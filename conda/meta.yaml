@@ -1,0 +1,59 @@
+
+{% set version = environ.get('GIT_DESCRIBE_TAG').lstrip('v') %}
+{% set number = GIT_DESCRIBE_NUMBER %}
+
+package:
+  name: flare-pkg
+  version: {{ version }}
+
+build:
+  number: {{ number }}
+
+about:
+  home: https://github.com/gottingen/flare
+  license: Apache License 2
+  license_family: APACHE
+  license_file: LICENSE
+  summary: A library for c++ based libraries and rpc libraries
+
+source:
+  git_url: ../
+
+outputs:
+  - name: flare
+    script: bld.sh   # [not win]
+    script: bld.bat  # [win]
+    build:
+      string: "h{{ GIT_DESCRIBE_HASH }}_{{ number }}"
+      run_exports:
+        - {{ pin_compatible('flare', exact=True) }}
+    requirements:
+      build:
+        - clang # [osx]
+        - clangxx #   [osx]
+        - gcc =8.5 # [linux]
+        - gxx =8.5 # [linux]
+        - sysroot_linux-64=2.17 # [linux]
+        - make
+        - openssl =1.1.1
+        - gflags >=2.2.2
+        - protobuf >=3.9.2, <=3.19.1
+      host:
+        - zlib
+        - sysroot_linux-64=2.17 # [linux]
+        - openssl =1.1.1
+        - gflags >=2.2.2
+        - protobuf >=3.9.2, <=3.19.1
+      run:
+        #- __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.15") }}  # [osx and x86_64]
+        - zlib
+        - sysroot_linux-64=2.17 # [linux]
+        - openssl =1.1.1
+        - gflags >=2.2.2
+        - protobuf >=3.9.2, <=3.19.1
+    test:
+      commands:
+        - test -f $PREFIX/lib/libflare.so              # [linux]
+        - test -f $PREFIX/lib/libflare.dylib           # [osx]
+      #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
+      #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]
