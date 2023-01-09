@@ -5,7 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-
+#include "testing/sstream_workaround.h"
 #include <iostream>
 #include "flare/container/bounded_queue.h"
 #include "testing/gtest_wrap.h"

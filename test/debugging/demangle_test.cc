@@ -4,8 +4,9 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/debugging/internal/demangle.h"
 
+#include "testing/sstream_workaround.h"
+#include "flare/debugging/internal/demangle.h"
 #include <cstdlib>
 #include <string>
 

@@ -5,6 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
+#include "testing/sstream_workaround.h"
 #include "flare/metrics/counter.h"
 #include "flare/metrics/prometheus_dumper.h"
 #include <thread>

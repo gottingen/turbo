@@ -4,8 +4,9 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/strings/internal/char_map.h"
 
+#include "testing/sstream_workaround.h"
+#include "flare/strings/internal/char_map.h"
 #include <cctype>
 #include <string>
 #include <vector>

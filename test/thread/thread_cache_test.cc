@@ -5,8 +5,8 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
+#include "testing/sstream_workaround.h"
 #include "flare/thread/thread_cache.h"
-
 #include <string>
 #include <thread>
 #include <vector>

@@ -6,7 +6,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-
+#include "testing/sstream_workaround.h"
 #include "flare/rapidjson/robust_json.h"
 
 #include "testing/gtest_wrap.h"

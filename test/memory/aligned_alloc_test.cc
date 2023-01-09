@@ -9,6 +9,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "testing/sstream_workaround.h"
 #include "flare/memory/aligned_memory.h"
 #include "flare/memory/scoped_ptr.h"
 #include "testing/gtest_wrap.h"

@@ -8,6 +8,7 @@
 #ifndef TEST_TESTING_FILESYSTEM_TEST_UTIL_H_
 #define TEST_TESTING_FILESYSTEM_TEST_UTIL_H_
 
+#include "testing/sstream_workaround.h"
 #include <flare/base/profile.h>
 #include <algorithm>
 #include <cstdio>

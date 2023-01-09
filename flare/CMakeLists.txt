@@ -97,7 +97,6 @@ set(FLARE_SRC
 #                  PUBLIC
 #                  SHARED
 
-link_directories($ENV{CONDA_PREFIX}/lib)
 carbin_cc_library(
         NAMESPACE flare
         NAME flare

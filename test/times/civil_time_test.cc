@@ -5,8 +5,8 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
+#include "testing/sstream_workaround.h"
 #include "flare/times/internal/chrono_time_internal.h"
-
 #include <iomanip>
 #include <limits>
 #include <sstream>

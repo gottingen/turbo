@@ -5,6 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
+#include "testing/sstream_workaround.h"
 #include "testing/gtest_wrap.h"
 #include <limits>                           //std::numeric_limits
 #include "flare/metrics/detail/sampler.h"

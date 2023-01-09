@@ -18,6 +18,7 @@
 // Date: 2015/08/27 17:12:38
 
 #include "testing/gtest_wrap.h"
+#include "testing/sstream_workaround.h"
 #include "flare/metrics/gauge.h"
 #include <gflags/gflags.h>
 #include <cstdlib>

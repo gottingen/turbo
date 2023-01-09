@@ -5,6 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
+#include "testing/sstream_workaround.h"
 #include "flare/metrics/histogram.h"
 #include "flare/metrics/prometheus_dumper.h"
 #include "flare/base/fast_rand.h"

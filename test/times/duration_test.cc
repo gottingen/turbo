@@ -5,6 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
+#include "testing/sstream_workaround.h"
 #if defined(_MSC_VER)
 #include <winsock2.h>  // for timeval
 #endif

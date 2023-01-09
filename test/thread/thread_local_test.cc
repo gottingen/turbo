@@ -5,6 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
+#include "testing/sstream_workaround.h"
 #include "flare/thread/thread_local.h"
 
 #include <dlfcn.h>

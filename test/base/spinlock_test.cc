@@ -6,7 +6,7 @@
  *****************************************************************/
 
 
-
+#include "testing/sstream_workaround.h"
 #include "flare/thread/spinlock.h"
 #include <thread>
 #include "flare/thread/latch.h"

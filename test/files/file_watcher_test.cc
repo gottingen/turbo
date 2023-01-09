@@ -4,7 +4,7 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-
+#include "testing/sstream_workaround.h"
 #include "testing/gtest_wrap.h"
 #include "flare/files/file_watcher.h"
 #include "flare/log/logging.h"

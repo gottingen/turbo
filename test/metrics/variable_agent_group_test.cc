@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include "testing/sstream_workaround.h"
 #include "testing/gtest_wrap.h"
 
 #include <pthread.h>                                // pthread_*

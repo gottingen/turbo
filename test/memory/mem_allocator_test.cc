@@ -1,4 +1,5 @@
 
+#include "testing/sstream_workaround.h"
 #include "flare/memory/allocator.h"
 
 #include "testing/gtest_wrap.h"

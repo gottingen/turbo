@@ -5,6 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 #include "testing/time_util.h"
+#include "testing/sstream_workaround.h"
 #include <algorithm>
 #include <cstddef>
 #include <cstring>

@@ -4,8 +4,9 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/strings/str_split.h"
 
+#include "testing/sstream_workaround.h"
+#include "flare/strings/str_split.h"
 #include <deque>
 #include <initializer_list>
 #include <list>
