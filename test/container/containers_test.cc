@@ -7,7 +7,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/container/containers.h"
+#include "turbo/container/containers.h"
 #include "testing/gtest_wrap.h"
 #include "testing/test_help.h"
 #include <cstddef>
@@ -17,12 +17,12 @@ class ContainersVectorTest : public with_tracked_allocator {
 };
 
 TEST_F(ContainersVectorTest, Empty) {
-    flare::containers::vector<std::string, 4> vector(allocator);
+    turbo::containers::vector<std::string, 4> vector(allocator);
     ASSERT_EQ(vector.size(), size_t(0));
 }
 
 TEST_F(ContainersVectorTest, WithinFixedCapIndex) {
-    flare::containers::vector<std::string, 4> vector(allocator);
+    turbo::containers::vector<std::string, 4> vector(allocator);
     vector.resize(4);
     vector[0] = "A";
     vector[1] = "B";
@@ -36,7 +36,7 @@ TEST_F(ContainersVectorTest, WithinFixedCapIndex) {
 }
 
 TEST_F(ContainersVectorTest, BeyondFixedCapIndex) {
-    flare::containers::vector<std::string, 1> vector(allocator);
+    turbo::containers::vector<std::string, 1> vector(allocator);
     vector.resize(4);
     vector[0] = "A";
     vector[1] = "B";
@@ -50,7 +50,7 @@ TEST_F(ContainersVectorTest, BeyondFixedCapIndex) {
 }
 
 TEST_F(ContainersVectorTest, WithinFixedCapPushPop) {
-    flare::containers::vector<std::string, 4> vector(allocator);
+    turbo::containers::vector<std::string, 4> vector(allocator);
     vector.push_back("A");
     vector.push_back("B");
     vector.push_back("C");
@@ -84,7 +84,7 @@ TEST_F(ContainersVectorTest, WithinFixedCapPushPop) {
 }
 
 TEST_F(ContainersVectorTest, BeyondFixedCapPushPop) {
-    flare::containers::vector<std::string, 2> vector(allocator);
+    turbo::containers::vector<std::string, 2> vector(allocator);
     vector.push_back("A");
     vector.push_back("B");
     vector.push_back("C");
@@ -118,14 +118,14 @@ TEST_F(ContainersVectorTest, BeyondFixedCapPushPop) {
 }
 
 TEST_F(ContainersVectorTest, CopyConstruct) {
-    flare::containers::vector<std::string, 4> vectorA(allocator);
+    turbo::containers::vector<std::string, 4> vectorA(allocator);
 
     vectorA.resize(3);
     vectorA[0] = "A";
     vectorA[1] = "B";
     vectorA[2] = "C";
 
-    flare::containers::vector<std::string, 4> vectorB(vectorA, allocator);
+    turbo::containers::vector<std::string, 4> vectorB(vectorA, allocator);
     ASSERT_EQ(vectorB.size(), size_t(3));
     ASSERT_EQ(vectorB[0], "A");
     ASSERT_EQ(vectorB[1], "B");
@@ -133,14 +133,14 @@ TEST_F(ContainersVectorTest, CopyConstruct) {
 }
 
 TEST_F(ContainersVectorTest, CopyConstructDifferentBaseCapacity) {
-    flare::containers::vector<std::string, 4> vectorA(allocator);
+    turbo::containers::vector<std::string, 4> vectorA(allocator);
 
     vectorA.resize(3);
     vectorA[0] = "A";
     vectorA[1] = "B";
     vectorA[2] = "C";
 
-    flare::containers::vector<std::string, 2> vectorB(vectorA, allocator);
+    turbo::containers::vector<std::string, 2> vectorB(vectorA, allocator);
     ASSERT_EQ(vectorB.size(), size_t(3));
     ASSERT_EQ(vectorB[0], "A");
     ASSERT_EQ(vectorB[1], "B");
@@ -148,14 +148,14 @@ TEST_F(ContainersVectorTest, CopyConstructDifferentBaseCapacity) {
 }
 
 TEST_F(ContainersVectorTest, CopyAssignment) {
-    flare::containers::vector<std::string, 4> vectorA(allocator);
+    turbo::containers::vector<std::string, 4> vectorA(allocator);
 
     vectorA.resize(3);
     vectorA[0] = "A";
     vectorA[1] = "B";
     vectorA[2] = "C";
 
-    flare::containers::vector<std::string, 4> vectorB(allocator);
+    turbo::containers::vector<std::string, 4> vectorB(allocator);
     vectorB = vectorA;
     ASSERT_EQ(vectorB.size(), size_t(3));
     ASSERT_EQ(vectorB[0], "A");
@@ -164,14 +164,14 @@ TEST_F(ContainersVectorTest, CopyAssignment) {
 }
 
 TEST_F(ContainersVectorTest, CopyAssignmentDifferentBaseCapacity) {
-    flare::containers::vector<std::string, 4> vectorA(allocator);
+    turbo::containers::vector<std::string, 4> vectorA(allocator);
 
     vectorA.resize(3);
     vectorA[0] = "A";
     vectorA[1] = "B";
     vectorA[2] = "C";
 
-    flare::containers::vector<std::string, 2> vectorB(allocator);
+    turbo::containers::vector<std::string, 2> vectorB(allocator);
     vectorB = vectorA;
     ASSERT_EQ(vectorB.size(), size_t(3));
     ASSERT_EQ(vectorB[0], "A");
@@ -180,14 +180,14 @@ TEST_F(ContainersVectorTest, CopyAssignmentDifferentBaseCapacity) {
 }
 
 TEST_F(ContainersVectorTest, MoveConstruct) {
-    flare::containers::vector<std::string, 4> vectorA(allocator);
+    turbo::containers::vector<std::string, 4> vectorA(allocator);
 
     vectorA.resize(3);
     vectorA[0] = "A";
     vectorA[1] = "B";
     vectorA[2] = "C";
 
-    flare::containers::vector<std::string, 2> vectorB(std::move(vectorA),
+    turbo::containers::vector<std::string, 2> vectorB(std::move(vectorA),
                                                       allocator);
     ASSERT_EQ(vectorB.size(), size_t(3));
     ASSERT_EQ(vectorB[0], "A");
@@ -196,8 +196,8 @@ TEST_F(ContainersVectorTest, MoveConstruct) {
 }
 
 TEST_F(ContainersVectorTest, Copy) {
-    flare::containers::vector<std::string, 4> vectorA(allocator);
-    flare::containers::vector<std::string, 2> vectorB(allocator);
+    turbo::containers::vector<std::string, 4> vectorA(allocator);
+    turbo::containers::vector<std::string, 2> vectorB(allocator);
 
     vectorA.resize(3);
     vectorA[0] = "A";
@@ -215,8 +215,8 @@ TEST_F(ContainersVectorTest, Copy) {
 }
 
 TEST_F(ContainersVectorTest, Move) {
-    flare::containers::vector<std::string, 4> vectorA(allocator);
-    flare::containers::vector<std::string, 2> vectorB(allocator);
+    turbo::containers::vector<std::string, 4> vectorA(allocator);
+    turbo::containers::vector<std::string, 2> vectorB(allocator);
 
     vectorA.resize(3);
     vectorA[0] = "A";
@@ -238,12 +238,12 @@ class ContainersListTest : public with_tracked_allocator {
 };
 
 TEST_F(ContainersListTest, Empty) {
-    flare::containers::list<std::string> list(allocator);
+    turbo::containers::list<std::string> list(allocator);
     ASSERT_EQ(list.size(), size_t(0));
 }
 
 TEST_F(ContainersListTest, EmplaceOne) {
-    flare::containers::list<std::string> list(allocator);
+    turbo::containers::list<std::string> list(allocator);
     auto itEntry = list.emplace_front("hello world");
     ASSERT_EQ(*itEntry, "hello world");
     ASSERT_EQ(list.size(), size_t(1));
@@ -254,7 +254,7 @@ TEST_F(ContainersListTest, EmplaceOne) {
 }
 
 TEST_F(ContainersListTest, EmplaceThree) {
-    flare::containers::list<std::string> list(allocator);
+    turbo::containers::list<std::string> list(allocator);
     auto itA = list.emplace_front("a");
     auto itB = list.emplace_front("b");
     auto itC = list.emplace_front("c");
@@ -273,7 +273,7 @@ TEST_F(ContainersListTest, EmplaceThree) {
 }
 
 TEST_F(ContainersListTest, EraseFront) {
-    flare::containers::list<std::string> list(allocator);
+    turbo::containers::list<std::string> list(allocator);
     auto itA = list.emplace_front("a");
     auto itB = list.emplace_front("b");
     auto itC = list.emplace_front("c");
@@ -288,7 +288,7 @@ TEST_F(ContainersListTest, EraseFront) {
 }
 
 TEST_F(ContainersListTest, EraseBack) {
-    flare::containers::list<std::string> list(allocator);
+    turbo::containers::list<std::string> list(allocator);
     auto itA = list.emplace_front("a");
     auto itB = list.emplace_front("b");
     auto itC = list.emplace_front("c");
@@ -303,7 +303,7 @@ TEST_F(ContainersListTest, EraseBack) {
 }
 
 TEST_F(ContainersListTest, EraseMid) {
-    flare::containers::list<std::string> list(allocator);
+    turbo::containers::list<std::string> list(allocator);
     auto itA = list.emplace_front("a");
     auto itB = list.emplace_front("b");
     auto itC = list.emplace_front("c");
@@ -318,7 +318,7 @@ TEST_F(ContainersListTest, EraseMid) {
 }
 
 TEST_F(ContainersListTest, Grow) {
-    flare::containers::list<std::string> list(allocator);
+    turbo::containers::list<std::string> list(allocator);
     for (int i = 0; i < 256; i++) {
         list.emplace_front(std::to_string(i));
     }

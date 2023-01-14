@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace hash_testing_internal {
 
@@ -85,16 +85,16 @@ namespace flare {
         };
 
         struct StatefulTestingHash
-                : flare::priv::hash_testing_internal::WithId<
+                : turbo::priv::hash_testing_internal::WithId<
                         StatefulTestingHash> {
             template<class T>
             size_t operator()(const T &t) const {
-                return flare::hash<T>{}(t);
+                return turbo::hash<T>{}(t);
             }
         };
 
         struct StatefulTestingEqual
-                : flare::priv::hash_testing_internal::WithId<
+                : turbo::priv::hash_testing_internal::WithId<
                         StatefulTestingEqual> {
             template<class T, class U>
             bool operator()(const T &t, const U &u) const {
@@ -155,20 +155,20 @@ namespace flare {
         }
 
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 namespace std {
     // inject specialization of std::hash for NonStandardLayout into namespace std
     // ----------------------------------------------------------------
     template<>
-    struct hash<flare::priv::NonStandardLayout> {
-        std::size_t operator()(flare::priv::NonStandardLayout const &p) const {
+    struct hash<turbo::priv::NonStandardLayout> {
+        std::size_t operator()(turbo::priv::NonStandardLayout const &p) const {
             return std::hash<std::string>()(p.value);
         }
     };
 }
 
-// FLARE_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS is false for glibcxx versions
+// TURBO_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS is false for glibcxx versions
 // where the unordered containers are missing certain constructors that
 // take allocator arguments. This test is defined ad-hoc for the platforms
 // we care about (notably Crosstool 17) because libstdcxx's useless
@@ -178,9 +178,9 @@ namespace std {
 // meet the allocator-aware container requirements;"
 #if (defined(__GLIBCXX__) && __GLIBCXX__ <= 20140425) || \
 (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
-#define FLARE_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS 0
+#define TURBO_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS 0
 #else
-#define FLARE_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS 1
+#define TURBO_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS 1
 #endif
 
 #endif  // HASH_POLICY_TESTING_H_

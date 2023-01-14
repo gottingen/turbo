@@ -17,10 +17,10 @@
 
 #include "testing/gtest_wrap.h"
 #include <gflags/gflags.h>
-#include "flare/fiber/internal/sys_futex.h"
-#include "flare/fiber/internal/timer_thread.h"
-#include "flare/fiber/internal/fiber.h"
-#include "flare/log/logging.h"
+#include "turbo/fiber/internal/sys_futex.h"
+#include "turbo/fiber/internal/timer_thread.h"
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/log/logging.h"
 
 namespace {
 
@@ -42,7 +42,7 @@ namespace {
                    int sleep_ms)
                 : _expect_run_time(run_time), _name(name), _sleep_ms(sleep_ms) {}
 
-        void schedule(flare::fiber_internal::TimerThread *timer_thread) {
+        void schedule(turbo::fiber_internal::TimerThread *timer_thread) {
             _task_id = timer_thread->schedule(
                     TimeKeeper::routine, this, _expect_run_time);
         }
@@ -51,24 +51,24 @@ namespace {
             timespec current_time;
             clock_gettime(CLOCK_REALTIME, &current_time);
             if (_name) {
-                FLARE_LOG(INFO) << "Run `" << _name << "' task_id=" << _task_id;
+                TURBO_LOG(INFO) << "Run `" << _name << "' task_id=" << _task_id;
             } else {
-                FLARE_LOG(INFO) << "Run task_id=" << _task_id;
+                TURBO_LOG(INFO) << "Run task_id=" << _task_id;
             }
             _run_times.push_back(current_time);
             const int saved_sleep_ms = _sleep_ms;
             if (saved_sleep_ms > 0) {
-                timespec timeout = flare::time_point::from_unix_millis(saved_sleep_ms).to_timespec();
-                flare::fiber_internal::futex_wait_private(&_sleep_ms, saved_sleep_ms, &timeout);
+                timespec timeout = turbo::time_point::from_unix_millis(saved_sleep_ms).to_timespec();
+                turbo::fiber_internal::futex_wait_private(&_sleep_ms, saved_sleep_ms, &timeout);
             }
         }
 
         void wakeup() {
             if (_sleep_ms != 0) {
                 _sleep_ms = 0;
-                flare::fiber_internal::futex_wake_private(&_sleep_ms, 1);
+                turbo::fiber_internal::futex_wake_private(&_sleep_ms, 1);
             } else {
-                FLARE_LOG(ERROR) << "No need to wakeup "
+                TURBO_LOG(ERROR) << "No need to wakeup "
                            << (_name ? _name : "") << " task_id=" << _task_id;
             }
         }
@@ -94,7 +94,7 @@ namespace {
         }
 
         timespec _expect_run_time;
-        flare::fiber_internal::TimerThread::TaskId _task_id;
+        turbo::fiber_internal::TimerThread::TaskId _task_id;
 
     private:
         const char *_name;
@@ -103,21 +103,21 @@ namespace {
     };
 
     TEST(TimerThreadTest, RunTasks) {
-        flare::fiber_internal::TimerThread timer_thread;
+        turbo::fiber_internal::TimerThread timer_thread;
         ASSERT_EQ(0, timer_thread.start(nullptr));
 
-        timespec _2s_later = flare::time_point::future_unix_seconds(2).to_timespec();
+        timespec _2s_later = turbo::time_point::future_unix_seconds(2).to_timespec();
         TimeKeeper keeper1(_2s_later, "keeper1");
         keeper1.schedule(&timer_thread);
 
         TimeKeeper keeper2(_2s_later, "keeper2");  // same time with keeper1
         keeper2.schedule(&timer_thread);
 
-        timespec _1s_later = flare::time_point::future_unix_seconds(1).to_timespec();
+        timespec _1s_later = turbo::time_point::future_unix_seconds(1).to_timespec();
         TimeKeeper keeper3(_1s_later, "keeper3");
         keeper3.schedule(&timer_thread);
 
-        timespec _10s_later = flare::time_point::future_unix_seconds(10).to_timespec();
+        timespec _10s_later = turbo::time_point::future_unix_seconds(10).to_timespec();
         TimeKeeper keeper4(_10s_later, "keeper4");
         keeper4.schedule(&timer_thread);
 
@@ -125,7 +125,7 @@ namespace {
         keeper5.schedule(&timer_thread);
 
         // sleep 1 second, and unschedule task2
-        FLARE_LOG(INFO) << "Sleep 1s";
+        TURBO_LOG(INFO) << "Sleep 1s";
         sleep(1);
         timer_thread.unschedule(keeper2._task_id);
         timer_thread.unschedule(keeper4._task_id);
@@ -133,13 +133,13 @@ namespace {
         timespec old_time = {0, 0};
         TimeKeeper keeper6(old_time, "keeper6");
         keeper6.schedule(&timer_thread);
-        const timespec keeper6_addtime = flare::time_point::future_unix_seconds(0).to_timespec();
+        const timespec keeper6_addtime = turbo::time_point::future_unix_seconds(0).to_timespec();
 
         // sleep 10 seconds and stop.
-        FLARE_LOG(INFO) << "Sleep 2s";
+        TURBO_LOG(INFO) << "Sleep 2s";
         sleep(2);
-        FLARE_LOG(INFO) << "Stop timer_thread";
-        flare::stop_watcher tm;
+        TURBO_LOG(INFO) << "Stop timer_thread";
+        turbo::stop_watcher tm;
         tm.start();
         timer_thread.stop_and_join();
         tm.stop();
@@ -157,15 +157,15 @@ namespace {
 // If the scheduled time is before start time, then should run it
 // immediately.
     TEST(TimerThreadTest, start_after_schedule) {
-        flare::fiber_internal::TimerThread timer_thread;
+        turbo::fiber_internal::TimerThread timer_thread;
         timespec past_time = {0, 0};
         TimeKeeper keeper(past_time, "keeper1");
         keeper.schedule(&timer_thread);
-        ASSERT_EQ(flare::fiber_internal::TimerThread::INVALID_TASK_ID, keeper._task_id);
+        ASSERT_EQ(turbo::fiber_internal::TimerThread::INVALID_TASK_ID, keeper._task_id);
         ASSERT_EQ(0, timer_thread.start(nullptr));
         keeper.schedule(&timer_thread);
-        ASSERT_NE(flare::fiber_internal::TimerThread::INVALID_TASK_ID, keeper._task_id);
-        timespec current_time =flare::time_point::future_unix_seconds(0).to_timespec();
+        ASSERT_NE(turbo::fiber_internal::TimerThread::INVALID_TASK_ID, keeper._task_id);
+        timespec current_time =turbo::time_point::future_unix_seconds(0).to_timespec();
         sleep(1);  // make sure timer thread start and run
         timer_thread.stop_and_join();
         keeper.expect_first_run(current_time);
@@ -173,7 +173,7 @@ namespace {
 
     class TestTask {
     public:
-        TestTask(flare::fiber_internal::TimerThread *timer_thread, TimeKeeper *keeper1,
+        TestTask(turbo::fiber_internal::TimerThread *timer_thread, TimeKeeper *keeper1,
                  TimeKeeper *keeper2, int expected_unschedule_result)
                 : _timer_thread(timer_thread), _keeper1(keeper1), _keeper2(keeper2),
                   _expected_unschedule_result(expected_unschedule_result) {
@@ -194,7 +194,7 @@ namespace {
         timespec _running_time;
 
     private:
-        flare::fiber_internal::TimerThread *_timer_thread;  // not owned.
+        turbo::fiber_internal::TimerThread *_timer_thread;  // not owned.
         TimeKeeper *_keeper1;  // not owned.
         TimeKeeper *_keeper2;  // not owned.
         int _expected_unschedule_result;
@@ -202,10 +202,10 @@ namespace {
 
 // Perform schedule and unschedule inside a running task
     TEST(TimerThreadTest, schedule_and_unschedule_in_task) {
-        flare::fiber_internal::TimerThread timer_thread;
+        turbo::fiber_internal::TimerThread timer_thread;
         timespec past_time = {0, 0};
         timespec future_time = {std::numeric_limits<int>::max(), 0};
-        const timespec _500ms_after = flare::time_point::future_unix_millis(500).to_timespec();
+        const timespec _500ms_after = turbo::time_point::future_unix_millis(500).to_timespec();
 
         TimeKeeper keeper1(future_time, "keeper1");
         TimeKeeper keeper2(past_time, "keeper2");
@@ -216,7 +216,7 @@ namespace {
         ASSERT_EQ(0, timer_thread.start(nullptr));
         keeper1.schedule(&timer_thread);  // start keeper1
         keeper3.schedule(&timer_thread);  // start keeper3
-        timespec keeper3_addtime = flare::time_point::future_unix_seconds(0).to_timespec();
+        timespec keeper3_addtime = turbo::time_point::future_unix_seconds(0).to_timespec();
         keeper5.schedule(&timer_thread);  // start keeper5
         sleep(1);  // let keeper1/3/5 run
 

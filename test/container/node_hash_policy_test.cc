@@ -7,12 +7,12 @@
 
 
 #include <memory>
-#include "flare/container/flat_hash_map.h"
+#include "turbo/container/flat_hash_map.h"
 
 
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
 
@@ -56,4 +56,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

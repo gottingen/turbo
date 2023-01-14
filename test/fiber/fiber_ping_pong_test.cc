@@ -22,13 +22,13 @@
 #include <signal.h>
 #include <gflags/gflags.h>
 #include "testing/gtest_wrap.h"
-#include "flare/base/compat.h"
-#include "flare/times/time.h"
-#include "flare/base/errno.h"
-#include <flare/fiber/internal/sys_futex.h>
-#include <flare/fiber/internal/waitable_event.h>
-#include "flare/fiber/internal/fiber.h"
-#include "flare/base/static_atomic.h"
+#include "turbo/base/compat.h"
+#include "turbo/times/time.h"
+#include "turbo/base/errno.h"
+#include <turbo/fiber/internal/sys_futex.h>
+#include <turbo/fiber/internal/waitable_event.h>
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/base/static_atomic.h"
 
 namespace {
 DEFINE_int32(thread_num, 1, "#pairs of threads doing ping pong");
@@ -36,18 +36,18 @@ DEFINE_bool(loop, false, "run until ctrl-C is pressed");
 DEFINE_bool(use_futex, false, "use futex instead of pipe");
 DEFINE_bool(use_butex, false, "use butex instead of pipe");
 
-void FLARE_ALLOW_UNUSED (*ignore_sigpipe)(int) = signal(SIGPIPE, SIG_IGN);
+void TURBO_ALLOW_UNUSED (*ignore_sigpipe)(int) = signal(SIGPIPE, SIG_IGN);
 
 volatile bool stop = false;
 void quit_handler(int) {
     stop = true;
 }
 
-struct FLARE_CACHELINE_ALIGNMENT AlignedIntWrapper {
+struct TURBO_CACHELINE_ALIGNMENT AlignedIntWrapper {
     int value;
 };
 
-struct FLARE_CACHELINE_ALIGNMENT PlayerArg {
+struct TURBO_CACHELINE_ALIGNMENT PlayerArg {
     int read_fd;
     int write_fd;
     int* wait_addr;
@@ -87,10 +87,10 @@ void* futex_player(void* void_arg) {
     PlayerArg* arg = static_cast<PlayerArg*>(void_arg);
     int counter = INITIAL_FUTEX_VALUE;
     while (!stop) {
-        int rc = flare::fiber_internal::futex_wait_private(arg->wait_addr, counter, nullptr);
+        int rc = turbo::fiber_internal::futex_wait_private(arg->wait_addr, counter, nullptr);
         ++counter;
         ++*arg->wake_addr;
-        flare::fiber_internal::futex_wake_private(arg->wake_addr, 1);
+        turbo::fiber_internal::futex_wake_private(arg->wake_addr, 1);
         ++arg->counter;
         arg->wakeup += (rc == 0);
     }
@@ -101,10 +101,10 @@ void* butex_player(void* void_arg) {
     PlayerArg* arg = static_cast<PlayerArg*>(void_arg);
     int counter = INITIAL_FUTEX_VALUE;
     while (!stop) {
-        int rc = flare::fiber_internal::waitable_event_wait(arg->wait_addr, counter, nullptr);
+        int rc = turbo::fiber_internal::waitable_event_wait(arg->wait_addr, counter, nullptr);
         ++counter;
         ++*arg->wake_addr;
-        flare::fiber_internal::waitable_event_wake(arg->wake_addr);
+        turbo::fiber_internal::waitable_event_wake(arg->wake_addr);
         ++arg->counter;
         arg->wakeup += (rc == 0);
     }
@@ -136,9 +136,9 @@ TEST(PingPongTest, ping_pong) {
             arg1->wait_addr = &w1->value;
             arg1->wake_addr = &w2->value;
         } else if (FLAGS_use_butex) {
-            arg1->wait_addr = flare::fiber_internal::waitable_event_create_checked<int>();
+            arg1->wait_addr = turbo::fiber_internal::waitable_event_create_checked<int>();
             *arg1->wait_addr = INITIAL_FUTEX_VALUE;
-            arg1->wake_addr = flare::fiber_internal::waitable_event_create_checked<int>();
+            arg1->wake_addr = turbo::fiber_internal::waitable_event_create_checked<int>();
             *arg1->wake_addr = INITIAL_FUTEX_VALUE;
         } else {
             ASSERT_TRUE(false);
@@ -179,10 +179,10 @@ TEST(PingPongTest, ping_pong) {
             ASSERT_EQ(1L, write(pipe1[1], &seed, 1));
         } else if (FLAGS_use_futex) {
             ++*arg1->wait_addr;
-            flare::fiber_internal::futex_wake_private(arg1->wait_addr, 1);
+            turbo::fiber_internal::futex_wake_private(arg1->wait_addr, 1);
         } else if (FLAGS_use_butex) {
             ++*arg1->wait_addr;
-            flare::fiber_internal::waitable_event_wake(arg1->wait_addr);
+            turbo::fiber_internal::waitable_event_wake(arg1->wait_addr);
         } else {
             ASSERT_TRUE(false);
         }
@@ -191,7 +191,7 @@ TEST(PingPongTest, ping_pong) {
     long last_counter = 0;
     long last_wakeup = 0;
     while (!stop) {
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         sleep(1);
         tm.stop();

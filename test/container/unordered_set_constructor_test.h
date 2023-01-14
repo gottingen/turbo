@@ -17,7 +17,7 @@
 #include "hash_generator_testing.h"
 #include "hash_policy_testing.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
 
         template<class UnordMap>
@@ -102,7 +102,7 @@ namespace flare {
 
         template<typename T>
         using expect_cxx14_apis =
-        flare::disjunction<flare::negation<is_std_unordered_set<T>>,
+        turbo::disjunction<turbo::negation<is_std_unordered_set<T>>,
                 has_cxx14_std_apis>;
 
         template<typename TypeParam>
@@ -144,7 +144,7 @@ namespace flare {
             BucketCountHashAllocTest<TypeParam>(expect_cxx14_apis<TypeParam>());
         }
 
-#if FLARE_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS
+#if TURBO_MAP_UNORDERED_SUPPORTS_ALLOC_CTORS
         using has_alloc_std_constructors = std::true_type;
 #else
         using has_alloc_std_constructors = std::false_type;
@@ -152,7 +152,7 @@ namespace flare {
 
         template<typename T>
         using expect_alloc_constructors =
-        flare::disjunction<flare::negation<is_std_unordered_set<T>>,
+        turbo::disjunction<turbo::negation<is_std_unordered_set<T>>,
                 has_alloc_std_constructors>;
 
         template<typename TypeParam>
@@ -484,6 +484,6 @@ namespace flare {
                 AssignmentFromInitializerListOverwritesExisting, AssignmentOnSelf);
 
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // UNORDERED_SET_CONSTRUCTOR_TEST_H_

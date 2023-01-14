@@ -7,12 +7,12 @@
 
 
 #include "testing/sstream_workaround.h"
-#include "flare/thread/spinlock.h"
+#include "turbo/thread/spinlock.h"
 #include <thread>
-#include "flare/thread/latch.h"
+#include "turbo/thread/latch.h"
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
 
 
     std::uint64_t counter{};
@@ -39,4 +39,4 @@ namespace flare {
         }
         ASSERT_EQ(T * N, counter);
     }
-}  // namespace flare
+}  // namespace turbo

@@ -6,8 +6,8 @@
  *****************************************************************/
 
 
-#ifndef FLARE_GTEST_WRAP_H
-#define FLARE_GTEST_WRAP_H
+#ifndef TURBO_GTEST_WRAP_H
+#define TURBO_GTEST_WRAP_H
 
 #ifdef private
 #undef private
@@ -19,4 +19,4 @@
 #include <gmock/gmock.h>
 #endif
 
-#endif //FLARE_GTEST_WRAP_H
+#endif //TURBO_GTEST_WRAP_H

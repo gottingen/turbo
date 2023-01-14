@@ -7,7 +7,7 @@
 
 #include "testing/sstream_workaround.h"
 #include <iostream>
-#include "flare/container/bounded_queue.h"
+#include "turbo/container/bounded_queue.h"
 #include "testing/gtest_wrap.h"
 
 namespace {
@@ -15,7 +15,7 @@ namespace {
     TEST(BoundedQueueTest, sanity) {
         const int N = 36;
         char storage[N * sizeof(int)];
-        flare::container::bounded_queue<int> q(storage, sizeof(storage), flare::container::NOT_OWN_STORAGE);
+        turbo::container::bounded_queue<int> q(storage, sizeof(storage), turbo::container::NOT_OWN_STORAGE);
         ASSERT_EQ(0ul, q.size());
         ASSERT_TRUE(q.empty());
         ASSERT_TRUE(nullptr == q.top());

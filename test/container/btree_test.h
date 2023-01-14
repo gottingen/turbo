@@ -28,11 +28,11 @@
 
 #include "testing/gtest_wrap.h"
 
-#include "flare/container/btree.h"
-#include "flare/container/flat_hash_map.h"
-#include "flare/container/flat_hash_set.h"
+#include "turbo/container/btree.h"
+#include "turbo/container/flat_hash_map.h"
+#include "turbo/container/flat_hash_set.h"
 
-namespace flare {
+namespace turbo {
 
     namespace test_internal {
 
@@ -115,12 +115,12 @@ namespace flare {
                 return value_ >= x.value_;
             }
 
-            flare::weak_ordering compare(const BaseCountedInstance &x) const {
+            turbo::weak_ordering compare(const BaseCountedInstance &x) const {
                 ++num_comparisons_;
                 return value_ < x.value_
-                       ? flare::weak_ordering::less
-                       : value_ == x.value_ ? flare::weak_ordering::equivalent
-                                            : flare::weak_ordering::greater;
+                       ? turbo::weak_ordering::less
+                       : value_ == x.value_ ? turbo::weak_ordering::equivalent
+                                            : turbo::weak_ordering::greater;
             }
 
             size_t value() const {
@@ -354,10 +354,10 @@ namespace flare {
 
 #if 0
         template <>
-        struct Generator<flare::Time> {
+        struct Generator<turbo::Time> {
             int maxval;
             explicit Generator(int m) : maxval(m) {}
-            flare::Time operator()(int i) const { return flare::FromUnixMillis(i); }
+            turbo::Time operator()(int i) const { return turbo::FromUnixMillis(i); }
         };
 #endif
 
@@ -393,7 +393,7 @@ namespace flare {
             std::minstd_rand0 rng(seed);
 
             std::vector<int> values;
-            flare::flat_hash_set<int> unique_values;
+            turbo::flat_hash_set<int> unique_values;
             if (values.size() < static_cast<size_t>(n)) {
                 for (size_t i = values.size(); i < (size_t) n; i++) {
                     int value;
@@ -481,6 +481,6 @@ namespace flare {
 
     }  // namespace priv
 
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // CONTAINER_BTREE_TEST_H_

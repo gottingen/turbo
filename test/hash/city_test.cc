@@ -4,13 +4,13 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/hash/internal/city.h"
+#include "turbo/hash/internal/city.h"
 #include <string.h>
 #include <cstdio>
 #include <iostream>
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
 
     namespace hash_internal {
 
@@ -583,4 +583,4 @@ namespace flare {
 
     }  // namespace hash_internal
 
-}  // namespace flare
+}  // namespace turbo

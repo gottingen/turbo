@@ -10,8 +10,8 @@
 // found in the LICENSE file.
 
 #include "testing/sstream_workaround.h"
-#include "flare/memory/aligned_memory.h"
-#include "flare/memory/scoped_ptr.h"
+#include "turbo/memory/aligned_memory.h"
+#include "turbo/memory/scoped_ptr.h"
 #include "testing/gtest_wrap.h"
 
 #define EXPECT_ALIGNED(ptr, align) \
@@ -19,7 +19,7 @@
 
 namespace {
 
-    using flare::aligned_memory;
+    using turbo::aligned_memory;
 
     TEST(aligned_memoryTest, StaticAlignment) {
         static aligned_memory<8, 8> raw8;
@@ -27,10 +27,10 @@ namespace {
         static aligned_memory<8, 256> raw256;
         static aligned_memory<8, 4096> raw4096;
 
-        EXPECT_EQ(8u, FLARE_ALIGN_OF(raw8));
-        EXPECT_EQ(16u, FLARE_ALIGN_OF(raw16));
-        EXPECT_EQ(256u, FLARE_ALIGN_OF(raw256));
-        EXPECT_EQ(4096u, FLARE_ALIGN_OF(raw4096));
+        EXPECT_EQ(8u, TURBO_ALIGN_OF(raw8));
+        EXPECT_EQ(16u, TURBO_ALIGN_OF(raw16));
+        EXPECT_EQ(256u, TURBO_ALIGN_OF(raw256));
+        EXPECT_EQ(4096u, TURBO_ALIGN_OF(raw4096));
 
         EXPECT_ALIGNED(raw8.void_data(), 8);
         EXPECT_ALIGNED(raw16.void_data(), 16);
@@ -40,7 +40,7 @@ namespace {
 
 // stack alignment is buggy before gcc 4.6
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=16660
-#if defined(FLARE_COMPILER_GNUC) &&                                    \
+#if defined(TURBO_COMPILER_GNUC) &&                                    \
     ( __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
 #define GOOD_GCC_STACK_ALIGNMENT
 #endif
@@ -50,9 +50,9 @@ namespace {
         aligned_memory<8, 16> raw16;
         aligned_memory<8, 128> raw128;
 
-        EXPECT_EQ(8u, FLARE_ALIGN_OF(raw8));
-        EXPECT_EQ(16u, FLARE_ALIGN_OF(raw16));
-        EXPECT_EQ(128u, FLARE_ALIGN_OF(raw128));
+        EXPECT_EQ(8u, TURBO_ALIGN_OF(raw8));
+        EXPECT_EQ(16u, TURBO_ALIGN_OF(raw16));
+        EXPECT_EQ(128u, TURBO_ALIGN_OF(raw128));
 
         EXPECT_ALIGNED(raw8.void_data(), 8);
         EXPECT_ALIGNED(raw16.void_data(), 16);
@@ -72,14 +72,14 @@ namespace {
 #if !(defined(OS_NACL) && defined(ARCH_CPU_X86_64)) &&  \
     defined(GOOD_GCC_STACK_ALIGNMENT)
   aligned_memory<8, 256> raw256;
-  EXPECT_EQ(256u, FLARE_ALIGN_OF(raw256));
+  EXPECT_EQ(256u, TURBO_ALIGN_OF(raw256));
   EXPECT_ALIGNED(raw256.void_data(), 256);
 
   // TODO(ios): This test hits an armv7 bug in clang. crbug.com/138066
 #if !(defined(OS_IOS) && defined(ARCH_CPU_ARM_FAMILY)) &&       \
     defined(GOOD_GCC_STACK_ALIGNMENT)
   aligned_memory<8, 4096> raw4096;
-  EXPECT_EQ(4096u, FLARE_ALIGN_OF(raw4096));
+  EXPECT_EQ(4096u, TURBO_ALIGN_OF(raw4096));
   EXPECT_ALIGNED(raw4096.void_data(), 4096);
 #endif  // !(defined(OS_IOS) && defined(ARCH_CPU_ARM_FAMILY))
 #endif  // !(defined(OS_NACL) && defined(ARCH_CPU_X86_64))
@@ -87,30 +87,30 @@ namespace {
     }
 
     TEST(aligned_memoryTest, DynamicAllocation) {
-        void* p = flare::aligned_alloc(8, 8);
+        void* p = turbo::aligned_alloc(8, 8);
         EXPECT_TRUE(p);
         EXPECT_ALIGNED(p, 8);
-        flare::aligned_free(p);
+        turbo::aligned_free(p);
 
-        p = flare::aligned_alloc(8, 16);
+        p = turbo::aligned_alloc(8, 16);
         EXPECT_TRUE(p);
         EXPECT_ALIGNED(p, 16);
-        flare::aligned_free(p);
+        turbo::aligned_free(p);
 
-        p = flare::aligned_alloc(8, 256);
+        p = turbo::aligned_alloc(8, 256);
         EXPECT_TRUE(p);
         EXPECT_ALIGNED(p, 256);
-        flare::aligned_free(p);
+        turbo::aligned_free(p);
 
-        p = flare::aligned_alloc(8, 4096);
+        p = turbo::aligned_alloc(8, 4096);
         EXPECT_TRUE(p);
         EXPECT_ALIGNED(p, 4096);
-        flare::aligned_free(p);
+        turbo::aligned_free(p);
     }
 
     TEST(aligned_memoryTest, ScopedDynamicAllocation) {
-        scoped_ptr<float, flare::aligned_free_deleter> p(
-                static_cast<float*>(flare::aligned_alloc(8, 8)));
+        scoped_ptr<float, turbo::aligned_free_deleter> p(
+                static_cast<float*>(turbo::aligned_alloc(8, 8)));
         EXPECT_TRUE(p.get());
         EXPECT_ALIGNED(p.get(), 8);
     }

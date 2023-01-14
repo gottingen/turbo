@@ -1,5 +1,5 @@
 package:
-  name: flare
+  name: turbo
   version: "0.2.0"
 
 source:
@@ -31,7 +31,7 @@ requirements:
     - leveldb =1.22
     - protobuf =3.12.4
 about:
-  home: https://github.com/flare-rpc/flare-cpp
+  home: https://github.com/turbo-rpc/turbo-cpp
   license: Apache License 2
   license_family: APACHE
   license_file: LICENSE

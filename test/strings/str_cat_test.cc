@@ -6,7 +6,7 @@
  *****************************************************************/
 // Unit tests for all str_cat.h functions
 
-#include "flare/strings/str_cat.h"
+#include "turbo/strings/str_cat.h"
 
 #include <cstdint>
 #include <string>
@@ -17,16 +17,16 @@
 #ifdef __ANDROID__
 // Android assert messages only go to system log, so death tests cannot inspect
 // the message for matching.
-#define FLARE_EXPECT_DEBUG_DEATH(statement, regex) \
+#define TURBO_EXPECT_DEBUG_DEATH(statement, regex) \
   EXPECT_DEBUG_DEATH(statement, ".*")
 #else
-#define FLARE_EXPECT_DEBUG_DEATH(statement, regex) \
+#define TURBO_EXPECT_DEBUG_DEATH(statement, regex) \
   EXPECT_DEBUG_DEATH(statement, regex)
 #endif
 
 namespace {
 
-// Test flare::string_cat of ints and longs of various sizes and signdedness.
+// Test turbo::string_cat of ints and longs of various sizes and signdedness.
     TEST(string_cat, Ints) {
         const short s = -1;  // NOLINT(runtime/int)
         const uint16_t us = 2;
@@ -41,19 +41,19 @@ namespace {
         const intptr_t intptr = -12;
         const uintptr_t uintptr = 13;
         std::string answer;
-        answer = flare::string_cat(s, us);
+        answer = turbo::string_cat(s, us);
         EXPECT_EQ(answer, "-12");
-        answer = flare::string_cat(i, ui);
+        answer = turbo::string_cat(i, ui);
         EXPECT_EQ(answer, "-34");
-        answer = flare::string_cat(l, ul);
+        answer = turbo::string_cat(l, ul);
         EXPECT_EQ(answer, "-56");
-        answer = flare::string_cat(ll, ull);
+        answer = turbo::string_cat(ll, ull);
         EXPECT_EQ(answer, "-78");
-        answer = flare::string_cat(ptrdiff, size);
+        answer = turbo::string_cat(ptrdiff, size);
         EXPECT_EQ(answer, "-910");
-        answer = flare::string_cat(ptrdiff, intptr);
+        answer = turbo::string_cat(ptrdiff, intptr);
         EXPECT_EQ(answer, "-9-12");
-        answer = flare::string_cat(uintptr, 0);
+        answer = turbo::string_cat(uintptr, 0);
         EXPECT_EQ(answer, "130");
     }
 
@@ -61,14 +61,14 @@ namespace {
         enum SmallNumbers {
             One = 1, Ten = 10
         } e = Ten;
-        EXPECT_EQ("10", flare::string_cat(e));
-        EXPECT_EQ("-5", flare::string_cat(SmallNumbers(-5)));
+        EXPECT_EQ("10", turbo::string_cat(e));
+        EXPECT_EQ("-5", turbo::string_cat(SmallNumbers(-5)));
 
         enum class Option {
             Boxers = 1, Briefs = -1
         };
 
-        EXPECT_EQ("-1", flare::string_cat(Option::Briefs));
+        EXPECT_EQ("-1", turbo::string_cat(Option::Briefs));
 
         enum class Airplane : uint64_t {
             Airbus = 1,
@@ -76,27 +76,27 @@ namespace {
             Canary = 10000000000  // too big for "int"
         };
 
-        EXPECT_EQ("10000000000", flare::string_cat(Airplane::Canary));
+        EXPECT_EQ("10000000000", turbo::string_cat(Airplane::Canary));
 
         enum class TwoGig : int32_t {
             TwoToTheZero = 1,
             TwoToTheSixteenth = 1 << 16,
             TwoToTheThirtyFirst = INT32_MIN
         };
-        EXPECT_EQ("65536", flare::string_cat(TwoGig::TwoToTheSixteenth));
-        EXPECT_EQ("-2147483648", flare::string_cat(TwoGig::TwoToTheThirtyFirst));
-        EXPECT_EQ("-1", flare::string_cat(static_cast<TwoGig>(-1)));
+        EXPECT_EQ("65536", turbo::string_cat(TwoGig::TwoToTheSixteenth));
+        EXPECT_EQ("-2147483648", turbo::string_cat(TwoGig::TwoToTheThirtyFirst));
+        EXPECT_EQ("-1", turbo::string_cat(static_cast<TwoGig>(-1)));
 
         enum class FourGig : uint32_t {
             TwoToTheZero = 1,
             TwoToTheSixteenth = 1 << 16,
             TwoToTheThirtyFirst = 1U << 31  // too big for "int"
         };
-        EXPECT_EQ("65536", flare::string_cat(FourGig::TwoToTheSixteenth));
-        EXPECT_EQ("2147483648", flare::string_cat(FourGig::TwoToTheThirtyFirst));
-        EXPECT_EQ("4294967295", flare::string_cat(static_cast<FourGig>(-1)));
+        EXPECT_EQ("65536", turbo::string_cat(FourGig::TwoToTheSixteenth));
+        EXPECT_EQ("2147483648", turbo::string_cat(FourGig::TwoToTheThirtyFirst));
+        EXPECT_EQ("4294967295", turbo::string_cat(static_cast<FourGig>(-1)));
 
-        EXPECT_EQ("10000000000", flare::string_cat(Airplane::Canary));
+        EXPECT_EQ("10000000000", turbo::string_cat(Airplane::Canary));
     }
 
     TEST(string_cat, Basics) {
@@ -121,71 +121,71 @@ namespace {
         int32_t i32s[] = {'H', 'C', 'W'};
         uint64_t ui64s[] = {12345678910LL, 10987654321LL};
 
-        EXPECT_EQ(flare::string_cat(), "");
+        EXPECT_EQ(turbo::string_cat(), "");
 
-        result = flare::string_cat(false, true, 2, 3);
+        result = turbo::string_cat(false, true, 2, 3);
         EXPECT_EQ(result, "0123");
 
-        result = flare::string_cat(-1);
+        result = turbo::string_cat(-1);
         EXPECT_EQ(result, "-1");
 
-        result = flare::string_cat(flare::SixDigits(0.5));
+        result = turbo::string_cat(turbo::SixDigits(0.5));
         EXPECT_EQ(result, "0.5");
 
-        result = flare::string_cat(strs[1], pieces[2]);
+        result = turbo::string_cat(strs[1], pieces[2]);
         EXPECT_EQ(result, "CruelWorld");
 
-        result = flare::string_cat(stdstrs[1], " ", stdstrs[2]);
+        result = turbo::string_cat(stdstrs[1], " ", stdstrs[2]);
         EXPECT_EQ(result, "std::Cruel std::World");
 
-        result = flare::string_cat(strs[0], ", ", pieces[2]);
+        result = turbo::string_cat(strs[0], ", ", pieces[2]);
         EXPECT_EQ(result, "Hello, World");
 
-        result = flare::string_cat(strs[0], ", ", strs[1], " ", strs[2], "!");
+        result = turbo::string_cat(strs[0], ", ", strs[1], " ", strs[2], "!");
         EXPECT_EQ(result, "Hello, Cruel World!");
 
-        result = flare::string_cat(pieces[0], ", ", pieces[1], " ", pieces[2]);
+        result = turbo::string_cat(pieces[0], ", ", pieces[1], " ", pieces[2]);
         EXPECT_EQ(result, "Hello, Cruel World");
 
-        result = flare::string_cat(c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
+        result = turbo::string_cat(c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
         EXPECT_EQ(result, "Hello, Cruel World");
 
-        result = flare::string_cat("ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
+        result = turbo::string_cat("ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
         EXPECT_EQ(result, "ASCII 72, 67 87!");
 
-        result = flare::string_cat(ui64s[0], ", ", ui64s[1], "!");
+        result = turbo::string_cat(ui64s[0], ", ", ui64s[1], "!");
         EXPECT_EQ(result, "12345678910, 10987654321!");
 
         std::string one =
                 "1";  // Actually, it's the size of this std::string that we want; a
         // 64-bit build distinguishes between size_t and uint64_t,
         // even though they're both unsigned 64-bit values.
-        result = flare::string_cat("And a ", one.size(), " and a ",
+        result = turbo::string_cat("And a ", one.size(), " and a ",
                                   &result[2] - &result[0], " and a ", one, " 2 3 4", "!");
         EXPECT_EQ(result, "And a 1 and a 2 and a 1 2 3 4!");
 
-        // result = flare::string_cat("Single chars won't compile", '!');
-        // result = flare::string_cat("Neither will nullptrs", nullptr);
+        // result = turbo::string_cat("Single chars won't compile", '!');
+        // result = turbo::string_cat("Neither will nullptrs", nullptr);
         result =
-                flare::string_cat("To output a char by ASCII/numeric value, use +: ", '!' + 0);
+                turbo::string_cat("To output a char by ASCII/numeric value, use +: ", '!' + 0);
         EXPECT_EQ(result, "To output a char by ASCII/numeric value, use +: 33");
 
         float f = 100000.5;
-        result = flare::string_cat("A hundred K and a half is ", flare::SixDigits(f));
+        result = turbo::string_cat("A hundred K and a half is ", turbo::SixDigits(f));
         EXPECT_EQ(result, "A hundred K and a half is 100000");
 
         f = 100001.5;
         result =
-                flare::string_cat("A hundred K and one and a half is ", flare::SixDigits(f));
+                turbo::string_cat("A hundred K and one and a half is ", turbo::SixDigits(f));
         EXPECT_EQ(result, "A hundred K and one and a half is 100002");
 
         double d = 100000.5;
         d *= d;
         result =
-                flare::string_cat("A hundred K and a half squared is ", flare::SixDigits(d));
+                turbo::string_cat("A hundred K and a half squared is ", turbo::SixDigits(d));
         EXPECT_EQ(result, "A hundred K and a half squared is 1.00001e+10");
 
-        result = flare::string_cat(1, 2, 333, 4444, 55555, 666666, 7777777, 88888888,
+        result = turbo::string_cat(1, 2, 333, 4444, 55555, 666666, 7777777, 88888888,
                                   999999999);
         EXPECT_EQ(result, "12333444455555666666777777788888888999999999");
     }
@@ -193,15 +193,15 @@ namespace {
     TEST(string_cat, CornerCases) {
         std::string result;
 
-        result = flare::string_cat("");  // NOLINT
+        result = turbo::string_cat("");  // NOLINT
         EXPECT_EQ(result, "");
-        result = flare::string_cat("", "");
+        result = turbo::string_cat("", "");
         EXPECT_EQ(result, "");
-        result = flare::string_cat("", "", "");
+        result = turbo::string_cat("", "", "");
         EXPECT_EQ(result, "");
-        result = flare::string_cat("", "", "", "");
+        result = turbo::string_cat("", "", "", "");
         EXPECT_EQ(result, "");
-        result = flare::string_cat("", "", "", "", "");
+        result = turbo::string_cat("", "", "", "", "");
         EXPECT_EQ(result, "");
     }
 
@@ -252,7 +252,7 @@ namespace {
 
         const mstring str2("Read this book about coffee tables");
 
-        std::string result = flare::string_cat(str1, str2);
+        std::string result = turbo::string_cat(str1, str2);
         EXPECT_EQ(result,
                   "PARACHUTE OFF A BLIMP INTO MOSCONE!!"
                   "Read this book about coffee tables");
@@ -261,54 +261,54 @@ namespace {
     TEST(string_cat, MaxArgs) {
         std::string result;
         // Test 10 up to 26 arguments, the old maximum
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a");
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a");
         EXPECT_EQ(result, "123456789a");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b");
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b");
         EXPECT_EQ(result, "123456789ab");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c");
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c");
         EXPECT_EQ(result, "123456789abc");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d");
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d");
         EXPECT_EQ(result, "123456789abcd");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e");
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e");
         EXPECT_EQ(result, "123456789abcde");
         result =
-                flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f");
+                turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f");
         EXPECT_EQ(result, "123456789abcdef");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g");
         EXPECT_EQ(result, "123456789abcdefg");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h");
         EXPECT_EQ(result, "123456789abcdefgh");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i");
         EXPECT_EQ(result, "123456789abcdefghi");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j");
         EXPECT_EQ(result, "123456789abcdefghij");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j", "k");
         EXPECT_EQ(result, "123456789abcdefghijk");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j", "k", "l");
         EXPECT_EQ(result, "123456789abcdefghijkl");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j", "k", "l", "m");
         EXPECT_EQ(result, "123456789abcdefghijklm");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j", "k", "l", "m", "n");
         EXPECT_EQ(result, "123456789abcdefghijklmn");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j", "k", "l", "m", "n", "o");
         EXPECT_EQ(result, "123456789abcdefghijklmno");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j", "k", "l", "m", "n", "o", "p");
         EXPECT_EQ(result, "123456789abcdefghijklmnop");
-        result = flare::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+        result = turbo::string_cat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                                   "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q");
         EXPECT_EQ(result, "123456789abcdefghijklmnopq");
         // No limit thanks to C++11's variadic templates
-        result = flare::string_cat(
+        result = turbo::string_cat(
                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "a", "b", "c", "d", "e", "f", "g", "h",
                 "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w",
                 "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
@@ -340,39 +340,39 @@ namespace {
         uint64_t ui64s[] = {12345678910LL, 10987654321LL};
 
         std::string::size_type old_size = result.size();
-        flare::string_append(&result);
+        turbo::string_append(&result);
         EXPECT_EQ(result.size(), old_size);
 
         old_size = result.size();
-        flare::string_append(&result, strs[0]);
+        turbo::string_append(&result, strs[0]);
         EXPECT_EQ(result.substr(old_size), "Hello");
 
         old_size = result.size();
-        flare::string_append(&result, strs[1], pieces[2]);
+        turbo::string_append(&result, strs[1], pieces[2]);
         EXPECT_EQ(result.substr(old_size), "CruelWorld");
 
         old_size = result.size();
-        flare::string_append(&result, stdstrs[0], ", ", pieces[2]);
+        turbo::string_append(&result, stdstrs[0], ", ", pieces[2]);
         EXPECT_EQ(result.substr(old_size), "std::Hello, World");
 
         old_size = result.size();
-        flare::string_append(&result, strs[0], ", ", stdstrs[1], " ", strs[2], "!");
+        turbo::string_append(&result, strs[0], ", ", stdstrs[1], " ", strs[2], "!");
         EXPECT_EQ(result.substr(old_size), "Hello, std::Cruel World!");
 
         old_size = result.size();
-        flare::string_append(&result, pieces[0], ", ", pieces[1], " ", pieces[2]);
+        turbo::string_append(&result, pieces[0], ", ", pieces[1], " ", pieces[2]);
         EXPECT_EQ(result.substr(old_size), "Hello, Cruel World");
 
         old_size = result.size();
-        flare::string_append(&result, c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
+        turbo::string_append(&result, c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
         EXPECT_EQ(result.substr(old_size), "Hello, Cruel World");
 
         old_size = result.size();
-        flare::string_append(&result, "ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
+        turbo::string_append(&result, "ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
         EXPECT_EQ(result.substr(old_size), "ASCII 72, 67 87!");
 
         old_size = result.size();
-        flare::string_append(&result, ui64s[0], ", ", ui64s[1], "!");
+        turbo::string_append(&result, ui64s[0], ", ", ui64s[1], "!");
         EXPECT_EQ(result.substr(old_size), "12345678910, 10987654321!");
 
         std::string one =
@@ -380,27 +380,27 @@ namespace {
         // 64-bit build distinguishes between size_t and uint64_t,
         // even though they're both unsigned 64-bit values.
         old_size = result.size();
-        flare::string_append(&result, "And a ", one.size(), " and a ",
+        turbo::string_append(&result, "And a ", one.size(), " and a ",
                             &result[2] - &result[0], " and a ", one, " 2 3 4", "!");
         EXPECT_EQ(result.substr(old_size), "And a 1 and a 2 and a 1 2 3 4!");
 
-        // result = flare::string_cat("Single chars won't compile", '!');
-        // result = flare::string_cat("Neither will nullptrs", nullptr);
+        // result = turbo::string_cat("Single chars won't compile", '!');
+        // result = turbo::string_cat("Neither will nullptrs", nullptr);
         old_size = result.size();
-        flare::string_append(&result,
+        turbo::string_append(&result,
                             "To output a char by ASCII/numeric value, use +: ", '!' + 0);
         EXPECT_EQ(result.substr(old_size),
                   "To output a char by ASCII/numeric value, use +: 33");
 
         // Test 9 arguments, the old maximum
         old_size = result.size();
-        flare::string_append(&result, 1, 22, 333, 4444, 55555, 666666, 7777777, 88888888,
+        turbo::string_append(&result, 1, 22, 333, 4444, 55555, 666666, 7777777, 88888888,
                             9);
         EXPECT_EQ(result.substr(old_size), "1223334444555556666667777777888888889");
 
         // No limit thanks to C++11's variadic templates
         old_size = result.size();
-        flare::string_append(
+        turbo::string_append(
                 &result, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,                           //
                 "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",  //
                 "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",  //
@@ -420,21 +420,21 @@ namespace {
         // Test that vector<bool>::reference and vector<bool>::const_reference
         // are handled as if the were really bool types and not the proxy types
         // they really are.
-        std::string result = flare::string_cat(v[0], v[1], cv[0], cv[1]); // NOLINT
+        std::string result = turbo::string_cat(v[0], v[1], cv[0], cv[1]); // NOLINT
         EXPECT_EQ(result, "1010");
     }
 
 // Passing nullptr to memcpy is undefined behavior and this test
 // provides coverage of codepaths that handle empty strings with nullptrs.
     TEST(string_cat, AvoidsMemcpyWithNullptr) {
-        EXPECT_EQ(flare::string_cat(42, std::string_view{}), "42");
+        EXPECT_EQ(turbo::string_cat(42, std::string_view{}), "42");
 
         // Cover CatPieces code.
-        EXPECT_EQ(flare::string_cat(1, 2, 3, 4, 5, std::string_view{}), "12345");
+        EXPECT_EQ(turbo::string_cat(1, 2, 3, 4, 5, std::string_view{}), "12345");
 
         // Cover append_pieces.
         std::string result;
-        flare::string_append(&result, 1, 2, 3, 4, 5, std::string_view{});
+        turbo::string_append(&result, 1, 2, 3, 4, 5, std::string_view{});
         EXPECT_EQ(result, "12345");
     }
 
@@ -443,39 +443,39 @@ namespace {
         std::string s = "self";
         // on linux it's "assertion", on mac it's "Assertion",
         // on chromiumos it's "Assertion ... failed".
-        FLARE_EXPECT_DEBUG_DEATH(flare::string_append(&s, s.c_str() + 1),
+        TURBO_EXPECT_DEBUG_DEATH(turbo::string_append(&s, s.c_str() + 1),
                                 "ssertion.*failed");
-        FLARE_EXPECT_DEBUG_DEATH(flare::string_append(&s, s), "ssertion.*failed");
+        TURBO_EXPECT_DEBUG_DEATH(turbo::string_append(&s, s), "ssertion.*failed");
     }
 
 #endif  // GTEST_HAS_DEATH_TEST
 
     TEST(string_append, CornerCases) {
         std::string result;
-        flare::string_append(&result, "");
+        turbo::string_append(&result, "");
         EXPECT_EQ(result, "");
-        flare::string_append(&result, "", "");
+        turbo::string_append(&result, "", "");
         EXPECT_EQ(result, "");
-        flare::string_append(&result, "", "", "");
+        turbo::string_append(&result, "", "", "");
         EXPECT_EQ(result, "");
-        flare::string_append(&result, "", "", "", "");
+        turbo::string_append(&result, "", "", "", "");
         EXPECT_EQ(result, "");
-        flare::string_append(&result, "", "", "", "", "");
+        turbo::string_append(&result, "", "", "", "", "");
         EXPECT_EQ(result, "");
     }
 
     TEST(string_append, CornerCasesNonEmptyAppend) {
         for (std::string result : {"hello", "a std::string too long to fit in the SSO"}) {
             const std::string expected = result;
-            flare::string_append(&result, "");
+            turbo::string_append(&result, "");
             EXPECT_EQ(result, expected);
-            flare::string_append(&result, "", "");
+            turbo::string_append(&result, "", "");
             EXPECT_EQ(result, expected);
-            flare::string_append(&result, "", "", "");
+            turbo::string_append(&result, "", "", "");
             EXPECT_EQ(result, expected);
-            flare::string_append(&result, "", "", "", "");
+            turbo::string_append(&result, "", "", "", "");
             EXPECT_EQ(result, expected);
-            flare::string_append(&result, "", "", "", "", "");
+            turbo::string_append(&result, "", "", "", "", "");
             EXPECT_EQ(result, expected);
         }
     }
@@ -485,23 +485,23 @@ namespace {
                   const char *spacepad_format) {
         char expected[256];
 
-        std::string actual = flare::string_cat(flare::hex(v, flare::kNoPad));
+        std::string actual = turbo::string_cat(turbo::hex(v, turbo::kNoPad));
         snprintf(expected, sizeof(expected), nopad_format, v);
         EXPECT_EQ(expected, actual) << " decimal value " << v;
 
-        for (int spec = flare::kZeroPad2; spec <= flare::kZeroPad20; ++spec) {
+        for (int spec = turbo::kZeroPad2; spec <= turbo::kZeroPad20; ++spec) {
             std::string factual =
-                    flare::string_cat(flare::hex(v, static_cast<flare::pad_spec>(spec)));
+                    turbo::string_cat(turbo::hex(v, static_cast<turbo::pad_spec>(spec)));
             snprintf(expected, sizeof(expected), zeropad_format,
-                     spec - flare::kZeroPad2 + 2, v);
+                     spec - turbo::kZeroPad2 + 2, v);
             EXPECT_EQ(expected, factual) << " decimal value " << v;
         }
 
-        for (int spec = flare::kSpacePad2; spec <= flare::kSpacePad20; ++spec) {
+        for (int spec = turbo::kSpacePad2; spec <= turbo::kSpacePad20; ++spec) {
             std::string factual =
-                    flare::string_cat(flare::hex(v, static_cast<flare::pad_spec>(spec)));
+                    turbo::string_cat(turbo::hex(v, static_cast<turbo::pad_spec>(spec)));
             snprintf(expected, sizeof(expected), spacepad_format,
-                     spec - flare::kSpacePad2 + 2, v);
+                     spec - turbo::kSpacePad2 + 2, v);
             EXPECT_EQ(expected, factual) << " decimal value " << v;
         }
     }
@@ -511,28 +511,28 @@ namespace {
                   const char *spacepad_format) {
         char expected[256];
 
-        std::string actual = flare::string_cat(flare::dec(v, flare::kNoPad));
+        std::string actual = turbo::string_cat(turbo::dec(v, turbo::kNoPad));
         snprintf(expected, sizeof(expected), nopad_format, v);
         EXPECT_EQ(expected, actual) << " decimal value " << v;
 
-        for (int spec = flare::kZeroPad2; spec <= flare::kZeroPad20; ++spec) {
+        for (int spec = turbo::kZeroPad2; spec <= turbo::kZeroPad20; ++spec) {
             std::string factual =
-                    flare::string_cat(flare::dec(v, static_cast<flare::pad_spec>(spec)));
+                    turbo::string_cat(turbo::dec(v, static_cast<turbo::pad_spec>(spec)));
             snprintf(expected, sizeof(expected), zeropad_format,
-                     spec - flare::kZeroPad2 + 2, v);
+                     spec - turbo::kZeroPad2 + 2, v);
             EXPECT_EQ(expected, factual)
                                 << " decimal value " << v << " format '" << zeropad_format
-                                << "' digits " << (spec - flare::kZeroPad2 + 2);
+                                << "' digits " << (spec - turbo::kZeroPad2 + 2);
         }
 
-        for (int spec = flare::kSpacePad2; spec <= flare::kSpacePad20; ++spec) {
+        for (int spec = turbo::kSpacePad2; spec <= turbo::kSpacePad20; ++spec) {
             std::string factual =
-                    flare::string_cat(flare::dec(v, static_cast<flare::pad_spec>(spec)));
+                    turbo::string_cat(turbo::dec(v, static_cast<turbo::pad_spec>(spec)));
             snprintf(expected, sizeof(expected), spacepad_format,
-                     spec - flare::kSpacePad2 + 2, v);
+                     spec - turbo::kSpacePad2 + 2, v);
             EXPECT_EQ(expected, factual)
                                 << " decimal value " << v << " format '" << spacepad_format
-                                << "' digits " << (spec - flare::kSpacePad2 + 2);
+                                << "' digits " << (spec - turbo::kSpacePad2 + 2);
         }
     }
 
@@ -599,10 +599,10 @@ namespace {
         CheckAll(0x12345678);
 
         int8_t minus_one_8bit = -1;
-        EXPECT_EQ("ff", flare::string_cat(flare::hex(minus_one_8bit)));
+        EXPECT_EQ("ff", turbo::string_cat(turbo::hex(minus_one_8bit)));
 
         int16_t minus_one_16bit = -1;
-        EXPECT_EQ("ffff", flare::string_cat(flare::hex(minus_one_16bit)));
+        EXPECT_EQ("ffff", turbo::string_cat(turbo::hex(minus_one_16bit)));
     }
 
     TEST(Numbers, TestFunctionsMovedOverFromNumbersMain) {

@@ -6,15 +6,15 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/debugging/internal/demangle.h"
+#include "turbo/debugging/internal/demangle.h"
 #include <cstdlib>
 #include <string>
 
 #include "testing/gtest_wrap.h"
-#include "flare/log/logging.h"
-#include "flare/debugging/internal/stack_consumption.h"
+#include "turbo/log/logging.h"
+#include "turbo/debugging/internal/stack_consumption.h"
 
-namespace flare::debugging {
+namespace turbo::debugging {
 
     namespace debugging_internal {
         namespace {
@@ -76,7 +76,7 @@ namespace flare::debugging {
 // Tests that verify that Demangle footprint is within some limit.
 // They are not to be run under sanitizers as the sanitizers increase
 // stack consumption by about 4x.
-#if defined(FLARE_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION) && \
+#if defined(TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION) && \
     !defined(ADDRESS_SANITIZER) && !defined(MEMORY_SANITIZER) && \
     !defined(THREAD_SANITIZER)
 
@@ -97,7 +97,7 @@ namespace flare::debugging {
                                                         int *stack_consumed) {
               g_mangled = mangled;
               *stack_consumed = GetSignalHandlerStackConsumption(DemangleSignalHandler);
-              FLARE_LOG(INFO)<<"Stack consumption of Demangle: "<< *stack_consumed;
+              TURBO_LOG(INFO)<<"Stack consumption of Demangle: "<< *stack_consumed;
               return g_demangle_result;
             }
 
@@ -186,4 +186,4 @@ namespace flare::debugging {
         }  // namespace
     }  // namespace debugging_internal
 
-}  // namespace flare::debugging
+}  // namespace turbo::debugging

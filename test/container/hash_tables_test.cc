@@ -5,7 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include "flare/container/hash_tables.h"
+#include "turbo/container/hash_tables.h"
 #include "testing/gtest_wrap.h"
 
 namespace {
@@ -16,7 +16,7 @@ namespace {
 #define INSERT_PAIR_TEST(Type, value1, value2) \
   { \
     Type pair(value1, value2); \
-    flare::container::hash_map<Type, int> map; \
+    turbo::container::hash_map<Type, int> map; \
     map[pair] = 1; \
   }
 

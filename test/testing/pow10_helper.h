@@ -9,9 +9,9 @@
 
 #include <vector>
 
-#include "flare/base/profile.h"
+#include "turbo/base/profile.h"
 
-namespace flare {
+namespace turbo {
 
     namespace strings_internal {
 
@@ -22,6 +22,6 @@ namespace flare {
 
     }  // namespace strings_internal
 
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // TEST_TESTING_POW10_HELPER_H_

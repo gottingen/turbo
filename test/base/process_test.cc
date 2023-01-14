@@ -5,12 +5,12 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include "flare/system/process.h"
-#include "flare/base/errno.h"
-#include "flare/strings/ends_with.h"
+#include "turbo/system/process.h"
+#include "turbo/base/errno.h"
+#include "turbo/strings/ends_with.h"
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
     extern int read_command_output_through_clone(std::ostream &, const char *);
 
     extern int read_command_output_through_popen(std::ostream &, const char *);
@@ -23,51 +23,51 @@ namespace {
 
     TEST(PopenTest, posix_popen) {
         std::ostringstream oss;
-        int rc = flare::read_command_output_through_popen(oss, "echo \"Hello World\"");
-        ASSERT_EQ(0, rc) << flare_error(errno);
+        int rc = turbo::read_command_output_through_popen(oss, "echo \"Hello World\"");
+        ASSERT_EQ(0, rc) << turbo_error(errno);
         ASSERT_EQ("Hello World\n", oss.str());
 
         oss.str("");
-        rc = flare::read_command_output_through_popen(oss, "exit 1");
-        EXPECT_EQ(1, rc) << flare_error(errno);
+        rc = turbo::read_command_output_through_popen(oss, "exit 1");
+        EXPECT_EQ(1, rc) << turbo_error(errno);
         ASSERT_TRUE(oss.str().empty()) << oss.str();
         oss.str("");
-        rc = flare::read_command_output_through_popen(oss, "kill -9 $$");
+        rc = turbo::read_command_output_through_popen(oss, "kill -9 $$");
         ASSERT_EQ(-1, rc);
         ASSERT_EQ(errno, ECHILD);
-        ASSERT_TRUE(flare::ends_with(oss.str(), "was killed by signal 9"));
+        ASSERT_TRUE(turbo::ends_with(oss.str(), "was killed by signal 9"));
         oss.str("");
-        rc = flare::read_command_output_through_popen(oss, "kill -15 $$");
+        rc = turbo::read_command_output_through_popen(oss, "kill -15 $$");
         ASSERT_EQ(-1, rc);
         ASSERT_EQ(errno, ECHILD);
-        ASSERT_TRUE(flare::ends_with(oss.str(), "was killed by signal 15"));
+        ASSERT_TRUE(turbo::ends_with(oss.str(), "was killed by signal 15"));
     }
 
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
 
     TEST(PopenTest, clone) {
         std::ostringstream oss;
-        int rc = flare::read_command_output_through_clone(oss, "echo \"Hello World\"");
-        ASSERT_EQ(0, rc) << flare_error(errno);
+        int rc = turbo::read_command_output_through_clone(oss, "echo \"Hello World\"");
+        ASSERT_EQ(0, rc) << turbo_error(errno);
         ASSERT_EQ("Hello World\n", oss.str());
 
         oss.str("");
-        rc = flare::read_command_output_through_clone(oss, "exit 1");
-        ASSERT_EQ(1, rc) << flare_error(errno);
+        rc = turbo::read_command_output_through_clone(oss, "exit 1");
+        ASSERT_EQ(1, rc) << turbo_error(errno);
         ASSERT_TRUE(oss.str().empty()) << oss.str();
         oss.str("");
-        rc = flare::read_command_output_through_clone(oss, "kill -9 $$");
+        rc = turbo::read_command_output_through_clone(oss, "kill -9 $$");
         ASSERT_EQ(-1, rc);
         ASSERT_EQ(errno, ECHILD);
-        ASSERT_TRUE(flare::ends_with(oss.str(), "was killed by signal 9"));
+        ASSERT_TRUE(turbo::ends_with(oss.str(), "was killed by signal 9"));
         oss.str("");
-        rc = flare::read_command_output_through_clone(oss, "kill -15 $$");
+        rc = turbo::read_command_output_through_clone(oss, "kill -15 $$");
         ASSERT_EQ(-1, rc);
         ASSERT_EQ(errno, ECHILD);
-        ASSERT_TRUE(flare::ends_with(oss.str(), "was killed by signal 15"));
+        ASSERT_TRUE(turbo::ends_with(oss.str(), "was killed by signal 15"));
 
         oss.str("");
-        ASSERT_EQ(0, flare::read_command_output_through_clone(oss, "for i in `seq 1 100000`; do echo -n '=' ; done"));
+        ASSERT_EQ(0, turbo::read_command_output_through_clone(oss, "for i in `seq 1 100000`; do echo -n '=' ; done"));
         ASSERT_EQ(100000u, oss.str().length());
         std::string expected;
         expected.resize(100000, '=');
@@ -115,6 +115,6 @@ namespace {
         ASSERT_EQ(cpid, waitpid(cpid, &ws, __WALL));
     }
 
-#endif  // FLARE_PLATFORM_LINUX
+#endif  // TURBO_PLATFORM_LINUX
 
 }

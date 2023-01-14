@@ -7,7 +7,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/rapidjson/robust_json.h"
+#include "turbo/rapidjson/robust_json.h"
 
 #include "testing/gtest_wrap.h"
 

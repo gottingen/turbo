@@ -6,7 +6,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/container/cache/item.h"
+#include "turbo/container/cache/item.h"
 #include "testing/gtest_wrap.h"
 #include <thread>
 
@@ -14,7 +14,7 @@ namespace testing {
     TEST(TestItem, TestItem) {
         auto duration = std::chrono::milliseconds(30);
         auto expires = std::chrono::steady_clock::now() + duration;
-        flare::cache_item<int, int> item(10, 20, expires);
+        turbo::cache_item<int, int> item(10, 20, expires);
         EXPECT_EQ(10, item.key());
         EXPECT_EQ(20, item.value());
         EXPECT_FALSE(item.expired());

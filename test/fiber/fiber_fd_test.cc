@@ -15,25 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "flare/base/compat.h"
+#include "turbo/base/compat.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/utsname.h>                           // uname
 #include <fcntl.h>
 #include "testing/gtest_wrap.h"
 #include <pthread.h>
-#include "flare/base/gperftools_profiler.h"
-#include "flare/times/time.h"
-#include "flare/base/fd_utility.h"
-#include "flare/log/logging.h"
-#include "flare/fiber/internal/schedule_group.h"
-#include "flare/fiber/internal/fiber_worker.h"
-#include "flare/fiber/internal/interrupt_pthread.h"
-#include "flare/fiber/internal/fiber.h"
-#include "flare/fiber/internal/unstable.h"
-#include "flare/fiber/this_fiber.h"
+#include "turbo/base/gperftools_profiler.h"
+#include "turbo/times/time.h"
+#include "turbo/base/fd_utility.h"
+#include "turbo/log/logging.h"
+#include "turbo/fiber/internal/schedule_group.h"
+#include "turbo/fiber/internal/fiber_worker.h"
+#include "turbo/fiber/internal/interrupt_pthread.h"
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/internal/unstable.h"
+#include "turbo/fiber/this_fiber.h"
 
-#if defined(FLARE_PLATFORM_OSX)
+#if defined(TURBO_PLATFORM_OSX)
 
 #include <sys/types.h>                           // struct kevent
 #include <sys/event.h>                           // kevent(), kqueue()
@@ -41,7 +41,7 @@
 #endif
 
 #ifndef NDEBUG
-namespace flare::fiber_internal {
+namespace turbo::fiber_internal {
     extern std::atomic<int> break_nums;
     extern schedule_group *global_task_control;
 
@@ -72,7 +72,7 @@ namespace {
         int epfd;
     };
 
-    struct FLARE_CACHELINE_ALIGNMENT ClientMeta {
+    struct TURBO_CACHELINE_ALIGNMENT ClientMeta {
         int fd;
         size_t count;
         size_t times;
@@ -90,22 +90,22 @@ namespace {
         //printf("begin to process fd=%d\n", m->fd);
         ssize_t n = read(m->fd, &count, sizeof(count));
         if (n != sizeof(count)) {
-            FLARE_LOG(FATAL) << "Should not happen in this test";
+            TURBO_LOG(FATAL) << "Should not happen in this test";
             return nullptr;
         }
         count += NCLIENT;
         //printf("write result=%lu to fd=%d\n", count, m->fd);
         if (write(m->fd, &count, sizeof(count)) != sizeof(count)) {
-            FLARE_LOG(FATAL) << "Should not happen in this test";
+            TURBO_LOG(FATAL) << "Should not happen in this test";
             return nullptr;
         }
 #ifdef CREATE_THREAD_TO_PROCESS
-# if defined(FLARE_PLATFORM_LINUX)
+# if defined(TURBO_PLATFORM_LINUX)
         epoll_event evt = { EPOLLIN | EPOLLONESHOT, { m } };
         if (epoll_ctl(m->epfd, EPOLL_CTL_MOD, m->fd, &evt) < 0) {
             epoll_ctl(m->epfd, EPOLL_CTL_ADD, m->fd, &evt);
         }
-# elif defined(FLARE_PLATFORM_OSX)
+# elif defined(TURBO_PLATFORM_OSX)
         struct kevent kqueue_event;
         EV_SET(&kqueue_event, m->fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT,
                 0, 0, m);
@@ -116,20 +116,20 @@ namespace {
     }
 
     void *epoll_thread(void *arg) {
-        flare::fiber_sleep_for(1);
+        turbo::fiber_sleep_for(1);
         EpollMeta *m = (EpollMeta *) arg;
         const int epfd = m->epfd;
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         epoll_event e[32];
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         struct kevent e[32];
 #endif
 
         while (!stop) {
 
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
 # ifndef USE_BLOCKING_EPOLL
-            const int n = epoll_wait(epfd, e, FLARE_ARRAY_SIZE(e), 0);
+            const int n = epoll_wait(epfd, e, TURBO_ARRAY_SIZE(e), 0);
             if (stop) {
                 break;
             }
@@ -138,7 +138,7 @@ namespace {
                 continue;
             }
 # else
-            const int n = epoll_wait(epfd, e, FLARE_ARRAY_SIZE(e), -1);
+            const int n = epoll_wait(epfd, e, TURBO_ARRAY_SIZE(e), -1);
             if (stop) {
                 break;
             }
@@ -146,8 +146,8 @@ namespace {
                 continue;
             }
 # endif
-#elif defined(FLARE_PLATFORM_OSX)
-            const int n = kevent(epfd, nullptr, 0, e, FLARE_ARRAY_SIZE(e), nullptr);
+#elif defined(TURBO_PLATFORM_OSX)
+            const int n = kevent(epfd, nullptr, 0, e, TURBO_ARRAY_SIZE(e), nullptr);
             if (stop) {
                 break;
             }
@@ -159,10 +159,10 @@ namespace {
                 if (EINTR == errno) {
                     continue;
                 }
-#if defined(FLARE_PLATFORM_LINUX)
-                    FLARE_PLOG(FATAL) << "Fail to epoll_wait";
-#elif defined(FLARE_PLATFORM_OSX)
-                FLARE_PLOG(FATAL) << "Fail to kevent";
+#if defined(TURBO_PLATFORM_LINUX)
+                    TURBO_PLOG(FATAL) << "Fail to epoll_wait";
+#elif defined(TURBO_PLATFORM_OSX)
+                TURBO_PLOG(FATAL) << "Fail to kevent";
 #endif
                 break;
             }
@@ -171,9 +171,9 @@ namespace {
             fiber_fvec vec[n];
             for (int i = 0; i < n; ++i) {
                 vec[i].fn = process_thread;
-# if defined(FLARE_PLATFORM_LINUX)
+# if defined(TURBO_PLATFORM_LINUX)
                 vec[i].arg = e[i].data.ptr;
-# elif defined(FLARE_PLATFORM_OSX)
+# elif defined(TURBO_PLATFORM_OSX)
                 vec[i].arg = e[i].udata;
 # endif
             }
@@ -181,9 +181,9 @@ namespace {
             fiber_startv(tid, vec, n, &FIBER_ATTR_SMALL);
 #else
             for (int i = 0; i < n; ++i) {
-# if defined(FLARE_PLATFORM_LINUX)
+# if defined(TURBO_PLATFORM_LINUX)
                 process_thread(e[i].data.ptr);
-# elif defined(FLARE_PLATFORM_OSX)
+# elif defined(TURBO_PLATFORM_OSX)
                 process_thread(e[i].udata);
 # endif
             }
@@ -196,25 +196,25 @@ namespace {
         ClientMeta *m = (ClientMeta *) arg;
         for (size_t i = 0; i < m->times; ++i) {
             if (write(m->fd, &m->count, sizeof(m->count)) != sizeof(m->count)) {
-                FLARE_LOG(FATAL) << "Should not happen in this test";
+                TURBO_LOG(FATAL) << "Should not happen in this test";
                 return nullptr;
             }
 #ifdef RUN_CLIENT_IN_FIBER
             ssize_t rc;
             do {
-# if defined(FLARE_PLATFORM_LINUX)
+# if defined(TURBO_PLATFORM_LINUX)
                 const int wait_rc = fiber_fd_wait(m->fd, EPOLLIN);
-# elif defined(FLARE_PLATFORM_OSX)
+# elif defined(TURBO_PLATFORM_OSX)
                 const int wait_rc = fiber_fd_wait(m->fd, EVFILT_READ);
 # endif
-                EXPECT_EQ(0, wait_rc) << flare_error();
+                EXPECT_EQ(0, wait_rc) << turbo_error();
                 rc = read(m->fd, &m->count, sizeof(m->count));
             } while (rc < 0 && errno == EAGAIN);
 #else
             ssize_t rc = read(m->fd, &m->count, sizeof(m->count));
 #endif
             if (rc != sizeof(m->count)) {
-                FLARE_PLOG(FATAL) << "Should not happen in this test, rc=" << rc;
+                TURBO_PLOG(FATAL) << "Should not happen in this test, rc=" << rc;
                 return nullptr;
             }
         }
@@ -234,7 +234,7 @@ namespace {
 // a kernel patch that lots of machines currently don't have
     TEST(FDTest, ping_pong) {
 #ifndef NDEBUG
-        flare::fiber_internal::break_nums = 0;
+        turbo::fiber_internal::break_nums = 0;
 #endif
 
         const size_t REP = 30000;
@@ -255,9 +255,9 @@ namespace {
         ClientMeta *cm[NCLIENT];
 
         for (size_t i = 0; i < NEPOLL; ++i) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
             epfd[i] = epoll_create(1024);
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
             epfd[i] = kqueue();
 #endif
             ASSERT_GT(epfd[i], 0);
@@ -272,25 +272,25 @@ namespace {
             ASSERT_EQ(0, fcntl(m->fd, F_SETFL, fcntl(m->fd, F_GETFL, 0) | O_NONBLOCK));
 
 #ifdef CREATE_THREAD_TO_PROCESS
-# if defined(FLARE_PLATFORM_LINUX)
+# if defined(TURBO_PLATFORM_LINUX)
             epoll_event evt = { EPOLLIN | EPOLLONESHOT, { m } };
-# elif defined(FLARE_PLATFORM_OSX)
+# elif defined(TURBO_PLATFORM_OSX)
             struct kevent kqueue_event;
             EV_SET(&kqueue_event, m->fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_ONESHOT,
                     0, 0, m);
 # endif
 #else
-# if defined(FLARE_PLATFORM_LINUX)
+# if defined(TURBO_PLATFORM_LINUX)
             epoll_event evt = { EPOLLIN, { m } };
-# elif defined(FLARE_PLATFORM_OSX)
+# elif defined(TURBO_PLATFORM_OSX)
             struct kevent kqueue_event;
             EV_SET(&kqueue_event, m->fd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, m);
 # endif
 #endif
 
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
             ASSERT_EQ(0, epoll_ctl(m->epfd, EPOLL_CTL_ADD, m->fd, &evt));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
             ASSERT_EQ(0, kevent(m->epfd, &kqueue_event, 1, nullptr, 0, nullptr));
 #endif
             cm[i] = new ClientMeta;
@@ -298,7 +298,7 @@ namespace {
             cm[i]->count = i;
             cm[i]->times = REP;
 #ifdef RUN_CLIENT_IN_FIBER
-            flare::base::make_non_blocking(cm[i]->fd);
+            turbo::base::make_non_blocking(cm[i]->fd);
             ASSERT_EQ(0, fiber_start_urgent(&cth[i], nullptr, client_thread, cm[i]));
 #else
             ASSERT_EQ(0, pthread_create(&cth[i], nullptr, client_thread, cm[i]));
@@ -306,7 +306,7 @@ namespace {
         }
 
         ProfilerStart("ping_pong.prof");
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
 
         for (size_t i = 0; i < NEPOLL; ++i) {
@@ -329,13 +329,13 @@ namespace {
         }
         tm.stop();
         ProfilerStop();
-        FLARE_LOG(INFO) << "tid=" << REP * NCLIENT * 1000000L / tm.u_elapsed();
+        TURBO_LOG(INFO) << "tid=" << REP * NCLIENT * 1000000L / tm.u_elapsed();
         stop = true;
         for (size_t i = 0; i < NEPOLL; ++i) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
             epoll_event evt = { EPOLLOUT,  { nullptr } };
             ASSERT_EQ(0, epoll_ctl(epfd[i], EPOLL_CTL_ADD, 0, &evt));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
             struct kevent kqueue_event;
             EV_SET(&kqueue_event, 0, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, nullptr);
             ASSERT_EQ(0, kevent(epfd[i], &kqueue_event, 1, nullptr, 0, nullptr));
@@ -346,16 +346,16 @@ namespace {
             pthread_join(eth[i], nullptr);
 #endif
         }
-        //flare::fiber_internal::stop_and_join_epoll_threads();
-        flare::fiber_sleep_for(100000);
+        //turbo::fiber_internal::stop_and_join_epoll_threads();
+        turbo::fiber_sleep_for(100000);
 
 #ifndef NDEBUG
-        std::cout << "break_nums=" << flare::fiber_internal::break_nums << std::endl;
+        std::cout << "break_nums=" << turbo::fiber_internal::break_nums << std::endl;
 #endif
     }
 
     TEST(FDTest, mod_closed_fd) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         // Conclusion:
         //   If fd is never added into epoll, MOD returns ENOENT
         //   If fd is inside epoll and valid, MOD returns 0
@@ -380,7 +380,7 @@ namespace {
 
         errno = 0;
         ASSERT_EQ(-1, epoll_ctl(epfd, EPOLL_CTL_MOD, fd[0], &e));
-        ASSERT_EQ(EBADF, errno) << flare_error();
+        ASSERT_EQ(EBADF, errno) << turbo_error();
 
         ASSERT_EQ(0, pipe(new_fd));
         ASSERT_EQ(fd[0], new_fd[0]);
@@ -388,14 +388,14 @@ namespace {
 
         errno = 0;
         ASSERT_EQ(-1, epoll_ctl(epfd, EPOLL_CTL_MOD, fd[0], &e));
-        ASSERT_EQ(ENOENT, errno) << flare_error();
+        ASSERT_EQ(ENOENT, errno) << turbo_error();
 
         ASSERT_EQ(0, close(epfd));
 #endif
     }
 
     TEST(FDTest, add_existing_fd) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         const int epfd = epoll_create(1024);
         epoll_event e = { EPOLLIN, { nullptr } };
         ASSERT_EQ(0, epoll_ctl(epfd, EPOLL_CTL_ADD, 0, &e));
@@ -407,12 +407,12 @@ namespace {
     }
 
     void *epoll_waiter(void *arg) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         epoll_event e;
         if (1 == epoll_wait((int)(intptr_t)arg, &e, 1, -1)) {
             std::cout << e.events << std::endl;
         }
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         struct kevent e;
         if (1 == kevent((int) (intptr_t) arg, nullptr, 0, &e, 1, nullptr)) {
             std::cout << e.flags << std::endl;
@@ -423,59 +423,59 @@ namespace {
     }
 
     TEST(FDTest, interrupt_pthread) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         const int epfd = epoll_create(1024);
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         const int epfd = kqueue();
 #endif
         pthread_t th, th2;
         ASSERT_EQ(0, pthread_create(&th, nullptr, epoll_waiter, (void *) (intptr_t) epfd));
         ASSERT_EQ(0, pthread_create(&th2, nullptr, epoll_waiter, (void *) (intptr_t) epfd));
-        flare::fiber_sleep_for(100000L);
+        turbo::fiber_sleep_for(100000L);
         std::cout << "wake up " << th << std::endl;
-        flare::fiber_internal::interrupt_pthread(th);
-        flare::fiber_sleep_for(100000L);
+        turbo::fiber_internal::interrupt_pthread(th);
+        turbo::fiber_sleep_for(100000L);
         std::cout << "wake up " << th2 << std::endl;
-        flare::fiber_internal::interrupt_pthread(th2);
+        turbo::fiber_internal::interrupt_pthread(th2);
         pthread_join(th, nullptr);
         pthread_join(th2, nullptr);
     }
 
     void *close_the_fd(void *arg) {
-        flare::fiber_sleep_for(10000/*10ms*/);
+        turbo::fiber_sleep_for(10000/*10ms*/);
         EXPECT_EQ(0, fiber_fd_close(*(int *) arg));
         return nullptr;
     }
 
     TEST(FDTest, invalid_epoll_events) {
         errno = 0;
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         ASSERT_EQ(-1, fiber_fd_wait(-1, EPOLLIN));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         ASSERT_EQ(-1, fiber_fd_wait(-1, EVFILT_READ));
 #endif
         ASSERT_EQ(EINVAL, errno);
         errno = 0;
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         ASSERT_EQ(-1, fiber_fd_timedwait(-1, EPOLLIN, nullptr));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         ASSERT_EQ(-1, fiber_fd_timedwait(-1, EVFILT_READ, nullptr));
 #endif
         ASSERT_EQ(EINVAL, errno);
 
         int fds[2];
         ASSERT_EQ(0, pipe(fds));
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         ASSERT_EQ(-1, fiber_fd_wait(fds[0], EPOLLET));
         ASSERT_EQ(EINVAL, errno);
 #endif
         fiber_id_t th;
         ASSERT_EQ(0, fiber_start_urgent(&th, nullptr, close_the_fd, &fds[1]));
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         ASSERT_EQ(0, fiber_fd_wait(fds[0], EPOLLIN | EPOLLET));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         ASSERT_EQ(0, fiber_fd_wait(fds[0], EVFILT_READ));
 #endif
         tm.stop();
@@ -485,10 +485,10 @@ namespace {
     }
 
     void *wait_for_the_fd(void *arg) {
-        timespec ts = flare::time_point::future_unix_millis(50).to_timespec();
-#if defined(FLARE_PLATFORM_LINUX)
+        timespec ts = turbo::time_point::future_unix_millis(50).to_timespec();
+#if defined(TURBO_PLATFORM_LINUX)
         fiber_fd_timedwait(*(int*)arg, EPOLLIN, &ts);
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         fiber_fd_timedwait(*(int *) arg, EVFILT_READ, &ts);
 #endif
         return nullptr;
@@ -501,7 +501,7 @@ namespace {
         ASSERT_EQ(0, pthread_create(&th, nullptr, wait_for_the_fd, &fds[0]));
         fiber_id_t bth;
         ASSERT_EQ(0, fiber_start_urgent(&bth, nullptr, wait_for_the_fd, &fds[0]));
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         ASSERT_EQ(0, pthread_join(th, nullptr));
         ASSERT_EQ(0, fiber_join(bth, nullptr));
@@ -516,7 +516,7 @@ namespace {
         ASSERT_EQ(0, pipe(fds));
         fiber_id_t bth;
         ASSERT_EQ(0, fiber_start_urgent(&bth, nullptr, wait_for_the_fd, &fds[0]));
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         ASSERT_EQ(0, fiber_fd_close(fds[0]));
         ASSERT_EQ(0, fiber_join(bth, nullptr));
@@ -524,9 +524,9 @@ namespace {
         ASSERT_LT(tm.m_elapsed(), 5);
 
         // Launch again, should quit soon due to EBADF
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         ASSERT_EQ(-1, fiber_fd_timedwait(fds[0], EPOLLIN, nullptr));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         ASSERT_EQ(-1, fiber_fd_timedwait(fds[0], EVFILT_READ, nullptr));
 #endif
         ASSERT_EQ(EBADF, errno);

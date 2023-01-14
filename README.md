@@ -1,6 +1,6 @@
-# flare - c++ base library
+# turbo - c++ base library
 
-flare is an Oteam collection of c++ library code. it designed to use c++ smartly.
+turbo is an Oteam collection of c++ library code. it designed to use c++ smartly.
 
 ## status
 
@@ -11,9 +11,9 @@ mac os  | llvm    | ok
 
 ## content index
 
-* [about flare](#about)
+* [about turbo](#about)
 * [about cmake](#cmake)
-* [build flare](#build)
+* [build turbo](#build)
 * [modules](#modules)
 * [examples](#examples)
 * [papers](#papers)
@@ -21,7 +21,7 @@ mac os  | llvm    | ok
 
 <a name="about"> </a>
 
-## about flare
+## about turbo
 
 Since the inception, it's aimed to <font size=16> **`consolidate algorithms, data structures, system operations and 
 make sure it's under control.`**</font>
@@ -43,9 +43,9 @@ Particularly, the goals are:
 
 <a name="build"> </a>
 
-## build flare
+## build turbo
 
-flare use cmake as build system. sample to build flare
+turbo use cmake as build system. sample to build turbo
 
 compiler requirement
 
@@ -56,11 +56,11 @@ compiler requirement
 
 build step
 
-flare dependency managed by conda, first need install conda
+turbo dependency managed by conda, first need install conda
 depends by conda, on mac
 ```shell
   conda env create -f conda/environment_osx.yaml
-  conda activate flare-dev
+  conda activate turbo-dev
   mkdir build
   cd build
   cmake ..
@@ -69,7 +69,7 @@ depends by conda, on mac
 on linux
 ```shell
   conda env create -f conda/environment_linux.yaml
-  conda activate flare-dev
+  conda activate turbo-dev
   mkdir build
   cd build
   cmake ..

@@ -11,7 +11,7 @@
 #include <fcntl.h>                              // ^
 #include "testing/gtest_wrap.h"
 #include <errno.h>
-#include "flare/base/fd_guard.h"
+#include "turbo/base/fd_guard.h"
 
 namespace {
 
@@ -30,14 +30,14 @@ namespace {
     };
 
     TEST_F(FDGuardTest, default_constructor) {
-        flare::base::fd_guard guard;
+        turbo::base::fd_guard guard;
         ASSERT_EQ(-1, guard);
     }
 
     TEST_F(FDGuardTest, destructor_closes_fd) {
         int fd = -1;
         {
-            flare::base::fd_guard guard(open(".tmp1", O_WRONLY | O_CREAT, 0600));
+            turbo::base::fd_guard guard(open(".tmp1", O_WRONLY | O_CREAT, 0600));
             ASSERT_GT(guard, 0);
             fd = guard;
         }
@@ -47,7 +47,7 @@ namespace {
     }
 
     TEST_F(FDGuardTest, reset_closes_previous_fd) {
-        flare::base::fd_guard guard(open(".tmp1", O_WRONLY | O_CREAT, 0600));
+        turbo::base::fd_guard guard(open(".tmp1", O_WRONLY | O_CREAT, 0600));
         ASSERT_GT(guard, 0);
         const int fd = guard;
         const int fd2 = open(".tmp2", O_WRONLY | O_CREAT, 0600);
@@ -61,7 +61,7 @@ namespace {
     }
 
     TEST_F(FDGuardTest, release) {
-        flare::base::fd_guard guard(open(".tmp1", O_WRONLY | O_CREAT, 0600));
+        turbo::base::fd_guard guard(open(".tmp1", O_WRONLY | O_CREAT, 0600));
         ASSERT_GT(guard, 0);
         const int fd = guard;
         ASSERT_EQ(fd, guard.release());

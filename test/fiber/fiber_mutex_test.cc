@@ -17,31 +17,31 @@
 
 #include <inttypes.h>
 #include "testing/gtest_wrap.h"
-#include "flare/base/compat.h"
-#include "flare/times/time.h"
-#include "flare/strings/str_format.h"
-#include "flare/log/logging.h"
-#include "flare/fiber/internal/fiber.h"
-#include "flare/fiber/internal/waitable_event.h"
-#include "flare/fiber/internal/schedule_group.h"
-#include "flare/fiber/fiber_mutex.h"
-#include "flare/base/gperftools_profiler.h"
-#include "flare/fiber/this_fiber.h"
+#include "turbo/base/compat.h"
+#include "turbo/times/time.h"
+#include "turbo/strings/str_format.h"
+#include "turbo/log/logging.h"
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/internal/waitable_event.h"
+#include "turbo/fiber/internal/schedule_group.h"
+#include "turbo/fiber/fiber_mutex.h"
+#include "turbo/base/gperftools_profiler.h"
+#include "turbo/fiber/this_fiber.h"
 
 namespace {
     inline unsigned *get_butex(fiber_mutex_t &m) {
         return m.event;
     }
 
-    long start_time = flare::time_now().to_unix_millis();
+    long start_time = turbo::time_now().to_unix_millis();
     int c = 0;
 
     void *locker(void *arg) {
         fiber_mutex_t *m = (fiber_mutex_t *) arg;
         fiber_mutex_lock(m);
         printf("[%" PRIu64 "] I'm here, %d, %" PRId64 "ms\n",
-               pthread_numeric_id(), ++c, flare::time_now().to_unix_millis() - start_time);
-        flare::fiber_sleep_for(10000);
+               pthread_numeric_id(), ++c, turbo::time_now().to_unix_millis() - start_time);
+        turbo::fiber_sleep_for(10000);
         fiber_mutex_unlock(m);
         return nullptr;
     }
@@ -66,10 +66,10 @@ namespace {
         fiber_mutex_t m;
         ASSERT_EQ(0, fiber_mutex_init(&m, nullptr));
         pthread_t th[8];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, locker, &m));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             pthread_join(th[i], nullptr);
         }
         ASSERT_EQ(0u, *get_butex(m));
@@ -105,17 +105,17 @@ namespace {
     }
 
     TEST(MutexTest, cpp_wrapper) {
-        flare::fiber_mutex mutex;
+        turbo::fiber_mutex mutex;
         ASSERT_TRUE(mutex.try_lock());
         mutex.unlock();
         mutex.lock();
         mutex.unlock();
         {
-            FLARE_SCOPED_LOCK(mutex);
+            TURBO_SCOPED_LOCK(mutex);
         }
         {
-            std::unique_lock<flare::fiber_mutex> lck1;
-            std::unique_lock<flare::fiber_mutex> lck2(mutex);
+            std::unique_lock<turbo::fiber_mutex> lck1;
+            std::unique_lock<turbo::fiber_mutex> lck2(mutex);
             lck1.swap(lck2);
             lck1.unlock();
             lck1.lock();
@@ -123,7 +123,7 @@ namespace {
         ASSERT_TRUE(mutex.try_lock());
         mutex.unlock();
         {
-            FLARE_SCOPED_LOCK(*mutex.native_handler());
+            TURBO_SCOPED_LOCK(*mutex.native_handler());
         }
         {
             std::unique_lock<fiber_mutex_t> lck1;
@@ -140,7 +140,7 @@ namespace {
     bool g_stopped = false;
 
     template<typename fiber_mutex>
-    struct FLARE_CACHELINE_ALIGNMENT PerfArgs {
+    struct TURBO_CACHELINE_ALIGNMENT PerfArgs {
         fiber_mutex *mutex;
         int64_t counter;
         int64_t elapse_ns;
@@ -153,16 +153,16 @@ namespace {
     void *add_with_mutex(void *void_arg) {
         PerfArgs<fiber_mutex> *args = (PerfArgs<fiber_mutex> *) void_arg;
         args->ready = true;
-        flare::stop_watcher t;
+        turbo::stop_watcher t;
         while (!g_stopped) {
             if (g_started) {
                 break;
             }
-            flare::fiber_sleep_for(1000);
+            turbo::fiber_sleep_for(1000);
         }
         t.start();
         while (!g_stopped) {
-            FLARE_SCOPED_LOCK(*args->mutex);
+            TURBO_SCOPED_LOCK(*args->mutex);
             ++args->counter;
         }
         t.stop();
@@ -214,7 +214,7 @@ namespace {
             wait_time += args[i].elapse_ns;
             count += args[i].counter;
         }
-        FLARE_LOG(INFO) << flare::base::class_name<fiber_mutex>() << " in "
+        TURBO_LOG(INFO) << turbo::base::class_name<fiber_mutex>() << " in "
                   << ((void *) create_fn == (void *) pthread_create ? "pthread" : "fiber")
                   << " thread_num=" << thread_num
                   << " count=" << count
@@ -226,16 +226,16 @@ namespace {
         std::mutex base_mutex;
         PerfTest(&base_mutex, (pthread_t *) nullptr, thread_num, pthread_create, pthread_join);
         PerfTest(&base_mutex, (fiber_id_t *) nullptr, thread_num, fiber_start_background, fiber_join);
-        flare::fiber_mutex fbr_mutex;
+        turbo::fiber_mutex fbr_mutex;
         PerfTest(&fbr_mutex, (pthread_t *) nullptr, thread_num, pthread_create, pthread_join);
         PerfTest(&fbr_mutex, (fiber_id_t *) nullptr, thread_num, fiber_start_background, fiber_join);
     }
 
     void *loop_until_stopped(void *arg) {
-        flare::fiber_mutex *m = (flare::fiber_mutex *) arg;
+        turbo::fiber_mutex *m = (turbo::fiber_mutex *) arg;
         while (!g_stopped) {
-            FLARE_SCOPED_LOCK(*m);
-            flare::fiber_sleep_for(20);
+            TURBO_SCOPED_LOCK(*m);
+            turbo::fiber_sleep_for(20);
         }
         return nullptr;
     }
@@ -244,7 +244,7 @@ namespace {
         g_stopped = false;
         const int N = 16;
         const int M = N * 2;
-        flare::fiber_mutex m;
+        turbo::fiber_mutex m;
         pthread_t pthreads[N];
         fiber_id_t fibers[M];
         // reserve enough workers for test. This is a must since we have
@@ -259,7 +259,7 @@ namespace {
             const fiber_attribute *attr = i % 2 ? nullptr : &FIBER_ATTR_PTHREAD;
             ASSERT_EQ(0, fiber_start_urgent(&fibers[i], attr, loop_until_stopped, &m));
         }
-        flare::fiber_sleep_for(1000L * 1000);
+        turbo::fiber_sleep_for(1000L * 1000);
         g_stopped = true;
         for (int i = 0; i < M; ++i) {
             fiber_join(fibers[i], nullptr);

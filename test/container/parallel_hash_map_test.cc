@@ -12,7 +12,7 @@
 
 #include "flat_hash_map_test.cc"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
 
@@ -162,4 +162,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

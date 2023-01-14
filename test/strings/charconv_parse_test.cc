@@ -4,20 +4,20 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/strings/internal/charconv_parse.h"
+#include "turbo/strings/internal/charconv_parse.h"
 
 #include <string>
 #include <utility>
 
 
 #include "testing/gtest_wrap.h"
-#include "flare/log/logging.h"
-#include "flare/strings/str_cat.h"
+#include "turbo/log/logging.h"
+#include "turbo/strings/str_cat.h"
 
-using flare::chars_format;
-using flare::strings_internal::FloatType;
-using flare::strings_internal::ParsedFloat;
-using flare::strings_internal::ParseFloat;
+using turbo::chars_format;
+using turbo::strings_internal::FloatType;
+using turbo::strings_internal::ParsedFloat;
+using turbo::strings_internal::ParseFloat;
 
 namespace {
 
@@ -33,7 +33,7 @@ namespace {
 // the location of the extended NaN string.  For numbers, this is the location
 // of the full, over-large mantissa.
     template<int base>
-    void ExpectParsedFloat(std::string s, flare::chars_format format_flags,
+    void ExpectParsedFloat(std::string s, turbo::chars_format format_flags,
                            FloatType expected_type, uint64_t expected_mantissa,
                            int expected_exponent,
                            int expected_literal_exponent = -999) {
@@ -48,13 +48,13 @@ namespace {
             begin_subrange = static_cast<int>(open_bracket_pos);
             s.replace(open_bracket_pos, 1, "");
             std::string::size_type close_bracket_pos = s.find(']');
-            FLARE_CHECK(close_bracket_pos != std::string_view::npos)<<
+            TURBO_CHECK(close_bracket_pos != std::string_view::npos)<<
                            "Test input contains [ without matching ]";
             end_subrange = static_cast<int>(close_bracket_pos);
             s.replace(close_bracket_pos, 1, "");
         }
         const std::string::size_type expected_characters_matched = s.find('$');
-        FLARE_CHECK(expected_characters_matched != std::string::npos)<<
+        TURBO_CHECK(expected_characters_matched != std::string::npos)<<
                        "Input std::string must contain $";
         s.replace(expected_characters_matched, 1, "");
 
@@ -90,7 +90,7 @@ namespace {
 // Input string `s` must contain a '$' character.  It marks the end of the
 // characters that were consumed by the match.
     template<int base>
-    void ExpectNumber(std::string s, flare::chars_format format_flags,
+    void ExpectNumber(std::string s, turbo::chars_format format_flags,
                       uint64_t expected_mantissa, int expected_exponent,
                       int expected_literal_exponent = -999) {
         ExpectParsedFloat<base>(std::move(s), format_flags, FloatType::kNumber,
@@ -102,7 +102,7 @@ namespace {
 //
 // This tests against both number bases, since infinities and NaNs have
 // identical representations in both modes.
-    void ExpectSpecial(const std::string &s, flare::chars_format format_flags,
+    void ExpectSpecial(const std::string &s, turbo::chars_format format_flags,
                        FloatType type) {
         ExpectParsedFloat<10>(s, format_flags, type, 0, 0);
         ExpectParsedFloat<16>(s, format_flags, type, 0, 0);
@@ -110,7 +110,7 @@ namespace {
 
 // Check that a given input string is not matched by Float.
     template<int base>
-    void ExpectFailedParse(std::string_view s, flare::chars_format format_flags) {
+    void ExpectFailedParse(std::string_view s, turbo::chars_format format_flags) {
         ParsedFloat parsed =
                 ParseFloat<base>(s.data(), s.data() + s.size(), format_flags);
         EXPECT_EQ(parsed.end, nullptr);

@@ -12,14 +12,14 @@
 #include <limits>
 #include <string>
 
-#include "flare/base/profile.h"
+#include "turbo/base/profile.h"
 
-namespace flare {
+namespace turbo {
 
 namespace strings_internal {
 
 template<typename IntType>
-FLARE_FORCE_INLINE bool Itoa(IntType value, int base, std::string *destination) {
+TURBO_FORCE_INLINE bool Itoa(IntType value, int base, std::string *destination) {
     destination->clear();
     if (base <= 1 || base > 36) {
         return false;
@@ -55,7 +55,7 @@ struct uint32_test_case {
     uint32_t expected;
 };
 
-FLARE_FORCE_INLINE const std::array<uint32_test_case, 27> &strtouint32_test_cases() {
+TURBO_FORCE_INLINE const std::array<uint32_test_case, 27> &strtouint32_test_cases() {
     static const std::array<uint32_test_case, 27> test_cases{{
                                                                      {"0xffffffff", true, 16,
                                                                              (std::numeric_limits<uint32_t>::max)()},
@@ -110,7 +110,7 @@ struct uint64_test_case {
     uint64_t expected;
 };
 
-FLARE_FORCE_INLINE const std::array<uint64_test_case, 34> &strtouint64_test_cases() {
+TURBO_FORCE_INLINE const std::array<uint64_test_case, 34> &strtouint64_test_cases() {
     static const std::array<uint64_test_case, 34> test_cases{{
                                                                      {"0x3423432448783446", true, 16,
                                                                              int64_t{0x3423432448783446}},
@@ -183,6 +183,6 @@ FLARE_FORCE_INLINE const std::array<uint64_test_case, 34> &strtouint64_test_case
 
 }  // namespace strings_internal
 
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // TEST_TESTING_NUMBERS_TEST_COMMON_H_

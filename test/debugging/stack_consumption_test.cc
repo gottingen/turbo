@@ -4,16 +4,16 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/debugging/internal/stack_consumption.h"
+#include "turbo/debugging/internal/stack_consumption.h"
 
-#ifdef FLARE_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#ifdef TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
 
 #include <string.h>
 
 #include "testing/gtest_wrap.h"
-#include "flare/log/logging.h"
+#include "turbo/log/logging.h"
 
-namespace flare::debugging {
+namespace turbo::debugging {
 
 namespace debugging_internal {
 namespace {
@@ -24,7 +24,7 @@ static void SimpleSignalHandler(int signo) {
 
   // Never true, but prevents compiler from optimizing buf out.
   if (signo == 0) {
-      FLARE_LOG(INFO)<<static_cast<void*>(buf);
+      TURBO_LOG(INFO)<<static_cast<void*>(buf);
   }
 }
 
@@ -36,6 +36,6 @@ TEST(SignalHandlerStackConsumptionTest, MeasuresStackConsumption) {
 }  // namespace
 }  // namespace debugging_internal
 
-}  // namespace flare::debugging
+}  // namespace turbo::debugging
 
-#endif  // FLARE_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#endif  // TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION

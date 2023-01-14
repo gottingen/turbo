@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 
-#include "flare/container/linked_list.h"
+#include "turbo/container/linked_list.h"
 #include "testing/gtest_wrap.h"
 
-namespace flare::container {
+namespace turbo::container {
     namespace {
 
         class Node : public link_node<Node> {
@@ -80,7 +80,7 @@ namespace flare::container {
             EXPECT_EQ(&n1, list.tail());
             {
                 const int expected[] = {1};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             Node n2(2);
@@ -90,7 +90,7 @@ namespace flare::container {
             EXPECT_EQ(&n2, list.tail());
             {
                 const int expected[] = {1, 2};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             Node n3(3);
@@ -100,7 +100,7 @@ namespace flare::container {
             EXPECT_EQ(&n3, list.tail());
             {
                 const int expected[] = {1, 2, 3};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
         }
 
@@ -123,7 +123,7 @@ namespace flare::container {
             EXPECT_EQ(&n5, list.tail());
             {
                 const int expected[] = {1, 2, 3, 4, 5};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             // Remove from the middle.
@@ -133,7 +133,7 @@ namespace flare::container {
             EXPECT_EQ(&n5, list.tail());
             {
                 const int expected[] = {1, 2, 4, 5};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             // Remove from the tail.
@@ -143,7 +143,7 @@ namespace flare::container {
             EXPECT_EQ(&n4, list.tail());
             {
                 const int expected[] = {1, 2, 4};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             // Remove from the head.
@@ -153,7 +153,7 @@ namespace flare::container {
             EXPECT_EQ(&n4, list.tail());
             {
                 const int expected[] = {2, 4};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             // Empty the list.
@@ -175,7 +175,7 @@ namespace flare::container {
             EXPECT_EQ(&n5, list.tail());
             {
                 const int expected[] = {1, 2, 3, 4, 5};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
         }
 
@@ -194,7 +194,7 @@ namespace flare::container {
             EXPECT_EQ(&n2, list.tail());
             {
                 const int expected[] = {1, 2};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             n3.insert_before(&n2);
@@ -203,7 +203,7 @@ namespace flare::container {
             EXPECT_EQ(&n2, list.tail());
             {
                 const int expected[] = {1, 3, 2};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             n4.insert_before(&n1);
@@ -212,7 +212,7 @@ namespace flare::container {
             EXPECT_EQ(&n2, list.tail());
             {
                 const int expected[] = {4, 1, 3, 2};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
         }
 
@@ -231,7 +231,7 @@ namespace flare::container {
             EXPECT_EQ(&n2, list.tail());
             {
                 const int expected[] = {1, 2};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             n3.insert_after(&n2);
@@ -240,7 +240,7 @@ namespace flare::container {
             EXPECT_EQ(&n3, list.tail());
             {
                 const int expected[] = {1, 2, 3};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
 
             n4.insert_after(&n1);
@@ -249,7 +249,7 @@ namespace flare::container {
             EXPECT_EQ(&n3, list.tail());
             {
                 const int expected[] = {1, 4, 2, 3};
-                ExpectListContents(list, FLARE_ARRAY_SIZE(expected), expected);
+                ExpectListContents(list, TURBO_ARRAY_SIZE(expected), expected);
             }
         }
 
@@ -306,4 +306,4 @@ namespace flare::container {
         }
 
     }  // namespace
-}  // namespace flare::container
+}  // namespace turbo::container

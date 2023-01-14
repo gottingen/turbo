@@ -7,7 +7,7 @@
 
 #include "testing/gtest_wrap.h"
 #include <errno.h>                     // errno
-#include "flare/files/temp_file.h"
+#include "turbo/files/temp_file.h"
 
 namespace {
 
@@ -23,7 +23,7 @@ protected:
 
 TEST_F(TempFileTest, should_create_tmp_file)
 {
-    flare::temp_file tmp;
+    turbo::temp_file tmp;
     struct stat st;
     //check if existed
     ASSERT_EQ(0, stat(tmp.fname(), &st));
@@ -31,7 +31,7 @@ TEST_F(TempFileTest, should_create_tmp_file)
 
 TEST_F(TempFileTest, should_write_string)
 {
-    flare::temp_file tmp;
+    turbo::temp_file tmp;
     const char *exp = "a test file";
     ASSERT_EQ(0, tmp.save(exp));
 
@@ -47,7 +47,7 @@ TEST_F(TempFileTest, should_write_string)
 
 TEST_F(TempFileTest, temp_with_specific_ext)
 {
-    flare::temp_file tmp("blah");
+    turbo::temp_file tmp("blah");
     const char *exp = "a test file";
     ASSERT_EQ(0, tmp.save(exp));
     struct stat st;
@@ -69,7 +69,7 @@ TEST_F(TempFileTest, should_delete_when_exit)
     std::string fname;
     struct stat st;
     {
-        flare::temp_file tmp;
+        turbo::temp_file tmp;
         //check if existed
         ASSERT_EQ(0, stat(tmp.fname(), &st));
         fname = tmp.fname();
@@ -82,7 +82,7 @@ TEST_F(TempFileTest, should_delete_when_exit)
 
 TEST_F(TempFileTest, should_save_with_format)
 {
-    flare::temp_file tmp;
+    turbo::temp_file tmp;
     tmp.save_format("%s%d%ld%s", "justmp", 1, 98L, "hello world");
 
     FILE *fp = fopen(tmp.fname(), "r");
@@ -101,7 +101,7 @@ TEST_F(TempFileTest, should_save_with_format_in_long_string)
     memset(buf, 'a', sizeof(buf));
     buf[2047] = '\0';
 
-    flare::temp_file tmp;
+    turbo::temp_file tmp;
     tmp.save_format("%s", buf);
 
     FILE *fp = fopen(tmp.fname(), "r");
@@ -122,7 +122,7 @@ struct test_t {
 TEST_F(TempFileTest, save_binary_twice)
 {
     test_t data = {12, -34, {'B', 'E', 'E', 'F'}};
-    flare::temp_file tmp;
+    turbo::temp_file tmp;
     ASSERT_EQ(0, tmp.save_bin(&data, sizeof(data)));
 
     FILE *fp = fopen(tmp.fname(), "r");

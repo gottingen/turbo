@@ -18,14 +18,14 @@
 #include <inttypes.h>
 #include <map>
 #include "testing/gtest_wrap.h"
-#include "flare/base/static_atomic.h"
-#include "flare/times/time.h"
-#include "flare/base/scoped_lock.h"
-#include "flare/base/gperftools_profiler.h"
-#include "flare/fiber/internal/fiber.h"
-#include "flare/fiber/fiber_cond.h"
-#include "flare/fiber/internal/stack.h"
-#include "flare/fiber/this_fiber.h"
+#include "turbo/base/static_atomic.h"
+#include "turbo/times/time.h"
+#include "turbo/base/scoped_lock.h"
+#include "turbo/base/gperftools_profiler.h"
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/fiber_cond.h"
+#include "turbo/fiber/internal/stack.h"
+#include "turbo/fiber/this_fiber.h"
 
 namespace {
     struct Arg {
@@ -42,9 +42,9 @@ namespace {
 
     void *signaler(void *void_arg) {
         Arg *a = (Arg *) void_arg;
-        signal_start_time = flare::get_current_time_micros();
+        signal_start_time = turbo::get_current_time_micros();
         while (!stop) {
-            flare::fiber_sleep_for(SIGNAL_INTERVAL_US);
+            turbo::fiber_sleep_for(SIGNAL_INTERVAL_US);
             fiber_cond_signal(&a->c);
         }
         return nullptr;
@@ -56,9 +56,9 @@ namespace {
         while (!stop) {
             fiber_cond_wait(&a->c, &a->m);
 
-            FLARE_SCOPED_LOCK(wake_mutex);
+            TURBO_SCOPED_LOCK(wake_mutex);
             wake_tid.push_back(fiber_self());
-            wake_time.push_back(flare::get_current_time_micros());
+            wake_time.push_back(turbo::get_current_time_micros());
         }
         fiber_mutex_unlock(&a->m);
         return nullptr;
@@ -78,7 +78,7 @@ namespace {
         wake_time.clear();
 
         fiber_id_t wth[8];
-        const size_t NW = FLARE_ARRAY_SIZE(wth);
+        const size_t NW = TURBO_ARRAY_SIZE(wth);
         for (size_t i = 0; i < NW; ++i) {
             ASSERT_EQ(0, fiber_start_urgent(&wth[i], nullptr, waiter, &a));
         }
@@ -86,7 +86,7 @@ namespace {
         fiber_id_t sth;
         ASSERT_EQ(0, fiber_start_urgent(&sth, nullptr, signaler, &a));
 
-        flare::fiber_sleep_for(SIGNAL_INTERVAL_US * 200);
+        turbo::fiber_sleep_for(SIGNAL_INTERVAL_US * 200);
 
         pthread_mutex_lock(&wake_mutex);
         const size_t nbeforestop = wake_time.size();
@@ -137,15 +137,15 @@ namespace {
     }
 
     struct WrapperArg {
-        flare::fiber_mutex mutex;
-        flare::fiber_cond cond;
+        turbo::fiber_mutex mutex;
+        turbo::fiber_cond cond;
     };
 
     void *cv_signaler(void *void_arg) {
         WrapperArg *a = (WrapperArg *) void_arg;
-        signal_start_time = flare::get_current_time_micros();
+        signal_start_time = turbo::get_current_time_micros();
         while (!stop) {
-            flare::fiber_sleep_for(SIGNAL_INTERVAL_US);
+            turbo::fiber_sleep_for(SIGNAL_INTERVAL_US);
             a->cond.notify_one();
         }
         return nullptr;
@@ -162,7 +162,7 @@ namespace {
 
     void *cv_mutex_waiter(void *void_arg) {
         WrapperArg *a = (WrapperArg *) void_arg;
-        std::unique_lock<flare::fiber_mutex> lck(a->mutex);
+        std::unique_lock<turbo::fiber_mutex> lck(a->mutex);
         while (!stop) {
             a->cond.wait(lck);
         }
@@ -178,26 +178,26 @@ namespace {
 
     TEST(CondTest, cpp_wrapper) {
         stop = false;
-        flare::fiber_cond cond;
+        turbo::fiber_cond cond;
         pthread_t bmutex_waiter_threads[8];
         pthread_t mutex_waiter_threads[8];
         pthread_t signal_thread;
         WrapperArg a;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(bmutex_waiter_threads); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(bmutex_waiter_threads); ++i) {
             ASSERT_EQ(0, pthread_create(&bmutex_waiter_threads[i], nullptr,
                                         cv_bmutex_waiter, &a));
             ASSERT_EQ(0, pthread_create(&mutex_waiter_threads[i], nullptr,
                                         cv_mutex_waiter, &a));
         }
         ASSERT_EQ(0, pthread_create(&signal_thread, nullptr, cv_signaler, &a));
-        flare::fiber_sleep_for(100L * 1000);
+        turbo::fiber_sleep_for(100L * 1000);
         {
-            FLARE_SCOPED_LOCK(a.mutex);
+            TURBO_SCOPED_LOCK(a.mutex);
             stop = true;
         }
         pthread_join(signal_thread, nullptr);
         a.cond.notify_all();
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(bmutex_waiter_threads); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(bmutex_waiter_threads); ++i) {
             pthread_join(bmutex_waiter_threads[i], nullptr);
             pthread_join(mutex_waiter_threads[i], nullptr);
         }
@@ -214,13 +214,13 @@ namespace {
         Signal() : _signal(0) {}
 
         void notify() {
-            FLARE_SCOPED_LOCK(_m);
+            TURBO_SCOPED_LOCK(_m);
             ++_signal;
             _c.notify_one();
         }
 
         int wait(int old_signal) {
-            std::unique_lock<flare::fiber_mutex> lck(_m);
+            std::unique_lock<turbo::fiber_mutex> lck(_m);
             while (_signal == old_signal) {
                 _c.wait(lck);
             }
@@ -228,8 +228,8 @@ namespace {
         }
 
     private:
-        flare::fiber_mutex _m;
-        flare::fiber_cond _c;
+        turbo::fiber_mutex _m;
+        turbo::fiber_cond _c;
         int _signal;
     };
 
@@ -277,13 +277,13 @@ namespace {
             ASSERT_EQ(0, fiber_join(threads[i], nullptr));
         }
         ProfilerStop();
-        FLARE_LOG(INFO) << "total_count=" << arg.total_count.load();
+        TURBO_LOG(INFO) << "total_count=" << arg.total_count.load();
     }
 
     struct BroadcastArg {
-        flare::fiber_cond wait_cond;
-        flare::fiber_cond broadcast_cond;
-        flare::fiber_mutex mutex;
+        turbo::fiber_cond wait_cond;
+        turbo::fiber_cond broadcast_cond;
+        turbo::fiber_mutex mutex;
         int nwaiter;
         int cur_waiter;
         int rounds;
@@ -292,7 +292,7 @@ namespace {
 
     void *wait_thread(void *arg) {
         BroadcastArg *ba = (BroadcastArg *) arg;
-        std::unique_lock<flare::fiber_mutex> lck(ba->mutex);
+        std::unique_lock<turbo::fiber_mutex> lck(ba->mutex);
         while (ba->rounds > 0) {
             const int saved_round = ba->rounds;
             ++ba->cur_waiter;
@@ -310,7 +310,7 @@ namespace {
         BroadcastArg *ba = (BroadcastArg *) arg;
         //int local_round = 0;
         while (ba->rounds > 0) {
-            std::unique_lock<flare::fiber_mutex> lck(ba->mutex);
+            std::unique_lock<turbo::fiber_mutex> lck(ba->mutex);
             while (ba->cur_waiter < ba->nwaiter) {
                 ba->broadcast_cond.wait(lck);
             }
@@ -323,7 +323,7 @@ namespace {
 
     void *disturb_thread(void *arg) {
         BroadcastArg *ba = (BroadcastArg *) arg;
-        std::unique_lock<flare::fiber_mutex> lck(ba->mutex);
+        std::unique_lock<turbo::fiber_mutex> lck(ba->mutex);
         while (ba->rounds > 0) {
             lck.unlock();
             lck.lock();
@@ -408,7 +408,7 @@ namespace {
 
     void *usleep_thread(void *) {
         while (!g_stop) {
-            flare::fiber_sleep_for(1000L * 1000L);
+            turbo::fiber_sleep_for(1000L * 1000L);
         }
         return nullptr;
     }
@@ -426,7 +426,7 @@ namespace {
         fiber_id_t tid;
         FiberCond c;
         c.Init();
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         fiber_start_urgent(&tid, &FIBER_ATTR_PTHREAD, wait_cond_thread, &c);
         std::vector<fiber_id_t> tids;
         tids.reserve(32768);
@@ -437,16 +437,16 @@ namespace {
             tids.push_back(t0);
         }
         tm.stop();
-        FLARE_LOG(INFO) << "Creating fibers took " << tm.u_elapsed() << " us";
+        TURBO_LOG(INFO) << "Creating fibers took " << tm.u_elapsed() << " us";
         usleep(3 * 1000 * 1000L);
         c.Signal();
         g_stop = true;
         fiber_join(tid, nullptr);
         for (size_t i = 0; i < tids.size(); ++i) {
-            FLARE_LOG_EVERY_SECOND(INFO) << "Joined " << i << " threads";
+            TURBO_LOG_EVERY_SECOND(INFO) << "Joined " << i << " threads";
             fiber_join(tids[i], nullptr);
         }
-        FLARE_LOG_EVERY_SECOND(INFO) << "Joined " << tids.size() << " threads";
+        TURBO_LOG_EVERY_SECOND(INFO) << "Joined " << tids.size() << " threads";
     }
 
     TEST(CondTest, too_many_fibers_from_pthread) {

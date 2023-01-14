@@ -5,12 +5,12 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include "flare/container/flat_hash_map.h"
+#include "turbo/container/flat_hash_map.h"
 #include "hash_policy_testing.h"
 
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
 
@@ -34,4 +34,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

@@ -5,16 +5,16 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 #include "testing/sstream_workaround.h"
-#include "flare/memory/ref_ptr.h"
+#include "turbo/memory/ref_ptr.h"
 #include <atomic>
 #include <chrono>
 #include <thread>
-#include "flare/base/fast_rand.h"
+#include "turbo/base/fast_rand.h"
 #include "testing/gtest_wrap.h"
 
 using namespace std::literals;
 
-namespace flare {
+namespace turbo {
 
     struct RefCounted1 {
         std::atomic<int> ref_count{1};
@@ -192,10 +192,10 @@ namespace flare {
             ASSERT_EQ(11, RefCounted1::instances);
             for (auto &&e : ts) {
                 e = std::thread([&] {
-                    auto op = flare::base::fast_rand() % 4;
+                    auto op = turbo::base::fast_rand() % 4;
                     while (!ever_success) {
                         if (op == 0) {
-                            atomic.store(temps[flare::base::fast_rand_less_than(9)], std::memory_order_release);
+                            atomic.store(temps[turbo::base::fast_rand_less_than(9)], std::memory_order_release);
                         } else if (op == 1) {
                             if (auto ptr = atomic.load(std::memory_order_acquire)) {
                                 ASSERT_EQ(12345, ptr->xxx);
@@ -221,7 +221,7 @@ namespace flare {
                                 ever_success = true;
                             }
                         } else {
-                            atomic.exchange(temps[flare::base::fast_rand_less_than(9)]);
+                            atomic.exchange(temps[turbo::base::fast_rand_less_than(9)]);
                         }
                         ASSERT_EQ(11, RefCounted1::instances);
                     }
@@ -234,4 +234,4 @@ namespace flare {
         }
     }
 */
-}  // namespace flare
+}  // namespace turbo

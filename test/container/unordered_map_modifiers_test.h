@@ -15,7 +15,7 @@
 #include "hash_policy_testing.h"
 
 
-namespace flare {
+namespace turbo {
     namespace priv {
 
         template<class UnordMap>
@@ -265,6 +265,6 @@ namespace flare {
                                     Erase, EraseRange, EraseKey, Swap);
 
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // UNORDERED_MAP_MODIFIERS_TEST_H_

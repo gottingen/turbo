@@ -13,13 +13,13 @@
 
 
 #include "testing/gtest_wrap.h"
-#include "flare/base/profile.h"
-#include "flare/times/internal/chrono_time_internal.h"
-#include "flare/times/internal/time_zone.h"
+#include "turbo/base/profile.h"
+#include "turbo/times/internal/chrono_time_internal.h"
+#include "turbo/times/internal/time_zone.h"
 
 namespace chrono = std::chrono;
 
-namespace flare {
+namespace turbo {
 
     namespace times_internal {
 
@@ -85,7 +85,7 @@ namespace flare {
             EXPECT_EQ(
                     "03:04:05",
                     format(kFmt,
-                           chrono::time_point_cast<flare::times_internal::seconds>(t0),
+                           chrono::time_point_cast<turbo::times_internal::seconds>(t0),
                            utc));
             EXPECT_EQ("03:04:00",
                       format(kFmt, chrono::time_point_cast<chrono::minutes>(t0), utc));
@@ -96,8 +96,8 @@ namespace flare {
         TEST(Format, TimePointExtendedResolution) {
             const char kFmt[] = "%H:%M:%E*S";
             const time_zone utc = utc_time_zone();
-            const time_point<flare::times_internal::seconds> tp =
-                    chrono::time_point_cast<flare::times_internal::seconds>(
+            const time_point<turbo::times_internal::seconds> tp =
+                    chrono::time_point_cast<turbo::times_internal::seconds>(
                             chrono::system_clock::from_time_t(0)) +
                     chrono::hours(12) + chrono::minutes(34) + chrono::seconds(56);
 
@@ -424,7 +424,7 @@ namespace flare {
         TEST(Format, ExtendedOffset) {
             const auto tp = chrono::system_clock::from_time_t(0);
 
-            auto tz = fixed_time_zone(flare::times_internal::seconds::zero());
+            auto tz = fixed_time_zone(turbo::times_internal::seconds::zero());
             TestFormatSpecifier(tp, tz, "%z", "+0000");
             TestFormatSpecifier(tp, tz, "%:z", "+00:00");
             TestFormatSpecifier(tp, tz, "%Ez", "+00:00");
@@ -505,7 +505,7 @@ namespace flare {
         TEST(Format, ExtendedSecondOffset) {
             const auto tp = chrono::system_clock::from_time_t(0);
 
-            auto tz = fixed_time_zone(flare::times_internal::seconds::zero());
+            auto tz = fixed_time_zone(turbo::times_internal::seconds::zero());
             TestFormatSpecifier(tp, tz, "%E*z", "+00:00:00");
             TestFormatSpecifier(tp, tz, "%::z", "+00:00:00");
             TestFormatSpecifier(tp, tz, "%:::z", "+00");
@@ -721,7 +721,7 @@ namespace flare {
             const char kFmt[] = "%H:%M:%E*S";
             const time_zone utc = utc_time_zone();
 
-            time_point<flare::times_internal::seconds> tp;
+            time_point<turbo::times_internal::seconds> tp;
             times_detail::femtoseconds fs;
             EXPECT_TRUE(times_detail::parse(kFmt, "12:34:56.123456789012345", utc, &tp, &fs));
             EXPECT_EQ("12:34:56.123456789012345", times_detail::format(kFmt, tp, fs, utc));
@@ -1258,7 +1258,7 @@ namespace flare {
 
         TEST(Parse, ExtendedOffset) {
             const time_zone utc = utc_time_zone();
-            time_point<flare::times_internal::seconds> tp;
+            time_point<turbo::times_internal::seconds> tp;
 
             EXPECT_TRUE(parse("%Ez", "+00:00", utc, &tp));
             EXPECT_EQ(convert(civil_second(1970, 1, 1, 0, 0, 0), utc), tp);
@@ -1289,7 +1289,7 @@ namespace flare {
 
         TEST(Parse, ExtendedSecondOffset) {
             const time_zone utc = utc_time_zone();
-            time_point<flare::times_internal::seconds> tp;
+            time_point<turbo::times_internal::seconds> tp;
 
             for (auto fmt : {"%Ez", "%E*z", "%:z", "%::z", "%:::z"}) {
                 EXPECT_TRUE(parse(fmt, "+00:00:00", utc, &tp));
@@ -1337,7 +1337,7 @@ namespace flare {
         TEST(Parse, ExtendedYears) {
             const time_zone utc = utc_time_zone();
             const char e4y_fmt[] = "%E4Y%m%d";  // no separators
-            time_point<flare::times_internal::seconds> tp;
+            time_point<turbo::times_internal::seconds> tp;
 
             // %E4Y consumes exactly four chars, including any sign.
             EXPECT_TRUE(parse(e4y_fmt, "-9991127", utc, &tp));
@@ -1380,33 +1380,33 @@ namespace flare {
 
         TEST(Parse, MaxRange) {
             const time_zone utc = utc_time_zone();
-            time_point<flare::times_internal::seconds> tp;
+            time_point<turbo::times_internal::seconds> tp;
 
             // tests the upper limit using +00:00 offset
             EXPECT_TRUE(
                     parse(RFC3339_sec, "292277026596-12-04T15:30:07+00:00", utc, &tp));
-            EXPECT_EQ(tp, time_point<flare::times_internal::seconds>::max());
+            EXPECT_EQ(tp, time_point<turbo::times_internal::seconds>::max());
             EXPECT_FALSE(
                     parse(RFC3339_sec, "292277026596-12-04T15:30:08+00:00", utc, &tp));
 
             // tests the upper limit using -01:00 offset
             EXPECT_TRUE(
                     parse(RFC3339_sec, "292277026596-12-04T14:30:07-01:00", utc, &tp));
-            EXPECT_EQ(tp, time_point<flare::times_internal::seconds>::max());
+            EXPECT_EQ(tp, time_point<turbo::times_internal::seconds>::max());
             EXPECT_FALSE(
                     parse(RFC3339_sec, "292277026596-12-04T15:30:07-01:00", utc, &tp));
 
             // tests the lower limit using +00:00 offset
             EXPECT_TRUE(
                     parse(RFC3339_sec, "-292277022657-01-27T08:29:52+00:00", utc, &tp));
-            EXPECT_EQ(tp, time_point<flare::times_internal::seconds>::min());
+            EXPECT_EQ(tp, time_point<turbo::times_internal::seconds>::min());
             EXPECT_FALSE(
                     parse(RFC3339_sec, "-292277022657-01-27T08:29:51+00:00", utc, &tp));
 
             // tests the lower limit using +01:00 offset
             EXPECT_TRUE(
                     parse(RFC3339_sec, "-292277022657-01-27T09:29:52+01:00", utc, &tp));
-            EXPECT_EQ(tp, time_point<flare::times_internal::seconds>::min());
+            EXPECT_EQ(tp, time_point<turbo::times_internal::seconds>::min());
             EXPECT_FALSE(
                     parse(RFC3339_sec, "-292277022657-01-27T08:29:51+01:00", utc, &tp));
 
@@ -1417,7 +1417,7 @@ namespace flare {
                                utc, &tp));
 
             // TODO: Add tests that parsing times with fractional seconds overflow
-            // appropriately. This can't be done until flare::times_internal::parse() properly detects
+            // appropriately. This can't be done until turbo::times_internal::parse() properly detects
             // overflow when combining the chrono seconds and femto.
         }
 
@@ -1469,24 +1469,24 @@ namespace flare {
 
         TEST(FormatParse, RoundTripDistantFuture) {
             const time_zone utc = utc_time_zone();
-            const time_point<flare::times_internal::seconds> in =
-                    time_point<flare::times_internal::seconds>::max();
+            const time_point<turbo::times_internal::seconds> in =
+                    time_point<turbo::times_internal::seconds>::max();
             const std::string s = format(RFC3339_full, in, utc);
-            time_point<flare::times_internal::seconds> out;
+            time_point<turbo::times_internal::seconds> out;
             EXPECT_TRUE(parse(RFC3339_full, s, utc, &out)) << s;
             EXPECT_EQ(in, out);
         }
 
         TEST(FormatParse, RoundTripDistantPast) {
             const time_zone utc = utc_time_zone();
-            const time_point<flare::times_internal::seconds> in =
-                    time_point<flare::times_internal::seconds>::min();
+            const time_point<turbo::times_internal::seconds> in =
+                    time_point<turbo::times_internal::seconds>::min();
             const std::string s = format(RFC3339_full, in, utc);
-            time_point<flare::times_internal::seconds> out;
+            time_point<turbo::times_internal::seconds> out;
             EXPECT_TRUE(parse(RFC3339_full, s, utc, &out)) << s;
             EXPECT_EQ(in, out);
         }
 
     }  // namespace times_internal
 
-}  // namespace flare
+}  // namespace turbo

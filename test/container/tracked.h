@@ -12,7 +12,7 @@
 #include <memory>
 #include <utility>
 
-namespace flare {
+namespace turbo {
     namespace priv {
 
         // A class that tracks its copies and moves so that it can be queried in tests.
@@ -73,6 +73,6 @@ namespace flare {
         };
 
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // TRACKED_H_

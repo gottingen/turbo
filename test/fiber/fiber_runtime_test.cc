@@ -17,17 +17,17 @@
 
 #include "testing/gtest_wrap.h"
 #include <gflags/gflags.h>
-#include "flare/base/static_atomic.h"
-#include "flare/times/time.h"
-#include "flare/log/logging.h"
-#include "flare/thread/thread.h"
-#include <flare/fiber/internal/waitable_event.h>
-#include "flare/log/logging.h"
-#include "flare/fiber/runtime.h"
-#include "flare/fiber/internal/fiber.h"
-#include "flare/fiber/internal/schedule_group.h"
+#include "turbo/base/static_atomic.h"
+#include "turbo/times/time.h"
+#include "turbo/log/logging.h"
+#include "turbo/thread/thread.h"
+#include <turbo/fiber/internal/waitable_event.h>
+#include "turbo/log/logging.h"
+#include "turbo/fiber/runtime.h"
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/internal/schedule_group.h"
 
-namespace flare::fiber_internal {
+namespace turbo::fiber_internal {
     extern schedule_group *g_task_control;
 }
 
@@ -37,23 +37,23 @@ namespace {
     }
 
     TEST(FiberTest, setconcurrency) {
-        ASSERT_EQ(8 + FIBER_EPOLL_THREAD_NUM, (size_t) flare::fiber_getconcurrency());
-        ASSERT_EQ(EINVAL, flare::fiber_setconcurrency(FIBER_MIN_CONCURRENCY - 1));
-        ASSERT_EQ(EINVAL, flare::fiber_setconcurrency(0));
-        ASSERT_EQ(EINVAL, flare::fiber_setconcurrency(-1));
-        ASSERT_EQ(EINVAL, flare::fiber_setconcurrency(FIBER_MAX_CONCURRENCY + 1));
-        ASSERT_EQ(0, flare::fiber_setconcurrency(FIBER_MIN_CONCURRENCY));
-        ASSERT_EQ(FIBER_MIN_CONCURRENCY, flare::fiber_getconcurrency());
-        ASSERT_EQ(0, flare::fiber_setconcurrency(FIBER_MIN_CONCURRENCY + 1));
-        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 1, flare::fiber_getconcurrency());
-        ASSERT_EQ(0, flare::fiber_setconcurrency(FIBER_MIN_CONCURRENCY));  // smaller value
+        ASSERT_EQ(8 + FIBER_EPOLL_THREAD_NUM, (size_t) turbo::fiber_getconcurrency());
+        ASSERT_EQ(EINVAL, turbo::fiber_setconcurrency(FIBER_MIN_CONCURRENCY - 1));
+        ASSERT_EQ(EINVAL, turbo::fiber_setconcurrency(0));
+        ASSERT_EQ(EINVAL, turbo::fiber_setconcurrency(-1));
+        ASSERT_EQ(EINVAL, turbo::fiber_setconcurrency(FIBER_MAX_CONCURRENCY + 1));
+        ASSERT_EQ(0, turbo::fiber_setconcurrency(FIBER_MIN_CONCURRENCY));
+        ASSERT_EQ(FIBER_MIN_CONCURRENCY, turbo::fiber_getconcurrency());
+        ASSERT_EQ(0, turbo::fiber_setconcurrency(FIBER_MIN_CONCURRENCY + 1));
+        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 1, turbo::fiber_getconcurrency());
+        ASSERT_EQ(0, turbo::fiber_setconcurrency(FIBER_MIN_CONCURRENCY));  // smaller value
         fiber_id_t th;
         ASSERT_EQ(0, fiber_start_urgent(&th, nullptr, dummy, nullptr));
-        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 1, flare::fiber_getconcurrency());
-        ASSERT_EQ(0, flare::fiber_setconcurrency(FIBER_MIN_CONCURRENCY + 5));
-        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 5, flare::fiber_getconcurrency());
-        ASSERT_EQ(EPERM, flare::fiber_setconcurrency(FIBER_MIN_CONCURRENCY + 1));
-        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 5, flare::fiber_getconcurrency());
+        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 1, turbo::fiber_getconcurrency());
+        ASSERT_EQ(0, turbo::fiber_setconcurrency(FIBER_MIN_CONCURRENCY + 5));
+        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 5, turbo::fiber_getconcurrency());
+        ASSERT_EQ(EPERM, turbo::fiber_setconcurrency(FIBER_MIN_CONCURRENCY + 1));
+        ASSERT_EQ(FIBER_MIN_CONCURRENCY + 5, turbo::fiber_getconcurrency());
     }
 
     static std::atomic<int> *odd;
@@ -61,7 +61,7 @@ namespace {
 
     static std::atomic<int> nfibers(0);
     static std::atomic<int> npthreads(0);
-    static FLARE_THREAD_LOCAL bool counted = false;
+    static TURBO_THREAD_LOCAL bool counted = false;
     static std::atomic<bool> stop(false);
 
     static void *odd_thread(void *) {
@@ -71,8 +71,8 @@ namespace {
                 counted = true;
                 npthreads.fetch_add(1);
             }
-            flare::fiber_internal::waitable_event_wake_all(even);
-            flare::fiber_internal::waitable_event_wait(odd, 0, nullptr);
+            turbo::fiber_internal::waitable_event_wake_all(even);
+            turbo::fiber_internal::waitable_event_wait(odd, 0, nullptr);
         }
         return nullptr;
     }
@@ -84,15 +84,15 @@ namespace {
                 counted = true;
                 npthreads.fetch_add(1);
             }
-            flare::fiber_internal::waitable_event_wake_all(odd);
-            flare::fiber_internal::waitable_event_wait(even, 0, nullptr);
+            turbo::fiber_internal::waitable_event_wake_all(odd);
+            turbo::fiber_internal::waitable_event_wait(even, 0, nullptr);
         }
         return nullptr;
     }
 
     TEST(FiberTest, setconcurrency_with_running_fiber) {
-        odd = flare::fiber_internal::waitable_event_create_checked<std::atomic<int> >();
-        even = flare::fiber_internal::waitable_event_create_checked<std::atomic<int> >();
+        odd = turbo::fiber_internal::waitable_event_create_checked<std::atomic<int> >();
+        even = turbo::fiber_internal::waitable_event_create_checked<std::atomic<int> >();
         ASSERT_TRUE(odd != nullptr && even != nullptr);
         *odd = 0;
         *even = 0;
@@ -106,23 +106,23 @@ namespace {
             tids.push_back(tid);
         }
         for (int i = 100; i <= N; ++i) {
-            ASSERT_EQ(0, flare::fiber_setconcurrency(i));
-            ASSERT_EQ(i, flare::fiber_getconcurrency());
+            ASSERT_EQ(0, turbo::fiber_setconcurrency(i));
+            ASSERT_EQ(i, turbo::fiber_getconcurrency());
         }
         usleep(1000 * N);
         *odd = 1;
         *even = 1;
         stop = true;
-        flare::fiber_internal::waitable_event_wake_all(odd);
-        flare::fiber_internal::waitable_event_wake_all(even);
+        turbo::fiber_internal::waitable_event_wake_all(odd);
+        turbo::fiber_internal::waitable_event_wake_all(even);
         for (size_t i = 0; i < tids.size(); ++i) {
             fiber_join(tids[i], nullptr);
         }
-        FLARE_LOG(INFO) << "All fibers has quit";
+        TURBO_LOG(INFO) << "All fibers has quit";
         ASSERT_EQ(2 * N, nfibers);
         // This is not necessarily true, not all workers need to run sth.
         //ASSERT_EQ(N, npthreads);
-        FLARE_LOG(INFO) << "Touched pthreads=" << npthreads;
+        TURBO_LOG(INFO) << "Touched pthreads=" << npthreads;
     }
 
     void *sleep_proc(void *) {
@@ -154,7 +154,7 @@ namespace {
         ASSERT_EQ(1, set_min_concurrency(-1)); // set min success
         ASSERT_EQ(1, set_min_concurrency(0)); // set min success
         ASSERT_EQ(0, get_min_concurrency());
-        int conn = flare::fiber_getconcurrency();
+        int conn = turbo::fiber_getconcurrency();
         int add_conn = 100;
 
         ASSERT_EQ(0, set_min_concurrency(conn + 1)); // set min failed
@@ -163,15 +163,15 @@ namespace {
         ASSERT_EQ(1, set_min_concurrency(conn - 1)); // set min success
         ASSERT_EQ(conn - 1, get_min_concurrency());
 
-        ASSERT_EQ(EINVAL, flare::fiber_setconcurrency(conn - 2)); // set max failed
-        ASSERT_EQ(0, flare::fiber_setconcurrency(conn + add_conn + 1)); // set max success
-        ASSERT_EQ(0, flare::fiber_setconcurrency(conn + add_conn)); // set max success
-        ASSERT_EQ(conn + add_conn, flare::fiber_getconcurrency());
-        ASSERT_EQ(conn, flare::fiber_internal::g_task_control->concurrency());
+        ASSERT_EQ(EINVAL, turbo::fiber_setconcurrency(conn - 2)); // set max failed
+        ASSERT_EQ(0, turbo::fiber_setconcurrency(conn + add_conn + 1)); // set max success
+        ASSERT_EQ(0, turbo::fiber_setconcurrency(conn + add_conn)); // set max success
+        ASSERT_EQ(conn + add_conn, turbo::fiber_getconcurrency());
+        ASSERT_EQ(conn, turbo::fiber_internal::g_task_control->concurrency());
 
         ASSERT_EQ(1, set_min_concurrency(conn + 1)); // set min success
         ASSERT_EQ(conn + 1, get_min_concurrency());
-        ASSERT_EQ(conn + 1, flare::fiber_internal::g_task_control->concurrency());
+        ASSERT_EQ(conn + 1, turbo::fiber_internal::g_task_control->concurrency());
 
         std::vector<fiber_id_t> tids;
         for (int i = 0; i < conn; ++i) {
@@ -187,8 +187,8 @@ namespace {
         for (size_t i = 0; i < tids.size(); ++i) {
             fiber_join(tids[i], nullptr);
         }
-        ASSERT_EQ(conn + add_conn, flare::fiber_getconcurrency());
-        ASSERT_EQ(conn + add_conn, flare::fiber_internal::g_task_control->concurrency());
+        ASSERT_EQ(conn + add_conn, turbo::fiber_getconcurrency());
+        ASSERT_EQ(conn + add_conn, turbo::fiber_internal::g_task_control->concurrency());
     }
 
 } // namespace

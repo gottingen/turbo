@@ -24,7 +24,7 @@
 #pragma warning(pop)
 #endif
 
-namespace flare {
+namespace turbo {
     namespace priv {
 
         template<class UnordMap>
@@ -40,10 +40,10 @@ namespace flare {
             EXPECT_TRUE((std::is_same<std::pair<const typename TypeParam::key_type,
                     typename TypeParam::mapped_type>,
                     typename TypeParam::value_type>()));
-            EXPECT_TRUE((flare::conjunction<
-                    flare::negation<std::is_signed<typename TypeParam::size_type>>,
+            EXPECT_TRUE((turbo::conjunction<
+                    turbo::negation<std::is_signed<typename TypeParam::size_type>>,
                     std::is_integral<typename TypeParam::size_type>>()));
-            EXPECT_TRUE((flare::conjunction<
+            EXPECT_TRUE((turbo::conjunction<
                     std::is_signed<typename TypeParam::difference_type>,
                     std::is_integral<typename TypeParam::difference_type>>()));
             EXPECT_TRUE((std::is_convertible<
@@ -85,6 +85,6 @@ namespace flare {
         REGISTER_TYPED_TEST_SUITE_P(MembersTest, Typedefs, SimpleFunctions, BeginEnd);
 
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // UNORDERED_MAP_MEMBERS_TEST_H_

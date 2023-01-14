@@ -7,16 +7,16 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/container/lru_cache.h"
+#include "turbo/container/lru_cache.h"
 #include "testing/gtest_wrap.h"
 
 #include <iostream>
 
 namespace testing {
     TEST(TestCache, TestSet) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         {
             auto item = cache.set(10, 20);
@@ -60,9 +60,9 @@ namespace testing {
     }
 
     TEST(TestCache, TestTwiceSet) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         cache.set(10, 20);
         cache.set(10, 30);
@@ -73,9 +73,9 @@ namespace testing {
     }
 
     TEST(TestCache, TestDel) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         {
             EXPECT_FALSE(cache.del(10));
@@ -124,12 +124,12 @@ namespace testing {
     }
 
     TEST(TestCache, TestGC) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.max_item_num_ = 10;
         config.prune_batch_size_ = 3;
         config.promote_per_times_ = 3;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         for (int i = 0; i < 10; i++) {
             cache.set(i, i + 1);
@@ -152,12 +152,12 @@ namespace testing {
     }
 
     TEST(TestCache, TestPromoteGC1) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.max_item_num_ = 10;
         config.prune_batch_size_ = 3;
         config.promote_per_times_ = 3;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         for (int i = 0; i < 10; i++) {
             cache.set(i, i + 1);
@@ -183,12 +183,12 @@ namespace testing {
     }
 
     TEST(TestCache, TestPromoteGC2) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.max_item_num_ = 10;
         config.prune_batch_size_ = 3;
         config.promote_per_times_ = 3;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         for (int i = 0; i < 10; i++) {
             cache.set(i, i + 1);
@@ -217,16 +217,16 @@ namespace testing {
     }
 
     TEST(TestCache, TestPromoteTableFull) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.max_item_num_ = 5000;
         config.prune_batch_size_ = 100;
         config.promote_per_times_ = 3;
-        config.item_expire_sec_ = flare::cache_config::kDefaultCacheItemExpireSec;
-        config.item_gen_time_threshold_ms_ = flare::cache_config::kDefaultGenItemTimeThresholdMs;
+        config.item_expire_sec_ = turbo::cache_config::kDefaultCacheItemExpireSec;
+        config.item_gen_time_threshold_ms_ = turbo::cache_config::kDefaultGenItemTimeThresholdMs;
         config.delete_buffer_len_ = 10;
         config.promote_buffer_len_ = 1;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         for (int i = 0; i < 1000; i++) {
             cache.set(i, i + 1);
@@ -237,9 +237,9 @@ namespace testing {
     }
 
     TEST(TestCache, TestTwoThreadSetDel) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         auto threadFunc = [&cache]() {
             for (int i = 0; i < 1000; i++) {
@@ -271,9 +271,9 @@ namespace testing {
     }
 
     TEST(TestCache, TestTwoThreadDelSet) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<int, int> cache(config);
+        turbo::lru_cache<int, int> cache(config);
         cache.start();
         auto threadFunc = [&cache]() {
             for (int j = 4; j >= 0; j--) {
@@ -297,7 +297,7 @@ namespace testing {
     }
 
     TEST(TestCache, TestDump) {
-        flare::lru_cache<int, int> cache;
+        turbo::lru_cache<int, int> cache;
         cache.start();
         for (int i = 0; i < 10; i++) {
             cache.set(i, i);
@@ -315,7 +315,7 @@ namespace testing {
     }
 
     TEST(TestCache, TestWithRamPolicyDump) {
-        flare::lru_cache<uint32_t, uint32_t> cache;
+        turbo::lru_cache<uint32_t, uint32_t> cache;
         cache.use_ram_policy();
         cache.start();
         for (uint32_t i = 0; i < 10; i++) {
@@ -333,12 +333,12 @@ namespace testing {
     }
 
     TEST(TestCache, TestWithRamPolicyGc) {
-        flare::cache_config config;
+        turbo::cache_config config;
         config.max_item_num_ = 10;
         config.prune_batch_size_ = 3;
         config.promote_per_times_ = 3;
         config.worker_sleep_ms_ = 0;
-        flare::lru_cache<uint32_t, uint32_t> cache(config);
+        turbo::lru_cache<uint32_t, uint32_t> cache(config);
         cache.use_ram_policy(256);
         cache.start();
         for (uint32_t i = 0; i < 7; i++) {

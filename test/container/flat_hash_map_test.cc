@@ -16,9 +16,9 @@
 #define THIS_EXTRA_TPL_PARAMS
 #endif
 
-#include "flare/container/flat_hash_map.h"
-#include "flare/container/parallel_node_hash_map.h"
-#include "flare/container/parallel_flat_hash_map.h"
+#include "turbo/container/flat_hash_map.h"
+#include "turbo/container/parallel_node_hash_map.h"
+#include "turbo/container/parallel_flat_hash_map.h"
 #include "hash_generator_testing.h"
 #include "unordered_map_constructor_test.h"
 #include "unordered_map_lookup_test.h"
@@ -26,11 +26,11 @@
 #include "unordered_map_modifiers_test.h"
 
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
-            using ::flare::priv::hash_internal::Enum;
-            using ::flare::priv::hash_internal::EnumClass;
+            using ::turbo::priv::hash_internal::Enum;
+            using ::turbo::priv::hash_internal::EnumClass;
             using ::testing::_;
             using ::testing::Pair;
             using ::testing::UnorderedElementsAre;
@@ -40,10 +40,10 @@ namespace flare {
                     Alloc<std::pair<const K, V>> THIS_EXTRA_TPL_PARAMS>;
 
 
-            template<class K, class V, class H = flare::priv::hash_default_hash<K>,
-                    class Eq = flare::priv::hash_default_eq<K>,
-                    class Alloc =  flare::priv::Allocator<
-                            flare::priv::Pair<const K, V>>>
+            template<class K, class V, class H = turbo::priv::hash_default_hash<K>,
+                    class Eq = turbo::priv::hash_default_eq<K>,
+                    class Alloc =  turbo::priv::Allocator<
+                            turbo::priv::Pair<const K, V>>>
             using ThisMap = THIS_HASH_MAP<K, V, H, Eq, Alloc THIS_EXTRA_TPL_PARAMS>;
 
             static_assert(!std::is_standard_layout<NonStandardLayout>(), "");
@@ -243,4 +243,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

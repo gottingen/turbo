@@ -10,15 +10,15 @@
 #define THIS_TEST_NAME  NodeHashMap
 #endif
 
-#include "flare/container/node_hash_map.h"
-#include "flare/container/parallel_node_hash_map.h"
+#include "turbo/container/node_hash_map.h"
+#include "turbo/container/parallel_node_hash_map.h"
 #include "tracked.h"
 #include "unordered_map_constructor_test.h"
 #include "unordered_map_lookup_test.h"
 #include "unordered_map_members_test.h"
 #include "unordered_map_modifiers_test.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
 
@@ -27,9 +27,9 @@ namespace flare {
             using ::testing::UnorderedElementsAre;
 
             using MapTypes = ::testing::Types<
-                    flare::THIS_HASH_MAP<int, int, StatefulTestingHash, StatefulTestingEqual,
+                    turbo::THIS_HASH_MAP<int, int, StatefulTestingHash, StatefulTestingEqual,
                             Alloc<std::pair<const int, int>>>,
-                    flare::THIS_HASH_MAP<std::string, std::string, StatefulTestingHash,
+                    turbo::THIS_HASH_MAP<std::string, std::string, StatefulTestingHash,
                             StatefulTestingEqual,
                             Alloc<std::pair<const std::string, std::string>>>>;
 
@@ -38,7 +38,7 @@ namespace flare {
             INSTANTIATE_TYPED_TEST_SUITE_P(THIS_TEST_NAME, MembersTest, MapTypes);
             INSTANTIATE_TYPED_TEST_SUITE_P(THIS_TEST_NAME, ModifiersTest, MapTypes);
 
-            using M = flare::THIS_HASH_MAP<std::string, Tracked<int>>;
+            using M = turbo::THIS_HASH_MAP<std::string, Tracked<int>>;
 
             TEST(THIS_TEST_NAME, Emplace) {
                 M m;
@@ -111,7 +111,7 @@ namespace flare {
             TEST(THIS_TEST_NAME, AssignRecursive) {
                 struct Tree {
                     // Verify that unordered_map<K, IncompleteType> can be instantiated.
-                    flare::THIS_HASH_MAP<int, Tree> children;
+                    turbo::THIS_HASH_MAP<int, Tree> children;
                 };
                 Tree root;
                 const Tree &child = root.children.emplace().first->second;
@@ -133,7 +133,7 @@ namespace flare {
                 struct hash {
                     size_t operator()(const Key &) const { return 0; }
                 };
-                flare::THIS_HASH_MAP<Key, int, hash, Eq> m;
+                turbo::THIS_HASH_MAP<Key, int, hash, Eq> m;
                 m[Key()];
             }
 
@@ -164,7 +164,7 @@ namespace flare {
             };
 
             TEST(THIS_TEST_NAME, MergeExtractInsert) {
-                flare::THIS_HASH_MAP<NonMovableKey, int, NonMovableKeyHash, NonMovableKeyEq>
+                turbo::THIS_HASH_MAP<NonMovableKey, int, NonMovableKeyHash, NonMovableKeyEq>
                         set1, set2;
                 set1.emplace(std::piecewise_construct, std::make_tuple(7),
                              std::make_tuple(-7));
@@ -225,4 +225,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

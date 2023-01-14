@@ -1,12 +1,12 @@
 
 #include "testing/gtest_wrap.h"
-#include <flare/fiber/fiber_latch.h>
-#include "flare/base/static_atomic.h"
-#include "flare/times/time.h"
+#include <turbo/fiber/fiber_latch.h>
+#include "turbo/base/static_atomic.h"
+#include "turbo/times/time.h"
 
 namespace {
     struct Arg {
-        flare::fiber_latch latcher;
+        turbo::fiber_latch latcher;
         std::atomic<int> num_sig;
     };
 
@@ -32,17 +32,17 @@ namespace {
     }
 
     TEST(FiberLatchTest, timed_wait) {
-        flare::fiber_latch latcher;
-        auto ts = flare::time_point::future_unix_millis(100).to_timespec();
+        turbo::fiber_latch latcher;
+        auto ts = turbo::time_point::future_unix_millis(100).to_timespec();
         int rc = latcher.timed_wait(&ts);
         ASSERT_EQ(rc, ETIMEDOUT);
         latcher.signal();
-        auto ts1 = flare::time_point::future_unix_millis(100).to_timespec();
+        auto ts1 = turbo::time_point::future_unix_millis(100).to_timespec();
         rc = latcher.timed_wait(&ts1);
         ASSERT_EQ(rc, 0);
-        flare::fiber_latch latcher1;
+        turbo::fiber_latch latcher1;
         latcher1.signal();
-        auto ts2 = flare::time_point::future_unix_millis(1).to_timespec();
+        auto ts2 = turbo::time_point::future_unix_millis(1).to_timespec();
         rc = latcher.timed_wait(&ts2);
         ASSERT_EQ(rc, 0);
     }

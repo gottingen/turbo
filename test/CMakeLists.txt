@@ -31,7 +31,7 @@ add_definitions(
 file(GLOB_RECURSE TESTING_SRC "${PROJECT_SOURCE_DIR}/test/testing/*.cc")
 
 carbin_cc_library(
-        NAMESPACE flare
+        NAMESPACE turbo
         NAME testing
         SOURCES ${TESTING_SRC} ${PROTO_SRCS}
         PRIVATE_COMPILE_OPTIONS ${CARBIN_DEFAULT_COPTS}

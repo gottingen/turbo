@@ -6,7 +6,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/log/logging.h"
+#include "turbo/log/logging.h"
 
 #include <string>
 #include <vector>

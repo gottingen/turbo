@@ -21,14 +21,14 @@
 #include <stdio.h>
 #include <signal.h>
 #include "testing/gtest_wrap.h"
-#include "flare/times/time.h"
-#include "flare/base/errno.h"
+#include "turbo/times/time.h"
+#include "turbo/base/errno.h"
 #include <limits.h>                            // INT_MAX
-#include "flare/base/static_atomic.h"
-#include "flare/fiber/internal/fiber.h"
-#include <flare/fiber/internal/sys_futex.h>
-#include <flare/fiber/internal/processor.h>
-#include "flare/fiber/this_fiber.h"
+#include "turbo/base/static_atomic.h"
+#include "turbo/fiber/internal/fiber.h"
+#include <turbo/fiber/internal/sys_futex.h>
+#include <turbo/fiber/internal/processor.h>
+#include "turbo/fiber/this_fiber.h"
 
 namespace {
     volatile bool stop = false;
@@ -44,8 +44,8 @@ namespace {
                 if (x > 0) {
                     while ((x = m->fetch_sub(1)) > 0) {
                         ++njob;
-                        const long start = flare::get_current_time_nanos();
-                        while (flare::get_current_time_nanos() < start + 10000) {
+                        const long start = turbo::get_current_time_nanos();
+                        while (turbo::get_current_time_nanos() < start + 10000) {
                         }
                         if (stop) {
                             return new int(njob);
@@ -58,7 +58,7 @@ namespace {
             }
 
             ++nthread;
-            flare::fiber_internal::futex_wait_private(m/*lock1*/, 0/*consumed_njob*/, nullptr);
+            turbo::fiber_internal::futex_wait_private(m/*lock1*/, 0/*consumed_njob*/, nullptr);
             --nthread;
         }
         return new int(njob);
@@ -68,34 +68,34 @@ namespace {
         const size_t N = 100000;
         std::atomic<int> lock1(0);
         pthread_t rth[8];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(rth); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(rth); ++i) {
             ASSERT_EQ(0, pthread_create(&rth[i], nullptr, read_thread, &lock1));
         }
 
-        const int64_t t1 = flare::get_current_time_nanos();
+        const int64_t t1 = turbo::get_current_time_nanos();
         for (size_t i = 0; i < N; ++i) {
             if (nthread) {
                 lock1.fetch_add(1);
-                flare::fiber_internal::futex_wake_private(&lock1, 1);
+                turbo::fiber_internal::futex_wake_private(&lock1, 1);
             } else {
                 lock1.fetch_add(1);
                 if (nthread) {
-                    flare::fiber_internal::futex_wake_private(&lock1, 1);
+                    turbo::fiber_internal::futex_wake_private(&lock1, 1);
                 }
             }
         }
-        const int64_t t2 = flare::get_current_time_nanos();
+        const int64_t t2 = turbo::get_current_time_nanos();
 
-        flare::fiber_sleep_for(3000000);
+        turbo::fiber_sleep_for(3000000);
         stop = true;
         for (int i = 0; i < 10; ++i) {
-            flare::fiber_internal::futex_wake_private(&lock1, INT_MAX);
+            turbo::fiber_internal::futex_wake_private(&lock1, INT_MAX);
             sched_yield();
         }
 
         int njob = 0;
         int *res;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(rth); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(rth); ++i) {
             pthread_join(rth[i], (void **) &res);
             njob += *res;
             delete res;
@@ -108,13 +108,13 @@ namespace {
     TEST(FutexTest, futex_wake_before_wait) {
         int lock1 = 0;
         timespec timeout = {1, 0};
-        ASSERT_EQ(0, flare::fiber_internal::futex_wake_private(&lock1, INT_MAX));
-        ASSERT_EQ(-1, flare::fiber_internal::futex_wait_private(&lock1, 0, &timeout));
+        ASSERT_EQ(0, turbo::fiber_internal::futex_wake_private(&lock1, INT_MAX));
+        ASSERT_EQ(-1, turbo::fiber_internal::futex_wait_private(&lock1, 0, &timeout));
         ASSERT_EQ(ETIMEDOUT, errno);
     }
 
     void *dummy_waiter(void *lock) {
-        flare::fiber_internal::futex_wait_private(lock, 0, nullptr);
+        turbo::fiber_internal::futex_wait_private(lock, 0, nullptr);
         return nullptr;
     }
 
@@ -127,10 +127,10 @@ namespace {
 
         sleep(1);
         int nwakeup = 0;
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         for (size_t i = 0; i < N; ++i) {
-            nwakeup += flare::fiber_internal::futex_wake_private(&lock1, 1);
+            nwakeup += turbo::fiber_internal::futex_wake_private(&lock1, 1);
         }
         tm.stop();
         printf("N=%lu, futex_wake a thread = %" PRId64 "ns\n", N, tm.n_elapsed() / N);
@@ -141,7 +141,7 @@ namespace {
         nwakeup = 0;
         tm.start();
         for (size_t i = 0; i < REP; ++i) {
-            nwakeup += flare::fiber_internal::futex_wake_private(&lock1, 1);
+            nwakeup += turbo::fiber_internal::futex_wake_private(&lock1, 1);
         }
         tm.stop();
         ASSERT_EQ(0, nwakeup);
@@ -151,13 +151,13 @@ namespace {
     std::atomic<int> nevent(0);
 
     void *waker(void *lock) {
-        flare::fiber_sleep_for(10000);
+        turbo::fiber_sleep_for(10000);
         const size_t REP = 100000;
         int nwakeup = 0;
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         for (size_t i = 0; i < REP; ++i) {
-            nwakeup += flare::fiber_internal::futex_wake_private(lock, 1);
+            nwakeup += turbo::fiber_internal::futex_wake_private(lock, 1);
         }
         tm.stop();
         EXPECT_EQ(0, nwakeup);
@@ -166,21 +166,21 @@ namespace {
     }
 
     void *batch_waker(void *lock) {
-        flare::fiber_sleep_for(10000);
+        turbo::fiber_sleep_for(10000);
         const size_t REP = 100000;
         int nwakeup = 0;
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         for (size_t i = 0; i < REP; ++i) {
             if (nevent.fetch_add(1, std::memory_order_relaxed) == 0) {
-                nwakeup += flare::fiber_internal::futex_wake_private(lock, 1);
+                nwakeup += turbo::fiber_internal::futex_wake_private(lock, 1);
                 int expected = 1;
                 while (1) {
                     int last_expected = expected;
                     if (nevent.compare_exchange_strong(expected, 0, std::memory_order_relaxed)) {
                         break;
                     }
-                    nwakeup += flare::fiber_internal::futex_wake_private(lock, expected - last_expected);
+                    nwakeup += turbo::fiber_internal::futex_wake_private(lock, expected - last_expected);
                 }
             }
         }
@@ -194,17 +194,17 @@ namespace {
         pthread_t th[8];
         int lock1;
         std::cout << "[Direct wake]" << std::endl;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, waker, &lock1));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_join(th[i], nullptr));
         }
         std::cout << "[Batch wake]" << std::endl;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, batch_waker, &lock1));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_join(th[i], nullptr));
         }
     }

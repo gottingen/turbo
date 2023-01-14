@@ -18,9 +18,9 @@ exec_prefix=${prefix}
 includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
 
-Name: flare
+Name: turbo
 Description: An industrial-grade RPC framework
-Version: @FLARE_VERSION@
+Version: @TURBO_VERSION@
 Cflags: -I${includedir}
 Libs: -L${libdir}/ -lbrpc
-Libs.private: @FLARE_PRIVATE_LIBS@
+Libs.private: @TURBO_PRIVATE_LIBS@

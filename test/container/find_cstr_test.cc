@@ -9,9 +9,9 @@
 #include <algorithm>
 #include <random>
 #include "testing/gtest_wrap.h"
-#include "flare/container/find_cstr.h"
-#include "flare/times/time.h"
-#include "flare/log/logging.h"
+#include "turbo/container/find_cstr.h"
+#include "turbo/times/time.h"
+#include "turbo/log/logging.h"
 
 namespace {
     class FindCstrTest : public ::testing::Test {
@@ -38,7 +38,7 @@ namespace {
             // nothing.
         }
         t1["hello"] = 0xdeadbeef;
-        std::map<std::string, int>::iterator it = flare::container::find_cstr(t1, "hello");
+        std::map<std::string, int>::iterator it = turbo::container::find_cstr(t1, "hello");
         ASSERT_TRUE(it != t1.end());
         ASSERT_EQ("hello", it->first);
         ASSERT_EQ(0xdeadbeef, (unsigned int) it->second);
@@ -74,10 +74,10 @@ namespace {
         std::mt19937 g(rd());
         std::shuffle(all_keys.begin(), all_keys.end(), g);
         int sum = 0;
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         for (size_t i = 0; i < all_keys.size(); ++i) {
-            sum += flare::container::find_cstr(t1, all_keys[i])->second;
+            sum += turbo::container::find_cstr(t1, all_keys[i])->second;
         }
         tm.stop();
         int64_t elp1 = tm.n_elapsed();
@@ -88,7 +88,7 @@ namespace {
         tm.stop();
         int64_t elp2 = tm.n_elapsed();
 
-        FLARE_LOG(INFO) << "elp1=" << elp1 / N << " elp2=" << elp2 / N;
+        TURBO_LOG(INFO) << "elp1=" << elp1 / N << " elp2=" << elp2 / N;
     }
 
 }

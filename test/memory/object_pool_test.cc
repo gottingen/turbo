@@ -8,13 +8,13 @@
 #include "testing/sstream_workaround.h"
 #include <inttypes.h>
 #include "testing/gtest_wrap.h"
-#include "flare/times/time.h"
-#include "flare/base/profile.h"
+#include "turbo/times/time.h"
+#include "turbo/base/profile.h"
 #include <random>
 
-#define FLARE_CLEAR_OBJECT_POOL_AFTER_ALL_THREADS_QUIT
+#define TURBO_CLEAR_OBJECT_POOL_AFTER_ALL_THREADS_QUIT
 
-#include "flare/memory/object_pool.h"
+#include "turbo/memory/object_pool.h"
 
 namespace {
     std::random_device rd;
@@ -37,7 +37,7 @@ namespace {
     };
 }
 
-namespace flare {
+namespace turbo {
     template<>
     struct ObjectPoolBlockMaxSize<MyObject> {
         static const size_t value = 128;
@@ -59,10 +59,10 @@ namespace flare {
             return foo->x != 0;
         }
     };
-}  // namespace flare
+}  // namespace turbo
 
 namespace {
-    using namespace flare;
+    using namespace turbo;
 
     class ObjectPoolTest : public ::testing::Test {
     protected:
@@ -101,7 +101,7 @@ namespace {
 
     TEST_F(ObjectPoolTest, change_config) {
         int a[2];
-        printf("%lu\n", FLARE_ARRAY_SIZE(a));
+        printf("%lu\n", TURBO_ARRAY_SIZE(a));
 
         ObjectPoolInfo info = describe_objects<MyObject>();
         ObjectPoolInfo zero_info = {0, 0, 0, 0, 3, 3, 0};
@@ -180,7 +180,7 @@ namespace {
         // Perf of this test is affected by previous case.
         const size_t N = 100000;
 
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
 
         // warm up
         int *p = get_object<int>();
@@ -217,7 +217,7 @@ namespace {
         std::vector<SilentObj *> new_list;
         new_list.reserve(N);
 
-        flare::stop_watcher tm1, tm2;
+        turbo::stop_watcher tm1, tm2;
 
         // warm up
         return_object(get_object<SilentObj>());
@@ -258,7 +258,7 @@ namespace {
         const size_t N = 100000;
         std::vector<D *> v;
         v.reserve(N);
-        flare::stop_watcher tm0, tm1, tm2;
+        turbo::stop_watcher tm0, tm1, tm2;
         D tmp = D();
         int sr = 0;
 
@@ -304,7 +304,7 @@ namespace {
         const size_t N = 100000;
         std::vector<D *> v2;
         v2.reserve(N);
-        flare::stop_watcher tm0, tm1, tm2;
+        turbo::stop_watcher tm0, tm1, tm2;
         D tmp = D();
 
         for (int j = 0; j < 3; ++j) {
@@ -344,18 +344,18 @@ namespace {
 
     TEST_F(ObjectPoolTest, get_and_return_int_multiple_threads) {
         pthread_t tid[16];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid); ++i) {
             ASSERT_EQ(0, pthread_create(&tid[i], nullptr, get_and_return_int, nullptr));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid); ++i) {
             pthread_join(tid[i], nullptr);
         }
 
         pthread_t tid2[16];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid2); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid2); ++i) {
             ASSERT_EQ(0, pthread_create(&tid2[i], nullptr, new_and_delete_int, nullptr));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid2); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid2); ++i) {
             pthread_join(tid2[i], nullptr);
         }
 

@@ -19,7 +19,7 @@
 
 #include "testing/gtest_wrap.h"
 #include "testing/sstream_workaround.h"
-#include "flare/metrics/gauge.h"
+#include "turbo/metrics/gauge.h"
 #include <gflags/gflags.h>
 #include <cstdlib>
 
@@ -30,11 +30,11 @@ protected:
 };
 
 TEST_F(FileDumperTest, filters) {
-    flare::gauge<int> a1("a_latency");
-    flare::gauge<int> a2("a_qps");
-    flare::gauge<int> a3("a_error");
-    flare::gauge<int> a4("process_*");
-    flare::gauge<int> a5("default");
+    turbo::gauge<int> a1("a_latency");
+    turbo::gauge<int> a2("a_qps");
+    turbo::gauge<int> a3("a_error");
+    turbo::gauge<int> a4("process_*");
+    turbo::gauge<int> a5("default");
     google::SetCommandLineOption("variable_dump_interval", "1");
     google::SetCommandLineOption("variable_dump", "true");
     sleep(2);

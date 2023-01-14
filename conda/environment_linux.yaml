@@ -1,4 +1,4 @@
-name: flare-dev
+name: turbo-dev
 channels:
   - conda-forge
   - defaults

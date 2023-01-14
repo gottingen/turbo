@@ -7,11 +7,11 @@
 
 
 
-#include "flare/base/type_index.h"
+#include "turbo/base/type_index.h"
 #include <string>
 #include "testing/gtest_wrap.h"
 
-namespace flare::base {
+namespace turbo::base {
 
     TEST(type_index, Compare) {
         constexpr type_index empty1, empty2;
@@ -40,4 +40,4 @@ namespace flare::base {
                   str_type.get_runtime_type_index());
     }
 
-}  // namespace flare
+}  // namespace turbo

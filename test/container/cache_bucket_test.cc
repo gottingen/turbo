@@ -6,14 +6,14 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/container/cache/bucket.h"
+#include "turbo/container/cache/bucket.h"
 
 #include "testing/gtest_wrap.h"
 
 TEST(Bucket, TestSet) {
-    flare::cache_bucket<int, int> bucket;
+    turbo::cache_bucket<int, int> bucket;
     {
-        flare::cache_item_ptr<int, int> existing = nullptr;
+        turbo::cache_item_ptr<int, int> existing = nullptr;
         auto item = bucket.set(10, 20, 10, existing);
         EXPECT_EQ(20, item->value());
         EXPECT_EQ(1, bucket.size());
@@ -22,7 +22,7 @@ TEST(Bucket, TestSet) {
         EXPECT_EQ(20, item->value());
     }
     {
-        flare::cache_item_ptr<int, int> existing = nullptr;
+        turbo::cache_item_ptr<int, int> existing = nullptr;
         auto item = bucket.set(10, 30, 10, existing);
         EXPECT_EQ(30, item->value());
         EXPECT_EQ(1, bucket.size());
@@ -32,7 +32,7 @@ TEST(Bucket, TestSet) {
         EXPECT_EQ(30, item->value());
     }
     {
-        flare::cache_item_ptr<int, int> existing = nullptr;
+        turbo::cache_item_ptr<int, int> existing = nullptr;
         auto item = bucket.set(30, 20, 10, existing);
         EXPECT_EQ(20, item->value());
         EXPECT_EQ(2, bucket.size());
@@ -43,13 +43,13 @@ TEST(Bucket, TestSet) {
 }
 
 TEST(Bucket, TestDel) {
-    flare::cache_bucket<int, int> bucket;
+    turbo::cache_bucket<int, int> bucket;
     {
         auto itemDel = bucket.remove(10);
         EXPECT_EQ(nullptr, itemDel);
     }
     {
-        flare::cache_item_ptr<int, int> existing = nullptr;
+        turbo::cache_item_ptr<int, int> existing = nullptr;
         bucket.set(10, 20, 10, existing);
         auto item = bucket.remove(10);
         EXPECT_EQ(20, item->value());
@@ -59,7 +59,7 @@ TEST(Bucket, TestDel) {
         EXPECT_EQ(0, bucket.size());
     }
     {
-        flare::cache_item_ptr<int, int> existing = nullptr;
+        turbo::cache_item_ptr<int, int> existing = nullptr;
         bucket.set(10, 20, 10, existing);
         bucket.set(20, 30, 10, existing);
         bucket.set(30, 40, 10, existing);
@@ -77,13 +77,13 @@ TEST(Bucket, TestDel) {
 }
 
 TEST(Bucket, TestGet) {
-    flare::cache_bucket<int, int> bucket;
+    turbo::cache_bucket<int, int> bucket;
     {
         auto item = bucket.get(10);
         EXPECT_EQ(nullptr, item);
     }
     {
-        flare::cache_item_ptr<int, int> existing = nullptr;
+        turbo::cache_item_ptr<int, int> existing = nullptr;
         bucket.set(10, 20, 10, existing);
         auto item = bucket.get(10);
         EXPECT_EQ(20, item->value());

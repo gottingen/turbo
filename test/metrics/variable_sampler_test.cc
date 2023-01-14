@@ -8,21 +8,21 @@
 #include "testing/sstream_workaround.h"
 #include "testing/gtest_wrap.h"
 #include <limits>                           //std::numeric_limits
-#include "flare/metrics/detail/sampler.h"
-#include "flare/times/time.h"
-#include "flare/log/logging.h"
+#include "turbo/metrics/detail/sampler.h"
+#include "turbo/times/time.h"
+#include "turbo/log/logging.h"
 
 namespace {
 
     TEST(SamplerTest, linked_list) {
-        flare::container::link_node<flare::metrics_detail::variable_sampler> n1, n2;
+        turbo::container::link_node<turbo::metrics_detail::variable_sampler> n1, n2;
         n1.insert_before_as_list(&n2);
         ASSERT_EQ(n1.next(), &n2);
         ASSERT_EQ(n1.previous(), &n2);
         ASSERT_EQ(n2.next(), &n1);
         ASSERT_EQ(n2.previous(), &n1);
 
-        flare::container::link_node<flare::metrics_detail::variable_sampler> n3, n4;
+        turbo::container::link_node<turbo::metrics_detail::variable_sampler> n3, n4;
         n3.insert_before_as_list(&n4);
         ASSERT_EQ(n3.next(), &n4);
         ASSERT_EQ(n3.previous(), &n4);
@@ -40,7 +40,7 @@ namespace {
         ASSERT_EQ(&n4, n1.previous());
     }
 
-    class DebugSampler : public flare::metrics_detail::variable_sampler {
+    class DebugSampler : public turbo::metrics_detail::variable_sampler {
     public:
         DebugSampler() : _ncalled(0) {}
 
@@ -101,13 +101,13 @@ namespace {
     TEST(SamplerTest, multi_threaded) {
         pthread_t th[10];
         DebugSampler::_s_ndestroy = 0;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, check, nullptr));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_join(th[i], nullptr));
         }
         sleep(1);
-        EXPECT_EQ(100 * FLARE_ARRAY_SIZE(th), (size_t) DebugSampler::_s_ndestroy);
+        EXPECT_EQ(100 * TURBO_ARRAY_SIZE(th), (size_t) DebugSampler::_s_ndestroy);
     }
 } // namespace

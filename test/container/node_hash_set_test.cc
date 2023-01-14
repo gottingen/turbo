@@ -10,19 +10,19 @@
 #define THIS_TEST_NAME  NodeHashSet
 #endif
 
-#include "flare/container/node_hash_set.h"
-#include "flare/container/flat_hash_set.h"
-#include "flare/container/parallel_node_hash_set.h"
+#include "turbo/container/node_hash_set.h"
+#include "turbo/container/flat_hash_set.h"
+#include "turbo/container/parallel_node_hash_set.h"
 #include "unordered_set_constructor_test.h"
 #include "unordered_set_lookup_test.h"
 #include "unordered_set_members_test.h"
 #include "unordered_set_modifiers_test.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
-            using ::flare::priv::hash_internal::Enum;
-            using ::flare::priv::hash_internal::EnumClass;
+            using ::turbo::priv::hash_internal::Enum;
+            using ::turbo::priv::hash_internal::EnumClass;
             using ::testing::Pointee;
             using ::testing::UnorderedElementsAre;
 
@@ -55,12 +55,12 @@ namespace flare {
                         return *a == *b;
                     }
                 };
-                flare::THIS_HASH_SET<std::unique_ptr<int>, hash, Eq> set1, set2;
-                set1.insert(flare::make_unique<int>(7));
-                set1.insert(flare::make_unique<int>(17));
+                turbo::THIS_HASH_SET<std::unique_ptr<int>, hash, Eq> set1, set2;
+                set1.insert(turbo::make_unique<int>(7));
+                set1.insert(turbo::make_unique<int>(17));
 
-                set2.insert(flare::make_unique<int>(7));
-                set2.insert(flare::make_unique<int>(19));
+                set2.insert(turbo::make_unique<int>(7));
+                set2.insert(turbo::make_unique<int>(19));
 
                 EXPECT_THAT(set1, UnorderedElementsAre(Pointee(7), Pointee(17)));
                 EXPECT_THAT(set2, UnorderedElementsAre(Pointee(7), Pointee(19)));
@@ -70,7 +70,7 @@ namespace flare {
                 EXPECT_THAT(set1, UnorderedElementsAre(Pointee(7), Pointee(17), Pointee(19)));
                 EXPECT_THAT(set2, UnorderedElementsAre(Pointee(7)));
 
-                auto node = set1.extract(flare::make_unique<int>(7));
+                auto node = set1.extract(turbo::make_unique<int>(7));
                 EXPECT_TRUE(node);
                 EXPECT_THAT(node.value(), Pointee(7));
                 EXPECT_THAT(set1, UnorderedElementsAre(Pointee(17), Pointee(19)));
@@ -84,12 +84,12 @@ namespace flare {
                 EXPECT_NE(insert_result.position->get(), insert_result.node.value().get());
                 EXPECT_THAT(set2, UnorderedElementsAre(Pointee(7)));
 
-                node = set1.extract(flare::make_unique<int>(17));
+                node = set1.extract(turbo::make_unique<int>(17));
                 EXPECT_TRUE(node);
                 EXPECT_THAT(node.value(), Pointee(17));
                 EXPECT_THAT(set1, UnorderedElementsAre(Pointee(19)));
 
-                node.value() = flare::make_unique<int>(23);
+                node.value() = turbo::make_unique<int>(23);
 
                 insert_result = set2.insert(std::move(node));
                 EXPECT_FALSE(node);
@@ -101,4 +101,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

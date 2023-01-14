@@ -10,11 +10,11 @@
 #include <chrono>
 #include <memory>
 #include <thread>
-#include "flare/thread/latch.h"
+#include "turbo/thread/latch.h"
 #include "testing/gtest_wrap.h"
-#include "flare/times/time.h"
+#include "turbo/times/time.h"
 
-namespace flare {
+namespace turbo {
 
     std::atomic<bool> exiting{false};
 
@@ -62,15 +62,15 @@ namespace flare {
 
     TEST(Latch, WaitFor) {
         latch l(1);
-        ASSERT_FALSE(l.wait_for(flare::duration::milliseconds(100)));
+        ASSERT_FALSE(l.wait_for(turbo::duration::milliseconds(100)));
         l.count_down();
-        ASSERT_TRUE(l.wait_for(flare::zero_duration()));
+        ASSERT_TRUE(l.wait_for(turbo::zero_duration()));
     }
 
     TEST(Latch, WaitUntil) {
         latch l(1);
-        ASSERT_FALSE(l.wait_until(flare::time_point::future_unix_millis(100)));
+        ASSERT_FALSE(l.wait_until(turbo::time_point::future_unix_millis(100)));
         l.count_down();
-        ASSERT_TRUE(l.wait_until(flare::time_now()));
+        ASSERT_TRUE(l.wait_until(turbo::time_now()));
     }
 }

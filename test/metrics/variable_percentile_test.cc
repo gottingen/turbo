@@ -7,8 +7,8 @@
 
 #include "testing/sstream_workaround.h"
 #include "testing/gtest_wrap.h"
-#include "flare/metrics/detail/percentile.h"
-#include "flare/log/logging.h"
+#include "turbo/metrics/detail/percentile.h"
+#include "turbo/log/logging.h"
 #include <fstream>
 
 class PercentileTest : public testing::Test {
@@ -20,12 +20,12 @@ protected:
 };
 
 TEST_F(PercentileTest, add) {
-    flare::metrics_detail::percentile p;
+    turbo::metrics_detail::percentile p;
     for (int j = 0; j < 10; ++j) {
         for (int i = 0; i < 10000; ++i) {
             p << (i + 1);
         }
-        flare::metrics_detail::global_percentile_samples b = p.reset();
+        turbo::metrics_detail::global_percentile_samples b = p.reset();
         uint32_t last_value = 0;
         for (uint32_t k = 1; k <= 10u; ++k) {
             uint32_t value = b.get_number(k / 10.0);
@@ -34,7 +34,7 @@ TEST_F(PercentileTest, add) {
             EXPECT_GT(value, (k * 1000 - 500)) << "k=" << k;
             EXPECT_LT(value, (k * 1000 + 500)) << "k=" << k;
         }
-        FLARE_LOG(INFO) << "99%:" << b.get_number(0.99) << ' '
+        TURBO_LOG(INFO) << "99%:" << b.get_number(0.99) << ' '
                         << "99.9%:" << b.get_number(0.999) << ' '
                         << "99.99%:" << b.get_number(0.9999);
 
@@ -53,8 +53,8 @@ TEST_F(PercentileTest, merge1) {
     size_t belong_to_b2 = 0;
 
     for (int repeat = 0; repeat < 100; ++repeat) {
-        flare::metrics_detail::percentile_interval<SAMPLE_SIZE * 3> b0;
-        flare::metrics_detail::percentile_interval<SAMPLE_SIZE> b1;
+        turbo::metrics_detail::percentile_interval<SAMPLE_SIZE * 3> b0;
+        turbo::metrics_detail::percentile_interval<SAMPLE_SIZE> b1;
         for (size_t i = 0; i < N; ++i) {
             if (b1.full()) {
                 b0.merge(b1);
@@ -63,7 +63,7 @@ TEST_F(PercentileTest, merge1) {
             ASSERT_TRUE(b1.add32(i));
         }
         b0.merge(b1);
-        flare::metrics_detail::percentile_interval<SAMPLE_SIZE * 2> b2;
+        turbo::metrics_detail::percentile_interval<SAMPLE_SIZE * 2> b2;
         for (size_t i = 0; i < N * 2; ++i) {
             if (b2.full()) {
                 b0.merge(b2);
@@ -96,8 +96,8 @@ TEST_F(PercentileTest, merge2) {
     size_t belong_to_b2 = 0;
 
     for (int repeat = 0; repeat < 100; ++repeat) {
-        flare::metrics_detail::percentile_interval<64> b0;
-        flare::metrics_detail::percentile_interval<64> b1;
+        turbo::metrics_detail::percentile_interval<64> b0;
+        turbo::metrics_detail::percentile_interval<64> b1;
         for (size_t i = 0; i < N1; ++i) {
             if (b1.full()) {
                 b0.merge(b1);
@@ -106,7 +106,7 @@ TEST_F(PercentileTest, merge2) {
             ASSERT_TRUE(b1.add32(i));
         }
         b0.merge(b1);
-        flare::metrics_detail::percentile_interval<64> b2;
+        turbo::metrics_detail::percentile_interval<64> b2;
         for (size_t i = 0; i < N2; ++i) {
             if (b2.full()) {
                 b0.merge(b2);
@@ -138,24 +138,24 @@ TEST_F(PercentileTest, combine_of) {
     size_t belongs[num_samplers] = {0};
     size_t total = 0;
     for (int repeat = 0; repeat < 100; ++repeat) {
-        flare::metrics_detail::percentile p[num_samplers];
+        turbo::metrics_detail::percentile p[num_samplers];
         for (int i = 0; i < num_samplers; ++i) {
             for (int j = 0; j < N * (i + 1); ++j) {
                 p[i] << base + i * (i + 1) * N / 2 + j;
             }
         }
-        std::vector<flare::metrics_detail::global_percentile_samples> result;
+        std::vector<turbo::metrics_detail::global_percentile_samples> result;
         result.reserve(num_samplers);
         for (int i = 0; i < num_samplers; ++i) {
             result.push_back(p[i].get_value());
         }
-        flare::metrics_detail::percentile_samples<510> g;
+        turbo::metrics_detail::percentile_samples<510> g;
         g.combine_of(result.begin(), result.end());
-        for (size_t i = 0; i < flare::metrics_detail::NUM_INTERVALS; ++i) {
+        for (size_t i = 0; i < turbo::metrics_detail::NUM_INTERVALS; ++i) {
             if (g._intervals[i] == nullptr) {
                 continue;
             }
-            flare::metrics_detail::percentile_interval<510> &p = *g._intervals[i];
+            turbo::metrics_detail::percentile_interval<510> &p = *g._intervals[i];
             total += p._num_samples;
             for (size_t j = 0; j < p._num_samples; ++j) {
                 for (int k = 0; k < num_samplers; ++k) {

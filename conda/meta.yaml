@@ -3,14 +3,14 @@
 {% set number = GIT_DESCRIBE_NUMBER %}
 
 package:
-  name: flare-pkg
+  name: turbo-pkg
   version: {{ version }}
 
 build:
   number: {{ number }}
 
 about:
-  home: https://github.com/gottingen/flare
+  home: https://github.com/gottingen/turbo
   license: Apache License 2
   license_family: APACHE
   license_file: LICENSE
@@ -20,13 +20,13 @@ source:
   git_url: ../
 
 outputs:
-  - name: flare
+  - name: turbo
     script: bld.sh   # [not win]
     script: bld.bat  # [win]
     build:
       string: "h{{ GIT_DESCRIBE_HASH }}_{{ number }}"
       run_exports:
-        - {{ pin_compatible('flare', exact=True) }}
+        - {{ pin_compatible('turbo', exact=True) }}
     requirements:
       build:
         - clang # [osx]
@@ -53,7 +53,7 @@ outputs:
         - protobuf >=3.9.2, <=3.19.1
     test:
       commands:
-        - test -f $PREFIX/lib/libflare.so              # [linux]
-        - test -f $PREFIX/lib/libflare.dylib           # [osx]
+        - test -f $PREFIX/lib/libturbo.so              # [linux]
+        - test -f $PREFIX/lib/libturbo.dylib           # [osx]
       #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
       #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]

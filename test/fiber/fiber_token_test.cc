@@ -17,13 +17,13 @@
 
 #include <iostream>
 #include "testing/gtest_wrap.h"
-#include "flare/times/time.h"
-#include "flare/fiber/internal/fiber.h"
-#include "flare/fiber/internal/fiber_worker.h"
-#include "flare/fiber/internal/waitable_event.h"
-#include "flare/fiber/this_fiber.h"
+#include "turbo/times/time.h"
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/internal/fiber_worker.h"
+#include "turbo/fiber/internal/waitable_event.h"
+#include "turbo/fiber/this_fiber.h"
 
-namespace flare::fiber_internal {
+namespace turbo::fiber_internal {
     void token_status(fiber_token_t, std::ostream &);
 
     uint32_t token_value(fiber_token_t id);
@@ -42,14 +42,14 @@ namespace {
 
     void *signaller(void *void_arg) {
         SignalArg arg = *(SignalArg *) void_arg;
-        flare::fiber_sleep_for(arg.sleep_us_before_fight);
+        turbo::fiber_sleep_for(arg.sleep_us_before_fight);
         void *data = nullptr;
         int rc = fiber_token_trylock(arg.id, &data);
         if (rc == 0) {
             EXPECT_EQ(0xdead, *(int *) data);
             ++*(int *) data;
             //EXPECT_EQ(EBUSY, fiber_token_destroy(arg.id, ECANCELED));
-            flare::fiber_sleep_for(arg.sleep_us_before_signal);
+            turbo::fiber_sleep_for(arg.sleep_us_before_signal);
             EXPECT_EQ(0, fiber_token_unlock_and_destroy(arg.id));
             return void_arg;
         } else {
@@ -63,19 +63,19 @@ namespace {
         int x = 0xdead;
         ASSERT_EQ(0, fiber_token_create_ranged(&id1, &x, nullptr, 2));
         fiber_token_t id2 = {id1.value + 1};
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id2));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id2));
         pthread_t th[8];
-        SignalArg args[FLARE_ARRAY_SIZE(th)];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        SignalArg args[TURBO_ARRAY_SIZE(th)];
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             args[i].sleep_us_before_fight = 0;
             args[i].sleep_us_before_signal = 0;
             args[i].id = (i == 0 ? id1 : id2);
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, signaller, &args[i]));
         }
-        void *ret[FLARE_ARRAY_SIZE(th)];
+        void *ret[TURBO_ARRAY_SIZE(th)];
         size_t non_null_ret = 0;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_join(th[i], &ret[i]));
             non_null_ret += (ret[i] != nullptr);
         }
@@ -83,18 +83,18 @@ namespace {
         ASSERT_EQ(0, fiber_token_join(id1));
         ASSERT_EQ(0, fiber_token_join(id2));
         ASSERT_EQ(0xdead + 1, x);
-        ASSERT_EQ(get_version(id1) + 5, flare::fiber_internal::token_value(id1));
-        ASSERT_EQ(get_version(id1) + 5, flare::fiber_internal::token_value(id2));
+        ASSERT_EQ(get_version(id1) + 5, turbo::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 5, turbo::fiber_internal::token_value(id2));
     }
 
     TEST(FiberTokenTest, join_before_destroy) {
         fiber_token_t id1;
         int x = 0xdead;
         ASSERT_EQ(0, fiber_token_create(&id1, &x, nullptr));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         pthread_t th[8];
-        SignalArg args[FLARE_ARRAY_SIZE(th)];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        SignalArg args[TURBO_ARRAY_SIZE(th)];
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             args[i].sleep_us_before_fight = 10000;
             args[i].sleep_us_before_signal = 0;
             args[i].id = id1;
@@ -102,11 +102,11 @@ namespace {
         }
         ASSERT_EQ(0, fiber_token_join(id1));
         ASSERT_EQ(0xdead + 1, x);
-        ASSERT_EQ(get_version(id1) + 4, flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 4, turbo::fiber_internal::token_value(id1));
 
-        void *ret[FLARE_ARRAY_SIZE(th)];
+        void *ret[TURBO_ARRAY_SIZE(th)];
         size_t non_null_ret = 0;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_join(th[i], &ret[i]));
             non_null_ret += (ret[i] != nullptr);
         }
@@ -129,11 +129,11 @@ namespace {
         fiber_token_t id1;
         OnResetArg arg = {{0}, 0};
         ASSERT_EQ(0, fiber_token_create(&id1, &arg, on_reset));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         ASSERT_EQ(0, fiber_token_error(id1, EBADF));
         ASSERT_EQ(EBADF, arg.error_code);
         ASSERT_EQ(id1.value, arg.id.value);
-        ASSERT_EQ(get_version(id1) + 4, flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 4, turbo::fiber_internal::token_value(id1));
     }
 
     TEST(FiberTokenTest, error_is_destroy_ranged) {
@@ -141,30 +141,30 @@ namespace {
         OnResetArg arg = {{0}, 0};
         ASSERT_EQ(0, fiber_token_create_ranged(&id1, &arg, on_reset, 2));
         fiber_token_t id2 = {id1.value + 1};
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id2));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id2));
         ASSERT_EQ(0, fiber_token_error(id2, EBADF));
         ASSERT_EQ(EBADF, arg.error_code);
         ASSERT_EQ(id2.value, arg.id.value);
-        ASSERT_EQ(get_version(id1) + 5, flare::fiber_internal::token_value(id2));
+        ASSERT_EQ(get_version(id1) + 5, turbo::fiber_internal::token_value(id2));
     }
 
     TEST(FiberTokenTest, default_error_is_destroy) {
         fiber_token_t id1;
         ASSERT_EQ(0, fiber_token_create(&id1, nullptr, nullptr));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         ASSERT_EQ(0, fiber_token_error(id1, EBADF));
-        ASSERT_EQ(get_version(id1) + 4, flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 4, turbo::fiber_internal::token_value(id1));
     }
 
     TEST(FiberTokenTest, doubly_destroy) {
         fiber_token_t id1;
         ASSERT_EQ(0, fiber_token_create_ranged(&id1, nullptr, nullptr, 2));
         fiber_token_t id2 = {id1.value + 1};
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id2));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id2));
         ASSERT_EQ(0, fiber_token_error(id1, EBADF));
-        ASSERT_EQ(get_version(id1) + 5, flare::fiber_internal::token_value(id1));
-        ASSERT_EQ(get_version(id1) + 5, flare::fiber_internal::token_value(id2));
+        ASSERT_EQ(get_version(id1) + 5, turbo::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 5, turbo::fiber_internal::token_value(id2));
         ASSERT_EQ(EINVAL, fiber_token_error(id1, EBADF));
         ASSERT_EQ(EINVAL, fiber_token_error(id2, EBADF));
     }
@@ -180,7 +180,7 @@ namespace {
         fiber_token_t id1;
         std::vector<int> result;
         ASSERT_EQ(0, fiber_token_create(&id1, &result, on_numeric_error));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         int err = 0;
         const int N = 100;
         for (int i = 0; i < N; ++i) {
@@ -191,13 +191,13 @@ namespace {
             ASSERT_EQ(i, result[i]);
         }
         ASSERT_EQ(0, fiber_token_trylock(id1, nullptr));
-        ASSERT_EQ(get_version(id1) + 1, flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 1, turbo::fiber_internal::token_value(id1));
         for (int i = 0; i < N; ++i) {
             ASSERT_EQ(0, fiber_token_error(id1, err++));
         }
         ASSERT_EQ((size_t) N, result.size());
         ASSERT_EQ(0, fiber_token_unlock(id1));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         ASSERT_EQ((size_t) 2 * N, result.size());
         for (int i = 0; i < 2 * N; ++i) {
             EXPECT_EQ(i, result[i]);
@@ -205,7 +205,7 @@ namespace {
         result.clear();
 
         ASSERT_EQ(0, fiber_token_trylock(id1, nullptr));
-        ASSERT_EQ(get_version(id1) + 1, flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 1, turbo::fiber_internal::token_value(id1));
         for (int i = 0; i < N; ++i) {
             ASSERT_EQ(0, fiber_token_error(id1, err++));
         }
@@ -215,26 +215,26 @@ namespace {
 
     static void *locker(void *arg) {
         fiber_token_t id = {(uintptr_t) arg};
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
         EXPECT_EQ(0, fiber_token_lock(id, nullptr));
-        flare::fiber_sleep_for(2000);
+        turbo::fiber_sleep_for(2000);
         EXPECT_EQ(0, fiber_token_unlock(id));
         tm.stop();
-        FLARE_LOG(INFO) << "Unlocked, tm=" << tm.u_elapsed();
+        TURBO_LOG(INFO) << "Unlocked, tm=" << tm.u_elapsed();
         return nullptr;
     }
 
     TEST(FiberTokenTest, id_lock) {
         fiber_token_t id1;
         ASSERT_EQ(0, fiber_token_create(&id1, nullptr, nullptr));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         pthread_t th[8];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, locker,
                                         (void *) id1.value));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_join(th[i], nullptr));
         }
     }
@@ -243,7 +243,7 @@ namespace {
         fiber_token_t id = {(uintptr_t) arg};
         int rc = fiber_token_lock(id, nullptr);
         if (rc == 0) {
-            flare::fiber_sleep_for(2000);
+            turbo::fiber_sleep_for(2000);
             EXPECT_EQ(0, fiber_token_unlock_and_destroy(id));
             return (void *) 1;
         } else {
@@ -255,14 +255,14 @@ namespace {
     TEST(FiberTokenTest, id_lock_and_destroy) {
         fiber_token_t id1;
         ASSERT_EQ(0, fiber_token_create(&id1, nullptr, nullptr));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         pthread_t th[8];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, failed_locker,
                                         (void *) id1.value));
         }
         int non_null = 0;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             void *ret = nullptr;
             ASSERT_EQ(0, pthread_join(th[i], &ret));
             non_null += (ret != nullptr);
@@ -274,24 +274,24 @@ namespace {
         fiber_token_t id1;
         int x = 0xdead;
         ASSERT_EQ(0, fiber_token_create(&id1, &x, nullptr));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         pthread_t th[8];
-        SignalArg args[FLARE_ARRAY_SIZE(th)];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        SignalArg args[TURBO_ARRAY_SIZE(th)];
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             args[i].sleep_us_before_fight = 0;
             args[i].sleep_us_before_signal = 20000;
             args[i].id = id1;
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, signaller, &args[i]));
         }
-        flare::fiber_sleep_for(10000);
+        turbo::fiber_sleep_for(10000);
         // join() waits until destroy() is called.
         ASSERT_EQ(0, fiber_token_join(id1));
         ASSERT_EQ(0xdead + 1, x);
-        ASSERT_EQ(get_version(id1) + 4, flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1) + 4, turbo::fiber_internal::token_value(id1));
 
-        void *ret[FLARE_ARRAY_SIZE(th)];
+        void *ret[TURBO_ARRAY_SIZE(th)];
         size_t non_null_ret = 0;
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_join(th[i], &ret[i]));
             non_null_ret += (ret[i] != nullptr);
         }
@@ -307,7 +307,7 @@ namespace {
         StoppedWaiterArgs *args = (StoppedWaiterArgs *) void_arg;
         args->thread_started = true;
         EXPECT_EQ(0, fiber_token_join(args->id));
-        EXPECT_EQ(get_version(args->id) + 4, flare::fiber_internal::token_value(args->id));
+        EXPECT_EQ(get_version(args->id) + 4, turbo::fiber_internal::token_value(args->id));
         return nullptr;
     }
 
@@ -315,28 +315,28 @@ namespace {
         fiber_token_t id1;
         int x = 0xdead;
         ASSERT_EQ(0, fiber_token_create(&id1, &x, nullptr));
-        ASSERT_EQ(get_version(id1), flare::fiber_internal::token_value(id1));
+        ASSERT_EQ(get_version(id1), turbo::fiber_internal::token_value(id1));
         void *data;
         ASSERT_EQ(0, fiber_token_trylock(id1, &data));
         ASSERT_EQ(&x, data);
         fiber_id_t th[8];
-        StoppedWaiterArgs args[FLARE_ARRAY_SIZE(th)];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        StoppedWaiterArgs args[TURBO_ARRAY_SIZE(th)];
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             args[i].id = id1;
             args[i].thread_started = false;
             ASSERT_EQ(0, fiber_start_urgent(&th[i], nullptr, stopped_waiter, &args[i]));
         }
         // stop does not wake up fiber_token_join
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             fiber_stop(th[i]);
         }
-        flare::fiber_sleep_for(10000);
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
-            ASSERT_TRUE(flare::fiber_internal::fiber_worker::exists(th[i]));
+        turbo::fiber_sleep_for(10000);
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
+            ASSERT_TRUE(turbo::fiber_internal::fiber_worker::exists(th[i]));
         }
         // destroy the id to end the joinings.
         ASSERT_EQ(0, fiber_token_unlock_and_destroy(id1));
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, fiber_join(th[i], nullptr));
         }
     }
@@ -344,7 +344,7 @@ namespace {
     void *waiter(void *arg) {
         fiber_token_t id = {(uintptr_t) arg};
         EXPECT_EQ(0, fiber_token_join(id));
-        EXPECT_EQ(get_version(id) + 4, flare::fiber_internal::token_value(id));
+        EXPECT_EQ(get_version(id) + 4, turbo::fiber_internal::token_value(id));
         return nullptr;
     }
 
@@ -359,21 +359,21 @@ namespace {
         fiber_token_list_t list;
         ASSERT_EQ(0, fiber_token_list_init(&list, 32, 32));
         fiber_token_t id[16];
-        int data[FLARE_ARRAY_SIZE(id)];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(id); ++i) {
+        int data[TURBO_ARRAY_SIZE(id)];
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(id); ++i) {
             data[i] = i;
             ASSERT_EQ(0, fiber_token_create(&id[i], &data[i], handle_data));
-            ASSERT_EQ(get_version(id[i]), flare::fiber_internal::token_value(id[i]));
+            ASSERT_EQ(get_version(id[i]), turbo::fiber_internal::token_value(id[i]));
             ASSERT_EQ(0, fiber_token_list_add(&list, id[i]));
         }
-        pthread_t th[FLARE_ARRAY_SIZE(id)];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        pthread_t th[TURBO_ARRAY_SIZE(id)];
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ(0, pthread_create(&th[i], nullptr, waiter, (void *) (intptr_t) id[i].value));
         }
-        flare::fiber_sleep_for(10000);
+        turbo::fiber_sleep_for(10000);
         ASSERT_EQ(0, fiber_token_list_reset(&list, EBADF));
 
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(th); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(th); ++i) {
             ASSERT_EQ((int) (i + 1), data[i]);
             ASSERT_EQ(0, pthread_join(th[i], nullptr));
             // already reset.
@@ -390,20 +390,20 @@ namespace {
     TEST(FiberTokenTest, status) {
         fiber_token_t id;
         fiber_token_create(&id, nullptr, nullptr);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         fiber_token_lock(id, nullptr);
         fiber_token_error(id, 123);
         fiber_token_error(id, 256);
         fiber_token_error(id, 1256);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         fiber_token_unlock_and_destroy(id);
         fiber_token_create(&id, nullptr, error_without_unlock);
         fiber_token_lock(id, nullptr);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         fiber_token_error(id, 12);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         fiber_token_unlock(id);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         fiber_token_unlock_and_destroy(id);
     }
 
@@ -411,10 +411,10 @@ namespace {
         fiber_token_t id;
         ASSERT_EQ(0, fiber_token_create(&id, nullptr, nullptr));
         ASSERT_EQ(0, fiber_token_lock_and_reset_range(id, nullptr, 1000));
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         fiber_token_unlock(id);
         ASSERT_EQ(0, fiber_token_lock_and_reset_range(id, nullptr, 300));
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         fiber_token_unlock_and_destroy(id);
     }
 
@@ -427,7 +427,7 @@ namespace {
 
     static void *fail_to_lock_id(void *args_in) {
         FailToLockIdArgs *args = (FailToLockIdArgs *) args_in;
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         EXPECT_EQ(args->expected_return, fiber_token_lock(args->id, nullptr));
         any_thread_quit = true;
         return nullptr;
@@ -446,7 +446,7 @@ namespace {
         // The threads should quit soon.
         pthread_join(pth, nullptr);
         fiber_join(bth, nullptr);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         ASSERT_EQ(0, fiber_token_unlock_and_destroy(id));
     }
 
@@ -470,7 +470,7 @@ namespace {
         // The threads should quit soon.
         pthread_join(pth, nullptr);
         fiber_join(bth, nullptr);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         ASSERT_EQ(0, fiber_token_lock(id, nullptr));
         ASSERT_EQ(0, fiber_token_unlock_and_destroy(id));
     }
@@ -493,7 +493,7 @@ namespace {
         // The threads should quit soon.
         pthread_join(pth, nullptr);
         fiber_join(bth, nullptr);
-        flare::fiber_internal::token_status(id, std::cout);
+        turbo::fiber_internal::token_status(id, std::cout);
         ASSERT_EQ(0, fiber_token_unlock_and_destroy(id));
     }
 

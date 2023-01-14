@@ -4,7 +4,7 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/debugging/symbolize.h"
+#include "turbo/debugging/symbolize.h"
 
 #ifndef _WIN32
 
@@ -18,48 +18,48 @@
 #include <memory>
 #include "testing/gtest_wrap.h"
 #include <gmock/gmock.h>
-#include "flare/base/profile.h"
-#include "flare/base/math/bit_cast.h"
-#include "flare/log/logging.h"
-#include "flare/debugging/internal/stack_consumption.h"
+#include "turbo/base/profile.h"
+#include "turbo/base/math/bit_cast.h"
+#include "turbo/log/logging.h"
+#include "turbo/debugging/internal/stack_consumption.h"
 
 
-// FLARE_ATTRIBUTE_SECTION_VARIABLE
+// TURBO_ATTRIBUTE_SECTION_VARIABLE
 //
 // Tells the compiler/linker to put a given variable into a section and define
 // `__start_ ## name` and `__stop_ ## name` symbols to bracket the section.
 // This functionality is supported by GNU linker.
-#ifdef FLARE_COMPILER_GNUC
-#ifndef FLARE_ATTRIBUTE_SECTION_VARIABLE
-#define FLARE_ATTRIBUTE_SECTION_VARIABLE(name) __attribute__((section(#name)))
+#ifdef TURBO_COMPILER_GNUC
+#ifndef TURBO_ATTRIBUTE_SECTION_VARIABLE
+#define TURBO_ATTRIBUTE_SECTION_VARIABLE(name) __attribute__((section(#name)))
 #endif
 #else
-#define FLARE_ATTRIBUTE_SECTION_VARIABLE(name)
+#define TURBO_ATTRIBUTE_SECTION_VARIABLE(name)
 #endif
 using testing::Contains;
 
 #ifdef _WIN32
-#define FLARE_SYMBOLIZE_TEST_NOINLINE __declspec(noinline)
+#define TURBO_SYMBOLIZE_TEST_NOINLINE __declspec(noinline)
 #else
-#define FLARE_SYMBOLIZE_TEST_NOINLINE FLARE_NO_INLINE
+#define TURBO_SYMBOLIZE_TEST_NOINLINE TURBO_NO_INLINE
 #endif
 
 // Functions to symbolize. Use C linkage to avoid mangled names.
 extern "C" {
-FLARE_NO_INLINE void nonstatic_func() {
+TURBO_NO_INLINE void nonstatic_func() {
     // The next line makes this a unique function to prevent the compiler from
     // folding identical functions together.
     volatile int x = __LINE__;
     static_cast<void>(x);
-    FLARE_BLOCK_TAIL_CALL_OPTIMIZATION();
+    TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
-FLARE_NO_INLINE static void static_func() {
+TURBO_NO_INLINE static void static_func() {
     // The next line makes this a unique function to prevent the compiler from
     // folding identical functions together.
     volatile int x = __LINE__;
     static_cast<void>(x);
-    FLARE_BLOCK_TAIL_CALL_OPTIMIZATION();
+    TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 }  // extern "C"
 
@@ -68,53 +68,53 @@ struct Foo {
 };
 
 // A C++ method that should have a mangled name.
-FLARE_NO_INLINE void Foo::func(int) {
+TURBO_NO_INLINE void Foo::func(int) {
     // The next line makes this a unique function to prevent the compiler from
     // folding identical functions together.
     volatile int x = __LINE__;
     static_cast<void>(x);
-    FLARE_BLOCK_TAIL_CALL_OPTIMIZATION();
+    TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
 // Create functions that will remain in different text sections in the
 // final binary when linker option "-z,keep-text-section-prefix" is used.
-int FLARE_ATTRIBUTE_SECTION_VARIABLE(
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(
 .text.unlikely)
 
 unlikely_func() {
     return 0;
 }
 
-int FLARE_ATTRIBUTE_SECTION_VARIABLE(
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(
 .text.hot)
 
 hot_func() {
     return 0;
 }
 
-int FLARE_ATTRIBUTE_SECTION_VARIABLE(
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(
 .text.startup)
 
 startup_func() {
     return 0;
 }
 
-int FLARE_ATTRIBUTE_SECTION_VARIABLE(
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(
 .text.exit)
 
 exit_func() {
     return 0;
 }
 
-int /*FLARE_ATTRIBUTE_SECTION_VARIABLE(.text)*/ regular_func() {
+int /*TURBO_ATTRIBUTE_SECTION_VARIABLE(.text)*/ regular_func() {
     return 0;
 }
 
 // Thread-local data may confuse the symbolizer, ensure that it does not.
 // Variable sizes and order are important.
-#ifdef FLARE_PER_THREAD_TLS
-static FLARE_PER_THREAD_TLS_KEYWORD char symbolize_test_thread_small[1];
-static FLARE_PER_THREAD_TLS_KEYWORD char
+#ifdef TURBO_PER_THREAD_TLS
+static TURBO_PER_THREAD_TLS_KEYWORD char symbolize_test_thread_small[1];
+static TURBO_PER_THREAD_TLS_KEYWORD char
     symbolize_test_thread_big[2 * 1024 * 1024];
 #endif
 
@@ -127,26 +127,26 @@ static volatile bool volatile_bool = false;
 // Force the binary to be large enough that a THP .text remap will succeed.
 static constexpr size_t kHpageSize = 1 << 21;
 const char kHpageTextPadding[kHpageSize * 4]
-FLARE_ATTRIBUTE_SECTION_VARIABLE(.text) = "";
+TURBO_ATTRIBUTE_SECTION_VARIABLE(.text) = "";
 #endif  // !defined(__EMSCRIPTEN__)
 
 static char try_symbolize_buffer[4096];
 
-// A wrapper function for flare::debugging::symbolize() to make the unit test simple.  The
+// A wrapper function for turbo::debugging::symbolize() to make the unit test simple.  The
 // limit must be < sizeof(try_symbolize_buffer).  Returns null if
-// flare::debugging::symbolize() returns false, otherwise returns try_symbolize_buffer with
-// the result of flare::debugging::symbolize().
+// turbo::debugging::symbolize() returns false, otherwise returns try_symbolize_buffer with
+// the result of turbo::debugging::symbolize().
 
 static const char *TrySymbolizeWithLimit(void *pc, int limit) {
-    FLARE_CHECK(static_cast<size_t>(limit) <= sizeof(try_symbolize_buffer)) <<
+    TURBO_CHECK(static_cast<size_t>(limit) <= sizeof(try_symbolize_buffer)) <<
                                                                       "try_symbolize_buffer is too small";
 
     // Use the heap to facilitate heap and buffer sanitizer tools.
     auto heap_buffer = std::make_unique<char[]>(sizeof(try_symbolize_buffer));
-    bool found = flare::debugging::symbolize(pc, heap_buffer.get(), limit);
+    bool found = turbo::debugging::symbolize(pc, heap_buffer.get(), limit);
     if (found) {
-        FLARE_CHECK(strnlen(heap_buffer.get(), static_cast<size_t>(limit)) < static_cast<size_t>(limit)) <<
-                                                                                                   "flare::debugging::symbolize() did not properly terminate the string";
+        TURBO_CHECK(strnlen(heap_buffer.get(), static_cast<size_t>(limit)) < static_cast<size_t>(limit)) <<
+                                                                                                   "turbo::debugging::symbolize() did not properly terminate the string";
         strncpy(try_symbolize_buffer, heap_buffer.get(),
                 sizeof(try_symbolize_buffer) - 1);
         try_symbolize_buffer[sizeof(try_symbolize_buffer) - 1] = '\0';
@@ -159,7 +159,7 @@ static const char *TrySymbolize(void *pc) {
     return TrySymbolizeWithLimit(pc, sizeof(try_symbolize_buffer));
 }
 
-#ifdef FLARE_INTERNAL_HAVE_ELF_SYMBOLIZE
+#ifdef TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE
 
 TEST(symbolize, Cached) {
   // Compilers should give us pointers to them.
@@ -207,14 +207,14 @@ TEST(symbolize, SymbolizeSplitTextSections) {
 }
 
 // Tests that verify that symbolize stack footprint is within some limit.
-#ifdef FLARE_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#ifdef TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
 
 static void *g_pc_to_symbolize;
 static char g_symbolize_buffer[4096];
 static char *g_symbolize_result;
 
 static void SymbolizeSignalHandler(int signo) {
-  if (flare::debugging::symbolize(g_pc_to_symbolize, g_symbolize_buffer,
+  if (turbo::debugging::symbolize(g_pc_to_symbolize, g_symbolize_buffer,
                       sizeof(g_symbolize_buffer))) {
     g_symbolize_result = g_symbolize_buffer;
   } else {
@@ -225,7 +225,7 @@ static void SymbolizeSignalHandler(int signo) {
 // Call symbolize and figure out the stack footprint of this call.
 static const char *SymbolizeStackConsumption(void *pc, int *stack_consumed) {
   g_pc_to_symbolize = pc;
-  *stack_consumed = flare::debugging::debugging_internal::GetSignalHandlerStackConsumption(
+  *stack_consumed = turbo::debugging::debugging_internal::GetSignalHandlerStackConsumption(
       SymbolizeSignalHandler);
   return g_symbolize_result;
 }
@@ -271,15 +271,15 @@ TEST(symbolize, SymbolizeWithDemanglingStackConsumption) {
   EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
 }
 
-#endif  // FLARE_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#endif  // TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
 
 // Use a 64K page size for PPC.
 const size_t kPageSize = 64 << 10;
 // We place a read-only symbols into the .text section and verify that we can
 // symbolize them and other symbols after remapping them.
-const char kPadding0[kPageSize * 4] FLARE_ATTRIBUTE_SECTION_VARIABLE(.text) =
+const char kPadding0[kPageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(.text) =
     "";
-const char kPadding1[kPageSize * 4] FLARE_ATTRIBUTE_SECTION_VARIABLE(.text) =
+const char kPadding1[kPageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(.text) =
     "";
 
 static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
@@ -287,7 +287,7 @@ static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
     if (info->dlpi_phdr[i].p_type == PT_LOAD &&
         info->dlpi_phdr[i].p_flags == (PF_R | PF_X)) {
       const void *const vaddr =
-          flare::base::bit_cast<void *>(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
+          turbo::base::bit_cast<void *>(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
       const auto segsize = info->dlpi_phdr[i].p_memsz;
 
       const char *self_exe;
@@ -297,7 +297,7 @@ static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
         self_exe = "/proc/self/exe";
       }
 
-      flare::debugging::debugging_internal::RegisterFileMappingHint(
+      turbo::debugging::debugging_internal::RegisterFileMappingHint(
           vaddr, reinterpret_cast<const char *>(vaddr) + segsize,
           info->dlpi_phdr[i].p_offset, self_exe);
 
@@ -311,18 +311,18 @@ static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
 TEST(symbolize, SymbolizeWithMultipleMaps) {
   // Force kPadding0 and kPadding1 to be linked in.
   if (volatile_bool) {
-    FLARE_LOG(INFO)<<kPadding0;
-    FLARE_LOG(INFO)<< kPadding1;
+    TURBO_LOG(INFO)<<kPadding0;
+    TURBO_LOG(INFO)<< kPadding1;
   }
 
   // Verify we can symbolize everything.
   char buf[512];
   memset(buf, 0, sizeof(buf));
-  flare::debugging::symbolize(kPadding0, buf, sizeof(buf));
+  turbo::debugging::symbolize(kPadding0, buf, sizeof(buf));
   EXPECT_STREQ("kPadding0", buf);
 
   memset(buf, 0, sizeof(buf));
-  flare::debugging::symbolize(kPadding1, buf, sizeof(buf));
+  turbo::debugging::symbolize(kPadding1, buf, sizeof(buf));
   EXPECT_STREQ("kPadding1", buf);
 
   // Specify a hint for the executable segment.
@@ -347,7 +347,7 @@ TEST(symbolize, SymbolizeWithMultipleMaps) {
   }
 
   // Invalidate the symbolization cache so we are forced to rely on the hint.
-  flare::debugging::symbolize(nullptr, buf, sizeof(buf));
+  turbo::debugging::symbolize(nullptr, buf, sizeof(buf));
 
   // Verify we can still symbolize.
   const char *expected[] = {"kPadding0", "kPadding1"};
@@ -356,7 +356,7 @@ TEST(symbolize, SymbolizeWithMultipleMaps) {
   for (int i = 0; i < 2; i++) {
     for (size_t offset : offsets) {
       memset(buf, 0, sizeof(buf));
-      flare::debugging::symbolize(ptrs[i] + offset, buf, sizeof(buf));
+      turbo::debugging::symbolize(ptrs[i] + offset, buf, sizeof(buf));
       EXPECT_STREQ(expected[i], buf);
     }
   }
@@ -364,7 +364,7 @@ TEST(symbolize, SymbolizeWithMultipleMaps) {
 
 // Appends string(*args->arg) to args->symbol_buf.
 static void DummySymbolDecorator(
-    const flare::debugging::debugging_internal::SymbolDecoratorArgs *args) {
+    const turbo::debugging::debugging_internal::SymbolDecoratorArgs *args) {
   std::string *message = static_cast<std::string *>(args->arg);
   strncat(args->symbol_buf, message->c_str(),
           args->symbol_buf_size - strlen(args->symbol_buf) - 1);
@@ -373,33 +373,33 @@ static void DummySymbolDecorator(
 TEST(symbolize, InstallAndRemoveSymbolDecorators) {
   int ticket_a;
   std::string a_message("a");
-  EXPECT_GE(ticket_a = flare::debugging::debugging_internal::InstallSymbolDecorator(
+  EXPECT_GE(ticket_a = turbo::debugging::debugging_internal::InstallSymbolDecorator(
                 DummySymbolDecorator, &a_message),
             0);
 
   int ticket_b;
   std::string b_message("b");
-  EXPECT_GE(ticket_b = flare::debugging::debugging_internal::InstallSymbolDecorator(
+  EXPECT_GE(ticket_b = turbo::debugging::debugging_internal::InstallSymbolDecorator(
                 DummySymbolDecorator, &b_message),
             0);
 
   int ticket_c;
   std::string c_message("c");
-  EXPECT_GE(ticket_c = flare::debugging::debugging_internal::InstallSymbolDecorator(
+  EXPECT_GE(ticket_c = turbo::debugging::debugging_internal::InstallSymbolDecorator(
                 DummySymbolDecorator, &c_message),
             0);
 
   char *address = reinterpret_cast<char *>(1);
   EXPECT_STREQ("abc", TrySymbolize(address++));
 
-  EXPECT_TRUE(flare::debugging::debugging_internal::RemoveSymbolDecorator(ticket_b));
+  EXPECT_TRUE(turbo::debugging::debugging_internal::RemoveSymbolDecorator(ticket_b));
 
   EXPECT_STREQ("ac", TrySymbolize(address++));
 
   // Cleanup: remove all remaining decorators so other stack traces don't
   // get mystery "ac" decoration.
-  EXPECT_TRUE(flare::debugging::debugging_internal::RemoveSymbolDecorator(ticket_a));
-  EXPECT_TRUE(flare::debugging::debugging_internal::RemoveSymbolDecorator(ticket_c));
+  EXPECT_TRUE(turbo::debugging::debugging_internal::RemoveSymbolDecorator(ticket_a));
+  EXPECT_TRUE(turbo::debugging::debugging_internal::RemoveSymbolDecorator(ticket_c));
 }
 
 // Some versions of Clang with optimizations enabled seem to be able
@@ -413,7 +413,7 @@ TEST(symbolize, ForEachSection) {
   ASSERT_NE(fd, -1);
 
   std::vector<std::string> sections;
-  ASSERT_TRUE(flare::debugging::debugging_internal::ForEachSection(
+  ASSERT_TRUE(turbo::debugging::debugging_internal::ForEachSection(
       fd, [&sections](const std::string &name, const ElfW(Shdr) &) {
         sections.push_back(name);
         return true;
@@ -431,7 +431,7 @@ TEST(symbolize, ForEachSection) {
 
 // x86 specific tests.  Uses some inline assembler.
 extern "C" {
-    FLARE_FORCE_INLINE void* inline_func() {
+    TURBO_FORCE_INLINE void* inline_func() {
   void *pc = nullptr;
 #if defined(__i386__)
   __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
@@ -441,7 +441,7 @@ extern "C" {
   return pc;
 }
 
-FLARE_NO_INLINE void * non_inline_func() {
+TURBO_NO_INLINE void * non_inline_func() {
   void *pc = nullptr;
 #if defined(__i386__)
   __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
@@ -451,25 +451,25 @@ FLARE_NO_INLINE void * non_inline_func() {
   return pc;
 }
 
-void FLARE_NO_INLINE TestWithPCInsideNonInlineFunction() {
-#if defined(FLARE_HAVE_ATTRIBUTE_NOINLINE) && \
+void TURBO_NO_INLINE TestWithPCInsideNonInlineFunction() {
+#if defined(TURBO_HAVE_ATTRIBUTE_NOINLINE) && \
     (defined(__i386__) || defined(__x86_64__))
   void *pc = non_inline_func();
   const char *symbol = TrySymbolize(pc);
-  FLARE_CHECK(symbol != nullptr)"TestWithPCInsideNonInlineFunction failed";
-  FLARE_CHECK(strcmp(symbol, "non_inline_func") == 0)<<
+  TURBO_CHECK(symbol != nullptr)"TestWithPCInsideNonInlineFunction failed";
+  TURBO_CHECK(strcmp(symbol, "non_inline_func") == 0)<<
                  "TestWithPCInsideNonInlineFunction failed";
   std::cout << "TestWithPCInsideNonInlineFunction passed" << std::endl;
 #endif
 }
 
-void FLARE_NO_INLINE TestWithPCInsideInlineFunction() {
-#if (defined(FLARE_COMPILER_CLANG) || defined(FLARE_COMPILER_GNUC)) && \
+void TURBO_NO_INLINE TestWithPCInsideInlineFunction() {
+#if (defined(TURBO_COMPILER_CLANG) || defined(TURBO_COMPILER_GNUC)) && \
     (defined(__i386__) || defined(__x86_64__))
   void *pc = inline_func();  // Must be inlined.
   const char *symbol = TrySymbolize(pc);
-  FLARE_CHECK(symbol != nullptr)<<"TestWithPCInsideInlineFunction failed";
-  FLARE_CHECK(strcmp(symbol, __FUNCTION__) == 0)<<
+  TURBO_CHECK(symbol != nullptr)<<"TestWithPCInsideInlineFunction failed";
+  TURBO_CHECK(strcmp(symbol, __FUNCTION__) == 0)<<
                  "TestWithPCInsideInlineFunction failed";
   std::cout << "TestWithPCInsideInlineFunction passed" << std::endl;
 #endif
@@ -477,12 +477,12 @@ void FLARE_NO_INLINE TestWithPCInsideInlineFunction() {
 }
 
 // Test with a return address.
-void FLARE_NO_INLINE TestWithReturnAddress() {
-#if defined(FLARE_COMPILER_CLANG) || defined(FLARE_COMPILER_GNUC)
+void TURBO_NO_INLINE TestWithReturnAddress() {
+#if defined(TURBO_COMPILER_CLANG) || defined(TURBO_COMPILER_GNUC)
   void *return_address = __builtin_return_address(0);
   const char *symbol = TrySymbolize(return_address);
-  FLARE_CHECK(symbol != nullptr)"TestWithReturnAddress failed";
-  FLARE_CHECK(strcmp(symbol, "main") == 0)<<"TestWithReturnAddress failed";
+  TURBO_CHECK(symbol != nullptr)"TestWithReturnAddress failed";
+  TURBO_CHECK(strcmp(symbol, "main") == 0)<<"TestWithReturnAddress failed";
   std::cout << "TestWithReturnAddress passed" << std::endl;
 #endif
 }
@@ -530,9 +530,9 @@ TEST(symbolize, SymbolizeWithDemangling) {
 
 TEST(symbolize, Unimplemented) {
     char buf[64];
-    EXPECT_FALSE(flare::debugging::symbolize((void *) (&nonstatic_func), buf, sizeof(buf)));
-    EXPECT_FALSE(flare::debugging::symbolize((void *) (&static_func), buf, sizeof(buf)));
-    EXPECT_FALSE(flare::debugging::symbolize((void *) (&Foo::func), buf, sizeof(buf)));
+    EXPECT_FALSE(turbo::debugging::symbolize((void *) (&nonstatic_func), buf, sizeof(buf)));
+    EXPECT_FALSE(turbo::debugging::symbolize((void *) (&static_func), buf, sizeof(buf)));
+    EXPECT_FALSE(turbo::debugging::symbolize((void *) (&Foo::func), buf, sizeof(buf)));
 }
 
 #endif
@@ -541,20 +541,20 @@ int main(int argc, char **argv) {
 #if !defined(__EMSCRIPTEN__)
     // Make sure kHpageTextPadding is linked into the binary.
     if (volatile_bool) {
-        FLARE_LOG(INFO) << kHpageTextPadding;
+        TURBO_LOG(INFO) << kHpageTextPadding;
     }
 #endif  // !defined(__EMSCRIPTEN__)
 
-#ifdef FLARE_PER_THREAD_TLS
+#ifdef TURBO_PER_THREAD_TLS
     // Touch the per-thread variables.
     symbolize_test_thread_small[0] = 0;
     symbolize_test_thread_big[0] = 0;
 #endif
 
-    flare::debugging::initialize_symbolizer(argv[0]);
+    turbo::debugging::initialize_symbolizer(argv[0]);
     testing::InitGoogleTest(&argc, argv);
 
-#ifdef FLARE_INTERNAL_HAVE_ELF_SYMBOLIZE
+#ifdef TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE
     TestWithPCInsideInlineFunction();
     TestWithPCInsideNonInlineFunction();
     TestWithReturnAddress();

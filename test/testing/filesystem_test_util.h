@@ -9,7 +9,7 @@
 #define TEST_TESTING_FILESYSTEM_TEST_UTIL_H_
 
 #include "testing/sstream_workaround.h"
-#include <flare/base/profile.h>
+#include <turbo/base/profile.h>
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -50,7 +50,7 @@ using fstream = std::fstream;
 
 #else
 
-#include "flare/files/filesystem.h"
+#include "turbo/files/filesystem.h"
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
@@ -74,7 +74,7 @@ using fstream = std::fstream;
 // file with that name, it is superceded by P1164R1, so only activate if really needed
 // #define TEST_LWG_2935_BEHAVIOUR
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// LWG #2937 enforces that flare::equivalent emits an error, if !flare::exists(p1)||!exists(p2)
+// LWG #2937 enforces that turbo::equivalent emits an error, if !turbo::exists(p1)||!exists(p2)
 #define TEST_LWG_2937_BEHAVIOUR
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -110,31 +110,31 @@ public:
             for (int i = 0; i < 8; ++i) {
                 filename += "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[rng()];
             }
-            _path = flare::canonical(flare::temp_directory_path()) / filename;
-        } while (flare::exists(_path));
-        flare::create_directories(_path);
+            _path = turbo::canonical(turbo::temp_directory_path()) / filename;
+        } while (turbo::exists(_path));
+        turbo::create_directories(_path);
         if (opt == TempOpt::change_path) {
-            _orig_dir = flare::current_path();
-            flare::current_path(_path);
+            _orig_dir = turbo::current_path();
+            turbo::current_path(_path);
         }
     }
 
     ~TemporaryDirectory() {
         if (!_orig_dir.empty()) {
-            flare::current_path(_orig_dir);
+            turbo::current_path(_orig_dir);
         }
-        flare::remove_all(_path);
+        turbo::remove_all(_path);
     }
 
-    const flare::file_path &path() const { return _path; }
+    const turbo::file_path &path() const { return _path; }
 
 private:
-    flare::file_path _path;
-    flare::file_path _orig_dir;
+    turbo::file_path _path;
+    turbo::file_path _orig_dir;
 };
 
-static void generateFile(const flare::file_path &pathname, int withSize = -1) {
-    flare::ofstream outfile(pathname);
+static void generateFile(const turbo::file_path &pathname, int withSize = -1) {
+    turbo::ofstream outfile(pathname);
     if (withSize < 0) {
         outfile << "Hello world!" << std::endl;
     } else {
@@ -204,7 +204,7 @@ static bool is_symlink_creation_supported() {
 #endif
 
 static bool has_host_root_name_support() {
-    return flare::file_path("//host").has_root_name();
+    return turbo::file_path("//host").has_root_name();
 }
 
 template<class T>

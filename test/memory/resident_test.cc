@@ -6,10 +6,10 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/memory/resident.h"
+#include "turbo/memory/resident.h"
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
 
     struct C {
         C() { ++instances; }
@@ -39,4 +39,4 @@ namespace flare {
         ASSERT_EQ(1ul, C::instances);
     }
 
-}  // namespace flare
+}  // namespace turbo

@@ -1,0 +1,70 @@
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// Date: Thu Nov 22 13:57:56 CST 2012
+
+#include "turbo/io/zero_copy_stream_as_streambuf.h"
+
+namespace turbo {
+
+    static_assert(sizeof(std::streambuf::char_type) == sizeof(char),
+                  "only_support_char");
+
+    int zero_copy_stream_as_stream_buf::overflow(int ch) {
+        if (ch == std::streambuf::traits_type::eof()) {
+            return ch;
+        }
+        void *block = nullptr;
+        int size = 0;
+        if (_zero_copy_stream->Next(&block, &size)) {
+            setp((char *) block, (char *) block + size);
+            // if size == 0, this function will call overflow again.
+            return sputc(ch);
+        } else {
+            setp(nullptr, nullptr);
+            return std::streambuf::traits_type::eof();
+        }
+    }
+
+    int zero_copy_stream_as_stream_buf::sync() {
+        // data are already in cord_buf.
+        return 0;
+    }
+
+    zero_copy_stream_as_stream_buf::~zero_copy_stream_as_stream_buf() {
+        shrink();
+    }
+
+    void zero_copy_stream_as_stream_buf::shrink() {
+        if (pbase() != nullptr) {
+            _zero_copy_stream->BackUp(epptr() - pptr());
+            setp(nullptr, nullptr);
+        }
+    }
+
+    std::streampos zero_copy_stream_as_stream_buf::seekoff(
+            std::streamoff off,
+            std::ios_base::seekdir way,
+            std::ios_base::openmode which) {
+        if (off == 0 && way == std::ios_base::cur) {
+            return _zero_copy_stream->ByteCount() - (epptr() - pptr());
+        }
+        return (std::streampos) (std::streamoff) -1;
+    }
+
+
+}  // namespace turbo

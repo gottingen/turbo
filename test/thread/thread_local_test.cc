@@ -6,7 +6,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/thread/thread_local.h"
+#include "turbo/thread/thread_local.h"
 
 #include <dlfcn.h>
 #include <sys/types.h>
@@ -24,9 +24,9 @@
 #include <vector>
 
 #include "testing/gtest_wrap.h"
-#include "flare/thread/latch.h"
+#include "turbo/thread/latch.h"
 
-namespace flare {
+namespace turbo {
 
     struct Widget {
         static int total;
@@ -256,4 +256,4 @@ namespace flare {
                 4);
     }
 
-}  // namespace flare
+}  // namespace turbo

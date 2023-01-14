@@ -6,7 +6,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/times/internal/chrono_time_internal.h"
+#include "turbo/times/internal/chrono_time_internal.h"
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -14,9 +14,9 @@
 #include <type_traits>
 
 #include "testing/gtest_wrap.h"
-#include "flare/base/profile.h"
+#include "turbo/base/profile.h"
 
-namespace flare {
+namespace turbo {
 
     namespace times_internal {
 
@@ -1053,4 +1053,4 @@ namespace flare {
 
     }  // namespace times_internal
 
-}  // namespace flare
+}  // namespace turbo

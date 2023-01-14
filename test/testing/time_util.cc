@@ -9,24 +9,24 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
-#include "flare/log/logging.h"
-#include "flare/times/internal/zone_info_source.h"
+#include "turbo/log/logging.h"
+#include "turbo/times/internal/zone_info_source.h"
 
-namespace flare {
+namespace turbo {
 
     namespace times_internal {
 
-        flare::time_zone load_time_zone(const std::string &name) {
-            flare::time_zone tz;
-            FLARE_DCHECK(load_time_zone(name, &tz))<< name;
+        turbo::time_zone load_time_zone(const std::string &name) {
+            turbo::time_zone tz;
+            TURBO_DCHECK(load_time_zone(name, &tz))<< name;
             return tz;
         }
 
     }  // namespace times_internal
 
-}  // namespace flare
+}  // namespace turbo
 
-namespace flare {
+namespace turbo {
 
     namespace times_internal {
         namespace {
@@ -36,7 +36,7 @@ namespace flare {
 // to update the data as long as the tests do not depend on recent changes
 // (and the past rules remain the same).
 
-#include "flare/times/internal/zoneinfo.inc"
+#include "turbo/times/internal/zoneinfo.inc"
 
             const struct ZoneInfo {
                 const char *name;
@@ -69,7 +69,7 @@ namespace flare {
 #endif
             };
 
-            class TestZoneInfoSource : public flare::times_internal::zone_info_source {
+            class TestZoneInfoSource : public turbo::times_internal::zone_info_source {
             public:
                 TestZoneInfoSource(const char *data, std::size_t size)
                         : data_(data), end_(data + size) {}
@@ -91,19 +91,19 @@ namespace flare {
                 const char *const end_;
             };
 
-            std::unique_ptr<flare::times_internal::zone_info_source> TestFactory(
+            std::unique_ptr<turbo::times_internal::zone_info_source> TestFactory(
                     const std::string &name,
-                    const std::function<std::unique_ptr<flare::times_internal::zone_info_source>(
+                    const std::function<std::unique_ptr<turbo::times_internal::zone_info_source>(
                             const std::string &name)> & /*fallback_factory*/) {
                 for (const ZoneInfo &zoneinfo : kZoneInfo) {
                     if (name == zoneinfo.name) {
                         if (zoneinfo.data == nullptr)
                             return nullptr;
-                        return std::unique_ptr<flare::times_internal::zone_info_source>(
+                        return std::unique_ptr<turbo::times_internal::zone_info_source>(
                                 new TestZoneInfoSource(zoneinfo.data, zoneinfo.length));
                     }
                 }
-                FLARE_LOG(FATAL)<<"Unexpected time zone"<<name<<" in test";
+                TURBO_LOG(FATAL)<<"Unexpected time zone"<<name<<" in test";
                 return nullptr;
             }
 
@@ -116,7 +116,7 @@ namespace flare {
 
     }  // namespace times_internal
 
-}  // namespace flare
+}  // namespace turbo
 
 
 void increment(char *s) {

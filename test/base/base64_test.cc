@@ -5,11 +5,11 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include "flare/base/base64.h"
+#include "turbo/base/base64.h"
 
 #include "testing/gtest_wrap.h"
 
-namespace flare::base {
+namespace turbo::base {
 
     TEST(Base64Test, Basic) {
         const std::string kText = "hello world";
@@ -27,4 +27,4 @@ namespace flare::base {
         EXPECT_EQ(kText, decoded);
     }
 
-}  // namespace namespace flare::base
+}  // namespace namespace turbo::base

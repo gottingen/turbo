@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <ostream>
 
-namespace flare {
+namespace turbo {
     namespace test_internal {
 
         // A type that counts number of occurences of the type, the live occurrences of
@@ -264,6 +264,6 @@ namespace flare {
         };
 
     }  // namespace test_internal
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_

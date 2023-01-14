@@ -8,7 +8,7 @@
 
 #include "testing/gtest_wrap.h"
 
-#include "flare/memory/allocator.h"
+#include "turbo/memory/allocator.h"
 
 // SchedulerParams holds Scheduler construction parameters for testing.
 struct SchedulerParams {
@@ -25,7 +25,7 @@ struct SchedulerParams {
 class with_tracked_allocator : public testing::Test {
 public:
     void SetUp() override {
-        allocator = new flare::tracked_allocator(flare::allocator::Default);
+        allocator = new turbo::tracked_allocator(turbo::allocator::Default);
     }
 
     void TearDown() override {
@@ -35,5 +35,5 @@ public:
         delete allocator;
     }
 
-    flare::tracked_allocator *allocator = nullptr;
+    turbo::tracked_allocator *allocator = nullptr;
 };

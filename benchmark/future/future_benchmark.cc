@@ -7,7 +7,7 @@
 
 
 #include <benchmark/benchmark.h>
-#include "flare/future/future.h"
+#include "turbo/future/future.h"
 
 // This is not the fairest of tests.
 static void BM_std_future_reference(benchmark::State &state) {
@@ -36,12 +36,12 @@ static void BM_std_future_reference(benchmark::State &state) {
     }
 }
 
-// This uses flare::future in a weird way, but that matches better with how std futures
+// This uses turbo::future in a weird way, but that matches better with how std futures
 // work.
-static void BM_using_flare_future_fair(benchmark::State &state) {
+static void BM_using_turbo_future_fair(benchmark::State &state) {
     for (auto _ : state) {
-        std::vector<flare::promise<int>> proms(2000);
-        std::vector<flare::future<int>> futs;
+        std::vector<turbo::promise<int>> proms(2000);
+        std::vector<turbo::future<int>> futs;
         futs.reserve(proms.size());
 
         for (auto &p : proms) {
@@ -57,7 +57,7 @@ static void BM_using_flare_future_fair(benchmark::State &state) {
 
         int total = 0;
         for (auto &f : futs) {
-            f.finally([&total](flare::expected<int> v) { total += *v; });
+            f.finally([&total](turbo::expected<int> v) { total += *v; });
         }
         worker.join();
 
@@ -65,15 +65,15 @@ static void BM_using_flare_future_fair(benchmark::State &state) {
     }
 }
 
-// This is more representative of how you would use flare::future to tackle that
+// This is more representative of how you would use turbo::future to tackle that
 // specific problem.
-static void BM_using_flare_future_normal(benchmark::State &state) {
+static void BM_using_turbo_future_normal(benchmark::State &state) {
     for (auto _ : state) {
-        std::vector<flare::promise<int>> proms(2000);
+        std::vector<turbo::promise<int>> proms(2000);
 
         int total = 0;
         for (auto &p : proms) {
-            p.get_future().finally([&total](flare::expected<int> v) { total += *v; });
+            p.get_future().finally([&total](turbo::expected<int> v) { total += *v; });
         }
 
         std::thread worker([ps = std::move(proms)]() mutable {
@@ -90,7 +90,7 @@ static void BM_using_flare_future_normal(benchmark::State &state) {
 }
 // Register the function as a benchmark
 BENCHMARK(BM_std_future_reference);
-BENCHMARK(BM_using_flare_future_normal);
-BENCHMARK(BM_using_flare_future_fair);
+BENCHMARK(BM_using_turbo_future_normal);
+BENCHMARK(BM_using_turbo_future_fair);
 // Run the benchmark
 BENCHMARK_MAIN();

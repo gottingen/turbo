@@ -7,18 +7,18 @@
 
 
 
-#include "flare/base/type_traits.h"
+#include "turbo/base/type_traits.h"
 #include <string>
 #include "testing/gtest_wrap.h"
 
 TEST(base, type_traits) {
-    EXPECT_FALSE(flare::has_mapped_type<int>::value);
+    EXPECT_FALSE(turbo::has_mapped_type<int>::value);
     EXPECT_TRUE(
-            (flare::has_mapped_type<std::map<int, int>>::value));
-    EXPECT_FALSE(flare::has_value_type<int>::value);
+            (turbo::has_mapped_type<std::map<int, int>>::value));
+    EXPECT_FALSE(turbo::has_value_type<int>::value);
     EXPECT_TRUE(
-            (flare::has_value_type<std::map<int, int>>::value));
-    EXPECT_FALSE(flare::has_const_iterator<int>::value);
+            (turbo::has_value_type<std::map<int, int>>::value));
+    EXPECT_FALSE(turbo::has_const_iterator<int>::value);
     EXPECT_TRUE(
-            (flare::has_const_iterator<std::map<int, int>>::value));
+            (turbo::has_const_iterator<std::map<int, int>>::value));
 }

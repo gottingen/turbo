@@ -19,22 +19,22 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "testing/gtest_wrap.h"
-#include "flare/times/time.h"
-#include "flare/base/profile.h"
+#include "turbo/times/time.h"
+#include "turbo/base/profile.h"
 
 namespace {
 
 class CachelineTest : public testing::Test {
 };
 
-struct FLARE_CACHELINE_ALIGNMENT Bar {
+struct TURBO_CACHELINE_ALIGNMENT Bar {
     int y;
 };
 
 struct Foo {
     char dummy1[0];
     int z;
-    int FLARE_CACHELINE_ALIGNMENT x[0];
+    int TURBO_CACHELINE_ALIGNMENT x[0];
     int y;
     int m;
     Bar bar;

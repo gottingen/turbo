@@ -11,17 +11,17 @@
 #include <cstdarg>
 #include <cstdio>
 #include <string>
-#include "flare/times/time.h"
-#include "flare/strings/fmt/os.h"
+#include "turbo/times/time.h"
+#include "turbo/strings/fmt/os.h"
 
-namespace flare::times_internal {
+namespace turbo::times_internal {
 
 
     // Loads the named timezone, but dies on any failure.
-    flare::time_zone load_time_zone(const std::string &name);
+    turbo::time_zone load_time_zone(const std::string &name);
 
 
-}  // namespace flare::times_internal
+}  // namespace turbo::times_internal
 
 
 enum {

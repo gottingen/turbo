@@ -4,7 +4,7 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/base/uninitialized.h"
+#include "turbo/base/uninitialized.h"
 #include "testing/gtest_wrap.h"
 
 namespace {
@@ -32,10 +32,10 @@ namespace {
             EXPECT_EQ(resize_call_count, 0);
             EXPECT_EQ(resize_default_init_call_count, 0);
             EXPECT_FALSE(
-                    flare::base::string_supports_uninitialized_resize(&rs));
+                    turbo::base::string_supports_uninitialized_resize(&rs));
             EXPECT_EQ(resize_call_count, 0);
             EXPECT_EQ(resize_default_init_call_count, 0);
-            flare::base::string_resize_uninitialized(&rs, 237);
+            turbo::base::string_resize_uninitialized(&rs, 237);
             EXPECT_EQ(resize_call_count, 1);
             EXPECT_EQ(resize_default_init_call_count, 0);
         }
@@ -48,10 +48,10 @@ namespace {
             EXPECT_EQ(resize_call_count, 0);
             EXPECT_EQ(resize_default_init_call_count, 0);
             EXPECT_TRUE(
-                    flare::base::string_supports_uninitialized_resize(&rus));
+                    turbo::base::string_supports_uninitialized_resize(&rus));
             EXPECT_EQ(resize_call_count, 0);
             EXPECT_EQ(resize_default_init_call_count, 0);
-            flare::base::string_resize_uninitialized(&rus, 237);
+            turbo::base::string_resize_uninitialized(&rus, 237);
             EXPECT_EQ(resize_call_count, 0);
             EXPECT_EQ(resize_default_init_call_count, 1);
         }

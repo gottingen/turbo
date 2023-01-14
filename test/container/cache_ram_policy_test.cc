@@ -6,7 +6,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/container/cache/ram_policy.h"
+#include "turbo/container/cache/ram_policy.h"
 #include "testing/gtest_wrap.h"
 
 #include <thread>
@@ -16,7 +16,7 @@ namespace testing {
     TEST(TestRamPolicy, TestOnCacheNormalSetAndDel) {
         uint32_t i = 0;
         std::function<void(void)> callback = [&]() { i++; };
-        flare::ram_cache_policy<uint32_t, uint32_t> p(64, callback);
+        turbo::ram_cache_policy<uint32_t, uint32_t> p(64, callback);
         p.on_cache_set(10, 233);
         p.on_cache_set(10, 233);
         EXPECT_EQ(i, 1);
@@ -38,7 +38,7 @@ namespace testing {
     TEST(TestRamPolicy, TestInitWithInvalidPram) {
         uint32_t i = 0;
         std::function<void(void)> callback = [&]() { i++; };
-        flare::ram_cache_policy<uint32_t, uint32_t> p(0, callback);
+        turbo::ram_cache_policy<uint32_t, uint32_t> p(0, callback);
         std::string want_dump1 = "{\"ram_cache_policy\":{\"max_ram_bytes_used\":33554432,\"ram_bytes_used\":0,\"%usage\":0}}";
         EXPECT_EQ(p.to_string(), want_dump1);
     }
@@ -46,7 +46,7 @@ namespace testing {
     TEST(TestRamPolicy, TestConcurrentSetAndDel) {
         std::atomic<uint32_t> set_count = 0;
         std::function<void(void)> callback = [&set_count]() { set_count++; };
-        flare::ram_cache_policy<uint32_t, uint32_t> p(256, callback);
+        turbo::ram_cache_policy<uint32_t, uint32_t> p(256, callback);
         std::vector<std::thread> vct;
         for (uint32_t i = 0; i < 10; i++) {
             vct.push_back(std::thread([&]() { p.on_cache_set(i, i); }));
@@ -72,7 +72,7 @@ namespace testing {
     TEST(TestRamPolicy, TestMixConcurrentSetAndDel) {
         uint32_t i = 0;
         std::function<void(void)> callback = [&]() { i++; };
-        flare::ram_cache_policy<uint32_t, uint32_t> p(256, callback);
+        turbo::ram_cache_policy<uint32_t, uint32_t> p(256, callback);
         std::vector<std::thread> vct;
         std::vector<std::thread> del_vct;
         for (uint32_t i = 0; i < 10; i++) {
@@ -107,7 +107,7 @@ namespace testing {
         };
         uint32_t i = 0;
         std::function<void(void)> callback = [&]() { i++; };
-        flare::ram_cache_policy<uint32_t, std::vector<uint32_t>, flare::ram_usage<uint32_t>, VectorRamUsage> p(
+        turbo::ram_cache_policy<uint32_t, std::vector<uint32_t>, turbo::ram_usage<uint32_t>, VectorRamUsage> p(
                 1 << 25, callback);
         p.on_cache_set(10, {233, 21});
         p.on_cache_set(10, {233, 21, 1});

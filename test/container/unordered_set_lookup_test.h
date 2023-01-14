@@ -13,7 +13,7 @@
 #include "hash_generator_testing.h"
 #include "hash_policy_testing.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
 
         template<class UnordSet>
@@ -78,6 +78,6 @@ namespace flare {
         REGISTER_TYPED_TEST_SUITE_P(LookupTest, Count, Find, EqualRange);
 
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // UNORDERED_SET_LOOKUP_TEST_H_

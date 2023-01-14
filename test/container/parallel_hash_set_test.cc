@@ -12,7 +12,7 @@
 
 #include "flat_hash_set_test.cc"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
 
@@ -27,7 +27,7 @@ namespace flare {
                 // This can be used as an alternative to providing a std::hash<Person> specialization
                 // --------------------------------------------------------------------------------------
                 friend size_t hash_value(const Entry &p) {
-                    return flare::hash_state().combine(0, p.key); // not checking value
+                    return turbo::hash_state().combine(0, p.key); // not checking value
                 }
 
                 int key;
@@ -38,7 +38,7 @@ namespace flare {
                 // ----------------
                 // test if_contains
                 // ----------------
-                using Set = flare::THIS_HASH_SET<Entry>;
+                using Set = turbo::THIS_HASH_SET<Entry>;
                 Set m = {{1, 7},
                          {2, 9}};
                 const Set &const_m(m);
@@ -55,7 +55,7 @@ namespace flare {
                 // --------------
                 // test modify_if
                 // --------------
-                using Set = flare::THIS_HASH_SET<Entry>;
+                using Set = turbo::THIS_HASH_SET<Entry>;
                 Set m = {{1, 7},
                          {2, 9}};
 
@@ -74,7 +74,7 @@ namespace flare {
                 // --------------------
                 // test lazy_emplace_l
                 // --------------------
-                using Set = flare::THIS_HASH_SET<Entry>;
+                using Set = turbo::THIS_HASH_SET<Entry>;
                 Set m = {{1, 7},
                          {2, 9}};
 
@@ -100,7 +100,7 @@ namespace flare {
                 // -------------
                 // test erase_if
                 // -------------
-                using Set = flare::THIS_HASH_SET<Entry>;
+                using Set = turbo::THIS_HASH_SET<Entry>;
                 Set m = {{1, 7},
                          {2, 9},
                          {5, 6}};
@@ -121,7 +121,7 @@ namespace flare {
                 // -------------
                 // test for_each
                 // -------------
-                using Set = flare::THIS_HASH_SET<Entry>;
+                using Set = turbo::THIS_HASH_SET<Entry>;
                 Set m = {{1, 7},
                          {2, 8},
                          {5, 11}};
@@ -135,7 +135,7 @@ namespace flare {
             }
 
             TEST(THIS_TEST_NAME, EmplaceSingle) {
-                using Set = flare::THIS_HASH_SET<int>;
+                using Set = turbo::THIS_HASH_SET<int>;
 
                 // --------------------
                 // test emplace_single
@@ -154,4 +154,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

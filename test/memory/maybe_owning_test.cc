@@ -5,12 +5,12 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 #include "testing/sstream_workaround.h"
-#include "flare/memory/maybe_owning.h"
+#include "turbo/memory/maybe_owning.h"
 #include "testing/gtest_wrap.h"
 
 using namespace std::literals;
 
-namespace flare {
+namespace turbo {
 
     int dtor_called = 0;
 
@@ -210,4 +210,4 @@ namespace flare {
         static_assert(std::is_convertible_v<Derived *, maybe_owning_argument<Base>>);
     }
 
-}  // namespace flare
+}  // namespace turbo

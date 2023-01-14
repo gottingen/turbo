@@ -4,7 +4,7 @@
 
 on linux platform
 ```shell
-cd flare-cpp
+cd turbo-cpp
 conda env create -f conda/environment_linux.yaml
 mkdir build
 cd build
@@ -14,7 +14,7 @@ make -j 4
 
 on linux mac os
 ```shell
-cd flare-cpp
+cd turbo-cpp
 conda env create -f conda/environment_osx.yaml
 mkdir build
 cd build
@@ -25,15 +25,15 @@ make -j 4
 if you want a conda package, do below
 
 ```shell
-    cd flare-cpp/conda
+    cd turbo-cpp/conda
     conda build .
 ```
 
 when you on mac os, mac sdk, you have install.
 
-flare prefers static linkages of deps, so that they don't have to be installed on every machine running the app.
+turbo prefers static linkages of deps, so that they don't have to be installed on every machine running the app.
 
-flare depends on following packages:
+turbo depends on following packages:
 
 * [gflags](https://github.com/gflags/gflags): Extensively used to define global options.
 * [protobuf](https://github.com/google/protobuf): Serializations of messages, interfaces of services.
@@ -70,7 +70,7 @@ sudo apt-get install -y cmake libgtest-dev && cd /usr/src/gtest && sudo cmake . 
 ```
 The directory of gtest source code may be changed, try `/usr/src/googletest/googletest` if `/usr/src/gtest` is not there.
 
-### Compile flare with cmake
+### Compile turbo with cmake
 ```shell
 cmake -B build && cmake --build build -j6
 ```
@@ -91,7 +91,7 @@ $ cmake -B build && cmake --build build -j4
 $ ./echo_server &
 $ ./echo_client
 ```
-Examples link flare statically, if you need to link the shared version, remove `CMakeCache.txt` and cmake with `-DLINK_SO=ON`
+Examples link turbo statically, if you need to link the shared version, remove `CMakeCache.txt` and cmake with `-DLINK_SO=ON`
 
 **Run tests**
 
@@ -128,14 +128,14 @@ If you need to run tests, install and compile gtest-devel (which is not compiled
 sudo yum install gtest-devel
 ```
 
-### Compile flare with cmake
-Same with [here](#compile-flare-with-cmake)
+### Compile turbo with cmake
+Same with [here](#compile-turbo-with-cmake)
 
 ## Linux with self-built deps
 
 ### Prepare deps
 
-flare builds itself to both static and shared libs by default, so it needs static and shared libs of deps to be built as well.
+turbo builds itself to both static and shared libs by default, so it needs static and shared libs of deps to be built as well.
 
 Take [gflags](https://github.com/gflags/gflags) as example, which does not build shared lib by default, you need to pass options to `cmake` to change the behavior:
 ```shell
@@ -143,18 +143,18 @@ $ cmake . -DBUILD_SHARED_LIBS=1 -DBUILD_STATIC_LIBS=1
 $ make
 ```
 
-### Compile flare
+### Compile turbo
 
 Keep on with the gflags example, let `../gflags_dev` be where gflags is cloned.
 
-git clone flare. cd into the repo and run
+git clone turbo. cd into the repo and run
 
 ```shell
 $ sh config_brpc.sh --headers="../gflags_dev /usr/include" --libs="../gflags_dev /usr/lib64"
 $ make
 ```
 
-Here we pass multiple paths to `--headers` and `--libs` to make the script search for multiple places. You can also group all deps and flare into one directory, then pass the directory to --headers/--libs which actually search all subdirectories recursively and will find necessary files.
+Here we pass multiple paths to `--headers` and `--libs` to make the script search for multiple places. You can also group all deps and turbo into one directory, then pass the directory to --headers/--libs which actually search all subdirectories recursively and will find necessary files.
 
 To change compiler to clang, add `--cxx=clang++ --cc=clang`.
 
@@ -171,8 +171,8 @@ $ sh config_brpc.sh --headers=.. --libs=..
 $ make
 ```
 
-### Compile flare with cmake
-Same with [here](#compile-flare-with-cmake)
+### Compile turbo with cmake
+Same with [here](#compile-turbo-with-cmake)
 
 ## MacOS
 
@@ -215,7 +215,7 @@ $ ./echo_server &
 $ ./echo_client
 ```
 
-Examples link flare statically, if you need to link the shared version, `make clean` and `LINK_SO=1 make`
+Examples link turbo statically, if you need to link the shared version, `make clean` and `LINK_SO=1 make`
 
 **Run tests**
 ```shell
@@ -224,8 +224,8 @@ $ make
 $ sh run_tests.sh
 ```
 
-### Compile flare with cmake
-Same with [here](#compile-flare-with-cmake)
+### Compile turbo with cmake
+Same with [here](#compile-turbo-with-cmake)
 
 # Supported deps
 
@@ -245,7 +245,7 @@ no known issues.
 
 Be compatible with pb 3.x and pb 2.x with the same file:
 Don't use new types in proto3 and start the proto file with `syntax="proto2";`
-[tools/add_syntax_equal_proto2_to_all.sh](https://github.com/flare/flare/blob/master/tools/add_syntax_equal_proto2_to_all.sh)can add `syntax="proto2"` to all proto files without it.
+[tools/add_syntax_equal_proto2_to_all.sh](https://github.com/turbo/turbo/blob/master/tools/add_syntax_equal_proto2_to_all.sh)can add `syntax="proto2"` to all proto files without it.
 
 Arena in pb 3.x is not supported yet.
 
@@ -259,9 +259,9 @@ required by https.
 
 ## tcmalloc: 1.7-2.5
 
-flare does **not** link [tcmalloc](http://goog-perftools.sourceforge.net/doc/tcmalloc.html) by default. Users link tcmalloc on-demand.
+turbo does **not** link [tcmalloc](http://goog-perftools.sourceforge.net/doc/tcmalloc.html) by default. Users link tcmalloc on-demand.
 
-Comparing to ptmalloc embedded in glibc, tcmalloc often improves performance. However different versions of tcmalloc may behave really differently. For example, tcmalloc 2.1 may make multi-threaded examples in flare perform significantly worse(due to a spinlock in tcmalloc) than the one using tcmalloc 1.7 and 2.5. Even different minor versions may differ. When you program behave unexpectedly, remove tcmalloc or try another version.
+Comparing to ptmalloc embedded in glibc, tcmalloc often improves performance. However different versions of tcmalloc may behave really differently. For example, tcmalloc 2.1 may make multi-threaded examples in turbo perform significantly worse(due to a spinlock in tcmalloc) than the one using tcmalloc 1.7 and 2.5. Even different minor versions may differ. When you program behave unexpectedly, remove tcmalloc or try another version.
 
 Code compiled with gcc 4.8.2 and linked to a tcmalloc compiled with earlier GCC may crash or deadlock before main(), E.g:
 
@@ -278,16 +278,16 @@ When you remove tcmalloc, not only remove the linkage with tcmalloc but also the
 
 ## valgrind: 3.8+
 
-flare detects valgrind automatically (and registers stacks of fiber). Older valgrind(say 3.2) is not supported.
+turbo detects valgrind automatically (and registers stacks of fiber). Older valgrind(say 3.2) is not supported.
 
 ## thrift: 0.9.3-0.11.0
 
 ## cmake 3.15+
 
-flare build by cmake build system.
+turbo build by cmake build system.
 
 no known issues.
 
 # Track instances
 
-We provide a program to help you to track and monitor all flare instances. Just run [trackme_server](https://github.com/flare/flare/tree/master/tools/trackme_server/) somewhere and launch need-to-be-tracked instances with -trackme_server=SERVER. The trackme_server will receive pings from instances periodically and print logs when it does. You can aggregate instance addresses from the log and call builtin services of the instances for further information.
+We provide a program to help you to track and monitor all turbo instances. Just run [trackme_server](https://github.com/turbo/turbo/tree/master/tools/trackme_server/) somewhere and launch need-to-be-tracked instances with -trackme_server=SERVER. The trackme_server will receive pings from instances periodically and print logs when it does. You can aggregate instance addresses from the log and call builtin services of the instances for further information.

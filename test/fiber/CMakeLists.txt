@@ -12,7 +12,7 @@ foreach (fl ${SRC})
     carbin_cc_test(
             NAME ${EXE_NAME}
             SOURCES ${fl}
-            PUBLIC_LINKED_TARGETS ${GTEST_MAIN_LIB}  ${GTM_LIB} ${CARBIN_DYLINK} ${DYNAMIC_LIB} flare::flare-test flare::testing ${GPERFTOOLS_LIBRARIES}
+            PUBLIC_LINKED_TARGETS ${GTEST_MAIN_LIB}  ${GTM_LIB} ${CARBIN_DYLINK} ${DYNAMIC_LIB} turbo::turbo-test turbo::testing ${GPERFTOOLS_LIBRARIES}
             PRIVATE_COMPILE_OPTIONS ${CARBIN_TEST_COPTS}
             VERBOSE
     )

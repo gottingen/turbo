@@ -6,10 +6,10 @@
  *****************************************************************/
 // This file tests string processing functions related to numeric values.
 
-#include "flare/strings/numbers.h"
-#include "flare/strings/internal/ostringstream.h"
+#include "turbo/strings/numbers.h"
+#include "turbo/strings/internal/ostringstream.h"
 #include <sys/types.h>
-#include "flare/base/fast_rand.h"
+#include "turbo/base/fast_rand.h"
 #include <cfenv>  // NOLINT(build/c++11)
 #include <cinttypes>
 #include <climits>
@@ -28,9 +28,9 @@
 
 
 #include "testing/gtest_wrap.h"
-#include "flare/log/logging.h"
+#include "turbo/log/logging.h"
 #include "numbers_test_common.h"
-#include "flare/strings/str_cat.h"
+#include "turbo/strings/str_cat.h"
 
 
 namespace {
@@ -133,16 +133,16 @@ double Pow10(int exp) {
 
 namespace {
 
-    using flare::numbers_internal::kSixDigitsToBufferSize;
-    using flare::numbers_internal::safe_strto32_base;
-    using flare::numbers_internal::safe_strto64_base;
-    using flare::numbers_internal::safe_strtou32_base;
-    using flare::numbers_internal::safe_strtou64_base;
-    using flare::numbers_internal::six_digits_to_buffer;
-    using flare::strings_internal::Itoa;
-    using flare::strings_internal::strtouint32_test_cases;
-    using flare::strings_internal::strtouint64_test_cases;
-    using flare::simple_atoi;
+    using turbo::numbers_internal::kSixDigitsToBufferSize;
+    using turbo::numbers_internal::safe_strto32_base;
+    using turbo::numbers_internal::safe_strto64_base;
+    using turbo::numbers_internal::safe_strtou32_base;
+    using turbo::numbers_internal::safe_strtou64_base;
+    using turbo::numbers_internal::six_digits_to_buffer;
+    using turbo::strings_internal::Itoa;
+    using turbo::strings_internal::strtouint32_test_cases;
+    using turbo::strings_internal::strtouint64_test_cases;
+    using turbo::simple_atoi;
     using testing::Eq;
     using testing::MatchesRegex;
 
@@ -248,21 +248,21 @@ namespace {
     typedef MyInteger<uint64_t> MyUInt64;
 
     void CheckInt32(int32_t x) {
-        char buffer[flare::numbers_internal::kFastToBufferSize];
-        char *actual = flare::numbers_internal::fast_int_to_buffer(x, buffer);
+        char buffer[turbo::numbers_internal::kFastToBufferSize];
+        char *actual = turbo::numbers_internal::fast_int_to_buffer(x, buffer);
         std::string expected = std::to_string(x);
         EXPECT_EQ(expected, std::string(buffer, actual)) << " Input " << x;
 
-        char *generic_actual = flare::numbers_internal::fast_int_to_buffer(x, buffer);
+        char *generic_actual = turbo::numbers_internal::fast_int_to_buffer(x, buffer);
         EXPECT_EQ(expected, std::string(buffer, generic_actual)) << " Input " << x;
     }
 
     void CheckInt64(int64_t x) {
-        char buffer[flare::numbers_internal::kFastToBufferSize + 3];
+        char buffer[turbo::numbers_internal::kFastToBufferSize + 3];
         buffer[0] = '*';
         buffer[23] = '*';
         buffer[24] = '*';
-        char *actual = flare::numbers_internal::fast_int_to_buffer(x, &buffer[1]);
+        char *actual = turbo::numbers_internal::fast_int_to_buffer(x, &buffer[1]);
         std::string expected = std::to_string(x);
         EXPECT_EQ(expected, std::string(&buffer[1], actual)) << " Input " << x;
         EXPECT_EQ(buffer[0], '*');
@@ -270,41 +270,41 @@ namespace {
         EXPECT_EQ(buffer[24], '*');
 
         char *my_actual =
-                flare::numbers_internal::fast_int_to_buffer(MyInt64(x), &buffer[1]);
+                turbo::numbers_internal::fast_int_to_buffer(MyInt64(x), &buffer[1]);
         EXPECT_EQ(expected, std::string(&buffer[1], my_actual)) << " Input " << x;
     }
 
     void CheckUInt32(uint32_t x) {
-        char buffer[flare::numbers_internal::kFastToBufferSize];
-        char *actual = flare::numbers_internal::fast_int_to_buffer(x, buffer);
+        char buffer[turbo::numbers_internal::kFastToBufferSize];
+        char *actual = turbo::numbers_internal::fast_int_to_buffer(x, buffer);
         std::string expected = std::to_string(x);
         EXPECT_EQ(expected, std::string(buffer, actual)) << " Input " << x;
 
-        char *generic_actual = flare::numbers_internal::fast_int_to_buffer(x, buffer);
+        char *generic_actual = turbo::numbers_internal::fast_int_to_buffer(x, buffer);
         EXPECT_EQ(expected, std::string(buffer, generic_actual)) << " Input " << x;
     }
 
     void CheckUInt64(uint64_t x) {
-        char buffer[flare::numbers_internal::kFastToBufferSize + 1];
-        char *actual = flare::numbers_internal::fast_int_to_buffer(x, &buffer[1]);
+        char buffer[turbo::numbers_internal::kFastToBufferSize + 1];
+        char *actual = turbo::numbers_internal::fast_int_to_buffer(x, &buffer[1]);
         std::string expected = std::to_string(x);
         EXPECT_EQ(expected, std::string(&buffer[1], actual)) << " Input " << x;
 
-        char *generic_actual = flare::numbers_internal::fast_int_to_buffer(x, &buffer[1]);
+        char *generic_actual = turbo::numbers_internal::fast_int_to_buffer(x, &buffer[1]);
         EXPECT_EQ(expected, std::string(&buffer[1], generic_actual))
                             << " Input " << x;
 
         char *my_actual =
-                flare::numbers_internal::fast_int_to_buffer(MyUInt64(x), &buffer[1]);
+                turbo::numbers_internal::fast_int_to_buffer(MyUInt64(x), &buffer[1]);
         EXPECT_EQ(expected, std::string(&buffer[1], my_actual)) << " Input " << x;
     }
 
     void CheckHex64(uint64_t v) {
         char expected[16 + 1];
-        std::string actual = flare::string_cat(flare::hex(v, flare::kZeroPad16));
+        std::string actual = turbo::string_cat(turbo::hex(v, turbo::kZeroPad16));
         snprintf(expected, sizeof(expected), "%016" PRIx64, static_cast<uint64_t>(v));
         EXPECT_EQ(expected, actual) << " Input " << v;
-        actual = flare::string_cat(flare::hex(v, flare::kSpacePad16));
+        actual = turbo::string_cat(turbo::hex(v, turbo::kSpacePad16));
         snprintf(expected, sizeof(expected), "%16" PRIx64, static_cast<uint64_t>(v));
         EXPECT_EQ(expected, actual) << " Input " << v;
     }
@@ -349,7 +349,7 @@ namespace {
     void VerifySimpleAtoiGood(in_val_type in_value, int_type exp_value) {
         std::string s;
         // uint128 can be streamed but not string_cat'd
-        flare::strings_internal::string_output_stream(&s) << in_value;
+        turbo::strings_internal::string_output_stream(&s) << in_value;
         int_type x = static_cast<int_type>(~exp_value);
         EXPECT_TRUE(simple_atoi(s, &x))
                             << "in_value=" << in_value << " s=" << s << " x=" << x;
@@ -361,7 +361,7 @@ namespace {
 
     template<typename int_type, typename in_val_type>
     void VerifySimpleAtoiBad(in_val_type in_value) {
-        std::string s = flare::string_cat(in_value);
+        std::string s = turbo::string_cat(in_value);
         int_type x;
         EXPECT_FALSE(simple_atoi(s, &x));
         EXPECT_FALSE(simple_atoi(s.c_str(), &x));
@@ -425,24 +425,24 @@ namespace {
         VerifySimpleAtoiGood<uint64_t>(std::numeric_limits<uint64_t>::max(),
                                        std::numeric_limits<uint64_t>::max());
 
-        // simple_atoi(std::string_view, flare::uint128)
-        VerifySimpleAtoiGood<flare::uint128>(0, 0);
-        VerifySimpleAtoiGood<flare::uint128>(42, 42);
-        VerifySimpleAtoiBad<flare::uint128>(-42);
+        // simple_atoi(std::string_view, turbo::uint128)
+        VerifySimpleAtoiGood<turbo::uint128>(0, 0);
+        VerifySimpleAtoiGood<turbo::uint128>(42, 42);
+        VerifySimpleAtoiBad<turbo::uint128>(-42);
 
-        VerifySimpleAtoiBad<flare::uint128>(std::numeric_limits<int32_t>::min());
-        VerifySimpleAtoiGood<flare::uint128>(std::numeric_limits<int32_t>::max(),
+        VerifySimpleAtoiBad<turbo::uint128>(std::numeric_limits<int32_t>::min());
+        VerifySimpleAtoiGood<turbo::uint128>(std::numeric_limits<int32_t>::max(),
                                                    std::numeric_limits<int32_t>::max());
-        VerifySimpleAtoiGood<flare::uint128>(std::numeric_limits<uint32_t>::max(),
+        VerifySimpleAtoiGood<turbo::uint128>(std::numeric_limits<uint32_t>::max(),
                                                    std::numeric_limits<uint32_t>::max());
-        VerifySimpleAtoiBad<flare::uint128>(std::numeric_limits<int64_t>::min());
-        VerifySimpleAtoiGood<flare::uint128>(std::numeric_limits<int64_t>::max(),
+        VerifySimpleAtoiBad<turbo::uint128>(std::numeric_limits<int64_t>::min());
+        VerifySimpleAtoiGood<turbo::uint128>(std::numeric_limits<int64_t>::max(),
                                                    std::numeric_limits<int64_t>::max());
-        VerifySimpleAtoiGood<flare::uint128>(std::numeric_limits<uint64_t>::max(),
+        VerifySimpleAtoiGood<turbo::uint128>(std::numeric_limits<uint64_t>::max(),
                                                    std::numeric_limits<uint64_t>::max());
-        VerifySimpleAtoiGood<flare::uint128>(
-                std::numeric_limits<flare::uint128>::max(),
-                std::numeric_limits<flare::uint128>::max());
+        VerifySimpleAtoiGood<turbo::uint128>(
+                std::numeric_limits<turbo::uint128>::max(),
+                std::numeric_limits<turbo::uint128>::max());
 
         // Some other types
         VerifySimpleAtoiGood<int>(-42, -42);
@@ -750,16 +750,16 @@ namespace {
 
             // Test overflow
             EXPECT_FALSE(
-                    parse_func(flare::string_cat(std::numeric_limits<IntType>::max(), value),
+                    parse_func(turbo::string_cat(std::numeric_limits<IntType>::max(), value),
                                &parsed_value, base));
 
             // Test underflow
             if (std::numeric_limits<IntType>::min() < 0) {
                 EXPECT_FALSE(
-                        parse_func(flare::string_cat(std::numeric_limits<IntType>::min(), value),
+                        parse_func(turbo::string_cat(std::numeric_limits<IntType>::min(), value),
                                    &parsed_value, base));
             } else {
-                EXPECT_FALSE(parse_func(flare::string_cat("-", value), &parsed_value, base));
+                EXPECT_FALSE(parse_func(turbo::string_cat("-", value), &parsed_value, base));
             }
         }
     }
@@ -784,11 +784,11 @@ namespace {
         // random number generators don't work for uint128, and
         // uint128 can be streamed but not string_cat'd, so this code must be custom
         // implemented for uint128, but is generally the same as what's above.
-        // test_random_integer_parse_base<flare::uint128>(
-        //     &flare::numbers_internal::safe_strtou128_base);
+        // test_random_integer_parse_base<turbo::uint128>(
+        //     &turbo::numbers_internal::safe_strtou128_base);
         using RandomEngine = std::minstd_rand0;
-        using IntType = flare::uint128;
-        constexpr auto parse_func = &flare::numbers_internal::safe_strtou128_base;
+        using IntType = turbo::uint128;
+        constexpr auto parse_func = &turbo::numbers_internal::safe_strtou128_base;
 
         std::random_device rd;
         RandomEngine rng(rd());
@@ -810,13 +810,13 @@ namespace {
 
             // Test overflow
             std::string s;
-            flare::strings_internal::string_output_stream(&s)
+            turbo::strings_internal::string_output_stream(&s)
                     << std::numeric_limits<IntType>::max() << value;
             EXPECT_FALSE(parse_func(s, &parsed_value, base));
 
             // Test underflow
             s.clear();
-            flare::strings_internal::string_output_stream(&s) << "-" << value;
+            turbo::strings_internal::string_output_stream(&s) << "-" << value;
             EXPECT_FALSE(parse_func(s, &parsed_value, base));
         }
     }
@@ -884,8 +884,8 @@ namespace {
 // feenableexcept() and fedisableexcept() are extensions supported by some libc
 // implementations.
 #if defined(__GLIBC__) || defined(__BIONIC__)
-#define FLARE_HAVE_FEENABLEEXCEPT 1
-#define FLARE_HAVE_FEDISABLEEXCEPT 1
+#define TURBO_HAVE_FEENABLEEXCEPT 1
+#define TURBO_HAVE_FEDISABLEEXCEPT 1
 #endif
 
     class SimpleDtoaTest : public testing::Test {
@@ -893,7 +893,7 @@ namespace {
         void SetUp() override {
             // Store the current floating point env & clear away any pending exceptions.
             feholdexcept(&fp_env_);
-#ifdef FLARE_HAVE_FEENABLEEXCEPT
+#ifdef TURBO_HAVE_FEENABLEEXCEPT
             // Turn on floating point exceptions.
             feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
@@ -903,7 +903,7 @@ namespace {
             // Restore the floating point environment to the original state.
             // In theory fedisableexcept is unnecessary; fesetenv will also do it.
             // In practice, our toolchains have subtle bugs.
-#ifdef FLARE_HAVE_FEDISABLEEXCEPT
+#ifdef TURBO_HAVE_FEDISABLEEXCEPT
             fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
             fesetenv(&fp_env_);
@@ -994,8 +994,8 @@ namespace {
             if (strcmp(sixdigitsbuf, snprintfbuf) != 0) {
                 mismatches.push_back(d);
                 if (mismatches.size() < 10) {
-                    FLARE_LOG(ERROR) <<
-                               flare::string_cat("Six-digit failure with double.  ", "d=", d,
+                    TURBO_LOG(ERROR) <<
+                               turbo::string_cat("Six-digit failure with double.  ", "d=", d,
                                                           "=", d, " sixdigits=", sixdigitsbuf,
                                                           " printf(%g)=", snprintfbuf).c_str();
                 }
@@ -1045,8 +1045,8 @@ namespace {
                 if (kFloatNumCases >= 1e9) {
                     // The exhaustive test takes a very long time, so log progress.
                     char buf[kSixDigitsToBufferSize];
-                    FLARE_LOG(INFO) <<
-                              flare::string_cat("Exp ", exponent, " powten=", powten, "(", powten,
+                    TURBO_LOG(INFO) <<
+                              turbo::string_cat("Exp ", exponent, " powten=", powten, "(", powten,
                                                          ") (",
                                                          std::string(buf, six_digits_to_buffer(powten, buf)), ")")
                                       .c_str();
@@ -1074,8 +1074,8 @@ namespace {
                 double before = nextafter(d, 0.0);
                 double after = nextafter(d, 1.7976931348623157e308);
                 char b1[32], b2[kSixDigitsToBufferSize];
-                FLARE_LOG(ERROR) <<
-                           flare::string_cat(
+                TURBO_LOG(ERROR) <<
+                           turbo::string_cat(
                                    "Mismatch #", i, "  d=", d, " (", ToNineDigits(d), ")",
                                    " sixdigits='", sixdigitsbuf, "'", " snprintf='", snprintfbuf,
                                    "'", " Before.=", PerfectDtoa(before), " ",
@@ -1104,8 +1104,8 @@ namespace {
                 {" ",                                              false, 0},
                 {"-",                                              false, 0},
                 {"123@@@",                                         false, 123},
-                {flare::string_cat(int32_min, int32_max), false, int32_min},
-                {flare::string_cat(int32_max, int32_max), false, int32_max},
+                {turbo::string_cat(int32_min, int32_max), false, int32_min},
+                {turbo::string_cat(int32_max, int32_max), false, int32_max},
         };
 
         for (const Int32TestLine &test_line : int32_test_line) {
@@ -1136,7 +1136,7 @@ namespace {
                 {" ",                                                false, 0},
                 {"-",                                                false, 0},
                 {"123@@@",                                           false, 123},
-                {flare::string_cat(uint32_max, uint32_max), false, uint32_max},
+                {turbo::string_cat(uint32_max, uint32_max), false, uint32_max},
         };
 
         for (const Uint32TestLine &test_line : uint32_test_line) {
@@ -1168,8 +1168,8 @@ namespace {
                 {" ",                                              false, 0},
                 {"-",                                              false, 0},
                 {"123@@@",                                         false, 123},
-                {flare::string_cat(int64_min, int64_max), false, int64_min},
-                {flare::string_cat(int64_max, int64_max), false, int64_max},
+                {turbo::string_cat(int64_min, int64_max), false, int64_min},
+                {turbo::string_cat(int64_max, int64_max), false, int64_max},
         };
 
         for (const Int64TestLine &test_line : int64_test_line) {
@@ -1200,7 +1200,7 @@ namespace {
                 {" ",                                                false, 0},
                 {"-",                                                false, 0},
                 {"123@@@",                                           false, 123},
-                {flare::string_cat(uint64_max, uint64_max), false, uint64_max},
+                {turbo::string_cat(uint64_max, uint64_max), false, uint64_max},
         };
 
         for (const Uint64TestLine &test_line : uint64_test_line) {
@@ -1351,7 +1351,7 @@ namespace {
 
     void TestFastHexToBufferZeroPad16(uint64_t v) {
         char buf[16];
-        auto digits = flare::numbers_internal::fast_hex_to_buffer_zero_pad16(v, buf);
+        auto digits = turbo::numbers_internal::fast_hex_to_buffer_zero_pad16(v, buf);
         std::string_view res(buf, 16);
         char buf2[17];
         snprintf(buf2, sizeof(buf2), "%016" PRIx64, v);
@@ -1367,7 +1367,7 @@ namespace {
         TestFastHexToBufferZeroPad16(std::numeric_limits<int64_t>::max());
         for (int i = 0; i < 100000; ++i) {
             TestFastHexToBufferZeroPad16(
-                    flare::base::fast_rand_in(std::numeric_limits<uint64_t>::min(),
+                    turbo::base::fast_rand_in(std::numeric_limits<uint64_t>::min(),
                                               std::numeric_limits<uint64_t>::max()));
         }
     }

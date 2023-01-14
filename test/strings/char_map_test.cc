@@ -6,7 +6,7 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/strings/internal/char_map.h"
+#include "turbo/strings/internal/char_map.h"
 #include <cctype>
 #include <string>
 #include <vector>
@@ -16,12 +16,12 @@
 
 namespace {
 
-    constexpr flare::strings_internal::Charmap everything_map =
-            ~flare::strings_internal::Charmap();
-    constexpr flare::strings_internal::Charmap nothing_map{};
+    constexpr turbo::strings_internal::Charmap everything_map =
+            ~turbo::strings_internal::Charmap();
+    constexpr turbo::strings_internal::Charmap nothing_map{};
 
     TEST(Charmap, AllTests) {
-        const flare::strings_internal::Charmap also_nothing_map("", 0);
+        const turbo::strings_internal::Charmap also_nothing_map("", 0);
         ASSERT_TRUE(everything_map.contains('\0'));
         ASSERT_TRUE(!nothing_map.contains('\0'));
         ASSERT_TRUE(!also_nothing_map.contains('\0'));
@@ -31,7 +31,7 @@ namespace {
             ASSERT_TRUE(!also_nothing_map.contains(ch));
         }
 
-        const flare::strings_internal::Charmap symbols("&@#@^!@?", 5);
+        const turbo::strings_internal::Charmap symbols("&@#@^!@?", 5);
         ASSERT_TRUE(symbols.contains('&'));
         ASSERT_TRUE(symbols.contains('@'));
         ASSERT_TRUE(symbols.contains('#'));
@@ -43,9 +43,9 @@ namespace {
             cnt += symbols.contains(ch);
         ASSERT_EQ(cnt, 4);
 
-        const flare::strings_internal::Charmap lets("^abcde", 3);
-        const flare::strings_internal::Charmap lets2("fghij\0klmnop", 10);
-        const flare::strings_internal::Charmap lets3("fghij\0klmnop");
+        const turbo::strings_internal::Charmap lets("^abcde", 3);
+        const turbo::strings_internal::Charmap lets2("fghij\0klmnop", 10);
+        const turbo::strings_internal::Charmap lets3("fghij\0klmnop");
         ASSERT_TRUE(lets2.contains('k'));
         ASSERT_TRUE(!lets3.contains('k'));
 
@@ -59,7 +59,7 @@ namespace {
     }
 
     namespace {
-        std::string Members(const flare::strings_internal::Charmap &m) {
+        std::string Members(const turbo::strings_internal::Charmap &m) {
             std::string r;
             for (size_t i = 0; i < 256; ++i)
                 if (m.contains(i)) r.push_back(i);
@@ -80,36 +80,36 @@ namespace {
     }  // namespace
 
     TEST(Charmap, Constexpr) {
-        constexpr flare::strings_internal::Charmap kEmpty = nothing_map;
+        constexpr turbo::strings_internal::Charmap kEmpty = nothing_map;
         EXPECT_THAT(Members(kEmpty), "");
-        constexpr flare::strings_internal::Charmap kA =
-                flare::strings_internal::Charmap::Char('A');
+        constexpr turbo::strings_internal::Charmap kA =
+                turbo::strings_internal::Charmap::Char('A');
         EXPECT_THAT(Members(kA), "A");
-        constexpr flare::strings_internal::Charmap kAZ =
-                flare::strings_internal::Charmap::Range('A', 'Z');
+        constexpr turbo::strings_internal::Charmap kAZ =
+                turbo::strings_internal::Charmap::Range('A', 'Z');
         EXPECT_THAT(Members(kAZ), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        constexpr flare::strings_internal::Charmap kIdentifier =
-                flare::strings_internal::Charmap::Range('0', '9') |
-                flare::strings_internal::Charmap::Range('A', 'Z') |
-                flare::strings_internal::Charmap::Range('a', 'z') |
-                flare::strings_internal::Charmap::Char('_');
+        constexpr turbo::strings_internal::Charmap kIdentifier =
+                turbo::strings_internal::Charmap::Range('0', '9') |
+                turbo::strings_internal::Charmap::Range('A', 'Z') |
+                turbo::strings_internal::Charmap::Range('a', 'z') |
+                turbo::strings_internal::Charmap::Char('_');
         EXPECT_THAT(Members(kIdentifier),
                     "0123456789"
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     "_"
                     "abcdefghijklmnopqrstuvwxyz");
-        constexpr flare::strings_internal::Charmap kAll = everything_map;
+        constexpr turbo::strings_internal::Charmap kAll = everything_map;
         for (size_t i = 0; i < 256; ++i) {
             EXPECT_TRUE(kAll.contains(i)) << i;
         }
-        constexpr flare::strings_internal::Charmap kHello =
-                flare::strings_internal::Charmap::FromString("Hello, world!");
+        constexpr turbo::strings_internal::Charmap kHello =
+                turbo::strings_internal::Charmap::FromString("Hello, world!");
         EXPECT_THAT(Members(kHello), " !,Hdelorw");
 
         // test negation and intersection
-        constexpr flare::strings_internal::Charmap kABC =
-                flare::strings_internal::Charmap::Range('A', 'Z') &
-                ~flare::strings_internal::Charmap::Range('D', 'Z');
+        constexpr turbo::strings_internal::Charmap kABC =
+                turbo::strings_internal::Charmap::Range('A', 'Z') &
+                ~turbo::strings_internal::Charmap::Range('D', 'Z');
         EXPECT_THAT(Members(kABC), "ABC");
     }
 
@@ -123,7 +123,7 @@ namespace {
             SCOPED_TRACE(*lo);
             for (auto hi = lo; hi != poi.end(); ++hi) {
                 SCOPED_TRACE(*hi);
-                EXPECT_THAT(Members(flare::strings_internal::Charmap::Range(*lo, *hi)),
+                EXPECT_THAT(Members(turbo::strings_internal::Charmap::Range(*lo, *hi)),
                             ClosedRangeString(*lo, *hi));
             }
         }
@@ -136,29 +136,29 @@ namespace {
             SCOPED_TRACE(c);
             SCOPED_TRACE(static_cast<char>(c));
             EXPECT_EQ(AsBool(std::isupper(c)),
-                      flare::strings_internal::UpperCharmap().contains(c));
+                      turbo::strings_internal::UpperCharmap().contains(c));
             EXPECT_EQ(AsBool(std::islower(c)),
-                      flare::strings_internal::LowerCharmap().contains(c));
+                      turbo::strings_internal::LowerCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isdigit(c)),
-                      flare::strings_internal::DigitCharmap().contains(c));
+                      turbo::strings_internal::DigitCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isalpha(c)),
-                      flare::strings_internal::AlphaCharmap().contains(c));
+                      turbo::strings_internal::AlphaCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isalnum(c)),
-                      flare::strings_internal::AlnumCharmap().contains(c));
+                      turbo::strings_internal::AlnumCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isxdigit(c)),
-                      flare::strings_internal::XDigitCharmap().contains(c));
+                      turbo::strings_internal::XDigitCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isprint(c)),
-                      flare::strings_internal::PrintCharmap().contains(c));
+                      turbo::strings_internal::PrintCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isspace(c)),
-                      flare::strings_internal::SpaceCharmap().contains(c));
+                      turbo::strings_internal::SpaceCharmap().contains(c));
             EXPECT_EQ(AsBool(std::iscntrl(c)),
-                      flare::strings_internal::CntrlCharmap().contains(c));
+                      turbo::strings_internal::CntrlCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isblank(c)),
-                      flare::strings_internal::BlankCharmap().contains(c));
+                      turbo::strings_internal::BlankCharmap().contains(c));
             EXPECT_EQ(AsBool(std::isgraph(c)),
-                      flare::strings_internal::GraphCharmap().contains(c));
+                      turbo::strings_internal::GraphCharmap().contains(c));
             EXPECT_EQ(AsBool(std::ispunct(c)),
-                      flare::strings_internal::PunctCharmap().contains(c));
+                      turbo::strings_internal::PunctCharmap().contains(c));
         }
     }
 

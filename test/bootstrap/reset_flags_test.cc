@@ -5,22 +5,22 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include "flare/bootstrap/flags.h"
-#include "flare/bootstrap/bootstrap.h"
+#include "turbo/bootstrap/flags.h"
+#include "turbo/bootstrap/bootstrap.h"
 #include "gflags/gflags.h"
 #include "testing/gtest_wrap.h"
 
 DEFINE_bool(test, true, "");
 
-FLARE_RESET_FLAGS(test, false);
+TURBO_RESET_FLAGS(test, false);
 
-namespace flare {
+namespace turbo {
 
     TEST(OverrideFlag, All) { EXPECT_FALSE(FLAGS_test); }
 
-}  // namespace flare::init
+}  // namespace turbo::init
 
 int main(int argc, char **argv) {
-    flare::bootstrap_init(argc, argv);
+    turbo::bootstrap_init(argc, argv);
     return ::RUN_ALL_TESTS();
 }

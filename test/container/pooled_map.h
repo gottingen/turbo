@@ -20,11 +20,11 @@
 #ifndef TEST_CONTAINER_POOLED_MAP_H_
 #define TEST_CONTAINER_POOLED_MAP_H_
 
-#include "flare/container/single_threaded_pool.h"
+#include "turbo/container/single_threaded_pool.h"
 #include <new>
 #include <map>
 
-namespace flare::container {
+namespace turbo::container {
     namespace details {
         template<class T1, size_t BLOCK_SIZE>
         class PooledAllocator;
@@ -117,7 +117,7 @@ namespace flare::container {
             void destroy(pointer p) { p->T1::~T1(); }
 
         private:
-            flare::container::SingleThreadedPool<sizeof(T1), BLOCK_SIZE, 1> _pool;
+            turbo::container::SingleThreadedPool<sizeof(T1), BLOCK_SIZE, 1> _pool;
         };
 
         // Return true if b could be used to deallocate storage obtained through a
@@ -129,15 +129,15 @@ namespace flare::container {
         bool operator!=(const PooledAllocator<T1, S1> &a, const PooledAllocator<T2, S2> &b) { return !(a == b); }
 
     } // namespace details
-} // namespace flare::container
+} // namespace turbo::container
 
 
 #include <utility>    // std::swap since C++11
 
 namespace std {
     template<class T1, size_t BLOCK_SIZE>
-    inline void swap(::flare::container::details::PooledAllocator<T1, BLOCK_SIZE> &lhs,
-                     ::flare::container::details::PooledAllocator<T1, BLOCK_SIZE> &rhs) {
+    inline void swap(::turbo::container::details::PooledAllocator<T1, BLOCK_SIZE> &lhs,
+                     ::turbo::container::details::PooledAllocator<T1, BLOCK_SIZE> &rhs) {
         lhs.swap(rhs);
     }
 }  // namespace std

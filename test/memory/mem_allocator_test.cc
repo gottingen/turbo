@@ -1,12 +1,12 @@
 
 #include "testing/sstream_workaround.h"
-#include "flare/memory/allocator.h"
+#include "turbo/memory/allocator.h"
 
 #include "testing/gtest_wrap.h"
 
 class AllocatorTest : public testing::Test {
 public:
-    flare::allocator *allocator = flare::allocator::Default;
+    turbo::allocator *allocator = turbo::allocator::Default;
 };
 
 TEST_F(AllocatorTest, AlignedAllocate) {
@@ -15,7 +15,7 @@ TEST_F(AllocatorTest, AlignedAllocate) {
             for (auto size : {1, 2, 3, 4, 5, 7, 8, 14, 16, 17,
                               31, 34, 50, 63, 64, 65, 100, 127, 128, 129,
                               200, 255, 256, 257, 500, 511, 512, 513}) {
-                flare::allocation::required_info request;
+                turbo::allocation::required_info request;
                 request.alignment = alignment;
                 request.size = size;
                 request.useGuards = useGuards;
@@ -65,14 +65,14 @@ TEST_F(AllocatorTest, Create) {
 
 #if GTEST_HAS_DEATH_TEST
 TEST_F(AllocatorTest, Guards) {
-    flare::allocation::required_info request;
+    turbo::allocation::required_info request;
     request.alignment = 16;
     request.size = 16;
     request.useGuards = true;
     auto alloc = allocator->allocate(request);
     auto ptr = reinterpret_cast<uint8_t *>(alloc.ptr);
     EXPECT_DEATH(ptr[-1] = 1, "");
-    EXPECT_DEATH(ptr[flare::page_size()] = 1, "");
+    EXPECT_DEATH(ptr[turbo::page_size()] = 1, "");
 }
 
 #endif

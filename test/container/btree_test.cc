@@ -7,10 +7,10 @@
 
 #include <numeric>
 #include "btree_test.h"
-#include "flare/log/logging.h"
+#include "turbo/log/logging.h"
 
 
-namespace flare {
+namespace turbo {
     namespace test_internal {
         size_t BaseCountedInstance::num_instances_ = 0;
         size_t BaseCountedInstance::num_live_instances_ = 0;
@@ -20,18 +20,18 @@ namespace flare {
         size_t BaseCountedInstance::num_comparisons_ = 0;
 
     }  // namespace test_internal
-}  // namespace flare
+}  // namespace turbo
 
 
 static const size_t test_values = 10000;
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
 
-            using ::flare::test_internal::CopyableMovableInstance;
-            using ::flare::test_internal::InstanceTracker;
-            using ::flare::test_internal::MovableOnlyInstance;
+            using ::turbo::test_internal::CopyableMovableInstance;
+            using ::turbo::test_internal::InstanceTracker;
+            using ::turbo::test_internal::MovableOnlyInstance;
             using ::testing::ElementsAre;
             using ::testing::ElementsAreArray;
             using ::testing::IsEmpty;
@@ -40,7 +40,7 @@ namespace flare {
 
             template<typename T, typename U>
             void CheckPairEquals(const T &x, const U &y) {
-                FLARE_CHECK(x == y) << "Values are unequal.";
+                TURBO_CHECK(x == y) << "Values are unequal.";
             }
 
             template<typename T, typename U, typename V, typename W>
@@ -100,7 +100,7 @@ namespace flare {
             template<typename IterType, typename CheckerIterType>
             IterType iter_check(IterType tree_iter, CheckerIterType checker_iter) const {
                 if (tree_iter == tree_.end()) {
-                    FLARE_CHECK(checker_iter == checker_.end()) << "Checker iterator not at end.";
+                    TURBO_CHECK(checker_iter == checker_.end()) << "Checker iterator not at end.";
                 } else {
                     CheckPairEquals(*tree_iter, *checker_iter);
                 }
@@ -110,7 +110,7 @@ namespace flare {
             template<typename IterType, typename CheckerIterType>
             IterType riter_check(IterType tree_iter, CheckerIterType checker_iter) const {
                 if (tree_iter == tree_.rend()) {
-                    FLARE_CHECK(checker_iter == checker_.rend()) << "Checker iterator not at rend.";
+                    TURBO_CHECK(checker_iter == checker_.rend()) << "Checker iterator not at rend.";
                 } else {
                     CheckPairEquals(*tree_iter, *checker_iter);
                 }
@@ -803,11 +803,11 @@ namespace flare {
             template<typename K, int N = 256>
             void SetTest() {
                 EXPECT_EQ(
-                        sizeof(flare::btree_set<K>),
-                        2 * sizeof(void *) + sizeof(typename flare::btree_set<K>::size_type));
-                using BtreeSet = flare::btree_set<K>;
+                        sizeof(turbo::btree_set<K>),
+                        2 * sizeof(void *) + sizeof(typename turbo::btree_set<K>::size_type));
+                using BtreeSet = turbo::btree_set<K>;
                 using CountingBtreeSet =
-                flare::btree_set<K, std::less<K>, PropagatingCountingAlloc<K>>;
+                turbo::btree_set<K, std::less<K>, PropagatingCountingAlloc<K>>;
                 BtreeTest<BtreeSet, std::set<K>>();
                 BtreeAllocatorTest<CountingBtreeSet>();
             }
@@ -815,11 +815,11 @@ namespace flare {
             template<typename K, int N = 256>
             void MapTest() {
                 EXPECT_EQ(
-                        sizeof(flare::btree_map<K, K>),
-                        2 * sizeof(void *) + sizeof(typename flare::btree_map<K, K>::size_type));
-                using BtreeMap = flare::btree_map<K, K>;
+                        sizeof(turbo::btree_map<K, K>),
+                        2 * sizeof(void *) + sizeof(typename turbo::btree_map<K, K>::size_type));
+                using BtreeMap = turbo::btree_map<K, K>;
                 using CountingBtreeMap =
-                flare::btree_map<K, K, std::less<K>,
+                turbo::btree_map<K, K, std::less<K>,
                         PropagatingCountingAlloc<std::pair<const K, K>>>;
                 BtreeTest<BtreeMap, std::map<K, K>>();
                 BtreeAllocatorTest<CountingBtreeMap>();
@@ -845,23 +845,23 @@ namespace flare {
             template<typename K, int N = 256>
             void MultiSetTest() {
                 EXPECT_EQ(
-                        sizeof(flare::btree_multiset<K>),
-                        2 * sizeof(void *) + sizeof(typename flare::btree_multiset<K>::size_type));
-                using BtreeMSet = flare::btree_multiset<K>;
+                        sizeof(turbo::btree_multiset<K>),
+                        2 * sizeof(void *) + sizeof(typename turbo::btree_multiset<K>::size_type));
+                using BtreeMSet = turbo::btree_multiset<K>;
                 using CountingBtreeMSet =
-                flare::btree_multiset<K, std::less<K>, PropagatingCountingAlloc<K>>;
+                turbo::btree_multiset<K, std::less<K>, PropagatingCountingAlloc<K>>;
                 BtreeMultiTest<BtreeMSet, std::multiset<K>>();
                 BtreeAllocatorTest<CountingBtreeMSet>();
             }
 
             template<typename K, int N = 256>
             void MultiMapTest() {
-                EXPECT_EQ(sizeof(flare::btree_multimap<K, K>),
+                EXPECT_EQ(sizeof(turbo::btree_multimap<K, K>),
                           2 * sizeof(void *) +
-                          sizeof(typename flare::btree_multimap<K, K>::size_type));
-                using BtreeMMap = flare::btree_multimap<K, K>;
+                          sizeof(typename turbo::btree_multimap<K, K>::size_type));
+                using BtreeMMap = turbo::btree_multimap<K, K>;
                 using CountingBtreeMMap =
-                flare::btree_multimap<K, K, std::less<K>,
+                turbo::btree_multimap<K, K, std::less<K>,
                         PropagatingCountingAlloc<std::pair<const K, K>>>;
                 BtreeMultiTest<BtreeMMap, std::multimap<K, K>>();
                 BtreeMultiMapTest<BtreeMMap>();
@@ -1001,7 +1001,7 @@ namespace flare {
             }
 
             TEST(Btree, NoHeterogeneousLookupWithoutAlias) {
-                using StringSet = flare::btree_set<std::string, NonTransparentCompare>;
+                using StringSet = turbo::btree_set<std::string, NonTransparentCompare>;
                 StringSet s;
                 ASSERT_TRUE(s.insert("hello").second);
                 ASSERT_TRUE(s.insert("world").second);
@@ -1013,7 +1013,7 @@ namespace flare {
                 EXPECT_FALSE(s.contains("blah"));
 
                 using StringMultiSet =
-                flare::btree_multiset<std::string, NonTransparentCompare>;
+                turbo::btree_multiset<std::string, NonTransparentCompare>;
                 StringMultiSet ms;
                 ms.insert("hello");
                 ms.insert("world");
@@ -1072,7 +1072,7 @@ namespace flare {
             int StringLike::constructor_calls_ = 0;
 
             TEST(Btree, HeterogeneousLookupDoesntDegradePerformance) {
-                using StringSet = flare::btree_set<StringLike>;
+                using StringSet = turbo::btree_set<StringLike>;
                 StringSet s;
                 for (size_t i = 0; i < 100; ++i) {
                     ASSERT_TRUE(s.insert(std::to_string(i).c_str()).second);
@@ -1123,7 +1123,7 @@ namespace flare {
             };
 
             TEST(Btree, SwapKeyCompare) {
-                using SubstringSet = flare::btree_set<std::string, SubstringLess>;
+                using SubstringSet = turbo::btree_set<std::string, SubstringLess>;
                 SubstringSet s1(SubstringLess(1), SubstringSet::allocator_type());
                 SubstringSet s2(SubstringLess(2), SubstringSet::allocator_type());
 
@@ -1147,7 +1147,7 @@ namespace flare {
             TEST(Btree, UpperBoundRegression) {
                 // Regress a bug where upper_bound would default-construct a new key_compare
                 // instead of copying the existing one.
-                using SubstringSet = flare::btree_set<std::string, SubstringLess>;
+                using SubstringSet = turbo::btree_set<std::string, SubstringLess>;
                 SubstringSet my_set(SubstringLess(3));
                 my_set.insert("aab");
                 my_set.insert("abb");
@@ -1162,11 +1162,11 @@ namespace flare {
 
             TEST(Btree, Comparison) {
                 const int kSetSize = 1201;
-                flare::btree_set<int64_t> my_set;
+                turbo::btree_set<int64_t> my_set;
                 for (size_t i = 0; i < kSetSize; ++i) {
                     my_set.insert(i);
                 }
-                flare::btree_set<int64_t> my_set_copy(my_set);
+                turbo::btree_set<int64_t> my_set_copy(my_set);
                 EXPECT_TRUE(my_set_copy == my_set);
                 EXPECT_TRUE(my_set == my_set_copy);
                 EXPECT_FALSE(my_set_copy != my_set);
@@ -1184,11 +1184,11 @@ namespace flare {
                 EXPECT_TRUE(my_set_copy != my_set);
                 EXPECT_TRUE(my_set != my_set_copy);
 
-                flare::btree_map<std::string, int64_t> my_map;
+                turbo::btree_map<std::string, int64_t> my_map;
                 for (size_t i = 0; i < kSetSize; ++i) {
                     my_map[std::string(i, 'a')] = i;
                 }
-                flare::btree_map<std::string, int64_t> my_map_copy(my_map);
+                turbo::btree_map<std::string, int64_t> my_map_copy(my_map);
                 EXPECT_TRUE(my_map_copy == my_map);
                 EXPECT_TRUE(my_map == my_map_copy);
                 EXPECT_FALSE(my_map_copy != my_map);
@@ -1219,10 +1219,10 @@ namespace flare {
                 ivec.push_back(1);
                 std::map<int, int> imap;
                 imap.insert(std::make_pair(1, 2));
-                flare::btree_multiset<int> tmset(ivec.begin(), ivec.end());
-                flare::btree_multimap<int, int> tmmap(imap.begin(), imap.end());
-                flare::btree_set<int> tset(ivec.begin(), ivec.end());
-                flare::btree_map<int, int> tmap(imap.begin(), imap.end());
+                turbo::btree_multiset<int> tmset(ivec.begin(), ivec.end());
+                turbo::btree_multimap<int, int> tmmap(imap.begin(), imap.end());
+                turbo::btree_set<int> tset(ivec.begin(), ivec.end());
+                turbo::btree_map<int, int> tmap(imap.begin(), imap.end());
                 EXPECT_EQ(1, tmset.size());
                 EXPECT_EQ(1, tmmap.size());
                 EXPECT_EQ(1, tset.size());
@@ -1230,7 +1230,7 @@ namespace flare {
             }
 
             TEST(Btree, BtreeMapCanHoldMoveOnlyTypes) {
-                flare::btree_map<std::string, std::unique_ptr<std::string>> m;
+                turbo::btree_map<std::string, std::unique_ptr<std::string>> m;
 
                 std::unique_ptr<std::string> &v = m["A"];
                 EXPECT_TRUE(v == nullptr);
@@ -1241,20 +1241,20 @@ namespace flare {
             }
 
             TEST(Btree, InitializerListConstructor) {
-                flare::btree_set<std::string> set({"a", "b"});
+                turbo::btree_set<std::string> set({"a", "b"});
                 EXPECT_EQ(set.count("a"), 1);
                 EXPECT_EQ(set.count("b"), 1);
 
-                flare::btree_multiset<int> mset({1, 1, 4});
+                turbo::btree_multiset<int> mset({1, 1, 4});
                 EXPECT_EQ(mset.count(1), 2);
                 EXPECT_EQ(mset.count(4), 1);
 
-                flare::btree_map<int, int> map({{1, 5},
+                turbo::btree_map<int, int> map({{1, 5},
                                                 {2, 10}});
                 EXPECT_EQ(map[1], 5);
                 EXPECT_EQ(map[2], 10);
 
-                flare::btree_multimap<int, int> mmap({{1, 5},
+                turbo::btree_multimap<int, int> mmap({{1, 5},
                                                       {1, 10}});
                 auto range = mmap.equal_range(1);
                 auto it = range.first;
@@ -1266,17 +1266,17 @@ namespace flare {
             }
 
             TEST(Btree, InitializerListInsert) {
-                flare::btree_set<std::string> set;
+                turbo::btree_set<std::string> set;
                 set.insert({"a", "b"});
                 EXPECT_EQ(set.count("a"), 1);
                 EXPECT_EQ(set.count("b"), 1);
 
-                flare::btree_multiset<int> mset;
+                turbo::btree_multiset<int> mset;
                 mset.insert({1, 1, 4});
                 EXPECT_EQ(mset.count(1), 2);
                 EXPECT_EQ(mset.count(4), 1);
 
-                flare::btree_map<int, int> map;
+                turbo::btree_map<int, int> map;
                 map.insert({{1, 5},
                             {2, 10}});
                 // Test that inserting one element using an initializer list also works.
@@ -1285,7 +1285,7 @@ namespace flare {
                 EXPECT_EQ(map[2], 10);
                 EXPECT_EQ(map[3], 15);
 
-                flare::btree_multimap<int, int> mmap;
+                turbo::btree_multimap<int, int> mmap;
                 mmap.insert({{1, 5},
                              {1, 10}});
                 auto range = mmap.equal_range(1);
@@ -1303,8 +1303,8 @@ namespace flare {
                 static_assert(!std::is_same<Adapted, Compare>::value,
                               "key_compare_to_adapter should have adapted this comparator.");
                 static_assert(
-                        std::is_same<flare::weak_ordering,
-                                flare::invoke_result_t<Adapted, const K &, const K &>>::value,
+                        std::is_same<turbo::weak_ordering,
+                                turbo::invoke_result_t<Adapted, const K &, const K &>>::value,
                         "Adapted comparator should be a key-compare-to comparator.");
             }
 
@@ -1316,7 +1316,7 @@ namespace flare {
                         "key_compare_to_adapter shouldn't have adapted this comparator.");
                 static_assert(
                         std::is_same<bool,
-                                flare::invoke_result_t<Unadapted, const K &, const K &>>::value,
+                                turbo::invoke_result_t<Unadapted, const K &, const K &>>::value,
                         "Un-adapted comparator should return bool.");
             }
 
@@ -1333,7 +1333,7 @@ namespace flare {
             TEST(Btree, RValueInsert) {
                 InstanceTracker tracker;
 
-                flare::btree_set<MovableOnlyInstance> set;
+                turbo::btree_set<MovableOnlyInstance> set;
                 set.insert(MovableOnlyInstance(1));
                 set.insert(MovableOnlyInstance(3));
                 MovableOnlyInstance two(2);
@@ -1343,14 +1343,14 @@ namespace flare {
                 ASSERT_NE(++it, set.end());
                 EXPECT_EQ(it->value(), 3);
 
-                flare::btree_multiset<MovableOnlyInstance> mset;
+                turbo::btree_multiset<MovableOnlyInstance> mset;
                 MovableOnlyInstance zero(0);
                 MovableOnlyInstance zero2(0);
                 mset.insert(std::move(zero));
                 mset.insert(mset.find(MovableOnlyInstance(0)), std::move(zero2));
                 EXPECT_EQ(mset.count(MovableOnlyInstance(0)), 2);
 
-                flare::btree_map<int, MovableOnlyInstance> map;
+                turbo::btree_map<int, MovableOnlyInstance> map;
                 std::pair<const int, MovableOnlyInstance> p1 = {1, MovableOnlyInstance(5)};
                 std::pair<const int, MovableOnlyInstance> p2 = {2, MovableOnlyInstance(10)};
                 std::pair<const int, MovableOnlyInstance> p3 = {3, MovableOnlyInstance(15)};
@@ -1360,7 +1360,7 @@ namespace flare {
                 ASSERT_NE(map.find(2), map.end());
                 EXPECT_EQ(map.find(2)->second.value(), 10);
 
-                flare::btree_multimap<int, MovableOnlyInstance> mmap;
+                turbo::btree_multimap<int, MovableOnlyInstance> mmap;
                 std::pair<const int, MovableOnlyInstance> p4 = {1, MovableOnlyInstance(5)};
                 std::pair<const int, MovableOnlyInstance> p5 = {1, MovableOnlyInstance(10)};
                 mmap.insert(std::move(p4));
@@ -1448,7 +1448,7 @@ namespace flare {
                 EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<decltype(set61)>(), 61);
                 EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<decltype(set100)>(), 100);
                 if constexpr (sizeof(void *) == 8) {
-                    EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<flare::btree_set<int32_t>>(),
+                    EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<turbo::btree_set<int32_t>>(),
                               BtreeNodePeer::GetNumValuesPerNode<decltype(set61)>());
                 }
 
@@ -1471,7 +1471,7 @@ namespace flare {
             }
 
             struct MovableOnlyInstanceThreeWayCompare {
-                flare::weak_ordering operator()(const MovableOnlyInstance &a,
+                turbo::weak_ordering operator()(const MovableOnlyInstance &a,
                                                 const MovableOnlyInstance &b) const {
                     return a.compare(b);
                 }
@@ -1503,7 +1503,7 @@ namespace flare {
                 EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<decltype(set61)>(), 61);
                 EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<decltype(set100)>(), 100);
                 if constexpr (sizeof(void *) == 8) {
-                    EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<flare::btree_set<int32_t>>(),
+                    EXPECT_EQ(BtreeNodePeer::GetNumValuesPerNode<turbo::btree_set<int32_t>>(),
                               BtreeNodePeer::GetNumValuesPerNode<decltype(set61)>());
                 }
 
@@ -1536,7 +1536,7 @@ namespace flare {
             };
 
             TEST(Btree, BtreeMapCanHoldNoDefaultCtorTypes) {
-                flare::btree_map<NoDefaultCtor, NoDefaultCtor> m;
+                turbo::btree_map<NoDefaultCtor, NoDefaultCtor> m;
 
                 for (size_t i = 1; i <= 99; ++i) {
                     SCOPED_TRACE(i);
@@ -1562,7 +1562,7 @@ namespace flare {
             }
 
             TEST(Btree, BtreeMultimapCanHoldNoDefaultCtorTypes) {
-                flare::btree_multimap<NoDefaultCtor, NoDefaultCtor> m;
+                turbo::btree_multimap<NoDefaultCtor, NoDefaultCtor> m;
 
                 for (size_t i = 1; i <= 99; ++i) {
                     SCOPED_TRACE(i);
@@ -1587,24 +1587,24 @@ namespace flare {
             }
 
             TEST(Btree, MapAt) {
-                flare::btree_map<int, int> map = {{1, 2},
+                turbo::btree_map<int, int> map = {{1, 2},
                                                   {2, 4}};
                 EXPECT_EQ(map.at(1), 2);
                 EXPECT_EQ(map.at(2), 4);
                 map.at(2) = 8;
-                const flare::btree_map<int, int> &const_map = map;
+                const turbo::btree_map<int, int> &const_map = map;
                 EXPECT_EQ(const_map.at(1), 2);
                 EXPECT_EQ(const_map.at(2), 8);
-#ifdef FLARE_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
                 EXPECT_THROW(map.at(3), std::out_of_range);
 #else
-                EXPECT_DEATH(map.at(3), "flare::btree_map::at");
+                EXPECT_DEATH(map.at(3), "turbo::btree_map::at");
 #endif
             }
 
             TEST(Btree, BtreeMultisetEmplace) {
                 const int value_to_insert = 123456;
-                flare::btree_multiset<int> s;
+                turbo::btree_multiset<int> s;
                 auto iter = s.emplace(value_to_insert);
                 ASSERT_NE(iter, s.end());
                 EXPECT_EQ(*iter, value_to_insert);
@@ -1618,7 +1618,7 @@ namespace flare {
 
             TEST(Btree, BtreeMultisetEmplaceHint) {
                 const int value_to_insert = 123456;
-                flare::btree_multiset<int> s;
+                turbo::btree_multiset<int> s;
                 auto iter = s.emplace(value_to_insert);
                 ASSERT_NE(iter, s.end());
                 EXPECT_EQ(*iter, value_to_insert);
@@ -1631,7 +1631,7 @@ namespace flare {
             TEST(Btree, BtreeMultimapEmplace) {
                 const int key_to_insert = 123456;
                 const char value0[] = "a";
-                flare::btree_multimap<int, std::string> s;
+                turbo::btree_multimap<int, std::string> s;
                 auto iter = s.emplace(key_to_insert, value0);
                 ASSERT_NE(iter, s.end());
                 EXPECT_EQ(iter->first, key_to_insert);
@@ -1649,7 +1649,7 @@ namespace flare {
             TEST(Btree, BtreeMultimapEmplaceHint) {
                 const int key_to_insert = 123456;
                 const char value0[] = "a";
-                flare::btree_multimap<int, std::string> s;
+                turbo::btree_multimap<int, std::string> s;
                 auto iter = s.emplace(key_to_insert, value0);
                 ASSERT_NE(iter, s.end());
                 EXPECT_EQ(iter->first, key_to_insert);
@@ -1663,7 +1663,7 @@ namespace flare {
             }
 
             TEST(Btree, ConstIteratorAccessors) {
-                flare::btree_set<int> set;
+                turbo::btree_set<int> set;
                 for (size_t i = 0; i < 100; ++i) {
                     set.insert(i);
                 }
@@ -1680,30 +1680,30 @@ namespace flare {
 
 #if 0
             TEST(Btree, StrSplitCompatible) {
-                const flare::btree_set<std::string> split_set = flare::StrSplit("a,b,c", ',');
-                const flare::btree_set<std::string> expected_set = {"a", "b", "c"};
+                const turbo::btree_set<std::string> split_set = turbo::StrSplit("a,b,c", ',');
+                const turbo::btree_set<std::string> expected_set = {"a", "b", "c"};
 
                 EXPECT_EQ(split_set, expected_set);
             }
 #endif
 
-            // We can't use EXPECT_EQ/etc. to compare flare::weak_ordering because they
-            // convert literal 0 to int and flare::weak_ordering can only be compared with
+            // We can't use EXPECT_EQ/etc. to compare turbo::weak_ordering because they
+            // convert literal 0 to int and turbo::weak_ordering can only be compared with
             // literal 0. Defining this function allows for avoiding ClangTidy warnings.
             bool Identity(const bool b) { return b; }
 
             TEST(Btree, ValueComp) {
-                flare::btree_set<int> s;
+                turbo::btree_set<int> s;
                 EXPECT_TRUE(s.value_comp()(1, 2));
                 EXPECT_FALSE(s.value_comp()(2, 2));
                 EXPECT_FALSE(s.value_comp()(2, 1));
 
-                flare::btree_map<int, int> m1;
+                turbo::btree_map<int, int> m1;
                 EXPECT_TRUE(m1.value_comp()(std::make_pair(1, 0), std::make_pair(2, 0)));
                 EXPECT_FALSE(m1.value_comp()(std::make_pair(2, 0), std::make_pair(2, 0)));
                 EXPECT_FALSE(m1.value_comp()(std::make_pair(2, 0), std::make_pair(1, 0)));
 
-                flare::btree_map<std::string, int> m2;
+                turbo::btree_map<std::string, int> m2;
                 EXPECT_TRUE(Identity(
                         m2.value_comp()(std::make_pair("a", 0), std::make_pair("b", 0)) < 0));
                 EXPECT_TRUE(Identity(
@@ -1713,10 +1713,10 @@ namespace flare {
             }
 
             TEST(Btree, DefaultConstruction) {
-                flare::btree_set<int> s;
-                flare::btree_map<int, int> m;
-                flare::btree_multiset<int> ms;
-                flare::btree_multimap<int, int> mm;
+                turbo::btree_set<int> s;
+                turbo::btree_map<int, int> m;
+                turbo::btree_multiset<int> ms;
+                turbo::btree_multimap<int, int> mm;
 
                 EXPECT_TRUE(s.empty());
                 EXPECT_TRUE(m.empty());
@@ -1732,8 +1732,8 @@ namespace flare {
                 std::vector<std::pair<int, int>> map_values;
                 for (int v : values) map_values.emplace_back(v, -v);
 
-                using set = flare::btree_set<int>;
-                EXPECT_TRUE(flare::VerifyTypeImplementsMapHashCorrectly({
+                using set = turbo::btree_set<int>;
+                EXPECT_TRUE(turbo::VerifyTypeImplementsMapHashCorrectly({
                             set{},
                                 set{1},
                                     set{2},
@@ -1743,8 +1743,8 @@ namespace flare {
                                                     set(values.rbegin(), values.rend()),
                                                     }));
 
-                using mset = flare::btree_multiset<int>;
-                EXPECT_TRUE(flare::VerifyTypeImplementsMapHashCorrectly({
+                using mset = turbo::btree_multiset<int>;
+                EXPECT_TRUE(turbo::VerifyTypeImplementsMapHashCorrectly({
                             mset{},
                                 mset{1},
                                     mset{1, 1},
@@ -1758,8 +1758,8 @@ namespace flare {
                                                                     mset(values.rbegin(), values.rend()),
                                                                     }));
 
-                using map = flare::btree_map<int, int>;
-                EXPECT_TRUE(flare::VerifyTypeImplementsMapHashCorrectly({
+                using map = turbo::btree_map<int, int>;
+                EXPECT_TRUE(turbo::VerifyTypeImplementsMapHashCorrectly({
                             map{},
                                 map{{1, 0}},
                                     map{{1, 1}},
@@ -1770,8 +1770,8 @@ namespace flare {
                                                         map(map_values.rbegin(), map_values.rend()),
                                                         }));
 
-                using mmap = flare::btree_multimap<int, int>;
-                EXPECT_TRUE(flare::VerifyTypeImplementsMapHashCorrectly({
+                using mmap = turbo::btree_multimap<int, int>;
+                EXPECT_TRUE(turbo::VerifyTypeImplementsMapHashCorrectly({
                             mmap{},
                                 mmap{{1, 0}},
                                     mmap{{1, 1}},
@@ -1787,8 +1787,8 @@ namespace flare {
 #endif
 
             TEST(Btree, ComparableSet) {
-                flare::btree_set<int> s1 = {1, 2};
-                flare::btree_set<int> s2 = {2, 3};
+                turbo::btree_set<int> s1 = {1, 2};
+                turbo::btree_set<int> s2 = {2, 3};
                 EXPECT_LT(s1, s2);
                 EXPECT_LE(s1, s2);
                 EXPECT_LE(s1, s1);
@@ -1798,8 +1798,8 @@ namespace flare {
             }
 
             TEST(Btree, ComparableSetsDifferentLength) {
-                flare::btree_set<int> s1 = {1, 2};
-                flare::btree_set<int> s2 = {1, 2, 3};
+                turbo::btree_set<int> s1 = {1, 2};
+                turbo::btree_set<int> s2 = {1, 2, 3};
                 EXPECT_LT(s1, s2);
                 EXPECT_LE(s1, s2);
                 EXPECT_GT(s2, s1);
@@ -1807,8 +1807,8 @@ namespace flare {
             }
 
             TEST(Btree, ComparableMultiset) {
-                flare::btree_multiset<int> s1 = {1, 2};
-                flare::btree_multiset<int> s2 = {2, 3};
+                turbo::btree_multiset<int> s1 = {1, 2};
+                turbo::btree_multiset<int> s2 = {2, 3};
                 EXPECT_LT(s1, s2);
                 EXPECT_LE(s1, s2);
                 EXPECT_LE(s1, s1);
@@ -1818,8 +1818,8 @@ namespace flare {
             }
 
             TEST(Btree, ComparableMap) {
-                flare::btree_map<int, int> s1 = {{1, 2}};
-                flare::btree_map<int, int> s2 = {{2, 3}};
+                turbo::btree_map<int, int> s1 = {{1, 2}};
+                turbo::btree_map<int, int> s2 = {{2, 3}};
                 EXPECT_LT(s1, s2);
                 EXPECT_LE(s1, s2);
                 EXPECT_LE(s1, s1);
@@ -1829,8 +1829,8 @@ namespace flare {
             }
 
             TEST(Btree, ComparableMultimap) {
-                flare::btree_multimap<int, int> s1 = {{1, 2}};
-                flare::btree_multimap<int, int> s2 = {{2, 3}};
+                turbo::btree_multimap<int, int> s1 = {{1, 2}};
+                turbo::btree_multimap<int, int> s2 = {{2, 3}};
                 EXPECT_LT(s1, s2);
                 EXPECT_LE(s1, s2);
                 EXPECT_LE(s1, s1);
@@ -1845,8 +1845,8 @@ namespace flare {
                 // [container.requirements.general].12, ordering associative containers always
                 // uses default '<' operator
                 // - even if otherwise the container uses custom functor.
-                flare::btree_set<int, std::greater<int>> s1 = {1, 2};
-                flare::btree_set<int, std::greater<int>> s2 = {2, 3};
+                turbo::btree_set<int, std::greater<int>> s1 = {1, 2};
+                turbo::btree_set<int, std::greater<int>> s2 = {2, 3};
                 EXPECT_LT(s1, s2);
                 EXPECT_LE(s1, s2);
                 EXPECT_LE(s1, s1);
@@ -1856,7 +1856,7 @@ namespace flare {
             }
 
             TEST(Btree, EraseReturnsIterator) {
-                flare::btree_set<int> set = {1, 2, 3, 4, 5};
+                turbo::btree_set<int> set = {1, 2, 3, 4, 5};
                 auto result_it = set.erase(set.begin(), set.find(3));
                 EXPECT_EQ(result_it, set.find(3));
                 result_it = set.erase(set.find(5));
@@ -1864,17 +1864,17 @@ namespace flare {
             }
 
             TEST(Btree, ExtractAndInsertNodeHandleSet) {
-                flare::btree_set<int> src1 = {1, 2, 3, 4, 5};
+                turbo::btree_set<int> src1 = {1, 2, 3, 4, 5};
                 auto nh = src1.extract(src1.find(3));
                 EXPECT_THAT(src1, ElementsAre(1, 2, 4, 5));
-                flare::btree_set<int> other;
-                flare::btree_set<int>::insert_return_type res = other.insert(std::move(nh));
+                turbo::btree_set<int> other;
+                turbo::btree_set<int>::insert_return_type res = other.insert(std::move(nh));
                 EXPECT_THAT(other, ElementsAre(3));
                 EXPECT_EQ(res.position, other.find(3));
                 EXPECT_TRUE(res.inserted);
                 EXPECT_TRUE(res.node.empty());
 
-                flare::btree_set<int> src2 = {3, 4};
+                turbo::btree_set<int> src2 = {3, 4};
                 nh = src2.extract(src2.find(3));
                 EXPECT_THAT(src2, ElementsAre(4));
                 res = other.insert(std::move(nh));
@@ -1953,24 +1953,24 @@ namespace flare {
             }
 
             TEST(Btree, ExtractTracking) {
-                TestExtractWithTrackingForSet<flare::btree_set<MovableOnlyInstance>>();
-                TestExtractWithTrackingForSet<flare::btree_multiset<MovableOnlyInstance>>();
+                TestExtractWithTrackingForSet<turbo::btree_set<MovableOnlyInstance>>();
+                TestExtractWithTrackingForSet<turbo::btree_multiset<MovableOnlyInstance>>();
                 TestExtractWithTrackingForMap<
-                        flare::btree_map<CopyableMovableInstance, MovableOnlyInstance>>();
+                        turbo::btree_map<CopyableMovableInstance, MovableOnlyInstance>>();
                 TestExtractWithTrackingForMap<
-                        flare::btree_multimap<CopyableMovableInstance, MovableOnlyInstance>>();
+                        turbo::btree_multimap<CopyableMovableInstance, MovableOnlyInstance>>();
             }
 
             TEST(Btree, ExtractAndInsertNodeHandleMultiSet) {
-                flare::btree_multiset<int> src1 = {1, 2, 3, 3, 4, 5};
+                turbo::btree_multiset<int> src1 = {1, 2, 3, 3, 4, 5};
                 auto nh = src1.extract(src1.find(3));
                 EXPECT_THAT(src1, ElementsAre(1, 2, 3, 4, 5));
-                flare::btree_multiset<int> other;
+                turbo::btree_multiset<int> other;
                 auto res = other.insert(std::move(nh));
                 EXPECT_THAT(other, ElementsAre(3));
                 EXPECT_EQ(res, other.find(3));
 
-                flare::btree_multiset<int> src2 = {3, 4};
+                turbo::btree_multiset<int> src2 = {3, 4};
                 nh = src2.extract(src2.find(3));
                 EXPECT_THAT(src2, ElementsAre(4));
                 res = other.insert(std::move(nh));
@@ -1979,20 +1979,20 @@ namespace flare {
             }
 
             TEST(Btree, ExtractAndInsertNodeHandleMap) {
-                flare::btree_map<int, int> src1 = {{1, 2},
+                turbo::btree_map<int, int> src1 = {{1, 2},
                                                    {3, 4},
                                                    {5, 6}};
                 auto nh = src1.extract(src1.find(3));
                 EXPECT_THAT(src1, ElementsAre(Pair(1, 2), Pair(5, 6)));
-                flare::btree_map<int, int> other;
-                flare::btree_map<int, int>::insert_return_type res =
+                turbo::btree_map<int, int> other;
+                turbo::btree_map<int, int>::insert_return_type res =
                         other.insert(std::move(nh));
                 EXPECT_THAT(other, ElementsAre(Pair(3, 4)));
                 EXPECT_EQ(res.position, other.find(3));
                 EXPECT_TRUE(res.inserted);
                 EXPECT_TRUE(res.node.empty());
 
-                flare::btree_map<int, int> src2 = {{3, 6}};
+                turbo::btree_map<int, int> src2 = {{3, 6}};
                 nh = src2.extract(src2.find(3));
                 EXPECT_TRUE(src2.empty());
                 res = other.insert(std::move(nh));
@@ -2005,17 +2005,17 @@ namespace flare {
             }
 
             TEST(Btree, ExtractAndInsertNodeHandleMultiMap) {
-                flare::btree_multimap<int, int> src1 = {{1, 2},
+                turbo::btree_multimap<int, int> src1 = {{1, 2},
                                                         {3, 4},
                                                         {5, 6}};
                 auto nh = src1.extract(src1.find(3));
                 EXPECT_THAT(src1, ElementsAre(Pair(1, 2), Pair(5, 6)));
-                flare::btree_multimap<int, int> other;
+                turbo::btree_multimap<int, int> other;
                 auto res = other.insert(std::move(nh));
                 EXPECT_THAT(other, ElementsAre(Pair(3, 4)));
                 EXPECT_EQ(res, other.find(3));
 
-                flare::btree_multimap<int, int> src2 = {{3, 6}};
+                turbo::btree_multimap<int, int> src2 = {{3, 6}};
                 nh = src2.extract(src2.find(3));
                 EXPECT_TRUE(src2.empty());
                 res = other.insert(std::move(nh));
@@ -2055,10 +2055,10 @@ namespace flare {
                 // For unique sets, insert with hsize_t is just a performance optimization.
                 // Test that insert works correctly when the hsize_t is right or wrong.
                 {
-                    flare::btree_set<int> src = {1, 2, 3, 4, 5};
+                    turbo::btree_set<int> src = {1, 2, 3, 4, 5};
                     auto nh = src.extract(src.find(3));
                     EXPECT_THAT(src, ElementsAre(1, 2, 4, 5));
-                    flare::btree_set<int> other = {0, 100};
+                    turbo::btree_set<int> other = {0, 100};
                     // Test a correct hint.
                     auto it = other.insert(other.lower_bound(3), std::move(nh));
                     EXPECT_THAT(other, ElementsAre(0, 3, 100));
@@ -2071,13 +2071,13 @@ namespace flare {
                     EXPECT_EQ(it, other.find(5));
                 }
 
-                flare::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare> src =
+                turbo::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare> src =
                         {{1, 2},
                          {3, 4},
                          {3, 5}};
                 auto nh = src.extract(src.lower_bound(3));
                 EXPECT_EQ(nh.value(), (InsertMultiHintData{3, 4}));
-                flare::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare>
+                turbo::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare>
                         other = {{3, 1},
                                  {3, 2},
                                  {3, 3}};
@@ -2098,17 +2098,17 @@ namespace flare {
             }
 
             struct IntCompareToCmp {
-                flare::weak_ordering operator()(int a, int b) const {
-                    if (a < b) return flare::weak_ordering::less;
-                    if (a > b) return flare::weak_ordering::greater;
-                    return flare::weak_ordering::equivalent;
+                turbo::weak_ordering operator()(int a, int b) const {
+                    if (a < b) return turbo::weak_ordering::less;
+                    if (a > b) return turbo::weak_ordering::greater;
+                    return turbo::weak_ordering::equivalent;
                 }
             };
 
             TEST(Btree, MergeIntoUniqueContainers) {
-                flare::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-                flare::btree_multiset<int> src2 = {3, 4, 4, 5};
-                flare::btree_set<int> dst;
+                turbo::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+                turbo::btree_multiset<int> src2 = {3, 4, 4, 5};
+                turbo::btree_set<int> dst;
 
                 dst.merge(src1);
                 EXPECT_TRUE(src1.empty());
@@ -2119,9 +2119,9 @@ namespace flare {
             }
 
             TEST(Btree, MergeIntoUniqueContainersWithCompareTo) {
-                flare::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-                flare::btree_multiset<int> src2 = {3, 4, 4, 5};
-                flare::btree_set<int, IntCompareToCmp> dst;
+                turbo::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+                turbo::btree_multiset<int> src2 = {3, 4, 4, 5};
+                turbo::btree_set<int, IntCompareToCmp> dst;
 
                 dst.merge(src1);
                 EXPECT_TRUE(src1.empty());
@@ -2132,9 +2132,9 @@ namespace flare {
             }
 
             TEST(Btree, MergeIntoMultiContainers) {
-                flare::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-                flare::btree_multiset<int> src2 = {3, 4, 4, 5};
-                flare::btree_multiset<int> dst;
+                turbo::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+                turbo::btree_multiset<int> src2 = {3, 4, 4, 5};
+                turbo::btree_multiset<int> dst;
 
                 dst.merge(src1);
                 EXPECT_TRUE(src1.empty());
@@ -2145,9 +2145,9 @@ namespace flare {
             }
 
             TEST(Btree, MergeIntoMultiContainersWithCompareTo) {
-                flare::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-                flare::btree_multiset<int> src2 = {3, 4, 4, 5};
-                flare::btree_multiset<int, IntCompareToCmp> dst;
+                turbo::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+                turbo::btree_multiset<int> src2 = {3, 4, 4, 5};
+                turbo::btree_multiset<int, IntCompareToCmp> dst;
 
                 dst.merge(src1);
                 EXPECT_TRUE(src1.empty());
@@ -2158,15 +2158,15 @@ namespace flare {
             }
 
             TEST(Btree, MergeIntoMultiMapsWithDifferentComparators) {
-                flare::btree_map<int, int, IntCompareToCmp> src1 = {{1, 1},
+                turbo::btree_map<int, int, IntCompareToCmp> src1 = {{1, 1},
                                                                     {2, 2},
                                                                     {3, 3}};
-                flare::btree_multimap<int, int, std::greater<int>> src2 = {
+                turbo::btree_multimap<int, int, std::greater<int>> src2 = {
                         {5, 5},
                         {4, 1},
                         {4, 4},
                         {3, 2}};
-                flare::btree_multimap<int, int> dst;
+                turbo::btree_multimap<int, int> dst;
 
                 dst.merge(src1);
                 EXPECT_TRUE(src1.empty());
@@ -2179,34 +2179,34 @@ namespace flare {
 
             struct KeyCompareToWeakOrdering {
                 template<typename T>
-                flare::weak_ordering operator()(const T &a, const T &b) const {
-                    return a < b ? flare::weak_ordering::less
-                                 : a == b ? flare::weak_ordering::equivalent
-                                          : flare::weak_ordering::greater;
+                turbo::weak_ordering operator()(const T &a, const T &b) const {
+                    return a < b ? turbo::weak_ordering::less
+                                 : a == b ? turbo::weak_ordering::equivalent
+                                          : turbo::weak_ordering::greater;
                 }
             };
 
             struct KeyCompareToStrongOrdering {
                 template<typename T>
-                flare::strong_ordering operator()(const T &a, const T &b) const {
-                    return a < b ? flare::strong_ordering::less
-                                 : a == b ? flare::strong_ordering::equal
-                                          : flare::strong_ordering::greater;
+                turbo::strong_ordering operator()(const T &a, const T &b) const {
+                    return a < b ? turbo::strong_ordering::less
+                                 : a == b ? turbo::strong_ordering::equal
+                                          : turbo::strong_ordering::greater;
                 }
             };
 
             TEST(Btree, UserProvidedKeyCompareToComparators) {
-                flare::btree_set<int, KeyCompareToWeakOrdering> weak_set = {1, 2, 3};
+                turbo::btree_set<int, KeyCompareToWeakOrdering> weak_set = {1, 2, 3};
                 EXPECT_TRUE(weak_set.contains(2));
                 EXPECT_FALSE(weak_set.contains(4));
 
-                flare::btree_set<int, KeyCompareToStrongOrdering> strong_set = {1, 2, 3};
+                turbo::btree_set<int, KeyCompareToStrongOrdering> strong_set = {1, 2, 3};
                 EXPECT_TRUE(strong_set.contains(2));
                 EXPECT_FALSE(strong_set.contains(4));
             }
 
             TEST(Btree, TryEmplaceBasicTest) {
-                flare::btree_map<int, std::string> m;
+                turbo::btree_map<int, std::string> m;
 
                 // Should construct a std::string from the literal.
                 m.try_emplace(1, "one");
@@ -2233,7 +2233,7 @@ namespace flare {
                 };
                 using Cmp = decltype(cmp);
 
-                flare::btree_map<int, int, Cmp> m(cmp);
+                turbo::btree_map<int, int, Cmp> m(cmp);
                 for (size_t i = 0; i < 128; ++i) {
                     m.emplace(i, i);
                 }
@@ -2285,7 +2285,7 @@ namespace flare {
             }
 
             TEST(Btree, TryEmplaceWithBadHint) {
-                flare::btree_map<int, int> m = {{1, 1},
+                turbo::btree_map<int, int> m = {{1, 1},
                                                 {9, 9}};
 
                 // Bad hint (too small), should still emplace:
@@ -2307,7 +2307,7 @@ namespace flare {
             }
 
             TEST(Btree, TryEmplaceMaintainsSortedOrder) {
-                flare::btree_map<int, std::string> m;
+                turbo::btree_map<int, std::string> m;
                 std::pair<int, std::string> pair5 = {5, "five"};
 
                 // Test both lvalue & rvalue emplace.
@@ -2324,13 +2324,13 @@ namespace flare {
             }
 
             TEST(Btree, TryEmplaceWithHintAndNoValueArgsWorks) {
-                flare::btree_map<int, int> m;
+                turbo::btree_map<int, int> m;
                 m.try_emplace(m.end(), 1);
                 EXPECT_EQ(0, m[1]);
             }
 
             TEST(Btree, TryEmplaceWithHintAndMultipleValueArgsWorks) {
-                flare::btree_map<int, std::string> m;
+                turbo::btree_map<int, std::string> m;
                 m.try_emplace(m.end(), 1, 10, 'a');
                 EXPECT_EQ(std::string(10, 'a'), m[1]);
             }
@@ -2345,7 +2345,7 @@ namespace flare {
 
                 // Test propagating allocator_type.
                 {
-                    flare::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
+                    turbo::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
                             PropagatingCountingAlloc<MovableOnlyInstance>>
                             set1(cmp, allocator1), set2(cmp, allocator2);
 
@@ -2357,7 +2357,7 @@ namespace flare {
                 }
                 // Test non-propagating allocator_type with equal allocators.
                 {
-                    flare::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
+                    turbo::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
                             CountingAllocator<MovableOnlyInstance>>
                             set1(cmp, allocator1), set2(cmp, allocator1);
 
@@ -2369,7 +2369,7 @@ namespace flare {
                 }
                 // Test non-propagating allocator_type with different allocators.
                 {
-                    flare::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
+                    turbo::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
                             CountingAllocator<MovableOnlyInstance>>
                             set1(cmp, allocator1), set2(cmp, allocator2);
 
@@ -2382,7 +2382,7 @@ namespace flare {
             }
 
             TEST(Btree, EmptyTree) {
-                flare::btree_set<int> s;
+                turbo::btree_set<int> s;
                 EXPECT_TRUE(s.empty());
                 EXPECT_EQ(s.size(), 0);
                 EXPECT_GT(s.max_size(), 0);
@@ -2393,17 +2393,17 @@ namespace flare {
             TEST(Btree, EraseIf) {
                 // Test that erase_if works with all the container types and supports lambdas.
                 {
-                    flare::btree_set<int> s = {1, 3, 5, 6, 100};
+                    turbo::btree_set<int> s = {1, 3, 5, 6, 100};
                     erase_if(s, [](int k) { return k > 3; });
                     EXPECT_THAT(s, ElementsAre(1, 3));
                 }
                 {
-                    flare::btree_multiset<int> s = {1, 3, 3, 5, 6, 6, 100};
+                    turbo::btree_multiset<int> s = {1, 3, 3, 5, 6, 6, 100};
                     erase_if(s, [](int k) { return k <= 3; });
                     EXPECT_THAT(s, ElementsAre(5, 6, 6, 100));
                 }
                 {
-                    flare::btree_map<int, int> m = {{1,   1},
+                    turbo::btree_map<int, int> m = {{1,   1},
                                                     {3,   3},
                                                     {6,   6},
                                                     {100, 100}};
@@ -2411,7 +2411,7 @@ namespace flare {
                     EXPECT_THAT(m, ElementsAre(Pair(1, 1), Pair(3, 3)));
                 }
                 {
-                    flare::btree_multimap<int, int> m = {{1,   1},
+                    turbo::btree_multimap<int, int> m = {{1,   1},
                                                          {3,   3},
                                                          {3,   6},
                                                          {6,   6},
@@ -2423,14 +2423,14 @@ namespace flare {
                 // Test that erasing all elements from a large set works and test support for
                 // function pointers.
                 {
-                    flare::btree_set<int> s;
+                    turbo::btree_set<int> s;
                     for (size_t i = 0; i < 1000; ++i) s.insert(2 * i);
                     erase_if(s, IsEven);
                     EXPECT_THAT(s, IsEmpty());
                 }
                 // Test that erase_if supports other format of function pointers.
                 {
-                    flare::btree_set<int> s = {1, 3, 5, 6, 100};
+                    turbo::btree_set<int> s = {1, 3, 5, 6, 100};
                     erase_if(s, &IsEven);
                     EXPECT_THAT(s, ElementsAre(1, 3, 5));
                 }
@@ -2438,4 +2438,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

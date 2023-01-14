@@ -13,7 +13,7 @@
 #include "hash_generator_testing.h"
 #include "hash_policy_testing.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
 
         template<class UnordSet>
@@ -178,6 +178,6 @@ namespace flare {
                                     EraseKey, Swap);
 
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 #endif  // UNORDERED_SET_MODIFIERS_TEST_H_

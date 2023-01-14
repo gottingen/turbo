@@ -7,17 +7,17 @@
 
 
 #include "testing/gtest_wrap.h"
-#include "flare/files/readline_file.h"
-#include "flare/files/temp_file.h"
-#include "flare/strings/fmt/format.h"
+#include "turbo/files/readline_file.h"
+#include "turbo/files/temp_file.h"
+#include "turbo/strings/fmt/format.h"
 
-namespace flare {
+namespace turbo {
 
     TEST(readlinefile, all) {
         temp_file lines_file("txt");
         std::string content;
         for(int i = 0; i < 100; i++) {
-            content += fmt::format("line{}:flare{}\n", i, i);
+            content += fmt::format("line{}:turbo{}\n", i, i);
         }
 
         content +=" \n\n\t\n\n";
@@ -26,7 +26,7 @@ namespace flare {
         content +="\\n\r\n";
         content +="\\r\\n\r\n";
         for(int i = 0; i < 100; i++) {
-            content += fmt::format("line{}:flare{}\r\n", i, i);
+            content += fmt::format("line{}:turbo{}\r\n", i, i);
         }
 
         lines_file.save_bin(content.data(), content.size());
@@ -38,14 +38,14 @@ namespace flare {
         }
         {
             readline_file rl_file1;
-            auto rs = rl_file1.open(lines_file.fname(), flare::readline_option::eNoSkip);
+            auto rs = rl_file1.open(lines_file.fname(), turbo::readline_option::eNoSkip);
             EXPECT_TRUE(rs.is_ok());
             EXPECT_EQ(207UL, rl_file1.size());
         }
 
         {
             readline_file rl_file1;
-            auto rs = rl_file1.open(lines_file.fname(), flare::readline_option::eTrimWhitespace);
+            auto rs = rl_file1.open(lines_file.fname(), turbo::readline_option::eTrimWhitespace);
             EXPECT_TRUE(rs.is_ok());
             EXPECT_EQ(203UL, rl_file1.size());
         }

@@ -4,13 +4,13 @@
  * All rights reserved.
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
-#include "flare/strings/internal/utf8.h"
+#include "turbo/strings/internal/utf8.h"
 
 #include <cstdint>
 #include <utility>
 
 #include "testing/gtest_wrap.h"
-#include "flare/base/profile.h"
+#include "turbo/base/profile.h"
 
 namespace {
 
@@ -29,9 +29,9 @@ namespace {
             char buf0[7] = {'\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'};
             char buf1[7] = {'\xFF', '\xFF', '\xFF', '\xFF', '\xFF', '\xFF', '\xFF'};
             char *buf0_written =
-                    &buf0[flare::strings_internal::EncodeUTF8Char(buf0, test.first)];
+                    &buf0[turbo::strings_internal::EncodeUTF8Char(buf0, test.first)];
             char *buf1_written =
-                    &buf1[flare::strings_internal::EncodeUTF8Char(buf1, test.first)];
+                    &buf1[turbo::strings_internal::EncodeUTF8Char(buf1, test.first)];
             int apparent_length = 7;
             while (buf0[apparent_length - 1] == '\x00' &&
                    buf1[apparent_length - 1] == '\xFF') {
@@ -44,11 +44,11 @@ namespace {
             EXPECT_EQ(std::string(buf1, apparent_length), test.second);
         }
         char buf[32] = "Don't Tread On Me";
-        EXPECT_LE(flare::strings_internal::EncodeUTF8Char(buf, 0x00110000),
-                  flare::strings_internal::kMaxEncodedUTF8Size);
+        EXPECT_LE(turbo::strings_internal::EncodeUTF8Char(buf, 0x00110000),
+                  turbo::strings_internal::kMaxEncodedUTF8Size);
         char buf2[32] = "Negative is invalid but sane";
-        EXPECT_LE(flare::strings_internal::EncodeUTF8Char(buf2, -1),
-                  flare::strings_internal::kMaxEncodedUTF8Size);
+        EXPECT_LE(turbo::strings_internal::EncodeUTF8Char(buf2, -1),
+                  turbo::strings_internal::kMaxEncodedUTF8Size);
     }
 
 #if defined(__clang__)

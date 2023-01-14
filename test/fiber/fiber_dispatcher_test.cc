@@ -16,21 +16,21 @@
 // under the License.
 
 #include <sys/uio.h>               // writev
-#include "flare/base/compat.h"
+#include "turbo/base/compat.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "testing/gtest_wrap.h"
-#include "flare/times/time.h"
-#include "flare/base/scoped_lock.h"
-#include "flare/base/fd_utility.h"
-#include "flare/log/logging.h"
-#include "flare/base/gperftools_profiler.h"
-#include "flare/fiber/internal/fiber.h"
-#include "flare/fiber/internal/schedule_group.h"
-#include "flare/fiber/internal/fiber_worker.h"
-#include "flare/fiber/this_fiber.h"
+#include "turbo/times/time.h"
+#include "turbo/base/scoped_lock.h"
+#include "turbo/base/fd_utility.h"
+#include "turbo/log/logging.h"
+#include "turbo/base/gperftools_profiler.h"
+#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/internal/schedule_group.h"
+#include "turbo/fiber/internal/fiber_worker.h"
+#include "turbo/fiber/this_fiber.h"
 
-#if defined(FLARE_PLATFORM_OSX)
+#if defined(TURBO_PLATFORM_OSX)
 
 #include <sys/types.h>                           // struct kevent
 #include <sys/event.h>                           // kevent(), kqueue()
@@ -39,7 +39,7 @@
 
 #define RUN_EPOLL_IN_FIBER
 
-namespace flare::fiber_internal {
+namespace turbo::fiber_internal {
     extern schedule_group *global_task_control;
 
     int stop_and_join_epoll_threads();
@@ -49,13 +49,13 @@ namespace {
     volatile bool client_stop = false;
     volatile bool server_stop = false;
 
-    struct FLARE_CACHELINE_ALIGNMENT ClientMeta {
+    struct TURBO_CACHELINE_ALIGNMENT ClientMeta {
         int fd;
         size_t times;
         size_t bytes;
     };
 
-    struct FLARE_CACHELINE_ALIGNMENT SocketMeta {
+    struct TURBO_CACHELINE_ALIGNMENT SocketMeta {
         int fd;
         int epfd;
         std::atomic<int> req;
@@ -89,11 +89,11 @@ namespace {
                     } else if (errno == EINTR) {
                         continue;
                     } else {
-                        FLARE_PLOG(FATAL) << "Fail to read fd=" << m->fd;
+                        TURBO_PLOG(FATAL) << "Fail to read fd=" << m->fd;
                         return nullptr;
                     }
                 } else {
-                    FLARE_LOG(FATAL) << "Another end closed fd=" << m->fd;
+                    TURBO_LOG(FATAL) << "Another end closed fd=" << m->fd;
                     return nullptr;
                 }
             } while (1);
@@ -114,17 +114,17 @@ namespace {
         EpollMeta *em = (EpollMeta *) arg;
         em->nthread = 0;
         em->nfold = 0;
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
         epoll_event e[32];
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
         struct kevent e[32];
 #endif
 
         while (!server_stop) {
-#if defined(FLARE_PLATFORM_LINUX)
-            const int n = epoll_wait(em->epfd, e, FLARE_ARRAY_SIZE(e), -1);
-#elif defined(FLARE_PLATFORM_OSX)
-            const int n = kevent(em->epfd, nullptr, 0, e, FLARE_ARRAY_SIZE(e), nullptr);
+#if defined(TURBO_PLATFORM_LINUX)
+            const int n = epoll_wait(em->epfd, e, TURBO_ARRAY_SIZE(e), -1);
+#elif defined(TURBO_PLATFORM_OSX)
+            const int n = kevent(em->epfd, nullptr, 0, e, TURBO_ARRAY_SIZE(e), nullptr);
 #endif
             if (server_stop) {
                 break;
@@ -133,18 +133,18 @@ namespace {
                 if (EINTR == errno) {
                     continue;
                 }
-#if defined(FLARE_PLATFORM_LINUX)
-                    FLARE_PLOG(FATAL) << "Fail to epoll_wait";
-#elif defined(FLARE_PLATFORM_OSX)
-                FLARE_PLOG(FATAL) << "Fail to kevent";
+#if defined(TURBO_PLATFORM_LINUX)
+                    TURBO_PLOG(FATAL) << "Fail to epoll_wait";
+#elif defined(TURBO_PLATFORM_OSX)
+                TURBO_PLOG(FATAL) << "Fail to kevent";
 #endif
                 break;
             }
 
             for (int i = 0; i < n; ++i) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
                 SocketMeta* m = (SocketMeta*)e[i].data.ptr;
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
                 SocketMeta *m = (SocketMeta *) e[i].udata;
 #endif
                 if (m->req.fetch_add(1, std::memory_order_acquire) == 0) {
@@ -184,7 +184,7 @@ namespace {
             }
             if (n < 0) {
                 if (errno != EINTR) {
-                    FLARE_PLOG(FATAL) << "Fail to write fd=" << m->fd;
+                    TURBO_PLOG(FATAL) << "Fail to write fd=" << m->fd;
                     return nullptr;
                 }
             } else {
@@ -224,9 +224,9 @@ namespace {
         SocketMeta *sm[NCLIENT];
 
         for (size_t i = 0; i < NEPOLL; ++i) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
             epfd[i] = epoll_create(1024);
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
             epfd[i] = kqueue();
 #endif
             ASSERT_GT(epfd[i], 0);
@@ -242,13 +242,13 @@ namespace {
             m->buf = (char *) malloc(m->buf_cap);
             m->bytes = 0;
             m->times = 0;
-            ASSERT_EQ(0, flare::base::make_non_blocking(m->fd));
+            ASSERT_EQ(0, turbo::base::make_non_blocking(m->fd));
             sm[i] = m;
 
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
             epoll_event evt = { (uint32_t)(EPOLLIN | EPOLLET), { m } };
             ASSERT_EQ(0, epoll_ctl(m->epfd, EPOLL_CTL_ADD, m->fd, &evt));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
             struct kevent kqueue_event;
             EV_SET(&kqueue_event, m->fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, m);
             ASSERT_EQ(0, kevent(m->epfd, &kqueue_event, 1, nullptr, 0, nullptr));
@@ -262,7 +262,7 @@ namespace {
         }
 
         ProfilerStart("dispatcher.prof");
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
         tm.start();
 
         for (size_t i = 0; i < NEPOLL; ++i) {
@@ -292,7 +292,7 @@ namespace {
             all_nfold += em[i]->nfold;
         }
 
-        FLARE_LOG(INFO) << "client_tp=" << client_bytes / (double) tm.u_elapsed()
+        TURBO_LOG(INFO) << "client_tp=" << client_bytes / (double) tm.u_elapsed()
                   << "MB/s server_tp=" << server_bytes / (double) tm.u_elapsed()
                   << "MB/s nthread=" << all_nthread << " nfold=" << all_nfold;
 
@@ -302,10 +302,10 @@ namespace {
         }
         server_stop = true;
         for (size_t i = 0; i < NEPOLL; ++i) {
-#if defined(FLARE_PLATFORM_LINUX)
+#if defined(TURBO_PLATFORM_LINUX)
             epoll_event evt = { EPOLLOUT,  { nullptr } };
             ASSERT_EQ(0, epoll_ctl(epfd[i], EPOLL_CTL_ADD, 0, &evt));
-#elif defined(FLARE_PLATFORM_OSX)
+#elif defined(TURBO_PLATFORM_OSX)
             struct kevent kqueue_event;
             EV_SET(&kqueue_event, 0, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, nullptr);
             ASSERT_EQ(0, kevent(epfd[i], &kqueue_event, 1, nullptr, 0, nullptr));
@@ -316,7 +316,7 @@ namespace {
             pthread_join(eth[i], nullptr);
 #endif
         }
-        flare::fiber_internal::stop_and_join_epoll_threads();
-        flare::fiber_sleep_for(100000);
+        turbo::fiber_internal::stop_and_join_epoll_threads();
+        turbo::fiber_sleep_for(100000);
     }
 } // namespace

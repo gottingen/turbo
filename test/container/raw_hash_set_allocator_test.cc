@@ -10,10 +10,10 @@
 #include <scoped_allocator>
 
 #include "testing/gtest_wrap.h"
-#include "flare/container/flat_hash_map.h"
+#include "turbo/container/flat_hash_map.h"
 #include "tracked.h"
 
-namespace flare {
+namespace turbo {
 namespace priv {
 namespace {
 
@@ -419,4 +419,4 @@ TEST_F(PropagateOnAll, Swap) {
 
 }  // namespace
 }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

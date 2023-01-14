@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 # TODO modify this for you project
-project(flare CXX C)
+project(turbo CXX C)
 
 # Compiler id for Apple Clang is now AppleClang.
 cmake_policy(SET CMP0025 NEW)
@@ -91,7 +91,7 @@ set(DYNAMIC_LIB
         )
 
 #TODO do add you own subdirs
-add_subdirectory(flare)
+add_subdirectory(turbo)
 # TODO end
 
 if (ENABLE_TESTING)

@@ -5,7 +5,7 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include "flare/container/flat_hash_map.h"
+#include "turbo/container/flat_hash_map.h"
 
 #include <memory>
 #include <string>
@@ -13,7 +13,7 @@
 
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace {
 
@@ -144,11 +144,11 @@ namespace flare {
 
             TEST(CompressedTupleTest, MoveOnlyElements) {
                 CompressedTuple<std::unique_ptr<std::string>> str_tup(
-                        flare::make_unique<std::string>("str"));
+                        turbo::make_unique<std::string>("str"));
 
                 CompressedTuple<CompressedTuple<std::unique_ptr<std::string>>,
                         std::unique_ptr<int>>
-                        x(std::move(str_tup), flare::make_unique<int>(5));
+                        x(std::move(str_tup), turbo::make_unique<int>(5));
 
                 EXPECT_EQ(*x.get<0>().get<0>(), "str");
                 EXPECT_EQ(*x.get<1>(), 5);
@@ -195,4 +195,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

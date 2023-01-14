@@ -5,9 +5,9 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#define FLARE_MAP_NON_DETERMINISTIC 1
+#define TURBO_MAP_NON_DETERMINISTIC 1
 
-#include "flare/container/flat_hash_map.h"
+#include "turbo/container/flat_hash_map.h"
 #include "hash_policy_testing.h"
 #include "hashtable_debug.h"
 
@@ -28,7 +28,7 @@
 
 #include "testing/gtest_wrap.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
 
         struct RawHashSetTestOnlyAccess {
@@ -322,7 +322,7 @@ namespace flare {
                 }
             };
 
-            struct StringHash : flare::hash<std::string_view> {
+            struct StringHash : turbo::hash<std::string_view> {
                 using is_transparent = void;
             };
             struct StringEq : std::equal_to<std::string_view> {
@@ -426,7 +426,7 @@ namespace flare {
 #ifdef __GNUC__
 
             template<class T>
-            FLARE_FORCE_INLINE void DoNotOptimize(const T &v) {
+            TURBO_FORCE_INLINE void DoNotOptimize(const T &v) {
                 asm volatile("" : : "r,m"(v) : "memory");
             }
 
@@ -445,7 +445,7 @@ namespace flare {
     !defined(ADDRESS_SANITIZER) && !defined(MEMORY_SANITIZER) && \
     !defined(THREAD_SANITIZER) && !defined(UNDEFINED_BEHAVIOR_SANITIZER) && \
     !defined(__EMSCRIPTEN__)
-                const auto now = [] { return flare::base_internal::CycleClock::Now(); };
+                const auto now = [] { return turbo::base_internal::CycleClock::Now(); };
 
                 // Make size enough to not fit in L2 cache (16.7 Mb)
                 static constexpr int size = 1 << 22;
@@ -1586,7 +1586,7 @@ namespace flare {
 
             TEST(Table, NoThrowMoveConstruct) {
                 ASSERT_TRUE(
-                        std::is_nothrow_copy_constructible<flare::hash<std::string_view>>::value);
+                        std::is_nothrow_copy_constructible<turbo::hash<std::string_view>>::value);
                 ASSERT_TRUE(std::is_nothrow_copy_constructible<
                                     std::equal_to<std::string_view>>::value);
                 ASSERT_TRUE(std::is_nothrow_copy_constructible<std::allocator<int>>::value);
@@ -1595,18 +1595,18 @@ namespace flare {
 
             TEST(Table, NoThrowMoveAssign) {
                 ASSERT_TRUE(
-                        std::is_nothrow_move_assignable<flare::hash<std::string_view>>::value);
+                        std::is_nothrow_move_assignable<turbo::hash<std::string_view>>::value);
                 ASSERT_TRUE(
                         std::is_nothrow_move_assignable<std::equal_to<std::string_view>>::value);
                 ASSERT_TRUE(std::is_nothrow_move_assignable<std::allocator<int>>::value);
                 ASSERT_TRUE(
-                        flare::allocator_traits<std::allocator<int>>::is_always_equal::value);
+                        turbo::allocator_traits<std::allocator<int>>::is_always_equal::value);
                 EXPECT_TRUE(std::is_nothrow_move_assignable<StringTable>::value);
             }
 
             TEST(Table, NoThrowSwappable) {
                 ASSERT_TRUE(
-                        priv::IsNoThrowSwappable<flare::hash<std::string_view>>());
+                        priv::IsNoThrowSwappable<turbo::hash<std::string_view>>());
                 ASSERT_TRUE(priv::IsNoThrowSwappable<
                                     std::equal_to<std::string_view>>());
                 ASSERT_TRUE(priv::IsNoThrowSwappable<std::allocator<int>>());
@@ -1690,12 +1690,12 @@ namespace flare {
             };
 
             template<template<typename> class C, class Table>
-            struct VerifyResultOf<C, Table, flare::void_t<C<Table>>> : std::true_type {
+            struct VerifyResultOf<C, Table, turbo::void_t<C<Table>>> : std::true_type {
             };
 
             TEST(Table, HeterogeneousLookupOverloads) {
                 using NonTransparentTable =
-                raw_hash_set<StringPolicy, flare::hash<std::string_view>,
+                raw_hash_set<StringPolicy, turbo::hash<std::string_view>,
                         std::equal_to<std::string_view>, std::allocator<int>>;
 
                 EXPECT_FALSE((VerifyResultOf<CallFind, NonTransparentTable>()));
@@ -1706,8 +1706,8 @@ namespace flare {
 
                 using TransparentTable = raw_hash_set<
                         StringPolicy,
-                        flare::priv::hash_default_hash<std::string_view>,
-                        flare::priv::hash_default_eq<std::string_view>,
+                        turbo::priv::hash_default_hash<std::string_view>,
+                        turbo::priv::hash_default_eq<std::string_view>,
                         std::allocator<int>>;
 
                 EXPECT_TRUE((VerifyResultOf<CallFind, TransparentTable>()));
@@ -1970,4 +1970,4 @@ namespace flare {
 
         }  // namespace
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo

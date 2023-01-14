@@ -12,13 +12,13 @@
 #include <map>
 #include <random>
 #include <vector>
-#include "flare/times/time.h"
-#include "flare/strings/str_format.h"
-#include "flare/log/logging.h"
-#include "flare/container/hash_tables.h"
-#include "flare/container/flat_map.h"
+#include "turbo/times/time.h"
+#include "turbo/strings/str_format.h"
+#include "turbo/log/logging.h"
+#include "turbo/container/hash_tables.h"
+#include "turbo/container/flat_map.h"
 #include "pooled_map.h"
-#include "flare/container/case_ignored_flat_map.h"
+#include "turbo/container/case_ignored_flat_map.h"
 
 namespace {
     class FlatMapTest : public ::testing::Test {
@@ -55,7 +55,7 @@ namespace {
 
     TEST_F(FlatMapTest, initialization_of_values) {
         // Construct non-POD values w/o copy-construction.
-        flare::container::FlatMap<int, Foo> map;
+        turbo::container::FlatMap<int, Foo> map;
         ASSERT_EQ(0, map.init(32));
         ASSERT_EQ(0, g_foo_ctor);
         ASSERT_EQ(0, g_foo_copy_ctor);
@@ -66,7 +66,7 @@ namespace {
         ASSERT_EQ(0, g_foo_assign);
 
         // Zeroize POD values.
-        flare::container::FlatMap<int, Bar> map2;
+        turbo::container::FlatMap<int, Bar> map2;
         ASSERT_EQ(0, map2.init(32));
         Bar &g = map2[1];
         ASSERT_EQ(0, g.x);
@@ -79,11 +79,11 @@ namespace {
     }
 
     TEST_F(FlatMapTest, swap_pooled_allocator) {
-        flare::container::details::PooledAllocator<int, 128> a1;
+        turbo::container::details::PooledAllocator<int, 128> a1;
         a1.allocate(1);
         const void *p1 = a1._pool._blocks;
 
-        flare::container::details::PooledAllocator<int, 128> a2;
+        turbo::container::details::PooledAllocator<int, 128> a2;
         a2.allocate(1);
         const void *p2 = a2._pool._blocks;
 
@@ -94,7 +94,7 @@ namespace {
     }
 
     TEST_F(FlatMapTest, copy_flat_map) {
-        typedef flare::container::FlatMap<std::string, std::string> Map;
+        typedef turbo::container::FlatMap<std::string, std::string> Map;
         Map uninit_m1;
         ASSERT_FALSE(uninit_m1.initialized());
         ASSERT_TRUE(uninit_m1.empty());
@@ -162,7 +162,7 @@ namespace {
         ASSERT_LT(bcs[0], m1.bucket_count());
         // larger than m1.bucket_count
         ASSERT_GT(bcs[2], m1.bucket_count());
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(bcs); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(bcs); ++i) {
             Map m5;
             ASSERT_EQ(0, m5.init(bcs[i]));
             const size_t old_bucket_count5 = m5.bucket_count();
@@ -177,7 +177,7 @@ namespace {
     }
 
     TEST_F(FlatMapTest, seek_by_string_piece) {
-        flare::container::FlatMap<std::string, int> m;
+        turbo::container::FlatMap<std::string, int> m;
         ASSERT_EQ(0, m.init(16));
         m["hello"] = 1;
         m["world"] = 2;
@@ -193,7 +193,7 @@ namespace {
 
     TEST_F(FlatMapTest, to_lower) {
         for (int c = -128; c < 128; ++c) {
-            ASSERT_EQ((char) ::tolower(c), flare::ascii::to_lower(c)) << "c=" << c;
+            ASSERT_EQ((char) ::tolower(c), turbo::ascii::to_lower(c)) << "c=" << c;
         }
 
         const size_t input_len = 102;
@@ -211,9 +211,9 @@ namespace {
         }
         input[input_len] = '\0';
         input2[input_len] = '\0';
-        flare::stop_watcher tm1;
-        flare::stop_watcher tm2;
-        flare::stop_watcher tm3;
+        turbo::stop_watcher tm1;
+        turbo::stop_watcher tm2;
+        turbo::stop_watcher tm3;
         int sum = 0;
         tm1.start();
         sum += strcasecmp(input, input2);
@@ -224,7 +224,7 @@ namespace {
         tm2.start();
         sum += memcmp(input, input2, input_len);
         tm2.stop();
-        FLARE_LOG(INFO) << "tm1=" << tm1.n_elapsed()
+        TURBO_LOG(INFO) << "tm1=" << tm1.n_elapsed()
                         << " tm2=" << tm2.n_elapsed()
                         << " tm3=" << tm3.n_elapsed() << " " << sum;
     }
@@ -232,17 +232,17 @@ namespace {
     TEST_F(FlatMapTest, __builtin_ctzl_perf) {
         int s = 0;
         const size_t N = 10000;
-        flare::stop_watcher tm1;
+        turbo::stop_watcher tm1;
         tm1.start();
         for (size_t i = 1; i <= N; ++i) {
             s += __builtin_ctzl(i);
         }
         tm1.stop();
-        FLARE_LOG(INFO) << "__builtin_ctzl takes " << tm1.n_elapsed() / (double) N << "ns";
+        TURBO_LOG(INFO) << "__builtin_ctzl takes " << tm1.n_elapsed() / (double) N << "ns";
     }
 
     TEST_F(FlatMapTest, case_ignored_map) {
-        flare::container::CaseIgnoredFlatMap<int> m1;
+        turbo::container::CaseIgnoredFlatMap<int> m1;
         ASSERT_EQ(0, m1.init(32));
         m1["Content-Type"] = 1;
         m1["content-Type"] = 10;
@@ -256,7 +256,7 @@ namespace {
     }
 
     TEST_F(FlatMapTest, case_ignored_set) {
-        flare::container::CaseIgnoredFlatSet s1;
+        turbo::container::CaseIgnoredFlatSet s1;
         ASSERT_EQ(0, s1.init(32));
         s1.insert("Content-Type");
         ASSERT_EQ(1ul, s1.size());
@@ -277,7 +277,7 @@ namespace {
 
 
     TEST_F(FlatMapTest, make_sure_all_methods_compile) {
-        typedef flare::container::FlatMap<int, long> M1;
+        typedef turbo::container::FlatMap<int, long> M1;
         M1 m1;
         ASSERT_EQ(0, m1.init(32));
         ASSERT_EQ(0u, m1.size());
@@ -304,7 +304,7 @@ namespace {
         }
         std::cout << std::endl;
 
-        typedef flare::container::FlatSet<int> S1;
+        typedef turbo::container::FlatSet<int> S1;
         S1 s1;
         ASSERT_EQ(0, s1.init(32));
         ASSERT_EQ(0u, s1.size());
@@ -334,16 +334,16 @@ namespace {
 
     TEST_F(FlatMapTest, flat_map_of_string) {
         std::vector<std::string> keys;
-        flare::container::FlatMap<std::string, size_t> m1;
+        turbo::container::FlatMap<std::string, size_t> m1;
         std::map<std::string, size_t> m2;
-        flare::container::hash_map<std::string, size_t> m3;
+        turbo::container::hash_map<std::string, size_t> m3;
         const size_t N = 10000;
         ASSERT_EQ(0, m1.init(N));
-        flare::stop_watcher tm1, tm1_2, tm2, tm3;
+        turbo::stop_watcher tm1, tm1_2, tm2, tm3;
         size_t sum = 0;
         keys.reserve(N);
         for (size_t i = 0; i < N; ++i) {
-            keys.push_back(flare::string_printf("up_latency_as_key_%lu", i));
+            keys.push_back(turbo::string_printf("up_latency_as_key_%lu", i));
         }
 
         tm1.start();
@@ -361,7 +361,7 @@ namespace {
             m3[keys[i]] += i;
         }
         tm3.stop();
-        FLARE_LOG(INFO) << "inserting strings takes " << tm1.n_elapsed() / N
+        TURBO_LOG(INFO) << "inserting strings takes " << tm1.n_elapsed() / N
                         << " " << tm2.n_elapsed() / N
                         << " " << tm3.n_elapsed() / N;
 
@@ -380,7 +380,7 @@ namespace {
             sum += m3.find(keys[i])->second;
         }
         tm3.stop();
-        FLARE_LOG(INFO) << "finding strings takes " << tm1.n_elapsed() / N
+        TURBO_LOG(INFO) << "finding strings takes " << tm1.n_elapsed() / N
                         << " " << tm2.n_elapsed() / N << " " << tm3.n_elapsed() / N;
 
         tm1.start();
@@ -404,7 +404,7 @@ namespace {
         }
         tm1_2.stop();
 
-        FLARE_LOG(INFO) << "finding c_strings takes " << tm1.n_elapsed() / N
+        TURBO_LOG(INFO) << "finding c_strings takes " << tm1.n_elapsed() / N
                         << " " << tm2.n_elapsed() / N << " " << tm3.n_elapsed() / N
                         << " " << tm1_2.n_elapsed() / N;
 
@@ -416,8 +416,8 @@ namespace {
     }
 
     TEST_F(FlatMapTest, fast_iterator) {
-        typedef flare::container::FlatMap<uint64_t, uint64_t> M1;
-        typedef flare::container::SparseFlatMap<uint64_t, uint64_t> M2;
+        typedef turbo::container::FlatMap<uint64_t, uint64_t> M1;
+        typedef turbo::container::SparseFlatMap<uint64_t, uint64_t> M2;
 
         M1 m1;
         M2 m2;
@@ -436,21 +436,21 @@ namespace {
             keys.push_back(rand());
         }
 
-        flare::stop_watcher tm2;
+        turbo::stop_watcher tm2;
         tm2.start();
         for (size_t i = 0; i < N; ++i) {
             m2[keys[i]] = i;
         }
         tm2.stop();
 
-        flare::stop_watcher tm1;
+        turbo::stop_watcher tm1;
         tm1.start();
         for (size_t i = 0; i < N; ++i) {
             m1[keys[i]] = i;
         }
         tm1.stop();
 
-        FLARE_LOG(INFO) << "m1.insert=" << tm1.n_elapsed() / (double) N
+        TURBO_LOG(INFO) << "m1.insert=" << tm1.n_elapsed() / (double) N
                         << "ns m2.insert=" << tm2.n_elapsed() / (double) N;
         tm1.start();
         for (M1::iterator it = m1.begin(); it != m1.end(); ++it);
@@ -459,7 +459,7 @@ namespace {
         tm2.start();
         for (M2::iterator it = m2.begin(); it != m2.end(); ++it);
         tm2.stop();
-        FLARE_LOG(INFO) << "m1.iterate=" << tm1.n_elapsed() / (double) N
+        TURBO_LOG(INFO) << "m1.iterate=" << tm1.n_elapsed() / (double) N
                         << "ns m2.iterate=" << tm2.n_elapsed() / (double) N;
 
         M1::iterator it1 = m1.begin();
@@ -474,11 +474,11 @@ namespace {
 
     template<typename Key, typename Value, typename OnPause>
     static void list_flat_map(std::vector<Key> *keys,
-                              const flare::container::FlatMap<Key, Value> &map,
+                              const turbo::container::FlatMap<Key, Value> &map,
                               size_t max_one_pass,
                               OnPause &on_pause) {
         keys->clear();
-        typedef flare::container::FlatMap<Key, Value> Map;
+        typedef turbo::container::FlatMap<Key, Value> Map;
         size_t n = 0;
         for (typename Map::const_iterator it = map.begin(); it != map.end(); ++it) {
             if (++n >= max_one_pass) {
@@ -498,7 +498,7 @@ namespace {
         }
     }
 
-    typedef flare::container::FlatMap<uint64_t, uint64_t> PositionHintMap;
+    typedef turbo::container::FlatMap<uint64_t, uint64_t> PositionHintMap;
 
     static void fill_position_hint_map(PositionHintMap *map,
                                        std::vector<uint64_t> *keys) {
@@ -519,7 +519,7 @@ namespace {
             keys->push_back(key);
             (*map)[key] = i;
         }
-        FLARE_LOG(INFO) << map->bucket_info();
+        TURBO_LOG(INFO) << map->bucket_info();
     }
 
     struct CountOnPause {
@@ -578,8 +578,8 @@ namespace {
             ++(*map)[inserted_key];
         }
 
-        flare::container::FlatSet<uint64_t> removed_keys;
-        flare::container::FlatSet<uint64_t> inserted_keys;
+        turbo::container::FlatSet<uint64_t> removed_keys;
+        turbo::container::FlatSet<uint64_t> inserted_keys;
         const std::vector<uint64_t> *keys;
         PositionHintMap *map;
     };
@@ -621,7 +621,7 @@ namespace {
             removed_keys.insert(removed_key);
         }
 
-        flare::container::FlatSet<uint64_t> removed_keys;
+        turbo::container::FlatSet<uint64_t> removed_keys;
         PositionHintMap *map;
     };
 
@@ -640,7 +640,7 @@ namespace {
         const size_t old_keys_out_size = keys_out.size();
         std::sort(keys_out.begin(), keys_out.end());
         keys_out.resize(std::unique(keys_out.begin(), keys_out.end()) - keys_out.begin());
-        FLARE_LOG_IF(INFO, keys_out.size() != old_keys_out_size)
+        TURBO_LOG_IF(INFO, keys_out.size() != old_keys_out_size)
                         << "Iterated " << old_keys_out_size - keys_out.size()
                         << " duplicated elements";
         ASSERT_EQ(m1.size(), keys_out.size());
@@ -697,8 +697,8 @@ namespace {
             }
         }
 
-        flare::container::FlatSet<uint64_t> removed_keys;
-        flare::container::FlatSet<uint64_t> inserted_keys;
+        turbo::container::FlatSet<uint64_t> removed_keys;
+        turbo::container::FlatSet<uint64_t> inserted_keys;
         const std::vector<uint64_t> *keys_out;
         std::vector<uint64_t> *all_keys;
         PositionHintMap *map;
@@ -750,22 +750,22 @@ namespace {
     TEST_F(FlatMapTest, perf_cmp_with_map_storing_pointers) {
         const size_t REP = 4;
         int *ptr[2048];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(ptr); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(ptr); ++i) {
             ptr[i] = new int;
         }
 
         std::set<int *> m1;
-        flare::container::FlatSet<int *, PointerHasher<int> > m2;
-        flare::container::hash_set<int *, PointerHasher<int> > m3;
+        turbo::container::FlatSet<int *, PointerHasher<int> > m2;
+        turbo::container::hash_set<int *, PointerHasher<int> > m3;
 
         std::vector<int *> r;
         int sum;
-        flare::stop_watcher tm;
+        turbo::stop_watcher tm;
 
-        r.reserve(FLARE_ARRAY_SIZE(ptr) * REP);
-        ASSERT_EQ(0, m2.init(FLARE_ARRAY_SIZE(ptr)));
+        r.reserve(TURBO_ARRAY_SIZE(ptr) * REP);
+        ASSERT_EQ(0, m2.init(TURBO_ARRAY_SIZE(ptr)));
 
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(ptr); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(ptr); ++i) {
             m1.insert(ptr[i]);
             m2.insert(ptr[i]);
             m3.insert(ptr[i]);
@@ -784,7 +784,7 @@ namespace {
             sum += (m2.seek(r[i]) != nullptr);
         }
         tm.stop();
-        FLARE_LOG(INFO) << "FlatMap takes " << tm.n_elapsed() / r.size();
+        TURBO_LOG(INFO) << "FlatMap takes " << tm.n_elapsed() / r.size();
 
         sum = 0;
         tm.start();
@@ -792,7 +792,7 @@ namespace {
             sum += (m1.find(r[i]) != m1.end());
         }
         tm.stop();
-        FLARE_LOG(INFO) << "std::set takes " << tm.n_elapsed() / r.size();
+        TURBO_LOG(INFO) << "std::set takes " << tm.n_elapsed() / r.size();
 
         sum = 0;
         tm.start();
@@ -800,9 +800,9 @@ namespace {
             sum += (m3.find(r[i]) != m3.end());
         }
         tm.stop();
-        FLARE_LOG(INFO) << "std::set takes " << tm.n_elapsed() / r.size();
+        TURBO_LOG(INFO) << "std::set takes " << tm.n_elapsed() / r.size();
 
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(ptr); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(ptr); ++i) {
             delete ptr[i];
         }
     }
@@ -862,7 +862,7 @@ namespace {
     };
 
     TEST_F(FlatMapTest, key_value_are_not_constructed_before_first_insertion) {
-        flare::container::FlatMap<Key, Value, KeyHasher, KeyEqualTo> m;
+        turbo::container::FlatMap<Key, Value, KeyHasher, KeyEqualTo> m;
         ASSERT_EQ(0, m.init(32));
         ASSERT_EQ(0, n_con_key);
         ASSERT_EQ(0, n_cp_con_key);
@@ -880,10 +880,10 @@ namespace {
     }
 
     TEST_F(FlatMapTest, manipulate_uninitialized_map) {
-        flare::container::FlatMap<int, int> m;
+        turbo::container::FlatMap<int, int> m;
         ASSERT_FALSE(m.initialized());
-        for (flare::container::FlatMap<int, int>::iterator it = m.begin(); it != m.end(); ++it) {
-            FLARE_LOG(INFO) << "nothing";
+        for (turbo::container::FlatMap<int, int>::iterator it = m.begin(); it != m.end(); ++it) {
+            TURBO_LOG(INFO) << "nothing";
         }
         ASSERT_EQ(nullptr, m.seek(1));
         ASSERT_EQ(0u, m.erase(1));
@@ -894,21 +894,21 @@ namespace {
     }
 
     TEST_F(FlatMapTest, perf_small_string_map) {
-        flare::stop_watcher tm1;
-        flare::stop_watcher tm2;
-        flare::stop_watcher tm3;
-        flare::stop_watcher tm4;
+        turbo::stop_watcher tm1;
+        turbo::stop_watcher tm2;
+        turbo::stop_watcher tm3;
+        turbo::stop_watcher tm4;
 
         for (int i = 0; i < 10; ++i) {
             tm3.start();
-            flare::container::PooledMap<std::string, std::string> m3;
+            turbo::container::PooledMap<std::string, std::string> m3;
             m3["Content-type"] = "application/json";
             m3["Request-Id"] = "true";
             m3["Status-Code"] = "200";
             tm3.stop();
 
             tm4.start();
-            flare::container::CaseIgnoredFlatMap<std::string> m4;
+            turbo::container::CaseIgnoredFlatMap<std::string> m4;
             m4.init(16);
             m4["Content-type"] = "application/json";
             m4["Request-Id"] = "true";
@@ -916,7 +916,7 @@ namespace {
             tm4.stop();
 
             tm1.start();
-            flare::container::FlatMap<std::string, std::string> m1;
+            turbo::container::FlatMap<std::string, std::string> m1;
             m1.init(16);
             m1["Content-type"] = "application/json";
             m1["Request-Id"] = "true";
@@ -930,7 +930,7 @@ namespace {
             m2["Status-Code"] = "200";
             tm2.stop();
 
-            FLARE_LOG(INFO) << "flatmap=" << tm1.n_elapsed()
+            TURBO_LOG(INFO) << "flatmap=" << tm1.n_elapsed()
                             << " ci_flatmap=" << tm4.n_elapsed()
                             << " map=" << tm2.n_elapsed()
                             << " pooled_map=" << tm3.n_elapsed();
@@ -939,7 +939,7 @@ namespace {
 
 
     TEST_F(FlatMapTest, sanity) {
-        typedef flare::container::FlatMap<uint64_t, long> Map;
+        typedef turbo::container::FlatMap<uint64_t, long> Map;
         Map m;
 
         ASSERT_FALSE(m.initialized());
@@ -1028,8 +1028,8 @@ namespace {
         srand(0);
 
         {
-            flare::container::hash_map<uint64_t, Value> ref[2];
-            typedef flare::container::FlatMap<uint64_t, Value> Map;
+            turbo::container::hash_map<uint64_t, Value> ref[2];
+            typedef turbo::container::FlatMap<uint64_t, Value> Map;
             Map ht[2];
             ht[0].init(40);
             ht[1] = ht[0];
@@ -1054,16 +1054,16 @@ namespace {
                     }
                 }
 
-                FLARE_LOG(INFO) << "Check j=" << j;
+                TURBO_LOG(INFO) << "Check j=" << j;
                 // bi-check
                 for (int i = 0; i < 2; ++i) {
                     for (Map::iterator it = ht[i].begin(); it != ht[i].end(); ++it) {
-                        flare::container::hash_map<uint64_t, Value>::iterator it2 = ref[i].find(it->first);
+                        turbo::container::hash_map<uint64_t, Value>::iterator it2 = ref[i].find(it->first);
                         ASSERT_TRUE (it2 != ref[i].end());
                         ASSERT_EQ (it2->second, it->second);
                     }
 
-                    for (flare::container::hash_map<uint64_t, Value>::iterator it = ref[i].begin();
+                    for (turbo::container::hash_map<uint64_t, Value>::iterator it = ref[i].begin();
                          it != ref[i].end(); ++it) {
                         Value *p_value = ht[i].seek(it->first);
                         ASSERT_TRUE (p_value != nullptr);
@@ -1080,7 +1080,7 @@ namespace {
         //ASSERT_EQ (ht[0]._pool->alloc_num(), 0ul);
         ASSERT_EQ (n_con + n_cp_con, n_des);
 
-        FLARE_LOG(INFO) << "n_con:" << n_con << std::endl
+        TURBO_LOG(INFO) << "n_con:" << n_con << std::endl
                         << "n_cp_con:" << n_cp_con << std::endl
                         << "n_con+n_cp_con:" << n_con + n_cp_con << std::endl
                         << "n_des:" << n_des << std::endl
@@ -1090,14 +1090,14 @@ namespace {
     template<typename T>
     void perf_insert_erase(bool random, const T &value) {
         size_t nkeys[] = {100, 1000, 10000};
-        const size_t NPASS = FLARE_ARRAY_SIZE(nkeys);
+        const size_t NPASS = TURBO_ARRAY_SIZE(nkeys);
 
         std::vector<uint64_t> keys;
-        flare::container::FlatMap<uint64_t, T> id_map;
+        turbo::container::FlatMap<uint64_t, T> id_map;
         std::map<uint64_t, T> std_map;
-        flare::container::PooledMap<uint64_t, T> pooled_map;
-        flare::container::hash_map<uint64_t, T> hash_map;
-        flare::stop_watcher id_tm, std_tm, pooled_tm, hash_tm;
+        turbo::container::PooledMap<uint64_t, T> pooled_map;
+        turbo::container::hash_map<uint64_t, T> hash_map;
+        turbo::stop_watcher id_tm, std_tm, pooled_tm, hash_tm;
 
         size_t max_nkeys = 0;
         for (size_t i = 0; i < NPASS; ++i) {
@@ -1117,7 +1117,7 @@ namespace {
         pooled_map.clear();
         hash_map.clear();
 
-        FLARE_LOG(INFO) << "[ value = " << sizeof(T) << " bytes ]";
+        TURBO_LOG(INFO) << "[ value = " << sizeof(T) << " bytes ]";
         for (size_t pass = 0; pass < NPASS; ++pass) {
             int start = rand();
             keys.clear();
@@ -1157,9 +1157,9 @@ namespace {
             }
             hash_tm.stop();
 
-            FLARE_LOG(INFO) << (random ? "Randomly" : "Sequentially")
+            TURBO_LOG(INFO) << (random ? "Randomly" : "Sequentially")
                             << " inserting " << keys.size()
-                            << " into FlatMap/std::map/flare::container::PooledMap/flare::container::hash_map takes "
+                            << " into FlatMap/std::map/turbo::container::PooledMap/turbo::container::hash_map takes "
                             << id_tm.n_elapsed() / keys.size()
                             << "/" << std_tm.n_elapsed() / keys.size()
                             << "/" << pooled_tm.n_elapsed() / keys.size()
@@ -1193,9 +1193,9 @@ namespace {
             }
             hash_tm.stop();
 
-            FLARE_LOG(INFO) << (random ? "Randomly" : "Sequentially")
+            TURBO_LOG(INFO) << (random ? "Randomly" : "Sequentially")
                             << " erasing " << keys.size()
-                            << " from FlatMap/std::map/flare::container::PooledMap/flare::container::hash_map takes "
+                            << " from FlatMap/std::map/turbo::container::PooledMap/turbo::container::hash_map takes "
                             << id_tm.n_elapsed() / keys.size()
                             << "/" << std_tm.n_elapsed() / keys.size()
                             << "/" << pooled_tm.n_elapsed() / keys.size()
@@ -1206,18 +1206,18 @@ namespace {
     template<typename T>
     void perf_seek(const T &value) {
         size_t nkeys[] = {100, 1000, 10000};
-        const size_t NPASS = FLARE_ARRAY_SIZE(nkeys);
+        const size_t NPASS = TURBO_ARRAY_SIZE(nkeys);
         std::vector<uint64_t> keys;
         std::vector<uint64_t> rkeys;
-        flare::container::FlatMap<uint64_t, T> id_map;
+        turbo::container::FlatMap<uint64_t, T> id_map;
         std::map<uint64_t, T> std_map;
-        flare::container::PooledMap<uint64_t, T> pooled_map;
-        flare::container::hash_map<uint64_t, T> hash_map;
+        turbo::container::PooledMap<uint64_t, T> pooled_map;
+        turbo::container::hash_map<uint64_t, T> hash_map;
 
-        flare::stop_watcher id_tm, std_tm, pooled_tm, hash_tm;
+        turbo::stop_watcher id_tm, std_tm, pooled_tm, hash_tm;
 
         id_map.init((size_t) (nkeys[NPASS - 1] * 1.5));
-        FLARE_LOG(INFO) << "[ value = " << sizeof(T) << " bytes ]";
+        TURBO_LOG(INFO) << "[ value = " << sizeof(T) << " bytes ]";
         for (size_t pass = 0; pass < NPASS; ++pass) {
             int start = rand();
             keys.clear();
@@ -1272,8 +1272,8 @@ namespace {
             }
             hash_tm.stop();
 
-            FLARE_LOG(INFO) << "Seeking " << keys.size()
-                            << " from FlatMap/std::map/flare::container::PooledMap/flare::container::hash_map takes "
+            TURBO_LOG(INFO) << "Seeking " << keys.size()
+                            << " from FlatMap/std::map/turbo::container::PooledMap/turbo::container::hash_map takes "
                             << id_tm.n_elapsed() / keys.size()
                             << "/" << std_tm.n_elapsed() / keys.size()
                             << "/" << pooled_tm.n_elapsed() / keys.size()
@@ -1304,8 +1304,8 @@ namespace {
     }
 
     TEST_F(FlatMapTest, copy) {
-        flare::container::FlatMap<int, int> m1;
-        flare::container::FlatMap<int, int> m2;
+        turbo::container::FlatMap<int, int> m1;
+        turbo::container::FlatMap<int, int> m2;
         ASSERT_EQ(0, m1.init(32));
         m1[1] = 1;
         m1[2] = 2;

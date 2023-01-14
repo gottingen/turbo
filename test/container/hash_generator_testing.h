@@ -23,7 +23,7 @@
 
 #include "hash_policy_testing.h"
 
-namespace flare {
+namespace turbo {
     namespace priv {
         namespace hash_internal {
             namespace generator_internal {
@@ -33,7 +33,7 @@ namespace flare {
                 };
 
                 template<class Map>
-                struct IsMap<Map, flare::void_t<typename Map::mapped_type>> : std::true_type {
+                struct IsMap<Map, turbo::void_t<typename Map::mapped_type>> : std::true_type {
                 };
 
             }  // namespace generator_internal
@@ -169,7 +169,7 @@ namespace flare {
             };
 
             template<class U>
-            struct Generator<U, flare::void_t<decltype(std::declval<U &>().key()),
+            struct Generator<U, turbo::void_t<decltype(std::declval<U &>().key()),
                     decltype(std::declval<U &>().value())>>
                     : Generator<std::pair<
                             typename std::decay<decltype(std::declval<U &>().key())>::type,
@@ -185,11 +185,11 @@ namespace flare {
 
         }  // namespace hash_internal
     }  // namespace priv
-}  // namespace flare
+}  // namespace turbo
 
 namespace std {
-    using flare::priv::hash_internal::EnumClass;
-    using flare::priv::hash_internal::Enum;
+    using turbo::priv::hash_internal::EnumClass;
+    using turbo::priv::hash_internal::Enum;
 
     template<>
     struct hash<EnumClass> {

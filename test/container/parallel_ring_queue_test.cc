@@ -7,14 +7,14 @@
 
 
 
-#include "flare/container/parallel_ring_queue.h"
+#include "turbo/container/parallel_ring_queue.h"
 #include "testing/gtest_wrap.h"
 #include <thread>
 #include <atomic>
 
 namespace testing {
     TEST(TestParallelRingQueue, TestQueue) {
-        flare::parallel_ring_queue<int> queue;
+        turbo::parallel_ring_queue<int> queue;
         for (uint32_t i = 1; i <= 2000; ++i) {
             auto stat = queue.push_back(i);
             if (i < queue.capacity()) {
@@ -47,7 +47,7 @@ namespace testing {
     }
 
     TEST(TestParallelRingQueue, TestCapacity) {
-        flare::parallel_ring_queue<int> queue;
+        turbo::parallel_ring_queue<int> queue;
         EXPECT_EQ(queue.capacity(), 1024);
         queue.reserve(100);
         EXPECT_EQ(queue.capacity(), 128);
@@ -78,7 +78,7 @@ namespace testing {
     }
 
     TEST(TestQueue, TestConcurrent) {
-        flare::parallel_ring_queue<int> q(1000);
+        turbo::parallel_ring_queue<int> q(1000);
         std::thread threads[10];
         for (int i = 0; i < 10; i++) {
             threads[i] = std::thread(
@@ -113,7 +113,7 @@ namespace testing {
     }
 
     TEST(TestQueue, TestConcurrentPushAndPop) {
-        flare::parallel_ring_queue<int> q(1000);
+        turbo::parallel_ring_queue<int> q(1000);
         std::thread threads_a[10];
         for (int i = 0; i < 10; i++) {
             threads_a[i] = std::thread(
@@ -148,7 +148,7 @@ namespace testing {
     }
 
     TEST(TestQueue, TestNoConcurrent) {
-        flare::parallel_ring_queue<int> q(64);
+        turbo::parallel_ring_queue<int> q(64);
         for (size_t i = 0; i < 30; i++) {
             q.push_back(i);
         }
@@ -177,7 +177,7 @@ namespace testing {
     }
 
     TEST(TestQueue, TestFront) {
-        flare::parallel_ring_queue<int> q(10);
+        turbo::parallel_ring_queue<int> q(10);
         for (int i = 0; i < 15; i++) {
             q.push_back(i);
         }
@@ -204,53 +204,53 @@ namespace testing {
 
     TEST(TestQueue, TestFixCapacity) {
         {
-            flare::parallel_ring_queue<int> q(10);
+            turbo::parallel_ring_queue<int> q(10);
             EXPECT_EQ(q.fix_capacity(10), 16);
         }
         {
-            flare::parallel_ring_queue<int> q(200);
+            turbo::parallel_ring_queue<int> q(200);
             EXPECT_EQ(q.fix_capacity(200), 256);
         }
         {
-            flare::parallel_ring_queue<int> q(0);
+            turbo::parallel_ring_queue<int> q(0);
             EXPECT_EQ(q.fix_capacity(0), 1024);
         }
         {
-            flare::parallel_ring_queue<int> q(static_cast<uint32_t>(1 << 31) + 2);
+            turbo::parallel_ring_queue<int> q(static_cast<uint32_t>(1 << 31) + 2);
             EXPECT_EQ(q.fix_capacity(static_cast<uint32_t>(1 << 31) + 2), static_cast<uint32_t>(1 << 31));
         }
         {
-            flare::parallel_ring_queue<int> q(0);
+            turbo::parallel_ring_queue<int> q(0);
             EXPECT_EQ(q.fix_capacity(0), 1024);
         }
     }
 
     TEST(TestQueue, TestPowerOfTwoForSize) {
         {
-            flare::parallel_ring_queue<int> q(10);
+            turbo::parallel_ring_queue<int> q(10);
             EXPECT_EQ(q.power_of_two_for_size(10), 16);
         }
         {
-            flare::parallel_ring_queue<int> q(0);
+            turbo::parallel_ring_queue<int> q(0);
             EXPECT_EQ(q.power_of_two_for_size(0), 0);
         }
         {
-            flare::parallel_ring_queue<int> q(1);
+            turbo::parallel_ring_queue<int> q(1);
             EXPECT_EQ(q.power_of_two_for_size(1), 1);
         }
     }
 
     TEST(TestQueue, TestHighestOneBit) {
         {
-            flare::parallel_ring_queue<int> q(10);
+            turbo::parallel_ring_queue<int> q(10);
             EXPECT_EQ(q.highest_one_bit(10), 8);
         }
         {
-            flare::parallel_ring_queue<int> q(0);
+            turbo::parallel_ring_queue<int> q(0);
             EXPECT_EQ(q.highest_one_bit(0), 0);
         }
         {
-            flare::parallel_ring_queue<int> q(17);
+            turbo::parallel_ring_queue<int> q(17);
             EXPECT_EQ(q.highest_one_bit(17), 16);
         }
     }

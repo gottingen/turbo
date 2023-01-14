@@ -11,12 +11,12 @@
 #include "testing/gtest_wrap.h"
 #include <algorithm>
 #include <random>
-#include "flare/times/time.h"
-#include "flare/base/fast_rand.h"
+#include "turbo/times/time.h"
+#include "turbo/base/fast_rand.h"
 
-#define FLARE_CLEAR_RESOURCE_POOL_AFTER_ALL_THREADS_QUIT
+#define TURBO_CLEAR_RESOURCE_POOL_AFTER_ALL_THREADS_QUIT
 
-#include "flare/memory/resource_pool.h"
+#include "turbo/memory/resource_pool.h"
 
 namespace {
     struct MyObject {
@@ -26,7 +26,7 @@ namespace {
 
     struct Foo {
         Foo() {
-            x = flare::base::fast_rand() % 2;
+            x = turbo::base::fast_rand() % 2;
         }
 
         ~Foo() {
@@ -37,7 +37,7 @@ namespace {
     };
 }
 
-namespace flare {
+namespace turbo {
     template<>
     struct ResourcePoolBlockMaxSize<MyObject> {
         static const size_t value = 128;
@@ -60,10 +60,10 @@ namespace flare {
         }
     };
 
-}  // namespace flare
+}  // namespace turbo
 
 namespace {
-    using namespace flare;
+    using namespace turbo;
 
     class ResourcePoolTest : public ::testing::Test {
     protected:
@@ -118,17 +118,17 @@ namespace {
 
     TEST_F(ResourcePoolTest, change_config) {
         int a[2];
-        printf("%lu\n", FLARE_ARRAY_SIZE(a));
+        printf("%lu\n", TURBO_ARRAY_SIZE(a));
 
-        flare::ResourcePoolInfo info = flare::describe_resources<MyObject>();
-        flare::ResourcePoolInfo zero_info = {0, 0, 0, 0, 3, 3, 0};
+        turbo::ResourcePoolInfo info = turbo::describe_resources<MyObject>();
+        turbo::ResourcePoolInfo zero_info = {0, 0, 0, 0, 3, 3, 0};
         ASSERT_EQ(0, memcmp(&info, &zero_info, sizeof(info)));
 
-        flare::ResourceId<MyObject> id = {0};
+        turbo::ResourceId<MyObject> id = {0};
         get_resource<MyObject>(&id);
-        std::cout << flare::describe_resources<MyObject>() << std::endl;
+        std::cout << turbo::describe_resources<MyObject>() << std::endl;
         return_resource(id);
-        std::cout << flare::describe_resources<MyObject>() << std::endl;
+        std::cout << turbo::describe_resources<MyObject>() << std::endl;
     }
 
     struct NonDefaultCtorObject {
@@ -141,29 +141,29 @@ namespace {
 
     TEST_F(ResourcePoolTest, sanity) {
         ptr_set.clear();
-        flare::ResourceId<NonDefaultCtorObject> id0 = {0};
-        flare::get_resource<NonDefaultCtorObject>(&id0, 10);
-        ASSERT_EQ(10, flare::address_resource(id0)->_value);
-        flare::get_resource<NonDefaultCtorObject>(&id0, 100, 30);
-        ASSERT_EQ(130, flare::address_resource(id0)->_value);
+        turbo::ResourceId<NonDefaultCtorObject> id0 = {0};
+        turbo::get_resource<NonDefaultCtorObject>(&id0, 10);
+        ASSERT_EQ(10, turbo::address_resource(id0)->_value);
+        turbo::get_resource<NonDefaultCtorObject>(&id0, 100, 30);
+        ASSERT_EQ(130, turbo::address_resource(id0)->_value);
 
-        printf("BLOCK_NITEM=%lu\n", flare::ResourcePool<YellObj>::BLOCK_NITEM);
+        printf("BLOCK_NITEM=%lu\n", turbo::ResourcePool<YellObj>::BLOCK_NITEM);
 
         nc = 0;
         nd = 0;
         {
-            flare::ResourceId<YellObj> id1;
-            YellObj *o1 = flare::get_resource(&id1);
+            turbo::ResourceId<YellObj> id1;
+            YellObj *o1 = turbo::get_resource(&id1);
             ASSERT_TRUE(o1);
-            ASSERT_EQ(o1, flare::address_resource(id1));
+            ASSERT_EQ(o1, turbo::address_resource(id1));
 
             ASSERT_EQ(1, nc);
             ASSERT_EQ(0, nd);
 
-            flare::ResourceId<YellObj> id2;
-            YellObj *o2 = flare::get_resource(&id2);
+            turbo::ResourceId<YellObj> id2;
+            YellObj *o2 = turbo::get_resource(&id2);
             ASSERT_TRUE(o2);
-            ASSERT_EQ(o2, flare::address_resource(id2));
+            ASSERT_EQ(o2, turbo::address_resource(id2));
 
             ASSERT_EQ(2, nc);
             ASSERT_EQ(0, nd);
@@ -178,7 +178,7 @@ namespace {
         }
         ASSERT_EQ(0, nd);
 
-        flare::clear_resources<YellObj>();
+        turbo::clear_resources<YellObj>();
         ASSERT_EQ(2, nd);
         ASSERT_TRUE(ptr_set.empty()) << ptr_set.size();
     }
@@ -187,36 +187,36 @@ namespace {
         nfoo_dtor = 0;
         int nfoo = 0;
         for (int i = 0; i < 100; ++i) {
-            flare::ResourceId<Foo> id = {0};
-            Foo *foo = flare::get_resource<Foo>(&id);
+            turbo::ResourceId<Foo> id = {0};
+            Foo *foo = turbo::get_resource<Foo>(&id);
             if (foo) {
                 ASSERT_EQ(1, foo->x);
                 ++nfoo;
             }
         }
         ASSERT_EQ(nfoo + nfoo_dtor, 100);
-        ASSERT_EQ((size_t) nfoo, flare::describe_resources<Foo>().item_num);
+        ASSERT_EQ((size_t) nfoo, turbo::describe_resources<Foo>().item_num);
     }
 
     TEST_F(ResourcePoolTest, get_int) {
-        flare::clear_resources<int>();
+        turbo::clear_resources<int>();
 
         // Perf of this test is affected by previous case.
         const size_t N = 100000;
 
-        flare::stop_watcher tm;
-        flare::ResourceId<int> id;
+        turbo::stop_watcher tm;
+        turbo::ResourceId<int> id;
 
         // warm up
-        if (flare::get_resource(&id)) {
-            flare::return_resource(id);
+        if (turbo::get_resource(&id)) {
+            turbo::return_resource(id);
         }
         ASSERT_EQ(0UL, id);
         delete (new int);
 
         tm.start();
         for (size_t i = 0; i < N; ++i) {
-            *flare::get_resource(&id) = i;
+            *turbo::get_resource(&id) = i;
         }
         tm.stop();
         printf("get a int takes %.1fns\n", tm.n_elapsed() / (double) N);
@@ -231,7 +231,7 @@ namespace {
         tm.start();
         for (size_t i = 0; i < N; ++i) {
             id.value = i;
-            *flare::ResourcePool<int>::unsafe_address_resource(id) = i;
+            *turbo::ResourcePool<int>::unsafe_address_resource(id) = i;
         }
         tm.stop();
         printf("unsafe_address a int takes %.1fns\n", tm.n_elapsed() / (double) N);
@@ -239,14 +239,14 @@ namespace {
         tm.start();
         for (size_t i = 0; i < N; ++i) {
             id.value = i;
-            *flare::address_resource(id) = i;
+            *turbo::address_resource(id) = i;
         }
         tm.stop();
         printf("address a int takes %.1fns\n", tm.n_elapsed() / (double) N);
 
-        std::cout << flare::describe_resources<int>() << std::endl;
-        flare::clear_resources<int>();
-        std::cout << flare::describe_resources<int>() << std::endl;
+        std::cout << turbo::describe_resources<int>() << std::endl;
+        turbo::clear_resources<int>();
+        std::cout << turbo::describe_resources<int>() << std::endl;
     }
 
 
@@ -258,13 +258,13 @@ namespace {
         const size_t N = 10000;
         std::vector<SilentObj *> new_list;
         new_list.reserve(N);
-        flare::ResourceId<SilentObj> id;
+        turbo::ResourceId<SilentObj> id;
 
-        flare::stop_watcher tm1, tm2;
+        turbo::stop_watcher tm1, tm2;
 
         // warm up
-        if (flare::get_resource(&id)) {
-            flare::return_resource(id);
+        if (turbo::get_resource(&id)) {
+            turbo::return_resource(id);
         }
         delete (new SilentObj);
 
@@ -291,7 +291,7 @@ namespace {
             new_list.clear();
         }
 
-        std::cout << flare::describe_resources<SilentObj>() << std::endl;
+        std::cout << turbo::describe_resources<SilentObj>() << std::endl;
     }
 
     struct D {
@@ -303,7 +303,7 @@ namespace {
         const size_t N = 100000;
         std::vector<ResourceId<D> > v;
         v.reserve(N);
-        flare::stop_watcher tm0, tm1, tm2;
+        turbo::stop_watcher tm0, tm1, tm2;
         ResourceId<D> id = {0};
         D tmp = D();
         int sr = 0;
@@ -353,7 +353,7 @@ namespace {
         const size_t N = 100000;
         std::vector<D *> v2;
         v2.reserve(N);
-        flare::stop_watcher tm0, tm1, tm2;
+        turbo::stop_watcher tm0, tm1, tm2;
         D tmp = D();
 
         std::random_device rd;
@@ -395,18 +395,18 @@ namespace {
 
     TEST_F(ResourcePoolTest, get_and_return_int_multiple_threads) {
         pthread_t tid[16];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid); ++i) {
             ASSERT_EQ(0, pthread_create(&tid[i], nullptr, get_and_return_int, nullptr));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid); ++i) {
             pthread_join(tid[i], nullptr);
         }
 
         pthread_t tid2[16];
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid2); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid2); ++i) {
             ASSERT_EQ(0, pthread_create(&tid2[i], nullptr, new_and_delete_int, nullptr));
         }
-        for (size_t i = 0; i < FLARE_ARRAY_SIZE(tid2); ++i) {
+        for (size_t i = 0; i < TURBO_ARRAY_SIZE(tid2); ++i) {
             pthread_join(tid2[i], nullptr);
         }
 

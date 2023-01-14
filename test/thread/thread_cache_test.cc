@@ -6,20 +6,20 @@
  *****************************************************************/
 
 #include "testing/sstream_workaround.h"
-#include "flare/thread/thread_cache.h"
+#include "turbo/thread/thread_cache.h"
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "testing/gtest_wrap.h"
-#include "flare/strings/numbers.h"
-#include "flare/times/time.h"
-#include "flare/thread/latch.h"
-#include "flare/base/fast_rand.h"
+#include "turbo/strings/numbers.h"
+#include "turbo/times/time.h"
+#include "turbo/thread/latch.h"
+#include "turbo/base/fast_rand.h"
 
 using namespace std::literals;
 
-namespace flare {
+namespace turbo {
 
     TEST(thread_cache, Basic) {
         thread_cache<std::string> tc_str("123");
@@ -49,13 +49,13 @@ namespace flare {
         std::vector<std::thread> ts;
 
         for (int i = 0; i != 100; ++i) {
-            ts.push_back(std::thread([&, s = flare::time_now()] {
-                while (flare::time_now() + flare::duration::seconds(10) < s) {
-                    if (flare::base::fast_rand() % 1000 == 0) {
-                        str.emplace(std::to_string(flare::base::fast_rand() % 33333));
+            ts.push_back(std::thread([&, s = turbo::time_now()] {
+                while (turbo::time_now() + turbo::duration::seconds(10) < s) {
+                    if (turbo::base::fast_rand() % 1000 == 0) {
+                        str.emplace(std::to_string(turbo::base::fast_rand() % 33333));
                     } else {
                         int64_t opt;
-                        auto r = flare::simple_atoi(str.non_idempotent_get(), &opt);
+                        auto r = turbo::simple_atoi(str.non_idempotent_get(), &opt);
                         ASSERT_TRUE(r);
                         ASSERT_LT(opt, 33333);
                     }
@@ -67,4 +67,4 @@ namespace flare {
         }
     }
 
-}  // namespace flare
+}  // namespace turbo
