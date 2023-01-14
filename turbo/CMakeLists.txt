@@ -123,7 +123,7 @@ if (ENABLE_TESTING)
 endif ()
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/turbo
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/turbo
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include
         FILES_MATCHING
         PATTERN "*.h"
         )
