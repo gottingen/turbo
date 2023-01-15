@@ -4,15 +4,12 @@
 file(GLOB_RECURSE TURBO_BASE_SRC "base/*.cc")
 file(GLOB_RECURSE TURBO_BOOTSTRAP_SRC "bootstrap/*.cc")
 file(GLOB_RECURSE TURBO_CONTAINER_SRC "container/*.cc")
-file(GLOB_RECURSE TURBO_DAG_SRC "dag/*.cc")
 file(GLOB_RECURSE TURBO_DEBUG_SRC "debugging/*.cc")
-file(GLOB_RECURSE TURBO_FIBER_SRC "fiber/*.cc")
 file(GLOB_RECURSE TURBO_FILES_SRC "files/*.cc")
 file(GLOB_RECURSE TURBO_HASH_SRC "hash/*.cc")
 file(GLOB_RECURSE TURBO_IO_SRC "io/*.cc")
 file(GLOB_RECURSE TURBO_LOG_SRC "log/*.cc")
 file(GLOB_RECURSE TURBO_MEMORY_SRC "memory/*.cc")
-file(GLOB_RECURSE TURBO_METRICS_SRC "metrics/*.cc")
 file(GLOB_RECURSE TURBO_JSON_SRC "rapidjson/*.cc")
 file(GLOB_RECURSE TURBO_STRINGS_SRC "strings/*.cc")
 file(GLOB_RECURSE TURBO_SYSTEM_SRC "system/*.cc")
@@ -33,11 +30,8 @@ set(TURBO_SRC
         ${TURBO_BOOTSTRAP_SRC}
         ${TURBO_HASH_SRC}
         ${TURBO_TIMES_SRC}
-        ${TURBO_FIBER_SRC}
         ${TURBO_FILES_SRC}
         ${TURBO_THREAD_SRC}
-        ${TURBO_FUTURE_SRC}
-        ${TURBO_DAG_SRC}
         ${TURBO_SYSTEM_SRC}
         ${TURBO_JSON_SRC}
         )
