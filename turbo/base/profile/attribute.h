@@ -259,5 +259,15 @@ inline void turbo_macro_unused(T const volatile & x) { (void)x; }
 #define TURBO_INLINE_VISIBILITY TURBO_HIDDEN TURBO_FORCE_INLINE
 #endif
 
+// align function
+#ifndef TURBO_ALIGN_FUNCTION
+#if defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
+#define TURBO_ALIGN_FUNCTION __attribute__((aligned(128)))
+#elif defined _MSC_VER
+#define TURBO_ALIGN_FUNCTION
+#else
+#define TURBO_ALIGN_FUNCTION
+#endif
+#endif
 
 #endif // TURBO_BASE_PROFILE_ATTRIBUTE_H_

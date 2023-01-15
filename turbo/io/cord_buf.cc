@@ -84,7 +84,7 @@ namespace turbo {
 #define SYS_pwritev 296
 #endif // SYS_pwritev
 
-// SYS_preadv/SYS_pwritev is available since Linux 2.6.30
+        // SYS_preadv/SYS_pwritev is available since Linux 2.6.30
         static ssize_t sys_preadv(int fd, const struct iovec *vector,
                                   int count, off_t offset) {
             return syscall(SYS_preadv, fd, vector, count, offset);
@@ -103,16 +103,17 @@ namespace turbo {
             }
 #if defined(TURBO_PLATFORM_OSX)
             return user_preadv;
-#endif
+#else  // TURBO_PLATFORM_OSX
             char dummy[1];
             iovec vec = {dummy, sizeof(dummy)};
             const int rc = syscall(SYS_preadv, (int) fd, &vec, 1, 0);
             if (rc < 0) {
                 TURBO_PLOG(WARNING) << "The kernel doesn't support SYS_preadv, "
-                                 " use user_preadv instead";
+                                       " use user_preadv instead";
                 return user_preadv;
             }
             return sys_preadv;
+#endif  // TURBO_PLATFORM_OSX
         }
 
         inline iov_function get_pwritev_func() {
@@ -123,7 +124,7 @@ namespace turbo {
             }
 #if defined(TURBO_PLATFORM_OSX)
             return user_pwritev;
-#endif
+#else
             char dummy[1];
             iovec vec = {dummy, sizeof(dummy)};
             const int rc = syscall(SYS_pwritev, (int) fd, &vec, 1, 0);
@@ -133,6 +134,7 @@ namespace turbo {
                 return user_pwritev;
             }
             return sys_pwritev;
+#endif  // TURBO_PLATFORM_OSX
         }
 
 #else   // TURBO_PROCESSOR_X86_64
@@ -227,7 +229,7 @@ namespace turbo {
 #ifndef NDEBUG
             if (abi_check != 0) {
                 TURBO_LOG(FATAL) << "Your program seems to wrongly contain two "
-                    "ABI-incompatible implementations of cord_buf";
+                                    "ABI-incompatible implementations of cord_buf";
             }
 #endif
         }
@@ -291,7 +293,7 @@ namespace turbo {
                 return nullptr;
             }
             return new(mem) cord_buf::Block(mem + sizeof(cord_buf::Block),
-                                         block_size - sizeof(cord_buf::Block));
+                                            block_size - sizeof(cord_buf::Block));
         }
 
         inline cord_buf::Block *create_block() {
@@ -982,7 +984,7 @@ namespace turbo {
     }
 
     ssize_t cord_buf::cut_multiple_into_SSL_channel(SSL *ssl, cord_buf *const *pieces,
-                                                 size_t count, int *ssl_error) {
+                                                    size_t count, int *ssl_error) {
         ssize_t nw = 0;
         *ssl_error = SSL_ERROR_NONE;
         for (size_t i = 0; i < count;) {
@@ -1245,7 +1247,7 @@ namespace turbo {
     static const uint32_t MAX_AREA_SIZE = (((uint32_t) 1) << AREA_SIZE_BITS) - 1;
 
     inline cord_buf::Area make_area(uint32_t ref_index, uint32_t ref_offset,
-                                 uint32_t size) {
+                                    uint32_t size) {
         if (ref_index > MAX_REF_INDEX ||
             ref_offset > MAX_REF_OFFSET ||
             size > MAX_AREA_SIZE) {
@@ -1318,11 +1320,11 @@ namespace turbo {
 
         // Use check because we need to see the stack here.
         TURBO_CHECK(false) << "cord_buf(" << size() << ", nref=" << _ref_num()
-                     << ") is shorter than what we reserved("
-                     << "ref=" << get_area_ref_index(area)
-                     << " off=" << get_area_ref_offset(area)
-                     << " size=" << get_area_size(area)
-                     << "), this assignment probably corrupted something...";
+                           << ") is shorter than what we reserved("
+                           << "ref=" << get_area_ref_index(area)
+                           << " off=" << get_area_ref_offset(area)
+                           << " size=" << get_area_size(area)
+                           << "), this assignment probably corrupted something...";
         return -1;
     }
 
@@ -1343,7 +1345,7 @@ namespace turbo {
             cord_buf::BlockRef const &r = _ref_at(i);
             const size_t nc = std::min(m, (size_t) r.length - offset);
             const cord_buf::BlockRef r2 = {(uint32_t) (r.offset + offset),
-                                        (uint32_t) nc, r.block};
+                                           (uint32_t) nc, r.block};
             buf->_push_back_ref(r2);
             offset = 0;
             m -= nc;
@@ -1778,15 +1780,15 @@ namespace turbo {
         const size_t size = (char *) _data_end - (char *) _data;
         if (n <= size) {
             const cord_buf::BlockRef r = {(uint32_t) ((char *) _data - _block->data),
-                                       (uint32_t) n,
-                                       _block};
+                                          (uint32_t) n,
+                                          _block};
             out->_push_back_ref(r);
             _data = (char *) _data + n;
             return n;
         } else if (size != 0) {
             const cord_buf::BlockRef r = {(uint32_t) ((char *) _data - _block->data),
-                                       (uint32_t) size,
-                                       _block};
+                                          (uint32_t) size,
+                                          _block};
             out->_push_back_ref(r);
             _buf->_pop_front_ref();
             _data = nullptr;
@@ -1916,8 +1918,8 @@ namespace turbo {
             }
         }
         const cord_buf::BlockRef r = {_cur_block->size,
-                                   (uint32_t) _cur_block->left_space(),
-                                   _cur_block};
+                                      (uint32_t) _cur_block->left_space(),
+                                      _cur_block};
         *data = _cur_block->data + r.offset;
         *size = r.length;
         _cur_block->size = _cur_block->cap;
@@ -1934,13 +1936,13 @@ namespace turbo {
                 // _cur_block must match end of the cord_buf
                 if (r.block != _cur_block) {
                     TURBO_LOG(FATAL) << "r.block=" << r.block
-                               << " does not match _cur_block=" << _cur_block;
+                                     << " does not match _cur_block=" << _cur_block;
                     return;
                 }
                 if (r.offset + r.length != _cur_block->size) {
                     TURBO_LOG(FATAL) << "r.offset(" << r.offset << ") + r.length("
-                               << r.length << ") != _cur_block->size("
-                               << _cur_block->size << ")";
+                                     << r.length << ") != _cur_block->size("
+                                     << _cur_block->size << ")";
                     return;
                 }
             } else {
@@ -1952,8 +1954,8 @@ namespace turbo {
                     // BlockRef of _buf. Safe to allocate more on the block.
                     if (r.offset + r.length != r.block->size) {
                         TURBO_LOG(FATAL) << "r.offset(" << r.offset << ") + r.length("
-                                   << r.length << ") != r.block->size("
-                                   << r.block->size << ")";
+                                         << r.length << ") != r.block->size("
+                                         << r.block->size << ")";
                         return;
                     }
                 } else if (r.offset + r.length != r.block->size) {
@@ -2081,7 +2083,7 @@ namespace turbo {
             const size_t block_size = _block_end - _block_begin;
             const size_t to_copy = std::min(block_size, n - nc);
             cord_buf::BlockRef r2 = {(uint32_t) (_block_begin - r.block->data),
-                                  (uint32_t) to_copy, r.block};
+                                     (uint32_t) to_copy, r.block};
             buf->_push_back_ref(r2);
             _block_begin += to_copy;
             _bytes_left -= to_copy;
