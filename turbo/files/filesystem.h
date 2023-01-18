@@ -17,49 +17,8 @@
 
 #endif
 
-#ifndef GHC_OS_DETECTED
-#if defined(__APPLE__) && defined(__MACH__)
-#define GHC_OS_MACOS
-#elif defined(__linux__)
-                                                                                                                        #define GHC_OS_LINUX
-#if defined(__ANDROID__)
-#define GHC_OS_ANDROID
-#endif
-#elif defined(_WIN64)
-#define GHC_OS_WINDOWS
-#define GHC_OS_WIN64
-#elif defined(_WIN32)
-#define GHC_OS_WINDOWS
-#define GHC_OS_WIN32
-#elif defined(__CYGWIN__)
-#define GHC_OS_CYGWIN
-#elif defined(__svr4__)
-#define GHC_OS_SYS5R4
-#elif defined(BSD)
-#define GHC_OS_BSD
-#elif defined(__EMSCRIPTEN__)
-#define GHC_OS_WEB
+#if defined(TURBO_PLATFORM_WEB)
 #include <wasi/api.h>
-#elif defined(__QNX__)
-#define GHC_OS_QNX
-#define GHC_NO_DIRENT_D_TYPE
-#else
-#error "Operating system currently not supported!"
-#endif
-#define GHC_OS_DETECTED
-#if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
-                                                                                                                        #if _MSVC_LANG == 201703L
-#define GHC_FILESYSTEM_RUNNING_CPP17
-#else
-#define GHC_FILESYSTEM_RUNNING_CPP20
-#endif
-#elif (defined(__cplusplus) && __cplusplus >= 201703L)
-#if __cplusplus == 201703L
-#define GHC_FILESYSTEM_RUNNING_CPP17
-#else
-#define GHC_FILESYSTEM_RUNNING_CPP20
-#endif
-#endif
 #endif
 
 #if defined(GHC_FILESYSTEM_IMPLEMENTATION)
@@ -128,7 +87,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#ifdef GHC_OS_ANDROID
+#ifdef TURBO_PLATFORM_ANDROID
 #include <android/api-level.h>
 #if __ANDROID_API__ < 12
 #include <sys/syscall.h>
@@ -136,17 +95,13 @@
 #include <sys/vfs.h>
 #define statvfs statfs
 #else
-
 #include <sys/statvfs.h>
-
 #endif
-#ifdef GHC_OS_CYGWIN
+#ifdef TURBO_PLATFORM_CYGWIN
 #include <strings.h>
 #endif
 #if !defined(__ANDROID__) || __ANDROID_API__ >= 26
-
 #include <langinfo.h>
-
 #endif
 #endif
 #ifdef TURBO_PLATFORM_OSX
@@ -798,7 +753,7 @@ public:
 
             directories_only = 0x40,
             create_symlinks = 0x80,
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
             create_hard_links = 0x100
 #endif
         };
@@ -953,7 +908,7 @@ public:
 
             file_status symlink_status(std::error_code &ec) const noexcept;
 
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
 #ifdef GHC_WITH_EXCEPTIONS
 
             uintmax_t hard_link_count() const;
@@ -1389,7 +1344,7 @@ public:
 
         GHC_FS_API file_path weakly_canonical(const file_path &p, std::error_code &ec) noexcept;
 
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
 #ifdef GHC_WITH_EXCEPTIONS
         GHC_FS_API void create_hard_link(const file_path &to, const file_path &new_hard_link);
 
@@ -2220,10 +2175,8 @@ inline std::wstring toWChar(const charT* unicodeString)
                 }
             }
 
-#ifndef GHC_OS_WEB
-
-            GHC_INLINE void
-            create_hardlink(const file_path &target_name, const file_path &new_hardlink, std::error_code &ec) {
+#ifndef TURBO_PLATFORM_WEB
+            GHC_INLINE void create_hardlink(const file_path &target_name, const file_path &new_hardlink, std::error_code &ec) {
                 if (::link(target_name.c_str(), new_hardlink.c_str()) != 0) {
                     ec = detail::make_system_error();
                 }
@@ -3900,7 +3853,7 @@ namespace detail {
                     if ((options & copy_options::create_symlinks) != copy_options::none) {
                         create_symlink(from.is_absolute() ? from : canonical(from, ec), to, ec);
                     }
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
                     else if ((options & copy_options::create_hard_links) != copy_options::none) {
                         create_hard_link(from, to, ec);
                     }
@@ -4205,7 +4158,7 @@ namespace detail {
             detail::create_symlink(to, new_symlink, true, ec);
         }
 
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
 #ifdef GHC_WITH_EXCEPTIONS
 
         GHC_INLINE void create_hard_link(const file_path &to, const file_path &new_hard_link) {
@@ -4413,7 +4366,7 @@ namespace detail {
 #endif
         }
 
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
 #ifdef GHC_WITH_EXCEPTIONS
 
         GHC_INLINE uintmax_t hard_link_count(const file_path &p) {
@@ -5470,7 +5423,7 @@ namespace detail {
             return turbo::file_size(file_path(), ec);
         }
 
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
 #ifdef GHC_WITH_EXCEPTIONS
 
         GHC_INLINE uintmax_t directory_entry::hard_link_count() const {

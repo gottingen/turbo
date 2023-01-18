@@ -276,7 +276,8 @@
 #else
 #error Unknown Apple Platform
 #endif
-
+#elif defined(TURBO_PLATFORM_WEB) || defined(__EMSCRIPTEN__)
+#define TURBO_PLATFORM_WEB 1
 // Linux
 // __linux and __linux__ are defined by the GCC and Borland compiler.
 // __i386__ and __intel__ are defined by the GCC compiler.
