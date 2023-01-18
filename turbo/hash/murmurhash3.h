@@ -24,6 +24,7 @@
 
 // ======= Platform-specific functions and macros =======
 // Microsoft Visual Studio
+#include "turbo/base/profile.h"
 #if defined(_MSC_VER) && (_MSC_VER < 1600)
 typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
@@ -37,18 +38,10 @@ typedef unsigned __int64 uint64_t;
 
 #endif // !defined(_MSC_VER)
 
-#if defined(_MSC_VER)
-#define MURMURHASH_FORCE_INLINE    __forceinline
-#define BIG_CONSTANT(x) (x)
-#else
-#define MURMURHASH_FORCE_INLINE inline __attribute__((always_inline))
-#define BIG_CONSTANT(x) (x##LLU)
-#endif
-
 namespace turbo::hash {
 
-// Finalization mix - force all bits of a hash block to avalanche
-    MURMURHASH_FORCE_INLINE uint32_t fmix32(uint32_t h) {
+    // Finalization mix - force all bits of a hash block to avalanche
+    TURBO_FORCE_INLINE uint32_t fmix32(uint32_t h) {
         h ^= h >> 16;
         h *= 0x85ebca6b;
         h ^= h >> 13;
@@ -57,26 +50,26 @@ namespace turbo::hash {
         return h;
     }
 
-    MURMURHASH_FORCE_INLINE uint64_t fmix64(uint64_t k) {
+    TURBO_FORCE_INLINE uint64_t fmix64(uint64_t k) {
         k ^= k >> 33;
-        k *= BIG_CONSTANT(0xff51afd7ed558ccd);
+        k *= 0xff51afd7ed558ccdLLU;
         k ^= k >> 33;
-        k *= BIG_CONSTANT(0xc4ceb9fe1a85ec53);
+        k *= 0xc4ceb9fe1a85ec53LLU;
         k ^= k >> 33;
         return k;
     }
 
-// ========= Original version ===========
+    // ========= Original version ===========
     void MurmurHash3_x86_32(const void *key, int len, uint32_t seed, void *out);
 
     void MurmurHash3_x86_128(const void *key, int len, uint32_t seed, void *out);
 
     void MurmurHash3_x64_128(const void *key, int len, uint32_t seed, void *out);
 
-// ========= Iterative version ==========
-// for computing hashcode for very large inputs, say file contents. The API are
-// similar with iterative MD5 API.
-// Notice: |ctx| must be non-nullptr and valid, otherwise the behavior is undefined.
+    // ========= Iterative version ==========
+    // for computing hashcode for very large inputs, say file contents. The API are
+    // similar with iterative MD5 API.
+    // Notice: |ctx| must be non-nullptr and valid, otherwise the behavior is undefined.
     struct MurmurHash3_x86_32_Context {
         uint32_t h1;
         int total_len;

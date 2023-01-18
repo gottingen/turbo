@@ -245,14 +245,14 @@ inline bool canNallocx() noexcept {
 }
 #endif
 
-/**
- * @brief Return the same size class values as nallocx from jemalloc.
- *
- * This doesn't require that the system is using jemalloc.
- *
- * @param minSize Requested size for allocation
- * @return size_t
- */
+    /**
+     * @brief Return the same size class values as nallocx from jemalloc.
+     *
+     * This doesn't require that the system is using jemalloc.
+     *
+     * @param minSize Requested size for allocation
+     * @return size_t
+     */
     inline constexpr size_t
     naiveGoodMallocSize(size_t minSize) noexcept {
         // The spacing increases by a power-of-two and there are generally four size
@@ -349,22 +349,22 @@ inline bool canNallocx() noexcept {
         return rv ? rv : minSize;
     }
 
-// We always request "good" sizes for allocation, so jemalloc can
-// never grow in place small blocks; they're already occupied to the
-// brim.  Blocks larger than or equal to 4096 bytes can in fact be
-// expanded in place, and this constant reflects that.
+    // We always request "good" sizes for allocation, so jemalloc can
+    // never grow in place small blocks; they're already occupied to the
+    // brim.  Blocks larger than or equal to 4096 bytes can in fact be
+    // expanded in place, and this constant reflects that.
     static const size_t jemallocMinInPlaceExpandable = 4096;
 
-/**
- * @brief Trivial wrapper around malloc that check for allocation
- * failure and throw std::bad_alloc in that case.
- *
- * @methodset Allocation Wrappers
- *
- * @param size size of allocation
- *
- * @return void* pointer to allocated buffer
- */
+    /**
+     * @brief Trivial wrapper around malloc that check for allocation
+     * failure and throw std::bad_alloc in that case.
+     *
+     * @methodset Allocation Wrappers
+     *
+     * @param size size of allocation
+     *
+     * @return void* pointer to allocated buffer
+     */
     inline void *checked_malloc(size_t size) {
         void *p = malloc(size);
         if (!p) {
@@ -373,17 +373,17 @@ inline bool canNallocx() noexcept {
         return p;
     }
 
-/**
- * @brief Trivial wrapper around calloc that check for allocation
- * failure and throw std::bad_alloc in that case.
- *
- * @methodset Allocation Wrappers
- *
- * @param n Number of elements
- * @param size Size of each element
- *
- * @return void* pointer to allocated buffer
- */
+    /**
+     * @brief Trivial wrapper around calloc that check for allocation
+     * failure and throw std::bad_alloc in that case.
+     *
+     * @methodset Allocation Wrappers
+     *
+     * @param n Number of elements
+     * @param size Size of each element
+     *
+     * @return void* pointer to allocated buffer
+     */
     inline void *checkedCalloc(size_t n, size_t size) {
         void *p = calloc(n, size);
         if (!p) {
@@ -392,17 +392,17 @@ inline bool canNallocx() noexcept {
         return p;
     }
 
-/**
- * @brief Trivial wrapper around realloc that check for allocation
- * failure and throw std::bad_alloc in that case.
- *
- * @methodset Allocation Wrappers
- *
- * @param ptr pointer to start of buffer
- * @param size size to reallocate starting from ptr
- *
- * @return pointer to reallocated buffer
- */
+    /**
+     * @brief Trivial wrapper around realloc that check for allocation
+     * failure and throw std::bad_alloc in that case.
+     *
+     * @methodset Allocation Wrappers
+     *
+     * @param ptr pointer to start of buffer
+     * @param size size to reallocate starting from ptr
+     *
+     * @return pointer to reallocated buffer
+     */
     inline void *checkedRealloc(void *ptr, size_t size) {
         void *p = realloc(ptr, size);
         if (!p) {
@@ -430,25 +430,25 @@ inline bool canNallocx() noexcept {
         }
     }
 
-/**
- * @brief Reallocs if there is less slack in the buffer, else performs malloc-copy-free
+    /**
+     * @brief Reallocs if there is less slack in the buffer, else performs malloc-copy-free
 
- * This function tries to reallocate a buffer of which only the first
- * currentSize bytes are used. The problem with using realloc is that
- * if currentSize is relatively small _and_ if realloc decides it
- * needs to move the memory chunk to a new buffer, then realloc ends
- * up copying data that is not used. It's generally not a win to try
- * to hook in to realloc() behavior to avoid copies - at least in
- * jemalloc, realloc() almost always ends up doing a copy, because
- * there is little fragmentation / slack space to take advantage of.
- *
- * @param p Pointer to start of buffer
- * @param currentSize Current used size
- * @param currentCapacity Capacity of buffer
- * @param newCapacity New capacity for the buffer
- *
- * @return pointer to realloc'ed buffer
- */
+     * This function tries to reallocate a buffer of which only the first
+     * currentSize bytes are used. The problem with using realloc is that
+     * if currentSize is relatively small _and_ if realloc decides it
+     * needs to move the memory chunk to a new buffer, then realloc ends
+     * up copying data that is not used. It's generally not a win to try
+     * to hook in to realloc() behavior to avoid copies - at least in
+     * jemalloc, realloc() almost always ends up doing a copy, because
+     * there is little fragmentation / slack space to take advantage of.
+     *
+     * @param p Pointer to start of buffer
+     * @param currentSize Current used size
+     * @param currentCapacity Capacity of buffer
+     * @param newCapacity New capacity for the buffer
+     *
+     * @return pointer to realloc'ed buffer
+     */
     TURBO_MALLOC_CHECKED_MALLOC TURBO_NO_INLINE inline void *smartRealloc(
             void *p,
             const size_t currentSize,
