@@ -63,9 +63,6 @@ namespace turbo {
     }  // namespace type_traits_internal
 
 
-    template<typename... Ts>
-    using void_t = typename type_traits_internal::VoidTImpl<Ts...>::type;
-
 
     template<typename T>
     struct is_function

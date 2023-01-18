@@ -29,6 +29,7 @@
 #include "turbo/base/math.h"
 #include "turbo/base/endian.h"
 #include "turbo/container/internal/map_base.h"
+#include "turbo/strings/string.h"
 
 namespace turbo {
 
@@ -4248,6 +4249,7 @@ namespace turbo {
                 bool operator()(std::basic_string_view<CharT> lhs, std::basic_string_view<CharT> rhs) const {
                     return lhs == rhs;
                 }
+
             };
         };
 

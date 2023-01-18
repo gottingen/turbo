@@ -27,5 +27,8 @@
 #include "turbo/base/math/sgn.h"
 #include "turbo/base/math/infinity.h"
 #include "turbo/base/math/round.h"
+#include "turbo/base/math/check_math.h"
+#include "turbo/base/math/power.h"
+#include "turbo/base/math/constexpr_math.h"
 
 #endif  // TURBO_BASE_MATH_H_

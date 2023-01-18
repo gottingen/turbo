@@ -17,6 +17,7 @@
 #endif
 
 #include "turbo/container/flat_hash_map.h"
+#include "turbo/strings/string.h"
 #include "turbo/container/parallel_node_hash_map.h"
 #include "turbo/container/parallel_flat_hash_map.h"
 #include "hash_generator_testing.h"
@@ -239,6 +240,13 @@ namespace turbo {
                 node.mapped() = 17;
                 m.insert(std::move(node));
                 EXPECT_THAT(m, UnorderedElementsAre(Pair(1, 17), Pair(2, 9)));
+            }
+
+            TEST(flat_hash_map, string)  {
+                turbo::flat_hash_map<std::string, std::string> a;
+                a["hell"] = "word";
+                auto it = a.find(std::string_view("hell"));
+                EXPECT_TRUE(it != a.end());
             }
 
         }  // namespace

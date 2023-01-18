@@ -185,11 +185,11 @@ namespace turbo::base {
 // When used with unsupported compilers, the TURBO_FALLTHROUGH_INTENDED macro
 // has no effect on diagnostics. In any case this macro has no effect on runtime
 // behavior and performance of code.
+/*
 #ifdef TURBO_FALLTHROUGH_INTENDED
 #error "TURBO_FALLTHROUGH_INTENDED should not be defined."
 #endif
 
-// TODO(zhangxy): Use c++17 standard [[fallthrough]] macro, when supported.
 #if defined(__clang__) && defined(__has_warning)
 #if __has_feature(cxx_attributes) && __has_warning("-Wimplicit-fallthrough")
 #define TURBO_FALLTHROUGH_INTENDED [[clang::fallthrough]]
@@ -203,8 +203,21 @@ namespace turbo::base {
   do {                            \
   } while (0)
 #endif
+*/
 
+#ifdef TURBO_FALLTHROUGH
+#error "TURBO_FALLTHROUGH should not be defined."
+#endif
 
+#if TURBO_COMPILER_HAS_CPP_ATTRIBUTE(fallthrough)
+#define TURBO_FALLTHROUGH [[fallthrough]]
+#elif TURBO_COMPILER_HAS_CPP_ATTRIBUTE(clang::fallthrough)
+#define TURBO_FALLTHROUGH [[clang::fallthrough]]
+#elif TURBO_COMPILER_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
+#define TURBO_FALLTHROUGH [[gnu::fallthrough]]
+#else
+#define TURBO_FALLTHROUGH
+#endif
 
 // TURBO_BLOCK_TAIL_CALL_OPTIMIZATION
 //

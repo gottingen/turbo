@@ -24,6 +24,8 @@
 #include <optional>  // IWYU pragma: export
 #include <shared_mutex>
 #include "turbo/base/profile.h"
+#include "turbo/base/utility.h"
+#include "turbo/base/type_traits.h"
 #include "turbo/thread/thread_annotations.h"
 
 
@@ -142,76 +144,8 @@ namespace turbo {
             type_traits_internal::IsMoveAssignableImpl, T> {
     };
 
-    // ---------------------------------------------------------------------------
-    // void_t()
-    //
-    // Ignores the type of any its arguments and returns `void`. In general, this
-    // metafunction allows you to create a general case that maps to `void` while
-    // allowing specializations that map to specific types.
-    //
-    // This metafunction is designed to be a drop-in replacement for the C++17
-    // `std::void_t` metafunction.
-    //
-    // NOTE: `turbo::void_t` does not use the standard-specified implementation so
-    // that it can remain compatible with gcc < 5.1. This can introduce slightly
-    // different behavior, such as when ordering partial specializations.
-    // ---------------------------------------------------------------------------
-    template<typename... Ts>
-    using void_t = typename type_traits_internal::VoidTImpl<Ts...>::type;
 
-// ---------------------------------------------------------------------------
-// conjunction
-//
-// Performs a compile-time logical AND operation on the passed types (which
-// must have  `::value` members convertible to `bool`. Short-circuits if it
-// encounters any `false` members (and does not compare the `::value` members
-// of any remaining arguments).
-//
-// This metafunction is designed to be a drop-in replacement for the C++17
-// `std::conjunction` metafunction.
-// ---------------------------------------------------------------------------
-    template<typename... Ts>
-    struct conjunction;
 
-    template<typename T, typename... Ts>
-    struct conjunction<T, Ts...>
-            : std::conditional<T::value, conjunction<Ts...>, T>::type {
-    };
-
-    template<typename T>
-    struct conjunction<T> : T {
-    };
-
-    template<>
-    struct conjunction<> : std::true_type {
-    };
-
-    // ---------------------------------------------------------------------------
-    // disjunction
-    //
-    // Performs a compile-time logical OR operation on the passed types (which
-    // must have  `::value` members convertible to `bool`. Short-circuits if it
-    // encounters any `true` members (and does not compare the `::value` members
-    // of any remaining arguments).
-    //
-    // This metafunction is designed to be a drop-in replacement for the C++17
-    // `std::disjunction` metafunction.
-    // ---------------------------------------------------------------------------
-    template<typename... Ts>
-    struct disjunction;
-
-    template<typename T, typename... Ts>
-    struct disjunction<T, Ts...> :
-            std::conditional<T::value, T, disjunction<Ts...>>::type {
-    };
-
-    template<typename T>
-    struct disjunction<T> : T {
-    };
-
-    template<>
-    struct disjunction<> : std::false_type {
-    };
 
     template<typename T>
     struct negation : std::integral_constant<bool, !T::value> {
@@ -282,12 +216,6 @@ namespace turbo {
     using add_pointer_t = typename std::add_pointer<T>::type;
 
     template<typename T>
-    using make_signed_t = typename std::make_signed<T>::type;
-
-    template<typename T>
-    using make_unsigned_t = typename std::make_unsigned<T>::type;
-
-    template<typename T>
     using remove_extent_t = typename std::remove_extent<T>::type;
 
     template<typename T>
@@ -297,15 +225,8 @@ namespace turbo {
     default_alignment_of_aligned_storage<Len>::value>
     using aligned_storage_t = typename std::aligned_storage<Len, Align>::type;
 
-    template<typename T>
-    using decay_t = typename std::decay<T>::type;
-
     template<bool B, typename T = void>
     using enable_if_t = typename std::enable_if<B, T>::type;
-
-    template<bool B, typename T, typename F>
-    using conditional_t = typename std::conditional<B, T, F>::type;
-
 
     template<typename... T>
     using common_type_t = typename std::common_type<T...>::type;

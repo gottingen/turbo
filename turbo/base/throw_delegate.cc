@@ -17,7 +17,7 @@ namespace turbo::base {
     namespace {
         template<typename T>
         [[noreturn]] void do_throw(const T &error) {
-#ifdef FLARFE_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
             throw error;
 #else
             TURBO_DLOG(FATAL) << error.what();

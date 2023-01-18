@@ -556,15 +556,15 @@ namespace turbo {
             case -4:
                 out[2] = '0';
                 ++out;
-                TURBO_FALLTHROUGH_INTENDED;
+                TURBO_FALLTHROUGH;
             case -3:
                 out[2] = '0';
                 ++out;
-                TURBO_FALLTHROUGH_INTENDED;
+                TURBO_FALLTHROUGH;
             case -2:
                 out[2] = '0';
                 ++out;
-                TURBO_FALLTHROUGH_INTENDED;
+                TURBO_FALLTHROUGH;
             case -1:
                 out += 2;
                 memcpy(out, &digits[0], 6);
