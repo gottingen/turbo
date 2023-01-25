@@ -14,286 +14,8 @@
 # limitations under the License.
 #
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    flags_path_util
-  HDRS
-    "internal/path_util.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::strings
-  PUBLIC
-)
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    flags_program_name
-  SRCS
-    "internal/program_name.cc"
-  HDRS
-    "internal/program_name.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::flags_path_util
-    turbo::strings
-    turbo::synchronization
-  PUBLIC
-)
 
-turbo_cc_library(
-  NAME
-    flags_config
-  SRCS
-    "usage_config.cc"
-  HDRS
-    "config.h"
-    "usage_config.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::flags_path_util
-    turbo::flags_program_name
-    turbo::core_headers
-    turbo::strings
-    turbo::synchronization
-)
-
-turbo_cc_library(
-  NAME
-    flags_marshalling
-  SRCS
-    "marshalling.cc"
-  HDRS
-    "marshalling.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_severity
-    turbo::optional
-    turbo::strings
-    turbo::str_format
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    flags_commandlineflag_internal
-  SRCS
-    "internal/commandlineflag.cc"
-  HDRS
-    "internal/commandlineflag.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::dynamic_annotations
-    turbo::fast_type_id
-)
-
-turbo_cc_library(
-  NAME
-    flags_commandlineflag
-  SRCS
-    "commandlineflag.cc"
-  HDRS
-    "commandlineflag.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::fast_type_id
-    turbo::flags_commandlineflag_internal
-    turbo::optional
-    turbo::strings
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    flags_private_handle_accessor
-  SRCS
-    "internal/private_handle_accessor.cc"
-  HDRS
-    "internal/private_handle_accessor.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::flags_commandlineflag
-    turbo::flags_commandlineflag_internal
-    turbo::strings
-)
-
-turbo_cc_library(
-  NAME
-    flags_reflection
-  SRCS
-    "reflection.cc"
-  HDRS
-    "reflection.h"
-    "internal/registry.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::flags_commandlineflag
-    turbo::flags_private_handle_accessor
-    turbo::flags_config
-    turbo::strings
-    turbo::synchronization
-    turbo::flat_hash_map
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    flags_internal
-  SRCS
-    "internal/flag.cc"
-  HDRS
-    "internal/flag.h"
-    "internal/sequence_lock.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::flags_commandlineflag
-    turbo::flags_commandlineflag_internal
-    turbo::flags_config
-    turbo::flags_marshalling
-    turbo::synchronization
-    turbo::meta
-    turbo::utility
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    flags
-  SRCS
-    "flag.cc"
-  HDRS
-    "declare.h"
-    "flag.h"
-    "internal/flag_msvc.inc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::flags_commandlineflag
-    turbo::flags_config
-    turbo::flags_internal
-    turbo::flags_reflection
-    turbo::base
-    turbo::core_headers
-    turbo::strings
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    flags_usage_internal
-  SRCS
-    "internal/usage.cc"
-  HDRS
-    "internal/usage.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::flags_config
-    turbo::flags
-    turbo::flags_commandlineflag
-    turbo::flags_internal
-    turbo::flags_path_util
-    turbo::flags_private_handle_accessor
-    turbo::flags_program_name
-    turbo::flags_reflection
-    turbo::flat_hash_map
-    turbo::strings
-    turbo::synchronization
-)
-
-turbo_cc_library(
-  NAME
-    flags_usage
-  SRCS
-    "usage.cc"
-  HDRS
-    "usage.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::flags_usage_internal
-    turbo::strings
-    turbo::synchronization
-)
-
-turbo_cc_library(
-  NAME
-    flags_parse
-  SRCS
-    "parse.cc"
-  HDRS
-    "internal/parse.h"
-    "parse.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::algorithm_container
-    turbo::config
-    turbo::core_headers
-    turbo::flags_config
-    turbo::flags
-    turbo::flags_commandlineflag
-    turbo::flags_commandlineflag_internal
-    turbo::flags_internal
-    turbo::flags_private_handle_accessor
-    turbo::flags_program_name
-    turbo::flags_reflection
-    turbo::flags_usage
-    turbo::strings
-    turbo::synchronization
-)
 
 ############################################################################
 # Unit tests in alpahabetical order.
@@ -306,14 +28,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags
-    turbo::flags_commandlineflag
-    turbo::flags_commandlineflag_internal
-    turbo::flags_config
-    turbo::flags_private_handle_accessor
-    turbo::flags_reflection
-    turbo::memory
-    turbo::strings
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -325,7 +40,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags_config
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -338,14 +53,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::core_headers
-    turbo::flags
-    turbo::flags_config
-    turbo::flags_internal
-    turbo::flags_marshalling
-    turbo::flags_reflection
-    turbo::strings
-    turbo::time
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -357,7 +65,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags_marshalling
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -369,14 +77,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags
-    turbo::flags_parse
-    turbo::flags_reflection
-    turbo::flags_usage_internal
-    turbo::raw_logging_internal
-    turbo::scoped_set_env
-    turbo::span
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -388,7 +89,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags_path_util
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -400,8 +101,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags_program_name
-    turbo::strings
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -413,12 +113,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags_commandlineflag_internal
-    turbo::flags
-    turbo::flags_reflection
-    turbo::flags_usage
-    turbo::memory
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -430,9 +125,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::flags_internal
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -444,10 +137,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags_config
-    turbo::flags_path_util
-    turbo::flags_program_name
-    turbo::strings
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -459,13 +149,6 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags_config
-    turbo::flags
-    turbo::flags_path_util
-    turbo::flags_program_name
-    turbo::flags_parse
-    turbo::flags_reflection
-    turbo::flags_usage
-    turbo::strings
+    turbo::turbo
     GTest::gmock
 )

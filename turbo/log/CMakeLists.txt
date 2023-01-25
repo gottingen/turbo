@@ -14,285 +14,7 @@
 # limitations under the License.
 #
 
-# Internal targets
-turbo_cc_library(
-  NAME
-    log_internal_check_impl
-  SRCS
-  HDRS
-    "internal/check_impl.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::core_headers
-    turbo::log_internal_check_op
-    turbo::log_internal_conditions
-    turbo::log_internal_message
-    turbo::log_internal_strip
-)
 
-turbo_cc_library(
-  NAME
-    log_internal_check_op
-  SRCS
-    "internal/check_op.cc"
-  HDRS
-    "internal/check_op.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_internal_nullguard
-    turbo::log_internal_nullstream
-    turbo::log_internal_strip
-    turbo::strings
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_conditions
-  SRCS
-    "internal/conditions.cc"
-  HDRS
-    "internal/conditions.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::log_internal_voidify
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_config
-  SRCS
-  HDRS
-    "internal/config.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_flags
-  SRCS
-  HDRS
-    "internal/flags.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::flags
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_format
-  SRCS
-    "internal/log_format.cc"
-  HDRS
-    "internal/log_format.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_internal_append_truncated
-    turbo::log_internal_config
-    turbo::log_internal_globals
-    turbo::log_severity
-    turbo::strings
-    turbo::str_format
-    turbo::time
-    turbo::span
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_globals
-  SRCS
-    "internal/globals.cc"
-  HDRS
-    "internal/globals.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_severity
-    turbo::raw_logging_internal
-    turbo::strings
-    turbo::time
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_log_impl
-  SRCS
-  HDRS
-    "internal/log_impl.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_conditions
-    turbo::log_internal_message
-    turbo::log_internal_strip
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_proto
-  SRCS
-    "internal/proto.cc"
-  HDRS
-    "internal/proto.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::strings
-    turbo::span
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_message
-  SRCS
-    "internal/log_message.cc"
-  HDRS
-    "internal/log_message.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::errno_saver
-    turbo::inlined_vector
-    turbo::examine_stack
-    turbo::log_internal_append_truncated
-    turbo::log_internal_format
-    turbo::log_internal_globals
-    turbo::log_internal_proto
-    turbo::log_internal_log_sink_set
-    turbo::log_internal_nullguard
-    turbo::log_globals
-    turbo::log_entry
-    turbo::log_severity
-    turbo::log_sink
-    turbo::log_sink_registry
-    turbo::memory
-    turbo::raw_logging_internal
-    turbo::strings
-    turbo::strerror
-    turbo::time
-    turbo::span
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_log_sink_set
-  SRCS
-    "internal/log_sink_set.cc"
-  HDRS
-    "internal/log_sink_set.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-    $<$<BOOL:${ANDROID}>:-llog>
-  DEPS
-    turbo::base
-    turbo::cleanup
-    turbo::config
-    turbo::core_headers
-    turbo::log_internal_config
-    turbo::log_internal_globals
-    turbo::log_globals
-    turbo::log_entry
-    turbo::log_severity
-    turbo::log_sink
-    turbo::raw_logging_internal
-    turbo::synchronization
-    turbo::span
-    turbo::strings
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_nullguard
-  SRCS
-    "internal/nullguard.cc"
-  HDRS
-    "internal/nullguard.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_nullstream
-  SRCS
-  HDRS
-    "internal/nullstream.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_severity
-    turbo::strings
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_strip
-  SRCS
-  HDRS
-    "internal/strip.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_message
-    turbo::log_internal_nullstream
-    turbo::log_severity
-)
 
 turbo_cc_library(
   NAME
@@ -306,12 +28,7 @@ turbo_cc_library(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_entry
-    turbo::log_severity
-    turbo::strings
-    turbo::time
+    turbo::turbo
   TESTONLY
 )
 
@@ -327,11 +44,7 @@ turbo_cc_library(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::config
-    turbo::log_globals
-    turbo::log_initialize
-    turbo::log_internal_globals
-    turbo::log_severity
+    turbo::turbo
     GTest::gtest
   TESTONLY
 )
@@ -348,271 +61,10 @@ turbo_cc_library(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_entry
-    turbo::log_internal_test_helpers
-    turbo::log_severity
-    turbo::strings
-    turbo::time
+    turbo::turbo
     GTest::gtest
     GTest::gmock
   TESTONLY
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_voidify
-  SRCS
-  HDRS
-    "internal/voidify.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-)
-
-turbo_cc_library(
-  NAME
-    log_internal_append_truncated
-  SRCS
-  HDRS
-    "internal/append_truncated.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::strings
-    turbo::span
-)
-
-# Public targets
-turbo_cc_library(
-  NAME
-    turbo_check
-  SRCS
-  HDRS
-    "turbo_check.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_check_impl
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    turbo_log
-  SRCS
-  HDRS
-    "turbo_log.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_log_impl
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    check
-  SRCS
-  HDRS
-    "check.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_check_impl
-    turbo::core_headers
-    turbo::log_internal_check_op
-    turbo::log_internal_conditions
-    turbo::log_internal_message
-    turbo::log_internal_strip
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    die_if_null
-  SRCS
-    "die_if_null.cc"
-  HDRS
-    "die_if_null.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log
-    turbo::strings
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    log_flags
-  SRCS
-    "flags.cc"
-  HDRS
-    "flags.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_globals
-    turbo::log_severity
-    turbo::log_internal_config
-    turbo::log_internal_flags
-    turbo::flags
-    turbo::flags_marshalling
-    turbo::strings
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    log_globals
-  SRCS
-    "globals.cc"
-  HDRS
-    "globals.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::atomic_hook
-    turbo::config
-    turbo::core_headers
-    turbo::hash
-    turbo::log_severity
-    turbo::strings
-)
-
-turbo_cc_library(
-  NAME
-    log_initialize
-  SRCS
-    "initialize.cc"
-  HDRS
-    "initialize.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::log_globals
-    turbo::log_internal_globals
-    turbo::time
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    log
-  SRCS
-  HDRS
-    "log.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_log_impl
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    log_entry
-  SRCS
-    "log_entry.cc"
-  HDRS
-    "log_entry.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_internal_config
-    turbo::log_severity
-    turbo::span
-    turbo::strings
-    turbo::time
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    log_sink
-  SRCS
-    "log_sink.cc"
-  HDRS
-    "log_sink.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::log_entry
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    log_sink_registry
-  SRCS
-  HDRS
-    "log_sink_registry.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::log_sink
-    turbo::log_internal_log_sink_set
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    log_streamer
-  SRCS
-  HDRS
-    "log_streamer.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::turbo_log
-    turbo::log_severity
-    turbo::optional
-    turbo::strings
-    turbo::strings_internal
-    turbo::utility
-  PUBLIC
 )
 
 turbo_cc_library(
@@ -627,49 +79,13 @@ turbo_cc_library(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::config
-    turbo::log_entry
-    turbo::log_severity
-    turbo::log_sink
-    turbo::log_sink_registry
-    turbo::raw_logging_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock
     GTest::gtest
   PUBLIC
   TESTONLY
 )
 
-turbo_cc_library(
-  NAME
-    log_internal_structured
-  HDRS
-    "internal/structured.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::log_internal_message
-    turbo::strings
-)
-
-turbo_cc_library(
-  NAME
-    log_structured
-  HDRS
-    "structured.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-    turbo::log_internal_structured
-    turbo::strings
-  PUBLIC
-)
 
 # Test targets
 
@@ -684,11 +100,8 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::turbo_check
-    turbo::config
-    turbo::core_headers
     turbo::log_internal_test_helpers
-    turbo::status
+    turbo::turbo
     GTest::gmock
     GTest::gtest_main
 )
@@ -704,11 +117,7 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::base
-    turbo::turbo_log
-    turbo::log_entry
-    turbo::log_globals
-    turbo::log_severity
+    turbo::turbo
     turbo::log_internal_test_actions
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
@@ -728,11 +137,8 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::check
-    turbo::config
-    turbo::core_headers
     turbo::log_internal_test_helpers
-    turbo::status
+    turbo::turbo
     GTest::gmock
     GTest::gtest_main
 )
@@ -747,8 +153,7 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::die_if_null
+    turbo::turbo
     turbo::log_internal_test_helpers
     GTest::gtest_main
 )
@@ -764,11 +169,7 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::base
-    turbo::log
-    turbo::log_entry
-    turbo::log_globals
-    turbo::log_severity
+    turbo::turbo
     turbo::log_internal_test_actions
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
@@ -787,17 +188,8 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::log_entry
-    turbo::log_internal_append_truncated
-    turbo::log_internal_format
-    turbo::log_internal_globals
     turbo::log_internal_test_helpers
-    turbo::log_severity
-    turbo::span
-    turbo::strings
-    turbo::time
+    turbo::turbo
     GTest::gmock
     GTest::gtest_main
 )
@@ -812,18 +204,10 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::log
-    turbo::log_flags
-    turbo::log_globals
-    turbo::log_internal_flags
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
-    turbo::log_severity
-    turbo::flags
-    turbo::flags_reflection
     turbo::scoped_mock_log
-    turbo::strings
+    turbo::turbo
     GTest::gmock
     GTest::gtest_main
 )
@@ -838,12 +222,8 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::log
-    turbo::log_globals
-    turbo::log_internal_globals
+    turbo::turbo
     turbo::log_internal_test_helpers
-    turbo::log_severity
     turbo::scoped_mock_log
     GTest::gtest_main
 )
@@ -858,13 +238,10 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::check
-    turbo::log
+    turbo::turbo
     turbo::log_internal_test_matchers
-    turbo::optional
+    turbo::log_internal_test_helpers
     turbo::scoped_mock_log
-    turbo::str_format
-    turbo::strings
     GTest::gmock
     GTest::gtest_main
 )
@@ -879,9 +256,7 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::log
-    turbo::log_severity
+    turbo::turbo
     turbo::scoped_mock_log
     GTest::gmock
     GTest::gtest_main
@@ -897,17 +272,11 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::log
+    turbo::turbo
     turbo::log_internal_test_actions
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
-    turbo::log_sink
-    turbo::log_sink_registry
-    turbo::log_severity
-    turbo::raw_logging_internal
     turbo::scoped_mock_log
-    turbo::strings
     GTest::gtest_main
 )
 
@@ -921,16 +290,11 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::base
-    turbo::core_headers
-    turbo::log
+    turbo::turbo
     turbo::log_internal_test_actions
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
-    turbo::log_streamer
-    turbo::log_severity
     turbo::scoped_mock_log
-    turbo::strings
     GTest::gtest_main
 )
 
@@ -944,14 +308,11 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::log
+    turbo::turbo
     turbo::log_internal_test_actions
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
-    turbo::log_sink
     turbo::scoped_mock_log
-    turbo::strings
-    turbo::time
     GTest::gmock
     GTest::gtest_main
 )
@@ -966,18 +327,10 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::log
-    turbo::log_globals
-    turbo::log_internal_globals
+    turbo::turbo
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
-    turbo::log_severity
-    turbo::memory
     turbo::scoped_mock_log
-    turbo::strings
-    turbo::synchronization
-    GTest::gmock
     GTest::gtest_main
 )
 
@@ -991,11 +344,8 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::log
-    turbo::log_globals
+    turbo::turbo
     turbo::log_internal_test_helpers
-    turbo::log_severity
     GTest::gmock
     GTest::gtest_main
 )
@@ -1010,13 +360,8 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::check
-    turbo::flags_program_name
-    turbo::log
+    turbo::turbo
     turbo::log_internal_test_helpers
-    turbo::strerror
-    turbo::strings
-    turbo::str_format
     GTest::gmock
     GTest::gtest_main
 )
@@ -1031,11 +376,9 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::core_headers
-    turbo::log
+    turbo::turbo
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
-    turbo::log_structured
     turbo::scoped_mock_log
     GTest::gmock
     GTest::gtest_main

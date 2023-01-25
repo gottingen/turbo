@@ -14,88 +14,6 @@
 # limitations under the License.
 #
 
-turbo_cc_library(
-  NAME
-    strings
-  HDRS
-    "ascii.h"
-    "charconv.h"
-    "escaping.h"
-    "internal/damerau_levenshtein_distance.h"
-    "internal/string_constant.h"
-    "internal/has_turbo_stringify.h"
-    "match.h"
-    "numbers.h"
-    "str_cat.h"
-    "str_join.h"
-    "str_replace.h"
-    "str_split.h"
-    "string_view.h"
-    "strip.h"
-    "substitute.h"
-  SRCS
-    "ascii.cc"
-    "charconv.cc"
-    "escaping.cc"
-    "internal/charconv_bigint.cc"
-    "internal/charconv_bigint.h"
-    "internal/charconv_parse.cc"
-    "internal/charconv_parse.h"
-    "internal/damerau_levenshtein_distance.cc"
-    "internal/memutil.cc"
-    "internal/memutil.h"
-    "internal/stringify_sink.h"
-    "internal/stringify_sink.cc"
-    "internal/stl_type_traits.h"
-    "internal/str_join_internal.h"
-    "internal/str_split_internal.h"
-    "match.cc"
-    "numbers.cc"
-    "str_cat.cc"
-    "str_replace.cc"
-    "str_split.cc"
-    "string_view.cc"
-    "substitute.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::strings_internal
-    turbo::base
-    turbo::bits
-    turbo::config
-    turbo::core_headers
-    turbo::endian
-    turbo::int128
-    turbo::memory
-    turbo::raw_logging_internal
-    turbo::throw_delegate
-    turbo::type_traits
-  PUBLIC
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    strings_internal
-  HDRS
-    "internal/char_map.h"
-    "internal/escaping.cc"
-    "internal/escaping.h"
-    "internal/ostringstream.h"
-    "internal/resize_uninitialized.h"
-    "internal/utf8.h"
-  SRCS
-    "internal/ostringstream.cc"
-    "internal/utf8.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::endian
-    turbo::raw_logging_internal
-    turbo::type_traits
-)
 
 turbo_cc_test(
   NAME
@@ -105,8 +23,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::base
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -118,9 +35,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::core_headers
-    turbo::fixed_array
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -132,8 +47,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -145,8 +59,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::base
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -159,8 +72,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -172,9 +84,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings_internal
-    turbo::base
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -186,8 +96,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::type_traits
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -199,10 +108,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::config
-    turbo::core_headers
-    turbo::dynamic_annotations
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -214,8 +120,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -227,7 +132,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -239,12 +144,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::core_headers
-    turbo::dynamic_annotations
-    turbo::btree
-    turbo::flat_hash_map
-    turbo::node_hash_map
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -256,7 +156,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -269,9 +169,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::core_headers
-    turbo::type_traits
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -283,10 +181,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::base
-    turbo::core_headers
-    turbo::memory
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -298,9 +193,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::str_format
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -313,14 +206,8 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::core_headers
     turbo::pow10_helper
-    turbo::config
-    turbo::raw_logging_internal
-    turbo::random_random
-    turbo::random_distributions
-    turbo::strings_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -332,8 +219,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::base
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -345,7 +231,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -357,8 +243,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::str_format
+    turbo::turbo
     turbo::pow10_helper
     GTest::gmock_main
 )
@@ -372,9 +257,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::config
-    turbo::raw_logging_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -388,56 +271,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::config
+    turbo::turbo
     GTest::gmock_main
 )
 
-turbo_cc_library(
-  NAME
-    str_format
-  HDRS
-    "str_format.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::str_format_internal
-  PUBLIC
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    str_format_internal
-  HDRS
-    "internal/str_format/arg.h"
-    "internal/str_format/bind.h"
-    "internal/str_format/checker.h"
-    "internal/str_format/constexpr_parser.h"
-    "internal/str_format/extension.h"
-    "internal/str_format/float_conversion.h"
-    "internal/str_format/output.h"
-    "internal/str_format/parser.h"
-  SRCS
-    "internal/str_format/arg.cc"
-    "internal/str_format/bind.cc"
-    "internal/str_format/extension.cc"
-    "internal/str_format/float_conversion.cc"
-    "internal/str_format/output.cc"
-    "internal/str_format/parser.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::bits
-    turbo::strings
-    turbo::config
-    turbo::core_headers
-    turbo::numeric_representation
-    turbo::type_traits
-    turbo::utility
-    turbo::int128
-    turbo::span
-)
 
 turbo_cc_test(
   NAME
@@ -447,10 +284,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::str_format
-    turbo::cord
-    turbo::strings
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -462,9 +296,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::str_format
-    turbo::str_format_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -476,8 +308,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::str_format
-    turbo::str_format_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -489,7 +320,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::str_format_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -501,7 +332,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::str_format
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -513,11 +344,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::strings
-    turbo::str_format_internal
-    turbo::core_headers
-    turbo::raw_logging_internal
-    turbo::int128
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -529,8 +356,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::str_format_internal
-    turbo::cord
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -542,8 +368,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::str_format_internal
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -558,7 +383,7 @@ turbo_cc_library(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
+    turbo::turbo
   TESTONLY
 )
 
@@ -571,61 +396,11 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::pow10_helper
-    turbo::str_format
+    turbo::turbo
     GTest::gmock_main
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cord_internal
-  HDRS
-    "internal/cord_data_edge.h"
-    "internal/cord_internal.h"
-    "internal/cord_rep_btree.h"
-    "internal/cord_rep_btree_navigator.h"
-    "internal/cord_rep_btree_reader.h"
-    "internal/cord_rep_crc.h"
-    "internal/cord_rep_consume.h"
-    "internal/cord_rep_flat.h"
-    "internal/cord_rep_ring.h"
-    "internal/cord_rep_ring_reader.h"
-  SRCS
-    "internal/cord_internal.cc"
-    "internal/cord_rep_btree.cc"
-    "internal/cord_rep_btree_navigator.cc"
-    "internal/cord_rep_btree_reader.cc"
-    "internal/cord_rep_crc.cc"
-    "internal/cord_rep_consume.cc"
-    "internal/cord_rep_ring.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base_internal
-    turbo::compressed_tuple
-    turbo::config
-    turbo::core_headers
-    turbo::crc_cord_state
-    turbo::endian
-    turbo::inlined_vector
-    turbo::layout
-    turbo::raw_logging_internal
-    turbo::strings
-    turbo::throw_delegate
-    turbo::type_traits
-)
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_update_tracker
-  HDRS
-    "internal/cordz_update_tracker.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-)
 
 turbo_cc_test(
   NAME
@@ -635,29 +410,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
-    turbo::cordz_update_tracker
-    turbo::core_headers
-    turbo::synchronization
+    turbo::turbo
     GTest::gmock_main
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_functions
-  HDRS
-    "internal/cordz_functions.h"
-  SRCS
-    "internal/cordz_functions.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::exponential_biased
-    turbo::raw_logging_internal
-)
 
 turbo_cc_test(
   NAME
@@ -665,43 +421,11 @@ turbo_cc_test(
   SRCS
     "internal/cordz_functions_test.cc"
   DEPS
-    turbo::config
-    turbo::cordz_functions
-    turbo::cordz_test_helpers
+    turbo::turbo
     GTest::gmock_main
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_statistics
-  HDRS
-    "internal/cordz_statistics.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::cordz_update_tracker
-    turbo::synchronization
-)
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_handle
-  HDRS
-    "internal/cordz_handle.h"
-  SRCS
-    "internal/cordz_handle.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::raw_logging_internal
-    turbo::synchronization
-)
 
 turbo_cc_test(
   NAME
@@ -709,41 +433,8 @@ turbo_cc_test(
   SRCS
     "internal/cordz_handle_test.cc"
   DEPS
-    turbo::config
-    turbo::cordz_handle
-    turbo::cordz_test_helpers
-    turbo::memory
-    turbo::random_random
-    turbo::random_distributions
-    turbo::synchronization
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_info
-  HDRS
-    "internal/cordz_info.h"
-  SRCS
-    "internal/cordz_info.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::cord_internal
-    turbo::cordz_functions
-    turbo::cordz_handle
-    turbo::cordz_statistics
-    turbo::cordz_update_tracker
-    turbo::core_headers
-    turbo::inlined_vector
-    turbo::span
-    turbo::raw_logging_internal
-    turbo::stacktrace
-    turbo::synchronization
 )
 
 turbo_cc_test(
@@ -754,17 +445,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
-    turbo::cord_internal
-    turbo::cordz_test_helpers
-    turbo::cordz_handle
-    turbo::cordz_info
-    turbo::cordz_statistics
-    turbo::cordz_test_helpers
-    turbo::cordz_update_tracker
-    turbo::span
-    turbo::stacktrace
-    turbo::symbolize
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -776,33 +457,8 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
-    turbo::cord
-    turbo::cord_internal
-    turbo::cordz_info
-    turbo::cordz_sample_token
-    turbo::cordz_statistics
-    turbo::cordz_update_scope
-    turbo::cordz_update_tracker
-    turbo::crc_cord_state
-    turbo::thread_pool
+    turbo::turbo
     GTest::gmock_main
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_sample_token
-  HDRS
-    "internal/cordz_sample_token.h"
-  SRCS
-    "internal/cordz_sample_token.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::cordz_handle
-    turbo::cordz_info
 )
 
 turbo_cc_test(
@@ -813,36 +469,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
-    turbo::cord_internal
-    turbo::cordz_handle
-    turbo::cordz_info
-    turbo::cordz_info
-    turbo::cordz_sample_token
-    turbo::cordz_test_helpers
-    turbo::memory
-    turbo::random_random
-    turbo::synchronization
-    turbo::thread_pool
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_update_scope
-  HDRS
-    "internal/cordz_update_scope.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::cord_internal
-    turbo::cordz_info
-    turbo::cordz_update_tracker
-    turbo::core_headers
-)
 
 turbo_cc_test(
   NAME
@@ -852,103 +482,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
-    turbo::cord_internal
-    turbo::cordz_info
-    turbo::cordz_test_helpers
-    turbo::cordz_update_scope
-    turbo::cordz_update_tracker
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )
 
-turbo_cc_library(
-  NAME
-    cord
-  HDRS
-    "cord.h"
-    "cord_buffer.h"
-  SRCS
-    "cord.cc"
-    "cord_analysis.cc"
-    "cord_analysis.h"
-    "cord_buffer.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::cord_internal
-    turbo::cordz_functions
-    turbo::cordz_info
-    turbo::cordz_update_scope
-    turbo::cordz_update_tracker
-    turbo::core_headers
-    turbo::crc_cord_state
-    turbo::endian
-    turbo::fixed_array
-    turbo::function_ref
-    turbo::inlined_vector
-    turbo::optional
-    turbo::raw_logging_internal
-    turbo::span
-    turbo::strings
-    turbo::type_traits
-  PUBLIC
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cord_rep_test_util
-  HDRS
-    "internal/cord_rep_test_util.h"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::config
-    turbo::cord_internal
-    turbo::raw_logging_internal
-    turbo::strings
-  TESTONLY
-)
-
-turbo_cc_library(
-  NAME
-    cord_test_helpers
-  HDRS
-    "cord_test_helpers.h"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::config
-    turbo::cord
-    turbo::cord_internal
-    turbo::strings
-  TESTONLY
-  PUBLIC
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cordz_test_helpers
-  HDRS
-    "cordz_test_helpers.h"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::config
-    turbo::cord
-    turbo::cord_internal
-    turbo::cordz_info
-    turbo::cordz_sample_token
-    turbo::cordz_statistics
-    turbo::cordz_update_tracker
-    turbo::core_headers
-    turbo::strings
-  TESTONLY
-)
 
 turbo_cc_test(
   NAME
@@ -958,19 +495,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::cord
-    turbo::str_format
-    turbo::strings
-    turbo::base
-    turbo::config
-    turbo::cord_test_helpers
-    turbo::cordz_test_helpers
-    turbo::core_headers
-    turbo::endian
-    turbo::hash
-    turbo::random_random
-    turbo::raw_logging_internal
-    turbo::fixed_array
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -982,12 +507,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::cord_internal
-    turbo::cord_rep_test_util
-    turbo::core_headers
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -999,14 +519,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::cleanup
-    turbo::config
-    turbo::cord_internal
-    turbo::cord_rep_test_util
-    turbo::core_headers
-    turbo::raw_logging_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -1018,13 +531,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::cord_internal
-    turbo::cord_rep_test_util
-    turbo::core_headers
-    turbo::raw_logging_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -1036,13 +543,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::cord_internal
-    turbo::cord_rep_test_util
-    turbo::core_headers
-    turbo::raw_logging_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -1054,10 +555,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
-    turbo::cord_internal
-    turbo::cord_rep_test_util
-    turbo::crc_cord_state
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -1069,12 +567,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::cord_internal
-    turbo::core_headers
-    turbo::raw_logging_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -1086,10 +579,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::cord_internal
-    turbo::core_headers
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -1101,18 +591,6 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::cord
-    turbo::cord_test_helpers
-    turbo::cordz_test_helpers
-    turbo::cordz_functions
-    turbo::cordz_info
-    turbo::cordz_sample_token
-    turbo::cordz_statistics
-    turbo::cordz_update_tracker
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::raw_logging_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )

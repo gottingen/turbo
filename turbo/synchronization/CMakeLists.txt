@@ -14,79 +14,6 @@
 # limitations under the License.
 #
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    graphcycles_internal
-  HDRS
-    "internal/graphcycles.h"
-  SRCS
-    "internal/graphcycles.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::base_internal
-    turbo::config
-    turbo::core_headers
-    turbo::malloc_internal
-    turbo::raw_logging_internal
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    kernel_timeout_internal
-  HDRS
-    "internal/kernel_timeout.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::core_headers
-    turbo::raw_logging_internal
-    turbo::time
-)
-
-turbo_cc_library(
-  NAME
-    synchronization
-  HDRS
-    "barrier.h"
-    "blocking_counter.h"
-    "internal/create_thread_identity.h"
-    "internal/futex.h"
-    "internal/per_thread_sem.h"
-    "internal/waiter.h"
-    "mutex.h"
-    "notification.h"
-  SRCS
-    "barrier.cc"
-    "blocking_counter.cc"
-    "internal/create_thread_identity.cc"
-    "internal/per_thread_sem.cc"
-    "internal/waiter.cc"
-    "notification.cc"
-    "mutex.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::graphcycles_internal
-    turbo::kernel_timeout_internal
-    turbo::atomic_hook
-    turbo::base
-    turbo::base_internal
-    turbo::config
-    turbo::core_headers
-    turbo::dynamic_annotations
-    turbo::malloc_internal
-    turbo::raw_logging_internal
-    turbo::stacktrace
-    turbo::symbolize
-    turbo::time
-    Threads::Threads
-  PUBLIC
-)
-
 turbo_cc_test(
   NAME
     barrier_test
@@ -95,8 +22,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::synchronization
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -108,8 +34,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::synchronization
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -121,26 +46,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::graphcycles_internal
-    turbo::core_headers
-    turbo::raw_logging_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    thread_pool
-  HDRS
-    "internal/thread_pool.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::any_invocable
-    turbo::core_headers
-    turbo::synchronization
-  TESTONLY
-)
 
 turbo_cc_test(
   NAME
@@ -150,14 +59,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::synchronization
-    turbo::thread_pool
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::memory
-    turbo::raw_logging_internal
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -169,9 +71,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::synchronization
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -183,8 +83,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::synchronization
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -197,11 +96,7 @@ turbo_cc_library(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::synchronization
-    turbo::base
-    turbo::config
-    turbo::strings
-    turbo::time
+    turbo::turbo
     GTest::gmock
   TESTONLY
 )
@@ -215,9 +110,7 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::per_thread_sem_test_common
-    turbo::synchronization
-    turbo::strings
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -229,7 +122,5 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::synchronization
-    turbo::core_headers
-    turbo::raw_logging_internal
+    turbo::turbo
 )

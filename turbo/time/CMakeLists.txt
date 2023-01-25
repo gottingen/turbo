@@ -14,78 +14,6 @@
 # limitations under the License.
 #
 
-turbo_cc_library(
-  NAME
-    time
-  HDRS
-    "civil_time.h"
-    "clock.h"
-    "time.h"
-  SRCS
-    "civil_time.cc"
-    "clock.cc"
-    "duration.cc"
-    "format.cc"
-    "internal/get_current_time_chrono.inc"
-    "internal/get_current_time_posix.inc"
-    "time.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::civil_time
-    turbo::core_headers
-    turbo::int128
-    turbo::raw_logging_internal
-    turbo::strings
-    turbo::time_zone
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    civil_time
-  HDRS
-    "internal/cctz/include/cctz/civil_time.h"
-    "internal/cctz/include/cctz/civil_time_detail.h"
-  SRCS
-  "internal/cctz/src/civil_time_detail.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-)
-
-if(APPLE)
-  find_library(CoreFoundation CoreFoundation)
-endif()
-
-turbo_cc_library(
-  NAME
-    time_zone
-  HDRS
-    "internal/cctz/include/cctz/time_zone.h"
-    "internal/cctz/include/cctz/zone_info_source.h"
-  SRCS
-    "internal/cctz/src/time_zone_fixed.cc"
-    "internal/cctz/src/time_zone_fixed.h"
-    "internal/cctz/src/time_zone_format.cc"
-    "internal/cctz/src/time_zone_if.cc"
-    "internal/cctz/src/time_zone_if.h"
-    "internal/cctz/src/time_zone_impl.cc"
-    "internal/cctz/src/time_zone_impl.h"
-    "internal/cctz/src/time_zone_info.cc"
-    "internal/cctz/src/time_zone_info.h"
-    "internal/cctz/src/time_zone_libc.cc"
-    "internal/cctz/src/time_zone_libc.h"
-    "internal/cctz/src/time_zone_lookup.cc"
-    "internal/cctz/src/time_zone_posix.cc"
-    "internal/cctz/src/time_zone_posix.h"
-    "internal/cctz/src/tzfile.h"
-    "internal/cctz/src/zone_info_source.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    $<$<PLATFORM_ID:Darwin>:${CoreFoundation}>
-)
 
 # Internal-only target, do not depend on directly.
 turbo_cc_library(
@@ -98,10 +26,7 @@ turbo_cc_library(
   COPTS
     ${TURBO_DEFAULT_COPTS}
   DEPS
-    turbo::time
-    turbo::config
-    turbo::raw_logging_internal
-    turbo::time_zone
+    turbo::turbo
   TESTONLY
 )
 
@@ -119,10 +44,7 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::time_internal_test_util
-    turbo::time
-    turbo::config
-    turbo::core_headers
-    turbo::time_zone
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -134,7 +56,6 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::flags
-    turbo::flags_reflection
+    turbo::turbo
     GTest::gmock_main
 )

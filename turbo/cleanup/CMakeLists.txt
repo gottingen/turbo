@@ -13,33 +13,7 @@
 # limitations under the License.
 
 # Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    cleanup_internal
-  HDRS
-    "internal/cleanup.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base_internal
-    turbo::core_headers
-    turbo::utility
-  PUBLIC
-)
 
-turbo_cc_library(
-  NAME
-    cleanup
-  HDRS
-    "cleanup.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::cleanup_internal
-    turbo::config
-    turbo::core_headers
-  PUBLIC
-)
 
 turbo_cc_test(
   NAME
@@ -49,8 +23,6 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::cleanup
-    turbo::config
-    turbo::utility
+    turbo::turbo
     GTest::gmock_main
 )

@@ -14,188 +14,7 @@
 # limitations under the License.
 #
 
-find_library(LIBRT rt)
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    atomic_hook
-  HDRS
-    "internal/atomic_hook.h"
-  DEPS
-    turbo::config
-    turbo::core_headers
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    errno_saver
-  HDRS
-    "internal/errno_saver.h"
-  DEPS
-    turbo::config
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-)
-
-
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    spinlock_wait
-  HDRS
-    "internal/spinlock_wait.h"
-  SRCS
-    "internal/spinlock_akaros.inc"
-    "internal/spinlock_linux.inc"
-    "internal/spinlock_posix.inc"
-    "internal/spinlock_wait.cc"
-    "internal/spinlock_win32.inc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base_internal
-    turbo::core_headers
-    turbo::errno_saver
-)
-
-turbo_cc_library(
-  NAME
-    config
-  HDRS
-    "config.h"
-    "options.h"
-    "policy_checks.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    dynamic_annotations
-  HDRS
-    "dynamic_annotations.h"
-  SRCS
-    "internal/dynamic_annotations.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
-    core_headers
-  HDRS
-    "attributes.h"
-    "const_init.h"
-    "macros.h"
-    "optimization.h"
-    "port.h"
-    "thread_annotations.h"
-    "internal/thread_annotations.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-  PUBLIC
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    malloc_internal
-  HDRS
-    "internal/direct_mmap.h"
-    "internal/low_level_alloc.h"
-  SRCS
-    "internal/low_level_alloc.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::base_internal
-    turbo::config
-    turbo::core_headers
-    turbo::dynamic_annotations
-    turbo::raw_logging_internal
-    Threads::Threads
-)
-
-turbo_cc_library(
-  NAME
-    base
-  HDRS
-    "call_once.h"
-    "../base/casts.h"
-    "internal/cycleclock.h"
-    "internal/cycleclock_config.h"
-    "internal/low_level_scheduling.h"
-    "internal/per_thread_tls.h"
-    "internal/spinlock.h"
-    "internal/sysinfo.h"
-    "internal/thread_identity.h"
-    "internal/tsan_mutex_interface.h"
-    "internal/unscaledcycleclock.h"
-    "internal/unscaledcycleclock_config.h"
-  SRCS
-    "internal/cycleclock.cc"
-    "internal/spinlock.cc"
-    "internal/sysinfo.cc"
-    "internal/thread_identity.cc"
-    "internal/unscaledcycleclock.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-    $<$<BOOL:${LIBRT}>:-lrt>
-    $<$<BOOL:${MINGW}>:-ladvapi32>
-  DEPS
-    turbo::atomic_hook
-    turbo::base_internal
-    turbo::config
-    turbo::core_headers
-    turbo::dynamic_annotations
-    turbo::log_severity
-    turbo::raw_logging_internal
-    turbo::spinlock_wait
-    turbo::type_traits
-    Threads::Threads
-  PUBLIC
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    throw_delegate
-  HDRS
-    "internal/throw_delegate.h"
-  SRCS
-    "internal/throw_delegate.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::raw_logging_internal
-)
-
-
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    pretty_function
-  HDRS
-    "internal/pretty_function.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-)
 
 
 # Internal-only target, do not depend on directly.
@@ -207,8 +26,7 @@ turbo_cc_library(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::atomic_hook
-    turbo::core_headers
+    turbo::turbo
   TESTONLY
 )
 
@@ -221,8 +39,7 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::atomic_hook_test_helper
-    turbo::atomic_hook
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock
     GTest::gtest_main
 )
@@ -236,8 +53,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::errno_saver
-    turbo::strerror
+    turbo::turbo
     GTest::gmock
     GTest::gtest_main
 )
@@ -250,9 +66,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::throw_delegate
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -268,11 +82,7 @@ turbo_cc_library(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::base_internal
-    turbo::core_headers
-    turbo::synchronization
+    turbo::turbo
     GTest::gtest
   TESTONLY
 )
@@ -286,29 +96,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::base_internal
-    turbo::config
-    turbo::core_headers
-    turbo::synchronization
+    turbo::turbo
     GTest::gtest_main
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    endian
-  HDRS
-    "internal/endian.h"
-    "internal/unaligned_access.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::config
-    turbo::core_headers
-  PUBLIC
-)
 
 turbo_cc_test(
   NAME
@@ -318,9 +109,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::config
-    turbo::endian
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -332,8 +121,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::config
-    turbo::synchronization
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -345,9 +133,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::core_headers
-    turbo::synchronization
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -360,8 +146,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::synchronization
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -373,8 +158,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::malloc_internal
-    turbo::node_hash_map
+    turbo::turbo
     Threads::Threads
 )
 
@@ -386,26 +170,9 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
-    turbo::core_headers
-    turbo::synchronization
+    turbo::turbo
     Threads::Threads
     GTest::gtest_main
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    scoped_set_env
-  SRCS
-    "internal/scoped_set_env.cc"
-  HDRS
-    "internal/scoped_set_env.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::raw_logging_internal
 )
 
 turbo_cc_test(
@@ -416,7 +183,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::scoped_set_env
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -428,25 +195,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::base
+    turbo::turbo
 )
 
 
-
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    prefetch
-  HDRS
-    "internal/prefetch.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-)
 
 turbo_cc_test(
   NAME
@@ -456,7 +208,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::prefetch
+    turbo::turbo
     GTest::gtest_main
 )
 
@@ -468,7 +220,6 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::core_headers
-    turbo::optional
+    turbo::turbo
     GTest::gtest_main
 )

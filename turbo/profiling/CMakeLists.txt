@@ -12,17 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-turbo_cc_library(
-  NAME
-    sample_recorder
-  HDRS
-    "internal/sample_recorder.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::synchronization
-)
 
 turbo_cc_test(
   NAME
@@ -32,23 +21,8 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::sample_recorder
-    turbo::time
+    turbo::turbo
     GTest::gmock_main
-)
-
-turbo_cc_library(
-  NAME
-    exponential_biased
-  SRCS
-    "internal/exponential_biased.cc"
-  HDRS
-    "internal/exponential_biased.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
 )
 
 turbo_cc_test(
@@ -59,24 +33,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::exponential_biased
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )
 
-turbo_cc_library(
-  NAME
-    periodic_sampler
-  SRCS
-    "internal/periodic_sampler.cc"
-  HDRS
-    "internal/periodic_sampler.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::core_headers
-    turbo::exponential_biased
-)
 
 turbo_cc_test(
   NAME
@@ -86,8 +46,7 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::core_headers
-    turbo::periodic_sampler
+    turbo::turbo
     GTest::gmock_main
 )
 
