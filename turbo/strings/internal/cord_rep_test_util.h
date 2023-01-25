@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_flat.h"

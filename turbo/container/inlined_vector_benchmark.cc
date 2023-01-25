@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/macros.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/strings/str_cat.h"

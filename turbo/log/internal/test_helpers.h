@@ -23,7 +23,7 @@
 
 #include "gtest/gtest.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/log/globals.h"
 
 namespace turbo {

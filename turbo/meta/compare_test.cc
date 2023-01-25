@@ -15,7 +15,7 @@
 #include "compare.h"
 
 #include "gtest/gtest.h"
-#include "turbo/platform/casts.h"
+#include "turbo/base/casts.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

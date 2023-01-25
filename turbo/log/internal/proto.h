@@ -28,7 +28,7 @@
 #include <limits>
 
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/casts.h"
+#include "turbo/base/casts.h"
 #include "turbo/platform/config.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/meta/span.h"

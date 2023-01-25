@@ -41,7 +41,7 @@
 #include "turbo/platform/config.h"
 #include "turbo/platform/internal/cycleclock.h"
 #include "turbo/platform/internal/prefetch.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/container/flat_hash_set.h"
 #include "turbo/container/internal/container_memory.h"

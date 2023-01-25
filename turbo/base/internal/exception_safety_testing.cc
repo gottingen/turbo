@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/exception_safety_testing.h"
+#include "exception_safety_testing.h"
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 

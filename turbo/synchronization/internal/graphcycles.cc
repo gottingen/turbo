@@ -38,8 +38,8 @@
 #include <algorithm>
 #include <array>
 #include <limits>
-#include "turbo/platform/internal/hide_ptr.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/hide_ptr.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/spinlock.h"
 
 // Do not use STL.   This module does not use standard memory allocation.

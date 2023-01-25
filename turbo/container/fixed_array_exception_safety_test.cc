@@ -20,7 +20,7 @@
 #include <initializer_list>
 
 #include "gtest/gtest.h"
-#include "turbo/platform/internal/exception_safety_testing.h"
+#include "turbo/base/internal/exception_safety_testing.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

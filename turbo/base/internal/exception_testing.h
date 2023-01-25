@@ -17,7 +17,7 @@
 #ifndef TURBO_BASE_INTERNAL_EXCEPTION_TESTING_H_
 #define TURBO_BASE_INTERNAL_EXCEPTION_TESTING_H_
 
-#include "gtest/gtest.h"
+#include "cmake-build-debug/googletest-src/googletest/include/gtest/gtest.h"
 #include "turbo/platform/config.h"
 
 // TURBO_BASE_INTERNAL_EXPECT_FAIL tests either for a specified thrown exception

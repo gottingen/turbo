@@ -36,7 +36,7 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/internal/errno_saver.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/log/internal/nullguard.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"

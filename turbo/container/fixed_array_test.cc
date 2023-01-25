@@ -28,7 +28,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/exception_testing.h"
+#include "turbo/base/internal/exception_testing.h"
 #include "turbo/platform/options.h"
 #include "turbo/container/internal/counting_allocator.h"
 #include "turbo/hash/hash_testing.h"

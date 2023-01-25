@@ -67,10 +67,10 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "turbo/platform/casts.h"
+#include "turbo/base/casts.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/low_level_alloc.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/port.h"
 #include "turbo/debugging/internal/demangle.h"

@@ -18,7 +18,7 @@
 #include <cstdint>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/inline_variable.h"
+#include "turbo/base/internal/inline_variable.h"
 #include "turbo/platform/internal/unscaledcycleclock_config.h"
 
 namespace turbo {

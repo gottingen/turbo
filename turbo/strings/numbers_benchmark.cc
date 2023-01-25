@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/random/distributions.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/numbers.h"

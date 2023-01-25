@@ -23,7 +23,7 @@
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/flags/flag.h"
 #include "turbo/flags/marshalling.h"
 #include "turbo/log/globals.h"

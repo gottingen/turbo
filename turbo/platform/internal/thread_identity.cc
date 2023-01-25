@@ -25,7 +25,7 @@
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/call_once.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/spinlock.h"
 
 namespace turbo {

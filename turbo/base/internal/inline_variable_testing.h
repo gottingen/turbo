@@ -15,7 +15,7 @@
 #ifndef TURBO_BASE_INTERNAL_INLINE_VARIABLE_TESTING_H_
 #define TURBO_BASE_INTERNAL_INLINE_VARIABLE_TESTING_H_
 
-#include "turbo/platform/internal/inline_variable.h"
+#include "inline_variable.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -14,7 +14,7 @@
 
 #include "turbo/random/internal/randen.h"
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/random/internal/randen_detect.h"
 
 // RANDen = RANDom generator or beetroots in Swiss High German.

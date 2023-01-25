@@ -22,7 +22,7 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/internal/atomic_hook.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/hash/hash.h"
 #include "turbo/strings/string_view.h"
 

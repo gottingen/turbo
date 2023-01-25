@@ -33,7 +33,7 @@
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

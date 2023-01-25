@@ -18,7 +18,7 @@
 #include <cstring>
 
 #include "gtest/gtest.h"
-#include "turbo/platform/casts.h"
+#include "turbo/base/casts.h"
 #include "turbo/platform/macros.h"
 
 namespace turbo {

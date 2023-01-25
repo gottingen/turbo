@@ -20,7 +20,7 @@
 #ifndef TURBO_LOG_INTERNAL_STRIP_H_
 #define TURBO_LOG_INTERNAL_STRIP_H_
 
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/log/internal/log_message.h"
 #include "turbo/log/internal/nullstream.h"
 

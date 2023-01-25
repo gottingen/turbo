@@ -41,36 +41,7 @@ turbo_cc_library(
     ${TURBO_DEFAULT_COPTS}
 )
 
-turbo_cc_library(
-  NAME
-    log_severity
-  HDRS
-    "log_severity.h"
-  SRCS
-    "log_severity.cc"
-  DEPS
-    turbo::core_headers
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-)
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    raw_logging_internal
-  HDRS
-    "internal/raw_logging.h"
-  SRCS
-    "internal/raw_logging.cc"
-  DEPS
-    turbo::atomic_hook
-    turbo::config
-    turbo::core_headers
-    turbo::errno_saver
-    turbo::log_severity
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-)
 
 # Internal-only target, do not depend on directly.
 turbo_cc_library(
@@ -157,29 +128,12 @@ turbo_cc_library(
     Threads::Threads
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    base_internal
-  HDRS
-    "internal/hide_ptr.h"
-    "internal/identity.h"
-    "internal/inline_variable.h"
-    "internal/invoke.h"
-    "internal/scheduling_mode.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::type_traits
-)
-
 turbo_cc_library(
   NAME
     base
   HDRS
     "call_once.h"
-    "casts.h"
+    "../base/casts.h"
     "internal/cycleclock.h"
     "internal/cycleclock_config.h"
     "internal/low_level_scheduling.h"
@@ -231,19 +185,7 @@ turbo_cc_library(
     turbo::raw_logging_internal
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    exception_testing
-  HDRS
-    "internal/exception_testing.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    GTest::gtest
-  TESTONLY
-)
+
 
 # Internal-only target, do not depend on directly.
 turbo_cc_library(
@@ -255,39 +197,6 @@ turbo_cc_library(
     ${TURBO_DEFAULT_COPTS}
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    exception_safety_testing
-  HDRS
-    "internal/exception_safety_testing.h"
-  SRCS
-    "internal/exception_safety_testing.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::config
-    turbo::pretty_function
-    turbo::memory
-    turbo::meta
-    turbo::strings
-    turbo::utility
-    GTest::gtest
-  TESTONLY
-)
-
-turbo_cc_test(
-  NAME
-    turbo_exception_safety_testing_test
-  SRCS
-    "exception_safety_testing_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::exception_safety_testing
-    turbo::memory
-    GTest::gtest_main
-)
 
 # Internal-only target, do not depend on directly.
 turbo_cc_library(
@@ -318,18 +227,6 @@ turbo_cc_test(
     GTest::gtest_main
 )
 
-turbo_cc_test(
-  NAME
-    bit_cast_test
-  SRCS
-    "bit_cast_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::base
-    turbo::core_headers
-    GTest::gtest_main
-)
 
 turbo_cc_test(
   NAME
@@ -359,35 +256,8 @@ turbo_cc_test(
     GTest::gtest_main
 )
 
-turbo_cc_test(
-  NAME
-    inline_variable_test
-  SRCS
-    "internal/inline_variable_testing.h"
-    "inline_variable_test.cc"
-    "inline_variable_test_a.cc"
-    "inline_variable_test_b.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::base_internal
-    GTest::gtest_main
-)
 
-turbo_cc_test(
-  NAME
-    invoke_test
-  SRCS
-    "invoke_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::base_internal
-    turbo::memory
-    turbo::strings
-    GTest::gmock
-    GTest::gtest_main
-)
+
 
 # Internal-only target, do not depend on directly.
 turbo_cc_library(
@@ -481,18 +351,6 @@ turbo_cc_test(
     GTest::gtest_main
 )
 
-turbo_cc_test(
-  NAME
-    raw_logging_test
-  SRCS
-    "raw_logging_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::raw_logging_internal
-    turbo::strings
-    GTest::gtest_main
-)
 
 turbo_cc_test(
   NAME
@@ -573,19 +431,7 @@ turbo_cc_test(
     turbo::base
 )
 
-turbo_cc_test(
-  NAME
-    log_severity_test
-  SRCS
-    "log_severity_test.cc"
-  DEPS
-    turbo::flags_internal
-    turbo::flags_marshalling
-    turbo::log_severity
-    turbo::strings
-    GTest::gmock
-    GTest::gtest_main
-)
+
 
 # Internal-only target, do not depend on directly.
 turbo_cc_library(
@@ -616,32 +462,6 @@ turbo_cc_test(
     turbo::strerror
     turbo::strings
     GTest::gmock
-    GTest::gtest_main
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    fast_type_id
-  HDRS
-    "internal/fast_type_id.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::config
-)
-
-turbo_cc_test(
-  NAME
-    fast_type_id_test
-  SRCS
-    "internal/fast_type_id_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::fast_type_id
     GTest::gtest_main
 )
 

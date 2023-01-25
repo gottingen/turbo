@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/flags/flag.h"
 #include "turbo/log/check.h"
 #include "turbo/log/globals.h"

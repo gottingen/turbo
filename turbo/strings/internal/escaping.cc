@@ -15,7 +15,7 @@
 #include "turbo/strings/internal/escaping.h"
 
 #include "turbo/platform/internal/endian.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

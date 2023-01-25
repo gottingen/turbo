@@ -29,7 +29,7 @@
 #include "gtest/gtest.h"
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/log/internal/append_truncated.h"
 #include "turbo/log/internal/log_format.h"
 #include "turbo/log/internal/test_helpers.h"

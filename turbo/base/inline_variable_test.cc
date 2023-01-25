@@ -14,8 +14,8 @@
 
 #include <type_traits>
 
-#include "turbo/platform/internal/inline_variable.h"
-#include "turbo/platform/internal/inline_variable_testing.h"
+#include "turbo/base/internal/inline_variable.h"
+#include "turbo/base/internal/inline_variable_testing.h"
 
 #include "gtest/gtest.h"
 

@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/string_view.h"
 
 namespace {

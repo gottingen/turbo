@@ -50,7 +50,7 @@
 #include <new>                   // for placement-new
 
 #include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/spinlock.h"
 
 // MAP_ANONYMOUS

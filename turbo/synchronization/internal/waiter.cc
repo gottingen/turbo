@@ -43,7 +43,7 @@
 #include <new>
 #include <type_traits>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/thread_identity.h"
 #include "turbo/platform/optimization.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"

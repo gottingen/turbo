@@ -18,7 +18,7 @@
 #ifndef TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
 #define TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/platform/macros.h"
 

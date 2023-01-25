@@ -42,7 +42,7 @@
 #include <ctime>
 
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/sysinfo.h"
 #include "turbo/debugging/internal/examine_stack.h"
 #include "turbo/debugging/stacktrace.h"

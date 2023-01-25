@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/invoke.h"
+#include "turbo/base/internal/invoke.h"
 
 #include <functional>
 #include <memory>

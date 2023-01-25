@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "raw_logging.h"
 
 #include <cstdarg>
 #include <cstddef>
@@ -25,7 +25,7 @@
 #include "turbo/platform/config.h"
 #include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/internal/errno_saver.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 
 // We know how to perform low-level writes to stderr in POSIX and Windows.  For
 // these platforms, we define the token TURBO_LOW_LEVEL_WRITE_SUPPORTED.

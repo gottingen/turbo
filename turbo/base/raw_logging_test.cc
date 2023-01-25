@@ -16,7 +16,7 @@
 // Raw logging testing is covered by logging_unittest.cc, which is not as
 // portable as this test.
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 
 #include <tuple>
 

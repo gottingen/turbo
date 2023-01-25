@@ -14,7 +14,7 @@
 
 #include "turbo/random/internal/nanobenchmark.h"
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/numbers.h"
 
 namespace turbo {

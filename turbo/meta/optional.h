@@ -61,7 +61,7 @@ TURBO_NAMESPACE_END
 #include <utility>
 
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/inline_variable.h"
+#include "turbo/base/internal/inline_variable.h"
 #include "turbo/meta/type_traits.h"
 #include "bad_optional_access.h"
 #include "turbo/meta/internal/optional.h"

@@ -25,7 +25,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/internal/str_format/bind.h"
 #include "turbo/strings/match.h"
 #include "turbo/meta/optional.h"

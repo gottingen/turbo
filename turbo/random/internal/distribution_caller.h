@@ -21,7 +21,7 @@
 #include <type_traits>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/fast_type_id.h"
+#include "turbo/base/internal/fast_type_id.h"
 #include "turbo/meta/utility.h"
 
 namespace turbo {

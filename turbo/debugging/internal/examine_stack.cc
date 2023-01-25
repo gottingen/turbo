@@ -34,7 +34,7 @@
 #include <cstdio>
 
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/macros.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/symbolize.h"

@@ -19,7 +19,7 @@
 
 #include "gtest/gtest.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/debugging/internal/stack_consumption.h"
 #include "turbo/memory/memory.h"
 

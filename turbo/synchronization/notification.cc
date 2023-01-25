@@ -16,7 +16,7 @@
 
 #include <atomic>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/synchronization/mutex.h"
 #include "turbo/time/time.h"
 

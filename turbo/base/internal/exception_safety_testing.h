@@ -30,7 +30,7 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "gtest/gtest.h"
+#include "cmake-build-debug/googletest-src/googletest/include/gtest/gtest.h"
 #include "turbo/platform/internal/pretty_function.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"

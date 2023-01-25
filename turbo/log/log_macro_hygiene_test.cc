@@ -16,7 +16,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/log/log.h"
 #include "turbo/log/scoped_mock_log.h"
 

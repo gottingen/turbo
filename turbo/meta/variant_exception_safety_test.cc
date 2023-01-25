@@ -27,7 +27,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/internal/exception_safety_testing.h"
+#include "turbo/base/internal/exception_safety_testing.h"
 #include "turbo/memory/memory.h"
 
 // See comment in turbo/base/config.h

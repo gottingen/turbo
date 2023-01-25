@@ -36,7 +36,7 @@
 #include "turbo/platform/const_init.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/low_level_scheduling.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/platform/internal/tsan_mutex_interface.h"
 #include "turbo/platform/thread_annotations.h"

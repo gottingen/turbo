@@ -30,7 +30,7 @@
 #include <string>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/fast_type_id.h"
+#include "turbo/base/internal/fast_type_id.h"
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/meta/optional.h"

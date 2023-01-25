@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/inline_variable_testing.h"
+#include "turbo/base/internal/inline_variable_testing.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace inline_variable_testing_internal {
 
-const Foo& get_foo_b() { return inline_variable_foo; }
+const Foo& get_foo_a() { return inline_variable_foo; }
 
-const int& get_int_b() { return inline_variable_int; }
+const int& get_int_a() { return inline_variable_int; }
 
 }  // namespace inline_variable_testing_internal
 TURBO_NAMESPACE_END

@@ -23,7 +23,7 @@
 #include <limits>
 #include <memory>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/ascii.h"
 
 namespace turbo {

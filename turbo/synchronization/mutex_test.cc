@@ -32,7 +32,7 @@
 #include "gtest/gtest.h"
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/sysinfo.h"
 #include "turbo/memory/memory.h"
 #include "turbo/synchronization/internal/thread_pool.h"

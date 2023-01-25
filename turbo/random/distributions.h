@@ -52,7 +52,7 @@
 #include <random>
 #include <type_traits>
 
-#include "turbo/platform/internal/inline_variable.h"
+#include "turbo/base/internal/inline_variable.h"
 #include "turbo/random/bernoulli_distribution.h"
 #include "turbo/random/beta_distribution.h"
 #include "turbo/random/exponential_distribution.h"

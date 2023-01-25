@@ -23,7 +23,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/casts.h"
+#include "casts.h"
 #include "turbo/memory/memory.h"
 #include "status.h"
 #include "turbo/strings/string_view.h"

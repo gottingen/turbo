@@ -33,7 +33,7 @@
 #include <bit>  // For std::bit_cast.
 #endif  // defined(__cpp_lib_bit_cast) && __cpp_lib_bit_cast >= 201806L
 
-#include "turbo/platform/internal/identity.h"
+#include "turbo/base/internal/identity.h"
 #include "turbo/platform/macros.h"
 #include "turbo/meta/type_traits.h"
 

@@ -28,7 +28,7 @@
 
 #include "benchmark/benchmark.h"
 #include "turbo/meta/container.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/btree_map.h"
 #include "turbo/container/btree_set.h"
 #include "turbo/container/btree_test.h"

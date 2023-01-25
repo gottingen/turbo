@@ -32,7 +32,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/meta/container.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/macros.h"
 #include "turbo/container/btree_map.h"
 #include "turbo/container/btree_set.h"

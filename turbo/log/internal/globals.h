@@ -23,7 +23,7 @@
 #define TURBO_LOG_INTERNAL_GLOBALS_H_
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 

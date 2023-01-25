@@ -17,7 +17,7 @@
 
 #include <type_traits>
 
-#include "turbo/platform/internal/identity.h"
+#include "identity.h"
 
 // File:
 //   This file define a macro that allows the creation of or emulation of C++17

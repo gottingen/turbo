@@ -65,7 +65,7 @@
 #include <string>
 
 #include "turbo/platform/const_init.h"
-#include "turbo/platform/internal/identity.h"
+#include "turbo/base/internal/identity.h"
 #include "turbo/platform/internal/low_level_alloc.h"
 #include "turbo/platform/internal/thread_identity.h"
 #include "turbo/platform/internal/tsan_mutex_interface.h"

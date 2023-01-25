@@ -14,7 +14,7 @@
 
 #include "turbo/synchronization/barrier.h"
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {

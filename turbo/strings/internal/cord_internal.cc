@@ -17,7 +17,7 @@
 #include <cassert>
 #include <memory>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_crc.h"

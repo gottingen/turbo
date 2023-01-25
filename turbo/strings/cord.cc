@@ -29,8 +29,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "turbo/platform/casts.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/casts.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
 #include "turbo/container/fixed_array.h"

@@ -15,7 +15,7 @@
 // See also //turbo/synchronization:mutex_benchmark for a comparison of SpinLock
 // and Mutex performance under varying levels of contention.
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/synchronization/internal/create_thread_identity.h"

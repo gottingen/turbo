@@ -20,7 +20,7 @@
 
 #include <cstdlib>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

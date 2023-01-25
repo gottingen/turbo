@@ -64,7 +64,7 @@
 #include <utility>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/invoke.h"
+#include "turbo/base/internal/invoke.h"
 #include "turbo/platform/macros.h"
 #include "turbo/platform/optimization.h"
 #include "turbo/meta/type_traits.h"

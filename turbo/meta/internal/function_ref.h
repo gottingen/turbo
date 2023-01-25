@@ -19,7 +19,7 @@
 #include <functional>
 #include <type_traits>
 
-#include "turbo/platform/internal/invoke.h"
+#include "turbo/base/internal/invoke.h"
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {

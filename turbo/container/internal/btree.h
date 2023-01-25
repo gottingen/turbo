@@ -58,7 +58,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/macros.h"
 #include "turbo/container/internal/common.h"
 #include "turbo/container/internal/common_policy_traits.h"

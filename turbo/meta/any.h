@@ -80,7 +80,7 @@ TURBO_NAMESPACE_END
 #include <typeinfo>
 #include <utility>
 
-#include "turbo/platform/internal/fast_type_id.h"
+#include "turbo/base/internal/fast_type_id.h"
 #include "turbo/meta/type_traits.h"
 #include "bad_any_cast.h"
 

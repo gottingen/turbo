@@ -186,7 +186,7 @@
 #include "turbo/platform/config.h"
 #include "turbo/platform/internal/endian.h"
 #include "turbo/platform/internal/prefetch.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/optimization.h"
 #include "turbo/platform/port.h"
 #include "turbo/container/internal/common.h"

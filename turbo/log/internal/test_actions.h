@@ -27,7 +27,7 @@
 #include <string>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/log_severity.h"
+#include "turbo/base/log_severity.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/strings/string_view.h"
 

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/synchronization/mutex.h"
 

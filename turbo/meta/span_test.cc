@@ -26,7 +26,7 @@
 #include "gtest/gtest.h"
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/exception_testing.h"
+#include "turbo/base/internal/exception_testing.h"
 #include "turbo/platform/options.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/container/inlined_vector.h"

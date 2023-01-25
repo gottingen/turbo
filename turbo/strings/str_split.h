@@ -43,7 +43,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/macros.h"
 #include "turbo/strings/internal/str_split_internal.h"
 #include "turbo/strings/string_view.h"

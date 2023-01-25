@@ -18,7 +18,7 @@
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/const_init.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/mutex.h"
 #include "turbo/synchronization/notification.h"

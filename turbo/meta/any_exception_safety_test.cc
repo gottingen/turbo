@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/platform/internal/exception_safety_testing.h"
+#include "turbo/base/internal/exception_safety_testing.h"
 
 using Thrower = testing::ThrowingValue<>;
 using NoThrowMoveThrower =
