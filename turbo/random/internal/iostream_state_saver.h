@@ -21,7 +21,7 @@
 #include <type_traits>
 
 #include "turbo/meta/type_traits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/int128.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

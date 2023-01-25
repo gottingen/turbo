@@ -25,7 +25,7 @@
 #include "turbo/hash/internal/spy_hash_state.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/types/variant.h"
+#include "turbo/meta/variant.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

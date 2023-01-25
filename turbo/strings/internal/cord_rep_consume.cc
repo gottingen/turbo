@@ -18,7 +18,7 @@
 #include <utility>
 
 #include "turbo/container/inlined_vector.h"
-#include "turbo/functional/function_ref.h"
+#include "turbo/meta/function_ref.h"
 #include "turbo/strings/internal/cord_internal.h"
 
 namespace turbo {

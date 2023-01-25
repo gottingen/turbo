@@ -51,3 +51,541 @@ turbo_cc_library(
     turbo::type_traits
   PUBLIC
 )
+
+
+turbo_cc_library(
+        NAME
+        utility
+        HDRS
+        "utility.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::base_internal
+        turbo::config
+        turbo::type_traits
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        utility_test
+        SRCS
+        "utility_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::utility
+        turbo::core_headers
+        turbo::memory
+        turbo::strings
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        any
+        HDRS
+        "any.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::bad_any_cast
+        turbo::config
+        turbo::core_headers
+        turbo::fast_type_id
+        turbo::type_traits
+        turbo::utility
+        PUBLIC
+)
+
+turbo_cc_library(
+        NAME
+        bad_any_cast
+        HDRS
+        "bad_any_cast.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::bad_any_cast_impl
+        turbo::config
+        PUBLIC
+)
+
+# Internal-only target, do not depend on directly.
+turbo_cc_library(
+        NAME
+        bad_any_cast_impl
+        SRCS
+        "bad_any_cast.h"
+        "bad_any_cast.cc"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::config
+        turbo::raw_logging_internal
+)
+
+turbo_cc_test(
+        NAME
+        any_test
+        SRCS
+        "any_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::any
+        turbo::config
+        turbo::exception_testing
+        turbo::raw_logging_internal
+        turbo::test_instance_tracker
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        any_test_noexceptions
+        SRCS
+        "any_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::any
+        turbo::config
+        turbo::exception_testing
+        turbo::raw_logging_internal
+        turbo::test_instance_tracker
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        any_exception_safety_test
+        SRCS
+        "any_exception_safety_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::any
+        turbo::config
+        turbo::exception_safety_testing
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        span
+        HDRS
+        "span.h"
+        SRCS
+        "internal/span.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::algorithm
+        turbo::core_headers
+        turbo::throw_delegate
+        turbo::type_traits
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        span_test
+        SRCS
+        "span_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::span
+        turbo::base
+        turbo::config
+        turbo::core_headers
+        turbo::exception_testing
+        turbo::fixed_array
+        turbo::inlined_vector
+        turbo::hash_testing
+        turbo::strings
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        span_test_noexceptions
+        SRCS
+        "span_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::span
+        turbo::base
+        turbo::config
+        turbo::core_headers
+        turbo::exception_testing
+        turbo::fixed_array
+        turbo::inlined_vector
+        turbo::hash_testing
+        turbo::strings
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        optional
+        HDRS
+        "optional.h"
+        SRCS
+        "internal/optional.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::bad_optional_access
+        turbo::base_internal
+        turbo::config
+        turbo::core_headers
+        turbo::memory
+        turbo::type_traits
+        turbo::utility
+        PUBLIC
+)
+
+turbo_cc_library(
+        NAME
+        bad_optional_access
+        HDRS
+        "bad_optional_access.h"
+        SRCS
+        "bad_optional_access.cc"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::config
+        turbo::raw_logging_internal
+        PUBLIC
+)
+
+turbo_cc_library(
+        NAME
+        bad_variant_access
+        HDRS
+        "bad_variant_access.h"
+        SRCS
+        "bad_variant_access.cc"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::config
+        turbo::raw_logging_internal
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        optional_test
+        SRCS
+        "optional_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::optional
+        turbo::config
+        turbo::raw_logging_internal
+        turbo::strings
+        turbo::type_traits
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        optional_exception_safety_test
+        SRCS
+        "optional_exception_safety_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::optional
+        turbo::config
+        turbo::exception_safety_testing
+        GTest::gmock_main
+)
+
+# Internal-only target, do not depend on directly.
+turbo_cc_library(
+        NAME
+        conformance_testing
+        HDRS
+        "internal/conformance_aliases.h"
+        "internal/conformance_archetype.h"
+        "internal/conformance_profile.h"
+        "internal/conformance_testing.h"
+        "internal/conformance_testing_helpers.h"
+        "internal/parentheses.h"
+        "internal/transform_args.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::algorithm
+        turbo::debugging
+        turbo::type_traits
+        turbo::strings
+        turbo::utility
+        GTest::gmock_main
+        TESTONLY
+)
+
+turbo_cc_test(
+        NAME
+        conformance_testing_test
+        SRCS
+        "internal/conformance_testing_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        ${TURBO_EXCEPTIONS_FLAG}
+        LINKOPTS
+        ${TURBO_EXCEPTIONS_FLAG_LINKOPTS}
+        DEPS
+        turbo::conformance_testing
+        turbo::type_traits
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        conformance_testing_test_no_exceptions
+        SRCS
+        "internal/conformance_testing_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::conformance_testing
+        turbo::type_traits
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        variant
+        HDRS
+        "variant.h"
+        SRCS
+        "internal/variant.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::bad_variant_access
+        turbo::base_internal
+        turbo::config
+        turbo::core_headers
+        turbo::type_traits
+        turbo::utility
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        variant_test
+        SRCS
+        "variant_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::variant
+        turbo::config
+        turbo::core_headers
+        turbo::memory
+        turbo::type_traits
+        turbo::strings
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        compare
+        HDRS
+        "compare.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::core_headers
+        turbo::type_traits
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        compare_test
+        SRCS
+        "compare_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::base
+        turbo::compare
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        variant_exception_safety_test
+        SRCS
+        "variant_exception_safety_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::variant
+        turbo::config
+        turbo::exception_safety_testing
+        turbo::memory
+        GTest::gmock_main
+)
+
+
+turbo_cc_library(
+        NAME
+        algorithm
+        HDRS
+        "algorithm.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::config
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        algorithm_test
+        SRCS
+        "algorithm_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::algorithm
+        turbo::config
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        algorithm_container
+        HDRS
+        "container.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::algorithm
+        turbo::core_headers
+        turbo::meta
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        container_test
+        SRCS
+        "container_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::algorithm_container
+        turbo::base
+        turbo::core_headers
+        turbo::memory
+        turbo::span
+        GTest::gmock_main
+)
+
+
+turbo_cc_library(
+        NAME
+        any_invocable
+        SRCS
+        "internal/any_invocable.h"
+        HDRS
+        "any_invocable.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::base_internal
+        turbo::config
+        turbo::core_headers
+        turbo::type_traits
+        turbo::utility
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        any_invocable_test
+        SRCS
+        "any_invocable_test.cc"
+        "internal/any_invocable.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::any_invocable
+        turbo::base_internal
+        turbo::config
+        turbo::core_headers
+        turbo::type_traits
+        turbo::utility
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        bind_front
+        SRCS
+        "internal/front_binder.h"
+        HDRS
+        "bind_front.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::base_internal
+        turbo::compressed_tuple
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        bind_front_test
+        SRCS
+        "bind_front_test.cc"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::bind_front
+        turbo::memory
+        GTest::gmock_main
+)
+
+turbo_cc_library(
+        NAME
+        function_ref
+        SRCS
+        "internal/function_ref.h"
+        HDRS
+        "function_ref.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::base_internal
+        turbo::core_headers
+        turbo::meta
+        PUBLIC
+)
+
+turbo_cc_test(
+        NAME
+        function_ref_test
+        SRCS
+        "function_ref_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::function_ref
+        turbo::memory
+        turbo::test_instance_tracker
+        GTest::gmock_main
+)

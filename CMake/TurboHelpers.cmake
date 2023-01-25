@@ -164,13 +164,13 @@ function(turbo_cc_library)
           if(_build_type STREQUAL "dll")
             # hide this MATCHES in an if-clause so it doesn't overwrite
             # the CMAKE_MATCH_1 from (${dep} MATCHES "^turbo::(.*)")
-            if(NOT PC_DEPS MATCHES "abseil_dll")
+            if(NOT PC_DEPS MATCHES "turbo_dll")
               # Join deps with commas.
               if(PC_DEPS)
                 set(PC_DEPS "${PC_DEPS},")
               endif()
               # don't duplicate dll-dep if it exists already
-              set(PC_DEPS "${PC_DEPS} abseil_dll = ${PC_VERSION}")
+              set(PC_DEPS "${PC_DEPS} turbo_dll = ${PC_VERSION}")
               set(LNK_LIB "${LNK_LIB} -labseil_dll")
             endif()
           else()
@@ -320,7 +320,7 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
       )
 
     if (_build_type STREQUAL "dll")
-        set(TURBO_CC_LIB_DEPS abseil_dll)
+        set(TURBO_CC_LIB_DEPS turbo_dll)
     endif()
 
     target_link_libraries(${_NAME}
@@ -421,7 +421,7 @@ function(turbo_cc_test)
         GTEST_LINKED_AS_SHARED_LIBRARY=1
     )
 
-    # Replace dependencies on targets inside the DLL with abseil_dll itself.
+    # Replace dependencies on targets inside the DLL with turbo_dll itself.
     turbo_internal_dll_targets(
       DEPS ${TURBO_CC_TEST_DEPS}
       OUTPUT TURBO_CC_TEST_DEPS

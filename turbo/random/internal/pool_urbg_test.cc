@@ -22,7 +22,7 @@
 
 #include "gtest/gtest.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 using turbo::random_internal::PoolURBG;
 using turbo::random_internal::RandenPool;

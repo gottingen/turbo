@@ -49,12 +49,12 @@
 #include "turbo/hash/internal/city.h"
 #include "turbo/hash/internal/low_level_hash.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/numeric/bits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/types/optional.h"
-#include "turbo/types/variant.h"
-#include "turbo/utility/utility.h"
+#include "turbo/meta/optional.h"
+#include "turbo/meta/variant.h"
+#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

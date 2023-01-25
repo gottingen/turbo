@@ -23,8 +23,8 @@
 
 #include "turbo/platform/attributes.h"
 #include "turbo/random/internal/fast_uniform_bits.h"
-#include "turbo/types/optional.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/optional.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

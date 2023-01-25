@@ -566,7 +566,7 @@ function(turbo_internal_dll_targets)
   foreach(dep IN LISTS TURBO_INTERNAL_DLL_DEPS)
     turbo_internal_dll_contains(TARGET ${dep} OUTPUT _contains)
     if (_contains)
-      list(APPEND _deps abseil_dll)
+      list(APPEND _deps turbo_dll)
     else()
       list(APPEND _deps ${dep})
     endif()
@@ -579,25 +579,25 @@ endfunction()
 
 function(turbo_make_dll)
   add_library(
-    abseil_dll
+    turbo_dll
     SHARED
       "${TURBO_INTERNAL_DLL_FILES}"
   )
   target_link_libraries(
-    abseil_dll
+    turbo_dll
     PRIVATE
       ${TURBO_DEFAULT_LINKOPTS}
   )
-  set_property(TARGET abseil_dll PROPERTY LINKER_LANGUAGE "CXX")
+  set_property(TARGET turbo_dll PROPERTY LINKER_LANGUAGE "CXX")
   target_include_directories(
-    abseil_dll
+    turbo_dll
     PUBLIC
       "$<BUILD_INTERFACE:${TURBO_COMMON_INCLUDE_DIRS}>"
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
   target_compile_options(
-    abseil_dll
+    turbo_dll
     PRIVATE
       ${TURBO_DEFAULT_COPTS}
   )
@@ -614,23 +614,23 @@ function(turbo_make_dll)
   endforeach()
   string(REPLACE ";" " " PC_LINKOPTS "${TURBO_CC_LIB_LINKOPTS}")
 
-  FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/abseil_dll.pc" CONTENT "\
+  FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_dll.pc" CONTENT "\
 prefix=${CMAKE_INSTALL_PREFIX}\n\
 exec_prefix=\${prefix}\n\
 libdir=${CMAKE_INSTALL_FULL_LIBDIR}\n\
 includedir=${CMAKE_INSTALL_FULL_INCLUDEDIR}\n\
 \n\
-Name: abseil_dll\n\
+Name: turbo_dll\n\
 Description: Turbo DLL library\n\
 URL: https://abseil.io/\n\
 Version: ${turbo_VERSION}\n\
 Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${TURBO_CC_LIB_IS_INTERFACE}>>:-labseil_dll>\n\
 Cflags: -I\${includedir}${PC_CFLAGS}\n")
-  INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/abseil_dll.pc"
+  INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_dll.pc"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
   target_compile_definitions(
-    abseil_dll
+    turbo_dll
     PRIVATE
       TURBO_BUILD_DLL
       NOMINMAX
@@ -657,7 +657,7 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
   endif()
 
-  install(TARGETS abseil_dll EXPORT ${PROJECT_NAME}Targets
+  install(TARGETS turbo_dll EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

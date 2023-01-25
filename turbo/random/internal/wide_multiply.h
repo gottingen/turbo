@@ -26,8 +26,8 @@
 #endif
 
 #include "turbo/platform/config.h"
-#include "turbo/numeric/bits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
 #include "turbo/random/internal/traits.h"
 
 namespace turbo {

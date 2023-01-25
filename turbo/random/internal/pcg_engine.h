@@ -19,8 +19,8 @@
 
 #include "turbo/platform/config.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/numeric/bits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
 #include "turbo/random/internal/fastmath.h"
 #include "turbo/random/internal/iostream_state_saver.h"
 

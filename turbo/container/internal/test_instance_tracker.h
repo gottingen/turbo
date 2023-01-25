@@ -18,7 +18,7 @@
 #include <cstdlib>
 #include <ostream>
 
-#include "turbo/types/compare.h"
+#include "turbo/meta/compare.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

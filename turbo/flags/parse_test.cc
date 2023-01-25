@@ -34,7 +34,7 @@
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/substitute.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 #ifdef _WIN32
 #include <windows.h>

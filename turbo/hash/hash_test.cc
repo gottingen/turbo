@@ -49,7 +49,7 @@
 #include "turbo/hash/hash_testing.h"
 #include "turbo/hash/internal/spy_hash_state.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/int128.h"
 #include "turbo/strings/cord_test_helpers.h"
 
 namespace {

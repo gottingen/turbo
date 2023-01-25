@@ -77,7 +77,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/crc/internal/crc_cord_state.h"
-#include "turbo/functional/function_ref.h"
+#include "turbo/meta/function_ref.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/cord_analysis.h"
 #include "turbo/strings/cord_buffer.h"
@@ -95,7 +95,7 @@
 #include "turbo/strings/internal/resize_uninitialized.h"
 #include "turbo/strings/internal/string_constant.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/types/optional.h"
+#include "turbo/meta/optional.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

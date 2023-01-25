@@ -30,7 +30,7 @@
 
 #include "turbo/platform/port.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/int128.h"
 #include "turbo/strings/internal/has_turbo_stringify.h"
 #include "turbo/strings/internal/str_format/extension.h"
 #include "turbo/strings/string_view.h"

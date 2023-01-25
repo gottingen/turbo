@@ -174,8 +174,8 @@
 #include "turbo/platform/config.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/types/span.h"
-#include "turbo/utility/utility.h"
+#include "turbo/meta/span.h"
+#include "turbo/meta/utility.h"
 
 #ifdef TURBO_HAVE_ADDRESS_SANITIZER
 #include <sanitizer/asan_interface.h>

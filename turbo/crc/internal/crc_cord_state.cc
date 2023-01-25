@@ -17,7 +17,7 @@
 #include <cassert>
 
 #include "turbo/platform/config.h"
-#include "turbo/numeric/bits.h"
+#include "turbo/base/bits.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -22,7 +22,7 @@
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

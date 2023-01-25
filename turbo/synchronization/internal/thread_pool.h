@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/functional/any_invocable.h"
+#include "turbo/meta/any_invocable.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {

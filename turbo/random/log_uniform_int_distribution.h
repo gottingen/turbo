@@ -23,7 +23,7 @@
 #include <ostream>
 #include <type_traits>
 
-#include "turbo/numeric/bits.h"
+#include "turbo/base/bits.h"
 #include "turbo/random/internal/fastmath.h"
 #include "turbo/random/internal/generate_real.h"
 #include "turbo/random/internal/iostream_state_saver.h"

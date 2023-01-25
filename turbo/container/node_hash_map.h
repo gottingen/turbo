@@ -40,7 +40,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/algorithm/container.h"
+#include "turbo/meta/container.h"
 #include "turbo/platform/macros.h"
 #include "turbo/container/internal/container_memory.h"
 #include "turbo/container/internal/hash_function_defaults.h"  // IWYU pragma: export

@@ -27,7 +27,7 @@
 #include "turbo/crc/internal/crc32_x86_arm_combined_simd.h"
 #include "turbo/crc/internal/crc_internal.h"
 #include "turbo/memory/memory.h"
-#include "turbo/numeric/bits.h"
+#include "turbo/base/bits.h"
 
 #if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) || \
     defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)

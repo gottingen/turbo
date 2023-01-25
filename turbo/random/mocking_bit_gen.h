@@ -45,9 +45,9 @@
 #include "turbo/random/random.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_join.h"
-#include "turbo/types/span.h"
-#include "turbo/types/variant.h"
-#include "turbo/utility/utility.h"
+#include "turbo/meta/span.h"
+#include "turbo/meta/variant.h"
+#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

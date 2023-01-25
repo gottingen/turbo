@@ -44,7 +44,7 @@
 #include "turbo/log/log_sink.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

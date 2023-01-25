@@ -25,14 +25,14 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/optimization.h"
-#include "turbo/functional/function_ref.h"
+#include "turbo/meta/function_ref.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/numeric/bits.h"
-#include "turbo/numeric/int128.h"
-#include "turbo/numeric/internal/representation.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
+#include "turbo/base/internal/representation.h"
 #include "turbo/strings/numbers.h"
-#include "turbo/types/optional.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/optional.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

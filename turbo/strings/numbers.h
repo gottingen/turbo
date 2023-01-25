@@ -43,8 +43,8 @@
 #include "turbo/platform/internal/endian.h"
 #include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
-#include "turbo/numeric/bits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

@@ -26,7 +26,7 @@
 #include "turbo/platform/config.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 using testing::Eq;
 using testing::Ge;

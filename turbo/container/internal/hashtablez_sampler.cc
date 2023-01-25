@@ -28,7 +28,7 @@
 #include "turbo/profiling/internal/exponential_biased.h"
 #include "turbo/profiling/internal/sample_recorder.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/utility/utility.h"
+#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

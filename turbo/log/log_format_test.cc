@@ -36,7 +36,7 @@
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_format.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/types/optional.h"
+#include "turbo/meta/optional.h"
 
 namespace {
 using ::turbo::log_internal::AsString;

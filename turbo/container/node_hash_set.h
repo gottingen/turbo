@@ -37,7 +37,7 @@
 
 #include <type_traits>
 
-#include "turbo/algorithm/container.h"
+#include "turbo/meta/container.h"
 #include "turbo/platform/macros.h"
 #include "turbo/container/internal/hash_function_defaults.h"  // IWYU pragma: export
 #include "turbo/container/internal/node_slot_policy.h"

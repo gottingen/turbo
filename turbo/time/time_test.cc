@@ -27,7 +27,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/int128.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/internal/test_util.h"
 

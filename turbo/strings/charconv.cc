@@ -21,8 +21,8 @@
 #include <limits>
 
 #include "turbo/platform/casts.h"
-#include "turbo/numeric/bits.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
 #include "turbo/strings/internal/charconv_bigint.h"
 #include "turbo/strings/internal/charconv_parse.h"
 

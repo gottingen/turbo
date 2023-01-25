@@ -19,7 +19,7 @@
 #include <limits>
 
 #include "turbo/random/internal/traits.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

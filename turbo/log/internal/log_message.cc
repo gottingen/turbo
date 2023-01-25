@@ -53,7 +53,7 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
     TurboInternalOnFatalLogMessage)(const turbo::LogEntry&) {

@@ -27,7 +27,7 @@
 #include "gtest/gtest.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/internal/raw_logging.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -24,8 +24,8 @@
 #include "turbo/strings/internal/str_format/arg.h"
 #include "turbo/strings/internal/str_format/checker.h"
 #include "turbo/strings/internal/str_format/parser.h"
-#include "turbo/types/span.h"
-#include "turbo/utility/utility.h"
+#include "turbo/meta/span.h"
+#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

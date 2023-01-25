@@ -27,8 +27,8 @@
 #include "turbo/container/inlined_vector.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/internal/seed_material.h"
-#include "turbo/types/optional.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/optional.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

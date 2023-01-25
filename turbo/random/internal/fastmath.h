@@ -22,7 +22,7 @@
 #include <cmath>
 #include <cstdint>
 
-#include "turbo/numeric/bits.h"
+#include "turbo/base/bits.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

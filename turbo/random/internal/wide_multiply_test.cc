@@ -16,7 +16,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/numeric/int128.h"
+#include "turbo/base/int128.h"
 
 using turbo::random_internal::MultiplyU128ToU256;
 using turbo::random_internal::U256;

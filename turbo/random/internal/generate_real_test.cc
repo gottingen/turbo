@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 #include "turbo/flags/flag.h"
-#include "turbo/numeric/bits.h"
+#include "turbo/base/bits.h"
 
 TURBO_FLAG(int64_t, turbo_random_test_trials, 50000,
           "Number of trials for the probability tests.");

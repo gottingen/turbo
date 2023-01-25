@@ -81,7 +81,7 @@
 #include <tuple>
 #include <utility>
 
-#include "turbo/functional/function_ref.h"
+#include "turbo/meta/function_ref.h"
 #include "turbo/hash/internal/hash.h"
 
 namespace turbo {

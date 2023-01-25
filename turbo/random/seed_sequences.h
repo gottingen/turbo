@@ -32,7 +32,7 @@
 #include "turbo/random/internal/salted_seed_seq.h"
 #include "turbo/random/internal/seed_material.h"
 #include "turbo/random/seed_gen_exception.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

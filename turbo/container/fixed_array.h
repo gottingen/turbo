@@ -40,7 +40,7 @@
 #include <new>
 #include <type_traits>
 
-#include "turbo/algorithm/algorithm.h"
+#include "turbo/meta/algorithm.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/throw_delegate.h"

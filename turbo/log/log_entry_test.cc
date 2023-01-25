@@ -38,7 +38,7 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/time.h"
-#include "turbo/types/span.h"
+#include "turbo/meta/span.h"
 
 namespace {
 using ::turbo::log_internal::LogEntryTestPeer;

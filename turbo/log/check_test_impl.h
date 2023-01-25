@@ -30,7 +30,7 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
 #include "turbo/log/internal/test_helpers.h"
-#include "turbo/status/status.h"
+#include "turbo/base/status.h"
 
 // NOLINTBEGIN(misc-definitions-in-headers)
 

@@ -27,7 +27,7 @@
 #include "turbo/platform/config.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/utility/utility.h"
+#include "turbo/meta/utility.h"
 
 #ifdef TURBO_HAVE_ADDRESS_SANITIZER
 #include <sanitizer/asan_interface.h>
