@@ -16,7 +16,7 @@
 #include <cstdio>
 #include <string>
 
-#include "turbo/platform/internal/strerror.h"
+#include "strerror.h"
 #include "benchmark/benchmark.h"
 
 namespace {

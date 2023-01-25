@@ -18,7 +18,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/internal/strerror.h"
+#include "turbo/base/internal/strerror.h"
 
 namespace {
 using ::testing::Eq;

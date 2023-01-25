@@ -48,7 +48,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/internal/strerror.h"
+#include "turbo/base/internal/strerror.h"
 #include "turbo/flags/internal/program_name.h"
 #include "turbo/log/check.h"
 #include "turbo/log/internal/test_helpers.h"
