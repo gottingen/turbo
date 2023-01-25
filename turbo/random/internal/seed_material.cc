@@ -28,8 +28,8 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/string_view.h"

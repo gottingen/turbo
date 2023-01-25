@@ -17,7 +17,7 @@
 
 #include <cstdint>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 // -------------------------------------------------------------------------
 // Many x86 and ARM machines have CRC acceleration hardware.

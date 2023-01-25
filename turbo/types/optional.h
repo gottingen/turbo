@@ -35,7 +35,7 @@
 #ifndef TURBO_TYPES_OPTIONAL_H_
 #define TURBO_TYPES_OPTIONAL_H_
 
-#include "turbo/base/config.h"   // TODO(calabrese) IWYU removal?
+#include "turbo/platform/config.h"   // TODO(calabrese) IWYU removal?
 #include "turbo/utility/utility.h"
 
 #ifdef TURBO_USES_STD_OPTIONAL
@@ -60,8 +60,8 @@ TURBO_NAMESPACE_END
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/inline_variable.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/inline_variable.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/types/bad_optional_access.h"
 #include "turbo/types/internal/optional.h"

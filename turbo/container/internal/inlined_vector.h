@@ -25,8 +25,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/macros.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"

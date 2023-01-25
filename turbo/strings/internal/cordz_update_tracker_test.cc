@@ -19,8 +19,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/synchronization/notification.h"
 
 namespace turbo {

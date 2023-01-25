@@ -20,8 +20,8 @@
 #include <cstdint>
 #include <cstring>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/types/span.h"
 
 namespace turbo {

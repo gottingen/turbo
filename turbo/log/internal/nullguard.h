@@ -27,8 +27,8 @@
 #include <array>
 #include <cstddef>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -27,11 +27,11 @@
 #include <string>
 #include <typeinfo>
 
-#include "turbo/base/call_once.h"
-#include "turbo/base/casts.h"
-#include "turbo/base/config.h"
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/call_once.h"
+#include "turbo/platform/casts.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/flags/usage_config.h"

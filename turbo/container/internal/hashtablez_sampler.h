@@ -44,9 +44,9 @@
 #include <memory>
 #include <vector>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/per_thread_tls.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/per_thread_tls.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/profiling/internal/sample_recorder.h"
 #include "turbo/synchronization/mutex.h"
 #include "turbo/utility/utility.h"

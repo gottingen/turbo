@@ -14,7 +14,7 @@
 
 #include "turbo/container/inlined_vector.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 #if defined(TURBO_HAVE_EXCEPTIONS)
 
@@ -25,7 +25,7 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "turbo/base/internal/exception_safety_testing.h"
+#include "turbo/platform/internal/exception_safety_testing.h"
 
 namespace {
 

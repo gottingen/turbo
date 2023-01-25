@@ -55,7 +55,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/macros.h"
+#include "turbo/platform/macros.h"
 #include "turbo/strings/internal/str_join_internal.h"
 #include "turbo/strings/string_view.h"
 

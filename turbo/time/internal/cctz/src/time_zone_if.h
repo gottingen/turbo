@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/time/internal/cctz/include/cctz/civil_time.h"
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 

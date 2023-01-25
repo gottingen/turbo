@@ -18,7 +18,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/random/internal/nanobenchmark.h"
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_engine.h"

@@ -20,8 +20,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/profiling/internal/sample_recorder.h"
 #include "turbo/synchronization/blocking_counter.h"
 #include "turbo/synchronization/internal/thread_pool.h"

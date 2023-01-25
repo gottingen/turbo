@@ -16,9 +16,9 @@
 #include <mutex>  // NOLINT(build/c++11)
 #include <vector>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/cycleclock.h"
-#include "turbo/base/internal/spinlock.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/cycleclock.h"
+#include "turbo/platform/internal/spinlock.h"
 #include "turbo/synchronization/blocking_counter.h"
 #include "turbo/synchronization/internal/thread_pool.h"
 #include "turbo/synchronization/mutex.h"

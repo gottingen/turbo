@@ -28,9 +28,9 @@
 // (2) When a new edge (x->y) is inserted, do nothing if rank[x] < rank[y].
 // (3) Otherwise: adjust ranks in the neighborhood of x and y.
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 // This file is a no-op if the required LowLevelAlloc support is missing.
-#include "turbo/base/internal/low_level_alloc.h"
+#include "turbo/platform/internal/low_level_alloc.h"
 #ifndef TURBO_LOW_LEVEL_ALLOC_MISSING
 
 #include "turbo/synchronization/internal/graphcycles.h"
@@ -38,9 +38,9 @@
 #include <algorithm>
 #include <array>
 #include <limits>
-#include "turbo/base/internal/hide_ptr.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/internal/spinlock.h"
+#include "turbo/platform/internal/hide_ptr.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/internal/spinlock.h"
 
 // Do not use STL.   This module does not use standard memory allocation.
 

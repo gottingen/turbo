@@ -14,7 +14,7 @@
 
 #include "turbo/types/variant.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 // This test is a no-op when turbo::variant is an alias for std::variant and when
 // exceptions are not enabled.
@@ -27,7 +27,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/internal/exception_safety_testing.h"
+#include "turbo/platform/internal/exception_safety_testing.h"
 #include "turbo/memory/memory.h"
 
 // See comment in turbo/base/config.h

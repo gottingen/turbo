@@ -17,7 +17,7 @@
 #ifndef TURBO_DEBUGGING_INTERNAL_EXAMINE_STACK_H_
 #define TURBO_DEBUGGING_INTERNAL_EXAMINE_STACK_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

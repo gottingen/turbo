@@ -18,7 +18,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/symbolize.h"
 #include "turbo/strings/cordz_test_helpers.h"

@@ -36,8 +36,8 @@ TURBO_NAMESPACE_END
 #include <syscall.h>
 #include <unistd.h>
 
-#include "turbo/base/internal/errno_saver.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/errno_saver.h"
+#include "turbo/platform/internal/raw_logging.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -29,9 +29,9 @@
 #include <string>
 #include <utility>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/log/internal/nullguard.h"
 #include "turbo/log/internal/nullstream.h"
 #include "turbo/log/internal/strip.h"

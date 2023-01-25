@@ -19,8 +19,8 @@
 #include <string>
 
 #include "gmock/gmock.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"
 #include "turbo/log/log_sink_registry.h"

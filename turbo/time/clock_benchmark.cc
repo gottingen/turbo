@@ -20,7 +20,7 @@
 #endif  // _WIN32
 #include <cstdio>
 
-#include "turbo/base/internal/cycleclock.h"
+#include "turbo/platform/internal/cycleclock.h"
 #include "benchmark/benchmark.h"
 
 namespace {

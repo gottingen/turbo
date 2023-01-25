@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/debugging/stacktrace.h"
 #include "benchmark/benchmark.h"
 

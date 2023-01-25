@@ -16,7 +16,7 @@
 
 #include <algorithm>
 
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/internal/resize_uninitialized.h"

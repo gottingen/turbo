@@ -16,7 +16,7 @@
 
 #include <memory>
 
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/container/internal/hash_generator_testing.h"
 #include "turbo/container/internal/unordered_map_constructor_test.h"
 #include "turbo/container/internal/unordered_map_lookup_test.h"

@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/base/internal/sysinfo.h"
+#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/time/clock.h"
 

@@ -23,7 +23,7 @@
 // used.
 #include <climits>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 // Maybe one day we can rewrite this file not to require the elf
 // symbol extensions in glibc, but for right now we need them.

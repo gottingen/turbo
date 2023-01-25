@@ -73,7 +73,7 @@
 #include <iosfwd>
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/internal/cctz/include/cctz/civil_time.h"
 

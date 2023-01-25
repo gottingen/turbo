@@ -23,9 +23,9 @@
 #include <thread>              // NOLINT(build/c++11)
 
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/cycleclock.h"
-#include "turbo/base/internal/thread_identity.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/cycleclock.h"
+#include "turbo/platform/internal/thread_identity.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"

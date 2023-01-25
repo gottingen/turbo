@@ -22,7 +22,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/macros.h"
+#include "turbo/platform/macros.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/internal/pool_urbg.h"

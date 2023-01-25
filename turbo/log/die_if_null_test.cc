@@ -21,7 +21,7 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/log/internal/test_helpers.h"
 
 namespace {

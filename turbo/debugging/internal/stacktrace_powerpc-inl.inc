@@ -31,9 +31,9 @@
 #include <cstdint>
 #include <cstdio>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/optimization.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/internal/address_is_readable.h"
 #include "turbo/debugging/internal/vdso_support.h"  // a no-op on non-elf or non-glibc systems

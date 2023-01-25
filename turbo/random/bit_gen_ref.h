@@ -28,8 +28,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/internal/fast_type_id.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/internal/fast_type_id.h"
+#include "turbo/platform/macros.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/internal/distribution_caller.h"
 #include "turbo/random/internal/fast_uniform_bits.h"

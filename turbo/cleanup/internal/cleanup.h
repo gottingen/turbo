@@ -19,9 +19,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/internal/invoke.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/internal/invoke.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/utility/utility.h"
 
 namespace turbo {

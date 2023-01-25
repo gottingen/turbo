@@ -27,12 +27,12 @@
 #include <tuple>
 #include <type_traits>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/identity.h"
-#include "turbo/base/internal/inline_variable.h"
-#include "turbo/base/internal/invoke.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/identity.h"
+#include "turbo/platform/internal/inline_variable.h"
+#include "turbo/platform/internal/invoke.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/types/bad_variant_access.h"
 #include "turbo/utility/utility.h"

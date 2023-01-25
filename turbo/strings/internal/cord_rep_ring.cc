@@ -21,9 +21,9 @@
 #include <memory>
 #include <string>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/internal/throw_delegate.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/platform/macros.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_consume.h"

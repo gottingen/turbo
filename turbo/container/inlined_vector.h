@@ -46,10 +46,10 @@
 #include <utility>
 
 #include "turbo/algorithm/algorithm.h"
-#include "turbo/base/internal/throw_delegate.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/optimization.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/container/internal/inlined_vector.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"

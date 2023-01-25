@@ -34,9 +34,9 @@
 #include <limits>
 #include <utility>
 
-#include "turbo/base/config.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 
 #if defined(_MSC_VER)
 // In very old versions of MSVC and when the /Zc:wchar_t flag is off, wchar_t is

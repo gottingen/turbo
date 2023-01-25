@@ -21,7 +21,7 @@
 #ifndef TURBO_LOG_LOG_SINK_H_
 #define TURBO_LOG_LOG_SINK_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/log/log_entry.h"
 
 namespace turbo {

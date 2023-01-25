@@ -66,8 +66,8 @@
 #include <limits>
 #include <string>
 
-#include "turbo/base/casts.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/casts.h"
+#include "turbo/platform/macros.h"
 #include "turbo/numeric/int128.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/strip.h"

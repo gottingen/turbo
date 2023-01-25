@@ -24,7 +24,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/memory/memory.h"
 #include "turbo/strings/str_cat.h"
 

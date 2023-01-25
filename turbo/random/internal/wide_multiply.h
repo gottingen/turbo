@@ -25,7 +25,7 @@
 #define TURBO_INTERNAL_USE_UMUL128 1
 #endif
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/numeric/bits.h"
 #include "turbo/numeric/int128.h"
 #include "turbo/random/internal/traits.h"

@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/base/macros.h"
+#include "turbo/platform/macros.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/bernoulli_distribution.h"
 #include "turbo/random/beta_distribution.h"

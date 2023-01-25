@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_info.h"
 

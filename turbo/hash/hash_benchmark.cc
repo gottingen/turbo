@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/container/flat_hash_set.h"
 #include "turbo/hash/hash.h"
 #include "turbo/random/random.h"

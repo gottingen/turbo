@@ -15,7 +15,7 @@
 // Every benchmark should have the same performance as the corresponding
 // headroom benchmark.
 
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/container/internal/layout.h"
 #include "benchmark/benchmark.h"
 

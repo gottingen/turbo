@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/functional/any_invocable.h"
 #include "turbo/synchronization/mutex.h"
 

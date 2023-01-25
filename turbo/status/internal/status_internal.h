@@ -18,7 +18,7 @@
 #include <string>
 #include <utility>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/strings/cord.h"
 

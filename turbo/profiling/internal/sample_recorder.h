@@ -28,8 +28,8 @@
 #include <cstddef>
 #include <functional>
 
-#include "turbo/base/config.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/mutex.h"
 #include "turbo/time/time.h"
 

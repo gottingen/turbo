@@ -24,8 +24,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/internal/scoped_set_env.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/internal/scoped_set_env.h"
 #include "turbo/flags/declare.h"
 #include "turbo/flags/flag.h"
 #include "turbo/flags/internal/parse.h"

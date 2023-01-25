@@ -19,7 +19,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/numeric/bits.h"
 #include "turbo/numeric/int128.h"
 

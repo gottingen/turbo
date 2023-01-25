@@ -25,8 +25,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/macros.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/random/internal/chi_square.h"
 #include "turbo/random/internal/distribution_test_util.h"

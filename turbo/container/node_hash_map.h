@@ -41,7 +41,7 @@
 #include <utility>
 
 #include "turbo/algorithm/container.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/macros.h"
 #include "turbo/container/internal/container_memory.h"
 #include "turbo/container/internal/hash_function_defaults.h"  // IWYU pragma: export
 #include "turbo/container/internal/node_slot_policy.h"

@@ -14,7 +14,7 @@
 
 #include "turbo/container/internal/hashtablez_sampler.h"
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

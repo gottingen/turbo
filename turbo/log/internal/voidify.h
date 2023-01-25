@@ -23,7 +23,7 @@
 #ifndef TURBO_LOG_INTERNAL_VOIDIFY_H_
 #define TURBO_LOG_INTERNAL_VOIDIFY_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

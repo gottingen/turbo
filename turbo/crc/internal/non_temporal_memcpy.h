@@ -44,8 +44,8 @@
 #include <cstdint>
 #include <cstring>
 
-#include "turbo/base/config.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/optimization.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

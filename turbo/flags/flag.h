@@ -32,9 +32,9 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/internal/flag.h"
 #include "turbo/flags/internal/registry.h"

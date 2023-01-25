@@ -19,7 +19,7 @@
 #include <istream>
 #include <limits>
 
-#include "turbo/base/optimization.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/random/internal/fast_uniform_bits.h"
 #include "turbo/random/internal/iostream_state_saver.h"
 

@@ -15,8 +15,8 @@
 
 #include <atomic>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/atomic_hook.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/atomic_hook.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

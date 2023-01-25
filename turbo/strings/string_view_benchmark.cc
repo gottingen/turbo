@@ -23,9 +23,9 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/macros.h"
 #include "turbo/strings/str_cat.h"
 
 namespace {

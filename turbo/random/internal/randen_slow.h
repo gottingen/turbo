@@ -17,7 +17,7 @@
 
 #include <cstddef>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <memory>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/crc/crc32c.h"
 
 // Defined if the class AcceleratedCrcMemcpyEngine exists.

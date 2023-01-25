@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/internal/throw_delegate.h"
+#include "turbo/platform/internal/throw_delegate.h"
 #include "turbo/container/internal/container_memory.h"
 #include "turbo/container/internal/raw_hash_set.h"  // IWYU pragma: export
 

@@ -226,7 +226,7 @@ if(TURBO_ENABLE_INSTALL)
       PATTERN "testdata" EXCLUDE
     )
 
-  file(READ "turbo/base/options.h" TURBO_INTERNAL_OPTIONS_H_CONTENTS)
+  file(READ "turbo/platform/options.h" TURBO_INTERNAL_OPTIONS_H_CONTENTS)
   if (TURBO_INTERNAL_AT_LEAST_CXX17)
     string(REGEX REPLACE
       "#define TURBO_OPTION_USE_STD_([^ ]*) 2"

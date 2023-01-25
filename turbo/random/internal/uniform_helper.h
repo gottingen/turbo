@@ -19,7 +19,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/internal/traits.h"
 

@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "time_zone_fixed.h"
 
 namespace turbo {

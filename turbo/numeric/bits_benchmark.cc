@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/numeric/bits.h"
 #include "turbo/random/random.h"
 

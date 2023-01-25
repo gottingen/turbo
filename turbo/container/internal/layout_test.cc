@@ -25,8 +25,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/types/span.h"
 
 namespace turbo {

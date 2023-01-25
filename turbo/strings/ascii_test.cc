@@ -20,8 +20,8 @@
 #include <string>
 
 #include "gtest/gtest.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 
 namespace {
 

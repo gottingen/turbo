@@ -14,7 +14,7 @@
 
 #include "turbo/log/log_sink.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

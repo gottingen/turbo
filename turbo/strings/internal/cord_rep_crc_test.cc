@@ -16,7 +16,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/crc/internal/crc_cord_state.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"

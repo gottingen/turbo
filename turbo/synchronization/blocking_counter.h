@@ -22,7 +22,7 @@
 
 #include <atomic>
 
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {

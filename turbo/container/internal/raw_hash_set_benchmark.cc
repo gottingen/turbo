@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/container/internal/hash_function_defaults.h"
 #include "turbo/container/internal/raw_hash_set.h"
 #include "turbo/strings/str_format.h"

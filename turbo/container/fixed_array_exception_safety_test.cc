@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/container/fixed_array.h"
 
 #ifdef TURBO_HAVE_EXCEPTIONS
@@ -20,7 +20,7 @@
 #include <initializer_list>
 
 #include "gtest/gtest.h"
-#include "turbo/base/internal/exception_safety_testing.h"
+#include "turbo/platform/internal/exception_safety_testing.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

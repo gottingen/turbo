@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 

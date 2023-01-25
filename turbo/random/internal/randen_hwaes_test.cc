@@ -16,7 +16,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_detect.h"
 #include "turbo/random/internal/randen_traits.h"

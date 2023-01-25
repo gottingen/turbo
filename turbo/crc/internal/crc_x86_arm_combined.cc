@@ -17,11 +17,11 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/internal/endian.h"
-#include "turbo/base/internal/prefetch.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/prefetch.h"
 #include "turbo/crc/internal/cpu_detect.h"
 #include "turbo/crc/internal/crc.h"
 #include "turbo/crc/internal/crc32_x86_arm_combined_simd.h"

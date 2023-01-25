@@ -21,8 +21,8 @@
 #include <functional>
 #include <limits>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/memory/memory.h"
 #include "turbo/profiling/internal/exponential_biased.h"

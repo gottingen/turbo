@@ -39,10 +39,10 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/endian.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/numeric/bits.h"
 #include "turbo/numeric/int128.h"
 #include "turbo/strings/string_view.h"

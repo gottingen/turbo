@@ -23,8 +23,8 @@
 #include <cstring>
 #include <ostream>
 
-#include "turbo/base/config.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/internal/str_format/output.h"
 #include "turbo/strings/string_view.h"

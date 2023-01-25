@@ -50,7 +50,7 @@
 #include <functional>
 #include <type_traits>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/functional/internal/function_ref.h"
 #include "turbo/meta/type_traits.h"
 

@@ -14,7 +14,7 @@
 
 #include "turbo/hash/internal/low_level_hash.h"
 
-#include "turbo/base/internal/unaligned_access.h"
+#include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/numeric/int128.h"
 
 namespace turbo {

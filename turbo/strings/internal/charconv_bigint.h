@@ -20,7 +20,7 @@
 #include <iostream>
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/internal/charconv_parse.h"
 #include "turbo/strings/string_view.h"

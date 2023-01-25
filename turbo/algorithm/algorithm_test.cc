@@ -20,7 +20,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 namespace {
 

@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <iostream>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/debugging/internal/address_is_readable.h"
 #include "turbo/debugging/internal/vdso_support.h"  // a no-op on non-elf or non-glibc systems
 #include "turbo/debugging/stacktrace.h"

@@ -26,8 +26,8 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/base/attributes.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/macros.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/declare.h"
 #include "turbo/flags/internal/flag.h"

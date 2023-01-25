@@ -27,7 +27,7 @@
 
 #include <atomic>
 
-#include "turbo/base/internal/thread_identity.h"
+#include "turbo/platform/internal/thread_identity.h"
 #include "turbo/synchronization/internal/create_thread_identity.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
 

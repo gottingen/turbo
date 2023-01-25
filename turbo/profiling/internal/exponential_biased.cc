@@ -21,8 +21,8 @@
 #include <cmath>
 #include <limits>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/optimization.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -28,7 +28,7 @@
 #include <iterator>
 #include <random>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/random/internal/salted_seed_seq.h"
 #include "turbo/random/internal/seed_material.h"
 #include "turbo/random/seed_gen_exception.h"

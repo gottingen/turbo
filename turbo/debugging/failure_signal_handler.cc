@@ -16,7 +16,7 @@
 
 #include "turbo/debugging/failure_signal_handler.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -41,9 +41,9 @@
 #include <cstring>
 #include <ctime>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/internal/sysinfo.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/debugging/internal/examine_stack.h"
 #include "turbo/debugging/stacktrace.h"
 

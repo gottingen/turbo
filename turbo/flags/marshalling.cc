@@ -23,9 +23,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/base/config.h"
-#include "turbo/base/log_severity.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/log_severity.h"
+#include "turbo/platform/macros.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/numbers.h"

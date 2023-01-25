@@ -43,8 +43,8 @@
 #include <bit>
 #endif
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/numeric/internal/bits.h"
 
 namespace turbo {

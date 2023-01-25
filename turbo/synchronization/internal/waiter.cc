@@ -14,7 +14,7 @@
 
 #include "turbo/synchronization/internal/waiter.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -43,9 +43,9 @@
 #include <new>
 #include <type_traits>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/internal/thread_identity.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/internal/thread_identity.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
 
 

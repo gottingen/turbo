@@ -64,13 +64,13 @@
 #include <iterator>
 #include <string>
 
-#include "turbo/base/const_init.h"
-#include "turbo/base/internal/identity.h"
-#include "turbo/base/internal/low_level_alloc.h"
-#include "turbo/base/internal/thread_identity.h"
-#include "turbo/base/internal/tsan_mutex_interface.h"
-#include "turbo/base/port.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/const_init.h"
+#include "turbo/platform/internal/identity.h"
+#include "turbo/platform/internal/low_level_alloc.h"
+#include "turbo/platform/internal/thread_identity.h"
+#include "turbo/platform/internal/tsan_mutex_interface.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
 #include "turbo/synchronization/internal/per_thread_sem.h"
 #include "turbo/time/time.h"

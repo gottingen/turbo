@@ -27,12 +27,12 @@
 #include <type_traits>
 #include <typeinfo>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/call_once.h"
-#include "turbo/base/casts.h"
-#include "turbo/base/config.h"
-#include "turbo/base/optimization.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/call_once.h"
+#include "turbo/platform/casts.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/optimization.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/internal/commandlineflag.h"

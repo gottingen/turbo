@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/base/internal/cycleclock.h"
+#include "turbo/platform/internal/cycleclock.h"
 #include "turbo/hash/hash_testing.h"
 #include "turbo/meta/type_traits.h"
 

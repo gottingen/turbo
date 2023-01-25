@@ -18,10 +18,10 @@
 
 #include <string>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/const_init.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/const_init.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/flags/internal/usage.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/synchronization/mutex.h"

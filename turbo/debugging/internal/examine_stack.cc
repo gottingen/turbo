@@ -20,7 +20,7 @@
 #include <unistd.h>
 #endif
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 #ifdef TURBO_HAVE_MMAP
 #include <sys/mman.h>
@@ -33,9 +33,9 @@
 #include <csignal>
 #include <cstdio>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/macros.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/symbolize.h"
 

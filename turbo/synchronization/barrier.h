@@ -19,7 +19,7 @@
 #ifndef TURBO_SYNCHRONIZATION_BARRIER_H_
 #define TURBO_SYNCHRONIZATION_BARRIER_H_
 
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {

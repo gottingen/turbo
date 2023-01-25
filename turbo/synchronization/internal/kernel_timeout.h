@@ -31,7 +31,7 @@
 #include <cstdint>
 #include <limits>
 
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 

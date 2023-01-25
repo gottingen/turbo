@@ -65,7 +65,7 @@
 #include <cstddef>
 #include <cstring>
 
-#include "turbo/base/port.h"  // disable some warnings on Windows
+#include "turbo/platform/port.h"  // disable some warnings on Windows
 #include "turbo/strings/ascii.h"  // for turbo::ascii_tolower
 
 namespace turbo {

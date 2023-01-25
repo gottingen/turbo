@@ -14,14 +14,14 @@
 
 #include "turbo/types/optional.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 // This test is a no-op when turbo::optional is an alias for std::optional and
 // when exceptions are not enabled.
 #if !defined(TURBO_USES_STD_OPTIONAL) && defined(TURBO_HAVE_EXCEPTIONS)
 
 #include "gtest/gtest.h"
-#include "turbo/base/internal/exception_safety_testing.h"
+#include "turbo/platform/internal/exception_safety_testing.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

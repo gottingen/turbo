@@ -23,7 +23,7 @@
 #include <cassert>
 #include <cstring>
 
-#include "turbo/base/optimization.h"
+#include "turbo/platform/optimization.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

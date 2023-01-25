@@ -19,7 +19,7 @@
 #include <cstddef>
 #include <deque>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/crc/crc32c.h"
 
 namespace turbo {

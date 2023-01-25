@@ -17,7 +17,7 @@
 #include <ctime>
 #include <string>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/flags/flag.h"
 #include "turbo/time/time.h"
 #include "benchmark/benchmark.h"

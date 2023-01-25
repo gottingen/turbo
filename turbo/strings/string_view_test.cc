@@ -26,9 +26,9 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/options.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/options.h"
 
 #if defined(TURBO_HAVE_STD_STRING_VIEW) || defined(__ANDROID__)
 // We don't control the death messaging when using std::string_view.

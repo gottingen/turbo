@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/utility/utility.h"

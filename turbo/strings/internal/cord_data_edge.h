@@ -18,7 +18,7 @@
 #include <cassert>
 #include <cstddef>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/string_view.h"

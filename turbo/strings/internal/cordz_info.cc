@@ -14,8 +14,8 @@
 
 #include "turbo/strings/internal/cordz_info.h"
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/spinlock.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/spinlock.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/strings/internal/cord_internal.h"

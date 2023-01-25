@@ -14,7 +14,7 @@
 
 #include "time_zone_if.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "time_zone_info.h"
 #include "time_zone_libc.h"
 

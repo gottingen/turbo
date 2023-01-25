@@ -19,8 +19,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/macros.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cordz_info.h"

@@ -77,8 +77,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/base/macros.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/internal/stringify_sink.h"

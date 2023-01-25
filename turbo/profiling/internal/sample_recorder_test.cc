@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "gmock/gmock.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/internal/thread_pool.h"
 #include "turbo/synchronization/mutex.h"
 #include "turbo/synchronization/notification.h"

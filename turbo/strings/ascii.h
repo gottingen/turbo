@@ -55,8 +55,8 @@
 #include <algorithm>
 #include <string>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

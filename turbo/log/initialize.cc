@@ -14,7 +14,7 @@
 
 #include "turbo/log/initialize.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/log/internal/globals.h"
 #include "turbo/time/time.h"
 

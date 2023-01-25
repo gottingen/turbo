@@ -18,8 +18,8 @@
 
 #include <cstdlib>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/raw_logging.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

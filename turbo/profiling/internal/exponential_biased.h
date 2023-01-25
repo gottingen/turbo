@@ -17,8 +17,8 @@
 
 #include <stdint.h>
 
-#include "turbo/base/config.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/macros.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -14,7 +14,7 @@
 
 #include <cstdint>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/crc/crc32c.h"
 #include "turbo/crc/internal/crc_memcpy.h"
 #include "turbo/crc/internal/non_temporal_memcpy.h"

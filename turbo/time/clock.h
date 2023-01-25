@@ -22,7 +22,7 @@
 #ifndef TURBO_TIME_CLOCK_H_
 #define TURBO_TIME_CLOCK_H_
 
-#include "turbo/base/macros.h"
+#include "turbo/platform/macros.h"
 #include "turbo/time/time.h"
 
 namespace turbo {

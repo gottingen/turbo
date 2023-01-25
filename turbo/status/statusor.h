@@ -43,8 +43,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/call_once.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/call_once.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/status/internal/statusor_internal.h"
 #include "turbo/status/status.h"

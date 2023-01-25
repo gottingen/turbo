@@ -19,9 +19,9 @@
 #include <cstdint>
 #include <iosfwd>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/strings/internal/cord_data_edge.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_flat.h"

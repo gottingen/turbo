@@ -51,9 +51,9 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/internal/prefetch.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/prefetch.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/crc/crc32c.h"
 #include "turbo/crc/internal/cpu_detect.h"
 #include "turbo/crc/internal/crc_memcpy.h"

@@ -15,8 +15,8 @@
 
 #include <atomic>
 
-#include "turbo/base/internal/raw_logging.h"  // For TURBO_RAW_CHECK
-#include "turbo/base/internal/spinlock.h"
+#include "turbo/platform/internal/raw_logging.h"  // For TURBO_RAW_CHECK
+#include "turbo/platform/internal/spinlock.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

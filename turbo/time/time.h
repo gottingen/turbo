@@ -84,7 +84,7 @@ struct timeval;
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/macros.h"
+#include "turbo/platform/macros.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"

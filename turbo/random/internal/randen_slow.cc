@@ -18,8 +18,8 @@
 #include <cstdint>
 #include <cstring>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/endian.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/endian.h"
 #include "turbo/numeric/int128.h"
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_traits.h"

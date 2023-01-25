@@ -37,7 +37,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/internal/fast_type_id.h"
+#include "turbo/platform/internal/fast_type_id.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/distributions.h"

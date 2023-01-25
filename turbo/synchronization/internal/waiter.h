@@ -16,7 +16,7 @@
 #ifndef TURBO_SYNCHRONIZATION_INTERNAL_WAITER_H_
 #define TURBO_SYNCHRONIZATION_INTERNAL_WAITER_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 #ifdef _WIN32
 #include <sdkddkver.h>
@@ -35,7 +35,7 @@
 #include <atomic>
 #include <cstdint>
 
-#include "turbo/base/internal/thread_identity.h"
+#include "turbo/platform/internal/thread_identity.h"
 #include "turbo/synchronization/internal/futex.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
 

@@ -21,7 +21,7 @@
 
 #include <ostream>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/log/internal/log_message.h"
 #include "turbo/strings/string_view.h"
 

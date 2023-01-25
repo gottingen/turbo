@@ -21,8 +21,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"

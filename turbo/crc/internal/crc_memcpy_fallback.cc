@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/crc/crc32c.h"
 #include "turbo/crc/internal/crc_memcpy.h"
 

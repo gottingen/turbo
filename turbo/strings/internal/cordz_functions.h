@@ -17,9 +17,9 @@
 
 #include <stdint.h>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/optimization.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

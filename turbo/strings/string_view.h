@@ -36,12 +36,12 @@
 #include <limits>
 #include <string>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/throw_delegate.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/optimization.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_USES_STD_STRING_VIEW
 

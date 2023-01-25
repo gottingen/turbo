@@ -22,9 +22,9 @@
 #include <limits>
 #include <string>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/functional/function_ref.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/numeric/bits.h"

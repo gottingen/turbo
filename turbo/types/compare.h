@@ -35,7 +35,7 @@
 #include <cstdlib>
 #include <type_traits>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {

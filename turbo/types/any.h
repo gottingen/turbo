@@ -53,7 +53,7 @@
 #ifndef TURBO_TYPES_ANY_H_
 #define TURBO_TYPES_ANY_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/utility/utility.h"
 
 #ifdef TURBO_USES_STD_ANY
@@ -80,7 +80,7 @@ TURBO_NAMESPACE_END
 #include <typeinfo>
 #include <utility>
 
-#include "turbo/base/internal/fast_type_id.h"
+#include "turbo/platform/internal/fast_type_id.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/types/bad_any_cast.h"
 

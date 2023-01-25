@@ -37,8 +37,8 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/macros.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/string_view.h"
 

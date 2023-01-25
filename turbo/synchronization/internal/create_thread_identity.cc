@@ -16,14 +16,14 @@
 #include <new>
 
 // This file is a no-op if the required LowLevelAlloc support is missing.
-#include "turbo/base/internal/low_level_alloc.h"
+#include "turbo/platform/internal/low_level_alloc.h"
 #ifndef TURBO_LOW_LEVEL_ALLOC_MISSING
 
 #include <string.h>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/spinlock.h"
-#include "turbo/base/internal/thread_identity.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/spinlock.h"
+#include "turbo/platform/internal/thread_identity.h"
 #include "turbo/synchronization/internal/per_thread_sem.h"
 
 namespace turbo {

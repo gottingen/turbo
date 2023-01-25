@@ -22,9 +22,9 @@
 #include <limits>
 #include <string>
 
-#include "turbo/base/internal/endian.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/internal/unaligned_access.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/strings/internal/char_map.h"
 #include "turbo/strings/internal/escaping.h"
 #include "turbo/strings/internal/resize_uninitialized.h"

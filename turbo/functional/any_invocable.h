@@ -38,7 +38,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/functional/internal/any_invocable.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/utility/utility.h"

@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include <iostream>
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/substitute.h"
 
 #if !defined(TURBO_LTS_RELEASE_VERSION) || TURBO_LTS_RELEASE_VERSION != 99998877

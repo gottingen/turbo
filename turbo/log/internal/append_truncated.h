@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <cstring>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/types/span.h"
 

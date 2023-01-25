@@ -19,10 +19,10 @@
 
 #include <atomic>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/atomic_hook.h"
-#include "turbo/base/log_severity.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/atomic_hook.h"
+#include "turbo/platform/log_severity.h"
 #include "turbo/hash/hash.h"
 #include "turbo/strings/string_view.h"
 

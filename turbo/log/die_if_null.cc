@@ -14,7 +14,7 @@
 
 #include "turbo/log/die_if_null.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/log/log.h"
 #include "turbo/strings/str_cat.h"
 

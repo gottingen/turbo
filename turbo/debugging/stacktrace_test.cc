@@ -15,8 +15,8 @@
 #include "turbo/debugging/stacktrace.h"
 
 #include "gtest/gtest.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/optimization.h"
 
 namespace {
 

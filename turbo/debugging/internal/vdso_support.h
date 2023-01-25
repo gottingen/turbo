@@ -41,7 +41,7 @@
 
 #include <atomic>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/debugging/internal/elf_mem_image.h"
 
 #ifdef TURBO_HAVE_ELF_MEM_IMAGE

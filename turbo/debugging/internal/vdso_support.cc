@@ -42,9 +42,9 @@
 #include <sys/auxv.h>
 #endif
 
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 
 #ifndef AT_SYSINFO_EHDR
 #define AT_SYSINFO_EHDR 33  // for crosstoolv10

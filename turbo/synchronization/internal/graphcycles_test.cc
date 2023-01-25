@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/macros.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

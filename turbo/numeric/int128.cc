@@ -23,7 +23,7 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/base/optimization.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/numeric/bits.h"
 
 namespace turbo {

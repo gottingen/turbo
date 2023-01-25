@@ -183,12 +183,12 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/endian.h"
-#include "turbo/base/internal/prefetch.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/optimization.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/prefetch.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/container/internal/common.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/container/internal/container_memory.h"

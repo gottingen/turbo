@@ -17,7 +17,7 @@
 #include <string>
 
 #include "benchmark/benchmark.h"
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/functional/any_invocable.h"
 #include "turbo/functional/function_ref.h"
 

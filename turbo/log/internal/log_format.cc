@@ -29,9 +29,9 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/base/config.h"
-#include "turbo/base/log_severity.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/log_severity.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/log/internal/append_truncated.h"
 #include "turbo/log/internal/config.h"
 #include "turbo/log/internal/globals.h"

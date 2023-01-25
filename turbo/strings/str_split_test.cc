@@ -27,8 +27,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/macros.h"
 #include "turbo/container/btree_map.h"
 #include "turbo/container/btree_set.h"
 #include "turbo/container/flat_hash_map.h"

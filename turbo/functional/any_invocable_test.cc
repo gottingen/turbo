@@ -21,7 +21,7 @@
 #include <type_traits>
 
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/utility/utility.h"
 

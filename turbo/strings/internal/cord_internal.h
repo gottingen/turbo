@@ -21,11 +21,11 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/endian.h"
-#include "turbo/base/internal/invoke.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/invoke.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/string_view.h"

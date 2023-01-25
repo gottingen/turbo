@@ -42,9 +42,9 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/unaligned_access.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/unaligned_access.h"
+#include "turbo/platform/port.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/hash/internal/city.h"
 #include "turbo/hash/internal/low_level_hash.h"

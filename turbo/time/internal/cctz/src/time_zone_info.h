@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/time/internal/cctz/include/cctz/civil_time.h"
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 #include "turbo/time/internal/cctz/include/cctz/zone_info_source.h"

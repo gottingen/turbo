@@ -23,8 +23,8 @@
 
 #include <string.h>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/raw_logging.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/numeric/int128.h"
 
 namespace {

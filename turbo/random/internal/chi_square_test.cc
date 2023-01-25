@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/macros.h"
 
 using turbo::random_internal::ChiSquare;
 using turbo::random_internal::ChiSquarePValue;

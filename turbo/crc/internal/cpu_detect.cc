@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 #if defined(__aarch64__) && defined(__linux__)
 #include <asm/hwcap.h>

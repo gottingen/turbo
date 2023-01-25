@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/strings/string_view.h"
 

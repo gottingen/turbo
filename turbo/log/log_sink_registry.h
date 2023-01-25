@@ -21,7 +21,7 @@
 #ifndef TURBO_LOG_LOG_SINK_REGISTRY_H_
 #define TURBO_LOG_LOG_SINK_REGISTRY_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/log/internal/log_sink_set.h"
 #include "turbo/log/log_sink.h"
 

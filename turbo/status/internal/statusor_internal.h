@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/status/status.h"
 #include "turbo/utility/utility.h"

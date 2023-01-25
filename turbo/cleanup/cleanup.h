@@ -70,8 +70,8 @@
 
 #include <utility>
 
-#include "turbo/base/config.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/macros.h"
 #include "turbo/cleanup/internal/cleanup.h"
 
 namespace turbo {

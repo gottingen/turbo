@@ -20,8 +20,8 @@
 #include <atomic>
 #include <string>
 
-#include "turbo/base/config.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/internal/private_handle_accessor.h"

@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/internal/commandlineflag.h"

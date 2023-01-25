@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/flag.h"
 #include "turbo/flags/internal/flag.h"

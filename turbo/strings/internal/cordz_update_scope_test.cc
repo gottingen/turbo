@@ -16,7 +16,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/cordz_test_helpers.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cordz_info.h"

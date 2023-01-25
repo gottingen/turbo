@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/macros.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/macros.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_format.h"
 

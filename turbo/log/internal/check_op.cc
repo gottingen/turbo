@@ -25,7 +25,7 @@
 #include <sstream>
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {

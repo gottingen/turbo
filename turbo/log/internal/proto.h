@@ -27,9 +27,9 @@
 #include <cstdint>
 #include <limits>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/casts.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/casts.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/types/span.h"
 

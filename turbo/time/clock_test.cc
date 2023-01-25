@@ -14,7 +14,7 @@
 
 #include "turbo/time/clock.h"
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #if defined(TURBO_HAVE_ALARM)
 #include <signal.h>
 #include <unistd.h>

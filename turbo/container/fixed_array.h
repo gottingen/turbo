@@ -41,12 +41,12 @@
 #include <type_traits>
 
 #include "turbo/algorithm/algorithm.h"
-#include "turbo/base/config.h"
-#include "turbo/base/dynamic_annotations.h"
-#include "turbo/base/internal/throw_delegate.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/optimization.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/memory/memory.h"
 

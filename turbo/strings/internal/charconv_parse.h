@@ -17,7 +17,7 @@
 
 #include <cstdint>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/charconv.h"
 
 namespace turbo {

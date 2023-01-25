@@ -33,8 +33,8 @@
 #include <atomic>
 #include <cstdint>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/log/internal/voidify.h"
 
 // `TURBO_LOG_INTERNAL_CONDITION` prefixes another macro that expands to a

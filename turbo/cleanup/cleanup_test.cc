@@ -19,7 +19,7 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/utility/utility.h"
 
 namespace {

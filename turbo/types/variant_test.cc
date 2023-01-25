@@ -36,8 +36,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/string_view.h"

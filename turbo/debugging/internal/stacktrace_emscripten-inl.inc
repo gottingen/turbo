@@ -25,7 +25,7 @@
 #include <atomic>
 #include <cstring>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/debugging/stacktrace.h"
 
 extern "C" {

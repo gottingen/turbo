@@ -20,8 +20,8 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_view.h"

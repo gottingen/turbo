@@ -17,8 +17,8 @@
 #include <atomic>
 #include <cstdint>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/cycleclock.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/cycleclock.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

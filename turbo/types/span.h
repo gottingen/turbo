@@ -60,11 +60,11 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/internal/throw_delegate.h"
-#include "turbo/base/macros.h"
-#include "turbo/base/optimization.h"
-#include "turbo/base/port.h"    // TODO(strel): remove this include
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/platform/macros.h"
+#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"    // TODO(strel): remove this include
 #include "turbo/meta/type_traits.h"
 #include "turbo/types/internal/span.h"
 

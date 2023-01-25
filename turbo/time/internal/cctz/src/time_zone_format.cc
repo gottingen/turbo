@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 
 // Include time.h directly since, by C++ standards, ctime doesn't have to

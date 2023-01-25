@@ -33,10 +33,10 @@
 #include <streambuf>
 #include <string>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/errno_saver.h"
-#include "turbo/base/log_severity.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/errno_saver.h"
+#include "turbo/platform/log_severity.h"
 #include "turbo/log/internal/nullguard.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"

@@ -22,8 +22,8 @@
 #include <utility>
 
 #include "gtest/gtest.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/string_view.h"
 

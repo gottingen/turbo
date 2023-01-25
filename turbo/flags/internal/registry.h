@@ -18,7 +18,7 @@
 
 #include <functional>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/strings/string_view.h"

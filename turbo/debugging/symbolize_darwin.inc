@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/debugging/internal/demangle.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_cat.h"

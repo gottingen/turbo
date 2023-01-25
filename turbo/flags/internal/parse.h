@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/flags/declare.h"
 #include "turbo/strings/string_view.h"
 

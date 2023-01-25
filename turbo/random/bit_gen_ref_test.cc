@@ -17,7 +17,7 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/base/internal/fast_type_id.h"
+#include "turbo/platform/internal/fast_type_id.h"
 #include "turbo/random/internal/sequence_urbg.h"
 #include "turbo/random/random.h"
 

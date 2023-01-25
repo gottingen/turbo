@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "turbo/base/attributes.h"
+#include "turbo/platform/attributes.h"
 #include "turbo/random/internal/fast_uniform_bits.h"
 #include "turbo/types/optional.h"
 #include "turbo/types/span.h"

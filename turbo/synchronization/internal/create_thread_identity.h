@@ -25,8 +25,8 @@
 #ifndef TURBO_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_
 #define TURBO_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_
 
-#include "turbo/base/internal/thread_identity.h"
-#include "turbo/base/port.h"
+#include "turbo/platform/internal/thread_identity.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

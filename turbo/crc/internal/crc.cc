@@ -43,9 +43,9 @@
 
 #include <cstdint>
 
-#include "turbo/base/internal/endian.h"
-#include "turbo/base/internal/prefetch.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/prefetch.h"
+#include "turbo/platform/internal/raw_logging.h"
 #include "turbo/crc/internal/crc_internal.h"
 
 namespace turbo {

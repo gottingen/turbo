@@ -45,9 +45,9 @@
 #include <tuple>
 #include <utility>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/inline_variable.h"
-#include "turbo/base/internal/invoke.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/inline_variable.h"
+#include "turbo/platform/internal/invoke.h"
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {

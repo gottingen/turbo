@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-add_subdirectory(base)
+add_subdirectory(platform)
 add_subdirectory(algorithm)
 add_subdirectory(cleanup)
 add_subdirectory(container)

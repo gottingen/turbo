@@ -24,10 +24,10 @@
 #include <string.h>  // for memcpy and memset
 #include <algorithm>
 
-#include "turbo/base/config.h"
-#include "turbo/base/internal/endian.h"
-#include "turbo/base/internal/unaligned_access.h"
-#include "turbo/base/optimization.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/unaligned_access.h"
+#include "turbo/platform/optimization.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

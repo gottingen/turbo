@@ -32,10 +32,10 @@
 #endif
 
 #include "turbo/algorithm/container.h"
-#include "turbo/base/attributes.h"
-#include "turbo/base/config.h"
-#include "turbo/base/const_init.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/const_init.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/flag.h"

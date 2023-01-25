@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 
 namespace turbo {

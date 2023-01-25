@@ -20,7 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/internal/inline_variable.h"
+#include "turbo/platform/internal/inline_variable.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/utility/utility.h"

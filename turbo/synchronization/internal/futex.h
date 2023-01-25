@@ -14,7 +14,7 @@
 #ifndef TURBO_SYNCHRONIZATION_INTERNAL_FUTEX_H_
 #define TURBO_SYNCHRONIZATION_INTERNAL_FUTEX_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -35,7 +35,7 @@
 #include <atomic>
 #include <cstdint>
 
-#include "turbo/base/optimization.h"
+#include "turbo/platform/optimization.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
 
 #ifdef TURBO_INTERNAL_HAVE_FUTEX

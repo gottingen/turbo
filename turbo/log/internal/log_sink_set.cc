@@ -30,12 +30,12 @@
 #include <algorithm>
 #include <vector>
 
-#include "turbo/base/attributes.h"
-#include "turbo/base/call_once.h"
-#include "turbo/base/config.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/base/log_severity.h"
-#include "turbo/base/thread_annotations.h"
+#include "turbo/platform/attributes.h"
+#include "turbo/platform/call_once.h"
+#include "turbo/platform/config.h"
+#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/platform/log_severity.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/cleanup/cleanup.h"
 #include "turbo/log/globals.h"
 #include "turbo/log/internal/config.h"

@@ -15,7 +15,7 @@
 #ifndef TURBO_TIME_INTERNAL_CCTZ_CIVIL_TIME_H_
 #define TURBO_TIME_INTERNAL_CCTZ_CIVIL_TIME_H_
 
-#include "turbo/base/config.h"
+#include "turbo/platform/config.h"
 #include "turbo/time/internal/cctz/include/cctz/civil_time_detail.h"
 
 namespace turbo {
