@@ -1,0 +1,371 @@
+#
+# Copyright 2017 The Abseil Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+absl_cc_library(
+  NAME
+    any
+  HDRS
+    "any.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::bad_any_cast
+    turbo::config
+    turbo::core_headers
+    turbo::fast_type_id
+    turbo::type_traits
+    turbo::utility
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    bad_any_cast
+  HDRS
+   "bad_any_cast.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::bad_any_cast_impl
+    turbo::config
+  PUBLIC
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    bad_any_cast_impl
+  SRCS
+   "bad_any_cast.h"
+   "bad_any_cast.cc"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::config
+    turbo::raw_logging_internal
+)
+
+absl_cc_test(
+  NAME
+    any_test
+  SRCS
+    "any_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::any
+    turbo::config
+    turbo::exception_testing
+    turbo::raw_logging_internal
+    turbo::test_instance_tracker
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    any_test_noexceptions
+  SRCS
+    "any_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::any
+    turbo::config
+    turbo::exception_testing
+    turbo::raw_logging_internal
+    turbo::test_instance_tracker
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    any_exception_safety_test
+  SRCS
+    "any_exception_safety_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::any
+    turbo::config
+    turbo::exception_safety_testing
+    GTest::gmock_main
+)
+
+absl_cc_library(
+  NAME
+    span
+  HDRS
+    "span.h"
+  SRCS
+    "internal/span.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::algorithm
+    turbo::core_headers
+    turbo::throw_delegate
+    turbo::type_traits
+  PUBLIC
+)
+
+absl_cc_test(
+  NAME
+    span_test
+  SRCS
+    "span_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::span
+    turbo::base
+    turbo::config
+    turbo::core_headers
+    turbo::exception_testing
+    turbo::fixed_array
+    turbo::inlined_vector
+    turbo::hash_testing
+    turbo::strings
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    span_test_noexceptions
+  SRCS
+    "span_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::span
+    turbo::base
+    turbo::config
+    turbo::core_headers
+    turbo::exception_testing
+    turbo::fixed_array
+    turbo::inlined_vector
+    turbo::hash_testing
+    turbo::strings
+    GTest::gmock_main
+)
+
+absl_cc_library(
+  NAME
+    optional
+  HDRS
+    "optional.h"
+  SRCS
+    "internal/optional.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::bad_optional_access
+    turbo::base_internal
+    turbo::config
+    turbo::core_headers
+    turbo::memory
+    turbo::type_traits
+    turbo::utility
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    bad_optional_access
+  HDRS
+    "bad_optional_access.h"
+  SRCS
+    "bad_optional_access.cc"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::config
+    turbo::raw_logging_internal
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    bad_variant_access
+  HDRS
+    "bad_variant_access.h"
+  SRCS
+    "bad_variant_access.cc"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::config
+    turbo::raw_logging_internal
+  PUBLIC
+)
+
+absl_cc_test(
+  NAME
+    optional_test
+  SRCS
+    "optional_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::optional
+    turbo::config
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::type_traits
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    optional_exception_safety_test
+  SRCS
+    "optional_exception_safety_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::optional
+    turbo::config
+    turbo::exception_safety_testing
+    GTest::gmock_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    conformance_testing
+  HDRS
+    "internal/conformance_aliases.h"
+    "internal/conformance_archetype.h"
+    "internal/conformance_profile.h"
+    "internal/conformance_testing.h"
+    "internal/conformance_testing_helpers.h"
+    "internal/parentheses.h"
+    "internal/transform_args.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::algorithm
+    turbo::debugging
+    turbo::type_traits
+    turbo::strings
+    turbo::utility
+    GTest::gmock_main
+  TESTONLY
+)
+
+absl_cc_test(
+  NAME
+    conformance_testing_test
+  SRCS
+    "internal/conformance_testing_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+    ${ABSL_EXCEPTIONS_FLAG}
+  LINKOPTS
+    ${ABSL_EXCEPTIONS_FLAG_LINKOPTS}
+  DEPS
+    turbo::conformance_testing
+    turbo::type_traits
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    conformance_testing_test_no_exceptions
+  SRCS
+    "internal/conformance_testing_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::conformance_testing
+    turbo::type_traits
+    GTest::gmock_main
+)
+
+absl_cc_library(
+  NAME
+    variant
+  HDRS
+    "variant.h"
+  SRCS
+    "internal/variant.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::bad_variant_access
+    turbo::base_internal
+    turbo::config
+    turbo::core_headers
+    turbo::type_traits
+    turbo::utility
+  PUBLIC
+)
+
+absl_cc_test(
+  NAME
+    variant_test
+  SRCS
+    "variant_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::variant
+    turbo::config
+    turbo::core_headers
+    turbo::memory
+    turbo::type_traits
+    turbo::strings
+    GTest::gmock_main
+)
+
+absl_cc_library(
+  NAME
+    compare
+  HDRS
+    "compare.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    turbo::core_headers
+    turbo::type_traits
+  PUBLIC
+)
+
+absl_cc_test(
+  NAME
+    compare_test
+  SRCS
+    "compare_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::base
+    turbo::compare
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    variant_exception_safety_test
+  SRCS
+    "variant_exception_safety_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::variant
+    turbo::config
+    turbo::exception_safety_testing
+    turbo::memory
+    GTest::gmock_main
+)

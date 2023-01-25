@@ -34,3 +34,7 @@
 #go
 go.mod
 go.sum
+
+build
+cmake-build-debug
+.idea

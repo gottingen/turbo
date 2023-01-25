@@ -1,0 +1,1042 @@
+#
+# Copyright 2022 The Abseil Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Internal targets
+absl_cc_library(
+  NAME
+    log_internal_check_impl
+  SRCS
+  HDRS
+    "internal/check_impl.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log_internal_check_op
+    turbo::log_internal_conditions
+    turbo::log_internal_message
+    turbo::log_internal_strip
+)
+
+absl_cc_library(
+  NAME
+    log_internal_check_op
+  SRCS
+    "internal/check_op.cc"
+  HDRS
+    "internal/check_op.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_internal_nullguard
+    turbo::log_internal_nullstream
+    turbo::log_internal_strip
+    turbo::strings
+)
+
+absl_cc_library(
+  NAME
+    log_internal_conditions
+  SRCS
+    "internal/conditions.cc"
+  HDRS
+    "internal/conditions.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::config
+    turbo::core_headers
+    turbo::log_internal_voidify
+)
+
+absl_cc_library(
+  NAME
+    log_internal_config
+  SRCS
+  HDRS
+    "internal/config.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+)
+
+absl_cc_library(
+  NAME
+    log_internal_flags
+  SRCS
+  HDRS
+    "internal/flags.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::flags
+)
+
+absl_cc_library(
+  NAME
+    log_internal_format
+  SRCS
+    "internal/log_format.cc"
+  HDRS
+    "internal/log_format.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_internal_append_truncated
+    turbo::log_internal_config
+    turbo::log_internal_globals
+    turbo::log_severity
+    turbo::strings
+    turbo::str_format
+    turbo::time
+    turbo::span
+)
+
+absl_cc_library(
+  NAME
+    log_internal_globals
+  SRCS
+    "internal/globals.cc"
+  HDRS
+    "internal/globals.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_severity
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::time
+)
+
+absl_cc_library(
+  NAME
+    log_internal_log_impl
+  SRCS
+  HDRS
+    "internal/log_impl.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::log_internal_conditions
+    turbo::log_internal_message
+    turbo::log_internal_strip
+)
+
+absl_cc_library(
+  NAME
+    log_internal_proto
+  SRCS
+    "internal/proto.cc"
+  HDRS
+    "internal/proto.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::config
+    turbo::core_headers
+    turbo::strings
+    turbo::span
+)
+
+absl_cc_library(
+  NAME
+    log_internal_message
+  SRCS
+    "internal/log_message.cc"
+  HDRS
+    "internal/log_message.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::config
+    turbo::core_headers
+    turbo::errno_saver
+    turbo::inlined_vector
+    turbo::examine_stack
+    turbo::log_internal_append_truncated
+    turbo::log_internal_format
+    turbo::log_internal_globals
+    turbo::log_internal_proto
+    turbo::log_internal_log_sink_set
+    turbo::log_internal_nullguard
+    turbo::log_globals
+    turbo::log_entry
+    turbo::log_severity
+    turbo::log_sink
+    turbo::log_sink_registry
+    turbo::memory
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::strerror
+    turbo::time
+    turbo::span
+)
+
+absl_cc_library(
+  NAME
+    log_internal_log_sink_set
+  SRCS
+    "internal/log_sink_set.cc"
+  HDRS
+    "internal/log_sink_set.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+    $<$<BOOL:${ANDROID}>:-llog>
+  DEPS
+    turbo::base
+    turbo::cleanup
+    turbo::config
+    turbo::core_headers
+    turbo::log_internal_config
+    turbo::log_internal_globals
+    turbo::log_globals
+    turbo::log_entry
+    turbo::log_severity
+    turbo::log_sink
+    turbo::raw_logging_internal
+    turbo::synchronization
+    turbo::span
+    turbo::strings
+)
+
+absl_cc_library(
+  NAME
+    log_internal_nullguard
+  SRCS
+    "internal/nullguard.cc"
+  HDRS
+    "internal/nullguard.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+)
+
+absl_cc_library(
+  NAME
+    log_internal_nullstream
+  SRCS
+  HDRS
+    "internal/nullstream.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_severity
+    turbo::strings
+)
+
+absl_cc_library(
+  NAME
+    log_internal_strip
+  SRCS
+  HDRS
+    "internal/strip.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::log_internal_message
+    turbo::log_internal_nullstream
+    turbo::log_severity
+)
+
+absl_cc_library(
+  NAME
+    log_internal_test_actions
+  SRCS
+    "internal/test_actions.cc"
+  HDRS
+    "internal/test_actions.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_entry
+    turbo::log_severity
+    turbo::strings
+    turbo::time
+  TESTONLY
+)
+
+absl_cc_library(
+  NAME
+    log_internal_test_helpers
+  SRCS
+    "internal/test_helpers.cc"
+  HDRS
+    "internal/test_helpers.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::log_globals
+    turbo::log_initialize
+    turbo::log_internal_globals
+    turbo::log_severity
+    GTest::gtest
+  TESTONLY
+)
+
+absl_cc_library(
+  NAME
+    log_internal_test_matchers
+  SRCS
+    "internal/test_matchers.cc"
+  HDRS
+    "internal/test_matchers.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_entry
+    turbo::log_internal_test_helpers
+    turbo::log_severity
+    turbo::strings
+    turbo::time
+    GTest::gtest
+    GTest::gmock
+  TESTONLY
+)
+
+absl_cc_library(
+  NAME
+    log_internal_voidify
+  SRCS
+  HDRS
+    "internal/voidify.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+)
+
+absl_cc_library(
+  NAME
+    log_internal_append_truncated
+  SRCS
+  HDRS
+    "internal/append_truncated.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::strings
+    turbo::span
+)
+
+# Public targets
+absl_cc_library(
+  NAME
+    absl_check
+  SRCS
+  HDRS
+    "absl_check.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::log_internal_check_impl
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    absl_log
+  SRCS
+  HDRS
+    "absl_log.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::log_internal_log_impl
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    check
+  SRCS
+  HDRS
+    "check.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::log_internal_check_impl
+    turbo::core_headers
+    turbo::log_internal_check_op
+    turbo::log_internal_conditions
+    turbo::log_internal_message
+    turbo::log_internal_strip
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    die_if_null
+  SRCS
+    "die_if_null.cc"
+  HDRS
+    "die_if_null.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log
+    turbo::strings
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    log_flags
+  SRCS
+    "flags.cc"
+  HDRS
+    "flags.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_globals
+    turbo::log_severity
+    turbo::log_internal_config
+    turbo::log_internal_flags
+    turbo::flags
+    turbo::flags_marshalling
+    turbo::strings
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    log_globals
+  SRCS
+    "globals.cc"
+  HDRS
+    "globals.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::atomic_hook
+    turbo::config
+    turbo::core_headers
+    turbo::hash
+    turbo::log_severity
+    turbo::strings
+)
+
+absl_cc_library(
+  NAME
+    log_initialize
+  SRCS
+    "initialize.cc"
+  HDRS
+    "initialize.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::log_globals
+    turbo::log_internal_globals
+    turbo::time
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    log
+  SRCS
+  HDRS
+    "log.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::log_internal_log_impl
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    log_entry
+  SRCS
+    "log_entry.cc"
+  HDRS
+    "log_entry.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_internal_config
+    turbo::log_severity
+    turbo::span
+    turbo::strings
+    turbo::time
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    log_sink
+  SRCS
+    "log_sink.cc"
+  HDRS
+    "log_sink.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::log_entry
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    log_sink_registry
+  SRCS
+  HDRS
+    "log_sink_registry.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::log_sink
+    turbo::log_internal_log_sink_set
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    log_streamer
+  SRCS
+  HDRS
+    "log_streamer.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::absl_log
+    turbo::log_severity
+    turbo::optional
+    turbo::strings
+    turbo::strings_internal
+    turbo::utility
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    scoped_mock_log
+  SRCS
+    "scoped_mock_log.cc"
+  HDRS
+    "scoped_mock_log.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::log_entry
+    turbo::log_severity
+    turbo::log_sink
+    turbo::log_sink_registry
+    turbo::raw_logging_internal
+    turbo::strings
+    GTest::gmock
+    GTest::gtest
+  PUBLIC
+  TESTONLY
+)
+
+absl_cc_library(
+  NAME
+    log_internal_structured
+  HDRS
+    "internal/structured.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::log_internal_message
+    turbo::strings
+)
+
+absl_cc_library(
+  NAME
+    log_structured
+  HDRS
+    "structured.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::log_internal_structured
+    turbo::strings
+  PUBLIC
+)
+
+# Test targets
+
+absl_cc_test(
+  NAME
+    absl_check_test
+  SRCS
+    "absl_check_test.cc"
+    "check_test_impl.h"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::absl_check
+    turbo::config
+    turbo::core_headers
+    turbo::log_internal_test_helpers
+    turbo::status
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    absl_log_basic_test
+  SRCS
+    "log_basic_test.cc"
+    "log_basic_test_impl.h"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::absl_log
+    turbo::log_entry
+    turbo::log_globals
+    turbo::log_severity
+    turbo::log_internal_test_actions
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::scoped_mock_log
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    check_test
+  SRCS
+    "check_test.cc"
+    "check_test_impl.h"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::check
+    turbo::config
+    turbo::core_headers
+    turbo::log_internal_test_helpers
+    turbo::status
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    die_if_null_test
+  SRCS
+    "die_if_null_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::die_if_null
+    turbo::log_internal_test_helpers
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_basic_test
+  SRCS
+    "log_basic_test.cc"
+    "log_basic_test_impl.h"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::log
+    turbo::log_entry
+    turbo::log_globals
+    turbo::log_severity
+    turbo::log_internal_test_actions
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::scoped_mock_log
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_entry_test
+  SRCS
+    "log_entry_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_entry
+    turbo::log_internal_append_truncated
+    turbo::log_internal_format
+    turbo::log_internal_globals
+    turbo::log_internal_test_helpers
+    turbo::log_severity
+    turbo::span
+    turbo::strings
+    turbo::time
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_flags_test
+  SRCS
+    "flags_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log
+    turbo::log_flags
+    turbo::log_globals
+    turbo::log_internal_flags
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::log_severity
+    turbo::flags
+    turbo::flags_reflection
+    turbo::scoped_mock_log
+    turbo::strings
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_globals_test
+  SRCS
+    "globals_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log
+    turbo::log_globals
+    turbo::log_internal_globals
+    turbo::log_internal_test_helpers
+    turbo::log_severity
+    turbo::scoped_mock_log
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_format_test
+  SRCS
+    "log_format_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::check
+    turbo::log
+    turbo::log_internal_test_matchers
+    turbo::optional
+    turbo::scoped_mock_log
+    turbo::str_format
+    turbo::strings
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_macro_hygiene_test
+  SRCS
+    "log_macro_hygiene_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log
+    turbo::log_severity
+    turbo::scoped_mock_log
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_sink_test
+  SRCS
+    "log_sink_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log
+    turbo::log_internal_test_actions
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::log_sink
+    turbo::log_sink_registry
+    turbo::log_severity
+    turbo::raw_logging_internal
+    turbo::scoped_mock_log
+    turbo::strings
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_streamer_test
+  SRCS
+    "log_streamer_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::core_headers
+    turbo::log
+    turbo::log_internal_test_actions
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::log_streamer
+    turbo::log_severity
+    turbo::scoped_mock_log
+    turbo::strings
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_modifier_methods_test
+  SRCS
+    "log_modifier_methods_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::log
+    turbo::log_internal_test_actions
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::log_sink
+    turbo::scoped_mock_log
+    turbo::strings
+    turbo::time
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    scoped_mock_log_test
+  SRCS
+    "scoped_mock_log_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log
+    turbo::log_globals
+    turbo::log_internal_globals
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::log_severity
+    turbo::memory
+    turbo::scoped_mock_log
+    turbo::strings
+    turbo::synchronization
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_internal_stderr_log_sink_test
+  SRCS
+    "internal/stderr_log_sink_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log
+    turbo::log_globals
+    turbo::log_internal_test_helpers
+    turbo::log_severity
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_stripping_test
+  SRCS
+    "stripping_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::check
+    turbo::flags_program_name
+    turbo::log
+    turbo::log_internal_test_helpers
+    turbo::strerror
+    turbo::strings
+    turbo::str_format
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    log_structured_test
+  SRCS
+    "structured_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::log
+    turbo::log_internal_test_helpers
+    turbo::log_internal_test_matchers
+    turbo::log_structured
+    turbo::scoped_mock_log
+    GTest::gmock
+    GTest::gtest_main
+)

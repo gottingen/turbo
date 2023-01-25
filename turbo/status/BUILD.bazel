@@ -1,0 +1,109 @@
+#
+# Copyright 2017 The Abseil Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This package contains `turbo::Status`.
+# It will expand later to have utilities around `Status` like `StatusOr`,
+# `StatusBuilder` and macros.
+
+load(
+    "//turbo:copts/configure_copts.bzl",
+    "ABSL_DEFAULT_COPTS",
+    "ABSL_DEFAULT_LINKOPTS",
+    "ABSL_TEST_COPTS",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+cc_library(
+    name = "status",
+    srcs = [
+        "internal/status_internal.h",
+        "status.cc",
+        "status_payload_printer.cc",
+    ],
+    hdrs = [
+        "status.h",
+        "status_payload_printer.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        "//turbo/base:atomic_hook",
+        "//turbo/base:core_headers",
+        "//turbo/base:raw_logging_internal",
+        "//turbo/base:strerror",
+        "//turbo/container:inlined_vector",
+        "//turbo/debugging:stacktrace",
+        "//turbo/debugging:symbolize",
+        "//turbo/functional:function_ref",
+        "//turbo/strings",
+        "//turbo/strings:cord",
+        "//turbo/strings:str_format",
+        "//turbo/types:optional",
+    ],
+)
+
+cc_test(
+    name = "status_test",
+    srcs = ["status_test.cc"],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":status",
+        "//turbo/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "statusor",
+    srcs = [
+        "internal/statusor_internal.h",
+        "statusor.cc",
+    ],
+    hdrs = [
+        "statusor.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":status",
+        "//turbo/base",
+        "//turbo/base:core_headers",
+        "//turbo/base:raw_logging_internal",
+        "//turbo/meta:type_traits",
+        "//turbo/strings",
+        "//turbo/types:variant",
+        "//turbo/utility",
+    ],
+)
+
+cc_test(
+    name = "statusor_test",
+    size = "small",
+    srcs = ["statusor_test.cc"],
+    deps = [
+        ":status",
+        ":statusor",
+        "//turbo/base",
+        "//turbo/memory",
+        "//turbo/strings",
+        "//turbo/types:any",
+        "//turbo/utility",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

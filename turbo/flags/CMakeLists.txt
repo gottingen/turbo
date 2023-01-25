@@ -1,0 +1,471 @@
+#
+# Copyright 2019 The Abseil Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    flags_path_util
+  HDRS
+    "internal/path_util.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::strings
+  PUBLIC
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    flags_program_name
+  SRCS
+    "internal/program_name.cc"
+  HDRS
+    "internal/program_name.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::flags_path_util
+    turbo::strings
+    turbo::synchronization
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    flags_config
+  SRCS
+    "usage_config.cc"
+  HDRS
+    "config.h"
+    "usage_config.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::flags_path_util
+    turbo::flags_program_name
+    turbo::core_headers
+    turbo::strings
+    turbo::synchronization
+)
+
+absl_cc_library(
+  NAME
+    flags_marshalling
+  SRCS
+    "marshalling.cc"
+  HDRS
+    "marshalling.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::log_severity
+    turbo::optional
+    turbo::strings
+    turbo::str_format
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    flags_commandlineflag_internal
+  SRCS
+    "internal/commandlineflag.cc"
+  HDRS
+    "internal/commandlineflag.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::dynamic_annotations
+    turbo::fast_type_id
+)
+
+absl_cc_library(
+  NAME
+    flags_commandlineflag
+  SRCS
+    "commandlineflag.cc"
+  HDRS
+    "commandlineflag.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::fast_type_id
+    turbo::flags_commandlineflag_internal
+    turbo::optional
+    turbo::strings
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    flags_private_handle_accessor
+  SRCS
+    "internal/private_handle_accessor.cc"
+  HDRS
+    "internal/private_handle_accessor.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::flags_commandlineflag
+    turbo::flags_commandlineflag_internal
+    turbo::strings
+)
+
+absl_cc_library(
+  NAME
+    flags_reflection
+  SRCS
+    "reflection.cc"
+  HDRS
+    "reflection.h"
+    "internal/registry.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::flags_commandlineflag
+    turbo::flags_private_handle_accessor
+    turbo::flags_config
+    turbo::strings
+    turbo::synchronization
+    turbo::flat_hash_map
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    flags_internal
+  SRCS
+    "internal/flag.cc"
+  HDRS
+    "internal/flag.h"
+    "internal/sequence_lock.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::config
+    turbo::flags_commandlineflag
+    turbo::flags_commandlineflag_internal
+    turbo::flags_config
+    turbo::flags_marshalling
+    turbo::synchronization
+    turbo::meta
+    turbo::utility
+  PUBLIC
+)
+
+absl_cc_library(
+  NAME
+    flags
+  SRCS
+    "flag.cc"
+  HDRS
+    "declare.h"
+    "flag.h"
+    "internal/flag_msvc.inc"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::flags_commandlineflag
+    turbo::flags_config
+    turbo::flags_internal
+    turbo::flags_reflection
+    turbo::base
+    turbo::core_headers
+    turbo::strings
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    flags_usage_internal
+  SRCS
+    "internal/usage.cc"
+  HDRS
+    "internal/usage.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::flags_config
+    turbo::flags
+    turbo::flags_commandlineflag
+    turbo::flags_internal
+    turbo::flags_path_util
+    turbo::flags_private_handle_accessor
+    turbo::flags_program_name
+    turbo::flags_reflection
+    turbo::flat_hash_map
+    turbo::strings
+    turbo::synchronization
+)
+
+absl_cc_library(
+  NAME
+    flags_usage
+  SRCS
+    "usage.cc"
+  HDRS
+    "usage.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::flags_usage_internal
+    turbo::strings
+    turbo::synchronization
+)
+
+absl_cc_library(
+  NAME
+    flags_parse
+  SRCS
+    "parse.cc"
+  HDRS
+    "internal/parse.h"
+    "parse.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::algorithm_container
+    turbo::config
+    turbo::core_headers
+    turbo::flags_config
+    turbo::flags
+    turbo::flags_commandlineflag
+    turbo::flags_commandlineflag_internal
+    turbo::flags_internal
+    turbo::flags_private_handle_accessor
+    turbo::flags_program_name
+    turbo::flags_reflection
+    turbo::flags_usage
+    turbo::strings
+    turbo::synchronization
+)
+
+############################################################################
+# Unit tests in alpahabetical order.
+
+absl_cc_test(
+  NAME
+    flags_commandlineflag_test
+  SRCS
+    "commandlineflag_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags
+    turbo::flags_commandlineflag
+    turbo::flags_commandlineflag_internal
+    turbo::flags_config
+    turbo::flags_private_handle_accessor
+    turbo::flags_reflection
+    turbo::memory
+    turbo::strings
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    flags_config_test
+  SRCS
+    "config_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags_config
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    flags_flag_test
+  SRCS
+    "flag_test.cc"
+    "flag_test_defs.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::core_headers
+    turbo::flags
+    turbo::flags_config
+    turbo::flags_internal
+    turbo::flags_marshalling
+    turbo::flags_reflection
+    turbo::strings
+    turbo::time
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    flags_marshalling_test
+  SRCS
+    "marshalling_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags_marshalling
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    flags_parse_test
+  SRCS
+    "parse_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags
+    turbo::flags_parse
+    turbo::flags_reflection
+    turbo::flags_usage_internal
+    turbo::raw_logging_internal
+    turbo::scoped_set_env
+    turbo::span
+    turbo::strings
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    flags_path_util_test
+  SRCS
+    "internal/path_util_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags_path_util
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    flags_program_name_test
+  SRCS
+    "internal/program_name_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags_program_name
+    turbo::strings
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    flags_reflection_test
+  SRCS
+    "reflection_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags_commandlineflag_internal
+    turbo::flags
+    turbo::flags_reflection
+    turbo::flags_usage
+    turbo::memory
+    turbo::strings
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    flags_sequence_lock_test
+  SRCS
+    "internal/sequence_lock_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::base
+    turbo::flags_internal
+    turbo::time
+    GTest::gmock_main
+)
+
+absl_cc_test(
+  NAME
+    flags_usage_config_test
+  SRCS
+    "usage_config_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags_config
+    turbo::flags_path_util
+    turbo::flags_program_name
+    turbo::strings
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    flags_usage_test
+  SRCS
+    "internal/usage_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    turbo::flags_config
+    turbo::flags
+    turbo::flags_path_util
+    turbo::flags_program_name
+    turbo::flags_parse
+    turbo::flags_reflection
+    turbo::flags_usage
+    turbo::strings
+    GTest::gmock
+)

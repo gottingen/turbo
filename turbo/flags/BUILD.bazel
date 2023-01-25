@@ -1,0 +1,583 @@
+#
+# Copyright 2019 The Abseil Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+load(
+    "//turbo:copts/configure_copts.bzl",
+    "ABSL_DEFAULT_COPTS",
+    "ABSL_DEFAULT_LINKOPTS",
+    "ABSL_TEST_COPTS",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+cc_library(
+    name = "path_util",
+    hdrs = [
+        "internal/path_util.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    visibility = [
+        "//turbo/flags:__pkg__",
+    ],
+    deps = [
+        "//turbo/base:config",
+        "//turbo/strings",
+    ],
+)
+
+cc_library(
+    name = "program_name",
+    srcs = [
+        "internal/program_name.cc",
+    ],
+    hdrs = [
+        "internal/program_name.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    visibility = [
+        "//turbo/flags:__pkg__",
+        "//turbo/log:__pkg__",
+    ],
+    deps = [
+        ":path_util",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/strings",
+        "//turbo/synchronization",
+    ],
+)
+
+cc_library(
+    name = "config",
+    srcs = [
+        "usage_config.cc",
+    ],
+    hdrs = [
+        "config.h",
+        "usage_config.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":path_util",
+        ":program_name",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/strings",
+        "//turbo/synchronization",
+    ],
+)
+
+cc_library(
+    name = "marshalling",
+    srcs = [
+        "marshalling.cc",
+    ],
+    hdrs = [
+        "marshalling.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/base:log_severity",
+        "//turbo/strings",
+        "//turbo/strings:str_format",
+        "//turbo/types:optional",
+    ],
+)
+
+cc_library(
+    name = "commandlineflag_internal",
+    srcs = [
+        "internal/commandlineflag.cc",
+    ],
+    hdrs = [
+        "internal/commandlineflag.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    visibility = [
+        "//visibility:private",
+    ],
+    deps = [
+        "//turbo/base:config",
+        "//turbo/base:fast_type_id",
+    ],
+)
+
+cc_library(
+    name = "commandlineflag",
+    srcs = [
+        "commandlineflag.cc",
+    ],
+    hdrs = [
+        "commandlineflag.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":commandlineflag_internal",
+        "//turbo/base:config",
+        "//turbo/base:fast_type_id",
+        "//turbo/strings",
+        "//turbo/types:optional",
+    ],
+)
+
+cc_library(
+    name = "private_handle_accessor",
+    srcs = [
+        "internal/private_handle_accessor.cc",
+    ],
+    hdrs = [
+        "internal/private_handle_accessor.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    visibility = [
+        "//turbo/flags:__pkg__",
+    ],
+    deps = [
+        ":commandlineflag",
+        ":commandlineflag_internal",
+        "//turbo/base:config",
+        "//turbo/strings",
+    ],
+)
+
+cc_library(
+    name = "reflection",
+    srcs = [
+        "reflection.cc",
+    ],
+    hdrs = [
+        "internal/registry.h",
+        "reflection.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":commandlineflag",
+        ":commandlineflag_internal",
+        ":config",
+        ":private_handle_accessor",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/container:flat_hash_map",
+        "//turbo/strings",
+        "//turbo/synchronization",
+    ],
+)
+
+cc_library(
+    name = "flag_internal",
+    srcs = [
+        "internal/flag.cc",
+    ],
+    hdrs = [
+        "internal/flag.h",
+        "internal/sequence_lock.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    visibility = ["//turbo/base:__subpackages__"],
+    deps = [
+        ":commandlineflag",
+        ":commandlineflag_internal",
+        ":config",
+        ":marshalling",
+        ":reflection",
+        "//turbo/base",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/base:dynamic_annotations",
+        "//turbo/memory",
+        "//turbo/meta:type_traits",
+        "//turbo/strings",
+        "//turbo/synchronization",
+        "//turbo/utility",
+    ],
+)
+
+cc_library(
+    name = "flag",
+    srcs = [
+        "flag.cc",
+        "internal/flag_msvc.inc",
+    ],
+    hdrs = [
+        "declare.h",
+        "flag.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":config",
+        ":flag_internal",
+        ":reflection",
+        "//turbo/base",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/strings",
+    ],
+)
+
+cc_library(
+    name = "usage_internal",
+    srcs = [
+        "internal/usage.cc",
+    ],
+    hdrs = [
+        "internal/usage.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    visibility = [
+        "//turbo/flags:__pkg__",
+    ],
+    deps = [
+        ":commandlineflag",
+        ":config",
+        ":flag",
+        ":flag_internal",
+        ":path_util",
+        ":private_handle_accessor",
+        ":program_name",
+        ":reflection",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/container:flat_hash_map",
+        "//turbo/strings",
+    ],
+)
+
+cc_library(
+    name = "usage",
+    srcs = [
+        "usage.cc",
+    ],
+    hdrs = [
+        "usage.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":usage_internal",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/strings",
+        "//turbo/synchronization",
+    ],
+)
+
+cc_library(
+    name = "parse",
+    srcs = ["parse.cc"],
+    hdrs = [
+        "internal/parse.h",
+        "parse.h",
+    ],
+    copts = ABSL_DEFAULT_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":commandlineflag",
+        ":commandlineflag_internal",
+        ":config",
+        ":flag",
+        ":flag_internal",
+        ":private_handle_accessor",
+        ":program_name",
+        ":reflection",
+        ":usage",
+        ":usage_internal",
+        "//turbo/algorithm:container",
+        "//turbo/base:config",
+        "//turbo/base:core_headers",
+        "//turbo/strings",
+        "//turbo/synchronization",
+    ],
+)
+
+############################################################################
+# Unit tests in alphabetical order.
+
+cc_test(
+    name = "commandlineflag_test",
+    size = "small",
+    srcs = [
+        "commandlineflag_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    tags = [
+        "no_test:os:android",
+        "no_test:os:ios",
+        "no_test_android",
+        "no_test_ios",
+        "no_test_wasm",
+    ],
+    deps = [
+        ":commandlineflag",
+        ":commandlineflag_internal",
+        ":config",
+        ":flag",
+        ":private_handle_accessor",
+        ":reflection",
+        "//turbo/memory",
+        "//turbo/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "config_test",
+    size = "small",
+    srcs = [
+        "config_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":config",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "flag_test",
+    size = "small",
+    srcs = [
+        "flag_test.cc",
+        "flag_test_defs.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    tags = [
+        "no_test:os:android",
+        "no_test:os:ios",
+        "no_test_android",
+        "no_test_ios",
+        "no_test_wasm",
+    ],
+    deps = [
+        ":config",
+        ":flag",
+        ":flag_internal",
+        ":marshalling",
+        ":reflection",
+        "//turbo/base:core_headers",
+        "//turbo/base:malloc_internal",
+        "//turbo/strings",
+        "//turbo/time",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_binary(
+    name = "flag_benchmark",
+    testonly = 1,
+    srcs = [
+        "flag_benchmark.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = select({
+        "//conditions:default": [],
+    }) + ABSL_DEFAULT_LINKOPTS,
+    tags = ["benchmark"],
+    visibility = ["//visibility:private"],
+    deps = [
+        "flag_benchmark.lds",
+        ":flag",
+        ":marshalling",
+        ":parse",
+        ":reflection",
+        "//turbo/strings",
+        "//turbo/time",
+        "//turbo/types:optional",
+        "@com_github_google_benchmark//:benchmark_main",
+    ],
+)
+
+cc_test(
+    name = "marshalling_test",
+    size = "small",
+    srcs = [
+        "marshalling_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":marshalling",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "parse_test",
+    size = "small",
+    srcs = [
+        "parse_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    tags = [
+        "no_test:os:android",
+        "no_test:os:ios",
+        "no_test_android",
+        "no_test_ios",
+        "no_test_wasm",
+    ],
+    deps = [
+        ":flag",
+        ":parse",
+        ":reflection",
+        ":usage_internal",
+        "//turbo/base:raw_logging_internal",
+        "//turbo/base:scoped_set_env",
+        "//turbo/strings",
+        "//turbo/types:span",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "path_util_test",
+    size = "small",
+    srcs = [
+        "internal/path_util_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":path_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "program_name_test",
+    size = "small",
+    srcs = [
+        "internal/program_name_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    tags = ["no_test_wasm"],
+    deps = [
+        ":program_name",
+        "//turbo/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "reflection_test",
+    size = "small",
+    srcs = [
+        "reflection_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    tags = [
+        "no_test:os:android",
+        "no_test:os:ios",
+        "no_test_android",
+        "no_test_ios",
+        "no_test_wasm",
+    ],
+    deps = [
+        ":commandlineflag_internal",
+        ":flag",
+        ":marshalling",
+        ":reflection",
+        ":usage_internal",
+        "//turbo/memory",
+        "//turbo/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "sequence_lock_test",
+    size = "small",
+    timeout = "moderate",
+    srcs = [
+        "internal/sequence_lock_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    shard_count = 31,
+    tags = ["no_test_wasm"],
+    deps = [
+        ":flag_internal",
+        "//turbo/base",
+        "//turbo/container:fixed_array",
+        "//turbo/time",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "usage_config_test",
+    size = "small",
+    srcs = [
+        "usage_config_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    deps = [
+        ":config",
+        ":path_util",
+        ":program_name",
+        "//turbo/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "usage_test",
+    size = "small",
+    srcs = [
+        "internal/usage_test.cc",
+    ],
+    copts = ABSL_TEST_COPTS,
+    linkopts = ABSL_DEFAULT_LINKOPTS,
+    tags = [
+        "no_test:os:android",
+        "no_test:os:ios",
+        "no_test_android",
+        "no_test_ios",
+        "no_test_wasm",
+    ],
+    deps = [
+        ":config",
+        ":flag",
+        ":parse",
+        ":path_util",
+        ":program_name",
+        ":reflection",
+        ":usage",
+        ":usage_internal",
+        "//turbo/strings",
+        "@com_google_googletest//:gtest",
+    ],
+)

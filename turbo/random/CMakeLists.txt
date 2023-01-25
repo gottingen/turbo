@@ -1,0 +1,1216 @@
+#
+# Copyright 2019 The Abseil Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+absl_cc_library(
+  NAME
+    random_random
+  HDRS
+    "random.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_distributions
+    turbo::random_internal_nonsecure_base
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_pool_urbg
+    turbo::random_internal_randen_engine
+    turbo::random_seed_sequences
+)
+
+absl_cc_library(
+  NAME
+    random_bit_gen_ref
+  HDRS
+    "bit_gen_ref.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::random_internal_distribution_caller
+    turbo::random_internal_fast_uniform_bits
+    turbo::type_traits
+)
+
+absl_cc_test(
+  NAME
+    random_bit_gen_ref_test
+  SRCS
+    "bit_gen_ref_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_bit_gen_ref
+    turbo::random_random
+    turbo::random_internal_sequence_urbg
+    turbo::fast_type_id
+    GTest::gmock
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_mock_helpers
+  HDRS
+    "internal/mock_helpers.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::fast_type_id
+    turbo::optional
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_mock_overload_set
+  HDRS
+    "internal/mock_overload_set.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_mocking_bit_gen
+    turbo::random_internal_mock_helpers
+  TESTONLY
+)
+
+absl_cc_library(
+  NAME
+    random_mocking_bit_gen
+  HDRS
+    "mock_distributions.h"
+    "mocking_bit_gen.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::flat_hash_map
+    turbo::raw_logging_internal
+    turbo::random_distributions
+    turbo::random_internal_distribution_caller
+    turbo::random_internal_mock_overload_set
+    turbo::random_random
+    turbo::strings
+    turbo::span
+    turbo::type_traits
+    turbo::utility
+    turbo::variant
+    GTest::gmock
+    GTest::gtest
+  PUBLIC
+  TESTONLY
+)
+
+absl_cc_test(
+  NAME
+    random_mock_distributions_test
+  SRCS
+    "mock_distributions_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_mocking_bit_gen
+    turbo::random_random
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_mocking_bit_gen_test
+  SRCS
+    "mocking_bit_gen_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_bit_gen_ref
+    turbo::random_mocking_bit_gen
+    turbo::random_random
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_library(
+  NAME
+    random_distributions
+  SRCS
+    "discrete_distribution.cc"
+    "gaussian_distribution.cc"
+  HDRS
+    "bernoulli_distribution.h"
+    "beta_distribution.h"
+    "discrete_distribution.h"
+    "distributions.h"
+    "exponential_distribution.h"
+    "gaussian_distribution.h"
+    "log_uniform_int_distribution.h"
+    "poisson_distribution.h"
+    "uniform_int_distribution.h"
+    "uniform_real_distribution.h"
+    "zipf_distribution.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base_internal
+    turbo::config
+    turbo::core_headers
+    turbo::random_internal_generate_real
+    turbo::random_internal_distribution_caller
+    turbo::random_internal_fast_uniform_bits
+    turbo::random_internal_fastmath
+    turbo::random_internal_iostream_state_saver
+    turbo::random_internal_traits
+    turbo::random_internal_uniform_helper
+    turbo::random_internal_wide_multiply
+    turbo::strings
+    turbo::type_traits
+)
+
+absl_cc_library(
+  NAME
+    random_seed_gen_exception
+  SRCS
+    "seed_gen_exception.cc"
+  HDRS
+    "seed_gen_exception.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+)
+
+absl_cc_library(
+  NAME
+    random_seed_sequences
+  SRCS
+    "seed_sequences.cc"
+  HDRS
+    "seed_sequences.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::inlined_vector
+    turbo::random_internal_pool_urbg
+    turbo::random_internal_salted_seed_seq
+    turbo::random_internal_seed_material
+    turbo::random_seed_gen_exception
+    turbo::span
+)
+
+absl_cc_test(
+  NAME
+    random_bernoulli_distribution_test
+  SRCS
+    "bernoulli_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_distributions
+    turbo::random_random
+    turbo::random_internal_sequence_urbg
+    turbo::random_internal_pcg_engine
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_beta_distribution_test
+  SRCS
+    "beta_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::numeric_representation
+    turbo::random_distributions
+    turbo::random_random
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_sequence_urbg
+    turbo::random_internal_pcg_engine
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::str_format
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_distributions_test
+  SRCS
+    "distributions_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_distributions
+    turbo::random_random
+    turbo::random_internal_distribution_test_util
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_generators_test
+  SRCS
+    "generators_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+    turbo::random_distributions
+    turbo::random_random
+    turbo::raw_logging_internal
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_log_uniform_int_distribution_test
+  SRCS
+    "log_uniform_int_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+    turbo::random_distributions
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_sequence_urbg
+    turbo::random_random
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::str_format
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_discrete_distribution_test
+  SRCS
+    "discrete_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_distributions
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_sequence_urbg
+    turbo::random_random
+    turbo::raw_logging_internal
+    turbo::strings
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_poisson_distribution_test
+  SRCS
+    "poisson_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_distributions
+    turbo::random_random
+    turbo::core_headers
+    turbo::flat_hash_map
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_sequence_urbg
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::str_format
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_exponential_distribution_test
+  SRCS
+    "exponential_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::numeric_representation
+    turbo::random_distributions
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_sequence_urbg
+    turbo::random_random
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::str_format
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_gaussian_distribution_test
+  SRCS
+    "gaussian_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::numeric_representation
+    turbo::random_distributions
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_sequence_urbg
+    turbo::random_random
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::str_format
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_uniform_int_distribution_test
+  SRCS
+    "uniform_int_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_distributions
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_sequence_urbg
+    turbo::random_random
+    turbo::raw_logging_internal
+    turbo::strings
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_uniform_real_distribution_test
+  SRCS
+    "uniform_real_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::numeric_representation
+    turbo::random_distributions
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_sequence_urbg
+    turbo::random_random
+    turbo::strings
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_zipf_distribution_test
+  SRCS
+    "zipf_distribution_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_distributions
+    turbo::random_internal_distribution_test_util
+    turbo::random_internal_pcg_engine
+    turbo::random_internal_sequence_urbg
+    turbo::random_random
+    turbo::raw_logging_internal
+    turbo::strings
+    GTest::gmock
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_examples_test
+  SRCS
+    "examples_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_random
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
+    random_seed_sequences_test
+  SRCS
+    "seed_sequences_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_seed_sequences
+    turbo::random_internal_nonsecure_base
+    turbo::random_random
+    GTest::gmock
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_traits
+  HDRS
+    "internal/traits.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_distribution_caller
+  HDRS
+    "internal/distribution_caller.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::utility
+    turbo::fast_type_id
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_fast_uniform_bits
+  HDRS
+    "internal/fast_uniform_bits.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_seed_material
+  SRCS
+    "internal/seed_material.cc"
+  HDRS
+    "internal/seed_material.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+    $<$<BOOL:${MINGW}>:-lbcrypt>
+  DEPS
+    turbo::core_headers
+    turbo::optional
+    turbo::random_internal_fast_uniform_bits
+    turbo::raw_logging_internal
+    turbo::span
+    turbo::strings
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_pool_urbg
+  SRCS
+    "internal/pool_urbg.cc"
+  HDRS
+    "internal/pool_urbg.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::base
+    turbo::config
+    turbo::core_headers
+    turbo::endian
+    turbo::random_internal_randen
+    turbo::random_internal_seed_material
+    turbo::random_internal_traits
+    turbo::random_seed_gen_exception
+    turbo::raw_logging_internal
+    turbo::span
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_explicit_seed_seq
+  HDRS
+      "internal/random_internal_explicit_seed_seq.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::endian
+  TESTONLY
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_sequence_urbg
+  HDRS
+    "internal/sequence_urbg.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+  TESTONLY
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_salted_seed_seq
+  HDRS
+    "internal/salted_seed_seq.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::inlined_vector
+    turbo::optional
+    turbo::span
+    turbo::random_internal_seed_material
+    turbo::type_traits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_iostream_state_saver
+  HDRS
+    "internal/iostream_state_saver.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::int128
+    turbo::type_traits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_generate_real
+  HDRS
+    "internal/generate_real.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::bits
+    turbo::random_internal_fastmath
+    turbo::random_internal_traits
+    turbo::type_traits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_wide_multiply
+  HDRS
+    "internal/wide_multiply.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::bits
+    turbo::config
+    turbo::int128
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_fastmath
+  HDRS
+    "internal/fastmath.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::bits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_nonsecure_base
+  HDRS
+    "internal/nonsecure_base.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::inlined_vector
+    turbo::random_internal_pool_urbg
+    turbo::random_internal_salted_seed_seq
+    turbo::random_internal_seed_material
+    turbo::span
+    turbo::type_traits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_pcg_engine
+  HDRS
+    "internal/pcg_engine.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::int128
+    turbo::random_internal_fastmath
+    turbo::random_internal_iostream_state_saver
+    turbo::type_traits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_randen_engine
+  HDRS
+    "internal/randen_engine.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::endian
+    turbo::random_internal_iostream_state_saver
+    turbo::random_internal_randen
+    turbo::raw_logging_internal
+    turbo::type_traits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_platform
+  HDRS
+    "internal/randen_traits.h"
+    "internal/platform.h"
+  SRCS
+    "internal/randen_round_keys.cc"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_randen
+  SRCS
+    "internal/randen.cc"
+  HDRS
+    "internal/randen.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_platform
+    turbo::random_internal_randen_hwaes
+    turbo::random_internal_randen_slow
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_randen_slow
+  SRCS
+    "internal/randen_slow.cc"
+  HDRS
+    "internal/randen_slow.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_platform
+    turbo::config
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_randen_hwaes
+  SRCS
+    "internal/randen_detect.cc"
+  HDRS
+    "internal/randen_detect.h"
+    "internal/randen_hwaes.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+    ${ABSL_RANDOM_RANDEN_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_platform
+    turbo::random_internal_randen_hwaes_impl
+    turbo::config
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_randen_hwaes_impl
+  SRCS
+    "internal/randen_hwaes.cc"
+    "internal/randen_hwaes.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+    ${ABSL_RANDOM_RANDEN_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_platform
+    turbo::config
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_distribution_test_util
+  SRCS
+    "internal/chi_square.cc"
+    "internal/distribution_test_util.cc"
+  HDRS
+    "internal/chi_square.h"
+    "internal/distribution_test_util.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::core_headers
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::str_format
+    turbo::span
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_traits_test
+  SRCS
+    "internal/traits_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_traits
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_generate_real_test
+  SRCS
+    "internal/generate_real_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::bits
+    turbo::flags
+    turbo::random_internal_generate_real
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_distribution_test_util_test
+  SRCS
+    "internal/distribution_test_util_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_distribution_test_util
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_fastmath_test
+  SRCS
+    "internal/fastmath_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_fastmath
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_explicit_seed_seq_test
+  SRCS
+    "internal/explicit_seed_seq_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_explicit_seed_seq
+    turbo::random_seed_sequences
+    GTest::gmock
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_salted_seed_seq_test
+  SRCS
+    "internal/salted_seed_seq_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_salted_seed_seq
+    GTest::gmock
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_chi_square_test
+  SRCS
+    "internal/chi_square_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::core_headers
+    turbo::random_internal_distribution_test_util
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_fast_uniform_bits_test
+  SRCS
+    "internal/fast_uniform_bits_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_fast_uniform_bits
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_nonsecure_base_test
+  SRCS
+    "internal/nonsecure_base_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_nonsecure_base
+    turbo::random_random
+    turbo::random_distributions
+    turbo::random_seed_sequences
+    turbo::strings
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_seed_material_test
+  SRCS
+    "internal/seed_material_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_seed_material
+    GTest::gmock
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_pool_urbg_test
+  SRCS
+    "internal/pool_urbg_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_pool_urbg
+    turbo::span
+    turbo::type_traits
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_pcg_engine_test
+  SRCS
+    "internal/pcg_engine_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_explicit_seed_seq
+    turbo::random_internal_pcg_engine
+    turbo::time
+    GTest::gmock
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_randen_engine_test
+  SRCS
+    "internal/randen_engine_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_explicit_seed_seq
+    turbo::random_internal_randen_engine
+    turbo::raw_logging_internal
+    turbo::strings
+    turbo::time
+    GTest::gmock
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_randen_test
+  SRCS
+    "internal/randen_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_randen
+    turbo::type_traits
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_randen_slow_test
+  SRCS
+    "internal/randen_slow_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::endian
+    turbo::random_internal_randen_slow
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_randen_hwaes_test
+  SRCS
+    "internal/randen_hwaes_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_platform
+    turbo::random_internal_randen_hwaes
+    turbo::random_internal_randen_hwaes_impl
+    turbo::raw_logging_internal
+    turbo::str_format
+    GTest::gmock
+    GTest::gtest
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    random_internal_uniform_helper
+  HDRS
+    "internal/uniform_helper.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::config
+    turbo::random_internal_traits
+    turbo::type_traits
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_uniform_helper_test
+  SRCS
+    "internal/uniform_helper_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_uniform_helper
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_iostream_state_saver_test
+  SRCS
+    "internal/iostream_state_saver_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_iostream_state_saver
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_test(
+  NAME
+    random_internal_wide_multiply_test
+  SRCS
+      internal/wide_multiply_test.cc
+  COPTS
+    ${ABSL_TEST_COPTS}
+  LINKOPTS
+    ${ABSL_DEFAULT_LINKOPTS}
+  DEPS
+    turbo::random_internal_wide_multiply
+    turbo::bits
+    turbo::int128
+    GTest::gmock
+    GTest::gtest_main
+)
