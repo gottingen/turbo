@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ EOF
 */
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
 static constexpr size_t kKeyBytes = 2176;
@@ -458,5 +458,5 @@ alignas(16) const unsigned char kRandenRoundKeys[kKeyBytes] = {
 };
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORDZ_INFO_H_
-#define ABSL_STRINGS_INTERNAL_CORDZ_INFO_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORDZ_INFO_H_
+#define TURBO_STRINGS_INTERNAL_CORDZ_INFO_H_
 
 #include <atomic>
 #include <cstdint>
@@ -32,7 +32,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // CordzInfo tracks a profiled Cord. Each of these objects can be in two places.
@@ -44,7 +44,7 @@ namespace cord_internal {
 // and will either be deleted or appended to the global_delete_queue. If it is
 // placed on the global_delete_queue, the CordzInfo object will be cleaned in
 // the destructor of a CordzSampleToken object.
-class ABSL_LOCKABLE CordzInfo : public CordzHandle {
+class TURBO_LOCKABLE CordzInfo : public CordzHandle {
  public:
   using MethodIdentifier = CordzUpdateTracker::MethodIdentifier;
 
@@ -121,45 +121,45 @@ class ABSL_LOCKABLE CordzInfo : public CordzHandle {
 
   // Retrieves the oldest existing CordzInfo.
   static CordzInfo* Head(const CordzSnapshot& snapshot)
-      ABSL_NO_THREAD_SAFETY_ANALYSIS;
+      TURBO_NO_THREAD_SAFETY_ANALYSIS;
 
   // Retrieves the next oldest existing CordzInfo older than 'this' instance.
   CordzInfo* Next(const CordzSnapshot& snapshot) const
-      ABSL_NO_THREAD_SAFETY_ANALYSIS;
+      TURBO_NO_THREAD_SAFETY_ANALYSIS;
 
   // Locks this instance for the update identified by `method`.
   // Increases the count for `method` in `update_tracker`.
-  void Lock(MethodIdentifier method) ABSL_EXCLUSIVE_LOCK_FUNCTION(mutex_);
+  void Lock(MethodIdentifier method) TURBO_EXCLUSIVE_LOCK_FUNCTION(mutex_);
 
   // Unlocks this instance. If the contained `rep` has been set to null
   // indicating the Cord has been cleared or is otherwise no longer sampled,
   // then this method will delete this CordzInfo instance.
-  void Unlock() ABSL_UNLOCK_FUNCTION(mutex_);
+  void Unlock() TURBO_UNLOCK_FUNCTION(mutex_);
 
   // Asserts that this CordzInfo instance is locked.
-  void AssertHeld() ABSL_ASSERT_EXCLUSIVE_LOCK(mutex_);
+  void AssertHeld() TURBO_ASSERT_EXCLUSIVE_LOCK(mutex_);
 
   // Updates the `rep` property of this instance. This methods is invoked by
   // Cord logic each time the root node of a sampled Cord changes, and before
   // the old root reference count is deleted. This guarantees that collection
   // code can always safely take a reference on the tracked cord.
   // Requires a lock to be held through the `Lock()` method.
-  // TODO(b/117940323): annotate with ABSL_EXCLUSIVE_LOCKS_REQUIRED once all
+  // TODO(b/117940323): annotate with TURBO_EXCLUSIVE_LOCKS_REQUIRED once all
   // Cord code is in a state where this can be proven true by the compiler.
   void SetCordRep(CordRep* rep);
 
   // Returns the current `rep` property of this instance with a reference
   // added, or null if this instance represents a cord that has since been
   // deleted or untracked.
-  CordRep* RefCordRep() const ABSL_LOCKS_EXCLUDED(mutex_);
+  CordRep* RefCordRep() const TURBO_LOCKS_EXCLUDED(mutex_);
 
   // Returns the current value of `rep_` for testing purposes only.
-  CordRep* GetCordRepForTesting() const ABSL_NO_THREAD_SAFETY_ANALYSIS {
+  CordRep* GetCordRepForTesting() const TURBO_NO_THREAD_SAFETY_ANALYSIS {
     return rep_;
   }
 
   // Sets the current value of `rep_` for testing purposes only.
-  void SetCordRepForTesting(CordRep* rep) ABSL_NO_THREAD_SAFETY_ANALYSIS {
+  void SetCordRepForTesting(CordRep* rep) TURBO_NO_THREAD_SAFETY_ANALYSIS {
     rep_ = rep;
   }
 
@@ -193,7 +193,7 @@ class ABSL_LOCKABLE CordzInfo : public CordzHandle {
                 turbo::base_internal::SCHEDULE_COOPERATIVE_AND_KERNEL) {}
 
     SpinLock mutex;
-    std::atomic<CordzInfo*> head ABSL_GUARDED_BY(mutex){nullptr};
+    std::atomic<CordzInfo*> head TURBO_GUARDED_BY(mutex){nullptr};
   };
 
   static constexpr size_t kMaxStackDepth = 64;
@@ -203,7 +203,7 @@ class ABSL_LOCKABLE CordzInfo : public CordzHandle {
   ~CordzInfo() override;
 
   // Sets `rep_` without holding a lock.
-  void UnsafeSetCordRep(CordRep* rep) ABSL_NO_THREAD_SAFETY_ANALYSIS;
+  void UnsafeSetCordRep(CordRep* rep) TURBO_NO_THREAD_SAFETY_ANALYSIS;
 
   void Track();
 
@@ -220,7 +220,7 @@ class ABSL_LOCKABLE CordzInfo : public CordzHandle {
 
   void ODRCheck() const {
 #ifndef NDEBUG
-    ABSL_RAW_CHECK(list_ == &global_list_, "ODR violation in Cord");
+    TURBO_RAW_CHECK(list_ == &global_list_, "ODR violation in Cord");
 #endif
   }
 
@@ -230,7 +230,7 @@ class ABSL_LOCKABLE CordzInfo : public CordzHandle {
   static void MaybeTrackCordImpl(InlineData& cord, const InlineData& src,
                                  MethodIdentifier method);
 
-  ABSL_CONST_INIT static List global_list_;
+  TURBO_CONST_INIT static List global_list_;
   List* const list_ = &global_list_;
 
   // ci_prev_ and ci_next_ require the global list mutex to be held.
@@ -240,7 +240,7 @@ class ABSL_LOCKABLE CordzInfo : public CordzHandle {
   std::atomic<CordzInfo*> ci_next_{nullptr};
 
   mutable turbo::Mutex mutex_;
-  CordRep* rep_ ABSL_GUARDED_BY(mutex_);
+  CordRep* rep_ TURBO_GUARDED_BY(mutex_);
 
   void* stack_[kMaxStackDepth];
   void* parent_stack_[kMaxStackDepth];
@@ -252,28 +252,28 @@ class ABSL_LOCKABLE CordzInfo : public CordzHandle {
   const turbo::Time create_time_;
 };
 
-inline ABSL_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
+inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
     InlineData& cord, MethodIdentifier method) {
-  if (ABSL_PREDICT_FALSE(cordz_should_profile())) {
+  if (TURBO_PREDICT_FALSE(cordz_should_profile())) {
     TrackCord(cord, method);
   }
 }
 
-inline ABSL_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
+inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
     InlineData& cord, const InlineData& src, MethodIdentifier method) {
-  if (ABSL_PREDICT_FALSE(InlineData::is_either_profiled(cord, src))) {
+  if (TURBO_PREDICT_FALSE(InlineData::is_either_profiled(cord, src))) {
     MaybeTrackCordImpl(cord, src, method);
   }
 }
 
-inline ABSL_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeUntrackCord(
+inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeUntrackCord(
     CordzInfo* info) {
-  if (ABSL_PREDICT_FALSE(info)) {
+  if (TURBO_PREDICT_FALSE(info)) {
     info->Untrack();
   }
 }
 
-inline void CordzInfo::AssertHeld() ABSL_ASSERT_EXCLUSIVE_LOCK(mutex_) {
+inline void CordzInfo::AssertHeld() TURBO_ASSERT_EXCLUSIVE_LOCK(mutex_) {
 #ifndef NDEBUG
   mutex_.AssertHeld();
 #endif
@@ -286,13 +286,13 @@ inline void CordzInfo::SetCordRep(CordRep* rep) {
 
 inline void CordzInfo::UnsafeSetCordRep(CordRep* rep) { rep_ = rep; }
 
-inline CordRep* CordzInfo::RefCordRep() const ABSL_LOCKS_EXCLUDED(mutex_) {
+inline CordRep* CordzInfo::RefCordRep() const TURBO_LOCKS_EXCLUDED(mutex_) {
   MutexLock lock(&mutex_);
   return rep_ ? CordRep::Ref(rep_) : nullptr;
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CORDZ_INFO_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORDZ_INFO_H_

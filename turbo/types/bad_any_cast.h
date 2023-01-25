@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,27 +18,27 @@
 //
 // This header file defines the `turbo::bad_any_cast` type.
 
-#ifndef ABSL_TYPES_BAD_ANY_CAST_H_
-#define ABSL_TYPES_BAD_ANY_CAST_H_
+#ifndef TURBO_TYPES_BAD_ANY_CAST_H_
+#define TURBO_TYPES_BAD_ANY_CAST_H_
 
 #include <typeinfo>
 
 #include "turbo/base/config.h"
 
-#ifdef ABSL_USES_STD_ANY
+#ifdef TURBO_USES_STD_ANY
 
 #include <any>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 using std::bad_any_cast;
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // ABSL_USES_STD_ANY
+#else  // TURBO_USES_STD_ANY
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // bad_any_cast
@@ -67,9 +67,9 @@ namespace any_internal {
 [[noreturn]] void ThrowBadAnyCast();
 
 }  // namespace any_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USES_STD_ANY
+#endif  // TURBO_USES_STD_ANY
 
-#endif  // ABSL_TYPES_BAD_ANY_CAST_H_
+#endif  // TURBO_TYPES_BAD_ANY_CAST_H_

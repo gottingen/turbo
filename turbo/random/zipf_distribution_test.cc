@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ TYPED_TEST(ZipfDistributionTypedTest, SerializeTest) {
       if (sample > sample_max) sample_max = sample;
       if (sample < sample_min) sample_min = sample;
     }
-    ABSL_INTERNAL_LOG(INFO,
+    TURBO_INTERNAL_LOG(INFO,
                       turbo::StrCat("Range: ", +sample_min, ", ", +sample_max));
   }
 }
@@ -303,17 +303,17 @@ TEST_P(ZipfTest, ChiSquaredTest) {
 
   // Log if the chi_squared value is above the threshold.
   if (chi_square > threshold) {
-    ABSL_INTERNAL_LOG(INFO, "values");
+    TURBO_INTERNAL_LOG(INFO, "values");
     for (size_t i = 0; i < expected.size(); i++) {
-      ABSL_INTERNAL_LOG(INFO, turbo::StrCat(points[i], ": ", buckets[i],
+      TURBO_INTERNAL_LOG(INFO, turbo::StrCat(points[i], ": ", buckets[i],
                                            " vs. E=", expected[i]));
     }
-    ABSL_INTERNAL_LOG(INFO, turbo::StrCat("trials ", trials));
-    ABSL_INTERNAL_LOG(INFO,
+    TURBO_INTERNAL_LOG(INFO, turbo::StrCat("trials ", trials));
+    TURBO_INTERNAL_LOG(INFO,
                       turbo::StrCat("mean ", avg, " vs. expected ", mean()));
-    ABSL_INTERNAL_LOG(INFO, turbo::StrCat(kChiSquared, "(data, ", dof, ") = ",
+    TURBO_INTERNAL_LOG(INFO, turbo::StrCat(kChiSquared, "(data, ", dof, ") = ",
                                          chi_square, " (", p_actual, ")"));
-    ABSL_INTERNAL_LOG(INFO,
+    TURBO_INTERNAL_LOG(INFO,
                       turbo::StrCat(kChiSquared, " @ 0.9995 = ", threshold));
     FAIL() << kChiSquared << " value of " << chi_square
            << " is above the threshold.";

@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(
@@ -58,7 +58,7 @@ cc_library(
         "charconv.h",
         "escaping.h",
         "internal/damerau_levenshtein_distance.h",
-        "internal/has_absl_stringify.h",
+        "internal/has_turbo_stringify.h",
         "internal/string_constant.h",
         "match.h",
         "numbers.h",
@@ -70,8 +70,8 @@ cc_library(
         "strip.h",
         "substitute.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":internal",
         "//turbo/base",
@@ -101,8 +101,8 @@ cc_library(
         "internal/resize_uninitialized.h",
         "internal/utf8.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -116,7 +116,7 @@ cc_test(
     name = "match_test",
     size = "small",
     srcs = ["match_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -131,7 +131,7 @@ cc_test(
         "escaping_test.cc",
         "internal/escaping_test_common.h",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord",
@@ -148,7 +148,7 @@ cc_test(
         "escaping_benchmark.cc",
         "internal/escaping_test_common.h",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -162,7 +162,7 @@ cc_test(
     name = "ascii_test",
     size = "small",
     srcs = ["ascii_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -174,7 +174,7 @@ cc_test(
 cc_test(
     name = "ascii_benchmark",
     srcs = ["ascii_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -189,7 +189,7 @@ cc_test(
     srcs = [
         "internal/damerau_levenshtein_distance_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         "//turbo/strings",
         "@com_google_googletest//:gtest_main",
@@ -202,7 +202,7 @@ cc_test(
         "internal/memutil.h",
         "internal/memutil_benchmark.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -219,7 +219,7 @@ cc_test(
         "internal/memutil.h",
         "internal/memutil_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -234,7 +234,7 @@ cc_test(
     srcs = [
         "internal/utf8_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":internal",
@@ -247,7 +247,7 @@ cc_test(
     name = "string_constant_test",
     size = "small",
     srcs = ["internal/string_constant_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -259,7 +259,7 @@ cc_test(
 cc_test(
     name = "string_view_benchmark",
     srcs = ["string_view_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -274,7 +274,7 @@ cc_test(
     name = "string_view_test",
     size = "small",
     srcs = ["string_view_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -308,8 +308,8 @@ cc_library(
         "internal/cord_rep_ring.h",
         "internal/cord_rep_ring_reader.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//visibility:private",
     ],
@@ -335,7 +335,7 @@ cc_test(
     name = "cord_data_edge_test",
     size = "small",
     srcs = ["internal/cord_data_edge_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord_internal",
@@ -350,7 +350,7 @@ cc_test(
     name = "cord_rep_btree_test",
     size = "medium",
     srcs = ["internal/cord_rep_btree_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord_internal",
@@ -367,7 +367,7 @@ cc_test(
     name = "cord_rep_btree_navigator_test",
     size = "medium",
     srcs = ["internal/cord_rep_btree_navigator_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord_internal",
@@ -383,7 +383,7 @@ cc_test(
     name = "cord_rep_btree_reader_test",
     size = "medium",
     srcs = ["internal/cord_rep_btree_reader_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord",
@@ -400,7 +400,7 @@ cc_test(
     name = "cord_rep_crc_test",
     size = "small",
     srcs = ["internal/cord_rep_crc_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord_internal",
@@ -414,8 +414,8 @@ cc_test(
 cc_library(
     name = "cordz_update_tracker",
     hdrs = ["internal/cordz_update_tracker.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -446,8 +446,8 @@ cc_library(
         "cord.h",
         "cord_buffer.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":cord_internal",
         ":cordz_functions",
@@ -478,8 +478,8 @@ cc_library(
     name = "cordz_handle",
     srcs = ["internal/cordz_handle.cc"],
     hdrs = ["internal/cordz_handle.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -495,8 +495,8 @@ cc_library(
     name = "cordz_info",
     srcs = ["internal/cordz_info.cc"],
     hdrs = ["internal/cordz_info.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -520,8 +520,8 @@ cc_library(
 cc_library(
     name = "cordz_update_scope",
     hdrs = ["internal/cordz_update_scope.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -537,7 +537,7 @@ cc_library(
 cc_test(
     name = "cordz_update_scope_test",
     srcs = ["internal/cordz_update_scope_test.cc"],
-    copts = ABSL_DEFAULT_COPTS,
+    copts = TURBO_DEFAULT_COPTS,
     deps = [
         ":cord_internal",
         ":cordz_info",
@@ -553,8 +553,8 @@ cc_library(
     name = "cordz_sample_token",
     srcs = ["internal/cordz_sample_token.cc"],
     hdrs = ["internal/cordz_sample_token.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -569,8 +569,8 @@ cc_library(
     name = "cordz_functions",
     srcs = ["internal/cordz_functions.cc"],
     hdrs = ["internal/cordz_functions.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -585,8 +585,8 @@ cc_library(
 cc_library(
     name = "cordz_statistics",
     hdrs = ["internal/cordz_statistics.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -696,8 +696,8 @@ cc_library(
     hdrs = [
         "cord_test_helpers.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":cord",
         ":cord_internal",
@@ -710,8 +710,8 @@ cc_library(
     name = "cord_rep_test_util",
     testonly = 1,
     hdrs = ["internal/cord_rep_test_util.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":cord_internal",
         ":strings",
@@ -724,8 +724,8 @@ cc_library(
     name = "cordz_test_helpers",
     testonly = 1,
     hdrs = ["cordz_test_helpers.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":cord",
         ":cord_internal",
@@ -744,7 +744,7 @@ cc_test(
     name = "cord_buffer_test",
     size = "small",
     srcs = ["cord_buffer_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord",
@@ -760,7 +760,7 @@ cc_test(
     name = "cord_test",
     size = "medium",
     srcs = ["cord_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord",
@@ -785,7 +785,7 @@ cc_test(
     name = "cordz_test",
     size = "medium",
     srcs = ["cordz_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = [
         "benchmark",
         "no_test_android_arm",
@@ -817,7 +817,7 @@ cc_test(
     name = "cord_ring_test",
     size = "medium",
     srcs = ["cord_ring_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord_internal",
@@ -834,7 +834,7 @@ cc_test(
     name = "cord_ring_reader_test",
     size = "medium",
     srcs = ["cord_ring_reader_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord_internal",
@@ -849,7 +849,7 @@ cc_test(
     name = "substitute_test",
     size = "small",
     srcs = ["substitute_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -861,7 +861,7 @@ cc_test(
 cc_test(
     name = "str_replace_benchmark",
     srcs = ["str_replace_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -875,7 +875,7 @@ cc_test(
     name = "str_replace_test",
     size = "small",
     srcs = ["str_replace_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -886,7 +886,7 @@ cc_test(
 cc_test(
     name = "str_split_test",
     srcs = ["str_split_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -902,7 +902,7 @@ cc_test(
 cc_test(
     name = "str_split_benchmark",
     srcs = ["str_split_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -916,7 +916,7 @@ cc_test(
     name = "ostringstream_test",
     size = "small",
     srcs = ["internal/ostringstream_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":internal",
@@ -927,7 +927,7 @@ cc_test(
 cc_test(
     name = "ostringstream_benchmark",
     srcs = ["internal/ostringstream_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -943,7 +943,7 @@ cc_test(
         "internal/resize_uninitialized.h",
         "internal/resize_uninitialized_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base:core_headers",
@@ -956,7 +956,7 @@ cc_test(
     name = "str_join_test",
     size = "small",
     srcs = ["str_join_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -969,7 +969,7 @@ cc_test(
 cc_test(
     name = "str_join_benchmark",
     srcs = ["str_join_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -982,7 +982,7 @@ cc_test(
     name = "str_cat_test",
     size = "small",
     srcs = ["str_cat_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format",
@@ -994,7 +994,7 @@ cc_test(
 cc_test(
     name = "str_cat_benchmark",
     srcs = ["str_cat_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -1010,7 +1010,7 @@ cc_test(
         "internal/numbers_test_common.h",
         "numbers_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":internal",
@@ -1027,7 +1027,7 @@ cc_test(
 cc_test(
     name = "numbers_benchmark",
     srcs = ["numbers_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -1043,7 +1043,7 @@ cc_test(
     name = "strip_test",
     size = "small",
     srcs = ["strip_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -1054,7 +1054,7 @@ cc_test(
 cc_test(
     name = "char_map_test",
     srcs = ["internal/char_map_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         ":internal",
         "@com_google_googletest//:gtest_main",
@@ -1064,7 +1064,7 @@ cc_test(
 cc_test(
     name = "char_map_benchmark",
     srcs = ["internal/char_map_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     deps = [
         ":internal",
@@ -1075,7 +1075,7 @@ cc_test(
 cc_test(
     name = "charconv_test",
     srcs = ["charconv_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         ":pow10_helper",
         ":str_format",
@@ -1090,7 +1090,7 @@ cc_test(
         "internal/charconv_parse.h",
         "internal/charconv_parse_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         ":strings",
         "//turbo/base:config",
@@ -1106,7 +1106,7 @@ cc_test(
         "internal/charconv_bigint_test.cc",
         "internal/charconv_parse.h",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         ":strings",
         "//turbo/base:config",
@@ -1133,8 +1133,8 @@ cc_library(
     hdrs = [
         "str_format.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":str_format_internal",
     ],
@@ -1160,8 +1160,8 @@ cc_library(
         "internal/str_format/output.h",
         "internal/str_format/parser.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":strings",
@@ -1181,7 +1181,7 @@ cc_library(
 cc_test(
     name = "str_format_test",
     srcs = ["str_format_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord",
@@ -1196,7 +1196,7 @@ cc_test(
     srcs = [
         "internal/str_format/extension_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format",
@@ -1209,7 +1209,7 @@ cc_test(
 cc_test(
     name = "str_format_arg_test",
     srcs = ["internal/str_format/arg_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format",
@@ -1221,7 +1221,7 @@ cc_test(
 cc_test(
     name = "str_format_bind_test",
     srcs = ["internal/str_format/bind_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format_internal",
@@ -1232,7 +1232,7 @@ cc_test(
 cc_test(
     name = "str_format_checker_test",
     srcs = ["internal/str_format/checker_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format",
@@ -1244,7 +1244,7 @@ cc_test(
     name = "str_format_convert_test",
     size = "medium",
     srcs = ["internal/str_format/convert_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format_internal",
@@ -1259,7 +1259,7 @@ cc_test(
 cc_test(
     name = "str_format_output_test",
     srcs = ["internal/str_format/output_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cord",
@@ -1271,7 +1271,7 @@ cc_test(
 cc_test(
     name = "str_format_parser_test",
     srcs = ["internal/str_format/parser_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format_internal",
@@ -1285,7 +1285,7 @@ cc_library(
     testonly = True,
     srcs = ["internal/pow10_helper.cc"],
     hdrs = ["internal/pow10_helper.h"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = ["//turbo/base:config"],
 )
@@ -1293,7 +1293,7 @@ cc_library(
 cc_test(
     name = "pow10_helper_test",
     srcs = ["internal/pow10_helper_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":pow10_helper",
@@ -1306,8 +1306,8 @@ cc_binary(
     name = "atod_manual_test",
     testonly = 1,
     srcs = ["atod_manual_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":str_format",

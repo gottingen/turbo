@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#ifndef ABSL_RANDOM_INTERNAL_UNIFORM_HELPER_H_
-#define ABSL_RANDOM_INTERNAL_UNIFORM_HELPER_H_
+#ifndef TURBO_RANDOM_INTERNAL_UNIFORM_HELPER_H_
+#define TURBO_RANDOM_INTERNAL_UNIFORM_HELPER_H_
 
 #include <cmath>
 #include <limits>
@@ -24,7 +24,7 @@
 #include "turbo/random/internal/traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 template <typename IntType>
 class uniform_int_distribution;
@@ -215,7 +215,7 @@ using UniformDistribution =
                               turbo::uniform_real_distribution<NumType>>::type;
 
 // UniformDistributionWrapper is used as the underlying distribution type
-// by the turbo::Uniform template function. It selects the proper Abseil
+// by the turbo::Uniform template function. It selects the proper Turbo
 // uniform distribution and provides constructor overloads that match the
 // expected parameter order as well as adjusting distribtuion bounds based
 // on the tag.
@@ -238,7 +238,7 @@ struct UniformDistributionWrapper : public UniformDistribution<NumType> {
 };
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_UNIFORM_HELPER_H_
+#endif  // TURBO_RANDOM_INTERNAL_UNIFORM_HELPER_H_

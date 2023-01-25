@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 #include "turbo/container/node_hash_map.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
 
@@ -155,7 +155,7 @@ static struct BeforeMain {
 
 }  // namespace
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 int main(int argc, char *argv[]) {

@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 // separate file to avoid cluttering the top of the API header with
 // implementation details.
 
-#ifndef ABSL_TYPES_INTERNAL_VARIANT_H_
-#define ABSL_TYPES_INTERNAL_VARIANT_H_
+#ifndef TURBO_TYPES_INTERNAL_VARIANT_H_
+#define TURBO_TYPES_INTERNAL_VARIANT_H_
 
 #include <cassert>
 #include <cstddef>
@@ -37,15 +37,15 @@
 #include "turbo/types/bad_variant_access.h"
 #include "turbo/utility/utility.h"
 
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(TURBO_USES_STD_VARIANT)
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 template <class... Types>
 class variant;
 
-ABSL_INTERNAL_INLINE_CONSTEXPR(size_t, variant_npos, static_cast<size_t>(-1));
+TURBO_INTERNAL_INLINE_CONSTEXPR(size_t, variant_npos, static_cast<size_t>(-1));
 
 template <class T>
 struct variant_size;
@@ -272,7 +272,7 @@ struct UnreachableSwitchCase {
   template <class Op>
   [[noreturn]] static VisitIndicesResultT<Op, std::size_t> Run(
       Op&& /*ignored*/) {
-#if ABSL_HAVE_BUILTIN(__builtin_unreachable) || \
+#if TURBO_HAVE_BUILTIN(__builtin_unreachable) || \
     (defined(__GNUC__) && !defined(__clang__))
     __builtin_unreachable();
 #elif defined(_MSC_VER)
@@ -301,7 +301,7 @@ struct ReachableSwitchCase {
 // power of 2 is because the number was picked to correspond to a power of 2
 // amount of "normal" alternatives, plus one for the possibility of the user
 // providing "monostate" in addition to the more natural alternatives.
-ABSL_INTERNAL_INLINE_CONSTEXPR(std::size_t, MaxUnrolledVisitCases, 33);
+TURBO_INTERNAL_INLINE_CONSTEXPR(std::size_t, MaxUnrolledVisitCases, 33);
 
 // Note: The default-definition is for unreachable cases.
 template <bool IsReachable>
@@ -423,7 +423,7 @@ struct VisitIndicesSwitch {
       case 32:
         return PickCase<Op, 32, EndIndex>::Run(turbo::forward<Op>(op));
       default:
-        ABSL_ASSERT(i == variant_npos);
+        TURBO_ASSERT(i == variant_npos);
         return turbo::base_internal::invoke(turbo::forward<Op>(op), NPos());
     }
   }
@@ -608,7 +608,7 @@ struct VariantCoreAccess {
   // Access a variant alternative, throwing if the index is incorrect.
   template <std::size_t I, class Variant>
   static VariantAccessResult<I, Variant> CheckedAccess(Variant&& self) {
-    if (ABSL_PREDICT_FALSE(self.index_ != I)) {
+    if (TURBO_PREDICT_FALSE(self.index_ != I)) {
       TypedThrowBadVariantAccess<VariantAccessResult<I, Variant>>();
     }
 
@@ -1627,8 +1627,8 @@ struct VariantHashBase<Variant,
 };
 
 }  // namespace variant_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // !defined(ABSL_USES_STD_VARIANT)
-#endif  // ABSL_TYPES_INTERNAL_VARIANT_H_
+#endif  // !defined(TURBO_USES_STD_VARIANT)
+#endif  // TURBO_TYPES_INTERNAL_VARIANT_H_

@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@
 #define FLAG_MULT(x) F3(x)
 #define TEST_FLAG_HEADER FLAG_HEADER_
 
-#define F(name) ABSL_FLAG(int, name, 0, "");
+#define F(name) TURBO_FLAG(int, name, 0, "");
 
 #define F1(name) \
   F(name##1);    \
@@ -83,7 +83,7 @@ struct UDT {
   int value;
 };
 
-bool AbslParseFlag(turbo::string_view in, UDT* udt, std::string* err) {
+bool TurboParseFlag(turbo::string_view in, UDT* udt, std::string* err) {
   if (in == "A") {
     udt->value = 1;
     return true;
@@ -96,7 +96,7 @@ bool AbslParseFlag(turbo::string_view in, UDT* udt, std::string* err) {
   *err = "Use values A, AAA instead";
   return false;
 }
-std::string AbslUnparseFlag(const UDT& udt) {
+std::string TurboUnparseFlag(const UDT& udt) {
   return udt.value == 1 ? "A" : "AAA";
 }
 
@@ -151,7 +151,7 @@ const std::string& GetTestTempDir() {
     }
 
     if (res->empty()) {
-      ABSL_INTERNAL_LOG(FATAL,
+      TURBO_INTERNAL_LOG(FATAL,
                         "Failed to make temporary directory for data files");
     }
 
@@ -225,14 +225,14 @@ const char* GetFlagfileFlag(const std::vector<FlagfileData>& ffd,
 
 }  // namespace
 
-ABSL_FLAG(int, int_flag, 1, "");
-ABSL_FLAG(double, double_flag, 1.1, "");
-ABSL_FLAG(std::string, string_flag, "a", "");
-ABSL_FLAG(bool, bool_flag, false, "");
-ABSL_FLAG(UDT, udt_flag, -1, "");
-ABSL_RETIRED_FLAG(int, legacy_int, 1, "");
-ABSL_RETIRED_FLAG(bool, legacy_bool, false, "");
-ABSL_RETIRED_FLAG(std::string, legacy_str, "l", "");
+TURBO_FLAG(int, int_flag, 1, "");
+TURBO_FLAG(double, double_flag, 1.1, "");
+TURBO_FLAG(std::string, string_flag, "a", "");
+TURBO_FLAG(bool, bool_flag, false, "");
+TURBO_FLAG(UDT, udt_flag, -1, "");
+TURBO_RETIRED_FLAG(int, legacy_int, 1, "");
+TURBO_RETIRED_FLAG(bool, legacy_bool, false, "");
+TURBO_RETIRED_FLAG(std::string, legacy_str, "l", "");
 
 namespace {
 

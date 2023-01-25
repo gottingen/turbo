@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_WIDE_MULTIPLY_H_
-#define ABSL_RANDOM_INTERNAL_WIDE_MULTIPLY_H_
+#ifndef TURBO_RANDOM_INTERNAL_WIDE_MULTIPLY_H_
+#define TURBO_RANDOM_INTERNAL_WIDE_MULTIPLY_H_
 
 #include <cstdint>
 #include <limits>
@@ -22,7 +22,7 @@
 #if (defined(_WIN32) || defined(_WIN64)) && defined(_M_IA64)
 #include <intrin.h>  // NOLINT(build/include_order)
 #pragma intrinsic(_umul128)
-#define ABSL_INTERNAL_USE_UMUL128 1
+#define TURBO_INTERNAL_USE_UMUL128 1
 #endif
 
 #include "turbo/base/config.h"
@@ -31,7 +31,7 @@
 #include "turbo/random/internal/traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // wide_multiply<T> multiplies two N-bit values to a 2N-bit result.
@@ -90,7 +90,7 @@ struct wide_multiply<uint128> {
 };
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_WIDE_MULTIPLY_H_
+#endif  // TURBO_RANDOM_INTERNAL_WIDE_MULTIPLY_H_

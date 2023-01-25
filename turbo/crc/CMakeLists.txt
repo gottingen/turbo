@@ -1,4 +1,4 @@
-# Copyright 2022 The Abseil Authors.
+# Copyright 2022 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     crc_cpu_detect
   HDRS
@@ -21,14 +21,14 @@ absl_cc_library(
   SRCS
     "internal/cpu_detect.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::config
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     crc_internal
   HDRS
@@ -39,7 +39,7 @@ absl_cc_library(
     "internal/crc_internal.h"
     "internal/crc_x86_arm_combined.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::crc_cpu_detect
     turbo::base
@@ -53,7 +53,7 @@ absl_cc_library(
     turbo::bits
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     crc32c
   HDRS
@@ -67,7 +67,7 @@ absl_cc_library(
     "internal/crc_memcpy_x86_64.cc"
     "internal/crc_non_temporal_memcpy.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::crc_cpu_detect
     turbo::crc_internal
@@ -80,13 +80,13 @@ absl_cc_library(
     turbo::strings
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     crc32c_test
   SRCS
     "crc32c_test.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::crc32c
     turbo::strings
@@ -94,38 +94,38 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     non_temporal_arm_intrinsics
   HDRS
     "internal/non_temporal_arm_intrinsics.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     non_temporal_memcpy
   HDRS
     "internal/non_temporal_memcpy.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::non_temporal_arm_intrinsics
     turbo::config
     turbo::core_headers
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     crc_memcpy_test
   SRCS
     "internal/crc_memcpy_test.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::crc32c
     turbo::memory
@@ -135,19 +135,19 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     non_temporal_memcpy_test
   SRCS
     "internal/non_temporal_memcpy_test.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::non_temporal_memcpy
     GTest::gtest_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     crc_cord_state
   HDRS
@@ -155,20 +155,20 @@ absl_cc_library(
   SRCS
     "internal/crc_cord_state.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::crc32c
     turbo::config
     turbo::strings
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     crc_cord_state_test
   SRCS
     "internal/crc_cord_state_test.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::crc_cord_state
     turbo::crc32c

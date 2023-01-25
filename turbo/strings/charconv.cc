@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,16 +26,16 @@
 #include "turbo/strings/internal/charconv_bigint.h"
 #include "turbo/strings/internal/charconv_parse.h"
 
-// The macro ABSL_BIT_PACK_FLOATS is defined on x86-64, where IEEE floating
+// The macro TURBO_BIT_PACK_FLOATS is defined on x86-64, where IEEE floating
 // point numbers have the same endianness in memory as a bitfield struct
 // containing the corresponding parts.
 //
 // When set, we replace calls to ldexp() with manual bit packing, which is
 // faster and is unaffected by floating point environment.
-#ifdef ABSL_BIT_PACK_FLOATS
-#error ABSL_BIT_PACK_FLOATS cannot be directly set
+#ifdef TURBO_BIT_PACK_FLOATS
+#error TURBO_BIT_PACK_FLOATS cannot be directly set
 #elif defined(__x86_64__) || defined(_M_X64)
-#define ABSL_BIT_PACK_FLOATS 1
+#define TURBO_BIT_PACK_FLOATS 1
 #endif
 
 // A note about subnormals:
@@ -58,7 +58,7 @@
 // narrower mantissas.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 template <typename FloatType>
@@ -138,7 +138,7 @@ struct FloatTraits<double> {
   // `exponent` must be exactly kMinNormalExponent, and a subnormal value is
   // made.
   static double Make(mantissa_t mantissa, int exponent, bool sign) {
-#ifndef ABSL_BIT_PACK_FLOATS
+#ifndef TURBO_BIT_PACK_FLOATS
     // Support ldexp no matter which namespace it's in.  Some platforms
     // incorrectly don't put it in namespace std.
     using namespace std;  // NOLINT
@@ -161,7 +161,7 @@ struct FloatTraits<double> {
     }
     dbl += mantissa;
     return turbo::bit_cast<double>(dbl);
-#endif  // ABSL_BIT_PACK_FLOATS
+#endif  // TURBO_BIT_PACK_FLOATS
   }
 };
 
@@ -191,7 +191,7 @@ struct FloatTraits<float> {
   }
 
   static float Make(mantissa_t mantissa, int exponent, bool sign) {
-#ifndef ABSL_BIT_PACK_FLOATS
+#ifndef TURBO_BIT_PACK_FLOATS
     // Support ldexpf no matter which namespace it's in.  Some platforms
     // incorrectly don't put it in namespace std.
     using namespace std;  // NOLINT
@@ -213,7 +213,7 @@ struct FloatTraits<float> {
     }
     flt += mantissa;
     return turbo::bit_cast<float>(flt);
-#endif  // ABSL_BIT_PACK_FLOATS
+#endif  // TURBO_BIT_PACK_FLOATS
   }
 };
 
@@ -806,7 +806,7 @@ bool EiselLemire(const strings_internal::ParsedFloat& input, bool negative,
     return false;
   }
 
-#ifndef ABSL_BIT_PACK_FLOATS
+#ifndef TURBO_BIT_PACK_FLOATS
   if (FloatTraits<FloatType>::kTargetBits == 64) {
     *value = FloatTraits<FloatType>::Make(
         (ret_man & 0x000FFFFFFFFFFFFFu) | 0x0010000000000000u,
@@ -835,7 +835,7 @@ bool EiselLemire(const strings_internal::ParsedFloat& input, bool negative,
     *value = turbo::bit_cast<float>(ret_bits);
     return true;
   }
-#endif  // ABSL_BIT_PACK_FLOATS
+#endif  // TURBO_BIT_PACK_FLOATS
   return false;
 }
 
@@ -1418,5 +1418,5 @@ const uint64_t kPower10MantissaLowTable[] = {
 };
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

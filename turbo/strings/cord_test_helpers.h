@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_STRINGS_CORD_TEST_HELPERS_H_
-#define ABSL_STRINGS_CORD_TEST_HELPERS_H_
+#ifndef TURBO_STRINGS_CORD_TEST_HELPERS_H_
+#define TURBO_STRINGS_CORD_TEST_HELPERS_H_
 
 #include <cstdint>
 #include <iostream>
@@ -27,7 +27,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Cord sizes relevant for testing
 enum class TestCordSize {
@@ -116,7 +116,7 @@ inline Cord MakeFragmentedCord(std::initializer_list<turbo::string_view> list) {
   return MakeFragmentedCord<std::initializer_list<turbo::string_view>>(list);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_CORD_TEST_HELPERS_H_
+#endif  // TURBO_STRINGS_CORD_TEST_HELPERS_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 extern "C" {
 
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
+void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
     std::atomic<uint32_t>* /* lock_word */, uint32_t /* value */, int loop,
     turbo::base_internal::SchedulingMode /* mode */) {
   if (loop == 0) {
@@ -34,7 +34,7 @@ void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
   }
 }
 
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWake)(
+void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockWake)(
     std::atomic<uint32_t>* /* lock_word */, bool /* all */) {}
 
 }  // extern "C"

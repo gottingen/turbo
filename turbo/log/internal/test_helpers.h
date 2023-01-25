@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 //
 // This file declares testing helpers for the logging library.
 
-#ifndef ABSL_LOG_INTERNAL_TEST_HELPERS_H_
-#define ABSL_LOG_INTERNAL_TEST_HELPERS_H_
+#ifndef TURBO_LOG_INTERNAL_TEST_HELPERS_H_
+#define TURBO_LOG_INTERNAL_TEST_HELPERS_H_
 
 #include "gtest/gtest.h"
 #include "turbo/base/config.h"
@@ -27,19 +27,19 @@
 #include "turbo/log/globals.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
-// `ABSL_MIN_LOG_LEVEL` can't be used directly since it is not always defined.
-constexpr auto kAbslMinLogLevel =
-#ifdef ABSL_MIN_LOG_LEVEL
-    static_cast<turbo::LogSeverityAtLeast>(ABSL_MIN_LOG_LEVEL);
+// `TURBO_MIN_LOG_LEVEL` can't be used directly since it is not always defined.
+constexpr auto kTurboMinLogLevel =
+#ifdef TURBO_MIN_LOG_LEVEL
+    static_cast<turbo::LogSeverityAtLeast>(TURBO_MIN_LOG_LEVEL);
 #else
     turbo::LogSeverityAtLeast::kInfo;
 #endif
 
 // Returns false if the specified severity level is disabled by
-// `ABSL_MIN_LOG_LEVEL` or `turbo::MinLogLevel()`.
+// `TURBO_MIN_LOG_LEVEL` or `turbo::MinLogLevel()`.
 bool LoggingEnabledAt(turbo::LogSeverity severity);
 
 // -----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ class LogTestEnvironment : public ::testing::Environment {
 };
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_TEST_HELPERS_H_
+#endif  // TURBO_LOG_INTERNAL_TEST_HELPERS_H_

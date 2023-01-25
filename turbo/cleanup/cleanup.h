@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors.
+// Copyright 2021 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,8 +65,8 @@
 // within the body of a function. It is not a value type and instead models a
 // control flow construct. Check out `defer` in Golang for something similar.
 
-#ifndef ABSL_CLEANUP_CLEANUP_H_
-#define ABSL_CLEANUP_CLEANUP_H_
+#ifndef TURBO_CLEANUP_CLEANUP_H_
+#define TURBO_CLEANUP_CLEANUP_H_
 
 #include <utility>
 
@@ -75,10 +75,10 @@
 #include "turbo/cleanup/internal/cleanup.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 template <typename Arg, typename Callback = void()>
-class ABSL_MUST_USE_RESULT Cleanup final {
+class TURBO_MUST_USE_RESULT Cleanup final {
   static_assert(cleanup_internal::WasDeduced<Arg>(),
                 "Explicit template parameters are not supported.");
 
@@ -91,12 +91,12 @@ class ABSL_MUST_USE_RESULT Cleanup final {
   Cleanup(Cleanup&& other) = default;
 
   void Cancel() && {
-    ABSL_HARDENING_ASSERT(storage_.IsCallbackEngaged());
+    TURBO_HARDENING_ASSERT(storage_.IsCallbackEngaged());
     storage_.DestroyCallback();
   }
 
   void Invoke() && {
-    ABSL_HARDENING_ASSERT(storage_.IsCallbackEngaged());
+    TURBO_HARDENING_ASSERT(storage_.IsCallbackEngaged());
     storage_.InvokeCallback();
     storage_.DestroyCallback();
   }
@@ -115,10 +115,10 @@ class ABSL_MUST_USE_RESULT Cleanup final {
 // `turbo::Cleanup c = /* callback */;`
 //
 // C++17 type deduction API for creating an instance of `turbo::Cleanup`
-#if defined(ABSL_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
+#if defined(TURBO_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
 template <typename Callback>
 Cleanup(Callback callback) -> Cleanup<cleanup_internal::Tag, Callback>;
-#endif  // defined(ABSL_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
+#endif  // defined(TURBO_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
 
 // `auto c = turbo::MakeCleanup(/* callback */);`
 //
@@ -134,7 +134,7 @@ turbo::Cleanup<cleanup_internal::Tag, Callback> MakeCleanup(Callback callback) {
   return {std::move(callback)};
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CLEANUP_CLEANUP_H_
+#endif  // TURBO_CLEANUP_CLEANUP_H_

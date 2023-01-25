@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -28,8 +28,8 @@ licenses(["notice"])
 cc_library(
     name = "type_traits",
     hdrs = ["type_traits.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
     ],
@@ -38,8 +38,8 @@ cc_library(
 cc_test(
     name = "type_traits_test",
     srcs = ["type_traits_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":type_traits",
         "//turbo/base:config",

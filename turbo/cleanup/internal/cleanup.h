@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors.
+// Copyright 2021 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CLEANUP_INTERNAL_CLEANUP_H_
-#define ABSL_CLEANUP_INTERNAL_CLEANUP_H_
+#ifndef TURBO_CLEANUP_INTERNAL_CLEANUP_H_
+#define TURBO_CLEANUP_INTERNAL_CLEANUP_H_
 
 #include <new>
 #include <type_traits>
@@ -25,7 +25,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace cleanup_internal {
 
@@ -56,7 +56,7 @@ class Storage {
   }
 
   Storage(Storage&& other) {
-    ABSL_HARDENING_ASSERT(other.IsCallbackEngaged());
+    TURBO_HARDENING_ASSERT(other.IsCallbackEngaged());
 
     ::new (GetCallbackBuffer()) Callback(std::move(other.GetCallback()));
     is_callback_engaged_ = true;
@@ -83,7 +83,7 @@ class Storage {
     GetCallback().~Callback();
   }
 
-  void InvokeCallback() ABSL_NO_THREAD_SAFETY_ANALYSIS {
+  void InvokeCallback() TURBO_NO_THREAD_SAFETY_ANALYSIS {
     std::move(GetCallback())();
   }
 
@@ -94,7 +94,7 @@ class Storage {
 
 }  // namespace cleanup_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CLEANUP_INTERNAL_CLEANUP_H_
+#endif  // TURBO_CLEANUP_INTERNAL_CLEANUP_H_

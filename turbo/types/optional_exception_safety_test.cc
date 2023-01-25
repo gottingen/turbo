@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@
 
 // This test is a no-op when turbo::optional is an alias for std::optional and
 // when exceptions are not enabled.
-#if !defined(ABSL_USES_STD_OPTIONAL) && defined(ABSL_HAVE_EXCEPTIONS)
+#if !defined(TURBO_USES_STD_OPTIONAL) && defined(TURBO_HAVE_EXCEPTIONS)
 
 #include "gtest/gtest.h"
 #include "turbo/base/internal/exception_safety_testing.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace {
 
@@ -286,7 +286,7 @@ TEST(OptionalExceptionSafety, NothrowMoveAssign) {
 
 }  // namespace
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // #if !defined(ABSL_USES_STD_OPTIONAL) && defined(ABSL_HAVE_EXCEPTIONS)
+#endif  // #if !defined(TURBO_USES_STD_OPTIONAL) && defined(TURBO_HAVE_EXCEPTIONS)

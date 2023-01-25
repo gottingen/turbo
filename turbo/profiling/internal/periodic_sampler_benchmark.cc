@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 #include "benchmark/benchmark.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace profiling_internal {
 namespace {
 
@@ -32,7 +32,7 @@ template <typename Sampler>
 void BM_SampleMinunumInlined(Sampler* sampler, benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(sampler);
-    if (ABSL_PREDICT_FALSE(sampler->SubtleMaybeSample())) {
+    if (TURBO_PREDICT_FALSE(sampler->SubtleMaybeSample())) {
       benchmark::DoNotOptimize(sampler->SubtleConfirmSample());
     }
   }
@@ -75,5 +75,5 @@ BENCHMARK(BM_PeriodicSampler_Disabled);
 
 }  // namespace
 }  // namespace profiling_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

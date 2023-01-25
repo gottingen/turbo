@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,17 +24,17 @@
 // this functionality generally only works on platforms/builds that have been
 // specifically configured to support it.)
 //
-// Note: stack traces in Abseil that do not utilize a symbolizer will result in
+// Note: stack traces in Turbo that do not utilize a symbolizer will result in
 // frames consisting of function addresses rather than human-readable function
 // names. (See symbolize.h for information on symbolizing these values.)
 
-#ifndef ABSL_DEBUGGING_STACKTRACE_H_
-#define ABSL_DEBUGGING_STACKTRACE_H_
+#ifndef TURBO_DEBUGGING_STACKTRACE_H_
+#define TURBO_DEBUGGING_STACKTRACE_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // GetStackFrames()
 //
@@ -225,7 +225,7 @@ namespace debugging_internal {
 // working.
 extern bool StackTraceWorksForTest();
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_STACKTRACE_H_
+#endif  // TURBO_DEBUGGING_STACKTRACE_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -75,13 +75,13 @@ class PrecompiledSeedSeq {
     static size_t idx = 0;
     for (; begin != end; begin++) {
       *begin = kSeedData[idx++];
-      if (idx >= ABSL_ARRAYSIZE(kSeedData)) {
+      if (idx >= TURBO_ARRAYSIZE(kSeedData)) {
         idx = 0;
       }
     }
   }
 
-  size_t size() const { return ABSL_ARRAYSIZE(kSeedData); }
+  size_t size() const { return TURBO_ARRAYSIZE(kSeedData); }
 
   template <typename OutIterator>
   void param(OutIterator out) const {
@@ -357,7 +357,7 @@ void BM_Thread(benchmark::State& state) {
   BENCHMARK_TEMPLATE(BM_Gamma, Engine, std::gamma_distribution<float>, 199);   \
   BENCHMARK_TEMPLATE(BM_Gamma, Engine, std::gamma_distribution<double>, 199);
 
-// ABSL Recommended interfaces.
+// TURBO Recommended interfaces.
 BM_BASIC(turbo::InsecureBitGen);  // === pcg64_2018_engine
 BM_BASIC(turbo::BitGen);    // === randen_engine<uint64_t>.
 BM_THREAD(turbo::BitGen);

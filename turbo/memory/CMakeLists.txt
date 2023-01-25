@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,26 +14,26 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     memory
   HDRS
     "memory.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::core_headers
     turbo::meta
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     memory_test
   SRCS
     "memory_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::memory
     turbo::core_headers

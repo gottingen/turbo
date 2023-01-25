@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -25,12 +25,12 @@
 
 namespace {
 
-void BM_Clock_Now_AbslTime(benchmark::State& state) {
+void BM_Clock_Now_TurboTime(benchmark::State& state) {
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(turbo::Now());
   }
 }
-BENCHMARK(BM_Clock_Now_AbslTime);
+BENCHMARK(BM_Clock_Now_TurboTime);
 
 void BM_Clock_Now_GetCurrentTimeNanos(benchmark::State& state) {
   while (state.KeepRunning()) {
@@ -39,12 +39,12 @@ void BM_Clock_Now_GetCurrentTimeNanos(benchmark::State& state) {
 }
 BENCHMARK(BM_Clock_Now_GetCurrentTimeNanos);
 
-void BM_Clock_Now_AbslTime_ToUnixNanos(benchmark::State& state) {
+void BM_Clock_Now_TurboTime_ToUnixNanos(benchmark::State& state) {
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(turbo::ToUnixNanos(turbo::Now()));
   }
 }
-BENCHMARK(BM_Clock_Now_AbslTime_ToUnixNanos);
+BENCHMARK(BM_Clock_Now_TurboTime_ToUnixNanos);
 
 void BM_Clock_Now_CycleClock(benchmark::State& state) {
   while (state.KeepRunning()) {

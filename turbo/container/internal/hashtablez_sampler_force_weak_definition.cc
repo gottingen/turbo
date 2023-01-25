@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
 #include "turbo/base/attributes.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // See hashtablez_sampler.h for details.
-extern "C" ABSL_ATTRIBUTE_WEAK bool ABSL_INTERNAL_C_SYMBOL(
-    AbslContainerInternalSampleEverything)() {
+extern "C" TURBO_ATTRIBUTE_WEAK bool TURBO_INTERNAL_C_SYMBOL(
+    TurboContainerInternalSampleEverything)() {
   return false;
 }
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

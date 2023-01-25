@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_RANDOM_INTERNAL_DISTRIBUTION_CALLER_H_
-#define ABSL_RANDOM_INTERNAL_DISTRIBUTION_CALLER_H_
+#ifndef TURBO_RANDOM_INTERNAL_DISTRIBUTION_CALLER_H_
+#define TURBO_RANDOM_INTERNAL_DISTRIBUTION_CALLER_H_
 
 #include <utility>
 #include <type_traits>
@@ -25,7 +25,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // DistributionCaller provides an opportunity to overload the general
@@ -89,7 +89,7 @@ struct DistributionCaller {
 };
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_DISTRIBUTION_CALLER_H_
+#endif  // TURBO_RANDOM_INTERNAL_DISTRIBUTION_CALLER_H_

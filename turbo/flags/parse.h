@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 // File: parse.h
 // -----------------------------------------------------------------------------
 //
-// This file defines the main parsing function for Abseil flags:
+// This file defines the main parsing function for Turbo flags:
 // `turbo::ParseCommandLine()`.
 
-#ifndef ABSL_FLAGS_PARSE_H_
-#define ABSL_FLAGS_PARSE_H_
+#ifndef TURBO_FLAGS_PARSE_H_
+#define TURBO_FLAGS_PARSE_H_
 
 #include <vector>
 
@@ -29,17 +29,17 @@
 #include "turbo/flags/internal/parse.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // ParseCommandLine()
 //
 // Parses the set of command-line arguments passed in the `argc` (argument
 // count) and `argv[]` (argument vector) parameters from `main()`, assigning
-// values to any defined Abseil flags. (Any arguments passed after the
+// values to any defined Turbo flags. (Any arguments passed after the
 // flag-terminating delimiter (`--`) are treated as positional arguments and
 // ignored.)
 //
-// Any command-line flags (and arguments to those flags) are parsed into Abseil
+// Any command-line flags (and arguments to those flags) are parsed into Turbo
 // Flag values, if those flags are defined. Any undefined flags will either
 // return an error, or be ignored if that flag is designated using `undefok` to
 // indicate "undefined is OK."
@@ -54,7 +54,7 @@ ABSL_NAMESPACE_BEGIN
 // help messages and then exits the program.
 std::vector<char*> ParseCommandLine(int argc, char* argv[]);
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_PARSE_H_
+#endif  // TURBO_FLAGS_PARSE_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ TYPED_TEST(LogUniformIntDistributionTypeTest, SerializeTest) {
       if (sample > sample_max) sample_max = sample;
       if (sample < sample_min) sample_min = sample;
     }
-    ABSL_INTERNAL_LOG(INFO,
+    TURBO_INTERNAL_LOG(INFO,
                       turbo::StrCat("Range: ", +sample_min, ", ", +sample_max));
   }
 }
@@ -161,11 +161,11 @@ double LogUniformIntChiSquaredTest::ChiSquaredTestImpl() {
   for (size_t i = 0; i < trials; ++i) {
     const auto sample = dist(rng_);
     // Check the bounds.
-    ABSL_ASSERT(sample <= dist.max());
-    ABSL_ASSERT(sample >= dist.min());
+    TURBO_ASSERT(sample <= dist.max());
+    TURBO_ASSERT(sample >= dist.min());
     // Convert the output of the generator to one of num_bucket buckets.
     int bucket = bucket_index(sample);
-    ABSL_ASSERT(bucket <= max_bucket);
+    TURBO_ASSERT(bucket <= max_bucket);
     ++buckets[bucket];
   }
 
@@ -182,11 +182,11 @@ double LogUniformIntChiSquaredTest::ChiSquaredTestImpl() {
   const double p = turbo::random_internal::ChiSquarePValue(chi_square, dof);
 
   if (chi_square > threshold) {
-    ABSL_INTERNAL_LOG(INFO, "values");
+    TURBO_INTERNAL_LOG(INFO, "values");
     for (size_t i = 0; i < buckets.size(); i++) {
-      ABSL_INTERNAL_LOG(INFO, turbo::StrCat(i, ": ", buckets[i]));
+      TURBO_INTERNAL_LOG(INFO, turbo::StrCat(i, ": ", buckets[i]));
     }
-    ABSL_INTERNAL_LOG(INFO,
+    TURBO_INTERNAL_LOG(INFO,
                       turbo::StrFormat("trials=%d\n"
                                       "%s(data, %d) = %f (%f)\n"
                                       "%s @ 0.98 = %f",

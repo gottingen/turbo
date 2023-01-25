@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,13 +50,13 @@
 // C++ ABI in the future.
 //
 
-#ifndef ABSL_DEBUGGING_INTERNAL_DEMANGLE_H_
-#define ABSL_DEBUGGING_INTERNAL_DEMANGLE_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
+#define TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 // Demangle `mangled`.  On success, return true and write the
@@ -65,7 +65,7 @@ namespace debugging_internal {
 bool Demangle(const char* mangled, char* out, size_t out_size);
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_INTERNAL_DEMANGLE_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_

@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,18 +24,18 @@
 #include "turbo/strings/str_format.h"
 
 #ifdef _MSC_FULL_VER
-#define ABSL_COMPILER_DOES_EXACT_ROUNDING 0
-#define ABSL_STRTOD_HANDLES_NAN_CORRECTLY 0
+#define TURBO_COMPILER_DOES_EXACT_ROUNDING 0
+#define TURBO_STRTOD_HANDLES_NAN_CORRECTLY 0
 #else
-#define ABSL_COMPILER_DOES_EXACT_ROUNDING 1
-#define ABSL_STRTOD_HANDLES_NAN_CORRECTLY 1
+#define TURBO_COMPILER_DOES_EXACT_ROUNDING 1
+#define TURBO_STRTOD_HANDLES_NAN_CORRECTLY 1
 #endif
 
 namespace {
 
 using turbo::strings_internal::Pow10;
 
-#if ABSL_COMPILER_DOES_EXACT_ROUNDING
+#if TURBO_COMPILER_DOES_EXACT_ROUNDING
 
 // Tests that the given string is accepted by turbo::from_chars, and that it
 // converts exactly equal to the given number.
@@ -552,10 +552,10 @@ TEST(FromChars, TestVersusStrtod) {
     for (int exponent = -300; exponent < 300; ++exponent) {
       std::string candidate = turbo::StrCat(mantissa, "e", exponent);
       double strtod_value = strtod(candidate.c_str(), nullptr);
-      double absl_value = 0;
+      double turbo_value = 0;
       turbo::from_chars(candidate.data(), candidate.data() + candidate.size(),
-                       absl_value);
-      ASSERT_EQ(strtod_value, absl_value) << candidate;
+                       turbo_value);
+      ASSERT_EQ(strtod_value, turbo_value) << candidate;
     }
   }
 }
@@ -570,10 +570,10 @@ TEST(FromChars, TestVersusStrtof) {
     for (int exponent = -43; exponent < 32; ++exponent) {
       std::string candidate = turbo::StrCat(mantissa, "e", exponent);
       float strtod_value = strtof(candidate.c_str(), nullptr);
-      float absl_value = 0;
+      float turbo_value = 0;
       turbo::from_chars(candidate.data(), candidate.data() + candidate.size(),
-                       absl_value);
-      ASSERT_EQ(strtod_value, absl_value) << candidate;
+                       turbo_value);
+      ASSERT_EQ(strtod_value, turbo_value) << candidate;
     }
   }
 }
@@ -607,10 +607,10 @@ TEST(FromChars, NaNDoubles) {
 
     // Also check that we match strtod()'s behavior.  This test assumes that the
     // platform has a compliant strtod().
-#if ABSL_STRTOD_HANDLES_NAN_CORRECTLY
+#if TURBO_STRTOD_HANDLES_NAN_CORRECTLY
     double strtod_double = strtod(input.c_str(), nullptr);
     EXPECT_TRUE(Identical(from_chars_double, strtod_double));
-#endif  // ABSL_STRTOD_HANDLES_NAN_CORRECTLY
+#endif  // TURBO_STRTOD_HANDLES_NAN_CORRECTLY
 
     // Check that we can parse a negative NaN
     std::string negative_input = "-" + input;
@@ -640,10 +640,10 @@ TEST(FromChars, NaNFloats) {
 
     // Also check that we match strtof()'s behavior.  This test assumes that the
     // platform has a compliant strtof().
-#if ABSL_STRTOD_HANDLES_NAN_CORRECTLY
+#if TURBO_STRTOD_HANDLES_NAN_CORRECTLY
     float strtof_float = strtof(input.c_str(), nullptr);
     EXPECT_TRUE(Identical(from_chars_float, strtof_float));
-#endif  // ABSL_STRTOD_HANDLES_NAN_CORRECTLY
+#endif  // TURBO_STRTOD_HANDLES_NAN_CORRECTLY
 
     // Check that we can parse a negative NaN
     std::string negative_input = "-" + input;

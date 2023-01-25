@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,22 +31,22 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr int HashtablezInfo::kMaxStackDepth;
 #endif
 
 namespace {
-ABSL_CONST_INIT std::atomic<bool> g_hashtablez_enabled{
+TURBO_CONST_INIT std::atomic<bool> g_hashtablez_enabled{
     false
 };
-ABSL_CONST_INIT std::atomic<int32_t> g_hashtablez_sample_parameter{1 << 10};
+TURBO_CONST_INIT std::atomic<int32_t> g_hashtablez_sample_parameter{1 << 10};
 std::atomic<HashtablezConfigListener> g_hashtablez_config_listener{nullptr};
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
-ABSL_PER_THREAD_TLS_KEYWORD turbo::profiling_internal::ExponentialBiased
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
+TURBO_PER_THREAD_TLS_KEYWORD turbo::profiling_internal::ExponentialBiased
     g_exponential_biased_generator;
 #endif
 
@@ -57,9 +57,9 @@ void TriggerHashtablezConfigListener() {
 
 }  // namespace
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
-ABSL_PER_THREAD_TLS_KEYWORD SamplingState global_next_sample = {0, 0};
-#endif  // defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
+TURBO_PER_THREAD_TLS_KEYWORD SamplingState global_next_sample = {0, 0};
+#endif  // defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 
 HashtablezSampler& GlobalHashtablezSampler() {
   static auto* sampler = new HashtablezSampler();
@@ -98,13 +98,13 @@ static bool ShouldForceSampling() {
     kForce,
     kUninitialized
   };
-  ABSL_CONST_INIT static std::atomic<ForceState> global_state{
+  TURBO_CONST_INIT static std::atomic<ForceState> global_state{
       kUninitialized};
   ForceState state = global_state.load(std::memory_order_relaxed);
-  if (ABSL_PREDICT_TRUE(state == kDontForce)) return false;
+  if (TURBO_PREDICT_TRUE(state == kDontForce)) return false;
 
   if (state == kUninitialized) {
-    state = ABSL_INTERNAL_C_SYMBOL(AbslContainerInternalSampleEverything)()
+    state = TURBO_INTERNAL_C_SYMBOL(TurboContainerInternalSampleEverything)()
                 ? kForce
                 : kDontForce;
     global_state.store(state, std::memory_order_relaxed);
@@ -114,7 +114,7 @@ static bool ShouldForceSampling() {
 
 HashtablezInfo* SampleSlow(SamplingState& next_sample,
                            size_t inline_element_size) {
-  if (ABSL_PREDICT_FALSE(ShouldForceSampling())) {
+  if (TURBO_PREDICT_FALSE(ShouldForceSampling())) {
     next_sample.next_sample = 1;
     const int64_t old_stride = exchange(next_sample.sample_stride, 1);
     HashtablezInfo* result =
@@ -122,7 +122,7 @@ HashtablezInfo* SampleSlow(SamplingState& next_sample,
     return result;
   }
 
-#if !defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if !defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
   next_sample = {
       std::numeric_limits<int64_t>::max(),
       std::numeric_limits<int64_t>::max(),
@@ -137,7 +137,7 @@ HashtablezInfo* SampleSlow(SamplingState& next_sample,
   next_sample.next_sample = next_stride;
   const int64_t old_stride = exchange(next_sample.sample_stride, next_stride);
   // Small values of interval are equivalent to just sampling next time.
-  ABSL_ASSERT(next_stride >= 1);
+  TURBO_ASSERT(next_stride >= 1);
 
   // g_hashtablez_enabled can be dynamically flipped, we need to set a threshold
   // low enough that we will start sampling in a reasonable time, so we just use
@@ -147,7 +147,7 @@ HashtablezInfo* SampleSlow(SamplingState& next_sample,
   // We will only be negative on our first count, so we should just retry in
   // that case.
   if (first) {
-    if (ABSL_PREDICT_TRUE(--next_sample.next_sample > 0)) return nullptr;
+    if (TURBO_PREDICT_TRUE(--next_sample.next_sample > 0)) return nullptr;
     return SampleSlow(next_sample, inline_element_size);
   }
 
@@ -160,7 +160,7 @@ void UnsampleSlow(HashtablezInfo* info) {
 }
 
 void RecordRehashSlow(HashtablezInfo* info, size_t total_probe_length) {
-#ifdef ABSL_INTERNAL_HAVE_SSE2
+#ifdef TURBO_INTERNAL_HAVE_SSE2
   total_probe_length /= 16;
 #else
   total_probe_length /= 8;
@@ -201,7 +201,7 @@ void RecordInsertSlow(HashtablezInfo* info, size_t hash,
   // SwissTables probe in groups of 16, so scale this to count items probes and
   // not offset from desired.
   size_t probe_length = distance_from_desired;
-#ifdef ABSL_INTERNAL_HAVE_SSE2
+#ifdef TURBO_INTERNAL_HAVE_SSE2
   probe_length /= 16;
 #else
   probe_length /= 8;
@@ -256,7 +256,7 @@ void SetHashtablezSampleParameterInternal(int32_t rate) {
   if (rate > 0) {
     g_hashtablez_sample_parameter.store(rate, std::memory_order_release);
   } else {
-    ABSL_RAW_LOG(ERROR, "Invalid hashtablez sample rate: %lld",
+    TURBO_RAW_LOG(ERROR, "Invalid hashtablez sample rate: %lld",
                  static_cast<long long>(rate));  // NOLINT(runtime/int)
   }
 }
@@ -274,10 +274,10 @@ void SetHashtablezMaxSamplesInternal(size_t max) {
   if (max > 0) {
     GlobalHashtablezSampler().SetMaxSamples(max);
   } else {
-    ABSL_RAW_LOG(ERROR, "Invalid hashtablez max samples: 0");
+    TURBO_RAW_LOG(ERROR, "Invalid hashtablez max samples: 0");
   }
 }
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

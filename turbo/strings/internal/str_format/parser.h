@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_FORMAT_PARSER_H_
-#define ABSL_STRINGS_INTERNAL_STR_FORMAT_PARSER_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_FORMAT_PARSER_H_
+#define TURBO_STRINGS_INTERNAL_STR_FORMAT_PARSER_H_
 
 #include <limits.h>
 #include <stddef.h>
@@ -33,7 +33,7 @@
 #include "turbo/strings/internal/str_format/extension.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 
 std::string LengthModToString(LengthMod v);
@@ -65,15 +65,15 @@ bool ParseFormatString(string_view src, Consumer consumer) {
       return consumer.Append(string_view(p, static_cast<size_t>(end - p)));
     }
     // We found a percent, so push the text run then process the percent.
-    if (ABSL_PREDICT_FALSE(!consumer.Append(
+    if (TURBO_PREDICT_FALSE(!consumer.Append(
             string_view(p, static_cast<size_t>(percent - p))))) {
       return false;
     }
-    if (ABSL_PREDICT_FALSE(percent + 1 >= end)) return false;
+    if (TURBO_PREDICT_FALSE(percent + 1 >= end)) return false;
 
     auto tag = GetTagForChar(percent[1]);
     if (tag.is_conv()) {
-      if (ABSL_PREDICT_FALSE(next_arg < 0)) {
+      if (TURBO_PREDICT_FALSE(next_arg < 0)) {
         // This indicates an error in the format string.
         // The only way to get `next_arg < 0` here is to have a positional
         // argument first which sets next_arg to -1 and then a non-positional
@@ -88,21 +88,21 @@ bool ParseFormatString(string_view src, Consumer consumer) {
       UnboundConversion conv;
       conv.conv = tag.as_conv();
       conv.arg_position = ++next_arg;
-      if (ABSL_PREDICT_FALSE(
+      if (TURBO_PREDICT_FALSE(
               !consumer.ConvertOne(conv, string_view(percent + 1, 1)))) {
         return false;
       }
     } else if (percent[1] != '%') {
       UnboundConversion conv;
       p = ConsumeUnboundConversionNoInline(percent + 1, end, &conv, &next_arg);
-      if (ABSL_PREDICT_FALSE(p == nullptr)) return false;
-      if (ABSL_PREDICT_FALSE(!consumer.ConvertOne(
+      if (TURBO_PREDICT_FALSE(p == nullptr)) return false;
+      if (TURBO_PREDICT_FALSE(!consumer.ConvertOne(
               conv, string_view(percent + 1,
                                 static_cast<size_t>(p - (percent + 1)))))) {
         return false;
       }
     } else {
-      if (ABSL_PREDICT_FALSE(!consumer.Append("%"))) return false;
+      if (TURBO_PREDICT_FALSE(!consumer.Append("%"))) return false;
       p = percent + 2;
       continue;
     }
@@ -219,13 +219,13 @@ template <FormatConversionCharSet... C>
 class ExtendedParsedFormat : public str_format_internal::ParsedFormatBase {
  public:
   explicit ExtendedParsedFormat(string_view format)
-#ifdef ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#ifdef TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
       __attribute__((
           enable_if(str_format_internal::EnsureConstexpr(format),
                     "Format string is not constexpr."),
           enable_if(str_format_internal::ValidFormatImpl<C...>(format),
                     "Format specified does not match the template arguments.")))
-#endif  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#endif  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
       : ExtendedParsedFormat(format, false) {
   }
 
@@ -262,7 +262,7 @@ class ExtendedParsedFormat : public str_format_internal::ParsedFormatBase {
       : ParsedFormatBase(s, allow_ignored, {C...}) {}
 };
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_PARSER_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_FORMAT_PARSER_H_

@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     graphcycles_internal
   HDRS
@@ -23,7 +23,7 @@ absl_cc_library(
   SRCS
     "internal/graphcycles.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::base_internal
@@ -34,20 +34,20 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     kernel_timeout_internal
   HDRS
     "internal/kernel_timeout.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::core_headers
     turbo::raw_logging_internal
     turbo::time
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     synchronization
   HDRS
@@ -68,7 +68,7 @@ absl_cc_library(
     "notification.cc"
     "mutex.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::graphcycles_internal
     turbo::kernel_timeout_internal
@@ -87,39 +87,39 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     barrier_test
   SRCS
     "barrier_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::synchronization
     turbo::time
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     blocking_counter_test
   SRCS
     "blocking_counter_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::synchronization
     turbo::time
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     graphcycles_test
   SRCS
     "internal/graphcycles_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::graphcycles_internal
     turbo::core_headers
@@ -128,13 +128,13 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     thread_pool
   HDRS
     "internal/thread_pool.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::any_invocable
     turbo::core_headers
@@ -142,13 +142,13 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     mutex_test
   SRCS
     "mutex_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::synchronization
     turbo::thread_pool
@@ -161,13 +161,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     mutex_method_pointer_test
   SRCS
     "mutex_method_pointer_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -175,13 +175,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     notification_test
   SRCS
     "notification_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::synchronization
     turbo::time
@@ -189,13 +189,13 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     per_thread_sem_test_common
   SRCS
     "internal/per_thread_sem_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::synchronization
     turbo::base
@@ -206,13 +206,13 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     per_thread_sem_test
   SRCS
     "internal/per_thread_sem_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::per_thread_sem_test_common
     turbo::synchronization
@@ -221,13 +221,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     lifetime_test
   SRCS
     "lifetime_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::synchronization
     turbo::core_headers

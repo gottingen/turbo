@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 
 #include "turbo/log/log.h"
 
-#define ABSL_TEST_LOG LOG
+#define TURBO_TEST_LOG LOG
 
 #include "gtest/gtest.h"
 #include "turbo/log/log_basic_test_impl.h"

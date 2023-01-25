@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@
 // accidentally overflowing your stack if large input is passed to
 // your function.
 
-#ifndef ABSL_CONTAINER_FIXED_ARRAY_H_
-#define ABSL_CONTAINER_FIXED_ARRAY_H_
+#ifndef TURBO_CONTAINER_FIXED_ARRAY_H_
+#define TURBO_CONTAINER_FIXED_ARRAY_H_
 
 #include <algorithm>
 #include <cassert>
@@ -51,7 +51,7 @@
 #include "turbo/memory/memory.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 constexpr static auto kFixedArrayUseDefault = static_cast<size_t>(-1);
 
@@ -212,7 +212,7 @@ class FixedArray {
   // Returns a reference the ith element of the fixed array.
   // REQUIRES: 0 <= i < size()
   reference operator[](size_type i) {
-    ABSL_HARDENING_ASSERT(i < size());
+    TURBO_HARDENING_ASSERT(i < size());
     return data()[i];
   }
 
@@ -220,7 +220,7 @@ class FixedArray {
   // ith element of the fixed array.
   // REQUIRES: 0 <= i < size()
   const_reference operator[](size_type i) const {
-    ABSL_HARDENING_ASSERT(i < size());
+    TURBO_HARDENING_ASSERT(i < size());
     return data()[i];
   }
 
@@ -229,7 +229,7 @@ class FixedArray {
   // Bounds-checked access.  Returns a reference to the ith element of the fixed
   // array, or throws std::out_of_range
   reference at(size_type i) {
-    if (ABSL_PREDICT_FALSE(i >= size())) {
+    if (TURBO_PREDICT_FALSE(i >= size())) {
       base_internal::ThrowStdOutOfRange("FixedArray::at failed bounds check");
     }
     return data()[i];
@@ -238,7 +238,7 @@ class FixedArray {
   // Overload of FixedArray::at() to return a const reference to the ith element
   // of the fixed array.
   const_reference at(size_type i) const {
-    if (ABSL_PREDICT_FALSE(i >= size())) {
+    if (TURBO_PREDICT_FALSE(i >= size())) {
       base_internal::ThrowStdOutOfRange("FixedArray::at failed bounds check");
     }
     return data()[i];
@@ -248,14 +248,14 @@ class FixedArray {
   //
   // Returns a reference to the first element of the fixed array.
   reference front() {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[0];
   }
 
   // Overload of FixedArray::front() to return a reference to the first element
   // of a fixed array of const values.
   const_reference front() const {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[0];
   }
 
@@ -263,14 +263,14 @@ class FixedArray {
   //
   // Returns a reference to the last element of the fixed array.
   reference back() {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[size() - 1];
   }
 
   // Overload of FixedArray::back() to return a reference to the last element
   // of a fixed array of const values.
   const_reference back() const {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[size() - 1];
   }
 
@@ -367,7 +367,7 @@ class FixedArray {
   }
 
   template <typename H>
-  friend H AbslHashValue(H h, const FixedArray& v) {
+  friend H TurboHashValue(H h, const FixedArray& v) {
     return H::combine(H::combine_contiguous(std::move(h), v.data(), v.size()),
                       v.size());
   }
@@ -417,15 +417,15 @@ class FixedArray {
     void AnnotateConstruct(size_type n);
     void AnnotateDestruct(size_type n);
 
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
     void* RedzoneBegin() { return &redzone_begin_; }
     void* RedzoneEnd() { return &redzone_end_ + 1; }
-#endif  // ABSL_HAVE_ADDRESS_SANITIZER
+#endif  // TURBO_HAVE_ADDRESS_SANITIZER
 
    private:
-    ABSL_ADDRESS_SANITIZER_REDZONE(redzone_begin_);
+    TURBO_ADDRESS_SANITIZER_REDZONE(redzone_begin_);
     alignas(StorageElement) char buff_[sizeof(StorageElement[inline_elements])];
-    ABSL_ADDRESS_SANITIZER_REDZONE(redzone_end_);
+    TURBO_ADDRESS_SANITIZER_REDZONE(redzone_end_);
   };
 
   class EmptyInlinedStorage {
@@ -470,9 +470,9 @@ class FixedArray {
       return n <= inline_elements;
     }
 
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
-    ABSL_ATTRIBUTE_NOINLINE
-#endif  // ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
+    TURBO_ATTRIBUTE_NOINLINE
+#endif  // TURBO_HAVE_ADDRESS_SANITIZER
     StorageElement* InitializeData() {
       if (UsingInlinedStorage(size())) {
         InlinedStorage::AnnotateConstruct(size());
@@ -491,7 +491,7 @@ class FixedArray {
   Storage storage_;
 };
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 template <typename T, size_t N, typename A>
 constexpr size_t FixedArray<T, N, A>::kInlineBytesDefault;
 
@@ -503,29 +503,29 @@ constexpr typename FixedArray<T, N, A>::size_type
 template <typename T, size_t N, typename A>
 void FixedArray<T, N, A>::NonEmptyInlinedStorage::AnnotateConstruct(
     typename FixedArray<T, N, A>::size_type n) {
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
   if (!n) return;
-  ABSL_ANNOTATE_CONTIGUOUS_CONTAINER(data(), RedzoneEnd(), RedzoneEnd(),
+  TURBO_ANNOTATE_CONTIGUOUS_CONTAINER(data(), RedzoneEnd(), RedzoneEnd(),
                                      data() + n);
-  ABSL_ANNOTATE_CONTIGUOUS_CONTAINER(RedzoneBegin(), data(), data(),
+  TURBO_ANNOTATE_CONTIGUOUS_CONTAINER(RedzoneBegin(), data(), data(),
                                      RedzoneBegin());
-#endif  // ABSL_HAVE_ADDRESS_SANITIZER
+#endif  // TURBO_HAVE_ADDRESS_SANITIZER
   static_cast<void>(n);  // Mark used when not in asan mode
 }
 
 template <typename T, size_t N, typename A>
 void FixedArray<T, N, A>::NonEmptyInlinedStorage::AnnotateDestruct(
     typename FixedArray<T, N, A>::size_type n) {
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
   if (!n) return;
-  ABSL_ANNOTATE_CONTIGUOUS_CONTAINER(data(), RedzoneEnd(), data() + n,
+  TURBO_ANNOTATE_CONTIGUOUS_CONTAINER(data(), RedzoneEnd(), data() + n,
                                      RedzoneEnd());
-  ABSL_ANNOTATE_CONTIGUOUS_CONTAINER(RedzoneBegin(), data(), RedzoneBegin(),
+  TURBO_ANNOTATE_CONTIGUOUS_CONTAINER(RedzoneBegin(), data(), RedzoneBegin(),
                                      data());
-#endif  // ABSL_HAVE_ADDRESS_SANITIZER
+#endif  // TURBO_HAVE_ADDRESS_SANITIZER
   static_cast<void>(n);  // Mark used when not in asan mode
 }
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_FIXED_ARRAY_H_
+#endif  // TURBO_CONTAINER_FIXED_ARRAY_H_

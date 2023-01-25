@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 // Functions for directly invoking mmap() via syscall, avoiding the case where
 // mmap() has been locally overridden.
 
-#ifndef ABSL_BASE_INTERNAL_DIRECT_MMAP_H_
-#define ABSL_BASE_INTERNAL_DIRECT_MMAP_H_
+#ifndef TURBO_BASE_INTERNAL_DIRECT_MMAP_H_
+#define TURBO_BASE_INTERNAL_DIRECT_MMAP_H_
 
 #include "turbo/base/config.h"
 
-#ifdef ABSL_HAVE_MMAP
+#ifdef TURBO_HAVE_MMAP
 
 #include <sys/mman.h>
 
@@ -66,7 +66,7 @@ extern "C" void* __mmap2(void*, size_t, int, int, int, size_t);
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // Platform specific logic extracted from
@@ -138,7 +138,7 @@ inline int DirectMunmap(void* start, size_t length) {
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #else  // !__linux__
@@ -147,7 +147,7 @@ ABSL_NAMESPACE_END
 // actual mmap()/munmap() methods.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 inline void* DirectMmap(void* start, size_t length, int prot, int flags, int fd,
@@ -160,11 +160,11 @@ inline int DirectMunmap(void* start, size_t length) {
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // __linux__
 
-#endif  // ABSL_HAVE_MMAP
+#endif  // TURBO_HAVE_MMAP
 
-#endif  // ABSL_BASE_INTERNAL_DIRECT_MMAP_H_
+#endif  // TURBO_BASE_INTERNAL_DIRECT_MMAP_H_

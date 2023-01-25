@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 bool SimpleAtof(turbo::string_view str, float* out) {
   *out = 0.0;
@@ -106,7 +106,7 @@ bool SimpleAtod(turbo::string_view str, double* out) {
 }
 
 bool SimpleAtob(turbo::string_view str, bool* out) {
-  ABSL_RAW_CHECK(out != nullptr, "Output pointer must not be nullptr.");
+  TURBO_RAW_CHECK(out != nullptr, "Output pointer must not be nullptr.");
   if (EqualsIgnoreCase(str, "true") || EqualsIgnoreCase(str, "t") ||
       EqualsIgnoreCase(str, "yes") || EqualsIgnoreCase(str, "y") ||
       EqualsIgnoreCase(str, "1")) {
@@ -567,15 +567,15 @@ size_t numbers_internal::SixDigitsToBuffer(double d, char* const buffer) {
     case -4:
       out[2] = '0';
       ++out;
-      ABSL_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH_INTENDED;
     case -3:
       out[2] = '0';
       ++out;
-      ABSL_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH_INTENDED;
     case -2:
       out[2] = '0';
       ++out;
-      ABSL_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH_INTENDED;
     case -1:
       out += 2;
       memcpy(out, &digits[0], 6);
@@ -732,8 +732,8 @@ inline bool safe_parse_sign_and_base(turbo::string_view* text /*inout*/,
 // commonly used bases.
 template <typename IntType>
 struct LookupTables {
-  ABSL_CONST_INIT static const IntType kVmaxOverBase[];
-  ABSL_CONST_INIT static const IntType kVminOverBase[];
+  TURBO_CONST_INIT static const IntType kVmaxOverBase[];
+  TURBO_CONST_INIT static const IntType kVminOverBase[];
 };
 
 // An array initializer macro for X/base where base in [0, 36].
@@ -760,7 +760,7 @@ struct LookupTables {
 // uint128& operator/=(uint128) is not constexpr, so hardcode the resulting
 // array to avoid a static initializer.
 template <>
-ABSL_CONST_INIT const uint128 LookupTables<uint128>::kVmaxOverBase[] = {
+TURBO_CONST_INIT const uint128 LookupTables<uint128>::kVmaxOverBase[] = {
     0,
     0,
     MakeUint128(9223372036854775807u, 18446744073709551615u),
@@ -812,7 +812,7 @@ ABSL_CONST_INIT const uint128 LookupTables<uint128>::kVmaxOverBase[] = {
 // int128& operator/=(int128) is not constexpr, so hardcode the resulting array
 // to avoid a static initializer.
 template <>
-ABSL_CONST_INIT const int128 LookupTables<int128>::kVmaxOverBase[] = {
+TURBO_CONST_INIT const int128 LookupTables<int128>::kVmaxOverBase[] = {
     0,
     0,
     MakeInt128(4611686018427387903, 18446744073709551615u),
@@ -865,7 +865,7 @@ ABSL_CONST_INIT const int128 LookupTables<int128>::kVmaxOverBase[] = {
 // int128& operator/=(int128) is not constexpr, so hardcode the resulting array
 // to avoid a static initializer.
 template <>
-ABSL_CONST_INIT const int128 LookupTables<int128>::kVminOverBase[] = {
+TURBO_CONST_INIT const int128 LookupTables<int128>::kVminOverBase[] = {
     0,
     0,
     MakeInt128(-4611686018427387904, 0u),
@@ -906,11 +906,11 @@ ABSL_CONST_INIT const int128 LookupTables<int128>::kVminOverBase[] = {
 };
 
 template <typename IntType>
-ABSL_CONST_INIT const IntType LookupTables<IntType>::kVmaxOverBase[] =
+TURBO_CONST_INIT const IntType LookupTables<IntType>::kVmaxOverBase[] =
     X_OVER_BASE_INITIALIZER(std::numeric_limits<IntType>::max());
 
 template <typename IntType>
-ABSL_CONST_INIT const IntType LookupTables<IntType>::kVminOverBase[] =
+TURBO_CONST_INIT const IntType LookupTables<IntType>::kVminOverBase[] =
     X_OVER_BASE_INITIALIZER(std::numeric_limits<IntType>::min());
 
 #undef X_OVER_BASE_INITIALIZER
@@ -1027,10 +1027,10 @@ inline bool safe_uint_internal(turbo::string_view text, IntType* value_p,
 namespace numbers_internal {
 
 // Digit conversion.
-ABSL_CONST_INIT ABSL_DLL const char kHexChar[] =
+TURBO_CONST_INIT TURBO_DLL const char kHexChar[] =
     "0123456789abcdef";
 
-ABSL_CONST_INIT ABSL_DLL const char kHexTable[513] =
+TURBO_CONST_INIT TURBO_DLL const char kHexTable[513] =
     "000102030405060708090a0b0c0d0e0f"
     "101112131415161718191a1b1c1d1e1f"
     "202122232425262728292a2b2c2d2e2f"
@@ -1048,7 +1048,7 @@ ABSL_CONST_INIT ABSL_DLL const char kHexTable[513] =
     "e0e1e2e3e4e5e6e7e8e9eaebecedeeef"
     "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff";
 
-ABSL_CONST_INIT ABSL_DLL const char two_ASCII_digits[100][2] = {
+TURBO_CONST_INIT TURBO_DLL const char two_ASCII_digits[100][2] = {
     {'0', '0'}, {'0', '1'}, {'0', '2'}, {'0', '3'}, {'0', '4'}, {'0', '5'},
     {'0', '6'}, {'0', '7'}, {'0', '8'}, {'0', '9'}, {'1', '0'}, {'1', '1'},
     {'1', '2'}, {'1', '3'}, {'1', '4'}, {'1', '5'}, {'1', '6'}, {'1', '7'},
@@ -1092,5 +1092,5 @@ bool safe_strtou128_base(turbo::string_view text, uint128* value, int base) {
 }
 
 }  // namespace numbers_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

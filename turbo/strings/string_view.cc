@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 #include "turbo/strings/string_view.h"
 
-#ifndef ABSL_USES_STD_STRING_VIEW
+#ifndef TURBO_USES_STD_STRING_VIEW
 
 #include <algorithm>
 #include <climits>
@@ -24,7 +24,7 @@
 #include "turbo/strings/internal/memutil.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace {
 void WritePadding(std::ostream& o, size_t pad) {
@@ -208,12 +208,12 @@ string_view::size_type string_view::find_last_not_of(
 }
 
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr string_view::size_type string_view::npos;
 constexpr string_view::size_type string_view::kMaxSize;
 #endif
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USES_STD_STRING_VIEW
+#endif  // TURBO_USES_STD_STRING_VIEW

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_CRC32C_H_
-#define ABSL_CRC_INTERNAL_CRC32C_H_
+#ifndef TURBO_CRC_INTERNAL_CRC32C_H_
+#define TURBO_CRC_INTERNAL_CRC32C_H_
 
 #include "turbo/base/config.h"
 #include "turbo/crc/crc32c.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 // Modifies a CRC32 value by removing `length` bytes with a value of 0 from
@@ -33,7 +33,7 @@ namespace crc_internal {
 crc32c_t UnextendCrc32cByZeroes(crc32c_t initial_crc, size_t length);
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_INTERNAL_CRC32C_H_
+#endif  // TURBO_CRC_INTERNAL_CRC32C_H_

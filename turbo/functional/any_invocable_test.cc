@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,10 +34,10 @@ namespace {
 // Helper macro used to avoid spelling `noexcept` in language versions older
 // than C++17, where it is not part of the type system, in order to avoid
 // compilation failures and internal compiler errors.
-#if ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
-#define ABSL_INTERNAL_NOEXCEPT_SPEC(noex) noexcept(noex)
+#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#define TURBO_INTERNAL_NOEXCEPT_SPEC(noex) noexcept(noex)
 #else
-#define ABSL_INTERNAL_NOEXCEPT_SPEC(noex)
+#define TURBO_INTERNAL_NOEXCEPT_SPEC(noex)
 #endif
 
 // A dummy type we use when passing qualifiers to metafunctions
@@ -188,7 +188,7 @@ template <Movable Movability, Destructible Destructibility, class Qual,
           NothrowCall CallExceptionSpec, ObjSize Size, ObjAlign Alignment>
 struct add;
 
-#define ABSL_INTERNALS_ADD(qual)                                              \
+#define TURBO_INTERNALS_ADD(qual)                                              \
   template <NothrowCall CallExceptionSpec, ObjSize Size, ObjAlign Alignment>  \
   struct alignas(static_cast<std::size_t>(Alignment))                         \
       add<Movable::trivial, Destructible::trivial, _ qual, CallExceptionSpec, \
@@ -200,7 +200,7 @@ struct add;
                 tail) {}                                                      \
     add(add&& other) = default; /*NOLINT*/                                    \
     Int operator()(int a, int b, int c) qual                                  \
-        ABSL_INTERNAL_NOEXCEPT_SPEC(CallExceptionSpec == NothrowCall::yes) {  \
+        TURBO_INTERNAL_NOEXCEPT_SPEC(CallExceptionSpec == NothrowCall::yes) {  \
       return state + a + b + c;                                               \
     }                                                                         \
     int state;                                                                \
@@ -218,7 +218,7 @@ struct add;
     ~add() noexcept {}                                                        \
     add(add&& other) = default; /*NOLINT*/                                    \
     Int operator()(int a, int b, int c) qual                                  \
-        ABSL_INTERNAL_NOEXCEPT_SPEC(CallExceptionSpec == NothrowCall::yes) {  \
+        TURBO_INTERNAL_NOEXCEPT_SPEC(CallExceptionSpec == NothrowCall::yes) {  \
       return state + a + b + c;                                               \
     }                                                                         \
     int state;                                                                \
@@ -226,18 +226,18 @@ struct add;
 
 // Explicitly specify an empty argument.
 // MSVC (at least up to _MSC_VER 1931, if not beyond) warns that
-// ABSL_INTERNALS_ADD() is an undefined zero-arg overload.
-#define ABSL_INTERNALS_NOARG
-ABSL_INTERNALS_ADD(ABSL_INTERNALS_NOARG);
-#undef ABSL_INTERNALS_NOARG
+// TURBO_INTERNALS_ADD() is an undefined zero-arg overload.
+#define TURBO_INTERNALS_NOARG
+TURBO_INTERNALS_ADD(TURBO_INTERNALS_NOARG);
+#undef TURBO_INTERNALS_NOARG
 
-ABSL_INTERNALS_ADD(const);
-ABSL_INTERNALS_ADD(&);
-ABSL_INTERNALS_ADD(const&);
-ABSL_INTERNALS_ADD(&&);       // NOLINT
-ABSL_INTERNALS_ADD(const&&);  // NOLINT
+TURBO_INTERNALS_ADD(const);
+TURBO_INTERNALS_ADD(&);
+TURBO_INTERNALS_ADD(const&);
+TURBO_INTERNALS_ADD(&&);       // NOLINT
+TURBO_INTERNALS_ADD(const&&);  // NOLINT
 
-#undef ABSL_INTERNALS_ADD
+#undef TURBO_INTERNALS_ADD
 
 template <Destructible Destructibility, class Qual,
           NothrowCall CallExceptionSpec, ObjSize Size, ObjAlign Alignment>
@@ -323,7 +323,7 @@ struct TestParams {
 
   // These types are used when testing with member object pointer Invocables
   using UnqualifiedUnaryFunType = int(Int const&&)
-      ABSL_INTERNAL_NOEXCEPT_SPEC(CallExceptionSpec == NothrowCall::yes);
+      TURBO_INTERNAL_NOEXCEPT_SPEC(CallExceptionSpec == NothrowCall::yes);
   using UnaryFunType = GiveQualifiersToFun<Qualifiers, UnqualifiedUnaryFunType>;
   using MemObjPtrType = int(Int::*);
   using UnaryAnyInvType = AnyInvocable<UnaryFunType>;
@@ -1233,7 +1233,7 @@ class AnyInvTestNoexceptTrue : public ::testing::Test {};
 TYPED_TEST_SUITE_P(AnyInvTestNoexceptTrue);
 
 TYPED_TEST_P(AnyInvTestNoexceptTrue, ConversionConstructionConstraints) {
-#if ABSL_INTERNAL_CPLUSPLUS_LANG < 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG < 201703L
   GTEST_SKIP() << "Noexcept was not part of the type system before C++17.";
 #else
   using AnyInvType = typename TypeParam::AnyInvType;
@@ -1248,7 +1248,7 @@ TYPED_TEST_P(AnyInvTestNoexceptTrue, ConversionConstructionConstraints) {
 }
 
 TYPED_TEST_P(AnyInvTestNoexceptTrue, ConversionAssignConstraints) {
-#if ABSL_INTERNAL_CPLUSPLUS_LANG < 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG < 201703L
   GTEST_SKIP() << "Noexcept was not part of the type system before C++17.";
 #else
   using AnyInvType = typename TypeParam::AnyInvType;
@@ -1283,7 +1283,7 @@ TYPED_TEST_P(AnyInvTestNonRvalue, ConversionConstructionReferenceWrapper) {
 }
 
 TYPED_TEST_P(AnyInvTestNonRvalue, NonMoveableResultType) {
-#if ABSL_INTERNAL_CPLUSPLUS_LANG < 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG < 201703L
   GTEST_SKIP() << "Copy/move elision was not standard before C++17";
 #else
   // Define a result type that cannot be copy- or move-constructed.
@@ -1367,7 +1367,7 @@ TYPED_TEST_P(AnyInvTestRvalue, ConversionConstructionReferenceWrapper) {
 }
 
 TYPED_TEST_P(AnyInvTestRvalue, NonMoveableResultType) {
-#if ABSL_INTERNAL_CPLUSPLUS_LANG < 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG < 201703L
   GTEST_SKIP() << "Copy/move elision was not standard before C++17";
 #else
   // Define a result type that cannot be copy- or move-constructed.
@@ -1418,7 +1418,7 @@ TYPED_TEST_P(AnyInvTestRvalue, NonConstCrashesOnSecondCall) {
   // Ensure we're still valid
   EXPECT_TRUE(static_cast<bool>(fun));  // NOLINT(bugprone-use-after-move)
 
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED == 1
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED == 1
   EXPECT_DEATH_IF_SUPPORTED(std::move(fun)(7, 8, 9), "");
 #endif
 }
@@ -1509,7 +1509,7 @@ using TestParameterListRemoteMovable = ::testing::Types<
 
 // Dynamic memory allocation for over-aligned data was introduced in C++17.
 // See https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0035r4.html
-#if ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
     // Types that must use remote storage because of a large alignment.
     ,
     TestParams<Movable::trivial, Destructible::trivial, _, NothrowCall::no,
@@ -1714,6 +1714,6 @@ static_assert(
 static_assert(!std::is_convertible<void*, turbo::AnyInvocable<void() &&>>::value,
               "");
 
-#undef ABSL_INTERNAL_NOEXCEPT_SPEC
+#undef TURBO_INTERNAL_NOEXCEPT_SPEC
 
 }  // namespace

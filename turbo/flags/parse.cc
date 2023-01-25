@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,27 +59,27 @@
 // --------------------------------------------------------------------
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 namespace {
 
-ABSL_CONST_INIT turbo::Mutex processing_checks_guard(turbo::kConstInit);
+TURBO_CONST_INIT turbo::Mutex processing_checks_guard(turbo::kConstInit);
 
-ABSL_CONST_INIT bool flagfile_needs_processing
-    ABSL_GUARDED_BY(processing_checks_guard) = false;
-ABSL_CONST_INIT bool fromenv_needs_processing
-    ABSL_GUARDED_BY(processing_checks_guard) = false;
-ABSL_CONST_INIT bool tryfromenv_needs_processing
-    ABSL_GUARDED_BY(processing_checks_guard) = false;
+TURBO_CONST_INIT bool flagfile_needs_processing
+    TURBO_GUARDED_BY(processing_checks_guard) = false;
+TURBO_CONST_INIT bool fromenv_needs_processing
+    TURBO_GUARDED_BY(processing_checks_guard) = false;
+TURBO_CONST_INIT bool tryfromenv_needs_processing
+    TURBO_GUARDED_BY(processing_checks_guard) = false;
 
-ABSL_CONST_INIT turbo::Mutex specified_flags_guard(turbo::kConstInit);
-ABSL_CONST_INIT std::vector<const CommandLineFlag*>* specified_flags
-    ABSL_GUARDED_BY(specified_flags_guard) = nullptr;
+TURBO_CONST_INIT turbo::Mutex specified_flags_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::vector<const CommandLineFlag*>* specified_flags
+    TURBO_GUARDED_BY(specified_flags_guard) = nullptr;
 
 // Suggesting at most kMaxHints flags in case of misspellings.
-ABSL_CONST_INIT const size_t kMaxHints = 100;
+TURBO_CONST_INIT const size_t kMaxHints = 100;
 // Suggesting only flags which have a smaller distance than kMaxDistance.
-ABSL_CONST_INIT const size_t kMaxDistance = 3;
+TURBO_CONST_INIT const size_t kMaxDistance = 3;
 
 struct SpecifiedFlagsCompare {
   bool operator()(const CommandLineFlag* a, const CommandLineFlag* b) const {
@@ -95,10 +95,10 @@ struct SpecifiedFlagsCompare {
 
 }  // namespace
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-ABSL_FLAG(std::vector<std::string>, flagfile, {},
+TURBO_FLAG(std::vector<std::string>, flagfile, {},
           "comma-separated list of files to load flags from")
     .OnUpdate([]() {
       if (turbo::GetFlag(FLAGS_flagfile).empty()) return;
@@ -108,12 +108,12 @@ ABSL_FLAG(std::vector<std::string>, flagfile, {},
       // Setting this flag twice before it is handled most likely an internal
       // error and should be reviewed by developers.
       if (turbo::flags_internal::flagfile_needs_processing) {
-        ABSL_INTERNAL_LOG(WARNING, "flagfile set twice before it is handled");
+        TURBO_INTERNAL_LOG(WARNING, "flagfile set twice before it is handled");
       }
 
       turbo::flags_internal::flagfile_needs_processing = true;
     });
-ABSL_FLAG(std::vector<std::string>, fromenv, {},
+TURBO_FLAG(std::vector<std::string>, fromenv, {},
           "comma-separated list of flags to set from the environment"
           " [use 'export FLAGS_flag1=value']")
     .OnUpdate([]() {
@@ -124,12 +124,12 @@ ABSL_FLAG(std::vector<std::string>, fromenv, {},
       // Setting this flag twice before it is handled most likely an internal
       // error and should be reviewed by developers.
       if (turbo::flags_internal::fromenv_needs_processing) {
-        ABSL_INTERNAL_LOG(WARNING, "fromenv set twice before it is handled.");
+        TURBO_INTERNAL_LOG(WARNING, "fromenv set twice before it is handled.");
       }
 
       turbo::flags_internal::fromenv_needs_processing = true;
     });
-ABSL_FLAG(std::vector<std::string>, tryfromenv, {},
+TURBO_FLAG(std::vector<std::string>, tryfromenv, {},
           "comma-separated list of flags to try to set from the environment if "
           "present")
     .OnUpdate([]() {
@@ -140,20 +140,20 @@ ABSL_FLAG(std::vector<std::string>, tryfromenv, {},
       // Setting this flag twice before it is handled most likely an internal
       // error and should be reviewed by developers.
       if (turbo::flags_internal::tryfromenv_needs_processing) {
-        ABSL_INTERNAL_LOG(WARNING,
+        TURBO_INTERNAL_LOG(WARNING,
                           "tryfromenv set twice before it is handled.");
       }
 
       turbo::flags_internal::tryfromenv_needs_processing = true;
     });
 
-ABSL_FLAG(std::vector<std::string>, undefok, {},
+TURBO_FLAG(std::vector<std::string>, undefok, {},
           "comma-separated list of flag names that it is okay to specify "
           "on the command line even if the program does not define a flag "
           "with that name");
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 namespace {
@@ -319,11 +319,11 @@ void CheckDefaultValuesParsingRoundtrip() {
   flags_internal::ForEachFlag([&](CommandLineFlag& flag) {
     if (flag.IsRetired()) return;
 
-#define ABSL_FLAGS_INTERNAL_IGNORE_TYPE(T, _) \
+#define TURBO_FLAGS_INTERNAL_IGNORE_TYPE(T, _) \
   if (flag.IsOfType<T>()) return;
 
-    ABSL_FLAGS_INTERNAL_SUPPORTED_TYPES(ABSL_FLAGS_INTERNAL_IGNORE_TYPE)
-#undef ABSL_FLAGS_INTERNAL_IGNORE_TYPE
+    TURBO_FLAGS_INTERNAL_SUPPORTED_TYPES(TURBO_FLAGS_INTERNAL_IGNORE_TYPE)
+#undef TURBO_FLAGS_INTERNAL_IGNORE_TYPE
 
     flags_internal::PrivateHandleAccessor::CheckDefaultValueParsingRoundtrip(
         flag);
@@ -572,7 +572,7 @@ std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag
       if (maybe_flag_name.empty() ||
           std::get<0>(LocateFlag(maybe_flag_name)) != nullptr) {
         // "--string_flag" "--known_flag" case
-        ABSL_INTERNAL_LOG(
+        TURBO_INTERNAL_LOG(
             WARNING,
             turbo::StrCat("Did you really mean to set flag '", flag.Name(),
                          "' to the value '", value, "'?"));
@@ -605,7 +605,7 @@ bool CanIgnoreUndefinedFlag(turbo::string_view flag_name) {
 
 bool WasPresentOnCommandLine(turbo::string_view flag_name) {
   turbo::MutexLock l(&specified_flags_guard);
-  ABSL_INTERNAL_CHECK(specified_flags != nullptr,
+  TURBO_INTERNAL_CHECK(specified_flags != nullptr,
                       "ParseCommandLine is not invoked yet");
 
   return std::binary_search(specified_flags->begin(), specified_flags->end(),
@@ -667,7 +667,7 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
                                         ArgvListAction arg_list_act,
                                         UsageFlagsAction usage_flag_act,
                                         OnUndefinedFlag on_undef_flag) {
-  ABSL_INTERNAL_CHECK(argc > 0, "Missing argv[0]");
+  TURBO_INTERNAL_CHECK(argc > 0, "Missing argv[0]");
 
   // Once parsing has started we will not have more flag registrations.
   // If we did, they would be missing during parsing, which is a problem on
@@ -733,7 +733,7 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
     // 50. If argument does not start with - or is just "-" - this is
     // positional argument.
     if (!turbo::ConsumePrefix(&arg, "-") || arg.empty()) {
-      ABSL_INTERNAL_CHECK(arg_from_argv,
+      TURBO_INTERNAL_CHECK(arg_from_argv,
                           "Flagfile cannot contain positional argument");
 
       positional_args.push_back(argv[curr_list.FrontIndex()]);
@@ -758,7 +758,7 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
     // 70. "--" alone means what it does for GNU: stop flags parsing. We do
     // not support positional arguments in flagfiles, so we just drop them.
     if (flag_name.empty()) {
-      ABSL_INTERNAL_CHECK(arg_from_argv,
+      TURBO_INTERNAL_CHECK(arg_from_argv,
                           "Flagfile cannot contain positional argument");
 
       curr_list.PopFront();
@@ -771,7 +771,7 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
     std::tie(flag, is_negative) = LocateFlag(flag_name);
 
     if (flag == nullptr) {
-      // Usage flags are not modeled as Abseil flags. Locate them separately.
+      // Usage flags are not modeled as Turbo flags. Locate them separately.
       if (flags_internal::DeduceUsageFlags(flag_name, value)) {
         continue;
       }
@@ -830,7 +830,7 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
     success = false;
   }
 
-#if ABSL_FLAGS_STRIP_NAMES
+#if TURBO_FLAGS_STRIP_NAMES
   if (!success) {
     flags_internal::ReportUsageError(
         "NOTE: command line flags are disabled in this build", true);
@@ -886,5 +886,5 @@ std::vector<char*> ParseCommandLine(int argc, char* argv[]) {
       flags_internal::OnUndefinedFlag::kAbortIfUndefined);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

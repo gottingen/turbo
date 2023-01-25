@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #include "turbo/container/internal/test_instance_tracker.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace test_internal {
 int BaseCountedInstance::num_instances_ = 0;
 int BaseCountedInstance::num_live_instances_ = 0;
@@ -25,5 +25,5 @@ int BaseCountedInstance::num_swaps_ = 0;
 int BaseCountedInstance::num_comparisons_ = 0;
 
 }  // namespace test_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

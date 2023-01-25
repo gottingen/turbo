@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 //
 // Implementation details for `turbo::AnyInvocable`
 
-#ifndef ABSL_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
-#define ABSL_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
+#ifndef TURBO_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
+#define TURBO_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -71,15 +71,15 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Helper macro used to prevent spelling `noexcept` in language versions older
 // than C++17, where it is not part of the type system, in order to avoid
 // compilation failures and internal compiler errors.
-#if ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
-#define ABSL_INTERNAL_NOEXCEPT_SPEC(noex) noexcept(noex)
+#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#define TURBO_INTERNAL_NOEXCEPT_SPEC(noex) noexcept(noex)
 #else
-#define ABSL_INTERNAL_NOEXCEPT_SPEC(noex)
+#define TURBO_INTERNAL_NOEXCEPT_SPEC(noex)
 #endif
 
 // Defined in functional/any_invocable.h
@@ -196,14 +196,14 @@ union TypeErasedState {
 template <class T>
 T& ObjectInLocalStorage(TypeErasedState* const state) {
   // We launder here because the storage may be reused with the same type.
-#if ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
   return *std::launder(reinterpret_cast<T*>(&state->storage));
-#elif ABSL_HAVE_BUILTIN(__builtin_launder)
+#elif TURBO_HAVE_BUILTIN(__builtin_launder)
   return *__builtin_launder(reinterpret_cast<T*>(&state->storage));
 #else
 
   // When `std::launder` or equivalent are not available, we rely on undefined
-  // behavior, which works as intended on Abseil's officially supported
+  // behavior, which works as intended on Turbo's officially supported
   // platforms as of Q2 2022.
 #if !defined(__clang__) && defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -223,13 +223,13 @@ T& ObjectInLocalStorage(TypeErasedState* const state) {
 // passed as both "from" and "to".
 using ManagerType = void(FunctionToCall /*operation*/,
                          TypeErasedState* /*from*/, TypeErasedState* /*to*/)
-    ABSL_INTERNAL_NOEXCEPT_SPEC(true);
+    TURBO_INTERNAL_NOEXCEPT_SPEC(true);
 
 // The type for functions issuing the actual invocation of the object
 // A pointer to such a function is contained in each AnyInvocable instance.
 template <bool SigIsNoexcept, class ReturnType, class... P>
 using InvokerType = ReturnType(TypeErasedState*, ForwardedParameterType<P>...)
-    ABSL_INTERNAL_NOEXCEPT_SPEC(SigIsNoexcept);
+    TURBO_INTERNAL_NOEXCEPT_SPEC(SigIsNoexcept);
 
 // The manager that is used when AnyInvocable is empty
 inline void EmptyManager(FunctionToCall /*operation*/,
@@ -277,12 +277,12 @@ void LocalManagerNontrivial(FunctionToCall operation,
     case FunctionToCall::relocate_from_to:
       // NOTE: Requires that the left-hand operand is already empty.
       ::new (static_cast<void*>(&to->storage)) T(std::move(from_object));
-      ABSL_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH_INTENDED;
     case FunctionToCall::dispose:
       from_object.~T();  // Must not throw. // NOLINT
       return;
   }
-  ABSL_UNREACHABLE();
+  TURBO_UNREACHABLE();
 }
 
 // The invoker that is used when a target function is in local storage
@@ -320,7 +320,7 @@ inline void RemoteManagerTrivial(FunctionToCall operation,
 #endif  // __cpp_sized_deallocation
       return;
   }
-  ABSL_UNREACHABLE();
+  TURBO_UNREACHABLE();
 }
 
 // The manager that is used when a target function is in remote storage and the
@@ -342,7 +342,7 @@ void RemoteManagerNontrivial(FunctionToCall operation,
       ::delete static_cast<T*>(from->remote.target);  // Must not throw.
       return;
   }
-  ABSL_UNREACHABLE();
+  TURBO_UNREACHABLE();
 }
 
 // The invoker that is used when a target function is in remote storage
@@ -604,7 +604,7 @@ class CoreImpl {
   using HasTrivialRemoteStorage =
       std::integral_constant<bool, std::is_trivially_destructible<T>::value &&
                                        alignof(T) <=
-                                           ABSL_INTERNAL_DEFAULT_NEW_ALIGNMENT>;
+                                           TURBO_INTERNAL_DEFAULT_NEW_ALIGNMENT>;
 
   template <class T, class... Args,
             typename = turbo::enable_if_t<HasTrivialRemoteStorage<T>::value>>
@@ -732,14 +732,14 @@ using CanAssignReferenceWrapper = TrueAlias<
 // messages and avoids an instantiation of std::is_nothrow_invocable_r in the
 // cases where the user did not specify a noexcept function type.
 //
-#define ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT(inv_quals, noex) \
-  ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_##noex(inv_quals)
+#define TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT(inv_quals, noex) \
+  TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_##noex(inv_quals)
 
 // The disjunction below is because we can't rely on std::is_nothrow_invocable_r
 // to give the right result when ReturnType is non-moveable in toolchains that
 // don't treat non-moveable result types correctly. For example this was the
 // case in libc++ before commit c3a24882 (2022-05).
-#define ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_true(inv_quals)      \
+#define TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_true(inv_quals)      \
   turbo::enable_if_t<turbo::disjunction<                                       \
       std::is_nothrow_invocable_r<                                           \
           ReturnType, UnwrapStdReferenceWrapper<turbo::decay_t<F>> inv_quals, \
@@ -753,7 +753,7 @@ using CanAssignReferenceWrapper = TrueAlias<
                   UnwrapStdReferenceWrapper<turbo::decay_t<F>> inv_quals,     \
                   P...>>>>::value>
 
-#define ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_false(inv_quals)
+#define TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_false(inv_quals)
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -769,9 +769,9 @@ using CanAssignReferenceWrapper = TrueAlias<
 // right result when ReturnType is non-moveable in toolchains that don't treat
 // non-moveable result types correctly. For example this was the case in libc++
 // before commit c3a24882 (2022-05).
-#define ABSL_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, noex)            \
+#define TURBO_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, noex)            \
   template <class ReturnType, class... P>                                      \
-  class Impl<ReturnType(P...) cv ref ABSL_INTERNAL_NOEXCEPT_SPEC(noex)>        \
+  class Impl<ReturnType(P...) cv ref TURBO_INTERNAL_NOEXCEPT_SPEC(noex)>        \
       : public CoreImpl<noex, ReturnType, P...> {                              \
    public:                                                                     \
     /*The base class, which contains the datamembers and core operations*/     \
@@ -789,7 +789,7 @@ using CanAssignReferenceWrapper = TrueAlias<
     /*SFINAE constraint to check if F is nothrow-invocable when necessary*/    \
     template <class F>                                                         \
     using CallIsNoexceptIfSigIsNoexcept =                                      \
-        TrueAlias<ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT(inv_quals,   \
+        TrueAlias<TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT(inv_quals,   \
                                                                   noex)>;      \
                                                                                \
     /*Put the AnyInvocable into an empty state.*/                              \
@@ -815,12 +815,12 @@ using CanAssignReferenceWrapper = TrueAlias<
       auto* invoker = this->invoker_;                                          \
       if (!std::is_const<QualifiedTestType>::value &&                          \
           std::is_rvalue_reference<QualifiedTestType>::value) {                \
-        ABSL_HARDENING_ASSERT([this]() {                                       \
+        TURBO_HARDENING_ASSERT([this]() {                                       \
           /* We checked that this isn't const above, so const_cast is safe */  \
           const_cast<Impl*>(this)->invoker_ =                                  \
               [](TypeErasedState*,                                             \
                  ForwardedParameterType<P>...) noexcept(noex) -> ReturnType {  \
-            ABSL_HARDENING_ASSERT(false && "AnyInvocable use-after-move");     \
+            TURBO_HARDENING_ASSERT(false && "AnyInvocable use-after-move");     \
             std::terminate();                                                  \
           };                                                                   \
           return this->HasValue();                                             \
@@ -840,39 +840,39 @@ using CanAssignReferenceWrapper = TrueAlias<
 
 // Define the `noexcept(true)` specialization only for C++17 and beyond, when
 // `noexcept` is part of the type system.
-#if ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
 // A convenience macro that defines specializations for the noexcept(true) and
 // noexcept(false) forms, given the other properties.
-#define ABSL_INTERNAL_ANY_INVOCABLE_IMPL(cv, ref, inv_quals)    \
-  ABSL_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, false); \
-  ABSL_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, true)
+#define TURBO_INTERNAL_ANY_INVOCABLE_IMPL(cv, ref, inv_quals)    \
+  TURBO_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, false); \
+  TURBO_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, true)
 #else
-#define ABSL_INTERNAL_ANY_INVOCABLE_IMPL(cv, ref, inv_quals) \
-  ABSL_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, false)
+#define TURBO_INTERNAL_ANY_INVOCABLE_IMPL(cv, ref, inv_quals) \
+  TURBO_INTERNAL_ANY_INVOCABLE_IMPL_(cv, ref, inv_quals, false)
 #endif
 
 // Non-ref-qualified partial specializations
-ABSL_INTERNAL_ANY_INVOCABLE_IMPL(, , &);
-ABSL_INTERNAL_ANY_INVOCABLE_IMPL(const, , const&);
+TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, , &);
+TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, , const&);
 
 // Lvalue-ref-qualified partial specializations
-ABSL_INTERNAL_ANY_INVOCABLE_IMPL(, &, &);
-ABSL_INTERNAL_ANY_INVOCABLE_IMPL(const, &, const&);
+TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, &, &);
+TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &, const&);
 
 // Rvalue-ref-qualified partial specializations
-ABSL_INTERNAL_ANY_INVOCABLE_IMPL(, &&, &&);
-ABSL_INTERNAL_ANY_INVOCABLE_IMPL(const, &&, const&&);
+TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, &&, &&);
+TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &&, const&&);
 
 // Undef the detail-only macros.
-#undef ABSL_INTERNAL_ANY_INVOCABLE_IMPL
-#undef ABSL_INTERNAL_ANY_INVOCABLE_IMPL_
-#undef ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_false
-#undef ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_true
-#undef ABSL_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT
-#undef ABSL_INTERNAL_NOEXCEPT_SPEC
+#undef TURBO_INTERNAL_ANY_INVOCABLE_IMPL
+#undef TURBO_INTERNAL_ANY_INVOCABLE_IMPL_
+#undef TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_false
+#undef TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_true
+#undef TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT
+#undef TURBO_INTERNAL_NOEXCEPT_SPEC
 
 }  // namespace internal_any_invocable
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
+#endif  // TURBO_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_

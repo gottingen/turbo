@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 namespace {
 
@@ -46,14 +46,14 @@ bool RegisterSyncLoggingFlags() {
   return true;
 }
 
-ABSL_ATTRIBUTE_UNUSED const bool unused = RegisterSyncLoggingFlags();
+TURBO_ATTRIBUTE_UNUSED const bool unused = RegisterSyncLoggingFlags();
 
 template <typename T>
 T GetFromEnv(const char* varname, T dflt) {
   const char* val = ::getenv(varname);
   if (val != nullptr) {
     std::string err;
-    ABSL_INTERNAL_CHECK(turbo::ParseFlag(val, &dflt, &err), err.c_str());
+    TURBO_INTERNAL_CHECK(turbo::ParseFlag(val, &dflt, &err), err.c_str());
   }
   return dflt;
 }
@@ -64,10 +64,10 @@ constexpr turbo::LogSeverityAtLeast StderrThresholdDefault() {
 
 }  // namespace
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-ABSL_FLAG(int, stderrthreshold,
+TURBO_FLAG(int, stderrthreshold,
           static_cast<int>(turbo::log_internal::StderrThresholdDefault()),
           "Log messages at or above this threshold level are copied to stderr.")
     .OnUpdate([] {
@@ -76,7 +76,7 @@ ABSL_FLAG(int, stderrthreshold,
               turbo::GetFlag(FLAGS_stderrthreshold)));
     });
 
-ABSL_FLAG(int, minloglevel, static_cast<int>(turbo::LogSeverityAtLeast::kInfo),
+TURBO_FLAG(int, minloglevel, static_cast<int>(turbo::LogSeverityAtLeast::kInfo),
           "Messages logged at a lower level than this don't actually "
           "get logged anywhere")
     .OnUpdate([] {
@@ -85,7 +85,7 @@ ABSL_FLAG(int, minloglevel, static_cast<int>(turbo::LogSeverityAtLeast::kInfo),
               turbo::GetFlag(FLAGS_minloglevel)));
     });
 
-ABSL_FLAG(std::string, log_backtrace_at, "",
+TURBO_FLAG(std::string, log_backtrace_at, "",
           "Emit a backtrace when logging at file:linenum.")
     .OnUpdate([] {
       const std::string log_backtrace_at =
@@ -105,7 +105,7 @@ ABSL_FLAG(std::string, log_backtrace_at, "",
       }
     });
 
-ABSL_FLAG(bool, log_prefix, true,
+TURBO_FLAG(bool, log_prefix, true,
           "Prepend the log prefix to the start of each log line")
     .OnUpdate([] {
       turbo::log_internal::RawEnableLogPrefix(turbo::GetFlag(FLAGS_log_prefix));

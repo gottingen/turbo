@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -69,7 +69,7 @@ BENCHMARK(BM_Time_Difference);
 // The "UTC" variants use UTC instead of the Google/local time zone.
 //
 
-void BM_Time_ToDateTime_Absl(benchmark::State& state) {
+void BM_Time_ToDateTime_Turbo(benchmark::State& state) {
   const turbo::TimeZone tz =
       turbo::time_internal::LoadTimeZone("America/Los_Angeles");
   turbo::Time t = turbo::FromUnixSeconds(1384569027);
@@ -80,7 +80,7 @@ void BM_Time_ToDateTime_Absl(benchmark::State& state) {
     benchmark::DoNotOptimize(t.In(tz));
   }
 }
-BENCHMARK(BM_Time_ToDateTime_Absl);
+BENCHMARK(BM_Time_ToDateTime_Turbo);
 
 void BM_Time_ToDateTime_Libc(benchmark::State& state) {
   // No timezone support, so just use localtime.
@@ -99,7 +99,7 @@ void BM_Time_ToDateTime_Libc(benchmark::State& state) {
 }
 BENCHMARK(BM_Time_ToDateTime_Libc);
 
-void BM_Time_ToDateTimeUTC_Absl(benchmark::State& state) {
+void BM_Time_ToDateTimeUTC_Turbo(benchmark::State& state) {
   const turbo::TimeZone tz = turbo::UTCTimeZone();
   turbo::Time t = turbo::FromUnixSeconds(1384569027);
   while (state.KeepRunning()) {
@@ -107,7 +107,7 @@ void BM_Time_ToDateTimeUTC_Absl(benchmark::State& state) {
     benchmark::DoNotOptimize(t.In(tz));
   }
 }
-BENCHMARK(BM_Time_ToDateTimeUTC_Absl);
+BENCHMARK(BM_Time_ToDateTimeUTC_Turbo);
 
 void BM_Time_ToDateTimeUTC_Libc(benchmark::State& state) {
   time_t t = 1384569027;
@@ -179,7 +179,7 @@ BENCHMARK(BM_Time_ToUnixSeconds);
 // The "Day0" variants require normalization of the day of month.
 //
 
-void BM_Time_FromCivil_Absl(benchmark::State& state) {
+void BM_Time_FromCivil_Turbo(benchmark::State& state) {
   const turbo::TimeZone tz =
       turbo::time_internal::LoadTimeZone("America/Los_Angeles");
   int i = 0;
@@ -194,7 +194,7 @@ void BM_Time_FromCivil_Absl(benchmark::State& state) {
     ++i;
   }
 }
-BENCHMARK(BM_Time_FromCivil_Absl);
+BENCHMARK(BM_Time_FromCivil_Turbo);
 
 void BM_Time_FromCivil_Libc(benchmark::State& state) {
   // No timezone support, so just use localtime.
@@ -223,16 +223,16 @@ void BM_Time_FromCivil_Libc(benchmark::State& state) {
 }
 BENCHMARK(BM_Time_FromCivil_Libc);
 
-void BM_Time_FromCivilUTC_Absl(benchmark::State& state) {
+void BM_Time_FromCivilUTC_Turbo(benchmark::State& state) {
   const turbo::TimeZone tz = turbo::UTCTimeZone();
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(
         turbo::FromCivil(turbo::CivilSecond(2014, 12, 18, 20, 16, 18), tz));
   }
 }
-BENCHMARK(BM_Time_FromCivilUTC_Absl);
+BENCHMARK(BM_Time_FromCivilUTC_Turbo);
 
-void BM_Time_FromCivilDay0_Absl(benchmark::State& state) {
+void BM_Time_FromCivilDay0_Turbo(benchmark::State& state) {
   const turbo::TimeZone tz =
       turbo::time_internal::LoadTimeZone("America/Los_Angeles");
   int i = 0;
@@ -247,7 +247,7 @@ void BM_Time_FromCivilDay0_Absl(benchmark::State& state) {
     ++i;
   }
 }
-BENCHMARK(BM_Time_FromCivilDay0_Absl);
+BENCHMARK(BM_Time_FromCivilDay0_Turbo);
 
 void BM_Time_FromCivilDay0_Libc(benchmark::State& state) {
   // No timezone support, so just use localtime.

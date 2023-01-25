@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -645,7 +645,7 @@ TEST(RandenTest, IsFastOrSlow) {
   }
   auto duration = turbo::GetCurrentTimeNanos() - start;
 
-  ABSL_INTERNAL_LOG(INFO, turbo::StrCat(static_cast<double>(duration) /
+  TURBO_INTERNAL_LOG(INFO, turbo::StrCat(static_cast<double>(duration) /
                                            static_cast<double>(kCount),
                                        "ns"));
 

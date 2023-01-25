@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@
 // The CPU is not required to maintain the ordering of a cycle counter read
 // with respect to surrounding instructions.
 
-#ifndef ABSL_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
-#define ABSL_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
+#ifndef TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
+#define TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
 
 #include <cstdint>
 
@@ -45,10 +45,10 @@
 #include "turbo/base/config.h"
 #include "turbo/base/internal/unscaledcycleclock_config.h"
 
-#if ABSL_USE_UNSCALED_CYCLECLOCK
+#if TURBO_USE_UNSCALED_CYCLECLOCK
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 class UnscaledCycleClockWrapperForGetCurrentTime;
 }  // namespace time_internal
@@ -88,9 +88,9 @@ inline int64_t UnscaledCycleClock::Now() {
 #endif
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USE_UNSCALED_CYCLECLOCK
+#endif  // TURBO_USE_UNSCALED_CYCLECLOCK
 
-#endif  // ABSL_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
+#endif  // TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_

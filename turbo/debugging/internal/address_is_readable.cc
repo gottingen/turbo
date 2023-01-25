@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@
 #if !defined(__linux__) || defined(__ANDROID__)
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 // On platforms other than Linux, just return true.
 bool AddressIsReadable(const void* /* addr */) { return true; }
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #else  // __linux__ && !__ANDROID__
@@ -40,7 +40,7 @@ ABSL_NAMESPACE_END
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 // NOTE: be extra careful about adding any interposable function calls here
@@ -82,15 +82,15 @@ bool AddressIsReadable(const void *addr) {
   //   file descriptor
   //
   // This can never succeed (invalid first argument to sigprocmask).
-  ABSL_RAW_CHECK(syscall(SYS_rt_sigprocmask, ~0, addr, nullptr,
+  TURBO_RAW_CHECK(syscall(SYS_rt_sigprocmask, ~0, addr, nullptr,
                          /*sizeof(kernel_sigset_t)*/ 8) == -1,
                  "unexpected success");
-  ABSL_RAW_CHECK(errno == EFAULT || errno == EINVAL, "unexpected errno");
+  TURBO_RAW_CHECK(errno == EFAULT || errno == EINVAL, "unexpected errno");
   return errno != EFAULT;
 }
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // __linux__ && !__ANDROID__

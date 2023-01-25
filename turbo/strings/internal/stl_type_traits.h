@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 //
 // IWYU pragma: private, include "turbo/strings/str_split.h"
 
-#ifndef ABSL_STRINGS_INTERNAL_STL_TYPE_TRAITS_H_
-#define ABSL_STRINGS_INTERNAL_STL_TYPE_TRAITS_H_
+#ifndef TURBO_STRINGS_INTERNAL_STL_TYPE_TRAITS_H_
+#define TURBO_STRINGS_INTERNAL_STL_TYPE_TRAITS_H_
 
 #include <array>
 #include <bitset>
@@ -40,7 +40,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 template <typename C, template <typename...> class T>
@@ -243,6 +243,6 @@ struct IsStrictlyBaseOfAndConvertibleToSTLContainer
                         IsConvertibleToSTLContainer<C>> {};
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
-#endif  // ABSL_STRINGS_INTERNAL_STL_TYPE_TRAITS_H_
+#endif  // TURBO_STRINGS_INTERNAL_STL_TYPE_TRAITS_H_

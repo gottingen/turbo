@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_BASE_INTERNAL_SCOPED_SET_ENV_H_
-#define ABSL_BASE_INTERNAL_SCOPED_SET_ENV_H_
+#ifndef TURBO_BASE_INTERNAL_SCOPED_SET_ENV_H_
+#define TURBO_BASE_INTERNAL_SCOPED_SET_ENV_H_
 
 #include <string>
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 class ScopedSetEnv {
@@ -39,7 +39,7 @@ class ScopedSetEnv {
 };
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_SCOPED_SET_ENV_H_
+#endif  // TURBO_BASE_INTERNAL_SCOPED_SET_ENV_H_

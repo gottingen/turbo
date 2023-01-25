@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_DISTRIBUTION_TEST_UTIL_H_
-#define ABSL_RANDOM_INTERNAL_DISTRIBUTION_TEST_UTIL_H_
+#ifndef TURBO_RANDOM_INTERNAL_DISTRIBUTION_TEST_UTIL_H_
+#define TURBO_RANDOM_INTERNAL_DISTRIBUTION_TEST_UTIL_H_
 
 #include <cstddef>
 #include <iostream>
@@ -26,7 +26,7 @@
 // non-test code.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // http://webspace.ship.edu/pgmarr/Geo441/Lectures/Lec%205%20-%20Normality%20Testing.pdf
@@ -107,7 +107,7 @@ double BetaIncomplete(double x, double p, double q);
 double BetaIncompleteInv(double p, double q, double alpha);
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_DISTRIBUTION_TEST_UTIL_H_
+#endif  // TURBO_RANDOM_INTERNAL_DISTRIBUTION_TEST_UTIL_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ struct EightBits {
 };
 
 template <typename T>
-void BM_absl_equal_benchmark(benchmark::State& state) {
+void BM_turbo_equal_benchmark(benchmark::State& state) {
   std::vector<T> xs(state.range(0), T(0));
   std::vector<T> ys = xs;
   while (state.KeepRunning()) {
@@ -70,7 +70,7 @@ void BM_memcmp_benchmark(benchmark::State& state) {
 // The expectation is that the compiler should be able to elide the equality
 // comparison altogether for sufficiently simple types.
 template <typename T>
-void BM_absl_equal_self_benchmark(benchmark::State& state) {
+void BM_turbo_equal_self_benchmark(benchmark::State& state) {
   std::vector<T> xs(state.range(0), T(0));
   while (state.KeepRunning()) {
     const bool same = turbo::equal(xs.begin(), xs.end(), xs.begin(), xs.end());
@@ -78,49 +78,49 @@ void BM_absl_equal_self_benchmark(benchmark::State& state) {
   }
 }
 
-BENCHMARK_TEMPLATE(BM_absl_equal_benchmark, uint8_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_benchmark, uint8_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_std_equal_benchmark, uint8_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_memcmp_benchmark, uint8_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
-BENCHMARK_TEMPLATE(BM_absl_equal_self_benchmark, uint8_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_self_benchmark, uint8_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 
-BENCHMARK_TEMPLATE(BM_absl_equal_benchmark, uint16_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_benchmark, uint16_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_std_equal_benchmark, uint16_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_memcmp_benchmark, uint16_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
-BENCHMARK_TEMPLATE(BM_absl_equal_self_benchmark, uint16_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_self_benchmark, uint16_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 
-BENCHMARK_TEMPLATE(BM_absl_equal_benchmark, uint32_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_benchmark, uint32_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_std_equal_benchmark, uint32_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_memcmp_benchmark, uint32_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
-BENCHMARK_TEMPLATE(BM_absl_equal_self_benchmark, uint32_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_self_benchmark, uint32_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 
-BENCHMARK_TEMPLATE(BM_absl_equal_benchmark, uint64_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_benchmark, uint64_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_std_equal_benchmark, uint64_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_memcmp_benchmark, uint64_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
-BENCHMARK_TEMPLATE(BM_absl_equal_self_benchmark, uint64_t)
+BENCHMARK_TEMPLATE(BM_turbo_equal_self_benchmark, uint64_t)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 
-BENCHMARK_TEMPLATE(BM_absl_equal_benchmark, EightBits)
+BENCHMARK_TEMPLATE(BM_turbo_equal_benchmark, EightBits)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_std_equal_benchmark, EightBits)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 BENCHMARK_TEMPLATE(BM_memcmp_benchmark, EightBits)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
-BENCHMARK_TEMPLATE(BM_absl_equal_self_benchmark, EightBits)
+BENCHMARK_TEMPLATE(BM_turbo_equal_self_benchmark, EightBits)
     ->Range(kMinBenchmarkSize, kMaxBenchmarkSize);
 
 }  // namespace

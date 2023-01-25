@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 //    https://www.linux-foundation.org/spec/ELF/ppc64/PPC-elf64abi-1.9.html#STACK
 // Linux has similar code: http://patchwork.ozlabs.org/linuxppc/patch?id=8882
 
-#ifndef ABSL_DEBUGGING_INTERNAL_STACKTRACE_POWERPC_INL_H_
-#define ABSL_DEBUGGING_INTERNAL_STACKTRACE_POWERPC_INL_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_STACKTRACE_POWERPC_INL_H_
+#define TURBO_DEBUGGING_INTERNAL_STACKTRACE_POWERPC_INL_H_
 
 #if defined(__linux__)
 #include <asm/ptrace.h>   // for PT_NIP.
@@ -66,8 +66,8 @@ static inline void *StacktracePowerPCGetLR(void **sp) {
 // checks (the strictness of which is controlled by the boolean parameter
 // "STRICT_UNWINDING") to reduce the chance that a bad pointer is returned.
 template<bool STRICT_UNWINDING, bool IS_WITH_CONTEXT>
-ABSL_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static void **NextStackFrame(void **old_sp, const void *uc) {
   void **new_sp = (void **) *old_sp;
   enum { kStackAlignment = 16 };
@@ -157,13 +157,13 @@ static void **NextStackFrame(void **old_sp, const void *uc) {
 }
 
 // This ensures that turbo::GetStackTrace sets up the Link Register properly.
-ABSL_ATTRIBUTE_NOINLINE static void AbslStacktracePowerPCDummyFunction() {
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+TURBO_ATTRIBUTE_NOINLINE static void TurboStacktracePowerPCDummyFunction() {
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
 template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
-ABSL_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
                       const void *ucp, int *min_dropped_frames) {
   void **sp;
@@ -184,7 +184,7 @@ static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
   // want here.  While the compiler will always(?) set up LR for
   // subroutine calls, it may not for leaf functions (such as this one).
   // This routine forces the compiler (at least gcc) to push it anyway.
-  AbslStacktracePowerPCDummyFunction();
+  TurboStacktracePowerPCDummyFunction();
 
   // The LR save area is used by the callee, so the top entry is bogus.
   skip_count++;
@@ -246,13 +246,13 @@ static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
 }
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 bool StackTraceWorksForTest() {
   return true;
 }
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_INTERNAL_STACKTRACE_POWERPC_INL_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_STACKTRACE_POWERPC_INL_H_

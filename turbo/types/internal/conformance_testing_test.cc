@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,33 +85,33 @@ using NothrowCopyConstructibleWithNew =
 
 // NOTE: ?: is used to verify contextually-convertible to bool and not simply
 //       implicit or explicit convertibility.
-#define ABSL_INTERNAL_COMPARISON_OP_EXPR(op) \
+#define TURBO_INTERNAL_COMPARISON_OP_EXPR(op) \
   ((std::declval<const T&>() op std::declval<const T&>()) ? true : true)
 
-#define ABSL_INTERNAL_COMPARISON_OP_TRAIT(name, op)                         \
+#define TURBO_INTERNAL_COMPARISON_OP_TRAIT(name, op)                         \
   template <class T>                                                        \
-  using name##Impl = decltype(ABSL_INTERNAL_COMPARISON_OP_EXPR(op));        \
+  using name##Impl = decltype(TURBO_INTERNAL_COMPARISON_OP_EXPR(op));        \
                                                                             \
   template <class T>                                                        \
   using name = turbo::type_traits_internal::is_detected<name##Impl, T>;      \
                                                                             \
   template <class T,                                                        \
             class Result = std::integral_constant<                          \
-                bool, noexcept(ABSL_INTERNAL_COMPARISON_OP_EXPR(op))>>      \
+                bool, noexcept(TURBO_INTERNAL_COMPARISON_OP_EXPR(op))>>      \
   using Nothrow##name##Impl = typename std::enable_if<Result::value>::type; \
                                                                             \
   template <class T>                                                        \
   using Nothrow##name =                                                     \
       turbo::type_traits_internal::is_detected<Nothrow##name##Impl, T>
 
-ABSL_INTERNAL_COMPARISON_OP_TRAIT(EqualityComparable, ==);
-ABSL_INTERNAL_COMPARISON_OP_TRAIT(InequalityComparable, !=);
-ABSL_INTERNAL_COMPARISON_OP_TRAIT(LessThanComparable, <);
-ABSL_INTERNAL_COMPARISON_OP_TRAIT(LessEqualComparable, <=);
-ABSL_INTERNAL_COMPARISON_OP_TRAIT(GreaterEqualComparable, >=);
-ABSL_INTERNAL_COMPARISON_OP_TRAIT(GreaterThanComparable, >);
+TURBO_INTERNAL_COMPARISON_OP_TRAIT(EqualityComparable, ==);
+TURBO_INTERNAL_COMPARISON_OP_TRAIT(InequalityComparable, !=);
+TURBO_INTERNAL_COMPARISON_OP_TRAIT(LessThanComparable, <);
+TURBO_INTERNAL_COMPARISON_OP_TRAIT(LessEqualComparable, <=);
+TURBO_INTERNAL_COMPARISON_OP_TRAIT(GreaterEqualComparable, >=);
+TURBO_INTERNAL_COMPARISON_OP_TRAIT(GreaterThanComparable, >);
 
-#undef ABSL_INTERNAL_COMPARISON_OP_TRAIT
+#undef TURBO_INTERNAL_COMPARISON_OP_TRAIT
 
 template <class T>
 class ProfileTest : public ::testing::Test {};
@@ -683,9 +683,9 @@ TYPED_TEST_P(ProfileTest, HasAppropriateAuxilliaryProperties) {
   //////////////////////////////////////////////////////////////////////////////
   switch (expected_props::hashable_support) {
     case ti::hashable::maybe:
-#if ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
       EXPECT_FALSE(turbo::type_traits_internal::IsHashable<arch>::value);
-#endif  // ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#endif  // TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
       break;
     case ti::hashable::yes:
       EXPECT_TRUE(turbo::type_traits_internal::IsHashable<arch>::value);
@@ -1190,7 +1190,7 @@ TEST(ConformanceTestingTest, Basic) {
 
   using lim = std::numeric_limits<float>;
 
-  ABSL_INTERNAL_ASSERT_CONFORMANCE_OF(float)
+  TURBO_INTERNAL_ASSERT_CONFORMANCE_OF(float)
       .INITIALIZER(-lim::infinity())
       .INITIALIZER(lim::lowest())
       .INITIALIZER(-1.f)
@@ -1281,7 +1281,7 @@ TEST(ConformanceTestingDeathTest, Failures) {
                                         ti::NothrowComparableProfile>;
 
     // Note: The initializers are intentionally in the wrong order.
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(float)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(float)
         .INITIALIZER(1.f)
         .INITIALIZER(0.f)
         .WITH_LOOSE_PROFILE(profile);
@@ -1291,7 +1291,7 @@ TEST(ConformanceTestingDeathTest, Failures) {
     using profile =
         ti::CombineProfiles<ti::NothrowMovableProfile, ti::EquatableProfile>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadMoveConstruct)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadMoveConstruct)
         .DUE_TO("Move construction")
         .INITIALIZER(BadMoveConstruct())
         .WITH_LOOSE_PROFILE(profile);
@@ -1301,7 +1301,7 @@ TEST(ConformanceTestingDeathTest, Failures) {
     using profile =
         ti::CombineProfiles<ti::NothrowMovableProfile, ti::EquatableProfile>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadMoveAssign)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadMoveAssign)
         .DUE_TO("Move assignment")
         .INITIALIZER(BadMoveAssign())
         .WITH_LOOSE_PROFILE(profile);
@@ -1314,7 +1314,7 @@ TEST(ConformanceTestingDeathTest, CompFailures) {
   {
     using BadComp = BadCompare<WhichCompIsBad::eq>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
         .DUE_TO("Comparison")
         .INITIALIZER(BadComp{0})
         .INITIALIZER(BadComp{1})
@@ -1324,7 +1324,7 @@ TEST(ConformanceTestingDeathTest, CompFailures) {
   {
     using BadComp = BadCompare<WhichCompIsBad::ne>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
         .DUE_TO("Comparison")
         .INITIALIZER(BadComp{0})
         .INITIALIZER(BadComp{1})
@@ -1334,7 +1334,7 @@ TEST(ConformanceTestingDeathTest, CompFailures) {
   {
     using BadComp = BadCompare<WhichCompIsBad::lt>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
         .DUE_TO("Comparison")
         .INITIALIZER(BadComp{0})
         .INITIALIZER(BadComp{1})
@@ -1344,7 +1344,7 @@ TEST(ConformanceTestingDeathTest, CompFailures) {
   {
     using BadComp = BadCompare<WhichCompIsBad::le>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
         .DUE_TO("Comparison")
         .INITIALIZER(BadComp{0})
         .INITIALIZER(BadComp{1})
@@ -1354,7 +1354,7 @@ TEST(ConformanceTestingDeathTest, CompFailures) {
   {
     using BadComp = BadCompare<WhichCompIsBad::ge>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
         .DUE_TO("Comparison")
         .INITIALIZER(BadComp{0})
         .INITIALIZER(BadComp{1})
@@ -1364,7 +1364,7 @@ TEST(ConformanceTestingDeathTest, CompFailures) {
   {
     using BadComp = BadCompare<WhichCompIsBad::gt>;
 
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadComp)
         .DUE_TO("Comparison")
         .INITIALIZER(BadComp{0})
         .INITIALIZER(BadComp{1})
@@ -1397,7 +1397,7 @@ TEST(ConformanceTestingDeathTest, SelfMoveFailure) {
   using profile = ti::EquatableNothrowMovableProfile;
 
   {
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadSelfMove)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadSelfMove)
         .DUE_TO("Move assignment")
         .INITIALIZER(BadSelfMove())
         .WITH_LOOSE_PROFILE(profile);
@@ -1431,7 +1431,7 @@ TEST(ConformanceTestingDeathTest, SelfCopyFailure) {
   using profile = ti::EquatableValueProfile;
 
   {
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadSelfCopy)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadSelfCopy)
         .DUE_TO("Copy assignment")
         .INITIALIZER(BadSelfCopy())
         .WITH_LOOSE_PROFILE(profile);
@@ -1458,7 +1458,7 @@ TEST(ConformanceTestingDeathTest, SelfSwapFailure) {
   using profile = ti::EquatableNothrowMovableProfile;
 
   {
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadSelfSwap)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadSelfSwap)
         .DUE_TO("Swap")
         .INITIALIZER(BadSelfSwap())
         .WITH_LOOSE_PROFILE(profile);
@@ -1498,7 +1498,7 @@ TEST(ConformanceTestingDeathTest, DefaultInitializedMoveAssignFailure) {
                           ti::EquatableProfile>;
 
   {
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadDefaultInitializedMoveAssign)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadDefaultInitializedMoveAssign)
         .DUE_TO("move assignment")
         .INITIALIZER(BadDefaultInitializedMoveAssign(0))
         .WITH_LOOSE_PROFILE(profile);
@@ -1546,7 +1546,7 @@ TEST(ConformanceTestingDeathTest, DefaultInitializedAssignFailure) {
                                       ti::EquatableProfile>;
 
   {
-    ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadDefaultInitializedCopyAssign)
+    TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(BadDefaultInitializedCopyAssign)
         .DUE_TO("copy assignment")
         .INITIALIZER(BadDefaultInitializedCopyAssign(0))
         .WITH_LOOSE_PROFILE(profile);

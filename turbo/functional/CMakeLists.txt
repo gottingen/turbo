@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     any_invocable
   SRCS
@@ -22,7 +22,7 @@ absl_cc_library(
   HDRS
     "any_invocable.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base_internal
     turbo::config
@@ -32,14 +32,14 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     any_invocable_test
   SRCS
     "any_invocable_test.cc"
     "internal/any_invocable.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::any_invocable
     turbo::base_internal
@@ -50,7 +50,7 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     bind_front
   SRCS
@@ -58,27 +58,27 @@ absl_cc_library(
   HDRS
     "bind_front.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base_internal
     turbo::compressed_tuple
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     bind_front_test
   SRCS
     "bind_front_test.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::bind_front
     turbo::memory
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     function_ref
   SRCS
@@ -86,7 +86,7 @@ absl_cc_library(
   HDRS
     "function_ref.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base_internal
     turbo::core_headers
@@ -94,13 +94,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     function_ref_test
   SRCS
     "function_ref_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::function_ref
     turbo::memory

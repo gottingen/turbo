@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -169,8 +169,8 @@
 // To iterate, we simply traverse the array, skipping empty and deleted slots
 // and stopping when we hit a `kSentinel`.
 
-#ifndef ABSL_CONTAINER_INTERNAL_RAW_HASH_SET_H_
-#define ABSL_CONTAINER_INTERNAL_RAW_HASH_SET_H_
+#ifndef TURBO_CONTAINER_INTERNAL_RAW_HASH_SET_H_
+#define TURBO_CONTAINER_INTERNAL_RAW_HASH_SET_H_
 
 #include <algorithm>
 #include <cmath>
@@ -200,11 +200,11 @@
 #include "turbo/numeric/bits.h"
 #include "turbo/utility/utility.h"
 
-#ifdef ABSL_INTERNAL_HAVE_SSE2
+#ifdef TURBO_INTERNAL_HAVE_SSE2
 #include <emmintrin.h>
 #endif
 
-#ifdef ABSL_INTERNAL_HAVE_SSSE3
+#ifdef TURBO_INTERNAL_HAVE_SSSE3
 #include <tmmintrin.h>
 #endif
 
@@ -212,30 +212,30 @@
 #include <intrin.h>
 #endif
 
-#ifdef ABSL_INTERNAL_HAVE_ARM_NEON
+#ifdef TURBO_INTERNAL_HAVE_ARM_NEON
 #include <arm_neon.h>
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
-#ifdef ABSL_SWISSTABLE_ENABLE_GENERATIONS
-#error ABSL_SWISSTABLE_ENABLE_GENERATIONS cannot be directly set
-#elif defined(ABSL_HAVE_ADDRESS_SANITIZER) || \
-    defined(ABSL_HAVE_MEMORY_SANITIZER)
+#ifdef TURBO_SWISSTABLE_ENABLE_GENERATIONS
+#error TURBO_SWISSTABLE_ENABLE_GENERATIONS cannot be directly set
+#elif defined(TURBO_HAVE_ADDRESS_SANITIZER) || \
+    defined(TURBO_HAVE_MEMORY_SANITIZER)
 // When compiled in sanitizer mode, we add generation integers to the backing
 // array and iterators. In the backing array, we store the generation between
 // the control bytes and the slots. When iterators are dereferenced, we assert
 // that the container has not been mutated in a way that could cause iterator
 // invalidation since the iterator was initialized.
-#define ABSL_SWISSTABLE_ENABLE_GENERATIONS
+#define TURBO_SWISSTABLE_ENABLE_GENERATIONS
 #endif
 
 // We use uint8_t so we don't need to worry about padding.
 using GenerationType = uint8_t;
 
-#ifdef ABSL_SWISSTABLE_ENABLE_GENERATIONS
+#ifdef TURBO_SWISSTABLE_ENABLE_GENERATIONS
 constexpr bool SwisstableGenerationsEnabled() { return true; }
 constexpr size_t NumGenerationBytes() { return sizeof(GenerationType); }
 #else
@@ -337,7 +337,7 @@ constexpr bool IsNoThrowSwappable(std::false_type /* is_swappable */) {
 
 template <typename T>
 uint32_t TrailingZeros(T x) {
-  ABSL_ASSUME(x != 0);
+  TURBO_ASSUME(x != 0);
   return static_cast<uint32_t>(countr_zero(x));
 }
 
@@ -475,7 +475,7 @@ static_assert(ctrl_t::kDeleted == static_cast<ctrl_t>(-2),
               "ctrl_t::kDeleted must be -2 to make the implementation of "
               "ConvertSpecialToEmptyAndFullToDeleted efficient");
 
-ABSL_DLL extern const ctrl_t kEmptyGroup[17];
+TURBO_DLL extern const ctrl_t kEmptyGroup[17];
 
 // Returns a pointer to a control byte group that can be used by empty tables.
 inline ctrl_t* EmptyGroup() {
@@ -521,7 +521,7 @@ inline bool IsFull(ctrl_t c) { return c >= static_cast<ctrl_t>(0); }
 inline bool IsDeleted(ctrl_t c) { return c == ctrl_t::kDeleted; }
 inline bool IsEmptyOrDeleted(ctrl_t c) { return c < ctrl_t::kSentinel; }
 
-#ifdef ABSL_INTERNAL_HAVE_SSE2
+#ifdef TURBO_INTERNAL_HAVE_SSE2
 // Quick reference guide for intrinsics used below:
 //
 // * __m128i: An XMM (128-bit) word.
@@ -582,7 +582,7 @@ struct GroupSse2Impl {
 
   // Returns a bitmask representing the positions of empty slots.
   NonIterableBitMask<uint32_t, kWidth> MaskEmpty() const {
-#ifdef ABSL_INTERNAL_HAVE_SSSE3
+#ifdef TURBO_INTERNAL_HAVE_SSSE3
     // This only works because ctrl_t::kEmpty is -128.
     return NonIterableBitMask<uint32_t, kWidth>(
         static_cast<uint32_t>(_mm_movemask_epi8(_mm_sign_epi8(ctrl, ctrl))));
@@ -610,7 +610,7 @@ struct GroupSse2Impl {
   void ConvertSpecialToEmptyAndFullToDeleted(ctrl_t* dst) const {
     auto msbs = _mm_set1_epi8(static_cast<char>(-128));
     auto x126 = _mm_set1_epi8(126);
-#ifdef ABSL_INTERNAL_HAVE_SSSE3
+#ifdef TURBO_INTERNAL_HAVE_SSSE3
     auto res = _mm_or_si128(_mm_shuffle_epi8(x126, ctrl), msbs);
 #else
     auto zero = _mm_setzero_si128();
@@ -622,9 +622,9 @@ struct GroupSse2Impl {
 
   __m128i ctrl;
 };
-#endif  // ABSL_INTERNAL_RAW_HASH_SET_HAVE_SSE2
+#endif  // TURBO_INTERNAL_RAW_HASH_SET_HAVE_SSE2
 
-#if defined(ABSL_INTERNAL_HAVE_ARM_NEON) && defined(ABSL_IS_LITTLE_ENDIAN)
+#if defined(TURBO_INTERNAL_HAVE_ARM_NEON) && defined(TURBO_IS_LITTLE_ENDIAN)
 struct GroupAArch64Impl {
   static constexpr size_t kWidth = 8;
 
@@ -682,7 +682,7 @@ struct GroupAArch64Impl {
 
   uint8x8_t ctrl;
 };
-#endif  // ABSL_INTERNAL_HAVE_ARM_NEON && ABSL_IS_LITTLE_ENDIAN
+#endif  // TURBO_INTERNAL_HAVE_ARM_NEON && TURBO_IS_LITTLE_ENDIAN
 
 struct GroupPortableImpl {
   static constexpr size_t kWidth = 8;
@@ -741,9 +741,9 @@ struct GroupPortableImpl {
   uint64_t ctrl;
 };
 
-#ifdef ABSL_INTERNAL_HAVE_SSE2
+#ifdef TURBO_INTERNAL_HAVE_SSE2
 using Group = GroupSse2Impl;
-#elif defined(ABSL_INTERNAL_HAVE_ARM_NEON) && defined(ABSL_IS_LITTLE_ENDIAN)
+#elif defined(TURBO_INTERNAL_HAVE_ARM_NEON) && defined(TURBO_IS_LITTLE_ENDIAN)
 using Group = GroupAArch64Impl;
 #else
 using Group = GroupPortableImpl;
@@ -859,7 +859,7 @@ class HashSetIteratorGenerationInfoDisabled {
   void set_generation_ptr(const GenerationType*) {}
 };
 
-#ifdef ABSL_SWISSTABLE_ENABLE_GENERATIONS
+#ifdef TURBO_SWISSTABLE_ENABLE_GENERATIONS
 using CommonFieldsGenerationInfo = CommonFieldsGenerationInfoEnabled;
 using HashSetIteratorGenerationInfo = HashSetIteratorGenerationInfoEnabled;
 #else
@@ -1021,18 +1021,18 @@ size_t SelectBucketCountForIterRange(InputIter first, InputIter last,
   return 0;
 }
 
-#define ABSL_INTERNAL_ASSERT_IS_FULL(ctrl, generation, generation_ptr,         \
+#define TURBO_INTERNAL_ASSERT_IS_FULL(ctrl, generation, generation_ptr,         \
                                      operation)                                \
   do {                                                                         \
-    ABSL_HARDENING_ASSERT(                                                     \
+    TURBO_HARDENING_ASSERT(                                                     \
         (ctrl != nullptr) && operation                                         \
         " called on invalid iterator. The iterator might be an end() "         \
         "iterator or may have been default constructed.");                     \
     if (SwisstableGenerationsEnabled() && generation != *generation_ptr)       \
-      ABSL_INTERNAL_LOG(FATAL, operation                                       \
+      TURBO_INTERNAL_LOG(FATAL, operation                                       \
                         " called on invalidated iterator. The table could "    \
                         "have rehashed since this iterator was initialized."); \
-    ABSL_HARDENING_ASSERT(                                                     \
+    TURBO_HARDENING_ASSERT(                                                     \
         (IsFull(*ctrl)) && operation                                           \
         " called on invalid iterator. The element might have been erased or "  \
         "the table might have rehashed.");                                     \
@@ -1042,11 +1042,11 @@ size_t SelectBucketCountForIterRange(InputIter first, InputIter last,
 inline void AssertIsValidForComparison(const ctrl_t* ctrl,
                                        GenerationType generation,
                                        const GenerationType* generation_ptr) {
-  ABSL_HARDENING_ASSERT((ctrl == nullptr || IsFull(*ctrl)) &&
+  TURBO_HARDENING_ASSERT((ctrl == nullptr || IsFull(*ctrl)) &&
                         "Invalid iterator comparison. The element might have "
                         "been erased or the table might have rehashed.");
   if (SwisstableGenerationsEnabled() && generation != *generation_ptr) {
-    ABSL_INTERNAL_LOG(FATAL,
+    TURBO_INTERNAL_LOG(FATAL,
                       "Invalid iterator comparison. The table could have "
                       "rehashed since this iterator was initialized.");
   }
@@ -1080,7 +1080,7 @@ inline bool AreItersFromSameContainer(const ctrl_t* ctrl_a,
 inline void AssertSameContainer(const ctrl_t* ctrl_a, const ctrl_t* ctrl_b,
                                 const void* const& slot_a,
                                 const void* const& slot_b) {
-  ABSL_HARDENING_ASSERT(
+  TURBO_HARDENING_ASSERT(
       AreItersFromSameContainer(ctrl_a, ctrl_b, slot_a, slot_b) &&
       "Invalid iterator comparison. The iterators may be from different "
       "containers or the container might have rehashed.");
@@ -1219,7 +1219,7 @@ inline size_t AllocSize(size_t capacity, size_t slot_size, size_t slot_align) {
 }
 
 template <typename Alloc, size_t SizeOfSlot, size_t AlignOfSlot>
-ABSL_ATTRIBUTE_NOINLINE void InitializeSlots(CommonFields& c, Alloc alloc) {
+TURBO_ATTRIBUTE_NOINLINE void InitializeSlots(CommonFields& c, Alloc alloc) {
   assert(c.capacity_);
   // Folks with custom allocators often make unwarranted assumptions about the
   // behavior of their classes vis-a-vis trivial destructability and what
@@ -1279,7 +1279,7 @@ void EraseMetaOnly(CommonFields& c, ctrl_t* it, size_t slot_size);
 // function body for raw_hash_set instantiations that have the
 // same slot alignment.
 template <size_t AlignOfSlot>
-ABSL_ATTRIBUTE_NOINLINE void DeallocateStandard(void*,
+TURBO_ATTRIBUTE_NOINLINE void DeallocateStandard(void*,
                                                 const PolicyFunctions& policy,
                                                 ctrl_t* ctrl, void* slot_array,
                                                 size_t n) {
@@ -1295,7 +1295,7 @@ ABSL_ATTRIBUTE_NOINLINE void DeallocateStandard(void*,
 // share the same function body for raw_hash_set instantiations that have the
 // same slot size as long as they are relocatable.
 template <size_t SizeOfSlot>
-ABSL_ATTRIBUTE_NOINLINE void TransferRelocatable(void*, void* dst, void* src) {
+TURBO_ATTRIBUTE_NOINLINE void TransferRelocatable(void*, void* dst, void* src) {
   memcpy(dst, src, SizeOfSlot);
 }
 
@@ -1419,21 +1419,21 @@ class raw_hash_set {
 
     // PRECONDITION: not an end() iterator.
     reference operator*() const {
-      ABSL_INTERNAL_ASSERT_IS_FULL(ctrl_, generation(), generation_ptr(),
+      TURBO_INTERNAL_ASSERT_IS_FULL(ctrl_, generation(), generation_ptr(),
                                    "operator*()");
       return PolicyTraits::element(slot_);
     }
 
     // PRECONDITION: not an end() iterator.
     pointer operator->() const {
-      ABSL_INTERNAL_ASSERT_IS_FULL(ctrl_, generation(), generation_ptr(),
+      TURBO_INTERNAL_ASSERT_IS_FULL(ctrl_, generation(), generation_ptr(),
                                    "operator->");
       return &operator*();
     }
 
     // PRECONDITION: not an end() iterator.
     iterator& operator++() {
-      ABSL_INTERNAL_ASSERT_IS_FULL(ctrl_, generation(), generation_ptr(),
+      TURBO_INTERNAL_ASSERT_IS_FULL(ctrl_, generation(), generation_ptr(),
                                    "operator++");
       ++ctrl_;
       ++slot_;
@@ -1465,7 +1465,7 @@ class raw_hash_set {
           slot_(slot) {
       // This assumption helps the compiler know that any non-end iterator is
       // not equal to any end iterator.
-      ABSL_ASSUME(ctrl != nullptr);
+      TURBO_ASSUME(ctrl != nullptr);
     }
     // For end() iterators.
     explicit iterator(const GenerationType* generation_ptr)
@@ -1481,7 +1481,7 @@ class raw_hash_set {
         ctrl_ += shift;
         slot_ += shift;
       }
-      if (ABSL_PREDICT_FALSE(*ctrl_ == ctrl_t::kSentinel)) ctrl_ = nullptr;
+      if (TURBO_PREDICT_FALSE(*ctrl_ == ctrl_t::kSentinel)) ctrl_ = nullptr;
     }
 
     ctrl_t* ctrl_ = nullptr;
@@ -1541,7 +1541,7 @@ class raw_hash_set {
           std::is_nothrow_default_constructible<key_equal>::value&&
               std::is_nothrow_default_constructible<allocator_type>::value) {}
 
-  ABSL_ATTRIBUTE_NOINLINE explicit raw_hash_set(
+  TURBO_ATTRIBUTE_NOINLINE explicit raw_hash_set(
       size_t bucket_count, const hasher& hash = hasher(),
       const key_equal& eq = key_equal(),
       const allocator_type& alloc = allocator_type())
@@ -1664,7 +1664,7 @@ class raw_hash_set {
     growth_left() -= that.size();
   }
 
-  ABSL_ATTRIBUTE_NOINLINE raw_hash_set(raw_hash_set&& that) noexcept(
+  TURBO_ATTRIBUTE_NOINLINE raw_hash_set(raw_hash_set&& that) noexcept(
       std::is_nothrow_copy_constructible<hasher>::value&&
           std::is_nothrow_copy_constructible<key_equal>::value&&
               std::is_nothrow_copy_constructible<allocator_type>::value)
@@ -1740,7 +1740,7 @@ class raw_hash_set {
   size_t capacity() const { return common().capacity_; }
   size_t max_size() const { return (std::numeric_limits<size_t>::max)(); }
 
-  ABSL_ATTRIBUTE_REINITIALIZES void clear() {
+  TURBO_ATTRIBUTE_REINITIALIZES void clear() {
     // Iterating over this container is O(bucket_count()). When bucket_count()
     // is much greater than size(), iteration becomes prohibitively expensive.
     // For clear() it is more important to reuse the allocated array when the
@@ -1997,7 +1997,7 @@ class raw_hash_set {
   // This overload is necessary because otherwise erase<K>(const K&) would be
   // a better match if non-const iterator is passed as an argument.
   void erase(iterator it) {
-    ABSL_INTERNAL_ASSERT_IS_FULL(it.ctrl_, it.generation(), it.generation_ptr(),
+    TURBO_INTERNAL_ASSERT_IS_FULL(it.ctrl_, it.generation(), it.generation_ptr(),
                                  "erase()");
     PolicyTraits::destroy(&alloc_ref(), it.slot_);
     erase_meta_only(it);
@@ -2032,7 +2032,7 @@ class raw_hash_set {
   }
 
   node_type extract(const_iterator position) {
-    ABSL_INTERNAL_ASSERT_IS_FULL(position.inner_.ctrl_,
+    TURBO_INTERNAL_ASSERT_IS_FULL(position.inner_.ctrl_,
                                  position.inner_.generation(),
                                  position.inner_.generation_ptr(), "extract()");
     auto node =
@@ -2117,12 +2117,12 @@ class raw_hash_set {
   void prefetch(const key_arg<K>& key) const {
     (void)key;
     // Avoid probing if we won't be able to prefetch the addresses received.
-#ifdef ABSL_INTERNAL_HAVE_PREFETCH
+#ifdef TURBO_INTERNAL_HAVE_PREFETCH
     prefetch_heap_block();
     auto seq = probe(common(), hash_ref()(key));
     base_internal::PrefetchT0(control() + seq.offset());
     base_internal::PrefetchT0(slot_array() + seq.offset());
-#endif  // ABSL_INTERNAL_HAVE_PREFETCH
+#endif  // TURBO_INTERNAL_HAVE_PREFETCH
   }
 
   // The API of find() has two extensions.
@@ -2140,12 +2140,12 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (ABSL_PREDICT_TRUE(PolicyTraits::apply(
+        if (TURBO_PREDICT_TRUE(PolicyTraits::apply(
                 EqualElement<K>{key, eq_ref()},
                 PolicyTraits::element(slot_ptr + seq.offset(i)))))
           return iterator_at(seq.offset(i));
       }
-      if (ABSL_PREDICT_TRUE(g.MaskEmpty())) return end();
+      if (TURBO_PREDICT_TRUE(g.MaskEmpty())) return end();
       seq.next();
       assert(seq.index() <= capacity() && "full table!");
     }
@@ -2215,7 +2215,7 @@ class raw_hash_set {
   template <typename H>
   friend typename std::enable_if<H::template is_hashable<value_type>::value,
                                  H>::type
-  AbslHashValue(H h, const raw_hash_set& s) {
+  TurboHashValue(H h, const raw_hash_set& s) {
     return H::combine(H::combine_unordered(std::move(h), s.begin(), s.end()),
                       s.size());
   }
@@ -2309,7 +2309,7 @@ class raw_hash_set {
         common(), CharAlloc(alloc_ref()));
   }
 
-  ABSL_ATTRIBUTE_NOINLINE void resize(size_t new_capacity) {
+  TURBO_ATTRIBUTE_NOINLINE void resize(size_t new_capacity) {
     assert(IsValidCapacity(new_capacity));
     auto* old_ctrl = control();
     auto* old_slots = slot_array();
@@ -2414,11 +2414,11 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (ABSL_PREDICT_TRUE(
+        if (TURBO_PREDICT_TRUE(
                 PolicyTraits::element(slot_array() + seq.offset(i)) == elem))
           return true;
       }
-      if (ABSL_PREDICT_TRUE(g.MaskEmpty())) return false;
+      if (TURBO_PREDICT_TRUE(g.MaskEmpty())) return false;
       seq.next();
       assert(seq.index() <= capacity() && "full table!");
     }
@@ -2450,12 +2450,12 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (ABSL_PREDICT_TRUE(PolicyTraits::apply(
+        if (TURBO_PREDICT_TRUE(PolicyTraits::apply(
                 EqualElement<K>{key, eq_ref()},
                 PolicyTraits::element(slot_array() + seq.offset(i)))))
           return {seq.offset(i), false};
       }
-      if (ABSL_PREDICT_TRUE(g.MaskEmpty())) break;
+      if (TURBO_PREDICT_TRUE(g.MaskEmpty())) break;
       seq.next();
       assert(seq.index() <= capacity() && "full table!");
     }
@@ -2466,7 +2466,7 @@ class raw_hash_set {
   // viable slot index to insert it at.
   //
   // REQUIRES: At least one non-full slot available.
-  size_t prepare_insert(size_t hash) ABSL_ATTRIBUTE_NOINLINE {
+  size_t prepare_insert(size_t hash) TURBO_ATTRIBUTE_NOINLINE {
     const bool rehash_for_bug_detection =
         common().should_rehash_for_bug_detection_on_insert();
     if (rehash_for_bug_detection) {
@@ -2476,7 +2476,7 @@ class raw_hash_set {
     }
     auto target = find_first_non_full(common(), hash);
     if (!rehash_for_bug_detection &&
-        ABSL_PREDICT_FALSE(growth_left() == 0 &&
+        TURBO_PREDICT_FALSE(growth_left() == 0 &&
                            !IsDeleted(control()[target.offset]))) {
       rehash_and_grow_if_necessary();
       target = find_first_non_full(common(), hash);
@@ -2676,10 +2676,10 @@ struct HashtableDebugAccess<Set, turbo::void_t<typename Set::raw_hash_set>> {
 
 }  // namespace hashtable_debug_internal
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#undef ABSL_SWISSTABLE_ENABLE_GENERATIONS
-#undef ABSL_INTERNAL_ASSERT_IS_FULL
+#undef TURBO_SWISSTABLE_ENABLE_GENERATIONS
+#undef TURBO_INTERNAL_ASSERT_IS_FULL
 
-#endif  // ABSL_CONTAINER_INTERNAL_RAW_HASH_SET_H_
+#endif  // TURBO_CONTAINER_INTERNAL_RAW_HASH_SET_H_

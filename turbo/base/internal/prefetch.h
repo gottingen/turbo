@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_BASE_INTERNAL_PREFETCH_H_
-#define ABSL_BASE_INTERNAL_PREFETCH_H_
+#ifndef TURBO_BASE_INTERNAL_PREFETCH_H_
+#define TURBO_BASE_INTERNAL_PREFETCH_H_
 
 #include "turbo/base/config.h"
 
@@ -21,7 +21,7 @@
 #include <xmmintrin.h>
 #endif
 
-#if defined(_MSC_VER) && defined(ABSL_INTERNAL_HAVE_SSE)
+#if defined(_MSC_VER) && defined(TURBO_INTERNAL_HAVE_SSE)
 #include <intrin.h>
 #pragma intrinsic(_mm_prefetch)
 #endif
@@ -69,7 +69,7 @@
 // SNB = Sandy Bridge, SKL = Skylake, SKX = Skylake Xeon.
 //
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 void PrefetchT0(const void* addr);
@@ -79,9 +79,9 @@ void PrefetchNta(const void* addr);
 
 // Implementation details follow.
 
-#if ABSL_HAVE_BUILTIN(__builtin_prefetch) || defined(__GNUC__)
+#if TURBO_HAVE_BUILTIN(__builtin_prefetch) || defined(__GNUC__)
 
-#define ABSL_INTERNAL_HAVE_PREFETCH 1
+#define TURBO_INTERNAL_HAVE_PREFETCH 1
 
 // See __builtin_prefetch:
 // https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html.
@@ -107,9 +107,9 @@ inline void PrefetchNta(const void* addr) {
   __builtin_prefetch(addr, 0, 0);
 }
 
-#elif defined(ABSL_INTERNAL_HAVE_SSE)
+#elif defined(TURBO_INTERNAL_HAVE_SSE)
 
-#define ABSL_INTERNAL_HAVE_PREFETCH 1
+#define TURBO_INTERNAL_HAVE_PREFETCH 1
 
 inline void PrefetchT0(const void* addr) {
   _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_T0);
@@ -132,7 +132,7 @@ inline void PrefetchNta(const void*) {}
 #endif
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_PREFETCH_H_
+#endif  // TURBO_BASE_INTERNAL_PREFETCH_H_

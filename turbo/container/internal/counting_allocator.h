@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CONTAINER_INTERNAL_COUNTING_ALLOCATOR_H_
-#define ABSL_CONTAINER_INTERNAL_COUNTING_ALLOCATOR_H_
+#ifndef TURBO_CONTAINER_INTERNAL_COUNTING_ALLOCATOR_H_
+#define TURBO_CONTAINER_INTERNAL_COUNTING_ALLOCATOR_H_
 
 #include <cstdint>
 #include <memory>
@@ -21,7 +21,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // This is a stateful allocator, but the state lives outside of the
@@ -81,12 +81,12 @@ class CountingAllocator {
   void destroy(U* p) {
     Allocator allocator;
     // Ignore GCC warning bug.
-#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuse-after-free"
 #endif
     AllocatorTraits::destroy(allocator, p);
-#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic pop
 #endif
     if (instance_count_ != nullptr) {
@@ -116,7 +116,7 @@ class CountingAllocator {
 };
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_COUNTING_ALLOCATOR_H_
+#endif  // TURBO_CONTAINER_INTERNAL_COUNTING_ALLOCATOR_H_

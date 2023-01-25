@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@
 #include "turbo/crc/internal/crc_internal.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 namespace {
@@ -157,7 +157,7 @@ int CRCImpl::FillZeroesTable(uint32_t poly, Uint32By256* t) {
     }
     inc = v;
   }
-  ABSL_RAW_CHECK(j <= 256, "");
+  TURBO_RAW_CHECK(j <= 256, "");
   return j;
 }
 
@@ -208,7 +208,7 @@ void CRC32::InitTables() {
   }
 
   int j = FillZeroesTable(kCrc32cPoly, t);
-  ABSL_RAW_CHECK(j <= static_cast<int>(ABSL_ARRAYSIZE(this->zeroes_)), "");
+  TURBO_RAW_CHECK(j <= static_cast<int>(TURBO_ARRAYSIZE(this->zeroes_)), "");
   for (int i = 0; i < j; i++) {
     this->zeroes_[i] = t[0][i];
   }
@@ -252,7 +252,7 @@ void CRC32::InitTables() {
   FillWordTable(kCrc32cUnextendPoly, kCrc32cUnextendPoly, 1, &reverse_table0_);
 
   j = FillZeroesTable(kCrc32cUnextendPoly, &reverse_zeroes_);
-  ABSL_RAW_CHECK(j <= static_cast<int>(ABSL_ARRAYSIZE(this->reverse_zeroes_)),
+  TURBO_RAW_CHECK(j <= static_cast<int>(TURBO_ARRAYSIZE(this->reverse_zeroes_)),
                  "");
 }
 
@@ -464,5 +464,5 @@ void CRC::Concat(uint32_t* px, uint32_t y, size_t ylen) {
 }
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

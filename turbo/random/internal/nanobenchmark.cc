@@ -34,54 +34,54 @@
 
 // OS
 #if defined(_WIN32) || defined(_WIN64)
-#define ABSL_OS_WIN
+#define TURBO_OS_WIN
 #include <windows.h>  // NOLINT
 
 #elif defined(__ANDROID__)
-#define ABSL_OS_ANDROID
+#define TURBO_OS_ANDROID
 
 #elif defined(__linux__)
-#define ABSL_OS_LINUX
+#define TURBO_OS_LINUX
 #include <sched.h>        // NOLINT
 #include <sys/syscall.h>  // NOLINT
 #endif
 
-#if defined(ABSL_ARCH_X86_64) && !defined(ABSL_OS_WIN)
+#if defined(TURBO_ARCH_X86_64) && !defined(TURBO_OS_WIN)
 #include <cpuid.h>  // NOLINT
 #endif
 
 // __ppc_get_timebase_freq
-#if defined(ABSL_ARCH_PPC)
+#if defined(TURBO_ARCH_PPC)
 #include <sys/platform/ppc.h>  // NOLINT
 #endif
 
 // clock_gettime
-#if defined(ABSL_ARCH_ARM) || defined(ABSL_ARCH_AARCH64)
+#if defined(TURBO_ARCH_ARM) || defined(TURBO_ARCH_AARCH64)
 #include <time.h>  // NOLINT
 #endif
 
-// ABSL_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE prevents inlining of the method.
-#if ABSL_HAVE_ATTRIBUTE(noinline) || (defined(__GNUC__) && !defined(__clang__))
-#define ABSL_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE __attribute__((noinline))
+// TURBO_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE prevents inlining of the method.
+#if TURBO_HAVE_ATTRIBUTE(noinline) || (defined(__GNUC__) && !defined(__clang__))
+#define TURBO_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE __attribute__((noinline))
 #elif defined(_MSC_VER)
-#define ABSL_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE __declspec(noinline)
+#define TURBO_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE __declspec(noinline)
 #else
-#define ABSL_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE
+#define TURBO_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal_nanobenchmark {
 namespace {
 
 // For code folding.
 namespace platform {
-#if defined(ABSL_ARCH_X86_64)
+#if defined(TURBO_ARCH_X86_64)
 
 // TODO(janwas): Merge with the one in randen_hwaes.cc?
 void Cpuid(const uint32_t level, const uint32_t count,
-           uint32_t* ABSL_RANDOM_INTERNAL_RESTRICT abcd) {
-#if defined(ABSL_OS_WIN)
+           uint32_t* TURBO_RANDOM_INTERNAL_RESTRICT abcd) {
+#if defined(TURBO_OS_WIN)
   int regs[4];
   __cpuidex(regs, level, count);
   for (int i = 0; i < 4; ++i) {
@@ -138,13 +138,13 @@ double NominalClockRate() {
   return 0.0;
 }
 
-#endif  // ABSL_ARCH_X86_64
+#endif  // TURBO_ARCH_X86_64
 }  // namespace platform
 
 // Prevents the compiler from eliding the computations that led to "output".
 template <class T>
 inline void PreventElision(T&& output) {
-#ifndef ABSL_OS_WIN
+#ifndef TURBO_OS_WIN
   // Works by indicating to the compiler that "output" is being read and
   // modified. The +r constraint avoids unnecessary writes to memory, but only
   // works for built-in types (typically FuncOutput).
@@ -214,10 +214,10 @@ namespace timer {
 // divide by InvariantTicksPerSecond.
 inline uint64_t Start64() {
   uint64_t t;
-#if defined(ABSL_ARCH_PPC)
+#if defined(TURBO_ARCH_PPC)
   asm volatile("mfspr %0, %1" : "=r"(t) : "i"(268));
-#elif defined(ABSL_ARCH_X86_64)
-#if defined(ABSL_OS_WIN)
+#elif defined(TURBO_ARCH_X86_64)
+#if defined(TURBO_OS_WIN)
   _ReadWriteBarrier();
   _mm_lfence();
   _ReadWriteBarrier();
@@ -249,8 +249,8 @@ inline uint64_t Start64() {
 
 inline uint64_t Stop64() {
   uint64_t t;
-#if defined(ABSL_ARCH_X86_64)
-#if defined(ABSL_OS_WIN)
+#if defined(TURBO_ARCH_X86_64)
+#if defined(TURBO_OS_WIN)
   _ReadWriteBarrier();
   unsigned aux;
   t = __rdtscp(&aux);
@@ -281,8 +281,8 @@ inline uint64_t Stop64() {
 // timestamp overflows about once a second.
 inline uint32_t Start32() {
   uint32_t t;
-#if defined(ABSL_ARCH_X86_64)
-#if defined(ABSL_OS_WIN)
+#if defined(TURBO_ARCH_X86_64)
+#if defined(TURBO_OS_WIN)
   _ReadWriteBarrier();
   _mm_lfence();
   _ReadWriteBarrier();
@@ -308,8 +308,8 @@ inline uint32_t Start32() {
 
 inline uint32_t Stop32() {
   uint32_t t;
-#if defined(ABSL_ARCH_X86_64)
-#if defined(ABSL_OS_WIN)
+#if defined(TURBO_ARCH_X86_64)
+#if defined(TURBO_OS_WIN)
   _ReadWriteBarrier();
   unsigned aux;
   t = static_cast<uint32_t>(__rdtscp(&aux));
@@ -359,24 +359,24 @@ void CountingSort(T* values, size_t num_values) {
   std::sort(unique.begin(), unique.end());
 
   // Write that many copies of each unique value to the array.
-  T* ABSL_RANDOM_INTERNAL_RESTRICT p = values;
+  T* TURBO_RANDOM_INTERNAL_RESTRICT p = values;
   for (const auto& value_count : unique) {
     std::fill(p, p + value_count.second, value_count.first);
     p += value_count.second;
   }
-  ABSL_RAW_CHECK(p == values + num_values, "Did not produce enough output");
+  TURBO_RAW_CHECK(p == values + num_values, "Did not produce enough output");
 }
 
 // @return i in [idx_begin, idx_begin + half_count) that minimizes
 // sorted[i + half_count] - sorted[i].
 template <typename T>
-size_t MinRange(const T* const ABSL_RANDOM_INTERNAL_RESTRICT sorted,
+size_t MinRange(const T* const TURBO_RANDOM_INTERNAL_RESTRICT sorted,
                 const size_t idx_begin, const size_t half_count) {
   T min_range = (std::numeric_limits<T>::max)();
   size_t min_idx = 0;
 
   for (size_t idx = idx_begin; idx < idx_begin + half_count; ++idx) {
-    ABSL_RAW_CHECK(sorted[idx] <= sorted[idx + half_count], "Not sorted");
+    TURBO_RAW_CHECK(sorted[idx] <= sorted[idx + half_count], "Not sorted");
     const T range = sorted[idx + half_count] - sorted[idx];
     if (range < min_range) {
       min_range = range;
@@ -394,7 +394,7 @@ size_t MinRange(const T* const ABSL_RANDOM_INTERNAL_RESTRICT sorted,
 // affected by outliers in highly-skewed distributions than the median.
 // The averaging operation below assumes "T" is an unsigned integer type.
 template <typename T>
-T ModeOfSorted(const T* const ABSL_RANDOM_INTERNAL_RESTRICT sorted,
+T ModeOfSorted(const T* const TURBO_RANDOM_INTERNAL_RESTRICT sorted,
                const size_t num_values) {
   size_t idx_begin = 0;
   size_t half_count = num_values / 2;
@@ -407,7 +407,7 @@ T ModeOfSorted(const T* const ABSL_RANDOM_INTERNAL_RESTRICT sorted,
   if (half_count == 0) {
     return x;
   }
-  ABSL_RAW_CHECK(half_count == 1, "Should stop at half_count=1");
+  TURBO_RAW_CHECK(half_count == 1, "Should stop at half_count=1");
   const T average = (x + sorted[idx_begin + 1] + 1) / 2;
   return average;
 }
@@ -427,7 +427,7 @@ T Mode(T (&values)[N]) {
 // Returns the median value. Side effect: sorts "values".
 template <typename T>
 T Median(T* values, const size_t num_values) {
-  ABSL_RAW_CHECK(num_values != 0, "Empty input");
+  TURBO_RAW_CHECK(num_values != 0, "Empty input");
   std::sort(values, values + num_values);
   const size_t half = num_values / 2;
   // Odd count: return middle
@@ -442,7 +442,7 @@ T Median(T* values, const size_t num_values) {
 template <typename T>
 T MedianAbsoluteDeviation(const T* values, const size_t num_values,
                           const T median) {
-  ABSL_RAW_CHECK(num_values != 0, "Empty input");
+  TURBO_RAW_CHECK(num_values != 0, "Empty input");
   std::vector<T> abs_deviations;
   abs_deviations.reserve(num_values);
   for (size_t i = 0; i < num_values; ++i) {
@@ -518,7 +518,7 @@ Ticks SampleUntilStable(const double max_rel_mad, double* rel_mad,
       // For "few" (depends also on the variance) samples, Median is safer.
       est = robust_statistics::Median(samples.data(), samples.size());
     }
-    ABSL_RAW_CHECK(est != 0, "Estimator returned zero duration");
+    TURBO_RAW_CHECK(est != 0, "Estimator returned zero duration");
 
     // Median absolute deviation (mad) is a robust measure of 'variability'.
     const Ticks abs_mad = robust_statistics::MedianAbsoluteDeviation(
@@ -527,7 +527,7 @@ Ticks SampleUntilStable(const double max_rel_mad, double* rel_mad,
 
     if (*rel_mad <= max_rel_mad || abs_mad <= max_abs_mad) {
       if (p.verbose) {
-        ABSL_RAW_LOG(INFO,
+        TURBO_RAW_LOG(INFO,
                      "%6zu samples => %5u (abs_mad=%4u, rel_mad=%4.2f%%)\n",
                      samples.size(), est, abs_mad, *rel_mad * 100.0);
       }
@@ -536,7 +536,7 @@ Ticks SampleUntilStable(const double max_rel_mad, double* rel_mad,
   }
 
   if (p.verbose) {
-    ABSL_RAW_LOG(WARNING,
+    TURBO_RAW_LOG(WARNING,
                  "rel_mad=%4.2f%% still exceeds %4.2f%% after %6zu samples.\n",
                  *rel_mad * 100.0, max_rel_mad * 100.0, samples.size());
   }
@@ -567,7 +567,7 @@ size_t NumSkip(const Func func, const void* arg, const InputVec& unique,
     const uint64_t t1 = timer::Stop64();
     const uint64_t elapsed = t1 - t0;
     if (elapsed >= (1ULL << 30)) {
-      ABSL_RAW_LOG(WARNING,
+      TURBO_RAW_LOG(WARNING,
                    "Measurement failed: need 64-bit timer for input=%zu\n",
                    static_cast<size_t>(input));
       return 0;
@@ -586,7 +586,7 @@ size_t NumSkip(const Func func, const void* arg, const InputVec& unique,
   const size_t num_skip =
       min_duration == 0 ? 0 : (max_skip + min_duration - 1) / min_duration;
   if (p.verbose) {
-    ABSL_RAW_LOG(INFO, "res=%u max_skip=%zu min_dur=%u num_skip=%zu\n",
+    TURBO_RAW_LOG(INFO, "res=%u max_skip=%zu min_dur=%u num_skip=%zu\n",
                  timer_resolution, max_skip, min_duration, num_skip);
   }
   return num_skip;
@@ -649,9 +649,9 @@ void FillSubset(const InputVec& full, const FuncInput input_to_skip,
       (*subset)[idx_subset++] = next;
     }
   }
-  ABSL_RAW_CHECK(idx_subset == subset->size(), "idx_subset not at end");
-  ABSL_RAW_CHECK(idx_omit == omit.size(), "idx_omit not at end");
-  ABSL_RAW_CHECK(occurrence == count - 1, "occurrence not at end");
+  TURBO_RAW_CHECK(idx_subset == subset->size(), "idx_subset not at end");
+  TURBO_RAW_CHECK(idx_omit == omit.size(), "idx_omit not at end");
+  TURBO_RAW_CHECK(occurrence == count - 1, "occurrence not at end");
 }
 
 // Returns total ticks elapsed for all inputs.
@@ -669,7 +669,7 @@ Ticks TotalDuration(const Func func, const void* arg, const InputVec* inputs,
 }
 
 // (Nearly) empty Func for measuring timer overhead/resolution.
-ABSL_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE FuncOutput
+TURBO_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE FuncOutput
 EmptyFunc(const void* arg, const FuncInput input) {
   return input;
 }
@@ -691,43 +691,43 @@ Ticks Overhead(const void* arg, const InputVec* inputs, const Params& p) {
 void PinThreadToCPU(int cpu) {
   // We might migrate to another CPU before pinning below, but at least cpu
   // will be one of the CPUs on which this thread ran.
-#if defined(ABSL_OS_WIN)
+#if defined(TURBO_OS_WIN)
   if (cpu < 0) {
     cpu = static_cast<int>(GetCurrentProcessorNumber());
-    ABSL_RAW_CHECK(cpu >= 0, "PinThreadToCPU detect failed");
+    TURBO_RAW_CHECK(cpu >= 0, "PinThreadToCPU detect failed");
     if (cpu >= 64) {
       // NOTE: On wine, at least, GetCurrentProcessorNumber() sometimes returns
       // a value > 64, which is out of range. When this happens, log a message
       // and don't set a cpu affinity.
-      ABSL_RAW_LOG(ERROR, "Invalid CPU number: %d", cpu);
+      TURBO_RAW_LOG(ERROR, "Invalid CPU number: %d", cpu);
       return;
     }
   } else if (cpu >= 64) {
     // User specified an explicit CPU affinity > the valid range.
-    ABSL_RAW_LOG(FATAL, "Invalid CPU number: %d", cpu);
+    TURBO_RAW_LOG(FATAL, "Invalid CPU number: %d", cpu);
   }
   const DWORD_PTR prev = SetThreadAffinityMask(GetCurrentThread(), 1ULL << cpu);
-  ABSL_RAW_CHECK(prev != 0, "SetAffinity failed");
-#elif defined(ABSL_OS_LINUX) && !defined(ABSL_OS_ANDROID)
+  TURBO_RAW_CHECK(prev != 0, "SetAffinity failed");
+#elif defined(TURBO_OS_LINUX) && !defined(TURBO_OS_ANDROID)
   if (cpu < 0) {
     cpu = sched_getcpu();
-    ABSL_RAW_CHECK(cpu >= 0, "PinThreadToCPU detect failed");
+    TURBO_RAW_CHECK(cpu >= 0, "PinThreadToCPU detect failed");
   }
   const pid_t pid = 0;  // current thread
   cpu_set_t set;
   CPU_ZERO(&set);
   CPU_SET(cpu, &set);
   const int err = sched_setaffinity(pid, sizeof(set), &set);
-  ABSL_RAW_CHECK(err == 0, "SetAffinity failed");
+  TURBO_RAW_CHECK(err == 0, "SetAffinity failed");
 #endif
 }
 
 // Returns tick rate. Invariant means the tick counter frequency is independent
 // of CPU throttling or sleep. May be expensive, caller should cache the result.
 double InvariantTicksPerSecond() {
-#if defined(ABSL_ARCH_PPC)
+#if defined(TURBO_ARCH_PPC)
   return __ppc_get_timebase_freq();
-#elif defined(ABSL_ARCH_X86_64)
+#elif defined(TURBO_ARCH_X86_64)
   // We assume the TSC is invariant; it is on all recent Intel/AMD CPUs.
   return platform::NominalClockRate();
 #else
@@ -745,13 +745,13 @@ size_t MeasureImpl(const Func func, const void* arg, const size_t num_skip,
   const Ticks overhead = Overhead(arg, &full, p);
   const Ticks overhead_skip = Overhead(arg, &subset, p);
   if (overhead < overhead_skip) {
-    ABSL_RAW_LOG(WARNING, "Measurement failed: overhead %u < %u\n", overhead,
+    TURBO_RAW_LOG(WARNING, "Measurement failed: overhead %u < %u\n", overhead,
                  overhead_skip);
     return 0;
   }
 
   if (p.verbose) {
-    ABSL_RAW_LOG(INFO, "#inputs=%5zu,%5zu overhead=%5u,%5u\n", full.size(),
+    TURBO_RAW_LOG(INFO, "#inputs=%5zu,%5zu overhead=%5u,%5u\n", full.size(),
                  subset.size(), overhead, overhead_skip);
   }
 
@@ -763,7 +763,7 @@ size_t MeasureImpl(const Func func, const void* arg, const size_t num_skip,
     const Ticks total_skip = TotalDuration(func, arg, &subset, p, &max_rel_mad);
 
     if (total < total_skip) {
-      ABSL_RAW_LOG(WARNING, "Measurement failed: total %u < %u\n", total,
+      TURBO_RAW_LOG(WARNING, "Measurement failed: total %u < %u\n", total,
                    total_skip);
       return 0;
     }
@@ -779,7 +779,7 @@ size_t MeasureImpl(const Func func, const void* arg, const size_t num_skip,
 
 size_t Measure(const Func func, const void* arg, const FuncInput* inputs,
                const size_t num_inputs, Result* results, const Params& p) {
-  ABSL_RAW_CHECK(num_inputs != 0, "No inputs");
+  TURBO_RAW_CHECK(num_inputs != 0, "No inputs");
 
   const InputVec unique = UniqueInputs(inputs, num_inputs);
   const size_t num_skip = NumSkip(func, arg, unique, p);  // never 0
@@ -800,5 +800,5 @@ size_t Measure(const Func func, const void* arg, const FuncInput* inputs,
 }
 
 }  // namespace random_internal_nanobenchmark
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

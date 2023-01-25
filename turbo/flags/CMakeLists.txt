@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
 #
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_path_util
   HDRS
     "internal/path_util.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::strings
@@ -31,7 +31,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_program_name
   SRCS
@@ -39,9 +39,9 @@ absl_cc_library(
   HDRS
     "internal/program_name.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -51,7 +51,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_config
   SRCS
@@ -60,9 +60,9 @@ absl_cc_library(
     "config.h"
     "usage_config.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::flags_path_util
@@ -72,7 +72,7 @@ absl_cc_library(
     turbo::synchronization
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_marshalling
   SRCS
@@ -80,9 +80,9 @@ absl_cc_library(
   HDRS
     "marshalling.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -93,7 +93,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_commandlineflag_internal
   SRCS
@@ -101,16 +101,16 @@ absl_cc_library(
   HDRS
     "internal/commandlineflag.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::dynamic_annotations
     turbo::fast_type_id
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_commandlineflag
   SRCS
@@ -118,9 +118,9 @@ absl_cc_library(
   HDRS
     "commandlineflag.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::fast_type_id
@@ -130,7 +130,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_private_handle_accessor
   SRCS
@@ -138,9 +138,9 @@ absl_cc_library(
   HDRS
     "internal/private_handle_accessor.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::flags_commandlineflag
@@ -148,7 +148,7 @@ absl_cc_library(
     turbo::strings
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_reflection
   SRCS
@@ -157,9 +157,9 @@ absl_cc_library(
     "reflection.h"
     "internal/registry.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::flags_commandlineflag
@@ -171,7 +171,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_internal
   SRCS
@@ -180,9 +180,9 @@ absl_cc_library(
     "internal/flag.h"
     "internal/sequence_lock.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::base
     turbo::config
@@ -196,7 +196,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags
   SRCS
@@ -206,9 +206,9 @@ absl_cc_library(
     "flag.h"
     "internal/flag_msvc.inc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::flags_commandlineflag
@@ -221,7 +221,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_usage_internal
   SRCS
@@ -229,9 +229,9 @@ absl_cc_library(
   HDRS
     "internal/usage.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::flags_config
@@ -247,7 +247,7 @@ absl_cc_library(
     turbo::synchronization
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_usage
   SRCS
@@ -255,9 +255,9 @@ absl_cc_library(
   HDRS
     "usage.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -266,7 +266,7 @@ absl_cc_library(
     turbo::synchronization
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     flags_parse
   SRCS
@@ -275,9 +275,9 @@ absl_cc_library(
     "internal/parse.h"
     "parse.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::algorithm_container
     turbo::config
@@ -298,13 +298,13 @@ absl_cc_library(
 ############################################################################
 # Unit tests in alpahabetical order.
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_commandlineflag_test
   SRCS
     "commandlineflag_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags
     turbo::flags_commandlineflag
@@ -317,26 +317,26 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_config_test
   SRCS
     "config_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags_config
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_flag_test
   SRCS
     "flag_test.cc"
     "flag_test_defs.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::core_headers
     turbo::flags
@@ -349,25 +349,25 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_marshalling_test
   SRCS
     "marshalling_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags_marshalling
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_parse_test
   SRCS
     "parse_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags
     turbo::flags_parse
@@ -380,38 +380,38 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_path_util_test
   SRCS
     "internal/path_util_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags_path_util
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_program_name_test
   SRCS
     "internal/program_name_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags_program_name
     turbo::strings
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_reflection_test
   SRCS
     "reflection_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags_commandlineflag_internal
     turbo::flags
@@ -422,13 +422,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_sequence_lock_test
   SRCS
     "internal/sequence_lock_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::flags_internal
@@ -436,13 +436,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_usage_config_test
   SRCS
     "usage_config_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags_config
     turbo::flags_path_util
@@ -451,13 +451,13 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flags_usage_test
   SRCS
     "internal/usage_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags_config
     turbo::flags

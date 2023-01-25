@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_RANDEN_ENGINE_H_
-#define ABSL_RANDOM_INTERNAL_RANDEN_ENGINE_H_
+#ifndef TURBO_RANDOM_INTERNAL_RANDEN_ENGINE_H_
+#define TURBO_RANDOM_INTERNAL_RANDEN_ENGINE_H_
 
 #include <algorithm>
 #include <cinttypes>
@@ -29,7 +29,7 @@
 #include "turbo/random/internal/randen.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // Deterministic pseudorandom byte generator with backtracking resistance
@@ -132,7 +132,7 @@ class alignas(8) randen_engine {
       const size_t requested_entropy = (entropy_size == 0) ? 8u : entropy_size;
       std::fill(buffer + requested_entropy, buffer + kBufferSize, 0);
       seq.generate(buffer, buffer + requested_entropy);
-#ifdef ABSL_IS_BIG_ENDIAN
+#ifdef TURBO_IS_BIG_ENDIAN
       // Randen expects the seed buffer to be in Little Endian; reverse it on
       // Big Endian platforms.
       for (sequence_result_type& e : buffer) {
@@ -258,7 +258,7 @@ class alignas(8) randen_engine {
 };
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_RANDEN_ENGINE_H_
+#endif  // TURBO_RANDOM_INTERNAL_RANDEN_ENGINE_H_

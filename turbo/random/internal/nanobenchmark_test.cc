@@ -18,7 +18,7 @@
 #include "turbo/strings/numbers.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal_nanobenchmark {
 namespace {
 
@@ -36,16 +36,16 @@ void MeasureDiv(const FuncInput (&inputs)[N]) {
   params.max_evals = 6;  // avoid test timeout
   const size_t num_results = Measure(&Div, nullptr, inputs, N, results, params);
   if (num_results == 0) {
-    ABSL_RAW_LOG(
+    TURBO_RAW_LOG(
         WARNING,
         "WARNING: Measurement failed, should not happen when using "
         "PinThreadToCPU unless the region to measure takes > 1 second.\n");
     return;
   }
   for (size_t i = 0; i < num_results; ++i) {
-    ABSL_RAW_LOG(INFO, "%5zu: %6.2f ticks; MAD=%4.2f%%\n", results[i].input,
+    TURBO_RAW_LOG(INFO, "%5zu: %6.2f ticks; MAD=%4.2f%%\n", results[i].input,
                  results[i].ticks, results[i].variability * 100.0);
-    ABSL_RAW_CHECK(results[i].ticks != 0.0f, "Zero duration");
+    TURBO_RAW_CHECK(results[i].ticks != 0.0f, "Zero duration");
   }
 }
 
@@ -54,7 +54,7 @@ void RunAll(const int argc, char* argv[]) {
   int cpu = -1;
   if (argc == 2) {
     if (!turbo::SimpleAtoi(argv[1], &cpu)) {
-      ABSL_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
+      TURBO_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
     }
   }
   PinThreadToCPU(cpu);
@@ -68,7 +68,7 @@ void RunAll(const int argc, char* argv[]) {
 
 }  // namespace
 }  // namespace random_internal_nanobenchmark
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 int main(int argc, char* argv[]) {

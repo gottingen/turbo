@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,15 +44,15 @@
 //     --linkopt=-fsanitize=leak ...
 //
 // -----------------------------------------------------------------------------
-#ifndef ABSL_DEBUGGING_LEAK_CHECK_H_
-#define ABSL_DEBUGGING_LEAK_CHECK_H_
+#ifndef TURBO_DEBUGGING_LEAK_CHECK_H_
+#define TURBO_DEBUGGING_LEAK_CHECK_H_
 
 #include <cstddef>
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // HaveLeakSanitizer()
 //
@@ -144,7 +144,7 @@ void RegisterLivePointers(const void* ptr, size_t size);
 // `RegisterLivePointers()`, enabling leak checking of those pointers.
 void UnRegisterLivePointers(const void* ptr, size_t size);
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_LEAK_CHECK_H_
+#endif  // TURBO_DEBUGGING_LEAK_CHECK_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -284,23 +284,23 @@ void TestToChrono() {
   EXPECT_EQ(milliseconds(N), turbo::ToChronoMilliseconds(turbo::Milliseconds(N)));
   EXPECT_EQ(seconds(N), turbo::ToChronoSeconds(turbo::Seconds(N)));
 
-  constexpr auto absl_minutes = turbo::Minutes(N);
+  constexpr auto turbo_minutes = turbo::Minutes(N);
   auto chrono_minutes = minutes(N);
-  if (absl_minutes == -turbo::InfiniteDuration()) {
+  if (turbo_minutes == -turbo::InfiniteDuration()) {
     chrono_minutes = minutes::min();
-  } else if (absl_minutes == turbo::InfiniteDuration()) {
+  } else if (turbo_minutes == turbo::InfiniteDuration()) {
     chrono_minutes = minutes::max();
   }
-  EXPECT_EQ(chrono_minutes, turbo::ToChronoMinutes(absl_minutes));
+  EXPECT_EQ(chrono_minutes, turbo::ToChronoMinutes(turbo_minutes));
 
-  constexpr auto absl_hours = turbo::Hours(N);
+  constexpr auto turbo_hours = turbo::Hours(N);
   auto chrono_hours = hours(N);
-  if (absl_hours == -turbo::InfiniteDuration()) {
+  if (turbo_hours == -turbo::InfiniteDuration()) {
     chrono_hours = hours::min();
-  } else if (absl_hours == turbo::InfiniteDuration()) {
+  } else if (turbo_hours == turbo::InfiniteDuration()) {
     chrono_hours = hours::max();
   }
-  EXPECT_EQ(chrono_hours, turbo::ToChronoHours(absl_hours));
+  EXPECT_EQ(chrono_hours, turbo::ToChronoHours(turbo_hours));
 }
 
 TEST(Duration, ToChrono) {
@@ -349,8 +349,8 @@ TEST(Duration, ToChrono) {
 }
 
 TEST(Duration, FactoryOverloads) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 
@@ -884,8 +884,8 @@ TEST(Duration, RelationalOperators) {
 }
 
 TEST(Duration, Addition) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 
@@ -982,8 +982,8 @@ TEST(Duration, Negation) {
 }
 
 TEST(Duration, AbsoluteValue) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 
@@ -1004,8 +1004,8 @@ TEST(Duration, AbsoluteValue) {
 }
 
 TEST(Duration, Multiplication) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 
@@ -1261,8 +1261,8 @@ TEST(Duration, RoundTripUnits) {
 }
 
 TEST(Duration, TruncConversions) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 
@@ -1562,8 +1562,8 @@ TEST(Duration, ConversionSaturation) {
 }
 
 TEST(Duration, FormatDuration) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 
@@ -1701,8 +1701,8 @@ TEST(Duration, FormatDuration) {
 }
 
 TEST(Duration, ParseDuration) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 

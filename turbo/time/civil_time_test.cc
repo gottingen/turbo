@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1176,7 +1176,7 @@ TEST(CivilTime, LeapYears) {
       {2100, 365, {3, 1}},
   };
 
-  for (int i = 0; i < ABSL_ARRAYSIZE(kLeapYearTable); ++i) {
+  for (int i = 0; i < TURBO_ARRAYSIZE(kLeapYearTable); ++i) {
     const int y = kLeapYearTable[i].year;
     const int m = kLeapYearTable[i].leap_day.month;
     const int d = kLeapYearTable[i].leap_day.day;

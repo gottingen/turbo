@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 // This file is a no-op if the required LowLevelAlloc support is missing.
 #include "turbo/base/internal/low_level_alloc.h"
-#ifndef ABSL_LOW_LEVEL_ALLOC_MISSING
+#ifndef TURBO_LOW_LEVEL_ALLOC_MISSING
 
 #include "turbo/synchronization/internal/per_thread_sem.h"
 
@@ -25,7 +25,7 @@
 #include "turbo/synchronization/internal/waiter.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 void PerThreadSem::SetThreadBlockedCounter(std::atomic<int> *counter) {
@@ -59,17 +59,17 @@ void PerThreadSem::Tick(base_internal::ThreadIdentity *identity) {
 }
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 extern "C" {
 
-ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemPost)(
+TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemPost)(
     turbo::base_internal::ThreadIdentity *identity) {
   turbo::synchronization_internal::Waiter::GetWaiter(identity)->Post();
 }
 
-ABSL_ATTRIBUTE_WEAK bool ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemWait)(
+TURBO_ATTRIBUTE_WEAK bool TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemWait)(
     turbo::synchronization_internal::KernelTimeout t) {
   bool timeout = false;
   turbo::base_internal::ThreadIdentity *identity;
@@ -99,4 +99,4 @@ ABSL_ATTRIBUTE_WEAK bool ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemWait)(
 
 }  // extern "C"
 
-#endif  // ABSL_LOW_LEVEL_ALLOC_MISSING
+#endif  // TURBO_LOW_LEVEL_ALLOC_MISSING

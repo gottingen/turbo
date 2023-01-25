@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,18 +24,18 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 turbo::once_flag once;
 
-ABSL_CONST_INIT Mutex counters_mu(turbo::kConstInit);
+TURBO_CONST_INIT Mutex counters_mu(turbo::kConstInit);
 
-int running_thread_count ABSL_GUARDED_BY(counters_mu) = 0;
-int call_once_invoke_count ABSL_GUARDED_BY(counters_mu) = 0;
-int call_once_finished_count ABSL_GUARDED_BY(counters_mu) = 0;
-int call_once_return_count ABSL_GUARDED_BY(counters_mu) = 0;
-bool done_blocking ABSL_GUARDED_BY(counters_mu) = false;
+int running_thread_count TURBO_GUARDED_BY(counters_mu) = 0;
+int call_once_invoke_count TURBO_GUARDED_BY(counters_mu) = 0;
+int call_once_finished_count TURBO_GUARDED_BY(counters_mu) = 0;
+int call_once_return_count TURBO_GUARDED_BY(counters_mu) = 0;
+bool done_blocking TURBO_GUARDED_BY(counters_mu) = false;
 
 // Function to be called from turbo::call_once.  Waits for a notification.
 void WaitAndIncrement() {
@@ -61,7 +61,7 @@ void ThreadBody() {
 }
 
 // Returns true if all threads are set up for the test.
-bool ThreadsAreSetup(void*) ABSL_EXCLUSIVE_LOCKS_REQUIRED(counters_mu) {
+bool ThreadsAreSetup(void*) TURBO_EXCLUSIVE_LOCKS_REQUIRED(counters_mu) {
   // All ten threads must be running, and WaitAndIncrement should be blocked.
   return running_thread_count == 10 && call_once_invoke_count == 1;
 }
@@ -103,5 +103,5 @@ TEST(CallOnceTest, ExecutionCount) {
 }
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

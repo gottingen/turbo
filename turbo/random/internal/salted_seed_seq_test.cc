@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,12 +45,12 @@ void ConformsToInterface() {
   {
     uint32_t init_array[] = {1, 2, 3, 4, 5};
     Sseq seq(std::begin(init_array), std::end(init_array));
-    EXPECT_EQ(seq.size(), ABSL_ARRAYSIZE(init_array));
+    EXPECT_EQ(seq.size(), TURBO_ARRAYSIZE(init_array));
 
     std::vector<uint32_t> state_vector;
     seq.param(std::back_inserter(state_vector));
 
-    EXPECT_EQ(state_vector.size(), ABSL_ARRAYSIZE(init_array));
+    EXPECT_EQ(state_vector.size(), TURBO_ARRAYSIZE(init_array));
     for (int i = 0; i < state_vector.size(); i++) {
       EXPECT_EQ(state_vector[i], i + 1);
     }
@@ -68,7 +68,7 @@ TEST(SaltedSeedSeq, CheckInterfaces) {
   // Control case
   ConformsToInterface<std::seed_seq>();
 
-  // Abseil classes
+  // Turbo classes
   ConformsToInterface<SaltedSeedSeq<std::seed_seq>>();
 }
 

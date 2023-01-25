@@ -12,8 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#ifndef ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_
-#define ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_
+#ifndef TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_
+#define TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_
 
 #include <string>
 
@@ -21,7 +21,7 @@
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -46,7 +46,7 @@ std::string FixedOffsetToAbbr(const seconds& offset);
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_
+#endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_

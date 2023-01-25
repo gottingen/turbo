@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "turbo/strings/str_format.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 namespace {
 
@@ -29,7 +29,7 @@ std::string ConvToString(FormatConversionCharSet conv) {
   if (Contains(conv, FormatConversionCharSetInternal::c)) { \
     out += #c;                                              \
   }
-  ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(CONV_SET_CASE, )
+  TURBO_INTERNAL_CONVERSION_CHARS_EXPAND_(CONV_SET_CASE, )
 #undef CONV_SET_CASE
   if (Contains(conv, FormatConversionCharSetInternal::kStar)) {
     out += "*";
@@ -54,7 +54,7 @@ TEST(StrFormatChecker, ArgumentToConv) {
   EXPECT_EQ(ConvToString(conv), "p");
 }
 
-#ifdef ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#ifdef TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
 struct Case {
   bool result;
@@ -168,9 +168,9 @@ TEST(StrFormatChecker, LongFormat) {
   EXPECT_TRUE(is_valid);
 }
 
-#endif  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#endif  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
 }  // namespace
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

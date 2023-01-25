@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_CORDZ_TEST_HELPERS_H_
-#define ABSL_STRINGS_CORDZ_TEST_HELPERS_H_
+#ifndef TURBO_STRINGS_CORDZ_TEST_HELPERS_H_
+#define TURBO_STRINGS_CORDZ_TEST_HELPERS_H_
 
 #include <utility>
 
@@ -30,7 +30,7 @@
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Returns the CordzInfo for the cord, or nullptr if the cord is not sampled.
 inline const cord_internal::CordzInfo* GetCordzInfoForTesting(
@@ -141,11 +141,11 @@ template <typename... Args>
 Cord UnsampledCord(Args... args) {
   CordzSamplingIntervalHelper never(9999);
   Cord cord(std::forward<Args>(args)...);
-  ABSL_ASSERT(GetCordzInfoForTesting(cord) == nullptr);
+  TURBO_ASSERT(GetCordzInfoForTesting(cord) == nullptr);
   return cord;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_CORDZ_TEST_HELPERS_H_
+#endif  // TURBO_STRINGS_CORDZ_TEST_HELPERS_H_

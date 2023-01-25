@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #include "turbo/hash/internal/hash.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 
 uint64_t MixingHashState::CombineLargeContiguousImpl32(
@@ -44,7 +44,7 @@ uint64_t MixingHashState::CombineLargeContiguousImpl64(
                                std::integral_constant<int, 8>{});
 }
 
-ABSL_CONST_INIT const void* const MixingHashState::kSeed = &kSeed;
+TURBO_CONST_INIT const void* const MixingHashState::kSeed = &kSeed;
 
 // The salt array used by LowLevelHash. This array is NOT the mechanism used to
 // make turbo::Hash non-deterministic between program invocations.  See `Seed()`
@@ -65,5 +65,5 @@ uint64_t MixingHashState::LowLevelHashImpl(const unsigned char* data,
 }
 
 }  // namespace hash_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

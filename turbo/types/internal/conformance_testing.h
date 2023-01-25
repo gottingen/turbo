@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 // -----------------------------------------------------------------------------
 //
 
-#ifndef ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
-#define ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
+#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
+#define TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -50,7 +50,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace types_internal {
 
 // Returns true if the compiler incorrectly greedily instantiates constexpr
@@ -155,7 +155,7 @@ std::string PrepareGivenContext(const Decls&... decls) {
 // Function objects that perform a check for each comparison operator         //
 ////////////////////////////////////////////////////////////////////////////////
 
-#define ABSL_INTERNAL_EXPECT_OP(name, op)                                   \
+#define TURBO_INTERNAL_EXPECT_OP(name, op)                                   \
   struct Expect##name {                                                     \
     template <class T>                                                      \
     void operator()(turbo::string_view test_name, turbo::string_view context, \
@@ -206,14 +206,14 @@ std::string PrepareGivenContext(const Decls&... decls) {
     ConformanceErrors* errors;                                              \
   }
 
-ABSL_INTERNAL_EXPECT_OP(Eq, ==);
-ABSL_INTERNAL_EXPECT_OP(Ne, !=);
-ABSL_INTERNAL_EXPECT_OP(Lt, <);
-ABSL_INTERNAL_EXPECT_OP(Le, <=);
-ABSL_INTERNAL_EXPECT_OP(Ge, >=);
-ABSL_INTERNAL_EXPECT_OP(Gt, >);
+TURBO_INTERNAL_EXPECT_OP(Eq, ==);
+TURBO_INTERNAL_EXPECT_OP(Ne, !=);
+TURBO_INTERNAL_EXPECT_OP(Lt, <);
+TURBO_INTERNAL_EXPECT_OP(Le, <=);
+TURBO_INTERNAL_EXPECT_OP(Ge, >=);
+TURBO_INTERNAL_EXPECT_OP(Gt, >);
 
-#undef ABSL_INTERNAL_EXPECT_OP
+#undef TURBO_INTERNAL_EXPECT_OP
 
 // A function object that verifies that two objects hash to the same value by
 // way of the std::hash specialization.
@@ -1159,7 +1159,7 @@ struct ExpectConformanceOf {
   template <class Fun,
             turbo::enable_if_t<std::is_same<
                 ResultOfGeneratorT<GeneratorType<Fun>>, T>::value>** = nullptr>
-  ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
+  TURBO_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
                                            EquivalenceClassType<Fun>>
   initializer(GeneratorType<Fun> fun) && {
     return {
@@ -1173,7 +1173,7 @@ struct ExpectConformanceOf {
                               turbo::conjunction<std::is_convertible<
                                   TestNames, turbo::string_view>...>::value>** =
                 nullptr>
-  ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
+  TURBO_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
   due_to(TestNames&&... test_names) && {
     (InsertEach)(&expected_failed_tests,
                  turbo::AsciiStrToLower(turbo::string_view(test_names))...);
@@ -1186,7 +1186,7 @@ struct ExpectConformanceOf {
                               turbo::conjunction<std::is_convertible<
                                   TestNames, turbo::string_view>...>::value>** =
                 nullptr>
-  ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
+  TURBO_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
   due_to(TestNames&&... test_names) && {
     // TODO(calabrese) Instead have DUE_TO only exist via a CRTP base.
     // This would produce better errors messages than the static_assert.
@@ -1205,7 +1205,7 @@ struct ExpectConformanceOf {
   template <class Fun,
             turbo::enable_if_t<std::is_same<
                 ResultOfGeneratorT<GeneratorType<Fun>>, T>::value>** = nullptr>
-  ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
+  TURBO_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
                                            EquivalenceClassType<Fun>>
   dont_class_directly_stateful_initializer(GeneratorType<Fun> fun) && {
     return {
@@ -1220,7 +1220,7 @@ struct ExpectConformanceOf {
       class... Funs,
       turbo::void_t<turbo::enable_if_t<std::is_same<
           ResultOfGeneratorT<GeneratorType<Funs>>, T>::value>...>** = nullptr>
-  ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
+  TURBO_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
                                            EquivalenceClassType<Funs...>>
   equivalence_class(GeneratorType<Funs>... funs) && {
     return {{std::tuple_cat(
@@ -1234,7 +1234,7 @@ struct ExpectConformanceOf {
   template <
       class ProfRange,
       turbo::enable_if_t<IsProfileOrProfileRange<ProfRange>::value>** = nullptr>
-  ABSL_MUST_USE_RESULT ::testing::AssertionResult with_strict_profile(
+  TURBO_MUST_USE_RESULT ::testing::AssertionResult with_strict_profile(
       ProfRange /*profile*/) {
     ConformanceErrors test_result =
         (ExpectRegularityImpl<
@@ -1250,7 +1250,7 @@ struct ExpectConformanceOf {
   // refined that a profile suggests, such as a type having a noexcept copy
   // constructor when all that is required is that the copy constructor exists).
   template <class Prof, turbo::enable_if_t<IsProfile<Prof>::value>** = nullptr>
-  ABSL_MUST_USE_RESULT ::testing::AssertionResult with_loose_profile(
+  TURBO_MUST_USE_RESULT ::testing::AssertionResult with_loose_profile(
       Prof /*profile*/) {
     ConformanceErrors test_result =
         (ExpectRegularityImpl<
@@ -1285,20 +1285,20 @@ struct EquivalenceClassMaker {
 // A top-level macro that begins the builder pattern.
 //
 // The argument here takes the datatype to be tested.
-#define ABSL_INTERNAL_ASSERT_CONFORMANCE_OF(...)                            \
+#define TURBO_INTERNAL_ASSERT_CONFORMANCE_OF(...)                            \
   GTEST_AMBIGUOUS_ELSE_BLOCKER_                                             \
-  if ABSL_INTERNAL_LPAREN                                                   \
+  if TURBO_INTERNAL_LPAREN                                                   \
   const ::testing::AssertionResult gtest_ar =                               \
-      ABSL_INTERNAL_LPAREN ::turbo::types_internal::ExpectConformanceOfType< \
+      TURBO_INTERNAL_LPAREN ::turbo::types_internal::ExpectConformanceOfType< \
           __VA_ARGS__>()
 
 // Akin to ASSERT_CONFORMANCE_OF except that it expects failure and tries to
 // match text.
-#define ABSL_INTERNAL_ASSERT_NONCONFORMANCE_OF(...)                            \
+#define TURBO_INTERNAL_ASSERT_NONCONFORMANCE_OF(...)                            \
   GTEST_AMBIGUOUS_ELSE_BLOCKER_                                                \
-  if ABSL_INTERNAL_LPAREN                                                      \
+  if TURBO_INTERNAL_LPAREN                                                      \
   const ::testing::AssertionResult gtest_ar =                                  \
-      ABSL_INTERNAL_LPAREN ::turbo::types_internal::ExpectNonconformanceOfType< \
+      TURBO_INTERNAL_LPAREN ::turbo::types_internal::ExpectNonconformanceOfType< \
           __VA_ARGS__>()
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1319,7 +1319,7 @@ struct EquivalenceClassMaker {
 // preprocessing so that it can be used in error reports.
 #define INITIALIZER(...)                         \
   initializer(::turbo::types_internal::Generator( \
-      [] { return __VA_ARGS__; }, ABSL_INTERNAL_STRINGIZE(__VA_ARGS__)))
+      [] { return __VA_ARGS__; }, TURBO_INTERNAL_STRINGIZE(__VA_ARGS__)))
 
 // Specify a value to be tested.
 //
@@ -1328,7 +1328,7 @@ struct EquivalenceClassMaker {
 // during preprocessing so that it can be used in error reports.
 #define STATEFUL_INITIALIZER(...)                         \
   stateful_initializer(::turbo::types_internal::Generator( \
-      [&] { return __VA_ARGS__; }, ABSL_INTERNAL_STRINGIZE(__VA_ARGS__)))
+      [&] { return __VA_ARGS__; }, TURBO_INTERNAL_STRINGIZE(__VA_ARGS__)))
 
 // Used in the builder-pattern.
 //
@@ -1337,8 +1337,8 @@ struct EquivalenceClassMaker {
 // knows that they are supposed to represent the same logical value (the values
 // compare the same, hash the same, etc.).
 #define EQUIVALENCE_CLASS(...)                    \
-  equivalence_class(ABSL_INTERNAL_TRANSFORM_ARGS( \
-      ABSL_INTERNAL_PREPEND_EQ_MAKER, __VA_ARGS__))
+  equivalence_class(TURBO_INTERNAL_TRANSFORM_ARGS( \
+      TURBO_INTERNAL_PREPEND_EQ_MAKER, __VA_ARGS__))
 
 // An invocation of this or WITH_STRICT_PROFILE must end the builder-pattern.
 // It takes a Profile as its argument.
@@ -1353,7 +1353,7 @@ struct EquivalenceClassMaker {
 #define WITH_LOOSE_PROFILE(...)                                      \
   with_loose_profile(                                                \
       ::turbo::types_internal::MakeLooseProfileRangeT<__VA_ARGS__>()) \
-      ABSL_INTERNAL_RPAREN ABSL_INTERNAL_RPAREN;                     \
+      TURBO_INTERNAL_RPAREN TURBO_INTERNAL_RPAREN;                     \
   else GTEST_FATAL_FAILURE_(gtest_ar.failure_message())  // NOLINT
 
 // An invocation of this or WITH_STRICT_PROFILE must end the builder-pattern.
@@ -1371,16 +1371,16 @@ struct EquivalenceClassMaker {
 #define WITH_STRICT_PROFILE(...)                                      \
   with_strict_profile(                                                \
       ::turbo::types_internal::MakeStrictProfileRangeT<__VA_ARGS__>()) \
-      ABSL_INTERNAL_RPAREN ABSL_INTERNAL_RPAREN;                      \
+      TURBO_INTERNAL_RPAREN TURBO_INTERNAL_RPAREN;                      \
   else GTEST_FATAL_FAILURE_(gtest_ar.failure_message())  // NOLINT
 
 // Internal macro that is used in the internals of the EDSL when forming
 // equivalence classes.
-#define ABSL_INTERNAL_PREPEND_EQ_MAKER(arg) \
+#define TURBO_INTERNAL_PREPEND_EQ_MAKER(arg) \
   ::turbo::types_internal::EquivalenceClassMaker().arg
 
 }  // namespace types_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
+#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_H_

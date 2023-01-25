@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ int GetNonShortStringOptimizationSize() {
       return i;
     }
   }
-  ABSL_RAW_LOG(
+  TURBO_RAW_LOG(
       FATAL,
       "Failed to find a string larger than the short string optimization");
   return -1;
@@ -382,11 +382,11 @@ constexpr size_t kLargeSize = kInlinedCapacity * 2;
 constexpr size_t kSmallSize = kInlinedCapacity / 2;
 constexpr size_t kBatchSize = 100;
 
-#define ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_FunctionTemplate, T) \
+#define TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_FunctionTemplate, T) \
   BENCHMARK_TEMPLATE(BM_FunctionTemplate, T, kLargeSize);        \
   BENCHMARK_TEMPLATE(BM_FunctionTemplate, T, kSmallSize)
 
-#define ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_FunctionTemplate, T)      \
+#define TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_FunctionTemplate, T)      \
   BENCHMARK_TEMPLATE(BM_FunctionTemplate, T, kLargeSize, kLargeSize); \
   BENCHMARK_TEMPLATE(BM_FunctionTemplate, T, kLargeSize, kSmallSize); \
   BENCHMARK_TEMPLATE(BM_FunctionTemplate, T, kSmallSize, kLargeSize); \
@@ -401,23 +401,23 @@ struct TrivialType {
 
 class NontrivialType {
  public:
-  ABSL_ATTRIBUTE_NOINLINE NontrivialType() : val_() {
+  TURBO_ATTRIBUTE_NOINLINE NontrivialType() : val_() {
     benchmark::DoNotOptimize(*this);
   }
 
-  ABSL_ATTRIBUTE_NOINLINE NontrivialType(const NontrivialType& other)
+  TURBO_ATTRIBUTE_NOINLINE NontrivialType(const NontrivialType& other)
       : val_(other.val_) {
     benchmark::DoNotOptimize(*this);
   }
 
-  ABSL_ATTRIBUTE_NOINLINE NontrivialType& operator=(
+  TURBO_ATTRIBUTE_NOINLINE NontrivialType& operator=(
       const NontrivialType& other) {
     val_ = other.val_;
     benchmark::DoNotOptimize(*this);
     return *this;
   }
 
-  ABSL_ATTRIBUTE_NOINLINE ~NontrivialType() noexcept {
+  TURBO_ATTRIBUTE_NOINLINE ~NontrivialType() noexcept {
     benchmark::DoNotOptimize(*this);
   }
 
@@ -459,8 +459,8 @@ void BM_ConstructFromSize(benchmark::State& state) {
         ::new (ptr) VecT(size);
       });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSize, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSize, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSize, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSize, NontrivialType);
 
 template <typename T, size_t ToSize>
 void BM_ConstructFromSizeRef(benchmark::State& state) {
@@ -477,8 +477,8 @@ void BM_ConstructFromSizeRef(benchmark::State& state) {
         ::new (ptr) VecT(size, ref);
       });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSizeRef, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSizeRef, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSizeRef, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromSizeRef, NontrivialType);
 
 template <typename T, size_t ToSize>
 void BM_ConstructFromRange(benchmark::State& state) {
@@ -493,8 +493,8 @@ void BM_ConstructFromRange(benchmark::State& state) {
         ::new (ptr) VecT(arr.begin(), arr.end());
       });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromRange, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromRange, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromRange, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromRange, NontrivialType);
 
 template <typename T, size_t ToSize>
 void BM_ConstructFromCopy(benchmark::State& state) {
@@ -510,8 +510,8 @@ void BM_ConstructFromCopy(benchmark::State& state) {
         ::new (ptr) VecT(other_vec);
       });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromCopy, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromCopy, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromCopy, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromCopy, NontrivialType);
 
 template <typename T, size_t ToSize>
 void BM_ConstructFromMove(benchmark::State& state) {
@@ -531,8 +531,8 @@ void BM_ConstructFromMove(benchmark::State& state) {
         ::new (ptr) VecT(std::move(vector_batch[i]));
       });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromMove, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromMove, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromMove, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_ConstructFromMove, NontrivialType);
 
 // Measure cost of copy-constructor+destructor.
 void BM_CopyTrivial(benchmark::State& state) {
@@ -570,8 +570,8 @@ void BM_AssignSizeRef(benchmark::State& state) {
         vec->assign(size, ref);
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignSizeRef, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignSizeRef, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignSizeRef, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignSizeRef, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_AssignRange(benchmark::State& state) {
@@ -585,8 +585,8 @@ void BM_AssignRange(benchmark::State& state) {
         vec->assign(arr.begin(), arr.end());
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignRange, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignRange, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignRange, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignRange, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_AssignFromCopy(benchmark::State& state) {
@@ -600,8 +600,8 @@ void BM_AssignFromCopy(benchmark::State& state) {
         *vec = other_vec;
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromCopy, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromCopy, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromCopy, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromCopy, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_AssignFromMove(benchmark::State& state) {
@@ -621,8 +621,8 @@ void BM_AssignFromMove(benchmark::State& state) {
         *vec = std::move(vector_batch[i]);
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromMove, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromMove, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromMove, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_AssignFromMove, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_ResizeSize(benchmark::State& state) {
@@ -636,8 +636,8 @@ void BM_ResizeSize(benchmark::State& state) {
       /* test_vec = */
       [](InlVec<T>* vec, size_t) { vec->resize(ToSize); });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSize, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSize, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSize, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSize, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_ResizeSizeRef(benchmark::State& state) {
@@ -655,8 +655,8 @@ void BM_ResizeSizeRef(benchmark::State& state) {
         vec->resize(ToSize, t);
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSizeRef, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSizeRef, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSizeRef, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_ResizeSizeRef, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_InsertSizeRef(benchmark::State& state) {
@@ -675,8 +675,8 @@ void BM_InsertSizeRef(benchmark::State& state) {
         vec->insert(pos, t);
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertSizeRef, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertSizeRef, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertSizeRef, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertSizeRef, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_InsertRange(benchmark::State& state) {
@@ -695,8 +695,8 @@ void BM_InsertRange(benchmark::State& state) {
         vec->insert(pos, other_vec.begin(), other_vec.end());
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertRange, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertRange, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertRange, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_InsertRange, NontrivialType);
 
 template <typename T, size_t FromSize>
 void BM_EmplaceBack(benchmark::State& state) {
@@ -710,8 +710,8 @@ void BM_EmplaceBack(benchmark::State& state) {
       /* test_vec = */
       [](InlVec<T>* vec, size_t) { vec->emplace_back(); });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_EmplaceBack, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_EmplaceBack, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_EmplaceBack, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_EmplaceBack, NontrivialType);
 
 template <typename T, size_t FromSize>
 void BM_PopBack(benchmark::State& state) {
@@ -725,8 +725,8 @@ void BM_PopBack(benchmark::State& state) {
       /* test_vec = */
       [](InlVec<T>* vec, size_t) { vec->pop_back(); });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_PopBack, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_PopBack, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_PopBack, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_PopBack, NontrivialType);
 
 template <typename T, size_t FromSize>
 void BM_EraseOne(benchmark::State& state) {
@@ -743,8 +743,8 @@ void BM_EraseOne(benchmark::State& state) {
         vec->erase(pos);
       });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseOne, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseOne, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseOne, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseOne, NontrivialType);
 
 template <typename T, size_t FromSize>
 void BM_EraseRange(benchmark::State& state) {
@@ -761,8 +761,8 @@ void BM_EraseRange(benchmark::State& state) {
         vec->erase(pos, pos + 1);
       });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseRange, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseRange, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseRange, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_EraseRange, NontrivialType);
 
 template <typename T, size_t FromSize>
 void BM_Clear(benchmark::State& state) {
@@ -771,8 +771,8 @@ void BM_Clear(benchmark::State& state) {
       /* prepare_vec = */ [](InlVec<T>* vec, size_t) { vec->resize(FromSize); },
       /* test_vec = */ [](InlVec<T>* vec, size_t) { vec->clear(); });
 }
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_Clear, TrivialType);
-ABSL_INTERNAL_BENCHMARK_ONE_SIZE(BM_Clear, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_Clear, TrivialType);
+TURBO_INTERNAL_BENCHMARK_ONE_SIZE(BM_Clear, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToCapacity>
 void BM_Reserve(benchmark::State& state) {
@@ -786,8 +786,8 @@ void BM_Reserve(benchmark::State& state) {
       /* test_vec = */
       [](InlVec<T>* vec, size_t) { vec->reserve(ToCapacity); });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_Reserve, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_Reserve, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_Reserve, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_Reserve, NontrivialType);
 
 template <typename T, size_t FromCapacity, size_t ToCapacity>
 void BM_ShrinkToFit(benchmark::State& state) {
@@ -801,8 +801,8 @@ void BM_ShrinkToFit(benchmark::State& state) {
       },
       /* test_vec = */ [](InlVec<T>* vec, size_t) { vec->shrink_to_fit(); });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_ShrinkToFit, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_ShrinkToFit, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_ShrinkToFit, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_ShrinkToFit, NontrivialType);
 
 template <typename T, size_t FromSize, size_t ToSize>
 void BM_Swap(benchmark::State& state) {
@@ -823,7 +823,7 @@ void BM_Swap(benchmark::State& state) {
         swap(*vec, vector_batch[i]);
       });
 }
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_Swap, TrivialType);
-ABSL_INTERNAL_BENCHMARK_TWO_SIZE(BM_Swap, NontrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_Swap, TrivialType);
+TURBO_INTERNAL_BENCHMARK_TWO_SIZE(BM_Swap, NontrivialType);
 
 }  // namespace

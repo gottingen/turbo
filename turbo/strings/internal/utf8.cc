@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #include "turbo/strings/internal/utf8.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 size_t EncodeUTF8Char(char *buffer, char32_t utf8_char) {
@@ -49,5 +49,5 @@ size_t EncodeUTF8Char(char *buffer, char32_t utf8_char) {
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

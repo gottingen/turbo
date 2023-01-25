@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_
-#define ABSL_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_
+#define TURBO_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_
 
 #include "turbo/base/config.h"
 #include "turbo/base/optimization.h"
@@ -23,19 +23,19 @@
 #include "turbo/strings/internal/cordz_update_tracker.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // CordzUpdateScope scopes an update to the provided CordzInfo.
 // The class invokes `info->Lock(method)` and `info->Unlock()` to guard
 // cordrep updates. This class does nothing if `info` is null.
 // See also the 'Lock`, `Unlock` and `SetCordRep` methods in `CordzInfo`.
-class ABSL_SCOPED_LOCKABLE CordzUpdateScope {
+class TURBO_SCOPED_LOCKABLE CordzUpdateScope {
  public:
   CordzUpdateScope(CordzInfo* info, CordzUpdateTracker::MethodIdentifier method)
-      ABSL_EXCLUSIVE_LOCK_FUNCTION(info)
+      TURBO_EXCLUSIVE_LOCK_FUNCTION(info)
       : info_(info) {
-    if (ABSL_PREDICT_FALSE(info_)) {
+    if (TURBO_PREDICT_FALSE(info_)) {
       info->Lock(method);
     }
   }
@@ -46,14 +46,14 @@ class ABSL_SCOPED_LOCKABLE CordzUpdateScope {
   CordzUpdateScope& operator=(CordzUpdateScope&& rhs) = delete;
   CordzUpdateScope& operator=(const CordzUpdateScope&) = delete;
 
-  ~CordzUpdateScope() ABSL_UNLOCK_FUNCTION() {
-    if (ABSL_PREDICT_FALSE(info_)) {
+  ~CordzUpdateScope() TURBO_UNLOCK_FUNCTION() {
+    if (TURBO_PREDICT_FALSE(info_)) {
       info_->Unlock();
     }
   }
 
   void SetCordRep(CordRep* rep) const {
-    if (ABSL_PREDICT_FALSE(info_)) {
+    if (TURBO_PREDICT_FALSE(info_)) {
       info_->SetCordRep(rep);
     }
   }
@@ -65,7 +65,7 @@ class ABSL_SCOPED_LOCKABLE CordzUpdateScope {
 };
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_

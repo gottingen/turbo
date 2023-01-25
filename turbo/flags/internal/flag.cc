@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,12 +41,12 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 // The help message indicating that the commandline flag has been
 // 'stripped'. It will not show up when doing "-help" and its
-// variants. The flag is stripped if ABSL_FLAGS_STRIP_HELP is set to 1
+// variants. The flag is stripped if TURBO_FLAGS_STRIP_HELP is set to 1
 // before including turbo/flags/flag.h
 const char kStrippedFlagHelp[] = "\001\002\003\004 (unknown) \004\003\002\001";
 
@@ -56,7 +56,7 @@ namespace {
 bool ShouldValidateFlagValue(FlagFastTypeId flag_type_id) {
 #define DONT_VALIDATE(T, _) \
   if (flag_type_id == base_internal::FastTypeId<T>()) return false;
-  ABSL_FLAGS_INTERNAL_SUPPORTED_TYPES(DONT_VALIDATE)
+  TURBO_FLAGS_INTERNAL_SUPPORTED_TYPES(DONT_VALIDATE)
 #undef DONT_VALIDATE
 
   return true;
@@ -110,7 +110,7 @@ class FlagState : public flags_internal::FlagStateInterface {
   void Restore() const override {
     if (!flag_impl_.RestoreState(*this)) return;
 
-    ABSL_INTERNAL_LOG(INFO,
+    TURBO_INTERNAL_LOG(INFO,
                       turbo::StrCat("Restore saved value of ", flag_impl_.Name(),
                                    " to: ", flag_impl_.CurrentValue()));
   }
@@ -162,7 +162,7 @@ void FlagImpl::Init() {
                     sizeof(initialized));
       }
       // Type can contain valid uninitialized bits, e.g. padding.
-      ABSL_ANNOTATE_MEMORY_IS_INITIALIZED(buf.data(), buf.size());
+      TURBO_ANNOTATE_MEMORY_IS_INITIALIZED(buf.data(), buf.size());
       OneWordValue().store(turbo::bit_cast<int64_t>(buf),
                            std::memory_order_release);
       break;
@@ -200,7 +200,7 @@ void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
   // visibile at the call site. `lhs_type_id` is the fast type id
   // corresponding to the type specified in flag definition. They must match
   //  for this operation to be well-defined.
-  if (ABSL_PREDICT_TRUE(lhs_type_id == rhs_type_id)) return;
+  if (TURBO_PREDICT_TRUE(lhs_type_id == rhs_type_id)) return;
 
   const std::type_info* lhs_runtime_type_id =
       flags_internal::RuntimeTypeId(op_);
@@ -208,11 +208,11 @@ void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
 
   if (lhs_runtime_type_id == rhs_runtime_type_id) return;
 
-#ifdef ABSL_INTERNAL_HAS_RTTI
+#ifdef TURBO_INTERNAL_HAS_RTTI
   if (*lhs_runtime_type_id == *rhs_runtime_type_id) return;
 #endif
 
-  ABSL_INTERNAL_LOG(
+  TURBO_INTERNAL_LOG(
       FATAL, turbo::StrCat("Flag '", Name(),
                           "' is defined as one type and declared as another"));
 }
@@ -488,7 +488,7 @@ bool FlagImpl::ReadOneBool() const {
 void FlagImpl::ReadSequenceLockedData(void* dst) const {
   size_t size = Sizeof(op_);
   // Attempt to read using the sequence lock.
-  if (ABSL_PREDICT_TRUE(seq_lock_.TryRead(dst, AtomicBufferValue(), size))) {
+  if (TURBO_PREDICT_TRUE(seq_lock_.TryRead(dst, AtomicBufferValue(), size))) {
     return;
   }
   // We failed due to contention. Acquire the lock to prevent contention
@@ -508,7 +508,7 @@ void FlagImpl::Write(const void* src) {
     std::string ignored_error;
     std::string src_as_str = flags_internal::Unparse(op_, src);
     if (!flags_internal::Parse(op_, src_as_str, obj.get(), &ignored_error)) {
-      ABSL_INTERNAL_LOG(ERROR, turbo::StrCat("Attempt to set flag '", Name(),
+      TURBO_INTERNAL_LOG(ERROR, turbo::StrCat("Attempt to set flag '", Name(),
                                             "' to invalid value ", src_as_str));
     }
   }
@@ -591,7 +591,7 @@ void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
   auto dst = MakeInitValue();
   std::string error;
   if (!flags_internal::Parse(op_, v, dst.get(), &error)) {
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         FATAL,
         turbo::StrCat("Flag ", Name(), " (from ", Filename(),
                      "): string form of default value '", v,
@@ -611,5 +611,5 @@ bool FlagImpl::ValidateInputValue(turbo::string_view value) const {
 }
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

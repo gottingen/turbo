@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // All functions here are thread-hostile due to file caching unless
 // commented otherwise.
 
-#ifndef ABSL_BASE_INTERNAL_SYSINFO_H_
-#define ABSL_BASE_INTERNAL_SYSINFO_H_
+#ifndef TURBO_BASE_INTERNAL_SYSINFO_H_
+#define TURBO_BASE_INTERNAL_SYSINFO_H_
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -34,7 +34,7 @@
 #include "turbo/base/port.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // Nominal core processor cycles per second of each processor.   This is _not_
@@ -68,7 +68,7 @@ pid_t GetTID();
 pid_t GetCachedTID();
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_SYSINFO_H_
+#endif  // TURBO_BASE_INTERNAL_SYSINFO_H_

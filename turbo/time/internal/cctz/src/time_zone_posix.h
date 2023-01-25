@@ -49,8 +49,8 @@
 //     }
 //   }
 
-#ifndef ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_
-#define ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_
+#ifndef TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_
+#define TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_
 
 #include <cstdint>
 #include <string>
@@ -58,7 +58,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -126,7 +126,7 @@ bool ParsePosixSpec(const std::string& spec, PosixTimeZone* res);
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_
+#endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_

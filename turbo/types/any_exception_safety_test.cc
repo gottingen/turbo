@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 // This test is a no-op when turbo::any is an alias for std::any and when
 // exceptions are not enabled.
-#if !defined(ABSL_USES_STD_ANY) && defined(ABSL_HAVE_EXCEPTIONS)
+#if !defined(TURBO_USES_STD_ANY) && defined(TURBO_HAVE_EXCEPTIONS)
 
 #include <typeinfo>
 #include <vector>
@@ -170,4 +170,4 @@ TEST(AnyExceptionSafety, Emplace) {
 
 }  // namespace
 
-#endif  // #if !defined(ABSL_USES_STD_ANY) && defined(ABSL_HAVE_EXCEPTIONS)
+#endif  // #if !defined(TURBO_USES_STD_ANY) && defined(TURBO_HAVE_EXCEPTIONS)

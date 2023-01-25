@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_FLAGS_INTERNAL_PROGRAM_NAME_H_
-#define ABSL_FLAGS_INTERNAL_PROGRAM_NAME_H_
+#ifndef TURBO_FLAGS_INTERNAL_PROGRAM_NAME_H_
+#define TURBO_FLAGS_INTERNAL_PROGRAM_NAME_H_
 
 #include <string>
 
@@ -25,7 +25,7 @@
 // Program name
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 // Returns program invocation name or "UNKNOWN" if `SetProgramInvocationName()`
@@ -44,7 +44,7 @@ std::string ShortProgramInvocationName();
 void SetProgramInvocationName(turbo::string_view prog_name_str);
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_INTERNAL_PROGRAM_NAME_H_
+#endif  // TURBO_FLAGS_INTERNAL_PROGRAM_NAME_H_

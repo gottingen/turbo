@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORDZ_STATISTICS_H_
-#define ABSL_STRINGS_INTERNAL_CORDZ_STATISTICS_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORDZ_STATISTICS_H_
+#define TURBO_STRINGS_INTERNAL_CORDZ_STATISTICS_H_
 
 #include <cstdint>
 
@@ -21,7 +21,7 @@
 #include "turbo/strings/internal/cordz_update_tracker.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // CordzStatistics captures some meta information about a Cord's shape.
@@ -82,7 +82,7 @@ struct CordzStatistics {
 };
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CORDZ_STATISTICS_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORDZ_STATISTICS_H_

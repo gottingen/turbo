@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // The OS-specific header included below must provide two calls:
-// AbslInternalSpinLockDelay() and AbslInternalSpinLockWake().
+// TurboInternalSpinLockDelay() and TurboInternalSpinLockWake().
 // See spinlock_wait.h for the specs.
 
 #include <atomic>
@@ -32,7 +32,7 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // See spinlock_wait.h for spec.
@@ -77,5 +77,5 @@ int SpinLockSuggestedDelayNS(int loop) {
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

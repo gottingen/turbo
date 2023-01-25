@@ -25,7 +25,7 @@
 #include "time_zone_fixed.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -109,5 +109,5 @@ const time_zone::Impl* time_zone::Impl::UTCImpl() {
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

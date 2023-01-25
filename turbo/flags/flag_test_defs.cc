@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include <string>
 #include "turbo/flags/flag.h"
 
-ABSL_FLAG(int, mistyped_int_flag, 0, "");
-ABSL_FLAG(std::string, mistyped_string_flag, "", "");
-ABSL_FLAG(bool, flag_on_separate_file, false, "");
-ABSL_RETIRED_FLAG(bool, retired_flag_on_separate_file, false, "");
+TURBO_FLAG(int, mistyped_int_flag, 0, "");
+TURBO_FLAG(std::string, mistyped_string_flag, "", "");
+TURBO_FLAG(bool, flag_on_separate_file, false, "");
+TURBO_RETIRED_FLAG(bool, retired_flag_on_separate_file, false, "");

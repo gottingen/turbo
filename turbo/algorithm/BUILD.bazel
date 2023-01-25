@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -28,8 +28,8 @@ licenses(["notice"])
 cc_library(
     name = "algorithm",
     hdrs = ["algorithm.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
     ],
@@ -39,8 +39,8 @@ cc_test(
     name = "algorithm_test",
     size = "small",
     srcs = ["algorithm_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":algorithm",
         "//turbo/base:config",
@@ -52,8 +52,8 @@ cc_binary(
     name = "algorithm_benchmark",
     testonly = 1,
     srcs = ["equal_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     deps = [
         ":algorithm",
@@ -67,8 +67,8 @@ cc_library(
     hdrs = [
         "container.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":algorithm",
         "//turbo/base:core_headers",
@@ -79,8 +79,8 @@ cc_library(
 cc_test(
     name = "container_test",
     srcs = ["container_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":container",
         "//turbo/base",

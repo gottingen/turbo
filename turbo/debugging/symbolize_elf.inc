@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,13 +82,13 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Value of argv[0]. Used by MaybeInitializeObjFile().
 static char *argv0_value = nullptr;
 
 void InitializeSymbolizer(const char *argv0) {
-#ifdef ABSL_HAVE_VDSO_SUPPORT
+#ifdef TURBO_HAVE_VDSO_SUPPORT
   // We need to make sure VDSOSupport::Init() is called before any setuid or
   // chroot calls, so InitializeSymbolizer() should be called very early in the
   // life of a program.
@@ -161,14 +161,14 @@ struct FileMappingHint {
 // Moreover, we are using only TryLock(), if the decorator list
 // is being modified (is busy), we skip all decorators, and possibly
 // loose some info. Sorry, that's the best we could do.
-ABSL_CONST_INIT turbo::base_internal::SpinLock g_decorators_mu(
+TURBO_CONST_INIT turbo::base_internal::SpinLock g_decorators_mu(
     turbo::kConstInit, turbo::base_internal::SCHEDULE_KERNEL_ONLY);
 
 const int kMaxFileMappingHints = 8;
 int g_num_file_mapping_hints;
 FileMappingHint g_file_mapping_hints[kMaxFileMappingHints];
 // Protects g_file_mapping_hints.
-ABSL_CONST_INIT turbo::base_internal::SpinLock g_file_mapping_mu(
+TURBO_CONST_INIT turbo::base_internal::SpinLock g_file_mapping_mu(
     turbo::kConstInit, turbo::base_internal::SCHEDULE_KERNEL_ONLY);
 
 // Async-signal-safe function to zero a buffer.
@@ -304,12 +304,12 @@ class Symbolizer {
     size_t len = strlen(s);
     char *dst = static_cast<char *>(
         base_internal::LowLevelAlloc::AllocWithArena(len + 1, SigSafeArena()));
-    ABSL_RAW_CHECK(dst != nullptr, "out of memory");
+    TURBO_RAW_CHECK(dst != nullptr, "out of memory");
     memcpy(dst, s, len + 1);
     return dst;
   }
   ObjFile *FindObjFile(const void *const start,
-                       size_t size) ABSL_ATTRIBUTE_NOINLINE;
+                       size_t size) TURBO_ATTRIBUTE_NOINLINE;
   static bool RegisterObjFile(const char *filename,
                               const void *const start_addr,
                               const void *const end_addr, uint64_t offset,
@@ -390,7 +390,7 @@ static void FreeSymbolizer(Symbolizer *s) {
 
 Symbolizer::Symbolizer() : ok_(true), addr_map_read_(false) {
   for (SymbolCacheLine &symbol_cache_line : symbol_cache_) {
-    for (size_t j = 0; j < ABSL_ARRAYSIZE(symbol_cache_line.name); ++j) {
+    for (size_t j = 0; j < TURBO_ARRAYSIZE(symbol_cache_line.name); ++j) {
       symbol_cache_line.pc[j] = nullptr;
       symbol_cache_line.name[j] = nullptr;
       symbol_cache_line.age[j] = 0;
@@ -424,7 +424,7 @@ static ssize_t ReadPersistent(int fd, void *buf, size_t count) {
     ssize_t len;
     NO_INTR(len = read(fd, buf0 + num_bytes, count - num_bytes));
     if (len < 0) {  // There was an error other than EINTR.
-      ABSL_RAW_LOG(WARNING, "read failed: errno=%d", errno);
+      TURBO_RAW_LOG(WARNING, "read failed: errno=%d", errno);
       return -1;
     }
     if (len == 0) {  // Reached EOF.
@@ -443,7 +443,7 @@ static ssize_t ReadFromOffset(const int fd, void *buf, const size_t count,
                               const off_t offset) {
   off_t off = lseek(fd, offset, SEEK_SET);
   if (off == (off_t)-1) {
-    ABSL_RAW_LOG(WARNING, "lseek(%d, %jd, SEEK_SET) failed: errno=%d", fd,
+    TURBO_RAW_LOG(WARNING, "lseek(%d, %jd, SEEK_SET) failed: errno=%d", fd,
                  static_cast<intmax_t>(offset), errno);
     return -1;
   }
@@ -477,7 +477,7 @@ static int FileGetElfType(const int fd) {
 // and return true.  Otherwise, return false.
 // To keep stack consumption low, we would like this function to not get
 // inlined.
-static ABSL_ATTRIBUTE_NOINLINE bool GetSectionHeaderByType(
+static TURBO_ATTRIBUTE_NOINLINE bool GetSectionHeaderByType(
     const int fd, ElfW(Half) sh_num, const off_t sh_offset, ElfW(Word) type,
     ElfW(Shdr) * out, char *tmp_buf, size_t tmp_buf_size) {
   ElfW(Shdr) *buf = reinterpret_cast<ElfW(Shdr) *>(tmp_buf);
@@ -492,14 +492,14 @@ static ABSL_ATTRIBUTE_NOINLINE bool GetSectionHeaderByType(
     const off_t offset = sh_offset + static_cast<off_t>(i * sizeof(buf[0]));
     const ssize_t len = ReadFromOffset(fd, buf, num_bytes_to_read, offset);
     if (len < 0) {
-      ABSL_RAW_LOG(
+      TURBO_RAW_LOG(
           WARNING,
           "Reading %zu bytes from offset %ju returned %zd which is negative.",
           num_bytes_to_read, static_cast<intmax_t>(offset), len);
       return false;
     }
     if (static_cast<size_t>(len) % sizeof(buf[0]) != 0) {
-      ABSL_RAW_LOG(
+      TURBO_RAW_LOG(
           WARNING,
           "Reading %zu bytes from offset %jd returned %zd which is not a "
           "multiple of %zu.",
@@ -571,7 +571,7 @@ bool GetSectionHeaderByName(int fd, const char *name, size_t name_len,
                             ElfW(Shdr) * out) {
   char header_name[kMaxSectionNameLen];
   if (sizeof(header_name) < name_len) {
-    ABSL_RAW_LOG(WARNING,
+    TURBO_RAW_LOG(WARNING,
                  "Section name '%s' is too long (%zu); "
                  "section will not be found (even if present).",
                  name, name_len);
@@ -670,7 +670,7 @@ static const char *ComputeOffset(const char *base, ptrdiff_t offset) {
 // If the symbol is not found, SYMBOL_NOT_FOUND is returned;
 // To keep stack consumption low, we would like this function to not get
 // inlined.
-static ABSL_ATTRIBUTE_NOINLINE FindSymbolResult FindSymbol(
+static TURBO_ATTRIBUTE_NOINLINE FindSymbolResult FindSymbol(
     const void *const pc, const int fd, char *out, size_t out_size,
     ptrdiff_t relocation, const ElfW(Shdr) * strtab, const ElfW(Shdr) * symtab,
     const ElfW(Shdr) * opd, char *tmp_buf, size_t tmp_buf_size) {
@@ -763,12 +763,12 @@ static ABSL_ATTRIBUTE_NOINLINE FindSymbolResult FindSymbol(
     const ssize_t n_read = ReadFromOffset(fd, out, out_size, off);
     if (n_read <= 0) {
       // This should never happen.
-      ABSL_RAW_LOG(WARNING,
+      TURBO_RAW_LOG(WARNING,
                    "Unable to read from fd %d at offset %lld: n_read = %zd", fd,
                    static_cast<long long>(off), n_read);
       return SYMBOL_NOT_FOUND;
     }
-    ABSL_RAW_CHECK(static_cast<size_t>(n_read) <= out_size,
+    TURBO_RAW_CHECK(static_cast<size_t>(n_read) <= out_size,
                    "ReadFromOffset read too much data.");
 
     // strtab->sh_offset points into .strtab-like section that contains
@@ -983,7 +983,7 @@ static bool ShouldUseMapping(const char *const flags) {
 // Read /proc/self/maps and run "callback" for each mmapped file found.  If
 // "callback" returns false, stop scanning and return true. Else continue
 // scanning /proc/self/maps. Return true if no parse error is found.
-static ABSL_ATTRIBUTE_NOINLINE bool ReadAddrMap(
+static TURBO_ATTRIBUTE_NOINLINE bool ReadAddrMap(
     bool (*callback)(const char *filename, const void *const start_addr,
                      const void *const end_addr, uint64_t offset, void *arg),
     void *arg, void *tmp_buf, size_t tmp_buf_size) {
@@ -997,7 +997,7 @@ static ABSL_ATTRIBUTE_NOINLINE bool ReadAddrMap(
   NO_INTR(maps_fd = open(maps_path, O_RDONLY));
   FileDescriptor wrapped_maps_fd(maps_fd);
   if (wrapped_maps_fd.get() < 0) {
-    ABSL_RAW_LOG(WARNING, "%s: errno=%d", maps_path, errno);
+    TURBO_RAW_LOG(WARNING, "%s: errno=%d", maps_path, errno);
     return false;
   }
 
@@ -1024,7 +1024,7 @@ static ABSL_ATTRIBUTE_NOINLINE bool ReadAddrMap(
     // Read start address.
     cursor = GetHex(cursor, eol, &start_address);
     if (cursor == eol || *cursor != '-') {
-      ABSL_RAW_LOG(WARNING, "Corrupt /proc/self/maps line: %s", line);
+      TURBO_RAW_LOG(WARNING, "Corrupt /proc/self/maps line: %s", line);
       return false;
     }
     ++cursor;  // Skip '-'.
@@ -1033,7 +1033,7 @@ static ABSL_ATTRIBUTE_NOINLINE bool ReadAddrMap(
     const void *end_address;
     cursor = GetHex(cursor, eol, &end_address);
     if (cursor == eol || *cursor != ' ') {
-      ABSL_RAW_LOG(WARNING, "Corrupt /proc/self/maps line: %s", line);
+      TURBO_RAW_LOG(WARNING, "Corrupt /proc/self/maps line: %s", line);
       return false;
     }
     ++cursor;  // Skip ' '.
@@ -1045,7 +1045,7 @@ static ABSL_ATTRIBUTE_NOINLINE bool ReadAddrMap(
     }
     // We expect at least four letters for flags (ex. "r-xp").
     if (cursor == eol || cursor < flags_start + 4) {
-      ABSL_RAW_LOG(WARNING, "Corrupt /proc/self/maps: %s", line);
+      TURBO_RAW_LOG(WARNING, "Corrupt /proc/self/maps: %s", line);
       return false;
     }
 
@@ -1150,7 +1150,7 @@ bool Symbolizer::RegisterObjFile(const char *filename,
   if (addr_map_size != 0) {
     ObjFile *old = impl->addr_map_.At(addr_map_size - 1);
     if (old->end_addr > end_addr) {
-      ABSL_RAW_LOG(ERROR,
+      TURBO_RAW_LOG(ERROR,
                    "Unsorted addr map entry: 0x%" PRIxPTR ": %s <-> 0x%" PRIxPTR
                    ": %s",
                    reinterpret_cast<uintptr_t>(end_addr), filename,
@@ -1160,7 +1160,7 @@ bool Symbolizer::RegisterObjFile(const char *filename,
       // The same entry appears twice. This sometimes happens for [vdso].
       if (old->start_addr != start_addr ||
           strcmp(old->filename, filename) != 0) {
-        ABSL_RAW_LOG(ERROR,
+        TURBO_RAW_LOG(ERROR,
                      "Duplicate addr 0x%" PRIxPTR ": %s <-> 0x%" PRIxPTR ": %s",
                      reinterpret_cast<uintptr_t>(end_addr), filename,
                      reinterpret_cast<uintptr_t>(old->end_addr), old->filename);
@@ -1190,7 +1190,7 @@ bool Symbolizer::RegisterObjFile(const char *filename,
 // where the input symbol is demangled in-place.
 // To keep stack consumption low, we would like this function to not
 // get inlined.
-static ABSL_ATTRIBUTE_NOINLINE void DemangleInplace(char *out, size_t out_size,
+static TURBO_ATTRIBUTE_NOINLINE void DemangleInplace(char *out, size_t out_size,
                                                     char *tmp_buf,
                                                     size_t tmp_buf_size) {
   if (Demangle(out, tmp_buf, tmp_buf_size)) {
@@ -1222,7 +1222,7 @@ const char *Symbolizer::FindSymbolInCache(const void *const pc) {
   if (pc == nullptr) return nullptr;
 
   SymbolCacheLine *line = GetCacheLine(pc);
-  for (size_t i = 0; i < ABSL_ARRAYSIZE(line->pc); ++i) {
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(line->pc); ++i) {
     if (line->pc[i] == pc) {
       AgeSymbols(line);
       line->age[i] = 0;
@@ -1240,7 +1240,7 @@ const char *Symbolizer::InsertSymbolInCache(const void *const pc,
   uint32_t max_age = 0;
   size_t oldest_index = 0;
   bool found_oldest_index = false;
-  for (size_t i = 0; i < ABSL_ARRAYSIZE(line->pc); ++i) {
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(line->pc); ++i) {
     if (line->pc[i] == nullptr) {
       AgeSymbols(line);
       line->pc[i] = pc;
@@ -1256,7 +1256,7 @@ const char *Symbolizer::InsertSymbolInCache(const void *const pc,
   }
 
   AgeSymbols(line);
-  ABSL_RAW_CHECK(found_oldest_index, "Corrupt cache");
+  TURBO_RAW_CHECK(found_oldest_index, "Corrupt cache");
   base_internal::LowLevelAlloc::Free(line->name[oldest_index]);
   line->pc[oldest_index] = pc;
   line->name[oldest_index] = CopyString(name);
@@ -1308,19 +1308,19 @@ static bool MaybeInitializeObjFile(ObjFile *obj) {
     }
 
     if (obj->fd < 0) {
-      ABSL_RAW_LOG(WARNING, "%s: open failed: errno=%d", obj->filename, errno);
+      TURBO_RAW_LOG(WARNING, "%s: open failed: errno=%d", obj->filename, errno);
       return false;
     }
     obj->elf_type = FileGetElfType(obj->fd);
     if (obj->elf_type < 0) {
-      ABSL_RAW_LOG(WARNING, "%s: wrong elf type: %d", obj->filename,
+      TURBO_RAW_LOG(WARNING, "%s: wrong elf type: %d", obj->filename,
                    obj->elf_type);
       return false;
     }
 
     if (!ReadFromOffsetExact(obj->fd, &obj->elf_header, sizeof(obj->elf_header),
                              0)) {
-      ABSL_RAW_LOG(WARNING, "%s: failed to read elf header", obj->filename);
+      TURBO_RAW_LOG(WARNING, "%s: failed to read elf header", obj->filename);
       return false;
     }
     const int phnum = obj->elf_header.e_phnum;
@@ -1330,7 +1330,7 @@ static bool MaybeInitializeObjFile(ObjFile *obj) {
     for (int j = 0; j < phnum; j++) {
       ElfW(Phdr) phdr;
       if (!ReadFromOffsetExact(obj->fd, &phdr, sizeof(phdr), phoff)) {
-        ABSL_RAW_LOG(WARNING, "%s: failed to read program header %d",
+        TURBO_RAW_LOG(WARNING, "%s: failed to read program header %d",
                      obj->filename, j);
         return false;
       }
@@ -1343,7 +1343,7 @@ static bool MaybeInitializeObjFile(ObjFile *obj) {
       if (num_executable_load_segments < obj->phdr.size()) {
         memcpy(&obj->phdr[num_executable_load_segments++], &phdr, sizeof(phdr));
       } else {
-        ABSL_RAW_LOG(
+        TURBO_RAW_LOG(
             WARNING, "%s: too many executable LOAD segments: %zu >= %zu",
             obj->filename, num_executable_load_segments, obj->phdr.size());
         break;
@@ -1351,7 +1351,7 @@ static bool MaybeInitializeObjFile(ObjFile *obj) {
     }
     if (num_executable_load_segments == 0) {
       // This object has no "r-x" LOAD segments. That's unexpected.
-      ABSL_RAW_LOG(WARNING, "%s: no executable LOAD segments", obj->filename);
+      TURBO_RAW_LOG(WARNING, "%s: no executable LOAD segments", obj->filename);
       return false;
     }
   }
@@ -1387,7 +1387,7 @@ const char *Symbolizer::GetUncachedSymbol(const void *pc) {
           if (p.p_type != PT_LOAD) {
             // We only expect PT_LOADs. This must be PT_NULL that we didn't
             // write over (i.e. we exhausted all interesting PT_LOADs).
-            ABSL_RAW_CHECK(p.p_type == PT_NULL, "unexpected p_type");
+            TURBO_RAW_CHECK(p.p_type == PT_NULL, "unexpected p_type");
             break;
           }
           if (pc < reinterpret_cast<void *>(start_addr + p.p_memsz)) {
@@ -1397,7 +1397,7 @@ const char *Symbolizer::GetUncachedSymbol(const void *pc) {
         }
         if (phdr == nullptr) {
           // That's unexpected. Hope for the best.
-          ABSL_RAW_LOG(
+          TURBO_RAW_LOG(
               WARNING,
               "%s: unable to find LOAD segment for pc: %p, start_addr: %zx",
               obj->filename, pc, start_addr);
@@ -1419,14 +1419,14 @@ const char *Symbolizer::GetUncachedSymbol(const void *pc) {
       }
     }
   } else {
-#if ABSL_HAVE_VDSO_SUPPORT
+#if TURBO_HAVE_VDSO_SUPPORT
     VDSOSupport vdso;
     if (vdso.IsPresent()) {
       VDSOSupport::SymbolInfo symbol_info;
       if (vdso.LookupSymbolByAddress(pc, &symbol_info)) {
         // All VDSO symbols are known to be short.
         size_t len = strlen(symbol_info.name);
-        ABSL_RAW_CHECK(len + 1 < sizeof(symbol_buf_),
+        TURBO_RAW_CHECK(len + 1 < sizeof(symbol_buf_),
                        "VDSO symbol unexpectedly long");
         memcpy(symbol_buf_, symbol_info.name, len + 1);
       }
@@ -1555,7 +1555,7 @@ bool RegisterFileMappingHint(const void *start, const void *end, uint64_t offset
     size_t len = strlen(filename);
     char *dst = static_cast<char *>(
         base_internal::LowLevelAlloc::AllocWithArena(len + 1, SigSafeArena()));
-    ABSL_RAW_CHECK(dst != nullptr, "out of memory");
+    TURBO_RAW_CHECK(dst != nullptr, "out of memory");
     memcpy(dst, filename, len + 1);
 
     auto &hint = g_file_mapping_hints[g_num_file_mapping_hints++];
@@ -1602,7 +1602,7 @@ bool GetFileMappingHint(const void **start, const void **end, uint64_t *offset,
 
 bool Symbolize(const void *pc, char *out, int out_size) {
   // Symbolization is very slow under tsan.
-  ABSL_ANNOTATE_IGNORE_READS_AND_WRITES_BEGIN();
+  TURBO_ANNOTATE_IGNORE_READS_AND_WRITES_BEGIN();
   SAFE_ASSERT(out_size >= 0);
   debugging_internal::Symbolizer *s = debugging_internal::AllocateSymbolizer();
   const char *name = s->GetSymbol(pc);
@@ -1622,14 +1622,14 @@ bool Symbolize(const void *pc, char *out, int out_size) {
     }
   }
   debugging_internal::FreeSymbolizer(s);
-  ABSL_ANNOTATE_IGNORE_READS_AND_WRITES_END();
+  TURBO_ANNOTATE_IGNORE_READS_AND_WRITES_END();
   return ok;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-extern "C" bool AbslInternalGetFileMappingHint(const void **start,
+extern "C" bool TurboInternalGetFileMappingHint(const void **start,
                                                const void **end, uint64_t *offset,
                                                const char **filename) {
   return turbo::debugging_internal::GetFileMappingHint(start, end, offset,

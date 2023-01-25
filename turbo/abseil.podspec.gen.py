@@ -22,10 +22,10 @@ SPEC_TEMPLATE = """
 Pod::Spec.new do |s|
   s.name     = 'abseil'
   s.version  = '${version}'
-  s.summary  = 'Abseil Common Libraries (C++) from Google'
+  s.summary  = 'Turbo Common Libraries (C++) from Google'
   s.homepage = 'https://abseil.io'
   s.license  = 'Apache License, Version 2.0'
-  s.authors  = { 'Abseil Team' => 'abseil-io@googlegroups.com' }
+  s.authors  = { 'Turbo Team' => 'abseil-io@googlegroups.com' }
   s.source = {
     :git => 'https://github.com/abseil/abseil-cpp.git',
     :tag => '${tag}',

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 // File: log/internal/structured.h
 // -----------------------------------------------------------------------------
 
-#ifndef ABSL_LOG_INTERNAL_STRUCTURED_H_
-#define ABSL_LOG_INTERNAL_STRUCTURED_H_
+#ifndef TURBO_LOG_INTERNAL_STRUCTURED_H_
+#define TURBO_LOG_INTERNAL_STRUCTURED_H_
 
 #include <ostream>
 
@@ -26,10 +26,10 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
-class ABSL_MUST_USE_RESULT AsLiteralImpl final {
+class TURBO_MUST_USE_RESULT AsLiteralImpl final {
  public:
   explicit AsLiteralImpl(turbo::string_view str) : str_(str) {}
   AsLiteralImpl(const AsLiteralImpl&) = default;
@@ -52,7 +52,7 @@ class ABSL_MUST_USE_RESULT AsLiteralImpl final {
 };
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_STRUCTURED_H_
+#endif  // TURBO_LOG_INTERNAL_STRUCTURED_H_

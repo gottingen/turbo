@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 // -----------------------------------------------------------------------------
 //
 
-#ifndef ABSL_LOG_FLAGS_H_
-#define ABSL_LOG_FLAGS_H_
+#ifndef TURBO_LOG_FLAGS_H_
+#define TURBO_LOG_FLAGS_H_
 
-// The Abseil Logging library supports the following command line flags to
+// The Turbo Logging library supports the following command line flags to
 // configure logging behavior at runtime:
 //
 // --stderrthreshold=<value>
@@ -40,4 +40,4 @@
 // To configure the Log library programmatically, use the interfaces defined in
 // turbo/log/globals.h.
 
-#endif  // ABSL_LOG_FLAGS_H_
+#endif  // TURBO_LOG_FLAGS_H_

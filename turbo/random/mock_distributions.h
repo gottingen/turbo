@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 // This file contains mock distribution functions for use alongside an
 // `turbo::MockingBitGen` object within the Googletest testing framework. Such
 // mocks are useful to provide deterministic values as return values within
-// (otherwise random) Abseil distribution functions.
+// (otherwise random) Turbo distribution functions.
 //
 // The return type of each function is a mock expectation object which
 // is used to set the match result.
@@ -43,8 +43,8 @@
 //   EXPECT_EQ(turbo::Uniform<int>(gen, 1, 1000), 20);
 //   EXPECT_EQ(turbo::Uniform<int>(gen, 1, 1000), 40);
 
-#ifndef ABSL_RANDOM_MOCK_DISTRIBUTIONS_H_
-#define ABSL_RANDOM_MOCK_DISTRIBUTIONS_H_
+#ifndef TURBO_RANDOM_MOCK_DISTRIBUTIONS_H_
+#define TURBO_RANDOM_MOCK_DISTRIBUTIONS_H_
 
 #include <limits>
 #include <type_traits>
@@ -58,7 +58,7 @@
 #include "turbo/random/mocking_bit_gen.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // turbo::MockUniform
@@ -260,7 +260,7 @@ using MockZipf =
                                      IntType(MockingBitGen&, IntType, double,
                                              double)>;
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_MOCK_DISTRIBUTIONS_H_
+#endif  // TURBO_RANDOM_MOCK_DISTRIBUTIONS_H_

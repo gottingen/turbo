@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include "turbo/memory/memory.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 namespace {
 
@@ -129,10 +129,10 @@ TEST(Demangle, AbiTags) {
 // Tests that verify that Demangle footprint is within some limit.
 // They are not to be run under sanitizers as the sanitizers increase
 // stack consumption by about 4x.
-#if defined(ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION) && \
-    !defined(ABSL_HAVE_ADDRESS_SANITIZER) &&                   \
-    !defined(ABSL_HAVE_MEMORY_SANITIZER) &&                    \
-    !defined(ABSL_HAVE_THREAD_SANITIZER)
+#if defined(TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION) && \
+    !defined(TURBO_HAVE_ADDRESS_SANITIZER) &&                   \
+    !defined(TURBO_HAVE_MEMORY_SANITIZER) &&                    \
+    !defined(TURBO_HAVE_THREAD_SANITIZER)
 
 static const char *g_mangled;
 static char g_demangle_buffer[4096];
@@ -151,7 +151,7 @@ static const char *DemangleStackConsumption(const char *mangled,
                                             int *stack_consumed) {
   g_mangled = mangled;
   *stack_consumed = GetSignalHandlerStackConsumption(DemangleSignalHandler);
-  ABSL_RAW_LOG(INFO, "Stack consumption of Demangle: %d", *stack_consumed);
+  TURBO_RAW_LOG(INFO, "Stack consumption of Demangle: %d", *stack_consumed);
   return g_demangle_result;
 }
 
@@ -239,5 +239,5 @@ TEST(DemangleRegression, DeeplyNestedArrayType) {
 
 }  // namespace
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

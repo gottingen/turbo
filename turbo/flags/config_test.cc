@@ -1,4 +1,4 @@
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,41 +20,41 @@
 
 #include "gtest/gtest.h"
 
-#ifndef ABSL_FLAGS_STRIP_NAMES
-#error ABSL_FLAGS_STRIP_NAMES is not defined
+#ifndef TURBO_FLAGS_STRIP_NAMES
+#error TURBO_FLAGS_STRIP_NAMES is not defined
 #endif
 
-#ifndef ABSL_FLAGS_STRIP_HELP
-#error ABSL_FLAGS_STRIP_HELP is not defined
+#ifndef TURBO_FLAGS_STRIP_HELP
+#error TURBO_FLAGS_STRIP_HELP is not defined
 #endif
 
 namespace {
 
-// Test that ABSL_FLAGS_STRIP_NAMES and ABSL_FLAGS_STRIP_HELP are configured how
+// Test that TURBO_FLAGS_STRIP_NAMES and TURBO_FLAGS_STRIP_HELP are configured how
 // we expect them to be configured by default. If you override this
 // configuration, this test will fail, but the code should still be safe to use.
 TEST(FlagsConfigTest, Test) {
 #if defined(__ANDROID__)
-  EXPECT_EQ(ABSL_FLAGS_STRIP_NAMES, 1);
-  EXPECT_EQ(ABSL_FLAGS_STRIP_HELP, 1);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_NAMES, 1);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_HELP, 1);
 #elif defined(__myriad2__)
-  EXPECT_EQ(ABSL_FLAGS_STRIP_NAMES, 0);
-  EXPECT_EQ(ABSL_FLAGS_STRIP_HELP, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_NAMES, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_HELP, 0);
 #elif defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
-  EXPECT_EQ(ABSL_FLAGS_STRIP_NAMES, 1);
-  EXPECT_EQ(ABSL_FLAGS_STRIP_HELP, 1);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_NAMES, 1);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_HELP, 1);
 #elif defined(TARGET_OS_EMBEDDED) && TARGET_OS_EMBEDDED
-  EXPECT_EQ(ABSL_FLAGS_STRIP_NAMES, 1);
-  EXPECT_EQ(ABSL_FLAGS_STRIP_HELP, 1);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_NAMES, 1);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_HELP, 1);
 #elif defined(__APPLE__)
-  EXPECT_EQ(ABSL_FLAGS_STRIP_NAMES, 0);
-  EXPECT_EQ(ABSL_FLAGS_STRIP_HELP, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_NAMES, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_HELP, 0);
 #elif defined(_WIN32)
-  EXPECT_EQ(ABSL_FLAGS_STRIP_NAMES, 0);
-  EXPECT_EQ(ABSL_FLAGS_STRIP_HELP, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_NAMES, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_HELP, 0);
 #elif defined(__linux__)
-  EXPECT_EQ(ABSL_FLAGS_STRIP_NAMES, 0);
-  EXPECT_EQ(ABSL_FLAGS_STRIP_HELP, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_NAMES, 0);
+  EXPECT_EQ(TURBO_FLAGS_STRIP_HELP, 0);
 #endif
 }
 

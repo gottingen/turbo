@@ -1,5 +1,5 @@
 #
-# Copyright 2020 The Abseil Authors.
+# Copyright 2020 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-absl_cc_library(
+turbo_cc_library(
   NAME
     status
   HDRS
@@ -24,7 +24,7 @@ absl_cc_library(
     "status_payload_printer.h"
     "status_payload_printer.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::atomic_hook
     turbo::config
@@ -42,20 +42,20 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     status_test
   SRCS
    "status_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::status
     turbo::strings
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     statusor
   HDRS
@@ -64,7 +64,7 @@ absl_cc_library(
     "statusor.cc"
     "internal/statusor_internal.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::status
@@ -77,13 +77,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     statusor_test
   SRCS
    "statusor_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::status
     turbo::statusor

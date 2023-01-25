@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The Abseil Authors.
+ * Copyright 2017 The Turbo Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 // Allow dynamic symbol lookup for in-memory Elf images.
 
-#ifndef ABSL_DEBUGGING_INTERNAL_ELF_MEM_IMAGE_H_
-#define ABSL_DEBUGGING_INTERNAL_ELF_MEM_IMAGE_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_ELF_MEM_IMAGE_H_
+#define TURBO_DEBUGGING_INTERNAL_ELF_MEM_IMAGE_H_
 
 // Including this will define the __GLIBC__ macro if glibc is being
 // used.
@@ -27,17 +27,17 @@
 
 // Maybe one day we can rewrite this file not to require the elf
 // symbol extensions in glibc, but for right now we need them.
-#ifdef ABSL_HAVE_ELF_MEM_IMAGE
-#error ABSL_HAVE_ELF_MEM_IMAGE cannot be directly set
+#ifdef TURBO_HAVE_ELF_MEM_IMAGE
+#error TURBO_HAVE_ELF_MEM_IMAGE cannot be directly set
 #endif
 
 #if defined(__ELF__) && !defined(__OpenBSD__) && !defined(__QNX__) && \
     !defined(__native_client__) && !defined(__asmjs__) &&             \
     !defined(__wasm__) && !defined(__HAIKU__)
-#define ABSL_HAVE_ELF_MEM_IMAGE 1
+#define TURBO_HAVE_ELF_MEM_IMAGE 1
 #endif
 
-#ifdef ABSL_HAVE_ELF_MEM_IMAGE
+#ifdef TURBO_HAVE_ELF_MEM_IMAGE
 
 #include <link.h>  // for ElfW
 
@@ -46,7 +46,7 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 // An in-memory ELF image (may not exist on disk).
@@ -131,9 +131,9 @@ class ElfMemImage {
 };
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HAVE_ELF_MEM_IMAGE
+#endif  // TURBO_HAVE_ELF_MEM_IMAGE
 
-#endif  // ABSL_DEBUGGING_INTERNAL_ELF_MEM_IMAGE_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_ELF_MEM_IMAGE_H_

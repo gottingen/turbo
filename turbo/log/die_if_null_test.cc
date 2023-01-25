@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,80 +26,80 @@
 
 namespace {
 
-auto* test_env ABSL_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 // TODO(b/69907837): Revisit these tests with the goal of making them less
 // convoluted.
-TEST(AbslDieIfNull, Simple) {
+TEST(TurboDieIfNull, Simple) {
   int64_t t;
   void* ptr = static_cast<void*>(&t);
-  void* ref = ABSL_DIE_IF_NULL(ptr);
+  void* ref = TURBO_DIE_IF_NULL(ptr);
   ASSERT_EQ(ptr, ref);
 
   char* t_as_char;
-  t_as_char = ABSL_DIE_IF_NULL(reinterpret_cast<char*>(&t));
+  t_as_char = TURBO_DIE_IF_NULL(reinterpret_cast<char*>(&t));
   (void)t_as_char;
 
   unsigned char* t_as_uchar;
-  t_as_uchar = ABSL_DIE_IF_NULL(reinterpret_cast<unsigned char*>(&t));
+  t_as_uchar = TURBO_DIE_IF_NULL(reinterpret_cast<unsigned char*>(&t));
   (void)t_as_uchar;
 
   int* t_as_int;
-  t_as_int = ABSL_DIE_IF_NULL(reinterpret_cast<int*>(&t));
+  t_as_int = TURBO_DIE_IF_NULL(reinterpret_cast<int*>(&t));
   (void)t_as_int;
 
   int64_t* t_as_int64_t;
-  t_as_int64_t = ABSL_DIE_IF_NULL(reinterpret_cast<int64_t*>(&t));
+  t_as_int64_t = TURBO_DIE_IF_NULL(reinterpret_cast<int64_t*>(&t));
   (void)t_as_int64_t;
 
   std::unique_ptr<int64_t> sptr(new int64_t);
-  EXPECT_EQ(sptr.get(), ABSL_DIE_IF_NULL(sptr).get());
-  ABSL_DIE_IF_NULL(sptr).reset();
+  EXPECT_EQ(sptr.get(), TURBO_DIE_IF_NULL(sptr).get());
+  TURBO_DIE_IF_NULL(sptr).reset();
 
   int64_t* int_ptr = new int64_t();
-  EXPECT_EQ(int_ptr, ABSL_DIE_IF_NULL(std::unique_ptr<int64_t>(int_ptr)).get());
+  EXPECT_EQ(int_ptr, TURBO_DIE_IF_NULL(std::unique_ptr<int64_t>(int_ptr)).get());
 }
 
 #if GTEST_HAS_DEATH_TEST
-TEST(DeathCheckAbslDieIfNull, Simple) {
+TEST(DeathCheckTurboDieIfNull, Simple) {
   void* ptr;
-  ASSERT_DEATH({ ptr = ABSL_DIE_IF_NULL(nullptr); }, "");
+  ASSERT_DEATH({ ptr = TURBO_DIE_IF_NULL(nullptr); }, "");
   (void)ptr;
 
   std::unique_ptr<int64_t> sptr;
-  ASSERT_DEATH(ptr = ABSL_DIE_IF_NULL(sptr).get(), "");
+  ASSERT_DEATH(ptr = TURBO_DIE_IF_NULL(sptr).get(), "");
 }
 #endif
 
-// Ensures that ABSL_DIE_IF_NULL works with C++11's std::unique_ptr and
+// Ensures that TURBO_DIE_IF_NULL works with C++11's std::unique_ptr and
 // std::shared_ptr.
-TEST(AbslDieIfNull, DoesNotCompareSmartPointerToNULL) {
+TEST(TurboDieIfNull, DoesNotCompareSmartPointerToNULL) {
   std::unique_ptr<int> up(new int);
-  EXPECT_EQ(&up, &ABSL_DIE_IF_NULL(up));
-  ABSL_DIE_IF_NULL(up).reset();
+  EXPECT_EQ(&up, &TURBO_DIE_IF_NULL(up));
+  TURBO_DIE_IF_NULL(up).reset();
 
   std::shared_ptr<int> sp(new int);
-  EXPECT_EQ(&sp, &ABSL_DIE_IF_NULL(sp));
-  ABSL_DIE_IF_NULL(sp).reset();
+  EXPECT_EQ(&sp, &TURBO_DIE_IF_NULL(sp));
+  TURBO_DIE_IF_NULL(sp).reset();
 }
 
-// Verifies that ABSL_DIE_IF_NULL returns an rvalue reference if its argument is
+// Verifies that TURBO_DIE_IF_NULL returns an rvalue reference if its argument is
 // an rvalue reference.
-TEST(AbslDieIfNull, PreservesRValues) {
+TEST(TurboDieIfNull, PreservesRValues) {
   int64_t* ptr = new int64_t();
-  auto uptr = ABSL_DIE_IF_NULL(std::unique_ptr<int64_t>(ptr));
+  auto uptr = TURBO_DIE_IF_NULL(std::unique_ptr<int64_t>(ptr));
   EXPECT_EQ(ptr, uptr.get());
 }
 
-// Verifies that ABSL_DIE_IF_NULL returns an lvalue if its argument is an
+// Verifies that TURBO_DIE_IF_NULL returns an lvalue if its argument is an
 // lvalue.
-TEST(AbslDieIfNull, PreservesLValues) {
+TEST(TurboDieIfNull, PreservesLValues) {
   int64_t array[2] = {0};
   int64_t* a = array + 0;
   int64_t* b = array + 1;
   using std::swap;
-  swap(ABSL_DIE_IF_NULL(a), ABSL_DIE_IF_NULL(b));
+  swap(TURBO_DIE_IF_NULL(a), TURBO_DIE_IF_NULL(b));
   EXPECT_EQ(array + 1, a);
   EXPECT_EQ(array + 0, b);
 }

@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,14 +53,14 @@ void BM_Ascii(benchmark::State& state) {
   AsciiBenchmark(state, f);
 }
 
-using AbslAsciiIsFunction = bool (*)(unsigned char);
-template <AbslAsciiIsFunction f>
+using TurboAsciiIsFunction = bool (*)(unsigned char);
+template <TurboAsciiIsFunction f>
 void BM_Ascii(benchmark::State& state) {
   AsciiBenchmark(state, f);
 }
 
-using AbslAsciiToFunction = char (*)(unsigned char);
-template <AbslAsciiToFunction f>
+using TurboAsciiToFunction = char (*)(unsigned char);
+template <TurboAsciiToFunction f>
 void BM_Ascii(benchmark::State& state) {
   AsciiBenchmark(state, f);
 }

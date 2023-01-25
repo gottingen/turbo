@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,10 +59,10 @@
 #include "turbo/crc/internal/crc_memcpy.h"
 #include "turbo/strings/string_view.h"
 
-#ifdef ABSL_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE
+#ifdef TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 namespace {
@@ -163,14 +163,14 @@ crc32c_t AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   constexpr std::size_t kCopyRoundSize = kRegions * kBlockSize;
 
   // Number of blocks per cacheline.
-  constexpr std::size_t kBlocksPerCacheLine = ABSL_CACHELINE_SIZE / kBlockSize;
+  constexpr std::size_t kBlocksPerCacheLine = TURBO_CACHELINE_SIZE / kBlockSize;
 
   char* dst_bytes = static_cast<char*>(dst);
   const char* src_bytes = static_cast<const char*>(src);
 
   // Make sure that one prefetch per big block is enough to cover the whole
   // dataset, and we don't prefetch too much.
-  static_assert(ABSL_CACHELINE_SIZE % kBlockSize == 0,
+  static_assert(TURBO_CACHELINE_SIZE % kBlockSize == 0,
                 "Cache lines are not divided evenly into blocks, may have "
                 "unintended behavior!");
 
@@ -181,7 +181,7 @@ crc32c_t AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
 
   // Experimentally-determined prefetch distance.  Main loop copies will
   // prefeth data 2 cache lines ahead.
-  constexpr std::size_t kPrefetchAhead = 2 * ABSL_CACHELINE_SIZE;
+  constexpr std::size_t kPrefetchAhead = 2 * TURBO_CACHELINE_SIZE;
 
   // Small-size CRC-memcpy : just do CRC + memcpy
   if (length < kCrcSmallSize) {
@@ -428,7 +428,7 @@ std::unique_ptr<CrcMemcpyEngine> CrcMemcpy::GetTestEngine(int vector,
 }
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE
+#endif  // TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE

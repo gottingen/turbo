@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 // File: status.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the Abseil `status` library, consisting of:
+// This header file defines the Turbo `status` library, consisting of:
 //
 //   * An `turbo::Status` class for holding error handling information
 //   * A set of canonical `turbo::StatusCode` error codes, and associated
@@ -48,8 +48,8 @@
 // error codes (of type `turbo::StatusCode`) enumerated in this header file.
 // These canonical codes are understood across the codebase and will be
 // accepted across all API and RPC boundaries.
-#ifndef ABSL_STATUS_STATUS_H_
-#define ABSL_STATUS_STATUS_H_
+#ifndef TURBO_STATUS_STATUS_H_
+#define TURBO_STATUS_STATUS_H_
 
 #include <ostream>
 #include <string>
@@ -62,7 +62,7 @@
 #include "turbo/types/optional.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::StatusCode
 //
@@ -420,7 +420,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //
 // Returned Status objects may not be ignored. status_internal.h has a forward
 // declaration of the form
-// class ABSL_MUST_USE_RESULT Status;
+// class TURBO_MUST_USE_RESULT Status;
 class Status final {
  public:
   // Constructors
@@ -472,7 +472,7 @@ class Status final {
   // Returns `true` if `this->code()` == `turbo::StatusCode::kOk`,
   // indicating the absence of an error.
   // Prefer checking for an OK status using this member function.
-  ABSL_MUST_USE_RESULT bool ok() const;
+  TURBO_MUST_USE_RESULT bool ok() const;
 
   // Status::code()
   //
@@ -684,22 +684,22 @@ std::ostream& operator<<(std::ostream& os, const Status& x);
 //
 // These convenience functions return `true` if a given status matches the
 // `turbo::StatusCode` error code of its associated function.
-ABSL_MUST_USE_RESULT bool IsAborted(const Status& status);
-ABSL_MUST_USE_RESULT bool IsAlreadyExists(const Status& status);
-ABSL_MUST_USE_RESULT bool IsCancelled(const Status& status);
-ABSL_MUST_USE_RESULT bool IsDataLoss(const Status& status);
-ABSL_MUST_USE_RESULT bool IsDeadlineExceeded(const Status& status);
-ABSL_MUST_USE_RESULT bool IsFailedPrecondition(const Status& status);
-ABSL_MUST_USE_RESULT bool IsInternal(const Status& status);
-ABSL_MUST_USE_RESULT bool IsInvalidArgument(const Status& status);
-ABSL_MUST_USE_RESULT bool IsNotFound(const Status& status);
-ABSL_MUST_USE_RESULT bool IsOutOfRange(const Status& status);
-ABSL_MUST_USE_RESULT bool IsPermissionDenied(const Status& status);
-ABSL_MUST_USE_RESULT bool IsResourceExhausted(const Status& status);
-ABSL_MUST_USE_RESULT bool IsUnauthenticated(const Status& status);
-ABSL_MUST_USE_RESULT bool IsUnavailable(const Status& status);
-ABSL_MUST_USE_RESULT bool IsUnimplemented(const Status& status);
-ABSL_MUST_USE_RESULT bool IsUnknown(const Status& status);
+TURBO_MUST_USE_RESULT bool IsAborted(const Status& status);
+TURBO_MUST_USE_RESULT bool IsAlreadyExists(const Status& status);
+TURBO_MUST_USE_RESULT bool IsCancelled(const Status& status);
+TURBO_MUST_USE_RESULT bool IsDataLoss(const Status& status);
+TURBO_MUST_USE_RESULT bool IsDeadlineExceeded(const Status& status);
+TURBO_MUST_USE_RESULT bool IsFailedPrecondition(const Status& status);
+TURBO_MUST_USE_RESULT bool IsInternal(const Status& status);
+TURBO_MUST_USE_RESULT bool IsInvalidArgument(const Status& status);
+TURBO_MUST_USE_RESULT bool IsNotFound(const Status& status);
+TURBO_MUST_USE_RESULT bool IsOutOfRange(const Status& status);
+TURBO_MUST_USE_RESULT bool IsPermissionDenied(const Status& status);
+TURBO_MUST_USE_RESULT bool IsResourceExhausted(const Status& status);
+TURBO_MUST_USE_RESULT bool IsUnauthenticated(const Status& status);
+TURBO_MUST_USE_RESULT bool IsUnavailable(const Status& status);
+TURBO_MUST_USE_RESULT bool IsUnimplemented(const Status& status);
+TURBO_MUST_USE_RESULT bool IsUnknown(const Status& status);
 
 // AbortedError()
 // AlreadyExistsError()
@@ -886,7 +886,7 @@ inline Status OkStatus() { return Status(); }
 // message-less kCancelled errors are common in the infrastructure.
 inline Status CancelledError() { return Status(turbo::StatusCode::kCancelled); }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STATUS_STATUS_H_
+#endif  // TURBO_STATUS_STATUS_H_

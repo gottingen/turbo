@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_FLAGS_INTERNAL_PATH_UTIL_H_
-#define ABSL_FLAGS_INTERNAL_PATH_UTIL_H_
+#ifndef TURBO_FLAGS_INTERNAL_PATH_UTIL_H_
+#define TURBO_FLAGS_INTERNAL_PATH_UTIL_H_
 
 #include "turbo/base/config.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 // A portable interface that returns the basename of the filename passed as an
@@ -56,7 +56,7 @@ inline turbo::string_view Package(turbo::string_view filename) {
 }
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_INTERNAL_PATH_UTIL_H_
+#endif  // TURBO_FLAGS_INTERNAL_PATH_UTIL_H_

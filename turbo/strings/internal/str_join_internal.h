@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@
 //
 // IWYU pragma: private, include "turbo/strings/str_join.h"
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_JOIN_INTERNAL_H_
-#define ABSL_STRINGS_INTERNAL_STR_JOIN_INTERNAL_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_JOIN_INTERNAL_H_
+#define TURBO_STRINGS_INTERNAL_STR_JOIN_INTERNAL_H_
 
 #include <cstring>
 #include <iterator>
@@ -43,7 +43,7 @@
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 //
@@ -311,7 +311,7 @@ std::string JoinRange(const Range& range, turbo::string_view separator) {
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_JOIN_INTERNAL_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_JOIN_INTERNAL_H_

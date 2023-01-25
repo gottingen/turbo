@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_TIME_INTERNAL_TEST_UTIL_H_
-#define ABSL_TIME_INTERNAL_TEST_UTIL_H_
+#ifndef TURBO_TIME_INTERNAL_TEST_UTIL_H_
+#define TURBO_TIME_INTERNAL_TEST_UTIL_H_
 
 #include <string>
 
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 
 // Loads the named timezone, but dies on any failure.
 turbo::TimeZone LoadTimeZone(const std::string& name);
 
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TIME_INTERNAL_TEST_UTIL_H_
+#endif  // TURBO_TIME_INTERNAL_TEST_UTIL_H_

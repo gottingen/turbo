@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,16 +30,16 @@
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 
-#ifdef ABSL_INTERNAL_HAVE_SSE2
+#ifdef TURBO_INTERNAL_HAVE_SSE2
 constexpr int kProbeLength = 16;
 #else
 constexpr int kProbeLength = 8;
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 class HashtablezInfoHandlePeer {
  public:
   static bool IsSampled(const HashtablezInfoHandle& h) {
@@ -54,7 +54,7 @@ class HashtablezInfoHandlePeer {
   static bool IsSampled(const HashtablezInfoHandle&) { return false; }
   static HashtablezInfo* GetInfo(HashtablezInfoHandle*) { return nullptr; }
 };
-#endif  // defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#endif  // defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 
 namespace {
 using ::turbo::synchronization_internal::ThreadPool;
@@ -226,7 +226,7 @@ TEST(HashtablezInfoTest, RecordReservation) {
   EXPECT_EQ(info.max_reserve.load(), 10);
 }
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 TEST(HashtablezSamplerTest, SmallSampleParameter) {
   const size_t test_element_size = 31;
   SetHashtablezEnabled(true);
@@ -424,5 +424,5 @@ TEST(HashtablezSamplerTest, Callback) {
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

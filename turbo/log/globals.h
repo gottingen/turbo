@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 //
 // This header declares global logging library configuration knobs.
 
-#ifndef ABSL_LOG_GLOBALS_H_
-#define ABSL_LOG_GLOBALS_H_
+#ifndef TURBO_LOG_GLOBALS_H_
+#define TURBO_LOG_GLOBALS_H_
 
 #include "turbo/base/attributes.h"
 #include "turbo/base/config.h"
@@ -27,7 +27,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 //------------------------------------------------------------------------------
 //  Minimum Log Level
@@ -42,7 +42,7 @@ ABSL_NAMESPACE_BEGIN
 //
 // Returns the value of the Minimum Log Level parameter.
 // This function is async-signal-safe.
-ABSL_MUST_USE_RESULT turbo::LogSeverityAtLeast MinLogLevel();
+TURBO_MUST_USE_RESULT turbo::LogSeverityAtLeast MinLogLevel();
 
 // SetMinLogLevel()
 //
@@ -81,7 +81,7 @@ class ScopedMinLogLevel final {
 //
 // Returns the value of the Stderr Threshold parameter.
 // This function is async-signal-safe.
-ABSL_MUST_USE_RESULT turbo::LogSeverityAtLeast StderrThreshold();
+TURBO_MUST_USE_RESULT turbo::LogSeverityAtLeast StderrThreshold();
 
 // SetStderrThreshold()
 //
@@ -117,7 +117,7 @@ class ScopedStderrThreshold final {
 //
 // Returns true if we should log a backtrace at the specified location.
 namespace log_internal {
-ABSL_MUST_USE_RESULT bool ShouldLogBacktraceAt(turbo::string_view file,
+TURBO_MUST_USE_RESULT bool ShouldLogBacktraceAt(turbo::string_view file,
                                                int line);
 }  // namespace log_internal
 
@@ -137,7 +137,7 @@ void SetLogBacktraceLocation(turbo::string_view file, int line);
 //
 // Returns the value of the Prepend Log Prefix option.
 // This function is async-signal-safe.
-ABSL_MUST_USE_RESULT bool ShouldPrependLogPrefix();
+TURBO_MUST_USE_RESULT bool ShouldPrependLogPrefix();
 
 // EnableLogPrefix()
 //
@@ -159,7 +159,7 @@ void RawSetStderrThreshold(turbo::LogSeverityAtLeast severity);
 void RawEnableLogPrefix(bool on_off);
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_GLOBALS_H_
+#endif  // TURBO_LOG_GLOBALS_H_

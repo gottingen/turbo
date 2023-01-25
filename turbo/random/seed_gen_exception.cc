@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 static constexpr const char kExceptionMessage[] =
     "Failed generating seed-material for URBG.";
@@ -33,7 +33,7 @@ const char* SeedGenException::what() const noexcept {
 namespace random_internal {
 
 void ThrowSeedGenException() {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   throw turbo::SeedGenException();
 #else
   std::cerr << kExceptionMessage << std::endl;
@@ -42,5 +42,5 @@ void ThrowSeedGenException() {
 }
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

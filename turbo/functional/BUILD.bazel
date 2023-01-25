@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -29,8 +29,8 @@ cc_library(
     name = "any_invocable",
     srcs = ["internal/any_invocable.h"],
     hdrs = ["any_invocable.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:base_internal",
         "//turbo/base:config",
@@ -46,8 +46,8 @@ cc_test(
         "any_invocable_test.cc",
         "internal/any_invocable.h",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":any_invocable",
         "//turbo/base:base_internal",
@@ -63,8 +63,8 @@ cc_library(
     name = "bind_front",
     srcs = ["internal/front_binder.h"],
     hdrs = ["bind_front.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:base_internal",
         "//turbo/container:compressed_tuple",
@@ -76,8 +76,8 @@ cc_library(
 cc_test(
     name = "bind_front_test",
     srcs = ["bind_front_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":bind_front",
         "//turbo/memory",
@@ -89,8 +89,8 @@ cc_library(
     name = "function_ref",
     srcs = ["internal/function_ref.h"],
     hdrs = ["function_ref.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:base_internal",
         "//turbo/base:core_headers",
@@ -102,7 +102,7 @@ cc_test(
     name = "function_ref_test",
     size = "small",
     srcs = ["function_ref_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         ":function_ref",
         "//turbo/container:test_instance_tracker",
@@ -116,7 +116,7 @@ cc_test(
     srcs = [
         "function_type_benchmark.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [

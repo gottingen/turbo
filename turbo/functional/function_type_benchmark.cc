@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "turbo/functional/function_ref.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 int dummy = 0;
@@ -39,7 +39,7 @@ struct LargeFunctor {
 };
 
 template <typename Function, typename... Args>
-void ABSL_ATTRIBUTE_NOINLINE CallFunction(Function f, Args&&... args) {
+void TURBO_ATTRIBUTE_NOINLINE CallFunction(Function f, Args&&... args) {
   f(std::forward<Args>(args)...);
 }
 
@@ -172,5 +172,5 @@ void BM_NonTrivialArgsAnyInvocable(benchmark::State& state) {
 BENCHMARK(BM_NonTrivialArgsAnyInvocable);
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
 // This header file contains utility functions for working with the system-wide
 // realtime clock. For descriptions of the main time abstractions used within
 // this header file, consult the time.h header file.
-#ifndef ABSL_TIME_CLOCK_H_
-#define ABSL_TIME_CLOCK_H_
+#ifndef TURBO_TIME_CLOCK_H_
+#define TURBO_TIME_CLOCK_H_
 
 #include "turbo/base/macros.h"
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Now()
 //
@@ -50,7 +50,7 @@ int64_t GetCurrentTimeNanos();
 // * Returns immediately when passed a nonpositive duration.
 void SleepFor(turbo::Duration duration);
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // -----------------------------------------------------------------------------
@@ -64,11 +64,11 @@ ABSL_NAMESPACE_END
 // By changing our extension points to be extern "C", we dodge this
 // check.
 extern "C" {
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalSleepFor)(turbo::Duration duration);
+void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(turbo::Duration duration);
 }  // extern "C"
 
 inline void turbo::SleepFor(turbo::Duration duration) {
-  ABSL_INTERNAL_C_SYMBOL(AbslInternalSleepFor)(duration);
+  TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(duration);
 }
 
-#endif  // ABSL_TIME_CLOCK_H_
+#endif  // TURBO_TIME_CLOCK_H_

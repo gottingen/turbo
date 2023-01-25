@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 void Notification::Notify() {
   MutexLock l(&this->mutex_);
 
 #ifndef NDEBUG
-  if (ABSL_PREDICT_FALSE(notified_yet_.load(std::memory_order_relaxed))) {
-    ABSL_RAW_LOG(
+  if (TURBO_PREDICT_FALSE(notified_yet_.load(std::memory_order_relaxed))) {
+    TURBO_RAW_LOG(
         FATAL,
         "Notify() method called more than once for Notification object %p",
         static_cast<void *>(this));
@@ -73,5 +73,5 @@ bool Notification::WaitForNotificationWithDeadline(turbo::Time deadline) const {
   return notified;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

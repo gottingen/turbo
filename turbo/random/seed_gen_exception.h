@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,15 +23,15 @@
 //
 // Note: if exceptions are disabled, `std::terminate()` is called instead.
 
-#ifndef ABSL_RANDOM_SEED_GEN_EXCEPTION_H_
-#define ABSL_RANDOM_SEED_GEN_EXCEPTION_H_
+#ifndef TURBO_RANDOM_SEED_GEN_EXCEPTION_H_
+#define TURBO_RANDOM_SEED_GEN_EXCEPTION_H_
 
 #include <exception>
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 //------------------------------------------------------------------------------
 // SeedGenException
@@ -49,7 +49,7 @@ namespace random_internal {
 [[noreturn]] void ThrowSeedGenException();
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_SEED_GEN_EXCEPTION_H_
+#endif  // TURBO_RANDOM_SEED_GEN_EXCEPTION_H_

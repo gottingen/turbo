@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,29 +47,29 @@
 // this abstraction, make sure that you should not instead be rewriting your
 // code to be more specific.
 //
-// Abseil has also released an `turbo::variant` type (a C++11 compatible version
+// Turbo has also released an `turbo::variant` type (a C++11 compatible version
 // of the C++17 `std::variant`), which is generally preferred for use over
 // `turbo::any`.
-#ifndef ABSL_TYPES_ANY_H_
-#define ABSL_TYPES_ANY_H_
+#ifndef TURBO_TYPES_ANY_H_
+#define TURBO_TYPES_ANY_H_
 
 #include "turbo/base/config.h"
 #include "turbo/utility/utility.h"
 
-#ifdef ABSL_USES_STD_ANY
+#ifdef TURBO_USES_STD_ANY
 
 #include <any>  // IWYU pragma: export
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 using std::any;
 using std::any_cast;
 using std::bad_any_cast;
 using std::make_any;
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // ABSL_USES_STD_ANY
+#else  // TURBO_USES_STD_ANY
 
 #include <algorithm>
 #include <cstddef>
@@ -85,7 +85,7 @@ ABSL_NAMESPACE_END
 #include "turbo/types/bad_any_cast.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 class any;
 
@@ -339,7 +339,7 @@ class any {
   // returns `false`.
   bool has_value() const noexcept { return obj_ != nullptr; }
 
-#ifdef ABSL_INTERNAL_HAS_RTTI
+#ifdef TURBO_INTERNAL_HAS_RTTI
   // Returns: typeid(T) if *this has a contained object of type T, otherwise
   // typeid(void).
   const std::type_info& type() const noexcept {
@@ -349,7 +349,7 @@ class any {
 
     return typeid(void);
   }
-#endif  // ABSL_INTERNAL_HAS_RTTI
+#endif  // TURBO_INTERNAL_HAS_RTTI
 
  private:
   // Tagged type-erased abstraction for holding a cloneable object.
@@ -358,9 +358,9 @@ class any {
     virtual ~ObjInterface() = default;
     virtual std::unique_ptr<ObjInterface> Clone() const = 0;
     virtual const void* ObjTypeId() const noexcept = 0;
-#ifdef ABSL_INTERNAL_HAS_RTTI
+#ifdef TURBO_INTERNAL_HAS_RTTI
     virtual const std::type_info& Type() const noexcept = 0;
-#endif  // ABSL_INTERNAL_HAS_RTTI
+#endif  // TURBO_INTERNAL_HAS_RTTI
   };
 
   // Hold a value of some queryable type, with an ability to Clone it.
@@ -377,9 +377,9 @@ class any {
 
     const void* ObjTypeId() const noexcept final { return IdForType<T>(); }
 
-#ifdef ABSL_INTERNAL_HAS_RTTI
+#ifdef TURBO_INTERNAL_HAS_RTTI
     const std::type_info& Type() const noexcept final { return typeid(T); }
-#endif  // ABSL_INTERNAL_HAS_RTTI
+#endif  // TURBO_INTERNAL_HAS_RTTI
 
     T value;
   };
@@ -509,9 +509,9 @@ T* any_cast(any* operand) noexcept {
              : nullptr;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USES_STD_ANY
+#endif  // TURBO_USES_STD_ANY
 
-#endif  // ABSL_TYPES_ANY_H_
+#endif  // TURBO_TYPES_ANY_H_

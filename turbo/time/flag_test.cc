@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,20 +21,20 @@
 #include "turbo/time/civil_time.h"
 #include "turbo/time/time.h"
 
-ABSL_FLAG(turbo::CivilSecond, test_flag_civil_second,
+TURBO_FLAG(turbo::CivilSecond, test_flag_civil_second,
           turbo::CivilSecond(2015, 1, 2, 3, 4, 5), "");
-ABSL_FLAG(turbo::CivilMinute, test_flag_civil_minute,
+TURBO_FLAG(turbo::CivilMinute, test_flag_civil_minute,
           turbo::CivilMinute(2015, 1, 2, 3, 4), "");
-ABSL_FLAG(turbo::CivilHour, test_flag_civil_hour, turbo::CivilHour(2015, 1, 2, 3),
+TURBO_FLAG(turbo::CivilHour, test_flag_civil_hour, turbo::CivilHour(2015, 1, 2, 3),
           "");
-ABSL_FLAG(turbo::CivilDay, test_flag_civil_day, turbo::CivilDay(2015, 1, 2), "");
-ABSL_FLAG(turbo::CivilMonth, test_flag_civil_month, turbo::CivilMonth(2015, 1),
+TURBO_FLAG(turbo::CivilDay, test_flag_civil_day, turbo::CivilDay(2015, 1, 2), "");
+TURBO_FLAG(turbo::CivilMonth, test_flag_civil_month, turbo::CivilMonth(2015, 1),
           "");
-ABSL_FLAG(turbo::CivilYear, test_flag_civil_year, turbo::CivilYear(2015), "");
+TURBO_FLAG(turbo::CivilYear, test_flag_civil_year, turbo::CivilYear(2015), "");
 
-ABSL_FLAG(turbo::Duration, test_duration_flag, turbo::Seconds(5),
+TURBO_FLAG(turbo::Duration, test_duration_flag, turbo::Seconds(5),
           "For testing support for Duration flags");
-ABSL_FLAG(turbo::Time, test_time_flag, turbo::InfinitePast(),
+TURBO_FLAG(turbo::Time, test_time_flag, turbo::InfinitePast(),
           "For testing support for Time flags");
 
 namespace {

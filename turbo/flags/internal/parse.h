@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_FLAGS_INTERNAL_PARSE_H_
-#define ABSL_FLAGS_INTERNAL_PARSE_H_
+#ifndef TURBO_FLAGS_INTERNAL_PARSE_H_
+#define TURBO_FLAGS_INTERNAL_PARSE_H_
 
 #include <string>
 #include <vector>
@@ -23,13 +23,13 @@
 #include "turbo/flags/declare.h"
 #include "turbo/strings/string_view.h"
 
-ABSL_DECLARE_FLAG(std::vector<std::string>, flagfile);
-ABSL_DECLARE_FLAG(std::vector<std::string>, fromenv);
-ABSL_DECLARE_FLAG(std::vector<std::string>, tryfromenv);
-ABSL_DECLARE_FLAG(std::vector<std::string>, undefok);
+TURBO_DECLARE_FLAG(std::vector<std::string>, flagfile);
+TURBO_DECLARE_FLAG(std::vector<std::string>, fromenv);
+TURBO_DECLARE_FLAG(std::vector<std::string>, tryfromenv);
+TURBO_DECLARE_FLAG(std::vector<std::string>, undefok);
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 enum class ArgvListAction { kRemoveParsedArgs, kKeepParsedArgs };
@@ -57,7 +57,7 @@ bool WasPresentOnCommandLine(turbo::string_view flag_name);
 std::vector<std::string> GetMisspellingHints(turbo::string_view flag);
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_INTERNAL_PARSE_H_
+#endif  // TURBO_FLAGS_INTERNAL_PARSE_H_

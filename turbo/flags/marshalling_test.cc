@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -948,7 +948,7 @@ TEST(MarshallingTest, TestOptionalStringUnparsing) {
 
 // --------------------------------------------------------------------
 
-#if defined(ABSL_HAVE_STD_OPTIONAL) && !defined(ABSL_USES_STD_OPTIONAL)
+#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 
 TEST(MarshallingTest, TestStdOptionalUnparsing) {
   std::optional<std::string> strvalue;

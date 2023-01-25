@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@
 // The CPU is not required to maintain the ordering of a cycle counter read
 // with respect to surrounding instructions.
 
-#ifndef ABSL_BASE_INTERNAL_CYCLECLOCK_H_
-#define ABSL_BASE_INTERNAL_CYCLECLOCK_H_
+#ifndef TURBO_BASE_INTERNAL_CYCLECLOCK_H_
+#define TURBO_BASE_INTERNAL_CYCLECLOCK_H_
 
 #include <atomic>
 #include <cstdint>
@@ -51,7 +51,7 @@
 #include "turbo/base/internal/unscaledcycleclock.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 using CycleClockSourceFunc = int64_t (*)();
@@ -74,14 +74,14 @@ class CycleClock {
   static double Frequency();
 
  private:
-#if ABSL_USE_UNSCALED_CYCLECLOCK
+#if TURBO_USE_UNSCALED_CYCLECLOCK
   static CycleClockSourceFunc LoadCycleClockSource();
 
   static constexpr int32_t kShift = kCycleClockShift;
   static constexpr double kFrequencyScale = kCycleClockFrequencyScale;
 
-  ABSL_CONST_INIT static std::atomic<CycleClockSourceFunc> cycle_clock_source_;
-#endif  //  ABSL_USE_UNSCALED_CYCLECLOC
+  TURBO_CONST_INIT static std::atomic<CycleClockSourceFunc> cycle_clock_source_;
+#endif  //  TURBO_USE_UNSCALED_CYCLECLOC
 
   CycleClock() = delete;  // no instances
   CycleClock(const CycleClock&) = delete;
@@ -102,7 +102,7 @@ class CycleClockSource {
   static void Register(CycleClockSourceFunc source);
 };
 
-#if ABSL_USE_UNSCALED_CYCLECLOCK
+#if TURBO_USE_UNSCALED_CYCLECLOCK
 
 inline CycleClockSourceFunc CycleClock::LoadCycleClockSource() {
 #if !defined(__x86_64__)
@@ -135,10 +135,10 @@ inline double CycleClock::Frequency() {
   return kFrequencyScale * base_internal::UnscaledCycleClock::Frequency();
 }
 
-#endif  // ABSL_USE_UNSCALED_CYCLECLOCK
+#endif  // TURBO_USE_UNSCALED_CYCLECLOCK
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_CYCLECLOCK_H_
+#endif  // TURBO_BASE_INTERNAL_CYCLECLOCK_H_

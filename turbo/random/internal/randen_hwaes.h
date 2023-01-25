@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_RANDEN_HWAES_H_
-#define ABSL_RANDOM_INTERNAL_RANDEN_HWAES_H_
+#ifndef TURBO_RANDOM_INTERNAL_RANDEN_HWAES_H_
+#define TURBO_RANDOM_INTERNAL_RANDEN_HWAES_H_
 
 #include "turbo/base/config.h"
 
@@ -23,7 +23,7 @@
 // optimization, potentially introducing ODR violations.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // RANDen = RANDom generator or beetroots in Swiss High German.
@@ -44,7 +44,7 @@ class RandenHwAes {
 bool HasRandenHwAesImplementation();
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_RANDEN_HWAES_H_
+#endif  // TURBO_RANDOM_INTERNAL_RANDEN_HWAES_H_

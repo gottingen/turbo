@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 // components. Higher-level components should build APIs based on
 // turbo::Time and turbo::Duration.
 
-#ifndef ABSL_SYNCHRONIZATION_INTERNAL_KERNEL_TIMEOUT_H_
-#define ABSL_SYNCHRONIZATION_INTERNAL_KERNEL_TIMEOUT_H_
+#ifndef TURBO_SYNCHRONIZATION_INTERNAL_KERNEL_TIMEOUT_H_
+#define TURBO_SYNCHRONIZATION_INTERNAL_KERNEL_TIMEOUT_H_
 
 #include <time.h>
 
@@ -36,7 +36,7 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 class Waiter;
@@ -132,7 +132,7 @@ inline struct timespec KernelTimeout::MakeAbsTimespec() const {
   int64_t n = ns_;
   static const int64_t kNanosPerSecond = 1000 * 1000 * 1000;
   if (n == 0) {
-    ABSL_RAW_LOG(
+    TURBO_RAW_LOG(
         ERROR, "Tried to create a timespec from a non-timeout; never do this.");
     // But we'll try to continue sanely.  no-timeout ~= saturated timeout.
     n = (std::numeric_limits<int64_t>::max)();
@@ -154,7 +154,7 @@ inline struct timespec KernelTimeout::MakeAbsTimespec() const {
 
 inline int64_t KernelTimeout::MakeAbsNanos() const {
   if (ns_ == 0) {
-    ABSL_RAW_LOG(
+    TURBO_RAW_LOG(
         ERROR, "Tried to create a timeout from a non-timeout; never do this.");
     // But we'll try to continue sanely.  no-timeout ~= saturated timeout.
     return (std::numeric_limits<int64_t>::max)();
@@ -164,7 +164,7 @@ inline int64_t KernelTimeout::MakeAbsNanos() const {
 }
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_SYNCHRONIZATION_INTERNAL_KERNEL_TIMEOUT_H_
+#endif  // TURBO_SYNCHRONIZATION_INTERNAL_KERNEL_TIMEOUT_H_

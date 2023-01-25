@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORD_REP_TEST_UTIL_H_
-#define ABSL_STRINGS_INTERNAL_CORD_REP_TEST_UTIL_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORD_REP_TEST_UTIL_H_
+#define TURBO_STRINGS_INTERNAL_CORD_REP_TEST_UTIL_H_
 
 #include <cassert>
 #include <memory>
@@ -29,7 +29,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cordrep_testing {
 
 inline cord_internal::CordRepSubstring* MakeSubstring(
@@ -151,7 +151,7 @@ inline void CordToString(cord_internal::CordRep* rep, std::string& s) {
   } else if (rep->tag == cord_internal::EXTERNAL) {
     s.append(rep->external()->base + offset, length);
   } else {
-    ABSL_RAW_LOG(FATAL, "Unsupported tag %d", rep->tag);
+    TURBO_RAW_LOG(FATAL, "Unsupported tag %d", rep->tag);
   }
 }
 
@@ -199,7 +199,7 @@ class AutoUnref {
 };
 
 }  // namespace cordrep_testing
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CORD_REP_TEST_UTIL_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORD_REP_TEST_UTIL_H_

@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors
+// Copyright 2020 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 extern thread_local bool cord_ring;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 using RandomEngine = std::mt19937_64;
@@ -527,7 +527,7 @@ TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringRing) {
 }
 
 TEST_F(CordRingTest, CreateWithIllegalExtraCapacity) {
-#if defined(ABSL_HAVE_EXCEPTIONS)
+#if defined(TURBO_HAVE_EXCEPTIONS)
   CordRep* flat = NeedsUnref(MakeFlat("Hello world"));
   try {
     CordRepRing::Create(flat, CordRepRing::kMaxCapacity);
@@ -1450,5 +1450,5 @@ TEST_F(CordRingTest, Dump) {
 }
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

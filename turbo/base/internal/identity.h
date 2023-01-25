@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_BASE_INTERNAL_IDENTITY_H_
-#define ABSL_BASE_INTERNAL_IDENTITY_H_
+#ifndef TURBO_BASE_INTERNAL_IDENTITY_H_
+#define TURBO_BASE_INTERNAL_IDENTITY_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace internal {
 
 template <typename T>
@@ -31,7 +31,7 @@ template <typename T>
 using identity_t = typename identity<T>::type;
 
 }  // namespace internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_IDENTITY_H_
+#endif  // TURBO_BASE_INTERNAL_IDENTITY_H_

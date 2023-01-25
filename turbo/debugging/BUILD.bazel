@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(
@@ -43,8 +43,8 @@ cc_library(
         "stacktrace.cc",
     ],
     hdrs = ["stacktrace.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":debugging_internal",
         "//turbo/base:config",
@@ -56,8 +56,8 @@ cc_library(
 cc_test(
     name = "stacktrace_test",
     srcs = ["stacktrace_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":stacktrace",
         "//turbo/base:core_headers",
@@ -79,8 +79,8 @@ cc_library(
         "internal/symbolize.h",
         "symbolize.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS + select({
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS + select({
         "//turbo:msvc_compiler": ["-DEFAULTLIB:dbghelp.lib"],
         "//turbo:clang-cl_compiler": ["-DEFAULTLIB:dbghelp.lib"],
         "//conditions:default": [],
@@ -101,12 +101,12 @@ cc_library(
 cc_test(
     name = "symbolize_test",
     srcs = ["symbolize_test.cc"],
-    copts = ABSL_TEST_COPTS + select({
+    copts = TURBO_TEST_COPTS + select({
         "//turbo:msvc_compiler": ["/Z7"],
         "//turbo:clang-cl_compiler": ["/Z7"],
         "//conditions:default": [],
     }),
-    linkopts = ABSL_DEFAULT_LINKOPTS + select({
+    linkopts = TURBO_DEFAULT_LINKOPTS + select({
         "//turbo:msvc_compiler": ["/DEBUG"],
         "//turbo:clang-cl_compiler": ["/DEBUG"],
         "//conditions:default": [],
@@ -132,8 +132,8 @@ cc_library(
     hdrs = [
         "internal/examine_stack.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//turbo/log/internal:__pkg__"],
     deps = [
         ":stacktrace",
@@ -148,8 +148,8 @@ cc_library(
     name = "failure_signal_handler",
     srcs = ["failure_signal_handler.cc"],
     hdrs = ["failure_signal_handler.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":examine_stack",
         ":stacktrace",
@@ -163,13 +163,13 @@ cc_library(
 cc_test(
     name = "failure_signal_handler_test",
     srcs = ["failure_signal_handler_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     linkopts = select({
         "//turbo:msvc_compiler": [],
         "//turbo:clang-cl_compiler": [],
         "//turbo:wasm": [],
         "//conditions:default": ["-pthread"],
-    }) + ABSL_DEFAULT_LINKOPTS,
+    }) + TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":failure_signal_handler",
         ":stacktrace",
@@ -192,8 +192,8 @@ cc_library(
         "internal/elf_mem_image.h",
         "internal/vdso_support.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base:config",
@@ -208,8 +208,8 @@ cc_library(
     name = "demangle_internal",
     srcs = ["internal/demangle.cc"],
     hdrs = ["internal/demangle.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base",
@@ -221,8 +221,8 @@ cc_library(
 cc_test(
     name = "demangle_test",
     srcs = ["internal/demangle_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":demangle_internal",
         ":stack_consumption",
@@ -238,8 +238,8 @@ cc_library(
     name = "leak_check",
     srcs = ["leak_check.cc"],
     hdrs = ["leak_check.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -249,8 +249,8 @@ cc_library(
 cc_test(
     name = "leak_check_test",
     srcs = ["leak_check_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["notsan"],
     deps = [
         ":leak_check",
@@ -268,8 +268,8 @@ cc_test(
 cc_binary(
     name = "leak_check_fail_test_binary",
     srcs = ["leak_check_fail_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":leak_check",
         "//turbo/base:raw_logging_internal",
@@ -282,8 +282,8 @@ cc_library(
     testonly = 1,
     srcs = ["internal/stack_consumption.cc"],
     hdrs = ["internal/stack_consumption.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base:config",
@@ -295,8 +295,8 @@ cc_library(
 cc_test(
     name = "stack_consumption_test",
     srcs = ["internal/stack_consumption_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["notsan"],
     deps = [
         ":stack_consumption",
@@ -310,8 +310,8 @@ cc_binary(
     name = "stacktrace_benchmark",
     testonly = 1,
     srcs = ["stacktrace_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     deps = [
         ":stacktrace",

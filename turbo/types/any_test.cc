@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #include "turbo/types/any.h"
 
 // This test is a no-op when turbo::any is an alias for std::any.
-#if !defined(ABSL_USES_STD_ANY)
+#if !defined(TURBO_USES_STD_ANY)
 
 #include <initializer_list>
 #include <type_traits>
@@ -642,56 +642,56 @@ TEST(AnyTest, ConversionConstructionCausesOneCopy) {
 // Tests for Exception Behavior //
 //////////////////////////////////
 
-#if defined(ABSL_USES_STD_ANY)
+#if defined(TURBO_USES_STD_ANY)
 
 // If using a std `any` implementation, we can't check for a specific message.
-#define ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(...)                      \
-  ABSL_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), turbo::bad_any_cast, \
+#define TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(...)                      \
+  TURBO_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), turbo::bad_any_cast, \
                                  "")
 
 #else
 
 // If using the turbo `any` implementation, we can rely on a specific message.
-#define ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(...)                      \
-  ABSL_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), turbo::bad_any_cast, \
+#define TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(...)                      \
+  TURBO_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), turbo::bad_any_cast, \
                                  "Bad any cast")
 
-#endif  // defined(ABSL_USES_STD_ANY)
+#endif  // defined(TURBO_USES_STD_ANY)
 
 TEST(AnyTest, ThrowBadAlloc) {
   {
     turbo::any a;
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int&&>(turbo::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int&&>(turbo::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int>(turbo::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int>(turbo::any{}));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int&>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int&>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int&&>(turbo::any{}));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int&&>(turbo::any{}));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int>(turbo::any{}));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int>(turbo::any{}));
 
     // const turbo::any operand
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int&>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int>(AsConst(a)));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int&>(AsConst(a)));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<int>(AsConst(a)));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const int>(AsConst(a)));
   }
 
   {
     turbo::any a(turbo::in_place_type<int>);
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float&&>(turbo::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float&>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float&>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float&&>(turbo::any{}));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(
         turbo::any_cast<const float&&>(turbo::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float>(turbo::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float>(turbo::any{}));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float>(a));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float>(turbo::any{}));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float>(turbo::any{}));
 
     // const turbo::any operand
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float&>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float>(AsConst(a)));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float&>(AsConst(a)));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<float>(AsConst(a)));
+    TURBO_ANY_TEST_EXPECT_BAD_ANY_CAST(turbo::any_cast<const float>(AsConst(a)));
   }
 }
 
@@ -701,53 +701,53 @@ struct BadCopyable {
   BadCopyable() = default;
   BadCopyable(BadCopyable&&) = default;
   BadCopyable(const BadCopyable&) {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     throw BadCopy();
 #else
-    ABSL_RAW_LOG(FATAL, "Bad copy");
+    TURBO_RAW_LOG(FATAL, "Bad copy");
 #endif
   }
 };
 
-#define ABSL_ANY_TEST_EXPECT_BAD_COPY(...) \
-  ABSL_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), BadCopy, "Bad copy")
+#define TURBO_ANY_TEST_EXPECT_BAD_COPY(...) \
+  TURBO_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), BadCopy, "Bad copy")
 
 // Test the guarantees regarding exceptions in copy/assign.
 TEST(AnyTest, FailedCopy) {
   {
     const BadCopyable bad{};
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(turbo::any{bad});
+    TURBO_ANY_TEST_EXPECT_BAD_COPY(turbo::any{bad});
   }
 
   {
     turbo::any src(turbo::in_place_type<BadCopyable>);
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(turbo::any{src});
+    TURBO_ANY_TEST_EXPECT_BAD_COPY(turbo::any{src});
   }
 
   {
     BadCopyable bad;
     turbo::any target;
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(target = bad);
+    TURBO_ANY_TEST_EXPECT_BAD_COPY(target = bad);
   }
 
   {
     BadCopyable bad;
     turbo::any target(turbo::in_place_type<BadCopyable>);
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(target = bad);
+    TURBO_ANY_TEST_EXPECT_BAD_COPY(target = bad);
     EXPECT_TRUE(target.has_value());
   }
 
   {
     turbo::any src(turbo::in_place_type<BadCopyable>);
     turbo::any target;
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(target = src);
+    TURBO_ANY_TEST_EXPECT_BAD_COPY(target = src);
     EXPECT_FALSE(target.has_value());
   }
 
   {
     turbo::any src(turbo::in_place_type<BadCopyable>);
     turbo::any target(turbo::in_place_type<BadCopyable>);
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(target = src);
+    TURBO_ANY_TEST_EXPECT_BAD_COPY(target = src);
     EXPECT_TRUE(target.has_value());
   }
 }
@@ -756,7 +756,7 @@ TEST(AnyTest, FailedCopy) {
 TEST(AnyTest, FailedEmplace) {
   BadCopyable bad;
   turbo::any target;
-  ABSL_ANY_TEST_EXPECT_BAD_COPY(target.emplace<BadCopyable>(bad));
+  TURBO_ANY_TEST_EXPECT_BAD_COPY(target.emplace<BadCopyable>(bad));
 }
 
 // GCC and Clang have a bug here.
@@ -769,10 +769,10 @@ TEST(AnyTest, FailedEmplaceInPlace) {
 #endif
   BadCopyable bad;
   turbo::any target(turbo::in_place_type<int>);
-  ABSL_ANY_TEST_EXPECT_BAD_COPY(target.emplace<BadCopyable>(bad));
+  TURBO_ANY_TEST_EXPECT_BAD_COPY(target.emplace<BadCopyable>(bad));
   EXPECT_FALSE(target.has_value());
 }
 
 }  // namespace
 
-#endif  // #if !defined(ABSL_USES_STD_ANY)
+#endif  // #if !defined(TURBO_USES_STD_ANY)

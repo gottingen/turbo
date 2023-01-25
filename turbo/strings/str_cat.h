@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,33 +48,33 @@
 // `StrCat()` or `StrAppend()`. You may specify a minimum hex field width using
 // a `PadSpec` enum.
 //
-// User-defined types can be formatted with the `AbslStringify()` customization
+// User-defined types can be formatted with the `TurboStringify()` customization
 // point. The API relies on detecting an overload in the user-defined type's
-// namespace of a free (non-member) `AbslStringify()` function as a definition
+// namespace of a free (non-member) `TurboStringify()` function as a definition
 // (typically declared as a friend and implemented in-line.
 // with the following signature:
 //
 // class MyClass { ... };
 //
 // template <typename Sink>
-// void AbslStringify(Sink& sink, const MyClass& value);
+// void TurboStringify(Sink& sink, const MyClass& value);
 //
-// An `AbslStringify()` overload for a type should only be declared in the same
+// An `TurboStringify()` overload for a type should only be declared in the same
 // file and namespace as said type.
 //
-// Note that `AbslStringify()` also supports use with `turbo::StrFormat()` and
+// Note that `TurboStringify()` also supports use with `turbo::StrFormat()` and
 // `turbo::Substitute()`.
 //
 // Example:
 //
 // struct Point {
 //   // To add formatting support to `Point`, we simply need to add a free
-//   // (non-member) function `AbslStringify()`. This method specifies how
+//   // (non-member) function `TurboStringify()`. This method specifies how
 //   // Point should be printed when turbo::StrCat() is called on it. You can add
 //   // such a free function using a friend declaration within the body of the
 //   // class. The sink parameter is a templated type to avoid requiring
 //   // dependencies.
-//   template <typename Sink> friend void AbslStringify(Sink&
+//   template <typename Sink> friend void TurboStringify(Sink&
 //   sink, const Point& p) {
 //     turbo::Format(&sink, "(%v, %v)", p.x, p.y);
 //   }
@@ -84,8 +84,8 @@
 // };
 // -----------------------------------------------------------------------------
 
-#ifndef ABSL_STRINGS_STR_CAT_H_
-#define ABSL_STRINGS_STR_CAT_H_
+#ifndef TURBO_STRINGS_STR_CAT_H_
+#define TURBO_STRINGS_STR_CAT_H_
 
 #include <array>
 #include <cstdint>
@@ -95,13 +95,13 @@
 #include <vector>
 
 #include "turbo/base/port.h"
-#include "turbo/strings/internal/has_absl_stringify.h"
+#include "turbo/strings/internal/has_turbo_stringify.h"
 #include "turbo/strings/internal/stringify_sink.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace strings_internal {
 // AlphaNumBuffer allows a way to pass a string to StrCat without having to do
@@ -295,7 +295,7 @@ class AlphaNum {
   AlphaNum(turbo::string_view pc) : piece_(pc) {}  // NOLINT(runtime/explicit)
 
   template <typename T, typename = typename std::enable_if<
-                            strings_internal::HasAbslStringify<T>::value>::type>
+                            strings_internal::HasTurboStringify<T>::value>::type>
   AlphaNum(                                         // NOLINT(runtime/explicit)
       const T& v,                                   // NOLINT(runtime/explicit)
       strings_internal::StringifySink&& sink = {})  // NOLINT(runtime/explicit)
@@ -321,7 +321,7 @@ class AlphaNum {
   template <typename T,
             typename = typename std::enable_if<
                 std::is_enum<T>{} && !std::is_convertible<T, int>{} &&
-                !strings_internal::HasAbslStringify<T>::value>::type>
+                !strings_internal::HasTurboStringify<T>::value>::type>
   AlphaNum(T e)  // NOLINT(runtime/explicit)
       : AlphaNum(static_cast<typename std::underlying_type<T>::type>(e)) {}
 
@@ -378,21 +378,21 @@ void AppendPieces(std::string* dest,
 
 }  // namespace strings_internal
 
-ABSL_MUST_USE_RESULT inline std::string StrCat() { return std::string(); }
+TURBO_MUST_USE_RESULT inline std::string StrCat() { return std::string(); }
 
-ABSL_MUST_USE_RESULT inline std::string StrCat(const AlphaNum& a) {
+TURBO_MUST_USE_RESULT inline std::string StrCat(const AlphaNum& a) {
   return std::string(a.data(), a.size());
 }
 
-ABSL_MUST_USE_RESULT std::string StrCat(const AlphaNum& a, const AlphaNum& b);
-ABSL_MUST_USE_RESULT std::string StrCat(const AlphaNum& a, const AlphaNum& b,
+TURBO_MUST_USE_RESULT std::string StrCat(const AlphaNum& a, const AlphaNum& b);
+TURBO_MUST_USE_RESULT std::string StrCat(const AlphaNum& a, const AlphaNum& b,
                                         const AlphaNum& c);
-ABSL_MUST_USE_RESULT std::string StrCat(const AlphaNum& a, const AlphaNum& b,
+TURBO_MUST_USE_RESULT std::string StrCat(const AlphaNum& a, const AlphaNum& b,
                                         const AlphaNum& c, const AlphaNum& d);
 
 // Support 5 or more arguments
 template <typename... AV>
-ABSL_MUST_USE_RESULT inline std::string StrCat(
+TURBO_MUST_USE_RESULT inline std::string StrCat(
     const AlphaNum& a, const AlphaNum& b, const AlphaNum& c, const AlphaNum& d,
     const AlphaNum& e, const AV&... args) {
   return strings_internal::CatPieces(
@@ -456,7 +456,7 @@ SixDigits(double d) {
   return result;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_STR_CAT_H_
+#endif  // TURBO_STRINGS_STR_CAT_H_

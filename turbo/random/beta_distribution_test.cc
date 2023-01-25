@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, SerializeTest) {
   };
   for (TypeParam alpha : kValues) {
     for (TypeParam beta : kValues) {
-      ABSL_INTERNAL_LOG(
+      TURBO_INTERNAL_LOG(
           INFO, turbo::StrFormat("Smoke test for Beta(%a, %a)", alpha, beta));
 
       param_type param(alpha, beta);
@@ -327,7 +327,7 @@ bool BetaDistributionTest::SingleZTestOnMeanAndVariance(double p,
       turbo::random_internal::Near("z", z_mean, 0.0, max_err) &&
       turbo::random_internal::Near("z_variance", z_variance, 0.0, max_err);
   if (!pass) {
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         INFO,
         turbo::StrFormat(
             "Beta(%f, %f), "
@@ -397,13 +397,13 @@ bool BetaDistributionTest::SingleChiSquaredTest(double p, size_t samples,
       (turbo::random_internal::ChiSquarePValue(chi_square, dof) >= p);
   if (!pass) {
     for (int i = 0; i < cutoffs.size(); i++) {
-      ABSL_INTERNAL_LOG(
+      TURBO_INTERNAL_LOG(
           INFO, turbo::StrFormat("cutoff[%d] = %f, actual count %d, expected %d",
                                 i, cutoffs[i], counts[i],
                                 static_cast<int>(expected[i])));
     }
 
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         INFO, turbo::StrFormat(
                   "Beta(%f, %f) %s %f, p = %f", alpha_, beta_,
                   turbo::random_internal::kChiSquared, chi_square,

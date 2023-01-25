@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -104,13 +104,13 @@ class RefCounted {
   }
 
   void Ref() const {
-    ABSL_RAW_CHECK(count_ != nullptr, "");
+    TURBO_RAW_CHECK(count_ != nullptr, "");
     ++(*count_);
   }
 
   void Unref() const {
     --(*count_);
-    ABSL_RAW_CHECK(*count_ >= 0, "");
+    TURBO_RAW_CHECK(*count_ >= 0, "");
   }
 
   int value_;
@@ -200,7 +200,7 @@ TEST(IntVec, PopBackNoOverflow) {
 TEST(IntVec, AtThrows) {
   IntVec v = {1, 2, 3};
   EXPECT_EQ(v.at(2), 3);
-  ABSL_BASE_INTERNAL_EXPECT_FAIL(v.at(3), std::out_of_range,
+  TURBO_BASE_INTERNAL_EXPECT_FAIL(v.at(3), std::out_of_range,
                                  "failed bounds check");
 }
 
@@ -255,7 +255,7 @@ TEST(IntVec, Hardened) {
   IntVec v;
   Fill(&v, 10);
   EXPECT_EQ(v[9], 9);
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
   EXPECT_DEATH_IF_SUPPORTED(v[10], "");
   EXPECT_DEATH_IF_SUPPORTED(v[static_cast<size_t>(-1)], "");
   EXPECT_DEATH_IF_SUPPORTED(v.resize(v.max_size() + 1), "");
@@ -1585,14 +1585,14 @@ TEST(AllocatorSupportTest, Constructors) {
   const int ia[] = {0, 1, 2, 3, 4, 5, 6, 7};
   int64_t allocated = 0;
   MyAlloc alloc(&allocated);
-  { AllocVec ABSL_ATTRIBUTE_UNUSED v; }
-  { AllocVec ABSL_ATTRIBUTE_UNUSED v(alloc); }
-  { AllocVec ABSL_ATTRIBUTE_UNUSED v(ia, ia + ABSL_ARRAYSIZE(ia), alloc); }
-  { AllocVec ABSL_ATTRIBUTE_UNUSED v({1, 2, 3}, alloc); }
+  { AllocVec TURBO_ATTRIBUTE_UNUSED v; }
+  { AllocVec TURBO_ATTRIBUTE_UNUSED v(alloc); }
+  { AllocVec TURBO_ATTRIBUTE_UNUSED v(ia, ia + TURBO_ARRAYSIZE(ia), alloc); }
+  { AllocVec TURBO_ATTRIBUTE_UNUSED v({1, 2, 3}, alloc); }
 
   AllocVec v2;
-  { AllocVec ABSL_ATTRIBUTE_UNUSED v(v2, alloc); }
-  { AllocVec ABSL_ATTRIBUTE_UNUSED v(std::move(v2), alloc); }
+  { AllocVec TURBO_ATTRIBUTE_UNUSED v(v2, alloc); }
+  { AllocVec TURBO_ATTRIBUTE_UNUSED v(std::move(v2), alloc); }
 }
 
 TEST(AllocatorSupportTest, CountAllocations) {
@@ -1602,12 +1602,12 @@ TEST(AllocatorSupportTest, CountAllocations) {
   int64_t allocated = 0;
   MyAlloc alloc(&allocated);
   {
-    AllocVec ABSL_ATTRIBUTE_UNUSED v(ia, ia + 4, alloc);
+    AllocVec TURBO_ATTRIBUTE_UNUSED v(ia, ia + 4, alloc);
     EXPECT_THAT(allocated, Eq(0));
   }
   EXPECT_THAT(allocated, Eq(0));
   {
-    AllocVec ABSL_ATTRIBUTE_UNUSED v(ia, ia + ABSL_ARRAYSIZE(ia), alloc);
+    AllocVec TURBO_ATTRIBUTE_UNUSED v(ia, ia + TURBO_ARRAYSIZE(ia), alloc);
     EXPECT_THAT(allocated, Eq(static_cast<int64_t>(v.size() * sizeof(int))));
   }
   EXPECT_THAT(allocated, Eq(0));
@@ -1666,8 +1666,8 @@ TEST(AllocatorSupportTest, SwapBothAllocated) {
     const int ia2[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     MyAlloc a1(&allocated1);
     MyAlloc a2(&allocated2);
-    AllocVec v1(ia1, ia1 + ABSL_ARRAYSIZE(ia1), a1);
-    AllocVec v2(ia2, ia2 + ABSL_ARRAYSIZE(ia2), a2);
+    AllocVec v1(ia1, ia1 + TURBO_ARRAYSIZE(ia1), a1);
+    AllocVec v2(ia2, ia2 + TURBO_ARRAYSIZE(ia2), a2);
     EXPECT_LT(v1.capacity(), v2.capacity());
     EXPECT_THAT(allocated1,
                 Eq(static_cast<int64_t>(v1.capacity() * sizeof(int))));
@@ -1695,8 +1695,8 @@ TEST(AllocatorSupportTest, SwapOneAllocated) {
     const int ia2[] = {0, 1, 2, 3};
     MyAlloc a1(&allocated1);
     MyAlloc a2(&allocated2);
-    AllocVec v1(ia1, ia1 + ABSL_ARRAYSIZE(ia1), a1);
-    AllocVec v2(ia2, ia2 + ABSL_ARRAYSIZE(ia2), a2);
+    AllocVec v1(ia1, ia1 + TURBO_ARRAYSIZE(ia1), a1);
+    AllocVec v2(ia2, ia2 + TURBO_ARRAYSIZE(ia2), a2);
     EXPECT_THAT(allocated1,
                 Eq(static_cast<int64_t>(v1.capacity() * sizeof(int))));
     EXPECT_THAT(allocated2, Eq(0));
@@ -1726,15 +1726,15 @@ TEST(AllocatorSupportTest, ScopedAllocatorWorksInlined) {
   // Called only once to remain inlined
   inlined_case.emplace_back();
 
-  int64_t absl_responsible_for_count = total_allocated_byte_count;
+  int64_t turbo_responsible_for_count = total_allocated_byte_count;
 
   // MSVC's allocator preemptively allocates in debug mode
 #if !defined(_MSC_VER)
-  EXPECT_EQ(absl_responsible_for_count, 0);
+  EXPECT_EQ(turbo_responsible_for_count, 0);
 #endif  // !defined(_MSC_VER)
 
   inlined_case[0].emplace_back();
-  EXPECT_GT(total_allocated_byte_count, absl_responsible_for_count);
+  EXPECT_GT(total_allocated_byte_count, turbo_responsible_for_count);
 
   inlined_case.clear();
   inlined_case.shrink_to_fit();
@@ -1755,11 +1755,11 @@ TEST(AllocatorSupportTest, ScopedAllocatorWorksAllocated) {
   allocated_case.emplace_back();
   allocated_case.emplace_back();
 
-  int64_t absl_responsible_for_count = total_allocated_byte_count;
-  EXPECT_GT(absl_responsible_for_count, 0);
+  int64_t turbo_responsible_for_count = total_allocated_byte_count;
+  EXPECT_GT(turbo_responsible_for_count, 0);
 
   allocated_case[1].emplace_back();
-  EXPECT_GT(total_allocated_byte_count, absl_responsible_for_count);
+  EXPECT_GT(total_allocated_byte_count, turbo_responsible_for_count);
 
   allocated_case.clear();
   allocated_case.shrink_to_fit();
@@ -1816,7 +1816,7 @@ TEST(InlinedVectorTest, MinimumAllocatorCompilesUsingTraits) {
   vec.resize(0);
 }
 
-TEST(InlinedVectorTest, AbslHashValueWorks) {
+TEST(InlinedVectorTest, TurboHashValueWorks) {
   using V = turbo::InlinedVector<int, 4>;
   std::vector<V> cases;
 
@@ -1832,7 +1832,7 @@ TEST(InlinedVectorTest, AbslHashValueWorks) {
     cases.push_back(v);
   }
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(cases));
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(cases));
 }
 
 class MoveConstructibleOnlyInstance

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_BASE_INTERNAL_ATOMIC_HOOK_H_
-#define ABSL_BASE_INTERNAL_ATOMIC_HOOK_H_
+#ifndef TURBO_BASE_INTERNAL_ATOMIC_HOOK_H_
+#define TURBO_BASE_INTERNAL_ATOMIC_HOOK_H_
 
 #include <atomic>
 #include <cassert>
@@ -24,35 +24,35 @@
 #include "turbo/base/config.h"
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#define ABSL_HAVE_WORKING_CONSTEXPR_STATIC_INIT 0
+#define TURBO_HAVE_WORKING_CONSTEXPR_STATIC_INIT 0
 #else
-#define ABSL_HAVE_WORKING_CONSTEXPR_STATIC_INIT 1
+#define TURBO_HAVE_WORKING_CONSTEXPR_STATIC_INIT 1
 #endif
 
 #if defined(_MSC_VER)
-#define ABSL_HAVE_WORKING_ATOMIC_POINTER 0
+#define TURBO_HAVE_WORKING_ATOMIC_POINTER 0
 #else
-#define ABSL_HAVE_WORKING_ATOMIC_POINTER 1
+#define TURBO_HAVE_WORKING_ATOMIC_POINTER 1
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 template <typename T>
 class AtomicHook;
 
 // To workaround AtomicHook not being constant-initializable on some platforms,
-// prefer to annotate instances with `ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES`
-// instead of `ABSL_CONST_INIT`.
-#if ABSL_HAVE_WORKING_CONSTEXPR_STATIC_INIT
-#define ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES ABSL_CONST_INIT
+// prefer to annotate instances with `TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES`
+// instead of `TURBO_CONST_INIT`.
+#if TURBO_HAVE_WORKING_CONSTEXPR_STATIC_INIT
+#define TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_CONST_INIT
 #else
-#define ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+#define TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
 #endif
 
 // `AtomicHook` is a helper class, templatized on a raw function pointer type,
-// for implementing Abseil customization hooks.  It is a callable object that
+// for implementing Turbo customization hooks.  It is a callable object that
 // dispatches to the registered hook.  Objects of type `AtomicHook` must have
 // static or thread storage duration.
 //
@@ -61,7 +61,7 @@ class AtomicHook;
 //
 // Hooks can be pre-registered via constant initialization, for example:
 //
-// ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static AtomicHook<void(*)()>
+// TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static AtomicHook<void(*)()>
 //     my_hook(DefaultAction);
 //
 // and then changed at runtime via a call to `Store()`.
@@ -79,10 +79,10 @@ class AtomicHook<ReturnType (*)(Args...)> {
 
   // Constructs an object that by default dispatches to/returns the
   // pre-registered default_fn when no hook has been registered at runtime.
-#if ABSL_HAVE_WORKING_ATOMIC_POINTER && ABSL_HAVE_WORKING_CONSTEXPR_STATIC_INIT
+#if TURBO_HAVE_WORKING_ATOMIC_POINTER && TURBO_HAVE_WORKING_CONSTEXPR_STATIC_INIT
   explicit constexpr AtomicHook(FnPtr default_fn)
       : hook_(default_fn), default_fn_(default_fn) {}
-#elif ABSL_HAVE_WORKING_CONSTEXPR_STATIC_INIT
+#elif TURBO_HAVE_WORKING_CONSTEXPR_STATIC_INIT
   explicit constexpr AtomicHook(FnPtr default_fn)
       : hook_(kUninitialized), default_fn_(default_fn) {}
 #else
@@ -143,7 +143,7 @@ class AtomicHook<ReturnType (*)(Args...)> {
   //
   // This causes an issue when building with LLVM under Windows.  To avoid this,
   // we use a less-efficient, intptr_t-based implementation on Windows.
-#if ABSL_HAVE_WORKING_ATOMIC_POINTER
+#if TURBO_HAVE_WORKING_ATOMIC_POINTER
   // Return the stored value, or DummyFunction if no value has been stored.
   FnPtr DoLoad() const { return hook_.load(std::memory_order_acquire); }
 
@@ -159,7 +159,7 @@ class AtomicHook<ReturnType (*)(Args...)> {
   }
 
   std::atomic<FnPtr> hook_;
-#else  // !ABSL_HAVE_WORKING_ATOMIC_POINTER
+#else  // !TURBO_HAVE_WORKING_ATOMIC_POINTER
   // Use a sentinel value unlikely to be the address of an actual function.
   static constexpr intptr_t kUninitialized = 0;
 
@@ -190,11 +190,11 @@ class AtomicHook<ReturnType (*)(Args...)> {
   const FnPtr default_fn_;
 };
 
-#undef ABSL_HAVE_WORKING_ATOMIC_POINTER
-#undef ABSL_HAVE_WORKING_CONSTEXPR_STATIC_INIT
+#undef TURBO_HAVE_WORKING_ATOMIC_POINTER
+#undef TURBO_HAVE_WORKING_CONSTEXPR_STATIC_INIT
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_ATOMIC_HOOK_H_
+#endif  // TURBO_BASE_INTERNAL_ATOMIC_HOOK_H_

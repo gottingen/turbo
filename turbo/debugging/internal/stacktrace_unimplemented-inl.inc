@@ -1,5 +1,5 @@
-#ifndef ABSL_DEBUGGING_INTERNAL_STACKTRACE_UNIMPLEMENTED_INL_H_
-#define ABSL_DEBUGGING_INTERNAL_STACKTRACE_UNIMPLEMENTED_INL_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_STACKTRACE_UNIMPLEMENTED_INL_H_
+#define TURBO_DEBUGGING_INTERNAL_STACKTRACE_UNIMPLEMENTED_INL_H_
 
 template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
 static int UnwindImpl(void** /* result */, int* /* sizes */,
@@ -12,13 +12,13 @@ static int UnwindImpl(void** /* result */, int* /* sizes */,
 }
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 bool StackTraceWorksForTest() {
   return false;
 }
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_INTERNAL_STACKTRACE_UNIMPLEMENTED_INL_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_STACKTRACE_UNIMPLEMENTED_INL_H_

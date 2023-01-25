@@ -1,7 +1,7 @@
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 
-set(ABSL_INTERNAL_DLL_FILES
+set(TURBO_INTERNAL_DLL_FILES
   "algorithm/algorithm.h"
   "algorithm/container.h"
   "base/attributes.h"
@@ -264,7 +264,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "strings/internal/string_constant.h"
   "strings/internal/stringify_sink.h"
   "strings/internal/stringify_sink.cc"
-  "strings/internal/has_absl_stringify.h"
+  "strings/internal/has_turbo_stringify.h"
   "strings/match.cc"
   "strings/match.h"
   "strings/numbers.cc"
@@ -381,7 +381,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "debugging/leak_check.cc"
 )
 
-set(ABSL_INTERNAL_DLL_TARGETS
+set(TURBO_INTERNAL_DLL_TARGETS
   "algorithm"
   "algorithm_container"
   "any"
@@ -503,7 +503,7 @@ set(ABSL_INTERNAL_DLL_TARGETS
   "variant"
 )
 
-function(_absl_target_compile_features_if_available TARGET TYPE FEATURE)
+function(_turbo_target_compile_features_if_available TARGET TYPE FEATURE)
   if(FEATURE IN_LIST CMAKE_CXX_COMPILE_FEATURES)
     target_compile_features(${TARGET} ${TYPE} ${FEATURE})
   else()
@@ -524,38 +524,38 @@ check_cxx_source_compiles(
 #endif
 int main() { return 0; }
 ]==]
-  ABSL_INTERNAL_AT_LEAST_CXX17)
+  TURBO_INTERNAL_AT_LEAST_CXX17)
 
-if(ABSL_INTERNAL_AT_LEAST_CXX17)
-  set(ABSL_INTERNAL_CXX_STD_FEATURE cxx_std_17)
+if(TURBO_INTERNAL_AT_LEAST_CXX17)
+  set(TURBO_INTERNAL_CXX_STD_FEATURE cxx_std_17)
 else()
-  set(ABSL_INTERNAL_CXX_STD_FEATURE cxx_std_14)
+  set(TURBO_INTERNAL_CXX_STD_FEATURE cxx_std_14)
 endif()
 
-function(absl_internal_dll_contains)
-  cmake_parse_arguments(ABSL_INTERNAL_DLL
+function(turbo_internal_dll_contains)
+  cmake_parse_arguments(TURBO_INTERNAL_DLL
     ""
     "OUTPUT;TARGET"
     ""
     ${ARGN}
   )
 
-  STRING(REGEX REPLACE "^turbo::" "" _target ${ABSL_INTERNAL_DLL_TARGET})
+  STRING(REGEX REPLACE "^turbo::" "" _target ${TURBO_INTERNAL_DLL_TARGET})
 
   list(FIND
-    ABSL_INTERNAL_DLL_TARGETS
+    TURBO_INTERNAL_DLL_TARGETS
     "${_target}"
     _index)
 
   if (${_index} GREATER -1)
-    set(${ABSL_INTERNAL_DLL_OUTPUT} 1 PARENT_SCOPE)
+    set(${TURBO_INTERNAL_DLL_OUTPUT} 1 PARENT_SCOPE)
   else()
-    set(${ABSL_INTERNAL_DLL_OUTPUT} 0 PARENT_SCOPE)
+    set(${TURBO_INTERNAL_DLL_OUTPUT} 0 PARENT_SCOPE)
   endif()
 endfunction()
 
-function(absl_internal_dll_targets)
-  cmake_parse_arguments(ABSL_INTERNAL_DLL
+function(turbo_internal_dll_targets)
+  cmake_parse_arguments(TURBO_INTERNAL_DLL
   ""
   "OUTPUT"
   "DEPS"
@@ -563,8 +563,8 @@ function(absl_internal_dll_targets)
   )
 
   set(_deps "")
-  foreach(dep IN LISTS ABSL_INTERNAL_DLL_DEPS)
-    absl_internal_dll_contains(TARGET ${dep} OUTPUT _contains)
+  foreach(dep IN LISTS TURBO_INTERNAL_DLL_DEPS)
+    turbo_internal_dll_contains(TARGET ${dep} OUTPUT _contains)
     if (_contains)
       list(APPEND _deps abseil_dll)
     else()
@@ -574,35 +574,35 @@ function(absl_internal_dll_targets)
 
   # Because we may have added the DLL multiple times
   list(REMOVE_DUPLICATES _deps)
-  set(${ABSL_INTERNAL_DLL_OUTPUT} "${_deps}" PARENT_SCOPE)
+  set(${TURBO_INTERNAL_DLL_OUTPUT} "${_deps}" PARENT_SCOPE)
 endfunction()
 
-function(absl_make_dll)
+function(turbo_make_dll)
   add_library(
     abseil_dll
     SHARED
-      "${ABSL_INTERNAL_DLL_FILES}"
+      "${TURBO_INTERNAL_DLL_FILES}"
   )
   target_link_libraries(
     abseil_dll
     PRIVATE
-      ${ABSL_DEFAULT_LINKOPTS}
+      ${TURBO_DEFAULT_LINKOPTS}
   )
   set_property(TARGET abseil_dll PROPERTY LINKER_LANGUAGE "CXX")
   target_include_directories(
     abseil_dll
     PUBLIC
-      "$<BUILD_INTERFACE:${ABSL_COMMON_INCLUDE_DIRS}>"
+      "$<BUILD_INTERFACE:${TURBO_COMMON_INCLUDE_DIRS}>"
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
   target_compile_options(
     abseil_dll
     PRIVATE
-      ${ABSL_DEFAULT_COPTS}
+      ${TURBO_DEFAULT_COPTS}
   )
 
-  foreach(cflag ${ABSL_CC_LIB_COPTS})
+  foreach(cflag ${TURBO_CC_LIB_COPTS})
     if(${cflag} MATCHES "^(-Wno|/wd)")
       # These flags are needed to suppress warnings that might fire in our headers.
       set(PC_CFLAGS "${PC_CFLAGS} ${cflag}")
@@ -612,7 +612,7 @@ function(absl_make_dll)
       set(PC_CFLAGS "${PC_CFLAGS} ${cflag}")
     endif()
   endforeach()
-  string(REPLACE ";" " " PC_LINKOPTS "${ABSL_CC_LIB_LINKOPTS}")
+  string(REPLACE ";" " " PC_LINKOPTS "${TURBO_CC_LIB_LINKOPTS}")
 
   FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/abseil_dll.pc" CONTENT "\
 prefix=${CMAKE_INSTALL_PREFIX}\n\
@@ -621,10 +621,10 @@ libdir=${CMAKE_INSTALL_FULL_LIBDIR}\n\
 includedir=${CMAKE_INSTALL_FULL_INCLUDEDIR}\n\
 \n\
 Name: abseil_dll\n\
-Description: Abseil DLL library\n\
+Description: Turbo DLL library\n\
 URL: https://abseil.io/\n\
-Version: ${absl_VERSION}\n\
-Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${ABSL_CC_LIB_IS_INTERFACE}>>:-labseil_dll>\n\
+Version: ${turbo_VERSION}\n\
+Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${TURBO_CC_LIB_IS_INTERFACE}>>:-labseil_dll>\n\
 Cflags: -I\${includedir}${PC_CFLAGS}\n")
   INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/abseil_dll.pc"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
@@ -632,28 +632,28 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
   target_compile_definitions(
     abseil_dll
     PRIVATE
-      ABSL_BUILD_DLL
+      TURBO_BUILD_DLL
       NOMINMAX
     INTERFACE
-      ${ABSL_CC_LIB_DEFINES}
-      ABSL_CONSUME_DLL
+      ${TURBO_CC_LIB_DEFINES}
+      TURBO_CONSUME_DLL
   )
 
-  if(ABSL_PROPAGATE_CXX_STD)
-    # Abseil libraries require C++14 as the current minimum standard. When
+  if(TURBO_PROPAGATE_CXX_STD)
+    # Turbo libraries require C++14 as the current minimum standard. When
     # compiled with C++17 (either because it is the compiler's default or
-    # explicitly requested), then Abseil requires C++17.
-    _absl_target_compile_features_if_available(${_NAME} PUBLIC ${ABSL_INTERNAL_CXX_STD_FEATURE})
+    # explicitly requested), then Turbo requires C++17.
+    _turbo_target_compile_features_if_available(${_NAME} PUBLIC ${TURBO_INTERNAL_CXX_STD_FEATURE})
   else()
     # Note: This is legacy (before CMake 3.8) behavior. Setting the
-    # target-level CXX_STANDARD property to ABSL_CXX_STANDARD (which is
+    # target-level CXX_STANDARD property to TURBO_CXX_STANDARD (which is
     # initialized by CMAKE_CXX_STANDARD) should have no real effect, since
     # that is the default value anyway.
     #
     # CXX_STANDARD_REQUIRED does guard against the top-level CMake project
     # not having enabled CMAKE_CXX_STANDARD_REQUIRED (which prevents
     # "decaying" to an older standard if the requested one isn't available).
-    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${ABSL_CXX_STANDARD})
+    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${TURBO_CXX_STANDARD})
     set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
   endif()
 

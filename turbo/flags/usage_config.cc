@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,13 +34,13 @@ extern "C" {
 
 // Additional report of fatal usage error message before we std::exit. Error is
 // fatal if is_fatal argument to ReportUsageError is true.
-ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(
-    AbslInternalReportFatalUsageError)(turbo::string_view) {}
+TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
+    TurboInternalReportFatalUsageError)(turbo::string_view) {}
 
 }  // extern "C"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 namespace {
@@ -104,9 +104,9 @@ std::string NormalizeFilename(turbo::string_view filename) {
 
 // --------------------------------------------------------------------
 
-ABSL_CONST_INIT turbo::Mutex custom_usage_config_guard(turbo::kConstInit);
-ABSL_CONST_INIT FlagsUsageConfig* custom_usage_config
-    ABSL_GUARDED_BY(custom_usage_config_guard) = nullptr;
+TURBO_CONST_INIT turbo::Mutex custom_usage_config_guard(turbo::kConstInit);
+TURBO_CONST_INIT FlagsUsageConfig* custom_usage_config
+    TURBO_GUARDED_BY(custom_usage_config_guard) = nullptr;
 
 }  // namespace
 
@@ -129,7 +129,7 @@ void ReportUsageError(turbo::string_view msg, bool is_fatal) {
   std::cerr << "ERROR: " << msg << std::endl;
 
   if (is_fatal) {
-    ABSL_INTERNAL_C_SYMBOL(AbslInternalReportFatalUsageError)(msg);
+    TURBO_INTERNAL_C_SYMBOL(TurboInternalReportFatalUsageError)(msg);
   }
 }
 
@@ -161,5 +161,5 @@ void SetFlagsUsageConfig(FlagsUsageConfig usage_config) {
     flags_internal::custom_usage_config = new FlagsUsageConfig(usage_config);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

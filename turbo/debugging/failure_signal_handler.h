@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 // File: failure_signal_handler.h
 // -----------------------------------------------------------------------------
 //
-// This file configures the Abseil *failure signal handler* to capture and dump
+// This file configures the Turbo *failure signal handler* to capture and dump
 // useful debugging information (such as a stacktrace) upon program failure.
 //
 // To use the failure signal handler, call `turbo::InstallFailureSignalHandler()`
@@ -36,18 +36,18 @@
 // `SIGFPE`, `SIGABRT`, `SIGTERM`, `SIGBUG`, and `SIGTRAP`) will call the
 // installed failure signal handler and provide debugging information to stderr.
 //
-// Note that you should *not* install the Abseil failure signal handler more
-// than once. You may, of course, have another (non-Abseil) failure signal
-// handler installed (which would be triggered if Abseil's failure signal
+// Note that you should *not* install the Turbo failure signal handler more
+// than once. You may, of course, have another (non-Turbo) failure signal
+// handler installed (which would be triggered if Turbo's failure signal
 // handler sets `call_previous_handler` to `true`).
 
-#ifndef ABSL_DEBUGGING_FAILURE_SIGNAL_HANDLER_H_
-#define ABSL_DEBUGGING_FAILURE_SIGNAL_HANDLER_H_
+#ifndef TURBO_DEBUGGING_FAILURE_SIGNAL_HANDLER_H_
+#define TURBO_DEBUGGING_FAILURE_SIGNAL_HANDLER_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // FailureSignalHandlerOptions
 //
@@ -84,7 +84,7 @@ struct FailureSignalHandlerOptions {
   // recover from the fatal signal. Instead, they should terminate the program
   // via some mechanism, like raising the default handler for the signal, or by
   // calling `_exit()`. Note that the failure signal handler may put parts of
-  // the Abseil library into a state from which they cannot recover.
+  // the Turbo library into a state from which they cannot recover.
   bool call_previous_handler = false;
 
   // If non-null, indicates a pointer to a callback function that will be called
@@ -115,7 +115,7 @@ namespace debugging_internal {
 const char* FailureSignalToString(int signo);
 }  // namespace debugging_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_FAILURE_SIGNAL_HANDLER_H_
+#endif  // TURBO_DEBUGGING_FAILURE_SIGNAL_HANDLER_H_

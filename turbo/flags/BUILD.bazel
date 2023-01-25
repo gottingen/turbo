@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -30,8 +30,8 @@ cc_library(
     hdrs = [
         "internal/path_util.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/flags:__pkg__",
     ],
@@ -49,8 +49,8 @@ cc_library(
     hdrs = [
         "internal/program_name.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/flags:__pkg__",
         "//turbo/log:__pkg__",
@@ -73,8 +73,8 @@ cc_library(
         "config.h",
         "usage_config.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":path_util",
         ":program_name",
@@ -93,8 +93,8 @@ cc_library(
     hdrs = [
         "marshalling.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -113,8 +113,8 @@ cc_library(
     hdrs = [
         "internal/commandlineflag.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//visibility:private",
     ],
@@ -132,8 +132,8 @@ cc_library(
     hdrs = [
         "commandlineflag.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":commandlineflag_internal",
         "//turbo/base:config",
@@ -151,8 +151,8 @@ cc_library(
     hdrs = [
         "internal/private_handle_accessor.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/flags:__pkg__",
     ],
@@ -173,8 +173,8 @@ cc_library(
         "internal/registry.h",
         "reflection.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":commandlineflag",
         ":commandlineflag_internal",
@@ -197,8 +197,8 @@ cc_library(
         "internal/flag.h",
         "internal/sequence_lock.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//turbo/base:__subpackages__"],
     deps = [
         ":commandlineflag",
@@ -228,8 +228,8 @@ cc_library(
         "declare.h",
         "flag.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":config",
         ":flag_internal",
@@ -249,8 +249,8 @@ cc_library(
     hdrs = [
         "internal/usage.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/flags:__pkg__",
     ],
@@ -278,8 +278,8 @@ cc_library(
     hdrs = [
         "usage.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":usage_internal",
         "//turbo/base:config",
@@ -296,8 +296,8 @@ cc_library(
         "internal/parse.h",
         "parse.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":commandlineflag",
         ":commandlineflag_internal",
@@ -326,8 +326,8 @@ cc_test(
     srcs = [
         "commandlineflag_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:android",
         "no_test:os:ios",
@@ -354,8 +354,8 @@ cc_test(
     srcs = [
         "config_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":config",
         "@com_google_googletest//:gtest_main",
@@ -369,8 +369,8 @@ cc_test(
         "flag_test.cc",
         "flag_test_defs.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:android",
         "no_test:os:ios",
@@ -398,10 +398,10 @@ cc_binary(
     srcs = [
         "flag_benchmark.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     linkopts = select({
         "//conditions:default": [],
-    }) + ABSL_DEFAULT_LINKOPTS,
+    }) + TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -423,8 +423,8 @@ cc_test(
     srcs = [
         "marshalling_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":marshalling",
         "@com_google_googletest//:gtest_main",
@@ -437,8 +437,8 @@ cc_test(
     srcs = [
         "parse_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:android",
         "no_test:os:ios",
@@ -465,8 +465,8 @@ cc_test(
     srcs = [
         "internal/path_util_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":path_util",
         "@com_google_googletest//:gtest_main",
@@ -479,8 +479,8 @@ cc_test(
     srcs = [
         "internal/program_name_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_wasm"],
     deps = [
         ":program_name",
@@ -495,8 +495,8 @@ cc_test(
     srcs = [
         "reflection_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:android",
         "no_test:os:ios",
@@ -523,8 +523,8 @@ cc_test(
     srcs = [
         "internal/sequence_lock_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     shard_count = 31,
     tags = ["no_test_wasm"],
     deps = [
@@ -542,8 +542,8 @@ cc_test(
     srcs = [
         "usage_config_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":config",
         ":path_util",
@@ -559,8 +559,8 @@ cc_test(
     srcs = [
         "internal/usage_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:android",
         "no_test:os:ios",

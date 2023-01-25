@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -27,8 +27,8 @@ licenses(["notice"])
 cc_library(
     name = "any",
     hdrs = ["any.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":bad_any_cast",
         "//turbo/base:config",
@@ -42,8 +42,8 @@ cc_library(
 cc_library(
     name = "bad_any_cast",
     hdrs = ["bad_any_cast.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":bad_any_cast_impl",
         "//turbo/base:config",
@@ -56,8 +56,8 @@ cc_library(
         "bad_any_cast.cc",
         "bad_any_cast.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base:config",
@@ -71,8 +71,8 @@ cc_test(
     srcs = [
         "any_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":any",
         "//turbo/base:config",
@@ -86,8 +86,8 @@ cc_test(
 cc_test(
     name = "any_exception_safety_test",
     srcs = ["any_exception_safety_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":any",
         "//turbo/base:config",
@@ -104,8 +104,8 @@ cc_library(
     hdrs = [
         "span.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/algorithm",
         "//turbo/base:core_headers",
@@ -118,8 +118,8 @@ cc_test(
     name = "span_test",
     size = "small",
     srcs = ["span_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":span",
         "//turbo/base:config",
@@ -137,8 +137,8 @@ cc_library(
     name = "optional",
     srcs = ["internal/optional.h"],
     hdrs = ["optional.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":bad_optional_access",
         "//turbo/base:base_internal",
@@ -154,8 +154,8 @@ cc_library(
     name = "bad_optional_access",
     srcs = ["bad_optional_access.cc"],
     hdrs = ["bad_optional_access.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:raw_logging_internal",
@@ -166,8 +166,8 @@ cc_library(
     name = "bad_variant_access",
     srcs = ["bad_variant_access.cc"],
     hdrs = ["bad_variant_access.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:raw_logging_internal",
@@ -180,8 +180,8 @@ cc_test(
     srcs = [
         "optional_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":optional",
         "//turbo/base:config",
@@ -197,8 +197,8 @@ cc_test(
     srcs = [
         "optional_exception_safety_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":optional",
         "//turbo/base:config",
@@ -219,8 +219,8 @@ cc_library(
         "internal/parentheses.h",
         "internal/transform_args.h",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/algorithm:container",
         "//turbo/meta:type_traits",
@@ -236,8 +236,8 @@ cc_test(
     srcs = [
         "internal/conformance_testing_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":conformance_testing",
         "//turbo/meta:type_traits",
@@ -249,8 +249,8 @@ cc_library(
     name = "variant",
     srcs = ["internal/variant.h"],
     hdrs = ["variant.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":bad_variant_access",
         "//turbo/base:base_internal",
@@ -265,8 +265,8 @@ cc_test(
     name = "variant_test",
     size = "small",
     srcs = ["variant_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":variant",
         "//turbo/base:config",
@@ -283,8 +283,8 @@ cc_test(
     srcs = [
         "variant_benchmark.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     deps = [
         ":variant",
@@ -299,8 +299,8 @@ cc_test(
     srcs = [
         "variant_exception_safety_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":variant",
         "//turbo/base:config",
@@ -313,8 +313,8 @@ cc_test(
 cc_library(
     name = "compare",
     hdrs = ["compare.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:core_headers",
         "//turbo/meta:type_traits",
@@ -327,7 +327,7 @@ cc_test(
     srcs = [
         "compare_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         ":compare",
         "//turbo/base",

@@ -1,5 +1,5 @@
 #
-# Copyright 2022 The Abseil Authors.
+# Copyright 2022 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
 #
 
 # Internal targets
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_check_impl
   SRCS
   HDRS
     "internal/check_impl.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log_internal_check_op
@@ -33,7 +33,7 @@ absl_cc_library(
     turbo::log_internal_strip
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_check_op
   SRCS
@@ -41,9 +41,9 @@ absl_cc_library(
   HDRS
     "internal/check_op.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -53,7 +53,7 @@ absl_cc_library(
     turbo::strings
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_conditions
   SRCS
@@ -61,9 +61,9 @@ absl_cc_library(
   HDRS
     "internal/conditions.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::base
     turbo::config
@@ -71,36 +71,36 @@ absl_cc_library(
     turbo::log_internal_voidify
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_config
   SRCS
   HDRS
     "internal/config.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_flags
   SRCS
   HDRS
     "internal/flags.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::flags
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_format
   SRCS
@@ -108,9 +108,9 @@ absl_cc_library(
   HDRS
     "internal/log_format.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -124,7 +124,7 @@ absl_cc_library(
     turbo::span
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_globals
   SRCS
@@ -132,9 +132,9 @@ absl_cc_library(
   HDRS
     "internal/globals.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -144,23 +144,23 @@ absl_cc_library(
     turbo::time
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_log_impl
   SRCS
   HDRS
     "internal/log_impl.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::log_internal_conditions
     turbo::log_internal_message
     turbo::log_internal_strip
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_proto
   SRCS
@@ -168,9 +168,9 @@ absl_cc_library(
   HDRS
     "internal/proto.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::base
     turbo::config
@@ -179,7 +179,7 @@ absl_cc_library(
     turbo::span
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_message
   SRCS
@@ -187,9 +187,9 @@ absl_cc_library(
   HDRS
     "internal/log_message.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::base
     turbo::config
@@ -216,7 +216,7 @@ absl_cc_library(
     turbo::span
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_log_sink_set
   SRCS
@@ -224,9 +224,9 @@ absl_cc_library(
   HDRS
     "internal/log_sink_set.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
     $<$<BOOL:${ANDROID}>:-llog>
   DEPS
     turbo::base
@@ -245,7 +245,7 @@ absl_cc_library(
     turbo::strings
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_nullguard
   SRCS
@@ -253,24 +253,24 @@ absl_cc_library(
   HDRS
     "internal/nullguard.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_nullstream
   SRCS
   HDRS
     "internal/nullstream.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -278,23 +278,23 @@ absl_cc_library(
     turbo::strings
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_strip
   SRCS
   HDRS
     "internal/strip.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::log_internal_message
     turbo::log_internal_nullstream
     turbo::log_severity
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_test_actions
   SRCS
@@ -302,9 +302,9 @@ absl_cc_library(
   HDRS
     "internal/test_actions.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -315,7 +315,7 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_test_helpers
   SRCS
@@ -323,9 +323,9 @@ absl_cc_library(
   HDRS
     "internal/test_helpers.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::log_globals
@@ -336,7 +336,7 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_test_matchers
   SRCS
@@ -344,9 +344,9 @@ absl_cc_library(
   HDRS
     "internal/test_matchers.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -360,30 +360,30 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_voidify
   SRCS
   HDRS
     "internal/voidify.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_append_truncated
   SRCS
   HDRS
     "internal/append_truncated.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::strings
@@ -391,46 +391,46 @@ absl_cc_library(
 )
 
 # Public targets
-absl_cc_library(
+turbo_cc_library(
   NAME
-    absl_check
+    turbo_check
   SRCS
   HDRS
-    "absl_check.h"
+    "turbo_check.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::log_internal_check_impl
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
-    absl_log
+    turbo_log
   SRCS
   HDRS
-    "absl_log.h"
+    "turbo_log.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::log_internal_log_impl
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     check
   SRCS
   HDRS
     "check.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::log_internal_check_impl
     turbo::core_headers
@@ -441,7 +441,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     die_if_null
   SRCS
@@ -449,9 +449,9 @@ absl_cc_library(
   HDRS
     "die_if_null.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -460,7 +460,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_flags
   SRCS
@@ -468,9 +468,9 @@ absl_cc_library(
   HDRS
     "flags.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -484,7 +484,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_globals
   SRCS
@@ -492,9 +492,9 @@ absl_cc_library(
   HDRS
     "globals.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::atomic_hook
     turbo::config
@@ -504,7 +504,7 @@ absl_cc_library(
     turbo::strings
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_initialize
   SRCS
@@ -512,9 +512,9 @@ absl_cc_library(
   HDRS
     "initialize.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::log_globals
@@ -523,22 +523,22 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log
   SRCS
   HDRS
     "log.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::log_internal_log_impl
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_entry
   SRCS
@@ -546,9 +546,9 @@ absl_cc_library(
   HDRS
     "log_entry.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -560,7 +560,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_sink
   SRCS
@@ -568,25 +568,25 @@ absl_cc_library(
   HDRS
     "log_sink.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::log_entry
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_sink_registry
   SRCS
   HDRS
     "log_sink_registry.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::log_sink
@@ -594,19 +594,19 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_streamer
   SRCS
   HDRS
     "log_streamer.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
-    turbo::absl_log
+    turbo::turbo_log
     turbo::log_severity
     turbo::optional
     turbo::strings
@@ -615,7 +615,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     scoped_mock_log
   SRCS
@@ -623,9 +623,9 @@ absl_cc_library(
   HDRS
     "scoped_mock_log.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::log_entry
@@ -640,30 +640,30 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_internal_structured
   HDRS
     "internal/structured.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::log_internal_message
     turbo::strings
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     log_structured
   HDRS
     "structured.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::log_internal_structured
@@ -673,18 +673,18 @@ absl_cc_library(
 
 # Test targets
 
-absl_cc_test(
+turbo_cc_test(
   NAME
-    absl_check_test
+    turbo_check_test
   SRCS
-    "absl_check_test.cc"
+    "turbo_check_test.cc"
     "check_test_impl.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::absl_check
+    turbo::turbo_check
     turbo::config
     turbo::core_headers
     turbo::log_internal_test_helpers
@@ -693,19 +693,19 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
-    absl_log_basic_test
+    turbo_log_basic_test
   SRCS
     "log_basic_test.cc"
     "log_basic_test_impl.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::base
-    turbo::absl_log
+    turbo::turbo_log
     turbo::log_entry
     turbo::log_globals
     turbo::log_severity
@@ -717,16 +717,16 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     check_test
   SRCS
     "check_test.cc"
     "check_test_impl.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::check
     turbo::config
@@ -737,15 +737,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     die_if_null_test
   SRCS
     "die_if_null_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::die_if_null
@@ -753,16 +753,16 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_basic_test
   SRCS
     "log_basic_test.cc"
     "log_basic_test_impl.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::base
     turbo::log
@@ -777,15 +777,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_entry_test
   SRCS
     "log_entry_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -802,15 +802,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_flags_test
   SRCS
     "flags_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log
@@ -828,15 +828,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_globals_test
   SRCS
     "globals_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log
@@ -848,15 +848,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_format_test
   SRCS
     "log_format_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::check
     turbo::log
@@ -869,15 +869,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_macro_hygiene_test
   SRCS
     "log_macro_hygiene_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log
@@ -887,15 +887,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_sink_test
   SRCS
     "log_sink_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log
@@ -911,15 +911,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_streamer_test
   SRCS
     "log_streamer_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::base
     turbo::core_headers
@@ -934,15 +934,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_modifier_methods_test
   SRCS
     "log_modifier_methods_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::log
     turbo::log_internal_test_actions
@@ -956,15 +956,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     scoped_mock_log_test
   SRCS
     "scoped_mock_log_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log
@@ -981,15 +981,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_internal_stderr_log_sink_test
   SRCS
     "internal/stderr_log_sink_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log
@@ -1000,15 +1000,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_stripping_test
   SRCS
     "stripping_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::check
     turbo::flags_program_name
@@ -1021,15 +1021,15 @@ absl_cc_test(
     GTest::gtest_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     log_structured_test
   SRCS
     "structured_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::core_headers
     turbo::log

@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ std::vector<int> MultiplicativeRange(int low, int high, int scale) {
   return result;
 }
 
-#ifndef ABSL_HAVE_THREAD_SANITIZER
+#ifndef TURBO_HAVE_THREAD_SANITIZER
 const int kMaxThreads = turbo::base_internal::NumCPUs();
 #else
 // With TSAN, a lot of threads contending for atomic access on the sequence

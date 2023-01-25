@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@
 // the default allocator (defined as `std::allocator<T>`). Optionally, a custom
 // allocator type may be specified as `A` in `turbo::InlinedVector<T, N, A>`.
 
-#ifndef ABSL_CONTAINER_INLINED_VECTOR_H_
-#define ABSL_CONTAINER_INLINED_VECTOR_H_
+#ifndef TURBO_CONTAINER_INLINED_VECTOR_H_
+#define TURBO_CONTAINER_INLINED_VECTOR_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -55,7 +55,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 // -----------------------------------------------------------------------------
 // InlinedVector
 // -----------------------------------------------------------------------------
@@ -329,14 +329,14 @@ class InlinedVector {
   //
   // Returns a `reference` to the `i`th element of the inlined vector.
   reference operator[](size_type i) {
-    ABSL_HARDENING_ASSERT(i < size());
+    TURBO_HARDENING_ASSERT(i < size());
     return data()[i];
   }
 
   // Overload of `InlinedVector::operator[](...)` that returns a
   // `const_reference` to the `i`th element of the inlined vector.
   const_reference operator[](size_type i) const {
-    ABSL_HARDENING_ASSERT(i < size());
+    TURBO_HARDENING_ASSERT(i < size());
     return data()[i];
   }
 
@@ -347,7 +347,7 @@ class InlinedVector {
   // NOTE: if `i` is not within the required range of `InlinedVector::at(...)`,
   // in both debug and non-debug builds, `std::out_of_range` will be thrown.
   reference at(size_type i) {
-    if (ABSL_PREDICT_FALSE(i >= size())) {
+    if (TURBO_PREDICT_FALSE(i >= size())) {
       base_internal::ThrowStdOutOfRange(
           "`InlinedVector::at(size_type)` failed bounds check");
     }
@@ -360,7 +360,7 @@ class InlinedVector {
   // NOTE: if `i` is not within the required range of `InlinedVector::at(...)`,
   // in both debug and non-debug builds, `std::out_of_range` will be thrown.
   const_reference at(size_type i) const {
-    if (ABSL_PREDICT_FALSE(i >= size())) {
+    if (TURBO_PREDICT_FALSE(i >= size())) {
       base_internal::ThrowStdOutOfRange(
           "`InlinedVector::at(size_type) const` failed bounds check");
     }
@@ -371,14 +371,14 @@ class InlinedVector {
   //
   // Returns a `reference` to the first element of the inlined vector.
   reference front() {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[0];
   }
 
   // Overload of `InlinedVector::front()` that returns a `const_reference` to
   // the first element of the inlined vector.
   const_reference front() const {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[0];
   }
 
@@ -386,14 +386,14 @@ class InlinedVector {
   //
   // Returns a `reference` to the last element of the inlined vector.
   reference back() {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[size() - 1];
   }
 
   // Overload of `InlinedVector::back()` that returns a `const_reference` to the
   // last element of the inlined vector.
   const_reference back() const {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
     return data()[size() - 1];
   }
 
@@ -480,7 +480,7 @@ class InlinedVector {
   // Overload of `InlinedVector::operator=(...)` that replaces the elements of
   // the inlined vector with copies of the elements of `other`.
   InlinedVector& operator=(const InlinedVector& other) {
-    if (ABSL_PREDICT_TRUE(this != std::addressof(other))) {
+    if (TURBO_PREDICT_TRUE(this != std::addressof(other))) {
       const_pointer other_data = other.data();
       assign(other_data, other_data + other.size());
     }
@@ -494,7 +494,7 @@ class InlinedVector {
   // NOTE: as a result of calling this overload, `other` is left in a valid but
   // unspecified state.
   InlinedVector& operator=(InlinedVector&& other) {
-    if (ABSL_PREDICT_TRUE(this != std::addressof(other))) {
+    if (TURBO_PREDICT_TRUE(this != std::addressof(other))) {
       MoveAssignment(MoveAssignmentPolicy{}, std::move(other));
     }
 
@@ -548,7 +548,7 @@ class InlinedVector {
   // NOTE: If `n` is smaller than `size()`, extra elements are destroyed. If `n`
   // is larger than `size()`, new elements are value-initialized.
   void resize(size_type n) {
-    ABSL_HARDENING_ASSERT(n <= max_size());
+    TURBO_HARDENING_ASSERT(n <= max_size());
     storage_.Resize(DefaultValueAdapter<A>(), n);
   }
 
@@ -558,7 +558,7 @@ class InlinedVector {
   // NOTE: if `n` is smaller than `size()`, extra elements are destroyed. If `n`
   // is larger than `size()`, new elements are copied-constructed from `v`.
   void resize(size_type n, const_reference v) {
-    ABSL_HARDENING_ASSERT(n <= max_size());
+    TURBO_HARDENING_ASSERT(n <= max_size());
     storage_.Resize(CopyValueAdapter<A>(std::addressof(v)), n);
   }
 
@@ -580,10 +580,10 @@ class InlinedVector {
   // of `v` starting at `pos`, returning an `iterator` pointing to the first of
   // the newly inserted elements.
   iterator insert(const_iterator pos, size_type n, const_reference v) {
-    ABSL_HARDENING_ASSERT(pos >= begin());
-    ABSL_HARDENING_ASSERT(pos <= end());
+    TURBO_HARDENING_ASSERT(pos >= begin());
+    TURBO_HARDENING_ASSERT(pos <= end());
 
-    if (ABSL_PREDICT_TRUE(n != 0)) {
+    if (TURBO_PREDICT_TRUE(n != 0)) {
       value_type dealias = v;
       // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=102329#c2
       // It appears that GCC thinks that since `pos` is a const pointer and may
@@ -620,10 +620,10 @@ class InlinedVector {
             EnableIfAtLeastForwardIterator<ForwardIterator> = 0>
   iterator insert(const_iterator pos, ForwardIterator first,
                   ForwardIterator last) {
-    ABSL_HARDENING_ASSERT(pos >= begin());
-    ABSL_HARDENING_ASSERT(pos <= end());
+    TURBO_HARDENING_ASSERT(pos >= begin());
+    TURBO_HARDENING_ASSERT(pos <= end());
 
-    if (ABSL_PREDICT_TRUE(first != last)) {
+    if (TURBO_PREDICT_TRUE(first != last)) {
       return storage_.Insert(
           pos, IteratorValueAdapter<A, ForwardIterator>(first),
           static_cast<size_type>(std::distance(first, last)));
@@ -640,8 +640,8 @@ class InlinedVector {
   template <typename InputIterator,
             DisableIfAtLeastForwardIterator<InputIterator> = 0>
   iterator insert(const_iterator pos, InputIterator first, InputIterator last) {
-    ABSL_HARDENING_ASSERT(pos >= begin());
-    ABSL_HARDENING_ASSERT(pos <= end());
+    TURBO_HARDENING_ASSERT(pos >= begin());
+    TURBO_HARDENING_ASSERT(pos <= end());
 
     size_type index = static_cast<size_type>(std::distance(cbegin(), pos));
     for (size_type i = index; first != last; ++i, static_cast<void>(++first)) {
@@ -657,8 +657,8 @@ class InlinedVector {
   // `pos`, returning an `iterator` pointing to the newly emplaced element.
   template <typename... Args>
   iterator emplace(const_iterator pos, Args&&... args) {
-    ABSL_HARDENING_ASSERT(pos >= begin());
-    ABSL_HARDENING_ASSERT(pos <= end());
+    TURBO_HARDENING_ASSERT(pos >= begin());
+    TURBO_HARDENING_ASSERT(pos <= end());
 
     value_type dealias(std::forward<Args>(args)...);
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=102329#c2
@@ -703,7 +703,7 @@ class InlinedVector {
   //
   // Destroys the element at `back()`, reducing the size by `1`.
   void pop_back() noexcept {
-    ABSL_HARDENING_ASSERT(!empty());
+    TURBO_HARDENING_ASSERT(!empty());
 
     AllocatorTraits<A>::destroy(storage_.GetAllocator(), data() + (size() - 1));
     storage_.SubtractSize(1);
@@ -716,8 +716,8 @@ class InlinedVector {
   //
   // NOTE: may return `end()`, which is not dereferencable.
   iterator erase(const_iterator pos) {
-    ABSL_HARDENING_ASSERT(pos >= begin());
-    ABSL_HARDENING_ASSERT(pos < end());
+    TURBO_HARDENING_ASSERT(pos >= begin());
+    TURBO_HARDENING_ASSERT(pos < end());
 
     return storage_.Erase(pos, pos + 1);
   }
@@ -728,11 +728,11 @@ class InlinedVector {
   //
   // NOTE: may return `end()`, which is not dereferencable.
   iterator erase(const_iterator from, const_iterator to) {
-    ABSL_HARDENING_ASSERT(from >= begin());
-    ABSL_HARDENING_ASSERT(from <= to);
-    ABSL_HARDENING_ASSERT(to <= end());
+    TURBO_HARDENING_ASSERT(from >= begin());
+    TURBO_HARDENING_ASSERT(from <= to);
+    TURBO_HARDENING_ASSERT(to <= end());
 
-    if (ABSL_PREDICT_TRUE(from != to)) {
+    if (TURBO_PREDICT_TRUE(from != to)) {
       return storage_.Erase(from, to);
     } else {
       return const_cast<iterator>(from);
@@ -774,14 +774,14 @@ class InlinedVector {
   //
   // Swaps the contents of the inlined vector with `other`.
   void swap(InlinedVector& other) {
-    if (ABSL_PREDICT_TRUE(this != std::addressof(other))) {
+    if (TURBO_PREDICT_TRUE(this != std::addressof(other))) {
       storage_.Swap(std::addressof(other.storage_));
     }
   }
 
  private:
   template <typename H, typename TheT, size_t TheN, typename TheA>
-  friend H AbslHashValue(H h, const turbo::InlinedVector<TheT, TheN, TheA>& a);
+  friend H TurboHashValue(H h, const turbo::InlinedVector<TheT, TheN, TheA>& a);
 
   void MoveAssignment(MemcpyPolicy, InlinedVector&& other) {
     inlined_vector_internal::DestroyAdapter<A>::DestroyElements(
@@ -898,17 +898,17 @@ bool operator>=(const turbo::InlinedVector<T, N, A>& a,
   return !(a < b);
 }
 
-// `AbslHashValue(...)`
+// `TurboHashValue(...)`
 //
 // Provides `turbo::Hash` support for `turbo::InlinedVector`. It is uncommon to
 // call this directly.
 template <typename H, typename T, size_t N, typename A>
-H AbslHashValue(H h, const turbo::InlinedVector<T, N, A>& a) {
+H TurboHashValue(H h, const turbo::InlinedVector<T, N, A>& a) {
   auto size = a.size();
   return H::combine(H::combine_contiguous(std::move(h), a.data(), size), size);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INLINED_VECTOR_H_
+#endif  // TURBO_CONTAINER_INLINED_VECTOR_H_

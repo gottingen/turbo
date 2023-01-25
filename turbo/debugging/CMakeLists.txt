@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 find_library(EXECINFO_LIBRARY execinfo)
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     stacktrace
   HDRS
@@ -34,7 +34,7 @@ absl_cc_library(
   SRCS
     "stacktrace.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
     $<$<BOOL:${EXECINFO_LIBRARY}>:${EXECINFO_LIBRARY}>
   DEPS
@@ -45,20 +45,20 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     stacktrace_test
   SRCS
     "stacktrace_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::stacktrace
     turbo::core_headers
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     symbolize
   HDRS
@@ -72,9 +72,9 @@ absl_cc_library(
     "symbolize_unimplemented.inc"
     "symbolize_win32.inc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
     $<$<BOOL:${MINGW}>:-ldbghelp>
   DEPS
     turbo::debugging_internal
@@ -89,13 +89,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     symbolize_test
   SRCS
     "symbolize_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
     $<$<BOOL:${MSVC}>:-Z7>
   LINKOPTS
     $<$<BOOL:${MSVC}>:-DEBUG>
@@ -112,7 +112,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     examine_stack
   HDRS
@@ -120,7 +120,7 @@ absl_cc_library(
   SRCS
     "internal/examine_stack.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::stacktrace
     turbo::symbolize
@@ -129,7 +129,7 @@ absl_cc_library(
     turbo::raw_logging_internal
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     failure_signal_handler
   HDRS
@@ -137,7 +137,7 @@ absl_cc_library(
   SRCS
     "failure_signal_handler.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::examine_stack
     turbo::stacktrace
@@ -148,13 +148,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     failure_signal_handler_test
   SRCS
     "failure_signal_handler_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::failure_signal_handler
     turbo::stacktrace
@@ -166,7 +166,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     debugging_internal
   HDRS
@@ -178,7 +178,7 @@ absl_cc_library(
     "internal/elf_mem_image.cc"
     "internal/vdso_support.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::core_headers
     turbo::config
@@ -188,7 +188,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     demangle_internal
   HDRS
@@ -196,20 +196,20 @@ absl_cc_library(
   SRCS
     "internal/demangle.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::core_headers
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     demangle_test
   SRCS
     "internal/demangle_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::demangle_internal
     turbo::stack_consumption
@@ -220,7 +220,7 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     leak_check
   HDRS
@@ -228,22 +228,22 @@ absl_cc_library(
   SRCS
     "leak_check.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     leak_check_test
   SRCS
     "leak_check_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   LINKOPTS
-    ${ABSL_DEFAULT_LINKOPTS}
+    ${TURBO_DEFAULT_LINKOPTS}
   DEPS
     turbo::leak_check
     turbo::base
@@ -251,7 +251,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     stack_consumption
   HDRS
@@ -259,7 +259,7 @@ absl_cc_library(
   SRCS
     "internal/stack_consumption.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -267,13 +267,13 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     stack_consumption_test
   SRCS
     "internal/stack_consumption_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::stack_consumption
     turbo::core_headers
@@ -282,11 +282,11 @@ absl_cc_test(
 )
 
 # component target
-absl_cc_library(
+turbo_cc_library(
   NAME
     debugging
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::stacktrace
     turbo::leak_check

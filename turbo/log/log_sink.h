@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@
 //
 // This header declares the interface class `turbo::LogSink`.
 
-#ifndef ABSL_LOG_LOG_SINK_H_
-#define ABSL_LOG_LOG_SINK_H_
+#ifndef TURBO_LOG_LOG_SINK_H_
+#define TURBO_LOG_LOG_SINK_H_
 
 #include "turbo/base/config.h"
 #include "turbo/log/log_entry.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::LogSink
 //
@@ -58,7 +58,7 @@ class LogSink {
   virtual void KeyFunction() const final;  // NOLINT(readability/inheritance)
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_LOG_SINK_H_
+#endif  // TURBO_LOG_LOG_SINK_H_

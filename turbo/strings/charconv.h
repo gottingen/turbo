@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_CHARCONV_H_
-#define ABSL_STRINGS_CHARCONV_H_
+#ifndef TURBO_STRINGS_CHARCONV_H_
+#define TURBO_STRINGS_CHARCONV_H_
 
 #include <system_error>  // NOLINT(build/c++11)
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Workalike compatibilty version of std::chars_format from C++17.
 //
@@ -53,7 +53,7 @@ struct from_chars_result {
 //
 // This interface incorporates the proposed resolutions for library issues
 // DR 3080 and DR 3081.  If these are adopted with different wording,
-// Abseil's behavior will change to match the standard.  (The behavior most
+// Turbo's behavior will change to match the standard.  (The behavior most
 // likely to change is for DR 3081, which says what `value` will be set to in
 // the case of overflow and underflow.  Code that wants to avoid possible
 // breaking changes in this area should not depend on `value` when the returned
@@ -114,7 +114,7 @@ inline chars_format& operator^=(chars_format& lhs, chars_format rhs) {
   return lhs;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_CHARCONV_H_
+#endif  // TURBO_STRINGS_CHARCONV_H_

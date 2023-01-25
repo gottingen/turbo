@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef ABSL_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
-#define ABSL_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
+#ifndef TURBO_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
+#define TURBO_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
 
 #include <type_traits>
 #include <utility>
@@ -23,10 +23,10 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 template <typename T>
-class ABSL_MUST_USE_RESULT StatusOr;
+class TURBO_MUST_USE_RESULT StatusOr;
 
 namespace internal_statusor {
 
@@ -136,14 +136,14 @@ class Helper {
  public:
   // Move type-agnostic error handling to the .cc.
   static void HandleInvalidStatusCtorArg(Status*);
-  ABSL_ATTRIBUTE_NORETURN static void Crash(const turbo::Status& status);
+  TURBO_ATTRIBUTE_NORETURN static void Crash(const turbo::Status& status);
 };
 
 // Construct an instance of T in `p` through placement new, passing Args... to
 // the constructor.
 // This abstraction is here mostly for the gcc performance fix.
 template <typename T, typename... Args>
-ABSL_ATTRIBUTE_NONNULL(1) void PlacementNew(void* p, Args&&... args) {
+TURBO_ATTRIBUTE_NONNULL(1) void PlacementNew(void* p, Args&&... args) {
   new (p) T(std::forward<Args>(args)...);
 }
 
@@ -286,11 +286,11 @@ class StatusOrData {
   }
 
   void EnsureOk() const {
-    if (ABSL_PREDICT_FALSE(!ok())) Helper::Crash(status_);
+    if (TURBO_PREDICT_FALSE(!ok())) Helper::Crash(status_);
   }
 
   void EnsureNotOk() {
-    if (ABSL_PREDICT_FALSE(ok())) Helper::HandleInvalidStatusCtorArg(&status_);
+    if (TURBO_PREDICT_FALSE(ok())) Helper::HandleInvalidStatusCtorArg(&status_);
   }
 
   // Construct the value (ie. data_) through placement new with the passed
@@ -387,10 +387,10 @@ struct MoveAssignBase<T, false> {
   MoveAssignBase& operator=(MoveAssignBase&&) = delete;
 };
 
-ABSL_ATTRIBUTE_NORETURN void ThrowBadStatusOrAccess(turbo::Status status);
+TURBO_ATTRIBUTE_NORETURN void ThrowBadStatusOrAccess(turbo::Status status);
 
 }  // namespace internal_statusor
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
+#endif  // TURBO_STATUS_INTERNAL_STATUSOR_INTERNAL_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 // This file contains common things needed by numbers_test.cc,
 // numbers_legacy_test.cc and numbers_benchmark.cc.
 
-#ifndef ABSL_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_
-#define ABSL_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_
+#ifndef TURBO_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_
+#define TURBO_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_
 
 #include <array>
 #include <cstdint>
@@ -26,7 +26,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 template <typename IntType>
@@ -178,7 +178,7 @@ inline const std::array<uint64_test_case, 34>& strtouint64_test_cases() {
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_
+#endif  // TURBO_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_

@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 // -----------------------------------------------------------------------------
 //
 // This file defines the main usage reporting configuration interfaces and
-// documents Abseil's supported built-in usage flags. If these flags are found
-// when parsing a command-line, Abseil will exit the program and display
+// documents Turbo's supported built-in usage flags. If these flags are found
+// when parsing a command-line, Turbo will exit the program and display
 // appropriate help messages.
-#ifndef ABSL_FLAGS_USAGE_CONFIG_H_
-#define ABSL_FLAGS_USAGE_CONFIG_H_
+#ifndef TURBO_FLAGS_USAGE_CONFIG_H_
+#define TURBO_FLAGS_USAGE_CONFIG_H_
 
 #include <functional>
 #include <string>
@@ -34,7 +34,7 @@
 // Built-in Usage Flags
 // -----------------------------------------------------------------------------
 //
-// Abseil supports the following built-in usage flags. When passed, these flags
+// Turbo supports the following built-in usage flags. When passed, these flags
 // exit the program and :
 //
 // * --help
@@ -55,7 +55,7 @@
 //     Shows help on modules whose name contains the specified substring
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace flags_internal {
 using FlagKindFilter = std::function<bool (turbo::string_view)>;
@@ -64,7 +64,7 @@ using FlagKindFilter = std::function<bool (turbo::string_view)>;
 // FlagsUsageConfig
 //
 // This structure contains the collection of callbacks for changing the behavior
-// of the usage reporting routines in Abseil Flags.
+// of the usage reporting routines in Turbo Flags.
 struct FlagsUsageConfig {
   // Returns true if flags defined in the given source code file should be
   // reported with --helpshort flag. For example, if the file
@@ -120,16 +120,16 @@ FlagsUsageConfig GetUsageConfig();
 void ReportUsageError(turbo::string_view msg, bool is_fatal);
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 extern "C" {
 
 // Additional report of fatal usage error message before we std::exit. Error is
 // fatal if is_fatal argument to ReportUsageError is true.
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalReportFatalUsageError)(
+void TURBO_INTERNAL_C_SYMBOL(TurboInternalReportFatalUsageError)(
     turbo::string_view);
 
 }  // extern "C"
 
-#endif  // ABSL_FLAGS_USAGE_CONFIG_H_
+#endif  // TURBO_FLAGS_USAGE_CONFIG_H_

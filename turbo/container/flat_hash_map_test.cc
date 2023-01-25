@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "turbo/types/any.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 using ::turbo::container_internal::hash_internal::Enum;
@@ -40,10 +40,10 @@ struct BeforeMain {
   BeforeMain() {
     turbo::flat_hash_map<int, int> x;
     x.insert({1, 1});
-    ABSL_RAW_CHECK(x.find(0) == x.end(), "x should not contain 0");
+    TURBO_RAW_CHECK(x.find(0) == x.end(), "x should not contain 0");
     auto it = x.find(1);
-    ABSL_RAW_CHECK(it != x.end(), "x should contain 1");
-    ABSL_RAW_CHECK(it->second, "1 should map to 1");
+    TURBO_RAW_CHECK(it != x.end(), "x should contain 1");
+    TURBO_RAW_CHECK(it->second, "1 should map to 1");
   }
 };
 const BeforeMain before_main;
@@ -321,5 +321,5 @@ TEST(FlatHashMap, RecursiveTypeCompiles) {
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

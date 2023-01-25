@@ -1,4 +1,4 @@
-// Copyright 2023 The Abseil Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ namespace {
 
 // This test is currently only known to pass on linux/x86_64.
 #if defined(__linux__) && defined(__x86_64__)
-ABSL_ATTRIBUTE_NOINLINE void Unwind(void* p) {
-  ABSL_ATTRIBUTE_UNUSED static void* volatile sink = p;
+TURBO_ATTRIBUTE_NOINLINE void Unwind(void* p) {
+  TURBO_ATTRIBUTE_UNUSED static void* volatile sink = p;
   constexpr int kSize = 16;
   void* stack[kSize];
   int frames[kSize];
@@ -31,16 +31,16 @@ ABSL_ATTRIBUTE_NOINLINE void Unwind(void* p) {
   turbo::GetStackFrames(stack, frames, kSize, 0);
 }
 
-ABSL_ATTRIBUTE_NOINLINE void HugeFrame() {
+TURBO_ATTRIBUTE_NOINLINE void HugeFrame() {
   char buffer[1 << 20];
   Unwind(buffer);
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
 TEST(StackTrace, HugeFrame) {
   // Ensure that the unwinder is not confused by very large stack frames.
   HugeFrame();
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 #endif
 

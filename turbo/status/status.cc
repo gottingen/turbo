@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
 #include "turbo/strings/str_split.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 std::string StatusCodeToString(StatusCode code) {
   switch (code) {
@@ -202,7 +202,7 @@ const std::string* Status::EmptyString() {
   return &empty.str;
 }
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr const char Status::kMovedFromString[];
 #endif
 
@@ -242,7 +242,7 @@ turbo::StatusCode Status::code() const {
 }
 
 void Status::PrepareToModify() {
-  ABSL_RAW_CHECK(!ok(), "PrepareToModify shouldn't be called on OK status.");
+  TURBO_RAW_CHECK(!ok(), "PrepareToModify shouldn't be called on OK status.");
   if (IsInlined(rep_)) {
     rep_ = PointerToRep(new status_internal::StatusRep(
         static_cast<turbo::StatusCode>(raw_code()), turbo::string_view(),
@@ -619,5 +619,5 @@ std::string* MakeCheckFailString(const turbo::Status* status,
 
 }  // namespace status_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

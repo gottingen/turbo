@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class UserDefinedType {
   void Append(turbo::string_view str) { value_.append(str.data(), str.size()); }
   const std::string& Value() const { return value_; }
 
-  friend void AbslFormatFlush(UserDefinedType* x, turbo::string_view str) {
+  friend void TurboFormatFlush(UserDefinedType* x, turbo::string_view str) {
     x->Append(str);
   }
 
@@ -86,13 +86,13 @@ TEST(FormatExtensionTest, VerifyEnumEquality) {
 #define X_VAL(id)                           \
   EXPECT_EQ(turbo::FormatConversionChar::id, \
             turbo::str_format_internal::FormatConversionCharInternal::id);
-  ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(X_VAL, );
+  TURBO_INTERNAL_CONVERSION_CHARS_EXPAND_(X_VAL, );
 #undef X_VAL
 
 #define X_VAL(id)                              \
   EXPECT_EQ(turbo::FormatConversionCharSet::id, \
             turbo::str_format_internal::FormatConversionCharSetInternal::id);
-  ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(X_VAL, );
+  TURBO_INTERNAL_CONVERSION_CHARS_EXPAND_(X_VAL, );
 #undef X_VAL
 }
 

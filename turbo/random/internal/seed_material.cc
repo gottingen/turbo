@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,12 +38,12 @@
 #if defined(__native_client__)
 
 #include <nacl/nacl_random.h>
-#define ABSL_RANDOM_USE_NACL_SECURE_RANDOM 1
+#define TURBO_RANDOM_USE_NACL_SECURE_RANDOM 1
 
 #elif defined(_WIN32)
 
 #include <windows.h>
-#define ABSL_RANDOM_USE_BCRYPT 1
+#define TURBO_RANDOM_USE_BCRYPT 1
 #pragma comment(lib, "bcrypt.lib")
 
 #elif defined(__Fuchsia__)
@@ -54,16 +54,16 @@
 #if defined(__GLIBC__) && \
     (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 25))
 // glibc >= 2.25 has getentropy()
-#define ABSL_RANDOM_USE_GET_ENTROPY 1
+#define TURBO_RANDOM_USE_GET_ENTROPY 1
 #endif
 
 #if defined(__EMSCRIPTEN__)
 #include <sys/random.h>
 // Emscripten has getentropy, but it resides in a different header.
-#define ABSL_RANDOM_USE_GET_ENTROPY 1
+#define TURBO_RANDOM_USE_GET_ENTROPY 1
 #endif
 
-#if defined(ABSL_RANDOM_USE_BCRYPT)
+#if defined(TURBO_RANDOM_USE_BCRYPT)
 #include <bcrypt.h>
 
 #ifndef BCRYPT_SUCCESS
@@ -74,7 +74,7 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
 
@@ -82,7 +82,7 @@ namespace {
 // TODO(turbo-team): Possibly place a cap on how much entropy may be read at a
 // time.
 
-#if defined(ABSL_RANDOM_USE_BCRYPT)
+#if defined(TURBO_RANDOM_USE_BCRYPT)
 
 // On Windows potentially use the BCRYPT CNG API to read available entropy.
 bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
@@ -91,7 +91,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
   ret = BCryptOpenAlgorithmProvider(&hProvider, BCRYPT_RNG_ALGORITHM,
                                     MS_PRIMITIVE_PROVIDER, 0);
   if (!(BCRYPT_SUCCESS(ret))) {
-    ABSL_RAW_LOG(ERROR, "Failed to open crypto provider.");
+    TURBO_RAW_LOG(ERROR, "Failed to open crypto provider.");
     return false;
   }
   ret = BCryptGenRandom(
@@ -103,7 +103,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
   return BCRYPT_SUCCESS(ret);
 }
 
-#elif defined(ABSL_RANDOM_USE_NACL_SECURE_RANDOM)
+#elif defined(TURBO_RANDOM_USE_NACL_SECURE_RANDOM)
 
 // On NaCL use nacl_secure_random to acquire bytes.
 bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
@@ -115,7 +115,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
     size_t nread = 0;
     const int error = nacl_secure_random(output_ptr, buffer_size, &nread);
     if (error != 0 || nread > buffer_size) {
-      ABSL_RAW_LOG(ERROR, "Failed to read secure_random seed data: %d", error);
+      TURBO_RAW_LOG(ERROR, "Failed to read secure_random seed data: %d", error);
       return false;
     }
     output_ptr += nread;
@@ -135,7 +135,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
 
 #else
 
-#if defined(ABSL_RANDOM_USE_GET_ENTROPY)
+#if defined(TURBO_RANDOM_USE_GET_ENTROPY)
 // On *nix, use getentropy() if supported. Note that libc may support
 // getentropy(), but the kernel may not, in which case this function will return
 // false.
@@ -151,13 +151,13 @@ bool ReadSeedMaterialFromGetEntropy(turbo::Span<uint32_t> values) {
     }
     // https://github.com/google/sanitizers/issues/1173
     // MemorySanitizer can't see through getentropy().
-    ABSL_ANNOTATE_MEMORY_IS_INITIALIZED(buffer, to_read);
+    TURBO_ANNOTATE_MEMORY_IS_INITIALIZED(buffer, to_read);
     buffer += to_read;
     buffer_size -= to_read;
   }
   return true;
 }
-#endif  // defined(ABSL_RANDOM_GETENTROPY)
+#endif  // defined(TURBO_RANDOM_GETENTROPY)
 
 // On *nix, read entropy from /dev/urandom.
 bool ReadSeedMaterialFromDevURandom(turbo::Span<uint32_t> values) {
@@ -188,7 +188,7 @@ bool ReadSeedMaterialFromDevURandom(turbo::Span<uint32_t> values) {
 }
 
 bool ReadSeedMaterialFromOSEntropyImpl(turbo::Span<uint32_t> values) {
-#if defined(ABSL_RANDOM_USE_GET_ENTROPY)
+#if defined(TURBO_RANDOM_USE_GET_ENTROPY)
   if (ReadSeedMaterialFromGetEntropy(values)) {
     return true;
   }
@@ -263,5 +263,5 @@ turbo::optional<uint32_t> GetSaltMaterial() {
 }
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

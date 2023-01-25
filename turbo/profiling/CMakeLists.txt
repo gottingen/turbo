@@ -1,4 +1,4 @@
-# Copyright 2021 The Abseil Authors
+# Copyright 2021 The Turbo Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,32 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     sample_recorder
   HDRS
     "internal/sample_recorder.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::synchronization
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     sample_recorder_test
   SRCS
     "internal/sample_recorder_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::sample_recorder
     turbo::time
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     exponential_biased
   SRCS
@@ -45,26 +45,26 @@ absl_cc_library(
   HDRS
     "internal/exponential_biased.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     exponential_biased_test
   SRCS
     "internal/exponential_biased_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::exponential_biased
     turbo::strings
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     periodic_sampler
   SRCS
@@ -72,19 +72,19 @@ absl_cc_library(
   HDRS
     "internal/periodic_sampler.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::core_headers
     turbo::exponential_biased
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     periodic_sampler_test
   SRCS
     "internal/periodic_sampler_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::core_headers
     turbo::periodic_sampler

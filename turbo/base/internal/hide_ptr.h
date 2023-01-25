@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_BASE_INTERNAL_HIDE_PTR_H_
-#define ABSL_BASE_INTERNAL_HIDE_PTR_H_
+#ifndef TURBO_BASE_INTERNAL_HIDE_PTR_H_
+#define TURBO_BASE_INTERNAL_HIDE_PTR_H_
 
 #include <cstdint>
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // Arbitrary value with high bits set. Xor'ing with it is unlikely
@@ -45,7 +45,7 @@ inline T* UnhidePtr(uintptr_t hidden) {
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_HIDE_PTR_H_
+#endif  // TURBO_BASE_INTERNAL_HIDE_PTR_H_

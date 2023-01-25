@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "turbo/profiling/internal/exponential_biased.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace profiling_internal {
 
 int64_t PeriodicSamplerBase::GetExponentialBiased(int period) noexcept {
@@ -30,13 +30,13 @@ bool PeriodicSamplerBase::SubtleConfirmSample() noexcept {
   int current_period = period();
 
   // Deal with period case 0 (always off) and 1 (always on)
-  if (ABSL_PREDICT_FALSE(current_period < 2)) {
+  if (TURBO_PREDICT_FALSE(current_period < 2)) {
     stride_ = 0;
     return current_period == 1;
   }
 
   // Check if this is the first call to Sample()
-  if (ABSL_PREDICT_FALSE(stride_ == 1)) {
+  if (TURBO_PREDICT_FALSE(stride_ == 1)) {
     stride_ = static_cast<uint64_t>(-GetExponentialBiased(current_period));
     if (static_cast<int64_t>(stride_) < -1) {
       ++stride_;
@@ -49,5 +49,5 @@ bool PeriodicSamplerBase::SubtleConfirmSample() noexcept {
 }
 
 }  // namespace profiling_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

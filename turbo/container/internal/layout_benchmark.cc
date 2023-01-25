@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include "benchmark/benchmark.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
@@ -39,7 +39,7 @@ void BM_OffsetConstantHeadroom(benchmark::State& state) {
 template <size_t Offset, class... Ts>
 void BM_OffsetConstant(benchmark::State& state) {
   using L = Layout<Ts...>;
-  ABSL_RAW_CHECK(L::Partial(3, 5, 7).template Offset<3>() == Offset,
+  TURBO_RAW_CHECK(L::Partial(3, 5, 7).template Offset<3>() == Offset,
                  "Invalid offset");
   for (auto _ : state) {
     DoNotOptimize(L::Partial(3, 5, 7).template Offset<3>());
@@ -69,7 +69,7 @@ void BM_OffsetVariableHeadroom(benchmark::State& state) {
   size_t n = 3;
   size_t m = 5;
   size_t k = 7;
-  ABSL_RAW_CHECK(VariableOffset<Ts...>(n, m, k) == Offset, "Invalid offset");
+  TURBO_RAW_CHECK(VariableOffset<Ts...>(n, m, k) == Offset, "Invalid offset");
   for (auto _ : state) {
     DoNotOptimize(n);
     DoNotOptimize(m);
@@ -84,7 +84,7 @@ void BM_OffsetVariable(benchmark::State& state) {
   size_t n = 3;
   size_t m = 5;
   size_t k = 7;
-  ABSL_RAW_CHECK(L::Partial(n, m, k).template Offset<3>() == Offset,
+  TURBO_RAW_CHECK(L::Partial(n, m, k).template Offset<3>() == Offset,
                  "Inavlid offset");
   for (auto _ : state) {
     DoNotOptimize(n);
@@ -118,5 +118,5 @@ OFFSET_BENCHMARK(BM_OffsetVariableHeadroom, 82, Int128, int32_t, int16_t,
 OFFSET_BENCHMARK(BM_OffsetVariable, 82, Int128, int32_t, int16_t, int8_t);
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

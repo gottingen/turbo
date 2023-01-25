@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors
+// Copyright 2020 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 // It is closely based on a version of wyhash, but does not maintain or
 // guarantee future compatibility with it.
 
-#ifndef ABSL_HASH_INTERNAL_LOW_LEVEL_HASH_H_
-#define ABSL_HASH_INTERNAL_LOW_LEVEL_HASH_H_
+#ifndef TURBO_HASH_INTERNAL_LOW_LEVEL_HASH_H_
+#define TURBO_HASH_INTERNAL_LOW_LEVEL_HASH_H_
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 
 // Hash function for a byte array. A 64-bit seed and a set of five 64-bit
@@ -44,7 +44,7 @@ uint64_t LowLevelHash(const void* data, size_t len, uint64_t seed,
                       const uint64_t salt[5]);
 
 }  // namespace hash_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HASH_INTERNAL_LOW_LEVEL_HASH_H_
+#endif  // TURBO_HASH_INTERNAL_LOW_LEVEL_HASH_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ using turbo::base_internal::SpinLock;
 using turbo::base_internal::SpinLockHolder;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
 
@@ -60,13 +60,13 @@ class RandenPoolEntry {
   }
 
   // Copy bytes into out.
-  void Fill(uint8_t* out, size_t bytes) ABSL_LOCKS_EXCLUDED(mu_);
+  void Fill(uint8_t* out, size_t bytes) TURBO_LOCKS_EXCLUDED(mu_);
 
   // Returns random bits from the buffer in units of T.
   template <typename T>
-  inline T Generate() ABSL_LOCKS_EXCLUDED(mu_);
+  inline T Generate() TURBO_LOCKS_EXCLUDED(mu_);
 
-  inline void MaybeRefill() ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
+  inline void MaybeRefill() TURBO_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
     if (next_ >= kState) {
       next_ = kCapacity;
       impl_.Generate(state_);
@@ -75,10 +75,10 @@ class RandenPoolEntry {
 
  private:
   // Randen URBG state.
-  uint32_t state_[kState] ABSL_GUARDED_BY(mu_);  // First to satisfy alignment.
+  uint32_t state_[kState] TURBO_GUARDED_BY(mu_);  // First to satisfy alignment.
   SpinLock mu_;
   const Randen impl_;
-  size_t next_ ABSL_GUARDED_BY(mu_);
+  size_t next_ TURBO_GUARDED_BY(mu_);
 };
 
 template <>
@@ -135,7 +135,7 @@ static constexpr size_t kPoolSize = 8;
 
 // Shared pool entries.
 static turbo::once_flag pool_once;
-ABSL_CACHELINE_ALIGNED static RandenPoolEntry* shared_pools[kPoolSize];
+TURBO_CACHELINE_ALIGNED static RandenPoolEntry* shared_pools[kPoolSize];
 
 // Returns an id in the range [0 ... kPoolSize), which indexes into the
 // pool of random engines.
@@ -151,11 +151,11 @@ size_t GetPoolID() {
   static_assert(kPoolSize >= 1,
                 "At least one urbg instance is required for PoolURBG");
 
-  ABSL_CONST_INIT static std::atomic<uint64_t> sequence{0};
+  TURBO_CONST_INIT static std::atomic<uint64_t> sequence{0};
 
-#ifdef ABSL_HAVE_THREAD_LOCAL
+#ifdef TURBO_HAVE_THREAD_LOCAL
   static thread_local size_t my_pool_id = kPoolSize;
-  if (ABSL_PREDICT_FALSE(my_pool_id == kPoolSize)) {
+  if (TURBO_PREDICT_FALSE(my_pool_id == kPoolSize)) {
     my_pool_id = (sequence++ % kPoolSize);
   }
   return my_pool_id;
@@ -164,7 +164,7 @@ size_t GetPoolID() {
     pthread_key_t tmp_key;
     int err = pthread_key_create(&tmp_key, nullptr);
     if (err) {
-      ABSL_RAW_LOG(FATAL, "pthread_key_create failed with %d", err);
+      TURBO_RAW_LOG(FATAL, "pthread_key_create failed with %d", err);
     }
     return tmp_key;
   }();
@@ -173,12 +173,12 @@ size_t GetPoolID() {
   // value is 0, so add +1 to distinguish from the null value.
   uintptr_t my_pool_id =
       reinterpret_cast<uintptr_t>(pthread_getspecific(tid_key));
-  if (ABSL_PREDICT_FALSE(my_pool_id == 0)) {
+  if (TURBO_PREDICT_FALSE(my_pool_id == 0)) {
     // No allocated ID, allocate the next value, cache it, and return.
     my_pool_id = (sequence++ % kPoolSize) + 1;
     int err = pthread_setspecific(tid_key, reinterpret_cast<void*>(my_pool_id));
     if (err) {
-      ABSL_RAW_LOG(FATAL, "pthread_setspecific failed with %d", err);
+      TURBO_RAW_LOG(FATAL, "pthread_setspecific failed with %d", err);
     }
   }
   return my_pool_id - 1;
@@ -189,7 +189,7 @@ size_t GetPoolID() {
 // by ARM platform code.
 RandenPoolEntry* PoolAlignedAlloc() {
   constexpr size_t kAlignment =
-      ABSL_CACHELINE_SIZE > 32 ? ABSL_CACHELINE_SIZE : 32;
+      TURBO_CACHELINE_SIZE > 32 ? TURBO_CACHELINE_SIZE : 32;
 
   // Not all the platforms that we build for have std::aligned_alloc, however
   // since we never free these objects, we can over allocate and munge the
@@ -249,5 +249,5 @@ template class RandenPool<uint32_t>;
 template class RandenPool<uint64_t>;
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

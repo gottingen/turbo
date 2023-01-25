@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CHARCONV_BIGINT_H_
-#define ABSL_STRINGS_INTERNAL_CHARCONV_BIGINT_H_
+#ifndef TURBO_STRINGS_INTERNAL_CHARCONV_BIGINT_H_
+#define TURBO_STRINGS_INTERNAL_CHARCONV_BIGINT_H_
 
 #include <algorithm>
 #include <cstdint>
@@ -26,7 +26,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 // The largest power that 5 that can be raised to, and still fit in a uint32_t.
@@ -34,9 +34,9 @@ constexpr int kMaxSmallPowerOfFive = 13;
 // The largest power that 10 that can be raised to, and still fit in a uint32_t.
 constexpr int kMaxSmallPowerOfTen = 9;
 
-ABSL_DLL extern const uint32_t
+TURBO_DLL extern const uint32_t
     kFiveToNth[kMaxSmallPowerOfFive + 1];
-ABSL_DLL extern const uint32_t kTenToNth[kMaxSmallPowerOfTen + 1];
+TURBO_DLL extern const uint32_t kTenToNth[kMaxSmallPowerOfTen + 1];
 
 // Large, fixed-width unsigned integer.
 //
@@ -417,7 +417,7 @@ extern template class BigUnsigned<4>;
 extern template class BigUnsigned<84>;
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CHARCONV_BIGINT_H_
+#endif  // TURBO_STRINGS_INTERNAL_CHARCONV_BIGINT_H_

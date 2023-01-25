@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@
 #include "turbo/base/log_severity.h"
 
 // We know how to perform low-level writes to stderr in POSIX and Windows.  For
-// these platforms, we define the token ABSL_LOW_LEVEL_WRITE_SUPPORTED.
+// these platforms, we define the token TURBO_LOW_LEVEL_WRITE_SUPPORTED.
 // Much of raw_logging.cc becomes a no-op when we can't output messages,
-// although a FATAL ABSL_RAW_LOG message will still abort the process.
+// although a FATAL TURBO_RAW_LOG message will still abort the process.
 
-// ABSL_HAVE_POSIX_WRITE is defined when the platform provides posix write()
+// TURBO_HAVE_POSIX_WRITE is defined when the platform provides posix write()
 // (as from unistd.h)
 //
 // This preprocessor token is also defined in raw_io.cc.  If you need to copy
@@ -43,43 +43,43 @@
 
 #include <unistd.h>
 
-#define ABSL_HAVE_POSIX_WRITE 1
-#define ABSL_LOW_LEVEL_WRITE_SUPPORTED 1
+#define TURBO_HAVE_POSIX_WRITE 1
+#define TURBO_LOW_LEVEL_WRITE_SUPPORTED 1
 #else
-#undef ABSL_HAVE_POSIX_WRITE
+#undef TURBO_HAVE_POSIX_WRITE
 #endif
 
-// ABSL_HAVE_SYSCALL_WRITE is defined when the platform provides the syscall
+// TURBO_HAVE_SYSCALL_WRITE is defined when the platform provides the syscall
 //   syscall(SYS_write, /*int*/ fd, /*char* */ buf, /*size_t*/ len);
 // for low level operations that want to avoid libc.
 #if (defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__)) && \
     !defined(__ANDROID__)
 #include <sys/syscall.h>
-#define ABSL_HAVE_SYSCALL_WRITE 1
-#define ABSL_LOW_LEVEL_WRITE_SUPPORTED 1
+#define TURBO_HAVE_SYSCALL_WRITE 1
+#define TURBO_LOW_LEVEL_WRITE_SUPPORTED 1
 #else
-#undef ABSL_HAVE_SYSCALL_WRITE
+#undef TURBO_HAVE_SYSCALL_WRITE
 #endif
 
 #ifdef _WIN32
 #include <io.h>
 
-#define ABSL_HAVE_RAW_IO 1
-#define ABSL_LOW_LEVEL_WRITE_SUPPORTED 1
+#define TURBO_HAVE_RAW_IO 1
+#define TURBO_LOW_LEVEL_WRITE_SUPPORTED 1
 #else
-#undef ABSL_HAVE_RAW_IO
+#undef TURBO_HAVE_RAW_IO
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace raw_log_internal {
 namespace {
 
 // TODO(gfalcon): We want raw-logging to work on as many platforms as possible.
-// Explicitly `#error` out when not `ABSL_LOW_LEVEL_WRITE_SUPPORTED`, except for
+// Explicitly `#error` out when not `TURBO_LOW_LEVEL_WRITE_SUPPORTED`, except for
 // a selected set of platforms for which we expect not to be able to raw log.
 
-#ifdef ABSL_LOW_LEVEL_WRITE_SUPPORTED
+#ifdef TURBO_LOW_LEVEL_WRITE_SUPPORTED
 constexpr char kTruncated[] = " ... (message truncated)\n";
 
 // sprintf the format to the buffer, adjusting *buf and *size to reflect the
@@ -87,7 +87,7 @@ constexpr char kTruncated[] = " ... (message truncated)\n";
 // truncation occurred, if possible leave room in the buffer for the message
 // kTruncated[].
 bool VADoRawLog(char** buf, int* size, const char* format, va_list ap)
-    ABSL_PRINTF_ATTRIBUTE(3, 0);
+    TURBO_PRINTF_ATTRIBUTE(3, 0);
 bool VADoRawLog(char** buf, int* size, const char* format, va_list ap) {
   if (*size < 0)
     return false;
@@ -105,7 +105,7 @@ bool VADoRawLog(char** buf, int* size, const char* format, va_list ap) {
   *buf += n;
   return result;
 }
-#endif  // ABSL_LOW_LEVEL_WRITE_SUPPORTED
+#endif  // TURBO_LOW_LEVEL_WRITE_SUPPORTED
 
 constexpr int kLogBufSize = 3000;
 
@@ -116,7 +116,7 @@ constexpr int kLogBufSize = 3000;
 // *DoRawLog writes to *buf of *size and move them past the written portion.
 // It returns true iff there was no overflow or error.
 bool DoRawLog(char** buf, int* size, const char* format, ...)
-    ABSL_PRINTF_ATTRIBUTE(3, 4);
+    TURBO_PRINTF_ATTRIBUTE(3, 4);
 bool DoRawLog(char** buf, int* size, const char* format, ...) {
   if (*size < 0)
     return false;
@@ -136,27 +136,27 @@ bool DefaultLogFilterAndPrefix(turbo::LogSeverity, const char* file, int line,
   return true;
 }
 
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
 turbo::base_internal::AtomicHook<LogFilterAndPrefixHook>
     log_filter_and_prefix_hook(DefaultLogFilterAndPrefix);
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
 turbo::base_internal::AtomicHook<AbortHook> abort_hook;
 
 void RawLogVA(turbo::LogSeverity severity, const char* file, int line,
-              const char* format, va_list ap) ABSL_PRINTF_ATTRIBUTE(4, 0);
+              const char* format, va_list ap) TURBO_PRINTF_ATTRIBUTE(4, 0);
 void RawLogVA(turbo::LogSeverity severity, const char* file, int line,
               const char* format, va_list ap) {
   char buffer[kLogBufSize];
   char* buf = buffer;
   int size = sizeof(buffer);
-#ifdef ABSL_LOW_LEVEL_WRITE_SUPPORTED
+#ifdef TURBO_LOW_LEVEL_WRITE_SUPPORTED
   bool enabled = true;
 #else
   bool enabled = false;
 #endif
 
-#ifdef ABSL_MIN_LOG_LEVEL
-  if (severity < static_cast<turbo::LogSeverity>(ABSL_MIN_LOG_LEVEL) &&
+#ifdef TURBO_MIN_LOG_LEVEL
+  if (severity < static_cast<turbo::LogSeverity>(TURBO_MIN_LOG_LEVEL) &&
       severity < turbo::LogSeverity::kFatal) {
     enabled = false;
   }
@@ -165,7 +165,7 @@ void RawLogVA(turbo::LogSeverity severity, const char* file, int line,
   enabled = log_filter_and_prefix_hook(severity, file, line, &buf, &size);
   const char* const prefix_end = buf;
 
-#ifdef ABSL_LOW_LEVEL_WRITE_SUPPORTED
+#ifdef TURBO_LOW_LEVEL_WRITE_SUPPORTED
   if (enabled) {
     bool no_chop = VADoRawLog(&buf, &size, format, ap);
     if (no_chop) {
@@ -203,13 +203,13 @@ void DefaultInternalLog(turbo::LogSeverity severity, const char* file, int line,
 
 void AsyncSignalSafeWriteToStderr(const char* s, size_t len) {
   turbo::base_internal::ErrnoSaver errno_saver;
-#if defined(ABSL_HAVE_SYSCALL_WRITE)
+#if defined(TURBO_HAVE_SYSCALL_WRITE)
   // We prefer calling write via `syscall` to minimize the risk of libc doing
   // something "helpful".
   syscall(SYS_write, STDERR_FILENO, s, len);
-#elif defined(ABSL_HAVE_POSIX_WRITE)
+#elif defined(TURBO_HAVE_POSIX_WRITE)
   write(STDERR_FILENO, s, len);
-#elif defined(ABSL_HAVE_RAW_IO)
+#elif defined(TURBO_HAVE_RAW_IO)
   _write(/* stderr */ 2, s, static_cast<unsigned>(len));
 #else
   // stderr logging unsupported on this platform
@@ -227,14 +227,14 @@ void RawLog(turbo::LogSeverity severity, const char* file, int line,
 }
 
 bool RawLoggingFullySupported() {
-#ifdef ABSL_LOW_LEVEL_WRITE_SUPPORTED
+#ifdef TURBO_LOW_LEVEL_WRITE_SUPPORTED
   return true;
-#else  // !ABSL_LOW_LEVEL_WRITE_SUPPORTED
+#else  // !TURBO_LOW_LEVEL_WRITE_SUPPORTED
   return false;
-#endif  // !ABSL_LOW_LEVEL_WRITE_SUPPORTED
+#endif  // !TURBO_LOW_LEVEL_WRITE_SUPPORTED
 }
 
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES ABSL_DLL
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL
     turbo::base_internal::AtomicHook<InternalLogFunction>
         internal_log_function(DefaultInternalLog);
 
@@ -249,5 +249,5 @@ void RegisterInternalLogFunction(InternalLogFunction func) {
 }
 
 }  // namespace raw_log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

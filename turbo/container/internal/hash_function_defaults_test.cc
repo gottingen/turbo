@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
@@ -333,7 +333,7 @@ TYPED_TEST_SUITE(StringLikeTest, StringTypesCartesianProduct);
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 enum Hash : size_t {
@@ -364,7 +364,7 @@ struct hash<Hashable<H>> {
 }  // namespace std
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
@@ -379,5 +379,5 @@ TEST(Delegate, HashDispatch) {
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

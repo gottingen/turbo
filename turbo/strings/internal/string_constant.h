@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_STRING_CONSTANT_H_
-#define ABSL_STRINGS_INTERNAL_STRING_CONSTANT_H_
+#ifndef TURBO_STRINGS_INTERNAL_STRING_CONSTANT_H_
+#define TURBO_STRINGS_INTERNAL_STRING_CONSTANT_H_
 
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 // StringConstant<T> represents a compile time string constant.
@@ -50,7 +50,7 @@ struct StringConstant {
                 "The input string_view must point to constant data.");
 };
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 template <typename T>
 constexpr turbo::string_view StringConstant<T>::value;
 #endif
@@ -66,7 +66,7 @@ constexpr StringConstant<T> MakeStringConstant(T) {
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STRING_CONSTANT_H_
+#endif  // TURBO_STRINGS_INTERNAL_STRING_CONSTANT_H_

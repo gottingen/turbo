@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_BASE_INTERNAL_THROW_DELEGATE_H_
-#define ABSL_BASE_INTERNAL_THROW_DELEGATE_H_
+#ifndef TURBO_BASE_INTERNAL_THROW_DELEGATE_H_
+#define TURBO_BASE_INTERNAL_THROW_DELEGATE_H_
 
 #include <string>
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // Helper functions that allow throwing exceptions consistently from anywhere.
@@ -69,7 +69,7 @@ namespace base_internal {
 // [[noreturn]] void ThrowStdBadArrayNewLength();
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_THROW_DELEGATE_H_
+#endif  // TURBO_BASE_INTERNAL_THROW_DELEGATE_H_

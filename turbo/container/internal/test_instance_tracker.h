@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_
-#define ABSL_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_
+#ifndef TURBO_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_
+#define TURBO_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_
 
 #include <cstdlib>
 #include <ostream>
@@ -21,7 +21,7 @@
 #include "turbo/types/compare.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace test_internal {
 
 // A type that counts number of occurrences of the type, the live occurrences of
@@ -268,7 +268,7 @@ class MovableOnlyInstance : public BaseCountedInstance {
 };
 
 }  // namespace test_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_
+#endif  // TURBO_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_

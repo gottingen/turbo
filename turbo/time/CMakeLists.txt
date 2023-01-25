@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     time
   HDRS
@@ -30,7 +30,7 @@ absl_cc_library(
     "internal/get_current_time_posix.inc"
     "time.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::civil_time
@@ -42,7 +42,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     civil_time
   HDRS
@@ -51,14 +51,14 @@ absl_cc_library(
   SRCS
   "internal/cctz/src/civil_time_detail.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
 )
 
 if(APPLE)
   find_library(CoreFoundation CoreFoundation)
 endif()
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     time_zone
   HDRS
@@ -82,13 +82,13 @@ absl_cc_library(
     "internal/cctz/src/tzfile.h"
     "internal/cctz/src/zone_info_source.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     $<$<PLATFORM_ID:Darwin>:${CoreFoundation}>
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     time_internal_test_util
   HDRS
@@ -96,7 +96,7 @@ absl_cc_library(
   SRCS
     "internal/test_util.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::time
     turbo::config
@@ -105,7 +105,7 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     time_test
   SRCS
@@ -116,7 +116,7 @@ absl_cc_test(
     "time_test.cc"
     "time_zone_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::time_internal_test_util
     turbo::time
@@ -126,13 +126,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     flag_test
   SRCS
     "flag_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::flags
     turbo::flags_reflection

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 // implement a subset of the `LogMessage` API and are used instead when logging
 // of messages has been disabled.
 
-#ifndef ABSL_LOG_INTERNAL_NULLSTREAM_H_
-#define ABSL_LOG_INTERNAL_NULLSTREAM_H_
+#ifndef TURBO_LOG_INTERNAL_NULLSTREAM_H_
+#define TURBO_LOG_INTERNAL_NULLSTREAM_H_
 
 #ifdef _WIN32
 #include <cstdlib>
@@ -37,7 +37,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 // A `NullStream` implements the API of `LogMessage` (a few methods and
@@ -115,20 +115,20 @@ class NullStreamMaybeFatal final : public NullStream {
 class NullStreamFatal final : public NullStream {
  public:
   NullStreamFatal() {}
-  // ABSL_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+  // TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
   // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
 #pragma warning(disable : 4722)
 #endif
-  ABSL_ATTRIBUTE_NORETURN ~NullStreamFatal() { _exit(1); }
+  TURBO_ATTRIBUTE_NORETURN ~NullStreamFatal() { _exit(1); }
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(pop)
 #endif
 };
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_GLOBALS_H_
+#endif  // TURBO_LOG_INTERNAL_GLOBALS_H_

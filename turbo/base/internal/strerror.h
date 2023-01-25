@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_BASE_INTERNAL_STRERROR_H_
-#define ABSL_BASE_INTERNAL_STRERROR_H_
+#ifndef TURBO_BASE_INTERNAL_STRERROR_H_
+#define TURBO_BASE_INTERNAL_STRERROR_H_
 
 #include <string>
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // A portable and thread-safe alternative to C89's `strerror`.
@@ -33,7 +33,7 @@ namespace base_internal {
 std::string StrError(int errnum);
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_STRERROR_H_
+#endif  // TURBO_BASE_INTERNAL_STRERROR_H_

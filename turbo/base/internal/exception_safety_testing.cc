@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 #include "turbo/base/internal/exception_safety_testing.h"
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
 #include "gtest/gtest.h"
 #include "turbo/meta/type_traits.h"
@@ -76,4 +76,4 @@ std::string GetSpecString(AllocSpec spec) {
 
 }  // namespace testing
 
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,23 +27,23 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 // These atomics represent logging library configuration.
 // Integer types are used instead of turbo::LogSeverity to ensure that a
 // lock-free std::atomic is used when possible.
-ABSL_CONST_INIT std::atomic<int> min_log_level{
+TURBO_CONST_INIT std::atomic<int> min_log_level{
     static_cast<int>(turbo::LogSeverityAtLeast::kInfo)};
-ABSL_CONST_INIT std::atomic<int> stderrthreshold{
+TURBO_CONST_INIT std::atomic<int> stderrthreshold{
     static_cast<int>(turbo::LogSeverityAtLeast::kError)};
 // We evaluate this value as a hash comparison to avoid having to
 // hold a mutex or make a copy (to access the value of a string-typed flag) in
 // very hot codepath.
-ABSL_CONST_INIT std::atomic<size_t> log_backtrace_at_hash{0};
-ABSL_CONST_INIT std::atomic<bool> prepend_log_prefix{true};
+TURBO_CONST_INIT std::atomic<size_t> log_backtrace_at_hash{0};
+TURBO_CONST_INIT std::atomic<bool> prepend_log_prefix{true};
 
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
 turbo::base_internal::AtomicHook<log_internal::LoggingGlobalsListener>
     logging_globals_listener;
 
@@ -144,5 +144,5 @@ void EnableLogPrefix(bool on_off) {
   TriggerLoggingGlobalsListener();
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

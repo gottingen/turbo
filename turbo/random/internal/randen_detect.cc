@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,23 +26,23 @@
 
 #if !defined(__UCLIBC__) && defined(__GLIBC__) && \
     (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 16))
-#define ABSL_HAVE_GETAUXVAL
+#define TURBO_HAVE_GETAUXVAL
 #endif
 
-#if defined(ABSL_ARCH_X86_64)
-#define ABSL_INTERNAL_USE_X86_CPUID
-#elif defined(ABSL_ARCH_PPC) || defined(ABSL_ARCH_ARM) || \
-    defined(ABSL_ARCH_AARCH64)
+#if defined(TURBO_ARCH_X86_64)
+#define TURBO_INTERNAL_USE_X86_CPUID
+#elif defined(TURBO_ARCH_PPC) || defined(TURBO_ARCH_ARM) || \
+    defined(TURBO_ARCH_AARCH64)
 #if defined(__ANDROID__)
-#define ABSL_INTERNAL_USE_ANDROID_GETAUXVAL
-#define ABSL_INTERNAL_USE_GETAUXVAL
-#elif defined(__linux__) && defined(ABSL_HAVE_GETAUXVAL)
-#define ABSL_INTERNAL_USE_LINUX_GETAUXVAL
-#define ABSL_INTERNAL_USE_GETAUXVAL
+#define TURBO_INTERNAL_USE_ANDROID_GETAUXVAL
+#define TURBO_INTERNAL_USE_GETAUXVAL
+#elif defined(__linux__) && defined(TURBO_HAVE_GETAUXVAL)
+#define TURBO_INTERNAL_USE_LINUX_GETAUXVAL
+#define TURBO_INTERNAL_USE_GETAUXVAL
 #endif
 #endif
 
-#if defined(ABSL_INTERNAL_USE_X86_CPUID)
+#if defined(TURBO_INTERNAL_USE_X86_CPUID)
 #if defined(_WIN32) || defined(_WIN64)
 #include <intrin.h>  // NOLINT(build/include_order)
 #else
@@ -54,10 +54,10 @@ static void __cpuid(int cpu_info[4], int info_type) {
                    : "a"(info_type), "c"(0));
 }
 #endif
-#endif  // ABSL_INTERNAL_USE_X86_CPUID
+#endif  // TURBO_INTERNAL_USE_X86_CPUID
 
 // On linux, just use the c-library getauxval call.
-#if defined(ABSL_INTERNAL_USE_LINUX_GETAUXVAL)
+#if defined(TURBO_INTERNAL_USE_LINUX_GETAUXVAL)
 
 extern "C" unsigned long getauxval(unsigned long type);  // NOLINT(runtime/int)
 
@@ -73,7 +73,7 @@ static uint32_t GetAuxval(uint32_t hwcap_type) {
 //
 // TODO(turbo-team): Consider implementing a fallback of directly reading
 // /proc/self/auxval.
-#if defined(ABSL_INTERNAL_USE_ANDROID_GETAUXVAL)
+#if defined(TURBO_INTERNAL_USE_ANDROID_GETAUXVAL)
 #include <dlfcn.h>
 
 static uint32_t GetAuxval(uint32_t hwcap_type) {
@@ -99,7 +99,7 @@ static uint32_t GetAuxval(uint32_t hwcap_type) {
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // The default return at the end of the function might be unreachable depending
@@ -118,7 +118,7 @@ namespace random_internal {
 //
 // Fon non-x86 it is much more complicated.
 //
-// 2. When ABSL_INTERNAL_USE_GETAUXVAL is defined, use getauxval() (either
+// 2. When TURBO_INTERNAL_USE_GETAUXVAL is defined, use getauxval() (either
 //    the direct c-library version, or the android probing version which loads
 //    libc), and read the hardware capability bits.
 //    This is based on the technique used by boringssl uses to detect
@@ -129,19 +129,19 @@ namespace random_internal {
 //
 
 bool CPUSupportsRandenHwAes() {
-#if defined(ABSL_INTERNAL_USE_X86_CPUID)
+#if defined(TURBO_INTERNAL_USE_X86_CPUID)
   // 1. For x86: Use CPUID to detect the required AES instruction set.
   int regs[4];
   __cpuid(reinterpret_cast<int*>(regs), 1);
   return regs[2] & (1 << 25);  // AES
 
-#elif defined(ABSL_INTERNAL_USE_GETAUXVAL)
+#elif defined(TURBO_INTERNAL_USE_GETAUXVAL)
   // 2. Use getauxval() to read the hardware bits and determine
   // cpu capabilities.
 
 #define AT_HWCAP 16
 #define AT_HWCAP2 26
-#if defined(ABSL_ARCH_PPC)
+#if defined(TURBO_ARCH_PPC)
   // For Power / PPC: Expect that the cpu supports VCRYPTO
   // See https://members.openpowerfoundation.org/document/dl/576
   // VCRYPTO should be present in POWER8 >= 2.07.
@@ -150,7 +150,7 @@ bool CPUSupportsRandenHwAes() {
   const uint32_t hwcap = GetAuxval(AT_HWCAP2);
   return (hwcap & kVCRYPTO) != 0;
 
-#elif defined(ABSL_ARCH_ARM)
+#elif defined(TURBO_ARCH_ARM)
   // For ARM: Require crypto+neon
   // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0500f/CIHBIBBA.html
   // Uses Linux kernel constants from arch/arm64/include/asm/hwcap.h
@@ -165,7 +165,7 @@ bool CPUSupportsRandenHwAes() {
   const uint32_t hwcap2 = GetAuxval(AT_HWCAP2);
   return (hwcap2 & kAES) != 0;
 
-#elif defined(ABSL_ARCH_AARCH64)
+#elif defined(TURBO_ARCH_AARCH64)
   // For AARCH64: Require crypto+neon
   // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0500f/CIHBIBBA.html
   static const uint32_t kNEON = 1 << 1;
@@ -174,14 +174,14 @@ bool CPUSupportsRandenHwAes() {
   return ((hwcap & kNEON) != 0) && ((hwcap & kAES) != 0);
 #endif
 
-#else  // ABSL_INTERNAL_USE_GETAUXVAL
+#else  // TURBO_INTERNAL_USE_GETAUXVAL
   // 3. By default, assume that the compiler default.
-  return ABSL_HAVE_ACCELERATED_AES ? true : false;
+  return TURBO_HAVE_ACCELERATED_AES ? true : false;
 
 #endif
   // NOTE: There are some other techniques that may be worth trying:
   //
-  // * Use an environment variable: ABSL_RANDOM_USE_HWAES
+  // * Use an environment variable: TURBO_RANDOM_USE_HWAES
   //
   // * Rely on compiler-generated target-based dispatch.
   // Using x86/gcc it might look something like this:
@@ -221,5 +221,5 @@ bool CPUSupportsRandenHwAes() {
 #endif
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

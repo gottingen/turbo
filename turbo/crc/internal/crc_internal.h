@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_CRC_INTERNAL_H_
-#define ABSL_CRC_INTERNAL_CRC_INTERNAL_H_
+#ifndef TURBO_CRC_INTERNAL_CRC_INTERNAL_H_
+#define TURBO_CRC_INTERNAL_CRC_INTERNAL_H_
 
 #include <cstdint>
 #include <memory>
@@ -23,14 +23,14 @@
 #include "turbo/crc/internal/crc.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace crc_internal {
 
 // Prefetch constants used in some Extend() implementations
-constexpr int kPrefetchHorizon = ABSL_CACHELINE_SIZE * 4;  // Prefetch this far
+constexpr int kPrefetchHorizon = TURBO_CACHELINE_SIZE * 4;  // Prefetch this far
 // Shorter prefetch distance for smaller buffers
-constexpr int kPrefetchHorizonMedium = ABSL_CACHELINE_SIZE * 1;
+constexpr int kPrefetchHorizonMedium = TURBO_CACHELINE_SIZE * 1;
 static_assert(kPrefetchHorizon >= 64, "CRCPrefetchHorizon less than loop len");
 
 // We require the Scramble() function:
@@ -173,7 +173,7 @@ CRCImpl* TryNewCRC32AcceleratedX86ARMCombined();
 std::vector<std::unique_ptr<CRCImpl>> NewCRC32AcceleratedX86ARMCombinedAll();
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_INTERNAL_CRC_INTERNAL_H_
+#endif  // TURBO_CRC_INTERNAL_CRC_INTERNAL_H_

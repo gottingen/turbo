@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,8 +43,8 @@
 //
 // See comments on the `turbo::StrJoin()` function for more examples.
 
-#ifndef ABSL_STRINGS_STR_JOIN_H_
-#define ABSL_STRINGS_STR_JOIN_H_
+#ifndef TURBO_STRINGS_STR_JOIN_H_
+#define TURBO_STRINGS_STR_JOIN_H_
 
 #include <cstdio>
 #include <cstring>
@@ -60,7 +60,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // Concept: Formatter
@@ -281,7 +281,7 @@ std::string StrJoin(const std::tuple<T...>& value,
   return strings_internal::JoinAlgorithm(value, separator, AlphaNumFormatter());
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_STR_JOIN_H_
+#endif  // TURBO_STRINGS_STR_JOIN_H_

@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,12 +50,12 @@ BENCHMARK(BM_StringViewFromString)->Arg(12)->Arg(128);
 
 // Provide a forcibly out-of-line wrapper for operator== that can be used in
 // benchmarks to measure the impact of inlining.
-ABSL_ATTRIBUTE_NOINLINE
+TURBO_ATTRIBUTE_NOINLINE
 bool NonInlinedEq(turbo::string_view a, turbo::string_view b) { return a == b; }
 
 // We use functions that cannot be inlined to perform the comparison loops so
 // that inlining of the operator== can't optimize away *everything*.
-ABSL_ATTRIBUTE_NOINLINE
+TURBO_ATTRIBUTE_NOINLINE
 void DoEqualityComparisons(benchmark::State& state, turbo::string_view a,
                            turbo::string_view b) {
   for (auto _ : state) {
@@ -100,7 +100,7 @@ BENCHMARK(BM_EqualDifferent)->DenseRange(0, 3)->Range(4, 1 << 10);
 // each with the same size. Provided our comparison makes the implementation
 // inline-able by the compiler, it should fold all of these away into a single
 // size check once per loop iteration.
-ABSL_ATTRIBUTE_NOINLINE
+TURBO_ATTRIBUTE_NOINLINE
 void DoConstantSizeInlinedEqualityComparisons(benchmark::State& state,
                                               turbo::string_view a) {
   for (auto _ : state) {
@@ -125,7 +125,7 @@ BENCHMARK(BM_EqualConstantSizeInlined)->DenseRange(2, 4);
 // This benchmark exists purely to give context to the above timings: this is
 // what they would look like if the compiler is completely unable to simplify
 // between two comparisons when they are comparing against constant strings.
-ABSL_ATTRIBUTE_NOINLINE
+TURBO_ATTRIBUTE_NOINLINE
 void DoConstantSizeNonInlinedEqualityComparisons(benchmark::State& state,
                                                  turbo::string_view a) {
   for (auto _ : state) {
@@ -293,7 +293,7 @@ void StringViewMapBenchmark(benchmark::State& state) {
   std::vector<int> all_indices;
   const int kBlockSize = 1 << 12;
   std::unordered_set<std::string> t(kBlockSize);
-  std::uniform_int_distribution<int> uniform(0, ABSL_ARRAYSIZE(words) - 1);
+  std::uniform_int_distribution<int> uniform(0, TURBO_ARRAYSIZE(words) - 1);
   for (int i = 0; i < table_size; i++) {
     all_indices.push_back(i);
     do {
@@ -319,7 +319,7 @@ void StringViewMapBenchmark(benchmark::State& state) {
     indices.insert(indices.end(), hot_indices.begin(), hot_indices.end());
   }
   std::shuffle(indices.begin(), indices.end(), rng);
-  ABSL_RAW_CHECK(
+  TURBO_RAW_CHECK(
       num_cold * kNumLookupsOfColdKeys + num_hot * kNumLookupsOfHotKeys ==
           indices.size(),
       "");
@@ -338,7 +338,7 @@ void StringViewMapBenchmark(benchmark::State& state) {
     for (int i = 0; i < table_size; i++) {
       h[keys[i]] = i * 2;
     }
-    ABSL_RAW_CHECK(h.size() == table_size, "");
+    TURBO_RAW_CHECK(h.size() == table_size, "");
     uint64_t sum = 0;
     for (int i = 0; i < indices.size(); i++) {
       sum += h[test_strings[i]];

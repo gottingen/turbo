@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 namespace {
@@ -51,7 +51,7 @@ ScopedSetEnv::ScopedSetEnv(const char* var_name, const char* new_value)
 #ifdef _WIN32
   char buf[kMaxEnvVarValueSize];
   auto get_res = GetEnvironmentVariableA(var_name_.c_str(), buf, sizeof(buf));
-  ABSL_INTERNAL_CHECK(get_res < sizeof(buf), "value exceeds buffer size");
+  TURBO_INTERNAL_CHECK(get_res < sizeof(buf), "value exceeds buffer size");
 
   if (get_res == 0) {
     was_unset_ = (GetLastError() == ERROR_ENVVAR_NOT_FOUND);
@@ -77,5 +77,5 @@ ScopedSetEnv::~ScopedSetEnv() {
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

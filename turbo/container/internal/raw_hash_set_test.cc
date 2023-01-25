@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 struct RawHashSetTestOnlyAccess {
@@ -1268,7 +1268,7 @@ ExpectedStats XorSeedExpectedStats() {
                 {{0.95, 0}, {0.99, 1}, {0.999, 4}, {0.9999, 10}}};
       }
   }
-  ABSL_RAW_LOG(FATAL, "%s", "Unknown Group width");
+  TURBO_RAW_LOG(FATAL, "%s", "Unknown Group width");
   return {};
 }
 
@@ -1364,7 +1364,7 @@ ExpectedStats LinearTransformExpectedStats() {
                 {{0.95, 0}, {0.99, 1}, {0.999, 6}, {0.9999, 10}}};
       }
   }
-  ABSL_RAW_LOG(FATAL, "%s", "Unknown Group width");
+  TURBO_RAW_LOG(FATAL, "%s", "Unknown Group width");
   return {};
 }
 
@@ -2104,7 +2104,7 @@ TEST(TableDeathTest, IteratorInvalidAssertsEqualityOperator) {
                             kContainerDiffDeathMessage);
 }
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 TEST(RawHashSamplerTest, Sample) {
   // Enable the feature even if the prod default is off.
   SetHashtablezEnabled(true);
@@ -2167,7 +2167,7 @@ TEST(RawHashSamplerTest, Sample) {
         << reservation;
   }
 }
-#endif  // ABSL_INTERNAL_HASHTABLEZ_SAMPLE
+#endif  // TURBO_INTERNAL_HASHTABLEZ_SAMPLE
 
 TEST(RawHashSamplerTest, DoNotSampleCustomAllocators) {
   // Enable the feature even if the prod default is off.
@@ -2190,7 +2190,7 @@ TEST(RawHashSamplerTest, DoNotSampleCustomAllocators) {
               0.00, 0.001);
 }
 
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
 TEST(Sanitizer, PoisoningUnused) {
   IntTable t;
   t.reserve(5);
@@ -2214,7 +2214,7 @@ TEST(Sanitizer, PoisoningOnErase) {
   t.erase(0);
   EXPECT_TRUE(__asan_address_is_poisoned(&v));
 }
-#endif  // ABSL_HAVE_ADDRESS_SANITIZER
+#endif  // TURBO_HAVE_ADDRESS_SANITIZER
 
 TEST(Table, AlignOne) {
   // We previously had a bug in which we were copying a control byte over the
@@ -2320,5 +2320,5 @@ TEST(Table, ReservedGrowthUpdatesWhenTableDoesntGrow) {
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@
 #include "turbo/base/port.h"
 #include "turbo/debugging/internal/stacktrace_config.h"
 
-#if defined(ABSL_STACKTRACE_INL_HEADER)
-#include ABSL_STACKTRACE_INL_HEADER
+#if defined(TURBO_STACKTRACE_INL_HEADER)
+#include TURBO_STACKTRACE_INL_HEADER
 #else
 # error Cannot calculate stack trace: will need to write for your environment
 
@@ -59,14 +59,14 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 typedef int (*Unwinder)(void**, int*, int, int, const void*, int*);
 std::atomic<Unwinder> custom;
 
 template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
-ABSL_ATTRIBUTE_ALWAYS_INLINE inline int Unwind(void** result, int* sizes,
+TURBO_ATTRIBUTE_ALWAYS_INLINE inline int Unwind(void** result, int* sizes,
                                                int max_depth, int skip_count,
                                                const void* uc,
                                                int* min_dropped_frames) {
@@ -78,19 +78,19 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE inline int Unwind(void** result, int* sizes,
   int size = (*f)(result, sizes, max_depth, skip_count + 1, uc,
                   min_dropped_frames);
   // To disable tail call to (*f)(...)
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
   return size;
 }
 
 }  // anonymous namespace
 
-ABSL_ATTRIBUTE_NOINLINE ABSL_ATTRIBUTE_NO_TAIL_CALL int GetStackFrames(
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int GetStackFrames(
     void** result, int* sizes, int max_depth, int skip_count) {
   return Unwind<true, false>(result, sizes, max_depth, skip_count, nullptr,
                              nullptr);
 }
 
-ABSL_ATTRIBUTE_NOINLINE ABSL_ATTRIBUTE_NO_TAIL_CALL int
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int
 GetStackFramesWithContext(void** result, int* sizes, int max_depth,
                           int skip_count, const void* uc,
                           int* min_dropped_frames) {
@@ -98,13 +98,13 @@ GetStackFramesWithContext(void** result, int* sizes, int max_depth,
                             min_dropped_frames);
 }
 
-ABSL_ATTRIBUTE_NOINLINE ABSL_ATTRIBUTE_NO_TAIL_CALL int GetStackTrace(
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int GetStackTrace(
     void** result, int max_depth, int skip_count) {
   return Unwind<false, false>(result, nullptr, max_depth, skip_count, nullptr,
                               nullptr);
 }
 
-ABSL_ATTRIBUTE_NOINLINE ABSL_ATTRIBUTE_NO_TAIL_CALL int
+TURBO_ATTRIBUTE_NOINLINE TURBO_ATTRIBUTE_NO_TAIL_CALL int
 GetStackTraceWithContext(void** result, int max_depth, int skip_count,
                          const void* uc, int* min_dropped_frames) {
   return Unwind<false, true>(result, nullptr, max_depth, skip_count, uc,
@@ -138,5 +138,5 @@ int DefaultStackUnwinder(void** pcs, int* sizes, int depth, int skip,
   return n;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

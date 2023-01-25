@@ -1,4 +1,4 @@
-// Copyright 2023 The Abseil Authors
+// Copyright 2023 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
-ABSL_CONST_INIT const std::array<char, 7> kCharNull{
+TURBO_CONST_INIT const std::array<char, 7> kCharNull{
     {'(', 'n', 'u', 'l', 'l', ')', '\0'}};
-ABSL_CONST_INIT const std::array<signed char, 7> kSignedCharNull{
+TURBO_CONST_INIT const std::array<signed char, 7> kSignedCharNull{
     {'(', 'n', 'u', 'l', 'l', ')', '\0'}};
-ABSL_CONST_INIT const std::array<unsigned char, 7> kUnsignedCharNull{
+TURBO_CONST_INIT const std::array<unsigned char, 7> kUnsignedCharNull{
     {'(', 'n', 'u', 'l', 'l', ')', '\0'}};
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

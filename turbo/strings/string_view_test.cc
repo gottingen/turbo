@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,14 +30,14 @@
 #include "turbo/base/dynamic_annotations.h"
 #include "turbo/base/options.h"
 
-#if defined(ABSL_HAVE_STD_STRING_VIEW) || defined(__ANDROID__)
+#if defined(TURBO_HAVE_STD_STRING_VIEW) || defined(__ANDROID__)
 // We don't control the death messaging when using std::string_view.
 // Android assert messages only go to system log, so death tests cannot inspect
 // the message for matching.
-#define ABSL_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
+#define TURBO_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
   EXPECT_DEATH_IF_SUPPORTED(statement, ".*")
 #else
-#define ABSL_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
+#define TURBO_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
   EXPECT_DEATH_IF_SUPPORTED(statement, regex)
 #endif
 
@@ -371,10 +371,10 @@ TEST(StringViewTest, STL1) {
   EXPECT_EQ(buf[1], c[1]);
   EXPECT_EQ(buf[2], c[2]);
   EXPECT_EQ(buf[3], a[3]);
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW(a.copy(buf, 1, 27), std::out_of_range);
 #else
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(a.copy(buf, 1, 27), "turbo::string_view::copy");
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(a.copy(buf, 1, 27), "turbo::string_view::copy");
 #endif
 }
 
@@ -712,10 +712,10 @@ TEST(StringViewTest, STL2Substr) {
   EXPECT_EQ(a.substr(0, turbo::string_view::npos), a);
   EXPECT_EQ(a.substr(23, turbo::string_view::npos), c);
   // throw exception
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW((void)a.substr(99, 2), std::out_of_range);
 #else
-  ABSL_EXPECT_DEATH_IF_SUPPORTED((void)a.substr(99, 2),
+  TURBO_EXPECT_DEATH_IF_SUPPORTED((void)a.substr(99, 2),
                                  "turbo::string_view::substr");
 #endif
 }
@@ -847,13 +847,13 @@ TEST(StringViewTest, FrontBackSingleChar) {
 }
 
 TEST(StringViewTest, FrontBackEmpty) {
-#ifndef ABSL_USES_STD_STRING_VIEW
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
-  // Abseil's string_view implementation has debug assertions that check that
+#ifndef TURBO_USES_STD_STRING_VIEW
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
+  // Turbo's string_view implementation has debug assertions that check that
   // front() and back() are not called on an empty string_view.
   turbo::string_view sv;
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(sv.front(), "");
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(sv.back(), "");
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(sv.front(), "");
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(sv.back(), "");
 #endif
 #endif
 }
@@ -870,10 +870,10 @@ TEST(StringViewTest, FrontBackEmpty) {
 // to the standard, but `turbo::string_view` implements a different
 // behavior for historical reasons. We work around tests that construct
 // `string_view` from `nullptr` when using libc++.
-#if !defined(ABSL_USES_STD_STRING_VIEW) ||                    \
+#if !defined(TURBO_USES_STD_STRING_VIEW) ||                    \
     (!(defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 9) && \
      !defined(_LIBCPP_VERSION) && !defined(_MSC_VER))
-#define ABSL_HAVE_STRING_VIEW_FROM_NULLPTR 1
+#define TURBO_HAVE_STRING_VIEW_FROM_NULLPTR 1
 #endif
 
 TEST(StringViewTest, NULLInput) {
@@ -881,7 +881,7 @@ TEST(StringViewTest, NULLInput) {
   EXPECT_EQ(s.data(), nullptr);
   EXPECT_EQ(s.size(), 0u);
 
-#ifdef ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
+#ifdef TURBO_HAVE_STRING_VIEW_FROM_NULLPTR
   s = turbo::string_view(nullptr);
   EXPECT_EQ(s.data(), nullptr);
   EXPECT_EQ(s.size(), 0u);
@@ -889,7 +889,7 @@ TEST(StringViewTest, NULLInput) {
   // .ToString() on a turbo::string_view with nullptr should produce the empty
   // string.
   EXPECT_EQ("", std::string(s));
-#endif  // ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
+#endif  // TURBO_HAVE_STRING_VIEW_FROM_NULLPTR
 }
 
 TEST(StringViewTest, Comparisons2) {
@@ -941,10 +941,10 @@ TEST(StringViewTest, At) {
   EXPECT_EQ(abc.at(0), 'a');
   EXPECT_EQ(abc.at(1), 'b');
   EXPECT_EQ(abc.at(2), 'c');
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW((void)abc.at(3), std::out_of_range);
 #else
-  ABSL_EXPECT_DEATH_IF_SUPPORTED((void)abc.at(3), "turbo::string_view::at");
+  TURBO_EXPECT_DEATH_IF_SUPPORTED((void)abc.at(3), "turbo::string_view::at");
 #endif
 }
 
@@ -998,12 +998,12 @@ TEST(StringViewTest, ConstexprNullSafeStringView) {
 
 TEST(StringViewTest, ConstexprCompiles) {
   constexpr turbo::string_view sp;
-#ifdef ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
+#ifdef TURBO_HAVE_STRING_VIEW_FROM_NULLPTR
   constexpr turbo::string_view cstr(nullptr);
 #endif
   constexpr turbo::string_view cstr_len("cstr", 4);
 
-#if defined(ABSL_USES_STD_STRING_VIEW)
+#if defined(TURBO_USES_STD_STRING_VIEW)
   // In libstdc++ (as of 7.2), `std::string_view::string_view(const char*)`
   // calls `std::char_traits<char>::length(const char*)` to get the string
   // length, but it is not marked constexpr yet. See GCC bug:
@@ -1014,37 +1014,37 @@ TEST(StringViewTest, ConstexprCompiles) {
   // TODO(zhangxy): Update the condition when libstdc++ adopts the constexpr
   // length().
 #if !defined(__GLIBCXX__)
-#define ABSL_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR 1
+#define TURBO_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR 1
 #endif  // !__GLIBCXX__
 
-#else  // ABSL_USES_STD_STRING_VIEW
+#else  // TURBO_USES_STD_STRING_VIEW
 
 // This duplicates the check for __builtin_strlen in the header.
-#if ABSL_HAVE_BUILTIN(__builtin_strlen) || \
+#if TURBO_HAVE_BUILTIN(__builtin_strlen) || \
     (defined(__GNUC__) && !defined(__clang__))
-#define ABSL_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR 1
+#define TURBO_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR 1
 #elif defined(__GNUC__)  // GCC or clang
 #error GCC/clang should have constexpr string_view.
 #endif
 
 // MSVC 2017+ should be able to construct a constexpr string_view from a cstr.
 #if defined(_MSC_VER) && _MSC_VER >= 1910
-#define ABSL_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR 1
+#define TURBO_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR 1
 #endif
 
-#endif  // ABSL_USES_STD_STRING_VIEW
+#endif  // TURBO_USES_STD_STRING_VIEW
 
-#ifdef ABSL_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR
+#ifdef TURBO_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR
   constexpr turbo::string_view cstr_strlen("foo");
   EXPECT_EQ(cstr_strlen.length(), 3u);
   constexpr turbo::string_view cstr_strlen2 = "bar";
   EXPECT_EQ(cstr_strlen2, "bar");
 
-#if ABSL_HAVE_BUILTIN(__builtin_memcmp) || \
+#if TURBO_HAVE_BUILTIN(__builtin_memcmp) || \
     (defined(__GNUC__) && !defined(__clang__))
-#define ABSL_HAVE_CONSTEXPR_STRING_VIEW_COMPARISON 1
+#define TURBO_HAVE_CONSTEXPR_STRING_VIEW_COMPARISON 1
 #endif
-#ifdef ABSL_HAVE_CONSTEXPR_STRING_VIEW_COMPARISON
+#ifdef TURBO_HAVE_CONSTEXPR_STRING_VIEW_COMPARISON
   constexpr turbo::string_view foo = "foo";
   constexpr turbo::string_view bar = "bar";
   constexpr bool foo_eq_bar = foo == bar;
@@ -1072,11 +1072,11 @@ TEST(StringViewTest, ConstexprCompiles) {
   constexpr turbo::string_view::iterator const_end_empty = sp.end();
   EXPECT_EQ(const_begin_empty, const_end_empty);
 
-#ifdef ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
+#ifdef TURBO_HAVE_STRING_VIEW_FROM_NULLPTR
   constexpr turbo::string_view::iterator const_begin_nullptr = cstr.begin();
   constexpr turbo::string_view::iterator const_end_nullptr = cstr.end();
   EXPECT_EQ(const_begin_nullptr, const_end_nullptr);
-#endif  // ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
+#endif  // TURBO_HAVE_STRING_VIEW_FROM_NULLPTR
 #endif  // !defined(__clang__) || ...
 
   constexpr turbo::string_view::iterator const_begin = cstr_len.begin();
@@ -1174,12 +1174,12 @@ TEST(StringViewTest, Noexcept) {
 }
 
 TEST(StringViewTest, BoundsCheck) {
-#ifndef ABSL_USES_STD_STRING_VIEW
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
-  // Abseil's string_view implementation has bounds-checking in debug mode.
+#ifndef TURBO_USES_STD_STRING_VIEW
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
+  // Turbo's string_view implementation has bounds-checking in debug mode.
   turbo::string_view h = "hello";
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(h[5], "");
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(h[static_cast<size_t>(-1)], "");
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(h[5], "");
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(h[static_cast<size_t>(-1)], "");
 #endif
 #endif
 }
@@ -1221,7 +1221,7 @@ TEST(FindOneCharTest, EdgeCases) {
   EXPECT_EQ(turbo::string_view::npos, a.rfind('x'));
 }
 
-#ifndef ABSL_HAVE_THREAD_SANITIZER  // Allocates too much memory for tsan.
+#ifndef TURBO_HAVE_THREAD_SANITIZER  // Allocates too much memory for tsan.
 TEST(HugeStringView, TwoPointTwoGB) {
   if (sizeof(size_t) <= 4)
     return;
@@ -1235,11 +1235,11 @@ TEST(HugeStringView, TwoPointTwoGB) {
   sp.remove_suffix(2);
   EXPECT_EQ(size - 1 - 2, sp.length());
 }
-#endif  // ABSL_HAVE_THREAD_SANITIZER
+#endif  // TURBO_HAVE_THREAD_SANITIZER
 
-#if !defined(NDEBUG) && !defined(ABSL_USES_STD_STRING_VIEW)
+#if !defined(NDEBUG) && !defined(TURBO_USES_STD_STRING_VIEW)
 TEST(NonNegativeLenTest, NonNegativeLen) {
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(
       turbo::string_view("xyz", static_cast<size_t>(-1)), "len <= kMaxSize");
 }
 
@@ -1250,10 +1250,10 @@ TEST(LenExceedsMaxSizeTest, LenExceedsMaxSize) {
   turbo::string_view ok_view("", max_size);
 
   // Adding one to the max should trigger an assertion.
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(turbo::string_view("", max_size + 1),
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(turbo::string_view("", max_size + 1),
                                  "len <= kMaxSize");
 }
-#endif  // !defined(NDEBUG) && !defined(ABSL_USES_STD_STRING_VIEW)
+#endif  // !defined(NDEBUG) && !defined(TURBO_USES_STD_STRING_VIEW)
 
 class StringViewStreamTest : public ::testing::Test {
  public:

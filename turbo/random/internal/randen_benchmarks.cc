@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ template <size_t N>
 void Print(const char* name, const size_t n, const Result (&results)[N],
            const size_t bytes) {
   if (n == 0) {
-    ABSL_RAW_LOG(
+    TURBO_RAW_LOG(
         WARNING,
         "WARNING: Measurement failed, should not happen when using "
         "PinThreadToCPU unless the region to measure takes > 1 second.\n");
@@ -140,7 +140,7 @@ void RunAll(const int argc, char* argv[]) {
   if (argc == 2) {
     int cpu = -1;
     if (!turbo::SimpleAtoi(argv[1], &cpu)) {
-      ABSL_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
+      TURBO_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
     }
     PinThreadToCPU(cpu);
   }
@@ -149,12 +149,12 @@ void RunAll(const int argc, char* argv[]) {
   const FuncInput unpredictable = (argc != 999);
   static const FuncInput inputs[] = {unpredictable * 100, unpredictable * 1000};
 
-#if !defined(ABSL_INTERNAL_DISABLE_AES) && ABSL_HAVE_ACCELERATED_AES
+#if !defined(TURBO_INTERNAL_DISABLE_AES) && TURBO_HAVE_ACCELERATED_AES
   Measure<AbsorbFn<RandenHwAes>>("Absorb (HwAes)", inputs);
 #endif
   Measure<AbsorbFn<RandenSlow>>("Absorb (Slow)", inputs);
 
-#if !defined(ABSL_INTERNAL_DISABLE_AES) && ABSL_HAVE_ACCELERATED_AES
+#if !defined(TURBO_INTERNAL_DISABLE_AES) && TURBO_HAVE_ACCELERATED_AES
   Measure<GenerateFn<RandenHwAes>>("Generate (HwAes)", inputs);
 #endif
   Measure<GenerateFn<RandenSlow>>("Generate (Slow)", inputs);

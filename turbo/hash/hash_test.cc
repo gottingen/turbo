@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@
 
 namespace {
 
-// Utility wrapper of T for the purposes of testing the `AbslHash` type erasure
+// Utility wrapper of T for the purposes of testing the `TurboHash` type erasure
 // mechanism.  `TypeErasedValue<T>` can be constructed with a `T`, and can
 // be compared and hashed.  However, all hashing goes through the hashing
 // type-erasure framework.
@@ -67,7 +67,7 @@ class TypeErasedValue {
   explicit TypeErasedValue(const T& n) : n_(n) {}
 
   template <typename H>
-  friend H AbslHashValue(H hash_state, const TypeErasedValue& v) {
+  friend H TurboHashValue(H hash_state, const TypeErasedValue& v) {
     v.HashValue(turbo::HashState::Create(&hash_state));
     return hash_state;
   }
@@ -153,11 +153,11 @@ TEST(HashValueTest, EnumAndBool) {
   EXPECT_TRUE((is_hashable<EnumClass>::value));
   EXPECT_TRUE((is_hashable<bool>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       LegacyEnum::kValue1, LegacyEnum::kValue2, LegacyEnum::kValue3)));
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       EnumClass::kValue4, EnumClass::kValue5, EnumClass::kValue6)));
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(true, false)));
 }
 
@@ -166,15 +166,15 @@ TEST(HashValueTest, FloatingPoint) {
   EXPECT_TRUE((is_hashable<double>::value));
   EXPECT_TRUE((is_hashable<long double>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(42.f, 0.f, -0.f, std::numeric_limits<float>::infinity(),
                       -std::numeric_limits<float>::infinity())));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(42., 0., -0., std::numeric_limits<double>::infinity(),
                       -std::numeric_limits<double>::infinity())));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       // Add some values with small exponent to test that NORMAL values also
       // append their category.
       .5L, 1.L, 2.L, 4.L, 42.L, 0.L, -0.L,
@@ -192,7 +192,7 @@ TEST(HashValueTest, Pointer) {
   int* ptr = &i;
   int* n = nullptr;
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(&i, ptr, nullptr, ptr + 1, n)));
 }
 
@@ -269,37 +269,37 @@ TEST(HashValueTest, PointerToMember) {
   EXPECT_TRUE((is_hashable<float Foo::*>::value));
   EXPECT_TRUE((is_hashable<double (Foo::*)(int, int)&&>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(&Foo::a, &Foo::b, static_cast<int Foo::*>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(&Foo::c, &Foo::d, static_cast<const int Foo::*>(nullptr),
                       &Foo::a, &Foo::b)));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       &Foo::f1, static_cast<void (Foo::*)()>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       &Foo::f2, static_cast<void (Foo::*)() const>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       &Foo::g1, &Foo::h1, static_cast<int (Foo::*)() &>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       &Foo::g2, &Foo::h2, static_cast<int (Foo::*)() const &>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       &Foo::g3, &Foo::h3, static_cast<int (Foo::*)() &&>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       &Foo::g4, &Foo::h4, static_cast<int (Foo::*)() const &&>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(static_cast<void (Foo::*)()>(&Foo::vfa),
                       static_cast<void (Foo::*)()>(&Foo::vfb),
                       static_cast<void (Foo::*)()>(nullptr))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(static_cast<void (Foo::*)()>(Foo::A::pq()),
                       static_cast<void (Foo::*)()>(Foo::B::pq()),
                       static_cast<void (Foo::*)()>(nullptr))));
@@ -311,11 +311,11 @@ TEST(HashValueTest, PairAndTuple) {
   EXPECT_TRUE((is_hashable<std::tuple<int&, int&>>::value));
   EXPECT_TRUE((is_hashable<std::tuple<int&&, int&&>>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       std::make_pair(0, 42), std::make_pair(0, 42), std::make_pair(42, 0),
       std::make_pair(0, 0), std::make_pair(42, 42), std::make_pair(1, 42))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(std::make_tuple(0, 0, 0), std::make_tuple(0, 0, 42),
                       std::make_tuple(0, 23, 0), std::make_tuple(17, 0, 0),
                       std::make_tuple(42, 0, 0), std::make_tuple(3, 9, 9),
@@ -323,11 +323,11 @@ TEST(HashValueTest, PairAndTuple) {
 
   // Test that tuples of lvalue references work (so we need a few lvalues):
   int a = 0, b = 1, c = 17, d = 23;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       std::tie(a, a), std::tie(a, b), std::tie(b, c), std::tie(c, d))));
 
   // Test that tuples of rvalue references work:
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       std::forward_as_tuple(0, 0, 0), std::forward_as_tuple(0, 0, 42),
       std::forward_as_tuple(0, 23, 0), std::forward_as_tuple(17, 0, 0),
       std::forward_as_tuple(42, 0, 0), std::forward_as_tuple(3, 9, 9),
@@ -384,7 +384,7 @@ TEST(HashValueTest, SmartPointers) {
   ASSERT_TRUE(SmartPointerEq{}(unique_null, nullptr));
   ASSERT_FALSE(SmartPointerEq{}(shared2, nullptr));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::forward_as_tuple(&i, nullptr,                    //
                             unique1, unique2, unique_null,  //
                             turbo::make_unique<int>(),       //
@@ -398,7 +398,7 @@ TEST(HashValueTest, FunctionPointer) {
   EXPECT_TRUE(is_hashable<Func>::value);
 
   Func p1 = [] { return 2; }, p2 = [] { return 1; };
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(p1, p2, nullptr)));
 }
 
@@ -433,7 +433,7 @@ TEST(HashValueTest, Strings) {
   const std::string large = std::string(2048, 'x');  // multiple of chunk size
   const std::string huge = std::string(5000, 'a');   // not a multiple
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(  //
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(  //
       std::string(), turbo::string_view(), turbo::Cord(),                     //
       std::string(""), turbo::string_view(""), turbo::Cord(""),               //
       std::string(small), turbo::string_view(small), turbo::Cord(small),      //
@@ -444,7 +444,7 @@ TEST(HashValueTest, Strings) {
 
   // Also check that nested types maintain the same hash.
   const WrapInTuple t{};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(  //
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(  //
       t(std::string()), t(turbo::string_view()), t(turbo::Cord()),            //
       t(std::string("")), t(turbo::string_view("")), t(turbo::Cord("")),      //
       t(std::string(small)), t(turbo::string_view(small)),                   //
@@ -463,7 +463,7 @@ TEST(HashValueTest, Strings) {
 TEST(HashValueTest, WString) {
   EXPECT_TRUE((is_hashable<std::wstring>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       std::wstring(), std::wstring(L"ABC"), std::wstring(L"ABC"),
       std::wstring(L"Some other different string"),
       std::wstring(L"Iñtërnâtiônàlizætiøn"))));
@@ -472,7 +472,7 @@ TEST(HashValueTest, WString) {
 TEST(HashValueTest, U16String) {
   EXPECT_TRUE((is_hashable<std::u16string>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       std::u16string(), std::u16string(u"ABC"), std::u16string(u"ABC"),
       std::u16string(u"Some other different string"),
       std::u16string(u"Iñtërnâtiônàlizætiøn"))));
@@ -481,7 +481,7 @@ TEST(HashValueTest, U16String) {
 TEST(HashValueTest, U32String) {
   EXPECT_TRUE((is_hashable<std::u32string>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       std::u32string(), std::u32string(U"ABC"), std::u32string(U"ABC"),
       std::u32string(U"Some other different string"),
       std::u32string(U"Iñtërnâtiônàlizætiøn"))));
@@ -490,17 +490,17 @@ TEST(HashValueTest, U32String) {
 TEST(HashValueTest, StdArray) {
   EXPECT_TRUE((is_hashable<std::array<int, 3>>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(std::array<int, 3>{}, std::array<int, 3>{{0, 23, 42}})));
 }
 
 TEST(HashValueTest, StdBitset) {
   EXPECT_TRUE((is_hashable<std::bitset<257>>::value));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       {std::bitset<2>("00"), std::bitset<2>("01"), std::bitset<2>("10"),
        std::bitset<2>("11")}));
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       {std::bitset<5>("10101"), std::bitset<5>("10001"), std::bitset<5>()}));
 
   constexpr int kNumBits = 256;
@@ -511,7 +511,7 @@ TEST(HashValueTest, StdBitset) {
   bit_strings[3][kNumBits / 3] = '0';
   bit_strings[4][kNumBits - 2] = '0';
   bit_strings[5][kNumBits - 1] = '0';
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       {std::bitset<kNumBits>(bit_strings[0].c_str()),
        std::bitset<kNumBits>(bit_strings[1].c_str()),
        std::bitset<kNumBits>(bit_strings[2].c_str()),
@@ -557,7 +557,7 @@ class UnorderedSequence {
     return !(lhs == rhs);
   }
   template <typename H>
-  friend H AbslHashValue(H h, const UnorderedSequence& u) {
+  friend H TurboHashValue(H h, const UnorderedSequence& u) {
     return H::combine(H::combine_unordered(std::move(h), u.begin(), u.end()),
                       u.size());
   }
@@ -585,7 +585,7 @@ TYPED_TEST_P(HashValueSequenceTest, BasicUsage) {
       TypeParam{a, a},    TypeParam{a, a, a}, TypeParam{a, a, b},
       TypeParam{a, b, a}, TypeParam{b, a, a}, TypeParam{a, b},
       TypeParam{b, c}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(exemplars));
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
 }
 
 REGISTER_TYPED_TEST_SUITE_P(HashValueSequenceTest, BasicUsage);
@@ -619,7 +619,7 @@ TYPED_TEST_P(HashValueNestedSequenceTest, BasicUsage) {
       T{V{1, 3}, V{4, 2}}, T{V{1, 4}, V{2, 3}}, T{V{1, 4}, V{3, 2}},
       T{V{2, 3}, V{1, 4}}, T{V{2, 3}, V{4, 1}}, T{V{2, 4}, V{1, 3}},
       T{V{2, 4}, V{3, 1}}, T{V{3, 4}, V{1, 2}}, T{V{3, 4}, V{2, 1}}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(exemplars));
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
 }
 
 REGISTER_TYPED_TEST_SUITE_P(HashValueNestedSequenceTest, BasicUsage);
@@ -635,14 +635,14 @@ using NestedIntSequenceTypes = testing::Types<
 INSTANTIATE_TYPED_TEST_SUITE_P(My, HashValueNestedSequenceTest,
                               NestedIntSequenceTypes);
 
-// Private type that only supports AbslHashValue to make sure our chosen hash
+// Private type that only supports TurboHashValue to make sure our chosen hash
 // implementation is recursive within turbo::Hash.
 // It uses std::abs() on the value to provide different bitwise representations
 // of the same logical value.
 struct Private {
   int i;
   template <typename H>
-  friend H AbslHashValue(H h, Private p) {
+  friend H TurboHashValue(H h, Private p) {
     return H::combine(std::move(h), std::abs(p.i));
   }
 
@@ -656,7 +656,7 @@ struct Private {
 };
 
 // Test helper for combine_piecewise_buffer.  It holds a string_view to the
-// buffer-to-be-hashed.  Its AbslHashValue specialization will split up its
+// buffer-to-be-hashed.  Its TurboHashValue specialization will split up its
 // contents at the character offsets requested.
 class PiecewiseHashTester {
  public:
@@ -672,7 +672,7 @@ class PiecewiseHashTester {
         split_locations_(std::move(split_locations)) {}
 
   template <typename H>
-  friend H AbslHashValue(H h, const PiecewiseHashTester& p) {
+  friend H TurboHashValue(H h, const PiecewiseHashTester& p) {
     if (!p.piecewise_) {
       return H::combine_contiguous(std::move(h), p.buf_.data(), p.buf_.size());
     }
@@ -705,7 +705,7 @@ class PiecewiseHashTester {
 // by "bar"
 struct DummyFooBar {
   template <typename H>
-  friend H AbslHashValue(H h, const DummyFooBar&) {
+  friend H TurboHashValue(H h, const DummyFooBar&) {
     const char* foo = "foo";
     const char* bar = "bar";
     h = H::combine_contiguous(std::move(h), foo, 3);
@@ -776,7 +776,7 @@ TEST(HashValueTest, Optional) {
   EXPECT_TRUE(is_hashable<turbo::optional<Private>>::value);
 
   using O = turbo::optional<Private>;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(O{}, O{{1}}, O{{-1}}, O{{10}})));
 }
 
@@ -784,10 +784,10 @@ TEST(HashValueTest, Variant) {
   using V = turbo::variant<Private, std::string>;
   EXPECT_TRUE(is_hashable<V>::value);
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       V(Private{1}), V(Private{-1}), V(Private{2}), V("ABC"), V("BCD"))));
 
-#if ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
   struct S {};
   EXPECT_FALSE(is_hashable<turbo::variant<S>>::value);
 #endif
@@ -810,7 +810,7 @@ TYPED_TEST_P(HashValueAssociativeMapTest, BasicUsage) {
                            M{V{1, "foo"}, V{42, "bar"}},
                            M{V{1, "foo"}, V{43, "bar"}},
                            M{V{1, "foo"}, V{43, "baz"}}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(exemplars));
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
 }
 
 REGISTER_TYPED_TEST_SUITE_P(HashValueAssociativeMapTest, BasicUsage);
@@ -841,7 +841,7 @@ TYPED_TEST_P(HashValueAssociativeMultimapTest, BasicUsage) {
                             MM{V{1, "foo"}, V{1, "foo"}, V{43, "bar"}},
                             MM{V{1, "foo"}, V{43, "bar"}, V{1, "foo"}},
                             MM{V{1, "foo"}, V{43, "baz"}}};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(exemplars));
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(exemplars));
 }
 
 REGISTER_TYPED_TEST_SUITE_P(HashValueAssociativeMultimapTest, BasicUsage);
@@ -855,15 +855,15 @@ TEST(HashValueTest, ReferenceWrapper) {
   EXPECT_TRUE(is_hashable<std::reference_wrapper<Private>>::value);
 
   Private p1{1}, p10{10};
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       p1, p10, std::ref(p1), std::ref(p10), std::cref(p1), std::cref(p10))));
 
   EXPECT_TRUE(is_hashable<std::reference_wrapper<int>>::value);
   int one = 1, ten = 10;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(std::make_tuple(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
       one, ten, std::ref(one), std::ref(ten), std::cref(one), std::cref(ten))));
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(std::tuple<std::reference_wrapper<int>>(std::ref(one)),
                       std::tuple<std::reference_wrapper<int>>(std::ref(ten)),
                       std::tuple<int>(one), std::tuple<int>(ten))));
@@ -894,7 +894,7 @@ TEST(IsHashableTest, ValidHash) {
   EXPECT_TRUE(IsAggregateInitializable<turbo::Hash<int>>::value);
 }
 
-#if ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 TEST(IsHashableTest, PoisonHash) {
   struct X {};
   EXPECT_FALSE((is_hashable<X>::value));
@@ -909,22 +909,22 @@ TEST(IsHashableTest, PoisonHash) {
   EXPECT_FALSE(IsAggregateInitializable<turbo::Hash<X>>::value);
 #endif
 }
-#endif  // ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#endif  // TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 
 // Hashable types
 //
-// These types exist simply to exercise various AbslHashValue behaviors, so
-// they are named by what their AbslHashValue overload does.
+// These types exist simply to exercise various TurboHashValue behaviors, so
+// they are named by what their TurboHashValue overload does.
 struct NoOp {
   template <typename HashCode>
-  friend HashCode AbslHashValue(HashCode h, NoOp n) {
+  friend HashCode TurboHashValue(HashCode h, NoOp n) {
     return h;
   }
 };
 
 struct EmptyCombine {
   template <typename HashCode>
-  friend HashCode AbslHashValue(HashCode h, EmptyCombine e) {
+  friend HashCode TurboHashValue(HashCode h, EmptyCombine e) {
     return HashCode::combine(std::move(h));
   }
 };
@@ -932,7 +932,7 @@ struct EmptyCombine {
 template <typename Int>
 struct CombineIterative {
   template <typename HashCode>
-  friend HashCode AbslHashValue(HashCode h, CombineIterative c) {
+  friend HashCode TurboHashValue(HashCode h, CombineIterative c) {
     for (int i = 0; i < 5; ++i) {
       h = HashCode::combine(std::move(h), Int(i));
     }
@@ -943,7 +943,7 @@ struct CombineIterative {
 template <typename Int>
 struct CombineVariadic {
   template <typename HashCode>
-  friend HashCode AbslHashValue(HashCode h, CombineVariadic c) {
+  friend HashCode TurboHashValue(HashCode h, CombineVariadic c) {
     return HashCode::combine(std::move(h), Int(0), Int(1), Int(2), Int(3),
                              Int(4));
   }
@@ -951,9 +951,9 @@ struct CombineVariadic {
 enum class InvokeTag {
   kUniquelyRepresented,
   kHashValue,
-#if ABSL_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
+#if TURBO_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
   kLegacyHash,
-#endif  // ABSL_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
+#endif  // TURBO_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
   kStdHash,
   kNone
 };
@@ -984,7 +984,7 @@ struct EnableIfContained
 template <
     typename H, InvokeTag... Tags,
     typename = typename EnableIfContained<InvokeTag::kHashValue, Tags...>::type>
-H AbslHashValue(H state, CustomHashType<Tags...> t) {
+H TurboHashValue(H state, CustomHashType<Tags...> t) {
   static_assert(MinTag<Tags...>::value == InvokeTag::kHashValue, "");
   return H::combine(std::move(state),
                     t.value + static_cast<int>(InvokeTag::kHashValue));
@@ -993,7 +993,7 @@ H AbslHashValue(H state, CustomHashType<Tags...> t) {
 }  // namespace
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 template <InvokeTag... Tags>
 struct is_uniquely_represented<
@@ -1001,11 +1001,11 @@ struct is_uniquely_represented<
     typename EnableIfContained<InvokeTag::kUniquelyRepresented, Tags...>::type>
     : std::true_type {};
 }  // namespace hash_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#if ABSL_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
-namespace ABSL_INTERNAL_LEGACY_HASH_NAMESPACE {
+#if TURBO_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
+namespace TURBO_INTERNAL_LEGACY_HASH_NAMESPACE {
 template <InvokeTag... Tags>
 struct hash<CustomHashType<Tags...>> {
   template <InvokeTag... TagsIn, typename = typename EnableIfContained<
@@ -1015,8 +1015,8 @@ struct hash<CustomHashType<Tags...>> {
     return t.value + static_cast<int>(InvokeTag::kLegacyHash);
   }
 };
-}  // namespace ABSL_INTERNAL_LEGACY_HASH_NAMESPACE
-#endif  // ABSL_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
+}  // namespace TURBO_INTERNAL_LEGACY_HASH_NAMESPACE
+#endif  // TURBO_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
 
 namespace std {
 template <InvokeTag... Tags>  // NOLINT
@@ -1045,13 +1045,13 @@ void TestCustomHashType(InvokeTagConstant<InvokeTag::kNone>, T...) {
 }
 
 void TestCustomHashType(InvokeTagConstant<InvokeTag::kNone>) {
-#if ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
   // is_hashable is false if we don't support any of the hooks.
   using type = CustomHashType<>;
   EXPECT_FALSE(is_hashable<type>());
   EXPECT_FALSE(is_hashable<const type>());
   EXPECT_FALSE(is_hashable<const type&>());
-#endif  // ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#endif  // TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 }
 
 template <InvokeTag Tag, typename... T>
@@ -1098,7 +1098,7 @@ struct StructWithPadding {
   int i;
 
   template <typename H>
-  friend H AbslHashValue(H hash_state, const StructWithPadding& s) {
+  friend H TurboHashValue(H hash_state, const StructWithPadding& s) {
     return H::combine(std::move(hash_state), s.c, s.i);
   }
 };
@@ -1116,7 +1116,7 @@ struct ArraySlice {
   T* end;
 
   template <typename H>
-  friend H AbslHashValue(H hash_state, const ArraySlice& slice) {
+  friend H TurboHashValue(H hash_state, const ArraySlice& slice) {
     for (auto t = slice.begin; t != slice.end; ++t) {
       hash_state = H::combine(std::move(hash_state), *t);
     }
@@ -1164,7 +1164,7 @@ struct ConvertibleFromNoOp {
   ConvertibleFromNoOp(NoOp) {}  // NOLINT(runtime/explicit)
 
   template <typename H>
-  friend H AbslHashValue(H hash_state, ConvertibleFromNoOp) {
+  friend H TurboHashValue(H hash_state, ConvertibleFromNoOp) {
     return H::combine(std::move(hash_state), 1);
   }
 };
@@ -1188,7 +1188,7 @@ struct IntAndString {
   std::string s;
 
   template <typename H>
-  friend H AbslHashValue(H hash_state, IntAndString int_and_string) {
+  friend H TurboHashValue(H hash_state, IntAndString int_and_string) {
     return H::combine(std::move(hash_state), int_and_string.s,
                       int_and_string.i);
   }

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #include "turbo/strings/internal/memutil.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 bool EqualsIgnoreCase(turbo::string_view piece1,
                       turbo::string_view piece2) noexcept {
@@ -39,5 +39,5 @@ bool EndsWithIgnoreCase(turbo::string_view text,
          EqualsIgnoreCase(text.substr(text.size() - suffix.size()), suffix);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

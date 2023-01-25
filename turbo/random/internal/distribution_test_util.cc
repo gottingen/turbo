@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "turbo/strings/str_format.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
 
@@ -92,11 +92,11 @@ bool Near(turbo::string_view msg, double actual, double expected, double bound) 
 
   std::string formatted = turbo::StrCat(
       msg, " actual=", actual, " expected=", expected, " err=", delta / bound);
-  ABSL_RAW_LOG(INFO, "%s", formatted.c_str());
+  TURBO_RAW_LOG(INFO, "%s", formatted.c_str());
   return false;
 }
 
-// TODO(turbo-team): Replace with an "ABSL_HAVE_SPECIAL_MATH" and try
+// TODO(turbo-team): Replace with an "TURBO_HAVE_SPECIAL_MATH" and try
 // to use std::beta().  As of this writing P0226R1 is not implemented
 // in libc++: http://libcxx.llvm.org/cxx1z_status.html
 double beta(double p, double q) {
@@ -396,7 +396,7 @@ double BetaIncompleteInv(const double p, const double q, const double alpha) {
 // computes `p` from that equation.
 double RequiredSuccessProbability(const double p_fail, const int num_trials) {
   double p = std::exp(std::log(1.0 - p_fail) / static_cast<double>(num_trials));
-  ABSL_ASSERT(p > 0);
+  TURBO_ASSERT(p > 0);
   return p;
 }
 
@@ -409,10 +409,10 @@ double ZScore(double expected_mean, const DistributionMoments& moments) {
 double MaxErrorTolerance(double acceptance_probability) {
   double one_sided_pvalue = 0.5 * (1.0 - acceptance_probability);
   const double max_err = InverseNormalSurvival(one_sided_pvalue);
-  ABSL_ASSERT(max_err > 0);
+  TURBO_ASSERT(max_err > 0);
   return max_err;
 }
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

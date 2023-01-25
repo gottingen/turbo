@@ -1,5 +1,5 @@
-#ifndef ABSL_DEBUGGING_INTERNAL_STACKTRACE_AARCH64_INL_H_
-#define ABSL_DEBUGGING_INTERNAL_STACKTRACE_AARCH64_INL_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_STACKTRACE_AARCH64_INL_H_
+#define TURBO_DEBUGGING_INTERNAL_STACKTRACE_AARCH64_INL_H_
 
 // Generate stack tracer for aarch64
 
@@ -25,7 +25,7 @@ static const size_t kUnknownFrameSize = 0;
 // Returns the address of the VDSO __kernel_rt_sigreturn function, if present.
 static const unsigned char* GetKernelRtSigreturnAddress() {
   constexpr uintptr_t kImpossibleAddress = 1;
-  ABSL_CONST_INIT static std::atomic<uintptr_t> memoized{kImpossibleAddress};
+  TURBO_CONST_INIT static std::atomic<uintptr_t> memoized{kImpossibleAddress};
   uintptr_t address = memoized.load(std::memory_order_relaxed);
   if (address != kImpossibleAddress) {
     return reinterpret_cast<const unsigned char*>(address);
@@ -33,7 +33,7 @@ static const unsigned char* GetKernelRtSigreturnAddress() {
 
   address = reinterpret_cast<uintptr_t>(nullptr);
 
-#ifdef ABSL_HAVE_VDSO_SUPPORT
+#ifdef TURBO_HAVE_VDSO_SUPPORT
   turbo::debugging_internal::VDSOSupport vdso;
   if (vdso.IsPresent()) {
     turbo::debugging_internal::VDSOSupport::SymbolInfo symbol_info;
@@ -78,8 +78,8 @@ static inline size_t ComputeStackFrameSize(const T* low,
 // checks (the strictness of which is controlled by the boolean parameter
 // "STRICT_UNWINDING") to reduce the chance that a bad pointer is returned.
 template<bool STRICT_UNWINDING, bool WITH_CONTEXT>
-ABSL_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static void **NextStackFrame(void **old_frame_pointer, const void *uc) {
   void **new_frame_pointer = reinterpret_cast<void**>(*old_frame_pointer);
   bool check_frame_size = true;
@@ -129,8 +129,8 @@ static void **NextStackFrame(void **old_frame_pointer, const void *uc) {
 }
 
 template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
-ABSL_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
                       const void *ucp, int *min_dropped_frames) {
 #ifdef __GNUC__
@@ -194,13 +194,13 @@ static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
 }
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 bool StackTraceWorksForTest() {
   return true;
 }
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_INTERNAL_STACKTRACE_AARCH64_INL_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_STACKTRACE_AARCH64_INL_H_

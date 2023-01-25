@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
 
-ABSL_CONST_INIT static turbo::base_internal::SpinLock map_lock(
+TURBO_CONST_INIT static turbo::base_internal::SpinLock map_lock(
     turbo::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
-ABSL_CONST_INIT static int num_identities_reused ABSL_GUARDED_BY(map_lock);
+TURBO_CONST_INIT static int num_identities_reused TURBO_GUARDED_BY(map_lock);
 
 static const void* const kCheckNoIdentity = reinterpret_cast<void*>(1);
 
@@ -40,7 +40,7 @@ static void TestThreadIdentityCurrent(const void* assert_no_identity) {
   ThreadIdentity* identity;
 
   // We have to test this conditionally, because if the test framework relies
-  // on Abseil, then some previous action may have already allocated an
+  // on Turbo, then some previous action may have already allocated an
   // identity.
   if (assert_no_identity == kCheckNoIdentity) {
     identity = CurrentThreadIdentityIfPresent();
@@ -125,5 +125,5 @@ TEST(ThreadIdentityTest, ReusedThreadIdentityMutexTest) {
 
 }  // namespace
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

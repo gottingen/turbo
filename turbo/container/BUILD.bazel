@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -28,8 +28,8 @@ licenses(["notice"])
 cc_library(
     name = "compressed_tuple",
     hdrs = ["internal/compressed_tuple.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/utility",
     ],
@@ -38,8 +38,8 @@ cc_library(
 cc_test(
     name = "compressed_tuple_test",
     srcs = ["internal/compressed_tuple_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":compressed_tuple",
         ":test_instance_tracker",
@@ -54,8 +54,8 @@ cc_test(
 cc_library(
     name = "fixed_array",
     hdrs = ["fixed_array.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":compressed_tuple",
         "//turbo/algorithm",
@@ -70,8 +70,8 @@ cc_library(
 cc_test(
     name = "fixed_array_test",
     srcs = ["fixed_array_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":counting_allocator",
         ":fixed_array",
@@ -86,8 +86,8 @@ cc_test(
 cc_test(
     name = "fixed_array_exception_safety_test",
     srcs = ["fixed_array_exception_safety_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":fixed_array",
         "//turbo/base:config",
@@ -100,8 +100,8 @@ cc_binary(
     name = "fixed_array_benchmark",
     testonly = 1,
     srcs = ["fixed_array_benchmark.cc"],
-    copts = ABSL_TEST_COPTS + ["$(STACK_FRAME_UNLIMITED)"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS + ["$(STACK_FRAME_UNLIMITED)"],
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     deps = [
         ":fixed_array",
@@ -112,8 +112,8 @@ cc_binary(
 cc_library(
     name = "inlined_vector_internal",
     hdrs = ["internal/inlined_vector.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":compressed_tuple",
         "//turbo/base:core_headers",
@@ -126,8 +126,8 @@ cc_library(
 cc_library(
     name = "inlined_vector",
     hdrs = ["inlined_vector.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":inlined_vector_internal",
         "//turbo/algorithm",
@@ -142,8 +142,8 @@ cc_library(
     name = "counting_allocator",
     testonly = 1,
     hdrs = ["internal/counting_allocator.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = ["//turbo/base:config"],
 )
@@ -151,8 +151,8 @@ cc_library(
 cc_test(
     name = "inlined_vector_test",
     srcs = ["inlined_vector_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":counting_allocator",
         ":inlined_vector",
@@ -172,8 +172,8 @@ cc_binary(
     name = "inlined_vector_benchmark",
     testonly = 1,
     srcs = ["inlined_vector_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     deps = [
         ":inlined_vector",
@@ -187,7 +187,7 @@ cc_binary(
 cc_test(
     name = "inlined_vector_exception_safety_test",
     srcs = ["inlined_vector_exception_safety_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     deps = [
         ":inlined_vector",
         "//turbo/base:config",
@@ -201,8 +201,8 @@ cc_library(
     testonly = 1,
     srcs = ["internal/test_instance_tracker.cc"],
     hdrs = ["internal/test_instance_tracker.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -212,8 +212,8 @@ cc_library(
 cc_test(
     name = "test_instance_tracker_test",
     srcs = ["internal/test_instance_tracker_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":test_instance_tracker",
         "@com_google_googletest//:gtest_main",
@@ -230,8 +230,8 @@ NOTEST_TAGS_MOBILE = [
 cc_library(
     name = "flat_hash_map",
     hdrs = ["flat_hash_map.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":container_memory",
         ":hash_function_defaults",
@@ -245,8 +245,8 @@ cc_library(
 cc_test(
     name = "flat_hash_map_test",
     srcs = ["flat_hash_map_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     deps = [
         ":flat_hash_map",
@@ -264,8 +264,8 @@ cc_test(
 cc_library(
     name = "flat_hash_set",
     hdrs = ["flat_hash_set.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":container_memory",
         ":hash_function_defaults",
@@ -279,8 +279,8 @@ cc_library(
 cc_test(
     name = "flat_hash_set_test",
     srcs = ["flat_hash_set_test.cc"],
-    copts = ABSL_TEST_COPTS + ["-DUNORDERED_SET_CXX17"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS + ["-DUNORDERED_SET_CXX17"],
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     deps = [
         ":flat_hash_set",
@@ -299,8 +299,8 @@ cc_test(
 cc_library(
     name = "node_hash_map",
     hdrs = ["node_hash_map.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":container_memory",
         ":hash_function_defaults",
@@ -315,8 +315,8 @@ cc_library(
 cc_test(
     name = "node_hash_map_test",
     srcs = ["node_hash_map_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     deps = [
         ":hash_generator_testing",
@@ -333,8 +333,8 @@ cc_test(
 cc_library(
     name = "node_hash_set",
     hdrs = ["node_hash_set.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_function_defaults",
         ":node_slot_policy",
@@ -348,8 +348,8 @@ cc_library(
 cc_test(
     name = "node_hash_set_test",
     srcs = ["node_hash_set_test.cc"],
-    copts = ABSL_TEST_COPTS + ["-DUNORDERED_SET_CXX17"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS + ["-DUNORDERED_SET_CXX17"],
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     deps = [
         ":node_hash_set",
@@ -364,8 +364,8 @@ cc_test(
 cc_library(
     name = "container_memory",
     hdrs = ["internal/container_memory.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/memory",
@@ -377,8 +377,8 @@ cc_library(
 cc_test(
     name = "container_memory_test",
     srcs = ["internal/container_memory_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     deps = [
         ":container_memory",
@@ -391,8 +391,8 @@ cc_test(
 cc_library(
     name = "hash_function_defaults",
     hdrs = ["internal/hash_function_defaults.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//visibility:private",
     ],
@@ -407,8 +407,8 @@ cc_library(
 cc_test(
     name = "hash_function_defaults_test",
     srcs = ["internal/hash_function_defaults_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = NOTEST_TAGS_MOBILE + ["no_test_loonix"],
     deps = [
         ":hash_function_defaults",
@@ -426,8 +426,8 @@ cc_library(
     testonly = 1,
     srcs = ["internal/hash_generator_testing.cc"],
     hdrs = ["internal/hash_generator_testing.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_policy_testing",
         "//turbo/memory",
@@ -440,8 +440,8 @@ cc_library(
     name = "hash_policy_testing",
     testonly = 1,
     hdrs = ["internal/hash_policy_testing.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/hash",
         "//turbo/strings",
@@ -451,8 +451,8 @@ cc_library(
 cc_test(
     name = "hash_policy_testing_test",
     srcs = ["internal/hash_policy_testing_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_policy_testing",
         "@com_google_googletest//:gtest_main",
@@ -462,8 +462,8 @@ cc_test(
 cc_library(
     name = "hash_policy_traits",
     hdrs = ["internal/hash_policy_traits.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":common_policy_traits",
         "//turbo/meta:type_traits",
@@ -473,8 +473,8 @@ cc_library(
 cc_test(
     name = "hash_policy_traits_test",
     srcs = ["internal/hash_policy_traits_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_policy_traits",
         "@com_google_googletest//:gtest_main",
@@ -484,8 +484,8 @@ cc_test(
 cc_library(
     name = "common_policy_traits",
     hdrs = ["internal/common_policy_traits.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = ["//turbo/meta:type_traits"],
 )
@@ -493,8 +493,8 @@ cc_library(
 cc_test(
     name = "common_policy_traits_test",
     srcs = ["internal/common_policy_traits_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":common_policy_traits",
         "@com_google_googletest//:gtest_main",
@@ -504,8 +504,8 @@ cc_test(
 cc_library(
     name = "hashtable_debug",
     hdrs = ["internal/hashtable_debug.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hashtable_debug_hooks",
     ],
@@ -514,8 +514,8 @@ cc_library(
 cc_library(
     name = "hashtable_debug_hooks",
     hdrs = ["internal/hashtable_debug_hooks.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
     ],
@@ -528,8 +528,8 @@ cc_library(
         "internal/hashtablez_sampler_force_weak_definition.cc",
     ],
     hdrs = ["internal/hashtablez_sampler.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base",
         "//turbo/base:config",
@@ -546,7 +546,7 @@ cc_library(
 cc_test(
     name = "hashtablez_sampler_test",
     srcs = ["internal/hashtablez_sampler_test.cc"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -565,16 +565,16 @@ cc_test(
 cc_library(
     name = "node_slot_policy",
     hdrs = ["internal/node_slot_policy.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = ["//turbo/base:config"],
 )
 
 cc_test(
     name = "node_slot_policy_test",
     srcs = ["internal/node_slot_policy_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_policy_traits",
         ":node_slot_policy",
@@ -585,8 +585,8 @@ cc_test(
 cc_library(
     name = "raw_hash_map",
     hdrs = ["internal/raw_hash_map.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":container_memory",
         ":raw_hash_set",
@@ -597,8 +597,8 @@ cc_library(
 cc_library(
     name = "common",
     hdrs = ["internal/common.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/meta:type_traits",
         "//turbo/types:optional",
@@ -609,8 +609,8 @@ cc_library(
     name = "raw_hash_set",
     srcs = ["internal/raw_hash_set.cc"],
     hdrs = ["internal/raw_hash_set.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":common",
         ":compressed_tuple",
@@ -633,7 +633,7 @@ cc_library(
 cc_test(
     name = "raw_hash_set_test",
     srcs = ["internal/raw_hash_set_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     linkstatic = 1,
     tags = NOTEST_TAGS_MOBILE + [
         "no_test_loonix",
@@ -663,8 +663,8 @@ cc_binary(
     name = "raw_hash_set_benchmark",
     testonly = 1,
     srcs = ["internal/raw_hash_set_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -680,10 +680,10 @@ cc_binary(
     name = "raw_hash_set_probe_benchmark",
     testonly = 1,
     srcs = ["internal/raw_hash_set_probe_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     linkopts = select({
         "//conditions:default": [],
-    }) + ABSL_DEFAULT_LINKOPTS,
+    }) + TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -702,8 +702,8 @@ cc_test(
     name = "raw_hash_set_allocator_test",
     size = "small",
     srcs = ["internal/raw_hash_set_allocator_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":raw_hash_set",
         ":tracked",
@@ -715,8 +715,8 @@ cc_test(
 cc_library(
     name = "layout",
     hdrs = ["internal/layout.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -731,8 +731,8 @@ cc_test(
     name = "layout_test",
     size = "small",
     srcs = ["internal/layout_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = NOTEST_TAGS_MOBILE + ["no_test_loonix"],
     visibility = ["//visibility:private"],
     deps = [
@@ -749,8 +749,8 @@ cc_binary(
     name = "layout_benchmark",
     testonly = 1,
     srcs = ["internal/layout_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -765,8 +765,8 @@ cc_library(
     name = "tracked",
     testonly = 1,
     hdrs = ["internal/tracked.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
     ],
@@ -776,8 +776,8 @@ cc_library(
     name = "unordered_map_constructor_test",
     testonly = 1,
     hdrs = ["internal/unordered_map_constructor_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_generator_testing",
         ":hash_policy_testing",
@@ -789,8 +789,8 @@ cc_library(
     name = "unordered_map_lookup_test",
     testonly = 1,
     hdrs = ["internal/unordered_map_lookup_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_generator_testing",
         ":hash_policy_testing",
@@ -802,8 +802,8 @@ cc_library(
     name = "unordered_map_modifiers_test",
     testonly = 1,
     hdrs = ["internal/unordered_map_modifiers_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_generator_testing",
         ":hash_policy_testing",
@@ -815,8 +815,8 @@ cc_library(
     name = "unordered_set_constructor_test",
     testonly = 1,
     hdrs = ["internal/unordered_set_constructor_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_generator_testing",
         ":hash_policy_testing",
@@ -829,8 +829,8 @@ cc_library(
     name = "unordered_set_members_test",
     testonly = 1,
     hdrs = ["internal/unordered_set_members_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/meta:type_traits",
         "@com_google_googletest//:gtest",
@@ -841,8 +841,8 @@ cc_library(
     name = "unordered_map_members_test",
     testonly = 1,
     hdrs = ["internal/unordered_map_members_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/meta:type_traits",
         "@com_google_googletest//:gtest",
@@ -853,8 +853,8 @@ cc_library(
     name = "unordered_set_lookup_test",
     testonly = 1,
     hdrs = ["internal/unordered_set_lookup_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_generator_testing",
         ":hash_policy_testing",
@@ -866,8 +866,8 @@ cc_library(
     name = "unordered_set_modifiers_test",
     testonly = 1,
     hdrs = ["internal/unordered_set_modifiers_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash_generator_testing",
         ":hash_policy_testing",
@@ -878,8 +878,8 @@ cc_library(
 cc_test(
     name = "unordered_set_test",
     srcs = ["internal/unordered_set_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     deps = [
         ":unordered_set_constructor_test",
@@ -893,8 +893,8 @@ cc_test(
 cc_test(
     name = "unordered_map_test",
     srcs = ["internal/unordered_map_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     deps = [
         ":unordered_map_constructor_test",
@@ -908,8 +908,8 @@ cc_test(
 cc_test(
     name = "sample_element_size_test",
     srcs = ["sample_element_size_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_loonix"],
     visibility = ["//visibility:private"],
     deps = [
@@ -931,8 +931,8 @@ cc_library(
         "btree_map.h",
         "btree_set.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         ":common",
@@ -956,8 +956,8 @@ cc_library(
     name = "btree_test_common",
     testonly = 1,
     hdrs = ["btree_test.h"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":btree",
@@ -974,8 +974,8 @@ cc_test(
     srcs = [
         "btree_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     shard_count = 10,
     tags = [
         "no_test:os:ios",
@@ -1007,8 +1007,8 @@ cc_binary(
     srcs = [
         "btree_benchmark.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [

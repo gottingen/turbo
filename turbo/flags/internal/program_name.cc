@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
-ABSL_CONST_INIT static turbo::Mutex program_name_guard(turbo::kConstInit);
-ABSL_CONST_INIT static std::string* program_name
-    ABSL_GUARDED_BY(program_name_guard) = nullptr;
+TURBO_CONST_INIT static turbo::Mutex program_name_guard(turbo::kConstInit);
+TURBO_CONST_INIT static std::string* program_name
+    TURBO_GUARDED_BY(program_name_guard) = nullptr;
 
 std::string ProgramInvocationName() {
   turbo::MutexLock l(&program_name_guard);
@@ -56,5 +56,5 @@ void SetProgramInvocationName(turbo::string_view prog_name_str) {
 }
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

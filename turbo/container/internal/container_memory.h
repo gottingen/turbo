@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CONTAINER_INTERNAL_CONTAINER_MEMORY_H_
-#define ABSL_CONTAINER_INTERNAL_CONTAINER_MEMORY_H_
+#ifndef TURBO_CONTAINER_INTERNAL_CONTAINER_MEMORY_H_
+#define TURBO_CONTAINER_INTERNAL_CONTAINER_MEMORY_H_
 
 #include <cassert>
 #include <cstddef>
@@ -29,16 +29,16 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/utility/utility.h"
 
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
 #include <sanitizer/asan_interface.h>
 #endif
 
-#ifdef ABSL_HAVE_MEMORY_SANITIZER
+#ifdef TURBO_HAVE_MEMORY_SANITIZER
 #include <sanitizer/msan_interface.h>
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 template <size_t Alignment>
@@ -218,10 +218,10 @@ DecomposeValue(F&& f, Arg&& arg) {
 
 // Helper functions for asan and msan.
 inline void SanitizerPoisonMemoryRegion(const void* m, size_t s) {
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
   ASAN_POISON_MEMORY_REGION(m, s);
 #endif
-#ifdef ABSL_HAVE_MEMORY_SANITIZER
+#ifdef TURBO_HAVE_MEMORY_SANITIZER
   __msan_poison(m, s);
 #endif
   (void)m;
@@ -229,10 +229,10 @@ inline void SanitizerPoisonMemoryRegion(const void* m, size_t s) {
 }
 
 inline void SanitizerUnpoisonMemoryRegion(const void* m, size_t s) {
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
   ASAN_UNPOISON_MEMORY_REGION(m, s);
 #endif
-#ifdef ABSL_HAVE_MEMORY_SANITIZER
+#ifdef TURBO_HAVE_MEMORY_SANITIZER
   __msan_unpoison(m, s);
 #endif
   (void)m;
@@ -448,7 +448,7 @@ struct map_slot_policy {
 };
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_CONTAINER_MEMORY_H_
+#endif  // TURBO_CONTAINER_INTERNAL_CONTAINER_MEMORY_H_

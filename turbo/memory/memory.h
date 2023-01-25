@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 // conversion of smart pointers. This file is an extension to the C++
 // standard <memory> library header file.
 
-#ifndef ABSL_MEMORY_MEMORY_H_
-#define ABSL_MEMORY_MEMORY_H_
+#ifndef TURBO_MEMORY_MEMORY_H_
+#define TURBO_MEMORY_MEMORY_H_
 
 #include <cstddef>
 #include <limits>
@@ -34,7 +34,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // Function Template: WrapUnique()
@@ -90,7 +90,7 @@ std::unique_ptr<T> WrapUnique(T* ptr) {
 // (Exception-Safe Function Calls)[https://herbsutter.com/gotw/_102/].
 // (In general, reviewers should treat `new T(a,b)` with scrutiny.)
 //
-// Historical note: Abseil once provided a C++11 compatible implementation of
+// Historical note: Turbo once provided a C++11 compatible implementation of
 // the C++14's `std::make_unique`. Now that C++11 support has been sunsetted,
 // `turbo::make_unique` simply uses the STL-provided implementation. New code
 // should use `std::make_unique`.
@@ -162,7 +162,7 @@ std::weak_ptr<T> WeakenPtr(const std::shared_ptr<T>& ptr) {
 // Class Template: pointer_traits
 // -----------------------------------------------------------------------------
 //
-// Historical note: Abseil once provided an implementation of
+// Historical note: Turbo once provided an implementation of
 // `std::pointer_traits` for platforms that had not yet provided it. Those
 // platforms are no longer supported. New code should simply use
 // `std::pointer_traits`.
@@ -172,7 +172,7 @@ using std::pointer_traits;
 // Class Template: allocator_traits
 // -----------------------------------------------------------------------------
 //
-// Historical note: Abseil once provided an implementation of
+// Historical note: Turbo once provided an implementation of
 // `std::allocator_traits` for platforms that had not yet provided it. Those
 // platforms are no longer supported. New code should simply use
 // `std::allocator_traits`.
@@ -202,17 +202,17 @@ using GetIsNothrow = typename Alloc::is_nothrow;
 
 }  // namespace memory_internal
 
-// ABSL_ALLOCATOR_NOTHROW is a build time configuration macro for user to
+// TURBO_ALLOCATOR_NOTHROW is a build time configuration macro for user to
 // specify whether the default allocation function can throw or never throws.
 // If the allocation function never throws, user should define it to a non-zero
-// value (e.g. via `-DABSL_ALLOCATOR_NOTHROW`).
+// value (e.g. via `-DTURBO_ALLOCATOR_NOTHROW`).
 // If the allocation function can throw, user should leave it undefined or
 // define it to zero.
 //
 // allocator_is_nothrow<Alloc> is a traits class that derives from
 // Alloc::is_nothrow if present, otherwise std::false_type. It's specialized
 // for Alloc = std::allocator<T> for any type T according to the state of
-// ABSL_ALLOCATOR_NOTHROW.
+// TURBO_ALLOCATOR_NOTHROW.
 //
 // default_allocator_is_nothrow is a class that derives from std::true_type
 // when the default allocator (global operator new) never throws, and
@@ -226,7 +226,7 @@ struct allocator_is_nothrow
     : memory_internal::ExtractOrT<memory_internal::GetIsNothrow, Alloc,
                                   std::false_type> {};
 
-#if defined(ABSL_ALLOCATOR_NOTHROW) && ABSL_ALLOCATOR_NOTHROW
+#if defined(TURBO_ALLOCATOR_NOTHROW) && TURBO_ALLOCATOR_NOTHROW
 template <typename T>
 struct allocator_is_nothrow<std::allocator<T>> : std::true_type {};
 struct default_allocator_is_nothrow : std::true_type {};
@@ -239,16 +239,16 @@ template <typename Allocator, typename Iterator, typename... Args>
 void ConstructRange(Allocator& alloc, Iterator first, Iterator last,
                     const Args&... args) {
   for (Iterator cur = first; cur != last; ++cur) {
-    ABSL_INTERNAL_TRY {
+    TURBO_INTERNAL_TRY {
       std::allocator_traits<Allocator>::construct(alloc, std::addressof(*cur),
                                                   args...);
     }
-    ABSL_INTERNAL_CATCH_ANY {
+    TURBO_INTERNAL_CATCH_ANY {
       while (cur != first) {
         --cur;
         std::allocator_traits<Allocator>::destroy(alloc, std::addressof(*cur));
       }
-      ABSL_INTERNAL_RETHROW;
+      TURBO_INTERNAL_RETHROW;
     }
   }
 }
@@ -258,21 +258,21 @@ void CopyRange(Allocator& alloc, Iterator destination, InputIterator first,
                InputIterator last) {
   for (Iterator cur = destination; first != last;
        static_cast<void>(++cur), static_cast<void>(++first)) {
-    ABSL_INTERNAL_TRY {
+    TURBO_INTERNAL_TRY {
       std::allocator_traits<Allocator>::construct(alloc, std::addressof(*cur),
                                                   *first);
     }
-    ABSL_INTERNAL_CATCH_ANY {
+    TURBO_INTERNAL_CATCH_ANY {
       while (cur != destination) {
         --cur;
         std::allocator_traits<Allocator>::destroy(alloc, std::addressof(*cur));
       }
-      ABSL_INTERNAL_RETHROW;
+      TURBO_INTERNAL_RETHROW;
     }
   }
 }
 }  // namespace memory_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_MEMORY_MEMORY_H_
+#endif  // TURBO_MEMORY_MEMORY_H_

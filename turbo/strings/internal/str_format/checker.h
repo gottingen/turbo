@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_FORMAT_CHECKER_H_
-#define ABSL_STRINGS_INTERNAL_STR_FORMAT_CHECKER_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_FORMAT_CHECKER_H_
+#define TURBO_STRINGS_INTERNAL_STR_FORMAT_CHECKER_H_
 
 #include <algorithm>
 
@@ -24,22 +24,22 @@
 
 // Compile time check support for entry points.
 
-#ifndef ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#ifndef TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 // We disable format checker under vscode intellisense compilation.
 // See https://github.com/microsoft/vscode-cpptools/issues/3683 for
 // more details.
-#if ABSL_HAVE_ATTRIBUTE(enable_if) && !defined(__native_client__) && \
+#if TURBO_HAVE_ATTRIBUTE(enable_if) && !defined(__native_client__) && \
     !defined(__INTELLISENSE__)
-#define ABSL_INTERNAL_ENABLE_FORMAT_CHECKER 1
-#endif  // ABSL_HAVE_ATTRIBUTE(enable_if) && !defined(__native_client__) &&
+#define TURBO_INTERNAL_ENABLE_FORMAT_CHECKER 1
+#endif  // TURBO_HAVE_ATTRIBUTE(enable_if) && !defined(__native_client__) &&
         // !defined(__INTELLISENSE__)
-#endif  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#endif  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 
-#ifdef ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#ifdef TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
 template <FormatConversionCharSet... C>
 constexpr bool ValidFormatImpl(string_view format) {
@@ -91,10 +91,10 @@ constexpr bool ValidFormatImpl(string_view format) {
   return true;
 }
 
-#endif  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#endif  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_CHECKER_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_FORMAT_CHECKER_H_

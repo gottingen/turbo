@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 // This header file contains various global objects and static helper routines
 // use in logging implementation.
 
-#ifndef ABSL_LOG_INTERNAL_GLOBALS_H_
-#define ABSL_LOG_INTERNAL_GLOBALS_H_
+#ifndef TURBO_LOG_INTERNAL_GLOBALS_H_
+#define TURBO_LOG_INTERNAL_GLOBALS_H_
 
 #include "turbo/base/config.h"
 #include "turbo/base/log_severity.h"
@@ -28,7 +28,7 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 // IsInitialized returns true if the logging library is initialized.
@@ -95,7 +95,7 @@ bool SuppressSigabortTrace();
 bool SetSuppressSigabortTrace(bool on_off);
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_GLOBALS_H_
+#endif  // TURBO_LOG_INTERNAL_GLOBALS_H_

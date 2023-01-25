@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors
+// Copyright 2020 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include "turbo/numeric/int128.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 
 static uint64_t Mix(uint64_t v0, uint64_t v1) {
@@ -108,5 +108,5 @@ uint64_t LowLevelHash(const void* data, size_t len, uint64_t seed,
 }
 
 }  // namespace hash_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

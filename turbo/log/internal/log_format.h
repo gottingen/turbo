@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 // This file declares routines implementing formatting of log message and log
 // prefix.
 
-#ifndef ABSL_LOG_INTERNAL_LOG_FORMAT_H_
-#define ABSL_LOG_INTERNAL_LOG_FORMAT_H_
+#ifndef TURBO_LOG_INTERNAL_LOG_FORMAT_H_
+#define TURBO_LOG_INTERNAL_LOG_FORMAT_H_
 
 #include <stddef.h>
 
@@ -35,7 +35,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 enum class PrefixFormat {
@@ -72,7 +72,7 @@ size_t FormatLogPrefix(turbo::LogSeverity severity, turbo::Time timestamp,
                        int line, PrefixFormat format, turbo::Span<char>& buf);
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_LOG_FORMAT_H_
+#endif  // TURBO_LOG_INTERNAL_LOG_FORMAT_H_

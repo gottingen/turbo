@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <string>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 
 std::string FlagsToString(Flags v) {
@@ -33,19 +33,19 @@ std::string FlagsToString(Flags v) {
   return s;
 }
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 
-#define ABSL_INTERNAL_X_VAL(id) \
+#define TURBO_INTERNAL_X_VAL(id) \
   constexpr turbo::FormatConversionChar FormatConversionCharInternal::id;
-ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(ABSL_INTERNAL_X_VAL, )
-#undef ABSL_INTERNAL_X_VAL
+TURBO_INTERNAL_CONVERSION_CHARS_EXPAND_(TURBO_INTERNAL_X_VAL, )
+#undef TURBO_INTERNAL_X_VAL
 // NOLINTNEXTLINE(readability-redundant-declaration)
 constexpr turbo::FormatConversionChar FormatConversionCharInternal::kNone;
 
-#define ABSL_INTERNAL_CHAR_SET_CASE(c) \
+#define TURBO_INTERNAL_CHAR_SET_CASE(c) \
   constexpr FormatConversionCharSet FormatConversionCharSetInternal::c;
-ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(ABSL_INTERNAL_CHAR_SET_CASE, )
-#undef ABSL_INTERNAL_CHAR_SET_CASE
+TURBO_INTERNAL_CONVERSION_CHARS_EXPAND_(TURBO_INTERNAL_CHAR_SET_CASE, )
+#undef TURBO_INTERNAL_CHAR_SET_CASE
 
 constexpr FormatConversionCharSet FormatConversionCharSetInternal::kStar;
 constexpr FormatConversionCharSet FormatConversionCharSetInternal::kIntegral;
@@ -53,7 +53,7 @@ constexpr FormatConversionCharSet FormatConversionCharSetInternal::kFloating;
 constexpr FormatConversionCharSet FormatConversionCharSetInternal::kNumeric;
 constexpr FormatConversionCharSet FormatConversionCharSetInternal::kPointer;
 
-#endif  // ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#endif  // TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 
 bool FormatSinkImpl::PutPaddedString(string_view value, int width,
                                      int precision, bool left) {
@@ -71,5 +71,5 @@ bool FormatSinkImpl::PutPaddedString(string_view value, int width,
 }
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

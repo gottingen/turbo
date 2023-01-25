@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@
 // This library supports std::unordered_{set,map}, dense_hash_{set,map} and
 // turbo::{flat,node,string}_hash_{set,map}.
 
-#ifndef ABSL_CONTAINER_INTERNAL_HASHTABLE_DEBUG_H_
-#define ABSL_CONTAINER_INTERNAL_HASHTABLE_DEBUG_H_
+#ifndef TURBO_CONTAINER_INTERNAL_HASHTABLE_DEBUG_H_
+#define TURBO_CONTAINER_INTERNAL_HASHTABLE_DEBUG_H_
 
 #include <cstddef>
 #include <algorithm>
@@ -38,7 +38,7 @@
 #include "turbo/container/internal/hashtable_debug_hooks.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // Returns the number of probes required to lookup `key`.  Returns 0 for a
@@ -104,7 +104,7 @@ size_t LowerBoundAllocatedByteSize(size_t num_elements) {
 }
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_HASHTABLE_DEBUG_H_
+#endif  // TURBO_CONTAINER_INTERNAL_HASHTABLE_DEBUG_H_

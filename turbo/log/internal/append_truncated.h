@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_LOG_INTERNAL_APPEND_TRUNCATED_H_
-#define ABSL_LOG_INTERNAL_APPEND_TRUNCATED_H_
+#ifndef TURBO_LOG_INTERNAL_APPEND_TRUNCATED_H_
+#define TURBO_LOG_INTERNAL_APPEND_TRUNCATED_H_
 
 #include <cstddef>
 #include <cstring>
@@ -23,7 +23,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 // Copies into `dst` as many bytes of `src` as will fit, then truncates the
 // copied bytes from the front of `dst` and returns the number of bytes written.
@@ -41,7 +41,7 @@ inline size_t AppendTruncated(char c, size_t n, turbo::Span<char> &dst) {
   return n;
 }
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_APPEND_TRUNCATED_H_
+#endif  // TURBO_LOG_INTERNAL_APPEND_TRUNCATED_H_

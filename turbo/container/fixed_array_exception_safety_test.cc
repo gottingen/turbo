@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #include "turbo/base/config.h"
 #include "turbo/container/fixed_array.h"
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
 #include <initializer_list>
 
@@ -23,7 +23,7 @@
 #include "turbo/base/internal/exception_safety_testing.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace {
 
@@ -195,7 +195,7 @@ TEST(FixedArrayExceptionSafety, FillWithAlloc) {
 
 }  // namespace
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS

@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,24 +36,24 @@
 //     fn = reinterpret_cast<FN>(info.address);
 //  }
 
-#ifndef ABSL_DEBUGGING_INTERNAL_VDSO_SUPPORT_H_
-#define ABSL_DEBUGGING_INTERNAL_VDSO_SUPPORT_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_VDSO_SUPPORT_H_
+#define TURBO_DEBUGGING_INTERNAL_VDSO_SUPPORT_H_
 
 #include <atomic>
 
 #include "turbo/base/attributes.h"
 #include "turbo/debugging/internal/elf_mem_image.h"
 
-#ifdef ABSL_HAVE_ELF_MEM_IMAGE
+#ifdef TURBO_HAVE_ELF_MEM_IMAGE
 
-#ifdef ABSL_HAVE_VDSO_SUPPORT
-#error ABSL_HAVE_VDSO_SUPPORT cannot be directly set
+#ifdef TURBO_HAVE_VDSO_SUPPORT
+#error TURBO_HAVE_VDSO_SUPPORT cannot be directly set
 #else
-#define ABSL_HAVE_VDSO_SUPPORT 1
+#define TURBO_HAVE_VDSO_SUPPORT 1
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 // NOTE: this class may be used from within tcmalloc, and can not
@@ -134,7 +134,7 @@ class VDSOSupport {
 
   // This function pointer may point to InitAndGetCPU,
   // GetCPUViaSyscall, or __vdso_getcpu at different stages of initialization.
-  ABSL_CONST_INIT static std::atomic<GetCpuFn> getcpu_fn_;
+  TURBO_CONST_INIT static std::atomic<GetCpuFn> getcpu_fn_;
 
   friend int GetCPU(void);  // Needs access to getcpu_fn_.
 
@@ -150,9 +150,9 @@ class VDSOSupport {
 int GetCPU();
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HAVE_ELF_MEM_IMAGE
+#endif  // TURBO_HAVE_ELF_MEM_IMAGE
 
-#endif  // ABSL_DEBUGGING_INTERNAL_VDSO_SUPPORT_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_VDSO_SUPPORT_H_

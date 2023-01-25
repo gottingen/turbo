@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 // barrier.h
 // -----------------------------------------------------------------------------
 
-#ifndef ABSL_SYNCHRONIZATION_BARRIER_H_
-#define ABSL_SYNCHRONIZATION_BARRIER_H_
+#ifndef TURBO_SYNCHRONIZATION_BARRIER_H_
+#define TURBO_SYNCHRONIZATION_BARRIER_H_
 
 #include "turbo/base/thread_annotations.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Barrier
 //
@@ -70,10 +70,10 @@ class Barrier {
 
  private:
   Mutex lock_;
-  int num_to_block_ ABSL_GUARDED_BY(lock_);
-  int num_to_exit_ ABSL_GUARDED_BY(lock_);
+  int num_to_block_ TURBO_GUARDED_BY(lock_);
+  int num_to_exit_ TURBO_GUARDED_BY(lock_);
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
-#endif  // ABSL_SYNCHRONIZATION_BARRIER_H_
+#endif  // TURBO_SYNCHRONIZATION_BARRIER_H_

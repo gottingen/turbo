@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
 // This test contains common things needed by both escaping_test.cc and
 // escaping_benchmark.cc.
 
-#ifndef ABSL_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_
-#define ABSL_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_
+#ifndef TURBO_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_
+#define TURBO_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_
 
 #include <array>
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 struct base64_testcase {
@@ -127,7 +127,7 @@ inline const std::array<base64_testcase, 5>& base64_strings() {
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_
+#endif  // TURBO_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_

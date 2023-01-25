@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@
 // pointing to the item just after the one that was erased (or end() if none
 // exists).
 
-#ifndef ABSL_CONTAINER_INTERNAL_BTREE_H_
-#define ABSL_CONTAINER_INTERNAL_BTREE_H_
+#ifndef TURBO_CONTAINER_INTERNAL_BTREE_H_
+#define TURBO_CONTAINER_INTERNAL_BTREE_H_
 
 #include <algorithm>
 #include <cassert>
@@ -73,17 +73,17 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
-#ifdef ABSL_BTREE_ENABLE_GENERATIONS
-#error ABSL_BTREE_ENABLE_GENERATIONS cannot be directly set
-#elif defined(ABSL_HAVE_ADDRESS_SANITIZER) || \
-    defined(ABSL_HAVE_MEMORY_SANITIZER)
+#ifdef TURBO_BTREE_ENABLE_GENERATIONS
+#error TURBO_BTREE_ENABLE_GENERATIONS cannot be directly set
+#elif defined(TURBO_HAVE_ADDRESS_SANITIZER) || \
+    defined(TURBO_HAVE_MEMORY_SANITIZER)
 // When compiled in sanitizer mode, we add generation integers to the nodes and
 // iterators. When iterators are used, we validate that the container has not
 // been mutated since the iterator was constructed.
-#define ABSL_BTREE_ENABLE_GENERATIONS
+#define TURBO_BTREE_ENABLE_GENERATIONS
 #endif
 
 template <typename Compare, typename T, typename U>
@@ -178,7 +178,7 @@ struct checked_compare_base<Compare, false> {
 struct BtreeTestOnlyCheckedCompareOptOutBase {};
 
 // A helper class to adapt the specified comparator for two use cases:
-// (1) When using common Abseil string types with common comparison functors,
+// (1) When using common Turbo string types with common comparison functors,
 // convert a boolean comparison into a three-way comparison that returns an
 // `turbo::weak_ordering`. This helper class is specialized for
 // less<std::string>, greater<std::string>, less<string_view>,
@@ -297,7 +297,7 @@ struct key_compare_adapter<std::greater<turbo::Cord>, turbo::Cord> {
   using type = StringBtreeDefaultGreater;
 };
 
-// Detects an 'absl_btree_prefer_linear_node_search' member. This is
+// Detects an 'turbo_btree_prefer_linear_node_search' member. This is
 // a protocol used as an opt-in or opt-out of linear search.
 //
 //  For example, this would be useful for key types that wrap an integer
@@ -305,7 +305,7 @@ struct key_compare_adapter<std::greater<turbo::Cord>, turbo::Cord> {
 //
 //   class K {
 //    public:
-//     using absl_btree_prefer_linear_node_search = std::true_type;
+//     using turbo_btree_prefer_linear_node_search = std::true_type;
 //     ...
 //    private:
 //     friend bool operator<(K a, K b) { return a.k_ < b.k_; }
@@ -322,12 +322,12 @@ template <typename T, typename = void>
 struct prefers_linear_node_search : std::false_type {};
 template <typename T>
 struct has_linear_node_search_preference<
-    T, turbo::void_t<typename T::absl_btree_prefer_linear_node_search>>
+    T, turbo::void_t<typename T::turbo_btree_prefer_linear_node_search>>
     : std::true_type {};
 template <typename T>
 struct prefers_linear_node_search<
-    T, turbo::void_t<typename T::absl_btree_prefer_linear_node_search>>
-    : T::absl_btree_prefer_linear_node_search {};
+    T, turbo::void_t<typename T::turbo_btree_prefer_linear_node_search>>
+    : T::turbo_btree_prefer_linear_node_search {};
 
 template <typename Compare, typename Key>
 constexpr bool compare_has_valid_result_type() {
@@ -379,7 +379,7 @@ struct common_params : common_policy_traits<SlotPolicy> {
   static constexpr bool kIsKeyCompareTransparent =
       IsTransparent<original_key_compare>::value || kIsKeyCompareStringAdapted;
   static constexpr bool kEnableGenerations =
-#ifdef ABSL_BTREE_ENABLE_GENERATIONS
+#ifdef TURBO_BTREE_ENABLE_GENERATIONS
       true;
 #else
       false;
@@ -530,7 +530,7 @@ class btree_node {
   //   // A pointer to the node's parent.
   //   btree_node *parent;
   //
-  //   // When ABSL_BTREE_ENABLE_GENERATIONS is defined, we also have a
+  //   // When TURBO_BTREE_ENABLE_GENERATIONS is defined, we also have a
   //   // generation integer in order to check that when iterators are
   //   // used, they haven't been invalidated already. Only the generation on
   //   // the root is used, but we have one on each node because whether a node
@@ -1044,7 +1044,7 @@ class btree_iterator_generation_info_enabled {
   template <typename Node>
   void assert_valid_generation(const Node *node) const {
     if (node != nullptr && node->generation() != generation_) {
-      ABSL_INTERNAL_LOG(
+      TURBO_INTERNAL_LOG(
           FATAL,
           "Attempting to use an invalidated iterator. The corresponding b-tree "
           "container has been mutated since this iterator was constructed.");
@@ -1064,7 +1064,7 @@ class btree_iterator_generation_info_disabled {
   void assert_valid_generation(const void *) const {}
 };
 
-#ifdef ABSL_BTREE_ENABLE_GENERATIONS
+#ifdef TURBO_BTREE_ENABLE_GENERATIONS
 using btree_iterator_generation_info = btree_iterator_generation_info_enabled;
 #else
 using btree_iterator_generation_info = btree_iterator_generation_info_disabled;
@@ -1146,12 +1146,12 @@ class btree_iterator : private btree_iterator_generation_info {
 
   // Accessors for the key/value the iterator is pointing at.
   reference operator*() const {
-    ABSL_HARDENING_ASSERT(node_ != nullptr);
+    TURBO_HARDENING_ASSERT(node_ != nullptr);
     assert_valid_generation(node_);
-    ABSL_HARDENING_ASSERT(position_ >= node_->start());
+    TURBO_HARDENING_ASSERT(position_ >= node_->start());
     if (position_ >= node_->finish()) {
-      ABSL_HARDENING_ASSERT(!IsEndIterator() && "Dereferencing end() iterator");
-      ABSL_HARDENING_ASSERT(position_ < node_->finish());
+      TURBO_HARDENING_ASSERT(!IsEndIterator() && "Dereferencing end() iterator");
+      TURBO_HARDENING_ASSERT(position_ < node_->finish());
     }
     return node_->value(static_cast<field_type>(position_));
   }
@@ -1208,11 +1208,11 @@ class btree_iterator : private btree_iterator_generation_info {
         position_(other.position_) {}
 
   bool Equals(const const_iterator other) const {
-    ABSL_HARDENING_ASSERT(((node_ == nullptr && other.node_ == nullptr) ||
+    TURBO_HARDENING_ASSERT(((node_ == nullptr && other.node_ == nullptr) ||
                            (node_ != nullptr && other.node_ != nullptr)) &&
                           "Comparing default-constructed iterator with "
                           "non-default-constructed iterator.");
-    // Note: we use assert instead of ABSL_HARDENING_ASSERT here because this
+    // Note: we use assert instead of TURBO_HARDENING_ASSERT here because this
     // changes the complexity of Equals from O(1) to O(log(N) + log(M)) where
     // N/M are sizes of the containers containing node_/other.node_.
     assert(AreNodesFromSameContainer(node_, other.node_) &&
@@ -1286,7 +1286,7 @@ class btree {
   struct alignas(node_type::Alignment()) EmptyNodeType : node_type {
     using field_type = typename node_type::field_type;
     node_type *parent;
-#ifdef ABSL_BTREE_ENABLE_GENERATIONS
+#ifdef TURBO_BTREE_ENABLE_GENERATIONS
     uint32_t generation = 0;
 #endif
     field_type position = 0;
@@ -1993,7 +1993,7 @@ void btree_node<P>::clear_and_delete(btree_node *node, allocator_type *alloc) {
 
   // Navigate to the leftmost leaf under node, and then delete upwards.
   while (node->is_internal()) node = node->start_child();
-#ifdef ABSL_BTREE_ENABLE_GENERATIONS
+#ifdef TURBO_BTREE_ENABLE_GENERATIONS
   // When generations are enabled, we delete the leftmost leaf last in case it's
   // the parent of the root and we need to check whether it's a leaf before we
   // can update the root's generation.
@@ -2017,7 +2017,7 @@ void btree_node<P>::clear_and_delete(btree_node *node, allocator_type *alloc) {
         parent = node->parent();
       }
       node->value_destroy_n(node->start(), node->count(), alloc);
-#ifdef ABSL_BTREE_ENABLE_GENERATIONS
+#ifdef TURBO_BTREE_ENABLE_GENERATIONS
       if (leftmost_leaf != node)
 #endif
         deallocate(LeafSize(node->max_count()), node, alloc);
@@ -2033,7 +2033,7 @@ void btree_node<P>::clear_and_delete(btree_node *node, allocator_type *alloc) {
       node->value_destroy_n(node->start(), node->count(), alloc);
       deallocate(InternalSize(), node, alloc);
       if (parent == delete_root_parent) {
-#ifdef ABSL_BTREE_ENABLE_GENERATIONS
+#ifdef TURBO_BTREE_ENABLE_GENERATIONS
         deallocate(LeafSize(leftmost_leaf->max_count()), leftmost_leaf, alloc);
 #endif
         return;
@@ -2973,10 +2973,10 @@ struct btree_access {
   }
 };
 
-#undef ABSL_BTREE_ENABLE_GENERATIONS
+#undef TURBO_BTREE_ENABLE_GENERATIONS
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_BTREE_H_
+#endif  // TURBO_CONTAINER_INTERNAL_BTREE_H_

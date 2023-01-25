@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 BadStatusOrAccess::BadStatusOrAccess(turbo::Status status)
     : status_(std::move(status)) {}
@@ -71,26 +71,26 @@ void Helper::HandleInvalidStatusCtorArg(turbo::Status* status) {
   const char* kMessage =
       "An OK status is not a valid constructor argument to StatusOr<T>";
 #ifdef NDEBUG
-  ABSL_INTERNAL_LOG(ERROR, kMessage);
+  TURBO_INTERNAL_LOG(ERROR, kMessage);
 #else
-  ABSL_INTERNAL_LOG(FATAL, kMessage);
+  TURBO_INTERNAL_LOG(FATAL, kMessage);
 #endif
   // In optimized builds, we will fall back to InternalError.
   *status = turbo::InternalError(kMessage);
 }
 
 void Helper::Crash(const turbo::Status& status) {
-  ABSL_INTERNAL_LOG(
+  TURBO_INTERNAL_LOG(
       FATAL,
       turbo::StrCat("Attempting to fetch value instead of handling error ",
                    status.ToString()));
 }
 
 void ThrowBadStatusOrAccess(turbo::Status status) {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   throw turbo::BadStatusOrAccess(std::move(status));
 #else
-  ABSL_INTERNAL_LOG(
+  TURBO_INTERNAL_LOG(
       FATAL,
       turbo::StrCat("Attempting to fetch value instead of handling error ",
                    status.ToString()));
@@ -99,5 +99,5 @@ void ThrowBadStatusOrAccess(turbo::Status status) {
 }
 
 }  // namespace internal_statusor
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

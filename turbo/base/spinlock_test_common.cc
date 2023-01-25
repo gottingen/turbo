@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ constexpr uint32_t kNumThreads = 10;
 constexpr int32_t kIters = 1000;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // This is defined outside of anonymous namespace so that it can be
@@ -58,9 +58,9 @@ namespace {
 static constexpr size_t kArrayLength = 10;
 static uint32_t values[kArrayLength];
 
-ABSL_CONST_INIT static SpinLock static_cooperative_spinlock(
+TURBO_CONST_INIT static SpinLock static_cooperative_spinlock(
     turbo::kConstInit, base_internal::SCHEDULE_COOPERATIVE_AND_KERNEL);
-ABSL_CONST_INIT static SpinLock static_noncooperative_spinlock(
+TURBO_CONST_INIT static SpinLock static_noncooperative_spinlock(
     turbo::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 
 // Simple integer hash function based on the public domain lookup2 hash.
@@ -106,7 +106,7 @@ static void ThreadedTest(SpinLock* spinlock) {
   }
 }
 
-#ifndef ABSL_HAVE_THREAD_SANITIZER
+#ifndef TURBO_HAVE_THREAD_SANITIZER
 static_assert(std::is_trivially_destructible<SpinLock>(), "");
 #endif
 
@@ -268,5 +268,5 @@ TEST(SpinLockWithThreads, DoesNotDeadlock) {
 
 }  // namespace
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

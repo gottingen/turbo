@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 // sometimes NACL returns slightly larger values.
 //
 // The MUSL libc used by emscripten also has a similar bug.
-#define ABSL_RANDOM_INACCURATE_LOG2
+#define TURBO_RANDOM_INACCURATE_LOG2
 #endif
 
 namespace {
@@ -69,7 +69,7 @@ TEST(FastMathTest, IntLog2CeilTest) {
   for (int i = 0; i < 64; i++) {
     const uint64_t i_pow_2 = static_cast<uint64_t>(1) << i;
     EXPECT_EQ(i, IntLog2Ceil(i_pow_2));
-#ifndef ABSL_RANDOM_INACCURATE_LOG2
+#ifndef TURBO_RANDOM_INACCURATE_LOG2
     EXPECT_EQ(i, static_cast<int>(std::ceil(std::log2(i_pow_2))));
 #endif
 

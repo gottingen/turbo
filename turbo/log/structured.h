@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@
 // string.  These helpers allow user code to add additional structure to the
 // data they stream.
 
-#ifndef ABSL_LOG_STRUCTURED_H_
-#define ABSL_LOG_STRUCTURED_H_
+#ifndef TURBO_LOG_STRUCTURED_H_
+#define TURBO_LOG_STRUCTURED_H_
 
 #include <ostream>
 
@@ -37,7 +37,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // LogAsLiteral()
 //
@@ -64,7 +64,7 @@ inline log_internal::AsLiteralImpl LogAsLiteral(turbo::string_view s) {
   return log_internal::AsLiteralImpl(s);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_STRUCTURED_H_
+#endif  // TURBO_LOG_STRUCTURED_H_

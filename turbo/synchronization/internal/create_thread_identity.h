@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The Abseil Authors.
+ * Copyright 2017 The Turbo Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@
 // and low_level_alloc) than accessing an existing one.  This separation allows
 // us to have a smaller //turbo/base:base.
 
-#ifndef ABSL_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_
-#define ABSL_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_
+#ifndef TURBO_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_
+#define TURBO_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_
 
 #include "turbo/base/internal/thread_identity.h"
 #include "turbo/base/port.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // Allocates and attaches a ThreadIdentity object for the calling thread.
@@ -43,14 +43,14 @@ base_internal::ThreadIdentity* CreateThreadIdentity();
 inline base_internal::ThreadIdentity* GetOrCreateCurrentThreadIdentity() {
   base_internal::ThreadIdentity* identity =
       base_internal::CurrentThreadIdentityIfPresent();
-  if (ABSL_PREDICT_FALSE(identity == nullptr)) {
+  if (TURBO_PREDICT_FALSE(identity == nullptr)) {
     return CreateThreadIdentity();
   }
   return identity;
 }
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_
+#endif  // TURBO_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 // This header declares the class `LogStreamer` and convenience functions to
 // construct LogStreamer objects with different associated log severity levels.
 
-#ifndef ABSL_LOG_LOG_STREAMER_H_
-#define ABSL_LOG_LOG_STREAMER_H_
+#ifndef TURBO_LOG_LOG_STREAMER_H_
+#define TURBO_LOG_LOG_STREAMER_H_
 
 #include <ios>
 #include <memory>
@@ -30,14 +30,14 @@
 
 #include "turbo/base/config.h"
 #include "turbo/base/log_severity.h"
-#include "turbo/log/absl_log.h"
+#include "turbo/log/turbo_log.h"
 #include "turbo/strings/internal/ostringstream.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/types/optional.h"
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // LogStreamer
 //
@@ -99,7 +99,7 @@ class LogStreamer final {
     that.stream_.reset();
   }
   LogStreamer& operator=(LogStreamer&& that) {
-    ABSL_LOG_IF(LEVEL(severity_), stream_).AtLocation(file_, line_) << buf_;
+    TURBO_LOG_IF(LEVEL(severity_), stream_).AtLocation(file_, line_) << buf_;
     severity_ = that.severity_;
     file_ = std::move(that.file_);
     line_ = that.line_;
@@ -114,7 +114,7 @@ class LogStreamer final {
   //
   // Logs this LogStreamer's buffered content as if by LOG.
   ~LogStreamer() {
-    ABSL_LOG_IF(LEVEL(severity_), stream_.has_value()).AtLocation(file_, line_)
+    TURBO_LOG_IF(LEVEL(severity_), stream_.has_value()).AtLocation(file_, line_)
         << buf_;
   }
 
@@ -165,7 +165,7 @@ inline LogStreamer LogFatalStreamer(turbo::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kFatal, file, line);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_LOG_STREAMER_H_
+#endif  // TURBO_LOG_LOG_STREAMER_H_

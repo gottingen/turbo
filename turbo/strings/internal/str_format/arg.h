@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_FORMAT_ARG_H_
-#define ABSL_STRINGS_INTERNAL_STR_FORMAT_ARG_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_FORMAT_ARG_H_
+#define TURBO_STRINGS_INTERNAL_STR_FORMAT_ARG_H_
 
 #include <string.h>
 #include <wchar.h>
@@ -31,12 +31,12 @@
 #include "turbo/base/port.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/numeric/int128.h"
-#include "turbo/strings/internal/has_absl_stringify.h"
+#include "turbo/strings/internal/has_turbo_stringify.h"
 #include "turbo/strings/internal/str_format/extension.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 class Cord;
 class FormatCountCapture;
@@ -70,7 +70,7 @@ template <typename T, typename = void>
 struct HasUserDefinedConvert : std::false_type {};
 
 template <typename T>
-struct HasUserDefinedConvert<T, void_t<decltype(AbslFormatConvert(
+struct HasUserDefinedConvert<T, void_t<decltype(TurboFormatConvert(
                                     std::declval<const T&>(),
                                     std::declval<const FormatConversionSpec&>(),
                                     std::declval<FormatSink*>()))>>
@@ -79,8 +79,8 @@ struct HasUserDefinedConvert<T, void_t<decltype(AbslFormatConvert(
 // These declarations prevent ADL lookup from continuing in turbo namespaces,
 // we are deliberately using these as ADL hooks and want them to consider
 // non-turbo namespaces only.
-void AbslFormatConvert();
-void AbslStringify();
+void TurboFormatConvert();
+void TurboStringify();
 
 template <typename T>
 bool ConvertIntArg(T v, FormatConversionSpecImpl conv, FormatSinkImpl* sink);
@@ -123,7 +123,7 @@ extern template bool ConvertIntArg<unsigned long long>(   // NOLINT
 template <typename T>
 auto FormatConvertImpl(const T& v, FormatConversionSpecImpl conv,
                        FormatSinkImpl* sink)
-    -> decltype(AbslFormatConvert(v,
+    -> decltype(TurboFormatConvert(v,
                                   std::declval<const FormatConversionSpec&>(),
                                   std::declval<FormatSink*>())) {
   using FormatConversionSpecT =
@@ -132,21 +132,21 @@ auto FormatConvertImpl(const T& v, FormatConversionSpecImpl conv,
       turbo::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
   auto fcs = conv.Wrap<FormatConversionSpecT>();
   auto fs = sink->Wrap<FormatSinkT>();
-  return AbslFormatConvert(v, fcs, &fs);
+  return TurboFormatConvert(v, fcs, &fs);
 }
 
 template <typename T>
 auto FormatConvertImpl(const T& v, FormatConversionSpecImpl conv,
                        FormatSinkImpl* sink)
     -> std::enable_if_t<std::is_enum<T>::value &&
-                            std::is_void<decltype(AbslStringify(
+                            std::is_void<decltype(TurboStringify(
                                 std::declval<FormatSink&>(), v))>::value,
                         IntegralConvertResult> {
   if (conv.conversion_char() == FormatConversionCharInternal::v) {
     using FormatSinkT =
         turbo::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
     auto fs = sink->Wrap<FormatSinkT>();
-    AbslStringify(fs, v);
+    TurboStringify(fs, v);
     return {true};
   } else {
     return {ConvertIntArg(
@@ -158,13 +158,13 @@ template <typename T>
 auto FormatConvertImpl(const T& v, FormatConversionSpecImpl,
                        FormatSinkImpl* sink)
     -> std::enable_if_t<!std::is_enum<T>::value &&
-                            std::is_void<decltype(AbslStringify(
+                            std::is_void<decltype(TurboStringify(
                                 std::declval<FormatSink&>(), v))>::value,
                         ArgConvertResult<FormatConversionCharSetInternal::v>> {
   using FormatSinkT =
       turbo::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
   auto fs = sink->Wrap<FormatSinkT>();
-  AbslStringify(fs, v);
+  TurboStringify(fs, v);
   return {true};
 }
 
@@ -175,11 +175,11 @@ class StreamedWrapper;
 // then convert it, appending to `sink` and return `true`.
 // Otherwise fail and return `false`.
 
-// AbslFormatConvert(v, conv, sink) is intended to be found by ADL on 'v'
+// TurboFormatConvert(v, conv, sink) is intended to be found by ADL on 'v'
 // as an extension mechanism. These FormatConvertImpl functions are the default
 // implementations.
 // The ADL search is augmented via the 'Sink*' parameter, which also
-// serves as a disambiguator to reject possible unintended 'AbslFormatConvert'
+// serves as a disambiguator to reject possible unintended 'TurboFormatConvert'
 // functions in the namespaces associated with 'v'.
 
 // Raw pointers.
@@ -214,22 +214,22 @@ StringConvertResult FormatConvertImpl(const std::string& v,
 StringConvertResult FormatConvertImpl(string_view v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-#if defined(ABSL_HAVE_STD_STRING_VIEW) && !defined(ABSL_USES_STD_STRING_VIEW)
+#if defined(TURBO_HAVE_STD_STRING_VIEW) && !defined(TURBO_USES_STD_STRING_VIEW)
 inline StringConvertResult FormatConvertImpl(std::string_view v,
                                              FormatConversionSpecImpl conv,
                                              FormatSinkImpl* sink) {
   return FormatConvertImpl(turbo::string_view(v.data(), v.size()), conv, sink);
 }
-#endif  // ABSL_HAVE_STD_STRING_VIEW && !ABSL_USES_STD_STRING_VIEW
+#endif  // TURBO_HAVE_STD_STRING_VIEW && !TURBO_USES_STD_STRING_VIEW
 
 ArgConvertResult<FormatConversionCharSetUnion(
     FormatConversionCharSetInternal::s, FormatConversionCharSetInternal::p)>
 FormatConvertImpl(const char* v, const FormatConversionSpecImpl conv,
                   FormatSinkImpl* sink);
 
-template <class AbslCord, typename std::enable_if<std::is_same<
-                              AbslCord, turbo::Cord>::value>::type* = nullptr>
-StringConvertResult FormatConvertImpl(const AbslCord& value,
+template <class TurboCord, typename std::enable_if<std::is_same<
+                              TurboCord, turbo::Cord>::value>::type* = nullptr>
+StringConvertResult FormatConvertImpl(const TurboCord& value,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink) {
   bool is_left = conv.has_left_flag();
@@ -333,7 +333,7 @@ IntegralConvertResult FormatConvertImpl(T v, FormatConversionSpecImpl conv,
 template <typename T>
 typename std::enable_if<std::is_enum<T>::value &&
                             !HasUserDefinedConvert<T>::value &&
-                            !strings_internal::HasAbslStringify<T>::value,
+                            !strings_internal::HasTurboStringify<T>::value,
                         IntegralConvertResult>::type
 FormatConvertImpl(T v, FormatConversionSpecImpl conv, FormatSinkImpl* sink);
 
@@ -447,7 +447,7 @@ class FormatArgImpl {
   struct DecayType {
     static constexpr bool kHasUserDefined =
         str_format_internal::HasUserDefinedConvert<T>::value ||
-        strings_internal::HasAbslStringify<T>::value;
+        strings_internal::HasTurboStringify<T>::value;
     using type = typename std::conditional<
         !kHasUserDefined && std::is_convertible<T, const char*>::value,
         const char*,
@@ -459,7 +459,7 @@ class FormatArgImpl {
   struct DecayType<T,
                    typename std::enable_if<
                        !str_format_internal::HasUserDefinedConvert<T>::value &&
-                       !strings_internal::HasAbslStringify<T>::value &&
+                       !strings_internal::HasTurboStringify<T>::value &&
                        std::is_enum<T>::value>::type> {
     using type = typename std::underlying_type<T>::type;
   };
@@ -562,12 +562,12 @@ class FormatArgImpl {
   template <typename T>
   static bool Dispatch(Data arg, FormatConversionSpecImpl spec, void* out) {
     // A `none` conv indicates that we want the `int` conversion.
-    if (ABSL_PREDICT_FALSE(spec.conversion_char() ==
+    if (TURBO_PREDICT_FALSE(spec.conversion_char() ==
                            FormatConversionCharInternal::kNone)) {
       return ToInt<T>(arg, static_cast<int*>(out), std::is_integral<T>(),
                       std::is_enum<T>());
     }
-    if (ABSL_PREDICT_FALSE(!Contains(ArgumentToConv<T>(),
+    if (TURBO_PREDICT_FALSE(!Contains(ArgumentToConv<T>(),
                                      spec.conversion_char()))) {
       return false;
     }
@@ -581,43 +581,43 @@ class FormatArgImpl {
   Dispatcher dispatcher_;
 };
 
-#define ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(T, E)                     \
+#define TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(T, E)                     \
   E template bool FormatArgImpl::Dispatch<T>(Data, FormatConversionSpecImpl, \
                                              void*)
 
-#define ABSL_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(...)                   \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(str_format_internal::VoidPtr,     \
+#define TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(...)                   \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(str_format_internal::VoidPtr,     \
                                              __VA_ARGS__);                     \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(bool, __VA_ARGS__);               \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(char, __VA_ARGS__);               \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(signed char, __VA_ARGS__);        \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned char, __VA_ARGS__);      \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(short, __VA_ARGS__); /* NOLINT */ \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned short,      /* NOLINT */ \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(bool, __VA_ARGS__);               \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(char, __VA_ARGS__);               \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(signed char, __VA_ARGS__);        \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned char, __VA_ARGS__);      \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(short, __VA_ARGS__); /* NOLINT */ \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned short,      /* NOLINT */ \
                                              __VA_ARGS__);                     \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(int, __VA_ARGS__);                \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned int, __VA_ARGS__);       \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long, __VA_ARGS__); /* NOLINT */  \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned long,      /* NOLINT */  \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(int, __VA_ARGS__);                \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned int, __VA_ARGS__);       \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long, __VA_ARGS__); /* NOLINT */  \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned long,      /* NOLINT */  \
                                              __VA_ARGS__);                     \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long long, /* NOLINT */           \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long long, /* NOLINT */           \
                                              __VA_ARGS__);                     \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned long long, /* NOLINT */  \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(unsigned long long, /* NOLINT */  \
                                              __VA_ARGS__);                     \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(int128, __VA_ARGS__);             \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(uint128, __VA_ARGS__);            \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(float, __VA_ARGS__);              \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(double, __VA_ARGS__);             \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long double, __VA_ARGS__);        \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(const char*, __VA_ARGS__);        \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string, __VA_ARGS__);        \
-  ABSL_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(string_view, __VA_ARGS__)
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(int128, __VA_ARGS__);             \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(uint128, __VA_ARGS__);            \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(float, __VA_ARGS__);              \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(double, __VA_ARGS__);             \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long double, __VA_ARGS__);        \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(const char*, __VA_ARGS__);        \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string, __VA_ARGS__);        \
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(string_view, __VA_ARGS__)
 
-ABSL_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
+TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
 
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_ARG_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_FORMAT_ARG_H_

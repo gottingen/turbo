@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ void BM_Strtod_Pi(benchmark::State& state) {
 }
 BENCHMARK(BM_Strtod_Pi);
 
-void BM_Absl_Pi(benchmark::State& state) {
+void BM_Turbo_Pi(benchmark::State& state) {
   const char* pi = "3.14159";
   const char* pi_end = pi + strlen(pi);
   for (auto s : state) {
@@ -41,7 +41,7 @@ void BM_Absl_Pi(benchmark::State& state) {
     benchmark::DoNotOptimize(v);
   }
 }
-BENCHMARK(BM_Absl_Pi);
+BENCHMARK(BM_Turbo_Pi);
 
 void BM_Strtod_Pi_float(benchmark::State& state) {
   const char* pi = "3.14159";
@@ -52,7 +52,7 @@ void BM_Strtod_Pi_float(benchmark::State& state) {
 }
 BENCHMARK(BM_Strtod_Pi_float);
 
-void BM_Absl_Pi_float(benchmark::State& state) {
+void BM_Turbo_Pi_float(benchmark::State& state) {
   const char* pi = "3.14159";
   const char* pi_end = pi + strlen(pi);
   for (auto s : state) {
@@ -62,7 +62,7 @@ void BM_Absl_Pi_float(benchmark::State& state) {
     benchmark::DoNotOptimize(v);
   }
 }
-BENCHMARK(BM_Absl_Pi_float);
+BENCHMARK(BM_Turbo_Pi_float);
 
 void BM_Strtod_HardLarge(benchmark::State& state) {
   const char* num = "272104041512242479.e200";
@@ -73,7 +73,7 @@ void BM_Strtod_HardLarge(benchmark::State& state) {
 }
 BENCHMARK(BM_Strtod_HardLarge);
 
-void BM_Absl_HardLarge(benchmark::State& state) {
+void BM_Turbo_HardLarge(benchmark::State& state) {
   const char* numstr = "272104041512242479.e200";
   const char* numstr_end = numstr + strlen(numstr);
   for (auto s : state) {
@@ -83,7 +83,7 @@ void BM_Absl_HardLarge(benchmark::State& state) {
     benchmark::DoNotOptimize(v);
   }
 }
-BENCHMARK(BM_Absl_HardLarge);
+BENCHMARK(BM_Turbo_HardLarge);
 
 void BM_Strtod_HardSmall(benchmark::State& state) {
   const char* num = "94080055902682397.e-242";
@@ -94,7 +94,7 @@ void BM_Strtod_HardSmall(benchmark::State& state) {
 }
 BENCHMARK(BM_Strtod_HardSmall);
 
-void BM_Absl_HardSmall(benchmark::State& state) {
+void BM_Turbo_HardSmall(benchmark::State& state) {
   const char* numstr = "94080055902682397.e-242";
   const char* numstr_end = numstr + strlen(numstr);
   for (auto s : state) {
@@ -104,7 +104,7 @@ void BM_Absl_HardSmall(benchmark::State& state) {
     benchmark::DoNotOptimize(v);
   }
 }
-BENCHMARK(BM_Absl_HardSmall);
+BENCHMARK(BM_Turbo_HardSmall);
 
 void BM_Strtod_HugeMantissa(benchmark::State& state) {
   std::string huge(200, '3');
@@ -116,7 +116,7 @@ void BM_Strtod_HugeMantissa(benchmark::State& state) {
 }
 BENCHMARK(BM_Strtod_HugeMantissa);
 
-void BM_Absl_HugeMantissa(benchmark::State& state) {
+void BM_Turbo_HugeMantissa(benchmark::State& state) {
   std::string huge(200, '3');
   const char* num = huge.c_str();
   const char* num_end = num + 200;
@@ -127,7 +127,7 @@ void BM_Absl_HugeMantissa(benchmark::State& state) {
     benchmark::DoNotOptimize(v);
   }
 }
-BENCHMARK(BM_Absl_HugeMantissa);
+BENCHMARK(BM_Turbo_HugeMantissa);
 
 std::string MakeHardCase(int length) {
   // The number 1.1521...e-297 is exactly halfway between 12345 * 2**-1000 and
@@ -162,7 +162,7 @@ void BM_Strtod_Big_And_Difficult(benchmark::State& state) {
 }
 BENCHMARK(BM_Strtod_Big_And_Difficult)->Range(3, 5000);
 
-void BM_Absl_Big_And_Difficult(benchmark::State& state) {
+void BM_Turbo_Big_And_Difficult(benchmark::State& state) {
   std::string testcase = MakeHardCase(state.range(0));
   const char* begin = testcase.c_str();
   const char* end = begin + testcase.size();
@@ -173,7 +173,7 @@ void BM_Absl_Big_And_Difficult(benchmark::State& state) {
     benchmark::DoNotOptimize(v);
   }
 }
-BENCHMARK(BM_Absl_Big_And_Difficult)->Range(3, 5000);
+BENCHMARK(BM_Turbo_Big_And_Difficult)->Range(3, 5000);
 
 }  // namespace
 
@@ -181,24 +181,24 @@ BENCHMARK(BM_Absl_Big_And_Difficult)->Range(3, 5000);
 // Benchmark                                 Time           CPU Iterations
 // ------------------------------------------------------------------------
 // BM_Strtod_Pi                             96 ns         96 ns    6337454
-// BM_Absl_Pi                               35 ns         35 ns   20031996
+// BM_Turbo_Pi                               35 ns         35 ns   20031996
 // BM_Strtod_Pi_float                       91 ns         91 ns    7745851
-// BM_Absl_Pi_float                         35 ns         35 ns   20430298
+// BM_Turbo_Pi_float                         35 ns         35 ns   20430298
 // BM_Strtod_HardLarge                     133 ns        133 ns    5288341
-// BM_Absl_HardLarge                       181 ns        181 ns    3855615
+// BM_Turbo_HardLarge                       181 ns        181 ns    3855615
 // BM_Strtod_HardSmall                     279 ns        279 ns    2517243
-// BM_Absl_HardSmall                       287 ns        287 ns    2458744
+// BM_Turbo_HardSmall                       287 ns        287 ns    2458744
 // BM_Strtod_HugeMantissa                  433 ns        433 ns    1604293
-// BM_Absl_HugeMantissa                    160 ns        160 ns    4403671
+// BM_Turbo_HugeMantissa                    160 ns        160 ns    4403671
 // BM_Strtod_Big_And_Difficult/3           236 ns        236 ns    2942496
 // BM_Strtod_Big_And_Difficult/8           232 ns        232 ns    2983796
 // BM_Strtod_Big_And_Difficult/64          437 ns        437 ns    1591951
 // BM_Strtod_Big_And_Difficult/512        1738 ns       1738 ns     402519
 // BM_Strtod_Big_And_Difficult/4096       3943 ns       3943 ns     176128
 // BM_Strtod_Big_And_Difficult/5000       4397 ns       4397 ns     157878
-// BM_Absl_Big_And_Difficult/3              39 ns         39 ns   17799583
-// BM_Absl_Big_And_Difficult/8              43 ns         43 ns   16096859
-// BM_Absl_Big_And_Difficult/64            550 ns        550 ns    1259717
-// BM_Absl_Big_And_Difficult/512          4167 ns       4167 ns     171414
-// BM_Absl_Big_And_Difficult/4096         9160 ns       9159 ns      76297
-// BM_Absl_Big_And_Difficult/5000         9738 ns       9738 ns      70140
+// BM_Turbo_Big_And_Difficult/3              39 ns         39 ns   17799583
+// BM_Turbo_Big_And_Difficult/8              43 ns         43 ns   16096859
+// BM_Turbo_Big_And_Difficult/64            550 ns        550 ns    1259717
+// BM_Turbo_Big_And_Difficult/512          4167 ns       4167 ns     171414
+// BM_Turbo_Big_And_Difficult/4096         9160 ns       9159 ns      76297
+// BM_Turbo_Big_And_Difficult/5000         9738 ns       9738 ns      70140

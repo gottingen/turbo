@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors
+// Copyright 2020 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -404,7 +404,7 @@ TEST(LowLevelHashTest, VerifyGolden) {
        uint64_t{0xc9ae5c8759b4877a}},
   };
 
-#if defined(ABSL_IS_BIG_ENDIAN)
+#if defined(TURBO_IS_BIG_ENDIAN)
   constexpr uint64_t kGolden[kNumGoldenOutputs] = {
       0xe5a40d39ab796423, 0x1766974bf7527d81, 0x5c3bbbe230db17a8,
       0xa6630143a7e6aa6f, 0x17645cb7318b86b,  0x218b175f30ba61f8,

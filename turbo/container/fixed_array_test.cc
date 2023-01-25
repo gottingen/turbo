@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -187,12 +187,12 @@ TEST(FixedArrayTest, SmallObjects) {
 TEST(FixedArrayTest, AtThrows) {
   turbo::FixedArray<int> a = {1, 2, 3};
   EXPECT_EQ(a.at(2), 3);
-  ABSL_BASE_INTERNAL_EXPECT_FAIL(a.at(3), std::out_of_range,
+  TURBO_BASE_INTERNAL_EXPECT_FAIL(a.at(3), std::out_of_range,
                                  "failed bounds check");
 }
 
 TEST(FixedArrayTest, Hardened) {
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
   turbo::FixedArray<int> a = {1, 2, 3};
   EXPECT_EQ(a[2], 3);
   EXPECT_DEATH_IF_SUPPORTED(a[3], "");
@@ -356,20 +356,20 @@ static void TestArrayOfArrays(int n) {
 
 TEST(IteratorConstructorTest, NonInline) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  turbo::FixedArray<int, ABSL_ARRAYSIZE(kInput) - 1> const fixed(
-      kInput, kInput + ABSL_ARRAYSIZE(kInput));
-  ASSERT_EQ(ABSL_ARRAYSIZE(kInput), fixed.size());
-  for (size_t i = 0; i < ABSL_ARRAYSIZE(kInput); ++i) {
+  turbo::FixedArray<int, TURBO_ARRAYSIZE(kInput) - 1> const fixed(
+      kInput, kInput + TURBO_ARRAYSIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
 
 TEST(IteratorConstructorTest, Inline) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  turbo::FixedArray<int, ABSL_ARRAYSIZE(kInput)> const fixed(
-      kInput, kInput + ABSL_ARRAYSIZE(kInput));
-  ASSERT_EQ(ABSL_ARRAYSIZE(kInput), fixed.size());
-  for (size_t i = 0; i < ABSL_ARRAYSIZE(kInput); ++i) {
+  turbo::FixedArray<int, TURBO_ARRAYSIZE(kInput)> const fixed(
+      kInput, kInput + TURBO_ARRAYSIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
@@ -378,9 +378,9 @@ TEST(IteratorConstructorTest, NonPod) {
   char const* kInput[] = {"red",  "orange", "yellow", "green",
                           "blue", "indigo", "violet"};
   turbo::FixedArray<std::string> const fixed(kInput,
-                                            kInput + ABSL_ARRAYSIZE(kInput));
-  ASSERT_EQ(ABSL_ARRAYSIZE(kInput), fixed.size());
-  for (size_t i = 0; i < ABSL_ARRAYSIZE(kInput); ++i) {
+                                            kInput + TURBO_ARRAYSIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
@@ -394,7 +394,7 @@ TEST(IteratorConstructorTest, FromEmptyVector) {
 
 TEST(IteratorConstructorTest, FromNonEmptyVector) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  std::vector<int> const items(kInput, kInput + ABSL_ARRAYSIZE(kInput));
+  std::vector<int> const items(kInput, kInput + TURBO_ARRAYSIZE(kInput));
   turbo::FixedArray<int> const fixed(items.begin(), items.end());
   ASSERT_EQ(items.size(), fixed.size());
   for (size_t i = 0; i < items.size(); ++i) {
@@ -404,7 +404,7 @@ TEST(IteratorConstructorTest, FromNonEmptyVector) {
 
 TEST(IteratorConstructorTest, FromBidirectionalIteratorRange) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  std::list<int> const items(kInput, kInput + ABSL_ARRAYSIZE(kInput));
+  std::list<int> const items(kInput, kInput + TURBO_ARRAYSIZE(kInput));
   turbo::FixedArray<int> const fixed(items.begin(), items.end());
   EXPECT_THAT(fixed, testing::ElementsAreArray(kInput));
 }
@@ -673,7 +673,7 @@ TEST(AllocatorSupportTest, CountOutoflineAllocations) {
     const int ia[] = {0, 1, 2, 3, 4, 5, 6, 7};
     Alloc alloc(&allocated, &active_instances);
 
-    AllocFxdArr arr(ia, ia + ABSL_ARRAYSIZE(ia), alloc);
+    AllocFxdArr arr(ia, ia + TURBO_ARRAYSIZE(ia), alloc);
 
     EXPECT_EQ(allocated, arr.size() * sizeof(int));
     static_cast<void>(arr);
@@ -768,7 +768,7 @@ TEST(AllocatorSupportTest, SizeValAllocConstructor) {
   }
 }
 
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
 TEST(FixedArrayTest, AddressSanitizerAnnotations1) {
   turbo::FixedArray<int, 32> a(10);
   int* raw = a.data();
@@ -815,9 +815,9 @@ TEST(FixedArrayTest, AddressSanitizerAnnotations4) {
   // so reading raw[21] should still trigger the correct warning.
   EXPECT_DEATH_IF_SUPPORTED(raw[21] = ThreeInts(), "container-overflow");
 }
-#endif  // ABSL_HAVE_ADDRESS_SANITIZER
+#endif  // TURBO_HAVE_ADDRESS_SANITIZER
 
-TEST(FixedArrayTest, AbslHashValueWorks) {
+TEST(FixedArrayTest, TurboHashValueWorks) {
   using V = turbo::FixedArray<int>;
   std::vector<V> cases;
 
@@ -831,7 +831,7 @@ TEST(FixedArrayTest, AbslHashValueWorks) {
     cases.push_back(v);
   }
 
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(cases));
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(cases));
 }
 
 }  // namespace

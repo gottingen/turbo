@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -877,7 +877,7 @@ TEST(LogFormatTest, CustomNonCopyable) {
 
 struct Point {
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const Point& p) {
+  friend void TurboStringify(Sink& sink, const Point& p) {
     turbo::Format(&sink, "(%d, %d)", p.x, p.y);
   }
 
@@ -885,7 +885,7 @@ struct Point {
   int y = 20;
 };
 
-TEST(LogFormatTest, AbslStringifyExample) {
+TEST(LogFormatTest, TurboStringifyExample) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   Point p;
@@ -900,10 +900,10 @@ TEST(LogFormatTest, AbslStringifyExample) {
   LOG(INFO) << p;
 }
 
-struct PointWithAbslStringifiyAndOstream {
+struct PointWithTurboStringifiyAndOstream {
   template <typename Sink>
-  friend void AbslStringify(Sink& sink,
-                            const PointWithAbslStringifiyAndOstream& p) {
+  friend void TurboStringify(Sink& sink,
+                            const PointWithTurboStringifiyAndOstream& p) {
     turbo::Format(&sink, "(%d, %d)", p.x, p.y);
   }
 
@@ -911,15 +911,15 @@ struct PointWithAbslStringifiyAndOstream {
   int y = 20;
 };
 
-ABSL_ATTRIBUTE_UNUSED std::ostream& operator<<(
-    std::ostream& os, const PointWithAbslStringifiyAndOstream&) {
-  return os << "Default to AbslStringify()";
+TURBO_ATTRIBUTE_UNUSED std::ostream& operator<<(
+    std::ostream& os, const PointWithTurboStringifiyAndOstream&) {
+  return os << "Default to TurboStringify()";
 }
 
-TEST(LogFormatTest, CustomWithAbslStringifyAndOstream) {
+TEST(LogFormatTest, CustomWithTurboStringifyAndOstream) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
-  PointWithAbslStringifiyAndOstream p;
+  PointWithTurboStringifiyAndOstream p;
 
   EXPECT_CALL(
       test_sink,
@@ -933,13 +933,13 @@ TEST(LogFormatTest, CustomWithAbslStringifyAndOstream) {
 
 struct PointStreamsNothing {
   template <typename Sink>
-  friend void AbslStringify(Sink&, const PointStreamsNothing&) {}
+  friend void TurboStringify(Sink&, const PointStreamsNothing&) {}
 
   int x = 10;
   int y = 20;
 };
 
-TEST(LogFormatTest, AbslStringifyStreamsNothing) {
+TEST(LogFormatTest, TurboStringifyStreamsNothing) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   PointStreamsNothing p;
@@ -955,7 +955,7 @@ TEST(LogFormatTest, AbslStringifyStreamsNothing) {
 
 struct PointMultipleAppend {
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const PointMultipleAppend& p) {
+  friend void TurboStringify(Sink& sink, const PointMultipleAppend& p) {
     sink.Append("(");
     sink.Append(turbo::StrCat(p.x, ", ", p.y, ")"));
   }
@@ -964,7 +964,7 @@ struct PointMultipleAppend {
   int y = 20;
 };
 
-TEST(LogFormatTest, AbslStringifyMultipleAppend) {
+TEST(LogFormatTest, TurboStringifyMultipleAppend) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   PointMultipleAppend p;
@@ -1627,7 +1627,7 @@ TEST(ManipulatorLogFormatTest, CustomClassStreamsNothing) {
 
 struct PointPercentV {
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const PointPercentV& p) {
+  friend void TurboStringify(Sink& sink, const PointPercentV& p) {
     turbo::Format(&sink, "(%v, %v)", p.x, p.y);
   }
 
@@ -1635,7 +1635,7 @@ struct PointPercentV {
   int y = 20;
 };
 
-TEST(ManipulatorLogFormatTest, IOManipsDoNotAffectAbslStringify) {
+TEST(ManipulatorLogFormatTest, IOManipsDoNotAffectTurboStringify) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   PointPercentV p;

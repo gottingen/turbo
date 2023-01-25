@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 // Implementation details for `turbo::bind_front()`.
 
-#ifndef ABSL_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
-#define ABSL_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
+#ifndef TURBO_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
+#define TURBO_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
 
 #include <cstddef>
 #include <type_traits>
@@ -27,7 +27,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace functional_internal {
 
 // Invoke the method, expanding the tuple of bound arguments.
@@ -89,7 +89,7 @@ template <class F, class... BoundArgs>
 using bind_front_t = FrontBinder<decay_t<F>, turbo::decay_t<BoundArgs>...>;
 
 }  // namespace functional_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
+#endif  // TURBO_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_

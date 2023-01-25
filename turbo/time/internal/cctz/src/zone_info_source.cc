@@ -17,7 +17,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -27,11 +27,11 @@ std::string ZoneInfoSource::Version() const { return std::string(); }
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz_extension {
 
@@ -69,38 +69,38 @@ ZoneInfoSourceFactory default_factory = DefaultFactory;
 #if defined(_M_IX86) || defined(_M_ARM)
 #pragma comment(                                                                                                                 \
         linker,                                                                                                                  \
-            "/alternatename:?zone_info_source_factory@cctz_extension@time_internal@" ABSL_INTERNAL_MANGLED_NS                    \
-            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                 \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                   \
-            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" ABSL_INTERNAL_MANGLED_BACKREFERENCE      \
-            "@ABV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                   \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                   \
-            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" ABSL_INTERNAL_MANGLED_BACKREFERENCE \
-            "@@ZA=?default_factory@cctz_extension@time_internal@" ABSL_INTERNAL_MANGLED_NS                                       \
-            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                 \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                   \
-            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" ABSL_INTERNAL_MANGLED_BACKREFERENCE      \
-            "@ABV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                   \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                   \
-            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" ABSL_INTERNAL_MANGLED_BACKREFERENCE \
+            "/alternatename:?zone_info_source_factory@cctz_extension@time_internal@" TURBO_INTERNAL_MANGLED_NS                    \
+            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                 \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                   \
+            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" TURBO_INTERNAL_MANGLED_BACKREFERENCE      \
+            "@ABV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                   \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                   \
+            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" TURBO_INTERNAL_MANGLED_BACKREFERENCE \
+            "@@ZA=?default_factory@cctz_extension@time_internal@" TURBO_INTERNAL_MANGLED_NS                                       \
+            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                 \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                   \
+            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" TURBO_INTERNAL_MANGLED_BACKREFERENCE      \
+            "@ABV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                   \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                   \
+            "@@@std@@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" TURBO_INTERNAL_MANGLED_BACKREFERENCE \
             "@@ZA")
 #elif defined(_M_IA_64) || defined(_M_AMD64) || defined(_M_ARM64)
 #pragma comment(                                                                                                                  \
         linker,                                                                                                                   \
-            "/alternatename:?zone_info_source_factory@cctz_extension@time_internal@" ABSL_INTERNAL_MANGLED_NS                     \
-            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                  \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                    \
-            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" ABSL_INTERNAL_MANGLED_BACKREFERENCE      \
-            "@AEBV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                   \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                    \
-            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" ABSL_INTERNAL_MANGLED_BACKREFERENCE \
-            "@@ZEA=?default_factory@cctz_extension@time_internal@" ABSL_INTERNAL_MANGLED_NS                                       \
-            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                  \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                    \
-            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" ABSL_INTERNAL_MANGLED_BACKREFERENCE      \
-            "@AEBV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                   \
-            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" ABSL_INTERNAL_MANGLED_NS                                    \
-            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" ABSL_INTERNAL_MANGLED_BACKREFERENCE \
+            "/alternatename:?zone_info_source_factory@cctz_extension@time_internal@" TURBO_INTERNAL_MANGLED_NS                     \
+            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                  \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                    \
+            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" TURBO_INTERNAL_MANGLED_BACKREFERENCE      \
+            "@AEBV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                   \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                    \
+            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" TURBO_INTERNAL_MANGLED_BACKREFERENCE \
+            "@@ZEA=?default_factory@cctz_extension@time_internal@" TURBO_INTERNAL_MANGLED_NS                                       \
+            "@@3P6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                  \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                    \
+            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@" TURBO_INTERNAL_MANGLED_BACKREFERENCE      \
+            "@AEBV?$function@$$A6A?AV?$unique_ptr@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                   \
+            "@@U?$default_delete@VZoneInfoSource@cctz@time_internal@" TURBO_INTERNAL_MANGLED_NS                                    \
+            "@@@std@@@std@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@@Z@" TURBO_INTERNAL_MANGLED_BACKREFERENCE \
             "@@ZEA")
 #else
 #error Unsupported MSVC platform
@@ -112,5 +112,5 @@ ZoneInfoSourceFactory zone_info_source_factory = DefaultFactory;
 
 }  // namespace cctz_extension
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

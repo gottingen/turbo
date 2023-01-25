@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ TYPED_TEST(GaussianDistributionInterfaceTest, SerializeTest) {
           EXPECT_LE(sample, before.max()) << before;
         }
         if (!std::is_same<TypeParam, long double>::value) {
-          ABSL_INTERNAL_LOG(
+          TURBO_INTERNAL_LOG(
               INFO, turbo::StrFormat("Range{%f, %f}: %f, %f", mean, stddev,
                                     sample_min, sample_max));
         }
@@ -165,8 +165,8 @@ class GaussianModel {
 
   // The inverse CDF, or PercentPoint function.
   double InverseCDF(double p) {
-    ABSL_ASSERT(p >= 0.0);
-    ABSL_ASSERT(p < 1.0);
+    TURBO_ASSERT(p >= 0.0);
+    TURBO_ASSERT(p < 1.0);
     return mean() + stddev() * -turbo::random_internal::InverseNormalSurvival(p);
   }
 
@@ -240,7 +240,7 @@ bool GaussianDistributionTests::SingleZTest(const double p,
       (std::pow(m.skewness, 2.0) + std::pow(m.kurtosis - 3.0, 2.0) / 4.0);
 
   if (!pass || jb > 9.21) {
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         INFO, turbo::StrFormat("p=%f max_err=%f\n"
                               " mean=%f vs. %f\n"
                               " stddev=%f vs. %f\n"
@@ -298,11 +298,11 @@ double GaussianDistributionTests::SingleChiSquaredTest() {
   // Log if the chi_square value is above the threshold.
   if (chi_square > threshold) {
     for (int i = 0; i < cutoffs.size(); i++) {
-      ABSL_INTERNAL_LOG(
+      TURBO_INTERNAL_LOG(
           INFO, turbo::StrFormat("%d : (%f) = %d", i, cutoffs[i], counts[i]));
     }
 
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         INFO, turbo::StrCat("mean=", mean(), " stddev=", stddev(), "\n",   //
                            " expected ", expected, "\n",                  //
                            kChiSquared, " ", chi_square, " (", p, ")\n",  //

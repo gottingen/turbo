@@ -19,7 +19,7 @@
 #include "time_zone_libc.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -41,5 +41,5 @@ TimeZoneIf::~TimeZoneIf() {}
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

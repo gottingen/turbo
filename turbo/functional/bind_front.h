@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@
 // partial function application. (See
 // https://en.wikipedia.org/wiki/Partial_application).
 
-#ifndef ABSL_FUNCTIONAL_BIND_FRONT_H_
-#define ABSL_FUNCTIONAL_BIND_FRONT_H_
+#ifndef TURBO_FUNCTIONAL_BIND_FRONT_H_
+#define TURBO_FUNCTIONAL_BIND_FRONT_H_
 
 #if defined(__cpp_lib_bind_front) && __cpp_lib_bind_front >= 201907L
 #include <functional>  // For std::bind_front.
@@ -38,7 +38,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // bind_front()
 //
@@ -187,7 +187,7 @@ constexpr functional_internal::bind_front_t<F, BoundArgs...> bind_front(
 }
 #endif  // defined(__cpp_lib_bind_front) && __cpp_lib_bind_front >= 201907L
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FUNCTIONAL_BIND_FRONT_H_
+#endif  // TURBO_FUNCTIONAL_BIND_FRONT_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_
-#define ABSL_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_
+#define TURBO_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 // Return whether the byte at *addr is readable, without faulting.
@@ -26,7 +26,7 @@ namespace debugging_internal {
 bool AddressIsReadable(const void *addr);
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_

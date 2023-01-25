@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,24 +19,24 @@
 #if !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)) || \
     WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 // UWP doesn't have access to win32 APIs.
-#define ABSL_INTERNAL_HAVE_SYMBOLIZE_WIN32
+#define TURBO_INTERNAL_HAVE_SYMBOLIZE_WIN32
 #endif
 #endif
 
 // Emscripten symbolization relies on JS. Do not use them in standalone mode.
 #if defined(__EMSCRIPTEN__) && !defined(STANDALONE_WASM)
-#define ABSL_INTERNAL_HAVE_SYMBOLIZE_WASM
+#define TURBO_INTERNAL_HAVE_SYMBOLIZE_WASM
 #endif
 
-#if defined(ABSL_INTERNAL_HAVE_ELF_SYMBOLIZE)
+#if defined(TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE)
 #include "turbo/debugging/symbolize_elf.inc"
-#elif defined(ABSL_INTERNAL_HAVE_SYMBOLIZE_WIN32)
+#elif defined(TURBO_INTERNAL_HAVE_SYMBOLIZE_WIN32)
 // The Windows Symbolizer only works if PDB files containing the debug info
 // are available to the program at runtime.
 #include "turbo/debugging/symbolize_win32.inc"
 #elif defined(__APPLE__)
 #include "turbo/debugging/symbolize_darwin.inc"
-#elif defined(ABSL_INTERNAL_HAVE_SYMBOLIZE_WASM)
+#elif defined(TURBO_INTERNAL_HAVE_SYMBOLIZE_WASM)
 #include "turbo/debugging/symbolize_emscripten.inc"
 #else
 #include "turbo/debugging/symbolize_unimplemented.inc"

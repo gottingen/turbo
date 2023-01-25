@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 # limitations under the License.
 #
 
-# Internal-only implementation classes for Abseil Random
+# Internal-only implementation classes for Turbo Random
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_RANDOM_RANDEN_COPTS",
-    "ABSL_TEST_COPTS",
-    "absl_random_randen_copts_init",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_RANDOM_RANDEN_COPTS",
+    "TURBO_TEST_COPTS",
+    "turbo_random_randen_copts_init",
 )
 
 default_package_visibility = [
@@ -35,8 +35,8 @@ licenses(["notice"])
 cc_library(
     name = "traits",
     hdrs = ["traits.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/numeric:bits",
@@ -47,8 +47,8 @@ cc_library(
 cc_library(
     name = "distribution_caller",
     hdrs = ["distribution_caller.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:fast_type_id",
@@ -61,8 +61,8 @@ cc_library(
     hdrs = [
         "fast_uniform_bits.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":traits",
         "//turbo/base:config",
@@ -78,8 +78,8 @@ cc_library(
     hdrs = [
         "seed_material.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS + select({
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS + select({
         "//turbo:msvc_compiler": ["-DEFAULTLIB:bcrypt.lib"],
         "//turbo:clang-cl_compiler": ["-DEFAULTLIB:bcrypt.lib"],
         "//conditions:default": [],
@@ -103,13 +103,13 @@ cc_library(
     hdrs = [
         "pool_urbg.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
+    copts = TURBO_DEFAULT_COPTS,
     linkopts = select({
         "//turbo:msvc_compiler": [],
         "//turbo:clang-cl_compiler": [],
         "//turbo:wasm": [],
         "//conditions:default": ["-pthread"],
-    }) + ABSL_DEFAULT_LINKOPTS,
+    }) + TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":randen",
         ":seed_material",
@@ -130,8 +130,8 @@ cc_library(
     hdrs = [
         "explicit_seed_seq.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:endian",
@@ -144,8 +144,8 @@ cc_library(
     hdrs = [
         "sequence_urbg.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = ["//turbo/base:config"],
 )
 
@@ -154,8 +154,8 @@ cc_library(
     hdrs = [
         "salted_seed_seq.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":seed_material",
         "//turbo/container:inlined_vector",
@@ -168,8 +168,8 @@ cc_library(
 cc_library(
     name = "iostream_state_saver",
     hdrs = ["iostream_state_saver.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/meta:type_traits",
         "//turbo/numeric:int128",
@@ -181,8 +181,8 @@ cc_library(
     hdrs = [
         "generate_real.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":fastmath",
         ":traits",
@@ -196,16 +196,16 @@ cc_library(
     hdrs = [
         "fastmath.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = ["//turbo/numeric:bits"],
 )
 
 cc_library(
     name = "wide_multiply",
     hdrs = ["wide_multiply.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":traits",
         "//turbo/base:config",
@@ -217,8 +217,8 @@ cc_library(
 cc_library(
     name = "nonsecure_base",
     hdrs = ["nonsecure_base.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":pool_urbg",
         ":salted_seed_seq",
@@ -233,8 +233,8 @@ cc_library(
 cc_library(
     name = "pcg_engine",
     hdrs = ["pcg_engine.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":fastmath",
         ":iostream_state_saver",
@@ -248,8 +248,8 @@ cc_library(
 cc_library(
     name = "randen_engine",
     hdrs = ["randen_engine.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = default_package_visibility + [
     ],
     deps = [
@@ -268,8 +268,8 @@ cc_library(
     hdrs = [
         "randen_traits.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     textual_hdrs = [
         "platform.h",
     ],
@@ -284,8 +284,8 @@ cc_library(
     hdrs = [
         "randen.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":platform",
         ":randen_hwaes",
@@ -298,8 +298,8 @@ cc_library(
     name = "randen_slow",
     srcs = ["randen_slow.cc"],
     hdrs = ["randen_slow.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":platform",
         "//turbo/base:config",
@@ -309,7 +309,7 @@ cc_library(
     ],
 )
 
-absl_random_randen_copts_init()
+turbo_random_randen_copts_init()
 
 cc_library(
     name = "randen_hwaes",
@@ -320,8 +320,8 @@ cc_library(
         "randen_detect.h",
         "randen_hwaes.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":platform",
         ":randen_hwaes_impl",
@@ -336,12 +336,12 @@ cc_library(
         "randen_hwaes.cc",
         "randen_hwaes.h",
     ],
-    copts = ABSL_DEFAULT_COPTS + ABSL_RANDOM_RANDEN_COPTS + select({
+    copts = TURBO_DEFAULT_COPTS + TURBO_RANDOM_RANDEN_COPTS + select({
         "//turbo:msvc_compiler": [],
         "//turbo:clang-cl_compiler": [],
         "//conditions:default": ["-Wno-pass-failed"],
     }),
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":platform",
         "//turbo/base:config",
@@ -355,7 +355,7 @@ cc_binary(
     srcs = [
         "gaussian_distribution_gentables.cc",
     ],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:core_headers",
         "//turbo/random:distributions",
@@ -373,8 +373,8 @@ cc_library(
         "chi_square.h",
         "distribution_test_util.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -386,7 +386,7 @@ cc_library(
 )
 
 # Common tags for tests, etc.
-ABSL_RANDOM_NONPORTABLE_TAGS = [
+TURBO_RANDOM_NONPORTABLE_TAGS = [
     "no_test_android_arm",
     "no_test_android_arm64",
     "no_test_android_x86",
@@ -401,8 +401,8 @@ cc_test(
     name = "traits_test",
     size = "small",
     srcs = ["traits_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":traits",
         "@com_google_googletest//:gtest_main",
@@ -415,8 +415,8 @@ cc_test(
     srcs = [
         "generate_real_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":generate_real",
         "//turbo/flags:flag",
@@ -429,8 +429,8 @@ cc_test(
     name = "distribution_test_util_test",
     size = "small",
     srcs = ["distribution_test_util_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distribution_test_util",
         "@com_google_googletest//:gtest_main",
@@ -441,8 +441,8 @@ cc_test(
     name = "fastmath_test",
     size = "small",
     srcs = ["fastmath_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":fastmath",
         "@com_google_googletest//:gtest_main",
@@ -453,8 +453,8 @@ cc_test(
     name = "explicit_seed_seq_test",
     size = "small",
     srcs = ["explicit_seed_seq_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":explicit_seed_seq",
         "//turbo/random:seed_sequences",
@@ -466,8 +466,8 @@ cc_test(
     name = "salted_seed_seq_test",
     size = "small",
     srcs = ["salted_seed_seq_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":salted_seed_seq",
         "@com_google_googletest//:gtest_main",
@@ -480,8 +480,8 @@ cc_test(
     srcs = [
         "chi_square_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distribution_test_util",
         "//turbo/base:core_headers",
@@ -495,8 +495,8 @@ cc_test(
     srcs = [
         "fast_uniform_bits_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":fast_uniform_bits",
         "@com_google_googletest//:gtest_main",
@@ -506,7 +506,7 @@ cc_test(
 cc_library(
     name = "mock_helpers",
     hdrs = ["mock_helpers.h"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:fast_type_id",
         "//turbo/types:optional",
@@ -517,7 +517,7 @@ cc_library(
     name = "mock_overload_set",
     testonly = 1,
     hdrs = ["mock_overload_set.h"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":mock_helpers",
         "//turbo/random:mocking_bit_gen",
@@ -531,8 +531,8 @@ cc_test(
     srcs = [
         "nonsecure_base_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":nonsecure_base",
         "//turbo/random",
@@ -547,8 +547,8 @@ cc_test(
     name = "seed_material_test",
     size = "small",
     srcs = ["seed_material_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":seed_material",
         "@com_google_googletest//:gtest_main",
@@ -561,8 +561,8 @@ cc_test(
     srcs = [
         "pool_urbg_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":pool_urbg",
         "//turbo/meta:type_traits",
@@ -575,9 +575,9 @@ cc_test(
     name = "pcg_engine_test",
     size = "medium",  # Trying to measure accuracy.
     srcs = ["pcg_engine_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     flaky = 1,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":explicit_seed_seq",
         ":pcg_engine",
@@ -592,8 +592,8 @@ cc_test(
     srcs = [
         "randen_engine_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":explicit_seed_seq",
         ":randen_engine",
@@ -608,8 +608,8 @@ cc_test(
     name = "randen_test",
     size = "small",
     srcs = ["randen_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":randen",
         "//turbo/meta:type_traits",
@@ -621,8 +621,8 @@ cc_test(
     name = "randen_slow_test",
     size = "small",
     srcs = ["randen_slow_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":platform",
         ":randen_slow",
@@ -635,9 +635,9 @@ cc_test(
     name = "randen_hwaes_test",
     size = "small",
     srcs = ["randen_hwaes_test.cc"],
-    copts = ABSL_TEST_COPTS + ABSL_RANDOM_RANDEN_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
-    tags = ABSL_RANDOM_NONPORTABLE_TAGS,
+    copts = TURBO_TEST_COPTS + TURBO_RANDOM_RANDEN_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
+    tags = TURBO_RANDOM_NONPORTABLE_TAGS,
     deps = [
         ":platform",
         ":randen_hwaes",
@@ -652,8 +652,8 @@ cc_test(
     name = "wide_multiply_test",
     size = "small",
     srcs = ["wide_multiply_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":wide_multiply",
         "//turbo/numeric:bits",
@@ -665,7 +665,7 @@ cc_test(
 cc_library(
     name = "nanobenchmark",
     srcs = ["nanobenchmark.cc"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     textual_hdrs = ["nanobenchmark.h"],
     deps = [
         ":platform",
@@ -679,8 +679,8 @@ cc_library(
 cc_library(
     name = "uniform_helper",
     hdrs = ["uniform_helper.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":traits",
         "//turbo/base:config",
@@ -694,7 +694,7 @@ cc_test(
     size = "small",
     srcs = ["nanobenchmark_test.cc"],
     flaky = 1,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "benchmark",
         "no_test_ios_x86_64",
@@ -713,10 +713,10 @@ cc_test(
     size = "medium",
     timeout = "long",
     srcs = ["randen_benchmarks.cc"],
-    copts = ABSL_TEST_COPTS + ABSL_RANDOM_RANDEN_COPTS,
+    copts = TURBO_TEST_COPTS + TURBO_RANDOM_RANDEN_COPTS,
     flaky = 1,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
-    tags = ABSL_RANDOM_NONPORTABLE_TAGS + ["benchmark"],
+    linkopts = TURBO_DEFAULT_LINKOPTS,
+    tags = TURBO_RANDOM_NONPORTABLE_TAGS + ["benchmark"],
     deps = [
         ":nanobenchmark",
         ":platform",
@@ -733,7 +733,7 @@ cc_test(
 cc_test(
     name = "iostream_state_saver_test",
     srcs = ["iostream_state_saver_test.cc"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":iostream_state_saver",
         "@com_google_googletest//:gtest_main",
@@ -744,8 +744,8 @@ cc_test(
     name = "uniform_helper_test",
     size = "small",
     srcs = ["uniform_helper_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":uniform_helper",
         "@com_google_googletest//:gtest_main",

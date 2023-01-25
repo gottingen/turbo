@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_CORD_ANALYSIS_H_
-#define ABSL_STRINGS_CORD_ANALYSIS_H_
+#ifndef TURBO_STRINGS_CORD_ANALYSIS_H_
+#define TURBO_STRINGS_CORD_ANALYSIS_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -22,7 +22,7 @@
 #include "turbo/strings/internal/cord_internal.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // Returns the *approximate* number of bytes held in full or in part by this
@@ -37,8 +37,8 @@ size_t GetEstimatedMemoryUsage(const CordRep* rep);
 size_t GetEstimatedFairShareMemoryUsage(const CordRep* rep);
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 
-#endif  // ABSL_STRINGS_CORD_ANALYSIS_H_
+#endif  // TURBO_STRINGS_CORD_ANALYSIS_H_

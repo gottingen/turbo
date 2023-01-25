@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 namespace {
 void EncodeRawVarint(uint64_t value, size_t size, turbo::Span<char> *buf) {
@@ -126,7 +126,7 @@ bool EncodeBytesTruncate(uint64_t tag, turbo::Span<const char> value,
   return true;
 }
 
-ABSL_MUST_USE_RESULT turbo::Span<char> EncodeMessageStart(
+TURBO_MUST_USE_RESULT turbo::Span<char> EncodeMessageStart(
     uint64_t tag, uint64_t max_size, turbo::Span<char> *buf) {
   const uint64_t tag_type = MakeTagType(tag, WireType::kLengthDelimited);
   const size_t tag_type_size = VarintSize(tag_type);
@@ -216,5 +216,5 @@ bool ProtoField::DecodeFrom(turbo::Span<const char> *data) {
 }
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

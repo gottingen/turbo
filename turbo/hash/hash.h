@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,23 +16,23 @@
 // File: hash.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the Abseil `hash` library and the Abseil hashing
+// This header file defines the Turbo `hash` library and the Turbo hashing
 // framework. This framework consists of the following:
 //
 //   * The `turbo::Hash` functor, which is used to invoke the hasher within the
-//     Abseil hashing framework. `turbo::Hash<T>` supports most basic types and
-//     a number of Abseil types out of the box.
-//   * `AbslHashValue`, an extension point that allows you to extend types to
-//     support Abseil hashing without requiring you to define a hashing
+//     Turbo hashing framework. `turbo::Hash<T>` supports most basic types and
+//     a number of Turbo types out of the box.
+//   * `TurboHashValue`, an extension point that allows you to extend types to
+//     support Turbo hashing without requiring you to define a hashing
 //     algorithm.
 //   * `HashState`, a type-erased class which implements the manipulation of the
 //     hash state (H) itself; contains member functions `combine()`,
 //     `combine_contiguous()`, and `combine_unordered()`; and which you can use
 //     to contribute to an existing hash state when hashing your types.
 //
-// Unlike `std::hash` or other hashing frameworks, the Abseil hashing framework
+// Unlike `std::hash` or other hashing frameworks, the Turbo hashing framework
 // provides most of its utility by abstracting away the hash algorithm (and its
-// implementation) entirely. Instead, a type invokes the Abseil hashing
+// implementation) entirely. Instead, a type invokes the Turbo hashing
 // framework by simply combining its state with the state of known, hashable
 // types. Hashing of that combined state is separately done by `turbo::Hash`.
 //
@@ -60,14 +60,14 @@
 //   };
 //
 //   // To add hashing support to `Circle`, we simply need to add a free
-//   // (non-member) function `AbslHashValue()`, and return the combined hash
+//   // (non-member) function `TurboHashValue()`, and return the combined hash
 //   // state of the existing hash state and the class state. You can add such a
 //   // free function using a friend declaration within the body of the class:
 //   class Circle {
 //    public:
 //     ...
 //     template <typename H>
-//     friend H AbslHashValue(H h, const Circle& c) {
+//     friend H TurboHashValue(H h, const Circle& c) {
 //       return H::combine(std::move(h), c.center_, c.radius_);
 //     }
 //     ...
@@ -75,8 +75,8 @@
 //
 // For more information, see Adding Type Support to `turbo::Hash` below.
 //
-#ifndef ABSL_HASH_HASH_H_
-#define ABSL_HASH_HASH_H_
+#ifndef TURBO_HASH_HASH_H_
+#define TURBO_HASH_HASH_H_
 
 #include <tuple>
 #include <utility>
@@ -85,7 +85,7 @@
 #include "turbo/hash/internal/hash.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // `turbo::Hash`
@@ -95,7 +95,7 @@ ABSL_NAMESPACE_BEGIN
 // satisfying any of the following conditions (in order):
 //
 //  * T is an arithmetic or pointer type
-//  * T defines an overload for `AbslHashValue(H, const T&)` for an arbitrary
+//  * T defines an overload for `TurboHashValue(H, const T&)` for an arbitrary
 //    hash state `H`.
 //  - T defines a specialization of `std::hash<T>`
 //
@@ -147,12 +147,12 @@ ABSL_NAMESPACE_BEGIN
 // following order:
 //
 //   * Natively supported types out of the box (see above)
-//   * Types for which an `AbslHashValue()` overload is provided (such as
+//   * Types for which an `TurboHashValue()` overload is provided (such as
 //     user-defined types). See "Adding Type Support to `turbo::Hash`" below.
 //   * Types which define a `std::hash<T>` specialization
 //
 // The fallback to legacy hash functions exists mainly for backwards
-// compatibility. If you have a choice, prefer defining an `AbslHashValue`
+// compatibility. If you have a choice, prefer defining an `TurboHashValue`
 // overload instead of specializing any legacy hash functors.
 //
 // -----------------------------------------------------------------------------
@@ -166,11 +166,11 @@ ABSL_NAMESPACE_BEGIN
 //   state of an object. Note that it is up to the implementation how it stores
 //   such state. A hash table, for example, may mix the state to produce an
 //   integer value; a testing framework may simply hold a vector of that state.
-// * Within implementations of `AbslHashValue()` used to extend user-defined
+// * Within implementations of `TurboHashValue()` used to extend user-defined
 //   types. (See "Adding Type Support to turbo::Hash" below.)
 // * Inside a `HashState`, providing type erasure for the concept of a hash
 //   state, which you can use to extend the `turbo::Hash` framework for types
-//   that are otherwise difficult to extend using `AbslHashValue()`. (See the
+//   that are otherwise difficult to extend using `TurboHashValue()`. (See the
 //   `HashState` class below.)
 //
 // The "hash state" concept contains three member functions for mixing hash
@@ -221,27 +221,27 @@ ABSL_NAMESPACE_BEGIN
 // Adding Type Support to `turbo::Hash`
 // -----------------------------------------------------------------------------
 //
-// To add support for your user-defined type, add a proper `AbslHashValue()`
+// To add support for your user-defined type, add a proper `TurboHashValue()`
 // overload as a free (non-member) function. The overload will take an
 // existing hash state and should combine that state with state from the type.
 //
 // Example:
 //
 //   template <typename H>
-//   H AbslHashValue(H state, const MyType& v) {
+//   H TurboHashValue(H state, const MyType& v) {
 //     return H::combine(std::move(state), v.field1, ..., v.fieldN);
 //   }
 //
 // where `(field1, ..., fieldN)` are the members you would use on your
 // `operator==` to define equality.
 //
-// Notice that `AbslHashValue` is not a class member, but an ordinary function.
-// An `AbslHashValue` overload for a type should only be declared in the same
-// file and namespace as said type. The proper `AbslHashValue` implementation
+// Notice that `TurboHashValue` is not a class member, but an ordinary function.
+// An `TurboHashValue` overload for a type should only be declared in the same
+// file and namespace as said type. The proper `TurboHashValue` implementation
 // for a given type will be discovered via ADL.
 //
 // Note: unlike `std::hash', `turbo::Hash` should never be specialized. It must
-// only be extended by adding `AbslHashValue()` overloads.
+// only be extended by adding `TurboHashValue()` overloads.
 //
 template <typename T>
 using Hash = turbo::hash_internal::Hash<T>;
@@ -269,7 +269,7 @@ size_t HashOf(const Types&... values) {
 // HashState
 //
 // A type erased version of the hash state concept, for use in user-defined
-// `AbslHashValue` implementations that can't use templates (such as PImpl
+// `TurboHashValue` implementations that can't use templates (such as PImpl
 // classes, virtual functions, etc.). The type erasure adds overhead so it
 // should be avoided unless necessary.
 //
@@ -280,7 +280,7 @@ size_t HashOf(const Types&... values) {
 // All other calls will be handled internally and will not invoke overloads
 // provided by the wrapped class.
 //
-// Users of this class should still define a template `AbslHashValue` function,
+// Users of this class should still define a template `TurboHashValue` function,
 // but can use `turbo::HashState::Create(&state)` to erase the type of the hash
 // state and dispatch to their private hashing logic.
 //
@@ -292,7 +292,7 @@ size_t HashOf(const Types&... values) {
 //   class Interface {
 //    public:
 //     template <typename H>
-//     friend H AbslHashValue(H state, const Interface& value) {
+//     friend H TurboHashValue(H state, const Interface& value) {
 //       state = H::combine(std::move(state), std::type_index(typeid(*this)));
 //       value.HashValue(turbo::HashState::Create(&state));
 //       return state;
@@ -415,7 +415,7 @@ class HashState : public hash_internal::HashStateBase<HashState> {
       turbo::FunctionRef<void(HashState, turbo::FunctionRef<void(HashState&)>)>);
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HASH_HASH_H_
+#endif  // TURBO_HASH_HASH_H_

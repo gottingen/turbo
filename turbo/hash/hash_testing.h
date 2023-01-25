@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_HASH_HASH_TESTING_H_
-#define ABSL_HASH_HASH_TESTING_H_
+#ifndef TURBO_HASH_HASH_TESTING_H_
+#define TURBO_HASH_HASH_TESTING_H_
 
 #include <initializer_list>
 #include <tuple>
@@ -28,7 +28,7 @@
 #include "turbo/types/variant.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Run the turbo::Hash algorithm over all the elements passed in and verify that
 // their hash expansion is congruent with their `==` operator.
@@ -39,22 +39,22 @@ ABSL_NAMESPACE_BEGIN
 // Users should pass a collection of types as either an initializer list or a
 // container of cases.
 //
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
 //       {v1, v2, ..., vN}));
 //
 //   std::vector<MyType> cases;
 //   // Fill cases...
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(cases));
+//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(cases));
 //
 // Users can pass a variety of types for testing heterogeneous lookup with
 // `std::make_tuple`:
 //
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
 //       std::make_tuple(v1, v2, ..., vN)));
 //
 //
 // Ideally, the values passed should provide enough coverage of the `==`
-// operator and the AbslHashValue implementations.
+// operator and the TurboHashValue implementations.
 // For dynamically sized types, the empty state should usually be included in
 // the values.
 //
@@ -63,7 +63,7 @@ ABSL_NAMESPACE_BEGIN
 //
 // Usage:
 //
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
 //       std::make_tuple(v1, v2, ..., vN), MyCustomEq{}));
 //
 // It checks the following requirements:
@@ -73,11 +73,11 @@ ABSL_NAMESPACE_BEGIN
 //   3. If `a == b` evaluates to false their hash expansion must be unequal.
 //   4. If `a == b` evaluates to false neither hash expansion can be a
 //      suffix of the other.
-//   5. AbslHashValue overloads should not be called by the user. They are only
+//   5. TurboHashValue overloads should not be called by the user. They are only
 //      meant to be called by the framework. Users should call H::combine() and
 //      H::combine_contiguous().
 //   6. No moved-from instance of the hash state is used in the implementation
-//      of AbslHashValue.
+//      of TurboHashValue.
 //
 // The values do not have to have the same type. This can be useful for
 // equivalent types that support heterogeneous lookup.
@@ -89,7 +89,7 @@ ABSL_NAMESPACE_BEGIN
 // struct Bad2 {
 //   int a, b;
 //   template <typename H>
-//   friend H AbslHashValue(H state, Bad2 x) {
+//   friend H TurboHashValue(H state, Bad2 x) {
 //     // Uses a and b.
 //     return H::combine(std::move(state), x.a, x.b);
 //   }
@@ -106,7 +106,7 @@ ABSL_NAMESPACE_BEGIN
 // struct Bad3 {
 //   int a, b;
 //   template <typename H>
-//   friend H AbslHashValue(H state, Bad3 x) {
+//   friend H TurboHashValue(H state, Bad3 x) {
 //     // Only uses a.
 //     return H::combine(std::move(state), x.a);
 //   }
@@ -123,7 +123,7 @@ ABSL_NAMESPACE_BEGIN
 // struct Bad4 {
 //   int *p, size;
 //   template <typename H>
-//   friend H AbslHashValue(H state, Bad4 x) {
+//   friend H TurboHashValue(H state, Bad4 x) {
 //     return H::combine_contiguous(std::move(state), x.p, x.p + x.size);
 //   }
 //   friend bool operator==(Bad4 x, Bad4 y) {
@@ -135,26 +135,26 @@ ABSL_NAMESPACE_BEGIN
 // An easy solution to this is to combine the size after combining the range,
 // like so:
 // template <typename H>
-// friend H AbslHashValue(H state, Bad4 x) {
+// friend H TurboHashValue(H state, Bad4 x) {
 //   return H::combine(
 //       H::combine_contiguous(std::move(state), x.p, x.p + x.size), x.size);
 // }
 //
 template <int&... ExplicitBarrier, typename Container>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(const Container& values);
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(const Container& values);
 
 template <int&... ExplicitBarrier, typename Container, typename Eq>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(const Container& values, Eq equals);
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals);
 
 template <int&..., typename T>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(std::initializer_list<T> values);
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values);
 
 template <int&..., typename T, typename Eq>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(std::initializer_list<T> values,
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values,
                                       Eq equals);
 
 namespace hash_internal {
@@ -184,8 +184,8 @@ struct ExpandVisitor {
 };
 
 template <typename Container, typename Eq>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(const Container& values, Eq equals) {
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals) {
   using V = typename Container::value_type;
 
   struct Info {
@@ -229,7 +229,7 @@ VerifyTypeImplementsAbslHashCorrectly(const Container& values, Eq equals) {
   }
 
   // We assume that equality is correctly implemented.
-  // Now we verify that AbslHashValue is also correctly implemented.
+  // Now we verify that TurboHashValue is also correctly implemented.
 
   for (const auto& c : classes) {
     // All elements of the equivalence class must have the same hash
@@ -341,38 +341,38 @@ struct DefaultEquals {
 }  // namespace hash_internal
 
 template <int&..., typename Container>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(const Container& values) {
-  return hash_internal::VerifyTypeImplementsAbslHashCorrectly(
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(const Container& values) {
+  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
       hash_internal::ContainerAsVector<Container>::Do(values),
       hash_internal::DefaultEquals{});
 }
 
 template <int&..., typename Container, typename Eq>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(const Container& values, Eq equals) {
-  return hash_internal::VerifyTypeImplementsAbslHashCorrectly(
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals) {
+  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
       hash_internal::ContainerAsVector<Container>::Do(values), equals);
 }
 
 template <int&..., typename T>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(std::initializer_list<T> values) {
-  return hash_internal::VerifyTypeImplementsAbslHashCorrectly(
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values) {
+  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
       hash_internal::ContainerAsVector<std::initializer_list<T>>::Do(values),
       hash_internal::DefaultEquals{});
 }
 
 template <int&..., typename T, typename Eq>
-ABSL_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsAbslHashCorrectly(std::initializer_list<T> values,
+TURBO_MUST_USE_RESULT testing::AssertionResult
+VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values,
                                       Eq equals) {
-  return hash_internal::VerifyTypeImplementsAbslHashCorrectly(
+  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
       hash_internal::ContainerAsVector<std::initializer_list<T>>::Do(values),
       equals);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HASH_HASH_TESTING_H_
+#endif  // TURBO_HASH_HASH_TESTING_H_

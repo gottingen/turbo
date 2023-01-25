@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -32,8 +32,8 @@ cc_library(
         "internal/hash.h",
     ],
     hdrs = ["hash.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":city",
         ":low_level_hash",
@@ -56,7 +56,7 @@ cc_library(
     name = "hash_testing",
     testonly = 1,
     hdrs = ["hash_testing.h"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":spy_hash_state",
         "//turbo/meta:type_traits",
@@ -69,8 +69,8 @@ cc_library(
 cc_test(
     name = "hash_test",
     srcs = ["hash_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":hash",
         ":hash_testing",
@@ -92,8 +92,8 @@ cc_binary(
     name = "hash_benchmark",
     testonly = 1,
     srcs = ["hash_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -112,8 +112,8 @@ cc_library(
     name = "spy_hash_state",
     testonly = 1,
     hdrs = ["internal/spy_hash_state.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":hash",
@@ -128,8 +128,8 @@ cc_library(
     hdrs = [
         "internal/city.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -140,8 +140,8 @@ cc_library(
 cc_test(
     name = "city_test",
     srcs = ["internal/city_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":city",
         "@com_google_googletest//:gtest_main",
@@ -152,8 +152,8 @@ cc_library(
     name = "low_level_hash",
     srcs = ["internal/low_level_hash.cc"],
     hdrs = ["internal/low_level_hash.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base:config",
@@ -165,8 +165,8 @@ cc_library(
 cc_test(
     name = "low_level_hash_test",
     srcs = ["internal/low_level_hash_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":low_level_hash",

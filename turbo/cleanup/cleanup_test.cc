@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors.
+// Copyright 2021 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ TYPED_TEST(CleanupTest, FactoryProducesCorrectType) {
   }
 }
 
-#if defined(ABSL_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
+#if defined(TURBO_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
 TYPED_TEST(CleanupTest, CTADProducesCorrectType) {
   {
     auto callback = TypeParam::AsCallback([] {});
@@ -186,7 +186,7 @@ TYPED_TEST(CleanupTest, FactoryAndCTADProduceSameType) {
         IsSame<decltype(factory_cleanup), decltype(deduction_cleanup)>(), "");
   }
 }
-#endif  // defined(ABSL_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
+#endif  // defined(TURBO_HAVE_CLASS_TEMPLATE_ARGUMENT_DEDUCTION)
 
 TYPED_TEST(CleanupTest, BasicUsage) {
   bool called = false;

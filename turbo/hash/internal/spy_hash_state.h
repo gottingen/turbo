@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_HASH_INTERNAL_SPY_HASH_STATE_H_
-#define ABSL_HASH_INTERNAL_SPY_HASH_STATE_H_
+#ifndef TURBO_HASH_INTERNAL_SPY_HASH_STATE_H_
+#define TURBO_HASH_INTERNAL_SPY_HASH_STATE_H_
 
 #include <algorithm>
 #include <ostream>
@@ -26,14 +26,14 @@
 #include "turbo/strings/str_join.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 
 // SpyHashState is an implementation of the HashState API that simply
 // accumulates all input bytes in an internal buffer. This makes it useful
-// for testing AbslHashValue overloads (so long as they are templated on the
+// for testing TurboHashValue overloads (so long as they are templated on the
 // HashState parameter), since it can report the exact hash representation
-// that the AbslHashValue overload produces.
+// that the TurboHashValue overload produces.
 //
 // Sample usage:
 // EXPECT_EQ(SpyHashState::combine(SpyHashState(), foo),
@@ -74,22 +74,22 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
                                   const Args&... args) {
     // Pass an instance of SpyHashStateImpl<A> when trying to combine `A`. This
     // allows us to test that the user only uses this instance for combine calls
-    // and does not call AbslHashValue directly.
-    // See AbslHashValue implementation at the bottom.
+    // and does not call TurboHashValue directly.
+    // See TurboHashValue implementation at the bottom.
     s = SpyHashStateImpl<A>::HashStateBase::combine(std::move(s), a);
     return SpyHashStateImpl::combine(std::move(s), args...);
   }
   static SpyHashStateImpl combine(SpyHashStateImpl s) {
-    if (direct_absl_hash_value_error_) {
-      *s.error_ = "AbslHashValue should not be invoked directly.";
+    if (direct_turbo_hash_value_error_) {
+      *s.error_ = "TurboHashValue should not be invoked directly.";
     } else if (s.moved_from_) {
       *s.error_ = "Used moved-from instance of the hash state object.";
     }
     return s;
   }
 
-  static void SetDirectAbslHashValueError() {
-    direct_absl_hash_value_error_ = true;
+  static void SetDirectTurboHashValueError() {
+    direct_turbo_hash_value_error_ = true;
   }
 
   // Two SpyHashStateImpl objects are equal if they hold equal hash
@@ -214,9 +214,9 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
   };
 
   // This is true if SpyHashStateImpl<T> has been passed to a call of
-  // AbslHashValue with the wrong type. This detects that the user called
-  // AbslHashValue directly (because the hash state type does not match).
-  static bool direct_absl_hash_value_error_;
+  // TurboHashValue with the wrong type. This detects that the user called
+  // TurboHashValue directly (because the hash state type does not match).
+  static bool direct_turbo_hash_value_error_;
 
   std::vector<std::string> hash_representation_;
   // This is a shared_ptr because we want all instances of the particular
@@ -227,7 +227,7 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
 };
 
 template <typename T>
-bool SpyHashStateImpl<T>::direct_absl_hash_value_error_;
+bool SpyHashStateImpl<T>::direct_turbo_hash_value_error_;
 
 template <bool& B>
 struct OdrUse {
@@ -254,13 +254,13 @@ template <
     //  - Second, it triggers a SFINAE error disabling the overload to prevent
     //    compile time errors. If we didn't disable the overload we would get
     //    ambiguous overload errors, which we don't want.
-    int = RunOnStartup<SpyHashStateImpl<T>::SetDirectAbslHashValueError>::run>
-void AbslHashValue(SpyHashStateImpl<T>, const U&);
+    int = RunOnStartup<SpyHashStateImpl<T>::SetDirectTurboHashValueError>::run>
+void TurboHashValue(SpyHashStateImpl<T>, const U&);
 
 using SpyHashState = SpyHashStateImpl<void>;
 
 }  // namespace hash_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HASH_INTERNAL_SPY_HASH_STATE_H_
+#endif  // TURBO_HASH_INTERNAL_SPY_HASH_STATE_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ TYPED_TEST(Uint128FloatTraitsTest, ConstructAssignTest) {
                 "TypeParam must not be assignable from turbo::uint128");
 }
 
-#ifdef ABSL_HAVE_INTRINSIC_INT128
+#ifdef TURBO_HAVE_INTRINSIC_INT128
 // These type traits done separately as TYPED_TEST requires typeinfo, and not
 // all platforms have this for __int128 even though they define the type.
 TEST(Uint128, IntrinsicTypeTraitsTest) {
@@ -91,7 +91,7 @@ TEST(Uint128, IntrinsicTypeTraitsTest) {
   static_assert(!std::is_assignable<unsigned __int128&, turbo::uint128>::value,
                 "unsigned __int128 must not be assignable from turbo::uint128");
 }
-#endif  // ABSL_HAVE_INTRINSIC_INT128
+#endif  // TURBO_HAVE_INTRINSIC_INT128
 
 TEST(Uint128, TrivialTraitsTest) {
   static_assert(turbo::is_trivially_default_constructible<turbo::uint128>::value,
@@ -260,7 +260,7 @@ TEST(Int128, RightShiftOfNegativeNumbers) {
 TEST(Uint128, ConversionTests) {
   EXPECT_TRUE(turbo::MakeUint128(1, 0));
 
-#ifdef ABSL_HAVE_INTRINSIC_INT128
+#ifdef TURBO_HAVE_INTRINSIC_INT128
   unsigned __int128 intrinsic =
       (static_cast<unsigned __int128>(0x3a5b76c209de76f6) << 64) +
       0x1f25e1d63a2b46c5;
@@ -271,7 +271,7 @@ TEST(Uint128, ConversionTests) {
   EXPECT_EQ(custom, turbo::uint128(static_cast<__int128>(intrinsic)));
   EXPECT_EQ(intrinsic, static_cast<unsigned __int128>(custom));
   EXPECT_EQ(intrinsic, static_cast<__int128>(custom));
-#endif  // ABSL_HAVE_INTRINSIC_INT128
+#endif  // TURBO_HAVE_INTRINSIC_INT128
 
   // verify that an integer greater than 2**64 that can be stored precisely
   // inside a double is converted to a turbo::uint128 without loss of
@@ -478,7 +478,7 @@ TEST(Uint128, NumericLimitsTest) {
 }
 
 TEST(Uint128, Hash) {
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly({
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly({
       // Some simple values
       turbo::uint128{0},
       turbo::uint128{1},
@@ -560,7 +560,7 @@ TYPED_TEST(Int128FloatTraitsTest, ConstructAssignTest) {
                 "TypeParam must not be assignable from turbo::int128");
 }
 
-#ifdef ABSL_HAVE_INTRINSIC_INT128
+#ifdef TURBO_HAVE_INTRINSIC_INT128
 // These type traits done separately as TYPED_TEST requires typeinfo, and not
 // all platforms have this for __int128 even though they define the type.
 TEST(Int128, IntrinsicTypeTraitsTest) {
@@ -578,7 +578,7 @@ TEST(Int128, IntrinsicTypeTraitsTest) {
   static_assert(!std::is_assignable<unsigned __int128&, turbo::int128>::value,
                 "unsigned __int128 must not be assignable from turbo::int128");
 }
-#endif  // ABSL_HAVE_INTRINSIC_INT128
+#endif  // TURBO_HAVE_INTRINSIC_INT128
 
 TEST(Int128, TrivialTraitsTest) {
   static_assert(turbo::is_trivially_default_constructible<turbo::int128>::value,
@@ -726,7 +726,7 @@ TEST(Int128, LimitsTest) {
   EXPECT_EQ(turbo::Int128Max(), ~turbo::Int128Min());
 }
 
-#if defined(ABSL_HAVE_INTRINSIC_INT128)
+#if defined(TURBO_HAVE_INTRINSIC_INT128)
 TEST(Int128, IntrinsicConversionTest) {
   __int128 intrinsic =
       (static_cast<__int128>(0x3a5b76c209de76f6) << 64) + 0x1f25e1d63a2b46c5;
@@ -736,7 +736,7 @@ TEST(Int128, IntrinsicConversionTest) {
   EXPECT_EQ(custom, turbo::int128(intrinsic));
   EXPECT_EQ(intrinsic, static_cast<__int128>(custom));
 }
-#endif  // ABSL_HAVE_INTRINSIC_INT128
+#endif  // TURBO_HAVE_INTRINSIC_INT128
 
 TEST(Int128, ConstexprTest) {
   constexpr turbo::int128 zero = turbo::int128();

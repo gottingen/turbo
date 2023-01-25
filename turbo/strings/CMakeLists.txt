@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     strings
   HDRS
@@ -23,7 +23,7 @@ absl_cc_library(
     "escaping.h"
     "internal/damerau_levenshtein_distance.h"
     "internal/string_constant.h"
-    "internal/has_absl_stringify.h"
+    "internal/has_turbo_stringify.h"
     "match.h"
     "numbers.h"
     "str_cat.h"
@@ -57,7 +57,7 @@ absl_cc_library(
     "string_view.cc"
     "substitute.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::strings_internal
     turbo::base
@@ -74,7 +74,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     strings_internal
   HDRS
@@ -88,7 +88,7 @@ absl_cc_library(
     "internal/ostringstream.cc"
     "internal/utf8.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -97,26 +97,26 @@ absl_cc_library(
     turbo::type_traits
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     match_test
   SRCS
     "match_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::base
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     escaping_test
   SRCS
     "escaping_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::core_headers
@@ -124,53 +124,53 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     ascii_test
   SRCS
     "ascii_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::core_headers
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     damerau_levenshtein_distance_test
   SRCS
     "internal/damerau_levenshtein_distance_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::base
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     memutil_test
   SRCS
     "internal/memutil.h"
     "internal/memutil_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::core_headers
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     utf8_test
   SRCS
     "internal/utf8_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings_internal
     turbo::base
@@ -178,26 +178,26 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     string_constant_test
   SRCS
     "internal/string_constant_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::type_traits
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     string_view_test
   SRCS
     "string_view_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::config
@@ -206,38 +206,38 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     substitute_test
   SRCS
     "substitute_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::core_headers
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_replace_test
   SRCS
     "str_replace_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_split_test
   SRCS
     "str_split_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::core_headers
@@ -248,26 +248,26 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     ostringstream_test
   SRCS
     "internal/ostringstream_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings_internal
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     resize_uninitialized_test
   SRCS
     "internal/resize_uninitialized.h"
     "internal/resize_uninitialized_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::core_headers
@@ -275,13 +275,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_join_test
   SRCS
     "str_join_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::base
@@ -290,13 +290,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_cat_test
   SRCS
     "str_cat_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::str_format
@@ -304,14 +304,14 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     numbers_test
   SRCS
     "internal/numbers_test_common.h"
     "numbers_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::core_headers
@@ -324,38 +324,38 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     strip_test
   SRCS
     "strip_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::base
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     char_map_test
   SRCS
     "internal/char_map_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings_internal
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     charconv_test
   SRCS
     "charconv_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::str_format
@@ -363,14 +363,14 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     charconv_parse_test
   SRCS
     "internal/charconv_parse.h"
     "internal/charconv_parse_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::config
@@ -378,7 +378,7 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     charconv_bigint_test
   SRCS
@@ -386,27 +386,27 @@ absl_cc_test(
     "internal/charconv_bigint_test.cc"
     "internal/charconv_parse.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::config
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     str_format
   HDRS
     "str_format.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::str_format_internal
   PUBLIC
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     str_format_internal
   HDRS
@@ -426,7 +426,7 @@ absl_cc_library(
     "internal/str_format/output.cc"
     "internal/str_format/parser.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::bits
     turbo::strings
@@ -439,13 +439,13 @@ absl_cc_library(
     turbo::span
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_test
   SRCS
     "str_format_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::str_format
     turbo::cord
@@ -454,13 +454,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_extension_test
   SRCS
     "internal/str_format/extension_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::str_format
     turbo::str_format_internal
@@ -468,50 +468,50 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_arg_test
   SRCS
     "internal/str_format/arg_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::str_format
     turbo::str_format_internal
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_bind_test
   SRCS
     "internal/str_format/bind_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::str_format_internal
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_checker_test
   SRCS
     "internal/str_format/checker_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::str_format
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_convert_test
   SRCS
     "internal/str_format/convert_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::strings
     turbo::str_format_internal
@@ -521,26 +521,26 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_output_test
   SRCS
     "internal/str_format/output_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::str_format_internal
     turbo::cord
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     str_format_parser_test
   SRCS
     "internal/str_format/parser_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::str_format_internal
     turbo::core_headers
@@ -548,7 +548,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     pow10_helper
   HDRS
@@ -556,19 +556,19 @@ absl_cc_library(
   SRCS
     "internal/pow10_helper.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
   TESTONLY
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     pow10_helper_test
   SRCS
     "internal/pow10_helper_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::pow10_helper
     turbo::str_format
@@ -576,7 +576,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cord_internal
   HDRS
@@ -599,7 +599,7 @@ absl_cc_library(
     "internal/cord_rep_consume.cc"
     "internal/cord_rep_ring.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base_internal
     turbo::compressed_tuple
@@ -616,24 +616,24 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_update_tracker
   HDRS
     "internal/cordz_update_tracker.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_update_tracker_test
   SRCS
     "internal/cordz_update_tracker_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cordz_update_tracker
@@ -643,7 +643,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_functions
   HDRS
@@ -651,7 +651,7 @@ absl_cc_library(
   SRCS
     "internal/cordz_functions.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -659,7 +659,7 @@ absl_cc_library(
     turbo::raw_logging_internal
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_functions_test
   SRCS
@@ -672,13 +672,13 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_statistics
   HDRS
     "internal/cordz_statistics.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -687,7 +687,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_handle
   HDRS
@@ -695,7 +695,7 @@ absl_cc_library(
   SRCS
     "internal/cordz_handle.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -703,7 +703,7 @@ absl_cc_library(
     turbo::synchronization
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_handle_test
   SRCS
@@ -721,7 +721,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_info
   HDRS
@@ -729,7 +729,7 @@ absl_cc_library(
   SRCS
     "internal/cordz_info.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -746,13 +746,13 @@ absl_cc_library(
     turbo::synchronization
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_info_test
   SRCS
     "internal/cordz_info_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord_internal
@@ -768,13 +768,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_info_statistics_test
   SRCS
     "internal/cordz_info_statistics_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord
@@ -790,7 +790,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_sample_token
   HDRS
@@ -798,20 +798,20 @@ absl_cc_library(
   SRCS
     "internal/cordz_sample_token.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::cordz_handle
     turbo::cordz_info
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_sample_token_test
   SRCS
     "internal/cordz_sample_token_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord_internal
@@ -829,13 +829,13 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_update_scope
   HDRS
     "internal/cordz_update_scope.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::cord_internal
@@ -844,13 +844,13 @@ absl_cc_library(
     turbo::core_headers
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_update_scope_test
   SRCS
     "internal/cordz_update_scope_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord_internal
@@ -862,7 +862,7 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     cord
   HDRS
@@ -874,7 +874,7 @@ absl_cc_library(
     "cord_analysis.h"
     "cord_buffer.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -898,13 +898,13 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cord_rep_test_util
   HDRS
     "internal/cord_rep_test_util.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord_internal
@@ -913,13 +913,13 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     cord_test_helpers
   HDRS
     "cord_test_helpers.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord
@@ -930,13 +930,13 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cordz_test_helpers
   HDRS
     "cordz_test_helpers.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord
@@ -950,13 +950,13 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_test
   SRCS
     "cord_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::cord
     turbo::str_format
@@ -974,13 +974,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_data_edge_test
   SRCS
     "internal/cord_data_edge_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -991,13 +991,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_rep_btree_test
   SRCS
     "internal/cord_rep_btree_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::cleanup
@@ -1010,13 +1010,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_rep_btree_navigator_test
   SRCS
     "internal/cord_rep_btree_navigator_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -1028,13 +1028,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_rep_btree_reader_test
   SRCS
     "internal/cord_rep_btree_reader_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -1046,13 +1046,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_rep_crc_test
   SRCS
     "internal/cord_rep_crc_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::cord_internal
@@ -1061,13 +1061,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_ring_test
   SRCS
     "cord_ring_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::config
@@ -1078,13 +1078,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cord_ring_reader_test
   SRCS
     "cord_ring_reader_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::cord_internal
@@ -1093,13 +1093,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cordz_test
   SRCS
     "cordz_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::cord
     turbo::cord_test_helpers

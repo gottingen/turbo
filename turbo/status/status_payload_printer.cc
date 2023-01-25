@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 #include "turbo/base/internal/atomic_hook.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace status_internal {
 
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
 static turbo::base_internal::AtomicHook<StatusPayloadPrinter> storage;
 
 void SetStatusPayloadPrinter(StatusPayloadPrinter printer) {
@@ -34,5 +34,5 @@ StatusPayloadPrinter GetStatusPayloadPrinter() {
 }
 
 }  // namespace status_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

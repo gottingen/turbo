@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@
 //
 // This utility is internal-only. Use at your own risk.
 
-#ifndef ABSL_CONTAINER_INTERNAL_HASHTABLEZ_SAMPLER_H_
-#define ABSL_CONTAINER_INTERNAL_HASHTABLEZ_SAMPLER_H_
+#ifndef TURBO_CONTAINER_INTERNAL_HASHTABLEZ_SAMPLER_H_
+#define TURBO_CONTAINER_INTERNAL_HASHTABLEZ_SAMPLER_H_
 
 #include <atomic>
 #include <functional>
@@ -52,7 +52,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // Stores information about a sampled hashtable.  All mutations to this *must*
@@ -68,7 +68,7 @@ struct HashtablezInfo : public profiling_internal::Sample<HashtablezInfo> {
   // Puts the object into a clean state, fills in the logically `const` members,
   // blocking for any readers that are currently sampling the object.
   void PrepareForSampling(int64_t stride, size_t inline_element_size_value)
-      ABSL_EXCLUSIVE_LOCKS_REQUIRED(init_mu);
+      TURBO_EXCLUSIVE_LOCKS_REQUIRED(init_mu);
 
   // These fields are mutated by the various Record* APIs and need to be
   // thread-safe.
@@ -120,11 +120,11 @@ HashtablezInfo* SampleSlow(SamplingState& next_sample,
                            size_t inline_element_size);
 void UnsampleSlow(HashtablezInfo* info);
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
-#error ABSL_INTERNAL_HASHTABLEZ_SAMPLE cannot be directly set
-#endif  // defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
+#error TURBO_INTERNAL_HASHTABLEZ_SAMPLE cannot be directly set
+#endif  // defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 class HashtablezInfoHandle {
  public:
   explicit HashtablezInfoHandle() : info_(nullptr) {}
@@ -133,7 +133,7 @@ class HashtablezInfoHandle {
   // We do not have a destructor. Caller is responsible for calling Unregister
   // before destroying the handle.
   void Unregister() {
-    if (ABSL_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
     UnsampleSlow(info_);
   }
 
@@ -143,7 +143,7 @@ class HashtablezInfoHandle {
   HashtablezInfoHandle(HashtablezInfoHandle&& o) noexcept
       : info_(turbo::exchange(o.info_, nullptr)) {}
   HashtablezInfoHandle& operator=(HashtablezInfoHandle&& o) noexcept {
-    if (ABSL_PREDICT_FALSE(info_ != nullptr)) {
+    if (TURBO_PREDICT_FALSE(info_ != nullptr)) {
       UnsampleSlow(info_);
     }
     info_ = turbo::exchange(o.info_, nullptr);
@@ -151,32 +151,32 @@ class HashtablezInfoHandle {
   }
 
   inline void RecordStorageChanged(size_t size, size_t capacity) {
-    if (ABSL_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
     RecordStorageChangedSlow(info_, size, capacity);
   }
 
   inline void RecordRehash(size_t total_probe_length) {
-    if (ABSL_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
     RecordRehashSlow(info_, total_probe_length);
   }
 
   inline void RecordReservation(size_t target_capacity) {
-    if (ABSL_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
     RecordReservationSlow(info_, target_capacity);
   }
 
   inline void RecordClearedReservation() {
-    if (ABSL_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
     RecordClearedReservationSlow(info_);
   }
 
   inline void RecordInsert(size_t hash, size_t distance_from_desired) {
-    if (ABSL_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
     RecordInsertSlow(info_, hash, distance_from_desired);
   }
 
   inline void RecordErase() {
-    if (ABSL_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
     RecordEraseSlow(info_);
   }
 
@@ -208,25 +208,25 @@ class HashtablezInfoHandle {
   friend inline void swap(HashtablezInfoHandle& /*lhs*/,
                           HashtablezInfoHandle& /*rhs*/) {}
 };
-#endif  // defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#endif  // defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
-extern ABSL_PER_THREAD_TLS_KEYWORD SamplingState global_next_sample;
-#endif  // defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
+extern TURBO_PER_THREAD_TLS_KEYWORD SamplingState global_next_sample;
+#endif  // defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 
 // Returns an RAII sampling handle that manages registration and unregistation
 // with the global sampler.
 inline HashtablezInfoHandle Sample(
-    size_t inline_element_size ABSL_ATTRIBUTE_UNUSED) {
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
-  if (ABSL_PREDICT_TRUE(--global_next_sample.next_sample > 0)) {
+    size_t inline_element_size TURBO_ATTRIBUTE_UNUSED) {
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
+  if (TURBO_PREDICT_TRUE(--global_next_sample.next_sample > 0)) {
     return HashtablezInfoHandle(nullptr);
   }
   return HashtablezInfoHandle(
       SampleSlow(global_next_sample, inline_element_size));
 #else
   return HashtablezInfoHandle(nullptr);
-#endif  // !ABSL_PER_THREAD_TLS
+#endif  // !TURBO_PER_THREAD_TLS
 }
 
 using HashtablezSampler =
@@ -258,10 +258,10 @@ void SetHashtablezMaxSamplesInternal(size_t max);
 // initialization of static storage duration objects.
 // The definition of this constant is weak, which allows us to inject a
 // different value for it at link time.
-extern "C" bool ABSL_INTERNAL_C_SYMBOL(AbslContainerInternalSampleEverything)();
+extern "C" bool TURBO_INTERNAL_C_SYMBOL(TurboContainerInternalSampleEverything)();
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_HASHTABLEZ_SAMPLER_H_
+#endif  // TURBO_CONTAINER_INTERNAL_HASHTABLEZ_SAMPLER_H_

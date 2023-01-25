@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef ABSL_STATUS_STATUS_PAYLOAD_PRINTER_H_
-#define ABSL_STATUS_STATUS_PAYLOAD_PRINTER_H_
+#ifndef TURBO_STATUS_STATUS_PAYLOAD_PRINTER_H_
+#define TURBO_STATUS_STATUS_PAYLOAD_PRINTER_H_
 
 #include <string>
 
@@ -21,7 +21,7 @@
 #include "turbo/types/optional.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace status_internal {
 
 // By default, `Status::ToString` and `operator<<(Status)` print a payload by
@@ -45,7 +45,7 @@ void SetStatusPayloadPrinter(StatusPayloadPrinter);
 StatusPayloadPrinter GetStatusPayloadPrinter();
 
 }  // namespace status_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STATUS_STATUS_PAYLOAD_PRINTER_H_
+#endif  // TURBO_STATUS_STATUS_PAYLOAD_PRINTER_H_

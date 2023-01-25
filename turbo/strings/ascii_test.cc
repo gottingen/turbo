@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -345,7 +345,7 @@ TEST(RemoveExtraAsciiWhitespace, InPlace) {
       "",
       "a\nb",
   };
-  const int NUM_TESTS = ABSL_ARRAYSIZE(inputs);
+  const int NUM_TESTS = TURBO_ARRAYSIZE(inputs);
 
   for (int i = 0; i < NUM_TESTS; i++) {
     std::string s(inputs[i]);

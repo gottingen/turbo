@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 #include "turbo/strings/numbers.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 namespace {
 
@@ -375,7 +375,7 @@ bool ConvertIntArg(T v, FormatConversionSpecImpl conv, FormatSinkImpl *sink) {
       return ConvertFloatImpl(static_cast<double>(v), conv, sink);
 
     default:
-      ABSL_ASSUME(false);
+      TURBO_ASSUME(false);
   }
 
   if (conv.is_basic()) {
@@ -545,11 +545,11 @@ IntegralConvertResult FormatConvertImpl(turbo::uint128 v,
   return {ConvertIntArg(v, conv, sink)};
 }
 
-ABSL_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_();
+TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_();
 
 
 
 }  // namespace str_format_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

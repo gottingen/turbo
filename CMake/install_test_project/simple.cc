@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
 #include "turbo/base/config.h"
 #include "turbo/strings/substitute.h"
 
-#if !defined(ABSL_LTS_RELEASE_VERSION) || ABSL_LTS_RELEASE_VERSION != 99998877
-#error ABSL_LTS_RELEASE_VERSION is not set correctly.
+#if !defined(TURBO_LTS_RELEASE_VERSION) || TURBO_LTS_RELEASE_VERSION != 99998877
+#error TURBO_LTS_RELEASE_VERSION is not set correctly.
 #endif
 
-#if !defined(ABSL_LTS_RELEASE_PATCH_LEVEL) || ABSL_LTS_RELEASE_PATCH_LEVEL != 0
-#error ABSL_LTS_RELEASE_PATCH_LEVEL is not set correctly.
+#if !defined(TURBO_LTS_RELEASE_PATCH_LEVEL) || TURBO_LTS_RELEASE_PATCH_LEVEL != 0
+#error TURBO_LTS_RELEASE_PATCH_LEVEL is not set correctly.
 #endif
 
 int main(int argc, char** argv) {

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 // acquire any locks, and can therefore be used by low-level memory
 // allocation, synchronization, and signal-handling code.
 
-#ifndef ABSL_BASE_INTERNAL_RAW_LOGGING_H_
-#define ABSL_BASE_INTERNAL_RAW_LOGGING_H_
+#ifndef TURBO_BASE_INTERNAL_RAW_LOGGING_H_
+#define TURBO_BASE_INTERNAL_RAW_LOGGING_H_
 
 #include <string>
 
@@ -37,32 +37,32 @@
 // * it uses an explicit printf-format and arguments list
 // * it will silently chop off really long message strings
 // Usage example:
-//   ABSL_RAW_LOG(ERROR, "Failed foo with %i: %s", status, error);
+//   TURBO_RAW_LOG(ERROR, "Failed foo with %i: %s", status, error);
 // This will print an almost standard log line like this to stderr only:
 //   E0821 211317 file.cc:123] RAW: Failed foo with 22: bad_file
 
-#define ABSL_RAW_LOG(severity, ...)                                            \
+#define TURBO_RAW_LOG(severity, ...)                                            \
   do {                                                                         \
-    constexpr const char* absl_raw_log_internal_basename =                     \
+    constexpr const char* turbo_raw_log_internal_basename =                     \
         ::turbo::raw_log_internal::Basename(__FILE__, sizeof(__FILE__) - 1);    \
-    ::turbo::raw_log_internal::RawLog(ABSL_RAW_LOG_INTERNAL_##severity,         \
-                                     absl_raw_log_internal_basename, __LINE__, \
+    ::turbo::raw_log_internal::RawLog(TURBO_RAW_LOG_INTERNAL_##severity,         \
+                                     turbo_raw_log_internal_basename, __LINE__, \
                                      __VA_ARGS__);                             \
   } while (0)
 
 // Similar to CHECK(condition) << message, but for low-level modules:
-// we use only ABSL_RAW_LOG that does not allocate memory.
+// we use only TURBO_RAW_LOG that does not allocate memory.
 // We do not want to provide args list here to encourage this usage:
-//   if (!cond)  ABSL_RAW_LOG(FATAL, "foo ...", hard_to_compute_args);
+//   if (!cond)  TURBO_RAW_LOG(FATAL, "foo ...", hard_to_compute_args);
 // so that the args are not computed when not needed.
-#define ABSL_RAW_CHECK(condition, message)                             \
+#define TURBO_RAW_CHECK(condition, message)                             \
   do {                                                                 \
-    if (ABSL_PREDICT_FALSE(!(condition))) {                            \
-      ABSL_RAW_LOG(FATAL, "Check %s failed: %s", #condition, message); \
+    if (TURBO_PREDICT_FALSE(!(condition))) {                            \
+      TURBO_RAW_LOG(FATAL, "Check %s failed: %s", #condition, message); \
     }                                                                  \
   } while (0)
 
-// ABSL_INTERNAL_LOG and ABSL_INTERNAL_CHECK work like the RAW variants above,
+// TURBO_INTERNAL_LOG and TURBO_INTERNAL_CHECK work like the RAW variants above,
 // except that if the richer log library is linked into the binary, we dispatch
 // to that instead.  This is potentially useful for internal logging and
 // assertions, where we are using RAW_LOG neither for its async-signal-safety
@@ -71,42 +71,42 @@
 //
 // The API is a subset of the above: each macro only takes two arguments.  Use
 // StrCat if you need to build a richer message.
-#define ABSL_INTERNAL_LOG(severity, message)                              \
+#define TURBO_INTERNAL_LOG(severity, message)                              \
   do {                                                                    \
-    constexpr const char* absl_raw_log_internal_filename = __FILE__;      \
+    constexpr const char* turbo_raw_log_internal_filename = __FILE__;      \
     ::turbo::raw_log_internal::internal_log_function(                      \
-        ABSL_RAW_LOG_INTERNAL_##severity, absl_raw_log_internal_filename, \
+        TURBO_RAW_LOG_INTERNAL_##severity, turbo_raw_log_internal_filename, \
         __LINE__, message);                                               \
-    if (ABSL_RAW_LOG_INTERNAL_##severity == ::turbo::LogSeverity::kFatal)  \
-      ABSL_UNREACHABLE();                                                 \
+    if (TURBO_RAW_LOG_INTERNAL_##severity == ::turbo::LogSeverity::kFatal)  \
+      TURBO_UNREACHABLE();                                                 \
   } while (0)
 
-#define ABSL_INTERNAL_CHECK(condition, message)                    \
+#define TURBO_INTERNAL_CHECK(condition, message)                    \
   do {                                                             \
-    if (ABSL_PREDICT_FALSE(!(condition))) {                        \
+    if (TURBO_PREDICT_FALSE(!(condition))) {                        \
       std::string death_message = "Check " #condition " failed: "; \
       death_message += std::string(message);                       \
-      ABSL_INTERNAL_LOG(FATAL, death_message);                     \
+      TURBO_INTERNAL_LOG(FATAL, death_message);                     \
     }                                                              \
   } while (0)
 
-#define ABSL_RAW_LOG_INTERNAL_INFO ::turbo::LogSeverity::kInfo
-#define ABSL_RAW_LOG_INTERNAL_WARNING ::turbo::LogSeverity::kWarning
-#define ABSL_RAW_LOG_INTERNAL_ERROR ::turbo::LogSeverity::kError
-#define ABSL_RAW_LOG_INTERNAL_FATAL ::turbo::LogSeverity::kFatal
-#define ABSL_RAW_LOG_INTERNAL_LEVEL(severity) \
+#define TURBO_RAW_LOG_INTERNAL_INFO ::turbo::LogSeverity::kInfo
+#define TURBO_RAW_LOG_INTERNAL_WARNING ::turbo::LogSeverity::kWarning
+#define TURBO_RAW_LOG_INTERNAL_ERROR ::turbo::LogSeverity::kError
+#define TURBO_RAW_LOG_INTERNAL_FATAL ::turbo::LogSeverity::kFatal
+#define TURBO_RAW_LOG_INTERNAL_LEVEL(severity) \
   ::turbo::NormalizeLogSeverity(severity)
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace raw_log_internal {
 
-// Helper function to implement ABSL_RAW_LOG
+// Helper function to implement TURBO_RAW_LOG
 // Logs format... at "severity" level, reporting it
 // as called from file:line.
 // This does not allocate memory or acquire locks.
 void RawLog(turbo::LogSeverity severity, const char* file, int line,
-            const char* format, ...) ABSL_PRINTF_ATTRIBUTE(4, 5);
+            const char* format, ...) TURBO_PRINTF_ATTRIBUTE(4, 5);
 
 // Writes the provided buffer directly to stderr, in a signal-safe, low-level
 // manner.
@@ -142,7 +142,7 @@ bool RawLoggingFullySupported();
 // hooks must avoid these operations, and must not throw exceptions.
 //
 // 'severity' is the severity level of the message being written.
-// 'file' and 'line' are the file and line number where the ABSL_RAW_LOG macro
+// 'file' and 'line' are the file and line number where the TURBO_RAW_LOG macro
 // was located.
 // 'buf' and 'buf_size' are pointers to the buffer and buffer size.  If the
 // hook writes a prefix, it must increment *buf and decrement *buf_size
@@ -155,7 +155,7 @@ using LogFilterAndPrefixHook = bool (*)(turbo::LogSeverity severity,
 // when a FATAL message is logged.  If the provided AbortHook() returns, the
 // logging system will call abort().
 //
-// 'file' and 'line' are the file and line number where the ABSL_RAW_LOG macro
+// 'file' and 'line' are the file and line number where the TURBO_RAW_LOG macro
 // was located.
 // The NUL-terminated logged message lives in the buffer between 'buf_start'
 // and 'buf_end'.  'prefix_end' points to the first non-prefix character of the
@@ -166,7 +166,7 @@ using LogFilterAndPrefixHook = bool (*)(turbo::LogSeverity severity,
 using AbortHook = void (*)(const char* file, int line, const char* buf_start,
                            const char* prefix_end, const char* buf_end);
 
-// Internal logging function for ABSL_INTERNAL_LOG to dispatch to.
+// Internal logging function for TURBO_INTERNAL_LOG to dispatch to.
 //
 // TODO(gfalcon): When string_view no longer depends on base, change this
 // interface to take its message as a string_view instead.
@@ -174,7 +174,7 @@ using InternalLogFunction = void (*)(turbo::LogSeverity severity,
                                      const char* file, int line,
                                      const std::string& message);
 
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES ABSL_DLL extern base_internal::AtomicHook<
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL extern base_internal::AtomicHook<
     InternalLogFunction>
     internal_log_function;
 
@@ -189,7 +189,7 @@ void RegisterAbortHook(AbortHook func);
 void RegisterInternalLogFunction(InternalLogFunction func);
 
 }  // namespace raw_log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_RAW_LOGGING_H_
+#endif  // TURBO_BASE_INTERNAL_RAW_LOGGING_H_

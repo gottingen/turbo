@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,10 +32,10 @@ using ::turbo::log_internal::MatchesOstream;
 using ::turbo::log_internal::TextMessage;
 using ::testing::Eq;
 
-auto *test_env ABSL_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto *test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
-// Abseil Logging library uses these by default, so we set them on the
+// Turbo Logging library uses these by default, so we set them on the
 // `std::ostream` we compare against too.
 std::ios &LoggingDefaults(std::ios &str) {
   str.setf(std::ios_base::showbase | std::ios_base::boolalpha |

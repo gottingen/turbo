@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // `turbo::string_view` must be copied if they are needed after the lifetime of
 // the `turbo::LogEntry`.
 
-#ifndef ABSL_LOG_LOG_ENTRY_H_
-#define ABSL_LOG_LOG_ENTRY_H_
+#ifndef TURBO_LOG_LOG_ENTRY_H_
+#define TURBO_LOG_LOG_ENTRY_H_
 
 #include <cstddef>
 #include <string>
@@ -36,7 +36,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace log_internal {
 // Test only friend.
@@ -72,10 +72,10 @@ class LogEntry final {
   // into a statically allocated character array obtained from `__FILE__`.
   // Statements like `LOG(INFO).AtLocation(std::string(...), ...)` will expose
   // the bug.  If you need the data later, you must copy them.
-  turbo::string_view source_filename() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  turbo::string_view source_filename() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return full_filename_;
   }
-  turbo::string_view source_basename() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  turbo::string_view source_basename() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return base_filename_;
   }
   int source_line() const { return line_; }
@@ -142,30 +142,30 @@ class LogEntry final {
   // The buffer does not outlive the entry; if you need the data later, you must
   // copy them.
   turbo::string_view text_message_with_prefix_and_newline() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+      TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return turbo::string_view(
         text_message_with_prefix_and_newline_and_nul_.data(),
         text_message_with_prefix_and_newline_and_nul_.size() - 1);
   }
   turbo::string_view text_message_with_prefix() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+      TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return turbo::string_view(
         text_message_with_prefix_and_newline_and_nul_.data(),
         text_message_with_prefix_and_newline_and_nul_.size() - 2);
   }
   turbo::string_view text_message_with_newline() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+      TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return turbo::string_view(
         text_message_with_prefix_and_newline_and_nul_.data() + prefix_len_,
         text_message_with_prefix_and_newline_and_nul_.size() - prefix_len_ - 1);
   }
-  turbo::string_view text_message() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  turbo::string_view text_message() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return turbo::string_view(
         text_message_with_prefix_and_newline_and_nul_.data() + prefix_len_,
         text_message_with_prefix_and_newline_and_nul_.size() - prefix_len_ - 2);
   }
   const char* text_message_with_prefix_and_newline_c_str() const
-      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+      TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return text_message_with_prefix_and_newline_and_nul_.data();
   }
 
@@ -174,7 +174,7 @@ class LogEntry final {
   //
   // The buffer does not outlive the entry; if you need the data later, you must
   // copy them.
-  turbo::string_view encoded_message() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  turbo::string_view encoded_message() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return encoding_;
   }
 
@@ -190,7 +190,7 @@ class LogEntry final {
   //
   // The buffer does not outlive the entry; if you need the data later, you must
   // copy them.
-  turbo::string_view stacktrace() const ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  turbo::string_view stacktrace() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return stacktrace_;
   }
 
@@ -214,7 +214,7 @@ class LogEntry final {
   friend class log_internal::LogMessage;
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_LOG_ENTRY_H_
+#endif  // TURBO_LOG_LOG_ENTRY_H_

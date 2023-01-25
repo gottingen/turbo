@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include "turbo/types/optional.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 namespace {
 
@@ -125,7 +125,7 @@ void StrAppendV(std::string *dst, const char *format, va_list ap) {
   delete[] buf;
 }
 
-void StrAppend(std::string *, const char *, ...) ABSL_PRINTF_ATTRIBUTE(2, 3);
+void StrAppend(std::string *, const char *, ...) TURBO_PRINTF_ATTRIBUTE(2, 3);
 void StrAppend(std::string *out, const char *format, ...) {
   va_list ap;
   va_start(ap, format);
@@ -133,7 +133,7 @@ void StrAppend(std::string *out, const char *format, ...) {
   va_end(ap);
 }
 
-std::string StrPrint(const char *, ...) ABSL_PRINTF_ATTRIBUTE(1, 2);
+std::string StrPrint(const char *, ...) TURBO_PRINTF_ATTRIBUTE(1, 2);
 std::string StrPrint(const char *format, ...) {
   va_list ap;
   va_start(ap, format);
@@ -232,9 +232,9 @@ TEST_F(FormatConvertTest, BasicString) {
   TestStringConvert(static_cast<const char*>("hello"));
   TestStringConvert(std::string("hello"));
   TestStringConvert(string_view("hello"));
-#if defined(ABSL_HAVE_STD_STRING_VIEW)
+#if defined(TURBO_HAVE_STD_STRING_VIEW)
   TestStringConvert(std::string_view("hello"));
-#endif  // ABSL_HAVE_STD_STRING_VIEW
+#endif  // TURBO_HAVE_STD_STRING_VIEW
 }
 
 TEST_F(FormatConvertTest, NullString) {
@@ -264,7 +264,7 @@ MATCHER_P(MatchesPointerString, ptr, "") {
   }
   void* parsed = nullptr;
   if (sscanf(arg.c_str(), "%p", &parsed) != 1) {
-    ABSL_RAW_LOG(FATAL, "Could not parse %s", arg.c_str());
+    TURBO_RAW_LOG(FATAL, "Could not parse %s", arg.c_str());
   }
   return ptr == parsed;
 }
@@ -1058,7 +1058,7 @@ TEST_F(FormatConvertTest, LongDoubleRoundA) {
 // We don't actually store the results. This is just to exercise the rest of the
 // machinery.
 struct NullSink {
-  friend void AbslFormatFlush(NullSink *sink, string_view str) {}
+  friend void TurboFormatFlush(NullSink *sink, string_view str) {}
 };
 
 template <typename... T>
@@ -1253,5 +1253,5 @@ TEST_F(FormatConvertTest, GlibcHasCorrectTraits) {
 
 }  // namespace
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <string>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 namespace {
@@ -158,12 +158,12 @@ const uint32_t* LargePowerOfFiveData(int i) {
 int LargePowerOfFiveSize(int i) { return 2 * i; }
 }  // namespace
 
-ABSL_DLL const uint32_t kFiveToNth[14] = {
+TURBO_DLL const uint32_t kFiveToNth[14] = {
     1,     5,      25,      125,     625,      3125,      15625,
     78125, 390625, 1953125, 9765625, 48828125, 244140625, 1220703125,
 };
 
-ABSL_DLL const uint32_t kTenToNth[10] = {
+TURBO_DLL const uint32_t kTenToNth[10] = {
     1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
 };
 
@@ -355,5 +355,5 @@ template class BigUnsigned<4>;
 template class BigUnsigned<84>;
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

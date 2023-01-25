@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 class CordRepBtreeTestPeer {
@@ -1564,5 +1564,5 @@ TEST(CordRepBtreeTest, ExtractAppendBufferShared) {
 
 }  // namespace
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

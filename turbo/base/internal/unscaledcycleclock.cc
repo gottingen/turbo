@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 #include "turbo/base/internal/unscaledcycleclock.h"
 
-#if ABSL_USE_UNSCALED_CYCLECLOCK
+#if TURBO_USE_UNSCALED_CYCLECLOCK
 
 #if defined(_WIN32)
 #include <intrin.h>
@@ -37,7 +37,7 @@
 #include "turbo/base/internal/sysinfo.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 #if defined(__i386__)
@@ -147,7 +147,7 @@ double UnscaledCycleClock::Frequency() {
 #endif
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USE_UNSCALED_CYCLECLOCK
+#endif  // TURBO_USE_UNSCALED_CYCLECLOCK

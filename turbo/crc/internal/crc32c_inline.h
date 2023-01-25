@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_CRC32C_INLINE_H_
-#define ABSL_CRC_INTERNAL_CRC32C_INLINE_H_
+#ifndef TURBO_CRC_INTERNAL_CRC32C_INLINE_H_
+#define TURBO_CRC_INTERNAL_CRC32C_INLINE_H_
 
 #include <cstdint>
 
@@ -22,15 +22,15 @@
 #include "turbo/crc/internal/crc32_x86_arm_combined_simd.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 // CRC32C implementation optimized for small inputs.
 // Either computes crc and return true, or if there is
 // no hardware support does nothing and returns false.
 inline bool ExtendCrc32cInline(uint32_t* crc, const char* p, size_t n) {
-#if defined(ABSL_CRC_INTERNAL_HAVE_ARM_SIMD) || \
-    defined(ABSL_CRC_INTERNAL_HAVE_X86_SIMD)
+#if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) || \
+    defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
   constexpr uint32_t kCrc32Xor = 0xffffffffU;
   *crc ^= kCrc32Xor;
   if (n & 1) {
@@ -61,12 +61,12 @@ inline bool ExtendCrc32cInline(uint32_t* crc, const char* p, size_t n) {
   static_cast<void>(p);
   static_cast<void>(n);
   return false;
-#endif  // defined(ABSL_CRC_INTERNAL_HAVE_ARM_SIMD) ||
-        // defined(ABSL_CRC_INTERNAL_HAVE_X86_SIMD)
+#endif  // defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) ||
+        // defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
 }
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_INTERNAL_CRC32C_INLINE_H_
+#endif  // TURBO_CRC_INTERNAL_CRC32C_INLINE_H_

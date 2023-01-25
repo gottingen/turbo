@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 // This files is a forwarding header for other headers containing various
 // portability macros and functions.
 
-#ifndef ABSL_BASE_PORT_H_
-#define ABSL_BASE_PORT_H_
+#ifndef TURBO_BASE_PORT_H_
+#define TURBO_BASE_PORT_H_
 
 #include "turbo/base/attributes.h"
 #include "turbo/base/config.h"
 #include "turbo/base/optimization.h"
 
-#endif  // ABSL_BASE_PORT_H_
+#endif  // TURBO_BASE_PORT_H_

@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,14 +43,14 @@ void RunBenchmark(benchmark::State& state, T value) {
 }  // namespace
 
 template <typename T>
-using AbslHash = turbo::Hash<T>;
+using TurboHash = turbo::Hash<T>;
 
 class TypeErasedInterface {
  public:
   virtual ~TypeErasedInterface() = default;
 
   template <typename H>
-  friend H AbslHashValue(H state, const TypeErasedInterface& wrapper) {
+  friend H TurboHashValue(H state, const TypeErasedInterface& wrapper) {
     state = H::combine(std::move(state), std::type_index(typeid(wrapper)));
     wrapper.HashValue(turbo::HashState::Create(&state));
     return state;
@@ -61,7 +61,7 @@ class TypeErasedInterface {
 };
 
 template <typename T>
-struct TypeErasedAbslHash {
+struct TypeErasedTurboHash {
   class Wrapper : public TypeErasedInterface {
    public:
     explicit Wrapper(const T& value) : value_(value) {}
@@ -130,7 +130,7 @@ struct FastUnorderedSet {
   std::vector<T> values;
 
   template <typename H>
-  friend H AbslHashValue(H h, const FastUnorderedSet& fus) {
+  friend H TurboHashValue(H h, const FastUnorderedSet& fus) {
     return H::combine(H::combine_unordered(std::move(h), fus.values.begin(),
                                            fus.values.end()),
                       fus.values.size());
@@ -159,95 +159,95 @@ turbo::flat_hash_set<T> FlatHashSet(size_t count) {
   size_t Codegen##hash##name(const decltype(__VA_ARGS__)& arg) { \
     return hash<decltype(__VA_ARGS__)>{}(arg);                   \
   }                                                              \
-  bool absl_hash_test_odr_use##hash##name =                      \
+  bool turbo_hash_test_odr_use##hash##name =                      \
       ODRUseFunction(&Codegen##hash##name);
 
-MAKE_BENCHMARK(AbslHash, Int32, int32_t{});
-MAKE_BENCHMARK(AbslHash, Int64, int64_t{});
-MAKE_BENCHMARK(AbslHash, Double, 1.2);
-MAKE_BENCHMARK(AbslHash, DoubleZero, 0.0);
-MAKE_BENCHMARK(AbslHash, PairInt32Int32, std::pair<int32_t, int32_t>{});
-MAKE_BENCHMARK(AbslHash, PairInt64Int64, std::pair<int64_t, int64_t>{});
-MAKE_BENCHMARK(AbslHash, TupleInt32BoolInt64,
+MAKE_BENCHMARK(TurboHash, Int32, int32_t{});
+MAKE_BENCHMARK(TurboHash, Int64, int64_t{});
+MAKE_BENCHMARK(TurboHash, Double, 1.2);
+MAKE_BENCHMARK(TurboHash, DoubleZero, 0.0);
+MAKE_BENCHMARK(TurboHash, PairInt32Int32, std::pair<int32_t, int32_t>{});
+MAKE_BENCHMARK(TurboHash, PairInt64Int64, std::pair<int64_t, int64_t>{});
+MAKE_BENCHMARK(TurboHash, TupleInt32BoolInt64,
                std::tuple<int32_t, bool, int64_t>{});
-MAKE_BENCHMARK(AbslHash, String_0, std::string());
-MAKE_BENCHMARK(AbslHash, String_10, std::string(10, 'a'));
-MAKE_BENCHMARK(AbslHash, String_30, std::string(30, 'a'));
-MAKE_BENCHMARK(AbslHash, String_90, std::string(90, 'a'));
-MAKE_BENCHMARK(AbslHash, String_200, std::string(200, 'a'));
-MAKE_BENCHMARK(AbslHash, String_5000, std::string(5000, 'a'));
-MAKE_BENCHMARK(AbslHash, Cord_Flat_0, turbo::Cord());
-MAKE_BENCHMARK(AbslHash, Cord_Flat_10, FlatCord(10));
-MAKE_BENCHMARK(AbslHash, Cord_Flat_30, FlatCord(30));
-MAKE_BENCHMARK(AbslHash, Cord_Flat_90, FlatCord(90));
-MAKE_BENCHMARK(AbslHash, Cord_Flat_200, FlatCord(200));
-MAKE_BENCHMARK(AbslHash, Cord_Flat_5000, FlatCord(5000));
-MAKE_BENCHMARK(AbslHash, Cord_Fragmented_200, FragmentedCord(200));
-MAKE_BENCHMARK(AbslHash, Cord_Fragmented_5000, FragmentedCord(5000));
-MAKE_BENCHMARK(AbslHash, VectorInt64_10, Vector<int64_t>(10));
-MAKE_BENCHMARK(AbslHash, VectorInt64_100, Vector<int64_t>(100));
-MAKE_BENCHMARK(AbslHash, VectorInt64_1000, Vector<int64_t>(1000));
-MAKE_BENCHMARK(AbslHash, VectorDouble_10, Vector<double>(10));
-MAKE_BENCHMARK(AbslHash, VectorDouble_100, Vector<double>(100));
-MAKE_BENCHMARK(AbslHash, VectorDouble_1000, Vector<double>(1000));
-MAKE_BENCHMARK(AbslHash, FlatHashSetInt64_10, FlatHashSet<int64_t>(10));
-MAKE_BENCHMARK(AbslHash, FlatHashSetInt64_100, FlatHashSet<int64_t>(100));
-MAKE_BENCHMARK(AbslHash, FlatHashSetInt64_1000, FlatHashSet<int64_t>(1000));
-MAKE_BENCHMARK(AbslHash, FlatHashSetDouble_10, FlatHashSet<double>(10));
-MAKE_BENCHMARK(AbslHash, FlatHashSetDouble_100, FlatHashSet<double>(100));
-MAKE_BENCHMARK(AbslHash, FlatHashSetDouble_1000, FlatHashSet<double>(1000));
-MAKE_BENCHMARK(AbslHash, FastUnorderedSetInt64_1000,
+MAKE_BENCHMARK(TurboHash, String_0, std::string());
+MAKE_BENCHMARK(TurboHash, String_10, std::string(10, 'a'));
+MAKE_BENCHMARK(TurboHash, String_30, std::string(30, 'a'));
+MAKE_BENCHMARK(TurboHash, String_90, std::string(90, 'a'));
+MAKE_BENCHMARK(TurboHash, String_200, std::string(200, 'a'));
+MAKE_BENCHMARK(TurboHash, String_5000, std::string(5000, 'a'));
+MAKE_BENCHMARK(TurboHash, Cord_Flat_0, turbo::Cord());
+MAKE_BENCHMARK(TurboHash, Cord_Flat_10, FlatCord(10));
+MAKE_BENCHMARK(TurboHash, Cord_Flat_30, FlatCord(30));
+MAKE_BENCHMARK(TurboHash, Cord_Flat_90, FlatCord(90));
+MAKE_BENCHMARK(TurboHash, Cord_Flat_200, FlatCord(200));
+MAKE_BENCHMARK(TurboHash, Cord_Flat_5000, FlatCord(5000));
+MAKE_BENCHMARK(TurboHash, Cord_Fragmented_200, FragmentedCord(200));
+MAKE_BENCHMARK(TurboHash, Cord_Fragmented_5000, FragmentedCord(5000));
+MAKE_BENCHMARK(TurboHash, VectorInt64_10, Vector<int64_t>(10));
+MAKE_BENCHMARK(TurboHash, VectorInt64_100, Vector<int64_t>(100));
+MAKE_BENCHMARK(TurboHash, VectorInt64_1000, Vector<int64_t>(1000));
+MAKE_BENCHMARK(TurboHash, VectorDouble_10, Vector<double>(10));
+MAKE_BENCHMARK(TurboHash, VectorDouble_100, Vector<double>(100));
+MAKE_BENCHMARK(TurboHash, VectorDouble_1000, Vector<double>(1000));
+MAKE_BENCHMARK(TurboHash, FlatHashSetInt64_10, FlatHashSet<int64_t>(10));
+MAKE_BENCHMARK(TurboHash, FlatHashSetInt64_100, FlatHashSet<int64_t>(100));
+MAKE_BENCHMARK(TurboHash, FlatHashSetInt64_1000, FlatHashSet<int64_t>(1000));
+MAKE_BENCHMARK(TurboHash, FlatHashSetDouble_10, FlatHashSet<double>(10));
+MAKE_BENCHMARK(TurboHash, FlatHashSetDouble_100, FlatHashSet<double>(100));
+MAKE_BENCHMARK(TurboHash, FlatHashSetDouble_1000, FlatHashSet<double>(1000));
+MAKE_BENCHMARK(TurboHash, FastUnorderedSetInt64_1000,
                FastUnorderedSet<int64_t>(1000));
-MAKE_BENCHMARK(AbslHash, FastUnorderedSetDouble_1000,
+MAKE_BENCHMARK(TurboHash, FastUnorderedSetDouble_1000,
                FastUnorderedSet<double>(1000));
-MAKE_BENCHMARK(AbslHash, PairStringString_0,
+MAKE_BENCHMARK(TurboHash, PairStringString_0,
                std::make_pair(std::string(), std::string()));
-MAKE_BENCHMARK(AbslHash, PairStringString_10,
+MAKE_BENCHMARK(TurboHash, PairStringString_10,
                std::make_pair(std::string(10, 'a'), std::string(10, 'b')));
-MAKE_BENCHMARK(AbslHash, PairStringString_30,
+MAKE_BENCHMARK(TurboHash, PairStringString_30,
                std::make_pair(std::string(30, 'a'), std::string(30, 'b')));
-MAKE_BENCHMARK(AbslHash, PairStringString_90,
+MAKE_BENCHMARK(TurboHash, PairStringString_90,
                std::make_pair(std::string(90, 'a'), std::string(90, 'b')));
-MAKE_BENCHMARK(AbslHash, PairStringString_200,
+MAKE_BENCHMARK(TurboHash, PairStringString_200,
                std::make_pair(std::string(200, 'a'), std::string(200, 'b')));
-MAKE_BENCHMARK(AbslHash, PairStringString_5000,
+MAKE_BENCHMARK(TurboHash, PairStringString_5000,
                std::make_pair(std::string(5000, 'a'), std::string(5000, 'b')));
 
-MAKE_BENCHMARK(TypeErasedAbslHash, Int32, int32_t{});
-MAKE_BENCHMARK(TypeErasedAbslHash, Int64, int64_t{});
-MAKE_BENCHMARK(TypeErasedAbslHash, PairInt32Int32,
+MAKE_BENCHMARK(TypeErasedTurboHash, Int32, int32_t{});
+MAKE_BENCHMARK(TypeErasedTurboHash, Int64, int64_t{});
+MAKE_BENCHMARK(TypeErasedTurboHash, PairInt32Int32,
                std::pair<int32_t, int32_t>{});
-MAKE_BENCHMARK(TypeErasedAbslHash, PairInt64Int64,
+MAKE_BENCHMARK(TypeErasedTurboHash, PairInt64Int64,
                std::pair<int64_t, int64_t>{});
-MAKE_BENCHMARK(TypeErasedAbslHash, TupleInt32BoolInt64,
+MAKE_BENCHMARK(TypeErasedTurboHash, TupleInt32BoolInt64,
                std::tuple<int32_t, bool, int64_t>{});
-MAKE_BENCHMARK(TypeErasedAbslHash, String_0, std::string());
-MAKE_BENCHMARK(TypeErasedAbslHash, String_10, std::string(10, 'a'));
-MAKE_BENCHMARK(TypeErasedAbslHash, String_30, std::string(30, 'a'));
-MAKE_BENCHMARK(TypeErasedAbslHash, String_90, std::string(90, 'a'));
-MAKE_BENCHMARK(TypeErasedAbslHash, String_200, std::string(200, 'a'));
-MAKE_BENCHMARK(TypeErasedAbslHash, String_5000, std::string(5000, 'a'));
-MAKE_BENCHMARK(TypeErasedAbslHash, VectorDouble_10,
+MAKE_BENCHMARK(TypeErasedTurboHash, String_0, std::string());
+MAKE_BENCHMARK(TypeErasedTurboHash, String_10, std::string(10, 'a'));
+MAKE_BENCHMARK(TypeErasedTurboHash, String_30, std::string(30, 'a'));
+MAKE_BENCHMARK(TypeErasedTurboHash, String_90, std::string(90, 'a'));
+MAKE_BENCHMARK(TypeErasedTurboHash, String_200, std::string(200, 'a'));
+MAKE_BENCHMARK(TypeErasedTurboHash, String_5000, std::string(5000, 'a'));
+MAKE_BENCHMARK(TypeErasedTurboHash, VectorDouble_10,
                std::vector<double>(10, 1.1));
-MAKE_BENCHMARK(TypeErasedAbslHash, VectorDouble_100,
+MAKE_BENCHMARK(TypeErasedTurboHash, VectorDouble_100,
                std::vector<double>(100, 1.1));
-MAKE_BENCHMARK(TypeErasedAbslHash, VectorDouble_1000,
+MAKE_BENCHMARK(TypeErasedTurboHash, VectorDouble_1000,
                std::vector<double>(1000, 1.1));
-MAKE_BENCHMARK(TypeErasedAbslHash, FlatHashSetInt64_10,
+MAKE_BENCHMARK(TypeErasedTurboHash, FlatHashSetInt64_10,
                FlatHashSet<int64_t>(10));
-MAKE_BENCHMARK(TypeErasedAbslHash, FlatHashSetInt64_100,
+MAKE_BENCHMARK(TypeErasedTurboHash, FlatHashSetInt64_100,
                FlatHashSet<int64_t>(100));
-MAKE_BENCHMARK(TypeErasedAbslHash, FlatHashSetInt64_1000,
+MAKE_BENCHMARK(TypeErasedTurboHash, FlatHashSetInt64_1000,
                FlatHashSet<int64_t>(1000));
-MAKE_BENCHMARK(TypeErasedAbslHash, FlatHashSetDouble_10,
+MAKE_BENCHMARK(TypeErasedTurboHash, FlatHashSetDouble_10,
                FlatHashSet<double>(10));
-MAKE_BENCHMARK(TypeErasedAbslHash, FlatHashSetDouble_100,
+MAKE_BENCHMARK(TypeErasedTurboHash, FlatHashSetDouble_100,
                FlatHashSet<double>(100));
-MAKE_BENCHMARK(TypeErasedAbslHash, FlatHashSetDouble_1000,
+MAKE_BENCHMARK(TypeErasedTurboHash, FlatHashSetDouble_1000,
                FlatHashSet<double>(1000));
-MAKE_BENCHMARK(TypeErasedAbslHash, FastUnorderedSetInt64_1000,
+MAKE_BENCHMARK(TypeErasedTurboHash, FastUnorderedSetInt64_1000,
                FastUnorderedSet<int64_t>(1000));
-MAKE_BENCHMARK(TypeErasedAbslHash, FastUnorderedSetDouble_1000,
+MAKE_BENCHMARK(TypeErasedTurboHash, FastUnorderedSetDouble_1000,
                FastUnorderedSet<double>(1000));
 
 // The latency benchmark attempts to model the speed of the hash function in
@@ -266,7 +266,7 @@ namespace {
 // measurements.
 static constexpr size_t kEntropySize = 16 << 10;
 static char entropy[kEntropySize + 1024];
-ABSL_ATTRIBUTE_UNUSED static const bool kInitialized = [] {
+TURBO_ATTRIBUTE_UNUSED static const bool kInitialized = [] {
   turbo::BitGen gen;
   static_assert(sizeof(entropy) % sizeof(uint64_t) == 0, "");
   for (int i = 0; i != sizeof(entropy); i += sizeof(uint64_t)) {
@@ -315,9 +315,9 @@ struct StringRand {
   BENCHMARK(BM_latency_##hash##_##name);                     \
   }  // namespace
 
-MAKE_LATENCY_BENCHMARK(AbslHash, Int32, PodRand<int32_t>);
-MAKE_LATENCY_BENCHMARK(AbslHash, Int64, PodRand<int64_t>);
-MAKE_LATENCY_BENCHMARK(AbslHash, String9, StringRand<9>);
-MAKE_LATENCY_BENCHMARK(AbslHash, String33, StringRand<33>);
-MAKE_LATENCY_BENCHMARK(AbslHash, String65, StringRand<65>);
-MAKE_LATENCY_BENCHMARK(AbslHash, String257, StringRand<257>);
+MAKE_LATENCY_BENCHMARK(TurboHash, Int32, PodRand<int32_t>);
+MAKE_LATENCY_BENCHMARK(TurboHash, Int64, PodRand<int64_t>);
+MAKE_LATENCY_BENCHMARK(TurboHash, String9, StringRand<9>);
+MAKE_LATENCY_BENCHMARK(TurboHash, String33, StringRand<33>);
+MAKE_LATENCY_BENCHMARK(TurboHash, String65, StringRand<65>);
+MAKE_LATENCY_BENCHMARK(TurboHash, String257, StringRand<257>);

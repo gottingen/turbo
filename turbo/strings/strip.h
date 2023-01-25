@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 // -----------------------------------------------------------------------------
 //
 // This file contains various functions for stripping substrings from a string.
-#ifndef ABSL_STRINGS_STRIP_H_
-#define ABSL_STRINGS_STRIP_H_
+#ifndef TURBO_STRINGS_STRIP_H_
+#define TURBO_STRINGS_STRIP_H_
 
 #include <cstddef>
 #include <string>
@@ -30,7 +30,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // ConsumePrefix()
 //
@@ -70,7 +70,7 @@ inline bool ConsumeSuffix(turbo::string_view* str, turbo::string_view expected) 
 // Returns a view into the input string `str` with the given `prefix` removed,
 // but leaving the original string intact. If the prefix does not match at the
 // start of the string, returns the original string instead.
-ABSL_MUST_USE_RESULT inline turbo::string_view StripPrefix(
+TURBO_MUST_USE_RESULT inline turbo::string_view StripPrefix(
     turbo::string_view str, turbo::string_view prefix) {
   if (turbo::StartsWith(str, prefix)) str.remove_prefix(prefix.size());
   return str;
@@ -81,13 +81,13 @@ ABSL_MUST_USE_RESULT inline turbo::string_view StripPrefix(
 // Returns a view into the input string `str` with the given `suffix` removed,
 // but leaving the original string intact. If the suffix does not match at the
 // end of the string, returns the original string instead.
-ABSL_MUST_USE_RESULT inline turbo::string_view StripSuffix(
+TURBO_MUST_USE_RESULT inline turbo::string_view StripSuffix(
     turbo::string_view str, turbo::string_view suffix) {
   if (turbo::EndsWith(str, suffix)) str.remove_suffix(suffix.size());
   return str;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_STRIP_H_
+#endif  // TURBO_STRINGS_STRIP_H_

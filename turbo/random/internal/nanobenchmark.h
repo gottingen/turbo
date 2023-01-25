@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_NANOBENCHMARK_H_
-#define ABSL_RANDOM_INTERNAL_NANOBENCHMARK_H_
+#ifndef TURBO_RANDOM_INTERNAL_NANOBENCHMARK_H_
+#define TURBO_RANDOM_INTERNAL_NANOBENCHMARK_H_
 
 // Benchmarks functions of a single integer argument with realistic branch
 // prediction hit rates. Uses a robust estimator to summarize the measurements.
@@ -53,7 +53,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal_nanobenchmark {
 
 // Input influencing the function being measured (e.g. number of bytes to copy).
@@ -166,7 +166,7 @@ static inline size_t MeasureClosure(const Closure& closure,
 }
 
 }  // namespace random_internal_nanobenchmark
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_NANOBENCHMARK_H_
+#endif  // TURBO_RANDOM_INTERNAL_NANOBENCHMARK_H_

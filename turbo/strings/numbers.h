@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 // converting numbers to strings, use `StrCat()` or `StrAppend()` in str_cat.h,
 // which automatically detect and convert most number values appropriately.
 
-#ifndef ABSL_STRINGS_NUMBERS_H_
-#define ABSL_STRINGS_NUMBERS_H_
+#ifndef TURBO_STRINGS_NUMBERS_H_
+#define TURBO_STRINGS_NUMBERS_H_
 
 #ifdef __SSSE3__
 #include <tmmintrin.h>
@@ -48,7 +48,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // SimpleAtoi()
 //
@@ -59,7 +59,7 @@ ABSL_NAMESPACE_BEGIN
 // encountered, this function returns `false`, leaving `out` in an unspecified
 // state.
 template <typename int_type>
-ABSL_MUST_USE_RESULT bool SimpleAtoi(turbo::string_view str, int_type* out);
+TURBO_MUST_USE_RESULT bool SimpleAtoi(turbo::string_view str, int_type* out);
 
 // SimpleAtof()
 //
@@ -70,7 +70,7 @@ ABSL_MUST_USE_RESULT bool SimpleAtoi(turbo::string_view str, int_type* out);
 // allowed formats for `str`, except SimpleAtof() is locale-independent and will
 // always use the "C" locale. If any errors are encountered, this function
 // returns `false`, leaving `out` in an unspecified state.
-ABSL_MUST_USE_RESULT bool SimpleAtof(turbo::string_view str, float* out);
+TURBO_MUST_USE_RESULT bool SimpleAtof(turbo::string_view str, float* out);
 
 // SimpleAtod()
 //
@@ -81,7 +81,7 @@ ABSL_MUST_USE_RESULT bool SimpleAtof(turbo::string_view str, float* out);
 // allowed formats for `str`, except SimpleAtod is locale-independent and will
 // always use the "C" locale. If any errors are encountered, this function
 // returns `false`, leaving `out` in an unspecified state.
-ABSL_MUST_USE_RESULT bool SimpleAtod(turbo::string_view str, double* out);
+TURBO_MUST_USE_RESULT bool SimpleAtod(turbo::string_view str, double* out);
 
 // SimpleAtob()
 //
@@ -91,7 +91,7 @@ ABSL_MUST_USE_RESULT bool SimpleAtod(turbo::string_view str, double* out);
 // are interpreted as boolean `false`: "false", "f", "no", "n", "0". If any
 // errors are encountered, this function returns `false`, leaving `out` in an
 // unspecified state.
-ABSL_MUST_USE_RESULT bool SimpleAtob(turbo::string_view str, bool* out);
+TURBO_MUST_USE_RESULT bool SimpleAtob(turbo::string_view str, bool* out);
 
 // SimpleHexAtoi()
 //
@@ -104,28 +104,28 @@ ABSL_MUST_USE_RESULT bool SimpleAtob(turbo::string_view str, bool* out);
 // by this function. If any errors are encountered, this function returns
 // `false`, leaving `out` in an unspecified state.
 template <typename int_type>
-ABSL_MUST_USE_RESULT bool SimpleHexAtoi(turbo::string_view str, int_type* out);
+TURBO_MUST_USE_RESULT bool SimpleHexAtoi(turbo::string_view str, int_type* out);
 
 // Overloads of SimpleHexAtoi() for 128 bit integers.
-ABSL_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
+TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
                                                turbo::int128* out);
-ABSL_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
+TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
                                                turbo::uint128* out);
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // End of public API.  Implementation details follow.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace numbers_internal {
 
 // Digit conversion.
-ABSL_DLL extern const char kHexChar[17];  // 0123456789abcdef
-ABSL_DLL extern const char
+TURBO_DLL extern const char kHexChar[17];  // 0123456789abcdef
+TURBO_DLL extern const char
     kHexTable[513];  // 000102030405060708090a0b0c0d0e0f1011...
-ABSL_DLL extern const char
+TURBO_DLL extern const char
     two_ASCII_digits[100][2];  // 00, 01, 02, 03...
 
 // Writes a two-character representation of 'i' to 'buf'. 'i' must be in the
@@ -197,9 +197,9 @@ char* FastIntToBuffer(int_type i, char* buffer) {
 }
 
 // Implementation of SimpleAtoi, generalized to support arbitrary base (used
-// with base different from 10 elsewhere in Abseil implementation).
+// with base different from 10 elsewhere in Turbo implementation).
 template <typename int_type>
-ABSL_MUST_USE_RESULT bool safe_strtoi_base(turbo::string_view s, int_type* out,
+TURBO_MUST_USE_RESULT bool safe_strtoi_base(turbo::string_view s, int_type* out,
                                            int base) {
   static_assert(sizeof(*out) == 4 || sizeof(*out) == 8,
                 "SimpleAtoi works only with 32-bit or 64-bit integers.");
@@ -243,7 +243,7 @@ ABSL_MUST_USE_RESULT bool safe_strtoi_base(turbo::string_view s, int_type* out,
 // Returns the number of non-pad digits of the output (it can never be zero
 // since 0 has one digit).
 inline size_t FastHexToBufferZeroPad16(uint64_t val, char* out) {
-#ifdef ABSL_INTERNAL_HAVE_SSSE3
+#ifdef TURBO_INTERNAL_HAVE_SSSE3
   uint64_t be = turbo::big_endian::FromHost64(val);
   const auto kNibbleMask = _mm_set1_epi8(0xf);
   const auto kHexDigits = _mm_setr_epi8('0', '1', '2', '3', '4', '5', '6', '7',
@@ -268,36 +268,36 @@ inline size_t FastHexToBufferZeroPad16(uint64_t val, char* out) {
 }  // namespace numbers_internal
 
 template <typename int_type>
-ABSL_MUST_USE_RESULT bool SimpleAtoi(turbo::string_view str, int_type* out) {
+TURBO_MUST_USE_RESULT bool SimpleAtoi(turbo::string_view str, int_type* out) {
   return numbers_internal::safe_strtoi_base(str, out, 10);
 }
 
-ABSL_MUST_USE_RESULT inline bool SimpleAtoi(turbo::string_view str,
+TURBO_MUST_USE_RESULT inline bool SimpleAtoi(turbo::string_view str,
                                             turbo::int128* out) {
   return numbers_internal::safe_strto128_base(str, out, 10);
 }
 
-ABSL_MUST_USE_RESULT inline bool SimpleAtoi(turbo::string_view str,
+TURBO_MUST_USE_RESULT inline bool SimpleAtoi(turbo::string_view str,
                                             turbo::uint128* out) {
   return numbers_internal::safe_strtou128_base(str, out, 10);
 }
 
 template <typename int_type>
-ABSL_MUST_USE_RESULT bool SimpleHexAtoi(turbo::string_view str, int_type* out) {
+TURBO_MUST_USE_RESULT bool SimpleHexAtoi(turbo::string_view str, int_type* out) {
   return numbers_internal::safe_strtoi_base(str, out, 16);
 }
 
-ABSL_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
+TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
                                                turbo::int128* out) {
   return numbers_internal::safe_strto128_base(str, out, 16);
 }
 
-ABSL_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
+TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(turbo::string_view str,
                                                turbo::uint128* out) {
   return numbers_internal::safe_strtou128_base(str, out, 16);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_NUMBERS_H_
+#endif  // TURBO_STRINGS_NUMBERS_H_

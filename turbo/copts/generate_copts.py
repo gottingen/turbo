@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Generate Abseil compile compile option configs.
+"""Generate Turbo compile compile option configs.
 
-Usage: <path_to_absl>/copts/generate_copts.py
+Usage: <path_to_turbo>/copts/generate_copts.py
 
 The configs are generated from copts.py.
 """
@@ -16,7 +16,7 @@ def file_header_lines():
   return [
       "GENERATED! DO NOT MANUALLY EDIT THIS FILE.", "",
       "(1) Edit turbo/copts/copts.py.",
-      "(2) Run `python <path_to_absl>/copts/generate_copts.py`."
+      "(2) Run `python <path_to_turbo>/copts/generate_copts.py`."
   ]
 
 
@@ -46,7 +46,7 @@ class CMakeStyle(object):
     return "\n".join((("# " + line).strip() for line in file_header_lines()))
 
   def filename(self):
-    return "GENERATED_AbseilCopts.cmake"
+    return "GENERATED_TurboCopts.cmake"
 
 
 class StarlarkStyle(object):

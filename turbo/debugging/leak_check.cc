@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,19 +23,19 @@
 #include "turbo/base/attributes.h"
 #include "turbo/base/config.h"
 
-#if defined(ABSL_HAVE_LEAK_SANITIZER)
+#if defined(TURBO_HAVE_LEAK_SANITIZER)
 
 #include <sanitizer/lsan_interface.h>
 
-#if ABSL_HAVE_ATTRIBUTE_WEAK
-extern "C" ABSL_ATTRIBUTE_WEAK int __lsan_is_turned_off();
+#if TURBO_HAVE_ATTRIBUTE_WEAK
+extern "C" TURBO_ATTRIBUTE_WEAK int __lsan_is_turned_off();
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 bool HaveLeakSanitizer() { return true; }
 
-#if ABSL_HAVE_ATTRIBUTE_WEAK
+#if TURBO_HAVE_ATTRIBUTE_WEAK
 bool LeakCheckerIsActive() {
   return !(&__lsan_is_turned_off && __lsan_is_turned_off());
 }
@@ -53,13 +53,13 @@ void UnRegisterLivePointers(const void* ptr, size_t size) {
 }
 LeakCheckDisabler::LeakCheckDisabler() { __lsan_disable(); }
 LeakCheckDisabler::~LeakCheckDisabler() { __lsan_enable(); }
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // defined(ABSL_HAVE_LEAK_SANITIZER)
+#else  // defined(TURBO_HAVE_LEAK_SANITIZER)
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 bool HaveLeakSanitizer() { return false; }
 bool LeakCheckerIsActive() { return false; }
 void DoIgnoreLeak(const void*) { }
@@ -67,7 +67,7 @@ void RegisterLivePointers(const void*, size_t) { }
 void UnRegisterLivePointers(const void*, size_t) { }
 LeakCheckDisabler::LeakCheckDisabler() { }
 LeakCheckDisabler::~LeakCheckDisabler() { }
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // defined(ABSL_HAVE_LEAK_SANITIZER)
+#endif  // defined(TURBO_HAVE_LEAK_SANITIZER)

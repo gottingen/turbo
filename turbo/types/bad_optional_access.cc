@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 #include "turbo/types/bad_optional_access.h"
 
-#ifndef ABSL_USES_STD_OPTIONAL
+#ifndef TURBO_USES_STD_OPTIONAL
 
 #include <cstdlib>
 
@@ -22,7 +22,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 bad_optional_access::~bad_optional_access() = default;
 
@@ -33,16 +33,16 @@ const char* bad_optional_access::what() const noexcept {
 namespace optional_internal {
 
 void throw_bad_optional_access() {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   throw bad_optional_access();
 #else
-  ABSL_RAW_LOG(FATAL, "Bad optional access");
+  TURBO_RAW_LOG(FATAL, "Bad optional access");
   abort();
 #endif
 }
 
 }  // namespace optional_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USES_STD_OPTIONAL
+#endif  // TURBO_USES_STD_OPTIONAL

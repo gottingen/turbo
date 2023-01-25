@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 The Abseil Authors.
+//  Copyright 2021 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace flags_internal {
 turbo::Mutex* GetGlobalConstructionGuard();
 }  // namespace flags_internal
 
-// Public methods of `turbo::Flag<T>` are NOT part of the Abseil Flags API.
+// Public methods of `turbo::Flag<T>` are NOT part of the Turbo Flags API.
 // See https://abseil.io/docs/cpp/guides/flags
 template <typename T>
 class Flag {
@@ -76,7 +76,7 @@ class Flag {
     return *impl_;
   }
 
-  // Public methods of `turbo::Flag<T>` are NOT part of the Abseil Flags API.
+  // Public methods of `turbo::Flag<T>` are NOT part of the Turbo Flags API.
   // See https://abseil.io/docs/cpp/guides/flags
   bool IsRetired() const { return GetImpl().IsRetired(); }
   turbo::string_view Name() const { return GetImpl().Name(); }

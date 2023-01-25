@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 // Utilities to help tests verify that hash tables properly handle stateful
 // allocators and hash functions.
 
-#ifndef ABSL_CONTAINER_INTERNAL_HASH_POLICY_TESTING_H_
-#define ABSL_CONTAINER_INTERNAL_HASH_POLICY_TESTING_H_
+#ifndef TURBO_CONTAINER_INTERNAL_HASH_POLICY_TESTING_H_
+#define TURBO_CONTAINER_INTERNAL_HASH_POLICY_TESTING_H_
 
 #include <cstdlib>
 #include <limits>
@@ -30,7 +30,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace hash_testing_internal {
 
@@ -87,7 +87,7 @@ struct NonStandardLayout {
   }
 
   template <typename H>
-  friend H AbslHashValue(H h, const NonStandardLayout& v) {
+  friend H TurboHashValue(H h, const NonStandardLayout& v) {
     return H::combine(std::move(h), v.value);
   }
 
@@ -163,10 +163,10 @@ auto keys(const Set& s)
 }
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-// ABSL_UNORDERED_SUPPORTS_ALLOC_CTORS is false for glibcxx versions
+// TURBO_UNORDERED_SUPPORTS_ALLOC_CTORS is false for glibcxx versions
 // where the unordered containers are missing certain constructors that
 // take allocator arguments. This test is defined ad-hoc for the platforms
 // we care about (notably Crosstool 17) because libstdcxx's useless
@@ -176,9 +176,9 @@ ABSL_NAMESPACE_END
 // meet the allocator-aware container requirements;"
 #if (defined(__GLIBCXX__) && __GLIBCXX__ <= 20140425 ) || \
 ( __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 9 ))
-#define ABSL_UNORDERED_SUPPORTS_ALLOC_CTORS 0
+#define TURBO_UNORDERED_SUPPORTS_ALLOC_CTORS 0
 #else
-#define ABSL_UNORDERED_SUPPORTS_ALLOC_CTORS 1
+#define TURBO_UNORDERED_SUPPORTS_ALLOC_CTORS 1
 #endif
 
-#endif  // ABSL_CONTAINER_INTERNAL_HASH_POLICY_TESTING_H_
+#endif  // TURBO_CONTAINER_INTERNAL_HASH_POLICY_TESTING_H_

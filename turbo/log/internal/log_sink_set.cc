@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 
 #include "turbo/log/internal/log_sink_set.h"
 
-#ifndef ABSL_HAVE_THREAD_LOCAL
+#ifndef TURBO_HAVE_THREAD_LOCAL
 #include <pthread.h>
 #endif
 
@@ -47,7 +47,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 namespace {
 
@@ -55,11 +55,11 @@ namespace {
 // a globally-registered `LogSink`'s `Send()` is currently being invoked on this
 // thread.
 bool& ThreadIsLoggingStatus() {
-#ifdef ABSL_HAVE_THREAD_LOCAL
-  ABSL_CONST_INIT thread_local bool thread_is_logging = false;
+#ifdef TURBO_HAVE_THREAD_LOCAL
+  TURBO_CONST_INIT thread_local bool thread_is_logging = false;
   return thread_is_logging;
 #else
-  ABSL_CONST_INIT static pthread_key_t thread_is_logging_key;
+  TURBO_CONST_INIT static pthread_key_t thread_is_logging_key;
   static const bool unused = [] {
     if (pthread_key_create(&thread_is_logging_key, [](void* data) {
           delete reinterpret_cast<bool*>(data);
@@ -73,7 +73,7 @@ bool& ThreadIsLoggingStatus() {
   bool* thread_is_logging_ptr =
       reinterpret_cast<bool*>(pthread_getspecific(thread_is_logging_key));
 
-  if (ABSL_PREDICT_FALSE(!thread_is_logging_ptr)) {
+  if (TURBO_PREDICT_FALSE(!thread_is_logging_ptr)) {
     thread_is_logging_ptr = new bool{false};
     if (pthread_setspecific(thread_is_logging_key, thread_is_logging_ptr)) {
       perror("pthread_setspecific failed");
@@ -94,7 +94,7 @@ class StderrLogSink final : public LogSink {
       return;
     }
 
-    ABSL_CONST_INIT static turbo::once_flag warn_if_not_initialized;
+    TURBO_CONST_INIT static turbo::once_flag warn_if_not_initialized;
     turbo::call_once(warn_if_not_initialized, []() {
       if (turbo::log_internal::IsInitialized()) return;
       const char w[] =
@@ -184,7 +184,7 @@ class GlobalLogSinkSet final {
 
   void LogToSinks(const turbo::LogEntry& entry,
                   turbo::Span<turbo::LogSink*> extra_sinks, bool extra_sinks_only)
-      ABSL_LOCKS_EXCLUDED(guard_) {
+      TURBO_LOCKS_EXCLUDED(guard_) {
     SendToSinks(entry, extra_sinks);
 
     if (!extra_sinks_only) {
@@ -203,7 +203,7 @@ class GlobalLogSinkSet final {
     }
   }
 
-  void AddLogSink(turbo::LogSink* sink) ABSL_LOCKS_EXCLUDED(guard_) {
+  void AddLogSink(turbo::LogSink* sink) TURBO_LOCKS_EXCLUDED(guard_) {
     {
       turbo::WriterMutexLock global_sinks_lock(&guard_);
       auto pos = std::find(sinks_.begin(), sinks_.end(), sink);
@@ -212,10 +212,10 @@ class GlobalLogSinkSet final {
         return;
       }
     }
-    ABSL_INTERNAL_LOG(FATAL, "Duplicate log sinks are not supported");
+    TURBO_INTERNAL_LOG(FATAL, "Duplicate log sinks are not supported");
   }
 
-  void RemoveLogSink(turbo::LogSink* sink) ABSL_LOCKS_EXCLUDED(guard_) {
+  void RemoveLogSink(turbo::LogSink* sink) TURBO_LOCKS_EXCLUDED(guard_) {
     {
       turbo::WriterMutexLock global_sinks_lock(&guard_);
       auto pos = std::find(sinks_.begin(), sinks_.end(), sink);
@@ -224,14 +224,14 @@ class GlobalLogSinkSet final {
         return;
       }
     }
-    ABSL_INTERNAL_LOG(FATAL, "Mismatched log sink being removed");
+    TURBO_INTERNAL_LOG(FATAL, "Mismatched log sink being removed");
   }
 
-  void FlushLogSinks() ABSL_LOCKS_EXCLUDED(guard_) {
+  void FlushLogSinks() TURBO_LOCKS_EXCLUDED(guard_) {
     if (ThreadIsLoggingToLogSink()) {
       // The thread_local condition demonstrates that we're already holding the
       // lock in order to iterate over `sinks_` for dispatch.  The thread-safety
-      // annotations don't know this, so we use `ABSL_NO_THREAD_SAFETY_ANALYSIS`
+      // annotations don't know this, so we use `TURBO_NO_THREAD_SAFETY_ANALYSIS`
       guard_.AssertReaderHeld();
       FlushLogSinksLocked();
     } else {
@@ -247,7 +247,7 @@ class GlobalLogSinkSet final {
   }
 
  private:
-  void FlushLogSinksLocked() ABSL_SHARED_LOCKS_REQUIRED(guard_) {
+  void FlushLogSinksLocked() TURBO_SHARED_LOCKS_REQUIRED(guard_) {
     for (turbo::LogSink* sink : sinks_) {
       sink->Flush();
     }
@@ -263,7 +263,7 @@ class GlobalLogSinkSet final {
 
   using LogSinksSet = std::vector<turbo::LogSink*>;
   turbo::Mutex guard_;
-  LogSinksSet sinks_ ABSL_GUARDED_BY(guard_);
+  LogSinksSet sinks_ TURBO_GUARDED_BY(guard_);
 };
 
 // Returns reference to the global LogSinks set.
@@ -292,5 +292,5 @@ void RemoveLogSink(turbo::LogSink* sink) {
 void FlushLogSinks() { log_internal::GlobalSinks().FlushLogSinks(); }
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

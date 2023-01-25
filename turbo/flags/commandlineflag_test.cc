@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,14 +29,14 @@
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_view.h"
 
-ABSL_FLAG(int, int_flag, 201, "int_flag help");
-ABSL_FLAG(std::string, string_flag, "dflt",
+TURBO_FLAG(int, int_flag, 201, "int_flag help");
+TURBO_FLAG(std::string, string_flag, "dflt",
           turbo::StrCat("string_flag", " help"));
-ABSL_RETIRED_FLAG(bool, bool_retired_flag, false, "bool_retired_flag help");
+TURBO_RETIRED_FLAG(bool, bool_retired_flag, false, "bool_retired_flag help");
 
 // These are only used to test default values.
-ABSL_FLAG(int, int_flag2, 201, "");
-ABSL_FLAG(std::string, string_flag2, "dflt", "");
+TURBO_FLAG(int, int_flag2, 201, "");
+TURBO_FLAG(std::string, string_flag2, "dflt", "");
 
 namespace {
 

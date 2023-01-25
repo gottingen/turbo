@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -345,7 +345,7 @@ TEST(BadStatusOrAccessTest, MoveAssignmentWhatOk) {
 // Define `EXPECT_DEATH_OR_THROW` to test the behavior of `StatusOr::value`,
 // which either throws `BadStatusOrAccess` or `LOG(FATAL)` based on whether
 // exceptions are enabled.
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 #define EXPECT_DEATH_OR_THROW(statement, status_)                  \
   EXPECT_THROW(                                                    \
       {                                                            \
@@ -358,10 +358,10 @@ TEST(BadStatusOrAccessTest, MoveAssignmentWhatOk) {
         }                                                          \
       },                                                           \
       turbo::BadStatusOrAccess);
-#else  // ABSL_HAVE_EXCEPTIONS
+#else  // TURBO_HAVE_EXCEPTIONS
 #define EXPECT_DEATH_OR_THROW(statement, status) \
   EXPECT_DEATH_IF_SUPPORTED(statement, status.ToString());
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS
 
 TEST(StatusOrDeathTest, TestDefaultCtorValue) {
   turbo::StatusOr<int> thing;
@@ -983,7 +983,7 @@ TEST(StatusOr, StatusOrCopyAndMoveTestsAssignment) {
   EXPECT_THAT(c, IsOkAndHolds(CopyDetectorHas(10, true, false)));
 }
 
-TEST(StatusOr, AbslAnyAssignment) {
+TEST(StatusOr, TurboAnyAssignment) {
   EXPECT_FALSE((std::is_assignable<turbo::StatusOr<turbo::any>,
                                    turbo::StatusOr<int>>::value));
   turbo::StatusOr<turbo::any> status_or;

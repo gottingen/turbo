@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@
 //   } else {
 //     LOG(ERROR) << result.status();
 //   }
-#ifndef ABSL_STATUS_STATUSOR_H_
-#define ABSL_STATUS_STATUSOR_H_
+#ifndef TURBO_STATUS_STATUSOR_H_
+#define TURBO_STATUS_STATUSOR_H_
 
 #include <exception>
 #include <initializer_list>
@@ -52,7 +52,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // BadStatusOrAccess
 //
@@ -106,13 +106,13 @@ class BadStatusOrAccess : public std::exception {
 
 // Returned StatusOr objects may not be ignored.
 template <typename T>
-#if ABSL_HAVE_CPP_ATTRIBUTE(nodiscard)
-// TODO(b/176172494): ABSL_MUST_USE_RESULT should expand to the more strict
+#if TURBO_HAVE_CPP_ATTRIBUTE(nodiscard)
+// TODO(b/176172494): TURBO_MUST_USE_RESULT should expand to the more strict
 // [[nodiscard]]. For now, just use [[nodiscard]] directly when it is available.
 class [[nodiscard]] StatusOr;
 #else
-class ABSL_MUST_USE_RESULT StatusOr;
-#endif  // ABSL_HAVE_CPP_ATTRIBUTE(nodiscard)
+class TURBO_MUST_USE_RESULT StatusOr;
+#endif  // TURBO_HAVE_CPP_ATTRIBUTE(nodiscard)
 
 // turbo::StatusOr<T>
 //
@@ -488,7 +488,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   // else {
   //    // Handle error
   // }
-  ABSL_MUST_USE_RESULT bool ok() const { return this->status_.ok(); }
+  TURBO_MUST_USE_RESULT bool ok() const { return this->status_.ok(); }
 
   // StatusOr<T>::status()
   //
@@ -524,10 +524,10 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   //
   // The `std::move` on statusor instead of on the whole expression enables
   // warnings about possible uses of the statusor object after the move.
-  const T& value() const& ABSL_ATTRIBUTE_LIFETIME_BOUND;
-  T& value() & ABSL_ATTRIBUTE_LIFETIME_BOUND;
-  const T&& value() const&& ABSL_ATTRIBUTE_LIFETIME_BOUND;
-  T&& value() && ABSL_ATTRIBUTE_LIFETIME_BOUND;
+  const T& value() const& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T& value() & TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  const T&& value() const&& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T&& value() && TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
   // StatusOr<T>:: operator*()
   //
@@ -539,10 +539,10 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   // `turbo::StatusOr<T>`. Alternatively, see the `value()` member function for a
   // similar API that guarantees crashing or throwing an exception if there is
   // no current value.
-  const T& operator*() const& ABSL_ATTRIBUTE_LIFETIME_BOUND;
-  T& operator*() & ABSL_ATTRIBUTE_LIFETIME_BOUND;
-  const T&& operator*() const&& ABSL_ATTRIBUTE_LIFETIME_BOUND;
-  T&& operator*() && ABSL_ATTRIBUTE_LIFETIME_BOUND;
+  const T& operator*() const& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T& operator*() & TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  const T&& operator*() const&& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T&& operator*() && TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
   // StatusOr<T>::operator->()
   //
@@ -551,8 +551,8 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   // REQUIRES: `this->ok() == true`, otherwise the behavior is undefined.
   //
   // Use `this->ok()` to verify that there is a current value.
-  const T* operator->() const ABSL_ATTRIBUTE_LIFETIME_BOUND;
-  T* operator->() ABSL_ATTRIBUTE_LIFETIME_BOUND;
+  const T* operator->() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T* operator->() TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
   // StatusOr<T>::value_or()
   //
@@ -770,7 +770,7 @@ void StatusOr<T>::IgnoreError() const {
   // no-op
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STATUS_STATUSOR_H_
+#endif  // TURBO_STATUS_STATUSOR_H_

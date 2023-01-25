@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,33 +21,33 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // A single block of empty control bytes for tables without any slots allocated.
 // This enables removing a branch in the hot path of find().
 // We have 17 bytes because there may be a generation counter. Any constant is
 // fine for the generation counter.
-alignas(16) ABSL_CONST_INIT ABSL_DLL const ctrl_t kEmptyGroup[17] = {
+alignas(16) TURBO_CONST_INIT TURBO_DLL const ctrl_t kEmptyGroup[17] = {
     ctrl_t::kSentinel, ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     ctrl_t::kEmpty,    ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     ctrl_t::kEmpty,    ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     ctrl_t::kEmpty,    ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     static_cast<ctrl_t>(0)};
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr size_t Group::kWidth;
 #endif
 
 // Returns "random" seed.
 inline size_t RandomSeed() {
-#ifdef ABSL_HAVE_THREAD_LOCAL
+#ifdef TURBO_HAVE_THREAD_LOCAL
   static thread_local size_t counter = 0;
   size_t value = ++counter;
-#else   // ABSL_HAVE_THREAD_LOCAL
+#else   // TURBO_HAVE_THREAD_LOCAL
   static std::atomic<size_t> counter(0);
   size_t value = counter.fetch_add(1, std::memory_order_relaxed);
-#endif  // ABSL_HAVE_THREAD_LOCAL
+#endif  // TURBO_HAVE_THREAD_LOCAL
   return value ^ static_cast<size_t>(reinterpret_cast<uintptr_t>(&counter));
 }
 
@@ -143,7 +143,7 @@ void DropDeletesWithoutResize(CommonFields& common,
     };
 
     // Element doesn't move.
-    if (ABSL_PREDICT_TRUE(probe_index(new_i) == probe_index(i))) {
+    if (TURBO_PREDICT_TRUE(probe_index(new_i) == probe_index(i))) {
       SetCtrl(common, i, H2(hash), slot_size);
       continue;
     }
@@ -218,5 +218,5 @@ void ClearBackingArray(CommonFields& c, const PolicyFunctions& policy,
 }
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

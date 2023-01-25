@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 
 #include "turbo/debugging/internal/stack_consumption.h"
 
-#ifdef ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#ifdef TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
 
 #include <string.h>
 
@@ -23,7 +23,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 namespace {
 
@@ -33,7 +33,7 @@ static void SimpleSignalHandler(int signo) {
 
   // Never true, but prevents compiler from optimizing buf out.
   if (signo == 0) {
-    ABSL_RAW_LOG(INFO, "%p", static_cast<void*>(buf));
+    TURBO_RAW_LOG(INFO, "%p", static_cast<void*>(buf));
   }
 }
 
@@ -44,7 +44,7 @@ TEST(SignalHandlerStackConsumptionTest, MeasuresStackConsumption) {
 
 }  // namespace
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#endif  // TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION

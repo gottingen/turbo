@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ static void BM_EnabledLogOverhead(benchmark::State& state) {
       turbo::LogSeverityAtLeast::kInfinity);
   turbo::log_internal::ScopedMinLogLevel scoped_min_log_level(
       turbo::LogSeverityAtLeast::kInfo);
-  ABSL_ATTRIBUTE_UNUSED NullLogSink null_sink;
+  TURBO_ATTRIBUTE_UNUSED NullLogSink null_sink;
   for (auto _ : state) {
     LOG(INFO);
   }

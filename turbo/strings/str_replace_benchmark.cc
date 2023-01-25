@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ void BM_StrReplaceAllOneReplacement(benchmark::State& state) {
   std::string src = *big_string;
   for (auto _ : state) {
     std::string dest = turbo::StrReplaceAll(src, {{"the", "box"}});
-    ABSL_RAW_CHECK(dest == *after_replacing_the,
+    TURBO_RAW_CHECK(dest == *after_replacing_the,
                    "not benchmarking intended behavior");
   }
 }
@@ -113,7 +113,7 @@ void BM_StrReplaceAll(benchmark::State& state) {
                                                  {"dozen", "brown"},
                                                  {"lazy", "pack"},
                                                  {"liquor", "shakes"}});
-    ABSL_RAW_CHECK(dest == *after_replacing_many,
+    TURBO_RAW_CHECK(dest == *after_replacing_many,
                    "not benchmarking intended behavior");
   }
 }

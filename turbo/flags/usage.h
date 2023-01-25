@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_FLAGS_USAGE_H_
-#define ABSL_FLAGS_USAGE_H_
+#ifndef TURBO_FLAGS_USAGE_H_
+#define TURBO_FLAGS_USAGE_H_
 
 #include "turbo/base/config.h"
 #include "turbo/strings/string_view.h"
@@ -23,7 +23,7 @@
 // Usage reporting interfaces
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Sets the "usage" message to be used by help reporting routines.
 // For example:
@@ -37,7 +37,7 @@ void SetProgramUsageMessage(turbo::string_view new_usage_message);
 // Returns the usage message set by SetProgramUsageMessage().
 turbo::string_view ProgramUsageMessage();
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_USAGE_H_
+#endif  // TURBO_FLAGS_USAGE_H_

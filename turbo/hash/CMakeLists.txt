@@ -1,5 +1,5 @@
 #
-# Copyright 2018 The Abseil Authors.
+# Copyright 2018 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     hash
   HDRS
@@ -23,7 +23,7 @@ absl_cc_library(
     "internal/hash.cc"
     "internal/hash.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::bits
     turbo::city
@@ -42,13 +42,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     hash_testing
   HDRS
     "hash_testing.h"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::spy_hash_state
     turbo::meta
@@ -59,13 +59,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     hash_test
   SRCS
     "hash_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::cord_test_helpers
     turbo::hash
@@ -87,13 +87,13 @@ absl_cc_test(
 # Note: Even though external code should not depend on this target
 # directly, it must be marked PUBLIC since it is a dependency of
 # hash_testing.
-absl_cc_library(
+turbo_cc_library(
   NAME
     spy_hash_state
   HDRS
     "internal/spy_hash_state.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::hash
     turbo::strings
@@ -103,7 +103,7 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     city
   HDRS
@@ -111,27 +111,27 @@ absl_cc_library(
   SRCS
     "internal/city.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
     turbo::endian
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     city_test
   SRCS
     "internal/city_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::city
     GTest::gmock_main
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     low_level_hash
   HDRS
@@ -139,20 +139,20 @@ absl_cc_library(
   SRCS
     "internal/low_level_hash.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::endian
     turbo::int128
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     low_level_hash_test
   SRCS
     "internal/low_level_hash_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::low_level_hash
     turbo::strings

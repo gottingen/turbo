@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
-#define ABSL_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
+#ifndef TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
+#define TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
@@ -23,9 +23,9 @@
 #if defined(__i386__) || defined(__x86_64__) || defined(__aarch64__) || \
     defined(__powerpc__) || defined(__ppc__) || defined(__riscv) ||     \
     defined(_M_IX86) || (defined(_M_X64) && !defined(_M_ARM64EC))
-#define ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 1
+#define TURBO_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 1
 #else
-#define ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 0
+#define TURBO_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 0
 #endif
 
 // The following platforms often disable access to the hardware
@@ -36,27 +36,27 @@
 // default on Android ARM64.
 #if defined(__native_client__) || (defined(__APPLE__)) || \
     (defined(__ANDROID__) && defined(__aarch64__))
-#define ABSL_USE_UNSCALED_CYCLECLOCK_DEFAULT 0
+#define TURBO_USE_UNSCALED_CYCLECLOCK_DEFAULT 0
 #else
-#define ABSL_USE_UNSCALED_CYCLECLOCK_DEFAULT 1
+#define TURBO_USE_UNSCALED_CYCLECLOCK_DEFAULT 1
 #endif
 
 // UnscaledCycleClock is an optional internal feature.
-// Use "#if ABSL_USE_UNSCALED_CYCLECLOCK" to test for its presence.
-// Can be overridden at compile-time via -DABSL_USE_UNSCALED_CYCLECLOCK=0|1
-#if !defined(ABSL_USE_UNSCALED_CYCLECLOCK)
-#define ABSL_USE_UNSCALED_CYCLECLOCK               \
-  (ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION && \
-   ABSL_USE_UNSCALED_CYCLECLOCK_DEFAULT)
+// Use "#if TURBO_USE_UNSCALED_CYCLECLOCK" to test for its presence.
+// Can be overridden at compile-time via -DTURBO_USE_UNSCALED_CYCLECLOCK=0|1
+#if !defined(TURBO_USE_UNSCALED_CYCLECLOCK)
+#define TURBO_USE_UNSCALED_CYCLECLOCK               \
+  (TURBO_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION && \
+   TURBO_USE_UNSCALED_CYCLECLOCK_DEFAULT)
 #endif
 
-#if ABSL_USE_UNSCALED_CYCLECLOCK
+#if TURBO_USE_UNSCALED_CYCLECLOCK
 // This macro can be used to test if UnscaledCycleClock::Frequency()
 // is NominalCPUFrequency() on a particular platform.
 #if (defined(__i386__) || defined(__x86_64__) || defined(__riscv) || \
      defined(_M_IX86) || defined(_M_X64))
-#define ABSL_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY
+#define TURBO_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY
 #endif
 #endif
 
-#endif  // ABSL_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
+#endif  // TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_

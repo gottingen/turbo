@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -359,7 +359,7 @@ class Base {
 // CWG issue 1734: http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1734
 // CWG issue 1928: http://open-std.org/JTC1/SC22/WG21/docs/cwg_closed.html#1928
 #if !defined(_LIBCPP_VERSION) || _LIBCPP_VERSION >= 3700
-#define ABSL_TRIVIALLY_DESTRUCTIBLE_CONSIDER_DELETED_DESTRUCTOR_NOT_TRIVIAL 1
+#define TURBO_TRIVIALLY_DESTRUCTIBLE_CONSIDER_DELETED_DESTRUCTOR_NOT_TRIVIAL 1
 #endif
 
 // As of the moment, GCC versions >5.1 have a problem compiling for
@@ -372,7 +372,7 @@ class Base {
 // GCC bug 83689: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83689
 #if defined(__clang__) || defined(_MSC_VER) || \
     (defined(__GNUC__) && __GNUC__ < 5)
-#define ABSL_GCC_BUG_TRIVIALLY_CONSTRUCTIBLE_ON_ARRAY_OF_NONTRIVIAL 1
+#define TURBO_GCC_BUG_TRIVIALLY_CONSTRUCTIBLE_ON_ARRAY_OF_NONTRIVIAL 1
 #endif
 
 TEST(TypeTraitsTest, TestIsFunction) {
@@ -421,7 +421,7 @@ TEST(TypeTraitsTest, TestTrivialDestructor) {
   // Verify that types with a nontrivial or deleted destructor
   // are marked as such.
   EXPECT_FALSE(turbo::is_trivially_destructible<NontrivialDestructor>::value);
-#ifdef ABSL_TRIVIALLY_DESTRUCTIBLE_CONSIDER_DELETED_DESTRUCTOR_NOT_TRIVIAL
+#ifdef TURBO_TRIVIALLY_DESTRUCTIBLE_CONSIDER_DELETED_DESTRUCTOR_NOT_TRIVIAL
   EXPECT_FALSE(turbo::is_trivially_destructible<DeletedDestructor>::value);
 #endif
 
@@ -527,7 +527,7 @@ TEST(TypeTraitsTest, TestTrivialDefaultCtor) {
       turbo::is_trivially_default_constructible<TrivialDefaultCtor10>::value);
 
   // Conversely, the opposite also holds.
-#ifdef ABSL_GCC_BUG_TRIVIALLY_CONSTRUCTIBLE_ON_ARRAY_OF_NONTRIVIAL
+#ifdef TURBO_GCC_BUG_TRIVIALLY_CONSTRUCTIBLE_ON_ARRAY_OF_NONTRIVIAL
   using NontrivialDefaultCtor10 = NontrivialDefaultCtor[10];
   EXPECT_FALSE(
       turbo::is_trivially_default_constructible<NontrivialDefaultCtor10>::value);
@@ -975,192 +975,192 @@ TEST(TypeTraitsTest, TestRemoveCVRef) {
                             int[2]>::value));
 }
 
-#define ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(trait_name, ...)          \
+#define TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(trait_name, ...)          \
   EXPECT_TRUE((std::is_same<typename std::trait_name<__VA_ARGS__>::type, \
                             turbo::trait_name##_t<__VA_ARGS__>>::value))
 
 TEST(TypeTraitsTest, TestRemoveCVAliases) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, const int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, const volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, const int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, const volatile int);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, const int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, const volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, const int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_const, const volatile int);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, const int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, const volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, const int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_volatile, const volatile int);
 }
 
 TEST(TypeTraitsTest, TestAddCVAliases) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, const int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, const volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, const int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_cv, const volatile int);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, const int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, const volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, const int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_const, const volatile int);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, const int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, const volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, const int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_volatile, const volatile int);
 }
 
 TEST(TypeTraitsTest, TestReferenceAliases) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, volatile int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, int&&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, volatile int&&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, volatile int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, int&&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_reference, volatile int&&);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, volatile int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, int&&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, volatile int&&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, volatile int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, int&&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_lvalue_reference, volatile int&&);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, volatile int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, int&&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, volatile int&&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, volatile int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, int&&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_rvalue_reference, volatile int&&);
 }
 
 TEST(TypeTraitsTest, TestPointerAliases) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_pointer, int*);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_pointer, volatile int*);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_pointer, int*);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_pointer, volatile int*);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_pointer, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_pointer, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_pointer, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(add_pointer, volatile int);
 }
 
 TEST(TypeTraitsTest, TestSignednessAliases) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, unsigned);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, volatile unsigned);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, unsigned);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_signed, volatile unsigned);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, unsigned);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, volatile unsigned);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, unsigned);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(make_unsigned, volatile unsigned);
 }
 
 TEST(TypeTraitsTest, TestExtentAliases) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[1]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[1][1]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[][1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[1][1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_extent, int[][1]);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[1]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[1][1]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[][1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[1][1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_all_extents, int[][1]);
 }
 
 TEST(TypeTraitsTest, TestAlignedStorageAlias) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 1);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 2);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 3);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 4);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 5);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 6);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 7);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 8);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 9);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 10);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 11);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 12);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 13);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 14);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 15);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 16);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 17);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 18);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 19);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 20);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 21);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 22);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 23);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 24);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 25);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 26);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 27);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 28);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 29);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 30);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 31);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 32);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 33);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 1);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 2);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 3);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 4);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 5);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 6);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 7);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 8);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 9);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 10);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 11);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 12);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 13);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 14);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 15);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 16);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 17);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 18);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 19);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 20);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 21);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 22);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 23);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 24);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 25);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 26);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 27);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 28);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 29);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 30);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 31);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 32);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 33);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 1, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 2, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 3, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 4, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 5, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 6, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 7, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 8, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 9, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 10, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 11, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 12, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 13, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 14, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 15, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 16, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 17, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 18, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 19, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 20, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 21, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 22, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 23, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 24, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 25, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 26, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 27, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 28, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 29, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 30, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 31, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 32, 128);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 33, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 1, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 2, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 3, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 4, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 5, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 6, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 7, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 8, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 9, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 10, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 11, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 12, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 13, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 14, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 15, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 16, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 17, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 18, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 19, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 20, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 21, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 22, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 23, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 24, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 25, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 26, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 27, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 28, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 29, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 30, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 31, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 32, 128);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(aligned_storage, 33, 128);
 }
 
 TEST(TypeTraitsTest, TestDecay) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, volatile int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, volatile int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const volatile int);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, volatile int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const volatile int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, volatile int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const volatile int&);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, volatile int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const volatile int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, volatile int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, const volatile int&);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int[1]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int[1][1]);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int[][1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int[1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int[1][1]);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int[][1]);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int());
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int(float));  // NOLINT
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int(char, ...));  // NOLINT
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int());
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int(float));  // NOLINT
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(decay, int(char, ...));  // NOLINT
 }
 
 struct TypeA {};
@@ -1202,27 +1202,27 @@ TEST(TypeTraitsTest, TestEnableIf) {
 }
 
 TEST(TypeTraitsTest, TestConditional) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(conditional, true, int, char);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(conditional, false, int, char);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(conditional, true, int, char);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(conditional, false, int, char);
 }
 
 // TODO(calabrese) Check with specialized std::common_type
 TEST(TypeTraitsTest, TestCommonType) {
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char, int);
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char&);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char, int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char&);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(common_type, int, char, int&);
 }
 
 TEST(TypeTraitsTest, TestUnderlyingType) {
   enum class enum_char : char {};
   enum class enum_long_long : long long {};  // NOLINT(runtime/int)
 
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(underlying_type, enum_char);
-  ABSL_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(underlying_type, enum_long_long);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(underlying_type, enum_char);
+  TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(underlying_type, enum_long_long);
 }
 
 struct GetTypeExtT {
@@ -1399,8 +1399,8 @@ TEST(TypeTraitsTest, IsNothrowSwappable) {
 }
 
 TEST(TrivallyRelocatable, Sanity) {
-#if !defined(ABSL_HAVE_ATTRIBUTE_TRIVIAL_ABI) || \
-    !ABSL_HAVE_BUILTIN(__is_trivially_relocatable)
+#if !defined(TURBO_HAVE_ATTRIBUTE_TRIVIAL_ABI) || \
+    !TURBO_HAVE_BUILTIN(__is_trivially_relocatable)
   GTEST_SKIP() << "No trivial ABI support.";
 #endif
 
@@ -1408,7 +1408,7 @@ TEST(TrivallyRelocatable, Sanity) {
   struct NonTrivial {
     NonTrivial(const NonTrivial&) {}  // NOLINT
   };
-  struct ABSL_ATTRIBUTE_TRIVIAL_ABI TrivialAbi {
+  struct TURBO_ATTRIBUTE_TRIVIAL_ABI TrivialAbi {
     TrivialAbi(const TrivialAbi&) {}  // NOLINT
   };
   EXPECT_TRUE(turbo::is_trivially_relocatable<Trivial>::value);
@@ -1416,7 +1416,7 @@ TEST(TrivallyRelocatable, Sanity) {
   EXPECT_TRUE(turbo::is_trivially_relocatable<TrivialAbi>::value);
 }
 
-#ifdef ABSL_HAVE_CONSTANT_EVALUATED
+#ifdef TURBO_HAVE_CONSTANT_EVALUATED
 
 constexpr int64_t NegateIfConstantEvaluated(int64_t i) {
   if (turbo::is_constant_evaluated()) {
@@ -1426,10 +1426,10 @@ constexpr int64_t NegateIfConstantEvaluated(int64_t i) {
   }
 }
 
-#endif  // ABSL_HAVE_CONSTANT_EVALUATED
+#endif  // TURBO_HAVE_CONSTANT_EVALUATED
 
 TEST(TrivallyRelocatable, is_constant_evaluated) {
-#ifdef ABSL_HAVE_CONSTANT_EVALUATED
+#ifdef TURBO_HAVE_CONSTANT_EVALUATED
   constexpr int64_t constant = NegateIfConstantEvaluated(42);
   EXPECT_EQ(constant, -42);
 
@@ -1441,7 +1441,7 @@ TEST(TrivallyRelocatable, is_constant_evaluated) {
   EXPECT_EQ(const_init, -42);
 #else
   GTEST_SKIP() << "turbo::is_constant_evaluated is not defined";
-#endif  // ABSL_HAVE_CONSTANT_EVALUATED
+#endif  // TURBO_HAVE_CONSTANT_EVALUATED
 }
 
 

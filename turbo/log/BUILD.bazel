@@ -1,5 +1,5 @@
 #
-# Copyright 2022 The Abseil Authors.
+# Copyright 2022 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -28,20 +28,20 @@ licenses(["notice"])
 # Public targets
 
 cc_library(
-    name = "absl_check",
-    hdrs = ["absl_check.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    name = "turbo_check",
+    hdrs = ["turbo_check.h"],
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/log/internal:check_impl",
     ],
 )
 
 cc_library(
-    name = "absl_log",
-    hdrs = ["absl_log.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    name = "turbo_log",
+    hdrs = ["turbo_log.h"],
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/log/internal:log_impl",
     ],
@@ -50,8 +50,8 @@ cc_library(
 cc_library(
     name = "check",
     hdrs = ["check.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/log/internal:check_impl",
         "//turbo/log/internal:check_op",
@@ -65,8 +65,8 @@ cc_library(
     name = "die_if_null",
     srcs = ["die_if_null.cc"],
     hdrs = ["die_if_null.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log",
         "//turbo/base:config",
@@ -79,8 +79,8 @@ cc_library(
     name = "flags",
     srcs = ["flags.cc"],
     hdrs = ["flags.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         ":globals",
@@ -101,8 +101,8 @@ cc_library(
     name = "globals",
     srcs = ["globals.cc"],
     hdrs = ["globals.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         "//turbo/base:atomic_hook",
@@ -118,8 +118,8 @@ cc_library(
     name = "initialize",
     srcs = ["initialize.cc"],
     hdrs = ["initialize.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         ":globals",
@@ -132,8 +132,8 @@ cc_library(
 cc_library(
     name = "log",
     hdrs = ["log.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/log/internal:log_impl",
     ],
@@ -143,8 +143,8 @@ cc_library(
     name = "log_entry",
     srcs = ["log_entry.cc"],
     hdrs = ["log_entry.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -160,8 +160,8 @@ cc_library(
     name = "log_sink",
     srcs = ["log_sink.cc"],
     hdrs = ["log_sink.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log_entry",
         "//turbo/base:config",
@@ -171,8 +171,8 @@ cc_library(
 cc_library(
     name = "log_sink_registry",
     hdrs = ["log_sink_registry.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log_sink",
         "//turbo/base:config",
@@ -183,10 +183,10 @@ cc_library(
 cc_library(
     name = "log_streamer",
     hdrs = ["log_streamer.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
-        ":absl_log",
+        ":turbo_log",
         "//turbo/base:config",
         "//turbo/base:log_severity",
         "//turbo/strings",
@@ -201,8 +201,8 @@ cc_library(
     testonly = True,
     srcs = ["scoped_mock_log.cc"],
     hdrs = ["scoped_mock_log.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log_entry",
         ":log_sink",
@@ -218,8 +218,8 @@ cc_library(
 cc_library(
     name = "structured",
     hdrs = ["structured.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/log/internal:structured",
@@ -230,31 +230,31 @@ cc_library(
 # Test targets
 
 cc_test(
-    name = "absl_check_test",
+    name = "turbo_check_test",
     size = "small",
-    srcs = ["absl_check_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    srcs = ["turbo_check_test.cc"],
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:ios",
         "no_test_ios",
         "no_test_wasm",
     ],
     deps = [
-        ":absl_check",
+        ":turbo_check",
         ":check_test_impl",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
-    name = "absl_log_basic_test",
+    name = "turbo_log_basic_test",
     size = "small",
-    srcs = ["absl_log_basic_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    srcs = ["turbo_log_basic_test.cc"],
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
-        ":absl_log",
+        ":turbo_log",
         ":log_basic_test_impl",
         "@com_google_googletest//:gtest_main",
     ],
@@ -264,8 +264,8 @@ cc_test(
     name = "check_test",
     size = "small",
     srcs = ["check_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:ios",
         "no_test_ios",
@@ -281,8 +281,8 @@ cc_test(
 cc_library(
     name = "check_test_impl",
     testonly = True,
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:ios",
         "no_test_ios",
@@ -303,8 +303,8 @@ cc_test(
     name = "die_if_null_test",
     size = "small",
     srcs = ["die_if_null_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":die_if_null",
         "//turbo/base:core_headers",
@@ -317,8 +317,8 @@ cc_test(
     name = "flags_test",
     size = "small",
     srcs = ["flags_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":flags",
         ":globals",
@@ -340,8 +340,8 @@ cc_test(
     name = "globals_test",
     size = "small",
     srcs = ["globals_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":globals",
         ":log",
@@ -358,8 +358,8 @@ cc_test(
     name = "log_basic_test",
     size = "small",
     srcs = ["log_basic_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log",
         ":log_basic_test_impl",
@@ -370,8 +370,8 @@ cc_test(
 cc_library(
     name = "log_basic_test_impl",
     testonly = True,
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     textual_hdrs = ["log_basic_test_impl.h"],
     visibility = ["//visibility:private"],
     deps = [
@@ -391,8 +391,8 @@ cc_test(
     name = "log_entry_test",
     size = "small",
     srcs = ["log_entry_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log_entry",
         "//turbo/base:config",
@@ -412,8 +412,8 @@ cc_test(
     name = "log_format_test",
     size = "small",
     srcs = ["log_format_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":check",
         ":log",
@@ -430,8 +430,8 @@ cc_test(
     name = "log_macro_hygiene_test",
     size = "small",
     srcs = ["log_macro_hygiene_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log",
         ":scoped_mock_log",
@@ -445,8 +445,8 @@ cc_test(
     name = "log_sink_test",
     size = "medium",
     srcs = ["log_sink_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:ios",
         "no_test_ios",
@@ -471,8 +471,8 @@ cc_test(
     name = "log_streamer_test",
     size = "medium",
     srcs = ["log_streamer_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log",
         ":log_streamer",
@@ -492,8 +492,8 @@ cc_test(
     name = "log_modifier_methods_test",
     size = "small",
     srcs = ["log_modifier_methods_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log",
         ":log_sink",
@@ -511,8 +511,8 @@ cc_test(
     name = "scoped_mock_log_test",
     size = "small",
     srcs = ["scoped_mock_log_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     linkstatic = 1,
     tags = [
         "no_test:os:ios",
@@ -538,8 +538,8 @@ cc_test(
     name = "stripping_test",
     size = "small",
     srcs = ["stripping_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     # This test requires all code live in the binary (instead of shared libraries)
     # because we test for the existence of specific literals in the binary.
     linkstatic = 1,
@@ -559,8 +559,8 @@ cc_test(
     name = "structured_test",
     size = "small",
     srcs = ["structured_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log",
         ":scoped_mock_log",
@@ -576,8 +576,8 @@ cc_binary(
     name = "log_benchmark",
     testonly = 1,
     srcs = ["log_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     deps = [
         ":check",

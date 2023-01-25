@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 //
 // This utility is internal-only. Use at your own risk.
 
-#ifndef ABSL_PROFILING_INTERNAL_SAMPLE_RECORDER_H_
-#define ABSL_PROFILING_INTERNAL_SAMPLE_RECORDER_H_
+#ifndef TURBO_PROFILING_INTERNAL_SAMPLE_RECORDER_H_
+#define TURBO_PROFILING_INTERNAL_SAMPLE_RECORDER_H_
 
 #include <atomic>
 #include <cstddef>
@@ -34,7 +34,7 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace profiling_internal {
 
 // Sample<T> that has members required for linking samples in the linked list of
@@ -45,7 +45,7 @@ struct Sample {
   // prevents races with sampling and resurrecting an object.
   turbo::Mutex init_mu;
   T* next = nullptr;
-  T* dead ABSL_GUARDED_BY(init_mu) = nullptr;
+  T* dead TURBO_GUARDED_BY(init_mu) = nullptr;
   int64_t weight;  // How many sampling events were required to sample this one.
 };
 
@@ -247,7 +247,7 @@ size_t SampleRecorder<T>::GetMaxSamples() const {
 }
 
 }  // namespace profiling_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_PROFILING_INTERNAL_SAMPLE_RECORDER_H_
+#endif  // TURBO_PROFILING_INTERNAL_SAMPLE_RECORDER_H_

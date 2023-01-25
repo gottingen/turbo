@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@
 #include "benchmark/benchmark.h"
 
 namespace {
-void BM_AbslStrError(benchmark::State& state) {
+void BM_TurboStrError(benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(turbo::base_internal::StrError(ERANGE));
   }
 }
-BENCHMARK(BM_AbslStrError);
+BENCHMARK(BM_TurboStrError);
 }  // namespace

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1227,8 +1227,8 @@ TEST(stringtest, safe_strtou64_base_length_delimited) {
 // feenableexcept() and fedisableexcept() are extensions supported by some libc
 // implementations.
 #if defined(__GLIBC__) || defined(__BIONIC__)
-#define ABSL_HAVE_FEENABLEEXCEPT 1
-#define ABSL_HAVE_FEDISABLEEXCEPT 1
+#define TURBO_HAVE_FEENABLEEXCEPT 1
+#define TURBO_HAVE_FEDISABLEEXCEPT 1
 #endif
 
 class SimpleDtoaTest : public testing::Test {
@@ -1236,7 +1236,7 @@ class SimpleDtoaTest : public testing::Test {
   void SetUp() override {
     // Store the current floating point env & clear away any pending exceptions.
     feholdexcept(&fp_env_);
-#ifdef ABSL_HAVE_FEENABLEEXCEPT
+#ifdef TURBO_HAVE_FEENABLEEXCEPT
     // Turn on floating point exceptions.
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
@@ -1246,7 +1246,7 @@ class SimpleDtoaTest : public testing::Test {
     // Restore the floating point environment to the original state.
     // In theory fedisableexcept is unnecessary; fesetenv will also do it.
     // In practice, our toolchains have subtle bugs.
-#ifdef ABSL_HAVE_FEDISABLEEXCEPT
+#ifdef TURBO_HAVE_FEDISABLEEXCEPT
     fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
     fesetenv(&fp_env_);
@@ -1337,7 +1337,7 @@ TEST_F(SimpleDtoaTest, ExhaustiveDoubleToSixDigits) {
     if (strcmp(sixdigitsbuf, snprintfbuf) != 0) {
       mismatches.push_back(d);
       if (mismatches.size() < 10) {
-        ABSL_RAW_LOG(ERROR, "%s",
+        TURBO_RAW_LOG(ERROR, "%s",
                      turbo::StrCat("Six-digit failure with double.  ", "d=", d,
                                   "=", d, " sixdigits=", sixdigitsbuf,
                                   " printf(%g)=", snprintfbuf)
@@ -1389,7 +1389,7 @@ TEST_F(SimpleDtoaTest, ExhaustiveDoubleToSixDigits) {
       if (kFloatNumCases >= 1e9) {
         // The exhaustive test takes a very long time, so log progress.
         char buf[kSixDigitsToBufferSize];
-        ABSL_RAW_LOG(
+        TURBO_RAW_LOG(
             INFO, "%s",
             turbo::StrCat("Exp ", exponent, " powten=", powten, "(", powten,
                          ") (",
@@ -1419,7 +1419,7 @@ TEST_F(SimpleDtoaTest, ExhaustiveDoubleToSixDigits) {
       double before = nextafter(d, 0.0);
       double after = nextafter(d, 1.7976931348623157e308);
       char b1[32], b2[kSixDigitsToBufferSize];
-      ABSL_RAW_LOG(
+      TURBO_RAW_LOG(
           ERROR, "%s",
           turbo::StrCat(
               "Mismatch #", i, "  d=", d, " (", ToNineDigits(d), ")",

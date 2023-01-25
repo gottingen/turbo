@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 static HANDLE process = NULL;
 
@@ -47,10 +47,10 @@ void InitializeSymbolizer(const char*) {
   SymSetOptions(SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME);
   if (!SymInitialize(process, nullptr, true)) {
     // GetLastError() returns a Win32 DWORD, but we assign to
-    // unsigned long long to simplify the ABSL_RAW_LOG case below.  The uniform
+    // unsigned long long to simplify the TURBO_RAW_LOG case below.  The uniform
     // initialization guarantees this is not a narrowing conversion.
     const unsigned long long error{GetLastError()};  // NOLINT(runtime/int)
-    ABSL_RAW_LOG(FATAL, "SymInitialize() failed: %llu", error);
+    TURBO_RAW_LOG(FATAL, "SymInitialize() failed: %llu", error);
   }
 }
 
@@ -78,5 +78,5 @@ bool Symbolize(const void* pc, char* out, int out_size) {
   return true;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

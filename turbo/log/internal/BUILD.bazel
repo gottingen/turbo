@@ -1,5 +1,5 @@
 #
-# Copyright 2022 The Abseil Authors.
+# Copyright 2022 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = [
@@ -30,8 +30,8 @@ licenses(["notice"])
 cc_library(
     name = "check_impl",
     hdrs = ["check_impl.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":check_op",
         ":conditions",
@@ -45,8 +45,8 @@ cc_library(
     name = "check_op",
     srcs = ["check_op.cc"],
     hdrs = ["check_op.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/log:__pkg__",
     ],
@@ -64,8 +64,8 @@ cc_library(
     name = "conditions",
     srcs = ["conditions.cc"],
     hdrs = ["conditions.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":voidify",
         "//turbo/base",
@@ -77,8 +77,8 @@ cc_library(
 cc_library(
     name = "config",
     hdrs = ["config.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/log:__pkg__",
     ],
@@ -91,8 +91,8 @@ cc_library(
 cc_library(
     name = "flags",
     hdrs = ["flags.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/flags:flag",
     ],
@@ -102,8 +102,8 @@ cc_library(
     name = "format",
     srcs = ["log_format.cc"],
     hdrs = ["log_format.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":append_truncated",
         ":config",
@@ -122,8 +122,8 @@ cc_library(
     name = "globals",
     srcs = ["globals.cc"],
     hdrs = ["globals.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/log:__pkg__",
     ],
@@ -140,8 +140,8 @@ cc_library(
 cc_library(
     name = "log_impl",
     hdrs = ["log_impl.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":conditions",
         ":log_message",
@@ -153,8 +153,8 @@ cc_library(
     name = "log_message",
     srcs = ["log_message.cc"],
     hdrs = ["log_message.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/log:__pkg__",
     ],
@@ -188,8 +188,8 @@ cc_library(
 cc_library(
     name = "append_truncated",
     hdrs = ["append_truncated.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/strings",
@@ -201,8 +201,8 @@ cc_library(
     name = "log_sink_set",
     srcs = ["log_sink_set.cc"],
     hdrs = ["log_sink_set.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS + select({
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS + select({
         "//conditions:default": [],
         "@platforms//os:android": ["-llog"],
     }),
@@ -228,8 +228,8 @@ cc_library(
     name = "nullguard",
     srcs = ["nullguard.cc"],
     hdrs = ["nullguard.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -239,8 +239,8 @@ cc_library(
 cc_library(
     name = "nullstream",
     hdrs = ["nullstream.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -252,8 +252,8 @@ cc_library(
 cc_library(
     name = "strip",
     hdrs = ["strip.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log_message",
         ":nullstream",
@@ -264,8 +264,8 @@ cc_library(
 cc_library(
     name = "structured",
     hdrs = ["structured.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":log_message",
         "//turbo/base:config",
@@ -278,8 +278,8 @@ cc_library(
     testonly = True,
     srcs = ["test_actions.cc"],
     hdrs = ["test_actions.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:config",
         "//turbo/base:core_headers",
@@ -299,8 +299,8 @@ cc_library(
     testonly = True,
     srcs = ["test_helpers.cc"],
     hdrs = ["test_helpers.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":globals",
         "//turbo/base:config",
@@ -316,8 +316,8 @@ cc_library(
     testonly = True,
     srcs = ["test_matchers.cc"],
     hdrs = ["test_matchers.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":test_helpers",
         "@com_google_googletest//:gtest",
@@ -337,8 +337,8 @@ cc_library(
 cc_library(
     name = "voidify",
     hdrs = ["voidify.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = ["//turbo/base:config"],
 )
 
@@ -346,8 +346,8 @@ cc_library(
     name = "proto",
     srcs = ["proto.cc"],
     hdrs = ["proto.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base",
         "//turbo/base:config",
@@ -362,8 +362,8 @@ cc_test(
     name = "stderr_log_sink_test",
     size = "small",
     srcs = ["stderr_log_sink_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test:os:android",
         "no_test:os:ios",

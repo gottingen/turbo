@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ TEST(StrJoin, APIExamples) {
   {
     // Array of ints
     const int a[] = {1, 2, 3, -4};
-    EXPECT_EQ("1-2-3--4", turbo::StrJoin(a, a + ABSL_ARRAYSIZE(a), "-"));
+    EXPECT_EQ("1-2-3--4", turbo::StrJoin(a, a + TURBO_ARRAYSIZE(a), "-"));
   }
 
   {

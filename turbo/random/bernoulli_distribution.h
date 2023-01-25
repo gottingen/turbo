@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_BERNOULLI_DISTRIBUTION_H_
-#define ABSL_RANDOM_BERNOULLI_DISTRIBUTION_H_
+#ifndef TURBO_RANDOM_BERNOULLI_DISTRIBUTION_H_
+#define TURBO_RANDOM_BERNOULLI_DISTRIBUTION_H_
 
 #include <cstdint>
 #include <istream>
@@ -24,7 +24,7 @@
 #include "turbo/random/internal/iostream_state_saver.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::bernoulli_distribution is a drop in replacement for
 // std::bernoulli_distribution. It guarantees that (given a perfect
@@ -153,7 +153,7 @@ bool bernoulli_distribution::Generate(double p,
     // returning v <= c would approximate P very well (up to an absolute error
     // of 1/2^32); the slow path (taken in that range of possible error, in the
     // case of equality) eliminates the remaining error.
-    if (ABSL_PREDICT_TRUE(v != c)) return v < c;
+    if (TURBO_PREDICT_TRUE(v != c)) return v < c;
 
     // It is guaranteed that `q` is strictly less than 1, because if `q` were
     // greater than or equal to 1, the same would be true for `p`. Certainly `p`
@@ -194,7 +194,7 @@ bool bernoulli_distribution::Generate(double p,
   }
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_BERNOULLI_DISTRIBUTION_H_
+#endif  // TURBO_RANDOM_BERNOULLI_DISTRIBUTION_H_

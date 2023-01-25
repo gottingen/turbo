@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "turbo/base/attributes.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 std::ostream& operator<<(std::ostream& os, turbo::LogSeverity s) {
   if (s == turbo::NormalizeLogSeverity(s)) return os << turbo::LogSeverityName(s);
@@ -51,5 +51,5 @@ std::ostream& operator<<(std::ostream& os, turbo::LogSeverityAtMost s) {
   }
   return os;
 }
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

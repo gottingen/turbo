@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_
-#define ABSL_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_
+#define TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_
 
 #include <cassert>
 
@@ -25,7 +25,7 @@
 #include "turbo/strings/internal/cord_rep_flat.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // CordRepBtreeReader implements logic to iterate over cord btrees.
@@ -184,7 +184,7 @@ inline turbo::string_view CordRepBtreeReader::Skip(size_t skip) {
   // need to skip the current edge as well as `skip`.
   const size_t edge_length = navigator_.Current()->length;
   CordRepBtreeNavigator::Position pos = navigator_.Skip(skip + edge_length);
-  if (ABSL_PREDICT_FALSE(pos.edge == nullptr)) {
+  if (TURBO_PREDICT_FALSE(pos.edge == nullptr)) {
     remaining_ = 0;
     return {};
   }
@@ -196,7 +196,7 @@ inline turbo::string_view CordRepBtreeReader::Skip(size_t skip) {
 
 inline turbo::string_view CordRepBtreeReader::Seek(size_t offset) {
   const CordRepBtreeNavigator::Position pos = navigator_.Seek(offset);
-  if (ABSL_PREDICT_FALSE(pos.edge == nullptr)) {
+  if (TURBO_PREDICT_FALSE(pos.edge == nullptr)) {
     remaining_ = 0;
     return {};
   }
@@ -206,7 +206,7 @@ inline turbo::string_view CordRepBtreeReader::Seek(size_t offset) {
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_READER_H_

@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-workspace(name = "com_google_absl")
+workspace(name = "com_google_turbo")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -23,7 +23,7 @@ http_archive(
     name = "com_google_googletest",  # 2023-01-05T19:15:29Z
     sha256 = "1c805208d019aabb8be3cddbc6098be8815ee5cf0a7baf526102528fd624c422",
     strip_prefix = "googletest-934542165899c786cb5d8a710529c37184730183",
-    # Keep this URL in sync with ABSL_GOOGLETEST_COMMIT in ci/cmake_common.sh.
+    # Keep this URL in sync with TURBO_GOOGLETEST_COMMIT in ci/cmake_common.sh.
     urls = ["https://github.com/google/googletest/archive/934542165899c786cb5d8a710529c37184730183.zip"],
 )
 

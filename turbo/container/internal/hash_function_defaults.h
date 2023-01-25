@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@
 // the hash function is hash<std::string> but as a pointer when the hash
 // function is hash<void*>.
 //
-#ifndef ABSL_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_
-#define ABSL_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_
+#ifndef TURBO_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_
+#define TURBO_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_
 
 #include <stdint.h>
 #include <cstddef>
@@ -57,7 +57,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // The hash of an object of type T is computed by using turbo::Hash.
@@ -157,7 +157,7 @@ template <class T>
 using hash_default_eq = typename container_internal::HashEq<T>::Eq;
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_
+#endif  // TURBO_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_

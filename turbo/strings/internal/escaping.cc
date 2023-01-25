@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
-ABSL_CONST_INIT const char kBase64Chars[] =
+TURBO_CONST_INIT const char kBase64Chars[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 size_t CalculateBase64EscapedLenInternal(size_t input_len, bool do_padding) {
@@ -172,12 +172,12 @@ size_t Base64EscapeInternal(const unsigned char* src, size_t szsrc, char* dest,
     default:
       // Should not be reached: blocks of 4 bytes are handled
       // in the while loop before this switch statement.
-      ABSL_RAW_LOG(FATAL, "Logic problem? szsrc = %zu", szsrc);
+      TURBO_RAW_LOG(FATAL, "Logic problem? szsrc = %zu", szsrc);
       break;
   }
   return static_cast<size_t>(cur_dest - dest);
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -134,7 +134,7 @@ TYPED_TEST(PoissonDistributionInterfaceTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
 
-    ABSL_INTERNAL_LOG(INFO, turbo::StrCat("Range {", param.mean(), "}: ",
+    TURBO_INTERNAL_LOG(INFO, turbo::StrCat("Range {", param.mean(), "}: ",
                                          +sample_min, ", ", +sample_max));
 
     // Validate stream serialization.
@@ -188,9 +188,9 @@ class PoissonModel {
   }
 
   void LogCDF() {
-    ABSL_INTERNAL_LOG(INFO, turbo::StrCat("CDF (mean = ", mean_, ")"));
+    TURBO_INTERNAL_LOG(INFO, turbo::StrCat("CDF (mean = ", mean_, ")"));
     for (const auto c : cdf_) {
-      ABSL_INTERNAL_LOG(INFO,
+      TURBO_INTERNAL_LOG(INFO,
                         turbo::StrCat(c.index, ": pmf=", c.pmf, " cdf=", c.cdf));
     }
   }
@@ -212,11 +212,11 @@ void PoissonModel::InitCDF() {
     // State already initialized.
     return;
   }
-  ABSL_ASSERT(mean_ < 201.0);
+  TURBO_ASSERT(mean_ < 201.0);
 
   const size_t max_i = 50 * stddev() + mean();
   const double e_neg_mean = std::exp(-mean());
-  ABSL_ASSERT(e_neg_mean > 0);
+  TURBO_ASSERT(e_neg_mean > 0);
 
   double d = 1;
   double last_result = e_neg_mean;
@@ -236,7 +236,7 @@ void PoissonModel::InitCDF() {
     }
     last_result = result;
   }
-  ABSL_ASSERT(!cdf_.empty());
+  TURBO_ASSERT(!cdf_.empty());
 }
 
 // PoissonDistributionZTest implements a z-test for the poisson distribution.
@@ -286,7 +286,7 @@ bool PoissonDistributionZTest::SingleZTest(const double p,
   const bool pass = turbo::random_internal::Near("z", z, 0.0, max_err);
 
   if (!pass) {
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         INFO, turbo::StrFormat("p=%f max_err=%f\n"
                               " mean=%f vs. %f\n"
                               " stddev=%f vs. %f\n"
@@ -300,7 +300,7 @@ bool PoissonDistributionZTest::SingleZTest(const double p,
   return pass;
 }
 
-TEST_P(PoissonDistributionZTest, AbslPoissonDistribution) {
+TEST_P(PoissonDistributionZTest, TurboPoissonDistribution) {
   const auto& param = GetParam();
   const int expected_failures =
       std::max(1, static_cast<int>(std::ceil(param.trials * param.p_fail)));
@@ -405,7 +405,7 @@ double PoissonDistributionChiSquaredTest::ChiSquaredTestImpl() {
   // The poisson CDF fails for large mean values, since e^-mean exceeds the
   // machine precision. For these cases, using a normal approximation would be
   // appropriate.
-  ABSL_ASSERT(mean() <= 200);
+  TURBO_ASSERT(mean() <= 200);
   InitChiSquaredTest(kBuckets);
 
   D dis(mean());
@@ -439,14 +439,14 @@ double PoissonDistributionChiSquaredTest::ChiSquaredTestImpl() {
   if (chi_square > threshold) {
     LogCDF();
 
-    ABSL_INTERNAL_LOG(INFO, turbo::StrCat("VALUES  buckets=", counts.size(),
+    TURBO_INTERNAL_LOG(INFO, turbo::StrCat("VALUES  buckets=", counts.size(),
                                          "  samples=", kSamples));
     for (size_t i = 0; i < counts.size(); i++) {
-      ABSL_INTERNAL_LOG(
+      TURBO_INTERNAL_LOG(
           INFO, turbo::StrCat(cutoffs_[i], ": ", counts[i], " vs. E=", e[i]));
     }
 
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         INFO,
         turbo::StrCat(kChiSquared, "(data, dof=", dof, ") = ", chi_square, " (",
                      p, ")\n", " vs.\n", kChiSquared, " @ 0.98 = ", threshold));
@@ -454,7 +454,7 @@ double PoissonDistributionChiSquaredTest::ChiSquaredTestImpl() {
   return p;
 }
 
-TEST_P(PoissonDistributionChiSquaredTest, AbslPoissonDistribution) {
+TEST_P(PoissonDistributionChiSquaredTest, TurboPoissonDistribution) {
   const int kTrials = 20;
 
   // Large values are not yet supported -- this requires estimating the cdf

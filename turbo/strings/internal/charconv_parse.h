@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CHARCONV_PARSE_H_
-#define ABSL_STRINGS_INTERNAL_CHARCONV_PARSE_H_
+#ifndef TURBO_STRINGS_INTERNAL_CHARCONV_PARSE_H_
+#define TURBO_STRINGS_INTERNAL_CHARCONV_PARSE_H_
 
 #include <cstdint>
 
@@ -21,7 +21,7 @@
 #include "turbo/strings/charconv.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 // Enum indicating whether a parsed float is a number or special value.
@@ -94,6 +94,6 @@ extern template ParsedFloat ParseFloat<16>(const char* begin, const char* end,
                                            turbo::chars_format format_flags);
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
-#endif  // ABSL_STRINGS_INTERNAL_CHARCONV_PARSE_H_
+#endif  // TURBO_STRINGS_INTERNAL_CHARCONV_PARSE_H_

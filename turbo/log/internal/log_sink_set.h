@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 // File: log/internal/log_sink_set.h
 // -----------------------------------------------------------------------------
 
-#ifndef ABSL_LOG_INTERNAL_LOG_SINK_SET_H_
-#define ABSL_LOG_INTERNAL_LOG_SINK_SET_H_
+#ifndef TURBO_LOG_INTERNAL_LOG_SINK_SET_H_
+#define TURBO_LOG_INTERNAL_LOG_SINK_SET_H_
 
 #include "turbo/base/config.h"
 #include "turbo/log/log_entry.h"
@@ -25,7 +25,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 // Returns true if a globally-registered `LogSink`'s `Send()` is currently
@@ -48,7 +48,7 @@ void RemoveLogSink(turbo::LogSink* sink);
 void FlushLogSinks();
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_LOG_SINK_SET_H_
+#endif  // TURBO_LOG_INTERNAL_LOG_SINK_SET_H_

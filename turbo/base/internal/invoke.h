@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,17 +34,17 @@
 // The implementation is SFINAE-friendly: substitution failure within invoke()
 // isn't an error.
 
-#ifndef ABSL_BASE_INTERNAL_INVOKE_H_
-#define ABSL_BASE_INTERNAL_INVOKE_H_
+#ifndef TURBO_BASE_INTERNAL_INVOKE_H_
+#define TURBO_BASE_INTERNAL_INVOKE_H_
 
 #include "turbo/base/config.h"
 
-#if ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
 
 #include <functional>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 using std::invoke;
@@ -52,10 +52,10 @@ using std::invoke_result_t;
 using std::is_invocable_r;
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#else  // TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
 
 #include <algorithm>
 #include <type_traits>
@@ -67,7 +67,7 @@ ABSL_NAMESPACE_END
 // top of this file for the API documentation.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // The five classes below each implement one of the clauses from the definition
@@ -104,14 +104,14 @@ struct MemFunAndRef : StrippedAccept<MemFunAndRef> {
   Invoke(MemFun&& mem_fun, Obj&& obj, Args&&... args) {
 // Ignore bogus GCC warnings on this line.
 // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101436 for similar example.
-#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(11, 0)
+#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(11, 0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
     return (std::forward<Obj>(obj).*
             std::forward<MemFun>(mem_fun))(std::forward<Args>(args)...);
-#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(11, 0)
+#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(11, 0)
 #pragma GCC diagnostic pop
 #endif
   }
@@ -233,9 +233,9 @@ template <typename R, typename F, typename... Args>
 using is_invocable_r = IsInvocableRImpl<void, R, F, Args...>;
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#endif  // TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
 
-#endif  // ABSL_BASE_INTERNAL_INVOKE_H_
+#endif  // TURBO_BASE_INTERNAL_INVOKE_H_

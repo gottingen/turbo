@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@
 // structured/low-entropy counters to digits of Pi.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
 
@@ -53,7 +53,7 @@ struct RandenState {
 RandenState GetRandenState() {
   static const RandenState state = []() {
     RandenState tmp;
-#if ABSL_RANDOM_INTERNAL_AES_DISPATCH
+#if TURBO_RANDOM_INTERNAL_AES_DISPATCH
     // HW AES Dispatch.
     if (HasRandenHwAesImplementation() && CPUSupportsRandenHwAes()) {
       tmp.has_crypto = true;
@@ -62,7 +62,7 @@ RandenState GetRandenState() {
       tmp.has_crypto = false;
       tmp.keys = RandenSlow::GetKeys();
     }
-#elif ABSL_HAVE_ACCELERATED_AES
+#elif TURBO_HAVE_ACCELERATED_AES
     // HW AES is enabled.
     tmp.has_crypto = true;
     tmp.keys = RandenHwAes::GetKeys();
@@ -81,11 +81,11 @@ RandenState GetRandenState() {
 Randen::Randen() {
   auto tmp = GetRandenState();
   keys_ = tmp.keys;
-#if ABSL_RANDOM_INTERNAL_AES_DISPATCH
+#if TURBO_RANDOM_INTERNAL_AES_DISPATCH
   has_crypto_ = tmp.has_crypto;
 #endif
 }
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

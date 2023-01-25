@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include "turbo/base/macros.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
 
@@ -80,10 +80,10 @@ TableGenerator::TableGenerator() {
   // The constants here should match the values in gaussian_distribution.h
   static constexpr int kC = kMask + 1;
 
-  static_assert((ABSL_ARRAYSIZE(tables_.x) == kC + 1),
+  static_assert((TURBO_ARRAYSIZE(tables_.x) == kC + 1),
                 "xArray must be length kMask + 2");
 
-  static_assert((ABSL_ARRAYSIZE(tables_.x) == ABSL_ARRAYSIZE(tables_.f)),
+  static_assert((TURBO_ARRAYSIZE(tables_.x) == TURBO_ARRAYSIZE(tables_.f)),
                 "fx and x arrays must be identical length");
 
   auto f = [](double x) { return std::exp(-0.5 * x * x); };
@@ -112,7 +112,7 @@ void TableGenerator::Print(std::ostream* os) {
          "#include \"turbo/random/gaussian_distribution.h\"\n"
          "\n"
          "namespace turbo {\n"
-         "ABSL_NAMESPACE_BEGIN\n"
+         "TURBO_NAMESPACE_BEGIN\n"
          "namespace random_internal {\n"
          "\n"
          "const gaussian_distribution_base::Tables\n"
@@ -123,7 +123,7 @@ void TableGenerator::Print(std::ostream* os) {
   *os << "};\n"
          "\n"
          "}  // namespace random_internal\n"
-         "ABSL_NAMESPACE_END\n"
+         "TURBO_NAMESPACE_END\n"
          "}  // namespace turbo\n"
          "\n"
          "// clang-format on\n"
@@ -132,7 +132,7 @@ void TableGenerator::Print(std::ostream* os) {
 }
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 int main(int, char**) {

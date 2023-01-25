@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,8 +43,8 @@
 // the visitor pattern are a good example of when this class should be used.
 //
 // This class is trivial to copy and should be passed by value.
-#ifndef ABSL_FUNCTIONAL_FUNCTION_REF_H_
-#define ABSL_FUNCTIONAL_FUNCTION_REF_H_
+#ifndef TURBO_FUNCTIONAL_FUNCTION_REF_H_
+#define TURBO_FUNCTIONAL_FUNCTION_REF_H_
 
 #include <cassert>
 #include <functional>
@@ -55,7 +55,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // FunctionRef
 //
@@ -101,7 +101,7 @@ class FunctionRef<R(Args...)> {
   // Constructs a FunctionRef from any invokable type.
   template <typename F, typename = EnableIfCompatible<const F&>>
   // NOLINTNEXTLINE(runtime/explicit)
-  FunctionRef(const F& f ABSL_ATTRIBUTE_LIFETIME_BOUND)
+  FunctionRef(const F& f TURBO_ATTRIBUTE_LIFETIME_BOUND)
       : invoker_(&turbo::functional_internal::InvokeObject<F, R, Args...>) {
     turbo::functional_internal::AssertNonNull(f);
     ptr_.obj = &f;
@@ -137,7 +137,7 @@ class FunctionRef<R(Args...)> {
   turbo::functional_internal::Invoker<R, Args...> invoker_;
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FUNCTIONAL_FUNCTION_REF_H_
+#endif  // TURBO_FUNCTIONAL_FUNCTION_REF_H_

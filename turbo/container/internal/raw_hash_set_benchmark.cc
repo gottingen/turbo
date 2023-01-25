@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include "benchmark/benchmark.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 struct RawHashSetTestOnlyAccess {
@@ -164,7 +164,7 @@ void BM_CacheInSteadyState(benchmark::State& state) {
     auto x = t.emplace(gen(rng), gen(rng));
     if (x.second) keys.push_back(x.first->first);
   }
-  ABSL_RAW_CHECK(state.range(0) >= 10, "");
+  TURBO_RAW_CHECK(state.range(0) >= 10, "");
   while (state.KeepRunning()) {
     // Some cache hits.
     std::deque<std::string>::const_iterator it;
@@ -174,7 +174,7 @@ void BM_CacheInSteadyState(benchmark::State& state) {
     }
     // Some cache misses.
     for (int i = 0; i != 10; ++i) ::benchmark::DoNotOptimize(t.find(gen(rng)));
-    ABSL_RAW_CHECK(t.erase(keys.front()), keys.front().c_str());
+    TURBO_RAW_CHECK(t.erase(keys.front()), keys.front().c_str());
     keys.pop_front();
     while (true) {
       auto x = t.emplace(gen(rng), gen(rng));
@@ -498,47 +498,47 @@ BENCHMARK(BM_Resize);
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // These methods are here to make it easy to examine the assembly for targeted
 // parts of the API.
-auto CodegenAbslRawHashSetInt64Find(turbo::container_internal::IntTable* table,
+auto CodegenTurboRawHashSetInt64Find(turbo::container_internal::IntTable* table,
                                     int64_t key) -> decltype(table->find(key)) {
   return table->find(key);
 }
 
-bool CodegenAbslRawHashSetInt64FindNeEnd(
+bool CodegenTurboRawHashSetInt64FindNeEnd(
     turbo::container_internal::IntTable* table, int64_t key) {
   return table->find(key) != table->end();
 }
 
 // This is useful because the find isn't inlined but the iterator comparison is.
-bool CodegenAbslRawHashSetStringFindNeEnd(
+bool CodegenTurboRawHashSetStringFindNeEnd(
     turbo::container_internal::StringTable* table, const std::string& key) {
   return table->find(key) != table->end();
 }
 
-auto CodegenAbslRawHashSetInt64Insert(turbo::container_internal::IntTable* table,
+auto CodegenTurboRawHashSetInt64Insert(turbo::container_internal::IntTable* table,
                                       int64_t key)
     -> decltype(table->insert(key)) {
   return table->insert(key);
 }
 
-bool CodegenAbslRawHashSetInt64Contains(
+bool CodegenTurboRawHashSetInt64Contains(
     turbo::container_internal::IntTable* table, int64_t key) {
   return table->contains(key);
 }
 
-void CodegenAbslRawHashSetInt64Iterate(
+void CodegenTurboRawHashSetInt64Iterate(
     turbo::container_internal::IntTable* table) {
   for (auto x : *table) benchmark::DoNotOptimize(x);
 }
 
 int odr =
     (::benchmark::DoNotOptimize(std::make_tuple(
-         &CodegenAbslRawHashSetInt64Find, &CodegenAbslRawHashSetInt64FindNeEnd,
-         &CodegenAbslRawHashSetStringFindNeEnd,
-         &CodegenAbslRawHashSetInt64Insert, &CodegenAbslRawHashSetInt64Contains,
-         &CodegenAbslRawHashSetInt64Iterate)),
+         &CodegenTurboRawHashSetInt64Find, &CodegenTurboRawHashSetInt64FindNeEnd,
+         &CodegenTurboRawHashSetStringFindNeEnd,
+         &CodegenTurboRawHashSetInt64Insert, &CodegenTurboRawHashSetInt64Contains,
+         &CodegenTurboRawHashSetInt64Iterate)),
      1);

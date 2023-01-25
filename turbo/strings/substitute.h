@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@
 //   * bool (Printed as "true" or "false")
 //   * pointer types other than char* (Printed as "0x<lower case hex string>",
 //     except that null is printed as "NULL")
-//   * user-defined types via the `AbslStringify()` customization point. See the
+//   * user-defined types via the `TurboStringify()` customization point. See the
 //     documentation for `turbo::StrCat` for an explanation on how to use this.
 //
 // If an invalid format string is provided, Substitute returns an empty string
@@ -69,8 +69,8 @@
 //     e.g. "Hello $f".
 // In debug mode, i.e. #ifndef NDEBUG, such errors terminate the program.
 
-#ifndef ABSL_STRINGS_SUBSTITUTE_H_
-#define ABSL_STRINGS_SUBSTITUTE_H_
+#ifndef TURBO_STRINGS_SUBSTITUTE_H_
+#define TURBO_STRINGS_SUBSTITUTE_H_
 
 #include <cstring>
 #include <string>
@@ -89,7 +89,7 @@
 #include "turbo/strings/strip.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace substitute_internal {
 
 // Arg
@@ -176,7 +176,7 @@ class Arg {
       : piece_(value ? "true" : "false") {}
 
   template <typename T, typename = typename std::enable_if<
-                            strings_internal::HasAbslStringify<T>::value>::type>
+                            strings_internal::HasTurboStringify<T>::value>::type>
   Arg(  // NOLINT(google-explicit-constructor)
       const T& v, strings_internal::StringifySink&& sink = {})
       : piece_(strings_internal::ExtractStringification(sink, v)) {}
@@ -204,7 +204,7 @@ class Arg {
   template <typename T,
             typename = typename std::enable_if<
                 std::is_enum<T>{} && !std::is_convertible<T, int>{} &&
-                !strings_internal::HasAbslStringify<T>::value>::type>
+                !strings_internal::HasTurboStringify<T>::value>::type>
   Arg(T value)  // NOLINT(google-explicit-constructor)
       : Arg(static_cast<typename std::underlying_type<T>::type>(value)) {}
 
@@ -224,7 +224,7 @@ void SubstituteAndAppendArray(std::string* output, turbo::string_view format,
                               const turbo::string_view* args_array,
                               size_t num_args);
 
-#if defined(ABSL_BAD_CALL_IF)
+#if defined(TURBO_BAD_CALL_IF)
 constexpr int CalculateOneBit(const char* format) {
   // Returns:
   // * 2^N for '$N' when N is in [0-9]
@@ -245,7 +245,7 @@ constexpr int PlaceholderBitmask(const char* format) {
                               : (CalculateOneBit(format + 1) |
                                  PlaceholderBitmask(SkipNumber(format + 1)));
 }
-#endif  // ABSL_BAD_CALL_IF
+#endif  // TURBO_BAD_CALL_IF
 
 }  // namespace substitute_internal
 
@@ -279,7 +279,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                 const substitute_internal::Arg& a0) {
   const turbo::string_view args[] = {a0.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -287,7 +287,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                 const substitute_internal::Arg& a1) {
   const turbo::string_view args[] = {a0.piece(), a1.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -296,7 +296,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                 const substitute_internal::Arg& a2) {
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -307,7 +307,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -319,7 +319,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -332,7 +332,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece(), a5.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -347,7 +347,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(
@@ -360,7 +360,7 @@ inline void SubstituteAndAppend(
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece(), a7.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(
@@ -374,7 +374,7 @@ inline void SubstituteAndAppend(
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece(), a7.piece(), a8.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
 inline void SubstituteAndAppend(
@@ -388,14 +388,14 @@ inline void SubstituteAndAppend(
       a0.piece(), a1.piece(), a2.piece(), a3.piece(), a4.piece(),
       a5.piece(), a6.piece(), a7.piece(), a8.piece(), a9.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                ABSL_ARRAYSIZE(args));
+                                                TURBO_ARRAYSIZE(args));
 }
 
-#if defined(ABSL_BAD_CALL_IF)
+#if defined(TURBO_BAD_CALL_IF)
 // This body of functions catches cases where the number of placeholders
 // doesn't match the number of data arguments.
 void SubstituteAndAppend(std::string* output, const char* format)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 0,
         "There were no substitution arguments "
         "but this format string either has a $[0-9] in it or contains "
@@ -403,7 +403,7 @@ void SubstituteAndAppend(std::string* output, const char* format)
 
 void SubstituteAndAppend(std::string* output, const char* format,
                          const substitute_internal::Arg& a0)
-    ABSL_BAD_CALL_IF(substitute_internal::PlaceholderBitmask(format) != 1,
+    TURBO_BAD_CALL_IF(substitute_internal::PlaceholderBitmask(format) != 1,
                      "There was 1 substitution argument given, but "
                      "this format string is missing its $0, contains "
                      "one of $1-$9, or contains an unescaped $ character (use "
@@ -412,7 +412,7 @@ void SubstituteAndAppend(std::string* output, const char* format,
 void SubstituteAndAppend(std::string* output, const char* format,
                          const substitute_internal::Arg& a0,
                          const substitute_internal::Arg& a1)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 3,
         "There were 2 substitution arguments given, but this format string is "
         "missing its $0/$1, contains one of $2-$9, or contains an "
@@ -422,7 +422,7 @@ void SubstituteAndAppend(std::string* output, const char* format,
                          const substitute_internal::Arg& a0,
                          const substitute_internal::Arg& a1,
                          const substitute_internal::Arg& a2)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 7,
         "There were 3 substitution arguments given, but "
         "this format string is missing its $0/$1/$2, contains one of "
@@ -433,7 +433,7 @@ void SubstituteAndAppend(std::string* output, const char* format,
                          const substitute_internal::Arg& a1,
                          const substitute_internal::Arg& a2,
                          const substitute_internal::Arg& a3)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 15,
         "There were 4 substitution arguments given, but "
         "this format string is missing its $0-$3, contains one of "
@@ -445,7 +445,7 @@ void SubstituteAndAppend(std::string* output, const char* format,
                          const substitute_internal::Arg& a2,
                          const substitute_internal::Arg& a3,
                          const substitute_internal::Arg& a4)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 31,
         "There were 5 substitution arguments given, but "
         "this format string is missing its $0-$4, contains one of "
@@ -458,7 +458,7 @@ void SubstituteAndAppend(std::string* output, const char* format,
                          const substitute_internal::Arg& a3,
                          const substitute_internal::Arg& a4,
                          const substitute_internal::Arg& a5)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 63,
         "There were 6 substitution arguments given, but "
         "this format string is missing its $0-$5, contains one of "
@@ -469,7 +469,7 @@ void SubstituteAndAppend(
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 127,
         "There were 7 substitution arguments given, but "
         "this format string is missing its $0-$6, contains one of "
@@ -481,7 +481,7 @@ void SubstituteAndAppend(
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
     const substitute_internal::Arg& a7)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 255,
         "There were 8 substitution arguments given, but "
         "this format string is missing its $0-$7, contains one of "
@@ -493,7 +493,7 @@ void SubstituteAndAppend(
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
     const substitute_internal::Arg& a7, const substitute_internal::Arg& a8)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 511,
         "There were 9 substitution arguments given, but "
         "this format string is missing its $0-$8, contains a $9, or "
@@ -506,12 +506,12 @@ void SubstituteAndAppend(
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
     const substitute_internal::Arg& a7, const substitute_internal::Arg& a8,
     const substitute_internal::Arg& a9)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 1023,
         "There were 10 substitution arguments given, but this "
         "format string either doesn't contain all of $0 through $9 or "
         "contains an unescaped $ character (use $$ instead)");
-#endif  // ABSL_BAD_CALL_IF
+#endif  // TURBO_BAD_CALL_IF
 
 // Substitute()
 //
@@ -529,20 +529,20 @@ void SubstituteAndAppend(
 //  void VarMsg(turbo::string_view format, const Args&... args) {
 //    std::string s = turbo::Substitute(format, args...);
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(turbo::string_view format) {
+TURBO_MUST_USE_RESULT inline std::string Substitute(turbo::string_view format) {
   std::string result;
   SubstituteAndAppend(&result, format);
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0) {
   std::string result;
   SubstituteAndAppend(&result, format, a0);
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1) {
   std::string result;
@@ -550,7 +550,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2) {
   std::string result;
@@ -558,7 +558,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3) {
@@ -567,7 +567,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4) {
@@ -576,7 +576,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
@@ -586,7 +586,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
@@ -596,7 +596,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
@@ -607,7 +607,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
@@ -618,7 +618,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(
+TURBO_MUST_USE_RESULT inline std::string Substitute(
     turbo::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
@@ -630,17 +630,17 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
   return result;
 }
 
-#if defined(ABSL_BAD_CALL_IF)
+#if defined(TURBO_BAD_CALL_IF)
 // This body of functions catches cases where the number of placeholders
 // doesn't match the number of data arguments.
 std::string Substitute(const char* format)
-    ABSL_BAD_CALL_IF(substitute_internal::PlaceholderBitmask(format) != 0,
+    TURBO_BAD_CALL_IF(substitute_internal::PlaceholderBitmask(format) != 0,
                      "There were no substitution arguments "
                      "but this format string either has a $[0-9] in it or "
                      "contains an unescaped $ character (use $$ instead)");
 
 std::string Substitute(const char* format, const substitute_internal::Arg& a0)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 1,
         "There was 1 substitution argument given, but "
         "this format string is missing its $0, contains one of $1-$9, "
@@ -648,7 +648,7 @@ std::string Substitute(const char* format, const substitute_internal::Arg& a0)
 
 std::string Substitute(const char* format, const substitute_internal::Arg& a0,
                        const substitute_internal::Arg& a1)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 3,
         "There were 2 substitution arguments given, but "
         "this format string is missing its $0/$1, contains one of "
@@ -657,7 +657,7 @@ std::string Substitute(const char* format, const substitute_internal::Arg& a0,
 std::string Substitute(const char* format, const substitute_internal::Arg& a0,
                        const substitute_internal::Arg& a1,
                        const substitute_internal::Arg& a2)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 7,
         "There were 3 substitution arguments given, but "
         "this format string is missing its $0/$1/$2, contains one of "
@@ -667,7 +667,7 @@ std::string Substitute(const char* format, const substitute_internal::Arg& a0,
                        const substitute_internal::Arg& a1,
                        const substitute_internal::Arg& a2,
                        const substitute_internal::Arg& a3)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 15,
         "There were 4 substitution arguments given, but "
         "this format string is missing its $0-$3, contains one of "
@@ -678,7 +678,7 @@ std::string Substitute(const char* format, const substitute_internal::Arg& a0,
                        const substitute_internal::Arg& a2,
                        const substitute_internal::Arg& a3,
                        const substitute_internal::Arg& a4)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 31,
         "There were 5 substitution arguments given, but "
         "this format string is missing its $0-$4, contains one of "
@@ -690,7 +690,7 @@ std::string Substitute(const char* format, const substitute_internal::Arg& a0,
                        const substitute_internal::Arg& a3,
                        const substitute_internal::Arg& a4,
                        const substitute_internal::Arg& a5)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 63,
         "There were 6 substitution arguments given, but "
         "this format string is missing its $0-$5, contains one of "
@@ -703,7 +703,7 @@ std::string Substitute(const char* format, const substitute_internal::Arg& a0,
                        const substitute_internal::Arg& a4,
                        const substitute_internal::Arg& a5,
                        const substitute_internal::Arg& a6)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 127,
         "There were 7 substitution arguments given, but "
         "this format string is missing its $0-$6, contains one of "
@@ -717,7 +717,7 @@ std::string Substitute(const char* format, const substitute_internal::Arg& a0,
                        const substitute_internal::Arg& a5,
                        const substitute_internal::Arg& a6,
                        const substitute_internal::Arg& a7)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 255,
         "There were 8 substitution arguments given, but "
         "this format string is missing its $0-$7, contains one of "
@@ -729,7 +729,7 @@ std::string Substitute(
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
     const substitute_internal::Arg& a7, const substitute_internal::Arg& a8)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 511,
         "There were 9 substitution arguments given, but "
         "this format string is missing its $0-$8, contains a $9, or "
@@ -742,14 +742,14 @@ std::string Substitute(
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
     const substitute_internal::Arg& a7, const substitute_internal::Arg& a8,
     const substitute_internal::Arg& a9)
-    ABSL_BAD_CALL_IF(
+    TURBO_BAD_CALL_IF(
         substitute_internal::PlaceholderBitmask(format) != 1023,
         "There were 10 substitution arguments given, but this "
         "format string either doesn't contain all of $0 through $9 or "
         "contains an unescaped $ character (use $$ instead)");
-#endif  // ABSL_BAD_CALL_IF
+#endif  // TURBO_BAD_CALL_IF
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_SUBSTITUTE_H_
+#endif  // TURBO_STRINGS_SUBSTITUTE_H_

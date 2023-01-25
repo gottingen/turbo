@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include "turbo/types/variant.h"
 
 // This test is a no-op when turbo::variant is an alias for std::variant.
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(TURBO_USES_STD_VARIANT)
 
 #include <algorithm>
 #include <cstddef>
@@ -42,20 +42,20 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/string_view.h"
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
-#define ABSL_VARIANT_TEST_EXPECT_FAIL(expr, exception_t, text) \
+#define TURBO_VARIANT_TEST_EXPECT_FAIL(expr, exception_t, text) \
   EXPECT_THROW(expr, exception_t)
 
 #else
 
-#define ABSL_VARIANT_TEST_EXPECT_FAIL(expr, exception_t, text) \
+#define TURBO_VARIANT_TEST_EXPECT_FAIL(expr, exception_t, text) \
   EXPECT_DEATH_IF_SUPPORTED(expr, text)
 
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-#define ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(...)                 \
-  ABSL_VARIANT_TEST_EXPECT_FAIL((void)(__VA_ARGS__), turbo::bad_variant_access, \
+#define TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(...)                 \
+  TURBO_VARIANT_TEST_EXPECT_FAIL((void)(__VA_ARGS__), turbo::bad_variant_access, \
                                 "Bad variant access")
 
 struct Hashable {};
@@ -70,7 +70,7 @@ struct hash<Hashable> {
 struct NonHashable {};
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 using ::testing::DoubleEq;
@@ -117,7 +117,7 @@ struct MoveOnlyWithListConstructor {
   int value = 0;
 };
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
 struct ConversionException {};
 
@@ -138,7 +138,7 @@ void ToValuelessByException(turbo::variant<H, T...>& v) {  // NOLINT
   }
 }
 
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS
 
 // An indexed sequence of distinct structures holding a single
 // value of type T
@@ -637,10 +637,10 @@ TEST(VariantTest, TestDtor) {
   EXPECT_EQ(4, counter);
 }
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
 // See comment in turbo/base/config.h
-#if defined(ABSL_INTERNAL_MSVC_2017_DBG_MODE)
+#if defined(TURBO_INTERNAL_MSVC_2017_DBG_MODE)
 TEST(VariantTest, DISABLED_TestDtorValuelessByException)
 #else
 // Test destruction when in the valueless_by_exception state.
@@ -663,7 +663,7 @@ TEST(VariantTest, TestDtorValuelessByException)
   EXPECT_EQ(1, counter);
 }
 
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS
 
 //////////////////////
 // [variant.assign] //
@@ -843,7 +843,7 @@ TEST(VariantTest, TestBackupAssign) {
   }
 
   // libstdc++ doesn't pass this test
-#if !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#if !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
   EXPECT_EQ(3, counter[0]);
   EXPECT_EQ(2, counter[1]);
   EXPECT_EQ(2, counter[2]);
@@ -996,7 +996,7 @@ TEST(VariantTest, NotValuelessByException) {
   EXPECT_FALSE(v.valueless_by_exception());
 }
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
 TEST(VariantTest, IndexValuelessByException) {
   using Var = variant<MoveCanThrow, std::string, double>;
@@ -1020,7 +1020,7 @@ TEST(VariantTest, ValuelessByException) {
   EXPECT_FALSE(v.valueless_by_exception());
 }
 
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS
 
 ////////////////////
 // [variant.swap] //
@@ -1050,7 +1050,7 @@ TEST(VariantTest, MemberSwap) {
     EXPECT_THAT(lhs, VariantWith<std::string>(s));
     EXPECT_THAT(rhs, VariantWith<int>(i));
   }
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   V valueless(in_place_index<0>);
   ToValuelessByException(valueless);
   {
@@ -1074,7 +1074,7 @@ TEST(VariantTest, MemberSwap) {
     EXPECT_TRUE(lhs.valueless_by_exception());
     EXPECT_TRUE(rhs.valueless_by_exception());
   }
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS
 }
 
 //////////////////////
@@ -1293,24 +1293,24 @@ TEST(VariantTest, BadGetIndex) {
   {
     Var v = 1;
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<1>(v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<1>(std::move(v)));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<1>(v));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<1>(std::move(v)));
 
     const Var& const_v = v;
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<1>(const_v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<1>(const_v));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
         turbo::get<1>(std::move(const_v)));  // NOLINT
   }
 
   {
     Var v = std::string("Hello");
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<0>(v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<0>(std::move(v)));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<0>(v));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<0>(std::move(v)));
 
     const Var& const_v = v;
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<0>(const_v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<0>(const_v));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
         turbo::get<0>(std::move(const_v)));  // NOLINT
   }
 }
@@ -1385,26 +1385,26 @@ TEST(VariantTest, BadGetType) {
   {
     Var v = 1;
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<std::string>(v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<std::string>(v));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
         turbo::get<std::string>(std::move(v)));
 
     const Var& const_v = v;
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
         turbo::get<std::string>(const_v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
         turbo::get<std::string>(std::move(const_v)));  // NOLINT
   }
 
   {
     Var v = std::string("Hello");
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<int>(v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<int>(std::move(v)));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<int>(v));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<int>(std::move(v)));
 
     const Var& const_v = v;
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<int>(const_v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(turbo::get<int>(const_v));
+    TURBO_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
         turbo::get<int>(std::move(const_v)));  // NOLINT
   }
 }
@@ -1713,7 +1713,7 @@ TEST(VariantTest, OperatorRelational) {
   EXPECT_TRUE(b >= a);
 }
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
 TEST(VariantTest, ValuelessOperatorEquals) {
   variant<MoveCanThrow, std::string> int_v(1), string_v("Hello"),
@@ -1934,7 +1934,7 @@ TEST(VariantTest, VisitReferenceWrapper) {
 }
 
 // libstdc++ std::variant doesn't support the INVOKE semantics.
-#if !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#if !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
 TEST(VariantTest, VisitMemberFunction) {
   turbo::variant<std::unique_ptr<Class>> p(turbo::make_unique<Class>());
   turbo::variant<std::unique_ptr<const Class>> cp(
@@ -1958,7 +1958,7 @@ TEST(VariantTest, VisitDataMember) {
 
   EXPECT_EQ(42, turbo::visit(&Class::member, cp));
 }
-#endif  // !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#endif  // !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
 
 /////////////////////////
 // [variant.monostate] //
@@ -2036,7 +2036,7 @@ TEST(VariantTest, NonmemberSwap) {
   std::swap(a, b);
   EXPECT_THAT(a, VariantWith<SpecialSwap>(v2));
   EXPECT_THAT(b, VariantWith<SpecialSwap>(v1));
-#ifndef ABSL_USES_STD_VARIANT
+#ifndef TURBO_USES_STD_VARIANT
   EXPECT_FALSE(turbo::get<SpecialSwap>(a).special_swap);
 #endif
 
@@ -2074,7 +2074,7 @@ TEST(VariantTest, Hash) {
   static_assert(type_traits_internal::IsHashable<variant<int, Hashable>>::value,
                 "");
 
-#if ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
   static_assert(!type_traits_internal::IsHashable<variant<NonHashable>>::value,
                 "");
   static_assert(
@@ -2084,7 +2084,7 @@ TEST(VariantTest, Hash) {
 
 // MSVC std::hash<std::variant> does not use the index, thus produce the same
 // result on the same value as different alternative.
-#if !(defined(_MSC_VER) && defined(ABSL_USES_STD_VARIANT))
+#if !(defined(_MSC_VER) && defined(TURBO_USES_STD_VARIANT))
   {
     // same value as different alternative
     variant<int, int> v0(in_place_index<0>, 42);
@@ -2092,7 +2092,7 @@ TEST(VariantTest, Hash) {
     std::hash<variant<int, int>> hash;
     EXPECT_NE(hash(v0), hash(v1));
   }
-#endif  // !(defined(_MSC_VER) && defined(ABSL_USES_STD_VARIANT))
+#endif  // !(defined(_MSC_VER) && defined(TURBO_USES_STD_VARIANT))
 
   {
     std::hash<variant<int>> hash;
@@ -2119,7 +2119,7 @@ TEST(VariantTest, Hash) {
 ////////////////////////////////////////
 
 // Test that a set requiring a basic type conversion works correctly
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(TURBO_USES_STD_VARIANT)
 TEST(VariantTest, TestConvertingSet) {
   typedef variant<double> Variant;
   Variant v(1.0);
@@ -2129,7 +2129,7 @@ TEST(VariantTest, TestConvertingSet) {
   ASSERT_TRUE(nullptr != turbo::get_if<double>(&v));
   EXPECT_DOUBLE_EQ(2, turbo::get<double>(v));
 }
-#endif  // ABSL_USES_STD_VARIANT
+#endif  // TURBO_USES_STD_VARIANT
 
 // Test that a vector of variants behaves reasonably.
 TEST(VariantTest, Container) {
@@ -2281,7 +2281,7 @@ struct Convertible2 {
 };
 
 TEST(VariantTest, TestRvalueConversion) {
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(TURBO_USES_STD_VARIANT)
   variant<double, std::string> var(
       ConvertVariantTo<variant<double, std::string>>(
           variant<std::string, int>(0)));
@@ -2315,7 +2315,7 @@ TEST(VariantTest, TestRvalueConversion) {
       ConvertVariantTo<variant<int32_t, uint32_t>>(variant<uint32_t>(42u));
   ASSERT_TRUE(turbo::holds_alternative<uint32_t>(variant2));
   EXPECT_EQ(42u, turbo::get<uint32_t>(variant2));
-#endif  // !ABSL_USES_STD_VARIANT
+#endif  // !TURBO_USES_STD_VARIANT
 
   variant<Convertible1, Convertible2> variant3(
       ConvertVariantTo<variant<Convertible1, Convertible2>>(
@@ -2328,7 +2328,7 @@ TEST(VariantTest, TestRvalueConversion) {
 }
 
 TEST(VariantTest, TestLvalueConversion) {
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(TURBO_USES_STD_VARIANT)
   variant<std::string, int> source1 = 0;
   variant<double, std::string> destination(
       ConvertVariantTo<variant<double, std::string>>(source1));
@@ -2430,7 +2430,7 @@ TEST(VariantTest, DoesNotMoveFromLvalues) {
 }
 
 TEST(VariantTest, TestRvalueConversionViaConvertVariantTo) {
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(TURBO_USES_STD_VARIANT)
   variant<double, std::string> var(
       ConvertVariantTo<variant<double, std::string>>(
           variant<std::string, int>(3)));
@@ -2470,7 +2470,7 @@ TEST(VariantTest, TestRvalueConversionViaConvertVariantTo) {
 }
 
 TEST(VariantTest, TestLvalueConversionViaConvertVariantTo) {
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(TURBO_USES_STD_VARIANT)
   variant<std::string, int> source1 = 3;
   variant<double, std::string> destination(
       ConvertVariantTo<variant<double, std::string>>(source1));
@@ -2502,7 +2502,7 @@ TEST(VariantTest, TestLvalueConversionViaConvertVariantTo) {
   variant<uint32_t> source6(42u);
   variant2 = ConvertVariantTo<variant<int32_t, uint32_t>>(source6);
   EXPECT_THAT(turbo::get_if<uint32_t>(&variant2), Pointee(42u));
-#endif  // !ABSL_USES_STD_VARIANT
+#endif  // !TURBO_USES_STD_VARIANT
 
   variant<Convertible2, Convertible1> source7((Convertible1()));
   variant<Convertible1, Convertible2> variant3(
@@ -2536,8 +2536,8 @@ TEST(VariantTest, TestMoveConversionViaConvertVariantTo) {
 // standard and we know that libstdc++ variant doesn't have this feature.
 // For more details see the paper:
 // http://open-std.org/JTC1/SC22/WG21/docs/papers/2017/p0602r0.html
-#if !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
-#define ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY 1
+#if !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#define TURBO_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY 1
 #endif
 
 TEST(VariantTest, TestCopyAndMoveTypeTraits) {
@@ -2554,12 +2554,12 @@ TEST(VariantTest, TestCopyAndMoveTypeTraits) {
   EXPECT_FALSE(
       turbo::is_trivially_copy_constructible<variant<std::string>>::value);
   EXPECT_FALSE(turbo::is_trivially_copy_assignable<variant<std::string>>::value);
-#if ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
+#if TURBO_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
   EXPECT_TRUE(turbo::is_trivially_copy_constructible<variant<int>>::value);
   EXPECT_TRUE(turbo::is_trivially_copy_assignable<variant<int>>::value);
   EXPECT_TRUE(is_trivially_move_constructible<variant<int>>::value);
   EXPECT_TRUE(is_trivially_move_assignable<variant<int>>::value);
-#endif  // ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
+#endif  // TURBO_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
 }
 
 TEST(VariantTest, TestVectorOfMoveonlyVariant) {
@@ -2576,7 +2576,7 @@ TEST(VariantTest, TestVectorOfMoveonlyVariant) {
 }
 
 TEST(VariantTest, NestedVariant) {
-#if ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
+#if TURBO_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
   static_assert(turbo::is_trivially_copy_constructible<variant<int>>(), "");
   static_assert(turbo::is_trivially_copy_assignable<variant<int>>(), "");
   static_assert(is_trivially_move_constructible<variant<int>>(), "");
@@ -2588,7 +2588,7 @@ TEST(VariantTest, NestedVariant) {
                 "");
   static_assert(is_trivially_move_constructible<variant<variant<int>>>(), "");
   static_assert(is_trivially_move_assignable<variant<variant<int>>>(), "");
-#endif  // ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
+#endif  // TURBO_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
 
   variant<int> x(42);
   variant<variant<int>> y(x);
@@ -2628,7 +2628,7 @@ struct TriviallyMoveAssignable {
 
 struct TriviallyCopyAssignable {};
 
-#if ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
+#if TURBO_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
 TEST(VariantTest, TestTriviality) {
   {
     using TrivDestVar = turbo::variant<TriviallyDestructible>;
@@ -2682,7 +2682,7 @@ TEST(VariantTest, TestTriviality) {
     EXPECT_TRUE(turbo::is_trivially_destructible<TrivCopyAssignVar>::value);
   }
 }
-#endif  // ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
+#endif  // TURBO_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
 
 // To verify that turbo::variant correctly use the nontrivial move ctor of its
 // member rather than use the trivial copy constructor.
@@ -2712,7 +2712,7 @@ TEST(VariantTest, MoveCtorBug) {
 }
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // #if !defined(ABSL_USES_STD_VARIANT)
+#endif  // #if !defined(TURBO_USES_STD_VARIANT)

@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -34,10 +34,10 @@ cc_library(
     hdrs = [
         "internal/graphcycles.h",
     ],
-    copts = ABSL_DEFAULT_COPTS + select({
+    copts = TURBO_DEFAULT_COPTS + select({
         "//conditions:default": [],
     }),
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -54,8 +54,8 @@ cc_library(
 cc_library(
     name = "kernel_timeout_internal",
     hdrs = ["internal/kernel_timeout.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/synchronization:__pkg__",
     ],
@@ -87,13 +87,13 @@ cc_library(
         "mutex.h",
         "notification.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
+    copts = TURBO_DEFAULT_COPTS,
     linkopts = select({
         "//turbo:msvc_compiler": [],
         "//turbo:clang-cl_compiler": [],
         "//turbo:wasm": [],
         "//conditions:default": ["-pthread"],
-    }) + ABSL_DEFAULT_LINKOPTS,
+    }) + TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":graphcycles_internal",
         ":kernel_timeout_internal",
@@ -117,8 +117,8 @@ cc_test(
     name = "barrier_test",
     size = "small",
     srcs = ["barrier_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -133,8 +133,8 @@ cc_test(
     name = "blocking_counter_test",
     size = "small",
     srcs = ["blocking_counter_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -149,8 +149,8 @@ cc_binary(
     name = "blocking_counter_benchmark",
     testonly = 1,
     srcs = ["blocking_counter_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     visibility = ["//visibility:private"],
     deps = [
@@ -164,8 +164,8 @@ cc_test(
     name = "graphcycles_test",
     size = "medium",
     srcs = ["internal/graphcycles_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":graphcycles_internal",
         "//turbo/base:core_headers",
@@ -177,8 +177,8 @@ cc_test(
 cc_test(
     name = "graphcycles_benchmark",
     srcs = ["internal/graphcycles_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "benchmark",
     ],
@@ -193,7 +193,7 @@ cc_library(
     name = "thread_pool",
     testonly = 1,
     hdrs = ["internal/thread_pool.h"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo:__subpackages__",
     ],
@@ -208,8 +208,8 @@ cc_test(
     name = "mutex_test",
     size = "large",
     srcs = ["mutex_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     shard_count = 25,
     deps = [
         ":synchronization",
@@ -227,8 +227,8 @@ cc_test(
 cc_test(
     name = "mutex_method_pointer_test",
     srcs = ["mutex_method_pointer_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":synchronization",
         "//turbo/base:config",
@@ -240,8 +240,8 @@ cc_library(
     name = "mutex_benchmark_common",
     testonly = 1,
     srcs = ["mutex_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = [
         "//turbo/synchronization:__pkg__",
     ],
@@ -258,8 +258,8 @@ cc_library(
 cc_binary(
     name = "mutex_benchmark",
     testonly = 1,
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":mutex_benchmark_common",
@@ -270,8 +270,8 @@ cc_test(
     name = "notification_test",
     size = "small",
     srcs = ["notification_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["no_test_lexan"],
     deps = [
         ":synchronization",
@@ -284,8 +284,8 @@ cc_library(
     name = "per_thread_sem_test_common",
     testonly = 1,
     srcs = ["internal/per_thread_sem_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":synchronization",
         "//turbo/base",
@@ -300,8 +300,8 @@ cc_library(
 cc_test(
     name = "per_thread_sem_test",
     size = "large",
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -319,8 +319,8 @@ cc_test(
     srcs = [
         "lifetime_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_ios_x86_64",
         "no_test_wasm",

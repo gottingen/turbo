@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors
+// Copyright 2020 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORD_REP_FLAT_H_
-#define ABSL_STRINGS_INTERNAL_CORD_REP_FLAT_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORD_REP_FLAT_H_
+#define TURBO_STRINGS_INTERNAL_CORD_REP_FLAT_H_
 
 #include <cassert>
 #include <cstddef>
@@ -25,7 +25,7 @@
 #include "turbo/strings/internal/cord_internal.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // Note: all constants below are never ODR used and internal to cord, we define
@@ -110,7 +110,7 @@ struct CordRepFlat : public CordRep {
 
   // Creates a new flat node.
   template <size_t max_flat_size, typename... Args>
-  static CordRepFlat* NewImpl(size_t len, Args... args ABSL_ATTRIBUTE_UNUSED) {
+  static CordRepFlat* NewImpl(size_t len, Args... args TURBO_ATTRIBUTE_UNUSED) {
     if (len <= kMinFlatLength) {
       len = kMinFlatLength;
     } else if (len > max_flat_size - kFlatOverhead) {
@@ -181,7 +181,7 @@ inline const CordRepFlat* CordRep::flat() const {
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CORD_REP_FLAT_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORD_REP_FLAT_H_

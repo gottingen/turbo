@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 // This file declares helpers routines and macros used to implement `CHECK`
 // macros.
 
-#ifndef ABSL_LOG_INTERNAL_CHECK_OP_H_
-#define ABSL_LOG_INTERNAL_CHECK_OP_H_
+#ifndef TURBO_LOG_INTERNAL_CHECK_OP_H_
+#define TURBO_LOG_INTERNAL_CHECK_OP_H_
 
 #include <stdint.h>
 
@@ -36,62 +36,62 @@
 #include "turbo/log/internal/nullstream.h"
 #include "turbo/log/internal/strip.h"
 
-// `ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL` wraps string literals that
-// should be stripped when `ABSL_MIN_LOG_LEVEL` exceeds `kFatal`.
-#ifdef ABSL_MIN_LOG_LEVEL
-#define ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(literal)         \
+// `TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL` wraps string literals that
+// should be stripped when `TURBO_MIN_LOG_LEVEL` exceeds `kFatal`.
+#ifdef TURBO_MIN_LOG_LEVEL
+#define TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(literal)         \
   (::turbo::LogSeverity::kFatal >=                               \
-           static_cast<::turbo::LogSeverity>(ABSL_MIN_LOG_LEVEL) \
+           static_cast<::turbo::LogSeverity>(TURBO_MIN_LOG_LEVEL) \
        ? (literal)                                              \
        : "")
 #else
-#define ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(literal) (literal)
+#define TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(literal) (literal)
 #endif
 
 #ifdef NDEBUG
 // `NDEBUG` is defined, so `DCHECK_EQ(x, y)` and so on do nothing.  However, we
 // still want the compiler to parse `x` and `y`, because we don't want to lose
 // potentially useful errors and warnings.
-#define ABSL_LOG_INTERNAL_DCHECK_NOP(x, y)   \
+#define TURBO_LOG_INTERNAL_DCHECK_NOP(x, y)   \
   while (false && ((void)(x), (void)(y), 0)) \
   ::turbo::log_internal::NullStream().InternalStream()
 #endif
 
-#define ABSL_LOG_INTERNAL_CHECK_OP(name, op, val1, val1_text, val2, val2_text) \
+#define TURBO_LOG_INTERNAL_CHECK_OP(name, op, val1, val1_text, val2, val2_text) \
   while (                                                                      \
-      ::std::string* absl_log_internal_check_op_result ABSL_ATTRIBUTE_UNUSED = \
+      ::std::string* turbo_log_internal_check_op_result TURBO_ATTRIBUTE_UNUSED = \
           ::turbo::log_internal::name##Impl(                                    \
               ::turbo::log_internal::GetReferenceableValue(val1),               \
               ::turbo::log_internal::GetReferenceableValue(val2),               \
-              ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(val1_text                 \
+              TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(val1_text                 \
                                                      " " #op " " val2_text)))  \
-  ABSL_LOG_INTERNAL_CHECK(*absl_log_internal_check_op_result).InternalStream()
-#define ABSL_LOG_INTERNAL_QCHECK_OP(name, op, val1, val1_text, val2, \
+  TURBO_LOG_INTERNAL_CHECK(*turbo_log_internal_check_op_result).InternalStream()
+#define TURBO_LOG_INTERNAL_QCHECK_OP(name, op, val1, val1_text, val2, \
                                     val2_text)                       \
-  while (::std::string* absl_log_internal_qcheck_op_result =         \
+  while (::std::string* turbo_log_internal_qcheck_op_result =         \
              ::turbo::log_internal::name##Impl(                       \
                  ::turbo::log_internal::GetReferenceableValue(val1),  \
                  ::turbo::log_internal::GetReferenceableValue(val2),  \
-                 ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(             \
+                 TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(             \
                      val1_text " " #op " " val2_text)))              \
-  ABSL_LOG_INTERNAL_QCHECK(*absl_log_internal_qcheck_op_result).InternalStream()
-#define ABSL_LOG_INTERNAL_CHECK_STROP(func, op, expected, s1, s1_text, s2,     \
+  TURBO_LOG_INTERNAL_QCHECK(*turbo_log_internal_qcheck_op_result).InternalStream()
+#define TURBO_LOG_INTERNAL_CHECK_STROP(func, op, expected, s1, s1_text, s2,     \
                                       s2_text)                                 \
-  while (::std::string* absl_log_internal_check_strop_result =                 \
+  while (::std::string* turbo_log_internal_check_strop_result =                 \
              ::turbo::log_internal::Check##func##expected##Impl(                \
                  (s1), (s2),                                                   \
-                 ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(s1_text " " #op        \
+                 TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(s1_text " " #op        \
                                                                 " " s2_text))) \
-  ABSL_LOG_INTERNAL_CHECK(*absl_log_internal_check_strop_result)               \
+  TURBO_LOG_INTERNAL_CHECK(*turbo_log_internal_check_strop_result)               \
       .InternalStream()
-#define ABSL_LOG_INTERNAL_QCHECK_STROP(func, op, expected, s1, s1_text, s2,    \
+#define TURBO_LOG_INTERNAL_QCHECK_STROP(func, op, expected, s1, s1_text, s2,    \
                                        s2_text)                                \
-  while (::std::string* absl_log_internal_qcheck_strop_result =                \
+  while (::std::string* turbo_log_internal_qcheck_strop_result =                \
              ::turbo::log_internal::Check##func##expected##Impl(                \
                  (s1), (s2),                                                   \
-                 ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(s1_text " " #op        \
+                 TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(s1_text " " #op        \
                                                                 " " s2_text))) \
-  ABSL_LOG_INTERNAL_QCHECK(*absl_log_internal_qcheck_strop_result)             \
+  TURBO_LOG_INTERNAL_QCHECK(*turbo_log_internal_qcheck_strop_result)             \
       .InternalStream()
 // This one is tricky:
 // * We must evaluate `val` exactly once, yet we need to do two things with it:
@@ -113,39 +113,39 @@
 // * As usual, no braces so we can stream into the expansion with `operator<<`.
 // * Also as usual, it must expand to a single (partial) statement with no
 //   ambiguous-else problems.
-#define ABSL_LOG_INTERNAL_CHECK_OK(val, val_text)                        \
+#define TURBO_LOG_INTERNAL_CHECK_OK(val, val_text)                        \
   for (::std::pair<const ::turbo::Status*, ::std::string*>                \
-           absl_log_internal_check_ok_goo;                               \
-       absl_log_internal_check_ok_goo.first =                            \
+           turbo_log_internal_check_ok_goo;                               \
+       turbo_log_internal_check_ok_goo.first =                            \
            ::turbo::log_internal::AsStatus(val),                          \
-       absl_log_internal_check_ok_goo.second =                           \
-           ABSL_PREDICT_TRUE(absl_log_internal_check_ok_goo.first->ok()) \
+       turbo_log_internal_check_ok_goo.second =                           \
+           TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok()) \
                ? nullptr                                                 \
                : ::turbo::status_internal::MakeCheckFailString(           \
-                     absl_log_internal_check_ok_goo.first,               \
-                     ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text     \
+                     turbo_log_internal_check_ok_goo.first,               \
+                     TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text     \
                                                             " is OK")),  \
-       !ABSL_PREDICT_TRUE(absl_log_internal_check_ok_goo.first->ok());)  \
-  ABSL_LOG_INTERNAL_CHECK(*absl_log_internal_check_ok_goo.second)        \
+       !TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok());)  \
+  TURBO_LOG_INTERNAL_CHECK(*turbo_log_internal_check_ok_goo.second)        \
       .InternalStream()
-#define ABSL_LOG_INTERNAL_QCHECK_OK(val, val_text)                       \
+#define TURBO_LOG_INTERNAL_QCHECK_OK(val, val_text)                       \
   for (::std::pair<const ::turbo::Status*, ::std::string*>                \
-           absl_log_internal_check_ok_goo;                               \
-       absl_log_internal_check_ok_goo.first =                            \
+           turbo_log_internal_check_ok_goo;                               \
+       turbo_log_internal_check_ok_goo.first =                            \
            ::turbo::log_internal::AsStatus(val),                          \
-       absl_log_internal_check_ok_goo.second =                           \
-           ABSL_PREDICT_TRUE(absl_log_internal_check_ok_goo.first->ok()) \
+       turbo_log_internal_check_ok_goo.second =                           \
+           TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok()) \
                ? nullptr                                                 \
                : ::turbo::status_internal::MakeCheckFailString(           \
-                     absl_log_internal_check_ok_goo.first,               \
-                     ABSL_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text     \
+                     turbo_log_internal_check_ok_goo.first,               \
+                     TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text     \
                                                             " is OK")),  \
-       !ABSL_PREDICT_TRUE(absl_log_internal_check_ok_goo.first->ok());)  \
-  ABSL_LOG_INTERNAL_QCHECK(*absl_log_internal_check_ok_goo.second)       \
+       !TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok());)  \
+  TURBO_LOG_INTERNAL_QCHECK(*turbo_log_internal_check_ok_goo.second)       \
       .InternalStream()
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 class Status;
 template <typename T>
@@ -284,8 +284,8 @@ using CheckOpStreamType = decltype(detect_specialization::Detect<T>(0));
 
 // Build the error message string.  Specify no inlining for code size.
 template <typename T1, typename T2>
-ABSL_ATTRIBUTE_RETURNS_NONNULL std::string* MakeCheckOpString(
-    T1 v1, T2 v2, const char* exprtext) ABSL_ATTRIBUTE_NOINLINE;
+TURBO_ATTRIBUTE_RETURNS_NONNULL std::string* MakeCheckOpString(
+    T1 v1, T2 v2, const char* exprtext) TURBO_ATTRIBUTE_NOINLINE;
 
 template <typename T1, typename T2>
 std::string* MakeCheckOpString(T1 v1, T2 v2, const char* exprtext) {
@@ -297,34 +297,34 @@ std::string* MakeCheckOpString(T1 v1, T2 v2, const char* exprtext) {
 
 // Add a few commonly used instantiations as extern to reduce size of objects
 // files.
-#define ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(x) \
+#define TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(x) \
   extern template std::string* MakeCheckOpString(x, x, const char*)
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(bool);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(int64_t);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(uint64_t);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(float);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(double);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(char);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(unsigned char);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const std::string&);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const turbo::string_view&);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const char*);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const signed char*);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const unsigned char*);
-ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const void*);
-#undef ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(bool);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(int64_t);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(uint64_t);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(float);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(double);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(char);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(unsigned char);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const std::string&);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const turbo::string_view&);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const char*);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const signed char*);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const unsigned char*);
+TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const void*);
+#undef TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN
 
-// Helper functions for `ABSL_LOG_INTERNAL_CHECK_OP` macro family.  The
+// Helper functions for `TURBO_LOG_INTERNAL_CHECK_OP` macro family.  The
 // `(int, int)` override works around the issue that the compiler will not
 // instantiate the template version of the function on values of unnamed enum
 // type.
-#define ABSL_LOG_INTERNAL_CHECK_OP_IMPL(name, op)                        \
+#define TURBO_LOG_INTERNAL_CHECK_OP_IMPL(name, op)                        \
   template <typename T1, typename T2>                                    \
   inline constexpr ::std::string* name##Impl(const T1& v1, const T2& v2, \
                                              const char* exprtext) {     \
     using U1 = CheckOpStreamType<T1>;                                    \
     using U2 = CheckOpStreamType<T2>;                                    \
-    return ABSL_PREDICT_TRUE(v1 op v2)                                   \
+    return TURBO_PREDICT_TRUE(v1 op v2)                                   \
                ? nullptr                                                 \
                : MakeCheckOpString<U1, U2>(v1, v2, exprtext);            \
   }                                                                      \
@@ -333,13 +333,13 @@ ABSL_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const void*);
     return name##Impl<int, int>(v1, v2, exprtext);                       \
   }
 
-ABSL_LOG_INTERNAL_CHECK_OP_IMPL(Check_EQ, ==)
-ABSL_LOG_INTERNAL_CHECK_OP_IMPL(Check_NE, !=)
-ABSL_LOG_INTERNAL_CHECK_OP_IMPL(Check_LE, <=)
-ABSL_LOG_INTERNAL_CHECK_OP_IMPL(Check_LT, <)
-ABSL_LOG_INTERNAL_CHECK_OP_IMPL(Check_GE, >=)
-ABSL_LOG_INTERNAL_CHECK_OP_IMPL(Check_GT, >)
-#undef ABSL_LOG_INTERNAL_CHECK_OP_IMPL
+TURBO_LOG_INTERNAL_CHECK_OP_IMPL(Check_EQ, ==)
+TURBO_LOG_INTERNAL_CHECK_OP_IMPL(Check_NE, !=)
+TURBO_LOG_INTERNAL_CHECK_OP_IMPL(Check_LE, <=)
+TURBO_LOG_INTERNAL_CHECK_OP_IMPL(Check_LT, <)
+TURBO_LOG_INTERNAL_CHECK_OP_IMPL(Check_GE, >=)
+TURBO_LOG_INTERNAL_CHECK_OP_IMPL(Check_GT, >)
+#undef TURBO_LOG_INTERNAL_CHECK_OP_IMPL
 
 std::string* CheckstrcmptrueImpl(const char* s1, const char* s2,
                                  const char* exprtext);
@@ -386,7 +386,7 @@ inline constexpr unsigned long long GetReferenceableValue(  // NOLINT
 }
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_CHECK_OP_H_
+#endif  // TURBO_LOG_INTERNAL_CHECK_OP_H_

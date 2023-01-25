@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@
 // In addition, the `str_format` library provides extension points for
 // augmenting formatting to new types.  See "StrFormat Extensions" below.
 
-#ifndef ABSL_STRINGS_STR_FORMAT_H_
-#define ABSL_STRINGS_STR_FORMAT_H_
+#ifndef TURBO_STRINGS_STR_FORMAT_H_
+#define TURBO_STRINGS_STR_FORMAT_H_
 
 #include <cstdio>
 #include <string>
@@ -80,7 +80,7 @@
 #include "turbo/strings/internal/str_format/parser.h"  // IWYU pragma: export
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // UntypedFormatSpec
 //
@@ -348,7 +348,7 @@ using ParsedFormat = str_format_internal::ExtendedParsedFormat<
 //
 // Returns an empty string in case of error.
 template <typename... Args>
-ABSL_MUST_USE_RESULT std::string StrFormat(const FormatSpec<Args...>& format,
+TURBO_MUST_USE_RESULT std::string StrFormat(const FormatSpec<Args...>& format,
                                            const Args&... args) {
   return str_format_internal::FormatPack(
       str_format_internal::UntypedFormatSpecImpl::Extract(format),
@@ -385,7 +385,7 @@ std::string& StrAppendFormat(std::string* dst,
 //
 //   std::cout << StreamFormat("%12.6f", 3.14);
 template <typename... Args>
-ABSL_MUST_USE_RESULT str_format_internal::Streamable StreamFormat(
+TURBO_MUST_USE_RESULT str_format_internal::Streamable StreamFormat(
     const FormatSpec<Args...>& format, const Args&... args) {
   return str_format_internal::Streamable(
       str_format_internal::UntypedFormatSpecImpl::Extract(format),
@@ -471,11 +471,11 @@ int SNPrintF(char* output, std::size_t size, const FormatSpec<Args...>& format,
 // FormatRawSink is a type erased wrapper around arbitrary sink objects
 // specifically used as an argument to `Format()`.
 //
-// All the object has to do define an overload of `AbslFormatFlush()` for the
+// All the object has to do define an overload of `TurboFormatFlush()` for the
 // sink, usually by adding a ADL-based free function in the same namespace as
 // the sink:
 //
-//   void AbslFormatFlush(MySink* dest, turbo::string_view part);
+//   void TurboFormatFlush(MySink* dest, turbo::string_view part);
 //
 // where `dest` is the pointer passed to `turbo::Format()`. The function should
 // append `part` to `dest`.
@@ -571,7 +571,7 @@ using FormatArg = str_format_internal::FormatArgImpl;
 //     return std::move(out);
 //   }
 //
-ABSL_MUST_USE_RESULT inline bool FormatUntyped(
+TURBO_MUST_USE_RESULT inline bool FormatUntyped(
     FormatRawSink raw_sink, const UntypedFormatSpec& format,
     turbo::Span<const FormatArg> args) {
   return str_format_internal::FormatUntyped(
@@ -583,34 +583,34 @@ ABSL_MUST_USE_RESULT inline bool FormatUntyped(
 // StrFormat Extensions
 //------------------------------------------------------------------------------
 //
-// AbslStringify()
+// TurboStringify()
 //
 // A simpler customization API for formatting user-defined types using
 // turbo::StrFormat(). The API relies on detecting an overload in the
-// user-defined type's namespace of a free (non-member) `AbslStringify()`
+// user-defined type's namespace of a free (non-member) `TurboStringify()`
 // function as a friend definition with the following signature:
 //
 // template <typename Sink>
-// void AbslStringify(Sink& sink, const X& value);
+// void TurboStringify(Sink& sink, const X& value);
 //
-// An `AbslStringify()` overload for a type should only be declared in the same
+// An `TurboStringify()` overload for a type should only be declared in the same
 // file and namespace as said type.
 //
-// Note that unlike with AbslFormatConvert(), AbslStringify() does not allow
-// customization of allowed conversion characters. AbslStringify() uses `%v` as
-// the underlying conversion specififer. Additionally, AbslStringify() supports
-// use with turbo::StrCat while AbslFormatConvert() does not.
+// Note that unlike with TurboFormatConvert(), TurboStringify() does not allow
+// customization of allowed conversion characters. TurboStringify() uses `%v` as
+// the underlying conversion specififer. Additionally, TurboStringify() supports
+// use with turbo::StrCat while TurboFormatConvert() does not.
 //
 // Example:
 //
 // struct Point {
 //   // To add formatting support to `Point`, we simply need to add a free
-//   // (non-member) function `AbslStringify()`. This method prints in the
+//   // (non-member) function `TurboStringify()`. This method prints in the
 //   // request format using the underlying `%v` specifier. You can add such a
 //   // free function using a friend declaration within the body of the class.
 //   // The sink parameter is a templated type to avoid requiring dependencies.
 //   template <typename Sink>
-//   friend void AbslStringify(Sink& sink, const Point& p) {
+//   friend void TurboStringify(Sink& sink, const Point& p) {
 //     turbo::Format(&sink, "(%v, %v)", p.x, p.y);
 //   }
 //
@@ -618,20 +618,20 @@ ABSL_MUST_USE_RESULT inline bool FormatUntyped(
 //   int y;
 // };
 //
-// AbslFormatConvert()
+// TurboFormatConvert()
 //
 // The StrFormat library provides a customization API for formatting
 // user-defined types using turbo::StrFormat(). The API relies on detecting an
 // overload in the user-defined type's namespace of a free (non-member)
-// `AbslFormatConvert()` function, usually as a friend definition with the
+// `TurboFormatConvert()` function, usually as a friend definition with the
 // following signature:
 //
-// turbo::FormatConvertResult<...> AbslFormatConvert(
+// turbo::FormatConvertResult<...> TurboFormatConvert(
 //     const X& value,
 //     const turbo::FormatConversionSpec& spec,
 //     turbo::FormatSink *sink);
 //
-// An `AbslFormatConvert()` overload for a type should only be declared in the
+// An `TurboFormatConvert()` overload for a type should only be declared in the
 // same file and namespace as said type.
 //
 // The abstractions within this definition include:
@@ -644,7 +644,7 @@ ABSL_MUST_USE_RESULT inline bool FormatUntyped(
 //   formatting operation
 //
 // The return type encodes all the conversion characters that your
-// AbslFormatConvert() routine accepts.  The return value should be {true}.
+// TurboFormatConvert() routine accepts.  The return value should be {true}.
 // A return value of {false} will result in `StrFormat()` returning
 // an empty string.  This result will be propagated to the result of
 // `FormatUntyped`.
@@ -653,7 +653,7 @@ ABSL_MUST_USE_RESULT inline bool FormatUntyped(
 //
 // struct Point {
 //   // To add formatting support to `Point`, we simply need to add a free
-//   // (non-member) function `AbslFormatConvert()`.  This method interprets
+//   // (non-member) function `TurboFormatConvert()`.  This method interprets
 //   // `spec` to print in the request format. The allowed conversion characters
 //   // can be restricted via the type of the result, in this example
 //   // string and integral formatting are allowed (but not, for instance
@@ -661,7 +661,7 @@ ABSL_MUST_USE_RESULT inline bool FormatUntyped(
 //   // using a friend declaration within the body of the class:
 //   friend turbo::FormatConvertResult<turbo::FormatConversionCharSet::kString |
 //                                    turbo::FormatConversionCharSet::kIntegral>
-//   AbslFormatConvert(const Point& p, const turbo::FormatConversionSpec& spec,
+//   TurboFormatConvert(const Point& p, const turbo::FormatConversionSpec& spec,
 //                     turbo::FormatSink* s) {
 //     if (spec.conversion_char() == turbo::FormatConversionChar::s) {
 //       turbo::Format(s, "x=%vy=%v", p.x, p.y);
@@ -780,7 +780,7 @@ constexpr FormatConversionCharSet operator|(FormatConversionCharSet a,
 // FormatConversionCharSet
 //
 // Specifies the _accepted_ conversion types as a template parameter to
-// FormatConvertResult for custom implementations of `AbslFormatConvert`.
+// FormatConvertResult for custom implementations of `TurboFormatConvert`.
 // Note the helper predefined alias definitions (kIntegral, etc.) below.
 enum class FormatConversionCharSet : uint64_t {
   // text
@@ -846,7 +846,7 @@ class FormatSink {
   }
 
   // Support `turbo::Format(&sink, format, args...)`.
-  friend void AbslFormatFlush(FormatSink* sink, turbo::string_view v) {
+  friend void TurboFormatFlush(FormatSink* sink, turbo::string_view v) {
     sink->Append(v);
   }
 
@@ -858,7 +858,7 @@ class FormatSink {
 
 // FormatConvertResult
 //
-// Indicates whether a call to AbslFormatConvert() was successful.
+// Indicates whether a call to TurboFormatConvert() was successful.
 // This return type informs the StrFormat extension framework (through
 // ADL but using the return type) of what conversion characters are supported.
 // It is strongly discouraged to return {false}, as this will result in an
@@ -868,7 +868,7 @@ struct FormatConvertResult {
   bool value;
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_STR_FORMAT_H_
+#endif  // TURBO_STRINGS_STR_FORMAT_H_

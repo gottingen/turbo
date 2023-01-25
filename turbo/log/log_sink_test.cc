@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ using ::testing::AnyNumber;
 using ::testing::HasSubstr;
 using ::testing::InSequence;
 
-auto* test_env ABSL_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 // Tests for global log sink registration.
@@ -205,7 +205,7 @@ class ReentrancyTest : public ::testing::Test {
               << "The log is coming from *inside the sink*.";
           break;
         default:
-          ABSL_RAW_LOG(FATAL, "Invalid mode %d.\n", static_cast<int>(mode_));
+          TURBO_RAW_LOG(FATAL, "Invalid mode %d.\n", static_cast<int>(mode_));
       }
     }
 

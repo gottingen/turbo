@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_FORMAT_CONSTEXPR_PARSER_H_
-#define ABSL_STRINGS_INTERNAL_STR_FORMAT_CONSTEXPR_PARSER_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_FORMAT_CONSTEXPR_PARSER_H_
+#define TURBO_STRINGS_INTERNAL_STR_FORMAT_CONSTEXPR_PARSER_H_
 
 #include <cassert>
 #include <cstdint>
@@ -23,7 +23,7 @@
 #include "turbo/strings/internal/str_format/extension.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 
 enum class LengthMod : std::uint8_t { h, hh, l, ll, L, j, z, t, q, none };
@@ -199,11 +199,11 @@ constexpr int ParseDigits(char& c, const char*& pos, const char* const end) {
   // digit doesn't match the expected characters.
   int num_digits = std::numeric_limits<int>::digits10;
   for (;;) {
-    if (ABSL_PREDICT_FALSE(pos == end)) break;
+    if (TURBO_PREDICT_FALSE(pos == end)) break;
     c = *pos++;
     if ('0' > c || c > '9') break;
     --num_digits;
-    if (ABSL_PREDICT_FALSE(!num_digits)) break;
+    if (TURBO_PREDICT_FALSE(!num_digits)) break;
     digits = 10 * digits + c - '0';
   }
   return digits;
@@ -217,21 +217,21 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
   char c = 0;
   // Read the next char into `c` and update `pos`. Returns false if there are
   // no more chars to read.
-#define ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR()          \
+#define TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR()          \
   do {                                                  \
-    if (ABSL_PREDICT_FALSE(pos == end)) return nullptr; \
+    if (TURBO_PREDICT_FALSE(pos == end)) return nullptr; \
     c = *pos++;                                         \
   } while (0)
 
   if (is_positional) {
-    ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
-    if (ABSL_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
+    TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
+    if (TURBO_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
     conv->arg_position = ParseDigits(c, pos, end);
     assert(conv->arg_position > 0);
-    if (ABSL_PREDICT_FALSE(c != '$')) return nullptr;
+    if (TURBO_PREDICT_FALSE(c != '$')) return nullptr;
   }
 
-  ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+  TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
 
   // We should start with the basic flag on.
   assert(conv->flags == Flags::kBasic);
@@ -244,7 +244,7 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
       auto tag = GetTagForChar(c);
       if (tag.is_flags()) {
         conv->flags = conv->flags | tag.as_flags();
-        ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+        TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
       } else {
         break;
       }
@@ -254,7 +254,7 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
       if (c >= '0') {
         int maybe_width = ParseDigits(c, pos, end);
         if (!is_positional && c == '$') {
-          if (ABSL_PREDICT_FALSE(*next_arg != 0)) return nullptr;
+          if (TURBO_PREDICT_FALSE(*next_arg != 0)) return nullptr;
           // Positional conversion.
           *next_arg = -1;
           return ConsumeConversion<true>(original_pos, end, conv, next_arg);
@@ -263,12 +263,12 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
         conv->width.set_value(maybe_width);
       } else if (c == '*') {
         conv->flags = conv->flags | Flags::kNonBasic;
-        ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+        TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
         if (is_positional) {
-          if (ABSL_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
+          if (TURBO_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
           conv->width.set_from_arg(ParseDigits(c, pos, end));
-          if (ABSL_PREDICT_FALSE(c != '$')) return nullptr;
-          ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+          if (TURBO_PREDICT_FALSE(c != '$')) return nullptr;
+          TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
         } else {
           conv->width.set_from_arg(++*next_arg);
         }
@@ -277,16 +277,16 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
 
     if (c == '.') {
       conv->flags = conv->flags | Flags::kNonBasic;
-      ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+      TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
       if ('0' <= c && c <= '9') {
         conv->precision.set_value(ParseDigits(c, pos, end));
       } else if (c == '*') {
-        ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+        TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
         if (is_positional) {
-          if (ABSL_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
+          if (TURBO_PREDICT_FALSE(c < '1' || c > '9')) return nullptr;
           conv->precision.set_from_arg(ParseDigits(c, pos, end));
           if (c != '$') return nullptr;
-          ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+          TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
         } else {
           conv->precision.set_from_arg(++*next_arg);
         }
@@ -298,30 +298,30 @@ constexpr const char* ConsumeConversion(const char* pos, const char* const end,
 
   auto tag = GetTagForChar(c);
 
-  if (ABSL_PREDICT_FALSE(c == 'v' && conv->flags != Flags::kBasic)) {
+  if (TURBO_PREDICT_FALSE(c == 'v' && conv->flags != Flags::kBasic)) {
     return nullptr;
   }
 
-  if (ABSL_PREDICT_FALSE(!tag.is_conv())) {
-    if (ABSL_PREDICT_FALSE(!tag.is_length())) return nullptr;
+  if (TURBO_PREDICT_FALSE(!tag.is_conv())) {
+    if (TURBO_PREDICT_FALSE(!tag.is_length())) return nullptr;
 
     // It is a length modifier.
     using str_format_internal::LengthMod;
     LengthMod length_mod = tag.as_length();
-    ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+    TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
     if (c == 'h' && length_mod == LengthMod::h) {
       conv->length_mod = LengthMod::hh;
-      ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+      TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
     } else if (c == 'l' && length_mod == LengthMod::l) {
       conv->length_mod = LengthMod::ll;
-      ABSL_FORMAT_PARSER_INTERNAL_GET_CHAR();
+      TURBO_FORMAT_PARSER_INTERNAL_GET_CHAR();
     } else {
       conv->length_mod = length_mod;
     }
     tag = GetTagForChar(c);
 
-    if (ABSL_PREDICT_FALSE(c == 'v')) return nullptr;
-    if (ABSL_PREDICT_FALSE(!tag.is_conv())) return nullptr;
+    if (TURBO_PREDICT_FALSE(c == 'v')) return nullptr;
+    if (TURBO_PREDICT_FALSE(!tag.is_conv())) return nullptr;
   }
 
   assert(CheckFastPathSetting(*conv));
@@ -345,7 +345,7 @@ constexpr const char* ConsumeUnboundConversion(const char* p, const char* end,
 }
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_CONSTEXPR_PARSER_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_FORMAT_CONSTEXPR_PARSER_H_

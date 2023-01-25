@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 #include "turbo/base/internal/exception_safety_testing.h"
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
 #include <cstddef>
 #include <exception>
@@ -702,7 +702,7 @@ struct BasicGuaranteeWithExtraContracts : public NonNegative {
   static constexpr int kExceptionSentinel = 9999;
 };
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr int BasicGuaranteeWithExtraContracts::kExceptionSentinel;
 #endif
 
@@ -870,14 +870,14 @@ TEST(ExceptionCheckTest, Exhaustiveness) {
 }
 
 struct LeaksIfCtorThrows : private exceptions_internal::TrackedObject {
-  LeaksIfCtorThrows() : TrackedObject(ABSL_PRETTY_FUNCTION) {
+  LeaksIfCtorThrows() : TrackedObject(TURBO_PRETTY_FUNCTION) {
     ++counter;
     ThrowingValue<> v;
     static_cast<void>(v);
     --counter;
   }
   LeaksIfCtorThrows(const LeaksIfCtorThrows&) noexcept
-      : TrackedObject(ABSL_PRETTY_FUNCTION) {}
+      : TrackedObject(TURBO_PRETTY_FUNCTION) {}
   static int counter;
 };
 int LeaksIfCtorThrows::counter = 0;
@@ -889,7 +889,7 @@ TEST(ExceptionCheckTest, TestLeakyCtor) {
 }
 
 struct Tracked : private exceptions_internal::TrackedObject {
-  Tracked() : TrackedObject(ABSL_PRETTY_FUNCTION) {}
+  Tracked() : TrackedObject(TURBO_PRETTY_FUNCTION) {}
 };
 
 TEST(ConstructorTrackerTest, CreatedBefore) {
@@ -956,4 +956,4 @@ TEST(ThrowingAllocatorTraitsTest, Assignablility) {
 
 }  // namespace testing
 
-#endif  // ABSL_HAVE_EXCEPTIONS
+#endif  // TURBO_HAVE_EXCEPTIONS

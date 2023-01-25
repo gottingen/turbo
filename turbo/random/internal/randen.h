@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_RANDEN_H_
-#define ABSL_RANDOM_INTERNAL_RANDEN_H_
+#ifndef TURBO_RANDOM_INTERNAL_RANDEN_H_
+#define TURBO_RANDOM_INTERNAL_RANDEN_H_
 
 #include <cstddef>
 
@@ -23,7 +23,7 @@
 #include "turbo/random/internal/randen_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // RANDen = RANDom generator or beetroots in Swiss High German.
@@ -45,14 +45,14 @@ class Randen {
   // (kCapacityBytes .. kStateBytes) may be consumed as PRNG state.
   // REQUIRES: state points to kStateBytes of state.
   inline void Generate(void* state) const {
-#if ABSL_RANDOM_INTERNAL_AES_DISPATCH
+#if TURBO_RANDOM_INTERNAL_AES_DISPATCH
     // HW AES Dispatch.
     if (has_crypto_) {
       RandenHwAes::Generate(keys_, state);
     } else {
       RandenSlow::Generate(keys_, state);
     }
-#elif ABSL_HAVE_ACCELERATED_AES
+#elif TURBO_HAVE_ACCELERATED_AES
     // HW AES is enabled.
     RandenHwAes::Generate(keys_, state);
 #else
@@ -66,14 +66,14 @@ class Randen {
   // REQUIRES: seed points to kSeedBytes of seed.
   // REQUIRES: state points to kStateBytes of state.
   inline void Absorb(const void* seed, void* state) const {
-#if ABSL_RANDOM_INTERNAL_AES_DISPATCH
+#if TURBO_RANDOM_INTERNAL_AES_DISPATCH
     // HW AES Dispatch.
     if (has_crypto_) {
       RandenHwAes::Absorb(seed, state);
     } else {
       RandenSlow::Absorb(seed, state);
     }
-#elif ABSL_HAVE_ACCELERATED_AES
+#elif TURBO_HAVE_ACCELERATED_AES
     // HW AES is enabled.
     RandenHwAes::Absorb(seed, state);
 #else
@@ -84,13 +84,13 @@ class Randen {
 
  private:
   const void* keys_;
-#if ABSL_RANDOM_INTERNAL_AES_DISPATCH
+#if TURBO_RANDOM_INTERNAL_AES_DISPATCH
   bool has_crypto_;
 #endif
 };
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_RANDEN_H_
+#endif  // TURBO_RANDOM_INTERNAL_RANDEN_H_

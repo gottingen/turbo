@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ TYPED_TEST(ExponentialDistributionTypedTest, SerializeTest) {
   for (const TypeParam lambda : kParams) {
     // Some values may be invalid; skip those.
     if (!std::isfinite(lambda)) continue;
-    ABSL_ASSERT(lambda > 0);
+    TURBO_ASSERT(lambda > 0);
 
     const param_type param(lambda);
 
@@ -115,7 +115,7 @@ TYPED_TEST(ExponentialDistributionTypedTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
     if (!std::is_same<TypeParam, long double>::value) {
-      ABSL_INTERNAL_LOG(INFO,
+      TURBO_INTERNAL_LOG(INFO,
                         turbo::StrFormat("Range {%f}: %f, %f, lambda=%f", lambda,
                                         sample_min, sample_max, lambda));
     }
@@ -164,8 +164,8 @@ class ExponentialModel {
 
   // The inverse CDF, or PercentPoint function of the distribution
   double InverseCDF(double p) {
-    ABSL_ASSERT(p >= 0.0);
-    ABSL_ASSERT(p < 1.0);
+    TURBO_ASSERT(p >= 0.0);
+    TURBO_ASSERT(p < 1.0);
     return -beta_ * std::log(1.0 - p);
   }
 
@@ -219,7 +219,7 @@ bool ExponentialDistributionTests::SingleZTest(const double p,
   const bool pass = turbo::random_internal::Near("z", z, 0.0, max_err);
 
   if (!pass) {
-    ABSL_INTERNAL_LOG(
+    TURBO_INTERNAL_LOG(
         INFO, turbo::StrFormat("p=%f max_err=%f\n"
                               " lambda=%f\n"
                               " mean=%f vs. %f\n"
@@ -275,11 +275,11 @@ double ExponentialDistributionTests::SingleChiSquaredTest() {
 
   if (chi_square > threshold) {
     for (int i = 0; i < cutoffs.size(); i++) {
-      ABSL_INTERNAL_LOG(
+      TURBO_INTERNAL_LOG(
           INFO, turbo::StrFormat("%d : (%f) = %d", i, cutoffs[i], counts[i]));
     }
 
-    ABSL_INTERNAL_LOG(INFO,
+    TURBO_INTERNAL_LOG(INFO,
                       turbo::StrCat("lambda ", lambda(), "\n",     //
                                    " expected ", expected, "\n",  //
                                    kChiSquared, " ", chi_square, " (", p, ")\n",

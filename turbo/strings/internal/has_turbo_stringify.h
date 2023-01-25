@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_HAS_ABSL_STRINGIFY_H_
-#define ABSL_STRINGS_INTERNAL_HAS_ABSL_STRINGIFY_H_
+#ifndef TURBO_STRINGS_INTERNAL_HAS_TURBO_STRINGIFY_H_
+#define TURBO_STRINGS_INTERNAL_HAS_TURBO_STRINGIFY_H_
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -21,12 +21,12 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace strings_internal {
 
 // This is an empty class not intended to be used. It exists so that
-// `HasAbslStringify` can reference a universal class rather than needing to be
+// `HasTurboStringify` can reference a universal class rather than needing to be
 // copied for each new sink.
 class UnimplementedSink {
  public:
@@ -35,21 +35,21 @@ class UnimplementedSink {
   void Append(string_view v);
 
   // Support `turbo::Format(&sink, format, args...)`.
-  friend void AbslFormatFlush(UnimplementedSink* sink, turbo::string_view v);
+  friend void TurboFormatFlush(UnimplementedSink* sink, turbo::string_view v);
 };
 
 template <typename T, typename = void>
-struct HasAbslStringify : std::false_type {};
+struct HasTurboStringify : std::false_type {};
 
 template <typename T>
-struct HasAbslStringify<
-    T, std::enable_if_t<std::is_void<decltype(AbslStringify(
+struct HasTurboStringify<
+    T, std::enable_if_t<std::is_void<decltype(TurboStringify(
            std::declval<strings_internal::UnimplementedSink&>(),
            std::declval<const T&>()))>::value>> : std::true_type {};
 
 }  // namespace strings_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_HAS_ABSL_STRINGIFY_H_
+#endif  // TURBO_STRINGS_INTERNAL_HAS_TURBO_STRINGIFY_H_

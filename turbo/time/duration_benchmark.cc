@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 #include "turbo/time/time.h"
 #include "benchmark/benchmark.h"
 
-ABSL_FLAG(turbo::Duration, absl_duration_flag_for_benchmark,
+TURBO_FLAG(turbo::Duration, turbo_duration_flag_for_benchmark,
           turbo::Milliseconds(1),
           "Flag to use for benchmarking duration flag access speed.");
 
@@ -342,15 +342,15 @@ BENCHMARK(BM_Duration_ToInt64Hours);
 // To/FromTimespec
 //
 
-void BM_Duration_ToTimespec_AbslTime(benchmark::State& state) {
+void BM_Duration_ToTimespec_TurboTime(benchmark::State& state) {
   turbo::Duration d = turbo::Seconds(1);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(turbo::ToTimespec(d));
   }
 }
-BENCHMARK(BM_Duration_ToTimespec_AbslTime);
+BENCHMARK(BM_Duration_ToTimespec_TurboTime);
 
-ABSL_ATTRIBUTE_NOINLINE timespec DoubleToTimespec(double seconds) {
+TURBO_ATTRIBUTE_NOINLINE timespec DoubleToTimespec(double seconds) {
   timespec ts;
   ts.tv_sec = seconds;
   ts.tv_nsec = (seconds - ts.tv_sec) * (1000 * 1000 * 1000);
@@ -364,7 +364,7 @@ void BM_Duration_ToTimespec_Double(benchmark::State& state) {
 }
 BENCHMARK(BM_Duration_ToTimespec_Double);
 
-void BM_Duration_FromTimespec_AbslTime(benchmark::State& state) {
+void BM_Duration_FromTimespec_TurboTime(benchmark::State& state) {
   timespec ts;
   ts.tv_sec = 0;
   ts.tv_nsec = 0;
@@ -376,9 +376,9 @@ void BM_Duration_FromTimespec_AbslTime(benchmark::State& state) {
     benchmark::DoNotOptimize(turbo::DurationFromTimespec(ts));
   }
 }
-BENCHMARK(BM_Duration_FromTimespec_AbslTime);
+BENCHMARK(BM_Duration_FromTimespec_TurboTime);
 
-ABSL_ATTRIBUTE_NOINLINE double TimespecToDouble(timespec ts) {
+TURBO_ATTRIBUTE_NOINLINE double TimespecToDouble(timespec ts) {
   return ts.tv_sec + (ts.tv_nsec / (1000 * 1000 * 1000));
 }
 
@@ -436,7 +436,7 @@ BENCHMARK(BM_Duration_ParseDuration)->DenseRange(0, kNumDurations - 1);
 void BM_Duration_GetFlag(benchmark::State& state) {
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(
-        turbo::GetFlag(FLAGS_absl_duration_flag_for_benchmark));
+        turbo::GetFlag(FLAGS_turbo_duration_flag_for_benchmark));
   }
 }
 BENCHMARK(BM_Duration_GetFlag);

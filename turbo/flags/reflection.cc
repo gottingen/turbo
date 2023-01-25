@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 The Abseil Authors.
+//  Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 // --------------------------------------------------------------------
@@ -52,8 +52,8 @@ class FlagRegistry {
   // Store a flag in this registry. Takes ownership of *flag.
   void RegisterFlag(CommandLineFlag& flag, const char* filename);
 
-  void Lock() ABSL_EXCLUSIVE_LOCK_FUNCTION(lock_) { lock_.Lock(); }
-  void Unlock() ABSL_UNLOCK_FUNCTION(lock_) { lock_.Unlock(); }
+  void Lock() TURBO_EXCLUSIVE_LOCK_FUNCTION(lock_) { lock_.Lock(); }
+  void Unlock() TURBO_UNLOCK_FUNCTION(lock_) { lock_.Unlock(); }
 
   // Returns the flag object for the specified name, or nullptr if not found.
   // Will emit a warning if a 'retired' flag is specified.
@@ -350,5 +350,5 @@ turbo::flat_hash_map<turbo::string_view, turbo::CommandLineFlag*> GetAllFlags() 
   return res;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

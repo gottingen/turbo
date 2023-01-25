@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 //
 // This is inspired by Craig Silverstein's PowerPC stacktrace code.
 
-#ifndef ABSL_DEBUGGING_INTERNAL_STACKTRACE_ARM_INL_H_
-#define ABSL_DEBUGGING_INTERNAL_STACKTRACE_ARM_INL_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_STACKTRACE_ARM_INL_H_
+#define TURBO_DEBUGGING_INTERNAL_STACKTRACE_ARM_INL_H_
 
 #include <cstdint>
 
@@ -127,13 +127,13 @@ static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
 }
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 bool StackTraceWorksForTest() {
   return false;
 }
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_INTERNAL_STACKTRACE_ARM_INL_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_STACKTRACE_ARM_INL_H_

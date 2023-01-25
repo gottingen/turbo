@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 // Heap-allocation of `LogMessage` is unsupported.  Construction outside of a
 // `LOG` macro is unsupported.
 
-#ifndef ABSL_LOG_INTERNAL_LOG_MESSAGE_H_
-#define ABSL_LOG_INTERNAL_LOG_MESSAGE_H_
+#ifndef TURBO_LOG_INTERNAL_LOG_MESSAGE_H_
+#define TURBO_LOG_INTERNAL_LOG_MESSAGE_H_
 
 #include <ios>
 #include <memory>
@@ -40,12 +40,12 @@
 #include "turbo/log/internal/nullguard.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"
-#include "turbo/strings/internal/has_absl_stringify.h"
+#include "turbo/strings/internal/has_turbo_stringify.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 constexpr int kLogMessageBufferSize = 15000;
 
@@ -53,10 +53,10 @@ class LogMessage {
  public:
   // Used for `LOG`.
   LogMessage(const char* file, int line,
-             turbo::LogSeverity severity) ABSL_ATTRIBUTE_COLD;
+             turbo::LogSeverity severity) TURBO_ATTRIBUTE_COLD;
   LogMessage(const LogMessage&) = delete;
   LogMessage& operator=(const LogMessage&) = delete;
-  ~LogMessage() ABSL_ATTRIBUTE_COLD;
+  ~LogMessage() TURBO_ATTRIBUTE_COLD;
 
   // Overrides the location inferred from the callsite.  The string pointed to
   // by `file` must be valid until the end of the statement.
@@ -154,20 +154,20 @@ class LogMessage {
 
   // This prevents non-const `char[]` arrays from looking like literals.
   template <int SIZE>
-  LogMessage& operator<<(char (&buf)[SIZE]) ABSL_ATTRIBUTE_NOINLINE;
+  LogMessage& operator<<(char (&buf)[SIZE]) TURBO_ATTRIBUTE_NOINLINE;
 
-  // Types that support `AbslStringify()` are serialized that way.
+  // Types that support `TurboStringify()` are serialized that way.
   template <typename T,
             typename std::enable_if<
-                strings_internal::HasAbslStringify<T>::value, int>::type = 0>
-  LogMessage& operator<<(const T& v) ABSL_ATTRIBUTE_NOINLINE;
+                strings_internal::HasTurboStringify<T>::value, int>::type = 0>
+  LogMessage& operator<<(const T& v) TURBO_ATTRIBUTE_NOINLINE;
 
-  // Types that don't support `AbslStringify()` but do support streaming into a
+  // Types that don't support `TurboStringify()` but do support streaming into a
   // `std::ostream&` are serialized that way.
   template <typename T,
             typename std::enable_if<
-                !strings_internal::HasAbslStringify<T>::value, int>::type = 0>
-  LogMessage& operator<<(const T& v) ABSL_ATTRIBUTE_NOINLINE;
+                !strings_internal::HasTurboStringify<T>::value, int>::type = 0>
+  LogMessage& operator<<(const T& v) TURBO_ATTRIBUTE_NOINLINE;
 
   // Note: We explicitly do not support `operator<<` for non-const references
   // because it breaks logging of non-integer bitfield types (i.e., enums).
@@ -175,11 +175,11 @@ class LogMessage {
  protected:
   // Call `abort()` or similar to perform `LOG(FATAL)` crash.  It is assumed
   // that the caller has already generated and written the trace as appropriate.
-  ABSL_ATTRIBUTE_NORETURN static void FailWithoutStackTrace();
+  TURBO_ATTRIBUTE_NORETURN static void FailWithoutStackTrace();
 
   // Similar to `FailWithoutStackTrace()`, but without `abort()`.  Terminates
   // the process with an error exit code.
-  ABSL_ATTRIBUTE_NORETURN static void FailQuietly();
+  TURBO_ATTRIBUTE_NORETURN static void FailQuietly();
 
   // Dispatches the completed `turbo::LogEntry` to applicable `turbo::LogSink`s.
   // This might as well be inlined into `~LogMessage` except that
@@ -220,9 +220,9 @@ class LogMessage {
     kNotLiteral,
   };
   void CopyToEncodedBuffer(turbo::string_view str,
-                           StringType str_type) ABSL_ATTRIBUTE_NOINLINE;
+                           StringType str_type) TURBO_ATTRIBUTE_NOINLINE;
   void CopyToEncodedBuffer(char ch, size_t num,
-                           StringType str_type) ABSL_ATTRIBUTE_NOINLINE;
+                           StringType str_type) TURBO_ATTRIBUTE_NOINLINE;
 
   // Returns `true` if the message is fatal or enabled debug-fatal.
   bool IsFatal() const;
@@ -246,7 +246,7 @@ class LogMessage {
   std::unique_ptr<LogMessageData> data_;
 };
 
-// Helper class so that `AbslStringify()` can modify the LogMessage.
+// Helper class so that `TurboStringify()` can modify the LogMessage.
 class StringifySink final {
  public:
   explicit StringifySink(LogMessage& message) : message_(message) {}
@@ -260,8 +260,8 @@ class StringifySink final {
     message_.CopyToEncodedBuffer(v, LogMessage::StringType::kNotLiteral);
   }
 
-  // For types that implement `AbslStringify` using `turbo::Format()`.
-  friend void AbslFormatFlush(StringifySink* sink, turbo::string_view v) {
+  // For types that implement `TurboStringify` using `turbo::Format()`.
+  friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
     sink->Append(v);
   }
 
@@ -269,20 +269,20 @@ class StringifySink final {
   LogMessage& message_;
 };
 
-// Note: the following is declared `ABSL_ATTRIBUTE_NOINLINE`
+// Note: the following is declared `TURBO_ATTRIBUTE_NOINLINE`
 template <typename T,
-          typename std::enable_if<strings_internal::HasAbslStringify<T>::value,
+          typename std::enable_if<strings_internal::HasTurboStringify<T>::value,
                                   int>::type>
 LogMessage& LogMessage::operator<<(const T& v) {
   StringifySink sink(*this);
   // Replace with public API.
-  AbslStringify(sink, v);
+  TurboStringify(sink, v);
   return *this;
 }
 
-// Note: the following is declared `ABSL_ATTRIBUTE_NOINLINE`
+// Note: the following is declared `TURBO_ATTRIBUTE_NOINLINE`
 template <typename T,
-          typename std::enable_if<!strings_internal::HasAbslStringify<T>::value,
+          typename std::enable_if<!strings_internal::HasTurboStringify<T>::value,
                                   int>::type>
 LogMessage& LogMessage::operator<<(const T& v) {
   OstreamView view(*data_);
@@ -296,14 +296,14 @@ LogMessage& LogMessage::operator<<(const char (&buf)[SIZE]) {
   return *this;
 }
 
-// Note: the following is declared `ABSL_ATTRIBUTE_NOINLINE`
+// Note: the following is declared `TURBO_ATTRIBUTE_NOINLINE`
 template <int SIZE>
 LogMessage& LogMessage::operator<<(char (&buf)[SIZE]) {
   CopyToEncodedBuffer(buf, StringType::kNotLiteral);
   return *this;
 }
 // We instantiate these specializations in the library's TU to save space in
-// other TUs.  Since the template is marked `ABSL_ATTRIBUTE_NOINLINE` we will be
+// other TUs.  Since the template is marked `TURBO_ATTRIBUTE_NOINLINE` we will be
 // emitting a function call either way.
 extern template LogMessage& LogMessage::operator<<(const char& v);
 extern template LogMessage& LogMessage::operator<<(const signed char& v);
@@ -331,25 +331,25 @@ extern template LogMessage& LogMessage::operator<<(const bool& v);
 // message.
 class LogMessageFatal final : public LogMessage {
  public:
-  LogMessageFatal(const char* file, int line) ABSL_ATTRIBUTE_COLD;
+  LogMessageFatal(const char* file, int line) TURBO_ATTRIBUTE_COLD;
   LogMessageFatal(const char* file, int line,
-                  turbo::string_view failure_msg) ABSL_ATTRIBUTE_COLD;
-  ABSL_ATTRIBUTE_NORETURN ~LogMessageFatal();
+                  turbo::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
+  TURBO_ATTRIBUTE_NORETURN ~LogMessageFatal();
 };
 
 class LogMessageQuietlyFatal final : public LogMessage {
  public:
-  LogMessageQuietlyFatal(const char* file, int line) ABSL_ATTRIBUTE_COLD;
+  LogMessageQuietlyFatal(const char* file, int line) TURBO_ATTRIBUTE_COLD;
   LogMessageQuietlyFatal(const char* file, int line,
-                         turbo::string_view failure_msg) ABSL_ATTRIBUTE_COLD;
-  ABSL_ATTRIBUTE_NORETURN ~LogMessageQuietlyFatal();
+                         turbo::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
+  TURBO_ATTRIBUTE_NORETURN ~LogMessageQuietlyFatal();
 };
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-extern "C" ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(
-    AbslInternalOnFatalLogMessage)(const turbo::LogEntry&);
+extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
+    TurboInternalOnFatalLogMessage)(const turbo::LogEntry&);
 
-#endif  // ABSL_LOG_INTERNAL_LOG_MESSAGE_H_
+#endif  // TURBO_LOG_INTERNAL_LOG_MESSAGE_H_

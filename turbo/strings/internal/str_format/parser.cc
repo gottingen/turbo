@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,13 +28,13 @@
 #include <unordered_set>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 
 // Define the array for non-constexpr uses.
 constexpr ConvTag ConvTagHolder::value[256];
 
-ABSL_ATTRIBUTE_NOINLINE const char* ConsumeUnboundConversionNoInline(
+TURBO_ATTRIBUTE_NOINLINE const char* ConsumeUnboundConversionNoInline(
     const char* p, const char* end, UnboundConversion* conv, int* next_arg) {
   return ConsumeUnboundConversion(p, end, conv, next_arg);
 }
@@ -136,5 +136,5 @@ bool ParsedFormatBase::MatchesConversions(
 }
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

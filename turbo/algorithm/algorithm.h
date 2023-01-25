@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 // This header file contains Google extensions to the standard <algorithm> C++
 // header.
 
-#ifndef ABSL_ALGORITHM_ALGORITHM_H_
-#define ABSL_ALGORITHM_ALGORITHM_H_
+#ifndef TURBO_ALGORITHM_ALGORITHM_H_
+#define TURBO_ALGORITHM_ALGORITHM_H_
 
 #include <algorithm>
 #include <iterator>
@@ -29,7 +29,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace algorithm_internal {
 
@@ -153,7 +153,7 @@ ForwardIterator rotate(ForwardIterator first, ForwardIterator middle,
                    ForwardIterator>());
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_ALGORITHM_ALGORITHM_H_
+#endif  // TURBO_ALGORITHM_ALGORITHM_H_

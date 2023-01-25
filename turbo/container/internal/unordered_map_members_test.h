@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CONTAINER_INTERNAL_UNORDERED_MAP_MEMBERS_TEST_H_
-#define ABSL_CONTAINER_INTERNAL_UNORDERED_MAP_MEMBERS_TEST_H_
+#ifndef TURBO_CONTAINER_INTERNAL_UNORDERED_MAP_MEMBERS_TEST_H_
+#define TURBO_CONTAINER_INTERNAL_UNORDERED_MAP_MEMBERS_TEST_H_
 
 #include <type_traits>
 #include "gmock/gmock.h"
@@ -21,7 +21,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 template <class UnordMap>
@@ -81,7 +81,7 @@ TYPED_TEST_P(MembersTest, BeginEnd) {
 REGISTER_TYPED_TEST_SUITE_P(MembersTest, Typedefs, SimpleFunctions, BeginEnd);
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_UNORDERED_MAP_MEMBERS_TEST_H_
+#endif  // TURBO_CONTAINER_INTERNAL_UNORDERED_MAP_MEMBERS_TEST_H_

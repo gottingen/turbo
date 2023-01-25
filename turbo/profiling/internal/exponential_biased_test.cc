@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 using ::testing::Ge;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace profiling_internal {
 namespace {
 
@@ -185,10 +185,10 @@ TEST(ExponentialBiasedTest, TestNextRandom) {
 // The generator needs to be available as a thread_local and as a static
 // variable.
 TEST(ExponentialBiasedTest, InitializationModes) {
-  ABSL_CONST_INIT static ExponentialBiased eb_static;
+  TURBO_CONST_INIT static ExponentialBiased eb_static;
   EXPECT_THAT(eb_static.GetSkipCount(2), Ge(0));
 
-#ifdef ABSL_HAVE_THREAD_LOCAL
+#ifdef TURBO_HAVE_THREAD_LOCAL
   thread_local ExponentialBiased eb_thread;
   EXPECT_THAT(eb_thread.GetSkipCount(2), Ge(0));
 #endif
@@ -199,5 +199,5 @@ TEST(ExponentialBiasedTest, InitializationModes) {
 
 }  // namespace
 }  // namespace profiling_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

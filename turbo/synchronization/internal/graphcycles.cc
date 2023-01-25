@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include "turbo/base/attributes.h"
 // This file is a no-op if the required LowLevelAlloc support is missing.
 #include "turbo/base/internal/low_level_alloc.h"
-#ifndef ABSL_LOW_LEVEL_ALLOC_MISSING
+#ifndef TURBO_LOW_LEVEL_ALLOC_MISSING
 
 #include "turbo/synchronization/internal/graphcycles.h"
 
@@ -45,16 +45,16 @@
 // Do not use STL.   This module does not use standard memory allocation.
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 namespace {
 
 // Avoid LowLevelAlloc's default arena since it calls malloc hooks in
 // which people are doing things like acquiring Mutexes.
-ABSL_CONST_INIT static turbo::base_internal::SpinLock arena_mu(
+TURBO_CONST_INIT static turbo::base_internal::SpinLock arena_mu(
     turbo::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
-ABSL_CONST_INIT static base_internal::LowLevelAlloc::Arena* arena;
+TURBO_CONST_INIT static base_internal::LowLevelAlloc::Arena* arena;
 
 static void InitArenaIfNecessary() {
   arena_mu.Lock();
@@ -386,18 +386,18 @@ bool GraphCycles::CheckInvariants() const {
     Node* nx = r->nodes_[x];
     void* ptr = base_internal::UnhidePtr<void>(nx->masked_ptr);
     if (ptr != nullptr && static_cast<uint32_t>(r->ptrmap_.Find(ptr)) != x) {
-      ABSL_RAW_LOG(FATAL, "Did not find live node in hash table %u %p", x, ptr);
+      TURBO_RAW_LOG(FATAL, "Did not find live node in hash table %u %p", x, ptr);
     }
     if (nx->visited) {
-      ABSL_RAW_LOG(FATAL, "Did not clear visited marker on node %u", x);
+      TURBO_RAW_LOG(FATAL, "Did not clear visited marker on node %u", x);
     }
     if (!ranks.insert(nx->rank)) {
-      ABSL_RAW_LOG(FATAL, "Duplicate occurrence of rank %d", nx->rank);
+      TURBO_RAW_LOG(FATAL, "Duplicate occurrence of rank %d", nx->rank);
     }
     HASH_FOR_EACH(y, nx->out) {
       Node* ny = r->nodes_[static_cast<uint32_t>(y)];
       if (nx->rank >= ny->rank) {
-        ABSL_RAW_LOG(FATAL, "Edge %u->%d has bad rank assignment %d->%d", x, y,
+        TURBO_RAW_LOG(FATAL, "Edge %u->%d has bad rank assignment %d->%d", x, y,
                      nx->rank, ny->rank);
       }
     }
@@ -682,7 +682,7 @@ void GraphCycles::UpdateStackTrace(GraphId id, int priority,
   if (n == nullptr || n->priority >= priority) {
     return;
   }
-  n->nstack = (*get_stack_trace)(n->stack, ABSL_ARRAYSIZE(n->stack));
+  n->nstack = (*get_stack_trace)(n->stack, TURBO_ARRAYSIZE(n->stack));
   n->priority = priority;
 }
 
@@ -698,7 +698,7 @@ int GraphCycles::GetStackTrace(GraphId id, void*** ptr) {
 }
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOW_LEVEL_ALLOC_MISSING
+#endif  // TURBO_LOW_LEVEL_ALLOC_MISSING

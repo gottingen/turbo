@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // the standard casts provided in the C++ standard. As with all cast operations,
 // use these with caution and only if alternatives do not exist.
 
-#ifndef ABSL_BASE_CASTS_H_
-#define ABSL_BASE_CASTS_H_
+#ifndef TURBO_BASE_CASTS_H_
+#define TURBO_BASE_CASTS_H_
 
 #include <cstring>
 #include <memory>
@@ -38,7 +38,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // implicit_cast()
 //
@@ -154,27 +154,27 @@ template <typename Dest, typename Source,
               sizeof(Dest) == sizeof(Source) &&
                   type_traits_internal::is_trivially_copyable<Source>::value &&
                   type_traits_internal::is_trivially_copyable<Dest>::value
-#if !ABSL_HAVE_BUILTIN(__builtin_bit_cast)
+#if !TURBO_HAVE_BUILTIN(__builtin_bit_cast)
                   && std::is_default_constructible<Dest>::value
-#endif  // !ABSL_HAVE_BUILTIN(__builtin_bit_cast)
+#endif  // !TURBO_HAVE_BUILTIN(__builtin_bit_cast)
               ,
               int>::type = 0>
-#if ABSL_HAVE_BUILTIN(__builtin_bit_cast)
+#if TURBO_HAVE_BUILTIN(__builtin_bit_cast)
 inline constexpr Dest bit_cast(const Source& source) {
   return __builtin_bit_cast(Dest, source);
 }
-#else  // ABSL_HAVE_BUILTIN(__builtin_bit_cast)
+#else  // TURBO_HAVE_BUILTIN(__builtin_bit_cast)
 inline Dest bit_cast(const Source& source) {
   Dest dest;
   memcpy(static_cast<void*>(std::addressof(dest)),
          static_cast<const void*>(std::addressof(source)), sizeof(dest));
   return dest;
 }
-#endif  // ABSL_HAVE_BUILTIN(__builtin_bit_cast)
+#endif  // TURBO_HAVE_BUILTIN(__builtin_bit_cast)
 
 #endif  // defined(__cpp_lib_bit_cast) && __cpp_lib_bit_cast >= 201806L
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_CASTS_H_
+#endif  // TURBO_BASE_CASTS_H_

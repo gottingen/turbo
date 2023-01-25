@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ static void SetInvariantChecked(bool new_value) {
 
 static void CheckSumG0G1(void *v) {
   TestContext *cxt = static_cast<TestContext *>(v);
-  ABSL_RAW_CHECK(cxt->g0 == -cxt->g1, "Error in CheckSumG0G1");
+  TURBO_RAW_CHECK(cxt->g0 == -cxt->g1, "Error in CheckSumG0G1");
   SetInvariantChecked(true);
 }
 
@@ -132,7 +132,7 @@ static void TestRW(TestContext *cxt, int c) {
   } else {
     for (int i = 0; i != cxt->iterations; i++) {
       turbo::ReaderMutexLock l(&cxt->mu);
-      ABSL_RAW_CHECK(cxt->g0 == -cxt->g1, "Error in TestRW");
+      TURBO_RAW_CHECK(cxt->g0 == -cxt->g1, "Error in TestRW");
       cxt->mu.AssertReaderHeld();
     }
   }
@@ -157,7 +157,7 @@ static void TestAwait(TestContext *cxt, int c) {
   cxt->mu.AssertHeld();
   while (cxt->g0 < cxt->iterations) {
     cxt->mu.Await(turbo::Condition(&mc, &MyContext::MyTurn));
-    ABSL_RAW_CHECK(mc.MyTurn(), "Error in TestAwait");
+    TURBO_RAW_CHECK(mc.MyTurn(), "Error in TestAwait");
     cxt->mu.AssertHeld();
     if (cxt->g0 < cxt->iterations) {
       int a = cxt->g0 + 1;
@@ -185,7 +185,7 @@ static void TestSignalAll(TestContext *cxt, int c) {
 }
 
 static void TestSignal(TestContext *cxt, int c) {
-  ABSL_RAW_CHECK(cxt->threads == 2, "TestSignal should use 2 threads");
+  TURBO_RAW_CHECK(cxt->threads == 2, "TestSignal should use 2 threads");
   int target = c;
   turbo::MutexLock l(&cxt->mu);
   cxt->mu.AssertHeld();
@@ -222,8 +222,8 @@ static void TestCVTimeout(TestContext *cxt, int c) {
 static bool G0GE2(TestContext *cxt) { return cxt->g0 >= 2; }
 
 static void TestTime(TestContext *cxt, int c, bool use_cv) {
-  ABSL_RAW_CHECK(cxt->iterations == 1, "TestTime should only use 1 iteration");
-  ABSL_RAW_CHECK(cxt->threads > 2, "TestTime should use more than 2 threads");
+  TURBO_RAW_CHECK(cxt->iterations == 1, "TestTime should only use 1 iteration");
+  TURBO_RAW_CHECK(cxt->threads > 2, "TestTime should use more than 2 threads");
   const bool kFalse = false;
   turbo::Condition false_cond(&kFalse);
   turbo::Condition g0ge2(G0GE2, cxt);
@@ -234,24 +234,24 @@ static void TestTime(TestContext *cxt, int c, bool use_cv) {
     if (use_cv) {
       cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
+      TURBO_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
                      "TestTime failed");
     }
     turbo::Duration elapsed = turbo::Now() - start;
-    ABSL_RAW_CHECK(
+    TURBO_RAW_CHECK(
         turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0),
         "TestTime failed");
-    ABSL_RAW_CHECK(cxt->g0 == 1, "TestTime failed");
+    TURBO_RAW_CHECK(cxt->g0 == 1, "TestTime failed");
 
     start = turbo::Now();
     if (use_cv) {
       cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
+      TURBO_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
                      "TestTime failed");
     }
     elapsed = turbo::Now() - start;
-    ABSL_RAW_CHECK(
+    TURBO_RAW_CHECK(
         turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0),
         "TestTime failed");
     cxt->g0++;
@@ -263,24 +263,24 @@ static void TestTime(TestContext *cxt, int c, bool use_cv) {
     if (use_cv) {
       cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(4));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(4)),
+      TURBO_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(4)),
                      "TestTime failed");
     }
     elapsed = turbo::Now() - start;
-    ABSL_RAW_CHECK(
+    TURBO_RAW_CHECK(
         turbo::Seconds(3.9) <= elapsed && elapsed <= turbo::Seconds(6.0),
         "TestTime failed");
-    ABSL_RAW_CHECK(cxt->g0 >= 3, "TestTime failed");
+    TURBO_RAW_CHECK(cxt->g0 >= 3, "TestTime failed");
 
     start = turbo::Now();
     if (use_cv) {
       cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
+      TURBO_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
                      "TestTime failed");
     }
     elapsed = turbo::Now() - start;
-    ABSL_RAW_CHECK(
+    TURBO_RAW_CHECK(
         turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0),
         "TestTime failed");
     if (use_cv) {
@@ -291,14 +291,14 @@ static void TestTime(TestContext *cxt, int c, bool use_cv) {
     if (use_cv) {
       cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
+      TURBO_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, turbo::Seconds(1)),
                      "TestTime failed");
     }
     elapsed = turbo::Now() - start;
-    ABSL_RAW_CHECK(
+    TURBO_RAW_CHECK(
         turbo::Seconds(0.9) <= elapsed && elapsed <= turbo::Seconds(2.0),
         "TestTime failed");
-    ABSL_RAW_CHECK(cxt->g0 == cxt->threads, "TestTime failed");
+    TURBO_RAW_CHECK(cxt->g0 == cxt->threads, "TestTime failed");
 
   } else if (c == 1) {
     turbo::MutexLock l(&cxt->mu);
@@ -306,12 +306,12 @@ static void TestTime(TestContext *cxt, int c, bool use_cv) {
     if (use_cv) {
       cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Milliseconds(500));
     } else {
-      ABSL_RAW_CHECK(
+      TURBO_RAW_CHECK(
           !cxt->mu.AwaitWithTimeout(false_cond, turbo::Milliseconds(500)),
           "TestTime failed");
     }
     const turbo::Duration elapsed = turbo::Now() - start;
-    ABSL_RAW_CHECK(
+    TURBO_RAW_CHECK(
         turbo::Seconds(0.4) <= elapsed && elapsed <= turbo::Seconds(0.9),
         "TestTime failed");
     cxt->g0++;
@@ -322,7 +322,7 @@ static void TestTime(TestContext *cxt, int c, bool use_cv) {
         cxt->cv.WaitWithTimeout(&cxt->mu, turbo::Seconds(100));
       }
     } else {
-      ABSL_RAW_CHECK(cxt->mu.AwaitWithTimeout(g0ge2, turbo::Seconds(100)),
+      TURBO_RAW_CHECK(cxt->mu.AwaitWithTimeout(g0ge2, turbo::Seconds(100)),
                      "TestTime failed");
     }
     cxt->g0++;
@@ -390,7 +390,7 @@ static int RunTest(void (*test)(TestContext *cxt, int), int threads,
 // verifies that the invariant check happened. The invariant function
 // will be passed the TestContext* as its arg and must call
 // SetInvariantChecked(true);
-#if !defined(ABSL_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
+#if !defined(TURBO_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
 static int RunTestWithInvariantDebugging(void (*test)(TestContext *cxt, int),
                                          int threads, int iterations,
                                          int operations,
@@ -400,7 +400,7 @@ static int RunTestWithInvariantDebugging(void (*test)(TestContext *cxt, int),
   TestContext cxt;
   cxt.mu.EnableInvariantDebugging(invariant, &cxt);
   int ret = RunTestCommon(&cxt, test, threads, iterations, operations);
-  ABSL_RAW_CHECK(GetInvariantChecked(), "Invariant not checked");
+  TURBO_RAW_CHECK(GetInvariantChecked(), "Invariant not checked");
   turbo::EnableMutexInvariantDebugging(false);  // Restore.
   return ret;
 }
@@ -428,10 +428,10 @@ TEST(Mutex, CondVarWaitSignalsAwait) {
   // Use a struct so the lock annotations apply.
   struct {
     turbo::Mutex barrier_mu;
-    bool barrier ABSL_GUARDED_BY(barrier_mu) = false;
+    bool barrier TURBO_GUARDED_BY(barrier_mu) = false;
 
     turbo::Mutex release_mu;
-    bool release ABSL_GUARDED_BY(release_mu) = false;
+    bool release TURBO_GUARDED_BY(release_mu) = false;
     turbo::CondVar released_cv;
   } state;
 
@@ -469,10 +469,10 @@ TEST(Mutex, CondVarWaitWithTimeoutSignalsAwait) {
   // Use a struct so the lock annotations apply.
   struct {
     turbo::Mutex barrier_mu;
-    bool barrier ABSL_GUARDED_BY(barrier_mu) = false;
+    bool barrier TURBO_GUARDED_BY(barrier_mu) = false;
 
     turbo::Mutex release_mu;
-    bool release ABSL_GUARDED_BY(release_mu) = false;
+    bool release TURBO_GUARDED_BY(release_mu) = false;
     turbo::CondVar released_cv;
   } state;
 
@@ -746,7 +746,7 @@ TEST(Mutex, LockWhenGuard) {
 // --------------------------------------------------------
 // The following test requires Mutex::ReaderLock to be a real shared
 // lock, which is not the case in all builds.
-#if !defined(ABSL_MUTEX_READER_LOCK_IS_EXCLUSIVE)
+#if !defined(TURBO_MUTEX_READER_LOCK_IS_EXCLUSIVE)
 
 // Test for fix of bug in UnlockSlow() that incorrectly decremented the reader
 // count when putting a thread to sleep waiting for a false condition when the
@@ -807,7 +807,7 @@ static void GetReadLock(ReaderDecrementBugStruct *x) {
 
 // Test for reader counter being decremented incorrectly by waiter
 // with false condition.
-TEST(Mutex, MutexReaderDecrementBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
+TEST(Mutex, MutexReaderDecrementBug) TURBO_NO_THREAD_SAFETY_ANALYSIS {
   ReaderDecrementBugStruct x;
   x.cond = false;
   x.waiting_on_cond = false;
@@ -848,15 +848,15 @@ TEST(Mutex, MutexReaderDecrementBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
   thread1.join();
   thread2.join();
 }
-#endif  // !ABSL_MUTEX_READER_LOCK_IS_EXCLUSIVE
+#endif  // !TURBO_MUTEX_READER_LOCK_IS_EXCLUSIVE
 
 // Test that we correctly handle the situation when a lock is
 // held and then destroyed (w/o unlocking).
-#ifdef ABSL_HAVE_THREAD_SANITIZER
+#ifdef TURBO_HAVE_THREAD_SANITIZER
 // TSAN reports errors when locked Mutexes are destroyed.
-TEST(Mutex, DISABLED_LockedMutexDestructionBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
+TEST(Mutex, DISABLED_LockedMutexDestructionBug) TURBO_NO_THREAD_SAFETY_ANALYSIS {
 #else
-TEST(Mutex, LockedMutexDestructionBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
+TEST(Mutex, LockedMutexDestructionBug) TURBO_NO_THREAD_SAFETY_ANALYSIS {
 #endif
   for (int i = 0; i != 10; i++) {
     // Create, lock and destroy 10 locks.
@@ -988,7 +988,7 @@ static bool ConditionWithAcquire(AcquireFromConditionStruct *x) {
                                turbo::Milliseconds(100));
     x->mu1.Unlock();
   }
-  ABSL_RAW_CHECK(x->value < 4, "should not be invoked a fourth time");
+  TURBO_RAW_CHECK(x->value < 4, "should not be invoked a fourth time");
 
   // We arrange for the condition to return true on only the 2nd and 3rd calls.
   return x->value == 2 || x->value == 3;
@@ -1101,7 +1101,7 @@ class ScopedDisableBazelTestWarnings {
 const char ScopedDisableBazelTestWarnings::kVarName[] =
     "TEST_WARNINGS_OUTPUT_FILE";
 
-#ifdef ABSL_HAVE_THREAD_SANITIZER
+#ifdef TURBO_HAVE_THREAD_SANITIZER
 // This test intentionally creates deadlocks to test the deadlock detector.
 TEST(Mutex, DISABLED_DeadlockDetectorBazelWarning) {
 #else
@@ -1135,7 +1135,7 @@ TEST(Mutex, DeadlockDetectorBazelWarning) {
 // annotation-based static thread-safety analysis is not currently
 // predicate-aware and cannot tell if the two for-loops that acquire and
 // release the locks have the same predicates.
-TEST(Mutex, DeadlockDetectorStressTest) ABSL_NO_THREAD_SAFETY_ANALYSIS {
+TEST(Mutex, DeadlockDetectorStressTest) TURBO_NO_THREAD_SAFETY_ANALYSIS {
   // Stress test: Here we create a large number of locks and use all of them.
   // If a deadlock detector keeps a full graph of lock acquisition order,
   // it will likely be too slow for this test to pass.
@@ -1153,11 +1153,11 @@ TEST(Mutex, DeadlockDetectorStressTest) ABSL_NO_THREAD_SAFETY_ANALYSIS {
   }
 }
 
-#ifdef ABSL_HAVE_THREAD_SANITIZER
+#ifdef TURBO_HAVE_THREAD_SANITIZER
 // TSAN reports errors when locked Mutexes are destroyed.
-TEST(Mutex, DISABLED_DeadlockIdBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
+TEST(Mutex, DISABLED_DeadlockIdBug) TURBO_NO_THREAD_SAFETY_ANALYSIS {
 #else
-TEST(Mutex, DeadlockIdBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
+TEST(Mutex, DeadlockIdBug) TURBO_NO_THREAD_SAFETY_ANALYSIS {
 #endif
   // Test a scenario where a cached deadlock graph node id in the
   // list of held locks is not invalidated when the corresponding
@@ -1207,7 +1207,7 @@ static turbo::Duration TimeoutTestAllowedSchedulingDelay() {
 
 // Returns true if `actual_delay` is close enough to `expected_delay` to pass
 // the timeouts/deadlines test.  Otherwise, logs warnings and returns false.
-ABSL_MUST_USE_RESULT
+TURBO_MUST_USE_RESULT
 static bool DelayIsWithinBounds(turbo::Duration expected_delay,
                                 turbo::Duration actual_delay) {
   bool pass = true;
@@ -1216,7 +1216,7 @@ static bool DelayIsWithinBounds(turbo::Duration expected_delay,
   // different clock than turbo::Now(), but these cases should be handled by the
   // the retry mechanism in each TimeoutTest.
   if (actual_delay < expected_delay) {
-    ABSL_RAW_LOG(WARNING,
+    TURBO_RAW_LOG(WARNING,
                  "Actual delay %s was too short, expected %s (difference %s)",
                  turbo::FormatDuration(actual_delay).c_str(),
                  turbo::FormatDuration(expected_delay).c_str(),
@@ -1231,7 +1231,7 @@ static bool DelayIsWithinBounds(turbo::Duration expected_delay,
                                  ? turbo::Milliseconds(10)
                                  : TimeoutTestAllowedSchedulingDelay();
   if (actual_delay > expected_delay + tolerance) {
-    ABSL_RAW_LOG(WARNING,
+    TURBO_RAW_LOG(WARNING,
                  "Actual delay %s was too long, expected %s (difference %s)",
                  turbo::FormatDuration(actual_delay).c_str(),
                  turbo::FormatDuration(expected_delay).c_str(),
@@ -1420,13 +1420,13 @@ INSTANTIATE_TEST_SUITE_P(All, TimeoutTest,
 
 TEST_P(TimeoutTest, Await) {
   const TimeoutTestParam params = GetParam();
-  ABSL_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
+  TURBO_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
 
   // Because this test asserts bounds on scheduling delays it is flaky.  To
   // compensate it loops forever until it passes.  Failures express as test
   // timeouts, in which case the test log can be used to diagnose the issue.
   for (int attempt = 1;; ++attempt) {
-    ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
+    TURBO_RAW_LOG(INFO, "Attempt %d", attempt);
 
     turbo::Mutex mu;
     bool value = false;  // condition value (under mu)
@@ -1454,13 +1454,13 @@ TEST_P(TimeoutTest, Await) {
 
 TEST_P(TimeoutTest, LockWhen) {
   const TimeoutTestParam params = GetParam();
-  ABSL_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
+  TURBO_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
 
   // Because this test asserts bounds on scheduling delays it is flaky.  To
   // compensate it loops forever until it passes.  Failures express as test
   // timeouts, in which case the test log can be used to diagnose the issue.
   for (int attempt = 1;; ++attempt) {
-    ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
+    TURBO_RAW_LOG(INFO, "Attempt %d", attempt);
 
     turbo::Mutex mu;
     bool value = false;  // condition value (under mu)
@@ -1489,13 +1489,13 @@ TEST_P(TimeoutTest, LockWhen) {
 
 TEST_P(TimeoutTest, ReaderLockWhen) {
   const TimeoutTestParam params = GetParam();
-  ABSL_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
+  TURBO_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
 
   // Because this test asserts bounds on scheduling delays it is flaky.  To
   // compensate it loops forever until it passes.  Failures express as test
   // timeouts, in which case the test log can be used to diagnose the issue.
   for (int attempt = 0;; ++attempt) {
-    ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
+    TURBO_RAW_LOG(INFO, "Attempt %d", attempt);
 
     turbo::Mutex mu;
     bool value = false;  // condition value (under mu)
@@ -1525,13 +1525,13 @@ TEST_P(TimeoutTest, ReaderLockWhen) {
 
 TEST_P(TimeoutTest, Wait) {
   const TimeoutTestParam params = GetParam();
-  ABSL_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
+  TURBO_RAW_LOG(INFO, "Params: %s", FormatString(params).c_str());
 
   // Because this test asserts bounds on scheduling delays it is flaky.  To
   // compensate it loops forever until it passes.  Failures express as test
   // timeouts, in which case the test log can be used to diagnose the issue.
   for (int attempt = 0;; ++attempt) {
-    ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
+    TURBO_RAW_LOG(INFO, "Attempt %d", attempt);
 
     turbo::Mutex mu;
     bool value = false;  // condition value (under mu)
@@ -1603,10 +1603,10 @@ INSTANTIATE_TEST_SUITE_P(ThreadCounts, MutexVariableThreadCountTest,
 // Reduces iterations by some factor for slow platforms
 // (determined empirically).
 static int ScaleIterations(int x) {
-  // ABSL_MUTEX_READER_LOCK_IS_EXCLUSIVE is set in the implementation
+  // TURBO_MUTEX_READER_LOCK_IS_EXCLUSIVE is set in the implementation
   // of Mutex that uses either std::mutex or pthread_mutex_t. Use
   // these as keys to determine the slow implementation.
-#if defined(ABSL_MUTEX_READER_LOCK_IS_EXCLUSIVE)
+#if defined(TURBO_MUTEX_READER_LOCK_IS_EXCLUSIVE)
   return x / 10;
 #else
   return x;
@@ -1618,7 +1618,7 @@ TEST_P(MutexVariableThreadCountTest, Mutex) {
   int iterations = ScaleIterations(10000000) / threads;
   int operations = threads * iterations;
   EXPECT_EQ(RunTest(&TestMu, threads, iterations, operations), operations);
-#if !defined(ABSL_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
+#if !defined(TURBO_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
   iterations = std::min(iterations, 10);
   operations = threads * iterations;
   EXPECT_EQ(RunTestWithInvariantDebugging(&TestMu, threads, iterations,
@@ -1632,7 +1632,7 @@ TEST_P(MutexVariableThreadCountTest, Try) {
   int iterations = 1000000 / threads;
   int operations = iterations * threads;
   EXPECT_EQ(RunTest(&TestTry, threads, iterations, operations), operations);
-#if !defined(ABSL_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
+#if !defined(TURBO_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
   iterations = std::min(iterations, 10);
   operations = threads * iterations;
   EXPECT_EQ(RunTestWithInvariantDebugging(&TestTry, threads, iterations,
@@ -1653,7 +1653,7 @@ TEST_P(MutexVariableThreadCountTest, RW) {
   int iterations = ScaleIterations(20000000) / threads;
   int operations = iterations * threads;
   EXPECT_EQ(RunTest(&TestRW, threads, iterations, operations), operations / 2);
-#if !defined(ABSL_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
+#if !defined(TURBO_MUTEX_ENABLE_INVARIANT_DEBUGGING_NOT_IMPLEMENTED)
   iterations = std::min(iterations, 10);
   operations = threads * iterations;
   EXPECT_EQ(RunTestWithInvariantDebugging(&TestRW, threads, iterations,

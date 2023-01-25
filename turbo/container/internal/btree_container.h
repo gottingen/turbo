@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CONTAINER_INTERNAL_BTREE_CONTAINER_H_
-#define ABSL_CONTAINER_INTERNAL_BTREE_CONTAINER_H_
+#ifndef TURBO_CONTAINER_INTERNAL_BTREE_CONTAINER_H_
+#define TURBO_CONTAINER_INTERNAL_BTREE_CONTAINER_H_
 
 #include <algorithm>
 #include <initializer_list>
@@ -28,7 +28,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // A common base class for btree_set, btree_map, btree_multiset, and
@@ -192,7 +192,7 @@ class btree_container {
   }
 
   // Utility routines.
-  ABSL_ATTRIBUTE_REINITIALIZES void clear() { tree_.clear(); }
+  TURBO_ATTRIBUTE_REINITIALIZES void clear() { tree_.clear(); }
   void swap(btree_container &other) { tree_.swap(other.tree_); }
   void verify() const { tree_.verify(); }
 
@@ -235,7 +235,7 @@ class btree_container {
 
   // Support turbo::Hash.
   template <typename State>
-  friend State AbslHashValue(State h, const btree_container &b) {
+  friend State TurboHashValue(State h, const btree_container &b) {
     for (const auto &v : b) {
       h = State::combine(std::move(h), v);
     }
@@ -707,7 +707,7 @@ class btree_multimap_container : public btree_multiset_container<Tree> {
 };
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_BTREE_CONTAINER_H_
+#endif  // TURBO_CONTAINER_INTERNAL_BTREE_CONTAINER_H_

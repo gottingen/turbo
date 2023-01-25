@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include "turbo/strings/ascii.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace {
 
@@ -120,7 +120,7 @@ turbo::string_view ByAnyChar::Find(turbo::string_view text, size_t pos) const {
 // ByLength
 //
 ByLength::ByLength(ptrdiff_t length) : length_(length) {
-  ABSL_RAW_CHECK(length > 0, "");
+  TURBO_RAW_CHECK(length > 0, "");
 }
 
 turbo::string_view ByLength::Find(turbo::string_view text,
@@ -135,5 +135,5 @@ turbo::string_view ByLength::Find(turbo::string_view text,
   return turbo::string_view(substr.data() + length_, 0);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

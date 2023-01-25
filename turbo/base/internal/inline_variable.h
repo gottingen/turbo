@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_BASE_INTERNAL_INLINE_VARIABLE_H_
-#define ABSL_BASE_INTERNAL_INLINE_VARIABLE_H_
+#ifndef TURBO_BASE_INTERNAL_INLINE_VARIABLE_H_
+#define TURBO_BASE_INTERNAL_INLINE_VARIABLE_H_
 
 #include <type_traits>
 
@@ -24,7 +24,7 @@
 //   inline variables based on whether or not the feature is supported.
 
 ////////////////////////////////////////////////////////////////////////////////
-// Macro: ABSL_INTERNAL_INLINE_CONSTEXPR(type, name, init)
+// Macro: TURBO_INTERNAL_INLINE_CONSTEXPR(type, name, init)
 //
 // Description:
 //   Expands to the equivalent of an inline constexpr instance of the specified
@@ -44,7 +44,7 @@
 // Usage:
 //
 //   // Equivalent to: `inline constexpr size_t variant_npos = -1;`
-//   ABSL_INTERNAL_INLINE_CONSTEXPR(size_t, variant_npos, -1);
+//   TURBO_INTERNAL_INLINE_CONSTEXPR(size_t, variant_npos, -1);
 //
 // Differences in implementation:
 //   For a direct, language-level inline variable, decltype(name) will be the
@@ -67,15 +67,15 @@
 //   appropriate place for pointer types, reference types, function pointer
 //   types, etc..
 #if defined(__clang__)
-#define ABSL_INTERNAL_EXTERN_DECL(type, name) \
+#define TURBO_INTERNAL_EXTERN_DECL(type, name) \
   extern const ::turbo::internal::identity_t<type> name;
 #else  // Otherwise, just define the macro to do nothing.
-#define ABSL_INTERNAL_EXTERN_DECL(type, name)
+#define TURBO_INTERNAL_EXTERN_DECL(type, name)
 #endif  // defined(__clang__)
 
 // See above comment at top of file for details.
-#define ABSL_INTERNAL_INLINE_CONSTEXPR(type, name, init) \
-  ABSL_INTERNAL_EXTERN_DECL(type, name)                  \
+#define TURBO_INTERNAL_INLINE_CONSTEXPR(type, name, init) \
+  TURBO_INTERNAL_EXTERN_DECL(type, name)                  \
   inline constexpr ::turbo::internal::identity_t<type> name = init
 
 #else
@@ -86,22 +86,22 @@
 //   identity_t is used here so that the const and name are in the
 //   appropriate place for pointer types, reference types, function pointer
 //   types, etc..
-#define ABSL_INTERNAL_INLINE_CONSTEXPR(var_type, name, init)                  \
-  template <class /*AbslInternalDummy*/ = void>                               \
-  struct AbslInternalInlineVariableHolder##name {                             \
+#define TURBO_INTERNAL_INLINE_CONSTEXPR(var_type, name, init)                  \
+  template <class /*TurboInternalDummy*/ = void>                               \
+  struct TurboInternalInlineVariableHolder##name {                             \
     static constexpr ::turbo::internal::identity_t<var_type> kInstance = init; \
   };                                                                          \
                                                                               \
-  template <class AbslInternalDummy>                                          \
+  template <class TurboInternalDummy>                                          \
   constexpr ::turbo::internal::identity_t<var_type>                            \
-      AbslInternalInlineVariableHolder##name<AbslInternalDummy>::kInstance;   \
+      TurboInternalInlineVariableHolder##name<TurboInternalDummy>::kInstance;   \
                                                                               \
   static constexpr const ::turbo::internal::identity_t<var_type>&              \
       name = /* NOLINT */                                                     \
-      AbslInternalInlineVariableHolder##name<>::kInstance;                    \
+      TurboInternalInlineVariableHolder##name<>::kInstance;                    \
   static_assert(sizeof(void (*)(decltype(name))) != 0,                        \
                 "Silence unused variable warnings.")
 
 #endif  // __cpp_inline_variables
 
-#endif  // ABSL_BASE_INTERNAL_INLINE_VARIABLE_H_
+#endif  // TURBO_BASE_INTERNAL_INLINE_VARIABLE_H_

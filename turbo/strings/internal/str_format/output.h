@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 // `BufferRawSink` is a simple output sink for a char buffer. Used by SnprintF.
 // `FILERawSink` is a std::FILE* based sink. Used by PrintF and FprintF.
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_FORMAT_OUTPUT_H_
-#define ABSL_STRINGS_INTERNAL_STR_FORMAT_OUTPUT_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_FORMAT_OUTPUT_H_
+#define TURBO_STRINGS_INTERNAL_STR_FORMAT_OUTPUT_H_
 
 #include <cstdio>
 #include <ios>
@@ -30,7 +30,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 
 // RawSink implementation that writes into a char* buffer.
@@ -68,30 +68,30 @@ class FILERawSink {
 };
 
 // Provide RawSink integration with common types from the STL.
-inline void AbslFormatFlush(std::string* out, string_view s) {
+inline void TurboFormatFlush(std::string* out, string_view s) {
   out->append(s.data(), s.size());
 }
-inline void AbslFormatFlush(std::ostream* out, string_view s) {
+inline void TurboFormatFlush(std::ostream* out, string_view s) {
   out->write(s.data(), static_cast<std::streamsize>(s.size()));
 }
 
-inline void AbslFormatFlush(FILERawSink* sink, string_view v) {
+inline void TurboFormatFlush(FILERawSink* sink, string_view v) {
   sink->Write(v);
 }
 
-inline void AbslFormatFlush(BufferRawSink* sink, string_view v) {
+inline void TurboFormatFlush(BufferRawSink* sink, string_view v) {
   sink->Write(v);
 }
 
 // This is a SFINAE to get a better compiler error message when the type
 // is not supported.
 template <typename T>
-auto InvokeFlush(T* out, string_view s) -> decltype(AbslFormatFlush(out, s)) {
-  AbslFormatFlush(out, s);
+auto InvokeFlush(T* out, string_view s) -> decltype(TurboFormatFlush(out, s)) {
+  TurboFormatFlush(out, s);
 }
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_OUTPUT_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_FORMAT_OUTPUT_H_

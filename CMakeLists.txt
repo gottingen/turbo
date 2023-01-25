@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ project(turbo LANGUAGES CXX)
 include(CTest)
 
 # Output directory is correct by default for most build setups. However, when
-# building Abseil as a DLL, it is important to have the DLL in the same
+# building Turbo as a DLL, it is important to have the DLL in the same
 # directory as the executable using it. Thus, we put all executables in a single
 # /bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -60,20 +60,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # when turbo is included as subproject (i.e. using add_subdirectory(abseil-cpp))
 # in the source tree of a project that uses it, install rules are disabled.
 if(NOT CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  option(ABSL_ENABLE_INSTALL "Enable install rule" OFF)
+  option(TURBO_ENABLE_INSTALL "Enable install rule" OFF)
 else()
-  option(ABSL_ENABLE_INSTALL "Enable install rule" ON)
+  option(TURBO_ENABLE_INSTALL "Enable install rule" ON)
 endif()
 
-option(ABSL_PROPAGATE_CXX_STD
-  "Use CMake C++ standard meta features (e.g. cxx_std_14) that propagate to targets that link to Abseil"
+option(TURBO_PROPAGATE_CXX_STD
+  "Use CMake C++ standard meta features (e.g. cxx_std_14) that propagate to targets that link to Turbo"
   ON)  # TODO: Default to ON for CMake 3.8 and greater.
-if((${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8) AND (NOT ABSL_PROPAGATE_CXX_STD))
-  message(WARNING "A future Abseil release will default ABSL_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
+if((${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8) AND (NOT TURBO_PROPAGATE_CXX_STD))
+  message(WARNING "A future Turbo release will default TURBO_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
 endif()
 
-option(ABSL_USE_SYSTEM_INCLUDES
-  "Silence warnings in Abseil headers by marking them as SYSTEM includes"
+option(TURBO_USE_SYSTEM_INCLUDES
+  "Silence warnings in Turbo headers by marking them as SYSTEM includes"
   OFF)
 
 list(APPEND CMAKE_MODULE_PATH
@@ -83,8 +83,8 @@ list(APPEND CMAKE_MODULE_PATH
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
-include(AbseilDll)
-include(AbseilHelpers)
+include(TurboDll)
+include(TurboHelpers)
 
 
 ##
@@ -99,12 +99,12 @@ include(AbseilHelpers)
 
 
 # include current path
-list(APPEND ABSL_COMMON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND TURBO_COMMON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(ABSL_USING_CLANG ON)
+  set(TURBO_USING_CLANG ON)
 else()
-  set(ABSL_USING_CLANG OFF)
+  set(TURBO_USING_CLANG OFF)
 endif()
 
 # find dependencies
@@ -113,35 +113,35 @@ find_package(Threads REQUIRED)
 
 include(CMakeDependentOption)
 
-option(ABSL_BUILD_TESTING
-  "If ON, Abseil will build all of Abseil's own tests." ON)
+option(TURBO_BUILD_TESTING
+  "If ON, Turbo will build all of Turbo's own tests." ON)
 
-option(ABSL_BUILD_TEST_HELPERS
-  "If ON, Abseil will build libraries that you can use to write tests against Abseil code. This option requires that Abseil is configured to use GoogleTest."
+option(TURBO_BUILD_TEST_HELPERS
+  "If ON, Turbo will build libraries that you can use to write tests against Turbo code. This option requires that Turbo is configured to use GoogleTest."
   OFF)
 
-option(ABSL_USE_EXTERNAL_GOOGLETEST
-  "If ON, Abseil will assume that the targets for GoogleTest are already provided by the including project. This makes sense when Abseil is used with add_subdirectory." OFF)
+option(TURBO_USE_EXTERNAL_GOOGLETEST
+  "If ON, Turbo will assume that the targets for GoogleTest are already provided by the including project. This makes sense when Turbo is used with add_subdirectory." OFF)
 
-cmake_dependent_option(ABSL_FIND_GOOGLETEST
-  "If ON, Abseil will use find_package(GTest) rather than assuming that GoogleTest is already provided by the including project."
+cmake_dependent_option(TURBO_FIND_GOOGLETEST
+  "If ON, Turbo will use find_package(GTest) rather than assuming that GoogleTest is already provided by the including project."
   ON
-  "ABSL_USE_EXTERNAL_GOOGLETEST"
+  "TURBO_USE_EXTERNAL_GOOGLETEST"
   OFF)
 
 
-option(ABSL_USE_GOOGLETEST_HEAD
+option(TURBO_USE_GOOGLETEST_HEAD
   "If ON, abseil will download HEAD from GoogleTest at config time." ON)
 
-set(ABSL_GOOGLETEST_DOWNLOAD_URL "" CACHE STRING "If set, download GoogleTest from this URL")
+set(TURBO_GOOGLETEST_DOWNLOAD_URL "" CACHE STRING "If set, download GoogleTest from this URL")
 
-set(ABSL_LOCAL_GOOGLETEST_DIR "/usr/src/googletest" CACHE PATH
-  "If ABSL_USE_GOOGLETEST_HEAD is OFF and ABSL_GOOGLETEST_URL is not set, specifies the directory of a local GoogleTest checkout."
+set(TURBO_LOCAL_GOOGLETEST_DIR "/usr/src/googletest" CACHE PATH
+  "If TURBO_USE_GOOGLETEST_HEAD is OFF and TURBO_GOOGLETEST_URL is not set, specifies the directory of a local GoogleTest checkout."
   )
 
-if((BUILD_TESTING AND ABSL_BUILD_TESTING) OR ABSL_BUILD_TEST_HELPERS)
-  if (ABSL_USE_EXTERNAL_GOOGLETEST)
-    if (ABSL_FIND_GOOGLETEST)
+if((BUILD_TESTING AND TURBO_BUILD_TESTING) OR TURBO_BUILD_TEST_HELPERS)
+  if (TURBO_USE_EXTERNAL_GOOGLETEST)
+    if (TURBO_FIND_GOOGLETEST)
       find_package(GTest REQUIRED)
     elseif(NOT TARGET GTest::gtest)
       if(TARGET gtest)
@@ -151,23 +151,23 @@ if((BUILD_TESTING AND ABSL_BUILD_TESTING) OR ABSL_BUILD_TEST_HELPERS)
         add_library(GTest::gmock ALIAS gmock)
         add_library(GTest::gmock_main ALIAS gmock_main)
       else()
-        message(FATAL_ERROR "ABSL_USE_EXTERNAL_GOOGLETEST is ON and ABSL_FIND_GOOGLETEST is OFF, which means that the top-level project must build the Google Test project. However, the target gtest was not found.")
+        message(FATAL_ERROR "TURBO_USE_EXTERNAL_GOOGLETEST is ON and TURBO_FIND_GOOGLETEST is OFF, which means that the top-level project must build the Google Test project. However, the target gtest was not found.")
       endif()
     endif()
   else()
-    set(absl_gtest_build_dir ${CMAKE_BINARY_DIR}/googletest-build)
-    if(ABSL_USE_GOOGLETEST_HEAD AND ABSL_GOOGLETEST_DOWNLOAD_URL)
-      message(FATAL_ERROR "Do not set both ABSL_USE_GOOGLETEST_HEAD and ABSL_GOOGLETEST_DOWNLOAD_URL")
+    set(turbo_gtest_build_dir ${CMAKE_BINARY_DIR}/googletest-build)
+    if(TURBO_USE_GOOGLETEST_HEAD AND TURBO_GOOGLETEST_DOWNLOAD_URL)
+      message(FATAL_ERROR "Do not set both TURBO_USE_GOOGLETEST_HEAD and TURBO_GOOGLETEST_DOWNLOAD_URL")
     endif()
-    if(ABSL_USE_GOOGLETEST_HEAD)
-      set(absl_gtest_download_url "https://gitee.com/gottingen/googletest/repository/archive/main.zip")
-    elseif(ABSL_GOOGLETEST_DOWNLOAD_URL)
-      set(absl_gtest_download_url ${ABSL_GOOGLETEST_DOWNLOAD_URL})
+    if(TURBO_USE_GOOGLETEST_HEAD)
+      set(turbo_gtest_download_url "https://gitee.com/gottingen/googletest/repository/archive/main.zip")
+    elseif(TURBO_GOOGLETEST_DOWNLOAD_URL)
+      set(turbo_gtest_download_url ${TURBO_GOOGLETEST_DOWNLOAD_URL})
     endif()
-    if(absl_gtest_download_url)
-      set(absl_gtest_src_dir ${CMAKE_BINARY_DIR}/googletest-src)
+    if(turbo_gtest_download_url)
+      set(turbo_gtest_src_dir ${CMAKE_BINARY_DIR}/googletest-src)
     else()
-      set(absl_gtest_src_dir ${ABSL_LOCAL_GOOGLETEST_DIR})
+      set(turbo_gtest_src_dir ${TURBO_LOCAL_GOOGLETEST_DIR})
     endif()
     include(CMake/Googletest/DownloadGTest.cmake)
   endif()
@@ -175,14 +175,14 @@ endif()
 
 add_subdirectory(turbo)
 
-if(ABSL_ENABLE_INSTALL)
+if(TURBO_ENABLE_INSTALL)
   # turbo:lts-remove-begin(system installation is supported for LTS releases)
   # We don't support system-wide installation
   list(APPEND SYSTEM_INSTALL_DIRS "/usr/local" "/usr" "/opt/" "/opt/local" "c:/Program Files/${PROJECT_NAME}")
   if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX IN_LIST SYSTEM_INSTALL_DIRS)
     message(WARNING "\
   The default and system-level install directories are unsupported except in LTS \
-  releases of Abseil.  Please set CMAKE_INSTALL_PREFIX to install Abseil in your \
+  releases of Turbo.  Please set CMAKE_INSTALL_PREFIX to install Turbo in your \
   source or build tree directly.\
     ")
   endif()
@@ -195,7 +195,7 @@ if(ABSL_ENABLE_INSTALL)
   )
 
   configure_package_config_file(
-    CMake/abslConfig.cmake.in
+    CMake/turboConfig.cmake.in
     "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   )
@@ -203,10 +203,10 @@ if(ABSL_ENABLE_INSTALL)
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   )
 
-  # Abseil only has a version in LTS releases.  This mechanism is accomplished
-  # Abseil's internal Copybara (https://github.com/google/copybara) workflows and
+  # Turbo only has a version in LTS releases.  This mechanism is accomplished
+  # Turbo's internal Copybara (https://github.com/google/copybara) workflows and
   # isn't visible in the CMake buildsystem itself.
-  if(absl_VERSION)
+  if(turbo_VERSION)
     write_basic_package_version_file(
       "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
       COMPATIBILITY ExactVersion
@@ -215,7 +215,7 @@ if(ABSL_ENABLE_INSTALL)
     install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
       DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     )
-  endif()  # absl_VERSION
+  endif()  # turbo_VERSION
 
   install(DIRECTORY turbo
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
@@ -226,24 +226,24 @@ if(ABSL_ENABLE_INSTALL)
       PATTERN "testdata" EXCLUDE
     )
 
-  file(READ "turbo/base/options.h" ABSL_INTERNAL_OPTIONS_H_CONTENTS)
-  if (ABSL_INTERNAL_AT_LEAST_CXX17)
+  file(READ "turbo/base/options.h" TURBO_INTERNAL_OPTIONS_H_CONTENTS)
+  if (TURBO_INTERNAL_AT_LEAST_CXX17)
     string(REGEX REPLACE
-      "#define ABSL_OPTION_USE_STD_([^ ]*) 2"
-      "#define ABSL_OPTION_USE_STD_\\1 1"
-      ABSL_INTERNAL_OPTIONS_H_PINNED
-      "${ABSL_INTERNAL_OPTIONS_H_CONTENTS}")
+      "#define TURBO_OPTION_USE_STD_([^ ]*) 2"
+      "#define TURBO_OPTION_USE_STD_\\1 1"
+      TURBO_INTERNAL_OPTIONS_H_PINNED
+      "${TURBO_INTERNAL_OPTIONS_H_CONTENTS}")
   else()
     string(REGEX REPLACE
-      "#define ABSL_OPTION_USE_STD_([^ ]*) 2"
-      "#define ABSL_OPTION_USE_STD_\\1 0"
-      ABSL_INTERNAL_OPTIONS_H_PINNED
-      "${ABSL_INTERNAL_OPTIONS_H_CONTENTS}")
+      "#define TURBO_OPTION_USE_STD_([^ ]*) 2"
+      "#define TURBO_OPTION_USE_STD_\\1 0"
+      TURBO_INTERNAL_OPTIONS_H_PINNED
+      "${TURBO_INTERNAL_OPTIONS_H_CONTENTS}")
   endif()
-  file(WRITE "${CMAKE_BINARY_DIR}/options-pinned.h" "${ABSL_INTERNAL_OPTIONS_H_PINNED}")
+  file(WRITE "${CMAKE_BINARY_DIR}/options-pinned.h" "${TURBO_INTERNAL_OPTIONS_H_PINNED}")
 
   install(FILES "${CMAKE_BINARY_DIR}/options-pinned.h"
          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/turbo/base
          RENAME "options.h")
 
-endif()  # ABSL_ENABLE_INSTALL
+endif()  # TURBO_ENABLE_INSTALL

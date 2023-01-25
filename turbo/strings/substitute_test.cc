@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace {
 
 struct MyStruct {
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const MyStruct& s) {
+  friend void TurboStringify(Sink& sink, const MyStruct& s) {
     sink.Append("MyStruct{.value = ");
     sink.Append(turbo::StrCat(s.value));
     sink.Append("}");
@@ -256,11 +256,11 @@ TEST(SubstituteTest, Enums) {
 enum class EnumWithStringify { Many = 0, Choices = 1 };
 
 template <typename Sink>
-void AbslStringify(Sink& sink, EnumWithStringify e) {
+void TurboStringify(Sink& sink, EnumWithStringify e) {
   sink.Append(e == EnumWithStringify::Many ? "Many" : "Choices");
 }
 
-TEST(SubstituteTest, AbslStringifyWithEnum) {
+TEST(SubstituteTest, TurboStringifyWithEnum) {
   const auto e = EnumWithStringify::Choices;
   EXPECT_EQ(turbo::Substitute("$0", e), "Choices");
 }

@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 // File: symbolize.h
 // -----------------------------------------------------------------------------
 //
-// This file configures the Abseil symbolizer for use in converting instruction
+// This file configures the Turbo symbolizer for use in converting instruction
 // pointer addresses (program counters) into human-readable names (function
-// calls, etc.) within Abseil code.
+// calls, etc.) within Turbo code.
 //
 // The symbolizer may be invoked from several sources:
 //
-//   * Implicitly, through the installation of an Abseil failure signal handler.
+//   * Implicitly, through the installation of an Turbo failure signal handler.
 //     (See failure_signal_handler.h for more information.)
 //   * By calling `Symbolize()` directly on a program counter you obtain through
 //     `turbo::GetStackTrace()` or `turbo::GetStackFrames()`. (See stacktrace.h
@@ -49,18 +49,18 @@
 //     return 0;
 //  }
 //
-#ifndef ABSL_DEBUGGING_SYMBOLIZE_H_
-#define ABSL_DEBUGGING_SYMBOLIZE_H_
+#ifndef TURBO_DEBUGGING_SYMBOLIZE_H_
+#define TURBO_DEBUGGING_SYMBOLIZE_H_
 
 #include "turbo/debugging/internal/symbolize.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // InitializeSymbolizer()
 //
 // Initializes the program counter symbolizer, given the path of the program
-// (typically obtained through `main()`s `argv[0]`). The Abseil symbolizer
+// (typically obtained through `main()`s `argv[0]`). The Turbo symbolizer
 // allows you to read program counters (instruction pointer values) using their
 // human-readable names within output such as stack traces.
 //
@@ -93,7 +93,7 @@ void InitializeSymbolizer(const char* argv0);
 //  }
 bool Symbolize(const void *pc, char *out, int out_size);
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_SYMBOLIZE_H_
+#endif  // TURBO_DEBUGGING_SYMBOLIZE_H_

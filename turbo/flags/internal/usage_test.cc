@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@
 #include "turbo/strings/match.h"
 #include "turbo/strings/string_view.h"
 
-ABSL_FLAG(int, usage_reporting_test_flag_01, 101,
+TURBO_FLAG(int, usage_reporting_test_flag_01, 101,
           "usage_reporting_test_flag_01 help message");
-ABSL_FLAG(bool, usage_reporting_test_flag_02, false,
+TURBO_FLAG(bool, usage_reporting_test_flag_02, false,
           "usage_reporting_test_flag_02 help message");
-ABSL_FLAG(double, usage_reporting_test_flag_03, 1.03,
+TURBO_FLAG(double, usage_reporting_test_flag_03, 1.03,
           "usage_reporting_test_flag_03 help message");
-ABSL_FLAG(int64_t, usage_reporting_test_flag_04, 1000000000000004L,
+TURBO_FLAG(int64_t, usage_reporting_test_flag_04, 1000000000000004L,
           "usage_reporting_test_flag_04 help message");
 
 static const char kTestUsageMessage[] = "Custom usage message";
@@ -48,15 +48,15 @@ struct UDT {
   UDT(const UDT&) = default;
   UDT& operator=(const UDT&) = default;
 };
-static bool AbslParseFlag(turbo::string_view, UDT*, std::string*) {
+static bool TurboParseFlag(turbo::string_view, UDT*, std::string*) {
   return true;
 }
-static std::string AbslUnparseFlag(const UDT&) { return "UDT{}"; }
+static std::string TurboUnparseFlag(const UDT&) { return "UDT{}"; }
 
-ABSL_FLAG(UDT, usage_reporting_test_flag_05, {},
+TURBO_FLAG(UDT, usage_reporting_test_flag_05, {},
           "usage_reporting_test_flag_05 help message");
 
-ABSL_FLAG(
+TURBO_FLAG(
     std::string, usage_reporting_test_flag_06, {},
     "usage_reporting_test_flag_06 help message.\n"
     "\n"
@@ -75,9 +75,9 @@ static std::string NormalizeFileName(turbo::string_view fname) {
   fname = normalized;
 #endif
 
-  auto absl_pos = fname.rfind("turbo/");
-  if (absl_pos != turbo::string_view::npos) {
-    fname = fname.substr(absl_pos);
+  auto turbo_pos = fname.rfind("turbo/");
+  if (turbo_pos != turbo::string_view::npos) {
+    fname = fname.substr(turbo_pos);
   }
   return std::string(fname);
 }
@@ -106,7 +106,7 @@ class UsageReportingTest : public testing::Test {
 using UsageReportingDeathTest = UsageReportingTest;
 
 TEST_F(UsageReportingDeathTest, TestSetProgramUsageMessage) {
-#if !defined(GTEST_HAS_ABSL) || !GTEST_HAS_ABSL
+#if !defined(GTEST_HAS_TURBO) || !GTEST_HAS_TURBO
   // Check for kTestUsageMessage set in main() below.
   EXPECT_EQ(turbo::ProgramUsageMessage(), kTestUsageMessage);
 #else
@@ -495,7 +495,7 @@ path.
 int main(int argc, char* argv[]) {
   (void)turbo::GetFlag(FLAGS_undefok);  // Force linking of parse.cc
   flags::SetProgramInvocationName("usage_test");
-#if !defined(GTEST_HAS_ABSL) || !GTEST_HAS_ABSL
+#if !defined(GTEST_HAS_TURBO) || !GTEST_HAS_TURBO
   // GoogleTest calls turbo::SetProgramUsageMessage() already.
   turbo::SetProgramUsageMessage(kTestUsageMessage);
 #endif

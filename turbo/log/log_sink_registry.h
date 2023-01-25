@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 //
 // This header declares APIs to operate on global set of registered log sinks.
 
-#ifndef ABSL_LOG_LOG_SINK_REGISTRY_H_
-#define ABSL_LOG_LOG_SINK_REGISTRY_H_
+#ifndef TURBO_LOG_LOG_SINK_REGISTRY_H_
+#define TURBO_LOG_LOG_SINK_REGISTRY_H_
 
 #include "turbo/base/config.h"
 #include "turbo/log/internal/log_sink_set.h"
 #include "turbo/log/log_sink.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // AddLogSink(), RemoveLogSink()
 //
@@ -55,7 +55,7 @@ inline void RemoveLogSink(turbo::LogSink* sink) {
 // Do not call this inside `turbo::LogSink::Send`.
 inline void FlushLogSinks() { log_internal::FlushLogSinks(); }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_LOG_SINK_REGISTRY_H_
+#endif  // TURBO_LOG_LOG_SINK_REGISTRY_H_

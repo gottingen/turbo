@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ void InstallHandlerAndRaise(int signo) {
   raise(signo);
 }
 
-TEST_P(FailureSignalHandlerDeathTest, AbslFailureSignal) {
+TEST_P(FailureSignalHandlerDeathTest, TurboFailureSignal) {
   const int signo = GetParam();
   std::string exit_regex = turbo::StrCat(
       "\\*\\*\\* ", turbo::debugging_internal::FailureSignalToString(signo),
@@ -59,14 +59,14 @@ TEST_P(FailureSignalHandlerDeathTest, AbslFailureSignal) {
 #endif
 }
 
-ABSL_CONST_INIT FILE* error_file = nullptr;
+TURBO_CONST_INIT FILE* error_file = nullptr;
 
 void WriteToErrorFile(const char* msg) {
   if (msg != nullptr) {
-    ABSL_RAW_CHECK(fwrite(msg, strlen(msg), 1, error_file) == 1,
+    TURBO_RAW_CHECK(fwrite(msg, strlen(msg), 1, error_file) == 1,
                    "fwrite() failed");
   }
-  ABSL_RAW_CHECK(fflush(error_file) == 0, "fflush() failed");
+  TURBO_RAW_CHECK(fflush(error_file) == 0, "fflush() failed");
 }
 
 std::string GetTmpDir() {
@@ -87,14 +87,14 @@ std::string GetTmpDir() {
 // This function runs in a fork()ed process on most systems.
 void InstallHandlerWithWriteToFileAndRaise(const char* file, int signo) {
   error_file = fopen(file, "w");
-  ABSL_RAW_CHECK(error_file != nullptr, "Failed create error_file");
+  TURBO_RAW_CHECK(error_file != nullptr, "Failed create error_file");
   turbo::FailureSignalHandlerOptions options;
   options.writerfn = WriteToErrorFile;
   turbo::InstallFailureSignalHandler(options);
   raise(signo);
 }
 
-TEST_P(FailureSignalHandlerDeathTest, AbslFatalSignalsWithWriterFn) {
+TEST_P(FailureSignalHandlerDeathTest, TurboFatalSignalsWithWriterFn) {
   const int signo = GetParam();
   std::string tmp_dir = GetTmpDir();
   std::string file = turbo::StrCat(tmp_dir, "/signo_", signo);
@@ -150,7 +150,7 @@ std::string SignalParamToString(const ::testing::TestParamInfo<int>& info) {
   return result;
 }
 
-INSTANTIATE_TEST_SUITE_P(AbslDeathTest, FailureSignalHandlerDeathTest,
+INSTANTIATE_TEST_SUITE_P(TurboDeathTest, FailureSignalHandlerDeathTest,
                          ::testing::ValuesIn(kFailureSignals),
                          SignalParamToString);
 

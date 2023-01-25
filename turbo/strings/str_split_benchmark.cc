@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ void BM_SplitStringWithOneChar(benchmark::State& state) {
                             delimiter);
     v += pieces.size();
   }
-  ABSL_RAW_CHECK(v == state.iterations(), "");
+  TURBO_RAW_CHECK(v == state.iterations(), "");
 }
 BENCHMARK_TEMPLATE(BM_SplitStringWithOneChar, OneCharLiteral);
 BENCHMARK_TEMPLATE(BM_SplitStringWithOneChar, OneCharStringLiteral);
@@ -172,7 +172,7 @@ void BM_SplitStringWithOneCharNoVector(benchmark::State& state) {
         "The quick brown fox jumps over the lazy dog", delimiter);
     v += std::distance(splitter.begin(), splitter.end());
   }
-  ABSL_RAW_CHECK(v == state.iterations(), "");
+  TURBO_RAW_CHECK(v == state.iterations(), "");
 }
 BENCHMARK_TEMPLATE(BM_SplitStringWithOneCharNoVector, OneCharLiteral);
 BENCHMARK_TEMPLATE(BM_SplitStringWithOneCharNoVector, OneCharStringLiteral);

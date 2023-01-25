@@ -12,8 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#ifndef ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_IF_H_
-#define ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_IF_H_
+#ifndef TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IF_H_
+#define TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IF_H_
 
 #include <chrono>
 #include <cstdint>
@@ -25,7 +25,7 @@
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -71,7 +71,7 @@ inline time_point<seconds> FromUnixSeconds(std::int_fast64_t t) {
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_IF_H_
+#endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IF_H_

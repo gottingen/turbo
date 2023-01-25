@@ -49,7 +49,7 @@
 #include "time_zone_if.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 namespace detail {
@@ -1025,5 +1025,5 @@ bool parse(const std::string& format, const std::string& input,
 }  // namespace detail
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@
 // to which the function is applied, `Pred` indicates the predicate object type
 // to be used by the function and `T` indicates the applicable element type.
 
-#ifndef ABSL_ALGORITHM_CONTAINER_H_
-#define ABSL_ALGORITHM_CONTAINER_H_
+#ifndef TURBO_ALGORITHM_CONTAINER_H_
+#define TURBO_ALGORITHM_CONTAINER_H_
 
 #include <algorithm>
 #include <cassert>
@@ -55,7 +55,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_algorithm_internal {
 
 // NOTE: it is important to defer to ADL lookup for building with C++ modules,
@@ -130,7 +130,7 @@ constexpr std::size_t c_size(T (&)[N]) {
 // PUBLIC API
 
 //------------------------------------------------------------------------------
-// Abseil algorithm.h functions
+// Turbo algorithm.h functions
 //------------------------------------------------------------------------------
 
 // c_linear_search()
@@ -1768,7 +1768,7 @@ OutputIt c_partial_sum(const InputSequence& input, OutputIt output_first,
                           output_first, std::forward<BinaryOp>(op));
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_ALGORITHM_CONTAINER_H_
+#endif  // TURBO_ALGORITHM_CONTAINER_H_

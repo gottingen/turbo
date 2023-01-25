@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 // generators (using the same seed sequence) may be helpful (e.g. replaying a
 // simulation whose state is derived from variates of a bit generator).
 
-#ifndef ABSL_RANDOM_SEED_SEQUENCES_H_
-#define ABSL_RANDOM_SEED_SEQUENCES_H_
+#ifndef TURBO_RANDOM_SEED_SEQUENCES_H_
+#define TURBO_RANDOM_SEED_SEQUENCES_H_
 
 #include <iterator>
 #include <random>
@@ -35,7 +35,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // turbo::SeedSeq
@@ -105,7 +105,7 @@ SeedSeq CreateSeedSeqFrom(URBG* urbg) {
 //
 SeedSeq MakeSeedSeq();
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_SEED_SEQUENCES_H_
+#endif  // TURBO_RANDOM_SEED_SEQUENCES_H_

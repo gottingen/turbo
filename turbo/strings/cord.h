@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,8 +57,8 @@
 // const methods without synchronization. Copying a Cord produces a new instance
 // that can be used concurrently with the original in arbitrary ways.
 
-#ifndef ABSL_STRINGS_CORD_H_
-#define ABSL_STRINGS_CORD_H_
+#ifndef TURBO_STRINGS_CORD_H_
+#define TURBO_STRINGS_CORD_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -98,7 +98,7 @@
 #include "turbo/types/optional.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 class Cord;
 class CordTestPeer;
 template <typename Releaser>
@@ -233,7 +233,7 @@ class Cord {
   //
   // Releases the Cord data. Any nodes that share data with other Cords, if
   // applicable, will have their reference counts reduced by 1.
-  ABSL_ATTRIBUTE_REINITIALIZES void Clear();
+  TURBO_ATTRIBUTE_REINITIALIZES void Clear();
 
   // Cord::Append()
   //
@@ -726,7 +726,7 @@ class Cord {
   turbo::string_view Flatten();
 
   // Supports turbo::Cord as a sink object for turbo::Format().
-  friend void AbslFormatFlush(turbo::Cord* cord, turbo::string_view part) {
+  friend void TurboFormatFlush(turbo::Cord* cord, turbo::string_view part) {
     cord->Append(part);
   }
 
@@ -754,7 +754,7 @@ class Cord {
   turbo::optional<uint32_t> ExpectedChecksum() const;
 
   template <typename H>
-  friend H AbslHashValue(H hash_state, const turbo::Cord& c) {
+  friend H TurboHashValue(H hash_state, const turbo::Cord& c) {
     turbo::optional<turbo::string_view> maybe_flat = c.TryFlat();
     if (maybe_flat.has_value()) {
       return H::combine(std::move(hash_state), *maybe_flat);
@@ -992,10 +992,10 @@ class Cord {
   // Requires src.length() > kMaxBytesToCopy.
   Cord& AssignLargeString(std::string&& src);
 
-  // Helper for AbslHashValue().
+  // Helper for TurboHashValue().
   template <typename H>
   H HashFragmented(H hash_state) const {
-    typename H::AbslInternalPiecewiseCombiner combiner;
+    typename H::TurboInternalPiecewiseCombiner combiner;
     ForEachChunk([&combiner, &hash_state](turbo::string_view chunk) {
       hash_state = combiner.add_buffer(std::move(hash_state), chunk.data(),
                                        chunk.size());
@@ -1008,11 +1008,11 @@ class Cord {
   const crc_internal::CrcCordState* MaybeGetCrcCordState() const;
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // allow a Cord to be logged
 extern std::ostream& operator<<(std::ostream& out, const Cord& cord);
@@ -1052,7 +1052,7 @@ inline CordRep* NewExternalRep(turbo::string_view data,
 template <typename Releaser>
 Cord MakeCordFromExternal(turbo::string_view data, Releaser&& releaser) {
   Cord cord;
-  if (ABSL_PREDICT_TRUE(!data.empty())) {
+  if (TURBO_PREDICT_TRUE(!data.empty())) {
     cord.contents_.EmplaceTree(::turbo::cord_internal::NewExternalRep(
                                    data, std::forward<Releaser>(releaser)),
                                Cord::MethodIdentifier::kMakeCordFromExternal);
@@ -1209,7 +1209,7 @@ inline void Cord::InlineRep::CopyToArray(char* dst) const {
 
 inline void Cord::InlineRep::MaybeRemoveEmptyCrcNode() {
   CordRep* rep = tree();
-  if (rep == nullptr || ABSL_PREDICT_TRUE(rep->length > 0)) {
+  if (rep == nullptr || TURBO_PREDICT_TRUE(rep->length > 0)) {
     return;
   }
   assert(rep->IsCrc());
@@ -1316,7 +1316,7 @@ inline void Cord::Prepend(turbo::string_view src) {
 }
 
 inline void Cord::Append(CordBuffer buffer) {
-  if (ABSL_PREDICT_FALSE(buffer.length() == 0)) return;
+  if (TURBO_PREDICT_FALSE(buffer.length() == 0)) return;
   turbo::string_view short_value;
   if (CordRep* rep = buffer.ConsumeValue(short_value)) {
     contents_.AppendTree(rep, CordzUpdateTracker::kAppendCordBuffer);
@@ -1326,7 +1326,7 @@ inline void Cord::Append(CordBuffer buffer) {
 }
 
 inline void Cord::Prepend(CordBuffer buffer) {
-  if (ABSL_PREDICT_FALSE(buffer.length() == 0)) return;
+  if (TURBO_PREDICT_FALSE(buffer.length() == 0)) return;
   turbo::string_view short_value;
   if (CordRep* rep = buffer.ConsumeValue(short_value)) {
     contents_.PrependTree(rep, CordzUpdateTracker::kPrependCordBuffer);
@@ -1393,7 +1393,7 @@ inline Cord::ChunkIterator::ChunkIterator(cord_internal::CordRep* tree) {
 inline Cord::ChunkIterator::ChunkIterator(const Cord* cord) {
   if (CordRep* tree = cord->contents_.tree()) {
     bytes_remaining_ = tree->length;
-    if (ABSL_PREDICT_TRUE(bytes_remaining_ != 0)) {
+    if (TURBO_PREDICT_TRUE(bytes_remaining_ != 0)) {
       InitTree(tree);
     } else {
       current_chunk_ = {};
@@ -1425,7 +1425,7 @@ inline void Cord::ChunkIterator::AdvanceBytesBtree(size_t n) {
 }
 
 inline Cord::ChunkIterator& Cord::ChunkIterator::operator++() {
-  ABSL_HARDENING_ASSERT(bytes_remaining_ > 0 &&
+  TURBO_HARDENING_ASSERT(bytes_remaining_ > 0 &&
                         "Attempted to iterate past `end()`");
   assert(bytes_remaining_ >= current_chunk_.size());
   bytes_remaining_ -= current_chunk_.size();
@@ -1455,12 +1455,12 @@ inline bool Cord::ChunkIterator::operator!=(const ChunkIterator& other) const {
 }
 
 inline Cord::ChunkIterator::reference Cord::ChunkIterator::operator*() const {
-  ABSL_HARDENING_ASSERT(bytes_remaining_ != 0);
+  TURBO_HARDENING_ASSERT(bytes_remaining_ != 0);
   return current_chunk_;
 }
 
 inline Cord::ChunkIterator::pointer Cord::ChunkIterator::operator->() const {
-  ABSL_HARDENING_ASSERT(bytes_remaining_ != 0);
+  TURBO_HARDENING_ASSERT(bytes_remaining_ != 0);
   return &current_chunk_;
 }
 
@@ -1472,7 +1472,7 @@ inline void Cord::ChunkIterator::RemoveChunkPrefix(size_t n) {
 
 inline void Cord::ChunkIterator::AdvanceBytes(size_t n) {
   assert(bytes_remaining_ >= n);
-  if (ABSL_PREDICT_TRUE(n < current_chunk_.size())) {
+  if (TURBO_PREDICT_TRUE(n < current_chunk_.size())) {
     RemoveChunkPrefix(n);
   } else if (n != 0) {
     if (btree_reader_) {
@@ -1500,7 +1500,7 @@ inline Cord::ChunkIterator Cord::ChunkRange::end() const {
 inline Cord::ChunkRange Cord::Chunks() const { return ChunkRange(this); }
 
 inline Cord::CharIterator& Cord::CharIterator::operator++() {
-  if (ABSL_PREDICT_TRUE(chunk_iterator_->size() > 1)) {
+  if (TURBO_PREDICT_TRUE(chunk_iterator_->size() > 1)) {
     chunk_iterator_.RemoveChunkPrefix(1);
   } else {
     ++chunk_iterator_;
@@ -1627,7 +1627,7 @@ class CordTestAccess {
   static uint8_t LengthToTag(size_t s);
 };
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_CORD_H_
+#endif  // TURBO_STRINGS_CORD_H_

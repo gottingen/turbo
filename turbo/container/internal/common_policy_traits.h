@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CONTAINER_INTERNAL_COMMON_POLICY_TRAITS_H_
-#define ABSL_CONTAINER_INTERNAL_COMMON_POLICY_TRAITS_H_
+#ifndef TURBO_CONTAINER_INTERNAL_COMMON_POLICY_TRAITS_H_
+#define TURBO_CONTAINER_INTERNAL_COMMON_POLICY_TRAITS_H_
 
 #include <cstddef>
 #include <cstring>
@@ -25,7 +25,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // Defines how slots are initialized/destroyed/moved.
@@ -126,7 +126,7 @@ struct common_policy_traits {
 };
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_COMMON_POLICY_TRAITS_H_
+#endif  // TURBO_CONTAINER_INTERNAL_COMMON_POLICY_TRAITS_H_

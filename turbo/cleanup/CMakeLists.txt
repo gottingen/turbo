@@ -1,4 +1,4 @@
-# Copyright 2021 The Abseil Authors.
+# Copyright 2021 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
 # limitations under the License.
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     cleanup_internal
   HDRS
     "internal/cleanup.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::base_internal
     turbo::core_headers
@@ -27,13 +27,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     cleanup
   HDRS
     "cleanup.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::cleanup_internal
     turbo::config
@@ -41,13 +41,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     cleanup_test
   SRCS
     "cleanup_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::cleanup
     turbo::config

@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@
 //                                                {">", "&gt;"},
 //                                                {"\"", "&quot;"},
 //                                                {"'", "&#39;"}});
-#ifndef ABSL_STRINGS_STR_REPLACE_H_
-#define ABSL_STRINGS_STR_REPLACE_H_
+#ifndef TURBO_STRINGS_STR_REPLACE_H_
+#define TURBO_STRINGS_STR_REPLACE_H_
 
 #include <string>
 #include <utility>
@@ -46,7 +46,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // StrReplaceAll()
 //
@@ -65,7 +65,7 @@ ABSL_NAMESPACE_BEGIN
 //        {"$who", "Bob"},
 //        {"#Noun", "Apples"}});
 //   EXPECT_EQ("Bob bought 5 Apples. Thanks Bob!", s);
-ABSL_MUST_USE_RESULT std::string StrReplaceAll(
+TURBO_MUST_USE_RESULT std::string StrReplaceAll(
     turbo::string_view s,
     std::initializer_list<std::pair<turbo::string_view, turbo::string_view>>
         replacements);
@@ -213,7 +213,7 @@ int StrReplaceAll(const StrToStrMapping& replacements, std::string* target) {
   return substitutions;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_STR_REPLACE_H_
+#endif  // TURBO_STRINGS_STR_REPLACE_H_

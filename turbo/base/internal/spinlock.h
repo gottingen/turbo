@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 //  Most users requiring mutual exclusion should use Mutex.
 //  SpinLock is provided for use in two situations:
-//   - for use by Abseil internal code that Mutex itself depends on
+//   - for use by Turbo internal code that Mutex itself depends on
 //   - for async signal safety (see below)
 
 // SpinLock is async signal safe.  If a spinlock is used within a signal
@@ -26,8 +26,8 @@
 //
 // Threads waiting on a SpinLock may be woken in an arbitrary order.
 
-#ifndef ABSL_BASE_INTERNAL_SPINLOCK_H_
-#define ABSL_BASE_INTERNAL_SPINLOCK_H_
+#ifndef TURBO_BASE_INTERNAL_SPINLOCK_H_
+#define TURBO_BASE_INTERNAL_SPINLOCK_H_
 
 #include <atomic>
 #include <cstdint>
@@ -42,13 +42,13 @@
 #include "turbo/base/thread_annotations.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
-class ABSL_LOCKABLE SpinLock {
+class TURBO_LOCKABLE SpinLock {
  public:
   SpinLock() : lockword_(kSpinLockCooperative) {
-    ABSL_TSAN_MUTEX_CREATE(this, __tsan_mutex_not_static);
+    TURBO_TSAN_MUTEX_CREATE(this, __tsan_mutex_not_static);
   }
 
   // Constructors that allow non-cooperative spinlocks to be created for use
@@ -62,37 +62,37 @@ class ABSL_LOCKABLE SpinLock {
   // For global SpinLock instances prefer trivial destructor when possible.
   // Default but non-trivial destructor in some build configurations causes an
   // extra static initializer.
-#ifdef ABSL_INTERNAL_HAVE_TSAN_INTERFACE
-  ~SpinLock() { ABSL_TSAN_MUTEX_DESTROY(this, __tsan_mutex_not_static); }
+#ifdef TURBO_INTERNAL_HAVE_TSAN_INTERFACE
+  ~SpinLock() { TURBO_TSAN_MUTEX_DESTROY(this, __tsan_mutex_not_static); }
 #else
   ~SpinLock() = default;
 #endif
 
   // Acquire this SpinLock.
-  inline void Lock() ABSL_EXCLUSIVE_LOCK_FUNCTION() {
-    ABSL_TSAN_MUTEX_PRE_LOCK(this, 0);
+  inline void Lock() TURBO_EXCLUSIVE_LOCK_FUNCTION() {
+    TURBO_TSAN_MUTEX_PRE_LOCK(this, 0);
     if (!TryLockImpl()) {
       SlowLock();
     }
-    ABSL_TSAN_MUTEX_POST_LOCK(this, 0, 0);
+    TURBO_TSAN_MUTEX_POST_LOCK(this, 0, 0);
   }
 
   // Try to acquire this SpinLock without blocking and return true if the
   // acquisition was successful.  If the lock was not acquired, false is
   // returned.  If this SpinLock is free at the time of the call, TryLock
   // will return true with high probability.
-  inline bool TryLock() ABSL_EXCLUSIVE_TRYLOCK_FUNCTION(true) {
-    ABSL_TSAN_MUTEX_PRE_LOCK(this, __tsan_mutex_try_lock);
+  inline bool TryLock() TURBO_EXCLUSIVE_TRYLOCK_FUNCTION(true) {
+    TURBO_TSAN_MUTEX_PRE_LOCK(this, __tsan_mutex_try_lock);
     bool res = TryLockImpl();
-    ABSL_TSAN_MUTEX_POST_LOCK(
+    TURBO_TSAN_MUTEX_POST_LOCK(
         this, __tsan_mutex_try_lock | (res ? 0 : __tsan_mutex_try_lock_failed),
         0);
     return res;
   }
 
   // Release this SpinLock, which must be held by the calling thread.
-  inline void Unlock() ABSL_UNLOCK_FUNCTION() {
-    ABSL_TSAN_MUTEX_PRE_UNLOCK(this, 0);
+  inline void Unlock() TURBO_UNLOCK_FUNCTION() {
+    TURBO_TSAN_MUTEX_PRE_UNLOCK(this, 0);
     uint32_t lock_value = lockword_.load(std::memory_order_relaxed);
     lock_value = lockword_.exchange(lock_value & kSpinLockCooperative,
                                     std::memory_order_release);
@@ -106,7 +106,7 @@ class ABSL_LOCKABLE SpinLock {
       // for the lock.
       SlowUnlock(lock_value);
     }
-    ABSL_TSAN_MUTEX_POST_UNLOCK(this, 0);
+    TURBO_TSAN_MUTEX_POST_UNLOCK(this, 0);
   }
 
   // Determine if the lock is held.  When the lock is held by the invoking
@@ -118,9 +118,9 @@ class ABSL_LOCKABLE SpinLock {
 
   // Return immediately if this thread holds the SpinLock exclusively.
   // Otherwise, report an error by crashing with a diagnostic.
-  inline void AssertHeld() const ABSL_ASSERT_EXCLUSIVE_LOCK() {
+  inline void AssertHeld() const TURBO_ASSERT_EXCLUSIVE_LOCK() {
     if (!IsHeld()) {
-      ABSL_RAW_LOG(FATAL, "thread should hold the lock on SpinLock");
+      TURBO_RAW_LOG(FATAL, "thread should hold the lock on SpinLock");
     }
   }
 
@@ -172,8 +172,8 @@ class ABSL_LOCKABLE SpinLock {
   }
 
   uint32_t TryLockInternal(uint32_t lock_value, uint32_t wait_cycles);
-  void SlowLock() ABSL_ATTRIBUTE_COLD;
-  void SlowUnlock(uint32_t lock_value) ABSL_ATTRIBUTE_COLD;
+  void SlowLock() TURBO_ATTRIBUTE_COLD;
+  void SlowUnlock(uint32_t lock_value) TURBO_ATTRIBUTE_COLD;
   uint32_t SpinLoop();
 
   inline bool TryLockImpl() {
@@ -189,13 +189,13 @@ class ABSL_LOCKABLE SpinLock {
 
 // Corresponding locker object that arranges to acquire a spinlock for
 // the duration of a C++ scope.
-class ABSL_SCOPED_LOCKABLE SpinLockHolder {
+class TURBO_SCOPED_LOCKABLE SpinLockHolder {
  public:
-  inline explicit SpinLockHolder(SpinLock* l) ABSL_EXCLUSIVE_LOCK_FUNCTION(l)
+  inline explicit SpinLockHolder(SpinLock* l) TURBO_EXCLUSIVE_LOCK_FUNCTION(l)
       : lock_(l) {
     l->Lock();
   }
-  inline ~SpinLockHolder() ABSL_UNLOCK_FUNCTION() { lock_->Unlock(); }
+  inline ~SpinLockHolder() TURBO_UNLOCK_FUNCTION() { lock_->Unlock(); }
 
   SpinLockHolder(const SpinLockHolder&) = delete;
   SpinLockHolder& operator=(const SpinLockHolder&) = delete;
@@ -246,7 +246,7 @@ inline uint32_t SpinLock::TryLockInternal(uint32_t lock_value,
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_SPINLOCK_H_
+#endif  // TURBO_BASE_INTERNAL_SPINLOCK_H_

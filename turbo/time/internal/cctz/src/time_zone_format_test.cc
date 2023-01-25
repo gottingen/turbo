@@ -31,7 +31,7 @@
 namespace chrono = std::chrono;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -1684,5 +1684,5 @@ TEST(FormatParse, RoundTripDistantPast) {
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

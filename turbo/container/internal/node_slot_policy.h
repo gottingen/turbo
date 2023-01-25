@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@
 // It may also optionally define `value()` and `apply()`. For documentation on
 // these, see hash_policy_traits.h.
 
-#ifndef ABSL_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_
-#define ABSL_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_
+#ifndef TURBO_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_
+#define TURBO_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_
 
 #include <cassert>
 #include <cstddef>
@@ -42,7 +42,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 template <class Reference, class Policy>
@@ -86,7 +86,7 @@ struct node_slot_policy {
 };
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_
+#endif  // TURBO_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_

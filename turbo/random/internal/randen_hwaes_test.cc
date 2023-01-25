@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,32 +67,32 @@ TEST(RandenHwAesTest, Default) {
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);
 
-  ABSL_RAW_LOG(INFO, "ABSL_HAVE_ACCELERATED_AES=%d", ABSL_HAVE_ACCELERATED_AES);
-  ABSL_RAW_LOG(INFO, "ABSL_RANDOM_INTERNAL_AES_DISPATCH=%d",
-               ABSL_RANDOM_INTERNAL_AES_DISPATCH);
+  TURBO_RAW_LOG(INFO, "TURBO_HAVE_ACCELERATED_AES=%d", TURBO_HAVE_ACCELERATED_AES);
+  TURBO_RAW_LOG(INFO, "TURBO_RANDOM_INTERNAL_AES_DISPATCH=%d",
+               TURBO_RANDOM_INTERNAL_AES_DISPATCH);
 
-#if defined(ABSL_ARCH_X86_64)
-  ABSL_RAW_LOG(INFO, "ABSL_ARCH_X86_64");
-#elif defined(ABSL_ARCH_X86_32)
-  ABSL_RAW_LOG(INFO, "ABSL_ARCH_X86_32");
-#elif defined(ABSL_ARCH_AARCH64)
-  ABSL_RAW_LOG(INFO, "ABSL_ARCH_AARCH64");
-#elif defined(ABSL_ARCH_ARM)
-  ABSL_RAW_LOG(INFO, "ABSL_ARCH_ARM");
-#elif defined(ABSL_ARCH_PPC)
-  ABSL_RAW_LOG(INFO, "ABSL_ARCH_PPC");
+#if defined(TURBO_ARCH_X86_64)
+  TURBO_RAW_LOG(INFO, "TURBO_ARCH_X86_64");
+#elif defined(TURBO_ARCH_X86_32)
+  TURBO_RAW_LOG(INFO, "TURBO_ARCH_X86_32");
+#elif defined(TURBO_ARCH_AARCH64)
+  TURBO_RAW_LOG(INFO, "TURBO_ARCH_AARCH64");
+#elif defined(TURBO_ARCH_ARM)
+  TURBO_RAW_LOG(INFO, "TURBO_ARCH_ARM");
+#elif defined(TURBO_ARCH_PPC)
+  TURBO_RAW_LOG(INFO, "TURBO_ARCH_PPC");
 #else
-  ABSL_RAW_LOG(INFO, "ARCH Unknown");
+  TURBO_RAW_LOG(INFO, "ARCH Unknown");
 #endif
 
   int x = turbo::random_internal::HasRandenHwAesImplementation();
-  ABSL_RAW_LOG(INFO, "HasRandenHwAesImplementation = %d", x);
+  TURBO_RAW_LOG(INFO, "HasRandenHwAesImplementation = %d", x);
 
   int y = turbo::random_internal::CPUSupportsRandenHwAes();
-  ABSL_RAW_LOG(INFO, "CPUSupportsRandenHwAes = %d", x);
+  TURBO_RAW_LOG(INFO, "CPUSupportsRandenHwAes = %d", x);
 
   if (!x || !y) {
-    ABSL_RAW_LOG(INFO, "Skipping Randen HWAES tests.");
+    TURBO_RAW_LOG(INFO, "Skipping Randen HWAES tests.");
     return 0;
   }
   return RUN_ALL_TESTS();

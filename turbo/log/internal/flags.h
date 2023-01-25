@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 // File: log/log_flags.h
 // -----------------------------------------------------------------------------
 //
-// This header declares set of flags which can be used to configure Abseil
+// This header declares set of flags which can be used to configure Turbo
 // Logging library behaviour at runtime.
 
-#ifndef ABSL_LOG_INTERNAL_FLAGS_H_
-#define ABSL_LOG_INTERNAL_FLAGS_H_
+#ifndef TURBO_LOG_INTERNAL_FLAGS_H_
+#define TURBO_LOG_INTERNAL_FLAGS_H_
 
 #include <string>
 
@@ -35,19 +35,19 @@
 // Log messages at this severity or above are sent to stderr in *addition* to
 // logfiles.  Defaults to `ERROR`.  See log_severity.h for numeric values of
 // severity levels.
-ABSL_DECLARE_FLAG(int, stderrthreshold);
+TURBO_DECLARE_FLAG(int, stderrthreshold);
 
 // Log messages at this severity or above are logged; others are discarded.
 // Defaults to `INFO`, i.e. log all severities.  See log_severity.h for numeric
 // values of severity levels.
-ABSL_DECLARE_FLAG(int, minloglevel);
+TURBO_DECLARE_FLAG(int, minloglevel);
 
 // If specified in the form file:linenum, any messages logged from a matching
 // location will also include a backtrace.
-ABSL_DECLARE_FLAG(std::string, log_backtrace_at);
+TURBO_DECLARE_FLAG(std::string, log_backtrace_at);
 
 // If true, the log prefix (severity, date, time, PID, etc.) is prepended to
 // each message logged. Defaults to true.
-ABSL_DECLARE_FLAG(bool, log_prefix);
+TURBO_DECLARE_FLAG(bool, log_prefix);
 
-#endif  // ABSL_LOG_INTERNAL_FLAGS_H_
+#endif  // TURBO_LOG_INTERNAL_FLAGS_H_

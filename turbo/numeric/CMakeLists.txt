@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,26 +14,26 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     bits
   HDRS
     "bits.h"
     "internal/bits.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::core_headers
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     bits_test
   SRCS
     "bits_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::bits
     turbo::core_headers
@@ -41,7 +41,7 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     int128
   HDRS
@@ -51,7 +51,7 @@ absl_cc_library(
     "int128_have_intrinsic.inc"
     "int128_no_intrinsic.inc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::core_headers
@@ -59,14 +59,14 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     int128_test
   SRCS
     "int128_stream_test.cc"
     "int128_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::int128
     turbo::base
@@ -76,23 +76,23 @@ absl_cc_test(
 )
 
 # component target
-absl_cc_library(
+turbo_cc_library(
   NAME
     numeric
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::int128
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     numeric_representation
   HDRS
     "internal/representation.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
   PUBLIC

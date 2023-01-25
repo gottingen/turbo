@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_BASE_INTERNAL_SPINLOCK_WAIT_H_
-#define ABSL_BASE_INTERNAL_SPINLOCK_WAIT_H_
+#ifndef TURBO_BASE_INTERNAL_SPINLOCK_WAIT_H_
+#define TURBO_BASE_INTERNAL_SPINLOCK_WAIT_H_
 
 // Operations to make atomic transitions on a word, and to allow
 // waiting for those transitions to become possible.
@@ -24,7 +24,7 @@
 #include "turbo/base/internal/scheduling_mode.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 // SpinLockWait() waits until it can perform one of several transitions from
@@ -58,12 +58,12 @@ void SpinLockWake(std::atomic<uint32_t> *w, bool all);
 void SpinLockDelay(std::atomic<uint32_t> *w, uint32_t value, int loop,
                    base_internal::SchedulingMode scheduling_mode);
 
-// Helper used by AbslInternalSpinLockDelay.
+// Helper used by TurboInternalSpinLockDelay.
 // Returns a suggested delay in nanoseconds for iteration number "loop".
 int SpinLockSuggestedDelayNS(int loop);
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // In some build configurations we pass --detect-odr-violations to the
@@ -73,23 +73,23 @@ ABSL_NAMESPACE_END
 // By changing our extension points to be extern "C", we dodge this
 // check.
 extern "C" {
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWake)(std::atomic<uint32_t> *w,
+void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockWake)(std::atomic<uint32_t> *w,
                                                       bool all);
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
+void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
     std::atomic<uint32_t> *w, uint32_t value, int loop,
     turbo::base_internal::SchedulingMode scheduling_mode);
 }
 
 inline void turbo::base_internal::SpinLockWake(std::atomic<uint32_t> *w,
                                               bool all) {
-  ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWake)(w, all);
+  TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockWake)(w, all);
 }
 
 inline void turbo::base_internal::SpinLockDelay(
     std::atomic<uint32_t> *w, uint32_t value, int loop,
     turbo::base_internal::SchedulingMode scheduling_mode) {
-  ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)
+  TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)
   (w, value, loop, scheduling_mode);
 }
 
-#endif  // ABSL_BASE_INTERNAL_SPINLOCK_WAIT_H_
+#endif  // TURBO_BASE_INTERNAL_SPINLOCK_WAIT_H_

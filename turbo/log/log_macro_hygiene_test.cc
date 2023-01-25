@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace {
 using ::testing::_;
 using ::testing::Eq;
 
-namespace not_absl {
+namespace not_turbo {
 
 class Dummy {
  public:
@@ -53,9 +53,9 @@ class LogSink {};
 class NullStream {};
 class NullStreamFatal {};
 
-}  // namespace not_absl
+}  // namespace not_turbo
 
-using namespace not_absl;  // NOLINT
+using namespace not_turbo;  // NOLINT
 
 // Tests for LOG(LEVEL(()).
 
@@ -77,7 +77,7 @@ TEST(LogHygieneTest, WorksForQualifiedSeverity) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeINFOSymbol) {
-  const double INFO ABSL_ATTRIBUTE_UNUSED = 7.77;
+  const double INFO TURBO_ATTRIBUTE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kInfo, _, "Hello world"));
@@ -87,7 +87,7 @@ TEST(LogHygieneTest, WorksWithAlternativeINFOSymbol) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeWARNINGSymbol) {
-  const double WARNING ABSL_ATTRIBUTE_UNUSED = 7.77;
+  const double WARNING TURBO_ATTRIBUTE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kWarning, _, "Hello world"));
@@ -97,7 +97,7 @@ TEST(LogHygieneTest, WorksWithAlternativeWARNINGSymbol) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeERRORSymbol) {
-  const double ERROR ABSL_ATTRIBUTE_UNUSED = 7.77;
+  const double ERROR TURBO_ATTRIBUTE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kError, _, "Hello world"));
@@ -107,7 +107,7 @@ TEST(LogHygieneTest, WorksWithAlternativeERRORSymbol) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeLEVELSymbol) {
-  const double LEVEL ABSL_ATTRIBUTE_UNUSED = 7.77;
+  const double LEVEL TURBO_ATTRIBUTE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kError, _, "Hello world"));

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // This allows streaming NullGuard<T>::Guard(v) to an output stream without
 // hitting undefined behavior for null values.
 
-#ifndef ABSL_LOG_INTERNAL_NULLGUARD_H_
-#define ABSL_LOG_INTERNAL_NULLGUARD_H_
+#ifndef TURBO_LOG_INTERNAL_NULLGUARD_H_
+#define TURBO_LOG_INTERNAL_NULLGUARD_H_
 
 #include <array>
 #include <cstddef>
@@ -31,12 +31,12 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
-ABSL_CONST_INIT extern const std::array<char, 7> kCharNull;
-ABSL_CONST_INIT extern const std::array<signed char, 7> kSignedCharNull;
-ABSL_CONST_INIT extern const std::array<unsigned char, 7> kUnsignedCharNull;
+TURBO_CONST_INIT extern const std::array<char, 7> kCharNull;
+TURBO_CONST_INIT extern const std::array<signed char, 7> kSignedCharNull;
+TURBO_CONST_INIT extern const std::array<unsigned char, 7> kUnsignedCharNull;
 
 template <typename T>
 struct NullGuard final {
@@ -80,7 +80,7 @@ struct NullGuard<std::nullptr_t> final {
 };
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_NULLGUARD_H_
+#endif  // TURBO_LOG_INTERNAL_NULLGUARD_H_

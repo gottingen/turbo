@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 #include "turbo/base/config.h"
 
-#if defined(ABSL_HAVE_EXCEPTIONS)
+#if defined(TURBO_HAVE_EXCEPTIONS)
 
 #include <array>
 #include <initializer_list>
@@ -49,7 +49,7 @@ using ThrowAllocMovableThrowerVec =
 // the elements that were constructed before it are not destroyed. This causes
 // incorrect exception safety test failures. Thus, `testing::nothrow_ctor` is
 // required. See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66139
-#define ABSL_INTERNAL_MAKE_INIT_LIST(T, N)                     \
+#define TURBO_INTERNAL_MAKE_INIT_LIST(T, N)                     \
   (N > kInlinedCapacity                                        \
        ? std::initializer_list<T>{T(0, testing::nothrow_ctor), \
                                   T(1, testing::nothrow_ctor), \
@@ -62,8 +62,8 @@ using ThrowAllocMovableThrowerVec =
                                                                \
        : std::initializer_list<T>{T(0, testing::nothrow_ctor), \
                                   T(1, testing::nothrow_ctor)})
-static_assert(kLargeSize == 8, "Must update ABSL_INTERNAL_MAKE_INIT_LIST(...)");
-static_assert(kSmallSize == 2, "Must update ABSL_INTERNAL_MAKE_INIT_LIST(...)");
+static_assert(kLargeSize == 8, "Must update TURBO_INTERNAL_MAKE_INIT_LIST(...)");
+static_assert(kSmallSize == 2, "Must update TURBO_INTERNAL_MAKE_INIT_LIST(...)");
 
 template <typename TheVecT, size_t... TheSizes>
 class TestParams {
@@ -182,10 +182,10 @@ TYPED_TEST(OneSizeTest, InitializerListConstructor) {
   constexpr static auto size = TypeParam::GetSizeAt(0);
 
   testing::TestThrowingCtor<VecT>(
-      ABSL_INTERNAL_MAKE_INIT_LIST(value_type, size));
+      TURBO_INTERNAL_MAKE_INIT_LIST(value_type, size));
 
   testing::TestThrowingCtor<VecT>(
-      ABSL_INTERNAL_MAKE_INIT_LIST(value_type, size), allocator_type{});
+      TURBO_INTERNAL_MAKE_INIT_LIST(value_type, size), allocator_type{});
 }
 
 TYPED_TEST(OneSizeTest, RangeConstructor) {
@@ -236,7 +236,7 @@ TYPED_TEST(TwoSizeTest, Assign) {
                     .WithContracts(InlinedVectorInvariants<VecT>);
 
   EXPECT_TRUE(tester.Test([](VecT* vec) {
-    *vec = ABSL_INTERNAL_MAKE_INIT_LIST(value_type, to_size);
+    *vec = TURBO_INTERNAL_MAKE_INIT_LIST(value_type, to_size);
   }));
 
   EXPECT_TRUE(tester.Test([](VecT* vec) {
@@ -255,7 +255,7 @@ TYPED_TEST(TwoSizeTest, Assign) {
   }));
 
   EXPECT_TRUE(tester.Test([](VecT* vec) {
-    vec->assign(ABSL_INTERNAL_MAKE_INIT_LIST(value_type, to_size));
+    vec->assign(TURBO_INTERNAL_MAKE_INIT_LIST(value_type, to_size));
   }));
 
   EXPECT_TRUE(tester.Test([](VecT* vec) {
@@ -332,15 +332,15 @@ TYPED_TEST(TwoSizeTest, Insert) {
 
   EXPECT_TRUE(tester.Test([](VecT* vec) {
     auto it = vec->begin();
-    vec->insert(it, ABSL_INTERNAL_MAKE_INIT_LIST(value_type, count));
+    vec->insert(it, TURBO_INTERNAL_MAKE_INIT_LIST(value_type, count));
   }));
   EXPECT_TRUE(tester.Test([](VecT* vec) {
     auto it = vec->begin() + (vec->size() / 2);
-    vec->insert(it, ABSL_INTERNAL_MAKE_INIT_LIST(value_type, count));
+    vec->insert(it, TURBO_INTERNAL_MAKE_INIT_LIST(value_type, count));
   }));
   EXPECT_TRUE(tester.Test([](VecT* vec) {
     auto it = vec->end();
-    vec->insert(it, ABSL_INTERNAL_MAKE_INIT_LIST(value_type, count));
+    vec->insert(it, TURBO_INTERNAL_MAKE_INIT_LIST(value_type, count));
   }));
 
   EXPECT_TRUE(tester.Test([](VecT* vec) {
@@ -505,4 +505,4 @@ TYPED_TEST(TwoSizeTest, Swap) {
 
 }  // namespace
 
-#endif  // defined(ABSL_HAVE_EXCEPTIONS)
+#endif  // defined(TURBO_HAVE_EXCEPTIONS)

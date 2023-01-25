@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "turbo/flags/flag.h"
 #include "turbo/numeric/bits.h"
 
-ABSL_FLAG(int64_t, absl_random_test_trials, 50000,
+TURBO_FLAG(int64_t, turbo_random_test_trials, 50000,
           "Number of trials for the probability tests.");
 
 using turbo::random_internal::GenerateNegativeTag;
@@ -449,7 +449,7 @@ TEST(GenerateRealTest, ExhaustiveFloat) {
     }
   };
 
-  size_t limit = turbo::GetFlag(FLAGS_absl_random_test_trials);
+  size_t limit = turbo::GetFlag(FLAGS_turbo_random_test_trials);
 
   // Generate all uint64_t which have unique floating point values.
   // Counting down from 0xFFFFFFFFFFFFFFFFu ... 0x0u

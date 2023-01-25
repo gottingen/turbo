@@ -4,9 +4,9 @@ project(googletest-external NONE)
 
 include(ExternalProject)
 ExternalProject_Add(googletest
-  URL               "${absl_gtest_download_url}"  # May be empty
-  SOURCE_DIR        "${absl_gtest_src_dir}"
-  BINARY_DIR        "${absl_gtest_build_dir}"
+  URL               "${turbo_gtest_download_url}"  # May be empty
+  SOURCE_DIR        "${turbo_gtest_src_dir}"
+  BINARY_DIR        "${turbo_gtest_build_dir}"
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     ""
   INSTALL_COMMAND   ""

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 // The semantics of PerThreadSem are the same as that of a counting semaphore.
 // Each thread maintains an abstract "count" value associated with its identity.
 
-#ifndef ABSL_SYNCHRONIZATION_INTERNAL_PER_THREAD_SEM_H_
-#define ABSL_SYNCHRONIZATION_INTERNAL_PER_THREAD_SEM_H_
+#ifndef TURBO_SYNCHRONIZATION_INTERNAL_PER_THREAD_SEM_H_
+#define TURBO_SYNCHRONIZATION_INTERNAL_PER_THREAD_SEM_H_
 
 #include <atomic>
 
@@ -32,7 +32,7 @@
 #include "turbo/synchronization/internal/kernel_timeout.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 class Mutex;
 
@@ -81,7 +81,7 @@ class PerThreadSem {
 };
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // In some build configurations we pass --detect-odr-violations to the
@@ -91,20 +91,20 @@ ABSL_NAMESPACE_END
 // By changing our extension points to be extern "C", we dodge this
 // check.
 extern "C" {
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemPost)(
+void TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemPost)(
     turbo::base_internal::ThreadIdentity* identity);
-bool ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemWait)(
+bool TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemWait)(
     turbo::synchronization_internal::KernelTimeout t);
 }  // extern "C"
 
 void turbo::synchronization_internal::PerThreadSem::Post(
     turbo::base_internal::ThreadIdentity* identity) {
-  ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemPost)(identity);
+  TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemPost)(identity);
 }
 
 bool turbo::synchronization_internal::PerThreadSem::Wait(
     turbo::synchronization_internal::KernelTimeout t) {
-  return ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemWait)(t);
+  return TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemWait)(t);
 }
 
-#endif  // ABSL_SYNCHRONIZATION_INTERNAL_PER_THREAD_SEM_H_
+#endif  // TURBO_SYNCHRONIZATION_INTERNAL_PER_THREAD_SEM_H_

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@
 // Credits to Matt Calabrese (https://github.com/mattcalabrese) for the original
 // implementation.
 
-#ifndef ABSL_FUNCTIONAL_ANY_INVOCABLE_H_
-#define ABSL_FUNCTIONAL_ANY_INVOCABLE_H_
+#ifndef TURBO_FUNCTIONAL_ANY_INVOCABLE_H_
+#define TURBO_FUNCTIONAL_ANY_INVOCABLE_H_
 
 #include <cstddef>
 #include <initializer_list>
@@ -44,7 +44,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::AnyInvocable
 //
@@ -310,7 +310,7 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
   friend class internal_any_invocable::CoreImpl;
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FUNCTIONAL_ANY_INVOCABLE_H_
+#endif  // TURBO_FUNCTIONAL_ANY_INVOCABLE_H_

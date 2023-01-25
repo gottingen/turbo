@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 // Core interfaces and definitions used by by low-level interfaces such as
 // SpinLock.
 
-#ifndef ABSL_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
-#define ABSL_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
+#ifndef TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
+#define TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/internal/scheduling_mode.h"
@@ -29,7 +29,7 @@ extern "C" bool __google_disable_rescheduling(void);
 extern "C" void __google_enable_rescheduling(bool disable_result);
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 class CondVar;
 class Mutex;
 
@@ -124,11 +124,11 @@ inline void SchedulingGuard::EnableRescheduling(bool /* disable_result */) {
 inline SchedulingGuard::ScopedEnable::ScopedEnable()
     : scheduling_disabled_depth_(0) {}
 inline SchedulingGuard::ScopedEnable::~ScopedEnable() {
-  ABSL_RAW_CHECK(scheduling_disabled_depth_ == 0, "disable unused warning");
+  TURBO_RAW_CHECK(scheduling_disabled_depth_ == 0, "disable unused warning");
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
+#endif  // TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_

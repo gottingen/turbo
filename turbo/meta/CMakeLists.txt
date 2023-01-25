@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,25 +14,25 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     type_traits
   HDRS
     "type_traits.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     type_traits_test
   SRCS
     "type_traits_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::config
     turbo::time
@@ -42,11 +42,11 @@ absl_cc_test(
 )
 
 # component target
-absl_cc_library(
+turbo_cc_library(
   NAME
     meta
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::type_traits
   PUBLIC

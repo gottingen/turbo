@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@
 // of a+b is easily derived from the hashes of a and b.  This property
 // doesn't hold for any hash functions in this file.
 
-#ifndef ABSL_HASH_INTERNAL_CITY_H_
-#define ABSL_HASH_INTERNAL_CITY_H_
+#ifndef TURBO_HASH_INTERNAL_CITY_H_
+#define TURBO_HASH_INTERNAL_CITY_H_
 
 #include <stdint.h>
 #include <stdlib.h>  // for size_t.
@@ -53,7 +53,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 
 // Hash function for a byte array.
@@ -72,7 +72,7 @@ uint64_t CityHash64WithSeeds(const char *s, size_t len, uint64_t seed0,
 uint32_t CityHash32(const char *s, size_t len);
 
 }  // namespace hash_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HASH_INTERNAL_CITY_H_
+#endif  // TURBO_HASH_INTERNAL_CITY_H_

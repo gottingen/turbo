@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@
 //   Civil Time = F(Absolute Time, Time Zone)
 //   Absolute Time = G(Civil Time, Time Zone)
 //
-// The Abseil time library allows you to construct such civil times from
+// The Turbo time library allows you to construct such civil times from
 // absolute times; consult time.h for such functionality.
 //
 // This library provides six classes for constructing civil-time objects, and
@@ -67,8 +67,8 @@
 //   // Valid in C++14
 //   constexpr turbo::CivilDay cd(1969, 07, 20);
 
-#ifndef ABSL_TIME_CIVIL_TIME_H_
-#define ABSL_TIME_CIVIL_TIME_H_
+#ifndef TURBO_TIME_CIVIL_TIME_H_
+#define TURBO_TIME_CIVIL_TIME_H_
 
 #include <iosfwd>
 #include <string>
@@ -78,7 +78,7 @@
 #include "turbo/time/internal/cctz/include/cctz/civil_time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace time_internal {
 struct second_tag : cctz::detail::second_tag {};
@@ -286,7 +286,7 @@ struct year_tag : month_tag, cctz::detail::year_tag {};
 // Practically speaking, any answer that is not what the programmer intended
 // is the wrong answer.
 //
-// The Abseil time library avoids this problem by making it impossible to
+// The Turbo time library avoids this problem by making it impossible to
 // ask ambiguous questions. All civil-time objects are aligned to a particular
 // civil-field boundary (such as aligned to a year, month, day, hour, minute,
 // or second), and arithmetic operates on the field to which the object is
@@ -295,7 +295,7 @@ struct year_tag : month_tag, cctz::detail::year_tag {};
 // month.
 //
 // Of course, there are ways to compute an answer the question at hand using
-// this Abseil time library, but they require the programmer to be explicit
+// this Turbo time library, but they require the programmer to be explicit
 // about the answer they expect. To illustrate, let's see how to compute all
 // three of the above possible answers to the question of "Jan 31 plus 1
 // month":
@@ -532,32 +532,32 @@ std::ostream& operator<<(std::ostream& os, CivilHour h);
 std::ostream& operator<<(std::ostream& os, CivilMinute m);
 std::ostream& operator<<(std::ostream& os, CivilSecond s);
 
-// AbslParseFlag()
+// TurboParseFlag()
 //
 // Parses the command-line flag string representation `s` into a civil-time
 // value. Flags must be specified in a format that is valid for
 // `turbo::ParseLenientCivilTime()`.
-bool AbslParseFlag(turbo::string_view s, CivilSecond* c, std::string* error);
-bool AbslParseFlag(turbo::string_view s, CivilMinute* c, std::string* error);
-bool AbslParseFlag(turbo::string_view s, CivilHour* c, std::string* error);
-bool AbslParseFlag(turbo::string_view s, CivilDay* c, std::string* error);
-bool AbslParseFlag(turbo::string_view s, CivilMonth* c, std::string* error);
-bool AbslParseFlag(turbo::string_view s, CivilYear* c, std::string* error);
+bool TurboParseFlag(turbo::string_view s, CivilSecond* c, std::string* error);
+bool TurboParseFlag(turbo::string_view s, CivilMinute* c, std::string* error);
+bool TurboParseFlag(turbo::string_view s, CivilHour* c, std::string* error);
+bool TurboParseFlag(turbo::string_view s, CivilDay* c, std::string* error);
+bool TurboParseFlag(turbo::string_view s, CivilMonth* c, std::string* error);
+bool TurboParseFlag(turbo::string_view s, CivilYear* c, std::string* error);
 
-// AbslUnparseFlag()
+// TurboUnparseFlag()
 //
 // Unparses a civil-time value into a command-line string representation using
 // the format specified by `turbo::ParseCivilTime()`.
-std::string AbslUnparseFlag(CivilSecond c);
-std::string AbslUnparseFlag(CivilMinute c);
-std::string AbslUnparseFlag(CivilHour c);
-std::string AbslUnparseFlag(CivilDay c);
-std::string AbslUnparseFlag(CivilMonth c);
-std::string AbslUnparseFlag(CivilYear c);
+std::string TurboUnparseFlag(CivilSecond c);
+std::string TurboUnparseFlag(CivilMinute c);
+std::string TurboUnparseFlag(CivilHour c);
+std::string TurboUnparseFlag(CivilDay c);
+std::string TurboUnparseFlag(CivilMonth c);
+std::string TurboUnparseFlag(CivilYear c);
 
 }  // namespace time_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TIME_CIVIL_TIME_H_
+#endif  // TURBO_TIME_CIVIL_TIME_H_

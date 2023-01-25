@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_view.h"
 
-#ifdef ABSL_INTERNAL_CORDZ_ENABLED
+#ifdef TURBO_INTERNAL_CORDZ_ENABLED
 
 using testing::Eq;
 using testing::AnyOf;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 using cord_internal::CordzInfo;
 using cord_internal::CordzSampleToken;
@@ -460,7 +460,7 @@ TEST(CordzTest, SmallSubCord) {
 
 }  // namespace
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_INTERNAL_CORDZ_ENABLED
+#endif  // TURBO_INTERNAL_CORDZ_ENABLED

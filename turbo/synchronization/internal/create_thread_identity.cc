@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 // This file is a no-op if the required LowLevelAlloc support is missing.
 #include "turbo/base/internal/low_level_alloc.h"
-#ifndef ABSL_LOW_LEVEL_ALLOC_MISSING
+#ifndef TURBO_LOW_LEVEL_ALLOC_MISSING
 
 #include <string.h>
 
@@ -27,14 +27,14 @@
 #include "turbo/synchronization/internal/per_thread_sem.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // ThreadIdentity storage is persistent, we maintain a free-list of previously
 // released ThreadIdentity objects.
-ABSL_CONST_INIT static base_internal::SpinLock freelist_lock(
+TURBO_CONST_INIT static base_internal::SpinLock freelist_lock(
     turbo::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
-ABSL_CONST_INIT static base_internal::ThreadIdentity* thread_identity_freelist;
+TURBO_CONST_INIT static base_internal::ThreadIdentity* thread_identity_freelist;
 
 // A per-thread destructor for reclaiming associated ThreadIdentity objects.
 // Since we must preserve their storage we cache them for re-use.
@@ -137,7 +137,7 @@ base_internal::ThreadIdentity* CreateThreadIdentity() {
 }
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOW_LEVEL_ALLOC_MISSING
+#endif  // TURBO_LOW_LEVEL_ALLOC_MISSING

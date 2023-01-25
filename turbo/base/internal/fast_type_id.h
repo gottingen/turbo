@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_BASE_INTERNAL_FAST_TYPE_ID_H_
-#define ABSL_BASE_INTERNAL_FAST_TYPE_ID_H_
+#ifndef TURBO_BASE_INTERNAL_FAST_TYPE_ID_H_
+#define TURBO_BASE_INTERNAL_FAST_TYPE_ID_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 template <typename Type>
@@ -28,7 +28,7 @@ struct FastTypeTag {
   constexpr static char dummy_var = 0;
 };
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 template <typename Type>
 constexpr char FastTypeTag<Type>::dummy_var;
 #endif
@@ -44,7 +44,7 @@ constexpr inline FastTypeIdType FastTypeId() {
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_FAST_TYPE_ID_H_
+#endif  // TURBO_BASE_INTERNAL_FAST_TYPE_ID_H_

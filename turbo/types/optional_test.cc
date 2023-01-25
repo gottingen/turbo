@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #include "turbo/types/optional.h"
 
 // This test is a no-op when turbo::optional is an alias for std::optional.
-#if !defined(ABSL_USES_STD_OPTIONAL)
+#if !defined(TURBO_USES_STD_OPTIONAL)
 
 #include <string>
 #include <type_traits>
@@ -29,7 +29,7 @@
 
 #if defined(__cplusplus) && __cplusplus >= 202002L
 // In C++20, volatile-qualified return types are deprecated.
-#define ABSL_VOLATILE_RETURN_TYPES_DEPRECATED 1
+#define TURBO_VOLATILE_RETURN_TYPES_DEPRECATED 1
 #endif
 
 // The following types help test an internal compiler error in GCC5 though
@@ -138,13 +138,13 @@ struct Listenable {
 
 StructorListener* Listenable::listener = nullptr;
 
-// ABSL_HAVE_NO_CONSTEXPR_INITIALIZER_LIST is defined to 1 when the standard
+// TURBO_HAVE_NO_CONSTEXPR_INITIALIZER_LIST is defined to 1 when the standard
 // library implementation doesn't marked initializer_list's default constructor
 // constexpr. The C++11 standard doesn't specify constexpr on it, but C++14
 // added it. However, libstdc++ 4.7 marked it constexpr.
 #if defined(_LIBCPP_VERSION) && \
     (_LIBCPP_STD_VER <= 11 || defined(_LIBCPP_HAS_NO_CXX14_CONSTEXPR))
-#define ABSL_HAVE_NO_CONSTEXPR_INITIALIZER_LIST 1
+#define TURBO_HAVE_NO_CONSTEXPR_INITIALIZER_LIST 1
 #endif
 
 struct ConstexprType {
@@ -156,7 +156,7 @@ struct ConstexprType {
   };
   constexpr ConstexprType() : x(kCtorDefault) {}
   constexpr explicit ConstexprType(int i) : x(kCtorInt) {}
-#ifndef ABSL_HAVE_NO_CONSTEXPR_INITIALIZER_LIST
+#ifndef TURBO_HAVE_NO_CONSTEXPR_INITIALIZER_LIST
   constexpr ConstexprType(std::initializer_list<int> il)
       : x(kCtorInitializerList) {}
 #endif
@@ -236,7 +236,7 @@ TEST(optionalTest, CopyConstructor) {
     EXPECT_TRUE(opt42_copy);
     EXPECT_EQ(42, *opt42_copy);
   }
-#if !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   {
     turbo::optional<volatile int> empty, opt42 = 42;
     turbo::optional<volatile int> empty_copy(empty);
@@ -261,7 +261,7 @@ TEST(optionalTest, CopyConstructor) {
       turbo::is_trivially_copy_constructible<turbo::optional<int>>::value);
   EXPECT_TRUE(
       turbo::is_trivially_copy_constructible<turbo::optional<const int>>::value);
-#if !defined(_MSC_VER) && !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#if !defined(_MSC_VER) && !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   // See defect report "Trivial copy/move constructor for class with volatile
   // member" at
   // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#2094
@@ -270,7 +270,7 @@ TEST(optionalTest, CopyConstructor) {
   // Also a cv-qualified scalar type should be trivially copyable.
   EXPECT_TRUE(turbo::is_trivially_copy_constructible<
               turbo::optional<volatile int>>::value);
-#endif  // !defined(_MSC_VER) && !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#endif  // !defined(_MSC_VER) && !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
 
   // constexpr copy constructor for trivially copyable types
   {
@@ -294,16 +294,16 @@ TEST(optionalTest, CopyConstructor) {
     constexpr turbo::optional<TrivialCopyable> o2 = o1;
     static_assert(o2, "");
     static_assert((*o2).x == 42, "");
-#ifndef ABSL_GLIBCXX_OPTIONAL_TRIVIALITY_BUG
+#ifndef TURBO_GLIBCXX_OPTIONAL_TRIVIALITY_BUG
     EXPECT_TRUE(turbo::is_trivially_copy_constructible<
                 turbo::optional<TrivialCopyable>>::value);
     EXPECT_TRUE(turbo::is_trivially_copy_constructible<
                 turbo::optional<const TrivialCopyable>>::value);
 #endif
-#if !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
     EXPECT_FALSE(std::is_copy_constructible<
                  turbo::optional<volatile TrivialCopyable>>::value);
-#endif  // !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   }
 }
 
@@ -352,7 +352,7 @@ TEST(optionalTest, InPlaceConstructor) {
   constexpr turbo::optional<ConstexprType> opt1{turbo::in_place_t(), 1};
   static_assert(opt1, "");
   static_assert((*opt1).x == ConstexprType::kCtorInt, "");
-#ifndef ABSL_HAVE_NO_CONSTEXPR_INITIALIZER_LIST
+#ifndef TURBO_HAVE_NO_CONSTEXPR_INITIALIZER_LIST
   constexpr turbo::optional<ConstexprType> opt2{turbo::in_place_t(), {1, 2}};
   static_assert(opt2, "");
   static_assert((*opt2).x == ConstexprType::kCtorInitializerList, "");
@@ -406,9 +406,9 @@ TEST(optionalTest, ValueConstructor) {
   // `-std=c++17`.
 #if defined(__GNUC__) && !defined(__clang__) && __GNUC__ == 7 && \
     __cplusplus == 201703L
-#define ABSL_GCC7_OVER_ICS_LIST_BUG 1
+#define TURBO_GCC7_OVER_ICS_LIST_BUG 1
 #endif
-#ifndef ABSL_GCC7_OVER_ICS_LIST_BUG
+#ifndef TURBO_GCC7_OVER_ICS_LIST_BUG
   constexpr turbo::optional<int> opt3({});
   static_assert(opt3, "");
   static_assert(*opt3 == 0, "");
@@ -654,7 +654,7 @@ TEST(optionalTest, CopyAssignment) {
   EXPECT_TRUE(turbo::is_copy_assignable<NonTrivial>::value);
   EXPECT_FALSE(turbo::is_trivially_copy_assignable<NonTrivial>::value);
 
-#if !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   {
     StructorListener listener;
     Listenable::listener = &listener;
@@ -673,7 +673,7 @@ TEST(optionalTest, CopyAssignment) {
     EXPECT_EQ(1, listener.destruct);
     EXPECT_EQ(1, listener.volatile_copy_assign);
   }
-#endif  // !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
 }
 
 TEST(optionalTest, MoveAssignment) {
@@ -696,7 +696,7 @@ TEST(optionalTest, MoveAssignment) {
     EXPECT_EQ(1, listener.destruct);
     EXPECT_EQ(1, listener.move_assign);
   }
-#if !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   {
     StructorListener listener;
     Listenable::listener = &listener;
@@ -716,7 +716,7 @@ TEST(optionalTest, MoveAssignment) {
     EXPECT_EQ(1, listener.destruct);
     EXPECT_EQ(1, listener.volatile_move_assign);
   }
-#endif  // !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   EXPECT_FALSE(turbo::is_move_assignable<turbo::optional<const int>>::value);
   EXPECT_TRUE(turbo::is_move_assignable<turbo::optional<Copyable>>::value);
   EXPECT_TRUE(turbo::is_move_assignable<turbo::optional<MoveableThrow>>::value);
@@ -1004,7 +1004,7 @@ TEST(optionalTest, PointerStuff) {
                      + __GNUC_MINOR__ * 100 \
                      + __GNUC_PATCHLEVEL__)
 #if GCC_VERSION < 40901
-#define ABSL_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG
+#define TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG
 #endif
 #endif
 
@@ -1024,7 +1024,7 @@ TEST(optionalTest, PointerStuff) {
 // This should invoke the "const &&" overload but since it ignores the const
 // qualifier it finds the "&&" overload the best candidate.
 #if defined(_MSC_VER) && _MSC_VER < 1910
-#define ABSL_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG
+#define TURBO_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG
 #endif
 
 TEST(optionalTest, Value) {
@@ -1039,20 +1039,20 @@ TEST(optionalTest, Value) {
   EXPECT_EQ("lvalue_c", lvalue_c.value());
   EXPECT_EQ("xvalue", O(turbo::in_place, "xvalue").value());
   EXPECT_EQ("xvalue_c", OC(turbo::in_place, "xvalue_c").value());
-#ifndef ABSL_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG
+#ifndef TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG
   EXPECT_EQ("cxvalue", CO(turbo::in_place, "cxvalue").value());
 #endif
   EXPECT_EQ("&", TypeQuals(lvalue.value()));
   EXPECT_EQ("c&", TypeQuals(clvalue.value()));
   EXPECT_EQ("c&", TypeQuals(lvalue_c.value()));
   EXPECT_EQ("&&", TypeQuals(O(turbo::in_place, "xvalue").value()));
-#if !defined(ABSL_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG) && \
-    !defined(ABSL_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
+#if !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG) && \
+    !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
   EXPECT_EQ("c&&", TypeQuals(CO(turbo::in_place, "cxvalue").value()));
 #endif
   EXPECT_EQ("c&&", TypeQuals(OC(turbo::in_place, "xvalue_c").value()));
 
-#if !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   // test on volatile type
   using OV = turbo::optional<volatile int>;
   OV lvalue_v(turbo::in_place, 42);
@@ -1060,11 +1060,11 @@ TEST(optionalTest, Value) {
   EXPECT_EQ(42, OV(42).value());
   EXPECT_TRUE((std::is_same<volatile int&, decltype(lvalue_v.value())>::value));
   EXPECT_TRUE((std::is_same<volatile int&&, decltype(OV(42).value())>::value));
-#endif  // !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
 
   // test exception throw on value()
   turbo::optional<int> empty;
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW((void)empty.value(), turbo::bad_optional_access);
 #else
   EXPECT_DEATH_IF_SUPPORTED((void)empty.value(), "Bad optional access");
@@ -1073,7 +1073,7 @@ TEST(optionalTest, Value) {
   // test constexpr value()
   constexpr turbo::optional<int> o1(1);
   static_assert(1 == o1.value(), "");  // const &
-#if !defined(_MSC_VER) && !defined(ABSL_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
+#if !defined(_MSC_VER) && !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
   using COI = const turbo::optional<int>;
   static_assert(2 == COI(2).value(), "");  // const &&
 #endif
@@ -1091,19 +1091,19 @@ TEST(optionalTest, DerefOperator) {
   EXPECT_EQ("lvalue_c", *lvalue_c);
   EXPECT_EQ("xvalue", *O(turbo::in_place, "xvalue"));
   EXPECT_EQ("xvalue_c", *OC(turbo::in_place, "xvalue_c"));
-#ifndef ABSL_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG
+#ifndef TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG
   EXPECT_EQ("cxvalue", *CO(turbo::in_place, "cxvalue"));
 #endif
   EXPECT_EQ("&", TypeQuals(*lvalue));
   EXPECT_EQ("c&", TypeQuals(*clvalue));
   EXPECT_EQ("&&", TypeQuals(*O(turbo::in_place, "xvalue")));
-#if !defined(ABSL_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG) && \
-    !defined(ABSL_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
+#if !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG) && \
+    !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
   EXPECT_EQ("c&&", TypeQuals(*CO(turbo::in_place, "cxvalue")));
 #endif
   EXPECT_EQ("c&&", TypeQuals(*OC(turbo::in_place, "xvalue_c")));
 
-#if !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   // test on volatile type
   using OV = turbo::optional<volatile int>;
   OV lvalue_v(turbo::in_place, 42);
@@ -1111,11 +1111,11 @@ TEST(optionalTest, DerefOperator) {
   EXPECT_EQ(42, *OV(42));
   EXPECT_TRUE((std::is_same<volatile int&, decltype(*lvalue_v)>::value));
   EXPECT_TRUE((std::is_same<volatile int&&, decltype(*OV(42))>::value));
-#endif  // !defined(ABSL_VOLATILE_RETURN_TYPES_DEPRECATED)
+#endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
 
   constexpr turbo::optional<int> opt1(1);
   static_assert(*opt1 == 1, "");
-#if !defined(_MSC_VER) && !defined(ABSL_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
+#if !defined(_MSC_VER) && !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
   using COI = const turbo::optional<int>;
   static_assert(*COI(2) == 2, "");
 #endif
@@ -1131,7 +1131,7 @@ TEST(optionalTest, ValueOr) {
   constexpr turbo::optional<double> copt_empty, copt_set = {1.2};
   static_assert(42.0 == copt_empty.value_or(42), "");
   static_assert(1.2 == copt_set.value_or(42), "");
-#ifndef ABSL_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG
+#ifndef TURBO_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG
   using COD = const turbo::optional<double>;
   static_assert(42.0 == COD().value_or(42), "");
   static_assert(1.2 == COD(1.2).value_or(42), "");
@@ -1535,7 +1535,7 @@ TEST(optionalTest, Hash) {
   turbo::type_traits_internal::AssertHashEnabled<turbo::optional<int>>();
   turbo::type_traits_internal::AssertHashEnabled<turbo::optional<Hashable>>();
 
-#if ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
   static_assert(!is_hash_enabled_for<turbo::optional<NonHashable>>::value, "");
   static_assert(!turbo::type_traits_internal::IsHashable<
                     turbo::optional<NonHashable>>::value,
@@ -1558,7 +1558,7 @@ TEST(optionalTest, Hash) {
 struct MoveMeNoThrow {
   MoveMeNoThrow() : x(0) {}
   [[noreturn]] MoveMeNoThrow(const MoveMeNoThrow& other) : x(other.x) {
-    ABSL_RAW_LOG(FATAL, "Should not be called.");
+    TURBO_RAW_LOG(FATAL, "Should not be called.");
     abort();
   }
   MoveMeNoThrow(MoveMeNoThrow&& other) noexcept : x(other.x) {}
@@ -1672,4 +1672,4 @@ TEST(optionalTest, InPlaceTSFINAEBug) {
 
 }  // namespace
 
-#endif  // #if !defined(ABSL_USES_STD_OPTIONAL)
+#endif  // #if !defined(TURBO_USES_STD_OPTIONAL)

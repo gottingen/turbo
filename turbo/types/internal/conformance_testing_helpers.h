@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
-#define ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
+#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
+#define TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
 
 // Checks to determine whether or not we can use abi::__cxa_demangle
 #if (defined(__ANDROID__) || defined(ANDROID)) && !defined(OS_ANDROID)
-#define ABSL_INTERNAL_OS_ANDROID
+#define TURBO_INTERNAL_OS_ANDROID
 #endif
 
 // We support certain compilers only.  See demangle.h for details.
 #if defined(OS_ANDROID) && (defined(__i386__) || defined(__x86_64__))
-#define ABSL_TYPES_INTERNAL_HAS_CXA_DEMANGLE 0
+#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 0
 #elif (__GNUC__ >= 4 || (__GNUC__ >= 3 && __GNUC_MINOR__ >= 4)) && \
     !defined(__mips__)
-#define ABSL_TYPES_INTERNAL_HAS_CXA_DEMANGLE 1
+#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 1
 #elif defined(__clang__) && !defined(_MSC_VER)
-#define ABSL_TYPES_INTERNAL_HAS_CXA_DEMANGLE 1
+#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 1
 #else
-#define ABSL_TYPES_INTERNAL_HAS_CXA_DEMANGLE 0
+#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 0
 #endif
 
 #include <tuple>
@@ -40,21 +40,21 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/utility/utility.h"
 
-#if ABSL_TYPES_INTERNAL_HAS_CXA_DEMANGLE
+#if TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE
 #include <cxxabi.h>
 
 #include <cstdlib>
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace types_internal {
 
 // Return a readable name for type T.
 template <class T>
 turbo::string_view NameOfImpl() {
 // TODO(calabrese) Investigate using debugging:internal_demangle as a fallback.
-#if ABSL_TYPES_INTERNAL_HAS_CXA_DEMANGLE
+#if TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE
   int status = 0;
   char* demangled_name = nullptr;
 
@@ -368,24 +368,24 @@ struct If</*Condition =*/true> {
 };
 
 //
-// ABSL_INTERNAL_STRINGIZE(...)
+// TURBO_INTERNAL_STRINGIZE(...)
 //
 // This variadic macro transforms its arguments into a c-string literal after
 // expansion.
 //
 // Example:
 //
-//   ABSL_INTERNAL_STRINGIZE(std::array<int, 10>)
+//   TURBO_INTERNAL_STRINGIZE(std::array<int, 10>)
 //
 // Results in:
 //
 //   "std::array<int, 10>"
-#define ABSL_INTERNAL_STRINGIZE(...) ABSL_INTERNAL_STRINGIZE_IMPL((__VA_ARGS__))
-#define ABSL_INTERNAL_STRINGIZE_IMPL(arg) ABSL_INTERNAL_STRINGIZE_IMPL2 arg
-#define ABSL_INTERNAL_STRINGIZE_IMPL2(...) #__VA_ARGS__
+#define TURBO_INTERNAL_STRINGIZE(...) TURBO_INTERNAL_STRINGIZE_IMPL((__VA_ARGS__))
+#define TURBO_INTERNAL_STRINGIZE_IMPL(arg) TURBO_INTERNAL_STRINGIZE_IMPL2 arg
+#define TURBO_INTERNAL_STRINGIZE_IMPL2(...) #__VA_ARGS__
 
 }  // namespace types_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
+#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_

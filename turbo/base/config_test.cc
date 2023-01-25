@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,18 +30,18 @@ TEST(ConfigTest, Endianness) {
   number.data[1] = 0x01;
   number.data[2] = 0x02;
   number.data[3] = 0x03;
-#if defined(ABSL_IS_LITTLE_ENDIAN) && defined(ABSL_IS_BIG_ENDIAN)
-#error Both ABSL_IS_LITTLE_ENDIAN and ABSL_IS_BIG_ENDIAN are defined
-#elif defined(ABSL_IS_LITTLE_ENDIAN)
+#if defined(TURBO_IS_LITTLE_ENDIAN) && defined(TURBO_IS_BIG_ENDIAN)
+#error Both TURBO_IS_LITTLE_ENDIAN and TURBO_IS_BIG_ENDIAN are defined
+#elif defined(TURBO_IS_LITTLE_ENDIAN)
   EXPECT_EQ(UINT32_C(0x03020100), number.value);
-#elif defined(ABSL_IS_BIG_ENDIAN)
+#elif defined(TURBO_IS_BIG_ENDIAN)
   EXPECT_EQ(UINT32_C(0x00010203), number.value);
 #else
 #error Unknown endianness
 #endif
 }
 
-#if defined(ABSL_HAVE_THREAD_LOCAL)
+#if defined(TURBO_HAVE_THREAD_LOCAL)
 TEST(ConfigTest, ThreadLocal) {
   static thread_local int mine_mine_mine = 16;
   EXPECT_EQ(16, mine_mine_mine);

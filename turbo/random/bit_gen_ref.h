@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 // -----------------------------------------------------------------------------
 //
 // This header defines a bit generator "reference" class, for use in interfaces
-// that take both Abseil (e.g. `turbo::BitGen`) and standard library (e.g.
+// that take both Turbo (e.g. `turbo::BitGen`) and standard library (e.g.
 // `std::mt19937`) bit generators.
 
-#ifndef ABSL_RANDOM_BIT_GEN_REF_H_
-#define ABSL_RANDOM_BIT_GEN_REF_H_
+#ifndef TURBO_RANDOM_BIT_GEN_REF_H_
+#define TURBO_RANDOM_BIT_GEN_REF_H_
 
 #include <limits>
 #include <type_traits>
@@ -35,7 +35,7 @@
 #include "turbo/random/internal/fast_uniform_bits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 template <typename URBG, typename = void, typename = void, typename = void>
@@ -67,7 +67,7 @@ class MockHelpers;
 //
 // `turbo::BitGenRef` is a type-erasing class that provides a generator-agnostic
 // non-owning "reference" interface for use in place of any specific uniform
-// random bit generator (URBG). This class may be used for both Abseil
+// random bit generator (URBG). This class may be used for both Turbo
 // (e.g. `turbo::BitGen`, `turbo::InsecureBitGen`) and Standard library (e.g
 // `std::mt19937`, `std::minstd_rand`) bit generators.
 //
@@ -179,7 +179,7 @@ class BitGenRef {
   friend class ::turbo::random_internal::MockHelpers;          // for InvokeMock
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_BIT_GEN_REF_H_
+#endif  // TURBO_RANDOM_BIT_GEN_REF_H_

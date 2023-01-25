@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 // File: log/die_if_null.h
 // -----------------------------------------------------------------------------
 //
-// This header declares macro `ABSL_DIE_IF_NULL`.
+// This header declares macro `TURBO_DIE_IF_NULL`.
 
-#ifndef ABSL_LOG_DIE_IF_NULL_H_
-#define ABSL_LOG_DIE_IF_NULL_H_
+#ifndef TURBO_LOG_DIE_IF_NULL_H_
+#define TURBO_LOG_DIE_IF_NULL_H_
 
 #include <stdint.h>
 
@@ -29,40 +29,40 @@
 #include "turbo/base/config.h"
 #include "turbo/base/optimization.h"
 
-// ABSL_DIE_IF_NULL()
+// TURBO_DIE_IF_NULL()
 //
-// `ABSL_DIE_IF_NULL` behaves as `CHECK_NE` against `nullptr` but *also*
+// `TURBO_DIE_IF_NULL` behaves as `CHECK_NE` against `nullptr` but *also*
 // "returns" its argument.  It is useful in initializers where statements (like
 // `CHECK_NE`) can't be used.  Outside initializers, prefer `CHECK` or
-// `CHECK_NE`. `ABSL_DIE_IF_NULL` works for both raw pointers and (compatible)
+// `CHECK_NE`. `TURBO_DIE_IF_NULL` works for both raw pointers and (compatible)
 // smart pointers including `std::unique_ptr` and `std::shared_ptr`; more
 // generally, it works for any type that can be compared to nullptr_t.  For
-// types that aren't raw pointers, `ABSL_DIE_IF_NULL` returns a reference to
+// types that aren't raw pointers, `TURBO_DIE_IF_NULL` returns a reference to
 // its argument, preserving the value category. Example:
 //
-//   Foo() : bar_(ABSL_DIE_IF_NULL(MethodReturningUniquePtr())) {}
+//   Foo() : bar_(TURBO_DIE_IF_NULL(MethodReturningUniquePtr())) {}
 //
 // Use `CHECK(ptr)` or `CHECK(ptr != nullptr)` if the returned pointer is
 // unused.
-#define ABSL_DIE_IF_NULL(val) \
+#define TURBO_DIE_IF_NULL(val) \
   ::turbo::log_internal::DieIfNull(__FILE__, __LINE__, #val, (val))
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 // Crashes the process after logging `exprtext` annotated at the `file` and
-// `line` location. Called when `ABSL_DIE_IF_NULL` fails. Calling this function
+// `line` location. Called when `TURBO_DIE_IF_NULL` fails. Calling this function
 // generates less code than its implementation would if inlined, for a slight
-// code size reduction each time `ABSL_DIE_IF_NULL` is called.
-ABSL_ATTRIBUTE_NORETURN ABSL_ATTRIBUTE_NOINLINE void DieBecauseNull(
+// code size reduction each time `TURBO_DIE_IF_NULL` is called.
+TURBO_ATTRIBUTE_NORETURN TURBO_ATTRIBUTE_NOINLINE void DieBecauseNull(
     const char* file, int line, const char* exprtext);
 
-// Helper for `ABSL_DIE_IF_NULL`.
+// Helper for `TURBO_DIE_IF_NULL`.
 template <typename T>
-ABSL_MUST_USE_RESULT T DieIfNull(const char* file, int line,
+TURBO_MUST_USE_RESULT T DieIfNull(const char* file, int line,
                                  const char* exprtext, T&& t) {
-  if (ABSL_PREDICT_FALSE(t == nullptr)) {
+  if (TURBO_PREDICT_FALSE(t == nullptr)) {
     // Call a non-inline helper function for a small code size improvement.
     DieBecauseNull(file, line, exprtext);
   }
@@ -70,7 +70,7 @@ ABSL_MUST_USE_RESULT T DieIfNull(const char* file, int line,
 }
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_DIE_IF_NULL_H_
+#endif  // TURBO_LOG_DIE_IF_NULL_H_

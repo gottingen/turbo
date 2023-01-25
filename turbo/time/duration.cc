@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace {
 
@@ -715,12 +715,12 @@ struct DisplayUnit {
   int prec;
   double pow10;
 };
-ABSL_CONST_INIT const DisplayUnit kDisplayNano = {"ns", 2, 1e2};
-ABSL_CONST_INIT const DisplayUnit kDisplayMicro = {"us", 5, 1e5};
-ABSL_CONST_INIT const DisplayUnit kDisplayMilli = {"ms", 8, 1e8};
-ABSL_CONST_INIT const DisplayUnit kDisplaySec = {"s", 11, 1e11};
-ABSL_CONST_INIT const DisplayUnit kDisplayMin = {"m", -1, 0.0};  // prec ignored
-ABSL_CONST_INIT const DisplayUnit kDisplayHour = {"h", -1,
+TURBO_CONST_INIT const DisplayUnit kDisplayNano = {"ns", 2, 1e2};
+TURBO_CONST_INIT const DisplayUnit kDisplayMicro = {"us", 5, 1e5};
+TURBO_CONST_INIT const DisplayUnit kDisplayMilli = {"ms", 8, 1e8};
+TURBO_CONST_INIT const DisplayUnit kDisplaySec = {"s", 11, 1e11};
+TURBO_CONST_INIT const DisplayUnit kDisplayMin = {"m", -1, 0.0};  // prec ignored
+TURBO_CONST_INIT const DisplayUnit kDisplayHour = {"h", -1,
                                                   0.0};  // prec ignored
 
 void AppendNumberUnit(std::string* out, int64_t n, DisplayUnit unit) {
@@ -871,7 +871,7 @@ bool ConsumeDurationUnit(const char** start, const char* end, Duration* unit) {
         default:
           break;
       }
-      ABSL_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH_INTENDED;
     case 1:
       switch (**start) {
         case 's':
@@ -940,16 +940,16 @@ bool ParseDuration(turbo::string_view dur_sv, Duration* d) {
   return true;
 }
 
-bool AbslParseFlag(turbo::string_view text, Duration* dst, std::string*) {
+bool TurboParseFlag(turbo::string_view text, Duration* dst, std::string*) {
   return ParseDuration(text, dst);
 }
 
-std::string AbslUnparseFlag(Duration d) { return FormatDuration(d); }
+std::string TurboUnparseFlag(Duration d) { return FormatDuration(d); }
 bool ParseFlag(const std::string& text, Duration* dst, std::string* ) {
   return ParseDuration(text, dst);
 }
 
 std::string UnparseFlag(Duration d) { return FormatDuration(d); }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

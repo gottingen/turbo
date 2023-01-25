@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORD_REP_BTREE_NAVIGATOR_H_
-#define ABSL_STRINGS_INTERNAL_CORD_REP_BTREE_NAVIGATOR_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_NAVIGATOR_H_
+#define TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_NAVIGATOR_H_
 
 #include <cassert>
 #include <iostream>
@@ -22,7 +22,7 @@
 #include "turbo/strings/internal/cord_rep_btree.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // CordRepBtreeNavigator is a bi-directional navigator allowing callers to
@@ -192,7 +192,7 @@ inline CordRepBtreeNavigator::Position CordRepBtreeNavigator::Seek(
   assert(btree() != nullptr);
   int height = height_;
   CordRepBtree* edge = node_[height];
-  if (ABSL_PREDICT_FALSE(offset >= edge->length)) return {nullptr, 0};
+  if (TURBO_PREDICT_FALSE(offset >= edge->length)) return {nullptr, 0};
   CordRepBtree::Position index = edge->IndexOf(offset);
   index_[height] = static_cast<uint8_t>(index.index);
   while (--height >= 0) {
@@ -208,7 +208,7 @@ inline CordRepBtreeNavigator::Position CordRepBtreeNavigator::InitOffset(
     CordRepBtree* tree, size_t offset) {
   assert(tree != nullptr);
   assert(tree->height() <= CordRepBtree::kMaxHeight);
-  if (ABSL_PREDICT_FALSE(offset >= tree->length)) return {nullptr, 0};
+  if (TURBO_PREDICT_FALSE(offset >= tree->length)) return {nullptr, 0};
   height_ = tree->height();
   node_[height_] = tree;
   return Seek(offset);
@@ -261,7 +261,7 @@ inline CordRep* CordRepBtreeNavigator::PreviousUp() {
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CORD_REP_BTREE_NAVIGATOR_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORD_REP_BTREE_NAVIGATOR_H_

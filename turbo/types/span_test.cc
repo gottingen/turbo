@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -234,7 +234,7 @@ TEST(IntSpan, ElementAccess) {
   EXPECT_EQ(s.front(), s[0]);
   EXPECT_EQ(s.back(), s[9]);
 
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
   EXPECT_DEATH_IF_SUPPORTED(s[-1], "");
   EXPECT_DEATH_IF_SUPPORTED(s[10], "");
 #endif
@@ -245,7 +245,7 @@ TEST(IntSpan, AtThrows) {
   turbo::Span<int> s(v);
 
   EXPECT_EQ(s.at(9), 9);
-  ABSL_BASE_INTERNAL_EXPECT_FAIL(s.at(10), std::out_of_range,
+  TURBO_BASE_INTERNAL_EXPECT_FAIL(s.at(10), std::out_of_range,
                                  "failed bounds check");
 }
 
@@ -275,7 +275,7 @@ TEST(IntSpan, RemovePrefixAndSuffix) {
 
   EXPECT_EQ(v, MakeRamp(20, 1));
 
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
   turbo::Span<int> prefix_death(v);
   EXPECT_DEATH_IF_SUPPORTED(prefix_death.remove_prefix(21), "");
   turbo::Span<int> suffix_death(v);
@@ -301,7 +301,7 @@ TEST(IntSpan, Subspan) {
   EXPECT_THAT(turbo::MakeSpan(ramp).subspan(3, 3), SpanIs(ramp.data() + 3, 3));
   EXPECT_THAT(turbo::MakeSpan(ramp).subspan(10, 5), SpanIs(ramp.data() + 10, 0));
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW(turbo::MakeSpan(ramp).subspan(11, 5), std::out_of_range);
 #else
   EXPECT_DEATH_IF_SUPPORTED(turbo::MakeSpan(ramp).subspan(11, 5), "");
@@ -317,7 +317,7 @@ TEST(IntSpan, First) {
   EXPECT_THAT(turbo::MakeSpan(ramp).first(10), SpanIs(ramp));
   EXPECT_THAT(turbo::MakeSpan(ramp).first(3), SpanIs(ramp.data(), 3));
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW(turbo::MakeSpan(ramp).first(11), std::out_of_range);
 #else
   EXPECT_DEATH_IF_SUPPORTED(turbo::MakeSpan(ramp).first(11), "");
@@ -333,7 +333,7 @@ TEST(IntSpan, Last) {
   EXPECT_THAT(turbo::MakeSpan(ramp).last(10), SpanIs(ramp));
   EXPECT_THAT(turbo::MakeSpan(ramp).last(3), SpanIs(ramp.data() + 7, 3));
 
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW(turbo::MakeSpan(ramp).last(11), std::out_of_range);
 #else
   EXPECT_DEATH_IF_SUPPORTED(turbo::MakeSpan(ramp).last(11), "");
@@ -782,9 +782,9 @@ TEST(IntSpan, NoexceptTest) {
 template <int i>
 struct ConstexprTester {};
 
-#define ABSL_TEST_CONSTEXPR(expr)                       \
+#define TURBO_TEST_CONSTEXPR(expr)                       \
   do {                                                  \
-    ABSL_ATTRIBUTE_UNUSED ConstexprTester<(expr, 1)> t; \
+    TURBO_ATTRIBUTE_UNUSED ConstexprTester<(expr, 1)> t; \
   } while (0)
 
 struct ContainerWithConstexprMethods {
@@ -797,28 +797,28 @@ TEST(ConstIntSpan, ConstexprTest) {
   static constexpr int a[] = {1, 2, 3};
   static constexpr int sized_arr[2] = {1, 2};
   static constexpr ContainerWithConstexprMethods c{1};
-  ABSL_TEST_CONSTEXPR(turbo::Span<const int>());
-  ABSL_TEST_CONSTEXPR(turbo::Span<const int>(a, 2));
-  ABSL_TEST_CONSTEXPR(turbo::Span<const int>(sized_arr));
-  ABSL_TEST_CONSTEXPR(turbo::Span<const int>(c));
-  ABSL_TEST_CONSTEXPR(turbo::MakeSpan(&a[0], 1));
-  ABSL_TEST_CONSTEXPR(turbo::MakeSpan(c));
-  ABSL_TEST_CONSTEXPR(turbo::MakeSpan(a));
-  ABSL_TEST_CONSTEXPR(turbo::MakeConstSpan(&a[0], 1));
-  ABSL_TEST_CONSTEXPR(turbo::MakeConstSpan(c));
-  ABSL_TEST_CONSTEXPR(turbo::MakeConstSpan(a));
+  TURBO_TEST_CONSTEXPR(turbo::Span<const int>());
+  TURBO_TEST_CONSTEXPR(turbo::Span<const int>(a, 2));
+  TURBO_TEST_CONSTEXPR(turbo::Span<const int>(sized_arr));
+  TURBO_TEST_CONSTEXPR(turbo::Span<const int>(c));
+  TURBO_TEST_CONSTEXPR(turbo::MakeSpan(&a[0], 1));
+  TURBO_TEST_CONSTEXPR(turbo::MakeSpan(c));
+  TURBO_TEST_CONSTEXPR(turbo::MakeSpan(a));
+  TURBO_TEST_CONSTEXPR(turbo::MakeConstSpan(&a[0], 1));
+  TURBO_TEST_CONSTEXPR(turbo::MakeConstSpan(c));
+  TURBO_TEST_CONSTEXPR(turbo::MakeConstSpan(a));
 
   constexpr turbo::Span<const int> span = c;
-  ABSL_TEST_CONSTEXPR(span.data());
-  ABSL_TEST_CONSTEXPR(span.size());
-  ABSL_TEST_CONSTEXPR(span.length());
-  ABSL_TEST_CONSTEXPR(span.empty());
-  ABSL_TEST_CONSTEXPR(span.begin());
-  ABSL_TEST_CONSTEXPR(span.cbegin());
-  ABSL_TEST_CONSTEXPR(span.subspan(0, 0));
-  ABSL_TEST_CONSTEXPR(span.first(1));
-  ABSL_TEST_CONSTEXPR(span.last(1));
-  ABSL_TEST_CONSTEXPR(span[0]);
+  TURBO_TEST_CONSTEXPR(span.data());
+  TURBO_TEST_CONSTEXPR(span.size());
+  TURBO_TEST_CONSTEXPR(span.length());
+  TURBO_TEST_CONSTEXPR(span.empty());
+  TURBO_TEST_CONSTEXPR(span.begin());
+  TURBO_TEST_CONSTEXPR(span.cbegin());
+  TURBO_TEST_CONSTEXPR(span.subspan(0, 0));
+  TURBO_TEST_CONSTEXPR(span.first(1));
+  TURBO_TEST_CONSTEXPR(span.last(1));
+  TURBO_TEST_CONSTEXPR(span[0]);
 }
 
 struct BigStruct {
@@ -834,7 +834,7 @@ TEST(Span, Hash) {
   int array[] = {1, 2, 3, 4};
   int array2[] = {1, 2, 3};
   using T = turbo::Span<const int>;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       {// Empties
        T(), T(nullptr, 0), T(array, 0), T(array2, 0),
        // Different array with same value

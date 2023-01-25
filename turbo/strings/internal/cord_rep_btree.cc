@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,10 +32,10 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr size_t CordRepBtree::kMaxCapacity;
 #endif
 
@@ -275,19 +275,19 @@ struct StackOperations {
       case CordRepBtree::kPopped:
         tree = edge_type == kBack ? CordRepBtree::New(tree, result.tree)
                                   : CordRepBtree::New(result.tree, tree);
-        if (ABSL_PREDICT_FALSE(tree->height() > CordRepBtree::kMaxHeight)) {
+        if (TURBO_PREDICT_FALSE(tree->height() > CordRepBtree::kMaxHeight)) {
           tree = CordRepBtree::Rebuild(tree);
-          ABSL_RAW_CHECK(tree->height() <= CordRepBtree::kMaxHeight,
+          TURBO_RAW_CHECK(tree->height() <= CordRepBtree::kMaxHeight,
                          "Max height exceeded");
         }
         return tree;
       case CordRepBtree::kCopied:
         CordRep::Unref(tree);
-        ABSL_FALLTHROUGH_INTENDED;
+        TURBO_FALLTHROUGH_INTENDED;
       case CordRepBtree::kSelf:
         return result.tree;
     }
-    ABSL_UNREACHABLE();
+    TURBO_UNREACHABLE();
     return result.tree;
   }
 
@@ -421,12 +421,12 @@ void CordRepBtree::Destroy(CordRepBtree* tree) {
 bool CordRepBtree::IsValid(const CordRepBtree* tree, bool shallow) {
 #define NODE_CHECK_VALID(x)                                           \
   if (!(x)) {                                                         \
-    ABSL_RAW_LOG(ERROR, "CordRepBtree::CheckValid() FAILED: %s", #x); \
+    TURBO_RAW_LOG(ERROR, "CordRepBtree::CheckValid() FAILED: %s", #x); \
     return false;                                                     \
   }
 #define NODE_CHECK_EQ(x, y)                                                    \
   if ((x) != (y)) {                                                            \
-    ABSL_RAW_LOG(ERROR,                                                        \
+    TURBO_RAW_LOG(ERROR,                                                        \
                  "CordRepBtree::CheckValid() FAILED: %s != %s (%s vs %s)", #x, \
                  #y, turbo::StrCat(x).c_str(), turbo::StrCat(y).c_str());        \
     return false;                                                              \
@@ -466,7 +466,7 @@ bool CordRepBtree::IsValid(const CordRepBtree* tree, bool shallow) {
 CordRepBtree* CordRepBtree::AssertValid(CordRepBtree* tree, bool shallow) {
   if (!IsValid(tree, shallow)) {
     Dump(tree, "CordRepBtree validation failed:", false, std::cout);
-    ABSL_RAW_LOG(FATAL, "CordRepBtree::CheckValid() FAILED");
+    TURBO_RAW_LOG(FATAL, "CordRepBtree::CheckValid() FAILED");
   }
   return tree;
 }
@@ -475,7 +475,7 @@ const CordRepBtree* CordRepBtree::AssertValid(const CordRepBtree* tree,
                                               bool shallow) {
   if (!IsValid(tree, shallow)) {
     Dump(tree, "CordRepBtree validation failed:", false, std::cout);
-    ABSL_RAW_LOG(FATAL, "CordRepBtree::CheckValid() FAILED");
+    TURBO_RAW_LOG(FATAL, "CordRepBtree::CheckValid() FAILED");
   }
   return tree;
 }
@@ -599,7 +599,7 @@ turbo::string_view CordRepBtree::AddData<kFront>(turbo::string_view data,
 template <EdgeType edge_type>
 CordRepBtree* CordRepBtree::AddData(CordRepBtree* tree, turbo::string_view data,
                                     size_t extra) {
-  if (ABSL_PREDICT_FALSE(data.empty())) return tree;
+  if (TURBO_PREDICT_FALSE(data.empty())) return tree;
 
   const size_t original_data_size = data.size();
   int depth = tree->height();
@@ -834,10 +834,10 @@ CordRep* CordRepBtree::RemoveSuffix(CordRepBtree* tree, size_t n) {
   assert(tree != nullptr);
   assert(n <= tree->length);
   const size_t len = tree->length;
-  if (ABSL_PREDICT_FALSE(n == 0)) {
+  if (TURBO_PREDICT_FALSE(n == 0)) {
     return tree;
   }
-  if (ABSL_PREDICT_FALSE(n >= len)) {
+  if (TURBO_PREDICT_FALSE(n >= len)) {
     CordRepBtree::Unref(tree);
     return nullptr;
   }
@@ -896,7 +896,7 @@ CordRep* CordRepBtree::RemoveSuffix(CordRepBtree* tree, size_t n) {
 CordRep* CordRepBtree::SubTree(size_t offset, size_t n) {
   assert(n <= this->length);
   assert(offset <= this->length - n);
-  if (ABSL_PREDICT_FALSE(n == 0)) return nullptr;
+  if (TURBO_PREDICT_FALSE(n == 0)) return nullptr;
 
   CordRepBtree* node = this;
   int height = node->height();
@@ -973,7 +973,7 @@ bool CordRepBtree::IsFlat(size_t offset, const size_t n,
                           turbo::string_view* fragment) const {
   assert(n <= this->length);
   assert(offset <= this->length - n);
-  if (ABSL_PREDICT_FALSE(n == 0)) return false;
+  if (TURBO_PREDICT_FALSE(n == 0)) return false;
   int height = this->height();
   const CordRepBtree* node = this;
   for (;;) {
@@ -1053,7 +1053,7 @@ CordRepBtree* CordRepBtree::CreateSlow(CordRep* rep) {
 }
 
 CordRepBtree* CordRepBtree::AppendSlow(CordRepBtree* tree, CordRep* rep) {
-  if (ABSL_PREDICT_TRUE(rep->IsBtree())) {
+  if (TURBO_PREDICT_TRUE(rep->IsBtree())) {
     return MergeTrees(tree, rep->btree());
   }
   auto consume = [&tree](CordRep* r, size_t offset, size_t length) {
@@ -1065,7 +1065,7 @@ CordRepBtree* CordRepBtree::AppendSlow(CordRepBtree* tree, CordRep* rep) {
 }
 
 CordRepBtree* CordRepBtree::PrependSlow(CordRepBtree* tree, CordRep* rep) {
-  if (ABSL_PREDICT_TRUE(rep->IsBtree())) {
+  if (TURBO_PREDICT_TRUE(rep->IsBtree())) {
     return MergeTrees(rep->btree(), tree);
   }
   auto consume = [&tree](CordRep* r, size_t offset, size_t length) {
@@ -1228,5 +1228,5 @@ CordRepBtree::ExtractResult CordRepBtree::ExtractAppendBuffer(
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-# Copyright 2022 The Abseil Authors
+# Copyright 2022 The Turbo Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:private"])
@@ -29,8 +29,8 @@ cc_library(
         "internal/cpu_detect.cc",
     ],
     hdrs = ["internal/cpu_detect.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base",
@@ -49,8 +49,8 @@ cc_library(
         "internal/crc.h",
         "internal/crc32_x86_arm_combined_simd.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":cpu_detect",
@@ -80,8 +80,8 @@ cc_library(
         "internal/crc32c.h",
         "internal/crc_memcpy.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:public"],
     deps = [
         ":cpu_detect",
@@ -99,8 +99,8 @@ cc_library(
 cc_test(
     name = "crc32c_test",
     srcs = ["crc32c_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":crc32c",
@@ -112,8 +112,8 @@ cc_test(
 cc_library(
     name = "non_temporal_arm_intrinsics",
     hdrs = ["internal/non_temporal_arm_intrinsics.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         "//turbo/base:config",
@@ -123,8 +123,8 @@ cc_library(
 cc_library(
     name = "non_temporal_memcpy",
     hdrs = ["internal/non_temporal_memcpy.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":non_temporal_arm_intrinsics",
@@ -137,8 +137,8 @@ cc_test(
     name = "crc_memcpy_test",
     size = "large",
     srcs = ["internal/crc_memcpy_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     shard_count = 3,
     visibility = ["//visibility:private"],
     deps = [
@@ -154,8 +154,8 @@ cc_test(
 cc_test(
     name = "non_temporal_memcpy_test",
     srcs = ["internal/non_temporal_memcpy_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":non_temporal_memcpy",
@@ -167,8 +167,8 @@ cc_library(
     name = "crc_cord_state",
     srcs = ["internal/crc_cord_state.cc"],
     hdrs = ["internal/crc_cord_state.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//turbo/strings:__pkg__"],
     deps = [
         ":crc32c",
@@ -181,8 +181,8 @@ cc_library(
 cc_test(
     name = "crc_cord_state_test",
     srcs = ["internal/crc_cord_state_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     visibility = ["//visibility:private"],
     deps = [
         ":crc32c",
@@ -195,8 +195,8 @@ cc_binary(
     name = "crc32c_benchmark",
     testonly = 1,
     srcs = ["crc32c_benchmark.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "benchmark",
     ],

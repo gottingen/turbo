@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_
-#define ABSL_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_
+#ifndef TURBO_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_
+#define TURBO_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_
 
 #include <cstdint>
 
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 // Calculate DamerauLevenshtein distance between two strings.
 // When the distance is larger than cutoff, the code just returns cutoff + 1.
@@ -28,7 +28,7 @@ uint8_t CappedDamerauLevenshteinDistance(turbo::string_view s1,
                                          turbo::string_view s2, uint8_t cutoff);
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_
+#endif  // TURBO_STRINGS_INTERNAL_DAMERAU_LEVENSHTEIN_DISTANCE_H_

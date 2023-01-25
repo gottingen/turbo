@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
 
@@ -40,7 +40,7 @@ TEST(CordzFunctionsTest, SampleRate) {
 // Cordz is disabled when we don't have thread_local. All calls to
 // should_profile will return false when cordz is diabled, so we might want to
 // avoid those tests.
-#ifdef ABSL_INTERNAL_CORDZ_ENABLED
+#ifdef TURBO_INTERNAL_CORDZ_ENABLED
 
 TEST(CordzFunctionsTest, ShouldProfileDisable) {
   int32_t orig_sample_rate = get_cordz_mean_interval();
@@ -129,7 +129,7 @@ TEST(CordzFunctionsTest, ShouldProfileRate) {
   set_cordz_mean_interval(orig_sample_rate);
 }
 
-#else  // ABSL_INTERNAL_CORDZ_ENABLED
+#else  // TURBO_INTERNAL_CORDZ_ENABLED
 
 TEST(CordzFunctionsTest, ShouldProfileDisabled) {
   int32_t orig_sample_rate = get_cordz_mean_interval();
@@ -141,9 +141,9 @@ TEST(CordzFunctionsTest, ShouldProfileDisabled) {
   set_cordz_mean_interval(orig_sample_rate);
 }
 
-#endif  // ABSL_INTERNAL_CORDZ_ENABLED
+#endif  // TURBO_INTERNAL_CORDZ_ENABLED
 
 }  // namespace
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

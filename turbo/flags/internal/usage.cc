@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ bool FLAGS_helpon = false;
 bool FLAGS_helpmatch = false;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 namespace {
 
@@ -421,12 +421,12 @@ int HandleUsageFlags(std::ostream& out,
 
 namespace {
 
-ABSL_CONST_INIT turbo::Mutex help_attributes_guard(turbo::kConstInit);
-ABSL_CONST_INIT std::string* match_substr
-    ABSL_GUARDED_BY(help_attributes_guard) = nullptr;
-ABSL_CONST_INIT HelpMode help_mode ABSL_GUARDED_BY(help_attributes_guard) =
+TURBO_CONST_INIT turbo::Mutex help_attributes_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::string* match_substr
+    TURBO_GUARDED_BY(help_attributes_guard) = nullptr;
+TURBO_CONST_INIT HelpMode help_mode TURBO_GUARDED_BY(help_attributes_guard) =
     HelpMode::kNone;
-ABSL_CONST_INIT HelpFormat help_format ABSL_GUARDED_BY(help_attributes_guard) =
+TURBO_CONST_INIT HelpFormat help_format TURBO_GUARDED_BY(help_attributes_guard) =
     HelpFormat::kHumanReadable;
 
 }  // namespace
@@ -522,5 +522,5 @@ bool DeduceUsageFlags(turbo::string_view name, turbo::string_view value) {
 }
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

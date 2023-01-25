@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
 
 #include <atomic>
 
-#include "turbo/base/internal/raw_logging.h"  // For ABSL_RAW_CHECK
+#include "turbo/base/internal/raw_logging.h"  // For TURBO_RAW_CHECK
 #include "turbo/base/internal/spinlock.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 using ::turbo::base_internal::SpinLockHolder;
 
-ABSL_CONST_INIT CordzHandle::Queue CordzHandle::global_queue_(turbo::kConstInit);
+TURBO_CONST_INIT CordzHandle::Queue CordzHandle::global_queue_(turbo::kConstInit);
 
 CordzHandle::CordzHandle(bool is_snapshot) : is_snapshot_(is_snapshot) {
   if (is_snapshot) {
@@ -113,7 +113,7 @@ bool CordzHandle::DiagnosticsHandleIsSafeToInspect(
     if (p == handle) return !snapshot_found;
     if (p == this) snapshot_found = true;
   }
-  ABSL_ASSERT(snapshot_found);  // Assert that 'this' is in delete queue.
+  TURBO_ASSERT(snapshot_found);  // Assert that 'this' is in delete queue.
   return true;
 }
 
@@ -135,5 +135,5 @@ CordzHandle::DiagnosticsGetSafeToInspectDeletedHandles() {
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

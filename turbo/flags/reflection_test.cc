@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"
 
-ABSL_FLAG(int, int_flag, 1, "int_flag help");
-ABSL_FLAG(std::string, string_flag, "dflt", "string_flag help");
-ABSL_RETIRED_FLAG(bool, bool_retired_flag, false, "bool_retired_flag help");
+TURBO_FLAG(int, int_flag, 1, "int_flag help");
+TURBO_FLAG(std::string, string_flag, "dflt", "string_flag help");
+TURBO_RETIRED_FLAG(bool, bool_retired_flag, false, "bool_retired_flag help");
 
 namespace {
 
@@ -96,7 +96,7 @@ struct CustomUDT {
   int a;
   int b;
 };
-bool AbslParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
+bool TurboParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
   std::vector<turbo::string_view> parts =
       turbo::StrSplit(in, ':', turbo::SkipWhitespace());
 
@@ -108,7 +108,7 @@ bool AbslParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
 
   return true;
 }
-std::string AbslUnparseFlag(const CustomUDT& f) {
+std::string TurboUnparseFlag(const CustomUDT& f) {
   return turbo::StrCat(f.a, ":", f.b);
 }
 
@@ -116,21 +116,21 @@ std::string AbslUnparseFlag(const CustomUDT& f) {
 
 // --------------------------------------------------------------------
 
-ABSL_FLAG(bool, test_flag_01, true, "");
-ABSL_FLAG(int, test_flag_02, 1234, "");
-ABSL_FLAG(int16_t, test_flag_03, -34, "");
-ABSL_FLAG(uint16_t, test_flag_04, 189, "");
-ABSL_FLAG(int32_t, test_flag_05, 10765, "");
-ABSL_FLAG(uint32_t, test_flag_06, 40000, "");
-ABSL_FLAG(int64_t, test_flag_07, -1234567, "");
-ABSL_FLAG(uint64_t, test_flag_08, 9876543, "");
-ABSL_FLAG(double, test_flag_09, -9.876e-50, "");
-ABSL_FLAG(float, test_flag_10, 1.234e12f, "");
-ABSL_FLAG(std::string, test_flag_11, "", "");
-ABSL_FLAG(turbo::Duration, test_flag_12, turbo::Minutes(10), "");
+TURBO_FLAG(bool, test_flag_01, true, "");
+TURBO_FLAG(int, test_flag_02, 1234, "");
+TURBO_FLAG(int16_t, test_flag_03, -34, "");
+TURBO_FLAG(uint16_t, test_flag_04, 189, "");
+TURBO_FLAG(int32_t, test_flag_05, 10765, "");
+TURBO_FLAG(uint32_t, test_flag_06, 40000, "");
+TURBO_FLAG(int64_t, test_flag_07, -1234567, "");
+TURBO_FLAG(uint64_t, test_flag_08, 9876543, "");
+TURBO_FLAG(double, test_flag_09, -9.876e-50, "");
+TURBO_FLAG(float, test_flag_10, 1.234e12f, "");
+TURBO_FLAG(std::string, test_flag_11, "", "");
+TURBO_FLAG(turbo::Duration, test_flag_12, turbo::Minutes(10), "");
 static int counter = 0;
-ABSL_FLAG(int, test_flag_13, 200, "").OnUpdate([]() { counter++; });
-ABSL_FLAG(CustomUDT, test_flag_14, {}, "");
+TURBO_FLAG(int, test_flag_13, 200, "").OnUpdate([]() { counter++; });
+TURBO_FLAG(CustomUDT, test_flag_14, {}, "");
 
 namespace {
 

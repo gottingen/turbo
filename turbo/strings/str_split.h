@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@
 //   // v[0] == "a", v[1] == "b", v[2] == "c"
 //
 // See StrSplit() below for more information.
-#ifndef ABSL_STRINGS_STR_SPLIT_H_
-#define ABSL_STRINGS_STR_SPLIT_H_
+#ifndef TURBO_STRINGS_STR_SPLIT_H_
+#define TURBO_STRINGS_STR_SPLIT_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -50,7 +50,7 @@
 #include "turbo/strings/strip.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 //------------------------------------------------------------------------------
 // Delimiters
@@ -541,7 +541,7 @@ StrSplit(StringType&& text, Delimiter d, Predicate p) {
       std::move(text), DelimiterType(d), std::move(p));
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_STR_SPLIT_H_
+#endif  // TURBO_STRINGS_STR_SPLIT_H_

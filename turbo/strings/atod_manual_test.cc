@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 // local checkout of the https://github.com/nigeltao/parse-number-fxx-test-data
 // repository. The test suite lives in a separate repository because its more
 // than 5 million test cases weigh over several hundred megabytes and because
-// the test cases are also useful to other software projects, not just Abseil.
+// the test cases are also useful to other software projects, not just Turbo.
 // Its data/*.txt files contain one test case per line, like:
 //
 // 3C00 3F800000 3FF0000000000000 1

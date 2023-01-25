@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_DEBUGGING_INTERNAL_EXAMINE_STACK_H_
-#define ABSL_DEBUGGING_INTERNAL_EXAMINE_STACK_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_EXAMINE_STACK_H_
+#define TURBO_DEBUGGING_INTERNAL_EXAMINE_STACK_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 // Type of function used for printing in stack trace dumping, etc.
@@ -58,7 +58,7 @@ void DumpStackTrace(int min_dropped_frames, int max_num_frames,
                     void* writer_arg);
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_DEBUGGING_INTERNAL_EXAMINE_STACK_H_
+#endif  // TURBO_DEBUGGING_INTERNAL_EXAMINE_STACK_H_

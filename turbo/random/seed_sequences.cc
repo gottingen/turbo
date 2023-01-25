@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #include "turbo/random/internal/pool_urbg.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 SeedSeq MakeSeedSeq() {
   SeedSeq::result_type seed_material[8];
@@ -25,5 +25,5 @@ SeedSeq MakeSeedSeq() {
   return SeedSeq(std::begin(seed_material), std::end(seed_material));
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

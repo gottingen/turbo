@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef ABSL_SYNCHRONIZATION_INTERNAL_FUTEX_H_
-#define ABSL_SYNCHRONIZATION_INTERNAL_FUTEX_H_
+#ifndef TURBO_SYNCHRONIZATION_INTERNAL_FUTEX_H_
+#define TURBO_SYNCHRONIZATION_INTERNAL_FUTEX_H_
 
 #include "turbo/base/config.h"
 
@@ -38,21 +38,21 @@
 #include "turbo/base/optimization.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
 
-#ifdef ABSL_INTERNAL_HAVE_FUTEX
-#error ABSL_INTERNAL_HAVE_FUTEX may not be set on the command line
+#ifdef TURBO_INTERNAL_HAVE_FUTEX
+#error TURBO_INTERNAL_HAVE_FUTEX may not be set on the command line
 #elif defined(__BIONIC__)
 // Bionic supports all the futex operations we need even when some of the futex
 // definitions are missing.
-#define ABSL_INTERNAL_HAVE_FUTEX
+#define TURBO_INTERNAL_HAVE_FUTEX
 #elif defined(__linux__) && defined(FUTEX_CLOCK_REALTIME)
 // FUTEX_CLOCK_REALTIME requires Linux >= 2.6.28.
-#define ABSL_INTERNAL_HAVE_FUTEX
+#define TURBO_INTERNAL_HAVE_FUTEX
 #endif
 
-#ifdef ABSL_INTERNAL_HAVE_FUTEX
+#ifdef TURBO_INTERNAL_HAVE_FUTEX
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // Some Android headers are missing these definitions even though they
@@ -104,7 +104,7 @@ class FutexImpl {
       err = syscall(SYS_futex, reinterpret_cast<int32_t *>(v),
                     FUTEX_WAIT | FUTEX_PRIVATE_FLAG, val, nullptr);
     }
-    if (ABSL_PREDICT_FALSE(err != 0)) {
+    if (TURBO_PREDICT_FALSE(err != 0)) {
       return -errno;
     }
     return 0;
@@ -117,7 +117,7 @@ class FutexImpl {
     long err = syscall(SYS_futex, reinterpret_cast<int32_t*>(v),
                        FUTEX_WAIT_BITSET | FUTEX_PRIVATE_FLAG, val, abstime,
                        nullptr, bits);
-    if (ABSL_PREDICT_FALSE(err != 0)) {
+    if (TURBO_PREDICT_FALSE(err != 0)) {
       return -errno;
     }
     return 0;
@@ -127,7 +127,7 @@ class FutexImpl {
     // NOLINTNEXTLINE(runtime/int)
     long err = syscall(SYS_futex, reinterpret_cast<int32_t*>(v),
                        FUTEX_WAKE | FUTEX_PRIVATE_FLAG, count);
-    if (ABSL_PREDICT_FALSE(err < 0)) {
+    if (TURBO_PREDICT_FALSE(err < 0)) {
       return -errno;
     }
     return 0;
@@ -139,7 +139,7 @@ class FutexImpl {
     long err = syscall(SYS_futex, reinterpret_cast<int32_t*>(v),
                        FUTEX_WAKE_BITSET | FUTEX_PRIVATE_FLAG, count, nullptr,
                        nullptr, bits);
-    if (ABSL_PREDICT_FALSE(err < 0)) {
+    if (TURBO_PREDICT_FALSE(err < 0)) {
       return -errno;
     }
     return 0;
@@ -149,9 +149,9 @@ class FutexImpl {
 class Futex : public FutexImpl {};
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_INTERNAL_HAVE_FUTEX
+#endif  // TURBO_INTERNAL_HAVE_FUTEX
 
-#endif  // ABSL_SYNCHRONIZATION_INTERNAL_FUTEX_H_
+#endif  // TURBO_SYNCHRONIZATION_INTERNAL_FUTEX_H_

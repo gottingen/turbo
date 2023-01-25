@@ -1,5 +1,5 @@
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 # limitations under the License.
 #
 
-# ABSL random-number generation libraries.
+# TURBO random-number generation libraries.
 
 load(
     "//turbo:copts/configure_copts.bzl",
-    "ABSL_DEFAULT_COPTS",
-    "ABSL_DEFAULT_LINKOPTS",
-    "ABSL_TEST_COPTS",
+    "TURBO_DEFAULT_COPTS",
+    "TURBO_DEFAULT_LINKOPTS",
+    "TURBO_TEST_COPTS",
 )
 
 package(default_visibility = ["//visibility:public"])
@@ -30,8 +30,8 @@ licenses(["notice"])
 cc_library(
     name = "random",
     hdrs = ["random.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":seed_sequences",
@@ -61,8 +61,8 @@ cc_library(
         "uniform_real_distribution.h",
         "zipf_distribution.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         "//turbo/base:base_internal",
         "//turbo/base:config",
@@ -85,8 +85,8 @@ cc_library(
     name = "seed_gen_exception",
     srcs = ["seed_gen_exception.cc"],
     hdrs = ["seed_gen_exception.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = ["//turbo/base:config"],
 )
 
@@ -96,8 +96,8 @@ cc_library(
     hdrs = [
         "seed_sequences.h",
     ],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":seed_gen_exception",
         "//turbo/base:config",
@@ -111,8 +111,8 @@ cc_library(
 cc_library(
     name = "bit_gen_ref",
     hdrs = ["bit_gen_ref.h"],
-    copts = ABSL_DEFAULT_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_DEFAULT_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":random",
         "//turbo/base:core_headers",
@@ -127,7 +127,7 @@ cc_library(
     name = "mock_distributions",
     testonly = 1,
     hdrs = ["mock_distributions.h"],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":mocking_bit_gen",
@@ -143,7 +143,7 @@ cc_library(
     hdrs = [
         "mocking_bit_gen.h",
     ],
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -164,8 +164,8 @@ cc_test(
     size = "small",
     timeout = "eternal",  # Android can take a very long time
     srcs = ["bernoulli_distribution_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -180,9 +180,9 @@ cc_test(
     size = "small",
     timeout = "eternal",  # Android can take a very long time
     srcs = ["beta_distribution_test.cc"],
-    copts = ABSL_TEST_COPTS,
+    copts = TURBO_TEST_COPTS,
     flaky = 1,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -207,8 +207,8 @@ cc_test(
     srcs = [
         "distributions_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -221,8 +221,8 @@ cc_test(
     name = "generators_test",
     size = "small",
     srcs = ["generators_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -236,8 +236,8 @@ cc_test(
     srcs = [
         "log_uniform_int_distribution_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",  # Does not converge on WASM.
     ],
@@ -260,8 +260,8 @@ cc_test(
     srcs = [
         "discrete_distribution_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -281,8 +281,8 @@ cc_test(
     srcs = [
         "poisson_distribution_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         # Too Slow.
         "no_test_android_arm",
@@ -308,8 +308,8 @@ cc_test(
     size = "small",
     timeout = "moderate",
     srcs = ["exponential_distribution_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -332,8 +332,8 @@ cc_test(
     srcs = [
         "gaussian_distribution_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -355,8 +355,8 @@ cc_test(
     srcs = [
         "uniform_int_distribution_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -375,8 +375,8 @@ cc_test(
     srcs = [
         "uniform_real_distribution_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_android_arm",
         "no_test_android_arm64",
@@ -401,8 +401,8 @@ cc_test(
     srcs = [
         "zipf_distribution_test.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":distributions",
         ":random",
@@ -419,8 +419,8 @@ cc_test(
     name = "bit_gen_ref_test",
     size = "small",
     srcs = ["bit_gen_ref_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":bit_gen_ref",
         ":random",
@@ -434,8 +434,8 @@ cc_test(
     name = "mocking_bit_gen_test",
     size = "small",
     srcs = ["mocking_bit_gen_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -452,8 +452,8 @@ cc_test(
     name = "mock_distributions_test",
     size = "small",
     srcs = ["mock_distributions_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -469,8 +469,8 @@ cc_test(
     name = "examples_test",
     size = "small",
     srcs = ["examples_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = [
         "no_test_wasm",
     ],
@@ -484,8 +484,8 @@ cc_test(
     name = "seed_sequences_test",
     size = "small",
     srcs = ["seed_sequences_test.cc"],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     deps = [
         ":random",
         ":seed_sequences",
@@ -501,8 +501,8 @@ cc_binary(
     srcs = [
         "benchmarks.cc",
     ],
-    copts = ABSL_TEST_COPTS,
-    linkopts = ABSL_DEFAULT_LINKOPTS,
+    copts = TURBO_TEST_COPTS,
+    linkopts = TURBO_DEFAULT_LINKOPTS,
     tags = ["benchmark"],
     deps = [
         ":distributions",

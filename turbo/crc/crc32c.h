@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 // The API includes the basic functions for computing such CRC32C values and
 // some utility functions for performing more efficient mathematical
 // computations using an existing checksum.
-#ifndef ABSL_CRC_CRC32C_H_
-#define ABSL_CRC_CRC32C_H_
+#ifndef TURBO_CRC_CRC32C_H_
+#define TURBO_CRC_CRC32C_H_
 
 #include <cstdint>
 #include <ostream>
@@ -32,7 +32,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 //-----------------------------------------------------------------------------
 // crc32c_t
@@ -177,7 +177,7 @@ inline std::ostream& operator<<(std::ostream& os, crc32c_t crc) {
   return os << static_cast<uint32_t>(crc);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_CRC32C_H_
+#endif  // TURBO_CRC_CRC32C_H_

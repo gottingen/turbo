@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 #include "turbo/base/internal/atomic_hook.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace atomic_hook_internal {
 
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES turbo::base_internal::AtomicHook<VoidF>
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES turbo::base_internal::AtomicHook<VoidF>
     func(DefaultFunc);
-ABSL_CONST_INIT int default_func_calls = 0;
+TURBO_CONST_INIT int default_func_calls = 0;
 void DefaultFunc() { default_func_calls++; }
 void RegisterFunc(VoidF f) { func.Store(f); }
 
 }  // namespace atomic_hook_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

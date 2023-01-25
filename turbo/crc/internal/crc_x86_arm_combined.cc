@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,16 +29,16 @@
 #include "turbo/memory/memory.h"
 #include "turbo/numeric/bits.h"
 
-#if defined(ABSL_CRC_INTERNAL_HAVE_ARM_SIMD) || \
-    defined(ABSL_CRC_INTERNAL_HAVE_X86_SIMD)
-#define ABSL_INTERNAL_CAN_USE_SIMD_CRC32C
+#if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) || \
+    defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
+#define TURBO_INTERNAL_CAN_USE_SIMD_CRC32C
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
-#if defined(ABSL_INTERNAL_CAN_USE_SIMD_CRC32C)
+#if defined(TURBO_INTERNAL_CAN_USE_SIMD_CRC32C)
 
 // Implementation details not exported outside of file
 namespace {
@@ -64,38 +64,38 @@ class CRC32AcceleratedX86ARMCombined : public CRC32 {
 constexpr size_t kSmallCutoff = 256;
 constexpr size_t kMediumCutoff = 2048;
 
-#define ABSL_INTERNAL_STEP1(crc)                      \
+#define TURBO_INTERNAL_STEP1(crc)                      \
   do {                                                \
     crc = CRC32_u8(static_cast<uint32_t>(crc), *p++); \
   } while (0)
-#define ABSL_INTERNAL_STEP2(crc)                                               \
+#define TURBO_INTERNAL_STEP2(crc)                                               \
   do {                                                                         \
     crc =                                                                      \
         CRC32_u16(static_cast<uint32_t>(crc), turbo::little_endian::Load16(p)); \
     p += 2;                                                                    \
   } while (0)
-#define ABSL_INTERNAL_STEP4(crc)                                               \
+#define TURBO_INTERNAL_STEP4(crc)                                               \
   do {                                                                         \
     crc =                                                                      \
         CRC32_u32(static_cast<uint32_t>(crc), turbo::little_endian::Load32(p)); \
     p += 4;                                                                    \
   } while (0)
-#define ABSL_INTERNAL_STEP8(crc, data)                  \
+#define TURBO_INTERNAL_STEP8(crc, data)                  \
   do {                                                  \
     crc = CRC32_u64(static_cast<uint32_t>(crc),         \
                     turbo::little_endian::Load64(data)); \
     data += 8;                                          \
   } while (0)
-#define ABSL_INTERNAL_STEP8BY2(crc0, crc1, p0, p1) \
+#define TURBO_INTERNAL_STEP8BY2(crc0, crc1, p0, p1) \
   do {                                             \
-    ABSL_INTERNAL_STEP8(crc0, p0);                 \
-    ABSL_INTERNAL_STEP8(crc1, p1);                 \
+    TURBO_INTERNAL_STEP8(crc0, p0);                 \
+    TURBO_INTERNAL_STEP8(crc1, p1);                 \
   } while (0)
-#define ABSL_INTERNAL_STEP8BY3(crc0, crc1, crc2, p0, p1, p2) \
+#define TURBO_INTERNAL_STEP8BY3(crc0, crc1, crc2, p0, p1, p2) \
   do {                                                       \
-    ABSL_INTERNAL_STEP8(crc0, p0);                           \
-    ABSL_INTERNAL_STEP8(crc1, p1);                           \
-    ABSL_INTERNAL_STEP8(crc2, p2);                           \
+    TURBO_INTERNAL_STEP8(crc0, p0);                           \
+    TURBO_INTERNAL_STEP8(crc1, p1);                           \
+    TURBO_INTERNAL_STEP8(crc2, p2);                           \
   } while (0)
 
 namespace {
@@ -215,7 +215,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
   // Computation for Generic Polynomials Using PCLMULQDQ Instruction"
   // https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
   // We are applying it to CRC32C polynomial.
-  ABSL_ATTRIBUTE_ALWAYS_INLINE void Process64BytesPclmul(
+  TURBO_ATTRIBUTE_ALWAYS_INLINE void Process64BytesPclmul(
       const uint8_t* p, V128* partialCRC) const {
     V128 loopMultiplicands = V128_Load(reinterpret_cast<const V128*>(k1k2));
 
@@ -252,7 +252,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
 
   // Reduce partialCRC produced by Process64BytesPclmul into a single value,
   // that represents crc checksum of all the processed bytes.
-  ABSL_ATTRIBUTE_ALWAYS_INLINE uint64_t
+  TURBO_ATTRIBUTE_ALWAYS_INLINE uint64_t
   FinalizePclmulStream(V128* partialCRC) const {
     V128 partialCRC1 = partialCRC[0];
     V128 partialCRC2 = partialCRC[1];
@@ -311,7 +311,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
   }
 
   // Update crc with 64 bytes of data from p.
-  ABSL_ATTRIBUTE_ALWAYS_INLINE uint64_t Process64BytesCRC(const uint8_t* p,
+  TURBO_ATTRIBUTE_ALWAYS_INLINE uint64_t Process64BytesCRC(const uint8_t* p,
                                                           uint64_t crc) const {
     for (int i = 0; i < 8; i++) {
       crc =
@@ -341,7 +341,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
   static constexpr size_t kMaxStreams = 3;
 };
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 alignas(16) constexpr uint64_t
     CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::k1k2[2];
 alignas(16) constexpr uint64_t
@@ -357,13 +357,13 @@ alignas(16) constexpr uint32_t
 constexpr size_t
     CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::kGroupsSmall;
 constexpr size_t CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::kMaxStreams;
-#endif  // ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#endif  // TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 
 template <size_t num_crc_streams, size_t num_pclmul_streams,
           CutoffStrategy strategy>
 class CRC32AcceleratedX86ARMCombinedMultipleStreams
     : public CRC32AcceleratedX86ARMCombinedMultipleStreamsBase {
-  ABSL_ATTRIBUTE_HOT
+  TURBO_ATTRIBUTE_HOT
   void Extend(uint32_t* crc, const void* bytes, size_t length) const override {
     static_assert(num_crc_streams >= 1 && num_crc_streams <= kMaxStreams,
                   "Invalid number of crc streams");
@@ -376,19 +376,19 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
 
     // We have dedicated instruction for 1,2,4 and 8 bytes.
     if (length & 8) {
-      ABSL_INTERNAL_STEP8(l, p);
+      TURBO_INTERNAL_STEP8(l, p);
       length &= ~size_t{8};
     }
     if (length & 4) {
-      ABSL_INTERNAL_STEP4(l);
+      TURBO_INTERNAL_STEP4(l);
       length &= ~size_t{4};
     }
     if (length & 2) {
-      ABSL_INTERNAL_STEP2(l);
+      TURBO_INTERNAL_STEP2(l);
       length &= ~size_t{2};
     }
     if (length & 1) {
-      ABSL_INTERNAL_STEP1(l);
+      TURBO_INTERNAL_STEP1(l);
       length &= ~size_t{1};
     }
     if (length == 0) {
@@ -402,8 +402,8 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
     if (strategy != CutoffStrategy::Unroll64CRC) {
       if (length < kSmallCutoff) {
         while (length >= 16) {
-          ABSL_INTERNAL_STEP8(l, p);
-          ABSL_INTERNAL_STEP8(l, p);
+          TURBO_INTERNAL_STEP8(l, p);
+          TURBO_INTERNAL_STEP8(l, p);
           length -= 16;
         }
         *crc = l;
@@ -425,10 +425,10 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
         const uint8_t* p2 = p1 + bs * blockSize;
 
         for (size_t i = 0; i + 1 < bs; ++i) {
-          ABSL_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
-          ABSL_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
-          ABSL_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
-          ABSL_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
+          TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
+          TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
+          TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
+          TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
           base_internal::PrefetchT0(
               reinterpret_cast<const char*>(p + kPrefetchHorizonMedium));
           base_internal::PrefetchT0(
@@ -437,10 +437,10 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
               reinterpret_cast<const char*>(p2 + kPrefetchHorizonMedium));
         }
         // Don't run crc on last 8 bytes.
-        ABSL_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
-        ABSL_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
-        ABSL_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
-        ABSL_INTERNAL_STEP8BY2(l64, l641, p, p1);
+        TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
+        TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
+        TURBO_INTERNAL_STEP8BY3(l64, l641, l642, p, p1, p2);
+        TURBO_INTERNAL_STEP8BY2(l64, l641, p, p1);
 
         V128 magic = *(reinterpret_cast<const V128*>(kClmulConstants) + bs - 1);
 
@@ -474,7 +474,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
       const uint8_t* x = RoundUp<8>(p);
       // Process bytes until p is 8-byte aligned, if that isn't past the end.
       while (p != x) {
-        ABSL_INTERNAL_STEP1(l);
+        TURBO_INTERNAL_STEP1(l);
       }
 
       size_t bs = static_cast<size_t>(e - p) /
@@ -588,20 +588,20 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreams
     l = static_cast<uint32_t>(l64);
 
     while ((e - p) >= 16) {
-      ABSL_INTERNAL_STEP8(l, p);
-      ABSL_INTERNAL_STEP8(l, p);
+      TURBO_INTERNAL_STEP8(l, p);
+      TURBO_INTERNAL_STEP8(l, p);
     }
     // Process the last few bytes
     while (p != e) {
-      ABSL_INTERNAL_STEP1(l);
+      TURBO_INTERNAL_STEP1(l);
     }
 
-#undef ABSL_INTERNAL_STEP8BY3
-#undef ABSL_INTERNAL_STEP8BY2
-#undef ABSL_INTERNAL_STEP8
-#undef ABSL_INTERNAL_STEP4
-#undef ABSL_INTERNAL_STEP2
-#undef ABSL_INTERNAL_STEP1
+#undef TURBO_INTERNAL_STEP8BY3
+#undef TURBO_INTERNAL_STEP8BY2
+#undef TURBO_INTERNAL_STEP8
+#undef TURBO_INTERNAL_STEP4
+#undef TURBO_INTERNAL_STEP2
+#undef TURBO_INTERNAL_STEP1
 
     *crc = l;
   }
@@ -709,7 +709,7 @@ std::vector<std::unique_ptr<CRCImpl>> NewCRC32AcceleratedX86ARMCombinedAll() {
   return ret;
 }
 
-#else  // !ABSL_INTERNAL_CAN_USE_SIMD_CRC32C
+#else  // !TURBO_INTERNAL_CAN_USE_SIMD_CRC32C
 
 std::vector<std::unique_ptr<CRCImpl>> NewCRC32AcceleratedX86ARMCombinedAll() {
   return std::vector<std::unique_ptr<CRCImpl>>();
@@ -721,5 +721,5 @@ CRCImpl* TryNewCRC32AcceleratedX86ARMCombined() { return nullptr; }
 #endif
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -108,14 +108,14 @@ void BM_MutexEnqueue(benchmark::State& state) {
   static Shared* shared = new Shared;
 
   // Set up 'blocked_threads' to count how many threads are currently blocked
-  // in Abseil synchronization code.
+  // in Turbo synchronization code.
   //
   // NOTE: Blocking done within the Google Benchmark library itself (e.g.
   // the barrier which synchronizes threads entering and exiting the benchmark
   // loop) does _not_ get registered in this counter. This is because Google
   // Benchmark uses its own synchronization primitives based on std::mutex, not
-  // Abseil synchronization primitives. If at some point the benchmark library
-  // merges into Abseil, this code may break.
+  // Turbo synchronization primitives. If at some point the benchmark library
+  // merges into Turbo, this code may break.
   turbo::synchronization_internal::PerThreadSem::SetThreadBlockedCounter(
       &shared->blocked_threads);
 
@@ -123,7 +123,7 @@ void BM_MutexEnqueue(benchmark::State& state) {
   // reusing the same static-initialized 'shared' object. Given the semantics
   // of the members, here, we expect everything to be reset to zero by the
   // end of any iteration. Assert that's the case, just to be sure.
-  ABSL_RAW_CHECK(
+  TURBO_RAW_CHECK(
       shared->looping_threads.load(std::memory_order_relaxed) == 0 &&
           shared->blocked_threads.load(std::memory_order_relaxed) == 0 &&
           !shared->thread_has_mutex.load(std::memory_order_relaxed),
@@ -300,7 +300,7 @@ void BM_ConditionWaiters(benchmark::State& state) {
 }
 
 // Some configurations have higher thread limits than others.
-#if defined(__linux__) && !defined(ABSL_HAVE_THREAD_SANITIZER)
+#if defined(__linux__) && !defined(TURBO_HAVE_THREAD_SANITIZER)
 constexpr int kMaxConditionWaiters = 8192;
 #else
 constexpr int kMaxConditionWaiters = 1024;

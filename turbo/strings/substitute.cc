@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace substitute_internal {
 
 void SubstituteAndAppendArray(std::string* output, turbo::string_view format,
@@ -35,7 +35,7 @@ void SubstituteAndAppendArray(std::string* output, turbo::string_view format,
     if (format[i] == '$') {
       if (i + 1 >= format.size()) {
 #ifndef NDEBUG
-        ABSL_RAW_LOG(FATAL,
+        TURBO_RAW_LOG(FATAL,
                      "Invalid turbo::Substitute() format string: \"%s\".",
                      turbo::CEscape(format).c_str());
 #endif
@@ -45,7 +45,7 @@ void SubstituteAndAppendArray(std::string* output, turbo::string_view format,
         int index = format[i + 1] - '0';
         if (static_cast<size_t>(index) >= num_args) {
 #ifndef NDEBUG
-          ABSL_RAW_LOG(
+          TURBO_RAW_LOG(
               FATAL,
               "Invalid turbo::Substitute() format string: asked for \"$"
               "%d\", but only %d args were given.  Full format string was: "
@@ -61,7 +61,7 @@ void SubstituteAndAppendArray(std::string* output, turbo::string_view format,
         ++i;  // Skip next char.
       } else {
 #ifndef NDEBUG
-        ABSL_RAW_LOG(FATAL,
+        TURBO_RAW_LOG(FATAL,
                      "Invalid turbo::Substitute() format string: \"%s\".",
                      turbo::CEscape(format).c_str());
 #endif
@@ -170,5 +170,5 @@ Arg::Arg(Dec dec) {
 }
 
 }  // namespace substitute_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_STRINGIFY_SINK_H_
-#define ABSL_STRINGS_INTERNAL_STRINGIFY_SINK_H_
+#ifndef TURBO_STRINGS_INTERNAL_STRINGIFY_SINK_H_
+#define TURBO_STRINGS_INTERNAL_STRINGIFY_SINK_H_
 
 #include <string>
 #include <type_traits>
@@ -22,7 +22,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace strings_internal {
 class StringifySink {
@@ -32,7 +32,7 @@ class StringifySink {
   void Append(string_view v);
 
   // Support `turbo::Format(&sink, format, args...)`.
-  friend void AbslFormatFlush(StringifySink* sink, turbo::string_view v) {
+  friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
     sink->Append(v);
   }
 
@@ -45,13 +45,13 @@ class StringifySink {
 
 template <typename T>
 string_view ExtractStringification(StringifySink& sink, const T& v) {
-  AbslStringify(sink, v);
+  TurboStringify(sink, v);
   return sink.buffer_;
 }
 
 }  // namespace strings_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STRINGIFY_SINK_H_
+#endif  // TURBO_STRINGS_INTERNAL_STRINGIFY_SINK_H_

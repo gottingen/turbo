@@ -17,8 +17,8 @@
 // times (represented by cctz::civil_second) using the rules defined by
 // a time zone (cctz::time_zone).
 
-#ifndef ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_H_
-#define ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_H_
+#ifndef TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_H_
+#define TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_H_
 
 #include <chrono>
 #include <cstdint>
@@ -30,7 +30,7 @@
 #include "turbo/time/internal/cctz/include/cctz/civil_time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -213,7 +213,7 @@ class time_zone {
   friend bool operator!=(time_zone lhs, time_zone rhs) { return !(lhs == rhs); }
 
   template <typename H>
-  friend H AbslHashValue(H h, time_zone tz) {
+  friend H TurboHashValue(H h, time_zone tz) {
     return H::combine(std::move(h), &tz.effective_impl());
   }
 
@@ -453,7 +453,7 @@ inline bool join_seconds(const time_point<seconds>& sec, const femtoseconds&,
 }  // namespace detail
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_H_
+#endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_H_

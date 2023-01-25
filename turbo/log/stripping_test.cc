@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 // ---------------------------------------
 //
 // When a `LOG` statement can be trivially proved at compile time to never fire,
-// e.g. due to `ABSL_MIN_LOG_LEVEL`, `NDEBUG`, or some explicit condition, data
+// e.g. due to `TURBO_MIN_LOG_LEVEL`, `NDEBUG`, or some explicit condition, data
 // streamed in can be dropped from the compiled program completely if they are
 // not used elsewhere.  This most commonly affects string literals, which users
 // often want to strip to reduce binary size and/or redact information about
@@ -62,7 +62,7 @@ using ::testing::_;
 using ::testing::Eq;
 using ::testing::NotNull;
 
-using turbo::log_internal::kAbslMinLogLevel;
+using turbo::log_internal::kTurboMinLogLevel;
 
 std::string Base64UnescapeOrDie(turbo::string_view data) {
   std::string decoded;
@@ -273,7 +273,7 @@ TEST_F(StrippingTest, Literal) {
   LOG(INFO) << "U3RyaXBwaW5nVGVzdC5MaXRlcmFs";
   auto exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
-  if (turbo::LogSeverity::kInfo >= kAbslMinLogLevel) {
+  if (turbo::LogSeverity::kInfo >= kTurboMinLogLevel) {
     EXPECT_THAT(exe.get(), FileHasSubstr(needle));
   } else {
     EXPECT_THAT(exe.get(), Not(FileHasSubstr(needle)));
@@ -291,7 +291,7 @@ TEST_F(StrippingTest, LiteralInExpression) {
                             "U3RyaXBwaW5nVGVzdC5MaXRlcmFsSW5FeHByZXNzaW9u");
   std::unique_ptr<FILE, std::function<void(FILE*)>> exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
-  if (turbo::LogSeverity::kInfo >= kAbslMinLogLevel) {
+  if (turbo::LogSeverity::kInfo >= kTurboMinLogLevel) {
     EXPECT_THAT(exe.get(), FileHasSubstr(needle));
   } else {
     EXPECT_THAT(exe.get(), Not(FileHasSubstr(needle)));
@@ -307,7 +307,7 @@ TEST_F(StrippingTest, Fatal) {
   EXPECT_DEATH_IF_SUPPORTED(LOG(FATAL) << "U3RyaXBwaW5nVGVzdC5GYXRhbA==", "");
   std::unique_ptr<FILE, std::function<void(FILE*)>> exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
-  if (turbo::LogSeverity::kFatal >= kAbslMinLogLevel) {
+  if (turbo::LogSeverity::kFatal >= kTurboMinLogLevel) {
     EXPECT_THAT(exe.get(), FileHasSubstr(needle));
   } else {
     EXPECT_THAT(exe.get(), Not(FileHasSubstr(needle)));
@@ -322,7 +322,7 @@ TEST_F(StrippingTest, Level) {
   LOG(LEVEL(severity)) << "U3RyaXBwaW5nVGVzdC5MZXZlbA==";
   std::unique_ptr<FILE, std::function<void(FILE*)>> exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
-  if (turbo::LogSeverity::kFatal >= kAbslMinLogLevel) {
+  if (turbo::LogSeverity::kFatal >= kTurboMinLogLevel) {
     // This can't be stripped at compile-time because it might evaluate to a
     // level that shouldn't be stripped.
     EXPECT_THAT(exe.get(), FileHasSubstr(needle));

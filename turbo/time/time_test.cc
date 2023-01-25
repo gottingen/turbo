@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -377,8 +377,8 @@ TEST(Time, FloorConversion) {
 }
 
 TEST(Time, RoundtripConversion) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 
@@ -563,8 +563,8 @@ TEST(Time, FromChrono) {
 }
 
 TEST(Time, ToChronoTime) {
-#if defined(ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    ABSL_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
+#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
+    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
   GTEST_SKIP();
 #endif
 

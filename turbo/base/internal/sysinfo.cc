@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@
 #include "turbo/base/thread_annotations.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace base_internal {
 
 namespace {
@@ -212,7 +212,7 @@ static bool ReadLongFromFile(const char *file, long *value) {
   return ret;
 }
 
-#if defined(ABSL_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY)
+#if defined(TURBO_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY)
 
 // Reads a monotonic time source and returns a value in
 // nanoseconds. The returned value uses an arbitrary epoch, not the
@@ -297,7 +297,7 @@ static double MeasureTscFrequency() {
   return last_measurement;
 }
 
-#endif  // ABSL_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY
+#endif  // TURBO_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY
 
 static double GetNominalCPUFrequency() {
   long freq = 0;
@@ -314,7 +314,7 @@ static double GetNominalCPUFrequency() {
     return freq * 1e3;  // Value is kHz.
   }
 
-#if defined(ABSL_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY)
+#if defined(TURBO_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY)
   // On these platforms, the TSC frequency is the nominal CPU
   // frequency.  But without having the kernel export it directly
   // though /sys/devices/system/cpu/cpu0/tsc_freq_khz, there is no
@@ -337,13 +337,13 @@ static double GetNominalCPUFrequency() {
   }
 
   return 1.0;
-#endif  // !ABSL_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY
+#endif  // !TURBO_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY
 }
 
 #endif
 
-ABSL_CONST_INIT static once_flag init_num_cpus_once;
-ABSL_CONST_INIT static int num_cpus = 0;
+TURBO_CONST_INIT static once_flag init_num_cpus_once;
+TURBO_CONST_INIT static int num_cpus = 0;
 
 // NumCPUs() may be called before main() and before malloc is properly
 // initialized, therefore this must not allocate memory.
@@ -354,8 +354,8 @@ int NumCPUs() {
 }
 
 // A default frequency of 0.0 might be dangerous if it is used in division.
-ABSL_CONST_INIT static once_flag init_nominal_cpu_frequency_once;
-ABSL_CONST_INIT static double nominal_cpu_frequency = 1.0;
+TURBO_CONST_INIT static once_flag init_nominal_cpu_frequency_once;
+TURBO_CONST_INIT static double nominal_cpu_frequency = 1.0;
 
 // NominalCPUFrequency() may be called before main() and before malloc is
 // properly initialized, therefore this must not allocate memory.
@@ -417,16 +417,16 @@ pid_t GetTID() {
 #else
 
 // Fallback implementation of GetTID using pthread_getspecific.
-ABSL_CONST_INIT static once_flag tid_once;
-ABSL_CONST_INIT static pthread_key_t tid_key;
-ABSL_CONST_INIT static turbo::base_internal::SpinLock tid_lock(
+TURBO_CONST_INIT static once_flag tid_once;
+TURBO_CONST_INIT static pthread_key_t tid_key;
+TURBO_CONST_INIT static turbo::base_internal::SpinLock tid_lock(
     turbo::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 
 // We set a bit per thread in this array to indicate that an ID is in
 // use. ID 0 is unused because it is the default value returned by
 // pthread_getspecific().
-ABSL_CONST_INIT static std::vector<uint32_t> *tid_array
-    ABSL_GUARDED_BY(tid_lock) = nullptr;
+TURBO_CONST_INIT static std::vector<uint32_t> *tid_array
+    TURBO_GUARDED_BY(tid_lock) = nullptr;
 static constexpr int kBitsPerWord = 32;  // tid_array is uint32_t.
 
 // Returns the TID to tid_array.
@@ -498,14 +498,14 @@ pid_t GetTID() {
 // userspace construct) to avoid unnecessary system calls. Without this caching,
 // it can take roughly 98ns, while it takes roughly 1ns with this caching.
 pid_t GetCachedTID() {
-#ifdef ABSL_HAVE_THREAD_LOCAL
+#ifdef TURBO_HAVE_THREAD_LOCAL
   static thread_local pid_t thread_id = GetTID();
   return thread_id;
 #else
   return GetTID();
-#endif  // ABSL_HAVE_THREAD_LOCAL
+#endif  // TURBO_HAVE_THREAD_LOCAL
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

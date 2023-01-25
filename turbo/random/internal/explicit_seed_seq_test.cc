@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,13 +40,13 @@ bool ConformsToInterface() {
   // Check that param() and size() return state provided to constructor.
   {
     uint32_t init_array[] = {1, 2, 3, 4, 5};
-    Sseq seq(init_array, &init_array[ABSL_ARRAYSIZE(init_array)]);
-    EXPECT_EQ(seq.size(), ABSL_ARRAYSIZE(init_array));
+    Sseq seq(init_array, &init_array[TURBO_ARRAYSIZE(init_array)]);
+    EXPECT_EQ(seq.size(), TURBO_ARRAYSIZE(init_array));
 
-    uint32_t state_array[ABSL_ARRAYSIZE(init_array)];
+    uint32_t state_array[TURBO_ARRAYSIZE(init_array)];
     seq.param(state_array);
 
-    for (int i = 0; i < ABSL_ARRAYSIZE(state_array); i++) {
+    for (int i = 0; i < TURBO_ARRAYSIZE(state_array); i++) {
       EXPECT_EQ(state_array[i], i + 1);
     }
   }
@@ -55,7 +55,7 @@ bool ConformsToInterface() {
     Sseq seq;
     uint32_t seeds[5];
 
-    seq.generate(seeds, &seeds[ABSL_ARRAYSIZE(seeds)]);
+    seq.generate(seeds, &seeds[TURBO_ARRAYSIZE(seeds)]);
   }
   return true;
 }
@@ -65,7 +65,7 @@ TEST(SeedSequences, CheckInterfaces) {
   // Control case
   EXPECT_TRUE(ConformsToInterface<std::seed_seq>());
 
-  // Abseil classes
+  // Turbo classes
   EXPECT_TRUE(ConformsToInterface<ExplicitSeedSeq>());
 }
 
@@ -166,12 +166,12 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
 
     // Apply the assignment-operator.
     // GCC 12 has a false-positive -Wstringop-overflow warning here.
-#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
     another_seq = seq_from_entropy;
-#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic pop
 #endif
 

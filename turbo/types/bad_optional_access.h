@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,27 +18,27 @@
 //
 // This header file defines the `turbo::bad_optional_access` type.
 
-#ifndef ABSL_TYPES_BAD_OPTIONAL_ACCESS_H_
-#define ABSL_TYPES_BAD_OPTIONAL_ACCESS_H_
+#ifndef TURBO_TYPES_BAD_OPTIONAL_ACCESS_H_
+#define TURBO_TYPES_BAD_OPTIONAL_ACCESS_H_
 
 #include <stdexcept>
 
 #include "turbo/base/config.h"
 
-#ifdef ABSL_USES_STD_OPTIONAL
+#ifdef TURBO_USES_STD_OPTIONAL
 
 #include <optional>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 using std::bad_optional_access;
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // ABSL_USES_STD_OPTIONAL
+#else  // TURBO_USES_STD_OPTIONAL
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // bad_optional_access
@@ -67,12 +67,12 @@ class bad_optional_access : public std::exception {
 namespace optional_internal {
 
 // throw delegator
-[[noreturn]] ABSL_DLL void throw_bad_optional_access();
+[[noreturn]] TURBO_DLL void throw_bad_optional_access();
 
 }  // namespace optional_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USES_STD_OPTIONAL
+#endif  // TURBO_USES_STD_OPTIONAL
 
-#endif  // ABSL_TYPES_BAD_OPTIONAL_ACCESS_H_
+#endif  // TURBO_TYPES_BAD_OPTIONAL_ACCESS_H_

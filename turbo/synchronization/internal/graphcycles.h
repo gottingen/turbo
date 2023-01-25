@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_SYNCHRONIZATION_INTERNAL_GRAPHCYCLES_H_
-#define ABSL_SYNCHRONIZATION_INTERNAL_GRAPHCYCLES_H_
+#ifndef TURBO_SYNCHRONIZATION_INTERNAL_GRAPHCYCLES_H_
+#define TURBO_SYNCHRONIZATION_INTERNAL_GRAPHCYCLES_H_
 
 // GraphCycles detects the introduction of a cycle into a directed
 // graph that is being built up incrementally.
@@ -43,7 +43,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // Opaque identifier for a graph node.
@@ -135,7 +135,7 @@ class GraphCycles {
 };
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif

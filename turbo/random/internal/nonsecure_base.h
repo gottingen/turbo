@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_NONSECURE_BASE_H_
-#define ABSL_RANDOM_INTERNAL_NONSECURE_BASE_H_
+#ifndef TURBO_RANDOM_INTERNAL_NONSECURE_BASE_H_
+#define TURBO_RANDOM_INTERNAL_NONSECURE_BASE_H_
 
 #include <algorithm>
 #include <cstdint>
@@ -31,7 +31,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // RandenPoolSeedSeq is a custom seed sequence type where generate() fills the
@@ -77,7 +77,7 @@ class RandenPoolSeedSeq {
       // ContiguousTag indicates the common case of a known contiguous buffer,
       // which allows directly filling the buffer. In C++20,
       // std::contiguous_iterator_tag provides a mechanism for testing this
-      // capability, however until Abseil's support requirements allow us to
+      // capability, however until Turbo's support requirements allow us to
       // assume C++20, limit checks to a few common cases.
       using TagType = turbo::conditional_t<
           (std::is_pointer<RandomAccessIterator>::value ||
@@ -155,7 +155,7 @@ class NonsecureURBGBase {
 };
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_NONSECURE_BASE_H_
+#endif  // TURBO_RANDOM_INTERNAL_NONSECURE_BASE_H_

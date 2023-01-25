@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 #include "turbo/debugging/internal/vdso_support.h"
 
-#ifdef ABSL_HAVE_VDSO_SUPPORT     // defined in vdso_support.h
+#ifdef TURBO_HAVE_VDSO_SUPPORT     // defined in vdso_support.h
 
 #if !defined(__has_include)
 #define __has_include(header) 0
@@ -35,10 +35,10 @@
 
 #if !defined(__UCLIBC__) && defined(__GLIBC__) && \
     (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 16))
-#define ABSL_HAVE_GETAUXVAL
+#define TURBO_HAVE_GETAUXVAL
 #endif
 
-#ifdef ABSL_HAVE_GETAUXVAL
+#ifdef TURBO_HAVE_GETAUXVAL
 #include <sys/auxv.h>
 #endif
 
@@ -62,14 +62,14 @@ using Elf32_auxv_t = Elf32_Auxinfo;
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
-ABSL_CONST_INIT
+TURBO_CONST_INIT
 std::atomic<const void *> VDSOSupport::vdso_base_(
     debugging_internal::ElfMemImage::kInvalidBase);
 
-ABSL_CONST_INIT std::atomic<VDSOSupport::GetCpuFn> VDSOSupport::getcpu_fn_(
+TURBO_CONST_INIT std::atomic<VDSOSupport::GetCpuFn> VDSOSupport::getcpu_fn_(
     &InitAndGetCPU);
 
 VDSOSupport::VDSOSupport()
@@ -91,7 +91,7 @@ VDSOSupport::VDSOSupport()
 // the operation should be idempotent.
 const void *VDSOSupport::Init() {
   const auto kInvalidBase = debugging_internal::ElfMemImage::kInvalidBase;
-#ifdef ABSL_HAVE_GETAUXVAL
+#ifdef TURBO_HAVE_GETAUXVAL
   if (vdso_base_.load(std::memory_order_relaxed) == kInvalidBase) {
     errno = 0;
     const void *const sysinfo_ehdr =
@@ -100,7 +100,7 @@ const void *VDSOSupport::Init() {
       vdso_base_.store(sysinfo_ehdr, std::memory_order_relaxed);
     }
   }
-#endif  // ABSL_HAVE_GETAUXVAL
+#endif  // TURBO_HAVE_GETAUXVAL
   if (vdso_base_.load(std::memory_order_relaxed) == kInvalidBase) {
     int fd = open("/proc/self/auxv", O_RDONLY);
     if (fd == -1) {
@@ -143,7 +143,7 @@ const void *VDSOSupport::Init() {
 }
 
 const void *VDSOSupport::SetBase(const void *base) {
-  ABSL_RAW_CHECK(base != debugging_internal::ElfMemImage::kInvalidBase,
+  TURBO_RAW_CHECK(base != debugging_internal::ElfMemImage::kInvalidBase,
                  "internal error");
   const void *old_base = vdso_base_.load(std::memory_order_relaxed);
   vdso_base_.store(base, std::memory_order_relaxed);
@@ -183,14 +183,14 @@ long VDSOSupport::InitAndGetCPU(unsigned *cpu,  // NOLINT(runtime/int)
                                 void *x, void *y) {
   Init();
   GetCpuFn fn = getcpu_fn_.load(std::memory_order_relaxed);
-  ABSL_RAW_CHECK(fn != &InitAndGetCPU, "Init() did not set getcpu_fn_");
+  TURBO_RAW_CHECK(fn != &InitAndGetCPU, "Init() did not set getcpu_fn_");
   return (*fn)(cpu, x, y);
 }
 
 // This function must be very fast, and may be called from very
 // low level (e.g. tcmalloc). Hence I avoid things like
 // GoogleOnceInit() and ::operator new.
-ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY
+TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY
 int GetCPU() {
   unsigned cpu;
   long ret_code =  // NOLINT(runtime/int)
@@ -199,7 +199,7 @@ int GetCPU() {
 }
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_HAVE_VDSO_SUPPORT
+#endif  // TURBO_HAVE_VDSO_SUPPORT

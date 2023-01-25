@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // reported with `#error`. This enforcement is best effort, so successfully
 // compiling this header does not guarantee a supported configuration.
 
-#ifndef ABSL_BASE_POLICY_CHECKS_H_
-#define ABSL_BASE_POLICY_CHECKS_H_
+#ifndef TURBO_BASE_POLICY_CHECKS_H_
+#define TURBO_BASE_POLICY_CHECKS_H_
 
 // Included for the __GLIBC_PREREQ macro used below.
 #include <limits.h>
@@ -92,22 +92,22 @@
 // `char` Size Check
 // -----------------------------------------------------------------------------
 
-// Abseil currently assumes CHAR_BIT == 8. If you would like to use Abseil on a
+// Turbo currently assumes CHAR_BIT == 8. If you would like to use Turbo on a
 // platform where this is not the case, please provide us with the details about
 // your platform so we can consider relaxing this requirement.
 #if CHAR_BIT != 8
-#error "Abseil assumes CHAR_BIT == 8."
+#error "Turbo assumes CHAR_BIT == 8."
 #endif
 
 // -----------------------------------------------------------------------------
 // `int` Size Check
 // -----------------------------------------------------------------------------
 
-// Abseil currently assumes that an int is 4 bytes. If you would like to use
-// Abseil on a platform where this is not the case, please provide us with the
+// Turbo currently assumes that an int is 4 bytes. If you would like to use
+// Turbo on a platform where this is not the case, please provide us with the
 // details about your platform so we can consider relaxing this requirement.
 #if INT_MAX < 2147483647
-#error "Abseil assumes that int is at least 4 bytes. "
+#error "Turbo assumes that int is at least 4 bytes. "
 #endif
 
-#endif  // ABSL_BASE_POLICY_CHECKS_H_
+#endif  // TURBO_BASE_POLICY_CHECKS_H_

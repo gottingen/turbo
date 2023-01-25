@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,18 +39,18 @@
 // abstraction and is designed to be a drop-in replacement for code compliant
 // with C++17.
 
-#ifndef ABSL_TYPES_VARIANT_H_
-#define ABSL_TYPES_VARIANT_H_
+#ifndef TURBO_TYPES_VARIANT_H_
+#define TURBO_TYPES_VARIANT_H_
 
 #include "turbo/base/config.h"
 #include "turbo/utility/utility.h"
 
-#ifdef ABSL_USES_STD_VARIANT
+#ifdef TURBO_USES_STD_VARIANT
 
 #include <variant>  // IWYU pragma: export
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 using std::bad_variant_access;
 using std::get;
 using std::get_if;
@@ -63,10 +63,10 @@ using std::variant_npos;
 using std::variant_size;
 using std::variant_size_v;
 using std::visit;
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // ABSL_USES_STD_VARIANT
+#else  // TURBO_USES_STD_VARIANT
 
 #include <functional>
 #include <new>
@@ -79,7 +79,7 @@ ABSL_NAMESPACE_END
 #include "turbo/types/internal/variant.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // turbo::variant
@@ -803,7 +803,7 @@ operator>=(const variant<Types...>& a, const variant<Types...>& b) {
                    a.index());
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace std {
@@ -821,10 +821,10 @@ struct hash<turbo::variant<T...>>
 
 }  // namespace std
 
-#endif  // ABSL_USES_STD_VARIANT
+#endif  // TURBO_USES_STD_VARIANT
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace variant_internal {
 
 // Helper visitor for converting a variant<Ts...>` into another type (mostly
@@ -860,7 +860,7 @@ To ConvertVariantTo(Variant&& variant) {
                      std::forward<Variant>(variant));
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TYPES_VARIANT_H_
+#endif  // TURBO_TYPES_VARIANT_H_

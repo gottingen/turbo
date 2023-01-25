@@ -12,8 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#ifndef ABSL_TIME_INTERNAL_CCTZ_CIVIL_TIME_DETAIL_H_
-#define ABSL_TIME_INTERNAL_CCTZ_CIVIL_TIME_DETAIL_H_
+#ifndef TURBO_TIME_INTERNAL_CCTZ_CIVIL_TIME_DETAIL_H_
+#define TURBO_TIME_INTERNAL_CCTZ_CIVIL_TIME_DETAIL_H_
 
 #include <cstdint>
 #include <limits>
@@ -34,7 +34,7 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -344,27 +344,27 @@ CONSTEXPR_F fields align(year_tag, fields f) noexcept {
 namespace impl {
 
 template <typename H>
-H AbslHashValueImpl(second_tag, H h, fields f) {
+H TurboHashValueImpl(second_tag, H h, fields f) {
   return H::combine(std::move(h), f.y, f.m, f.d, f.hh, f.mm, f.ss);
 }
 template <typename H>
-H AbslHashValueImpl(minute_tag, H h, fields f) {
+H TurboHashValueImpl(minute_tag, H h, fields f) {
   return H::combine(std::move(h), f.y, f.m, f.d, f.hh, f.mm);
 }
 template <typename H>
-H AbslHashValueImpl(hour_tag, H h, fields f) {
+H TurboHashValueImpl(hour_tag, H h, fields f) {
   return H::combine(std::move(h), f.y, f.m, f.d, f.hh);
 }
 template <typename H>
-H AbslHashValueImpl(day_tag, H h, fields f) {
+H TurboHashValueImpl(day_tag, H h, fields f) {
   return H::combine(std::move(h), f.y, f.m, f.d);
 }
 template <typename H>
-H AbslHashValueImpl(month_tag, H h, fields f) {
+H TurboHashValueImpl(month_tag, H h, fields f) {
   return H::combine(std::move(h), f.y, f.m);
 }
 template <typename H>
-H AbslHashValueImpl(year_tag, H h, fields f) {
+H TurboHashValueImpl(year_tag, H h, fields f) {
   return H::combine(std::move(h), f.y);
 }
 
@@ -455,8 +455,8 @@ class civil_time {
   }
 
   template <typename H>
-  friend H AbslHashValue(H h, civil_time a) {
-    return impl::AbslHashValueImpl(T{}, std::move(h), a.f_);
+  friend H TurboHashValue(H h, civil_time a) {
+    return impl::TurboHashValueImpl(T{}, std::move(h), a.f_);
   }
 
  private:
@@ -622,11 +622,11 @@ std::ostream& operator<<(std::ostream& os, weekday wd);
 }  // namespace detail
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #undef CONSTEXPR_M
 #undef CONSTEXPR_F
 #undef CONSTEXPR_D
 
-#endif  // ABSL_TIME_INTERNAL_CCTZ_CIVIL_TIME_DETAIL_H_
+#endif  // TURBO_TIME_INTERNAL_CCTZ_CIVIL_TIME_DETAIL_H_

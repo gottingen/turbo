@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 // This test is a no-op when turbo::variant is an alias for std::variant and when
 // exceptions are not enabled.
-#if !defined(ABSL_USES_STD_VARIANT) && defined(ABSL_HAVE_EXCEPTIONS)
+#if !defined(TURBO_USES_STD_VARIANT) && defined(TURBO_HAVE_EXCEPTIONS)
 
 #include <iostream>
 #include <memory>
@@ -31,10 +31,10 @@
 #include "turbo/memory/memory.h"
 
 // See comment in turbo/base/config.h
-#if !defined(ABSL_INTERNAL_MSVC_2017_DBG_MODE)
+#if !defined(TURBO_INTERNAL_MSVC_2017_DBG_MODE)
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 using ::testing::MakeExceptionSafetyTester;
@@ -238,7 +238,7 @@ TEST(VariantExceptionSafetyTest, CopyAssign) {
   }
   // libstdc++ std::variant has bugs on copy assignment regarding exception
   // safety.
-#if !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#if !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
   // index() != j
   // if is_nothrow_copy_constructible_v<Tj> or
   // !is_nothrow_move_constructible<Tj> is true, equivalent to
@@ -269,7 +269,7 @@ TEST(VariantExceptionSafetyTest, CopyAssign) {
                     .Test());
     EXPECT_FALSE(tester.WithContracts(strong_guarantee).Test());
   }
-#endif  // !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#endif  // !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
   {
     // is_nothrow_copy_constructible_v<Tj> == false &&
     // is_nothrow_move_constructible_v<Tj> == true
@@ -326,7 +326,7 @@ TEST(VariantExceptionSafetyTest, MoveAssign) {
     // The fix is targeted for gcc-9.
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87431#c7
     // https://gcc.gnu.org/viewcvs/gcc?view=revision&revision=267614
-#if !(defined(ABSL_USES_STD_VARIANT) && \
+#if !(defined(TURBO_USES_STD_VARIANT) && \
       defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE == 8)
     // - otherwise (index() != j), equivalent to
     // emplace<j>(get<j>(std::move(rhs)))
@@ -343,7 +343,7 @@ TEST(VariantExceptionSafetyTest, MoveAssign) {
                       auto copy = rhs;
                       *lhs = std::move(copy);
                     }));
-#endif  // !(defined(ABSL_USES_STD_VARIANT) &&
+#endif  // !(defined(TURBO_USES_STD_VARIANT) &&
         //   defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE == 8)
   }
 }
@@ -446,7 +446,7 @@ TEST(VariantExceptionSafetyTest, ValueAssign) {
   // and operator=(variant&&) invokes Tj's move ctor which doesn't throw.
   // libstdc++ std::variant has bugs on conversion assignment regarding
   // exception safety.
-#if !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#if !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
   {
     MoveNothrow rhs;
     EXPECT_TRUE(MakeExceptionSafetyTester()
@@ -454,7 +454,7 @@ TEST(VariantExceptionSafetyTest, ValueAssign) {
                     .WithContracts(VariantInvariants, strong_guarantee)
                     .Test([&rhs](ThrowingVariant* lhs) { *lhs = rhs; }));
   }
-#endif  // !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
+#endif  // !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
 }
 
 TEST(VariantExceptionSafetyTest, Emplace) {
@@ -524,9 +524,9 @@ TEST(VariantExceptionSafetyTest, Swap) {
 }
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // !defined(ABSL_INTERNAL_MSVC_2017_DBG_MODE)
+#endif  // !defined(TURBO_INTERNAL_MSVC_2017_DBG_MODE)
 
-#endif  // #if !defined(ABSL_USES_STD_VARIANT) && defined(ABSL_HAVE_EXCEPTIONS)
+#endif  // #if !defined(TURBO_USES_STD_VARIANT) && defined(TURBO_HAVE_EXCEPTIONS)

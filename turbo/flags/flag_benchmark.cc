@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,17 +30,17 @@
 namespace {
 using String = std::string;
 using VectorOfStrings = std::vector<std::string>;
-using AbslDuration = turbo::Duration;
+using TurboDuration = turbo::Duration;
 
 // We do not want to take over marshalling for the types turbo::optional<int>,
 // turbo::optional<std::string> which we do not own. Instead we introduce unique
 // "aliases" to these types, which we do.
-using AbslOptionalInt = turbo::optional<int>;
-struct OptionalInt : AbslOptionalInt {
-  using AbslOptionalInt::AbslOptionalInt;
+using TurboOptionalInt = turbo::optional<int>;
+struct OptionalInt : TurboOptionalInt {
+  using TurboOptionalInt::TurboOptionalInt;
 };
-// Next two functions represent Abseil Flags marshalling for OptionalInt.
-bool AbslParseFlag(turbo::string_view src, OptionalInt* flag,
+// Next two functions represent Turbo Flags marshalling for OptionalInt.
+bool TurboParseFlag(turbo::string_view src, OptionalInt* flag,
                    std::string* error) {
   int val;
   if (src.empty())
@@ -50,16 +50,16 @@ bool AbslParseFlag(turbo::string_view src, OptionalInt* flag,
   *flag = val;
   return true;
 }
-std::string AbslUnparseFlag(const OptionalInt& flag) {
+std::string TurboUnparseFlag(const OptionalInt& flag) {
   return !flag ? "" : turbo::UnparseFlag(*flag);
 }
 
-using AbslOptionalString = turbo::optional<std::string>;
-struct OptionalString : AbslOptionalString {
-  using AbslOptionalString::AbslOptionalString;
+using TurboOptionalString = turbo::optional<std::string>;
+struct OptionalString : TurboOptionalString {
+  using TurboOptionalString::TurboOptionalString;
 };
-// Next two functions represent Abseil Flags marshalling for OptionalString.
-bool AbslParseFlag(turbo::string_view src, OptionalString* flag,
+// Next two functions represent Turbo Flags marshalling for OptionalString.
+bool TurboParseFlag(turbo::string_view src, OptionalString* flag,
                    std::string* error) {
   std::string val;
   if (src.empty())
@@ -69,7 +69,7 @@ bool AbslParseFlag(turbo::string_view src, OptionalString* flag,
   *flag = val;
   return true;
 }
-std::string AbslUnparseFlag(const OptionalString& flag) {
+std::string TurboUnparseFlag(const OptionalString& flag) {
   return !flag ? "" : turbo::UnparseFlag(*flag);
 }
 
@@ -78,9 +78,9 @@ struct UDT {
   UDT(const UDT&) {}
   UDT& operator=(const UDT&) { return *this; }
 };
-// Next two functions represent Abseil Flags marshalling for UDT.
-bool AbslParseFlag(turbo::string_view, UDT*, std::string*) { return true; }
-std::string AbslUnparseFlag(const UDT&) { return ""; }
+// Next two functions represent Turbo Flags marshalling for UDT.
+bool TurboParseFlag(turbo::string_view, UDT*, std::string*) { return true; }
+std::string TurboUnparseFlag(const UDT&) { return ""; }
 
 }  // namespace
 
@@ -98,7 +98,7 @@ std::string AbslUnparseFlag(const UDT&) { return ""; }
   A(VectorOfStrings)         \
   A(OptionalInt)             \
   A(OptionalString)          \
-  A(AbslDuration)            \
+  A(TurboDuration)            \
   A(UDT)
 
 #define REPLICATE_0(A, T, name, index) A(T, name, index)
@@ -142,7 +142,7 @@ constexpr size_t kNumFlags = 0 REPLICATE(COUNT, _, _);
 // benchmark results more reproducible across unrelated code changes.
 #pragma clang section data = ".benchmark_flags"
 #endif
-#define DEFINE_FLAG(T, name, index) ABSL_FLAG(T, name##_##index, {}, "");
+#define DEFINE_FLAG(T, name, index) TURBO_FLAG(T, name##_##index, {}, "");
 #define FLAG_DEF(T) REPLICATE(DEFINE_FLAG, T, T##_flag);
 BENCHMARKED_TYPES(FLAG_DEF)
 #if defined(__clang__) && defined(__linux__)
@@ -151,7 +151,7 @@ BENCHMARKED_TYPES(FLAG_DEF)
 // Register thousands of flags to bloat up the size of the registry.
 // This mimics real life production binaries.
 #define BLOAT_FLAG(_unused1, _unused2, index) \
-  ABSL_FLAG(int, bloat_flag_##index, 0, "");
+  TURBO_FLAG(int, bloat_flag_##index, 0, "");
 REPLICATE_ALL(BLOAT_FLAG, _, _)
 
 namespace {
@@ -244,8 +244,8 @@ BENCHMARK(BM_ThreadedFindCommandLineFlag)->ThreadRange(1, 16);
 #ifdef __llvm__
 // To view disassembly use: gdb ${BINARY}  -batch -ex "disassemble /s $FUNC"
 #define InvokeGetFlag(T)                                             \
-  T AbslInvokeGetFlag##T() { return turbo::GetFlag(SINGLE_FLAG(T)); } \
-  int odr##T = (benchmark::DoNotOptimize(AbslInvokeGetFlag##T), 1);
+  T TurboInvokeGetFlag##T() { return turbo::GetFlag(SINGLE_FLAG(T)); } \
+  int odr##T = (benchmark::DoNotOptimize(TurboInvokeGetFlag##T), 1);
 
 BENCHMARKED_TYPES(InvokeGetFlag)
 #endif  // __llvm__

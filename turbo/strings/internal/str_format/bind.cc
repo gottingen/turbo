@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <string>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace str_format_internal {
 
 namespace {
@@ -209,7 +209,7 @@ std::ostream& Streamable::Print(std::ostream& os) const {
 std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
                         turbo::Span<const FormatArgImpl> args) {
   size_t orig = out->size();
-  if (ABSL_PREDICT_FALSE(!FormatUntyped(out, format, args))) {
+  if (TURBO_PREDICT_FALSE(!FormatUntyped(out, format, args))) {
     out->erase(orig);
   }
   return *out;
@@ -218,7 +218,7 @@ std::string& AppendPack(std::string* out, const UntypedFormatSpecImpl format,
 std::string FormatPack(const UntypedFormatSpecImpl format,
                        turbo::Span<const FormatArgImpl> args) {
   std::string out;
-  if (ABSL_PREDICT_FALSE(!FormatUntyped(&out, format, args))) {
+  if (TURBO_PREDICT_FALSE(!FormatUntyped(&out, format, args))) {
     out.clear();
   }
   return out;
@@ -255,5 +255,5 @@ int SnprintF(char* output, size_t size, const UntypedFormatSpecImpl format,
 }
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

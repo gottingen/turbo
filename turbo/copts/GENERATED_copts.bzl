@@ -1,10 +1,10 @@
 """GENERATED! DO NOT MANUALLY EDIT THIS FILE.
 
 (1) Edit turbo/copts/copts.py.
-(2) Run `python <path_to_absl>/copts/generate_copts.py`.
+(2) Run `python <path_to_turbo>/copts/generate_copts.py`.
 """
 
-ABSL_CLANG_CL_FLAGS = [
+TURBO_CLANG_CL_FLAGS = [
     "/W3",
     "/DNOMINMAX",
     "/DWIN32_LEAN_AND_MEAN",
@@ -13,7 +13,7 @@ ABSL_CLANG_CL_FLAGS = [
     "/D_ENABLE_EXTENDED_ALIGNED_STORAGE",
 ]
 
-ABSL_CLANG_CL_TEST_FLAGS = [
+TURBO_CLANG_CL_TEST_FLAGS = [
     "/W3",
     "/DNOMINMAX",
     "/DWIN32_LEAN_AND_MEAN",
@@ -38,7 +38,7 @@ ABSL_CLANG_CL_TEST_FLAGS = [
     "-Wno-gnu-zero-variadic-macro-arguments",
 ]
 
-ABSL_GCC_FLAGS = [
+TURBO_GCC_FLAGS = [
     "-Wall",
     "-Wextra",
     "-Wcast-qual",
@@ -56,7 +56,7 @@ ABSL_GCC_FLAGS = [
     "-DNOMINMAX",
 ]
 
-ABSL_GCC_TEST_FLAGS = [
+TURBO_GCC_TEST_FLAGS = [
     "-Wall",
     "-Wextra",
     "-Wcast-qual",
@@ -80,7 +80,7 @@ ABSL_GCC_TEST_FLAGS = [
     "-Wno-unused-private-field",
 ]
 
-ABSL_LLVM_FLAGS = [
+TURBO_LLVM_FLAGS = [
     "-Wall",
     "-Wextra",
     "-Wcast-qual",
@@ -118,7 +118,7 @@ ABSL_LLVM_FLAGS = [
     "-DNOMINMAX",
 ]
 
-ABSL_LLVM_TEST_FLAGS = [
+TURBO_LLVM_TEST_FLAGS = [
     "-Wall",
     "-Wextra",
     "-Wcast-qual",
@@ -170,7 +170,7 @@ ABSL_LLVM_TEST_FLAGS = [
     "-Wno-gnu-zero-variadic-macro-arguments",
 ]
 
-ABSL_MSVC_FLAGS = [
+TURBO_MSVC_FLAGS = [
     "/W3",
     "/bigobj",
     "/wd4005",
@@ -187,11 +187,11 @@ ABSL_MSVC_FLAGS = [
     "/D_ENABLE_EXTENDED_ALIGNED_STORAGE",
 ]
 
-ABSL_MSVC_LINKOPTS = [
+TURBO_MSVC_LINKOPTS = [
     "-ignore:4221",
 ]
 
-ABSL_MSVC_TEST_FLAGS = [
+TURBO_MSVC_TEST_FLAGS = [
     "/W3",
     "/bigobj",
     "/wd4005",
@@ -213,18 +213,18 @@ ABSL_MSVC_TEST_FLAGS = [
     "/DNOMINMAX",
 ]
 
-ABSL_RANDOM_HWAES_ARM32_FLAGS = [
+TURBO_RANDOM_HWAES_ARM32_FLAGS = [
     "-mfpu=neon",
 ]
 
-ABSL_RANDOM_HWAES_ARM64_FLAGS = [
+TURBO_RANDOM_HWAES_ARM64_FLAGS = [
     "-march=armv8-a+crypto",
 ]
 
-ABSL_RANDOM_HWAES_MSVC_X64_FLAGS = [
+TURBO_RANDOM_HWAES_MSVC_X64_FLAGS = [
 ]
 
-ABSL_RANDOM_HWAES_X64_FLAGS = [
+TURBO_RANDOM_HWAES_X64_FLAGS = [
     "-maes",
     "-msse4.1",
 ]

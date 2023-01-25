@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 #include <sys/syscall.h>
 #endif
 
-#ifdef ABSL_HAVE_SEMAPHORE_H
+#ifdef TURBO_HAVE_SEMAPHORE_H
 #include <semaphore.h>
 #endif
 
@@ -50,7 +50,7 @@
 
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 static void MaybeBecomeIdle() {
@@ -65,7 +65,7 @@ static void MaybeBecomeIdle() {
   }
 }
 
-#if ABSL_WAITER_MODE == ABSL_WAITER_MODE_FUTEX
+#if TURBO_WAITER_MODE == TURBO_WAITER_MODE_FUTEX
 
 Waiter::Waiter() {
   futex_.store(0, std::memory_order_relaxed);
@@ -97,7 +97,7 @@ bool Waiter::Wait(KernelTimeout t) {
       } else if (err == -ETIMEDOUT) {
         return false;
       } else {
-        ABSL_RAW_LOG(FATAL, "Futex operation failed with error %d\n", err);
+        TURBO_RAW_LOG(FATAL, "Futex operation failed with error %d\n", err);
       }
     }
     first_pass = false;
@@ -114,19 +114,19 @@ void Waiter::Post() {
 void Waiter::Poke() {
   // Wake one thread waiting on the futex.
   const int err = Futex::Wake(&futex_, 1);
-  if (ABSL_PREDICT_FALSE(err < 0)) {
-    ABSL_RAW_LOG(FATAL, "Futex operation failed with error %d\n", err);
+  if (TURBO_PREDICT_FALSE(err < 0)) {
+    TURBO_RAW_LOG(FATAL, "Futex operation failed with error %d\n", err);
   }
 }
 
-#elif ABSL_WAITER_MODE == ABSL_WAITER_MODE_CONDVAR
+#elif TURBO_WAITER_MODE == TURBO_WAITER_MODE_CONDVAR
 
 class PthreadMutexHolder {
  public:
   explicit PthreadMutexHolder(pthread_mutex_t *mu) : mu_(mu) {
     const int err = pthread_mutex_lock(mu_);
     if (err != 0) {
-      ABSL_RAW_LOG(FATAL, "pthread_mutex_lock failed: %d", err);
+      TURBO_RAW_LOG(FATAL, "pthread_mutex_lock failed: %d", err);
     }
   }
 
@@ -136,7 +136,7 @@ class PthreadMutexHolder {
   ~PthreadMutexHolder() {
     const int err = pthread_mutex_unlock(mu_);
     if (err != 0) {
-      ABSL_RAW_LOG(FATAL, "pthread_mutex_unlock failed: %d", err);
+      TURBO_RAW_LOG(FATAL, "pthread_mutex_unlock failed: %d", err);
     }
   }
 
@@ -147,12 +147,12 @@ class PthreadMutexHolder {
 Waiter::Waiter() {
   const int err = pthread_mutex_init(&mu_, 0);
   if (err != 0) {
-    ABSL_RAW_LOG(FATAL, "pthread_mutex_init failed: %d", err);
+    TURBO_RAW_LOG(FATAL, "pthread_mutex_init failed: %d", err);
   }
 
   const int err2 = pthread_cond_init(&cv_, 0);
   if (err2 != 0) {
-    ABSL_RAW_LOG(FATAL, "pthread_cond_init failed: %d", err2);
+    TURBO_RAW_LOG(FATAL, "pthread_cond_init failed: %d", err2);
   }
 
   waiter_count_ = 0;
@@ -177,7 +177,7 @@ bool Waiter::Wait(KernelTimeout t) {
     if (!t.has_timeout()) {
       const int err = pthread_cond_wait(&cv_, &mu_);
       if (err != 0) {
-        ABSL_RAW_LOG(FATAL, "pthread_cond_wait failed: %d", err);
+        TURBO_RAW_LOG(FATAL, "pthread_cond_wait failed: %d", err);
       }
     } else {
       const int err = pthread_cond_timedwait(&cv_, &mu_, &abs_timeout);
@@ -186,7 +186,7 @@ bool Waiter::Wait(KernelTimeout t) {
         return false;
       }
       if (err != 0) {
-        ABSL_RAW_LOG(FATAL, "pthread_cond_timedwait failed: %d", err);
+        TURBO_RAW_LOG(FATAL, "pthread_cond_timedwait failed: %d", err);
       }
     }
     first_pass = false;
@@ -211,17 +211,17 @@ void Waiter::Poke() {
 void Waiter::InternalCondVarPoke() {
   if (waiter_count_ != 0) {
     const int err = pthread_cond_signal(&cv_);
-    if (ABSL_PREDICT_FALSE(err != 0)) {
-      ABSL_RAW_LOG(FATAL, "pthread_cond_signal failed: %d", err);
+    if (TURBO_PREDICT_FALSE(err != 0)) {
+      TURBO_RAW_LOG(FATAL, "pthread_cond_signal failed: %d", err);
     }
   }
 }
 
-#elif ABSL_WAITER_MODE == ABSL_WAITER_MODE_SEM
+#elif TURBO_WAITER_MODE == TURBO_WAITER_MODE_SEM
 
 Waiter::Waiter() {
   if (sem_init(&sem_, 0, 0) != 0) {
-    ABSL_RAW_LOG(FATAL, "sem_init failed with errno %d\n", errno);
+    TURBO_RAW_LOG(FATAL, "sem_init failed with errno %d\n", errno);
   }
   wakeups_.store(0, std::memory_order_relaxed);
 }
@@ -254,12 +254,12 @@ bool Waiter::Wait(KernelTimeout t) {
       if (!t.has_timeout()) {
         if (sem_wait(&sem_) == 0) break;
         if (errno == EINTR) continue;
-        ABSL_RAW_LOG(FATAL, "sem_wait failed: %d", errno);
+        TURBO_RAW_LOG(FATAL, "sem_wait failed: %d", errno);
       } else {
         if (sem_timedwait(&sem_, &abs_timeout) == 0) break;
         if (errno == EINTR) continue;
         if (errno == ETIMEDOUT) return false;
-        ABSL_RAW_LOG(FATAL, "sem_timedwait failed: %d", errno);
+        TURBO_RAW_LOG(FATAL, "sem_timedwait failed: %d", errno);
       }
     }
     first_pass = false;
@@ -276,11 +276,11 @@ void Waiter::Post() {
 
 void Waiter::Poke() {
   if (sem_post(&sem_) != 0) {  // Wake any semaphore waiter.
-    ABSL_RAW_LOG(FATAL, "sem_post failed with errno %d\n", errno);
+    TURBO_RAW_LOG(FATAL, "sem_post failed with errno %d\n", errno);
   }
 }
 
-#elif ABSL_WAITER_MODE == ABSL_WAITER_MODE_WIN32
+#elif TURBO_WAITER_MODE == TURBO_WAITER_MODE_WIN32
 
 class Waiter::WinHelper {
  public:
@@ -298,7 +298,7 @@ class Waiter::WinHelper {
                 "`mu_storage_` does not have the same alignment as SRWLOCK");
 
   static_assert(sizeof(CONDITION_VARIABLE) == sizeof(void *),
-                "`ABSL_CONDITION_VARIABLE_STORAGE` does not have the same size "
+                "`TURBO_CONDITION_VARIABLE_STORAGE` does not have the same size "
                 "as `CONDITION_VARIABLE`");
   static_assert(
       alignof(CONDITION_VARIABLE) == alignof(void *),
@@ -359,14 +359,14 @@ bool Waiter::Wait(KernelTimeout t) {
     // No wakeups available, time to wait.
     if (!SleepConditionVariableSRW(cv, mu, t.InMillisecondsFromNow(), 0)) {
       // GetLastError() returns a Win32 DWORD, but we assign to
-      // unsigned long to simplify the ABSL_RAW_LOG case below.  The uniform
+      // unsigned long to simplify the TURBO_RAW_LOG case below.  The uniform
       // initialization guarantees this is not a narrowing conversion.
       const unsigned long err{GetLastError()};  // NOLINT(runtime/int)
       if (err == ERROR_TIMEOUT) {
         --waiter_count_;
         return false;
       } else {
-        ABSL_RAW_LOG(FATAL, "SleepConditionVariableSRW failed: %lu", err);
+        TURBO_RAW_LOG(FATAL, "SleepConditionVariableSRW failed: %lu", err);
       }
     }
     first_pass = false;
@@ -395,9 +395,9 @@ void Waiter::InternalCondVarPoke() {
 }
 
 #else
-#error Unknown ABSL_WAITER_MODE
+#error Unknown TURBO_WAITER_MODE
 #endif
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

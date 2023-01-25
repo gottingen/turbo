@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ void BM_StressTest(benchmark::State& state) {
     for (int i = 0; i < num_nodes; i++) {
       int end = std::min(num_nodes, i + 5);
       for (int j = i + 1; j < end; j++) {
-        ABSL_RAW_CHECK(g.InsertEdge(nodes[i], nodes[j]), "");
+        TURBO_RAW_CHECK(g.InsertEdge(nodes[i], nodes[j]), "");
       }
     }
   }

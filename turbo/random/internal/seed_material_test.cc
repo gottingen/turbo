@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@
 #ifdef __ANDROID__
 // Android assert messages only go to system log, so death tests cannot inspect
 // the message for matching.
-#define ABSL_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
+#define TURBO_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
   EXPECT_DEATH_IF_SUPPORTED(statement, ".*")
 #else
-#define ABSL_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
+#define TURBO_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \
   EXPECT_DEATH_IF_SUPPORTED(statement, regex)
 #endif
 
@@ -79,7 +79,7 @@ TEST(ReadSeedMaterialFromOSEntropy, NullPtrVectorArgument) {
       turbo::Span<uint32_t>(nullptr, 32)));
 #else
   bool result;
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(
       result = turbo::random_internal::ReadSeedMaterialFromOSEntropy(
           turbo::Span<uint32_t>(nullptr, 32)),
       "!= nullptr");
@@ -120,7 +120,7 @@ TEST(ReadSeedMaterialFromURBG, NullUrbgArgument) {
       nullptr, turbo::Span<uint32_t>(seed_material, kSeedMaterialSize)));
 #else
   bool result;
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(
       result = turbo::random_internal::ReadSeedMaterialFromURBG<std::mt19937_64>(
           nullptr, turbo::Span<uint32_t>(seed_material, kSeedMaterialSize)),
       "!= nullptr");
@@ -135,7 +135,7 @@ TEST(ReadSeedMaterialFromURBG, NullPtrVectorArgument) {
       &urbg, turbo::Span<uint32_t>(nullptr, 32)));
 #else
   bool result;
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(
+  TURBO_EXPECT_DEATH_IF_SUPPORTED(
       result = turbo::random_internal::ReadSeedMaterialFromURBG(
           &urbg, turbo::Span<uint32_t>(nullptr, 32)),
       "!= nullptr");

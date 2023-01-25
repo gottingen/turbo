@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace {
 
@@ -168,32 +168,32 @@ std::ostream& operator<<(std::ostream& os, CivilSecond s) {
   return os << FormatCivilTime(s);
 }
 
-bool AbslParseFlag(string_view s, CivilSecond* c, std::string*) {
+bool TurboParseFlag(string_view s, CivilSecond* c, std::string*) {
   return ParseLenientCivilTime(s, c);
 }
-bool AbslParseFlag(string_view s, CivilMinute* c, std::string*) {
+bool TurboParseFlag(string_view s, CivilMinute* c, std::string*) {
   return ParseLenientCivilTime(s, c);
 }
-bool AbslParseFlag(string_view s, CivilHour* c, std::string*) {
+bool TurboParseFlag(string_view s, CivilHour* c, std::string*) {
   return ParseLenientCivilTime(s, c);
 }
-bool AbslParseFlag(string_view s, CivilDay* c, std::string*) {
+bool TurboParseFlag(string_view s, CivilDay* c, std::string*) {
   return ParseLenientCivilTime(s, c);
 }
-bool AbslParseFlag(string_view s, CivilMonth* c, std::string*) {
+bool TurboParseFlag(string_view s, CivilMonth* c, std::string*) {
   return ParseLenientCivilTime(s, c);
 }
-bool AbslParseFlag(string_view s, CivilYear* c, std::string*) {
+bool TurboParseFlag(string_view s, CivilYear* c, std::string*) {
   return ParseLenientCivilTime(s, c);
 }
-std::string AbslUnparseFlag(CivilSecond c) { return FormatCivilTime(c); }
-std::string AbslUnparseFlag(CivilMinute c) { return FormatCivilTime(c); }
-std::string AbslUnparseFlag(CivilHour c) { return FormatCivilTime(c); }
-std::string AbslUnparseFlag(CivilDay c) { return FormatCivilTime(c); }
-std::string AbslUnparseFlag(CivilMonth c) { return FormatCivilTime(c); }
-std::string AbslUnparseFlag(CivilYear c) { return FormatCivilTime(c); }
+std::string TurboUnparseFlag(CivilSecond c) { return FormatCivilTime(c); }
+std::string TurboUnparseFlag(CivilMinute c) { return FormatCivilTime(c); }
+std::string TurboUnparseFlag(CivilHour c) { return FormatCivilTime(c); }
+std::string TurboUnparseFlag(CivilDay c) { return FormatCivilTime(c); }
+std::string TurboUnparseFlag(CivilMonth c) { return FormatCivilTime(c); }
+std::string TurboUnparseFlag(CivilYear c) { return FormatCivilTime(c); }
 
 }  // namespace time_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

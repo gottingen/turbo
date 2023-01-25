@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
-#define ABSL_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
+#ifndef TURBO_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
+#define TURBO_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
 
 #include <cassert>
 #include <functional>
@@ -23,7 +23,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace functional_internal {
 
 // Like a void* that can handle function pointers as well. The standard does not
@@ -100,7 +100,7 @@ template <bool C>
 using EnableIf = typename ::std::enable_if<C, int>::type;
 
 }  // namespace functional_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
+#endif  // TURBO_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_

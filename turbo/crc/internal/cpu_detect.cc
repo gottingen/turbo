@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 #if defined(__x86_64__) || defined(_M_X64)
@@ -215,7 +215,7 @@ bool SupportsArmCRC32PMULL() { return false; }
 #define HWCAP_CPUID (1 << 11)
 #endif
 
-#define ABSL_INTERNAL_AARCH64_ID_REG_READ(id, val) \
+#define TURBO_INTERNAL_AARCH64_ID_REG_READ(id, val) \
   asm("mrs %0, " #id : "=r"(val))
 
 CpuType GetCpuType() {
@@ -228,7 +228,7 @@ CpuType GetCpuType() {
   uint64_t hwcaps = getauxval(AT_HWCAP);
   if (hwcaps & HWCAP_CPUID) {
     uint64_t midr = 0;
-    ABSL_INTERNAL_AARCH64_ID_REG_READ(MIDR_EL1, midr);
+    TURBO_INTERNAL_AARCH64_ID_REG_READ(MIDR_EL1, midr);
     uint32_t implementer = (midr >> 24) & 0xff;
     uint32_t part_number = (midr >> 4) & 0xfff;
     if (implementer == 0x41 && part_number == 0xd0c) {
@@ -252,5 +252,5 @@ bool SupportsArmCRC32PMULL() { return false; }
 #endif
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

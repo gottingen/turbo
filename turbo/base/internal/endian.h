@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_BASE_INTERNAL_ENDIAN_H_
-#define ABSL_BASE_INTERNAL_ENDIAN_H_
+#ifndef TURBO_BASE_INTERNAL_ENDIAN_H_
+#define TURBO_BASE_INTERNAL_ENDIAN_H_
 
 #include <cstdint>
 #include <cstdlib>
@@ -25,10 +25,10 @@
 #include "turbo/base/port.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 inline uint64_t gbswap_64(uint64_t host_int) {
-#if ABSL_HAVE_BUILTIN(__builtin_bswap64) || defined(__GNUC__)
+#if TURBO_HAVE_BUILTIN(__builtin_bswap64) || defined(__GNUC__)
   return __builtin_bswap64(host_int);
 #elif defined(_MSC_VER)
   return _byteswap_uint64(host_int);
@@ -45,7 +45,7 @@ inline uint64_t gbswap_64(uint64_t host_int) {
 }
 
 inline uint32_t gbswap_32(uint32_t host_int) {
-#if ABSL_HAVE_BUILTIN(__builtin_bswap32) || defined(__GNUC__)
+#if TURBO_HAVE_BUILTIN(__builtin_bswap32) || defined(__GNUC__)
   return __builtin_bswap32(host_int);
 #elif defined(_MSC_VER)
   return _byteswap_ulong(host_int);
@@ -58,7 +58,7 @@ inline uint32_t gbswap_32(uint32_t host_int) {
 }
 
 inline uint16_t gbswap_16(uint16_t host_int) {
-#if ABSL_HAVE_BUILTIN(__builtin_bswap16) || defined(__GNUC__)
+#if TURBO_HAVE_BUILTIN(__builtin_bswap16) || defined(__GNUC__)
   return __builtin_bswap16(host_int);
 #elif defined(_MSC_VER)
   return _byteswap_ushort(host_int);
@@ -68,7 +68,7 @@ inline uint16_t gbswap_16(uint16_t host_int) {
 #endif
 }
 
-#ifdef ABSL_IS_LITTLE_ENDIAN
+#ifdef TURBO_IS_LITTLE_ENDIAN
 
 // Portable definitions for htonl (host-to-network) and friends on little-endian
 // architectures.
@@ -76,7 +76,7 @@ inline uint16_t ghtons(uint16_t x) { return gbswap_16(x); }
 inline uint32_t ghtonl(uint32_t x) { return gbswap_32(x); }
 inline uint64_t ghtonll(uint64_t x) { return gbswap_64(x); }
 
-#elif defined ABSL_IS_BIG_ENDIAN
+#elif defined TURBO_IS_BIG_ENDIAN
 
 // Portable definitions for htonl (host-to-network) etc on big-endian
 // architectures. These definitions are simpler since the host byte order is the
@@ -87,8 +87,8 @@ inline uint64_t ghtonll(uint64_t x) { return x; }
 
 #else
 #error \
-    "Unsupported byte order: Either ABSL_IS_BIG_ENDIAN or " \
-       "ABSL_IS_LITTLE_ENDIAN must be defined"
+    "Unsupported byte order: Either TURBO_IS_BIG_ENDIAN or " \
+       "TURBO_IS_LITTLE_ENDIAN must be defined"
 #endif  // byte order
 
 inline uint16_t gntohs(uint16_t x) { return ghtons(x); }
@@ -101,7 +101,7 @@ inline uint64_t gntohll(uint64_t x) { return ghtonll(x); }
 // Load/Store methods are alignment safe
 namespace little_endian {
 // Conversion functions.
-#ifdef ABSL_IS_LITTLE_ENDIAN
+#ifdef TURBO_IS_LITTLE_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return x; }
 inline uint16_t ToHost16(uint16_t x) { return x; }
@@ -114,7 +114,7 @@ inline uint64_t ToHost64(uint64_t x) { return x; }
 
 inline constexpr bool IsLittleEndian() { return true; }
 
-#elif defined ABSL_IS_BIG_ENDIAN
+#elif defined TURBO_IS_BIG_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return gbswap_16(x); }
 inline uint16_t ToHost16(uint16_t x) { return gbswap_16(x); }
@@ -161,27 +161,27 @@ inline int64_t ToHost(int64_t x) {
 
 // Functions to do unaligned loads and stores in little-endian order.
 inline uint16_t Load16(const void *p) {
-  return ToHost16(ABSL_INTERNAL_UNALIGNED_LOAD16(p));
+  return ToHost16(TURBO_INTERNAL_UNALIGNED_LOAD16(p));
 }
 
 inline void Store16(void *p, uint16_t v) {
-  ABSL_INTERNAL_UNALIGNED_STORE16(p, FromHost16(v));
+  TURBO_INTERNAL_UNALIGNED_STORE16(p, FromHost16(v));
 }
 
 inline uint32_t Load32(const void *p) {
-  return ToHost32(ABSL_INTERNAL_UNALIGNED_LOAD32(p));
+  return ToHost32(TURBO_INTERNAL_UNALIGNED_LOAD32(p));
 }
 
 inline void Store32(void *p, uint32_t v) {
-  ABSL_INTERNAL_UNALIGNED_STORE32(p, FromHost32(v));
+  TURBO_INTERNAL_UNALIGNED_STORE32(p, FromHost32(v));
 }
 
 inline uint64_t Load64(const void *p) {
-  return ToHost64(ABSL_INTERNAL_UNALIGNED_LOAD64(p));
+  return ToHost64(TURBO_INTERNAL_UNALIGNED_LOAD64(p));
 }
 
 inline void Store64(void *p, uint64_t v) {
-  ABSL_INTERNAL_UNALIGNED_STORE64(p, FromHost64(v));
+  TURBO_INTERNAL_UNALIGNED_STORE64(p, FromHost64(v));
 }
 
 }  // namespace little_endian
@@ -191,7 +191,7 @@ inline void Store64(void *p, uint64_t v) {
 //
 // Load/Store methods are alignment safe
 namespace big_endian {
-#ifdef ABSL_IS_LITTLE_ENDIAN
+#ifdef TURBO_IS_LITTLE_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return gbswap_16(x); }
 inline uint16_t ToHost16(uint16_t x) { return gbswap_16(x); }
@@ -204,7 +204,7 @@ inline uint64_t ToHost64(uint64_t x) { return gbswap_64(x); }
 
 inline constexpr bool IsLittleEndian() { return true; }
 
-#elif defined ABSL_IS_BIG_ENDIAN
+#elif defined TURBO_IS_BIG_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return x; }
 inline uint16_t ToHost16(uint16_t x) { return x; }
@@ -251,32 +251,32 @@ inline int64_t ToHost(int64_t x) {
 
 // Functions to do unaligned loads and stores in big-endian order.
 inline uint16_t Load16(const void *p) {
-  return ToHost16(ABSL_INTERNAL_UNALIGNED_LOAD16(p));
+  return ToHost16(TURBO_INTERNAL_UNALIGNED_LOAD16(p));
 }
 
 inline void Store16(void *p, uint16_t v) {
-  ABSL_INTERNAL_UNALIGNED_STORE16(p, FromHost16(v));
+  TURBO_INTERNAL_UNALIGNED_STORE16(p, FromHost16(v));
 }
 
 inline uint32_t Load32(const void *p) {
-  return ToHost32(ABSL_INTERNAL_UNALIGNED_LOAD32(p));
+  return ToHost32(TURBO_INTERNAL_UNALIGNED_LOAD32(p));
 }
 
 inline void Store32(void *p, uint32_t v) {
-  ABSL_INTERNAL_UNALIGNED_STORE32(p, FromHost32(v));
+  TURBO_INTERNAL_UNALIGNED_STORE32(p, FromHost32(v));
 }
 
 inline uint64_t Load64(const void *p) {
-  return ToHost64(ABSL_INTERNAL_UNALIGNED_LOAD64(p));
+  return ToHost64(TURBO_INTERNAL_UNALIGNED_LOAD64(p));
 }
 
 inline void Store64(void *p, uint64_t v) {
-  ABSL_INTERNAL_UNALIGNED_STORE64(p, FromHost64(v));
+  TURBO_INTERNAL_UNALIGNED_STORE64(p, FromHost64(v));
 }
 
 }  // namespace big_endian
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_ENDIAN_H_
+#endif  // TURBO_BASE_INTERNAL_ENDIAN_H_

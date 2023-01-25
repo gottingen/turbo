@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_BETA_DISTRIBUTION_H_
-#define ABSL_RANDOM_BETA_DISTRIBUTION_H_
+#ifndef TURBO_RANDOM_BETA_DISTRIBUTION_H_
+#define TURBO_RANDOM_BETA_DISTRIBUTION_H_
 
 #include <cassert>
 #include <cmath>
@@ -29,7 +29,7 @@
 #include "turbo/random/internal/iostream_state_saver.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::beta_distribution:
 // Generate a floating-point variate conforming to a Beta distribution:
@@ -134,21 +134,21 @@ class beta_distribution {
 #ifdef _MSC_VER
     // MSVC does not have constexpr implementations for std::log and std::exp
     // so they are computed at runtime.
-#define ABSL_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR
+#define TURBO_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR
 #else
-#define ABSL_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR constexpr
+#define TURBO_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR constexpr
 #endif
 
     // The threshold for whether std::exp(1/a) is finite.
     // Note that this value is quite large, and a smaller a_ is NOT abnormal.
-    static ABSL_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR result_type
+    static TURBO_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR result_type
     ThresholdForSmallA() {
       return result_type(1) /
              std::log((std::numeric_limits<result_type>::max)());
     }
 
     // The threshold for whether a * std::log(a) is finite.
-    static ABSL_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR result_type
+    static TURBO_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR result_type
     ThresholdForLargeA() {
       return std::exp(
           std::log((std::numeric_limits<result_type>::max)()) -
@@ -156,7 +156,7 @@ class beta_distribution {
           ThresholdPadding());
     }
 
-#undef ABSL_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR
+#undef TURBO_RANDOM_INTERNAL_LOG_EXP_CONSTEXPR
 
     // Pad the threshold for large A for long double on PPC. This is done via a
     // template specialization below.
@@ -385,7 +385,7 @@ beta_distribution<RealType>::operator()(URBG& g,  // NOLINT(runtime/references)
     case param_type::JOEHNK:
       return AlgorithmJoehnk(g, p);
     case param_type::CHENG_BA:
-      ABSL_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH_INTENDED;
     case param_type::CHENG_BB:
       return AlgorithmCheng(g, p);
     default:
@@ -421,7 +421,7 @@ std::basic_istream<CharT, Traits>& operator>>(
   return is;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_BETA_DISTRIBUTION_H_
+#endif  // TURBO_RANDOM_BETA_DISTRIBUTION_H_

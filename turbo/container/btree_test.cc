@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,10 +47,10 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/types/compare.h"
 
-ABSL_FLAG(int, test_values, 10000, "The number of values to use for tests");
+TURBO_FLAG(int, test_values, 10000, "The number of values to use for tests");
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
@@ -66,7 +66,7 @@ using ::testing::SizeIs;
 
 template <typename T, typename U>
 void CheckPairEquals(const T &x, const U &y) {
-  ABSL_INTERNAL_CHECK(x == y, "Values are unequal.");
+  TURBO_INTERNAL_CHECK(x == y, "Values are unequal.");
 }
 
 template <typename T, typename U, typename V, typename W>
@@ -127,7 +127,7 @@ class base_checker {
   template <typename IterType, typename CheckerIterType>
   IterType iter_check(IterType tree_iter, CheckerIterType checker_iter) const {
     if (tree_iter == tree_.end()) {
-      ABSL_INTERNAL_CHECK(checker_iter == checker_.end(),
+      TURBO_INTERNAL_CHECK(checker_iter == checker_.end(),
                           "Checker iterator not at end.");
     } else {
       CheckPairEquals(*tree_iter, *checker_iter);
@@ -137,7 +137,7 @@ class base_checker {
   template <typename IterType, typename CheckerIterType>
   IterType riter_check(IterType tree_iter, CheckerIterType checker_iter) const {
     if (tree_iter == tree_.rend()) {
-      ABSL_INTERNAL_CHECK(checker_iter == checker_.rend(),
+      TURBO_INTERNAL_CHECK(checker_iter == checker_.rend(),
                           "Checker iterator not at rend.");
     } else {
       CheckPairEquals(*tree_iter, *checker_iter);
@@ -1249,17 +1249,17 @@ class BtreeMapTest : public ::testing::Test {
   };
 
   struct KeyLin {
-    using absl_btree_prefer_linear_node_search = std::true_type;
+    using turbo_btree_prefer_linear_node_search = std::true_type;
   };
   struct CmpLin : Cmp {
-    using absl_btree_prefer_linear_node_search = std::true_type;
+    using turbo_btree_prefer_linear_node_search = std::true_type;
   };
 
   struct KeyBin {
-    using absl_btree_prefer_linear_node_search = std::false_type;
+    using turbo_btree_prefer_linear_node_search = std::false_type;
   };
   struct CmpBin : Cmp {
-    using absl_btree_prefer_linear_node_search = std::false_type;
+    using turbo_btree_prefer_linear_node_search = std::false_type;
   };
 
   template <typename K, typename C>
@@ -1648,7 +1648,7 @@ TEST(Btree, MapAt) {
   const turbo::btree_map<int, int> &const_map = map;
   EXPECT_EQ(const_map.at(1), 2);
   EXPECT_EQ(const_map.at(2), 8);
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW(map.at(3), std::out_of_range);
 #else
   EXPECT_DEATH_IF_SUPPORTED(map.at(3), "turbo::btree_map::at");
@@ -1814,7 +1814,7 @@ TEST(Btree, SwissTableHashable) {
   for (int v : values) map_values.emplace_back(v, -v);
 
   using set = turbo::btree_set<int>;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly({
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly({
       set{},
       set{1},
       set{2},
@@ -1825,7 +1825,7 @@ TEST(Btree, SwissTableHashable) {
   }));
 
   using mset = turbo::btree_multiset<int>;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly({
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly({
       mset{},
       mset{1},
       mset{1, 1},
@@ -1840,7 +1840,7 @@ TEST(Btree, SwissTableHashable) {
   }));
 
   using map = turbo::btree_map<int, int>;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly({
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly({
       map{},
       map{{1, 0}},
       map{{1, 1}},
@@ -1852,7 +1852,7 @@ TEST(Btree, SwissTableHashable) {
   }));
 
   using mmap = turbo::btree_multimap<int, int>;
-  EXPECT_TRUE(turbo::VerifyTypeImplementsAbslHashCorrectly({
+  EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly({
       mmap{},
       mmap{{1, 0}},
       mmap{{1, 1}},
@@ -3466,5 +3466,5 @@ TEST(Btree, InvalidIteratorComparison) {
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

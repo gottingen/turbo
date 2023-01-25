@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_DISCRETE_DISTRIBUTION_H_
-#define ABSL_RANDOM_DISCRETE_DISTRIBUTION_H_
+#ifndef TURBO_RANDOM_DISCRETE_DISTRIBUTION_H_
+#define TURBO_RANDOM_DISCRETE_DISTRIBUTION_H_
 
 #include <cassert>
 #include <cmath>
@@ -29,7 +29,7 @@
 #include "turbo/random/uniform_int_distribution.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::discrete_distribution
 //
@@ -241,7 +241,7 @@ std::basic_istream<CharT, Traits>& operator>>(
   return is;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_DISCRETE_DISTRIBUTION_H_
+#endif  // TURBO_RANDOM_DISCRETE_DISTRIBUTION_H_

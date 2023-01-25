@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 #include "turbo/types/bad_any_cast.h"
 
-#ifndef ABSL_USES_STD_ANY
+#ifndef TURBO_USES_STD_ANY
 
 #include <cstdlib>
 
@@ -22,7 +22,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 bad_any_cast::~bad_any_cast() = default;
 
@@ -31,16 +31,16 @@ const char* bad_any_cast::what() const noexcept { return "Bad any cast"; }
 namespace any_internal {
 
 void ThrowBadAnyCast() {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   throw bad_any_cast();
 #else
-  ABSL_RAW_LOG(FATAL, "Bad any cast");
+  TURBO_RAW_LOG(FATAL, "Bad any cast");
   std::abort();
 #endif
 }
 
 }  // namespace any_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USES_STD_ANY
+#endif  // TURBO_USES_STD_ANY

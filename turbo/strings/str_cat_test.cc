@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@
 #ifdef __ANDROID__
 // Android assert messages only go to system log, so death tests cannot inspect
 // the message for matching.
-#define ABSL_EXPECT_DEBUG_DEATH(statement, regex) \
+#define TURBO_EXPECT_DEBUG_DEATH(statement, regex) \
   EXPECT_DEBUG_DEATH(statement, ".*")
 #else
-#define ABSL_EXPECT_DEBUG_DEATH(statement, regex) \
+#define TURBO_EXPECT_DEBUG_DEATH(statement, regex) \
   EXPECT_DEBUG_DEATH(statement, regex)
 #endif
 
@@ -448,9 +448,9 @@ TEST(StrAppend, Death) {
   std::string s = "self";
   // on linux it's "assertion", on mac it's "Assertion",
   // on chromiumos it's "Assertion ... failed".
-  ABSL_EXPECT_DEBUG_DEATH(turbo::StrAppend(&s, s.c_str() + 1),
+  TURBO_EXPECT_DEBUG_DEATH(turbo::StrAppend(&s, s.c_str() + 1),
                           "ssertion.*failed");
-  ABSL_EXPECT_DEBUG_DEATH(turbo::StrAppend(&s, s), "ssertion.*failed");
+  TURBO_EXPECT_DEBUG_DEATH(turbo::StrAppend(&s, s), "ssertion.*failed");
 }
 #endif  // GTEST_HAS_DEATH_TEST
 
@@ -615,7 +615,7 @@ TEST(Numbers, TestFunctionsMovedOverFromNumbersMain) {
 
 struct PointStringify {
   template <typename FormatSink>
-  friend void AbslStringify(FormatSink& sink, const PointStringify& p) {
+  friend void TurboStringify(FormatSink& sink, const PointStringify& p) {
     sink.Append("(");
     sink.Append(turbo::StrCat(p.x));
     sink.Append(", ");
@@ -627,7 +627,7 @@ struct PointStringify {
   double y = 20.0;
 };
 
-TEST(StrCat, AbslStringifyExample) {
+TEST(StrCat, TurboStringifyExample) {
   PointStringify p;
   EXPECT_EQ(turbo::StrCat(p), "(10, 20)");
   EXPECT_EQ(turbo::StrCat("a ", p, " z"), "a (10, 20) z");
@@ -635,7 +635,7 @@ TEST(StrCat, AbslStringifyExample) {
 
 struct PointStringifyUsingFormat {
   template <typename FormatSink>
-  friend void AbslStringify(FormatSink& sink,
+  friend void TurboStringify(FormatSink& sink,
                             const PointStringifyUsingFormat& p) {
     turbo::Format(&sink, "(%g, %g)", p.x, p.y);
   }
@@ -644,7 +644,7 @@ struct PointStringifyUsingFormat {
   double y = 20.0;
 };
 
-TEST(StrCat, AbslStringifyExampleUsingFormat) {
+TEST(StrCat, TurboStringifyExampleUsingFormat) {
   PointStringifyUsingFormat p;
   EXPECT_EQ(turbo::StrCat(p), "(10, 20)");
   EXPECT_EQ(turbo::StrCat("a ", p, " z"), "a (10, 20) z");
@@ -653,11 +653,11 @@ TEST(StrCat, AbslStringifyExampleUsingFormat) {
 enum class EnumWithStringify { Many = 0, Choices = 1 };
 
 template <typename Sink>
-void AbslStringify(Sink& sink, EnumWithStringify e) {
+void TurboStringify(Sink& sink, EnumWithStringify e) {
   turbo::Format(&sink, "%s", e == EnumWithStringify::Many ? "Many" : "Choices");
 }
 
-TEST(StrCat, AbslStringifyWithEnum) {
+TEST(StrCat, TurboStringifyWithEnum) {
   const auto e = EnumWithStringify::Choices;
   EXPECT_EQ(turbo::StrCat(e), "Choices");
 }

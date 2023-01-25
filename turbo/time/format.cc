@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@
 namespace cctz = turbo::time_internal::cctz;
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
-ABSL_DLL extern const char RFC3339_full[] = "%Y-%m-%d%ET%H:%M:%E*S%Ez";
-ABSL_DLL extern const char RFC3339_sec[] = "%Y-%m-%d%ET%H:%M:%S%Ez";
+TURBO_DLL extern const char RFC3339_full[] = "%Y-%m-%d%ET%H:%M:%E*S%Ez";
+TURBO_DLL extern const char RFC3339_sec[] = "%Y-%m-%d%ET%H:%M:%S%Ez";
 
-ABSL_DLL extern const char RFC1123_full[] = "%a, %d %b %E4Y %H:%M:%S %z";
-ABSL_DLL extern const char RFC1123_no_wday[] = "%d %b %E4Y %H:%M:%S %z";
+TURBO_DLL extern const char RFC1123_full[] = "%a, %d %b %E4Y %H:%M:%S %z";
+TURBO_DLL extern const char RFC1123_no_wday[] = "%d %b %E4Y %H:%M:%S %z";
 
 namespace {
 
@@ -142,11 +142,11 @@ bool ParseTime(turbo::string_view format, turbo::string_view input,
 }
 
 // Functions required to support turbo::Time flags.
-bool AbslParseFlag(turbo::string_view text, turbo::Time* t, std::string* error) {
+bool TurboParseFlag(turbo::string_view text, turbo::Time* t, std::string* error) {
   return turbo::ParseTime(RFC3339_full, text, turbo::UTCTimeZone(), t, error);
 }
 
-std::string AbslUnparseFlag(turbo::Time t) {
+std::string TurboUnparseFlag(turbo::Time t) {
   return turbo::FormatTime(RFC3339_full, t, turbo::UTCTimeZone());
 }
 bool ParseFlag(const std::string& text, turbo::Time* t, std::string* error) {
@@ -157,5 +157,5 @@ std::string UnparseFlag(turbo::Time t) {
   return turbo::FormatTime(RFC3339_full, t, turbo::UTCTimeZone());
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

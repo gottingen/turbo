@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,38 +14,38 @@
 # limitations under the License.
 #
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     algorithm
   HDRS
     "algorithm.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     algorithm_test
   SRCS
     "algorithm_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::algorithm
     turbo::config
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     algorithm_container
   HDRS
     "container.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::algorithm
     turbo::core_headers
@@ -53,13 +53,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     container_test
   SRCS
     "container_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::algorithm_container
     turbo::base

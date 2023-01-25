@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 // -----------------------------------------------------------------------------
 //
 
-#ifndef ABSL_LOG_INTERNAL_CONFIG_H_
-#define ABSL_LOG_INTERNAL_CONFIG_H_
+#ifndef TURBO_LOG_INTERNAL_CONFIG_H_
+#define TURBO_LOG_INTERNAL_CONFIG_H_
 
 #include "turbo/base/config.h"
 
@@ -29,7 +29,7 @@
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 #ifdef _WIN32
@@ -39,7 +39,7 @@ using Tid = pid_t;
 #endif
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_CONFIG_H_
+#endif  // TURBO_LOG_INTERNAL_CONFIG_H_

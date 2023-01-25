@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ EM_JS(bool, HaveOffsetConverter, (),
 // clang-format on
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 void InitializeSymbolizer(const char*) {
   if (!HaveOffsetConverter()) {
-    ABSL_RAW_LOG(INFO,
+    TURBO_RAW_LOG(INFO,
                  "Symbolization unavailable. Rebuild with -sWASM=1 "
                  "and -sUSE_OFFSET_CONVERTER=1.");
   }
@@ -68,5 +68,5 @@ bool Symbolize(const void* pc, char* out, int out_size) {
   return true;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

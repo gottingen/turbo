@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,13 +55,13 @@
 #include "turbo/time/time.h"
 #include "turbo/types/span.h"
 
-extern "C" ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(
-    AbslInternalOnFatalLogMessage)(const turbo::LogEntry&) {
+extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
+    TurboInternalOnFatalLogMessage)(const turbo::LogEntry&) {
   // Default - Do nothing
 }
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 namespace {
@@ -234,9 +234,9 @@ LogMessage::LogMessage(const char* file, int line, turbo::LogSeverity severity)
 }
 
 LogMessage::~LogMessage() {
-#ifdef ABSL_MIN_LOG_LEVEL
+#ifdef TURBO_MIN_LOG_LEVEL
   if (data_->entry.log_severity() <
-          static_cast<turbo::LogSeverity>(ABSL_MIN_LOG_LEVEL) &&
+          static_cast<turbo::LogSeverity>(TURBO_MIN_LOG_LEVEL) &&
       data_->entry.log_severity() < turbo::LogSeverity::kFatal) {
     return;
   }
@@ -294,13 +294,13 @@ LogMessage& LogMessage::WithPerror() {
 }
 
 LogMessage& LogMessage::ToSinkAlso(turbo::LogSink* sink) {
-  ABSL_INTERNAL_CHECK(sink, "null LogSink*");
+  TURBO_INTERNAL_CHECK(sink, "null LogSink*");
   data_->extra_sinks.push_back(sink);
   return *this;
 }
 
 LogMessage& LogMessage::ToSinkOnly(turbo::LogSink* sink) {
-  ABSL_INTERNAL_CHECK(sink, "null LogSink*");
+  TURBO_INTERNAL_CHECK(sink, "null LogSink*");
   data_->extra_sinks.clear();
   data_->extra_sinks.push_back(sink);
   data_->extra_sinks_only = true;
@@ -308,8 +308,8 @@ LogMessage& LogMessage::ToSinkOnly(turbo::LogSink* sink) {
 }
 
 #ifdef __ELF__
-extern "C" void __gcov_dump() ABSL_ATTRIBUTE_WEAK;
-extern "C" void __gcov_flush() ABSL_ATTRIBUTE_WEAK;
+extern "C" void __gcov_dump() TURBO_ATTRIBUTE_WEAK;
+extern "C" void __gcov_flush() TURBO_ATTRIBUTE_WEAK;
 #endif
 
 void LogMessage::FailWithoutStackTrace() {
@@ -391,7 +391,7 @@ void LogMessage::Flush() {
   }
 
   // Have we already seen a fatal message?
-  ABSL_CONST_INIT static std::atomic<bool> seen_fatal(false);
+  TURBO_CONST_INIT static std::atomic<bool> seen_fatal(false);
   if (data_->entry.log_severity() == turbo::LogSeverity::kFatal &&
       turbo::log_internal::ExitOnDFatal()) {
     // Exactly one LOG(FATAL) message is responsible for aborting the process,
@@ -463,7 +463,7 @@ void LogMessage::PrepareToDie() {
   // someone else can use them (as long as they flush afterwards)
   if (data_->first_fatal) {
     // Notify observers about the upcoming fatal error.
-    ABSL_INTERNAL_C_SYMBOL(AbslInternalOnFatalLogMessage)(data_->entry);
+    TURBO_INTERNAL_C_SYMBOL(TurboInternalOnFatalLogMessage)(data_->entry);
   }
 
   if (!data_->fail_quietly) {
@@ -571,7 +571,7 @@ LogMessageFatal::LogMessageFatal(const char* file, int line,
   *this << "Check failed: " << failure_msg << " ";
 }
 
-// ABSL_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+// TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
 // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
@@ -597,7 +597,7 @@ LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line,
   *this << "Check failed: " << failure_msg << " ";
 }
 
-// ABSL_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+// TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
 // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
@@ -613,5 +613,5 @@ LogMessageQuietlyFatal::~LogMessageQuietlyFatal() {
 
 }  // namespace log_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

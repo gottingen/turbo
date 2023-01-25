@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@
 // for `std::unordered_map`. Like `unordered_map`, search, insertion, and
 // deletion of map elements can be done as an `O(1)` operation. However,
 // `flat_hash_map` (and other unordered associative containers known as the
-// collection of Abseil "Swiss tables") contain other optimizations that result
+// collection of Turbo "Swiss tables") contain other optimizations that result
 // in both memory and computation advantages.
 //
 // In most cases, your default choice for a hash map should be a map of type
 // `flat_hash_map`.
 
-#ifndef ABSL_CONTAINER_FLAT_HASH_MAP_H_
-#define ABSL_CONTAINER_FLAT_HASH_MAP_H_
+#ifndef TURBO_CONTAINER_FLAT_HASH_MAP_H_
+#define TURBO_CONTAINER_FLAT_HASH_MAP_H_
 
 #include <cstddef>
 #include <new>
@@ -43,7 +43,7 @@
 #include "turbo/memory/memory.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 template <class K, class V>
 struct FlatHashMapPolicy;
@@ -70,10 +70,10 @@ struct FlatHashMapPolicy;
 // * Returns `void` from the `erase(iterator)` overload.
 //
 // By default, `flat_hash_map` uses the `turbo::Hash` hashing framework.
-// All fundamental and Abseil types that support the `turbo::Hash` framework have
+// All fundamental and Turbo types that support the `turbo::Hash` framework have
 // a compatible equality operator for comparing insertions into `flat_hash_map`.
 // If your type is not yet supported by the `turbo::Hash` framework, see
-// turbo/hash/hash.h for information on extending Abseil hashing to user-defined
+// turbo/hash/hash.h for information on extending Turbo hashing to user-defined
 // types.
 //
 // Using `turbo::flat_hash_map` at interface boundaries in dynamically loaded
@@ -607,7 +607,7 @@ struct IsUnorderedContainer<
 
 }  // namespace container_algorithm_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_FLAT_HASH_MAP_H_
+#endif  // TURBO_CONTAINER_FLAT_HASH_MAP_H_

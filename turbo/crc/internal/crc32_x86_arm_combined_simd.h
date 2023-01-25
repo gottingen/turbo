@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_CRC32_X86_ARM_COMBINED_SIMD_H_
-#define ABSL_CRC_INTERNAL_CRC32_X86_ARM_COMBINED_SIMD_H_
+#ifndef TURBO_CRC_INTERNAL_CRC32_X86_ARM_COMBINED_SIMD_H_
+#define TURBO_CRC_INTERNAL_CRC32_X86_ARM_COMBINED_SIMD_H_
 
 #include <cstdint>
 
@@ -31,32 +31,32 @@
 #if defined(__x86_64__) && defined(__SSE4_2__) && defined(__PCLMUL__)
 
 #include <x86intrin.h>
-#define ABSL_CRC_INTERNAL_HAVE_X86_SIMD
+#define TURBO_CRC_INTERNAL_HAVE_X86_SIMD
 
 #elif defined(_MSC_VER) && defined(__AVX__)
 
 // MSVC AVX (/arch:AVX) implies SSE 4.2 and PCLMULQDQ.
 #include <intrin.h>
-#define ABSL_CRC_INTERNAL_HAVE_X86_SIMD
+#define TURBO_CRC_INTERNAL_HAVE_X86_SIMD
 
 #elif defined(__aarch64__) && defined(__LITTLE_ENDIAN__) && \
-    defined(__ARM_FEATURE_CRC32) && defined(ABSL_INTERNAL_HAVE_ARM_NEON) &&  \
+    defined(__ARM_FEATURE_CRC32) && defined(TURBO_INTERNAL_HAVE_ARM_NEON) &&  \
     defined(__ARM_FEATURE_CRYPTO)
 
 #include <arm_acle.h>
 #include <arm_neon.h>
-#define ABSL_CRC_INTERNAL_HAVE_ARM_SIMD
+#define TURBO_CRC_INTERNAL_HAVE_ARM_SIMD
 
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
-#if defined(ABSL_CRC_INTERNAL_HAVE_ARM_SIMD) || \
-    defined(ABSL_CRC_INTERNAL_HAVE_X86_SIMD)
+#if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) || \
+    defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
 
-#if defined(ABSL_CRC_INTERNAL_HAVE_ARM_SIMD)
+#if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD)
 using V128 = uint64x2_t;
 #else
 using V128 = __m128i;
@@ -117,7 +117,7 @@ V128 V128_ShiftLeft64(const V128 l, const V128 r);
 
 #endif
 
-#if defined(ABSL_CRC_INTERNAL_HAVE_X86_SIMD)
+#if defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
 
 inline uint32_t CRC32_u8(uint32_t crc, uint8_t v) {
   return _mm_crc32_u8(crc, v);
@@ -179,7 +179,7 @@ inline V128 V128_ShiftLeft64(const V128 l, const V128 r) {
   return _mm_sll_epi64(l, r);
 }
 
-#elif defined(ABSL_CRC_INTERNAL_HAVE_ARM_SIMD)
+#elif defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD)
 
 inline uint32_t CRC32_u8(uint32_t crc, uint8_t v) { return __crc32cb(crc, v); }
 
@@ -263,7 +263,7 @@ inline V128 V128_ShiftLeft64(const V128 l, const V128 r) {
 #endif
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_INTERNAL_CRC32_X86_ARM_COMBINED_SIMD_H_
+#endif  // TURBO_CRC_INTERNAL_CRC32_X86_ARM_COMBINED_SIMD_H_

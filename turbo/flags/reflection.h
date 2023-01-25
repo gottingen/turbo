@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 // File: reflection.h
 // -----------------------------------------------------------------------------
 //
-// This file defines the routines to access and operate on an Abseil Flag's
+// This file defines the routines to access and operate on an Turbo Flag's
 // reflection handle.
 
-#ifndef ABSL_FLAGS_REFLECTION_H_
-#define ABSL_FLAGS_REFLECTION_H_
+#ifndef TURBO_FLAGS_REFLECTION_H_
+#define TURBO_FLAGS_REFLECTION_H_
 
 #include <string>
 
@@ -31,14 +31,14 @@
 #include "turbo/flags/internal/commandlineflag.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 class FlagSaverImpl;
 }  // namespace flags_internal
 
 // FindCommandLineFlag()
 //
-// Returns the reflection handle of an Abseil flag of the specified name, or
+// Returns the reflection handle of an Turbo flag of the specified name, or
 // `nullptr` if not found. This function will emit a warning if the name of a
 // 'retired' flag is specified.
 turbo::CommandLineFlag* FindCommandLineFlag(turbo::string_view name);
@@ -84,7 +84,7 @@ class FlagSaver {
 
 //-----------------------------------------------------------------------------
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_REFLECTION_H_
+#endif  // TURBO_FLAGS_REFLECTION_H_

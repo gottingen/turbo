@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@
 //
 // WARNING: using template metaprogramming to detect or depend on API
 // features is brittle and not guaranteed. Neither the standard library nor
-// Abseil provides any guarantee that APIs are stable in the face of template
+// Turbo provides any guarantee that APIs are stable in the face of template
 // metaprogramming. Use with caution.
-#ifndef ABSL_META_TYPE_TRAITS_H_
-#define ABSL_META_TYPE_TRAITS_H_
+#ifndef TURBO_META_TYPE_TRAITS_H_
+#define TURBO_META_TYPE_TRAITS_H_
 
 #include <cstddef>
 #include <functional>
@@ -44,19 +44,19 @@
 // MSVC constructibility traits do not detect destructor properties and so our
 // implementations should not use them as a source-of-truth.
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)
-#define ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION 1
+#define TURBO_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION 1
 #endif
 
 // Defines the default alignment. `__STDCPP_DEFAULT_NEW_ALIGNMENT__` is a C++17
 // feature.
 #if defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
-#define ABSL_INTERNAL_DEFAULT_NEW_ALIGNMENT __STDCPP_DEFAULT_NEW_ALIGNMENT__
+#define TURBO_INTERNAL_DEFAULT_NEW_ALIGNMENT __STDCPP_DEFAULT_NEW_ALIGNMENT__
 #else  // defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
-#define ABSL_INTERNAL_DEFAULT_NEW_ALIGNMENT alignof(std::max_align_t)
+#define TURBO_INTERNAL_DEFAULT_NEW_ALIGNMENT alignof(std::max_align_t)
 #endif  // defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // Defined and documented later on in this file.
 template <typename T>
@@ -286,13 +286,13 @@ struct is_function
 // https://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html#Type-Traits.
 template <typename T>
 struct is_trivially_destructible
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+#ifdef TURBO_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
     : std::is_trivially_destructible<T> {
 #else
     : std::integral_constant<bool, __has_trivial_destructor(T) &&
                                    std::is_destructible<T>::value> {
 #endif
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+#ifdef TURBO_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
  private:
   static constexpr bool compliant = std::is_trivially_destructible<T>::value ==
                                     is_trivially_destructible::value;
@@ -302,7 +302,7 @@ struct is_trivially_destructible
   static_assert(compliant || !std::is_trivially_destructible<T>::value,
                 "Not compliant with std::is_trivially_destructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+#endif  // TURBO_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
 };
 
 // is_trivially_default_constructible()
@@ -339,16 +339,16 @@ struct is_trivially_destructible
 // Nontrivially destructible types will cause the expression to be nontrivial.
 template <typename T>
 struct is_trivially_default_constructible
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
+#if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
     : std::is_trivially_default_constructible<T> {
 #else
     : std::integral_constant<bool, __has_trivial_constructor(T) &&
                                    std::is_default_constructible<T>::value &&
                                    is_trivially_destructible<T>::value> {
 #endif
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+#if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
-        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
+        TURBO_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_default_constructible<T>::value ==
@@ -359,7 +359,7 @@ struct is_trivially_default_constructible
   static_assert(compliant || !std::is_trivially_default_constructible<T>::value,
                 "Not compliant with std::is_trivially_default_constructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif  // TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
 };
 
 // is_trivially_move_constructible()
@@ -377,7 +377,7 @@ struct is_trivially_default_constructible
 // expression to be nontrivial.
 template <typename T>
 struct is_trivially_move_constructible
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
+#if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
     : std::is_trivially_move_constructible<T> {
 #else
     : std::conditional<
@@ -385,9 +385,9 @@ struct is_trivially_move_constructible
           type_traits_internal::IsTriviallyMoveConstructibleObject<T>,
           std::is_reference<T>>::type::type {
 #endif
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+#if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
-        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
+        TURBO_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_move_constructible<T>::value ==
@@ -398,7 +398,7 @@ struct is_trivially_move_constructible
   static_assert(compliant || !std::is_trivially_move_constructible<T>::value,
                 "Not compliant with std::is_trivially_move_constructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif  // TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
 };
 
 // is_trivially_copy_constructible()
@@ -420,9 +420,9 @@ struct is_trivially_copy_constructible
           std::is_object<T>::value && !std::is_array<T>::value,
           type_traits_internal::IsTriviallyCopyConstructibleObject<T>,
           std::is_lvalue_reference<T>>::type::type {
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+#if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
-        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
+        TURBO_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_copy_constructible<T>::value ==
@@ -433,7 +433,7 @@ struct is_trivially_copy_constructible
   static_assert(compliant || !std::is_trivially_copy_constructible<T>::value,
                 "Not compliant with std::is_trivially_copy_constructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif  // TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
 };
 
 // is_trivially_move_assignable()
@@ -459,7 +459,7 @@ struct is_trivially_move_assignable
           std::is_move_assignable<type_traits_internal::SingleMemberUnion<T>>,
           type_traits_internal::IsTriviallyMoveAssignableReference<T>>::type::
           type {
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#ifdef TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
  private:
   static constexpr bool compliant =
       std::is_trivially_move_assignable<T>::value ==
@@ -470,7 +470,7 @@ struct is_trivially_move_assignable
   static_assert(compliant || !std::is_trivially_move_assignable<T>::value,
                 "Not compliant with std::is_trivially_move_assignable; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#endif  // TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
 };
 
 // is_trivially_copy_assignable()
@@ -490,14 +490,14 @@ struct is_trivially_move_assignable
 // `is_trivially_assignable<T&, const T&>`.
 template <typename T>
 struct is_trivially_copy_assignable
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#ifdef TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
     : std::is_trivially_copy_assignable<T> {
 #else
     : std::integral_constant<
           bool, __has_trivial_assign(typename std::remove_reference<T>::type) &&
                     turbo::is_copy_assignable<T>::value> {
 #endif
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#ifdef TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
  private:
   static constexpr bool compliant =
       std::is_trivially_copy_assignable<T>::value ==
@@ -508,7 +508,7 @@ struct is_trivially_copy_assignable
   static_assert(compliant || !std::is_trivially_copy_assignable<T>::value,
                 "Not compliant with std::is_trivially_copy_assignable; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#endif  // TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
 };
 
 #if defined(__cpp_lib_remove_cvref) && __cpp_lib_remove_cvref >= 201711L
@@ -549,7 +549,7 @@ namespace type_traits_internal {
 //
 // We expose this metafunction only for internal use within turbo.
 
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_COPYABLE)
+#if defined(TURBO_HAVE_STD_IS_TRIVIALLY_COPYABLE)
 template <typename T>
 struct is_trivially_copyable : std::is_trivially_copyable<T> {};
 #else
@@ -689,15 +689,15 @@ namespace type_traits_internal {
 //
 #if defined(_MSC_VER) || (defined(_LIBCPP_VERSION) && \
                           _LIBCPP_VERSION < 4000 && _LIBCPP_STD_VER > 11)
-#define ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 0
+#define TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 0
 #else
-#define ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 1
+#define TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 1
 #endif
 
-#if !ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if !TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 template <typename Key, typename = size_t>
 struct IsHashable : std::true_type {};
-#else   // ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#else   // TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 template <typename Key, typename = void>
 struct IsHashable : std::false_type {};
 
@@ -707,7 +707,7 @@ struct IsHashable<
     turbo::enable_if_t<std::is_convertible<
         decltype(std::declval<std::hash<Key>&>()(std::declval<Key const&>())),
         std::size_t>::value>> : std::true_type {};
-#endif  // !ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#endif  // !TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 
 struct AssertHashEnabledHelper {
  private:
@@ -835,7 +835,7 @@ using swap_internal::StdSwapIsUnconstrained;
 //
 // https://clang.llvm.org/docs/LanguageExtensions.html#:~:text=__is_trivially_relocatable
 //
-#if ABSL_HAVE_BUILTIN(__is_trivially_relocatable)
+#if TURBO_HAVE_BUILTIN(__is_trivially_relocatable)
 template <class T>
 struct is_trivially_relocatable
     : std::integral_constant<bool, __is_trivially_relocatable(T)> {};
@@ -856,17 +856,17 @@ struct is_trivially_relocatable : std::integral_constant<bool, false> {};
 // of `__builtin_is_constant_evaluated` if available, otherwise the function
 // will fail to compile.
 //
-// Applications can inspect `ABSL_HAVE_CONSTANT_EVALUATED` at compile time
+// Applications can inspect `TURBO_HAVE_CONSTANT_EVALUATED` at compile time
 // to check if this function is supported.
 //
 // Example:
 //
 // constexpr MyClass::MyClass(int param) {
-// #ifdef ABSL_HAVE_CONSTANT_EVALUATED
+// #ifdef TURBO_HAVE_CONSTANT_EVALUATED
 //   if (!turbo::is_constant_evaluated()) {
-//     ABSL_LOG(INFO) << "MyClass(" << param << ")";
+//     TURBO_LOG(INFO) << "MyClass(" << param << ")";
 //   }
-// #endif  // ABSL_HAVE_CONSTANT_EVALUATED
+// #endif  // TURBO_HAVE_CONSTANT_EVALUATED
 // }
 //
 // Upstream documentation:
@@ -874,16 +874,16 @@ struct is_trivially_relocatable : std::integral_constant<bool, false> {};
 // http://en.cppreference.com/w/cpp/types/is_constant_evaluated
 // http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#:~:text=__builtin_is_constant_evaluated
 //
-#if defined(ABSL_HAVE_CONSTANT_EVALUATED)
+#if defined(TURBO_HAVE_CONSTANT_EVALUATED)
 constexpr bool is_constant_evaluated() noexcept {
 #ifdef __cpp_lib_is_constant_evaluated
   return std::is_constant_evaluated();
-#elif ABSL_HAVE_BUILTIN(__builtin_is_constant_evaluated)
+#elif TURBO_HAVE_BUILTIN(__builtin_is_constant_evaluated)
   return __builtin_is_constant_evaluated();
 #endif
 }
-#endif  // ABSL_HAVE_CONSTANT_EVALUATED
-ABSL_NAMESPACE_END
+#endif  // TURBO_HAVE_CONSTANT_EVALUATED
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_META_TYPE_TRAITS_H_
+#endif  // TURBO_META_TYPE_TRAITS_H_

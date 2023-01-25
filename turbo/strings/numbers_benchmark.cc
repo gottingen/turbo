@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ BENCHMARK_TEMPLATE(BM_FastIntToBuffer, int64_t)->Range(0, 1 << 30);
 // Creates an integer that would be printed as `num_digits` repeated 7s in the
 // given `base`. `base` must be greater than or equal to 8.
 int64_t RepeatedSevens(int num_digits, int base) {
-  ABSL_RAW_CHECK(base >= 8, "");
+  TURBO_RAW_CHECK(base >= 8, "");
   int64_t num = 7;
   while (--num_digits) num = base * num + 7;
   return num;
@@ -59,7 +59,7 @@ void BM_safe_strto32_string(benchmark::State& state) {
     benchmark::DoNotOptimize(
         turbo::numbers_internal::safe_strto32_base(str, &value, base));
   }
-  ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
+  TURBO_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
 BENCHMARK(BM_safe_strto32_string)
     ->ArgPair(1, 8)
@@ -86,7 +86,7 @@ void BM_safe_strto64_string(benchmark::State& state) {
     benchmark::DoNotOptimize(
         turbo::numbers_internal::safe_strto64_base(str, &value, base));
   }
-  ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
+  TURBO_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
 BENCHMARK(BM_safe_strto64_string)
     ->ArgPair(1, 8)
@@ -114,7 +114,7 @@ void BM_safe_strtou32_string(benchmark::State& state) {
     benchmark::DoNotOptimize(
         turbo::numbers_internal::safe_strtou32_base(str, &value, base));
   }
-  ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
+  TURBO_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
 BENCHMARK(BM_safe_strtou32_string)
     ->ArgPair(1, 8)
@@ -141,7 +141,7 @@ void BM_safe_strtou64_string(benchmark::State& state) {
     benchmark::DoNotOptimize(
         turbo::numbers_internal::safe_strtou64_base(str, &value, base));
   }
-  ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
+  TURBO_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
 BENCHMARK(BM_safe_strtou64_string)
     ->ArgPair(1, 8)

@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 using ::turbo::cord_internal::CordRep;
 using ::turbo::cord_internal::CordRepBtree;
@@ -162,7 +162,7 @@ static CordRep* CordRepFromString(std::string&& src) {
 // --------------------------------------------------------------------
 // Cord::InlineRep functions
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr unsigned char Cord::InlineRep::kMaxInline;
 #endif
 
@@ -300,7 +300,7 @@ void Cord::InlineRep::AssignSlow(const Cord::InlineRep& src) {
   assert(&src != this);
   assert(is_tree() || src.is_tree());
   auto constexpr method = CordzUpdateTracker::kAssignCord;
-  if (ABSL_PREDICT_TRUE(!is_tree())) {
+  if (TURBO_PREDICT_TRUE(!is_tree())) {
     EmplaceTree(CordRep::Ref(src.as_tree()), src.data_, method);
     return;
   }
@@ -671,7 +671,7 @@ inline void Cord::Prepend(T&& src) {
 template void Cord::Prepend(std::string&& src);
 
 void Cord::RemovePrefix(size_t n) {
-  ABSL_INTERNAL_CHECK(n <= size(),
+  TURBO_INTERNAL_CHECK(n <= size(),
                       turbo::StrCat("Requested prefix size ", n,
                                    " exceeds Cord's size ", size()));
   contents_.MaybeRemoveEmptyCrcNode();
@@ -702,7 +702,7 @@ void Cord::RemovePrefix(size_t n) {
 }
 
 void Cord::RemoveSuffix(size_t n) {
-  ABSL_INTERNAL_CHECK(n <= size(),
+  TURBO_INTERNAL_CHECK(n <= size(),
                       turbo::StrCat("Requested suffix size ", n,
                                    " exceeds Cord's size ", size()));
   contents_.MaybeRemoveEmptyCrcNode();
@@ -1070,7 +1070,7 @@ void Cord::CopyToArraySlowPath(char* dst) const {
 }
 
 Cord Cord::ChunkIterator::AdvanceAndReadBytes(size_t n) {
-  ABSL_HARDENING_ASSERT(bytes_remaining_ >= n &&
+  TURBO_HARDENING_ASSERT(bytes_remaining_ >= n &&
                         "Attempted to iterate past `end()`");
   Cord subcord;
   auto constexpr method = CordzUpdateTracker::kCordReader;
@@ -1139,7 +1139,7 @@ Cord Cord::ChunkIterator::AdvanceAndReadBytes(size_t n) {
 }
 
 char Cord::operator[](size_t i) const {
-  ABSL_HARDENING_ASSERT(i < size());
+  TURBO_HARDENING_ASSERT(i < size());
   size_t offset = i;
   const CordRep* rep = contents_.tree();
   if (rep == nullptr) {
@@ -1301,7 +1301,7 @@ static void DumpNode(CordRep* rep, bool include_data, std::ostream* os,
       indents.pop_back();
     }
   }
-  ABSL_INTERNAL_CHECK(indents.empty(), "");
+  TURBO_INTERNAL_CHECK(indents.empty(), "");
 }
 
 static std::string ReportError(CordRep* root, CordRep* node) {
@@ -1319,31 +1319,31 @@ static bool VerifyNode(CordRep* root, CordRep* start_node,
     CordRep* node = worklist.back();
     worklist.pop_back();
 
-    ABSL_INTERNAL_CHECK(node != nullptr, ReportError(root, node));
+    TURBO_INTERNAL_CHECK(node != nullptr, ReportError(root, node));
     if (node != root) {
-      ABSL_INTERNAL_CHECK(node->length != 0, ReportError(root, node));
-      ABSL_INTERNAL_CHECK(!node->IsCrc(), ReportError(root, node));
+      TURBO_INTERNAL_CHECK(node->length != 0, ReportError(root, node));
+      TURBO_INTERNAL_CHECK(!node->IsCrc(), ReportError(root, node));
     }
 
     if (node->IsFlat()) {
-      ABSL_INTERNAL_CHECK(node->length <= node->flat()->Capacity(),
+      TURBO_INTERNAL_CHECK(node->length <= node->flat()->Capacity(),
                           ReportError(root, node));
     } else if (node->IsExternal()) {
-      ABSL_INTERNAL_CHECK(node->external()->base != nullptr,
+      TURBO_INTERNAL_CHECK(node->external()->base != nullptr,
                           ReportError(root, node));
     } else if (node->IsSubstring()) {
-      ABSL_INTERNAL_CHECK(
+      TURBO_INTERNAL_CHECK(
           node->substring()->start < node->substring()->child->length,
           ReportError(root, node));
-      ABSL_INTERNAL_CHECK(node->substring()->start + node->length <=
+      TURBO_INTERNAL_CHECK(node->substring()->start + node->length <=
                               node->substring()->child->length,
                           ReportError(root, node));
     } else if (node->IsCrc()) {
-      ABSL_INTERNAL_CHECK(
+      TURBO_INTERNAL_CHECK(
           node->crc()->child != nullptr || node->crc()->length == 0,
           ReportError(root, node));
       if (node->crc()->child != nullptr) {
-        ABSL_INTERNAL_CHECK(node->crc()->length == node->crc()->child->length,
+        TURBO_INTERNAL_CHECK(node->crc()->length == node->crc()->child->length,
                             ReportError(root, node));
         worklist.push_back(node->crc()->child);
       }
@@ -1366,7 +1366,7 @@ size_t CordTestAccess::FlatTagToLength(uint8_t tag) {
   return cord_internal::TagToLength(tag);
 }
 uint8_t CordTestAccess::LengthToTag(size_t s) {
-  ABSL_INTERNAL_CHECK(s <= kMaxFlatLength, turbo::StrCat("Invalid length ", s));
+  TURBO_INTERNAL_CHECK(s <= kMaxFlatLength, turbo::StrCat("Invalid length ", s));
   return cord_internal::AllocatedSizeToTag(s + cord_internal::kFlatOverhead);
 }
 size_t CordTestAccess::SizeofCordRepExternal() {
@@ -1376,5 +1376,5 @@ size_t CordTestAccess::SizeofCordRepSubstring() {
   return sizeof(CordRepSubstring);
 }
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

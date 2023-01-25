@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,19 +17,19 @@
 // -----------------------------------------------------------------------------
 //
 // This header defines the recommended Uniform Random Bit Generator (URBG)
-// types for use within the Abseil Random library. These types are not
+// types for use within the Turbo Random library. These types are not
 // suitable for security-related use-cases, but should suffice for most other
 // uses of generating random values.
 //
-// The Abseil random library provides the following URBG types:
+// The Turbo random library provides the following URBG types:
 //
 //   * BitGen, a good general-purpose bit generator, optimized for generating
 //     random (but not cryptographically secure) values
 //   * InsecureBitGen, a slightly faster, though less random, bit generator, for
 //     cases where the existing BitGen is a drag on performance.
 
-#ifndef ABSL_RANDOM_RANDOM_H_
-#define ABSL_RANDOM_RANDOM_H_
+#ifndef TURBO_RANDOM_RANDOM_H_
+#define TURBO_RANDOM_RANDOM_H_
 
 #include <random>
 
@@ -41,14 +41,14 @@
 #include "turbo/random/seed_sequences.h"  // IWYU pragma: export
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // turbo::BitGen
 // -----------------------------------------------------------------------------
 //
 // `turbo::BitGen` is a general-purpose random bit generator for generating
-// random values for use within the Abseil random library. Typically, you use a
+// random values for use within the Turbo random library. Typically, you use a
 // bit generator in combination with a distribution to provide random values.
 //
 // Example:
@@ -183,7 +183,7 @@ using InsecureBitGen =
 // discards the intermediate results.
 // ---------------------------------------------------------------------------
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_RANDOM_H_
+#endif  // TURBO_RANDOM_RANDOM_H_

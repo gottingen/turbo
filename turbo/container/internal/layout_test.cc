@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
@@ -38,7 +38,7 @@ using ::turbo::Span;
 using ::testing::ElementsAre;
 
 size_t Distance(const void* from, const void* to) {
-  ABSL_RAW_CHECK(from <= to, "Distance must be non-negative");
+  TURBO_RAW_CHECK(from <= to, "Distance must be non-negative");
   return static_cast<const char*>(to) - static_cast<const char*>(from);
 }
 
@@ -1386,7 +1386,7 @@ struct Region {
 };
 
 void ExpectRegionPoisoned(const unsigned char* p, size_t n, bool poisoned) {
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
   for (size_t i = 0; i != n; ++i) {
     EXPECT_EQ(poisoned, __asan_address_is_poisoned(p + i));
   }
@@ -1637,5 +1637,5 @@ TEST(CompactString, Works) {
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
-#define ABSL_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
+#ifndef TURBO_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
+#define TURBO_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -48,14 +48,14 @@
 #include "turbo/base/optimization.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 // This non-temporal memcpy does regular load and non-temporal store memory
 // copy. It is compatible to both 16-byte aligned and unaligned addresses. If
 // data at the destination is not immediately accessed, using non-temporal
 // memcpy can save 1 DRAM load of the destination cacheline.
-constexpr size_t kCacheLineSize = ABSL_CACHELINE_SIZE;
+constexpr size_t kCacheLineSize = TURBO_CACHELINE_SIZE;
 
 // If the objects overlap, the behavior is undefined.
 inline void *non_temporal_store_memcpy(void *__restrict dst,
@@ -174,7 +174,7 @@ inline void *non_temporal_store_memcpy_avx(void *__restrict dst,
 }
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
+#endif  // TURBO_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_

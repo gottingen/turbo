@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -56,13 +56,13 @@ void ExpectParsedFloat(std::string s, turbo::chars_format format_flags,
     begin_subrange = static_cast<int>(open_bracket_pos);
     s.replace(open_bracket_pos, 1, "");
     std::string::size_type close_bracket_pos = s.find(']');
-    ABSL_RAW_CHECK(close_bracket_pos != turbo::string_view::npos,
+    TURBO_RAW_CHECK(close_bracket_pos != turbo::string_view::npos,
                    "Test input contains [ without matching ]");
     end_subrange = static_cast<int>(close_bracket_pos);
     s.replace(close_bracket_pos, 1, "");
   }
   const std::string::size_type expected_characters_matched = s.find('$');
-  ABSL_RAW_CHECK(expected_characters_matched != std::string::npos,
+  TURBO_RAW_CHECK(expected_characters_matched != std::string::npos,
                  "Input string must contain $");
   s.replace(expected_characters_matched, 1, "");
 

@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // This global mutex protects on-demand construction of flag objects in MSVC
 // builds.
@@ -26,7 +26,7 @@ ABSL_NAMESPACE_BEGIN
 
 namespace flags_internal {
 
-ABSL_CONST_INIT static turbo::Mutex construction_guard(turbo::kConstInit);
+TURBO_CONST_INIT static turbo::Mutex construction_guard(turbo::kConstInit);
 
 turbo::Mutex* GetGlobalConstructionGuard() { return &construction_guard; }
 
@@ -34,5 +34,5 @@ turbo::Mutex* GetGlobalConstructionGuard() { return &construction_guard; }
 
 #endif
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

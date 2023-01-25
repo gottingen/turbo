@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 //
 // This file includes an `turbo::MockingBitGen` class to use as a mock within the
 // Googletest testing framework. Such a mock is useful to provide deterministic
-// values as return values within (otherwise random) Abseil distribution
+// values as return values within (otherwise random) Turbo distribution
 // functions. Such determinism within a mock is useful within testing frameworks
 // to test otherwise indeterminate APIs.
 //
 // More information about the Googletest testing framework is available at
 // https://github.com/google/googletest
 
-#ifndef ABSL_RANDOM_MOCKING_BIT_GEN_H_
-#define ABSL_RANDOM_MOCKING_BIT_GEN_H_
+#ifndef TURBO_RANDOM_MOCKING_BIT_GEN_H_
+#define TURBO_RANDOM_MOCKING_BIT_GEN_H_
 
 #include <iterator>
 #include <limits>
@@ -50,7 +50,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace random_internal {
 template <typename>
@@ -93,7 +93,7 @@ class BitGenRef;
 //   EXPECT_EQ(turbo::Uniform<int>(gen, 0, 10), 5);
 //   EXPECT_EQ(turbo::Uniform<int>(gen, 30, 40), 35);
 //
-// At this time, only mock distributions supplied within the Abseil random
+// At this time, only mock distributions supplied within the Turbo random
 // library are officially supported.
 //
 // EXPECT_CALL and ON_CALL need to be made within the same DLL component as
@@ -234,7 +234,7 @@ class MockingBitGen {
                                                       // InvokeMock
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_MOCKING_BIT_GEN_H_
+#endif  // TURBO_RANDOM_MOCKING_BIT_GEN_H_

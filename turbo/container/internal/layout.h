@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -157,8 +157,8 @@
 // creates a `Layout` object, which exposes the same functionality by inheriting
 // from `LayoutImpl<>`.
 
-#ifndef ABSL_CONTAINER_INTERNAL_LAYOUT_H_
-#define ABSL_CONTAINER_INTERNAL_LAYOUT_H_
+#ifndef TURBO_CONTAINER_INTERNAL_LAYOUT_H_
+#define TURBO_CONTAINER_INTERNAL_LAYOUT_H_
 
 #include <assert.h>
 #include <stddef.h>
@@ -177,20 +177,20 @@
 #include "turbo/types/span.h"
 #include "turbo/utility/utility.h"
 
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
 #include <sanitizer/asan_interface.h>
 #endif
 
 #if defined(__GXX_RTTI)
-#define ABSL_INTERNAL_HAS_CXA_DEMANGLE
+#define TURBO_INTERNAL_HAS_CXA_DEMANGLE
 #endif
 
-#ifdef ABSL_INTERNAL_HAS_CXA_DEMANGLE
+#ifdef TURBO_INTERNAL_HAS_CXA_DEMANGLE
 #include <cxxabi.h>
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // A type wrapper that instructs `Layout` to use the specific alignment for the
@@ -296,7 +296,7 @@ std::string TypeName() {
   std::string out;
   int status = 0;
   char* demangled = nullptr;
-#ifdef ABSL_INTERNAL_HAS_CXA_DEMANGLE
+#ifdef TURBO_INTERNAL_HAS_CXA_DEMANGLE
   demangled = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, &status);
 #endif
   if (status == 0 && demangled != nullptr) {  // Demangling succeeded.
@@ -616,7 +616,7 @@ class LayoutImpl<std::tuple<Elements...>, turbo::index_sequence<SizeSeq...>,
   void PoisonPadding(const Char* p) const {
     static_assert(N < NumOffsets, "Index out of bounds");
     (void)p;
-#ifdef ABSL_HAVE_ADDRESS_SANITIZER
+#ifdef TURBO_HAVE_ADDRESS_SANITIZER
     PoisonPadding<Char, N - 1>(p);
     // The `if` is an optimization. It doesn't affect the observable behaviour.
     if (ElementAlignment<N - 1>::value % ElementAlignment<N>::value) {
@@ -737,7 +737,7 @@ class Layout : public internal_layout::LayoutType<sizeof...(Ts), Ts...> {
 };
 
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_LAYOUT_H_
+#endif  // TURBO_CONTAINER_INTERNAL_LAYOUT_H_

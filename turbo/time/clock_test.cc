@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #include "turbo/time/clock.h"
 
 #include "turbo/base/config.h"
-#if defined(ABSL_HAVE_ALARM)
+#if defined(TURBO_HAVE_ALARM)
 #include <signal.h>
 #include <unistd.h>
 #ifdef _AIX
@@ -41,7 +41,7 @@ TEST(Time, Now) {
 
 enum class AlarmPolicy { kWithoutAlarm, kWithAlarm };
 
-#if defined(ABSL_HAVE_ALARM)
+#if defined(TURBO_HAVE_ALARM)
 bool alarm_handler_invoked = false;
 
 void AlarmHandler(int signo) {
@@ -58,7 +58,7 @@ bool SleepForBounded(turbo::Duration d, turbo::Duration lower_bound,
                      AlarmPolicy alarm_policy, int* attempts) {
   const turbo::Time deadline = turbo::Now() + timeout;
   while (turbo::Now() < deadline) {
-#if defined(ABSL_HAVE_ALARM)
+#if defined(TURBO_HAVE_ALARM)
     sig_t old_alarm = SIG_DFL;
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       alarm_handler_invoked = false;
@@ -72,7 +72,7 @@ bool SleepForBounded(turbo::Duration d, turbo::Duration lower_bound,
     turbo::Time start = turbo::Now();
     turbo::SleepFor(d);
     turbo::Duration actual = turbo::Now() - start;
-#if defined(ABSL_HAVE_ALARM)
+#if defined(TURBO_HAVE_ALARM)
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       signal(SIGALRM, old_alarm);
       if (!alarm_handler_invoked) continue;
@@ -113,7 +113,7 @@ TEST(SleepFor, Bounded) {
   const turbo::Duration timeout = 48 * d;
   EXPECT_TRUE(AssertSleepForBounded(d, early, late, timeout,
                                     AlarmPolicy::kWithoutAlarm));
-#if defined(ABSL_HAVE_ALARM)
+#if defined(TURBO_HAVE_ALARM)
   EXPECT_TRUE(AssertSleepForBounded(d, early, late, timeout,
                                     AlarmPolicy::kWithAlarm));
 #endif

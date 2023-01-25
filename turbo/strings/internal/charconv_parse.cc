@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "turbo/strings/internal/memutil.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 // ParseFloat<10> will read the first 19 significant digits of the mantissa.
@@ -45,7 +45,7 @@ static_assert(std::numeric_limits<uint64_t>::digits10 ==
                   kDecimalMantissaDigitsMax,
               "(a) above");
 
-// IEEE doubles, which we assume in Abseil, have 53 binary bits of mantissa.
+// IEEE doubles, which we assume in Turbo, have 53 binary bits of mantissa.
 static_assert(std::numeric_limits<double>::is_iec559, "IEEE double assumed");
 static_assert(std::numeric_limits<double>::radix == 2, "IEEE double fact");
 static_assert(std::numeric_limits<double>::digits == 53, "IEEE double fact");
@@ -500,5 +500,5 @@ template ParsedFloat ParseFloat<16>(const char* begin, const char* end,
                                     chars_format format_flags);
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

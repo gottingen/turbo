@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -295,7 +295,7 @@ TEST(ChiSquareTest, TableData) {
       /**/};
 
   //    0.90      0.95     0.975      0.99     0.999
-  for (int i = 0; i < ABSL_ARRAYSIZE(data); i++) {
+  for (int i = 0; i < TURBO_ARRAYSIZE(data); i++) {
     const double E = 0.0001;
     EXPECT_NEAR(ChiSquarePValue(data[i][0], i + 1), 0.10, E)
         << i << " " << data[i][0];

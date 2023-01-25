@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_RANDOM_INTERNAL_IOSTREAM_STATE_SAVER_H_
-#define ABSL_RANDOM_INTERNAL_IOSTREAM_STATE_SAVER_H_
+#ifndef TURBO_RANDOM_INTERNAL_IOSTREAM_STATE_SAVER_H_
+#define TURBO_RANDOM_INTERNAL_IOSTREAM_STATE_SAVER_H_
 
 #include <cmath>
 #include <iostream>
@@ -24,7 +24,7 @@
 #include "turbo/numeric/int128.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // The null_state_saver does nothing.
@@ -73,16 +73,16 @@ class ostream_state_saver {
 };
 
 #if defined(__NDK_MAJOR__) && __NDK_MAJOR__ < 16
-#define ABSL_RANDOM_INTERNAL_IOSTREAM_HEXFLOAT 1
+#define TURBO_RANDOM_INTERNAL_IOSTREAM_HEXFLOAT 1
 #else
-#define ABSL_RANDOM_INTERNAL_IOSTREAM_HEXFLOAT 0
+#define TURBO_RANDOM_INTERNAL_IOSTREAM_HEXFLOAT 0
 #endif
 
 template <typename CharT, typename Traits>
 ostream_state_saver<std::basic_ostream<CharT, Traits>> make_ostream_state_saver(
     std::basic_ostream<CharT, Traits>& os,  // NOLINT(runtime/references)
     std::ios_base::fmtflags flags = std::ios_base::dec | std::ios_base::left |
-#if ABSL_RANDOM_INTERNAL_IOSTREAM_HEXFLOAT
+#if TURBO_RANDOM_INTERNAL_IOSTREAM_HEXFLOAT
                                     std::ios_base::fixed |
 #endif
                                     std::ios_base::scientific) {
@@ -198,7 +198,7 @@ struct stream_u128_helper<turbo::uint128> {
   }
 };
 
-#ifdef ABSL_HAVE_INTRINSIC_INT128
+#ifdef TURBO_HAVE_INTRINSIC_INT128
 template <>
 struct stream_u128_helper<__uint128_t> {
   template <typename IStream>
@@ -239,7 +239,7 @@ inline FloatType read_floating_point(IStream& is) {
 }
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_INTERNAL_IOSTREAM_STATE_SAVER_H_
+#endif  // TURBO_RANDOM_INTERNAL_IOSTREAM_STATE_SAVER_H_

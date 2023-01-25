@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 //
 // Provides the internal API for hashtable_debug.h.
 
-#ifndef ABSL_CONTAINER_INTERNAL_HASHTABLE_DEBUG_HOOKS_H_
-#define ABSL_CONTAINER_INTERNAL_HASHTABLE_DEBUG_HOOKS_H_
+#ifndef TURBO_CONTAINER_INTERNAL_HASHTABLE_DEBUG_HOOKS_H_
+#define TURBO_CONTAINER_INTERNAL_HASHTABLE_DEBUG_HOOKS_H_
 
 #include <cstddef>
 
@@ -26,7 +26,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace hashtable_debug_internal {
 
@@ -79,7 +79,7 @@ struct HashtableDebugAccess {
 
 }  // namespace hashtable_debug_internal
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_HASHTABLE_DEBUG_HOOKS_H_
+#endif  // TURBO_CONTAINER_INTERNAL_HASHTABLE_DEBUG_HOOKS_H_

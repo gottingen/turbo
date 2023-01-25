@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_FLAGS_INTERNAL_USAGE_H_
-#define ABSL_FLAGS_INTERNAL_USAGE_H_
+#ifndef TURBO_FLAGS_INTERNAL_USAGE_H_
+#define TURBO_FLAGS_INTERNAL_USAGE_H_
 
 #include <iosfwd>
 #include <string>
@@ -28,7 +28,7 @@
 // Usage reporting interfaces
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 // The format to report the help messages in.
@@ -98,7 +98,7 @@ void SetFlagsHelpFormat(HelpFormat);
 bool DeduceUsageFlags(turbo::string_view name, turbo::string_view value);
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_INTERNAL_USAGE_H_
+#endif  // TURBO_FLAGS_INTERNAL_USAGE_H_

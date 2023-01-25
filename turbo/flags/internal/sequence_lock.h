@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_FLAGS_INTERNAL_SEQUENCE_LOCK_H_
-#define ABSL_FLAGS_INTERNAL_SEQUENCE_LOCK_H_
+#ifndef TURBO_FLAGS_INTERNAL_SEQUENCE_LOCK_H_
+#define TURBO_FLAGS_INTERNAL_SEQUENCE_LOCK_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -26,7 +26,7 @@
 #include "turbo/base/optimization.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
 // Align 'x' up to the nearest 'align' bytes.
@@ -81,13 +81,13 @@ class SequenceLock {
     // Acquire barrier ensures that no loads done by f() are reordered
     // above the first load of the sequence counter.
     int64_t seq_before = lock_.load(std::memory_order_acquire);
-    if (ABSL_PREDICT_FALSE(seq_before & 1) == 1) return false;
+    if (TURBO_PREDICT_FALSE(seq_before & 1) == 1) return false;
     RelaxedCopyFromAtomic(dst, src, size);
     // Another acquire fence ensures that the load of 'lock_' below is
     // strictly ordered after the RelaxedCopyToAtomic call above.
     std::atomic_thread_fence(std::memory_order_acquire);
     int64_t seq_after = lock_.load(std::memory_order_relaxed);
-    return ABSL_PREDICT_TRUE(seq_before == seq_after);
+    return TURBO_PREDICT_TRUE(seq_before == seq_after);
   }
 
   // Copy "size" bytes from "src" to "dst" as a write-side critical section
@@ -181,7 +181,7 @@ class SequenceLock {
 };
 
 }  // namespace flags_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_INTERNAL_SEQUENCE_LOCK_H_
+#endif  // TURBO_FLAGS_INTERNAL_SEQUENCE_LOCK_H_

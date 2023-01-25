@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_SYNCHRONIZATION_INTERNAL_WAITER_H_
-#define ABSL_SYNCHRONIZATION_INTERNAL_WAITER_H_
+#ifndef TURBO_SYNCHRONIZATION_INTERNAL_WAITER_H_
+#define TURBO_SYNCHRONIZATION_INTERNAL_WAITER_H_
 
 #include "turbo/base/config.h"
 
@@ -28,7 +28,7 @@
 #include <linux/futex.h>
 #endif
 
-#ifdef ABSL_HAVE_SEMAPHORE_H
+#ifdef TURBO_HAVE_SEMAPHORE_H
 #include <semaphore.h>
 #endif
 
@@ -39,26 +39,26 @@
 #include "turbo/synchronization/internal/futex.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
 
-// May be chosen at compile time via -DABSL_FORCE_WAITER_MODE=<index>
-#define ABSL_WAITER_MODE_FUTEX 0
-#define ABSL_WAITER_MODE_SEM 1
-#define ABSL_WAITER_MODE_CONDVAR 2
-#define ABSL_WAITER_MODE_WIN32 3
+// May be chosen at compile time via -DTURBO_FORCE_WAITER_MODE=<index>
+#define TURBO_WAITER_MODE_FUTEX 0
+#define TURBO_WAITER_MODE_SEM 1
+#define TURBO_WAITER_MODE_CONDVAR 2
+#define TURBO_WAITER_MODE_WIN32 3
 
-#if defined(ABSL_FORCE_WAITER_MODE)
-#define ABSL_WAITER_MODE ABSL_FORCE_WAITER_MODE
+#if defined(TURBO_FORCE_WAITER_MODE)
+#define TURBO_WAITER_MODE TURBO_FORCE_WAITER_MODE
 #elif defined(_WIN32) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#define ABSL_WAITER_MODE ABSL_WAITER_MODE_WIN32
-#elif defined(ABSL_INTERNAL_HAVE_FUTEX)
-#define ABSL_WAITER_MODE ABSL_WAITER_MODE_FUTEX
-#elif defined(ABSL_HAVE_SEMAPHORE_H)
-#define ABSL_WAITER_MODE ABSL_WAITER_MODE_SEM
+#define TURBO_WAITER_MODE TURBO_WAITER_MODE_WIN32
+#elif defined(TURBO_INTERNAL_HAVE_FUTEX)
+#define TURBO_WAITER_MODE TURBO_WAITER_MODE_FUTEX
+#elif defined(TURBO_HAVE_SEMAPHORE_H)
+#define TURBO_WAITER_MODE TURBO_WAITER_MODE_SEM
 #else
-#define ABSL_WAITER_MODE ABSL_WAITER_MODE_CONDVAR
+#define TURBO_WAITER_MODE TURBO_WAITER_MODE_CONDVAR
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // Waiter is an OS-specific semaphore.
@@ -93,7 +93,7 @@ class Waiter {
   }
 
   // How many periods to remain idle before releasing resources
-#ifndef ABSL_HAVE_THREAD_SANITIZER
+#ifndef TURBO_HAVE_THREAD_SANITIZER
   static constexpr int kIdlePeriods = 60;
 #else
   // Memory consumption under ThreadSanitizer is a serious concern,
@@ -109,13 +109,13 @@ class Waiter {
   // which are reused via a freelist and are never destroyed.
   ~Waiter() = delete;
 
-#if ABSL_WAITER_MODE == ABSL_WAITER_MODE_FUTEX
+#if TURBO_WAITER_MODE == TURBO_WAITER_MODE_FUTEX
   // Futexes are defined by specification to be 32-bits.
   // Thus std::atomic<int32_t> must be just an int32_t with lockfree methods.
   std::atomic<int32_t> futex_;
   static_assert(sizeof(int32_t) == sizeof(futex_), "Wrong size for futex");
 
-#elif ABSL_WAITER_MODE == ABSL_WAITER_MODE_CONDVAR
+#elif TURBO_WAITER_MODE == TURBO_WAITER_MODE_CONDVAR
   // REQUIRES: mu_ must be held.
   void InternalCondVarPoke();
 
@@ -124,14 +124,14 @@ class Waiter {
   int waiter_count_;
   int wakeup_count_;  // Unclaimed wakeups.
 
-#elif ABSL_WAITER_MODE == ABSL_WAITER_MODE_SEM
+#elif TURBO_WAITER_MODE == TURBO_WAITER_MODE_SEM
   sem_t sem_;
   // This seems superfluous, but for Poke() we need to cause spurious
   // wakeups on the semaphore. Hence we can't actually use the
   // semaphore's count.
   std::atomic<int> wakeups_;
 
-#elif ABSL_WAITER_MODE == ABSL_WAITER_MODE_WIN32
+#elif TURBO_WAITER_MODE == TURBO_WAITER_MODE_WIN32
   // WinHelper - Used to define utilities for accessing the lock and
   // condition variable storage once the types are complete.
   class WinHelper;
@@ -150,12 +150,12 @@ class Waiter {
   int wakeup_count_;
 
 #else
-  #error Unknown ABSL_WAITER_MODE
+  #error Unknown TURBO_WAITER_MODE
 #endif
 };
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_SYNCHRONIZATION_INTERNAL_WAITER_H_
+#endif  // TURBO_SYNCHRONIZATION_INTERNAL_WAITER_H_

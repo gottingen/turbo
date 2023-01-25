@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,17 +26,17 @@
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
-ABSL_CONST_INIT std::atomic<bool> cord_ring_buffer_enabled(
+TURBO_CONST_INIT std::atomic<bool> cord_ring_buffer_enabled(
     kCordEnableRingBufferDefault);
-ABSL_CONST_INIT std::atomic<bool> shallow_subcords_enabled(
+TURBO_CONST_INIT std::atomic<bool> shallow_subcords_enabled(
     kCordShallowSubcordsDefault);
-ABSL_CONST_INIT std::atomic<bool> cord_btree_exhaustive_validation(false);
+TURBO_CONST_INIT std::atomic<bool> cord_btree_exhaustive_validation(false);
 
 void LogFatalNodeType(CordRep* rep) {
-  ABSL_INTERNAL_LOG(FATAL, turbo::StrCat("Unexpected node type: ",
+  TURBO_INTERNAL_LOG(FATAL, turbo::StrCat("Unexpected node type: ",
                                         static_cast<int>(rep->tag)));
 }
 
@@ -73,5 +73,5 @@ void CordRep::Destroy(CordRep* rep) {
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

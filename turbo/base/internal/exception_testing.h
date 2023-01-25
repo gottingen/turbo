@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Testing utilities for ABSL types which throw exceptions.
+// Testing utilities for TURBO types which throw exceptions.
 
-#ifndef ABSL_BASE_INTERNAL_EXCEPTION_TESTING_H_
-#define ABSL_BASE_INTERNAL_EXCEPTION_TESTING_H_
+#ifndef TURBO_BASE_INTERNAL_EXCEPTION_TESTING_H_
+#define TURBO_BASE_INTERNAL_EXCEPTION_TESTING_H_
 
 #include "gtest/gtest.h"
 #include "turbo/base/config.h"
 
-// ABSL_BASE_INTERNAL_EXPECT_FAIL tests either for a specified thrown exception
+// TURBO_BASE_INTERNAL_EXPECT_FAIL tests either for a specified thrown exception
 // if exceptions are enabled, or for death with a specified text in the error
 // message
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 
-#define ABSL_BASE_INTERNAL_EXPECT_FAIL(expr, exception_t, text) \
+#define TURBO_BASE_INTERNAL_EXPECT_FAIL(expr, exception_t, text) \
   EXPECT_THROW(expr, exception_t)
 
 #elif defined(__ANDROID__)
 // Android asserts do not log anywhere that gtest can currently inspect.
 // So we expect exit, but cannot match the message.
-#define ABSL_BASE_INTERNAL_EXPECT_FAIL(expr, exception_t, text) \
+#define TURBO_BASE_INTERNAL_EXPECT_FAIL(expr, exception_t, text) \
   EXPECT_DEATH(expr, ".*")
 #else
-#define ABSL_BASE_INTERNAL_EXPECT_FAIL(expr, exception_t, text) \
+#define TURBO_BASE_INTERNAL_EXPECT_FAIL(expr, exception_t, text) \
   EXPECT_DEATH_IF_SUPPORTED(expr, text)
 
 #endif
 
-#endif  // ABSL_BASE_INTERNAL_EXCEPTION_TESTING_H_
+#endif  // TURBO_BASE_INTERNAL_EXCEPTION_TESTING_H_

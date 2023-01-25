@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 // A fast, bit-vector map for 8-bit unsigned characters.
 // This class is useful for non-character purposes as well.
 
-#ifndef ABSL_STRINGS_INTERNAL_CHAR_MAP_H_
-#define ABSL_STRINGS_INTERNAL_CHAR_MAP_H_
+#ifndef TURBO_STRINGS_INTERNAL_CHAR_MAP_H_
+#define TURBO_STRINGS_INTERNAL_CHAR_MAP_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +28,7 @@
 #include "turbo/base/port.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 class Charmap {
@@ -53,7 +53,7 @@ class Charmap {
 
   // Returns true if and only if a character exists in both maps.
   bool IntersectsWith(const Charmap& c) const {
-    for (size_t i = 0; i < ABSL_ARRAYSIZE(m_); ++i) {
+    for (size_t i = 0; i < TURBO_ARRAYSIZE(m_); ++i) {
       if ((m_[i] & c.m_[i]) != 0) return true;
     }
     return false;
@@ -152,7 +152,7 @@ constexpr Charmap GraphCharmap() { return PrintCharmap() & ~SpaceCharmap(); }
 constexpr Charmap PunctCharmap() { return GraphCharmap() & ~AlnumCharmap(); }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_CHAR_MAP_H_
+#endif  // TURBO_STRINGS_INTERNAL_CHAR_MAP_H_

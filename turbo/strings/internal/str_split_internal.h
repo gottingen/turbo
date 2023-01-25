@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@
 //
 // IWYU pragma: private, include "turbo/strings/str_split.h"
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_SPLIT_INTERNAL_H_
-#define ABSL_STRINGS_INTERNAL_STR_SPLIT_INTERNAL_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_SPLIT_INTERNAL_H_
+#define TURBO_STRINGS_INTERNAL_STR_SPLIT_INTERNAL_H_
 
 #include <array>
 #include <initializer_list>
@@ -47,7 +47,7 @@
 #endif  // _GLIBCXX_DEBUG
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 // This class is implicitly constructible from everything that turbo::string_view
@@ -425,7 +425,7 @@ class Splitter {
 };
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_SPLIT_INTERNAL_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_SPLIT_INTERNAL_H_

@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors
+// Copyright 2020 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "turbo/random/random.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 TEST(Rotate, Left) {
@@ -145,7 +145,7 @@ TEST(Rotate, Symmetry) {
 }
 
 TEST(Counting, LeadingZeroes) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_CLZ
+#if TURBO_INTERNAL_HAS_CONSTEXPR_CLZ
   static_assert(countl_zero(uint8_t{}) == 8, "");
   static_assert(countl_zero(static_cast<uint8_t>(-1)) == 0, "");
   static_assert(countl_zero(uint16_t{}) == 16, "");
@@ -183,7 +183,7 @@ TEST(Counting, LeadingZeroes) {
 }
 
 TEST(Counting, LeadingOnes) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_CLZ
+#if TURBO_INTERNAL_HAS_CONSTEXPR_CLZ
   static_assert(countl_one(uint8_t{}) == 0, "");
   static_assert(countl_one(static_cast<uint8_t>(-1)) == 8, "");
   static_assert(countl_one(uint16_t{}) == 0, "");
@@ -205,7 +205,7 @@ TEST(Counting, LeadingOnes) {
 }
 
 TEST(Counting, TrailingZeroes) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_CTZ
+#if TURBO_INTERNAL_HAS_CONSTEXPR_CTZ
   static_assert(countr_zero(uint8_t{}) == 8, "");
   static_assert(countr_zero(static_cast<uint8_t>(-1)) == 0, "");
   static_assert(countr_zero(uint16_t{}) == 16, "");
@@ -227,7 +227,7 @@ TEST(Counting, TrailingZeroes) {
 }
 
 TEST(Counting, TrailingOnes) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_CTZ
+#if TURBO_INTERNAL_HAS_CONSTEXPR_CTZ
   static_assert(countr_one(uint8_t{}) == 0, "");
   static_assert(countr_one(static_cast<uint8_t>(-1)) == 8, "");
   static_assert(countr_one(uint16_t{}) == 0, "");
@@ -249,7 +249,7 @@ TEST(Counting, TrailingOnes) {
 }
 
 TEST(Counting, Popcount) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_POPCOUNT
+#if TURBO_INTERNAL_HAS_CONSTEXPR_POPCOUNT
   static_assert(popcount(uint8_t{}) == 0, "");
   static_assert(popcount(uint8_t{1}) == 1, "");
   static_assert(popcount(static_cast<uint8_t>(-1)) == 8, "");
@@ -262,7 +262,7 @@ TEST(Counting, Popcount) {
   static_assert(popcount(uint64_t{}) == 0, "");
   static_assert(popcount(uint64_t{1}) == 1, "");
   static_assert(popcount(~uint64_t{}) == 64, "");
-#endif  // ABSL_INTERNAL_HAS_CONSTEXPR_POPCOUNT
+#endif  // TURBO_INTERNAL_HAS_CONSTEXPR_POPCOUNT
 
   EXPECT_EQ(popcount(uint8_t{}), 0);
   EXPECT_EQ(popcount(uint8_t{1}), 1);
@@ -396,7 +396,7 @@ bool IsBitCeilConstantExpression(char) {
 }
 
 TEST(IntegralPowersOfTwo, Ceiling) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_CLZ
+#if TURBO_INTERNAL_HAS_CONSTEXPR_CLZ
   static_assert(bit_ceil(0u) == 1, "");
   static_assert(bit_ceil(1u) == 1, "");
   static_assert(bit_ceil(2u) == 2, "");
@@ -450,7 +450,7 @@ TEST(IntegralPowersOfTwo, Ceiling) {
 }
 
 TEST(IntegralPowersOfTwo, Floor) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_CLZ
+#if TURBO_INTERNAL_HAS_CONSTEXPR_CLZ
   static_assert(bit_floor(0u) == 0, "");
   static_assert(bit_floor(1u) == 1, "");
   static_assert(bit_floor(2u) == 2, "");
@@ -507,7 +507,7 @@ TEST(IntegralPowersOfTwo, Floor) {
 }
 
 TEST(IntegralPowersOfTwo, Width) {
-#if ABSL_INTERNAL_HAS_CONSTEXPR_CLZ
+#if TURBO_INTERNAL_HAS_CONSTEXPR_CLZ
   static_assert(bit_width(uint8_t{}) == 0, "");
   static_assert(bit_width(uint8_t{1}) == 1, "");
   static_assert(bit_width(uint8_t{3}) == 2, "");
@@ -562,12 +562,12 @@ TEST(IntegralPowersOfTwo, Width) {
 
 // On GCC and Clang, anticiapte that implementations will be constexpr
 #if defined(__GNUC__)
-static_assert(ABSL_INTERNAL_HAS_CONSTEXPR_POPCOUNT,
+static_assert(TURBO_INTERNAL_HAS_CONSTEXPR_POPCOUNT,
               "popcount should be constexpr");
-static_assert(ABSL_INTERNAL_HAS_CONSTEXPR_CLZ, "clz should be constexpr");
-static_assert(ABSL_INTERNAL_HAS_CONSTEXPR_CTZ, "ctz should be constexpr");
+static_assert(TURBO_INTERNAL_HAS_CONSTEXPR_CLZ, "clz should be constexpr");
+static_assert(TURBO_INTERNAL_HAS_CONSTEXPR_CTZ, "ctz should be constexpr");
 #endif
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

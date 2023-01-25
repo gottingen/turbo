@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 const uint64_t kInitialNumber{0x0123456789abcdef};
@@ -34,7 +34,7 @@ const uint16_t k16Value{0x0123};
 const int kNumValuesToTest = 1000000;
 const int kRandomSeed = 12345;
 
-#if defined(ABSL_IS_BIG_ENDIAN)
+#if defined(TURBO_IS_BIG_ENDIAN)
 const uint64_t kInitialInNetworkOrder{kInitialNumber};
 const uint64_t k64ValueLE{0xefcdab8967452301};
 const uint32_t k32ValueLE{0x67452301};
@@ -43,7 +43,7 @@ const uint16_t k16ValueLE{0x2301};
 const uint64_t k64ValueBE{kInitialNumber};
 const uint32_t k32ValueBE{k32Value};
 const uint16_t k16ValueBE{k16Value};
-#elif defined(ABSL_IS_LITTLE_ENDIAN)
+#elif defined(TURBO_IS_LITTLE_ENDIAN)
 const uint64_t kInitialInNetworkOrder{0xefcdab8967452301};
 const uint64_t k64ValueLE{kInitialNumber};
 const uint32_t k32ValueLE{k32Value};
@@ -96,11 +96,11 @@ inline T UnalignedLoad(const char* p) {
   switch (sizeof(T)) {
     case 1: return *reinterpret_cast<const T*>(p);
     case 2:
-      return ABSL_INTERNAL_UNALIGNED_LOAD16(p);
+      return TURBO_INTERNAL_UNALIGNED_LOAD16(p);
     case 4:
-      return ABSL_INTERNAL_UNALIGNED_LOAD32(p);
+      return TURBO_INTERNAL_UNALIGNED_LOAD32(p);
     case 8:
-      return ABSL_INTERNAL_UNALIGNED_LOAD64(p);
+      return TURBO_INTERNAL_UNALIGNED_LOAD64(p);
     default:
       // Suppresses invalid "not all control paths return a value" on MSVC
       return {};
@@ -131,18 +131,18 @@ static void GBSwapHelper(const std::vector<T>& host_values_to_test,
 }
 
 void Swap16(char* bytes) {
-  ABSL_INTERNAL_UNALIGNED_STORE16(
-      bytes, gbswap_16(ABSL_INTERNAL_UNALIGNED_LOAD16(bytes)));
+  TURBO_INTERNAL_UNALIGNED_STORE16(
+      bytes, gbswap_16(TURBO_INTERNAL_UNALIGNED_LOAD16(bytes)));
 }
 
 void Swap32(char* bytes) {
-  ABSL_INTERNAL_UNALIGNED_STORE32(
-      bytes, gbswap_32(ABSL_INTERNAL_UNALIGNED_LOAD32(bytes)));
+  TURBO_INTERNAL_UNALIGNED_STORE32(
+      bytes, gbswap_32(TURBO_INTERNAL_UNALIGNED_LOAD32(bytes)));
 }
 
 void Swap64(char* bytes) {
-  ABSL_INTERNAL_UNALIGNED_STORE64(
-      bytes, gbswap_64(ABSL_INTERNAL_UNALIGNED_LOAD64(bytes)));
+  TURBO_INTERNAL_UNALIGNED_STORE64(
+      bytes, gbswap_64(TURBO_INTERNAL_UNALIGNED_LOAD64(bytes)));
 }
 
 TEST(EndianessTest, Uint16) {
@@ -259,5 +259,5 @@ TEST(EndianessTest, big_endian) {
 }
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

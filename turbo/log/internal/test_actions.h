@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 // File: log/internal/test_actions.h
 // -----------------------------------------------------------------------------
 //
-// This file declares Googletest's actions used in the Abseil Logging library
+// This file declares Googletest's actions used in the Turbo Logging library
 // unit tests.
 
-#ifndef ABSL_LOG_INTERNAL_TEST_ACTIONS_H_
-#define ABSL_LOG_INTERNAL_TEST_ACTIONS_H_
+#ifndef TURBO_LOG_INTERNAL_TEST_ACTIONS_H_
+#define TURBO_LOG_INTERNAL_TEST_ACTIONS_H_
 
 #include <iostream>
 #include <ostream>
@@ -32,7 +32,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 // These actions are used by the child process in a death test.
@@ -84,7 +84,7 @@ inline WriteEntryToStderr DeathTestUnexpectedLogging() {
 }
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_TEST_ACTIONS_H_
+#endif  // TURBO_LOG_INTERNAL_TEST_ACTIONS_H_

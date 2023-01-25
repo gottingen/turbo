@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <cstdlib>
-#include <thread>  // NOLINT(build/c++11), Abseil test
+#include <thread>  // NOLINT(build/c++11), Turbo test
 #include <type_traits>
 
 #include "turbo/base/attributes.h"
@@ -35,20 +35,20 @@ namespace {
 // Thread two waits on 'notification', then sets 'state' inside the 'mutex',
 // signalling the change via 'condvar'.
 //
-// These tests use ABSL_RAW_CHECK to validate invariants, rather than EXPECT or
+// These tests use TURBO_RAW_CHECK to validate invariants, rather than EXPECT or
 // ASSERT from gUnit, because we need to invoke them during global destructors,
 // when gUnit teardown would have already begun.
 void ThreadOne(turbo::Mutex* mutex, turbo::CondVar* condvar,
                turbo::Notification* notification, bool* state) {
   // Test that the notification is in a valid initial state.
-  ABSL_RAW_CHECK(!notification->HasBeenNotified(), "invalid Notification");
-  ABSL_RAW_CHECK(*state == false, "*state not initialized");
+  TURBO_RAW_CHECK(!notification->HasBeenNotified(), "invalid Notification");
+  TURBO_RAW_CHECK(*state == false, "*state not initialized");
 
   {
     turbo::MutexLock lock(mutex);
 
     notification->Notify();
-    ABSL_RAW_CHECK(notification->HasBeenNotified(), "invalid Notification");
+    TURBO_RAW_CHECK(notification->HasBeenNotified(), "invalid Notification");
 
     while (*state == false) {
       condvar->Wait(mutex);
@@ -58,11 +58,11 @@ void ThreadOne(turbo::Mutex* mutex, turbo::CondVar* condvar,
 
 void ThreadTwo(turbo::Mutex* mutex, turbo::CondVar* condvar,
                turbo::Notification* notification, bool* state) {
-  ABSL_RAW_CHECK(*state == false, "*state not initialized");
+  TURBO_RAW_CHECK(*state == false, "*state not initialized");
 
   // Wake thread one
   notification->WaitForNotification();
-  ABSL_RAW_CHECK(notification->HasBeenNotified(), "invalid Notification");
+  TURBO_RAW_CHECK(notification->HasBeenNotified(), "invalid Notification");
   {
     turbo::MutexLock lock(mutex);
     *state = true;
@@ -97,7 +97,7 @@ void TestLocals() {
 }
 
 // Normal kConstInit usage
-ABSL_CONST_INIT turbo::Mutex const_init_mutex(turbo::kConstInit);
+TURBO_CONST_INIT turbo::Mutex const_init_mutex(turbo::kConstInit);
 void TestConstInitGlobal() { RunTests(&const_init_mutex, nullptr); }
 
 // Global variables during start and termination
@@ -140,7 +140,7 @@ OnConstruction test_early_const_init([] {
 // This definition appears before test_early_const_init, but it should be
 // initialized first (due to constant initialization).  Test that the object
 // actually works when constructed this way.
-ABSL_CONST_INIT turbo::Mutex early_const_init_mutex(turbo::kConstInit);
+TURBO_CONST_INIT turbo::Mutex early_const_init_mutex(turbo::kConstInit);
 
 // Furthermore, test that the const-init c'tor doesn't stomp over the state of
 // a Mutex.  Really, this is a test that the platform under test correctly
@@ -148,11 +148,11 @@ ABSL_CONST_INIT turbo::Mutex early_const_init_mutex(turbo::kConstInit);
 // constructors of globals "happen at link time"; memory is pre-initialized,
 // before the constructors of either grab_lock or check_still_locked are run.)
 extern turbo::Mutex const_init_sanity_mutex;
-OnConstruction grab_lock([]() ABSL_NO_THREAD_SAFETY_ANALYSIS {
+OnConstruction grab_lock([]() TURBO_NO_THREAD_SAFETY_ANALYSIS {
   const_init_sanity_mutex.Lock();
 });
-ABSL_CONST_INIT turbo::Mutex const_init_sanity_mutex(turbo::kConstInit);
-OnConstruction check_still_locked([]() ABSL_NO_THREAD_SAFETY_ANALYSIS {
+TURBO_CONST_INIT turbo::Mutex const_init_sanity_mutex(turbo::kConstInit);
+OnConstruction check_still_locked([]() TURBO_NO_THREAD_SAFETY_ANALYSIS {
   const_init_sanity_mutex.AssertHeld();
   const_init_sanity_mutex.Unlock();
 });
@@ -168,7 +168,7 @@ extern turbo::Mutex late_const_init_mutex;
 OnDestruction test_late_const_init([] {
   RunTests(&late_const_init_mutex, nullptr);
 });
-ABSL_CONST_INIT turbo::Mutex late_const_init_mutex(turbo::kConstInit);
+TURBO_CONST_INIT turbo::Mutex late_const_init_mutex(turbo::kConstInit);
 
 }  // namespace
 

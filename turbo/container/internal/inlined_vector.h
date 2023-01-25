@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CONTAINER_INTERNAL_INLINED_VECTOR_H_
-#define ABSL_CONTAINER_INTERNAL_INLINED_VECTOR_H_
+#ifndef TURBO_CONTAINER_INTERNAL_INLINED_VECTOR_H_
+#define TURBO_CONTAINER_INTERNAL_INLINED_VECTOR_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -33,7 +33,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace inlined_vector_internal {
 
 // GCC does not deal very well with the below code
@@ -131,7 +131,7 @@ struct Allocation {
 
 template <typename A,
           bool IsOverAligned =
-              (alignof(ValueType<A>) > ABSL_INTERNAL_DEFAULT_NEW_ALIGNMENT)>
+              (alignof(ValueType<A>) > TURBO_INTERNAL_DEFAULT_NEW_ALIGNMENT)>
 struct MallocAdapter {
   static Allocation<A> Allocate(A& allocator, SizeType<A> requested_capacity) {
     return {AllocatorTraits<A>::allocate(allocator, requested_capacity),
@@ -149,10 +149,10 @@ void ConstructElements(NoTypeDeduction<A>& allocator,
                        Pointer<A> construct_first, ValueAdapter& values,
                        SizeType<A> construct_size) {
   for (SizeType<A> i = 0; i < construct_size; ++i) {
-    ABSL_INTERNAL_TRY { values.ConstructNext(allocator, construct_first + i); }
-    ABSL_INTERNAL_CATCH_ANY {
+    TURBO_INTERNAL_TRY { values.ConstructNext(allocator, construct_first + i); }
+    TURBO_INTERNAL_CATCH_ANY {
       DestroyAdapter<A>::DestroyElements(allocator, construct_first, i);
-      ABSL_INTERNAL_RETHROW;
+      TURBO_INTERNAL_RETHROW;
     }
   }
 }
@@ -247,7 +247,7 @@ class AllocationTransaction {
     return result.data;
   }
 
-  ABSL_MUST_USE_RESULT Allocation<A> Release() && {
+  TURBO_MUST_USE_RESULT Allocation<A> Release() && {
     Allocation<A> result = {GetData(), GetCapacity()};
     Reset();
     return result;
@@ -398,7 +398,7 @@ class Storage {
   // Storage Member Mutators
   // ---------------------------------------------------------------------------
 
-  ABSL_ATTRIBUTE_NOINLINE void InitFrom(const Storage& other);
+  TURBO_ATTRIBUTE_NOINLINE void InitFrom(const Storage& other);
 
   template <typename ValueAdapter>
   void Initialize(ValueAdapter values, SizeType<A> new_size);
@@ -450,7 +450,7 @@ class Storage {
   }
 
   void SubtractSize(SizeType<A> count) {
-    ABSL_HARDENING_ASSERT(count <= GetSize());
+    TURBO_HARDENING_ASSERT(count <= GetSize());
 
     GetSizeAndIsAllocated() -= count << static_cast<SizeType<A>>(1);
   }
@@ -461,7 +461,7 @@ class Storage {
   }
 
   void MemcpyFrom(const Storage& other_storage) {
-    ABSL_HARDENING_ASSERT(IsMemcpyOk<A>::value ||
+    TURBO_HARDENING_ASSERT(IsMemcpyOk<A>::value ||
                           other_storage.GetIsAllocated());
 
     GetSizeAndIsAllocated() = other_storage.GetSizeAndIsAllocated();
@@ -476,7 +476,7 @@ class Storage {
   }
 
  private:
-  ABSL_ATTRIBUTE_NOINLINE void DestroyContents();
+  TURBO_ATTRIBUTE_NOINLINE void DestroyContents();
 
   using Metadata = container_internal::CompressedTuple<A, SizeType<A>>;
 
@@ -509,7 +509,7 @@ class Storage {
   void SwapInlinedElements(NotMemcpyPolicy, Storage* other);
 
   template <typename... Args>
-  ABSL_ATTRIBUTE_NOINLINE Reference<A> EmplaceBackSlow(Args&&... args);
+  TURBO_ATTRIBUTE_NOINLINE Reference<A> EmplaceBackSlow(Args&&... args);
 
   Metadata metadata_;
   Data data_;
@@ -525,7 +525,7 @@ void Storage<T, N, A>::DestroyContents() {
 template <typename T, size_t N, typename A>
 void Storage<T, N, A>::InitFrom(const Storage& other) {
   const SizeType<A> n = other.GetSize();
-  ABSL_HARDENING_ASSERT(n > 0);  // Empty sources handled handled in caller.
+  TURBO_HARDENING_ASSERT(n > 0);  // Empty sources handled handled in caller.
   ConstPointer<A> src;
   Pointer<A> dst;
   if (!other.GetIsAllocated()) {
@@ -557,8 +557,8 @@ template <typename ValueAdapter>
 auto Storage<T, N, A>::Initialize(ValueAdapter values, SizeType<A> new_size)
     -> void {
   // Only callable from constructors!
-  ABSL_HARDENING_ASSERT(!GetIsAllocated());
-  ABSL_HARDENING_ASSERT(GetSize() == 0);
+  TURBO_HARDENING_ASSERT(!GetIsAllocated());
+  TURBO_HARDENING_ASSERT(GetSize() == 0);
 
   Pointer<A> construct_data;
   if (new_size > GetInlinedCapacity()) {
@@ -768,7 +768,7 @@ template <typename... Args>
 auto Storage<T, N, A>::EmplaceBack(Args&&... args) -> Reference<A> {
   StorageView<A> storage_view = MakeStorageView();
   const SizeType<A> n = storage_view.size;
-  if (ABSL_PREDICT_TRUE(n != storage_view.capacity)) {
+  if (TURBO_PREDICT_TRUE(n != storage_view.capacity)) {
     // Fast path; new element fits.
     Pointer<A> last_ptr = storage_view.data + n;
     AllocatorTraits<A>::construct(GetAllocator(), last_ptr,
@@ -795,13 +795,13 @@ auto Storage<T, N, A>::EmplaceBackSlow(Args&&... args) -> Reference<A> {
   AllocatorTraits<A>::construct(GetAllocator(), last_ptr,
                                 std::forward<Args>(args)...);
   // Move elements from old backing store to new backing store.
-  ABSL_INTERNAL_TRY {
+  TURBO_INTERNAL_TRY {
     ConstructElements<A>(GetAllocator(), allocation_tx.GetData(), move_values,
                          storage_view.size);
   }
-  ABSL_INTERNAL_CATCH_ANY {
+  TURBO_INTERNAL_CATCH_ANY {
     AllocatorTraits<A>::destroy(GetAllocator(), last_ptr);
-    ABSL_INTERNAL_RETHROW;
+    TURBO_INTERNAL_RETHROW;
   }
   // Destroy elements in old backing store.
   DestroyAdapter<A>::DestroyElements(GetAllocator(), storage_view.data,
@@ -842,7 +842,7 @@ template <typename T, size_t N, typename A>
 auto Storage<T, N, A>::Reserve(SizeType<A> requested_capacity) -> void {
   StorageView<A> storage_view = MakeStorageView();
 
-  if (ABSL_PREDICT_FALSE(requested_capacity <= storage_view.capacity)) return;
+  if (TURBO_PREDICT_FALSE(requested_capacity <= storage_view.capacity)) return;
 
   AllocationTransaction<A> allocation_tx(GetAllocator());
 
@@ -867,12 +867,12 @@ auto Storage<T, N, A>::Reserve(SizeType<A> requested_capacity) -> void {
 template <typename T, size_t N, typename A>
 auto Storage<T, N, A>::ShrinkToFit() -> void {
   // May only be called on allocated instances!
-  ABSL_HARDENING_ASSERT(GetIsAllocated());
+  TURBO_HARDENING_ASSERT(GetIsAllocated());
 
   StorageView<A> storage_view{GetAllocatedData(), GetSize(),
                               GetAllocatedCapacity()};
 
-  if (ABSL_PREDICT_FALSE(storage_view.size == storage_view.capacity)) return;
+  if (TURBO_PREDICT_FALSE(storage_view.size == storage_view.capacity)) return;
 
   AllocationTransaction<A> allocation_tx(GetAllocator());
 
@@ -891,13 +891,13 @@ auto Storage<T, N, A>::ShrinkToFit() -> void {
     construct_data = GetInlinedData();
   }
 
-  ABSL_INTERNAL_TRY {
+  TURBO_INTERNAL_TRY {
     ConstructElements<A>(GetAllocator(), construct_data, move_values,
                          storage_view.size);
   }
-  ABSL_INTERNAL_CATCH_ANY {
+  TURBO_INTERNAL_CATCH_ANY {
     SetAllocation({storage_view.data, storage_view.capacity});
-    ABSL_INTERNAL_RETHROW;
+    TURBO_INTERNAL_RETHROW;
   }
 
   DestroyAdapter<A>::DestroyElements(GetAllocator(), storage_view.data,
@@ -916,7 +916,7 @@ auto Storage<T, N, A>::ShrinkToFit() -> void {
 template <typename T, size_t N, typename A>
 auto Storage<T, N, A>::Swap(Storage* other_storage_ptr) -> void {
   using std::swap;
-  ABSL_HARDENING_ASSERT(this != other_storage_ptr);
+  TURBO_HARDENING_ASSERT(this != other_storage_ptr);
 
   if (GetIsAllocated() && other_storage_ptr->GetIsAllocated()) {
     swap(data_.allocated, other_storage_ptr->data_.allocated);
@@ -934,15 +934,15 @@ auto Storage<T, N, A>::Swap(Storage* other_storage_ptr) -> void {
     IteratorValueAdapter<A, MoveIterator<A>> move_values(
         MoveIterator<A>(inlined_ptr->GetInlinedData()));
 
-    ABSL_INTERNAL_TRY {
+    TURBO_INTERNAL_TRY {
       ConstructElements<A>(inlined_ptr->GetAllocator(),
                            allocated_ptr->GetInlinedData(), move_values,
                            inlined_ptr->GetSize());
     }
-    ABSL_INTERNAL_CATCH_ANY {
+    TURBO_INTERNAL_CATCH_ANY {
       allocated_ptr->SetAllocation(Allocation<A>{
           allocated_storage_view.data, allocated_storage_view.capacity});
-      ABSL_INTERNAL_RETHROW;
+      TURBO_INTERNAL_RETHROW;
     }
 
     DestroyAdapter<A>::DestroyElements(inlined_ptr->GetAllocator(),
@@ -1025,7 +1025,7 @@ void Storage<T, N, A>::SwapInlinedElements(NotMemcpyPolicy policy,
 #endif
 
 }  // namespace inlined_vector_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_INTERNAL_INLINED_VECTOR_H_
+#endif  // TURBO_CONTAINER_INTERNAL_INLINED_VECTOR_H_

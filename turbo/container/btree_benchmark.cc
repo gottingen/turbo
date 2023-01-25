@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
@@ -268,7 +268,7 @@ void BM_QueueAddRem(benchmark::State& state) {
   using V = typename remove_pair_const<typename T::value_type>::type;
   typename KeyOfValue<typename T::key_type, V>::type key_of_value;
 
-  ABSL_RAW_CHECK(kBenchmarkValues % 2 == 0, "for performance");
+  TURBO_RAW_CHECK(kBenchmarkValues % 2 == 0, "for performance");
 
   T container;
 
@@ -330,7 +330,7 @@ void BM_MixedAddRem(benchmark::State& state) {
   using V = typename remove_pair_const<typename T::value_type>::type;
   typename KeyOfValue<typename T::key_type, V>::type key_of_value;
 
-  ABSL_RAW_CHECK(kBenchmarkValues % 2 == 0, "for performance");
+  TURBO_RAW_CHECK(kBenchmarkValues % 2 == 0, "for performance");
 
   T container;
 
@@ -601,7 +601,7 @@ struct BigType {
 
   // Support turbo::Hash.
   template <typename State>
-  friend State AbslHashValue(State h, const BigType& b) {
+  friend State TurboHashValue(State h, const BigType& b) {
     for (int i = 0; i < Size && i < Copies; ++i)
       h = State::combine(std::move(h), b.values[i]);
     return h;
@@ -760,5 +760,5 @@ BENCHMARK(BM_BtreeSet_IteratorSubtraction)->Range(1 << 10, 1 << 20);
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

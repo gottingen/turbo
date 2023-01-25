@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ int value = 0;
 void TestHook(int x) { value = x; }
 
 TEST(AtomicHookTest, NoDefaultFunction) {
-  ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static turbo::base_internal::AtomicHook<
+  TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static turbo::base_internal::AtomicHook<
       void (*)(int)>
       hook;
   value = 0;
@@ -55,7 +55,7 @@ TEST(AtomicHookTest, NoDefaultFunction) {
 
 TEST(AtomicHookTest, WithDefaultFunction) {
   // Set the default value to TestHook at compile-time.
-  ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static turbo::base_internal::AtomicHook<
+  TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static turbo::base_internal::AtomicHook<
       void (*)(int)>
       hook(TestHook);
   value = 0;
@@ -74,7 +74,7 @@ TEST(AtomicHookTest, WithDefaultFunction) {
   EXPECT_EQ(value, 2);
 }
 
-ABSL_CONST_INIT int override_func_calls = 0;
+TURBO_CONST_INIT int override_func_calls = 0;
 void OverrideFunc() { override_func_calls++; }
 static struct OverrideInstaller {
   OverrideInstaller() { turbo::atomic_hook_internal::func.Store(OverrideFunc); }

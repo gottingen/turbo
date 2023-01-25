@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 // When a thread terminates, its ThreadIdentity object may be reused for a
 // thread created later.
 
-#ifndef ABSL_BASE_INTERNAL_THREAD_IDENTITY_H_
-#define ABSL_BASE_INTERNAL_THREAD_IDENTITY_H_
+#ifndef TURBO_BASE_INTERNAL_THREAD_IDENTITY_H_
+#define TURBO_BASE_INTERNAL_THREAD_IDENTITY_H_
 
 #ifndef _WIN32
 #include <pthread.h>
@@ -35,7 +35,7 @@
 #include "turbo/base/optimization.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 struct SynchLocksHeld;
 struct SynchWaitParams;
@@ -189,53 +189,53 @@ void SetCurrentThreadIdentity(ThreadIdentity* identity,
 // from that function.
 void ClearCurrentThreadIdentity();
 
-// May be chosen at compile time via: -DABSL_FORCE_THREAD_IDENTITY_MODE=<mode
+// May be chosen at compile time via: -DTURBO_FORCE_THREAD_IDENTITY_MODE=<mode
 // index>
-#ifdef ABSL_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC
-#error ABSL_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC cannot be directly set
+#ifdef TURBO_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC
+#error TURBO_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC cannot be directly set
 #else
-#define ABSL_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC 0
+#define TURBO_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC 0
 #endif
 
-#ifdef ABSL_THREAD_IDENTITY_MODE_USE_TLS
-#error ABSL_THREAD_IDENTITY_MODE_USE_TLS cannot be directly set
+#ifdef TURBO_THREAD_IDENTITY_MODE_USE_TLS
+#error TURBO_THREAD_IDENTITY_MODE_USE_TLS cannot be directly set
 #else
-#define ABSL_THREAD_IDENTITY_MODE_USE_TLS 1
+#define TURBO_THREAD_IDENTITY_MODE_USE_TLS 1
 #endif
 
-#ifdef ABSL_THREAD_IDENTITY_MODE_USE_CPP11
-#error ABSL_THREAD_IDENTITY_MODE_USE_CPP11 cannot be directly set
+#ifdef TURBO_THREAD_IDENTITY_MODE_USE_CPP11
+#error TURBO_THREAD_IDENTITY_MODE_USE_CPP11 cannot be directly set
 #else
-#define ABSL_THREAD_IDENTITY_MODE_USE_CPP11 2
+#define TURBO_THREAD_IDENTITY_MODE_USE_CPP11 2
 #endif
 
-#ifdef ABSL_THREAD_IDENTITY_MODE
-#error ABSL_THREAD_IDENTITY_MODE cannot be directly set
-#elif defined(ABSL_FORCE_THREAD_IDENTITY_MODE)
-#define ABSL_THREAD_IDENTITY_MODE ABSL_FORCE_THREAD_IDENTITY_MODE
+#ifdef TURBO_THREAD_IDENTITY_MODE
+#error TURBO_THREAD_IDENTITY_MODE cannot be directly set
+#elif defined(TURBO_FORCE_THREAD_IDENTITY_MODE)
+#define TURBO_THREAD_IDENTITY_MODE TURBO_FORCE_THREAD_IDENTITY_MODE
 #elif defined(_WIN32) && !defined(__MINGW32__)
-#define ABSL_THREAD_IDENTITY_MODE ABSL_THREAD_IDENTITY_MODE_USE_CPP11
-#elif defined(__APPLE__) && defined(ABSL_HAVE_THREAD_LOCAL)
-#define ABSL_THREAD_IDENTITY_MODE ABSL_THREAD_IDENTITY_MODE_USE_CPP11
-#elif ABSL_PER_THREAD_TLS && defined(__GOOGLE_GRTE_VERSION__) &&        \
+#define TURBO_THREAD_IDENTITY_MODE TURBO_THREAD_IDENTITY_MODE_USE_CPP11
+#elif defined(__APPLE__) && defined(TURBO_HAVE_THREAD_LOCAL)
+#define TURBO_THREAD_IDENTITY_MODE TURBO_THREAD_IDENTITY_MODE_USE_CPP11
+#elif TURBO_PER_THREAD_TLS && defined(__GOOGLE_GRTE_VERSION__) &&        \
     (__GOOGLE_GRTE_VERSION__ >= 20140228L)
 // Support for async-safe TLS was specifically added in GRTEv4.  It's not
 // present in the upstream eglibc.
 // Note:  Current default for production systems.
-#define ABSL_THREAD_IDENTITY_MODE ABSL_THREAD_IDENTITY_MODE_USE_TLS
+#define TURBO_THREAD_IDENTITY_MODE TURBO_THREAD_IDENTITY_MODE_USE_TLS
 #else
-#define ABSL_THREAD_IDENTITY_MODE \
-  ABSL_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC
+#define TURBO_THREAD_IDENTITY_MODE \
+  TURBO_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC
 #endif
 
-#if ABSL_THREAD_IDENTITY_MODE == ABSL_THREAD_IDENTITY_MODE_USE_TLS || \
-    ABSL_THREAD_IDENTITY_MODE == ABSL_THREAD_IDENTITY_MODE_USE_CPP11
+#if TURBO_THREAD_IDENTITY_MODE == TURBO_THREAD_IDENTITY_MODE_USE_TLS || \
+    TURBO_THREAD_IDENTITY_MODE == TURBO_THREAD_IDENTITY_MODE_USE_CPP11
 
-#if ABSL_PER_THREAD_TLS
-ABSL_CONST_INIT extern ABSL_PER_THREAD_TLS_KEYWORD ThreadIdentity*
+#if TURBO_PER_THREAD_TLS
+TURBO_CONST_INIT extern TURBO_PER_THREAD_TLS_KEYWORD ThreadIdentity*
     thread_identity_ptr;
-#elif defined(ABSL_HAVE_THREAD_LOCAL)
-ABSL_CONST_INIT extern thread_local ThreadIdentity* thread_identity_ptr;
+#elif defined(TURBO_HAVE_THREAD_LOCAL)
+TURBO_CONST_INIT extern thread_local ThreadIdentity* thread_identity_ptr;
 #else
 #error Thread-local storage not detected on this platform
 #endif
@@ -246,24 +246,24 @@ ABSL_CONST_INIT extern thread_local ThreadIdentity* thread_identity_ptr;
 // inlined. In the other cases we opt to have the function not be inlined. Note
 // that `CurrentThreadIdentityIfPresent` is declared above so we can exclude
 // this entire inline definition.
-#if !defined(__APPLE__) && !defined(ABSL_BUILD_DLL) && \
-    !defined(ABSL_CONSUME_DLL)
-#define ABSL_INTERNAL_INLINE_CURRENT_THREAD_IDENTITY_IF_PRESENT 1
+#if !defined(__APPLE__) && !defined(TURBO_BUILD_DLL) && \
+    !defined(TURBO_CONSUME_DLL)
+#define TURBO_INTERNAL_INLINE_CURRENT_THREAD_IDENTITY_IF_PRESENT 1
 #endif
 
-#ifdef ABSL_INTERNAL_INLINE_CURRENT_THREAD_IDENTITY_IF_PRESENT
+#ifdef TURBO_INTERNAL_INLINE_CURRENT_THREAD_IDENTITY_IF_PRESENT
 inline ThreadIdentity* CurrentThreadIdentityIfPresent() {
   return thread_identity_ptr;
 }
 #endif
 
-#elif ABSL_THREAD_IDENTITY_MODE != \
-    ABSL_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC
-#error Unknown ABSL_THREAD_IDENTITY_MODE
+#elif TURBO_THREAD_IDENTITY_MODE != \
+    TURBO_THREAD_IDENTITY_MODE_USE_POSIX_SETSPECIFIC
+#error Unknown TURBO_THREAD_IDENTITY_MODE
 #endif
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_BASE_INTERNAL_THREAD_IDENTITY_H_
+#endif  // TURBO_BASE_INTERNAL_THREAD_IDENTITY_H_

@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@
 //    * `turbo::Span` has an explicit mutable-reference constructor
 //
 // For more information, see the class comments below.
-#ifndef ABSL_TYPES_SPAN_H_
-#define ABSL_TYPES_SPAN_H_
+#ifndef TURBO_TYPES_SPAN_H_
+#define TURBO_TYPES_SPAN_H_
 
 #include <algorithm>
 #include <cassert>
@@ -69,7 +69,7 @@
 #include "turbo/types/internal/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 //------------------------------------------------------------------------------
 // Span
@@ -201,7 +201,7 @@ class Span {
             typename = span_internal::EnableIfNotIsView<V>>
   explicit Span(
       V& v
-          ABSL_ATTRIBUTE_LIFETIME_BOUND) noexcept  // NOLINT(runtime/references)
+          TURBO_ATTRIBUTE_LIFETIME_BOUND) noexcept  // NOLINT(runtime/references)
       : Span(span_internal::GetData(v), v.size()) {}
 
   // Implicit reference constructor for a read-only `Span<const T>` type
@@ -210,11 +210,11 @@ class Span {
             typename = span_internal::EnableIfNotIsView<V>>
   constexpr Span(
       const V& v
-          ABSL_ATTRIBUTE_LIFETIME_BOUND) noexcept  // NOLINT(runtime/explicit)
+          TURBO_ATTRIBUTE_LIFETIME_BOUND) noexcept  // NOLINT(runtime/explicit)
       : Span(span_internal::GetData(v), v.size()) {}
 
   // Overloads of the above two functions that are only enabled for view types.
-  // This is so we can drop the ABSL_ATTRIBUTE_LIFETIME_BOUND annotation. These
+  // This is so we can drop the TURBO_ATTRIBUTE_LIFETIME_BOUND annotation. These
   // overloads must be made unique by using a different template parameter list
   // (hence the = 0 for the IsView enabler).
   template <typename V, typename = EnableIfConvertibleFrom<V>,
@@ -266,7 +266,7 @@ class Span {
   template <typename LazyT = T,
             typename = EnableIfValueIsConst<LazyT>>
   Span(std::initializer_list<value_type> v
-           ABSL_ATTRIBUTE_LIFETIME_BOUND) noexcept  // NOLINT(runtime/explicit)
+           TURBO_ATTRIBUTE_LIFETIME_BOUND) noexcept  // NOLINT(runtime/explicit)
       : Span(v.begin(), v.size()) {}
 
   // Accessors
@@ -297,14 +297,14 @@ class Span {
   // Returns a reference to the i'th element of this span.
   constexpr reference operator[](size_type i) const noexcept {
     // MSVC 2015 accepts this as constexpr, but not ptr_[i]
-    return ABSL_HARDENING_ASSERT(i < size()), *(data() + i);
+    return TURBO_HARDENING_ASSERT(i < size()), *(data() + i);
   }
 
   // Span::at()
   //
   // Returns a reference to the i'th element of this span.
   constexpr reference at(size_type i) const {
-    return ABSL_PREDICT_TRUE(i < size())  //
+    return TURBO_PREDICT_TRUE(i < size())  //
                ? *(data() + i)
                : (base_internal::ThrowStdOutOfRange(
                       "Span::at failed bounds check"),
@@ -316,7 +316,7 @@ class Span {
   // Returns a reference to the first element of this span. The span must not
   // be empty.
   constexpr reference front() const noexcept {
-    return ABSL_HARDENING_ASSERT(size() > 0), *data();
+    return TURBO_HARDENING_ASSERT(size() > 0), *data();
   }
 
   // Span::back()
@@ -324,7 +324,7 @@ class Span {
   // Returns a reference to the last element of this span. The span must not
   // be empty.
   constexpr reference back() const noexcept {
-    return ABSL_HARDENING_ASSERT(size() > 0), *(data() + size() - 1);
+    return TURBO_HARDENING_ASSERT(size() > 0), *(data() + size() - 1);
   }
 
   // Span::begin()
@@ -389,7 +389,7 @@ class Span {
   //
   // Removes the first `n` elements from the span.
   void remove_prefix(size_type n) noexcept {
-    ABSL_HARDENING_ASSERT(size() >= n);
+    TURBO_HARDENING_ASSERT(size() >= n);
     ptr_ += n;
     len_ -= n;
   }
@@ -398,7 +398,7 @@ class Span {
   //
   // Removes the last `n` elements from the span.
   void remove_suffix(size_type n) noexcept {
-    ABSL_HARDENING_ASSERT(size() >= n);
+    TURBO_HARDENING_ASSERT(size() >= n);
     len_ -= n;
   }
 
@@ -460,7 +460,7 @@ class Span {
 
   // Support for turbo::Hash.
   template <typename H>
-  friend H AbslHashValue(H h, Span v) {
+  friend H TurboHashValue(H h, Span v) {
     return H::combine(H::combine_contiguous(std::move(h), v.data(), v.size()),
                       v.size());
   }
@@ -686,7 +686,7 @@ constexpr Span<T> MakeSpan(T* ptr, size_t size) noexcept {
 
 template <int&... ExplicitArgumentBarrier, typename T>
 Span<T> MakeSpan(T* begin, T* end) noexcept {
-  return ABSL_HARDENING_ASSERT(begin <= end),
+  return TURBO_HARDENING_ASSERT(begin <= end),
          Span<T>(begin, static_cast<size_t>(end - begin));
 }
 
@@ -732,7 +732,7 @@ constexpr Span<const T> MakeConstSpan(T* ptr, size_t size) noexcept {
 
 template <int&... ExplicitArgumentBarrier, typename T>
 Span<const T> MakeConstSpan(T* begin, T* end) noexcept {
-  return ABSL_HARDENING_ASSERT(begin <= end), Span<const T>(begin, end - begin);
+  return TURBO_HARDENING_ASSERT(begin <= end), Span<const T>(begin, end - begin);
 }
 
 template <int&... ExplicitArgumentBarrier, typename C>
@@ -744,6 +744,6 @@ template <int&... ExplicitArgumentBarrier, typename T, size_t N>
 constexpr Span<const T> MakeConstSpan(const T (&array)[N]) noexcept {
   return Span<const T>(array, N);
 }
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
-#endif  // ABSL_TYPES_SPAN_H_
+#endif  // TURBO_TYPES_SPAN_H_

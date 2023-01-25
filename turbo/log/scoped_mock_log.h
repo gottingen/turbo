@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 //
 // This header declares `class turbo::ScopedMockLog`, for use in testing.
 
-#ifndef ABSL_LOG_SCOPED_MOCK_LOG_H_
-#define ABSL_LOG_SCOPED_MOCK_LOG_H_
+#ifndef TURBO_LOG_SCOPED_MOCK_LOG_H_
+#define TURBO_LOG_SCOPED_MOCK_LOG_H_
 
 #include <atomic>
 #include <string>
@@ -31,7 +31,7 @@
 #include "turbo/log/log_sink.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // MockLogDefault
 //
@@ -188,7 +188,7 @@ class ScopedMockLog final {
   std::atomic<bool> is_triggered_;
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_SCOPED_MOCK_LOG_H_
+#endif  // TURBO_LOG_SCOPED_MOCK_LOG_H_

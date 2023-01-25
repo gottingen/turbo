@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_CPU_DETECT_H_
-#define ABSL_CRC_INTERNAL_CPU_DETECT_H_
+#ifndef TURBO_CRC_INTERNAL_CPU_DETECT_H_
+#define TURBO_CRC_INTERNAL_CPU_DETECT_H_
 
 #include "turbo/base/config.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 // Enumeration of architectures that we have special-case tuning parameters for.
@@ -51,7 +51,7 @@ CpuType GetCpuType();
 bool SupportsArmCRC32PMULL();
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_INTERNAL_CPU_DETECT_H_
+#endif  // TURBO_CRC_INTERNAL_CPU_DETECT_H_

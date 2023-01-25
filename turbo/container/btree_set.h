@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,14 +49,14 @@
 // Another API difference is that btree iterators can be subtracted, and this
 // is faster than using std::distance.
 
-#ifndef ABSL_CONTAINER_BTREE_SET_H_
-#define ABSL_CONTAINER_BTREE_SET_H_
+#ifndef TURBO_CONTAINER_BTREE_SET_H_
+#define TURBO_CONTAINER_BTREE_SET_H_
 
 #include "turbo/container/internal/btree.h"  // IWYU pragma: export
 #include "turbo/container/internal/btree_container.h"  // IWYU pragma: export
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace container_internal {
 
@@ -815,7 +815,7 @@ struct set_params : common_params<Key, Compare, Alloc, TargetNodeSize, IsMulti,
 
 }  // namespace container_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_BTREE_SET_H_
+#endif  // TURBO_CONTAINER_BTREE_SET_H_

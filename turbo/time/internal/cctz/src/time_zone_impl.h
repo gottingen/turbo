@@ -12,8 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#ifndef ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_IMPL_H_
-#define ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_IMPL_H_
+#ifndef TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IMPL_H_
+#define TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IMPL_H_
 
 #include <memory>
 #include <string>
@@ -25,7 +25,7 @@
 #include "time_zone_info.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
 
@@ -87,7 +87,7 @@ class time_zone::Impl {
 
 }  // namespace cctz
 }  // namespace time_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_IMPL_H_
+#endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IMPL_H_

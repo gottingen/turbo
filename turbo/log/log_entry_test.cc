@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,12 +47,12 @@ using ::testing::IsTrue;
 using ::testing::StartsWith;
 using ::testing::StrEq;
 
-auto* test_env ABSL_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 }  // namespace
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 class LogEntryTestPeer {
@@ -131,7 +131,7 @@ class LogEntryTestPeer {
 };
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace {
@@ -206,7 +206,7 @@ TEST(LogEntryTest, EmptyFields) {
 }
 
 TEST(LogEntryTest, NegativeFields) {
-  // When Abseil's minimum C++ version is C++17, this conditional can be
+  // When Turbo's minimum C++ version is C++17, this conditional can be
   // converted to a constexpr if and the static_cast below removed.
   if (std::is_signed<turbo::LogEntry::tid_t>::value) {
     LogEntryTestPeer entry(
@@ -316,7 +316,7 @@ TEST(LogEntryTest, LongFields) {
 }
 
 TEST(LogEntryTest, LongNegativeFields) {
-  // When Abseil's minimum C++ version is C++17, this conditional can be
+  // When Turbo's minimum C++ version is C++17, this conditional can be
   // converted to a constexpr if and the static_cast below removed.
   if (std::is_signed<turbo::LogEntry::tid_t>::value) {
     LogEntryTestPeer entry(

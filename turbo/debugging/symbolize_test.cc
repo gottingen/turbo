@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,27 +38,27 @@
 using testing::Contains;
 
 #ifdef _WIN32
-#define ABSL_SYMBOLIZE_TEST_NOINLINE __declspec(noinline)
+#define TURBO_SYMBOLIZE_TEST_NOINLINE __declspec(noinline)
 #else
-#define ABSL_SYMBOLIZE_TEST_NOINLINE ABSL_ATTRIBUTE_NOINLINE
+#define TURBO_SYMBOLIZE_TEST_NOINLINE TURBO_ATTRIBUTE_NOINLINE
 #endif
 
 // Functions to symbolize. Use C linkage to avoid mangled names.
 extern "C" {
-ABSL_SYMBOLIZE_TEST_NOINLINE void nonstatic_func() {
+TURBO_SYMBOLIZE_TEST_NOINLINE void nonstatic_func() {
   // The next line makes this a unique function to prevent the compiler from
   // folding identical functions together.
   volatile int x = __LINE__;
   static_cast<void>(x);
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
-ABSL_SYMBOLIZE_TEST_NOINLINE static void static_func() {
+TURBO_SYMBOLIZE_TEST_NOINLINE static void static_func() {
   // The next line makes this a unique function to prevent the compiler from
   // folding identical functions together.
   volatile int x = __LINE__;
   static_cast<void>(x);
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 }  // extern "C"
 
@@ -67,41 +67,41 @@ struct Foo {
 };
 
 // A C++ method that should have a mangled name.
-ABSL_SYMBOLIZE_TEST_NOINLINE void Foo::func(int) {
+TURBO_SYMBOLIZE_TEST_NOINLINE void Foo::func(int) {
   // The next line makes this a unique function to prevent the compiler from
   // folding identical functions together.
   volatile int x = __LINE__;
   static_cast<void>(x);
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
 // Create functions that will remain in different text sections in the
 // final binary when linker option "-z,keep-text-section-prefix" is used.
-int ABSL_ATTRIBUTE_SECTION_VARIABLE(.text.unlikely) unlikely_func() {
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.unlikely) unlikely_func() {
   return 0;
 }
 
-int ABSL_ATTRIBUTE_SECTION_VARIABLE(.text.hot) hot_func() {
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.hot) hot_func() {
   return 0;
 }
 
-int ABSL_ATTRIBUTE_SECTION_VARIABLE(.text.startup) startup_func() {
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.startup) startup_func() {
   return 0;
 }
 
-int ABSL_ATTRIBUTE_SECTION_VARIABLE(.text.exit) exit_func() {
+int TURBO_ATTRIBUTE_SECTION_VARIABLE(.text.exit) exit_func() {
   return 0;
 }
 
-int /*ABSL_ATTRIBUTE_SECTION_VARIABLE(.text)*/ regular_func() {
+int /*TURBO_ATTRIBUTE_SECTION_VARIABLE(.text)*/ regular_func() {
   return 0;
 }
 
 // Thread-local data may confuse the symbolizer, ensure that it does not.
 // Variable sizes and order are important.
-#if ABSL_PER_THREAD_TLS
-static ABSL_PER_THREAD_TLS_KEYWORD char symbolize_test_thread_small[1];
-static ABSL_PER_THREAD_TLS_KEYWORD char
+#if TURBO_PER_THREAD_TLS
+static TURBO_PER_THREAD_TLS_KEYWORD char symbolize_test_thread_small[1];
+static TURBO_PER_THREAD_TLS_KEYWORD char
     symbolize_test_thread_big[2 * 1024 * 1024];
 #endif
 
@@ -113,7 +113,7 @@ static volatile bool volatile_bool = false;
 
 // Force the binary to be large enough that a THP .text remap will succeed.
 static constexpr size_t kHpageSize = 1 << 21;
-const char kHpageTextPadding[kHpageSize * 4] ABSL_ATTRIBUTE_SECTION_VARIABLE(
+const char kHpageTextPadding[kHpageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(
     .text) = "";
 #endif  // !defined(__EMSCRIPTEN__)
 
@@ -124,14 +124,14 @@ static char try_symbolize_buffer[4096];
 // turbo::Symbolize() returns false, otherwise returns try_symbolize_buffer with
 // the result of turbo::Symbolize().
 static const char *TrySymbolizeWithLimit(void *pc, int limit) {
-  ABSL_RAW_CHECK(limit <= sizeof(try_symbolize_buffer),
+  TURBO_RAW_CHECK(limit <= sizeof(try_symbolize_buffer),
                  "try_symbolize_buffer is too small");
 
   // Use the heap to facilitate heap and buffer sanitizer tools.
   auto heap_buffer = turbo::make_unique<char[]>(sizeof(try_symbolize_buffer));
   bool found = turbo::Symbolize(pc, heap_buffer.get(), limit);
   if (found) {
-    ABSL_RAW_CHECK(strnlen(heap_buffer.get(), limit) < limit,
+    TURBO_RAW_CHECK(strnlen(heap_buffer.get(), limit) < limit,
                    "turbo::Symbolize() did not properly terminate the string");
     strncpy(try_symbolize_buffer, heap_buffer.get(),
             sizeof(try_symbolize_buffer) - 1);
@@ -146,22 +146,22 @@ static const char *TrySymbolize(void *pc) {
   return TrySymbolizeWithLimit(pc, sizeof(try_symbolize_buffer));
 }
 
-#if defined(ABSL_INTERNAL_HAVE_ELF_SYMBOLIZE) ||    \
-    defined(ABSL_INTERNAL_HAVE_DARWIN_SYMBOLIZE) || \
-    defined(ABSL_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE)
+#if defined(TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE) ||    \
+    defined(TURBO_INTERNAL_HAVE_DARWIN_SYMBOLIZE) || \
+    defined(TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE)
 
 // Test with a return address.
-void ABSL_ATTRIBUTE_NOINLINE TestWithReturnAddress() {
-#if defined(ABSL_HAVE_ATTRIBUTE_NOINLINE)
+void TURBO_ATTRIBUTE_NOINLINE TestWithReturnAddress() {
+#if defined(TURBO_HAVE_ATTRIBUTE_NOINLINE)
   void *return_address = __builtin_return_address(0);
   const char *symbol = TrySymbolize(return_address);
-  ABSL_RAW_CHECK(symbol != nullptr, "TestWithReturnAddress failed");
-  ABSL_RAW_CHECK(strcmp(symbol, "main") == 0, "TestWithReturnAddress failed");
+  TURBO_RAW_CHECK(symbol != nullptr, "TestWithReturnAddress failed");
+  TURBO_RAW_CHECK(strcmp(symbol, "main") == 0, "TestWithReturnAddress failed");
   std::cout << "TestWithReturnAddress passed" << std::endl;
 #endif
 }
 
-#ifndef ABSL_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE
+#ifndef TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE
 
 TEST(Symbolize, Cached) {
   // Compilers should give us pointers to them.
@@ -209,7 +209,7 @@ TEST(Symbolize, SymbolizeSplitTextSections) {
 }
 
 // Tests that verify that Symbolize stack footprint is within some limit.
-#ifdef ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#ifdef TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
 
 static void *g_pc_to_symbolize;
 static char g_symbolize_buffer[4096];
@@ -235,8 +235,8 @@ static const char *SymbolizeStackConsumption(void *pc, int *stack_consumed) {
 static int GetStackConsumptionUpperLimit() {
   // Symbolize stack consumption should be within 2kB.
   int stack_consumption_upper_limit = 2048;
-#if defined(ABSL_HAVE_ADDRESS_SANITIZER) || \
-    defined(ABSL_HAVE_MEMORY_SANITIZER) || defined(ABSL_HAVE_THREAD_SANITIZER)
+#if defined(TURBO_HAVE_ADDRESS_SANITIZER) || \
+    defined(TURBO_HAVE_MEMORY_SANITIZER) || defined(TURBO_HAVE_THREAD_SANITIZER)
   // Account for sanitizer instrumentation requiring additional stack space.
   stack_consumption_upper_limit *= 5;
 #endif
@@ -273,16 +273,16 @@ TEST(Symbolize, SymbolizeWithDemanglingStackConsumption) {
   EXPECT_LT(stack_consumed, GetStackConsumptionUpperLimit());
 }
 
-#endif  // ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
+#endif  // TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION
 
-#ifndef ABSL_INTERNAL_HAVE_DARWIN_SYMBOLIZE
+#ifndef TURBO_INTERNAL_HAVE_DARWIN_SYMBOLIZE
 // Use a 64K page size for PPC.
 const size_t kPageSize = 64 << 10;
 // We place a read-only symbols into the .text section and verify that we can
 // symbolize them and other symbols after remapping them.
-const char kPadding0[kPageSize * 4] ABSL_ATTRIBUTE_SECTION_VARIABLE(.text) =
+const char kPadding0[kPageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(.text) =
     "";
-const char kPadding1[kPageSize * 4] ABSL_ATTRIBUTE_SECTION_VARIABLE(.text) =
+const char kPadding1[kPageSize * 4] TURBO_ATTRIBUTE_SECTION_VARIABLE(.text) =
     "";
 
 static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
@@ -314,8 +314,8 @@ static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
 TEST(Symbolize, SymbolizeWithMultipleMaps) {
   // Force kPadding0 and kPadding1 to be linked in.
   if (volatile_bool) {
-    ABSL_RAW_LOG(INFO, "%s", kPadding0);
-    ABSL_RAW_LOG(INFO, "%s", kPadding1);
+    TURBO_RAW_LOG(INFO, "%s", kPadding0);
+    TURBO_RAW_LOG(INFO, "%s", kPadding1);
   }
 
   // Verify we can symbolize everything.
@@ -433,12 +433,12 @@ TEST(Symbolize, ForEachSection) {
 
   close(fd);
 }
-#endif  // !ABSL_INTERNAL_HAVE_DARWIN_SYMBOLIZE
-#endif  // !ABSL_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE
+#endif  // !TURBO_INTERNAL_HAVE_DARWIN_SYMBOLIZE
+#endif  // !TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE
 
 // x86 specific tests.  Uses some inline assembler.
 extern "C" {
-inline void *ABSL_ATTRIBUTE_ALWAYS_INLINE inline_func() {
+inline void *TURBO_ATTRIBUTE_ALWAYS_INLINE inline_func() {
   void *pc = nullptr;
 #if defined(__i386__)
   __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
@@ -448,7 +448,7 @@ inline void *ABSL_ATTRIBUTE_ALWAYS_INLINE inline_func() {
   return pc;
 }
 
-void *ABSL_ATTRIBUTE_NOINLINE non_inline_func() {
+void *TURBO_ATTRIBUTE_NOINLINE non_inline_func() {
   void *pc = nullptr;
 #if defined(__i386__)
   __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
@@ -458,32 +458,32 @@ void *ABSL_ATTRIBUTE_NOINLINE non_inline_func() {
   return pc;
 }
 
-void ABSL_ATTRIBUTE_NOINLINE TestWithPCInsideNonInlineFunction() {
-#if defined(ABSL_HAVE_ATTRIBUTE_NOINLINE) && \
+void TURBO_ATTRIBUTE_NOINLINE TestWithPCInsideNonInlineFunction() {
+#if defined(TURBO_HAVE_ATTRIBUTE_NOINLINE) && \
     (defined(__i386__) || defined(__x86_64__))
   void *pc = non_inline_func();
   const char *symbol = TrySymbolize(pc);
-  ABSL_RAW_CHECK(symbol != nullptr, "TestWithPCInsideNonInlineFunction failed");
-  ABSL_RAW_CHECK(strcmp(symbol, "non_inline_func") == 0,
+  TURBO_RAW_CHECK(symbol != nullptr, "TestWithPCInsideNonInlineFunction failed");
+  TURBO_RAW_CHECK(strcmp(symbol, "non_inline_func") == 0,
                  "TestWithPCInsideNonInlineFunction failed");
   std::cout << "TestWithPCInsideNonInlineFunction passed" << std::endl;
 #endif
 }
 
-void ABSL_ATTRIBUTE_NOINLINE TestWithPCInsideInlineFunction() {
-#if defined(ABSL_HAVE_ATTRIBUTE_ALWAYS_INLINE) && \
+void TURBO_ATTRIBUTE_NOINLINE TestWithPCInsideInlineFunction() {
+#if defined(TURBO_HAVE_ATTRIBUTE_ALWAYS_INLINE) && \
     (defined(__i386__) || defined(__x86_64__))
   void *pc = inline_func();  // Must be inlined.
   const char *symbol = TrySymbolize(pc);
-  ABSL_RAW_CHECK(symbol != nullptr, "TestWithPCInsideInlineFunction failed");
-  ABSL_RAW_CHECK(strcmp(symbol, __FUNCTION__) == 0,
+  TURBO_RAW_CHECK(symbol != nullptr, "TestWithPCInsideInlineFunction failed");
+  TURBO_RAW_CHECK(strcmp(symbol, __FUNCTION__) == 0,
                  "TestWithPCInsideInlineFunction failed");
   std::cout << "TestWithPCInsideInlineFunction passed" << std::endl;
 #endif
 }
 }
 
-#if defined(__arm__) && ABSL_HAVE_ATTRIBUTE(target) && \
+#if defined(__arm__) && TURBO_HAVE_ATTRIBUTE(target) && \
     ((__ARM_ARCH >= 7) || !defined(__ARM_PCS_VFP))
 // Test that we correctly identify bounds of Thumb functions on ARM.
 //
@@ -516,21 +516,21 @@ __attribute__((target("arm"))) int ArmThumbOverlapArm(int x) {
   return x * x * x;
 }
 
-void ABSL_ATTRIBUTE_NOINLINE TestArmThumbOverlap() {
-#if defined(ABSL_HAVE_ATTRIBUTE_NOINLINE)
+void TURBO_ATTRIBUTE_NOINLINE TestArmThumbOverlap() {
+#if defined(TURBO_HAVE_ATTRIBUTE_NOINLINE)
   const char *symbol = TrySymbolize((void *)&ArmThumbOverlapArm);
-  ABSL_RAW_CHECK(symbol != nullptr, "TestArmThumbOverlap failed");
-  ABSL_RAW_CHECK(strcmp("ArmThumbOverlapArm()", symbol) == 0,
+  TURBO_RAW_CHECK(symbol != nullptr, "TestArmThumbOverlap failed");
+  TURBO_RAW_CHECK(strcmp("ArmThumbOverlapArm()", symbol) == 0,
                  "TestArmThumbOverlap failed");
   std::cout << "TestArmThumbOverlap passed" << std::endl;
 #endif
 }
 
-#endif  // defined(__arm__) && ABSL_HAVE_ATTRIBUTE(target) && ((__ARM_ARCH >= 7)
+#endif  // defined(__arm__) && TURBO_HAVE_ATTRIBUTE(target) && ((__ARM_ARCH >= 7)
         // || !defined(__ARM_PCS_VFP))
 
 #elif defined(_WIN32)
-#if !defined(ABSL_CONSUME_DLL)
+#if !defined(TURBO_CONSUME_DLL)
 
 TEST(Symbolize, Basics) {
   EXPECT_STREQ("nonstatic_func", TrySymbolize((void *)(&nonstatic_func)));
@@ -569,7 +569,7 @@ TEST(Symbolize, SymbolizeWithDemangling) {
   EXPECT_TRUE(strstr(result, "Foo::func") != nullptr) << result;
 }
 
-#endif  // !defined(ABSL_CONSUME_DLL)
+#endif  // !defined(TURBO_CONSUME_DLL)
 #else  // Symbolizer unimplemented
 TEST(Symbolize, Unimplemented) {
   char buf[64];
@@ -584,11 +584,11 @@ int main(int argc, char **argv) {
 #if !defined(__EMSCRIPTEN__)
   // Make sure kHpageTextPadding is linked into the binary.
   if (volatile_bool) {
-    ABSL_RAW_LOG(INFO, "%s", kHpageTextPadding);
+    TURBO_RAW_LOG(INFO, "%s", kHpageTextPadding);
   }
 #endif  // !defined(__EMSCRIPTEN__)
 
-#if ABSL_PER_THREAD_TLS
+#if TURBO_PER_THREAD_TLS
   // Touch the per-thread variables.
   symbolize_test_thread_small[0] = 0;
   symbolize_test_thread_big[0] = 0;
@@ -597,12 +597,12 @@ int main(int argc, char **argv) {
   turbo::InitializeSymbolizer(argv[0]);
   testing::InitGoogleTest(&argc, argv);
 
-#if defined(ABSL_INTERNAL_HAVE_ELF_SYMBOLIZE) || \
-    defined(ABSL_INTERNAL_HAVE_DARWIN_SYMBOLIZE)
+#if defined(TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE) || \
+    defined(TURBO_INTERNAL_HAVE_DARWIN_SYMBOLIZE)
   TestWithPCInsideInlineFunction();
   TestWithPCInsideNonInlineFunction();
   TestWithReturnAddress();
-#if defined(__arm__) && ABSL_HAVE_ATTRIBUTE(target) && \
+#if defined(__arm__) && TURBO_HAVE_ATTRIBUTE(target) && \
     ((__ARM_ARCH >= 7) || !defined(__ARM_PCS_VFP))
   TestArmThumbOverlap();
 #endif

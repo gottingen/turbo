@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,8 +47,8 @@
 //  * Y receives a `true` return value from either `HasBeenNotified()` or
 //    `WaitForNotificationWithTimeout()`.
 
-#ifndef ABSL_SYNCHRONIZATION_NOTIFICATION_H_
-#define ABSL_SYNCHRONIZATION_NOTIFICATION_H_
+#ifndef TURBO_SYNCHRONIZATION_NOTIFICATION_H_
+#define TURBO_SYNCHRONIZATION_NOTIFICATION_H_
 
 #include <atomic>
 
@@ -57,7 +57,7 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // Notification
@@ -74,7 +74,7 @@ class Notification {
   // Notification::HasBeenNotified()
   //
   // Returns the value of the notification's internal "notified" state.
-  ABSL_MUST_USE_RESULT bool HasBeenNotified() const {
+  TURBO_MUST_USE_RESULT bool HasBeenNotified() const {
     return HasBeenNotifiedInternal(&this->notified_yet_);
   }
 
@@ -117,7 +117,7 @@ class Notification {
   std::atomic<bool> notified_yet_;  // written under mutex_
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_SYNCHRONIZATION_NOTIFICATION_H_
+#endif  // TURBO_SYNCHRONIZATION_NOTIFICATION_H_

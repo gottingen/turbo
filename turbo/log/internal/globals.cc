@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,25 +25,25 @@
 #include "turbo/time/time.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 namespace {
 // Keeps track of whether Logging initialization is finalized.
 // Log messages generated before that will go to stderr.
-ABSL_CONST_INIT std::atomic<bool> logging_initialized(false);
+TURBO_CONST_INIT std::atomic<bool> logging_initialized(false);
 
 // The TimeZone used for logging. This may only be set once.
-ABSL_CONST_INIT std::atomic<turbo::TimeZone*> timezone_ptr{nullptr};
+TURBO_CONST_INIT std::atomic<turbo::TimeZone*> timezone_ptr{nullptr};
 
 // If true, the logging library will symbolize stack in fatal messages
-ABSL_CONST_INIT std::atomic<bool> symbolize_stack_trace(true);
+TURBO_CONST_INIT std::atomic<bool> symbolize_stack_trace(true);
 
 // Specifies maximum number of stack frames to report in fatal messages.
-ABSL_CONST_INIT std::atomic<int> max_frames_in_stack_trace(64);
+TURBO_CONST_INIT std::atomic<int> max_frames_in_stack_trace(64);
 
-ABSL_CONST_INIT std::atomic<bool> exit_on_dfatal(true);
-ABSL_CONST_INIT std::atomic<bool> suppress_sigabort_trace(false);
+TURBO_CONST_INIT std::atomic<bool> exit_on_dfatal(true);
+TURBO_CONST_INIT std::atomic<bool> suppress_sigabort_trace(false);
 }  // namespace
 
 bool IsInitialized() {
@@ -81,7 +81,7 @@ void SetTimeZone(turbo::TimeZone tz) {
   if (!timezone_ptr.compare_exchange_strong(expected, new_tz,
                                             std::memory_order_release,
                                             std::memory_order_relaxed)) {
-    ABSL_RAW_LOG(FATAL,
+    TURBO_RAW_LOG(FATAL,
                  "turbo::log_internal::SetTimeZone() has already been called");
   }
 }
@@ -121,5 +121,5 @@ bool SetSuppressSigabortTrace(bool on_off) {
 }
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

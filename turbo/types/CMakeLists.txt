@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Abseil Authors.
+# Copyright 2017 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-absl_cc_library(
+turbo_cc_library(
   NAME
     any
   HDRS
     "any.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::bad_any_cast
     turbo::config
@@ -30,13 +30,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     bad_any_cast
   HDRS
    "bad_any_cast.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::bad_any_cast_impl
     turbo::config
@@ -44,26 +44,26 @@ absl_cc_library(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     bad_any_cast_impl
   SRCS
    "bad_any_cast.h"
    "bad_any_cast.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::raw_logging_internal
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     any_test
   SRCS
     "any_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::any
     turbo::config
@@ -73,13 +73,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     any_test_noexceptions
   SRCS
     "any_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::any
     turbo::config
@@ -89,13 +89,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     any_exception_safety_test
   SRCS
     "any_exception_safety_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::any
     turbo::config
@@ -103,7 +103,7 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     span
   HDRS
@@ -111,7 +111,7 @@ absl_cc_library(
   SRCS
     "internal/span.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::algorithm
     turbo::core_headers
@@ -120,13 +120,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     span_test
   SRCS
     "span_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::span
     turbo::base
@@ -140,13 +140,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     span_test_noexceptions
   SRCS
     "span_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::span
     turbo::base
@@ -160,7 +160,7 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     optional
   HDRS
@@ -168,7 +168,7 @@ absl_cc_library(
   SRCS
     "internal/optional.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::bad_optional_access
     turbo::base_internal
@@ -180,7 +180,7 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     bad_optional_access
   HDRS
@@ -188,14 +188,14 @@ absl_cc_library(
   SRCS
     "bad_optional_access.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::raw_logging_internal
   PUBLIC
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     bad_variant_access
   HDRS
@@ -203,20 +203,20 @@ absl_cc_library(
   SRCS
     "bad_variant_access.cc"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::config
     turbo::raw_logging_internal
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     optional_test
   SRCS
     "optional_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::optional
     turbo::config
@@ -226,13 +226,13 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     optional_exception_safety_test
   SRCS
     "optional_exception_safety_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::optional
     turbo::config
@@ -241,7 +241,7 @@ absl_cc_test(
 )
 
 # Internal-only target, do not depend on directly.
-absl_cc_library(
+turbo_cc_library(
   NAME
     conformance_testing
   HDRS
@@ -253,7 +253,7 @@ absl_cc_library(
     "internal/parentheses.h"
     "internal/transform_args.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::algorithm
     turbo::debugging
@@ -264,36 +264,36 @@ absl_cc_library(
   TESTONLY
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     conformance_testing_test
   SRCS
     "internal/conformance_testing_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
-    ${ABSL_EXCEPTIONS_FLAG}
+    ${TURBO_TEST_COPTS}
+    ${TURBO_EXCEPTIONS_FLAG}
   LINKOPTS
-    ${ABSL_EXCEPTIONS_FLAG_LINKOPTS}
+    ${TURBO_EXCEPTIONS_FLAG_LINKOPTS}
   DEPS
     turbo::conformance_testing
     turbo::type_traits
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     conformance_testing_test_no_exceptions
   SRCS
     "internal/conformance_testing_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::conformance_testing
     turbo::type_traits
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     variant
   HDRS
@@ -301,7 +301,7 @@ absl_cc_library(
   SRCS
     "internal/variant.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::bad_variant_access
     turbo::base_internal
@@ -312,13 +312,13 @@ absl_cc_library(
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     variant_test
   SRCS
     "variant_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::variant
     turbo::config
@@ -329,39 +329,39 @@ absl_cc_test(
     GTest::gmock_main
 )
 
-absl_cc_library(
+turbo_cc_library(
   NAME
     compare
   HDRS
     "compare.h"
   COPTS
-    ${ABSL_DEFAULT_COPTS}
+    ${TURBO_DEFAULT_COPTS}
   DEPS
     turbo::core_headers
     turbo::type_traits
   PUBLIC
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     compare_test
   SRCS
     "compare_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::base
     turbo::compare
     GTest::gmock_main
 )
 
-absl_cc_test(
+turbo_cc_test(
   NAME
     variant_exception_safety_test
   SRCS
     "variant_exception_safety_test.cc"
   COPTS
-    ${ABSL_TEST_COPTS}
+    ${TURBO_TEST_COPTS}
   DEPS
     turbo::variant
     turbo::config

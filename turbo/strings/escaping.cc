@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 // These are used for the leave_nulls_escaped argument to CUnescapeInternal().
@@ -652,13 +652,13 @@ bool Base64UnescapeInternal(const char* src_param, size_t szsrc, char* dest,
 
     default:
       // state should have no other values at this point.
-      ABSL_RAW_LOG(FATAL, "This can't happen; base64 decoder state = %d",
+      TURBO_RAW_LOG(FATAL, "This can't happen; base64 decoder state = %d",
                    state);
   }
 
   // The remainder of the string should be all whitespace, mixed with
   // exactly 0 equals signs, or exactly 'expected_equals' equals
-  // signs.  (Always accepting 0 equals signs is an Abseil extension
+  // signs.  (Always accepting 0 equals signs is an Turbo extension
   // not covered in the RFC, as is accepting dot as the pad character.)
 
   int equals = 0;
@@ -956,5 +956,5 @@ std::string BytesToHexString(turbo::string_view from) {
   return result;
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

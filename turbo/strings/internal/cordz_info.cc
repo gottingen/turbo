@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,16 +29,16 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 using ::turbo::base_internal::SpinLockHolder;
 
-#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 constexpr size_t CordzInfo::kMaxStackDepth;
 #endif
 
-ABSL_CONST_INIT CordzInfo::List CordzInfo::global_list_{turbo::kConstInit};
+TURBO_CONST_INIT CordzInfo::List CordzInfo::global_list_{turbo::kConstInit};
 
 namespace {
 
@@ -228,7 +228,7 @@ class CordRepAnalyzer {
 }  // namespace
 
 CordzInfo* CordzInfo::Head(const CordzSnapshot& snapshot) {
-  ABSL_ASSERT(snapshot.is_snapshot());
+  TURBO_ASSERT(snapshot.is_snapshot());
 
   // We can do an 'unsafe' load of 'head', as we are guaranteed that the
   // instance it points to is kept alive by the provided CordzSnapshot, so we
@@ -237,17 +237,17 @@ CordzInfo* CordzInfo::Head(const CordzSnapshot& snapshot) {
   // delete queue: ODR violations may lead to 'snapshot' and 'global_list_'
   // being in different libraries / modules.
   CordzInfo* head = global_list_.head.load(std::memory_order_acquire);
-  ABSL_ASSERT(snapshot.DiagnosticsHandleIsSafeToInspect(head));
+  TURBO_ASSERT(snapshot.DiagnosticsHandleIsSafeToInspect(head));
   return head;
 }
 
 CordzInfo* CordzInfo::Next(const CordzSnapshot& snapshot) const {
-  ABSL_ASSERT(snapshot.is_snapshot());
+  TURBO_ASSERT(snapshot.is_snapshot());
 
   // Similar to the 'Head()' function, we do not need a mutex here.
   CordzInfo* next = ci_next_.load(std::memory_order_acquire);
-  ABSL_ASSERT(snapshot.DiagnosticsHandleIsSafeToInspect(this));
-  ABSL_ASSERT(snapshot.DiagnosticsHandleIsSafeToInspect(next));
+  TURBO_ASSERT(snapshot.DiagnosticsHandleIsSafeToInspect(this));
+  TURBO_ASSERT(snapshot.DiagnosticsHandleIsSafeToInspect(next));
   return next;
 }
 
@@ -324,7 +324,7 @@ CordzInfo::CordzInfo(CordRep* rep,
 CordzInfo::~CordzInfo() {
   // `rep_` is potentially kept alive if CordzInfo is included
   // in a collection snapshot (which should be rare).
-  if (ABSL_PREDICT_FALSE(rep_)) {
+  if (TURBO_PREDICT_FALSE(rep_)) {
     CordRep::Unref(rep_);
   }
 }
@@ -350,15 +350,15 @@ void CordzInfo::Untrack() {
     CordzInfo* const prev = ci_prev_.load(std::memory_order_acquire);
 
     if (next) {
-      ABSL_ASSERT(next->ci_prev_.load(std::memory_order_acquire) == this);
+      TURBO_ASSERT(next->ci_prev_.load(std::memory_order_acquire) == this);
       next->ci_prev_.store(prev, std::memory_order_release);
     }
     if (prev) {
-      ABSL_ASSERT(head != this);
-      ABSL_ASSERT(prev->ci_next_.load(std::memory_order_acquire) == this);
+      TURBO_ASSERT(head != this);
+      TURBO_ASSERT(prev->ci_next_.load(std::memory_order_acquire) == this);
       prev->ci_next_.store(next, std::memory_order_release);
     } else {
-      ABSL_ASSERT(head == this);
+      TURBO_ASSERT(head == this);
       list_->head.store(next, std::memory_order_release);
     }
   }
@@ -380,13 +380,13 @@ void CordzInfo::Untrack() {
 }
 
 void CordzInfo::Lock(MethodIdentifier method)
-    ABSL_EXCLUSIVE_LOCK_FUNCTION(mutex_) {
+    TURBO_EXCLUSIVE_LOCK_FUNCTION(mutex_) {
   mutex_.Lock();
   update_tracker_.LossyAdd(method);
   assert(rep_);
 }
 
-void CordzInfo::Unlock() ABSL_UNLOCK_FUNCTION(mutex_) {
+void CordzInfo::Unlock() TURBO_UNLOCK_FUNCTION(mutex_) {
   bool tracked = rep_ != nullptr;
   mutex_.Unlock();
   if (!tracked) {
@@ -417,5 +417,5 @@ CordzStatistics CordzInfo::GetCordzStatistics() const {
 }
 
 }  // namespace cord_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

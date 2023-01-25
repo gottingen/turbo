@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@
 //  https://en.cppreference.com/w/cpp/utility/apply
 //  http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3658.html
 
-#ifndef ABSL_UTILITY_UTILITY_H_
-#define ABSL_UTILITY_UTILITY_H_
+#ifndef TURBO_UTILITY_UTILITY_H_
+#define TURBO_UTILITY_UTILITY_H_
 
 #include <cstddef>
 #include <cstdlib>
@@ -51,7 +51,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // integer_sequence
 //
@@ -159,12 +159,12 @@ using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
 
 // Tag types
 
-#ifdef ABSL_USES_STD_OPTIONAL
+#ifdef TURBO_USES_STD_OPTIONAL
 
 using std::in_place_t;
 using std::in_place;
 
-#else  // ABSL_USES_STD_OPTIONAL
+#else  // TURBO_USES_STD_OPTIONAL
 
 // in_place_t
 //
@@ -173,11 +173,11 @@ using std::in_place;
 // `std::in_place_t`.
 struct in_place_t {};
 
-ABSL_INTERNAL_INLINE_CONSTEXPR(in_place_t, in_place, {});
+TURBO_INTERNAL_INLINE_CONSTEXPR(in_place_t, in_place, {});
 
-#endif  // ABSL_USES_STD_OPTIONAL
+#endif  // TURBO_USES_STD_OPTIONAL
 
-#if defined(ABSL_USES_STD_ANY) || defined(ABSL_USES_STD_VARIANT)
+#if defined(TURBO_USES_STD_ANY) || defined(TURBO_USES_STD_VARIANT)
 using std::in_place_type;
 using std::in_place_type_t;
 #else
@@ -192,9 +192,9 @@ using in_place_type_t = void (*)(utility_internal::InPlaceTypeTag<T>);
 
 template <typename T>
 void in_place_type(utility_internal::InPlaceTypeTag<T>) {}
-#endif  // ABSL_USES_STD_ANY || ABSL_USES_STD_VARIANT
+#endif  // TURBO_USES_STD_ANY || TURBO_USES_STD_VARIANT
 
-#ifdef ABSL_USES_STD_VARIANT
+#ifdef TURBO_USES_STD_VARIANT
 using std::in_place_index;
 using std::in_place_index_t;
 #else
@@ -209,7 +209,7 @@ using in_place_index_t = void (*)(utility_internal::InPlaceIndexTag<I>);
 
 template <size_t I>
 void in_place_index(utility_internal::InPlaceIndexTag<I>) {}
-#endif  // ABSL_USES_STD_VARIANT
+#endif  // TURBO_USES_STD_VARIANT
 
 // Constexpr move and forward
 
@@ -344,7 +344,7 @@ constexpr T make_from_tuple(Tuple&& tup) {
           std::tuple_size<turbo::decay_t<Tuple>>::value>{});
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_UTILITY_UTILITY_H_
+#endif  // TURBO_UTILITY_UTILITY_H_

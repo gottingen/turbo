@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 AlphaNum::AlphaNum(Hex hex) {
   static_assert(numbers_internal::kFastToBufferSize >= 32,
@@ -245,5 +245,5 @@ void StrAppend(std::string* dest, const AlphaNum& a, const AlphaNum& b,
   assert(out == begin + dest->size());
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

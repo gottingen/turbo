@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 //
 // This header defines a class for representing a uniform floating-point
 // distribution over a half-open interval [a,b). You use this distribution in
-// combination with an Abseil random bit generator to produce random values
+// combination with an Turbo random bit generator to produce random values
 // according to the rules of the distribution.
 //
 // `turbo::uniform_real_distribution` is a drop-in replacement for the C++11
@@ -29,8 +29,8 @@
 // default-initialized. See https://bugs.llvm.org//show_bug.cgi?id=18767
 // `turbo::uniform_real_distribution` does not exhibit this behavior.
 
-#ifndef ABSL_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_
-#define ABSL_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_
+#ifndef TURBO_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_
+#define TURBO_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_
 
 #include <cassert>
 #include <cmath>
@@ -45,7 +45,7 @@
 #include "turbo/random/internal/iostream_state_saver.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::uniform_real_distribution<T>
 //
@@ -196,7 +196,7 @@ std::basic_istream<CharT, Traits>& operator>>(
   }
   return is;
 }
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_
+#endif  // TURBO_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_

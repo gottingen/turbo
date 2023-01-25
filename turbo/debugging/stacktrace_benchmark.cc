@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
 #include "benchmark/benchmark.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 
 static constexpr int kMaxStackDepth = 100;
 static constexpr int kCacheSize = (1 << 16);
 void* pcs[kMaxStackDepth];
 
-ABSL_ATTRIBUTE_NOINLINE void func(benchmark::State& state, int x, int depth) {
+TURBO_ATTRIBUTE_NOINLINE void func(benchmark::State& state, int x, int depth) {
   if (x <= 0) {
     // Touch a significant amount of memory so that the stack is likely to be
     // not cached in the L1 cache.
@@ -38,7 +38,7 @@ ABSL_ATTRIBUTE_NOINLINE void func(benchmark::State& state, int x, int depth) {
     benchmark::DoNotOptimize(turbo::GetStackTrace(pcs, depth, 0));
     return;
   }
-  ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+  TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
   func(state, --x, depth);
 }
 
@@ -51,5 +51,5 @@ void BM_GetStackTrace(benchmark::State& state) {
 
 BENCHMARK(BM_GetStackTrace)->DenseRange(10, kMaxStackDepth, 10);
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

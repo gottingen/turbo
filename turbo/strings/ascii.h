@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@
 //   numerical values greater than 127) then the functions return the same value
 //   as the input character.
 
-#ifndef ABSL_STRINGS_ASCII_H_
-#define ABSL_STRINGS_ASCII_H_
+#ifndef TURBO_STRINGS_ASCII_H_
+#define TURBO_STRINGS_ASCII_H_
 
 #include <algorithm>
 #include <string>
@@ -60,17 +60,17 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace ascii_internal {
 
 // Declaration for an array of bitfields holding character information.
-ABSL_DLL extern const unsigned char kPropertyBits[256];
+TURBO_DLL extern const unsigned char kPropertyBits[256];
 
 // Declaration for the array of characters to upper-case characters.
-ABSL_DLL extern const char kToUpper[256];
+TURBO_DLL extern const char kToUpper[256];
 
 // Declaration for the array of characters to lower-case characters.
-ABSL_DLL extern const char kToLower[256];
+TURBO_DLL extern const char kToLower[256];
 
 }  // namespace ascii_internal
 
@@ -168,7 +168,7 @@ inline char ascii_tolower(unsigned char c) {
 void AsciiStrToLower(std::string* s);
 
 // Creates a lowercase string from a given turbo::string_view.
-ABSL_MUST_USE_RESULT inline std::string AsciiStrToLower(turbo::string_view s) {
+TURBO_MUST_USE_RESULT inline std::string AsciiStrToLower(turbo::string_view s) {
   std::string result(s);
   turbo::AsciiStrToLower(&result);
   return result;
@@ -186,7 +186,7 @@ inline char ascii_toupper(unsigned char c) {
 void AsciiStrToUpper(std::string* s);
 
 // Creates an uppercase string from a given turbo::string_view.
-ABSL_MUST_USE_RESULT inline std::string AsciiStrToUpper(turbo::string_view s) {
+TURBO_MUST_USE_RESULT inline std::string AsciiStrToUpper(turbo::string_view s) {
   std::string result(s);
   turbo::AsciiStrToUpper(&result);
   return result;
@@ -194,7 +194,7 @@ ABSL_MUST_USE_RESULT inline std::string AsciiStrToUpper(turbo::string_view s) {
 
 // Returns turbo::string_view with whitespace stripped from the beginning of the
 // given string_view.
-ABSL_MUST_USE_RESULT inline turbo::string_view StripLeadingAsciiWhitespace(
+TURBO_MUST_USE_RESULT inline turbo::string_view StripLeadingAsciiWhitespace(
     turbo::string_view str) {
   auto it = std::find_if_not(str.begin(), str.end(), turbo::ascii_isspace);
   return str.substr(static_cast<size_t>(it - str.begin()));
@@ -208,7 +208,7 @@ inline void StripLeadingAsciiWhitespace(std::string* str) {
 
 // Returns turbo::string_view with whitespace stripped from the end of the given
 // string_view.
-ABSL_MUST_USE_RESULT inline turbo::string_view StripTrailingAsciiWhitespace(
+TURBO_MUST_USE_RESULT inline turbo::string_view StripTrailingAsciiWhitespace(
     turbo::string_view str) {
   auto it = std::find_if_not(str.rbegin(), str.rend(), turbo::ascii_isspace);
   return str.substr(0, static_cast<size_t>(str.rend() - it));
@@ -222,7 +222,7 @@ inline void StripTrailingAsciiWhitespace(std::string* str) {
 
 // Returns turbo::string_view with whitespace stripped from both ends of the
 // given string_view.
-ABSL_MUST_USE_RESULT inline turbo::string_view StripAsciiWhitespace(
+TURBO_MUST_USE_RESULT inline turbo::string_view StripAsciiWhitespace(
     turbo::string_view str) {
   return StripTrailingAsciiWhitespace(StripLeadingAsciiWhitespace(str));
 }
@@ -236,7 +236,7 @@ inline void StripAsciiWhitespace(std::string* str) {
 // Removes leading, trailing, and consecutive internal whitespace.
 void RemoveExtraAsciiWhitespace(std::string*);
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_ASCII_H_
+#endif  // TURBO_STRINGS_ASCII_H_

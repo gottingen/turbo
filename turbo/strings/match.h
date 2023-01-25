@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,15 +30,15 @@
 // Note: The order of parameters in these functions is designed to mimic the
 // order an equivalent member function would exhibit;
 // e.g. `s.Contains(x)` ==> `turbo::StrContains(s, x).
-#ifndef ABSL_STRINGS_MATCH_H_
-#define ABSL_STRINGS_MATCH_H_
+#ifndef TURBO_STRINGS_MATCH_H_
+#define TURBO_STRINGS_MATCH_H_
 
 #include <cstring>
 
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // StrContains()
 //
@@ -94,7 +94,7 @@ bool StartsWithIgnoreCase(turbo::string_view text,
 bool EndsWithIgnoreCase(turbo::string_view text,
                         turbo::string_view suffix) noexcept;
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_MATCH_H_
+#endif  // TURBO_STRINGS_MATCH_H_

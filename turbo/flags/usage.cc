@@ -1,5 +1,5 @@
 //
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 namespace {
-ABSL_CONST_INIT turbo::Mutex usage_message_guard(turbo::kConstInit);
-ABSL_CONST_INIT std::string* program_usage_message
-    ABSL_GUARDED_BY(usage_message_guard) = nullptr;
+TURBO_CONST_INIT turbo::Mutex usage_message_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::string* program_usage_message
+    TURBO_GUARDED_BY(usage_message_guard) = nullptr;
 }  // namespace
 }  // namespace flags_internal
 
@@ -42,7 +42,7 @@ void SetProgramUsageMessage(turbo::string_view new_usage_message) {
   turbo::MutexLock l(&flags_internal::usage_message_guard);
 
   if (flags_internal::program_usage_message != nullptr) {
-    ABSL_INTERNAL_LOG(FATAL, "SetProgramUsageMessage() called twice.");
+    TURBO_INTERNAL_LOG(FATAL, "SetProgramUsageMessage() called twice.");
     std::exit(1);
   }
 
@@ -61,5 +61,5 @@ turbo::string_view ProgramUsageMessage() {
              : "Warning: SetProgramUsageMessage() never called";
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

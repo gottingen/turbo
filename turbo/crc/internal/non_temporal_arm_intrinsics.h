@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
-#define ABSL_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
+#ifndef TURBO_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
+#define TURBO_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
 
 #include "turbo/base/config.h"
 
@@ -53,7 +53,7 @@ static inline __attribute__((always_inline)) __m128i _mm_loadu_si128(
 // https://msdn.microsoft.com/en-us/library/ba08y07y%28v=vs.90%29.aspx
 static inline __attribute__((always_inline)) void _mm_stream_si128(__m128i *p,
                                                                    __m128i a) {
-#if ABSL_HAVE_BUILTIN(__builtin_nontemporal_store)
+#if TURBO_HAVE_BUILTIN(__builtin_nontemporal_store)
   __builtin_nontemporal_store(a, p);
 #else
   vst1q_s64((int64_t *)p, vreinterpretq_s64_m128i(a));
@@ -76,4 +76,4 @@ static inline __attribute__((always_inline)) __m128i _mm_set_epi8(
 }
 #endif  // __aarch64__
 
-#endif  // ABSL_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
+#endif  // TURBO_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_

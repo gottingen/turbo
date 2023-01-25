@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 namespace {
 
@@ -32,12 +32,12 @@ BlockingCounter::BlockingCounter(int initial_count)
     : count_(initial_count),
       num_waiting_(0),
       done_{initial_count == 0 ? true : false} {
-  ABSL_RAW_CHECK(initial_count >= 0, "BlockingCounter initial_count negative");
+  TURBO_RAW_CHECK(initial_count >= 0, "BlockingCounter initial_count negative");
 }
 
 bool BlockingCounter::DecrementCount() {
   int count = count_.fetch_sub(1, std::memory_order_acq_rel) - 1;
-  ABSL_RAW_CHECK(count >= 0,
+  TURBO_RAW_CHECK(count >= 0,
                  "BlockingCounter::DecrementCount() called too many times");
   if (count == 0) {
     MutexLock l(&lock_);
@@ -52,7 +52,7 @@ void BlockingCounter::Wait() {
 
   // only one thread may call Wait(). To support more than one thread,
   // implement a counter num_to_exit, like in the Barrier class.
-  ABSL_RAW_CHECK(num_waiting_ == 0, "multiple threads called Wait()");
+  TURBO_RAW_CHECK(num_waiting_ == 0, "multiple threads called Wait()");
   num_waiting_++;
 
   this->lock_.Await(Condition(IsDone, &this->done_));
@@ -63,5 +63,5 @@ void BlockingCounter::Wait() {
   // after we return from this method.
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,15 +35,15 @@
 // you want to refer to is not in scope, you may use a member pointer
 // (e.g. &MyClass::mutex_) to refer to a mutex in some (unknown) object.
 
-#ifndef ABSL_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
-#define ABSL_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
+#ifndef TURBO_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
+#define TURBO_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
 
-// ABSL_LEGACY_THREAD_ANNOTATIONS is a *temporary* compatibility macro that can
+// TURBO_LEGACY_THREAD_ANNOTATIONS is a *temporary* compatibility macro that can
 // be defined on the compile command-line to restore the legacy spellings of the
 // thread annotations macros/functions. The macros in this file are available
-// under ABSL_ prefixed spellings in turbo/base/thread_annotations.h. This macro
+// under TURBO_ prefixed spellings in turbo/base/thread_annotations.h. This macro
 // and the legacy spellings will be removed in the future.
-#ifdef ABSL_LEGACY_THREAD_ANNOTATIONS
+#ifdef TURBO_LEGACY_THREAD_ANNOTATIONS
 
 #if defined(__clang__)
 #define THREAD_ANNOTATION_ATTRIBUTE__(x)   __attribute__((x))
@@ -145,7 +145,7 @@
 // LOCKS_EXCLUDED()
 //
 // Documents the locks acquired in the body of the function. These locks
-// cannot be held when calling this function (as Abseil's `Mutex` locks are
+// cannot be held when calling this function (as Turbo's `Mutex` locks are
 // non-reentrant).
 #define LOCKS_EXCLUDED(...) \
   THREAD_ANNOTATION_ATTRIBUTE__(locks_excluded(__VA_ARGS__))
@@ -275,6 +275,6 @@ inline T& ts_unchecked_read(T& v) NO_THREAD_SAFETY_ANALYSIS {
 
 }  // namespace thread_safety_analysis
 
-#endif  // defined(ABSL_LEGACY_THREAD_ANNOTATIONS)
+#endif  // defined(TURBO_LEGACY_THREAD_ANNOTATIONS)
 
-#endif  // ABSL_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
+#endif  // TURBO_BASE_INTERNAL_THREAD_ANNOTATIONS_H_

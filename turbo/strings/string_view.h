@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 //
 // This `turbo::string_view` abstraction is designed to be a drop-in
 // replacement for the C++17 `std::string_view` abstraction.
-#ifndef ABSL_STRINGS_STRING_VIEW_H_
-#define ABSL_STRINGS_STRING_VIEW_H_
+#ifndef TURBO_STRINGS_STRING_VIEW_H_
+#define TURBO_STRINGS_STRING_VIEW_H_
 
 #include <algorithm>
 #include <cassert>
@@ -43,28 +43,28 @@
 #include "turbo/base/optimization.h"
 #include "turbo/base/port.h"
 
-#ifdef ABSL_USES_STD_STRING_VIEW
+#ifdef TURBO_USES_STD_STRING_VIEW
 
 #include <string_view>  // IWYU pragma: export
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 using string_view = std::string_view;
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // ABSL_USES_STD_STRING_VIEW
+#else  // TURBO_USES_STD_STRING_VIEW
 
-#if ABSL_HAVE_BUILTIN(__builtin_memcmp) ||        \
+#if TURBO_HAVE_BUILTIN(__builtin_memcmp) ||        \
     (defined(__GNUC__) && !defined(__clang__)) || \
     (defined(_MSC_VER) && _MSC_VER >= 1928)
-#define ABSL_INTERNAL_STRING_VIEW_MEMCMP __builtin_memcmp
-#else  // ABSL_HAVE_BUILTIN(__builtin_memcmp)
-#define ABSL_INTERNAL_STRING_VIEW_MEMCMP memcmp
-#endif  // ABSL_HAVE_BUILTIN(__builtin_memcmp)
+#define TURBO_INTERNAL_STRING_VIEW_MEMCMP __builtin_memcmp
+#else  // TURBO_HAVE_BUILTIN(__builtin_memcmp)
+#define TURBO_INTERNAL_STRING_VIEW_MEMCMP memcmp
+#endif  // TURBO_HAVE_BUILTIN(__builtin_memcmp)
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::string_view
 //
@@ -183,7 +183,7 @@ class string_view {
   template <typename Allocator>
   string_view(  // NOLINT(runtime/explicit)
       const std::basic_string<char, std::char_traits<char>, Allocator>& str
-          ABSL_ATTRIBUTE_LIFETIME_BOUND) noexcept
+          TURBO_ATTRIBUTE_LIFETIME_BOUND) noexcept
       // This is implemented in terms of `string_view(p, n)` so `str.size()`
       // doesn't need to be reevaluated after `ptr_` is set.
       // The length check is also skipped since it is unnecessary and causes
@@ -290,7 +290,7 @@ class string_view {
   // Returns the ith element of the `string_view` using the array operator.
   // Note that this operator does not perform any bounds checking.
   constexpr const_reference operator[](size_type i) const {
-    return ABSL_HARDENING_ASSERT(i < size()), ptr_[i];
+    return TURBO_HARDENING_ASSERT(i < size()), ptr_[i];
   }
 
   // string_view::at()
@@ -299,7 +299,7 @@ class string_view {
   // and an exception of type `std::out_of_range` will be thrown on invalid
   // access.
   constexpr const_reference at(size_type i) const {
-    return ABSL_PREDICT_TRUE(i < size())
+    return TURBO_PREDICT_TRUE(i < size())
                ? ptr_[i]
                : ((void)base_internal::ThrowStdOutOfRange(
                       "turbo::string_view::at"),
@@ -310,14 +310,14 @@ class string_view {
   //
   // Returns the first element of a `string_view`.
   constexpr const_reference front() const {
-    return ABSL_HARDENING_ASSERT(!empty()), ptr_[0];
+    return TURBO_HARDENING_ASSERT(!empty()), ptr_[0];
   }
 
   // string_view::back()
   //
   // Returns the last element of a `string_view`.
   constexpr const_reference back() const {
-    return ABSL_HARDENING_ASSERT(!empty()), ptr_[size() - 1];
+    return TURBO_HARDENING_ASSERT(!empty()), ptr_[size() - 1];
   }
 
   // string_view::data()
@@ -336,7 +336,7 @@ class string_view {
   // Removes the first `n` characters from the `string_view`. Note that the
   // underlying string is not changed, only the view.
   constexpr void remove_prefix(size_type n) {
-    ABSL_HARDENING_ASSERT(n <= length_);
+    TURBO_HARDENING_ASSERT(n <= length_);
     ptr_ += n;
     length_ -= n;
   }
@@ -346,7 +346,7 @@ class string_view {
   // Removes the last `n` characters from the `string_view`. Note that the
   // underlying string is not changed, only the view.
   constexpr void remove_suffix(size_type n) {
-    ABSL_HARDENING_ASSERT(n <= length_);
+    TURBO_HARDENING_ASSERT(n <= length_);
     length_ -= n;
   }
 
@@ -373,7 +373,7 @@ class string_view {
   // Copies the contents of the `string_view` at offset `pos` and length `n`
   // into `buf`.
   size_type copy(char* buf, size_type n, size_type pos = 0) const {
-    if (ABSL_PREDICT_FALSE(pos > length_)) {
+    if (TURBO_PREDICT_FALSE(pos > length_)) {
       base_internal::ThrowStdOutOfRange("turbo::string_view::copy");
     }
     size_type rlen = (std::min)(length_ - pos, n);
@@ -391,7 +391,7 @@ class string_view {
   // `pos > size`.
   // Use turbo::ClippedSubstr if you need a truncating substr operation.
   constexpr string_view substr(size_type pos = 0, size_type n = npos) const {
-    return ABSL_PREDICT_FALSE(pos > length_)
+    return TURBO_PREDICT_FALSE(pos > length_)
                ? (base_internal::ThrowStdOutOfRange(
                       "turbo::string_view::substr"),
                   string_view())
@@ -408,7 +408,7 @@ class string_view {
     return CompareImpl(length_, x.length_,
                        Min(length_, x.length_) == 0
                            ? 0
-                           : ABSL_INTERNAL_STRING_VIEW_MEMCMP(
+                           : TURBO_INTERNAL_STRING_VIEW_MEMCMP(
                                  ptr_, x.ptr_, Min(length_, x.length_)));
   }
 
@@ -601,7 +601,7 @@ class string_view {
       (std::numeric_limits<difference_type>::max)();
 
   static constexpr size_type CheckLengthInternal(size_type len) {
-    return ABSL_HARDENING_ASSERT(len <= kMaxSize), len;
+    return TURBO_HARDENING_ASSERT(len <= kMaxSize), len;
   }
 
   static constexpr size_type StrlenInternal(const char* str) {
@@ -610,11 +610,11 @@ class string_view {
     const char* begin = str;
     while (*str != '\0') ++str;
     return str - begin;
-#elif ABSL_HAVE_BUILTIN(__builtin_strlen) || \
+#elif TURBO_HAVE_BUILTIN(__builtin_strlen) || \
     (defined(__GNUC__) && !defined(__clang__))
     // GCC has __builtin_strlen according to
     // https://gcc.gnu.org/onlinedocs/gcc-4.7.0/gcc/Other-Builtins.html, but
-    // ABSL_HAVE_BUILTIN doesn't detect that, so we use the extra checks above.
+    // TURBO_HAVE_BUILTIN doesn't detect that, so we use the extra checks above.
     // __builtin_strlen is constexpr.
     return __builtin_strlen(str);
 #else
@@ -643,7 +643,7 @@ class string_view {
 constexpr bool operator==(string_view x, string_view y) noexcept {
   return x.size() == y.size() &&
          (x.empty() ||
-          ABSL_INTERNAL_STRING_VIEW_MEMCMP(x.data(), y.data(), x.size()) == 0);
+          TURBO_INTERNAL_STRING_VIEW_MEMCMP(x.data(), y.data(), x.size()) == 0);
 }
 
 constexpr bool operator!=(string_view x, string_view y) noexcept {
@@ -669,15 +669,15 @@ constexpr bool operator>=(string_view x, string_view y) noexcept {
 // IO Insertion Operator
 std::ostream& operator<<(std::ostream& o, string_view piece);
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#undef ABSL_INTERNAL_STRING_VIEW_MEMCMP
+#undef TURBO_INTERNAL_STRING_VIEW_MEMCMP
 
-#endif  // ABSL_USES_STD_STRING_VIEW
+#endif  // TURBO_USES_STD_STRING_VIEW
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // ClippedSubstr()
 //
@@ -698,7 +698,7 @@ constexpr string_view NullSafeStringView(const char* p) {
   return p ? string_view(p) : string_view();
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_STRING_VIEW_H_
+#endif  // TURBO_STRINGS_STRING_VIEW_H_

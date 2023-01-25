@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,19 +27,19 @@
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_traits.h"
 
-// ABSL_RANDEN_HWAES_IMPL indicates whether this file will contain
+// TURBO_RANDEN_HWAES_IMPL indicates whether this file will contain
 // a hardware accelerated implementation of randen, or whether it
 // will contain stubs that exit the process.
-#if ABSL_HAVE_ACCELERATED_AES
+#if TURBO_HAVE_ACCELERATED_AES
 // The following plaforms have implemented RandenHwAes.
-#if defined(ABSL_ARCH_X86_64) || defined(ABSL_ARCH_X86_32) || \
-    defined(ABSL_ARCH_PPC) || defined(ABSL_ARCH_ARM) ||       \
-    defined(ABSL_ARCH_AARCH64)
-#define ABSL_RANDEN_HWAES_IMPL 1
+#if defined(TURBO_ARCH_X86_64) || defined(TURBO_ARCH_X86_32) || \
+    defined(TURBO_ARCH_PPC) || defined(TURBO_ARCH_ARM) ||       \
+    defined(TURBO_ARCH_AARCH64)
+#define TURBO_RANDEN_HWAES_IMPL 1
 #endif
 #endif
 
-#if !defined(ABSL_RANDEN_HWAES_IMPL)
+#if !defined(TURBO_RANDEN_HWAES_IMPL)
 // No accelerated implementation is supported.
 // The RandenHwAes functions are stubs that print an error and exit.
 
@@ -47,7 +47,7 @@
 #include <cstdlib>
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 // No accelerated implementation.
@@ -56,7 +56,7 @@ bool HasRandenHwAesImplementation() { return false; }
 // NOLINTNEXTLINE
 const void* RandenHwAes::GetKeys() {
   // Attempted to dispatch to an unsupported dispatch target.
-  const int d = ABSL_RANDOM_INTERNAL_AES_DISPATCH;
+  const int d = TURBO_RANDOM_INTERNAL_AES_DISPATCH;
   fprintf(stderr, "AES Hardware detection failed (%d).\n", d);
   exit(1);
   return nullptr;
@@ -65,7 +65,7 @@ const void* RandenHwAes::GetKeys() {
 // NOLINTNEXTLINE
 void RandenHwAes::Absorb(const void*, void*) {
   // Attempted to dispatch to an unsupported dispatch target.
-  const int d = ABSL_RANDOM_INTERNAL_AES_DISPATCH;
+  const int d = TURBO_RANDOM_INTERNAL_AES_DISPATCH;
   fprintf(stderr, "AES Hardware detection failed (%d).\n", d);
   exit(1);
 }
@@ -73,16 +73,16 @@ void RandenHwAes::Absorb(const void*, void*) {
 // NOLINTNEXTLINE
 void RandenHwAes::Generate(const void*, void*) {
   // Attempted to dispatch to an unsupported dispatch target.
-  const int d = ABSL_RANDOM_INTERNAL_AES_DISPATCH;
+  const int d = TURBO_RANDOM_INTERNAL_AES_DISPATCH;
   fprintf(stderr, "AES Hardware detection failed (%d).\n", d);
   exit(1);
 }
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#else  // defined(ABSL_RANDEN_HWAES_IMPL)
+#else  // defined(TURBO_RANDEN_HWAES_IMPL)
 //
 // Accelerated implementations are supported.
 // We need the per-architecture includes and defines.
@@ -95,20 +95,20 @@ using turbo::random_internal::RandenTraits;
 
 // TARGET_CRYPTO defines a crypto attribute for each architecture.
 //
-// NOTE: Evaluate whether we should eliminate ABSL_TARGET_CRYPTO.
+// NOTE: Evaluate whether we should eliminate TURBO_TARGET_CRYPTO.
 #if (defined(__clang__) || defined(__GNUC__))
-#if defined(ABSL_ARCH_X86_64) || defined(ABSL_ARCH_X86_32)
-#define ABSL_TARGET_CRYPTO __attribute__((target("aes")))
-#elif defined(ABSL_ARCH_PPC)
-#define ABSL_TARGET_CRYPTO __attribute__((target("crypto")))
+#if defined(TURBO_ARCH_X86_64) || defined(TURBO_ARCH_X86_32)
+#define TURBO_TARGET_CRYPTO __attribute__((target("aes")))
+#elif defined(TURBO_ARCH_PPC)
+#define TURBO_TARGET_CRYPTO __attribute__((target("crypto")))
 #else
-#define ABSL_TARGET_CRYPTO
+#define TURBO_TARGET_CRYPTO
 #endif
 #else
-#define ABSL_TARGET_CRYPTO
+#define TURBO_TARGET_CRYPTO
 #endif
 
-#if defined(ABSL_ARCH_PPC)
+#if defined(TURBO_ARCH_PPC)
 // NOTE: Keep in mind that PPC can operate in little-endian or big-endian mode,
 // however the PPC altivec vector registers (and thus the AES instructions)
 // always operate in big-endian mode.
@@ -126,7 +126,7 @@ using turbo::random_internal::RandenTraits;
 using Vector128 = __vector unsigned long long;  // NOLINT(runtime/int)
 
 namespace {
-inline ABSL_TARGET_CRYPTO Vector128 ReverseBytes(const Vector128& v) {
+inline TURBO_TARGET_CRYPTO Vector128 ReverseBytes(const Vector128& v) {
   // Reverses the bytes of the vector.
   const __vector unsigned char perm = {15, 14, 13, 12, 11, 10, 9, 8,
                                        7,  6,  5,  4,  3,  2,  1, 0};
@@ -136,23 +136,23 @@ inline ABSL_TARGET_CRYPTO Vector128 ReverseBytes(const Vector128& v) {
 // WARNING: these load/store in native byte order. It is OK to load and then
 // store an unchanged vector, but interpreting the bits as a number or input
 // to AES will have undefined results.
-inline ABSL_TARGET_CRYPTO Vector128 Vector128Load(const void* from) {
+inline TURBO_TARGET_CRYPTO Vector128 Vector128Load(const void* from) {
   return vec_vsx_ld(0, reinterpret_cast<const Vector128*>(from));
 }
 
-inline ABSL_TARGET_CRYPTO void Vector128Store(const Vector128& v, void* to) {
+inline TURBO_TARGET_CRYPTO void Vector128Store(const Vector128& v, void* to) {
   vec_vsx_st(v, 0, reinterpret_cast<Vector128*>(to));
 }
 
 // One round of AES. "round_key" is a public constant for breaking the
 // symmetry of AES (ensures previously equal columns differ afterwards).
-inline ABSL_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
+inline TURBO_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
                                              const Vector128& round_key) {
   return Vector128(__builtin_crypto_vcipher(state, round_key));
 }
 
 // Enables native loads in the round loop by pre-swapping.
-inline ABSL_TARGET_CRYPTO void SwapEndian(turbo::uint128* state) {
+inline TURBO_TARGET_CRYPTO void SwapEndian(turbo::uint128* state) {
   for (uint32_t block = 0; block < RandenTraits::kFeistelBlocks; ++block) {
     Vector128Store(ReverseBytes(Vector128Load(state + block)), state + block);
   }
@@ -160,7 +160,7 @@ inline ABSL_TARGET_CRYPTO void SwapEndian(turbo::uint128* state) {
 
 }  // namespace
 
-#elif defined(ABSL_ARCH_ARM) || defined(ABSL_ARCH_AARCH64)
+#elif defined(TURBO_ARCH_ARM) || defined(TURBO_ARCH_AARCH64)
 
 // Rely on the ARM NEON+Crypto advanced simd types, defined in <arm_neon.h>.
 // uint8x16_t is the user alias for underlying __simd128_uint8_t type.
@@ -183,17 +183,17 @@ using Vector128 = uint8x16_t;
 
 namespace {
 
-inline ABSL_TARGET_CRYPTO Vector128 Vector128Load(const void* from) {
+inline TURBO_TARGET_CRYPTO Vector128 Vector128Load(const void* from) {
   return vld1q_u8(reinterpret_cast<const uint8_t*>(from));
 }
 
-inline ABSL_TARGET_CRYPTO void Vector128Store(const Vector128& v, void* to) {
+inline TURBO_TARGET_CRYPTO void Vector128Store(const Vector128& v, void* to) {
   vst1q_u8(reinterpret_cast<uint8_t*>(to), v);
 }
 
 // One round of AES. "round_key" is a public constant for breaking the
 // symmetry of AES (ensures previously equal columns differ afterwards).
-inline ABSL_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
+inline TURBO_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
                                              const Vector128& round_key) {
   // It is important to always use the full round function - omitting the
   // final MixColumns reduces security [https://eprint.iacr.org/2010/041.pdf]
@@ -205,11 +205,11 @@ inline ABSL_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
   return vaesmcq_u8(vaeseq_u8(state, uint8x16_t{})) ^ round_key;
 }
 
-inline ABSL_TARGET_CRYPTO void SwapEndian(void*) {}
+inline TURBO_TARGET_CRYPTO void SwapEndian(void*) {}
 
 }  // namespace
 
-#elif defined(ABSL_ARCH_X86_64) || defined(ABSL_ARCH_X86_32)
+#elif defined(TURBO_ARCH_X86_64) || defined(TURBO_ARCH_X86_32)
 // On x86 we rely on the aesni instructions
 #include <immintrin.h>
 
@@ -233,17 +233,17 @@ class Vector128 {
   __m128i data_;
 };
 
-inline ABSL_TARGET_CRYPTO Vector128 Vector128Load(const void* from) {
+inline TURBO_TARGET_CRYPTO Vector128 Vector128Load(const void* from) {
   return Vector128(_mm_load_si128(reinterpret_cast<const __m128i*>(from)));
 }
 
-inline ABSL_TARGET_CRYPTO void Vector128Store(const Vector128& v, void* to) {
+inline TURBO_TARGET_CRYPTO void Vector128Store(const Vector128& v, void* to) {
   _mm_store_si128(reinterpret_cast<__m128i*>(to), v.data());
 }
 
 // One round of AES. "round_key" is a public constant for breaking the
 // symmetry of AES (ensures previously equal columns differ afterwards).
-inline ABSL_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
+inline TURBO_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
                                              const Vector128& round_key) {
   // It is important to always use the full round function - omitting the
   // final MixColumns reduces security [https://eprint.iacr.org/2010/041.pdf]
@@ -251,7 +251,7 @@ inline ABSL_TARGET_CRYPTO Vector128 AesRound(const Vector128& state,
   return Vector128(_mm_aesenc_si128(state.data(), round_key.data()));
 }
 
-inline ABSL_TARGET_CRYPTO void SwapEndian(void*) {}
+inline TURBO_TARGET_CRYPTO void SwapEndian(void*) {}
 
 }  // namespace
 
@@ -277,7 +277,7 @@ namespace {
 
 // Block shuffles applies a shuffle to the entire state between AES rounds.
 // Improved odd-even shuffle from "New criterion for diffusion property".
-inline ABSL_TARGET_CRYPTO void BlockShuffle(turbo::uint128* state) {
+inline TURBO_TARGET_CRYPTO void BlockShuffle(turbo::uint128* state) {
   static_assert(RandenTraits::kFeistelBlocks == 16,
                 "Expecting 16 FeistelBlocks.");
 
@@ -324,9 +324,9 @@ inline ABSL_TARGET_CRYPTO void BlockShuffle(turbo::uint128* state) {
 // per 16 bytes (vs. 10 for AES-CTR). Computing eight round functions in
 // parallel hides the 7-cycle AESNI latency on HSW. Note that the Feistel
 // XORs are 'free' (included in the second AES instruction).
-inline ABSL_TARGET_CRYPTO const turbo::uint128* FeistelRound(
+inline TURBO_TARGET_CRYPTO const turbo::uint128* FeistelRound(
     turbo::uint128* state,
-    const turbo::uint128* ABSL_RANDOM_INTERNAL_RESTRICT keys) {
+    const turbo::uint128* TURBO_RANDOM_INTERNAL_RESTRICT keys) {
   static_assert(RandenTraits::kFeistelBlocks == 16,
                 "Expecting 16 FeistelBlocks.");
 
@@ -386,9 +386,9 @@ inline ABSL_TARGET_CRYPTO const turbo::uint128* FeistelRound(
 // Indistinguishable from ideal by chosen-ciphertext adversaries using less than
 // 2^64 queries if the round function is a PRF. This is similar to the b=8 case
 // of Simpira v2, but more efficient than its generic construction for b=16.
-inline ABSL_TARGET_CRYPTO void Permute(
+inline TURBO_TARGET_CRYPTO void Permute(
     turbo::uint128* state,
-    const turbo::uint128* ABSL_RANDOM_INTERNAL_RESTRICT keys) {
+    const turbo::uint128* TURBO_RANDOM_INTERNAL_RESTRICT keys) {
   // (Successfully unrolled; the first iteration jumps into the second half)
 #ifdef __clang__
 #pragma clang loop unroll_count(2)
@@ -402,15 +402,15 @@ inline ABSL_TARGET_CRYPTO void Permute(
 }  // namespace
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
 bool HasRandenHwAesImplementation() { return true; }
 
-const void* ABSL_TARGET_CRYPTO RandenHwAes::GetKeys() {
+const void* TURBO_TARGET_CRYPTO RandenHwAes::GetKeys() {
   // Round keys for one AES per Feistel round and branch.
   // The canonical implementation uses first digits of Pi.
-#if defined(ABSL_ARCH_PPC)
+#if defined(TURBO_ARCH_PPC)
   return kRandenRoundKeysBE;
 #else
   return kRandenRoundKeys;
@@ -418,17 +418,17 @@ const void* ABSL_TARGET_CRYPTO RandenHwAes::GetKeys() {
 }
 
 // NOLINTNEXTLINE
-void ABSL_TARGET_CRYPTO RandenHwAes::Absorb(const void* seed_void,
+void TURBO_TARGET_CRYPTO RandenHwAes::Absorb(const void* seed_void,
                                             void* state_void) {
   static_assert(RandenTraits::kCapacityBytes / sizeof(Vector128) == 1,
                 "Unexpected Randen kCapacityBlocks");
   static_assert(RandenTraits::kStateBytes / sizeof(Vector128) == 16,
                 "Unexpected Randen kStateBlocks");
 
-  auto* state = reinterpret_cast<turbo::uint128 * ABSL_RANDOM_INTERNAL_RESTRICT>(
+  auto* state = reinterpret_cast<turbo::uint128 * TURBO_RANDOM_INTERNAL_RESTRICT>(
       state_void);
   const auto* seed =
-      reinterpret_cast<const turbo::uint128 * ABSL_RANDOM_INTERNAL_RESTRICT>(
+      reinterpret_cast<const turbo::uint128 * TURBO_RANDOM_INTERNAL_RESTRICT>(
           seed_void);
 
   Vector128 b1 = Vector128Load(state + 1);
@@ -493,7 +493,7 @@ void ABSL_TARGET_CRYPTO RandenHwAes::Absorb(const void* seed_void,
 }
 
 // NOLINTNEXTLINE
-void ABSL_TARGET_CRYPTO RandenHwAes::Generate(const void* keys_void,
+void TURBO_TARGET_CRYPTO RandenHwAes::Generate(const void* keys_void,
                                               void* state_void) {
   static_assert(RandenTraits::kCapacityBytes == sizeof(Vector128),
                 "Capacity mismatch");
@@ -520,7 +520,7 @@ void ABSL_TARGET_CRYPTO RandenHwAes::Generate(const void* keys_void,
 #endif
 
 }  // namespace random_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // (ABSL_RANDEN_HWAES_IMPL)
+#endif  // (TURBO_RANDEN_HWAES_IMPL)

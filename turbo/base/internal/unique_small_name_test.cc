@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,15 +30,15 @@ void DoNotOptimize(const T& var) {
 #endif
 }
 
-int very_long_int_variable_name ABSL_INTERNAL_UNIQUE_SMALL_NAME() = 0;
-char very_long_str_variable_name[] ABSL_INTERNAL_UNIQUE_SMALL_NAME() = "abc";
+int very_long_int_variable_name TURBO_INTERNAL_UNIQUE_SMALL_NAME() = 0;
+char very_long_str_variable_name[] TURBO_INTERNAL_UNIQUE_SMALL_NAME() = "abc";
 
 TEST(UniqueSmallName, NonAutomaticVar) {
   EXPECT_EQ(very_long_int_variable_name, 0);
   EXPECT_EQ(turbo::string_view(very_long_str_variable_name), "abc");
 }
 
-int VeryLongFreeFunctionName() ABSL_INTERNAL_UNIQUE_SMALL_NAME();
+int VeryLongFreeFunctionName() TURBO_INTERNAL_UNIQUE_SMALL_NAME();
 
 TEST(UniqueSmallName, FreeFunction) {
   DoNotOptimize(&VeryLongFreeFunctionName);
@@ -51,9 +51,9 @@ int VeryLongFreeFunctionName() { return 456; }
 struct VeryLongStructName {
   explicit VeryLongStructName(int i);
 
-  int VeryLongMethodName() ABSL_INTERNAL_UNIQUE_SMALL_NAME();
+  int VeryLongMethodName() TURBO_INTERNAL_UNIQUE_SMALL_NAME();
 
-  static int VeryLongStaticMethodName() ABSL_INTERNAL_UNIQUE_SMALL_NAME();
+  static int VeryLongStaticMethodName() TURBO_INTERNAL_UNIQUE_SMALL_NAME();
 
  private:
   int fld;

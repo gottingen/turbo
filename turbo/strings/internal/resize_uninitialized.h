@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_STRINGS_INTERNAL_RESIZE_UNINITIALIZED_H_
-#define ABSL_STRINGS_INTERNAL_RESIZE_UNINITIALIZED_H_
+#ifndef TURBO_STRINGS_INTERNAL_RESIZE_UNINITIALIZED_H_
+#define TURBO_STRINGS_INTERNAL_RESIZE_UNINITIALIZED_H_
 
 #include <algorithm>
 #include <string>
@@ -26,7 +26,7 @@
 #include "turbo/meta/type_traits.h"  //  for void_t
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 // In this type trait, we look for a __resize_default_init member function, and
@@ -113,7 +113,7 @@ void STLStringResizeUninitializedAmortized(string_type* s, size_t new_size) {
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_RESIZE_UNINITIALIZED_H_
+#endif  // TURBO_STRINGS_INTERNAL_RESIZE_UNINITIALIZED_H_

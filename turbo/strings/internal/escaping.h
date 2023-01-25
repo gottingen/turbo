@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_ESCAPING_H_
-#define ABSL_STRINGS_INTERNAL_ESCAPING_H_
+#ifndef TURBO_STRINGS_INTERNAL_ESCAPING_H_
+#define TURBO_STRINGS_INTERNAL_ESCAPING_H_
 
 #include <cassert>
 
 #include "turbo/strings/internal/resize_uninitialized.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
-ABSL_CONST_INIT extern const char kBase64Chars[];
+TURBO_CONST_INIT extern const char kBase64Chars[];
 
 // Calculates the length of a Base64 encoding (RFC 4648) of a string of length
 // `input_len`, with or without padding per `do_padding`. Note that 'web-safe'
@@ -50,7 +50,7 @@ void Base64EscapeInternal(const unsigned char* src, size_t szsrc, String* dest,
 }
 
 }  // namespace strings_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_ESCAPING_H_
+#endif  // TURBO_STRINGS_INTERNAL_ESCAPING_H_

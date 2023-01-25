@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ constexpr const char* what_arg = "The quick brown fox jumps over the lazy dog";
 
 template <typename E>
 void ExpectThrowChar(void (*f)(const char*)) {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   try {
     f(what_arg);
     FAIL() << "Didn't throw";
@@ -53,7 +53,7 @@ void ExpectThrowChar(void (*f)(const char*)) {
 
 template <typename E>
 void ExpectThrowString(void (*f)(const std::string&)) {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   try {
     f(what_arg);
     FAIL() << "Didn't throw";
@@ -67,7 +67,7 @@ void ExpectThrowString(void (*f)(const std::string&)) {
 
 template <typename E>
 void ExpectThrowNoWhat(void (*f)()) {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   try {
     f();
     FAIL() << "Didn't throw";
@@ -151,7 +151,7 @@ TEST(ThrowDelegate, ThrowStdUnderflowErrorString) {
 }
 
 TEST(ThrowDelegate, ThrowStdBadFunctionCallNoWhat) {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   try {
     ThrowStdBadFunctionCall();
     FAIL() << "Didn't throw";

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_SYNCHRONIZATION_INTERNAL_THREAD_POOL_H_
-#define ABSL_SYNCHRONIZATION_INTERNAL_THREAD_POOL_H_
+#ifndef TURBO_SYNCHRONIZATION_INTERNAL_THREAD_POOL_H_
+#define TURBO_SYNCHRONIZATION_INTERNAL_THREAD_POOL_H_
 
 #include <cassert>
 #include <cstddef>
@@ -28,7 +28,7 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // A simple ThreadPool implementation for tests.
@@ -64,7 +64,7 @@ class ThreadPool {
   }
 
  private:
-  bool WorkAvailable() const ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
+  bool WorkAvailable() const TURBO_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
     return !queue_.empty();
   }
 
@@ -85,12 +85,12 @@ class ThreadPool {
   }
 
   turbo::Mutex mu_;
-  std::queue<turbo::AnyInvocable<void()>> queue_ ABSL_GUARDED_BY(mu_);
+  std::queue<turbo::AnyInvocable<void()>> queue_ TURBO_GUARDED_BY(mu_);
   std::vector<std::thread> threads_;
 };
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_SYNCHRONIZATION_INTERNAL_THREAD_POOL_H_
+#endif  // TURBO_SYNCHRONIZATION_INTERNAL_THREAD_POOL_H_

@@ -1,4 +1,4 @@
-// Copyright 2019 The Abseil Authors.
+// Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@
 // The parentheses macros are used when wanting to require a rescan before
 // expansion of parenthesized text appearing after a function-style macro name.
 
-#ifndef ABSL_TYPES_INTERNAL_PARENTHESES_H_
-#define ABSL_TYPES_INTERNAL_PARENTHESES_H_
+#ifndef TURBO_TYPES_INTERNAL_PARENTHESES_H_
+#define TURBO_TYPES_INTERNAL_PARENTHESES_H_
 
-#define ABSL_INTERNAL_LPAREN (
+#define TURBO_INTERNAL_LPAREN (
 
-#define ABSL_INTERNAL_RPAREN )
+#define TURBO_INTERNAL_RPAREN )
 
-#endif  // ABSL_TYPES_INTERNAL_PARENTHESES_H_
+#endif  // TURBO_TYPES_INTERNAL_PARENTHESES_H_

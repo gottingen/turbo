@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ TYPED_TEST(UniformIntDistributionTest, ParamSerializeTest) {
       }
     }
     std::string msg = turbo::StrCat("Range: ", +sample_min, ", ", +sample_max);
-    ABSL_RAW_LOG(INFO, "%s", msg.c_str());
+    TURBO_RAW_LOG(INFO, "%s", msg.c_str());
   }
 }
 
@@ -210,7 +210,7 @@ TYPED_TEST(UniformIntDistributionTest, ChiSquaredTest50) {
     turbo::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
     turbo::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                     kThreshold);
-    ABSL_RAW_LOG(INFO, "%s", msg.c_str());
+    TURBO_RAW_LOG(INFO, "%s", msg.c_str());
     FAIL() << msg;
   }
 }

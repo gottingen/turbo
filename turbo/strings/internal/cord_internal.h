@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors.
+// Copyright 2021 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_CORD_INTERNAL_H_
-#define ABSL_STRINGS_INTERNAL_CORD_INTERNAL_H_
+#ifndef TURBO_STRINGS_INTERNAL_CORD_INTERNAL_H_
+#define TURBO_STRINGS_INTERNAL_CORD_INTERNAL_H_
 
 #include <atomic>
 #include <cassert>
@@ -31,7 +31,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // The overhead of a vtable is too much for Cord, so we roll our own subclasses
@@ -89,7 +89,7 @@ enum Constants {
 };
 
 // Emits a fatal error "Unexpected node type: xyz" and aborts the program.
-ABSL_ATTRIBUTE_NORETURN void LogFatalNodeType(CordRep* rep);
+TURBO_ATTRIBUTE_NORETURN void LogFatalNodeType(CordRep* rep);
 
 // Fast implementation of memmove for up to 15 bytes. This implementation is
 // safe for overlapping regions. If nullify_tail is true, the destination is
@@ -413,7 +413,7 @@ inline CordRepSubstring* CordRepSubstring::Create(CordRep* child, size_t pos,
 
   // TODO(b/217376272): Harden internal logic.
   // Move to strategical places inside the Cord logic and make this an assert.
-  if (ABSL_PREDICT_FALSE(!(child->IsExternal() || child->IsFlat()))) {
+  if (TURBO_PREDICT_FALSE(!(child->IsExternal() || child->IsFlat()))) {
     LogFatalNodeType(child);
   }
 
@@ -453,11 +453,11 @@ inline void CordRepExternal::Delete(CordRep* rep) {
 
 template <typename Str>
 struct ConstInitExternalStorage {
-  ABSL_CONST_INIT static CordRepExternal value;
+  TURBO_CONST_INIT static CordRepExternal value;
 };
 
 template <typename Str>
-ABSL_CONST_INIT CordRepExternal
+TURBO_CONST_INIT CordRepExternal
     ConstInitExternalStorage<Str>::value(Str::value);
 
 enum {
@@ -483,7 +483,7 @@ static_assert(sizeof(cordz_info_t) >= sizeof(intptr_t), "");
 // a little endian value where the first byte in the host's representation
 // holds 'value`, with all other bytes being 0.
 static constexpr cordz_info_t LittleEndianByte(unsigned char value) {
-#if defined(ABSL_IS_BIG_ENDIAN)
+#if defined(TURBO_IS_BIG_ENDIAN)
   return static_cast<cordz_info_t>(value) << ((sizeof(cordz_info_t) - 1) * 8);
 #else
   return value;
@@ -609,7 +609,7 @@ class InlineData {
   }
 
   void set_inline_data(const char* data, size_t n) {
-    ABSL_ASSERT(n <= kMaxInline);
+    TURBO_ASSERT(n <= kMaxInline);
     rep_.set_tag(static_cast<int8_t>(n << 1));
     SmallMemmove<true>(rep_.as_chars(), data, n);
   }
@@ -642,7 +642,7 @@ class InlineData {
   // Requires `size` to be <= kMaxInline.
   // See the documentation on 'as_chars()' for more information and examples.
   void set_inline_size(size_t size) {
-    ABSL_ASSERT(size <= kMaxInline);
+    TURBO_ASSERT(size <= kMaxInline);
     rep_.set_tag(static_cast<int8_t>(size << 1));
   }
 
@@ -757,9 +757,9 @@ inline const CordRepExternal* CordRep::external() const {
 }
 
 inline CordRep* CordRep::Ref(CordRep* rep) {
-  // ABSL_ASSUME is a workaround for
+  // TURBO_ASSUME is a workaround for
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105585
-  ABSL_ASSUME(rep != nullptr);
+  TURBO_ASSUME(rep != nullptr);
   rep->refcount.Increment();
   return rep;
 }
@@ -768,13 +768,13 @@ inline void CordRep::Unref(CordRep* rep) {
   assert(rep != nullptr);
   // Expect refcount to be 0. Avoiding the cost of an atomic decrement should
   // typically outweigh the cost of an extra branch checking for ref == 1.
-  if (ABSL_PREDICT_FALSE(!rep->refcount.DecrementExpectHighRefcount())) {
+  if (TURBO_PREDICT_FALSE(!rep->refcount.DecrementExpectHighRefcount())) {
     Destroy(rep);
   }
 }
 
 }  // namespace cord_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
-#endif  // ABSL_STRINGS_INTERNAL_CORD_INTERNAL_H_
+#endif  // TURBO_STRINGS_INTERNAL_CORD_INTERNAL_H_

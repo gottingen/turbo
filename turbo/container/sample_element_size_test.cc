@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 #include "turbo/container/node_hash_set.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 // Create some tables of type `Table`, then look at all the new
 // `HashtablezInfo`s to make sure that the `inline_element_size ==
 // expected_element_size`.  The `inline_element_size` is the amount of memory
@@ -65,14 +65,14 @@ struct bigstruct {
     return memcmp(x.a, y.a, sizeof(x.a)) == 0;
   }
   template <typename H>
-  friend H AbslHashValue(H h, const bigstruct& c) {
+  friend H TurboHashValue(H h, const bigstruct& c) {
     return H::combine_contiguous(std::move(h), c.a, sizeof(c.a));
   }
 };
 #endif
 
 TEST(FlatHashMap, SampleElementSize) {
-#if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
+#if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
   // Enable sampling even if the prod default is off.
   SetHashtablezEnabled(true);
   SetHashtablezSampleParameter(1);
@@ -110,5 +110,5 @@ TEST(FlatHashMap, SampleElementSize) {
 
 }  // namespace
 }  // namespace container_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

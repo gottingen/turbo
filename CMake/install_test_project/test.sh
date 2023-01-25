@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2019 The Abseil Authors.
+# Copyright 2019 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Unit and integration tests for Abseil LTS CMake installation
+# Unit and integration tests for Turbo LTS CMake installation
 
 # Fail on any error. Treat unset variables an error. Print commands as executed.
 set -euox pipefail
 
-absl_dir=/abseil-cpp
-absl_build_dir=/buildfs
+turbo_dir=/abseil-cpp
+turbo_build_dir=/buildfs
 googletest_builddir=/googletest_builddir
-project_dir="${absl_dir}"/CMake/install_test_project
+project_dir="${turbo_dir}"/CMake/install_test_project
 project_build_dir=/buildfs/project-build
 
 build_shared_libs="OFF"
@@ -33,9 +33,9 @@ fi
 # Build and install GoogleTest
 mkdir "${googletest_builddir}"
 pushd "${googletest_builddir}"
-curl -L "${ABSL_GOOGLETEST_DOWNLOAD_URL}" --output "${ABSL_GOOGLETEST_COMMIT}".zip
-unzip "${ABSL_GOOGLETEST_COMMIT}".zip
-pushd "googletest-${ABSL_GOOGLETEST_COMMIT}"
+curl -L "${TURBO_GOOGLETEST_DOWNLOAD_URL}" --output "${TURBO_GOOGLETEST_COMMIT}".zip
+unzip "${TURBO_GOOGLETEST_COMMIT}".zip
+pushd "googletest-${TURBO_GOOGLETEST_COMMIT}"
 mkdir build
 pushd build
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS="${build_shared_libs}" ..
@@ -49,13 +49,13 @@ popd
 # Run the LTS transformations
 ./create_lts.py 99998877
 
-# Build and install Abseil
-pushd "${absl_build_dir}"
-cmake "${absl_dir}" \
-  -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
-  -DABSL_FIND_GOOGLETEST=ON  \
+# Build and install Turbo
+pushd "${turbo_build_dir}"
+cmake "${turbo_dir}" \
+  -DTURBO_USE_EXTERNAL_GOOGLETEST=ON \
+  -DTURBO_FIND_GOOGLETEST=ON  \
   -DCMAKE_BUILD_TYPE=Release \
-  -DABSL_BUILD_TESTING=ON \
+  -DTURBO_BUILD_TESTING=ON \
   -DBUILD_SHARED_LIBS="${build_shared_libs}"
 make -j $(nproc)
 ctest -j $(nproc) --output-on-failure
@@ -63,7 +63,7 @@ make install
 ldconfig
 popd
 
-# Test the project against the installed Abseil
+# Test the project against the installed Turbo
 mkdir -p "${project_build_dir}"
 pushd "${project_build_dir}"
 cmake "${project_dir}"
@@ -78,8 +78,8 @@ fi
 
 popd
 
-if ! grep turbo::strings "/usr/local/lib/cmake/turbo/abslTargets.cmake"; then
-  cat "/usr/local/lib/cmake/turbo/abslTargets.cmake"
+if ! grep turbo::strings "/usr/local/lib/cmake/turbo/turboTargets.cmake"; then
+  cat "/usr/local/lib/cmake/turbo/turboTargets.cmake"
   echo "CMake targets named incorrectly"
   exit 1
 fi
@@ -91,20 +91,20 @@ cat > hello-abseil.cc << EOF
 #include "turbo/strings/str_format.h"
 
 int main(int argc, char **argv) {
-  turbo::PrintF("Hello Abseil!\n");
+  turbo::PrintF("Hello Turbo!\n");
   return EXIT_SUCCESS;
 }
 EOF
 
 if [ "${LINK_TYPE:-}" != "DYNAMIC" ]; then
-  pc_args=($(pkg-config --cflags --libs --static absl_str_format))
+  pc_args=($(pkg-config --cflags --libs --static turbo_str_format))
   g++ -static -o hello-abseil hello-abseil.cc "${pc_args[@]}"
 else
-  pc_args=($(pkg-config --cflags --libs absl_str_format))
+  pc_args=($(pkg-config --cflags --libs turbo_str_format))
   g++ -o hello-abseil hello-abseil.cc "${pc_args[@]}"
 fi
 hello="$(./hello-abseil)"
-[[ "${hello}" == "Hello Abseil!" ]]
+[[ "${hello}" == "Hello Turbo!" ]]
 
 popd
 

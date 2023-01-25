@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace {
 using str_format_internal::FormatArgImpl;
 
@@ -294,7 +294,7 @@ TEST_F(FormatEntryPointTest, StreamWithV) {
   };
 
   std::string buf(4096, '\0');
-  for (auto i = 0; i < ABSL_ARRAYSIZE(formats); ++i) {
+  for (auto i = 0; i < TURBO_ARRAYSIZE(formats); ++i) {
     const auto parsed =
         ParsedFormat<'v', 'u', 'c', 'v', 'f', 'v'>::NewAllowIgnored(formats[i]);
     std::ostringstream oss;
@@ -1073,7 +1073,7 @@ TEST_F(FormatWrapperTest, ParsedFormatWithV) {
 }
 
 }  // namespace
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace {
@@ -1083,7 +1083,7 @@ struct Point {
   friend turbo::FormatConvertResult<turbo::FormatConversionCharSet::kString |
                                    turbo::FormatConversionCharSet::kIntegral |
                                    turbo::FormatConversionCharSet::v>
-  AbslFormatConvert(const Point& p, const turbo::FormatConversionSpec& spec,
+  TurboFormatConvert(const Point& p, const turbo::FormatConversionSpec& spec,
                     turbo::FormatSink* s) {
     if (spec.conversion_char() == turbo::FormatConversionChar::s) {
       s->Append(turbo::StrCat("x=", p.x, " y=", p.y));
@@ -1097,7 +1097,7 @@ struct Point {
   int y = 20;
 };
 
-TEST_F(FormatExtensionTest, AbslFormatConvertExample) {
+TEST_F(FormatExtensionTest, TurboFormatConvertExample) {
   Point p;
   EXPECT_EQ(turbo::StrFormat("a %s z", p), "a x=10 y=20 z");
   EXPECT_EQ(turbo::StrFormat("a %d z", p), "a 10,20 z");
@@ -1113,7 +1113,7 @@ TEST_F(FormatExtensionTest, AbslFormatConvertExample) {
 
 struct PointStringify {
   template <typename FormatSink>
-  friend void AbslStringify(FormatSink& sink, const PointStringify& p) {
+  friend void TurboStringify(FormatSink& sink, const PointStringify& p) {
     sink.Append(turbo::StrCat("(", p.x, ", ", p.y, ")"));
   }
 
@@ -1121,14 +1121,14 @@ struct PointStringify {
   double y = 20.0;
 };
 
-TEST_F(FormatExtensionTest, AbslStringifyExample) {
+TEST_F(FormatExtensionTest, TurboStringifyExample) {
   PointStringify p;
   EXPECT_EQ(turbo::StrFormat("a %v z", p), "a (10, 20) z");
 }
 
 struct PointStringifyUsingFormat {
   template <typename FormatSink>
-  friend void AbslStringify(FormatSink& sink,
+  friend void TurboStringify(FormatSink& sink,
                             const PointStringifyUsingFormat& p) {
     turbo::Format(&sink, "(%g, %g)", p.x, p.y);
   }
@@ -1137,7 +1137,7 @@ struct PointStringifyUsingFormat {
   double y = 20.0;
 };
 
-TEST_F(FormatExtensionTest, AbslStringifyExampleUsingFormat) {
+TEST_F(FormatExtensionTest, TurboStringifyExampleUsingFormat) {
   PointStringifyUsingFormat p;
   EXPECT_EQ(turbo::StrFormat("a %v z", p), "a (10, 20) z");
 }
@@ -1145,7 +1145,7 @@ TEST_F(FormatExtensionTest, AbslStringifyExampleUsingFormat) {
 enum class EnumClassWithStringify { Many = 0, Choices = 1 };
 
 template <typename Sink>
-void AbslStringify(Sink& sink, EnumClassWithStringify e) {
+void TurboStringify(Sink& sink, EnumClassWithStringify e) {
   turbo::Format(&sink, "%s",
                e == EnumClassWithStringify::Many ? "Many" : "Choices");
 }
@@ -1153,11 +1153,11 @@ void AbslStringify(Sink& sink, EnumClassWithStringify e) {
 enum EnumWithStringify { Many, Choices };
 
 template <typename Sink>
-void AbslStringify(Sink& sink, EnumWithStringify e) {
+void TurboStringify(Sink& sink, EnumWithStringify e) {
   turbo::Format(&sink, "%s", e == EnumWithStringify::Many ? "Many" : "Choices");
 }
 
-TEST_F(FormatExtensionTest, AbslStringifyWithEnumWithV) {
+TEST_F(FormatExtensionTest, TurboStringifyWithEnumWithV) {
   const auto e_class = EnumClassWithStringify::Choices;
   EXPECT_EQ(turbo::StrFormat("My choice is %v", e_class),
             "My choice is Choices");
@@ -1166,7 +1166,7 @@ TEST_F(FormatExtensionTest, AbslStringifyWithEnumWithV) {
   EXPECT_EQ(turbo::StrFormat("My choice is %v", e), "My choice is Choices");
 }
 
-TEST_F(FormatExtensionTest, AbslStringifyEnumWithD) {
+TEST_F(FormatExtensionTest, TurboStringifyEnumWithD) {
   const auto e_class = EnumClassWithStringify::Many;
   EXPECT_EQ(turbo::StrFormat("My choice is %d", e_class), "My choice is 0");
 
@@ -1177,11 +1177,11 @@ TEST_F(FormatExtensionTest, AbslStringifyEnumWithD) {
 enum class EnumWithLargerValue { x = 32 };
 
 template <typename Sink>
-void AbslStringify(Sink& sink, EnumWithLargerValue e) {
+void TurboStringify(Sink& sink, EnumWithLargerValue e) {
   turbo::Format(&sink, "%s", "Many");
 }
 
-TEST_F(FormatExtensionTest, AbslStringifyEnumOtherSpecifiers) {
+TEST_F(FormatExtensionTest, TurboStringifyEnumOtherSpecifiers) {
   const auto e = EnumWithLargerValue::x;
   EXPECT_EQ(turbo::StrFormat("My choice is %g", e), "My choice is 32");
   EXPECT_EQ(turbo::StrFormat("My choice is %x", e), "My choice is 20");
@@ -1192,20 +1192,20 @@ TEST_F(FormatExtensionTest, AbslStringifyEnumOtherSpecifiers) {
 // Some codegen thunks that we can use to easily dump the generated assembly for
 // different StrFormat calls.
 
-std::string CodegenAbslStrFormatInt(int i) {  // NOLINT
+std::string CodegenTurboStrFormatInt(int i) {  // NOLINT
   return turbo::StrFormat("%d", i);
 }
 
-std::string CodegenAbslStrFormatIntStringInt64(int i, const std::string& s,
+std::string CodegenTurboStrFormatIntStringInt64(int i, const std::string& s,
                                                int64_t i64) {  // NOLINT
   return turbo::StrFormat("%d %s %d", i, s, i64);
 }
 
-void CodegenAbslStrAppendFormatInt(std::string* out, int i) {  // NOLINT
+void CodegenTurboStrAppendFormatInt(std::string* out, int i) {  // NOLINT
   turbo::StrAppendFormat(out, "%d", i);
 }
 
-void CodegenAbslStrAppendFormatIntStringInt64(std::string* out, int i,
+void CodegenTurboStrAppendFormatIntStringInt64(std::string* out, int i,
                                               const std::string& s,
                                               int64_t i64) {  // NOLINT
   turbo::StrAppendFormat(out, "%d %s %d", i, s, i64);

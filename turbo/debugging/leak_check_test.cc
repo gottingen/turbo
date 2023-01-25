@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ TEST(LeakCheckTest, IgnoreLeakSuppressesLeakedMemoryErrors) {
     GTEST_SKIP() << "LeakChecker is not active";
   }
   auto foo = turbo::IgnoreLeak(new std::string("some ignored leaked string"));
-  ABSL_RAW_LOG(INFO, "Ignoring leaked string %s", foo->c_str());
+  TURBO_RAW_LOG(INFO, "Ignoring leaked string %s", foo->c_str());
 }
 
 TEST(LeakCheckTest, LeakCheckDisablerIgnoresLeak) {
@@ -35,7 +35,7 @@ TEST(LeakCheckTest, LeakCheckDisablerIgnoresLeak) {
   }
   turbo::LeakCheckDisabler disabler;
   auto foo = new std::string("some string leaked while checks are disabled");
-  ABSL_RAW_LOG(INFO, "Ignoring leaked string %s", foo->c_str());
+  TURBO_RAW_LOG(INFO, "Ignoring leaked string %s", foo->c_str());
 }
 
 }  // namespace

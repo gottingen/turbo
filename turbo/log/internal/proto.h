@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 // buffers in protocol buffer wire format.  This library takes no steps to
 // ensure that the encoded data matches with any message specification.
 
-#ifndef ABSL_LOG_INTERNAL_PROTO_H_
-#define ABSL_LOG_INTERNAL_PROTO_H_
+#ifndef TURBO_LOG_INTERNAL_PROTO_H_
+#define TURBO_LOG_INTERNAL_PROTO_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -34,7 +34,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 // turbo::Span<char> represents a view into the available space in a mutable
@@ -169,7 +169,7 @@ inline bool EncodeStringTruncate(uint64_t tag, turbo::string_view value,
 // safe to pass to `EncodeMessageLength` but need not be.
 // Used for string, bytes, message, and packed-repeated field type.
 // Consumes up to kMaxVarintSize * 2 bytes (20).
-ABSL_MUST_USE_RESULT turbo::Span<char> EncodeMessageStart(uint64_t tag,
+TURBO_MUST_USE_RESULT turbo::Span<char> EncodeMessageStart(uint64_t tag,
                                                          uint64_t max_size,
                                                          turbo::Span<char> *buf);
 
@@ -282,7 +282,7 @@ class ProtoField final {
 };
 
 }  // namespace log_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_LOG_INTERNAL_PROTO_H_
+#endif  // TURBO_LOG_INTERNAL_PROTO_H_

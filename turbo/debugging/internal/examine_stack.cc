@@ -1,5 +1,5 @@
 //
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 #include "turbo/base/config.h"
 
-#ifdef ABSL_HAVE_MMAP
+#ifdef TURBO_HAVE_MMAP
 #include <sys/mman.h>
 #endif
 
@@ -40,7 +40,7 @@
 #include "turbo/debugging/symbolize.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 
 namespace {
@@ -49,27 +49,27 @@ constexpr int kDefaultDumpStackFramesLimit = 64;
 // and two extra for the leading "0x".
 constexpr int kPrintfPointerFieldWidth = 2 + 2 * sizeof(void*);
 
-ABSL_CONST_INIT SymbolizeUrlEmitter debug_stack_trace_hook = nullptr;
+TURBO_CONST_INIT SymbolizeUrlEmitter debug_stack_trace_hook = nullptr;
 
 // Async-signal safe mmap allocator.
 void* Allocate(size_t num_bytes) {
-#ifdef ABSL_HAVE_MMAP
+#ifdef TURBO_HAVE_MMAP
   void* p = ::mmap(nullptr, num_bytes, PROT_READ | PROT_WRITE,
                    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   return p == MAP_FAILED ? nullptr : p;
 #else
   (void)num_bytes;
   return nullptr;
-#endif  // ABSL_HAVE_MMAP
+#endif  // TURBO_HAVE_MMAP
 }
 
 void Deallocate(void* p, size_t size) {
-#ifdef ABSL_HAVE_MMAP
+#ifdef TURBO_HAVE_MMAP
   ::munmap(p, size);
 #else
   (void)p;
   (void)size;
-#endif  // ABSL_HAVE_MMAP
+#endif  // TURBO_HAVE_MMAP
 }
 
 // Print a program counter only.
@@ -164,7 +164,7 @@ void* GetProgramCounter(void* const vuc) {
 #elif defined(__hppa__)
     return reinterpret_cast<void*>(context->uc_mcontext.sc_iaoq[0]);
 #elif defined(__i386__)
-    if (14 < ABSL_ARRAYSIZE(context->uc_mcontext.gregs))
+    if (14 < TURBO_ARRAYSIZE(context->uc_mcontext.gregs))
       return reinterpret_cast<void*>(context->uc_mcontext.gregs[14]);
 #elif defined(__ia64__)
     return reinterpret_cast<void*>(context->uc_mcontext.sc_ip);
@@ -189,7 +189,7 @@ void* GetProgramCounter(void* const vuc) {
 #elif defined(__sparc__) && defined(__arch64__)
     return reinterpret_cast<void*>(context->uc_mcontext.mc_gregs[19]);
 #elif defined(__x86_64__)
-    if (16 < ABSL_ARRAYSIZE(context->uc_mcontext.gregs))
+    if (16 < TURBO_ARRAYSIZE(context->uc_mcontext.gregs))
       return reinterpret_cast<void*>(context->uc_mcontext.gregs[16]);
 #elif defined(__e2k__)
     return reinterpret_cast<void*>(context->uc_mcontext.cr0_hi);
@@ -270,7 +270,7 @@ void DumpPCAndFrameSizesAndStackTrace(void* const pc, void* const stack[],
 
 // Dump current stack trace as directed by writer.
 // Make sure this function is not inlined to avoid skipping too many top frames.
-ABSL_ATTRIBUTE_NOINLINE
+TURBO_ATTRIBUTE_NOINLINE
 void DumpStackTrace(int min_dropped_frames, int max_num_frames,
                     bool symbolize_stacktrace, OutputWriter* writer,
                     void* writer_arg) {
@@ -313,5 +313,5 @@ void DumpStackTrace(int min_dropped_frames, int max_num_frames,
 }
 
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

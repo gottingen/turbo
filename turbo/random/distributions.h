@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 // -----------------------------------------------------------------------------
 //
 // This header defines functions representing distributions, which you use in
-// combination with an Abseil random bit generator to produce random values
+// combination with an Turbo random bit generator to produce random values
 // according to the rules of that distribution.
 //
-// The Abseil random library defines the following distributions within this
+// The Turbo random library defines the following distributions within this
 // file:
 //
 //   * `turbo::Uniform` for uniform (constant) distributions having constant
@@ -43,8 +43,8 @@
 // your own distribution classes, as it allows library maintainers greater
 // flexibility to change the underlying implementation in the future.
 
-#ifndef ABSL_RANDOM_DISTRIBUTIONS_H_
-#define ABSL_RANDOM_DISTRIBUTIONS_H_
+#ifndef TURBO_RANDOM_DISTRIBUTIONS_H_
+#define TURBO_RANDOM_DISTRIBUTIONS_H_
 
 #include <algorithm>
 #include <cmath>
@@ -66,15 +66,15 @@
 #include "turbo/random/zipf_distribution.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
-ABSL_INTERNAL_INLINE_CONSTEXPR(IntervalClosedClosedTag, IntervalClosedClosed,
+TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalClosedClosedTag, IntervalClosedClosed,
                                {});
-ABSL_INTERNAL_INLINE_CONSTEXPR(IntervalClosedClosedTag, IntervalClosed, {});
-ABSL_INTERNAL_INLINE_CONSTEXPR(IntervalClosedOpenTag, IntervalClosedOpen, {});
-ABSL_INTERNAL_INLINE_CONSTEXPR(IntervalOpenOpenTag, IntervalOpenOpen, {});
-ABSL_INTERNAL_INLINE_CONSTEXPR(IntervalOpenOpenTag, IntervalOpen, {});
-ABSL_INTERNAL_INLINE_CONSTEXPR(IntervalOpenClosedTag, IntervalOpenClosed, {});
+TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalClosedClosedTag, IntervalClosed, {});
+TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalClosedOpenTag, IntervalClosedOpen, {});
+TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalOpenOpenTag, IntervalOpenOpen, {});
+TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalOpenOpenTag, IntervalOpen, {});
+TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalOpenClosedTag, IntervalOpenClosed, {});
 
 // -----------------------------------------------------------------------------
 // turbo::Uniform<T>(tag, bitgen, lo, hi)
@@ -446,7 +446,7 @@ IntType Zipf(URBG&& urbg,  // NOLINT(runtime/references)
       distribution_t>(&urbg, hi, q, v);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_DISTRIBUTIONS_H_
+#endif  // TURBO_RANDOM_DISTRIBUTIONS_H_

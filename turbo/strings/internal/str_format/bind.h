@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_STRINGS_INTERNAL_STR_FORMAT_BIND_H_
-#define ABSL_STRINGS_INTERNAL_STR_FORMAT_BIND_H_
+#ifndef TURBO_STRINGS_INTERNAL_STR_FORMAT_BIND_H_
+#define TURBO_STRINGS_INTERNAL_STR_FORMAT_BIND_H_
 
 #include <array>
 #include <cstdio>
@@ -28,7 +28,7 @@
 #include "turbo/utility/utility.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 class UntypedFormatSpec;
 
@@ -119,7 +119,7 @@ class FormatSpecTemplate
   }
 
  public:
-#ifdef ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#ifdef TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
   // Honeypot overload for when the string is not constexpr.
   // We use the 'unavailable' attribute to give a better compiler error than
@@ -158,12 +158,12 @@ class FormatSpecTemplate
       __attribute__((enable_if(ValidFormatImpl<Args...>(s), "bad format trap")))
       : Base(s) {}
 
-#else  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#else  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
   FormatSpecTemplate(const char* s) : Base(s) {}  // NOLINT
   FormatSpecTemplate(string_view s) : Base(s) {}  // NOLINT
 
-#endif  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
+#endif  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
   template <FormatConversionCharSet... C>
   FormatSpecTemplate(const ExtendedParsedFormat<C...>& pc)  // NOLINT
@@ -178,7 +178,7 @@ class Streamable {
   Streamable(const UntypedFormatSpecImpl& format,
              turbo::Span<const FormatArgImpl> args)
       : format_(format) {
-    if (args.size() <= ABSL_ARRAYSIZE(few_args_)) {
+    if (args.size() <= TURBO_ARRAYSIZE(few_args_)) {
       for (size_t i = 0; i < args.size(); ++i) {
         few_args_[i] = args[i];
       }
@@ -243,7 +243,7 @@ class StreamedWrapper {
 };
 
 }  // namespace str_format_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_BIND_H_
+#endif  // TURBO_STRINGS_INTERNAL_STR_FORMAT_BIND_H_

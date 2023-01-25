@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // useful for building large Cords that may require custom allocation of its
 // associated memory.
 //
-#ifndef ABSL_STRINGS_CORD_BUFFER_H_
-#define ABSL_STRINGS_CORD_BUFFER_H_
+#ifndef TURBO_STRINGS_CORD_BUFFER_H_
+#define TURBO_STRINGS_CORD_BUFFER_H_
 
 #include <algorithm>
 #include <cassert>
@@ -39,7 +39,7 @@
 #include "turbo/types/span.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 class Cord;
 class CordBufferTestPeer;
@@ -381,7 +381,7 @@ class CordBuffer {
     // memory is always on an even address, and uses the least significant bit
     // of the first or last byte (depending on endianness) as the inline size
     // indicator overlapping with the least significant byte of the CordRep*.
-#if defined(ABSL_IS_BIG_ENDIAN)
+#if defined(TURBO_IS_BIG_ENDIAN)
     struct Long {
       explicit Long(cord_internal::CordRepFlat* rep_arg) : rep(rep_arg) {}
       void* padding;
@@ -552,7 +552,7 @@ inline size_t CordBuffer::length() const {
 }
 
 inline void CordBuffer::SetLength(size_t length) {
-  ABSL_HARDENING_ASSERT(length <= capacity());
+  TURBO_HARDENING_ASSERT(length <= capacity());
   if (rep_.is_short()) {
     rep_.set_short_length(length);
   } else {
@@ -561,7 +561,7 @@ inline void CordBuffer::SetLength(size_t length) {
 }
 
 inline void CordBuffer::IncreaseLengthBy(size_t n) {
-  ABSL_HARDENING_ASSERT(n <= capacity() && length() + n <= capacity());
+  TURBO_HARDENING_ASSERT(n <= capacity() && length() + n <= capacity());
   if (rep_.is_short()) {
     rep_.add_short_length(n);
   } else {
@@ -569,7 +569,7 @@ inline void CordBuffer::IncreaseLengthBy(size_t n) {
   }
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_STRINGS_CORD_BUFFER_H_
+#endif  // TURBO_STRINGS_CORD_BUFFER_H_

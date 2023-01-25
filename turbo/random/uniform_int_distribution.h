@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 //
 // This header defines a class for representing a uniform integer distribution
 // over the closed (inclusive) interval [a,b]. You use this distribution in
-// combination with an Abseil random bit generator to produce random values
+// combination with an Turbo random bit generator to produce random values
 // according to the rules of the distribution.
 //
 // `turbo::uniform_int_distribution` is a drop-in replacement for the C++11
 // `std::uniform_int_distribution` [rand.dist.uni.int] but is considerably
 // faster than the libstdc++ implementation.
 
-#ifndef ABSL_RANDOM_UNIFORM_INT_DISTRIBUTION_H_
-#define ABSL_RANDOM_UNIFORM_INT_DISTRIBUTION_H_
+#ifndef TURBO_RANDOM_UNIFORM_INT_DISTRIBUTION_H_
+#define TURBO_RANDOM_UNIFORM_INT_DISTRIBUTION_H_
 
 #include <cassert>
 #include <istream>
@@ -40,7 +40,7 @@
 #include "turbo/random/internal/wide_multiply.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // turbo::uniform_int_distribution<T>
 //
@@ -250,9 +250,9 @@ uniform_int_distribution<IntType>::Generate(
   // Two optimizations here:
   // * Rejection occurs with some probability less than 1/2, and for reasonable
   //   ranges considerably less (in particular, less than 1/(F+1)), so
-  //   ABSL_PREDICT_FALSE is apt.
+  //   TURBO_PREDICT_FALSE is apt.
   // * `Lim` is an overestimate of `threshold`, and doesn't require a divide.
-  if (ABSL_PREDICT_FALSE(helper::lo(product) < Lim)) {
+  if (TURBO_PREDICT_FALSE(helper::lo(product) < Lim)) {
     // This quantity is exactly equal to `2^N % Lim`, but does not require high
     // precision calculations: `2^N % Lim` is congruent to `(2^N - Lim) % Lim`.
     // Ideally this could be expressed simply as `-X` rather than `2^N - X`, but
@@ -269,7 +269,7 @@ uniform_int_distribution<IntType>::Generate(
   return helper::hi(product);
 }
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_RANDOM_UNIFORM_INT_DISTRIBUTION_H_
+#endif  // TURBO_RANDOM_UNIFORM_INT_DISTRIBUTION_H_

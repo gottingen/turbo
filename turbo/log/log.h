@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@
 //     Copies all metadata (but no data) from the specified `turbo::LogEntry`.
 //     This can be used to change the severity of a message, but it has some
 //     limitations:
-//     * `ABSL_MIN_LOG_LEVEL` is evaluated against the severity passed into
+//     * `TURBO_MIN_LOG_LEVEL` is evaluated against the severity passed into
 //       `LOG` (or the implicit `FATAL` level of `CHECK`).
 //     * `LOG(FATAL)` and `CHECK` terminate the process unconditionally, even if
 //       the severity is changed later.
@@ -133,18 +133,18 @@
 // noted that their actual type is unspecified.
 //
 // To implement a custom formatting operator for a type you own, there are two
-// options: `AbslStringify()` or `std::ostream& operator<<(std::ostream&, ...)`.
+// options: `TurboStringify()` or `std::ostream& operator<<(std::ostream&, ...)`.
 // It is recommended that users make their types loggable through
-// `AbslStringify()` as it is a universal stringification extension that also
+// `TurboStringify()` as it is a universal stringification extension that also
 // enables `turbo::StrFormat` and `turbo::StrCat` support. If both
-// `AbslStringify()` and `std::ostream& operator<<(std::ostream&, ...)` are
-// defined, `AbslStringify()` will be used.
+// `TurboStringify()` and `std::ostream& operator<<(std::ostream&, ...)` are
+// defined, `TurboStringify()` will be used.
 //
-// To use the `AbslStringify()` API, define a friend function template in your
+// To use the `TurboStringify()` API, define a friend function template in your
 // type's namespace with the following signature:
 //
 //   template <typename Sink>
-//   void AbslStringify(Sink& sink, const UserDefinedType& value);
+//   void TurboStringify(Sink& sink, const UserDefinedType& value);
 //
 // `Sink` has the same interface as `turbo::FormatSink`, but without
 // `PutPaddedString()`.
@@ -153,7 +153,7 @@
 //
 //   struct Point {
 //     template <typename Sink>
-//     friend void AbslStringify(Sink& sink, const Point& p) {
+//     friend void TurboStringify(Sink& sink, const Point& p) {
 //       turbo::Format(&sink, "(%v, %v)", p.x, p.y);
 //     }
 //
@@ -165,7 +165,7 @@
 // `std::ostream& operator<<(std::ostream&, ...)` in your type's namespace (for
 // ADL) just as you would to stream it to `std::cout`.
 //
-// Currently `AbslStringify()` ignores output manipulators but this is not
+// Currently `TurboStringify()` ignores output manipulators but this is not
 // guaranteed behavior and may be subject to change in the future. If you would
 // like guaranteed behavior regarding output manipulators, please use
 // `std::ostream& operator<<(std::ostream&, ...)` to make custom types loggable
@@ -184,8 +184,8 @@
 //   LOG(INFO) << std::hex << 0xdeadbeef;  // logs "0xdeadbeef"
 //   LOG(INFO) << 0xdeadbeef;              // logs "3735928559"
 
-#ifndef ABSL_LOG_LOG_H_
-#define ABSL_LOG_LOG_H_
+#ifndef TURBO_LOG_LOG_H_
+#define TURBO_LOG_LOG_H_
 
 #include "turbo/log/internal/log_impl.h"
 
@@ -196,29 +196,29 @@
 // Example:
 //
 //   LOG(INFO) << "Found " << num_cookies << " cookies";
-#define LOG(severity) ABSL_LOG_IMPL(_##severity)
+#define LOG(severity) TURBO_LOG_IMPL(_##severity)
 
 // PLOG()
 //
 // `PLOG` behaves like `LOG` except that a description of the current state of
 // `errno` is appended to the streamed message.
-#define PLOG(severity) ABSL_PLOG_IMPL(_##severity)
+#define PLOG(severity) TURBO_PLOG_IMPL(_##severity)
 
 // DLOG()
 //
 // `DLOG` behaves like `LOG` in debug mode (i.e. `#ifndef NDEBUG`).  Otherwise
 // it compiles away and does nothing.  Note that `DLOG(FATAL)` does not
 // terminate the program if `NDEBUG` is defined.
-#define DLOG(severity) ABSL_DLOG_IMPL(_##severity)
+#define DLOG(severity) TURBO_DLOG_IMPL(_##severity)
 
 // `LOG_IF` and friends add a second argument which specifies a condition.  If
 // the condition is false, nothing is logged.
 // Example:
 //
 //   LOG_IF(INFO, num_cookies > 10) << "Got lots of cookies";
-#define LOG_IF(severity, condition) ABSL_LOG_IF_IMPL(_##severity, condition)
-#define PLOG_IF(severity, condition) ABSL_PLOG_IF_IMPL(_##severity, condition)
-#define DLOG_IF(severity, condition) ABSL_DLOG_IF_IMPL(_##severity, condition)
+#define LOG_IF(severity, condition) TURBO_LOG_IF_IMPL(_##severity, condition)
+#define PLOG_IF(severity, condition) TURBO_PLOG_IF_IMPL(_##severity, condition)
+#define DLOG_IF(severity, condition) TURBO_DLOG_IF_IMPL(_##severity, condition)
 
 // LOG_EVERY_N
 //
@@ -231,21 +231,21 @@
 //
 //   LOG_EVERY_N(WARNING, 1000) << "Got a packet with a bad CRC (" << COUNTER
 //                              << " total)";
-#define LOG_EVERY_N(severity, n) ABSL_LOG_EVERY_N_IMPL(_##severity, n)
+#define LOG_EVERY_N(severity, n) TURBO_LOG_EVERY_N_IMPL(_##severity, n)
 
 // LOG_FIRST_N
 //
 // `LOG_FIRST_N` behaves like `LOG_EVERY_N` except that the specified message is
 // logged when the counter's value is less than `n`.  `LOG_FIRST_N` is
 // thread-safe.
-#define LOG_FIRST_N(severity, n) ABSL_LOG_FIRST_N_IMPL(_##severity, n)
+#define LOG_FIRST_N(severity, n) TURBO_LOG_FIRST_N_IMPL(_##severity, n)
 
 // LOG_EVERY_POW_2
 //
 // `LOG_EVERY_POW_2` behaves like `LOG_EVERY_N` except that the specified
 // message is logged when the counter's value is a power of 2.
 // `LOG_EVERY_POW_2` is thread-safe.
-#define LOG_EVERY_POW_2(severity) ABSL_LOG_EVERY_POW_2_IMPL(_##severity)
+#define LOG_EVERY_POW_2(severity) TURBO_LOG_EVERY_POW_2_IMPL(_##severity)
 
 // LOG_EVERY_N_SEC
 //
@@ -257,19 +257,19 @@
 //
 //   LOG_EVERY_N_SEC(INFO, 2.5) << "Got " << COUNTER << " cookies so far";
 #define LOG_EVERY_N_SEC(severity, n_seconds) \
-  ABSL_LOG_EVERY_N_SEC_IMPL(_##severity, n_seconds)
+  TURBO_LOG_EVERY_N_SEC_IMPL(_##severity, n_seconds)
 
-#define PLOG_EVERY_N(severity, n) ABSL_PLOG_EVERY_N_IMPL(_##severity, n)
-#define PLOG_FIRST_N(severity, n) ABSL_PLOG_FIRST_N_IMPL(_##severity, n)
-#define PLOG_EVERY_POW_2(severity) ABSL_PLOG_EVERY_POW_2_IMPL(_##severity)
+#define PLOG_EVERY_N(severity, n) TURBO_PLOG_EVERY_N_IMPL(_##severity, n)
+#define PLOG_FIRST_N(severity, n) TURBO_PLOG_FIRST_N_IMPL(_##severity, n)
+#define PLOG_EVERY_POW_2(severity) TURBO_PLOG_EVERY_POW_2_IMPL(_##severity)
 #define PLOG_EVERY_N_SEC(severity, n_seconds) \
-  ABSL_PLOG_EVERY_N_SEC_IMPL(_##severity, n_seconds)
+  TURBO_PLOG_EVERY_N_SEC_IMPL(_##severity, n_seconds)
 
-#define DLOG_EVERY_N(severity, n) ABSL_DLOG_EVERY_N_IMPL(_##severity, n)
-#define DLOG_FIRST_N(severity, n) ABSL_DLOG_FIRST_N_IMPL(_##severity, n)
-#define DLOG_EVERY_POW_2(severity) ABSL_DLOG_EVERY_POW_2_IMPL(_##severity)
+#define DLOG_EVERY_N(severity, n) TURBO_DLOG_EVERY_N_IMPL(_##severity, n)
+#define DLOG_FIRST_N(severity, n) TURBO_DLOG_FIRST_N_IMPL(_##severity, n)
+#define DLOG_EVERY_POW_2(severity) TURBO_DLOG_EVERY_POW_2_IMPL(_##severity)
 #define DLOG_EVERY_N_SEC(severity, n_seconds) \
-  ABSL_DLOG_EVERY_N_SEC_IMPL(_##severity, n_seconds)
+  TURBO_DLOG_EVERY_N_SEC_IMPL(_##severity, n_seconds)
 
 // `LOG_IF_EVERY_N` and friends behave as the corresponding `LOG_EVERY_N`
 // but neither increment a counter nor log a message if condition is false (as
@@ -279,30 +279,30 @@
 //   LOG_IF_EVERY_N(INFO, (size > 1024), 10) << "Got the " << COUNTER
 //                                           << "th big cookie";
 #define LOG_IF_EVERY_N(severity, condition, n) \
-  ABSL_LOG_IF_EVERY_N_IMPL(_##severity, condition, n)
+  TURBO_LOG_IF_EVERY_N_IMPL(_##severity, condition, n)
 #define LOG_IF_FIRST_N(severity, condition, n) \
-  ABSL_LOG_IF_FIRST_N_IMPL(_##severity, condition, n)
+  TURBO_LOG_IF_FIRST_N_IMPL(_##severity, condition, n)
 #define LOG_IF_EVERY_POW_2(severity, condition) \
-  ABSL_LOG_IF_EVERY_POW_2_IMPL(_##severity, condition)
+  TURBO_LOG_IF_EVERY_POW_2_IMPL(_##severity, condition)
 #define LOG_IF_EVERY_N_SEC(severity, condition, n_seconds) \
-  ABSL_LOG_IF_EVERY_N_SEC_IMPL(_##severity, condition, n_seconds)
+  TURBO_LOG_IF_EVERY_N_SEC_IMPL(_##severity, condition, n_seconds)
 
 #define PLOG_IF_EVERY_N(severity, condition, n) \
-  ABSL_PLOG_IF_EVERY_N_IMPL(_##severity, condition, n)
+  TURBO_PLOG_IF_EVERY_N_IMPL(_##severity, condition, n)
 #define PLOG_IF_FIRST_N(severity, condition, n) \
-  ABSL_PLOG_IF_FIRST_N_IMPL(_##severity, condition, n)
+  TURBO_PLOG_IF_FIRST_N_IMPL(_##severity, condition, n)
 #define PLOG_IF_EVERY_POW_2(severity, condition) \
-  ABSL_PLOG_IF_EVERY_POW_2_IMPL(_##severity, condition)
+  TURBO_PLOG_IF_EVERY_POW_2_IMPL(_##severity, condition)
 #define PLOG_IF_EVERY_N_SEC(severity, condition, n_seconds) \
-  ABSL_PLOG_IF_EVERY_N_SEC_IMPL(_##severity, condition, n_seconds)
+  TURBO_PLOG_IF_EVERY_N_SEC_IMPL(_##severity, condition, n_seconds)
 
 #define DLOG_IF_EVERY_N(severity, condition, n) \
-  ABSL_DLOG_IF_EVERY_N_IMPL(_##severity, condition, n)
+  TURBO_DLOG_IF_EVERY_N_IMPL(_##severity, condition, n)
 #define DLOG_IF_FIRST_N(severity, condition, n) \
-  ABSL_DLOG_IF_FIRST_N_IMPL(_##severity, condition, n)
+  TURBO_DLOG_IF_FIRST_N_IMPL(_##severity, condition, n)
 #define DLOG_IF_EVERY_POW_2(severity, condition) \
-  ABSL_DLOG_IF_EVERY_POW_2_IMPL(_##severity, condition)
+  TURBO_DLOG_IF_EVERY_POW_2_IMPL(_##severity, condition)
 #define DLOG_IF_EVERY_N_SEC(severity, condition, n_seconds) \
-  ABSL_DLOG_IF_EVERY_N_SEC_IMPL(_##severity, condition, n_seconds)
+  TURBO_DLOG_IF_EVERY_N_SEC_IMPL(_##severity, condition, n_seconds)
 
-#endif  // ABSL_LOG_LOG_H_
+#endif  // TURBO_LOG_LOG_H_

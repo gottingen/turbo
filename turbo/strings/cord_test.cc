@@ -1,4 +1,4 @@
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -191,7 +191,7 @@ static turbo::Cord MakeComposite() {
 }
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 class CordTestPeer {
  public:
@@ -208,8 +208,8 @@ class CordTestPeer {
   }
 
   static Cord MakeSubstring(Cord src, size_t offset, size_t length) {
-    ABSL_RAW_CHECK(src.contents_.is_tree(), "Can not be inlined");
-    ABSL_RAW_CHECK(src.ExpectedChecksum() == turbo::nullopt,
+    TURBO_RAW_CHECK(src.contents_.is_tree(), "Can not be inlined");
+    TURBO_RAW_CHECK(src.ExpectedChecksum() == turbo::nullopt,
                    "Can not be hardened");
     Cord cord;
     auto* tree = cord_internal::SkipCrcNode(src.contents_.tree());
@@ -219,7 +219,7 @@ class CordTestPeer {
   }
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // The CordTest fixture runs all tests with and without Cord Btree enabled,
@@ -372,7 +372,7 @@ TEST_P(CordTest, GigabyteCordFromExternal) {
   for (int i = 0; i < 1024; ++i) {
     c.Append(from);
   }
-  ABSL_RAW_LOG(INFO, "Made a Cord with %zu bytes!", c.size());
+  TURBO_RAW_LOG(INFO, "Made a Cord with %zu bytes!", c.size());
   // Note: on a 32-bit build, this comes out to   2,818,048,000 bytes.
   // Note: on a 64-bit build, this comes out to 171,932,385,280 bytes.
 }
@@ -1245,15 +1245,15 @@ turbo::Cord BigCord(size_t len, char v) {
 // Splice block into cord.
 turbo::Cord SpliceCord(const turbo::Cord& blob, int64_t offset,
                       const turbo::Cord& block) {
-  ABSL_RAW_CHECK(offset >= 0, "");
-  ABSL_RAW_CHECK(offset + block.size() <= blob.size(), "");
+  TURBO_RAW_CHECK(offset >= 0, "");
+  TURBO_RAW_CHECK(offset + block.size() <= blob.size(), "");
   turbo::Cord result(blob);
   result.RemoveSuffix(blob.size() - offset);
   result.Append(block);
   turbo::Cord suffix(blob);
   suffix.RemovePrefix(offset + block.size());
   result.Append(suffix);
-  ABSL_RAW_CHECK(blob.size() == result.size(), "");
+  TURBO_RAW_CHECK(blob.size() == result.size(), "");
   return result;
 }
 
@@ -1443,8 +1443,8 @@ TEST_P(CordTest, CompareRandomComparisons) {
   for (int i = 0; i < kIters; i++) {
     turbo::Cord c, d;
     for (int j = 0; j < (i % 7) + 1; j++) {
-      c.Append(a[GetUniformRandomUpTo(&rng, ABSL_ARRAYSIZE(a))]);
-      d.Append(a[GetUniformRandomUpTo(&rng, ABSL_ARRAYSIZE(a))]);
+      c.Append(a[GetUniformRandomUpTo(&rng, TURBO_ARRAYSIZE(a))]);
+      d.Append(a[GetUniformRandomUpTo(&rng, TURBO_ARRAYSIZE(a))]);
     }
     std::bernoulli_distribution coin_flip(0.5);
     MaybeHarden(c);
@@ -1853,7 +1853,7 @@ TEST(CordTest, CordMemoryUsageBTree) {
   // windows DLL, we may have ODR like effects on the flag, meaning the DLL
   // code will run with the picked up default.
   if (!turbo::CordTestPeer::Tree(cord1)->IsBtree()) {
-    ABSL_RAW_LOG(WARNING, "Cord library code not respecting btree flag");
+    TURBO_RAW_LOG(WARNING, "Cord library code not respecting btree flag");
     return;
   }
 
@@ -1938,7 +1938,7 @@ TEST_P(CordTest, DiabolicalGrowth) {
   std::string value;
   turbo::CopyCordToString(cord, &value);
   EXPECT_EQ(value, expected);
-  ABSL_RAW_LOG(INFO, "Diabolical size allocated = %zu",
+  TURBO_RAW_LOG(INFO, "Diabolical size allocated = %zu",
                cord.EstimatedMemoryUsage());
 }
 
@@ -2178,7 +2178,7 @@ TEST_P(CordTest, AdvanceAndReadOnDataEdge) {
         as_flat ? turbo::Cord(data)
                 : turbo::MakeCordFromExternal(data, [](turbo::string_view) {});
     auto it = cord.Chars().begin();
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
     EXPECT_DEATH_IF_SUPPORTED(cord.AdvanceAndRead(&it, 2001), ".*");
 #endif
 
@@ -2215,7 +2215,7 @@ TEST_P(CordTest, AdvanceAndReadOnSubstringDataEdge) {
     const std::string substr = data.substr(200, 2000);
 
     auto it = cord.Chars().begin();
-#if !defined(NDEBUG) || ABSL_OPTION_HARDENED
+#if !defined(NDEBUG) || TURBO_OPTION_HARDENED
     EXPECT_DEATH_IF_SUPPORTED(cord.AdvanceAndRead(&it, 2001), ".*");
 #endif
 
@@ -2483,8 +2483,8 @@ TEST_P(CordTest, Hardening) {
   EXPECT_DEATH_IF_SUPPORTED(cord.RemoveSuffix(6), "");
 
   bool test_hardening = false;
-  ABSL_HARDENING_ASSERT([&]() {
-    // This only runs when ABSL_HARDENING_ASSERT is active.
+  TURBO_HARDENING_ASSERT([&]() {
+    // This only runs when TURBO_HARDENING_ASSERT is active.
     test_hardening = true;
     return true;
   }());
@@ -2579,7 +2579,7 @@ void TestConstinitConstructor(Str) {
   const auto expected = Str::value;
   // Defined before `cord` to be destroyed after it.
   static AfterExitCordTester exit_tester;  // NOLINT
-  ABSL_CONST_INIT static CordLeaker cord_leaker(Str{});  // NOLINT
+  TURBO_CONST_INIT static CordLeaker cord_leaker(Str{});  // NOLINT
   // cord_leaker is static, so this reference will remain valid through the end
   // of program execution.
   static turbo::Cord& cord = cord_leaker.cord;

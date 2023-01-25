@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 #include "turbo/types/bad_variant_access.h"
 
-#ifndef ABSL_USES_STD_VARIANT
+#ifndef TURBO_USES_STD_VARIANT
 
 #include <cstdlib>
 #include <stdexcept>
@@ -23,7 +23,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 //////////////////////////
 // [variant.bad.access] //
@@ -38,19 +38,19 @@ const char* bad_variant_access::what() const noexcept {
 namespace variant_internal {
 
 void ThrowBadVariantAccess() {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   throw bad_variant_access();
 #else
-  ABSL_RAW_LOG(FATAL, "Bad variant access");
+  TURBO_RAW_LOG(FATAL, "Bad variant access");
   abort();  // TODO(calabrese) Remove once RAW_LOG FATAL is noreturn.
 #endif
 }
 
 void Rethrow() {
-#ifdef ABSL_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   throw;
 #else
-  ABSL_RAW_LOG(FATAL,
+  TURBO_RAW_LOG(FATAL,
                "Internal error in turbo::variant implementation. Attempted to "
                "rethrow an exception when building with exceptions disabled.");
   abort();  // TODO(calabrese) Remove once RAW_LOG FATAL is noreturn.
@@ -58,7 +58,7 @@ void Rethrow() {
 }
 
 }  // namespace variant_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_USES_STD_VARIANT
+#endif  // TURBO_USES_STD_VARIANT

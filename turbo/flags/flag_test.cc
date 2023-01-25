@@ -1,5 +1,5 @@
 //
-//  Copyright 2019 The Abseil Authors.
+//  Copyright 2019 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,8 +41,8 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 
-ABSL_DECLARE_FLAG(int64_t, mistyped_int_flag);
-ABSL_DECLARE_FLAG(std::vector<std::string>, mistyped_string_flag);
+TURBO_DECLARE_FLAG(int64_t, mistyped_int_flag);
+TURBO_DECLARE_FLAG(std::vector<std::string>, mistyped_string_flag);
 
 namespace {
 
@@ -63,8 +63,8 @@ struct UDT {
   UDT(const UDT&) = default;
   UDT& operator=(const UDT&) = default;
 };
-bool AbslParseFlag(turbo::string_view, UDT*, std::string*) { return true; }
-std::string AbslUnparseFlag(const UDT&) { return ""; }
+bool TurboParseFlag(turbo::string_view, UDT*, std::string*) { return true; }
+std::string TurboUnparseFlag(const UDT&) { return ""; }
 
 class FlagTest : public testing::Test {
  protected:
@@ -141,7 +141,7 @@ using String = std::string;
   constexpr flags::FlagDefaultArg f1default##T{                            \
       flags::FlagDefaultSrc{dflt}, flags::FlagDefaultKind::dflt_kind};     \
   constexpr turbo::Flag<T> f1##T{"f1", "file", help_arg, f1default##T};     \
-  ABSL_CONST_INIT turbo::Flag<T> f2##T {                                    \
+  TURBO_CONST_INIT turbo::Flag<T> f2##T {                                    \
     "f2", "file",                                                          \
         {flags::FlagHelpMsg(&TestHelpMsg), flags::FlagHelpKind::kGenFunc}, \
         flags::FlagDefaultArg {                                            \
@@ -155,7 +155,7 @@ using String = std::string;
       flags::FlagDefaultSrc{dflt}, flags::FlagDefaultKind::dflt_kind}; \
   constexpr turbo::Flag<T> f1##T{"f1", "file", &TestLiteralHelpMsg,     \
                                 &TestMakeDflt<T>};                     \
-  ABSL_CONST_INIT turbo::Flag<T> f2##T {                                \
+  TURBO_CONST_INIT turbo::Flag<T> f2##T {                                \
     "f2", "file", &TestHelpMsg, &TestMakeDflt<T>                       \
   }
 #endif
@@ -178,7 +178,7 @@ bool TestConstructionFor(const turbo::Flag<T>& f1, turbo::Flag<T>& f2) {
   EXPECT_EQ(turbo::GetFlagReflectionHandle(f1).Help(), "literal help");
   EXPECT_EQ(turbo::GetFlagReflectionHandle(f1).Filename(), "file");
 
-  flags::FlagRegistrar<T, false>(ABSL_FLAG_IMPL_FLAG_PTR(f2), nullptr)
+  flags::FlagRegistrar<T, false>(TURBO_FLAG_IMPL_FLAG_PTR(f2), nullptr)
       .OnUpdate(TestCallback);
 
   EXPECT_EQ(turbo::GetFlagReflectionHandle(f2).Name(), "f2");
@@ -208,22 +208,22 @@ TEST_F(FlagTest, TestConstruction) {
 
 }  // namespace
 
-ABSL_DECLARE_FLAG(bool, test_flag_01);
-ABSL_DECLARE_FLAG(int, test_flag_02);
-ABSL_DECLARE_FLAG(int16_t, test_flag_03);
-ABSL_DECLARE_FLAG(uint16_t, test_flag_04);
-ABSL_DECLARE_FLAG(int32_t, test_flag_05);
-ABSL_DECLARE_FLAG(uint32_t, test_flag_06);
-ABSL_DECLARE_FLAG(int64_t, test_flag_07);
-ABSL_DECLARE_FLAG(uint64_t, test_flag_08);
-ABSL_DECLARE_FLAG(double, test_flag_09);
-ABSL_DECLARE_FLAG(float, test_flag_10);
-ABSL_DECLARE_FLAG(std::string, test_flag_11);
-ABSL_DECLARE_FLAG(turbo::Duration, test_flag_12);
+TURBO_DECLARE_FLAG(bool, test_flag_01);
+TURBO_DECLARE_FLAG(int, test_flag_02);
+TURBO_DECLARE_FLAG(int16_t, test_flag_03);
+TURBO_DECLARE_FLAG(uint16_t, test_flag_04);
+TURBO_DECLARE_FLAG(int32_t, test_flag_05);
+TURBO_DECLARE_FLAG(uint32_t, test_flag_06);
+TURBO_DECLARE_FLAG(int64_t, test_flag_07);
+TURBO_DECLARE_FLAG(uint64_t, test_flag_08);
+TURBO_DECLARE_FLAG(double, test_flag_09);
+TURBO_DECLARE_FLAG(float, test_flag_10);
+TURBO_DECLARE_FLAG(std::string, test_flag_11);
+TURBO_DECLARE_FLAG(turbo::Duration, test_flag_12);
 
 namespace {
 
-#if !ABSL_FLAGS_STRIP_NAMES
+#if !TURBO_FLAGS_STRIP_NAMES
 
 TEST_F(FlagTest, TestFlagDeclaration) {
   // test that we can access flag objects.
@@ -252,28 +252,28 @@ TEST_F(FlagTest, TestFlagDeclaration) {
   EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).Name(),
             "test_flag_12");
 }
-#endif  // !ABSL_FLAGS_STRIP_NAMES
+#endif  // !TURBO_FLAGS_STRIP_NAMES
 
 // --------------------------------------------------------------------
 
 }  // namespace
 
-ABSL_FLAG(bool, test_flag_01, true, "test flag 01");
-ABSL_FLAG(int, test_flag_02, 1234, "test flag 02");
-ABSL_FLAG(int16_t, test_flag_03, -34, "test flag 03");
-ABSL_FLAG(uint16_t, test_flag_04, 189, "test flag 04");
-ABSL_FLAG(int32_t, test_flag_05, 10765, "test flag 05");
-ABSL_FLAG(uint32_t, test_flag_06, 40000, "test flag 06");
-ABSL_FLAG(int64_t, test_flag_07, -1234567, "test flag 07");
-ABSL_FLAG(uint64_t, test_flag_08, 9876543, "test flag 08");
-ABSL_FLAG(double, test_flag_09, -9.876e-50, "test flag 09");
-ABSL_FLAG(float, test_flag_10, 1.234e12f, "test flag 10");
-ABSL_FLAG(std::string, test_flag_11, "", "test flag 11");
-ABSL_FLAG(turbo::Duration, test_flag_12, turbo::Minutes(10), "test flag 12");
+TURBO_FLAG(bool, test_flag_01, true, "test flag 01");
+TURBO_FLAG(int, test_flag_02, 1234, "test flag 02");
+TURBO_FLAG(int16_t, test_flag_03, -34, "test flag 03");
+TURBO_FLAG(uint16_t, test_flag_04, 189, "test flag 04");
+TURBO_FLAG(int32_t, test_flag_05, 10765, "test flag 05");
+TURBO_FLAG(uint32_t, test_flag_06, 40000, "test flag 06");
+TURBO_FLAG(int64_t, test_flag_07, -1234567, "test flag 07");
+TURBO_FLAG(uint64_t, test_flag_08, 9876543, "test flag 08");
+TURBO_FLAG(double, test_flag_09, -9.876e-50, "test flag 09");
+TURBO_FLAG(float, test_flag_10, 1.234e12f, "test flag 10");
+TURBO_FLAG(std::string, test_flag_11, "", "test flag 11");
+TURBO_FLAG(turbo::Duration, test_flag_12, turbo::Minutes(10), "test flag 12");
 
 namespace {
 
-#if !ABSL_FLAGS_STRIP_NAMES
+#if !TURBO_FLAGS_STRIP_NAMES
 TEST_F(FlagTest, TestFlagDefinition) {
   turbo::string_view expected_file_name = "turbo/flags/flag_test.cc";
 
@@ -385,7 +385,7 @@ TEST_F(FlagTest, TestFlagDefinition) {
       expected_file_name))
       << turbo::GetFlagReflectionHandle(FLAGS_test_flag_12).Filename();
 }
-#endif  // !ABSL_FLAGS_STRIP_NAMES
+#endif  // !TURBO_FLAGS_STRIP_NAMES
 
 // --------------------------------------------------------------------
 
@@ -468,11 +468,11 @@ struct NonTriviallyCopyableAggregate {
 
   int value;
 };
-bool AbslParseFlag(turbo::string_view src, NonTriviallyCopyableAggregate* f,
+bool TurboParseFlag(turbo::string_view src, NonTriviallyCopyableAggregate* f,
                    std::string* e) {
   return turbo::ParseFlag(src, &f->value, e);
 }
-std::string AbslUnparseFlag(const NonTriviallyCopyableAggregate& ntc) {
+std::string TurboUnparseFlag(const NonTriviallyCopyableAggregate& ntc) {
   return turbo::StrCat(ntc.value);
 }
 
@@ -483,12 +483,12 @@ bool operator==(const NonTriviallyCopyableAggregate& ntc1,
 
 }  // namespace
 
-ABSL_FLAG(bool, test_flag_eb_01, {}, "");
-ABSL_FLAG(int32_t, test_flag_eb_02, {}, "");
-ABSL_FLAG(int64_t, test_flag_eb_03, {}, "");
-ABSL_FLAG(double, test_flag_eb_04, {}, "");
-ABSL_FLAG(std::string, test_flag_eb_05, {}, "");
-ABSL_FLAG(NonTriviallyCopyableAggregate, test_flag_eb_06, {}, "");
+TURBO_FLAG(bool, test_flag_eb_01, {}, "");
+TURBO_FLAG(int32_t, test_flag_eb_02, {}, "");
+TURBO_FLAG(int64_t, test_flag_eb_03, {}, "");
+TURBO_FLAG(double, test_flag_eb_04, {}, "");
+TURBO_FLAG(std::string, test_flag_eb_05, {}, "");
+TURBO_FLAG(NonTriviallyCopyableAggregate, test_flag_eb_06, {}, "");
 
 namespace {
 
@@ -615,7 +615,7 @@ TEST_F(FlagTest, ConcurrentSetAndGet) {
   int i = 0;
   while (turbo::Now() < end_time) {
     turbo::SetFlag(&FLAGS_test_flag_12,
-                  kValidDurations[i++ % ABSL_ARRAYSIZE(kValidDurations)]);
+                  kValidDurations[i++ % TURBO_ARRAYSIZE(kValidDurations)]);
   }
   stop.store(true, std::memory_order_relaxed);
   for (auto& t : threads) t.join();
@@ -627,9 +627,9 @@ int GetDflt1() { return 1; }
 
 }  // namespace
 
-ABSL_FLAG(int, test_int_flag_with_non_const_default, GetDflt1(),
+TURBO_FLAG(int, test_int_flag_with_non_const_default, GetDflt1(),
           "test int flag non const default");
-ABSL_FLAG(std::string, test_string_flag_with_non_const_default,
+TURBO_FLAG(std::string, test_string_flag_with_non_const_default,
           turbo::StrCat("AAA", "BBB"), "test string flag non const default");
 
 namespace {
@@ -644,18 +644,18 @@ TEST_F(FlagTest, TestNonConstexprDefault) {
 
 }  // namespace
 
-ABSL_FLAG(bool, test_flag_with_non_const_help, true,
+TURBO_FLAG(bool, test_flag_with_non_const_help, true,
           turbo::StrCat("test ", "flag ", "non const help"));
 
 namespace {
 
-#if !ABSL_FLAGS_STRIP_HELP
+#if !TURBO_FLAGS_STRIP_HELP
 TEST_F(FlagTest, TestNonConstexprHelp) {
   EXPECT_EQ(
       turbo::GetFlagReflectionHandle(FLAGS_test_flag_with_non_const_help).Help(),
       "test flag non const help");
 }
-#endif  //! ABSL_FLAGS_STRIP_HELP
+#endif  //! TURBO_FLAGS_STRIP_HELP
 
 // --------------------------------------------------------------------
 
@@ -664,9 +664,9 @@ void TestFlagCB();
 
 }  // namespace
 
-ABSL_FLAG(int, test_flag_with_cb, 100, "").OnUpdate(TestFlagCB);
+TURBO_FLAG(int, test_flag_with_cb, 100, "").OnUpdate(TestFlagCB);
 
-ABSL_FLAG(int, test_flag_with_lambda_cb, 200, "").OnUpdate([]() {
+TURBO_FLAG(int, test_flag_with_lambda_cb, 200, "").OnUpdate([]() {
   cb_test_value = turbo::GetFlag(FLAGS_test_flag_with_lambda_cb) +
                   turbo::GetFlag(FLAGS_test_flag_with_cb);
 });
@@ -701,7 +701,7 @@ struct CustomUDT {
   int a;
   int b;
 };
-bool AbslParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
+bool TurboParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
   std::vector<turbo::string_view> parts =
       turbo::StrSplit(in, ':', turbo::SkipWhitespace());
 
@@ -713,13 +713,13 @@ bool AbslParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
 
   return true;
 }
-std::string AbslUnparseFlag(const CustomUDT& f) {
+std::string TurboUnparseFlag(const CustomUDT& f) {
   return turbo::StrCat(f.a, ":", f.b);
 }
 
 }  // namespace
 
-ABSL_FLAG(CustomUDT, test_flag_custom_udt, CustomUDT(), "test flag custom UDT");
+TURBO_FLAG(CustomUDT, test_flag_custom_udt, CustomUDT(), "test flag custom UDT");
 
 namespace {
 
@@ -776,14 +776,14 @@ struct ConversionTestVal {
   int a;
 };
 
-bool AbslParseFlag(turbo::string_view in, ConversionTestVal* val_out,
+bool TurboParseFlag(turbo::string_view in, ConversionTestVal* val_out,
                    std::string*) {
   if (!turbo::SimpleAtoi(in, &val_out->a)) {
     return false;
   }
   return true;
 }
-std::string AbslUnparseFlag(const ConversionTestVal& val) {
+std::string TurboUnparseFlag(const ConversionTestVal& val) {
   return turbo::StrCat(val.a);
 }
 
@@ -791,7 +791,7 @@ std::string AbslUnparseFlag(const ConversionTestVal& val) {
 
 // Flag default values can be specified with a value that converts to the flag
 // value type implicitly.
-ABSL_FLAG(ConversionTestVal, test_flag_implicit_conv,
+TURBO_FLAG(ConversionTestVal, test_flag_implicit_conv,
           ConversionTestVal::ViaImplicitConv::kTen,
           "test flag init via implicit conversion");
 
@@ -818,19 +818,19 @@ struct NonDfltConstructible {
   int value;
 };
 
-bool AbslParseFlag(turbo::string_view in, NonDfltConstructible* ndc_out,
+bool TurboParseFlag(turbo::string_view in, NonDfltConstructible* ndc_out,
                    std::string*) {
   return turbo::SimpleAtoi(in, &ndc_out->value);
 }
-std::string AbslUnparseFlag(const NonDfltConstructible& ndc) {
+std::string TurboUnparseFlag(const NonDfltConstructible& ndc) {
   return turbo::StrCat(ndc.value);
 }
 
 }  // namespace
 
-ABSL_FLAG(NonDfltConstructible, ndc_flag1, NonDfltConstructible('1'),
+TURBO_FLAG(NonDfltConstructible, ndc_flag1, NonDfltConstructible('1'),
           "Flag with non default constructible type");
-ABSL_FLAG(NonDfltConstructible, ndc_flag2, 0,
+TURBO_FLAG(NonDfltConstructible, ndc_flag2, 0,
           "Flag with non default constructible type");
 
 namespace {
@@ -850,13 +850,13 @@ TEST_F(FlagTest, TestNonDefaultConstructibleType) {
 
 // --------------------------------------------------------------------
 
-ABSL_RETIRED_FLAG(bool, old_bool_flag, true, "old descr");
-ABSL_RETIRED_FLAG(int, old_int_flag, (int)std::sqrt(10), "old descr");
-ABSL_RETIRED_FLAG(std::string, old_str_flag, "", turbo::StrCat("old ", "descr"));
+TURBO_RETIRED_FLAG(bool, old_bool_flag, true, "old descr");
+TURBO_RETIRED_FLAG(int, old_int_flag, (int)std::sqrt(10), "old descr");
+TURBO_RETIRED_FLAG(std::string, old_str_flag, "", turbo::StrCat("old ", "descr"));
 
 namespace {
 
-bool initialization_order_fiasco_test ABSL_ATTRIBUTE_UNUSED = [] {
+bool initialization_order_fiasco_test TURBO_ATTRIBUTE_UNUSED = [] {
   // Iterate over all the flags during static initialization.
   // This should not trigger ASan's initialization-order-fiasco.
   auto* handle1 = turbo::FindCommandLineFlag("flag_on_separate_file");
@@ -893,10 +893,10 @@ struct SmallAlignUDT {
   char bytes[14];
 };
 
-bool AbslParseFlag(turbo::string_view, SmallAlignUDT*, std::string*) {
+bool TurboParseFlag(turbo::string_view, SmallAlignUDT*, std::string*) {
   return true;
 }
-std::string AbslUnparseFlag(const SmallAlignUDT&) { return ""; }
+std::string TurboUnparseFlag(const SmallAlignUDT&) { return ""; }
 
 // User-defined type with small size, but not trivially copyable.
 struct NonTriviallyCopyableUDT {
@@ -910,15 +910,15 @@ struct NonTriviallyCopyableUDT {
   char c;
 };
 
-bool AbslParseFlag(turbo::string_view, NonTriviallyCopyableUDT*, std::string*) {
+bool TurboParseFlag(turbo::string_view, NonTriviallyCopyableUDT*, std::string*) {
   return true;
 }
-std::string AbslUnparseFlag(const NonTriviallyCopyableUDT&) { return ""; }
+std::string TurboUnparseFlag(const NonTriviallyCopyableUDT&) { return ""; }
 
 }  // namespace
 
-ABSL_FLAG(SmallAlignUDT, test_flag_sa_udt, {}, "help");
-ABSL_FLAG(NonTriviallyCopyableUDT, test_flag_ntc_udt, {}, "help");
+TURBO_FLAG(SmallAlignUDT, test_flag_sa_udt, {}, "help");
+TURBO_FLAG(NonTriviallyCopyableUDT, test_flag_ntc_udt, {}, "help");
 
 namespace {
 
@@ -959,14 +959,14 @@ struct EnumWrapper {
   TestE e;
 };
 
-bool AbslParseFlag(turbo::string_view, EnumWrapper*, std::string*) {
+bool TurboParseFlag(turbo::string_view, EnumWrapper*, std::string*) {
   return true;
 }
-std::string AbslUnparseFlag(const EnumWrapper&) { return ""; }
+std::string TurboUnparseFlag(const EnumWrapper&) { return ""; }
 
 }  // namespace
 
-ABSL_FLAG(EnumWrapper, test_enum_wrapper_flag, {}, "help");
+TURBO_FLAG(EnumWrapper, test_enum_wrapper_flag, {}, "help");
 
 TEST_F(FlagTest, TesTypeWrappingEnum) {
   EnumWrapper value = turbo::GetFlag(FLAGS_test_enum_wrapper_flag);
@@ -978,14 +978,14 @@ TEST_F(FlagTest, TesTypeWrappingEnum) {
   EXPECT_EQ(value.e, B);
 }
 
-// This is a compile test to ensure macros are expanded within ABSL_FLAG and
-// ABSL_DECLARE_FLAG.
+// This is a compile test to ensure macros are expanded within TURBO_FLAG and
+// TURBO_DECLARE_FLAG.
 #define FLAG_NAME_MACRO(name) prefix_ ## name
-ABSL_DECLARE_FLAG(int, FLAG_NAME_MACRO(test_macro_named_flag));
-ABSL_FLAG(int, FLAG_NAME_MACRO(test_macro_named_flag), 0,
-          "Testing macro expansion within ABSL_FLAG");
+TURBO_DECLARE_FLAG(int, FLAG_NAME_MACRO(test_macro_named_flag));
+TURBO_FLAG(int, FLAG_NAME_MACRO(test_macro_named_flag), 0,
+          "Testing macro expansion within TURBO_FLAG");
 
-TEST_F(FlagTest, MacroWithinAbslFlag) {
+TEST_F(FlagTest, MacroWithinTurboFlag) {
   EXPECT_EQ(turbo::GetFlag(FLAGS_prefix_test_macro_named_flag), 0);
   turbo::SetFlag(&FLAGS_prefix_test_macro_named_flag, 1);
   EXPECT_EQ(turbo::GetFlag(FLAGS_prefix_test_macro_named_flag), 1);
@@ -994,26 +994,26 @@ TEST_F(FlagTest, MacroWithinAbslFlag) {
 // --------------------------------------------------------------------
 
 #if defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 5
-#define ABSL_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
+#define TURBO_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
 #endif
 
-#ifndef ABSL_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
-ABSL_FLAG(turbo::optional<bool>, optional_bool, turbo::nullopt, "help");
+#ifndef TURBO_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
+TURBO_FLAG(turbo::optional<bool>, optional_bool, turbo::nullopt, "help");
 #endif
-ABSL_FLAG(turbo::optional<int>, optional_int, {}, "help");
-ABSL_FLAG(turbo::optional<double>, optional_double, 9.3, "help");
-ABSL_FLAG(turbo::optional<std::string>, optional_string, turbo::nullopt, "help");
-ABSL_FLAG(turbo::optional<turbo::Duration>, optional_duration, turbo::nullopt,
+TURBO_FLAG(turbo::optional<int>, optional_int, {}, "help");
+TURBO_FLAG(turbo::optional<double>, optional_double, 9.3, "help");
+TURBO_FLAG(turbo::optional<std::string>, optional_string, turbo::nullopt, "help");
+TURBO_FLAG(turbo::optional<turbo::Duration>, optional_duration, turbo::nullopt,
           "help");
-ABSL_FLAG(turbo::optional<turbo::optional<int>>, optional_optional_int,
+TURBO_FLAG(turbo::optional<turbo::optional<int>>, optional_optional_int,
           turbo::nullopt, "help");
-#if defined(ABSL_HAVE_STD_OPTIONAL) && !defined(ABSL_USES_STD_OPTIONAL)
-ABSL_FLAG(std::optional<int64_t>, std_optional_int64, std::nullopt, "help");
+#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
+TURBO_FLAG(std::optional<int64_t>, std_optional_int64, std::nullopt, "help");
 #endif
 
 namespace {
 
-#ifndef ABSL_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
+#ifndef TURBO_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
 TEST_F(FlagTest, TestOptionalBool) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_bool).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), turbo::nullopt);
@@ -1140,7 +1140,7 @@ TEST_F(FlagTest, TestOptionalOptional) {
 
 // --------------------------------------------------------------------
 
-#if defined(ABSL_HAVE_STD_OPTIONAL) && !defined(ABSL_USES_STD_OPTIONAL)
+#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 
 TEST_F(FlagTest, TestStdOptional) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());

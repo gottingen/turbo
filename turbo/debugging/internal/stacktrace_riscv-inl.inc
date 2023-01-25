@@ -1,4 +1,4 @@
-// Copyright 2021 The Abseil Authors
+// Copyright 2021 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_DEBUGGING_INTERNAL_STACKTRACE_RISCV_INL_H_
-#define ABSL_DEBUGGING_INTERNAL_STACKTRACE_RISCV_INL_H_
+#ifndef TURBO_DEBUGGING_INTERNAL_STACKTRACE_RISCV_INL_H_
+#define TURBO_DEBUGGING_INTERNAL_STACKTRACE_RISCV_INL_H_
 
 // Generate stack trace for riscv
 
@@ -52,8 +52,8 @@ static inline uintptr_t ComputeStackFrameSize(const T *low, const T *high) {
 // strictness of which is controlled by the boolean parameter
 // "STRICT_UNWINDING") to reduce the chance that a bad pointer is returned.
 template <bool STRICT_UNWINDING, bool WITH_CONTEXT>
-ABSL_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static void ** NextStackFrame(void **old_frame_pointer, const void *uc,
                               const std::pair<size_t, size_t> range) {
   //               .
@@ -114,8 +114,8 @@ static void ** NextStackFrame(void **old_frame_pointer, const void *uc,
 }
 
 template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
-ABSL_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static int UnwindImpl(void **result, int *sizes, int max_depth, int skip_count,
                       const void *ucp, int *min_dropped_frames) {
   // The `frame_pointer` that is computed here points to the top of the frame.
@@ -181,11 +181,11 @@ static int UnwindImpl(void **result, int *sizes, int max_depth, int skip_count,
 }
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace debugging_internal {
 bool StackTraceWorksForTest() { return true; }
 }  // namespace debugging_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif

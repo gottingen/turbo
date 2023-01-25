@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace {
 template <turbo::base_internal::SchedulingMode scheduling_mode>
 static void BM_SpinLock(benchmark::State& state) {
   // Ensure a ThreadIdentity is installed.
-  ABSL_INTERNAL_CHECK(
+  TURBO_INTERNAL_CHECK(
       turbo::synchronization_internal::GetOrCreateCurrentThreadIdentity() !=
           nullptr,
       "GetOrCreateCurrentThreadIdentity() failed");

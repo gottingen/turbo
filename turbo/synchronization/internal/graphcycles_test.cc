@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "turbo/base/macros.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // We emulate a GraphCycles object with a node vector and an edge vector.
@@ -65,51 +65,51 @@ static bool IsReachable(Edges *edges, int from, int to,
 }
 
 static void PrintEdges(Edges *edges) {
-  ABSL_RAW_LOG(INFO, "EDGES (%zu)", edges->size());
+  TURBO_RAW_LOG(INFO, "EDGES (%zu)", edges->size());
   for (const auto &edge : *edges) {
     int a = edge.from;
     int b = edge.to;
-    ABSL_RAW_LOG(INFO, "%d %d", a, b);
+    TURBO_RAW_LOG(INFO, "%d %d", a, b);
   }
-  ABSL_RAW_LOG(INFO, "---");
+  TURBO_RAW_LOG(INFO, "---");
 }
 
 static void PrintGCEdges(Nodes *nodes, const IdMap &id, GraphCycles *gc) {
-  ABSL_RAW_LOG(INFO, "GC EDGES");
+  TURBO_RAW_LOG(INFO, "GC EDGES");
   for (int a : *nodes) {
     for (int b : *nodes) {
       if (gc->HasEdge(Get(id, a), Get(id, b))) {
-        ABSL_RAW_LOG(INFO, "%d %d", a, b);
+        TURBO_RAW_LOG(INFO, "%d %d", a, b);
       }
     }
   }
-  ABSL_RAW_LOG(INFO, "---");
+  TURBO_RAW_LOG(INFO, "---");
 }
 
 static void PrintTransitiveClosure(Nodes *nodes, Edges *edges) {
-  ABSL_RAW_LOG(INFO, "Transitive closure");
+  TURBO_RAW_LOG(INFO, "Transitive closure");
   for (int a : *nodes) {
     for (int b : *nodes) {
       std::unordered_set<int> seen;
       if (IsReachable(edges, a, b, &seen)) {
-        ABSL_RAW_LOG(INFO, "%d %d", a, b);
+        TURBO_RAW_LOG(INFO, "%d %d", a, b);
       }
     }
   }
-  ABSL_RAW_LOG(INFO, "---");
+  TURBO_RAW_LOG(INFO, "---");
 }
 
 static void PrintGCTransitiveClosure(Nodes *nodes, const IdMap &id,
                                      GraphCycles *gc) {
-  ABSL_RAW_LOG(INFO, "GC Transitive closure");
+  TURBO_RAW_LOG(INFO, "GC Transitive closure");
   for (int a : *nodes) {
     for (int b : *nodes) {
       if (gc->IsReachable(Get(id, a), Get(id, b))) {
-        ABSL_RAW_LOG(INFO, "%d %d", a, b);
+        TURBO_RAW_LOG(INFO, "%d %d", a, b);
       }
     }
   }
-  ABSL_RAW_LOG(INFO, "---");
+  TURBO_RAW_LOG(INFO, "---");
 }
 
 static void CheckTransitiveClosure(Nodes *nodes, Edges *edges, const IdMap &id,
@@ -125,7 +125,7 @@ static void CheckTransitiveClosure(Nodes *nodes, Edges *edges, const IdMap &id,
         PrintGCEdges(nodes, id, gc);
         PrintTransitiveClosure(nodes, edges);
         PrintGCTransitiveClosure(nodes, id, gc);
-        ABSL_RAW_LOG(FATAL, "gc_reachable %s reachable %s a %d b %d",
+        TURBO_RAW_LOG(FATAL, "gc_reachable %s reachable %s a %d b %d",
                      gc_reachable ? "true" : "false",
                      reachable ? "true" : "false", a, b);
       }
@@ -142,7 +142,7 @@ static void CheckEdges(Nodes *nodes, Edges *edges, const IdMap &id,
     if (!gc->HasEdge(Get(id, a), Get(id, b))) {
       PrintEdges(edges);
       PrintGCEdges(nodes, id, gc);
-      ABSL_RAW_LOG(FATAL, "!gc->HasEdge(%d, %d)", a, b);
+      TURBO_RAW_LOG(FATAL, "!gc->HasEdge(%d, %d)", a, b);
     }
   }
   for (const auto &a : *nodes) {
@@ -155,13 +155,13 @@ static void CheckEdges(Nodes *nodes, Edges *edges, const IdMap &id,
   if (count != edges->size()) {
     PrintEdges(edges);
     PrintGCEdges(nodes, id, gc);
-    ABSL_RAW_LOG(FATAL, "edges->size() %zu  count %d", edges->size(), count);
+    TURBO_RAW_LOG(FATAL, "edges->size() %zu  count %d", edges->size(), count);
   }
 }
 
 static void CheckInvariants(const GraphCycles &gc) {
-  if (ABSL_PREDICT_FALSE(!gc.CheckInvariants()))
-    ABSL_RAW_LOG(FATAL, "CheckInvariants");
+  if (TURBO_PREDICT_FALSE(!gc.CheckInvariants()))
+    TURBO_RAW_LOG(FATAL, "CheckInvariants");
 }
 
 // Returns the index of a randomly chosen node in *nodes.
@@ -283,7 +283,7 @@ TEST(GraphCycles, RandomizedTest) {
         int to = RandomNode(&rng, &nodes);
         GraphId path[2*kMaxNodes];
         int path_len = graph_cycles.FindPath(id[nodes[from]], id[nodes[to]],
-                                             ABSL_ARRAYSIZE(path), path);
+                                             TURBO_ARRAYSIZE(path), path);
         std::unordered_set<int> seen;
         bool reachable = IsReachable(&edges, nodes[from], nodes[to], &seen);
         bool gc_reachable =
@@ -309,7 +309,7 @@ TEST(GraphCycles, RandomizedTest) {
       break;
 
     default:
-      ABSL_RAW_LOG(FATAL, "op %d", op);
+      TURBO_RAW_LOG(FATAL, "op %d", op);
     }
 
     // Very rarely, test graph expansion by adding then removing many nodes.
@@ -387,10 +387,10 @@ class GraphCyclesTest : public ::testing::Test {
 
   std::string Path(int x, int y) {
     GraphId path[5];
-    int np = g_.FindPath(Get(id_, x), Get(id_, y), ABSL_ARRAYSIZE(path), path);
+    int np = g_.FindPath(Get(id_, x), Get(id_, y), TURBO_ARRAYSIZE(path), path);
     std::string result;
     for (int i = 0; i < np; i++) {
-      if (i >= ABSL_ARRAYSIZE(path)) {
+      if (i >= TURBO_ARRAYSIZE(path)) {
         result += " ...";
         break;
       }
@@ -460,5 +460,5 @@ TEST_F(GraphCyclesTest, ManyEdges) {
 }
 
 }  // namespace synchronization_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo

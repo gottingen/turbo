@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Abseil Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@
 // -----------------------------------------------------------------------------
 //
 // This header file defines the `CommandLineFlag`, which acts as a type-erased
-// handle for accessing metadata about the Abseil Flag in question.
+// handle for accessing metadata about the Turbo Flag in question.
 //
-// Because an actual Abseil flag is of an unspecified type, you should not
+// Because an actual Turbo flag is of an unspecified type, you should not
 // manipulate or interact directly with objects of that type. Instead, use the
 // CommandLineFlag type as an intermediary.
-#ifndef ABSL_FLAGS_COMMANDLINEFLAG_H_
-#define ABSL_FLAGS_COMMANDLINEFLAG_H_
+#ifndef TURBO_FLAGS_COMMANDLINEFLAG_H_
+#define TURBO_FLAGS_COMMANDLINEFLAG_H_
 
 #include <memory>
 #include <string>
@@ -36,14 +36,14 @@
 #include "turbo/types/optional.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 class PrivateHandleAccessor;
 }  // namespace flags_internal
 
 // CommandLineFlag
 //
-// This type acts as a type-erased handle for an instance of an Abseil Flag and
+// This type acts as a type-erased handle for an instance of an Turbo Flag and
 // holds reflection information pertaining to that flag. Use CommandLineFlag to
 // access a flag's name, location, help string etc.
 //
@@ -194,7 +194,7 @@ class CommandLineFlag {
   virtual void CheckDefaultValueParsingRoundtrip() const = 0;
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_FLAGS_COMMANDLINEFLAG_H_
+#endif  // TURBO_FLAGS_COMMANDLINEFLAG_H_

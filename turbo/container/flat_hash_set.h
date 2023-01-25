@@ -1,4 +1,4 @@
-// Copyright 2018 The Abseil Authors.
+// Copyright 2018 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@
 // be a more efficient replacement for `std::unordered_set`. Like
 // `unordered_set`, search, insertion, and deletion of set elements can be done
 // as an `O(1)` operation. However, `flat_hash_set` (and other unordered
-// associative containers known as the collection of Abseil "Swiss tables")
+// associative containers known as the collection of Turbo "Swiss tables")
 // contain other optimizations that result in both memory and computation
 // advantages.
 //
 // In most cases, your default choice for a hash set should be a set of type
 // `flat_hash_set`.
-#ifndef ABSL_CONTAINER_FLAT_HASH_SET_H_
-#define ABSL_CONTAINER_FLAT_HASH_SET_H_
+#ifndef TURBO_CONTAINER_FLAT_HASH_SET_H_
+#define TURBO_CONTAINER_FLAT_HASH_SET_H_
 
 #include <type_traits>
 #include <utility>
@@ -40,7 +40,7 @@
 #include "turbo/memory/memory.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 template <typename T>
 struct FlatHashSetPolicy;
@@ -66,10 +66,10 @@ struct FlatHashSetPolicy;
 // * Returns `void` from the `erase(iterator)` overload.
 //
 // By default, `flat_hash_set` uses the `turbo::Hash` hashing framework. All
-// fundamental and Abseil types that support the `turbo::Hash` framework have a
+// fundamental and Turbo types that support the `turbo::Hash` framework have a
 // compatible equality operator for comparing insertions into `flat_hash_set`.
 // If your type is not yet supported by the `turbo::Hash` framework, see
-// turbo/hash/hash.h for information on extending Abseil hashing to user-defined
+// turbo/hash/hash.h for information on extending Turbo hashing to user-defined
 // types.
 //
 // Using `turbo::flat_hash_set` at interface boundaries in dynamically loaded
@@ -497,7 +497,7 @@ struct IsUnorderedContainer<turbo::flat_hash_set<Key, Hash, KeyEqual, Allocator>
 
 }  // namespace container_algorithm_internal
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CONTAINER_FLAT_HASH_SET_H_
+#endif  // TURBO_CONTAINER_FLAT_HASH_SET_H_

@@ -1,4 +1,4 @@
-// Copyright 2022 The Abseil Authors
+// Copyright 2022 The Turbo Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ABSL_CRC_INTERNAL_CRC_MEMCPY_H_
-#define ABSL_CRC_INTERNAL_CRC_MEMCPY_H_
+#ifndef TURBO_CRC_INTERNAL_CRC_MEMCPY_H_
+#define TURBO_CRC_INTERNAL_CRC_MEMCPY_H_
 
 #include <cstddef>
 #include <memory>
@@ -23,13 +23,13 @@
 
 // Defined if the class AcceleratedCrcMemcpyEngine exists.
 #if defined(__x86_64__) && defined(__SSE4_2__)
-#define ABSL_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE 1
+#define TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE 1
 #elif defined(_MSC_VER) && defined(__AVX__)
-#define ABSL_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE 1
+#define TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE 1
 #endif
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 class CrcMemcpyEngine {
@@ -113,7 +113,7 @@ inline crc32c_t Crc32CAndCopy(void* __restrict dst, const void* __restrict src,
 }
 
 }  // namespace crc_internal
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_CRC_INTERNAL_CRC_MEMCPY_H_
+#endif  // TURBO_CRC_INTERNAL_CRC_MEMCPY_H_

@@ -1,4 +1,4 @@
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -604,7 +604,7 @@ TEST(Split, Temporary) {
   // destroyed, if the splitter keeps a reference to the string's contents,
   // it'll reference freed memory instead of just dead on-stack memory.
   const char input[] = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u";
-  EXPECT_LT(sizeof(std::string), ABSL_ARRAYSIZE(input))
+  EXPECT_LT(sizeof(std::string), TURBO_ARRAYSIZE(input))
       << "Input should be larger than fits on the stack.";
 
   // This happens more often in C++11 as part of a range-based for loop.
@@ -943,8 +943,8 @@ TEST(Delimiter, ByLength) {
 }
 
 TEST(Split, WorksWithLargeStrings) {
-#if defined(ABSL_HAVE_ADDRESS_SANITIZER) || \
-    defined(ABSL_HAVE_MEMORY_SANITIZER) || defined(ABSL_HAVE_THREAD_SANITIZER)
+#if defined(TURBO_HAVE_ADDRESS_SANITIZER) || \
+    defined(TURBO_HAVE_MEMORY_SANITIZER) || defined(TURBO_HAVE_THREAD_SANITIZER)
   constexpr size_t kSize = (uint32_t{1} << 26) + 1;  // 64M + 1 byte
 #else
   constexpr size_t kSize = (uint32_t{1} << 31) + 1;  // 2G + 1 byte

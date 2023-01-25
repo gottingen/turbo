@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Abseil Authors.
+// Copyright 2017 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 // blocking_counter.h
 // -----------------------------------------------------------------------------
 
-#ifndef ABSL_SYNCHRONIZATION_BLOCKING_COUNTER_H_
-#define ABSL_SYNCHRONIZATION_BLOCKING_COUNTER_H_
+#ifndef TURBO_SYNCHRONIZATION_BLOCKING_COUNTER_H_
+#define TURBO_SYNCHRONIZATION_BLOCKING_COUNTER_H_
 
 #include <atomic>
 
@@ -26,7 +26,7 @@
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
-ABSL_NAMESPACE_BEGIN
+TURBO_NAMESPACE_BEGIN
 
 // BlockingCounter
 //
@@ -91,11 +91,11 @@ class BlockingCounter {
  private:
   Mutex lock_;
   std::atomic<int> count_;
-  int num_waiting_ ABSL_GUARDED_BY(lock_);
-  bool done_ ABSL_GUARDED_BY(lock_);
+  int num_waiting_ TURBO_GUARDED_BY(lock_);
+  bool done_ TURBO_GUARDED_BY(lock_);
 };
 
-ABSL_NAMESPACE_END
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // ABSL_SYNCHRONIZATION_BLOCKING_COUNTER_H_
+#endif  // TURBO_SYNCHRONIZATION_BLOCKING_COUNTER_H_
