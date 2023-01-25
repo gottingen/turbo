@@ -373,3 +373,35 @@ turbo_cc_test(
         turbo::fast_type_id
         GTest::gtest_main
 )
+
+# Internal-only target, do not depend on directly.
+turbo_cc_library(
+        NAME
+        strerror
+        SRCS
+        "internal/strerror.cc"
+        HDRS
+        "internal/strerror.h"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        LINKOPTS
+        ${TURBO_DEFAULT_LINKOPTS}
+        DEPS
+        turbo::config
+        turbo::core_headers
+        turbo::errno_saver
+)
+
+turbo_cc_test(
+        NAME
+        strerror_test
+        SRCS
+        "internal/strerror_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::strerror
+        turbo::strings
+        GTest::gmock
+        GTest::gtest_main
+)

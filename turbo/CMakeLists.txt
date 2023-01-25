@@ -14,23 +14,157 @@
 # limitations under the License.
 #
 
-add_subdirectory(platform)
-add_subdirectory(base)
-add_subdirectory(cleanup)
-add_subdirectory(container)
-add_subdirectory(crc)
-add_subdirectory(debugging)
-add_subdirectory(flags)
-add_subdirectory(hash)
-add_subdirectory(log)
-add_subdirectory(memory)
-add_subdirectory(meta)
-add_subdirectory(profiling)
-add_subdirectory(random)
-add_subdirectory(strings)
-add_subdirectory(synchronization)
-add_subdirectory(time)
 
+set(TURBO_ALL_SRC
+        "platform/internal/cycleclock.cc"
+        "platform/internal/spinlock.cc"
+        "platform/internal/spinlock_wait.cc"
+        "platform/internal/sysinfo.cc"
+        "platform/internal/thread_identity.cc"
+        "platform/internal/throw_delegate.cc"
+        "platform/internal/unscaledcycleclock.cc"
+        "platform/internal/low_level_alloc.cc"
+        "base/internal/raw_logging.cc"
+        "base/internal/strerror.cc"
+        "base/log_severity.cc"
+        "base/status.cc"
+        "base/statusor.cc"
+        "base/status_payload_printer.cc"
+        "container/internal/hashtablez_sampler.cc"
+        "container/internal/hashtablez_sampler_force_weak_definition.cc"
+        "container/internal/raw_hash_set.cc"
+        "crc/crc32c.cc"
+        "crc/internal/cpu_detect.cc"
+        "crc/internal/crc.cc"
+        "crc/internal/crc_cord_state.cc"
+        "crc/internal/crc_x86_arm_combined.cc"
+        "crc/internal/crc_memcpy_fallback.cc"
+        "crc/internal/crc_memcpy_x86_64.cc"
+        "crc/internal/crc_non_temporal_memcpy.cc"
+        "crc/internal/crc_x86_arm_combined.cc"
+        "debugging/failure_signal_handler.cc"
+        "debugging/stacktrace.cc"
+        "debugging/symbolize.cc"
+        "debugging/internal/address_is_readable.cc"
+        "debugging/internal/demangle.cc"
+        "debugging/internal/elf_mem_image.cc"
+        "debugging/internal/examine_stack.cc"
+        "debugging/internal/stack_consumption.cc"
+        "debugging/internal/vdso_support.cc"
+        "debugging/leak_check.cc"
+        "hash/internal/city.cc"
+        "hash/internal/hash.cc"
+        "hash/internal/low_level_hash.cc"
+        "base/int128.cc"
+        "profiling/internal/exponential_biased.cc"
+        "profiling/internal/periodic_sampler.cc"
+        "random/discrete_distribution.cc"
+        "random/gaussian_distribution.cc"
+        "random/internal/pool_urbg.cc"
+        "random/internal/randen.cc"
+        "random/internal/randen_detect.cc"
+        "random/internal/randen_hwaes.cc"
+        "random/internal/randen_round_keys.cc"
+        "random/internal/randen_slow.cc"
+        "random/internal/seed_material.cc"
+        "random/seed_gen_exception.cc"
+        "random/seed_sequences.cc"
+        "strings/ascii.cc"
+        "strings/charconv.cc"
+        "strings/cord.cc"
+        "strings/cord_analysis.cc"
+        "strings/cord_buffer.cc"
+        "strings/escaping.cc"
+        "strings/internal/charconv_bigint.cc"
+        "strings/internal/charconv_parse.cc"
+        "strings/internal/cord_internal.cc"
+        "strings/internal/cord_rep_btree.cc"
+        "strings/internal/cord_rep_btree_navigator.cc"
+        "strings/internal/cord_rep_btree_reader.cc"
+        "strings/internal/cord_rep_crc.cc"
+        "strings/internal/cord_rep_consume.cc"
+        "strings/internal/cord_rep_ring.cc"
+        "strings/internal/cordz_functions.cc"
+        "strings/internal/cordz_handle.cc"
+        "strings/internal/cordz_info.cc"
+        "strings/internal/cordz_sample_token.cc"
+        "strings/internal/damerau_levenshtein_distance.cc"
+        "strings/internal/stringify_sink.cc"
+        "strings/match.cc"
+        "strings/numbers.cc"
+        "strings/str_cat.cc"
+        "strings/str_replace.cc"
+        "strings/str_split.cc"
+        "strings/string_view.cc"
+        "strings/substitute.cc"
+        "strings/internal/escaping.cc"
+        "strings/internal/memutil.cc"
+        "strings/internal/ostringstream.cc"
+        "strings/internal/pow10_helper.cc"
+        "strings/internal/str_format/arg.cc"
+        "strings/internal/str_format/bind.cc"
+        "strings/internal/str_format/extension.cc"
+        "strings/internal/str_format/float_conversion.cc"
+        "strings/internal/str_format/output.cc"
+        "strings/internal/str_format/parser.cc"
+        "strings/internal/utf8.cc"
+        "synchronization/barrier.cc"
+        "synchronization/blocking_counter.cc"
+        "synchronization/mutex.cc"
+        "synchronization/notification.cc"
+        "synchronization/internal/create_thread_identity.cc"
+        "synchronization/internal/graphcycles.cc"
+        "synchronization/internal/per_thread_sem.cc"
+        "synchronization/internal/waiter.cc"
+        "time/civil_time.cc"
+        "time/clock.cc"
+        "time/duration.cc"
+        "time/format.cc"
+        "time/time.cc"
+        "time/internal/cctz/src/civil_time_detail.cc"
+        "time/internal/cctz/src/time_zone_fixed.cc"
+        "time/internal/cctz/src/time_zone_format.cc"
+        "time/internal/cctz/src/time_zone_if.cc"
+        "time/internal/cctz/src/time_zone_impl.cc"
+        "time/internal/cctz/src/time_zone_info.cc"
+        "time/internal/cctz/src/time_zone_libc.cc"
+        "time/internal/cctz/src/time_zone_lookup.cc"
+        "time/internal/cctz/src/time_zone_posix.cc"
+        "time/internal/cctz/src/zone_info_source.cc"
+        "meta/bad_any_cast.cc"
+        "meta/bad_optional_access.cc"
+        "meta/bad_variant_access.cc"
+        )
+
+turbo_cc_library(
+        NAME
+        turbo
+        SRCS
+        ${TURBO_ALL_SRC}
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        ${TURBO_DYLINK}
+)
+
+if (TURBO_BUILD_TESTING)
+    add_subdirectory(platform)
+    add_subdirectory(base)
+    add_subdirectory(cleanup)
+    add_subdirectory(container)
+    add_subdirectory(crc)
+    add_subdirectory(debugging)
+    add_subdirectory(flags)
+    add_subdirectory(hash)
+    add_subdirectory(log)
+    add_subdirectory(memory)
+    add_subdirectory(meta)
+    add_subdirectory(profiling)
+    add_subdirectory(random)
+    add_subdirectory(strings)
+    add_subdirectory(synchronization)
+    add_subdirectory(time)
+endif (TURBO_BUILD_TESTING)
 if (${TURBO_BUILD_DLL})
-  turbo_make_dll()
-endif()
+    turbo_make_dll()
+endif ()

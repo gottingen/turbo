@@ -35,7 +35,7 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/internal/strerror.h"
+#include "turbo/base/internal/strerror.h"
 #include "turbo/platform/internal/sysinfo.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/container/inlined_vector.h"

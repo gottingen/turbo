@@ -173,6 +173,14 @@ if((BUILD_TESTING AND TURBO_BUILD_TESTING) OR TURBO_BUILD_TEST_HELPERS)
   endif()
 endif()
 
+set(TURBO_DYLINK)
+if (APPLE)
+  find_library(CoreFoundation CoreFoundation)
+  list(APPEND TURBO_DYLINK ${CoreFoundation} pthread)
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+  list(APPEND TURBO_DYLINK rt dl pthread)
+endif ()
+
 add_subdirectory(turbo)
 
 if(TURBO_ENABLE_INSTALL)
