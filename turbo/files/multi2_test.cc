@@ -21,22 +21,20 @@
 // SOFTWARE.
 //
 //---------------------------------------------------------------------------------------
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
+#include "gtest/gtest.h"
 #include "turbo/files/filesystem.h"
+
 namespace fs = ghc::filesystem;
 
-// This test and the one in multi2.cpp doesn't actually test relevant functionality,
+// This test and the one in multi1.cpp doesn't actualy test relevant functionality,
 // it is just used to check that it is possible to include filesystem.h in multiple
 // source files.
-TEST_CASE("Multifile-test 1", "[multi]")
-{
-    CHECK("/usr/local/bin" == fs::path("/usr/local/bin").generic_string());
+TEST(Multifile, multi_1) {
+    ASSERT_TRUE("/usr/local/bin" == fs::path("/usr/local/bin").generic_string());
     std::string str = "/usr/local/bin";
     std::u16string u16str = u"/usr/local/bin";
     std::u32string u32str = U"/usr/local/bin";
-    CHECK(str == fs::path(str.begin(), str.end()));
-    CHECK(str == fs::path(u16str.begin(), u16str.end()));
-    CHECK(str == fs::path(u32str.begin(), u32str.end()));
+    ASSERT_TRUE(str == fs::path(str.begin(), str.end()));
+    ASSERT_TRUE(str == fs::path(u16str.begin(), u16str.end()));
+    ASSERT_TRUE(str == fs::path(u32str.begin(), u32str.end()));
 }

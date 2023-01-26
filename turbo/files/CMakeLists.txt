@@ -1,91 +1,62 @@
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
-include(ParseAndAddCatchTests)
-include_directories(${PROJECT_SOURCE_DIR})
-function(SetTestCompileOptions target_name)
-    target_compile_options(${target_name} PRIVATE
-        $<$<BOOL:${EMSCRIPTEN}>:-s DISABLE_EXCEPTION_CATCHING=0>
-        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Werror -Wno-deprecated-declarations>
-        $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wno-psabi -Werror -Wno-deprecated-declarations>
-        $<$<CXX_COMPILER_ID:MSVC>:/WX /wd4996>
-        $<$<BOOL:${CYGWIN}>:-Wa,-mbig-obj>)
-endfunction()
 
-if(GHC_COVERAGE)
-    message("Generating test runner for coverage run...")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMCMAKE_EXE_LINKER_FLAGS} --coverage") 
-    add_executable(filesystem_test filesystem_test.cc catch.hpp)
-    if(MINGW)
-        target_compile_options(filesystem_test PUBLIC --coverage "-Wa,-mbig-obj")
-    else()
-        target_compile_options(filesystem_test PUBLIC --coverage)
-    endif()
-    target_link_libraries(filesystem_test PUBLIC turbo::turbo --coverage)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "(SunOS|Solaris)")
-        target_link_libraries(filesystem_test PUBLIC xnet)
-    endif()
-    if("cxx_std_17" IN_LIST GHC_FILESYSTEM_TEST_COMPILE_FEATURES)
-        AddTestExecutableWithStdCpp(17 filesystem_test.cc catch.hpp)
-    endif()
-    if("cxx_std_20" IN_LIST GHC_FILESYSTEM_TEST_COMPILE_FEATURES)
-        AddTestExecutableWithStdCpp(20 filesystem_test.cc catch.hpp)
-    endif()
-else()
-    message("Generating test runner for normal test...")
-    add_executable(filesystem_test filesystem_test.cc catch.hpp)
-    target_link_libraries(filesystem_test turbo::turbo)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "(SunOS|Solaris)")
-        target_link_libraries(filesystem_test xnet)
-    endif()
-    SetTestCompileOptions(filesystem_test)
-    if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-        target_compile_definitions(filesystem_test PRIVATE _CRT_SECURE_NO_WARNINGS WIN32_LEAN_AND_MEAN NOMINMAX)
-    endif()
-    if(EMSCRIPTEN)
-        set_target_properties(filesystem_test PROPERTIES LINK_FLAGS "-g4 -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1")
-    endif()
-    ParseAndAddCatchTests(filesystem_test)
-    if(GHC_FILESYSTEM_BUILD_STD_TESTING)
-        AddExecutableWithStdFS(std_filesystem_test filesystem_test.cc catch.hpp)
-    endif()
-    if(WIN32)
-        add_executable(filesystem_test_char filesystem_test.cc catch.hpp)
-        target_link_libraries(filesystem_test_char turbo::turbo)
-        SetTestCompileOptions(filesystem_test_char)
-        if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-		target_compile_definitions(filesystem_test_char PRIVATE _CRT_SECURE_NO_WARNINGS GHC_WIN_DISABLE_WSTRING_STORAGE_TYPE)
-        else()
-		target_compile_definitions(filesystem_test_char PRIVATE GHC_WIN_DISABLE_WSTRING_STORAGE_TYPE)
-        endif()
-        ParseAndAddCatchTests(filesystem_test_char)
-    endif()
-    if("cxx_std_17" IN_LIST GHC_FILESYSTEM_TEST_COMPILE_FEATURES)
-        AddTestExecutableWithStdCpp(17 filesystem_test.cc catch.hpp)
-    endif()
-    if("cxx_std_20" IN_LIST GHC_FILESYSTEM_TEST_COMPILE_FEATURES)
-        AddTestExecutableWithStdCpp(20 filesystem_test.cc catch.hpp)
-    endif()
-endif()
+turbo_cc_test(
+        NAME
+        multi1_test
+        SRCS
+        "multi1_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
 
-add_executable(multifile_test multi1.cc multi2.cc catch.hpp)
-target_link_libraries(multifile_test turbo::turbo)
-add_test(multifile_test multifile_test)
+turbo_cc_test(
+        NAME
+        multi2_test
+        SRCS
+        "multi2_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
 
-add_executable(fwd_impl_test fwd_test.cc impl_test.cc)
-target_link_libraries(fwd_impl_test turbo::turbo)
-if(${CMAKE_SYSTEM_NAME} MATCHES "(SunOS|Solaris)")
-    target_link_libraries(fwd_impl_test xnet)
-endif()
-SetTestCompileOptions(fwd_impl_test)
-if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
-	target_compile_definitions(fwd_impl_test PRIVATE _CRT_SECURE_NO_WARNINGS WIN32_LEAN_AND_MEAN NOMINMAX)
-endif()
-add_test(fwd_impl_test fwd_impl_test)
+turbo_cc_test(
+        NAME
+        impl_test
+        SRCS
+        "impl_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
 
-add_executable(exception exception.cc)
-if(NOT MSVC)
-    target_compile_options(exception PRIVATE -fno-exceptions)
-endif()
-target_include_directories(exception PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-SetTestCompileOptions(exception)
+
+turbo_cc_test(
+        NAME
+        fs_exception_test
+        SRCS
+        "fs_exception_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        filesystem_test
+        SRCS
+        "filesystem_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)

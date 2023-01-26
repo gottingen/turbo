@@ -1,10 +1,11 @@
 //---------------------------------------------------------------------------------------
 //
-// ghc::filesystem - A C++17-like filesystem implementation for C++11/C++14/C++17/C++20
+// turbo::filesystem - A C++17-like filesystem implementation for C++11/C++14/C++17/C++20
 //
 //---------------------------------------------------------------------------------------
 //
 // Copyright (c) 2018, Steffen Schümann <s.schuemann@pobox.com>
+// Copyright (c) Jeff.li <lijippy@@163.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +43,8 @@
 // #endif
 //
 //---------------------------------------------------------------------------------------
-#ifndef GHC_FILESYSTEM_H
-#define GHC_FILESYSTEM_H
+#ifndef TURBO_FILES_FILESYSTEM_H_
+#define TURBO_FILES_FILESYSTEM_H_
 
 // #define BSD manifest constant only in
 // sys/param.h
@@ -249,6 +250,7 @@
 #define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
 #endif
 
+#include "turbo/strings/string_view.h"
 #if defined(GHC_HAS_STD_STRING_VIEW)
 #include <string_view>
 #elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
@@ -6046,4 +6048,4 @@ GHC_INLINE recursive_directory_iterator end(const recursive_directory_iterator&)
 #undef GHC_INLINE
 #undef GHC_EXPAND_IMPL
 
-#endif  // GHC_FILESYSTEM_H
+#endif  // TURBO_FILES_FILESYSTEM_H_
