@@ -16,8 +16,8 @@
 // It provides ThreadSanitizer annotations for custom mutexes.
 // See <sanitizer/tsan_interface.h> for meaning of these annotations.
 
-#ifndef TURBO_BASE_INTERNAL_TSAN_MUTEX_INTERFACE_H_
-#define TURBO_BASE_INTERNAL_TSAN_MUTEX_INTERFACE_H_
+#ifndef TURBO_PLATFORM_INTERNAL_TSAN_MUTEX_INTERFACE_H_
+#define TURBO_PLATFORM_INTERNAL_TSAN_MUTEX_INTERFACE_H_
 
 #include "turbo/platform/config.h"
 
@@ -65,4 +65,4 @@
 
 #endif
 
-#endif  // TURBO_BASE_INTERNAL_TSAN_MUTEX_INTERFACE_H_
+#endif  // TURBO_PLATFORM_INTERNAL_TSAN_MUTEX_INTERFACE_H_

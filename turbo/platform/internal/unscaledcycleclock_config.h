@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
-#define TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
+#ifndef TURBO_PLATFORM_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
+#define TURBO_PLATFORM_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
@@ -59,4 +59,4 @@
 #endif
 #endif
 
-#endif  // TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_
+#endif  // TURBO_PLATFORM_INTERNAL_UNSCALEDCYCLECLOCK_CONFIG_H_

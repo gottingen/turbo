@@ -26,8 +26,8 @@
 //
 // Threads waiting on a SpinLock may be woken in an arbitrary order.
 
-#ifndef TURBO_BASE_INTERNAL_SPINLOCK_H_
-#define TURBO_BASE_INTERNAL_SPINLOCK_H_
+#ifndef TURBO_PLATFORM_INTERNAL_SPINLOCK_H_
+#define TURBO_PLATFORM_INTERNAL_SPINLOCK_H_
 
 #include <atomic>
 #include <cstdint>
@@ -249,4 +249,4 @@ inline uint32_t SpinLock::TryLockInternal(uint32_t lock_value,
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_SPINLOCK_H_
+#endif  // TURBO_PLATFORM_INTERNAL_SPINLOCK_H_

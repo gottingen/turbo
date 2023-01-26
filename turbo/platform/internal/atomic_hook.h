@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_BASE_INTERNAL_ATOMIC_HOOK_H_
-#define TURBO_BASE_INTERNAL_ATOMIC_HOOK_H_
+#ifndef TURBO_PLATFORM_INTERNAL_ATOMIC_HOOK_H_
+#define TURBO_PLATFORM_INTERNAL_ATOMIC_HOOK_H_
 
 #include <atomic>
 #include <cassert>
@@ -197,4 +197,4 @@ class AtomicHook<ReturnType (*)(Args...)> {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_ATOMIC_HOOK_H_
+#endif  // TURBO_PLATFORM_INTERNAL_ATOMIC_HOOK_H_

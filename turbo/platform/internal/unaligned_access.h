@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_BASE_INTERNAL_UNALIGNED_ACCESS_H_
-#define TURBO_BASE_INTERNAL_UNALIGNED_ACCESS_H_
+#ifndef TURBO_PLATFORM_INTERNAL_UNALIGNED_ACCESS_H_
+#define TURBO_PLATFORM_INTERNAL_UNALIGNED_ACCESS_H_
 
 #include <string.h>
 
@@ -79,4 +79,4 @@ TURBO_NAMESPACE_END
 
 #endif  // defined(__cplusplus), end of unaligned API
 
-#endif  // TURBO_BASE_INTERNAL_UNALIGNED_ACCESS_H_
+#endif  // TURBO_PLATFORM_INTERNAL_UNALIGNED_ACCESS_H_

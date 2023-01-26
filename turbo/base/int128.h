@@ -23,8 +23,8 @@
 // are defined in this file, while many inline `int128` methods are defined in
 // the `int128_*_intrinsic.inc` files.
 
-#ifndef TURBO_NUMERIC_INT128_H_
-#define TURBO_NUMERIC_INT128_H_
+#ifndef TURBO_BASE_INT128_H_
+#define TURBO_BASE_INT128_H_
 
 #include <cassert>
 #include <cmath>
@@ -1162,4 +1162,4 @@ TURBO_NAMESPACE_END
 
 #undef TURBO_INTERNAL_WCHAR_T
 
-#endif  // TURBO_NUMERIC_INT128_H_
+#endif  // TURBO_BASE_INT128_H_

@@ -33,8 +33,8 @@
 // The CPU is not required to maintain the ordering of a cycle counter read
 // with respect to surrounding instructions.
 
-#ifndef TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
-#define TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
+#ifndef TURBO_PLATFORM_INTERNAL_UNSCALEDCYCLECLOCK_H_
+#define TURBO_PLATFORM_INTERNAL_UNSCALEDCYCLECLOCK_H_
 
 #include <cstdint>
 
@@ -93,4 +93,4 @@ TURBO_NAMESPACE_END
 
 #endif  // TURBO_USE_UNSCALED_CYCLECLOCK
 
-#endif  // TURBO_BASE_INTERNAL_UNSCALEDCYCLECLOCK_H_
+#endif  // TURBO_PLATFORM_INTERNAL_UNSCALEDCYCLECLOCK_H_

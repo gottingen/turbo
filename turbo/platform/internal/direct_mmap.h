@@ -15,8 +15,8 @@
 // Functions for directly invoking mmap() via syscall, avoiding the case where
 // mmap() has been locally overridden.
 
-#ifndef TURBO_BASE_INTERNAL_DIRECT_MMAP_H_
-#define TURBO_BASE_INTERNAL_DIRECT_MMAP_H_
+#ifndef TURBO_PLATFORM_INTERNAL_DIRECT_MMAP_H_
+#define TURBO_PLATFORM_INTERNAL_DIRECT_MMAP_H_
 
 #include "turbo/platform/config.h"
 
@@ -167,4 +167,4 @@ TURBO_NAMESPACE_END
 
 #endif  // TURBO_HAVE_MMAP
 
-#endif  // TURBO_BASE_INTERNAL_DIRECT_MMAP_H_
+#endif  // TURBO_PLATFORM_INTERNAL_DIRECT_MMAP_H_

@@ -64,8 +64,8 @@
 // proper Turbo implementation at compile-time, which will not be sufficient
 // to guarantee ABI stability to package managers.
 
-#ifndef TURBO_BASE_OPTIONS_H_
-#define TURBO_BASE_OPTIONS_H_
+#ifndef TURBO_PLATFORM_OPTIONS_H_
+#define TURBO_PLATFORM_OPTIONS_H_
 
 // -----------------------------------------------------------------------------
 // Type Compatibility Options
@@ -229,4 +229,4 @@
 
 #define TURBO_OPTION_HARDENED 0
 
-#endif  // TURBO_BASE_OPTIONS_H_
+#endif  // TURBO_PLATFORM_OPTIONS_H_

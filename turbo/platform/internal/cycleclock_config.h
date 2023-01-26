@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_BASE_INTERNAL_CYCLECLOCK_CONFIG_H_
-#define TURBO_BASE_INTERNAL_CYCLECLOCK_CONFIG_H_
+#ifndef TURBO_PLATFORM_INTERNAL_CYCLECLOCK_CONFIG_H_
+#define TURBO_PLATFORM_INTERNAL_CYCLECLOCK_CONFIG_H_
 
 #include <cstdint>
 
@@ -52,4 +52,4 @@ TURBO_INTERNAL_INLINE_CONSTEXPR(double, kCycleClockFrequencyScale,
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_CYCLECLOCK_CONFIG_H_
+#endif  // TURBO_PLATFORM_INTERNAL_CYCLECLOCK_CONFIG_H_

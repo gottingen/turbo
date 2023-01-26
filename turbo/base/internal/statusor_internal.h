@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef TURBO_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
-#define TURBO_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
+#ifndef TURBO_BASE_INTERNAL_STATUSOR_INTERNAL_H_
+#define TURBO_BASE_INTERNAL_STATUSOR_INTERNAL_H_
 
 #include <type_traits>
 #include <utility>
@@ -393,4 +393,4 @@ TURBO_ATTRIBUTE_NORETURN void ThrowBadStatusOrAccess(turbo::Status status);
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_STATUS_INTERNAL_STATUSOR_INTERNAL_H_
+#endif  // TURBO_BASE_INTERNAL_STATUSOR_INTERNAL_H_

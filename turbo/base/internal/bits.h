@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_NUMERIC_INTERNAL_BITS_H_
-#define TURBO_NUMERIC_INTERNAL_BITS_H_
+#ifndef TURBO_BASE_INTERNAL_BITS_H_
+#define TURBO_BASE_INTERNAL_BITS_H_
 
 #include <cstdint>
 #include <limits>
@@ -355,4 +355,4 @@ TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ inline
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_NUMERIC_INTERNAL_BITS_H_
+#endif  // TURBO_BASE_INTERNAL_BITS_H_

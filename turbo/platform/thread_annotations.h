@@ -31,8 +31,8 @@
 // you want to refer to is not in scope, you may use a member pointer
 // (e.g. &MyClass::mutex_) to refer to a mutex in some (unknown) object.
 
-#ifndef TURBO_BASE_THREAD_ANNOTATIONS_H_
-#define TURBO_BASE_THREAD_ANNOTATIONS_H_
+#ifndef TURBO_PLATFORM_THREAD_ANNOTATIONS_H_
+#define TURBO_PLATFORM_THREAD_ANNOTATIONS_H_
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
@@ -332,4 +332,4 @@ inline T& ts_unchecked_read(T& v) TURBO_NO_THREAD_SAFETY_ANALYSIS {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_THREAD_ANNOTATIONS_H_
+#endif  // TURBO_PLATFORM_THREAD_ANNOTATIONS_H_

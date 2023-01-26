@@ -1082,7 +1082,7 @@ void RegisterCondVarTracer(void (*fn)(const char *msg, const void *cv));
 // DEPRECATED: The default symbolizer function is turbo::Symbolize() and the
 // ability to register a different hook for symbolizing stack traces will be
 // removed on or after 2023-05-01.
-TURBO_DEPRECATED("turbo::RegisterSymbolizer() is deprecated and will be removed "
+TURBO_DEPRECATED_MESSAGE("turbo::RegisterSymbolizer() is deprecated and will be removed "
                 "on or after 2023-05-01")
 void RegisterSymbolizer(bool (*fn)(const void *pc, char *out, int out_size));
 

@@ -632,9 +632,9 @@ bool TurboParseFlag(turbo::string_view text, Duration* dst, std::string* error);
 // the format specified by `turbo::ParseDuration()`.
 std::string TurboUnparseFlag(Duration d);
 
-TURBO_DEPRECATED("Use TurboParseFlag() instead.")
+    TURBO_DEPRECATED_MESSAGE("Use TurboParseFlag() instead.")
 bool ParseFlag(const std::string& text, Duration* dst, std::string* error);
-TURBO_DEPRECATED("Use TurboUnparseFlag() instead.")
+    TURBO_DEPRECATED_MESSAGE("Use TurboUnparseFlag() instead.")
 std::string UnparseFlag(Duration d);
 
 // Time
@@ -939,9 +939,9 @@ bool TurboParseFlag(turbo::string_view text, Time* t, std::string* error);
 // the format specified by `turbo::ParseTime()`.
 std::string TurboUnparseFlag(Time t);
 
-TURBO_DEPRECATED("Use TurboParseFlag() instead.")
+    TURBO_DEPRECATED_MESSAGE("Use TurboParseFlag() instead.")
 bool ParseFlag(const std::string& text, Time* t, std::string* error);
-TURBO_DEPRECATED("Use TurboUnparseFlag() instead.")
+    TURBO_DEPRECATED_MESSAGE("Use TurboUnparseFlag() instead.")
 std::string UnparseFlag(Time t);
 
 // TimeZone

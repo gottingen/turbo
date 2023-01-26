@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "turbo/synchronization/internal/waiter.h"
-
 #include "turbo/platform/config.h"
 
 #ifdef _WIN32
@@ -32,7 +31,7 @@
 #ifdef TURBO_HAVE_SEMAPHORE_H
 #include <semaphore.h>
 #endif
-
+#include <semaphore.h>
 #include <errno.h>
 #include <stdio.h>
 #include <time.h>

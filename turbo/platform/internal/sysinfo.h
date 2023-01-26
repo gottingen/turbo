@@ -21,8 +21,8 @@
 // All functions here are thread-hostile due to file caching unless
 // commented otherwise.
 
-#ifndef TURBO_BASE_INTERNAL_SYSINFO_H_
-#define TURBO_BASE_INTERNAL_SYSINFO_H_
+#ifndef TURBO_PLATFORM_INTERNAL_SYSINFO_H_
+#define TURBO_PLATFORM_INTERNAL_SYSINFO_H_
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -71,4 +71,4 @@ pid_t GetCachedTID();
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_SYSINFO_H_
+#endif  // TURBO_PLATFORM_INTERNAL_SYSINFO_H_

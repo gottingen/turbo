@@ -48,6 +48,10 @@ if (POLICY CMP0067)
   cmake_policy(SET CMP0067 NEW)
 endif (POLICY CMP0067)
 
+if (POLICY CMP0110)
+  cmake_policy(SET CMP0110 NEW)
+endif (POLICY CMP0110)
+
 project(turbo LANGUAGES CXX)
 include(CTest)
 
@@ -65,9 +69,11 @@ else()
   option(TURBO_ENABLE_INSTALL "Enable install rule" ON)
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+
 option(TURBO_PROPAGATE_CXX_STD
   "Use CMake C++ standard meta features (e.g. cxx_std_14) that propagate to targets that link to Turbo"
-  ON)  # TODO: Default to ON for CMake 3.8 and greater.
+  OFF)  # TODO: Default to ON for CMake 3.8 and greater.
 if((${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8) AND (NOT TURBO_PROPAGATE_CXX_STD))
   message(WARNING "A future Turbo release will default TURBO_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
 endif()
@@ -251,7 +257,7 @@ if(TURBO_ENABLE_INSTALL)
   file(WRITE "${CMAKE_BINARY_DIR}/options-pinned.h" "${TURBO_INTERNAL_OPTIONS_H_PINNED}")
 
   install(FILES "${CMAKE_BINARY_DIR}/options-pinned.h"
-         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/turbo/base
+         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/turbo/platform
          RENAME "options.h")
 
 endif()  # TURBO_ENABLE_INSTALL

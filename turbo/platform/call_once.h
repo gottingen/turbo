@@ -22,8 +22,8 @@
 // fix, so that (for example) non-const references may be passed to the invoked
 // function.
 
-#ifndef TURBO_BASE_CALL_ONCE_H_
-#define TURBO_BASE_CALL_ONCE_H_
+#ifndef TURBO_PLATFORM_CALL_ONCE_H_
+#define TURBO_PLATFORM_CALL_ONCE_H_
 
 #include <algorithm>
 #include <atomic>
@@ -216,4 +216,4 @@ void call_once(turbo::once_flag& flag, Callable&& fn, Args&&... args) {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_CALL_ONCE_H_
+#endif  // TURBO_PLATFORM_CALL_ONCE_H_

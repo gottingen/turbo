@@ -17,8 +17,8 @@
 // When a thread terminates, its ThreadIdentity object may be reused for a
 // thread created later.
 
-#ifndef TURBO_BASE_INTERNAL_THREAD_IDENTITY_H_
-#define TURBO_BASE_INTERNAL_THREAD_IDENTITY_H_
+#ifndef TURBO_PLATFORM_INTERNAL_THREAD_IDENTITY_H_
+#define TURBO_PLATFORM_INTERNAL_THREAD_IDENTITY_H_
 
 #ifndef _WIN32
 #include <pthread.h>
@@ -266,4 +266,4 @@ inline ThreadIdentity* CurrentThreadIdentityIfPresent() {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_THREAD_IDENTITY_H_
+#endif  // TURBO_PLATFORM_INTERNAL_THREAD_IDENTITY_H_

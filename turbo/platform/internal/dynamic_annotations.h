@@ -42,8 +42,8 @@
 //   If neither Dynamic Annotations nor Clang thread-safety warnings are
 //   enabled, then all annotation-macros expand to empty.
 
-#ifndef TURBO_BASE_INTERNAL_DYNAMIC_ANNOTATIONS_H_
-#define TURBO_BASE_INTERNAL_DYNAMIC_ANNOTATIONS_H_
+#ifndef TURBO_PLATFORM_INTERNAL_DYNAMIC_ANNOTATIONS_H_
+#define TURBO_PLATFORM_INTERNAL_DYNAMIC_ANNOTATIONS_H_
 
 #include <stddef.h>
 
@@ -395,4 +395,4 @@
 #undef TURBO_INTERNAL_END_EXTERN_C
 #undef TURBO_INTERNAL_STATIC_INLINE
 
-#endif  // TURBO_BASE_INTERNAL_DYNAMIC_ANNOTATIONS_H_
+#endif  // TURBO_PLATFORM_INTERNAL_DYNAMIC_ANNOTATIONS_H_
