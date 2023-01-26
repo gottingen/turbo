@@ -1,0 +1,15 @@
+name: turbo-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - gcc =8.5 # [linux]
+  - gxx =8.5 # [linux]
+  - sysroot_linux-64=2.17 # [linux]
+  - openssl =1.1.1
+  - gflags >=2.2.2
+  - protobuf >=3.9.2, <=3.19.1
+  - gperftools=2.9.1
+  - gtest
+  - gmock
+  - benchmark
