@@ -14,19 +14,6 @@
 # limitations under the License.
 #
 
-turbo_cc_library(
-  NAME
-    memory
-  HDRS
-    "memory.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::core_headers
-    turbo::meta
-  PUBLIC
-)
-
 turbo_cc_test(
   NAME
     memory_test
@@ -35,7 +22,6 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::memory
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
 )

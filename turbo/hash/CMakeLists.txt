@@ -16,44 +16,13 @@
 
 turbo_cc_library(
   NAME
-    hash
-  HDRS
-    "hash.h"
-  SRCS
-    "internal/hash.cc"
-    "internal/hash.h"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::bits
-    turbo::city
-    turbo::config
-    turbo::core_headers
-    turbo::endian
-    turbo::fixed_array
-    turbo::function_ref
-    turbo::meta
-    turbo::int128
-    turbo::strings
-    turbo::optional
-    turbo::variant
-    turbo::utility
-    turbo::low_level_hash
-  PUBLIC
-)
-
-turbo_cc_library(
-  NAME
     hash_testing
   HDRS
     "hash_testing.h"
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::spy_hash_state
-    turbo::meta
-    turbo::strings
-    turbo::variant
+    turbo::turbo
     GTest::gmock
   TESTONLY
   PUBLIC
@@ -67,18 +36,8 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::cord_test_helpers
-    turbo::hash
     turbo::hash_testing
-    turbo::core_headers
-    turbo::btree
-    turbo::flat_hash_map
-    turbo::flat_hash_set
-    turbo::node_hash_map
-    turbo::node_hash_set
-    turbo::spy_hash_state
-    turbo::meta
-    turbo::int128
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -102,21 +61,6 @@ turbo_cc_library(
   PUBLIC
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    city
-  HDRS
-    "internal/city.h"
-  SRCS
-    "internal/city.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::endian
-)
 
 turbo_cc_test(
   NAME
@@ -126,25 +70,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::city
+    turbo::turbo
     GTest::gmock_main
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    low_level_hash
-  HDRS
-    "internal/low_level_hash.h"
-  SRCS
-    "internal/low_level_hash.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::endian
-    turbo::int128
-)
 
 turbo_cc_test(
   NAME
@@ -154,7 +83,6 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::low_level_hash
-    turbo::strings
+    turbo::turbo
     GTest::gmock_main
 )

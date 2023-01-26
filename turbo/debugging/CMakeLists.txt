@@ -16,34 +16,6 @@
 
 find_library(EXECINFO_LIBRARY execinfo)
 
-turbo_cc_library(
-  NAME
-    stacktrace
-  HDRS
-    "stacktrace.h"
-    "internal/stacktrace_aarch64-inl.inc"
-    "internal/stacktrace_arm-inl.inc"
-    "internal/stacktrace_config.h"
-    "internal/stacktrace_emscripten-inl.inc"
-    "internal/stacktrace_generic-inl.inc"
-    "internal/stacktrace_powerpc-inl.inc"
-    "internal/stacktrace_riscv-inl.inc"
-    "internal/stacktrace_unimplemented-inl.inc"
-    "internal/stacktrace_win32-inl.inc"
-    "internal/stacktrace_x86-inl.inc"
-  SRCS
-    "stacktrace.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    $<$<BOOL:${EXECINFO_LIBRARY}>:${EXECINFO_LIBRARY}>
-  DEPS
-    turbo::debugging_internal
-    turbo::config
-    turbo::core_headers
-    turbo::raw_logging_internal
-  PUBLIC
-)
 
 turbo_cc_test(
   NAME
@@ -53,40 +25,8 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::stacktrace
-    turbo::core_headers
+    turbo::turbo
     GTest::gmock_main
-)
-
-turbo_cc_library(
-  NAME
-    symbolize
-  HDRS
-    "symbolize.h"
-    "internal/symbolize.h"
-  SRCS
-    "symbolize.cc"
-    "symbolize_darwin.inc"
-    "symbolize_elf.inc"
-    "symbolize_emscripten.inc"
-    "symbolize_unimplemented.inc"
-    "symbolize_win32.inc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-    $<$<BOOL:${MINGW}>:-ldbghelp>
-  DEPS
-    turbo::debugging_internal
-    turbo::demangle_internal
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::dynamic_annotations
-    turbo::malloc_internal
-    turbo::raw_logging_internal
-    turbo::strings
-  PUBLIC
 )
 
 turbo_cc_test(
@@ -100,53 +40,10 @@ turbo_cc_test(
   LINKOPTS
     $<$<BOOL:${MSVC}>:-DEBUG>
   DEPS
-    turbo::stack_consumption
-    turbo::symbolize
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::memory
-    turbo::raw_logging_internal
-    turbo::strings
+    turbo::turbo
     GTest::gmock
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    examine_stack
-  HDRS
-    "internal/examine_stack.h"
-  SRCS
-    "internal/examine_stack.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::stacktrace
-    turbo::symbolize
-    turbo::config
-    turbo::core_headers
-    turbo::raw_logging_internal
-)
-
-turbo_cc_library(
-  NAME
-    failure_signal_handler
-  HDRS
-    "failure_signal_handler.h"
-  SRCS
-    "failure_signal_handler.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::examine_stack
-    turbo::stacktrace
-    turbo::base
-    turbo::config
-    turbo::core_headers
-    turbo::raw_logging_internal
-  PUBLIC
-)
 
 turbo_cc_test(
   NAME
@@ -156,52 +53,11 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::failure_signal_handler
-    turbo::stacktrace
-    turbo::symbolize
-    turbo::strings
-    turbo::raw_logging_internal
+    turbo::turbo
     Threads::Threads
     GTest::gmock
 )
 
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    debugging_internal
-  HDRS
-    "internal/address_is_readable.h"
-    "internal/elf_mem_image.h"
-    "internal/vdso_support.h"
-  SRCS
-    "internal/address_is_readable.cc"
-    "internal/elf_mem_image.cc"
-    "internal/vdso_support.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::core_headers
-    turbo::config
-    turbo::dynamic_annotations
-    turbo::errno_saver
-    turbo::raw_logging_internal
-)
-
-# Internal-only target, do not depend on directly.
-turbo_cc_library(
-  NAME
-    demangle_internal
-  HDRS
-    "internal/demangle.h"
-  SRCS
-    "internal/demangle.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::base
-    turbo::core_headers
-  PUBLIC
-)
 
 turbo_cc_test(
   NAME
@@ -211,29 +67,10 @@ turbo_cc_test(
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
-    turbo::demangle_internal
-    turbo::stack_consumption
-    turbo::config
-    turbo::core_headers
-    turbo::memory
-    turbo::raw_logging_internal
+    turbo::turbo
     GTest::gmock_main
 )
 
-turbo_cc_library(
-  NAME
-    leak_check
-  HDRS
-    "leak_check.h"
-  SRCS
-    "leak_check.cc"
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::config
-    turbo::core_headers
-  PUBLIC
-)
 
 turbo_cc_test(
   NAME
@@ -245,8 +82,7 @@ turbo_cc_test(
   LINKOPTS
     ${TURBO_DEFAULT_LINKOPTS}
   DEPS
-    turbo::leak_check
-    turbo::base
+    turbo::turbo
     GTest::gmock_main
 )
 
@@ -261,9 +97,7 @@ turbo_cc_library(
   COPTS
     ${TURBO_DEFAULT_COPTS}
   DEPS
-    turbo::config
-    turbo::core_headers
-    turbo::raw_logging_internal
+    turbo::turbo
   TESTONLY
 )
 
@@ -276,19 +110,6 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::stack_consumption
-    turbo::core_headers
-    turbo::raw_logging_internal
+    turbo::turbo
     GTest::gmock_main
-)
-
-# component target
-turbo_cc_library(
-  NAME
-    debugging
-  COPTS
-    ${TURBO_DEFAULT_COPTS}
-  DEPS
-    turbo::stacktrace
-    turbo::leak_check
-  PUBLIC
 )
