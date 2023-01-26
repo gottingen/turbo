@@ -708,6 +708,20 @@
 	#endif
 
 
+    // TURBO_HAVE_BUILTIN()
+    //
+    // Checks whether the compiler supports a Clang Feature Checking Macro, and if
+    // so, checks whether it supports the provided builtin function "x" where x
+    // is one of the functions noted in
+    // https://clang.llvm.org/docs/LanguageExtensions.html
+    //
+    // Note: Use this macro to avoid an extra level of #ifdef __has_builtin check.
+    // http://releases.llvm.org/3.3/tools/clang/docs/LanguageExtensions.html
+    #ifdef __has_builtin
+    #define TURBO_HAVE_BUILTIN(x) __has_builtin(x)
+    #else
+    #define TURBO_HAVE_BUILTIN(x) 0
+    #endif
 
     // TURBO_ASSUME(cond)
     //
