@@ -620,8 +620,8 @@ static bool ShouldPickFirstSymbol(const ElfW(Sym) & symbol1,
   // this is not a weak symbol.
   char bind1 = ELF_ST_BIND(symbol1.st_info);
   char bind2 = ELF_ST_BIND(symbol1.st_info);
-  if (bind1 == STURBO_WEAK && bind2 != STURBO_WEAK) return false;
-  if (bind2 == STURBO_WEAK && bind1 != STURBO_WEAK) return true;
+  if (bind1 == STB_WEAK && bind2 != STB_WEAK) return false;
+  if (bind2 == STB_WEAK && bind1 != STB_WEAK) return true;
 
   // If one of the symbols has zero size and the other is not, pick the
   // one that has non-zero size.

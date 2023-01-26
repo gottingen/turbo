@@ -34,6 +34,7 @@
 #include "turbo/debugging/internal/stack_consumption.h"
 #include "turbo/memory/memory.h"
 #include "turbo/strings/string_view.h"
+#include "turbo/log/turbo_log.h"
 
 using testing::Contains;
 
@@ -128,6 +129,7 @@ static const char *TrySymbolizeWithLimit(void *pc, int limit) {
                  "try_symbolize_buffer is too small");
 
   // Use the heap to facilitate heap and buffer sanitizer tools.
+  TURBO_LOG(INFO)<<"limit size:"<<limit;
   auto heap_buffer = turbo::make_unique<char[]>(sizeof(try_symbolize_buffer));
   bool found = turbo::Symbolize(pc, heap_buffer.get(), limit);
   if (found) {
@@ -137,7 +139,7 @@ static const char *TrySymbolizeWithLimit(void *pc, int limit) {
             sizeof(try_symbolize_buffer) - 1);
     try_symbolize_buffer[sizeof(try_symbolize_buffer) - 1] = '\0';
   }
-
+  TURBO_LOG(INFO)<<"found:"<<(found ? "true" : "false");
   return found ? try_symbolize_buffer : nullptr;
 }
 
@@ -475,6 +477,7 @@ void TURBO_ATTRIBUTE_NOINLINE TestWithPCInsideInlineFunction() {
     (defined(__i386__) || defined(__x86_64__))
   void *pc = inline_func();  // Must be inlined.
   const char *symbol = TrySymbolize(pc);
+    std::cout <<"symbol: "<<symbol<< std::endl;
   TURBO_RAW_CHECK(symbol != nullptr, "TestWithPCInsideInlineFunction failed");
   TURBO_RAW_CHECK(strcmp(symbol, __FUNCTION__) == 0,
                  "TestWithPCInsideInlineFunction failed");

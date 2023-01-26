@@ -591,7 +591,7 @@
 	#if !defined(TURBO_HAS_INCLUDE)
 		#if defined(TURBO_COMPILER_CPP17_ENABLED)
 			#define TURBO_HAS_INCLUDE(x) __has_include(x)
-		#elif TURBO_COMPILER_CLANG
+		#elif defined(TURBO_COMPILER_CLANG)
 			#define TURBO_HAS_INCLUDE(x) __has_include(x)
 		#elif TURBO_COMPILER_GNUC
 			#define TURBO_HAS_INCLUDE(x) __has_include(x)

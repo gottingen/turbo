@@ -43,7 +43,7 @@
 #endif
 
 #include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/port.h"
 
 #ifndef AT_SYSINFO_EHDR
