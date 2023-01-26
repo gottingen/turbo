@@ -21,8 +21,8 @@
 // reported with `#error`. This enforcement is best effort, so successfully
 // compiling this header does not guarantee a supported configuration.
 
-#ifndef TURBO_BASE_POLICY_CHECKS_H_
-#define TURBO_BASE_POLICY_CHECKS_H_
+#ifndef TURBO_PLATFORM_POLICY_CHECKS_H_
+#define TURBO_PLATFORM_POLICY_CHECKS_H_
 
 // Included for the __GLIBC_PREREQ macro used below.
 #include <limits.h>
@@ -110,4 +110,4 @@
 #error "Turbo assumes that int is at least 4 bytes. "
 #endif
 
-#endif  // TURBO_BASE_POLICY_CHECKS_H_
+#endif  // TURBO_PLATFORM_POLICY_CHECKS_H_

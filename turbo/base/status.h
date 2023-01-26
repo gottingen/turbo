@@ -48,8 +48,8 @@
 // error codes (of type `turbo::StatusCode`) enumerated in this header file.
 // These canonical codes are understood across the codebase and will be
 // accepted across all API and RPC boundaries.
-#ifndef TURBO_STATUS_STATUS_H_
-#define TURBO_STATUS_STATUS_H_
+#ifndef TURBO_BASE_STATUS_H_
+#define TURBO_BASE_STATUS_H_
 
 #include <ostream>
 #include <string>
@@ -889,4 +889,4 @@ inline Status CancelledError() { return Status(turbo::StatusCode::kCancelled); }
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_STATUS_STATUS_H_
+#endif  // TURBO_BASE_STATUS_H_

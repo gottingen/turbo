@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_BASE_INTERNAL_PER_THREAD_TLS_H_
-#define TURBO_BASE_INTERNAL_PER_THREAD_TLS_H_
+#ifndef TURBO_PLATFORM_INTERNAL_PER_THREAD_TLS_H_
+#define TURBO_PLATFORM_INTERNAL_PER_THREAD_TLS_H_
 
 // This header defines two macros:
 //
@@ -49,4 +49,4 @@
 #define TURBO_PER_THREAD_TLS 0
 #endif
 
-#endif  // TURBO_BASE_INTERNAL_PER_THREAD_TLS_H_
+#endif  // TURBO_PLATFORM_INTERNAL_PER_THREAD_TLS_H_

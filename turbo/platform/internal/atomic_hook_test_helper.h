@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_BASE_INTERNAL_ATOMIC_HOOK_TEST_HELPER_H_
-#define TURBO_BASE_INTERNAL_ATOMIC_HOOK_TEST_HELPER_H_
+#ifndef TURBO_PLATFORM_INTERNAL_ATOMIC_HOOK_TEST_HELPER_H_
+#define TURBO_PLATFORM_INTERNAL_ATOMIC_HOOK_TEST_HELPER_H_
 
 #include "turbo/platform/internal/atomic_hook.h"
 
@@ -31,4 +31,4 @@ void RegisterFunc(VoidF func);
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_ATOMIC_HOOK_TEST_HELPER_H_
+#endif  // TURBO_PLATFORM_INTERNAL_ATOMIC_HOOK_TEST_HELPER_H_

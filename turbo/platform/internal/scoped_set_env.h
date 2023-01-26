@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_BASE_INTERNAL_SCOPED_SET_ENV_H_
-#define TURBO_BASE_INTERNAL_SCOPED_SET_ENV_H_
+#ifndef TURBO_PLATFORM_INTERNAL_SCOPED_SET_ENV_H_
+#define TURBO_PLATFORM_INTERNAL_SCOPED_SET_ENV_H_
 
 #include <string>
 
@@ -42,4 +42,4 @@ class ScopedSetEnv {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_SCOPED_SET_ENV_H_
+#endif  // TURBO_PLATFORM_INTERNAL_SCOPED_SET_ENV_H_

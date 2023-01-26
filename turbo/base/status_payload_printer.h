@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef TURBO_STATUS_STATUS_PAYLOAD_PRINTER_H_
-#define TURBO_STATUS_STATUS_PAYLOAD_PRINTER_H_
+#ifndef TURBO_BASE_STATUS_PAYLOAD_PRINTER_H_
+#define TURBO_BASE_STATUS_PAYLOAD_PRINTER_H_
 
 #include <string>
 
@@ -48,4 +48,4 @@ StatusPayloadPrinter GetStatusPayloadPrinter();
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_STATUS_STATUS_PAYLOAD_PRINTER_H_
+#endif  // TURBO_BASE_STATUS_PAYLOAD_PRINTER_H_

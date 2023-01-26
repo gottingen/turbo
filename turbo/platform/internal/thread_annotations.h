@@ -35,8 +35,8 @@
 // you want to refer to is not in scope, you may use a member pointer
 // (e.g. &MyClass::mutex_) to refer to a mutex in some (unknown) object.
 
-#ifndef TURBO_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
-#define TURBO_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
+#ifndef TURBO_PLATFORM_INTERNAL_THREAD_ANNOTATIONS_H_
+#define TURBO_PLATFORM_INTERNAL_THREAD_ANNOTATIONS_H_
 
 // TURBO_LEGACY_THREAD_ANNOTATIONS is a *temporary* compatibility macro that can
 // be defined on the compile command-line to restore the legacy spellings of the
@@ -277,4 +277,4 @@ inline T& ts_unchecked_read(T& v) NO_THREAD_SAFETY_ANALYSIS {
 
 #endif  // defined(TURBO_LEGACY_THREAD_ANNOTATIONS)
 
-#endif  // TURBO_BASE_INTERNAL_THREAD_ANNOTATIONS_H_
+#endif  // TURBO_PLATFORM_INTERNAL_THREAD_ANNOTATIONS_H_

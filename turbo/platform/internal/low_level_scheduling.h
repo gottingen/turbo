@@ -15,8 +15,8 @@
 // Core interfaces and definitions used by by low-level interfaces such as
 // SpinLock.
 
-#ifndef TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
-#define TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
+#ifndef TURBO_PLATFORM_INTERNAL_LOW_LEVEL_SCHEDULING_H_
+#define TURBO_PLATFORM_INTERNAL_LOW_LEVEL_SCHEDULING_H_
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/scheduling_mode.h"
@@ -131,4 +131,4 @@ inline SchedulingGuard::ScopedEnable::~ScopedEnable() {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_LOW_LEVEL_SCHEDULING_H_
+#endif  // TURBO_PLATFORM_INTERNAL_LOW_LEVEL_SCHEDULING_H_

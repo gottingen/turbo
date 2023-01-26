@@ -31,67 +31,12 @@
 // `__has_attribute()` first. If the check fails, we check if we are on GCC and
 // assume the attribute exists on GCC (which is verified on GCC 4.7).
 
-#ifndef TURBO_BASE_ATTRIBUTES_H_
-#define TURBO_BASE_ATTRIBUTES_H_
+#ifndef TURBO_PLATFORM_ATTRIBUTES_H_
+#define TURBO_PLATFORM_ATTRIBUTES_H_
 
 #include "turbo/platform/config.h"
 
-// TURBO_HAVE_ATTRIBUTE
-//
-// A function-like feature checking macro that is a wrapper around
-// `__has_attribute`, which is defined by GCC 5+ and Clang and evaluates to a
-// nonzero constant integer if the attribute is supported or 0 if not.
-//
-// It evaluates to zero if `__has_attribute` is not defined by the compiler.
-//
-// GCC: https://gcc.gnu.org/gcc-5/changes.html
-// Clang: https://clang.llvm.org/docs/LanguageExtensions.html
-#ifdef __has_attribute
-#define TURBO_HAVE_ATTRIBUTE(x) __has_attribute(x)
-#else
-#define TURBO_HAVE_ATTRIBUTE(x) 0
-#endif
 
-// TURBO_HAVE_CPP_ATTRIBUTE
-//
-// A function-like feature checking macro that accepts C++11 style attributes.
-// It's a wrapper around `__has_cpp_attribute`, defined by ISO C++ SD-6
-// (https://en.cppreference.com/w/cpp/experimental/feature_test). If we don't
-// find `__has_cpp_attribute`, will evaluate to 0.
-#if defined(__cplusplus) && defined(__has_cpp_attribute)
-// NOTE: requiring __cplusplus above should not be necessary, but
-// works around https://bugs.llvm.org/show_bug.cgi?id=23435.
-#define TURBO_HAVE_CPP_ATTRIBUTE(x) __has_cpp_attribute(x)
-#else
-#define TURBO_HAVE_CPP_ATTRIBUTE(x) 0
-#endif
-
-// -----------------------------------------------------------------------------
-// Function Attributes
-// -----------------------------------------------------------------------------
-//
-// GCC: https://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html
-// Clang: https://clang.llvm.org/docs/AttributeReference.html
-
-// TURBO_PRINTF_ATTRIBUTE
-// TURBO_SCANF_ATTRIBUTE
-//
-// Tells the compiler to perform `printf` format string checking if the
-// compiler supports it; see the 'format' attribute in
-// <https://gcc.gnu.org/onlinedocs/gcc-4.7.0/gcc/Function-Attributes.html>.
-//
-// Note: As the GCC manual states, "[s]ince non-static C++ methods
-// have an implicit 'this' argument, the arguments of such methods
-// should be counted from two, not one."
-#if TURBO_HAVE_ATTRIBUTE(format) || (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_PRINTF_ATTRIBUTE(string_index, first_to_check) \
-  __attribute__((__format__(__printf__, string_index, first_to_check)))
-#define TURBO_SCANF_ATTRIBUTE(string_index, first_to_check) \
-  __attribute__((__format__(__scanf__, string_index, first_to_check)))
-#else
-#define TURBO_PRINTF_ATTRIBUTE(string_index, first_to_check)
-#define TURBO_SCANF_ATTRIBUTE(string_index, first_to_check)
-#endif
 
 // TURBO_ATTRIBUTE_ALWAYS_INLINE
 // TURBO_ATTRIBUTE_NOINLINE
@@ -399,47 +344,6 @@
 #define TURBO_REQUIRE_STACK_ALIGN_TRAMPOLINE (0)
 #endif
 
-// TURBO_MUST_USE_RESULT
-//
-// Tells the compiler to warn about unused results.
-//
-// For code or headers that are assured to only build with C++17 and up, prefer
-// just using the standard `[[nodiscard]]` directly over this macro.
-//
-// When annotating a function, it must appear as the first part of the
-// declaration or definition. The compiler will warn if the return value from
-// such a function is unused:
-//
-//   TURBO_MUST_USE_RESULT Sprocket* AllocateSprocket();
-//   AllocateSprocket();  // Triggers a warning.
-//
-// When annotating a class, it is equivalent to annotating every function which
-// returns an instance.
-//
-//   class TURBO_MUST_USE_RESULT Sprocket {};
-//   Sprocket();  // Triggers a warning.
-//
-//   Sprocket MakeSprocket();
-//   MakeSprocket();  // Triggers a warning.
-//
-// Note that references and pointers are not instances:
-//
-//   Sprocket* SprocketPointer();
-//   SprocketPointer();  // Does *not* trigger a warning.
-//
-// TURBO_MUST_USE_RESULT allows using cast-to-void to suppress the unused result
-// warning. For that, warn_unused_result is used only for clang but not for gcc.
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66425
-//
-// Note: past advice was to place the macro after the argument list.
-//
-// TODO(b/176172494): Use TURBO_HAVE_CPP_ATTRIBUTE(nodiscard) when all code is
-// compliant with the stricter [[nodiscard]].
-#if defined(__clang__) && TURBO_HAVE_ATTRIBUTE(warn_unused_result)
-#define TURBO_MUST_USE_RESULT __attribute__((warn_unused_result))
-#else
-#define TURBO_MUST_USE_RESULT
-#endif
 
 // TURBO_ATTRIBUTE_HOT, TURBO_ATTRIBUTE_COLD
 //
@@ -643,39 +547,6 @@
   } while (0)
 #endif
 
-// TURBO_DEPRECATED()
-//
-// Marks a deprecated class, struct, enum, function, method and variable
-// declarations. The macro argument is used as a custom diagnostic message (e.g.
-// suggestion of a better alternative).
-//
-// For code or headers that are assured to only build with C++14 and up, prefer
-// just using the standard `[[deprecated("message")]]` directly over this macro.
-//
-// Examples:
-//
-//   class TURBO_DEPRECATED("Use Bar instead") Foo {...};
-//
-//   TURBO_DEPRECATED("Use Baz() instead") void Bar() {...}
-//
-//   template <typename T>
-//   TURBO_DEPRECATED("Use DoThat() instead")
-//   void DoThis();
-//
-//   enum FooEnum {
-//     kBar TURBO_DEPRECATED("Use kBaz instead"),
-//   };
-//
-// Every usage of a deprecated entity will trigger a warning when compiled with
-// GCC/Clang's `-Wdeprecated-declarations` option. Google's production toolchain
-// turns this warning off by default, instead relying on clang-tidy to report
-// new uses of deprecated code.
-#if TURBO_HAVE_ATTRIBUTE(deprecated)
-#define TURBO_DEPRECATED(message) __attribute__((deprecated(message)))
-#else
-#define TURBO_DEPRECATED(message)
-#endif
-
 // TURBO_CONST_INIT
 //
 // A variable declaration annotated with the `TURBO_CONST_INIT` attribute will
@@ -779,4 +650,4 @@
 #define TURBO_ATTRIBUTE_TRIVIAL_ABI
 #endif
 
-#endif  // TURBO_BASE_ATTRIBUTES_H_
+#endif  // TURBO_PLATFORM_ATTRIBUTES_H_

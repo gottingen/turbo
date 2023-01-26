@@ -45,8 +45,8 @@
 //   ...
 //   #endif  // TURBO_HAVE_MMAP
 
-#ifndef TURBO_BASE_CONFIG_H_
-#define TURBO_BASE_CONFIG_H_
+#ifndef TURBO_PALTFORM_CONFIG_H_
+#define TURBO_PALTFORM_CONFIG_H_
 
 // Included for the __GLIBC__ macro (or similar macros on other systems).
 #include <limits.h>
@@ -82,6 +82,8 @@
 #include <TargetConditionals.h>
 #endif
 
+#include "turbo/platform/config/base.h"
+#include "turbo/platform/config/have.h"
 #include "turbo/platform/options.h"
 #include "turbo/platform/policy_checks.h"
 
@@ -462,21 +464,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #error TURBO_HAVE_SCHED_YIELD cannot be directly set
 #elif defined(__linux__) || defined(__ros__) || defined(__native_client__)
 #define TURBO_HAVE_SCHED_YIELD 1
-#endif
-
-// TURBO_HAVE_SEMAPHORE_H
-//
-// Checks whether the platform supports the <semaphore.h> header and sem_init(3)
-// family of functions as standardized in POSIX.1-2001.
-//
-// Note: While Apple provides <semaphore.h> for both iOS and macOS, it is
-// explicitly deprecated and will cause build failures if enabled for those
-// platforms.  We side-step the issue by not defining it here for Apple
-// platforms.
-#ifdef TURBO_HAVE_SEMAPHORE_H
-#error TURBO_HAVE_SEMAPHORE_H cannot be directly set
-#elif defined(__linux__) || defined(__ros__)
-#define TURBO_HAVE_SEMAPHORE_H 1
 #endif
 
 // TURBO_HAVE_ALARM
@@ -939,4 +926,4 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_HAVE_CONSTANT_EVALUATED 1
 #endif
 
-#endif  // TURBO_BASE_CONFIG_H_
+#endif  // TURBO_PALTFORM_CONFIG_H_

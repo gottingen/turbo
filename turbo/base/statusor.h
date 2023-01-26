@@ -33,8 +33,8 @@
 //   } else {
 //     LOG(ERROR) << result.status();
 //   }
-#ifndef TURBO_STATUS_STATUSOR_H_
-#define TURBO_STATUS_STATUSOR_H_
+#ifndef TURBO_BASE_STATUSOR_H_
+#define TURBO_BASE_STATUSOR_H_
 
 #include <exception>
 #include <initializer_list>
@@ -773,4 +773,4 @@ void StatusOr<T>::IgnoreError() const {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_STATUS_STATUSOR_H_
+#endif  // TURBO_BASE_STATUSOR_H_

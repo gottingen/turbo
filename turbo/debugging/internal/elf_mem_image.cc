@@ -283,7 +283,7 @@ bool ElfMemImage::LookupSymbolByAddress(const void *address,
     if (symbol_start <= address && address < symbol_end) {
       if (info_out) {
         // Client wants to know details for that symbol (the usual case).
-        if (ElfBind(info.symbol) == STB_GLOBAL) {
+        if (ElfBind(info.symbol) == STURBO_GLOBAL) {
           // Strong symbol; just return it.
           *info_out = info;
           return true;

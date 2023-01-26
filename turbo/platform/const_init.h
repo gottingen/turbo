@@ -19,8 +19,8 @@
 // A constructor tag used to mark an object as safe for use as a global
 // variable, avoiding the usual lifetime issues that can affect globals.
 
-#ifndef TURBO_BASE_CONST_INIT_H_
-#define TURBO_BASE_CONST_INIT_H_
+#ifndef TURBO_PLATFORM_CONST_INIT_H_
+#define TURBO_PLATFORM_CONST_INIT_H_
 
 #include "turbo/platform/config.h"
 
@@ -73,4 +73,4 @@ enum ConstInitType {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_CONST_INIT_H_
+#endif  // TURBO_PLATFORM_CONST_INIT_H_

@@ -39,8 +39,8 @@
 // The CPU is not required to maintain the ordering of a cycle counter read
 // with respect to surrounding instructions.
 
-#ifndef TURBO_BASE_INTERNAL_CYCLECLOCK_H_
-#define TURBO_BASE_INTERNAL_CYCLECLOCK_H_
+#ifndef TURBO_PLATFORM_INTERNAL_CYCLECLOCK_H_
+#define TURBO_PLATFORM_INTERNAL_CYCLECLOCK_H_
 
 #include <atomic>
 #include <cstdint>
@@ -141,4 +141,4 @@ inline double CycleClock::Frequency() {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_CYCLECLOCK_H_
+#endif  // TURBO_PLATFORM_INTERNAL_CYCLECLOCK_H_

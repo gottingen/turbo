@@ -31,8 +31,8 @@
 // When using a standard library that implements these functions, we use the
 // standard library's implementation.
 
-#ifndef TURBO_NUMERIC_BITS_H_
-#define TURBO_NUMERIC_BITS_H_
+#ifndef TURBO_BASE_BITS_H_
+#define TURBO_BASE_BITS_H_
 
 #include <cstdint>
 #include <limits>
@@ -174,4 +174,4 @@ using std::has_single_bit;
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_NUMERIC_BITS_H_
+#endif  // TURBO_BASE_BITS_H_

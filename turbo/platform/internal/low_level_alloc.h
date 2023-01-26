@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_BASE_INTERNAL_LOW_LEVEL_ALLOC_H_
-#define TURBO_BASE_INTERNAL_LOW_LEVEL_ALLOC_H_
+#ifndef TURBO_PLATFORM_INTERNAL_LOW_LEVEL_ALLOC_H_
+#define TURBO_PLATFORM_INTERNAL_LOW_LEVEL_ALLOC_H_
 
 // A simple thread-safe memory allocator that does not depend on
 // mutexes or thread-specific data.  It is intended to be used
@@ -123,4 +123,4 @@ class LowLevelAlloc {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_LOW_LEVEL_ALLOC_H_
+#endif  // TURBO_PLATFORM_INTERNAL_LOW_LEVEL_ALLOC_H_

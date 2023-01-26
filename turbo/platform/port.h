@@ -15,11 +15,11 @@
 // This files is a forwarding header for other headers containing various
 // portability macros and functions.
 
-#ifndef TURBO_BASE_PORT_H_
-#define TURBO_BASE_PORT_H_
+#ifndef TURBO_PLATFORM_PORT_H_
+#define TURBO_PLATFORM_PORT_H_
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/optimization.h"
 
-#endif  // TURBO_BASE_PORT_H_
+#endif  // TURBO_PLATFORM_PORT_H_
