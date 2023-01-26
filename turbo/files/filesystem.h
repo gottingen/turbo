@@ -250,7 +250,6 @@
 #define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
 #endif
 
-#include "turbo/strings/string_view.h"
 #if defined(GHC_HAS_STD_STRING_VIEW)
 #include <string_view>
 #elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
