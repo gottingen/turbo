@@ -20,7 +20,7 @@ source:
   git_url: ../
 
 outputs:
-  - name: turbo
+  - name: turbo-turbo
     script: bld.sh   # [not win]
     script: bld.bat  # [win]
     build:
@@ -29,16 +29,9 @@ outputs:
         - {{ pin_compatible('turbo', exact=True) }}
     requirements:
       build:
-        - clang # [osx]
-        - clangxx #   [osx]
-        - gcc =8.5 # [linux]
-        - gxx =8.5 # [linux]
-        - sysroot_linux-64=2.17 # [linux]
       host:
-        - sysroot_linux-64=2.17 # [linux]
       run:
         #- __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.15") }}  # [osx and x86_64]
-        - sysroot_linux-64=2.17 # [linux]
     test:
       commands:
         - test -f $PREFIX/lib/libturbo_turbo.so              # [linux]

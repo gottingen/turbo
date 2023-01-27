@@ -205,16 +205,16 @@ if(TURBO_ENABLE_INSTALL)
   # install as a subdirectory only
   install(EXPORT ${PROJECT_NAME}Targets
     NAMESPACE turbo::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    DESTINATION "lib/cmake/${PROJECT_NAME}"
   )
 
   configure_package_config_file(
     CMake/turboConfig.cmake.in
     "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}"
   )
   install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+    DESTINATION "lib/cmake/${PROJECT_NAME}"
   )
 
   # Turbo only has a version in LTS releases.  This mechanism is accomplished
@@ -227,7 +227,7 @@ if(TURBO_ENABLE_INSTALL)
     )
 
     install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+      DESTINATION "lib/cmake/${PROJECT_NAME}"
     )
   endif()  # turbo_VERSION
 

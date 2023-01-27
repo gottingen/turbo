@@ -23,7 +23,7 @@
 #include <cassert>
 #include <cstddef>
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/raw_logging.h"
+#include "turbo/base/internal/raw_logging.h"
 
 // From binutils/include/elf/common.h (this doesn't appear to be documented
 // anywhere else).
@@ -283,7 +283,7 @@ bool ElfMemImage::LookupSymbolByAddress(const void *address,
     if (symbol_start <= address && address < symbol_end) {
       if (info_out) {
         // Client wants to know details for that symbol (the usual case).
-        if (ElfBind(info.symbol) == STURBO_GLOBAL) {
+        if (ElfBind(info.symbol) == STB_GLOBAL) {
           // Strong symbol; just return it.
           *info_out = info;
           return true;

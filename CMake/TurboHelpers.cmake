@@ -211,7 +211,7 @@ Requires:${PC_DEPS}\n\
 Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${TURBO_CC_LIB_IS_INTERFACE}>>:${LNK_LIB}>\n\
 Cflags: -I\${includedir}${PC_CFLAGS}\n")
       INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_${_NAME}.pc"
-              DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+              DESTINATION "lib/pkgconfig")
     endif()
   endif()
 
@@ -346,9 +346,9 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
   # installed abseil can't be tested.
   if(NOT TURBO_CC_LIB_TESTONLY AND TURBO_ENABLE_INSTALL)
     install(TARGETS ${_NAME} EXPORT ${PROJECT_NAME}Targets
-          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib
     )
   endif()
 

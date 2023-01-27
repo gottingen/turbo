@@ -627,7 +627,7 @@ Version: ${turbo_VERSION}\n\
 Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${TURBO_CC_LIB_IS_INTERFACE}>>:-labseil_dll>\n\
 Cflags: -I\${includedir}${PC_CFLAGS}\n")
   INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_dll.pc"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+    DESTINATION "lib/pkgconfig")
 
   target_compile_definitions(
     turbo_dll
@@ -658,8 +658,8 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
   endif()
 
   install(TARGETS turbo_dll EXPORT ${PROJECT_NAME}Targets
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
   )
 endfunction()
