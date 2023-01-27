@@ -211,14 +211,14 @@ ArgConvertResult<FormatConversionCharSetInternal::p> FormatConvertImpl(
 StringConvertResult FormatConvertImpl(const std::string& v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-StringConvertResult FormatConvertImpl(string_view v,
+StringConvertResult FormatConvertImpl(std::string_view v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
 #if defined(TURBO_HAVE_STD_STRING_VIEW) && !defined(TURBO_USES_STD_STRING_VIEW)
 inline StringConvertResult FormatConvertImpl(std::string_view v,
                                              FormatConversionSpecImpl conv,
                                              FormatSinkImpl* sink) {
-  return FormatConvertImpl(turbo::string_view(v.data(), v.size()), conv, sink);
+  return FormatConvertImpl(std::string_view(v.data(), v.size()), conv, sink);
 }
 #endif  // TURBO_HAVE_STD_STRING_VIEW && !TURBO_USES_STD_STRING_VIEW
 
@@ -248,7 +248,7 @@ StringConvertResult FormatConvertImpl(const TurboCord& value,
 
   if (space_remaining > 0 && !is_left) sink->Append(space_remaining, ' ');
 
-  for (string_view piece : value.Chunks()) {
+  for (std::string_view piece : value.Chunks()) {
     if (piece.size() > to_write) {
       piece.remove_suffix(piece.size() - to_write);
       to_write = 0;
@@ -611,7 +611,7 @@ class FormatArgImpl {
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long double, __VA_ARGS__);        \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(const char*, __VA_ARGS__);        \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string, __VA_ARGS__);        \
-  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(string_view, __VA_ARGS__)
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string_view, __VA_ARGS__)
 
 TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
 

@@ -63,7 +63,7 @@ struct UDT {
   UDT(const UDT&) = default;
   UDT& operator=(const UDT&) = default;
 };
-bool TurboParseFlag(turbo::string_view, UDT*, std::string*) { return true; }
+bool TurboParseFlag(std::string_view, UDT*, std::string*) { return true; }
 std::string TurboUnparseFlag(const UDT&) { return ""; }
 
 class FlagTest : public testing::Test {
@@ -76,7 +76,7 @@ class FlagTest : public testing::Test {
   }
 
  private:
-  static std::string NormalizeFileName(turbo::string_view fname) {
+  static std::string NormalizeFileName(std::string_view fname) {
 #ifdef _WIN32
     std::string normalized(fname);
     std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -275,7 +275,7 @@ namespace {
 
 #if !TURBO_FLAGS_STRIP_NAMES
 TEST_F(FlagTest, TestFlagDefinition) {
-  turbo::string_view expected_file_name = "turbo/flags/flag_test.cc";
+  std::string_view expected_file_name = "turbo/flags/flag_test.cc";
 
   EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Name(),
             "test_flag_01");
@@ -468,7 +468,7 @@ struct NonTriviallyCopyableAggregate {
 
   int value;
 };
-bool TurboParseFlag(turbo::string_view src, NonTriviallyCopyableAggregate* f,
+bool TurboParseFlag(std::string_view src, NonTriviallyCopyableAggregate* f,
                    std::string* e) {
   return turbo::ParseFlag(src, &f->value, e);
 }
@@ -701,8 +701,8 @@ struct CustomUDT {
   int a;
   int b;
 };
-bool TurboParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
-  std::vector<turbo::string_view> parts =
+bool TurboParseFlag(std::string_view in, CustomUDT* f, std::string*) {
+  std::vector<std::string_view> parts =
       turbo::StrSplit(in, ':', turbo::SkipWhitespace());
 
   if (parts.size() != 2) return false;
@@ -776,7 +776,7 @@ struct ConversionTestVal {
   int a;
 };
 
-bool TurboParseFlag(turbo::string_view in, ConversionTestVal* val_out,
+bool TurboParseFlag(std::string_view in, ConversionTestVal* val_out,
                    std::string*) {
   if (!turbo::SimpleAtoi(in, &val_out->a)) {
     return false;
@@ -818,7 +818,7 @@ struct NonDfltConstructible {
   int value;
 };
 
-bool TurboParseFlag(turbo::string_view in, NonDfltConstructible* ndc_out,
+bool TurboParseFlag(std::string_view in, NonDfltConstructible* ndc_out,
                    std::string*) {
   return turbo::SimpleAtoi(in, &ndc_out->value);
 }
@@ -893,7 +893,7 @@ struct SmallAlignUDT {
   char bytes[14];
 };
 
-bool TurboParseFlag(turbo::string_view, SmallAlignUDT*, std::string*) {
+bool TurboParseFlag(std::string_view, SmallAlignUDT*, std::string*) {
   return true;
 }
 std::string TurboUnparseFlag(const SmallAlignUDT&) { return ""; }
@@ -910,7 +910,7 @@ struct NonTriviallyCopyableUDT {
   char c;
 };
 
-bool TurboParseFlag(turbo::string_view, NonTriviallyCopyableUDT*, std::string*) {
+bool TurboParseFlag(std::string_view, NonTriviallyCopyableUDT*, std::string*) {
   return true;
 }
 std::string TurboUnparseFlag(const NonTriviallyCopyableUDT&) { return ""; }
@@ -959,7 +959,7 @@ struct EnumWrapper {
   TestE e;
 };
 
-bool TurboParseFlag(turbo::string_view, EnumWrapper*, std::string*) {
+bool TurboParseFlag(std::string_view, EnumWrapper*, std::string*) {
   return true;
 }
 std::string TurboUnparseFlag(const EnumWrapper&) { return ""; }
@@ -998,15 +998,15 @@ TEST_F(FlagTest, MacroWithinTurboFlag) {
 #endif
 
 #ifndef TURBO_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
-TURBO_FLAG(turbo::optional<bool>, optional_bool, turbo::nullopt, "help");
+TURBO_FLAG(std::optional<bool>, optional_bool, std::nullopt, "help");
 #endif
-TURBO_FLAG(turbo::optional<int>, optional_int, {}, "help");
-TURBO_FLAG(turbo::optional<double>, optional_double, 9.3, "help");
-TURBO_FLAG(turbo::optional<std::string>, optional_string, turbo::nullopt, "help");
-TURBO_FLAG(turbo::optional<turbo::Duration>, optional_duration, turbo::nullopt,
+TURBO_FLAG(std::optional<int>, optional_int, {}, "help");
+TURBO_FLAG(std::optional<double>, optional_double, 9.3, "help");
+TURBO_FLAG(std::optional<std::string>, optional_string, std::nullopt, "help");
+TURBO_FLAG(std::optional<turbo::Duration>, optional_duration, std::nullopt,
           "help");
-TURBO_FLAG(turbo::optional<turbo::optional<int>>, optional_optional_int,
-          turbo::nullopt, "help");
+TURBO_FLAG(std::optional<std::optional<int>>, optional_optional_int,
+          std::nullopt, "help");
 #if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 TURBO_FLAG(std::optional<int64_t>, std_optional_int64, std::nullopt, "help");
 #endif
@@ -1016,7 +1016,7 @@ namespace {
 #ifndef TURBO_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
 TEST_F(FlagTest, TestOptionalBool) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_bool).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), std::nullopt);
 
   turbo::SetFlag(&FLAGS_optional_bool, false);
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_bool).has_value());
@@ -1026,9 +1026,9 @@ TEST_F(FlagTest, TestOptionalBool) {
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_bool).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), true);
 
-  turbo::SetFlag(&FLAGS_optional_bool, turbo::nullopt);
+  turbo::SetFlag(&FLAGS_optional_bool, std::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_bool).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_bool), std::nullopt);
 }
 
 // --------------------------------------------------------------------
@@ -1036,7 +1036,7 @@ TEST_F(FlagTest, TestOptionalBool) {
 
 TEST_F(FlagTest, TestOptionalInt) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_int).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), std::nullopt);
 
   turbo::SetFlag(&FLAGS_optional_int, 0);
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_int).has_value());
@@ -1046,9 +1046,9 @@ TEST_F(FlagTest, TestOptionalInt) {
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_int).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), 10);
 
-  turbo::SetFlag(&FLAGS_optional_int, turbo::nullopt);
+  turbo::SetFlag(&FLAGS_optional_int, std::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_int).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_int), std::nullopt);
 }
 
 // --------------------------------------------------------------------
@@ -1065,16 +1065,16 @@ TEST_F(FlagTest, TestOptionalDouble) {
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_double).has_value());
   EXPECT_DOUBLE_EQ(*turbo::GetFlag(FLAGS_optional_double), 1.234);
 
-  turbo::SetFlag(&FLAGS_optional_double, turbo::nullopt);
+  turbo::SetFlag(&FLAGS_optional_double, std::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_double).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_double), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_double), std::nullopt);
 }
 
 // --------------------------------------------------------------------
 
 TEST_F(FlagTest, TestOptionalString) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_string).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), std::nullopt);
 
   // Setting optional string to "" leads to undefined behavior.
 
@@ -1086,16 +1086,16 @@ TEST_F(FlagTest, TestOptionalString) {
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_string).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), "QWERTY");
 
-  turbo::SetFlag(&FLAGS_optional_string, turbo::nullopt);
+  turbo::SetFlag(&FLAGS_optional_string, std::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_string).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_string), std::nullopt);
 }
 
 // --------------------------------------------------------------------
 
 TEST_F(FlagTest, TestOptionalDuration) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), std::nullopt);
 
   turbo::SetFlag(&FLAGS_optional_duration, turbo::ZeroDuration());
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_duration).has_value());
@@ -1105,37 +1105,37 @@ TEST_F(FlagTest, TestOptionalDuration) {
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_duration).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::Hours(3));
 
-  turbo::SetFlag(&FLAGS_optional_duration, turbo::nullopt);
+  turbo::SetFlag(&FLAGS_optional_duration, std::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_duration).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_duration), std::nullopt);
 }
 
 // --------------------------------------------------------------------
 
 TEST_F(FlagTest, TestOptionalOptional) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), std::nullopt);
 
-  turbo::optional<int> nullint{turbo::nullopt};
+  std::optional<int> nullint{std::nullopt};
 
   turbo::SetFlag(&FLAGS_optional_optional_int, nullint);
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
   EXPECT_NE(turbo::GetFlag(FLAGS_optional_optional_int), nullint);
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int),
-            turbo::optional<turbo::optional<int>>{nullint});
+            std::optional<std::optional<int>>{nullint});
 
   turbo::SetFlag(&FLAGS_optional_optional_int, 0);
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), 0);
 
-  turbo::SetFlag(&FLAGS_optional_optional_int, turbo::optional<int>{0});
+  turbo::SetFlag(&FLAGS_optional_optional_int, std::optional<int>{0});
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), 0);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::optional<int>{0});
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), std::optional<int>{0});
 
-  turbo::SetFlag(&FLAGS_optional_optional_int, turbo::nullopt);
+  turbo::SetFlag(&FLAGS_optional_optional_int, std::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::nullopt);
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), std::nullopt);
 }
 
 // --------------------------------------------------------------------

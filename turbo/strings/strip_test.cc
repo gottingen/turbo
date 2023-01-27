@@ -28,7 +28,7 @@
 namespace {
 
 TEST(Strip, ConsumePrefixOneChar) {
-  turbo::string_view input("abc");
+  std::string_view input("abc");
   EXPECT_TRUE(turbo::ConsumePrefix(&input, "a"));
   EXPECT_EQ(input, "bc");
 
@@ -46,7 +46,7 @@ TEST(Strip, ConsumePrefixOneChar) {
 }
 
 TEST(Strip, ConsumePrefix) {
-  turbo::string_view input("abcdef");
+  std::string_view input("abcdef");
   EXPECT_FALSE(turbo::ConsumePrefix(&input, "abcdefg"));
   EXPECT_EQ(input, "abcdef");
 
@@ -68,7 +68,7 @@ TEST(Strip, ConsumePrefix) {
 }
 
 TEST(Strip, ConsumeSuffix) {
-  turbo::string_view input("abcdef");
+  std::string_view input("abcdef");
   EXPECT_FALSE(turbo::ConsumeSuffix(&input, "abcdefg"));
   EXPECT_EQ(input, "abcdef");
 
@@ -90,7 +90,7 @@ TEST(Strip, ConsumeSuffix) {
 }
 
 TEST(Strip, StripPrefix) {
-  const turbo::string_view null_str;
+  const std::string_view null_str;
 
   EXPECT_EQ(turbo::StripPrefix("foobar", "foo"), "bar");
   EXPECT_EQ(turbo::StripPrefix("foobar", ""), "foobar");
@@ -102,7 +102,7 @@ TEST(Strip, StripPrefix) {
 }
 
 TEST(Strip, StripSuffix) {
-  const turbo::string_view null_str;
+  const std::string_view null_str;
 
   EXPECT_EQ(turbo::StripSuffix("foobar", "bar"), "foo");
   EXPECT_EQ(turbo::StripSuffix("foobar", ""), "foobar");
@@ -169,10 +169,10 @@ TEST(Strip, StripTrailingAsciiWhitespace) {
 }
 
 TEST(String, StripLeadingAsciiWhitespace) {
-  turbo::string_view orig = "\t  \n\f\r\n\vfoo";
+  std::string_view orig = "\t  \n\f\r\n\vfoo";
   EXPECT_EQ("foo", turbo::StripLeadingAsciiWhitespace(orig));
   orig = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
-  EXPECT_EQ(turbo::string_view(), turbo::StripLeadingAsciiWhitespace(orig));
+  EXPECT_EQ(std::string_view(), turbo::StripLeadingAsciiWhitespace(orig));
 }
 
 TEST(Strip, StripAsciiWhitespace) {
@@ -188,7 +188,7 @@ TEST(Strip, StripAsciiWhitespace) {
   std::string test5 = "foo \t\f\r\v\n";
   turbo::StripAsciiWhitespace(&test5);
   EXPECT_EQ(test5, "foo");
-  turbo::string_view test6("\t  \f\r\n\vfoo \t\f\r\v\n");
+  std::string_view test6("\t  \f\r\n\vfoo \t\f\r\v\n");
   test6 = turbo::StripAsciiWhitespace(test6);
   EXPECT_EQ(test6, "foo");
   test6 = turbo::StripAsciiWhitespace(test6);

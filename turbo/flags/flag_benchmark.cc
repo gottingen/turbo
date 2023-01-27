@@ -24,7 +24,7 @@
 #include "turbo/flags/reflection.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
-#include "turbo/meta/optional.h"
+#include <optional>
 #include "benchmark/benchmark.h"
 
 namespace {
@@ -32,15 +32,15 @@ using String = std::string;
 using VectorOfStrings = std::vector<std::string>;
 using TurboDuration = turbo::Duration;
 
-// We do not want to take over marshalling for the types turbo::optional<int>,
-// turbo::optional<std::string> which we do not own. Instead we introduce unique
+// We do not want to take over marshalling for the types std::optional<int>,
+// std::optional<std::string> which we do not own. Instead we introduce unique
 // "aliases" to these types, which we do.
-using TurboOptionalInt = turbo::optional<int>;
+using TurboOptionalInt = std::optional<int>;
 struct OptionalInt : TurboOptionalInt {
   using TurboOptionalInt::TurboOptionalInt;
 };
 // Next two functions represent Turbo Flags marshalling for OptionalInt.
-bool TurboParseFlag(turbo::string_view src, OptionalInt* flag,
+bool TurboParseFlag(std::string_view src, OptionalInt* flag,
                    std::string* error) {
   int val;
   if (src.empty())
@@ -54,12 +54,12 @@ std::string TurboUnparseFlag(const OptionalInt& flag) {
   return !flag ? "" : turbo::UnparseFlag(*flag);
 }
 
-using TurboOptionalString = turbo::optional<std::string>;
+using TurboOptionalString = std::optional<std::string>;
 struct OptionalString : TurboOptionalString {
   using TurboOptionalString::TurboOptionalString;
 };
 // Next two functions represent Turbo Flags marshalling for OptionalString.
-bool TurboParseFlag(turbo::string_view src, OptionalString* flag,
+bool TurboParseFlag(std::string_view src, OptionalString* flag,
                    std::string* error) {
   std::string val;
   if (src.empty())
@@ -79,7 +79,7 @@ struct UDT {
   UDT& operator=(const UDT&) { return *this; }
 };
 // Next two functions represent Turbo Flags marshalling for UDT.
-bool TurboParseFlag(turbo::string_view, UDT*, std::string*) { return true; }
+bool TurboParseFlag(std::string_view, UDT*, std::string*) { return true; }
 std::string TurboUnparseFlag(const UDT&) { return ""; }
 
 }  // namespace

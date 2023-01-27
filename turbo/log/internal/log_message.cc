@@ -100,7 +100,7 @@ bool PrintValue(turbo::Span<char>& dst, turbo::Span<const char> buf) {
   return true;
 }
 
-turbo::string_view Basename(turbo::string_view filepath) {
+std::string_view Basename(std::string_view filepath) {
 #ifdef _WIN32
   size_t path = filepath.find_last_of("/\\");
 #else
@@ -244,7 +244,7 @@ LogMessage::~LogMessage() {
   Flush();
 }
 
-LogMessage& LogMessage::AtLocation(turbo::string_view file, int line) {
+LogMessage& LogMessage::AtLocation(std::string_view file, int line) {
   data_->entry.full_filename_ = file;
   data_->entry.base_filename_ = Basename(file);
   data_->entry.line_ = line;
@@ -349,7 +349,7 @@ LogMessage& LogMessage::operator<<(const std::string& v) {
   return *this;
 }
 
-LogMessage& LogMessage::operator<<(turbo::string_view v) {
+LogMessage& LogMessage::operator<<(std::string_view v) {
   CopyToEncodedBuffer(v, StringType::kNotLiteral);
   return *this;
 }
@@ -405,7 +405,7 @@ void LogMessage::Flush() {
 
   data_->FinalizeEncodingAndFormat();
   data_->entry.encoding_ =
-      turbo::string_view(data_->encoded_buf.data(),
+      std::string_view(data_->encoded_buf.data(),
                         static_cast<size_t>(data_->encoded_remaining.data() -
                                             data_->encoded_buf.data()));
   SendToLog();
@@ -518,7 +518,7 @@ void LogMessage::LogBacktraceIfNeeded() {
 // containing the specified string data using a `Value` field appropriate to
 // `str_type`.  Truncates `str` if necessary, but emits nothing and marks the
 // buffer full if  even the field headers do not fit.
-void LogMessage::CopyToEncodedBuffer(turbo::string_view str,
+void LogMessage::CopyToEncodedBuffer(std::string_view str,
                                      StringType str_type) {
   auto encoded_remaining_copy = data_->encoded_remaining;
   auto start = EncodeMessageStart(
@@ -566,7 +566,7 @@ LogMessageFatal::LogMessageFatal(const char* file, int line)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {}
 
 LogMessageFatal::LogMessageFatal(const char* file, int line,
-                                 turbo::string_view failure_msg)
+                                 std::string_view failure_msg)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {
   *this << "Check failed: " << failure_msg << " ";
 }
@@ -591,7 +591,7 @@ LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line)
 }
 
 LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line,
-                                               turbo::string_view failure_msg)
+                                               std::string_view failure_msg)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {
   SetFailQuietly();
   *this << "Check failed: " << failure_msg << " ";

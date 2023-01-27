@@ -55,10 +55,10 @@ using ::testing::IsTrue;
 auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
-void WriteToStream(turbo::string_view data, std::ostream* os) {
+void WriteToStream(std::string_view data, std::ostream* os) {
   *os << "WriteToStream: " << data;
 }
-void WriteToStreamRef(turbo::string_view data, std::ostream& os) {
+void WriteToStreamRef(std::string_view data, std::ostream& os) {
   os << "WriteToStreamRef: " << data;
 }
 

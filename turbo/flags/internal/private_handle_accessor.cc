@@ -42,7 +42,7 @@ bool PrivateHandleAccessor::IsSpecifiedOnCommandLine(
 }
 
 bool PrivateHandleAccessor::ValidateInputValue(const CommandLineFlag& flag,
-                                               turbo::string_view value) {
+                                               std::string_view value) {
   return flag.ValidateInputValue(value);
 }
 
@@ -52,7 +52,7 @@ void PrivateHandleAccessor::CheckDefaultValueParsingRoundtrip(
 }
 
 bool PrivateHandleAccessor::ParseFrom(CommandLineFlag& flag,
-                                      turbo::string_view value,
+                                      std::string_view value,
                                       flags_internal::FlagSettingMode set_mode,
                                       flags_internal::ValueSource source,
                                       std::string& error) {

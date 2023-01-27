@@ -32,7 +32,7 @@
 //
 // Example:
 //
-// turbo::Status myFunction(turbo::string_view fname, ...) {
+// turbo::Status myFunction(std::string_view fname, ...) {
 //   ...
 //   // encounter error
 //   if (error condition) {
@@ -54,12 +54,12 @@
 #include <ostream>
 #include <string>
 #include <utility>
+#include <optional>
 
 #include "turbo/meta/function_ref.h"
 #include "turbo/base/internal/status_internal.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/optional.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -351,7 +351,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //
 // Example:
 //
-// turbo::Status myFunction(turbo::string_view fname, ...) {
+// turbo::Status myFunction(std::string_view fname, ...) {
 //   ...
 //   // encounter error
 //   if (error condition) {
@@ -411,7 +411,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //     info.retry_delay().seconds() = 30;
 //     // Payloads require a unique key (a URL to ensure no collisions with
 //     // other payloads), and an `turbo::Cord` to hold the encoded data.
-//     turbo::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
+//     std::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
 //     result.SetPayload(url, info.SerializeAsCord());
 //     return result;
 //   }
@@ -436,7 +436,7 @@ class Status final {
   //
   // The `msg` string must be in UTF-8. The implementation may complain (e.g.,  // NOLINT
   // by printing a warning) if it is not.
-  Status(turbo::StatusCode code, turbo::string_view msg);
+  Status(turbo::StatusCode code, std::string_view msg);
 
   Status(const Status&);
   Status& operator=(const Status& x);
@@ -497,7 +497,7 @@ class Status final {
   // Note that this message rarely describes the error code.  It is not unusual
   // for the error message to be the empty string. As a result, prefer
   // `operator<<` or `Status::ToString()` for debug logging.
-  turbo::string_view message() const;
+  std::string_view message() const;
 
   friend bool operator==(const Status&, const Status&);
   friend bool operator!=(const Status&, const Status&);
@@ -565,7 +565,7 @@ class Status final {
   // Status::GetPayload()
   //
   // Gets the payload of a status given its unique `type_url` key, if present.
-  turbo::optional<turbo::Cord> GetPayload(turbo::string_view type_url) const;
+  std::optional<turbo::Cord> GetPayload(std::string_view type_url) const;
 
   // Status::SetPayload()
   //
@@ -573,13 +573,13 @@ class Status final {
   // any existing payload for that `type_url`.
   //
   // NOTE: This function does nothing if the Status is ok.
-  void SetPayload(turbo::string_view type_url, turbo::Cord payload);
+  void SetPayload(std::string_view type_url, turbo::Cord payload);
 
   // Status::ErasePayload()
   //
   // Erases the payload corresponding to the `type_url` key.  Returns `true` if
   // the payload was present.
-  bool ErasePayload(turbo::string_view type_url);
+  bool ErasePayload(std::string_view type_url);
 
   // Status::ForEachPayload()
   //
@@ -592,7 +592,7 @@ class Status final {
   // NOTE: Any mutation on the same 'turbo::Status' object during visitation is
   // forbidden and could result in undefined behavior.
   void ForEachPayload(
-      turbo::FunctionRef<void(turbo::string_view, const turbo::Cord&)> visitor)
+      turbo::FunctionRef<void(std::string_view, const turbo::Cord&)> visitor)
       const;
 
  private:
@@ -721,22 +721,22 @@ TURBO_MUST_USE_RESULT bool IsUnknown(const Status& status);
 // These convenience functions create an `turbo::Status` object with an error
 // code as indicated by the associated function name, using the error message
 // passed in `message`.
-Status AbortedError(turbo::string_view message);
-Status AlreadyExistsError(turbo::string_view message);
-Status CancelledError(turbo::string_view message);
-Status DataLossError(turbo::string_view message);
-Status DeadlineExceededError(turbo::string_view message);
-Status FailedPreconditionError(turbo::string_view message);
-Status InternalError(turbo::string_view message);
-Status InvalidArgumentError(turbo::string_view message);
-Status NotFoundError(turbo::string_view message);
-Status OutOfRangeError(turbo::string_view message);
-Status PermissionDeniedError(turbo::string_view message);
-Status ResourceExhaustedError(turbo::string_view message);
-Status UnauthenticatedError(turbo::string_view message);
-Status UnavailableError(turbo::string_view message);
-Status UnimplementedError(turbo::string_view message);
-Status UnknownError(turbo::string_view message);
+Status AbortedError(std::string_view message);
+Status AlreadyExistsError(std::string_view message);
+Status CancelledError(std::string_view message);
+Status DataLossError(std::string_view message);
+Status DeadlineExceededError(std::string_view message);
+Status FailedPreconditionError(std::string_view message);
+Status InternalError(std::string_view message);
+Status InvalidArgumentError(std::string_view message);
+Status NotFoundError(std::string_view message);
+Status OutOfRangeError(std::string_view message);
+Status PermissionDeniedError(std::string_view message);
+Status ResourceExhaustedError(std::string_view message);
+Status UnauthenticatedError(std::string_view message);
+Status UnavailableError(std::string_view message);
+Status UnimplementedError(std::string_view message);
+Status UnknownError(std::string_view message);
 
 // ErrnoToStatusCode()
 //
@@ -749,7 +749,7 @@ turbo::StatusCode ErrnoToStatusCode(int error_number);
 //
 // Convenience function that creates a `turbo::Status` using an `error_number`,
 // which should be an `errno` value.
-Status ErrnoToStatus(int error_number, turbo::string_view message);
+Status ErrnoToStatus(int error_number, std::string_view message);
 
 //------------------------------------------------------------------------------
 // Implementation details follow
@@ -803,11 +803,11 @@ inline bool Status::ok() const {
   return rep_ == CodeToInlinedRep(turbo::StatusCode::kOk);
 }
 
-inline turbo::string_view Status::message() const {
+inline std::string_view Status::message() const {
   return !IsInlined(rep_)
              ? RepToPointer(rep_)->message
-             : (IsMovedFrom(rep_) ? turbo::string_view(kMovedFromString)
-                                  : turbo::string_view());
+             : (IsMovedFrom(rep_) ? std::string_view(kMovedFromString)
+                                  : std::string_view());
 }
 
 inline bool operator==(const Status& lhs, const Status& rhs) {

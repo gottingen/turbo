@@ -84,7 +84,7 @@ TEST_P(ParseFlagFromAlmostOutOfRangeIntegerTest, YieldsExpectedValue) {
 }
 
 using ParseFlagFromIntegerMatchingEnumeratorTest =
-    TestWithParam<std::tuple<turbo::string_view, turbo::LogSeverity>>;
+    TestWithParam<std::tuple<std::string_view, turbo::LogSeverity>>;
 INSTANTIATE_TEST_SUITE_P(
     Instantiation, ParseFlagFromIntegerMatchingEnumeratorTest,
     Values(std::make_tuple("0", turbo::LogSeverity::kInfo),
@@ -99,7 +99,7 @@ INSTANTIATE_TEST_SUITE_P(
            std::make_tuple("2", turbo::LogSeverity::kError),
            std::make_tuple("3", turbo::LogSeverity::kFatal)));
 TEST_P(ParseFlagFromIntegerMatchingEnumeratorTest, YieldsExpectedValue) {
-  const turbo::string_view to_parse = std::get<0>(GetParam());
+  const std::string_view to_parse = std::get<0>(GetParam());
   const turbo::LogSeverity expected = std::get<1>(GetParam());
   turbo::LogSeverity value;
   std::string error;
@@ -108,14 +108,14 @@ TEST_P(ParseFlagFromIntegerMatchingEnumeratorTest, YieldsExpectedValue) {
 }
 
 using ParseFlagFromOtherIntegerTest =
-    TestWithParam<std::tuple<turbo::string_view, int>>;
+    TestWithParam<std::tuple<std::string_view, int>>;
 INSTANTIATE_TEST_SUITE_P(Instantiation, ParseFlagFromOtherIntegerTest,
                          Values(std::make_tuple("-1", -1),
                                 std::make_tuple("4", 4),
                                 std::make_tuple("010", 10),
                                 std::make_tuple("0x10", 16)));
 TEST_P(ParseFlagFromOtherIntegerTest, YieldsExpectedValue) {
-  const turbo::string_view to_parse = std::get<0>(GetParam());
+  const std::string_view to_parse = std::get<0>(GetParam());
   const auto expected = static_cast<turbo::LogSeverity>(std::get<1>(GetParam()));
   turbo::LogSeverity value;
   std::string error;
@@ -124,7 +124,7 @@ TEST_P(ParseFlagFromOtherIntegerTest, YieldsExpectedValue) {
 }
 
 using ParseFlagFromEnumeratorTest =
-    TestWithParam<std::tuple<turbo::string_view, turbo::LogSeverity>>;
+    TestWithParam<std::tuple<std::string_view, turbo::LogSeverity>>;
 INSTANTIATE_TEST_SUITE_P(
     Instantiation, ParseFlagFromEnumeratorTest,
     Values(std::make_tuple("INFO", turbo::LogSeverity::kInfo),
@@ -148,7 +148,7 @@ INSTANTIATE_TEST_SUITE_P(
            std::make_tuple("FaTaL", turbo::LogSeverity::kFatal),
            std::make_tuple("KfAtAl", turbo::LogSeverity::kFatal)));
 TEST_P(ParseFlagFromEnumeratorTest, YieldsExpectedValue) {
-  const turbo::string_view to_parse = std::get<0>(GetParam());
+  const std::string_view to_parse = std::get<0>(GetParam());
   const turbo::LogSeverity expected = std::get<1>(GetParam());
   turbo::LogSeverity value;
   std::string error;
@@ -156,18 +156,18 @@ TEST_P(ParseFlagFromEnumeratorTest, YieldsExpectedValue) {
   EXPECT_THAT(value, Eq(expected));
 }
 
-using ParseFlagFromGarbageTest = TestWithParam<turbo::string_view>;
+using ParseFlagFromGarbageTest = TestWithParam<std::string_view>;
 INSTANTIATE_TEST_SUITE_P(Instantiation, ParseFlagFromGarbageTest,
                          Values("", "\0", " ", "garbage", "kkinfo", "I"));
 TEST_P(ParseFlagFromGarbageTest, ReturnsError) {
-  const turbo::string_view to_parse = GetParam();
+  const std::string_view to_parse = GetParam();
   turbo::LogSeverity value;
   std::string error;
   EXPECT_THAT(turbo::ParseFlag(to_parse, &value, &error), IsFalse()) << value;
 }
 
 using UnparseFlagToEnumeratorTest =
-    TestWithParam<std::tuple<turbo::LogSeverity, turbo::string_view>>;
+    TestWithParam<std::tuple<turbo::LogSeverity, std::string_view>>;
 INSTANTIATE_TEST_SUITE_P(
     Instantiation, UnparseFlagToEnumeratorTest,
     Values(std::make_tuple(turbo::LogSeverity::kInfo, "INFO"),
@@ -176,7 +176,7 @@ INSTANTIATE_TEST_SUITE_P(
            std::make_tuple(turbo::LogSeverity::kFatal, "FATAL")));
 TEST_P(UnparseFlagToEnumeratorTest, ReturnsExpectedValueAndRoundTrips) {
   const turbo::LogSeverity to_unparse = std::get<0>(GetParam());
-  const turbo::string_view expected = std::get<1>(GetParam());
+  const std::string_view expected = std::get<1>(GetParam());
   const std::string stringified_value = turbo::UnparseFlag(to_unparse);
   EXPECT_THAT(stringified_value, Eq(expected));
   turbo::LogSeverity reparsed_value;

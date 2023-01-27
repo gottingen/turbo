@@ -638,7 +638,7 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // TURBO_USES_STD_OPTIONAL
 //
-// Indicates whether turbo::optional is an alias for std::optional.
+// Indicates whether std::optional is an alias for std::optional.
 #if !defined(TURBO_OPTION_USE_STD_OPTIONAL)
 #error options.h is misconfigured.
 #elif TURBO_OPTION_USE_STD_OPTIONAL == 0 || \
@@ -668,7 +668,7 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // TURBO_USES_STD_STRING_VIEW
 //
-// Indicates whether turbo::string_view is an alias for std::string_view.
+// Indicates whether std::string_view is an alias for std::string_view.
 #if !defined(TURBO_OPTION_USE_STD_STRING_VIEW)
 #error options.h is misconfigured.
 #elif TURBO_OPTION_USE_STD_STRING_VIEW == 0 || \

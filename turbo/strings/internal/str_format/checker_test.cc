@@ -91,8 +91,8 @@ TEST(StrFormatChecker, ValidFormat) {
       ValidFormat<int, std::string>("%*s"),             //
       ValidFormat<int, double>("%.*f"),                 //
       ValidFormat<void (*)(), volatile int*>("%p %p"),  //
-      ValidFormat<string_view, const char*, double, void*>(
-          "string_view=%s const char*=%s double=%f void*=%p)"),
+      ValidFormat<std::string_view, const char*, double, void*>(
+          "std::string_view=%s const char*=%s double=%f void*=%p)"),
       ValidFormat<int>("%v"),  //
 
       ValidFormat<int>("%% %1$d"),               //
@@ -108,8 +108,8 @@ TEST(StrFormatChecker, ValidFormat) {
       ValidFormat<double, int>("%2$d %1$g"),     //
       ValidFormat<int, std::string>("%2$*1$s"),  //
       ValidFormat<int, double>("%2$.*1$f"),      //
-      ValidFormat<void*, string_view, const char*, double>(
-          "string_view=%2$s const char*=%3$s double=%4$f void*=%1$p "
+      ValidFormat<void*, std::string_view, const char*, double>(
+          "std::string_view=%2$s const char*=%3$s double=%4$f void*=%1$p "
           "repeat=%3$s)"),
       ValidFormat<std::string>("%1$v"),
   };

@@ -44,12 +44,12 @@ class PrivateHandleAccessor {
 
   // Access to CommandLineFlag::ValidateInputValue.
   static bool ValidateInputValue(const CommandLineFlag& flag,
-                                 turbo::string_view value);
+                                 std::string_view value);
 
   // Access to CommandLineFlag::CheckDefaultValueParsingRoundtrip.
   static void CheckDefaultValueParsingRoundtrip(const CommandLineFlag& flag);
 
-  static bool ParseFrom(CommandLineFlag& flag, turbo::string_view value,
+  static bool ParseFrom(CommandLineFlag& flag, std::string_view value,
                         flags_internal::FlagSettingMode set_mode,
                         flags_internal::ValueSource source, std::string& error);
 };

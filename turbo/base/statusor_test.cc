@@ -20,14 +20,13 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-
+#include <any>
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "casts.h"
 #include "turbo/memory/memory.h"
 #include "status.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/any.h"
 #include "turbo/meta/utility.h"
 
 namespace {
@@ -804,13 +803,13 @@ TEST(StatusOr, ExplicitConstruction) {
 TEST(StatusOr, ImplicitConstruction) {
   // Check implicit casting works.
   auto status_or =
-      turbo::implicit_cast<turbo::StatusOr<turbo::variant<int, std::string>>>(10);
+      turbo::implicit_cast<turbo::StatusOr<std::variant<int, std::string>>>(10);
   EXPECT_THAT(status_or, IsOkAndHolds(VariantWith<int>(10)));
 }
 
 TEST(StatusOr, ImplicitConstructionFromInitliazerList) {
   // Note: dropping the explicit std::initializer_list<int> is not supported
-  // by turbo::StatusOr or turbo::optional.
+  // by turbo::StatusOr or std::optional.
   auto status_or =
       turbo::implicit_cast<turbo::StatusOr<std::vector<int>>>({{10, 20, 30}});
   EXPECT_THAT(status_or, IsOkAndHolds(ElementsAre(10, 20, 30)));
@@ -904,49 +903,49 @@ TEST(StatusOr, CopyAndMoveAbility) {
 }
 
 TEST(StatusOr, StatusOrAnyCopyAndMoveConstructorTests) {
-  turbo::StatusOr<turbo::any> status_or = CopyDetector(10);
-  turbo::StatusOr<turbo::any> status_error = turbo::InvalidArgumentError("foo");
+  turbo::StatusOr<std::any> status_or = CopyDetector(10);
+  turbo::StatusOr<std::any> status_error = turbo::InvalidArgumentError("foo");
   EXPECT_THAT(
       status_or,
       IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, true, false))));
-  turbo::StatusOr<turbo::any> a = status_or;
+  turbo::StatusOr<std::any> a = status_or;
   EXPECT_THAT(
       a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-  turbo::StatusOr<turbo::any> a_err = status_error;
+  turbo::StatusOr<std::any> a_err = status_error;
   EXPECT_THAT(a_err, Not(IsOk()));
 
-  const turbo::StatusOr<turbo::any>& cref = status_or;
+  const turbo::StatusOr<std::any>& cref = status_or;
   // No lint for no-change copy.
-  turbo::StatusOr<turbo::any> b = cref;  // NOLINT
+  turbo::StatusOr<std::any> b = cref;  // NOLINT
   EXPECT_THAT(
       b, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-  const turbo::StatusOr<turbo::any>& cref_err = status_error;
+  const turbo::StatusOr<std::any>& cref_err = status_error;
   // No lint for no-change copy.
-  turbo::StatusOr<turbo::any> b_err = cref_err;  // NOLINT
+  turbo::StatusOr<std::any> b_err = cref_err;  // NOLINT
   EXPECT_THAT(b_err, Not(IsOk()));
 
-  turbo::StatusOr<turbo::any> c = std::move(status_or);
+  turbo::StatusOr<std::any> c = std::move(status_or);
   EXPECT_THAT(
       c, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, true, false))));
-  turbo::StatusOr<turbo::any> c_err = std::move(status_error);
+  turbo::StatusOr<std::any> c_err = std::move(status_error);
   EXPECT_THAT(c_err, Not(IsOk()));
 }
 
 TEST(StatusOr, StatusOrAnyCopyAndMoveAssignment) {
-  turbo::StatusOr<turbo::any> status_or = CopyDetector(10);
-  turbo::StatusOr<turbo::any> status_error = turbo::InvalidArgumentError("foo");
-  turbo::StatusOr<turbo::any> a;
+  turbo::StatusOr<std::any> status_or = CopyDetector(10);
+  turbo::StatusOr<std::any> status_error = turbo::InvalidArgumentError("foo");
+  turbo::StatusOr<std::any> a;
   a = status_or;
   EXPECT_THAT(
       a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
   a = status_error;
   EXPECT_THAT(a, Not(IsOk()));
 
-  const turbo::StatusOr<turbo::any>& cref = status_or;
+  const turbo::StatusOr<std::any>& cref = status_or;
   a = cref;
   EXPECT_THAT(
       a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-  const turbo::StatusOr<turbo::any>& cref_err = status_error;
+  const turbo::StatusOr<std::any>& cref_err = status_error;
   a = cref_err;
   EXPECT_THAT(a, Not(IsOk()));
   a = std::move(status_or);
@@ -984,15 +983,15 @@ TEST(StatusOr, StatusOrCopyAndMoveTestsAssignment) {
 }
 
 TEST(StatusOr, TurboAnyAssignment) {
-  EXPECT_FALSE((std::is_assignable<turbo::StatusOr<turbo::any>,
+  EXPECT_FALSE((std::is_assignable<turbo::StatusOr<std::any>,
                                    turbo::StatusOr<int>>::value));
-  turbo::StatusOr<turbo::any> status_or;
+  turbo::StatusOr<std::any> status_or;
   status_or = turbo::InvalidArgumentError("foo");
   EXPECT_THAT(status_or, Not(IsOk()));
 }
 
 TEST(StatusOr, ImplicitAssignment) {
-  turbo::StatusOr<turbo::variant<int, std::string>> status_or;
+  turbo::StatusOr<std::variant<int, std::string>> status_or;
   status_or = 10;
   EXPECT_THAT(status_or, IsOkAndHolds(VariantWith<int>(10)));
 }

@@ -40,10 +40,10 @@ TURBO_NAMESPACE_BEGIN
 //
 // Example:
 //
-//   turbo::string_view input("abc");
+//   std::string_view input("abc");
 //   EXPECT_TRUE(turbo::ConsumePrefix(&input, "a"));
 //   EXPECT_EQ(input, "bc");
-inline bool ConsumePrefix(turbo::string_view* str, turbo::string_view expected) {
+inline bool ConsumePrefix(std::string_view* str, std::string_view expected) {
   if (!turbo::StartsWith(*str, expected)) return false;
   str->remove_prefix(expected.size());
   return true;
@@ -56,10 +56,10 @@ inline bool ConsumePrefix(turbo::string_view* str, turbo::string_view expected) 
 //
 // Example:
 //
-//   turbo::string_view input("abcdef");
+//   std::string_view input("abcdef");
 //   EXPECT_TRUE(turbo::ConsumeSuffix(&input, "def"));
 //   EXPECT_EQ(input, "abc");
-inline bool ConsumeSuffix(turbo::string_view* str, turbo::string_view expected) {
+inline bool ConsumeSuffix(std::string_view* str, std::string_view expected) {
   if (!turbo::EndsWith(*str, expected)) return false;
   str->remove_suffix(expected.size());
   return true;
@@ -70,8 +70,8 @@ inline bool ConsumeSuffix(turbo::string_view* str, turbo::string_view expected) 
 // Returns a view into the input string `str` with the given `prefix` removed,
 // but leaving the original string intact. If the prefix does not match at the
 // start of the string, returns the original string instead.
-TURBO_MUST_USE_RESULT inline turbo::string_view StripPrefix(
-    turbo::string_view str, turbo::string_view prefix) {
+TURBO_MUST_USE_RESULT inline std::string_view StripPrefix(
+    std::string_view str, std::string_view prefix) {
   if (turbo::StartsWith(str, prefix)) str.remove_prefix(prefix.size());
   return str;
 }
@@ -81,8 +81,8 @@ TURBO_MUST_USE_RESULT inline turbo::string_view StripPrefix(
 // Returns a view into the input string `str` with the given `suffix` removed,
 // but leaving the original string intact. If the suffix does not match at the
 // end of the string, returns the original string instead.
-TURBO_MUST_USE_RESULT inline turbo::string_view StripSuffix(
-    turbo::string_view str, turbo::string_view suffix) {
+TURBO_MUST_USE_RESULT inline std::string_view StripSuffix(
+    std::string_view str, std::string_view suffix) {
   if (turbo::EndsWith(str, suffix)) str.remove_suffix(suffix.size());
   return str;
 }

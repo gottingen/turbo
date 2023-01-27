@@ -433,10 +433,10 @@ class CordBuffer {
   // `short_value` to the inlined data value. In either case, the current
   // instance length is reset to zero.
   // This method is intended to be used by Cord internal functions only.
-  cord_internal::CordRep* ConsumeValue(turbo::string_view& short_value) {
+  cord_internal::CordRep* ConsumeValue(std::string_view& short_value) {
     cord_internal::CordRep* rep = nullptr;
     if (rep_.is_short()) {
-      short_value = turbo::string_view(rep_.data(), rep_.short_length());
+      short_value = std::string_view(rep_.data(), rep_.short_length());
     } else {
       rep = rep_.rep();
     }

@@ -69,10 +69,10 @@ TURBO_NAMESPACE_BEGIN
 //     ...
 //   }
 //   EXPECT_EQ(unescaped_s, "foo\rbar\nbaz\t");
-bool CUnescape(turbo::string_view source, std::string* dest, std::string* error);
+bool CUnescape(std::string_view source, std::string* dest, std::string* error);
 
 // Overload of `CUnescape()` with no error reporting.
-inline bool CUnescape(turbo::string_view source, std::string* dest) {
+inline bool CUnescape(std::string_view source, std::string* dest) {
   return CUnescape(source, dest, nullptr);
 }
 
@@ -87,7 +87,7 @@ inline bool CUnescape(turbo::string_view source, std::string* dest) {
 //   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
 //   std::string escaped_s = turbo::CEscape(s);
 //   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\010\\t\\n\\013\\014\\r\\n");
-std::string CEscape(turbo::string_view src);
+std::string CEscape(std::string_view src);
 
 // CHexEscape()
 //
@@ -100,7 +100,7 @@ std::string CEscape(turbo::string_view src);
 //   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
 //   std::string escaped_s = turbo::CHexEscape(s);
 //   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\x08\\t\\n\\x0b\\x0c\\r\\n");
-std::string CHexEscape(turbo::string_view src);
+std::string CHexEscape(std::string_view src);
 
 // Utf8SafeCEscape()
 //
@@ -108,30 +108,30 @@ std::string CHexEscape(turbo::string_view src);
 // octal sequences, and passing through UTF-8 characters without conversion.
 // I.e., when encountering any bytes with their high bit set, this function
 // will not escape those values, whether or not they are valid UTF-8.
-std::string Utf8SafeCEscape(turbo::string_view src);
+std::string Utf8SafeCEscape(std::string_view src);
 
 // Utf8SafeCHexEscape()
 //
 // Escapes a 'src' string using C-style escape sequences, escaping bytes as
 // hexadecimal sequences, and passing through UTF-8 characters without
 // conversion.
-std::string Utf8SafeCHexEscape(turbo::string_view src);
+std::string Utf8SafeCHexEscape(std::string_view src);
 
 // Base64Escape()
 //
 // Encodes a `src` string into a base64-encoded 'dest' string with padding
 // characters. This function conforms with RFC 4648 section 4 (base64) and RFC
 // 2045. See also CalculateBase64EscapedLen().
-void Base64Escape(turbo::string_view src, std::string* dest);
-std::string Base64Escape(turbo::string_view src);
+void Base64Escape(std::string_view src, std::string* dest);
+std::string Base64Escape(std::string_view src);
 
 // WebSafeBase64Escape()
 //
 // Encodes a `src` string into a base64 string, like Base64Escape() does, but
 // outputs '-' instead of '+' and '_' instead of '/', and does not pad 'dest'.
 // This function conforms with RFC 4648 section 5 (base64url).
-void WebSafeBase64Escape(turbo::string_view src, std::string* dest);
-std::string WebSafeBase64Escape(turbo::string_view src);
+void WebSafeBase64Escape(std::string_view src, std::string* dest);
+std::string WebSafeBase64Escape(std::string_view src);
 
 // Base64Unescape()
 //
@@ -140,7 +140,7 @@ std::string WebSafeBase64Escape(turbo::string_view src);
 // `src` contains invalid characters, `dest` is cleared and returns `false`.
 // If padding is included (note that `Base64Escape()` does produce it), it must
 // be correct. In the padding, '=' and '.' are treated identically.
-bool Base64Unescape(turbo::string_view src, std::string* dest);
+bool Base64Unescape(std::string_view src, std::string* dest);
 
 // WebSafeBase64Unescape()
 //
@@ -149,19 +149,19 @@ bool Base64Unescape(turbo::string_view src, std::string* dest);
 // invalid characters, `dest` is cleared and returns `false`. If padding is
 // included (note that `WebSafeBase64Escape()` does not produce it), it must be
 // correct. In the padding, '=' and '.' are treated identically.
-bool WebSafeBase64Unescape(turbo::string_view src, std::string* dest);
+bool WebSafeBase64Unescape(std::string_view src, std::string* dest);
 
 // HexStringToBytes()
 //
 // Converts an ASCII hex string into bytes, returning binary data of length
 // `from.size()/2`.
-std::string HexStringToBytes(turbo::string_view from);
+std::string HexStringToBytes(std::string_view from);
 
 // BytesToHexString()
 //
 // Converts binary data into an ASCII text string, returning a string of size
 // `2*from.size()`.
-std::string BytesToHexString(turbo::string_view from);
+std::string BytesToHexString(std::string_view from);
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

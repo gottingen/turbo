@@ -83,7 +83,7 @@ double InverseNormalSurvival(double x) {
   return -kSqrt2 * turbo::random_internal::erfinv(2 * x - 1.0);
 }
 
-bool Near(turbo::string_view msg, double actual, double expected, double bound) {
+bool Near(std::string_view msg, double actual, double expected, double bound) {
   assert(bound > 0.0);
   double delta = fabs(expected - actual);
   if (delta < bound) {

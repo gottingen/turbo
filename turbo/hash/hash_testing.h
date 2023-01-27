@@ -19,13 +19,13 @@
 #include <tuple>
 #include <type_traits>
 #include <vector>
+#include <variant>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/hash/internal/spy_hash_state.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/meta/variant.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -192,9 +192,9 @@ VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals) {
     const V& value;
     size_t index;
     std::string ToString() const {
-      return turbo::visit(PrintVisitor{index}, value);
+      return std::visit(PrintVisitor{index}, value);
     }
-    SpyHashState expand() const { return turbo::visit(ExpandVisitor{}, value); }
+    SpyHashState expand() const { return std::visit(ExpandVisitor{}, value); }
   };
 
   using EqClass = std::vector<Info>;
@@ -205,7 +205,7 @@ VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals) {
   for (const auto& value : values) {
     EqClass* c = nullptr;
     for (auto& eqclass : classes) {
-      if (turbo::visit(EqVisitor<Eq>{equals}, value, eqclass[0].value)) {
+      if (std::visit(EqVisitor<Eq>{equals}, value, eqclass[0].value)) {
         c = &eqclass;
         break;
       }
@@ -297,11 +297,11 @@ struct MakeTypeSet<T, Ts...> : MakeTypeSet<Ts...>::template Insert<T>::type {};
 
 template <typename... T>
 using VariantForTypes = typename MakeTypeSet<
-    const typename std::decay<T>::type*...>::template apply<turbo::variant>;
+    const typename std::decay<T>::type*...>::template apply<std::variant>;
 
 template <typename Container>
 struct ContainerAsVector {
-  using V = turbo::variant<const typename Container::value_type*>;
+  using V = std::variant<const typename Container::value_type*>;
   using Out = std::vector<V>;
 
   static Out Do(const Container& values) {

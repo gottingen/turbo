@@ -52,7 +52,7 @@ namespace types_internal {
 
 // Return a readable name for type T.
 template <class T>
-turbo::string_view NameOfImpl() {
+std::string_view NameOfImpl() {
 // TODO(calabrese) Investigate using debugging:internal_demangle as a fallback.
 #if TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE
   int status = 0;
@@ -79,7 +79,7 @@ turbo::string_view NameOfImpl() {
 // because we only use this internally with unqualified object types.
 template <class T>
 std::string NameOf() {
-  static const turbo::string_view result = NameOfImpl<T>();
+  static const std::string_view result = NameOfImpl<T>();
   return std::string(result);
 }
 

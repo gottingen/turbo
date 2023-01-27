@@ -58,8 +58,8 @@ void WriteEntryToStderr::operator()(const turbo::LogEntry& entry) const {
 }
 
 void WriteEntryToStderr::operator()(turbo::LogSeverity severity,
-                                    turbo::string_view filename,
-                                    turbo::string_view log_message) const {
+                                    std::string_view filename,
+                                    std::string_view log_message) const {
   if (!message.empty()) std::cerr << message << "\n";
   const std::string source_filename = turbo::CHexEscape(filename);
   const std::string text_message = turbo::CHexEscape(log_message);

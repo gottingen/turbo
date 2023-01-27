@@ -27,13 +27,13 @@
 #include <ostream>
 #include <string>
 #include <utility>
+#include <optional>
 
 #include "turbo/platform/config.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/log/turbo_log.h"
 #include "turbo/strings/internal/ostringstream.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/optional.h"
 #include "turbo/meta/utility.h"
 
 namespace turbo {
@@ -77,7 +77,7 @@ class LogStreamer final {
   //
   // Creates a LogStreamer with a given `severity` that will log a message
   // attributed to the given `file` and `line`.
-  explicit LogStreamer(turbo::LogSeverity severity, turbo::string_view file,
+  explicit LogStreamer(turbo::LogSeverity severity, std::string_view file,
                        int line)
       : severity_(severity),
         line_(line),
@@ -131,27 +131,27 @@ class LogStreamer final {
   std::string buf_;
   // A disengaged `stream_` indicates a moved-from `LogStreamer` that should not
   // `LOG` upon destruction.
-  turbo::optional<turbo::strings_internal::OStringStream> stream_;
+  std::optional<turbo::strings_internal::OStringStream> stream_;
 };
 
 // LogInfoStreamer()
 //
 // Returns a LogStreamer that writes at level LogSeverity::kInfo.
-inline LogStreamer LogInfoStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogInfoStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kInfo, file, line);
 }
 
 // LogWarningStreamer()
 //
 // Returns a LogStreamer that writes at level LogSeverity::kWarning.
-inline LogStreamer LogWarningStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogWarningStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kWarning, file, line);
 }
 
 // LogErrorStreamer()
 //
 // Returns a LogStreamer that writes at level LogSeverity::kError.
-inline LogStreamer LogErrorStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogErrorStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kError, file, line);
 }
 
@@ -161,7 +161,7 @@ inline LogStreamer LogErrorStreamer(turbo::string_view file, int line) {
 //
 // The program will be terminated when this `LogStreamer` is destroyed,
 // regardless of whether any data were streamed in.
-inline LogStreamer LogFatalStreamer(turbo::string_view file, int line) {
+inline LogStreamer LogFatalStreamer(std::string_view file, int line) {
   return turbo::LogStreamer(turbo::LogSeverity::kFatal, file, line);
 }
 

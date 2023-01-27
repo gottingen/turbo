@@ -38,7 +38,7 @@ TURBO_CONST_INIT std::string* program_usage_message
 
 // --------------------------------------------------------------------
 // Sets the "usage" message to be used by help reporting routines.
-void SetProgramUsageMessage(turbo::string_view new_usage_message) {
+void SetProgramUsageMessage(std::string_view new_usage_message) {
   turbo::MutexLock l(&flags_internal::usage_message_guard);
 
   if (flags_internal::program_usage_message != nullptr) {
@@ -53,11 +53,11 @@ void SetProgramUsageMessage(turbo::string_view new_usage_message) {
 // Returns the usage message set by SetProgramUsageMessage().
 // Note: We able to return string_view here only because calling
 // SetProgramUsageMessage twice is prohibited.
-turbo::string_view ProgramUsageMessage() {
+std::string_view ProgramUsageMessage() {
   turbo::MutexLock l(&flags_internal::usage_message_guard);
 
   return flags_internal::program_usage_message != nullptr
-             ? turbo::string_view(*flags_internal::program_usage_message)
+             ? std::string_view(*flags_internal::program_usage_message)
              : "Warning: SetProgramUsageMessage() never called";
 }
 

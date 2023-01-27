@@ -15,7 +15,7 @@
 #include "turbo/platform/optimization.h"
 
 #include "gtest/gtest.h"
-#include "turbo/meta/optional.h"
+#include <optional>
 
 namespace {
 
@@ -80,8 +80,8 @@ TEST(PredictTest, Pointer) {
 
 TEST(PredictTest, Optional) {
   // Note: An optional's truth value is the value's existence, not its truth.
-  turbo::optional<bool> has_value(false);
-  turbo::optional<bool> no_value;
+  std::optional<bool> has_value(false);
+  std::optional<bool> no_value;
   EXPECT_TRUE(TURBO_PREDICT_TRUE(has_value));
   EXPECT_FALSE(TURBO_PREDICT_TRUE(no_value));
   EXPECT_TRUE(TURBO_PREDICT_FALSE(has_value));

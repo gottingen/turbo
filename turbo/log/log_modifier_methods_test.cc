@@ -67,7 +67,7 @@ TEST(TailCallsModifiesTest, AtLocationFileLine) {
           SourceBasename(Eq("very_long_source_file.cc")), SourceLine(Eq(777)),
           // The logged line should change too, even though the prefix must
           // grow to fit the new metadata.
-          TextMessageWithPrefix(Truly([](turbo::string_view msg) {
+          TextMessageWithPrefix(Truly([](std::string_view msg) {
             return turbo::EndsWith(msg,
                                   " very_long_source_file.cc:777] hello world");
           })))));

@@ -67,7 +67,7 @@ void BM_ExtendCacheMiss(benchmark::State& state) {
       benchmark::DoNotOptimize(base);
       benchmark::DoNotOptimize(extension);
       turbo::crc32c_t crc =
-          turbo::ExtendCrc32c(base, turbo::string_view(&extension[i], len));
+          turbo::ExtendCrc32c(base, std::string_view(&extension[i], len));
       benchmark::DoNotOptimize(crc);
     }
   }

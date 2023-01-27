@@ -367,7 +367,7 @@ struct is_constructible_convertible_assignable_from_optional
 // for checking whether an expression is convertible to bool.
 bool convertible_to_bool(bool);
 
-// Base class for std::hash<turbo::optional<T>>:
+// Base class for std::hash<std::optional<T>>:
 // If std::hash<std::remove_const_t<T>> is enabled, it provides operator() to
 // compute the hash; Otherwise, it is disabled.
 // Reference N4659 23.14.15 [unord.hash].
@@ -383,9 +383,9 @@ struct optional_hash_base {
 template <typename T>
 struct optional_hash_base<T, decltype(std::hash<turbo::remove_const_t<T> >()(
                                  std::declval<turbo::remove_const_t<T> >()))> {
-  using argument_type = turbo::optional<T>;
+  using argument_type = std::optional<T>;
   using result_type = size_t;
-  size_t operator()(const turbo::optional<T>& opt) const {
+  size_t operator()(const std::optional<T>& opt) const {
     turbo::type_traits_internal::AssertHashEnabled<turbo::remove_const_t<T>>();
     if (opt) {
       return std::hash<turbo::remove_const_t<T> >()(*opt);

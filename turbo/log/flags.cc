@@ -95,11 +95,11 @@ TURBO_FLAG(std::string, log_backtrace_at, "",
       const size_t last_colon = log_backtrace_at.rfind(':');
       if (last_colon == log_backtrace_at.npos) return;
 
-      const turbo::string_view file =
-          turbo::string_view(log_backtrace_at).substr(0, last_colon);
+      const std::string_view file =
+          std::string_view(log_backtrace_at).substr(0, last_colon);
       int line;
       if (turbo::SimpleAtoi(
-              turbo::string_view(log_backtrace_at).substr(last_colon + 1),
+              std::string_view(log_backtrace_at).substr(last_colon + 1),
               &line)) {
         turbo::SetLogBacktraceLocation(file, line);
       }

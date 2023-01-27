@@ -46,8 +46,8 @@ TEST(StrJoin, APIExamples) {
   }
 
   {
-    // Collection of turbo::string_view
-    std::vector<turbo::string_view> v = {"foo", "bar", "baz"};
+    // Collection of std::string_view
+    std::vector<std::string_view> v = {"foo", "bar", "baz"};
     EXPECT_EQ("foo-bar-baz", turbo::StrJoin(v, "-"));
   }
 
@@ -226,7 +226,7 @@ TEST(AlphaNumFormatter, FormatterAPI) {
   f(&s, static_cast<double>(5));
   f(&s, static_cast<unsigned>(6));
   f(&s, static_cast<size_t>(7));
-  f(&s, turbo::string_view(" OK"));
+  f(&s, std::string_view(" OK"));
   EXPECT_EQ("Testing: 1234567 OK", s);
 }
 
@@ -268,7 +268,7 @@ TEST(StreamFormatter, FormatterAPI) {
   f(&s, static_cast<double>(5));
   f(&s, static_cast<unsigned>(6));
   f(&s, static_cast<size_t>(7));
-  f(&s, turbo::string_view(" OK "));
+  f(&s, std::string_view(" OK "));
   StreamableType streamable = {"object"};
   f(&s, streamable);
   EXPECT_EQ("Testing: 1234567 OK Streamable:object", s);
@@ -380,7 +380,7 @@ TEST(StrJoin, PublicAPIOverloads) {
 }
 
 TEST(StrJoin, Array) {
-  const turbo::string_view a[] = {"a", "b", "c"};
+  const std::string_view a[] = {"a", "b", "c"};
   EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
 }
 
@@ -403,7 +403,7 @@ TEST(StrJoin, InitializerList) {
   }
 
   {
-    std::initializer_list<turbo::string_view> a = {"a", "b", "c"};
+    std::initializer_list<std::string_view> a = {"a", "b", "c"};
     EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
   }
 
@@ -515,11 +515,11 @@ class TestIterator {
   using difference_type = int;
 
   // `data` must outlive the result.
-  static TestIterator begin(const std::vector<turbo::string_view>& data) {
+  static TestIterator begin(const std::vector<std::string_view>& data) {
     return TestIterator(&data, 0);
   }
 
-  static TestIterator end(const std::vector<turbo::string_view>& data) {
+  static TestIterator end(const std::vector<std::string_view>& data) {
     return TestIterator(nullptr, data.size());
   }
 
@@ -562,10 +562,10 @@ class TestIterator {
   }
 
  private:
-  TestIterator(const std::vector<turbo::string_view>* data, size_t pos)
+  TestIterator(const std::vector<std::string_view>* data, size_t pos)
       : data_(data), pos_(pos) {}
 
-  const std::vector<turbo::string_view>* data_;
+  const std::vector<std::string_view>* data_;
   size_t pos_;
 };
 
@@ -573,7 +573,7 @@ template <typename ValueT>
 class TestIteratorRange {
  public:
   // `data` must be non-null and must outlive the result.
-  explicit TestIteratorRange(const std::vector<turbo::string_view>& data)
+  explicit TestIteratorRange(const std::vector<std::string_view>& data)
       : begin_(TestIterator<ValueT>::begin(data)),
         end_(TestIterator<ValueT>::end(data)) {}
 
@@ -586,22 +586,22 @@ class TestIteratorRange {
 };
 
 TEST(StrJoin, TestIteratorRequirementsNoFormatter) {
-  const std::vector<turbo::string_view> a = {"a", "b", "c"};
+  const std::vector<std::string_view> a = {"a", "b", "c"};
 
   // When the value type is string-like (`std::string` or `string_view`),
   // the NoFormatter template specialization is used internally.
   EXPECT_EQ("a-b-c",
-            turbo::StrJoin(TestIteratorRange<turbo::string_view>(a), "-"));
+            turbo::StrJoin(TestIteratorRange<std::string_view>(a), "-"));
 }
 
 TEST(StrJoin, TestIteratorRequirementsCustomFormatter) {
-  const std::vector<turbo::string_view> a = {"a", "b", "c"};
+  const std::vector<std::string_view> a = {"a", "b", "c"};
   EXPECT_EQ("a-b-c",
             turbo::StrJoin(TestIteratorRange<TestValue>(a), "-",
                           [](std::string* out, const TestValue& value) {
                             turbo::StrAppend(
                                 out,
-                                turbo::string_view(value.data(), value.size()));
+                                std::string_view(value.data(), value.size()));
                           }));
 }
 

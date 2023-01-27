@@ -130,8 +130,8 @@ MATCHER(IsValidRingBuffer, "RingBuffer is valid") {
 }
 
 // Returns the flats contained in the provided CordRepRing
-std::vector<string_view> ToFlats(const CordRepRing* r) {
-  std::vector<string_view> flats;
+std::vector<std::string_view> ToFlats(const CordRepRing* r) {
+  std::vector<std::string_view> flats;
   flats.reserve(r->entries());
   index_type pos = r->head();
   do {
@@ -142,7 +142,7 @@ std::vector<string_view> ToFlats(const CordRepRing* r) {
 
 class not_a_string_view {
  public:
-  explicit not_a_string_view(turbo::string_view s)
+  explicit not_a_string_view(std::string_view s)
       : data_(s.data()), size_(s.size()) {}
   explicit not_a_string_view(const void* data, size_t size)
       : data_(data), size_(size) {}
@@ -187,14 +187,14 @@ std::string ToString(const CordRepRing* r) {
   value.reserve(r->length);
   index_type pos = r->head();
   do {
-    turbo::string_view sv = r->entry_data(pos);
+    std::string_view sv = r->entry_data(pos);
     value.append(sv.data(), sv.size());
   } while ((pos = r->advance(pos)) != r->tail());
   return value;
 }
 
 // Creates a flat for testing
-CordRep* MakeFlat(turbo::string_view s, size_t extra = 0) {
+CordRep* MakeFlat(std::string_view s, size_t extra = 0) {
   CordRepFlat* flat = CordRepFlat::New(s.length() + extra);
   memcpy(flat->Data(), s.data(), s.length());
   flat->length = s.length();
@@ -202,10 +202,10 @@ CordRep* MakeFlat(turbo::string_view s, size_t extra = 0) {
 }
 
 // Creates an external node for testing
-CordRepExternal* MakeExternal(turbo::string_view s) {
+CordRepExternal* MakeExternal(std::string_view s) {
   struct Rep : public CordRepExternal {
     std::string s;
-    explicit Rep(turbo::string_view s) : s(s) {
+    explicit Rep(std::string_view s) : s(s) {
       this->tag = EXTERNAL;
       this->base = s.data();
       this->length = s.length();
@@ -233,7 +233,7 @@ CordRepExternal* MakeFakeExternal(size_t length) {
 }
 
 // Creates a flat or an external node for testing depending on the size.
-CordRep* MakeLeaf(turbo::string_view s, size_t extra = 0) {
+CordRep* MakeLeaf(std::string_view s, size_t extra = 0) {
   if (s.size() <= turbo::cord_internal::kMaxFlatLength) {
     return MakeFlat(s, extra);
   } else {
@@ -268,7 +268,7 @@ Composition RandomComposition() {
   return (rng() & 1) ? kMix : ((rng() & 1) ? kAppend : kPrepend);
 }
 
-turbo::string_view ToString(Composition composition) {
+std::string_view ToString(Composition composition) {
   switch (composition) {
     case kAppend:
       return "Append";
@@ -501,7 +501,7 @@ INSTANTIATE_TEST_SUITE_P(
     TestParamToString);
 
 TEST_P(CordRingCreateTest, CreateFromFlat) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   CordRepRing* result = NeedsUnref(CordRepRing::Create(MakeFlat(str1)));
   ASSERT_THAT(result, IsValidRingBuffer());
   EXPECT_THAT(result->length, Eq(str1.size()));
@@ -523,7 +523,7 @@ TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringRing) {
   CordRepRing* result = NeedsUnref(CordRepRing::Create(sub));
   ASSERT_THAT(result, IsValidRingBuffer());
   EXPECT_THAT(result, EqIfInputPrivate(GetParam(), ring));
-  EXPECT_THAT(ToString(result), string_view(kFox).substr(2, 11));
+  EXPECT_THAT(ToString(result), std::string_view(kFox).substr(2, 11));
 }
 
 TEST_F(CordRingTest, CreateWithIllegalExtraCapacity) {
@@ -541,7 +541,7 @@ TEST_F(CordRingTest, CreateWithIllegalExtraCapacity) {
 }
 
 TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringOfFlat) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* flat = RefIfInputShared(MakeFlat(str1));
   auto* child = RefIfInputSharedIndirect(MakeSubstring(4, 20, flat));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
@@ -551,7 +551,7 @@ TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringOfFlat) {
 }
 
 TEST_P(CordRingCreateTest, CreateFromExternal) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* child = RefIfInputShared(MakeExternal(str1));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -560,7 +560,7 @@ TEST_P(CordRingCreateTest, CreateFromExternal) {
 }
 
 TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringOfExternal) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* external = RefIfInputShared(MakeExternal(str1));
   auto* child = RefIfInputSharedIndirect(MakeSubstring(1, 24, external));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
@@ -583,7 +583,7 @@ TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringOfLargeExternal) {
 }
 
 TEST_P(CordRingCreateTest, Properties) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   CordRepRing* result = NeedsUnref(CordRepRing::Create(MakeFlat(str1), 120));
   ASSERT_THAT(result, IsValidRingBuffer());
   EXPECT_THAT(result->head(), Eq(0));
@@ -595,7 +595,7 @@ TEST_P(CordRingCreateTest, Properties) {
 }
 
 TEST_P(CordRingCreateTest, EntryForNewFlat) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   CordRep* child = MakeFlat(str1);
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child, 120));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -605,7 +605,7 @@ TEST_P(CordRingCreateTest, EntryForNewFlat) {
 }
 
 TEST_P(CordRingCreateTest, EntryForNewFlatSubstring) {
-  turbo::string_view str1 = "1234567890abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "1234567890abcdefghijklmnopqrstuvwxyz";
   CordRep* child = MakeFlat(str1);
   CordRep* substring = MakeSubstring(10, 26, child);
   CordRepRing* result = NeedsUnref(CordRepRing::Create(substring, 1));
@@ -616,8 +616,8 @@ TEST_P(CordRingCreateTest, EntryForNewFlatSubstring) {
 }
 
 TEST_P(CordRingBuildTest, AppendFlat) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, MakeFlat(str2)));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -628,8 +628,8 @@ TEST_P(CordRingBuildTest, AppendFlat) {
 }
 
 TEST_P(CordRingBuildTest, PrependFlat) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, MakeFlat(str2)));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -640,8 +640,8 @@ TEST_P(CordRingBuildTest, PrependFlat) {
 }
 
 TEST_P(CordRingBuildTest, AppendString) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -652,8 +652,8 @@ TEST_P(CordRingBuildTest, AppendString) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingExtra) {
-  turbo::string_view str1 = "1234";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "1234";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeFlat(str1, 26), 0);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -663,8 +663,8 @@ TEST_P(CordRingBuildTest, AppendStringHavingExtra) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingPartialExtra) {
-  turbo::string_view str1 = "1234";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "1234";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   // Create flat with at least one extra byte. We don't expect to have sized
   // alloc and capacity rounding to grant us enough to not make it partial.
@@ -673,8 +673,8 @@ TEST_P(CordRingBuildTest, AppendStringHavingPartialExtra) {
   ASSERT_THAT(avail, Lt(str2.size())) << " adjust test for larger flats!";
 
   // Construct the flats we do expect using all of `avail`.
-  turbo::string_view str1a = str2.substr(0, avail);
-  turbo::string_view str2a = str2.substr(avail);
+  std::string_view str1a = str2.substr(0, avail);
+  std::string_view str2a = str2.substr(avail);
 
   CordRepRing* ring = CreateWithCapacity(flat, 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
@@ -690,8 +690,8 @@ TEST_P(CordRingBuildTest, AppendStringHavingPartialExtra) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingExtraInSubstring) {
-  turbo::string_view str1 = "123456789_1234";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "123456789_1234";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRep* flat = RemovePrefix(10, MakeFlat(str1, 26));
   CordRepRing* ring = CreateWithCapacity(flat, 0);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
@@ -707,8 +707,8 @@ TEST_P(CordRingBuildTest, AppendStringHavingExtraInSubstring) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingSharedExtra) {
-  turbo::string_view str1 = "123456789_1234";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "123456789_1234";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (int shared_type = 0; shared_type < 2; ++shared_type) {
     SCOPED_TRACE(turbo::StrCat("Shared extra type ", shared_type));
 
@@ -740,9 +740,9 @@ TEST_P(CordRingBuildTest, AppendStringHavingSharedExtra) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringWithExtra) {
-  turbo::string_view str1 = "1234";
-  turbo::string_view str2 = "1234567890";
-  turbo::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "1234";
+  std::string_view str2 = "1234567890";
+  std::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2, 26));
   result = CordRepRing::Append(result, str3);
@@ -753,8 +753,8 @@ TEST_P(CordRingBuildTest, AppendStringWithExtra) {
 }
 
 TEST_P(CordRingBuildTest, PrependString) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   // Use external rep to avoid appending to first flat
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, str2));
@@ -769,8 +769,8 @@ TEST_P(CordRingBuildTest, PrependString) {
 }
 
 TEST_P(CordRingBuildTest, PrependStringHavingExtra) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz1234";
-  turbo::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz1234";
+  std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRep* flat = RemovePrefix(26, MakeFlat(str1));
   CordRepRing* ring = CreateWithCapacity(flat, 0);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, str2));
@@ -786,9 +786,9 @@ TEST_P(CordRingBuildTest, PrependStringHavingExtra) {
 }
 
 TEST_P(CordRingBuildTest, PrependStringHavingSharedExtra) {
-  turbo::string_view str1 = "123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  turbo::string_view str2 = "abcdefghij";
-  turbo::string_view str1a = str1.substr(10);
+  std::string_view str1 = "123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str2 = "abcdefghij";
+  std::string_view str1a = str1.substr(10);
   for (int shared_type = 1; shared_type < 2; ++shared_type) {
     SCOPED_TRACE(turbo::StrCat("Shared extra type ", shared_type));
 
@@ -815,9 +815,9 @@ TEST_P(CordRingBuildTest, PrependStringHavingSharedExtra) {
 }
 
 TEST_P(CordRingBuildTest, PrependStringWithExtra) {
-  turbo::string_view str1 = "1234";
-  turbo::string_view str2 = "1234567890";
-  turbo::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  std::string_view str1 = "1234";
+  std::string_view str2 = "1234567890";
+  std::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, str2, 26));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -885,7 +885,7 @@ TEST_P(CordRingSubTest, SubRing) {
   auto composition = RandomComposition();
   SCOPED_TRACE(ToString(composition));
   auto flats = MakeSpan(kFoxFlats);
-  string_view all = kFox;
+  std::string_view all = kFox;
   for (size_t offset = 0; offset < all.size() - 1; ++offset) {
     CordRepRing* ring = RefIfShared(FromFlats(flats, composition));
     CordRepRing* result = CordRepRing::SubRing(ring, offset, 0);
@@ -911,7 +911,7 @@ TEST_P(CordRingSubTest, SubRingFromLargeExternal) {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   };
   std::string buffer = turbo::StrCat(flats[0], flats[1], flats[2]);
-  turbo::string_view all = buffer;
+  std::string_view all = buffer;
   for (size_t offset = 0; offset < 30; ++offset) {
     CordRepRing* ring = RefIfShared(FromFlats(flats, composition));
     CordRepRing* result = CordRepRing::SubRing(ring, offset, 0);
@@ -934,7 +934,7 @@ TEST_P(CordRingSubTest, RemovePrefix) {
   auto composition = RandomComposition();
   SCOPED_TRACE(ToString(composition));
   auto flats = MakeSpan(kFoxFlats);
-  string_view all = kFox;
+  std::string_view all = kFox;
   CordRepRing* ring = RefIfShared(FromFlats(flats, composition));
   CordRepRing* result = CordRepRing::RemovePrefix(ring, all.size());
   EXPECT_THAT(result, nullptr);
@@ -966,7 +966,7 @@ TEST_P(CordRingSubTest, RemoveSuffix) {
   auto composition = RandomComposition();
   SCOPED_TRACE(ToString(composition));
   auto flats = MakeSpan(kFoxFlats);
-  string_view all = kFox;
+  std::string_view all = kFox;
   CordRepRing* ring = RefIfShared(FromFlats(flats, composition));
   CordRepRing* result = CordRepRing::RemoveSuffix(ring, all.size());
   EXPECT_THAT(result, nullptr);
@@ -1259,7 +1259,7 @@ TEST_F(CordRingTest, FindWithHint) {
   int flat_pos = 0;
   size_t flat_offset = 0;
   for (auto sflat : flats) {
-    string_view flat(sflat);
+    std::string_view flat(sflat);
     for (int offset = 0; offset < flat.length(); ++offset) {
       for (int start = 0; start <= flat_pos; ++start) {
         index_type hint = ring->advance(ring->head(), start);
@@ -1371,7 +1371,7 @@ TEST_F(CordRingTest, GetCharacter) {
 }
 
 TEST_F(CordRingTest, GetCharacterWithSubstring) {
-  turbo::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  std::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* child = MakeSubstring(4, 20, MakeFlat(str1));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -1384,12 +1384,12 @@ TEST_F(CordRingTest, GetCharacterWithSubstring) {
 TEST_F(CordRingTest, IsFlatSingleFlat) {
   for (bool external : {false, true}) {
     SCOPED_TRACE(external ? "With External" : "With Flat");
-    turbo::string_view str = "Hello world";
+    std::string_view str = "Hello world";
     CordRep* rep = external ? MakeExternal(str) : MakeFlat(str);
     CordRepRing* ring = NeedsUnref(CordRepRing::Create(rep));
 
     // The ring is a single non-fragmented flat:
-    turbo::string_view fragment;
+    std::string_view fragment;
     EXPECT_TRUE(ring->IsFlat(nullptr));
     EXPECT_TRUE(ring->IsFlat(&fragment));
     EXPECT_THAT(fragment, Eq("Hello world"));
@@ -1409,8 +1409,8 @@ TEST_F(CordRingTest, IsFlatSingleFlat) {
 TEST_F(CordRingTest, IsFlatMultiFlat) {
   for (bool external : {false, true}) {
     SCOPED_TRACE(external ? "With External" : "With Flat");
-    turbo::string_view str1 = "Hello world";
-    turbo::string_view str2 = "Halt and catch fire";
+    std::string_view str1 = "Hello world";
+    std::string_view str2 = "Halt and catch fire";
     CordRep* rep1 = external ? MakeExternal(str1) : MakeFlat(str1);
     CordRep* rep2 = external ? MakeExternal(str2) : MakeFlat(str2);
     CordRepRing* ring = CordRepRing::Append(CordRepRing::Create(rep1), rep2);
@@ -1418,7 +1418,7 @@ TEST_F(CordRingTest, IsFlatMultiFlat) {
 
     // The ring is fragmented, IsFlat() on the entire cord must be false.
     EXPECT_FALSE(ring->IsFlat(nullptr));
-    turbo::string_view fragment = "Don't touch this";
+    std::string_view fragment = "Don't touch this";
     EXPECT_FALSE(ring->IsFlat(&fragment));
     EXPECT_THAT(fragment, Eq("Don't touch this"));
 

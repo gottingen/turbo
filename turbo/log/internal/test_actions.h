@@ -42,7 +42,7 @@ namespace log_internal {
 // `EXPECT_CALL`/`WillOnce` and `ON_CALL`/`WillByDefault` (for unexpected calls)
 // to write messages to stderr that the parent can match against.
 struct WriteToStderr final {
-  explicit WriteToStderr(turbo::string_view m) : message(m) {}
+  explicit WriteToStderr(std::string_view m) : message(m) {}
   std::string message;
 
   template <typename... Args>
@@ -52,7 +52,7 @@ struct WriteToStderr final {
 };
 
 struct WriteToStderrWithFilename final {
-  explicit WriteToStderrWithFilename(turbo::string_view m) : message(m) {}
+  explicit WriteToStderrWithFilename(std::string_view m) : message(m) {}
 
   std::string message;
 
@@ -60,13 +60,13 @@ struct WriteToStderrWithFilename final {
 };
 
 struct WriteEntryToStderr final {
-  explicit WriteEntryToStderr(turbo::string_view m) : message(m) {}
+  explicit WriteEntryToStderr(std::string_view m) : message(m) {}
 
   std::string message = "";
 
   void operator()(const turbo::LogEntry& entry) const;
-  void operator()(turbo::LogSeverity, turbo::string_view,
-                  turbo::string_view) const;
+  void operator()(turbo::LogSeverity, std::string_view,
+                  std::string_view) const;
 };
 
 // See the documentation for `DeathTestValidateExpectations` above.

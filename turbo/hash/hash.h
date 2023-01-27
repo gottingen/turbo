@@ -117,7 +117,7 @@ TURBO_NAMESPACE_BEGIN
 //  * All the standard associative containers (provided the elements are
 //    hashable)
 //  * turbo types such as the following:
-//    * turbo::string_view
+//    * std::string_view
 //    * turbo::uint128
 //    * turbo::Time, turbo::Duration, and turbo::TimeZone
 //  * turbo containers (provided the elements are hashable) such as the

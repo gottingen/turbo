@@ -141,7 +141,7 @@ TEST_F(FormatBindTest, FormatPack) {
       {__LINE__, "a%1$.*5$db", "a{10:d}b"},
   };
   for (const Expectation &e : kExpect) {
-    turbo::string_view fmt = e.fmt;
+    std::string_view fmt = e.fmt;
     SCOPED_TRACE(e.line);
     SCOPED_TRACE(e.fmt);
     UntypedFormatSpecImpl format(fmt);

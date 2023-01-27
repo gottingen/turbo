@@ -18,7 +18,7 @@
 //
 // This header declares `class turbo::LogEntry`, which represents a log record as
 // passed to `LogSink::Send`. Data returned by pointer or by reference or by
-// `turbo::string_view` must be copied if they are needed after the lifetime of
+// `std::string_view` must be copied if they are needed after the lifetime of
 // the `turbo::LogEntry`.
 
 #ifndef TURBO_LOG_LOG_ENTRY_H_
@@ -72,10 +72,10 @@ class LogEntry final {
   // into a statically allocated character array obtained from `__FILE__`.
   // Statements like `LOG(INFO).AtLocation(std::string(...), ...)` will expose
   // the bug.  If you need the data later, you must copy them.
-  turbo::string_view source_filename() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
+  std::string_view source_filename() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return full_filename_;
   }
-  turbo::string_view source_basename() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
+  std::string_view source_basename() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return base_filename_;
   }
   int source_line() const { return line_; }
@@ -141,26 +141,26 @@ class LogEntry final {
   //
   // The buffer does not outlive the entry; if you need the data later, you must
   // copy them.
-  turbo::string_view text_message_with_prefix_and_newline() const
+  std::string_view text_message_with_prefix_and_newline() const
       TURBO_ATTRIBUTE_LIFETIME_BOUND {
-    return turbo::string_view(
+    return std::string_view(
         text_message_with_prefix_and_newline_and_nul_.data(),
         text_message_with_prefix_and_newline_and_nul_.size() - 1);
   }
-  turbo::string_view text_message_with_prefix() const
+  std::string_view text_message_with_prefix() const
       TURBO_ATTRIBUTE_LIFETIME_BOUND {
-    return turbo::string_view(
+    return std::string_view(
         text_message_with_prefix_and_newline_and_nul_.data(),
         text_message_with_prefix_and_newline_and_nul_.size() - 2);
   }
-  turbo::string_view text_message_with_newline() const
+  std::string_view text_message_with_newline() const
       TURBO_ATTRIBUTE_LIFETIME_BOUND {
-    return turbo::string_view(
+    return std::string_view(
         text_message_with_prefix_and_newline_and_nul_.data() + prefix_len_,
         text_message_with_prefix_and_newline_and_nul_.size() - prefix_len_ - 1);
   }
-  turbo::string_view text_message() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
-    return turbo::string_view(
+  std::string_view text_message() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
+    return std::string_view(
         text_message_with_prefix_and_newline_and_nul_.data() + prefix_len_,
         text_message_with_prefix_and_newline_and_nul_.size() - prefix_len_ - 2);
   }
@@ -174,7 +174,7 @@ class LogEntry final {
   //
   // The buffer does not outlive the entry; if you need the data later, you must
   // copy them.
-  turbo::string_view encoded_message() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
+  std::string_view encoded_message() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return encoding_;
   }
 
@@ -190,15 +190,15 @@ class LogEntry final {
   //
   // The buffer does not outlive the entry; if you need the data later, you must
   // copy them.
-  turbo::string_view stacktrace() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
+  std::string_view stacktrace() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return stacktrace_;
   }
 
  private:
   LogEntry() = default;
 
-  turbo::string_view full_filename_;
-  turbo::string_view base_filename_;
+  std::string_view full_filename_;
+  std::string_view base_filename_;
   int line_;
   bool prefix_;
   turbo::LogSeverity severity_;
@@ -207,7 +207,7 @@ class LogEntry final {
   tid_t tid_;
   turbo::Span<const char> text_message_with_prefix_and_newline_and_nul_;
   size_t prefix_len_;
-  turbo::string_view encoding_;
+  std::string_view encoding_;
   std::string stacktrace_;
 
   friend class log_internal::LogEntryTestPeer;

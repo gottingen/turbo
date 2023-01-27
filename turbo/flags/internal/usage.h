@@ -50,8 +50,8 @@ void FlagHelp(std::ostream& out, const CommandLineFlag& flag,
 //  .../path/to/file.<ext>
 // for any extension 'ext'. If the filter is empty this function produces help
 // messages for all flags.
-void FlagsHelp(std::ostream& out, turbo::string_view filter,
-               HelpFormat format, turbo::string_view program_usage_message);
+void FlagsHelp(std::ostream& out, std::string_view filter,
+               HelpFormat format, std::string_view program_usage_message);
 
 // --------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ void FlagsHelp(std::ostream& out, turbo::string_view filter,
 // Non negative return values are expected to be used as an exit code for a
 // binary.
 int HandleUsageFlags(std::ostream& out,
-                     turbo::string_view program_usage_message);
+                     std::string_view program_usage_message);
 
 // --------------------------------------------------------------------
 // Globals representing usage reporting flags
@@ -88,14 +88,14 @@ HelpMode GetFlagsHelpMode();
 HelpFormat GetFlagsHelpFormat();
 
 // These are corresponding setters to the attributes above.
-void SetFlagsHelpMatchSubstr(turbo::string_view);
+void SetFlagsHelpMatchSubstr(std::string_view);
 void SetFlagsHelpMode(HelpMode);
 void SetFlagsHelpFormat(HelpFormat);
 
 // Deduces usage flags from the input argument in a form --name=value or
 // --name. argument is already split into name and value before we call this
 // function.
-bool DeduceUsageFlags(turbo::string_view name, turbo::string_view value);
+bool DeduceUsageFlags(std::string_view name, std::string_view value);
 
 }  // namespace flags_internal
 TURBO_NAMESPACE_END

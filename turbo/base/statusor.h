@@ -42,13 +42,13 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/call_once.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/base/internal/statusor_internal.h"
 #include "status.h"
-#include "turbo/meta/variant.h"
 #include "turbo/meta/utility.h"
 
 namespace turbo {
