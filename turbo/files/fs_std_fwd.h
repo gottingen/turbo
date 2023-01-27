@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------
 //
-// ghc::filesystem - A C++17-like filesystem implementation for C++11/C++14
+// turbo::filesystem - A C++17-like filesystem implementation for C++11/C++14
 //
 //---------------------------------------------------------------------------------------
 //
@@ -26,7 +26,7 @@
 //
 //---------------------------------------------------------------------------------------
 // fs_std_fwd.hpp - The forwarding header for the header/implementation seperated usage of
-//                  ghc::filesystem that uses std::filesystem if it detects it.
+//                  turbo::filesystem that uses std::filesystem if it detects it.
 // This file can be include at any place, where fs::filesystem api is needed while
 // not bleeding implementation details (e.g. system includes) into the global namespace,
 // as long as one cpp includes fs_std_impl.hpp to deliver the matching implementations.
@@ -57,10 +57,10 @@ using fstream = std::fstream;
 #include "turbo/files/filesystem.h"
 
 namespace fs {
-    using namespace ghc::filesystem;
-    using ifstream = ghc::filesystem::ifstream;
-    using ofstream = ghc::filesystem::ofstream;
-    using fstream = ghc::filesystem::fstream;
+    using namespace turbo::filesystem;
+    using ifstream = turbo::filesystem::ifstream;
+    using ofstream = turbo::filesystem::ofstream;
+    using fstream = turbo::filesystem::fstream;
 }
 #endif
 #endif  // TURBO_FILES_FS_STD_FWD_H_

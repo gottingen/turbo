@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------
 //
-// ghc::filesystem - A C++17-like filesystem implementation for C++11/C++14
+// turbo::filesystem - A C++17-like filesystem implementation for C++11/C++14
 //
 //---------------------------------------------------------------------------------------
 //
@@ -26,8 +26,8 @@
 //
 //---------------------------------------------------------------------------------------
 // fs_fwd.hpp - The forwarding header for the header/implementation seperated usage of
-//              ghc::filesystem.
-// This file can be include at any place, where ghc::filesystem api is needed while
+//              turbo::filesystem.
+// This file can be include at any place, where turbo::filesystem api is needed while
 // not bleeding implementation details (e.g. system includes) into the global namespace,
 // as long as one cpp includes fs_impl.hpp to deliver the matching implementations.
 //---------------------------------------------------------------------------------------

@@ -63,10 +63,10 @@ using fstream = std::fstream;
 #include "turbo/files/filesystem.h"
 #endif
 namespace fs {
-using namespace ghc::filesystem;
-using ifstream = ghc::filesystem::ifstream;
-using ofstream = ghc::filesystem::ofstream;
-using fstream = ghc::filesystem::fstream;
+using namespace turbo::filesystem;
+using ifstream = turbo::filesystem::ifstream;
+using ofstream = turbo::filesystem::ofstream;
+using fstream = turbo::filesystem::fstream;
 }  // namespace fs
 #endif
 
@@ -86,7 +86,7 @@ using fstream = ghc::filesystem::fstream;
 #include "gtest/gtest.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Behaviour Switches (should match the config in ghc/filesystem.hpp):
+// Behaviour Switches (should match the config in filesystem.h):
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // LWG #2682 disables the since then invalid use of the copy option create_symlinks on directories
 #define TEST_LWG_2682_BEHAVIOUR
@@ -1019,7 +1019,7 @@ TEST(FilesystemPath, itr) {
     ASSERT_TRUE("foo,bar" == iterateResult(fs::path("foo/bar")));
     ASSERT_TRUE("/,foo,bar" == iterateResult(fs::path("/foo/bar")));
 #ifndef USE_STD_FS
-    // ghc::filesystem enforces redundant slashes to be reduced to one
+    // turbo::filesystem enforces redundant slashes to be reduced to one
     ASSERT_TRUE("/,foo,bar" == iterateResult(fs::path("///foo/bar")));
 #else
     // typically std::filesystem keeps them
@@ -1042,7 +1042,7 @@ TEST(FilesystemPath, itr) {
     ASSERT_TRUE("bar,foo" == reverseIterateResult(fs::path("foo/bar")));
     ASSERT_TRUE("bar,foo,/" == reverseIterateResult(fs::path("/foo/bar")));
 #ifndef USE_STD_FS
-    // ghc::filesystem enforces redundant slashes to be reduced to one
+    // turbo::filesystem enforces redundant slashes to be reduced to one
     ASSERT_TRUE("bar,foo,/" == reverseIterateResult(fs::path("///foo/bar")));
 #else
     // typically std::filesystem keeps them
@@ -2763,16 +2763,10 @@ TEST(FilesystemStatus, weakly_canonical) {
 }
 
 TEST(FilesystemStatus, string_view) {
-#if defined(GHC_HAS_STD_STRING_VIEW) || defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
 
-#if defined(GHC_HAS_STD_STRING_VIEW)
     using namespace std::literals;
     using string_view = std::string_view;
     using wstring_view = std::wstring_view;
-#elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-    using string_view = std::experimental::string_view;
-    using wstring_view = std::experimental::wstring_view;
-#endif
 
     {
         std::string p("foo/bar");
@@ -2797,10 +2791,6 @@ TEST(FilesystemStatus, string_view) {
         ASSERT_TRUE(p2 == "foo");
         ASSERT_TRUE(p2.compare(wstring_view(L"foo")) == 0);
     }
-
-#else
-    WARN("std::string_view specific tests are empty without std::string_view.");
-#endif
 }
 
 TEST(FilesystemStatus, win_long) {

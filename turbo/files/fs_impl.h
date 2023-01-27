@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------
 //
-// ghc::filesystem - A C++17-like filesystem implementation for C++11/C++14
+// turbo::filesystem - A C++17-like filesystem implementation for C++11/C++14
 //
 //---------------------------------------------------------------------------------------
 //
@@ -26,8 +26,8 @@
 //
 //---------------------------------------------------------------------------------------
 // fs_impl.hpp - The implementation header for the header/implementation seperated usage of
-//               ghc::filesystem.
-// This file can be used to hide the implementation of ghc::filesystem into a single cpp.
+//               turbo::filesystem.
+// This file can be used to hide the implementation of turbo::filesystem into a single cpp.
 // The cpp has to include this before including fs_fwd.hpp directly or via a different
 // header to work.
 //---------------------------------------------------------------------------------------
