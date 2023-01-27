@@ -11,4 +11,4 @@ changelog
 | using std::optional                   | y    |
 | using std::any                        | y    |
 | using std::variant                    | y    |
-| using std::string_view for filesystem | n    |
+| using std::string_view for filesystem | y    |
