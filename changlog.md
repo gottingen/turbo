@@ -12,3 +12,5 @@ changelog
 | using std::any                        | y    |
 | using std::variant                    | y    |
 | using std::string_view for filesystem | y    |
+| add sequence read file | y|
+| robost json | y|
