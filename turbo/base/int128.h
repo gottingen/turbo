@@ -38,19 +38,6 @@
 #include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
 
-#if defined(_MSC_VER)
-// In very old versions of MSVC and when the /Zc:wchar_t flag is off, wchar_t is
-// a typedef for unsigned short.  Otherwise wchar_t is mapped to the __wchar_t
-// builtin type.  We need to make sure not to define operator wchar_t()
-// alongside operator unsigned short() in these instances.
-#define TURBO_INTERNAL_WCHAR_T __wchar_t
-#if defined(_M_X64) && !defined(_M_ARM64EC)
-#include <intrin.h>
-#pragma intrinsic(_umul128)
-#endif  // defined(_M_X64)
-#else   // defined(_MSC_VER)
-#define TURBO_INTERNAL_WCHAR_T wchar_t
-#endif  // defined(_MSC_VER)
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -145,7 +132,7 @@ class
   constexpr explicit operator unsigned char() const;
   constexpr explicit operator char16_t() const;
   constexpr explicit operator char32_t() const;
-  constexpr explicit operator TURBO_INTERNAL_WCHAR_T() const;
+  constexpr explicit operator TURBO_WCHAR_T() const;
   constexpr explicit operator short() const;  // NOLINT(runtime/int)
   // NOLINTNEXTLINE(runtime/int)
   constexpr explicit operator unsigned short() const;
@@ -373,7 +360,7 @@ class int128 {
   constexpr explicit operator unsigned char() const;
   constexpr explicit operator char16_t() const;
   constexpr explicit operator char32_t() const;
-  constexpr explicit operator TURBO_INTERNAL_WCHAR_T() const;
+  constexpr explicit operator TURBO_WCHAR_T() const;
   constexpr explicit operator short() const;  // NOLINT(runtime/int)
   // NOLINTNEXTLINE(runtime/int)
   constexpr explicit operator unsigned short() const;
@@ -727,8 +714,8 @@ constexpr uint128::operator char32_t() const {
   return static_cast<char32_t>(lo_);
 }
 
-constexpr uint128::operator TURBO_INTERNAL_WCHAR_T() const {
-  return static_cast<TURBO_INTERNAL_WCHAR_T>(lo_);
+constexpr uint128::operator TURBO_WCHAR_T() const {
+  return static_cast<TURBO_WCHAR_T>(lo_);
 }
 
 // NOLINTNEXTLINE(runtime/int)
@@ -1160,6 +1147,6 @@ constexpr int64_t BitCastToSigned(uint64_t v) {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#undef TURBO_INTERNAL_WCHAR_T
+#undef TURBO_WCHAR_T
 
 #endif  // TURBO_BASE_INT128_H_

@@ -78,14 +78,14 @@ TEST(ConversionCharTest, Names) {
 
 class ConsumeUnboundConversionTest : public ::testing::Test {
  public:
-  std::pair<string_view, string_view> Consume(string_view src) {
+  std::pair<std::string_view, std::string_view> Consume(std::string_view src) {
     int next = 0;
     o = UnboundConversion();  // refresh
     const char* p = ConsumeUnboundConversion(
         src.data(), src.data() + src.size(), &o, &next);
     if (!p) return {{}, src};
-    return {string_view(src.data(), p - src.data()),
-            string_view(p, src.data() + src.size() - p)};
+    return {std::string_view(src.data(), p - src.data()),
+            std::string_view(p, src.data() + src.size() - p)};
   }
 
   bool Run(const char *fmt, bool force_positional = false) {
@@ -100,9 +100,9 @@ class ConsumeUnboundConversionTest : public ::testing::Test {
 TEST_F(ConsumeUnboundConversionTest, ConsumeSpecification) {
   struct Expectation {
     int line;
-    string_view src;
-    string_view out;
-    string_view src_post;
+    std::string_view src;
+    std::string_view out;
+    std::string_view src_post;
   };
   const Expectation kExpect[] = {
     {__LINE__, "",     "",     ""  },
@@ -337,12 +337,12 @@ struct SummarizeConsumer {
   std::string* out;
   explicit SummarizeConsumer(std::string* out) : out(out) {}
 
-  bool Append(string_view s) {
+  bool Append(std::string_view s) {
     *out += "[" + std::string(s) + "]";
     return true;
   }
 
-  bool ConvertOne(const UnboundConversion& conv, string_view s) {
+  bool ConvertOne(const UnboundConversion& conv, std::string_view s) {
     *out += "{";
     *out += std::string(s);
     *out += ":";

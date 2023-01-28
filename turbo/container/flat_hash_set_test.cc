@@ -62,7 +62,7 @@ INSTANTIATE_TYPED_TEST_SUITE_P(FlatHashSet, ModifiersTest, SetTypes);
 
 TEST(FlatHashSet, EmplaceString) {
   std::vector<std::string> v = {"a", "b"};
-  turbo::flat_hash_set<turbo::string_view> hs(v.begin(), v.end());
+  turbo::flat_hash_set<std::string_view> hs(v.begin(), v.end());
   EXPECT_THAT(hs, UnorderedElementsAreArray(v));
 }
 

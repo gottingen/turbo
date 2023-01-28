@@ -27,8 +27,8 @@
 // (`std::weak_equality`, etc.) and are designed to be drop-in replacements
 // for code compliant with C++20.
 
-#ifndef TURBO_TYPES_COMPARE_H_
-#define TURBO_TYPES_COMPARE_H_
+#ifndef TURBO_META_COMPARE_H_
+#define TURBO_META_COMPARE_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -597,4 +597,4 @@ constexpr turbo::weak_ordering do_three_way_comparison(const Compare &compare,
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_TYPES_COMPARE_H_
+#endif  // TURBO_META_COMPARE_H_

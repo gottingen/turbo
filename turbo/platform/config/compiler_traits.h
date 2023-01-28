@@ -1448,8 +1448,30 @@
 			// with the -fshort-wchar compiler argument.
 			#define TURBO_WCHAR_SIZE 2
 		#endif
-	#endif
+    #endif
 
+
+    #if defined(_MSC_VER)
+        // In very old versions of MSVC and when the /Zc:wchar_t flag is off, wchar_t is
+        // a typedef for unsigned short.  Otherwise wchar_t is mapped to the __wchar_t
+        // builtin type.  We need to make sure not to define operator wchar_t()
+        // alongside operator unsigned short() in these instances.
+        #define TURBO_WCHAR_T __wchar_t
+        #if defined(_M_X64) && !defined(_M_ARM64EC)
+        #include <intrin.h>
+        #pragma intrinsic(_umul128)
+    #endif  // defined(_M_X64)
+    #else   // defined(_MSC_VER)
+        #define TURBO_WCHAR_T wchar_t
+    #endif  // defined(_MSC_VER)
+
+    #ifndef TURBO_LITERAL
+        #if defined(TURBO_PLATFORM_WINDOWS)
+            #define  TURBO_LITERAL(str) L##str
+        #else
+            #define  TURBO_LITERAL(str) str
+        #endif
+    #endif
 
 	// ------------------------------------------------------------------------
 	// TURBO_RESTRICT
@@ -1497,42 +1519,16 @@
 	//
 
 	#ifndef TURBO_DEPRECATED
-		#if defined(TURBO_COMPILER_CPP14_ENABLED)
-			#define TURBO_DEPRECATED [[deprecated]]
-		#elif defined(TURBO_COMPILER_MSVC) && (TURBO_COMPILER_VERSION > 1300) // If VC7 (VS2003) or later...
-			#define TURBO_DEPRECATED __declspec(deprecated)
-		#elif defined(TURBO_COMPILER_MSVC)
-			#define TURBO_DEPRECATED
-		#else
-			#define TURBO_DEPRECATED __attribute__((deprecated))
-		#endif
+        #define TURBO_DEPRECATED [[deprecated]]
 	#endif
 
 	#ifndef TURBO_PREFIX_DEPRECATED
-		#if defined(TURBO_COMPILER_CPP14_ENABLED)
-			#define TURBO_PREFIX_DEPRECATED [[deprecated]]
-			#define TURBO_POSTFIX_DEPRECATED
-		#elif defined(TURBO_COMPILER_MSVC) && (TURBO_COMPILER_VERSION > 1300) // If VC7 (VS2003) or later...
-			#define TURBO_PREFIX_DEPRECATED __declspec(deprecated)
-			#define TURBO_POSTFIX_DEPRECATED
-		#elif defined(TURBO_COMPILER_MSVC)
-			#define TURBO_PREFIX_DEPRECATED
-			#define TURBO_POSTFIX_DEPRECATED
-		#else
-			#define TURBO_PREFIX_DEPRECATED
-			#define TURBO_POSTFIX_DEPRECATED __attribute__((deprecated))
-		#endif
+        #define TURBO_PREFIX_DEPRECATED [[deprecated]]
+        #define TURBO_POSTFIX_DEPRECATED
 	#endif
 
 	#ifndef TURBO_DEPRECATED_MESSAGE
-		#if defined(TURBO_COMPILER_CPP14_ENABLED)
-			#define TURBO_DEPRECATED_MESSAGE(msg) [[deprecated(#msg)]]
-        #elif TURBO_HAVE_ATTRIBUTE(deprecated)
-            #define TURBO_DEPRECATED_MESSAGE(message) __attribute__((deprecated(message)))
-		#else
-			// Compiler does not support depreaction messages, explicitly drop the msg but still mark the function as deprecated
-			#define TURBO_DEPRECATED_MESSAGE(msg) TURBO_DEPRECATED
-		#endif
+        #define TURBO_DEPRECATED_MESSAGE(msg) [[deprecated(#msg)]]
 	#endif
 
 

@@ -34,6 +34,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -46,7 +47,6 @@
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_join.h"
 #include "turbo/meta/span.h"
-#include "turbo/meta/variant.h"
 #include "turbo/meta/utility.h"
 
 namespace turbo {

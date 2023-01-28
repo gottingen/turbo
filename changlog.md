@@ -5,9 +5,13 @@ changelog
 
 # v0.6.3
 
-|plan | done | 
-|:---- |:-----|
-|using std::string_view| n    |
-|using std::optional | n |
-|using std::any | n |
-|using std::variant | n |
+| plan                                  | done | 
+|:--------------------------------------|:-----|
+| using std::string_view                | y    |
+| using std::optional                   | y    |
+| using std::any                        | y    |
+| using std::variant                    | y    |
+| using std::string_view for filesystem | y    |
+| add sequence read file | y|
+| robost json | y|
+|fix log test bug on x86_64| y|

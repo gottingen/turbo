@@ -89,6 +89,14 @@
 	#define TURBO_PLATFORM_DESKTOP 1
 #endif
 
+#if defined(__EMSCRIPTEN__)
+#define TURBO_PLATFORM_WEB
+#endif
+
+#if defined(__QNX__)
+#define TURBO_PLATFORM_QNX
+#endif
+
 // MinGW
 // This is a pseudo-platform which will be defined along with TURBO_PLATFORM_WINDOWS when
 // using the MinGW Windows build environment.

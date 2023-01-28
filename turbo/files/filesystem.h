@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------
 //
-// turbo::filesystem - A C++17-like filesystem implementation for C++11/C++14/C++17/C++20
+// turbo::filesystem - A C++17-like filesystem implementation for C++17/C++20
 //
 //---------------------------------------------------------------------------------------
 //
@@ -39,7 +39,7 @@
 // #endif
 // #ifndef TURBO_USE_STD_FS
 // #include "turbo/files/filesystem.h"
-// namespace fs = ghc::filesystem;
+// namespace fs = turbo::filesystem;
 // #endif
 //
 //---------------------------------------------------------------------------------------
@@ -48,105 +48,16 @@
 
 // #define BSD manifest constant only in
 // sys/param.h
+#include "turbo/platform/config.h"
 #ifndef _WIN32
 #include <sys/param.h>
 #endif
 
-#ifndef GHC_OS_DETECTED
-#if defined(__APPLE__) && defined(__MACH__)
-#define GHC_OS_MACOS
-#elif defined(__linux__)
-#define GHC_OS_LINUX
-#if defined(__ANDROID__)
-#define GHC_OS_ANDROID
-#endif
-#elif defined(_WIN64)
-#define GHC_OS_WINDOWS
-#define GHC_OS_WIN64
-#elif defined(_WIN32)
-#define GHC_OS_WINDOWS
-#define GHC_OS_WIN32
-#elif defined(__CYGWIN__)
-#define GHC_OS_CYGWIN
-#elif defined(__sun) && defined(__SVR4)
-#define GHC_OS_SOLARIS
-#elif defined(__svr4__)
-#define GHC_OS_SYS5R4
-#elif defined(BSD)
-#define GHC_OS_BSD
-#elif defined(__EMSCRIPTEN__)
-#define GHC_OS_WEB
+#ifdef TURBO_PLATFORM_WEB
 #include <wasi/api.h>
-#elif defined(__QNX__)
-#define GHC_OS_QNX
-#else
-#error "Operating system currently not supported!"
-#endif
-#define GHC_OS_DETECTED
-#if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
-#if _MSVC_LANG == 201703L
-#define GHC_FILESYSTEM_RUNNING_CPP17
-#else
-#define GHC_FILESYSTEM_RUNNING_CPP20
-#endif
-#elif (defined(__cplusplus) && __cplusplus >= 201703L)
-#if __cplusplus == 201703L
-#define GHC_FILESYSTEM_RUNNING_CPP17
-#else
-#define GHC_FILESYSTEM_RUNNING_CPP20
-#endif
-#endif
 #endif
 
-#if defined(TURBO_FILESYSTEM_IMPLEMENTATION)
-#define GHC_EXPAND_IMPL
-#define GHC_INLINE
-#ifdef GHC_OS_WINDOWS
-#ifndef GHC_FS_API
-#define GHC_FS_API
-#endif
-#ifndef GHC_FS_API_CLASS
-#define GHC_FS_API_CLASS
-#endif
-#else
-#ifndef GHC_FS_API
-#define GHC_FS_API __attribute__((visibility("default")))
-#endif
-#ifndef GHC_FS_API_CLASS
-#define GHC_FS_API_CLASS __attribute__((visibility("default")))
-#endif
-#endif
-#elif defined(TURBO_FILESYSTEM_FWD)
-#define GHC_INLINE
-#ifdef GHC_OS_WINDOWS
-#ifndef GHC_FS_API
-#define GHC_FS_API extern
-#endif
-#ifndef GHC_FS_API_CLASS
-#define GHC_FS_API_CLASS
-#endif
-#else
-#ifndef GHC_FS_API
-#define GHC_FS_API extern
-#endif
-#ifndef GHC_FS_API_CLASS
-#define GHC_FS_API_CLASS
-#endif
-#endif
-#else
-#define GHC_EXPAND_IMPL
-#define GHC_INLINE inline
-#ifndef GHC_FS_API
-#define GHC_FS_API
-#endif
-#ifndef GHC_FS_API_CLASS
-#define GHC_FS_API_CLASS
-#endif
-#endif
-
-#ifdef GHC_EXPAND_IMPL
-
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 #include <windows.h>
 // additional includes
 #include <shellapi.h>
@@ -163,7 +74,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-#ifdef GHC_OS_ANDROID
+#ifdef TURBO_PLATFORM_ANDROID
 #include <android/api-level.h>
 #if __ANDROID_API__ < 12
 #include <sys/syscall.h>
@@ -173,23 +84,21 @@
 #else
 #include <sys/statvfs.h>
 #endif
-#ifdef GHC_OS_CYGWIN
+#ifdef TURBO_PLATFORM_CYGWIN
 #include <strings.h>
 #endif
 #if !defined(__ANDROID__) || __ANDROID_API__ >= 26
 #include <langinfo.h>
 #endif
 #endif
-#ifdef GHC_OS_MACOS
+#ifdef TURBO_PLATFORM_APPLE
 #include <Availability.h>
 #endif
 
-#if defined(__cpp_impl_three_way_comparison) && defined(__has_include)
-#if __has_include(<compare>)
-#define GHC_HAS_THREEWAY_COMP
+#ifdef TURBO_HAVE_THREEWAY_COMP
 #include <compare>
 #endif
-#endif
+
 
 #include <algorithm>
 #include <cctype>
@@ -207,56 +116,9 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#else  // GHC_EXPAND_IMPL
-
-#if defined(__cpp_impl_three_way_comparison) && defined(__has_include)
-#if __has_include(<compare>)
-#define GHC_HAS_THREEWAY_COMP
-#include <compare>
-#endif
-#endif
-#include <chrono>
-#include <fstream>
-#include <memory>
-#include <stack>
-#include <stdexcept>
-#include <string>
-#include <system_error>
-#ifdef GHC_OS_WINDOWS
-#include <vector>
-#endif
-#endif  // GHC_EXPAND_IMPL
-
-// After standard library includes.
-// Standard library support for std::string_view.
-#if defined(__cpp_lib_string_view)
-#define GHC_HAS_STD_STRING_VIEW
-#elif defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION >= 4000) && (__cplusplus >= 201402)
-#define GHC_HAS_STD_STRING_VIEW
-#elif defined(_GLIBCXX_RELEASE) && (_GLIBCXX_RELEASE >= 7) && (__cplusplus >= 201703)
-#define GHC_HAS_STD_STRING_VIEW
-#elif defined(_MSC_VER) && (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
-#define GHC_HAS_STD_STRING_VIEW
-#endif
-
-// Standard library support for std::experimental::string_view.
-#if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION >= 3700 && _LIBCPP_VERSION < 7000) && (__cplusplus >= 201402)
-#define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
-#elif defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)) && (__cplusplus >= 201402)
-#define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
-#elif defined(__GLIBCXX__) && defined(_GLIBCXX_USE_DUAL_ABI) && (__cplusplus >= 201402)
-// macro _GLIBCXX_USE_DUAL_ABI is always defined in libstdc++ from gcc-5 and newer
-#define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
-#endif
-
-#if defined(GHC_HAS_STD_STRING_VIEW)
 #include <string_view>
-#elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-#include <experimental/string_view>
-#endif
 
-#if !defined(GHC_OS_WINDOWS) && !defined(PATH_MAX)
+#if !defined(TURBO_PLATFORM_WINDOWS) && !defined(PATH_MAX)
 #define PATH_MAX 4096
 #endif
 
@@ -265,7 +127,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Enforce C++17 API where possible when compiling for C++20, handles the following cases:
 // * fs::path::u8string() returns std::string instead of std::u8string
-// #define GHC_FILESYSTEM_ENFORCE_CPP17_API
+// #define TURBO_FILESYSTEM_ENFORCE_CPP17
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // LWG #2682 disables the since then invalid use of the copy option create_symlinks on directories
 // configure LWG conformance ()
@@ -287,7 +149,7 @@
 // LWG #2937 enforces that fs::equivalent emits an error, if !fs::exists(p1)||!exists(p2)
 #define LWG_2937_BEHAVIOUR
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// UTF8-Everywhere is the original behaviour of ghc::filesystem. But since v1.5 the Windows
+// UTF8-Everywhere is the original behaviour of turbo::filesystem. But since v1.5 the Windows
 // version defaults to std::wstring storage backend. Still all std::string will be interpreted
 // as UTF-8 encoded. With this define you can enforce the old behavior on Windows, using
 // std::string as backend and for fs::path::native() and char for fs::path::c_str(). This
@@ -297,41 +159,25 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Raise errors/exceptions when invalid unicode codepoints or UTF-8 sequences are found,
 // instead of replacing them with the unicode replacement character (U+FFFD).
-// #define GHC_RAISE_UNICODE_ERRORS
+// #define TURBO_RAISE_UNICODE_ERRORS
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Automatic prefix windows path with "\\?\" if they would break the MAX_PATH length.
 // instead of replacing them with the unicode replacement character (U+FFFD).
-#ifndef GHC_WIN_DISABLE_AUTO_PREFIXES
-#define GHC_WIN_AUTO_PREFIX_LONG_PATH
-#endif  // GHC_WIN_DISABLE_AUTO_PREFIXES
+#ifndef TURBO_WIN_DISABLE_AUTO_PREFIXES
+#define TURBO_WIN_AUTO_PREFIX_LONG_PATH
+#endif  // TURBO_WIN_DISABLE_AUTO_PREFIXES
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// ghc::filesystem version in decimal (major * 10000 + minor * 100 + patch)
+// turbo::filesystem version in decimal (major * 10000 + minor * 100 + patch)
 #define TURBO_FILESYSTEM_VERSION 10512L
 
-#if !defined(GHC_WITH_EXCEPTIONS) && (defined(__EXCEPTIONS) || defined(__cpp_exceptions) || defined(_CPPUNWIND))
-#define GHC_WITH_EXCEPTIONS
-#endif
-#if !defined(GHC_WITH_EXCEPTIONS) && defined(GHC_RAISE_UNICODE_ERRORS)
-#error "Can't raise unicode errors with exception support disabled"
-#endif
-
-namespace ghc {
+namespace turbo {
 namespace filesystem {
 
-#if defined(GHC_HAS_CUSTOM_STRING_VIEW)
-#define GHC_WITH_STRING_VIEW
-#elif defined(GHC_HAS_STD_STRING_VIEW)
-#define GHC_WITH_STRING_VIEW
 using std::basic_string_view;
-#elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-#define GHC_WITH_STRING_VIEW
-using std::experimental::basic_string_view;
-#endif
 
 // temporary existing exception type for yet unimplemented parts
-class GHC_FS_API_CLASS not_implemented_exception : public std::logic_error
-{
+class  not_implemented_exception : public std::logic_error {
 public:
     not_implemented_exception()
         : std::logic_error("function not implemented yet.")
@@ -344,7 +190,7 @@ class path_helper_base
 {
 public:
     using value_type = char_type;
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     static constexpr value_type preferred_separator = '\\';
 #else
     static constexpr value_type preferred_separator = '/';
@@ -356,7 +202,7 @@ template <typename char_type>
 constexpr char_type path_helper_base<char_type>::preferred_separator;
 #endif
 
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 class path;
 namespace detail {
 bool has_executable_extension(const path& p);
@@ -364,18 +210,16 @@ bool has_executable_extension(const path& p);
 #endif
 
 // [fs.class.path] class path
-class GHC_FS_API_CLASS path
-#if defined(GHC_OS_WINDOWS) && !defined(TURBO_WIN_DISABLE_WSTRING_STORAGE_TYPE)
-#define GHC_USE_WCHAR_T
-#define GHC_NATIVEWP(p) p.c_str()
-#define GHC_PLATFORM_LITERAL(str) L##str
+class  path
+#if defined(TURBO_PLATFORM_WINDOWS) && !defined(TURBO_WIN_DISABLE_WSTRING_STORAGE_TYPE)
+#define TURBO_FS_USE_WCHAR_T
+#define TURBO_NATIVEWP(p) p.c_str()
     : private path_helper_base<std::wstring::value_type>
 {
 public:
     using path_helper_base<std::wstring::value_type>::value_type;
 #else
-#define GHC_NATIVEWP(p) p.wstring().c_str()
-#define GHC_PLATFORM_LITERAL(str) str
+#define TURBO_NATIVEWP(p) p.wstring().c_str()
     : private path_helper_base<std::string::value_type>
 {
 public:
@@ -388,7 +232,7 @@ public:
     /// The path format in which the constructor argument is given.
     enum format {
         generic_format,  ///< The generic format, internally used by
-                         ///< ghc::filesystem::path with slashes
+                         ///< turbo::filesystem::path with slashes
         native_format,   ///< The format native to the current platform this code
                          ///< is build for
         auto_format,     ///< Try to auto-detect the format, fallback to native
@@ -406,7 +250,6 @@ public:
     struct _is_basic_string<std::basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT>>> : std::true_type
     {
     };
-#ifdef GHC_WITH_STRING_VIEW
     template <class CharT, class Traits>
     struct _is_basic_string<basic_string_view<CharT, Traits>> : std::true_type
     {
@@ -415,12 +258,11 @@ public:
     struct _is_basic_string<basic_string_view<CharT, std::char_traits<CharT>>> : std::true_type
     {
     };
-#endif
 
     template <typename T1, typename T2 = void>
     using path_type = typename std::enable_if<!std::is_same<path, T1>::value, path>::type;
     template <typename T>
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     using path_from_string =
         typename std::enable_if<_is_basic_string<T>::value || std::is_same<char const*, typename std::decay<T>::type>::value || std::is_same<char*, typename std::decay<T>::type>::value || std::is_same<char8_t const*, typename std::decay<T>::type>::value ||
                                     std::is_same<char8_t*, typename std::decay<T>::type>::value || std::is_same<char16_t const*, typename std::decay<T>::type>::value || std::is_same<char16_t*, typename std::decay<T>::type>::value ||
@@ -447,7 +289,7 @@ public:
     path(const Source& source, format fmt = auto_format);
     template <class InputIterator>
     path(InputIterator first, InputIterator last, format fmt = auto_format);
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     template <class Source, typename = path_from_string<Source>>
     path(const Source& source, const std::locale& loc, format fmt = auto_format);
     template <class InputIterator>
@@ -479,9 +321,7 @@ public:
     // [fs.path.concat] concatenation
     path& operator+=(const path& x);
     path& operator+=(const string_type& x);
-#ifdef GHC_WITH_STRING_VIEW
     path& operator+=(basic_string_view<value_type> x);
-#endif
     path& operator+=(const value_type* x);
     path& operator+=(value_type x);
     template <class Source>
@@ -509,7 +349,7 @@ public:
     std::basic_string<EcharT, traits, Allocator> string(const Allocator& a = Allocator()) const;
     std::string string() const;
     std::wstring wstring() const;
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     std::u8string u8string() const;
 #else
     std::string u8string() const;
@@ -522,7 +362,7 @@ public:
     std::basic_string<EcharT, traits, Allocator> generic_string(const Allocator& a = Allocator()) const;
     std::string generic_string() const;
     std::wstring generic_wstring() const;
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     std::u8string generic_u8string() const;
 #else
     std::string generic_u8string() const;
@@ -533,9 +373,7 @@ public:
     // [fs.path.compare] compare
     int compare(const path& p) const noexcept;
     int compare(const string_type& s) const;
-#ifdef GHC_WITH_STRING_VIEW
     int compare(basic_string_view<value_type> s) const;
-#endif
     int compare(const value_type* s) const;
 
     // [fs.path.decompose] decomposition
@@ -607,32 +445,32 @@ private:
     void postprocess_path_with_format(format fmt);
     void check_long_path();
     impl_string_type _path;
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     void handle_prefixes();
     friend bool detail::has_executable_extension(const path& p);
-#ifdef GHC_WIN_AUTO_PREFIX_LONG_PATH
+#ifdef TURBO_WIN_AUTO_PREFIX_LONG_PATH
     string_type::size_type _prefixLength{0};
-#else   // GHC_WIN_AUTO_PREFIX_LONG_PATH
+#else   // TURBO_WIN_AUTO_PREFIX_LONG_PATH
     static const string_type::size_type _prefixLength{0};
-#endif  // GHC_WIN_AUTO_PREFIX_LONG_PATH
+#endif  // TURBO_WIN_AUTO_PREFIX_LONG_PATH
 #else
     static const string_type::size_type _prefixLength{0};
 #endif
 };
 
 // [fs.path.nonmember] path non-member functions
-GHC_FS_API void swap(path& lhs, path& rhs) noexcept;
-GHC_FS_API size_t hash_value(const path& p) noexcept;
-#ifdef GHC_HAS_THREEWAY_COMP
-GHC_FS_API std::strong_ordering operator<=>(const path& lhs, const path& rhs) noexcept;
+ void swap(path& lhs, path& rhs) noexcept;
+ size_t hash_value(const path& p) noexcept;
+#ifdef TURBO_HAVE_THREEWAY_COMP
+ std::strong_ordering operator<=>(const path& lhs, const path& rhs) noexcept;
 #endif
-GHC_FS_API bool operator==(const path& lhs, const path& rhs) noexcept;
-GHC_FS_API bool operator!=(const path& lhs, const path& rhs) noexcept;
-GHC_FS_API bool operator<(const path& lhs, const path& rhs) noexcept;
-GHC_FS_API bool operator<=(const path& lhs, const path& rhs) noexcept;
-GHC_FS_API bool operator>(const path& lhs, const path& rhs) noexcept;
-GHC_FS_API bool operator>=(const path& lhs, const path& rhs) noexcept;
-GHC_FS_API path operator/(const path& lhs, const path& rhs);
+ bool operator==(const path& lhs, const path& rhs) noexcept;
+ bool operator!=(const path& lhs, const path& rhs) noexcept;
+ bool operator<(const path& lhs, const path& rhs) noexcept;
+ bool operator<=(const path& lhs, const path& rhs) noexcept;
+ bool operator>(const path& lhs, const path& rhs) noexcept;
+ bool operator>=(const path& lhs, const path& rhs) noexcept;
+ path operator/(const path& lhs, const path& rhs);
 
 // [fs.path.io] path inserter and extractor
 template <class charT, class traits>
@@ -642,18 +480,18 @@ std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, traits>&
 
 // [pfs.path.factory] path factory functions
 template <class Source, typename = path::path_from_string<Source>>
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
-[[deprecated("use ghc::filesystem::path::path() with std::u8string instead")]]
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
+[[deprecated("use turbo::filesystem::path::path() with std::u8string instead")]]
 #endif
 path u8path(const Source& source);
 template <class InputIterator>
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
-[[deprecated("use ghc::filesystem::path::path() with std::u8string instead")]]
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
+[[deprecated("use turbo::filesystem::path::path() with std::u8string instead")]]
 #endif
 path u8path(InputIterator first, InputIterator last);
 
 // [fs.class.filesystem_error] class filesystem_error
-class GHC_FS_API_CLASS filesystem_error : public std::system_error
+class  filesystem_error : public std::system_error
 {
 public:
     filesystem_error(const std::string& what_arg, std::error_code ec);
@@ -669,7 +507,7 @@ private:
     path _p1, _p2;
 };
 
-class GHC_FS_API_CLASS path::iterator
+class  path::iterator
 {
 public:
     using value_type = const path;
@@ -775,7 +613,7 @@ enum class copy_options : uint16_t {
 
     directories_only = 0x40,
     create_symlinks = 0x80,
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
     create_hard_links = 0x100
 #endif
 };
@@ -788,7 +626,7 @@ enum class directory_options : uint16_t {
 };
 
 // [fs.class.file_status] class file_status
-class GHC_FS_API_CLASS file_status
+class  file_status
 {
 public:
     // [fs.file_status.cons] constructors and destructor
@@ -816,14 +654,14 @@ private:
 using file_time_type = std::chrono::time_point<std::chrono::system_clock>;
 
 // [fs.class.directory_entry] Class directory_entry
-class GHC_FS_API_CLASS directory_entry
+class  directory_entry
 {
 public:
     // [fs.dir.entry.cons] constructors and destructor
     directory_entry() noexcept = default;
     directory_entry(const directory_entry&) = default;
     directory_entry(directory_entry&&) noexcept = default;
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     explicit directory_entry(const path& p);
 #endif
     directory_entry(const path& p, std::error_code& ec);
@@ -834,7 +672,7 @@ public:
     directory_entry& operator=(directory_entry&&) noexcept = default;
 
     // [fs.dir.entry.mods] modifiers
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     void assign(const path& p);
     void replace_filename(const path& p);
     void refresh();
@@ -846,7 +684,7 @@ public:
     // [fs.dir.entry.obs] observers
     const filesystem::path& path() const noexcept;
     operator const filesystem::path&() const noexcept;
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     bool exists() const;
     bool is_block_file() const;
     bool is_character_file() const;
@@ -875,14 +713,14 @@ public:
     file_status status(std::error_code& ec) const noexcept;
     file_status symlink_status(std::error_code& ec) const noexcept;
 
-#ifndef GHC_OS_WEB
-#ifdef GHC_WITH_EXCEPTIONS
+#ifndef TURBO_PLATFORM_WEB
+#ifdef TURBO_HAVE_EXCEPTIONS
     uintmax_t hard_link_count() const;
 #endif
     uintmax_t hard_link_count(std::error_code& ec) const noexcept;
 #endif
 
-#ifdef GHC_HAS_THREEWAY_COMP
+#ifdef TURBO_HAVE_THREEWAY_COMP
     std::strong_ordering operator<=>(const directory_entry& rhs) const noexcept;
 #endif
     bool operator<(const directory_entry& rhs) const noexcept;
@@ -894,7 +732,7 @@ public:
 
 private:
     friend class directory_iterator;
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     file_type status_file_type() const;
 #endif
     file_type status_file_type(std::error_code& ec) const noexcept;
@@ -902,17 +740,17 @@ private:
     file_status _status;
     file_status _symlink_status;
     uintmax_t _file_size = static_cast<uintmax_t>(-1);
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
     uintmax_t _hard_link_count = static_cast<uintmax_t>(-1);
 #endif
     time_t _last_write_time = 0;
 };
 
 // [fs.class.directory.iterator] Class directory_iterator
-class GHC_FS_API_CLASS directory_iterator
+class  directory_iterator
 {
 public:
-    class GHC_FS_API_CLASS proxy
+    class  proxy
     {
     public:
         const directory_entry& operator*() const& noexcept { return _dir_entry; }
@@ -935,7 +773,7 @@ public:
 
     // [fs.dir.itr.members] member functions
     directory_iterator() noexcept;
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     explicit directory_iterator(const path& p);
     directory_iterator(const path& p, directory_options options);
 #endif
@@ -948,13 +786,13 @@ public:
     directory_iterator& operator=(directory_iterator&& rhs) noexcept;
     const directory_entry& operator*() const;
     const directory_entry* operator->() const;
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     directory_iterator& operator++();
 #endif
     directory_iterator& increment(std::error_code& ec) noexcept;
 
     // other members as required by [input.iterators]
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     proxy operator++(int)
     {
         proxy p{**this};
@@ -972,11 +810,11 @@ private:
 };
 
 // [fs.dir.itr.nonmembers] directory_iterator non-member functions
-GHC_FS_API directory_iterator begin(directory_iterator iter) noexcept;
-GHC_FS_API directory_iterator end(const directory_iterator&) noexcept;
+ directory_iterator begin(directory_iterator iter) noexcept;
+ directory_iterator end(const directory_iterator&) noexcept;
 
 // [fs.class.re.dir.itr] class recursive_directory_iterator
-class GHC_FS_API_CLASS recursive_directory_iterator
+class  recursive_directory_iterator
 {
 public:
     using iterator_category = std::input_iterator_tag;
@@ -987,10 +825,10 @@ public:
 
     // [fs.rec.dir.itr.members] constructors and destructor
     recursive_directory_iterator() noexcept;
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     explicit recursive_directory_iterator(const path& p);
     recursive_directory_iterator(const path& p, directory_options options);
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
     recursive_directory_iterator(const path& p, directory_options options, std::error_code& ec) noexcept;
     recursive_directory_iterator(const path& p, std::error_code& ec) noexcept;
     recursive_directory_iterator(const recursive_directory_iterator& rhs);
@@ -1008,26 +846,26 @@ public:
     // [fs.rec.dir.itr.members] modifiers recursive_directory_iterator&
     recursive_directory_iterator& operator=(const recursive_directory_iterator& rhs);
     recursive_directory_iterator& operator=(recursive_directory_iterator&& rhs) noexcept;
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     recursive_directory_iterator& operator++();
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
     recursive_directory_iterator& increment(std::error_code& ec) noexcept;
 
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     void pop();
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
     void pop(std::error_code& ec);
     void disable_recursion_pending();
 
     // other members as required by [input.iterators]
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
     directory_iterator::proxy operator++(int)
     {
         directory_iterator::proxy proxy{**this};
         ++*this;
         return proxy;
     }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
     bool operator==(const recursive_directory_iterator& rhs) const;
     bool operator!=(const recursive_directory_iterator& rhs) const;
 
@@ -1047,115 +885,115 @@ private:
 };
 
 // [fs.rec.dir.itr.nonmembers] directory_iterator non-member functions
-GHC_FS_API recursive_directory_iterator begin(recursive_directory_iterator iter) noexcept;
-GHC_FS_API recursive_directory_iterator end(const recursive_directory_iterator&) noexcept;
+ recursive_directory_iterator begin(recursive_directory_iterator iter) noexcept;
+ recursive_directory_iterator end(const recursive_directory_iterator&) noexcept;
 
 // [fs.op.funcs] filesystem operations
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_FS_API path absolute(const path& p);
-GHC_FS_API path canonical(const path& p);
-GHC_FS_API void copy(const path& from, const path& to);
-GHC_FS_API void copy(const path& from, const path& to, copy_options options);
-GHC_FS_API bool copy_file(const path& from, const path& to);
-GHC_FS_API bool copy_file(const path& from, const path& to, copy_options option);
-GHC_FS_API void copy_symlink(const path& existing_symlink, const path& new_symlink);
-GHC_FS_API bool create_directories(const path& p);
-GHC_FS_API bool create_directory(const path& p);
-GHC_FS_API bool create_directory(const path& p, const path& attributes);
-GHC_FS_API void create_directory_symlink(const path& to, const path& new_symlink);
-GHC_FS_API void create_symlink(const path& to, const path& new_symlink);
-GHC_FS_API path current_path();
-GHC_FS_API void current_path(const path& p);
-GHC_FS_API bool exists(const path& p);
-GHC_FS_API bool equivalent(const path& p1, const path& p2);
-GHC_FS_API uintmax_t file_size(const path& p);
-GHC_FS_API bool is_block_file(const path& p);
-GHC_FS_API bool is_character_file(const path& p);
-GHC_FS_API bool is_directory(const path& p);
-GHC_FS_API bool is_empty(const path& p);
-GHC_FS_API bool is_fifo(const path& p);
-GHC_FS_API bool is_other(const path& p);
-GHC_FS_API bool is_regular_file(const path& p);
-GHC_FS_API bool is_socket(const path& p);
-GHC_FS_API bool is_symlink(const path& p);
-GHC_FS_API file_time_type last_write_time(const path& p);
-GHC_FS_API void last_write_time(const path& p, file_time_type new_time);
-GHC_FS_API void permissions(const path& p, perms prms, perm_options opts = perm_options::replace);
-GHC_FS_API path proximate(const path& p, const path& base = current_path());
-GHC_FS_API path read_symlink(const path& p);
-GHC_FS_API path relative(const path& p, const path& base = current_path());
-GHC_FS_API bool remove(const path& p);
-GHC_FS_API uintmax_t remove_all(const path& p);
-GHC_FS_API void rename(const path& from, const path& to);
-GHC_FS_API void resize_file(const path& p, uintmax_t size);
-GHC_FS_API space_info space(const path& p);
-GHC_FS_API file_status status(const path& p);
-GHC_FS_API file_status symlink_status(const path& p);
-GHC_FS_API path temp_directory_path();
-GHC_FS_API path weakly_canonical(const path& p);
-#endif
-GHC_FS_API path absolute(const path& p, std::error_code& ec);
-GHC_FS_API path canonical(const path& p, std::error_code& ec);
-GHC_FS_API void copy(const path& from, const path& to, std::error_code& ec) noexcept;
-GHC_FS_API void copy(const path& from, const path& to, copy_options options, std::error_code& ec) noexcept;
-GHC_FS_API bool copy_file(const path& from, const path& to, std::error_code& ec) noexcept;
-GHC_FS_API bool copy_file(const path& from, const path& to, copy_options option, std::error_code& ec) noexcept;
-GHC_FS_API void copy_symlink(const path& existing_symlink, const path& new_symlink, std::error_code& ec) noexcept;
-GHC_FS_API bool create_directories(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool create_directory(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool create_directory(const path& p, const path& attributes, std::error_code& ec) noexcept;
-GHC_FS_API void create_directory_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept;
-GHC_FS_API void create_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept;
-GHC_FS_API path current_path(std::error_code& ec);
-GHC_FS_API void current_path(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool exists(file_status s) noexcept;
-GHC_FS_API bool exists(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool equivalent(const path& p1, const path& p2, std::error_code& ec) noexcept;
-GHC_FS_API uintmax_t file_size(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_block_file(file_status s) noexcept;
-GHC_FS_API bool is_block_file(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_character_file(file_status s) noexcept;
-GHC_FS_API bool is_character_file(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_directory(file_status s) noexcept;
-GHC_FS_API bool is_directory(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_empty(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_fifo(file_status s) noexcept;
-GHC_FS_API bool is_fifo(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_other(file_status s) noexcept;
-GHC_FS_API bool is_other(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_regular_file(file_status s) noexcept;
-GHC_FS_API bool is_regular_file(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_socket(file_status s) noexcept;
-GHC_FS_API bool is_socket(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool is_symlink(file_status s) noexcept;
-GHC_FS_API bool is_symlink(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API file_time_type last_write_time(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API void last_write_time(const path& p, file_time_type new_time, std::error_code& ec) noexcept;
-GHC_FS_API void permissions(const path& p, perms prms, std::error_code& ec) noexcept;
-GHC_FS_API void permissions(const path& p, perms prms, perm_options opts, std::error_code& ec) noexcept;
-GHC_FS_API path proximate(const path& p, std::error_code& ec);
-GHC_FS_API path proximate(const path& p, const path& base, std::error_code& ec);
-GHC_FS_API path read_symlink(const path& p, std::error_code& ec);
-GHC_FS_API path relative(const path& p, std::error_code& ec);
-GHC_FS_API path relative(const path& p, const path& base, std::error_code& ec);
-GHC_FS_API bool remove(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API uintmax_t remove_all(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API void rename(const path& from, const path& to, std::error_code& ec) noexcept;
-GHC_FS_API void resize_file(const path& p, uintmax_t size, std::error_code& ec) noexcept;
-GHC_FS_API space_info space(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API file_status status(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API bool status_known(file_status s) noexcept;
-GHC_FS_API file_status symlink_status(const path& p, std::error_code& ec) noexcept;
-GHC_FS_API path temp_directory_path(std::error_code& ec) noexcept;
-GHC_FS_API path weakly_canonical(const path& p, std::error_code& ec) noexcept;
+#ifdef TURBO_HAVE_EXCEPTIONS
+ path absolute(const path& p);
+ path canonical(const path& p);
+ void copy(const path& from, const path& to);
+ void copy(const path& from, const path& to, copy_options options);
+ bool copy_file(const path& from, const path& to);
+ bool copy_file(const path& from, const path& to, copy_options option);
+ void copy_symlink(const path& existing_symlink, const path& new_symlink);
+ bool create_directories(const path& p);
+ bool create_directory(const path& p);
+ bool create_directory(const path& p, const path& attributes);
+ void create_directory_symlink(const path& to, const path& new_symlink);
+ void create_symlink(const path& to, const path& new_symlink);
+ path current_path();
+ void current_path(const path& p);
+ bool exists(const path& p);
+ bool equivalent(const path& p1, const path& p2);
+ uintmax_t file_size(const path& p);
+ bool is_block_file(const path& p);
+ bool is_character_file(const path& p);
+ bool is_directory(const path& p);
+ bool is_empty(const path& p);
+ bool is_fifo(const path& p);
+ bool is_other(const path& p);
+ bool is_regular_file(const path& p);
+ bool is_socket(const path& p);
+ bool is_symlink(const path& p);
+ file_time_type last_write_time(const path& p);
+ void last_write_time(const path& p, file_time_type new_time);
+ void permissions(const path& p, perms prms, perm_options opts = perm_options::replace);
+ path proximate(const path& p, const path& base = current_path());
+ path read_symlink(const path& p);
+ path relative(const path& p, const path& base = current_path());
+ bool remove(const path& p);
+ uintmax_t remove_all(const path& p);
+ void rename(const path& from, const path& to);
+ void resize_file(const path& p, uintmax_t size);
+ space_info space(const path& p);
+ file_status status(const path& p);
+ file_status symlink_status(const path& p);
+ path temp_directory_path();
+ path weakly_canonical(const path& p);
+#endif  // TURBO_HAVE_EXCEPTIONS
+ path absolute(const path& p, std::error_code& ec);
+ path canonical(const path& p, std::error_code& ec);
+ void copy(const path& from, const path& to, std::error_code& ec) noexcept;
+ void copy(const path& from, const path& to, copy_options options, std::error_code& ec) noexcept;
+ bool copy_file(const path& from, const path& to, std::error_code& ec) noexcept;
+ bool copy_file(const path& from, const path& to, copy_options option, std::error_code& ec) noexcept;
+ void copy_symlink(const path& existing_symlink, const path& new_symlink, std::error_code& ec) noexcept;
+ bool create_directories(const path& p, std::error_code& ec) noexcept;
+ bool create_directory(const path& p, std::error_code& ec) noexcept;
+ bool create_directory(const path& p, const path& attributes, std::error_code& ec) noexcept;
+ void create_directory_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept;
+ void create_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept;
+ path current_path(std::error_code& ec);
+ void current_path(const path& p, std::error_code& ec) noexcept;
+ bool exists(file_status s) noexcept;
+ bool exists(const path& p, std::error_code& ec) noexcept;
+ bool equivalent(const path& p1, const path& p2, std::error_code& ec) noexcept;
+ uintmax_t file_size(const path& p, std::error_code& ec) noexcept;
+ bool is_block_file(file_status s) noexcept;
+ bool is_block_file(const path& p, std::error_code& ec) noexcept;
+ bool is_character_file(file_status s) noexcept;
+ bool is_character_file(const path& p, std::error_code& ec) noexcept;
+ bool is_directory(file_status s) noexcept;
+ bool is_directory(const path& p, std::error_code& ec) noexcept;
+ bool is_empty(const path& p, std::error_code& ec) noexcept;
+ bool is_fifo(file_status s) noexcept;
+ bool is_fifo(const path& p, std::error_code& ec) noexcept;
+ bool is_other(file_status s) noexcept;
+ bool is_other(const path& p, std::error_code& ec) noexcept;
+ bool is_regular_file(file_status s) noexcept;
+ bool is_regular_file(const path& p, std::error_code& ec) noexcept;
+ bool is_socket(file_status s) noexcept;
+ bool is_socket(const path& p, std::error_code& ec) noexcept;
+ bool is_symlink(file_status s) noexcept;
+ bool is_symlink(const path& p, std::error_code& ec) noexcept;
+ file_time_type last_write_time(const path& p, std::error_code& ec) noexcept;
+ void last_write_time(const path& p, file_time_type new_time, std::error_code& ec) noexcept;
+ void permissions(const path& p, perms prms, std::error_code& ec) noexcept;
+ void permissions(const path& p, perms prms, perm_options opts, std::error_code& ec) noexcept;
+ path proximate(const path& p, std::error_code& ec);
+ path proximate(const path& p, const path& base, std::error_code& ec);
+ path read_symlink(const path& p, std::error_code& ec);
+ path relative(const path& p, std::error_code& ec);
+ path relative(const path& p, const path& base, std::error_code& ec);
+ bool remove(const path& p, std::error_code& ec) noexcept;
+ uintmax_t remove_all(const path& p, std::error_code& ec) noexcept;
+ void rename(const path& from, const path& to, std::error_code& ec) noexcept;
+ void resize_file(const path& p, uintmax_t size, std::error_code& ec) noexcept;
+ space_info space(const path& p, std::error_code& ec) noexcept;
+ file_status status(const path& p, std::error_code& ec) noexcept;
+ bool status_known(file_status s) noexcept;
+ file_status symlink_status(const path& p, std::error_code& ec) noexcept;
+ path temp_directory_path(std::error_code& ec) noexcept;
+ path weakly_canonical(const path& p, std::error_code& ec) noexcept;
 
-#ifndef GHC_OS_WEB
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_FS_API void create_hard_link(const path& to, const path& new_hard_link);
-GHC_FS_API uintmax_t hard_link_count(const path& p);
-#endif
-GHC_FS_API void create_hard_link(const path& to, const path& new_hard_link, std::error_code& ec) noexcept;
-GHC_FS_API uintmax_t hard_link_count(const path& p, std::error_code& ec) noexcept;
+#ifndef TURBO_PLATFORM_WEB
+#ifdef TURBO_HAVE_EXCEPTIONS
+ void create_hard_link(const path& to, const path& new_hard_link);
+ uintmax_t hard_link_count(const path& p);
+#endif  // TURBO_HAVE_EXCEPTIONS
+ void create_hard_link(const path& to, const path& new_hard_link, std::error_code& ec) noexcept;
+ uintmax_t hard_link_count(const path& p, std::error_code& ec) noexcept;
 #endif
 
 // Non-C++17 add-on std::fstream wrappers with path
@@ -1169,7 +1007,7 @@ public:
     const basic_filebuf& operator=(const basic_filebuf&) = delete;
     basic_filebuf<charT, traits>* open(const path& p, std::ios_base::openmode mode)
     {
-#if defined(GHC_OS_WINDOWS) && !defined(__GLIBCXX__)
+#if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
         return std::basic_filebuf<charT, traits>::open(p.wstring().c_str(), mode) ? this : 0;
 #else
         return std::basic_filebuf<charT, traits>::open(p.string().c_str(), mode) ? this : 0;
@@ -1182,7 +1020,7 @@ class basic_ifstream : public std::basic_ifstream<charT, traits>
 {
 public:
     basic_ifstream() {}
-#if defined(GHC_OS_WINDOWS) && !defined(__GLIBCXX__)
+#if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
     explicit basic_ifstream(const path& p, std::ios_base::openmode mode = std::ios_base::in)
         : std::basic_ifstream<charT, traits>(p.wstring().c_str(), mode)
     {
@@ -1205,7 +1043,7 @@ class basic_ofstream : public std::basic_ofstream<charT, traits>
 {
 public:
     basic_ofstream() {}
-#if defined(GHC_OS_WINDOWS) && !defined(__GLIBCXX__)
+#if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
     explicit basic_ofstream(const path& p, std::ios_base::openmode mode = std::ios_base::out)
         : std::basic_ofstream<charT, traits>(p.wstring().c_str(), mode)
     {
@@ -1228,7 +1066,7 @@ class basic_fstream : public std::basic_fstream<charT, traits>
 {
 public:
     basic_fstream() {}
-#if defined(GHC_OS_WINDOWS) && !defined(__GLIBCXX__)
+#if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
     explicit basic_fstream(const path& p, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         : std::basic_fstream<charT, traits>(p.wstring().c_str(), mode)
     {
@@ -1255,7 +1093,7 @@ typedef basic_ofstream<wchar_t> wofstream;
 typedef basic_fstream<char> fstream;
 typedef basic_fstream<wchar_t> wfstream;
 
-class GHC_FS_API_CLASS u8arguments
+class  u8arguments
 {
 public:
     u8arguments(int& argc, char**& argv);
@@ -1273,7 +1111,7 @@ private:
     int& _refargc;
     char**& _refargv;
     bool _isvalid;
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     std::vector<std::string> _args;
     std::vector<char*> _argp;
 #endif
@@ -1285,11 +1123,11 @@ private:
 
 namespace detail {
 enum utf8_states_t { S_STRT = 0, S_RJCT = 8 };
-GHC_FS_API void appendUTF8(std::string& str, uint32_t unicode);
-GHC_FS_API bool is_surrogate(uint32_t c);
-GHC_FS_API bool is_high_surrogate(uint32_t c);
-GHC_FS_API bool is_low_surrogate(uint32_t c);
-GHC_FS_API unsigned consumeUtf8Fragment(const unsigned state, const uint8_t fragment, uint32_t& codepoint);
+ void appendUTF8(std::string& str, uint32_t unicode);
+ bool is_surrogate(uint32_t c);
+ bool is_high_surrogate(uint32_t c);
+ bool is_low_surrogate(uint32_t c);
+ unsigned consumeUtf8Fragment(const unsigned state, const uint8_t fragment, uint32_t& codepoint);
 enum class portable_error {
     none = 0,
     exists,
@@ -1299,11 +1137,11 @@ enum class portable_error {
     invalid_argument,
     is_a_directory,
 };
-GHC_FS_API std::error_code make_error_code(portable_error err);
-#ifdef GHC_OS_WINDOWS
-GHC_FS_API std::error_code make_system_error(uint32_t err = 0);
+ std::error_code make_error_code(portable_error err);
+#ifdef TURBO_PLATFORM_WINDOWS
+ std::error_code make_system_error(uint32_t err = 0);
 #else
-GHC_FS_API std::error_code make_system_error(int err = 0);
+ std::error_code make_system_error(int err = 0);
 
 template <typename T, typename = int>
 struct has_d_type : std::false_type{};
@@ -1312,13 +1150,13 @@ template <typename T>
 struct has_d_type<T, decltype((void)T::d_type, 0)> : std::true_type {};
 
 template <typename T>
-GHC_INLINE file_type file_type_from_dirent_impl(const T&, std::false_type)
+inline file_type file_type_from_dirent_impl(const T&, std::false_type)
 {
     return file_type::none;
 }
 
 template <typename T>
-GHC_INLINE file_type file_type_from_dirent_impl(const T& t, std::true_type)
+inline file_type file_type_from_dirent_impl(const T& t, std::true_type)
 {
     switch (t.d_type) {
 #ifdef DT_BLK
@@ -1359,7 +1197,7 @@ GHC_INLINE file_type file_type_from_dirent_impl(const T& t, std::true_type)
 }
 
 template <class T>
-GHC_INLINE file_type file_type_from_dirent(const T& t)
+inline file_type file_type_from_dirent(const T& t)
 {
     return file_type_from_dirent_impl(t, has_d_type<T>{});
 }
@@ -1368,11 +1206,10 @@ GHC_INLINE file_type file_type_from_dirent(const T& t)
 
 namespace detail {
 
-#ifdef GHC_EXPAND_IMPL
 
-GHC_INLINE std::error_code make_error_code(portable_error err)
+inline std::error_code make_error_code(portable_error err)
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     switch (err) {
         case portable_error::none:
             return std::error_code();
@@ -1414,19 +1251,18 @@ GHC_INLINE std::error_code make_error_code(portable_error err)
     return std::error_code();
 }
 
-#ifdef GHC_OS_WINDOWS
-GHC_INLINE std::error_code make_system_error(uint32_t err)
+#ifdef TURBO_PLATFORM_WINDOWS
+inline std::error_code make_system_error(uint32_t err)
 {
     return std::error_code(err ? static_cast<int>(err) : static_cast<int>(::GetLastError()), std::system_category());
 }
 #else
-GHC_INLINE std::error_code make_system_error(int err)
+inline std::error_code make_system_error(int err)
 {
     return std::error_code(err ? err : errno, std::system_category());
 }
 #endif
 
-#endif  // GHC_EXPAND_IMPL
 
 template <typename Enum>
 using EnableBitmask = typename std::enable_if<std::is_same<Enum, perms>::value || std::is_same<Enum, perm_options>::value || std::is_same<Enum, copy_options>::value || std::is_same<Enum, directory_options>::value, Enum>::type;
@@ -1481,31 +1317,30 @@ detail::EnableBitmask<Enum>& operator^=(Enum& X, Enum Y)
     return X;
 }
 
-#ifdef GHC_EXPAND_IMPL
 
 namespace detail {
 
-GHC_INLINE bool in_range(uint32_t c, uint32_t lo, uint32_t hi)
+inline bool in_range(uint32_t c, uint32_t lo, uint32_t hi)
 {
     return (static_cast<uint32_t>(c - lo) < (hi - lo + 1));
 }
 
-GHC_INLINE bool is_surrogate(uint32_t c)
+inline bool is_surrogate(uint32_t c)
 {
     return in_range(c, 0xd800, 0xdfff);
 }
 
-GHC_INLINE bool is_high_surrogate(uint32_t c)
+inline bool is_high_surrogate(uint32_t c)
 {
     return (c & 0xfffffc00) == 0xd800;
 }
 
-GHC_INLINE bool is_low_surrogate(uint32_t c)
+inline bool is_low_surrogate(uint32_t c)
 {
     return (c & 0xfffffc00) == 0xdc00;
 }
 
-GHC_INLINE void appendUTF8(std::string& str, uint32_t unicode)
+inline void appendUTF8(std::string& str, uint32_t unicode)
 {
     if (unicode <= 0x7f) {
         str.push_back(static_cast<char>(unicode));
@@ -1526,7 +1361,7 @@ GHC_INLINE void appendUTF8(std::string& str, uint32_t unicode)
         str.push_back(static_cast<char>((unicode & 0x3f) + 128));
     }
     else {
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
         throw filesystem_error("Illegal code point for unicode character.", str, std::make_error_code(std::errc::illegal_byte_sequence));
 #else
         appendUTF8(str, 0xfffd);
@@ -1537,7 +1372,7 @@ GHC_INLINE void appendUTF8(std::string& str, uint32_t unicode)
 // Thanks to Bjoern Hoehrmann (https://bjoern.hoehrmann.de/utf-8/decoder/dfa/)
 // and Taylor R Campbell for the ideas to this DFA approach of UTF-8 decoding;
 // Generating debugging and shrinking my own DFA from scratch was a day of fun!
-GHC_INLINE unsigned consumeUtf8Fragment(const unsigned state, const uint8_t fragment, uint32_t& codepoint)
+inline unsigned consumeUtf8Fragment(const unsigned state, const uint8_t fragment, uint32_t& codepoint)
 {
     static const uint32_t utf8_state_info[] = {
         // encoded states
@@ -1549,7 +1384,7 @@ GHC_INLINE unsigned consumeUtf8Fragment(const unsigned state, const uint8_t frag
     return state == S_RJCT ? static_cast<unsigned>(S_RJCT) : static_cast<unsigned>((utf8_state_info[category + 16] >> (state << 2)) & 0xf);
 }
 
-GHC_INLINE bool validUtf8(const std::string& utf8String)
+inline bool validUtf8(const std::string& utf8String)
 {
     std::string::const_iterator iter = utf8String.begin();
     unsigned utf8_state = S_STRT;
@@ -1567,7 +1402,6 @@ GHC_INLINE bool validUtf8(const std::string& utf8String)
 
 }  // namespace detail
 
-#endif
 
 namespace detail {
 
@@ -1598,7 +1432,7 @@ inline StringType fromUtf8(const Utf8String& utf8String, const typename StringTy
             codepoint = 0;
         }
         else if (utf8_state == S_RJCT) {
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
             throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
 #else
             result += static_cast<typename StringType::value_type>(0xfffd);
@@ -1608,7 +1442,7 @@ inline StringType fromUtf8(const Utf8String& utf8String, const typename StringTy
         }
     }
     if (utf8_state) {
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
         throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
 #else
         result += static_cast<typename StringType::value_type>(0xfffd);
@@ -1631,7 +1465,7 @@ inline StringType fromUtf8(const Utf8String& utf8String, const typename StringTy
             codepoint = 0;
         }
         else if (utf8_state == S_RJCT) {
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
             throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
 #else
             result += static_cast<typename StringType::value_type>(0xfffd);
@@ -1641,7 +1475,7 @@ inline StringType fromUtf8(const Utf8String& utf8String, const typename StringTy
         }
     }
     if (utf8_state) {
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
         throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
 #else
         result += static_cast<typename StringType::value_type>(0xfffd);
@@ -1653,11 +1487,7 @@ inline StringType fromUtf8(const Utf8String& utf8String, const typename StringTy
 template <class StringType, typename charT, std::size_t N>
 inline StringType fromUtf8(const charT (&utf8String)[N])
 {
-#ifdef GHC_WITH_STRING_VIEW
     return fromUtf8<StringType>(basic_string_view<charT>(utf8String, N - 1));
-#else
-    return fromUtf8<StringType>(std::basic_string<charT>(utf8String, N - 1));
-#endif
 }
 
 template <typename strT, typename std::enable_if<path::_is_basic_string<strT>::value && (sizeof(typename strT::value_type) == 1), int>::type size = 1>
@@ -1676,9 +1506,8 @@ inline std::string toUtf8(const strT& unicodeString)
             ++iter;
             if (iter != unicodeString.end() && is_high_surrogate(c) && is_low_surrogate(*iter)) {
                 appendUTF8(result, (char32_t(c) << 10) + *iter - 0x35fdc00);
-            }
-            else {
-#ifdef GHC_RAISE_UNICODE_ERRORS
+            } else {
+#ifdef TURBO_RAISE_UNICODE_ERRORS
                 throw filesystem_error("Illegal code point for unicode character.", result, std::make_error_code(std::errc::illegal_byte_sequence));
 #else
                 appendUTF8(result, 0xfffd);
@@ -1708,14 +1537,10 @@ inline std::string toUtf8(const strT& unicodeString)
 template <typename charT>
 inline std::string toUtf8(const charT* unicodeString)
 {
-#ifdef GHC_WITH_STRING_VIEW
     return toUtf8(basic_string_view<charT, std::char_traits<charT>>(unicodeString));
-#else
-    return toUtf8(std::basic_string<charT, std::char_traits<charT>>(unicodeString));
-#endif
 }
 
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
 template <class StringType, class WString, typename std::enable_if<path::_is_basic_string<WString>::value && (sizeof(typename WString::value_type) == 2) && (sizeof(typename StringType::value_type) == 1), bool>::type = false>
 inline StringType fromWChar(const WString& wString, const typename StringType::allocator_type& alloc = typename StringType::allocator_type())
 {
@@ -1758,46 +1583,41 @@ inline std::wstring toWChar(const strT& unicodeString)
 template <typename charT>
 inline std::wstring toWChar(const charT* unicodeString)
 {
-#ifdef GHC_WITH_STRING_VIEW
     return toWChar(basic_string_view<charT, std::char_traits<charT>>(unicodeString));
-#else
-    return toWChar(std::basic_string<charT, std::char_traits<charT>>(unicodeString));
-#endif
 }
-#endif  // GHC_USE_WCHAR_T
+#endif  // TURBO_FS_USE_WCHAR_T
 
 }  // namespace detail
 
-#ifdef GHC_EXPAND_IMPL
 
 namespace detail {
 
 template <typename strT, typename std::enable_if<path::_is_basic_string<strT>::value, bool>::type = true>
-GHC_INLINE bool startsWith(const strT& what, const strT& with)
+inline bool startsWith(const strT& what, const strT& with)
 {
     return with.length() <= what.length() && equal(with.begin(), with.end(), what.begin());
 }
 
 template <typename strT, typename std::enable_if<path::_is_basic_string<strT>::value, bool>::type = true>
-GHC_INLINE bool endsWith(const strT& what, const strT& with)
+inline bool endsWith(const strT& what, const strT& with)
 {
     return with.length() <= what.length() && what.compare(what.length() - with.length(), with.size(), with) == 0;
 }
 
 }  // namespace detail
 
-GHC_INLINE void path::check_long_path()
+inline void path::check_long_path()
 {
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
-    if (is_absolute() && _path.length() >= MAX_PATH - 12 && !detail::startsWith(_path, impl_string_type(GHC_PLATFORM_LITERAL("\\\\?\\")))) {
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
+    if (is_absolute() && _path.length() >= MAX_PATH - 12 && !detail::startsWith(_path, impl_string_type(TURBO_LITERAL("\\\\?\\")))) {
         postprocess_path_with_format(native_format);
     }
 #endif
 }
 
-GHC_INLINE void path::postprocess_path_with_format(path::format fmt)
+inline void path::postprocess_path_with_format(path::format fmt)
 {
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
     if (!detail::validUtf8(_path)) {
         path t;
         t._path = _path;
@@ -1805,7 +1625,7 @@ GHC_INLINE void path::postprocess_path_with_format(path::format fmt)
     }
 #endif
     switch (fmt) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
         case path::native_format:
         case path::auto_format:
         case path::generic_format:
@@ -1814,9 +1634,9 @@ GHC_INLINE void path::postprocess_path_with_format(path::format fmt)
                     c = preferred_separator;
                 }
             }
-#ifdef GHC_WIN_AUTO_PREFIX_LONG_PATH
-            if (is_absolute() && _path.length() >= MAX_PATH - 12 && !detail::startsWith(_path, impl_string_type(GHC_PLATFORM_LITERAL("\\\\?\\")))) {
-                _path = GHC_PLATFORM_LITERAL("\\\\?\\") + _path;
+#ifdef TURBO_WIN_AUTO_PREFIX_LONG_PATH
+            if (is_absolute() && _path.length() >= MAX_PATH - 12 && !detail::startsWith(_path, impl_string_type(TURBO_LITERAL("\\\\?\\")))) {
+                _path = TURBO_LITERAL("\\\\?\\") + _path;
             }
 #endif
             handle_prefixes();
@@ -1839,11 +1659,10 @@ GHC_INLINE void path::postprocess_path_with_format(path::format fmt)
     }
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 template <class Source, typename>
 inline path::path(const Source& source, format fmt)
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     : _path(detail::toWChar(source))
 #else
     : _path(detail::toUtf8(source))
@@ -1870,13 +1689,12 @@ inline path::path(InputIterator first, InputIterator last, format fmt)
     // delegated
 }
 
-#ifdef GHC_EXPAND_IMPL
 
 namespace detail {
 
-GHC_INLINE bool equals_simple_insensitive(const path::value_type* str1, const path::value_type* str2)
+inline bool equals_simple_insensitive(const path::value_type* str1, const path::value_type* str2)
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 #ifdef __GNUC__
     while (::tolower((unsigned char)*str1) == ::tolower((unsigned char)*str2++)) {
         if (*str1++ == 0)
@@ -1884,18 +1702,18 @@ GHC_INLINE bool equals_simple_insensitive(const path::value_type* str1, const pa
     }
     return false;
 #else  // __GNUC__
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     return 0 == ::_wcsicmp(str1, str2);
-#else   // GHC_USE_WCHAR_T
+#else   // TURBO_FS_USE_WCHAR_T
     return 0 == ::_stricmp(str1, str2);
-#endif  // GHC_USE_WCHAR_T
+#endif  // TURBO_FS_USE_WCHAR_T
 #endif  // __GNUC__
-#else   // GHC_OS_WINDOWS
+#else   // TURBO_PLATFORM_WINDOWS
     return 0 == ::strcasecmp(str1, str2);
-#endif  // GHC_OS_WINDOWS
+#endif  // TURBO_PLATFORM_WINDOWS
 }
 
-GHC_INLINE int compare_simple_insensitive(const path::value_type* str1, size_t len1, const path::value_type* str2, size_t len2)
+inline int compare_simple_insensitive(const path::value_type* str1, size_t len1, const path::value_type* str2, size_t len2)
 {
     while (len1 > 0 && len2 > 0 && ::tolower(static_cast<unsigned char>(*str1)) == ::tolower(static_cast<unsigned char>(*str2))) {
         --len1;
@@ -1912,12 +1730,12 @@ GHC_INLINE int compare_simple_insensitive(const path::value_type* str1, size_t l
     return len1 == 0 ? -1 : 1;
 }
 
-GHC_INLINE const char* strerror_adapter(char* gnu, char*)
+inline const char* strerror_adapter(char* gnu, char*)
 {
     return gnu;
 }
 
-GHC_INLINE const char* strerror_adapter(int posix, char* buffer)
+inline const char* strerror_adapter(int posix, char* buffer)
 {
     if (posix) {
         return "Error in strerror_r!";
@@ -1926,9 +1744,9 @@ GHC_INLINE const char* strerror_adapter(int posix, char* buffer)
 }
 
 template <typename ErrorNumber>
-GHC_INLINE std::string systemErrorText(ErrorNumber code = 0)
+inline std::string systemErrorText(ErrorNumber code = 0)
 {
-#if defined(GHC_OS_WINDOWS)
+#if defined(TURBO_PLATFORM_WINDOWS)
     LPVOID msgBuf;
     DWORD dw = code ? static_cast<DWORD>(code) : ::GetLastError();
     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&msgBuf, 0, NULL);
@@ -1941,11 +1759,11 @@ GHC_INLINE std::string systemErrorText(ErrorNumber code = 0)
 #endif
 }
 
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 using CreateSymbolicLinkW_fp = BOOLEAN(WINAPI*)(LPCWSTR, LPCWSTR, DWORD);
 using CreateHardLinkW_fp = BOOLEAN(WINAPI*)(LPCWSTR, LPCWSTR, LPSECURITY_ATTRIBUTES);
 
-GHC_INLINE void create_symlink(const path& target_name, const path& new_symlink, bool to_directory, std::error_code& ec)
+inline void create_symlink(const path& target_name, const path& new_symlink, bool to_directory, std::error_code& ec)
 {
     std::error_code tec;
     auto fs = status(target_name, tec);
@@ -1962,9 +1780,9 @@ GHC_INLINE void create_symlink(const path& target_name, const path& new_symlink,
 #pragma GCC diagnostic pop
 #endif
     if (api_call) {
-        if (api_call(GHC_NATIVEWP(new_symlink), GHC_NATIVEWP(target_name), to_directory ? 1 : 0) == 0) {
+        if (api_call(TURBO_NATIVEWP(new_symlink), TURBO_NATIVEWP(target_name), to_directory ? 1 : 0) == 0) {
             auto result = ::GetLastError();
-            if (result == ERROR_PRIVILEGE_NOT_HELD && api_call(GHC_NATIVEWP(new_symlink), GHC_NATIVEWP(target_name), to_directory ? 3 : 2) != 0) {
+            if (result == ERROR_PRIVILEGE_NOT_HELD && api_call(TURBO_NATIVEWP(new_symlink), TURBO_NATIVEWP(target_name), to_directory ? 3 : 2) != 0) {
                 return;
             }
             ec = detail::make_system_error(result);
@@ -1975,7 +1793,7 @@ GHC_INLINE void create_symlink(const path& target_name, const path& new_symlink,
     }
 }
 
-GHC_INLINE void create_hardlink(const path& target_name, const path& new_hardlink, std::error_code& ec)
+inline void create_hardlink(const path& target_name, const path& new_hardlink, std::error_code& ec)
 {
 #if defined(__GNUC__) && __GNUC__ >= 8
 #pragma GCC diagnostic push
@@ -1986,7 +1804,7 @@ GHC_INLINE void create_hardlink(const path& target_name, const path& new_hardlin
 #pragma GCC diagnostic pop
 #endif
     if (api_call) {
-        if (api_call(GHC_NATIVEWP(new_hardlink), GHC_NATIVEWP(target_name), NULL) == 0) {
+        if (api_call(TURBO_NATIVEWP(new_hardlink), TURBO_NATIVEWP(target_name), NULL) == 0) {
             ec = detail::make_system_error();
         }
     }
@@ -1995,7 +1813,7 @@ GHC_INLINE void create_hardlink(const path& target_name, const path& new_hardlin
     }
 }
 
-GHC_INLINE path getFullPathName(const wchar_t* p, std::error_code& ec)
+inline path getFullPathName(const wchar_t* p, std::error_code& ec)
 {
     ULONG size = ::GetFullPathNameW(p, 0, 0, 0);
     if (size) {
@@ -2010,15 +1828,15 @@ GHC_INLINE path getFullPathName(const wchar_t* p, std::error_code& ec)
 }
 
 #else
-GHC_INLINE void create_symlink(const path& target_name, const path& new_symlink, bool, std::error_code& ec)
+inline void create_symlink(const path& target_name, const path& new_symlink, bool, std::error_code& ec)
 {
     if (::symlink(target_name.c_str(), new_symlink.c_str()) != 0) {
         ec = detail::make_system_error();
     }
 }
 
-#ifndef GHC_OS_WEB
-GHC_INLINE void create_hardlink(const path& target_name, const path& new_hardlink, std::error_code& ec)
+#ifndef TURBO_PLATFORM_WEB
+inline void create_hardlink(const path& target_name, const path& new_hardlink, std::error_code& ec)
 {
     if (::link(target_name.c_str(), new_hardlink.c_str()) != 0) {
         ec = detail::make_system_error();
@@ -2028,9 +1846,9 @@ GHC_INLINE void create_hardlink(const path& target_name, const path& new_hardlin
 #endif
 
 template <typename T>
-GHC_INLINE file_status file_status_from_st_mode(T mode)
+inline file_status file_status_from_st_mode(T mode)
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     file_type ft = file_type::unknown;
     if ((mode & _S_IFDIR) == _S_IFDIR) {
         ft = file_type::directory;
@@ -2071,7 +1889,7 @@ GHC_INLINE file_status file_status_from_st_mode(T mode)
 #endif
 }
 
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 
 class unique_handle
 {
@@ -2160,9 +1978,9 @@ struct free_deleter
     void operator()(T* p) const { std::free(p); }
 };
 
-GHC_INLINE std::unique_ptr<REPARSE_DATA_BUFFER, free_deleter<REPARSE_DATA_BUFFER>> getReparseData(const path& p, std::error_code& ec)
+inline std::unique_ptr<REPARSE_DATA_BUFFER, free_deleter<REPARSE_DATA_BUFFER>> getReparseData(const path& p, std::error_code& ec)
 {
-    unique_handle file(CreateFileW(GHC_NATIVEWP(p), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, 0));
+    unique_handle file(CreateFileW(TURBO_NATIVEWP(p), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, 0));
     if (!file) {
         ec = detail::make_system_error();
         return nullptr;
@@ -2180,9 +1998,9 @@ GHC_INLINE std::unique_ptr<REPARSE_DATA_BUFFER, free_deleter<REPARSE_DATA_BUFFER
 }
 #endif
 
-GHC_INLINE path resolveSymlink(const path& p, std::error_code& ec)
+inline path resolveSymlink(const path& p, std::error_code& ec)
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     path result;
     auto reparseData = detail::getReparseData(p, ec);
     if (!ec) {
@@ -2204,7 +2022,7 @@ GHC_INLINE path resolveSymlink(const path& p, std::error_code& ec)
                     break;
                 }
                 case IO_REPARSE_TAG_MOUNT_POINT:
-                    result = detail::getFullPathName(GHC_NATIVEWP(p), ec);
+                    result = detail::getFullPathName(TURBO_NATIVEWP(p), ec);
                     // result = std::wstring(&reparseData->MountPointReparseBuffer.PathBuffer[reparseData->MountPointReparseBuffer.SubstituteNameOffset / sizeof(WCHAR)], reparseData->MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
                     break;
                 default:
@@ -2231,8 +2049,8 @@ GHC_INLINE path resolveSymlink(const path& p, std::error_code& ec)
 #endif
 }
 
-#ifdef GHC_OS_WINDOWS
-GHC_INLINE time_t timeFromFILETIME(const FILETIME& ft)
+#ifdef TURBO_PLATFORM_WINDOWS
+inline time_t timeFromFILETIME(const FILETIME& ft)
 {
     ULARGE_INTEGER ull;
     ull.LowPart = ft.dwLowDateTime;
@@ -2240,7 +2058,7 @@ GHC_INLINE time_t timeFromFILETIME(const FILETIME& ft)
     return static_cast<time_t>(ull.QuadPart / 10000000ULL - 11644473600ULL);
 }
 
-GHC_INLINE void timeToFILETIME(time_t t, FILETIME& ft)
+inline void timeToFILETIME(time_t t, FILETIME& ft)
 {
     ULARGE_INTEGER ull;
     ull.QuadPart = static_cast<ULONGLONG>((t * 10000000LL) + 116444736000000000LL);
@@ -2249,31 +2067,31 @@ GHC_INLINE void timeToFILETIME(time_t t, FILETIME& ft)
 }
 
 template <typename INFO>
-GHC_INLINE uintmax_t hard_links_from_INFO(const INFO* info)
+inline uintmax_t hard_links_from_INFO(const INFO* info)
 {
     return static_cast<uintmax_t>(-1);
 }
 
 template <>
-GHC_INLINE uintmax_t hard_links_from_INFO<BY_HANDLE_FILE_INFORMATION>(const BY_HANDLE_FILE_INFORMATION* info)
+inline uintmax_t hard_links_from_INFO<BY_HANDLE_FILE_INFORMATION>(const BY_HANDLE_FILE_INFORMATION* info)
 {
     return info->nNumberOfLinks;
 }
 
 template <typename INFO>
-GHC_INLINE DWORD reparse_tag_from_INFO(const INFO*)
+inline DWORD reparse_tag_from_INFO(const INFO*)
 {
     return 0;
 }
 
 template <>
-GHC_INLINE DWORD reparse_tag_from_INFO(const WIN32_FIND_DATAW* info)
+inline DWORD reparse_tag_from_INFO(const WIN32_FIND_DATAW* info)
 {
     return info->dwReserved0;
 }
 
 template <typename INFO>
-GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::error_code& ec, uintmax_t* sz = nullptr, time_t* lwt = nullptr)
+inline file_status status_from_INFO(const path& p, const INFO* info, std::error_code& ec, uintmax_t* sz = nullptr, time_t* lwt = nullptr)
 {
     file_type ft = file_type::unknown;
     if (sizeof(INFO) == sizeof(WIN32_FIND_DATAW)) {
@@ -2315,21 +2133,21 @@ GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::er
 
 #endif
 
-GHC_INLINE bool is_not_found_error(std::error_code& ec)
+inline bool is_not_found_error(std::error_code& ec)
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return ec.value() == ERROR_FILE_NOT_FOUND || ec.value() == ERROR_PATH_NOT_FOUND || ec.value() == ERROR_INVALID_NAME;
 #else
     return ec.value() == ENOENT || ec.value() == ENOTDIR;
 #endif
 }
 
-GHC_INLINE file_status symlink_status_ex(const path& p, std::error_code& ec, uintmax_t* sz = nullptr, uintmax_t* nhl = nullptr, time_t* lwt = nullptr) noexcept
+inline file_status symlink_status_ex(const path& p, std::error_code& ec, uintmax_t* sz = nullptr, uintmax_t* nhl = nullptr, time_t* lwt = nullptr) noexcept
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     file_status fs;
     WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (!GetFileAttributesExW(GHC_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
+    if (!GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
         ec = detail::make_system_error();
     }
     else {
@@ -2362,16 +2180,16 @@ GHC_INLINE file_status symlink_status_ex(const path& p, std::error_code& ec, uin
 #endif
 }
 
-GHC_INLINE file_status status_ex(const path& p, std::error_code& ec, file_status* sls = nullptr, uintmax_t* sz = nullptr, uintmax_t* nhl = nullptr, time_t* lwt = nullptr, int recurse_count = 0) noexcept
+inline file_status status_ex(const path& p, std::error_code& ec, file_status* sls = nullptr, uintmax_t* sz = nullptr, uintmax_t* nhl = nullptr, time_t* lwt = nullptr, int recurse_count = 0) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     if (recurse_count > 16) {
         ec = detail::make_system_error(0x2A9 /*ERROR_STOPPED_ON_SYMLINK*/);
         return file_status(file_type::unknown);
     }
     WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (!::GetFileAttributesExW(GHC_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
+    if (!::GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
         ec = detail::make_system_error();
     }
     else if (attr.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
@@ -2444,14 +2262,14 @@ GHC_INLINE file_status status_ex(const path& p, std::error_code& ec, file_status
 
 }  // namespace detail
 
-GHC_INLINE u8arguments::u8arguments(int& argc, char**& argv)
+inline u8arguments::u8arguments(int& argc, char**& argv)
     : _argc(argc)
     , _argv(argv)
     , _refargc(argc)
     , _refargv(argv)
     , _isvalid(false)
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     LPWSTR* p;
     p = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
     _args.reserve(static_cast<size_t>(argc));
@@ -2478,33 +2296,32 @@ GHC_INLINE u8arguments::u8arguments(int& argc, char**& argv)
 //-----------------------------------------------------------------------------
 // [fs.path.construct] constructors and destructor
 
-GHC_INLINE path::path() noexcept {}
+inline path::path() noexcept {}
 
-GHC_INLINE path::path(const path& p)
+inline path::path(const path& p)
     : _path(p._path)
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     , _prefixLength(p._prefixLength)
 #endif
 {
 }
 
-GHC_INLINE path::path(path&& p) noexcept
+inline path::path(path&& p) noexcept
     : _path(std::move(p._path))
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     , _prefixLength(p._prefixLength)
 #endif
 {
 }
 
-GHC_INLINE path::path(string_type&& source, format fmt)
+inline path::path(string_type&& source, format fmt)
     : _path(std::move(source))
 {
     postprocess_path_with_format(fmt);
 }
 
-#endif  // GHC_EXPAND_IMPL
 
-#ifdef GHC_WITH_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
 template <class Source, typename>
 inline path::path(const Source& source, const std::locale& loc, format fmt)
     : path(source, fmt)
@@ -2524,46 +2341,45 @@ inline path::path(InputIterator first, InputIterator last, const std::locale& lo
         throw filesystem_error("This implementation only supports UTF-8 locales!", path(_path), detail::make_error_code(detail::portable_error::not_supported));
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-#ifdef GHC_EXPAND_IMPL
 
-GHC_INLINE path::~path() {}
+
+inline path::~path() {}
 
 //-----------------------------------------------------------------------------
 // [fs.path.assign] assignments
 
-GHC_INLINE path& path::operator=(const path& p)
+inline path& path::operator=(const path& p)
 {
     _path = p._path;
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     _prefixLength = p._prefixLength;
 #endif
     return *this;
 }
 
-GHC_INLINE path& path::operator=(path&& p) noexcept
+inline path& path::operator=(path&& p) noexcept
 {
     _path = std::move(p._path);
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     _prefixLength = p._prefixLength;
 #endif
     return *this;
 }
 
-GHC_INLINE path& path::operator=(path::string_type&& source)
+inline path& path::operator=(path::string_type&& source)
 {
     return assign(source);
 }
 
-GHC_INLINE path& path::assign(path::string_type&& source)
+inline path& path::assign(path::string_type&& source)
 {
     _path = std::move(source);
     postprocess_path_with_format(native_format);
     return *this;
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 template <class Source>
 inline path& path::operator=(const Source& source)
@@ -2574,7 +2390,7 @@ inline path& path::operator=(const Source& source)
 template <class Source>
 inline path& path::assign(const Source& source)
 {
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     _path.assign(detail::toWChar(source));
 #else
     _path.assign(detail::toUtf8(source));
@@ -2587,7 +2403,7 @@ template <>
 inline path& path::assign<path>(const path& source)
 {
     _path = source._path;
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     _prefixLength = source._prefixLength;
 #endif
     return *this;
@@ -2601,12 +2417,11 @@ inline path& path::assign(InputIterator first, InputIterator last)
     return *this;
 }
 
-#ifdef GHC_EXPAND_IMPL
 
 //-----------------------------------------------------------------------------
 // [fs.path.append] appends
 
-GHC_INLINE path& path::operator/=(const path& p)
+inline path& path::operator/=(const path& p)
 {
     if (p.empty()) {
         // was: if ((!has_root_directory() && is_absolute()) || has_filename())
@@ -2641,7 +2456,7 @@ GHC_INLINE path& path::operator/=(const path& p)
     return *this;
 }
 
-GHC_INLINE void path::append_name(const value_type* name)
+inline void path::append_name(const value_type* name)
 {
     if (_path.empty()) {
         this->operator/=(path(name));
@@ -2655,7 +2470,6 @@ GHC_INLINE void path::append_name(const value_type* name)
     }
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 template <class Source>
 inline path& path::operator/=(const Source& source)
@@ -2682,41 +2496,34 @@ inline path& path::append(InputIterator first, InputIterator last)
     return append(part);
 }
 
-#ifdef GHC_EXPAND_IMPL
 
 //-----------------------------------------------------------------------------
 // [fs.path.concat] concatenation
 
-GHC_INLINE path& path::operator+=(const path& x)
+inline path& path::operator+=(const path& x)
 {
     return concat(x._path);
 }
 
-GHC_INLINE path& path::operator+=(const string_type& x)
+inline path& path::operator+=(const string_type& x)
 {
     return concat(x);
 }
 
-#ifdef GHC_WITH_STRING_VIEW
-GHC_INLINE path& path::operator+=(basic_string_view<value_type> x)
+inline path& path::operator+=(basic_string_view<value_type> x)
 {
     return concat(x);
 }
-#endif
 
-GHC_INLINE path& path::operator+=(const value_type* x)
+inline path& path::operator+=(const value_type* x)
 {
-#ifdef GHC_WITH_STRING_VIEW
     basic_string_view<value_type> part(x);
-#else
-    string_type part(x);
-#endif
     return concat(part);
 }
 
-GHC_INLINE path& path::operator+=(value_type x)
+inline path& path::operator+=(value_type x)
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     if (x == generic_separator) {
         x = preferred_separator;
     }
@@ -2728,7 +2535,6 @@ GHC_INLINE path& path::operator+=(value_type x)
     return *this;
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 template <class Source>
 inline path::path_from_string<Source>& path::operator+=(const Source& x)
@@ -2739,11 +2545,7 @@ inline path::path_from_string<Source>& path::operator+=(const Source& x)
 template <class EcharT>
 inline path::path_type_EcharT<EcharT>& path::operator+=(EcharT x)
 {
-#ifdef GHC_WITH_STRING_VIEW
     basic_string_view<EcharT> part(&x, 1);
-#else
-    std::basic_string<EcharT> part(1, x);
-#endif
     concat(part);
     return *this;
 }
@@ -2764,26 +2566,25 @@ inline path& path::concat(InputIterator first, InputIterator last)
     return *this;
 }
 
-#ifdef GHC_EXPAND_IMPL
 
 //-----------------------------------------------------------------------------
 // [fs.path.modifiers] modifiers
-GHC_INLINE void path::clear() noexcept
+inline void path::clear() noexcept
 {
     _path.clear();
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     _prefixLength = 0;
 #endif
 }
 
-GHC_INLINE path& path::make_preferred()
+inline path& path::make_preferred()
 {
     // as this filesystem implementation only uses generic_format
     // internally, this must be a no-op
     return *this;
 }
 
-GHC_INLINE path& path::remove_filename()
+inline path& path::remove_filename()
 {
     if (has_filename()) {
         _path.erase(_path.size() - filename()._path.size());
@@ -2791,13 +2592,13 @@ GHC_INLINE path& path::remove_filename()
     return *this;
 }
 
-GHC_INLINE path& path::replace_filename(const path& replacement)
+inline path& path::replace_filename(const path& replacement)
 {
     remove_filename();
     return append(replacement);
 }
 
-GHC_INLINE path& path::replace_extension(const path& replacement)
+inline path& path::replace_extension(const path& replacement)
 {
     if (has_extension()) {
         _path.erase(_path.size() - extension()._path.size());
@@ -2808,76 +2609,74 @@ GHC_INLINE path& path::replace_extension(const path& replacement)
     return concat(replacement);
 }
 
-GHC_INLINE void path::swap(path& rhs) noexcept
+inline void path::swap(path& rhs) noexcept
 {
     _path.swap(rhs._path);
-#if defined(GHC_OS_WINDOWS) && defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     std::swap(_prefixLength, rhs._prefixLength);
 #endif
 }
 
 //-----------------------------------------------------------------------------
 // [fs.path.native.obs] native format observers
-GHC_INLINE const path::string_type& path::native() const noexcept
+inline const path::string_type& path::native() const noexcept
 {
     return _path;
 }
 
-GHC_INLINE const path::value_type* path::c_str() const noexcept
+inline const path::value_type* path::c_str() const noexcept
 {
     return native().c_str();
 }
 
-GHC_INLINE path::operator path::string_type() const
+inline path::operator path::string_type() const
 {
     return native();
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 template <class EcharT, class traits, class Allocator>
 inline std::basic_string<EcharT, traits, Allocator> path::string(const Allocator& a) const
 {
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     return detail::fromWChar<std::basic_string<EcharT, traits, Allocator>>(_path, a);
 #else
     return detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(_path, a);
 #endif
 }
 
-#ifdef GHC_EXPAND_IMPL
 
-GHC_INLINE std::string path::string() const
+inline std::string path::string() const
 {
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     return detail::toUtf8(native());
 #else
     return native();
 #endif
 }
 
-GHC_INLINE std::wstring path::wstring() const
+inline std::wstring path::wstring() const
 {
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     return native();
 #else
     return detail::fromUtf8<std::wstring>(native());
 #endif
 }
 
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
-GHC_INLINE std::u8string path::u8string() const
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
+inline std::u8string path::u8string() const
 {
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     return std::u8string(reinterpret_cast<const char8_t*>(detail::toUtf8(native()).c_str()));
 #else
     return std::u8string(reinterpret_cast<const char8_t*>(c_str()));
 #endif
 }
 #else
-GHC_INLINE std::string path::u8string() const
+inline std::string path::u8string() const
 {
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
     return detail::toUtf8(native());
 #else
     return native();
@@ -2885,27 +2684,26 @@ GHC_INLINE std::string path::u8string() const
 }
 #endif
 
-GHC_INLINE std::u16string path::u16string() const
+inline std::u16string path::u16string() const
 {
     // TODO: optimize
     return detail::fromUtf8<std::u16string>(string());
 }
 
-GHC_INLINE std::u32string path::u32string() const
+inline std::u32string path::u32string() const
 {
     // TODO: optimize
     return detail::fromUtf8<std::u32string>(string());
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 //-----------------------------------------------------------------------------
 // [fs.path.generic.obs] generic format observers
 template <class EcharT, class traits, class Allocator>
 inline std::basic_string<EcharT, traits, Allocator> path::generic_string(const Allocator& a) const
 {
-#ifdef GHC_OS_WINDOWS
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_PLATFORM_WINDOWS
+#ifdef TURBO_FS_USE_WCHAR_T
     auto result = detail::fromWChar<std::basic_string<EcharT, traits, Allocator>, path::string_type>(_path, a);
 #else
     auto result = detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(_path, a);
@@ -2921,39 +2719,38 @@ inline std::basic_string<EcharT, traits, Allocator> path::generic_string(const A
 #endif
 }
 
-#ifdef GHC_EXPAND_IMPL
 
-GHC_INLINE std::string path::generic_string() const
+inline std::string path::generic_string() const
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return generic_string<std::string::value_type, std::string::traits_type, std::string::allocator_type>();
 #else
     return _path;
 #endif
 }
 
-GHC_INLINE std::wstring path::generic_wstring() const
+inline std::wstring path::generic_wstring() const
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return generic_string<std::wstring::value_type, std::wstring::traits_type, std::wstring::allocator_type>();
 #else
     return detail::fromUtf8<std::wstring>(_path);
 #endif
 }  // namespace filesystem
 
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
-GHC_INLINE std::u8string path::generic_u8string() const
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
+inline std::u8string path::generic_u8string() const
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return generic_string<std::u8string::value_type, std::u8string::traits_type, std::u8string::allocator_type>();
 #else
     return std::u8string(reinterpret_cast<const char8_t*>(_path.c_str()));
 #endif
 }
 #else
-GHC_INLINE std::string path::generic_u8string() const
+inline std::string path::generic_u8string() const
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return generic_string<std::string::value_type, std::string::traits_type, std::string::allocator_type>();
 #else
     return _path;
@@ -2961,18 +2758,18 @@ GHC_INLINE std::string path::generic_u8string() const
 }
 #endif
 
-GHC_INLINE std::u16string path::generic_u16string() const
+inline std::u16string path::generic_u16string() const
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return generic_string<std::u16string::value_type, std::u16string::traits_type, std::u16string::allocator_type>();
 #else
     return detail::fromUtf8<std::u16string>(_path);
 #endif
 }
 
-GHC_INLINE std::u32string path::generic_u32string() const
+inline std::u32string path::generic_u32string() const
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return generic_string<std::u32string::value_type, std::u32string::traits_type, std::u32string::allocator_type>();
 #else
     return detail::fromUtf8<std::u32string>(_path);
@@ -2981,12 +2778,12 @@ GHC_INLINE std::u32string path::generic_u32string() const
 
 //-----------------------------------------------------------------------------
 // [fs.path.compare] compare
-GHC_INLINE int path::compare(const path& p) const noexcept
+inline int path::compare(const path& p) const noexcept
 {
 #ifdef LWG_2936_BEHAVIOUR
     auto rnl1 = root_name_length();
     auto rnl2 = p.root_name_length();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     auto rnc = detail::compare_simple_insensitive(_path.c_str(), rnl1, p._path.c_str(), rnl2);
 #else
     auto rnc = _path.compare(0, rnl1, p._path, 0, (std::min(rnl1, rnl2)));
@@ -3022,7 +2819,7 @@ GHC_INLINE int path::compare(const path& p) const noexcept
     }
     return *iter1 < *iter2 ? -1 : 1;
 #else  // LWG_2936_BEHAVIOUR
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     auto rnl1 = root_name_length();
     auto rnl2 = p.root_name_length();
     auto rnc = detail::compare_simple_insensitive(_path.c_str(), rnl1, p._path.c_str(), rnl2);
@@ -3036,42 +2833,40 @@ GHC_INLINE int path::compare(const path& p) const noexcept
 #endif
 }
 
-GHC_INLINE int path::compare(const string_type& s) const
+inline int path::compare(const string_type& s) const
 {
     return compare(path(s));
 }
 
-#ifdef GHC_WITH_STRING_VIEW
-GHC_INLINE int path::compare(basic_string_view<value_type> s) const
+inline int path::compare(basic_string_view<value_type> s) const
 {
     return compare(path(s));
 }
-#endif
 
-GHC_INLINE int path::compare(const value_type* s) const
+inline int path::compare(const value_type* s) const
 {
     return compare(path(s));
 }
 
 //-----------------------------------------------------------------------------
 // [fs.path.decompose] decomposition
-#ifdef GHC_OS_WINDOWS
-GHC_INLINE void path::handle_prefixes()
+#ifdef TURBO_PLATFORM_WINDOWS
+inline void path::handle_prefixes()
 {
-#if defined(GHC_WIN_AUTO_PREFIX_LONG_PATH)
+#if defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
     _prefixLength = 0;
     if (_path.length() >= 6 && _path[2] == '?' && std::toupper(static_cast<unsigned char>(_path[4])) >= 'A' && std::toupper(static_cast<unsigned char>(_path[4])) <= 'Z' && _path[5] == ':') {
-        if (detail::startsWith(_path, impl_string_type(GHC_PLATFORM_LITERAL("\\\\?\\"))) || detail::startsWith(_path, impl_string_type(GHC_PLATFORM_LITERAL("\\??\\")))) {
+        if (detail::startsWith(_path, impl_string_type(TURBO_LITERAL("\\\\?\\"))) || detail::startsWith(_path, impl_string_type(TURBO_LITERAL("\\??\\")))) {
             _prefixLength = 4;
         }
     }
-#endif  // GHC_WIN_AUTO_PREFIX_LONG_PATH
+#endif  // TURBO_WIN_AUTO_PREFIX_LONG_PATH
 }
 #endif
 
-GHC_INLINE path::string_type::size_type path::root_name_length() const noexcept
+inline path::string_type::size_type path::root_name_length() const noexcept
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     if (_path.length() >= _prefixLength + 2 && std::toupper(static_cast<unsigned char>(_path[_prefixLength])) >= 'A' && std::toupper(static_cast<unsigned char>(_path[_prefixLength])) <= 'Z' && _path[_prefixLength + 1] == ':') {
         return 2;
     }
@@ -3088,12 +2883,12 @@ GHC_INLINE path::string_type::size_type path::root_name_length() const noexcept
     return 0;
 }
 
-GHC_INLINE path path::root_name() const
+inline path path::root_name() const
 {
     return path(_path.substr(_prefixLength, root_name_length()), native_format);
 }
 
-GHC_INLINE path path::root_directory() const
+inline path path::root_directory() const
 {
     if (has_root_directory()) {
         static const path _root_dir(std::string(1, preferred_separator), native_format);
@@ -3102,18 +2897,18 @@ GHC_INLINE path path::root_directory() const
     return path();
 }
 
-GHC_INLINE path path::root_path() const
+inline path path::root_path() const
 {
     return path(root_name().string() + root_directory().string(), native_format);
 }
 
-GHC_INLINE path path::relative_path() const
+inline path path::relative_path() const
 {
     auto rootPathLen = _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
     return path(_path.substr((std::min)(rootPathLen, _path.length())), generic_format);
 }
 
-GHC_INLINE path path::parent_path() const
+inline path path::parent_path() const
 {
     auto rootPathLen = _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
     if (rootPathLen < _path.length()) {
@@ -3134,12 +2929,12 @@ GHC_INLINE path path::parent_path() const
     }
 }
 
-GHC_INLINE path path::filename() const
+inline path path::filename() const
 {
     return !has_relative_path() ? path() : path(*--end());
 }
 
-GHC_INLINE path path::stem() const
+inline path path::stem() const
 {
     impl_string_type fn = filename().native();
     if (fn != "." && fn != "..") {
@@ -3151,7 +2946,7 @@ GHC_INLINE path path::stem() const
     return path{fn, native_format};
 }
 
-GHC_INLINE path path::extension() const
+inline path path::extension() const
 {
     if (has_relative_path()) {
         auto iter = end();
@@ -3164,9 +2959,9 @@ GHC_INLINE path path::extension() const
     return path();
 }
 
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 namespace detail {
-GHC_INLINE bool has_executable_extension(const path& p)
+inline bool has_executable_extension(const path& p)
 {
     if (p.has_relative_path()) {
         auto iter = p.end();
@@ -3176,8 +2971,8 @@ GHC_INLINE bool has_executable_extension(const path& p)
             return false;
         }
         const path::value_type* ext = fn._path.c_str() + pos + 1;
-        if (detail::equals_simple_insensitive(ext, GHC_PLATFORM_LITERAL("exe")) || detail::equals_simple_insensitive(ext, GHC_PLATFORM_LITERAL("cmd")) || detail::equals_simple_insensitive(ext, GHC_PLATFORM_LITERAL("bat")) ||
-            detail::equals_simple_insensitive(ext, GHC_PLATFORM_LITERAL("com"))) {
+        if (detail::equals_simple_insensitive(ext, TURBO_LITERAL("exe")) || detail::equals_simple_insensitive(ext, TURBO_LITERAL("cmd")) || detail::equals_simple_insensitive(ext, TURBO_LITERAL("bat")) ||
+            detail::equals_simple_insensitive(ext, TURBO_LITERAL("com"))) {
             return true;
         }
     }
@@ -3188,70 +2983,70 @@ GHC_INLINE bool has_executable_extension(const path& p)
 
 //-----------------------------------------------------------------------------
 // [fs.path.query] query
-GHC_INLINE bool path::empty() const noexcept
+inline bool path::empty() const noexcept
 {
     return _path.empty();
 }
 
-GHC_INLINE bool path::has_root_name() const
+inline bool path::has_root_name() const
 {
     return root_name_length() > 0;
 }
 
-GHC_INLINE bool path::has_root_directory() const
+inline bool path::has_root_directory() const
 {
     auto rootLen = _prefixLength + root_name_length();
     return (_path.length() > rootLen && _path[rootLen] == preferred_separator);
 }
 
-GHC_INLINE bool path::has_root_path() const
+inline bool path::has_root_path() const
 {
     return has_root_name() || has_root_directory();
 }
 
-GHC_INLINE bool path::has_relative_path() const
+inline bool path::has_relative_path() const
 {
     auto rootPathLen = _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
     return rootPathLen < _path.length();
 }
 
-GHC_INLINE bool path::has_parent_path() const
+inline bool path::has_parent_path() const
 {
     return !parent_path().empty();
 }
 
-GHC_INLINE bool path::has_filename() const
+inline bool path::has_filename() const
 {
     return has_relative_path() && !filename().empty();
 }
 
-GHC_INLINE bool path::has_stem() const
+inline bool path::has_stem() const
 {
     return !stem().empty();
 }
 
-GHC_INLINE bool path::has_extension() const
+inline bool path::has_extension() const
 {
     return !extension().empty();
 }
 
-GHC_INLINE bool path::is_absolute() const
+inline bool path::is_absolute() const
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     return has_root_name() && has_root_directory();
 #else
     return has_root_directory();
 #endif
 }
 
-GHC_INLINE bool path::is_relative() const
+inline bool path::is_relative() const
 {
     return !is_absolute();
 }
 
 //-----------------------------------------------------------------------------
 // [fs.path.gen] generation
-GHC_INLINE path path::lexically_normal() const
+inline path path::lexically_normal() const
 {
     path dest;
     bool lastDotDot = false;
@@ -3284,7 +3079,7 @@ GHC_INLINE path path::lexically_normal() const
     return dest;
 }
 
-GHC_INLINE path path::lexically_relative(const path& base) const
+inline path path::lexically_relative(const path& base) const
 {
     if (root_name() != base.root_name() || is_absolute() != base.is_absolute() || (!has_root_directory() && base.has_root_directory())) {
         return path();
@@ -3319,7 +3114,7 @@ GHC_INLINE path path::lexically_relative(const path& base) const
     return result;
 }
 
-GHC_INLINE path path::lexically_proximate(const path& base) const
+inline path path::lexically_proximate(const path& base) const
 {
     path result = lexically_relative(base);
     return result.empty() ? *this : result;
@@ -3327,9 +3122,9 @@ GHC_INLINE path path::lexically_proximate(const path& base) const
 
 //-----------------------------------------------------------------------------
 // [fs.path.itr] iterators
-GHC_INLINE path::iterator::iterator() {}
+inline path::iterator::iterator() {}
 
-GHC_INLINE path::iterator::iterator(const path& p, const impl_string_type::const_iterator& pos)
+inline path::iterator::iterator(const path& p, const impl_string_type::const_iterator& pos)
     : _first(p._path.begin())
     , _last(p._path.end())
     , _prefix(_first + static_cast<string_type::difference_type>(p._prefixLength))
@@ -3341,7 +3136,7 @@ GHC_INLINE path::iterator::iterator(const path& p, const impl_string_type::const
     }
 }
 
-GHC_INLINE path::impl_string_type::const_iterator path::iterator::increment(const path::impl_string_type::const_iterator& pos) const
+inline path::impl_string_type::const_iterator path::iterator::increment(const path::impl_string_type::const_iterator& pos) const
 {
     path::impl_string_type::const_iterator i = pos;
     bool fromStart = i == _first || i == _prefix;
@@ -3377,7 +3172,7 @@ GHC_INLINE path::impl_string_type::const_iterator path::iterator::increment(cons
     return i;
 }
 
-GHC_INLINE path::impl_string_type::const_iterator path::iterator::decrement(const path::impl_string_type::const_iterator& pos) const
+inline path::impl_string_type::const_iterator path::iterator::decrement(const path::impl_string_type::const_iterator& pos) const
 {
     path::impl_string_type::const_iterator i = pos;
     if (i != _first) {
@@ -3385,8 +3180,8 @@ GHC_INLINE path::impl_string_type::const_iterator path::iterator::decrement(cons
         // if this is now the root slash or the trailing slash, we are done,
         // else check for network name
         if (i != _root && (pos != _last || *i != preferred_separator)) {
-#ifdef GHC_OS_WINDOWS
-            static const impl_string_type seps = GHC_PLATFORM_LITERAL("\\:");
+#ifdef TURBO_PLATFORM_WINDOWS
+            static const impl_string_type seps = TURBO_LITERAL("\\:");
             i = std::find_first_of(std::reverse_iterator<path::impl_string_type::const_iterator>(i), std::reverse_iterator<path::impl_string_type::const_iterator>(_first), seps.begin(), seps.end()).base();
             if (i > _first && *i == ':') {
                 i++;
@@ -3403,7 +3198,7 @@ GHC_INLINE path::impl_string_type::const_iterator path::iterator::decrement(cons
     return i;
 }
 
-GHC_INLINE void path::iterator::updateCurrent()
+inline void path::iterator::updateCurrent()
 {
     if ((_iter == _last) || (_iter != _first && _iter != _last && (*_iter == preferred_separator && _iter != _root) && (_iter + 1 == _last))) {
         _current.clear();
@@ -3413,7 +3208,7 @@ GHC_INLINE void path::iterator::updateCurrent()
     }
 }
 
-GHC_INLINE path::iterator& path::iterator::operator++()
+inline path::iterator& path::iterator::operator++()
 {
     _iter = increment(_iter);
     while (_iter != _last &&                 // we didn't reach the end
@@ -3427,114 +3222,113 @@ GHC_INLINE path::iterator& path::iterator::operator++()
     return *this;
 }
 
-GHC_INLINE path::iterator path::iterator::operator++(int)
+inline path::iterator path::iterator::operator++(int)
 {
     path::iterator i{*this};
     ++(*this);
     return i;
 }
 
-GHC_INLINE path::iterator& path::iterator::operator--()
+inline path::iterator& path::iterator::operator--()
 {
     _iter = decrement(_iter);
     updateCurrent();
     return *this;
 }
 
-GHC_INLINE path::iterator path::iterator::operator--(int)
+inline path::iterator path::iterator::operator--(int)
 {
     auto i = *this;
     --(*this);
     return i;
 }
 
-GHC_INLINE bool path::iterator::operator==(const path::iterator& other) const
+inline bool path::iterator::operator==(const path::iterator& other) const
 {
     return _iter == other._iter;
 }
 
-GHC_INLINE bool path::iterator::operator!=(const path::iterator& other) const
+inline bool path::iterator::operator!=(const path::iterator& other) const
 {
     return _iter != other._iter;
 }
 
-GHC_INLINE path::iterator::reference path::iterator::operator*() const
+inline path::iterator::reference path::iterator::operator*() const
 {
     return _current;
 }
 
-GHC_INLINE path::iterator::pointer path::iterator::operator->() const
+inline path::iterator::pointer path::iterator::operator->() const
 {
     return &_current;
 }
 
-GHC_INLINE path::iterator path::begin() const
+inline path::iterator path::begin() const
 {
     return iterator(*this, _path.begin());
 }
 
-GHC_INLINE path::iterator path::end() const
+inline path::iterator path::end() const
 {
     return iterator(*this, _path.end());
 }
 
 //-----------------------------------------------------------------------------
 // [fs.path.nonmember] path non-member functions
-GHC_INLINE void swap(path& lhs, path& rhs) noexcept
+inline void swap(path& lhs, path& rhs) noexcept
 {
     swap(lhs._path, rhs._path);
 }
 
-GHC_INLINE size_t hash_value(const path& p) noexcept
+inline size_t hash_value(const path& p) noexcept
 {
     return std::hash<std::string>()(p.generic_string());
 }
 
-#ifdef GHC_HAS_THREEWAY_COMP
-GHC_INLINE std::strong_ordering operator<=>(const path& lhs, const path& rhs) noexcept
+#ifdef TURBO_HAVE_THREEWAY_COMP
+inline std::strong_ordering operator<=>(const path& lhs, const path& rhs) noexcept
 {
     return lhs.compare(rhs) <=> 0;
 }
 #endif
 
-GHC_INLINE bool operator==(const path& lhs, const path& rhs) noexcept
+inline bool operator==(const path& lhs, const path& rhs) noexcept
 {
     return lhs.compare(rhs) == 0;
 }
 
-GHC_INLINE bool operator!=(const path& lhs, const path& rhs) noexcept
+inline bool operator!=(const path& lhs, const path& rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
-GHC_INLINE bool operator<(const path& lhs, const path& rhs) noexcept
+inline bool operator<(const path& lhs, const path& rhs) noexcept
 {
     return lhs.compare(rhs) < 0;
 }
 
-GHC_INLINE bool operator<=(const path& lhs, const path& rhs) noexcept
+inline bool operator<=(const path& lhs, const path& rhs) noexcept
 {
     return lhs.compare(rhs) <= 0;
 }
 
-GHC_INLINE bool operator>(const path& lhs, const path& rhs) noexcept
+inline bool operator>(const path& lhs, const path& rhs) noexcept
 {
     return lhs.compare(rhs) > 0;
 }
 
-GHC_INLINE bool operator>=(const path& lhs, const path& rhs) noexcept
+inline bool operator>=(const path& lhs, const path& rhs) noexcept
 {
     return lhs.compare(rhs) >= 0;
 }
 
-GHC_INLINE path operator/(const path& lhs, const path& rhs)
+inline path operator/(const path& lhs, const path& rhs)
 {
     path result(lhs);
     result /= rhs;
     return result;
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 //-----------------------------------------------------------------------------
 // [fs.path.io] path inserter and extractor
@@ -3591,18 +3385,17 @@ inline std::basic_istream<charT, traits>& operator>>(std::basic_istream<charT, t
     return is;
 }
 
-#ifdef GHC_EXPAND_IMPL
 
 //-----------------------------------------------------------------------------
 // [fs.class.filesystem_error] Class filesystem_error
-GHC_INLINE filesystem_error::filesystem_error(const std::string& what_arg, std::error_code ec)
+inline filesystem_error::filesystem_error(const std::string& what_arg, std::error_code ec)
     : std::system_error(ec, what_arg)
     , _what_arg(what_arg)
     , _ec(ec)
 {
 }
 
-GHC_INLINE filesystem_error::filesystem_error(const std::string& what_arg, const path& p1, std::error_code ec)
+inline filesystem_error::filesystem_error(const std::string& what_arg, const path& p1, std::error_code ec)
     : std::system_error(ec, what_arg)
     , _what_arg(what_arg)
     , _ec(ec)
@@ -3613,7 +3406,7 @@ GHC_INLINE filesystem_error::filesystem_error(const std::string& what_arg, const
     }
 }
 
-GHC_INLINE filesystem_error::filesystem_error(const std::string& what_arg, const path& p1, const path& p2, std::error_code ec)
+inline filesystem_error::filesystem_error(const std::string& what_arg, const path& p1, const path& p2, std::error_code ec)
     : std::system_error(ec, what_arg)
     , _what_arg(what_arg)
     , _ec(ec)
@@ -3628,25 +3421,25 @@ GHC_INLINE filesystem_error::filesystem_error(const std::string& what_arg, const
     }
 }
 
-GHC_INLINE const path& filesystem_error::path1() const noexcept
+inline const path& filesystem_error::path1() const noexcept
 {
     return _p1;
 }
 
-GHC_INLINE const path& filesystem_error::path2() const noexcept
+inline const path& filesystem_error::path2() const noexcept
 {
     return _p2;
 }
 
-GHC_INLINE const char* filesystem_error::what() const noexcept
+inline const char* filesystem_error::what() const noexcept
 {
     return _what_arg.c_str();
 }
 
 //-----------------------------------------------------------------------------
 // [fs.op.funcs] filesystem operations
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path absolute(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path absolute(const path& p)
 {
     std::error_code ec;
     path result = absolute(p, ec);
@@ -3655,19 +3448,19 @@ GHC_INLINE path absolute(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path absolute(const path& p, std::error_code& ec)
+inline path absolute(const path& p, std::error_code& ec)
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     if (p.empty()) {
         return absolute(current_path(ec), ec) / "";
     }
-    ULONG size = ::GetFullPathNameW(GHC_NATIVEWP(p), 0, 0, 0);
+    ULONG size = ::GetFullPathNameW(TURBO_NATIVEWP(p), 0, 0, 0);
     if (size) {
         std::vector<wchar_t> buf(size, 0);
-        ULONG s2 = GetFullPathNameW(GHC_NATIVEWP(p), size, buf.data(), nullptr);
+        ULONG s2 = GetFullPathNameW(TURBO_NATIVEWP(p), size, buf.data(), nullptr);
         if (s2 && s2 < size) {
             path result = path(std::wstring(buf.data(), s2));
             if (p.filename() == ".") {
@@ -3706,8 +3499,8 @@ GHC_INLINE path absolute(const path& p, std::error_code& ec)
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path canonical(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path canonical(const path& p)
 {
     std::error_code ec;
     auto result = canonical(p, ec);
@@ -3716,9 +3509,9 @@ GHC_INLINE path canonical(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path canonical(const path& p, std::error_code& ec)
+inline path canonical(const path& p, std::error_code& ec)
 {
     if (p.empty()) {
         ec = detail::make_error_code(detail::portable_error::not_found);
@@ -3781,13 +3574,13 @@ GHC_INLINE path canonical(const path& p, std::error_code& ec)
     return result;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void copy(const path& from, const path& to)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void copy(const path& from, const path& to)
 {
     copy(from, to, copy_options::none);
 }
 
-GHC_INLINE void copy(const path& from, const path& to, copy_options options)
+inline void copy(const path& from, const path& to, copy_options options)
 {
     std::error_code ec;
     copy(from, to, options, ec);
@@ -3795,14 +3588,14 @@ GHC_INLINE void copy(const path& from, const path& to, copy_options options)
         throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void copy(const path& from, const path& to, std::error_code& ec) noexcept
+inline void copy(const path& from, const path& to, std::error_code& ec) noexcept
 {
     copy(from, to, copy_options::none, ec);
 }
 
-GHC_INLINE void copy(const path& from, const path& to, copy_options options, std::error_code& ec) noexcept
+inline void copy(const path& from, const path& to, copy_options options, std::error_code& ec) noexcept
 {
     std::error_code tec;
     file_status fs_from, fs_to;
@@ -3843,7 +3636,7 @@ GHC_INLINE void copy(const path& from, const path& to, copy_options options, std
             if ((options & copy_options::create_symlinks) != copy_options::none) {
                 create_symlink(from.is_absolute() ? from : canonical(from, ec), to, ec);
             }
-#ifndef GHC_OS_WEB
+#ifndef TURBO_PLATFORM_WEB
             else if ((options & copy_options::create_hard_links) != copy_options::none) {
                 create_hard_link(from, to, ec);
             }
@@ -3880,13 +3673,13 @@ GHC_INLINE void copy(const path& from, const path& to, copy_options options, std
     return;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool copy_file(const path& from, const path& to)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool copy_file(const path& from, const path& to)
 {
     return copy_file(from, to, copy_options::none);
 }
 
-GHC_INLINE bool copy_file(const path& from, const path& to, copy_options option)
+inline bool copy_file(const path& from, const path& to, copy_options option)
 {
     std::error_code ec;
     auto result = copy_file(from, to, option, ec);
@@ -3895,14 +3688,14 @@ GHC_INLINE bool copy_file(const path& from, const path& to, copy_options option)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool copy_file(const path& from, const path& to, std::error_code& ec) noexcept
+inline bool copy_file(const path& from, const path& to, std::error_code& ec) noexcept
 {
     return copy_file(from, to, copy_options::none, ec);
 }
 
-GHC_INLINE bool copy_file(const path& from, const path& to, copy_options options, std::error_code& ec) noexcept
+inline bool copy_file(const path& from, const path& to, copy_options options, std::error_code& ec) noexcept
 {
     std::error_code tecf, tect;
     auto sf = status(from, tecf);
@@ -3935,8 +3728,8 @@ GHC_INLINE bool copy_file(const path& from, const path& to, copy_options options
         }
         overwrite = true;
     }
-#ifdef GHC_OS_WINDOWS
-    if (!::CopyFileW(GHC_NATIVEWP(from), GHC_NATIVEWP(to), !overwrite)) {
+#ifdef TURBO_PLATFORM_WINDOWS
+    if (!::CopyFileW(TURBO_NATIVEWP(from), TURBO_NATIVEWP(to), !overwrite)) {
         ec = detail::make_system_error();
         return false;
     }
@@ -3979,8 +3772,8 @@ GHC_INLINE bool copy_file(const path& from, const path& to, copy_options options
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void copy_symlink(const path& existing_symlink, const path& new_symlink)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void copy_symlink(const path& existing_symlink, const path& new_symlink)
 {
     std::error_code ec;
     copy_symlink(existing_symlink, new_symlink, ec);
@@ -3988,9 +3781,9 @@ GHC_INLINE void copy_symlink(const path& existing_symlink, const path& new_symli
         throw filesystem_error(detail::systemErrorText(ec.value()), existing_symlink, new_symlink, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void copy_symlink(const path& existing_symlink, const path& new_symlink, std::error_code& ec) noexcept
+inline void copy_symlink(const path& existing_symlink, const path& new_symlink, std::error_code& ec) noexcept
 {
     ec.clear();
     auto to = read_symlink(existing_symlink, ec);
@@ -4004,8 +3797,8 @@ GHC_INLINE void copy_symlink(const path& existing_symlink, const path& new_symli
     }
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool create_directories(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool create_directories(const path& p)
 {
     std::error_code ec;
     auto result = create_directories(p, ec);
@@ -4014,9 +3807,9 @@ GHC_INLINE bool create_directories(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool create_directories(const path& p, std::error_code& ec) noexcept
+inline bool create_directories(const path& p, std::error_code& ec) noexcept
 {
     path current;
     ec.clear();
@@ -4055,8 +3848,8 @@ GHC_INLINE bool create_directories(const path& p, std::error_code& ec) noexcept
     return didCreate;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool create_directory(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool create_directory(const path& p)
 {
     std::error_code ec;
     auto result = create_directory(p, path(), ec);
@@ -4065,15 +3858,15 @@ GHC_INLINE bool create_directory(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool create_directory(const path& p, std::error_code& ec) noexcept
+inline bool create_directory(const path& p, std::error_code& ec) noexcept
 {
     return create_directory(p, path(), ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool create_directory(const path& p, const path& attributes)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool create_directory(const path& p, const path& attributes)
 {
     std::error_code ec;
     auto result = create_directory(p, attributes, ec);
@@ -4082,9 +3875,9 @@ GHC_INLINE bool create_directory(const path& p, const path& attributes)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool create_directory(const path& p, const path& attributes, std::error_code& ec) noexcept
+inline bool create_directory(const path& p, const path& attributes, std::error_code& ec) noexcept
 {
     std::error_code tec;
     ec.clear();
@@ -4098,14 +3891,14 @@ GHC_INLINE bool create_directory(const path& p, const path& attributes, std::err
         return false;
     }
 #endif
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     if (!attributes.empty()) {
-        if (!::CreateDirectoryExW(GHC_NATIVEWP(attributes), GHC_NATIVEWP(p), NULL)) {
+        if (!::CreateDirectoryExW(TURBO_NATIVEWP(attributes), TURBO_NATIVEWP(p), NULL)) {
             ec = detail::make_system_error();
             return false;
         }
     }
-    else if (!::CreateDirectoryW(GHC_NATIVEWP(p), NULL)) {
+    else if (!::CreateDirectoryW(TURBO_NATIVEWP(p), NULL)) {
         ec = detail::make_system_error();
         return false;
     }
@@ -4127,8 +3920,8 @@ GHC_INLINE bool create_directory(const path& p, const path& attributes, std::err
     return true;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void create_directory_symlink(const path& to, const path& new_symlink)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void create_directory_symlink(const path& to, const path& new_symlink)
 {
     std::error_code ec;
     create_directory_symlink(to, new_symlink, ec);
@@ -4136,16 +3929,16 @@ GHC_INLINE void create_directory_symlink(const path& to, const path& new_symlink
         throw filesystem_error(detail::systemErrorText(ec.value()), to, new_symlink, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void create_directory_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept
+inline void create_directory_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept
 {
     detail::create_symlink(to, new_symlink, true, ec);
 }
 
-#ifndef GHC_OS_WEB
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void create_hard_link(const path& to, const path& new_hard_link)
+#ifndef TURBO_PLATFORM_WEB
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void create_hard_link(const path& to, const path& new_hard_link)
 {
     std::error_code ec;
     create_hard_link(to, new_hard_link, ec);
@@ -4153,16 +3946,16 @@ GHC_INLINE void create_hard_link(const path& to, const path& new_hard_link)
         throw filesystem_error(detail::systemErrorText(ec.value()), to, new_hard_link, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void create_hard_link(const path& to, const path& new_hard_link, std::error_code& ec) noexcept
+inline void create_hard_link(const path& to, const path& new_hard_link, std::error_code& ec) noexcept
 {
     detail::create_hardlink(to, new_hard_link, ec);
 }
 #endif
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void create_symlink(const path& to, const path& new_symlink)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void create_symlink(const path& to, const path& new_symlink)
 {
     std::error_code ec;
     create_symlink(to, new_symlink, ec);
@@ -4170,15 +3963,15 @@ GHC_INLINE void create_symlink(const path& to, const path& new_symlink)
         throw filesystem_error(detail::systemErrorText(ec.value()), to, new_symlink, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void create_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept
+inline void create_symlink(const path& to, const path& new_symlink, std::error_code& ec) noexcept
 {
     detail::create_symlink(to, new_symlink, false, ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path current_path()
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path current_path()
 {
     std::error_code ec;
     auto result = current_path(ec);
@@ -4187,12 +3980,12 @@ GHC_INLINE path current_path()
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path current_path(std::error_code& ec)
+inline path current_path(std::error_code& ec)
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     DWORD pathlen = ::GetCurrentDirectoryW(0, 0);
     std::unique_ptr<wchar_t[]> buffer(new wchar_t[size_t(pathlen) + 1]);
     if (::GetCurrentDirectoryW(pathlen, buffer.get()) == 0) {
@@ -4211,8 +4004,8 @@ GHC_INLINE path current_path(std::error_code& ec)
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void current_path(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void current_path(const path& p)
 {
     std::error_code ec;
     current_path(p, ec);
@@ -4220,13 +4013,13 @@ GHC_INLINE void current_path(const path& p)
         throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void current_path(const path& p, std::error_code& ec) noexcept
+inline void current_path(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
-    if (!::SetCurrentDirectoryW(GHC_NATIVEWP(p))) {
+#ifdef TURBO_PLATFORM_WINDOWS
+    if (!::SetCurrentDirectoryW(TURBO_NATIVEWP(p))) {
         ec = detail::make_system_error();
     }
 #else
@@ -4236,19 +4029,19 @@ GHC_INLINE void current_path(const path& p, std::error_code& ec) noexcept
 #endif
 }
 
-GHC_INLINE bool exists(file_status s) noexcept
+inline bool exists(file_status s) noexcept
 {
     return status_known(s) && s.type() != file_type::not_found;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool exists(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool exists(const path& p)
 {
     return exists(status(p));
 }
-#endif
+#endif  //
 
-GHC_INLINE bool exists(const path& p, std::error_code& ec) noexcept
+inline bool exists(const path& p, std::error_code& ec) noexcept
 {
     file_status s = status(p, ec);
     if (status_known(s)) {
@@ -4257,8 +4050,8 @@ GHC_INLINE bool exists(const path& p, std::error_code& ec) noexcept
     return exists(s);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool equivalent(const path& p1, const path& p2)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool equivalent(const path& p1, const path& p2)
 {
     std::error_code ec;
     bool result = equivalent(p1, p2, ec);
@@ -4267,15 +4060,15 @@ GHC_INLINE bool equivalent(const path& p1, const path& p2)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool equivalent(const path& p1, const path& p2, std::error_code& ec) noexcept
+inline bool equivalent(const path& p1, const path& p2, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
-    detail::unique_handle file1(::CreateFileW(GHC_NATIVEWP(p1), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
+#ifdef TURBO_PLATFORM_WINDOWS
+    detail::unique_handle file1(::CreateFileW(TURBO_NATIVEWP(p1), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
     auto e1 = ::GetLastError();
-    detail::unique_handle file2(::CreateFileW(GHC_NATIVEWP(p2), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
+    detail::unique_handle file2(::CreateFileW(TURBO_NATIVEWP(p2), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
     if (!file1 || !file2) {
 #ifdef LWG_2937_BEHAVIOUR
         ec = detail::make_system_error(e1 ? e1 : ::GetLastError());
@@ -4316,8 +4109,8 @@ GHC_INLINE bool equivalent(const path& p1, const path& p2, std::error_code& ec) 
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE uintmax_t file_size(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline uintmax_t file_size(const path& p)
 {
     std::error_code ec;
     auto result = file_size(p, ec);
@@ -4326,14 +4119,14 @@ GHC_INLINE uintmax_t file_size(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE uintmax_t file_size(const path& p, std::error_code& ec) noexcept
+inline uintmax_t file_size(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (!GetFileAttributesExW(GHC_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
+    if (!GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
         ec = detail::make_system_error();
         return static_cast<uintmax_t>(-1);
     }
@@ -4348,9 +4141,9 @@ GHC_INLINE uintmax_t file_size(const path& p, std::error_code& ec) noexcept
 #endif
 }
 
-#ifndef GHC_OS_WEB
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE uintmax_t hard_link_count(const path& p)
+#ifndef TURBO_PLATFORM_WEB
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline uintmax_t hard_link_count(const path& p)
 {
     std::error_code ec;
     auto result = hard_link_count(p, ec);
@@ -4359,14 +4152,14 @@ GHC_INLINE uintmax_t hard_link_count(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE uintmax_t hard_link_count(const path& p, std::error_code& ec) noexcept
+inline uintmax_t hard_link_count(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     uintmax_t result = static_cast<uintmax_t>(-1);
-    detail::unique_handle file(::CreateFileW(GHC_NATIVEWP(p), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
+    detail::unique_handle file(::CreateFileW(TURBO_NATIVEWP(p), 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
     BY_HANDLE_FILE_INFORMATION inf;
     if (!file) {
         ec = detail::make_system_error();
@@ -4391,59 +4184,59 @@ GHC_INLINE uintmax_t hard_link_count(const path& p, std::error_code& ec) noexcep
 }
 #endif
 
-GHC_INLINE bool is_block_file(file_status s) noexcept
+inline bool is_block_file(file_status s) noexcept
 {
     return s.type() == file_type::block;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_block_file(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_block_file(const path& p)
 {
     return is_block_file(status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_block_file(const path& p, std::error_code& ec) noexcept
+inline bool is_block_file(const path& p, std::error_code& ec) noexcept
 {
     return is_block_file(status(p, ec));
 }
 
-GHC_INLINE bool is_character_file(file_status s) noexcept
+inline bool is_character_file(file_status s) noexcept
 {
     return s.type() == file_type::character;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_character_file(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_character_file(const path& p)
 {
     return is_character_file(status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_character_file(const path& p, std::error_code& ec) noexcept
+inline bool is_character_file(const path& p, std::error_code& ec) noexcept
 {
     return is_character_file(status(p, ec));
 }
 
-GHC_INLINE bool is_directory(file_status s) noexcept
+inline bool is_directory(file_status s) noexcept
 {
     return s.type() == file_type::directory;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_directory(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_directory(const path& p)
 {
     return is_directory(status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_directory(const path& p, std::error_code& ec) noexcept
+inline bool is_directory(const path& p, std::error_code& ec) noexcept
 {
     return is_directory(status(p, ec));
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_empty(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_empty(const path& p)
 {
     if (is_directory(p)) {
         return directory_iterator(p) == directory_iterator();
@@ -4452,9 +4245,9 @@ GHC_INLINE bool is_empty(const path& p)
         return file_size(p) == 0;
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_empty(const path& p, std::error_code& ec) noexcept
+inline bool is_empty(const path& p, std::error_code& ec) noexcept
 {
     auto fs = status(p, ec);
     if (ec) {
@@ -4476,93 +4269,93 @@ GHC_INLINE bool is_empty(const path& p, std::error_code& ec) noexcept
     }
 }
 
-GHC_INLINE bool is_fifo(file_status s) noexcept
+inline bool is_fifo(file_status s) noexcept
 {
     return s.type() == file_type::fifo;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_fifo(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_fifo(const path& p)
 {
     return is_fifo(status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_fifo(const path& p, std::error_code& ec) noexcept
+inline bool is_fifo(const path& p, std::error_code& ec) noexcept
 {
     return is_fifo(status(p, ec));
 }
 
-GHC_INLINE bool is_other(file_status s) noexcept
+inline bool is_other(file_status s) noexcept
 {
     return exists(s) && !is_regular_file(s) && !is_directory(s) && !is_symlink(s);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_other(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_other(const path& p)
 {
     return is_other(status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_other(const path& p, std::error_code& ec) noexcept
+inline bool is_other(const path& p, std::error_code& ec) noexcept
 {
     return is_other(status(p, ec));
 }
 
-GHC_INLINE bool is_regular_file(file_status s) noexcept
+inline bool is_regular_file(file_status s) noexcept
 {
     return s.type() == file_type::regular;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_regular_file(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_regular_file(const path& p)
 {
     return is_regular_file(status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_regular_file(const path& p, std::error_code& ec) noexcept
+inline bool is_regular_file(const path& p, std::error_code& ec) noexcept
 {
     return is_regular_file(status(p, ec));
 }
 
-GHC_INLINE bool is_socket(file_status s) noexcept
+inline bool is_socket(file_status s) noexcept
 {
     return s.type() == file_type::socket;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_socket(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_socket(const path& p)
 {
     return is_socket(status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_socket(const path& p, std::error_code& ec) noexcept
+inline bool is_socket(const path& p, std::error_code& ec) noexcept
 {
     return is_socket(status(p, ec));
 }
 
-GHC_INLINE bool is_symlink(file_status s) noexcept
+inline bool is_symlink(file_status s) noexcept
 {
     return s.type() == file_type::symlink;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool is_symlink(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool is_symlink(const path& p)
 {
     return is_symlink(symlink_status(p));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool is_symlink(const path& p, std::error_code& ec) noexcept
+inline bool is_symlink(const path& p, std::error_code& ec) noexcept
 {
     return is_symlink(symlink_status(p, ec));
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE file_time_type last_write_time(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline file_time_type last_write_time(const path& p)
 {
     std::error_code ec;
     auto result = last_write_time(p, ec);
@@ -4571,9 +4364,9 @@ GHC_INLINE file_time_type last_write_time(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE file_time_type last_write_time(const path& p, std::error_code& ec) noexcept
+inline file_time_type last_write_time(const path& p, std::error_code& ec) noexcept
 {
     time_t result = 0;
     ec.clear();
@@ -4581,8 +4374,8 @@ GHC_INLINE file_time_type last_write_time(const path& p, std::error_code& ec) no
     return ec ? (file_time_type::min)() : std::chrono::system_clock::from_time_t(result);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void last_write_time(const path& p, file_time_type new_time)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void last_write_time(const path& p, file_time_type new_time)
 {
     std::error_code ec;
     last_write_time(p, new_time, ec);
@@ -4590,14 +4383,14 @@ GHC_INLINE void last_write_time(const path& p, file_time_type new_time)
         throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void last_write_time(const path& p, file_time_type new_time, std::error_code& ec) noexcept
+inline void last_write_time(const path& p, file_time_type new_time, std::error_code& ec) noexcept
 {
     ec.clear();
     auto d = new_time.time_since_epoch();
-#ifdef GHC_OS_WINDOWS
-    detail::unique_handle file(::CreateFileW(GHC_NATIVEWP(p), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL));
+#ifdef TURBO_PLATFORM_WINDOWS
+    detail::unique_handle file(::CreateFileW(TURBO_NATIVEWP(p), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL));
     FILETIME ft;
     auto tt = std::chrono::duration_cast<std::chrono::microseconds>(d).count() * 10 + 116444736000000000;
     ft.dwLowDateTime = static_cast<DWORD>(tt);
@@ -4605,7 +4398,7 @@ GHC_INLINE void last_write_time(const path& p, file_time_type new_time, std::err
     if (!::SetFileTime(file.get(), 0, 0, &ft)) {
         ec = detail::make_system_error();
     }
-#elif defined(GHC_OS_MACOS)
+#elif defined(TURBO_PLATFORM_APPLE)
 #ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 101300
     struct ::stat fs;
@@ -4653,8 +4446,8 @@ GHC_INLINE void last_write_time(const path& p, file_time_type new_time, std::err
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void permissions(const path& p, perms prms, perm_options opts)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void permissions(const path& p, perms prms, perm_options opts)
 {
     std::error_code ec;
     permissions(p, prms, opts, ec);
@@ -4662,14 +4455,14 @@ GHC_INLINE void permissions(const path& p, perms prms, perm_options opts)
         throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void permissions(const path& p, perms prms, std::error_code& ec) noexcept
+inline void permissions(const path& p, perms prms, std::error_code& ec) noexcept
 {
     permissions(p, prms, perm_options::replace, ec);
 }
 
-GHC_INLINE void permissions(const path& p, perms prms, perm_options opts, std::error_code& ec) noexcept
+inline void permissions(const path& p, perms prms, perm_options opts, std::error_code& ec) noexcept
 {
     if (static_cast<int>(opts & (perm_options::replace | perm_options::add | perm_options::remove)) == 0) {
         ec = detail::make_error_code(detail::portable_error::invalid_argument);
@@ -4684,12 +4477,12 @@ GHC_INLINE void permissions(const path& p, perms prms, perm_options opts, std::e
             prms = fs.permissions() & ~prms;
         }
     }
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 #ifdef __GNUC__
-    auto oldAttr = GetFileAttributesW(GHC_NATIVEWP(p));
+    auto oldAttr = GetFileAttributesW(TURBO_NATIVEWP(p));
     if (oldAttr != INVALID_FILE_ATTRIBUTES) {
         DWORD newAttr = ((prms & perms::owner_write) == perms::owner_write) ? oldAttr & ~(static_cast<DWORD>(FILE_ATTRIBUTE_READONLY)) : oldAttr | FILE_ATTRIBUTE_READONLY;
-        if (oldAttr == newAttr || SetFileAttributesW(GHC_NATIVEWP(p), newAttr)) {
+        if (oldAttr == newAttr || SetFileAttributesW(TURBO_NATIVEWP(p), newAttr)) {
             return;
         }
     }
@@ -4715,8 +4508,8 @@ GHC_INLINE void permissions(const path& p, perms prms, perm_options opts, std::e
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path proximate(const path& p, std::error_code& ec)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path proximate(const path& p, std::error_code& ec)
 {
     auto cp = current_path(ec);
     if (!ec) {
@@ -4724,22 +4517,22 @@ GHC_INLINE path proximate(const path& p, std::error_code& ec)
     }
     return path();
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path proximate(const path& p, const path& base)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path proximate(const path& p, const path& base)
 {
     return weakly_canonical(p).lexically_proximate(weakly_canonical(base));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path proximate(const path& p, const path& base, std::error_code& ec)
+inline path proximate(const path& p, const path& base, std::error_code& ec)
 {
     return weakly_canonical(p, ec).lexically_proximate(weakly_canonical(base, ec));
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path read_symlink(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path read_symlink(const path& p)
 {
     std::error_code ec;
     auto result = read_symlink(p, ec);
@@ -4748,9 +4541,9 @@ GHC_INLINE path read_symlink(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path read_symlink(const path& p, std::error_code& ec)
+inline path read_symlink(const path& p, std::error_code& ec)
 {
     file_status fs = symlink_status(p, ec);
     if (fs.type() != file_type::symlink) {
@@ -4761,25 +4554,25 @@ GHC_INLINE path read_symlink(const path& p, std::error_code& ec)
     return ec ? path() : result;
 }
 
-GHC_INLINE path relative(const path& p, std::error_code& ec)
+inline path relative(const path& p, std::error_code& ec)
 {
     return relative(p, current_path(ec), ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path relative(const path& p, const path& base)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path relative(const path& p, const path& base)
 {
     return weakly_canonical(p).lexically_relative(weakly_canonical(base));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path relative(const path& p, const path& base, std::error_code& ec)
+inline path relative(const path& p, const path& base, std::error_code& ec)
 {
     return weakly_canonical(p, ec).lexically_relative(weakly_canonical(base, ec));
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool remove(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool remove(const path& p)
 {
     std::error_code ec;
     auto result = remove(p, ec);
@@ -4788,13 +4581,13 @@ GHC_INLINE bool remove(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool remove(const path& p, std::error_code& ec) noexcept
+inline bool remove(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_PLATFORM_WINDOWS
+#ifdef TURBO_FS_USE_WCHAR_T
     auto cstr = p.c_str();
 #else
     std::wstring np = detail::fromUtf8<std::wstring>(p.u8string());
@@ -4839,8 +4632,8 @@ GHC_INLINE bool remove(const path& p, std::error_code& ec) noexcept
     return ec ? false : true;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE uintmax_t remove_all(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline uintmax_t remove_all(const path& p)
 {
     std::error_code ec;
     auto result = remove_all(p, ec);
@@ -4849,9 +4642,9 @@ GHC_INLINE uintmax_t remove_all(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE uintmax_t remove_all(const path& p, std::error_code& ec) noexcept
+inline uintmax_t remove_all(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
     uintmax_t count = 0;
@@ -4897,8 +4690,8 @@ GHC_INLINE uintmax_t remove_all(const path& p, std::error_code& ec) noexcept
     return count;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void rename(const path& from, const path& to)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void rename(const path& from, const path& to)
 {
     std::error_code ec;
     rename(from, to, ec);
@@ -4906,14 +4699,14 @@ GHC_INLINE void rename(const path& from, const path& to)
         throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void rename(const path& from, const path& to, std::error_code& ec) noexcept
+inline void rename(const path& from, const path& to, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     if (from != to) {
-        if (!MoveFileExW(GHC_NATIVEWP(from), GHC_NATIVEWP(to), (DWORD)MOVEFILE_REPLACE_EXISTING)) {
+        if (!MoveFileExW(TURBO_NATIVEWP(from), TURBO_NATIVEWP(to), (DWORD)MOVEFILE_REPLACE_EXISTING)) {
             ec = detail::make_system_error();
         }
     }
@@ -4926,8 +4719,8 @@ GHC_INLINE void rename(const path& from, const path& to, std::error_code& ec) no
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void resize_file(const path& p, uintmax_t size)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void resize_file(const path& p, uintmax_t size)
 {
     std::error_code ec;
     resize_file(p, size, ec);
@@ -4935,12 +4728,12 @@ GHC_INLINE void resize_file(const path& p, uintmax_t size)
         throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void resize_file(const path& p, uintmax_t size, std::error_code& ec) noexcept
+inline void resize_file(const path& p, uintmax_t size, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     LARGE_INTEGER lisize;
     lisize.QuadPart = static_cast<LONGLONG>(size);
     if (lisize.QuadPart < 0) {
@@ -4951,7 +4744,7 @@ GHC_INLINE void resize_file(const path& p, uintmax_t size, std::error_code& ec) 
 #endif
         return;
     }
-    detail::unique_handle file(CreateFileW(GHC_NATIVEWP(p), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
+    detail::unique_handle file(CreateFileW(TURBO_NATIVEWP(p), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL));
     if (!file) {
         ec = detail::make_system_error();
     }
@@ -4965,8 +4758,8 @@ GHC_INLINE void resize_file(const path& p, uintmax_t size, std::error_code& ec) 
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE space_info space(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline space_info space(const path& p)
 {
     std::error_code ec;
     auto result = space(p, ec);
@@ -4975,16 +4768,16 @@ GHC_INLINE space_info space(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE space_info space(const path& p, std::error_code& ec) noexcept
+inline space_info space(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ULARGE_INTEGER freeBytesAvailableToCaller = {{ 0, 0 }};
     ULARGE_INTEGER totalNumberOfBytes = {{ 0, 0 }};
     ULARGE_INTEGER totalNumberOfFreeBytes = {{ 0, 0 }};
-    if (!GetDiskFreeSpaceExW(GHC_NATIVEWP(p), &freeBytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)) {
+    if (!GetDiskFreeSpaceExW(TURBO_NATIVEWP(p), &freeBytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)) {
         ec = detail::make_system_error();
         return {static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1)};
     }
@@ -4999,8 +4792,8 @@ GHC_INLINE space_info space(const path& p, std::error_code& ec) noexcept
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE file_status status(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline file_status status(const path& p)
 {
     std::error_code ec;
     auto result = status(p, ec);
@@ -5009,20 +4802,20 @@ GHC_INLINE file_status status(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE file_status status(const path& p, std::error_code& ec) noexcept
+inline file_status status(const path& p, std::error_code& ec) noexcept
 {
     return detail::status_ex(p, ec);
 }
 
-GHC_INLINE bool status_known(file_status s) noexcept
+inline bool status_known(file_status s) noexcept
 {
     return s.type() != file_type::none;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE file_status symlink_status(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline file_status symlink_status(const path& p)
 {
     std::error_code ec;
     auto result = symlink_status(p, ec);
@@ -5031,15 +4824,15 @@ GHC_INLINE file_status symlink_status(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE file_status symlink_status(const path& p, std::error_code& ec) noexcept
+inline file_status symlink_status(const path& p, std::error_code& ec) noexcept
 {
     return detail::symlink_status_ex(p, ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path temp_directory_path()
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path temp_directory_path()
 {
     std::error_code ec;
     path result = temp_directory_path(ec);
@@ -5048,12 +4841,12 @@ GHC_INLINE path temp_directory_path()
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path temp_directory_path(std::error_code& ec) noexcept
+inline path temp_directory_path(std::error_code& ec) noexcept
 {
     ec.clear();
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     wchar_t buffer[512];
     auto rc = GetTempPathW(511, buffer);
     if (!rc || rc > 511) {
@@ -5074,8 +4867,8 @@ GHC_INLINE path temp_directory_path(std::error_code& ec) noexcept
 #endif
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE path weakly_canonical(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline path weakly_canonical(const path& p)
 {
     std::error_code ec;
     auto result = weakly_canonical(p, ec);
@@ -5084,9 +4877,9 @@ GHC_INLINE path weakly_canonical(const path& p)
     }
     return result;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE path weakly_canonical(const path& p, std::error_code& ec) noexcept
+inline path weakly_canonical(const path& p, std::error_code& ec) noexcept
 {
     path result;
     ec.clear();
@@ -5128,40 +4921,40 @@ GHC_INLINE path weakly_canonical(const path& p, std::error_code& ec) noexcept
 //-----------------------------------------------------------------------------
 // [fs.class.file_status] class file_status
 // [fs.file_status.cons] constructors and destructor
-GHC_INLINE file_status::file_status() noexcept
+inline file_status::file_status() noexcept
     : file_status(file_type::none)
 {
 }
 
-GHC_INLINE file_status::file_status(file_type ft, perms prms) noexcept
+inline file_status::file_status(file_type ft, perms prms) noexcept
     : _type(ft)
     , _perms(prms)
 {
 }
 
-GHC_INLINE file_status::file_status(const file_status& other) noexcept
+inline file_status::file_status(const file_status& other) noexcept
     : _type(other._type)
     , _perms(other._perms)
 {
 }
 
-GHC_INLINE file_status::file_status(file_status&& other) noexcept
+inline file_status::file_status(file_status&& other) noexcept
     : _type(other._type)
     , _perms(other._perms)
 {
 }
 
-GHC_INLINE file_status::~file_status() {}
+inline file_status::~file_status() {}
 
 // assignments:
-GHC_INLINE file_status& file_status::operator=(const file_status& rhs) noexcept
+inline file_status& file_status::operator=(const file_status& rhs) noexcept
 {
     _type = rhs._type;
     _perms = rhs._perms;
     return *this;
 }
 
-GHC_INLINE file_status& file_status::operator=(file_status&& rhs) noexcept
+inline file_status& file_status::operator=(file_status&& rhs) noexcept
 {
     _type = rhs._type;
     _perms = rhs._perms;
@@ -5169,23 +4962,23 @@ GHC_INLINE file_status& file_status::operator=(file_status&& rhs) noexcept
 }
 
 // [fs.file_status.mods] modifiers
-GHC_INLINE void file_status::type(file_type ft) noexcept
+inline void file_status::type(file_type ft) noexcept
 {
     _type = ft;
 }
 
-GHC_INLINE void file_status::permissions(perms prms) noexcept
+inline void file_status::permissions(perms prms) noexcept
 {
     _perms = prms;
 }
 
 // [fs.file_status.obs] observers
-GHC_INLINE file_type file_status::type() const noexcept
+inline file_type file_status::type() const noexcept
 {
     return _type;
 }
 
-GHC_INLINE perms file_status::permissions() const noexcept
+inline perms file_status::permissions() const noexcept
 {
     return _perms;
 }
@@ -5196,23 +4989,23 @@ GHC_INLINE perms file_status::permissions() const noexcept
 // directory_entry::directory_entry() noexcept = default;
 // directory_entry::directory_entry(const directory_entry&) = default;
 // directory_entry::directory_entry(directory_entry&&) noexcept = default;
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE directory_entry::directory_entry(const filesystem::path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline directory_entry::directory_entry(const filesystem::path& p)
     : _path(p)
     , _file_size(static_cast<uintmax_t>(-1))
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
     , _hard_link_count(static_cast<uintmax_t>(-1))
 #endif
     , _last_write_time(0)
 {
     refresh();
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE directory_entry::directory_entry(const filesystem::path& p, std::error_code& ec)
+inline directory_entry::directory_entry(const filesystem::path& p, std::error_code& ec)
     : _path(p)
     , _file_size(static_cast<uintmax_t>(-1))
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
     , _hard_link_count(static_cast<uintmax_t>(-1))
 #endif
     , _last_write_time(0)
@@ -5220,43 +5013,43 @@ GHC_INLINE directory_entry::directory_entry(const filesystem::path& p, std::erro
     refresh(ec);
 }
 
-GHC_INLINE directory_entry::~directory_entry() {}
+inline directory_entry::~directory_entry() {}
 
 // assignments:
 // directory_entry& directory_entry::operator=(const directory_entry&) = default;
 // directory_entry& directory_entry::operator=(directory_entry&&) noexcept = default;
 
 // [fs.dir.entry.mods] directory_entry modifiers
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void directory_entry::assign(const filesystem::path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void directory_entry::assign(const filesystem::path& p)
 {
     _path = p;
     refresh();
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void directory_entry::assign(const filesystem::path& p, std::error_code& ec)
+inline void directory_entry::assign(const filesystem::path& p, std::error_code& ec)
 {
     _path = p;
     refresh(ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void directory_entry::replace_filename(const filesystem::path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void directory_entry::replace_filename(const filesystem::path& p)
 {
     _path.replace_filename(p);
     refresh();
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void directory_entry::replace_filename(const filesystem::path& p, std::error_code& ec)
+inline void directory_entry::replace_filename(const filesystem::path& p, std::error_code& ec)
 {
     _path.replace_filename(p);
     refresh(ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void directory_entry::refresh()
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void directory_entry::refresh()
 {
     std::error_code ec;
     refresh(ec);
@@ -5264,11 +5057,11 @@ GHC_INLINE void directory_entry::refresh()
         throw filesystem_error(detail::systemErrorText(ec.value()), _path, ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void directory_entry::refresh(std::error_code& ec) noexcept
+inline void directory_entry::refresh(std::error_code& ec) noexcept
 {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     _status = detail::status_ex(_path, ec, &_symlink_status, &_file_size, nullptr, &_last_write_time);
 #else
     _status = detail::status_ex(_path, ec, &_symlink_status, &_file_size, &_hard_link_count, &_last_write_time);
@@ -5276,24 +5069,24 @@ GHC_INLINE void directory_entry::refresh(std::error_code& ec) noexcept
 }
 
 // [fs.dir.entry.obs] directory_entry observers
-GHC_INLINE const filesystem::path& directory_entry::path() const noexcept
+inline const filesystem::path& directory_entry::path() const noexcept
 {
     return _path;
 }
 
-GHC_INLINE directory_entry::operator const filesystem::path&() const noexcept
+inline directory_entry::operator const filesystem::path&() const noexcept
 {
     return _path;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE file_type directory_entry::status_file_type() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline file_type directory_entry::status_file_type() const
 {
     return _status.type() != file_type::none ? _status.type() : filesystem::status(path()).type();
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE file_type directory_entry::status_file_type(std::error_code& ec) const noexcept
+inline file_type directory_entry::status_file_type(std::error_code& ec) const noexcept
 {
     if (_status.type() != file_type::none) {
         ec.clear();
@@ -5302,112 +5095,112 @@ GHC_INLINE file_type directory_entry::status_file_type(std::error_code& ec) cons
     return filesystem::status(path(), ec).type();
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::exists() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::exists() const
 {
     return status_file_type() != file_type::not_found;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::exists(std::error_code& ec) const noexcept
+inline bool directory_entry::exists(std::error_code& ec) const noexcept
 {
     return status_file_type(ec) != file_type::not_found;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_block_file() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_block_file() const
 {
     return status_file_type() == file_type::block;
 }
-#endif
-GHC_INLINE bool directory_entry::is_block_file(std::error_code& ec) const noexcept
+#endif  // TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_block_file(std::error_code& ec) const noexcept
 {
     return status_file_type(ec) == file_type::block;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_character_file() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_character_file() const
 {
     return status_file_type() == file_type::character;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::is_character_file(std::error_code& ec) const noexcept
+inline bool directory_entry::is_character_file(std::error_code& ec) const noexcept
 {
     return status_file_type(ec) == file_type::character;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_directory() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_directory() const
 {
     return status_file_type() == file_type::directory;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::is_directory(std::error_code& ec) const noexcept
+inline bool directory_entry::is_directory(std::error_code& ec) const noexcept
 {
     return status_file_type(ec) == file_type::directory;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_fifo() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_fifo() const
 {
     return status_file_type() == file_type::fifo;
 }
-#endif
+#endif   // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::is_fifo(std::error_code& ec) const noexcept
+inline bool directory_entry::is_fifo(std::error_code& ec) const noexcept
 {
     return status_file_type(ec) == file_type::fifo;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_other() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_other() const
 {
     auto ft = status_file_type();
     return ft != file_type::none && ft != file_type::not_found && ft != file_type::regular && ft != file_type::directory && !is_symlink();
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::is_other(std::error_code& ec) const noexcept
+inline bool directory_entry::is_other(std::error_code& ec) const noexcept
 {
     auto ft = status_file_type(ec);
     bool other = ft != file_type::none && ft != file_type::not_found && ft != file_type::regular && ft != file_type::directory && !is_symlink(ec);
     return !ec && other;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_regular_file() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_regular_file() const
 {
     return status_file_type() == file_type::regular;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::is_regular_file(std::error_code& ec) const noexcept
+inline bool directory_entry::is_regular_file(std::error_code& ec) const noexcept
 {
     return status_file_type(ec) == file_type::regular;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_socket() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_socket() const
 {
     return status_file_type() == file_type::socket;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::is_socket(std::error_code& ec) const noexcept
+inline bool directory_entry::is_socket(std::error_code& ec) const noexcept
 {
     return status_file_type(ec) == file_type::socket;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE bool directory_entry::is_symlink() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline bool directory_entry::is_symlink() const
 {
     return _symlink_status.type() != file_type::none ? _symlink_status.type() == file_type::symlink : filesystem::is_symlink(symlink_status());
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE bool directory_entry::is_symlink(std::error_code& ec) const noexcept
+inline bool directory_entry::is_symlink(std::error_code& ec) const noexcept
 {
     if (_symlink_status.type() != file_type::none) {
         ec.clear();
@@ -5416,17 +5209,17 @@ GHC_INLINE bool directory_entry::is_symlink(std::error_code& ec) const noexcept
     return filesystem::is_symlink(symlink_status(ec));
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE uintmax_t directory_entry::file_size() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline uintmax_t directory_entry::file_size() const
 {
     if (_file_size != static_cast<uintmax_t>(-1)) {
         return _file_size;
     }
     return filesystem::file_size(path());
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE uintmax_t directory_entry::file_size(std::error_code& ec) const noexcept
+inline uintmax_t directory_entry::file_size(std::error_code& ec) const noexcept
 {
     if (_file_size != static_cast<uintmax_t>(-1)) {
         ec.clear();
@@ -5435,22 +5228,22 @@ GHC_INLINE uintmax_t directory_entry::file_size(std::error_code& ec) const noexc
     return filesystem::file_size(path(), ec);
 }
 
-#ifndef GHC_OS_WEB
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE uintmax_t directory_entry::hard_link_count() const
+#ifndef TURBO_PLATFORM_WEB
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline uintmax_t directory_entry::hard_link_count() const
 {
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
     if (_hard_link_count != static_cast<uintmax_t>(-1)) {
         return _hard_link_count;
     }
 #endif
     return filesystem::hard_link_count(path());
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE uintmax_t directory_entry::hard_link_count(std::error_code& ec) const noexcept
+inline uintmax_t directory_entry::hard_link_count(std::error_code& ec) const noexcept
 {
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
     if (_hard_link_count != static_cast<uintmax_t>(-1)) {
         ec.clear();
         return _hard_link_count;
@@ -5460,17 +5253,17 @@ GHC_INLINE uintmax_t directory_entry::hard_link_count(std::error_code& ec) const
 }
 #endif
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE file_time_type directory_entry::last_write_time() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline file_time_type directory_entry::last_write_time() const
 {
     if (_last_write_time != 0) {
         return std::chrono::system_clock::from_time_t(_last_write_time);
     }
     return filesystem::last_write_time(path());
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE file_time_type directory_entry::last_write_time(std::error_code& ec) const noexcept
+inline file_time_type directory_entry::last_write_time(std::error_code& ec) const noexcept
 {
     if (_last_write_time != 0) {
         ec.clear();
@@ -5479,17 +5272,17 @@ GHC_INLINE file_time_type directory_entry::last_write_time(std::error_code& ec) 
     return filesystem::last_write_time(path(), ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE file_status directory_entry::status() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline file_status directory_entry::status() const
 {
     if (_status.type() != file_type::none && _status.permissions() != perms::unknown) {
         return _status;
     }
     return filesystem::status(path());
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE file_status directory_entry::status(std::error_code& ec) const noexcept
+inline file_status directory_entry::status(std::error_code& ec) const noexcept
 {
     if (_status.type() != file_type::none && _status.permissions() != perms::unknown) {
         ec.clear();
@@ -5498,17 +5291,17 @@ GHC_INLINE file_status directory_entry::status(std::error_code& ec) const noexce
     return filesystem::status(path(), ec);
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE file_status directory_entry::symlink_status() const
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline file_status directory_entry::symlink_status() const
 {
     if (_symlink_status.type() != file_type::none && _symlink_status.permissions() != perms::unknown) {
         return _symlink_status;
     }
     return filesystem::symlink_status(path());
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE file_status directory_entry::symlink_status(std::error_code& ec) const noexcept
+inline file_status directory_entry::symlink_status(std::error_code& ec) const noexcept
 {
     if (_symlink_status.type() != file_type::none && _symlink_status.permissions() != perms::unknown) {
         ec.clear();
@@ -5517,39 +5310,39 @@ GHC_INLINE file_status directory_entry::symlink_status(std::error_code& ec) cons
     return filesystem::symlink_status(path(), ec);
 }
 
-#ifdef GHC_HAS_THREEWAY_COMP
-GHC_INLINE std::strong_ordering directory_entry::operator<=>(const directory_entry& rhs) const noexcept
+#ifdef TURBO_HAVE_THREEWAY_COMP
+inline std::strong_ordering directory_entry::operator<=>(const directory_entry& rhs) const noexcept
 {
     return _path <=> rhs._path;
 }
 #endif
 
-GHC_INLINE bool directory_entry::operator<(const directory_entry& rhs) const noexcept
+inline bool directory_entry::operator<(const directory_entry& rhs) const noexcept
 {
     return _path < rhs._path;
 }
 
-GHC_INLINE bool directory_entry::operator==(const directory_entry& rhs) const noexcept
+inline bool directory_entry::operator==(const directory_entry& rhs) const noexcept
 {
     return _path == rhs._path;
 }
 
-GHC_INLINE bool directory_entry::operator!=(const directory_entry& rhs) const noexcept
+inline bool directory_entry::operator!=(const directory_entry& rhs) const noexcept
 {
     return _path != rhs._path;
 }
 
-GHC_INLINE bool directory_entry::operator<=(const directory_entry& rhs) const noexcept
+inline bool directory_entry::operator<=(const directory_entry& rhs) const noexcept
 {
     return _path <= rhs._path;
 }
 
-GHC_INLINE bool directory_entry::operator>(const directory_entry& rhs) const noexcept
+inline bool directory_entry::operator>(const directory_entry& rhs) const noexcept
 {
     return _path > rhs._path;
 }
 
-GHC_INLINE bool directory_entry::operator>=(const directory_entry& rhs) const noexcept
+inline bool directory_entry::operator>=(const directory_entry& rhs) const noexcept
 {
     return _path >= rhs._path;
 }
@@ -5557,7 +5350,7 @@ GHC_INLINE bool directory_entry::operator>=(const directory_entry& rhs) const no
 //-----------------------------------------------------------------------------
 // [fs.class.directory_iterator] class directory_iterator
 
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 class directory_iterator::impl
 {
 public:
@@ -5568,7 +5361,7 @@ public:
     {
         if (!_base.empty()) {
             ZeroMemory(&_findData, sizeof(WIN32_FIND_DATAW));
-            if ((_dirHandle = FindFirstFileW(GHC_NATIVEWP((_base / "*")), &_findData)) != INVALID_HANDLE_VALUE) {
+            if ((_dirHandle = FindFirstFileW(TURBO_NATIVEWP((_base / "*")), &_findData)) != INVALID_HANDLE_VALUE) {
                 if (std::wstring(_findData.cFileName) == L"." || std::wstring(_findData.cFileName) == L"..") {
                     increment(_ec);
                 }
@@ -5600,10 +5393,10 @@ public:
             do {
                 if (FindNextFileW(_dirHandle, &_findData)) {
                     _dir_entry._path = _base;
-#ifdef GHC_USE_WCHAR_T
+#ifdef TURBO_FS_USE_WCHAR_T
                     _dir_entry._path.append_name(_findData.cFileName);
 #else
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
                     try {
                         _dir_entry._path.append_name(detail::toUtf8(_findData.cFileName).c_str());
                     }
@@ -5747,13 +5540,13 @@ public:
 #endif
 
 // [fs.dir.itr.members] member functions
-GHC_INLINE directory_iterator::directory_iterator() noexcept
+inline directory_iterator::directory_iterator() noexcept
     : _impl(new impl(path(), directory_options::none))
 {
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE directory_iterator::directory_iterator(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline directory_iterator::directory_iterator(const path& p)
     : _impl(new impl(p, directory_options::none))
 {
     if (_impl->_ec) {
@@ -5762,16 +5555,16 @@ GHC_INLINE directory_iterator::directory_iterator(const path& p)
     _impl->_ec.clear();
 }
 
-GHC_INLINE directory_iterator::directory_iterator(const path& p, directory_options options)
+inline directory_iterator::directory_iterator(const path& p, directory_options options)
     : _impl(new impl(p, options))
 {
     if (_impl->_ec) {
         throw filesystem_error(detail::systemErrorText(_impl->_ec.value()), p, _impl->_ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE directory_iterator::directory_iterator(const path& p, std::error_code& ec) noexcept
+inline directory_iterator::directory_iterator(const path& p, std::error_code& ec) noexcept
     : _impl(new impl(p, directory_options::none))
 {
     if (_impl->_ec) {
@@ -5779,7 +5572,7 @@ GHC_INLINE directory_iterator::directory_iterator(const path& p, std::error_code
     }
 }
 
-GHC_INLINE directory_iterator::directory_iterator(const path& p, directory_options options, std::error_code& ec) noexcept
+inline directory_iterator::directory_iterator(const path& p, directory_options options, std::error_code& ec) noexcept
     : _impl(new impl(p, options))
 {
     if (_impl->_ec) {
@@ -5787,42 +5580,42 @@ GHC_INLINE directory_iterator::directory_iterator(const path& p, directory_optio
     }
 }
 
-GHC_INLINE directory_iterator::directory_iterator(const directory_iterator& rhs)
+inline directory_iterator::directory_iterator(const directory_iterator& rhs)
     : _impl(rhs._impl)
 {
 }
 
-GHC_INLINE directory_iterator::directory_iterator(directory_iterator&& rhs) noexcept
+inline directory_iterator::directory_iterator(directory_iterator&& rhs) noexcept
     : _impl(std::move(rhs._impl))
 {
 }
 
-GHC_INLINE directory_iterator::~directory_iterator() {}
+inline directory_iterator::~directory_iterator() {}
 
-GHC_INLINE directory_iterator& directory_iterator::operator=(const directory_iterator& rhs)
+inline directory_iterator& directory_iterator::operator=(const directory_iterator& rhs)
 {
     _impl = rhs._impl;
     return *this;
 }
 
-GHC_INLINE directory_iterator& directory_iterator::operator=(directory_iterator&& rhs) noexcept
+inline directory_iterator& directory_iterator::operator=(directory_iterator&& rhs) noexcept
 {
     _impl = std::move(rhs._impl);
     return *this;
 }
 
-GHC_INLINE const directory_entry& directory_iterator::operator*() const
+inline const directory_entry& directory_iterator::operator*() const
 {
     return _impl->_dir_entry;
 }
 
-GHC_INLINE const directory_entry* directory_iterator::operator->() const
+inline const directory_entry* directory_iterator::operator->() const
 {
     return &_impl->_dir_entry;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE directory_iterator& directory_iterator::operator++()
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline directory_iterator& directory_iterator::operator++()
 {
     std::error_code ec;
     _impl->increment(ec);
@@ -5831,32 +5624,32 @@ GHC_INLINE directory_iterator& directory_iterator::operator++()
     }
     return *this;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE directory_iterator& directory_iterator::increment(std::error_code& ec) noexcept
+inline directory_iterator& directory_iterator::increment(std::error_code& ec) noexcept
 {
     _impl->increment(ec);
     return *this;
 }
 
-GHC_INLINE bool directory_iterator::operator==(const directory_iterator& rhs) const
+inline bool directory_iterator::operator==(const directory_iterator& rhs) const
 {
     return _impl->_dir_entry._path == rhs._impl->_dir_entry._path;
 }
 
-GHC_INLINE bool directory_iterator::operator!=(const directory_iterator& rhs) const
+inline bool directory_iterator::operator!=(const directory_iterator& rhs) const
 {
     return _impl->_dir_entry._path != rhs._impl->_dir_entry._path;
 }
 
 // [fs.dir.itr.nonmembers] directory_iterator non-member functions
 
-GHC_INLINE directory_iterator begin(directory_iterator iter) noexcept
+inline directory_iterator begin(directory_iterator iter) noexcept
 {
     return iter;
 }
 
-GHC_INLINE directory_iterator end(const directory_iterator&) noexcept
+inline directory_iterator end(const directory_iterator&) noexcept
 {
     return directory_iterator();
 }
@@ -5864,91 +5657,91 @@ GHC_INLINE directory_iterator end(const directory_iterator&) noexcept
 //-----------------------------------------------------------------------------
 // [fs.class.rec.dir.itr] class recursive_directory_iterator
 
-GHC_INLINE recursive_directory_iterator::recursive_directory_iterator() noexcept
+inline recursive_directory_iterator::recursive_directory_iterator() noexcept
     : _impl(new recursive_directory_iterator_impl(directory_options::none, true))
 {
     _impl->_dir_iter_stack.push(directory_iterator());
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE recursive_directory_iterator::recursive_directory_iterator(const path& p)
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline recursive_directory_iterator::recursive_directory_iterator(const path& p)
     : _impl(new recursive_directory_iterator_impl(directory_options::none, true))
 {
     _impl->_dir_iter_stack.push(directory_iterator(p));
 }
 
-GHC_INLINE recursive_directory_iterator::recursive_directory_iterator(const path& p, directory_options options)
+inline recursive_directory_iterator::recursive_directory_iterator(const path& p, directory_options options)
     : _impl(new recursive_directory_iterator_impl(options, true))
 {
     _impl->_dir_iter_stack.push(directory_iterator(p, options));
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE recursive_directory_iterator::recursive_directory_iterator(const path& p, directory_options options, std::error_code& ec) noexcept
+inline recursive_directory_iterator::recursive_directory_iterator(const path& p, directory_options options, std::error_code& ec) noexcept
     : _impl(new recursive_directory_iterator_impl(options, true))
 {
     _impl->_dir_iter_stack.push(directory_iterator(p, options, ec));
 }
 
-GHC_INLINE recursive_directory_iterator::recursive_directory_iterator(const path& p, std::error_code& ec) noexcept
+inline recursive_directory_iterator::recursive_directory_iterator(const path& p, std::error_code& ec) noexcept
     : _impl(new recursive_directory_iterator_impl(directory_options::none, true))
 {
     _impl->_dir_iter_stack.push(directory_iterator(p, ec));
 }
 
-GHC_INLINE recursive_directory_iterator::recursive_directory_iterator(const recursive_directory_iterator& rhs)
+inline recursive_directory_iterator::recursive_directory_iterator(const recursive_directory_iterator& rhs)
     : _impl(rhs._impl)
 {
 }
 
-GHC_INLINE recursive_directory_iterator::recursive_directory_iterator(recursive_directory_iterator&& rhs) noexcept
+inline recursive_directory_iterator::recursive_directory_iterator(recursive_directory_iterator&& rhs) noexcept
     : _impl(std::move(rhs._impl))
 {
 }
 
-GHC_INLINE recursive_directory_iterator::~recursive_directory_iterator() {}
+inline recursive_directory_iterator::~recursive_directory_iterator() {}
 
 // [fs.rec.dir.itr.members] observers
-GHC_INLINE directory_options recursive_directory_iterator::options() const
+inline directory_options recursive_directory_iterator::options() const
 {
     return _impl->_options;
 }
 
-GHC_INLINE int recursive_directory_iterator::depth() const
+inline int recursive_directory_iterator::depth() const
 {
     return static_cast<int>(_impl->_dir_iter_stack.size() - 1);
 }
 
-GHC_INLINE bool recursive_directory_iterator::recursion_pending() const
+inline bool recursive_directory_iterator::recursion_pending() const
 {
     return _impl->_recursion_pending;
 }
 
-GHC_INLINE const directory_entry& recursive_directory_iterator::operator*() const
+inline const directory_entry& recursive_directory_iterator::operator*() const
 {
     return *(_impl->_dir_iter_stack.top());
 }
 
-GHC_INLINE const directory_entry* recursive_directory_iterator::operator->() const
+inline const directory_entry* recursive_directory_iterator::operator->() const
 {
     return &(*(_impl->_dir_iter_stack.top()));
 }
 
 // [fs.rec.dir.itr.members] modifiers recursive_directory_iterator&
-GHC_INLINE recursive_directory_iterator& recursive_directory_iterator::operator=(const recursive_directory_iterator& rhs)
+inline recursive_directory_iterator& recursive_directory_iterator::operator=(const recursive_directory_iterator& rhs)
 {
     _impl = rhs._impl;
     return *this;
 }
 
-GHC_INLINE recursive_directory_iterator& recursive_directory_iterator::operator=(recursive_directory_iterator&& rhs) noexcept
+inline recursive_directory_iterator& recursive_directory_iterator::operator=(recursive_directory_iterator&& rhs) noexcept
 {
     _impl = std::move(rhs._impl);
     return *this;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE recursive_directory_iterator& recursive_directory_iterator::operator++()
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline recursive_directory_iterator& recursive_directory_iterator::operator++()
 {
     std::error_code ec;
     increment(ec);
@@ -5957,9 +5750,9 @@ GHC_INLINE recursive_directory_iterator& recursive_directory_iterator::operator+
     }
     return *this;
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE recursive_directory_iterator& recursive_directory_iterator::increment(std::error_code& ec) noexcept
+inline recursive_directory_iterator& recursive_directory_iterator::increment(std::error_code& ec) noexcept
 {
     bool isSymLink = (*this)->is_symlink(ec);
     bool isDir = !ec && (*this)->is_directory(ec);
@@ -5987,8 +5780,8 @@ GHC_INLINE recursive_directory_iterator& recursive_directory_iterator::increment
     return *this;
 }
 
-#ifdef GHC_WITH_EXCEPTIONS
-GHC_INLINE void recursive_directory_iterator::pop()
+#ifdef TURBO_HAVE_EXCEPTIONS
+inline void recursive_directory_iterator::pop()
 {
     std::error_code ec;
     pop(ec);
@@ -5996,9 +5789,9 @@ GHC_INLINE void recursive_directory_iterator::pop()
         throw filesystem_error(detail::systemErrorText(ec.value()), _impl->_dir_iter_stack.empty() ? path() : _impl->_dir_iter_stack.top()->path(), ec);
     }
 }
-#endif
+#endif  // TURBO_HAVE_EXCEPTIONS
 
-GHC_INLINE void recursive_directory_iterator::pop(std::error_code& ec)
+inline void recursive_directory_iterator::pop(std::error_code& ec)
 {
     if (depth() == 0) {
         *this = recursive_directory_iterator();
@@ -6011,40 +5804,36 @@ GHC_INLINE void recursive_directory_iterator::pop(std::error_code& ec)
     }
 }
 
-GHC_INLINE void recursive_directory_iterator::disable_recursion_pending()
+inline void recursive_directory_iterator::disable_recursion_pending()
 {
     _impl->_recursion_pending = false;
 }
 
 // other members as required by [input.iterators]
-GHC_INLINE bool recursive_directory_iterator::operator==(const recursive_directory_iterator& rhs) const
+inline bool recursive_directory_iterator::operator==(const recursive_directory_iterator& rhs) const
 {
     return _impl->_dir_iter_stack.top() == rhs._impl->_dir_iter_stack.top();
 }
 
-GHC_INLINE bool recursive_directory_iterator::operator!=(const recursive_directory_iterator& rhs) const
+inline bool recursive_directory_iterator::operator!=(const recursive_directory_iterator& rhs) const
 {
     return _impl->_dir_iter_stack.top() != rhs._impl->_dir_iter_stack.top();
 }
 
 // [fs.rec.dir.itr.nonmembers] directory_iterator non-member functions
-GHC_INLINE recursive_directory_iterator begin(recursive_directory_iterator iter) noexcept
+inline recursive_directory_iterator begin(recursive_directory_iterator iter) noexcept
 {
     return iter;
 }
 
-GHC_INLINE recursive_directory_iterator end(const recursive_directory_iterator&) noexcept
+inline recursive_directory_iterator end(const recursive_directory_iterator&) noexcept
 {
     return recursive_directory_iterator();
 }
 
-#endif  // GHC_EXPAND_IMPL
 
 }  // namespace filesystem
-}  // namespace ghc
+}  // namespace turbo
 
-// cleanup some macros
-#undef GHC_INLINE
-#undef GHC_EXPAND_IMPL
 
 #endif  // TURBO_FILES_FILESYSTEM_H_

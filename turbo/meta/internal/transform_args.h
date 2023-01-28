@@ -19,8 +19,8 @@
 // This file contains a higher-order macro that "transforms" each element of a
 // a variadic argument by a provided secondary macro.
 
-#ifndef TURBO_TYPES_INTERNAL_TRANSFORM_ARGS_H_
-#define TURBO_TYPES_INTERNAL_TRANSFORM_ARGS_H_
+#ifndef TURBO_META_INTERNAL_TRANSFORM_ARGS_H_
+#define TURBO_META_INTERNAL_TRANSFORM_ARGS_H_
 
 //
 // TURBO_INTERNAL_CAT(a, b)
@@ -243,4 +243,4 @@
       __VA_ARGS__, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, \
       17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, ))
 
-#endif  // TURBO_TYPES_INTERNAL_TRANSFORM_ARGS_H_
+#endif  // TURBO_META_INTERNAL_TRANSFORM_ARGS_H_

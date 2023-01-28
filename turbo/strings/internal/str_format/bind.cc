@@ -106,11 +106,11 @@ class ConverterConsumer {
   ConverterConsumer(Converter converter, turbo::Span<const FormatArgImpl> pack)
       : converter_(converter), arg_context_(pack) {}
 
-  bool Append(string_view s) {
+  bool Append(std::string_view s) {
     converter_.Append(s);
     return true;
   }
-  bool ConvertOne(const UnboundConversion& conv, string_view conv_string) {
+  bool ConvertOne(const UnboundConversion& conv, std::string_view conv_string) {
     BoundConversion bound;
     if (!arg_context_.Bind(&conv, &bound)) return false;
     return converter_.ConvertOne(bound, conv_string);
@@ -137,9 +137,9 @@ class DefaultConverter {
  public:
   explicit DefaultConverter(FormatSinkImpl* sink) : sink_(sink) {}
 
-  void Append(string_view s) const { sink_->Append(s); }
+  void Append(std::string_view s) const { sink_->Append(s); }
 
-  bool ConvertOne(const BoundConversion& bound, string_view /*conv*/) const {
+  bool ConvertOne(const BoundConversion& bound, std::string_view /*conv*/) const {
     return FormatArgImplFriend::Convert(*bound.arg(), bound, sink_);
   }
 
@@ -151,9 +151,9 @@ class SummarizingConverter {
  public:
   explicit SummarizingConverter(FormatSinkImpl* sink) : sink_(sink) {}
 
-  void Append(string_view s) const { sink_->Append(s); }
+  void Append(std::string_view s) const { sink_->Append(s); }
 
-  bool ConvertOne(const BoundConversion& bound, string_view /*conv*/) const {
+  bool ConvertOne(const BoundConversion& bound, std::string_view /*conv*/) const {
     UntypedFormatSpecImpl spec("%d");
 
     std::ostringstream ss;

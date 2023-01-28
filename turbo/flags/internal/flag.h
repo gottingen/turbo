@@ -122,7 +122,7 @@ inline void* Clone(FlagOpFn op, const void* obj) {
   return res;
 }
 // Returns true if parsing of input text is successfull.
-inline bool Parse(FlagOpFn op, turbo::string_view text, void* dst,
+inline bool Parse(FlagOpFn op, std::string_view text, void* dst,
                   std::string* error) {
   return op(FlagOp::kParse, &text, dst, error) != nullptr;
 }
@@ -184,7 +184,7 @@ struct FixedCharArray {
 
   template <size_t... I>
   static constexpr FixedCharArray<N> FromLiteralString(
-      turbo::string_view str, turbo::index_sequence<I...>) {
+      std::string_view str, turbo::index_sequence<I...>) {
     return (void)str, FixedCharArray<N>({{str[I]..., '\0'}});
   }
 };
@@ -523,7 +523,7 @@ class FlagImpl final : public CommandLineFlag {
 
   // Attempts to parse supplied `value` string. If parsing is successful,
   // returns new value. Otherwise returns nullptr.
-  std::unique_ptr<void, DynValueDeleter> TryParse(turbo::string_view value,
+  std::unique_ptr<void, DynValueDeleter> TryParse(std::string_view value,
                                                   std::string& err) const
       TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
   // Stores the flag value based on the pointer to the source.
@@ -547,7 +547,7 @@ class FlagImpl final : public CommandLineFlag {
   }
 
   // CommandLineFlag interface implementation
-  turbo::string_view Name() const override;
+  std::string_view Name() const override;
   std::string Filename() const override;
   std::string Help() const override;
   FlagFastTypeId TypeId() const override;
@@ -555,7 +555,7 @@ class FlagImpl final : public CommandLineFlag {
       TURBO_LOCKS_EXCLUDED(*DataGuard());
   std::string DefaultValue() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
   std::string CurrentValue() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
-  bool ValidateInputValue(turbo::string_view value) const override
+  bool ValidateInputValue(std::string_view value) const override
       TURBO_LOCKS_EXCLUDED(*DataGuard());
   void CheckDefaultValueParsingRoundtrip() const override
       TURBO_LOCKS_EXCLUDED(*DataGuard());
@@ -573,7 +573,7 @@ class FlagImpl final : public CommandLineFlag {
   bool RestoreState(const FlagState& flag_state)
       TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-  bool ParseFrom(turbo::string_view value, FlagSettingMode set_mode,
+  bool ParseFrom(std::string_view value, FlagSettingMode set_mode,
                  ValueSource source, std::string& error) override
       TURBO_LOCKS_EXCLUDED(*DataGuard());
 
@@ -643,7 +643,7 @@ class Flag {
         value_() {}
 
   // CommandLineFlag interface
-  turbo::string_view Name() const { return impl_.Name(); }
+  std::string_view Name() const { return impl_.Name(); }
   std::string Filename() const { return impl_.Filename(); }
   std::string Help() const { return impl_.Help(); }
   // Do not use. To be removed.
@@ -743,7 +743,7 @@ void* FlagOps(FlagOp op, const void* v1, void* v2, void* v3) {
       // Initialize the temporary instance of type T based on current value in
       // destination (which is going to be flag's default value).
       T temp(*static_cast<T*>(v2));
-      if (!turbo::ParseFlag<T>(*static_cast<const turbo::string_view*>(v1), &temp,
+      if (!turbo::ParseFlag<T>(*static_cast<const std::string_view*>(v1), &temp,
                               static_cast<std::string*>(v3))) {
         return nullptr;
       }

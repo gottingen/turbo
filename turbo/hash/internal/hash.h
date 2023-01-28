@@ -41,6 +41,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <optional>
+#include <variant>
 
 #include "turbo/platform/config.h"
 #include "turbo/platform/internal/unaligned_access.h"
@@ -52,8 +54,6 @@
 #include "turbo/base/bits.h"
 #include "turbo/base/int128.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/optional.h"
-#include "turbo/meta/variant.h"
 #include "turbo/meta/utility.h"
 
 namespace turbo {
@@ -518,14 +518,14 @@ H TurboHashValue(H hash_state, const std::shared_ptr<T>& ptr) {
 //  - `turbo::Cord`
 //  - `std::string` (and std::basic_string<char, std::char_traits<char>, A> for
 //      any allocator A)
-//  - `turbo::string_view` and `std::string_view`
+//  - `std::string_view` and `std::string_view`
 //
 // For simplicity, we currently support only `char` strings. This support may
 // be broadened, if necessary, but with some caution - this overload would
 // misbehave in cases where the traits' `eq()` member isn't equivalent to `==`
 // on the underlying character type.
 template <typename H>
-H TurboHashValue(H hash_state, turbo::string_view str) {
+H TurboHashValue(H hash_state, std::string_view str) {
   return H::combine(
       H::combine_contiguous(std::move(hash_state), str.data(), str.size()),
       str.size());
@@ -751,10 +751,10 @@ typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
   return H::combine(std::move(hash_state), opt.get());
 }
 
-// TurboHashValue for hashing turbo::optional
+// TurboHashValue for hashing std::optional
 template <typename H, typename T>
 typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
-    H hash_state, const turbo::optional<T>& opt) {
+    H hash_state, const std::optional<T>& opt) {
   if (opt) hash_state = H::combine(std::move(hash_state), *opt);
   return H::combine(std::move(hash_state), opt.has_value());
 }
@@ -772,9 +772,9 @@ struct VariantVisitor {
 // TurboHashValue for hashing turbo::variant
 template <typename H, typename... T>
 typename std::enable_if<conjunction<is_hashable<T>...>::value, H>::type
-TurboHashValue(H hash_state, const turbo::variant<T...>& v) {
+TurboHashValue(H hash_state, const std::variant<T...>& v) {
   if (!v.valueless_by_exception()) {
-    hash_state = turbo::visit(VariantVisitor<H>{std::move(hash_state)}, v);
+    hash_state = std::visit(VariantVisitor<H>{std::move(hash_state)}, v);
   }
   return H::combine(std::move(hash_state), v.index());
 }

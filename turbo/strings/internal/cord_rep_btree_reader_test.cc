@@ -59,7 +59,7 @@ TEST(CordRepBtreeReaderTest, Next) {
 
     CordRepBtreeReader reader;
     size_t remaining = data.length();
-    turbo::string_view chunk = reader.Init(node);
+    std::string_view chunk = reader.Init(node);
     EXPECT_THAT(chunk, Eq(data.substr(0, chunk.length())));
 
     remaining -= chunk.length();
@@ -97,7 +97,7 @@ TEST(CordRepBtreeReaderTest, Skip) {
       for (size_t skip2 = 0; skip2 < data.length() - kChars; ++skip2) {
         CordRepBtreeReader reader;
         size_t remaining = data.length();
-        turbo::string_view chunk = reader.Init(node);
+        std::string_view chunk = reader.Init(node);
         remaining -= chunk.length();
 
         chunk = reader.Skip(skip1);
@@ -142,7 +142,7 @@ TEST(CordRepBtreeReaderTest, Seek) {
     for (size_t seek = 0; seek < data.length() - 1; ++seek) {
       CordRepBtreeReader reader;
       reader.Init(node);
-      turbo::string_view chunk = reader.Seek(seek);
+      std::string_view chunk = reader.Seek(seek);
       ASSERT_THAT(chunk, Not(IsEmpty()));
       ASSERT_THAT(chunk, Eq(data.substr(seek, chunk.length())));
       ASSERT_THAT(reader.remaining(),
@@ -172,7 +172,7 @@ TEST(CordRepBtreeReaderTest, Read) {
 
   CordRep* tree;
   CordRepBtreeReader reader;
-  turbo::string_view chunk;
+  std::string_view chunk;
 
   // Read zero bytes
   chunk = reader.Init(node);
@@ -254,7 +254,7 @@ TEST(CordRepBtreeReaderTest, ReadExhaustive) {
 
     for (size_t read_size : {kChars - 1, kChars, kChars + 7, cap * cap}) {
       CordRepBtreeReader reader;
-      turbo::string_view chunk = reader.Init(node);
+      std::string_view chunk = reader.Init(node);
 
       // `consumed` tracks the end of last consumed chunk which is the start of
       // the next chunk: we always read with `chunk_size = chunk.length()`.

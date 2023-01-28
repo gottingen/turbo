@@ -24,11 +24,11 @@
 // The parentheses macros are used when wanting to require a rescan before
 // expansion of parenthesized text appearing after a function-style macro name.
 
-#ifndef TURBO_TYPES_INTERNAL_PARENTHESES_H_
-#define TURBO_TYPES_INTERNAL_PARENTHESES_H_
+#ifndef TURBO_META_INTERNAL_PARENTHESES_H_
+#define TURBO_META_INTERNAL_PARENTHESES_H_
 
 #define TURBO_INTERNAL_LPAREN (
 
 #define TURBO_INTERNAL_RPAREN )
 
-#endif  // TURBO_TYPES_INTERNAL_PARENTHESES_H_
+#endif  // TURBO_META_INTERNAL_PARENTHESES_H_

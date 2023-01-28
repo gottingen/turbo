@@ -39,15 +39,15 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 // In some configurations, Googletest's string matchers (e.g.
-// `::testing::EndsWith`) need help to match `turbo::string_view`.
-::testing::Matcher<turbo::string_view> AsString(
+// `::testing::EndsWith`) need help to match `std::string_view`.
+::testing::Matcher<std::string_view> AsString(
     const ::testing::Matcher<const std::string&>& str_matcher);
 
 // These matchers correspond to the components of `turbo::LogEntry`.
 ::testing::Matcher<const turbo::LogEntry&> SourceFilename(
-    const ::testing::Matcher<turbo::string_view>& source_filename);
+    const ::testing::Matcher<std::string_view>& source_filename);
 ::testing::Matcher<const turbo::LogEntry&> SourceBasename(
-    const ::testing::Matcher<turbo::string_view>& source_basename);
+    const ::testing::Matcher<std::string_view>& source_basename);
 // Be careful with this one; multi-line statements using `__LINE__` evaluate
 // differently on different platforms.  In particular, the MSVC implementation
 // of `EXPECT_DEATH` returns the line number of the macro expansion to all lines
@@ -66,25 +66,25 @@ namespace log_internal {
 ::testing::Matcher<const turbo::LogEntry&> ThreadID(
     const ::testing::Matcher<turbo::LogEntry::tid_t>&);
 ::testing::Matcher<const turbo::LogEntry&> TextMessageWithPrefixAndNewline(
-    const ::testing::Matcher<turbo::string_view>&
+    const ::testing::Matcher<std::string_view>&
         text_message_with_prefix_and_newline);
 ::testing::Matcher<const turbo::LogEntry&> TextMessageWithPrefix(
-    const ::testing::Matcher<turbo::string_view>& text_message_with_prefix);
+    const ::testing::Matcher<std::string_view>& text_message_with_prefix);
 ::testing::Matcher<const turbo::LogEntry&> TextMessage(
-    const ::testing::Matcher<turbo::string_view>& text_message);
+    const ::testing::Matcher<std::string_view>& text_message);
 ::testing::Matcher<const turbo::LogEntry&> TextPrefix(
-    const ::testing::Matcher<turbo::string_view>& text_prefix);
+    const ::testing::Matcher<std::string_view>& text_prefix);
 ::testing::Matcher<const turbo::LogEntry&> Verbosity(
     const ::testing::Matcher<int>& verbosity);
 ::testing::Matcher<const turbo::LogEntry&> Stacktrace(
-    const ::testing::Matcher<turbo::string_view>& stacktrace);
+    const ::testing::Matcher<std::string_view>& stacktrace);
 // Behaves as `Eq(stream.str())`, but produces better failure messages.
-::testing::Matcher<turbo::string_view> MatchesOstream(
+::testing::Matcher<std::string_view> MatchesOstream(
     const std::ostringstream& stream);
 ::testing::Matcher<const std::string&> DeathTestValidateExpectations();
 
 ::testing::Matcher<const turbo::LogEntry&> RawEncodedMessage(
-    const ::testing::Matcher<turbo::string_view>& raw_encoded_message);
+    const ::testing::Matcher<std::string_view>& raw_encoded_message);
 #define ENCODED_MESSAGE(message_matcher) ::testing::_
 
 }  // namespace log_internal

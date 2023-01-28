@@ -42,13 +42,13 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/call_once.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/base/internal/statusor_internal.h"
 #include "status.h"
-#include "turbo/meta/variant.h"
 #include "turbo/meta/utility.h"
 
 namespace turbo {
@@ -411,7 +411,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
       typename = typename std::enable_if<turbo::conjunction<
           std::is_constructible<T, U&&>, std::is_assignable<T&, U&&>,
           turbo::disjunction<
-              std::is_same<turbo::remove_cv_t<turbo::remove_reference_t<U>>, T>,
+              std::is_same<std::remove_cv_t<std::remove_reference_t<U>>, T>,
               turbo::conjunction<
                   turbo::negation<std::is_convertible<U&&, turbo::Status>>,
                   turbo::negation<internal_statusor::
@@ -444,7 +444,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
               internal_statusor::IsDirectInitializationValid<T, U&&>,
               std::is_constructible<T, U&&>, std::is_convertible<U&&, T>,
               turbo::disjunction<
-                  std::is_same<turbo::remove_cv_t<turbo::remove_reference_t<U>>,
+                  std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                                T>,
                   turbo::conjunction<
                       turbo::negation<std::is_convertible<U&&, turbo::Status>>,
@@ -461,7 +461,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
           turbo::conjunction<
               internal_statusor::IsDirectInitializationValid<T, U&&>,
               turbo::disjunction<
-                  std::is_same<turbo::remove_cv_t<turbo::remove_reference_t<U>>,
+                  std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                                T>,
                   turbo::conjunction<
                       turbo::negation<std::is_constructible<turbo::Status, U&&>>,

@@ -19,7 +19,7 @@
 #include <type_traits>
 
 #include "turbo/meta/type_traits.h"
-#include "turbo/meta/optional.h"
+#include <optional>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -100,7 +100,7 @@ class node_handle_base {
 
   void reset() {
     assert(alloc_.has_value());
-    alloc_ = turbo::nullopt;
+    alloc_ = std::nullopt;
   }
 
   slot_type* slot() const {
@@ -110,7 +110,7 @@ class node_handle_base {
   allocator_type* alloc() { return std::addressof(*alloc_); }
 
  private:
-  turbo::optional<allocator_type> alloc_ = {};
+  std::optional<allocator_type> alloc_ = {};
   alignas(slot_type) mutable unsigned char slot_space_[sizeof(slot_type)] = {};
 };
 

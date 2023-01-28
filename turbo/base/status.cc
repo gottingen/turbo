@@ -79,17 +79,17 @@ std::ostream& operator<<(std::ostream& os, StatusCode code) {
 
 namespace status_internal {
 
-static turbo::optional<size_t> FindPayloadIndexByUrl(
+static std::optional<size_t> FindPayloadIndexByUrl(
     const Payloads* payloads,
-    turbo::string_view type_url) {
+    std::string_view type_url) {
   if (payloads == nullptr)
-    return turbo::nullopt;
+    return std::nullopt;
 
   for (size_t i = 0; i < payloads->size(); ++i) {
     if ((*payloads)[i].type_url == type_url) return i;
   }
 
-  return turbo::nullopt;
+  return std::nullopt;
 }
 
 // Convert canonical code to a value known to this binary.
@@ -120,18 +120,18 @@ turbo::StatusCode MapToLocalCode(int value) {
 }
 }  // namespace status_internal
 
-turbo::optional<turbo::Cord> Status::GetPayload(
-    turbo::string_view type_url) const {
+std::optional<turbo::Cord> Status::GetPayload(
+    std::string_view type_url) const {
   const auto* payloads = GetPayloads();
-  turbo::optional<size_t> index =
+  std::optional<size_t> index =
       status_internal::FindPayloadIndexByUrl(payloads, type_url);
   if (index.has_value())
     return (*payloads)[index.value()].payload;
 
-  return turbo::nullopt;
+  return std::nullopt;
 }
 
-void Status::SetPayload(turbo::string_view type_url, turbo::Cord payload) {
+void Status::SetPayload(std::string_view type_url, turbo::Cord payload) {
   if (ok()) return;
 
   PrepareToModify();
@@ -141,7 +141,7 @@ void Status::SetPayload(turbo::string_view type_url, turbo::Cord payload) {
     rep->payloads = turbo::make_unique<status_internal::Payloads>();
   }
 
-  turbo::optional<size_t> index =
+  std::optional<size_t> index =
       status_internal::FindPayloadIndexByUrl(rep->payloads.get(), type_url);
   if (index.has_value()) {
     (*rep->payloads)[index.value()].payload = std::move(payload);
@@ -151,8 +151,8 @@ void Status::SetPayload(turbo::string_view type_url, turbo::Cord payload) {
   rep->payloads->push_back({std::string(type_url), std::move(payload)});
 }
 
-bool Status::ErasePayload(turbo::string_view type_url) {
-  turbo::optional<size_t> index =
+bool Status::ErasePayload(std::string_view type_url) {
+  std::optional<size_t> index =
       status_internal::FindPayloadIndexByUrl(GetPayloads(), type_url);
   if (index.has_value()) {
     PrepareToModify();
@@ -171,7 +171,7 @@ bool Status::ErasePayload(turbo::string_view type_url) {
 }
 
 void Status::ForEachPayload(
-    turbo::FunctionRef<void(turbo::string_view, const turbo::Cord&)> visitor)
+    turbo::FunctionRef<void(std::string_view, const turbo::Cord&)> visitor)
     const {
   if (auto* payloads = GetPayloads()) {
     bool in_reverse =
@@ -222,7 +222,7 @@ void Status::UnrefNonInlined(uintptr_t rep) {
   }
 }
 
-Status::Status(turbo::StatusCode code, turbo::string_view msg)
+Status::Status(turbo::StatusCode code, std::string_view msg)
     : rep_(CodeToInlinedRep(code)) {
   if (code != turbo::StatusCode::kOk && !msg.empty()) {
     rep_ = PointerToRep(new status_internal::StatusRep(code, msg, nullptr));
@@ -245,7 +245,7 @@ void Status::PrepareToModify() {
   TURBO_RAW_CHECK(!ok(), "PrepareToModify shouldn't be called on OK status.");
   if (IsInlined(rep_)) {
     rep_ = PointerToRep(new status_internal::StatusRep(
-        static_cast<turbo::StatusCode>(raw_code()), turbo::string_view(),
+        static_cast<turbo::StatusCode>(raw_code()), std::string_view(),
         nullptr));
     return;
   }
@@ -308,9 +308,9 @@ std::string Status::ToStringSlow(StatusToStringMode mode) const {
   if (with_payload) {
     status_internal::StatusPayloadPrinter printer =
         status_internal::GetStatusPayloadPrinter();
-    this->ForEachPayload([&](turbo::string_view type_url,
+    this->ForEachPayload([&](std::string_view type_url,
                              const turbo::Cord& payload) {
-      turbo::optional<std::string> result;
+      std::optional<std::string> result;
       if (printer) result = printer(type_url, payload);
       turbo::StrAppend(
           &text, " [", type_url, "='",
@@ -327,67 +327,67 @@ std::ostream& operator<<(std::ostream& os, const Status& x) {
   return os;
 }
 
-Status AbortedError(turbo::string_view message) {
+Status AbortedError(std::string_view message) {
   return Status(turbo::StatusCode::kAborted, message);
 }
 
-Status AlreadyExistsError(turbo::string_view message) {
+Status AlreadyExistsError(std::string_view message) {
   return Status(turbo::StatusCode::kAlreadyExists, message);
 }
 
-Status CancelledError(turbo::string_view message) {
+Status CancelledError(std::string_view message) {
   return Status(turbo::StatusCode::kCancelled, message);
 }
 
-Status DataLossError(turbo::string_view message) {
+Status DataLossError(std::string_view message) {
   return Status(turbo::StatusCode::kDataLoss, message);
 }
 
-Status DeadlineExceededError(turbo::string_view message) {
+Status DeadlineExceededError(std::string_view message) {
   return Status(turbo::StatusCode::kDeadlineExceeded, message);
 }
 
-Status FailedPreconditionError(turbo::string_view message) {
+Status FailedPreconditionError(std::string_view message) {
   return Status(turbo::StatusCode::kFailedPrecondition, message);
 }
 
-Status InternalError(turbo::string_view message) {
+Status InternalError(std::string_view message) {
   return Status(turbo::StatusCode::kInternal, message);
 }
 
-Status InvalidArgumentError(turbo::string_view message) {
+Status InvalidArgumentError(std::string_view message) {
   return Status(turbo::StatusCode::kInvalidArgument, message);
 }
 
-Status NotFoundError(turbo::string_view message) {
+Status NotFoundError(std::string_view message) {
   return Status(turbo::StatusCode::kNotFound, message);
 }
 
-Status OutOfRangeError(turbo::string_view message) {
+Status OutOfRangeError(std::string_view message) {
   return Status(turbo::StatusCode::kOutOfRange, message);
 }
 
-Status PermissionDeniedError(turbo::string_view message) {
+Status PermissionDeniedError(std::string_view message) {
   return Status(turbo::StatusCode::kPermissionDenied, message);
 }
 
-Status ResourceExhaustedError(turbo::string_view message) {
+Status ResourceExhaustedError(std::string_view message) {
   return Status(turbo::StatusCode::kResourceExhausted, message);
 }
 
-Status UnauthenticatedError(turbo::string_view message) {
+Status UnauthenticatedError(std::string_view message) {
   return Status(turbo::StatusCode::kUnauthenticated, message);
 }
 
-Status UnavailableError(turbo::string_view message) {
+Status UnavailableError(std::string_view message) {
   return Status(turbo::StatusCode::kUnavailable, message);
 }
 
-Status UnimplementedError(turbo::string_view message) {
+Status UnimplementedError(std::string_view message) {
   return Status(turbo::StatusCode::kUnimplemented, message);
 }
 
-Status UnknownError(turbo::string_view message) {
+Status UnknownError(std::string_view message) {
   return Status(turbo::StatusCode::kUnknown, message);
 }
 
@@ -597,13 +597,13 @@ StatusCode ErrnoToStatusCode(int error_number) {
 
 namespace {
 std::string MessageForErrnoToStatus(int error_number,
-                                    turbo::string_view message) {
+                                    std::string_view message) {
   return turbo::StrCat(message, ": ",
                       turbo::base_internal::StrError(error_number));
 }
 }  // namespace
 
-Status ErrnoToStatus(int error_number, turbo::string_view message) {
+Status ErrnoToStatus(int error_number, std::string_view message) {
   return Status(ErrnoToStatusCode(error_number),
                 MessageForErrnoToStatus(error_number, message));
 }

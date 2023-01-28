@@ -19,22 +19,22 @@
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-bool EqualsIgnoreCase(turbo::string_view piece1,
-                      turbo::string_view piece2) noexcept {
+bool EqualsIgnoreCase(std::string_view piece1,
+                      std::string_view piece2) noexcept {
   return (piece1.size() == piece2.size() &&
           0 == turbo::strings_internal::memcasecmp(piece1.data(), piece2.data(),
                                                   piece1.size()));
   // memcasecmp uses turbo::ascii_tolower().
 }
 
-bool StartsWithIgnoreCase(turbo::string_view text,
-                          turbo::string_view prefix) noexcept {
+bool StartsWithIgnoreCase(std::string_view text,
+                          std::string_view prefix) noexcept {
   return (text.size() >= prefix.size()) &&
          EqualsIgnoreCase(text.substr(0, prefix.size()), prefix);
 }
 
-bool EndsWithIgnoreCase(turbo::string_view text,
-                        turbo::string_view suffix) noexcept {
+bool EndsWithIgnoreCase(std::string_view text,
+                        std::string_view suffix) noexcept {
   return (text.size() >= suffix.size()) &&
          EqualsIgnoreCase(text.substr(text.size() - suffix.size()), suffix);
 }

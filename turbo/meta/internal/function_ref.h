@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
-#define TURBO_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
+#ifndef TURBO_META_INTERNAL_FUNCTION_REF_H_
+#define TURBO_META_INTERNAL_FUNCTION_REF_H_
 
 #include <cassert>
 #include <functional>
@@ -103,4 +103,4 @@ using EnableIf = typename ::std::enable_if<C, int>::type;
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_
+#endif  // TURBO_META_INTERNAL_FUNCTION_REF_H_

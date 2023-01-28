@@ -44,7 +44,7 @@
 // `LOG` macros evaluate to an unterminated statement.  The value at the end of
 // the statement supports some chainable methods:
 //
-//   * .AtLocation(turbo::string_view file, int line)
+//   * .AtLocation(std::string_view file, int line)
 //     .AtLocation(turbo::SourceLocation loc)
 //     Overrides the location inferred from the callsite.  The string pointed to
 //     by `file` must be valid until the end of the statement.

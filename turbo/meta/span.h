@@ -18,7 +18,7 @@
 // -----------------------------------------------------------------------------
 //
 // This header file defines a `Span<T>` type for holding a reference to existing
-// array data. The `Span` object, much like the `turbo::string_view` object,
+// array data. The `Span` object, much like the `std::string_view` object,
 // does not own such data itself, and the data being referenced by the span must
 // outlive the span itself. Unlike `view` type references, a span can hold a
 // reference to mutable data (and can mutate it for underlying types of
@@ -49,8 +49,8 @@
 //    * `turbo::Span` has an explicit mutable-reference constructor
 //
 // For more information, see the class comments below.
-#ifndef TURBO_TYPES_SPAN_H_
-#define TURBO_TYPES_SPAN_H_
+#ifndef TURBO_META_SPAN_H_
+#define TURBO_META_SPAN_H_
 
 #include <algorithm>
 #include <cassert>
@@ -94,8 +94,8 @@ TURBO_NAMESPACE_BEGIN
 // spans which can mutate their values (of type `T`) must use explicit
 // constructors.
 //
-// A `Span<T>` is somewhat analogous to an `turbo::string_view`, but for an array
-// of elements of type `T`, and unlike an `turbo::string_view`, a span can hold a
+// A `Span<T>` is somewhat analogous to an `std::string_view`, but for an array
+// of elements of type `T`, and unlike an `std::string_view`, a span can hold a
 // reference to mutable data. A user of `Span` must ensure that the data being
 // pointed to outlives the `Span` itself.
 //
@@ -171,7 +171,7 @@ class Span {
 
  public:
   using element_type = T;
-  using value_type = turbo::remove_cv_t<T>;
+  using value_type = std::remove_cv_t<T>;
   using pointer = T*;
   using const_pointer = const T*;
   using reference = T&;
@@ -746,4 +746,4 @@ constexpr Span<const T> MakeConstSpan(const T (&array)[N]) noexcept {
 }
 TURBO_NAMESPACE_END
 }  // namespace turbo
-#endif  // TURBO_TYPES_SPAN_H_
+#endif  // TURBO_META_SPAN_H_

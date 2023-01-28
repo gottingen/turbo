@@ -48,7 +48,7 @@ namespace debugging_internal {
 //
 // This is not async-signal-safe.
 bool ForEachSection(int fd,
-                    const std::function<bool(turbo::string_view name,
+                    const std::function<bool(std::string_view name,
                                              const ElfW(Shdr) &)>& callback);
 
 // Gets the section header for the given name, if it exists. Returns true on

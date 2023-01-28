@@ -100,17 +100,6 @@ turbo_cc_test(
     GTest::gmock_main
 )
 
-turbo_cc_test(
-  NAME
-    string_view_test
-  SRCS
-    "string_view_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gmock_main
-)
 
 turbo_cc_test(
   NAME

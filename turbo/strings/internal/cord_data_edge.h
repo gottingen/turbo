@@ -40,9 +40,9 @@ inline bool IsDataEdge(const CordRep* edge) {
   return edge->tag == EXTERNAL || edge->tag >= FLAT;
 }
 
-// Returns the `turbo::string_view` data reference for the provided data edge.
+// Returns the `std::string_view` data reference for the provided data edge.
 // Requires 'IsDataEdge(edge) == true`.
-inline turbo::string_view EdgeData(const CordRep* edge) {
+inline std::string_view EdgeData(const CordRep* edge) {
   assert(IsDataEdge(edge));
 
   size_t offset = 0;
@@ -52,8 +52,8 @@ inline turbo::string_view EdgeData(const CordRep* edge) {
     edge = edge->substring()->child;
   }
   return edge->tag >= FLAT
-             ? turbo::string_view{edge->flat()->Data() + offset, length}
-             : turbo::string_view{edge->external()->base + offset, length};
+             ? std::string_view{edge->flat()->Data() + offset, length}
+             : std::string_view{edge->external()->base + offset, length};
 }
 
 }  // namespace cord_internal

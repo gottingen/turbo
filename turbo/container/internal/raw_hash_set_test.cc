@@ -335,13 +335,13 @@ using Uint8Policy = ValuePolicy<uint8_t>;
 class StringPolicy {
   template <class F, class K, class V,
             class = typename std::enable_if<
-                std::is_convertible<const K&, turbo::string_view>::value>::type>
+                std::is_convertible<const K&, std::string_view>::value>::type>
   decltype(std::declval<F>()(
-      std::declval<const turbo::string_view&>(), std::piecewise_construct,
+      std::declval<const std::string_view&>(), std::piecewise_construct,
       std::declval<std::tuple<K>>(),
       std::declval<V>())) static apply_impl(F&& f,
                                             std::pair<std::tuple<K>, V> p) {
-    const turbo::string_view& key = std::get<0>(p.first);
+    const std::string_view& key = std::get<0>(p.first);
     return std::forward<F>(f)(key, std::piecewise_construct, std::move(p.first),
                               std::move(p.second));
   }
@@ -390,10 +390,10 @@ class StringPolicy {
   }
 };
 
-struct StringHash : turbo::Hash<turbo::string_view> {
+struct StringHash : turbo::Hash<std::string_view> {
   using is_transparent = void;
 };
-struct StringEq : std::equal_to<turbo::string_view> {
+struct StringEq : std::equal_to<std::string_view> {
   using is_transparent = void;
 };
 
@@ -452,7 +452,7 @@ struct BadTable : raw_hash_set<IntPolicy, BadFastHash, std::equal_to<int>,
 };
 
 TEST(Table, EmptyFunctorOptimization) {
-  static_assert(std::is_empty<std::equal_to<turbo::string_view>>::value, "");
+  static_assert(std::is_empty<std::equal_to<std::string_view>>::value, "");
   static_assert(std::is_empty<std::allocator<int>>::value, "");
 
   struct MockTable {
@@ -471,7 +471,7 @@ TEST(Table, EmptyFunctorOptimization) {
     size_t growth_left;
   };
   struct StatelessHash {
-    size_t operator()(turbo::string_view) const { return 0; }
+    size_t operator()(std::string_view) const { return 0; }
   };
   struct StatefulHash : StatelessHash {
     size_t dummy;
@@ -501,13 +501,13 @@ TEST(Table, EmptyFunctorOptimization) {
       mock_size + generation_size,
       sizeof(
           raw_hash_set<StringPolicy, StatelessHash,
-                       std::equal_to<turbo::string_view>, std::allocator<int>>));
+                       std::equal_to<std::string_view>, std::allocator<int>>));
 
   EXPECT_EQ(
       mock_size + sizeof(StatefulHash) + generation_size,
       sizeof(
           raw_hash_set<StringPolicy, StatefulHash,
-                       std::equal_to<turbo::string_view>, std::allocator<int>>));
+                       std::equal_to<std::string_view>, std::allocator<int>>));
 }
 
 TEST(Table, Empty) {
@@ -1702,18 +1702,18 @@ TEST(Table, ReplacingDeletedSlotDoesNotRehash) {
 
 TEST(Table, NoThrowMoveConstruct) {
   ASSERT_TRUE(
-      std::is_nothrow_copy_constructible<turbo::Hash<turbo::string_view>>::value);
+      std::is_nothrow_copy_constructible<turbo::Hash<std::string_view>>::value);
   ASSERT_TRUE(std::is_nothrow_copy_constructible<
-              std::equal_to<turbo::string_view>>::value);
+              std::equal_to<std::string_view>>::value);
   ASSERT_TRUE(std::is_nothrow_copy_constructible<std::allocator<int>>::value);
   EXPECT_TRUE(std::is_nothrow_move_constructible<StringTable>::value);
 }
 
 TEST(Table, NoThrowMoveAssign) {
   ASSERT_TRUE(
-      std::is_nothrow_move_assignable<turbo::Hash<turbo::string_view>>::value);
+      std::is_nothrow_move_assignable<turbo::Hash<std::string_view>>::value);
   ASSERT_TRUE(
-      std::is_nothrow_move_assignable<std::equal_to<turbo::string_view>>::value);
+      std::is_nothrow_move_assignable<std::equal_to<std::string_view>>::value);
   ASSERT_TRUE(std::is_nothrow_move_assignable<std::allocator<int>>::value);
   ASSERT_TRUE(
       turbo::allocator_traits<std::allocator<int>>::is_always_equal::value);
@@ -1722,9 +1722,9 @@ TEST(Table, NoThrowMoveAssign) {
 
 TEST(Table, NoThrowSwappable) {
   ASSERT_TRUE(
-      container_internal::IsNoThrowSwappable<turbo::Hash<turbo::string_view>>());
+      container_internal::IsNoThrowSwappable<turbo::Hash<std::string_view>>());
   ASSERT_TRUE(container_internal::IsNoThrowSwappable<
-              std::equal_to<turbo::string_view>>());
+              std::equal_to<std::string_view>>());
   ASSERT_TRUE(container_internal::IsNoThrowSwappable<std::allocator<int>>());
   EXPECT_TRUE(container_internal::IsNoThrowSwappable<StringTable>());
 }
@@ -1798,8 +1798,8 @@ struct VerifyResultOf<C, Table, turbo::void_t<C<Table>>> : std::true_type {};
 
 TEST(Table, HeterogeneousLookupOverloads) {
   using NonTransparentTable =
-      raw_hash_set<StringPolicy, turbo::Hash<turbo::string_view>,
-                   std::equal_to<turbo::string_view>, std::allocator<int>>;
+      raw_hash_set<StringPolicy, turbo::Hash<std::string_view>,
+                   std::equal_to<std::string_view>, std::allocator<int>>;
 
   EXPECT_FALSE((VerifyResultOf<CallFind, NonTransparentTable>()));
   EXPECT_FALSE((VerifyResultOf<CallErase, NonTransparentTable>()));
@@ -1809,8 +1809,8 @@ TEST(Table, HeterogeneousLookupOverloads) {
 
   using TransparentTable = raw_hash_set<
       StringPolicy,
-      turbo::container_internal::hash_default_hash<turbo::string_view>,
-      turbo::container_internal::hash_default_eq<turbo::string_view>,
+      turbo::container_internal::hash_default_hash<std::string_view>,
+      turbo::container_internal::hash_default_eq<std::string_view>,
       std::allocator<int>>;
 
   EXPECT_TRUE((VerifyResultOf<CallFind, TransparentTable>()));
@@ -1859,7 +1859,7 @@ TEST(Table, Merge) {
 
 TEST(Table, IteratorEmplaceConstructibleRequirement) {
   struct Value {
-    explicit Value(turbo::string_view view) : value(view) {}
+    explicit Value(std::string_view view) : value(view) {}
     std::string value;
 
     bool operator==(const Value& other) const { return value == other.value; }

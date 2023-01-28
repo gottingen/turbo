@@ -27,7 +27,7 @@ TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 // Copies into `dst` as many bytes of `src` as will fit, then truncates the
 // copied bytes from the front of `dst` and returns the number of bytes written.
-inline size_t AppendTruncated(turbo::string_view src, turbo::Span<char> &dst) {
+inline size_t AppendTruncated(std::string_view src, turbo::Span<char> &dst) {
   if (src.size() > dst.size()) src = src.substr(0, dst.size());
   memcpy(dst.data(), src.data(), src.size());
   dst.remove_prefix(src.size());

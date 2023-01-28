@@ -84,7 +84,7 @@ namespace cctz {
 // a handful of helper functions and algorithms for performing common
 // calculations. These are described below.
 //
-// Note: In C++14 and later, this library is usable in a constexpr context.
+// Note: In C++17 and later, this library is usable in a constexpr context.
 //
 // CONSTRUCTION:
 //

@@ -39,14 +39,14 @@ TURBO_FLAG(turbo::Time, test_time_flag, turbo::InfinitePast(),
 
 namespace {
 
-bool SetFlagValue(turbo::string_view flag_name, turbo::string_view value) {
+bool SetFlagValue(std::string_view flag_name, std::string_view value) {
   auto* flag = turbo::FindCommandLineFlag(flag_name);
   if (!flag) return false;
   std::string err;
   return flag->ParseFrom(value, &err);
 }
 
-bool GetFlagValue(turbo::string_view flag_name, std::string& value) {
+bool GetFlagValue(std::string_view flag_name, std::string& value) {
   auto* flag = turbo::FindCommandLineFlag(flag_name);
   if (!flag) return false;
   value = flag->CurrentValue();

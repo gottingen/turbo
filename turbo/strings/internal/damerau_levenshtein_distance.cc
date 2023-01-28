@@ -31,8 +31,8 @@ namespace strings_internal {
 // detected.
 // When the distance is larger than cutoff, or one of the strings has more
 // than MAX_SIZE=100 characters, the code returns min(MAX_SIZE, cutoff) + 1.
-uint8_t CappedDamerauLevenshteinDistance(turbo::string_view s1,
-                                         turbo::string_view s2, uint8_t cutoff) {
+uint8_t CappedDamerauLevenshteinDistance(std::string_view s1,
+                                         std::string_view s2, uint8_t cutoff) {
   const uint8_t MAX_SIZE = 100;
   const uint8_t _cutoff = std::min(MAX_SIZE, cutoff);
   const uint8_t cutoff_plus_1 = static_cast<uint8_t>(_cutoff + 1);

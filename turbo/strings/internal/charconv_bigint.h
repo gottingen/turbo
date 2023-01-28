@@ -68,7 +68,7 @@ class BigUnsigned {
   // Constructs a BigUnsigned from the given string_view containing a decimal
   // value.  If the input string is not a decimal integer, constructs a 0
   // instead.
-  explicit BigUnsigned(turbo::string_view sv) : size_(0), words_{} {
+  explicit BigUnsigned(std::string_view sv) : size_(0), words_{} {
     // Check for valid input, returning a 0 otherwise.  This is reasonable
     // behavior only because this constructor is for unit tests.
     if (std::find_if_not(sv.begin(), sv.end(), ascii_isdigit) != sv.end() ||

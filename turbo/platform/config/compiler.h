@@ -98,7 +98,6 @@
  *     TURBO_COMPILER_NO_VARIABLE_TEMPLATES
  * 
  *  C++17 functionality
- *     TURBO_COMPILER_NO_INLINE_VARIABLES
  *     TURBO_COMPILER_NO_ALIGNED_NEW
  *
  *  C++20 functionality
@@ -265,25 +264,6 @@
 			// To do: Is there a generic way to determine this?
 		#endif
 	#endif
-
-
-	// TURBO_COMPILER_CPP14_ENABLED
-	//
-	// Defined as 1 if the compiler has its available C++14 support enabled, else undefined.
-	// This does not mean that all of C++14 or any particular feature of C++14 is supported
-	// by the compiler. It means that whatever C++14 support the compiler has is enabled.
-	//
-	// We cannot use (__cplusplus >= 201402L) alone because some compiler vendors have 
-	// decided to not define __cplusplus like thus until they have fully completed their
-	// C++14 support.
-	#if !defined(TURBO_COMPILER_CPP14_ENABLED) && defined(__cplusplus)
-		#if (__cplusplus >= 201402L) 								// Clang and GCC defines this like so in C++14 mode.
-			#define TURBO_COMPILER_CPP14_ENABLED 1
-		#elif defined(_MSC_VER) && (_MSC_VER >= 1900)  	// VS2015+ 
-			#define TURBO_COMPILER_CPP14_ENABLED 1
-		#endif
-	#endif
-
 
 	// TURBO_COMPILER_CPP17_ENABLED
 	//
@@ -1143,45 +1123,6 @@
 			#define TURBO_COMPILER_NO_TEMPLATE_ALIASES 1
 		#endif
 	#endif
-
-
-	// TURBO_COMPILER_NO_VARIABLE_TEMPLATES
-	//
-	// Refers to C++14 variable templates.
-	// Example variable template usage:
-	//     template<class T>
-	//     constexpr T pi = T(3.1415926535897932385);
-	//
-	#if !defined(TURBO_COMPILER_NO_VARIABLE_TEMPLATES)
-		#if defined(_MSC_VER) && (_MSC_FULL_VER >= 190023918)    // VS2015 Update 2 and above.
-			// supported.
-		#elif defined(TURBO_COMPILER_CPP14_ENABLED) && defined(__clang__) && (TURBO_COMPILER_VERSION >= 304) && !defined(__apple_build_version__)    // Clang 3.4+, not including Apple's Clang.
-			// supported.
-		#elif defined(TURBO_COMPILER_CPP14_ENABLED) && defined(__GNUC__) && (TURBO_COMPILER_VERSION >= 5000)   // GCC 5+
-			// supported.
-		#elif !defined(TURBO_COMPILER_CPP14_ENABLED)
-			#define TURBO_COMPILER_NO_VARIABLE_TEMPLATES 1
-		#endif
-	#endif
-
-
-	// TURBO_COMPILER_NO_INLINE_VARIABLES
-	//
-	// Refers to C++17 inline variables that allows the definition of variables in header files
-	//
-	// Example usage:
-	//    struct Foo 
-	//    {
-	//        static inline constexpr int kConstant = 42;  // no out of class definition
-	//    };
-	//
-	// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4424.pdf
-	// http://en.cppreference.com/w/cpp/language/inline
-	//
-	#if !defined(TURBO_COMPILER_NO_INLINE_VARIABLES)
-		#define TURBO_COMPILER_NO_INLINE_VARIABLES 1
-	#endif
-
 
 	// TURBO_COMPILER_NO_INITIALIZER_LISTS
 	//

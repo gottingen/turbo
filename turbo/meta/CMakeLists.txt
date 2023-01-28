@@ -44,47 +44,6 @@ turbo_cc_test(
 )
 
 
-turbo_cc_test(
-        NAME
-        any_test
-        SRCS
-        "any_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::exception_testing
-        turbo::turbo
-        turbo::test_instance_tracker
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        any_test_noexceptions
-        SRCS
-        "any_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::exception_testing
-        turbo::turbo
-        turbo::test_instance_tracker
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        any_exception_safety_test
-        SRCS
-        "any_exception_safety_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        turbo::exception_safety_testing
-        GTest::gmock_main
-)
-
 
 turbo_cc_test(
         NAME
@@ -114,30 +73,6 @@ turbo_cc_test(
         GTest::gmock_main
 )
 
-turbo_cc_test(
-        NAME
-        optional_test
-        SRCS
-        "optional_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        optional_exception_safety_test
-        SRCS
-        "optional_exception_safety_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        turbo::exception_safety_testing
-        GTest::gmock_main
-)
 
 # Internal-only target, do not depend on directly.
 turbo_cc_library(
@@ -189,18 +124,6 @@ turbo_cc_test(
 )
 
 
-turbo_cc_test(
-        NAME
-        variant_test
-        SRCS
-        "variant_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
-
 
 turbo_cc_test(
         NAME
@@ -210,19 +133,6 @@ turbo_cc_test(
         COPTS
         ${TURBO_TEST_COPTS}
         DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        variant_exception_safety_test
-        SRCS
-        "variant_exception_safety_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::exception_safety_testing
         turbo::turbo
         GTest::gmock_main
 )

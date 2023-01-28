@@ -43,11 +43,11 @@ cmake_minimum_required(VERSION 3.10)
 project(my_app_project)
 
 # Pick the C++ standard to compile with.
-# Turbo currently supports C++14, C++17, and C++20.
-set(CMAKE_CXX_STANDARD 14)
+# Turbo currently supports C++17, and C++20.
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(abseil-cpp)
+add_subdirectory(turbo)
 
 add_executable(my_exe source.cpp)
 target_link_libraries(my_exe turbo::base turbo::synchronization turbo::strings)

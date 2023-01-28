@@ -14,8 +14,8 @@
 
 // Implementation details for `turbo::bind_front()`.
 
-#ifndef TURBO_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
-#define TURBO_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
+#ifndef TURBO_META_INTERNAL_FRONT_BINDER_H_
+#define TURBO_META_INTERNAL_FRONT_BINDER_H_
 
 #include <cstddef>
 #include <type_traits>
@@ -92,4 +92,4 @@ using bind_front_t = FrontBinder<decay_t<F>, turbo::decay_t<BoundArgs>...>;
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
+#endif  // TURBO_META_INTERNAL_FRONT_BINDER_H_

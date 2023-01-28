@@ -61,13 +61,13 @@ struct IntPolicy {
 class StringPolicy {
   template <class F, class K, class V,
             class = typename std::enable_if<
-                std::is_convertible<const K&, turbo::string_view>::value>::type>
+                std::is_convertible<const K&, std::string_view>::value>::type>
   decltype(std::declval<F>()(
-      std::declval<const turbo::string_view&>(), std::piecewise_construct,
+      std::declval<const std::string_view&>(), std::piecewise_construct,
       std::declval<std::tuple<K>>(),
       std::declval<V>())) static apply_impl(F&& f,
                                             std::pair<std::tuple<K>, V> p) {
-    const turbo::string_view& key = std::get<0>(p.first);
+    const std::string_view& key = std::get<0>(p.first);
     return std::forward<F>(f)(key, std::piecewise_construct, std::move(p.first),
                               std::move(p.second));
   }
@@ -116,10 +116,10 @@ class StringPolicy {
   }
 };
 
-struct StringHash : container_internal::hash_default_hash<turbo::string_view> {
+struct StringHash : container_internal::hash_default_hash<std::string_view> {
   using is_transparent = void;
 };
-struct StringEq : std::equal_to<turbo::string_view> {
+struct StringEq : std::equal_to<std::string_view> {
   using is_transparent = void;
 };
 

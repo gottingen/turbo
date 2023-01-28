@@ -32,10 +32,10 @@ class UnimplementedSink {
  public:
   void Append(size_t count, char ch);
 
-  void Append(string_view v);
+  void Append(std::string_view v);
 
   // Support `turbo::Format(&sink, format, args...)`.
-  friend void TurboFormatFlush(UnimplementedSink* sink, turbo::string_view v);
+  friend void TurboFormatFlush(UnimplementedSink* sink, std::string_view v);
 };
 
 template <typename T, typename = void>

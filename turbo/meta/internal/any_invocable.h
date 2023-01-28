@@ -14,8 +14,8 @@
 //
 // Implementation details for `turbo::AnyInvocable`
 
-#ifndef TURBO_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
-#define TURBO_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
+#ifndef TURBO_META_INTERNAL_ANY_INVOCABLE_H_
+#define TURBO_META_INTERNAL_ANY_INVOCABLE_H_
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -875,4 +875,4 @@ TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &&, const&&);
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_
+#endif  // TURBO_META_INTERNAL_ANY_INVOCABLE_H_

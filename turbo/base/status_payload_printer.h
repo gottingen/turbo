@@ -15,10 +15,10 @@
 #define TURBO_BASE_STATUS_PAYLOAD_PRINTER_H_
 
 #include <string>
+#include <optional>
 
 #include "turbo/strings/cord.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/optional.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -29,12 +29,12 @@ namespace status_internal {
 // extension point, which is a global printer function that can be set by users
 // to specify how to print payloads. The function takes the type URL and the
 // payload as input, and should return a valid human-readable string on success
-// or `turbo::nullopt` on failure (in which case it falls back to the default
+// or `std::nullopt` on failure (in which case it falls back to the default
 // approach of printing the raw bytes).
 // NOTE: This is an internal API and the design is subject to change in the
 // future in a non-backward-compatible way. Since it's only meant for debugging
 // purpose, you should not rely on it in any critical logic.
-using StatusPayloadPrinter = turbo::optional<std::string> (*)(turbo::string_view,
+using StatusPayloadPrinter = std::optional<std::string> (*)(std::string_view,
                                                              const turbo::Cord&);
 
 // Sets the global payload printer. Only one printer should be set per process.

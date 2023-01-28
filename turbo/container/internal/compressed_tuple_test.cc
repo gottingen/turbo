@@ -16,13 +16,13 @@
 
 #include <memory>
 #include <string>
+#include <any>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/container/internal/test_instance_tracker.h"
 #include "turbo/memory/memory.h"
-#include "turbo/meta/any.h"
-#include "turbo/meta/optional.h"
+#include <optional>
 #include "turbo/meta/utility.h"
 
 // These are declared at global scope purely so that error messages
@@ -326,13 +326,13 @@ TEST(CompressedTupleTest, MoveConstructionMoveOnlyElements) {
 }
 
 TEST(CompressedTupleTest, AnyElements) {
-  any a(std::string("str"));
-  CompressedTuple<any, any&> x(any(5), a);
-  EXPECT_EQ(turbo::any_cast<int>(x.get<0>()), 5);
-  EXPECT_EQ(turbo::any_cast<std::string>(x.get<1>()), "str");
+  std::any a(std::string("str"));
+  CompressedTuple<std::any, std::any&> x(std::any(5), a);
+  EXPECT_EQ(std::any_cast<int>(x.get<0>()), 5);
+  EXPECT_EQ(std::any_cast<std::string>(x.get<1>()), "str");
 
   a = 0.5f;
-  EXPECT_EQ(turbo::any_cast<float>(x.get<1>()), 0.5);
+  EXPECT_EQ(std::any_cast<float>(x.get<1>()), 0.5);
 }
 
 TEST(CompressedTupleTest, Constexpr) {
@@ -369,15 +369,15 @@ TEST(CompressedTupleTest, Constexpr) {
   EXPECT_EQ(trivial2, 0);
 #endif
 
-  constexpr CompressedTuple<Empty<0>, NonTrivialStruct, turbo::optional<int>>
+  constexpr CompressedTuple<Empty<0>, NonTrivialStruct, std::optional<int>>
       non_trivial = {};
   constexpr CallType non_trivial0 = non_trivial.get<0>().value();
   constexpr int non_trivial1 = non_trivial.get<1>().value();
-  constexpr turbo::optional<int> non_trivial2 = non_trivial.get<2>();
+  constexpr std::optional<int> non_trivial2 = non_trivial.get<2>();
 
   EXPECT_EQ(non_trivial0, CallType::kConstRef);
   EXPECT_EQ(non_trivial1, 5);
-  EXPECT_EQ(non_trivial2, turbo::nullopt);
+  EXPECT_EQ(non_trivial2, std::nullopt);
 
   static constexpr char data[] = "DEF";
   constexpr CompressedTuple<const char*> z(data);

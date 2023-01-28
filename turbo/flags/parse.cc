@@ -85,10 +85,10 @@ struct SpecifiedFlagsCompare {
   bool operator()(const CommandLineFlag* a, const CommandLineFlag* b) const {
     return a->Name() < b->Name();
   }
-  bool operator()(const CommandLineFlag* a, turbo::string_view b) const {
+  bool operator()(const CommandLineFlag* a, std::string_view b) const {
     return a->Name() < b;
   }
-  bool operator()(turbo::string_view a, const CommandLineFlag* b) const {
+  bool operator()(std::string_view a, const CommandLineFlag* b) const {
     return a < b->Name();
   }
 };
@@ -170,7 +170,7 @@ class ArgsList {
 
   size_t Size() const { return args_.size() - next_arg_; }
   size_t FrontIndex() const { return next_arg_; }
-  turbo::string_view Front() const { return args_[next_arg_]; }
+  std::string_view Front() const { return args_[next_arg_]; }
   void PopFront() { next_arg_++; }
 
  private:
@@ -196,7 +196,7 @@ bool ArgsList::ReadFromFlagfile(const std::string& flag_file_name) {
   bool success = true;
 
   while (std::getline(flag_file, line)) {
-    turbo::string_view stripped = turbo::StripLeadingAsciiWhitespace(line);
+    std::string_view stripped = turbo::StripLeadingAsciiWhitespace(line);
 
     if (stripped.empty() || stripped[0] == '#') {
       // Comment or empty line; just ignore.
@@ -269,8 +269,8 @@ bool GetEnvVar(const char* var_name, std::string& var_value) {
 //   "--foo=bar" -> {"foo", "bar", false}.
 //   "--foo"     -> {"foo", "", false}.
 //   "--foo="    -> {"foo", "", true}.
-std::tuple<turbo::string_view, turbo::string_view, bool> SplitNameAndValue(
-    turbo::string_view arg) {
+std::tuple<std::string_view, std::string_view, bool> SplitNameAndValue(
+    std::string_view arg) {
   // Allow -foo and --foo
   turbo::ConsumePrefix(&arg, "-");
 
@@ -280,12 +280,12 @@ std::tuple<turbo::string_view, turbo::string_view, bool> SplitNameAndValue(
 
   auto equal_sign_pos = arg.find("=");
 
-  turbo::string_view flag_name = arg.substr(0, equal_sign_pos);
+  std::string_view flag_name = arg.substr(0, equal_sign_pos);
 
-  turbo::string_view value;
+  std::string_view value;
   bool is_empty_value = false;
 
-  if (equal_sign_pos != turbo::string_view::npos) {
+  if (equal_sign_pos != std::string_view::npos) {
     value = arg.substr(equal_sign_pos + 1);
     is_empty_value = value.empty();
   }
@@ -298,7 +298,7 @@ std::tuple<turbo::string_view, turbo::string_view, bool> SplitNameAndValue(
 // Returns:
 //  found flag or nullptr
 //  is negative in case of --nofoo
-std::tuple<CommandLineFlag*, bool> LocateFlag(turbo::string_view flag_name) {
+std::tuple<CommandLineFlag*, bool> LocateFlag(std::string_view flag_name) {
   CommandLineFlag* flag = turbo::FindCommandLineFlag(flag_name);
   bool is_negative = false;
 
@@ -497,8 +497,8 @@ void ResetGeneratorFlags(const std::vector<std::string>& flagfile_value) {
 //  deduced value
 // We are also mutating curr_list in case if we need to get a hold of next
 // argument in the input.
-std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag,
-                                                    turbo::string_view value,
+std::tuple<bool, std::string_view> DeduceFlagValue(const CommandLineFlag& flag,
+                                                    std::string_view value,
                                                     bool is_negative,
                                                     bool is_empty_value,
                                                     ArgsList* curr_list) {
@@ -585,7 +585,7 @@ std::tuple<bool, turbo::string_view> DeduceFlagValue(const CommandLineFlag& flag
 
 // --------------------------------------------------------------------
 
-bool CanIgnoreUndefinedFlag(turbo::string_view flag_name) {
+bool CanIgnoreUndefinedFlag(std::string_view flag_name) {
   auto undefok = turbo::GetFlag(FLAGS_undefok);
   if (std::find(undefok.begin(), undefok.end(), flag_name) != undefok.end()) {
     return true;
@@ -603,7 +603,7 @@ bool CanIgnoreUndefinedFlag(turbo::string_view flag_name) {
 
 // --------------------------------------------------------------------
 
-bool WasPresentOnCommandLine(turbo::string_view flag_name) {
+bool WasPresentOnCommandLine(std::string_view flag_name) {
   turbo::MutexLock l(&specified_flags_guard);
   TURBO_INTERNAL_CHECK(specified_flags != nullptr,
                       "ParseCommandLine is not invoked yet");
@@ -616,7 +616,7 @@ bool WasPresentOnCommandLine(turbo::string_view flag_name) {
 
 struct BestHints {
   explicit BestHints(uint8_t _max) : best_distance(_max + 1) {}
-  bool AddHint(turbo::string_view hint, uint8_t distance) {
+  bool AddHint(std::string_view hint, uint8_t distance) {
     if (hints.size() >= kMaxHints) return false;
     if (distance == best_distance) {
       hints.emplace_back(hint);
@@ -634,7 +634,7 @@ struct BestHints {
 
 // Return the list of flags with the smallest Damerau-Levenshtein distance to
 // the given flag.
-std::vector<std::string> GetMisspellingHints(const turbo::string_view flag) {
+std::vector<std::string> GetMisspellingHints(const std::string_view flag) {
   const size_t maxCutoff = std::min(flag.size() / 2 + 1, kMaxDistance);
   auto undefok = turbo::GetFlag(FLAGS_undefok);
   BestHints best_hints(static_cast<uint8_t>(maxCutoff));
@@ -652,7 +652,7 @@ std::vector<std::string> GetMisspellingHints(const turbo::string_view flag) {
     }
   });
   // Finally calculate distance to flags in "undefok".
-  turbo::c_for_each(undefok, [&](const turbo::string_view f) {
+  turbo::c_for_each(undefok, [&](const std::string_view f) {
     if (best_hints.hints.size() >= kMaxHints) return;
     uint8_t distance = strings_internal::CappedDamerauLevenshteinDistance(
         flag, f, best_hints.best_distance);
@@ -727,7 +727,7 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
     // 40. Pick up the front remaining argument in the current list. If current
     // stack of argument lists contains only one element - we are processing an
     // argument from the original argv.
-    turbo::string_view arg(curr_list.Front());
+    std::string_view arg(curr_list.Front());
     bool arg_from_argv = input_args.size() == 1;
 
     // 50. If argument does not start with - or is just "-" - this is
@@ -749,8 +749,8 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
     // can be empty either if there were no '=' in argument string at all or
     // an argument looked like "--foo=". In a latter case is_empty_value is
     // true.
-    turbo::string_view flag_name;
-    turbo::string_view value;
+    std::string_view flag_name;
+    std::string_view value;
     bool is_empty_value = false;
 
     std::tie(flag_name, value, is_empty_value) = SplitNameAndValue(arg);

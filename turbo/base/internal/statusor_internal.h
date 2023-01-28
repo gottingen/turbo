@@ -69,11 +69,11 @@ using IsConstructibleOrConvertibleOrAssignableFromStatusOr =
 template <typename T, typename U>
 struct IsDirectInitializationAmbiguous
     : public turbo::conditional_t<
-          std::is_same<turbo::remove_cv_t<turbo::remove_reference_t<U>>,
+          std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
           IsDirectInitializationAmbiguous<
-              T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>> {};
+              T, std::remove_cv_t<std::remove_reference_t<U>>>> {};
 
 template <typename T, typename V>
 struct IsDirectInitializationAmbiguous<T, turbo::StatusOr<V>>
@@ -84,14 +84,14 @@ struct IsDirectInitializationAmbiguous<T, turbo::StatusOr<V>>
 template <typename T, typename U>
 using IsDirectInitializationValid = turbo::disjunction<
     // Short circuits if T is basically U.
-    std::is_same<T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+    std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
     turbo::negation<turbo::disjunction<
         std::is_same<turbo::StatusOr<T>,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::in_place_t,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         IsDirectInitializationAmbiguous<T, U>>>>;
 
 // This trait detects whether `StatusOr<T>::operator=(U&&)` is ambiguous, which
@@ -107,11 +107,11 @@ using IsDirectInitializationValid = turbo::disjunction<
 template <typename T, typename U>
 struct IsForwardingAssignmentAmbiguous
     : public turbo::conditional_t<
-          std::is_same<turbo::remove_cv_t<turbo::remove_reference_t<U>>,
+          std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
           IsForwardingAssignmentAmbiguous<
-              T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>> {};
+              T, std::remove_cv_t<std::remove_reference_t<U>>>> {};
 
 template <typename T, typename U>
 struct IsForwardingAssignmentAmbiguous<T, turbo::StatusOr<U>>
@@ -122,14 +122,14 @@ struct IsForwardingAssignmentAmbiguous<T, turbo::StatusOr<U>>
 template <typename T, typename U>
 using IsForwardingAssignmentValid = turbo::disjunction<
     // Short circuits if T is basically U.
-    std::is_same<T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+    std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
     turbo::negation<turbo::disjunction<
         std::is_same<turbo::StatusOr<T>,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::in_place_t,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         IsForwardingAssignmentAmbiguous<T, U>>>>;
 
 class Helper {

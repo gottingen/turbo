@@ -373,6 +373,7 @@ TEST(CHECKTest, TestComparisonPlacementsInCompoundStatements) {
   (void)var4;
 #endif  // __GNUC__
 #endif  // TURBO_INTERNAL_CPLUSPLUS_LANG
+
 }
 
 TEST(CHECKTest, TestDCHECK) {
@@ -451,6 +452,7 @@ TEST(CHECKTest, TestQCHECKPlacementsInCompoundStatements) {
   (void)var2;
 #endif  // __GNUC__
 #endif  // TURBO_INTERNAL_CPLUSPLUS_LANG
+
 }
 
 class ComparableType {

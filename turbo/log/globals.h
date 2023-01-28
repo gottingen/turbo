@@ -117,14 +117,14 @@ class ScopedStderrThreshold final {
 //
 // Returns true if we should log a backtrace at the specified location.
 namespace log_internal {
-TURBO_MUST_USE_RESULT bool ShouldLogBacktraceAt(turbo::string_view file,
+TURBO_MUST_USE_RESULT bool ShouldLogBacktraceAt(std::string_view file,
                                                int line);
 }  // namespace log_internal
 
 // SetLogBacktraceLocation()
 //
 // Sets the location the backtrace should be logged at.
-void SetLogBacktraceLocation(turbo::string_view file, int line);
+void SetLogBacktraceLocation(std::string_view file, int line);
 
 //------------------------------------------------------------------------------
 // Prepend Log Prefix

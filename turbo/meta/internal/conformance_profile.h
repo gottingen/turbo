@@ -33,8 +33,8 @@
 // Regularity Profile. For more information regarding archetypes, see
 // "conformance_archetypes.h".
 
-#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_PROFILE_H_
-#define TURBO_TYPES_INTERNAL_CONFORMANCE_PROFILE_H_
+#ifndef TURBO_META_INTERNAL_CONFORMANCE_PROFILE_H_
+#define TURBO_META_INTERNAL_CONFORMANCE_PROFILE_H_
 
 #include <set>
 #include <type_traits>
@@ -87,7 +87,7 @@ class ConformanceErrors {
   // previously reported as failing. This behavior is useful for tests that
   // have multiple parts, where failures and successes are reported individually
   // with the same test name.
-  void addTestSuccess(turbo::string_view test_name) {
+  void addTestSuccess(std::string_view test_name) {
     auto normalized_test_name = turbo::AsciiStrToLower(test_name);
 
     // If the test is already reported as failing, do not add it to the list of
@@ -105,7 +105,7 @@ class ConformanceErrors {
   //
   // TODO(calabrese) Determine desired behavior when if this function throws.
   template <class... P>
-  void addTestFailure(turbo::string_view test_name, const P&... args) {
+  void addTestFailure(std::string_view test_name, const P&... args) {
     // Output a message related to the test failure.
     assertion_result_ << "\n\n"
                          "Failed test: "
@@ -930,4 +930,4 @@ struct RegularityDomain {};
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_PROFILE_H_
+#endif  // TURBO_META_INTERNAL_CONFORMANCE_PROFILE_H_

@@ -22,7 +22,7 @@
 // accepting function types that neither take ownership nor copy the type; using
 // the reference type in this case avoids a copy and an allocation. Best
 // practices of other non-owning reference-like objects (such as
-// `turbo::string_view`) apply here.
+// `std::string_view`) apply here.
 //
 //  An `turbo::FunctionRef` is similar in usage to a `std::function` but has the
 //  following differences:
@@ -43,8 +43,8 @@
 // the visitor pattern are a good example of when this class should be used.
 //
 // This class is trivial to copy and should be passed by value.
-#ifndef TURBO_FUNCTIONAL_FUNCTION_REF_H_
-#define TURBO_FUNCTIONAL_FUNCTION_REF_H_
+#ifndef TURBO_META_FUNCTION_REF_H_
+#define TURBO_META_FUNCTION_REF_H_
 
 #include <cassert>
 #include <functional>
@@ -76,11 +76,11 @@ class FunctionRef;
 //
 //   // The following function takes a function callback by const reference
 //   bool Visitor(const std::function<void(my_proto&,
-//                                         turbo::string_view)>& callback);
+//                                         std::string_view)>& callback);
 //
 //   // Assuming that the function is not stored or otherwise copied, it can be
 //   // replaced by an `turbo::FunctionRef`:
-//   bool Visitor(turbo::FunctionRef<void(my_proto&, turbo::string_view)>
+//   bool Visitor(turbo::FunctionRef<void(my_proto&, std::string_view)>
 //                  callback);
 //
 // Note: the assignment operator within an `turbo::FunctionRef` is intentionally
@@ -140,4 +140,4 @@ class FunctionRef<R(Args...)> {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FUNCTIONAL_FUNCTION_REF_H_
+#endif  // TURBO_META_FUNCTION_REF_H_

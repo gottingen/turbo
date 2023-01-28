@@ -38,7 +38,7 @@ crc32c_t CrcNonTemporalMemcpyEngine::Compute(void* __restrict dst,
   std::size_t offset = 0;
   for (; offset + kBlockSize < length; offset += kBlockSize) {
     crc = turbo::ExtendCrc32c(crc,
-                             turbo::string_view(src_bytes + offset, kBlockSize));
+                             std::string_view(src_bytes + offset, kBlockSize));
     non_temporal_store_memcpy(dst_bytes + offset, src_bytes + offset,
                               kBlockSize);
   }
@@ -47,7 +47,7 @@ crc32c_t CrcNonTemporalMemcpyEngine::Compute(void* __restrict dst,
   if (offset < length) {
     std::size_t final_copy_size = length - offset;
     crc = ExtendCrc32c(crc,
-                       turbo::string_view(src_bytes + offset, final_copy_size));
+                       std::string_view(src_bytes + offset, final_copy_size));
 
     non_temporal_store_memcpy(dst_bytes + offset, src_bytes + offset,
                               final_copy_size);
@@ -69,7 +69,7 @@ crc32c_t CrcNonTemporalMemcpyAVXEngine::Compute(void* __restrict dst,
   // Copy + CRC loop - run 8k chunks until we are out of full chunks.
   std::size_t offset = 0;
   for (; offset + kBlockSize < length; offset += kBlockSize) {
-    crc = ExtendCrc32c(crc, turbo::string_view(src_bytes + offset, kBlockSize));
+    crc = ExtendCrc32c(crc, std::string_view(src_bytes + offset, kBlockSize));
 
     non_temporal_store_memcpy_avx(dst_bytes + offset, src_bytes + offset,
                                   kBlockSize);
@@ -79,7 +79,7 @@ crc32c_t CrcNonTemporalMemcpyAVXEngine::Compute(void* __restrict dst,
   if (offset < length) {
     std::size_t final_copy_size = length - offset;
     crc = ExtendCrc32c(crc,
-                       turbo::string_view(src_bytes + offset, final_copy_size));
+                       std::string_view(src_bytes + offset, final_copy_size));
 
     non_temporal_store_memcpy_avx(dst_bytes + offset, src_bytes + offset,
                                   final_copy_size);

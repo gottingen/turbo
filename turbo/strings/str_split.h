@@ -58,12 +58,12 @@ TURBO_NAMESPACE_BEGIN
 //
 // `StrSplit()` uses delimiters to define the boundaries between elements in the
 // provided input. Several `Delimiter` types are defined below. If a string
-// (`const char*`, `std::string`, or `turbo::string_view`) is passed in place of
+// (`const char*`, `std::string`, or `std::string_view`) is passed in place of
 // an explicit `Delimiter` object, `StrSplit()` treats it the same way as if it
 // were passed a `ByString` delimiter.
 //
 // A `Delimiter` is an object with a `Find()` function that knows how to find
-// the first occurrence of itself in a given `turbo::string_view`.
+// the first occurrence of itself in a given `std::string_view`.
 //
 // The following `Delimiter` types are available for use within `StrSplit()`:
 //
@@ -75,16 +75,16 @@ TURBO_NAMESPACE_BEGIN
 //
 // A Delimiter's `Find()` member function will be passed an input `text` that is
 // to be split and a position (`pos`) to begin searching for the next delimiter
-// in `text`. The returned turbo::string_view should refer to the next occurrence
-// (after `pos`) of the represented delimiter; this returned turbo::string_view
+// in `text`. The returned std::string_view should refer to the next occurrence
+// (after `pos`) of the represented delimiter; this returned std::string_view
 // represents the next location where the input `text` should be broken.
 //
-// The returned turbo::string_view may be zero-length if the Delimiter does not
+// The returned std::string_view may be zero-length if the Delimiter does not
 // represent a part of the string (e.g., a fixed-length delimiter). If no
-// delimiter is found in the input `text`, a zero-length turbo::string_view
+// delimiter is found in the input `text`, a zero-length std::string_view
 // referring to `text.end()` should be returned (e.g.,
 // `text.substr(text.size())`). It is important that the returned
-// turbo::string_view always be within the bounds of the input `text` given as an
+// std::string_view always be within the bounds of the input `text` given as an
 // argument--it must not refer to a string that is physically located outside of
 // the given string.
 //
@@ -95,9 +95,9 @@ TURBO_NAMESPACE_BEGIN
 //   struct SimpleDelimiter {
 //     const char c_;
 //     explicit SimpleDelimiter(char c) : c_(c) {}
-//     turbo::string_view Find(turbo::string_view text, size_t pos) {
+//     std::string_view Find(std::string_view text, size_t pos) {
 //       auto found = text.find(c_, pos);
-//       if (found == turbo::string_view::npos)
+//       if (found == std::string_view::npos)
 //         return text.substr(text.size());
 //
 //       return text.substr(found, 1);
@@ -123,8 +123,8 @@ TURBO_NAMESPACE_BEGIN
 //   // v[0] == "a", v[1] == "b", v[2] == "c"
 class ByString {
  public:
-  explicit ByString(turbo::string_view sp);
-  turbo::string_view Find(turbo::string_view text, size_t pos) const;
+  explicit ByString(std::string_view sp);
+  std::string_view Find(std::string_view text, size_t pos) const;
 
  private:
   const std::string delimiter_;
@@ -156,7 +156,7 @@ class ByString {
 class ByChar {
  public:
   explicit ByChar(char c) : c_(c) {}
-  turbo::string_view Find(turbo::string_view text, size_t pos) const;
+  std::string_view Find(std::string_view text, size_t pos) const;
 
  private:
   char c_;
@@ -181,8 +181,8 @@ class ByChar {
 //
 class ByAnyChar {
  public:
-  explicit ByAnyChar(turbo::string_view sp);
-  turbo::string_view Find(turbo::string_view text, size_t pos) const;
+  explicit ByAnyChar(std::string_view sp);
+  std::string_view Find(std::string_view text, size_t pos) const;
 
  private:
   const std::string delimiters_;
@@ -213,7 +213,7 @@ class ByAnyChar {
 class ByLength {
  public:
   explicit ByLength(ptrdiff_t length);
-  turbo::string_view Find(turbo::string_view text, size_t pos) const;
+  std::string_view Find(std::string_view text, size_t pos) const;
 
  private:
   const ptrdiff_t length_;
@@ -246,7 +246,7 @@ struct SelectDelimiter<const char*> {
   using type = ByString;
 };
 template <>
-struct SelectDelimiter<turbo::string_view> {
+struct SelectDelimiter<std::string_view> {
   using type = ByString;
 };
 template <>
@@ -260,9 +260,9 @@ class MaxSplitsImpl {
  public:
   MaxSplitsImpl(Delimiter delimiter, int limit)
       : delimiter_(delimiter), limit_(limit), count_(0) {}
-  turbo::string_view Find(turbo::string_view text, size_t pos) {
+  std::string_view Find(std::string_view text, size_t pos) {
     if (count_++ == limit_) {
-      return turbo::string_view(text.data() + text.size(),
+      return std::string_view(text.data() + text.size(),
                                0);  // No more matches.
     }
     return delimiter_.Find(text, pos);
@@ -307,7 +307,7 @@ MaxSplits(Delimiter delimiter, int limit) {
 // as an optional third argument to the `StrSplit()` function.
 //
 // Predicates are unary functions (or functors) that take a single
-// `turbo::string_view` argument and return a bool indicating whether the
+// `std::string_view` argument and return a bool indicating whether the
 // argument should be included (`true`) or excluded (`false`).
 //
 // Predicates are useful when filtering out empty substrings. By default, empty
@@ -327,12 +327,12 @@ MaxSplits(Delimiter delimiter, int limit) {
 //
 //  // v[0] == " a ", v[1] == " ", v[2] == "", v[3] = "b", v[4] == ""
 struct AllowEmpty {
-  bool operator()(turbo::string_view) const { return true; }
+  bool operator()(std::string_view) const { return true; }
 };
 
 // SkipEmpty()
 //
-// Returns `false` if the given `turbo::string_view` is empty, indicating that
+// Returns `false` if the given `std::string_view` is empty, indicating that
 // `StrSplit()` should omit the empty string.
 //
 // Example:
@@ -345,12 +345,12 @@ struct AllowEmpty {
 // to be empty. To skip such whitespace as well, use the `SkipWhitespace()`
 // predicate.
 struct SkipEmpty {
-  bool operator()(turbo::string_view sp) const { return !sp.empty(); }
+  bool operator()(std::string_view sp) const { return !sp.empty(); }
 };
 
 // SkipWhitespace()
 //
-// Returns `false` if the given `turbo::string_view` is empty *or* contains only
+// Returns `false` if the given `std::string_view` is empty *or* contains only
 // whitespace, indicating that `StrSplit()` should omit the string.
 //
 // Example:
@@ -363,7 +363,7 @@ struct SkipEmpty {
 //   std::vector<std::string> v = turbo::StrSplit(" a , ,,b,", ',', SkipEmpty());
 //   // v[0] == " a ", v[1] == " ", v[2] == "b"
 struct SkipWhitespace {
-  bool operator()(turbo::string_view sp) const {
+  bool operator()(std::string_view sp) const {
     sp = turbo::StripAsciiWhitespace(sp);
     return !sp.empty();
   }
@@ -420,9 +420,9 @@ using EnableSplitIfString =
 //
 // The `StrSplit()` function adapts the returned collection to the collection
 // specified by the caller (e.g. `std::vector` above). The returned collections
-// may contain `std::string`, `turbo::string_view` (in which case the original
+// may contain `std::string`, `std::string_view` (in which case the original
 // string being split must ensure that it outlives the collection), or any
-// object that can be explicitly created from an `turbo::string_view`. This
+// object that can be explicitly created from an `std::string_view`. This
 // behavior works for:
 //
 // 1) All standard STL containers including `std::vector`, `std::list`,
@@ -431,9 +431,9 @@ using EnableSplitIfString =
 //
 // Example:
 //
-//   // The results are returned as `turbo::string_view` objects. Note that we
+//   // The results are returned as `std::string_view` objects. Note that we
 //   // have to ensure that the input string outlives any results.
-//   std::vector<turbo::string_view> v = turbo::StrSplit("a,b,c", ',');
+//   std::vector<std::string_view> v = turbo::StrSplit("a,b,c", ',');
 //
 //   // Stores results in a std::set<std::string>, which also performs
 //   // de-duplication and orders the elements in ascending order.
@@ -441,7 +441,7 @@ using EnableSplitIfString =
 //   // v[0] == "a", v[1] == "b", v[2] = "c"
 //
 //   // `StrSplit()` can be used within a range-based for loop, in which case
-//   // each element will be of type `turbo::string_view`.
+//   // each element will be of type `std::string_view`.
 //   std::vector<std::string> v;
 //   for (const auto sv : turbo::StrSplit("a,b,c", ',')) {
 //     if (sv != "b") v.emplace_back(sv);
@@ -477,7 +477,7 @@ using EnableSplitIfString =
 //   // The input string "a=b=c,d=e,f=,g" becomes
 //   // { "a" => "b=c", "d" => "e", "f" => "", "g" => "" }
 //   std::map<std::string, std::string> m;
-//   for (turbo::string_view sp : turbo::StrSplit("a=b=c,d=e,f=,g", ',')) {
+//   for (std::string_view sp : turbo::StrSplit("a=b=c,d=e,f=,g", ',')) {
 //     m.insert(turbo::StrSplit(sp, turbo::MaxSplits('=', 1)));
 //   }
 //   EXPECT_EQ("b=c", m.find("a")->second);
@@ -488,19 +488,19 @@ using EnableSplitIfString =
 // WARNING: Due to a legacy bug that is maintained for backward compatibility,
 // splitting the following empty string_views produces different results:
 //
-//   turbo::StrSplit(turbo::string_view(""), '-');  // {""}
-//   turbo::StrSplit(turbo::string_view(), '-');    // {}, but should be {""}
+//   turbo::StrSplit(std::string_view(""), '-');  // {""}
+//   turbo::StrSplit(std::string_view(), '-');    // {}, but should be {""}
 //
 // Try not to depend on this distinction because the bug may one day be fixed.
 template <typename Delimiter>
 strings_internal::Splitter<
     typename strings_internal::SelectDelimiter<Delimiter>::type, AllowEmpty,
-    turbo::string_view>
+    std::string_view>
 StrSplit(strings_internal::ConvertibleToStringView text, Delimiter d) {
   using DelimiterType =
       typename strings_internal::SelectDelimiter<Delimiter>::type;
   return strings_internal::Splitter<DelimiterType, AllowEmpty,
-                                    turbo::string_view>(
+                                    std::string_view>(
       text.value(), DelimiterType(d), AllowEmpty());
 }
 
@@ -519,13 +519,13 @@ StrSplit(StringType&& text, Delimiter d) {
 template <typename Delimiter, typename Predicate>
 strings_internal::Splitter<
     typename strings_internal::SelectDelimiter<Delimiter>::type, Predicate,
-    turbo::string_view>
+    std::string_view>
 StrSplit(strings_internal::ConvertibleToStringView text, Delimiter d,
          Predicate p) {
   using DelimiterType =
       typename strings_internal::SelectDelimiter<Delimiter>::type;
   return strings_internal::Splitter<DelimiterType, Predicate,
-                                    turbo::string_view>(
+                                    std::string_view>(
       text.value(), DelimiterType(d), std::move(p));
 }
 

@@ -34,7 +34,7 @@ namespace str_format_internal {
 namespace {
 
 // Reduce *capacity by s.size(), clipped to a 0 minimum.
-void ReducePadding(string_view s, size_t *capacity) {
+void ReducePadding(std::string_view s, size_t *capacity) {
   *capacity = Excess(s.size(), *capacity);
 }
 
@@ -160,11 +160,11 @@ class IntDigits {
 
   // The printed value including the '-' sign if available.
   // For inputs of value `0`, this will return "0"
-  string_view with_neg_and_zero() const { return {start_, size_}; }
+  std::string_view with_neg_and_zero() const { return {start_, size_}; }
 
   // The printed value not including the '-' sign.
   // For inputs of value `0`, this will return "".
-  string_view without_neg_or_zero() const {
+  std::string_view without_neg_or_zero() const {
     static_assert('-' < '0', "The check below verifies both.");
     size_t advance = start_[0] <= '0' ? 1 : 0;
     return {start_ + advance, size_ - advance};
@@ -181,7 +181,7 @@ class IntDigits {
 
 // Note: 'o' conversions do not have a base indicator, it's just that
 // the '#' flag is specified to modify the precision for 'o' conversions.
-string_view BaseIndicator(const IntDigits &as_digits,
+std::string_view BaseIndicator(const IntDigits &as_digits,
                           const FormatConversionSpecImpl conv) {
   // always show 0x for %p.
   bool alt = conv.has_alt_flag() ||
@@ -199,7 +199,7 @@ string_view BaseIndicator(const IntDigits &as_digits,
   return {};
 }
 
-string_view SignColumn(bool neg, const FormatConversionSpecImpl conv) {
+std::string_view SignColumn(bool neg, const FormatConversionSpecImpl conv) {
   if (conv.conversion_char() == FormatConversionCharInternal::d ||
       conv.conversion_char() == FormatConversionCharInternal::i) {
     if (neg) return "-";
@@ -231,13 +231,13 @@ bool ConvertIntImplInnerSlow(const IntDigits &as_digits,
   if (conv.width() >= 0)
     fill = static_cast<size_t>(conv.width());
 
-  string_view formatted = as_digits.without_neg_or_zero();
+  std::string_view formatted = as_digits.without_neg_or_zero();
   ReducePadding(formatted, &fill);
 
-  string_view sign = SignColumn(as_digits.is_negative(), conv);
+  std::string_view sign = SignColumn(as_digits.is_negative(), conv);
   ReducePadding(sign, &fill);
 
-  string_view base_indicator = BaseIndicator(as_digits, conv);
+  std::string_view base_indicator = BaseIndicator(as_digits, conv);
   ReducePadding(base_indicator, &fill);
 
   bool precision_specified = conv.precision() >= 0;
@@ -306,7 +306,7 @@ bool ConvertFloatArg(T v, FormatConversionSpecImpl conv, FormatSinkImpl *sink) {
          ConvertFloatImpl(v, conv, sink);
 }
 
-inline bool ConvertStringArg(string_view v, const FormatConversionSpecImpl conv,
+inline bool ConvertStringArg(std::string_view v, const FormatConversionSpecImpl conv,
                              FormatSinkImpl *sink) {
   if (conv.is_basic()) {
     sink->Append(v);
@@ -424,7 +424,7 @@ StringConvertResult FormatConvertImpl(const std::string &v,
   return {ConvertStringArg(v, conv, sink)};
 }
 
-StringConvertResult FormatConvertImpl(string_view v,
+StringConvertResult FormatConvertImpl(std::string_view v,
                                       const FormatConversionSpecImpl conv,
                                       FormatSinkImpl *sink) {
   return {ConvertStringArg(v, conv, sink)};
@@ -445,7 +445,7 @@ FormatConvertImpl(const char *v, const FormatConversionSpecImpl conv,
     // If precision is set, we look for the NUL-terminator on the valid range.
     len = static_cast<size_t>(std::find(v, v + conv.precision(), '\0') - v);
   }
-  return {ConvertStringArg(string_view(v, len), conv, sink)};
+  return {ConvertStringArg(std::string_view(v, len), conv, sink)};
 }
 
 // ==================== Raw pointers ====================

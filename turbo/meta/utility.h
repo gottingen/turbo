@@ -37,8 +37,8 @@
 //  https://en.cppreference.com/w/cpp/utility/apply
 //  http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3658.html
 
-#ifndef TURBO_UTILITY_UTILITY_H_
-#define TURBO_UTILITY_UTILITY_H_
+#ifndef TURBO_META_UTILITY_H_
+#define TURBO_META_UTILITY_H_
 
 #include <cstddef>
 #include <cstdlib>
@@ -159,57 +159,12 @@ using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
 
 // Tag types
 
-#ifdef TURBO_USES_STD_OPTIONAL
-
 using std::in_place_t;
 using std::in_place;
-
-#else  // TURBO_USES_STD_OPTIONAL
-
-// in_place_t
-//
-// Tag type used to specify in-place construction, such as with
-// `turbo::optional`, designed to be a drop-in replacement for C++17's
-// `std::in_place_t`.
-struct in_place_t {};
-
-TURBO_INTERNAL_INLINE_CONSTEXPR(in_place_t, in_place, {});
-
-#endif  // TURBO_USES_STD_OPTIONAL
-
-#if defined(TURBO_USES_STD_ANY) || defined(TURBO_USES_STD_VARIANT)
 using std::in_place_type;
 using std::in_place_type_t;
-#else
-
-// in_place_type_t
-//
-// Tag type used for in-place construction when the type to construct needs to
-// be specified, such as with `turbo::any`, designed to be a drop-in replacement
-// for C++17's `std::in_place_type_t`.
-template <typename T>
-using in_place_type_t = void (*)(utility_internal::InPlaceTypeTag<T>);
-
-template <typename T>
-void in_place_type(utility_internal::InPlaceTypeTag<T>) {}
-#endif  // TURBO_USES_STD_ANY || TURBO_USES_STD_VARIANT
-
-#ifdef TURBO_USES_STD_VARIANT
 using std::in_place_index;
 using std::in_place_index_t;
-#else
-
-// in_place_index_t
-//
-// Tag type used for in-place construction when the type to construct needs to
-// be specified, such as with `turbo::any`, designed to be a drop-in replacement
-// for C++17's `std::in_place_index_t`.
-template <size_t I>
-using in_place_index_t = void (*)(utility_internal::InPlaceIndexTag<I>);
-
-template <size_t I>
-void in_place_index(utility_internal::InPlaceIndexTag<I>) {}
-#endif  // TURBO_USES_STD_VARIANT
 
 // Constexpr move and forward
 
@@ -218,8 +173,8 @@ void in_place_index(utility_internal::InPlaceIndexTag<I>) {}
 // A constexpr version of `std::move()`, designed to be a drop-in replacement
 // for C++14's `std::move()`.
 template <typename T>
-constexpr turbo::remove_reference_t<T>&& move(T&& t) noexcept {
-  return static_cast<turbo::remove_reference_t<T>&&>(t);
+constexpr std::remove_reference_t<T>&& move(T&& t) noexcept {
+  return static_cast<std::remove_reference_t<T>&&>(t);
 }
 
 // forward()
@@ -228,7 +183,7 @@ constexpr turbo::remove_reference_t<T>&& move(T&& t) noexcept {
 // for C++14's `std::forward()`.
 template <typename T>
 constexpr T&& forward(
-    turbo::remove_reference_t<T>& t) noexcept {  // NOLINT(runtime/references)
+    std::remove_reference_t<T>& t) noexcept {  // NOLINT(runtime/references)
   return static_cast<T&&>(t);
 }
 
@@ -347,4 +302,4 @@ constexpr T make_from_tuple(Tuple&& tup) {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_UTILITY_UTILITY_H_
+#endif  // TURBO_META_UTILITY_H_

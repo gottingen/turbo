@@ -32,10 +32,10 @@ TURBO_NAMESPACE_BEGIN
 //                   " <uselessarg1> <uselessarg2>"));
 // Do not include commandline flags in the usage: we do that for you!
 // Note: Calling SetProgramUsageMessage twice will trigger a call to std::exit.
-void SetProgramUsageMessage(turbo::string_view new_usage_message);
+void SetProgramUsageMessage(std::string_view new_usage_message);
 
 // Returns the usage message set by SetProgramUsageMessage().
-turbo::string_view ProgramUsageMessage();
+std::string_view ProgramUsageMessage();
 
 TURBO_NAMESPACE_END
 }  // namespace turbo
