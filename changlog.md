@@ -14,3 +14,4 @@ changelog
 | using std::string_view for filesystem | y    |
 | add sequence read file | y|
 | robost json | y|
+|fix log test bug on x86_64| y|
