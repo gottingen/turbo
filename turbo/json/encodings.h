@@ -307,18 +307,18 @@ concept Encoding {
         }
     };
 
-///////////////////////////////////////////////////////////////////////////////
-// UTF16
+    ///////////////////////////////////////////////////////////////////////////////
+    // UTF16
 
-//! UTF-16 encoding.
-/*! http://en.wikipedia.org/wiki/UTF-16
-    http://tools.ietf.org/html/rfc2781
-    \tparam CharType Type for storing 16-bit UTF-16 data. Default is wchar_t. C++11 may use char16_t instead.
-    \note implements Encoding concept
+    //! UTF-16 encoding.
+    /*! http://en.wikipedia.org/wiki/UTF-16
+        http://tools.ietf.org/html/rfc2781
+        \tparam CharType Type for storing 16-bit UTF-16 data. Default is wchar_t. C++11 may use char16_t instead.
+        \note implements Encoding concept
 
-    \note For in-memory access, no need to concern endianness. The code units and code points are represented by CPU's endianness.
-    For streaming, use UTF16LE and UTF16BE, which handle endianness.
-*/
+        \note For in-memory access, no need to concern endianness. The code units and code points are represented by CPU's endianness.
+        For streaming, use UTF16LE and UTF16BE, which handle endianness.
+    */
     template<typename CharType = wchar_t>
     struct UTF16 {
         typedef CharType Ch;
@@ -392,7 +392,7 @@ concept Encoding {
         }
     };
 
-//! UTF-16 little endian encoding.
+    //! UTF-16 little endian encoding.
     template<typename CharType = wchar_t>
     struct UTF16LE : UTF16<CharType> {
         template<typename InputByteStream>
@@ -458,17 +458,17 @@ concept Encoding {
         }
     };
 
-///////////////////////////////////////////////////////////////////////////////
-// UTF32
+    ///////////////////////////////////////////////////////////////////////////////
+    // UTF32
 
-//! UTF-32 encoding. 
-/*! http://en.wikipedia.org/wiki/UTF-32
-    \tparam CharType Type for storing 32-bit UTF-32 data. Default is unsigned. C++11 may use char32_t instead.
-    \note implements Encoding concept
+    //! UTF-32 encoding.
+    /*! http://en.wikipedia.org/wiki/UTF-32
+        \tparam CharType Type for storing 32-bit UTF-32 data. Default is unsigned. C++11 may use char32_t instead.
+        \note implements Encoding concept
 
-    \note For in-memory access, no need to concern endianness. The code units and code points are represented by CPU's endianness.
-    For streaming, use UTF32LE and UTF32BE, which handle endianness.
-*/
+        \note For in-memory access, no need to concern endianness. The code units and code points are represented by CPU's endianness.
+        For streaming, use UTF32LE and UTF32BE, which handle endianness.
+    */
     template<typename CharType = unsigned>
     struct UTF32 {
         typedef CharType Ch;

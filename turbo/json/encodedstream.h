@@ -30,11 +30,11 @@ RAPIDJSON_DIAG_OFF(padded)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-//! Input byte stream wrapper with a statically bound encoding.
-/*!
-    \tparam Encoding The interpretation of encoding of the stream. Either UTF8, UTF16LE, UTF16BE, UTF32LE, UTF32BE.
-    \tparam InputByteStream Type of input byte stream. For example, FileReadStream.
-*/
+    //! Input byte stream wrapper with a statically bound encoding.
+    /*!
+        \tparam Encoding The interpretation of encoding of the stream. Either UTF8, UTF16LE, UTF16BE, UTF32LE, UTF32BE.
+        \tparam InputByteStream Type of input byte stream. For example, FileReadStream.
+    */
     template<typename Encoding, typename InputByteStream>
     class EncodedInputStream {
         RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);

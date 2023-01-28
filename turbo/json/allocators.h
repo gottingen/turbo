@@ -19,46 +19,46 @@
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-///////////////////////////////////////////////////////////////////////////////
-// Allocator
+    ///////////////////////////////////////////////////////////////////////////////
+    // Allocator
 
-/*! \class rapidjson::Allocator
-    \brief Concept for allocating, resizing and freeing memory block.
-    
-    Note that Malloc() and Realloc() are non-static but Free() is static.
-    
-    So if an allocator need to support Free(), it needs to put its pointer in 
-    the header of memory block.
+    /*! \class rapidjson::Allocator
+        \brief Concept for allocating, resizing and freeing memory block.
 
-\code
-concept Allocator {
-    static const bool kNeedFree;    //!< Whether this allocator needs to call Free().
+        Note that Malloc() and Realloc() are non-static but Free() is static.
 
-    // Allocate a memory block.
-    // \param size of the memory block in bytes.
-    // \returns pointer to the memory block.
-    void* Malloc(size_t size);
+        So if an allocator need to support Free(), it needs to put its pointer in
+        the header of memory block.
 
-    // Resize a memory block.
-    // \param originalPtr The pointer to current memory block. Null pointer is permitted.
-    // \param originalSize The current size in bytes. (Design issue: since some allocator may not book-keep this, explicitly pass to it can save memory.)
-    // \param newSize the new size in bytes.
-    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize);
+    \code
+    concept Allocator {
+        static const bool kNeedFree;    //!< Whether this allocator needs to call Free().
 
-    // Free a memory block.
-    // \param pointer to the memory block. Null pointer is permitted.
-    static void Free(void *ptr);
-};
-\endcode
-*/
+        // Allocate a memory block.
+        // \param size of the memory block in bytes.
+        // \returns pointer to the memory block.
+        void* Malloc(size_t size);
 
-///////////////////////////////////////////////////////////////////////////////
-// CrtAllocator
+        // Resize a memory block.
+        // \param originalPtr The pointer to current memory block. Null pointer is permitted.
+        // \param originalSize The current size in bytes. (Design issue: since some allocator may not book-keep this, explicitly pass to it can save memory.)
+        // \param newSize the new size in bytes.
+        void* Realloc(void* originalPtr, size_t originalSize, size_t newSize);
 
-//! C-runtime library allocator.
-/*! This class is just wrapper for standard C library memory routines.
-    \note implements Allocator concept
-*/
+        // Free a memory block.
+        // \param pointer to the memory block. Null pointer is permitted.
+        static void Free(void *ptr);
+    };
+    \endcode
+    */
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // CrtAllocator
+
+    //! C-runtime library allocator.
+    /*! This class is just wrapper for standard C library memory routines.
+        \note implements Allocator concept
+    */
     class CrtAllocator {
     public:
         static const bool kNeedFree = true;
