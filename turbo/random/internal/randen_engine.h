@@ -23,7 +23,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/internal/iostream_state_saver.h"
 #include "turbo/random/internal/randen.h"

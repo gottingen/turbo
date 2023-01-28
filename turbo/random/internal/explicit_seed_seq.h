@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

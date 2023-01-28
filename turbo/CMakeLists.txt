@@ -32,6 +32,7 @@ set(TURBO_ALL_SRC
         "base/statusor.cc"
         "base/int128.cc"
         "base/status_payload_printer.cc"
+        "base/turbo_error.cc"
         "container/internal/hashtablez_sampler.cc"
         "container/internal/hashtablez_sampler_force_weak_definition.cc"
         "container/internal/raw_hash_set.cc"

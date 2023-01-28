@@ -14,7 +14,7 @@
 
 #include "turbo/strings/internal/escaping.h"
 
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {

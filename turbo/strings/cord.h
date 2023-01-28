@@ -72,7 +72,7 @@
 
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/platform/internal/per_thread_tls.h"
 #include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"

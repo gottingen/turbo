@@ -103,18 +103,6 @@ turbo_cc_test(
 
 turbo_cc_test(
   NAME
-    endian_test
-  SRCS
-    "internal/endian_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gtest_main
-)
-
-turbo_cc_test(
-  NAME
     config_test
   SRCS
     "config_test.cc"

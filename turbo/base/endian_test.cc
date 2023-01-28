@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 
 #include <algorithm>
 #include <cstdint>
