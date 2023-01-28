@@ -621,50 +621,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_HAVE_STD_STRING_VIEW 1
 #endif
 
-// TURBO_USES_STD_ANY
-//
-// Indicates whether turbo::any is an alias for std::any.
-#if !defined(TURBO_OPTION_USE_STD_ANY)
-#error options.h is misconfigured.
-#elif TURBO_OPTION_USE_STD_ANY == 0 || \
-    (TURBO_OPTION_USE_STD_ANY == 2 && !defined(TURBO_HAVE_STD_ANY))
-#undef TURBO_USES_STD_ANY
-#elif TURBO_OPTION_USE_STD_ANY == 1 || \
-    (TURBO_OPTION_USE_STD_ANY == 2 && defined(TURBO_HAVE_STD_ANY))
-#define TURBO_USES_STD_ANY 1
-#else
-#error options.h is misconfigured.
-#endif
-
-// TURBO_USES_STD_OPTIONAL
-//
-// Indicates whether std::optional is an alias for std::optional.
-#if !defined(TURBO_OPTION_USE_STD_OPTIONAL)
-#error options.h is misconfigured.
-#elif TURBO_OPTION_USE_STD_OPTIONAL == 0 || \
-    (TURBO_OPTION_USE_STD_OPTIONAL == 2 && !defined(TURBO_HAVE_STD_OPTIONAL))
-#undef TURBO_USES_STD_OPTIONAL
-#elif TURBO_OPTION_USE_STD_OPTIONAL == 1 || \
-    (TURBO_OPTION_USE_STD_OPTIONAL == 2 && defined(TURBO_HAVE_STD_OPTIONAL))
-#define TURBO_USES_STD_OPTIONAL 1
-#else
-#error options.h is misconfigured.
-#endif
-
-// TURBO_USES_STD_VARIANT
-//
-// Indicates whether turbo::variant is an alias for std::variant.
-#if !defined(TURBO_OPTION_USE_STD_VARIANT)
-#error options.h is misconfigured.
-#elif TURBO_OPTION_USE_STD_VARIANT == 0 || \
-    (TURBO_OPTION_USE_STD_VARIANT == 2 && !defined(TURBO_HAVE_STD_VARIANT))
-#undef TURBO_USES_STD_VARIANT
-#elif TURBO_OPTION_USE_STD_VARIANT == 1 || \
-    (TURBO_OPTION_USE_STD_VARIANT == 2 && defined(TURBO_HAVE_STD_VARIANT))
-#define TURBO_USES_STD_VARIANT 1
-#else
-#error options.h is misconfigured.
-#endif
 
 // TURBO_USES_STD_STRING_VIEW
 //

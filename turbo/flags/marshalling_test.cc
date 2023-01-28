@@ -946,33 +946,6 @@ TEST(MarshallingTest, TestOptionalStringUnparsing) {
   EXPECT_EQ(turbo::UnparseFlag(strvalue), "");
 }
 
-// --------------------------------------------------------------------
-
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-
-TEST(MarshallingTest, TestStdOptionalUnparsing) {
-  std::optional<std::string> strvalue;
-  EXPECT_EQ(turbo::UnparseFlag(strvalue), "");
-
-  strvalue = "asdfg";
-  EXPECT_EQ(turbo::UnparseFlag(strvalue), "asdfg");
-
-  strvalue = " ";
-  EXPECT_EQ(turbo::UnparseFlag(strvalue), " ");
-
-  strvalue = "";  // It is UB to set an optional string flag to ""
-  EXPECT_EQ(turbo::UnparseFlag(strvalue), "");
-
-  std::optional<int> intvalue;
-  EXPECT_EQ(turbo::UnparseFlag(intvalue), "");
-
-  intvalue = 10;
-  EXPECT_EQ(turbo::UnparseFlag(intvalue), "10");
-}
-
-// --------------------------------------------------------------------
-
-#endif
 
 template <typename T>
 void TestRoundtrip(T v) {

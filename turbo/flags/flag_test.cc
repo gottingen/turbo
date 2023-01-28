@@ -1007,9 +1007,6 @@ TURBO_FLAG(std::optional<turbo::Duration>, optional_duration, std::nullopt,
           "help");
 TURBO_FLAG(std::optional<std::optional<int>>, optional_optional_int,
           std::nullopt, "help");
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-TURBO_FLAG(std::optional<int64_t>, std_optional_int64, std::nullopt, "help");
-#endif
 
 namespace {
 
@@ -1138,29 +1135,5 @@ TEST_F(FlagTest, TestOptionalOptional) {
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), std::nullopt);
 }
 
-// --------------------------------------------------------------------
-
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-
-TEST_F(FlagTest, TestStdOptional) {
-  EXPECT_FALSE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), std::nullopt);
-
-  turbo::SetFlag(&FLAGS_std_optional_int64, 0);
-  EXPECT_TRUE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), 0);
-
-  turbo::SetFlag(&FLAGS_std_optional_int64, 0xFFFFFFFFFF16);
-  EXPECT_TRUE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), 0xFFFFFFFFFF16);
-
-  turbo::SetFlag(&FLAGS_std_optional_int64, std::nullopt);
-  EXPECT_FALSE(turbo::GetFlag(FLAGS_std_optional_int64).has_value());
-  EXPECT_EQ(turbo::GetFlag(FLAGS_std_optional_int64), std::nullopt);
-}
-
-// --------------------------------------------------------------------
-
-#endif
 
 }  // namespace

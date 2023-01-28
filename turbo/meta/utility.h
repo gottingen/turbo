@@ -159,57 +159,12 @@ using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
 
 // Tag types
 
-#ifdef TURBO_USES_STD_OPTIONAL
-
 using std::in_place_t;
 using std::in_place;
-
-#else  // TURBO_USES_STD_OPTIONAL
-
-// in_place_t
-//
-// Tag type used to specify in-place construction, such as with
-// `std::optional`, designed to be a drop-in replacement for C++17's
-// `std::in_place_t`.
-struct in_place_t {};
-
-TURBO_INTERNAL_INLINE_CONSTEXPR(in_place_t, in_place, {});
-
-#endif  // TURBO_USES_STD_OPTIONAL
-
-#if defined(TURBO_USES_STD_ANY) || defined(TURBO_USES_STD_VARIANT)
 using std::in_place_type;
 using std::in_place_type_t;
-#else
-
-// in_place_type_t
-//
-// Tag type used for in-place construction when the type to construct needs to
-// be specified, such as with `turbo::any`, designed to be a drop-in replacement
-// for C++17's `std::in_place_type_t`.
-template <typename T>
-using in_place_type_t = void (*)(utility_internal::InPlaceTypeTag<T>);
-
-template <typename T>
-void in_place_type(utility_internal::InPlaceTypeTag<T>) {}
-#endif  // TURBO_USES_STD_ANY || TURBO_USES_STD_VARIANT
-
-#ifdef TURBO_USES_STD_VARIANT
 using std::in_place_index;
 using std::in_place_index_t;
-#else
-
-// in_place_index_t
-//
-// Tag type used for in-place construction when the type to construct needs to
-// be specified, such as with `turbo::any`, designed to be a drop-in replacement
-// for C++17's `std::in_place_index_t`.
-template <size_t I>
-using in_place_index_t = void (*)(utility_internal::InPlaceIndexTag<I>);
-
-template <size_t I>
-void in_place_index(utility_internal::InPlaceIndexTag<I>) {}
-#endif  // TURBO_USES_STD_VARIANT
 
 // Constexpr move and forward
 

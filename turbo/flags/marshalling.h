@@ -200,10 +200,6 @@
 #define TURBO_FLAGS_MARSHALLING_H_
 
 #include "turbo/platform/config.h"
-
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-#include <optional>
-#endif
 #include <string>
 #include <vector>
 #include <optional>
@@ -252,21 +248,6 @@ bool TurboParseFlag(std::string_view text, std::optional<T>* f,
   return true;
 }
 
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-template <typename T>
-bool TurboParseFlag(std::string_view text, std::optional<T>* f,
-                   std::string* err) {
-  if (text.empty()) {
-    *f = std::nullopt;
-    return true;
-  }
-  T value;
-  if (!turbo::ParseFlag(text, &value, err)) return false;
-
-  *f = std::move(value);
-  return true;
-}
-#endif
 
 template <typename T>
 bool InvokeParseFlag(std::string_view input, T* dst, std::string* err) {
@@ -286,12 +267,6 @@ std::string TurboUnparseFlag(const std::optional<T>& f) {
   return f.has_value() ? turbo::UnparseFlag(*f) : "";
 }
 
-#if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
-template <typename T>
-std::string TurboUnparseFlag(const std::optional<T>& f) {
-  return f.has_value() ? turbo::UnparseFlag(*f) : "";
-}
-#endif
 
 template <typename T>
 std::string Unparse(const T& v) {
