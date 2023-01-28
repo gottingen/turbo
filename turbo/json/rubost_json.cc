@@ -51,7 +51,7 @@ RAPIDJSON_NAMESPACE_BEGIN
             return turbo::NotFoundError("not exists file");
         }
 
-        turbo::sequential_read_file file;
+        turbo::SequentialReadFile file;
         auto rs = file.open(file_path);
         if(!rs.ok()) {
             return rs;

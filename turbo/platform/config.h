@@ -549,95 +549,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 0
 #endif
 
-// TURBO_HAVE_STD_ANY
-//
-// Checks whether C++17 std::any is available by checking whether <any> exists.
-#ifdef TURBO_HAVE_STD_ANY
-#error "TURBO_HAVE_STD_ANY cannot be directly set."
-#endif
-
-#ifdef __has_include
-#if __has_include(<any>) && defined(__cplusplus) && __cplusplus >= 201703L && \
-    !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_ANY 1
-#endif
-#endif
-
-// TURBO_HAVE_STD_OPTIONAL
-//
-// Checks whether C++17 std::optional is available.
-#ifdef TURBO_HAVE_STD_OPTIONAL
-#error "TURBO_HAVE_STD_OPTIONAL cannot be directly set."
-#endif
-
-#ifdef __has_include
-#if __has_include(<optional>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L && !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_OPTIONAL 1
-#endif
-#endif
-
-// TURBO_HAVE_STD_VARIANT
-//
-// Checks whether C++17 std::variant is available.
-#ifdef TURBO_HAVE_STD_VARIANT
-#error "TURBO_HAVE_STD_VARIANT cannot be directly set."
-#endif
-
-#ifdef __has_include
-#if __has_include(<variant>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L && !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_VARIANT 1
-#endif
-#endif
-
-// TURBO_HAVE_STD_STRING_VIEW
-//
-// Checks whether C++17 std::string_view is available.
-#ifdef TURBO_HAVE_STD_STRING_VIEW
-#error "TURBO_HAVE_STD_STRING_VIEW cannot be directly set."
-#endif
-
-#ifdef __has_include
-#if __has_include(<string_view>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L
-#define TURBO_HAVE_STD_STRING_VIEW 1
-#endif
-#endif
-
-// For MSVC, `__has_include` is supported in VS 2017 15.3, which is later than
-// the support for <optional>, <any>, <string_view>, <variant>. So we use
-// _MSC_VER to check whether we have VS 2017 RTM (when <optional>, <any>,
-// <string_view>, <variant> is implemented) or higher. Also, `__cplusplus` is
-// not correctly set by MSVC, so we use `_MSVC_LANG` to check the language
-// version.
-// TODO(zhangxy): fix tests before enabling aliasing for `std::any`.
-#if defined(_MSC_VER) && _MSC_VER >= 1910 &&         \
-    ((defined(_MSVC_LANG) && _MSVC_LANG > 201402) || \
-     (defined(__cplusplus) && __cplusplus > 201402))
-// #define TURBO_HAVE_STD_ANY 1
-#define TURBO_HAVE_STD_OPTIONAL 1
-#define TURBO_HAVE_STD_VARIANT 1
-#define TURBO_HAVE_STD_STRING_VIEW 1
-#endif
-
-
-// TURBO_USES_STD_STRING_VIEW
-//
-// Indicates whether std::string_view is an alias for std::string_view.
-#if !defined(TURBO_OPTION_USE_STD_STRING_VIEW)
-#error options.h is misconfigured.
-#elif TURBO_OPTION_USE_STD_STRING_VIEW == 0 || \
-    (TURBO_OPTION_USE_STD_STRING_VIEW == 2 &&  \
-     !defined(TURBO_HAVE_STD_STRING_VIEW))
-#undef TURBO_USES_STD_STRING_VIEW
-#elif TURBO_OPTION_USE_STD_STRING_VIEW == 1 || \
-    (TURBO_OPTION_USE_STD_STRING_VIEW == 2 &&  \
-     defined(TURBO_HAVE_STD_STRING_VIEW))
-#define TURBO_USES_STD_STRING_VIEW 1
-#else
-#error options.h is misconfigured.
-#endif
 
 // In debug mode, MSVC 2017's std::variant throws a EXCEPTION_ACCESS_VIOLATION
 // SEH exception from emplace for variant<SomeStruct> when constructing the
@@ -666,6 +577,16 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_INTERNAL_MANGLED_NS \
   TURBO_INTERNAL_TOKEN_STR(TURBO_OPTION_INLINE_NAMESPACE_NAME) "@turbo"
 #define TURBO_INTERNAL_MANGLED_BACKREFERENCE "6"
+#endif
+#endif
+
+#ifdef TURBO_HAVE_THREEWAY_COMP
+#error "TURBO_HAVE_THREEWAY_COMP can not be define directly"
+#endif
+
+#if defined(__cpp_impl_three_way_comparison) && defined(__has_include)
+#if __has_include(<compare>)
+#define TURBO_HAVE_THREEWAY_COMP
 #endif
 #endif
 

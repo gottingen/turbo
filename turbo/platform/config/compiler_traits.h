@@ -1448,8 +1448,30 @@
 			// with the -fshort-wchar compiler argument.
 			#define TURBO_WCHAR_SIZE 2
 		#endif
-	#endif
+    #endif
 
+
+    #if defined(_MSC_VER)
+        // In very old versions of MSVC and when the /Zc:wchar_t flag is off, wchar_t is
+        // a typedef for unsigned short.  Otherwise wchar_t is mapped to the __wchar_t
+        // builtin type.  We need to make sure not to define operator wchar_t()
+        // alongside operator unsigned short() in these instances.
+        #define TURBO_WCHAR_T __wchar_t
+        #if defined(_M_X64) && !defined(_M_ARM64EC)
+        #include <intrin.h>
+        #pragma intrinsic(_umul128)
+    #endif  // defined(_M_X64)
+    #else   // defined(_MSC_VER)
+        #define TURBO_WCHAR_T wchar_t
+    #endif  // defined(_MSC_VER)
+
+    #ifndef TURBO_LITERAL
+        #if defined(TURBO_PLATFORM_WINDOWS)
+            #define  TURBO_LITERAL(str) L##str
+        #else
+            #define  TURBO_LITERAL(str) str
+        #endif
+    #endif
 
 	// ------------------------------------------------------------------------
 	// TURBO_RESTRICT

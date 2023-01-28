@@ -214,14 +214,6 @@ StringConvertResult FormatConvertImpl(const std::string& v,
 StringConvertResult FormatConvertImpl(std::string_view v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-#if defined(TURBO_HAVE_STD_STRING_VIEW) && !defined(TURBO_USES_STD_STRING_VIEW)
-inline StringConvertResult FormatConvertImpl(std::string_view v,
-                                             FormatConversionSpecImpl conv,
-                                             FormatSinkImpl* sink) {
-  return FormatConvertImpl(std::string_view(v.data(), v.size()), conv, sink);
-}
-#endif  // TURBO_HAVE_STD_STRING_VIEW && !TURBO_USES_STD_STRING_VIEW
-
 ArgConvertResult<FormatConversionCharSetUnion(
     FormatConversionCharSetInternal::s, FormatConversionCharSetInternal::p)>
 FormatConvertImpl(const char* v, const FormatConversionSpecImpl conv,

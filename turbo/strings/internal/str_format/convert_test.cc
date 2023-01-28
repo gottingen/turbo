@@ -232,9 +232,6 @@ TEST_F(FormatConvertTest, BasicString) {
   TestStringConvert(static_cast<const char*>("hello"));
   TestStringConvert(std::string("hello"));
   TestStringConvert(std::string_view("hello"));
-#if defined(TURBO_HAVE_STD_STRING_VIEW)
-  TestStringConvert(std::string_view("hello"));
-#endif  // TURBO_HAVE_STD_STRING_VIEW
 }
 
 TEST_F(FormatConvertTest, NullString) {

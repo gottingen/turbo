@@ -17,13 +17,13 @@
 
 namespace turbo {
 
-    sequential_read_file::~sequential_read_file() {
+    SequentialReadFile::~SequentialReadFile() {
         if (_fd > 0) {
             ::close(_fd);
         }
     }
 
-    turbo::Status sequential_read_file::open(const turbo::filesystem::path &path) noexcept {
+    turbo::Status SequentialReadFile::open(const turbo::filesystem::path &path) noexcept {
         CHECK(_fd == -1) << "do not reopen";
         turbo::Status rs;
         _path = path;
@@ -35,7 +35,7 @@ namespace turbo {
         return rs;
     }
 
-    turbo::Status sequential_read_file::read(std::string *content, size_t n) {
+    turbo::Status SequentialReadFile::read(std::string *content, size_t n) {
         turbo::Cord portal;
         auto frs = read(&portal, n);
         size_t size = 0;
@@ -46,7 +46,7 @@ namespace turbo {
         return frs;
     }
 
-    turbo::Status sequential_read_file::read(turbo::Cord *buf, size_t n) {
+    turbo::Status SequentialReadFile::read(turbo::Cord *buf, size_t n) {
         size_t left = n;
         turbo::Status frs;
         std::vector<char> tmpBuf;
@@ -72,27 +72,27 @@ namespace turbo {
         return turbo::OkStatus();
     }
 
-    void sequential_read_file::close() {
+    void SequentialReadFile::close() {
         if (_fd > 0) {
             ::close(_fd);
             _fd = -1;
         }
     }
 
-    void sequential_read_file::reset() {
+    void SequentialReadFile::reset() {
         if (_fd > 0) {
             ::lseek(_fd, 0, SEEK_SET);
         }
     }
 
-    turbo::Status sequential_read_file::skip(size_t n) {
+    turbo::Status SequentialReadFile::skip(size_t n) {
         if (_fd > 0) {
             ::lseek(_fd, n, SEEK_CUR);
         }
         return turbo::OkStatus();
     }
 
-    bool sequential_read_file::is_eof(turbo::Status *frs) {
+    bool SequentialReadFile::is_eof(turbo::Status *frs) {
         std::error_code ec;
         auto size = turbo::filesystem::file_size(_path, ec);
         if (ec) {

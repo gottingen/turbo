@@ -17,11 +17,11 @@
 
 namespace turbo {
 
-    class sequential_read_file {
+    class SequentialReadFile {
     public:
-        sequential_read_file() noexcept = default;
+        SequentialReadFile() noexcept = default;
 
-        ~sequential_read_file();
+        ~SequentialReadFile();
 
         turbo::Status open(const turbo::filesystem::path &path) noexcept;
 
@@ -46,7 +46,7 @@ namespace turbo {
         }
 
     private:
-        TURBO_NON_COPYABLE(sequential_read_file);
+        TURBO_NON_COPYABLE(SequentialReadFile);
 
         static const size_t npos = std::numeric_limits<size_t>::max();
         int _fd{-1};

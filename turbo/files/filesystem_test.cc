@@ -39,36 +39,13 @@
 #define NOMINMAX 1
 #endif
 
-#ifdef USE_STD_FS
-#include <filesystem>
-namespace fs {
-using namespace std::filesystem;
-using ifstream = std::ifstream;
-using ofstream = std::ofstream;
-using fstream = std::fstream;
-}  // namespace fs
-#ifdef __GNUC__
-#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
-#ifdef _MSC_VER
-#define IS_WCHAR_PATH
-#endif
-#ifdef WIN32
-#define GHC_OS_WINDOWS
-#endif
-#else
-#ifdef TURBO_FILESYSTEM_FWD_TEST
-#include "turbo/files/fs_fwd.h"
-#else
 #include "turbo/files/filesystem.h"
-#endif
 namespace fs {
 using namespace turbo::filesystem;
 using ifstream = turbo::filesystem::ifstream;
 using ofstream = turbo::filesystem::ofstream;
 using fstream = turbo::filesystem::fstream;
 }  // namespace fs
-#endif
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
@@ -80,9 +57,6 @@ using fstream = turbo::filesystem::fstream;
 #include <unistd.h>
 #endif
 
-#ifndef TURBO_FILESYSTEM_FWD_TEST
-#define CATCH_CONFIG_MAIN
-#endif
 #include "gtest/gtest.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -215,7 +189,7 @@ static void generateFile(const fs::path& pathname, int withSize = -1)
     }
 }
 
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 inline bool isWow64Proc()
 {
     typedef BOOL(WINAPI * IsWow64Process_t)(HANDLE, PBOOL);
@@ -328,7 +302,7 @@ TEST(TemporaryDirectory, fsTestTempdir)
     ASSERT_TRUE(!fs::exists(tempPath));
 }
 
-#ifdef GHC_FILESYSTEM_VERSION
+#ifdef TURBO_FILESYSTEM_VERSION
 TEST(Filesystem, detail_utf8)
 {
     ASSERT_TRUE(fs::detail::fromUtf8<std::wstring>("foobar").length() == 6);
@@ -341,7 +315,7 @@ TEST(Filesystem, detail_utf8)
     ASSERT_TRUE(fs::detail::toUtf8(std::wstring(L"föobar")).length() == 7);
     //ASSERT_TRUE(fs::detail::toUtf8(std::wstring(L"föobar")) == u8"föobar");
 
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
     ASSERT_THROW(fs::detail::fromUtf8<std::u16string>(std::string("\xed\xa0\x80")), fs::filesystem_error);
     ASSERT_THROW(fs::detail::fromUtf8<std::u16string>(std::string("\xc3")), fs::filesystem_error);
 #else
@@ -350,11 +324,11 @@ TEST(Filesystem, detail_utf8)
 #endif
 }
 
-TEST(fs_utf, detail.utf8)
+TEST(fs_utf, detail_utf8)
 {
     std::string t;
     ASSERT_TRUE(std::string("\xc3\xa4/\xe2\x82\xac\xf0\x9d\x84\x9e") == fs::detail::toUtf8(std::u16string(u"\u00E4/\u20AC\U0001D11E")));
-#ifdef GHC_RAISE_UNICODE_ERRORS
+#ifdef TURBO_RAISE_UNICODE_ERRORS
     ASSERT_THROW(fs::detail::toUtf8(std::u16string(1, 0xd800)), fs::filesystem_error);
     ASSERT_THROW(fs::detail::appendUTF8(t, 0x200000), fs::filesystem_error);
 #else
@@ -366,14 +340,14 @@ TEST(fs_utf, detail.utf8)
 #endif
 
 TEST(Filesystem, generic) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path::preferred_separator == '\\');
 #else
     ASSERT_TRUE(fs::path::preferred_separator == '/');
 #endif
 }
 
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
 TEST(Filesystem, path_gen) {
     if (!has_host_root_name_support()) {
         TURBO_LOG(WARNING)<<"This implementation doesn't support path(\"//host\").has_root_name() == true [C++17 30.12.8.1 par. 4] on this platform, tests based on this are skipped. (Should be okay.)";
@@ -384,12 +358,12 @@ TEST(Filesystem, path_gen) {
 TEST(Filesystem, construct) {
     ASSERT_TRUE("/usr/local/bin" == fs::path("/usr/local/bin").generic_string());
     std::string str = "/usr/local/bin";
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     std::u8string u8str = u8"/usr/local/bin";
 #endif
     std::u16string u16str = u"/usr/local/bin";
     std::u32string u32str = U"/usr/local/bin";
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     ASSERT_TRUE(u8str == fs::path(u8str).generic_u8string());
 #endif
     ASSERT_TRUE(u16str == fs::path(u16str).generic_u16string());
@@ -397,16 +371,16 @@ TEST(Filesystem, construct) {
     ASSERT_TRUE(str == fs::path(str, fs::path::format::generic_format));
     ASSERT_TRUE(str == fs::path(str.begin(), str.end()));
     ASSERT_TRUE(fs::path(std::wstring(3, 67)) == "CCC");
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     ASSERT_TRUE(str == fs::path(u8str.begin(), u8str.end()));
 #endif
     ASSERT_TRUE(str == fs::path(u16str.begin(), u16str.end()));
     ASSERT_TRUE(str == fs::path(u32str.begin(), u32str.end()));
-#ifdef GHC_FILESYSTEM_VERSION
+#ifdef TURBO_FILESYSTEM_VERSION
     ASSERT_TRUE(fs::path("///foo/bar") == "/foo/bar");
     ASSERT_TRUE(fs::path("//foo//bar") == "//foo/bar");
 #endif
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE("\\usr\\local\\bin" == fs::path("/usr/local/bin"));
     ASSERT_TRUE("C:\\usr\\local\\bin" == fs::path("C:\\usr\\local\\bin"));
 #else
@@ -416,7 +390,7 @@ TEST(Filesystem, construct) {
         ASSERT_TRUE("//host/foo/bar" == fs::path("//host/foo/bar"));
     }
 
-#if !defined(GHC_OS_WINDOWS) && !(defined(__GLIBCXX__) && !(defined(_GLIBCXX_RELEASE) && (_GLIBCXX_RELEASE >= 8))) && !defined(USE_STD_FS)
+#if !defined(TURBO_PLATFORM_WINDOWS) && !(defined(__GLIBCXX__) && !(defined(_GLIBCXX_RELEASE) && (_GLIBCXX_RELEASE >= 8))) && !defined(USE_STD_FS)
     std::locale loc;
     bool testUTF8Locale = false;
     try {
@@ -456,7 +430,7 @@ TEST(FilesystemPath, assign)
     ASSERT_TRUE(p2 == p3);
     p3.assign(L"/usr/local");
     ASSERT_TRUE(p2 == p3);
-#if defined(IS_WCHAR_PATH) || defined(GHC_USE_WCHAR_T)
+#if defined(IS_WCHAR_PATH) || defined(TURBO_FS_USE_WCHAR_T)
     p3 = fs::path::string_type{L"/foo/bar"};
     ASSERT_TRUE(p1 == p3);
     p3.assign(fs::path::string_type{L"/usr/local"});
@@ -479,7 +453,7 @@ TEST(FilesystemPath, assign)
 }
 
 TEST(FilesystemPath, append) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("foo") / "c:/bar" == "c:/bar");
     ASSERT_TRUE(fs::path("foo") / "c:" == "c:");
     ASSERT_TRUE(fs::path("c:") / "" == "c:");
@@ -547,7 +521,7 @@ TEST(FilesystemPath, modifiers) {
     ASSERT_TRUE(p == "");
 
     // make_preferred() is a no-op
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("foo\\bar") == "foo/bar");
     ASSERT_TRUE(fs::path("foo\\bar").make_preferred() == "foo/bar");
 #else
@@ -580,8 +554,8 @@ TEST(FilesystemPath, modifiers) {
 }
 
 TEST(FilesystemPath, obs) {
-#ifdef GHC_OS_WINDOWS
-#if defined(IS_WCHAR_PATH) || defined(GHC_USE_WCHAR_T)
+#ifdef TURBO_PLATFORM_WINDOWS
+#if defined(IS_WCHAR_PATH) || defined(TURBO_FS_USE_WCHAR_T)
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").native() == fs::path::string_type(L"\u00E4\\\u20AC"));
     // ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").string() == std::string("ä\\€")); // MSVCs returns local DBCS encoding
 #else
@@ -591,7 +565,7 @@ TEST(FilesystemPath, obs) {
     ASSERT_TRUE((std::string)fs::u8path("\xc3\xa4\\\xe2\x82\xac") == std::string("\xc3\xa4\\\xe2\x82\xac"));
 #endif
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").wstring() == std::wstring(L"\u00E4\\\u20AC"));
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u8string() == std::u8string(u8"\u00E4\\\u20AC"));
 #else
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u8string() == std::string("\xc3\xa4\\\xe2\x82\xac"));
@@ -604,7 +578,7 @@ TEST(FilesystemPath, obs) {
     ASSERT_TRUE((std::string)fs::u8path("\xc3\xa4/\xe2\x82\xac") == std::string("\xc3\xa4/\xe2\x82\xac"));
     ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").string() == std::string("\xc3\xa4/\xe2\x82\xac"));
     ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").wstring() == std::wstring(L"ä/€"));
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u8string() == std::u8string(u8"\xc3\xa4/\xe2\x82\xac"));
 #else
     ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u8string() == std::string("\xc3\xa4/\xe2\x82\xac"));
@@ -617,7 +591,7 @@ TEST(FilesystemPath, obs) {
 }
 
 TEST(FilesystemPath,generic_obs) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
 #ifndef IS_WCHAR_PATH
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_string() == std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
@@ -626,7 +600,7 @@ TEST(FilesystemPath,generic_obs) {
     ASSERT_TRUE(t.c_str() == std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_wstring() == std::wstring(L"\U000000E4/\U000020AC"));
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u8string() == std::u8string(u8"\u00E4/\u20AC"));
 #else
     ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u8string() == std::string("\xc3\xa4/\xe2\x82\xac"));
@@ -640,7 +614,7 @@ TEST(FilesystemPath,generic_obs) {
     ASSERT_TRUE(t.c_str() == std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
     ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_wstring() == std::wstring(L"ä/€"));
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u8string() == std::u8string(u8"\xc3\xa4/\xe2\x82\xac"));
 #else
     ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u8string() == std::string("\xc3\xa4/\xe2\x82\xac"));
@@ -663,7 +637,7 @@ TEST(FilesystemPath, compare) {
     ASSERT_TRUE(fs::path("/foo/b").compare(fs::path("/foo/b")) == 0);
     ASSERT_TRUE(fs::path("/foo/b").compare(fs::path("/foo/c")) < 0);
 
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("c:\\a\\b").compare("C:\\a\\b") == 0);
     ASSERT_TRUE(fs::path("c:\\a\\b").compare("d:\\a\\b") != 0);
     ASSERT_TRUE(fs::path("c:\\a\\b").compare("C:\\A\\b") != 0);
@@ -688,7 +662,7 @@ TEST(FilesystemPath, decompose) {
     ASSERT_TRUE(fs::path("foo/bar").root_name() == "");
     ASSERT_TRUE(fs::path("/foo/bar").root_name() == "");
     ASSERT_TRUE(fs::path("///foo/bar").root_name() == "");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:/foo").root_name() == "C:");
     ASSERT_TRUE(fs::path("C:\\foo").root_name() == "C:");
     ASSERT_TRUE(fs::path("C:foo").root_name() == "C:");
@@ -706,7 +680,7 @@ TEST(FilesystemPath, decompose) {
     ASSERT_TRUE(fs::path("foo/bar").root_directory() == "");
     ASSERT_TRUE(fs::path("/foo/bar").root_directory() == "/");
     ASSERT_TRUE(fs::path("///foo/bar").root_directory() == "/");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:/foo").root_directory() == "/");
     ASSERT_TRUE(fs::path("C:\\foo").root_directory() == "/");
     ASSERT_TRUE(fs::path("C:foo").root_directory() == "");
@@ -724,7 +698,7 @@ TEST(FilesystemPath, decompose) {
     ASSERT_TRUE(fs::path("foo/bar").root_path() == "");
     ASSERT_TRUE(fs::path("/foo/bar").root_path() == "/");
     ASSERT_TRUE(fs::path("///foo/bar").root_path() == "/");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:/foo").root_path() == "C:/");
     ASSERT_TRUE(fs::path("C:\\foo").root_path() == "C:/");
     ASSERT_TRUE(fs::path("C:foo").root_path() == "C:");
@@ -742,7 +716,7 @@ TEST(FilesystemPath, decompose) {
     ASSERT_TRUE(fs::path("foo/bar").relative_path() == "foo/bar");
     ASSERT_TRUE(fs::path("/foo/bar").relative_path() == "foo/bar");
     ASSERT_TRUE(fs::path("///foo/bar").relative_path() == "foo/bar");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:/foo").relative_path() == "foo");
     ASSERT_TRUE(fs::path("C:\\foo").relative_path() == "foo");
     ASSERT_TRUE(fs::path("C:foo").relative_path() == "foo");
@@ -760,7 +734,7 @@ TEST(FilesystemPath, decompose) {
     ASSERT_TRUE(fs::path("foo/bar").parent_path() == "foo");
     ASSERT_TRUE(fs::path("/foo/bar").parent_path() == "/foo");
     ASSERT_TRUE(fs::path("///foo/bar").parent_path() == "/foo");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:/foo").parent_path() == "C:/");
     ASSERT_TRUE(fs::path("C:\\foo").parent_path() == "C:/");
     ASSERT_TRUE(fs::path("C:foo").parent_path() == "C:");
@@ -778,7 +752,7 @@ TEST(FilesystemPath, decompose) {
     ASSERT_TRUE(fs::path("foo/bar").filename() == "bar");
     ASSERT_TRUE(fs::path("/foo/bar").filename() == "bar");
     ASSERT_TRUE(fs::path("///foo/bar").filename() == "bar");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:/foo").filename() == "foo");
     ASSERT_TRUE(fs::path("C:\\foo").filename() == "foo");
     ASSERT_TRUE(fs::path("C:foo").filename() == "foo");
@@ -833,7 +807,7 @@ TEST(FilesystemPath, query) {
     ASSERT_TRUE(!fs::path("foo").has_root_path());
     ASSERT_TRUE(!fs::path("foo/bar").has_root_path());
     ASSERT_TRUE(fs::path("/foo").has_root_path());
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:foo").has_root_path());
     ASSERT_TRUE(fs::path("C:/foo").has_root_path());
 #endif
@@ -842,7 +816,7 @@ TEST(FilesystemPath, query) {
     ASSERT_TRUE(!fs::path("foo").has_root_name());
     ASSERT_TRUE(!fs::path("foo/bar").has_root_name());
     ASSERT_TRUE(!fs::path("/foo").has_root_name());
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("C:foo").has_root_name());
     ASSERT_TRUE(fs::path("C:/foo").has_root_name());
 #endif
@@ -851,7 +825,7 @@ TEST(FilesystemPath, query) {
     ASSERT_TRUE(!fs::path("foo").has_root_directory());
     ASSERT_TRUE(!fs::path("foo/bar").has_root_directory());
     ASSERT_TRUE(fs::path("/foo").has_root_directory());
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(!fs::path("C:foo").has_root_directory());
     ASSERT_TRUE(fs::path("C:/foo").has_root_directory());
 #endif
@@ -889,7 +863,7 @@ TEST(FilesystemPath, query) {
 
     // is_absolute()
     ASSERT_TRUE(!fs::path("foo/bar").is_absolute());
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(!fs::path("/foo").is_absolute());
     ASSERT_TRUE(!fs::path("c:foo").is_absolute());
     ASSERT_TRUE(fs::path("c:/foo").is_absolute());
@@ -899,7 +873,7 @@ TEST(FilesystemPath, query) {
 
     // is_relative()
     ASSERT_TRUE(fs::path("foo/bar").is_relative());
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("/foo").is_relative());
     ASSERT_TRUE(fs::path("c:foo").is_relative());
     ASSERT_TRUE(!fs::path("c:/foo").is_relative());
@@ -930,7 +904,7 @@ TEST(FilesystemPath,fs_path_gen) {
     ASSERT_TRUE(fs::path("ab/cd/ef/../../qw").lexically_normal() == "ab/qw");
     ASSERT_TRUE(fs::path("a/b/../../../c").lexically_normal() == "../c");
     ASSERT_TRUE(fs::path("../").lexically_normal() == "..");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("\\/\\///\\/").lexically_normal() == "/");
     ASSERT_TRUE(fs::path("a/b/..\\//..///\\/../c\\\\/").lexically_normal() == "../c/");
     ASSERT_TRUE(fs::path("..a/b/..\\//..///\\/../c\\\\/").lexically_normal() == "../c/");
@@ -948,7 +922,7 @@ TEST(FilesystemPath,fs_path_gen) {
     if (has_host_root_name_support()) {
         ASSERT_TRUE(fs::path("//host1/foo").lexically_relative("//host2.bar") == "");
     }
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("c:/foo").lexically_relative("/bar") == "");
     ASSERT_TRUE(fs::path("c:foo").lexically_relative("c:/bar") == "");
     ASSERT_TRUE(fs::path("foo").lexically_relative("/bar") == "");
@@ -965,7 +939,7 @@ TEST(FilesystemPath,fs_path_gen) {
         ASSERT_TRUE(fs::path("//host1/a/d").lexically_proximate("//host2/a/b/c") == "//host1/a/d");
     }
     ASSERT_TRUE(fs::path("a/d").lexically_proximate("/a/b/c") == "a/d");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE(fs::path("c:/a/d").lexically_proximate("c:/a/b/c") == "../../d");
     ASSERT_TRUE(fs::path("c:/a/d").lexically_proximate("d:/a/b/c") == "c:/a/d");
     ASSERT_TRUE(fs::path("c:/foo").lexically_proximate("/bar") == "c:/foo");
@@ -1027,7 +1001,7 @@ TEST(FilesystemPath, itr) {
 #endif
     ASSERT_TRUE("/,foo,bar," == iterateResult(fs::path("/foo/bar///")));
     ASSERT_TRUE("foo,.,bar,..," == iterateResult(fs::path("foo/.///bar/../")));
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE("C:,/,foo" == iterateResult(fs::path("C:/foo")));
 #endif
 
@@ -1050,7 +1024,7 @@ TEST(FilesystemPath, itr) {
 #endif
     ASSERT_TRUE(",bar,foo,/" == reverseIterateResult(fs::path("/foo/bar///")));
     ASSERT_TRUE(",..,bar,.,foo" == reverseIterateResult(fs::path("foo/.///bar/../")));
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     ASSERT_TRUE("foo,/,C:" == reverseIterateResult(fs::path("C:/foo")));
     ASSERT_TRUE("foo,C:" == reverseIterateResult(fs::path("C:foo")));
 #endif
@@ -1114,7 +1088,7 @@ TEST(FilesystemPath, io) {
     {
         std::ostringstream os;
         os << fs::path("/root/foo bar");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
         ASSERT_TRUE(os.str() == "\"\\\\root\\\\foo bar\"");
 #else
         ASSERT_TRUE(os.str() == "\"/root/foo bar\"");
@@ -1123,7 +1097,7 @@ TEST(FilesystemPath, io) {
     {
         std::ostringstream os;
         os << fs::path("/root/foo\"bar");
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
         ASSERT_TRUE(os.str() == "\"\\\\root\\\\foo\\\"bar\"");
 #else
         ASSERT_TRUE(os.str() == "\"/root/foo\\\"bar\"");
@@ -1232,7 +1206,6 @@ TEST(FilesystemPath, file_status) {
         ASSERT_TRUE(fs.type() == fs::file_type::regular);
         ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
     }
-#if !defined(USE_STD_FS) || defined(GHC_FILESYSTEM_RUNNING_CPP20)
     {
         fs::file_status fs1{fs::file_type::regular, fs::perms::owner_read | fs::perms::owner_write | fs::perms::owner_exec};
         fs::file_status fs2{fs::file_type::regular, fs::perms::owner_read | fs::perms::owner_write | fs::perms::owner_exec};
@@ -1242,7 +1215,6 @@ TEST(FilesystemPath, file_status) {
         ASSERT_FALSE(fs1 == fs3);
         ASSERT_FALSE(fs1 == fs4);
     }
-#endif
 }
 
 TEST(FilesystemDir, dir_entry)
@@ -1315,7 +1287,7 @@ TEST(FilesystemDir, dir_entry)
     ec.clear();
     ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(de.last_write_time(ec) - now).count()) < 3);
     ASSERT_TRUE(!ec);
-#ifndef GHC_OS_WEB
+#ifndef TURBO_OS_WEB
     ASSERT_TRUE(de.hard_link_count() == 1);
     ASSERT_TRUE(de.hard_link_count(ec) == 1);
     ASSERT_TRUE(!ec);
@@ -1327,7 +1299,7 @@ TEST(FilesystemDir, dir_entry)
     ASSERT_TRUE(ec);
     auto de2none = fs::directory_entry();
     ec.clear();
-#ifndef GHC_OS_WEB
+#ifndef TURBO_OS_WEB
     ASSERT_TRUE(de2none.hard_link_count(ec) == static_cast<uintmax_t>(-1));
     ASSERT_THROW(de2none.hard_link_count(), fs::filesystem_error);
     ASSERT_TRUE(ec);
@@ -1709,7 +1681,7 @@ TEST(FilesystemDir, op_copy) {
         ASSERT_TRUE(fs::is_symlink("dir3/dir2/file3"));
 #endif
     }
-#ifndef GHC_OS_WEB
+#ifndef TURBO_OS_WEB
     {
         TemporaryDirectory t(TempOpt::change_path);
         std::error_code ec;
@@ -1892,7 +1864,7 @@ TEST(FilesystemDir, create_directory_symlink) {
 }
 
 TEST(FilesystemDir, create_hard_link) {
-#ifndef GHC_OS_WEB
+#ifndef TURBO_OS_WEB
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 1234);
@@ -2003,7 +1975,7 @@ TEST(Filesystem, exists) {
     ASSERT_TRUE(!ec);
     ec = std::error_code(42, std::system_category());
     ASSERT_TRUE(!fs::exists("foo", ec));
-#if defined(__cpp_lib_char8_t) && !defined(GHC_FILESYSTEM_ENFORCE_CPP17_API)
+#if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17)
     ASSERT_TRUE(!fs::exists(u8"foo"));
 #endif
     ASSERT_TRUE(!ec);
@@ -2014,7 +1986,7 @@ TEST(Filesystem, exists) {
     ec = std::error_code(42, std::system_category());
     ASSERT_TRUE(fs::exists(t.path(), ec));
     ASSERT_TRUE(!ec);
-#if defined(GHC_OS_WINDOWS) && !defined(GHC_FILESYSTEM_FWD)
+#if defined(TURBO_PLATFORM_WINDOWS)
     if (::GetFileAttributesW(L"C:\\fs-test") != INVALID_FILE_ATTRIBUTES) {
         ASSERT_TRUE(fs::exists("C:\\fs-test"));    
     }
@@ -2042,7 +2014,7 @@ TEST(Filesystem, file_size) {
     ec.clear();
 }
 
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
 static uintmax_t getHardlinkCount(const fs::path& p)
 {
     struct stat st = {};
@@ -2053,10 +2025,10 @@ static uintmax_t getHardlinkCount(const fs::path& p)
 
 TEST(Filesystem, hard_link_count)
 {
-#ifndef GHC_OS_WEB
+#ifndef TURBO_OS_WEB
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     // windows doesn't implement "."/".." as hardlinks, so it
     // starts with 1 and subdirectories don't change the count
     ASSERT_TRUE(fs::hard_link_count(t.path()) == 1);
@@ -2097,7 +2069,7 @@ public:
             fs::create_symlink("regular", "file_symlink");
             fs::create_directory_symlink("directory", "dir_symlink");
         }
-#if !defined(GHC_OS_WINDOWS) && !defined(GHC_OS_WEB)
+#if !defined(TURBO_PLATFORM_WINDOWS) && !defined(TURBO_OS_WEB)
         EXPECT_TRUE(::mkfifo("fifo", 0644) == 0);
         _hasFifo = true;
         struct ::sockaddr_un addr;
@@ -2129,15 +2101,12 @@ public:
 
     fs::path character_path() const
     {
-#ifndef GHC_OS_SOLARIS
         std::error_code ec;
         if (fs::exists("/dev/null", ec)) {
             return "/dev/null";
-        }
-        else if (fs::exists("NUL", ec)) {
+        } else if (fs::exists("NUL", ec)) {
             return "NUL";
         }
-#endif
         return fs::path();
     }
     fs::path temp_path() const { return _t.path(); }
@@ -2407,7 +2376,7 @@ TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_symlink - is_symlink", "[filesyst
     ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::unknown)));
 }
 */
-#ifndef GHC_OS_WEB
+#ifndef TURBO_OS_WEB
 static fs::file_time_type timeFromString(const std::string& str)
 {
     struct ::tm tm;
@@ -2441,7 +2410,7 @@ TEST(Filesystem, last_write_time) {
         // checks that the time of the symlink is fetched
         ASSERT_TRUE(ft == fs::last_write_time("foo2"));
     }
-#ifndef GHC_OS_WEB
+#ifndef TURBO_OS_WEB
     auto nt = timeFromString("2015-10-21T04:30:00");
     ASSERT_NO_THROW(fs::last_write_time(t.path() / "foo", nt));
     ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(fs::last_write_time("foo") - nt).count()) < 1);
@@ -2462,7 +2431,7 @@ TEST(Filesystem, permissions) {
     auto allWrite = fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write;
     ASSERT_NO_THROW(fs::permissions("foo", allWrite, fs::perm_options::remove));
     ASSERT_TRUE((fs::status("foo").permissions() & fs::perms::owner_write) != fs::perms::owner_write);
-#if !defined(GHC_OS_WINDOWS)
+#if !defined(TURBO_PLATFORM_WINDOWS)
     if (geteuid() != 0)
 #endif
     {
@@ -2499,7 +2468,7 @@ TEST(Filesystem, proximate) {
     ASSERT_TRUE(fs::proximate("a/b", "c/d") == "../../a/b");
     ASSERT_TRUE(fs::proximate("a/b", "c/d", ec) == "../../a/b");
     ASSERT_TRUE(!ec);
-#ifndef GHC_OS_WINDOWS
+#ifndef TURBO_PLATFORM_WINDOWS
     if (has_host_root_name_support()) {
         ASSERT_TRUE(fs::proximate("//host1/a/d", "//host2/a/b/c") == "//host1/a/d");
         ASSERT_TRUE(fs::proximate("//host1/a/d", "//host2/a/b/c", ec) == "//host1/a/d");
@@ -2638,7 +2607,7 @@ TEST(Filesystem, fs_op_space) {
         ASSERT_TRUE(si.free >= si.available);
         ASSERT_TRUE(!ec);
     }
-#ifndef GHC_OS_WEB // statvfs under emscripten always returns a result, so this tests would fail
+#ifndef TURBO_OS_WEB // statvfs under emscripten always returns a result, so this tests would fail
     {
         std::error_code ec;
         fs::space_info si;
@@ -2794,7 +2763,7 @@ TEST(FilesystemStatus, string_view) {
 }
 
 TEST(FilesystemStatus, win_long) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     TemporaryDirectory t(TempOpt::change_path);
     char c = 'A';
     fs::path dir{"\\\\?\\"};
@@ -2820,7 +2789,7 @@ TEST(FilesystemStatus, win_long) {
 }
 
 TEST(Filesystem, win_namespaces) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     {
         std::error_code ec;
         fs::path p(R"(\\localhost\c$\Windows)");
@@ -2874,7 +2843,7 @@ TEST(Filesystem, win_namespaces) {
 }
 
 TEST(Filesystem, win_mapped) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     // this test expects a mapped volume on C:\\fs-test as is the case on the development test system
     // does nothing on other systems
     if (fs::exists("C:\\fs-test")) {
@@ -2886,7 +2855,7 @@ TURBO_LOG(WARNING)<<"Windows specific tests are empty on non-Windows systems.";
 }
 
 TEST(Filesystem, win_remove) {
-#ifdef GHC_OS_WINDOWS
+#ifdef TURBO_PLATFORM_WINDOWS
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 512);
