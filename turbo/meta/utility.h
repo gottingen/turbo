@@ -37,8 +37,8 @@
 //  https://en.cppreference.com/w/cpp/utility/apply
 //  http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3658.html
 
-#ifndef TURBO_UTILITY_UTILITY_H_
-#define TURBO_UTILITY_UTILITY_H_
+#ifndef TURBO_META_UTILITY_H_
+#define TURBO_META_UTILITY_H_
 
 #include <cstddef>
 #include <cstdlib>
@@ -218,8 +218,8 @@ void in_place_index(utility_internal::InPlaceIndexTag<I>) {}
 // A constexpr version of `std::move()`, designed to be a drop-in replacement
 // for C++14's `std::move()`.
 template <typename T>
-constexpr turbo::remove_reference_t<T>&& move(T&& t) noexcept {
-  return static_cast<turbo::remove_reference_t<T>&&>(t);
+constexpr std::remove_reference_t<T>&& move(T&& t) noexcept {
+  return static_cast<std::remove_reference_t<T>&&>(t);
 }
 
 // forward()
@@ -228,7 +228,7 @@ constexpr turbo::remove_reference_t<T>&& move(T&& t) noexcept {
 // for C++14's `std::forward()`.
 template <typename T>
 constexpr T&& forward(
-    turbo::remove_reference_t<T>& t) noexcept {  // NOLINT(runtime/references)
+    std::remove_reference_t<T>& t) noexcept {  // NOLINT(runtime/references)
   return static_cast<T&&>(t);
 }
 
@@ -347,4 +347,4 @@ constexpr T make_from_tuple(Tuple&& tup) {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_UTILITY_UTILITY_H_
+#endif  // TURBO_META_UTILITY_H_

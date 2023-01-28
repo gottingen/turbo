@@ -17,8 +17,8 @@
 // -----------------------------------------------------------------------------
 //
 
-#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
-#define TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
+#ifndef TURBO_META_INTERNAL_CONFORMANCE_TESTING_H_
+#define TURBO_META_INTERNAL_CONFORMANCE_TESTING_H_
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -1383,4 +1383,4 @@ struct EquivalenceClassMaker {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_H_
+#endif  // TURBO_META_INTERNAL_CONFORMANCE_TESTING_H_

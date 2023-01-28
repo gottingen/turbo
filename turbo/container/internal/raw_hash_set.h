@@ -1412,7 +1412,7 @@ class raw_hash_set {
     using reference =
         turbo::conditional_t<PolicyTraits::constant_iterators::value,
                             const value_type&, value_type&>;
-    using pointer = turbo::remove_reference_t<reference>*;
+    using pointer = std::remove_reference_t<reference>*;
     using difference_type = typename raw_hash_set::difference_type;
 
     iterator() {}

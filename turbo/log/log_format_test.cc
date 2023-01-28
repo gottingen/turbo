@@ -1278,8 +1278,6 @@ TEST(ManipulatorLogFormatTest, ScientificFloat) {
 #if defined(__BIONIC__) && (!defined(__ANDROID_API__) || __ANDROID_API__ < 22)
 // Bionic doesn't support `%a` until API 22, so this prints 'a' even if the
 // C++ standard library implements it correctly (by forwarding to printf).
-#elif defined(__GLIBCXX__) && __cplusplus < 201402L
-// libstdc++ shipped C++11 support without `std::hexfloat`.
 #else
 TEST(ManipulatorLogFormatTest, FixedAndScientificFloat) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -1313,8 +1311,6 @@ TEST(ManipulatorLogFormatTest, FixedAndScientificFloat) {
 #if defined(__BIONIC__) && (!defined(__ANDROID_API__) || __ANDROID_API__ < 22)
 // Bionic doesn't support `%a` until API 22, so this prints 'a' even if the C++
 // standard library supports `std::hexfloat` (by forwarding to printf).
-#elif defined(__GLIBCXX__) && __cplusplus < 201402L
-// libstdc++ shipped C++11 support without `std::hexfloat`.
 #else
 TEST(ManipulatorLogFormatTest, HexfloatFloat) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);

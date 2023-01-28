@@ -33,8 +33,8 @@
 // Regularity Profile. For more information regarding archetypes, see
 // "conformance_archetypes.h".
 
-#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_PROFILE_H_
-#define TURBO_TYPES_INTERNAL_CONFORMANCE_PROFILE_H_
+#ifndef TURBO_META_INTERNAL_CONFORMANCE_PROFILE_H_
+#define TURBO_META_INTERNAL_CONFORMANCE_PROFILE_H_
 
 #include <set>
 #include <type_traits>
@@ -930,4 +930,4 @@ struct RegularityDomain {};
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_PROFILE_H_
+#endif  // TURBO_META_INTERNAL_CONFORMANCE_PROFILE_H_

@@ -977,7 +977,7 @@ TEST(TypeTraitsTest, TestRemoveCVRef) {
 
 #define TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(trait_name, ...)          \
   EXPECT_TRUE((std::is_same<typename std::trait_name<__VA_ARGS__>::type, \
-                            turbo::trait_name##_t<__VA_ARGS__>>::value))
+                            std::trait_name##_t<__VA_ARGS__>>::value))
 
 TEST(TypeTraitsTest, TestRemoveCVAliases) {
   TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, int);

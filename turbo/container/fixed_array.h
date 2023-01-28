@@ -393,7 +393,7 @@ class FixedArray {
   //     error: call to int __builtin___sprintf_chk(etc...)
   //     will always overflow destination buffer [-Werror]
   //
-  template <typename OuterT, typename InnerT = turbo::remove_extent_t<OuterT>,
+  template <typename OuterT, typename InnerT = std::remove_extent_t<OuterT>,
             size_t InnerN = std::extent<OuterT>::value>
   struct StorageElementWrapper {
     InnerT array[InnerN];

@@ -60,11 +60,11 @@
 //   // Construct a civil-time object for a specific second
 //   const turbo::CivilSecond cd(2018, 8, 1, 12, 0, 1);
 //
-// Note: In C++14 and later, this library is usable in a constexpr context.
+// Note: In C++17 and later, this library is usable in a constexpr context.
 //
 // Example:
 //
-//   // Valid in C++14
+//   // Valid in C++17
 //   constexpr turbo::CivilDay cd(1969, 07, 20);
 
 #ifndef TURBO_TIME_CIVIL_TIME_H_

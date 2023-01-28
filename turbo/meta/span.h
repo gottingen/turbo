@@ -49,8 +49,8 @@
 //    * `turbo::Span` has an explicit mutable-reference constructor
 //
 // For more information, see the class comments below.
-#ifndef TURBO_TYPES_SPAN_H_
-#define TURBO_TYPES_SPAN_H_
+#ifndef TURBO_META_SPAN_H_
+#define TURBO_META_SPAN_H_
 
 #include <algorithm>
 #include <cassert>
@@ -171,7 +171,7 @@ class Span {
 
  public:
   using element_type = T;
-  using value_type = turbo::remove_cv_t<T>;
+  using value_type = std::remove_cv_t<T>;
   using pointer = T*;
   using const_pointer = const T*;
   using reference = T&;
@@ -746,4 +746,4 @@ constexpr Span<const T> MakeConstSpan(const T (&array)[N]) noexcept {
 }
 TURBO_NAMESPACE_END
 }  // namespace turbo
-#endif  // TURBO_TYPES_SPAN_H_
+#endif  // TURBO_META_SPAN_H_

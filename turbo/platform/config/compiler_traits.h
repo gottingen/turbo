@@ -1497,42 +1497,16 @@
 	//
 
 	#ifndef TURBO_DEPRECATED
-		#if defined(TURBO_COMPILER_CPP14_ENABLED)
-			#define TURBO_DEPRECATED [[deprecated]]
-		#elif defined(TURBO_COMPILER_MSVC) && (TURBO_COMPILER_VERSION > 1300) // If VC7 (VS2003) or later...
-			#define TURBO_DEPRECATED __declspec(deprecated)
-		#elif defined(TURBO_COMPILER_MSVC)
-			#define TURBO_DEPRECATED
-		#else
-			#define TURBO_DEPRECATED __attribute__((deprecated))
-		#endif
+        #define TURBO_DEPRECATED [[deprecated]]
 	#endif
 
 	#ifndef TURBO_PREFIX_DEPRECATED
-		#if defined(TURBO_COMPILER_CPP14_ENABLED)
-			#define TURBO_PREFIX_DEPRECATED [[deprecated]]
-			#define TURBO_POSTFIX_DEPRECATED
-		#elif defined(TURBO_COMPILER_MSVC) && (TURBO_COMPILER_VERSION > 1300) // If VC7 (VS2003) or later...
-			#define TURBO_PREFIX_DEPRECATED __declspec(deprecated)
-			#define TURBO_POSTFIX_DEPRECATED
-		#elif defined(TURBO_COMPILER_MSVC)
-			#define TURBO_PREFIX_DEPRECATED
-			#define TURBO_POSTFIX_DEPRECATED
-		#else
-			#define TURBO_PREFIX_DEPRECATED
-			#define TURBO_POSTFIX_DEPRECATED __attribute__((deprecated))
-		#endif
+        #define TURBO_PREFIX_DEPRECATED [[deprecated]]
+        #define TURBO_POSTFIX_DEPRECATED
 	#endif
 
 	#ifndef TURBO_DEPRECATED_MESSAGE
-		#if defined(TURBO_COMPILER_CPP14_ENABLED)
-			#define TURBO_DEPRECATED_MESSAGE(msg) [[deprecated(#msg)]]
-        #elif TURBO_HAVE_ATTRIBUTE(deprecated)
-            #define TURBO_DEPRECATED_MESSAGE(message) __attribute__((deprecated(message)))
-		#else
-			// Compiler does not support depreaction messages, explicitly drop the msg but still mark the function as deprecated
-			#define TURBO_DEPRECATED_MESSAGE(msg) TURBO_DEPRECATED
-		#endif
+        #define TURBO_DEPRECATED_MESSAGE(msg) [[deprecated(#msg)]]
 	#endif
 
 

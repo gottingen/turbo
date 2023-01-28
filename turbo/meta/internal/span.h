@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#ifndef TURBO_TYPES_INTERNAL_SPAN_H_
-#define TURBO_TYPES_INTERNAL_SPAN_H_
+#ifndef TURBO_META_INTERNAL_SPAN_H_
+#define TURBO_META_INTERNAL_SPAN_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -70,7 +70,7 @@ using HasData =
 // Extracts value type from a Container
 template <typename C>
 struct ElementType {
-  using type = typename turbo::remove_reference_t<C>::value_type;
+  using type = typename std::remove_reference_t<C>::value_type;
 };
 
 template <typename T, size_t N>
@@ -136,4 +136,4 @@ using EnableIfNotIsView = std::enable_if_t<!IsView<T>::value, int>;
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_TYPES_INTERNAL_SPAN_H_
+#endif  // TURBO_META_INTERNAL_SPAN_H_

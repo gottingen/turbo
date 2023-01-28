@@ -31,8 +31,8 @@
 // a Conformance Profile as a template argument and its instantiations are a
 // minimum-conforming model of that profile.
 
-#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_ARCHETYPE_H_
-#define TURBO_TYPES_INTERNAL_CONFORMANCE_ARCHETYPE_H_
+#ifndef TURBO_META_INTERNAL_CONFORMANCE_ARCHETYPE_H_
+#define TURBO_META_INTERNAL_CONFORMANCE_ARCHETYPE_H_
 
 #include <cstddef>
 #include <functional>
@@ -915,7 +915,7 @@ struct ExceptionalBool {
 //
 // NOTE: Non-nothrow operators throw via their result's conversion to bool even
 // though the operation itself is noexcept.
-#define TURBO_TYPES_INTERNAL_OP(enum_name, op)                                \
+#define TURBO_META_INTERNAL_OP(enum_name, op)                                \
   template <class Prof>                                                      \
   turbo::enable_if_t<!PropertiesOfT<Prof>::is_##enum_name, bool> operator op( \
       const Archetype<Prof>&, const Archetype<Prof>&) = delete;              \
@@ -934,14 +934,14 @@ struct ExceptionalBool {
                                                 rhs.archetype_state);        \
   }
 
-TURBO_TYPES_INTERNAL_OP(equality_comparable, ==);
-TURBO_TYPES_INTERNAL_OP(inequality_comparable, !=);
-TURBO_TYPES_INTERNAL_OP(less_than_comparable, <);
-TURBO_TYPES_INTERNAL_OP(less_equal_comparable, <=);
-TURBO_TYPES_INTERNAL_OP(greater_equal_comparable, >=);
-TURBO_TYPES_INTERNAL_OP(greater_than_comparable, >);
+TURBO_META_INTERNAL_OP(equality_comparable, ==);
+TURBO_META_INTERNAL_OP(inequality_comparable, !=);
+TURBO_META_INTERNAL_OP(less_than_comparable, <);
+TURBO_META_INTERNAL_OP(less_equal_comparable, <=);
+TURBO_META_INTERNAL_OP(greater_equal_comparable, >=);
+TURBO_META_INTERNAL_OP(greater_than_comparable, >);
 
-#undef TURBO_TYPES_INTERNAL_OP
+#undef TURBO_META_INTERNAL_OP
 
 // Base class for std::hash specializations when an Archetype doesn't support
 // hashing.
@@ -975,4 +975,4 @@ struct hash<::turbo::types_internal::Archetype<Prof>>
 
 }  // namespace std
 
-#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_ARCHETYPE_H_
+#endif  // TURBO_META_INTERNAL_CONFORMANCE_ARCHETYPE_H_

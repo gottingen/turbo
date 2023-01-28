@@ -19,8 +19,8 @@
 // This file contains type aliases of common ConformanceProfiles and Archetypes
 // so that they can be directly used by name without creating them from scratch.
 
-#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_ALIASES_H_
-#define TURBO_TYPES_INTERNAL_CONFORMANCE_ALIASES_H_
+#ifndef TURBO_META_INTERNAL_CONFORMANCE_ALIASES_H_
+#define TURBO_META_INTERNAL_CONFORMANCE_ALIASES_H_
 
 #include "conformance_archetype.h"
 #include "conformance_profile.h"
@@ -444,4 +444,4 @@ TURBO_NAMESPACE_END
 
 #undef TURBO_INTERNAL_PROFILE_AND_ARCHETYPE_ALIAS
 
-#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_ALIASES_H_
+#endif  // TURBO_META_INTERNAL_CONFORMANCE_ALIASES_H_

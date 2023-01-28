@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
-#define TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
+#ifndef TURBO_META_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
+#define TURBO_META_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
 
 // Checks to determine whether or not we can use abi::__cxa_demangle
 #if (defined(__ANDROID__) || defined(ANDROID)) && !defined(OS_ANDROID)
@@ -22,14 +22,14 @@
 
 // We support certain compilers only.  See demangle.h for details.
 #if defined(OS_ANDROID) && (defined(__i386__) || defined(__x86_64__))
-#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 0
+#define TURBO_META_INTERNAL_HAS_CXA_DEMANGLE 0
 #elif (__GNUC__ >= 4 || (__GNUC__ >= 3 && __GNUC_MINOR__ >= 4)) && \
     !defined(__mips__)
-#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 1
+#define TURBO_META_INTERNAL_HAS_CXA_DEMANGLE 1
 #elif defined(__clang__) && !defined(_MSC_VER)
-#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 1
+#define TURBO_META_INTERNAL_HAS_CXA_DEMANGLE 1
 #else
-#define TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE 0
+#define TURBO_META_INTERNAL_HAS_CXA_DEMANGLE 0
 #endif
 
 #include <tuple>
@@ -40,7 +40,7 @@
 #include "turbo/strings/string_view.h"
 #include "turbo/meta/utility.h"
 
-#if TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE
+#if TURBO_META_INTERNAL_HAS_CXA_DEMANGLE
 #include <cxxabi.h>
 
 #include <cstdlib>
@@ -54,7 +54,7 @@ namespace types_internal {
 template <class T>
 std::string_view NameOfImpl() {
 // TODO(calabrese) Investigate using debugging:internal_demangle as a fallback.
-#if TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE
+#if TURBO_META_INTERNAL_HAS_CXA_DEMANGLE
   int status = 0;
   char* demangled_name = nullptr;
 
@@ -388,4 +388,4 @@ struct If</*Condition =*/true> {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_
+#endif  // TURBO_META_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_

@@ -43,8 +43,8 @@
 // the visitor pattern are a good example of when this class should be used.
 //
 // This class is trivial to copy and should be passed by value.
-#ifndef TURBO_FUNCTIONAL_FUNCTION_REF_H_
-#define TURBO_FUNCTIONAL_FUNCTION_REF_H_
+#ifndef TURBO_META_FUNCTION_REF_H_
+#define TURBO_META_FUNCTION_REF_H_
 
 #include <cassert>
 #include <functional>
@@ -140,4 +140,4 @@ class FunctionRef<R(Args...)> {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FUNCTIONAL_FUNCTION_REF_H_
+#endif  // TURBO_META_FUNCTION_REF_H_

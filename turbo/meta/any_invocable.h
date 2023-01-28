@@ -30,8 +30,8 @@
 // Credits to Matt Calabrese (https://github.com/mattcalabrese) for the original
 // implementation.
 
-#ifndef TURBO_FUNCTIONAL_ANY_INVOCABLE_H_
-#define TURBO_FUNCTIONAL_ANY_INVOCABLE_H_
+#ifndef TURBO_META_ANY_INVOCABLE_H_
+#define TURBO_META_ANY_INVOCABLE_H_
 
 #include <cstddef>
 #include <initializer_list>
@@ -313,4 +313,4 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FUNCTIONAL_ANY_INVOCABLE_H_
+#endif  // TURBO_META_ANY_INVOCABLE_H_

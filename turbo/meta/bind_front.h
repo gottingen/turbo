@@ -27,8 +27,8 @@
 // partial function application. (See
 // https://en.wikipedia.org/wiki/Partial_application).
 
-#ifndef TURBO_FUNCTIONAL_BIND_FRONT_H_
-#define TURBO_FUNCTIONAL_BIND_FRONT_H_
+#ifndef TURBO_META_BIND_FRONT_H_
+#define TURBO_META_BIND_FRONT_H_
 
 #if defined(__cpp_lib_bind_front) && __cpp_lib_bind_front >= 201907L
 #include <functional>  // For std::bind_front.
@@ -190,4 +190,4 @@ constexpr functional_internal::bind_front_t<F, BoundArgs...> bind_front(
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_FUNCTIONAL_BIND_FRONT_H_
+#endif  // TURBO_META_BIND_FRONT_H_
