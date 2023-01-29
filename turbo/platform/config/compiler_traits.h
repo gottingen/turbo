@@ -5,7 +5,7 @@
  * Copyright (c) Jeff.Li
  *-----------------------------------------------------------------------------
  * Currently supported defines include:
- *    TURBO_PREPROCESSOR_JOIN
+ *    TURBO_CONCAT
  *    
  *    TURBO_COMPILER_IS_ANSIC
  *    TURBO_COMPILER_IS_C99
@@ -223,14 +223,14 @@
 
 
 	// ------------------------------------------------------------------------
-	// TURBO_PREPROCESSOR_JOIN
+	// TURBO_CONCAT
 	//
 	// This macro joins the two arguments together, even when one of
 	// the arguments is itself a macro (see 16.3.1 in C++98 standard).
 	// This is often used to create a unique name with __LINE__.
 	//
 	// For example, this declaration:
-	//    char TURBO_PREPROCESSOR_JOIN(unique_, __LINE__);
+	//    char TURBO_CONCAT(unique_, __LINE__);
 	// expands to this:
 	//    char unique_73;
 	//
@@ -240,10 +240,10 @@
 	// is enabled. The result is that __LINE__ gets converted to
 	// something like __LINE__(Var+37).
 	//
-	#ifndef TURBO_PREPROCESSOR_JOIN
-		#define TURBO_PREPROCESSOR_JOIN(a, b)  TURBO_PREPROCESSOR_JOIN1(a, b)
-		#define TURBO_PREPROCESSOR_JOIN1(a, b) TURBO_PREPROCESSOR_JOIN2(a, b)
-		#define TURBO_PREPROCESSOR_JOIN2(a, b) a##b
+	#ifndef TURBO_CONCAT
+		#define TURBO_CONCAT(a, b)  TURBO_CONCAT1(a, b)
+		#define TURBO_CONCAT1(a, b) TURBO_CONCAT2(a, b)
+		#define TURBO_CONCAT2(a, b) a##b
 	#endif
 
     // TURBO_PRETTY_FUNCTION

@@ -1,6 +1,9 @@
 changelog
 ===
 
+# 0.6.5
+* make turbo::status can be used by user define error and
+sub systems.
 
 
 # v0.6.3
