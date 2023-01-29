@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/base/internal/throw_delegate.h"
 
 #include <functional>
 #include <new>

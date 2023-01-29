@@ -583,3 +583,28 @@ turbo_cc_test(
     turbo::turbo
     GTest::gmock_main
 )
+
+turbo_cc_test(
+        NAME
+        utf8_decoder_test
+        SRCS
+        "utf8/utf8_decoder_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        utf8_encoder_test
+        SRCS
+        "utf8/utf8_encoder_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+

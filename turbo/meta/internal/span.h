@@ -22,7 +22,7 @@
 #include <type_traits>
 
 #include "turbo/meta/algorithm.h"
-#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {

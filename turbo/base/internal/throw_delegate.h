@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_PLATFORM_INTERNAL_THROW_DELEGATE_H_
-#define TURBO_PLATFORM_INTERNAL_THROW_DELEGATE_H_
+#ifndef TURBO_BASE_INTERNAL_THROW_DELEGATE_H_
+#define TURBO_BASE_INTERNAL_THROW_DELEGATE_H_
 
 #include <string>
 
@@ -72,4 +72,4 @@ namespace base_internal {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_PLATFORM_INTERNAL_THROW_DELEGATE_H_
+#endif  // TURBO_BASE_INTERNAL_THROW_DELEGATE_H_

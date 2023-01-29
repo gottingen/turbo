@@ -43,7 +43,7 @@
 #include "turbo/meta/algorithm.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/platform/macros.h"
 #include "turbo/platform/optimization.h"
 #include "turbo/platform/port.h"
