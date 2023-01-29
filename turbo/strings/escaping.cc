@@ -22,7 +22,7 @@
 #include <limits>
 #include <string>
 
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/strings/internal/char_map.h"

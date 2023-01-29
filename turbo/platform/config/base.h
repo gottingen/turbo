@@ -724,11 +724,14 @@
 
 #ifndef CHAR8_T_DEFINED // If the user hasn't already defined these...
 	#define CHAR8_T_DEFINED
+    using char8_t = unsigned char;
+    /*
 	#if defined(TURBO_PLATFORM_APPLE)
-		#define char8_t char    // The Apple debugger is too stupid to realize char8_t is typedef'd to char, so we #define it.
+		#define char8_t unsigned char    // The Apple debugger is too stupid to realize char8_t is typedef'd to char, so we #define it.
 	#else
-		typedef char char8_t;
+		typedef unsigned char char8_t;
 	#endif
+     */
 	
 	#if TURBO_CHAR16_NATIVE
 		// In C++, char16_t and char32_t are already defined by the compiler.

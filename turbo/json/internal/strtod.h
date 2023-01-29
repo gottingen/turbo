@@ -122,7 +122,7 @@ RAPIDJSON_NAMESPACE_BEGIN
                 return false;
         }
 
-// Compute an approximation and see if it is within 1/2 ULP
+        // Compute an approximation and see if it is within 1/2 ULP
         inline bool StrtodDiyFp(const char *decimals, size_t length, size_t decimalPosition, int exp, double *result) {
             uint64_t significand = 0;
             size_t i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999

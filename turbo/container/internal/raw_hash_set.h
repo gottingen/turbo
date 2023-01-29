@@ -184,7 +184,7 @@
 #include <utility>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/platform/internal/prefetch.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/optimization.h"

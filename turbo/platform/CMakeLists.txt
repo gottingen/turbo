@@ -58,19 +58,6 @@ turbo_cc_test(
     GTest::gtest_main
 )
 
-turbo_cc_test(
-  NAME
-    throw_delegate_test
-  SRCS
-    "throw_delegate_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gtest_main
-)
-
-
 
 
 # Internal-only target, do not depend on directly.
@@ -100,18 +87,6 @@ turbo_cc_test(
     GTest::gtest_main
 )
 
-
-turbo_cc_test(
-  NAME
-    endian_test
-  SRCS
-    "internal/endian_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gtest_main
-)
 
 turbo_cc_test(
   NAME

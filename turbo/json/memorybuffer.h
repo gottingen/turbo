@@ -20,19 +20,19 @@
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-//! Represents an in-memory output byte stream.
-/*!
-    This class is mainly for being wrapped by EncodedOutputStream or AutoUTFOutputStream.
+    //! Represents an in-memory output byte stream.
+    /*!
+        This class is mainly for being wrapped by EncodedOutputStream or AutoUTFOutputStream.
 
-    It is similar to FileWriteBuffer but the destination is an in-memory buffer instead of a file.
+        It is similar to FileWriteBuffer but the destination is an in-memory buffer instead of a file.
 
-    Differences between MemoryBuffer and StringBuffer:
-    1. StringBuffer has Encoding but MemoryBuffer is only a byte buffer. 
-    2. StringBuffer::GetString() returns a null-terminated string. MemoryBuffer::GetBuffer() returns a buffer without terminator.
+        Differences between MemoryBuffer and StringBuffer:
+        1. StringBuffer has Encoding but MemoryBuffer is only a byte buffer.
+        2. StringBuffer::GetString() returns a null-terminated string. MemoryBuffer::GetBuffer() returns a buffer without terminator.
 
-    \tparam Allocator type for allocating memory buffer.
-    \note implements Stream concept
-*/
+        \tparam Allocator type for allocating memory buffer.
+        \note implements Stream concept
+    */
     template<typename Allocator = CrtAllocator>
     struct GenericMemoryBuffer {
         typedef char Ch; // byte
@@ -64,7 +64,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     typedef GenericMemoryBuffer<> MemoryBuffer;
 
-//! Implement specialized version of PutN() with memset() for better performance.
+    //! Implement specialized version of PutN() with memset() for better performance.
     template<>
     inline void PutN(MemoryBuffer &memoryBuffer, char c, size_t n) {
         std::memset(memoryBuffer.stack_.Push<char>(n), c, n * sizeof(c));
@@ -72,4 +72,4 @@ RAPIDJSON_NAMESPACE_BEGIN
 
 RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_MEMORYBUFFER_H_
+#endif  // RAPIDJSON_MEMORYBUFFER_H_

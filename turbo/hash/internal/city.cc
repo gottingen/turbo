@@ -25,7 +25,7 @@
 #include <algorithm>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/optimization.h"
 

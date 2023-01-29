@@ -83,25 +83,25 @@ RAPIDJSON_NAMESPACE_BEGIN
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
 
-//! (Constant) member iterator for a JSON object value
-/*!
-    \tparam Const Is this a constant iterator?
-    \tparam Encoding    Encoding of the value. (Even non-string values need to have the same encoding in a document)
-    \tparam Allocator   Allocator type for allocating memory of object, array and string.
+    //! (Constant) member iterator for a JSON object value
+    /*!
+        \tparam Const Is this a constant iterator?
+        \tparam Encoding    Encoding of the value. (Even non-string values need to have the same encoding in a document)
+        \tparam Allocator   Allocator type for allocating memory of object, array and string.
 
-    This class implements a Random Access Iterator for GenericMember elements
-    of a GenericValue, see ISO/IEC 14882:2003(E) C++ standard, 24.1 [lib.iterator.requirements].
+        This class implements a Random Access Iterator for GenericMember elements
+        of a GenericValue, see ISO/IEC 14882:2003(E) C++ standard, 24.1 [lib.iterator.requirements].
 
-    \note This iterator implementation is mainly intended to avoid implicit
-        conversions from iterator values to \c nullptr,
-        e.g. from GenericValue::FindMember.
+        \note This iterator implementation is mainly intended to avoid implicit
+            conversions from iterator values to \c nullptr,
+            e.g. from GenericValue::FindMember.
 
-    \note Define \c RAPIDJSON_NOMEMBERITERATORCLASS to fall back to a
-        pointer-based implementation, if your platform doesn't provide
-        the C++ <iterator> header.
+        \note Define \c RAPIDJSON_NOMEMBERITERATORCLASS to fall back to a
+            pointer-based implementation, if your platform doesn't provide
+            the C++ <iterator> header.
 
-    \see GenericMember, GenericValue::MemberIterator, GenericValue::ConstMemberIterator
- */
+        \see GenericMember, GenericValue::MemberIterator, GenericValue::ConstMemberIterator
+     */
     template<bool Const, typename Encoding, typename Allocator>
     class GenericMemberIterator
             : public std::iterator<std::random_access_iterator_tag, typename internal::MaybeAddConst<Const, GenericMember<Encoding, Allocator> >::Type> {

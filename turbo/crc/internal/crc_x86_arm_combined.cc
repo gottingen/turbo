@@ -20,7 +20,7 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/platform/config.h"
 #include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/platform/internal/prefetch.h"
 #include "turbo/crc/internal/cpu_detect.h"
 #include "turbo/crc/internal/crc.h"

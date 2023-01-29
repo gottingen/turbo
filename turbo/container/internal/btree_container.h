@@ -21,7 +21,7 @@
 #include <utility>
 
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/container/internal/btree.h"  // IWYU pragma: export
 #include "turbo/container/internal/common.h"
 #include "turbo/memory/memory.h"

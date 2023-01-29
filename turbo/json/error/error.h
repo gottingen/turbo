@@ -89,20 +89,20 @@ RAPIDJSON_NAMESPACE_BEGIN
         kParseErrorUnspecificSyntaxError            //!< Unspecific syntax error.
     };
 
-//! Result of parsing (wraps ParseErrorCode)
-/*!
-    \ingroup RAPIDJSON_ERRORS
-    \code
-        Document doc;
-        ParseResult ok = doc.Parse("[42]");
-        if (!ok) {
-            fprintf(stderr, "JSON parse error: %s (%u)",
-                    GetParseError_En(ok.Code()), ok.Offset());
-            exit(EXIT_FAILURE);
-        }
-    \endcode
-    \see GenericReader::Parse, GenericDocument::Parse
-*/
+    //! Result of parsing (wraps ParseErrorCode)
+    /*!
+        \ingroup RAPIDJSON_ERRORS
+        \code
+            Document doc;
+            ParseResult ok = doc.Parse("[42]");
+            if (!ok) {
+                fprintf(stderr, "JSON parse error: %s (%u)",
+                        GetParseError_En(ok.Code()), ok.Offset());
+                exit(EXIT_FAILURE);
+            }
+        \endcode
+        \see GenericReader::Parse, GenericDocument::Parse
+    */
     struct ParseResult {
     public:
         //! Default constructor, no error.

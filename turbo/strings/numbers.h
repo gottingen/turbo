@@ -40,7 +40,7 @@
 #include <type_traits>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
 #include "turbo/base/bits.h"

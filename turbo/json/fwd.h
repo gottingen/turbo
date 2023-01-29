@@ -19,7 +19,7 @@
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-// encodings.h
+    // encodings.h
 
     template<typename CharType>
     struct UTF8;
@@ -43,14 +43,14 @@ RAPIDJSON_NAMESPACE_BEGIN
     template<typename SourceEncoding, typename TargetEncoding>
     struct Transcoder;
 
-// allocators.h
+    // allocators.h
 
     class CrtAllocator;
 
     template<typename BaseAllocator>
     class MemoryPoolAllocator;
 
-// stream.h
+    // stream.h
 
     template<typename Encoding>
     struct GenericStringStream;
@@ -62,33 +62,33 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     typedef GenericInsituStringStream<UTF8<char> > InsituStringStream;
 
-// stringbuffer.h
+    // stringbuffer.h
 
     template<typename Encoding, typename Allocator>
     class GenericStringBuffer;
 
     typedef GenericStringBuffer<UTF8<char>, CrtAllocator> StringBuffer;
 
-// filereadstream.h
+    // filereadstream.h
 
     class FileReadStream;
 
-// filewritestream.h
+    // filewritestream.h
 
     class FileWriteStream;
 
-// memorybuffer.h
+    // memorybuffer.h
 
     template<typename Allocator>
     struct GenericMemoryBuffer;
 
     typedef GenericMemoryBuffer<CrtAllocator> MemoryBuffer;
 
-// memorystream.h
+    // memorystream.h
 
     struct MemoryStream;
 
-// reader.h
+    // reader.h
 
     template<typename Encoding, typename Derived>
     struct BaseReaderHandler;
@@ -129,7 +129,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     typedef GenericDocument<UTF8<char>, MemoryPoolAllocator<CrtAllocator>, CrtAllocator> Document;
 
-// pointer.h
+    // pointer.h
 
     template<typename ValueType, typename Allocator>
     class GenericPointer;
@@ -157,4 +157,4 @@ RAPIDJSON_NAMESPACE_BEGIN
 
 RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_RAPIDJSONFWD_H_
+#endif  // RAPIDJSON_RAPIDJSONFWD_H_

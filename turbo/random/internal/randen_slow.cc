@@ -19,7 +19,7 @@
 #include <cstring>
 
 #include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/int128.h"
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_traits.h"

@@ -46,7 +46,7 @@
 #include <utility>
 
 #include "turbo/meta/algorithm.h"
-#include "turbo/platform/internal/throw_delegate.h"
+#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/platform/macros.h"
 #include "turbo/platform/optimization.h"
 #include "turbo/platform/port.h"

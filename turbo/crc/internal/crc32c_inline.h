@@ -18,7 +18,7 @@
 #include <cstdint>
 
 #include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/crc/internal/crc32_x86_arm_combined_simd.h"
 
 namespace turbo {

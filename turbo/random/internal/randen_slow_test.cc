@@ -17,7 +17,7 @@
 #include <cstring>
 
 #include "gtest/gtest.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/random/internal/randen_traits.h"
 
 namespace {

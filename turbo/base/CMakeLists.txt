@@ -27,6 +27,19 @@ turbo_cc_test(
 )
 
 turbo_cc_test(
+        NAME
+        throw_delegate_test
+        SRCS
+        "throw_delegate_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
   NAME
     statusor_test
   SRCS
@@ -38,6 +51,17 @@ turbo_cc_test(
     GTest::gmock_main
 )
 
+turbo_cc_test(
+        NAME
+        endian_test
+        SRCS
+        "endian_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
 
 turbo_cc_test(
         NAME
