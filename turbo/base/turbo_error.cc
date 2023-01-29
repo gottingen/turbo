@@ -66,7 +66,7 @@ const char* TurboError() {
         return turbo::tls_error_buf;
     }
 #else
-    s = strerror_r(errno, turbo::tls_error_buf, turbo::ERROR_BUFSIZE);
+    const char* s = strerror_r(errno, turbo::tls_error_buf, turbo::ERROR_BUFSIZE);
         if (s) {
             return s;
         }
