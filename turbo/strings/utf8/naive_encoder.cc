@@ -22,12 +22,13 @@
 
 #include <cstring>
 #include <string>
+#include "turbo/base/casts.h"
 
 namespace turbo {
 namespace utf8_details {
 
 static constexpr uint32_t UTF8_BUF_SIZE = 8;
-static constexpr uint32_t UTF8_MAX = 0x7FFFFFFFu;
+static constexpr uint32_t TURBO_ALLOW_UNUSED UTF8_MAX = 0x7FFFFFFFu;
 // https://unicodebook.readthedocs.io/unicode_encodings.html
 static constexpr uint32_t UNICODE_MAX = 0x10FFFF;
 
@@ -57,7 +58,10 @@ size_t NaiveCountBytesSize(const uint32_t* s_ptr, const uint32_t* s_ptr_end) noe
   return counts;
 }
 
+
 static int32_t NaiveUTF8EncodeOne(char* buff, uint32_t x) noexcept {
+    TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion);
+    TURBO_DISABLE_GCC_WARNING(-Wsign-conversion);
   int n = 1; /* number of bytes put in buffer (backwards) */
   if (x < 0x80) {
     /* ascii? */
@@ -65,12 +69,14 @@ static int32_t NaiveUTF8EncodeOne(char* buff, uint32_t x) noexcept {
   } else {               /* need continuation bytes */
     uint32_t mfb = 0x3f; /* maximum that fits in first byte */
     do {                 /* add continuation bytes */
-      buff[UTF8_BUF_SIZE - (n++)] = 0x80 | (x & 0x3f);
+      buff[UTF8_BUF_SIZE - static_cast<size_t>(n++)] = 0x80 |( x & 0x3f);
       x >>= 6;         /* remove added bits */
       mfb >>= 1;       /* now there is one less bit available in first byte */
     } while (x > mfb); /* still needs continuation byte? */
     buff[UTF8_BUF_SIZE - n] = ((~mfb << 1) | x) & 0xFF; /* add first byte */
   }
+    TURBO_RESTORE_CLANG_WARNING();
+    TURBO_RESTORE_GCC_WARNING();
   return n;
 }
 
@@ -84,7 +90,7 @@ ptrdiff_t NaiveEncoder(const uint32_t* s_ptr,
     char buff[UTF8_BUF_SIZE];
     if (code_point <= UNICODE_MAX) {
       auto n = NaiveUTF8EncodeOne(buff, code_point);
-      std::memcpy(dst, buff + UTF8_BUF_SIZE - n, n);
+      std::memcpy(dst, buff + UTF8_BUF_SIZE - n, static_cast<size_t>(n));
       dst += n;
     } else {
       std::memcpy(dst, invalid_char, invalid_char_len);

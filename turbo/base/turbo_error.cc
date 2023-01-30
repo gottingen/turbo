@@ -71,4 +71,5 @@ const char* TurboError() {
             return s;
         }
 #endif
+    return "";
 }

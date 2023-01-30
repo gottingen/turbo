@@ -81,6 +81,7 @@
 #include <tuple>
 #include <utility>
 
+#include "turbo/base/int128.h"
 #include "turbo/meta/function_ref.h"
 #include "turbo/hash/internal/hash.h"
 
@@ -414,6 +415,32 @@ class HashState : public hash_internal::HashStateBase<HashState> {
       HashState state,
       turbo::FunctionRef<void(HashState, turbo::FunctionRef<void(HashState&)>)>);
 };
+
+    template<int n>
+    struct hash_mix {
+        inline size_t operator()(size_t) const;
+    };
+
+    template<>
+    struct hash_mix<4> {
+        inline size_t operator()(size_t a) const {
+            static constexpr uint64_t kmul = 0xcc9e2d51UL;
+            // static constexpr uint64_t kmul = 0x3B9ACB93UL; // [greg] my own random prime
+            uint64_t l = a * kmul;
+            return static_cast<size_t>(l ^ (l >> 32));
+        }
+    };
+
+    template<>
+    struct hash_mix<8> {
+        // Very fast mixing (similar to Abseil)
+        inline size_t operator()(uint128 a) const {
+            static constexpr uint128 k = 0xde5fb9d2630458e9ULL;
+            // static constexpr uint64_t k = 0x7C9D0BF0567102A5ULL; // [greg] my own random prime
+            uint128 hh = a * k;
+            return Uint128High64(hh) + Uint128Low64(hh);
+        }
+    };
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

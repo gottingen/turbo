@@ -107,8 +107,6 @@ set(TURBO_ALL_SRC
         "strings/cord_analysis.cc"
         "strings/cord_buffer.cc"
         "strings/escaping.cc"
-        "strings/fmt/format.cc"
-        "strings/fmt/os.cc"
         "strings/internal/charconv_bigint.cc"
         "strings/internal/charconv_parse.cc"
         "strings/internal/cord_internal.cc"
