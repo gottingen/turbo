@@ -60,8 +60,7 @@ size_t NaiveCountBytesSize(const uint32_t* s_ptr, const uint32_t* s_ptr_end) noe
 
 
 static int32_t NaiveUTF8EncodeOne(char* buff, uint32_t x) noexcept {
-    TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion);
-    TURBO_DISABLE_GCC_WARNING(-Wsign-conversion);
+    TURBO_DISABLE_WARNING(-Wsign-conversion);
   int n = 1; /* number of bytes put in buffer (backwards) */
   if (x < 0x80) {
     /* ascii? */
@@ -75,8 +74,7 @@ static int32_t NaiveUTF8EncodeOne(char* buff, uint32_t x) noexcept {
     } while (x > mfb); /* still needs continuation byte? */
     buff[UTF8_BUF_SIZE - n] = ((~mfb << 1) | x) & 0xFF; /* add first byte */
   }
-    TURBO_RESTORE_CLANG_WARNING();
-    TURBO_RESTORE_GCC_WARNING();
+    TURBO_RESTORE_WARNING();
   return n;
 }
 

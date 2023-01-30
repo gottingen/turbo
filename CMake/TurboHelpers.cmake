@@ -178,8 +178,8 @@ function(turbo_cc_library)
             if(PC_DEPS)
               set(PC_DEPS "${PC_DEPS},")
             endif()
-            set(PC_DEPS "${PC_DEPS} turbo_${CMAKE_MATCH_1} = ${PC_VERSION}")
-            set(LNK_LIB "${LNK_LIB} -lturbo_${_NAME}")
+            set(PC_DEPS "${PC_DEPS} ${CMAKE_MATCH_1} = ${PC_VERSION}")
+            set(LNK_LIB "${LNK_LIB} -l${_NAME}")
           endif()
         endif()
       endforeach()
@@ -197,20 +197,20 @@ function(turbo_cc_library)
         endif()
       endforeach()
       string(REPLACE ";" " " PC_LINKOPTS "${TURBO_CC_LIB_LINKOPTS}")
-      FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_${_NAME}.pc" CONTENT "\
+      FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/${_NAME}.pc" CONTENT "\
 prefix=${CMAKE_INSTALL_PREFIX}\n\
 exec_prefix=\${prefix}\n\
 libdir=${CMAKE_INSTALL_FULL_LIBDIR}\n\
 includedir=${CMAKE_INSTALL_FULL_INCLUDEDIR}\n\
 \n\
-Name: turbo_${_NAME}\n\
+Name: ${_NAME}\n\
 Description: Turbo ${_NAME} library\n\
-URL: https://abseil.io/\n\
+URL: https://github.com/gottingen/turbo\n\
 Version: ${PC_VERSION}\n\
 Requires:${PC_DEPS}\n\
 Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${TURBO_CC_LIB_IS_INTERFACE}>>:${LNK_LIB}>\n\
 Cflags: -I\${includedir}${PC_CFLAGS}\n")
-      INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_${_NAME}.pc"
+      INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/${_NAME}.pc"
               DESTINATION "lib/pkgconfig")
     endif()
   endif()
@@ -306,7 +306,7 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     # installed.
     if(TURBO_ENABLE_INSTALL)
       set_target_properties(${_NAME} PROPERTIES
-        OUTPUT_NAME "turbo_${_NAME}"
+        OUTPUT_NAME "${_NAME}"
         SOVERSION 0
       )
     endif()

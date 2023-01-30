@@ -34,7 +34,7 @@ outputs:
         #- __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.15") }}  # [osx and x86_64]
     test:
       commands:
-        - test -f $PREFIX/lib/libturbo_turbo.so              # [linux]
-        - test -f $PREFIX/lib/libturbo_turbo.dylib           # [osx]
+        - test -f $PREFIX/lib/libturbo.so              # [linux]
+        - test -f $PREFIX/lib/libturbo.dylib           # [osx]
       #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
       #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]

@@ -1213,7 +1213,25 @@
 		#define TURBO_RESTORE_ALL_CW_WARNINGS()
 	#endif
 
+    #ifndef TURBO_DISABLE_WARNING
+        #if defined(TURBO_COMPILER_CLANG) || defined(TURBO_COMPILER_CLANG_CL)
+            #define TURBO_DISABLE_WARNING(x) TURBO_DISABLE_CLANG_WARNING(x)
+        #elif  defined(TURBO_COMPILER_GNUC)
+            #define TURBO_DISABLE_WARNING(x) TURBO_DISABLE_GCC_WARNING(x)
+        #elif defined(_MSC_VER)
+            #define TURBO_DISABLE_WARNING(x) TURBO_DISABLE_VC_WARNING(x)
+        #endif
+    #endif
 
+    #ifndef TURBO_RESTORE_WARNING
+        #if defined(TURBO_COMPILER_CLANG) || defined(TURBO_COMPILER_CLANG_CL)
+            #define TURBO_RESTORE_WARNING() TURBO_RESTORE_CLANG_WARNING()
+        #elif  defined(TURBO_COMPILER_GNUC)
+            #define TURBO_RESTORE_WARNING() TURBO_RESTORE_GCC_WARNING()
+        #elif defined(_MSC_VER)
+            #define TURBO_RESTORE_WARNING() TURBO_RESTORE_VC_WARNING()
+        #endif
+    #endif
 
 	// ------------------------------------------------------------------------
 	// TURBO_PURE
