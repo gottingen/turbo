@@ -43,7 +43,7 @@ TURBO_NAMESPACE_END
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-enum class StatusCode : int;
+using StatusCode = int;
 
 namespace status_internal {
 
@@ -57,15 +57,17 @@ using Payloads = turbo::InlinedVector<Payload, 1>;
 
 // Reference-counted representation of Status data.
 struct StatusRep {
-  StatusRep(turbo::StatusCode code_arg, std::string_view message_arg,
+  StatusRep(unsigned short int index_arg, turbo::StatusCode code_arg, std::string_view message_arg,
             std::unique_ptr<status_internal::Payloads> payloads_arg)
       : ref(int32_t{1}),
         code(code_arg),
+        index(index_arg),
         message(message_arg),
         payloads(std::move(payloads_arg)) {}
 
   std::atomic<int32_t> ref;
   turbo::StatusCode code;
+  unsigned short int index;
   std::string message;
   std::unique_ptr<status_internal::Payloads> payloads;
 };

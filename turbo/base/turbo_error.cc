@@ -39,19 +39,6 @@ int DescribeCustomizedErrno(
             fprintf(stderr, "WARNING: Detected shared library loading\n");
             return -1;
         }
-    } else {
-#if defined(TURBO_PLATFORM_OSX)
-        const int rc = strerror_r(error_code, tls_error_buf, ERROR_BUFSIZE);
-        if (rc != EINVAL)
-#else
-        desc = strerror_r(error_code, tls_error_buf, ERROR_BUFSIZE);
-        if (desc && strncmp(desc, "Unknown error", 13) != 0)
-#endif
-        {
-            fprintf(stderr, "Fail to define %s(%d) which is already defined as `%s', abort.",
-                    error_name, error_code, desc);
-            _exit(1);
-        }
     }
     errno_desc[error_code - ERRNO_BEGIN] = description;
     return 0;  // must
@@ -61,30 +48,28 @@ int DescribeCustomizedErrno(
 
 const char* TurboError(int error_code) {
     if (error_code == -1) {
-        return "General error -1";
+        return "";
     }
     if (error_code >= turbo::ERRNO_BEGIN && error_code < turbo::ERRNO_END) {
         const char* s = turbo::errno_desc[error_code - turbo::ERRNO_BEGIN];
         if (s) {
             return s;
         }
+    }
+    return "";
+}
+
+const char* TurboError() {
 #if defined(TURBO_PLATFORM_OSX)
-        const int rc = strerror_r(error_code, turbo::tls_error_buf, turbo::ERROR_BUFSIZE);
-        if (rc == 0 || rc == ERANGE/*bufsize is not long enough*/) {
-            return turbo::tls_error_buf;
-        }
+    const int rc = strerror_r(errno, turbo::tls_error_buf, turbo::ERROR_BUFSIZE);
+    if (rc == 0 || rc == ERANGE/*bufsize is not long enough*/) {
+        return turbo::tls_error_buf;
+    }
 #else
-        s = strerror_r(error_code, turbo::tls_error_buf, turbo::ERROR_BUFSIZE);
+    const char* s = strerror_r(errno, turbo::tls_error_buf, turbo::ERROR_BUFSIZE);
         if (s) {
             return s;
         }
 #endif
-    }
-    snprintf(turbo::tls_error_buf, turbo::ERROR_BUFSIZE,
-             "Unknown error %d", error_code);
-    return turbo::tls_error_buf;
-}
-
-const char* TurboError() {
-    return TurboError(errno);
+    return "";
 }

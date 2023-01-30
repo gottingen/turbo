@@ -5,17 +5,14 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#ifndef TURBO_BASE_ERRNO_H_
-#define TURBO_BASE_ERRNO_H_
+#ifndef TURBO_BASE_TURBO_MOULE_H_
+#define TURBO_BASE_TURBO_MOULE_H_
 
 #define __const__
 
 #include <errno.h>                           // errno
 #include "turbo/platform/config.h"
 
-//-----------------------------------------
-// Use system errno before defining yours !
-//-----------------------------------------
 //
 // To add new errno, you shall define the errno in header first, either by
 // macro or constant, or even in protobuf.
@@ -32,7 +29,7 @@
 //     TURBO_REGISTER_ERRNO(EMYERROR, "my error")
 //
 // Once the error is successfully defined:
-//     turbo_error(error_code) returns the description.
+//     turbo_error(module_index) returns the description.
 //     turbo_error() returns description of last system error code.
 //
 // %m in printf-alike functions does NOT recognize errors defined by
@@ -53,20 +50,22 @@
 
 namespace turbo {
     // You should not call this function, use TURBO_REGISTER_ERRNO instead.
-    extern int DescribeCustomizedErrno(int, const char *, const char *);
+    extern int DescribeCustomizedModule(int, const char *, const char *);
 }  // namespace turbo::base
 
-template<int error_code>
-class TurboErrorHelper {
+template<unsigned short int module_index>
+class TurboModuleHelper {
 };
 
-#define TURBO_REGISTER_ERRNO(error_code, description)                   \
-    const int TURBO_ALLOW_UNUSED TURBO_CONCAT(turbo_errno_dummy_, __LINE__) =              \
-        ::turbo::DescribeCustomizedErrno((error_code), #error_code, (description)); \
-    template <> class TurboErrorHelper<(int)(error_code)> {};
+#define TURBO_REGISTER_MODULE_INDEX(module_index, description)                   \
+    const int TURBO_ALLOW_UNUSED TURBO_CONCAT(turbo_module_dummy_, __LINE__) =              \
+        ::turbo::DescribeCustomizedModule((module_index), #module_index, (description)); \
+    template <> class TurboModuleHelper<(unsigned short int)(module_index)> {};
 
-const char *TurboError(int error_code);
+const char *TurboModule(int module_index);
 
-const char *TurboError();
+namespace turbo {
+    static constexpr unsigned short int kTurboModuleIndex = 0;
+}  // namespace turbo
 
-#endif  // TURBO_BASE_ERRNO_H_
+#endif  // TURBO_BASE_TURBO_MOULE_H_

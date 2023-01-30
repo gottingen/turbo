@@ -291,11 +291,11 @@ TEST(StatusOr, TestMoveOnlyVector) {
 TEST(StatusOr, TestDefaultCtor) {
   turbo::StatusOr<int> thing;
   EXPECT_FALSE(thing.ok());
-  EXPECT_EQ(thing.status().code(), turbo::StatusCode::kUnknown);
+  EXPECT_EQ(thing.status().code(), turbo::kUnknown);
 }
 
 TEST(StatusOr, StatusCtorForwards) {
-  turbo::Status status(turbo::StatusCode::kInternal, "Some error");
+  turbo::Status status(turbo::kInternal, "Some error");
 
   EXPECT_EQ(turbo::StatusOr<int>(status).status().message(), "Some error");
   EXPECT_EQ(status.message(), "Some error");
@@ -403,7 +403,7 @@ TEST(StatusOrDeathTest, TestStatusCtorStatusOk) {
         // In optimized mode, we are actually going to get error::INTERNAL for
         // status here, rather than crashing, so check that.
         EXPECT_FALSE(thing.ok());
-        EXPECT_EQ(thing.status().code(), turbo::StatusCode::kInternal);
+        EXPECT_EQ(thing.status().code(), turbo::kInternal);
       },
       "An OK status is not a valid constructor argument");
 }
@@ -415,7 +415,7 @@ TEST(StatusOrDeathTest, TestPointerStatusCtorStatusOk) {
         // In optimized mode, we are actually going to get error::INTERNAL for
         // status here, rather than crashing, so check that.
         EXPECT_FALSE(thing.ok());
-        EXPECT_EQ(thing.status().code(), turbo::StatusCode::kInternal);
+        EXPECT_EQ(thing.status().code(), turbo::kInternal);
       },
       "An OK status is not a valid constructor argument");
 }
@@ -448,7 +448,7 @@ TEST(StatusOr, BadValueAccess) {
 TEST(StatusOr, TestStatusCtor) {
   turbo::StatusOr<int> thing(turbo::CancelledError());
   EXPECT_FALSE(thing.ok());
-  EXPECT_EQ(thing.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(thing.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, TestValueCtor) {
@@ -489,7 +489,7 @@ TEST(StatusOr, Emplace) {
   EXPECT_THAT(status_or_foo, IsOkAndHolds(Field(&Foo::x, 20)));
   status_or_foo = turbo::InvalidArgumentError("msg");
   EXPECT_FALSE(status_or_foo.ok());
-  EXPECT_EQ(status_or_foo.status().code(), turbo::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status_or_foo.status().code(), turbo::kInvalidArgument);
   EXPECT_EQ(status_or_foo.status().message(), "msg");
   status_or_foo.emplace(20);
   EXPECT_THAT(status_or_foo, IsOkAndHolds(Field(&Foo::x, 20)));
@@ -504,7 +504,7 @@ TEST(StatusOr, EmplaceInitializerList) {
                                  Field(&InPlaceHelper::y, Pointee(4)))));
   status_or = turbo::InvalidArgumentError("msg");
   EXPECT_FALSE(status_or.ok());
-  EXPECT_EQ(status_or.status().code(), turbo::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status_or.status().code(), turbo::kInvalidArgument);
   EXPECT_EQ(status_or.status().message(), "msg");
   status_or.emplace({1, 2, 3}, turbo::make_unique<int>(4));
   EXPECT_THAT(status_or,
@@ -523,7 +523,7 @@ TEST(StatusOr, TestCopyCtorStatusOk) {
 TEST(StatusOr, TestCopyCtorStatusNotOk) {
   turbo::StatusOr<int> original(turbo::CancelledError());
   turbo::StatusOr<int> copy(original);
-  EXPECT_EQ(copy.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(copy.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, TestCopyCtorNonAssignable) {
@@ -613,7 +613,7 @@ TEST(StatusOr, TestAssignmentStatusNotOk) {
     EXPECT_EQ(expected, target.status());
 
     EXPECT_FALSE(source.ok());
-    EXPECT_EQ(source.status().code(), turbo::StatusCode::kInternal);
+    EXPECT_EQ(source.status().code(), turbo::kInternal);
   }
 }
 
@@ -1052,7 +1052,7 @@ TEST(StatusOr, TestAssignmentStatusNotOkConverting) {
     EXPECT_EQ(expected, target.status());
 
     EXPECT_FALSE(source.ok());
-    EXPECT_EQ(source.status().code(), turbo::StatusCode::kInternal);
+    EXPECT_EQ(source.status().code(), turbo::kInternal);
   }
 }
 
@@ -1077,7 +1077,7 @@ TEST(StatusOr, SelfAssignment) {
     so = *&so;
 
     EXPECT_FALSE(so.ok());
-    EXPECT_EQ(so.status().code(), turbo::StatusCode::kNotFound);
+    EXPECT_EQ(so.status().code(), turbo::kNotFound);
     EXPECT_EQ(so.status().message(), "taco");
   }
 
@@ -1103,7 +1103,7 @@ TEST(StatusOr, SelfAssignment) {
     so = std::move(same);
 
     EXPECT_FALSE(so.ok());
-    EXPECT_EQ(so.status().code(), turbo::StatusCode::kNotFound);
+    EXPECT_EQ(so.status().code(), turbo::kNotFound);
     EXPECT_EQ(so.status().message(), "taco");
   }
 
@@ -1130,7 +1130,7 @@ TEST(StatusOr, SelfAssignment) {
     so = std::move(same);
 
     EXPECT_FALSE(so.ok());
-    EXPECT_EQ(so.status().code(), turbo::StatusCode::kNotFound);
+    EXPECT_EQ(so.status().code(), turbo::kNotFound);
     EXPECT_EQ(so.status().message(), "taco");
   }
 }
@@ -1239,7 +1239,7 @@ TEST(StatusOr, TestStatus) {
   EXPECT_TRUE(good.ok());
   turbo::StatusOr<int> bad(turbo::CancelledError());
   EXPECT_FALSE(bad.ok());
-  EXPECT_EQ(bad.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(bad.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, OperatorStarRefQualifiers) {
@@ -1308,14 +1308,14 @@ TEST(StatusOr, RValueStatus) {
   turbo::StatusOr<int> so(turbo::NotFoundError("taco"));
   const turbo::Status s = std::move(so).status();
 
-  EXPECT_EQ(s.code(), turbo::StatusCode::kNotFound);
+  EXPECT_EQ(s.code(), turbo::kNotFound);
   EXPECT_EQ(s.message(), "taco");
 
   // Check that !ok() still implies !status().ok(), even after moving out of the
   // object. See the note on the rvalue ref-qualified status method.
   EXPECT_FALSE(so.ok());  // NOLINT
   EXPECT_FALSE(so.status().ok());
-  EXPECT_EQ(so.status().code(), turbo::StatusCode::kInternal);
+  EXPECT_EQ(so.status().code(), turbo::kInternal);
   EXPECT_EQ(so.status().message(), "Status accessed after move.");
 }
 
@@ -1334,13 +1334,13 @@ TEST(StatusOr, TestValueConst) {
 TEST(StatusOr, TestPointerDefaultCtor) {
   turbo::StatusOr<int*> thing;
   EXPECT_FALSE(thing.ok());
-  EXPECT_EQ(thing.status().code(), turbo::StatusCode::kUnknown);
+  EXPECT_EQ(thing.status().code(), turbo::kUnknown);
 }
 
 TEST(StatusOr, TestPointerStatusCtor) {
   turbo::StatusOr<int*> thing(turbo::CancelledError());
   EXPECT_FALSE(thing.ok());
-  EXPECT_EQ(thing.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(thing.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, TestPointerValueCtor) {
@@ -1384,7 +1384,7 @@ TEST(StatusOr, TestPointerCopyCtorStatusOk) {
 TEST(StatusOr, TestPointerCopyCtorStatusNotOk) {
   turbo::StatusOr<int*> original(turbo::CancelledError());
   turbo::StatusOr<int*> copy(original);
-  EXPECT_EQ(copy.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(copy.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, TestPointerCopyCtorStatusOKConverting) {
@@ -1398,7 +1398,7 @@ TEST(StatusOr, TestPointerCopyCtorStatusOKConverting) {
 TEST(StatusOr, TestPointerCopyCtorStatusNotOkConverting) {
   turbo::StatusOr<Derived*> original(turbo::CancelledError());
   turbo::StatusOr<Base2*> copy(original);
-  EXPECT_EQ(copy.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(copy.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, TestPointerAssignmentStatusOk) {
@@ -1414,7 +1414,7 @@ TEST(StatusOr, TestPointerAssignmentStatusNotOk) {
   turbo::StatusOr<int*> source(turbo::CancelledError());
   turbo::StatusOr<int*> target;
   target = source;
-  EXPECT_EQ(target.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(target.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, TestPointerAssignmentStatusOKConverting) {
@@ -1438,7 +1438,7 @@ TEST(StatusOr, TestPointerStatus) {
   turbo::StatusOr<const int*> good(&kI);
   EXPECT_TRUE(good.ok());
   turbo::StatusOr<const int*> bad(turbo::CancelledError());
-  EXPECT_EQ(bad.status().code(), turbo::StatusCode::kCancelled);
+  EXPECT_EQ(bad.status().code(), turbo::kCancelled);
 }
 
 TEST(StatusOr, TestPointerValue) {

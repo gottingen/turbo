@@ -7,13 +7,14 @@
 
 
 #include "turbo/files/sequential_read_file.h"
-#include "turbo/log/turbo_log.h"
-#include "turbo/log/check.h"
 #include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
-#include <errno.h>
-#include <string.h>
+#include <cerrno>
+#include <cstring>
+#include "turbo/log/turbo_log.h"
+#include "turbo/log/check.h"
+#include "turbo/base/casts.h"
 
 namespace turbo {
 
@@ -38,9 +39,7 @@ namespace turbo {
     turbo::Status SequentialReadFile::read(std::string *content, size_t n) {
         turbo::Cord portal;
         auto frs = read(&portal, n);
-        size_t size = 0;
         if (frs.ok()) {
-            size = portal.size();
             CopyCordToString(portal,content);
         }
         return frs;
@@ -56,7 +55,7 @@ namespace turbo {
         while (left > 0) {
             ssize_t read_len = ::read(_fd, ptr, std::min(left, kMaxTempSize));
             if (read_len > 0) {
-                left -= read_len;
+                left -= static_cast<size_t>(read_len);
             } else if (read_len == 0) {
                 break;
             } else if (errno == EINTR) {
@@ -66,8 +65,8 @@ namespace turbo {
                                    << " fd: " << _fd << " size: " << n;
                 return ErrnoToStatus(errno,"");
             }
-            buf->Append(std::string_view(ptr, read_len));
-            _has_read += read_len;
+            buf->Append(std::string_view(ptr, static_cast<size_t>(read_len)));
+            _has_read += static_cast<size_t>(read_len);
         }
         return turbo::OkStatus();
     }
@@ -87,7 +86,7 @@ namespace turbo {
 
     turbo::Status SequentialReadFile::skip(size_t n) {
         if (_fd > 0) {
-            ::lseek(_fd, n, SEEK_CUR);
+            ::lseek(_fd, implicit_cast<off_t>(n), SEEK_CUR);
         }
         return turbo::OkStatus();
     }
