@@ -9,58 +9,18 @@ augments to stl.
 # build
 
 Since designed the Turbo, easy to build and ingest is one of its goals.
-so we make it's using as easy as we can.
-## dependencies
+so we make it's using as easy as we can. details see [build](docs/build.md)
 
-* cmake version > 3.15
-* ApplyClang > 12
-* gcc >= 9.3
-* 
-## on macbook
+for easy to ingest, Turbo have package on anaconda. When you on conda environment,
+you can get it as below.
 
 ```shell
-    git clone github.com/gottingen/turbo.git
-    cd turbo
-    mkdir build
-    cd build
-    cmake .. -DTURBO_BUILD_TESTING=ON
-    make -j 4
+    conda install -c mgottingen turbo
 ```
 
-## on ubuntu20.04
-ubuntu 20.04 original gcc/g++ version is 9.3.
-**prepare env**
-```shell
-    sudo apt-get install gcc g++
-    sudo apt-get imstall cmake
-```
-**build** 
-```shell
-    git clone github.com/gottingen/turbo.git
-    cd turbo
-    mkdir build
-    cd build
-    cmake .. -DTURBO_BUILD_TESTING=ON
-    make -j 4
-```
-## on centos7
-
-centos7 we need to use scl to upgrade our compiler.
+or 
 
 ```shell
-sudo yum install centos-release-scl
-sudo yum install devtoolset-9-gcc*
-scl enable devtoolset-9 bash
+    conda install -c conda-forge turbo
 ```
-
-```shell
-    git clone github.com/gottingen/turbo.git
-    cd turbo
-    mkdir build
-    cd build
-    cmake .. -DTURBO_BUILD_TESTING=ON
-    make -j 4
-```
-## conda env
-
 

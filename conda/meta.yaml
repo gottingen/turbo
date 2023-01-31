@@ -20,7 +20,7 @@ source:
   git_url: ../
 
 outputs:
-  - name: turbo-turbo
+  - name: turbo
     script: bld.sh   # [not win]
     script: bld.bat  # [win]
     build:
