@@ -1275,7 +1275,8 @@ TEST(ManipulatorLogFormatTest, ScientificFloat) {
   LOG(INFO) << std::scientific << value;
 }
 
-#if (defined(__BIONIC__) && (!defined(__ANDROID_API__) || __ANDROID_API__ < 22)) || defined(TURBO_PROCESSOR_ARM)
+#if 1
+//#if (defined(__BIONIC__) && (!defined(__ANDROID_API__) || __ANDROID_API__ < 22)) || defined(TURBO_PROCESSOR_ARM)
 // Bionic doesn't support `%a` until API 22, so this prints 'a' even if the
 // C++ standard library implements it correctly (by forwarding to printf).
 #else
@@ -1308,7 +1309,8 @@ TEST(ManipulatorLogFormatTest, FixedAndScientificFloat) {
 }
 #endif
 
-#if (defined(__BIONIC__) && (!defined(__ANDROID_API__) || __ANDROID_API__ < 22)) || defined(TURBO_PROCESSOR_ARM)
+#if 1
+//#if (defined(__BIONIC__) && (!defined(__ANDROID_API__) || __ANDROID_API__ < 22)) || defined(TURBO_PROCESSOR_ARM)
 // Bionic doesn't support `%a` until API 22, so this prints 'a' even if the C++
 // standard library supports `std::hexfloat` (by forwarding to printf).
 #else
