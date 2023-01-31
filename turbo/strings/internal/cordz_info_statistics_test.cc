@@ -19,7 +19,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/platform/config.h"
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"

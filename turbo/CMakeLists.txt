@@ -37,15 +37,19 @@ set(TURBO_ALL_SRC
         "container/internal/hashtablez_sampler.cc"
         "container/internal/hashtablez_sampler_force_weak_definition.cc"
         "container/internal/raw_hash_set.cc"
-        "crc/crc32c.cc"
-        "crc/internal/cpu_detect.cc"
-        "crc/internal/crc.cc"
-        "crc/internal/crc_cord_state.cc"
-        "crc/internal/crc_x86_arm_combined.cc"
-        "crc/internal/crc_memcpy_fallback.cc"
-        "crc/internal/crc_memcpy_x86_64.cc"
-        "crc/internal/crc_non_temporal_memcpy.cc"
-        "crc/internal/crc_x86_arm_combined.cc"
+        "crypto/crc32c.cc"
+        "crypto/internal/cpu_detect.cc"
+        "crypto/internal/crc.cc"
+        "crypto/internal/crc_cord_state.cc"
+        "crypto/internal/crc_x86_arm_combined.cc"
+        "crypto/internal/crc_memcpy_fallback.cc"
+        "crypto/internal/crc_memcpy_x86_64.cc"
+        "crypto/internal/crc_non_temporal_memcpy.cc"
+        "crypto/internal/crc_x86_arm_combined.cc"
+        "crypto/md5.cc"
+        "crypto/sha1.cc"
+        "crypto/sha256.cc"
+        "crypto/sha512.cc"
         "debugging/failure_signal_handler.cc"
         "debugging/stacktrace.cc"
         "debugging/symbolize.cc"
@@ -185,7 +189,7 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(base)
     add_subdirectory(cleanup)
     add_subdirectory(container)
-    add_subdirectory(crc)
+    add_subdirectory(crypto)
     add_subdirectory(debugging)
     add_subdirectory(files)
     add_subdirectory(flags)

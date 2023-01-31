@@ -77,7 +77,7 @@
 #include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
 #include "turbo/container/inlined_vector.h"
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/meta/function_ref.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/cord_analysis.h"
