@@ -24,3 +24,20 @@ or
     conda install -c conda-forge turbo
 ```
 
+# Try Try Try
+
+* Read [overview](docs/overview.md) to know the goals of turbo and its advantages. 
+* Read [getting start](docs/getting_start.md) for building turbo and work with [examples](examples).
+* Modules:
+  * [platform](docs/platform.md) 
+  * [Status](docs/status.md)
+  * [base](docs/base.md)
+
+# Acknowledgement
+
+* [Abseil](github.com/abseil/abseil-cpp)
+* [Folly](github.com/facebook/folly)
+* [Onnxruntime](github.com/microsoft/onnxruntime)
+* [brpc](github.com/apache/brpc)
+* [tvm](github.com/apache/tvm)
+* [EASTL](https://github.com/electronicarts/EASTL)
