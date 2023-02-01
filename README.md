@@ -18,12 +18,6 @@ you can get it as below.
     conda install -c mgottingen turbo
 ```
 
-or 
-
-```shell
-    conda install -c conda-forge turbo
-```
-
 # Try Try Try
 
 * Read [overview](docs/overview.md) to know the goals of turbo and its advantages. 
@@ -32,6 +26,7 @@ or
   * [platform](docs/platform.md) 
   * [Status](docs/status.md)
   * [base](docs/base.md)
+  * [json](docs/json.md) rapidjson docs
 
 # Acknowledgement
 

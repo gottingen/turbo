@@ -1,18 +1,20 @@
 
+file(COPY bin DESTINATION ${PROJECT_BINARY_DIR})
+
 set(JSON_SOURCES
 	allocators_test.cc
     biginteger_test.cc
     clzll_test.cc
 	cursorstreamwrapper_test.cc
-    #document_test.cc
+    document_test.cc
     dtoa_test.cc
-    #encodedstream_test.cc
+    encodedstream_test.cc
     encodings_test.cc
     fwd_test.cc
-    #filestream_test.cc
+    filestream_test.cc
     itoa_test.cc
-    #istreamwrapper_test.cc
-    #jsonchecker_test.cc
+    istreamwrapper_test.cc
+    jsonchecker_test.cc
     namespace_test.cc
     pointer_test.cc
     platform_test.cc
@@ -20,7 +22,7 @@ set(JSON_SOURCES
     ostreamwrapper_test.cc
     reader_test.cc
     regex_test.cc
-	#schema_test.cc
+	schema_test.cc
 	simd_test.cc
     strfunc_test.cc
     stringbuffer_test.cc

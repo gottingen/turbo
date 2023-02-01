@@ -569,5 +569,4 @@ function(turbo_cc_binary)
     set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
   endif()
 
-  add_test(NAME ${_NAME} COMMAND ${_NAME})
 endfunction()
