@@ -12,10 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef TURBO_VERSION_H_
 #define TURBO_VERSION_H_
 
-#define TURBO_VERSION "0.6.6"
+#include "turbo/strings/str_format.h"
 
-#endif  // TURBO_VERSION_H_
+// TURBO_VERSION % 100 is the patch level
+// TURBO_VERSION / 100 % 1000 is the minor version
+// TURBO_VERSION / 100000 is the major version
+
+// current version: 0.6.11
+#define TURBO_VERSION 000611
+
+#define TURBO_MAJOR_VERSION TURBO_VERSION / 100000
+#define TURBO_MINOR_VERSION TURBO_VERSION / 100 % 1000
+#define TURBO_PATCH_VERSION TURBO_VERSION % 100
+
+namespace turbo {
+
+const std::string &version() {
+  static const std::string vstr = turbo::StrFormat(
+      "%d.%d%d", TURBO_MAJOR_VERSION, TURBO_MINOR_VERSION, TURBO_PATCH_VERSION);
+  return vstr;
+}
+
+} // namespace turbo
+
+#endif // TURBO_VERSION_H_

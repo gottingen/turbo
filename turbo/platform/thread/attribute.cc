@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Turbo Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,17 +19,21 @@
 #define _GNU_SOURCE
 #endif
 
+#if defined(TURBO_PLATFORM_LINUX)
+
 #include <pthread.h>
 #include <sched.h>
-
 #include <string>
-
 #include "turbo/log/logging.h"
 
-namespace turbo {
+#endif  // TURBO_PLATFORM_LINUX
+
+namespace turbo::platform_internal {
+
+#if defined(TURBO_PLATFORM_LINUX)
 
 int TrySetCurrentThreadAffinity(const std::vector<int>& affinity) {
-  FLARE_CHECK(!affinity.empty());
+  TURBO_CHECK(!affinity.empty());
   cpu_set_t cpuset;
 
   CPU_ZERO(&cpuset);
@@ -41,16 +45,18 @@ int TrySetCurrentThreadAffinity(const std::vector<int>& affinity) {
 
 void SetCurrentThreadAffinity(const std::vector<int>& affinity) {
   auto rc = TrySetCurrentThreadAffinity(affinity);
-  FLARE_CHECK(rc == 0, "Cannot set thread affinity for thread [{}]: [{}] {}.",
-              reinterpret_cast<const void*>(pthread_self()), rc, strerror(rc));
+  TURBO_CHECK(rc == 0)<< "Cannot set thread affinity for thread ["
+                      <<reinterpret_cast<const void*>(pthread_self())
+                      <<"]: ["<<rc<<"] "<<strerror(rc)<<".";
 }
 
 std::vector<int> GetCurrentThreadAffinity() {
   cpu_set_t cpuset;
   CPU_ZERO(&cpuset);
   auto rc = pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
-  FLARE_CHECK(rc == 0, "Cannot get thread affinity of thread [{}]: [{}] {}.",
-              reinterpret_cast<const void*>(pthread_self()), rc, strerror(rc));
+  TURBO_CHECK(rc == 0)<<"Cannot set name for thread ["<<reinterpret_cast<const void*>(pthread_self())
+                    <<"]: ["<<rc
+                  <<"] "<<strerror(rc));
 
   std::vector<int> result;
   for (int i = 0; i != __CPU_SETSIZE; ++i) {
@@ -64,11 +70,12 @@ std::vector<int> GetCurrentThreadAffinity() {
 void SetCurrentThreadName(const std::string& name) {
   auto rc = pthread_setname_np(pthread_self(), name.c_str());
   if (rc != 0) {
-    FLARE_LOG_WARNING("Cannot set name for thread [{}]: [{}] {}",
-                      reinterpret_cast<const void*>(pthread_self()), rc,
-                      strerror(rc));
+    TURBO_LOG(WARNING)<<"Cannot set name for thread ["<<reinterpret_cast<const void*>(pthread_self())
+                      <<"]: ["<<rc
+                      <<"] "<<strerror(rc));
     // Silently ignored.
   }
 }
 
-}  // namespace flare
+#endif  // TURBO_PLATFORM_LINUX
+}  // namespace turbo::platform_internal

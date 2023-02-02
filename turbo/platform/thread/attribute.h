@@ -1,5 +1,5 @@
 //
-// Copyright 2022 The Turbo Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,12 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include "turbo/platform/macros.h"
+#include "turbo/meta/type_traits.h"
 
-namespace turbo {
+namespace turbo::platform_internal {
+
+#if defined(TURBO_PLATFORM_LINUX)
 
 // Some helper methods for manipulating threads.
 
@@ -43,6 +47,7 @@ std::vector<int> GetCurrentThreadAffinity();
 // Error, if any, is ignored.
 void SetCurrentThreadName(const std::string& name);
 
-}  // namespace turbo
+#endif  // TURBO_PLATFORM_LINUX
+}  // namespace turbo::platform_internal
 
 #endif  // TURBO_PLATFORM_THREAD_ATTRIBUTE_H_

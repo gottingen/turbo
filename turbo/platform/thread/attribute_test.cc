@@ -1,34 +1,34 @@
-// Copyright (C) 2020 THL A29 Limited, a Tencent company. All rights reserved.
 //
-// Licensed under the BSD 3-Clause License (the "License"); you may not use this
-// file except in compliance with the License. You may obtain a copy of the
-// License at
+// Copyright 2023 The Turbo Authors.
 //
-// https://opensource.org/licenses/BSD-3-Clause
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations under
-// the License.
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "flare/base/thread/attribute.h"
 
+#include "turbo/platform/thread/attribute.h"
+#if defined(TURBO_PLATFORM_LINUX)
 #include <pthread.h>
-
 #include <chrono>
 #include <thread>
 #include <vector>
-
 #include "gtest/gtest.h"
 
-#include "flare/base/internal/cpu.h"
-#include "flare/base/logging.h"
-#include "flare/base/random.h"
+#include "turbo/base/internal/cpu.h"
+#include "turbo/log/logging.h"
+#include "turbo/base/random.h"
 
 using namespace std::literals;
 
-namespace flare {
+namespace turbo::platform_internal {
 
 TEST(Thread, SetCurrentAffinity) {
   auto nprocs = internal::GetNumberOfProcessorsConfigured();
@@ -52,4 +52,6 @@ TEST(Thread, SetCurrentName) {
   ASSERT_EQ("asdf", std::string(buffer));
 }
 
-}  // namespace flare
+}  // namespace turbo::platform_internal
+
+#endif  // TURBO_PLATFORM_LINUX
