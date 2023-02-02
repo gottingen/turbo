@@ -342,7 +342,7 @@ TEST(BadStatusOrAccessTest, MoveAssignmentWhatOk) {
 }
 
 // Define `EXPECT_DEATH_OR_THROW` to test the behavior of `StatusOr::value`,
-// which either throws `BadStatusOrAccess` or `LOG(FATAL)` based on whether
+// which either throws `BadStatusOrAccess` or `TURBO_LOG(FATAL)` based on whether
 // exceptions are enabled.
 #ifdef TURBO_HAVE_EXCEPTIONS
 #define EXPECT_DEATH_OR_THROW(statement, status_)                  \

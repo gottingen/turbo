@@ -64,13 +64,13 @@ class LogEntry final {
   LogEntry& operator=(const LogEntry&) = delete;
 
   // Source file and line where the log message occurred.  Taken from `__FILE__`
-  // and `__LINE__` unless overridden by `LOG(...).AtLocation(...)`.
+  // and `__LINE__` unless overridden by `TURBO_LOG(...).AtLocation(...)`.
   //
   // Take special care not to use the values returned by `source_filename()` and
   // `source_basename()` after the lifetime of the entry.  This is always
   // incorrect, but it will often work in practice because they usually point
   // into a statically allocated character array obtained from `__FILE__`.
-  // Statements like `LOG(INFO).AtLocation(std::string(...), ...)` will expose
+  // Statements like `TURBO_LOG(INFO).AtLocation(std::string(...), ...)` will expose
   // the bug.  If you need the data later, you must copy them.
   std::string_view source_filename() const TURBO_ATTRIBUTE_LIFETIME_BOUND {
     return full_filename_;
@@ -83,7 +83,7 @@ class LogEntry final {
   // LogEntry::prefix()
   //
   // True unless the metadata prefix was suppressed once by
-  // `LOG(...).NoPrefix()` or globally by `turbo::EnableLogPrefix(false)`.
+  // `TURBO_LOG(...).NoPrefix()` or globally by `turbo::EnableLogPrefix(false)`.
   // Implies `text_message_with_prefix() == text_message()`.
   bool prefix() const { return prefix_; }
 
@@ -103,7 +103,7 @@ class LogEntry final {
   //
   // Returns the time at which this entry was written.  Captured during
   // evaluation of `LOG`, but can be overridden by
-  // `LOG(...).WithTimestamp(...)`.
+  // `TURBO_LOG(...).WithTimestamp(...)`.
   //
   // Take care not to rely on timestamps increasing monotonically, or even to
   // rely on timestamps having any particular relationship with reality (since
@@ -113,7 +113,7 @@ class LogEntry final {
   // LogEntry::tid()
   //
   // Returns the ID of the thread that wrote this entry.  Captured during
-  // evaluation of `LOG`, but can be overridden by `LOG(...).WithThreadID(...)`.
+  // evaluation of `LOG`, but can be overridden by `TURBO_LOG(...).WithThreadID(...)`.
   //
   // Take care not to *rely* on reported thread IDs as they can be overridden as
   // specified above.

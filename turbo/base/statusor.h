@@ -31,7 +31,7 @@
 //   if (result.ok()) {
 //     result->DoSomethingCool();
 //   } else {
-//     LOG(ERROR) << result.status();
+//     TURBO_LOG(ERROR) << result.status();
 //   }
 #ifndef TURBO_BASE_STATUSOR_H_
 #define TURBO_BASE_STATUSOR_H_
@@ -68,7 +68,7 @@ TURBO_NAMESPACE_BEGIN
 //   turbo::StatusOr<int> v = FetchInt();
 //   DoWork(v.value());  // Accessing value() when not "OK" may throw
 // } catch (turbo::BadStatusOrAccess& ex) {
-//   LOG(ERROR) << ex.status();
+//   TURBO_LOG(ERROR) << ex.status();
 // }
 class BadStatusOrAccess : public std::exception {
  public:
@@ -135,7 +135,7 @@ class TURBO_MUST_USE_RESULT StatusOr;
 //   if (result.ok()) {
 //     result->DoSomethingCool();
 //   } else {
-//     LOG(ERROR) << result.status();
+//     TURBO_LOG(ERROR) << result.status();
 //   }
 //
 // Accessing the object held by an `turbo::StatusOr<T>` should be performed via
@@ -167,9 +167,9 @@ class TURBO_MUST_USE_RESULT StatusOr;
 //
 //  StatusOr<std::unique_ptr<Foo>> result = FooFactory::MakeNewFoo(arg);
 //  if (!result.ok()) {
-//    LOG(ERROR) << result.status();
+//    TURBO_LOG(ERROR) << result.status();
 //  } else if (*result == nullptr) {
-//    LOG(ERROR) << "Unexpected null pointer";
+//    TURBO_LOG(ERROR) << "Unexpected null pointer";
 //  } else {
 //    (*result)->DoSomethingCool();
 //  }

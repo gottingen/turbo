@@ -22,7 +22,7 @@
 #include "turbo/log/internal/test_actions.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/log_sink_registry.h"
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/strings/string_view.h"
@@ -55,15 +55,15 @@ TEST(LogSinkRegistryTest, AddLogSink) {
   EXPECT_CALL(test_sink,
               Log(turbo::LogSeverity::kError, __FILE__, "This is an error"));
 
-  LOG(INFO) << "hello world";
+  TURBO_LOG(INFO) << "hello world";
   test_sink.StartCapturingLogs();
 
-  LOG(INFO) << "Test : " << 42;
-  LOG(WARNING) << "Danger" << ' ' << "ahead";
-  LOG(ERROR) << "This is an error";
+  TURBO_LOG(INFO) << "Test : " << 42;
+  TURBO_LOG(WARNING) << "Danger" << ' ' << "ahead";
+  TURBO_LOG(ERROR) << "This is an error";
 
   test_sink.StopCapturingLogs();
-  LOG(INFO) << "Goodby world";
+  TURBO_LOG(INFO) << "Goodby world";
 }
 
 TEST(LogSinkRegistryTest, MultipleLogSinks) {
@@ -80,19 +80,19 @@ TEST(LogSinkRegistryTest, MultipleLogSinks) {
   EXPECT_CALL(test_sink1, Log(turbo::LogSeverity::kInfo, _, "Third")).Times(0);
   EXPECT_CALL(test_sink2, Log(turbo::LogSeverity::kInfo, _, "Third")).Times(1);
 
-  LOG(INFO) << "Before first";
+  TURBO_LOG(INFO) << "Before first";
 
   test_sink1.StartCapturingLogs();
-  LOG(INFO) << "First";
+  TURBO_LOG(INFO) << "First";
 
   test_sink2.StartCapturingLogs();
-  LOG(INFO) << "Second";
+  TURBO_LOG(INFO) << "Second";
 
   test_sink1.StopCapturingLogs();
-  LOG(INFO) << "Third";
+  TURBO_LOG(INFO) << "Third";
 
   test_sink2.StopCapturingLogs();
-  LOG(INFO) << "Fourth";
+  TURBO_LOG(INFO) << "Fourth";
 }
 
 TEST(LogSinkRegistrationDeathTest, DuplicateSinkRegistration) {
@@ -131,11 +131,11 @@ TEST(LogSinkTest, FlushSinks) {
 TEST(LogSinkDeathTest, DeathInSend) {
   class FatalSendSink : public turbo::LogSink {
    public:
-    void Send(const turbo::LogEntry&) override { LOG(FATAL) << "goodbye world"; }
+    void Send(const turbo::LogEntry&) override { TURBO_LOG(FATAL) << "goodbye world"; }
   };
 
   FatalSendSink sink;
-  EXPECT_EXIT({ LOG(INFO).ToSinkAlso(&sink) << "hello world"; }, DiedOfFatal,
+  EXPECT_EXIT({ TURBO_LOG(INFO).ToSinkAlso(&sink) << "hello world"; }, DiedOfFatal,
               _);
 }
 
@@ -149,13 +149,13 @@ TEST(LogSinkTest, ToSinkAlso) {
   EXPECT_CALL(another_sink, Log(_, _, "hello world"));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).ToSinkAlso(&another_sink.UseAsLocalSink()) << "hello world";
+  TURBO_LOG(INFO).ToSinkAlso(&another_sink.UseAsLocalSink()) << "hello world";
 }
 
 TEST(LogSinkTest, ToSinkOnly) {
   turbo::ScopedMockLog another_sink(turbo::MockLogDefault::kDisallowUnexpected);
   EXPECT_CALL(another_sink, Log(_, _, "hello world"));
-  LOG(INFO).ToSinkOnly(&another_sink.UseAsLocalSink()) << "hello world";
+  TURBO_LOG(INFO).ToSinkOnly(&another_sink.UseAsLocalSink()) << "hello world";
 }
 
 TEST(LogSinkTest, ToManySinks) {
@@ -169,7 +169,7 @@ TEST(LogSinkTest, ToManySinks) {
   EXPECT_CALL(sink4, Log(_, _, "hello world"));
   EXPECT_CALL(sink5, Log(_, _, "hello world"));
 
-  LOG(INFO)
+  TURBO_LOG(INFO)
           .ToSinkAlso(&sink1.UseAsLocalSink())
           .ToSinkAlso(&sink2.UseAsLocalSink())
           .ToSinkOnly(&sink3.UseAsLocalSink())
@@ -194,14 +194,14 @@ class ReentrancyTest : public ::testing::Test {
     void Send(const turbo::LogEntry&) override {
       switch (mode_) {
         case LogMode::kNormal:
-          LOG(LEVEL(severity_)) << "The log is coming from *inside the sink*.";
+          TURBO_LOG(LEVEL(severity_)) << "The log is coming from *inside the sink*.";
           break;
         case LogMode::kToSinkAlso:
-          LOG(LEVEL(severity_)).ToSinkAlso(sink_)
+          TURBO_LOG(LEVEL(severity_)).ToSinkAlso(sink_)
               << "The log is coming from *inside the sink*.";
           break;
         case LogMode::kToSinkOnly:
-          LOG(LEVEL(severity_)).ToSinkOnly(sink_)
+          TURBO_LOG(LEVEL(severity_)).ToSinkOnly(sink_)
               << "The log is coming from *inside the sink*.";
           break;
         default:
@@ -218,7 +218,7 @@ class ReentrancyTest : public ::testing::Test {
   static std::string_view LogAndReturn(turbo::LogSeverity severity,
                                         std::string_view to_log,
                                         std::string_view to_return) {
-    LOG(LEVEL(severity)) << to_log;
+    TURBO_LOG(LEVEL(severity)) << to_log;
     return to_return;
   }
 };
@@ -233,8 +233,8 @@ TEST_F(ReentrancyTest, LogFunctionThatLogs) {
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kInfo, _, "here"));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << LogAndReturn(turbo::LogSeverity::kInfo, "hello", "world");
-  LOG(INFO) << LogAndReturn(turbo::LogSeverity::kWarning, "danger", "here");
+  TURBO_LOG(INFO) << LogAndReturn(turbo::LogSeverity::kInfo, "hello", "world");
+  TURBO_LOG(INFO) << LogAndReturn(turbo::LogSeverity::kWarning, "danger", "here");
 }
 
 TEST_F(ReentrancyTest, RegisteredLogSinkThatLogsInSend) {
@@ -244,7 +244,7 @@ TEST_F(ReentrancyTest, RegisteredLogSinkThatLogsInSend) {
 
   test_sink.StartCapturingLogs();
   turbo::AddLogSink(&renentrant_sink);
-  LOG(INFO) << "hello world";
+  TURBO_LOG(INFO) << "hello world";
   turbo::RemoveLogSink(&renentrant_sink);
 }
 
@@ -256,7 +256,7 @@ TEST_F(ReentrancyTest, AlsoLogSinkThatLogsInSend) {
               Log(_, _, "The log is coming from *inside the sink*."));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
+  TURBO_LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
 }
 
 TEST_F(ReentrancyTest, RegisteredAlsoLogSinkThatLogsInSend) {
@@ -271,7 +271,7 @@ TEST_F(ReentrancyTest, RegisteredAlsoLogSinkThatLogsInSend) {
 
   test_sink.StartCapturingLogs();
   turbo::AddLogSink(&reentrant_sink);
-  LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
+  TURBO_LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
   turbo::RemoveLogSink(&reentrant_sink);
 }
 
@@ -282,7 +282,7 @@ TEST_F(ReentrancyTest, OnlyLogSinkThatLogsInSend) {
               Log(_, _, "The log is coming from *inside the sink*."));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
+  TURBO_LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
 }
 
 TEST_F(ReentrancyTest, RegisteredOnlyLogSinkThatLogsInSend) {
@@ -293,7 +293,7 @@ TEST_F(ReentrancyTest, RegisteredOnlyLogSinkThatLogsInSend) {
 
   test_sink.StartCapturingLogs();
   turbo::AddLogSink(&reentrant_sink);
-  LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
+  TURBO_LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
   turbo::RemoveLogSink(&reentrant_sink);
 }
 
@@ -311,7 +311,7 @@ TEST_F(ReentrancyDeathTest, LogFunctionThatLogsFatal) {
             .WillOnce(DeathTestExpectedLogging());
 
         test_sink.StartCapturingLogs();
-        LOG(INFO) << LogAndReturn(turbo::LogSeverity::kFatal, "hello", "world");
+        TURBO_LOG(INFO) << LogAndReturn(turbo::LogSeverity::kFatal, "hello", "world");
       },
       DiedOfFatal, DeathTestValidateExpectations());
 }
@@ -329,7 +329,7 @@ TEST_F(ReentrancyDeathTest, RegisteredLogSinkThatLogsFatalInSend) {
 
         test_sink.StartCapturingLogs();
         turbo::AddLogSink(&reentrant_sink);
-        LOG(INFO) << "hello world";
+        TURBO_LOG(INFO) << "hello world";
         // No need to call RemoveLogSink - process is dead at this point.
       },
       DiedOfFatal, DeathTestValidateExpectations());
@@ -351,7 +351,7 @@ TEST_F(ReentrancyDeathTest, AlsoLogSinkThatLogsFatalInSend) {
             .WillOnce(DeathTestExpectedLogging());
 
         test_sink.StartCapturingLogs();
-        LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
+        TURBO_LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
       },
       DiedOfFatal, DeathTestValidateExpectations());
 }
@@ -372,7 +372,7 @@ TEST_F(ReentrancyDeathTest, RegisteredAlsoLogSinkThatLogsFatalInSend) {
 
         test_sink.StartCapturingLogs();
         turbo::AddLogSink(&reentrant_sink);
-        LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
+        TURBO_LOG(INFO).ToSinkAlso(&reentrant_sink) << "hello world";
         // No need to call RemoveLogSink - process is dead at this point.
       },
       DiedOfFatal, DeathTestValidateExpectations());
@@ -391,7 +391,7 @@ TEST_F(ReentrancyDeathTest, OnlyLogSinkThatLogsFatalInSend) {
             .WillOnce(DeathTestExpectedLogging());
 
         test_sink.StartCapturingLogs();
-        LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
+        TURBO_LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
       },
       DiedOfFatal, DeathTestValidateExpectations());
 }
@@ -410,7 +410,7 @@ TEST_F(ReentrancyDeathTest, RegisteredOnlyLogSinkThatLogsFatalInSend) {
 
         test_sink.StartCapturingLogs();
         turbo::AddLogSink(&reentrant_sink);
-        LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
+        TURBO_LOG(INFO).ToSinkOnly(&reentrant_sink) << "hello world";
         // No need to call RemoveLogSink - process is dead at this point.
       },
       DiedOfFatal, DeathTestValidateExpectations());

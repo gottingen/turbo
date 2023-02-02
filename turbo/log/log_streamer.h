@@ -41,7 +41,7 @@ TURBO_NAMESPACE_BEGIN
 
 // LogStreamer
 //
-// Although you can stream into `LOG(INFO)`, you can't pass it into a function
+// Although you can stream into `TURBO_LOG(INFO)`, you can't pass it into a function
 // that takes a `std::ostream` parameter. `LogStreamer::stream()` provides a
 // `std::ostream` that buffers everything that's streamed in.  The buffer's
 // contents are logged as if by `LOG` when the `LogStreamer` is destroyed.

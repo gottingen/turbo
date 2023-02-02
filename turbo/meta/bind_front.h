@@ -108,7 +108,7 @@ TURBO_NAMESPACE_BEGIN
 // Example: Binding arguments explicitly.
 //
 //   void LogStringView(std::string_view sv) {
-//     LOG(INFO) << sv;
+//     TURBO_LOG(INFO) << sv;
 //   }
 //
 //   Executor* e = Executor::DefaultExecutor();

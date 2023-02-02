@@ -26,7 +26,7 @@
 #include "turbo/log/globals.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/strings/str_cat.h"
 
@@ -98,7 +98,7 @@ TEST_F(LogFlagsTest, EmptyBacktraceAtFlag) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << "hello world";
+  TURBO_LOG(INFO) << "hello world";
 }
 
 TEST_F(LogFlagsTest, BacktraceAtNonsense) {
@@ -109,13 +109,13 @@ TEST_F(LogFlagsTest, BacktraceAtNonsense) {
   EXPECT_CALL(test_sink, Send(TextMessage(Not(HasSubstr("(stacktrace:")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << "hello world";
+  TURBO_LOG(INFO) << "hello world";
 }
 
 TEST_F(LogFlagsTest, BacktraceAtWrongFile) {
   turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
-  auto do_log = [] { LOG(INFO) << "hello world"; };
+  auto do_log = [] { TURBO_LOG(INFO) << "hello world"; };
   turbo::SetFlag(&FLAGS_log_backtrace_at,
                 turbo::StrCat("some_other_file.cc:", log_line));
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -129,7 +129,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongFile) {
 TEST_F(LogFlagsTest, BacktraceAtWrongLine) {
   turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
-  auto do_log = [] { LOG(INFO) << "hello world"; };
+  auto do_log = [] { TURBO_LOG(INFO) << "hello world"; };
   turbo::SetFlag(&FLAGS_log_backtrace_at,
                 turbo::StrCat("flags_test.cc:", log_line + 1));
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -143,7 +143,7 @@ TEST_F(LogFlagsTest, BacktraceAtWrongLine) {
 TEST_F(LogFlagsTest, BacktraceAtWholeFilename) {
   turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
-  auto do_log = [] { LOG(INFO) << "hello world"; };
+  auto do_log = [] { TURBO_LOG(INFO) << "hello world"; };
   turbo::SetFlag(&FLAGS_log_backtrace_at, turbo::StrCat(__FILE__, ":", log_line));
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
@@ -156,7 +156,7 @@ TEST_F(LogFlagsTest, BacktraceAtWholeFilename) {
 TEST_F(LogFlagsTest, BacktraceAtNonmatchingSuffix) {
   turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
-  auto do_log = [] { LOG(INFO) << "hello world"; };
+  auto do_log = [] { TURBO_LOG(INFO) << "hello world"; };
   turbo::SetFlag(&FLAGS_log_backtrace_at,
                 turbo::StrCat("flags_test.cc:", log_line, "gibberish"));
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -170,7 +170,7 @@ TEST_F(LogFlagsTest, BacktraceAtNonmatchingSuffix) {
 TEST_F(LogFlagsTest, LogsBacktrace) {
   turbo::SetMinLogLevel(turbo::LogSeverityAtLeast::kInfo);
   const int log_line = __LINE__ + 1;
-  auto do_log = [] { LOG(INFO) << "hello world"; };
+  auto do_log = [] { TURBO_LOG(INFO) << "hello world"; };
   turbo::SetFlag(&FLAGS_log_backtrace_at,
                 turbo::StrCat("flags_test.cc:", log_line));
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);

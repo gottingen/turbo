@@ -15,9 +15,8 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/flags/flag.h"
-#include "turbo/log/check.h"
 #include "turbo/log/globals.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"
 #include "turbo/log/log_sink_registry.h"
@@ -39,14 +38,14 @@ constexpr int x = -1;
 void BM_SuccessfulBinaryCheck(benchmark::State& state) {
   int n = 0;
   while (state.KeepRunningBatch(8)) {
-    CHECK_GE(n, x);
-    CHECK_GE(n, x);
-    CHECK_GE(n, x);
-    CHECK_GE(n, x);
-    CHECK_GE(n, x);
-    CHECK_GE(n, x);
-    CHECK_GE(n, x);
-    CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
+    TURBO_CHECK_GE(n, x);
     ++n;
   }
   benchmark::DoNotOptimize(n);
@@ -56,14 +55,14 @@ BENCHMARK(BM_SuccessfulBinaryCheck);
 static void BM_SuccessfulUnaryCheck(benchmark::State& state) {
   int n = 0;
   while (state.KeepRunningBatch(8)) {
-    CHECK(n >= x);
-    CHECK(n >= x);
-    CHECK(n >= x);
-    CHECK(n >= x);
-    CHECK(n >= x);
-    CHECK(n >= x);
-    CHECK(n >= x);
-    CHECK(n >= x);
+    TURBO_CHECK(n >= x);
+    TURBO_CHECK(n >= x);
+    TURBO_CHECK(n >= x);
+    TURBO_CHECK(n >= x);
+    TURBO_CHECK(n >= x);
+    TURBO_CHECK(n >= x);
+    TURBO_CHECK(n >= x);
+    TURBO_CHECK(n >= x);
     ++n;
   }
   benchmark::DoNotOptimize(n);
@@ -76,7 +75,7 @@ static void BM_DisabledLogOverhead(benchmark::State& state) {
   turbo::log_internal::ScopedMinLogLevel scoped_min_log_level(
       turbo::LogSeverityAtLeast::kInfinity);
   for (auto _ : state) {
-    LOG(INFO);
+    TURBO_LOG(INFO);
   }
 }
 BENCHMARK(BM_DisabledLogOverhead);
@@ -88,7 +87,7 @@ static void BM_EnabledLogOverhead(benchmark::State& state) {
       turbo::LogSeverityAtLeast::kInfo);
   TURBO_ATTRIBUTE_UNUSED NullLogSink null_sink;
   for (auto _ : state) {
-    LOG(INFO);
+    TURBO_LOG(INFO);
   }
 }
 BENCHMARK(BM_EnabledLogOverhead);

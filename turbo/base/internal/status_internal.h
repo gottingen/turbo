@@ -75,7 +75,7 @@ struct StatusRep {
 turbo::StatusCode MapToLocalCode(int value);
 
 // Returns a pointer to a newly-allocated string with the given `prefix`,
-// suitable for output as an error message in assertion/`CHECK()` failures.
+// suitable for output as an error message in assertion/`TURBO_CHECK()` failures.
 //
 // This is an internal implementation detail for Turbo logging.
 std::string* MakeCheckFailString(const turbo::Status* status,

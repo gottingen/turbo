@@ -92,7 +92,7 @@ TURBO_NAMESPACE_BEGIN
 //
 //   turbo::UntypedFormatSpec format("%d");
 //   std::string out;
-//   CHECK(turbo::FormatUntyped(&out, format, {turbo::FormatArg(1)}));
+//   TURBO_CHECK(turbo::FormatUntyped(&out, format, {turbo::FormatArg(1)}));
 class UntypedFormatSpec {
  public:
   UntypedFormatSpec() = delete;

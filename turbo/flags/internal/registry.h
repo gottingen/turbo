@@ -52,7 +52,7 @@ void FinalizeRegistry();
 //   - is fully supported by _all_ flag parsing routines.
 //   - consumes args normally, and complains about type mismatches in its
 //     argument.
-//   - emits a complaint but does not die (e.g. LOG(ERROR)) if it is
+//   - emits a complaint but does not die (e.g. TURBO_LOG(ERROR)) if it is
 //     accessed by name through the flags API for parsing or otherwise.
 //
 // The registrations for a flag happen in an unspecified order as the

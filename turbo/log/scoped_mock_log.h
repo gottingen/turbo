@@ -40,11 +40,11 @@ enum class MockLogDefault { kIgnoreUnexpected, kDisallowUnexpected };
 
 // ScopedMockLog
 //
-// ScopedMockLog is a LogSink that intercepts LOG() messages issued during its
+// ScopedMockLog is a LogSink that intercepts TURBO_LOG() messages issued during its
 // lifespan.
 //
 // Using this together with GoogleTest, it's easy to test how a piece of code
-// calls LOG(). The typical usage, noting the distinction between
+// calls TURBO_LOG(). The typical usage, noting the distinction between
 // "uninteresting" and "unexpected", looks like this:
 //
 //   using ::testing::_;
@@ -85,7 +85,7 @@ enum class MockLogDefault { kIgnoreUnexpected, kDisallowUnexpected };
 //     Bar();  // Exercises the code under test.
 //    }
 //
-// Note that in a multi-threaded environment, all LOG() messages from a single
+// Note that in a multi-threaded environment, all TURBO_LOG() messages from a single
 // thread will be handled in sequence, but that cannot be guaranteed for
 // messages from different threads. In fact, if the same or multiple
 // expectations are matched on two threads concurrently, their actions will be
@@ -132,7 +132,7 @@ class ScopedMockLog final {
   //
   // Each `ScopedMockLog` is implemented with an `turbo::LogSink`; this method
   // returns a reference to that sink (e.g. for use with
-  // `LOG(...).ToSinkOnly()`) and marks the `ScopedMockLog` as having been used
+  // `TURBO_LOG(...).ToSinkOnly()`) and marks the `ScopedMockLog` as having been used
   // even if `StartCapturingLogs` is never called.
   turbo::LogSink& UseAsLocalSink();
 
@@ -142,7 +142,7 @@ class ScopedMockLog final {
   //            std::string_view message);
   //
   // The second argument to Log() is the full path of the source file in
-  // which the LOG() was issued.
+  // which the TURBO_LOG() was issued.
   //
   // This is a shorthand form, which should be used by most users. Use the
   // `Send` mock only if you want to add expectations for other log message

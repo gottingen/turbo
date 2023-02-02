@@ -111,7 +111,7 @@ class TURBO_LOCKABLE SpinLock {
 
   // Determine if the lock is held.  When the lock is held by the invoking
   // thread, true will always be returned. Intended to be used as
-  // CHECK(lock.IsHeld()).
+  // TURBO_CHECK(lock.IsHeld()).
   inline bool IsHeld() const {
     return (lockword_.load(std::memory_order_relaxed) & kSpinLockHeld) != 0;
   }

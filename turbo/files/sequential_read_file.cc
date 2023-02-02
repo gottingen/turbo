@@ -12,8 +12,7 @@
 #include <fcntl.h>
 #include <cerrno>
 #include <cstring>
-#include "turbo/log/turbo_log.h"
-#include "turbo/log/check.h"
+#include "turbo/log/logging.h"
 #include "turbo/base/casts.h"
 
 namespace turbo {
@@ -25,7 +24,7 @@ namespace turbo {
     }
 
     turbo::Status SequentialReadFile::open(const turbo::filesystem::path &path) noexcept {
-        CHECK(_fd == -1) << "do not reopen";
+        TURBO_CHECK(_fd == -1) << "do not reopen";
         turbo::Status rs;
         _path = path;
         _fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC, 0644);

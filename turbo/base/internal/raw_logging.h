@@ -29,8 +29,8 @@
 #include "turbo/platform/optimization.h"
 #include "turbo/platform/port.h"
 
-// This is similar to LOG(severity) << format..., but
-// * it is to be used ONLY by low-level modules that can't use normal LOG()
+// This is similar to TURBO_LOG(severity) << format..., but
+// * it is to be used ONLY by low-level modules that can't use normal TURBO_LOG()
 // * it is designed to be a low-level logger that does not allocate any
 //   memory and does not need any locks, hence:
 // * it logs straight and ONLY to STDERR w/o buffering
@@ -50,7 +50,7 @@
                                      __VA_ARGS__);                             \
   } while (0)
 
-// Similar to CHECK(condition) << message, but for low-level modules:
+// Similar to TURBO_CHECK(condition) << message, but for low-level modules:
 // we use only TURBO_RAW_LOG that does not allocate memory.
 // We do not want to provide args list here to encourage this usage:
 //   if (!cond)  TURBO_RAW_LOG(FATAL, "foo ...", hard_to_compute_args);

@@ -48,7 +48,7 @@
 #include "turbo/container/internal/hash_function_defaults.h"
 #include "turbo/container/internal/hash_policy_testing.h"
 #include "turbo/container/internal/hashtable_debug.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
@@ -1284,7 +1284,7 @@ TEST(Table, DISABLED_EnsureNonQuadraticTopNXorSeedByProbeSeqLength) {
   for (size_t size : sizes) {
     auto& stat = stats[size];
     VerifyStats(size, expected, stat);
-    LOG(INFO) << size << " " << stat;
+    TURBO_LOG(INFO) << size << " " << stat;
   }
 }
 
@@ -1380,7 +1380,7 @@ TEST(Table, DISABLED_EnsureNonQuadraticTopNLinearTransformByProbeSeqLength) {
   for (size_t size : sizes) {
     auto& stat = stats[size];
     VerifyStats(size, expected, stat);
-    LOG(INFO) << size << " " << stat;
+    TURBO_LOG(INFO) << size << " " << stat;
   }
 }
 

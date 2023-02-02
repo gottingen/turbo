@@ -17,7 +17,7 @@
 #include "gtest/gtest.h"
 #include "turbo/platform/attributes.h"
 #include "turbo/base/log_severity.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
 
 namespace {
@@ -37,7 +37,7 @@ class Dummy {
 
 // This line tests that local definitions of INFO, WARNING, ERROR, and
 // etc don't shadow the global ones used by the logging macros.  If
-// they do, the LOG() calls in the tests won't compile, catching the
+// they do, the TURBO_LOG() calls in the tests won't compile, catching the
 // bug.
 const Dummy INFO, WARNING, ERROR, FATAL, NUM_SEVERITIES;
 
@@ -57,7 +57,7 @@ class NullStreamFatal {};
 
 using namespace not_turbo;  // NOLINT
 
-// Tests for LOG(LEVEL(()).
+// Tests for TURBO_LOG(LEVEL(()).
 
 TEST(LogHygieneTest, WorksForQualifiedSeverity) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -68,12 +68,12 @@ TEST(LogHygieneTest, WorksForQualifiedSeverity) {
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kError, _, "To ERROR"));
 
   test_sink.StartCapturingLogs();
-  // Note that LOG(LEVEL()) expects the severity as a run-time
+  // Note that TURBO_LOG(LEVEL()) expects the severity as a run-time
   // expression (as opposed to a compile-time constant).  Hence we
   // test that :: is allowed before INFO, etc.
-  LOG(LEVEL(turbo::LogSeverity::kInfo)) << "To INFO";
-  LOG(LEVEL(turbo::LogSeverity::kWarning)) << "To WARNING";
-  LOG(LEVEL(turbo::LogSeverity::kError)) << "To ERROR";
+  TURBO_LOG(LEVEL(turbo::LogSeverity::kInfo)) << "To INFO";
+  TURBO_LOG(LEVEL(turbo::LogSeverity::kWarning)) << "To WARNING";
+  TURBO_LOG(LEVEL(turbo::LogSeverity::kError)) << "To ERROR";
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeINFOSymbol) {
@@ -83,7 +83,7 @@ TEST(LogHygieneTest, WorksWithAlternativeINFOSymbol) {
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kInfo, _, "Hello world"));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << "Hello world";
+  TURBO_LOG(INFO) << "Hello world";
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeWARNINGSymbol) {
@@ -93,7 +93,7 @@ TEST(LogHygieneTest, WorksWithAlternativeWARNINGSymbol) {
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kWarning, _, "Hello world"));
 
   test_sink.StartCapturingLogs();
-  LOG(WARNING) << "Hello world";
+  TURBO_LOG(WARNING) << "Hello world";
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeERRORSymbol) {
@@ -103,7 +103,7 @@ TEST(LogHygieneTest, WorksWithAlternativeERRORSymbol) {
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kError, _, "Hello world"));
 
   test_sink.StartCapturingLogs();
-  LOG(ERROR) << "Hello world";
+  TURBO_LOG(ERROR) << "Hello world";
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeLEVELSymbol) {
@@ -113,7 +113,7 @@ TEST(LogHygieneTest, WorksWithAlternativeLEVELSymbol) {
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kError, _, "Hello world"));
 
   test_sink.StartCapturingLogs();
-  LOG(LEVEL(turbo::LogSeverity::kError)) << "Hello world";
+  TURBO_LOG(LEVEL(turbo::LogSeverity::kError)) << "Hello world";
 }
 
 #define INFO Bogus
@@ -130,11 +130,11 @@ TEST(LogHygieneTest, WorksWithINFODefined) {
       .Times(2 + (IsOptimized ? 2 : 0));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << "Hello world";
-  LOG_IF(INFO, true) << "Hello world";
+  TURBO_LOG(INFO) << "Hello world";
+  TURBO_LOG_IF(INFO, true) << "Hello world";
 
-  DLOG(INFO) << "Hello world";
-  DLOG_IF(INFO, true) << "Hello world";
+  TURBO_DLOG(INFO) << "Hello world";
+  TURBO_DLOG_IF(INFO, true) << "Hello world";
 }
 
 #undef INFO
@@ -147,25 +147,25 @@ TEST(LogHygieneTest, WorksWithUnderscoreINFODefined) {
       .Times(2 + (IsOptimized ? 2 : 0));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << "Hello world";
-  LOG_IF(INFO, true) << "Hello world";
+  TURBO_LOG(INFO) << "Hello world";
+  TURBO_LOG_IF(INFO, true) << "Hello world";
 
-  DLOG(INFO) << "Hello world";
-  DLOG_IF(INFO, true) << "Hello world";
+  TURBO_DLOG(INFO) << "Hello world";
+  TURBO_LOG_IF(INFO, true) << "Hello world";
 }
 #undef _INFO
 
 TEST(LogHygieneTest, ExpressionEvaluationInLEVELSeverity) {
   auto i = static_cast<int>(turbo::LogSeverity::kInfo);
-  LOG(LEVEL(++i)) << "hello world";  // NOLINT
+  TURBO_LOG(LEVEL(++i)) << "hello world";  // NOLINT
   EXPECT_THAT(i, Eq(static_cast<int>(turbo::LogSeverity::kInfo) + 1));
 }
 
 TEST(LogHygieneTest, ExpressionEvaluationInStreamedMessage) {
   int i = 0;
-  LOG(INFO) << ++i;
+  TURBO_LOG(INFO) << ++i;
   EXPECT_THAT(i, 1);
-  LOG_IF(INFO, false) << ++i;
+  TURBO_LOG_IF(INFO, false) << ++i;
   EXPECT_THAT(i, 1);
 }
 
@@ -176,7 +176,7 @@ class UnbracedSwitchCompileTest {
   static void Log() {
     switch (0) {
       case 0:
-        LOG(INFO);
+        TURBO_LOG(INFO);
         break;
       default:
         break;

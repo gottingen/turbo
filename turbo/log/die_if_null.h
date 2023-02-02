@@ -42,7 +42,7 @@
 //
 //   Foo() : bar_(TURBO_DIE_IF_NULL(MethodReturningUniquePtr())) {}
 //
-// Use `CHECK(ptr)` or `CHECK(ptr != nullptr)` if the returned pointer is
+// Use `TURBO_CHECK(ptr)` or `TURBO_CHECK(ptr != nullptr)` if the returned pointer is
 // unused.
 #define TURBO_DIE_IF_NULL(val) \
   ::turbo::log_internal::DieIfNull(__FILE__, __LINE__, #val, (val))

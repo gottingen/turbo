@@ -29,9 +29,8 @@
 #endif
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/log/check.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/str_cat.h"
@@ -71,7 +70,7 @@ TEST(LogFormatTest, NoMessage) {
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   const int log_line = __LINE__ + 1;
-  auto do_log = [] { LOG(INFO); };
+  auto do_log = [] { TURBO_LOG(INFO); };
 
   EXPECT_CALL(test_sink,
               Send(AllOf(TextMessage(MatchesOstream(ComparisonStream())),
@@ -103,7 +102,7 @@ TYPED_TEST(CharLogFormatTest, Printable) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "x" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(CharLogFormatTest, Unprintable) {
@@ -121,7 +120,7 @@ TYPED_TEST(CharLogFormatTest, Unprintable) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 template <typename T>
@@ -144,7 +143,7 @@ TYPED_TEST(UnsignedIntLogFormatTest, Positive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "224" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(UnsignedIntLogFormatTest, BitfieldPositive) {
@@ -163,7 +162,7 @@ TYPED_TEST(UnsignedIntLogFormatTest, BitfieldPositive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "42" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value.bits;
+  TURBO_LOG(INFO) << value.bits;
 }
 
 template <typename T>
@@ -186,7 +185,7 @@ TYPED_TEST(SignedIntLogFormatTest, Positive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "224" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(SignedIntLogFormatTest, Negative) {
@@ -204,7 +203,7 @@ TYPED_TEST(SignedIntLogFormatTest, Negative) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(SignedIntLogFormatTest, BitfieldPositive) {
@@ -223,7 +222,7 @@ TYPED_TEST(SignedIntLogFormatTest, BitfieldPositive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "21" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value.bits;
+  TURBO_LOG(INFO) << value.bits;
 }
 
 TYPED_TEST(SignedIntLogFormatTest, BitfieldNegative) {
@@ -242,7 +241,7 @@ TYPED_TEST(SignedIntLogFormatTest, BitfieldNegative) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "-21" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value.bits;
+  TURBO_LOG(INFO) << value.bits;
 }
 
 // Ignore these test cases on GCC due to "is too small to hold all values ..."
@@ -283,7 +282,7 @@ TYPED_TEST(UnsignedEnumLogFormatTest, Positive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "224" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(UnsignedEnumLogFormatTest, BitfieldPositive) {
@@ -302,7 +301,7 @@ TYPED_TEST(UnsignedEnumLogFormatTest, BitfieldPositive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "42" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value.bits;
+  TURBO_LOG(INFO) << value.bits;
 }
 
 enum MySignedEnum {
@@ -342,7 +341,7 @@ TYPED_TEST(SignedEnumLogFormatTest, Positive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "224" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(SignedEnumLogFormatTest, Negative) {
@@ -360,7 +359,7 @@ TYPED_TEST(SignedEnumLogFormatTest, Negative) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(SignedEnumLogFormatTest, BitfieldPositive) {
@@ -379,7 +378,7 @@ TYPED_TEST(SignedEnumLogFormatTest, BitfieldPositive) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "21" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value.bits;
+  TURBO_LOG(INFO) << value.bits;
 }
 
 TYPED_TEST(SignedEnumLogFormatTest, BitfieldNegative) {
@@ -398,7 +397,7 @@ TYPED_TEST(SignedEnumLogFormatTest, BitfieldNegative) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "-21" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value.bits;
+  TURBO_LOG(INFO) << value.bits;
 }
 #endif
 
@@ -417,7 +416,7 @@ TEST(FloatLogFormatTest, Positive) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(FloatLogFormatTest, Negative) {
@@ -435,7 +434,7 @@ TEST(FloatLogFormatTest, Negative) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(FloatLogFormatTest, NegativeExponent) {
@@ -453,7 +452,7 @@ TEST(FloatLogFormatTest, NegativeExponent) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(DoubleLogFormatTest, Positive) {
@@ -471,7 +470,7 @@ TEST(DoubleLogFormatTest, Positive) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(DoubleLogFormatTest, Negative) {
@@ -489,7 +488,7 @@ TEST(DoubleLogFormatTest, Negative) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(DoubleLogFormatTest, NegativeExponent) {
@@ -507,7 +506,7 @@ TEST(DoubleLogFormatTest, NegativeExponent) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 template <typename T>
@@ -529,7 +528,7 @@ TYPED_TEST(FloatingPointLogFormatTest, Zero) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "0" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(FloatingPointLogFormatTest, Integer) {
@@ -546,7 +545,7 @@ TYPED_TEST(FloatingPointLogFormatTest, Integer) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "1" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(FloatingPointLogFormatTest, Infinity) {
@@ -563,7 +562,7 @@ TYPED_TEST(FloatingPointLogFormatTest, Infinity) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "inf" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(FloatingPointLogFormatTest, NegativeInfinity) {
@@ -581,7 +580,7 @@ TYPED_TEST(FloatingPointLogFormatTest, NegativeInfinity) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(FloatingPointLogFormatTest, NaN) {
@@ -597,7 +596,7 @@ TYPED_TEST(FloatingPointLogFormatTest, NaN) {
                  TextMessage(AnyOf(Eq("nan"), Eq("NaN"))),
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "nan" })pb")))));
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(FloatingPointLogFormatTest, NegativeNaN) {
@@ -618,7 +617,7 @@ TYPED_TEST(FloatingPointLogFormatTest, NegativeNaN) {
                     EqualsProto(R"pb(value { str: "nan" })pb"),
                     EqualsProto(R"pb(value { str: "-nan(ind)" })pb"))))));
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 template <typename T>
@@ -640,7 +639,7 @@ TYPED_TEST(VoidPtrLogFormatTest, Null) {
                                    Eq("00000000"), Eq("0000000000000000"))))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(VoidPtrLogFormatTest, NonNull) {
@@ -661,7 +660,7 @@ TYPED_TEST(VoidPtrLogFormatTest, NonNull) {
               EqualsProto(R"pb(value { str: "00000000DEADBEEF" })pb"))))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 template <typename T>
@@ -688,7 +687,7 @@ TYPED_TEST(VolatilePtrLogFormatTest, Null) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(VolatilePtrLogFormatTest, NonNull) {
@@ -706,7 +705,7 @@ TYPED_TEST(VolatilePtrLogFormatTest, NonNull) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 template <typename T>
@@ -732,7 +731,7 @@ TYPED_TEST(CharPtrLogFormatTest, Null) {
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(null)" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TYPED_TEST(CharPtrLogFormatTest, NonNull) {
@@ -751,7 +750,7 @@ TYPED_TEST(CharPtrLogFormatTest, NonNull) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(BoolLogFormatTest, True) {
@@ -769,7 +768,7 @@ TEST(BoolLogFormatTest, True) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(BoolLogFormatTest, False) {
@@ -787,7 +786,7 @@ TEST(BoolLogFormatTest, False) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 TEST(LogFormatTest, StringLiteral) {
@@ -804,7 +803,7 @@ TEST(LogFormatTest, StringLiteral) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << "value";
+  TURBO_LOG(INFO) << "value";
 }
 
 TEST(LogFormatTest, CharArray) {
@@ -822,7 +821,7 @@ TEST(LogFormatTest, CharArray) {
                                                              })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 class CustomClass {};
@@ -844,7 +843,7 @@ TEST(LogFormatTest, Custom) {
                                                             str: "CustomClass{}"
                                                           })pb")))));
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 class CustomClassNonCopyable {
@@ -872,7 +871,7 @@ TEST(LogFormatTest, CustomNonCopyable) {
                      R"pb(value { str: "CustomClassNonCopyable{}" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value;
+  TURBO_LOG(INFO) << value;
 }
 
 struct Point {
@@ -897,7 +896,7 @@ TEST(LogFormatTest, TurboStringifyExample) {
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(10, 20)" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << p;
+  TURBO_LOG(INFO) << p;
 }
 
 struct PointWithTurboStringifiyAndOstream {
@@ -928,7 +927,7 @@ TEST(LogFormatTest, CustomWithTurboStringifyAndOstream) {
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(10, 20)" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << p;
+  TURBO_LOG(INFO) << p;
 }
 
 struct PointStreamsNothing {
@@ -950,7 +949,7 @@ TEST(LogFormatTest, TurboStringifyStreamsNothing) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << p << 77;
+  TURBO_LOG(INFO) << p << 77;
 }
 
 struct PointMultipleAppend {
@@ -977,7 +976,7 @@ TEST(LogFormatTest, TurboStringifyMultipleAppend) {
                                            value { str: "10, 20)" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << p;
+  TURBO_LOG(INFO) << p;
 }
 
 TEST(ManipulatorLogFormatTest, BoolAlphaTrue) {
@@ -1000,7 +999,7 @@ TEST(ManipulatorLogFormatTest, BoolAlphaTrue) {
                                   value { str: "1" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::noboolalpha << value << " "  //
+  TURBO_LOG(INFO) << std::noboolalpha << value << " "  //
             << std::boolalpha << value << " "    //
             << std::noboolalpha << value;
 }
@@ -1025,7 +1024,7 @@ TEST(ManipulatorLogFormatTest, BoolAlphaFalse) {
                                   value { str: "0" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::noboolalpha << value << " "  //
+  TURBO_LOG(INFO) << std::noboolalpha << value << " "  //
             << std::boolalpha << value << " "    //
             << std::noboolalpha << value;
 }
@@ -1050,7 +1049,7 @@ TEST(ManipulatorLogFormatTest, ShowPoint) {
                                                   value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::noshowpoint << value << " "  //
+  TURBO_LOG(INFO) << std::noshowpoint << value << " "  //
             << std::showpoint << value << " "    //
             << std::noshowpoint << value;
 }
@@ -1075,7 +1074,7 @@ TEST(ManipulatorLogFormatTest, ShowPos) {
                                                   value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::noshowpos << value << " "  //
+  TURBO_LOG(INFO) << std::noshowpos << value << " "  //
             << std::showpos << value << " "    //
             << std::noshowpos << value;
 }
@@ -1100,7 +1099,7 @@ TEST(ManipulatorLogFormatTest, UppercaseFloat) {
                                   value { str: "7.7e+07" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::nouppercase << value << " "  //
+  TURBO_LOG(INFO) << std::nouppercase << value << " "  //
             << std::uppercase << value << " "    //
             << std::nouppercase << value;
 }
@@ -1119,7 +1118,7 @@ TEST(ManipulatorLogFormatTest, Hex) {
                                                                str: "0x77"
                                                              })pb")))));
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::hex << value;
+  TURBO_LOG(INFO) << std::hex << value;
 }
 
 TEST(ManipulatorLogFormatTest, Oct) {
@@ -1136,7 +1135,7 @@ TEST(ManipulatorLogFormatTest, Oct) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "077" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::oct << value;
+  TURBO_LOG(INFO) << std::oct << value;
 }
 
 TEST(ManipulatorLogFormatTest, Dec) {
@@ -1153,7 +1152,7 @@ TEST(ManipulatorLogFormatTest, Dec) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::hex << std::dec << value;
+  TURBO_LOG(INFO) << std::hex << std::dec << value;
 }
 
 TEST(ManipulatorLogFormatTest, ShowbaseHex) {
@@ -1177,7 +1176,7 @@ TEST(ManipulatorLogFormatTest, ShowbaseHex) {
                                                   value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::hex                         //
+  TURBO_LOG(INFO) << std::hex                         //
             << std::noshowbase << value << " "  //
             << std::showbase << value << " "    //
             << std::noshowbase << value;
@@ -1204,7 +1203,7 @@ TEST(ManipulatorLogFormatTest, ShowbaseOct) {
                                                   value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::oct                         //
+  TURBO_LOG(INFO) << std::oct                         //
             << std::noshowbase << value << " "  //
             << std::showbase << value << " "    //
             << std::noshowbase << value;
@@ -1232,7 +1231,7 @@ TEST(ManipulatorLogFormatTest, UppercaseHex) {
                                   value { str: "0xbeef" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::hex                          //
+  TURBO_LOG(INFO) << std::hex                          //
             << std::nouppercase << value << " "  //
             << std::uppercase << value << " "    //
             << std::nouppercase << value;
@@ -1254,7 +1253,7 @@ TEST(ManipulatorLogFormatTest, FixedFloat) {
                                                   })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::fixed << value;
+  TURBO_LOG(INFO) << std::fixed << value;
 }
 
 TEST(ManipulatorLogFormatTest, ScientificFloat) {
@@ -1272,7 +1271,7 @@ TEST(ManipulatorLogFormatTest, ScientificFloat) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::scientific << value;
+  TURBO_LOG(INFO) << std::scientific << value;
 }
 
 #if 1
@@ -1303,7 +1302,7 @@ TEST(ManipulatorLogFormatTest, FixedAndScientificFloat) {
   test_sink.StartCapturingLogs();
 
   // This combination should mean the same thing as `std::hexfloat`.
-  LOG(INFO) << std::setiosflags(std::ios_base::scientific |
+  TURBO_LOG(INFO) << std::setiosflags(std::ios_base::scientific |
                                 std::ios_base::fixed)
             << value;
 }
@@ -1333,7 +1332,7 @@ TEST(ManipulatorLogFormatTest, HexfloatFloat) {
                                             })pb"))))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::hexfloat << value;
+  TURBO_LOG(INFO) << std::hexfloat << value;
 }
 #endif
 
@@ -1352,7 +1351,7 @@ TEST(ManipulatorLogFormatTest, DefaultFloatFloat) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::hexfloat << std::defaultfloat << value;
+  TURBO_LOG(INFO) << std::hexfloat << std::defaultfloat << value;
 }
 
 TEST(ManipulatorLogFormatTest, Ends) {
@@ -1368,7 +1367,7 @@ TEST(ManipulatorLogFormatTest, Ends) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "\0" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::ends;
+  TURBO_LOG(INFO) << std::ends;
 }
 
 TEST(ManipulatorLogFormatTest, Endl) {
@@ -1385,7 +1384,7 @@ TEST(ManipulatorLogFormatTest, Endl) {
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "\n" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::endl;
+  TURBO_LOG(INFO) << std::endl;
 }
 
 TEST(ManipulatorLogFormatTest, SetIosFlags) {
@@ -1412,7 +1411,7 @@ TEST(ManipulatorLogFormatTest, SetIosFlags) {
           )pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::resetiosflags(std::ios_base::basefield)
+  TURBO_LOG(INFO) << std::resetiosflags(std::ios_base::basefield)
             << std::setiosflags(std::ios_base::hex) << value << " "  //
             << std::resetiosflags(std::ios_base::basefield)
             << std::setiosflags(std::ios_base::dec) << value;
@@ -1439,7 +1438,7 @@ TEST(ManipulatorLogFormatTest, SetBase) {
                           value { str: "119" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::setbase(16) << value << " "  //
+  TURBO_LOG(INFO) << std::setbase(16) << value << " "  //
             << std::setbase(0) << value;
 }
 
@@ -1461,7 +1460,7 @@ TEST(ManipulatorLogFormatTest, SetPrecision) {
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "6.022e+23" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::setprecision(4) << value;
+  TURBO_LOG(INFO) << std::setprecision(4) << value;
 }
 
 TEST(ManipulatorLogFormatTest, SetPrecisionOverflow) {
@@ -1479,7 +1478,7 @@ TEST(ManipulatorLogFormatTest, SetPrecisionOverflow) {
                      R"pb(value { str: "602214085700000015187968" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::setprecision(200) << value;
+  TURBO_LOG(INFO) << std::setprecision(200) << value;
 }
 
 TEST(ManipulatorLogFormatTest, SetW) {
@@ -1500,7 +1499,7 @@ TEST(ManipulatorLogFormatTest, SetW) {
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "      77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::setw(8) << value;
+  TURBO_LOG(INFO) << std::setw(8) << value;
 }
 
 TEST(ManipulatorLogFormatTest, Left) {
@@ -1518,7 +1517,7 @@ TEST(ManipulatorLogFormatTest, Left) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::left << std::setw(8) << value;
+  TURBO_LOG(INFO) << std::left << std::setw(8) << value;
 }
 
 TEST(ManipulatorLogFormatTest, Right) {
@@ -1536,7 +1535,7 @@ TEST(ManipulatorLogFormatTest, Right) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::right << std::setw(8) << value;
+  TURBO_LOG(INFO) << std::right << std::setw(8) << value;
 }
 
 TEST(ManipulatorLogFormatTest, Internal) {
@@ -1554,7 +1553,7 @@ TEST(ManipulatorLogFormatTest, Internal) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::internal << std::setw(8) << value;
+  TURBO_LOG(INFO) << std::internal << std::setw(8) << value;
 }
 
 TEST(ManipulatorLogFormatTest, SetFill) {
@@ -1576,7 +1575,7 @@ TEST(ManipulatorLogFormatTest, SetFill) {
                                                           })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::setfill('0') << std::setw(8) << value;
+  TURBO_LOG(INFO) << std::setfill('0') << std::setw(8) << value;
 }
 
 class FromCustomClass {};
@@ -1600,7 +1599,7 @@ TEST(ManipulatorLogFormatTest, FromCustom) {
                                   value { str: "0x77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value << " " << 0x77;
+  TURBO_LOG(INFO) << value << " " << 0x77;
 }
 
 class StreamsNothing {};
@@ -1620,7 +1619,7 @@ TEST(ManipulatorLogFormatTest, CustomClassStreamsNothing) {
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "77" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << value << 77;
+  TURBO_LOG(INFO) << value << 77;
 }
 
 struct PointPercentV {
@@ -1645,7 +1644,7 @@ TEST(ManipulatorLogFormatTest, IOManipsDoNotAffectTurboStringify) {
           ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "(10, 20)" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::hex << p;
+  TURBO_LOG(INFO) << std::hex << p;
 }
 
 TEST(StructuredLoggingOverflowTest, TruncatesStrings) {
@@ -1667,7 +1666,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStrings) {
               Each(Eq('x'))))))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << std::string(2 * turbo::log_internal::kLogMessageBufferSize, 'x');
+  TURBO_LOG(INFO) << std::string(2 * turbo::log_internal::kLogMessageBufferSize, 'x');
 }
 
 struct StringLike {
@@ -1696,7 +1695,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesInsertionOperators) {
               Each(Eq('x'))))))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO) << StringLike{
+  TURBO_LOG(INFO) << StringLike{
       std::string(2 * turbo::log_internal::kLogMessageBufferSize, 'x')};
 }
 
@@ -1706,20 +1705,20 @@ size_t MaxLogFieldLengthNoPrefix() {
   class StringLengthExtractorSink : public turbo::LogSink {
    public:
     void Send(const turbo::LogEntry& entry) override {
-      CHECK(!size_.has_value());
-      CHECK_EQ(entry.text_message().find_first_not_of('x'),
+      TURBO_CHECK(!size_.has_value());
+      TURBO_CHECK_EQ(entry.text_message().find_first_not_of('x'),
                std::string_view::npos);
       size_.emplace(entry.text_message().size());
     }
     size_t size() const {
-      CHECK(size_.has_value());
+      TURBO_CHECK(size_.has_value());
       return *size_;
     }
 
    private:
     std::optional<size_t> size_;
   } extractor_sink;
-  LOG(INFO).NoPrefix().ToSinkOnly(&extractor_sink)
+  TURBO_LOG(INFO).NoPrefix().ToSinkOnly(&extractor_sink)
       << std::string(2 * turbo::log_internal::kLogMessageBufferSize, 'x');
   return extractor_sink.size();
 }
@@ -1736,7 +1735,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStringsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits exactly, no part of y fits.
-    LOG(INFO).NoPrefix() << std::string(longest_fit, 'x') << "y";
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit, 'x') << "y";
   }
   {
     turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -1746,7 +1745,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStringsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits, one byte from y's header fits but shouldn't be visible.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 1, 'x') << "y";
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 1, 'x') << "y";
   }
   {
     turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -1756,7 +1755,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStringsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits, two bytes from y's header fit but shouldn't be visible.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 2, 'x') << "y";
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 2, 'x') << "y";
   }
   {
     turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -1766,7 +1765,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStringsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits, three bytes from y's header fit but shouldn't be visible.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 3, 'x') << "y";
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 3, 'x') << "y";
   }
   {
     turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -1778,7 +1777,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStringsCleanly) {
     test_sink.StartCapturingLogs();
     // x fits, all four bytes from y's header fit but no data bytes do, so we
     // encode an empty string.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 4, 'x') << "y";
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 4, 'x') << "y";
   }
   {
     turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -1789,7 +1788,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStringsCleanly) {
                    RawEncodedMessage(AsString(EndsWith("y"))))));
     test_sink.StartCapturingLogs();
     // x fits, y fits exactly.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 5, 'x') << "y";
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 5, 'x') << "y";
   }
 }
 
@@ -1805,7 +1804,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesInsertionOperatorsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits exactly, no part of y fits.
-    LOG(INFO).NoPrefix() << std::string(longest_fit, 'x') << StringLike{"y"};
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit, 'x') << StringLike{"y"};
   }
   {
     turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
@@ -1815,7 +1814,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesInsertionOperatorsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits, one byte from y's header fits but shouldn't be visible.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 1, 'x')
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 1, 'x')
                          << StringLike{"y"};
   }
   {
@@ -1826,7 +1825,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesInsertionOperatorsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits, two bytes from y's header fit but shouldn't be visible.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 2, 'x')
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 2, 'x')
                          << StringLike{"y"};
   }
   {
@@ -1837,7 +1836,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesInsertionOperatorsCleanly) {
                            RawEncodedMessage(AsString(EndsWith("x"))))));
     test_sink.StartCapturingLogs();
     // x fits, three bytes from y's header fit but shouldn't be visible.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 3, 'x')
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 3, 'x')
                          << StringLike{"y"};
   }
   {
@@ -1850,7 +1849,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesInsertionOperatorsCleanly) {
     // x fits, all four bytes from y's header fit but no data bytes do.  We
     // don't encode an empty string here because every I/O manipulator hits this
     // codepath and those shouldn't leave empty strings behind.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 4, 'x')
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 4, 'x')
                          << StringLike{"y"};
   }
   {
@@ -1862,7 +1861,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesInsertionOperatorsCleanly) {
                    RawEncodedMessage(AsString(EndsWith("y"))))));
     test_sink.StartCapturingLogs();
     // x fits, y fits exactly.
-    LOG(INFO).NoPrefix() << std::string(longest_fit - 5, 'x')
+    TURBO_LOG(INFO).NoPrefix() << std::string(longest_fit - 5, 'x')
                          << StringLike{"y"};
   }
 }
