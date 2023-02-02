@@ -27,6 +27,7 @@ you can get it as below.
   * [Status](docs/status.md)
   * [base](docs/base.md)
   * [json](docs/json.md) rapidjson docs
+  * [workflow](docs/workflow.md)
 
 # Acknowledgement
 
