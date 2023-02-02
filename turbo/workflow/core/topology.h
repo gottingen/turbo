@@ -5,8 +5,6 @@
 
 namespace turbo {
 
-    template<typename T>
-    using SmallVector = InlinedVector<T, 2>;
     // class: TopologyBase
     class TopologyBase {
 
@@ -49,7 +47,7 @@ namespace turbo {
 
         std::promise<void> _promise;
 
-        turbo::SmallVector<Node *> _sources;
+        turbo::InlinedVector<Node *> _sources;
 
         std::function<bool()> _pred;
         std::function<void()> _call;

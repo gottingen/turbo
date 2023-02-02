@@ -150,6 +150,14 @@
 #define TURBO_CACHELINE_ALIGNED
 #endif
 
+namespace turbo {
+  // Struct: CachelineAligned
+  // Due to prefetch, we typically do 2x cacheline for the alignment.
+  template <typename T> struct CachelineAligned {
+    alignas(2 * TURBO_CACHELINE_SIZE) T data;
+  };
+}
+
 // TURBO_PREDICT_TRUE, TURBO_PREDICT_FALSE
 //
 // Enables the compiler to prioritize compilation using static analysis for

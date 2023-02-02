@@ -1126,8 +1126,7 @@ SizeType Deserializer<Stream, SizeType>::_load(T&& t) {
   return t.load(*this);
 }
 
-}  // ned of namespace turbo -----------------------------------------------------
-
+}  // namespace turbo
 
 
 

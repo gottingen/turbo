@@ -118,7 +118,7 @@ from which turbo::Workflow and turbo::Subflow are derived.
         @brief creates a multi-condition task
 
         @tparam C callable type constructible from
-                std::function<turbo::SmallVector<int>()>
+                std::function<turbo::InlinedVector<int>()>
 
         @param callable callable to construct a multi-condition task
 
@@ -132,7 +132,7 @@ from which turbo::Workflow and turbo::Subflow are derived.
 
         auto [init, cond, branch1, branch2, branch3] = workflow.emplace(
           [] () { },
-          [] () { return turbo::SmallVector<int>{0, 2}; },
+          [] () { return turbo::InlinedVector<int>{0, 2}; },
           [] () { std::cout << "branch1\n"; },
           [] () { std::cout << "branch2\n"; },
           [] () { std::cout << "branch3\n"; }

@@ -1,12 +1,7 @@
 #pragma once
 
 #include <turbo/platform/config.h>
-#include "turbo/workflow/utility/traits.h"
-
-/**
-@file tsq.hpp
-@brief task queue include file
-*/
+#include "turbo/meta/type_traits.h"
 
 namespace turbo {
 

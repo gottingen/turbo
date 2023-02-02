@@ -9,15 +9,10 @@
 #include "turbo/workflow/core/tsq.h"
 #include "turbo/meta/algorithm.h"
 #include "turbo/workflow/utility/math.h"
-#include "turbo/workflow/utility/os.h"
 #include "turbo/workflow/utility/serializer.h"
 #include "turbo/container/inlined_vector.h"
-#include "turbo/workflow/utility/traits.h"
+#include "turbo/meta/type_traits.h"
 
-/**
-@file graph.h
-@brief graph include file
-*/
 
 namespace turbo {
 
@@ -342,7 +337,7 @@ namespace turbo {
             template<typename C>
             MultiCondition(C &&);
 
-            std::function<turbo::SmallVector<int>()> work;
+            std::function<turbo::InlinedVector<int>()> work;
         };
 
         // module work handle
@@ -411,8 +406,8 @@ namespace turbo {
         >;
 
         struct Semaphores {
-            SmallVector<Semaphore *> to_acquire;
-            SmallVector<Semaphore *> to_release;
+            InlinedVector<Semaphore *> to_acquire;
+            InlinedVector<Semaphore *> to_release;
         };
 
     public:
@@ -455,8 +450,8 @@ namespace turbo {
 
         handle_t _handle;
 
-        turbo::SmallVector<Node *> _successors;
-        turbo::SmallVector<Node *> _dependents;
+        turbo::InlinedVector<Node *> _successors;
+        turbo::InlinedVector<Node *> _dependents;
 
         Topology *_topology{nullptr};
 
@@ -475,9 +470,9 @@ namespace turbo {
 
         bool _is_conditioner() const;
 
-        bool _acquire_all(SmallVector<Node *> &);
+        bool _acquire_all(InlinedVector<Node *> &);
 
-        SmallVector<Node *> _release_all();
+        InlinedVector<Node *> _release_all();
     };
 
     // ----------------------------------------------------------------------------
@@ -713,7 +708,7 @@ namespace turbo {
 
 
     // Function: _acquire_all
-    inline bool Node::_acquire_all(SmallVector<Node *> &nodes) {
+    inline bool Node::_acquire_all(InlinedVector<Node *> &nodes) {
 
         auto &to_acquire = _semaphores->to_acquire;
 
@@ -730,11 +725,11 @@ namespace turbo {
     }
 
     // Function: _release_all
-    inline SmallVector<Node *> Node::_release_all() {
+    inline InlinedVector<Node *> Node::_release_all() {
 
         auto &to_release = _semaphores->to_release;
 
-        SmallVector<Node *> nodes;
+        InlinedVector<Node *> nodes;
         for (const auto &sem : to_release) {
             auto r = sem->_release();
             nodes.insert(std::end(nodes), std::begin(r), std::end(r));

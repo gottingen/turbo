@@ -22,7 +22,7 @@ namespace turbo {
       3. condition task      : the callable constructible from
                                @c std::function<int()>
       4. multi-condition task: the callable constructible from
-                               @c %std::function<turbo::SmallVector<int>()>
+                               @c %std::function<turbo::InlinedVector<int>()>
       5. module task         : the task constructed from turbo::Workflow::composed_of
       6. runtime task        : the callable constructible from
                                @c std::function<void(turbo::Runtime&)>

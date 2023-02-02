@@ -4,5 +4,4 @@
 
 namespace turbo {
 
-}  // end of namespace turbo -----------------------------------------------------
-
+}  // namespace turbo

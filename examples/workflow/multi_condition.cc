@@ -14,7 +14,7 @@ int main() {
   turbo::Executor executor;
   turbo::Workflow workflow("Multi-Conditional Tasking Demo");
 
-  auto A = workflow.emplace([&]() -> turbo::SmallVector<int> {
+  auto A = workflow.emplace([&]() -> turbo::InlinedVector<int> {
     std::cout << "A\n";
     return {0, 2};
   }).name("A");

@@ -129,7 +129,7 @@ A static task is a callable object constructible from std::function<void()>.
     > &&
     !std::is_invocable_r_v<int, C> &&
     !
-    std::is_invocable_r_v<turbo::SmallVector<int>, C>;
+    std::is_invocable_r_v<turbo::InlinedVector<int>, C>;
 
 /**
 @brief determines if a callable is a dynamic task
@@ -151,11 +151,11 @@ A condition task is a callable object constructible from std::function<int()>.
     @brief determines if a callable is a multi-condition task
 
     A multi-condition task is a callable object constructible from
-    std::function<turbo::SmallVector<int>()>.
+    std::function<turbo::InlinedVector<int>()>.
     */
     template<typename C>
     constexpr bool is_multi_condition_task_v =
-            std::is_invocable_r_v < turbo::SmallVector<int>, C
+            std::is_invocable_r_v < turbo::InlinedVector<int>, C
     >;
 
     /**

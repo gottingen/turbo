@@ -72,7 +72,5 @@ T unique_id() {
   return counter.fetch_add(1, std::memory_order_relaxed);
 }
 
-}  // end of namespace turbo -----------------------------------------------------
-
-
+}  // namespace turbo
 

@@ -1,12 +1,9 @@
 #pragma once
 
+#include "turbo/base/environment.h"
 #include "turbo/workflow/core/observer.h"
 #include "turbo/workflow/core/workflow.h"
 
-/**
-@file executor.hpp
-@brief executor include file
-*/
 
 namespace turbo {
 
@@ -734,9 +731,9 @@ namespace turbo {
 
         void _schedule(Node *);
 
-        void _schedule(Worker &, const SmallVector<Node *> &);
+        void _schedule(Worker &, const InlinedVector<Node *> &);
 
-        void _schedule(const SmallVector<Node *> &);
+        void _schedule(const InlinedVector<Node *> &);
 
         void _set_up_topology(Worker *, Topology *);
 
@@ -764,9 +761,9 @@ namespace turbo {
 
         void _detach_dynamic_task(Worker &, Node *, Graph &);
 
-        void _invoke_condition_task(Worker &, Node *, SmallVector<int> &);
+        void _invoke_condition_task(Worker &, Node *, InlinedVector<int> &);
 
-        void _invoke_multi_condition_task(Worker &, Node *, SmallVector<int> &);
+        void _invoke_multi_condition_task(Worker &, Node *, InlinedVector<int> &);
 
         void _invoke_module_task(Worker &, Node *);
 
@@ -792,7 +789,7 @@ namespace turbo {
         void _invoke_syclflow_task_entry(Node *, C &&, Q &);
     };
 
-// Constructor
+    // Constructor
     inline Executor::Executor(size_t N, std::shared_ptr <WorkerInterface> wix) :
             _MAX_STEALS{((N + 1) << 1)},
             _threads{N},
@@ -1259,7 +1256,7 @@ namespace turbo {
     }
 
 // Procedure: _schedule
-    inline void Executor::_schedule(Worker &worker, const SmallVector<Node *> &nodes) {
+    inline void Executor::_schedule(Worker &worker, const InlinedVector<Node *> &nodes) {
 
         // We need to cacth the node count to avoid accessing the nodes
         // vector while the parent topology is removed!
@@ -1298,7 +1295,7 @@ namespace turbo {
     }
 
 // Procedure: _schedule
-    inline void Executor::_schedule(const SmallVector<Node *> &nodes) {
+    inline void Executor::_schedule(const InlinedVector<Node *> &nodes) {
 
         // parent topology may be removed!
         const auto num_nodes = nodes.size();
@@ -1338,7 +1335,7 @@ namespace turbo {
 
         // if acquiring semaphore(s) exists, acquire them first
         if (node->_semaphores && !node->_semaphores->to_acquire.empty()) {
-            SmallVector < Node * > nodes;
+            InlinedVector < Node * > nodes;
             if (!node->_acquire_all(nodes)) {
                 _schedule(worker, nodes);
                 return;
@@ -1348,7 +1345,7 @@ namespace turbo {
 
         // condition task
         //int cond = -1;
-        SmallVector<int> conds;
+        InlinedVector<int> conds;
 
         // switch is faster than nested if-else due to jump table
         switch (node->_handle.index()) {
@@ -1603,7 +1600,7 @@ namespace turbo {
             return;
         }
 
-        SmallVector < Node * > src;
+        InlinedVector < Node * > src;
 
         for (auto n : g._nodes) {
 
@@ -1634,7 +1631,7 @@ namespace turbo {
             return;
         }
 
-        SmallVector < Node * > src;
+        InlinedVector < Node * > src;
 
         for (auto n : g._nodes) {
             n->_state.store(0, std::memory_order_relaxed);
@@ -1652,7 +1649,7 @@ namespace turbo {
 
 // Procedure: _invoke_condition_task
     inline void Executor::_invoke_condition_task(
-            Worker &worker, Node *node, SmallVector<int> &conds
+            Worker &worker, Node *node, InlinedVector<int> &conds
     ) {
         _observer_prologue(worker, node);
         conds = {std::get_if<Node::Condition>(&node->_handle)->work()};
@@ -1661,7 +1658,7 @@ namespace turbo {
 
 // Procedure: _invoke_multi_condition_task
     inline void Executor::_invoke_multi_condition_task(
-            Worker &worker, Node *node, SmallVector<int> &conds
+            Worker &worker, Node *node, InlinedVector<int> &conds
     ) {
         _observer_prologue(worker, node);
         conds = std::get_if<Node::MultiCondition>(&node->_handle)->work();
