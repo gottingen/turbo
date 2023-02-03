@@ -1,7 +1,19 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
 
 // --------------------------------------------------------
 // Testcase: CriticalSection
@@ -24,7 +36,7 @@ void critical_section(size_t W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == N);
+  EXPECT_TRUE(counter == N);
 
   executor.run(taskflow);
   executor.run(taskflow);
@@ -32,31 +44,31 @@ void critical_section(size_t W) {
 
   executor.wait_for_all();
 
-  REQUIRE(counter == 4*N);
-  REQUIRE(section.count() == 1);
+  EXPECT_TRUE(counter == 4*N);
+  EXPECT_TRUE(section.count() == 1);
 }
 
-TEST_CASE("CriticalSection.1thread") {
+TEST(CriticalSection, 1thread) {
   critical_section(1);
 }
 
-TEST_CASE("CriticalSection.2threads") {
+TEST(CriticalSection, 2threads) {
   critical_section(2);
 }
 
-TEST_CASE("CriticalSection.3threads") {
+TEST(CriticalSection, 3threads) {
   critical_section(3);
 }
 
-TEST_CASE("CriticalSection.7threads") {
+TEST(CriticalSection, 7threads) {
   critical_section(7);
 }
 
-TEST_CASE("CriticalSection.11threads") {
+TEST(CriticalSection, 11threads) {
   critical_section(11);
 }
 
-TEST_CASE("CriticalSection.16threads") {
+TEST(CriticalSection, 16threads) {
   critical_section(16);
 }
 
@@ -83,23 +95,23 @@ void semaphore(size_t W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == 2*N);
+  EXPECT_TRUE(counter == 2*N);
 
 }
 
-TEST_CASE("Semaphore.1thread") {
+TEST(Semaphore, 1thread) {
   semaphore(1);
 }
 
-TEST_CASE("Semaphore.2threads") {
+TEST(Semaphore, 2threads) {
   semaphore(2);
 }
 
-TEST_CASE("Semaphore.4threads") {
+TEST(Semaphore, 4threads) {
   semaphore(4);
 }
 
-TEST_CASE("Semaphore.8threads") {
+TEST(Semaphore, 8threads) {
   semaphore(8);
 }
 
@@ -127,24 +139,24 @@ void overlapped_semaphore(size_t W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == N);
-  REQUIRE(semaphore1.count() == 1);
-  REQUIRE(semaphore4.count() == 4);
+  EXPECT_TRUE(counter == N);
+  EXPECT_TRUE(semaphore1.count() == 1);
+  EXPECT_TRUE(semaphore4.count() == 4);
 }
 
-TEST_CASE("OverlappedSemaphore.1thread") {
+TEST(OverlappedSemaphore, 1thread) {
   overlapped_semaphore(1);
 }
 
-TEST_CASE("OverlappedSemaphore.2threads") {
+TEST(OverlappedSemaphore, 2threads) {
   overlapped_semaphore(2);
 }
 
-TEST_CASE("OverlappedSemaphore.4threads") {
+TEST(OverlappedSemaphore, 4threads) {
   overlapped_semaphore(4);
 }
 
-TEST_CASE("OverlappedSemaphore.8threads") {
+TEST(OverlappedSemaphore, 8threads) {
   overlapped_semaphore(8);
 }
 
@@ -184,28 +196,28 @@ void conflict_graph(size_t W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == 3);
+  EXPECT_TRUE(counter == 3);
 
   for(size_t i=0; i<10; i++) {
     executor.run_n(taskflow, 10);
   }
   executor.wait_for_all();
 
-  REQUIRE(counter == 303);
+  EXPECT_TRUE(counter == 303);
 }
 
-TEST_CASE("ConflictGraph.1thread") {
+TEST(ConflictGraph, 1thread) {
   conflict_graph(1);
 }
 
-TEST_CASE("ConflictGraph.2threads") {
+TEST(ConflictGraph, 2threads) {
   conflict_graph(2);
 }
 
-TEST_CASE("ConflictGraph.3threads") {
+TEST(ConflictGraph, 3threads) {
   conflict_graph(3);
 }
 
-TEST_CASE("ConflictGraph.4threads") {
+TEST(ConflictGraph, 4threads) {
   conflict_graph(4);
 }

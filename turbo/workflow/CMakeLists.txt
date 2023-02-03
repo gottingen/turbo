@@ -84,3 +84,51 @@ turbo_cc_test(
         turbo::turbo
         GTest::gmock_main
 )
+
+turbo_cc_test(
+        NAME
+        traversals_test
+        SRCS
+        "traversals_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        cancellation_test
+        SRCS
+        "cancellation_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        work_stealing_test
+        SRCS
+        "work_stealing_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        semaphores_test
+        SRCS
+        "semaphores_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
