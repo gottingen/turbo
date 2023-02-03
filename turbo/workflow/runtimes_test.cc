@@ -1,15 +1,26 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
-#include <turbo/workflow/algorithm/pipeline.h>
-
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
+#include "turbo/workflow/algorithm/pipeline.h"
 
 // --------------------------------------------------------
 // Testcase: RuntimeTasking
 // --------------------------------------------------------
 
-TEST_CASE("Runtime.Basics" * doctest::timeout(300)) {
+TEST(Runtime, Basics) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor;
@@ -19,7 +30,7 @@ TEST_CASE("Runtime.Basics" * doctest::timeout(300)) {
 
   taskflow.emplace([&](turbo::Runtime& rt){
     rt.run_and_wait([&](turbo::Subflow& sf){
-      REQUIRE(&rt.executor() == &executor);
+      EXPECT_TRUE(&rt.executor() == &executor);
       auto task1 = sf.emplace([&](){a++;});
       auto task2 = sf.emplace([&](){a++;});
       auto task3 = sf.emplace([&](){a++;});
@@ -34,7 +45,7 @@ TEST_CASE("Runtime.Basics" * doctest::timeout(300)) {
 
   taskflow.emplace([&](turbo::Subflow& sf){
     sf.emplace([&](turbo::Runtime& rt){
-      REQUIRE(&rt.executor() == &executor);
+      EXPECT_TRUE(&rt.executor() == &executor);
       rt.run_and_wait([&](turbo::Subflow& sf){
         auto task1 = sf.emplace([&](){b++;});
         auto task2 = sf.emplace([&](){b++;});
@@ -52,15 +63,15 @@ TEST_CASE("Runtime.Basics" * doctest::timeout(300)) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(a == 5);
-  REQUIRE(b == 5);
+  EXPECT_TRUE(a == 5);
+  EXPECT_TRUE(b == 5);
 }
 
 // --------------------------------------------------------
-// Testcase: Runtime.ExternalGraph.Simple
+// Testcase: PipelineSP_ExternalGraph.Simple
 // --------------------------------------------------------
 
-TEST_CASE("Runtime.ExternalGraph.Simple" * doctest::timeout(300)) {
+TEST(Runtime, ExternalGraph_Simple) {
 
   const size_t N = 100;
 
@@ -91,13 +102,13 @@ TEST_CASE("Runtime.ExternalGraph.Simple" * doctest::timeout(300)) {
   executor.run_n(taskflow, 100).wait();
 
   for(size_t i=0; i<N; i++) {
-    REQUIRE(results[i] == 400);
+    EXPECT_TRUE(results[i] == 400);
   }
 
 }
 
 // --------------------------------------------------------
-// Testcase: Runtime.Subflow
+// Testcase: PipelineSP_Subflow
 // --------------------------------------------------------
 
 void runtime_subflow(size_t w) {
@@ -154,45 +165,45 @@ void runtime_subflow(size_t w) {
 
     executor.run(parent).wait();
     //taskflow.dump(std::cout);
-    REQUIRE(sums == runtime_tasks_per_line*lines*subtask);
+    EXPECT_TRUE(sums == runtime_tasks_per_line*lines*subtask);
   }
 }
 
-TEST_CASE("Runtime.Subflow.1thread" * doctest::timeout(300)){
+TEST(Runtime, Subflow_1thread){
   runtime_subflow(1);
 }
 
-TEST_CASE("Runtime.Subflow.2threads" * doctest::timeout(300)){
+TEST(Runtime, Subflow_2threads){
   runtime_subflow(2);
 }
 
-TEST_CASE("Runtime.Subflow.3threads" * doctest::timeout(300)){
+TEST(Runtime, Subflow_3threads){
   runtime_subflow(3);
 }
 
-TEST_CASE("Runtime.Subflow.4threads" * doctest::timeout(300)){
+TEST(Runtime, Subflow_4threads){
   runtime_subflow(4);
 }
 
-TEST_CASE("Runtime.Subflow.5threads" * doctest::timeout(300)){
+TEST(Runtime, Subflow_5threads){
   runtime_subflow(5);
 }
 
-TEST_CASE("Runtime.Subflow.6threads" * doctest::timeout(300)){
+TEST(Runtime, Subflow_6threads){
   runtime_subflow(6);
 }
 
-TEST_CASE("Runtime.Subflow.7threads" * doctest::timeout(300)){
+TEST(Runtime, Subflow_7threads){
   runtime_subflow(7);
 }
 
-TEST_CASE("Runtime.Subflow.8threads" * doctest::timeout(300)){
+TEST(Runtime, Subflow_8threads){
   runtime_subflow(8);
 }
 
 
 // --------------------------------------------------------
-// Testcase: Pipeline(SP).Runtime.Subflow
+// Testcase: PipelineSP,PipelineSP_Subflow
 // --------------------------------------------------------
 
 void pipeline_sp_runtime_subflow(size_t w) {
@@ -233,46 +244,46 @@ void pipeline_sp_runtime_subflow(size_t w) {
 
     taskflow.composed_of(pl).name("pipeline");
     executor.run(taskflow).wait();
-    REQUIRE(sums == subtask*max_tokens);
+    EXPECT_TRUE(sums == subtask*max_tokens);
   //}
 }
 
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.1thread" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_1thread){
   pipeline_sp_runtime_subflow(1);
 }
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.2threads" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_2threads){
   pipeline_sp_runtime_subflow(2);
 }
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.3threads" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_3threads){
   pipeline_sp_runtime_subflow(3);
 }
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.4threads" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_4threads){
   pipeline_sp_runtime_subflow(4);
 }
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.5threads" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_5threads){
   pipeline_sp_runtime_subflow(5);
 }
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.6threads" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_6threads){
   pipeline_sp_runtime_subflow(6);
 }
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.7threads" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_7threads){
   pipeline_sp_runtime_subflow(7);
 }
 
-TEST_CASE("Pipeline(SP).Runtime.Subflow.8threads" * doctest::timeout(300)){
+TEST(PipelineSP,PipelineSP_Subflow_8threads){
   pipeline_sp_runtime_subflow(8);
 }
 
 
 // --------------------------------------------------------
-// Testcase: Pipeline(SPSPSPSP).Runtime.Subflow
+// Testcase: PipelineSPSPSPSP, PipelineSP_Subflow
 // --------------------------------------------------------
 
 void pipeline_spspspsp_runtime_subflow(size_t w) {
@@ -386,46 +397,46 @@ void pipeline_spspspsp_runtime_subflow(size_t w) {
 
     taskflow.composed_of(pl).name("pipeline");
     executor.run(taskflow).wait();
-    REQUIRE(sums == subtask*max_tokens*7);
+    EXPECT_TRUE(sums == subtask*max_tokens*7);
   }
 }
 
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.1thread" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_1thread){
   pipeline_spspspsp_runtime_subflow(1);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.2threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_2threads){
   pipeline_spspspsp_runtime_subflow(2);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.3threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_3threads){
   pipeline_spspspsp_runtime_subflow(3);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.4threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_4threads){
   pipeline_spspspsp_runtime_subflow(4);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.5threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_5threads){
   pipeline_spspspsp_runtime_subflow(5);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.6threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_6threads){
   pipeline_spspspsp_runtime_subflow(6);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.7threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_7threads){
   pipeline_spspspsp_runtime_subflow(7);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Subflow.8threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Subflow_8threads){
   pipeline_spspspsp_runtime_subflow(8);
 }
 
 
 // --------------------------------------------------------
-// Testcase: Pipeline(SPSPSPSP).Runtime.IrregularSubflow
+// Testcase: PipelineSPSPSPSP, PipelineSP_IrregularSubflow
 // --------------------------------------------------------
 
 void pipeline_spspspsp_runtime_irregular_subflow(size_t w) {
@@ -609,44 +620,44 @@ void pipeline_spspspsp_runtime_irregular_subflow(size_t w) {
 
   //taskflow.dump(std::cout);
   // there are 31 spawned subtasks in total
-  REQUIRE(sums == 31*max_tokens);
+  EXPECT_TRUE(sums == 31*max_tokens);
 }
 
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.1thread" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_1thread){
   pipeline_spspspsp_runtime_irregular_subflow(1);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.2threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_2threads){
   pipeline_spspspsp_runtime_irregular_subflow(2);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.3threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_3threads){
   pipeline_spspspsp_runtime_irregular_subflow(3);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.4threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_4threads){
   pipeline_spspspsp_runtime_irregular_subflow(4);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.5threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_5threads){
   pipeline_spspspsp_runtime_irregular_subflow(5);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.6threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_6threads){
   pipeline_spspspsp_runtime_irregular_subflow(6);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.7threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_7threads){
   pipeline_spspspsp_runtime_irregular_subflow(7);
 }
 
-TEST_CASE("Pipeline(SPSPSPSP).Runtime.Irregular.Subflow.8threads" * doctest::timeout(300)){
+TEST(PipelineSPSPSPSP, PipelineSP_Irregular_Subflow_8threads){
   pipeline_spspspsp_runtime_irregular_subflow(8);
 }
 
 // --------------------------------------------------------
-// Testcase: ScalablePipeline(SPSPSPSP).Runtime.Subflow
+// Testcase: ScalablePipelineSPSPSPSP, PipelineSP_Subflow
 // --------------------------------------------------------
 
 void scalable_pipeline_spspspsp_runtime_subflow(size_t w) {
@@ -753,40 +764,40 @@ void scalable_pipeline_spspspsp_runtime_subflow(size_t w) {
 
     taskflow.composed_of(sp).name("pipeline");
     executor.run(taskflow).wait();
-    REQUIRE(sums == subtask*max_tokens*7);
+    EXPECT_TRUE(sums == subtask*max_tokens*7);
   }
 }
 
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.1thread" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_1thread){
   scalable_pipeline_spspspsp_runtime_subflow(1);
 }
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.2threads" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_2threads){
   scalable_pipeline_spspspsp_runtime_subflow(2);
 }
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.3threads" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_3threads){
   scalable_pipeline_spspspsp_runtime_subflow(3);
 }
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.4threads" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_4threads){
   scalable_pipeline_spspspsp_runtime_subflow(4);
 }
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.5threads" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_5threads){
   scalable_pipeline_spspspsp_runtime_subflow(5);
 }
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.6threads" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_6threads){
   scalable_pipeline_spspspsp_runtime_subflow(6);
 }
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.7threads" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_7threads){
   scalable_pipeline_spspspsp_runtime_subflow(7);
 }
 
-TEST_CASE("ScalablePipeline(SPSPSPSP).Runtime.Subflow.8threads" * doctest::timeout(300)){
+TEST(ScalablePipelineSPSPSPSP, PipelineSP_Subflow_8threads){
   scalable_pipeline_spspspsp_runtime_subflow(8);
 }
 

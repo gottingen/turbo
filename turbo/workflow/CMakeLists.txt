@@ -132,3 +132,28 @@ turbo_cc_test(
         turbo::turbo
         GTest::gmock_main
 )
+
+turbo_cc_test(
+        NAME
+        runtimes_test
+        SRCS
+        "runtimes_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+
+
+turbo_cc_test(
+        NAME
+        pipelines_test
+        SRCS
+        "pipelines_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
