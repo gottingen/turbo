@@ -20,7 +20,7 @@
 
 #include "turbo/platform/config.h"
 #include "turbo/platform/optimization.h"
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/strings/internal/cord_internal.h"
 
 namespace turbo {

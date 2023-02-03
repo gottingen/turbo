@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Turbo Authors.
+# Copyright 2022 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -543,4 +543,16 @@ turbo_cc_test(
   DEPS
     turbo::turbo
     GTest::gmock_main
+)
+
+turbo_cc_test(
+        NAME
+        serializer_test
+        SRCS
+        "serializer_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
 )

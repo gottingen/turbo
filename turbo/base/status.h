@@ -1,4 +1,4 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -379,7 +379,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //
 //   turbo::Status result = DoSomething();
 //   if (!result.ok()) {
-//     LOG(ERROR) << result;
+//     TURBO_LOG(ERROR) << result;
 //   }
 //
 //   // Provide a default if switching on multiple error codes
@@ -390,7 +390,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //       break;
 //     // The user does not have permission. Log an error.
 //     case turbo::StatusCode::kPermissionDenied:
-//       LOG(ERROR) << result;
+//       TURBO_LOG(ERROR) << result;
 //       break;
 //     // Propagate the error otherwise.
 //     default:

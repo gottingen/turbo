@@ -50,9 +50,8 @@
 #include "gtest/gtest.h"
 #include "turbo/base/internal/strerror.h"
 #include "turbo/flags/internal/program_name.h"
-#include "turbo/log/check.h"
 #include "turbo/log/internal/test_helpers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/str_format.h"
 #include "turbo/strings/string_view.h"
@@ -66,7 +65,7 @@ using turbo::log_internal::kTurboMinLogLevel;
 
 std::string Base64UnescapeOrDie(std::string_view data) {
   std::string decoded;
-  CHECK(turbo::Base64Unescape(data, &decoded));
+  TURBO_CHECK(turbo::Base64Unescape(data, &decoded));
   return decoded;
 }
 
@@ -75,14 +74,14 @@ std::string Base64UnescapeOrDie(std::string_view data) {
 // -----------------------------------------------------------------------------
 
 // This matcher is used to validate that literal strings streamed into
-// `LOG` statements that ought to be compiled out (e.g. `LOG_IF(INFO, false)`)
+// `LOG` statements that ought to be compiled out (e.g. `TURBO_LOG_IF(INFO, false)`)
 // do not appear in the binary.
 //
 // Note that passing the string to be sought directly to `FileHasSubstr()` all
 // but forces its inclusion in the binary regardless of the logging library's
 // behavior. For example:
 //
-//   LOG_IF(INFO, false) << "you're the man now dog";
+//   TURBO_LOG_IF(INFO, false) << "you're the man now dog";
 //   // This will always pass:
 //   // EXPECT_THAT(fp, FileHasSubstr("you're the man now dog"));
 //   // So use this instead:
@@ -270,7 +269,7 @@ TEST_F(StrippingTest, Literal) {
   // as would happen if we used a literal.  We might (or might not) leave it
   // lying around later; that's what the tests are for!
   const std::string needle = turbo::Base64Escape("StrippingTest.Literal");
-  LOG(INFO) << "U3RyaXBwaW5nVGVzdC5MaXRlcmFs";
+  TURBO_LOG(INFO) << "U3RyaXBwaW5nVGVzdC5MaXRlcmFs";
   auto exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
   if (turbo::LogSeverity::kInfo >= kTurboMinLogLevel) {
@@ -287,7 +286,7 @@ TEST_F(StrippingTest, LiteralInExpression) {
   // lying around later; that's what the tests are for!
   const std::string needle =
       turbo::Base64Escape("StrippingTest.LiteralInExpression");
-  LOG(INFO) << turbo::StrCat("secret: ",
+  TURBO_LOG(INFO) << turbo::StrCat("secret: ",
                             "U3RyaXBwaW5nVGVzdC5MaXRlcmFsSW5FeHByZXNzaW9u");
   std::unique_ptr<FILE, std::function<void(FILE*)>> exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
@@ -304,7 +303,7 @@ TEST_F(StrippingTest, Fatal) {
   // as would happen if we used a literal.  We might (or might not) leave it
   // lying around later; that's what the tests are for!
   const std::string needle = turbo::Base64Escape("StrippingTest.Fatal");
-  EXPECT_DEATH_IF_SUPPORTED(LOG(FATAL) << "U3RyaXBwaW5nVGVzdC5GYXRhbA==", "");
+  EXPECT_DEATH_IF_SUPPORTED(TURBO_LOG(FATAL) << "U3RyaXBwaW5nVGVzdC5GYXRhbA==", "");
   std::unique_ptr<FILE, std::function<void(FILE*)>> exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
   if (turbo::LogSeverity::kFatal >= kTurboMinLogLevel) {
@@ -319,7 +318,7 @@ TEST_F(StrippingTest, Level) {
   volatile auto severity = turbo::LogSeverity::kWarning;
   // Ensure that `severity` is not a compile-time constant to prove that
   // stripping works regardless:
-  LOG(LEVEL(severity)) << "U3RyaXBwaW5nVGVzdC5MZXZlbA==";
+  TURBO_LOG(LEVEL(severity)) << "U3RyaXBwaW5nVGVzdC5MZXZlbA==";
   std::unique_ptr<FILE, std::function<void(FILE*)>> exe = OpenTestExecutable();
   ASSERT_THAT(exe, NotNull());
   if (turbo::LogSeverity::kFatal >= kTurboMinLogLevel) {

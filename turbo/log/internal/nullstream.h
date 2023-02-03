@@ -95,7 +95,7 @@ inline NullStream& operator<<(NullStream& str,
 
 // `NullStreamMaybeFatal` implements the process termination semantics of
 // `LogMessage`, which is used for `DFATAL` severity and expression-defined
-// severity e.g. `LOG(LEVEL(HowBadIsIt()))`.  Like `LogMessage`, it terminates
+// severity e.g. `TURBO_LOG(LEVEL(HowBadIsIt()))`.  Like `LogMessage`, it terminates
 // the process when destroyed if the passed-in severity equals `FATAL`.
 class NullStreamMaybeFatal final : public NullStream {
  public:

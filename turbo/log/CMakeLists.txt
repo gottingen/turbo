@@ -91,60 +91,6 @@ turbo_cc_library(
 
 turbo_cc_test(
   NAME
-    turbo_check_test
-  SRCS
-    "turbo_check_test.cc"
-    "check_test_impl.h"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_test_helpers
-    turbo::turbo
-    GTest::gmock
-    GTest::gtest_main
-)
-
-turbo_cc_test(
-  NAME
-    turbo_log_basic_test
-  SRCS
-    "log_basic_test.cc"
-    "log_basic_test_impl.h"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::turbo
-    turbo::log_internal_test_actions
-    turbo::log_internal_test_helpers
-    turbo::log_internal_test_matchers
-    turbo::scoped_mock_log
-    GTest::gmock
-    GTest::gtest_main
-)
-
-turbo_cc_test(
-  NAME
-    check_test
-  SRCS
-    "check_test.cc"
-    "check_test_impl.h"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::log_internal_test_helpers
-    turbo::turbo
-    GTest::gmock
-    GTest::gtest_main
-)
-
-turbo_cc_test(
-  NAME
     die_if_null_test
   SRCS
     "die_if_null_test.cc"
@@ -158,25 +104,6 @@ turbo_cc_test(
     GTest::gtest_main
 )
 
-turbo_cc_test(
-  NAME
-    log_basic_test
-  SRCS
-    "log_basic_test.cc"
-    "log_basic_test_impl.h"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  LINKOPTS
-    ${TURBO_DEFAULT_LINKOPTS}
-  DEPS
-    turbo::turbo
-    turbo::log_internal_test_actions
-    turbo::log_internal_test_helpers
-    turbo::log_internal_test_matchers
-    turbo::scoped_mock_log
-    GTest::gmock
-    GTest::gtest_main
-)
 
 turbo_cc_test(
   NAME

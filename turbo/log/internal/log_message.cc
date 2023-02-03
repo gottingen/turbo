@@ -394,8 +394,8 @@ void LogMessage::Flush() {
   TURBO_CONST_INIT static std::atomic<bool> seen_fatal(false);
   if (data_->entry.log_severity() == turbo::LogSeverity::kFatal &&
       turbo::log_internal::ExitOnDFatal()) {
-    // Exactly one LOG(FATAL) message is responsible for aborting the process,
-    // even if multiple threads LOG(FATAL) concurrently.
+    // Exactly one TURBO_LOG(FATAL) message is responsible for aborting the process,
+    // even if multiple threads TURBO_LOG(FATAL) concurrently.
     bool expected_seen_fatal = false;
     if (seen_fatal.compare_exchange_strong(expected_seen_fatal, true,
                                            std::memory_order_relaxed)) {

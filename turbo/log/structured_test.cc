@@ -24,7 +24,7 @@
 #include "turbo/platform/attributes.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
 
 namespace {
@@ -57,7 +57,7 @@ TEST(StreamingFormatTest, LogAsLiteral) {
                              R"pb(value { literal: "hello world" })pb")))));
 
   sink.StartCapturingLogs();
-  LOG(INFO) << turbo::LogAsLiteral(not_a_literal);
+  TURBO_LOG(INFO) << turbo::LogAsLiteral(not_a_literal);
 }
 
 }  // namespace

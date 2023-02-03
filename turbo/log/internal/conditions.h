@@ -55,7 +55,7 @@
 // Although this is not used anywhere a statement (e.g. `if`) could not go,
 // the ternary expression does a better job avoiding spurious diagnostics
 // (dangling else, missing switch case) and preserving noreturn semantics (e.g.
-// on `LOG(FATAL)`) without requiring braces.
+// on `TURBO_LOG(FATAL)`) without requiring braces.
 #define TURBO_LOG_INTERNAL_STATELESS_CONDITION(condition) \
   switch (0)                                             \
   case 0:                                                \

@@ -48,7 +48,6 @@
 //    TURBO_ASM_STYLE_ATT | TURBO_ASM_STYLE_INTEL | TURBO_ASM_STYLE_MOTOROLA
 //    TURBO_PLATFORM_PTR_SIZE = <integer size in bytes>
 //    TURBO_PLATFORM_WORD_SIZE = <integer size in bytes>
-//    TURBO_CACHE_LINE_SIZE = <integer size in bytes>
 //---------------------------------------------------------------------------
 
 /*
@@ -712,28 +711,6 @@
 #if !defined(TURBO_WINAPI_FAMILY_PARTITION)
 	#define TURBO_WINAPI_FAMILY_PARTITION(Partition) (0)
 #endif
-
-
-// TURBO_CACHE_LINE_SIZE
-// Specifies the cache line size broken down by compile target.
-// This the expected best guess values for the targets that we can make at compilation time.
-
-#ifndef TURBO_CACHE_LINE_SIZE
-	#if   defined(TURBO_PROCESSOR_X86)
-		#define TURBO_CACHE_LINE_SIZE 32    // This is the minimum possible value.
-	#elif defined(TURBO_PROCESSOR_X86_64)
-		#define TURBO_CACHE_LINE_SIZE 64    // This is the minimum possible value
-	#elif defined(TURBO_PROCESSOR_ARM32)
-		#define TURBO_CACHE_LINE_SIZE 32    // This varies between implementations and is usually 32 or 64.
-	#elif defined(TURBO_PROCESSOR_ARM64)
-		#define TURBO_CACHE_LINE_SIZE 64    // Cache line Cortex-A8  (64 bytes) http://shervinemami.info/armAssembly.html however this remains to be mostly an assumption at this stage
-	#elif (TURBO_PLATFORM_WORD_SIZE == 4)
-		#define TURBO_CACHE_LINE_SIZE 32    // This is the minimum possible value
-	#else
-		#define TURBO_CACHE_LINE_SIZE 64    // This is the minimum possible value
-	#endif
-#endif
-
 
 #endif  // TURBO_PLATFORM_CONFIG_PLATFORM_H_
 

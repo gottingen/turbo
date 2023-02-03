@@ -9,58 +9,31 @@ augments to stl.
 # build
 
 Since designed the Turbo, easy to build and ingest is one of its goals.
-so we make it's using as easy as we can.
-## dependencies
+so we make it's using as easy as we can. details see [build](docs/build.md)
 
-* cmake version > 3.15
-* ApplyClang > 12
-* gcc >= 9.3
-* 
-## on macbook
+for easy to ingest, Turbo have package on anaconda. When you on conda environment,
+you can get it as below.
 
 ```shell
-    git clone github.com/gottingen/turbo.git
-    cd turbo
-    mkdir build
-    cd build
-    cmake .. -DTURBO_BUILD_TESTING=ON
-    make -j 4
+    conda install -c mgottingen turbo
 ```
 
-## on ubuntu20.04
-ubuntu 20.04 original gcc/g++ version is 9.3.
-**prepare env**
-```shell
-    sudo apt-get install gcc g++
-    sudo apt-get imstall cmake
-```
-**build** 
-```shell
-    git clone github.com/gottingen/turbo.git
-    cd turbo
-    mkdir build
-    cd build
-    cmake .. -DTURBO_BUILD_TESTING=ON
-    make -j 4
-```
-## on centos7
+# Try Try Try
 
-centos7 we need to use scl to upgrade our compiler.
+* Read [overview](docs/overview.md) to know the goals of turbo and its advantages. 
+* Read [getting start](docs/getting_start.md) for building turbo and work with [examples](examples).
+* Modules:
+  * [platform](docs/platform.md) 
+  * [Status](docs/status.md)
+  * [base](docs/base.md)
+  * [json](docs/json.md) rapidjson docs
+  * [workflow](docs/workflow.md)
 
-```shell
-sudo yum install centos-release-scl
-sudo yum install devtoolset-9-gcc*
-scl enable devtoolset-9 bash
-```
+# Acknowledgement
 
-```shell
-    git clone github.com/gottingen/turbo.git
-    cd turbo
-    mkdir build
-    cd build
-    cmake .. -DTURBO_BUILD_TESTING=ON
-    make -j 4
-```
-## conda env
-
-
+* [Abseil](github.com/abseil/abseil-cpp)
+* [Folly](github.com/facebook/folly)
+* [Onnxruntime](github.com/microsoft/onnxruntime)
+* [brpc](github.com/apache/brpc)
+* [tvm](github.com/apache/tvm)
+* [EASTL](https://github.com/electronicarts/EASTL)

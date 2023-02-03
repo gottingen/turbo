@@ -315,7 +315,7 @@ TEST_P(BasicLogDeathTest, Level) {
   // turbo::log_internal::ScopedMinLogLevel scoped_min_log_level(GetParam());
 
   // Ensure that `severity` is not a compile-time constant to prove that
-  // `LOG(LEVEL(severity))` works regardless:
+  // `TURBO_LOG(LEVEL(severity))` works regardless:
   auto volatile severity = turbo::LogSeverity::kFatal;
 
   const int log_line = __LINE__ + 1;

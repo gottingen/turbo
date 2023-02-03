@@ -15,7 +15,7 @@
 #include "turbo/log/die_if_null.h"
 
 #include "turbo/platform/config.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {
@@ -23,7 +23,7 @@ TURBO_NAMESPACE_BEGIN
 namespace log_internal {
 
 void DieBecauseNull(const char* file, int line, const char* exprtext) {
-  LOG(FATAL).AtLocation(file, line)
+  TURBO_LOG(FATAL).AtLocation(file, line)
       << turbo::StrCat("Check failed: '", exprtext, "' Must be non-null");
 }
 

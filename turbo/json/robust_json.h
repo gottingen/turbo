@@ -14,7 +14,7 @@
 #include <turbo/json/reader.h>
 #include <turbo/json/stringbuffer.h>
 #include <turbo/json/writer.h>
-#include <turbo/log/check.h>
+#include <turbo/log/logging.h>
 #include <turbo/base/status.h>
 
 #include <functional>
@@ -49,7 +49,7 @@ RAPIDJSON_NAMESPACE_BEGIN
          * @return
          */
         [[nodiscard]] RapidJsonValue &raw() const {
-            CHECK(v_.has_value());
+            TURBO_CHECK(v_.has_value());
             return v_.value().get();
         }
 

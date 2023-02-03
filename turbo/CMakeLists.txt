@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Turbo Authors.
+# Copyright 2022 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,14 +16,6 @@
 
 
 set(TURBO_ALL_SRC
-        "platform/internal/cycleclock.cc"
-        "platform/internal/spinlock.cc"
-        "platform/internal/spinlock_wait.cc"
-        "platform/internal/sysinfo.cc"
-        "platform/internal/scoped_set_env.cc"
-        "platform/internal/thread_identity.cc"
-        "platform/internal/unscaledcycleclock.cc"
-        "platform/internal/low_level_alloc.cc"
         "base/internal/raw_logging.cc"
         "base/internal/strerror.cc"
         "base/log_severity.cc"
@@ -37,15 +29,19 @@ set(TURBO_ALL_SRC
         "container/internal/hashtablez_sampler.cc"
         "container/internal/hashtablez_sampler_force_weak_definition.cc"
         "container/internal/raw_hash_set.cc"
-        "crc/crc32c.cc"
-        "crc/internal/cpu_detect.cc"
-        "crc/internal/crc.cc"
-        "crc/internal/crc_cord_state.cc"
-        "crc/internal/crc_x86_arm_combined.cc"
-        "crc/internal/crc_memcpy_fallback.cc"
-        "crc/internal/crc_memcpy_x86_64.cc"
-        "crc/internal/crc_non_temporal_memcpy.cc"
-        "crc/internal/crc_x86_arm_combined.cc"
+        "crypto/crc32c.cc"
+        "crypto/internal/cpu_detect.cc"
+        "crypto/internal/crc.cc"
+        "crypto/internal/crc_cord_state.cc"
+        "crypto/internal/crc_x86_arm_combined.cc"
+        "crypto/internal/crc_memcpy_fallback.cc"
+        "crypto/internal/crc_memcpy_x86_64.cc"
+        "crypto/internal/crc_non_temporal_memcpy.cc"
+        "crypto/internal/crc_x86_arm_combined.cc"
+        "crypto/md5.cc"
+        "crypto/sha1.cc"
+        "crypto/sha256.cc"
+        "crypto/sha512.cc"
         "debugging/failure_signal_handler.cc"
         "debugging/stacktrace.cc"
         "debugging/symbolize.cc"
@@ -88,6 +84,15 @@ set(TURBO_ALL_SRC
         "log/initialize.cc"
         "log/log_entry.cc"
         "log/log_sink.cc"
+        "platform/internal/cycleclock.cc"
+        "platform/internal/spinlock.cc"
+        "platform/internal/spinlock_wait.cc"
+        "platform/internal/sysinfo.cc"
+        "platform/internal/scoped_set_env.cc"
+        "platform/internal/thread_identity.cc"
+        "platform/internal/unscaledcycleclock.cc"
+        "platform/internal/low_level_alloc.cc"
+        "platform/thread/attribute.cc"
         "profiling/internal/exponential_biased.cc"
         "profiling/internal/periodic_sampler.cc"
         "random/discrete_distribution.cc"
@@ -185,7 +190,7 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(base)
     add_subdirectory(cleanup)
     add_subdirectory(container)
-    add_subdirectory(crc)
+    add_subdirectory(crypto)
     add_subdirectory(debugging)
     add_subdirectory(files)
     add_subdirectory(flags)
@@ -199,6 +204,7 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(strings)
     add_subdirectory(synchronization)
     add_subdirectory(time)
+    add_subdirectory(workflow)
 endif (TURBO_BUILD_TESTING)
 if (${TURBO_BUILD_DLL})
     turbo_make_dll()

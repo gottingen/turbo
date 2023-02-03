@@ -67,18 +67,18 @@ int MaxFramesInLogStackTrace();
 // the logging library. This function is async-signal-safe.
 void SetMaxFramesInLogStackTrace(int max_num_frames);
 
-// Determines whether we exit the program for a LOG(DFATAL) message in
+// Determines whether we exit the program for a TURBO_LOG(DFATAL) message in
 // debug mode.  It does this by skipping the call to Fail/FailQuietly.
 // This is intended for testing only.
 //
-// This can have some effects on LOG(FATAL) as well. Failure messages
+// This can have some effects on TURBO_LOG(FATAL) as well. Failure messages
 // are always allocated (rather than sharing a buffer), the crash
 // reason is not recorded, the "gwq" status message is not updated,
-// and the stack trace is not recorded.  The LOG(FATAL) *will* still
+// and the stack trace is not recorded.  The TURBO_LOG(FATAL) *will* still
 // exit the program. Since this function is used only in testing,
 // these differences are acceptable.
 //
-// Additionally, LOG(LEVEL(FATAL)) is indistinguishable from LOG(DFATAL) and
+// Additionally, TURBO_LOG(LEVEL(FATAL)) is indistinguishable from TURBO_LOG(DFATAL) and
 // will not terminate the program if SetExitOnDFatal(false) has been called.
 bool ExitOnDFatal();
 
@@ -87,7 +87,7 @@ void SetExitOnDFatal(bool on_off);
 
 // Determines if the logging library should suppress logging of stacktraces in
 // the `SIGABRT` handler, typically because we just logged a stacktrace as part
-// of `LOG(FATAL)` and are about to send ourselves a `SIGABRT` to end the
+// of `TURBO_LOG(FATAL)` and are about to send ourselves a `SIGABRT` to end the
 // program.
 bool SuppressSigabortTrace();
 

@@ -27,7 +27,7 @@
 #include "turbo/log/internal/test_actions.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/strings/string_view.h"
 
@@ -359,7 +359,7 @@ TEST(LogStreamerTest, CorrectDefaultFlags) {
   test_sink.StartCapturingLogs();
   turbo::LogInfoStreamer("path/file.cc", 1234).stream()
       << false << std::hex << 0xdeadbeef;
-  LOG(INFO) << false << std::hex << 0xdeadbeef;
+  TURBO_LOG(INFO) << false << std::hex << 0xdeadbeef;
 }
 
 }  // namespace

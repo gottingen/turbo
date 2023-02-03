@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -835,6 +835,160 @@ constexpr bool is_constant_evaluated() noexcept {
 #endif
 }
 #endif  // TURBO_HAVE_CONSTANT_EVALUATED
+
+//-----------------------------------------------------------------------------
+// Move-On-Copy
+//-----------------------------------------------------------------------------
+
+// Struct: MoveOnCopyWrapper
+template <typename T>
+struct MoC {
+
+  MoC(T&& rhs) : object(std::move(rhs)) {}
+  MoC(const MoC& other) : object(std::move(other.object)) {}
+
+  T& get() { return object; }
+
+  mutable T object;
+};
+
+template <typename T>
+auto make_moc(T&& m) {
+  return MoC<T>(std::forward<T>(m));
+}
+
+
+//-----------------------------------------------------------------------------
+// Visitors.
+//-----------------------------------------------------------------------------
+
+//// Overloadded.
+//template <typename... Ts>
+//struct Visitors : Ts... {
+//  using Ts::operator()... ;
+//};
+//
+//template <typename... Ts>
+//Visitors(Ts...) -> Visitors<Ts...>;
+
+// ----------------------------------------------------------------------------
+// std::variant
+// ----------------------------------------------------------------------------
+template <typename T, typename>
+struct get_index;
+
+template <size_t I, typename... Ts>
+struct get_index_impl {};
+
+template <size_t I, typename T, typename... Ts>
+struct get_index_impl<I, T, T, Ts...> : std::integral_constant<size_t, I>{};
+
+template <size_t I, typename T, typename U, typename... Ts>
+struct get_index_impl<I, T, U, Ts...> : get_index_impl<I+1, T, Ts...>{};
+
+template <typename T, typename... Ts>
+struct get_index<T, std::variant<Ts...>> : get_index_impl<0, T, Ts...>{};
+
+template <typename T, typename... Ts>
+constexpr auto get_index_v = get_index<T, Ts...>::value;
+
+
+
+// ----------------------------------------------------------------------------
+// unwrap_reference
+// ----------------------------------------------------------------------------
+
+template <class T>
+struct unwrap_reference { using type = T; };
+
+template <class U>
+struct unwrap_reference<std::reference_wrapper<U>> { using type = U&; };
+
+template<class T>
+using unwrap_reference_t = typename unwrap_reference<T>::type;
+
+template< class T >
+struct unwrap_ref_decay : unwrap_reference<std::decay_t<T>> {};
+
+template<class T>
+using unwrap_ref_decay_t = typename unwrap_ref_decay<T>::type;
+
+
+// ----------------------------------------------------------------------------
+// visit a tuple with a functor at runtime
+// ----------------------------------------------------------------------------
+
+template <typename Func, typename Tuple, size_t N = 0>
+void visit_tuple(Func func, Tuple& tup, size_t idx) {
+  if (N == idx) {
+    std::invoke(func, std::get<N>(tup));
+    return;
+  }
+  if constexpr (N + 1 < std::tuple_size_v<Tuple>) {
+    return visit_tuple<Func, Tuple, N + 1>(func, tup, idx);
+  }
+}
+
+
+// ----------------------------------------------------------------------------
+// unroll loop
+// ----------------------------------------------------------------------------
+
+// Template unrolled looping construct.
+template<auto beg, auto end, auto step, bool valid = (beg < end)>
+struct Unroll {
+  template<typename F>
+  static void eval(F f) {
+    f(beg);
+    Unroll<beg + step, end, step>::eval(f);
+  }
+};
+
+template<auto beg, auto end, auto step>
+struct Unroll<beg, end, step, false> {
+  template<typename F>
+  static void eval(F) { }
+};
+
+template<auto beg, auto end, auto step, typename F>
+void unroll(F f) {
+  Unroll<beg, end, step>::eval(f);
+}
+
+
+// ----------------------------------------------------------------------------
+// make types of variant unique
+// ----------------------------------------------------------------------------
+
+template <typename T, typename... Ts>
+struct filter_duplicates { using type = T; };
+
+template <template <typename...> class C, typename... Ts, typename U, typename... Us>
+struct filter_duplicates<C<Ts...>, U, Us...>
+    : std::conditional_t<(std::is_same_v<U, Ts> || ...)
+                             , filter_duplicates<C<Ts...>, Us...>
+                         , filter_duplicates<C<Ts..., U>, Us...>> {};
+
+template <typename T>
+struct unique_variant;
+
+template <typename... Ts>
+struct unique_variant<std::variant<Ts...>> : filter_duplicates<std::variant<>, Ts...> {};
+
+template <typename T>
+using unique_variant_t = typename unique_variant<T>::type;
+
+//// Struct: dependent_false
+//template <typename... T>
+//struct dependent_false {
+//  static constexpr bool value = false;
+//};
+//
+//template <typename... T>
+//constexpr auto dependent_false_v = dependent_false<T...>::value;
+
+template<typename> inline constexpr bool dependent_false_v = false;
+
 TURBO_NAMESPACE_END
 }  // namespace turbo
 

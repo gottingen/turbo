@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -152,6 +152,21 @@ ForwardIterator rotate(ForwardIterator first, ForwardIterator middle,
       std::is_same<decltype(std::rotate(first, middle, last)),
                    ForwardIterator>());
 }
+
+template<typename T>
+constexpr std::enable_if_t<std::is_integral<std::decay_t<T>>::value, size_t>
+distance(T beg, T end, T step) {
+  return (end - beg + step + (step > 0 ? -1 : 1)) / step;
+}
+
+template<typename T>
+constexpr std::enable_if_t<std::is_integral<std::decay_t<T>>::value, bool>
+is_range_invalid(T beg, T end, T step) {
+  return ((step == 0 && beg != end) ||
+          (beg < end && step <= 0) ||
+          (beg > end && step >= 0));
+}
+
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

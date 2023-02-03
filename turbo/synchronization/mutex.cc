@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -500,7 +500,7 @@ static void PostSynchEvent(void *obj, int ev) {
 // while waiting on one Mutex, the implementation calls a client callback
 // (such as a Condition function) that acquires another Mutex. We don't
 // strictly need to allow this, but programmers become confused if we do not
-// allow them to use functions such a LOG() within Condition functions.  The
+// allow them to use functions such a TURBO_LOG() within Condition functions.  The
 // PerThreadSynch struct points at the most recent SynchWaitParams struct when
 // the thread is on a Mutex's waiter queue.
 struct SynchWaitParams {

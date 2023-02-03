@@ -53,12 +53,12 @@ TURBO_NAMESPACE_BEGIN
 //
 //   void Logger::LogString(std::string_view str, turbo::LogSeverity severity,
 //                          const char *file, int line) {
-//     LOG(LEVEL(severity)).AtLocation(file, line) << str;
+//     TURBO_LOG(LEVEL(severity)).AtLocation(file, line) << str;
 //   }
 //   void Logger::LogStringLiteral(std::string_view str,
 //                                 turbo::LogSeverity severity, const char *file,
 //                                 int line) {
-//     LOG(LEVEL(severity)).AtLocation(file, line) << turbo::LogAsLiteral(str);
+//     TURBO_LOG(LEVEL(severity)).AtLocation(file, line) << turbo::LogAsLiteral(str);
 //   }
 inline log_internal::AsLiteralImpl LogAsLiteral(std::string_view s) {
   return log_internal::AsLiteralImpl(s);

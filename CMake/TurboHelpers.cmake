@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Turbo Authors.
+# Copyright 2022 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -462,4 +462,111 @@ function(turbo_cc_test)
   endif()
 
   add_test(NAME ${_NAME} COMMAND ${_NAME})
+endfunction()
+
+
+
+# turbo_cc_binary()
+#
+# CMake function to imitate Bazel's cc_test rule.
+#
+# Parameters:
+# NAME: name of target (see Usage below)
+# SRCS: List of source files for the binary
+# DEPS: List of other libraries to be linked in to the binary targets
+# COPTS: List of private compile options
+# DEFINES: List of public defines
+# LINKOPTS: List of link options
+#
+# Note:
+# By default, turbo_cc_binary will always create a binary named turbo_${NAME}.
+# This will also add it to ctest list as turbo_${NAME}.
+#
+# Usage:
+# turbo_cc_library(
+#   NAME
+#     awesome
+#   HDRS
+#     "a.h"
+#   SRCS
+#     "a.cc"
+#   PUBLIC
+# )
+#
+# turbo_cc_binary(
+#   NAME
+#     awesome_test
+#   SRCS
+#     "awesome_test.cc"
+#   DEPS
+#     turbo::awesome
+#     GTest::gmock
+#     GTest::gtest_main
+# )
+function(turbo_cc_binary)
+
+  cmake_parse_arguments(TURBO_CC_BINARY
+          ""
+          "NAME"
+          "SRCS;COPTS;DEFINES;LINKOPTS;DEPS"
+          ${ARGN}
+          )
+
+  set(_NAME "${TURBO_CC_BINARY_NAME}")
+
+  add_executable(${_NAME} "")
+  target_sources(${_NAME} PRIVATE ${TURBO_CC_BINARY_SRCS})
+  target_include_directories(${_NAME}
+          PUBLIC ${TURBO_COMMON_INCLUDE_DIRS}
+          PRIVATE ${GMOCK_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS}
+          )
+
+  if (${TURBO_BUILD_DLL})
+    target_compile_definitions(${_NAME}
+            PUBLIC
+            ${TURBO_CC_BINARY_DEFINES}
+            TURBO_CONSUME_DLL
+            GTEST_LINKED_AS_SHARED_LIBRARY=1
+            )
+
+    # Replace dependencies on targets inside the DLL with turbo_dll itself.
+    turbo_internal_dll_targets(
+            DEPS ${TURBO_CC_BINARY_DEPS}
+            OUTPUT TURBO_CC_BINARY_DEPS
+    )
+  else()
+    target_compile_definitions(${_NAME}
+            PUBLIC
+            ${TURBO_CC_BINARY_DEFINES}
+            )
+  endif()
+  target_compile_options(${_NAME}
+          PRIVATE ${TURBO_CC_LIB_COPTS}
+          )
+
+  target_link_libraries(${_NAME}
+          PUBLIC ${TURBO_CC_BINARY_DEPS}
+          PRIVATE ${TURBO_CC_BINARY_LINKOPTS}
+          )
+  # Add all Turbo targets to a folder in the IDE for organization.
+  set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/test)
+
+  if(TURBO_PROPAGATE_CXX_STD)
+    # Turbo libraries require C++14 as the current minimum standard.
+    # Top-level application CMake projects should ensure a consistent C++
+    # standard for all compiled sources by setting CMAKE_CXX_STANDARD.
+    _turbo_target_compile_features_if_available(${_NAME} PUBLIC ${TURBO_INTERNAL_CXX_STD_FEATURE})
+  else()
+    # Note: This is legacy (before CMake 3.8) behavior. Setting the
+    # target-level CXX_STANDARD property to TURBO_CXX_STANDARD (which is
+    # initialized by CMAKE_CXX_STANDARD) should have no real effect, since
+    # that is the default value anyway.
+    #
+    # CXX_STANDARD_REQUIRED does guard against the top-level CMake project
+    # not having enabled CMAKE_CXX_STANDARD_REQUIRED (which prevents
+    # "decaying" to an older standard if the requested one isn't available).
+    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${TURBO_CXX_STANDARD})
+    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+  endif()
+
 endfunction()

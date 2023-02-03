@@ -26,7 +26,7 @@
 #include "turbo/log/globals.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/memory/memory.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/string_view.h"
@@ -73,7 +73,7 @@ TEST(ScopedMockLogDeathTest, StopCapturingLogsCannotBeCalledWhenNotCapturing) {
 }
 #endif
 
-// Tests that ScopedMockLog intercepts LOG()s when it's alive.
+// Tests that ScopedMockLog intercepts TURBO_LOG()s when it's alive.
 TEST(ScopedMockLogTest, LogMockCatchAndMatchStrictExpectations) {
   turbo::ScopedMockLog log;
 
@@ -85,10 +85,10 @@ TEST(ScopedMockLogTest, LogMockCatchAndMatchStrictExpectations) {
   EXPECT_CALL(log, Log(turbo::LogSeverity::kError, _, "Bad!!"));
 
   log.StartCapturingLogs();
-  LOG(WARNING) << "Danger.";
-  LOG(INFO) << "Working...";
-  LOG(INFO) << "Working...";
-  LOG(ERROR) << "Bad!!";
+  TURBO_LOG(WARNING) << "Danger.";
+  TURBO_LOG(INFO) << "Working...";
+  TURBO_LOG(INFO) << "Working...";
+  TURBO_LOG(ERROR) << "Bad!!";
 }
 
 TEST(ScopedMockLogTest, LogMockCatchAndMatchSendExpectations) {
@@ -105,7 +105,7 @@ TEST(ScopedMockLogTest, LogMockCatchAndMatchSendExpectations) {
                  })))));
 
   log.StartCapturingLogs();
-  LOG(INFO)
+  TURBO_LOG(INFO)
           .AtLocation("/my/very/very/very_long_source_file.cc", 777)
           .WithThreadID(1234)
       << "Info message";
@@ -123,37 +123,37 @@ TEST(ScopedMockLogTest, ScopedMockLogCanBeNice) {
   log.StartCapturingLogs();
 
   // Any number of these are OK.
-  LOG(INFO) << "Info message.";
+  TURBO_LOG(INFO) << "Info message.";
   // Any number of these are OK.
-  LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
+  TURBO_LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
 
-  LOG(WARNING) << "Danger.";
-
-  // Any number of these are OK.
-  LOG(INFO) << "Info message.";
-  // Any number of these are OK.
-  LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
-
-  LOG(INFO) << "Working...";
+  TURBO_LOG(WARNING) << "Danger.";
 
   // Any number of these are OK.
-  LOG(INFO) << "Info message.";
+  TURBO_LOG(INFO) << "Info message.";
   // Any number of these are OK.
-  LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
+  TURBO_LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
 
-  LOG(INFO) << "Working...";
-
-  // Any number of these are OK.
-  LOG(INFO) << "Info message.";
-  // Any number of these are OK.
-  LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
-
-  LOG(ERROR) << "Bad!!";
+  TURBO_LOG(INFO) << "Working...";
 
   // Any number of these are OK.
-  LOG(INFO) << "Info message.";
+  TURBO_LOG(INFO) << "Info message.";
   // Any number of these are OK.
-  LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
+  TURBO_LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
+
+  TURBO_LOG(INFO) << "Working...";
+
+  // Any number of these are OK.
+  TURBO_LOG(INFO) << "Info message.";
+  // Any number of these are OK.
+  TURBO_LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
+
+  TURBO_LOG(ERROR) << "Bad!!";
+
+  // Any number of these are OK.
+  TURBO_LOG(INFO) << "Info message.";
+  // Any number of these are OK.
+  TURBO_LOG(WARNING).AtLocation("SomeOtherFile.cc", 100) << "Danger ";
 }
 
 // Tests that ScopedMockLog generates a test failure if a message is logged
@@ -166,9 +166,9 @@ TEST(ScopedMockLogTest, RejectsUnexpectedLogs) {
         EXPECT_CALL(log, Log(Lt(turbo::LogSeverity::kError), _, _))
             .Times(AnyNumber());
         log.StartCapturingLogs();
-        LOG(INFO) << "Ignored";
-        LOG(WARNING) << "Ignored";
-        LOG(ERROR) << "Should not be ignored";
+        TURBO_LOG(INFO) << "Ignored";
+        TURBO_LOG(WARNING) << "Ignored";
+        TURBO_LOG(ERROR) << "Should not be ignored";
       },
       "Should not be ignored");
 }
@@ -179,15 +179,15 @@ TEST(ScopedMockLogTest, CapturesLogsAfterStartCapturingLogs) {
 
   // The ScopedMockLog object shouldn't see these LOGs, as it hasn't
   // started capturing LOGs yet.
-  LOG(INFO) << "Ignored info";
-  LOG(WARNING) << "Ignored warning";
-  LOG(ERROR) << "Ignored error";
+  TURBO_LOG(INFO) << "Ignored info";
+  TURBO_LOG(WARNING) << "Ignored warning";
+  TURBO_LOG(ERROR) << "Ignored error";
 
   EXPECT_CALL(log, Log(turbo::LogSeverity::kInfo, _, "Expected info"));
   log.StartCapturingLogs();
 
   // Only this LOG will be seen by the ScopedMockLog.
-  LOG(INFO) << "Expected info";
+  TURBO_LOG(INFO) << "Expected info";
 }
 
 TEST(ScopedMockLogTest, DoesNotCaptureLogsAfterStopCapturingLogs) {
@@ -197,15 +197,15 @@ TEST(ScopedMockLogTest, DoesNotCaptureLogsAfterStopCapturingLogs) {
   log.StartCapturingLogs();
 
   // This LOG should be seen by the ScopedMockLog.
-  LOG(INFO) << "Expected info";
+  TURBO_LOG(INFO) << "Expected info";
 
   log.StopCapturingLogs();
 
   // The ScopedMockLog object shouldn't see these LOGs, as it has
   // stopped capturing LOGs.
-  LOG(INFO) << "Ignored info";
-  LOG(WARNING) << "Ignored warning";
-  LOG(ERROR) << "Ignored error";
+  TURBO_LOG(INFO) << "Ignored info";
+  TURBO_LOG(WARNING) << "Ignored warning";
+  TURBO_LOG(ERROR) << "Ignored error";
 }
 
 // Tests that all messages are intercepted regardless of issuing thread. The
@@ -223,11 +223,11 @@ TEST(ScopedMockLogTest, LogFromMultipleThreads) {
   turbo::Barrier barrier(2);
   std::thread thread1([&barrier]() {
     barrier.Block();
-    LOG(INFO) << "Thread 1";
+    TURBO_LOG(INFO) << "Thread 1";
   });
   std::thread thread2([&barrier]() {
     barrier.Block();
-    LOG(INFO) << "Thread 2";
+    TURBO_LOG(INFO) << "Thread 2";
   });
 
   thread1.join();
@@ -247,8 +247,8 @@ TEST(ScopedMockLogTest, NoSequenceWithMultipleThreads) {
 
   log.StartCapturingLogs();
 
-  std::thread thread1([]() { LOG(INFO) << "Thread 1"; });
-  std::thread thread2([]() { LOG(INFO) << "Thread 2"; });
+  std::thread thread1([]() { TURBO_LOG(INFO) << "Thread 1"; });
+  std::thread thread2([]() { TURBO_LOG(INFO) << "Thread 2"; });
 
   thread1.join();
   thread2.join();
@@ -267,7 +267,7 @@ TEST(ScopedMockLogTsanTest,
   std::thread thread([&logging_started]() {
     for (int i = 0; i < 100; ++i) {
       if (i == 50) logging_started.Notify();
-      LOG(INFO) << "Thread log";
+      TURBO_LOG(INFO) << "Thread log";
     }
   });
 
@@ -282,9 +282,9 @@ TEST(ScopedMockLogTest, AsLocalSink) {
   EXPECT_CALL(log, Log(_, _, "two"));
   EXPECT_CALL(log, Log(_, _, "three"));
 
-  LOG(INFO) << "one";
-  LOG(INFO).ToSinkOnly(&log.UseAsLocalSink()) << "two";
-  LOG(INFO).ToSinkAlso(&log.UseAsLocalSink()) << "three";
+  TURBO_LOG(INFO) << "one";
+  TURBO_LOG(INFO).ToSinkOnly(&log.UseAsLocalSink()) << "two";
+  TURBO_LOG(INFO).ToSinkAlso(&log.UseAsLocalSink()) << "three";
 }
 
 }  // namespace

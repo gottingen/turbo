@@ -23,7 +23,7 @@
 #include "turbo/base/log_severity.h"
 #include "turbo/log/globals.h"
 #include "turbo/log/internal/test_helpers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 
 namespace {
 using ::testing::AllOf;
@@ -48,7 +48,7 @@ TEST(StderrLogSinkDeathTest, InfoMessagesInStderr) {
   EXPECT_DEATH_IF_SUPPORTED(
       {
         turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
-        LOG(INFO) << "INFO message";
+        TURBO_LOG(INFO) << "INFO message";
         exit(1);
       },
       "INFO message");
@@ -58,7 +58,7 @@ TEST(StderrLogSinkDeathTest, WarningMessagesInStderr) {
   EXPECT_DEATH_IF_SUPPORTED(
       {
         turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
-        LOG(WARNING) << "WARNING message";
+        TURBO_LOG(WARNING) << "WARNING message";
         exit(1);
       },
       "WARNING message");
@@ -68,7 +68,7 @@ TEST(StderrLogSinkDeathTest, ErrorMessagesInStderr) {
   EXPECT_DEATH_IF_SUPPORTED(
       {
         turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
-        LOG(ERROR) << "ERROR message";
+        TURBO_LOG(ERROR) << "ERROR message";
         exit(1);
       },
       "ERROR message");
@@ -83,21 +83,21 @@ TEST(StderrLogSinkDeathTest, FatalMessagesInStderr) {
   EXPECT_DEATH_IF_SUPPORTED(
       {
         turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
-        LOG(FATAL) << message;
+        TURBO_LOG(FATAL) << message;
       },
       AllOf(HasSubstrTimes(message, expected_count), HasSubstr(stacktrace)));
 }
 
 TEST(StderrLogSinkDeathTest, SecondaryFatalMessagesInStderr) {
   auto MessageGen = []() -> std::string {
-    LOG(FATAL) << "Internal failure";
+    TURBO_LOG(FATAL) << "Internal failure";
     return "External failure";
   };
 
   EXPECT_DEATH_IF_SUPPORTED(
       {
         turbo::SetStderrThreshold(turbo::LogSeverityAtLeast::kInfo);
-        LOG(FATAL) << MessageGen();
+        TURBO_LOG(FATAL) << MessageGen();
       },
       "Internal failure");
 }

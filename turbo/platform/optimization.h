@@ -1,5 +1,5 @@
 //
-// Copyright 2017 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -149,6 +149,14 @@
 #else
 #define TURBO_CACHELINE_ALIGNED
 #endif
+
+namespace turbo {
+  // Struct: CachelineAligned
+  // Due to prefetch, we typically do 2x cacheline for the alignment.
+  template <typename T> struct CachelineAligned {
+    alignas(2 * TURBO_CACHELINE_SIZE) T data;
+  };
+}
 
 // TURBO_PREDICT_TRUE, TURBO_PREDICT_FALSE
 //

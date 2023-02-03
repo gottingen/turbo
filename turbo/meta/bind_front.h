@@ -1,4 +1,4 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ TURBO_NAMESPACE_BEGIN
 // Example: Binding arguments explicitly.
 //
 //   void LogStringView(std::string_view sv) {
-//     LOG(INFO) << sv;
+//     TURBO_LOG(INFO) << sv;
 //   }
 //
 //   Executor* e = Executor::DefaultExecutor();

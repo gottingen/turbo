@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ inline std::nullptr_t RawPtr(std::nullptr_t) { return nullptr; }
 //     auto up = turbo::make_unique<int>(10);
 //     auto sp = turbo::ShareUniquePtr(std::move(up));  // shared_ptr<int>
 //     CHECK_EQ(*sp, 10);
-//     CHECK(up == nullptr);
+//     TURBO_CHECK(up == nullptr);
 //
 // Note that this conversion is correct even when T is an array type, and more
 // generally it works for *any* deleter of the `unique_ptr` (single-object
@@ -151,7 +151,7 @@ std::shared_ptr<T> ShareUniquePtr(std::unique_ptr<T, D>&& ptr) {
 //    auto wp = turbo::WeakenPtr(sp);
 //    CHECK_EQ(sp.get(), wp.lock().get());
 //    sp.reset();
-//    CHECK(wp.lock() == nullptr);
+//    TURBO_CHECK(wp.lock() == nullptr);
 //
 template <typename T>
 std::weak_ptr<T> WeakenPtr(const std::shared_ptr<T>& ptr) {

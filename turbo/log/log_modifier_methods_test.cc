@@ -20,7 +20,7 @@
 #include "turbo/log/internal/test_actions.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/log.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/log_sink.h"
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/strings/match.h"
@@ -73,7 +73,7 @@ TEST(TailCallsModifiesTest, AtLocationFileLine) {
           })))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).AtLocation("/my/very/very/very_long_source_file.cc", 777)
+  TURBO_LOG(INFO).AtLocation("/my/very/very/very_long_source_file.cc", 777)
       << "hello world";
 }
 
@@ -84,7 +84,7 @@ TEST(TailCallsModifiesTest, NoPrefix) {
                                     TextMessageWithPrefix(Eq("hello world")))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).NoPrefix() << "hello world";
+  TURBO_LOG(INFO).NoPrefix() << "hello world";
 }
 
 TEST(TailCallsModifiesTest, NoPrefixNoMessageNoShirtNoShoesNoService) {
@@ -95,7 +95,7 @@ TEST(TailCallsModifiesTest, NoPrefixNoMessageNoShirtNoShoesNoService) {
                          TextMessageWithPrefix(IsEmpty()),
                          TextMessageWithPrefixAndNewline(Eq("\n")))));
   test_sink.StartCapturingLogs();
-  LOG(INFO).NoPrefix();
+  TURBO_LOG(INFO).NoPrefix();
 }
 
 TEST(TailCallsModifiesTest, WithVerbosity) {
@@ -104,7 +104,7 @@ TEST(TailCallsModifiesTest, WithVerbosity) {
   EXPECT_CALL(test_sink, Send(Verbosity(Eq(2))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).WithVerbosity(2) << "hello world";
+  TURBO_LOG(INFO).WithVerbosity(2) << "hello world";
 }
 
 TEST(TailCallsModifiesTest, WithVerbosityNoVerbosity) {
@@ -114,7 +114,7 @@ TEST(TailCallsModifiesTest, WithVerbosityNoVerbosity) {
               Send(Verbosity(Eq(turbo::LogEntry::kNoVerbosityLevel))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).WithVerbosity(2).WithVerbosity(turbo::LogEntry::kNoVerbosityLevel)
+  TURBO_LOG(INFO).WithVerbosity(2).WithVerbosity(turbo::LogEntry::kNoVerbosityLevel)
       << "hello world";
 }
 
@@ -124,7 +124,7 @@ TEST(TailCallsModifiesTest, WithTimestamp) {
   EXPECT_CALL(test_sink, Send(Timestamp(Eq(turbo::UnixEpoch()))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).WithTimestamp(turbo::UnixEpoch()) << "hello world";
+  TURBO_LOG(INFO).WithTimestamp(turbo::UnixEpoch()) << "hello world";
 }
 
 TEST(TailCallsModifiesTest, WithThreadID) {
@@ -134,14 +134,14 @@ TEST(TailCallsModifiesTest, WithThreadID) {
               Send(AllOf(ThreadID(Eq(turbo::LogEntry::tid_t{1234})))));
 
   test_sink.StartCapturingLogs();
-  LOG(INFO).WithThreadID(1234) << "hello world";
+  TURBO_LOG(INFO).WithThreadID(1234) << "hello world";
 }
 
 TEST(TailCallsModifiesTest, WithMetadataFrom) {
   class ForwardingLogSink : public turbo::LogSink {
    public:
     void Send(const turbo::LogEntry &entry) override {
-      LOG(LEVEL(entry.log_severity())).WithMetadataFrom(entry)
+      TURBO_LOG(LEVEL(entry.log_severity())).WithMetadataFrom(entry)
           << "forwarded: " << entry.text_message();
     }
   } forwarding_sink;
@@ -161,7 +161,7 @@ TEST(TailCallsModifiesTest, WithMetadataFrom) {
                                       value { str: "hello world" })pb")))));
 
   test_sink.StartCapturingLogs();
-  LOG(WARNING)
+  TURBO_LOG(WARNING)
           .AtLocation("fake/file", 123)
           .NoPrefix()
           .WithTimestamp(turbo::UnixEpoch())
@@ -201,7 +201,7 @@ TEST(TailCallsModifiesTest, WithPerror) {
 
   test_sink.StartCapturingLogs();
   errno = EBADF;
-  LOG(INFO).WithPerror() << "hello world";
+  TURBO_LOG(INFO).WithPerror() << "hello world";
 }
 
 #if GTEST_HAS_DEATH_TEST
@@ -212,7 +212,7 @@ TEST(ModifierMethodDeathTest, ToSinkOnlyQFatal) {
             turbo::MockLogDefault::kDisallowUnexpected);
 
         auto do_log = [&test_sink] {
-          LOG(QFATAL).ToSinkOnly(&test_sink.UseAsLocalSink()) << "hello world";
+          TURBO_LOG(QFATAL).ToSinkOnly(&test_sink.UseAsLocalSink()) << "hello world";
         };
 
         EXPECT_CALL(test_sink, Send)

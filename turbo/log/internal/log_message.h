@@ -173,7 +173,7 @@ class LogMessage {
   // because it breaks logging of non-integer bitfield types (i.e., enums).
 
  protected:
-  // Call `abort()` or similar to perform `LOG(FATAL)` crash.  It is assumed
+  // Call `abort()` or similar to perform `TURBO_LOG(FATAL)` crash.  It is assumed
   // that the caller has already generated and written the trace as appropriate.
   TURBO_ATTRIBUTE_NORETURN static void FailWithoutStackTrace();
 

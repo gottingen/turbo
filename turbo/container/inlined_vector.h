@@ -1,4 +1,4 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ TURBO_NAMESPACE_BEGIN
 // capacity, it will trigger an initial allocation on the heap, and will behave
 // as a `std::vector`. The API of the `turbo::InlinedVector` within this file is
 // designed to cover the same API footprint as covered by `std::vector`.
-template <typename T, size_t N, typename A = std::allocator<T>>
+template <typename T = int, size_t N = 2, typename A = std::allocator<T>>
 class InlinedVector {
   static_assert(N > 0, "`turbo::InlinedVector` requires an inlined capacity.");
 
