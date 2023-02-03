@@ -1416,6 +1416,57 @@ TEST(TrivallyRelocatable, Sanity) {
   EXPECT_TRUE(turbo::is_trivially_relocatable<TrivialAbi>::value);
 }
 
+
+// --------------------------------------------------------
+// Testcase: Reference Wrapper
+// --------------------------------------------------------
+
+TEST(typtraits, RefWrapper) {
+
+  static_assert(std::is_same<
+                    turbo::unwrap_reference_t<int>, int
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_reference_t<int&>, int&
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_reference_t<int&&>, int&&
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_reference_t<std::reference_wrapper<int>>, int&
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_reference_t<std::reference_wrapper<std::reference_wrapper<int>>>,
+                    std::reference_wrapper<int>&
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_ref_decay_t<int>, int
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_ref_decay_t<int&>, int
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_ref_decay_t<int&&>, int
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_ref_decay_t<std::reference_wrapper<int>>, int&
+                    >::value, "");
+
+  static_assert(std::is_same<
+                    turbo::unwrap_ref_decay_t<std::reference_wrapper<std::reference_wrapper<int>>>,
+                    std::reference_wrapper<int>&
+                    >::value, "");
+
+}
+
 #ifdef TURBO_HAVE_CONSTANT_EVALUATED
 
 constexpr int64_t NegateIfConstantEvaluated(int64_t i) {

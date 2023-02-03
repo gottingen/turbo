@@ -227,3 +227,16 @@ turbo_cc_test(
         GTest::gtest_main
 )
 
+turbo_cc_test(
+        NAME
+        uuid_test
+        SRCS
+        "uuid_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock
+        GTest::gtest_main
+)
+
