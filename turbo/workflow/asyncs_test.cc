@@ -1,7 +1,19 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
 
 // --------------------------------------------------------
 // Testcase: Async
@@ -26,33 +38,33 @@ void async(unsigned W) {
 
   executor.wait_for_all();
 
-  REQUIRE(counter == N);
+  EXPECT_TRUE(counter == N);
 
   int c = 0;
   for(auto& fu : fus) {
     c += fu.get().value();
   }
 
-  REQUIRE(-c == 2*N);
+  EXPECT_TRUE(-c == 2*N);
 }
 
-TEST_CASE("Async.1thread" * doctest::timeout(300)) {
+TEST(Async, 1thread) {
   async(1);
 }
 
-TEST_CASE("Async.2threads" * doctest::timeout(300)) {
+TEST(Async, 2threads) {
   async(2);
 }
 
-TEST_CASE("Async.4threads" * doctest::timeout(300)) {
+TEST(Async, 4threads) {
   async(4);
 }
 
-TEST_CASE("Async.8threads" * doctest::timeout(300)) {
+TEST(Async, 8threads) {
   async(8);
 }
 
-TEST_CASE("Async.16threads" * doctest::timeout(300)) {
+TEST(Async, 16threads) {
   async(16);
 }
 
@@ -88,33 +100,33 @@ void nested_async(unsigned W) {
 
   executor.wait_for_all();
 
-  REQUIRE(counter == 4*N);
+  EXPECT_TRUE(counter == 4*N);
 
   int c = 0;
   for(auto& fu : fus) {
     c += fu.get().value();
   }
 
-  REQUIRE(-c == 2*N);
+  EXPECT_TRUE(-c == 2*N);
 }
 
-TEST_CASE("NestedAsync.1thread" * doctest::timeout(300)) {
+TEST(NestedAsync, 1thread) {
   nested_async(1);
 }
 
-TEST_CASE("NestedAsync.2threads" * doctest::timeout(300)) {
+TEST(NestedAsync, 2threads) {
   nested_async(2);
 }
 
-TEST_CASE("NestedAsync.4threads" * doctest::timeout(300)) {
+TEST(NestedAsync, 4threads) {
   nested_async(4);
 }
 
-TEST_CASE("NestedAsync.8threads" * doctest::timeout(300)) {
+TEST(NestedAsync, 8threads) {
   nested_async(8);
 }
 
-TEST_CASE("NestedAsync.16threads" * doctest::timeout(300)) {
+TEST(NestedAsync, 16threads) {
   nested_async(16);
 }
 
@@ -163,27 +175,27 @@ void mixed_async(unsigned W) {
   executor.run(taskflow);
   executor.wait_for_all();
 
-  REQUIRE(counter == 4*N);
+  EXPECT_TRUE(counter == 4*N);
 
 }
 
-TEST_CASE("MixedAsync.1thread" * doctest::timeout(300)) {
+TEST(MixedAsync, 1thread) {
   mixed_async(1);
 }
 
-TEST_CASE("MixedAsync.2threads" * doctest::timeout(300)) {
+TEST(MixedAsync, 2threads) {
   mixed_async(2);
 }
 
-TEST_CASE("MixedAsync.4threads" * doctest::timeout(300)) {
+TEST(MixedAsync, 4threads) {
   mixed_async(4);
 }
 
-TEST_CASE("MixedAsync.8threads" * doctest::timeout(300)) {
+TEST(MixedAsync, 8threads) {
   mixed_async(8);
 }
 
-TEST_CASE("MixedAsync.16threads" * doctest::timeout(300)) {
+TEST(MixedAsync, 16threads) {
   mixed_async(16);
 }
 
@@ -242,18 +254,18 @@ void subflow_async(size_t W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == 405);
+  EXPECT_TRUE(counter == 405);
 }
 
-TEST_CASE("SubflowAsync.1thread") {
+TEST(SubflowAsync, 1thread) {
   subflow_async(1);
 }
 
-TEST_CASE("SubflowAsync.3threads") {
+TEST(SubflowAsync, 3threads) {
   subflow_async(3);
 }
 
-TEST_CASE("SubflowAsync.11threads") {
+TEST(SubflowAsync, 11threads) {
   subflow_async(11);
 }
 
@@ -290,21 +302,21 @@ void nested_subflow_async(size_t W) {
     });
 
     sf1.join();
-    REQUIRE(counter == 600);
+    EXPECT_TRUE(counter == 600);
   });
 
   executor.run(taskflow).wait();
-  REQUIRE(counter == 600);
+  EXPECT_TRUE(counter == 600);
 }
 
-TEST_CASE("NestedSubflowAsync.1thread") {
+TEST(NestedSubflowAsync, 1thread) {
   nested_subflow_async(1);
 }
 
-TEST_CASE("NestedSubflowAsync.3threads") {
+TEST(NestedSubflowAsync, 3threads) {
   nested_subflow_async(3);
 }
 
-TEST_CASE("NestedSubflowAsync.11threads") {
+TEST(NestedSubflowAsync, 11threads) {
   nested_subflow_async(11);
 }

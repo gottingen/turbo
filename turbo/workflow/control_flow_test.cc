@@ -1,13 +1,26 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+
+#include "turbo/workflow//workflow.h"
 
 // --------------------------------------------------------
 // Testcase: Conditional Tasking
 // --------------------------------------------------------
 
-TEST_CASE("Cond.Types") {
+TEST(Cond, Types) {
 
   turbo::Workflow taskflow;
 
@@ -25,8 +38,8 @@ TEST_CASE("Cond.Types") {
   static_assert(turbo::is_condition_task_v<decltype(explicit_c)>);
   static_assert(turbo::is_condition_task_v<decltype(implicit_c)>);
 
-  REQUIRE(explicit_task.type() == turbo::TaskType::CONDITION);
-  REQUIRE(implicit_task.type() == turbo::TaskType::CONDITION);
+  EXPECT_TRUE(explicit_task.type() == turbo::TaskType::CONDITION);
+  EXPECT_TRUE(implicit_task.type() == turbo::TaskType::CONDITION);
 }
 
 
@@ -68,29 +81,29 @@ void loop_cond(unsigned w) {
 
   auto A = taskflow.emplace([&] () { counter = 0; });
   auto B = taskflow.emplace([&] () mutable {
-      REQUIRE((++counter % 100) == (++state % 100));
+      EXPECT_TRUE((++counter % 100) == (++state % 100));
       return counter < 100 ? 0 : 1;
   });
   auto C = taskflow.emplace(
     [&] () {
-      REQUIRE(counter == 100);
+      EXPECT_TRUE(counter == 100);
       counter = 0;
   });
 
   A.precede(B);
   B.precede(B, C);
 
-  REQUIRE(A.num_strong_dependents() == 0);
-  REQUIRE(A.num_weak_dependents() == 0);
-  REQUIRE(A.num_dependents() == 0);
+  EXPECT_TRUE(A.num_strong_dependents() == 0);
+  EXPECT_TRUE(A.num_weak_dependents() == 0);
+  EXPECT_TRUE(A.num_dependents() == 0);
 
-  REQUIRE(B.num_strong_dependents() == 1);
-  REQUIRE(B.num_weak_dependents() == 1);
-  REQUIRE(B.num_dependents() == 2);
+  EXPECT_TRUE(B.num_strong_dependents() == 1);
+  EXPECT_TRUE(B.num_weak_dependents() == 1);
+  EXPECT_TRUE(B.num_dependents() == 2);
 
   executor.run(taskflow).wait();
-  REQUIRE(counter == 0);
-  REQUIRE(state == 100);
+  EXPECT_TRUE(counter == 0);
+  EXPECT_TRUE(state == 100);
 
   executor.run(taskflow);
   executor.run(taskflow);
@@ -99,22 +112,22 @@ void loop_cond(unsigned w) {
   executor.run_n(taskflow, 10);
   executor.wait_for_all();
 
-  REQUIRE(state == 1500);
+  EXPECT_TRUE(state == 1500);
 }
 
-TEST_CASE("LoopCond.1thread" * doctest::timeout(300)) {
+TEST(LoopCond, 1thread) {
   loop_cond(1);
 }
 
-TEST_CASE("LoopCond.2threads" * doctest::timeout(300)) {
+TEST(LoopCond, 2threads) {
   loop_cond(2);
 }
 
-TEST_CASE("LoopCond.3threads" * doctest::timeout(300)) {
+TEST(LoopCond, 3threads) {
   loop_cond(3);
 }
 
-TEST_CASE("LoopCond.4threads" * doctest::timeout(300)) {
+TEST(LoopCond, 4threads) {
   loop_cond(4);
 }
 
@@ -161,24 +174,24 @@ void flip_coin_cond(unsigned w) {
 
   average_steps = total_steps / (double)rounds;
 
-  REQUIRE(std::fabs(average_steps-32.0)<1.0);
+  EXPECT_TRUE(std::fabs(average_steps-32.0)<1.0);
 
   //taskflow.dump(std::cout);
 }
 
-TEST_CASE("FlipCoinCond.1thread" * doctest::timeout(300)) {
+TEST(FlipCoinCond, 1thread) {
   flip_coin_cond(1);
 }
 
-TEST_CASE("FlipCoinCond.2threads" * doctest::timeout(300)) {
+TEST(FlipCoinCond, 2threads) {
   flip_coin_cond(2);
 }
 
-TEST_CASE("FlipCoinCond.3threads" * doctest::timeout(300)) {
+TEST(FlipCoinCond, 3threads) {
   flip_coin_cond(3);
 }
 
-TEST_CASE("FlipCoinCond.4threads" * doctest::timeout(300)) {
+TEST(FlipCoinCond, 4threads) {
   flip_coin_cond(4);
 }
 
@@ -208,19 +221,19 @@ void cyclic_cond(unsigned w) {
   bool pass_T = false;
   std::vector<bool> pass(total_iteration, false);
   auto T = flow.emplace([&](){
-    REQUIRE(num_iterations == total_iteration); pass_T=true; }
+    EXPECT_TRUE(num_iterations == total_iteration); pass_T=true; }
   );
   auto branch = flow.emplace([&](){ return sel++; });
   A.precede(branch);
   for(size_t i=0; i<total_iteration; i++) {
     auto t = flow.emplace([&, i](){
       if(num_iterations < total_iteration) {
-        REQUIRE(!pass[i]);
+        EXPECT_TRUE(!pass[i]);
         pass[i] = true;
         return 0;
       }
       // The last node will come to here (last iteration)
-      REQUIRE(!pass[i]);
+      EXPECT_TRUE(!pass[i]);
       pass[i] = true;
       return 1;
     });
@@ -231,48 +244,48 @@ void cyclic_cond(unsigned w) {
 
   executor.run(flow).get();
 
-  REQUIRE(pass_T);
+  EXPECT_TRUE(pass_T);
   for(size_t i=0; i<pass.size(); i++) {
-    REQUIRE(pass[i]);
+    EXPECT_TRUE(pass[i]);
   }
 }
 
-TEST_CASE("CyclicCond.1thread" * doctest::timeout(300)) {
+TEST(CyclicCond, 1thread) {
   cyclic_cond(1);
 }
 
-TEST_CASE("CyclicCond.2threads" * doctest::timeout(300)) {
+TEST(CyclicCond, 2threads) {
   cyclic_cond(2);
 }
 
-TEST_CASE("CyclicCond.3threads" * doctest::timeout(300)) {
+TEST(CyclicCond, 3threads) {
   cyclic_cond(3);
 }
 
-TEST_CASE("CyclicCond.4threads" * doctest::timeout(300)) {
+TEST(CyclicCond, 4threads) {
   cyclic_cond(4);
 }
 
-TEST_CASE("CyclicCond.5threads" * doctest::timeout(300)) {
+TEST(CyclicCond, 5threads) {
   cyclic_cond(5);
 }
 
-TEST_CASE("CyclicCond.6threads" * doctest::timeout(300)) {
+TEST(CyclicCond, 6threads) {
   cyclic_cond(6);
 }
 
-TEST_CASE("CyclicCond.7threads" * doctest::timeout(300)) {
+TEST(CyclicCond, 7threads) {
   cyclic_cond(7);
 }
 
-TEST_CASE("CyclicCond.8threads" * doctest::timeout(300)) {
+TEST(CyclicCond, 8threads) {
   cyclic_cond(8);
 }
 
 // ----------------------------------------------------------------------------
 // BTreeCond
 // ----------------------------------------------------------------------------
-TEST_CASE("BTreeCondition" * doctest::timeout(300)) {
+TEST(BTreeCond, BTreeCondition) {
   for(unsigned w=1; w<=8; ++w) {
     for(int l=1; l<12; l++) {
       turbo::Workflow flow;
@@ -308,7 +321,7 @@ TEST_CASE("BTreeCondition" * doctest::timeout(300)) {
       turbo::Executor executor(w);
       executor.run(flow).wait();
 
-      REQUIRE(counter == (1<<((level+1)/2)) - 1);
+      EXPECT_TRUE(counter == (1<<((level+1)/2)) - 1);
     }
   }
 }
@@ -319,7 +332,7 @@ TEST_CASE("BTreeCondition" * doctest::timeout(300)) {
 //             |
 //             ---- > C
 
-TEST_CASE("DynamicBTreeCondition" * doctest::timeout(300)) {
+TEST(Cond, DynamicBTreeCondition) {
   for(unsigned w=1; w<=8; ++w) {
     std::atomic<int> counter {0};
     constexpr int max_depth = 6;
@@ -331,7 +344,7 @@ TEST_CASE("DynamicBTreeCondition" * doctest::timeout(300)) {
     turbo::Executor executor(w);
     executor.run_n(flow, 4).get();
     // Each run increments the counter by (2^(max_depth+1) - 1)
-    REQUIRE(counter.load() == ((1<<(max_depth+1)) - 1)*4);
+    EXPECT_TRUE(counter.load() == ((1<<(max_depth+1)) - 1)*4);
   }
 }
 
@@ -408,38 +421,38 @@ void nested_cond(unsigned w) {
   const int repeat = 10;
   executor.run_n(flow, repeat).get();
 
-  REQUIRE(counter == (inner_loop+1)*(mid_loop+1)*(outer_loop+1)*repeat);
+  EXPECT_TRUE(counter == (inner_loop+1)*(mid_loop+1)*(outer_loop+1)*repeat);
 }
 
-TEST_CASE("NestedCond.1thread" * doctest::timeout(300)) {
+TEST(NestedCond, 1thread) {
   nested_cond(1);
 }
 
-TEST_CASE("NestedCond.2threads" * doctest::timeout(300)) {
+TEST(NestedCond, 2threads) {
   nested_cond(2);
 }
 
-TEST_CASE("NestedCond.3threads" * doctest::timeout(300)) {
+TEST(NestedCond, 3threads) {
   nested_cond(3);
 }
 
-TEST_CASE("NestedCond.4threads" * doctest::timeout(300)) {
+TEST(NestedCond, 4threads) {
   nested_cond(4);
 }
 
-TEST_CASE("NestedCond.5threads" * doctest::timeout(300)) {
+TEST(NestedCond, 5threads) {
   nested_cond(5);
 }
 
-TEST_CASE("NestedCond.6threads" * doctest::timeout(300)) {
+TEST(NestedCond, 6threads) {
   nested_cond(6);
 }
 
-TEST_CASE("NestedCond.7threads" * doctest::timeout(300)) {
+TEST(NestedCond, 7threads) {
   nested_cond(7);
 }
 
-TEST_CASE("NestedCond.8threads" * doctest::timeout(300)) {
+TEST(NestedCond, 8threads) {
   nested_cond(8);
 }
 
@@ -477,7 +490,7 @@ void cond2cond(unsigned w) {
     return iteration_C2++;
   }).succeed(cond1).precede(cond1, A);
 
-  flow.emplace([](){ REQUIRE(false); }).succeed(cond1).name("B");
+  flow.emplace([](){ EXPECT_TRUE(false); }).succeed(cond1).name("B");
   flow.emplace([&](){
     iteration_C1 = 0;
     iteration_C2 = 0;
@@ -486,41 +499,41 @@ void cond2cond(unsigned w) {
   turbo::Executor executor(w);
   executor.run_n(flow, repeat).get();
 
-  REQUIRE(num_visit_A  == 3*repeat);
-  REQUIRE(num_visit_C1 == 4*repeat);
-  REQUIRE(num_visit_C2 == 3*repeat);
+  EXPECT_TRUE(num_visit_A  == 3*repeat);
+  EXPECT_TRUE(num_visit_C1 == 4*repeat);
+  EXPECT_TRUE(num_visit_C2 == 3*repeat);
 
 }
 
-TEST_CASE("Cond2Cond.1thread" * doctest::timeout(300)) {
+TEST(Cond2Cond, 1thread) {
   cond2cond(1);
 }
 
-TEST_CASE("Cond2Cond.2threads" * doctest::timeout(300)) {
+TEST(Cond2Cond, 2threads) {
   cond2cond(2);
 }
 
-TEST_CASE("Cond2Cond.3threads" * doctest::timeout(300)) {
+TEST(Cond2Cond, 3threads) {
   cond2cond(3);
 }
 
-TEST_CASE("Cond2Cond.4threads" * doctest::timeout(300)) {
+TEST(Cond2Cond, 4threads) {
   cond2cond(4);
 }
 
-TEST_CASE("Cond2Cond.5threads" * doctest::timeout(300)) {
+TEST(Cond2Cond, 5threads) {
   cond2cond(5);
 }
 
-TEST_CASE("Cond2Cond.6threads" * doctest::timeout(300)) {
+TEST(Cond2Cond, 6threads) {
   cond2cond(6);
 }
 
-TEST_CASE("Cond2Cond.7threads" * doctest::timeout(300)) {
+TEST(Cond2Cond, 7threads) {
   cond2cond(7);
 }
 
-TEST_CASE("Cond2Cond.8threads" * doctest::timeout(300)) {
+TEST(Cond2Cond, 8threads) {
   cond2cond(8);
 }
 
@@ -537,7 +550,7 @@ void hierarchical_condition(unsigned w) {
 
   auto c1A = tf1.emplace( [&](){ c1=0; } );
   auto c1B = tf1.emplace( [&, state=0] () mutable {
-    REQUIRE(state++ % 100 == c1 % 100);
+    EXPECT_TRUE(state++ % 100 == c1 % 100);
   });
   auto c1C = tf1.emplace( [&](){ return (++c1 < 100) ? 0 : 1; });
 
@@ -548,9 +561,9 @@ void hierarchical_condition(unsigned w) {
   c1B.name("c1B");
   c1C.name("c1C");
 
-  auto c2A = tf2.emplace( [&](){ REQUIRE(c2 == 100); c2 = 0; } );
+  auto c2A = tf2.emplace( [&](){ EXPECT_TRUE(c2 == 100); c2 = 0; } );
   auto c2B = tf2.emplace( [&, state=0] () mutable {
-      REQUIRE((state++ % 100) == (c2 % 100));
+      EXPECT_TRUE((state++ % 100) == (c2 % 100));
   });
   auto c2C = tf2.emplace( [&](){ return (++c2 < 100) ? 0 : 1; });
 
@@ -575,15 +588,15 @@ void hierarchical_condition(unsigned w) {
   }).name("loop2");
 
   auto sync = tf3.emplace([&](){
-    REQUIRE(c2==0);
-    REQUIRE(c2_repeat==100);
+    EXPECT_TRUE(c2==0);
+    EXPECT_TRUE(c2_repeat==100);
     c2_repeat = 0;
   }).name("sync");
 
   auto grab = tf3.emplace([&](){
-    REQUIRE(c1 == 100);
-    REQUIRE(c2 == 0);
-    REQUIRE(c2_repeat == 0);
+    EXPECT_TRUE(c1 == 100);
+    EXPECT_TRUE(c2 == 0);
+    EXPECT_TRUE(c2_repeat == 0);
   }).name("grab");
 
   auto mod0 = tf3.composed_of(tf0).name("module0");
@@ -613,35 +626,35 @@ void hierarchical_condition(unsigned w) {
   //tf3.dump(std::cout);
 }
 
-TEST_CASE("HierCondition.1thread" * doctest::timeout(300)) {
+TEST(HierCondition, 1thread) {
   hierarchical_condition(1);
 }
 
-TEST_CASE("HierCondition.2threads" * doctest::timeout(300)) {
+TEST(HierCondition, 2threads) {
   hierarchical_condition(2);
 }
 
-TEST_CASE("HierCondition.3threads" * doctest::timeout(300)) {
+TEST(HierCondition, 3threads) {
   hierarchical_condition(3);
 }
 
-TEST_CASE("HierCondition.4threads" * doctest::timeout(300)) {
+TEST(HierCondition, 4threads) {
   hierarchical_condition(4);
 }
 
-TEST_CASE("HierCondition.5threads" * doctest::timeout(300)) {
+TEST(HierCondition, 5threads) {
   hierarchical_condition(5);
 }
 
-TEST_CASE("HierCondition.6threads" * doctest::timeout(300)) {
+TEST(HierCondition, 6threads) {
   hierarchical_condition(6);
 }
 
-TEST_CASE("HierCondition.7threads" * doctest::timeout(300)) {
+TEST(HierCondition, 7threads) {
   hierarchical_condition(7);
 }
 
-TEST_CASE("HierCondition.8threads" * doctest::timeout(300)) {
+TEST(HierCondition, 8threads) {
   hierarchical_condition(8);
 }
 
@@ -664,7 +677,7 @@ void condition_subflow(unsigned W) {
 
   auto subflow = taskflow.emplace([&](turbo::Subflow& sf){
     sf.emplace([&, i](){
-      REQUIRE(i<I);
+      EXPECT_TRUE(i<I);
       data[i] = i*(i+1)/2*123;;
     }).name(std::to_string(i));
     sf.detach();
@@ -683,10 +696,10 @@ void condition_subflow(unsigned W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(taskflow.num_tasks() == 4 + I);
+  EXPECT_TRUE(taskflow.num_tasks() == 4 + I);
 
   for(size_t i=0; i<data.size(); ++i) {
-    REQUIRE(data[i] == i*(i+1)/2*123);
+    EXPECT_TRUE(data[i] == i*(i+1)/2*123);
     data[i] = 0;
   }
 
@@ -696,43 +709,43 @@ void condition_subflow(unsigned W) {
 
   executor.wait_for_all();
 
-  REQUIRE(taskflow.num_tasks() == 4 + I*100);
+  EXPECT_TRUE(taskflow.num_tasks() == 4 + I*100);
 
   for(size_t i=0; i<data.size(); ++i) {
-    REQUIRE(data[i] == i*(i+1)/2*123);
+    EXPECT_TRUE(data[i] == i*(i+1)/2*123);
   }
 
 }
 
-TEST_CASE("CondSubflow.1thread") {
+TEST(CondSubflow, 1thread) {
   condition_subflow(1);
 }
 
-TEST_CASE("CondSubflow.2threads") {
+TEST(CondSubflow, 2threads) {
   condition_subflow(2);
 }
 
-TEST_CASE("CondSubflow.3threads") {
+TEST(CondSubflow, 3threads) {
   condition_subflow(3);
 }
 
-TEST_CASE("CondSubflow.4threads") {
+TEST(CondSubflow, 4threads) {
   condition_subflow(4);
 }
 
-TEST_CASE("CondSubflow.5threads") {
+TEST(CondSubflow, 5threads) {
   condition_subflow(5);
 }
 
-TEST_CASE("CondSubflow.6threads") {
+TEST(CondSubflow, 6threads) {
   condition_subflow(6);
 }
 
-TEST_CASE("CondSubflow.7threads") {
+TEST(CondSubflow, 7threads) {
   condition_subflow(7);
 }
 
-TEST_CASE("CondSubflow.8threads") {
+TEST(CondSubflow, 8threads) {
   condition_subflow(8);
 }
 
@@ -740,7 +753,7 @@ TEST_CASE("CondSubflow.8threads") {
 // Multi-conditional tasking
 // ----------------------------------------------------------------------------
 
-TEST_CASE("MultiCond.Types") {
+TEST(MultiCond, Types) {
 
   turbo::Workflow taskflow;
 
@@ -759,8 +772,8 @@ TEST_CASE("MultiCond.Types") {
   static_assert(turbo::is_multi_condition_task_v<decltype(explicit_mc)>);
   static_assert(turbo::is_multi_condition_task_v<decltype(implicit_mc)>);
 
-  REQUIRE(explicit_task.type() == turbo::TaskType::CONDITION);
-  REQUIRE(implicit_task.type() == turbo::TaskType::CONDITION);
+  EXPECT_TRUE(explicit_task.type() == turbo::TaskType::CONDITION);
+  EXPECT_TRUE(implicit_task.type() == turbo::TaskType::CONDITION);
 }
 
 // ----------------------------------------------------------------------------
@@ -799,38 +812,38 @@ void multiple_branches(unsigned W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(2*ans == counter);
+  EXPECT_TRUE(2*ans == counter);
 }
 
-TEST_CASE("MultipleBranches.1thread") {
+TEST(MultipleBranches, 1thread) {
   multiple_branches(1);
 }
 
-TEST_CASE("MultipleBranches.2threads") {
+TEST(MultipleBranches, 2threads) {
   multiple_branches(2);
 }
 
-TEST_CASE("MultipleBranches.3threads") {
+TEST(MultipleBranches, 3threads) {
   multiple_branches(3);
 }
 
-TEST_CASE("MultipleBranches.4threads") {
+TEST(MultipleBranches, 4threads) {
   multiple_branches(4);
 }
 
-TEST_CASE("MultipleBranches.5threads") {
+TEST(MultipleBranches, 5threads) {
   multiple_branches(5);
 }
 
-TEST_CASE("MultipleBranches.6threads") {
+TEST(MultipleBranches, 6threads) {
   multiple_branches(6);
 }
 
-TEST_CASE("MultipleBranches.7threads") {
+TEST(MultipleBranches, 7threads) {
   multiple_branches(7);
 }
 
-TEST_CASE("MultipleBranches.8threads") {
+TEST(MultipleBranches, 8threads) {
   multiple_branches(8);
 }
 
@@ -897,38 +910,38 @@ void multiple_loops(unsigned W) {
 
   //taskflow.dump(std::cout);
 
-  REQUIRE(counter == 40);
+  EXPECT_TRUE(counter == 40);
 }
 
-TEST_CASE("MultipleLoops.1thread") {
+TEST(MultipleLoops, 1thread) {
   multiple_loops(1);
 }
 
-TEST_CASE("MultipleLoops.2threads") {
+TEST(MultipleLoops, 2threads) {
   multiple_loops(2);
 }
 
-TEST_CASE("MultipleLoops.3threads") {
+TEST(MultipleLoops, 3threads) {
   multiple_loops(3);
 }
 
-TEST_CASE("MultipleLoops.4threads") {
+TEST(MultipleLoops, 4threads) {
   multiple_loops(4);
 }
 
-TEST_CASE("MultipleLoops.5threads") {
+TEST(MultipleLoops, 5threads) {
   multiple_loops(5);
 }
 
-TEST_CASE("MultipleLoops.6threads") {
+TEST(MultipleLoops, 6threads) {
   multiple_loops(6);
 }
 
-TEST_CASE("MultipleLoops.7threads") {
+TEST(MultipleLoops, 7threads) {
   multiple_loops(7);
 }
 
-TEST_CASE("MultipleLoops.8threads") {
+TEST(MultipleLoops, 8threads) {
   multiple_loops(8);
 }
 
@@ -962,22 +975,22 @@ void binary_tree(unsigned w) {
 
   executor.run_n(taskflow, N).wait();
 
-  REQUIRE(((1<<N)-1)*N == counter);
+  EXPECT_TRUE(((1<<N)-1)*N == counter);
 }
 
-TEST_CASE("MultiCondBinaryTree.1thread") {
+TEST(MultiCondBinaryTree, 1thread) {
   binary_tree(1);
 }
 
-TEST_CASE("MultiCondBinaryTree.2threads") {
+TEST(MultiCondBinaryTree, 2threads) {
   binary_tree(2);
 }
 
-TEST_CASE("MultiCondBinaryTree.3threads") {
+TEST(MultiCondBinaryTree, 3threads) {
   binary_tree(3);
 }
 
-TEST_CASE("MultiCondBinaryTree.4threads") {
+TEST(MultiCondBinaryTree, 4threads) {
   binary_tree(4);
 }
 

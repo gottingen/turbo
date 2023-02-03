@@ -1,7 +1,19 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+#include "workflow.h"
 
 class CustomWorkerBehavior : public turbo::WorkerInterface {
 
@@ -30,7 +42,7 @@ class CustomWorkerBehavior : public turbo::WorkerInterface {
 
 };
 
-TEST_CASE("WorkerInterface" * doctest::timeout(300)) {
+TEST(Worker, Interface) {
 
   const size_t N = 10;
 
@@ -42,13 +54,13 @@ TEST_CASE("WorkerInterface" * doctest::timeout(300)) {
       turbo::Executor executor(n, std::make_shared<CustomWorkerBehavior>(counter, ids));
     }
 
-    REQUIRE(counter == n*2);
-    REQUIRE(ids.size() == n);
+    EXPECT_TRUE(counter == n*2);
+    EXPECT_TRUE(ids.size() == n);
 
     std::sort(ids.begin(), ids.end(), std::less<int>{});
 
     for(size_t i=0; i<n; i++) {
-      REQUIRE(ids[i] == i);
+      EXPECT_TRUE(ids[i] == i);
     }
   }
 
