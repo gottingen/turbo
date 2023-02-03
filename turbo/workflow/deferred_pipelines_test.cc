@@ -1,9 +1,20 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-
-#include <turbo/workflow/workflow.h>
-#include <turbo/workflow/algorithm/pipeline.h>
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
+#include "turbo/workflow/algorithm/pipeline.h"
 
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
@@ -56,26 +67,26 @@ void pipeline_1P_S_DeferPreviousToken(size_t L, unsigned w) {
               deferrals.push_back(pf.num_deferrals());
             break;
           }
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
         }
       }}
     );
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(collection1.size() == N);
+      EXPECT_TRUE(collection1.size() == N);
 
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection1[i] == i);
+        EXPECT_TRUE(collection1[i] == i);
       }
 
-      REQUIRE(deferrals.size() == N);
+      EXPECT_TRUE(deferrals.size() == N);
       for (size_t i = 0; i < deferrals.size(); ++i) {
         if (i == 0) {
-          REQUIRE(deferrals[i] == 0);
+          EXPECT_TRUE(deferrals[i] == 0);
         }
         else {
-          REQUIRE(deferrals[i] == 1);
+          EXPECT_TRUE(deferrals[i] == 1);
         }
       }
     }).name("test");
@@ -90,67 +101,67 @@ void pipeline_1P_S_DeferPreviousToken(size_t L, unsigned w) {
 }
 
 // one pipe (S)
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_1L_1W) {
   pipeline_1P_S_DeferPreviousToken(1, 1);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_1L_2W) {
   pipeline_1P_S_DeferPreviousToken(1, 2);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_1L_3W) {
   pipeline_1P_S_DeferPreviousToken(1, 3);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_1L_4W) {
   pipeline_1P_S_DeferPreviousToken(1, 4);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_2L_1W) {
   pipeline_1P_S_DeferPreviousToken(2, 1);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_2L_2W) {
   pipeline_1P_S_DeferPreviousToken(2, 2);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_2L_3W) {
   pipeline_1P_S_DeferPreviousToken(2, 3);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_2L_4W) {
   pipeline_1P_S_DeferPreviousToken(2, 4);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_3L_1W) {
   pipeline_1P_S_DeferPreviousToken(3, 1);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_3L_2W) {
   pipeline_1P_S_DeferPreviousToken(3, 2);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_3L_3W) {
   pipeline_1P_S_DeferPreviousToken(3, 3);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_3L_4W) {
   pipeline_1P_S_DeferPreviousToken(3, 4);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_4L_1W) {
   pipeline_1P_S_DeferPreviousToken(4, 1);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_4L_2W) {
   pipeline_1P_S_DeferPreviousToken(4, 2);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_4L_3W) {
   pipeline_1P_S_DeferPreviousToken(4, 3);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferPreviousToken.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferPreviousToken_4L_4W) {
   pipeline_1P_S_DeferPreviousToken(4, 4);
 }
 
@@ -206,12 +217,12 @@ void pipeline_2P_SS_DeferPreviousToken(size_t L, unsigned w) {
               deferrals1.push_back(pf.num_deferrals());          
             break;
           }
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
         }
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [&mybuffer, &mutex, &collection2, L, &deferrals2](auto& pf) mutable {
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(pf.token() % L == pf.line());
         {
           std::scoped_lock<std::mutex> lock(mutex);
           collection2.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
@@ -219,10 +230,10 @@ void pipeline_2P_SS_DeferPreviousToken(size_t L, unsigned w) {
         }
 
         if (pf.token() == 0) {
-          REQUIRE(pf.num_deferrals() == 0);
+          EXPECT_TRUE(pf.num_deferrals() == 0);
         }
         else {
-          REQUIRE(pf.num_deferrals() == 1);
+          EXPECT_TRUE(pf.num_deferrals() == 1);
         }
         //printf("Stage 2 : token %zu at line %zu\n", pf.token(), pf.line());
       }}
@@ -230,23 +241,23 @@ void pipeline_2P_SS_DeferPreviousToken(size_t L, unsigned w) {
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(collection1.size() == N);
-      REQUIRE(collection2.size() == N);
+      EXPECT_TRUE(collection1.size() == N);
+      EXPECT_TRUE(collection2.size() == N);
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection1[i] == i);
-        REQUIRE(collection2[i] == i);
+        EXPECT_TRUE(collection1[i] == i);
+        EXPECT_TRUE(collection2[i] == i);
       }
 
-      REQUIRE(deferrals1.size() == N);
-      REQUIRE(deferrals2.size() == N);
+      EXPECT_TRUE(deferrals1.size() == N);
+      EXPECT_TRUE(deferrals2.size() == N);
       for (size_t i = 0; i < deferrals1.size(); ++i) {
         if (i == 0) {
-          REQUIRE(deferrals1[i] == 0);
-          REQUIRE(deferrals2[i] == 0);
+          EXPECT_TRUE(deferrals1[i] == 0);
+          EXPECT_TRUE(deferrals2[i] == 0);
         }
         else {
-          REQUIRE(deferrals1[i] == 1);
-          REQUIRE(deferrals2[i] == 1);
+          EXPECT_TRUE(deferrals1[i] == 1);
+          EXPECT_TRUE(deferrals2[i] == 1);
         }
       }
     }).name("test");
@@ -263,67 +274,67 @@ void pipeline_2P_SS_DeferPreviousToken(size_t L, unsigned w) {
 }
 
 // two pipes (SS)
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_1L_1W) {
   pipeline_2P_SS_DeferPreviousToken(1, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_1L_2W) {
   pipeline_2P_SS_DeferPreviousToken(1, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_1L_3W) {
   pipeline_2P_SS_DeferPreviousToken(1, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_1L_4W) {
   pipeline_2P_SS_DeferPreviousToken(1, 4);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_2L_1W) {
   pipeline_2P_SS_DeferPreviousToken(2, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_2L_2W) {
   pipeline_2P_SS_DeferPreviousToken(2, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_2L_3W) {
   pipeline_2P_SS_DeferPreviousToken(2, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_2L_4W) {
   pipeline_2P_SS_DeferPreviousToken(2, 4);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_3L_1W) {
   pipeline_2P_SS_DeferPreviousToken(3, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_3L_2W) {
   pipeline_2P_SS_DeferPreviousToken(3, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_3L_3W) {
   pipeline_2P_SS_DeferPreviousToken(3, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_3L_4W) {
   pipeline_2P_SS_DeferPreviousToken(3, 4);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_4L_1W) {
   pipeline_2P_SS_DeferPreviousToken(4, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_4L_2W) {
   pipeline_2P_SS_DeferPreviousToken(4, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_4L_3W) {
   pipeline_2P_SS_DeferPreviousToken(4, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferPreviousToken.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferPreviousToken_4L_4W) {
   pipeline_2P_SS_DeferPreviousToken(4, 4);
 }
 
@@ -378,12 +389,12 @@ void pipeline_2P_SP_DeferPreviousToken(size_t L, unsigned w) {
               mybuffer[pf.line()][pf.pipe()] = pf.token();           
             break;
           }
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
         }
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL, [&mybuffer, &mutex, &collection2, L, &deferrals2](auto& pf) mutable {
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(pf.token() % L == pf.line());
         {
           std::scoped_lock<std::mutex> lock(mutex);
           collection2.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
@@ -391,10 +402,10 @@ void pipeline_2P_SP_DeferPreviousToken(size_t L, unsigned w) {
         }
 
         if (pf.token() == 0) {
-          REQUIRE(pf.num_deferrals() == 0);
+          EXPECT_TRUE(pf.num_deferrals() == 0);
         }
         else {
-          REQUIRE(pf.num_deferrals() == 1);
+          EXPECT_TRUE(pf.num_deferrals() == 1);
         }
     
         //printf("Stage 2 : token %zu at line %zu\n", pf.token(), pf.line());
@@ -403,25 +414,25 @@ void pipeline_2P_SP_DeferPreviousToken(size_t L, unsigned w) {
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(collection1.size() == N);
-      REQUIRE(collection2.size() == N);
+      EXPECT_TRUE(collection1.size() == N);
+      EXPECT_TRUE(collection2.size() == N);
       sort(collection2.begin(), collection2.end());
   
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection1[i] == i);
-        REQUIRE(collection2[i] == i);
+        EXPECT_TRUE(collection1[i] == i);
+        EXPECT_TRUE(collection2[i] == i);
       }
 
-      REQUIRE(deferrals1.size() == N);
-      REQUIRE(deferrals2.size() == N);
+      EXPECT_TRUE(deferrals1.size() == N);
+      EXPECT_TRUE(deferrals2.size() == N);
       for (size_t i = 0; i < N; ++i) {
         if (i == 0) {
-          REQUIRE(deferrals1[0] == 0);
-          REQUIRE(deferrals2[0] == 0);
+          EXPECT_TRUE(deferrals1[0] == 0);
+          EXPECT_TRUE(deferrals2[0] == 0);
         }
         else {
-          REQUIRE(deferrals1[i] == 1);
-          REQUIRE(deferrals2[i] == 1);
+          EXPECT_TRUE(deferrals1[i] == 1);
+          EXPECT_TRUE(deferrals2[i] == 1);
         }
       }
     }).name("test");
@@ -438,67 +449,67 @@ void pipeline_2P_SP_DeferPreviousToken(size_t L, unsigned w) {
 }
 
 // two pipes (SP)
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_1L_1W) {
   pipeline_2P_SP_DeferPreviousToken(1, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_1L_2W) {
   pipeline_2P_SP_DeferPreviousToken(1, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_1L_3W) {
   pipeline_2P_SP_DeferPreviousToken(1, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_1L_4W) {
   pipeline_2P_SP_DeferPreviousToken(1, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_2L_1W) {
   pipeline_2P_SP_DeferPreviousToken(2, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_2L_2W) {
   pipeline_2P_SP_DeferPreviousToken(2, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_2L_3W) {
   pipeline_2P_SP_DeferPreviousToken(2, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_2L_4W) {
   pipeline_2P_SP_DeferPreviousToken(2, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_3L_1W) {
   pipeline_2P_SP_DeferPreviousToken(3, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_3L_2W) {
   pipeline_2P_SP_DeferPreviousToken(3, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_3L_3W) {
   pipeline_2P_SP_DeferPreviousToken(3, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_3L_4W) {
   pipeline_2P_SP_DeferPreviousToken(3, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_4L_1W) {
   pipeline_2P_SP_DeferPreviousToken(4, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_4L_2W) {
   pipeline_2P_SP_DeferPreviousToken(4, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_4L_3W) {
   pipeline_2P_SP_DeferPreviousToken(4, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferPreviousToken.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferPreviousToken_4L_4W) {
   pipeline_2P_SP_DeferPreviousToken(4, 4);
 }
 
@@ -557,14 +568,14 @@ void pipeline_1P_S_DeferNextToken(size_t L, unsigned w, turbo::PipeType) {
     taskflow.composed_of(pl).name("module_of_pipeline");
     executor.run(taskflow).wait();
  
-    REQUIRE(deferrals.size() == N); 
+    EXPECT_TRUE(deferrals.size() == N); 
     for (size_t i = 0; i < deferrals.size()-1;++i) {
-      REQUIRE(deferrals[i] == 1);
+      EXPECT_TRUE(deferrals[i] == 1);
     }
-    REQUIRE(deferrals[deferrals.size()-1] == 0);
+    EXPECT_TRUE(deferrals[deferrals.size()-1] == 0);
 
     for (size_t i = 0; i < collection1.size(); ++i) {
-      REQUIRE(i + collection1[i] == N-1);
+      EXPECT_TRUE(i + collection1[i] == N-1);
     }
     
     collection1.clear();
@@ -573,67 +584,67 @@ void pipeline_1P_S_DeferNextToken(size_t L, unsigned w, turbo::PipeType) {
 }
 
 // one pipe 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_1L_1W) {
   pipeline_1P_S_DeferNextToken(1, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_1L_2W) {
   pipeline_1P_S_DeferNextToken(1, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_1L_3W) {
   pipeline_1P_S_DeferNextToken(1, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_1L_4W) {
   pipeline_1P_S_DeferNextToken(1, 4, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_2L_1W) {
   pipeline_1P_S_DeferNextToken(2, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_2L_2W) {
   pipeline_1P_S_DeferNextToken(2, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_2L_3W) {
   pipeline_1P_S_DeferNextToken(2, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_2L_4W) {
   pipeline_1P_S_DeferNextToken(2, 4, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_3L_1W) {
   pipeline_1P_S_DeferNextToken(3, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_3L_2W) {
   pipeline_1P_S_DeferNextToken(3, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_3L_3W) {
   pipeline_1P_S_DeferNextToken(3, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_3L_4W) {
   pipeline_1P_S_DeferNextToken(3, 4, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_4L_1W) {
   pipeline_1P_S_DeferNextToken(4, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_4L_2W) {
   pipeline_1P_S_DeferNextToken(4, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_4L_3W) {
   pipeline_1P_S_DeferNextToken(4, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).DeferNextToken.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_DeferNextToken_4L_4W) {
   pipeline_1P_S_DeferNextToken(4, 4, turbo::PipeType::SERIAL);
 }
 
@@ -706,18 +717,18 @@ void pipeline_2P_SS_DeferNextToken(size_t L, unsigned w, turbo::PipeType second_
     executor.run(taskflow).wait();
    
     for (size_t i = 0; i < collection1.size(); ++i) {
-      REQUIRE(i + collection1[i] == N-1);
-      REQUIRE(i + collection2[i] == N-1);
+      EXPECT_TRUE(i + collection1[i] == N-1);
+      EXPECT_TRUE(i + collection2[i] == N-1);
     }
     
-    REQUIRE(deferrals1.size() == N);
-    REQUIRE(deferrals2.size() == N);
+    EXPECT_TRUE(deferrals1.size() == N);
+    EXPECT_TRUE(deferrals2.size() == N);
     for (size_t i = 0; i < deferrals1.size()-1; ++i) {
-      REQUIRE(deferrals1[i] == 1);
-      REQUIRE(deferrals2[i] == 1);
+      EXPECT_TRUE(deferrals1[i] == 1);
+      EXPECT_TRUE(deferrals2[i] == 1);
     }
-    REQUIRE(deferrals1[deferrals1.size()-1] == 0);
-    REQUIRE(deferrals2[deferrals2.size()-1] == 0);
+    EXPECT_TRUE(deferrals1[deferrals1.size()-1] == 0);
+    EXPECT_TRUE(deferrals2[deferrals2.size()-1] == 0);
 
     collection1.clear();
     collection2.clear();
@@ -727,67 +738,67 @@ void pipeline_2P_SS_DeferNextToken(size_t L, unsigned w, turbo::PipeType second_
 }
 
 // two pipes 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_1L_1W) {
   pipeline_2P_SS_DeferNextToken(1, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_1L_2W) {
   pipeline_2P_SS_DeferNextToken(1, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_1L_3W) {
   pipeline_2P_SS_DeferNextToken(1, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_1L_4W) {
   pipeline_2P_SS_DeferNextToken(1, 4, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_2L_1W) {
   pipeline_2P_SS_DeferNextToken(2, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_2L_2W) {
   pipeline_2P_SS_DeferNextToken(2, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_2L_3W) {
   pipeline_2P_SS_DeferNextToken(2, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_2L_4W) {
   pipeline_2P_SS_DeferNextToken(2, 4, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_3L_1W) {
   pipeline_2P_SS_DeferNextToken(3, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_3L_2W) {
   pipeline_2P_SS_DeferNextToken(3, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_3L_3W) {
   pipeline_2P_SS_DeferNextToken(3, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_3L_4W) {
   pipeline_2P_SS_DeferNextToken(3, 4, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_4L_1W) {
   pipeline_2P_SS_DeferNextToken(4, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_4L_2W) {
   pipeline_2P_SS_DeferNextToken(4, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_4L_3W) {
   pipeline_2P_SS_DeferNextToken(4, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.2P(SS).DeferNextToken.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_DeferNextToken_4L_4W) {
   pipeline_2P_SS_DeferNextToken(4, 4, turbo::PipeType::SERIAL);
 }
 
@@ -863,18 +874,18 @@ void pipeline_2P_SP_DeferNextToken(size_t L, unsigned w) {
   
     sort(collection2.begin(), collection2.end()); 
     for (size_t i = 0; i < collection1.size(); ++i) {
-      REQUIRE(i + collection1[i] == N-1);
-      REQUIRE(collection2[i] == i);
+      EXPECT_TRUE(i + collection1[i] == N-1);
+      EXPECT_TRUE(collection2[i] == i);
     }
     
-    REQUIRE(deferrals1.size() == N);
-    REQUIRE(deferrals2.size() == N);
+    EXPECT_TRUE(deferrals1.size() == N);
+    EXPECT_TRUE(deferrals2.size() == N);
     for (size_t i = 0; i < deferrals1.size()-1; ++i) {
-      REQUIRE(deferrals1[i] == 1);
-      REQUIRE(deferrals2[i] == 1);
+      EXPECT_TRUE(deferrals1[i] == 1);
+      EXPECT_TRUE(deferrals2[i] == 1);
     }
-    REQUIRE(deferrals1[deferrals1.size()-1] == 0);
-    REQUIRE(deferrals2[deferrals2.size()-1] == 0);
+    EXPECT_TRUE(deferrals1[deferrals1.size()-1] == 0);
+    EXPECT_TRUE(deferrals2[deferrals2.size()-1] == 0);
     
     collection1.clear();
     collection2.clear();
@@ -884,67 +895,67 @@ void pipeline_2P_SP_DeferNextToken(size_t L, unsigned w) {
 }
 
 // two pipes 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_1L_1W) {
   pipeline_2P_SP_DeferNextToken(1, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_1L_2W) {
   pipeline_2P_SP_DeferNextToken(1, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_1L_3W) {
   pipeline_2P_SP_DeferNextToken(1, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_1L_4W) {
   pipeline_2P_SP_DeferNextToken(1, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_2L_1W) {
   pipeline_2P_SP_DeferNextToken(2, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_2L_2W) {
   pipeline_2P_SP_DeferNextToken(2, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_2L_3W) {
   pipeline_2P_SP_DeferNextToken(2, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_2L_4W) {
   pipeline_2P_SP_DeferNextToken(2, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_3L_1W) {
   pipeline_2P_SP_DeferNextToken(3, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_3L_2W) {
   pipeline_2P_SP_DeferNextToken(3, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_3L_3W) {
   pipeline_2P_SP_DeferNextToken(3, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_3L_4W) {
   pipeline_2P_SP_DeferNextToken(3, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_4L_1W) {
   pipeline_2P_SP_DeferNextToken(4, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_4L_2W) {
   pipeline_2P_SP_DeferNextToken(4, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_4L_3W) {
   pipeline_2P_SP_DeferNextToken(4, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).DeferNextToken.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_DeferNextToken_4L_4W) {
   pipeline_2P_SP_DeferNextToken(4, 4);
 }
 
@@ -1129,7 +1140,7 @@ void pipeline_1P_S_264VideoFormat(size_t L, unsigned w) {
         if (video[i].defers.size()) {
           it = std::find(collection1.begin(), collection1.end(), i);
           index_it = std::distance(collection1.begin(), it);
-          REQUIRE(it != collection1.end());
+          EXPECT_TRUE(it != collection1.end());
           //if (it == collection1.end()) {
           //  printf("Token %zu is missing\n", i);
           //}
@@ -1137,20 +1148,20 @@ void pipeline_1P_S_264VideoFormat(size_t L, unsigned w) {
             it_dep = std::find(collection1.begin(), collection1.end(), video[i].defers[j]);
             index_it_dep = std::distance(collection1.begin(), it_dep);
             
-            REQUIRE(it != collection1.end());
-            REQUIRE(it_dep != collection1.end());
-            REQUIRE(index_it_dep < index_it);
+            EXPECT_TRUE(it != collection1.end());
+            EXPECT_TRUE(it_dep != collection1.end());
+            EXPECT_TRUE(index_it_dep < index_it);
           }
         }
       }
 
-      REQUIRE(deferrals1.size() == N);
+      EXPECT_TRUE(deferrals1.size() == N);
       for (size_t i = 0; i < N; ++i) {
         if (video[i].type == 'I') {
-          REQUIRE(deferrals1[i] == 0);
+          EXPECT_TRUE(deferrals1[i] == 0);
         }
         else {
-          REQUIRE(deferrals1[i] == 1);
+          EXPECT_TRUE(deferrals1[i] == 1);
         }
       }
     }).name("test");
@@ -1164,52 +1175,52 @@ void pipeline_1P_S_264VideoFormat(size_t L, unsigned w) {
   }
 }
 
-TEST_CASE("Pipeline.1P(S).264VideoFormat.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_1L_1W) {
   pipeline_1P_S_264VideoFormat(1,1);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_1L_2W) {
   pipeline_1P_S_264VideoFormat(1,2);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_1L_3W) {
   pipeline_1P_S_264VideoFormat(1,3);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_1L_4W) {
   pipeline_1P_S_264VideoFormat(1,4);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_2L_1W) {
   pipeline_1P_S_264VideoFormat(2,1);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_2L_2W) {
   pipeline_1P_S_264VideoFormat(2,2);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_2L_3W) {
   pipeline_1P_S_264VideoFormat(2,3);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_2L_4W) {
   pipeline_1P_S_264VideoFormat(2,4);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_3L_1W) {
   pipeline_1P_S_264VideoFormat(3,1);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_3L_2W) {
   pipeline_1P_S_264VideoFormat(3,2);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_3L_3W) {
   pipeline_1P_S_264VideoFormat(3,3);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_3L_4W) {
   pipeline_1P_S_264VideoFormat(3,4);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_4L_1W) {
   pipeline_1P_S_264VideoFormat(4,1);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_4L_2W) {
   pipeline_1P_S_264VideoFormat(4,2);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_4L_3W) {
   pipeline_1P_S_264VideoFormat(4,3);
 }
-TEST_CASE("Pipeline.1P(S).264VideoFormat.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1P_S_264VideoFormat_4L_4W) {
   pipeline_1P_S_264VideoFormat(4,4);
 }
 
@@ -1321,7 +1332,7 @@ void pipeline_2P_SS_264VideoFormat(size_t L, unsigned w) {
       //printf("N = %zu and collection1.size() = %zu\n", N, collection1.size());
       for (size_t i = 0; i < collection1.size(); ++i) {
         //printf("collection1[%zu]=%zu, collection2[%zu]=%zu\n", i, collection1[i], i, collection2[i]);
-        REQUIRE(collection1[i] == collection2[i]);
+        EXPECT_TRUE(collection1[i] == collection2[i]);
       }
 
       for (size_t i = 0; i < N; ++i) {
@@ -1340,23 +1351,23 @@ void pipeline_2P_SS_264VideoFormat(size_t L, unsigned w) {
             it_dep = std::find(collection1.begin(), collection1.end(), video[i].defers[j]);
             index_it_dep = std::distance(collection1.begin(), it_dep);
             
-            REQUIRE(it != collection1.end());
-            REQUIRE(it_dep != collection1.end());
-            REQUIRE(index_it_dep < index_it);
+            EXPECT_TRUE(it != collection1.end());
+            EXPECT_TRUE(it_dep != collection1.end());
+            EXPECT_TRUE(index_it_dep < index_it);
           }
         }
       }
 
-      REQUIRE(deferrals1.size() == N);
-      REQUIRE(deferrals2.size() == N);
+      EXPECT_TRUE(deferrals1.size() == N);
+      EXPECT_TRUE(deferrals2.size() == N);
       for (size_t i = 0; i < N; ++i) {
         if (video[i].type == 'I') {
-          REQUIRE(deferrals1[i] == 0);
-          REQUIRE(deferrals2[i] == 0);
+          EXPECT_TRUE(deferrals1[i] == 0);
+          EXPECT_TRUE(deferrals2[i] == 0);
         }
         else {
-          REQUIRE(deferrals1[i] == 1);
-          REQUIRE(deferrals2[i] == 1);
+          EXPECT_TRUE(deferrals1[i] == 1);
+          EXPECT_TRUE(deferrals2[i] == 1);
         }
       }
     }).name("test");
@@ -1372,52 +1383,52 @@ void pipeline_2P_SS_264VideoFormat(size_t L, unsigned w) {
   }
 }
 
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_1L_1W) {
   pipeline_2P_SS_264VideoFormat(1,1);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_1L_2W) {
   pipeline_2P_SS_264VideoFormat(1,2);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_1L_3W) {
   pipeline_2P_SS_264VideoFormat(1,3);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_1L_4W) {
   pipeline_2P_SS_264VideoFormat(1,4);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_2L_1W) {
   pipeline_2P_SS_264VideoFormat(2,1);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_2L_2W) {
   pipeline_2P_SS_264VideoFormat(2,2);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_2L_3W) {
   pipeline_2P_SS_264VideoFormat(2,3);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_2L_4W) {
   pipeline_2P_SS_264VideoFormat(2,4);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_3L_1W) {
   pipeline_2P_SS_264VideoFormat(3,1);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_3L_2W) {
   pipeline_2P_SS_264VideoFormat(3,2);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_3L_3W) {
   pipeline_2P_SS_264VideoFormat(3,3);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_3L_4W) {
   pipeline_2P_SS_264VideoFormat(3,4);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_4L_1W) {
   pipeline_2P_SS_264VideoFormat(4,1);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_4L_2W) {
   pipeline_2P_SS_264VideoFormat(4,2);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_4L_3W) {
   pipeline_2P_SS_264VideoFormat(4,3);
 }
-TEST_CASE("Pipeline.2P(SS).264VideoFormat.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_SS_264VideoFormat_4L_4W) {
   pipeline_2P_SS_264VideoFormat(4,4);
 }
 
@@ -1528,8 +1539,8 @@ void pipeline_2P_SP_264VideoFormat(size_t L, unsigned w) {
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(collection1.size() == N);
-      REQUIRE(collection2.size() == N);
+      EXPECT_TRUE(collection1.size() == N);
+      EXPECT_TRUE(collection2.size() == N);
 
       for (size_t i = 0; i < N; ++i) {
         std::vector<size_t>::iterator it;
@@ -1541,22 +1552,22 @@ void pipeline_2P_SP_264VideoFormat(size_t L, unsigned w) {
           for (size_t j = 0; j < video[i].defers.size(); ++j) {
             it_dep = std::find(collection1.begin(), collection1.end(), video[i].defers[j]);
             
-            REQUIRE(it != collection1.end());
-            REQUIRE(it_dep != collection1.end());
+            EXPECT_TRUE(it != collection1.end());
+            EXPECT_TRUE(it_dep != collection1.end());
           }
         }
       }
 
-      REQUIRE(deferrals1.size() == N);
-      REQUIRE(deferrals2.size() == N);
+      EXPECT_TRUE(deferrals1.size() == N);
+      EXPECT_TRUE(deferrals2.size() == N);
       for (size_t i = 0; i < N; ++i) {
         if (video[i].type == 'I') {
-          REQUIRE(deferrals1[i] == 0);
-          REQUIRE(deferrals2[i] == 0);
+          EXPECT_TRUE(deferrals1[i] == 0);
+          EXPECT_TRUE(deferrals2[i] == 0);
         }
         else {
-          REQUIRE(deferrals1[i] == 1);
-          REQUIRE(deferrals2[i] == 1);
+          EXPECT_TRUE(deferrals1[i] == 1);
+          EXPECT_TRUE(deferrals2[i] == 1);
         }
       }
 
@@ -1573,52 +1584,52 @@ void pipeline_2P_SP_264VideoFormat(size_t L, unsigned w) {
   }
 }
 
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_1L_1W) {
   pipeline_2P_SP_264VideoFormat(1,1);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_1L_2W) {
   pipeline_2P_SP_264VideoFormat(1,2);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_1L_3W) {
   pipeline_2P_SP_264VideoFormat(1,3);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_1L_4W) {
   pipeline_2P_SP_264VideoFormat(1,4);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_2L_1W) {
   pipeline_2P_SP_264VideoFormat(2,1);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_2L_2W) {
   pipeline_2P_SP_264VideoFormat(2,2);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_2L_3W) {
   pipeline_2P_SP_264VideoFormat(2,3);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_2L_4W) {
   pipeline_2P_SP_264VideoFormat(2,4);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_3L_1W) {
   pipeline_2P_SP_264VideoFormat(3,1);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_3L_2W) {
   pipeline_2P_SP_264VideoFormat(3,2);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_3L_3W) {
   pipeline_2P_SP_264VideoFormat(3,3);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_3L_4W) {
   pipeline_2P_SP_264VideoFormat(3,4);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_4L_1W) {
   pipeline_2P_SP_264VideoFormat(4,1);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_4L_2W) {
   pipeline_2P_SP_264VideoFormat(4,2);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_4L_3W) {
   pipeline_2P_SP_264VideoFormat(4,3);
 }
-TEST_CASE("Pipeline.2P(SP).264VideoFormat.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2p_PS_264VideoFormat_4L_4W) {
   pipeline_2P_SP_264VideoFormat(4,4);
 }
 
@@ -1757,9 +1768,9 @@ void pipeline_3P_SPP_264VideoFormat(size_t L, unsigned w) {
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(collection1.size() == N);
-      REQUIRE(collection2.size() == N);
-      REQUIRE(collection3.size() == N);
+      EXPECT_TRUE(collection1.size() == N);
+      EXPECT_TRUE(collection2.size() == N);
+      EXPECT_TRUE(collection3.size() == N);
 
       for (size_t i = 0; i < N; ++i) {
         std::vector<size_t>::iterator it;
@@ -1771,36 +1782,36 @@ void pipeline_3P_SPP_264VideoFormat(size_t L, unsigned w) {
           for (size_t j = 0; j < video[i].defers.size(); ++j) {
             it_dep = std::find(collection1.begin(), collection1.end(), video[i].defers[j]);
             
-            REQUIRE(it != collection1.end());
-            REQUIRE(it_dep != collection1.end());
+            EXPECT_TRUE(it != collection1.end());
+            EXPECT_TRUE(it_dep != collection1.end());
           }
         }
       }
 
-      REQUIRE(deferrals1.size() == N);
-      REQUIRE(deferrals2.size() == N);
-      REQUIRE(deferrals3.size() == N);
+      EXPECT_TRUE(deferrals1.size() == N);
+      EXPECT_TRUE(deferrals2.size() == N);
+      EXPECT_TRUE(deferrals3.size() == N);
       for (size_t i = 0; i < N; ++i) {
         if (video[i].type == 'I') {
-          REQUIRE(deferrals1[i] == 0);
-          REQUIRE(deferrals2[i] == 0);
-          REQUIRE(deferrals3[i] == 0);
+          EXPECT_TRUE(deferrals1[i] == 0);
+          EXPECT_TRUE(deferrals2[i] == 0);
+          EXPECT_TRUE(deferrals3[i] == 0);
         }
         else if (video[i].type == 'P') {
-          REQUIRE(deferrals1[i] == 1);
-          REQUIRE(deferrals2[i] == 1);
-          REQUIRE(deferrals3[i] == 1);
+          EXPECT_TRUE(deferrals1[i] == 1);
+          EXPECT_TRUE(deferrals2[i] == 1);
+          EXPECT_TRUE(deferrals3[i] == 1);
         }
         else {
           if (video[i].b_defer == true) {
-            REQUIRE(deferrals1[i] == 2);
-            REQUIRE(deferrals2[i] == 2);
-            REQUIRE(deferrals3[i] == 2);
+            EXPECT_TRUE(deferrals1[i] == 2);
+            EXPECT_TRUE(deferrals2[i] == 2);
+            EXPECT_TRUE(deferrals3[i] == 2);
           }
           else {
-            REQUIRE(deferrals1[i] == 1);
-            REQUIRE(deferrals2[i] == 1);
-            REQUIRE(deferrals3[i] == 1);
+            EXPECT_TRUE(deferrals1[i] == 1);
+            EXPECT_TRUE(deferrals2[i] == 1);
+            EXPECT_TRUE(deferrals3[i] == 1);
           }
         }
       }
@@ -1820,52 +1831,52 @@ void pipeline_3P_SPP_264VideoFormat(size_t L, unsigned w) {
   }
 }
 
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_1L_1W) {
   pipeline_3P_SPP_264VideoFormat(1,1);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_1L_2W) {
   pipeline_3P_SPP_264VideoFormat(1,2);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_1L_3W) {
   pipeline_3P_SPP_264VideoFormat(1,3);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_1L_4W) {
   pipeline_3P_SPP_264VideoFormat(1,4);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_2L_1W) {
   pipeline_3P_SPP_264VideoFormat(2,1);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_2L_2W) {
   pipeline_3P_SPP_264VideoFormat(2,2);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_2L_3W) {
   pipeline_3P_SPP_264VideoFormat(2,3);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_2L_4W) {
   pipeline_3P_SPP_264VideoFormat(2,4);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_3L_1W) {
   pipeline_3P_SPP_264VideoFormat(3,1);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_3L_2W) {
   pipeline_3P_SPP_264VideoFormat(3,2);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_3L_3W) {
   pipeline_3P_SPP_264VideoFormat(3,3);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_3L_4W) {
   pipeline_3P_SPP_264VideoFormat(3,4);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_4L_1W) {
   pipeline_3P_SPP_264VideoFormat(4,1);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_4L_2W) {
   pipeline_3P_SPP_264VideoFormat(4,2);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_4L_3W) {
   pipeline_3P_SPP_264VideoFormat(4,3);
 }
-TEST_CASE("Pipeline.3P(SPP).264VideoFormat.4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3P_SPP_264VideoFormat_4L_4W) {
   pipeline_3P_SPP_264VideoFormat(4,4);
 }
 
