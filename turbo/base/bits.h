@@ -171,6 +171,25 @@ using std::has_single_bit;
 
 #endif
 
+// Compute log2(n) using integer operations.
+// While std::log2 is more accurate than std::log(n) / std::log(2), for
+// very large numbers--those close to std::numeric_limits<uint64_t>::max() - 2,
+// for instance--std::log2 rounds up rather than down, which introduces
+// definite skew in the results.
+template <class T>
+TURBO_INTERNAL_CONSTEXPR_CLZ inline
+    typename std::enable_if<std::is_unsigned<T>::value, int>::type
+log2_floor(T n) {
+  return (n <= 1) ? 0 : (std::numeric_limits<T>::digits - 1 - countl_zero(n));
+}
+
+template <class T>
+TURBO_INTERNAL_CONSTEXPR_CLZ inline
+    typename std::enable_if<std::is_unsigned<T>::value, int>::type
+log2_ceil(T n) {
+  return (n <= 1) ? 0 : (std::numeric_limits<T>::digits - countl_zero(n - 1));
+}
+
 TURBO_NAMESPACE_END
 }  // namespace turbo
 

@@ -218,7 +218,5 @@ namespace turbo {
         return task;
     }
 
-}  // end of namespace turbo -----------------------------------------------------
-
-
+}  // namespace turbo
 

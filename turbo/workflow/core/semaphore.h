@@ -57,14 +57,14 @@ for(auto & task : tasks) {  // each task acquires and release the semaphore
 executor.run(workflow).wait();
 @endcode
 
-The above example creates five tasks with no dependencies between them.
-Under normal circumstances, the five tasks would be executed concurrently.
-However, this example has a semaphore with initial count 1,
-and all tasks need to acquire that semaphore before running and release that
-semaphore after they are done.
-This arrangement limits the number of concurrently running tasks to only one.
+    The above example creates five tasks with no dependencies between them.
+    Under normal circumstances, the five tasks would be executed concurrently.
+    However, this example has a semaphore with initial count 1,
+    and all tasks need to acquire that semaphore before running and release that
+    semaphore after they are done.
+    This arrangement limits the number of concurrently running tasks to only one.
 
-*/
+    */
     class Semaphore {
 
         friend class Node;

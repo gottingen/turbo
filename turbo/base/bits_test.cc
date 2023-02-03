@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "bits.h"
+#include "turbo/base/bits.h"
 
 #include <limits>
 
@@ -567,6 +567,59 @@ static_assert(TURBO_INTERNAL_HAS_CONSTEXPR_POPCOUNT,
 static_assert(TURBO_INTERNAL_HAS_CONSTEXPR_CLZ, "clz should be constexpr");
 static_assert(TURBO_INTERNAL_HAS_CONSTEXPR_CTZ, "ctz should be constexpr");
 #endif
+
+
+TEST(FastMathTest, IntLog2FloorTest) {
+  constexpr uint64_t kZero = 0;
+  EXPECT_EQ(0, log2_floor(uint64_t{0}));  // boundary. return 0.
+  EXPECT_EQ(0, log2_floor(uint64_t{1}));
+  EXPECT_EQ(1, log2_floor(uint64_t{2}));
+  EXPECT_EQ(63, log2_floor(~kZero));
+  
+  // A boundary case: Converting 0xffffffffffffffff requires > 53
+  // bits of precision, so the conversion to double rounds up,
+  // and the result of std::log2(x) > log2_floor(x).
+  EXPECT_LT(log2_floor(~kZero), static_cast<int>(std::log2(~kZero)));
+
+  for (int i = 0; i < 64; i++) {
+    const uint64_t i_pow_2 = static_cast<uint64_t>(1) << i;
+    EXPECT_EQ(i, log2_floor(i_pow_2));
+    EXPECT_EQ(i, static_cast<int>(std::log2(i_pow_2)));
+
+    uint64_t y = i_pow_2;
+    for (int j = i - 1; j > 0; --j) {
+      y = y | (i_pow_2 >> j);
+      EXPECT_EQ(i, log2_floor(y));
+    }
+  }
+}
+
+TEST(FastMathTest, IntLog2CeilTest) {
+  constexpr uint64_t kZero = 0;
+  EXPECT_EQ(0, log2_ceil(uint64_t{0}));  // boundary. return 0.
+  EXPECT_EQ(0, log2_ceil(uint64_t{1}));
+  EXPECT_EQ(1, log2_ceil(uint64_t{2}));
+  EXPECT_EQ(64, log2_ceil(~kZero));
+
+  // A boundary case: Converting 0xffffffffffffffff requires > 53
+  // bits of precision, so the conversion to double rounds up,
+  // and the result of std::log2(x) > log2_floor(x).
+  EXPECT_LE(log2_ceil(~kZero), static_cast<int>(std::log2(~kZero)));
+
+  for (int i = 0; i < 64; i++) {
+    const uint64_t i_pow_2 = static_cast<uint64_t>(1) << i;
+    EXPECT_EQ(i, log2_ceil(i_pow_2));
+#ifndef TURBO_RANDOM_INACCURATE_LOG2
+    EXPECT_EQ(i, static_cast<int>(std::ceil(std::log2(i_pow_2))));
+#endif
+
+    uint64_t y = i_pow_2;
+    for (int j = i - 1; j > 0; --j) {
+      y = y | (i_pow_2 >> j);
+      EXPECT_EQ(i + 1, log2_ceil(y));
+    }
+  }
+}
 
 }  // namespace
 TURBO_NAMESPACE_END

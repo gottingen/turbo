@@ -4,19 +4,6 @@
 
 namespace turbo {
 
-
-/**
-@brief returns floor(log2(n)), assumes n > 0
-*/
-template<typename T>
-constexpr int log2(T n) {
-  int log = 0;
-  while (n >>= 1) {
-    ++log;
-  }
-  return log;
-}
-
 /**
 @brief finds the median of three numbers of dereferenced iterators using
        the given comparator

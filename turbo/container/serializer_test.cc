@@ -1,7 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest.h"
-#include <turbo/workflow/utility/serializer.h>
+#include "turbo/container/serializer.h"
+#include "gtest/gtest.h"
 #include <random>
 
 // ----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ void test_pod() {
     o_double
   );
 
-  //REQUIRE(o_sz == os.out_avail());
+  //EXPECT_TRUE(o_sz == os.out_avail());
 
   // InputStreamBuffer
   std::istringstream is(os.str());
@@ -145,15 +145,15 @@ void test_pod() {
     i_float,
     i_double
   );
-  REQUIRE(is.rdbuf()->in_avail() == 0);
+  EXPECT_TRUE(is.rdbuf()->in_avail() == 0);
 
-  REQUIRE(i_sz == o_sz);
-  REQUIRE(o_uint32 == i_uint32);
-  REQUIRE(o_int32 == i_int32);
-  REQUIRE(o_uint64 == i_uint64);
-  REQUIRE(o_int64 == i_int64);
-  REQUIRE(o_float == i_float);
-  REQUIRE(o_double == i_double);
+  EXPECT_TRUE(i_sz == o_sz);
+  EXPECT_TRUE(o_uint32 == i_uint32);
+  EXPECT_TRUE(o_int32 == i_int32);
+  EXPECT_TRUE(o_uint64 == i_uint64);
+  EXPECT_TRUE(o_int64 == i_int64);
+  EXPECT_TRUE(o_float == i_float);
+  EXPECT_TRUE(o_double == i_double);
 }
 
 // Procedure: test_struct
@@ -171,16 +171,16 @@ void test_struct() {
     std::ostringstream os;
     turbo::Serializer oar(os);
     auto o_sz = oar(o_pods);
-    //REQUIRE(o_sz == os.out_avail());
+    //EXPECT_TRUE(o_sz == os.out_avail());
 
     // Inputstream
     std::istringstream is(os.str());
     turbo::Deserializer iar(is);
     auto i_sz = iar(i_pods);
-    REQUIRE(is.rdbuf()->in_avail() == 0);
+    EXPECT_TRUE(is.rdbuf()->in_avail() == 0);
 
-    REQUIRE(o_sz == i_sz);
-    REQUIRE(o_pods == i_pods);
+    EXPECT_TRUE(o_sz == i_sz);
+    EXPECT_TRUE(o_pods == i_pods);
   }
 }
 
@@ -197,7 +197,7 @@ void test_string() {
 
     T o_char_str = random<T>();
     auto o_sz = oar(o_char_str);
-    //REQUIRE(o_sz == os.out_avail());
+    //EXPECT_TRUE(o_sz == os.out_avail());
 
     // Inputstream
     std::istringstream is(os.str());
@@ -205,10 +205,10 @@ void test_string() {
 
     T i_char_str;
     auto i_sz = iar(i_char_str);
-    REQUIRE(is.rdbuf()->in_avail() == 0);
+    EXPECT_TRUE(is.rdbuf()->in_avail() == 0);
 
-    REQUIRE(o_sz == i_sz);
-    REQUIRE(o_char_str == i_char_str);
+    EXPECT_TRUE(o_sz == i_sz);
+    EXPECT_TRUE(o_char_str == i_char_str);
   }
 }
 
@@ -249,14 +249,14 @@ for(size_t i=0; i<64; i++) {                                   \
                                                                \
   auto i_sz = iar(i_int32s, i_int64s, i_chars, i_floats, i_doubles, i_strings, i_podses);\
                                    \
-  REQUIRE(o_sz == i_sz);           \
-  REQUIRE(o_int32s == i_int32s);   \
-  REQUIRE(o_int64s == i_int64s);   \
-  REQUIRE(o_chars == i_chars);     \
-  REQUIRE(o_floats == i_floats);   \
-  REQUIRE(o_doubles == i_doubles); \
-  REQUIRE(o_strings == i_strings); \
-  REQUIRE(o_podses == i_podses);   \
+  EXPECT_TRUE(o_sz == i_sz);           \
+  EXPECT_TRUE(o_int32s == i_int32s);   \
+  EXPECT_TRUE(o_int64s == i_int64s);   \
+  EXPECT_TRUE(o_chars == i_chars);     \
+  EXPECT_TRUE(o_floats == i_floats);   \
+  EXPECT_TRUE(o_doubles == i_doubles); \
+  EXPECT_TRUE(o_strings == i_strings); \
+  EXPECT_TRUE(o_podses == i_podses);   \
 }
 
 
@@ -296,15 +296,15 @@ for (size_t i = 0; i < 64; i++) {                                              \
   std::container<std::string, std::string> i_strings;                            \
                                                                                  \
   auto i_sz = iar(i_int32s, i_int64s, i_chars, i_floats, i_doubles , i_strings); \
-  REQUIRE(0 == is.rdbuf()->in_avail());                                          \
+  EXPECT_TRUE(0 == is.rdbuf()->in_avail());                                          \
                                                                                  \
-  REQUIRE(o_sz == i_sz);                                                         \
-  REQUIRE(o_int32s == i_int32s);                                                 \
-  REQUIRE(o_int64s == i_int64s);                                                 \
-  REQUIRE(o_chars == i_chars);                                                   \
-  REQUIRE(o_floats == i_floats);                                                 \
-  REQUIRE(o_doubles == i_doubles);                                               \
-  REQUIRE(o_strings == i_strings);                                               \
+  EXPECT_TRUE(o_sz == i_sz);                                                         \
+  EXPECT_TRUE(o_int32s == i_int32s);                                                 \
+  EXPECT_TRUE(o_int64s == i_int64s);                                                 \
+  EXPECT_TRUE(o_chars == i_chars);                                                   \
+  EXPECT_TRUE(o_floats == i_floats);                                                 \
+  EXPECT_TRUE(o_doubles == i_doubles);                                               \
+  EXPECT_TRUE(o_strings == i_strings);                                               \
 }
 
 
@@ -343,15 +343,15 @@ for (size_t i = 0; i < 64; i++) {                                             \
   std::container<std::string> i_strings;                                        \
                                                                                 \
   auto i_sz = iar(i_int32s, i_int64s, i_chars, i_floats, i_doubles, i_strings); \
-  REQUIRE(0 == is.rdbuf()->in_avail());                                         \
+  EXPECT_TRUE(0 == is.rdbuf()->in_avail());                                         \
                                                                                 \
-  REQUIRE(o_sz == i_sz);                                                        \
-  REQUIRE(o_int32s == i_int32s);                                                \
-  REQUIRE(o_int64s == i_int64s);                                                \
-  REQUIRE(o_chars == i_chars);                                                  \
-  REQUIRE(o_floats == i_floats);                                                \
-  REQUIRE(o_doubles == i_doubles);                                              \
-  REQUIRE(o_strings == i_strings);                                              \
+  EXPECT_TRUE(o_sz == i_sz);                                                        \
+  EXPECT_TRUE(o_int32s == i_int32s);                                                \
+  EXPECT_TRUE(o_int64s == i_int64s);                                                \
+  EXPECT_TRUE(o_chars == i_chars);                                                  \
+  EXPECT_TRUE(o_floats == i_floats);                                                \
+  EXPECT_TRUE(o_doubles == i_doubles);                                              \
+  EXPECT_TRUE(o_strings == i_strings);                                              \
 }
 
 // Procedure: test_array
@@ -385,13 +385,13 @@ void test_array() {
     turbo::Deserializer iar(is);
 
     auto isz = iar(ichar, iint, idouble, istring);
-    REQUIRE(0 == is.rdbuf()->in_avail());
+    EXPECT_TRUE(0 == is.rdbuf()->in_avail());
 
-    REQUIRE(osz == isz);
-    REQUIRE(ochar == ichar);
-    REQUIRE(oint == iint);
-    REQUIRE(odouble == idouble);
-    REQUIRE(ostring == istring);
+    EXPECT_TRUE(osz == isz);
+    EXPECT_TRUE(ochar == ichar);
+    EXPECT_TRUE(oint == iint);
+    EXPECT_TRUE(odouble == idouble);
+    EXPECT_TRUE(ostring == istring);
   }
 }
 
@@ -429,14 +429,14 @@ void test_variant() {
     std::istringstream is(os.str());
     turbo::Deserializer iar(is);
     auto isz = iar(ipod1, ipod2, ipod3, imix2, irec2);
-    REQUIRE(0 == is.rdbuf()->in_avail());
+    EXPECT_TRUE(0 == is.rdbuf()->in_avail());
 
-    REQUIRE(osz == isz);
-    REQUIRE(opod1 == ipod1);
-    REQUIRE(opod2 == ipod2);
-    REQUIRE(opod3 == ipod3);
-    REQUIRE(omix2 == imix2);
-    REQUIRE(orec2 == irec2);
+    EXPECT_TRUE(osz == isz);
+    EXPECT_TRUE(opod1 == ipod1);
+    EXPECT_TRUE(opod2 == ipod2);
+    EXPECT_TRUE(opod3 == ipod3);
+    EXPECT_TRUE(omix2 == imix2);
+    EXPECT_TRUE(orec2 == irec2);
   }
 }
 
@@ -470,15 +470,15 @@ void test_time_point() {
     turbo::Deserializer iar(is);
     auto isz = iar(i_tpt1, i_tpt2, i_tpt3, i_dur1, i_dur2, i_dur3);
 
-    REQUIRE(0 == is.rdbuf()->in_avail());
-    REQUIRE(osz == isz);
+    EXPECT_TRUE(0 == is.rdbuf()->in_avail());
+    EXPECT_TRUE(osz == isz);
 
-    REQUIRE(o_tpt1 == i_tpt1);
-    REQUIRE(o_tpt2 == i_tpt2);
-    REQUIRE(o_tpt3 == i_tpt3);
-    REQUIRE(o_dur1 == i_dur1);
-    REQUIRE(o_dur2 == i_dur2);
-    REQUIRE(o_dur3 == i_dur3);
+    EXPECT_TRUE(o_tpt1 == i_tpt1);
+    EXPECT_TRUE(o_tpt2 == i_tpt2);
+    EXPECT_TRUE(o_tpt3 == i_tpt3);
+    EXPECT_TRUE(o_dur1 == i_dur1);
+    EXPECT_TRUE(o_dur2 == i_dur2);
+    EXPECT_TRUE(o_dur3 == i_dur3);
   }
 }
 
@@ -502,13 +502,13 @@ void test_optional() {
     std::istringstream is(os.str());
     turbo::Deserializer iar(is);
     auto isz = iar(i_nbool, i_ybool, i_nstr, i_ystr);
-    REQUIRE(0 == is.rdbuf()->in_avail());
-    REQUIRE(osz == isz);
+    EXPECT_TRUE(0 == is.rdbuf()->in_avail());
+    EXPECT_TRUE(osz == isz);
 
-    REQUIRE(o_nbool == i_nbool);
-    REQUIRE(o_ybool == i_ybool);
-    REQUIRE(o_nstr == i_nstr);
-    REQUIRE(o_ystr == i_ystr);
+    EXPECT_TRUE(o_nbool == i_nbool);
+    EXPECT_TRUE(o_ybool == i_ybool);
+    EXPECT_TRUE(o_nstr == i_nstr);
+    EXPECT_TRUE(o_ystr == i_ystr);
   }
 }
 
@@ -533,90 +533,90 @@ void test_tuple() {
     turbo::Deserializer iar(is);
     auto isz = iar(i0, i1, i2, i3, i4);
 
-    REQUIRE(0 == is.rdbuf()->in_avail());
-    REQUIRE(osz == isz);
+    EXPECT_TRUE(0 == is.rdbuf()->in_avail());
+    EXPECT_TRUE(osz == isz);
 
-    REQUIRE(o0 == i0);
-    REQUIRE(o1 == i1);
-    REQUIRE(o2 == i2);
-    REQUIRE(o3 == i3);
-    REQUIRE(o4 == i4);
+    EXPECT_TRUE(o0 == i0);
+    EXPECT_TRUE(o1 == i1);
+    EXPECT_TRUE(o2 == i2);
+    EXPECT_TRUE(o3 == i3);
+    EXPECT_TRUE(o4 == i4);
   }
 }
 
 // ----------------------------------------------------------------------------
 
 // POD
-TEST_CASE("POD" * doctest::timeout(300)) {
+TEST(serializer, POD) {
   test_pod();
 }
 
 // POD-struct
-TEST_CASE("POD-Struct" * doctest::timeout(300)) {
+TEST(serializer, POD_Struct) {
   test_struct();
 }
 
 // std::string
-TEST_CASE("string" * doctest::timeout(300)) {
+TEST(serializer, string) {
   test_string<std::string>();
 }
 
 // std::vector
-TEST_CASE("vector" * doctest::timeout(300)) {
+TEST(serializer, std_vector) {
   TEST_SEQ_CONT_BODY(vector)
 }
 
 // std::deque
-TEST_CASE("deque" * doctest::timeout(300)) {
+TEST(serializer, deque) {
   TEST_SEQ_CONT_BODY(deque)
 }
 
 // std::list
-TEST_CASE("list" * doctest::timeout(300)) {
+TEST(serializer, list) {
   TEST_SEQ_CONT_BODY(list)
 }
 
 // std::forward_list
-TEST_CASE("forward_list" * doctest::timeout(300)) {
+TEST(serializer, forward_list) {
   TEST_SEQ_CONT_BODY(forward_list)
 }
 
 // std::map
-TEST_CASE("map" * doctest::timeout(300)) {
+TEST(serializer, map) {
   TEST_MAP_CONT_BODY(map);
 }
 
 // std::unordered_map
-TEST_CASE("unordered_map" * doctest::timeout(300)) {
+TEST(serializer, unordered_map) {
   TEST_MAP_CONT_BODY(unordered_map);
 }
 
 // std::set
-TEST_CASE("set" * doctest::timeout(300)) {
+TEST(serializer, set) {
   TEST_SET_CONT_BODY(set);
 }
 
 // std::unordered_set
-TEST_CASE("unordered_set" * doctest::timeout(300)) {
+TEST(serializer, unordered_set) {
   TEST_SET_CONT_BODY(unordered_set);
 }
 
 // std::array
-TEST_CASE("array" * doctest::timeout(300)) {
+TEST(serializer, array) {
   test_array();
 }
 
 // std::chrono::time_point
-TEST_CASE("time_point" * doctest::timeout(300)) {
+TEST(serializer, time_point) {
   test_time_point();
 }
 
 // std::optional
-TEST_CASE("optional" * doctest::timeout(300)) {
+TEST(serializer, optional) {
   test_optional();
 }
 
 // std::tuple
-TEST_CASE("tuple" * doctest::timeout(300)) {
+TEST(serializer, tuple) {
   test_tuple();
 }

@@ -28,18 +28,6 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace random_internal {
 
-// Compute log2(n) using integer operations.
-// While std::log2 is more accurate than std::log(n) / std::log(2), for
-// very large numbers--those close to std::numeric_limits<uint64_t>::max() - 2,
-// for instance--std::log2 rounds up rather than down, which introduces
-// definite skew in the results.
-inline int IntLog2Floor(uint64_t n) {
-  return (n <= 1) ? 0 : (63 - countl_zero(n));
-}
-inline int IntLog2Ceil(uint64_t n) {
-  return (n <= 1) ? 0 : (64 - countl_zero(n - 1));
-}
-
 inline double StirlingLogFactorial(double n) {
   assert(n >= 1);
   // Using Stirling's approximation.

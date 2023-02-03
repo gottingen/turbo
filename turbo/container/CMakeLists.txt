@@ -544,3 +544,15 @@ turbo_cc_test(
     turbo::turbo
     GTest::gmock_main
 )
+
+turbo_cc_test(
+        NAME
+        serializer_test
+        SRCS
+        "serializer_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)

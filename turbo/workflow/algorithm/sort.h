@@ -1,6 +1,7 @@
 #pragma once
 
 #include "turbo/workflow/core/executor.h"
+#include "turbo/base/bits.h"
 
 namespace turbo {
 
@@ -418,11 +419,11 @@ namespace turbo {
         //sf.join();
     }
 
-// ----------------------------------------------------------------------------
-// turbo::Workflow::sort
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // turbo::Workflow::sort
+    // ----------------------------------------------------------------------------
 
-// Function: sort
+    // Function: sort
     template<typename B, typename E, typename C>
     Task FlowBuilder::sort(B beg, E end, C cmp) {
 
@@ -449,7 +450,7 @@ namespace turbo {
             }
 
             //parallel_3wqsort(sf, beg, end-1, cmp);
-            parallel_pdqsort(sf, beg, end, cmp, log2(end - beg));
+            parallel_pdqsort(sf, beg, end, cmp, turbo::log2_floor(static_cast<uint64_t>(end - beg)));
 
             sf.join();
         });
@@ -457,7 +458,7 @@ namespace turbo {
         return task;
     }
 
-// Function: sort
+    // Function: sort
     template<typename B, typename E>
     Task FlowBuilder::sort(B beg, E end) {
         using value_type = std::decay_t<decltype(*std::declval<B>())>;
