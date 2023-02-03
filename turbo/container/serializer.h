@@ -41,6 +41,11 @@
 #include <variant>
 #include <optional>
 #include "turbo/platform/macros.h"
+#include "turbo/container/flat_hash_map.h"
+#include "turbo/container/flat_hash_set.h"
+#include "turbo/container/btree_map.h"
+#include "turbo/container/btree_set.h"
+#include "turbo/container/inlined_vector.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -77,6 +82,19 @@ struct is_std_vector <std::vector<ArgsT...>> : std::true_type {};
 
 template <typename T>
 constexpr bool is_std_vector_v = is_std_vector<T>::value;
+
+// turbo::InlinedVector
+template <typename T>
+struct is_inlined_vector : std::false_type {};
+
+template <typename... ArgsT>
+struct is_inlined_vector <turbo::InlinedVector<ArgsT...>> : std::true_type {};
+
+template <typename T, size_t N, typename A>
+struct is_inlined_vector <turbo::InlinedVector<T,N,A>> : std::true_type {};
+
+template <typename T>
+constexpr bool is_inlined_vector_v = is_inlined_vector<T>::value;
 
 // std::deque
 template <typename T>
@@ -329,6 +347,7 @@ constexpr auto is_default_serializable_v = (
   std::is_enum_v<T>          ||
   is_std_basic_string_v<T>   ||
   is_std_vector_v<T>         ||
+  is_inlined_vector_v<T>     ||
   is_std_deque_v<T>          ||
   is_std_list_v<T>           ||
   is_std_forward_list_v<T>   ||
@@ -376,7 +395,8 @@ class Serializer {
     SizeType _save(T&&);
 
     template <typename T,
-      std::enable_if_t<is_std_vector_v<std::decay_t<T>>, void>* = nullptr
+      std::enable_if_t<is_std_vector_v<std::decay_t<T>>||
+                     is_inlined_vector_v<std::decay_t<T>>, void>* = nullptr
     >
     SizeType _save(T&&);
 
@@ -493,7 +513,7 @@ SizeType Serializer<Stream, SizeType>::_save(T&& t) {
 // std::vector
 template <typename Stream, typename SizeType>
 template <typename T,
-  std::enable_if_t<is_std_vector_v<std::decay_t<T>>, void>*
+  std::enable_if_t<is_std_vector_v<std::decay_t<T>> || is_inlined_vector_v<std::decay_t<T>>, void>*
 >
 SizeType Serializer<Stream, SizeType>::_save(T&& t) {
 
@@ -685,6 +705,7 @@ constexpr auto is_default_deserializable_v =
   std::is_enum_v<T>          ||
   is_std_basic_string_v<T>   ||
   is_std_vector_v<T>         ||
+  is_inlined_vector_v<T>     ||
   is_std_deque_v<T>          ||
   is_std_list_v<T>           ||
   is_std_forward_list_v<T>   ||
@@ -739,7 +760,7 @@ class Deserializer {
     SizeType _load(T&&);
 
     template <typename T,
-      std::enable_if_t<is_std_vector_v<std::decay_t<T>>, void>* = nullptr
+      std::enable_if_t<is_std_vector_v<std::decay_t<T>> || is_inlined_vector_v<std::decay_t<T>>, void>* = nullptr
     >
     SizeType _load(T&&);
 
@@ -878,7 +899,7 @@ SizeType Deserializer<Stream, SizeType>::_load(T&& t) {
 // std::vector
 template <typename Stream, typename SizeType>
 template <typename T,
-  std::enable_if_t<is_std_vector_v<std::decay_t<T>>, void>*
+  std::enable_if_t<is_std_vector_v<std::decay_t<T>> || is_inlined_vector_v<std::decay_t<T>>, void>*
 >
 SizeType Deserializer<Stream, SizeType>::_load(T&& t) {
 

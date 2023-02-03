@@ -219,13 +219,13 @@ for(size_t i=0; i<64; i++) {                                   \
   std::ostringstream os;                                       \
   turbo::Serializer oar(os);                                      \
                                                                \
-  std::container <int>     o_int32s  (num_data);               \
-  std::container <long long>     o_int64s  (num_data);         \
-  std::container <char>        o_chars   (num_data);           \
-  std::container <float>       o_floats  (num_data);           \
-  std::container <double>      o_doubles (num_data);           \
-  std::container <std::string> o_strings (num_data);           \
-  std::container <PODs>        o_podses  (num_data);           \
+  container <int>     o_int32s  (num_data);               \
+  container <long long>     o_int64s  (num_data);         \
+  container <char>        o_chars   (num_data);           \
+  container <float>       o_floats  (num_data);           \
+  container <double>      o_doubles (num_data);           \
+  container <std::string> o_strings (num_data);           \
+  container <PODs>        o_podses  (num_data);           \
                                                                \
   for(auto& v : o_int32s)  v = random<int>();                  \
   for(auto& v : o_int64s)  v = random<long long>();            \
@@ -239,13 +239,13 @@ for(size_t i=0; i<64; i++) {                                   \
   std::istringstream is(os.str());                             \
   turbo::Deserializer iar(is);                                    \
                                                                \
-  std::container <int>     i_int32s;                           \
-  std::container <long long>     i_int64s;                     \
-  std::container <char>        i_chars;                        \
-  std::container <float>       i_floats;                       \
-  std::container <double>      i_doubles;                      \
-  std::container <std::string> i_strings;                      \
-  std::container <PODs>        i_podses;                       \
+  container <int>     i_int32s;                           \
+  container <long long>     i_int64s;                     \
+  container <char>        i_chars;                        \
+  container <float>       i_floats;                       \
+  container <double>      i_doubles;                      \
+  container <std::string> i_strings;                      \
+  container <PODs>        i_podses;                       \
                                                                \
   auto i_sz = iar(i_int32s, i_int64s, i_chars, i_floats, i_doubles, i_strings, i_podses);\
                                    \
@@ -563,22 +563,29 @@ TEST(serializer, string) {
 
 // std::vector
 TEST(serializer, std_vector) {
-  TEST_SEQ_CONT_BODY(vector)
+  TEST_SEQ_CONT_BODY(std::vector)
+}
+
+// turbo::InlinedVector
+TEST(serializer, InlinedVector) {
+    TEST_SEQ_CONT_BODY(turbo::InlinedVector)
+    auto v = turbo::is_inlined_vector_v< turbo::InlinedVector<PODs, 2> >;
+    EXPECT_TRUE(v);
 }
 
 // std::deque
 TEST(serializer, deque) {
-  TEST_SEQ_CONT_BODY(deque)
+  TEST_SEQ_CONT_BODY(std::deque)
 }
 
 // std::list
 TEST(serializer, list) {
-  TEST_SEQ_CONT_BODY(list)
+  TEST_SEQ_CONT_BODY(std::list)
 }
 
 // std::forward_list
 TEST(serializer, forward_list) {
-  TEST_SEQ_CONT_BODY(forward_list)
+  TEST_SEQ_CONT_BODY(std::forward_list)
 }
 
 // std::map
