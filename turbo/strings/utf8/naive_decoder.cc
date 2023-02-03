@@ -21,6 +21,7 @@
 #include "turbo/strings/utf8/naive_decoder.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 
 static constexpr uint32_t UTF8_MAX = 0x7FFFFFFFu;
@@ -81,4 +82,5 @@ ptrdiff_t NaiveDecoder(unsigned char const* s_ptr,
 }
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo

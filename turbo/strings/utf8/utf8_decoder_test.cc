@@ -25,7 +25,7 @@
 #include <turbo/strings/utf8/codec.h>
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 namespace {
 uint64_t NowNanos() {
   static constexpr uint64_t kSecondsToNanos = 1000ULL * 1000ULL * 1000ULL;
@@ -185,5 +185,5 @@ TEST(UTF8Lib, DecoderCheckLength) {
     EXPECT_EQ(c1, c2);
   }
 }
-
+TURBO_NAMESPACE_END
 }  // namespace turbo

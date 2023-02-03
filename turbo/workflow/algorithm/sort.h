@@ -1,10 +1,72 @@
-#pragma once
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef TURBO_WORKFLOW_ALGORITHM_SORT_H_
+#define TURBO_WORKFLOW_ALGORITHM_SORT_H_
 
 #include "turbo/workflow/core/executor.h"
 #include "turbo/base/bits.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
+namespace {
+/**
+@brief finds the median of three numbers of dereferenced iterators using
+ the given comparator
+*/
+template <typename RandItr, typename C>
+RandItr median_of_three(RandItr l, RandItr m, RandItr r, C cmp) {
+  return cmp(*l, *m) ? (cmp(*m, *r) ? m : (cmp(*l, *r) ? r : l))
+                     : (cmp(*r, *m) ? m : (cmp(*r, *l) ? r : l));
+}
 
+/**
+@brief finds the pseudo median of a range of items using spreaded
+   nine numbers
+*/
+template <typename RandItr, typename C>
+RandItr pseudo_median_of_nine(RandItr beg, RandItr end, C cmp) {
+  size_t N = std::distance(beg, end);
+  size_t offset = N >> 3;
+  return median_of_three(
+      median_of_three(beg, beg + offset, beg + (offset * 2), cmp),
+      median_of_three(beg + (offset * 3), beg + (offset * 4),
+                      beg + (offset * 5), cmp),
+      median_of_three(beg + (offset * 6), beg + (offset * 7), end - 1, cmp),
+      cmp);
+}
+
+/**
+@brief sorts two elements of dereferenced iterators using the given
+   comparison function
+*/
+template <typename Iter, typename Compare>
+void sort2(Iter a, Iter b, Compare comp) {
+  if (comp(*b, *a))
+    std::iter_swap(a, b);
+}
+/**
+@brief sorts three elements of dereferenced iterators using the given
+   comparison function
+*/
+template <typename Iter, typename Compare>
+void sort3(Iter a, Iter b, Iter c, Compare comp) {
+  sort2(a, b, comp);
+  sort2(b, c, comp);
+  sort2(a, b, comp);
+}
+}
     // threshold whether or not to perform parallel sort
     template<typename I>
     constexpr size_t parallel_sort_cutoff() {
@@ -58,9 +120,9 @@ namespace turbo {
         }
     }
 
-// Sorts [begin, end) using insertion sort with the given comparison function.
-// Assumes *(begin - 1) is an element smaller than or equal to any element
-// in [begin, end).
+    // Sorts [begin, end) using insertion sort with the given comparison function.
+    // Assumes *(begin - 1) is an element smaller than or equal to any element
+    // in [begin, end).
     template<typename RandItr, typename Compare>
     void unguarded_insertion_sort(RandItr begin, RandItr end, Compare comp) {
 
@@ -464,6 +526,7 @@ namespace turbo {
         using value_type = std::decay_t<decltype(*std::declval<B>())>;
         return sort(beg, end, std::less<value_type>{});
     }
+    TURBO_NAMESPACE_END
+}  // namespace turbo
 
-}  // namespace turbo ------------------------------------------------------------
-
+#endif  // TURBO_WORKFLOW_ALGORITHM_SORT_H_

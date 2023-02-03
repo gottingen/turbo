@@ -25,6 +25,7 @@
 #include "turbo/base/casts.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 
 static constexpr uint32_t UTF8_BUF_SIZE = 8;
@@ -99,4 +100,5 @@ ptrdiff_t NaiveEncoder(const uint32_t* s_ptr,
 }
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo

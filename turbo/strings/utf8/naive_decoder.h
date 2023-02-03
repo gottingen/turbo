@@ -18,13 +18,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#pragma once
+
+#ifndef TURBO_STRINGS_UTF8_NAIVE_DECODER_H_
+#define TURBO_STRINGS_UTF8_NAIVE_DECODER_H_
 
 #include <cstddef>
 #include <cstdint>
 #include "turbo/platform/config.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 
 ptrdiff_t NaiveDecoder(unsigned char const* s_ptr,
@@ -32,4 +35,7 @@ ptrdiff_t NaiveDecoder(unsigned char const* s_ptr,
                        char32_t* dest) noexcept;
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo
+
+#endif  // TURBO_STRINGS_UTF8_NAIVE_DECODER_H_

@@ -1,4 +1,19 @@
-#pragma once
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef TURBO_WORKFLOW_CORE_TASK_H_
+#define TURBO_WORKFLOW_CORE_TASK_H_
 
 #include "turbo/workflow/core/graph.h"
 
@@ -8,16 +23,13 @@
 */
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 
-// ----------------------------------------------------------------------------
-// Task Types
-// ----------------------------------------------------------------------------
+    /**
+    @enum TaskType
 
-/**
-@enum TaskType
-
-@brief enumeration of all task types
-*/
+    @brief enumeration of all task types
+    */
     enum class TaskType : int {
         /** @brief placeholder task type */
         PLACEHOLDER = 0,
@@ -41,10 +53,10 @@ namespace turbo {
         UNDEFINED
     };
 
-/**
-@private
-@brief array of all task types (used for iterating task types)
-*/
+    /**
+    @private
+    @brief array of all task types (used for iterating task types)
+    */
     inline constexpr std::array<TaskType, 9> TASK_TYPES = {
             TaskType::PLACEHOLDER,
             TaskType::CUDAFLOW,
@@ -57,23 +69,23 @@ namespace turbo {
             TaskType::RUNTIME
     };
 
-/**
-@brief convert a task type to a human-readable string
+    /**
+    @brief convert a task type to a human-readable string
 
-The name of each task type is the litte-case string of its characters.
+    The name of each task type is the litte-case string of its characters.
 
-@code{.cpp}
-TaskType::PLACEHOLDER     ->  "placeholder"
-TaskType::CUDAFLOW        ->  "cudaflow"
-TaskType::SYCLFLOW        ->  "syclflow"
-TaskType::STATIC          ->  "static"
-TaskType::DYNAMIC         ->  "subflow"
-TaskType::CONDITION       ->  "condition"
-TaskType::MODULE          ->  "module"
-TaskType::ASYNC           ->  "async"
-TaskType::RUNTIME         ->  "runtime"
-@endcode
-*/
+    @code{.cpp}
+    TaskType::PLACEHOLDER     ->  "placeholder"
+    TaskType::CUDAFLOW        ->  "cudaflow"
+    TaskType::SYCLFLOW        ->  "syclflow"
+    TaskType::STATIC          ->  "static"
+    TaskType::DYNAMIC         ->  "subflow"
+    TaskType::CONDITION       ->  "condition"
+    TaskType::MODULE          ->  "module"
+    TaskType::ASYNC           ->  "async"
+    TaskType::RUNTIME         ->  "runtime"
+    @endcode
+    */
     inline const char *to_string(TaskType type) {
 
         const char *val;
@@ -114,15 +126,15 @@ TaskType::RUNTIME         ->  "runtime"
         return val;
     }
 
-// ----------------------------------------------------------------------------
-// Task Traits
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // Task Traits
+    // ----------------------------------------------------------------------------
 
-/**
-@brief determines if a callable is a static task
+    /**
+    @brief determines if a callable is a static task
 
-A static task is a callable object constructible from std::function<void()>.
-*/
+    A static task is a callable object constructible from std::function<void()>.
+    */
     template<typename C>
     constexpr bool is_static_task_v =
             std::is_invocable_r_v < void, C
@@ -131,11 +143,11 @@ A static task is a callable object constructible from std::function<void()>.
     !
     std::is_invocable_r_v<turbo::InlinedVector<int>, C>;
 
-/**
-@brief determines if a callable is a dynamic task
+    /**
+    @brief determines if a callable is a dynamic task
 
-A dynamic task is a callable object constructible from std::function<void(Subflow&)>.
-*/
+    A dynamic task is a callable object constructible from std::function<void(Subflow&)>.
+    */
     template<typename C>
     constexpr bool is_dynamic_task_v = std::is_invocable_r_v<void, C, Subflow &>;
 
@@ -495,13 +507,13 @@ A condition task is a callable object constructible from std::function<int()>.
         return _node != rhs._node;
     }
 
-// Function: name
+    // Function: name
     inline Task &Task::name(const std::string &name) {
         _node->_name = name;
         return *this;
     }
 
-// Function: acquire
+    // Function: acquire
     inline Task &Task::acquire(Semaphore &s) {
         if (!_node->_semaphores) {
             _node->_semaphores = std::make_unique<Node::Semaphores>();
@@ -510,7 +522,7 @@ A condition task is a callable object constructible from std::function<int()>.
         return *this;
     }
 
-// Function: release
+    // Function: release
     inline Task &Task::release(Semaphore &s) {
         if (!_node->_semaphores) {
             //_node->_semaphores.emplace();
@@ -520,37 +532,37 @@ A condition task is a callable object constructible from std::function<int()>.
         return *this;
     }
 
-// Procedure: reset
+    // Procedure: reset
     inline void Task::reset() {
         _node = nullptr;
     }
 
-// Procedure: reset_work
+    // Procedure: reset_work
     inline void Task::reset_work() {
         _node->_handle.emplace<std::monostate>();
     }
 
-// Function: name
+    // Function: name
     inline const std::string &Task::name() const {
         return _node->_name;
     }
 
-// Function: num_dependents
+    // Function: num_dependents
     inline size_t Task::num_dependents() const {
         return _node->num_dependents();
     }
 
-// Function: num_strong_dependents
+    // Function: num_strong_dependents
     inline size_t Task::num_strong_dependents() const {
         return _node->num_strong_dependents();
     }
 
-// Function: num_weak_dependents
+    // Function: num_weak_dependents
     inline size_t Task::num_weak_dependents() const {
         return _node->num_weak_dependents();
     }
 
-// Function: num_successors
+    // Function: num_successors
     inline size_t Task::num_successors() const {
         return _node->num_successors();
     }
@@ -829,15 +841,15 @@ A condition task is a callable object constructible from std::function<int()>.
         }
     }
 
-}  // end of namespace turbo. ---------------------------------------------------
-
+TURBO_NAMESPACE_END
+}  // namespace turbo
 namespace std {
 
-/**
-@struct hash
+    /**
+    @struct hash
 
-@brief hash specialization for std::hash<turbo::Task>
-*/
+    @brief hash specialization for std::hash<turbo::Task>
+    */
     template<>
     struct hash<turbo::Task> {
         auto operator()(const turbo::Task &task) const noexcept {
@@ -845,11 +857,11 @@ namespace std {
         }
     };
 
-/**
-@struct hash
+    /**
+    @struct hash
 
-@brief hash specialization for std::hash<turbo::TaskView>
-*/
+    @brief hash specialization for std::hash<turbo::TaskView>
+    */
     template<>
     struct hash<turbo::TaskView> {
         auto operator()(const turbo::TaskView &task_view) const noexcept {
@@ -857,7 +869,7 @@ namespace std {
         }
     };
 
-}  // end of namespace std ----------------------------------------------------
+}  // namespace std
 
-
+#endif  // TURBO_WORKFLOW_CORE_TASK_H_
 

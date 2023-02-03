@@ -1,7 +1,19 @@
-// 2019/02/09 - created by Tsung-Wei Huang
-//  - modified the event count from Eigen
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#pragma once
+#ifndef TURBO_WORKFLOW_CORE_NOTIFIER_H_
+#define TURBO_WORKFLOW_CORE_NOTIFIER_H_
 
 #include <iostream>
 #include <vector>
@@ -27,7 +39,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 // Notifier allows to wait for arbitrary predicates in non-blocking
 // algorithms. Think of condition variable, but wait predicate does not need to
 // be protected by a mutex. Usage:
@@ -260,7 +272,7 @@ class Notifier {
   }
 
 };
-
-
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
+
+#endif  // TURBO_WORKFLOW_CORE_NOTIFIER_H_
