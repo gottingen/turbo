@@ -21,6 +21,7 @@
 #include <turbo/strings/utf8/greedy_table_decoder.h>
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 // clang-format off
 
@@ -307,4 +308,5 @@ size_t GreedyTableDecoder::CountUnitSize(const char8_t* pSrc, const char8_t* pSr
 }
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo

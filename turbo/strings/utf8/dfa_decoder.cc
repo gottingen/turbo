@@ -25,6 +25,7 @@
 #include <cstdio>
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 // clang-format off
 
@@ -427,4 +428,5 @@ void DFADecoder::PrintStateData(State curr, CharClass type, uint32_t unit, State
 }
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -18,7 +18,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#pragma once
+#ifndef TURBO_STRINGS_UTF8_GREEDY_DECODER_H_
+#define TURBO_STRINGS_UTF8_GREEDY_DECODER_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +27,7 @@
 #include "turbo/platform/config.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 
 class GreedyTableDecoder {
@@ -130,4 +132,6 @@ TURBO_FORCE_INLINE void GreedyTableDecoder::AdvanceByGreedy_4(const char8_t*& pS
 }
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo
+#endif  // TURBO_STRINGS_UTF8_GREEDY_DECODER_H_

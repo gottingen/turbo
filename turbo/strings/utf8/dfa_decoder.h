@@ -22,6 +22,7 @@
 #include "turbo/platform/config.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 //--------------------------------------------------------------------------------------------------
 /// \brief  Traits style class to perform conversions from UTF-8 to UTF-32
@@ -294,6 +295,7 @@ TURBO_FORCE_INLINE DFADecoder::State DFADecoder::AdvanceWithTrace(char8_t const*
 }
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_UTF8_DFA_DECODE_H_

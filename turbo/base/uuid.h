@@ -1,4 +1,19 @@
-#pragma once
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef TURBO_BASE_UUID_H_
+#define TURBO_BASE_UUID_H_
 
 #include <iostream>
 #include <string>
@@ -6,9 +21,10 @@
 #include <limits>
 #include <random>
 #include <chrono>
+#include "turbo/platform/config.h"
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
 // Class: UUID
 //
 // A universally unique identifier (UUID) is an identifier standard used in software
@@ -221,7 +237,7 @@ inline std::ostream& operator << (std::ostream& os, const UUID& rhs) {
   os << rhs.to_string();
   return os;
 }
-
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace std {
@@ -235,3 +251,4 @@ struct hash<turbo::UUID> {
 
 }  // namespace std
 
+#endif  // TURBO_BASE_UUID_H_

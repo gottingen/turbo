@@ -24,8 +24,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "turbo/platform/config.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 
 size_t NaiveCountBytesSize(const uint32_t* s_ptr, const uint32_t* s_ptr_end) noexcept;
@@ -35,6 +37,7 @@ ptrdiff_t NaiveEncoder(const uint32_t* s_ptr,
                        unsigned char* dst) noexcept;
 
 }  // namespace utf8_details
+TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_UTF8_NAIVE_ENCODER_H_
