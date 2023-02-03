@@ -1,6 +1,4 @@
 
-add_subdirectory(test)
-
 turbo_cc_test(
         NAME
         compositions_test
