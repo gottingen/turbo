@@ -1,15 +1,13 @@
-#pragma once
+
+#ifndef TURBO_WORKFLOW_CORE_OBSERVER_H_
+#define TURBO_WORKFLOW_CORE_OBSERVER_H_
 
 #include "turbo/workflow/core/task.h"
 #include "turbo/workflow/core/worker.h"
-
-/** 
-@file observer.hpp
-@brief observer include file
-*/
+#include "turbo/base/unique_id.h"
 
 namespace turbo {
-
+TURBO_NAMESPACE_BEGIN
     // ----------------------------------------------------------------------------
     // timeline data structure
     // ----------------------------------------------------------------------------
@@ -83,9 +81,9 @@ namespace turbo {
         }
     };
 
-/**
-@private
- */
+    /**
+    @private
+     */
     struct ProfileData {
 
         std::vector<Timeline> timelines;
@@ -111,65 +109,65 @@ namespace turbo {
         }
     };
 
-// ----------------------------------------------------------------------------
-// observer interface 
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // observer interface
+    // ----------------------------------------------------------------------------
 
-/**
-@class: ObserverInterface
+    /**
+    @class: ObserverInterface
 
-@brief class to derive an executor observer 
+    @brief class to derive an executor observer
 
-The turbo::ObserverInterface class allows users to define custom methods to monitor
-the behaviors of an executor. This is particularly useful when you want to 
-inspect the performance of an executor and visualize when each thread 
-participates in the execution of a task.
-To prevent users from direct access to the internal threads and tasks, 
-turbo::ObserverInterface provides immutable wrappers,
-turbo::WorkerView and turbo::TaskView, over workers and tasks.
+    The turbo::ObserverInterface class allows users to define custom methods to monitor
+    the behaviors of an executor. This is particularly useful when you want to
+    inspect the performance of an executor and visualize when each thread
+    participates in the execution of a task.
+    To prevent users from direct access to the internal threads and tasks,
+    turbo::ObserverInterface provides immutable wrappers,
+    turbo::WorkerView and turbo::TaskView, over workers and tasks.
 
-Please refer to turbo::WorkerView and turbo::TaskView for details.
+    Please refer to turbo::WorkerView and turbo::TaskView for details.
 
-Example usage:
+    Example usage:
 
-@code{.cpp}
+    @code{.cpp}
 
-struct MyObserver : public turbo::ObserverInterface {
+    struct MyObserver : public turbo::ObserverInterface {
 
-  MyObserver(const std::string& name) {
-    std::cout << "constructing observer " << name << '\n';
-  }
+      MyObserver(const std::string& name) {
+        std::cout << "constructing observer " << name << '\n';
+      }
 
-  void set_up(size_t num_workers) override final {
-    std::cout << "setting up observer with " << num_workers << " workers\n";
-  }
+      void set_up(size_t num_workers) override final {
+        std::cout << "setting up observer with " << num_workers << " workers\n";
+      }
 
-  void on_entry(WorkerView w, turbo::TaskView tv) override final {
-    std::ostringstream oss;
-    oss << "worker " << w.id() << " ready to run " << tv.name() << '\n';
-    std::cout << oss.str();
-  }
+      void on_entry(WorkerView w, turbo::TaskView tv) override final {
+        std::ostringstream oss;
+        oss << "worker " << w.id() << " ready to run " << tv.name() << '\n';
+        std::cout << oss.str();
+      }
 
-  void on_exit(WorkerView w, turbo::TaskView tv) override final {
-    std::ostringstream oss;
-    oss << "worker " << w.id() << " finished running " << tv.name() << '\n';
-    std::cout << oss.str();
-  }
-};
-  
-turbo::Workflow workflow;
-turbo::Executor executor;
+      void on_exit(WorkerView w, turbo::TaskView tv) override final {
+        std::ostringstream oss;
+        oss << "worker " << w.id() << " finished running " << tv.name() << '\n';
+        std::cout << oss.str();
+      }
+    };
 
-// insert tasks into workflow
-// ...
-  
-// create a custom observer
-std::shared_ptr<MyObserver> observer = executor.make_observer<MyObserver>("MyObserver");
+    turbo::Workflow workflow;
+    turbo::Executor executor;
 
-// run the workflow
-executor.run(workflow).wait();
-@endcode
-*/
+    // insert tasks into workflow
+    // ...
+
+    // create a custom observer
+    std::shared_ptr<MyObserver> observer = executor.make_observer<MyObserver>("MyObserver");
+
+    // run the workflow
+    executor.run(workflow).wait();
+    @endcode
+    */
     class ObserverInterface {
 
     public:
@@ -200,36 +198,36 @@ executor.run(workflow).wait();
         virtual void on_exit(WorkerView wv, TaskView task_view) = 0;
     };
 
-// ----------------------------------------------------------------------------
-// ChromeObserver definition
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ChromeObserver definition
+    // ----------------------------------------------------------------------------
 
-/**
-@class: ChromeObserver
+    /**
+    @class: ChromeObserver
 
-@brief class to create an observer based on Chrome tracing format
+    @brief class to create an observer based on Chrome tracing format
 
-A turbo::ChromeObserver inherits turbo::ObserverInterface and defines methods to dump
-the observed thread activities into a format that can be visualized through
-@ChromeTracing.
+    A turbo::ChromeObserver inherits turbo::ObserverInterface and defines methods to dump
+    the observed thread activities into a format that can be visualized through
+    @ChromeTracing.
 
-@code{.cpp}
-turbo::Workflow workflow;
-turbo::Executor executor;
+    @code{.cpp}
+    turbo::Workflow workflow;
+    turbo::Executor executor;
 
-// insert tasks into workflow
-// ...
-  
-// create a custom observer
-std::shared_ptr<turbo::ChromeObserver> observer = executor.make_observer<turbo::ChromeObserver>();
+    // insert tasks into workflow
+    // ...
 
-// run the workflow
-executor.run(workflow).wait();
+    // create a custom observer
+    std::shared_ptr<turbo::ChromeObserver> observer = executor.make_observer<turbo::ChromeObserver>();
 
-// dump the thread activities to a chrome-tracing format.
-observer->dump(std::cout);
-@endcode
-*/
+    // run the workflow
+    executor.run(workflow).wait();
+
+    // dump the thread activities to a chrome-tracing format.
+    observer->dump(std::cout);
+    @endcode
+    */
     class ChromeObserver : public ObserverInterface {
 
         friend class Executor;
@@ -309,12 +307,12 @@ observer->dump(std::cout);
         _timeline.origin = observer_stamp_t::clock::now();
     }
 
-// Procedure: on_entry
+    // Procedure: on_entry
     inline void ChromeObserver::on_entry(WorkerView wv, TaskView) {
         _timeline.stacks[wv.id()].push(observer_stamp_t::clock::now());
     }
 
-// Procedure: on_exit
+    // Procedure: on_exit
     inline void ChromeObserver::on_exit(WorkerView wv, TaskView tv) {
 
         size_t w = wv.id();
@@ -1051,7 +1049,7 @@ observer->dump(std::cout);
         }
     }
 
+TURBO_NAMESPACE_END
+}  // namespace turbo
 
-}  // end of namespace turbo -----------------------------------------------------
-
-
+#endif  // TURBO_WORKFLOW_CORE_OBSERVER_H_
