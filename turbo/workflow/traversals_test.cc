@@ -1,8 +1,19 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
 
 // --------------------------------------------------------
 // Graph generation
@@ -32,9 +43,9 @@ std::unique_ptr<Node[]> make_dag(size_t num_nodes, size_t max_degree) {
   for(size_t i=0; i<num_nodes; i++) {
     nodes[i].idx = i;
     nodes[i].name = std::to_string(i);
-    REQUIRE(!nodes[i].visited);
-    REQUIRE(nodes[i].successors.empty());
-    REQUIRE(nodes[i].dependents == 0);
+    EXPECT_TRUE(!nodes[i].visited);
+    EXPECT_TRUE(nodes[i].successors.empty());
+    EXPECT_TRUE(nodes[i].dependents == 0);
   }
 
   // Create a DAG
@@ -59,9 +70,9 @@ std::unique_ptr<Node[]> make_chain(size_t num_nodes) {
   for(size_t i=0; i<num_nodes; i++) {
     nodes[i].idx = i;
     nodes[i].name = std::to_string(i);
-    REQUIRE(!nodes[i].visited);
-    REQUIRE(nodes[i].successors.empty());
-    REQUIRE(nodes[i].dependents == 0);
+    EXPECT_TRUE(!nodes[i].visited);
+    EXPECT_TRUE(nodes[i].successors.empty());
+    EXPECT_TRUE(nodes[i].dependents == 0);
   }
 
   // Create a DAG
@@ -75,7 +86,7 @@ std::unique_ptr<Node[]> make_chain(size_t num_nodes) {
 // --------------------------------------------------------
 // Testcase: StaticTraversal
 // --------------------------------------------------------
-TEST_CASE("StaticTraversal" * doctest::timeout(300)) {
+TEST(Static, Traversal) {
 
   size_t max_degree = 4;
   size_t num_nodes = 1000;
@@ -111,10 +122,10 @@ TEST_CASE("StaticTraversal" * doctest::timeout(300)) {
     executor.run(tf).wait();  // block until finished
 
     for(size_t i=0; i<num_nodes; i++) {
-      REQUIRE(nodes[i].visited);
-      REQUIRE(nodes[i].dependents == 0);
+      EXPECT_TRUE(nodes[i].visited);
+      EXPECT_TRUE(nodes[i].dependents == 0);
       for(size_t j=0; j<nodes[i].successors.size(); ++j) {
-        REQUIRE(nodes[i].level < nodes[i].successors[j]->level);
+        EXPECT_TRUE(nodes[i].level < nodes[i].successors[j]->level);
       }
     }
   }
@@ -123,14 +134,14 @@ TEST_CASE("StaticTraversal" * doctest::timeout(300)) {
 // --------------------------------------------------------
 // Testcase: DynamicTraversal
 // --------------------------------------------------------
-TEST_CASE("DynamicTraversal" * doctest::timeout(300)) {
+TEST(Dynamic, Traversal) {
 
   std::atomic<size_t> level;
 
   std::function<void(Node*, turbo::Subflow&)> traverse;
 
   traverse = [&] (Node* n, turbo::Subflow& subflow) {
-    REQUIRE(!n->visited);
+    EXPECT_TRUE(!n->visited);
     n->visited = true;
     size_t S = n->successors.size();
     for(size_t i=0; i<S; i++) {
@@ -171,10 +182,10 @@ TEST_CASE("DynamicTraversal" * doctest::timeout(300)) {
     executor.run(tf).wait();  // block until finished
 
     for(size_t i=0; i<num_nodes; i++) {
-      REQUIRE(nodes[i].visited);
-      REQUIRE(nodes[i].dependents == 0);
+      EXPECT_TRUE(nodes[i].visited);
+      EXPECT_TRUE(nodes[i].dependents == 0);
       for(size_t j=0; j<nodes[i].successors.size(); ++j) {
-        REQUIRE(nodes[i].level < nodes[i].successors[j]->level);
+        EXPECT_TRUE(nodes[i].level < nodes[i].successors[j]->level);
       }
     }
   }
@@ -183,14 +194,14 @@ TEST_CASE("DynamicTraversal" * doctest::timeout(300)) {
 // --------------------------------------------------------
 // Testcase: RecursiveTraversal
 // --------------------------------------------------------
-//TEST_CASE("RecursiveTraversal" * doctest::timeout(300)) {
+//TEST("RecursiveTraversal) {
 //
 //  std::atomic<size_t> level;
 //
 //  std::function<void(Node*, turbo::Subflow&)> traverse;
 //
 //  traverse = [&] (Node* n, turbo::Subflow& subflow) {
-//    REQUIRE(!n->visited);
+//    EXPECT_TRUE(!n->visited);
 //    n->visited = true;
 //    size_t S = n->successors.size();
 //    for(size_t i=0; i<S; i++) {
@@ -230,10 +241,10 @@ TEST_CASE("DynamicTraversal" * doctest::timeout(300)) {
 //    executor.run(tf).wait();  // block until finished
 //
 //    for(size_t i=0; i<num_nodes; i++) {
-//      REQUIRE(nodes[i].visited);
-//      REQUIRE(nodes[i].dependents == 0);
+//      EXPECT_TRUE(nodes[i].visited);
+//      EXPECT_TRUE(nodes[i].dependents == 0);
 //      for(size_t j=0; j<nodes[i].successors.size(); ++j) {
-//        REQUIRE(nodes[i].level < nodes[i].successors[j]->level);
+//        EXPECT_TRUE(nodes[i].level < nodes[i].successors[j]->level);
 //      }
 //    }
 //  }
@@ -270,7 +281,7 @@ void parallel_traversal(unsigned num_threads) {
       std::function<void(Node*, turbo::Subflow&)> traverse;
 
       traverse = [&] (Node* n, turbo::Subflow& subflow) {
-        REQUIRE(!n->visited);
+        EXPECT_TRUE(!n->visited);
         n->visited = true;
         size_t S = n->successors.size();
         for(size_t i=0; i<S; i++) {
@@ -294,10 +305,10 @@ void parallel_traversal(unsigned num_threads) {
       executor.run(tf).wait();  // block until finished
 
       for(size_t i=0; i<num_nodes; i++) {
-        REQUIRE(nodes[i].visited);
-        REQUIRE(nodes[i].dependents == 0);
+        EXPECT_TRUE(nodes[i].visited);
+        EXPECT_TRUE(nodes[i].dependents == 0);
         for(size_t j=0; j<nodes[i].successors.size(); ++j) {
-          REQUIRE(nodes[i].level < nodes[i].successors[j]->level);
+          EXPECT_TRUE(nodes[i].level < nodes[i].successors[j]->level);
         }
       }
     });
@@ -306,35 +317,35 @@ void parallel_traversal(unsigned num_threads) {
   for(auto& thread : threads) thread.join();
 }
 
-TEST_CASE("ParallelTraversal.1" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_1) {
   parallel_traversal(1);
 }
 
-TEST_CASE("ParallelTraversal.2" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_2) {
   parallel_traversal(2);
 }
 
-TEST_CASE("ParallelTraversal.3" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_3) {
   parallel_traversal(3);
 }
 
-TEST_CASE("ParallelTraversal.4" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_4) {
   parallel_traversal(4);
 }
 
-TEST_CASE("ParallelTraversal.5" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_5) {
   parallel_traversal(5);
 }
 
-TEST_CASE("ParallelTraversal.6" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_6) {
   parallel_traversal(6);
 }
 
-TEST_CASE("ParallelTraversal.7" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_7) {
   parallel_traversal(7);
 }
 
-TEST_CASE("ParallelTraversal.8" * doctest::timeout(300)) {
+TEST(Parallel, Traversal_8) {
   parallel_traversal(8);
 }
 

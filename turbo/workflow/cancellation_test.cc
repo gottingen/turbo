@@ -1,17 +1,30 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+
+#include "turbo/workflow/workflow.h"
 
 // EmptyFuture
-TEST_CASE("EmptyFuture" * doctest::timeout(300)) {
+TEST(Future, EmptyFuture) {
   turbo::Future<void> fu;
-  REQUIRE(fu.valid() == false);
-  REQUIRE(fu.cancel() == false);
+  EXPECT_TRUE(fu.valid() == false);
+  EXPECT_TRUE(fu.cancel() == false);
 }
 
 // Future
-TEST_CASE("Future" * doctest::timeout(300)) {
+TEST(Future,Future) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor(4);
@@ -28,11 +41,11 @@ TEST_CASE("Future" * doctest::timeout(300)) {
 
   fu.get();
 
-  REQUIRE(counter == 100);
+  EXPECT_TRUE(counter == 100);
 }
 
 // Cancel
-TEST_CASE("Cancel" * doctest::timeout(300)) {
+TEST(Future,Cancel) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor(4);
@@ -50,20 +63,20 @@ TEST_CASE("Cancel" * doctest::timeout(300)) {
   // a new round
   counter = 0;
   auto fu = executor.run(taskflow);
-  REQUIRE(fu.cancel() == true);
+  EXPECT_TRUE(fu.cancel() == true);
   fu.get();
-  REQUIRE(counter < 10000);
+  EXPECT_TRUE(counter < 10000);
 
   // a new round
   counter = 0;
   fu = executor.run_n(taskflow, 100);
-  REQUIRE(fu.cancel() == true);
+  EXPECT_TRUE(fu.cancel() == true);
   fu.get();
-  REQUIRE(counter < 10000);
+  EXPECT_TRUE(counter < 10000);
 }
 
 // multiple cnacels
-TEST_CASE("MultipleCancels" * doctest::timeout(300)) {
+TEST(Future,MultipleCancels) {
 
   turbo::Workflow taskflow1, taskflow2, taskflow3, taskflow4;
   turbo::Executor executor(4);
@@ -96,22 +109,22 @@ TEST_CASE("MultipleCancels" * doctest::timeout(300)) {
   auto fu2 = executor.run(taskflow2);
   auto fu3 = executor.run(taskflow3);
   auto fu4 = executor.run(taskflow4);
-  REQUIRE(fu1.cancel() == true);
-  REQUIRE(fu2.cancel() == true);
-  REQUIRE(fu3.cancel() == true);
-  REQUIRE(fu4.cancel() == true);
+  EXPECT_TRUE(fu1.cancel() == true);
+  EXPECT_TRUE(fu2.cancel() == true);
+  EXPECT_TRUE(fu3.cancel() == true);
+  EXPECT_TRUE(fu4.cancel() == true);
   executor.wait_for_all();
-  REQUIRE(counter < 10000);
-  REQUIRE(fu1.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
-  REQUIRE(fu2.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
-  REQUIRE(fu3.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
-  REQUIRE(fu4.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
+  EXPECT_TRUE(counter < 10000);
+  EXPECT_TRUE(fu1.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
+  EXPECT_TRUE(fu2.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
+  EXPECT_TRUE(fu3.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
+  EXPECT_TRUE(fu4.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready);
 }
 
 
 
 // cancel subflow
-TEST_CASE("CancelSubflow" * doctest::timeout(300)) {
+TEST(Future,CancelSubflow) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor(4);
@@ -139,26 +152,26 @@ TEST_CASE("CancelSubflow" * doctest::timeout(300)) {
   // a new round
   counter = 0;
   auto fu = executor.run(taskflow);
-  REQUIRE(fu.cancel() == true);
+  EXPECT_TRUE(fu.cancel() == true);
   fu.get();
-  REQUIRE(counter < 10000);
+  EXPECT_TRUE(counter < 10000);
 
   // a new round
   counter = 0;
   auto fu1 = executor.run(taskflow);
   auto fu2 = executor.run(taskflow);
   auto fu3 = executor.run(taskflow);
-  REQUIRE(fu1.cancel() == true);
-  REQUIRE(fu2.cancel() == true);
-  REQUIRE(fu3.cancel() == true);
+  EXPECT_TRUE(fu1.cancel() == true);
+  EXPECT_TRUE(fu2.cancel() == true);
+  EXPECT_TRUE(fu3.cancel() == true);
   fu1.get();
   fu2.get();
   fu3.get();
-  REQUIRE(counter < 10000);
+  EXPECT_TRUE(counter < 10000);
 }
 
 // cancel asynchronous tasks in subflow
-TEST_CASE("CancelSubflowAsyncTasks" * doctest::timeout(300)) {
+TEST(Future,CancelSubflowAsyncTasks) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor(4);
@@ -193,13 +206,13 @@ TEST_CASE("CancelSubflowAsyncTasks" * doctest::timeout(300)) {
   // a new round
   counter = 0;
   auto fu = executor.run(taskflow);
-  REQUIRE(fu.cancel() == true);
+  EXPECT_TRUE(fu.cancel() == true);
   fu.get();
-  REQUIRE(counter < 10000);
+  EXPECT_TRUE(counter < 10000);
 }
 
 // cancel infinite loop
-TEST_CASE("CancelInfiniteLoop" * doctest::timeout(300)) {
+TEST(Future,CancelInfiniteLoop) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor(4);
@@ -212,12 +225,12 @@ TEST_CASE("CancelInfiniteLoop" * doctest::timeout(300)) {
   }
 
   auto fu = executor.run(taskflow);
-  REQUIRE(fu.cancel() == true);
+  EXPECT_TRUE(fu.cancel() == true);
   fu.get();
 }
 
 // cancel from another
-TEST_CASE("CancelFromAnother" * doctest::timeout(300)) {
+TEST(Future,CancelFromAnother) {
 
   turbo::Workflow taskflow, another;
   turbo::Executor executor(4);
@@ -230,18 +243,18 @@ TEST_CASE("CancelFromAnother" * doctest::timeout(300)) {
 
   auto fu = executor.run(taskflow);
 
-  REQUIRE(fu.wait_for(
+  EXPECT_TRUE(fu.wait_for(
     std::chrono::milliseconds(100)) == std::future_status::timeout
   );
 
   // create a task to cancel another flow
-  another.emplace([&]() { REQUIRE(fu.cancel() == true); });
+  another.emplace([&]() { EXPECT_TRUE(fu.cancel() == true); });
 
   executor.run(another).wait();
 }
 
 // cancel from async task
-TEST_CASE("CancelFromAsync" * doctest::timeout(300)) {
+TEST(Future,CancelFromAsync) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor(4);
@@ -255,14 +268,14 @@ TEST_CASE("CancelFromAsync" * doctest::timeout(300)) {
   executor.async([&](){
     auto fu = executor.run_n(taskflow, 100);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    REQUIRE(fu.cancel() == true);
+    EXPECT_TRUE(fu.cancel() == true);
   });
 
   executor.wait_for_all();
 }
 
 // cancel async tasks
-TEST_CASE("CancelAsync") {
+TEST(Future,CancelAsync) {
 
   turbo::Executor executor(2);
 
@@ -283,16 +296,16 @@ TEST_CASE("CancelAsync") {
 
   executor.wait_for_all();
 
-  REQUIRE(n_success > n_failure);
+  EXPECT_TRUE(n_success > n_failure);
 
   for(auto& fu : futures) {
-    REQUIRE(fu.valid());
-    CHECK_NOTHROW(fu.get());
+    EXPECT_TRUE(fu.valid());
+    EXPECT_NO_THROW(fu.get());
   }
 }
 
 // cancel subflow async tasks
-TEST_CASE("CancelSubflowAsync") {
+TEST(Future,CancelSubflowAsync) {
 
   turbo::Workflow taskflow;
   turbo::Executor executor(2);
@@ -321,16 +334,16 @@ TEST_CASE("CancelSubflowAsync") {
   }
 
   executor.wait_for_all();
-  REQUIRE(n_success > n_failure);
+  EXPECT_TRUE(n_success > n_failure);
 
   for(auto& fu : futures) {
-    REQUIRE(fu.valid());
-    CHECK_NOTHROW(fu.get());
+    EXPECT_TRUE(fu.valid());
+    EXPECT_NO_THROW(fu.get());
   }
 }
 
 // cancel composition tasks
-TEST_CASE("CancelComposition") {
+TEST(Future,CancelComposition) {
 
   turbo::Executor executor(4);
 
@@ -387,7 +400,7 @@ TEST_CASE("CancelComposition") {
 
     executor.wait_for_all();
 
-    REQUIRE(success <= N);
+    EXPECT_TRUE(success <= N);
   }
 }
 

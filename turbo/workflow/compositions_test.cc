@@ -1,12 +1,24 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
 
 // --------------------------------------------------------
 // Testcase: Composition
 // --------------------------------------------------------
-TEST_CASE("Composition-1" * doctest::timeout(300)) {
+TEST(Composition, 1) {
 
   for(unsigned w=1; w<=8; ++w) {
 
@@ -45,11 +57,11 @@ TEST_CASE("Composition-1" * doctest::timeout(300)) {
     E.precede(m1_1);
 
     executor.run(f1).get();
-    REQUIRE(cnt == 10);
+    EXPECT_TRUE(cnt == 10);
 
     cnt = 0;
     executor.run_n(f1, 100).get();
-    REQUIRE(cnt == 10 * 100);
+    EXPECT_TRUE(cnt == 10 * 100);
 
     auto m1_2 = f1.composed_of(f0);
     m1_1.precede(m1_2);
@@ -57,7 +69,7 @@ TEST_CASE("Composition-1" * doctest::timeout(300)) {
     for(int n=0; n<100; n++) {
       cnt = 0;
       executor.run_n(f1, n).get();
-      REQUIRE(cnt == 15*n);
+      EXPECT_TRUE(cnt == 15*n);
     }
 
     cnt = 0;
@@ -67,12 +79,12 @@ TEST_CASE("Composition-1" * doctest::timeout(300)) {
 
     executor.wait_for_all();
 
-    REQUIRE(cnt == 1500);
+    EXPECT_TRUE(cnt == 1500);
   }
 }
 
 // TESTCASE: composition-2
-TEST_CASE("Composition-2" * doctest::timeout(300)) {
+TEST(Composition, 2) {
 
   for(unsigned w=1; w<=8; ++w) {
 
@@ -112,7 +124,7 @@ TEST_CASE("Composition-2" * doctest::timeout(300)) {
     for(int n=0; n<100; n++) {
       cnt = 0;
       executor.run_n(f2, n).get();
-      REQUIRE(cnt == 20*n);
+      EXPECT_TRUE(cnt == 20*n);
     }
 
     // asynchronous run
@@ -121,12 +133,12 @@ TEST_CASE("Composition-2" * doctest::timeout(300)) {
       executor.run(f2);
     }
     executor.wait_for_all();
-    REQUIRE(cnt == 100*20);
+    EXPECT_TRUE(cnt == 100*20);
   }
 }
 
 // TESTCASE: composition-3
-TEST_CASE("Composition-3" * doctest::timeout(300)) {
+TEST(Composition, 3) {
 
   for(unsigned w=1; w<=8; ++w) {
 
@@ -164,7 +176,7 @@ TEST_CASE("Composition-3" * doctest::timeout(300)) {
     for(int n=0; n<100; n++) {
       cnt = 0;
       executor.run_n(f3, n).get();
-      REQUIRE(cnt == 16*n);
+      EXPECT_TRUE(cnt == 16*n);
     }
 
     // asynchronous run
@@ -173,14 +185,14 @@ TEST_CASE("Composition-3" * doctest::timeout(300)) {
       executor.run(f3);
     }
     executor.wait_for_all();
-    REQUIRE(cnt == 16*100);
+    EXPECT_TRUE(cnt == 16*100);
   }
 }
 
 // ----------------------------------------------------------------------------
 // ParallelCompositions
 // ----------------------------------------------------------------------------
-TEST_CASE("ParallelCompositions") {
+TEST(Parallel, Compositions) {
 
   std::vector<turbo::Workflow> taskflows(100);
 
@@ -211,7 +223,7 @@ TEST_CASE("ParallelCompositions") {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == 80000);
+  EXPECT_TRUE(counter == 80000);
 }
 
 

@@ -1,7 +1,19 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
-#include <turbo/workflow/workflow.h>
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
 
 // ============================================================================
 // Test without Priority
@@ -14,7 +26,7 @@ void tsq_owner() {
     turbo::TaskQueue<void*> queue;
     std::vector<void*> gold(N);
 
-    REQUIRE(queue.empty());
+    EXPECT_TRUE(queue.empty());
 
     // push and pop
     for(size_t i=0; i<N; ++i) {
@@ -23,10 +35,10 @@ void tsq_owner() {
     }
     for(size_t i=0; i<N; ++i) {
       auto ptr = queue.pop();
-      REQUIRE(ptr != nullptr);
-      REQUIRE(gold[N-i-1] == ptr);
+      EXPECT_TRUE(ptr != nullptr);
+      EXPECT_TRUE(gold[N-i-1] == ptr);
     }
-    REQUIRE(queue.pop() == nullptr);
+    EXPECT_TRUE(queue.pop() == nullptr);
 
     // push and steal
     for(size_t i=0; i<N; ++i) {
@@ -35,8 +47,8 @@ void tsq_owner() {
     // i starts from 1 to avoid cache effect
     for(size_t i=1; i<N; ++i) {
       auto ptr = queue.steal();
-      REQUIRE(ptr != nullptr);
-      REQUIRE(gold[i] == ptr);
+      EXPECT_TRUE(ptr != nullptr);
+      EXPECT_TRUE(gold[i] == ptr);
     }
   }
 }
@@ -65,7 +77,7 @@ void tsq_n_thieves(size_t M) {
             consumed.fetch_add(1, std::memory_order_relaxed);
           }
         }
-        REQUIRE(queue.steal() == nullptr);
+        EXPECT_TRUE(queue.steal() == nullptr);
       });
     }
 
@@ -82,9 +94,9 @@ void tsq_n_thieves(size_t M) {
         consumed.fetch_add(1, std::memory_order_relaxed);
       }
     }
-    REQUIRE(queue.steal() == nullptr);
-    REQUIRE(queue.pop() == nullptr);
-    REQUIRE(queue.empty());
+    EXPECT_TRUE(queue.steal() == nullptr);
+    EXPECT_TRUE(queue.pop() == nullptr);
+    EXPECT_TRUE(queue.empty());
 
     // join thieves
     for(auto& thread : threads) thread.join();
@@ -99,8 +111,8 @@ void tsq_n_thieves(size_t M) {
     std::sort(items.begin(), items.end());
     std::sort(gold.begin(), gold.end());
 
-    REQUIRE(items.size() == N);
-    REQUIRE(items == gold);
+    EXPECT_TRUE(items.size() == N);
+    EXPECT_TRUE(items == gold);
   }
 
 }
@@ -108,63 +120,63 @@ void tsq_n_thieves(size_t M) {
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.Owner
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.QueueOwner" * doctest::timeout(300)) {
+TEST(WorkStealing, QueueOwner) {
   tsq_owner();
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.1Thief
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue1Thief" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue1Thief) {
   tsq_n_thieves(1);
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.2Thieves
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue2Thieves" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue2Thieves) {
   tsq_n_thieves(2);
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.3Thieves
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue3Thieves" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue3Thieves) {
   tsq_n_thieves(3);
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.4Thieves
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue4Thieves" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue4Thieves) {
   tsq_n_thieves(4);
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.5Thieves
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue5Thieves" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue5Thieves) {
   tsq_n_thieves(5);
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.6Thieves
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue6Thieves" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue6Thieves) {
   tsq_n_thieves(6);
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.7Thieves
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue7Thieves" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue7Thieves) {
   tsq_n_thieves(7);
 }
 
 // ----------------------------------------------------------------------------
 // Testcase: TSQTest.8Thieves
 // ----------------------------------------------------------------------------
-TEST_CASE("WorkStealing.Queue8Thieves" * doctest::timeout(300)) {
+TEST(WorkStealing, Queue8Thieves) {
   tsq_n_thieves(8);
 }
 
@@ -180,39 +192,39 @@ void priority_tsq_owner() {
   turbo::TaskQueue<void*, P> queue;
 
   //for(unsigned p=0; p<P; p++) {
-  //  REQUIRE(queue.push(nullptr, p) == true);
-  //  REQUIRE(queue.push(nullptr, p) == false);
-  //  REQUIRE(queue.push(nullptr, p) == false);
-  //  REQUIRE(queue.push(nullptr, p) == false);
+  //  EXPECT_TRUE(queue.push(nullptr, p) == true);
+  //  EXPECT_TRUE(queue.push(nullptr, p) == false);
+  //  EXPECT_TRUE(queue.push(nullptr, p) == false);
+  //  EXPECT_TRUE(queue.push(nullptr, p) == false);
 
-  //  REQUIRE(queue.pop(p) == nullptr);
-  //  REQUIRE(queue.pop(p) == nullptr);
-  //  REQUIRE(queue.pop(p) == nullptr);
-  //  REQUIRE(queue.pop(p) == nullptr);
-  //  REQUIRE(queue.pop(p) == nullptr);
+  //  EXPECT_TRUE(queue.pop(p) == nullptr);
+  //  EXPECT_TRUE(queue.pop(p) == nullptr);
+  //  EXPECT_TRUE(queue.pop(p) == nullptr);
+  //  EXPECT_TRUE(queue.pop(p) == nullptr);
+  //  EXPECT_TRUE(queue.pop(p) == nullptr);
   //  
-  //  REQUIRE(queue.push(nullptr, p) == true);
-  //  REQUIRE(queue.push(nullptr, p) == false);
+  //  EXPECT_TRUE(queue.push(nullptr, p) == true);
+  //  EXPECT_TRUE(queue.push(nullptr, p) == false);
   //  
-  //  REQUIRE(queue.pop(p) == nullptr);
-  //  REQUIRE(queue.pop(p) == nullptr);
+  //  EXPECT_TRUE(queue.pop(p) == nullptr);
+  //  EXPECT_TRUE(queue.pop(p) == nullptr);
 
-  //  REQUIRE(queue.empty(p) == true);
+  //  EXPECT_TRUE(queue.empty(p) == true);
   //}
 
   for(size_t N=1; N<=777777; N=N*2+1) {
 
     std::vector<std::pair<void*, unsigned>> gold(N);
 
-    REQUIRE(queue.empty());
-    REQUIRE(queue.pop() == nullptr);
+    EXPECT_TRUE(queue.empty());
+    EXPECT_TRUE(queue.pop() == nullptr);
 
     for(unsigned p=0; p<P; p++) {
-      REQUIRE(queue.empty(p));
-      REQUIRE(queue.pop(p) == nullptr);
-      REQUIRE(queue.steal(p) == nullptr);
+      EXPECT_TRUE(queue.empty(p));
+      EXPECT_TRUE(queue.pop(p) == nullptr);
+      EXPECT_TRUE(queue.steal(p) == nullptr);
     }
-    REQUIRE(queue.empty());
+    EXPECT_TRUE(queue.empty());
 
     // push 
     for(size_t i=0; i<N; ++i) {
@@ -225,10 +237,10 @@ void priority_tsq_owner() {
     for(size_t i=0; i<N; ++i) {
       auto [g_ptr, g_pri]= gold[N-i-1];
       auto ptr = queue.pop(g_pri);
-      REQUIRE(ptr != nullptr);
-      REQUIRE(ptr == g_ptr);
+      EXPECT_TRUE(ptr != nullptr);
+      EXPECT_TRUE(ptr == g_ptr);
     }
-    REQUIRE(queue.pop() == nullptr);
+    EXPECT_TRUE(queue.pop() == nullptr);
 
     // push and steal
     for(size_t i=0; i<N; ++i) {
@@ -239,20 +251,20 @@ void priority_tsq_owner() {
     for(size_t i=0; i<N; ++i) {
       auto [g_ptr, g_pri] = gold[i];
       auto ptr = queue.steal(g_pri);
-      REQUIRE(ptr != nullptr);
-      REQUIRE(g_ptr == ptr);
+      EXPECT_TRUE(ptr != nullptr);
+      EXPECT_TRUE(g_ptr == ptr);
     }
     
     for(unsigned p=0; p<P; p++) {
-      REQUIRE(queue.empty(p));
-      REQUIRE(queue.pop(p) == nullptr);
-      REQUIRE(queue.steal(p) == nullptr);
+      EXPECT_TRUE(queue.empty(p));
+      EXPECT_TRUE(queue.pop(p) == nullptr);
+      EXPECT_TRUE(queue.steal(p) == nullptr);
     }
-    REQUIRE(queue.empty());
+    EXPECT_TRUE(queue.empty());
   }
 }
 
-TEST_CASE("WorkStealing.PriorityQueue.Owner" * doctest::timeout(300)) {
+TEST(WorkStealing, PriorityQueue_Owner) {
   priority_tsq_owner();
 }
 
@@ -299,7 +311,7 @@ void starvation_test(size_t W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == W - W/2 + 100);
+  EXPECT_TRUE(counter == W - W/2 + 100);
 
   // large linear chain followed by many branches
   size_t N = 1000;
@@ -341,39 +353,39 @@ void starvation_test(size_t W) {
 
   executor.run(taskflow).wait();
 
-  REQUIRE(counter == target + N);
+  EXPECT_TRUE(counter == target + N);
   
 }
 
-TEST_CASE("WorkStealing.Starvation.1thread" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_1thread) {
   starvation_test(1);
 }
 
-TEST_CASE("WorkStealing.Starvation.2threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_2threads) {
   starvation_test(2);
 }
 
-TEST_CASE("WorkStealing.Starvation.3threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_3threads) {
   starvation_test(3);
 }
 
-TEST_CASE("WorkStealing.Starvation.4threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_4threads) {
   starvation_test(4);
 }
 
-TEST_CASE("WorkStealing.Starvation.5threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_5threads) {
   starvation_test(5);
 }
 
-TEST_CASE("WorkStealing.Starvation.6threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_6threads) {
   starvation_test(6);
 }
 
-TEST_CASE("WorkStealing.Starvation.7threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_7threads) {
   starvation_test(7);
 }
 
-TEST_CASE("WorkStealing.Starvation.8threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Starvation_8threads) {
   starvation_test(8);
 }
 
@@ -385,7 +397,7 @@ void starvation_loop_test(size_t W) {
 
   size_t L=100, B = 1024;
 
-  REQUIRE(B > W);
+  EXPECT_TRUE(B > W);
   
   turbo::Workflow taskflow;
   turbo::Executor executor(W);
@@ -399,9 +411,9 @@ void starvation_loop_test(size_t W) {
 
   auto [merge, cond, stop] = taskflow.emplace(
     [&](){  
-      REQUIRE(barrier.load(std::memory_order_relaxed) == B);
-      REQUIRE(counter.load(std::memory_order_relaxed) == (L + B - 1));
-      REQUIRE(set.size() == W);
+      EXPECT_TRUE(barrier.load(std::memory_order_relaxed) == B);
+      EXPECT_TRUE(counter.load(std::memory_order_relaxed) == (L + B - 1));
+      EXPECT_TRUE(set.size() == W);
       counter = 0;
       barrier = 0;
       set.clear();
@@ -410,9 +422,9 @@ void starvation_loop_test(size_t W) {
       return ++n >= 10 ? 1 : 0;
     },
     [&](){
-      REQUIRE(barrier.load(std::memory_order_relaxed) == 0);
-      REQUIRE(counter.load(std::memory_order_relaxed) == 0);
-      REQUIRE(set.size() == 0);
+      EXPECT_TRUE(barrier.load(std::memory_order_relaxed) == 0);
+      EXPECT_TRUE(counter.load(std::memory_order_relaxed) == 0);
+      EXPECT_TRUE(set.size() == 0);
     }
   );
 
@@ -469,35 +481,35 @@ void starvation_loop_test(size_t W) {
   executor.run(taskflow).wait();
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.1thread" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_1thread) {
   starvation_loop_test(1);
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.2threads" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_2threads) {
   starvation_loop_test(2);
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.3threads" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_3threads) {
   starvation_loop_test(3);
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.4threads" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_4threads) {
   starvation_loop_test(4);
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.5threads" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_5threads) {
   starvation_loop_test(5);
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.6threads" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_6threads) {
   starvation_loop_test(6);
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.7threads" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_7threads) {
   starvation_loop_test(7);
 }
 
-TEST_CASE("WorkStealing.StarvationLoop.8threads" * doctest::timeout(300)) {
+TEST(WorkStealing, StarvationLoop_8threads) {
   starvation_loop_test(8);
 }
 
@@ -509,7 +521,7 @@ void subflow_starvation_test(size_t W) {
 
   size_t L=100, B = 1024;
 
-  REQUIRE(B > W);
+  EXPECT_TRUE(B > W);
   
   turbo::Workflow taskflow;
   turbo::Executor executor(W);
@@ -525,9 +537,9 @@ void subflow_starvation_test(size_t W) {
 
     auto [merge, cond, stop] = subflow.emplace(
       [&](){  
-        REQUIRE(barrier.load(std::memory_order_relaxed) == B);
-        REQUIRE(counter.load(std::memory_order_relaxed) == (L + B - 1));
-        REQUIRE(set.size() == W);
+        EXPECT_TRUE(barrier.load(std::memory_order_relaxed) == B);
+        EXPECT_TRUE(counter.load(std::memory_order_relaxed) == (L + B - 1));
+        EXPECT_TRUE(set.size() == W);
         counter = 0;
         barrier = 0;
         set.clear();
@@ -536,9 +548,9 @@ void subflow_starvation_test(size_t W) {
         return ++n >= 5 ? 1 : 0;
       },
       [&](){
-        REQUIRE(barrier.load(std::memory_order_relaxed) == 0);
-        REQUIRE(counter.load(std::memory_order_relaxed) == 0);
-        REQUIRE(set.size() == 0);
+        EXPECT_TRUE(barrier.load(std::memory_order_relaxed) == 0);
+        EXPECT_TRUE(counter.load(std::memory_order_relaxed) == 0);
+        EXPECT_TRUE(set.size() == 0);
       }
     );
 
@@ -596,35 +608,35 @@ void subflow_starvation_test(size_t W) {
   executor.run_n(taskflow, 5).wait();
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.1thread" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_1thread) {
   subflow_starvation_test(1);
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.2threads" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_2threads) {
   subflow_starvation_test(2);
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.3threads" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_3threads) {
   subflow_starvation_test(3);
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.4threads" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_4threads) {
   subflow_starvation_test(4);
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.5threads" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_5threads) {
   subflow_starvation_test(5);
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.6threads" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_6threads) {
   subflow_starvation_test(6);
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.7threads" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_7threads) {
   subflow_starvation_test(7);
 }
 
-TEST_CASE("WorkStealing.SubflowStarvation.8threads" * doctest::timeout(300)) {
+TEST(WorkStealing, SubflowStarvation_8threads) {
   subflow_starvation_test(8);
 }
 
@@ -636,7 +648,7 @@ void embarrasing_starvation_test(size_t W) {
 
   size_t B = 65536;
 
-  REQUIRE(B > W);
+  EXPECT_TRUE(B > W);
   
   turbo::Workflow taskflow, parent;
   turbo::Executor executor(W);
@@ -668,38 +680,38 @@ void embarrasing_starvation_test(size_t W) {
 
   executor.run(parent).wait();
 
-  REQUIRE(set.size() == W);
+  EXPECT_TRUE(set.size() == W);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.1thread" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_1thread) {
   embarrasing_starvation_test(1);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.2threads" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_2threads) {
   embarrasing_starvation_test(2);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.3threads" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_3threads) {
   embarrasing_starvation_test(3);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.4threads" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_4threads) {
   embarrasing_starvation_test(4);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.5threads" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_5threads) {
   embarrasing_starvation_test(5);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.6threads" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_6threads) {
   embarrasing_starvation_test(6);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.7threads" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_7threads) {
   embarrasing_starvation_test(7);
 }
 
-TEST_CASE("WorkStealing.EmbarrasingStarvation.8threads" * doctest::timeout(300)) {
+TEST(WorkStealing, EmbarrasingStarvation_8threads) {
   embarrasing_starvation_test(8);
 }
 
@@ -766,7 +778,7 @@ void skewed_starvation(size_t W) {
     }
     stop.store(true, std::memory_order_relaxed);
 
-    REQUIRE(set.size() + 1 == W);
+    EXPECT_TRUE(set.size() + 1 == W);
   }).name("stop");
 
   parent.precede(left);
@@ -776,35 +788,35 @@ void skewed_starvation(size_t W) {
   executor.run_n(taskflow, 1024).wait();
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.1thread") {
+TEST(WorkStealing, SkewedStarvation_1thread) {
   skewed_starvation(1);
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.2threads") {
+TEST(WorkStealing, SkewedStarvation_2threads) {
   skewed_starvation(2);
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.3threads") {
+TEST(WorkStealing, SkewedStarvation_3threads) {
   skewed_starvation(3);
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.4threads") {
+TEST(WorkStealing, SkewedStarvation_4threads) {
   skewed_starvation(4);
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.5threads") {
+TEST(WorkStealing, SkewedStarvation_5threads) {
   skewed_starvation(5);
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.6threads") {
+TEST(WorkStealing, SkewedStarvation_6threads) {
   skewed_starvation(6);
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.7threads") {
+TEST(WorkStealing, SkewedStarvation_7threads) {
   skewed_starvation(7);
 }
 
-TEST_CASE("WorkStealing.SkewedStarvation.8threads") {
+TEST(WorkStealing, SkewedStarvation_8threads) {
   skewed_starvation(8);
 }
 
@@ -879,7 +891,7 @@ void nary_starvation(size_t W) {
       std::this_thread::yield();
     }
     stop.store(true, std::memory_order_relaxed);
-    REQUIRE(set.size() + 1 == W);
+    EXPECT_TRUE(set.size() + 1 == W);
   }).name("stop");
 
   parent.precede(pivot);
@@ -889,35 +901,35 @@ void nary_starvation(size_t W) {
   executor.run_n(taskflow, 5).wait();
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.1thread") {
+TEST(WorkStealing, NAryStarvation_1thread) {
   nary_starvation(1);
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.2threads") {
+TEST(WorkStealing, NAryStarvation_2threads) {
   nary_starvation(2);
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.3threads") {
+TEST(WorkStealing, NAryStarvation_3threads) {
   nary_starvation(3);
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.4threads") {
+TEST(WorkStealing, NAryStarvation_4threads) {
   nary_starvation(4);
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.5threads") {
+TEST(WorkStealing, NAryStarvation_5threads) {
   nary_starvation(5);
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.6threads") {
+TEST(WorkStealing, NAryStarvation_6threads) {
   nary_starvation(6);
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.7threads") {
+TEST(WorkStealing, NAryStarvation_7threads) {
   nary_starvation(7);
 }
 
-TEST_CASE("WorkStealing.NAryStarvation.8threads") {
+TEST(WorkStealing, NAryStarvation_8threads) {
   nary_starvation(8);
 }
 
@@ -965,7 +977,7 @@ void wavefront_starvation(size_t W) {
               std::this_thread::yield();
             }
             stop.store(true, std::memory_order_relaxed);
-            REQUIRE(set.size() + 1 == W);
+            EXPECT_TRUE(set.size() + 1 == W);
           }
           else {
             // record the worker
@@ -1012,38 +1024,38 @@ void wavefront_starvation(size_t W) {
   //taskflow.dump(std::cout);
   executor.run_n(taskflow, 1024).wait();
 
-  REQUIRE(count == W*W*1024);
+  EXPECT_TRUE(count == W*W*1024);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.1thread") {
+TEST(WorkStealing, WavefrontStarvation_1thread) {
   wavefront_starvation(1);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.2threads") {
+TEST(WorkStealing, WavefrontStarvation_2threads) {
   wavefront_starvation(2);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.3threads") {
+TEST(WorkStealing, WavefrontStarvation_3threads) {
   wavefront_starvation(3);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.4threads") {
+TEST(WorkStealing, WavefrontStarvation_4threads) {
   wavefront_starvation(4);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.5threads") {
+TEST(WorkStealing, WavefrontStarvation_5threads) {
   wavefront_starvation(5);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.6threads") {
+TEST(WorkStealing, WavefrontStarvation_6threads) {
   wavefront_starvation(6);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.7threads") {
+TEST(WorkStealing, WavefrontStarvation_7threads) {
   wavefront_starvation(7);
 }
 
-TEST_CASE("WorkStealing.WavefrontStarvation.8threads") {
+TEST(WorkStealing, WavefrontStarvation_8threads) {
   wavefront_starvation(8);
 }
 
@@ -1088,44 +1100,44 @@ void oversubscription_test(size_t W) {
   for(size_t t=1; t<=100; t++) {
     set.clear();
     executor.run(taskflow).wait();
-    REQUIRE(counter == 100*(W/2)*t);
-    REQUIRE(set.size() <= W/2);
+    EXPECT_TRUE(counter == 100*(W/2)*t);
+    EXPECT_TRUE(set.size() <= W/2);
   }
 }
 
-TEST_CASE("WorkStealing.Oversubscription.2threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Oversubscription_2threads) {
   oversubscription_test(2);
 }
 
-TEST_CASE("WorkStealing.Oversubscription.3threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Oversubscription_3threads) {
   oversubscription_test(3);
 }
 
-TEST_CASE("WorkStealing.Oversubscription.4threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Oversubscription_4threads) {
   oversubscription_test(4);
 }
 
-TEST_CASE("WorkStealing.Oversubscription.5threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Oversubscription_5threads) {
   oversubscription_test(5);
 }
 
-TEST_CASE("WorkStealing.Oversubscription.6threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Oversubscription_6threads) {
   oversubscription_test(6);
 }
 
-TEST_CASE("WorkStealing.Oversubscription.7threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Oversubscription_7threads) {
   oversubscription_test(7);
 }
 
-TEST_CASE("WorkStealing.Oversubscription.8threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Oversubscription_8threads) {
   oversubscription_test(8);
 }
 
-//TEST_CASE("WorkStealing.Oversubscription.16threads" * doctest::timeout(300)) {
+//TEST(WorkStealing, Oversubscription_16threads) {
 //  oversubscription_test(16);
 //}
 //
-//TEST_CASE("WorkStealing.Oversubscription.32threads" * doctest::timeout(300)) {
+//TEST(WorkStealing, Oversubscription_32threads) {
 //  oversubscription_test(32);
 //}
 
@@ -1163,7 +1175,7 @@ void ws_broom(size_t W) {
 
 }
  
-//TEST_CASE("WS.broom.2threads") {
+//TEST(WS.broom.2threads) {
 //  ws_broom(10);
 //}
 
@@ -1180,7 +1192,7 @@ void continuation_test(size_t W) {
 
   int w = executor.this_worker_id();
 
-  REQUIRE(w == -1);
+  EXPECT_TRUE(w == -1);
 
   for(size_t i=0; i<1000; i++) {
     curr = taskflow.emplace([&, i]() mutable {
@@ -1188,7 +1200,7 @@ void continuation_test(size_t W) {
         w = executor.this_worker_id();
       } 
       else {
-        REQUIRE(w == executor.this_worker_id());
+        EXPECT_TRUE(w == executor.this_worker_id());
       }
     });
 
@@ -1203,35 +1215,35 @@ void continuation_test(size_t W) {
 
 }
 
-TEST_CASE("WorkStealing.Continuation.1thread" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_1thread) {
   continuation_test(1);
 }
 
-TEST_CASE("WorkStealing.Continuation.2threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_2threads) {
   continuation_test(2);
 }
 
-TEST_CASE("WorkStealing.Continuation.3threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_3threads) {
   continuation_test(3);
 }
 
-TEST_CASE("WorkStealing.Continuation.4threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_4threads) {
   continuation_test(4);
 }
 
-TEST_CASE("WorkStealing.Continuation.5threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_5threads) {
   continuation_test(5);
 }
 
-TEST_CASE("WorkStealing.Continuation.6threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_6threads) {
   continuation_test(6);
 }
 
-TEST_CASE("WorkStealing.Continuation.7threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_7threads) {
   continuation_test(7);
 }
 
-TEST_CASE("WorkStealing.Continuation.8threads" * doctest::timeout(300)) {
+TEST(WorkStealing, Continuation_8threads) {
   continuation_test(8);
 }
 

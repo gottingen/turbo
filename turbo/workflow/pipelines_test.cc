@@ -1,9 +1,22 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include "doctest.h"
+#include "gtest/gtest.h"
+#include "turbo/workflow/workflow.h"
 
-#include <turbo/workflow/workflow.h>
-#include <turbo/workflow/algorithm/pipeline.h>
+#include "turbo/workflow/algorithm/pipeline.h"
+#include "workflow.h"
 
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
@@ -32,8 +45,8 @@ void pipeline_1P(size_t L, unsigned w, turbo::PipeType type) {
           pf.stop();
           return;
         }
-        REQUIRE(j == source[j]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j == source[j]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         j++;
       }});
 
@@ -41,8 +54,8 @@ void pipeline_1P(size_t L, unsigned w, turbo::PipeType type) {
       auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
 
       auto test = taskflow.emplace([&](){
-        REQUIRE(j == N);
-        REQUIRE(pl.num_tokens() == N);
+        EXPECT_TRUE(j == N);
+        EXPECT_TRUE(pl.num_tokens() == N);
       }).name("test");
 
       pipeline.precede(test);
@@ -76,89 +89,89 @@ void pipeline_1P(size_t L, unsigned w, turbo::PipeType type) {
 
     //  taskflow.composed_of(pl);
     //  executor.run(taskflow).wait();
-    //  REQUIRE(collection.size() == N);
+    //  EXPECT_TRUE(collection.size() == N);
     //  std::sort(collection.begin(), collection.end());
     //  for(size_t k=0; k<N; k++) {
-    //    REQUIRE(collection[k] == k);
+    //    EXPECT_TRUE(collection[k] == k);
     //  }
 
     //  j = 0;
     //  collection.clear();
     //  executor.run(taskflow).wait();
-    //  REQUIRE(collection.size() == N);
+    //  EXPECT_TRUE(collection.size() == N);
     //  std::sort(collection.begin(), collection.end());
     //  for(size_t k=0; k<N; k++) {
-    //    REQUIRE(collection[k] == k);
+    //    EXPECT_TRUE(collection[k] == k);
     //  }
     //}
   }
 }
 
 // serial pipe with one line
-TEST_CASE("Pipeline.1P(S).1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_1L_1W) {
   pipeline_1P(1, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_1L_2W) {
   pipeline_1P(1, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_1L_3W) {
   pipeline_1P(1, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_1L_4W) {
   pipeline_1P(1, 4, turbo::PipeType::SERIAL);
 }
 
 // serial pipe with two lines
-TEST_CASE("Pipeline.1P(S).2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_2L_1W) {
   pipeline_1P(2, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_2L_2W) {
   pipeline_1P(2, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_2L_3W) {
   pipeline_1P(2, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_2L_4W) {
   pipeline_1P(2, 4, turbo::PipeType::SERIAL);
 }
 
 // serial pipe with three lines
-TEST_CASE("Pipeline.1P(S).3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_3L_1W) {
   pipeline_1P(3, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_3L_2W) {
   pipeline_1P(3, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_3L_3W) {
   pipeline_1P(3, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_3L_4W) {
   pipeline_1P(3, 4, turbo::PipeType::SERIAL);
 }
 
 // serial pipe with three lines
-TEST_CASE("Pipeline.1P(S).4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_4L_1W) {
   pipeline_1P(4, 1, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_4L_2W) {
   pipeline_1P(4, 2, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_4L_3W) {
   pipeline_1P(4, 3, turbo::PipeType::SERIAL);
 }
 
-TEST_CASE("Pipeline.1P(S).4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 1PS_4L_4W) {
   pipeline_1P(4, 4, turbo::PipeType::SERIAL);
 }
 
@@ -190,27 +203,27 @@ void pipeline_2P_SS(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1 == source[j1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1 == source[j1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         //*(pf.output()) = source[j1] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j1] + 1;
         j1++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j2, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j2 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j2] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
-        //REQUIRE(source[j2] + 1 == *(pf.input()));
+        EXPECT_TRUE(j2 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j2] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
+        //EXPECT_TRUE(source[j2] + 1 == *(pf.input()));
         j2++;
       }}
     );
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(j1 == N);
-      REQUIRE(j2 == N);
-      REQUIRE(pl.num_tokens() == cnt * N);
+      EXPECT_TRUE(j1 == N);
+      EXPECT_TRUE(j2 == N);
+      EXPECT_TRUE(pl.num_tokens() == cnt * N);
     }).name("test");
 
     pipeline.precede(test);
@@ -229,67 +242,67 @@ void pipeline_2P_SS(size_t L, unsigned w) {
 }
 
 // two pipes (SS)
-TEST_CASE("Pipeline.2P(SS).1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_1L_1W) {
   pipeline_2P_SS(1, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_1L_2W) {
   pipeline_2P_SS(1, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_1L_3W) {
   pipeline_2P_SS(1, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_1L_4W) {
   pipeline_2P_SS(1, 4);
 }
 
-TEST_CASE("Pipeline.2P(SS).2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 22PSS_2L_1W) {
   pipeline_2P_SS(2, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 22PSS_2L_2W) {
   pipeline_2P_SS(2, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 22PSS_2L_3W) {
   pipeline_2P_SS(2, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 22PSS_2L_4W) {
   pipeline_2P_SS(2, 4);
 }
 
-TEST_CASE("Pipeline.2P(SS).3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_3L_1W) {
   pipeline_2P_SS(3, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_3L_2W) {
   pipeline_2P_SS(3, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_3L_3W) {
   pipeline_2P_SS(3, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_3L_4W) {
   pipeline_2P_SS(3, 4);
 }
 
-TEST_CASE("Pipeline.2P(SS).4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_4L_1W) {
   pipeline_2P_SS(4, 1);
 }
 
-TEST_CASE("Pipeline.2P(SS).4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_4L_2W) {
   pipeline_2P_SS(4, 2);
 }
 
-TEST_CASE("Pipeline.2P(SS).4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_4L_3W) {
   pipeline_2P_SS(4, 3);
 }
 
-TEST_CASE("Pipeline.2P(SS).4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSS_4L_4W) {
   pipeline_2P_SS(4, 4);
 }
 
@@ -322,8 +335,8 @@ void pipeline_2P_SP(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1 == source[j1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1 == source[j1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         //*(pf.output()) = source[j1] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j1] + 1;
         j1++;
@@ -331,10 +344,10 @@ void pipeline_2P_SP(size_t L, unsigned w) {
 
       turbo::Pipe{turbo::PipeType::PARALLEL,
       [N, &collection, &mutex, &j2, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j2++ < N);
+        EXPECT_TRUE(j2++ < N);
         {
           std::scoped_lock<std::mutex> lock(mutex);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
         }
       }}
@@ -342,14 +355,14 @@ void pipeline_2P_SP(size_t L, unsigned w) {
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(j1 == N);
-      REQUIRE(j2 == N);
+      EXPECT_TRUE(j1 == N);
+      EXPECT_TRUE(j2 == N);
 
       std::sort(collection.begin(), collection.end());
       for(size_t i = 0; i < N; i++) {
-        REQUIRE(collection[i] == i + 1);
+        EXPECT_TRUE(collection[i] == i + 1);
       }
-      REQUIRE(pl.num_tokens() == cnt * N);
+      EXPECT_TRUE(pl.num_tokens() == cnt * N);
     }).name("test");
 
     pipeline.precede(test);
@@ -368,67 +381,67 @@ void pipeline_2P_SP(size_t L, unsigned w) {
 }
 
 // two pipes (SP)
-TEST_CASE("Pipeline.2P(SP).1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_1L_1W) {
   pipeline_2P_SP(1, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_1L_2W) {
   pipeline_2P_SP(1, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_1L_3W) {
   pipeline_2P_SP(1, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_1L_4W) {
   pipeline_2P_SP(1, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_2L_1W) {
   pipeline_2P_SP(2, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_2L_2W) {
   pipeline_2P_SP(2, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_2L_3W) {
   pipeline_2P_SP(2, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_2L_4W) {
   pipeline_2P_SP(2, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_3L_1W) {
   pipeline_2P_SP(3, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_3L_2W) {
   pipeline_2P_SP(3, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_3L_3W) {
   pipeline_2P_SP(3, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_3L_4W) {
   pipeline_2P_SP(3, 4);
 }
 
-TEST_CASE("Pipeline.2P(SP).4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_4L_1W) {
   pipeline_2P_SP(4, 1);
 }
 
-TEST_CASE("Pipeline.2P(SP).4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_4L_2W) {
   pipeline_2P_SP(4, 2);
 }
 
-TEST_CASE("Pipeline.2P(SP).4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_4L_3W) {
   pipeline_2P_SP(4, 3);
 }
 
-TEST_CASE("Pipeline.2P(SP).4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 2PSP_4L_4W) {
   pipeline_2P_SP(4, 4);
 }
 
@@ -458,17 +471,17 @@ void pipeline_3P_SSS(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1 == source[j1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1 == source[j1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         //*(pf.output()) = source[j1] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j1] + 1;
         j1++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j2, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j2 < N);
-        REQUIRE(source[j2] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j2 < N);
+        EXPECT_TRUE(source[j2] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
 
         //*(pf.output()) = source[j2] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j2] + 1;
@@ -476,19 +489,19 @@ void pipeline_3P_SSS(size_t L, unsigned w) {
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j3, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j3 < N);
-        REQUIRE(source[j3] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j3 < N);
+        EXPECT_TRUE(source[j3] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         j3++;
       }}
     );
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(j1 == N);
-      REQUIRE(j2 == N);
-      REQUIRE(j3 == N);
-      REQUIRE(pl.num_tokens() == cnt * N);
+      EXPECT_TRUE(j1 == N);
+      EXPECT_TRUE(j2 == N);
+      EXPECT_TRUE(j3 == N);
+      EXPECT_TRUE(pl.num_tokens() == cnt * N);
     }).name("test");
 
     pipeline.precede(test);
@@ -506,67 +519,67 @@ void pipeline_3P_SSS(size_t L, unsigned w) {
 }
 
 // three pipes (SSS)
-TEST_CASE("Pipeline.3P(SSS).1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_1L_1W) {
   pipeline_3P_SSS(1, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSS).1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_1L_2W) {
   pipeline_3P_SSS(1, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSS).1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_1L_3W) {
   pipeline_3P_SSS(1, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSS).1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_1L_4W) {
   pipeline_3P_SSS(1, 4);
 }
 
-TEST_CASE("Pipeline.3P(SSS).2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_2L_1W) {
   pipeline_3P_SSS(2, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSS).2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_2L_2W) {
   pipeline_3P_SSS(2, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSS).2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_2L_3W) {
   pipeline_3P_SSS(2, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSS).2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_2L_4W) {
   pipeline_3P_SSS(2, 4);
 }
 
-TEST_CASE("Pipeline.3P(SSS).3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_3L_1W) {
   pipeline_3P_SSS(3, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSS).3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_3L_2W) {
   pipeline_3P_SSS(3, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSS).3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_3L_3W) {
   pipeline_3P_SSS(3, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSS).3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_3L_4W) {
   pipeline_3P_SSS(3, 4);
 }
 
-TEST_CASE("Pipeline.3P(SSS).4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_4L_1W) {
   pipeline_3P_SSS(4, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSS).4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_4L_2W) {
   pipeline_3P_SSS(4, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSS).4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_4L_3W) {
   pipeline_3P_SSS(4, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSS).4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSS_4L_4W) {
   pipeline_3P_SSS(4, 4);
 }
 
@@ -601,27 +614,27 @@ void pipeline_3P_SSP(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1 == source[j1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1 == source[j1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         //*(pf.output()) = source[j1] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j1] + 1;
         j1++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j2, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j2 < N);
-        REQUIRE(source[j2] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j2 < N);
+        EXPECT_TRUE(source[j2] + 1 == mybuffer[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         //*(pf.output()) = source[j2] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j2] + 1;
         j2++;
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL, [N, &j3, &mutex, &collection, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j3++ < N);
+        EXPECT_TRUE(j3++ < N);
         {
           std::scoped_lock<std::mutex> lock(mutex);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
         }
       }}
@@ -629,16 +642,16 @@ void pipeline_3P_SSP(size_t L, unsigned w) {
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(j1 == N);
-      REQUIRE(j2 == N);
-      REQUIRE(j3 == N);
-      REQUIRE(collection.size() == N);
+      EXPECT_TRUE(j1 == N);
+      EXPECT_TRUE(j2 == N);
+      EXPECT_TRUE(j3 == N);
+      EXPECT_TRUE(collection.size() == N);
 
       std::sort(collection.begin(), collection.end());
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection[i] == i + 1);
+        EXPECT_TRUE(collection[i] == i + 1);
       }
-      REQUIRE(pl.num_tokens() == cnt * N);
+      EXPECT_TRUE(pl.num_tokens() == cnt * N);
     }).name("test");
 
     pipeline.precede(test);
@@ -658,67 +671,67 @@ void pipeline_3P_SSP(size_t L, unsigned w) {
 }
 
 // three pipes (SSP)
-TEST_CASE("Pipeline.3P(SSP).1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_1L_1W) {
   pipeline_3P_SSP(1, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSP).1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_1L_2W) {
   pipeline_3P_SSP(1, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSP).1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_1L_3W) {
   pipeline_3P_SSP(1, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSP).1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_1L_4W) {
   pipeline_3P_SSP(1, 4);
 }
 
-TEST_CASE("Pipeline.3P(SSP).2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_2L_1W) {
   pipeline_3P_SSP(2, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSP).2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_2L_2W) {
   pipeline_3P_SSP(2, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSP).2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_2L_3W) {
   pipeline_3P_SSP(2, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSP).2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_2L_4W) {
   pipeline_3P_SSP(2, 4);
 }
 
-TEST_CASE("Pipeline.3P(SSP).3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_3L_1W) {
   pipeline_3P_SSP(3, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSP).3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_3L_2W) {
   pipeline_3P_SSP(3, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSP).3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_3L_3W) {
   pipeline_3P_SSP(3, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSP).3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_3L_4W) {
   pipeline_3P_SSP(3, 4);
 }
 
-TEST_CASE("Pipeline.3P(SSP).4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_4L_1W) {
   pipeline_3P_SSP(4, 1);
 }
 
-TEST_CASE("Pipeline.3P(SSP).4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_4L_2W) {
   pipeline_3P_SSP(4, 2);
 }
 
-TEST_CASE("Pipeline.3P(SSP).4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_4L_3W) {
   pipeline_3P_SSP(4, 3);
 }
 
-TEST_CASE("Pipeline.3P(SSP).4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSSP_4L_4W) {
   pipeline_3P_SSP(4, 4);
 }
 
@@ -753,44 +766,44 @@ void pipeline_3P_SPS(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1 == source[j1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1 == source[j1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         //*(pf.output()) = source[j1] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j1] + 1;
         j1++;
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL, [N, &j2, &mutex, &collection, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j2++ < N);
+        EXPECT_TRUE(j2++ < N);
         //*(pf.output()) = *(pf.input()) + 1;
         {
           std::scoped_lock<std::mutex> lock(mutex);
           mybuffer[pf.line()][pf.pipe()] = mybuffer[pf.line()][pf.pipe() - 1] + 1;
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
         }
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j3, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j3 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j3] + 2 == mybuffer[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(j3 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j3] + 2 == mybuffer[pf.line()][pf.pipe() - 1]);
         j3++;
       }}
     );
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(j1 == N);
-      REQUIRE(j2 == N);
-      REQUIRE(j3 == N);
-      REQUIRE(collection.size() == N);
+      EXPECT_TRUE(j1 == N);
+      EXPECT_TRUE(j2 == N);
+      EXPECT_TRUE(j3 == N);
+      EXPECT_TRUE(collection.size() == N);
 
       std::sort(collection.begin(), collection.end());
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection[i] == i + 1);
+        EXPECT_TRUE(collection[i] == i + 1);
       }
-      REQUIRE(pl.num_tokens() == cnt * N);
+      EXPECT_TRUE(pl.num_tokens() == cnt * N);
 
     }).name("test");
 
@@ -811,67 +824,67 @@ void pipeline_3P_SPS(size_t L, unsigned w) {
 }
 
 // three pipes (SPS)
-TEST_CASE("Pipeline.3P(SPS).1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_1L_1W) {
   pipeline_3P_SPS(1, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPS).1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_1L_2W) {
   pipeline_3P_SPS(1, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPS).1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_1L_3W) {
   pipeline_3P_SPS(1, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPS).1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_1L_4W) {
   pipeline_3P_SPS(1, 4);
 }
 
-TEST_CASE("Pipeline.3P(SPS).2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_2L_1W) {
   pipeline_3P_SPS(2, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPS).2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_2L_2W) {
   pipeline_3P_SPS(2, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPS).2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_2L_3W) {
   pipeline_3P_SPS(2, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPS).2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_2L_4W) {
   pipeline_3P_SPS(2, 4);
 }
 
-TEST_CASE("Pipeline.3P(SPS).3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_3L_1W) {
   pipeline_3P_SPS(3, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPS).3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_3L_2W) {
   pipeline_3P_SPS(3, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPS).3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_3L_3W) {
   pipeline_3P_SPS(3, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPS).3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_3L_4W) {
   pipeline_3P_SPS(3, 4);
 }
 
-TEST_CASE("Pipeline.3P(SPS).4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_4L_1W) {
   pipeline_3P_SPS(4, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPS).4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_4L_2W) {
   pipeline_3P_SPS(4, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPS).4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_4L_3W) {
   pipeline_3P_SPS(4, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPS).4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPS_4L_4W) {
   pipeline_3P_SPS(4, 4);
 }
 
@@ -910,29 +923,29 @@ void pipeline_3P_SPP(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1 == source[j1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1 == source[j1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         //*(pf.output()) = source[j1] + 1;
         mybuffer[pf.line()][pf.pipe()] = source[j1] + 1;
         j1++;
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL, [N, &j2, &mutex2, &collection2, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j2++ < N);
+        EXPECT_TRUE(j2++ < N);
         //*pf.output() = *pf.input() + 1;
         {
           std::scoped_lock<std::mutex> lock(mutex2);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           mybuffer[pf.line()][pf.pipe()] = mybuffer[pf.line()][pf.pipe() - 1] + 1;
           collection2.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
         }
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL, [N, &j3, &mutex3, &collection3, &mybuffer, L](auto& pf) mutable {
-        REQUIRE(j3++ < N);
+        EXPECT_TRUE(j3++ < N);
         {
           std::scoped_lock<std::mutex> lock(mutex3);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection3.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
         }
       }}
@@ -940,19 +953,19 @@ void pipeline_3P_SPP(size_t L, unsigned w) {
 
     auto pipeline = taskflow.composed_of(pl).name("module_of_pipeline");
     auto test = taskflow.emplace([&](){
-      REQUIRE(j1 == N);
-      REQUIRE(j2 == N);
-      REQUIRE(j3 == N);
-      REQUIRE(collection2.size() == N);
-      REQUIRE(collection3.size() == N);
+      EXPECT_TRUE(j1 == N);
+      EXPECT_TRUE(j2 == N);
+      EXPECT_TRUE(j3 == N);
+      EXPECT_TRUE(collection2.size() == N);
+      EXPECT_TRUE(collection3.size() == N);
 
       std::sort(collection2.begin(), collection2.end());
       std::sort(collection3.begin(), collection3.end());
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection2[i] == i + 1);
-        REQUIRE(collection3[i] == i + 2);
+        EXPECT_TRUE(collection2[i] == i + 1);
+        EXPECT_TRUE(collection3[i] == i + 2);
       }
-      REQUIRE(pl.num_tokens() == cnt * N);
+      EXPECT_TRUE(pl.num_tokens() == cnt * N);
     }).name("test");
 
     pipeline.precede(test);
@@ -973,67 +986,67 @@ void pipeline_3P_SPP(size_t L, unsigned w) {
 }
 
 // three pipes (SPP)
-TEST_CASE("Pipeline.3P(SPP).1L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_1L_1W) {
   pipeline_3P_SPP(1, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPP).1L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_1L_2W) {
   pipeline_3P_SPP(1, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPP).1L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_1L_3W) {
   pipeline_3P_SPP(1, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPP).1L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_1L_4W) {
   pipeline_3P_SPP(1, 4);
 }
 
-TEST_CASE("Pipeline.3P(SPP).2L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_2L_1W) {
   pipeline_3P_SPP(2, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPP).2L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_2L_2W) {
   pipeline_3P_SPP(2, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPP).2L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_2L_3W) {
   pipeline_3P_SPP(2, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPP).2L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_2L_4W) {
   pipeline_3P_SPP(2, 4);
 }
 
-TEST_CASE("Pipeline.3P(SPP).3L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_3L_1W) {
   pipeline_3P_SPP(3, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPP).3L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_3L_2W) {
   pipeline_3P_SPP(3, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPP).3L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_3L_3W) {
   pipeline_3P_SPP(3, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPP).3L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_3L_4W) {
   pipeline_3P_SPP(3, 4);
 }
 
-TEST_CASE("Pipeline.3P(SPP).4L.1W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_4L_1W) {
   pipeline_3P_SPP(4, 1);
 }
 
-TEST_CASE("Pipeline.3P(SPP).4L.2W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_4L_2W) {
   pipeline_3P_SPP(4, 2);
 }
 
-TEST_CASE("Pipeline.3P(SPP).4L.3W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_4L_3W) {
   pipeline_3P_SPP(4, 3);
 }
 
-TEST_CASE("Pipeline.3P(SPP).4L.4W" * doctest::timeout(300)) {
+TEST(Pipeline, 3PSPP_4L_4W) {
   pipeline_3P_SPP(4, 4);
 }
 
@@ -1076,43 +1089,43 @@ void three_parallel_pipelines(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1_1 == source[j1_1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1_1 == source[j1_1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer1[pf.line()][pf.pipe()] = source[j1_1] + 1;
         j1_1++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j1_2, &mybuffer1, L](auto& pf) mutable {
-        REQUIRE(j1_2 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j1_2] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(j1_2 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j1_2] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
         mybuffer1[pf.line()][pf.pipe()] = source[j1_2] + 1;
         j1_2++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j1_3, &mybuffer1, L](auto& pf) mutable {
-        REQUIRE(j1_3 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j1_3] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(j1_3 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j1_3] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
         mybuffer1[pf.line()][pf.pipe()] = source[j1_3] + 1;
         j1_3++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j1_4, &mybuffer1, L](auto& pf) mutable {
-        REQUIRE(j1_4 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j1_4] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(j1_4 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j1_4] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
         j1_4++;
       }}
     );
 
     auto pipeline1 = taskflow.composed_of(pl1).name("module_of_pipeline1");
     auto test1 = taskflow.emplace([&](){
-      REQUIRE(j1_1 == N);
-      REQUIRE(j1_2 == N);
-      REQUIRE(j1_3 == N);
-      REQUIRE(j1_4 == N);
-      REQUIRE(pl1.num_tokens() == cnt1 * N);
+      EXPECT_TRUE(j1_1 == N);
+      EXPECT_TRUE(j1_2 == N);
+      EXPECT_TRUE(j1_3 == N);
+      EXPECT_TRUE(j1_4 == N);
+      EXPECT_TRUE(pl1.num_tokens() == cnt1 * N);
     }).name("test1");
 
     pipeline1.precede(test1);
@@ -1133,25 +1146,25 @@ void three_parallel_pipelines(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j2_1 == source[j2_1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j2_1 == source[j2_1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer2[pf.line()][pf.pipe()] = source[j2_1] + 1;
         j2_1++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j2_2, &mybuffer2, L](auto& pf) mutable {
-        REQUIRE(j2_2 < N);
-        REQUIRE(source[j2_2] + 1 == mybuffer2[pf.line()][pf.pipe() - 1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j2_2 < N);
+        EXPECT_TRUE(source[j2_2] + 1 == mybuffer2[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer2[pf.line()][pf.pipe()] = source[j2_2] + 1;
         j2_2++;
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL, [N, &j2_3, &mutex2_3, &collection2_3, &mybuffer2, L](auto& pf) mutable {
-        REQUIRE(j2_3++ < N);
+        EXPECT_TRUE(j2_3++ < N);
         {
           std::scoped_lock<std::mutex> lock(mutex2_3);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection2_3.push_back(mybuffer2[pf.line()][pf.pipe() - 1]);
         }
       }}
@@ -1159,16 +1172,16 @@ void three_parallel_pipelines(size_t L, unsigned w) {
 
     auto pipeline2 = taskflow.composed_of(pl2).name("module_of_pipeline2");
     auto test2 = taskflow.emplace([&](){
-      REQUIRE(j2_1 == N);
-      REQUIRE(j2_2 == N);
-      REQUIRE(j2_3 == N);
-      REQUIRE(collection2_3.size() == N);
+      EXPECT_TRUE(j2_1 == N);
+      EXPECT_TRUE(j2_2 == N);
+      EXPECT_TRUE(j2_3 == N);
+      EXPECT_TRUE(collection2_3.size() == N);
 
       std::sort(collection2_3.begin(), collection2_3.end());
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection2_3[i] == i + 1);
+        EXPECT_TRUE(collection2_3[i] == i + 1);
       }
-      REQUIRE(pl2.num_tokens() == cnt2 * N);
+      EXPECT_TRUE(pl2.num_tokens() == cnt2 * N);
     }).name("test2");
 
     pipeline2.precede(test2);
@@ -1189,18 +1202,18 @@ void three_parallel_pipelines(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j3_1 == source[j3_1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j3_1 == source[j3_1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer3[pf.line()][pf.pipe()] = source[j3_1] + 1;
         j3_1++;
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL,
       [N, &collection3_2, &mutex3_2, &j3_2, &mybuffer3, L](auto& pf) mutable {
-        REQUIRE(j3_2++ < N);
+        EXPECT_TRUE(j3_2++ < N);
         {
           std::scoped_lock<std::mutex> lock(mutex3_2);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection3_2.push_back(mybuffer3[pf.line()][pf.pipe() - 1]);
         }
       }}
@@ -1208,14 +1221,14 @@ void three_parallel_pipelines(size_t L, unsigned w) {
 
     auto pipeline3 = taskflow.composed_of(pl3).name("module_of_pipeline3");
     auto test3 = taskflow.emplace([&](){
-      REQUIRE(j3_1 == N);
-      REQUIRE(j3_2 == N);
+      EXPECT_TRUE(j3_1 == N);
+      EXPECT_TRUE(j3_2 == N);
 
       std::sort(collection3_2.begin(), collection3_2.end());
       for(size_t i = 0; i < N; i++) {
-        REQUIRE(collection3_2[i] == i + 1);
+        EXPECT_TRUE(collection3_2[i] == i + 1);
       }
-      REQUIRE(pl3.num_tokens() == cnt3 * N);
+      EXPECT_TRUE(pl3.num_tokens() == cnt3 * N);
     }).name("test3");
 
     pipeline3.precede(test3);
@@ -1265,259 +1278,259 @@ void three_parallel_pipelines(size_t L, unsigned w) {
 }
 
 // three parallel piplines
-TEST_CASE("Three.Parallel.Pipelines.1L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_1W) {
   three_parallel_pipelines(1, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.1L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_2W) {
   three_parallel_pipelines(1, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.1L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_3W) {
   three_parallel_pipelines(1, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.1L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_4W) {
   three_parallel_pipelines(1, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.1L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_5W) {
   three_parallel_pipelines(1, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.1L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_6W) {
   three_parallel_pipelines(1, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.1L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_7W) {
   three_parallel_pipelines(1, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.1L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_1L_8W) {
   three_parallel_pipelines(1, 8);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_1W) {
   three_parallel_pipelines(2, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_2W) {
   three_parallel_pipelines(2, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_3W) {
   three_parallel_pipelines(2, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_4W) {
   three_parallel_pipelines(2, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_5W) {
   three_parallel_pipelines(2, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_6W) {
   three_parallel_pipelines(2, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_7W) {
   three_parallel_pipelines(2, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.2L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_2L_8W) {
   three_parallel_pipelines(2, 8);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_1W) {
   three_parallel_pipelines(3, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_2W) {
   three_parallel_pipelines(3, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_3W) {
   three_parallel_pipelines(3, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_4W) {
   three_parallel_pipelines(3, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_5W) {
   three_parallel_pipelines(3, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_6W) {
   three_parallel_pipelines(3, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_7W) {
   three_parallel_pipelines(3, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.3L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_3L_8W) {
   three_parallel_pipelines(3, 8);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_1W) {
   three_parallel_pipelines(4, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_2W) {
   three_parallel_pipelines(4, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_3W) {
   three_parallel_pipelines(4, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_4W) {
   three_parallel_pipelines(4, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_5W) {
   three_parallel_pipelines(4, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_6W) {
   three_parallel_pipelines(4, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_7W) {
   three_parallel_pipelines(4, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.4L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_4L_8W) {
   three_parallel_pipelines(4, 8);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_1W) {
   three_parallel_pipelines(5, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_2W) {
   three_parallel_pipelines(5, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_3W) {
   three_parallel_pipelines(5, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_4W) {
   three_parallel_pipelines(5, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_5W) {
   three_parallel_pipelines(5, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_6W) {
   three_parallel_pipelines(5, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_7W) {
   three_parallel_pipelines(5, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.5L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_5L_8W) {
   three_parallel_pipelines(5, 8);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_1W) {
   three_parallel_pipelines(6, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_2W) {
   three_parallel_pipelines(6, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_3W) {
   three_parallel_pipelines(6, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_4W) {
   three_parallel_pipelines(6, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_5W) {
   three_parallel_pipelines(6, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_6W) {
   three_parallel_pipelines(6, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_7W) {
   three_parallel_pipelines(6, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.6L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_6L_8W) {
   three_parallel_pipelines(6, 8);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_1W) {
   three_parallel_pipelines(7, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_2W) {
   three_parallel_pipelines(7, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_3W) {
   three_parallel_pipelines(7, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_4W) {
   three_parallel_pipelines(7, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_5W) {
   three_parallel_pipelines(7, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_6W) {
   three_parallel_pipelines(7, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_7W) {
   three_parallel_pipelines(7, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.7L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_7L_8W) {
   three_parallel_pipelines(7, 8);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.1W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_1W) {
   three_parallel_pipelines(8, 1);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.2W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_2W) {
   three_parallel_pipelines(8, 2);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.3W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_3W) {
   three_parallel_pipelines(8, 3);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.4W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_4W) {
   three_parallel_pipelines(8, 4);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.5W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_5W) {
   three_parallel_pipelines(8, 5);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.6W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_6W) {
   three_parallel_pipelines(8, 6);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.7W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_7W) {
   three_parallel_pipelines(8, 7);
 }
 
-TEST_CASE("Three.Parallel.Pipelines.8L.8W" * doctest::timeout(300)) {
+TEST(Three_Parallel, Pipelines_8L_8W) {
   three_parallel_pipelines(8, 8);
 }
 
@@ -1556,43 +1569,43 @@ void three_concatenated_pipelines(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j1_1 == source[j1_1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j1_1 == source[j1_1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer1[pf.line()][pf.pipe()] = source[j1_1] + 1;
         j1_1++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j1_2, &mybuffer1, L](auto& pf) mutable {
-        REQUIRE(j1_2 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j1_2] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(j1_2 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j1_2] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
         mybuffer1[pf.line()][pf.pipe()] = source[j1_2] + 1;
         j1_2++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j1_3, &mybuffer1, L](auto& pf) mutable {
-        REQUIRE(j1_3 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j1_3] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(j1_3 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j1_3] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
         mybuffer1[pf.line()][pf.pipe()] = source[j1_3] + 1;
         j1_3++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j1_4, &mybuffer1, L](auto& pf) mutable {
-        REQUIRE(j1_4 < N);
-        REQUIRE(pf.token() % L == pf.line());
-        REQUIRE(source[j1_4] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(j1_4 < N);
+        EXPECT_TRUE(pf.token() % L == pf.line());
+        EXPECT_TRUE(source[j1_4] + 1 == mybuffer1[pf.line()][pf.pipe() - 1]);
         j1_4++;
       }}
     );
 
     auto pipeline1 = taskflow.composed_of(pl1).name("module_of_pipeline1");
     auto test1 = taskflow.emplace([&](){
-      REQUIRE(j1_1 == N);
-      REQUIRE(j1_2 == N);
-      REQUIRE(j1_3 == N);
-      REQUIRE(j1_4 == N);
-      REQUIRE(pl1.num_tokens() == cnt1 * N);
+      EXPECT_TRUE(j1_1 == N);
+      EXPECT_TRUE(j1_2 == N);
+      EXPECT_TRUE(j1_3 == N);
+      EXPECT_TRUE(j1_4 == N);
+      EXPECT_TRUE(pl1.num_tokens() == cnt1 * N);
     }).name("test1");
 
 
@@ -1611,25 +1624,25 @@ void three_concatenated_pipelines(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j2_1 == source[j2_1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j2_1 == source[j2_1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer2[pf.line()][pf.pipe()] = source[j2_1] + 1;
         j2_1++;
       }},
 
       turbo::Pipe{turbo::PipeType::SERIAL, [N, &source, &j2_2, &mybuffer2, L](auto& pf) mutable {
-        REQUIRE(j2_2 < N);
-        REQUIRE(source[j2_2] + 1 == mybuffer2[pf.line()][pf.pipe() - 1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j2_2 < N);
+        EXPECT_TRUE(source[j2_2] + 1 == mybuffer2[pf.line()][pf.pipe() - 1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer2[pf.line()][pf.pipe()] = source[j2_2] + 1;
         j2_2++;
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL, [N, &j2_3, &mutex2_3, &collection2_3, &mybuffer2, L](auto& pf) mutable {
-        REQUIRE(j2_3++ < N);
+        EXPECT_TRUE(j2_3++ < N);
         {
           std::scoped_lock<std::mutex> lock(mutex2_3);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection2_3.push_back(mybuffer2[pf.line()][pf.pipe() - 1]);
         }
       }}
@@ -1637,16 +1650,16 @@ void three_concatenated_pipelines(size_t L, unsigned w) {
 
     auto pipeline2 = taskflow.composed_of(pl2).name("module_of_pipeline2");
     auto test2 = taskflow.emplace([&](){
-      REQUIRE(j2_1 == N);
-      REQUIRE(j2_2 == N);
-      REQUIRE(j2_3 == N);
-      REQUIRE(collection2_3.size() == N);
+      EXPECT_TRUE(j2_1 == N);
+      EXPECT_TRUE(j2_2 == N);
+      EXPECT_TRUE(j2_3 == N);
+      EXPECT_TRUE(collection2_3.size() == N);
 
       std::sort(collection2_3.begin(), collection2_3.end());
       for (size_t i = 0; i < N; ++i) {
-        REQUIRE(collection2_3[i] == i + 1);
+        EXPECT_TRUE(collection2_3[i] == i + 1);
       }
-      REQUIRE(pl2.num_tokens() == cnt2 * N);
+      EXPECT_TRUE(pl2.num_tokens() == cnt2 * N);
     }).name("test2");
 
 
@@ -1665,18 +1678,18 @@ void three_concatenated_pipelines(size_t L, unsigned w) {
           pf.stop();
           return;
         }
-        REQUIRE(j3_1 == source[j3_1]);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(j3_1 == source[j3_1]);
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer3[pf.line()][pf.pipe()] = source[j3_1] + 1;
         j3_1++;
       }},
 
       turbo::Pipe{turbo::PipeType::PARALLEL,
       [N, &collection3_2, &mutex3_2, &j3_2, &mybuffer3, L](auto& pf) mutable {
-        REQUIRE(j3_2++ < N);
+        EXPECT_TRUE(j3_2++ < N);
         {
           std::scoped_lock<std::mutex> lock(mutex3_2);
-          REQUIRE(pf.token() % L == pf.line());
+          EXPECT_TRUE(pf.token() % L == pf.line());
           collection3_2.push_back(mybuffer3[pf.line()][pf.pipe() - 1]);
         }
       }}
@@ -1684,14 +1697,14 @@ void three_concatenated_pipelines(size_t L, unsigned w) {
 
     auto pipeline3 = taskflow.composed_of(pl3).name("module_of_pipeline3");
     auto test3 = taskflow.emplace([&](){
-      REQUIRE(j3_1 == N);
-      REQUIRE(j3_2 == N);
+      EXPECT_TRUE(j3_1 == N);
+      EXPECT_TRUE(j3_2 == N);
 
       std::sort(collection3_2.begin(), collection3_2.end());
       for(size_t i = 0; i < N; i++) {
-        REQUIRE(collection3_2[i] == i + 1);
+        EXPECT_TRUE(collection3_2[i] == i + 1);
       }
-      REQUIRE(pl3.num_tokens() == cnt3 * N);
+      EXPECT_TRUE(pl3.num_tokens() == cnt3 * N);
     }).name("test3");
 
 
@@ -1744,259 +1757,259 @@ void three_concatenated_pipelines(size_t L, unsigned w) {
 }
 
 // three concatenated piplines
-TEST_CASE("Three.Concatenated.Pipelines.1L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_1W) {
   three_concatenated_pipelines(1, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.1L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_2W) {
   three_concatenated_pipelines(1, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.1L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_3W) {
   three_concatenated_pipelines(1, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.1L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_4W) {
   three_concatenated_pipelines(1, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.1L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_5W) {
   three_concatenated_pipelines(1, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.1L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_6W) {
   three_concatenated_pipelines(1, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.1L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_7W) {
   three_concatenated_pipelines(1, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.1L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_1L_8W) {
   three_concatenated_pipelines(1, 8);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_1W) {
   three_concatenated_pipelines(2, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_2W) {
   three_concatenated_pipelines(2, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_3W) {
   three_concatenated_pipelines(2, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_4W) {
   three_concatenated_pipelines(2, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_5W) {
   three_concatenated_pipelines(2, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_6W) {
   three_concatenated_pipelines(2, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_7W) {
   three_concatenated_pipelines(2, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.2L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_2L_8W) {
   three_concatenated_pipelines(2, 8);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_1W) {
   three_concatenated_pipelines(3, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_2W) {
   three_concatenated_pipelines(3, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_3W) {
   three_concatenated_pipelines(3, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_4W) {
   three_concatenated_pipelines(3, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_5W) {
   three_concatenated_pipelines(3, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_6W) {
   three_concatenated_pipelines(3, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_7W) {
   three_concatenated_pipelines(3, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.3L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_3L_8W) {
   three_concatenated_pipelines(3, 8);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_1W) {
   three_concatenated_pipelines(4, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_2W) {
   three_concatenated_pipelines(4, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_3W) {
   three_concatenated_pipelines(4, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_4W) {
   three_concatenated_pipelines(4, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_5W) {
   three_concatenated_pipelines(4, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_6W) {
   three_concatenated_pipelines(4, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_7W) {
   three_concatenated_pipelines(4, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.4L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_4L_8W) {
   three_concatenated_pipelines(4, 8);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_1W) {
   three_concatenated_pipelines(5, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_2W) {
   three_concatenated_pipelines(5, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_3W) {
   three_concatenated_pipelines(5, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_4W) {
   three_concatenated_pipelines(5, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_5W) {
   three_concatenated_pipelines(5, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_6W) {
   three_concatenated_pipelines(5, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_7W) {
   three_concatenated_pipelines(5, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.5L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_5L_8W) {
   three_concatenated_pipelines(5, 8);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_1W) {
   three_concatenated_pipelines(6, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_2W) {
   three_concatenated_pipelines(6, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_3W) {
   three_concatenated_pipelines(6, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_4W) {
   three_concatenated_pipelines(6, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_5W) {
   three_concatenated_pipelines(6, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_6W) {
   three_concatenated_pipelines(6, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_7W) {
   three_concatenated_pipelines(6, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.6L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_6L_8W) {
   three_concatenated_pipelines(6, 8);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_1W) {
   three_concatenated_pipelines(7, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_2W) {
   three_concatenated_pipelines(7, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_3W) {
   three_concatenated_pipelines(7, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_4W) {
   three_concatenated_pipelines(7, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_5W) {
   three_concatenated_pipelines(7, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_6W) {
   three_concatenated_pipelines(7, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_7W) {
   three_concatenated_pipelines(7, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.7L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_7L_8W) {
   three_concatenated_pipelines(7, 8);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.1W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_1W) {
   three_concatenated_pipelines(8, 1);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.2W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_2W) {
   three_concatenated_pipelines(8, 2);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.3W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_3W) {
   three_concatenated_pipelines(8, 3);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.4W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_4W) {
   three_concatenated_pipelines(8, 4);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.5W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_5W) {
   three_concatenated_pipelines(8, 5);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.6W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_6W) {
   three_concatenated_pipelines(8, 6);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.7W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_7W) {
   three_concatenated_pipelines(8, 7);
 }
 
-TEST_CASE("Three.Concatenated.Pipelines.8L.8W" * doctest::timeout(300)) {
+TEST(Three_Concatenated, Pipelines_8L_8W) {
   three_concatenated_pipelines(8, 8);
 }
 
@@ -2037,35 +2050,35 @@ void looping_pipelines(size_t L, unsigned w) {
         pf.stop();
         return;
       }
-      REQUIRE(j1 == source[j1]);
-      REQUIRE(pf.token() % L == pf.line());
+      EXPECT_TRUE(j1 == source[j1]);
+      EXPECT_TRUE(pf.token() % L == pf.line());
       mybuffer[pf.line()][pf.pipe()] = source[j1] + 1;
       j1++;
     }},
 
     turbo::Pipe{turbo::PipeType::PARALLEL, [&N, &j2, &mutex2, &collection2, &mybuffer, L](auto& pf) mutable {
-      REQUIRE(j2++ < N);
+      EXPECT_TRUE(j2++ < N);
       {
         std::scoped_lock<std::mutex> lock(mutex2);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(pf.token() % L == pf.line());
         mybuffer[pf.line()][pf.pipe()] = mybuffer[pf.line()][pf.pipe() - 1] + 1;
         collection2.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
       }
     }},
 
     turbo::Pipe{turbo::PipeType::SERIAL, [&N, &source, &j3, &mybuffer, L](auto& pf) mutable {
-      REQUIRE(j3 < N);
-      REQUIRE(pf.token() % L == pf.line());
-      REQUIRE(source[j3] + 2 == mybuffer[pf.line()][pf.pipe() - 1]);
+      EXPECT_TRUE(j3 < N);
+      EXPECT_TRUE(pf.token() % L == pf.line());
+      EXPECT_TRUE(source[j3] + 2 == mybuffer[pf.line()][pf.pipe() - 1]);
       mybuffer[pf.line()][pf.pipe()] = mybuffer[pf.line()][pf.pipe() - 1] + 1;
       j3++;
     }},
 
     turbo::Pipe{turbo::PipeType::PARALLEL, [&N, &j4, &mutex4, &collection4, &mybuffer, L](auto& pf) mutable {
-      REQUIRE(j4++ < N);
+      EXPECT_TRUE(j4++ < N);
       {
         std::scoped_lock<std::mutex> lock(mutex4);
-        REQUIRE(pf.token() % L == pf.line());
+        EXPECT_TRUE(pf.token() % L == pf.line());
         collection4.push_back(mybuffer[pf.line()][pf.pipe() - 1]);
       }
     }}
@@ -2075,19 +2088,19 @@ void looping_pipelines(size_t L, unsigned w) {
   auto initial = taskflow.emplace([](){}).name("initial");
 
   auto conditional = taskflow.emplace([&](){
-    REQUIRE(j1 == N);
-    REQUIRE(j2 == N);
-    REQUIRE(j3 == N);
-    REQUIRE(j4 == N);
-    REQUIRE(collection2.size() == N);
-    REQUIRE(collection4.size() == N);
+    EXPECT_TRUE(j1 == N);
+    EXPECT_TRUE(j2 == N);
+    EXPECT_TRUE(j3 == N);
+    EXPECT_TRUE(j4 == N);
+    EXPECT_TRUE(collection2.size() == N);
+    EXPECT_TRUE(collection4.size() == N);
     std::sort(collection2.begin(), collection2.end());
     std::sort(collection4.begin(), collection4.end());
     for (size_t i = 0; i < N; ++i) {
-      REQUIRE(collection2[i] == i + 1);
-      REQUIRE(collection4[i] == i + 3);
+      EXPECT_TRUE(collection2[i] == i + 1);
+      EXPECT_TRUE(collection4[i] == i + 3);
     }
-    REQUIRE(pl.num_tokens() == cnt);
+    EXPECT_TRUE(pl.num_tokens() == cnt);
 
     // reset variables
     j1 = j2 = j3 = j4 = 0;
@@ -2114,259 +2127,259 @@ void looping_pipelines(size_t L, unsigned w) {
 }
 
 // looping piplines
-TEST_CASE("Looping.Pipelines.1L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_1W) {
   looping_pipelines(1, 1);
 }
 
-TEST_CASE("Looping.Pipelines.1L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_2W) {
   looping_pipelines(1, 2);
 }
 
-TEST_CASE("Looping.Pipelines.1L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_3W) {
   looping_pipelines(1, 3);
 }
 
-TEST_CASE("Looping.Pipelines.1L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_4W) {
   looping_pipelines(1, 4);
 }
 
-TEST_CASE("Looping.Pipelines.1L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_5W) {
   looping_pipelines(1, 5);
 }
 
-TEST_CASE("Looping.Pipelines.1L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_6W) {
   looping_pipelines(1, 6);
 }
 
-TEST_CASE("Looping.Pipelines.1L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_7W) {
   looping_pipelines(1, 7);
 }
 
-TEST_CASE("Looping.Pipelines.1L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_1L_8W) {
   looping_pipelines(1, 8);
 }
 
-TEST_CASE("Looping.Pipelines.2L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_1W) {
   looping_pipelines(2, 1);
 }
 
-TEST_CASE("Looping.Pipelines.2L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_2W) {
   looping_pipelines(2, 2);
 }
 
-TEST_CASE("Looping.Pipelines.2L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_3W) {
   looping_pipelines(2, 3);
 }
 
-TEST_CASE("Looping.Pipelines.2L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_4W) {
   looping_pipelines(2, 4);
 }
 
-TEST_CASE("Looping.Pipelines.2L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_5W) {
   looping_pipelines(2, 5);
 }
 
-TEST_CASE("Looping.Pipelines.2L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_6W) {
   looping_pipelines(2, 6);
 }
 
-TEST_CASE("Looping.Pipelines.2L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_7W) {
   looping_pipelines(2, 7);
 }
 
-TEST_CASE("Looping.Pipelines.2L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_2L_8W) {
   looping_pipelines(2, 8);
 }
 
-TEST_CASE("Looping.Pipelines.3L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_1W) {
   looping_pipelines(3, 1);
 }
 
-TEST_CASE("Looping.Pipelines.3L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_2W) {
   looping_pipelines(3, 2);
 }
 
-TEST_CASE("Looping.Pipelines.3L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_3W) {
   looping_pipelines(3, 3);
 }
 
-TEST_CASE("Looping.Pipelines.3L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_4W) {
   looping_pipelines(3, 4);
 }
 
-TEST_CASE("Looping.Pipelines.3L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_5W) {
   looping_pipelines(3, 5);
 }
 
-TEST_CASE("Looping.Pipelines.3L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_6W) {
   looping_pipelines(3, 6);
 }
 
-TEST_CASE("Looping.Pipelines.3L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_7W) {
   looping_pipelines(3, 7);
 }
 
-TEST_CASE("Looping.Pipelines.3L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_3L_8W) {
   looping_pipelines(3, 8);
 }
 
-TEST_CASE("Looping.Pipelines.4L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_1W) {
   looping_pipelines(4, 1);
 }
 
-TEST_CASE("Looping.Pipelines.4L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_2W) {
   looping_pipelines(4, 2);
 }
 
-TEST_CASE("Looping.Pipelines.4L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_3W) {
   looping_pipelines(4, 3);
 }
 
-TEST_CASE("Looping.Pipelines.4L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_4W) {
   looping_pipelines(4, 4);
 }
 
-TEST_CASE("Looping.Pipelines.4L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_5W) {
   looping_pipelines(4, 5);
 }
 
-TEST_CASE("Looping.Pipelines.4L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_6W) {
   looping_pipelines(4, 6);
 }
 
-TEST_CASE("Looping.Pipelines.4L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_7W) {
   looping_pipelines(4, 7);
 }
 
-TEST_CASE("Looping.Pipelines.4L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_4L_8W) {
   looping_pipelines(4, 8);
 }
 
-TEST_CASE("Looping.Pipelines.5L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_1W) {
   looping_pipelines(5, 1);
 }
 
-TEST_CASE("Looping.Pipelines.5L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_2W) {
   looping_pipelines(5, 2);
 }
 
-TEST_CASE("Looping.Pipelines.5L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_3W) {
   looping_pipelines(5, 3);
 }
 
-TEST_CASE("Looping.Pipelines.5L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_4W) {
   looping_pipelines(5, 4);
 }
 
-TEST_CASE("Looping.Pipelines.5L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_5W) {
   looping_pipelines(5, 5);
 }
 
-TEST_CASE("Looping.Pipelines.5L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_6W) {
   looping_pipelines(5, 6);
 }
 
-TEST_CASE("Looping.Pipelines.5L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_7W) {
   looping_pipelines(5, 7);
 }
 
-TEST_CASE("Looping.Pipelines.5L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_5L_8W) {
   looping_pipelines(5, 8);
 }
 
-TEST_CASE("Looping.Pipelines.6L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_1W) {
   looping_pipelines(6, 1);
 }
 
-TEST_CASE("Looping.Pipelines.6L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_2W) {
   looping_pipelines(6, 2);
 }
 
-TEST_CASE("Looping.Pipelines.6L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_3W) {
   looping_pipelines(6, 3);
 }
 
-TEST_CASE("Looping.Pipelines.6L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_4W) {
   looping_pipelines(6, 4);
 }
 
-TEST_CASE("Looping.Pipelines.6L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_5W) {
   looping_pipelines(6, 5);
 }
 
-TEST_CASE("Looping.Pipelines.6L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_6W) {
   looping_pipelines(6, 6);
 }
 
-TEST_CASE("Looping.Pipelines.6L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_7W) {
   looping_pipelines(6, 7);
 }
 
-TEST_CASE("Looping.Pipelines.6L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_6L_8W) {
   looping_pipelines(6, 8);
 }
 
-TEST_CASE("Looping.Pipelines.7L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_1W) {
   looping_pipelines(7, 1);
 }
 
-TEST_CASE("Looping.Pipelines.7L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_2W) {
   looping_pipelines(7, 2);
 }
 
-TEST_CASE("Looping.Pipelines.7L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_3W) {
   looping_pipelines(7, 3);
 }
 
-TEST_CASE("Looping.Pipelines.7L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_4W) {
   looping_pipelines(7, 4);
 }
 
-TEST_CASE("Looping.Pipelines.7L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_5W) {
   looping_pipelines(7, 5);
 }
 
-TEST_CASE("Looping.Pipelines.7L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_6W) {
   looping_pipelines(7, 6);
 }
 
-TEST_CASE("Looping.Pipelines.7L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_7W) {
   looping_pipelines(7, 7);
 }
 
-TEST_CASE("Looping.Pipelines.7L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_7L_8W) {
   looping_pipelines(7, 8);
 }
 
-TEST_CASE("Looping.Pipelines.8L.1W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_1W) {
   looping_pipelines(8, 1);
 }
 
-TEST_CASE("Looping.Pipelines.8L.2W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_2W) {
   looping_pipelines(8, 2);
 }
 
-TEST_CASE("Looping.Pipelines.8L.3W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_3W) {
   looping_pipelines(8, 3);
 }
 
-TEST_CASE("Looping.Pipelines.8L.4W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_4W) {
   looping_pipelines(8, 4);
 }
 
-TEST_CASE("Looping.Pipelines.8L.5W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_5W) {
   looping_pipelines(8, 5);
 }
 
-TEST_CASE("Looping.Pipelines.8L.6W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_6W) {
   looping_pipelines(8, 6);
 }
 
-TEST_CASE("Looping.Pipelines.8L.7W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_7W) {
   looping_pipelines(8, 7);
 }
 
-TEST_CASE("Looping.Pipelines.8L.8W" * doctest::timeout(300)) {
+TEST(Looping, Pipelines_8L_8W) {
   looping_pipelines(8, 8);
 }
 
@@ -2465,7 +2478,7 @@ void ifelse_pipeline(size_t L, unsigned w) {
 
     auto check_t = taskflow.emplace([&](){
       for(size_t n = 0; n < N; ++n) {
-        REQUIRE(collection[n] == ifelse_pipe_ans(source[n]));
+        EXPECT_TRUE(collection[n] == ifelse_pipe_ans(source[n]));
       }
     }).name("check");
 
@@ -2476,67 +2489,67 @@ void ifelse_pipeline(size_t L, unsigned w) {
   }
 }
 
-TEST_CASE("Ifelse.Pipelines.1L.1W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_1L_1W) {
   ifelse_pipeline(1, 1);
 }
 
-TEST_CASE("Ifelse.Pipelines.1L.2W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_1L_2W) {
   ifelse_pipeline(1, 2);
 }
 
-TEST_CASE("Ifelse.Pipelines.1L.3W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_1L_3W) {
   ifelse_pipeline(1, 3);
 }
 
-TEST_CASE("Ifelse.Pipelines.1L.4W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_1L_4W) {
   ifelse_pipeline(1, 4);
 }
 
-TEST_CASE("Ifelse.Pipelines.3L.1W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_3L_1W) {
   ifelse_pipeline(3, 1);
 }
 
-TEST_CASE("Ifelse.Pipelines.3L.2W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_3L_2W) {
   ifelse_pipeline(3, 2);
 }
 
-TEST_CASE("Ifelse.Pipelines.3L.3W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_3L_3W) {
   ifelse_pipeline(3, 3);
 }
 
-TEST_CASE("Ifelse.Pipelines.3L.4W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_3L_4W) {
   ifelse_pipeline(3, 4);
 }
 
-TEST_CASE("Ifelse.Pipelines.5L.1W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_5L_1W) {
   ifelse_pipeline(5, 1);
 }
 
-TEST_CASE("Ifelse.Pipelines.5L.2W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_5L_2W) {
   ifelse_pipeline(5, 2);
 }
 
-TEST_CASE("Ifelse.Pipelines.5L.3W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_5L_3W) {
   ifelse_pipeline(5, 3);
 }
 
-TEST_CASE("Ifelse.Pipelines.5L.4W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_5L_4W) {
   ifelse_pipeline(5, 4);
 }
 
-TEST_CASE("Ifelse.Pipelines.7L.1W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_7L_1W) {
   ifelse_pipeline(7, 1);
 }
 
-TEST_CASE("Ifelse.Pipelines.7L.2W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_7L_2W) {
   ifelse_pipeline(7, 2);
 }
 
-TEST_CASE("Ifelse.Pipelines.7L.3W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_7L_3W) {
   ifelse_pipeline(7, 3);
 }
 
-TEST_CASE("Ifelse.Pipelines.7L.4W" * doctest::timeout(300)) {
+TEST(Ifelse, Pipelines_7L_4W) {
   ifelse_pipeline(7, 4);
 }
 
@@ -2612,7 +2625,7 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
                 return;
               }
 
-              REQUIRE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
 
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subj1] + 1;
@@ -2622,9 +2635,9 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
             // subpipe 2
             turbo::Pipe{turbo::PipeType::PARALLEL, [&, subN](auto& subpf) mutable {
-              REQUIRE(subj2++ < subN);
-              REQUIRE(subpf.token() % subL == subpf.line());
-              REQUIRE(source[pf.token()][subpf.token()] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
+              EXPECT_TRUE(subj2++ < subN);
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(source[pf.token()][subpf.token()] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subpf.token()] + 1;
             }},
@@ -2632,9 +2645,9 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
             // subpipe 3
             turbo::Pipe{turbo::PipeType::SERIAL, [&, subN](auto& subpf) mutable {
-              REQUIRE(subj3 < subN);
-              REQUIRE(subpf.token() % subL == subpf.line());
-              REQUIRE(source[pf.token()][subj3] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
+              EXPECT_TRUE(subj3 < subN);
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(source[pf.token()][subj3] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subj3] + 3;
               subcollection.push_back(subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]);
@@ -2647,11 +2660,11 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
           // test task
           auto test_t = taskflow.emplace([&, subN](){
-            REQUIRE(subj1 == subN);
-            REQUIRE(subj2 == subN);
-            REQUIRE(subj3 == subN);
-            //REQUIRE(subpl.num_tokens() == subN);
-            REQUIRE(subcollection.size() == subN);
+            EXPECT_TRUE(subj1 == subN);
+            EXPECT_TRUE(subj2 == subN);
+            EXPECT_TRUE(subj3 == subN);
+            //EXPECT_TRUE(subpl.num_tokens() == subN);
+            EXPECT_TRUE(subcollection.size() == subN);
           }).name("test");
 
           // subpipeline
@@ -2673,13 +2686,13 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
          //begin of pipe 2 ---------------------------
         turbo::Pipe{turbo::PipeType::PARALLEL, [&, w, N, subN, subL](auto& pf) mutable {
 
-          REQUIRE(j2++ < N);
+          EXPECT_TRUE(j2++ < N);
           int res = std::accumulate(
             source[pf.token()].begin(),
             source[pf.token()].begin() + subN,
             0
           );
-          REQUIRE(buffer[pf.line()][pf.pipe() - 1] == res + 3 * subN);
+          EXPECT_TRUE(buffer[pf.line()][pf.pipe() - 1] == res + 3 * subN);
 
           size_t subj1 = 0, subj3 = 0;
           std::atomic<size_t> subj2 = 0;
@@ -2696,7 +2709,7 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
                 return;
               }
 
-              REQUIRE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
 
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subj1] + 1;
@@ -2706,9 +2719,9 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
             // subpipe 2
             turbo::Pipe{turbo::PipeType::PARALLEL, [&, subN](auto& subpf) mutable {
-              REQUIRE(subj2++ < subN);
-              REQUIRE(subpf.token() % subL == subpf.line());
-              REQUIRE(source[j2][subpf.token()] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
+              EXPECT_TRUE(subj2++ < subN);
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(source[j2][subpf.token()] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subpf.token()] + 1;
             }},
@@ -2716,9 +2729,9 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
             // subpipe 3
             turbo::Pipe{turbo::PipeType::SERIAL, [&, subN](auto& subpf) mutable {
-              REQUIRE(subj3 < subN);
-              REQUIRE(subpf.token() % subL == subpf.line());
-              REQUIRE(source[pf.token()][subj3] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
+              EXPECT_TRUE(subj3 < subN);
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(source[pf.token()][subj3] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subj3] + 13;
               subcollection.push_back(subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]);
@@ -2731,11 +2744,11 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
           // test task
           auto test_t = taskflow.emplace([&, subN](){
-            REQUIRE(subj1 == subN);
-            REQUIRE(subj2 == subN);
-            REQUIRE(subj3 == subN);
-            //REQUIRE(subpl.num_tokens() == subN);
-            REQUIRE(subcollection.size() == subN);
+            EXPECT_TRUE(subj1 == subN);
+            EXPECT_TRUE(subj2 == subN);
+            EXPECT_TRUE(subj3 == subN);
+            //EXPECT_TRUE(subpl.num_tokens() == subN);
+            EXPECT_TRUE(subcollection.size() == subN);
           }).name("test");
 
           // subpipeline
@@ -2756,14 +2769,14 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
         // begin of pipe 3 ---------------------------
         turbo::Pipe{turbo::PipeType::SERIAL, [&, w, N, subN, subL](auto& pf) mutable {
 
-          REQUIRE(j3++ < N);
+          EXPECT_TRUE(j3++ < N);
           int res = std::accumulate(
             source[pf.token()].begin(),
             source[pf.token()].begin() + subN,
             0
           );
 
-          REQUIRE(buffer[pf.line()][pf.pipe() - 1] == res + 13 * subN);
+          EXPECT_TRUE(buffer[pf.line()][pf.pipe() - 1] == res + 13 * subN);
 
           size_t subj1 = 0, subj3 = 0;
           std::atomic<size_t> subj2 = 0;
@@ -2780,7 +2793,7 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
                 return;
               }
 
-              REQUIRE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
 
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subj1] + 1;
@@ -2790,9 +2803,9 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
             // subpipe 2
             turbo::Pipe{turbo::PipeType::PARALLEL, [&, subN](auto& subpf) mutable {
-              REQUIRE(subj2++ < subN);
-              REQUIRE(subpf.token() % subL == subpf.line());
-              REQUIRE(source[pf.token()][subpf.token()] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
+              EXPECT_TRUE(subj2++ < subN);
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(source[pf.token()][subpf.token()] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subpf.token()] + 1;
             }},
@@ -2800,9 +2813,9 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
             // subpipe 3
             turbo::Pipe{turbo::PipeType::SERIAL, [&, subN](auto& subpf) mutable {
-              REQUIRE(subj3 < subN);
-              REQUIRE(subpf.token() % subL == subpf.line());
-              REQUIRE(source[pf.token()][subj3] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
+              EXPECT_TRUE(subj3 < subN);
+              EXPECT_TRUE(subpf.token() % subL == subpf.line());
+              EXPECT_TRUE(source[pf.token()][subj3] + 1 == subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe() - 1]);
               subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]
                 = source[pf.token()][subj3] + 7;
               subcollection.push_back(subbuffers[pf.line()][pf.pipe()][subpf.line()][subpf.pipe()]);
@@ -2815,11 +2828,11 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
 
           // test task
           auto test_t = taskflow.emplace([&, subN](){
-            REQUIRE(subj1 == subN);
-            REQUIRE(subj2 == subN);
-            REQUIRE(subj3 == subN);
-            //REQUIRE(subpl.num_tokens() == subN);
-            REQUIRE(subcollection.size() == subN);
+            EXPECT_TRUE(subj1 == subN);
+            EXPECT_TRUE(subj2 == subN);
+            EXPECT_TRUE(subj3 == subN);
+            //EXPECT_TRUE(subpl.num_tokens() == subN);
+            EXPECT_TRUE(subcollection.size() == subN);
           }).name("test");
 
           // subpipeline
@@ -2845,7 +2858,7 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
             source[j4].begin() + subN,
             0
           );
-          REQUIRE(buffer[pf.line()][pf.pipe() - 1] == res + 7 * subN);
+          EXPECT_TRUE(buffer[pf.line()][pf.pipe() - 1] == res + 7 * subN);
           j4++;
         }}
         // end of pipe 4 -----------------------------
@@ -2858,74 +2871,74 @@ void pipeline_in_pipeline(size_t L, unsigned w, unsigned subL) {
   }
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.1L.1W.1subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_1L_1W_1subL) {
   pipeline_in_pipeline(1, 1, 1);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.1L.1W.3subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_1L_1W_3subL) {
   pipeline_in_pipeline(1, 1, 3);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.1L.1W.4subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_1L_1W_4subL) {
   pipeline_in_pipeline(1, 1, 4);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.1L.2W.1subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_1L_2W_1subL) {
   pipeline_in_pipeline(1, 2, 1);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.1L.2W.3subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_1L_2W_3subL) {
   pipeline_in_pipeline(1, 2, 3);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.1L.2W.4subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_1L_2W_4subL) {
   pipeline_in_pipeline(1, 2, 4);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.3L.1W.1subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_3L_1W_1subL) {
   pipeline_in_pipeline(3, 1, 1);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.3L.1W.3subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_3L_1W_3subL) {
   pipeline_in_pipeline(3, 1, 3);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.3L.1W.4subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_3L_1W_4subL) {
   pipeline_in_pipeline(3, 1, 4);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.3L.2W.1subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_3L_2W_1subL) {
   pipeline_in_pipeline(3, 2, 1);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.3L.2W.3subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_3L_2W_3subL) {
   pipeline_in_pipeline(3, 2, 3);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.3L.2W.4subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_3L_2W_4subL) {
   pipeline_in_pipeline(3, 2, 4);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.5L.1W.1subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_5L_1W_1subL) {
   pipeline_in_pipeline(5, 1, 1);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.5L.1W.3subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_5L_1W_3subL) {
   pipeline_in_pipeline(5, 1, 3);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.5L.1W.4subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_5L_1W_4subL) {
   pipeline_in_pipeline(5, 1, 4);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.5L.2W.1subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_5L_2W_1subL) {
   pipeline_in_pipeline(5, 2, 1);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.5L.2W.3subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_5L_2W_3subL) {
   pipeline_in_pipeline(5, 2, 3);
 }
 
-TEST_CASE("PipelineinPipeline.Pipelines.5L.2W.4subL" * doctest::timeout(300)) {
+TEST(PipelineinPipeline, Pipelines_5L_2W_4subL) {
   pipeline_in_pipeline(5, 2, 4);
 }
