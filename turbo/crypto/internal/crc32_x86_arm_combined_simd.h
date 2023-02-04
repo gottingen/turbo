@@ -40,7 +40,7 @@
 #define TURBO_CRYPTO_INTERNAL_HAVE_X86_SIMD
 
 #elif defined(__aarch64__) && defined(__LITTLE_ENDIAN__) && \
-    defined(__ARM_FEATURE_CRC32) && defined(TURBO_NEON) &&  \
+    defined(__ARM_FEATURE_CRC32) && defined(TURBO_NEON_AVAILABLE) &&  \
     defined(__ARM_FEATURE_CRYPTO)
 
 #include <arm_acle.h>

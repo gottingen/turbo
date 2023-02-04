@@ -211,7 +211,7 @@
 #include <intrin.h>
 #endif
 
-#ifdef TURBO_NEON
+#ifdef TURBO_NEON_AVAILABLE
 #include <arm_neon.h>
 #endif
 
@@ -623,7 +623,7 @@ struct GroupSse2Impl {
 };
 #endif  // TURBO_INTERNAL_RAW_HASH_SET_HAVE_SSE2
 
-#if defined(TURBO_NEON) && defined(TURBO_SYSTEM_LITTLE_ENDIAN)
+#if defined(TURBO_NEON_AVAILABLE) && defined(TURBO_SYSTEM_LITTLE_ENDIAN)
 struct GroupAArch64Impl {
   static constexpr size_t kWidth = 8;
 
@@ -681,7 +681,7 @@ struct GroupAArch64Impl {
 
   uint8x8_t ctrl;
 };
-#endif  // TURBO_NEON && TURBO_SYSTEM_LITTLE_ENDIAN
+#endif  // TURBO_NEON_AVAILABLE && TURBO_SYSTEM_LITTLE_ENDIAN
 
 struct GroupPortableImpl {
   static constexpr size_t kWidth = 8;
@@ -742,7 +742,7 @@ struct GroupPortableImpl {
 
 #ifdef TURBO_INTERNAL_HAVE_SSE2
 using Group = GroupSse2Impl;
-#elif defined(TURBO_NEON) && defined(TURBO_SYSTEM_LITTLE_ENDIAN)
+#elif defined(TURBO_NEON_AVAILABLE) && defined(TURBO_SYSTEM_LITTLE_ENDIAN)
 using Group = GroupAArch64Impl;
 #else
 using Group = GroupPortableImpl;
