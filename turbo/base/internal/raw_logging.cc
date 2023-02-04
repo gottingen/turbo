@@ -233,7 +233,7 @@ bool RawLoggingFullySupported() {
 #endif  // !TURBO_LOW_LEVEL_WRITE_SUPPORTED
 }
 
-TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_API
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL
     turbo::base_internal::AtomicHook<InternalLogFunction>
         internal_log_function(DefaultInternalLog);
 

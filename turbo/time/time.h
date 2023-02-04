@@ -1325,15 +1325,15 @@ TURBO_ATTRIBUTE_PURE_FUNCTION struct tm ToTM(Time t, TimeZone tz);
 // time with UTC offset.  Also note the use of "%Y": RFC3339 mandates that
 // years have exactly four digits, but we allow them to take their natural
 // width.
-TURBO_API extern const char RFC3339_full[];  // %Y-%m-%d%ET%H:%M:%E*S%Ez
-TURBO_API extern const char RFC3339_sec[];   // %Y-%m-%d%ET%H:%M:%S%Ez
+TURBO_DLL extern const char RFC3339_full[];  // %Y-%m-%d%ET%H:%M:%E*S%Ez
+TURBO_DLL extern const char RFC3339_sec[];   // %Y-%m-%d%ET%H:%M:%S%Ez
 
 // RFC1123_full
 // RFC1123_no_wday
 //
 // FormatTime()/ParseTime() format specifiers for RFC1123 date/time strings.
-TURBO_API extern const char RFC1123_full[];     // %a, %d %b %E4Y %H:%M:%S %z
-TURBO_API extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
+TURBO_DLL extern const char RFC1123_full[];     // %a, %d %b %E4Y %H:%M:%S %z
+TURBO_DLL extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
 
 // FormatTime()
 //

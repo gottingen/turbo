@@ -158,12 +158,12 @@ const uint32_t* LargePowerOfFiveData(int i) {
 int LargePowerOfFiveSize(int i) { return 2 * i; }
 }  // namespace
 
-TURBO_API const uint32_t kFiveToNth[14] = {
+TURBO_DLL const uint32_t kFiveToNth[14] = {
     1,     5,      25,      125,     625,      3125,      15625,
     78125, 390625, 1953125, 9765625, 48828125, 244140625, 1220703125,
 };
 
-TURBO_API const uint32_t kTenToNth[10] = {
+TURBO_DLL const uint32_t kTenToNth[10] = {
     1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
 };
 

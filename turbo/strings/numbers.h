@@ -120,10 +120,10 @@ TURBO_NAMESPACE_BEGIN
 namespace numbers_internal {
 
 // Digit conversion.
-TURBO_API extern const char kHexChar[17];  // 0123456789abcdef
-TURBO_API extern const char
+TURBO_DLL extern const char kHexChar[17];  // 0123456789abcdef
+TURBO_DLL extern const char
     kHexTable[513];  // 000102030405060708090a0b0c0d0e0f1011...
-TURBO_API extern const char
+TURBO_DLL extern const char
     two_ASCII_digits[100][2];  // 00, 01, 02, 03...
 
 // Writes a two-character representation of 'i' to 'buf'. 'i' must be in the

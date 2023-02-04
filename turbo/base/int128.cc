@@ -29,7 +29,7 @@
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-TURBO_API const uint128 kuint128max = MakeUint128(
+TURBO_DLL const uint128 kuint128max = MakeUint128(
     std::numeric_limits<uint64_t>::max(), std::numeric_limits<uint64_t>::max());
 
 namespace {

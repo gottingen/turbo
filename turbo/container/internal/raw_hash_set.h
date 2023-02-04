@@ -474,7 +474,7 @@ static_assert(ctrl_t::kDeleted == static_cast<ctrl_t>(-2),
               "ctrl_t::kDeleted must be -2 to make the implementation of "
               "ConvertSpecialToEmptyAndFullToDeleted efficient");
 
-TURBO_API extern const ctrl_t kEmptyGroup[17];
+TURBO_DLL extern const ctrl_t kEmptyGroup[17];
 
 // Returns a pointer to a control byte group that can be used by empty tables.
 inline ctrl_t* EmptyGroup() {

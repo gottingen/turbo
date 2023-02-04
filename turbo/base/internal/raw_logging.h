@@ -171,7 +171,7 @@ using InternalLogFunction = void (*)(turbo::LogSeverity severity,
                                      const char* file, int line,
                                      const std::string& message);
 
-TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_API extern base_internal::AtomicHook<
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL extern base_internal::AtomicHook<
     InternalLogFunction>
     internal_log_function;
 

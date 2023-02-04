@@ -27,11 +27,11 @@ namespace cctz = turbo::time_internal::cctz;
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-TURBO_API extern const char RFC3339_full[] = "%Y-%m-%d%ET%H:%M:%E*S%Ez";
-TURBO_API extern const char RFC3339_sec[] = "%Y-%m-%d%ET%H:%M:%S%Ez";
+TURBO_DLL extern const char RFC3339_full[] = "%Y-%m-%d%ET%H:%M:%E*S%Ez";
+TURBO_DLL extern const char RFC3339_sec[] = "%Y-%m-%d%ET%H:%M:%S%Ez";
 
-TURBO_API extern const char RFC1123_full[] = "%a, %d %b %E4Y %H:%M:%S %z";
-TURBO_API extern const char RFC1123_no_wday[] = "%d %b %E4Y %H:%M:%S %z";
+TURBO_DLL extern const char RFC1123_full[] = "%a, %d %b %E4Y %H:%M:%S %z";
+TURBO_DLL extern const char RFC1123_no_wday[] = "%d %b %E4Y %H:%M:%S %z";
 
 namespace {
 

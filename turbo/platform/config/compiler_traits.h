@@ -1987,24 +1987,38 @@
 		#endif
         #endif
 
+        // TURBO_DLL
+        //
+        // When building Turbo as a DLL, this macro expands to `__declspec(dllexport)`
+        // so we can annotate symbols appropriately as being exported. When used in
+        // headers consuming a DLL, this macro expands to `__declspec(dllimport)` so
+        // that consumers know the symbol is defined inside the DLL. In all other cases,
+        // the macro expands to nothing.
+        #if defined(_MSC_VER)
+          #if defined(TURBO_BUILD_DLL)
+            #define TURBO_DLL __declspec(dllexport)
+          #elif defined(TURBO_CONSUME_DLL)
+            #define TURBO_DLL __declspec(dllimport)
+          #else
+            #define TURBO_DLL
+          #endif
+          #else
+            #define TURBO_DLL
+        #endif  // defined(_MSC_VER)
+
+
         #ifndef TURBO_API
           #if defined(_MSC_VER)
             #define TURBO_HIDDEN
-            #if defined(TURBO_BUILD_DLL)
-              #define TURBO_API __declspec(dllexport)
-            #elif defined(TURBO_CONSUME_DLL)
-              #define TURBO_API __declspec(dllimport)
-            #else
-              #define TURBO_API
-            #endif
-          #elif TURBO_HAVE_ATTRIBUTE(visibility)
+            #define TURBO_API TURBO_DLL
+          #elif defined(__GNUC__) && TURBO_HAVE_ATTRIBUTE(visibility)
             #define TURBO_HIDDEN   __attribute__((__visibility__("hidden")))
-            #define TURBO_API      __attribute__ ((visibility("default")))
+            #define TURBO_API      __attribute__((visibility("default")))
           #else
             #define TURBO_HIDDEN
             #define TURBO_API
           #endif
-        #endif  // TURBO_API
+        #endif  // TURBO_DLL
 
         #ifndef TURBO_INLINE_INLINE_VISIBILITY
           #define TURBO_INLINE_INLINE_VISIBILITY  TURBO_HIDDEN TURBO_FORCE_INLINE

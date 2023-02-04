@@ -22,7 +22,6 @@
 #include "turbo/base/casts.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/unaligned_access.h"
-#include "turbo/platform/port.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -78,7 +77,7 @@ namespace turbo {
 
     inline uint64_t ghtonll(uint64_t x) { return gbswap_64(x); }
 
-#elif defined TURBO_SYSTEM_BIG_ENDIAN
+#elif defined(TURBO_SYSTEM_BIG_ENDIAN)
 
     // Portable definitions for htonl (host-to-network) etc on big-endian
     // architectures. These definitions are simpler since the host byte order is the

@@ -34,9 +34,9 @@ constexpr int kMaxSmallPowerOfFive = 13;
 // The largest power that 10 that can be raised to, and still fit in a uint32_t.
 constexpr int kMaxSmallPowerOfTen = 9;
 
-TURBO_API extern const uint32_t
+TURBO_DLL extern const uint32_t
     kFiveToNth[kMaxSmallPowerOfFive + 1];
-TURBO_API extern const uint32_t kTenToNth[kMaxSmallPowerOfTen + 1];
+TURBO_DLL extern const uint32_t kTenToNth[kMaxSmallPowerOfTen + 1];
 
 // Large, fixed-width unsigned integer.
 //

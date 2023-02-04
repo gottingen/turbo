@@ -925,7 +925,7 @@ struct is_hashable
     : std::integral_constant<bool, HashSelect::template Apply<T>::value> {};
 
 // MixingHashState
-class TURBO_API MixingHashState : public HashStateBase<MixingHashState> {
+class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
   // turbo::uint128 is not an alias or a thin wrapper around the intrinsic.
   // We use the intrinsic when available to improve performance.
 #ifdef TURBO_HAVE_INTRINSIC_INT128

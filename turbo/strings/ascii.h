@@ -63,13 +63,13 @@ TURBO_NAMESPACE_BEGIN
 namespace ascii_internal {
 
 // Declaration for an array of bitfields holding character information.
-TURBO_API extern const unsigned char kPropertyBits[256];
+TURBO_DLL extern const unsigned char kPropertyBits[256];
 
 // Declaration for the array of characters to upper-case characters.
-TURBO_API extern const char kToUpper[256];
+TURBO_DLL extern const char kToUpper[256];
 
 // Declaration for the array of characters to lower-case characters.
-TURBO_API extern const char kToLower[256];
+TURBO_DLL extern const char kToLower[256];
 
 }  // namespace ascii_internal
 
