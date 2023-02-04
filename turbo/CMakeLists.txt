@@ -92,7 +92,6 @@ set(TURBO_ALL_SRC
         "platform/internal/thread_identity.cc"
         "platform/internal/unscaledcycleclock.cc"
         "platform/internal/low_level_alloc.cc"
-        "platform/thread/attribute.cc"
         "profiling/internal/exponential_biased.cc"
         "profiling/internal/periodic_sampler.cc"
         "random/discrete_distribution.cc"
