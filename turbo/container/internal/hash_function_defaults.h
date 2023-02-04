@@ -51,8 +51,8 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
 #include "turbo/hash/hash.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/string_view.h"
 

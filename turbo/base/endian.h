@@ -20,9 +20,8 @@
 #include <cstdlib>
 
 #include "turbo/base/casts.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/port.h"
+#include "turbo/platform/internal/unaligned_access.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -68,7 +67,7 @@ namespace turbo {
 #endif
     }
 
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#ifdef TURBO_SYSTEM_LITTLE_ENDIAN
 
     // Portable definitions for htonl (host-to-network) and friends on little-endian
     // architectures.
@@ -78,7 +77,7 @@ namespace turbo {
 
     inline uint64_t ghtonll(uint64_t x) { return gbswap_64(x); }
 
-#elif defined TURBO_IS_BIG_ENDIAN
+#elif defined(TURBO_SYSTEM_BIG_ENDIAN)
 
     // Portable definitions for htonl (host-to-network) etc on big-endian
     // architectures. These definitions are simpler since the host byte order is the
@@ -89,8 +88,8 @@ namespace turbo {
 
 #else
 #error \
-    "Unsupported byte order: Either TURBO_IS_BIG_ENDIAN or " \
-       "TURBO_IS_LITTLE_ENDIAN must be defined"
+    "Unsupported byte order: Either TURBO_SYSTEM_BIG_ENDIAN or " \
+       "TURBO_SYSTEM_LITTLE_ENDIAN must be defined"
 #endif  // byte order
 
     inline uint16_t gntohs(uint16_t x) { return ghtons(x); }
@@ -105,7 +104,7 @@ namespace turbo {
     // Load/Store methods are alignment safe
     namespace little_endian {
         // Conversion functions.
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#ifdef TURBO_SYSTEM_LITTLE_ENDIAN
 
         inline uint16_t FromHost16(uint16_t x) { return x; }
 
@@ -121,7 +120,7 @@ namespace turbo {
 
         inline constexpr bool IsLittleEndian() { return true; }
 
-#elif defined TURBO_IS_BIG_ENDIAN
+#elif defined TURBO_SYSTEM_BIG_ENDIAN
 
         inline uint16_t FromHost16(uint16_t x) { return gbswap_16(x); }
         inline uint16_t ToHost16(uint16_t x) { return gbswap_16(x); }
@@ -212,7 +211,7 @@ namespace turbo {
     //
     // Load/Store methods are alignment safe
     namespace big_endian {
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#ifdef TURBO_SYSTEM_LITTLE_ENDIAN
 
         inline uint16_t FromHost16(uint16_t x) { return gbswap_16(x); }
 
@@ -228,7 +227,7 @@ namespace turbo {
 
         inline constexpr bool IsLittleEndian() { return true; }
 
-#elif defined TURBO_IS_BIG_ENDIAN
+#elif defined TURBO_SYSTEM_BIG_ENDIAN
 
         inline uint16_t FromHost16(uint16_t x) { return x; }
         inline uint16_t ToHost16(uint16_t x) { return x; }

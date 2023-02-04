@@ -42,7 +42,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

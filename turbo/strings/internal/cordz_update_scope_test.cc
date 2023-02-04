@@ -14,13 +14,13 @@
 
 #include "turbo/strings/internal/cordz_update_scope.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cordz_test_helpers.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cordz_info.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

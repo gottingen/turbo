@@ -14,7 +14,7 @@
 
 #include "turbo/strings/internal/cordz_sample_token.h"
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_info.h"
 

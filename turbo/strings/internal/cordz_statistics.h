@@ -17,7 +17,7 @@
 
 #include <cstdint>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 
 namespace turbo {

@@ -18,7 +18,7 @@
 #ifndef TURBO_PLATFORM_INTERNAL_DIRECT_MMAP_H_
 #define TURBO_PLATFORM_INTERNAL_DIRECT_MMAP_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_HAVE_MMAP
 

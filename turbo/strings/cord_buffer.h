@@ -31,12 +31,11 @@
 #include <memory>
 #include <utility>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/macros.h"
 #include "turbo/base/bits.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -381,7 +380,7 @@ class CordBuffer {
     // memory is always on an even address, and uses the least significant bit
     // of the first or last byte (depending on endianness) as the inline size
     // indicator overlapping with the least significant byte of the CordRep*.
-#if defined(TURBO_IS_BIG_ENDIAN)
+#if defined(TURBO_SYSTEM_BIG_ENDIAN)
     struct Long {
       explicit Long(cord_internal::CordRepFlat* rep_arg) : rep(rep_arg) {}
       void* padding;

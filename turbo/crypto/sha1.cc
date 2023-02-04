@@ -6,9 +6,9 @@
  *****************************************************************/
 
 #include "turbo/crypto/sha1.h"
-#include "turbo/strings/escaping.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/bits.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/escaping.h"
 #include <string_view>
 
 namespace turbo {

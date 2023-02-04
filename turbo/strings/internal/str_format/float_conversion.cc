@@ -22,17 +22,15 @@
 #include <limits>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/meta/function_ref.h"
-#include "turbo/meta/type_traits.h"
 #include "turbo/base/bits.h"
 #include "turbo/base/int128.h"
 #include "turbo/base/internal/representation.h"
+#include "turbo/meta/function_ref.h"
+#include "turbo/meta/span.h"
+#include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/numbers.h"
 #include <optional>
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

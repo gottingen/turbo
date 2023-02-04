@@ -26,7 +26,6 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/config.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/flag.h"
 #include "turbo/flags/internal/flag.h"
@@ -35,6 +34,7 @@
 #include "turbo/flags/internal/program_name.h"
 #include "turbo/flags/internal/registry.h"
 #include "turbo/flags/usage_config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"

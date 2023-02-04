@@ -18,7 +18,7 @@
 #include <new>
 #include <stdexcept>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
 
 namespace {

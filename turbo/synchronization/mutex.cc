@@ -41,23 +41,21 @@
 #include <iterator>
 #include <thread>  // NOLINT(build/c++11)
 
-#include "turbo/platform/attributes.h"
+#include "turbo/base/internal/hide_ptr.h"
+#include "turbo/base/internal/raw_logging.h"
+#include "turbo/debugging/stacktrace.h"
+#include "turbo/debugging/symbolize.h"
 #include "turbo/platform/call_once.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/internal/cycleclock.h"
-#include "turbo/base/internal/hide_ptr.h"
 #include "turbo/platform/internal/low_level_alloc.h"
-#include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/internal/sysinfo.h"
 #include "turbo/platform/internal/thread_identity.h"
 #include "turbo/platform/internal/tsan_mutex_interface.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/platform/port.h"
-#include "turbo/debugging/stacktrace.h"
-#include "turbo/debugging/symbolize.h"
 #include "turbo/synchronization/internal/graphcycles.h"
 #include "turbo/synchronization/internal/per_thread_sem.h"
 #include "turbo/time/time.h"
@@ -446,10 +444,10 @@ static void PostSynchEvent(void *obj, int ev) {
   // or it explicitly says to log
   if (e == nullptr || e->log) {
     void *pcs[40];
-    int n = turbo::GetStackTrace(pcs, TURBO_ARRAYSIZE(pcs), 1);
+    int n = turbo::GetStackTrace(pcs, TURBO_ARRAY_SIZE(pcs), 1);
     // A buffer with enough space for the ASCII for all the PCs, even on a
     // 64-bit machine.
-    char buffer[TURBO_ARRAYSIZE(pcs) * 24];
+    char buffer[TURBO_ARRAY_SIZE(pcs) * 24];
     int pos = snprintf(buffer, sizeof (buffer), " @");
     for (int i = 0; i != n; i++) {
       int b = snprintf(&buffer[pos], sizeof(buffer) - static_cast<size_t>(pos),
@@ -1220,7 +1218,7 @@ static void LockEnter(Mutex* mu, GraphId id, SynchLocksHeld *held_locks) {
     i++;
   }
   if (i == n) {
-    if (n == TURBO_ARRAYSIZE(held_locks->locks)) {
+    if (n == TURBO_ARRAY_SIZE(held_locks->locks)) {
       held_locks->overflow = true;  // lost some data
     } else {                        // we have room for lock
       held_locks->locks[i].mu = mu;
@@ -1327,7 +1325,7 @@ static char *StackString(void **pcs, int n, char *buf, int maxlen,
 
 static char *CurrentStackString(char *buf, int maxlen, bool symbolize) {
   void *pcs[40];
-  return StackString(pcs, turbo::GetStackTrace(pcs, TURBO_ARRAYSIZE(pcs), 2), buf,
+  return StackString(pcs, turbo::GetStackTrace(pcs, TURBO_ARRAY_SIZE(pcs), 2), buf,
                      maxlen, symbolize);
 }
 
@@ -1417,7 +1415,7 @@ static GraphId DeadlockCheck(Mutex *mu) {
                    static_cast<void *>(mu), b->buf);
       TURBO_RAW_LOG(ERROR, "Cycle: ");
       int path_len = deadlock_graph->FindPath(
-          mu_id, other_node_id, TURBO_ARRAYSIZE(b->path), b->path);
+          mu_id, other_node_id, TURBO_ARRAY_SIZE(b->path), b->path);
       for (int j = 0; j != path_len; j++) {
         GraphId id = b->path[j];
         Mutex *path_mu = static_cast<Mutex *>(deadlock_graph->Ptr(id));

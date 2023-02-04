@@ -25,10 +25,10 @@
 
 #include <string>
 
-#include "turbo/platform/config.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/internal/commandlineflag.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

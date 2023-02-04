@@ -25,7 +25,7 @@
 #include <cstring>
 
 #include "turbo/debugging/stacktrace.h"
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 
 // Sometimes, we can try to get a stack trace from within a stack
 // trace, because we don't block signals inside this code (which would be too

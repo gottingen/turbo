@@ -33,13 +33,12 @@
 #include <streambuf>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/errno_saver.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/log/internal/nullguard.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/errno_saver.h"
 #include "turbo/strings/internal/has_turbo_stringify.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"

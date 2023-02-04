@@ -18,9 +18,9 @@
 #include <cstddef>
 #include <cstring>
 
-#include "turbo/platform/config.h"
-#include "turbo/strings/string_view.h"
 #include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

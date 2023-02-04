@@ -178,7 +178,7 @@ class Streamable {
   Streamable(const UntypedFormatSpecImpl& format,
              turbo::Span<const FormatArgImpl> args)
       : format_(format) {
-    if (args.size() <= TURBO_ARRAYSIZE(few_args_)) {
+    if (args.size() <= TURBO_ARRAY_SIZE(few_args_)) {
       for (size_t i = 0; i < args.size(); ++i) {
         few_args_[i] = args[i];
       }

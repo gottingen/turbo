@@ -19,12 +19,12 @@
 //
 // This header file defines portable macros for performance optimization.
 
-#ifndef TURBO_BASE_OPTIMIZATION_H_
-#define TURBO_BASE_OPTIMIZATION_H_
+#ifndef TURBO_PLATFORM_CONFIG_OPTIMIZATION_H_
+#define TURBO_PLATFORM_CONFIG_OPTIMIZATION_H_
 
 #include <assert.h>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/config/config.h"
 
 // TURBO_BLOCK_TAIL_CALL_OPTIMIZATION
 //
@@ -262,4 +262,4 @@ namespace turbo {
 #define TURBO_INTERNAL_UNIQUE_SMALL_NAME()
 #endif
 
-#endif  // TURBO_BASE_OPTIMIZATION_H_
+#endif  // TURBO_PLATFORM_CONFIG_OPTIMIZATION_H_

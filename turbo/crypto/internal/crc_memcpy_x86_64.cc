@@ -51,12 +51,12 @@
 #include <cstdint>
 #include <type_traits>
 
+#include "turbo/crypto/crc32c.h"
 #include "turbo/crypto/internal/cpu_detect.h"
 #include "turbo/crypto/internal/crc_memcpy.h"
-#include "turbo/crypto/crc32c.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/prefetch.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/strings/string_view.h"
 
 #ifdef TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE

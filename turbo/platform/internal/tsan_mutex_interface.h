@@ -19,7 +19,7 @@
 #ifndef TURBO_PLATFORM_INTERNAL_TSAN_MUTEX_INTERFACE_H_
 #define TURBO_PLATFORM_INTERNAL_TSAN_MUTEX_INTERFACE_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // TURBO_INTERNAL_HAVE_TSAN_INTERFACE
 // Macro intended only for internal use.

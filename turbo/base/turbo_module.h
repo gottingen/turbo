@@ -10,8 +10,8 @@
 
 #define __const__
 
-#include <errno.h>                           // errno
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
+#include <errno.h> // errno
 
 //
 // To add new errno, you shall define the errno in header first, either by

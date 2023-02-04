@@ -44,17 +44,17 @@
 #include <optional>
 #include <variant>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/unaligned_access.h"
-#include "turbo/platform/port.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/hash/internal/city.h"
 #include "turbo/hash/internal/low_level_hash.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/base/bits.h"
-#include "turbo/base/int128.h"
-#include "turbo/strings/string_view.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/unaligned_access.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -606,7 +606,7 @@ TurboHashValue(H hash_state, const std::vector<T, Allocator>& vector) {
 
 // TurboHashValue special cases for hashing std::vector<bool>
 
-#if defined(TURBO_IS_BIG_ENDIAN) && \
+#if defined(TURBO_SYSTEM_BIG_ENDIAN) && \
     (defined(__GLIBCXX__) || defined(__GLIBCPP__))
 
 // std::hash in libstdc++ does not work correctly with vector<bool> on Big
@@ -788,7 +788,7 @@ TurboHashValue(H hash_state, const std::variant<T...>& v) {
 // It does not expose the raw bytes, and a fallback to std::hash<> is most
 // likely faster.
 
-#if defined(TURBO_IS_BIG_ENDIAN) && \
+#if defined(TURBO_SYSTEM_BIG_ENDIAN) && \
     (defined(__GLIBCXX__) || defined(__GLIBCPP__))
 // TurboHashValue for hashing std::bitset
 //
@@ -1046,7 +1046,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
                                                  size_t len) {
     uint64_t low_mem = turbo::base_internal::UnalignedLoad64(p);
     uint64_t high_mem = turbo::base_internal::UnalignedLoad64(p + len - 8);
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#ifdef TURBO_SYSTEM_LITTLE_ENDIAN
     uint64_t most_significant = high_mem;
     uint64_t least_significant = low_mem;
 #else
@@ -1060,7 +1060,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
   static uint64_t Read4To8(const unsigned char* p, size_t len) {
     uint32_t low_mem = turbo::base_internal::UnalignedLoad32(p);
     uint32_t high_mem = turbo::base_internal::UnalignedLoad32(p + len - 4);
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#ifdef TURBO_SYSTEM_LITTLE_ENDIAN
     uint32_t most_significant = high_mem;
     uint32_t least_significant = low_mem;
 #else
@@ -1076,7 +1076,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
     unsigned char mem0 = p[0];
     unsigned char mem1 = p[len / 2];
     unsigned char mem2 = p[len - 1];
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#ifdef TURBO_SYSTEM_LITTLE_ENDIAN
     unsigned char significant2 = mem2;
     unsigned char significant1 = mem1;
     unsigned char significant0 = mem0;

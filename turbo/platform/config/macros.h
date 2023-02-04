@@ -25,29 +25,28 @@
 // platforms like Windows, Mac, and embedded systems.  Before making
 // any changes here, make sure that you're not breaking any platforms.
 
-#ifndef TURBO_BASE_MACROS_H_
-#define TURBO_BASE_MACROS_H_
+#ifndef TURBO_PLATFORM_CONFIG_MACROS_H_
+#define TURBO_PLATFORM_CONFIG_MACROS_H_
 
 #include <cassert>
 #include <cstddef>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/platform/port.h"
+#include "turbo/platform/config/config.h"
+#include "turbo/platform/config/attributes.h"
+#include "turbo/platform/config/optimization.h"
 
-// TURBO_ARRAYSIZE()
+// TURBO_ARRAY_SIZE()
 //
 // Returns the number of elements in an array as a compile-time constant, which
 // can be used in defining new arrays. If you use this macro on a pointer by
 // mistake, you will get a compile-time error.
-#define TURBO_ARRAYSIZE(array) \
+#define TURBO_ARRAY_SIZE(array) \
   (sizeof(::turbo::macros_internal::ArraySizeHelper(array)))
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace macros_internal {
-// Note: this internal template function declaration is used by TURBO_ARRAYSIZE.
+// Note: this internal template function declaration is used by TURBO_ARRAY_SIZE.
 // The function doesn't need a definition, as we only use its type.
 template <typename T, size_t N>
 auto ArraySizeHelper(const T (&array)[N]) -> char (&)[N];
@@ -138,4 +137,4 @@ TURBO_NAMESPACE_END
 #define TURBO_INTERNAL_RETHROW do {} while (false)
 #endif  // TURBO_HAVE_EXCEPTIONS
 
-#endif  // TURBO_BASE_MACROS_H_
+#endif  // TURBO_PLATFORM_CONFIG_MACROS_H_

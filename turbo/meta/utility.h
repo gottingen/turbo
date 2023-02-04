@@ -45,10 +45,10 @@
 #include <tuple>
 #include <utility>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/inline_variable.h"
 #include "turbo/base/internal/invoke.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

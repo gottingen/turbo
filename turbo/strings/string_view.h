@@ -28,7 +28,7 @@
 #define TURBO_STRINGS_STRING_VIEW_H_
 
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include <string_view>  // IWYU pragma: export
 
 namespace turbo {

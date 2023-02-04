@@ -17,15 +17,15 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_view.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

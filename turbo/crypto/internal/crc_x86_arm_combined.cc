@@ -17,15 +17,14 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "turbo/base/bits.h"
+#include "turbo/base/endian.h"
 #include "turbo/crypto/internal/cpu_detect.h"
 #include "turbo/crypto/internal/crc.h"
 #include "turbo/crypto/internal/crc32_x86_arm_combined_simd.h"
 #include "turbo/crypto/internal/crc_internal.h"
-#include "turbo/base/bits.h"
-#include "turbo/base/endian.h"
 #include "turbo/memory/memory.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/prefetch.h"
 

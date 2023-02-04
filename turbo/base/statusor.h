@@ -44,12 +44,12 @@
 #include <utility>
 #include <variant>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/call_once.h"
-#include "turbo/meta/type_traits.h"
 #include "turbo/base/internal/statusor_internal.h"
 #include "turbo/base/status.h"
+#include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/call_once.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

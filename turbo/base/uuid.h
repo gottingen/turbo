@@ -15,13 +15,13 @@
 #ifndef TURBO_BASE_UUID_H_
 #define TURBO_BASE_UUID_H_
 
-#include <iostream>
-#include <string>
+#include "turbo/platform/port.h"
+#include <chrono>
 #include <cstring>
+#include <iostream>
 #include <limits>
 #include <random>
-#include <chrono>
-#include "turbo/platform/config.h"
+#include <string>
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

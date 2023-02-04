@@ -17,7 +17,7 @@
 #include <atomic>
 #include <cstdint>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/cycleclock.h"
 
 namespace turbo {

@@ -14,10 +14,10 @@
 #include <cstdint>
 #include <iostream>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/debugging/internal/address_is_readable.h"
-#include "turbo/debugging/internal/vdso_support.h"  // a no-op on non-elf or non-glibc systems
+#include "turbo/debugging/internal/vdso_support.h" // a no-op on non-elf or non-glibc systems
 #include "turbo/debugging/stacktrace.h"
+#include "turbo/platform/port.h"
 
 static const size_t kUnknownFrameSize = 0;
 

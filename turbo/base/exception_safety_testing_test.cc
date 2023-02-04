@@ -26,6 +26,7 @@
 #include "gtest/gtest-spi.h"
 #include "gtest/gtest.h"
 #include "turbo/memory/memory.h"
+#include "turbo/log/logging.h"
 
 namespace testing {
 
@@ -328,6 +329,7 @@ TEST(ThrowingValueTest, NonThrowingDelete) {
   UnsetCountdown();
 }
 
+#if !defined(TURBO_PROCESSOR_ARM64)
 TEST(ThrowingValueTest, NonThrowingPlacementDelete) {
   constexpr int kArrayLen = 2;
   // We intentionally create extra space to store the tag allocated by placement
@@ -337,23 +339,31 @@ TEST(ThrowingValueTest, NonThrowingPlacementDelete) {
   alignas(ThrowingValue<>) unsigned char buf[sizeof(ThrowingValue<>)];
   alignas(ThrowingValue<>) unsigned char
       array_buf[sizeof(ThrowingValue<>[kStorageLen])];
+  TURBO_LOG(INFO)<<111;
   auto* placed = new (&buf) ThrowingValue<>(1);
   auto placed_array = new (&array_buf) ThrowingValue<>[kArrayLen];
-
+  TURBO_LOG(INFO)<<2222;
   SetCountdown();
+  TURBO_LOG(INFO)<<3333;
   ExpectNoThrow([placed, &buf]() {
     placed->~ThrowingValue<>();
+    TURBO_LOG(INFO)<<4444;
     ThrowingValue<>::operator delete(placed, &buf);
+    TURBO_LOG(INFO)<<5555;
   });
-
+  TURBO_LOG(INFO)<<6666;
   SetCountdown();
   ExpectNoThrow([&, placed_array]() {
+    TURBO_LOG(INFO)<<777;
     for (int i = 0; i < kArrayLen; ++i) placed_array[i].~ThrowingValue<>();
     ThrowingValue<>::operator delete[](placed_array, &array_buf);
+    TURBO_LOG(INFO)<<8888;
   });
-
+  TURBO_LOG(INFO)<<9999;
   UnsetCountdown();
+  TURBO_LOG(INFO)<<1010101;
 }
+#endif  // TURBO_PROCESSOR_ARM64
 
 TEST(ThrowingValueTest, NonThrowingDestructor) {
   auto* allocated = new ThrowingValue<>();

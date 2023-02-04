@@ -390,7 +390,7 @@ static void FreeSymbolizer(Symbolizer *s) {
 
 Symbolizer::Symbolizer() : ok_(true), addr_map_read_(false) {
   for (SymbolCacheLine &symbol_cache_line : symbol_cache_) {
-    for (size_t j = 0; j < TURBO_ARRAYSIZE(symbol_cache_line.name); ++j) {
+    for (size_t j = 0; j < TURBO_ARRAY_SIZE(symbol_cache_line.name); ++j) {
       symbol_cache_line.pc[j] = nullptr;
       symbol_cache_line.name[j] = nullptr;
       symbol_cache_line.age[j] = 0;
@@ -1222,7 +1222,7 @@ const char *Symbolizer::FindSymbolInCache(const void *const pc) {
   if (pc == nullptr) return nullptr;
 
   SymbolCacheLine *line = GetCacheLine(pc);
-  for (size_t i = 0; i < TURBO_ARRAYSIZE(line->pc); ++i) {
+  for (size_t i = 0; i < TURBO_ARRAY_SIZE(line->pc); ++i) {
     if (line->pc[i] == pc) {
       AgeSymbols(line);
       line->age[i] = 0;
@@ -1240,7 +1240,7 @@ const char *Symbolizer::InsertSymbolInCache(const void *const pc,
   uint32_t max_age = 0;
   size_t oldest_index = 0;
   bool found_oldest_index = false;
-  for (size_t i = 0; i < TURBO_ARRAYSIZE(line->pc); ++i) {
+  for (size_t i = 0; i < TURBO_ARRAY_SIZE(line->pc); ++i) {
     if (line->pc[i] == nullptr) {
       AgeSymbols(line);
       line->pc[i] = pc;

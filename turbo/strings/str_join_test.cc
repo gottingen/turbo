@@ -29,12 +29,12 @@
 #include <type_traits>
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/macros.h"
 #include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"
 #include "turbo/strings/string_view.h"
+#include "gtest/gtest.h"
 
 namespace {
 
@@ -93,7 +93,7 @@ TEST(StrJoin, APIExamples) {
   {
     // Array of ints
     const int a[] = {1, 2, 3, -4};
-    EXPECT_EQ("1-2-3--4", turbo::StrJoin(a, a + TURBO_ARRAYSIZE(a), "-"));
+    EXPECT_EQ("1-2-3--4", turbo::StrJoin(a, a + TURBO_ARRAY_SIZE(a), "-"));
   }
 
   {

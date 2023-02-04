@@ -21,7 +21,7 @@ constexpr uint64_t Int128Low64(int128 v) { return v.lo_; }
 
 constexpr int64_t Int128High64(int128 v) { return v.hi_; }
 
-#if defined(TURBO_IS_LITTLE_ENDIAN)
+#if defined(TURBO_SYSTEM_LITTLE_ENDIAN)
 
 constexpr int128::int128(int64_t high, uint64_t low) :
     lo_(low), hi_(high) {}
@@ -42,7 +42,7 @@ constexpr int128::int128(unsigned long long v) : lo_{v}, hi_{0} {}
 constexpr int128::int128(uint128 v)
     : lo_{Uint128Low64(v)}, hi_{static_cast<int64_t>(Uint128High64(v))} {}
 
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif defined(TURBO_SYSTEM_BIG_ENDIAN)
 
 constexpr int128::int128(int64_t high, uint64_t low) :
     hi_{high}, lo_{low} {}

@@ -20,7 +20,7 @@
 #include <ostream>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // Disable constexpr support unless we are in C++14 mode.
 #if __cpp_constexpr >= 201304 || (defined(_MSC_VER) && _MSC_VER >= 1910)

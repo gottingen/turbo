@@ -22,11 +22,11 @@
 #include <utility>
 #include <vector>
 
+#include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/str_cat.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/memory/memory.h"
-#include "turbo/strings/str_cat.h"
 
 namespace {
 

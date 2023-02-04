@@ -5,9 +5,9 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include <sys/stat.h>
-#include "turbo/platform/config.h"              // TURBO_PLATFORM_OSX
 #include "turbo/files/file_watcher.h"
+#include "turbo/platform/port.h" // TURBO_PLATFORM_OSX
+#include <sys/stat.h>
 
 namespace turbo {
 

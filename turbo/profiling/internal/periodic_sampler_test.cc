@@ -16,10 +16,9 @@
 
 #include <thread>  // NOLINT(build/c++11)
 
+#include "turbo/platform/port.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/macros.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

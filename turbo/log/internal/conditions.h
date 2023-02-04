@@ -33,9 +33,8 @@
 #include <atomic>
 #include <cstdint>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/log/internal/voidify.h"
+#include "turbo/platform/port.h"
 
 // `TURBO_LOG_INTERNAL_CONDITION` prefixes another macro that expands to a
 // temporary `LogMessage` instantiation followed by zero or more streamed

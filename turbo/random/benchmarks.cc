@@ -24,8 +24,8 @@
 #include <random>
 #include <type_traits>
 #include <vector>
-
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
+#include "benchmark/benchmark.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/bernoulli_distribution.h"
 #include "turbo/random/beta_distribution.h"
@@ -39,7 +39,6 @@
 #include "turbo/random/uniform_int_distribution.h"
 #include "turbo/random/uniform_real_distribution.h"
 #include "turbo/random/zipf_distribution.h"
-#include "benchmark/benchmark.h"
 
 namespace {
 
@@ -75,13 +74,13 @@ class PrecompiledSeedSeq {
     static size_t idx = 0;
     for (; begin != end; begin++) {
       *begin = kSeedData[idx++];
-      if (idx >= TURBO_ARRAYSIZE(kSeedData)) {
+      if (idx >= TURBO_ARRAY_SIZE(kSeedData)) {
         idx = 0;
       }
     }
   }
 
-  size_t size() const { return TURBO_ARRAYSIZE(kSeedData); }
+  size_t size() const { return TURBO_ARRAY_SIZE(kSeedData); }
 
   template <typename OutIterator>
   void param(OutIterator out) const {

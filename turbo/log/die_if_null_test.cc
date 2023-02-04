@@ -20,9 +20,9 @@
 #include <memory>
 #include <utility>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
 #include "turbo/log/internal/test_helpers.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace {
 

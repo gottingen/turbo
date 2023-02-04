@@ -22,9 +22,9 @@
 #ifndef TURBO_STRINGS_UTF8_NAIVE_DECODER_H_
 #define TURBO_STRINGS_UTF8_NAIVE_DECODER_H_
 
+#include "turbo/platform/port.h"
 #include <cstddef>
 #include <cstdint>
-#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

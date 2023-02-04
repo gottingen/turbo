@@ -92,7 +92,7 @@ turbo_cc_test(
   NAME
     config_test
   SRCS
-    "config_test.cc"
+    "config/config_test.cc"
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
@@ -191,7 +191,7 @@ turbo_cc_test(
   NAME
     optimization_test
   SRCS
-    "optimization_test.cc"
+    "config/optimization_test.cc"
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS

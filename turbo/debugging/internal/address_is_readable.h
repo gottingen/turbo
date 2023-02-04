@@ -15,7 +15,7 @@
 #ifndef TURBO_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_
 #define TURBO_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

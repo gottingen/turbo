@@ -22,12 +22,12 @@
 #include <string>
 #include <thread>  // NOLINT
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/str_format/bind.h"
 #include "turbo/strings/match.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include <optional>
 
 namespace turbo {

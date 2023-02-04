@@ -17,11 +17,11 @@
 #include <thread>
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/const_init.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/mutex.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

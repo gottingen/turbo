@@ -29,15 +29,14 @@
 #include <type_traits>
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/synchronization/internal/thread_pool.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
+#include "gtest/gtest.h"
 
 namespace {
 

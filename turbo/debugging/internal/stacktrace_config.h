@@ -21,7 +21,7 @@
 #ifndef TURBO_DEBUGGING_INTERNAL_STACKTRACE_CONFIG_H_
 #define TURBO_DEBUGGING_INTERNAL_STACKTRACE_CONFIG_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #if defined(TURBO_STACKTRACE_INL_HEADER)
 #error TURBO_STACKTRACE_INL_HEADER cannot be directly set

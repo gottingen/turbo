@@ -14,7 +14,7 @@
 
 #include "turbo/container/inlined_vector.h"
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #if defined(TURBO_HAVE_EXCEPTIONS)
 

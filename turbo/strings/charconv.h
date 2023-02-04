@@ -17,7 +17,7 @@
 
 #include <system_error>  // NOLINT(build/c++11)
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

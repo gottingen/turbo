@@ -20,9 +20,9 @@
 #include <utility>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/fast_type_id.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

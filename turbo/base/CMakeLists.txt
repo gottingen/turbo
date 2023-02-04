@@ -124,7 +124,7 @@ turbo_cc_library(
 
 turbo_cc_test(
         NAME
-        turbo_exception_safety_testing_test
+        exception_safety_testing_test
         SRCS
         "exception_safety_testing_test.cc"
         COPTS

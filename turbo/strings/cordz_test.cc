@@ -15,11 +15,8 @@
 #include <cstdint>
 #include <string>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/cord_test_helpers.h"
 #include "turbo/strings/cordz_test_helpers.h"
@@ -30,6 +27,8 @@
 #include "turbo/strings/internal/cordz_update_tracker.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_view.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 #ifdef TURBO_INTERNAL_CORDZ_ENABLED
 

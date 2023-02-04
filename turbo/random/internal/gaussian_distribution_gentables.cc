@@ -24,7 +24,7 @@
 #include <limits>
 #include <string>
 
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -80,10 +80,10 @@ TableGenerator::TableGenerator() {
   // The constants here should match the values in gaussian_distribution.h
   static constexpr int kC = kMask + 1;
 
-  static_assert((TURBO_ARRAYSIZE(tables_.x) == kC + 1),
+  static_assert((TURBO_ARRAY_SIZE(tables_.x) == kC + 1),
                 "xArray must be length kMask + 2");
 
-  static_assert((TURBO_ARRAYSIZE(tables_.x) == TURBO_ARRAYSIZE(tables_.f)),
+  static_assert((TURBO_ARRAY_SIZE(tables_.x) == TURBO_ARRAY_SIZE(tables_.f)),
                 "fx and x arrays must be identical length");
 
   auto f = [](double x) { return std::exp(-0.5 * x * x); };

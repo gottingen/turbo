@@ -22,7 +22,7 @@
 #include <string.h>
 #include <cassert>
 #include <cstddef>
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/base/internal/raw_logging.h"
 
 // From binutils/include/elf/common.h (this doesn't appear to be documented
@@ -175,14 +175,14 @@ void ElfMemImage::Init(const void *base) {
   }
   switch (base_as_char[EI_DATA]) {
     case ELFDATA2LSB: {
-#ifndef TURBO_IS_LITTLE_ENDIAN
+#ifndef TURBO_SYSTEM_LITTLE_ENDIAN
       assert(false);
       return;
 #endif
       break;
     }
     case ELFDATA2MSB: {
-#ifndef TURBO_IS_BIG_ENDIAN
+#ifndef TURBO_SYSTEM_BIG_ENDIAN
       assert(false);
       return;
 #endif

@@ -16,13 +16,13 @@
 #include <mutex>  // NOLINT(build/c++11)
 #include <vector>
 
-#include "turbo/platform/config.h"
+#include "benchmark/benchmark.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/cycleclock.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/synchronization/blocking_counter.h"
 #include "turbo/synchronization/internal/thread_pool.h"
 #include "turbo/synchronization/mutex.h"
-#include "benchmark/benchmark.h"
 
 namespace {
 

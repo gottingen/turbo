@@ -21,13 +21,11 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/endian.h"
 #include "turbo/base/internal/invoke.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
@@ -483,7 +481,7 @@ static_assert(sizeof(cordz_info_t) >= sizeof(intptr_t), "");
 // a little endian value where the first byte in the host's representation
 // holds 'value`, with all other bytes being 0.
 static constexpr cordz_info_t LittleEndianByte(unsigned char value) {
-#if defined(TURBO_IS_BIG_ENDIAN)
+#if defined(TURBO_SYSTEM_BIG_ENDIAN)
   return static_cast<cordz_info_t>(value) << ((sizeof(cordz_info_t) - 1) * 8);
 #else
   return value;

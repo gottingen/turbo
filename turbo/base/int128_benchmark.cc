@@ -19,8 +19,8 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#include "turbo/platform/config.h"
-#include "int128.h"
+#include "turbo/base/int128.h"
+#include "turbo/platform/port.h"
 
 namespace {
 

@@ -16,8 +16,8 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#include "turbo/platform/optimization.h"
-#include "bits.h"
+#include "turbo/base/bits.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/random.h"
 
 namespace turbo {

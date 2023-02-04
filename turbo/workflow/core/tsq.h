@@ -15,8 +15,8 @@
 #ifndef TURBO_WORKFLOW_CORE_TSQ_H_
 #define TURBO_WORKFLOW_CORE_TSQ_H_
 
-#include <turbo/platform/config.h>
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

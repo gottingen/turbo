@@ -32,11 +32,8 @@
 #include <string>
 #include <tuple>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/internal/strerror.h"
-#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/debugging/internal/examine_stack.h"
@@ -50,10 +47,12 @@
 #include "turbo/log/log_sink.h"
 #include "turbo/log/log_sink_registry.h"
 #include "turbo/memory/memory.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
-#include "turbo/meta/span.h"
 
 extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
     TurboInternalOnFatalLogMessage)(const turbo::LogEntry&) {

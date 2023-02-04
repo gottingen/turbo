@@ -16,9 +16,9 @@
 
 #include <string.h>
 
+#include "turbo/platform/port.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/macros.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -46,7 +46,7 @@ TEST(LengthModTest, Names) {
     {__LINE__, LengthMod::t,    "t" },
     {__LINE__, LengthMod::q,    "q" },
   };
-  EXPECT_EQ(TURBO_ARRAYSIZE(kExpect), 10);
+  EXPECT_EQ(TURBO_ARRAY_SIZE(kExpect), 10);
   for (auto e : kExpect) {
     SCOPED_TRACE(e.line);
     EXPECT_EQ(e.name, LengthModToString(e.mod));
@@ -267,7 +267,7 @@ TEST_F(ConsumeUnboundConversionTest, WidthAndPrecision) {
 
 TEST_F(ConsumeUnboundConversionTest, Flags) {
   static const char kAllFlags[] = "-+ #0";
-  static const int kNumFlags = TURBO_ARRAYSIZE(kAllFlags) - 1;
+  static const int kNumFlags = TURBO_ARRAY_SIZE(kAllFlags) - 1;
   for (int rev = 0; rev < 2; ++rev) {
     for (int i = 0; i < 1 << kNumFlags; ++i) {
       std::string fmt;

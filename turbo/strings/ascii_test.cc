@@ -19,9 +19,8 @@
 #include <cstring>
 #include <string>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace {
 
@@ -345,7 +344,7 @@ TEST(RemoveExtraAsciiWhitespace, InPlace) {
       "",
       "a\nb",
   };
-  const int NUM_TESTS = TURBO_ARRAYSIZE(inputs);
+  const int NUM_TESTS = TURBO_ARRAY_SIZE(inputs);
 
   for (int i = 0; i < NUM_TESTS; i++) {
     std::string s(inputs[i]);

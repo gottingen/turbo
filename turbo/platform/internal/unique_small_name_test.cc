@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "gtest/gtest.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
+#include "gtest/gtest.h"
 
 // This test by itself does not do anything fancy, but it serves as binary I can
 // query in shell test.

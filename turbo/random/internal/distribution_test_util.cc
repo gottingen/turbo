@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_format.h"
 

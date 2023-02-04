@@ -27,8 +27,8 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_engine.h"
 

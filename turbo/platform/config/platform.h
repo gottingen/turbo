@@ -44,7 +44,6 @@
 //    TURBO_PLATFORM_DESCRIPTION = <string>
 //    TURBO_PROCESSOR_XXX
 //    TURBO_MISALIGNED_SUPPORT_LEVEL=0|1|2
-//    TURBO_SYSTEM_LITTLE_ENDIAN | TURBO_SYSTEM_BIG_ENDIAN
 //    TURBO_ASM_STYLE_ATT | TURBO_ASM_STYLE_INTEL | TURBO_ASM_STYLE_MOTOROLA
 //    TURBO_PLATFORM_PTR_SIZE = <integer size in bytes>
 //    TURBO_PLATFORM_WORD_SIZE = <integer size in bytes>
@@ -121,7 +120,6 @@
 
 	#define TURBO_PLATFORM_KETTLE 1
 	#define TURBO_PLATFORM_NAME "PS4"
-	#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 	#define TURBO_PLATFORM_DESCRIPTION "PS4 on x64"
 	#define TURBO_PLATFORM_CONSOLE 1
 	#define TURBO_PLATFORM_SONY 1
@@ -161,7 +159,6 @@
 	#define TURBO_PLATFORM_NAME "XBox One"
   //#define TURBO_PROCESSOR_X86  Currently our policy is that we don't define this, even though x64 is something of a superset of x86.
 	#define TURBO_PROCESSOR_X86_64 1
-	#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 	#define TURBO_PLATFORM_DESCRIPTION "XBox One on x64"
 	#define TURBO_ASM_STYLE_INTEL 1
 	#define TURBO_PLATFORM_CONSOLE 1
@@ -238,11 +235,6 @@
 	#define TURBO_PLATFORM_NAME        "Larrabee"
 	#define TURBO_PLATFORM_DESCRIPTION "Larrabee on LRB1"
 	#define TURBO_PROCESSOR_X86_64 1
-	#if defined(BYTE_ORDER) && (BYTE_ORDER == 4321)
-		#define TURBO_SYSTEM_BIG_ENDIAN 1
-	#else
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
-	#endif
 	#define TURBO_PROCESSOR_LRB 1
 	#define TURBO_PROCESSOR_LRB1 1       // Larrabee version 1
 	#define TURBO_ASM_STYLE_ATT 1        // Both types of asm style
@@ -274,9 +266,6 @@
 	#else
 		#error Unknown processor
 	#endif
-	#if !defined(TURBO_SYSTEM_BIG_ENDIAN) && !defined(TURBO_SYSTEM_LITTLE_ENDIAN)
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
-	#endif
 	#define TURBO_PLATFORM_MOBILE 1
 
 // Samsung SMART TV - a Linux-based smart TV
@@ -289,7 +278,6 @@
 	#define TURBO_PLATFORM_NAME "SamsungTV"
 	#define TURBO_PLATFORM_DESCRIPTION "Samsung SMART TV on ARM"
 	#define TURBO_ASM_STYLE_ATT 1
-	#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 	#define TURBO_PROCESSOR_ARM32 1
 	#define TURBO_ABI_ARM_LINUX 1 // a.k.a. "ARM eabi"
 	#define TURBO_PROCESSOR_ARM7 1
@@ -312,21 +300,17 @@
 		#if defined(__arm__)
 			#define TURBO_ABI_ARM_APPLE 1
 			#define TURBO_PROCESSOR_ARM32 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "iPhone on ARM"
 		#elif defined(__aarch64__) || defined(__AARCH64)
 			#define TURBO_ABI_ARM64_APPLE 1
 			#define TURBO_PROCESSOR_ARM64 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "iPhone on ARM64"
 		#elif defined(__i386__)
 			#define TURBO_PLATFORM_IPHONE_SIMULATOR 1
 			#define TURBO_PROCESSOR_X86 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "iPhone simulator on x86"
 		#elif defined(__x86_64) || defined(__amd64)
 			#define TURBO_PROCESSOR_X86_64 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "iPhone simulator on x64"
 		#else
 			#error Unknown processor
@@ -349,31 +333,25 @@
 		#define TURBO_PLATFORM_NAME "OSX"
 		#if defined(__i386__) || defined(__intel__)
 			#define TURBO_PROCESSOR_X86 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "OSX on x86"
 		#elif defined(__x86_64) || defined(__amd64)
 			#define TURBO_PROCESSOR_X86_64 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "OSX on x64"
 		#elif defined(__arm__)
 			#define TURBO_ABI_ARM_APPLE 1
 			#define TURBO_PROCESSOR_ARM32 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "OSX on ARM"
 		#elif defined(__aarch64__) || defined(__AARCH64)
 			#define TURBO_ABI_ARM64_APPLE 1
 			#define TURBO_PROCESSOR_ARM64 1
-			#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "OSX on ARM64"
 		#elif defined(__POWERPC64__) || defined(__powerpc64__)
 			#define TURBO_PROCESSOR_POWERPC 1
 			#define TURBO_PROCESSOR_POWERPC_64 1
-			#define TURBO_SYSTEM_BIG_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "OSX on PowerPC 64"
 		#elif defined(__POWERPC__) || defined(__powerpc__)
 			#define TURBO_PROCESSOR_POWERPC 1
 			#define TURBO_PROCESSOR_POWERPC_32 1
-			#define TURBO_SYSTEM_BIG_ENDIAN 1
 			#define TURBO_PLATFORM_DESCRIPTION "OSX on PowerPC"
 		#else
 			#error Unknown processor
@@ -405,7 +383,6 @@
 	#define TURBO_PLATFORM_NAME "Linux"
 	#if defined(__i386__) || defined(__intel__) || defined(_M_IX86)
 		#define TURBO_PROCESSOR_X86 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Linux on x86"
 	#elif defined(__ARM_ARCH_7A__) || defined(__ARM_EABI__)
 		#define TURBO_ABI_ARM_LINUX 1
@@ -416,17 +393,14 @@
 		#define TURBO_PLATFORM_DESCRIPTION "Linux on ARM64"
 	#elif defined(__x86_64__)
 		#define TURBO_PROCESSOR_X86_64 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Linux on x64"
 	#elif defined(__powerpc64__)
 		#define TURBO_PROCESSOR_POWERPC 1
 		#define TURBO_PROCESSOR_POWERPC_64 1
-		#define TURBO_SYSTEM_BIG_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Linux on PowerPC 64"
 	#elif defined(__powerpc__)
 		#define TURBO_PROCESSOR_POWERPC 1
 		#define TURBO_PROCESSOR_POWERPC_32 1
-		#define TURBO_SYSTEM_BIG_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Linux on PowerPC"
 	#else
 		#error Unknown processor
@@ -446,21 +420,17 @@
 	#define TURBO_PLATFORM_NAME "BSD Unix"
 	#if defined(__i386__) || defined(__intel__)
 		#define TURBO_PROCESSOR_X86 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "BSD on x86"
 	#elif defined(__x86_64__)
 		#define TURBO_PROCESSOR_X86_64 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "BSD on x64"
 	#elif defined(__powerpc64__)
 		#define TURBO_PROCESSOR_POWERPC 1
 		#define TURBO_PROCESSOR_POWERPC_64 1
-		#define TURBO_SYSTEM_BIG_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "BSD on PowerPC 64"
 	#elif defined(__powerpc__)
 		#define TURBO_PROCESSOR_POWERPC 1
 		#define TURBO_PROCESSOR_POWERPC_32 1
-		#define TURBO_SYSTEM_BIG_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "BSD on PowerPC"
 	#else
 		#error Unknown processor
@@ -481,16 +451,13 @@
 	#define TURBO_PLATFORM_NAME "Windows Phone"
 	#if defined(_M_AMD64) || defined(_AMD64_) || defined(__x86_64__)
 		#define TURBO_PROCESSOR_X86_64 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows Phone on x64"
 	#elif defined(_M_IX86) || defined(_X86_)
 		#define TURBO_PROCESSOR_X86 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows Phone on X86"
 	#elif defined(_M_ARM)
 		#define TURBO_ABI_ARM_WINCE 1
 		#define TURBO_PROCESSOR_ARM32 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows Phone on ARM"
 	#else //Possibly other Windows Phone variants
 		#error Unknown processor
@@ -546,24 +513,19 @@
 	#endif
 	#if defined(_M_AMD64) || defined(_AMD64_) || defined(__x86_64__)
 		#define TURBO_PROCESSOR_X86_64 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows on x64"
 	#elif defined(_M_IX86) || defined(_X86_)
 		#define TURBO_PROCESSOR_X86 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows on X86"
 	#elif defined(_M_IA64) || defined(_IA64_)
 		#define TURBO_PROCESSOR_IA64 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows on IA-64"
 	#elif defined(_M_ARM)
 		#define TURBO_ABI_ARM_WINCE 1
 		#define TURBO_PROCESSOR_ARM32 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows on ARM"
 	#elif defined(_M_ARM64)
 		#define TURBO_PROCESSOR_ARM64 1
-		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Windows on ARM64"
 	#else //Possibly other Windows CE variants
 		#error Unknown processor
@@ -664,6 +626,33 @@
 #endif
 
 
+// TURBO_SYSTEM_LITTLE_ENDIAN
+// TURBO_SYSTEM_BIG_ENDIAN
+//
+// Checks the endianness of the platform.
+//
+// Notes: uses the built in endian macros provided by GCC (since 4.6) and
+// Clang (since 3.2); see
+// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html.
+// Otherwise, if _WIN32, assume little endian. Otherwise, bail with an error.
+#if defined(TURBO_SYSTEM_BIG_ENDIAN)
+#error "TURBO_SYSTEM_BIG_ENDIAN cannot be directly set."
+#endif
+#if defined(TURBO_SYSTEM_LITTLE_ENDIAN)
+#error "TURBO_SYSTEM_LITTLE_ENDIAN cannot be directly set."
+#endif
+
+#if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
+     __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define TURBO_SYSTEM_LITTLE_ENDIAN 1
+#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && \
+    __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define TURBO_SYSTEM_BIG_ENDIAN 1
+#elif defined(_WIN32)
+#define TURBO_SYSTEM_LITTLE_ENDIAN 1
+#else
+#error "turbo endian detection needs to be set up for your compiler"
+#endif
 
 // TURBO_PLATFORM_WORD_SIZE
 // This defines the size of a machine word. This will be the same as

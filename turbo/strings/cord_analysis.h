@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 
 namespace turbo {

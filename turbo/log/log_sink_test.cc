@@ -15,17 +15,17 @@
 
 #include "turbo/log/log_sink.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/log/internal/test_actions.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
-#include "turbo/log/logging.h"
 #include "turbo/log/log_sink_registry.h"
+#include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 

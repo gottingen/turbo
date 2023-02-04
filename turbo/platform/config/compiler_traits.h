@@ -110,6 +110,12 @@
     #define TURBO_HAVE_ATTRIBUTE(x) 0
     #endif
 
+    #ifdef __has_feature
+      #define TURBO_HAVE_FEATURE(f) __has_feature(f)
+    #else
+      #define TURBO_HAVE_FEATURE(f) 0
+    #endif
+
     // TURBO_HAVE_CPP_ATTRIBUTE
     //
     // A function-like feature checking macro that accepts C++11 style attributes.
@@ -1883,13 +1889,17 @@
 	#endif
 
 	// ------------------------------------------------------------------------
-	// TURBO_NEON
-	// TURBO_NEON may be used to determine if NEON is supported.
-	#ifndef TURBO_NEON
-		#if defined(__ARM_NEON__) || defined(__ARM_NEON)
-			#define TURBO_NEON 1
-		#else
-			#define TURBO_NEON 0
+	// TURBO_NEON_AVAILABLE
+        // TURBO_NEON_AVAILABLE is used for compile-time detection of NEON (ARM
+        // SIMD).
+        //
+        // If __CUDA_ARCH__ is defined, then we are compiling CUDA code in device mode.
+        // In device mode, NEON intrinsics are not available, regardless of host
+        // platform.
+        // https://llvm.org/docs/CompileCudaWithLLVM.html#detecting-clang-vs-nvcc-from-code
+	#ifndef TURBO_NEON_AVAILABLE
+		#if (defined(__ARM_NEON__) || defined(__ARM_NEON)) && !defined(__CUDA_ARCH__)
+			#define TURBO_NEON_AVAILABLE 1
 		#endif
 	#endif
 
@@ -1973,54 +1983,47 @@
 		#else
 			#define TURBO_EXPORT
 		#endif
-    #endif
+        #endif
+
+        // TURBO_DLL
+        //
+        // When building Turbo as a DLL, this macro expands to `__declspec(dllexport)`
+        // so we can annotate symbols appropriately as being exported. When used in
+        // headers consuming a DLL, this macro expands to `__declspec(dllimport)` so
+        // that consumers know the symbol is defined inside the DLL. In all other cases,
+        // the macro expands to nothing.
+        #if defined(_MSC_VER)
+          #if defined(TURBO_BUILD_DLL)
+            #define TURBO_DLL __declspec(dllexport)
+          #elif defined(TURBO_CONSUME_DLL)
+            #define TURBO_DLL __declspec(dllimport)
+          #else
+            #define TURBO_DLL
+          #endif
+          #else
+            #define TURBO_DLL
+        #endif  // defined(_MSC_VER)
 
 
-///////////////////////////////////////////////////////////////////////////////
-// TURBO_API
-//
-// This is used to label functions as DLL exports under Microsoft platforms.
-// If TURBO_DLL is defined, then the user is building EAThread as a DLL and EAThread's
-// non-templated functions will be exported. EAThread template functions are not
-// labelled as TURBO_API (and are thus not exported in a DLL build). This is
-// because it's not possible (or at least unsafe) to implement inline templated
-// functions in a DLL.
-//
-// Example usage of TURBO_API:
-//    TURBO_API int someVariable = 10;         // Export someVariable in a DLL build.
-//
-//    struct TURBO_API SomeClass{              // Export SomeClass and its member functions in a DLL build.
-//        TURBO_HIDDEN void PrivateMethod();    // Not exported.
-//    };
-//
-//    TURBO_API void SomeFunction();           // Export SomeFunction in a DLL build.
-//
-// For GCC, see http://gcc.gnu.org/wiki/Visibility
-//
-#ifndef TURBO_API // If the build file hasn't already defined this to be dllexport...
-#if defined(TURBO_DLL)
-#if defined(_MSC_VER)
-			#define TURBO_API      __declspec(dllimport)
-			#define TURBO_HIDDEN
-		#elif defined(__CYGWIN__)
-			#define TURBO_API      __attribute__((dllimport))
-			#define TURBO_HIDDEN
-		#elif (defined(__GNUC__) && (__GNUC__ >= 4))
-			#define TURBO_API      __attribute__ ((visibility("default")))
-			#define TURBO_HIDDEN    __attribute__ ((visibility("hidden")))
-		#else
-			#define TURBO_API
-			#define TURBO_HIDDEN
-		#endif
-#else
-#define TURBO_API
-#define TURBO_HIDDEN
-#endif
-#endif
+        #ifndef TURBO_API
+          #if defined(_MSC_VER)
+            #define TURBO_HIDDEN
+            #define TURBO_API TURBO_DLL
+          #elif defined(__GNUC__) && TURBO_HAVE_ATTRIBUTE(visibility)
+            #define TURBO_HIDDEN   __attribute__((__visibility__("hidden")))
+            #define TURBO_API      __attribute__((visibility("default")))
+          #else
+            #define TURBO_HIDDEN
+            #define TURBO_API
+          #endif
+        #endif  // TURBO_DLL
+
+        #ifndef TURBO_INLINE_INLINE_VISIBILITY
+          #define TURBO_INLINE_INLINE_VISIBILITY  TURBO_HIDDEN TURBO_FORCE_INLINE
+        #endif  // TURBO_INLINE_INLINE_VISIBILITY
 
 
-
-    // ------------------------------------------------------------------------
+        // ------------------------------------------------------------------------
 	// TURBO_PRAGMA_ONCE_SUPPORTED
 	//
 	// This is a wrapper for the #pragma once preprocessor directive.

@@ -23,7 +23,7 @@
 
 #include <string.h>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {

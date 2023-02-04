@@ -19,10 +19,10 @@
 #ifndef TURBO_LOG_INTERNAL_LOG_SINK_SET_H_
 #define TURBO_LOG_INTERNAL_LOG_SINK_SET_H_
 
-#include "turbo/platform/config.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"
 #include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
