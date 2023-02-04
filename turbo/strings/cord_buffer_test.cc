@@ -21,12 +21,12 @@
 #include <string>
 #include <utility>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
-#include "turbo/meta/span.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 using testing::Eq;
 using testing::Ge;

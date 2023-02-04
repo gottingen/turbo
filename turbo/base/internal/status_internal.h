@@ -18,8 +18,8 @@
 #include <string>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/container/inlined_vector.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 
 #ifndef SWIG

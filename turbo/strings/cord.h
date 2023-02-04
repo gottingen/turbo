@@ -70,16 +70,14 @@
 #include <type_traits>
 #include <optional>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/endian.h"
-#include "turbo/platform/internal/per_thread_tls.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/meta/function_ref.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/per_thread_tls.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord_analysis.h"
 #include "turbo/strings/cord_buffer.h"
 #include "turbo/strings/internal/cord_data_edge.h"

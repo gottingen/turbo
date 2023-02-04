@@ -24,16 +24,15 @@
 #include <string.h>  // for memcpy and memset
 #include <algorithm>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/endian.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/unaligned_access.h"
-#include "turbo/platform/optimization.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 
-#ifdef TURBO_IS_BIG_ENDIAN
+#ifdef TURBO_SYSTEM_BIG_ENDIAN
 #define uint32_in_expected_order(x) (turbo::gbswap_32(x))
 #define uint64_in_expected_order(x) (turbo::gbswap_64(x))
 #else

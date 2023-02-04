@@ -17,9 +17,9 @@
 
 #include <cstdint>
 
-#include "turbo/crypto/internal/crc32_x86_arm_combined_simd.h"
 #include "turbo/base/endian.h"
-#include "turbo/platform/config.h"
+#include "turbo/crypto/internal/crc32_x86_arm_combined_simd.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

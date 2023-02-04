@@ -10,9 +10,9 @@
 #ifndef TURBO_FILES_SEQUENTIAL_READ_FILE_H_
 #define TURBO_FILES_SEQUENTIAL_READ_FILE_H_
 
-#include "turbo/files/filesystem.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/status.h"
+#include "turbo/files/filesystem.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 
 namespace turbo {

@@ -23,13 +23,13 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/platform/optimization.h"
 #include "bits.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-TURBO_DLL const uint128 kuint128max = MakeUint128(
+TURBO_API const uint128 kuint128max = MakeUint128(
     std::numeric_limits<uint64_t>::max(), std::numeric_limits<uint64_t>::max());
 
 namespace {

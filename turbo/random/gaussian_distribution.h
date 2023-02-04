@@ -28,7 +28,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/fast_uniform_bits.h"
 #include "turbo/random/internal/generate_real.h"
 #include "turbo/random/internal/iostream_state_saver.h"
@@ -44,7 +44,7 @@ namespace random_internal {
 // The specific algorithm has some of the improvements suggested by the
 // 2005 paper, "An Improved Ziggurat Method to Generate Normal Random Samples",
 // Jurgen A Doornik.  (https://www.doornik.com/research/ziggurat.pdf)
-class TURBO_DLL gaussian_distribution_base {
+class TURBO_API gaussian_distribution_base {
  public:
   template <typename URBG>
   inline double zignor(URBG& g);  // NOLINT(runtime/references)

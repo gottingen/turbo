@@ -22,10 +22,9 @@
 #include <type_traits>
 
 #include "turbo/platform/call_once.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/direct_mmap.h"
 #include "turbo/platform/internal/scheduling_mode.h"
-#include "turbo/platform/macros.h"
 #include "turbo/platform/thread_annotations.h"
 
 // LowLevelAlloc requires that the platform support low-level

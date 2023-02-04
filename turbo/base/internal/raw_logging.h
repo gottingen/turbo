@@ -21,12 +21,9 @@
 
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/base/log_severity.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/port.h"
 
 // This is similar to TURBO_LOG(severity) << format..., but
@@ -174,7 +171,7 @@ using InternalLogFunction = void (*)(turbo::LogSeverity severity,
                                      const char* file, int line,
                                      const std::string& message);
 
-TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL extern base_internal::AtomicHook<
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_API extern base_internal::AtomicHook<
     InternalLogFunction>
     internal_log_function;
 

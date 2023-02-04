@@ -27,13 +27,12 @@
 #include <cstddef>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/log/internal/config.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

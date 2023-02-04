@@ -16,18 +16,18 @@
 
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/symbolize.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cordz_test_helpers.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/meta/span.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -14,8 +14,8 @@
 
 #include "turbo/log/initialize.h"
 
-#include "turbo/platform/config.h"
 #include "turbo/log/internal/globals.h"
+#include "turbo/platform/port.h"
 #include "turbo/time/time.h"
 
 namespace turbo {

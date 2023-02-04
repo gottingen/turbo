@@ -35,11 +35,11 @@
 #ifndef TURBO_META_TYPE_TRAITS_H_
 #define TURBO_META_TYPE_TRAITS_H_
 
+#include "turbo/platform/port.h"
 #include <cstddef>
 #include <functional>
 #include <type_traits>
 #include <variant>
-#include "turbo/platform/config.h"
 
 // MSVC constructibility traits do not detect destructor properties and so our
 // implementations should not use them as a source-of-truth.

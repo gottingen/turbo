@@ -18,7 +18,7 @@
 #ifndef TURBO_PLATFORM_INTERNAL_SCHEDULING_MODE_H_
 #define TURBO_PLATFORM_INTERNAL_SCHEDULING_MODE_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

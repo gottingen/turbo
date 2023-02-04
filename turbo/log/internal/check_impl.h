@@ -15,11 +15,11 @@
 #ifndef TURBO_LOG_INTERNAL_CHECK_IMPL_H_
 #define TURBO_LOG_INTERNAL_CHECK_IMPL_H_
 
-#include "turbo/platform/optimization.h"
 #include "turbo/log/internal/check_op.h"
 #include "turbo/log/internal/conditions.h"
 #include "turbo/log/internal/log_message.h"
 #include "turbo/log/internal/strip.h"
+#include "turbo/platform/port.h"
 
 // CHECK
 #define TURBO_CHECK_IMPL(condition, condition_text)                    \

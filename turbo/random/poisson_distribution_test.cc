@@ -23,11 +23,9 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/flat_hash_map.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/chi_square.h"
 #include "turbo/random/internal/distribution_test_util.h"
 #include "turbo/random/internal/pcg_engine.h"
@@ -37,6 +35,8 @@
 #include "turbo/strings/str_format.h"
 #include "turbo/strings/str_replace.h"
 #include "turbo/strings/strip.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 // Notes about generating poisson variates:
 //

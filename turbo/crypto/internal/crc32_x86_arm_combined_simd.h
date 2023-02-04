@@ -17,7 +17,7 @@
 
 #include <cstdint>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // -------------------------------------------------------------------------
 // Many x86 and ARM machines have CRC acceleration hardware.
@@ -40,7 +40,7 @@
 #define TURBO_CRYPTO_INTERNAL_HAVE_X86_SIMD
 
 #elif defined(__aarch64__) && defined(__LITTLE_ENDIAN__) && \
-    defined(__ARM_FEATURE_CRC32) && defined(TURBO_INTERNAL_HAVE_ARM_NEON) &&  \
+    defined(__ARM_FEATURE_CRC32) && defined(TURBO_NEON) &&  \
     defined(__ARM_FEATURE_CRYPTO)
 
 #include <arm_acle.h>

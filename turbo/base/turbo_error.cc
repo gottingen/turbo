@@ -6,13 +6,13 @@
  *****************************************************************/
 
 #include "turbo/base/turbo_error.h"
-#include "turbo/platform/config.h"
-#include <errno.h>                                     // errno
-#include <string.h>                                    // strerror_r
-#include <cstdlib>                                    // EXIT_FAILURE
-#include <stdio.h>                                     // snprintf
-#include <unistd.h>                                    // _exit
+#include "turbo/platform/port.h"
+#include <cstdlib> // EXIT_FAILURE
+#include <errno.h> // errno
 #include <mutex>
+#include <stdio.h>  // snprintf
+#include <string.h> // strerror_r
+#include <unistd.h> // _exit
 
 namespace turbo {
 

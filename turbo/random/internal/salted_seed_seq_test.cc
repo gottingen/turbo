@@ -45,12 +45,12 @@ void ConformsToInterface() {
   {
     uint32_t init_array[] = {1, 2, 3, 4, 5};
     Sseq seq(std::begin(init_array), std::end(init_array));
-    EXPECT_EQ(seq.size(), TURBO_ARRAYSIZE(init_array));
+    EXPECT_EQ(seq.size(), TURBO_ARRAY_SIZE(init_array));
 
     std::vector<uint32_t> state_vector;
     seq.param(std::back_inserter(state_vector));
 
-    EXPECT_EQ(state_vector.size(), TURBO_ARRAYSIZE(init_array));
+    EXPECT_EQ(state_vector.size(), TURBO_ARRAY_SIZE(init_array));
     for (int i = 0; i < state_vector.size(); i++) {
       EXPECT_EQ(state_vector[i], i + 1);
     }

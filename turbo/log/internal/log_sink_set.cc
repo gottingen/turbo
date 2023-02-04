@@ -30,21 +30,20 @@
 #include <algorithm>
 #include <vector>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/call_once.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/log_severity.h"
-#include "turbo/platform/thread_annotations.h"
 #include "turbo/cleanup/cleanup.h"
 #include "turbo/log/globals.h"
 #include "turbo/log/internal/config.h"
 #include "turbo/log/internal/globals.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/call_once.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -39,12 +39,10 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
-#include "turbo/base/endian.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/base/bits.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/int128.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
@@ -122,10 +120,10 @@ TURBO_NAMESPACE_BEGIN
 namespace numbers_internal {
 
 // Digit conversion.
-TURBO_DLL extern const char kHexChar[17];  // 0123456789abcdef
-TURBO_DLL extern const char
+TURBO_API extern const char kHexChar[17];  // 0123456789abcdef
+TURBO_API extern const char
     kHexTable[513];  // 000102030405060708090a0b0c0d0e0f1011...
-TURBO_DLL extern const char
+TURBO_API extern const char
     two_ASCII_digits[100][2];  // 00, 01, 02, 03...
 
 // Writes a two-character representation of 'i' to 'buf'. 'i' must be in the

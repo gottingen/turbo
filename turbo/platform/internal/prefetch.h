@@ -15,7 +15,7 @@
 #ifndef TURBO_BASE_INTERNAL_PREFETCH_H_
 #define TURBO_BASE_INTERNAL_PREFETCH_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef __SSE__
 #include <xmmintrin.h>

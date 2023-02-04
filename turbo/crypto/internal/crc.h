@@ -17,7 +17,7 @@
 
 #include <cstdint>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // This class implements CRCs (aka Rabin Fingerprints).
 // Treats the input as a polynomial with coefficients in Z(2),

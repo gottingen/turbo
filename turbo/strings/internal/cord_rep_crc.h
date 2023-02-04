@@ -18,9 +18,8 @@
 #include <cassert>
 #include <cstdint>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/crypto/internal/crc_cord_state.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 
 namespace turbo {

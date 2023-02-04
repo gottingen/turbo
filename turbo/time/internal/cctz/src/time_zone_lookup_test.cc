@@ -21,7 +21,7 @@
 #include <thread>
 #include <vector>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 #if defined(__linux__)
 #include <features.h>

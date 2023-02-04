@@ -199,10 +199,10 @@
 #ifndef TURBO_FLAGS_MARSHALLING_H_
 #define TURBO_FLAGS_MARSHALLING_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 
 #include "turbo/strings/string_view.h"
 

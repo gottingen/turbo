@@ -5,10 +5,10 @@
  * Author by liyinbin (jeff.li) lijippy@163.com
  *****************************************************************/
 
-#include "turbo/platform/config.h"
 #include "turbo/crypto/sha256.h"
-#include "turbo/strings/escaping.h"
 #include "turbo/base/bits.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/escaping.h"
 
 namespace turbo {
 

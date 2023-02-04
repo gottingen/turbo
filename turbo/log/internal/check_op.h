@@ -29,12 +29,10 @@
 #include <string>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/log/internal/nullguard.h"
 #include "turbo/log/internal/nullstream.h"
 #include "turbo/log/internal/strip.h"
+#include "turbo/platform/port.h"
 
 // `TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL` wraps string literals that
 // should be stripped when `TURBO_MIN_LOG_LEVEL` exceeds `kFatal`.

@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/substitute.h"
+#include <iostream>
 
 #if !defined(TURBO_LTS_RELEASE_VERSION) || TURBO_LTS_RELEASE_VERSION != 99998877
 #error TURBO_LTS_RELEASE_VERSION is not set correctly.

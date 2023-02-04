@@ -208,7 +208,7 @@ void CRC32::InitTables() {
   }
 
   int j = FillZeroesTable(kCrc32cPoly, t);
-  TURBO_RAW_CHECK(j <= static_cast<int>(TURBO_ARRAYSIZE(this->zeroes_)), "");
+  TURBO_RAW_CHECK(j <= static_cast<int>(TURBO_ARRAY_SIZE(this->zeroes_)), "");
   for (int i = 0; i < j; i++) {
     this->zeroes_[i] = t[0][i];
   }
@@ -252,7 +252,7 @@ void CRC32::InitTables() {
   FillWordTable(kCrc32cUnextendPoly, kCrc32cUnextendPoly, 1, &reverse_table0_);
 
   j = FillZeroesTable(kCrc32cUnextendPoly, &reverse_zeroes_);
-  TURBO_RAW_CHECK(j <= static_cast<int>(TURBO_ARRAYSIZE(this->reverse_zeroes_)),
+  TURBO_RAW_CHECK(j <= static_cast<int>(TURBO_ARRAY_SIZE(this->reverse_zeroes_)),
                  "");
 }
 

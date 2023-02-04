@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <cstring>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -28,7 +28,7 @@ namespace container_internal {
 // This enables removing a branch in the hot path of find().
 // We have 17 bytes because there may be a generation counter. Any constant is
 // fine for the generation counter.
-alignas(16) TURBO_CONST_INIT TURBO_DLL const ctrl_t kEmptyGroup[17] = {
+alignas(16) TURBO_CONST_INIT TURBO_API const ctrl_t kEmptyGroup[17] = {
     ctrl_t::kSentinel, ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     ctrl_t::kEmpty,    ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     ctrl_t::kEmpty,    ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,

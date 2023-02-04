@@ -14,10 +14,10 @@
 
 #include <cstdint>
 
+#include "turbo/crypto/crc32c.h"
 #include "turbo/crypto/internal/crc_memcpy.h"
 #include "turbo/crypto/internal/non_temporal_memcpy.h"
-#include "turbo/crypto/crc32c.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

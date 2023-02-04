@@ -23,16 +23,14 @@
 #include <type_traits>
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/low_level_scheduling.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/internal/sysinfo.h"
-#include "turbo/platform/macros.h"
 #include "turbo/synchronization/blocking_counter.h"
 #include "turbo/synchronization/notification.h"
+#include "gtest/gtest.h"
 
 constexpr uint32_t kNumThreads = 10;
 constexpr int32_t kIters = 1000;

@@ -45,8 +45,8 @@
 //   ...
 //   #endif  // TURBO_HAVE_MMAP
 
-#ifndef TURBO_PALTFORM_CONFIG_H_
-#define TURBO_PALTFORM_CONFIG_H_
+#ifndef TURBO_PLATFORM_CONFIG_CONFIG_H_
+#define TURBO_PLATFORM_CONFIG_CONFIG_H_
 
 // Included for the __GLIBC__ macro (or similar macros on other systems).
 #include <limits.h>
@@ -82,10 +82,10 @@
 #include <TargetConditionals.h>
 #endif
 
+#include "turbo/platform/config/policy_checks.h"
 #include "turbo/platform/config/base.h"
 #include "turbo/platform/config/have.h"
 #include "turbo/platform/options.h"
-#include "turbo/platform/policy_checks.h"
 
 // Turbo long-term support (LTS) releases will define
 // `TURBO_LTS_RELEASE_VERSION` to the integer representing the date string of the
@@ -185,16 +185,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #error options.h is misconfigured.
 #endif
 
-// -----------------------------------------------------------------------------
-// Compiler Feature Checks
-// -----------------------------------------------------------------------------
-
-
-#ifdef __has_feature
-#define TURBO_HAVE_FEATURE(f) __has_feature(f)
-#else
-#define TURBO_HAVE_FEATURE(f) 0
-#endif
 
 // Portable check for GCC minimum version:
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
@@ -481,75 +471,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_HAVE_ALARM 1
 #endif
 
-// TURBO_IS_LITTLE_ENDIAN
-// TURBO_IS_BIG_ENDIAN
-//
-// Checks the endianness of the platform.
-//
-// Notes: uses the built in endian macros provided by GCC (since 4.6) and
-// Clang (since 3.2); see
-// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html.
-// Otherwise, if _WIN32, assume little endian. Otherwise, bail with an error.
-#if defined(TURBO_IS_BIG_ENDIAN)
-#error "TURBO_IS_BIG_ENDIAN cannot be directly set."
-#endif
-#if defined(TURBO_IS_LITTLE_ENDIAN)
-#error "TURBO_IS_LITTLE_ENDIAN cannot be directly set."
-#endif
-
-#if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
-     __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define TURBO_IS_LITTLE_ENDIAN 1
-#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && \
-    __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define TURBO_IS_BIG_ENDIAN 1
-#elif defined(_WIN32)
-#define TURBO_IS_LITTLE_ENDIAN 1
-#else
-#error "turbo endian detection needs to be set up for your compiler"
-#endif
-
-// macOS < 10.13 and iOS < 11 don't let you use <any>, <optional>, or <variant>
-// even though the headers exist and are publicly noted to work, because the
-// libc++ shared library shipped on the system doesn't have the requisite
-// exported symbols.  See https://github.com/abseil/abseil-cpp/issues/207 and
-// https://developer.apple.com/documentation/xcode_release_notes/xcode_10_release_notes
-//
-// libc++ spells out the availability requirements in the file
-// llvm-project/libcxx/include/__config via the #define
-// _LIBCPP_AVAILABILITY_BAD_OPTIONAL_ACCESS.
-//
-// Unfortunately, Apple initially mis-stated the requirements as macOS < 10.14
-// and iOS < 12 in the libc++ headers. This was corrected by
-// https://github.com/llvm/llvm-project/commit/7fb40e1569dd66292b647f4501b85517e9247953
-// which subsequently made it into the XCode 12.5 release. We need to match the
-// old (incorrect) conditions when built with old XCode, but can use the
-// corrected earlier versions with new XCode.
-#if defined(__APPLE__) && defined(_LIBCPP_VERSION) &&               \
-    ((_LIBCPP_VERSION >= 11000 && /* XCode 12.5 or later: */        \
-      ((defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&   \
-        __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 101300) ||  \
-       (defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) &&  \
-        __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ < 110000) || \
-       (defined(__ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__) &&   \
-        __ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__ < 40000) ||   \
-       (defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__) &&      \
-        __ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__ < 110000))) ||   \
-     (_LIBCPP_VERSION < 11000 && /* Pre-XCode 12.5: */              \
-      ((defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&   \
-        __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 101400) ||  \
-       (defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) &&  \
-        __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ < 120000) || \
-       (defined(__ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__) &&   \
-        __ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__ < 50000) ||   \
-       (defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__) &&      \
-        __ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__ < 120000))))
-#define TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 1
-#else
-#define TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 0
-#endif
-
-
 // In debug mode, MSVC 2017's std::variant throws a EXCEPTION_ACCESS_VIOLATION
 // SEH exception from emplace for variant<SomeStruct> when constructing the
 // struct can throw. This defeats some of variant_test and
@@ -589,25 +510,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_HAVE_THREEWAY_COMP
 #endif
 #endif
-
-// TURBO_DLL
-//
-// When building Turbo as a DLL, this macro expands to `__declspec(dllexport)`
-// so we can annotate symbols appropriately as being exported. When used in
-// headers consuming a DLL, this macro expands to `__declspec(dllimport)` so
-// that consumers know the symbol is defined inside the DLL. In all other cases,
-// the macro expands to nothing.
-#if defined(_MSC_VER)
-#if defined(TURBO_BUILD_DLL)
-#define TURBO_DLL __declspec(dllexport)
-#elif defined(TURBO_CONSUME_DLL)
-#define TURBO_DLL __declspec(dllimport)
-#else
-#define TURBO_DLL
-#endif
-#else
-#define TURBO_DLL
-#endif  // defined(_MSC_VER)
 
 // TURBO_HAVE_MEMORY_SANITIZER
 //
@@ -765,19 +667,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_INTERNAL_HAVE_SSSE3 1
 #endif
 
-// TURBO_INTERNAL_HAVE_ARM_NEON is used for compile-time detection of NEON (ARM
-// SIMD).
-//
-// If __CUDA_ARCH__ is defined, then we are compiling CUDA code in device mode.
-// In device mode, NEON intrinsics are not available, regardless of host
-// platform.
-// https://llvm.org/docs/CompileCudaWithLLVM.html#detecting-clang-vs-nvcc-from-code
-#ifdef TURBO_INTERNAL_HAVE_ARM_NEON
-#error TURBO_INTERNAL_HAVE_ARM_NEON cannot be directly set
-#elif defined(__ARM_NEON) && !defined(__CUDA_ARCH__)
-#define TURBO_INTERNAL_HAVE_ARM_NEON 1
-#endif
-
 // TURBO_HAVE_CONSTANT_EVALUATED is used for compile-time detection of
 // constant evaluation support through `turbo::is_constant_evaluated`.
 #ifdef TURBO_HAVE_CONSTANT_EVALUATED
@@ -789,4 +678,4 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_HAVE_CONSTANT_EVALUATED 1
 #endif
 
-#endif  // TURBO_PALTFORM_CONFIG_H_
+#endif  // TURBO_PLATFORM_CONFIG_CONFIG_H_

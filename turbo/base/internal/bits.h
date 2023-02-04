@@ -25,8 +25,7 @@
 #include <intrin.h>
 #endif
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #if defined(__GNUC__) && !defined(__clang__)
 // GCC

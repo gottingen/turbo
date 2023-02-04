@@ -16,7 +16,7 @@
 #ifndef TURBO_SYNCHRONIZATION_INTERNAL_WAITER_H_
 #define TURBO_SYNCHRONIZATION_INTERNAL_WAITER_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef _WIN32
 #include <sdkddkver.h>

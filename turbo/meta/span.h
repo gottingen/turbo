@@ -60,13 +60,10 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/base/internal/throw_delegate.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/platform/port.h"    // TODO(strel): remove this include
-#include "turbo/meta/type_traits.h"
 #include "turbo/meta/internal/span.h"
+#include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h" // TODO(strel): remove this include
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

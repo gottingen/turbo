@@ -37,9 +37,8 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 #ifdef _GLIBCXX_DEBUG

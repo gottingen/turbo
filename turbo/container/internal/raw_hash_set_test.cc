@@ -35,12 +35,6 @@
 #include <utility>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/cycleclock.h"
-#include "turbo/platform/internal/prefetch.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/container/flat_hash_set.h"
@@ -49,7 +43,12 @@
 #include "turbo/container/internal/hash_policy_testing.h"
 #include "turbo/container/internal/hashtable_debug.h"
 #include "turbo/log/logging.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/cycleclock.h"
+#include "turbo/platform/internal/prefetch.h"
 #include "turbo/strings/string_view.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

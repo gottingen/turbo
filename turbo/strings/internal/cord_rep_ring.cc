@@ -23,8 +23,8 @@
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/internal/throw_delegate.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/inlined_vector.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_consume.h"
 #include "turbo/strings/internal/cord_rep_flat.h"

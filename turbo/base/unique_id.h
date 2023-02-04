@@ -5,7 +5,7 @@
 #ifndef TURBO_BASE_UNIQUE_ID_H_
 #define TURBO_BASE_UNIQUE_ID_H_
 
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include <atomic>
 
 namespace turbo {

@@ -31,12 +31,10 @@
 // `__has_attribute()` first. If the check fails, we check if we are on GCC and
 // assume the attribute exists on GCC (which is verified on GCC 4.7).
 
-#ifndef TURBO_PLATFORM_ATTRIBUTES_H_
-#define TURBO_PLATFORM_ATTRIBUTES_H_
+#ifndef TURBO_PLATFORM_CONFIG_ATTRIBUTES_H_
+#define TURBO_PLATFORM_CONFIG_ATTRIBUTES_H_
 
-#include "turbo/platform/config.h"
-
-
+#include "turbo/platform/config/config.h"
 
 // TURBO_ATTRIBUTE_ALWAYS_INLINE
 // TURBO_ATTRIBUTE_NOINLINE
@@ -650,4 +648,4 @@
 #define TURBO_ATTRIBUTE_TRIVIAL_ABI
 #endif
 
-#endif  // TURBO_PLATFORM_ATTRIBUTES_H_
+#endif  // TURBO_PLATFORM_CONFIG_ATTRIBUTES_H_

@@ -31,12 +31,10 @@
 #include <cstdint>
 #include <cstdio>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/platform/port.h"
-#include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/internal/address_is_readable.h"
-#include "turbo/debugging/internal/vdso_support.h"  // a no-op on non-elf or non-glibc systems
+#include "turbo/debugging/internal/vdso_support.h" // a no-op on non-elf or non-glibc systems
+#include "turbo/debugging/stacktrace.h"
+#include "turbo/platform/port.h"
 
 // Given a stack pointer, return the saved link register value.
 // Note that this is the link register for a callee.

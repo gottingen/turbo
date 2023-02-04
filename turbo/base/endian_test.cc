@@ -20,8 +20,8 @@
 #include <random>
 #include <vector>
 
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -34,7 +34,7 @@ const uint16_t k16Value{0x0123};
 const int kNumValuesToTest = 1000000;
 const int kRandomSeed = 12345;
 
-#if defined(TURBO_IS_BIG_ENDIAN)
+#if defined(TURBO_SYSTEM_BIG_ENDIAN)
 const uint64_t kInitialInNetworkOrder{kInitialNumber};
 const uint64_t k64ValueLE{0xefcdab8967452301};
 const uint32_t k32ValueLE{0x67452301};
@@ -43,7 +43,7 @@ const uint16_t k16ValueLE{0x2301};
 const uint64_t k64ValueBE{kInitialNumber};
 const uint32_t k32ValueBE{k32Value};
 const uint16_t k16ValueBE{k16Value};
-#elif defined(TURBO_IS_LITTLE_ENDIAN)
+#elif defined(TURBO_SYSTEM_LITTLE_ENDIAN)
 const uint64_t kInitialInNetworkOrder{0xefcdab8967452301};
 const uint64_t k64ValueLE{kInitialNumber};
 const uint32_t k32ValueLE{k32Value};

@@ -17,9 +17,8 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/container/inlined_vector.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_data_edge.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
@@ -27,9 +26,8 @@
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cord_rep_ring.h"
 //
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/meta/function_ref.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

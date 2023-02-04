@@ -20,7 +20,7 @@
 #include <unistd.h>
 #endif
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_HAVE_MMAP
 #include <sys/mman.h>
@@ -33,11 +33,10 @@
 #include <csignal>
 #include <cstdio>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/symbolize.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -164,7 +163,7 @@ void* GetProgramCounter(void* const vuc) {
 #elif defined(__hppa__)
     return reinterpret_cast<void*>(context->uc_mcontext.sc_iaoq[0]);
 #elif defined(__i386__)
-    if (14 < TURBO_ARRAYSIZE(context->uc_mcontext.gregs))
+    if (14 < TURBO_ARRAY_SIZE(context->uc_mcontext.gregs))
       return reinterpret_cast<void*>(context->uc_mcontext.gregs[14]);
 #elif defined(__ia64__)
     return reinterpret_cast<void*>(context->uc_mcontext.sc_ip);
@@ -189,7 +188,7 @@ void* GetProgramCounter(void* const vuc) {
 #elif defined(__sparc__) && defined(__arch64__)
     return reinterpret_cast<void*>(context->uc_mcontext.mc_gregs[19]);
 #elif defined(__x86_64__)
-    if (16 < TURBO_ARRAYSIZE(context->uc_mcontext.gregs))
+    if (16 < TURBO_ARRAY_SIZE(context->uc_mcontext.gregs))
       return reinterpret_cast<void*>(context->uc_mcontext.gregs[16]);
 #elif defined(__e2k__)
     return reinterpret_cast<void*>(context->uc_mcontext.cr0_hi);

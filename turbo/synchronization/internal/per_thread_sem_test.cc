@@ -22,13 +22,13 @@
 #include <string>
 #include <thread>              // NOLINT(build/c++11)
 
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/cycleclock.h"
 #include "turbo/platform/internal/thread_identity.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
+#include "gtest/gtest.h"
 
 // In this test we explicitly avoid the use of synchronization
 // primitives which might use PerThreadSem, most notably turbo::Mutex.

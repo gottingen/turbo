@@ -32,12 +32,10 @@
 #include <utility>
 
 #include "turbo/base/internal/invoke.h"
-#include "turbo/platform/internal/low_level_scheduling.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/internal/low_level_scheduling.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/platform/internal/spinlock_wait.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {
@@ -173,7 +171,7 @@ void CallOnceImpl(std::atomic<uint32_t>* control,
   uint32_t old_control = kOnceInit;
   if (control->compare_exchange_strong(old_control, kOnceRunning,
                                        std::memory_order_relaxed) ||
-      base_internal::SpinLockWait(control, TURBO_ARRAYSIZE(trans), trans,
+      base_internal::SpinLockWait(control, TURBO_ARRAY_SIZE(trans), trans,
                                   scheduling_mode) == kOnceInit) {
     base_internal::invoke(std::forward<Callable>(fn),
                           std::forward<Args>(args)...);

@@ -18,14 +18,14 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/attributes.h"
+#include "benchmark/benchmark.h"
 #include "turbo/container/flat_hash_set.h"
 #include "turbo/hash/hash.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/cord_test_helpers.h"
 #include "turbo/strings/string_view.h"
-#include "benchmark/benchmark.h"
 
 namespace {
 

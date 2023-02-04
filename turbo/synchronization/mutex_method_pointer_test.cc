@@ -17,8 +17,8 @@
 #include <cstdlib>
 #include <string>
 
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 
 namespace {
 

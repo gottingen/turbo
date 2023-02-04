@@ -29,8 +29,8 @@
 #include <utility>
 
 #include "turbo/base/internal/fast_type_id.h"
-#include "turbo/platform/macros.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/distribution_caller.h"
 #include "turbo/random/internal/fast_uniform_bits.h"
 

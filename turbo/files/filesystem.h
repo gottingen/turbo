@@ -48,7 +48,7 @@
 
 // #define BSD manifest constant only in
 // sys/param.h
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #ifndef _WIN32
 #include <sys/param.h>
 #endif

@@ -22,13 +22,13 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/macros.h"
 #include "turbo/container/inlined_vector.h"
+#include "turbo/meta/span.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/pool_urbg.h"
 #include "turbo/random/internal/salted_seed_seq.h"
 #include "turbo/random/internal/seed_material.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

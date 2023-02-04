@@ -23,9 +23,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/log_severity.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/numbers.h"
@@ -49,7 +48,7 @@ bool TurboParseFlag(std::string_view text, bool* dst, std::string*) {
 
   text = turbo::StripAsciiWhitespace(text);
 
-  for (size_t i = 0; i < TURBO_ARRAYSIZE(kTrue); ++i) {
+  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kTrue); ++i) {
     if (turbo::EqualsIgnoreCase(text, kTrue[i])) {
       *dst = true;
       return true;

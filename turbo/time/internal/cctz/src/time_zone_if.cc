@@ -14,9 +14,9 @@
 
 #include "time_zone_if.h"
 
-#include "turbo/platform/config.h"
 #include "time_zone_info.h"
 #include "time_zone_libc.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

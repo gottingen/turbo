@@ -15,7 +15,7 @@
 #ifndef TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
 #define TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef __aarch64__
 #include <arm_neon.h>

@@ -13,9 +13,7 @@
 // limitations under the License.
 
 #include "turbo/time/clock.h"
-
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -30,8 +28,6 @@
 
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 
 namespace turbo {

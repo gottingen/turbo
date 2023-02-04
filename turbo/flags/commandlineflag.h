@@ -30,9 +30,9 @@
 #include <string>
 #include <optional>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/fast_type_id.h"
 #include "turbo/flags/internal/commandlineflag.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

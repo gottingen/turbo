@@ -21,11 +21,10 @@
 #include <cstring>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/base/log_severity.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/internal/errno_saver.h"
-#include "turbo/base/log_severity.h"
 
 // We know how to perform low-level writes to stderr in POSIX and Windows.  For
 // these platforms, we define the token TURBO_LOW_LEVEL_WRITE_SUPPORTED.
@@ -234,7 +233,7 @@ bool RawLoggingFullySupported() {
 #endif  // !TURBO_LOW_LEVEL_WRITE_SUPPORTED
 }
 
-TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_DLL
+TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES TURBO_API
     turbo::base_internal::AtomicHook<InternalLogFunction>
         internal_log_function(DefaultInternalLog);
 

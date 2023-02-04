@@ -37,7 +37,7 @@
 #ifndef TURBO_BASE_INTERNAL_INVOKE_H_
 #define TURBO_BASE_INTERNAL_INVOKE_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
 

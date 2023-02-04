@@ -17,9 +17,6 @@
 
 #include <string>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/flags/flag.h"
 #include "turbo/flags/reflection.h"
@@ -28,7 +25,10 @@
 #include "turbo/log/internal/test_matchers.h"
 #include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/str_cat.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 using ::turbo::log_internal::TextMessage;

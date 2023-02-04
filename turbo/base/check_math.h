@@ -5,13 +5,12 @@
 #ifndef TURBO_BASE_CHECK_MATH_H_
 #define TURBO_BASE_CHECK_MATH_H_
 
-
+#include "turbo/platform/port.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <type_traits>
-#include "turbo/platform/config.h"
 
 #ifdef _MSC_VER
 #include <intrin.h>

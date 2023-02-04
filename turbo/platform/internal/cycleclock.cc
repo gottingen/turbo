@@ -25,8 +25,7 @@
 #include <atomic>
 #include <chrono>  // NOLINT(build/c++11)
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
 
 namespace turbo {

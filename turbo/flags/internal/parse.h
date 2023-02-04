@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "turbo/platform/config.h"
 #include "turbo/flags/declare.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 TURBO_DECLARE_FLAG(std::vector<std::string>, flagfile);

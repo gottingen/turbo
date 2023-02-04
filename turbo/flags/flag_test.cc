@@ -25,21 +25,20 @@
 #include <thread>  // NOLINT
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/macros.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/declare.h"
 #include "turbo/flags/internal/flag.h"
 #include "turbo/flags/marshalling.h"
 #include "turbo/flags/reflection.h"
 #include "turbo/flags/usage_config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
+#include "gtest/gtest.h"
 
 TURBO_DECLARE_FLAG(int64_t, mistyped_int_flag);
 TURBO_DECLARE_FLAG(std::vector<std::string>, mistyped_string_flag);
@@ -615,7 +614,7 @@ TEST_F(FlagTest, ConcurrentSetAndGet) {
   int i = 0;
   while (turbo::Now() < end_time) {
     turbo::SetFlag(&FLAGS_test_flag_12,
-                  kValidDurations[i++ % TURBO_ARRAYSIZE(kValidDurations)]);
+                  kValidDurations[i++ % TURBO_ARRAY_SIZE(kValidDurations)]);
   }
   stop.store(true, std::memory_order_relaxed);
   for (auto& t : threads) t.join();

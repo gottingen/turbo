@@ -25,12 +25,11 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/memory/memory.h"
-#include "turbo/meta/type_traits.h"
 #include "turbo/meta/span.h"
+#include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

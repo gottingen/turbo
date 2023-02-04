@@ -30,9 +30,9 @@
 #include <memory>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/bits.h"
+#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/charconv.h"
 #include "turbo/strings/escaping.h"
@@ -1027,10 +1027,10 @@ inline bool safe_uint_internal(std::string_view text, IntType* value_p,
 namespace numbers_internal {
 
 // Digit conversion.
-TURBO_CONST_INIT TURBO_DLL const char kHexChar[] =
+TURBO_CONST_INIT TURBO_API const char kHexChar[] =
     "0123456789abcdef";
 
-TURBO_CONST_INIT TURBO_DLL const char kHexTable[513] =
+TURBO_CONST_INIT TURBO_API const char kHexTable[513] =
     "000102030405060708090a0b0c0d0e0f"
     "101112131415161718191a1b1c1d1e1f"
     "202122232425262728292a2b2c2d2e2f"
@@ -1048,7 +1048,7 @@ TURBO_CONST_INIT TURBO_DLL const char kHexTable[513] =
     "e0e1e2e3e4e5e6e7e8e9eaebecedeeef"
     "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff";
 
-TURBO_CONST_INIT TURBO_DLL const char two_ASCII_digits[100][2] = {
+TURBO_CONST_INIT TURBO_API const char two_ASCII_digits[100][2] = {
     {'0', '0'}, {'0', '1'}, {'0', '2'}, {'0', '3'}, {'0', '4'}, {'0', '5'},
     {'0', '6'}, {'0', '7'}, {'0', '8'}, {'0', '9'}, {'1', '0'}, {'1', '1'},
     {'1', '2'}, {'1', '3'}, {'1', '4'}, {'1', '5'}, {'1', '6'}, {'1', '7'},

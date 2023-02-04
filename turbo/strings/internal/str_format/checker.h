@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/str_format/arg.h"
 #include "turbo/strings/internal/str_format/constexpr_parser.h"
 #include "turbo/strings/internal/str_format/extension.h"

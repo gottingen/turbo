@@ -59,18 +59,18 @@
 #include <utility>
 
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/internal/common.h"
 #include "turbo/container/internal/common_policy_traits.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/container/internal/container_memory.h"
 #include "turbo/container/internal/layout.h"
 #include "turbo/memory/memory.h"
+#include "turbo/meta/compare.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/compare.h"
-#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

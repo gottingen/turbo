@@ -31,11 +31,10 @@
 
 #include "turbo/base/casts.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/crypto/internal/crc_cord_state.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord_buffer.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/internal/cord_data_edge.h"

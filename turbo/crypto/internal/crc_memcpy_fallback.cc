@@ -15,9 +15,9 @@
 #include <cstdint>
 #include <memory>
 
-#include "turbo/crypto/internal/crc_memcpy.h"
 #include "turbo/crypto/crc32c.h"
-#include "turbo/platform/config.h"
+#include "turbo/crypto/internal/crc_memcpy.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

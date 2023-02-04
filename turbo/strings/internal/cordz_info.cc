@@ -14,10 +14,11 @@
 
 #include "turbo/strings/internal/cordz_info.h"
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/spinlock.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/debugging/stacktrace.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/spinlock.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_crc.h"
@@ -26,7 +27,6 @@
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

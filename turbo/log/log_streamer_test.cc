@@ -19,17 +19,17 @@
 #include <iostream>
 #include <utility>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/log/internal/test_actions.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
 #include "turbo/log/logging.h"
 #include "turbo/log/scoped_mock_log.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/sysinfo.h"
 #include "turbo/strings/string_view.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 using ::turbo::log_internal::DeathTestExpectedLogging;

@@ -18,8 +18,9 @@
 #ifndef TURBO_PLATFORM_PORT_H_
 #define TURBO_PLATFORM_PORT_H_
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/config/attributes.h"
+#include "turbo/platform/config/macros.h"
+#include "turbo/platform/config/config.h"
+#include "turbo/platform/config/optimization.h"
 
 #endif  // TURBO_PLATFORM_PORT_H_

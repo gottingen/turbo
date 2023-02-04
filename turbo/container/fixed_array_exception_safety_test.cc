@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/config.h"
 #include "turbo/container/fixed_array.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 

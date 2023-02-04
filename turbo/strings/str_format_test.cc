@@ -294,7 +294,7 @@ TEST_F(FormatEntryPointTest, StreamWithV) {
   };
 
   std::string buf(4096, '\0');
-  for (auto i = 0; i < TURBO_ARRAYSIZE(formats); ++i) {
+  for (auto i = 0; i < TURBO_ARRAY_SIZE(formats); ++i) {
     const auto parsed =
         ParsedFormat<'v', 'u', 'c', 'v', 'f', 'v'>::NewAllowIgnored(formats[i]);
     std::ostringstream oss;

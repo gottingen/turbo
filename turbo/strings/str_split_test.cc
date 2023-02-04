@@ -25,15 +25,15 @@
 #include <unordered_set>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/btree_map.h"
 #include "turbo/container/btree_set.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/container/node_hash_map.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/dynamic_annotations.h"
 #include "turbo/strings/numbers.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 
@@ -604,7 +604,7 @@ TEST(Split, Temporary) {
   // destroyed, if the splitter keeps a reference to the string's contents,
   // it'll reference freed memory instead of just dead on-stack memory.
   const char input[] = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u";
-  EXPECT_LT(sizeof(std::string), TURBO_ARRAYSIZE(input))
+  EXPECT_LT(sizeof(std::string), TURBO_ARRAY_SIZE(input))
       << "Input should be larger than fits on the stack.";
 
   // This happens more often in C++11 as part of a range-based for loop.
