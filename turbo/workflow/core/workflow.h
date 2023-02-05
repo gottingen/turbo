@@ -308,7 +308,7 @@ TURBO_NAMESPACE_BEGIN
         rhs._satellite.reset();
     }
 
-// Move assignment
+    // Move assignment
     inline Workflow &Workflow::operator=(Workflow &&rhs) {
         if (this != &rhs) {
             std::scoped_lock<std::mutex, std::mutex> lock(_mutex, rhs._mutex);
@@ -346,12 +346,12 @@ TURBO_NAMESPACE_BEGIN
         return _name;
     }
 
-// Function: graph
+    // Function: graph
     inline Graph &Workflow::graph() {
         return _graph;
     }
 
-// Function: for_each_task
+    // Function: for_each_task
     template<typename V>
     void Workflow::for_each_task(V &&visitor) const {
         for (size_t i = 0; i < _graph._nodes.size(); ++i) {
@@ -502,7 +502,7 @@ TURBO_NAMESPACE_BEGIN
         }
     }
 
-// Procedure: _dump
+    // Procedure: _dump
     inline void Workflow::_dump(
             std::ostream &os, const Graph *graph, Dumper &dumper
     ) const {

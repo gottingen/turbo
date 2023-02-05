@@ -159,7 +159,7 @@ TURBO_FORCE_INLINE void DFADecoder::AdvanceWithTable(char8_t const*& pSrc,
   char32_t unit;  //- The current UTF-8 code unit
   int32_t type;   //- The current code unit's character class
 
-#pragma unroll(size)
+//#pragma unroll(size)
   for (int32_t i = 1; i < size; ++i) {
     unit = *pSrc++;                              //- Cache the current code unit
     cdpt = (cdpt << 6) | (unit & 0x3F);          //- Adjust code point with continuation bits

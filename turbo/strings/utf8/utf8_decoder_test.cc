@@ -24,6 +24,7 @@
 
 #include <turbo/strings/utf8/codec.h>
 
+TURBO_DISABLE_CLANG_WARNING(-Wcast-qual);
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace {
@@ -187,3 +188,4 @@ TEST(UTF8Lib, DecoderCheckLength) {
 }
 TURBO_NAMESPACE_END
 }  // namespace turbo
+TURBO_RESTORE_CLANG_WARNING();

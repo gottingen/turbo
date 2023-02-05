@@ -185,7 +185,9 @@ namespace turbo {
     }
 
     void SHA512::process(const std::string &str) {
+        TURBO_DISABLE_CLANG_WARNING(-Wshorten-64-to-32)
         return process(str.data(), str.size());
+        TURBO_RESTORE_CLANG_WARNING()
     }
 
     void SHA512::finalize(void *digest) {

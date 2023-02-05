@@ -21,6 +21,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include "turbo/platform/port.h"
 
 namespace turbo {
 
@@ -350,7 +351,11 @@ template <typename T, size_t S>
 template <class P, class Q>
 constexpr P *ObjectPool<T, S>::_parent_class_of(const Q *ptr,
                                                 const Q P::*member) const {
+  TURBO_DISABLE_CLANG_WARNING(-Wcast-qual);
+  TURBO_DISABLE_GCC_WARNING(-Wcast-qual);
   return (P *)((char *)ptr - _offset_in_class(member));
+  TURBO_RESTORE_CLANG_WARNING();
+  TURBO_RESTORE_GCC_WARNING();
 }
 
 // Function: _block_of

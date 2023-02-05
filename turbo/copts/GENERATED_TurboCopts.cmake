@@ -72,6 +72,7 @@ list(APPEND TURBO_GCC_TEST_FLAGS
     "-DNOMINMAX"
     "-Wno-deprecated-declarations"
     "-Wno-missing-declarations"
+    "-Wno-cast-qual"
     "-Wno-self-move"
     "-Wno-sign-compare"
     "-Wno-unused-function"

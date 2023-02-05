@@ -12,7 +12,7 @@
 namespace turbo {
 
     namespace digest_detail {
-
+        TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion)
         static TURBO_FORCE_INLINE uint32_t min(uint32_t x, uint32_t y) {
             return x < y ? x : y;
         }
@@ -147,7 +147,7 @@ namespace turbo {
             state[2] = state[2] + c;
             state[3] = state[3] + d;
         }
-
+        TURBO_RESTORE_CLANG_WARNING();
     }  // namespace digest_detail
 
     MD5::MD5() {
@@ -197,7 +197,9 @@ namespace turbo {
     }
 
     void MD5::process(const std::string &str) {
+        TURBO_DISABLE_CLANG_WARNING(-Wshorten-64-to-32)
         return process(str.data(), str.size());
+        TURBO_RESTORE_CLANG_WARNING()
     }
 
     void MD5::finalize(void *digest) {

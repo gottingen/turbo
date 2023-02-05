@@ -343,7 +343,7 @@
 #endif
 
 
-// TURBO_ATTRIBUTE_HOT, TURBO_ATTRIBUTE_COLD
+// TURBO_ATTRIBUTE_HOT, TURBO_COLD
 //
 // Tells GCC that a function is hot or cold. GCC can use this information to
 // improve static analysis, i.e. a conditional branch to a cold function
@@ -360,9 +360,9 @@
 #endif
 
 #if TURBO_HAVE_ATTRIBUTE(cold) || (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_ATTRIBUTE_COLD __attribute__((cold))
+#define TURBO_COLD __attribute__((cold))
 #else
-#define TURBO_ATTRIBUTE_COLD
+#define TURBO_COLD
 #endif
 
 // TURBO_XRAY_ALWAYS_INSTRUMENT, TURBO_XRAY_NEVER_INSTRUMENT, TURBO_XRAY_LOG_ARGS

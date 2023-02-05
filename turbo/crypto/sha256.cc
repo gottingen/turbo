@@ -104,7 +104,7 @@ namespace turbo {
                         h = t0 + t1;
                     };
 
-            for (size_t i = 0; i < 64; ++i) {
+            for (uint32_t i = 0; i < 64; ++i) {
                 RND(S[0], S[1], S[2], S[3], S[4], S[5], S[6], S[7], i);
                 t = S[7], S[7] = S[6], S[6] = S[5], S[5] = S[4],
                 S[4] = S[3], S[3] = S[2], S[2] = S[1], S[1] = S[0], S[0] = t;
@@ -167,7 +167,9 @@ namespace turbo {
     }
 
     void SHA256::process(const std::string &str) {
+        TURBO_DISABLE_CLANG_WARNING(-Wshorten-64-to-32);
         return process(str.data(), str.size());
+        TURBO_RESTORE_CLANG_WARNING();
     }
 
     void SHA256::finalize(void *digest) {

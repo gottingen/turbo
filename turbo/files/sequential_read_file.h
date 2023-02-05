@@ -29,7 +29,7 @@ namespace turbo {
 
         turbo::Status read(turbo::Cord *buf, size_t n = npos);
 
-        turbo::Status skip(size_t n);
+        turbo::Status skip(off_t n);
 
         bool is_eof(turbo::Status *frs);
 

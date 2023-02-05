@@ -989,7 +989,57 @@ using unique_variant_t = typename unique_variant<T>::type;
 
 template<typename> inline constexpr bool dependent_false_v = false;
 
+#if TURBO_COMPILER_HAVE_RTTI
+#define TURBO_TYPE_INFO_OF(...) (&typeid(__VA_ARGS__))
+#else
+#define TURBO_TYPE_INFO_OF(...) \
+  ((sizeof(__VA_ARGS__)), static_cast<std::type_info const*>(nullptr))
+#endif
+
+//  type_info_of
+//
+//  Returns &typeid(T) if RTTI is available, nullptr otherwise.
+//
+//  This overload works on the static type of the template parameter.
+template <typename T>
+TURBO_FORCE_INLINE static std::type_info const* type_info_of() {
+  return TURBO_TYPE_INFO_OF(T);
+}
+
+//  type_info_of
+//
+//  Returns &typeid(t) if RTTI is available, nullptr otherwise.
+//
+//  This overload works on the dynamic type of the non-template parameter.
+template <typename T>
+TURBO_FORCE_INLINE static std::type_info const* type_info_of(
+    [[maybe_unused]] T const& t) {
+  return FOLLY_TYPE_INFO_OF(t);
+}
+
 TURBO_NAMESPACE_END
 }  // namespace turbo
+
+//////
+// TURBO_DECLVAL(T)
+//
+// This macro works like std::declval<T>() but does the same thing in a way
+// that does not require instantiating a function template.
+//
+// Use this macro instead of std::declval<T>() in places that are widely
+// instantiated to reduce compile-time overhead of instantiating function
+// templates.
+//
+// Note that, like std::declval<T>(), this macro can only be used in
+// unevaluated contexts.
+//
+// There are some small differences between this macro and std::declval<T>().
+// - This macro results in a value of type 'T' instead of 'T&&'.
+// - This macro requires the type T to be a complete type at the
+// point of use.
+// If this is a problem then use TURBO_DECLVAL(T&&) instead, or if T might
+// be 'void', then use TURBO_DECLVAL(std::add_rvalue_reference_t<T>).
+ //
+#define TURBO_DECLVAL(...) static_cast<__VA_ARGS__ (*)() noexcept>(nullptr)()
 
 #endif  // TURBO_META_TYPE_TRAITS_H_
