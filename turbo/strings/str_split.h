@@ -376,6 +376,12 @@ using EnableSplitIfString =
                             std::is_same<T, const std::string>::value,
                             int>::type;
 
+template <typename T>
+using EnableSplitIfInlineString =
+    typename std::enable_if<std::is_same<T, turbo::inlined_string>::value ||
+                                std::is_same<T, const turbo::inlined_string>::value,
+                            int>::type;
+
 //------------------------------------------------------------------------------
 //                                  StrSplit()
 //------------------------------------------------------------------------------
@@ -506,6 +512,18 @@ StrSplit(strings_internal::ConvertibleToStringView text, Delimiter d) {
 }
 
 template <typename Delimiter, typename StringType,
+          EnableSplitIfInlineString<StringType> = 0>
+strings_internal::Splitter<
+    typename strings_internal::SelectDelimiter<Delimiter>::type, AllowEmpty,
+    turbo::inlined_string>
+StrSplit(StringType&& text, Delimiter d) {
+  using DelimiterType =
+      typename strings_internal::SelectDelimiter<Delimiter>::type;
+  return strings_internal::Splitter<DelimiterType, AllowEmpty, turbo::inlined_string>(
+      std::move(text), DelimiterType(d), AllowEmpty());
+}
+
+template <typename Delimiter, typename StringType,
           EnableSplitIfString<StringType> = 0>
 strings_internal::Splitter<
     typename strings_internal::SelectDelimiter<Delimiter>::type, AllowEmpty,
@@ -539,6 +557,18 @@ StrSplit(StringType&& text, Delimiter d, Predicate p) {
   using DelimiterType =
       typename strings_internal::SelectDelimiter<Delimiter>::type;
   return strings_internal::Splitter<DelimiterType, Predicate, std::string>(
+      std::move(text), DelimiterType(d), std::move(p));
+}
+
+template <typename Delimiter, typename Predicate, typename StringType,
+          EnableSplitIfInlineString<StringType> = 0>
+strings_internal::Splitter<
+    typename strings_internal::SelectDelimiter<Delimiter>::type, Predicate,
+    turbo::inlined_string>
+StrSplit(StringType&& text, Delimiter d, Predicate p) {
+  using DelimiterType =
+      typename strings_internal::SelectDelimiter<Delimiter>::type;
+  return strings_internal::Splitter<DelimiterType, Predicate, turbo::inlined_string>(
       std::move(text), DelimiterType(d), std::move(p));
 }
 

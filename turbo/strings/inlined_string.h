@@ -1014,6 +1014,9 @@ public:
   /* implicit */ basic_inlined_string(const std::basic_string<E, T, A2> &str)
       : store_(str.data(), str.size()) {}
 
+  basic_inlined_string(const std::basic_string_view<E, T> &str)
+      : store_(str.data(), str.size()) {}
+
   basic_inlined_string(const basic_inlined_string &str, size_type pos, size_type n = npos,
                  const A & /* a */ = A()) {
     assign(str, pos, n);

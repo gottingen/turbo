@@ -40,6 +40,7 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
+#include "turbo/strings/inlined_string.h"
 
 #ifdef _GLIBCXX_DEBUG
 #include "turbo/strings/internal/stl_type_traits.h"
@@ -368,6 +369,20 @@ class Splitter {
     std::vector<std::string, A> operator()(const Splitter& splitter) const {
       const std::vector<std::string_view> v = splitter;
       return std::vector<std::string, A>(v.begin(), v.end());
+    }
+  };
+
+  // Partial specialization for a std::vector<std::string>.
+  //
+  // Optimized for the common case of splitting to a std::vector<std::string>.
+  // In this case we first split the results to a std::vector<std::string_view>
+  // so the returned std::vector<std::string> can have space reserved to avoid
+  // std::string moves.
+  template <typename A>
+  struct ConvertToContainer<std::vector<turbo::inlined_string, A>, turbo::inlined_string, false> {
+    std::vector<turbo::inlined_string, A> operator()(const Splitter& splitter) const {
+      const std::vector<std::string_view> v = splitter;
+      return std::vector<turbo::inlined_string, A>(v.begin(), v.end());
     }
   };
 

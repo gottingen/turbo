@@ -1201,7 +1201,7 @@ TEST(InlinedString, testAllClauses) {
   TEST_CLAUSE(21_4_8_9_a);
 }
 
-/*
+
 TEST(InlinedString, testGetline) {
   std::string s1 =
       "\
@@ -1234,7 +1234,7 @@ sed nisl. In diam lacus, lobortis ut posuere nec, ornare id quam.";
     }
   }
 }
-*/
+
 TEST(InlinedString, testMoveCtor) {
   // Move constructor. Make sure we allocate a large string, so the
   // small string optimization doesn't kick in.
