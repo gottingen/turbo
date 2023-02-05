@@ -154,7 +154,7 @@ namespace turbo {
         }
         *result = {};
         return false;
-#elif _MSC_VER && TURBO_PLATFORM_X64
+#elif defined(_MSC_VER) && defined(TURBO_PROCESSOR_X86_64)
         static_assert(sizeof(T) <= sizeof(unsigned __int64), "Too large");
   if (sizeof(T) < sizeof(uint64_t)) {
     return detail::generic_checked_mul(result, a, b);

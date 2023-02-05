@@ -42,7 +42,7 @@
 #include "turbo/platform/port.h"
 
 // Ignore shadowing warnings within this file, so includers can use -Wshadow.
-TURBO_DISABLE_GCC_WARNING("-Wshadow")
+TURBO_DISABLE_GCC_WARNING(-Wshadow)
 
 namespace turbo {
 
@@ -330,7 +330,7 @@ public:
     case Category::isLarge:
       return mutableDataLarge();
     }
-    turbo::assume_unreachable();
+    return turbo::assume_unreachable(), nullptr;
   }
 
   const Char *c_str() const {

@@ -35,7 +35,7 @@ static const unsigned char* UTF8DecodeOne(const unsigned char* s,
   if (c < 0x80) {   /* ascii? */
     res = c;
   } else {
-    int count = 0;                /* to count number of continuation bytes */
+    size_t count = 0;                /* to count number of continuation bytes */
     for (; c & 0x40u; c <<= 1u) { /* while it needs continuation bytes... */
       if (count >= s_limit) {
         return nullptr;

@@ -342,7 +342,7 @@ void* exception_ptr_get_object_(
 //  objects fails. This is likely to do with mismatch between the application
 //  ABI and the system-provided libstdc++/libc++/cxxabi ABI. May falsely return
 //  true on other platforms.
-[[TURBO_PURE]] inline bool exception_ptr_access() noexcept {
+TURBO_PURE inline bool exception_ptr_access() noexcept {
   return detail::exception_ptr_access_ct || detail::exception_ptr_access_rt();
 }
 

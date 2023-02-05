@@ -1,7 +1,6 @@
-// Copyright 2022 ByteDance Ltd. and/or its affiliates.
 /*
  * Copyright (c) Facebook, Inc. and its affiliates.
- *
+ * Copyright 2022 The Turbo Authors.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -119,7 +118,9 @@ inline bool usingJEMalloc() noexcept {
 //}
 #endif
 
-TURBO_NO_INLINE inline bool canSdallocx() noexcept {
+void sizedFree(void* ptr, size_t size);
+
+    TURBO_NO_INLINE inline bool canSdallocx() noexcept {
   static bool rv = usingJEMalloc();
   return rv;
 }
@@ -184,6 +185,7 @@ void* checkedRealloc(void* ptr, size_t size) {
 }
 
 void sizedFree(void* ptr, size_t size) {
+  TURBO_UNUSED(size);
 #if defined(USE_JEMALLOC) || defined(MATX_USE_JEMALLOC)
   if (canSdallocx()) {
     sdallocx(ptr, size, 0);
