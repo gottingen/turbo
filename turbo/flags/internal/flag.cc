@@ -207,7 +207,7 @@ void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
 
   if (lhs_runtime_type_id == rhs_runtime_type_id) return;
 
-#ifdef TURBO_INTERNAL_HAS_RTTI
+#ifdef TURBO_COMPILER_HAVE_RTTI
   if (*lhs_runtime_type_id == *rhs_runtime_type_id) return;
 #endif
 

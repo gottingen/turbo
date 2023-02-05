@@ -84,6 +84,7 @@ set(TURBO_ALL_SRC
         "log/initialize.cc"
         "log/log_entry.cc"
         "log/log_sink.cc"
+        "memory/jemalloc_helper.cc"
         "platform/internal/cycleclock.cc"
         "platform/internal/spinlock.cc"
         "platform/internal/spinlock_wait.cc"

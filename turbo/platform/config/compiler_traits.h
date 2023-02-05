@@ -2018,9 +2018,9 @@
           #endif
         #endif  // TURBO_DLL
 
-        #ifndef TURBO_INLINE_INLINE_VISIBILITY
-          #define TURBO_INLINE_INLINE_VISIBILITY  TURBO_HIDDEN TURBO_FORCE_INLINE
-        #endif  // TURBO_INLINE_INLINE_VISIBILITY
+        #ifndef TURBO_INLINE_VISIBILITY
+          #define TURBO_INLINE_VISIBILITY  TURBO_HIDDEN TURBO_FORCE_INLINE
+        #endif  // TURBO_INLINE_VISIBILITY
 
 
         // ------------------------------------------------------------------------

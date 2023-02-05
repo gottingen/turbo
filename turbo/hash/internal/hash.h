@@ -518,7 +518,7 @@ H TurboHashValue(H hash_state, const std::shared_ptr<T>& ptr) {
 //  - `turbo::Cord`
 //  - `std::string` (and std::basic_string<char, std::char_traits<char>, A> for
 //      any allocator A)
-//  - `std::string_view` and `std::string_view`
+//  - `std::string_view`
 //
 // For simplicity, we currently support only `char` strings. This support may
 // be broadened, if necessary, but with some caution - this overload would

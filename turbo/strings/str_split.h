@@ -48,6 +48,7 @@
 #include "turbo/strings/internal/str_split_internal.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/strip.h"
+#include "turbo/strings/inlined_string.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

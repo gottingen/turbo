@@ -554,6 +554,8 @@
 		#define TURBO_COMPILER_NO_RTTI 1
 	#elif defined(__ARMCC_VERSION) && defined(__TARGET_CPU_MPCORE) && !defined(__RTTI)
 		#define TURBO_COMPILER_NO_RTTI 1
+        #else
+                #define TURBO_COMPILER_HAVE_RTTI 1
 	#endif
 
 

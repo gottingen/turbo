@@ -172,8 +172,8 @@ class TURBO_LOCKABLE SpinLock {
   }
 
   uint32_t TryLockInternal(uint32_t lock_value, uint32_t wait_cycles);
-  void SlowLock() TURBO_ATTRIBUTE_COLD;
-  void SlowUnlock(uint32_t lock_value) TURBO_ATTRIBUTE_COLD;
+  void SlowLock() TURBO_COLD;
+  void SlowUnlock(uint32_t lock_value) TURBO_COLD;
   uint32_t SpinLoop();
 
   inline bool TryLockImpl() {
