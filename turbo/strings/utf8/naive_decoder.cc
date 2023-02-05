@@ -64,12 +64,12 @@ ptrdiff_t NaiveDecoder(unsigned char const* s_ptr,
   auto* dest_orig = dst;
   const unsigned char* data = s_ptr;
   uint32_t code = 0;
-  size_t limit = s_ptr_end - s_ptr;
+  auto limit = static_cast<size_t>(s_ptr_end - s_ptr);
   while (data && limit > 0) {
     const unsigned char* next_data = UTF8DecodeOne(data, limit, &code);
     if (next_data) {
       *dst++ = code;
-      limit -= (next_data - data);
+      limit -= static_cast<size_t>(next_data - data);
       data = next_data;
     } else {
       // for invalid utf8, use 0xFFFD instead

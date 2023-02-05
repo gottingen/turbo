@@ -83,7 +83,7 @@ namespace turbo {
         }
     }
 
-    turbo::Status SequentialReadFile::skip(size_t n) {
+    turbo::Status SequentialReadFile::skip(off_t n) {
         if (_fd > 0) {
             ::lseek(_fd, implicit_cast<off_t>(n), SEEK_CUR);
         }

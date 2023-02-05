@@ -222,6 +222,7 @@ struct SplitterIsConvertibleToImpl<C, true, true>
           std::is_constructible<typename C::key_type, std::string_view>,
           std::is_constructible<typename C::mapped_type, std::string_view>> {};
 
+
 template <typename C>
 struct SplitterIsConvertibleTo
     : SplitterIsConvertibleToImpl<
@@ -400,7 +401,7 @@ class Splitter {
       Container m;
       iterator it;
       bool insert = true;
-      for (const std::string_view sv : splitter) {
+      for (const std::string_view &sv : splitter) {
         if (insert) {
           it = InsertOrEmplace(&m, sv);
         } else {
