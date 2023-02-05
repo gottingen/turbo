@@ -2000,9 +2000,9 @@ TURBO_NAMESPACE_BEGIN
         }
     }
 
-// ############################################################################
-// Forward Declaration: Subflow
-// ############################################################################
+    // ############################################################################
+    // Forward Declaration: Subflow
+    // ############################################################################
 
     inline void Subflow::join() {
 
@@ -2013,7 +2013,7 @@ TURBO_NAMESPACE_BEGIN
         }
 
         // only the parent worker can join the subflow
-        _executor._consume_graph(_worker, _parent, _graph);
+        _executor._consume_graph(_worker, _parent, _graph_ref);
         _joinable = false;
     }
 
@@ -2026,11 +2026,11 @@ TURBO_NAMESPACE_BEGIN
         }
 
         // only the parent worker can detach the subflow
-        _executor._detach_dynamic_task(_worker, _parent, _graph);
+        _executor._detach_dynamic_task(_worker, _parent, _graph_ref);
         _joinable = false;
     }
 
-// Function: named_async
+    // Function: named_async
     template<typename F, typename... ArgsT>
     auto Subflow::named_async(const std::string &name, F &&f, ArgsT &&... args) {
         return _named_async(
@@ -2038,7 +2038,7 @@ TURBO_NAMESPACE_BEGIN
         );
     }
 
-// Function: _named_async
+    // Function: _named_async
     template<typename F, typename... ArgsT>
     auto Subflow::_named_async(
             Worker &w,

@@ -37,7 +37,7 @@ TURBO_NAMESPACE_BEGIN
         /**
         @brief constructs a flow builder with a graph
         */
-        FlowBuilder(Graph &graph);
+        explicit FlowBuilder(Graph &graph);
 
         /**
         @brief creates a static task
@@ -743,7 +743,7 @@ TURBO_NAMESPACE_BEGIN
         /**
         @brief associated graph object
         */
-        Graph &_graph;
+        Graph &_graph_ref;
 
     private:
 
@@ -753,14 +753,14 @@ TURBO_NAMESPACE_BEGIN
 
     // Constructor
     inline FlowBuilder::FlowBuilder(Graph &graph) :
-            _graph{graph} {
+                                                    _graph_ref{graph} {
     }
 
     // Function: emplace
     template<typename C, std::enable_if_t<is_static_task_v < C>, void> *>
 
     Task FlowBuilder::emplace(C &&c) {
-        return Task(_graph._emplace_back(
+        return Task(_graph_ref._emplace_back(
                 std::in_place_type_t<Node::Static>{}, std::forward<C>(c)
         ));
     }
@@ -769,7 +769,7 @@ TURBO_NAMESPACE_BEGIN
     template<typename C, std::enable_if_t<is_dynamic_task_v < C>, void> *>
 
     Task FlowBuilder::emplace(C &&c) {
-        return Task(_graph._emplace_back(
+        return Task(_graph_ref._emplace_back(
                 std::in_place_type_t<Node::Dynamic>{}, std::forward<C>(c)
         ));
     }
@@ -778,7 +778,7 @@ TURBO_NAMESPACE_BEGIN
     template<typename C, std::enable_if_t<is_condition_task_v < C>, void> *>
 
     Task FlowBuilder::emplace(C &&c) {
-        return Task(_graph._emplace_back(
+        return Task(_graph_ref._emplace_back(
                 std::in_place_type_t<Node::Condition>{}, std::forward<C>(c)
         ));
     }
@@ -787,7 +787,7 @@ TURBO_NAMESPACE_BEGIN
     template<typename C, std::enable_if_t<is_multi_condition_task_v < C>, void> *>
 
     Task FlowBuilder::emplace(C &&c) {
-        return Task(_graph._emplace_back(
+        return Task(_graph_ref._emplace_back(
                 std::in_place_type_t<Node::MultiCondition>{}, std::forward<C>(c)
         ));
     }
@@ -796,7 +796,7 @@ TURBO_NAMESPACE_BEGIN
     template<typename C, std::enable_if_t<is_runtime_task_v < C>, void> *>
 
     Task FlowBuilder::emplace(C &&c) {
-        return Task(_graph._emplace_back(
+        return Task(_graph_ref._emplace_back(
                 std::in_place_type_t<Node::Runtime>{}, std::forward<C>(c)
         ));
     }
@@ -828,13 +828,13 @@ TURBO_NAMESPACE_BEGIN
             }
         });
 
-        _graph._erase(task._node);
+        _graph_ref._erase(task._node);
     }
 
 // Function: composed_of
     template<typename T>
     Task FlowBuilder::composed_of(T &object) {
-        auto node = _graph._emplace_back(
+        auto node = _graph_ref._emplace_back(
                 std::in_place_type_t<Node::Module>{}, object
         );
         return Task(node);
@@ -842,7 +842,7 @@ TURBO_NAMESPACE_BEGIN
 
 // Function: placeholder
     inline Task FlowBuilder::placeholder() {
-        auto node = _graph._emplace_back();
+        auto node = _graph_ref._emplace_back();
         return Task(node);
     }
 
@@ -1150,7 +1150,7 @@ C.precede(D);  // D runs after C
     // Procedure: reset
     inline void Subflow::reset(bool clear_graph) {
         if (clear_graph) {
-            _graph._clear();
+            _graph_ref._clear();
         }
         _joinable = true;
     }
