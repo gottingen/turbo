@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/attributes.h"
+#include "benchmark/benchmark.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/flags/flag.h"
 #include "turbo/log/check.h"
@@ -21,7 +21,7 @@
 #include "turbo/log/log_entry.h"
 #include "turbo/log/log_sink.h"
 #include "turbo/log/log_sink_registry.h"
-#include "benchmark/benchmark.h"
+#include "turbo/platform/port.h"
 
 namespace {
 

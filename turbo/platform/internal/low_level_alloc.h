@@ -28,8 +28,7 @@
 
 #include <cstdint>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // LowLevelAlloc requires that the platform support low-level
 // allocation of virtual memory. Platforms lacking this cannot use

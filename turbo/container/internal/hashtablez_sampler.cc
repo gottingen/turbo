@@ -21,14 +21,13 @@
 #include <functional>
 #include <limits>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/memory/memory.h"
+#include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 #include "turbo/profiling/internal/exponential_biased.h"
 #include "turbo/profiling/internal/sample_recorder.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

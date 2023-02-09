@@ -40,15 +40,12 @@
 #include <new>
 #include <type_traits>
 
-#include "turbo/meta/algorithm.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/throw_delegate.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/platform/port.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/memory/memory.h"
+#include "turbo/meta/algorithm.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/throw_delegate.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

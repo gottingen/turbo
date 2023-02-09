@@ -19,9 +19,9 @@
 #include <iosfwd>
 #include <string>
 
-#include "turbo/platform/config.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/declare.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 // --------------------------------------------------------------------

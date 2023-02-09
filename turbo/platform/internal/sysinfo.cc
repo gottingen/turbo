@@ -14,7 +14,7 @@
 
 #include "turbo/platform/internal/sysinfo.h"
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -50,9 +50,9 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/call_once.h"
-#include "turbo/platform/config.h"
+#include "turbo/base/call_once.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
 #include "turbo/platform/thread_annotations.h"

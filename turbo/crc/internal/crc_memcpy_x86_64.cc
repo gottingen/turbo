@@ -51,12 +51,12 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/prefetch.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/crc/crc32c.h"
 #include "turbo/crc/internal/cpu_detect.h"
 #include "turbo/crc/internal/crc_memcpy.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/prefetch.h"
 #include "turbo/strings/string_view.h"
 
 #ifdef TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE

@@ -77,7 +77,6 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/escaping.h"

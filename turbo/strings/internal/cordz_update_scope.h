@@ -15,8 +15,7 @@
 #ifndef TURBO_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_
 #define TURBO_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cordz_info.h"

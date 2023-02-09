@@ -24,10 +24,10 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/config.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_HAVE_ADDRESS_SANITIZER
 #include <sanitizer/asan_interface.h>

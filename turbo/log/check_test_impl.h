@@ -25,12 +25,11 @@
 #include <ostream>
 #include <string>
 
+#include "turbo/base/status.h"
+#include "turbo/log/internal/test_helpers.h"
+#include "turbo/platform/port.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/log/internal/test_helpers.h"
-#include "turbo/base/status.h"
 
 // NOLINTBEGIN(misc-definitions-in-headers)
 

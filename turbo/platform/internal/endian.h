@@ -20,7 +20,7 @@
 #include <cstdlib>
 
 #include "turbo/base/casts.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/port.h"
 

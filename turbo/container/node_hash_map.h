@@ -40,13 +40,13 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/meta/container.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/internal/container_memory.h"
-#include "turbo/container/internal/hash_function_defaults.h"  // IWYU pragma: export
+#include "turbo/container/internal/hash_function_defaults.h" // IWYU pragma: export
 #include "turbo/container/internal/node_slot_policy.h"
-#include "turbo/container/internal/raw_hash_map.h"  // IWYU pragma: export
+#include "turbo/container/internal/raw_hash_map.h" // IWYU pragma: export
 #include "turbo/memory/memory.h"
+#include "turbo/meta/container.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

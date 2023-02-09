@@ -23,18 +23,16 @@
 #include <iostream>
 #include <memory>
 
+#include "turbo/base/casts.h"
+#include "turbo/base/internal/raw_logging.h"
+#include "turbo/debugging/internal/stack_consumption.h"
+#include "turbo/log/turbo_log.h"
+#include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/per_thread_tls.h"
+#include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/base/casts.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/per_thread_tls.h"
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/debugging/internal/stack_consumption.h"
-#include "turbo/memory/memory.h"
-#include "turbo/strings/string_view.h"
-#include "turbo/log/turbo_log.h"
 
 using testing::Contains;
 

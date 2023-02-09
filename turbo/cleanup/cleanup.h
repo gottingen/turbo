@@ -70,9 +70,8 @@
 
 #include <utility>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/macros.h"
 #include "turbo/cleanup/internal/cleanup.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -17,14 +17,14 @@
 
 #include <string>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/log/internal/globals.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/log.h"
 #include "turbo/log/scoped_mock_log.h"
+#include "turbo/platform/port.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 

@@ -23,8 +23,8 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/platform/optimization.h"
-#include "bits.h"
+#include "turbo/base/bits.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

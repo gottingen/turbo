@@ -18,13 +18,12 @@
 #include <atomic>
 #include <limits>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/base/call_once.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/internal/cycleclock.h"
 #include "turbo/platform/internal/spinlock_wait.h"
 #include "turbo/platform/internal/sysinfo.h" /* For NumCPUs() */
-#include "turbo/platform/call_once.h"
 
 // Description of lock-word:
 //  31..00: [............................3][2][1][0]

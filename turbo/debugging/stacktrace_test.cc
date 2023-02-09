@@ -14,9 +14,8 @@
 
 #include "turbo/debugging/stacktrace.h"
 
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
 
 namespace {
 

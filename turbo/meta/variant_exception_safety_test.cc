@@ -14,7 +14,7 @@
 
 #include "variant.h"
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // This test is a no-op when turbo::variant is an alias for std::variant and when
 // exceptions are not enabled.

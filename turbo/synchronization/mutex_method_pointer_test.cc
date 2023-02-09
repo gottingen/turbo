@@ -14,11 +14,10 @@
 
 #include "turbo/synchronization/mutex.h"
 
+#include "turbo/platform/port.h"
 #include <cstdlib>
 #include <string>
-
 #include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 
 namespace {
 

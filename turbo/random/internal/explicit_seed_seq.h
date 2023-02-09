@@ -22,7 +22,7 @@
 #include <iterator>
 #include <vector>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/endian.h"
 
 namespace turbo {

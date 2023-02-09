@@ -20,8 +20,8 @@
 #include <random>
 #include <vector>
 
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -42,8 +42,8 @@
 #ifndef TURBO_TYPES_VARIANT_H_
 #define TURBO_TYPES_VARIANT_H_
 
-#include "turbo/platform/config.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_USES_STD_VARIANT
 
@@ -73,10 +73,10 @@ TURBO_NAMESPACE_END
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
-#include "turbo/meta/type_traits.h"
 #include "turbo/meta/internal/variant.h"
+#include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

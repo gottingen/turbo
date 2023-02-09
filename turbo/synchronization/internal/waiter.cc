@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "turbo/synchronization/internal/waiter.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -43,10 +43,9 @@
 #include <type_traits>
 
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/thread_identity.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/synchronization/internal/kernel_timeout.h"
-
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

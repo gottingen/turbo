@@ -21,12 +21,9 @@
 
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/base/log_severity.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/port.h"
 
 // This is similar to LOG(severity) << format..., but

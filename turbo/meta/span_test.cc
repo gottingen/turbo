@@ -22,16 +22,15 @@
 #include <type_traits>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/exception_testing.h"
-#include "turbo/platform/options.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/hash/hash_testing.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/options.h"
 #include "turbo/strings/str_cat.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 

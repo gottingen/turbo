@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <cstring>
 
-#include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {

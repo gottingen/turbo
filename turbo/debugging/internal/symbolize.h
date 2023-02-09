@@ -23,7 +23,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 #ifdef TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE

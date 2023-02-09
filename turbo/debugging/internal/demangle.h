@@ -53,7 +53,7 @@
 #ifndef TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
 #define TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

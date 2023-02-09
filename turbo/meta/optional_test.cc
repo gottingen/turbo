@@ -21,11 +21,11 @@
 #include <type_traits>
 #include <utility>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
+#include "gtest/gtest.h"
 
 #if defined(__cplusplus) && __cplusplus >= 202002L
 // In C++20, volatile-qualified return types are deprecated.

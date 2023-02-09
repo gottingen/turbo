@@ -18,10 +18,7 @@
 #include <limits>
 #include <random>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/profiling/internal/sample_recorder.h"
 #include "turbo/synchronization/blocking_counter.h"
 #include "turbo/synchronization/internal/thread_pool.h"
@@ -29,6 +26,8 @@
 #include "turbo/synchronization/notification.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 #ifdef TURBO_INTERNAL_HAVE_SSE2
 constexpr int kProbeLength = 16;

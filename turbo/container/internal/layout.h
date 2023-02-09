@@ -171,11 +171,11 @@
 #include <typeinfo>
 #include <utility>
 
-#include "turbo/platform/config.h"
-#include "turbo/meta/type_traits.h"
-#include "turbo/strings/str_cat.h"
 #include "turbo/meta/span.h"
+#include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/str_cat.h"
 
 #ifdef TURBO_HAVE_ADDRESS_SANITIZER
 #include <sanitizer/asan_interface.h>

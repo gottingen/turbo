@@ -17,8 +17,7 @@
 
 #include <stdint.h>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -29,11 +29,7 @@
 #include <utility>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/meta/container.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/btree_map.h"
 #include "turbo/container/btree_set.h"
 #include "turbo/container/internal/counting_allocator.h"
@@ -41,11 +37,15 @@
 #include "turbo/flags/flag.h"
 #include "turbo/hash/hash_testing.h"
 #include "turbo/memory/memory.h"
+#include "turbo/meta/compare.h"
+#include "turbo/meta/container.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/compare.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 TURBO_FLAG(int, test_values, 10000, "The number of values to use for tests");
 

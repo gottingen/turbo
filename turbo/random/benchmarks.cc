@@ -25,8 +25,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "turbo/platform/macros.h"
+#include "benchmark/benchmark.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/bernoulli_distribution.h"
 #include "turbo/random/beta_distribution.h"
 #include "turbo/random/exponential_distribution.h"
@@ -39,7 +40,6 @@
 #include "turbo/random/uniform_int_distribution.h"
 #include "turbo/random/uniform_real_distribution.h"
 #include "turbo/random/zipf_distribution.h"
-#include "benchmark/benchmark.h"
 
 namespace {
 

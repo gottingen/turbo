@@ -30,9 +30,9 @@
 #include <memory>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/bits.h"
+#include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/charconv.h"
 #include "turbo/strings/escaping.h"

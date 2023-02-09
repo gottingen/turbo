@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <limits>
 
-#include "turbo/platform/const_init.h"
+#include "turbo/base/const_init.h"
 #include "turbo/strings/internal/str_format/extension.h"
 
 namespace turbo {

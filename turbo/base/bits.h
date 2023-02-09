@@ -43,9 +43,8 @@
 #include <bit>
 #endif
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/bits.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

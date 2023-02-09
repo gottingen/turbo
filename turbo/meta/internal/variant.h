@@ -27,15 +27,13 @@
 #include <tuple>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/identity.h"
 #include "turbo/base/internal/inline_variable.h"
 #include "turbo/base/internal/invoke.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/meta/type_traits.h"
 #include "turbo/meta/bad_variant_access.h"
+#include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 
 #if !defined(TURBO_USES_STD_VARIANT)
 

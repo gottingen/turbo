@@ -29,18 +29,17 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/log_severity.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/log/internal/append_truncated.h"
 #include "turbo/log/internal/config.h"
 #include "turbo/log/internal/globals.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_format.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/time.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

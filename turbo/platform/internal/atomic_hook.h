@@ -20,8 +20,7 @@
 #include <cstdint>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #define TURBO_HAVE_WORKING_CONSTEXPR_STATIC_INIT 0

@@ -22,11 +22,11 @@
 #include <utility>
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/exception_testing.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/internal/test_instance_tracker.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace {
 using turbo::test_internal::CopyableOnlyInstance;

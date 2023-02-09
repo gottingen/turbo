@@ -25,8 +25,8 @@
 #include <atomic>
 #include <cstring>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/debugging/stacktrace.h"
+#include "turbo/platform/port.h"
 
 extern "C" {
 uintptr_t emscripten_stack_snapshot();

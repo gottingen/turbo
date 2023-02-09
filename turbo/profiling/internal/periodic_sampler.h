@@ -19,7 +19,7 @@
 
 #include <atomic>
 
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/profiling/internal/exponential_biased.h"
 
 namespace turbo {

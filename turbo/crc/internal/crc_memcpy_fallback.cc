@@ -15,9 +15,9 @@
 #include <cstdint>
 #include <memory>
 
-#include "turbo/platform/config.h"
 #include "turbo/crc/crc32c.h"
 #include "turbo/crc/internal/crc_memcpy.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -20,9 +20,9 @@
 #include <utility>
 
 #include "turbo/base/internal/invoke.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/thread_annotations.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/thread_annotations.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -17,8 +17,8 @@
 #ifndef TURBO_BASE_INTERNAL_EXCEPTION_TESTING_H_
 #define TURBO_BASE_INTERNAL_EXCEPTION_TESTING_H_
 
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 
 // TURBO_BASE_INTERNAL_EXPECT_FAIL tests either for a specified thrown exception
 // if exceptions are enabled, or for death with a specified text in the error

@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/config/config.h"
 
 // TURBO_BLOCK_TAIL_CALL_OPTIMIZATION
 //

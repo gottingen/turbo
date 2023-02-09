@@ -20,7 +20,7 @@
 #include <unistd.h>
 #endif
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_HAVE_MMAP
 #include <sys/mman.h>
@@ -33,11 +33,10 @@
 #include <csignal>
 #include <cstdio>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/symbolize.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

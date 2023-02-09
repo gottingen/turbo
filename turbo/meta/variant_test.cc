@@ -34,13 +34,12 @@
 #include <utility>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/port.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 

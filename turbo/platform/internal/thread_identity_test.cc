@@ -17,13 +17,12 @@
 #include <thread>  // NOLINT(build/c++11)
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/spinlock.h"
-#include "turbo/platform/macros.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/internal/per_thread_sem.h"
 #include "turbo/synchronization/mutex.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

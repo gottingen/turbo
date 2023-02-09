@@ -39,12 +39,10 @@
 #include <string>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/base/bits.h"
 #include "turbo/base/int128.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/endian.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

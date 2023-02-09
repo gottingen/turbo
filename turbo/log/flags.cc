@@ -21,13 +21,12 @@
 #include <cstdlib>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/flags/flag.h"
 #include "turbo/flags/marshalling.h"
 #include "turbo/log/globals.h"
 #include "turbo/log/internal/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/string_view.h"
 

@@ -20,8 +20,7 @@
 
 #include "turbo/debugging/leak_check.h"
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #if defined(TURBO_HAVE_LEAK_SANITIZER)
 

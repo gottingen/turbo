@@ -44,12 +44,11 @@
 #include <memory>
 #include <vector>
 
-#include "turbo/platform/config.h"
+#include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/per_thread_tls.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/profiling/internal/sample_recorder.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

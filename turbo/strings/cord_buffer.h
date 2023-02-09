@@ -31,12 +31,11 @@
 #include <memory>
 #include <utility>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/macros.h"
 #include "turbo/base/bits.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

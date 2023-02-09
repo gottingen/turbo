@@ -22,13 +22,13 @@
 #include <string>
 #include <thread>  // NOLINT
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/meta/optional.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/str_format/bind.h"
 #include "turbo/strings/match.h"
-#include "turbo/meta/optional.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

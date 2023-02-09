@@ -31,11 +31,7 @@
 #include <windows.h>
 #endif
 
-#include "turbo/meta/container.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/const_init.h"
-#include "turbo/platform/thread_annotations.h"
+#include "turbo/base/const_init.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/flag.h"
@@ -48,6 +44,9 @@
 #include "turbo/flags/reflection.h"
 #include "turbo/flags/usage.h"
 #include "turbo/flags/usage_config.h"
+#include "turbo/meta/container.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/internal/damerau_levenshtein_distance.h"
 #include "turbo/strings/str_cat.h"

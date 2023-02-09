@@ -21,10 +21,10 @@
 #include <string>
 #include <vector>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/random/internal/fast_uniform_bits.h"
 #include "turbo/meta/optional.h"
 #include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
+#include "turbo/random/internal/fast_uniform_bits.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

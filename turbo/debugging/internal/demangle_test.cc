@@ -17,11 +17,11 @@
 #include <cstdlib>
 #include <string>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/debugging/internal/stack_consumption.h"
 #include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -21,7 +21,7 @@
 
 #include <string.h>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/internal/thread_identity.h"
 #include "turbo/synchronization/internal/per_thread_sem.h"

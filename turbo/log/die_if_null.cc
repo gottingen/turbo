@@ -14,8 +14,8 @@
 
 #include "turbo/log/die_if_null.h"
 
-#include "turbo/platform/config.h"
 #include "turbo/log/log.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {

@@ -38,10 +38,10 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/config.h"
 #include "turbo/meta/internal/any_invocable.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

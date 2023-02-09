@@ -19,7 +19,7 @@
 
 #include <sys/ucontext.h>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #if defined(__linux__)
 #include <sys/mman.h>
 #include <ucontext.h>
@@ -33,8 +33,8 @@
 #include <limits>
 #include <utility>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/debugging/stacktrace.h"
+#include "turbo/platform/port.h"
 
 static const uintptr_t kUnknownFrameSize = 0;
 

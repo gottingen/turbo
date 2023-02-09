@@ -19,9 +19,8 @@
 #include <limits>
 #include <random>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/profiling/internal/exponential_biased.h"
 
 namespace turbo {

@@ -28,7 +28,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/fast_uniform_bits.h"
 #include "turbo/random/internal/generate_real.h"
 #include "turbo/random/internal/iostream_state_saver.h"

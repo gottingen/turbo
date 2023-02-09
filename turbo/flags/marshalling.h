@@ -199,7 +199,7 @@
 #ifndef TURBO_FLAGS_MARSHALLING_H_
 #define TURBO_FLAGS_MARSHALLING_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 #include <optional>

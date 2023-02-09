@@ -18,7 +18,7 @@
 #include <sstream>
 #include <type_traits>
 
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
 
 namespace {

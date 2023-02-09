@@ -16,7 +16,7 @@
 
 #include <cassert>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_data_edge.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"

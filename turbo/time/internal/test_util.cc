@@ -14,8 +14,8 @@
 
 #include "turbo/time/internal/test_util.h"
 
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

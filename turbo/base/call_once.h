@@ -32,12 +32,11 @@
 #include <utility>
 
 #include "turbo/base/internal/invoke.h"
-#include "turbo/platform/internal/low_level_scheduling.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/low_level_scheduling.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/platform/internal/spinlock_wait.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/optimization.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {

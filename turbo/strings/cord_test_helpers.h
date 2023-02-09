@@ -21,7 +21,7 @@
 #include <iostream>
 #include <string>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/string_view.h"

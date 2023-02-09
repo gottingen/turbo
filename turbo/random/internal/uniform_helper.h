@@ -19,8 +19,8 @@
 #include <limits>
 #include <type_traits>
 
-#include "turbo/platform/config.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/traits.h"
 
 namespace turbo {

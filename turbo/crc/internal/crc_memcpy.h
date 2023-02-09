@@ -18,8 +18,8 @@
 #include <cstddef>
 #include <memory>
 
-#include "turbo/platform/config.h"
 #include "turbo/crc/crc32c.h"
+#include "turbo/platform/port.h"
 
 // Defined if the class AcceleratedCrcMemcpyEngine exists.
 #if defined(__x86_64__) && defined(__SSE4_2__)

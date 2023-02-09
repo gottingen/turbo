@@ -14,12 +14,12 @@
 
 #include "turbo/strings/internal/cord_rep_crc.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

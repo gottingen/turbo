@@ -34,9 +34,7 @@
 #ifndef TURBO_PLATFORM_THREAD_ANNOTATIONS_H_
 #define TURBO_PLATFORM_THREAD_ANNOTATIONS_H_
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-// TODO(mbonadei): Remove after the backward compatibility period.
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/thread_annotations.h"  // IWYU pragma: export
 
 // TURBO_GUARDED_BY()

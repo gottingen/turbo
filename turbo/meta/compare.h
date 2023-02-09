@@ -35,8 +35,8 @@
 #include <cstdlib>
 #include <type_traits>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

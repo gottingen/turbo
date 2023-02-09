@@ -16,9 +16,9 @@
 #include <thread>  // NOLINT(build/c++11), Turbo test
 #include <type_traits>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/const_init.h"
+#include "turbo/base/const_init.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/mutex.h"
 #include "turbo/synchronization/notification.h"

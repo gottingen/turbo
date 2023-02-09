@@ -19,8 +19,9 @@
 #include <cstdint>
 #include <functional>
 
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/internal/cord_internal.h"
@@ -29,7 +30,6 @@
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/meta/span.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -21,8 +21,7 @@
 
 #include <cstdint>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // unaligned APIs
 

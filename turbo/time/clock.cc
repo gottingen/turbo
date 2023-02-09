@@ -14,9 +14,6 @@
 
 #include "turbo/time/clock.h"
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/optimization.h"
-
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -28,10 +25,9 @@
 #include <ctime>
 #include <limits>
 
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
-#include "turbo/platform/macros.h"
-#include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 
 namespace turbo {

@@ -82,10 +82,10 @@
 #include <TargetConditionals.h>
 #endif
 
+#include "policy_checks.h"
 #include "turbo/platform/config/base.h"
 #include "turbo/platform/config/have.h"
 #include "turbo/platform/options.h"
-#include "turbo/platform/policy_checks.h"
 
 // Turbo long-term support (LTS) releases will define
 // `TURBO_LTS_RELEASE_VERSION` to the integer representing the date string of the

@@ -23,7 +23,7 @@
 #include <cstdint>
 #include <ctime>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/errno_saver.h"
 
 // The SpinLock lockword is `std::atomic<uint32_t>`. Here we assert that

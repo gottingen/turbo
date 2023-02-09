@@ -16,8 +16,8 @@
 #ifndef TURBO_FLAGS_INTERNAL_COMMANDLINEFLAG_H_
 #define TURBO_FLAGS_INTERNAL_COMMANDLINEFLAG_H_
 
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/fast_type_id.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

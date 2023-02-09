@@ -21,9 +21,8 @@
 #ifndef TURBO_LOG_GLOBALS_H_
 #define TURBO_LOG_GLOBALS_H_
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/log_severity.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

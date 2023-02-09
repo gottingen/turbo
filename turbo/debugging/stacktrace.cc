@@ -38,9 +38,8 @@
 
 #include <atomic>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/port.h"
 #include "turbo/debugging/internal/stacktrace_config.h"
+#include "turbo/platform/port.h"
 
 #if defined(TURBO_STACKTRACE_INL_HEADER)
 #include TURBO_STACKTRACE_INL_HEADER

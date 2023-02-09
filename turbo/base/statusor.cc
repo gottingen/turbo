@@ -16,9 +16,9 @@
 #include <cstdlib>
 #include <utility>
 
-#include "turbo/platform/call_once.h"
-#include "turbo/base/internal/raw_logging.h"
+#include "call_once.h"
 #include "status.h"
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {

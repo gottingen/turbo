@@ -34,8 +34,6 @@
 #include <limits>
 #include <utility>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
 
 #if defined(_MSC_VER)

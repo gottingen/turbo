@@ -16,10 +16,10 @@
 #include <memory>
 #include <string>
 
-#include "benchmark/benchmark.h"
-#include "turbo/platform/attributes.h"
 #include "any_invocable.h"
+#include "benchmark/benchmark.h"
 #include "function_ref.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

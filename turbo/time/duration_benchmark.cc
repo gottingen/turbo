@@ -17,10 +17,10 @@
 #include <ctime>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/flags/flag.h"
-#include "turbo/time/time.h"
 #include "benchmark/benchmark.h"
+#include "turbo/flags/flag.h"
+#include "turbo/platform/port.h"
+#include "turbo/time/time.h"
 
 TURBO_FLAG(turbo::Duration, turbo_duration_flag_for_benchmark,
           turbo::Milliseconds(1),

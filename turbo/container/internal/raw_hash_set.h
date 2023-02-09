@@ -183,12 +183,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
-#include "turbo/platform/internal/prefetch.h"
+#include "turbo/base/bits.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/platform/port.h"
 #include "turbo/container/internal/common.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/container/internal/container_memory.h"
@@ -197,8 +193,11 @@
 #include "turbo/container/internal/hashtablez_sampler.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/base/bits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/prefetch.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_INTERNAL_HAVE_SSE2
 #include <emmintrin.h>

@@ -17,10 +17,7 @@
 
 #include <utility>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cordz_info.h"
@@ -28,6 +25,8 @@
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 #include "turbo/strings/str_cat.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

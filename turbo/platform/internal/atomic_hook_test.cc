@@ -14,10 +14,10 @@
 
 #include "turbo/platform/internal/atomic_hook.h"
 
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/atomic_hook_test_helper.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/internal/atomic_hook_test_helper.h"
 
 namespace {
 

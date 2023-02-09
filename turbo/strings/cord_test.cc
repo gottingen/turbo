@@ -26,14 +26,11 @@
 #include <utility>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/endian.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/hash/hash.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/endian.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/cord_test_helpers.h"
 #include "turbo/strings/cordz_test_helpers.h"
@@ -41,6 +38,8 @@
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_format.h"
 #include "turbo/strings/string_view.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 // convenience local constants
 static constexpr auto FLAT = turbo::cord_internal::FLAT;

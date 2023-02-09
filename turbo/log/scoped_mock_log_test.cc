@@ -18,20 +18,20 @@
 #include <memory>
 #include <thread>  // NOLINT(build/c++11)
 
-#include "gmock/gmock.h"
-#include "gtest/gtest-spi.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/log/globals.h"
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/log/internal/test_matchers.h"
 #include "turbo/log/log.h"
 #include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/synchronization/barrier.h"
 #include "turbo/synchronization/notification.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest-spi.h"
+#include "gtest/gtest.h"
 
 namespace {
 

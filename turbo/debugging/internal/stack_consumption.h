@@ -18,7 +18,7 @@
 #ifndef TURBO_DEBUGGING_INTERNAL_STACK_CONSUMPTION_H_
 #define TURBO_DEBUGGING_INTERNAL_STACK_CONSUMPTION_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // The code in this module is not portable.
 // Use this feature test macro to detect its availability.

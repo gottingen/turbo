@@ -28,7 +28,7 @@
 // (2) When a new edge (x->y) is inserted, do nothing if rank[x] < rank[y].
 // (3) Otherwise: adjust ranks in the neighborhood of x and y.
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 // This file is a no-op if the required LowLevelAlloc support is missing.
 #include "turbo/platform/internal/low_level_alloc.h"
 #ifndef TURBO_LOW_LEVEL_ALLOC_MISSING

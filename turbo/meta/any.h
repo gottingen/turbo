@@ -53,8 +53,8 @@
 #ifndef TURBO_TYPES_ANY_H_
 #define TURBO_TYPES_ANY_H_
 
-#include "turbo/platform/config.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_USES_STD_ANY
 

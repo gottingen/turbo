@@ -20,10 +20,10 @@
 #include <numeric>
 #include <type_traits>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 static_assert(turbo::internal_any_invocable::kStorageSize >= sizeof(void*),
               "These tests assume that the small object storage is at least "

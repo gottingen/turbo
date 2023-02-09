@@ -21,8 +21,8 @@
 #include <numeric>
 #include <vector>
 
+#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/macros.h"
 
 using turbo::random_internal::ChiSquare;
 using turbo::random_internal::ChiSquarePValue;

@@ -27,11 +27,10 @@
 #include <cstdint>
 #include <limits>
 
-#include "turbo/platform/attributes.h"
 #include "turbo/base/casts.h"
-#include "turbo/platform/config.h"
-#include "turbo/strings/string_view.h"
 #include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

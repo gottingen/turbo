@@ -15,7 +15,7 @@
 
 #include <atomic>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/atomic_hook.h"
 
 namespace turbo {

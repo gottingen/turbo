@@ -52,7 +52,7 @@
 
 #include <atomic>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/synchronization/mutex.h"
 #include "turbo/time/time.h"
 

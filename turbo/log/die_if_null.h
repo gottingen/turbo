@@ -25,9 +25,7 @@
 
 #include <utility>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 
 // TURBO_DIE_IF_NULL()
 //

@@ -19,9 +19,9 @@
 #include <cstring>
 #include <string>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/macros.h"
 #include "turbo/platform/port.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace {
 

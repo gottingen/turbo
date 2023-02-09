@@ -20,9 +20,9 @@
 #include <utility>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

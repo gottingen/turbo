@@ -18,9 +18,9 @@
 #include <list>
 #include <vector>
 
+#include "turbo/platform/port.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 
 namespace {
 

@@ -45,8 +45,7 @@
 #include <atomic>
 #include <cstdint>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/cycleclock_config.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
 

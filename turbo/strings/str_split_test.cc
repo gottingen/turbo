@@ -25,15 +25,15 @@
 #include <unordered_set>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/macros.h"
 #include "turbo/container/btree_map.h"
 #include "turbo/container/btree_set.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/container/node_hash_map.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/dynamic_annotations.h"
 #include "turbo/strings/numbers.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 

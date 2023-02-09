@@ -20,8 +20,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 
 namespace turbo {

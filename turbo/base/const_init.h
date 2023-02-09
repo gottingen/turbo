@@ -22,7 +22,7 @@
 #ifndef TURBO_PLATFORM_CONST_INIT_H_
 #define TURBO_PLATFORM_CONST_INIT_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 // In general, objects with static storage duration (such as global variables)
 // can trigger tricky object lifetime situations.  Attempting to access them

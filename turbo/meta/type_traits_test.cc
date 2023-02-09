@@ -20,11 +20,10 @@
 #include <utility>
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
+#include "gtest/gtest.h"
 
 namespace {
 

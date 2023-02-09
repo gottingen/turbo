@@ -17,11 +17,10 @@
 #include <array>
 #include <thread>  // NOLINT
 
+#include "turbo/platform/port.h"
+#include "turbo/synchronization/notification.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/synchronization/notification.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -16,7 +16,7 @@
 #ifndef TURBO_FLAGS_INTERNAL_PATH_UTIL_H_
 #define TURBO_FLAGS_INTERNAL_PATH_UTIL_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

@@ -42,19 +42,19 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/internal/unaligned_access.h"
-#include "turbo/platform/port.h"
+#include "turbo/base/bits.h"
+#include "turbo/base/int128.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/hash/internal/city.h"
 #include "turbo/hash/internal/low_level_hash.h"
-#include "turbo/meta/type_traits.h"
-#include "turbo/base/bits.h"
-#include "turbo/base/int128.h"
-#include "turbo/strings/string_view.h"
 #include "turbo/meta/optional.h"
-#include "turbo/meta/variant.h"
+#include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/meta/variant.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/internal/unaligned_access.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

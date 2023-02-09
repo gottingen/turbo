@@ -18,9 +18,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace {
 

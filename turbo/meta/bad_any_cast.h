@@ -23,7 +23,7 @@
 
 #include <typeinfo>
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_USES_STD_ANY
 

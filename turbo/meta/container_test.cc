@@ -27,12 +27,12 @@
 #include <valarray>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "turbo/base/casts.h"
-#include "turbo/platform/macros.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace {
 

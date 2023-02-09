@@ -34,9 +34,7 @@
 #ifndef TURBO_PLATFORM_ATTRIBUTES_H_
 #define TURBO_PLATFORM_ATTRIBUTES_H_
 
-#include "turbo/platform/config.h"
-
-
+#include "turbo/platform/config/config.h"
 
 // TURBO_ATTRIBUTE_ALWAYS_INLINE
 // TURBO_ATTRIBUTE_NOINLINE

@@ -20,10 +20,8 @@
 #include <ostream>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/optimization.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_data_edge.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_consume.h"

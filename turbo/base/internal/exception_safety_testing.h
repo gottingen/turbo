@@ -17,7 +17,7 @@
 #ifndef TURBO_BASE_INTERNAL_EXCEPTION_SAFETY_TESTING_H_
 #define TURBO_BASE_INTERNAL_EXCEPTION_SAFETY_TESTING_H_
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
@@ -30,13 +30,13 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/substitute.h"
-#include "turbo/meta/utility.h"
+#include "gtest/gtest.h"
 
 namespace testing {
 

@@ -22,8 +22,8 @@
 #ifndef TURBO_LOG_INTERNAL_GLOBALS_H_
 #define TURBO_LOG_INTERNAL_GLOBALS_H_
 
-#include "turbo/platform/config.h"
 #include "turbo/base/log_severity.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 

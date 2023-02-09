@@ -21,11 +21,10 @@
 #include <cstring>
 #include <string>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
+#include "turbo/base/log_severity.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/atomic_hook.h"
 #include "turbo/platform/internal/errno_saver.h"
-#include "turbo/base/log_severity.h"
 
 // We know how to perform low-level writes to stderr in POSIX and Windows.  For
 // these platforms, we define the token TURBO_LOW_LEVEL_WRITE_SUPPORTED.

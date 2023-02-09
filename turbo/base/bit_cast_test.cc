@@ -17,9 +17,9 @@
 #include <cstdint>
 #include <cstring>
 
-#include "gtest/gtest.h"
 #include "turbo/base/casts.h"
-#include "turbo/platform/macros.h"
+#include "turbo/platform/port.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

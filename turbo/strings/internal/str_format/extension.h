@@ -23,9 +23,9 @@
 #include <cstring>
 #include <ostream>
 
-#include "turbo/platform/config.h"
-#include "turbo/platform/port.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/internal/str_format/output.h"
 #include "turbo/strings/string_view.h"
 

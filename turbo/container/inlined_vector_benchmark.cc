@@ -16,11 +16,11 @@
 #include <string>
 #include <vector>
 
-#include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/macros.h"
-#include "turbo/container/inlined_vector.h"
-#include "turbo/strings/str_cat.h"
 #include "benchmark/benchmark.h"
+#include "turbo/base/internal/raw_logging.h"
+#include "turbo/container/inlined_vector.h"
+#include "turbo/platform/port.h"
+#include "turbo/strings/str_cat.h"
 
 namespace {
 

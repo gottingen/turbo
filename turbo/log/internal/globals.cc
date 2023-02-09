@@ -17,10 +17,9 @@
 #include <atomic>
 #include <cstdio>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/log_severity.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 

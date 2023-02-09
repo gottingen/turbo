@@ -27,12 +27,8 @@
 #include <type_traits>
 #include <typeinfo>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/call_once.h"
+#include "turbo/base/call_once.h"
 #include "turbo/base/casts.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
-#include "turbo/platform/thread_annotations.h"
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/config.h"
 #include "turbo/flags/internal/commandlineflag.h"
@@ -40,9 +36,11 @@
 #include "turbo/flags/internal/sequence_lock.h"
 #include "turbo/flags/marshalling.h"
 #include "turbo/meta/type_traits.h"
+#include "turbo/meta/utility.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/synchronization/mutex.h"
-#include "turbo/meta/utility.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -17,17 +17,16 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/endian.h"
-#include "turbo/platform/internal/prefetch.h"
+#include "turbo/base/bits.h"
 #include "turbo/crc/internal/cpu_detect.h"
 #include "turbo/crc/internal/crc.h"
 #include "turbo/crc/internal/crc32_x86_arm_combined_simd.h"
 #include "turbo/crc/internal/crc_internal.h"
 #include "turbo/memory/memory.h"
-#include "turbo/base/bits.h"
+#include "turbo/platform/port.h"
+#include "turbo/platform/dynamic_annotations.h"
+#include "turbo/platform/internal/endian.h"
+#include "turbo/platform/internal/prefetch.h"
 
 #if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) || \
     defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)

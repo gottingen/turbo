@@ -29,12 +29,12 @@
 #include <type_traits>
 #include <vector>
 
-#include "gtest/gtest.h"
-#include "turbo/platform/macros.h"
 #include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"
 #include "turbo/strings/string_view.h"
+#include "gtest/gtest.h"
 
 namespace {
 

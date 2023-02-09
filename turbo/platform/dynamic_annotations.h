@@ -47,11 +47,7 @@
 
 #include <stddef.h>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#ifdef __cplusplus
-#include "turbo/platform/macros.h"
-#endif
+#include "turbo/platform/port.h"
 
 // TODO(rogeeff): Remove after the backward compatibility period.
 #include "turbo/platform/internal/dynamic_annotations.h"  // IWYU pragma: export

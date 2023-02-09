@@ -20,7 +20,7 @@
 
 #include <atomic>
 
-#include "turbo/platform/attributes.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/thread_identity.h"
 #include "turbo/synchronization/internal/waiter.h"
 

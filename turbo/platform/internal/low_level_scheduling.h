@@ -19,8 +19,8 @@
 #define TURBO_PLATFORM_INTERNAL_LOW_LEVEL_SCHEDULING_H_
 
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/scheduling_mode.h"
-#include "turbo/platform/macros.h"
 
 // The following two declarations exist so SchedulingGuard may friend them with
 // the appropriate language linkage.  These callbacks allow libc internals, such

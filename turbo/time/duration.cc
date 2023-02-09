@@ -67,8 +67,8 @@
 #include <string>
 
 #include "turbo/base/casts.h"
-#include "turbo/platform/macros.h"
 #include "turbo/base/int128.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/strip.h"
 #include "turbo/time/time.h"

@@ -23,11 +23,11 @@
 #include <sstream>
 #include <type_traits>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "turbo/platform/config.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/meta/span.h"
+#include "turbo/platform/port.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

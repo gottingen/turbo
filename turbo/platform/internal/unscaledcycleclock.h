@@ -42,7 +42,7 @@
 #include <TargetConditionals.h>
 #endif
 
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/internal/unscaledcycleclock_config.h"
 
 #if TURBO_USE_UNSCALED_CYCLECLOCK

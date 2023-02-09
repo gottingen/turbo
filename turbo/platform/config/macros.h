@@ -31,9 +31,9 @@
 #include <cassert>
 #include <cstddef>
 
-#include "turbo/platform/attributes.h"
-#include "turbo/platform/config.h"
-#include "turbo/platform/optimization.h"
+#include "optimization.h"
+#include "turbo/platform/config/attributes.h"
+#include "turbo/platform/config/config.h"
 #include "turbo/platform/port.h"
 
 // TURBO_ARRAYSIZE()
