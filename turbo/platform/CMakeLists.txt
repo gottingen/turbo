@@ -1,5 +1,5 @@
 #
-# Copyright 2017 The Turbo Authors.
+# Copyright 2020 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,17 +89,6 @@ turbo_cc_test(
 )
 
 
-turbo_cc_test(
-  NAME
-    endian_test
-  SRCS
-    "internal/endian_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gtest_main
-)
 
 turbo_cc_test(
   NAME

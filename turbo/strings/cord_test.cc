@@ -26,11 +26,11 @@
 #include <utility>
 #include <vector>
 
+#include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/hash/hash.h"
 #include "turbo/platform/port.h"
-#include "turbo/platform/internal/endian.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/cord_test_helpers.h"
 #include "turbo/strings/cordz_test_helpers.h"

@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/random/internal/iostream_state_saver.h"
 #include "turbo/random/internal/randen.h"

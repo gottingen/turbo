@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <limits>
 #include <string>
 
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/strings/internal/char_map.h"

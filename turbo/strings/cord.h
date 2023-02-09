@@ -69,13 +69,12 @@
 #include <string>
 #include <type_traits>
 
+#include "turbo/base/endian.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/crc/internal/crc_cord_state.h"
 #include "turbo/meta/function_ref.h"
 #include "turbo/meta/optional.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/platform/port.h"
-#include "turbo/platform/internal/endian.h"
 #include "turbo/platform/internal/per_thread_tls.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord_analysis.h"

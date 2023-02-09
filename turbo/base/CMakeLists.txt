@@ -77,6 +77,18 @@ turbo_cc_test(
 
 turbo_cc_test(
         NAME
+        endian_test
+        SRCS
+        "endian_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
         int128_test
         SRCS
         "int128_stream_test.cc"

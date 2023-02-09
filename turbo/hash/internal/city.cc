@@ -24,9 +24,9 @@
 #include <string.h>  // for memcpy and memset
 #include <algorithm>
 
-#include "turbo/platform/port.h"
-#include "turbo/platform/internal/endian.h"
+#include "turbo/base/endian.h"
 #include "turbo/platform/internal/unaligned_access.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

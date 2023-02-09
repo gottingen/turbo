@@ -184,6 +184,7 @@
 #include <utility>
 
 #include "turbo/base/bits.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/internal/common.h"
 #include "turbo/container/internal/compressed_tuple.h"
@@ -194,8 +195,6 @@
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
-#include "turbo/platform/port.h"
-#include "turbo/platform/internal/endian.h"
 #include "turbo/platform/internal/prefetch.h"
 #include "turbo/platform/port.h"
 

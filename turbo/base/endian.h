@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,6 +70,7 @@ inline uint16_t gbswap_16(uint16_t host_int) {
 
 #ifdef TURBO_IS_LITTLE_ENDIAN
 
+static constexpr bool kIsLittleEndian = true;
 // Portable definitions for htonl (host-to-network) and friends on little-endian
 // architectures.
 inline uint16_t ghtons(uint16_t x) { return gbswap_16(x); }
@@ -77,7 +78,7 @@ inline uint32_t ghtonl(uint32_t x) { return gbswap_32(x); }
 inline uint64_t ghtonll(uint64_t x) { return gbswap_64(x); }
 
 #elif defined TURBO_IS_BIG_ENDIAN
-
+static constexpr bool kIsLittleEndian = false;
 // Portable definitions for htonl (host-to-network) etc on big-endian
 // architectures. These definitions are simpler since the host byte order is the
 // same as network byte order.

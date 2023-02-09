@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@
 #include <iterator>
 
 #include "turbo/base/call_once.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/port.h"
-#include "turbo/platform/internal/endian.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/internal/sysinfo.h"
 #include "turbo/platform/internal/unaligned_access.h"
+#include "turbo/platform/port.h"
 #include "turbo/random/internal/randen.h"
 #include "turbo/random/internal/seed_material.h"
 #include "turbo/random/seed_gen_exception.h"

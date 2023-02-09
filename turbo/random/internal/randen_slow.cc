@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 #include <cstdint>
 #include <cstring>
 
+#include "turbo/base/endian.h"
 #include "turbo/base/int128.h"
 #include "turbo/platform/port.h"
-#include "turbo/platform/internal/endian.h"
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_traits.h"
 

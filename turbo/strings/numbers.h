@@ -1,4 +1,4 @@
-// Copyright 2017 The Turbo Authors.
+// Copyright 2020 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,9 +40,9 @@
 #include <type_traits>
 
 #include "turbo/base/bits.h"
+#include "turbo/base/endian.h"
 #include "turbo/base/int128.h"
 #include "turbo/platform/port.h"
-#include "turbo/platform/internal/endian.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
