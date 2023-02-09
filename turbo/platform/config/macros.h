@@ -36,18 +36,18 @@
 #include "turbo/platform/config/config.h"
 #include "turbo/platform/port.h"
 
-// TURBO_ARRAYSIZE()
+// TURBO_ARRAY_SIZE()
 //
 // Returns the number of elements in an array as a compile-time constant, which
 // can be used in defining new arrays. If you use this macro on a pointer by
 // mistake, you will get a compile-time error.
-#define TURBO_ARRAYSIZE(array) \
+#define TURBO_ARRAY_SIZE(array) \
   (sizeof(::turbo::macros_internal::ArraySizeHelper(array)))
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace macros_internal {
-// Note: this internal template function declaration is used by TURBO_ARRAYSIZE.
+// Note: this internal template function declaration is used by TURBO_ARRAY_SIZE.
 // The function doesn't need a definition, as we only use its type.
 template <typename T, size_t N>
 auto ArraySizeHelper(const T (&array)[N]) -> char (&)[N];

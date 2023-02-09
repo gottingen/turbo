@@ -356,20 +356,20 @@ static void TestArrayOfArrays(int n) {
 
 TEST(IteratorConstructorTest, NonInline) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  turbo::FixedArray<int, TURBO_ARRAYSIZE(kInput) - 1> const fixed(
-      kInput, kInput + TURBO_ARRAYSIZE(kInput));
-  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
-  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
+  turbo::FixedArray<int, TURBO_ARRAY_SIZE(kInput) - 1> const fixed(
+      kInput, kInput + TURBO_ARRAY_SIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAY_SIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
 
 TEST(IteratorConstructorTest, Inline) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  turbo::FixedArray<int, TURBO_ARRAYSIZE(kInput)> const fixed(
-      kInput, kInput + TURBO_ARRAYSIZE(kInput));
-  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
-  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
+  turbo::FixedArray<int, TURBO_ARRAY_SIZE(kInput)> const fixed(
+      kInput, kInput + TURBO_ARRAY_SIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAY_SIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
@@ -378,9 +378,9 @@ TEST(IteratorConstructorTest, NonPod) {
   char const* kInput[] = {"red",  "orange", "yellow", "green",
                           "blue", "indigo", "violet"};
   turbo::FixedArray<std::string> const fixed(kInput,
-                                            kInput + TURBO_ARRAYSIZE(kInput));
-  ASSERT_EQ(TURBO_ARRAYSIZE(kInput), fixed.size());
-  for (size_t i = 0; i < TURBO_ARRAYSIZE(kInput); ++i) {
+                                            kInput + TURBO_ARRAY_SIZE(kInput));
+  ASSERT_EQ(TURBO_ARRAY_SIZE(kInput), fixed.size());
+  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kInput); ++i) {
     ASSERT_EQ(kInput[i], fixed[i]);
   }
 }
@@ -394,7 +394,7 @@ TEST(IteratorConstructorTest, FromEmptyVector) {
 
 TEST(IteratorConstructorTest, FromNonEmptyVector) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  std::vector<int> const items(kInput, kInput + TURBO_ARRAYSIZE(kInput));
+  std::vector<int> const items(kInput, kInput + TURBO_ARRAY_SIZE(kInput));
   turbo::FixedArray<int> const fixed(items.begin(), items.end());
   ASSERT_EQ(items.size(), fixed.size());
   for (size_t i = 0; i < items.size(); ++i) {
@@ -404,7 +404,7 @@ TEST(IteratorConstructorTest, FromNonEmptyVector) {
 
 TEST(IteratorConstructorTest, FromBidirectionalIteratorRange) {
   int const kInput[] = {2, 3, 5, 7, 11, 13, 17};
-  std::list<int> const items(kInput, kInput + TURBO_ARRAYSIZE(kInput));
+  std::list<int> const items(kInput, kInput + TURBO_ARRAY_SIZE(kInput));
   turbo::FixedArray<int> const fixed(items.begin(), items.end());
   EXPECT_THAT(fixed, testing::ElementsAreArray(kInput));
 }
@@ -673,7 +673,7 @@ TEST(AllocatorSupportTest, CountOutoflineAllocations) {
     const int ia[] = {0, 1, 2, 3, 4, 5, 6, 7};
     Alloc alloc(&allocated, &active_instances);
 
-    AllocFxdArr arr(ia, ia + TURBO_ARRAYSIZE(ia), alloc);
+    AllocFxdArr arr(ia, ia + TURBO_ARRAY_SIZE(ia), alloc);
 
     EXPECT_EQ(allocated, arr.size() * sizeof(int));
     static_cast<void>(arr);

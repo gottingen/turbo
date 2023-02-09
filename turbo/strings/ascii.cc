@@ -1,4 +1,4 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "turbo/strings/ascii.h"
+#include "turbo/strings/inlined_string.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -155,19 +156,25 @@ TURBO_DLL const char kToUpper[256] = {
 
 }  // namespace ascii_internal
 
-void AsciiStrToLower(std::string* s) {
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value>::type
+AsciiStrToLower(String* s) {
   for (auto& ch : *s) {
     ch = turbo::ascii_tolower(static_cast<unsigned char>(ch));
   }
 }
 
-void AsciiStrToUpper(std::string* s) {
+template <typename String>
+TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
+AsciiStrToUpper(String* s) {
   for (auto& ch : *s) {
     ch = turbo::ascii_toupper(static_cast<unsigned char>(ch));
   }
 }
 
-void RemoveExtraAsciiWhitespace(std::string* str) {
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value>::type
+RemoveExtraAsciiWhitespace(String* str) {
   auto stripped = StripAsciiWhitespace(*str);
 
   if (stripped.empty()) {
@@ -195,6 +202,13 @@ void RemoveExtraAsciiWhitespace(std::string* str) {
 
   str->erase(static_cast<size_t>(output_it - &(*str)[0]));
 }
+
+template void AsciiStrToLower(std::string *);
+template void AsciiStrToLower(turbo::inlined_string *);
+template void AsciiStrToUpper(std::string *);
+template void AsciiStrToUpper(turbo::inlined_string *);
+template void RemoveExtraAsciiWhitespace(std::string* str);
+template void RemoveExtraAsciiWhitespace(turbo::inlined_string* str);
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -682,7 +682,7 @@ void GraphCycles::UpdateStackTrace(GraphId id, int priority,
   if (n == nullptr || n->priority >= priority) {
     return;
   }
-  n->nstack = (*get_stack_trace)(n->stack, TURBO_ARRAYSIZE(n->stack));
+  n->nstack = (*get_stack_trace)(n->stack, TURBO_ARRAY_SIZE(n->stack));
   n->priority = priority;
 }
 

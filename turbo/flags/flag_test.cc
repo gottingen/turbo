@@ -614,7 +614,7 @@ TEST_F(FlagTest, ConcurrentSetAndGet) {
   int i = 0;
   while (turbo::Now() < end_time) {
     turbo::SetFlag(&FLAGS_test_flag_12,
-                  kValidDurations[i++ % TURBO_ARRAYSIZE(kValidDurations)]);
+                  kValidDurations[i++ % TURBO_ARRAY_SIZE(kValidDurations)]);
   }
   stop.store(true, std::memory_order_relaxed);
   for (auto& t : threads) t.join();

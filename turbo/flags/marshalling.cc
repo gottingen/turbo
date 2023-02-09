@@ -48,7 +48,7 @@ bool TurboParseFlag(turbo::string_view text, bool* dst, std::string*) {
 
   text = turbo::StripAsciiWhitespace(text);
 
-  for (size_t i = 0; i < TURBO_ARRAYSIZE(kTrue); ++i) {
+  for (size_t i = 0; i < TURBO_ARRAY_SIZE(kTrue); ++i) {
     if (turbo::EqualsIgnoreCase(text, kTrue[i])) {
       *dst = true;
       return true;

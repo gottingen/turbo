@@ -295,7 +295,7 @@ TEST(ChiSquareTest, TableData) {
       /**/};
 
   //    0.90      0.95     0.975      0.99     0.999
-  for (int i = 0; i < TURBO_ARRAYSIZE(data); i++) {
+  for (int i = 0; i < TURBO_ARRAY_SIZE(data); i++) {
     const double E = 0.0001;
     EXPECT_NEAR(ChiSquarePValue(data[i][0], i + 1), 0.10, E)
         << i << " " << data[i][0];

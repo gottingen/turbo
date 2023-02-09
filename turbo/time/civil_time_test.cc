@@ -1176,7 +1176,7 @@ TEST(CivilTime, LeapYears) {
       {2100, 365, {3, 1}},
   };
 
-  for (int i = 0; i < TURBO_ARRAYSIZE(kLeapYearTable); ++i) {
+  for (int i = 0; i < TURBO_ARRAY_SIZE(kLeapYearTable); ++i) {
     const int y = kLeapYearTable[i].year;
     const int m = kLeapYearTable[i].leap_day.month;
     const int d = kLeapYearTable[i].leap_day.day;

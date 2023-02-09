@@ -604,7 +604,7 @@ TEST(Split, Temporary) {
   // destroyed, if the splitter keeps a reference to the string's contents,
   // it'll reference freed memory instead of just dead on-stack memory.
   const char input[] = "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u";
-  EXPECT_LT(sizeof(std::string), TURBO_ARRAYSIZE(input))
+  EXPECT_LT(sizeof(std::string), TURBO_ARRAY_SIZE(input))
       << "Input should be larger than fits on the stack.";
 
   // This happens more often in C++11 as part of a range-based for loop.

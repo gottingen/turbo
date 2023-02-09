@@ -1442,8 +1442,8 @@ TEST_P(CordTest, CompareRandomComparisons) {
   for (int i = 0; i < kIters; i++) {
     turbo::Cord c, d;
     for (int j = 0; j < (i % 7) + 1; j++) {
-      c.Append(a[GetUniformRandomUpTo(&rng, TURBO_ARRAYSIZE(a))]);
-      d.Append(a[GetUniformRandomUpTo(&rng, TURBO_ARRAYSIZE(a))]);
+      c.Append(a[GetUniformRandomUpTo(&rng, TURBO_ARRAY_SIZE(a))]);
+      d.Append(a[GetUniformRandomUpTo(&rng, TURBO_ARRAY_SIZE(a))]);
     }
     std::bernoulli_distribution coin_flip(0.5);
     MaybeHarden(c);

@@ -93,7 +93,7 @@ TEST(StrJoin, APIExamples) {
   {
     // Array of ints
     const int a[] = {1, 2, 3, -4};
-    EXPECT_EQ("1-2-3--4", turbo::StrJoin(a, a + TURBO_ARRAYSIZE(a), "-"));
+    EXPECT_EQ("1-2-3--4", turbo::StrJoin(a, a + TURBO_ARRAY_SIZE(a), "-"));
   }
 
   {

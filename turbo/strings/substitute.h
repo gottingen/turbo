@@ -278,7 +278,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                 const substitute_internal::Arg& a0) {
   const turbo::string_view args[] = {a0.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -286,7 +286,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                 const substitute_internal::Arg& a1) {
   const turbo::string_view args[] = {a0.piece(), a1.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -295,7 +295,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                 const substitute_internal::Arg& a2) {
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -306,7 +306,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -318,7 +318,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -331,7 +331,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
   const turbo::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece(), a5.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
@@ -346,7 +346,7 @@ inline void SubstituteAndAppend(std::string* output, turbo::string_view format,
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(
@@ -359,7 +359,7 @@ inline void SubstituteAndAppend(
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece(), a7.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(
@@ -373,7 +373,7 @@ inline void SubstituteAndAppend(
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece(), a7.piece(), a8.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 inline void SubstituteAndAppend(
@@ -387,7 +387,7 @@ inline void SubstituteAndAppend(
       a0.piece(), a1.piece(), a2.piece(), a3.piece(), a4.piece(),
       a5.piece(), a6.piece(), a7.piece(), a8.piece(), a9.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
-                                                TURBO_ARRAYSIZE(args));
+                                                TURBO_ARRAY_SIZE(args));
 }
 
 #if defined(TURBO_BAD_CALL_IF)

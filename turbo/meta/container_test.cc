@@ -71,7 +71,7 @@ TEST_F(NonMutatingTest, Distance) {
             static_cast<size_t>(turbo::c_distance(container_)));
   EXPECT_EQ(sequence_.size(), static_cast<size_t>(turbo::c_distance(sequence_)));
   EXPECT_EQ(vector_.size(), static_cast<size_t>(turbo::c_distance(vector_)));
-  EXPECT_EQ(TURBO_ARRAYSIZE(array_),
+  EXPECT_EQ(TURBO_ARRAY_SIZE(array_),
             static_cast<size_t>(turbo::c_distance(array_)));
 
   // Works with a temporary argument.

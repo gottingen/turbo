@@ -283,7 +283,7 @@ TEST(GraphCycles, RandomizedTest) {
         int to = RandomNode(&rng, &nodes);
         GraphId path[2*kMaxNodes];
         int path_len = graph_cycles.FindPath(id[nodes[from]], id[nodes[to]],
-                                             TURBO_ARRAYSIZE(path), path);
+                                             TURBO_ARRAY_SIZE(path), path);
         std::unordered_set<int> seen;
         bool reachable = IsReachable(&edges, nodes[from], nodes[to], &seen);
         bool gc_reachable =
@@ -387,10 +387,10 @@ class GraphCyclesTest : public ::testing::Test {
 
   std::string Path(int x, int y) {
     GraphId path[5];
-    int np = g_.FindPath(Get(id_, x), Get(id_, y), TURBO_ARRAYSIZE(path), path);
+    int np = g_.FindPath(Get(id_, x), Get(id_, y), TURBO_ARRAY_SIZE(path), path);
     std::string result;
     for (int i = 0; i < np; i++) {
-      if (i >= TURBO_ARRAYSIZE(path)) {
+      if (i >= TURBO_ARRAY_SIZE(path)) {
         result += " ...";
         break;
       }

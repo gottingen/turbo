@@ -1586,7 +1586,7 @@ TEST(AllocatorSupportTest, Constructors) {
   MyAlloc alloc(&allocated);
   { AllocVec TURBO_ATTRIBUTE_UNUSED v; }
   { AllocVec TURBO_ATTRIBUTE_UNUSED v(alloc); }
-  { AllocVec TURBO_ATTRIBUTE_UNUSED v(ia, ia + TURBO_ARRAYSIZE(ia), alloc); }
+  { AllocVec TURBO_ATTRIBUTE_UNUSED v(ia, ia + TURBO_ARRAY_SIZE(ia), alloc); }
   { AllocVec TURBO_ATTRIBUTE_UNUSED v({1, 2, 3}, alloc); }
 
   AllocVec v2;
@@ -1606,7 +1606,7 @@ TEST(AllocatorSupportTest, CountAllocations) {
   }
   EXPECT_THAT(allocated, Eq(0));
   {
-    AllocVec TURBO_ATTRIBUTE_UNUSED v(ia, ia + TURBO_ARRAYSIZE(ia), alloc);
+    AllocVec TURBO_ATTRIBUTE_UNUSED v(ia, ia + TURBO_ARRAY_SIZE(ia), alloc);
     EXPECT_THAT(allocated, Eq(static_cast<int64_t>(v.size() * sizeof(int))));
   }
   EXPECT_THAT(allocated, Eq(0));
@@ -1665,8 +1665,8 @@ TEST(AllocatorSupportTest, SwapBothAllocated) {
     const int ia2[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     MyAlloc a1(&allocated1);
     MyAlloc a2(&allocated2);
-    AllocVec v1(ia1, ia1 + TURBO_ARRAYSIZE(ia1), a1);
-    AllocVec v2(ia2, ia2 + TURBO_ARRAYSIZE(ia2), a2);
+    AllocVec v1(ia1, ia1 + TURBO_ARRAY_SIZE(ia1), a1);
+    AllocVec v2(ia2, ia2 + TURBO_ARRAY_SIZE(ia2), a2);
     EXPECT_LT(v1.capacity(), v2.capacity());
     EXPECT_THAT(allocated1,
                 Eq(static_cast<int64_t>(v1.capacity() * sizeof(int))));
@@ -1694,8 +1694,8 @@ TEST(AllocatorSupportTest, SwapOneAllocated) {
     const int ia2[] = {0, 1, 2, 3};
     MyAlloc a1(&allocated1);
     MyAlloc a2(&allocated2);
-    AllocVec v1(ia1, ia1 + TURBO_ARRAYSIZE(ia1), a1);
-    AllocVec v2(ia2, ia2 + TURBO_ARRAYSIZE(ia2), a2);
+    AllocVec v1(ia1, ia1 + TURBO_ARRAY_SIZE(ia1), a1);
+    AllocVec v2(ia2, ia2 + TURBO_ARRAY_SIZE(ia2), a2);
     EXPECT_THAT(allocated1,
                 Eq(static_cast<int64_t>(v1.capacity() * sizeof(int))));
     EXPECT_THAT(allocated2, Eq(0));

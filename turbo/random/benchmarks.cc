@@ -75,13 +75,13 @@ class PrecompiledSeedSeq {
     static size_t idx = 0;
     for (; begin != end; begin++) {
       *begin = kSeedData[idx++];
-      if (idx >= TURBO_ARRAYSIZE(kSeedData)) {
+      if (idx >= TURBO_ARRAY_SIZE(kSeedData)) {
         idx = 0;
       }
     }
   }
 
-  size_t size() const { return TURBO_ARRAYSIZE(kSeedData); }
+  size_t size() const { return TURBO_ARRAY_SIZE(kSeedData); }
 
   template <typename OutIterator>
   void param(OutIterator out) const {

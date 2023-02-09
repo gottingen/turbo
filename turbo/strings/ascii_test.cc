@@ -1,4 +1,4 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 #include <string>
 
 #include "turbo/platform/port.h"
-#include "turbo/platform/port.h"
 #include "gtest/gtest.h"
+#include "turbo/strings/inlined_string.h"
 
 namespace {
 
@@ -231,8 +231,9 @@ TEST(StripLeadingAsciiWhitespace, FromStringView) {
                                      {"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
-TEST(StripLeadingAsciiWhitespace, InPlace) {
-  std::string str;
+template<typename Str>
+void TestInPlace() {
+  Str str;
 
   turbo::StripLeadingAsciiWhitespace(&str);
   EXPECT_EQ("", str);
@@ -253,6 +254,10 @@ TEST(StripLeadingAsciiWhitespace, InPlace) {
   turbo::StripLeadingAsciiWhitespace(&str);
   EXPECT_EQ(turbo::string_view{}, str);
 }
+TEST(StripLeadingAsciiWhitespace, InPlace) {
+    TestInPlace<std::string>();
+    TestInPlace<turbo::inlined_string>();
+}
 
 TEST(StripTrailingAsciiWhitespace, FromStringView) {
   EXPECT_EQ(turbo::string_view{},
@@ -265,8 +270,9 @@ TEST(StripTrailingAsciiWhitespace, FromStringView) {
                                      {"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
-TEST(StripTrailingAsciiWhitespace, InPlace) {
-  std::string str;
+template <typename String>
+void StripTrailingAsciiWhitespaceinplace() {
+  String str;
 
   turbo::StripTrailingAsciiWhitespace(&str);
   EXPECT_EQ("", str);
@@ -287,6 +293,10 @@ TEST(StripTrailingAsciiWhitespace, InPlace) {
   turbo::StripTrailingAsciiWhitespace(&str);
   EXPECT_EQ(turbo::string_view{}, str);
 }
+TEST(StripTrailingAsciiWhitespace, InPlace) {
+    StripTrailingAsciiWhitespaceinplace<std::string>();
+    StripTrailingAsciiWhitespaceinplace<turbo::inlined_string>();
+}
 
 TEST(StripAsciiWhitespace, FromStringView) {
   EXPECT_EQ(turbo::string_view{},
@@ -300,8 +310,9 @@ TEST(StripAsciiWhitespace, FromStringView) {
             turbo::StripAsciiWhitespace({"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
-TEST(StripAsciiWhitespace, InPlace) {
-  std::string str;
+template <typename Str>
+void StripAsciiWhitespaceInPlace() {
+  Str str;
 
   turbo::StripAsciiWhitespace(&str);
   EXPECT_EQ("", str);
@@ -322,36 +333,45 @@ TEST(StripAsciiWhitespace, InPlace) {
   turbo::StripAsciiWhitespace(&str);
   EXPECT_EQ(turbo::string_view{}, str);
 }
+TEST(StripAsciiWhitespace, InPlace) {
+    StripAsciiWhitespaceInPlace<std::string>();
+    StripAsciiWhitespaceInPlace<turbo::inlined_string>();
+}
 
+template <typename String>
+void RemoveExtraAsciiWhitespaceInplace() {
+    const char* inputs[] = {"No extra space",
+                            "  Leading whitespace",
+                            "Trailing whitespace  ",
+                            "  Leading and trailing  ",
+                            " Whitespace \t  in\v   middle  ",
+                            "'Eeeeep!  \n Newlines!\n",
+                            "nospaces",
+                            "",
+                            "\n\t a\t\n\nb \t\n"};
+
+    const char* outputs[] = {
+        "No extra space",
+        "Leading whitespace",
+        "Trailing whitespace",
+        "Leading and trailing",
+        "Whitespace in middle",
+        "'Eeeeep! Newlines!",
+        "nospaces",
+        "",
+        "a\nb",
+    };
+    const int NUM_TESTS = TURBO_ARRAY_SIZE(inputs);
+
+    for (int i = 0; i < NUM_TESTS; i++) {
+      String s(inputs[i]);
+      turbo::RemoveExtraAsciiWhitespace(&s);
+      EXPECT_EQ(outputs[i], s);
+    }
+}
 TEST(RemoveExtraAsciiWhitespace, InPlace) {
-  const char* inputs[] = {"No extra space",
-                          "  Leading whitespace",
-                          "Trailing whitespace  ",
-                          "  Leading and trailing  ",
-                          " Whitespace \t  in\v   middle  ",
-                          "'Eeeeep!  \n Newlines!\n",
-                          "nospaces",
-                          "",
-                          "\n\t a\t\n\nb \t\n"};
-
-  const char* outputs[] = {
-      "No extra space",
-      "Leading whitespace",
-      "Trailing whitespace",
-      "Leading and trailing",
-      "Whitespace in middle",
-      "'Eeeeep! Newlines!",
-      "nospaces",
-      "",
-      "a\nb",
-  };
-  const int NUM_TESTS = TURBO_ARRAYSIZE(inputs);
-
-  for (int i = 0; i < NUM_TESTS; i++) {
-    std::string s(inputs[i]);
-    turbo::RemoveExtraAsciiWhitespace(&s);
-    EXPECT_EQ(outputs[i], s);
-  }
+    RemoveExtraAsciiWhitespaceInplace<std::string>();
+    RemoveExtraAsciiWhitespaceInplace<turbo::inlined_string>();
 }
 
 }  // namespace

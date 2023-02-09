@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@
 
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
+#include "turbo/meta/type_traits.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -164,11 +165,16 @@ inline char ascii_tolower(unsigned char c) {
 }
 
 // Converts the characters in `s` to lowercase, changing the contents of `s`.
-void AsciiStrToLower(std::string* s);
+template <typename String>
+TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
+AsciiStrToLower(String* s);
 
 // Creates a lowercase string from a given turbo::string_view.
-TURBO_MUST_USE_RESULT inline std::string AsciiStrToLower(turbo::string_view s) {
-  std::string result(s);
+
+template <typename String = std::string>
+TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
+AsciiStrToLower(turbo::string_view s) {
+  String result(s);
   turbo::AsciiStrToLower(&result);
   return result;
 }
@@ -182,11 +188,15 @@ inline char ascii_toupper(unsigned char c) {
 }
 
 // Converts the characters in `s` to uppercase, changing the contents of `s`.
-void AsciiStrToUpper(std::string* s);
+template <typename String>
+TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
+AsciiStrToUpper(String* s);
 
 // Creates an uppercase string from a given turbo::string_view.
-TURBO_MUST_USE_RESULT inline std::string AsciiStrToUpper(turbo::string_view s) {
-  std::string result(s);
+template <typename String = std::string>
+TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
+AsciiStrToUpper(turbo::string_view s) {
+  String result(s);
   turbo::AsciiStrToUpper(&result);
   return result;
 }
@@ -200,7 +210,9 @@ TURBO_MUST_USE_RESULT inline turbo::string_view StripLeadingAsciiWhitespace(
 }
 
 // Strips in place whitespace from the beginning of the given string.
-inline void StripLeadingAsciiWhitespace(std::string* str) {
+template <typename String>
+inline typename std::enable_if<turbo::is_string_type<String>::value>::type
+StripLeadingAsciiWhitespace(String* str) {
   auto it = std::find_if_not(str->begin(), str->end(), turbo::ascii_isspace);
   str->erase(str->begin(), it);
 }
@@ -214,7 +226,9 @@ TURBO_MUST_USE_RESULT inline turbo::string_view StripTrailingAsciiWhitespace(
 }
 
 // Strips in place whitespace from the end of the given string
-inline void StripTrailingAsciiWhitespace(std::string* str) {
+template <typename String>
+inline typename std::enable_if<turbo::is_string_type<String>::value>::type
+StripTrailingAsciiWhitespace(String* str) {
   auto it = std::find_if_not(str->rbegin(), str->rend(), turbo::ascii_isspace);
   str->erase(static_cast<size_t>(str->rend() - it));
 }
@@ -227,13 +241,17 @@ TURBO_MUST_USE_RESULT inline turbo::string_view StripAsciiWhitespace(
 }
 
 // Strips in place whitespace from both ends of the given string
-inline void StripAsciiWhitespace(std::string* str) {
+template <typename String>
+inline typename std::enable_if<turbo::is_string_type<String>::value>::type
+StripAsciiWhitespace(String* str) {
   StripTrailingAsciiWhitespace(str);
   StripLeadingAsciiWhitespace(str);
 }
 
 // Removes leading, trailing, and consecutive internal whitespace.
-void RemoveExtraAsciiWhitespace(std::string*);
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value>::type
+RemoveExtraAsciiWhitespace(String*);
 
 TURBO_NAMESPACE_END
 }  // namespace turbo
