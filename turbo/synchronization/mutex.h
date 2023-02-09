@@ -477,9 +477,9 @@ class TURBO_LOCKABLE Mutex {
                             synchronization_internal::KernelTimeout t,
                             int flags);
   void LockSlow(MuHow how, const Condition *cond,
-                int flags) TURBO_ATTRIBUTE_COLD;
+                int flags) TURBO_COLD;
   // slow path release
-  void UnlockSlow(SynchWaitParams *waitp) TURBO_ATTRIBUTE_COLD;
+  void UnlockSlow(SynchWaitParams *waitp) TURBO_COLD;
   // Common code between Await() and AwaitWithTimeout/Deadline()
   bool AwaitCommon(const Condition &cond,
                    synchronization_internal::KernelTimeout t);

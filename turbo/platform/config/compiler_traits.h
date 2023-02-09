@@ -2004,7 +2004,9 @@
 #endif
 #endif
 
-
+#ifndef TURBO_INLINE_VISIBILITY
+#define TURBO_INLINE_VISIBILITY  TURBO_HIDDEN TURBO_FORCE_INLINE
+#endif  // TURBO_INLINE_VISIBILITY
 
     // ------------------------------------------------------------------------
 	// TURBO_PRAGMA_ONCE_SUPPORTED

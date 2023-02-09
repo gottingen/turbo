@@ -362,7 +362,7 @@ template <size_t num_crc_streams, size_t num_pclmul_streams,
           CutoffStrategy strategy>
 class CRC32AcceleratedX86ARMCombinedMultipleStreams
     : public CRC32AcceleratedX86ARMCombinedMultipleStreamsBase {
-  TURBO_ATTRIBUTE_HOT
+  TURBO_HOT
   void Extend(uint32_t* crc, const void* bytes, size_t length) const override {
     static_assert(num_crc_streams >= 1 && num_crc_streams <= kMaxStreams,
                   "Invalid number of crc streams");

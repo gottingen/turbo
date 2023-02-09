@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -15,7 +15,7 @@
 #ifndef RAPIDJSON_OSTREAMWRAPPER_H_
 #define RAPIDJSON_OSTREAMWRAPPER_H_
 
-#include <turbo/json/stream.h>
+#include "stream.h"
 #include <iosfwd>
 
 #ifdef __clang__
@@ -40,61 +40,40 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     \tparam StreamType Class derived from \c std::basic_ostream.
 */
+   
+template <typename StreamType>
+class BasicOStreamWrapper {
+public:
+    typedef typename StreamType::char_type Ch;
+    BasicOStreamWrapper(StreamType& stream) : stream_(stream) {}
 
-    template<typename StreamType>
-    class BasicOStreamWrapper {
-    public:
-        typedef typename StreamType::char_type Ch;
+    void Put(Ch c) {
+        stream_.put(c);
+    }
 
-        BasicOStreamWrapper(StreamType &stream) : stream_(stream) {}
+    void Flush() {
+        stream_.flush();
+    }
 
-        void Put(Ch c) {
-            stream_.put(c);
-        }
+    // Not implemented
+    char Peek() const { RAPIDJSON_ASSERT(false); return 0; }
+    char Take() { RAPIDJSON_ASSERT(false); return 0; }
+    size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
+    char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
 
-        void Flush() {
-            stream_.flush();
-        }
+private:
+    BasicOStreamWrapper(const BasicOStreamWrapper&);
+    BasicOStreamWrapper& operator=(const BasicOStreamWrapper&);
 
-        // Not implemented
-        char Peek() const {
-            RAPIDJSON_ASSERT(false);
-            return 0;
-        }
+    StreamType& stream_;
+};
 
-        char Take() {
-            RAPIDJSON_ASSERT(false);
-            return 0;
-        }
-
-        size_t Tell() const {
-            RAPIDJSON_ASSERT(false);
-            return 0;
-        }
-
-        char *PutBegin() {
-            RAPIDJSON_ASSERT(false);
-            return 0;
-        }
-
-        size_t PutEnd(char *) {
-            RAPIDJSON_ASSERT(false);
-            return 0;
-        }
-
-    private:
-        BasicOStreamWrapper(const BasicOStreamWrapper &);
-
-        BasicOStreamWrapper &operator=(const BasicOStreamWrapper &);
-
-        StreamType &stream_;
-    };
-
-    typedef BasicOStreamWrapper<std::ostream> OStreamWrapper;
-    typedef BasicOStreamWrapper<std::wostream> WOStreamWrapper;
+typedef BasicOStreamWrapper<std::ostream> OStreamWrapper;
+typedef BasicOStreamWrapper<std::wostream> WOStreamWrapper;
 
 #ifdef __clang__
-    RAPIDJSON_DIAG_POP
+RAPIDJSON_DIAG_POP
 #endif
 
 RAPIDJSON_NAMESPACE_END

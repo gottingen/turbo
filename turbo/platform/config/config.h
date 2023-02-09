@@ -835,12 +835,12 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #define TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL 1
 #endif
 
-// `TURBO_INTERNAL_HAS_RTTI` determines whether abseil is being compiled with
+// `TURBO_COMPILER_HAVE_RTTI` determines whether abseil is being compiled with
 // RTTI support.
-#ifdef TURBO_INTERNAL_HAS_RTTI
-#error TURBO_INTERNAL_HAS_RTTI cannot be directly set
+#ifdef TURBO_COMPILER_HAVE_RTTI
+#error TURBO_COMPILER_HAVE_RTTI cannot be directly set
 #elif !defined(__GNUC__) || defined(__GXX_RTTI)
-#define TURBO_INTERNAL_HAS_RTTI 1
+#define TURBO_COMPILER_HAVE_RTTI 1
 #endif  // !defined(__GNUC__) || defined(__GXX_RTTI)
 
 // TURBO_INTERNAL_HAVE_SSE is used for compile-time detection of SSE support.

@@ -339,7 +339,7 @@ class any {
   // returns `false`.
   bool has_value() const noexcept { return obj_ != nullptr; }
 
-#ifdef TURBO_INTERNAL_HAS_RTTI
+#ifdef TURBO_COMPILER_HAVE_RTTI
   // Returns: typeid(T) if *this has a contained object of type T, otherwise
   // typeid(void).
   const std::type_info& type() const noexcept {
@@ -349,7 +349,7 @@ class any {
 
     return typeid(void);
   }
-#endif  // TURBO_INTERNAL_HAS_RTTI
+#endif  // TURBO_COMPILER_HAVE_RTTI
 
  private:
   // Tagged type-erased abstraction for holding a cloneable object.
@@ -358,9 +358,9 @@ class any {
     virtual ~ObjInterface() = default;
     virtual std::unique_ptr<ObjInterface> Clone() const = 0;
     virtual const void* ObjTypeId() const noexcept = 0;
-#ifdef TURBO_INTERNAL_HAS_RTTI
+#ifdef TURBO_COMPILER_HAVE_RTTI
     virtual const std::type_info& Type() const noexcept = 0;
-#endif  // TURBO_INTERNAL_HAS_RTTI
+#endif  // TURBO_COMPILER_HAVE_RTTI
   };
 
   // Hold a value of some queryable type, with an ability to Clone it.
@@ -377,9 +377,9 @@ class any {
 
     const void* ObjTypeId() const noexcept final { return IdForType<T>(); }
 
-#ifdef TURBO_INTERNAL_HAS_RTTI
+#ifdef TURBO_COMPILER_HAVE_RTTI
     const std::type_info& Type() const noexcept final { return typeid(T); }
-#endif  // TURBO_INTERNAL_HAS_RTTI
+#endif  // TURBO_COMPILER_HAVE_RTTI
 
     T value;
   };

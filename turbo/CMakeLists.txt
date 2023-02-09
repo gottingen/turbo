@@ -22,7 +22,7 @@ set(TURBO_ALL_SRC
         "platform/internal/sysinfo.cc"
         "platform/internal/scoped_set_env.cc"
         "platform/internal/thread_identity.cc"
-        "platform/internal/throw_delegate.cc"
+        "base/internal/throw_delegate.cc"
         "platform/internal/unscaledcycleclock.cc"
         "platform/internal/low_level_alloc.cc"
         "base/internal/raw_logging.cc"
@@ -54,6 +54,8 @@ set(TURBO_ALL_SRC
         "debugging/internal/stack_consumption.cc"
         "debugging/internal/vdso_support.cc"
         "debugging/leak_check.cc"
+        "files/file_watcher.cc"
+        "files/sequential_read_file.cc"
         "flags/internal/commandlineflag.cc"
         "flags/internal/flag.cc"
         "flags/internal/program_name.cc"
@@ -69,6 +71,7 @@ set(TURBO_ALL_SRC
         "hash/internal/city.cc"
         "hash/internal/hash.cc"
         "hash/internal/low_level_hash.cc"
+        "json/rubost_json.cc"
         "log/internal/check_op.cc"
         "log/internal/conditions.cc"
         "log/internal/globals.cc"
@@ -83,6 +86,7 @@ set(TURBO_ALL_SRC
         "log/initialize.cc"
         "log/log_entry.cc"
         "log/log_sink.cc"
+        "memory/jemalloc_helper.cc"
         "meta/bad_any_cast.cc"
         "meta/bad_optional_access.cc"
         "meta/bad_variant_access.cc"
@@ -184,6 +188,7 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(files)
     add_subdirectory(flags)
     add_subdirectory(hash)
+    add_subdirectory(json)
     add_subdirectory(log)
     add_subdirectory(memory)
     add_subdirectory(meta)

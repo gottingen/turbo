@@ -28,6 +28,18 @@ turbo_cc_test(
 )
 
 turbo_cc_test(
+        NAME
+        inlined_string_test
+        SRCS
+        "inlined_string_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+
+turbo_cc_test(
   NAME
     escaping_test
   SRCS

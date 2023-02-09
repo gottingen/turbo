@@ -1,4 +1,4 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
+#include "turbo/strings/inlined_string.h"
 
 #ifdef _GLIBCXX_DEBUG
 #include "turbo/strings/internal/stl_type_traits.h"
@@ -221,6 +222,7 @@ struct SplitterIsConvertibleToImpl<C, true, true>
           std::is_constructible<typename C::key_type, turbo::string_view>,
           std::is_constructible<typename C::mapped_type, turbo::string_view>> {};
 
+
 template <typename C>
 struct SplitterIsConvertibleTo
     : SplitterIsConvertibleToImpl<
@@ -371,6 +373,20 @@ class Splitter {
     }
   };
 
+  // Partial specialization for a std::vector<std::string>.
+  //
+  // Optimized for the common case of splitting to a std::vector<std::string>.
+  // In this case we first split the results to a std::vector<turbo::string_view>
+  // so the returned std::vector<std::string> can have space reserved to avoid
+  // std::string moves.
+  template <typename A>
+  struct ConvertToContainer<std::vector<turbo::inlined_string, A>, turbo::inlined_string, false> {
+    std::vector<turbo::inlined_string, A> operator()(const Splitter& splitter) const {
+      const std::vector<turbo::string_view> v = splitter;
+      return std::vector<turbo::inlined_string, A>(v.begin(), v.end());
+    }
+  };
+
   // Partial specialization for containers of pairs (e.g., maps).
   //
   // The algorithm is to insert a new pair into the map for each even-numbered
@@ -385,7 +401,7 @@ class Splitter {
       Container m;
       iterator it;
       bool insert = true;
-      for (const turbo::string_view sv : splitter) {
+      for (const turbo::string_view &sv : splitter) {
         if (insert) {
           it = InsertOrEmplace(&m, sv);
         } else {

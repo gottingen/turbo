@@ -45,12 +45,11 @@
 #include <type_traits>
 #include <utility>
 
+#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/container/internal/inlined_vector.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/algorithm.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/platform/port.h"
-#include "turbo/platform/internal/throw_delegate.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {

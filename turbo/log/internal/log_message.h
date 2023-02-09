@@ -52,10 +52,10 @@ class LogMessage {
  public:
   // Used for `LOG`.
   LogMessage(const char* file, int line,
-             turbo::LogSeverity severity) TURBO_ATTRIBUTE_COLD;
+             turbo::LogSeverity severity) TURBO_COLD;
   LogMessage(const LogMessage&) = delete;
   LogMessage& operator=(const LogMessage&) = delete;
-  ~LogMessage() TURBO_ATTRIBUTE_COLD;
+  ~LogMessage() TURBO_COLD;
 
   // Overrides the location inferred from the callsite.  The string pointed to
   // by `file` must be valid until the end of the statement.
@@ -330,17 +330,17 @@ extern template LogMessage& LogMessage::operator<<(const bool& v);
 // message.
 class LogMessageFatal final : public LogMessage {
  public:
-  LogMessageFatal(const char* file, int line) TURBO_ATTRIBUTE_COLD;
+  LogMessageFatal(const char* file, int line) TURBO_COLD;
   LogMessageFatal(const char* file, int line,
-                  turbo::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
+                  turbo::string_view failure_msg) TURBO_COLD;
   TURBO_ATTRIBUTE_NORETURN ~LogMessageFatal();
 };
 
 class LogMessageQuietlyFatal final : public LogMessage {
  public:
-  LogMessageQuietlyFatal(const char* file, int line) TURBO_ATTRIBUTE_COLD;
+  LogMessageQuietlyFatal(const char* file, int line) TURBO_COLD;
   LogMessageQuietlyFatal(const char* file, int line,
-                         turbo::string_view failure_msg) TURBO_ATTRIBUTE_COLD;
+                         turbo::string_view failure_msg) TURBO_COLD;
   TURBO_ATTRIBUTE_NORETURN ~LogMessageQuietlyFatal();
 };
 

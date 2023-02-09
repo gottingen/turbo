@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------
 //
-// ghc::filesystem - A C++17-like filesystem implementation for C++11/C++14
+// turbo::filesystem - A C++17-like filesystem implementation for C++11/C++14
 //
 //---------------------------------------------------------------------------------------
 //
@@ -26,7 +26,7 @@
 //
 //---------------------------------------------------------------------------------------
 // fs_std.hpp - The dynamic switching header that includes std::filesystem if detected
-//              or ghc::filesystem if not, and makes the resulting API available in the
+//              or turbo::filesystem if not, and makes the resulting API available in the
 //              namespace fs.
 //---------------------------------------------------------------------------------------
 #ifndef TURBO_FILES_FS_STD_H_
@@ -53,10 +53,10 @@ using fstream = std::fstream;
 #include "turbo/files/filesystem.h"
 
 namespace fs {
-    using namespace ghc::filesystem;
-    using ifstream = ghc::filesystem::ifstream;
-    using ofstream = ghc::filesystem::ofstream;
-    using fstream = ghc::filesystem::fstream;
+    using namespace turbo::filesystem;
+    using ifstream = turbo::filesystem::ifstream;
+    using ofstream = turbo::filesystem::ofstream;
+    using fstream = turbo::filesystem::fstream;
 }
 #endif
 #endif  // TURBO_FILES_FS_STD_H_

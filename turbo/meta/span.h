@@ -60,10 +60,10 @@
 #include <type_traits>
 #include <utility>
 
+#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/meta/internal/span.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
-#include "turbo/platform/internal/throw_delegate.h"
 #include "turbo/platform/port.h" // TODO(strel): remove this include
 
 namespace turbo {
