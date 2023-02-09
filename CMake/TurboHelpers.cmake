@@ -50,7 +50,7 @@ endif()
 #           BUILD_TESTING=ON and TURBO_BUILD_TESTING=ON.
 #
 # Note:
-# By default, turbo_cc_library will always create a library named turbo_${NAME},
+# By default, turbo_cc_library will always create a library named ${NAME},
 # and alias target turbo::${NAME}.  The turbo:: form should always be used.
 # This is to reduce namespace pollution.
 #
@@ -98,7 +98,7 @@ function(turbo_cc_library)
   if(TURBO_ENABLE_INSTALL)
     set(_NAME "${TURBO_CC_LIB_NAME}")
   else()
-    set(_NAME "turbo_${TURBO_CC_LIB_NAME}")
+    set(_NAME "${TURBO_CC_LIB_NAME}")
   endif()
 
   # Check if this is a header-only library
@@ -178,8 +178,8 @@ function(turbo_cc_library)
             if(PC_DEPS)
               set(PC_DEPS "${PC_DEPS},")
             endif()
-            set(PC_DEPS "${PC_DEPS} turbo_${CMAKE_MATCH_1} = ${PC_VERSION}")
-            set(LNK_LIB "${LNK_LIB} -lturbo_${_NAME}")
+            set(PC_DEPS "${PC_DEPS} ${CMAKE_MATCH_1} = ${PC_VERSION}")
+            set(LNK_LIB "${LNK_LIB} -l${_NAME}")
           endif()
         endif()
       endforeach()
@@ -197,20 +197,20 @@ function(turbo_cc_library)
         endif()
       endforeach()
       string(REPLACE ";" " " PC_LINKOPTS "${TURBO_CC_LIB_LINKOPTS}")
-      FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_${_NAME}.pc" CONTENT "\
+      FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/${_NAME}.pc" CONTENT "\
 prefix=${CMAKE_INSTALL_PREFIX}\n\
 exec_prefix=\${prefix}\n\
 libdir=${CMAKE_INSTALL_FULL_LIBDIR}\n\
 includedir=${CMAKE_INSTALL_FULL_INCLUDEDIR}\n\
 \n\
-Name: turbo_${_NAME}\n\
+Name: ${_NAME}\n\
 Description: Turbo ${_NAME} library\n\
 URL: https://abseil.io/\n\
 Version: ${PC_VERSION}\n\
 Requires:${PC_DEPS}\n\
 Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${TURBO_CC_LIB_IS_INTERFACE}>>:${LNK_LIB}>\n\
 Cflags: -I\${includedir}${PC_CFLAGS}\n")
-      INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/turbo_${_NAME}.pc"
+      INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/${_NAME}.pc"
               DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
     endif()
   endif()
@@ -301,12 +301,12 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
       set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
     endif()
 
-    # When being installed, we lose the turbo_ prefix.  We want to put it back
+    # When being installed, we lose the  prefix.  We want to put it back
     # to have properly named lib files.  This is a no-op when we are not being
     # installed.
     if(TURBO_ENABLE_INSTALL)
       set_target_properties(${_NAME} PROPERTIES
-        OUTPUT_NAME "turbo_${_NAME}"
+        OUTPUT_NAME "${_NAME}"
         SOVERSION 0
       )
     endif()
@@ -368,8 +368,8 @@ endfunction()
 # LINKOPTS: List of link options
 #
 # Note:
-# By default, turbo_cc_test will always create a binary named turbo_${NAME}.
-# This will also add it to ctest list as turbo_${NAME}.
+# By default, turbo_cc_test will always create a binary named ${NAME}.
+# This will also add it to ctest list as ${NAME}.
 #
 # Usage:
 # turbo_cc_library(
