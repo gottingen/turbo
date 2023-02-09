@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
-#define TURBO_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
+#ifndef TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_MEMCPY_H_
+#define TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_MEMCPY_H_
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -36,7 +36,7 @@
 #endif
 
 #ifdef __aarch64__
-#include "turbo/crc/internal/non_temporal_arm_intrinsics.h"
+#include "turbo/crypto/internal/non_temporal_arm_intrinsics.h"
 #endif
 
 #include <algorithm>
@@ -176,4 +176,4 @@ inline void *non_temporal_store_memcpy_avx(void *__restrict dst,
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_CRC_INTERNAL_NON_TEMPORAL_MEMCPY_H_
+#endif  // TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_MEMCPY_H_

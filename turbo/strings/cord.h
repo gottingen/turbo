@@ -71,7 +71,7 @@
 
 #include "turbo/base/endian.h"
 #include "turbo/container/inlined_vector.h"
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/meta/function_ref.h"
 #include "turbo/meta/optional.h"
 #include "turbo/meta/type_traits.h"

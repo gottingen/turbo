@@ -206,7 +206,7 @@ void sizedFree(void* ptr, size_t size) {
  * jemalloc, realloc() almost always ends up doing a copy, because
  * there is little fragmentation / slack space to take advantage of.
  */
-MATXSCRIPT_MALLOC_CHECKED_MALLOC TURBO_NO_INLINE void* smartRealloc(
+TURBO_CHECKED_MALLOC TURBO_NO_INLINE void* smartRealloc(
     void* p, const size_t currentSize, const size_t currentCapacity, const size_t newCapacity) {
   assert(p);
   assert(currentSize <= currentCapacity && currentCapacity < newCapacity);

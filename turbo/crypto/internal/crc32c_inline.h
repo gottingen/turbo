@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_CRC_INTERNAL_CRC32C_INLINE_H_
-#define TURBO_CRC_INTERNAL_CRC32C_INLINE_H_
+#ifndef TURBO_CRYPTO_INTERNAL_CRC32C_INLINE_H_
+#define TURBO_CRYPTO_INTERNAL_CRC32C_INLINE_H_
 
 #include <cstdint>
 
 #include "turbo/base/endian.h"
-#include "turbo/crc/internal/crc32_x86_arm_combined_simd.h"
+#include "turbo/crypto/internal/crc32_x86_arm_combined_simd.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {
@@ -29,8 +29,8 @@ namespace crc_internal {
 // Either computes crc and return true, or if there is
 // no hardware support does nothing and returns false.
 inline bool ExtendCrc32cInline(uint32_t* crc, const char* p, size_t n) {
-#if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) || \
-    defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
+#if defined(TURBO_CRYPTO_INTERNAL_HAVE_ARM_SIMD) || \
+    defined(TURBO_CRYPTO_INTERNAL_HAVE_X86_SIMD)
   constexpr uint32_t kCrc32Xor = 0xffffffffU;
   *crc ^= kCrc32Xor;
   if (n & 1) {
@@ -61,12 +61,12 @@ inline bool ExtendCrc32cInline(uint32_t* crc, const char* p, size_t n) {
   static_cast<void>(p);
   static_cast<void>(n);
   return false;
-#endif  // defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) ||
-        // defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
+#endif  // defined(TURBO_CRYPTO_INTERNAL_HAVE_ARM_SIMD) ||
+        // defined(TURBO_CRYPTO_INTERNAL_HAVE_X86_SIMD)
 }
 
 }  // namespace crc_internal
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_CRC_INTERNAL_CRC32C_INLINE_H_
+#endif  // TURBO_CRYPTO_INTERNAL_CRC32C_INLINE_H_

@@ -108,7 +108,7 @@ template <class Pod> inline void podCopy(const Pod *b, const Pod *e, Pod *d) {
   assert(d != nullptr);
   assert(e >= b);
   assert(d >= e || d + (e - b) <= b);
-  memcpy(d, b, (e - b) * sizeof(Pod));
+  memcpy(d, b, static_cast<size_t>(e - b) * sizeof(Pod));
 }
 
 /*

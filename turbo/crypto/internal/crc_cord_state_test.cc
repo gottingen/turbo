@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 
 #include <algorithm>
 #include <cstdint>
 #include <string>
 #include <utility>
 
+#include "turbo/crypto/crc32c.h"
 #include "gtest/gtest.h"
-#include "turbo/crc/crc32c.h"
 
 namespace {
 

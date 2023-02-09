@@ -16,7 +16,7 @@
 #include <random>
 #include <vector>
 
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/internal/cord_internal.h"

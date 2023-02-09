@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/crc/internal/cpu_detect.h"
+#include "turbo/crypto/internal/cpu_detect.h"
 
 #include <cstdint>
 #include <string>

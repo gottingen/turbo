@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/crc/internal/non_temporal_memcpy.h"
+#include "turbo/crypto/internal/non_temporal_memcpy.h"
 
 #include <algorithm>
 #include <cstdint>

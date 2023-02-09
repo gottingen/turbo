@@ -19,17 +19,17 @@
 
 #include "turbo/base/bits.h"
 #include "turbo/base/endian.h"
-#include "turbo/crc/internal/cpu_detect.h"
-#include "turbo/crc/internal/crc.h"
-#include "turbo/crc/internal/crc32_x86_arm_combined_simd.h"
-#include "turbo/crc/internal/crc_internal.h"
+#include "turbo/crypto/internal/cpu_detect.h"
+#include "turbo/crypto/internal/crc.h"
+#include "turbo/crypto/internal/crc32_x86_arm_combined_simd.h"
+#include "turbo/crypto/internal/crc_internal.h"
 #include "turbo/memory/memory.h"
+#include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/prefetch.h"
-#include "turbo/platform/port.h"
 
-#if defined(TURBO_CRC_INTERNAL_HAVE_ARM_SIMD) || \
-    defined(TURBO_CRC_INTERNAL_HAVE_X86_SIMD)
+#if defined(TURBO_CRYPTO_INTERNAL_HAVE_ARM_SIMD) || \
+    defined(TURBO_CRYPTO_INTERNAL_HAVE_X86_SIMD)
 #define TURBO_INTERNAL_CAN_USE_SIMD_CRC32C
 #endif
 
@@ -362,7 +362,7 @@ template <size_t num_crc_streams, size_t num_pclmul_streams,
           CutoffStrategy strategy>
 class CRC32AcceleratedX86ARMCombinedMultipleStreams
     : public CRC32AcceleratedX86ARMCombinedMultipleStreamsBase {
-  TURBO_HOT
+  TURBO_ATTRIBUTE_HOT
   void Extend(uint32_t* crc, const void* bytes, size_t length) const override {
     static_assert(num_crc_streams >= 1 && num_crc_streams <= kMaxStreams,
                   "Invalid number of crc streams");

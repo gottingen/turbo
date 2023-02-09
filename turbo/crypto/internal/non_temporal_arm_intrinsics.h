@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
-#define TURBO_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
+#ifndef TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
+#define TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
 
 #include "turbo/platform/port.h"
 
@@ -76,4 +76,4 @@ static inline __attribute__((always_inline)) __m128i _mm_set_epi8(
 }
 #endif  // __aarch64__
 
-#endif  // TURBO_CRC_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_
+#endif  // TURBO_CRYPTO_INTERNAL_NON_TEMPORAL_ARM_INTRINSICS_H_

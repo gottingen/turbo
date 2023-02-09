@@ -31,6 +31,7 @@
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/str_join.h"
 #include "turbo/strings/string_view.h"
+#include "turbo/strings/internal/escaping.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -122,16 +123,34 @@ std::string Utf8SafeCHexEscape(turbo::string_view src);
 // Encodes a `src` string into a base64-encoded 'dest' string with padding
 // characters. This function conforms with RFC 4648 section 4 (base64) and RFC
 // 2045. See also CalculateBase64EscapedLen().
-void Base64Escape(turbo::string_view src, std::string* dest);
-std::string Base64Escape(turbo::string_view src);
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value>::type
+Base64Escape(turbo::string_view src, String* dest);
+template <typename String = std::string>
+typename std::enable_if<turbo::is_string_type<String>::value, String>::type
+Base64Escape(turbo::string_view src) {
+  String dest;
+  strings_internal::Base64EscapeInternal(
+      reinterpret_cast<const unsigned char*>(src.data()), src.size(), &dest,
+      true, strings_internal::kBase64Chars);
+  return dest;
+}
 
 // WebSafeBase64Escape()
 //
 // Encodes a `src` string into a base64 string, like Base64Escape() does, but
 // outputs '-' instead of '+' and '_' instead of '/', and does not pad 'dest'.
 // This function conforms with RFC 4648 section 5 (base64url).
-void WebSafeBase64Escape(turbo::string_view src, std::string* dest);
-std::string WebSafeBase64Escape(turbo::string_view src);
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value>::type
+WebSafeBase64Escape(turbo::string_view src, String* dest);
+template <typename String = std::string>
+typename std::enable_if<turbo::is_string_type<String>::value, String>::type
+WebSafeBase64Escape(turbo::string_view src) {
+  String dest;
+  WebSafeBase64Escape(src, &dest);
+  return dest;
+}
 
 // Base64Unescape()
 //
@@ -140,7 +159,9 @@ std::string WebSafeBase64Escape(turbo::string_view src);
 // `src` contains invalid characters, `dest` is cleared and returns `false`.
 // If padding is included (note that `Base64Escape()` does produce it), it must
 // be correct. In the padding, '=' and '.' are treated identically.
-bool Base64Unescape(turbo::string_view src, std::string* dest);
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
+Base64Unescape(turbo::string_view src, String* dest);
 
 // WebSafeBase64Unescape()
 //
@@ -149,19 +170,40 @@ bool Base64Unescape(turbo::string_view src, std::string* dest);
 // invalid characters, `dest` is cleared and returns `false`. If padding is
 // included (note that `WebSafeBase64Escape()` does not produce it), it must be
 // correct. In the padding, '=' and '.' are treated identically.
-bool WebSafeBase64Unescape(turbo::string_view src, std::string* dest);
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
+WebSafeBase64Unescape(turbo::string_view src, String* dest);
 
 // HexStringToBytes()
 //
 // Converts an ASCII hex string into bytes, returning binary data of length
 // `from.size()/2`.
-std::string HexStringToBytes(turbo::string_view from);
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value>::type
+HexStringToBytes(turbo::string_view from, String *dest);
+template <typename String = std::string>
+typename std::enable_if<turbo::is_string_type<String>::value, String>::type
+HexStringToBytes(turbo::string_view from) {
+  String result;
+  HexStringToBytes(from, &result);
+  return result;
+}
 
 // BytesToHexString()
 //
 // Converts binary data into an ASCII text string, returning a string of size
 // `2*from.size()`.
-std::string BytesToHexString(turbo::string_view from);
+template <typename String>
+typename std::enable_if<turbo::is_string_type<String>::value>::type
+BytesToHexString(turbo::string_view from, String *dest);
+
+template <typename String = std::string>
+typename std::enable_if<turbo::is_string_type<String>::value, String>::type
+BytesToHexString(turbo::string_view from) {
+    String result;
+    BytesToHexString(from, &result);
+    return result;
+}
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

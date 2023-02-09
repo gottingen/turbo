@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_CRC_INTERNAL_CRC_INTERNAL_H_
-#define TURBO_CRC_INTERNAL_CRC_INTERNAL_H_
+#ifndef TURBO_CRYPTO_INTERNAL_CRC_INTERNAL_H_
+#define TURBO_CRYPTO_INTERNAL_CRC_INTERNAL_H_
 
 #include <cstdint>
 #include <memory>
 #include <vector>
 
+#include "turbo/crypto/internal/crc.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/crc/internal/crc.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -176,4 +176,4 @@ std::vector<std::unique_ptr<CRCImpl>> NewCRC32AcceleratedX86ARMCombinedAll();
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_CRC_INTERNAL_CRC_INTERNAL_H_
+#endif  // TURBO_CRYPTO_INTERNAL_CRC_INTERNAL_H_

@@ -14,7 +14,7 @@
 
 #include "turbo/strings/internal/cord_rep_crc.h"
 
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"

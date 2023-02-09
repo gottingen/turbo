@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_CRC_INTERNAL_CRC_MEMCPY_H_
-#define TURBO_CRC_INTERNAL_CRC_MEMCPY_H_
+#ifndef TURBO_CRYPTO_INTERNAL_CRC_MEMCPY_H_
+#define TURBO_CRYPTO_INTERNAL_CRC_MEMCPY_H_
 
 #include <cstddef>
 #include <memory>
 
-#include "turbo/crc/crc32c.h"
+#include "turbo/crypto/crc32c.h"
 #include "turbo/platform/port.h"
 
 // Defined if the class AcceleratedCrcMemcpyEngine exists.
@@ -116,4 +116,4 @@ inline crc32c_t Crc32CAndCopy(void* __restrict dst, const void* __restrict src,
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_CRC_INTERNAL_CRC_MEMCPY_H_
+#endif  // TURBO_CRYPTO_INTERNAL_CRC_MEMCPY_H_

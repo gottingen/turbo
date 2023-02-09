@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_CRC_INTERNAL_CRC_H_
-#define TURBO_CRC_INTERNAL_CRC_H_
+#ifndef TURBO_CRYPTO_INTERNAL_CRC_H_
+#define TURBO_CRYPTO_INTERNAL_CRC_H_
 
 #include <cstdint>
 
@@ -88,4 +88,4 @@ class CRC {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_CRC_INTERNAL_CRC_H_
+#endif  // TURBO_CRYPTO_INTERNAL_CRC_H_

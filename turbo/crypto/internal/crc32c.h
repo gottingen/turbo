@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_CRC_INTERNAL_CRC32C_H_
-#define TURBO_CRC_INTERNAL_CRC32C_H_
+#ifndef TURBO_CRYPTO_INTERNAL_CRC32C_H_
+#define TURBO_CRYPTO_INTERNAL_CRC32C_H_
 
-#include "turbo/crc/crc32c.h"
+#include "turbo/crypto/crc32c.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {
@@ -36,4 +36,4 @@ crc32c_t UnextendCrc32cByZeroes(crc32c_t initial_crc, size_t length);
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_CRC_INTERNAL_CRC32C_H_
+#endif  // TURBO_CRYPTO_INTERNAL_CRC32C_H_

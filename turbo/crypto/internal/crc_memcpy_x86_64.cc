@@ -51,9 +51,9 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "turbo/crc/crc32c.h"
-#include "turbo/crc/internal/cpu_detect.h"
-#include "turbo/crc/internal/crc_memcpy.h"
+#include "turbo/crypto/crc32c.h"
+#include "turbo/crypto/internal/cpu_detect.h"
+#include "turbo/crypto/internal/crc_memcpy.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/prefetch.h"
@@ -186,7 +186,7 @@ crc32c_t AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   // Small-size CRC-memcpy : just do CRC + memcpy
   if (length < kCrcSmallSize) {
     crc32c_t crc =
-        ExtendCrc32c(initial_crc, turbo::string_view(src_bytes, length));
+        ExtendCrc32c(initial_crc, std::string_view(src_bytes, length));
     memcpy(dst, src, length);
     return crc;
   }

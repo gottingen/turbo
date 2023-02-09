@@ -33,7 +33,7 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/container/inlined_vector.h"
-#include "turbo/crc/internal/crc_cord_state.h"
+#include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord_buffer.h"
 #include "turbo/strings/escaping.h"

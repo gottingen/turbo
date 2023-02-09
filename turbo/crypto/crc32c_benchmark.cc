@@ -14,11 +14,11 @@
 
 #include <string>
 
-#include "turbo/crc/crc32c.h"
-#include "turbo/crc/internal/crc32c.h"
+#include "benchmark/benchmark.h"
+#include "turbo/crypto/crc32c.h"
+#include "turbo/crypto/internal/crc32c.h"
 #include "turbo/memory/memory.h"
 #include "turbo/strings/string_view.h"
-#include "benchmark/benchmark.h"
 
 namespace {
 
@@ -67,7 +67,7 @@ void BM_ExtendCacheMiss(benchmark::State& state) {
       benchmark::DoNotOptimize(base);
       benchmark::DoNotOptimize(extension);
       turbo::crc32c_t crc =
-          turbo::ExtendCrc32c(base, turbo::string_view(&extension[i], len));
+          turbo::ExtendCrc32c(base, std::string_view(&extension[i], len));
       benchmark::DoNotOptimize(crc);
     }
   }
