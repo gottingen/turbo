@@ -22,7 +22,7 @@
 #include <string.h>
 #include <cassert>
 #include <cstddef>
-#include "turbo/platform/config.h"
+#include "turbo/platform/port.h"
 #include "turbo/base/internal/raw_logging.h"
 
 // From binutils/include/elf/common.h (this doesn't appear to be documented
