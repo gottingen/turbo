@@ -20,28 +20,16 @@ source:
   git_url: ../
 
 outputs:
-  - name: turbo-turbo
+  - name: turbo
     script: bld.sh   # [not win]
     script: bld.bat  # [win]
     build:
       string: "h{{ GIT_DESCRIBE_HASH }}_{{ number }}"
       run_exports:
         - {{ pin_compatible('turbo', exact=True) }}
-    requirements:
-      build:
-        - clang # [osx]
-        - clangxx #   [osx]
-        - gcc =8.5 # [linux]
-        - gxx =8.5 # [linux]
-        - sysroot_linux-64=2.17 # [linux]
-      host:
-        - sysroot_linux-64=2.17 # [linux]
-      run:
-        #- __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.15") }}  # [osx and x86_64]
-        - sysroot_linux-64=2.17 # [linux]
     test:
       commands:
-        - test -f $PREFIX/lib/libturbo_turbo.so              # [linux]
-        - test -f $PREFIX/lib/libturbo_turbo.dylib           # [osx]
+        - test -f $PREFIX/lib/libturbo.so              # [linux]
+        - test -f $PREFIX/lib/libturbo.dylib           # [osx]
       #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
       #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]
