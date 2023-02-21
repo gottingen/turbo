@@ -195,7 +195,7 @@ RAPIDJSON_NAMESPACE_BEGIN
     ROBUST_JSON_DEFINE_BOTH_AS(uint64_t, as_uint64(v_));
 
     template<typename OptionalRefRapidJsonValue>
-    turbo::optional<uint64_t> as_int64(OptionalRefRapidJsonValue v_) {
+    turbo::optional<int64_t> as_int64(OptionalRefRapidJsonValue v_) {
         if (v_.has_value()) {
             auto &v = v_.value().get();
             if (v.IsInt64()) {
@@ -203,7 +203,7 @@ RAPIDJSON_NAMESPACE_BEGIN
                 return turbo::make_optional(v.GetInt64());
             }
             if (v.IsString()) {
-                uint64_t n;
+                int64_t n;
                 if (!turbo::SimpleAtoi(turbo::string_view{v.GetString(), v.GetStringLength()}, &n)) {
                     return turbo::nullopt;
                 }

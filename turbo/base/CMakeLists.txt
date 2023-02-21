@@ -52,9 +52,9 @@ turbo_cc_test(
 
 turbo_cc_test(
   NAME
-    statusor_test
+    result_status_test
   SRCS
-   "statusor_test.cc"
+   "result_status_test.cc"
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
