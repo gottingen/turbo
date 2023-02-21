@@ -218,10 +218,10 @@ class ResultStatus : private result_status_internal::ResultStatusData<T>,
   ResultStatus& operator=(const ResultStatus&) = default;
 
   // `ResultStatus<T>` is move constructible if `T` is move constructible.
-  ResultStatus(ResultStatus&&) noexcept = default;
+  ResultStatus(ResultStatus&&) = default;
   // `ResultStatus<T>` is moveAssignable if `T` is move constructible and move
   // assignable.
-  ResultStatus& operator=(ResultStatus&&) noexcept = default;
+  ResultStatus& operator=(ResultStatus&&) = default;
 
   // Converting Constructors
 
