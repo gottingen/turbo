@@ -17,13 +17,13 @@
 // -----------------------------------------------------------------------------
 //
 // An `turbo::ResultStatus<T>` represents a union of an `turbo::Status` object
-// and an object of type `T`. The `turbo::ResultStatus<T>` will either contain
-// an object of type `T` (indicating a successful operation), or an error (of
-// type `turbo::Status`) explaining why such a value is not present.
+// and an object of type `T`. The `turbo::ResultStatus<T>` will either contain an
+// object of type `T` (indicating a successful operation), or an error (of type
+// `turbo::Status`) explaining why such a value is not present.
 //
 // In general, check the success of an operation returning an
-// `turbo::ResultStatus<T>` like you would an `turbo::Status` by using the
-// `ok()` member function.
+// `turbo::ResultStatus<T>` like you would an `turbo::Status` by using the `ok()`
+// member function.
 //
 // Example:
 //
@@ -71,14 +71,14 @@ TURBO_NAMESPACE_BEGIN
 //   TURBO_LOG(ERROR) << ex.status();
 // }
 class BadResultStatusAccess : public std::exception {
-public:
+ public:
   explicit BadResultStatusAccess(turbo::Status status);
   ~BadResultStatusAccess() override = default;
 
-  BadResultStatusAccess(const BadResultStatusAccess &other);
-  BadResultStatusAccess &operator=(const BadResultStatusAccess &other);
-  BadResultStatusAccess(BadResultStatusAccess &&other) noexcept;
-  BadResultStatusAccess &operator=(BadResultStatusAccess &&other) noexcept;
+  BadResultStatusAccess(const BadResultStatusAccess& other);
+  BadResultStatusAccess& operator=(const BadResultStatusAccess& other);
+  BadResultStatusAccess(BadResultStatusAccess&& other) noexcept;
+  BadResultStatusAccess& operator=(BadResultStatusAccess&& other) noexcept;
 
   // BadResultStatusAccess::what()
   //
@@ -88,15 +88,15 @@ public:
   //
   // The pointer of this string is guaranteed to be valid until any non-const
   // function is invoked on the exception object.
-  const char *what() const noexcept override;
+  const char* what() const noexcept override;
 
   // BadResultStatusAccess::status()
   //
-  // Returns the associated `turbo::Status` of the `turbo::ResultStatus<T>`
-  // object's error.
-  const turbo::Status &status() const;
+  // Returns the associated `turbo::Status` of the `turbo::ResultStatus<T>` object's
+  // error.
+  const turbo::Status& status() const;
 
-private:
+ private:
   void InitWhat() const;
 
   turbo::Status status_;
@@ -112,22 +112,22 @@ template <typename T>
 class [[nodiscard]] ResultStatus;
 #else
 class TURBO_MUST_USE_RESULT ResultStatus;
-#endif // TURBO_HAVE_CPP_ATTRIBUTE(nodiscard)
+#endif  // TURBO_HAVE_CPP_ATTRIBUTE(nodiscard)
 
 // turbo::ResultStatus<T>
 //
-// The `turbo::ResultStatus<T>` class template is a union of an `turbo::Status`
-// object and an object of type `T`. The `turbo::ResultStatus<T>` models an
-// object that is either a usable object, or an error (of type `turbo::Status`)
-// explaining why such an object is not present. An `turbo::ResultStatus<T>` is
-// typically the return value of a function which may fail.
+// The `turbo::ResultStatus<T>` class template is a union of an `turbo::Status` object
+// and an object of type `T`. The `turbo::ResultStatus<T>` models an object that is
+// either a usable object, or an error (of type `turbo::Status`) explaining why
+// such an object is not present. An `turbo::ResultStatus<T>` is typically the return
+// value of a function which may fail.
 //
 // An `turbo::ResultStatus<T>` can never hold an "OK" status (an
 // `turbo::StatusCode::kOk` value); instead, the presence of an object of type
 // `T` indicates success. Instead of checking for a `kOk` value, use the
-// `turbo::ResultStatus<T>::ok()` member function. (It is for this reason, and
-// code readability, that using the `ok()` function is preferred for
-// `turbo::Status` as well.)
+// `turbo::ResultStatus<T>::ok()` member function. (It is for this reason, and code
+// readability, that using the `ok()` function is preferred for `turbo::Status`
+// as well.)
 //
 // Example:
 //
@@ -138,8 +138,8 @@ class TURBO_MUST_USE_RESULT ResultStatus;
 //     TURBO_LOG(ERROR) << result.status();
 //   }
 //
-// Accessing the object held by an `turbo::ResultStatus<T>` should be performed
-// via `operator*` or `operator->`, after a call to `ok()` confirms that the
+// Accessing the object held by an `turbo::ResultStatus<T>` should be performed via
+// `operator*` or `operator->`, after a call to `ok()` confirms that the
 // `turbo::ResultStatus<T>` holds an object of type `T`:
 //
 // Example:
@@ -149,9 +149,9 @@ class TURBO_MUST_USE_RESULT ResultStatus;
 //     updated_total += *i
 //   }
 //
-// NOTE: using `turbo::ResultStatus<T>::value()` when no valid value is present
-// will throw an exception if exceptions are enabled or terminate the process
-// when exceptions are not enabled.
+// NOTE: using `turbo::ResultStatus<T>::value()` when no valid value is present will
+// throw an exception if exceptions are enabled or terminate the process when
+// exceptions are not enabled.
 //
 // Example:
 //
@@ -159,11 +159,11 @@ class TURBO_MUST_USE_RESULT ResultStatus;
 //   const Foo& foo = result.value();    // Crash/exception if no value present
 //   foo.DoSomethingCool();
 //
-// A `turbo::ResultStatus<T*>` can be constructed from a null pointer like any
-// other pointer value, and the result will be that `ok()` returns `true` and
+// A `turbo::ResultStatus<T*>` can be constructed from a null pointer like any other
+// pointer value, and the result will be that `ok()` returns `true` and
 // `value()` returns `nullptr`. Checking the value of pointer in an
-// `turbo::ResultStatus<T*>` generally requires a bit more care, to ensure both
-// that a value is present and that value is not null:
+// `turbo::ResultStatus<T*>` generally requires a bit more care, to ensure both that
+// a value is present and that value is not null:
 //
 //  ResultStatus<std::unique_ptr<Foo>> result = FooFactory::MakeNewFoo(arg);
 //  if (!result.ok()) {
@@ -185,15 +185,16 @@ class TURBO_MUST_USE_RESULT ResultStatus;
 //  }
 template <typename T>
 class ResultStatus : private result_status_internal::ResultStatusData<T>,
-                     private result_status_internal::CopyCtorBase<T>,
-                     private result_status_internal::MoveCtorBase<T>,
-                     private result_status_internal::CopyAssignBase<T>,
-                     private result_status_internal::MoveAssignBase<T> {
-  template <typename U> friend class ResultStatus;
+                 private result_status_internal::CopyCtorBase<T>,
+                 private result_status_internal::MoveCtorBase<T>,
+                 private result_status_internal::CopyAssignBase<T>,
+                 private result_status_internal::MoveAssignBase<T> {
+  template <typename U>
+  friend class ResultStatus;
 
   typedef result_status_internal::ResultStatusData<T> Base;
 
-public:
+ public:
   // ResultStatus<T>::value_type
   //
   // This instance data provides a generic `value_type` member for use within
@@ -203,124 +204,117 @@ public:
 
   // Constructors
 
-  // Constructs a new `turbo::ResultStatus` with an
-  // `turbo::StatusCode::kUnknown` status. This constructor is marked 'explicit'
-  // to prevent usages in return values such as 'return {};', under the
-  // misconception that `turbo::ResultStatus<std::vector<int>>` will be
-  // initialized with an empty vector, instead of an
-  // `turbo::StatusCode::kUnknown` error code.
+  // Constructs a new `turbo::ResultStatus` with an `turbo::StatusCode::kUnknown`
+  // status. This constructor is marked 'explicit' to prevent usages in return
+  // values such as 'return {};', under the misconception that
+  // `turbo::ResultStatus<std::vector<int>>` will be initialized with an empty
+  // vector, instead of an `turbo::StatusCode::kUnknown` error code.
   explicit ResultStatus();
 
   // `ResultStatus<T>` is copy constructible if `T` is copy constructible.
-  ResultStatus(const ResultStatus &) = default;
+  ResultStatus(const ResultStatus&) = default;
   // `ResultStatus<T>` is copy assignable if `T` is copy constructible and copy
   // assignable.
-  ResultStatus &operator=(const ResultStatus &) = default;
+  ResultStatus& operator=(const ResultStatus&) = default;
 
   // `ResultStatus<T>` is move constructible if `T` is move constructible.
-  // FIXME(bohuli) C++14 DO NOT mark as noexcept, gcc will mark as deleted
-  ResultStatus(ResultStatus &&) = default;
+  ResultStatus(ResultStatus&&) noexcept = default;
   // `ResultStatus<T>` is moveAssignable if `T` is move constructible and move
   // assignable.
-  ResultStatus &operator=(ResultStatus &&) = default;
+  ResultStatus& operator=(ResultStatus&&) noexcept = default;
 
   // Converting Constructors
 
-  // Constructs a new `turbo::ResultStatus<T>` from an `turbo::ResultStatus<U>`,
-  // when `T` is constructible from `U`. To avoid ambiguity, these constructors
-  // are disabled if `T` is also constructible from `ResultStatus<U>.`. This
-  // constructor is explicit if and only if the corresponding construction of
-  // `T` from `U` is explicit. (This constructor inherits its explicitness from
-  // the underlying constructor.)
+  // Constructs a new `turbo::ResultStatus<T>` from an `turbo::ResultStatus<U>`, when `T`
+  // is constructible from `U`. To avoid ambiguity, these constructors are
+  // disabled if `T` is also constructible from `ResultStatus<U>.`. This constructor
+  // is explicit if and only if the corresponding construction of `T` from `U`
+  // is explicit. (This constructor inherits its explicitness from the
+  // underlying constructor.)
   template <
       typename U,
       turbo::enable_if_t<
           turbo::conjunction<
               turbo::negation<std::is_same<T, U>>,
-              std::is_constructible<T, const U &>,
-              std::is_convertible<const U &, T>,
-              turbo::negation<result_status_internal::
-                                  IsConstructibleOrConvertibleFromResultStatus<
-                                      T, U>>>::value,
+              std::is_constructible<T, const U&>,
+              std::is_convertible<const U&, T>,
+              turbo::negation<
+                  result_status_internal::IsConstructibleOrConvertibleFromResultStatus<
+                      T, U>>>::value,
           int> = 0>
-  ResultStatus(const ResultStatus<U> &other) // NOLINT
-      : Base(static_cast<const typename ResultStatus<U>::Base &>(other)) {}
+  ResultStatus(const ResultStatus<U>& other)  // NOLINT
+      : Base(static_cast<const typename ResultStatus<U>::Base&>(other)) {}
   template <
       typename U,
       turbo::enable_if_t<
           turbo::conjunction<
               turbo::negation<std::is_same<T, U>>,
-              std::is_constructible<T, const U &>,
-              turbo::negation<std::is_convertible<const U &, T>>,
-              turbo::negation<result_status_internal::
-                                  IsConstructibleOrConvertibleFromResultStatus<
-                                      T, U>>>::value,
+              std::is_constructible<T, const U&>,
+              turbo::negation<std::is_convertible<const U&, T>>,
+              turbo::negation<
+                  result_status_internal::IsConstructibleOrConvertibleFromResultStatus<
+                      T, U>>>::value,
           int> = 0>
-  explicit ResultStatus(const ResultStatus<U> &other)
-      : Base(static_cast<const typename ResultStatus<U>::Base &>(other)) {}
+  explicit ResultStatus(const ResultStatus<U>& other)
+      : Base(static_cast<const typename ResultStatus<U>::Base&>(other)) {}
 
   template <
       typename U,
       turbo::enable_if_t<
           turbo::conjunction<
-              turbo::negation<std::is_same<T, U>>,
-              std::is_constructible<T, U &&>, std::is_convertible<U &&, T>,
-              turbo::negation<result_status_internal::
-                                  IsConstructibleOrConvertibleFromResultStatus<
-                                      T, U>>>::value,
+              turbo::negation<std::is_same<T, U>>, std::is_constructible<T, U&&>,
+              std::is_convertible<U&&, T>,
+              turbo::negation<
+                  result_status_internal::IsConstructibleOrConvertibleFromResultStatus<
+                      T, U>>>::value,
           int> = 0>
-  ResultStatus(ResultStatus<U> &&other) // NOLINT
-      : Base(static_cast<typename ResultStatus<U>::Base &&>(other)) {}
+  ResultStatus(ResultStatus<U>&& other)  // NOLINT
+      : Base(static_cast<typename ResultStatus<U>::Base&&>(other)) {}
   template <
       typename U,
       turbo::enable_if_t<
           turbo::conjunction<
-              turbo::negation<std::is_same<T, U>>,
-              std::is_constructible<T, U &&>,
-              turbo::negation<std::is_convertible<U &&, T>>,
-              turbo::negation<result_status_internal::
-                                  IsConstructibleOrConvertibleFromResultStatus<
-                                      T, U>>>::value,
+              turbo::negation<std::is_same<T, U>>, std::is_constructible<T, U&&>,
+              turbo::negation<std::is_convertible<U&&, T>>,
+              turbo::negation<
+                  result_status_internal::IsConstructibleOrConvertibleFromResultStatus<
+                      T, U>>>::value,
           int> = 0>
-  explicit ResultStatus(ResultStatus<U> &&other)
-      : Base(static_cast<typename ResultStatus<U>::Base &&>(other)) {}
+  explicit ResultStatus(ResultStatus<U>&& other)
+      : Base(static_cast<typename ResultStatus<U>::Base&&>(other)) {}
 
   // Converting Assignment Operators
 
   // Creates an `turbo::ResultStatus<T>` through assignment from an
   // `turbo::ResultStatus<U>` when:
   //
-  //   * Both `turbo::ResultStatus<T>` and `turbo::ResultStatus<U>` are OK by
-  //   assigning
+  //   * Both `turbo::ResultStatus<T>` and `turbo::ResultStatus<U>` are OK by assigning
   //     `U` to `T` directly.
-  //   * `turbo::ResultStatus<T>` is OK and `turbo::ResultStatus<U>` contains an
-  //   error
+  //   * `turbo::ResultStatus<T>` is OK and `turbo::ResultStatus<U>` contains an error
   //      code by destroying `turbo::ResultStatus<T>`'s value and assigning from
   //      `turbo::ResultStatus<U>'
-  //   * `turbo::ResultStatus<T>` contains an error code and
-  //   `turbo::ResultStatus<U>` is
+  //   * `turbo::ResultStatus<T>` contains an error code and `turbo::ResultStatus<U>` is
   //      OK by directly initializing `T` from `U`.
-  //   * Both `turbo::ResultStatus<T>` and `turbo::ResultStatus<U>` contain an
-  //   error
+  //   * Both `turbo::ResultStatus<T>` and `turbo::ResultStatus<U>` contain an error
   //     code by assigning the `Status` in `turbo::ResultStatus<U>` to
   //     `turbo::ResultStatus<T>`
   //
   // These overloads only apply if `turbo::ResultStatus<T>` is constructible and
-  // assignable from `turbo::ResultStatus<U>` and `ResultStatus<T>` cannot be
-  // directly assigned from `ResultStatus<U>`.
+  // assignable from `turbo::ResultStatus<U>` and `ResultStatus<T>` cannot be directly
+  // assigned from `ResultStatus<U>`.
   template <
       typename U,
       turbo::enable_if_t<
           turbo::conjunction<
               turbo::negation<std::is_same<T, U>>,
-              std::is_constructible<T, const U &>,
-              std::is_assignable<T, const U &>,
+              std::is_constructible<T, const U&>,
+              std::is_assignable<T, const U&>,
               turbo::negation<
                   result_status_internal::
                       IsConstructibleOrConvertibleOrAssignableFromResultStatus<
                           T, U>>>::value,
           int> = 0>
-  ResultStatus &operator=(const ResultStatus<U> &other) {
+  ResultStatus& operator=(const ResultStatus<U>& other) {
     this->Assign(other);
     return *this;
   }
@@ -328,21 +322,21 @@ public:
       typename U,
       turbo::enable_if_t<
           turbo::conjunction<
-              turbo::negation<std::is_same<T, U>>,
-              std::is_constructible<T, U &&>, std::is_assignable<T, U &&>,
+              turbo::negation<std::is_same<T, U>>, std::is_constructible<T, U&&>,
+              std::is_assignable<T, U&&>,
               turbo::negation<
                   result_status_internal::
                       IsConstructibleOrConvertibleOrAssignableFromResultStatus<
                           T, U>>>::value,
           int> = 0>
-  ResultStatus &operator=(ResultStatus<U> &&other) {
+  ResultStatus& operator=(ResultStatus<U>&& other) {
     this->Assign(std::move(other));
     return *this;
   }
 
-  // Constructs a new `turbo::ResultStatus<T>` with a non-ok status. After
-  // calling this constructor, `this->ok()` will be `false` and calls to
-  // `value()` will crash, or produce an exception if exceptions are enabled.
+  // Constructs a new `turbo::ResultStatus<T>` with a non-ok status. After calling
+  // this constructor, `this->ok()` will be `false` and calls to `value()` will
+  // crash, or produce an exception if exceptions are enabled.
   //
   // The constructor also takes any type `U` that is convertible to
   // `turbo::Status`. This constructor is explicit if an only if `U` is not of
@@ -355,52 +349,43 @@ public:
       typename U = turbo::Status,
       turbo::enable_if_t<
           turbo::conjunction<
-              std::is_convertible<U &&, turbo::Status>,
-              std::is_constructible<turbo::Status, U &&>,
-              turbo::negation<
-                  std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
+              std::is_convertible<U&&, turbo::Status>,
+              std::is_constructible<turbo::Status, U&&>,
+              turbo::negation<std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
               turbo::negation<std::is_same<turbo::decay_t<U>, T>>,
-              turbo::negation<
-                  std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
-              turbo::negation<
-                  result_status_internal::HasConversionOperatorToResultStatus<
-                      T, U &&>>>::value,
+              turbo::negation<std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
+              turbo::negation<result_status_internal::HasConversionOperatorToResultStatus<
+                  T, U&&>>>::value,
           int> = 0>
-  explicit ResultStatus(U &&v) noexcept : Base(std::forward<U>(v)) {}
+  ResultStatus(U&& v) noexcept : Base(std::forward<U>(v)) {}
 
   template <
       typename U = turbo::Status,
       turbo::enable_if_t<
           turbo::conjunction<
-              turbo::negation<std::is_convertible<U &&, turbo::Status>>,
-              std::is_constructible<turbo::Status, U &&>,
-              turbo::negation<
-                  std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
+              turbo::negation<std::is_convertible<U&&, turbo::Status>>,
+              std::is_constructible<turbo::Status, U&&>,
+              turbo::negation<std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
               turbo::negation<std::is_same<turbo::decay_t<U>, T>>,
-              turbo::negation<
-                  std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
-              turbo::negation<
-                  result_status_internal::HasConversionOperatorToResultStatus<
-                      T, U &&>>>::value,
+              turbo::negation<std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
+              turbo::negation<result_status_internal::HasConversionOperatorToResultStatus<
+                  T, U&&>>>::value,
           int> = 0>
-  explicit ResultStatus(U &&v) : Base(std::forward<U>(v)) {}
+  explicit ResultStatus(U&& v) : Base(std::forward<U>(v)) {}
 
   template <
       typename U = turbo::Status,
       turbo::enable_if_t<
           turbo::conjunction<
-              std::is_convertible<U &&, turbo::Status>,
-              std::is_constructible<turbo::Status, U &&>,
-              turbo::negation<
-                  std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
+              std::is_convertible<U&&, turbo::Status>,
+              std::is_constructible<turbo::Status, U&&>,
+              turbo::negation<std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
               turbo::negation<std::is_same<turbo::decay_t<U>, T>>,
-              turbo::negation<
-                  std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
-              turbo::negation<
-                  result_status_internal::HasConversionOperatorToResultStatus<
-                      T, U &&>>>::value,
+              turbo::negation<std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
+              turbo::negation<result_status_internal::HasConversionOperatorToResultStatus<
+                  T, U&&>>>::value,
           int> = 0>
-  ResultStatus &operator=(U &&v) {
+  ResultStatus& operator=(U&& v) {
     this->AssignStatus(std::forward<U>(v));
     return *this;
   }
@@ -424,17 +409,15 @@ public:
   template <
       typename U = T,
       typename = typename std::enable_if<turbo::conjunction<
-          std::is_constructible<T, U &&>, std::is_assignable<T &, U &&>,
+          std::is_constructible<T, U&&>, std::is_assignable<T&, U&&>,
           turbo::disjunction<
               std::is_same<std::remove_cv_t<std::remove_reference_t<U>>, T>,
               turbo::conjunction<
-                  turbo::negation<std::is_convertible<U &&, turbo::Status>>,
-                  turbo::negation<
-                      result_status_internal::
-                          HasConversionOperatorToResultStatus<T, U &&>>>>,
-          result_status_internal::IsForwardingAssignmentValid<T, U &&>>::
-                                             value>::type>
-  ResultStatus &operator=(U &&v) {
+                  turbo::negation<std::is_convertible<U&&, turbo::Status>>,
+                  turbo::negation<result_status_internal::
+                                     HasConversionOperatorToResultStatus<T, U&&>>>>,
+          result_status_internal::IsForwardingAssignmentValid<T, U&&>>::value>::type>
+  ResultStatus& operator=(U&& v) {
     this->Assign(std::forward<U>(v));
     return *this;
   }
@@ -442,59 +425,60 @@ public:
   // Constructs the inner value `T` in-place using the provided args, using the
   // `T(args...)` constructor.
   template <typename... Args>
-  explicit ResultStatus(turbo::in_place_t, Args &&...args);
+  explicit ResultStatus(turbo::in_place_t, Args&&... args);
   template <typename U, typename... Args>
   explicit ResultStatus(turbo::in_place_t, std::initializer_list<U> ilist,
-                        Args &&...args);
+                    Args&&... args);
 
   // Constructs the inner value `T` in-place using the provided args, using the
   // `T(U)` (direct-initialization) constructor. This constructor is only valid
   // if `T` can be constructed from a `U`. Can accept move or copy constructors.
   //
   // This constructor is explicit if `U` is not convertible to `T`. To avoid
-  // ambiguity, this constructor is disabled if `U` is a `ResultStatus<J>`,
-  // where `J` is convertible to `T`.
+  // ambiguity, this constructor is disabled if `U` is a `ResultStatus<J>`, where
+  // `J` is convertible to `T`.
   template <
       typename U = T,
       turbo::enable_if_t<
           turbo::conjunction<
-              result_status_internal::IsDirectInitializationValid<T, U &&>,
-              std::is_constructible<T, U &&>, std::is_convertible<U &&, T>,
+              result_status_internal::IsDirectInitializationValid<T, U&&>,
+              std::is_constructible<T, U&&>, std::is_convertible<U&&, T>,
               turbo::disjunction<
-                  std::is_same<std::remove_cv_t<std::remove_reference_t<U>>, T>,
+                  std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
+                               T>,
                   turbo::conjunction<
-                      turbo::negation<std::is_convertible<U &&, turbo::Status>>,
-                      turbo::negation<result_status_internal::
-                                          HasConversionOperatorToResultStatus<
-                                              T, U &&>>>>>::value,
+                      turbo::negation<std::is_convertible<U&&, turbo::Status>>,
+                      turbo::negation<
+                          result_status_internal::HasConversionOperatorToResultStatus<
+                              T, U&&>>>>>::value,
           int> = 0>
-  ResultStatus(U &&u) // NOLINT
+  ResultStatus(U&& u)  // NOLINT
       : ResultStatus(turbo::in_place, std::forward<U>(u)) {}
 
   template <
       typename U = T,
       turbo::enable_if_t<
           turbo::conjunction<
-              result_status_internal::IsDirectInitializationValid<T, U &&>,
+              result_status_internal::IsDirectInitializationValid<T, U&&>,
               turbo::disjunction<
-                  std::is_same<std::remove_cv_t<std::remove_reference_t<U>>, T>,
+                  std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
+                               T>,
                   turbo::conjunction<
+                      turbo::negation<std::is_constructible<turbo::Status, U&&>>,
                       turbo::negation<
-                          std::is_constructible<turbo::Status, U &&>>,
-                      turbo::negation<
-                          result_status_internal::
-                              HasConversionOperatorToResultStatus<T, U &&>>>>,
-              std::is_constructible<T, U &&>,
-              turbo::negation<std::is_convertible<U &&, T>>>::value,
+                          result_status_internal::HasConversionOperatorToResultStatus<
+                              T, U&&>>>>,
+              std::is_constructible<T, U&&>,
+              turbo::negation<std::is_convertible<U&&, T>>>::value,
           int> = 0>
-  explicit ResultStatus(U &&u) // NOLINT
+  explicit ResultStatus(U&& u)  // NOLINT
       : ResultStatus(turbo::in_place, std::forward<U>(u)) {}
 
   // ResultStatus<T>::ok()
   //
-  // Returns whether or not this `turbo::ResultStatus<T>` holds a `T` value.
-  // This member function is analogous to `turbo::Status::ok()` and should be
-  // used similarly to check the status of return values.
+  // Returns whether or not this `turbo::ResultStatus<T>` holds a `T` value. This
+  // member function is analogous to `turbo::Status::ok()` and should be used
+  // similarly to check the status of return values.
   //
   // Example:
   //
@@ -509,16 +493,16 @@ public:
   // ResultStatus<T>::status()
   //
   // Returns a reference to the current `turbo::Status` contained within the
-  // `turbo::ResultStatus<T>`. If `turbo::ResultStatus<T>` contains a `T`, then
-  // this function returns `turbo::OkStatus()`.
-  const Status &status() const &;
+  // `turbo::ResultStatus<T>`. If `turbo::ResultStatus<T>` contains a `T`, then this
+  // function returns `turbo::OkStatus()`.
+  const Status& status() const&;
   Status status() &&;
 
   // ResultStatus<T>::value()
   //
   // Returns a reference to the held value if `this->ok()`. Otherwise, throws
-  // `turbo::BadResultStatusAccess` if exceptions are enabled, or is guaranteed
-  // to terminate the process if exceptions are disabled.
+  // `turbo::BadResultStatusAccess` if exceptions are enabled, or is guaranteed to
+  // terminate the process if exceptions are disabled.
   //
   // If you have already checked the status using `this->ok()`, you probably
   // want to use `operator*()` or `operator->()` to access the value instead of
@@ -526,24 +510,24 @@ public:
   //
   // Note: for value types that are cheap to copy, prefer simple code:
   //
-  //   T value = rtstatus.value();
+  //   T value = statusor.value();
   //
   // Otherwise, if the value type is expensive to copy, but can be left
   // in the ResultStatus, simply assign to a reference:
   //
-  //   T& value = rtstatus.value();  // or `const T&`
+  //   T& value = statusor.value();  // or `const T&`
   //
   // Otherwise, if the value type supports an efficient move, it can be
   // used as follows:
   //
-  //   T value = std::move(rtstatus).value();
+  //   T value = std::move(statusor).value();
   //
-  // The `std::move` on rtstatus instead of on the whole expression enables
-  // warnings about possible uses of the rtstatus object after the move.
-  const T &value() const &TURBO_ATTRIBUTE_LIFETIME_BOUND;
-  T &value() & TURBO_ATTRIBUTE_LIFETIME_BOUND;
-  const T &&value() const &&TURBO_ATTRIBUTE_LIFETIME_BOUND;
-  T &&value() && TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  // The `std::move` on statusor instead of on the whole expression enables
+  // warnings about possible uses of the statusor object after the move.
+  const T& value() const& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T& value() & TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  const T&& value() const&& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T&& value() && TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
   // ResultStatus<T>:: operator*()
   //
@@ -552,13 +536,13 @@ public:
   // REQUIRES: `this->ok() == true`, otherwise the behavior is undefined.
   //
   // Use `this->ok()` to verify that there is a current value within the
-  // `turbo::ResultStatus<T>`. Alternatively, see the `value()` member function
-  // for a similar API that guarantees crashing or throwing an exception if
-  // there is no current value.
-  const T &operator*() const &TURBO_ATTRIBUTE_LIFETIME_BOUND;
-  T &operator*() & TURBO_ATTRIBUTE_LIFETIME_BOUND;
-  const T &&operator*() const &&TURBO_ATTRIBUTE_LIFETIME_BOUND;
-  T &&operator*() && TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  // `turbo::ResultStatus<T>`. Alternatively, see the `value()` member function for a
+  // similar API that guarantees crashing or throwing an exception if there is
+  // no current value.
+  const T& operator*() const& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T& operator*() & TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  const T&& operator*() const&& TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T&& operator*() && TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
   // ResultStatus<T>::operator->()
   //
@@ -567,8 +551,8 @@ public:
   // REQUIRES: `this->ok() == true`, otherwise the behavior is undefined.
   //
   // Use `this->ok()` to verify that there is a current value.
-  const T *operator->() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
-  T *operator->() TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  const T* operator->() const TURBO_ATTRIBUTE_LIFETIME_BOUND;
+  T* operator->() TURBO_ATTRIBUTE_LIFETIME_BOUND;
 
   // ResultStatus<T>::value_or()
   //
@@ -579,12 +563,14 @@ public:
   // if necessary. If the value type supports an efficient move, it can be used
   // as follows:
   //
-  //   T value = std::move(rtstatus).value_or(def);
+  //   T value = std::move(statusor).value_or(def);
   //
   // Unlike with `value`, calling `std::move()` on the result of `value_or` will
   // still trigger a copy.
-  template <typename U> T value_or(U &&default_value) const &;
-  template <typename U> T value_or(U &&default_value) &&;
+  template <typename U>
+  T value_or(U&& default_value) const&;
+  template <typename U>
+  T value_or(U&& default_value) &&;
 
   // ResultStatus<T>::IgnoreError()
   //
@@ -597,7 +583,8 @@ public:
   //
   // Reconstructs the inner value T in-place using the provided args, using the
   // T(args...) constructor. Returns reference to the reconstructed `T`.
-  template <typename... Args> T &emplace(Args &&...args) {
+  template <typename... Args>
+  T& emplace(Args&&... args) {
     if (ok()) {
       this->Clear();
       this->MakeValue(std::forward<Args>(args)...);
@@ -610,10 +597,10 @@ public:
 
   template <
       typename U, typename... Args,
-      turbo::enable_if_t<std::is_constructible<T, std::initializer_list<U> &,
-                                               Args &&...>::value,
-                         int> = 0>
-  T &emplace(std::initializer_list<U> ilist, Args &&...args) {
+      turbo::enable_if_t<
+          std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value,
+          int> = 0>
+  T& emplace(std::initializer_list<U> ilist, Args&&... args) {
     if (ok()) {
       this->Clear();
       this->MakeValue(ilist, std::forward<Args>(args)...);
@@ -624,19 +611,20 @@ public:
     return this->data_;
   }
 
-private:
+ private:
   using result_status_internal::ResultStatusData<T>::Assign;
-  template <typename U> void Assign(const turbo::ResultStatus<U> &other);
-  template <typename U> void Assign(turbo::ResultStatus<U> &&other);
+  template <typename U>
+  void Assign(const turbo::ResultStatus<U>& other);
+  template <typename U>
+  void Assign(turbo::ResultStatus<U>&& other);
 };
 
 // operator==()
 //
 // This operator checks the equality of two `turbo::ResultStatus<T>` objects.
 template <typename T>
-bool operator==(const ResultStatus<T> &lhs, const ResultStatus<T> &rhs) {
-  if (lhs.ok() && rhs.ok())
-    return *lhs == *rhs;
+bool operator==(const ResultStatus<T>& lhs, const ResultStatus<T>& rhs) {
+  if (lhs.ok() && rhs.ok()) return *lhs == *rhs;
   return lhs.status() == rhs.status();
 }
 
@@ -644,7 +632,7 @@ bool operator==(const ResultStatus<T> &lhs, const ResultStatus<T> &rhs) {
 //
 // This operator checks the inequality of two `turbo::ResultStatus<T>` objects.
 template <typename T>
-bool operator!=(const ResultStatus<T> &lhs, const ResultStatus<T> &rhs) {
+bool operator!=(const ResultStatus<T>& lhs, const ResultStatus<T>& rhs) {
   return !(lhs == rhs);
 }
 
@@ -658,7 +646,7 @@ ResultStatus<T>::ResultStatus() : Base(Status(turbo::kUnknown, "")) {}
 
 template <typename T>
 template <typename U>
-inline void ResultStatus<T>::Assign(const ResultStatus<U> &other) {
+inline void ResultStatus<T>::Assign(const ResultStatus<U>& other) {
   if (other.ok()) {
     this->Assign(*other);
   } else {
@@ -668,7 +656,7 @@ inline void ResultStatus<T>::Assign(const ResultStatus<U> &other) {
 
 template <typename T>
 template <typename U>
-inline void ResultStatus<T>::Assign(ResultStatus<U> &&other) {
+inline void ResultStatus<T>::Assign(ResultStatus<U>&& other) {
   if (other.ok()) {
     this->Assign(*std::move(other));
   } else {
@@ -677,83 +665,91 @@ inline void ResultStatus<T>::Assign(ResultStatus<U> &&other) {
 }
 template <typename T>
 template <typename... Args>
-ResultStatus<T>::ResultStatus(turbo::in_place_t, Args &&...args)
+ResultStatus<T>::ResultStatus(turbo::in_place_t, Args&&... args)
     : Base(turbo::in_place, std::forward<Args>(args)...) {}
 
 template <typename T>
 template <typename U, typename... Args>
 ResultStatus<T>::ResultStatus(turbo::in_place_t, std::initializer_list<U> ilist,
-                              Args &&...args)
+                      Args&&... args)
     : Base(turbo::in_place, ilist, std::forward<Args>(args)...) {}
 
-template <typename T> const Status &ResultStatus<T>::status() const & {
+template <typename T>
+const Status& ResultStatus<T>::status() const& {
   return this->status_;
 }
-template <typename T> Status ResultStatus<T>::status() && {
+template <typename T>
+Status ResultStatus<T>::status() && {
   return ok() ? OkStatus() : std::move(this->status_);
 }
 
-template <typename T> const T &ResultStatus<T>::value() const & {
-  if (!this->ok())
-    result_status_internal::ThrowBadResultStatusAccess(this->status_);
+template <typename T>
+const T& ResultStatus<T>::value() const& {
+  if (!this->ok()) result_status_internal::ThrowBadResultStatusAccess(this->status_);
   return this->data_;
 }
 
-template <typename T> T &ResultStatus<T>::value() & {
-  if (!this->ok())
-    result_status_internal::ThrowBadResultStatusAccess(this->status_);
+template <typename T>
+T& ResultStatus<T>::value() & {
+  if (!this->ok()) result_status_internal::ThrowBadResultStatusAccess(this->status_);
   return this->data_;
 }
 
-template <typename T> const T &&ResultStatus<T>::value() const && {
+template <typename T>
+const T&& ResultStatus<T>::value() const&& {
   if (!this->ok()) {
-    result_status_internal::ThrowBadResultStatusAccess(
-        std::move(this->status_));
+    result_status_internal::ThrowBadResultStatusAccess(std::move(this->status_));
   }
   return std::move(this->data_);
 }
 
-template <typename T> T &&ResultStatus<T>::value() && {
+template <typename T>
+T&& ResultStatus<T>::value() && {
   if (!this->ok()) {
-    result_status_internal::ThrowBadResultStatusAccess(
-        std::move(this->status_));
+    result_status_internal::ThrowBadResultStatusAccess(std::move(this->status_));
   }
   return std::move(this->data_);
 }
 
-template <typename T> const T &ResultStatus<T>::operator*() const & {
+template <typename T>
+const T& ResultStatus<T>::operator*() const& {
   this->EnsureOk();
   return this->data_;
 }
 
-template <typename T> T &ResultStatus<T>::operator*() & {
+template <typename T>
+T& ResultStatus<T>::operator*() & {
   this->EnsureOk();
   return this->data_;
 }
 
-template <typename T> const T &&ResultStatus<T>::operator*() const && {
+template <typename T>
+const T&& ResultStatus<T>::operator*() const&& {
   this->EnsureOk();
   return std::move(this->data_);
 }
 
-template <typename T> T &&ResultStatus<T>::operator*() && {
+template <typename T>
+T&& ResultStatus<T>::operator*() && {
   this->EnsureOk();
   return std::move(this->data_);
 }
 
-template <typename T> const T *ResultStatus<T>::operator->() const {
+template <typename T>
+const T* ResultStatus<T>::operator->() const {
   this->EnsureOk();
   return &this->data_;
 }
 
-template <typename T> T *ResultStatus<T>::operator->() {
+template <typename T>
+T* ResultStatus<T>::operator->() {
   this->EnsureOk();
   return &this->data_;
 }
 
 template <typename T>
 template <typename U>
-T ResultStatus<T>::value_or(U &&default_value) const & {
+T ResultStatus<T>::value_or(U&& default_value) const& {
   if (ok()) {
     return this->data_;
   }
@@ -762,18 +758,19 @@ T ResultStatus<T>::value_or(U &&default_value) const & {
 
 template <typename T>
 template <typename U>
-T ResultStatus<T>::value_or(U &&default_value) && {
+T ResultStatus<T>::value_or(U&& default_value) && {
   if (ok()) {
     return std::move(this->data_);
   }
   return std::forward<U>(default_value);
 }
 
-template <typename T> void ResultStatus<T>::IgnoreError() const {
+template <typename T>
+void ResultStatus<T>::IgnoreError() const {
   // no-op
 }
 
 TURBO_NAMESPACE_END
-} // namespace turbo
+}  // namespace turbo
 
-#endif // TURBO_BASE_RESULT_STATUS_H_
+#endif  // TURBO_BASE_RESULT_STATUS_H_

@@ -13,7 +13,8 @@
 // limitations under the License.
 #include "turbo/base/status.h"
 
-#include <cerrno>
+#include <errno.h>
+
 #include <cassert>
 #include <utility>
 
