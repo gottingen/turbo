@@ -356,7 +356,7 @@ class direct_buffered_file {
 
   enum { buffer_size = 4096 };
   char buffer_[buffer_size];
-  int pos_;
+  size_t pos_;
 
   void flush() {
     if (pos_ == 0) return;
@@ -364,7 +364,7 @@ class direct_buffered_file {
     pos_ = 0;
   }
 
-  int free_capacity() const { return buffer_size - pos_; }
+  size_t free_capacity() const { return static_cast<size_t>(buffer_size) - pos_; }
 
  public:
   direct_buffered_file(cstring_view path, int oflag)
@@ -396,7 +396,7 @@ class direct_buffered_file {
       remaining_size -= size;
     }
     memcpy(f.buffer_ + f.pos_, buf.data() + remaining_pos, remaining_size);
-    f.pos_ += static_cast<int>(remaining_size);
+    f.pos_ += remaining_size;
   }
 };
 #endif  // FMT_USE_FCNTL
