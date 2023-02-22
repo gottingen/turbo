@@ -665,6 +665,7 @@ inline void inlined_string_core<Char>::initSmall(const Char *const data,
   if ((reinterpret_cast<size_t>(data) & (sizeof(size_t) - 1)) == 0) {
     const size_t byteSize = size * sizeof(Char);
     constexpr size_t wordWidth = sizeof(size_t);
+    TURBO_DISABLE_GCC_WARNING(-Wimplicit-fallthrough=)
     switch ((byteSize + wordWidth - 1) / wordWidth) { // Number of words.
     case 3:
       ml_.capacity_ = reinterpret_cast<const size_t *>(data)[2];
@@ -677,6 +678,7 @@ inline void inlined_string_core<Char>::initSmall(const Char *const data,
       TURBO_FALLTHROUGH;
     case 0:
       break;
+    TURBO_RESTORE_GCC_WARNING()
     }
   } else
 #endif

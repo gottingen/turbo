@@ -52,7 +52,6 @@ list(APPEND TURBO_GCC_FLAGS
     "-Wvarargs"
     "-Wvla"
     "-Wwrite-strings"
-    "-Wno-noexcept-type"
     "-DNOMINMAX"
 )
 
