@@ -169,7 +169,7 @@ TEST(UTF8Lib, DecoderCheckLength) {
   for (auto i = 0; valid_examples[i]; ++i) {
     auto s_ptr = valid_examples[i];
     auto len = strlen(s_ptr);
-    auto s_u_ptr = (unsigned char*)s_ptr;
+    auto s_u_ptr = (const unsigned char*)s_ptr;
     auto c1 = utf8_details::GreedyTableDecoder::CountUnitSize(s_u_ptr, s_u_ptr + len);
     std::unique_ptr<char32_t[]> buffer(new char32_t[len]);
     auto c2 = utf8_details::GreedyTableDecoder::Convert(s_u_ptr, s_u_ptr + len, buffer.get());
@@ -179,7 +179,7 @@ TEST(UTF8Lib, DecoderCheckLength) {
   for (auto i = 0; invalid_examples[i]; ++i) {
     auto s_ptr = invalid_examples[i];
     auto len = strlen(s_ptr);
-    auto s_u_ptr = (unsigned char*)s_ptr;
+    auto s_u_ptr = (const unsigned char*)s_ptr;
     auto c1 = utf8_details::GreedyTableDecoder::CountUnitSize(s_u_ptr, s_u_ptr + len);
     std::unique_ptr<char32_t[]> buffer(new char32_t[len]);
     auto c2 = utf8_details::GreedyTableDecoder::Convert(s_u_ptr, s_u_ptr + len, buffer.get());

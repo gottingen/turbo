@@ -1,4 +1,4 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "status.h"
+#include "turbo/base/status.h"
 
 #include <errno.h>
 
@@ -21,6 +21,7 @@
 #include "status_payload_printer.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/internal/strerror.h"
+#include "turbo/base/turbo_error.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/debugging/symbolize.h"
 #include "turbo/platform/port.h"
@@ -29,48 +30,30 @@
 #include "turbo/strings/str_format.h"
 #include "turbo/strings/str_split.h"
 
+TURBO_REGISTER_ERRNO(turbo::kOk, "OK");
+TURBO_REGISTER_ERRNO(turbo::kCancelled, "CANCELLED");
+TURBO_REGISTER_ERRNO(turbo::kUnknown, "UNKNOWN");
+TURBO_REGISTER_ERRNO(turbo::kInvalidArgument, "INVALID_ARGUMENT");
+TURBO_REGISTER_ERRNO(turbo::kDeadlineExceeded, "DEADLINE_EXCEEDED");
+TURBO_REGISTER_ERRNO(turbo::kNotFound, "NOT_FOUND");
+TURBO_REGISTER_ERRNO(turbo::kAlreadyExists, "ALREADY_EXISTS");
+TURBO_REGISTER_ERRNO(turbo::kPermissionDenied, "PERMISSION_DENIED");
+TURBO_REGISTER_ERRNO(turbo::kUnauthenticated, "UNAUTHENTICATED");
+TURBO_REGISTER_ERRNO(turbo::kResourceExhausted, "RESOURCE_EXHAUSTED");
+TURBO_REGISTER_ERRNO(turbo::kFailedPrecondition, "FAILED_PRECONDITION");
+TURBO_REGISTER_ERRNO(turbo::kAborted, "ABORTED");
+TURBO_REGISTER_ERRNO(turbo::kOutOfRange, "OUT_OF_RANGE");
+TURBO_REGISTER_ERRNO(turbo::kUnimplemented, "UNIMPLEMENTED");
+TURBO_REGISTER_ERRNO(turbo::kInternal, "INTERNAL");
+TURBO_REGISTER_ERRNO(turbo::kUnavailable, "UNAVAILABLE");
+TURBO_REGISTER_ERRNO(turbo::kDataLoss, "DATA_LOSS");
+
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
+
 std::string StatusCodeToString(StatusCode code) {
-  switch (code) {
-    case StatusCode::kOk:
-      return "OK";
-    case StatusCode::kCancelled:
-      return "CANCELLED";
-    case StatusCode::kUnknown:
-      return "UNKNOWN";
-    case StatusCode::kInvalidArgument:
-      return "INVALID_ARGUMENT";
-    case StatusCode::kDeadlineExceeded:
-      return "DEADLINE_EXCEEDED";
-    case StatusCode::kNotFound:
-      return "NOT_FOUND";
-    case StatusCode::kAlreadyExists:
-      return "ALREADY_EXISTS";
-    case StatusCode::kPermissionDenied:
-      return "PERMISSION_DENIED";
-    case StatusCode::kUnauthenticated:
-      return "UNAUTHENTICATED";
-    case StatusCode::kResourceExhausted:
-      return "RESOURCE_EXHAUSTED";
-    case StatusCode::kFailedPrecondition:
-      return "FAILED_PRECONDITION";
-    case StatusCode::kAborted:
-      return "ABORTED";
-    case StatusCode::kOutOfRange:
-      return "OUT_OF_RANGE";
-    case StatusCode::kUnimplemented:
-      return "UNIMPLEMENTED";
-    case StatusCode::kInternal:
-      return "INTERNAL";
-    case StatusCode::kUnavailable:
-      return "UNAVAILABLE";
-    case StatusCode::kDataLoss:
-      return "DATA_LOSS";
-    default:
-      return "";
-  }
+    return TurboError(code);
 }
 
 std::ostream& operator<<(std::ostream& os, StatusCode code) {
@@ -96,26 +79,26 @@ static turbo::optional<size_t> FindPayloadIndexByUrl(
 turbo::StatusCode MapToLocalCode(int value) {
   turbo::StatusCode code = static_cast<turbo::StatusCode>(value);
   switch (code) {
-    case turbo::StatusCode::kOk:
-    case turbo::StatusCode::kCancelled:
-    case turbo::StatusCode::kUnknown:
-    case turbo::StatusCode::kInvalidArgument:
-    case turbo::StatusCode::kDeadlineExceeded:
-    case turbo::StatusCode::kNotFound:
-    case turbo::StatusCode::kAlreadyExists:
-    case turbo::StatusCode::kPermissionDenied:
-    case turbo::StatusCode::kResourceExhausted:
-    case turbo::StatusCode::kFailedPrecondition:
-    case turbo::StatusCode::kAborted:
-    case turbo::StatusCode::kOutOfRange:
-    case turbo::StatusCode::kUnimplemented:
-    case turbo::StatusCode::kInternal:
-    case turbo::StatusCode::kUnavailable:
-    case turbo::StatusCode::kDataLoss:
-    case turbo::StatusCode::kUnauthenticated:
+    case turbo::kOk:
+    case turbo::kCancelled:
+    case turbo::kUnknown:
+    case turbo::kInvalidArgument:
+    case turbo::kDeadlineExceeded:
+    case turbo::kNotFound:
+    case turbo::kAlreadyExists:
+    case turbo::kPermissionDenied:
+    case turbo::kResourceExhausted:
+    case turbo::kFailedPrecondition:
+    case turbo::kAborted:
+    case turbo::kOutOfRange:
+    case turbo::kUnimplemented:
+    case turbo::kInternal:
+    case turbo::kUnavailable:
+    case turbo::kDataLoss:
+    case turbo::kUnauthenticated:
       return code;
     default:
-      return turbo::StatusCode::kUnknown;
+      return turbo::kUnknown;
   }
 }
 }  // namespace status_internal
@@ -224,11 +207,25 @@ void Status::UnrefNonInlined(uintptr_t rep) {
 
 Status::Status(turbo::StatusCode code, turbo::string_view msg)
     : rep_(CodeToInlinedRep(code)) {
-  if (code != turbo::StatusCode::kOk && !msg.empty()) {
-    rep_ = PointerToRep(new status_internal::StatusRep(code, msg, nullptr));
+  if (code != turbo::kOk && !msg.empty()) {
+    rep_ = PointerToRep(new status_internal::StatusRep(kTurboModuleIndex, code, msg, nullptr));
   }
 }
 
+Status::Status(unsigned short int index, turbo::StatusCode code, turbo::string_view msg)
+        : rep_(CodeToInlinedRep(index, code)) {
+    if (code != turbo::kOk && !msg.empty()) {
+        rep_ = PointerToRep(new status_internal::StatusRep(index, code, msg, nullptr));
+    }
+}
+
+/*
+template <typename... Args>
+Status::Status(unsigned short int module_index, turbo::StatusCode code, const FormatSpec<Args...>& format,
+       const Args&... args) {
+
+}
+*/
 int Status::raw_code() const {
   if (IsInlined(rep_)) {
     return static_cast<int>(InlinedRepToCode(rep_));
@@ -237,14 +234,23 @@ int Status::raw_code() const {
   return static_cast<int>(rep->code);
 }
 
+unsigned short int Status::index() const {
+    if (IsInlined(rep_)) {
+        return static_cast<unsigned short int>(InlinedRepToIndex(rep_));
+    }
+    status_internal::StatusRep* rep = RepToPointer(rep_);
+    return static_cast<unsigned short int>(rep->index);
+}
+
 turbo::StatusCode Status::code() const {
-  return status_internal::MapToLocalCode(raw_code());
+  //return status_internal::MapToLocalCode(raw_code());
+    return raw_code();
 }
 
 void Status::PrepareToModify() {
   TURBO_RAW_CHECK(!ok(), "PrepareToModify shouldn't be called on OK status.");
   if (IsInlined(rep_)) {
-    rep_ = PointerToRep(new status_internal::StatusRep(
+    rep_ = PointerToRep(new status_internal::StatusRep(static_cast<unsigned short int>(index()),
         static_cast<turbo::StatusCode>(raw_code()), turbo::string_view(),
         nullptr));
     return;
@@ -258,6 +264,7 @@ void Status::PrepareToModify() {
       payloads = turbo::make_unique<status_internal::Payloads>(*rep->payloads);
     }
     status_internal::StatusRep* const new_rep = new status_internal::StatusRep(
+            rep->index,
         rep->code, message(), std::move(payloads));
     rep_ = PointerToRep(new_rep);
     UnrefNonInlined(rep_i);
@@ -300,7 +307,14 @@ bool Status::EqualsSlow(const turbo::Status& a, const turbo::Status& b) {
 
 std::string Status::ToStringSlow(StatusToStringMode mode) const {
   std::string text;
-  turbo::StrAppend(&text, turbo::StatusCodeToString(code()), ": ", message());
+  const bool with_module = (mode & StatusToStringMode::kWithModule) ==
+                              StatusToStringMode::kWithModule;
+
+  if(with_module) {
+      turbo::StrAppend(&text, TurboModule(index()), "::", StatusCodeToString(code()), ": ", message());
+  } else {
+      turbo::StrAppend(&text,  StatusCodeToString(code()), ": ", message());
+  }
 
   const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
                       StatusToStringMode::kWithPayload;
@@ -328,137 +342,137 @@ std::ostream& operator<<(std::ostream& os, const Status& x) {
 }
 
 Status AbortedError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kAborted, message);
+  return Status(turbo::kAborted, message);
 }
 
 Status AlreadyExistsError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kAlreadyExists, message);
+  return Status(turbo::kAlreadyExists, message);
 }
 
 Status CancelledError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kCancelled, message);
+  return Status(turbo::kCancelled, message);
 }
 
 Status DataLossError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kDataLoss, message);
+  return Status(turbo::kDataLoss, message);
 }
 
 Status DeadlineExceededError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kDeadlineExceeded, message);
+  return Status(turbo::kDeadlineExceeded, message);
 }
 
 Status FailedPreconditionError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kFailedPrecondition, message);
+  return Status(turbo::kFailedPrecondition, message);
 }
 
 Status InternalError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kInternal, message);
+  return Status(turbo::kInternal, message);
 }
 
 Status InvalidArgumentError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kInvalidArgument, message);
+  return Status(turbo::kInvalidArgument, message);
 }
 
 Status NotFoundError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kNotFound, message);
+  return Status(turbo::kNotFound, message);
 }
 
 Status OutOfRangeError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kOutOfRange, message);
+  return Status(turbo::kOutOfRange, message);
 }
 
 Status PermissionDeniedError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kPermissionDenied, message);
+  return Status(turbo::kPermissionDenied, message);
 }
 
 Status ResourceExhaustedError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kResourceExhausted, message);
+  return Status(turbo::kResourceExhausted, message);
 }
 
 Status UnauthenticatedError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kUnauthenticated, message);
+  return Status(turbo::kUnauthenticated, message);
 }
 
 Status UnavailableError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kUnavailable, message);
+  return Status(turbo::kUnavailable, message);
 }
 
 Status UnimplementedError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kUnimplemented, message);
+  return Status(turbo::kUnimplemented, message);
 }
 
 Status UnknownError(turbo::string_view message) {
-  return Status(turbo::StatusCode::kUnknown, message);
+  return Status(turbo::kUnknown, message);
 }
 
 bool IsAborted(const Status& status) {
-  return status.code() == turbo::StatusCode::kAborted;
+  return status.code() == turbo::kAborted;
 }
 
 bool IsAlreadyExists(const Status& status) {
-  return status.code() == turbo::StatusCode::kAlreadyExists;
+  return status.code() == turbo::kAlreadyExists;
 }
 
 bool IsCancelled(const Status& status) {
-  return status.code() == turbo::StatusCode::kCancelled;
+  return status.code() == turbo::kCancelled;
 }
 
 bool IsDataLoss(const Status& status) {
-  return status.code() == turbo::StatusCode::kDataLoss;
+  return status.code() == turbo::kDataLoss;
 }
 
 bool IsDeadlineExceeded(const Status& status) {
-  return status.code() == turbo::StatusCode::kDeadlineExceeded;
+  return status.code() == turbo::kDeadlineExceeded;
 }
 
 bool IsFailedPrecondition(const Status& status) {
-  return status.code() == turbo::StatusCode::kFailedPrecondition;
+  return status.code() == turbo::kFailedPrecondition;
 }
 
 bool IsInternal(const Status& status) {
-  return status.code() == turbo::StatusCode::kInternal;
+  return status.code() == turbo::kInternal;
 }
 
 bool IsInvalidArgument(const Status& status) {
-  return status.code() == turbo::StatusCode::kInvalidArgument;
+  return status.code() == turbo::kInvalidArgument;
 }
 
 bool IsNotFound(const Status& status) {
-  return status.code() == turbo::StatusCode::kNotFound;
+  return status.code() == turbo::kNotFound;
 }
 
 bool IsOutOfRange(const Status& status) {
-  return status.code() == turbo::StatusCode::kOutOfRange;
+  return status.code() == turbo::kOutOfRange;
 }
 
 bool IsPermissionDenied(const Status& status) {
-  return status.code() == turbo::StatusCode::kPermissionDenied;
+  return status.code() == turbo::kPermissionDenied;
 }
 
 bool IsResourceExhausted(const Status& status) {
-  return status.code() == turbo::StatusCode::kResourceExhausted;
+  return status.code() == turbo::kResourceExhausted;
 }
 
 bool IsUnauthenticated(const Status& status) {
-  return status.code() == turbo::StatusCode::kUnauthenticated;
+  return status.code() == turbo::kUnauthenticated;
 }
 
 bool IsUnavailable(const Status& status) {
-  return status.code() == turbo::StatusCode::kUnavailable;
+  return status.code() == turbo::kUnavailable;
 }
 
 bool IsUnimplemented(const Status& status) {
-  return status.code() == turbo::StatusCode::kUnimplemented;
+  return status.code() == turbo::kUnimplemented;
 }
 
 bool IsUnknown(const Status& status) {
-  return status.code() == turbo::StatusCode::kUnknown;
+  return status.code() == turbo::kUnknown;
 }
 
 StatusCode ErrnoToStatusCode(int error_number) {
   switch (error_number) {
     case 0:
-      return StatusCode::kOk;
+      return kOk;
     case EINVAL:        // Invalid argument
     case ENAMETOOLONG:  // Filename too long
     case E2BIG:         // Argument list too long
@@ -472,10 +486,10 @@ StatusCode ErrnoToStatusCode(int error_number) {
     case ENOTTY:        // Inappropriate I/O control operation
     case EPROTOTYPE:    // Protocol wrong type for socket
     case ESPIPE:        // Invalid seek
-      return StatusCode::kInvalidArgument;
+      return kInvalidArgument;
     case ETIMEDOUT:  // Connection timed out
     case ETIME:      // Timer expired
-      return StatusCode::kDeadlineExceeded;
+      return kDeadlineExceeded;
     case ENODEV:  // No such device
     case ENOENT:  // No such file or directory
 #ifdef ENOMEDIUM
@@ -483,21 +497,21 @@ StatusCode ErrnoToStatusCode(int error_number) {
 #endif
     case ENXIO:  // No such device or address
     case ESRCH:  // No such process
-      return StatusCode::kNotFound;
+      return kNotFound;
     case EEXIST:         // File exists
     case EADDRNOTAVAIL:  // Address not available
     case EALREADY:       // Connection already in progress
 #ifdef ENOTUNIQ
     case ENOTUNIQ:  // Name not unique on network
 #endif
-      return StatusCode::kAlreadyExists;
+      return kAlreadyExists;
     case EPERM:   // Operation not permitted
     case EACCES:  // Permission denied
 #ifdef ENOKEY
     case ENOKEY:  // Required key not available
 #endif
     case EROFS:  // Read only file system
-      return StatusCode::kPermissionDenied;
+      return kPermissionDenied;
     case ENOTEMPTY:   // Directory not empty
     case EISDIR:      // Is a directory
     case ENOTDIR:     // Not a directory
@@ -524,7 +538,7 @@ StatusCode ErrnoToStatusCode(int error_number) {
 #ifdef EUNATCH
     case EUNATCH:  // Protocol driver not attached
 #endif
-      return StatusCode::kFailedPrecondition;
+      return kFailedPrecondition;
     case ENOSPC:  // No space left on device
 #ifdef EDQUOT
     case EDQUOT:  // Disk quota exceeded
@@ -539,14 +553,14 @@ StatusCode ErrnoToStatusCode(int error_number) {
 #ifdef EUSERS
     case EUSERS:  // Too many users
 #endif
-      return StatusCode::kResourceExhausted;
+      return kResourceExhausted;
 #ifdef ECHRNG
     case ECHRNG:  // Channel number out of range
 #endif
     case EFBIG:      // File too large
     case EOVERFLOW:  // Value too large to be stored in data type
     case ERANGE:     // Result too large
-      return StatusCode::kOutOfRange;
+      return kOutOfRange;
 #ifdef ENOPKG
     case ENOPKG:  // Package not installed
 #endif
@@ -561,7 +575,7 @@ StatusCode ErrnoToStatusCode(int error_number) {
     case ESOCKTNOSUPPORT:  // Socket type not supported
 #endif
     case EXDEV:  // Improper link
-      return StatusCode::kUnimplemented;
+      return kUnimplemented;
     case EAGAIN:  // Resource temporarily unavailable
 #ifdef ECOMM
     case ECOMM:  // Communication error on send
@@ -582,16 +596,16 @@ StatusCode ErrnoToStatusCode(int error_number) {
 #ifdef ENONET
     case ENONET:  // Machine is not on the network
 #endif
-      return StatusCode::kUnavailable;
+      return kUnavailable;
     case EDEADLK:  // Resource deadlock avoided
 #ifdef ESTALE
     case ESTALE:  // Stale file handle
 #endif
-      return StatusCode::kAborted;
+      return kAborted;
     case ECANCELED:  // Operation cancelled
-      return StatusCode::kCancelled;
+      return kCancelled;
     default:
-      return StatusCode::kUnknown;
+      return kUnknown;
   }
 }
 

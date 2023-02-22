@@ -11,27 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "statusor.h"
+#include "turbo/base/result_status.h"
 
-#include <cstdlib>
 #include <utility>
 
-#include "call_once.h"
-#include "status.h"
+#include "turbo/base/call_once.h"
 #include "turbo/base/internal/raw_logging.h"
+#include "turbo/base/status.h"
 #include "turbo/strings/str_cat.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-BadStatusOrAccess::BadStatusOrAccess(turbo::Status status)
+BadResultStatusAccess::BadResultStatusAccess(turbo::Status status)
     : status_(std::move(status)) {}
 
-BadStatusOrAccess::BadStatusOrAccess(const BadStatusOrAccess& other)
+BadResultStatusAccess::BadResultStatusAccess(const BadResultStatusAccess& other)
     : status_(other.status_) {}
 
-BadStatusOrAccess& BadStatusOrAccess::operator=(
-    const BadStatusOrAccess& other) {
+BadResultStatusAccess& BadResultStatusAccess::operator=(
+    const BadResultStatusAccess& other) {
   // Ensure assignment is correct regardless of whether this->InitWhat() has
   // already been called.
   other.InitWhat();
@@ -40,7 +39,7 @@ BadStatusOrAccess& BadStatusOrAccess::operator=(
   return *this;
 }
 
-BadStatusOrAccess& BadStatusOrAccess::operator=(BadStatusOrAccess&& other) {
+BadResultStatusAccess& BadResultStatusAccess::operator=(BadResultStatusAccess&& other) noexcept {
   // Ensure assignment is correct regardless of whether this->InitWhat() has
   // already been called.
   other.InitWhat();
@@ -49,27 +48,27 @@ BadStatusOrAccess& BadStatusOrAccess::operator=(BadStatusOrAccess&& other) {
   return *this;
 }
 
-BadStatusOrAccess::BadStatusOrAccess(BadStatusOrAccess&& other)
+BadResultStatusAccess::BadResultStatusAccess(BadResultStatusAccess&& other) noexcept
     : status_(std::move(other.status_)) {}
 
-const char* BadStatusOrAccess::what() const noexcept {
+const char* BadResultStatusAccess::what() const noexcept {
   InitWhat();
   return what_.c_str();
 }
 
-const turbo::Status& BadStatusOrAccess::status() const { return status_; }
+const turbo::Status& BadResultStatusAccess::status() const { return status_; }
 
-void BadStatusOrAccess::InitWhat() const {
+void BadResultStatusAccess::InitWhat() const {
   turbo::call_once(init_what_, [this] {
-    what_ = turbo::StrCat("Bad StatusOr access: ", status_.ToString());
+    what_ = turbo::StrCat("Bad ResultStatus access: ", status_.ToString());
   });
 }
 
-namespace internal_statusor {
+namespace result_status_internal {
 
 void Helper::HandleInvalidStatusCtorArg(turbo::Status* status) {
   const char* kMessage =
-      "An OK status is not a valid constructor argument to StatusOr<T>";
+      "An OK status is not a valid constructor argument to ResultStatus<T>";
 #ifdef NDEBUG
   TURBO_INTERNAL_LOG(ERROR, kMessage);
 #else
@@ -86,9 +85,9 @@ void Helper::Crash(const turbo::Status& status) {
                    status.ToString()));
 }
 
-void ThrowBadStatusOrAccess(turbo::Status status) {
+void ThrowBadResultStatusAccess(turbo::Status status) {
 #ifdef TURBO_HAVE_EXCEPTIONS
-  throw turbo::BadStatusOrAccess(std::move(status));
+  throw turbo::BadResultStatusAccess(std::move(status));
 #else
   TURBO_INTERNAL_LOG(
       FATAL,
@@ -98,6 +97,6 @@ void ThrowBadStatusOrAccess(turbo::Status status) {
 #endif
 }
 
-}  // namespace internal_statusor
+}  // namespace result_status_internal
 TURBO_NAMESPACE_END
 }  // namespace turbo

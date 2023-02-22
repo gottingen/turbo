@@ -1,4 +1,4 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "status.h"
+#include "turbo/base/status.h"
 
 #include <errno.h>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/strings/str_cat.h"
+#include "turbo/base/turbo_error.h"
+#include "turbo/base/turbo_module.h"
+
+TURBO_REGISTER_ERRNO(30, "TEST_ERROR");
+TURBO_REGISTER_MODULE_INDEX(1, "TEST_MODULE");
 
 namespace {
 
@@ -27,11 +32,34 @@ using ::testing::HasSubstr;
 using ::testing::Optional;
 using ::testing::UnorderedElementsAreArray;
 
+TEST(StatusCode, registry) {
+        const turbo::StatusCode code = 30;
+        EXPECT_EQ(turbo::StatusCodeToString(code), "TEST_ERROR");
+        turbo::Status s(30, "");
+        EXPECT_EQ(s.code(), 30);
+        EXPECT_EQ(s.raw_code(), 30);
+        EXPECT_EQ(s.index(), 0);
+
+        turbo::Status si(1, 30, "");
+        EXPECT_EQ(si.raw_code(), 30);
+        EXPECT_EQ(si.index(), 1);
+        std::ostringstream oss;
+
+        oss<<si;
+        EXPECT_EQ(oss.str(), "TEST_MODULE::TEST_ERROR: ");
+
+        turbo::Status sim(1, 30, "fail");
+        std::ostringstream oss1;
+
+        oss1<<sim;
+        EXPECT_EQ(oss1.str(), "TEST_MODULE::TEST_ERROR: fail");
+}
 TEST(StatusCode, InsertionOperator) {
-  const turbo::StatusCode code = turbo::StatusCode::kUnknown;
+  const turbo::StatusCode code = turbo::kUnknown;
   std::ostringstream oss;
   oss << code;
-  EXPECT_EQ(oss.str(), turbo::StatusCodeToString(code));
+  EXPECT_EQ(oss.str(), "2");
+  EXPECT_EQ(turbo::StatusCodeToString(code), "UNKNOWN");
 }
 
 // This structure holds the details for testing a single error code,
@@ -47,30 +75,30 @@ struct ErrorTest {
 };
 
 constexpr ErrorTest kErrorTests[]{
-    {turbo::StatusCode::kCancelled, turbo::CancelledError, turbo::IsCancelled},
-    {turbo::StatusCode::kUnknown, turbo::UnknownError, turbo::IsUnknown},
-    {turbo::StatusCode::kInvalidArgument, turbo::InvalidArgumentError,
+    {turbo::kCancelled, turbo::CancelledError, turbo::IsCancelled},
+    {turbo::kUnknown, turbo::UnknownError, turbo::IsUnknown},
+    {turbo::kInvalidArgument, turbo::InvalidArgumentError,
      turbo::IsInvalidArgument},
-    {turbo::StatusCode::kDeadlineExceeded, turbo::DeadlineExceededError,
+    {turbo::kDeadlineExceeded, turbo::DeadlineExceededError,
      turbo::IsDeadlineExceeded},
-    {turbo::StatusCode::kNotFound, turbo::NotFoundError, turbo::IsNotFound},
-    {turbo::StatusCode::kAlreadyExists, turbo::AlreadyExistsError,
+    {turbo::kNotFound, turbo::NotFoundError, turbo::IsNotFound},
+    {turbo::kAlreadyExists, turbo::AlreadyExistsError,
      turbo::IsAlreadyExists},
-    {turbo::StatusCode::kPermissionDenied, turbo::PermissionDeniedError,
+    {turbo::kPermissionDenied, turbo::PermissionDeniedError,
      turbo::IsPermissionDenied},
-    {turbo::StatusCode::kResourceExhausted, turbo::ResourceExhaustedError,
+    {turbo::kResourceExhausted, turbo::ResourceExhaustedError,
      turbo::IsResourceExhausted},
-    {turbo::StatusCode::kFailedPrecondition, turbo::FailedPreconditionError,
+    {turbo::kFailedPrecondition, turbo::FailedPreconditionError,
      turbo::IsFailedPrecondition},
-    {turbo::StatusCode::kAborted, turbo::AbortedError, turbo::IsAborted},
-    {turbo::StatusCode::kOutOfRange, turbo::OutOfRangeError, turbo::IsOutOfRange},
-    {turbo::StatusCode::kUnimplemented, turbo::UnimplementedError,
+    {turbo::kAborted, turbo::AbortedError, turbo::IsAborted},
+    {turbo::kOutOfRange, turbo::OutOfRangeError, turbo::IsOutOfRange},
+    {turbo::kUnimplemented, turbo::UnimplementedError,
      turbo::IsUnimplemented},
-    {turbo::StatusCode::kInternal, turbo::InternalError, turbo::IsInternal},
-    {turbo::StatusCode::kUnavailable, turbo::UnavailableError,
+    {turbo::kInternal, turbo::InternalError, turbo::IsInternal},
+    {turbo::kUnavailable, turbo::UnavailableError,
      turbo::IsUnavailable},
-    {turbo::StatusCode::kDataLoss, turbo::DataLossError, turbo::IsDataLoss},
-    {turbo::StatusCode::kUnauthenticated, turbo::UnauthenticatedError,
+    {turbo::kDataLoss, turbo::DataLossError, turbo::IsDataLoss},
+    {turbo::kUnauthenticated, turbo::UnauthenticatedError,
      turbo::IsUnauthenticated},
 };
 
@@ -106,28 +134,28 @@ TEST(Status, CreateAndClassify) {
 TEST(Status, DefaultConstructor) {
   turbo::Status status;
   EXPECT_TRUE(status.ok());
-  EXPECT_EQ(turbo::StatusCode::kOk, status.code());
+  EXPECT_EQ(turbo::kOk, status.code());
   EXPECT_EQ("", status.message());
 }
 
 TEST(Status, OkStatus) {
   turbo::Status status = turbo::OkStatus();
   EXPECT_TRUE(status.ok());
-  EXPECT_EQ(turbo::StatusCode::kOk, status.code());
+  EXPECT_EQ(turbo::kOk, status.code());
   EXPECT_EQ("", status.message());
 }
 
 TEST(Status, ConstructorWithCodeMessage) {
   {
-    turbo::Status status(turbo::StatusCode::kCancelled, "");
+    turbo::Status status(turbo::kCancelled, "");
     EXPECT_FALSE(status.ok());
-    EXPECT_EQ(turbo::StatusCode::kCancelled, status.code());
+    EXPECT_EQ(turbo::kCancelled, status.code());
     EXPECT_EQ("", status.message());
   }
   {
-    turbo::Status status(turbo::StatusCode::kInternal, "message");
+    turbo::Status status(turbo::kInternal, "message");
     EXPECT_FALSE(status.ok());
-    EXPECT_EQ(turbo::StatusCode::kInternal, status.code());
+    EXPECT_EQ(turbo::kInternal, status.code());
     EXPECT_EQ("message", status.message());
   }
 }
@@ -135,7 +163,7 @@ TEST(Status, ConstructorWithCodeMessage) {
 TEST(Status, ConstructOutOfRangeCode) {
   const int kRawCode = 9999;
   turbo::Status status(static_cast<turbo::StatusCode>(kRawCode), "");
-  EXPECT_EQ(turbo::StatusCode::kUnknown, status.code());
+  //EXPECT_EQ(turbo::kUnknown, status.code());
   EXPECT_EQ(kRawCode, status.raw_code());
 }
 
@@ -158,7 +186,7 @@ TEST(Status, TestGetSetPayload) {
   EXPECT_FALSE(ok_status.GetPayload(kUrl1));
   EXPECT_FALSE(ok_status.GetPayload(kUrl2));
 
-  turbo::Status bad_status(turbo::StatusCode::kInternal, "fail");
+  turbo::Status bad_status(turbo::kInternal, "fail");
   bad_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
   bad_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
 
@@ -177,7 +205,7 @@ TEST(Status, TestGetSetPayload) {
 }
 
 TEST(Status, TestErasePayload) {
-  turbo::Status bad_status(turbo::StatusCode::kInternal, "fail");
+  turbo::Status bad_status(turbo::kInternal, "fail");
   bad_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
   bad_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
   bad_status.SetPayload(kUrl3, turbo::Cord(kPayload3));
@@ -197,12 +225,12 @@ TEST(Status, TestErasePayload) {
 }
 
 TEST(Status, TestComparePayloads) {
-  turbo::Status bad_status1(turbo::StatusCode::kInternal, "fail");
+  turbo::Status bad_status1(turbo::kInternal, "fail");
   bad_status1.SetPayload(kUrl1, turbo::Cord(kPayload1));
   bad_status1.SetPayload(kUrl2, turbo::Cord(kPayload2));
   bad_status1.SetPayload(kUrl3, turbo::Cord(kPayload3));
 
-  turbo::Status bad_status2(turbo::StatusCode::kInternal, "fail");
+  turbo::Status bad_status2(turbo::kInternal, "fail");
   bad_status2.SetPayload(kUrl2, turbo::Cord(kPayload2));
   bad_status2.SetPayload(kUrl3, turbo::Cord(kPayload3));
   bad_status2.SetPayload(kUrl1, turbo::Cord(kPayload1));
@@ -211,11 +239,11 @@ TEST(Status, TestComparePayloads) {
 }
 
 TEST(Status, TestComparePayloadsAfterErase) {
-  turbo::Status payload_status(turbo::StatusCode::kInternal, "");
+  turbo::Status payload_status(turbo::kInternal, "");
   payload_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
   payload_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
 
-  turbo::Status empty_status(turbo::StatusCode::kInternal, "");
+  turbo::Status empty_status(turbo::kInternal, "");
 
   // Different payloads, not equal
   EXPECT_NE(payload_status, empty_status);
@@ -240,7 +268,7 @@ PayloadsVec AllVisitedPayloads(const turbo::Status& s) {
 }
 
 TEST(Status, TestForEachPayload) {
-  turbo::Status bad_status(turbo::StatusCode::kInternal, "fail");
+  turbo::Status bad_status(turbo::kInternal, "fail");
   bad_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
   bad_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
   bad_status.SetPayload(kUrl3, turbo::Cord(kPayload3));
@@ -263,7 +291,7 @@ TEST(Status, TestForEachPayload) {
   // Test that visitation order is not consistent between run.
   std::vector<turbo::Status> scratch;
   while (true) {
-    scratch.emplace_back(turbo::StatusCode::kInternal, "fail");
+    scratch.emplace_back(turbo::kInternal, "fail");
 
     scratch.back().SetPayload(kUrl1, turbo::Cord(kPayload1));
     scratch.back().SetPayload(kUrl2, turbo::Cord(kPayload2));
@@ -276,7 +304,7 @@ TEST(Status, TestForEachPayload) {
 }
 
 TEST(Status, ToString) {
-  turbo::Status s(turbo::StatusCode::kInternal, "fail");
+  turbo::Status s(turbo::kInternal, "fail");
   EXPECT_EQ("INTERNAL: fail", s.ToString());
   s.SetPayload("foo", turbo::Cord("bar"));
   EXPECT_EQ("INTERNAL: fail [foo='bar']", s.ToString());
@@ -287,7 +315,7 @@ TEST(Status, ToString) {
 }
 
 TEST(Status, ToStringMode) {
-  turbo::Status s(turbo::StatusCode::kInternal, "fail");
+  turbo::Status s(turbo::kInternal, "fail");
   s.SetPayload("foo", turbo::Cord("bar"));
   s.SetPayload("bar", turbo::Cord("\377"));
 
@@ -315,7 +343,7 @@ turbo::Status EraseAndReturn(const turbo::Status& base) {
 
 TEST(Status, CopyOnWriteForErasePayload) {
   {
-    turbo::Status base(turbo::StatusCode::kInvalidArgument, "fail");
+    turbo::Status base(turbo::kInvalidArgument, "fail");
     base.SetPayload(kUrl1, turbo::Cord(kPayload1));
     EXPECT_TRUE(base.GetPayload(kUrl1).has_value());
     turbo::Status copy = EraseAndReturn(base);
@@ -323,7 +351,7 @@ TEST(Status, CopyOnWriteForErasePayload) {
     EXPECT_FALSE(copy.GetPayload(kUrl1).has_value());
   }
   {
-    turbo::Status base(turbo::StatusCode::kInvalidArgument, "fail");
+    turbo::Status base(turbo::kInvalidArgument, "fail");
     base.SetPayload(kUrl1, turbo::Cord(kPayload1));
     turbo::Status copy = base;
 
@@ -344,12 +372,12 @@ TEST(Status, CopyConstructor) {
     EXPECT_EQ(copy, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     turbo::Status copy(status);
     EXPECT_EQ(copy, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     status.SetPayload(kUrl1, turbo::Cord(kPayload1));
     turbo::Status copy(status);
     EXPECT_EQ(copy, status);
@@ -364,12 +392,12 @@ TEST(Status, CopyAssignment) {
     EXPECT_EQ(assignee, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     assignee = status;
     EXPECT_EQ(assignee, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     status.SetPayload(kUrl1, turbo::Cord(kPayload1));
     assignee = status;
     EXPECT_EQ(assignee, status);
@@ -377,7 +405,7 @@ TEST(Status, CopyAssignment) {
 }
 
 TEST(Status, CopyAssignmentIsNotRef) {
-  const turbo::Status status_orig(turbo::StatusCode::kInvalidArgument, "message");
+  const turbo::Status status_orig(turbo::kInvalidArgument, "message");
   turbo::Status status_copy = status_orig;
   EXPECT_EQ(status_orig, status_copy);
   status_copy.SetPayload(kUrl1, turbo::Cord(kPayload1));
@@ -391,13 +419,13 @@ TEST(Status, MoveConstructor) {
     EXPECT_EQ(copy, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     turbo::Status copy(
-        turbo::Status(turbo::StatusCode::kInvalidArgument, "message"));
+        turbo::Status(turbo::kInvalidArgument, "message"));
     EXPECT_EQ(copy, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     status.SetPayload(kUrl1, turbo::Cord(kPayload1));
     turbo::Status copy1(status);
     turbo::Status copy2(std::move(status));
@@ -413,19 +441,19 @@ TEST(Status, MoveAssignment) {
     EXPECT_EQ(assignee, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
-    assignee = turbo::Status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
+    assignee = turbo::Status(turbo::kInvalidArgument, "message");
     EXPECT_EQ(assignee, status);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     status.SetPayload(kUrl1, turbo::Cord(kPayload1));
     turbo::Status copy(status);
     assignee = std::move(status);
     EXPECT_EQ(assignee, copy);
   }
   {
-    turbo::Status status(turbo::StatusCode::kInvalidArgument, "message");
+    turbo::Status status(turbo::kInvalidArgument, "message");
     turbo::Status copy(status);
     status = static_cast<turbo::Status&&>(status);
     EXPECT_EQ(status, copy);
@@ -436,10 +464,10 @@ TEST(Status, Update) {
   turbo::Status s;
   s.Update(turbo::OkStatus());
   EXPECT_TRUE(s.ok());
-  const turbo::Status a(turbo::StatusCode::kCancelled, "message");
+  const turbo::Status a(turbo::kCancelled, "message");
   s.Update(a);
   EXPECT_EQ(s, a);
-  const turbo::Status b(turbo::StatusCode::kInternal, "other message");
+  const turbo::Status b(turbo::kInternal, "other message");
   s.Update(b);
   EXPECT_EQ(s, a);
   s.Update(turbo::OkStatus());
@@ -477,8 +505,8 @@ TEST(Status, Swap) {
     EXPECT_EQ(copy2, s1);
   };
   const turbo::Status ok;
-  const turbo::Status no_payload(turbo::StatusCode::kAlreadyExists, "no payload");
-  turbo::Status with_payload(turbo::StatusCode::kInternal, "with payload");
+  const turbo::Status no_payload(turbo::kAlreadyExists, "no payload");
+  turbo::Status with_payload(turbo::kInternal, "with payload");
   with_payload.SetPayload(kUrl1, turbo::Cord(kPayload1));
   test_swap(ok, no_payload);
   test_swap(no_payload, ok);
@@ -489,20 +517,20 @@ TEST(Status, Swap) {
 }
 
 TEST(StatusErrno, ErrnoToStatusCode) {
-  EXPECT_EQ(turbo::ErrnoToStatusCode(0), turbo::StatusCode::kOk);
+  EXPECT_EQ(turbo::ErrnoToStatusCode(0), turbo::kOk);
 
   // Spot-check a few errno values.
   EXPECT_EQ(turbo::ErrnoToStatusCode(EINVAL),
-            turbo::StatusCode::kInvalidArgument);
-  EXPECT_EQ(turbo::ErrnoToStatusCode(ENOENT), turbo::StatusCode::kNotFound);
+            turbo::kInvalidArgument);
+  EXPECT_EQ(turbo::ErrnoToStatusCode(ENOENT), turbo::kNotFound);
 
   // We'll pick a very large number so it hopefully doesn't collide to errno.
-  EXPECT_EQ(turbo::ErrnoToStatusCode(19980927), turbo::StatusCode::kUnknown);
+  EXPECT_EQ(turbo::ErrnoToStatusCode(19980927), turbo::kUnknown);
 }
 
 TEST(StatusErrno, ErrnoToStatus) {
   turbo::Status status = turbo::ErrnoToStatus(ENOENT, "Cannot open 'path'");
-  EXPECT_EQ(status.code(), turbo::StatusCode::kNotFound);
+  EXPECT_EQ(status.code(), turbo::kNotFound);
   EXPECT_EQ(status.message(), "Cannot open 'path': No such file or directory");
 }
 

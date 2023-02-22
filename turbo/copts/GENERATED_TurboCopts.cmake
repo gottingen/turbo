@@ -77,6 +77,7 @@ list(APPEND TURBO_GCC_TEST_FLAGS
     "-Wno-unused-function"
     "-Wno-unused-parameter"
     "-Wno-unused-private-field"
+    "-Wno-noexcept-type"
 )
 
 list(APPEND TURBO_LLVM_FLAGS

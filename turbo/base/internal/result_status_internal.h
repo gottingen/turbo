@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef TURBO_BASE_INTERNAL_STATUSOR_INTERNAL_H_
-#define TURBO_BASE_INTERNAL_STATUSOR_INTERNAL_H_
+#ifndef TURBO_BASE_INTERNAL_RESULT_STATUS_INTERNAL_H_
+#define TURBO_BASE_INTERNAL_RESULT_STATUS_INTERNAL_H_
 
 #include <type_traits>
 #include <utility>
@@ -26,110 +26,110 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
 template <typename T>
-class TURBO_MUST_USE_RESULT StatusOr;
+class TURBO_MUST_USE_RESULT ResultStatus;
 
-namespace internal_statusor {
+namespace result_status_internal {
 
-// Detects whether `U` has conversion operator to `StatusOr<T>`, i.e. `operator
-// StatusOr<T>()`.
+// Detects whether `U` has conversion operator to `ResultStatus<T>`, i.e. `operator
+// ResultStatus<T>()`.
 template <typename T, typename U, typename = void>
-struct HasConversionOperatorToStatusOr : std::false_type {};
+struct HasConversionOperatorToResultStatus : std::false_type {};
 
 template <typename T, typename U>
-void test(char (*)[sizeof(std::declval<U>().operator turbo::StatusOr<T>())]);
+void test(char (*)[sizeof(std::declval<U>().operator turbo::ResultStatus<T>())]);
 
 template <typename T, typename U>
-struct HasConversionOperatorToStatusOr<T, U, decltype(test<T, U>(0))>
+struct HasConversionOperatorToResultStatus<T, U, decltype(test<T, U>(0))>
     : std::true_type {};
 
-// Detects whether `T` is constructible or convertible from `StatusOr<U>`.
+// Detects whether `T` is constructible or convertible from `ResultStatus<U>`.
 template <typename T, typename U>
-using IsConstructibleOrConvertibleFromStatusOr =
-    turbo::disjunction<std::is_constructible<T, StatusOr<U>&>,
-                      std::is_constructible<T, const StatusOr<U>&>,
-                      std::is_constructible<T, StatusOr<U>&&>,
-                      std::is_constructible<T, const StatusOr<U>&&>,
-                      std::is_convertible<StatusOr<U>&, T>,
-                      std::is_convertible<const StatusOr<U>&, T>,
-                      std::is_convertible<StatusOr<U>&&, T>,
-                      std::is_convertible<const StatusOr<U>&&, T>>;
+using IsConstructibleOrConvertibleFromResultStatus =
+    turbo::disjunction<std::is_constructible<T, ResultStatus<U>&>,
+                      std::is_constructible<T, const ResultStatus<U>&>,
+                      std::is_constructible<T, ResultStatus<U>&&>,
+                      std::is_constructible<T, const ResultStatus<U>&&>,
+                      std::is_convertible<ResultStatus<U>&, T>,
+                      std::is_convertible<const ResultStatus<U>&, T>,
+                      std::is_convertible<ResultStatus<U>&&, T>,
+                      std::is_convertible<const ResultStatus<U>&&, T>>;
 
 // Detects whether `T` is constructible or convertible or assignable from
-// `StatusOr<U>`.
+// `ResultStatus<U>`.
 template <typename T, typename U>
-using IsConstructibleOrConvertibleOrAssignableFromStatusOr =
-    turbo::disjunction<IsConstructibleOrConvertibleFromStatusOr<T, U>,
-                      std::is_assignable<T&, StatusOr<U>&>,
-                      std::is_assignable<T&, const StatusOr<U>&>,
-                      std::is_assignable<T&, StatusOr<U>&&>,
-                      std::is_assignable<T&, const StatusOr<U>&&>>;
+using IsConstructibleOrConvertibleOrAssignableFromResultStatus =
+    turbo::disjunction<IsConstructibleOrConvertibleFromResultStatus<T, U>,
+                      std::is_assignable<T&, ResultStatus<U>&>,
+                      std::is_assignable<T&, const ResultStatus<U>&>,
+                      std::is_assignable<T&, ResultStatus<U>&&>,
+                      std::is_assignable<T&, const ResultStatus<U>&&>>;
 
-// Detects whether direct initializing `StatusOr<T>` from `U` is ambiguous, i.e.
-// when `U` is `StatusOr<V>` and `T` is constructible or convertible from `V`.
+// Detects whether direct initializing `ResultStatus<T>` from `U` is ambiguous, i.e.
+// when `U` is `ResultStatus<V>` and `T` is constructible or convertible from `V`.
 template <typename T, typename U>
 struct IsDirectInitializationAmbiguous
     : public turbo::conditional_t<
-          std::is_same<turbo::remove_cv_t<turbo::remove_reference_t<U>>,
+          std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
           IsDirectInitializationAmbiguous<
-              T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>> {};
+              T, std::remove_cv_t<std::remove_reference_t<U>>>> {};
 
 template <typename T, typename V>
-struct IsDirectInitializationAmbiguous<T, turbo::StatusOr<V>>
-    : public IsConstructibleOrConvertibleFromStatusOr<T, V> {};
+struct IsDirectInitializationAmbiguous<T, turbo::ResultStatus<V>>
+    : public IsConstructibleOrConvertibleFromResultStatus<T, V> {};
 
 // Checks against the constraints of the direction initialization, i.e. when
-// `StatusOr<T>::StatusOr(U&&)` should participate in overload resolution.
+// `ResultStatus<T>::ResultStatus(U&&)` should participate in overload resolution.
 template <typename T, typename U>
 using IsDirectInitializationValid = turbo::disjunction<
     // Short circuits if T is basically U.
-    std::is_same<T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+    std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
     turbo::negation<turbo::disjunction<
-        std::is_same<turbo::StatusOr<T>,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+        std::is_same<turbo::ResultStatus<T>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::in_place_t,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         IsDirectInitializationAmbiguous<T, U>>>>;
 
-// This trait detects whether `StatusOr<T>::operator=(U&&)` is ambiguous, which
+// This trait detects whether `ResultStatus<T>::operator=(U&&)` is ambiguous, which
 // is equivalent to whether all the following conditions are met:
-// 1. `U` is `StatusOr<V>`.
+// 1. `U` is `ResultStatus<V>`.
 // 2. `T` is constructible and assignable from `V`.
-// 3. `T` is constructible and assignable from `U` (i.e. `StatusOr<V>`).
+// 3. `T` is constructible and assignable from `U` (i.e. `ResultStatus<V>`).
 // For example, the following code is considered ambiguous:
-// (`T` is `bool`, `U` is `StatusOr<bool>`, `V` is `bool`)
-//   StatusOr<bool> s1 = true;  // s1.ok() && s1.ValueOrDie() == true
-//   StatusOr<bool> s2 = false;  // s2.ok() && s2.ValueOrDie() == false
+// (`T` is `bool`, `U` is `ResultStatus<bool>`, `V` is `bool`)
+//   ResultStatus<bool> s1 = true;  // s1.ok() && s1.ValueOrDie() == true
+//   ResultStatus<bool> s2 = false;  // s2.ok() && s2.ValueOrDie() == false
 //   s1 = s2;  // ambiguous, `s1 = s2.ValueOrDie()` or `s1 = bool(s2)`?
 template <typename T, typename U>
 struct IsForwardingAssignmentAmbiguous
     : public turbo::conditional_t<
-          std::is_same<turbo::remove_cv_t<turbo::remove_reference_t<U>>,
+          std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
           IsForwardingAssignmentAmbiguous<
-              T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>> {};
+              T, std::remove_cv_t<std::remove_reference_t<U>>>> {};
 
 template <typename T, typename U>
-struct IsForwardingAssignmentAmbiguous<T, turbo::StatusOr<U>>
-    : public IsConstructibleOrConvertibleOrAssignableFromStatusOr<T, U> {};
+struct IsForwardingAssignmentAmbiguous<T, turbo::ResultStatus<U>>
+    : public IsConstructibleOrConvertibleOrAssignableFromResultStatus<T, U> {};
 
 // Checks against the constraints of the forwarding assignment, i.e. whether
-// `StatusOr<T>::operator(U&&)` should participate in overload resolution.
+// `ResultStatus<T>::operator(U&&)` should participate in overload resolution.
 template <typename T, typename U>
 using IsForwardingAssignmentValid = turbo::disjunction<
     // Short circuits if T is basically U.
-    std::is_same<T, turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+    std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
     turbo::negation<turbo::disjunction<
-        std::is_same<turbo::StatusOr<T>,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+        std::is_same<turbo::ResultStatus<T>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::in_place_t,
-                     turbo::remove_cv_t<turbo::remove_reference_t<U>>>,
+                     std::remove_cv_t<std::remove_reference_t<U>>>,
         IsForwardingAssignmentAmbiguous<T, U>>>>;
 
 class Helper {
@@ -151,14 +151,14 @@ TURBO_ATTRIBUTE_NONNULL(1) void PlacementNew(void* p, Args&&... args) {
 // We move all this to a base class to allow mixing with the appropriate
 // TraitsBase specialization.
 template <typename T>
-class StatusOrData {
+class ResultStatusData {
   template <typename U>
-  friend class StatusOrData;
+  friend class ResultStatusData;
 
  public:
-  StatusOrData() = delete;
+  ResultStatusData() = delete;
 
-  StatusOrData(const StatusOrData& other) {
+  ResultStatusData(const ResultStatusData& other) {
     if (other.ok()) {
       MakeValue(other.data_);
       MakeStatus();
@@ -167,7 +167,7 @@ class StatusOrData {
     }
   }
 
-  StatusOrData(StatusOrData&& other) noexcept {
+  ResultStatusData(ResultStatusData&& other) noexcept {
     if (other.ok()) {
       MakeValue(std::move(other.data_));
       MakeStatus();
@@ -177,7 +177,7 @@ class StatusOrData {
   }
 
   template <typename U>
-  explicit StatusOrData(const StatusOrData<U>& other) {
+  explicit ResultStatusData(const ResultStatusData<U>& other) {
     if (other.ok()) {
       MakeValue(other.data_);
       MakeStatus();
@@ -187,7 +187,7 @@ class StatusOrData {
   }
 
   template <typename U>
-  explicit StatusOrData(StatusOrData<U>&& other) {
+  explicit ResultStatusData(ResultStatusData<U>&& other) {
     if (other.ok()) {
       MakeValue(std::move(other.data_));
       MakeStatus();
@@ -197,26 +197,26 @@ class StatusOrData {
   }
 
   template <typename... Args>
-  explicit StatusOrData(turbo::in_place_t, Args&&... args)
+  explicit ResultStatusData(turbo::in_place_t, Args&&... args)
       : data_(std::forward<Args>(args)...) {
     MakeStatus();
   }
 
-  explicit StatusOrData(const T& value) : data_(value) {
+  explicit ResultStatusData(const T& value) : data_(value) {
     MakeStatus();
   }
-  explicit StatusOrData(T&& value) : data_(std::move(value)) {
+  explicit ResultStatusData(T&& value) : data_(std::move(value)) {
     MakeStatus();
   }
 
   template <typename U,
             turbo::enable_if_t<std::is_constructible<turbo::Status, U&&>::value,
                               int> = 0>
-  explicit StatusOrData(U&& v) : status_(std::forward<U>(v)) {
+  explicit ResultStatusData(U&& v) : status_(std::forward<U>(v)) {
     EnsureNotOk();
   }
 
-  StatusOrData& operator=(const StatusOrData& other) {
+  ResultStatusData& operator=(const ResultStatusData& other) {
     if (this == &other) return *this;
     if (other.ok())
       Assign(other.data_);
@@ -225,7 +225,7 @@ class StatusOrData {
     return *this;
   }
 
-  StatusOrData& operator=(StatusOrData&& other) {
+  ResultStatusData& operator=(ResultStatusData&& other) {
     if (this == &other) return *this;
     if (other.ok())
       Assign(std::move(other.data_));
@@ -234,7 +234,7 @@ class StatusOrData {
     return *this;
   }
 
-  ~StatusOrData() {
+  ~ResultStatusData() {
     if (ok()) {
       status_.~Status();
       data_.~T();
@@ -297,21 +297,21 @@ class StatusOrData {
   // argument.
   template <typename... Arg>
   void MakeValue(Arg&&... arg) {
-    internal_statusor::PlacementNew<T>(&dummy_, std::forward<Arg>(arg)...);
+    result_status_internal::PlacementNew<T>(&dummy_, std::forward<Arg>(arg)...);
   }
 
   // Construct the status (ie. status_) through placement new with the passed
   // argument.
   template <typename... Args>
   void MakeStatus(Args&&... args) {
-    internal_statusor::PlacementNew<Status>(&status_,
+    result_status_internal::PlacementNew<Status>(&status_,
                                             std::forward<Args>(args)...);
   }
 };
 
 // Helper base classes to allow implicitly deleted constructors and assignment
-// operators in `StatusOr`. For example, `CopyCtorBase` will explicitly delete
-// the copy constructor when T is not copy constructible and `StatusOr` will
+// operators in `ResultStatus`. For example, `CopyCtorBase` will explicitly delete
+// the copy constructor when T is not copy constructible and `ResultStatus` will
 // inherit that behavior implicitly.
 template <typename T, bool = std::is_copy_constructible<T>::value>
 struct CopyCtorBase {
@@ -387,10 +387,10 @@ struct MoveAssignBase<T, false> {
   MoveAssignBase& operator=(MoveAssignBase&&) = delete;
 };
 
-TURBO_ATTRIBUTE_NORETURN void ThrowBadStatusOrAccess(turbo::Status status);
+TURBO_ATTRIBUTE_NORETURN void ThrowBadResultStatusAccess(turbo::Status status);
 
-}  // namespace internal_statusor
+}  // namespace result_status_internal
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_BASE_INTERNAL_STATUSOR_INTERNAL_H_
+#endif  // TURBO_BASE_INTERNAL_RESULT_STATUS_INTERNAL_H_

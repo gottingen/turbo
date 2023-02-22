@@ -1,4 +1,4 @@
-// Copyright 2019 The Turbo Authors.
+// Copyright 2022 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 // errors in C++, and is used to represent error state in both in-process
 // library calls as well as RPC calls. Some of these errors may be recoverable,
 // but others may not. Most functions that can produce a recoverable error
-// should be designed to return an `turbo::Status` (or `turbo::StatusOr`).
+// should be designed to return an `turbo::Status` (or `turbo::ResultStatus`).
 //
 // Example:
 //
@@ -56,53 +56,56 @@
 #include <utility>
 
 #include "turbo/meta/function_ref.h"
+#include "turbo/meta/optional.h"
 #include "turbo/base/internal/status_internal.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/optional.h"
+#include "turbo/strings/str_format.h"
+#include "turbo/base/turbo_error.h"
+#include "turbo/base/turbo_module.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-// turbo::StatusCode
-//
-// An `turbo::StatusCode` is an enumerated type indicating either no error ("OK")
-// or an error condition. In most cases, an `turbo::Status` indicates a
-// recoverable error, and the purpose of signalling an error is to indicate what
-// action to take in response to that error. These error codes map to the proto
-// RPC error codes indicated in https://cloud.google.com/apis/design/errors.
-//
-// The errors listed below are the canonical errors associated with
-// `turbo::Status` and are used throughout the codebase. As a result, these
-// error codes are somewhat generic.
-//
-// In general, try to return the most specific error that applies if more than
-// one error may pertain. For example, prefer `kOutOfRange` over
-// `kFailedPrecondition` if both codes apply. Similarly prefer `kNotFound` or
-// `kAlreadyExists` over `kFailedPrecondition`.
-//
-// Because these errors may cross RPC boundaries, these codes are tied to the
-// `google.rpc.Code` definitions within
-// https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto
-// The string value of these RPC codes is denoted within each enum below.
-//
-// If your error handling code requires more context, you can attach payloads
-// to your status. See `turbo::Status::SetPayload()` and
-// `turbo::Status::GetPayload()` below.
-enum class StatusCode : int {
+    // turbo::StatusCode
+    //
+    // An `turbo::StatusCode` is an enumerated type indicating either no error ("OK")
+    // or an error condition. In most cases, an `turbo::Status` indicates a
+    // recoverable error, and the purpose of signalling an error is to indicate what
+    // action to take in response to that error. These error codes map to the proto
+    // RPC error codes indicated in https://cloud.google.com/apis/design/errors.
+    //
+    // The errors listed below are the canonical errors associated with
+    // `turbo::Status` and are used throughout the codebase. As a result, these
+    // error codes are somewhat generic.
+    //
+    // In general, try to return the most specific error that applies if more than
+    // one error may pertain. For example, prefer `kOutOfRange` over
+    // `kFailedPrecondition` if both codes apply. Similarly prefer `kNotFound` or
+    // `kAlreadyExists` over `kFailedPrecondition`.
+    //
+    // Because these errors may cross RPC boundaries, these codes are tied to the
+    // `google.rpc.Code` definitions within
+    // https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto
+    // The string value of these RPC codes is denoted within each enum below.
+    //
+    // If your error handling code requires more context, you can attach payloads
+    // to your status. See `turbo::Status::SetPayload()` and
+    // `turbo::Status::GetPayload()` below.
+    ///  using StatusCode =  int;
   // StatusCode::kOk
   //
   // kOK (gRPC code "OK") does not indicate an error; this value is returned on
   // success. It is typical to check for this value before proceeding on any
   // given call across an API or RPC boundary. To check this value, use the
   // `turbo::Status::ok()` member function rather than inspecting the raw code.
-  kOk = 0,
+  static constexpr StatusCode kOk = 0;
 
   // StatusCode::kCancelled
   //
   // kCancelled (gRPC code "CANCELLED") indicates the operation was cancelled,
   // typically by the caller.
-  kCancelled = 1,
+  static constexpr StatusCode kCancelled = 1;
 
   // StatusCode::kUnknown
   //
@@ -110,7 +113,7 @@ enum class StatusCode : int {
   // general, more specific errors should be raised, if possible. Errors raised
   // by APIs that do not return enough error information may be converted to
   // this error.
-  kUnknown = 2,
+  static constexpr StatusCode kUnknown = 2;
 
   // StatusCode::kInvalidArgument
   //
@@ -120,7 +123,7 @@ enum class StatusCode : int {
   // the arguments themselves. Errors with validly formed arguments that may
   // cause errors with the state of the receiving system should be denoted with
   // `kFailedPrecondition` instead.
-  kInvalidArgument = 3,
+  static constexpr StatusCode kInvalidArgument = 3;
 
   // StatusCode::kDeadlineExceeded
   //
@@ -129,7 +132,7 @@ enum class StatusCode : int {
   // state within a system, this error may be returned even if the operation has
   // completed successfully. For example, a successful response from a server
   // could have been delayed long enough for the deadline to expire.
-  kDeadlineExceeded = 4,
+  static constexpr StatusCode kDeadlineExceeded = 4;
 
   // StatusCode::kNotFound
   //
@@ -140,14 +143,14 @@ enum class StatusCode : int {
   // users, such as during a gradual feature rollout or undocumented allow list.
   // If a request should be denied for specific sets of users, such as through
   // user-based access control, use `kPermissionDenied` instead.
-  kNotFound = 5,
+  static constexpr StatusCode kNotFound = 5;
 
   // StatusCode::kAlreadyExists
   //
   // kAlreadyExists (gRPC code "ALREADY_EXISTS") indicates that the entity a
   // caller attempted to create (such as a file or directory) is already
   // present.
-  kAlreadyExists = 6,
+  static constexpr StatusCode kAlreadyExists = 6;
 
   // StatusCode::kPermissionDenied
   //
@@ -161,14 +164,14 @@ enum class StatusCode : int {
   // some resource. Instead, use `kResourceExhausted` for those errors.
   // `kPermissionDenied` must not be used if the caller cannot be identified.
   // Instead, use `kUnauthenticated` for those errors.
-  kPermissionDenied = 7,
+  static constexpr StatusCode kPermissionDenied = 7;
 
   // StatusCode::kResourceExhausted
   //
   // kResourceExhausted (gRPC code "RESOURCE_EXHAUSTED") indicates some resource
   // has been exhausted, perhaps a per-user quota, or perhaps the entire file
   // system is out of space.
-  kResourceExhausted = 8,
+  static constexpr StatusCode kResourceExhausted = 8;
 
   // StatusCode::kFailedPrecondition
   //
@@ -189,7 +192,7 @@ enum class StatusCode : int {
   //      fails because the directory is non-empty, `kFailedPrecondition`
   //      should be returned since the client should not retry unless
   //      the files are deleted from the directory.
-  kFailedPrecondition = 9,
+  static constexpr StatusCode kFailedPrecondition = 9;
 
   // StatusCode::kAborted
   //
@@ -199,7 +202,7 @@ enum class StatusCode : int {
   //
   // See the guidelines above for deciding between `kFailedPrecondition`,
   // `kAborted`, and `kUnavailable`.
-  kAborted = 10,
+  static constexpr StatusCode kAborted = 10;
 
   // StatusCode::kOutOfRange
   //
@@ -219,21 +222,21 @@ enum class StatusCode : int {
   // error) when it applies so that callers who are iterating through
   // a space can easily look for an `kOutOfRange` error to detect when
   // they are done.
-  kOutOfRange = 11,
+  static constexpr StatusCode kOutOfRange = 11;
 
   // StatusCode::kUnimplemented
   //
   // kUnimplemented (gRPC code "UNIMPLEMENTED") indicates the operation is not
   // implemented or supported in this service. In this case, the operation
   // should not be re-attempted.
-  kUnimplemented = 12,
+  static constexpr StatusCode kUnimplemented = 12;
 
   // StatusCode::kInternal
   //
   // kInternal (gRPC code "INTERNAL") indicates an internal error has occurred
   // and some invariants expected by the underlying system have not been
   // satisfied. This error code is reserved for serious errors.
-  kInternal = 13,
+  static constexpr StatusCode kInternal = 13;
 
   // StatusCode::kUnavailable
   //
@@ -244,21 +247,21 @@ enum class StatusCode : int {
   //
   // See the guidelines above for deciding between `kFailedPrecondition`,
   // `kAborted`, and `kUnavailable`.
-  kUnavailable = 14,
+  static constexpr StatusCode kUnavailable = 14;
 
   // StatusCode::kDataLoss
   //
   // kDataLoss (gRPC code "DATA_LOSS") indicates that unrecoverable data loss or
   // corruption has occurred. As this error is serious, proper alerting should
   // be attached to errors such as this.
-  kDataLoss = 15,
+  static constexpr StatusCode kDataLoss = 15;
 
   // StatusCode::kUnauthenticated
   //
   // kUnauthenticated (gRPC code "UNAUTHENTICATED") indicates that the request
   // does not have valid authentication credentials for the operation. Correct
   // the authentication and try again.
-  kUnauthenticated = 16,
+  static constexpr StatusCode kUnauthenticated = 16;
 
   // StatusCode::DoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_
   //
@@ -269,8 +272,7 @@ enum class StatusCode : int {
   // codes with `switch()` statements to *not* simply enumerate all possible
   // values, but instead provide a "default:" case. Providing such a default
   // case ensures that code will compile when new codes are added.
-  kDoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_ = 20
-};
+  static constexpr StatusCode kDoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_ = 20;
 
 // StatusCodeToString()
 //
@@ -293,6 +295,8 @@ enum class StatusToStringMode : int {
   kWithNoExtraData = 0,
   // ToString will contain the payloads.
   kWithPayload = 1 << 0,
+  // ToString will contain the module name.
+  kWithModule = 1 << 1,
   // ToString will include all the extra data this Status has.
   kWithEverything = ~kWithNoExtraData,
   // Default mode used by ToString. Its exact value might change in the future.
@@ -341,7 +345,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 // across API boundaries (and in particular across RPC boundaries). Some of
 // these errors may be recoverable, but others may not. Most
 // functions which can produce a recoverable error should be designed to return
-// either an `turbo::Status` (or the similar `turbo::StatusOr<T>`, which holds
+// either an `turbo::Status` (or the similar `turbo::ResultStatus<T>`, which holds
 // either an object of type `T` or an error).
 //
 // API developers should construct their functions to return `turbo::OkStatus()`
@@ -375,7 +379,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //
 //   turbo::Status result = DoSomething();
 //   if (!result.ok()) {
-//     LOG(ERROR) << result;
+//     TURBO_LOG(ERROR) << result;
 //   }
 //
 //   // Provide a default if switching on multiple error codes
@@ -386,7 +390,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //       break;
 //     // The user does not have permission. Log an error.
 //     case turbo::StatusCode::kPermissionDenied:
-//       LOG(ERROR) << result;
+//       TURBO_LOG(ERROR) << result;
 //       break;
 //     // Propagate the error otherwise.
 //     default:
@@ -438,6 +442,13 @@ class Status final {
   // by printing a warning) if it is not.
   Status(turbo::StatusCode code, turbo::string_view msg);
 
+  Status(unsigned short int index, turbo::StatusCode code, turbo::string_view msg);
+
+  /*
+  template <typename... Args>
+  Status(unsigned short int module_index, turbo::StatusCode code, const FormatSpec<Args...>& format,
+         const Args&... args);
+         */
   Status(const Status&);
   Status& operator=(const Status& x);
 
@@ -490,6 +501,8 @@ class Status final {
   // NOTE: This function should only be called when converting to an associated
   // wire format. Use `Status::code()` for error handling.
   int raw_code() const;
+
+  unsigned short int index() const;
 
   // Status::message()
   //
@@ -634,7 +647,10 @@ class Status final {
   // Convert between error::Code and the inlined uintptr_t representation used
   // by rep_. See rep_ for details.
   static uintptr_t CodeToInlinedRep(turbo::StatusCode code);
+  static uintptr_t CodeToInlinedRep(unsigned short int module_index, turbo::StatusCode code);
+
   static turbo::StatusCode InlinedRepToCode(uintptr_t rep);
+  static unsigned short int InlinedRepToIndex(uintptr_t rep);
 
   // Converts between StatusRep* and the external uintptr_t representation used
   // by rep_. See rep_ for details.
@@ -755,7 +771,7 @@ Status ErrnoToStatus(int error_number, turbo::string_view message);
 // Implementation details follow
 //------------------------------------------------------------------------------
 
-inline Status::Status() : rep_(CodeToInlinedRep(turbo::StatusCode::kOk)) {}
+inline Status::Status() : rep_(CodeToInlinedRep(turbo::kOk)) {}
 
 inline Status::Status(turbo::StatusCode code) : rep_(CodeToInlinedRep(code)) {}
 
@@ -800,7 +816,7 @@ inline void Status::Update(Status&& new_status) {
 inline Status::~Status() { Unref(rep_); }
 
 inline bool Status::ok() const {
-  return rep_ == CodeToInlinedRep(turbo::StatusCode::kOk);
+  return rep_ == CodeToInlinedRep(turbo::kOk);
 }
 
 inline turbo::string_view Status::message() const {
@@ -846,18 +862,29 @@ inline bool Status::IsMovedFrom(uintptr_t rep) {
 }
 
 inline uintptr_t Status::MovedFromRep() {
-  return CodeToInlinedRep(turbo::StatusCode::kInternal) | 2;
+  return CodeToInlinedRep(turbo::kInternal) | 2;
 }
 
 inline uintptr_t Status::CodeToInlinedRep(turbo::StatusCode code) {
   return static_cast<uintptr_t>(code) << 2;
 }
 
-inline turbo::StatusCode Status::InlinedRepToCode(uintptr_t rep) {
-  assert(IsInlined(rep));
-  return static_cast<turbo::StatusCode>(rep >> 2);
+inline uintptr_t Status::CodeToInlinedRep(unsigned short int module_index, turbo::StatusCode code) {
+    uintptr_t  ret =  static_cast<uintptr_t>(module_index)<<32;
+    ret |=  static_cast<uintptr_t>(code);
+    return ret << 2;
 }
 
+inline turbo::StatusCode Status::InlinedRepToCode(uintptr_t rep) {
+  assert(IsInlined(rep));
+  static constexpr uintptr_t kCodeMask = 0x00000000FFFFFFFF;
+  return static_cast<turbo::StatusCode>((rep >> 2) & kCodeMask);
+}
+inline unsigned short int Status::InlinedRepToIndex(uintptr_t rep) {
+    assert(IsInlined(rep));
+    static constexpr uintptr_t kIndexMask = 0x000000000000FFFF;
+    return static_cast<unsigned short int>((rep >> 34) & kIndexMask);
+}
 inline status_internal::StatusRep* Status::RepToPointer(uintptr_t rep) {
   assert(!IsInlined(rep));
   return reinterpret_cast<status_internal::StatusRep*>(rep - 1);
@@ -884,7 +911,7 @@ inline Status OkStatus() { return Status(); }
 // Creates a `Status` object with the `turbo::StatusCode::kCancelled` error code
 // and an empty message. It is provided only for efficiency, given that
 // message-less kCancelled errors are common in the infrastructure.
-inline Status CancelledError() { return Status(turbo::StatusCode::kCancelled); }
+inline Status CancelledError() { return Status(turbo::kCancelled); }
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

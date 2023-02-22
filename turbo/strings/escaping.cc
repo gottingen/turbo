@@ -942,13 +942,6 @@ WebSafeBase64Escape(turbo::string_view src, String* dest) {
 template void WebSafeBase64Escape(turbo::string_view, std::string*);
 template void WebSafeBase64Escape(turbo::string_view, inlined_string*);
 
-std::string WebSafeBase64Escape(turbo::string_view src) {
-  std::string dest;
-  strings_internal::Base64EscapeInternal(
-      reinterpret_cast<const unsigned char*>(src.data()), src.size(), &dest,
-      false, kWebSafeBase64Chars);
-  return dest;
-}
 
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type

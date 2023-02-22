@@ -94,7 +94,7 @@
 // This one is tricky:
 // * We must evaluate `val` exactly once, yet we need to do two things with it:
 //   evaluate `.ok()` and (sometimes) `.ToString()`.
-// * `val` might be an `turbo::Status` or some `turbo::StatusOr<T>`.
+// * `val` might be an `turbo::Status` or some `turbo::ResultStatus<T>`.
 // * `val` might be e.g. `ATemporary().GetStatus()`, which may return a
 //   reference to a member of `ATemporary` that is only valid until the end of
 //   the full expression.
@@ -147,7 +147,7 @@ TURBO_NAMESPACE_BEGIN
 
 class Status;
 template <typename T>
-class StatusOr;
+class ResultStatus;
 
 namespace status_internal {
 std::string* MakeCheckFailString(const turbo::Status* status,
@@ -156,12 +156,12 @@ std::string* MakeCheckFailString(const turbo::Status* status,
 
 namespace log_internal {
 
-// Convert a Status or a StatusOr to its underlying status value.
+// Convert a Status or a ResultStatus to its underlying status value.
 //
 // (This implementation does not require a dep on turbo::Status to work.)
 inline const turbo::Status* AsStatus(const turbo::Status& s) { return &s; }
 template <typename T>
-const turbo::Status* AsStatus(const turbo::StatusOr<T>& s) {
+const turbo::Status* AsStatus(const turbo::ResultStatus<T>& s) {
   return &s.status();
 }
 
