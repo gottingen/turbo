@@ -34,7 +34,7 @@ namespace turbo {
 /// -fno-exceptions.
 // TODO COLD IT
 template <typename Ex>
-[[noreturn]] TURBO_NO_INLINE TURBO_COLD void throw_exception(Ex&& ex) {
+TURBO_NORETURN TURBO_NO_INLINE TURBO_COLD void throw_exception(Ex&& ex) {
 #if TURBO_HAVE_EXCEPTIONS
   throw static_cast<Ex&&>(ex);
 #else
@@ -47,7 +47,7 @@ template <typename Ex>
 ///
 /// Terminates as if by forwarding to throw_exception but in a noexcept context.
 template <typename Ex>
-[[noreturn]] TURBO_NO_INLINE void terminate_with(Ex&& ex) noexcept {
+TURBO_NORETURN TURBO_NO_INLINE void terminate_with(Ex&& ex) noexcept {
   throw_exception(static_cast<Ex&&>(ex));
 }
 
@@ -81,11 +81,11 @@ using throw_exception_arg_t =
     typename throw_exception_arg_<R>::template apply<R>;
 
 template <typename Ex, typename... Args>
-[[noreturn]] TURBO_NO_INLINE TURBO_COLD void throw_exception_(Args... args) {
+TURBO_NORETURN TURBO_NO_INLINE TURBO_COLD void throw_exception_(Args... args) {
   throw_exception(Ex(static_cast<Args>(args)...));
 }
 template <typename Ex, typename... Args>
-[[noreturn]] TURBO_NO_INLINE TURBO_COLD void terminate_with_(
+TURBO_NORETURN TURBO_NO_INLINE TURBO_COLD void terminate_with_(
     Args... args) noexcept {
   throw_exception(Ex(static_cast<Args>(args)...));
 }
@@ -107,7 +107,7 @@ template <typename Ex, typename... Args>
 /// behaviors for refs to arrays, one for the general case and one for where the
 /// inner type is char const. Having two behaviors can be surprising, so avoid.
 template <typename Ex, typename... Args>
-[[noreturn]] TURBO_INLINE_VISIBILITY void throw_exception(Args&&... args) {
+TURBO_NORETURN TURBO_INLINE_VISIBILITY void throw_exception(Args&&... args) {
   detail::throw_exception_<Ex, detail::throw_exception_arg_t<Args&&>...>(
       static_cast<Args&&>(args)...);
 }
@@ -116,7 +116,7 @@ template <typename Ex, typename... Args>
 ///
 /// Terminates as if by forwarding to throw_exception within a noexcept context.
 template <typename Ex, typename... Args>
-[[noreturn]] TURBO_INLINE_VISIBILITY void terminate_with(Args&&... args) {
+TURBO_NORETURN TURBO_INLINE_VISIBILITY void terminate_with(Args&&... args) {
   detail::terminate_with_<Ex, detail::throw_exception_arg_t<Args>...>(
       static_cast<Args&&>(args)...);
 }
@@ -158,8 +158,8 @@ template <
     typename FD = std::remove_pointer_t<std::decay_t<F>>,
     std::enable_if_t<std::is_function<FD>::value, int> = 0,
     typename R = decltype(TURBO_DECLVAL(F &&)(TURBO_DECLVAL(A &&)...))>
-TURBO_INLINE_VISIBILITY R invoke_cold(F&& f, A&&... a) //
-    noexcept(noexcept(f(static_cast<A&&>(a)...))) {
+TURBO_INLINE_VISIBILITY R invoke_cold(F&& f, A&&... a)
+    TURBO_NOEXCEPT_IF(TURBO_NOEXCEPT_EXPR(f(static_cast<A&&>(a)...))) {
   return f(static_cast<A&&>(a)...);
 }
 
@@ -188,7 +188,7 @@ TURBO_INLINE_VISIBILITY R invoke_cold(F&& f, A&&... a) //
 ///         i);
 ///   }
 template <typename F, typename... A>
-[[noreturn]] TURBO_NO_INLINE TURBO_COLD void
+TURBO_NORETURN TURBO_NO_INLINE TURBO_COLD void
 invoke_noreturn_cold(F&& f, A&&... a) noexcept(
     /* formatting */ noexcept(static_cast<F&&>(f)(static_cast<A&&>(a)...))) {
   static_cast<F&&>(f)(static_cast<A&&>(a)...);
@@ -294,7 +294,7 @@ catch_exception(Try&& t, Catch&& c, CatchA&&... a) noexcept(
 /// Equivalent to:
 ///
 ///   throw;
-[[noreturn]] TURBO_INLINE_VISIBILITY void rethrow_current_exception() {
+TURBO_NORETURN TURBO_INLINE_VISIBILITY void rethrow_current_exception() {
 #if TURBO_HAVE_EXCEPTIONS
   throw;
 #else
