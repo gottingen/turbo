@@ -149,7 +149,7 @@ template <
     std::enable_if_t<!std::is_function<FD>::value, int> = 0,
     typename R = decltype(TURBO_DECLVAL(F &&)(TURBO_DECLVAL(A &&)...))>
 TURBO_NO_INLINE TURBO_COLD R invoke_cold(F&& f, A&&... a) //
-    noexcept(noexcept(static_cast<F&&>(f)(static_cast<A&&>(a)...))) {
+    TURBO_NOEXCEPT_IF(TURBO_NOEXCEPT_EXPR(static_cast<F&&>(f)(static_cast<A&&>(a)...))) {
   return static_cast<F&&>(f)(static_cast<A&&>(a)...);
 }
 template <
