@@ -27,7 +27,9 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
+TURBO_NAMESPACE_BEGIN
 
+TURBO_DISABLE_GCC_WARNING(-Wnoexcept-type)
 /// throw_exception
 ///
 /// Throw an exception if exceptions are enabled, or terminate if compiled with
@@ -143,7 +145,6 @@ TURBO_NORETURN TURBO_INLINE_VISIBILITY void terminate_with(Args&&... args) {
 ///         i);
 ///   }
 /// TODO(jeff) when c++14 ,it warnings -Wnoexcept-type
-TURBO_DISABLE_GCC_WARNING(-Wnoexcept-type)
 template <
     typename F,
     typename... A,
@@ -164,7 +165,7 @@ TURBO_INLINE_VISIBILITY R invoke_cold(F&& f, A&&... a)
     TURBO_NOEXCEPT_IF(TURBO_NOEXCEPT_EXPR(f(static_cast<A&&>(a)...))) {
   return f(static_cast<A&&>(a)...);
 }
-TURBO_RESTORE_GCC_WARNING()
+
 /// invoke_noreturn_cold
 ///
 /// Invoke the provided function with the provided arguments. If the invocation
@@ -441,6 +442,8 @@ public:
   char const* what() const noexcept;
 };
 
-} // namespace turbo
+TURBO_RESTORE_GCC_WARNING()
 
+TURBO_NAMESPACE_END
+} // namespace turbo
 #endif // TURBO_BASE_EXCEPTIONS_H_
