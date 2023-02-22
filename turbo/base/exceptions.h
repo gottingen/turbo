@@ -143,7 +143,7 @@ TURBO_NORETURN TURBO_INLINE_VISIBILITY void terminate_with(Args&&... args) {
 ///         i);
 ///   }
 /// TODO(jeff) when c++14 ,it warnings -Wnoexcept-type
-TURBO_DISABLE_GCC_WARNING("-Wnoexcept-type")
+TURBO_DISABLE_GCC_WARNING(-Wnoexcept-type)
 template <
     typename F,
     typename... A,
