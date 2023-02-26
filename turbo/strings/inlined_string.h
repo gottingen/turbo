@@ -35,8 +35,8 @@
 #include "turbo/base/assume.h"
 #include "turbo/base/check_math.h"
 #include "turbo/base/endian.h"
-#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/base/exceptions.h"
+#include "turbo/base/internal/throw_delegate.h"
 #include "turbo/memory/jemalloc_helper.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
@@ -131,7 +131,8 @@ enum class AcquireMallocatedString {};
 
 /*
  * inlined_string_core_model is a mock-up type that defines all required
- * signatures of a inlined_string core. The inlined_string class itself uses such
+ * signatures of a inlined_string core. The inlined_string class itself uses
+such
  * a core object to implement all of the numerous member functions
  * required by the standard.
  *
@@ -144,8 +145,8 @@ class inlined_string_core_model {
  public:
   inlined_string_core_model();
   inlined_string_core_model(const inlined_string_core_model &);
-  inlined_string_core_model& operator=(const inlined_string_core_model &) = delete;
-  ~inlined_string_core_model();
+  inlined_string_core_model& operator=(const inlined_string_core_model &) =
+delete; ~inlined_string_core_model();
   // Returns a pointer to string's buffer (currently only contiguous
   // strings are supported). The pointer is guaranteed to be valid
   // until the next call to a non-const member function.
@@ -227,10 +228,20 @@ class inlined_string_core_model {
  * - If the second MSb is set, then the string is large. On little-endian,
  *   these 2 bits are the 2 MSbs of MediumLarge::capacity_, while on
  *   big-endian, these 2 bits are the 2 LSbs. This keeps both little-endian
- *   and big-endian inlined_string_core equivalent with merely different ops used
- *   to extract capacity/category.
+ *   and big-endian inlined_string_core equivalent with merely different ops
+ * used to extract capacity/category.
  */
 template <class Char> class inlined_string_core {
+public:
+  typedef uint8_t category_type;
+
+  struct NoInit {};
+
+  enum class Category : category_type {
+    isSmall = 0,
+    isMedium = kIsLittleEndian ? 0x80 : 0x2,
+    isLarge = kIsLittleEndian ? 0x40 : 0x1,
+  };
 public:
   inlined_string_core() noexcept { reset(); }
 
@@ -263,7 +274,7 @@ public:
   }
 
   inlined_string_core(const Char *const data, const size_t size,
-                bool disableSSO = INLINED_STRING_DISABLE_SSO) {
+                      bool disableSSO = INLINED_STRING_DISABLE_SSO) {
     if (!disableSSO && size <= maxSmallSize) {
       initSmall(data, size);
     } else if (size <= maxMediumSize) {
@@ -273,6 +284,32 @@ public:
     }
     assert(this->size() == size);
     assert(size == 0 || memcmp(this->data(), data, size * sizeof(Char)) == 0);
+  }
+
+  inlined_string_core(const size_t size, NoInit,
+                      bool disableSSO = INLINED_STRING_DISABLE_SSO) {
+    if (!disableSSO && size <= maxSmallSize) {
+      initSmallNoFill(size);
+    } else if (size <= maxMediumSize) {
+      initMediumNoFill(size);
+    } else {
+      initLargeNoFill(size);
+    }
+    assert(this->size() == size);
+  }
+
+  inlined_string_core(const size_t size, Char c,
+                      bool disableSSO = INLINED_STRING_DISABLE_SSO) {
+    Char *ptr = nullptr;
+    if (!disableSSO && size <= maxSmallSize) {
+      ptr = initSmallNoFill(size);
+    } else if (size <= maxMediumSize) {
+      ptr = initMediumNoFill(size);
+    } else {
+      ptr = initLargeNoFill(size);
+    }
+    assert(this->size() == size);
+    strings_internal::podFill(ptr, ptr + size, c);
   }
 
   ~inlined_string_core() noexcept {
@@ -289,8 +326,8 @@ public:
   //
   // So if you want a 2-character string, pass malloc(3) as "data",
   // pass 2 as "size", and pass 3 as "allocatedSize".
-  inlined_string_core(Char *const data, const size_t size, const size_t allocatedSize,
-                AcquireMallocatedString) {
+  inlined_string_core(Char *const data, const size_t size,
+                      const size_t allocatedSize, AcquireMallocatedString) {
     if (size > 0) {
       assert(allocatedSize >= size + 1);
       assert(data[size] == '\0');
@@ -354,7 +391,7 @@ public:
   TURBO_NO_INLINE
   void reserve(size_t minCapacity,
                bool disableSSO = INLINED_STRING_DISABLE_SSO) {
-    TURBO_DISABLE_CLANG_WARNING(-Wcovered-switch-default)
+    TURBO_DISABLE_CLANG_WARNING(-Wcovered - switch - default)
     switch (category()) {
     case Category::isSmall:
       reserveSmall(minCapacity, disableSSO);
@@ -394,7 +431,7 @@ public:
   }
 
   size_t capacity() const {
-    TURBO_DISABLE_CLANG_WARNING(-Wcovered-switch-default)
+    TURBO_DISABLE_CLANG_WARNING(-Wcovered - switch - default)
     switch (category()) {
     case Category::isSmall:
       return maxSmallSize;
@@ -418,7 +455,6 @@ public:
     return category() == Category::isLarge && RefCounted::refs(ml_.data_) > 1;
   }
 
-private:
   Char *c_str() {
     Char *ptr = ml_.data_;
     // With this syntax, GCC and Clang generate a CMOV instead of a branch.
@@ -519,13 +555,7 @@ private:
     }
   };
 
-  typedef uint8_t category_type;
-
-  enum class Category : category_type {
-    isSmall = 0,
-    isMedium = kIsLittleEndian ? 0x80 : 0x2,
-    isLarge = kIsLittleEndian ? 0x40 : 0x1,
-  };
+public:
 
   Category category() const {
     // works for both big-endian and little-endian
@@ -593,6 +623,10 @@ private:
   void initMedium(const Char *data, size_t size);
   void initLarge(const Char *data, size_t size);
 
+  Char *initSmallNoFill(size_t size);
+  Char *initMediumNoFill(size_t size);
+  Char *initLargeNoFill(size_t size);
+
   void reserveSmall(size_t minCapacity, bool disableSSO);
   void reserveMedium(size_t minCapacity);
   void reserveLarge(size_t minCapacity);
@@ -606,8 +640,10 @@ private:
 };
 
 template <class Char>
-inline void inlined_string_core<Char>::copySmall(const inlined_string_core &rhs) {
-  static_assert(offsetof(MediumLarge, data_) == 0, "inlined_string layout failure");
+inline void
+inlined_string_core<Char>::copySmall(const inlined_string_core &rhs) {
+  static_assert(offsetof(MediumLarge, data_) == 0,
+                "inlined_string layout failure");
   static_assert(offsetof(MediumLarge, size_) == sizeof(ml_.data_),
                 "inlined_string layout failure");
   static_assert(offsetof(MediumLarge, capacity_) == 2 * sizeof(ml_.data_),
@@ -622,21 +658,23 @@ inline void inlined_string_core<Char>::copySmall(const inlined_string_core &rhs)
 }
 
 template <class Char>
-TURBO_NO_INLINE void inlined_string_core<Char>::copyMedium(const inlined_string_core &rhs) {
+TURBO_NO_INLINE void
+inlined_string_core<Char>::copyMedium(const inlined_string_core &rhs) {
   // Medium strings are copied eagerly. Don't forget to allocate
   // one extra Char for the null terminator.
   auto const allocSize = goodMallocSize((1 + rhs.ml_.size_) * sizeof(Char));
   ml_.data_ = static_cast<Char *>(checkedMalloc(allocSize));
   // Also copies terminator.
   strings_internal::podCopy(rhs.ml_.data_, rhs.ml_.data_ + rhs.ml_.size_ + 1,
-                           ml_.data_);
+                            ml_.data_);
   ml_.size_ = rhs.ml_.size_;
   ml_.setCapacity(allocSize / sizeof(Char) - 1, Category::isMedium);
   assert(category() == Category::isMedium);
 }
 
 template <class Char>
-TURBO_NO_INLINE void inlined_string_core<Char>::copyLarge(const inlined_string_core &rhs) {
+TURBO_NO_INLINE void
+inlined_string_core<Char>::copyLarge(const inlined_string_core &rhs) {
   // Large strings are just refcounted
   ml_ = rhs.ml_;
   RefCounted::incrementRefs(ml_.data_);
@@ -646,7 +684,7 @@ TURBO_NO_INLINE void inlined_string_core<Char>::copyLarge(const inlined_string_c
 // Small strings are bitblitted
 template <class Char>
 inline void inlined_string_core<Char>::initSmall(const Char *const data,
-                                           const size_t size) {
+                                                 const size_t size) {
   // Layout is: Char* data_, size_t size_, size_t capacity_
   static_assert(sizeof(*this) == sizeof(Char *) + 2 * sizeof(size_t),
                 "inlined_string has unexpected size");
@@ -665,7 +703,7 @@ inline void inlined_string_core<Char>::initSmall(const Char *const data,
   if ((reinterpret_cast<size_t>(data) & (sizeof(size_t) - 1)) == 0) {
     const size_t byteSize = size * sizeof(Char);
     constexpr size_t wordWidth = sizeof(size_t);
-    TURBO_DISABLE_GCC_WARNING(-Wimplicit-fallthrough=)
+    TURBO_DISABLE_GCC_WARNING(-Wimplicit - fallthrough =)
     switch ((byteSize + wordWidth - 1) / wordWidth) { // Number of words.
     case 3:
       ml_.capacity_ = reinterpret_cast<const size_t *>(data)[2];
@@ -678,7 +716,7 @@ inline void inlined_string_core<Char>::initSmall(const Char *const data,
       TURBO_FALLTHROUGH;
     case 0:
       break;
-    TURBO_RESTORE_GCC_WARNING()
+      TURBO_RESTORE_GCC_WARNING()
     }
   } else
 #endif
@@ -691,8 +729,9 @@ inline void inlined_string_core<Char>::initSmall(const Char *const data,
 }
 
 template <class Char>
-TURBO_NO_INLINE void inlined_string_core<Char>::initMedium(const Char *const data,
-                                                     const size_t size) {
+TURBO_NO_INLINE void
+inlined_string_core<Char>::initMedium(const Char *const data,
+                                      const size_t size) {
   // Medium strings are allocated normally. Don't forget to
   // allocate one extra Char for the terminating null.
   auto const allocSize = goodMallocSize((1 + size) * sizeof(Char));
@@ -706,8 +745,9 @@ TURBO_NO_INLINE void inlined_string_core<Char>::initMedium(const Char *const dat
 }
 
 template <class Char>
-TURBO_NO_INLINE void inlined_string_core<Char>::initLarge(const Char *const data,
-                                                    const size_t size) {
+TURBO_NO_INLINE void
+inlined_string_core<Char>::initLarge(const Char *const data,
+                                     const size_t size) {
   // Large strings are allocated differently
   size_t effectiveCapacity = size;
   auto const newRC = RefCounted::create(data, &effectiveCapacity);
@@ -715,6 +755,37 @@ TURBO_NO_INLINE void inlined_string_core<Char>::initLarge(const Char *const data
   ml_.size_ = size;
   ml_.setCapacity(effectiveCapacity, Category::isLarge);
   ml_.data_[size] = '\0';
+}
+
+template <class Char>
+inline Char *inlined_string_core<Char>::initSmallNoFill(const size_t size) {
+  setSmallSize(size);
+  return small_;
+}
+
+template <class Char>
+TURBO_NO_INLINE inline Char *
+inlined_string_core<Char>::initMediumNoFill(const size_t size) {
+  // Medium strings are allocated normally. Don't forget to
+  // allocate one extra Char for the terminating null.
+  size_t effectiveCapacity = goodMallocSize((size + 1) * sizeof(Char));
+  auto const newMB = MediumLarge::create(&effectiveCapacity);
+  ml_.data_ = newMB->data_;
+  ml_.size_ = size;
+  ml_.data_[size] = '\0';
+  return ml_.data_;
+}
+
+template <class Char>
+TURBO_NO_INLINE inline Char *
+inlined_string_core<Char>::initLargeNoFill(const size_t size) {
+  // Large strings are allocated differently
+  size_t effectiveCapacity = size;
+  auto const newRC = RefCounted::create(&effectiveCapacity);
+  ml_.data_ = newRC->data_;
+  ml_.size_ = size;
+  ml_.data_[size] = '\0';
+  return ml_.data_;
 }
 
 template <class Char>
@@ -733,7 +804,8 @@ TURBO_NO_INLINE void inlined_string_core<Char>::unshare(size_t minCapacity) {
   // size_ remains unchanged.
 }
 
-template <class Char> inline Char *inlined_string_core<Char>::mutableDataLarge() {
+template <class Char>
+inline Char *inlined_string_core<Char>::mutableDataLarge() {
   assert(category() == Category::isLarge);
   if (RefCounted::refs(ml_.data_) > 1) { // Ensure unique.
     unshare();
@@ -742,7 +814,8 @@ template <class Char> inline Char *inlined_string_core<Char>::mutableDataLarge()
 }
 
 template <class Char>
-TURBO_NO_INLINE void inlined_string_core<Char>::reserveLarge(size_t minCapacity) {
+TURBO_NO_INLINE void
+inlined_string_core<Char>::reserveLarge(size_t minCapacity) {
   assert(category() == Category::isLarge);
   if (RefCounted::refs(ml_.data_) > 1) { // Ensure unique
     // We must make it unique regardless; in-place reallocation is
@@ -789,15 +862,16 @@ inlined_string_core<Char>::reserveMedium(const size_t minCapacity) {
     nascent.ml_.size_ = ml_.size_;
     // Also copies terminator.
     strings_internal::podCopy(ml_.data_, ml_.data_ + ml_.size_ + 1,
-                             nascent.ml_.data_);
+                              nascent.ml_.data_);
     nascent.swap(*this);
     assert(capacity() >= minCapacity);
   }
 }
 
 template <class Char>
-TURBO_NO_INLINE void inlined_string_core<Char>::reserveSmall(size_t minCapacity,
-                                                       const bool disableSSO) {
+TURBO_NO_INLINE void
+inlined_string_core<Char>::reserveSmall(size_t minCapacity,
+                                        const bool disableSSO) {
   assert(category() == Category::isSmall);
   if (!disableSSO && minCapacity <= maxSmallSize) {
     // small
@@ -1017,15 +1091,16 @@ public:
       : store_(str.data(), str.size()) {}
 
   basic_inlined_string(const turbo::string_view &str)
-      : store_(str.data(), str.size()/sizeof(E)) {}
+      : store_(str.data(), str.size() / sizeof(E)) {}
 
-  basic_inlined_string(const basic_inlined_string &str, size_type pos, size_type n = npos,
-                 const A & /* a */ = A()) {
+  basic_inlined_string(const basic_inlined_string &str, size_type pos,
+                       size_type n = npos, const A & /* a */ = A()) {
     assign(str, pos, n);
   }
 
   TURBO_NO_INLINE
-  /* implicit */ basic_inlined_string(const value_type *s, const A & /*a*/ = A())
+  /* implicit */ basic_inlined_string(const value_type *s,
+                                      const A & /*a*/ = A())
       : store_(s, traitsLength(s)) {}
 
   TURBO_NO_INLINE
@@ -1050,12 +1125,12 @@ public:
   // Specialization for const char*, const char*
   TURBO_NO_INLINE
   basic_inlined_string(const value_type *b, const value_type *e,
-                 const A & /*a*/ = A())
+                       const A & /*a*/ = A())
       : store_(b, size_type(e - b)) {}
 
   // Nonstandard constructor
   basic_inlined_string(value_type *s, size_type n, size_type c,
-                 AcquireMallocatedString a)
+                       AcquireMallocatedString a)
       : store_(s, n, c, a) {}
 
   // Construction from initialization list
@@ -1096,11 +1171,11 @@ public:
   // which overload the implementation is referring to.
   template <typename TP>
   typename std::enable_if<
-      std::is_convertible<
-          TP, typename basic_inlined_string<E, T, A, Storage>::value_type>::value &&
-          !std::is_same<
-              typename std::decay<TP>::type,
-              typename basic_inlined_string<E, T, A, Storage>::value_type>::value,
+      std::is_convertible<TP, typename basic_inlined_string<
+                                  E, T, A, Storage>::value_type>::value &&
+          !std::is_same<typename std::decay<TP>::type,
+                        typename basic_inlined_string<
+                            E, T, A, Storage>::value_type>::value,
       basic_inlined_string<E, T, A, Storage> &>::type
   operator=(TP c) = delete;
 
@@ -1204,7 +1279,9 @@ public:
   }
 
   // C++11 21.4.6 modifiers:
-  basic_inlined_string &operator+=(const basic_inlined_string &str) { return append(str); }
+  basic_inlined_string &operator+=(const basic_inlined_string &str) {
+    return append(str);
+  }
 
   basic_inlined_string &operator+=(const value_type *s) { return append(s); }
 
@@ -1220,8 +1297,8 @@ public:
 
   basic_inlined_string &append(const basic_inlined_string &str);
 
-  basic_inlined_string &append(const basic_inlined_string &str, const size_type pos,
-                         size_type n);
+  basic_inlined_string &append(const basic_inlined_string &str,
+                               const size_type pos, size_type n);
 
   basic_inlined_string &append(const value_type *s, size_type n);
 
@@ -1256,8 +1333,8 @@ public:
     return *this = std::move(str);
   }
 
-  basic_inlined_string &assign(const basic_inlined_string &str, const size_type pos,
-                         size_type n);
+  basic_inlined_string &assign(const basic_inlined_string &str,
+                               const size_type pos, size_type n);
 
   basic_inlined_string &assign(const value_type *s, const size_type n);
 
@@ -1274,18 +1351,20 @@ public:
     return replace(begin(), end(), first_or_n, last_or_c);
   }
 
-  basic_inlined_string &insert(size_type pos1, const basic_inlined_string &str) {
+  basic_inlined_string &insert(size_type pos1,
+                               const basic_inlined_string &str) {
     return insert(pos1, str.data(), str.size());
   }
 
   basic_inlined_string &insert(size_type pos1, const basic_inlined_string &str,
-                         size_type pos2, size_type n) {
+                               size_type pos2, size_type n) {
     enforce<std::out_of_range>(pos2 <= str.length(), "");
     procrustes(n, str.length() - pos2);
     return insert(pos1, str.data() + pos2, n);
   }
 
-  basic_inlined_string &insert(size_type pos, const value_type *s, size_type n) {
+  basic_inlined_string &insert(size_type pos, const value_type *s,
+                               size_type n) {
     enforce<std::out_of_range>(pos <= length(), "");
     insert(begin() + pos, s, s + n);
     return *this;
@@ -1312,12 +1391,13 @@ private:
   istream_type &getlineImpl(istream_type &is, value_type delim);
 
 public:
-  friend inline istream_type &getline(istream_type &is, basic_inlined_string &str,
-                                      value_type delim) {
+  friend inline istream_type &
+  getline(istream_type &is, basic_inlined_string &str, value_type delim) {
     return str.getlineImpl(is, delim);
   }
 
-  friend inline istream_type &getline(istream_type &is, basic_inlined_string &str) {
+  friend inline istream_type &getline(istream_type &is,
+                                      basic_inlined_string &str) {
     return getline(is, str, '\n');
   }
 
@@ -1341,7 +1421,8 @@ public:
   template <class ItOrLength, class ItOrChar>
   iterator insert(const_iterator p, ItOrLength first_or_n, ItOrChar last_or_c) {
     using Sel =
-        std::integral_constant<bool, std::numeric_limits<ItOrLength>::is_specialized>;
+        std::integral_constant<bool,
+                               std::numeric_limits<ItOrLength>::is_specialized>;
     return insertImplDiscr(p, first_or_n, last_or_c, Sel());
   }
 
@@ -1375,22 +1456,23 @@ public:
   // Replaces at most n1 chars of *this, starting with pos1 with the
   // content of str
   basic_inlined_string &replace(size_type pos1, size_type n1,
-                          const basic_inlined_string &str) {
+                                const basic_inlined_string &str) {
     return replace(pos1, n1, str.data(), str.size());
   }
 
   // Replaces at most n1 chars of *this, starting with pos1,
   // with at most n2 chars of str starting with pos2
   basic_inlined_string &replace(size_type pos1, size_type n1,
-                          const basic_inlined_string &str, size_type pos2,
-                          size_type n2) {
+                                const basic_inlined_string &str, size_type pos2,
+                                size_type n2) {
     enforce<std::out_of_range>(pos2 <= str.length(), "");
     return replace(pos1, n1, str.data() + pos2,
                    std::min(n2, str.size() - pos2));
   }
 
   // Replaces at most n1 chars of *this, starting with pos, with chars from s
-  basic_inlined_string &replace(size_type pos, size_type n1, const value_type *s) {
+  basic_inlined_string &replace(size_type pos, size_type n1,
+                                const value_type *s) {
     return replace(pos, n1, s, traitsLength(s));
   }
 
@@ -1402,8 +1484,8 @@ public:
   // Replaces at most n1 chars of *this, starting with pos, with at
   // most n2 chars of str.  str must have at least n2 chars.
   template <class StrOrLength, class NumOrChar>
-  basic_inlined_string &replace(size_type pos, size_type n1, StrOrLength s_or_n2,
-                          NumOrChar n_or_c) {
+  basic_inlined_string &replace(size_type pos, size_type n1,
+                                StrOrLength s_or_n2, NumOrChar n_or_c) {
     Invariant checker(*this);
 
     enforce<std::out_of_range>(pos <= size(), "");
@@ -1412,7 +1494,8 @@ public:
     return replace(b, b + n1, s_or_n2, n_or_c);
   }
 
-  basic_inlined_string &replace(iterator i1, iterator i2, const basic_inlined_string &str) {
+  basic_inlined_string &replace(iterator i1, iterator i2,
+                                const basic_inlined_string &str) {
     return replace(i1, i2, str.data(), str.length());
   }
 
@@ -1420,21 +1503,28 @@ public:
     return replace(i1, i2, s, traitsLength(s));
   }
   template <typename H>
-  friend H TurboHashValue(H hash_state, const turbo::basic_inlined_string<value_type, traits_type, allocator_type>& str) {
-      return H::combine(std::move(hash_state), turbo::string_view(str.data(), str.size() * sizeof(value_type)));
+  friend H
+  TurboHashValue(H hash_state,
+                 const turbo::basic_inlined_string<value_type, traits_type,
+                                                   allocator_type> &str) {
+    return H::combine(
+        std::move(hash_state),
+        turbo::string_view(str.data(), str.size() * sizeof(value_type)));
   }
+
 private:
   basic_inlined_string &replaceImplDiscr(iterator i1, iterator i2,
-                                   const value_type *s, size_type n,
-                                   std::integral_constant<int, 2>);
+                                         const value_type *s, size_type n,
+                                         std::integral_constant<int, 2>);
 
   basic_inlined_string &replaceImplDiscr(iterator i1, iterator i2, size_type n2,
-                                   value_type c,
-                                   std::integral_constant<int, 1>);
+                                         value_type c,
+                                         std::integral_constant<int, 1>);
 
   template <class InputIter>
   basic_inlined_string &replaceImplDiscr(iterator i1, iterator i2, InputIter b,
-                                   InputIter e, std::integral_constant<int, 0>);
+                                         InputIter e,
+                                         std::integral_constant<int, 0>);
 
 private:
   template <class FwdIterator>
@@ -1459,7 +1549,7 @@ private:
 public:
   template <class T1, class T2>
   basic_inlined_string &replace(iterator i1, iterator i2, T1 first_or_n_or_s,
-                          T2 last_or_c_or_n) {
+                                T2 last_or_c_or_n) {
     constexpr bool num1 = std::numeric_limits<T1>::is_specialized,
                    num2 = std::numeric_limits<T2>::is_specialized;
     using Sel =
@@ -1516,7 +1606,8 @@ public:
     return rfind(&c, pos, 1);
   }
 
-  size_type find_first_of(const basic_inlined_string &str, size_type pos = 0) const {
+  size_type find_first_of(const basic_inlined_string &str,
+                          size_type pos = 0) const {
     return find_first_of(str.data(), pos, str.length());
   }
 
@@ -1597,7 +1688,8 @@ public:
     return compare(0, size(), str);
   }
 
-  int compare(size_type pos1, size_type n1, const basic_inlined_string &str) const {
+  int compare(size_type pos1, size_type n1,
+              const basic_inlined_string &str) const {
     return compare(pos1, n1, str.data(), str.size());
   }
 
@@ -1659,7 +1751,8 @@ basic_inlined_string<E, T, A, S>::operator=(const basic_inlined_string &lhs) {
 // Move assignment
 template <typename E, class T, class A, class S>
 inline basic_inlined_string<E, T, A, S> &
-basic_inlined_string<E, T, A, S>::operator=(basic_inlined_string &&goner) noexcept {
+basic_inlined_string<E, T, A, S>::operator=(
+    basic_inlined_string &&goner) noexcept {
   if (TURBO_UNLIKELY(&goner == this)) {
     // Compatibility with std::basic_string<>,
     // C++11 21.4.2 [string.cons] / 23 requires self-move-assignment support.
@@ -1690,9 +1783,8 @@ basic_inlined_string<E, T, A, S>::operator=(value_type c) {
 }
 
 template <typename E, class T, class A, class S>
-inline void
-basic_inlined_string<E, T, A, S>::resize(const size_type n,
-                                   const value_type c /*= value_type()*/) {
+inline void basic_inlined_string<E, T, A, S>::resize(
+    const size_type n, const value_type c /*= value_type()*/) {
   Invariant checker(*this);
 
   auto size = this->size();
@@ -1720,7 +1812,7 @@ basic_inlined_string<E, T, A, S>::append(const basic_inlined_string &str) {
 template <typename E, class T, class A, class S>
 inline basic_inlined_string<E, T, A, S> &
 basic_inlined_string<E, T, A, S>::append(const basic_inlined_string &str,
-                                   const size_type pos, size_type n) {
+                                         const size_type pos, size_type n) {
   const size_type sz = str.size();
   enforce<std::out_of_range>(pos <= sz, "");
   procrustes(n, sz - pos);
@@ -1772,7 +1864,7 @@ basic_inlined_string<E, T, A, S>::append(size_type n, value_type c) {
 template <typename E, class T, class A, class S>
 inline basic_inlined_string<E, T, A, S> &
 basic_inlined_string<E, T, A, S>::assign(const basic_inlined_string &str,
-                                   const size_type pos, size_type n) {
+                                         const size_type pos, size_type n) {
   const size_type sz = str.size();
   enforce<std::out_of_range>(pos <= sz, "");
   procrustes(n, sz - pos);
@@ -1781,7 +1873,8 @@ basic_inlined_string<E, T, A, S>::assign(const basic_inlined_string &str,
 
 template <typename E, class T, class A, class S>
 TURBO_NO_INLINE basic_inlined_string<E, T, A, S> &
-basic_inlined_string<E, T, A, S>::assign(const value_type *s, const size_type n) {
+basic_inlined_string<E, T, A, S>::assign(const value_type *s,
+                                         const size_type n) {
   Invariant checker(*this);
 
   if (n == 0) {
@@ -1806,7 +1899,8 @@ basic_inlined_string<E, T, A, S>::assign(const value_type *s, const size_type n)
 
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::istream_type &
-basic_inlined_string<E, T, A, S>::getlineImpl(istream_type &is, value_type delim) {
+basic_inlined_string<E, T, A, S>::getlineImpl(istream_type &is,
+                                              value_type delim) {
   Invariant checker(*this);
 
   clear();
@@ -1839,8 +1933,9 @@ basic_inlined_string<E, T, A, S>::getlineImpl(istream_type &is, value_type delim
 
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::size_type
-basic_inlined_string<E, T, A, S>::find(const value_type *needle, const size_type pos,
-                                 const size_type nsize) const {
+basic_inlined_string<E, T, A, S>::find(const value_type *needle,
+                                       const size_type pos,
+                                       const size_type nsize) const {
   auto const size = this->size();
   // nsize + pos can overflow (eg pos == npos), guard against that by checking
   // that nsize + pos does not wrap around.
@@ -1902,7 +1997,8 @@ basic_inlined_string<E, T, A, S>::find(const value_type *needle, const size_type
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::iterator
 basic_inlined_string<E, T, A, S>::insertImplDiscr(const_iterator i, size_type n,
-                                            value_type c, std::true_type) {
+                                                  value_type c,
+                                                  std::true_type) {
   Invariant checker(*this);
 
   assert(i >= cbegin() && i <= cend());
@@ -1921,7 +2017,8 @@ template <typename E, class T, class A, class S>
 template <class InputIter>
 inline typename basic_inlined_string<E, T, A, S>::iterator
 basic_inlined_string<E, T, A, S>::insertImplDiscr(const_iterator i, InputIter b,
-                                            InputIter e, std::false_type) {
+                                                  InputIter e,
+                                                  std::false_type) {
   return insertImpl(
       i, b, e, typename std::iterator_traits<InputIter>::iterator_category());
 }
@@ -1930,8 +2027,8 @@ template <typename E, class T, class A, class S>
 template <class FwdIterator>
 inline typename basic_inlined_string<E, T, A, S>::iterator
 basic_inlined_string<E, T, A, S>::insertImpl(const_iterator i, FwdIterator s1,
-                                       FwdIterator s2,
-                                       std::forward_iterator_tag) {
+                                             FwdIterator s2,
+                                             std::forward_iterator_tag) {
   Invariant checker(*this);
 
   assert(i >= cbegin() && i <= cend());
@@ -1952,8 +2049,8 @@ template <typename E, class T, class A, class S>
 template <class InputIterator>
 inline typename basic_inlined_string<E, T, A, S>::iterator
 basic_inlined_string<E, T, A, S>::insertImpl(const_iterator i, InputIterator b,
-                                       InputIterator e,
-                                       std::input_iterator_tag) {
+                                             InputIterator e,
+                                             std::input_iterator_tag) {
   const auto pos = i - cbegin();
   basic_inlined_string temp(cbegin(), i);
   for (; b != e; ++b) {
@@ -1966,9 +2063,9 @@ basic_inlined_string<E, T, A, S>::insertImpl(const_iterator i, InputIterator b,
 
 template <typename E, class T, class A, class S>
 inline basic_inlined_string<E, T, A, S> &
-basic_inlined_string<E, T, A, S>::replaceImplDiscr(iterator i1, iterator i2,
-                                             const value_type *s, size_type n,
-                                             std::integral_constant<int, 2>) {
+basic_inlined_string<E, T, A, S>::replaceImplDiscr(
+    iterator i1, iterator i2, const value_type *s, size_type n,
+    std::integral_constant<int, 2>) {
   assert(i1 <= i2);
   assert(begin() <= i1 && i1 <= end());
   assert(begin() <= i2 && i2 <= end());
@@ -1977,9 +2074,9 @@ basic_inlined_string<E, T, A, S>::replaceImplDiscr(iterator i1, iterator i2,
 
 template <typename E, class T, class A, class S>
 inline basic_inlined_string<E, T, A, S> &
-basic_inlined_string<E, T, A, S>::replaceImplDiscr(iterator i1, iterator i2,
-                                             size_type n2, value_type c,
-                                             std::integral_constant<int, 1>) {
+basic_inlined_string<E, T, A, S>::replaceImplDiscr(
+    iterator i1, iterator i2, size_type n2, value_type c,
+    std::integral_constant<int, 1>) {
   const size_type n1 = i2 - i1;
   if (n1 > n2) {
     std::fill(i1, i1 + n2, c);
@@ -1995,9 +2092,9 @@ basic_inlined_string<E, T, A, S>::replaceImplDiscr(iterator i1, iterator i2,
 template <typename E, class T, class A, class S>
 template <class InputIter>
 inline basic_inlined_string<E, T, A, S> &
-basic_inlined_string<E, T, A, S>::replaceImplDiscr(iterator i1, iterator i2,
-                                             InputIter b, InputIter e,
-                                             std::integral_constant<int, 0>) {
+basic_inlined_string<E, T, A, S>::replaceImplDiscr(
+    iterator i1, iterator i2, InputIter b, InputIter e,
+    std::integral_constant<int, 0>) {
   using Cat = typename std::iterator_traits<InputIter>::iterator_category;
   replaceImpl(i1, i2, b, e, Cat());
   return *this;
@@ -2005,10 +2102,8 @@ basic_inlined_string<E, T, A, S>::replaceImplDiscr(iterator i1, iterator i2,
 
 template <typename E, class T, class A, class S>
 template <class FwdIterator>
-inline bool basic_inlined_string<E, T, A, S>::replaceAliased(iterator i1, iterator i2,
-                                                       FwdIterator s1,
-                                                       FwdIterator s2,
-                                                       std::true_type) {
+inline bool basic_inlined_string<E, T, A, S>::replaceAliased(
+    iterator i1, iterator i2, FwdIterator s1, FwdIterator s2, std::true_type) {
   std::less_equal<const value_type *> le{};
   const bool aliased = le(&*begin(), &*s1) && le(&*s1, &*end());
   if (!aliased) {
@@ -2024,16 +2119,16 @@ inline bool basic_inlined_string<E, T, A, S>::replaceAliased(iterator i1, iterat
 
 template <typename E, class T, class A, class S>
 template <class FwdIterator>
-inline void basic_inlined_string<E, T, A, S>::replaceImpl(iterator i1, iterator i2,
-                                                    FwdIterator s1,
-                                                    FwdIterator s2,
-                                                    std::forward_iterator_tag) {
+inline void
+basic_inlined_string<E, T, A, S>::replaceImpl(iterator i1, iterator i2,
+                                              FwdIterator s1, FwdIterator s2,
+                                              std::forward_iterator_tag) {
   Invariant checker(*this);
 
   // Handle aliased replace
-  using Sel =
-      std::integral_constant<bool, std::is_same<FwdIterator, iterator>::value ||
-                         std::is_same<FwdIterator, const_iterator>::value>;
+  using Sel = std::integral_constant<
+      bool, std::is_same<FwdIterator, iterator>::value ||
+                std::is_same<FwdIterator, const_iterator>::value>;
   if (replaceAliased(i1, i2, s1, s2, Sel())) {
     return;
   }
@@ -2057,10 +2152,10 @@ inline void basic_inlined_string<E, T, A, S>::replaceImpl(iterator i1, iterator 
 
 template <typename E, class T, class A, class S>
 template <class InputIterator>
-inline void basic_inlined_string<E, T, A, S>::replaceImpl(iterator i1, iterator i2,
-                                                    InputIterator b,
-                                                    InputIterator e,
-                                                    std::input_iterator_tag) {
+inline void
+basic_inlined_string<E, T, A, S>::replaceImpl(iterator i1, iterator i2,
+                                              InputIterator b, InputIterator e,
+                                              std::input_iterator_tag) {
   basic_inlined_string temp(begin(), i1);
   temp.append(b, e).append(i2, end());
   swap(temp);
@@ -2069,7 +2164,7 @@ inline void basic_inlined_string<E, T, A, S>::replaceImpl(iterator i1, iterator 
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::size_type
 basic_inlined_string<E, T, A, S>::rfind(const value_type *s, size_type pos,
-                                  size_type n) const {
+                                        size_type n) const {
   if (n > length()) {
     return npos;
   }
@@ -2092,8 +2187,9 @@ basic_inlined_string<E, T, A, S>::rfind(const value_type *s, size_type pos,
 
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::size_type
-basic_inlined_string<E, T, A, S>::find_first_of(const value_type *s, size_type pos,
-                                          size_type n) const {
+basic_inlined_string<E, T, A, S>::find_first_of(const value_type *s,
+                                                size_type pos,
+                                                size_type n) const {
   if (pos > length() || n == 0) {
     return npos;
   }
@@ -2108,8 +2204,9 @@ basic_inlined_string<E, T, A, S>::find_first_of(const value_type *s, size_type p
 
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::size_type
-basic_inlined_string<E, T, A, S>::find_last_of(const value_type *s, size_type pos,
-                                         size_type n) const {
+basic_inlined_string<E, T, A, S>::find_last_of(const value_type *s,
+                                               size_type pos,
+                                               size_type n) const {
   if (!empty() && n > 0) {
     pos = std::min(pos, length() - 1);
     const_iterator i(begin() + pos);
@@ -2128,8 +2225,8 @@ basic_inlined_string<E, T, A, S>::find_last_of(const value_type *s, size_type po
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::size_type
 basic_inlined_string<E, T, A, S>::find_first_not_of(const value_type *s,
-                                              size_type pos,
-                                              size_type n) const {
+                                                    size_type pos,
+                                                    size_type n) const {
   if (pos < length()) {
     const_iterator i(begin() + pos), finish(end());
     for (; i != finish; ++i) {
@@ -2143,8 +2240,9 @@ basic_inlined_string<E, T, A, S>::find_first_not_of(const value_type *s,
 
 template <typename E, class T, class A, class S>
 inline typename basic_inlined_string<E, T, A, S>::size_type
-basic_inlined_string<E, T, A, S>::find_last_not_of(const value_type *s, size_type pos,
-                                             size_type n) const {
+basic_inlined_string<E, T, A, S>::find_last_not_of(const value_type *s,
+                                                   size_type pos,
+                                                   size_type n) const {
   if (!this->empty()) {
     pos = std::min(pos, size() - 1);
     const_iterator i(begin() + pos);
@@ -2196,8 +2294,9 @@ operator+(const basic_inlined_string<E, T, A, S> &lhs,
 
 // C++11 21.4.8.1/4
 template <typename E, class T, class A, class S>
-inline basic_inlined_string<E, T, A, S> operator+(basic_inlined_string<E, T, A, S> &&lhs,
-                                            basic_inlined_string<E, T, A, S> &&rhs) {
+inline basic_inlined_string<E, T, A, S>
+operator+(basic_inlined_string<E, T, A, S> &&lhs,
+          basic_inlined_string<E, T, A, S> &&rhs) {
   return std::move(lhs.append(rhs));
 }
 
@@ -2215,8 +2314,8 @@ operator+(const E *lhs, const basic_inlined_string<E, T, A, S> &rhs) {
 
 // C++11 21.4.8.1/6
 template <typename E, class T, class A, class S>
-inline basic_inlined_string<E, T, A, S> operator+(const E *lhs,
-                                            basic_inlined_string<E, T, A, S> &&rhs) {
+inline basic_inlined_string<E, T, A, S>
+operator+(const E *lhs, basic_inlined_string<E, T, A, S> &&rhs) {
   //
   const auto len = basic_inlined_string<E, T, A, S>::traits_type::length(lhs);
   if (rhs.capacity() >= len + rhs.size()) {
@@ -2244,8 +2343,8 @@ operator+(E lhs, const basic_inlined_string<E, T, A, S> &rhs) {
 
 // C++11 21.4.8.1/8
 template <typename E, class T, class A, class S>
-inline basic_inlined_string<E, T, A, S> operator+(E lhs,
-                                            basic_inlined_string<E, T, A, S> &&rhs) {
+inline basic_inlined_string<E, T, A, S>
+operator+(E lhs, basic_inlined_string<E, T, A, S> &&rhs) {
   //
   if (rhs.capacity() > rhs.size()) {
     // Good, at least we don't need to reallocate
@@ -2273,8 +2372,8 @@ operator+(const basic_inlined_string<E, T, A, S> &lhs, const E *rhs) {
 
 // C++11 21.4.8.1/10
 template <typename E, class T, class A, class S>
-inline basic_inlined_string<E, T, A, S> operator+(basic_inlined_string<E, T, A, S> &&lhs,
-                                            const E *rhs) {
+inline basic_inlined_string<E, T, A, S>
+operator+(basic_inlined_string<E, T, A, S> &&lhs, const E *rhs) {
   //
   return std::move(lhs += rhs);
 }
@@ -2292,8 +2391,8 @@ operator+(const basic_inlined_string<E, T, A, S> &lhs, E rhs) {
 
 // C++11 21.4.8.1/12
 template <typename E, class T, class A, class S>
-inline basic_inlined_string<E, T, A, S> operator+(basic_inlined_string<E, T, A, S> &&lhs,
-                                            E rhs) {
+inline basic_inlined_string<E, T, A, S>
+operator+(basic_inlined_string<E, T, A, S> &&lhs, E rhs) {
   //
   return std::move(lhs += rhs);
 }
@@ -2420,20 +2519,24 @@ operator>=(const typename basic_inlined_string<E, T, A, S>::value_type *lhs,
 
 // C++11 21.4.8.8
 template <typename E, class T, class A, class S>
-void swap(basic_inlined_string<E, T, A, S> &lhs, basic_inlined_string<E, T, A, S> &rhs) {
+void swap(basic_inlined_string<E, T, A, S> &lhs,
+          basic_inlined_string<E, T, A, S> &rhs) {
   lhs.swap(rhs);
 }
 
 // TODO: make this faster.
 template <typename E, class T, class A, class S>
-inline std::basic_istream<typename basic_inlined_string<E, T, A, S>::value_type,
-                          typename basic_inlined_string<E, T, A, S>::traits_type> &
+inline std::basic_istream<
+    typename basic_inlined_string<E, T, A, S>::value_type,
+    typename basic_inlined_string<E, T, A, S>::traits_type> &
 operator>>(
     std::basic_istream<typename basic_inlined_string<E, T, A, S>::value_type,
-                       typename basic_inlined_string<E, T, A, S>::traits_type> &is,
+                       typename basic_inlined_string<E, T, A, S>::traits_type>
+        &is,
     basic_inlined_string<E, T, A, S> &str) {
-  typedef std::basic_istream<typename basic_inlined_string<E, T, A, S>::value_type,
-                             typename basic_inlined_string<E, T, A, S>::traits_type>
+  typedef std::basic_istream<
+      typename basic_inlined_string<E, T, A, S>::value_type,
+      typename basic_inlined_string<E, T, A, S>::traits_type>
       _istream_type;
   typename _istream_type::sentry sentry(is);
   size_t extracted = 0;
@@ -2467,15 +2570,18 @@ operator>>(
 }
 
 template <typename E, class T, class A, class S>
-inline std::basic_ostream<typename basic_inlined_string<E, T, A, S>::value_type,
-                          typename basic_inlined_string<E, T, A, S>::traits_type> &
+inline std::basic_ostream<
+    typename basic_inlined_string<E, T, A, S>::value_type,
+    typename basic_inlined_string<E, T, A, S>::traits_type> &
 operator<<(
     std::basic_ostream<typename basic_inlined_string<E, T, A, S>::value_type,
-                       typename basic_inlined_string<E, T, A, S>::traits_type> &os,
+                       typename basic_inlined_string<E, T, A, S>::traits_type>
+        &os,
     const basic_inlined_string<E, T, A, S> &str) {
 #ifdef _LIBCPP_VERSION
-  typedef std::basic_ostream<typename basic_inlined_string<E, T, A, S>::value_type,
-                             typename basic_inlined_string<E, T, A, S>::traits_type>
+  typedef std::basic_ostream<
+      typename basic_inlined_string<E, T, A, S>::value_type,
+      typename basic_inlined_string<E, T, A, S>::traits_type>
       _ostream_type;
   typename _ostream_type::sentry _s(os);
   if (_s) {
@@ -2583,8 +2689,7 @@ inline bool operator>=(const std::basic_string<E, T, A2> &lhs,
 
 typedef basic_inlined_string<char> inlined_string;
 
-template <>
-struct is_string_type<inlined_string> : public std::true_type{};
+template <> struct is_string_type<inlined_string> : public std::true_type {};
 
 // Compatibility function, to make sure toStdString(s) can be called
 // to convert a std::string or inlined_string variable s into type std::string
