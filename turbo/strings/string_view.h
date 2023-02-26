@@ -171,8 +171,10 @@ class string_view {
 
   static constexpr size_type npos = static_cast<size_type>(-1);
 
+  static constexpr int32_t kUnknownCategory = INT8_MIN;
+
   // Null `string_view` constructor
-  constexpr string_view() noexcept : ptr_(nullptr), length_(0) {}
+  constexpr string_view() noexcept : ptr_(nullptr), length_(0), category_(kUnknownCategory) {}
 
   // Implicit constructors
 
@@ -191,11 +193,15 @@ class string_view {
   // instead (see below).
   // The length check is skipped since it is unnecessary and causes code bloat.
   constexpr string_view(const char* str)  // NOLINT(runtime/explicit)
-      : ptr_(str), length_(str ? StrlenInternal(str) : 0) {}
+      : ptr_(str), length_(str ? StrlenInternal(str) : 0), category_(kUnknownCategory){}
 
   // Implicit constructor of a `string_view` from a `const char*` and length.
   constexpr string_view(const char* data, size_type len)
-      : ptr_(data), length_(CheckLengthInternal(len)) {}
+      : ptr_(data), length_(CheckLengthInternal(len)), category_(kUnknownCategory) {}
+
+  // for some case use it as string pieces
+  constexpr string_view(const char* data, size_type len, int32_t category)
+      : ptr_(data), length_(CheckLengthInternal(len)), category_(category) {}
 
   // NOTE: Harmlessly omitted to work around gdb bug.
   //   constexpr string_view(const string_view&) noexcept = default;
@@ -586,6 +592,10 @@ class string_view {
     return find_last_not_of(string_view(s), pos);
   }
 
+  constexpr int32_t category() const noexcept {
+    return category_;
+  }
+
  private:
   // The constructor from std::string delegates to this constructor.
   // See the comment on that constructor for the rationale.
@@ -631,6 +641,7 @@ class string_view {
 
   const char* ptr_;
   size_type length_;
+  int32_t   category_;
 };
 
 // This large function is defined inline so that in a fairly common case where
