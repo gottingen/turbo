@@ -768,10 +768,10 @@ TURBO_NO_INLINE inline Char *
 inlined_string_core<Char>::initMediumNoFill(const size_t size) {
   // Medium strings are allocated normally. Don't forget to
   // allocate one extra Char for the terminating null.
-  size_t effectiveCapacity = goodMallocSize((size + 1) * sizeof(Char));
-  auto const newMB = MediumLarge::create(&effectiveCapacity);
-  ml_.data_ = newMB->data_;
+  auto const allocSize = goodMallocSize((1 + size) * sizeof(Char));
+  ml_.data_ = static_cast<Char *>(checkedMalloc(allocSize));
   ml_.size_ = size;
+  ml_.setCapacity(allocSize / sizeof(Char) - 1, Category::isMedium);
   ml_.data_[size] = '\0';
   return ml_.data_;
 }
