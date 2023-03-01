@@ -2391,7 +2391,7 @@
                     #if defined(__clang__)
                       #define TURBO_FALLTHROUGH [[clang::fallthrough]]
                     #elif defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 7000
-                      #define define TURBO_FALLTHROUGH [[gnu::fallthrough]]
+                      #define TURBO_FALLTHROUGH [[gnu::fallthrough]]
                     #endif
 		#else
                     #define TURBO_FALLTHROUGH
