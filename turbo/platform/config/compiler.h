@@ -17,13 +17,13 @@
  *     TURBO_COMPILER_GREEN_HILLS
  *     TURBO_COMPILER_CLANG
  *     TURBO_COMPILER_CLANG_CL
- *     
+ *
  *     TURBO_COMPILER_VERSION = <integer>
  *     TURBO_COMPILER_NAME = <string>
  *     TURBO_COMPILER_STRING = <string>
- *     
+ *
  *     TURBO_COMPILER_VA_COPY_REQUIRED
- * 
+ *
  *  C++98/03 functionality
  *     TURBO_COMPILER_NO_STATIC_CONSTANTS
  *     TURBO_COMPILER_NO_TEMPLATE_SPECIALIZATION
@@ -96,14 +96,14 @@
  *
  *  C++14 functionality
  *     TURBO_COMPILER_NO_VARIABLE_TEMPLATES
- * 
+ *
  *  C++17 functionality
  *     TURBO_COMPILER_NO_INLINE_VARIABLES
  *     TURBO_COMPILER_NO_ALIGNED_NEW
  *
  *  C++20 functionality
  *     TURBO_COMPILER_NO_DESIGNATED_INITIALIZERS
- *     
+ *
  *-----------------------------------------------------------------------------
  *
  * Supplemental documentation
@@ -127,7 +127,7 @@
  *
  *     TURBO_COMPILER_NO_MEMBER_TEMPLATE_SPECIALIZATION
  *         Some compilers fail to allow member template specialization, such as with this:
- *             struct A{ 
+ *             struct A{
  *                 template<class U> void DoSomething(U u);
  *                 void DoSomething(int x);
  *             };
@@ -149,9 +149,9 @@
  *
  *     TURBO_COMPILER_NO_COVARIANT_RETURN_TYPE
  *         See the C++ standard sec 10.3,p5.
- *     
+ *
  *     TURBO_COMPILER_NO_DEDUCED_TYPENAME
- *         Some compilers don't support the use of 'typename' for 
+ *         Some compilers don't support the use of 'typename' for
  *         dependent types in deduced contexts, as with this:
  *             template <class T> void Function(T, typename T::type);
  *
@@ -159,17 +159,17 @@
  *         Also known as Koenig lookup. Basically, if you have a function
  *         that is a namespace and you call that function without prefixing
  *         it with the namespace the compiler should look at any arguments
- *         you pass to that function call and search their namespace *first* 
+ *         you pass to that function call and search their namespace *first*
  *         to see if the given function exists there.
  *
  *     TURBO_COMPILER_NO_EXCEPTION_STD_NAMESPACE
- *         <exception> is in namespace std. Some std libraries fail to 
- *         put the contents of <exception> in namespace std. The following 
+ *         <exception> is in namespace std. Some std libraries fail to
+ *         put the contents of <exception> in namespace std. The following
  *         code should normally be legal:
  *             void Function(){ std::terminate(); }
  *
  *     TURBO_COMPILER_NO_EXPLICIT_FUNCTION_TEMPLATE_ARGUMENTS
- *         Some compilers fail to execute DoSomething() properly, though they 
+ *         Some compilers fail to execute DoSomething() properly, though they
  *         succeed in compiling it, as with this:
  *             template <int i>
  *             bool DoSomething(int j){ return i == j; };
@@ -177,12 +177,12 @@
  *
  *     TURBO_COMPILER_NO_EXCEPTIONS
  *         The compiler is configured to disallow the use of try/throw/catch
- *         syntax (often to improve performance). Use of such syntax in this 
- *         case will cause a compilation error. 
- *         
+ *         syntax (often to improve performance). Use of such syntax in this
+ *         case will cause a compilation error.
+ *
  *     TURBO_COMPILER_NO_UNWIND
- *         The compiler is configured to allow the use of try/throw/catch 
- *         syntax and behaviour but disables the generation of stack unwinding 
+ *         The compiler is configured to allow the use of try/throw/catch
+ *         syntax and behaviour but disables the generation of stack unwinding
  *         code for responding to exceptions (often to improve performance).
  *
  *---------------------------------------------------------------------------*/
@@ -200,22 +200,22 @@
 		#define INTERNAL_PRIMITIVE_STRINGIZE(x) #x
 	#endif
 
-	// TURBO_COMPILER_HAS_FEATURE
-	#ifndef TURBO_COMPILER_HAS_FEATURE
+	// TURBO_HAVE_FEATURE
+	#ifndef TURBO_HAVE_FEATURE
 		#if defined(__clang__)
-			#define TURBO_COMPILER_HAS_FEATURE(x) __has_feature(x)
+			#define TURBO_HAVE_FEATURE(x) __has_feature(x)
 		#else
-			#define TURBO_COMPILER_HAS_FEATURE(x) 0
+			#define TURBO_HAVE_FEATURE(x) 0
 		#endif
 	#endif
 
 
-	// TURBO_COMPILER_HAS_BUILTIN
-	#ifndef TURBO_COMPILER_HAS_BUILTIN
+	// TURBO_HAVE_BUILTIN
+	#ifndef TURBO_HAVE_BUILTIN
 		#if defined(__clang__)
-			#define TURBO_COMPILER_HAS_BUILTIN(x) __has_builtin(x)
+			#define TURBO_HAVE_BUILTIN(x) __has_builtin(x)
 		#else
-			#define TURBO_COMPILER_HAS_BUILTIN(x) 0
+			#define TURBO_HAVE_BUILTIN(x) 0
 		#endif
 	#endif
 
@@ -250,7 +250,7 @@
 	// by the compiler. It means that whatever C++11 support the compiler has is enabled.
 	// This also includes existing and older compilers that still identify C++11 as C++0x.
 	//
-	// We cannot use (__cplusplus >= 201103L) alone because some compiler vendors have 
+	// We cannot use (__cplusplus >= 201103L) alone because some compiler vendors have
 	// decided to not define __cplusplus like thus until they have fully completed their
 	// C++11 support.
 	//
@@ -273,13 +273,13 @@
 	// This does not mean that all of C++14 or any particular feature of C++14 is supported
 	// by the compiler. It means that whatever C++14 support the compiler has is enabled.
 	//
-	// We cannot use (__cplusplus >= 201402L) alone because some compiler vendors have 
+	// We cannot use (__cplusplus >= 201402L) alone because some compiler vendors have
 	// decided to not define __cplusplus like thus until they have fully completed their
 	// C++14 support.
 	#if !defined(TURBO_COMPILER_CPP14_ENABLED) && defined(__cplusplus)
 		#if (__cplusplus >= 201402L) 								// Clang and GCC defines this like so in C++14 mode.
 			#define TURBO_COMPILER_CPP14_ENABLED 1
-		#elif defined(_MSC_VER) && (_MSC_VER >= 1900)  	// VS2015+ 
+		#elif defined(_MSC_VER) && (_MSC_VER >= 1900)  	// VS2015+
 			#define TURBO_COMPILER_CPP14_ENABLED 1
 		#endif
 	#endif
@@ -290,12 +290,12 @@
 	// Defined as 1 if the compiler has its available C++17 support enabled, else undefined.
 	// This does not mean that all of C++17 or any particular feature of C++17 is supported
 	// by the compiler. It means that whatever C++17 support the compiler has is enabled.
- 	// 
-	// We cannot use (__cplusplus >= 201703L) alone because some compiler vendors have 
+ 	//
+	// We cannot use (__cplusplus >= 201703L) alone because some compiler vendors have
 	// decided to not define __cplusplus like thus until they have fully completed their
 	// C++17 support.
 	#if !defined(TURBO_COMPILER_CPP17_ENABLED) && defined(__cplusplus)
-		#if (__cplusplus >= 201703L) 
+		#if (__cplusplus >= 201703L)
 			#define TURBO_COMPILER_CPP17_ENABLED 1
 		#elif defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L) // C++17+
 			#define TURBO_COMPILER_CPP17_ENABLED 1
@@ -349,7 +349,7 @@
 		#define TURBO_COMPILER_NAME    "GCC"
 		#define TURBO_COMPILER_STRING  TURBO_COMPILER_NAME " compiler, version " INTERNAL_STRINGIZE( __GNUC__ ) "." INTERNAL_STRINGIZE( __GNUC_MINOR__ )
 
-		#if (__GNUC__ == 2) && (__GNUC_MINOR__ < 95) // If GCC < 2.95... 
+		#if (__GNUC__ == 2) && (__GNUC_MINOR__ < 95) // If GCC < 2.95...
 			#define TURBO_COMPILER_NO_MEMBER_TEMPLATES 1
 		#endif
 		#if (__GNUC__ == 2) && (__GNUC_MINOR__ <= 97) // If GCC <= 2.97...
@@ -388,7 +388,7 @@
 			#define TURBO_COMPILER_MICROSOFT 1
 		#endif
 
-		// Should we enable the following? This isn't as clear because as of this writing we don't know if the Intel 
+		// Should we enable the following? This isn't as clear because as of this writing we don't know if the Intel
 		// compiler truly emulates GCC well enough that enabling this does more good than harm.
 		#if defined(__GNUC__)
 			#define TURBO_COMPILER_GNUC 1
@@ -459,7 +459,7 @@
 			//#define TURBO_COMPILER_NO_MEMBER_TEMPLATES 1                       // VC7.0 supports member templates properly 95% of the time. So do we flag the remaining 5%?
 
 		#elif (_MSC_VER < 1400) // VS2003       _MSC_VER of 1300 means VC7 (VS2003)
-			// The VC7.1 and later compiler is fairly close to the C++ standard 
+			// The VC7.1 and later compiler is fairly close to the C++ standard
 			// and thus has no compiler limitations that we are concerned about.
 			#define TURBO_COMPILER_MSVC7_2003 1
 			#define TURBO_COMPILER_MSVC7_1    1
@@ -538,8 +538,8 @@
 	// TURBO_COMPILER_VA_COPY_REQUIRED
 	//
 	// Defines whether va_copy must be used to copy or save va_list objects between uses.
-	// Some compilers on some platforms implement va_list whereby its contents  
-	// are destroyed upon usage, even if passed by value to another function. 
+	// Some compilers on some platforms implement va_list whereby its contents
+	// are destroyed upon usage, even if passed by value to another function.
 	// With these compilers you can use va_copy to save and restore a va_list.
 	// Known compiler/platforms that destroy va_list contents upon usage include:
 	//     CodeWarrior on PowerPC
@@ -564,7 +564,7 @@
 	//
 	#if defined(__EDG_VERSION__) && !defined(__RTTI)
 		#define TURBO_COMPILER_NO_RTTI 1
-	#elif defined(__clang__) && !TURBO_COMPILER_HAS_FEATURE(cxx_rtti)
+	#elif defined(__clang__) && !TURBO_HAVE_FEATURE(cxx_rtti)
 		#define TURBO_COMPILER_NO_RTTI 1
 	#elif defined(__IBMCPP__) && !defined(__RTTI_ALL__)
 		#define TURBO_COMPILER_NO_RTTI 1
@@ -581,11 +581,11 @@
 	// TURBO_COMPILER_NO_EXCEPTIONS / TURBO_COMPILER_NO_UNWIND
 	//
 	// If TURBO_COMPILER_NO_EXCEPTIONS is defined, then the compiler is
-	// configured to not recognize C++ exception-handling statements 
+	// configured to not recognize C++ exception-handling statements
 	// such as try/catch/throw. Thus, when TURBO_COMPILER_NO_EXCEPTIONS is
 	// defined, code that attempts to use exception handling statements
 	// will usually cause a compilation error. If is often desirable
-	// for projects to disable exception handling because exception 
+	// for projects to disable exception handling because exception
 	// handling causes extra code and/or data generation which might
 	// not be needed, especially if it is known that exceptions won't
 	// be happening. When writing code that is to be portable between
@@ -608,7 +608,7 @@
 
 	// ------------------------------------------------------------------------
 	// TURBO_DISABLE_ALL_VC_WARNINGS / TURBO_RESTORE_ALL_VC_WARNINGS
-	// 
+	//
 	// Disable and re-enable all warning(s) within code.
 	//
 	// Example usage:
@@ -658,7 +658,7 @@
 	//
 	//
 	#if !defined(TURBO_COMPILER_NO_ALIGNED_NEW)
-		#if defined(_HAS_ALIGNED_NEW) && _HAS_ALIGNED_NEW // VS2017 15.5 Preview 
+		#if defined(_HAS_ALIGNED_NEW) && _HAS_ALIGNED_NEW // VS2017 15.5 Preview
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP17_ENABLED)
 			// supported.
@@ -670,7 +670,7 @@
 	// TURBO_COMPILER_NO_NEW_THROW_SPEC / TURBO_THROW_SPEC_NEW / TURBO_THROW_SPEC_DELETE
 	//
 	// If defined then the compiler's version of operator new is not decorated
-	// with a throw specification. This is useful for us to know because we 
+	// with a throw specification. This is useful for us to know because we
 	// often want to write our own overloaded operator new implementations.
 	// We need such operator new overrides to be declared identically to the
 	// way the compiler is defining operator new itself.
@@ -686,7 +686,7 @@
 	//      void  operator delete[](void*, const std::nothrow_t&) TURBO_THROW_SPEC_DELETE_NONE();
 	//
 	#if defined(TURBO_HAVE_DINKUMWARE_CPP_LIBRARY)
-		#if defined(_MSC_VER) && (_MSC_VER >= 1912)  // VS2017 15.3+ 
+		#if defined(_MSC_VER) && (_MSC_VER >= 1912)  // VS2017 15.3+
 			#define TURBO_THROW_SPEC_NEW(x)        noexcept(false)
 			#define TURBO_THROW_SPEC_NEW_NONE()    noexcept
 			#define TURBO_THROW_SPEC_DELETE_NONE() noexcept
@@ -728,7 +728,7 @@
 	// If defined, then the compiler doesn't provide a Standard C++ library.
 	//
 	#if defined(TURBO_PLATFORM_ANDROID)
-		// Disabled because EA's eaconfig/android_config/android_sdk packages currently 
+		// Disabled because EA's eaconfig/android_config/android_sdk packages currently
 		// don't support linking STL libraries. Perhaps we can figure out what linker arguments
 		// are needed for an app so we can manually specify them and then re-enable this code.
 		//#include <android/api-level.h>
@@ -741,10 +741,10 @@
 
 	// TURBO_COMPILER_NO_STATIC_VARIABLE_INIT
 	//
-	// If defined, it means that global or static C++ variables will be 
-	// constructed. Not all compiler/platorm combinations support this. 
+	// If defined, it means that global or static C++ variables will be
+	// constructed. Not all compiler/platorm combinations support this.
 	// User code that needs to be portable must avoid having C++ variables
-	// that construct before main. 
+	// that construct before main.
 	//
 	//#if defined(TURBO_PLATFORM_MOBILE)
 	//    #define TURBO_COMPILER_NO_STATIC_VARIABLE_INIT 1
@@ -762,7 +762,7 @@
 	//#endif
 
 	// TURBO_COMPILER_NO_VARIADIC_MACROS
-	// 
+	//
 	// If defined, the compiler doesn't support C99/C++11 variadic macros.
 	// With a variadic macro, you can do this:
 	//     #define MY_PRINTF(format, ...) printf(format, __VA_ARGS__)
@@ -779,7 +779,7 @@
 
 
 	// TURBO_COMPILER_NO_RVALUE_REFERENCES
-	// 
+	//
 	// If defined, the compiler doesn't fully support C++11 rvalue reference semantics.
 	// This applies to the compiler only and not the Standard Library in use with the compiler,
 	// which is required by the Standard to have some support itself.
@@ -789,7 +789,7 @@
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__EDG_VERSION__) && (__EDG_VERSION__ >= 403) // EDG 4.3+.
 			// supported. Earlier EDG supported a subset of rvalue references. Implicit move constructors and assignment operators aren't supported until EDG 4.5.
-		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_COMPILER_HAS_FEATURE(cxx_rvalue_references)
+		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_HAVE_FEATURE(cxx_rvalue_references)
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__GNUC__) && (TURBO_COMPILER_VERSION >= 4005)   // GCC 4.5+
 			// supported.
@@ -800,7 +800,7 @@
 
 
 	// TURBO_COMPILER_NO_EXTERN_TEMPLATE
-	// 
+	//
 	// If defined, the compiler doesn't support C++11 extern template.
 	// With extern templates, you can do this:
 	//     extern template void DoSomething(KnownType u);
@@ -823,7 +823,7 @@
 
 
 	// TURBO_COMPILER_NO_RANGE_BASED_FOR_LOOP
-	// 
+	//
 	// If defined, the compiler doesn't support C++11 range-based for loops.
 	// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2930.html
 	// You must #include <iterator> for range-based for loops to work.
@@ -858,7 +858,7 @@
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__EDG_VERSION__) && (__EDG_VERSION__ >= 406) // EDG 4.6+.
 			// supported.
-		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_COMPILER_HAS_FEATURE(cxx_constexpr)
+		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_HAVE_FEATURE(cxx_constexpr)
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__GNUC__) && (TURBO_COMPILER_VERSION >= 4006) // GCC 4.6+
 			// supported.
@@ -885,10 +885,10 @@
 			#define TURBO_COMPILER_NO_CONSTEXPR_IF 1
 		#endif
 	#endif
-	
+
 
 	// TURBO_COMPILER_NO_OVERRIDE
-	// 
+	//
 	// Refers to the C++11 override specifier.
 	//
 	#ifndef TURBO_COMPILER_NO_OVERRIDE
@@ -905,7 +905,7 @@
 
 
 	// TURBO_COMPILER_NO_INHERITANCE_FINAL
-	// 
+	//
 	// Refers to the C++11 final specifier.
 	//
 	#ifndef TURBO_COMPILER_NO_INHERITANCE_FINAL
@@ -1170,7 +1170,7 @@
 	// Refers to C++17 inline variables that allows the definition of variables in header files
 	//
 	// Example usage:
-	//    struct Foo 
+	//    struct Foo
 	//    {
 	//        static inline constexpr int kConstant = 42;  // no out of class definition
 	//    };
@@ -1231,7 +1231,7 @@
 
 
 	// TURBO_COMPILER_NO_CARRIES_DEPENDENCY
-	// 
+	//
 	// Refers to C++11 declaration attribute: carries_dependency.
 	// http://en.cppreference.com/w/cpp/language/attributes
 	// http://blog.aaronballman.com/2011/09/understanding-attributes/
@@ -1253,7 +1253,7 @@
 
 
 	// TURBO_COMPILER_NO_FALLTHROUGH
-	// 
+	//
 	// Refers to C++17 declaration attribute: fallthrough.
 	// http://en.cppreference.com/w/cpp/language/attributes
 	//
@@ -1267,7 +1267,7 @@
 
 
 	// TURBO_COMPILER_NO_NODISCARD
-	// 
+	//
 	// Refers to C++17 declaration attribute: nodiscard.
 	// http://en.cppreference.com/w/cpp/language/attributes
 	//
@@ -1281,7 +1281,7 @@
 
 
 	// TURBO_COMPILER_NO_MAYBE_UNUSED
-	// 
+	//
 	// Refers to C++17 declaration attribute: maybe_unused.
 	// http://en.cppreference.com/w/cpp/language/attributes
 	//
@@ -1353,7 +1353,7 @@
 
 	// TURBO_COMPILER_NO_RIGHT_ANGLE_BRACKETS
 	//
-	// Defines if the compiler supports >> (as opposed to > >) in template 
+	// Defines if the compiler supports >> (as opposed to > >) in template
 	// declarations such as typedef tbstl::list<tbstl::list<int>> ListList;
 	//
 	#if !defined(TURBO_COMPILER_NO_RIGHT_ANGLE_BRACKETS)
@@ -1373,7 +1373,7 @@
 
 	// TURBO_COMPILER_NO_ALIGNOF
 	//
-	// Refers specifically to C++11 alignof and not old compiler extensions such as __alignof__(). 
+	// Refers specifically to C++11 alignof and not old compiler extensions such as __alignof__().
 	// However, TBBase provides a portable TURBO_ALIGN_OF which works for all compilers.
 	//
 	#if !defined(TURBO_COMPILER_NO_ALIGNOF)
@@ -1436,7 +1436,7 @@
 	//
 	#if !defined(TURBO_COMPILER_NO_INHERITING_CONSTRUCTORS)
 		// Not supported by VC++ as of VS2013.
-		#if defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_COMPILER_HAS_FEATURE(cxx_inheriting_constructors)    // Clang
+		#if defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_HAVE_FEATURE(cxx_inheriting_constructors)    // Clang
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__GNUC__) && (TURBO_COMPILER_VERSION >= 4008)   // GCC 4.8+
 			// supported.
@@ -1569,8 +1569,8 @@
 
 
 	// TURBO_COMPILER_NO_FUNCTION_TEMPLATE_DEFAULT_ARGS
-	//  
-	// The compiler does not support default template arguments for function templates. 
+	//
+	// The compiler does not support default template arguments for function templates.
 	// http://stackoverflow.com/questions/2447458/default-template-arguments-for-function-templates
 	//
 	#if !defined(TURBO_COMPILER_NO_FUNCTION_TEMPLATE_DEFAULT_ARGS)
@@ -1701,7 +1701,7 @@
 		#if defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && (TURBO_COMPILER_VERSION >= 401) && defined(__apple_build_version__)    // Apple clang 4.1+
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && (TURBO_COMPILER_VERSION >= 301) && !defined(__apple_build_version__) // Clang 3.1+, not including Apple's Clang.
-			// supported. 
+			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__GNUC__) && (TURBO_COMPILER_VERSION >= 4005)   // GCC 4.5+
 			// supported.
 		#else
@@ -1752,13 +1752,13 @@
 	//
 	// Refers specifically to C++ thread_local, which is like compiler __thread implementations except
 	// that it also supports non-trivial classes (e.g. with ctors). TURBO_COMPILER_NO_THREAD_LOCAL refers
-	// specifically to full C++11 thread_local support. The EAThread package provides a wrapper for 
+	// specifically to full C++11 thread_local support. The EAThread package provides a wrapper for
 	// __thread via TURBO_THREAD_LOCAL (which unfortunately sounds like C++ thread_local).
 	//
 	// https://en.cppreference.com/w/cpp/keyword/thread_local
 	//
 	#if !defined(TURBO_COMPILER_NO_THREAD_LOCAL)
-		#if defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_COMPILER_HAS_FEATURE(cxx_thread_local)
+		#if defined(TURBO_COMPILER_CPP11_ENABLED) && defined(__clang__) && TURBO_HAVE_FEATURE(cxx_thread_local)
 			// supported.
 		#elif defined(TURBO_COMPILER_CPP11_ENABLED) && defined(_MSC_VER) && (TURBO_COMPILER_VERSION >= 1900)     // VS2015+
 			// supported.

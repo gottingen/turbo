@@ -187,7 +187,7 @@ void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
 
 // For printing into memory_buffer.
 template <typename Char, typename Context>
-FMT_DEPRECATED void printf(detail::buffer<Char>& buf,
+TURBO_DEPRECATED void printf(detail::buffer<Char>& buf,
                            basic_string_view<Char> format,
                            basic_format_args<Context> args) {
   return detail::vprintf(buf, format, args);
@@ -379,7 +379,7 @@ template <typename OutputIt, typename Char> class basic_printf_context {
 
   parse_context_type& parse_context() { return parse_ctx_; }
 
-  FMT_CONSTEXPR void on_error(const char* message) {
+  TURBO_CONSTEXPR void on_error(const char* message) {
     parse_ctx_.on_error(message);
   }
 

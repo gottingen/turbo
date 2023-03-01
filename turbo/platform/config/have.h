@@ -145,8 +145,8 @@
 
 // Clang libc++
 #if !defined(TURBO_HAVE_LIBCPP_LIBRARY) && !defined(TURBO_NO_HAVE_LIBCPP_LIBRARY)
-	#if TURBO_HAS_INCLUDE_AVAILABLE
-		#if TURBO_HAS_INCLUDE(<__config>)
+	#if TURBO_HAVE_INCLUDE_AVAILABLE
+		#if TURBO_HAVE_INCLUDE(<__config>)
 			#define TURBO_HAVE_LIBCPP_LIBRARY 1 // We could also #include <ciso646> and check if defined(_LIBCPP_VERSION).
 		#endif
 	#endif

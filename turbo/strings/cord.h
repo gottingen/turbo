@@ -1049,7 +1049,7 @@ inline CordRep* NewExternalRep(turbo::string_view data,
 template <typename Releaser>
 Cord MakeCordFromExternal(turbo::string_view data, Releaser&& releaser) {
   Cord cord;
-  if (TURBO_PREDICT_TRUE(!data.empty())) {
+  if (TURBO_LIKELY(!data.empty())) {
     cord.contents_.EmplaceTree(::turbo::cord_internal::NewExternalRep(
                                    data, std::forward<Releaser>(releaser)),
                                Cord::MethodIdentifier::kMakeCordFromExternal);
@@ -1206,7 +1206,7 @@ inline void Cord::InlineRep::CopyToArray(char* dst) const {
 
 inline void Cord::InlineRep::MaybeRemoveEmptyCrcNode() {
   CordRep* rep = tree();
-  if (rep == nullptr || TURBO_PREDICT_TRUE(rep->length > 0)) {
+  if (rep == nullptr || TURBO_LIKELY(rep->length > 0)) {
     return;
   }
   assert(rep->IsCrc());
@@ -1313,7 +1313,7 @@ inline void Cord::Prepend(turbo::string_view src) {
 }
 
 inline void Cord::Append(CordBuffer buffer) {
-  if (TURBO_PREDICT_FALSE(buffer.length() == 0)) return;
+  if (TURBO_UNLIKELY(buffer.length() == 0)) return;
   turbo::string_view short_value;
   if (CordRep* rep = buffer.ConsumeValue(short_value)) {
     contents_.AppendTree(rep, CordzUpdateTracker::kAppendCordBuffer);
@@ -1323,7 +1323,7 @@ inline void Cord::Append(CordBuffer buffer) {
 }
 
 inline void Cord::Prepend(CordBuffer buffer) {
-  if (TURBO_PREDICT_FALSE(buffer.length() == 0)) return;
+  if (TURBO_UNLIKELY(buffer.length() == 0)) return;
   turbo::string_view short_value;
   if (CordRep* rep = buffer.ConsumeValue(short_value)) {
     contents_.PrependTree(rep, CordzUpdateTracker::kPrependCordBuffer);
@@ -1390,7 +1390,7 @@ inline Cord::ChunkIterator::ChunkIterator(cord_internal::CordRep* tree) {
 inline Cord::ChunkIterator::ChunkIterator(const Cord* cord) {
   if (CordRep* tree = cord->contents_.tree()) {
     bytes_remaining_ = tree->length;
-    if (TURBO_PREDICT_TRUE(bytes_remaining_ != 0)) {
+    if (TURBO_LIKELY(bytes_remaining_ != 0)) {
       InitTree(tree);
     } else {
       current_chunk_ = {};
@@ -1469,7 +1469,7 @@ inline void Cord::ChunkIterator::RemoveChunkPrefix(size_t n) {
 
 inline void Cord::ChunkIterator::AdvanceBytes(size_t n) {
   assert(bytes_remaining_ >= n);
-  if (TURBO_PREDICT_TRUE(n < current_chunk_.size())) {
+  if (TURBO_LIKELY(n < current_chunk_.size())) {
     RemoveChunkPrefix(n);
   } else if (n != 0) {
     if (btree_reader_) {
@@ -1497,7 +1497,7 @@ inline Cord::ChunkIterator Cord::ChunkRange::end() const {
 inline Cord::ChunkRange Cord::Chunks() const { return ChunkRange(this); }
 
 inline Cord::CharIterator& Cord::CharIterator::operator++() {
-  if (TURBO_PREDICT_TRUE(chunk_iterator_->size() > 1)) {
+  if (TURBO_LIKELY(chunk_iterator_->size() > 1)) {
     chunk_iterator_.RemoveChunkPrefix(1);
   } else {
     ++chunk_iterator_;

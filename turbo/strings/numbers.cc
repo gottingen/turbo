@@ -567,15 +567,15 @@ size_t numbers_internal::SixDigitsToBuffer(double d, char* const buffer) {
     case -4:
       out[2] = '0';
       ++out;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case -3:
       out[2] = '0';
       ++out;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case -2:
       out[2] = '0';
       ++out;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case -1:
       out += 2;
       memcpy(out, &digits[0], 6);

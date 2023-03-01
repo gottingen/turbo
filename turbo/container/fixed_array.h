@@ -226,7 +226,7 @@ class FixedArray {
   // Bounds-checked access.  Returns a reference to the ith element of the fixed
   // array, or throws std::out_of_range
   reference at(size_type i) {
-    if (TURBO_PREDICT_FALSE(i >= size())) {
+    if (TURBO_UNLIKELY(i >= size())) {
       base_internal::ThrowStdOutOfRange("FixedArray::at failed bounds check");
     }
     return data()[i];
@@ -235,7 +235,7 @@ class FixedArray {
   // Overload of FixedArray::at() to return a const reference to the ith element
   // of the fixed array.
   const_reference at(size_type i) const {
-    if (TURBO_PREDICT_FALSE(i >= size())) {
+    if (TURBO_UNLIKELY(i >= size())) {
       base_internal::ThrowStdOutOfRange("FixedArray::at failed bounds check");
     }
     return data()[i];
@@ -468,7 +468,7 @@ class FixedArray {
     }
 
 #ifdef TURBO_HAVE_ADDRESS_SANITIZER
-    TURBO_ATTRIBUTE_NOINLINE
+    TURBO_NO_INLINE
 #endif  // TURBO_HAVE_ADDRESS_SANITIZER
     StorageElement* InitializeData() {
       if (UsingInlinedStorage(size())) {

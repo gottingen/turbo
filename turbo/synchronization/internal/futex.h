@@ -104,7 +104,7 @@ class FutexImpl {
       err = syscall(SYS_futex, reinterpret_cast<int32_t *>(v),
                     FUTEX_WAIT | FUTEX_PRIVATE_FLAG, val, nullptr);
     }
-    if (TURBO_PREDICT_FALSE(err != 0)) {
+    if (TURBO_UNLIKELY(err != 0)) {
       return -errno;
     }
     return 0;
@@ -117,7 +117,7 @@ class FutexImpl {
     long err = syscall(SYS_futex, reinterpret_cast<int32_t*>(v),
                        FUTEX_WAIT_BITSET | FUTEX_PRIVATE_FLAG, val, abstime,
                        nullptr, bits);
-    if (TURBO_PREDICT_FALSE(err != 0)) {
+    if (TURBO_UNLIKELY(err != 0)) {
       return -errno;
     }
     return 0;
@@ -127,7 +127,7 @@ class FutexImpl {
     // NOLINTNEXTLINE(runtime/int)
     long err = syscall(SYS_futex, reinterpret_cast<int32_t*>(v),
                        FUTEX_WAKE | FUTEX_PRIVATE_FLAG, count);
-    if (TURBO_PREDICT_FALSE(err < 0)) {
+    if (TURBO_UNLIKELY(err < 0)) {
       return -errno;
     }
     return 0;
@@ -139,7 +139,7 @@ class FutexImpl {
     long err = syscall(SYS_futex, reinterpret_cast<int32_t*>(v),
                        FUTEX_WAKE_BITSET | FUTEX_PRIVATE_FLAG, count, nullptr,
                        nullptr, bits);
-    if (TURBO_PREDICT_FALSE(err < 0)) {
+    if (TURBO_UNLIKELY(err < 0)) {
       return -errno;
     }
     return 0;

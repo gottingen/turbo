@@ -111,7 +111,7 @@ void windows_error::init(int err_code, string_view format_str,
 }
 
 void detail::format_windows_error(detail::buffer<char>& out, int error_code,
-                                  string_view message) FMT_NOEXCEPT {
+                                  string_view message) TURBO_NOEXCEPT {
   FMT_TRY {
     wmemory_buffer buf;
     buf.resize(inline_buffer_size);
@@ -139,12 +139,12 @@ void detail::format_windows_error(detail::buffer<char>& out, int error_code,
 }
 
 void report_windows_error(int error_code,
-                          fmt::string_view message) FMT_NOEXCEPT {
+                          fmt::string_view message) TURBO_NOEXCEPT {
   report_error(detail::format_windows_error, error_code, message);
 }
 #endif  // _WIN32
 
-buffered_file::~buffered_file() FMT_NOEXCEPT {
+buffered_file::~buffered_file() TURBO_NOEXCEPT {
   if (file_ && FMT_SYSTEM(fclose(file_)) != 0)
     report_system_error(errno, "cannot close file");
 }
@@ -185,7 +185,7 @@ file::file(cstring_view path, int oflag) {
     FMT_THROW(system_error(errno, "cannot open file {}", path.c_str()));
 }
 
-file::~file() FMT_NOEXCEPT {
+file::~file() TURBO_NOEXCEPT {
   // Don't retry close in case of EINTR!
   // See http://linux.derkeiler.com/Mailing-Lists/Kernel/2005-09/3000.html
   if (fd_ != -1 && FMT_POSIX_CALL(close(fd_)) != 0)
@@ -259,7 +259,7 @@ void file::dup2(int fd) {
   }
 }
 
-void file::dup2(int fd, error_code& ec) FMT_NOEXCEPT {
+void file::dup2(int fd, error_code& ec) TURBO_NOEXCEPT {
   int result = 0;
   FMT_RETRY(result, FMT_POSIX_CALL(dup2(fd_, fd)));
   if (result == -1) ec = error_code(errno);

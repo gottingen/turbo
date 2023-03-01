@@ -5,8 +5,8 @@
 //
 // For the license information refer to format.h.
 
-#ifndef FMT_CORE_H_
-#define FMT_CORE_H_
+#ifndef TURBO_STRINGS_FMT_CORE_H_
+#define TURBO_STRINGS_FMT_CORE_H_
 
 #include <cstdio>  // std::FILE
 #include <cstring>
@@ -17,15 +17,8 @@
 #include <type_traits>
 #include <vector>
 #include "turbo/strings/inlined_string.h"
+#include "turbo/platform/port.h"
 
-// The fmt library version in the form major * 10000 + minor * 100 + patch.
-#define FMT_VERSION 70000
-
-#ifdef __clang__
-#  define FMT_CLANG_VERSION (__clang_major__ * 100 + __clang_minor__)
-#else
-#  define FMT_CLANG_VERSION 0
-#endif
 
 #if defined(__GNUC__) && !defined(__clang__)
 #  define FMT_GCC_VERSION (__GNUC__ * 100 + __GNUC_MINOR__)
@@ -33,17 +26,6 @@
 #  define FMT_GCC_VERSION 0
 #endif
 
-#if defined(__INTEL_COMPILER)
-#  define FMT_ICC_VERSION __INTEL_COMPILER
-#else
-#  define FMT_ICC_VERSION 0
-#endif
-
-#if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  define FMT_HAS_GXX_CXX11 FMT_GCC_VERSION
-#else
-#  define FMT_HAS_GXX_CXX11 0
-#endif
 
 #ifdef __NVCC__
 #  define FMT_NVCC __NVCC__
@@ -58,55 +40,6 @@
 #  define FMT_MSC_VER 0
 #  define FMT_SUPPRESS_MSC_WARNING(n)
 #endif
-#ifdef __has_feature
-#  define FMT_HAS_FEATURE(x) __has_feature(x)
-#else
-#  define FMT_HAS_FEATURE(x) 0
-#endif
-
-#if defined(__has_include) && !defined(__INTELLISENSE__) && \
-    !(FMT_ICC_VERSION && FMT_ICC_VERSION < 1600)
-#  define FMT_HAS_INCLUDE(x) __has_include(x)
-#else
-#  define FMT_HAS_INCLUDE(x) 0
-#endif
-
-#ifdef __has_cpp_attribute
-#  define FMT_HAS_CPP_ATTRIBUTE(x) __has_cpp_attribute(x)
-#else
-#  define FMT_HAS_CPP_ATTRIBUTE(x) 0
-#endif
-
-#define FMT_HAS_CPP14_ATTRIBUTE(attribute) \
-  (__cplusplus >= 201402L && FMT_HAS_CPP_ATTRIBUTE(attribute))
-
-#define FMT_HAS_CPP17_ATTRIBUTE(attribute) \
-  (__cplusplus >= 201703L && FMT_HAS_CPP_ATTRIBUTE(attribute))
-
-// Check if relaxed C++14 constexpr is supported.
-// GCC doesn't allow throw in constexpr until version 6 (bug 67371).
-#ifndef FMT_USE_CONSTEXPR
-#  define FMT_USE_CONSTEXPR                                           \
-    (FMT_HAS_FEATURE(cxx_relaxed_constexpr) || FMT_MSC_VER >= 1910 || \
-     (FMT_GCC_VERSION >= 600 && __cplusplus >= 201402L)) &&           \
-        !FMT_NVCC && !FMT_ICC_VERSION
-#endif
-#if FMT_USE_CONSTEXPR
-#  define FMT_CONSTEXPR constexpr
-#  define FMT_CONSTEXPR_DECL constexpr
-#else
-#  define FMT_CONSTEXPR inline
-#  define FMT_CONSTEXPR_DECL
-#endif
-
-#ifndef FMT_OVERRIDE
-#  if FMT_HAS_FEATURE(cxx_override) || \
-      (FMT_GCC_VERSION >= 408 && FMT_HAS_GXX_CXX11) || FMT_MSC_VER >= 1900
-#    define FMT_OVERRIDE override
-#  else
-#    define FMT_OVERRIDE
-#  endif
-#endif
 
 // Check if exceptions are disabled.
 #ifndef FMT_EXCEPTIONS
@@ -118,75 +51,15 @@
 #  endif
 #endif
 
-// Define FMT_USE_NOEXCEPT to make fmt use noexcept (C++11 feature).
-#ifndef FMT_USE_NOEXCEPT
-#  define FMT_USE_NOEXCEPT 0
-#endif
-
-#if FMT_USE_NOEXCEPT || FMT_HAS_FEATURE(cxx_noexcept) || \
-    (FMT_GCC_VERSION >= 408 && FMT_HAS_GXX_CXX11) || FMT_MSC_VER >= 1900
-#  define FMT_DETECTED_NOEXCEPT noexcept
-#  define FMT_HAS_CXX11_NOEXCEPT 1
-#else
-#  define FMT_DETECTED_NOEXCEPT throw()
-#  define FMT_HAS_CXX11_NOEXCEPT 0
-#endif
-
-#ifndef FMT_NOEXCEPT
-#  if FMT_EXCEPTIONS || FMT_HAS_CXX11_NOEXCEPT
-#    define FMT_NOEXCEPT FMT_DETECTED_NOEXCEPT
-#  else
-#    define FMT_NOEXCEPT
-#  endif
-#endif
-
-// [[noreturn]] is disabled on MSVC and NVCC because of bogus unreachable code
-// warnings.
-#if FMT_EXCEPTIONS && FMT_HAS_CPP_ATTRIBUTE(noreturn) && !FMT_MSC_VER && \
-    !FMT_NVCC
-#  define FMT_NORETURN [[noreturn]]
-#else
-#  define FMT_NORETURN
-#endif
-
-#ifndef FMT_DEPRECATED
-#  if FMT_HAS_CPP14_ATTRIBUTE(deprecated) || FMT_MSC_VER >= 1900
-#    define FMT_DEPRECATED [[deprecated]]
-#  else
-#    if defined(__GNUC__) || defined(__clang__)
-#      define FMT_DEPRECATED __attribute__((deprecated))
-#    elif FMT_MSC_VER
-#      define FMT_DEPRECATED __declspec(deprecated)
-#    else
-#      define FMT_DEPRECATED /* deprecated */
-#    endif
-#  endif
-#endif
-
-// Workaround broken [[deprecated]] in the Intel, PGI and NVCC compilers.
-#if FMT_ICC_VERSION || defined(__PGI) || FMT_NVCC
-#  define FMT_DEPRECATED_ALIAS
-#else
-#  define FMT_DEPRECATED_ALIAS FMT_DEPRECATED
-#endif
-
-#ifndef FMT_INLINE
-#  if FMT_GCC_VERSION || FMT_CLANG_VERSION
-#    define FMT_INLINE inline __attribute__((always_inline))
-#  else
-#    define FMT_INLINE inline
-#  endif
-#endif
-
 #ifndef FMT_BEGIN_NAMESPACE
-#  if FMT_HAS_FEATURE(cxx_inline_namespaces) || FMT_GCC_VERSION >= 404 || \
+#  if TURBO_HAVE_FEATURE(cxx_inline_namespaces) || FMT_GCC_VERSION >= 404 || \
       FMT_MSC_VER >= 1900
-#    define FMT_INLINE_NAMESPACE inline namespace
+#    define TURBO_INLINE_NAMESPACE inline namespace
 #    define FMT_END_NAMESPACE \
       }                       \
       }
 #  else
-#    define FMT_INLINE_NAMESPACE namespace
+#    define TURBO_INLINE_NAMESPACE namespace
 #    define FMT_END_NAMESPACE \
       }                       \
       using namespace v6;     \
@@ -194,45 +67,16 @@
 #  endif
 #  define FMT_BEGIN_NAMESPACE \
     namespace fmt {           \
-    FMT_INLINE_NAMESPACE v6 {
-#endif
-
-#if !defined(FMT_HEADER_ONLY) && defined(_WIN32)
-#  define FMT_CLASS_API FMT_SUPPRESS_MSC_WARNING(4275)
-#  ifdef FMT_EXPORT
-#    define FMT_API __declspec(dllexport)
-#    define FMT_EXTERN_TEMPLATE_API FMT_API
-#    define FMT_EXPORTED
-#  elif defined(FMT_SHARED)
-#    define FMT_API __declspec(dllimport)
-#    define FMT_EXTERN_TEMPLATE_API FMT_API
-#  endif
-#else
-#  define FMT_CLASS_API
-#endif
-#ifndef FMT_API
-#  define FMT_API
-#endif
-#ifndef FMT_EXTERN_TEMPLATE_API
-#  define FMT_EXTERN_TEMPLATE_API
-#endif
-#ifndef FMT_INSTANTIATION_DEF_API
-#  define FMT_INSTANTIATION_DEF_API FMT_API
-#endif
-
-#ifndef FMT_HEADER_ONLY
-#  define FMT_EXTERN extern
-#else
-#  define FMT_EXTERN
+    TURBO_INLINE_NAMESPACE v6 {
 #endif
 
 // libc++ supports string_view in pre-c++17.
-#if (FMT_HAS_INCLUDE(<string_view>) &&                       \
+#if (TURBO_HAVE_INCLUDE(<string_view>) &&                       \
      (__cplusplus > 201402L || defined(_LIBCPP_VERSION))) || \
     (defined(_MSVC_LANG) && _MSVC_LANG > 201402L && _MSC_VER >= 1910)
 #  include <string_view>
 #  define FMT_USE_STRING_VIEW
-#elif FMT_HAS_INCLUDE("experimental/string_view") && __cplusplus >= 201402L
+#elif TURBO_HAVE_INCLUDE("experimental/string_view") && __cplusplus >= 201402L
 #  include <experimental/string_view>
 #  define FMT_USE_EXPERIMENTAL_STRING_VIEW
 #endif
@@ -274,7 +118,7 @@ namespace detail {
 // warnings.
 template <typename T> constexpr T const_check(T value) { return value; }
 
-FMT_NORETURN FMT_API void assert_fail(const char* file, int line,
+TURBO_NORETURN TURBO_DLL void assert_fail(const char* file, int line,
                                       const char* message);
 
 #ifndef FMT_ASSERT
@@ -314,7 +158,7 @@ struct uint128_t {};
 
 // Casts a nonnegative integer to unsigned.
 template <typename Int>
-FMT_CONSTEXPR typename std::make_unsigned<Int>::type to_unsigned(Int value) {
+TURBO_CONSTEXPR typename std::make_unsigned<Int>::type to_unsigned(Int value) {
   FMT_ASSERT(value >= 0, "negative value");
   return static_cast<typename std::make_unsigned<Int>::type>(value);
 }
@@ -353,10 +197,10 @@ template <typename Char> class basic_string_view {
   using value_type = Char;
   using iterator = const Char*;
 
-  constexpr basic_string_view() FMT_NOEXCEPT : data_(nullptr), size_(0) {}
+  constexpr basic_string_view() TURBO_NOEXCEPT : data_(nullptr), size_(0) {}
 
   /** Constructs a string reference object from a C string and a size. */
-  constexpr basic_string_view(const Char* s, size_t count) FMT_NOEXCEPT
+  constexpr basic_string_view(const Char* s, size_t count) TURBO_NOEXCEPT
       : data_(s),
         size_(count) {}
 
@@ -367,26 +211,26 @@ template <typename Char> class basic_string_view {
     \endrst
    */
 #if __cplusplus >= 201703L  // C++17's char_traits::length() is constexpr.
-  FMT_CONSTEXPR
+  TURBO_CONSTEXPR
 #endif
   basic_string_view(const Char* s)
       : data_(s), size_(std::char_traits<Char>::length(s)) {}
 
   /** Constructs a string reference from a ``std::basic_string`` object. */
   template <typename Traits, typename Alloc>
-  FMT_CONSTEXPR basic_string_view(
-      const std::basic_string<Char, Traits, Alloc>& s) FMT_NOEXCEPT
+  TURBO_CONSTEXPR basic_string_view(
+      const std::basic_string<Char, Traits, Alloc>& s) TURBO_NOEXCEPT
       : data_(s.data()),
         size_(s.size()) {}
   template <typename Traits, typename Alloc>
-  FMT_CONSTEXPR basic_string_view(
-      const turbo::basic_inlined_string<Char, Traits, Alloc>& s) FMT_NOEXCEPT
+  TURBO_CONSTEXPR basic_string_view(
+      const turbo::basic_inlined_string<Char, Traits, Alloc>& s) TURBO_NOEXCEPT
       : data_(s.data()),
         size_(s.size()) {}
 
   template <typename S, FMT_ENABLE_IF(std::is_same<
                                       S, detail::std_string_view<Char>>::value)>
-  FMT_CONSTEXPR basic_string_view(S s) FMT_NOEXCEPT : data_(s.data()),
+  TURBO_CONSTEXPR basic_string_view(S s) TURBO_NOEXCEPT : data_(s.data()),
                                                       size_(s.size()) {}
 
   /** Returns a pointer to the string data. */
@@ -400,7 +244,7 @@ template <typename Char> class basic_string_view {
 
   constexpr const Char& operator[](size_t pos) const { return data_[pos]; }
 
-  FMT_CONSTEXPR void remove_prefix(size_t n) {
+  TURBO_CONSTEXPR void remove_prefix(size_t n) {
     data_ += n;
     size_ -= n;
   }
@@ -523,7 +367,7 @@ struct error_handler {
   constexpr error_handler(const error_handler&) = default;
 
   // This function is intentionally not constexpr to give a compile-time error.
-  FMT_NORETURN FMT_API void on_error(const char* message);
+  TURBO_NORETURN TURBO_DLL void on_error(const char* message);
 };
 }  // namespace detail
 
@@ -564,15 +408,15 @@ class basic_format_parse_context : private ErrorHandler {
     Returns an iterator to the beginning of the format string range being
     parsed.
    */
-  constexpr iterator begin() const FMT_NOEXCEPT { return format_str_.begin(); }
+  constexpr iterator begin() const TURBO_NOEXCEPT { return format_str_.begin(); }
 
   /**
     Returns an iterator past the end of the format string range being parsed.
    */
-  constexpr iterator end() const FMT_NOEXCEPT { return format_str_.end(); }
+  constexpr iterator end() const TURBO_NOEXCEPT { return format_str_.end(); }
 
   /** Advances the begin iterator to ``it``. */
-  FMT_CONSTEXPR void advance_to(iterator it) {
+  TURBO_CONSTEXPR void advance_to(iterator it) {
     format_str_.remove_prefix(detail::to_unsigned(it - begin()));
   }
 
@@ -580,7 +424,7 @@ class basic_format_parse_context : private ErrorHandler {
     Reports an error if using the manual argument indexing; otherwise returns
     the next argument index and switches to the automatic indexing.
    */
-  FMT_CONSTEXPR int next_arg_id() {
+  TURBO_CONSTEXPR int next_arg_id() {
     // Don't check if the argument id is valid to avoid overhead and because it
     // will be checked during formatting anyway.
     if (next_arg_id_ >= 0) return next_arg_id_++;
@@ -592,16 +436,16 @@ class basic_format_parse_context : private ErrorHandler {
     Reports an error if using the automatic argument indexing; otherwise
     switches to the manual indexing.
    */
-  FMT_CONSTEXPR void check_arg_id(int) {
+  TURBO_CONSTEXPR void check_arg_id(int) {
     if (next_arg_id_ > 0)
       on_error("cannot switch from automatic to manual argument indexing");
     else
       next_arg_id_ = -1;
   }
 
-  FMT_CONSTEXPR void check_arg_id(basic_string_view<Char>) {}
+  TURBO_CONSTEXPR void check_arg_id(basic_string_view<Char>) {}
 
-  FMT_CONSTEXPR void on_error(const char* message) {
+  TURBO_CONSTEXPR void on_error(const char* message) {
     ErrorHandler::on_error(message);
   }
 
@@ -645,15 +489,15 @@ template <typename T> class buffer {
  protected:
   // Don't initialize ptr_ since it is not accessed to save a few cycles.
   FMT_SUPPRESS_MSC_WARNING(26495)
-  buffer(size_t sz) FMT_NOEXCEPT : size_(sz), capacity_(sz) {}
+  buffer(size_t sz) TURBO_NOEXCEPT : size_(sz), capacity_(sz) {}
 
-  buffer(T* p = nullptr, size_t sz = 0, size_t cap = 0) FMT_NOEXCEPT
+  buffer(T* p = nullptr, size_t sz = 0, size_t cap = 0) TURBO_NOEXCEPT
       : ptr_(p),
         size_(sz),
         capacity_(cap) {}
 
   /** Sets the buffer data and capacity. */
-  void set(T* buf_data, size_t buf_capacity) FMT_NOEXCEPT {
+  void set(T* buf_data, size_t buf_capacity) TURBO_NOEXCEPT {
     ptr_ = buf_data;
     capacity_ = buf_capacity;
   }
@@ -669,23 +513,23 @@ template <typename T> class buffer {
   void operator=(const buffer&) = delete;
   virtual ~buffer() = default;
 
-  T* begin() FMT_NOEXCEPT { return ptr_; }
-  T* end() FMT_NOEXCEPT { return ptr_ + size_; }
+  T* begin() TURBO_NOEXCEPT { return ptr_; }
+  T* end() TURBO_NOEXCEPT { return ptr_ + size_; }
 
-  const T* begin() const FMT_NOEXCEPT { return ptr_; }
-  const T* end() const FMT_NOEXCEPT { return ptr_ + size_; }
+  const T* begin() const TURBO_NOEXCEPT { return ptr_; }
+  const T* end() const TURBO_NOEXCEPT { return ptr_ + size_; }
 
   /** Returns the size of this buffer. */
-  size_t size() const FMT_NOEXCEPT { return size_; }
+  size_t size() const TURBO_NOEXCEPT { return size_; }
 
   /** Returns the capacity of this buffer. */
-  size_t capacity() const FMT_NOEXCEPT { return capacity_; }
+  size_t capacity() const TURBO_NOEXCEPT { return capacity_; }
 
   /** Returns a pointer to the buffer data. */
-  T* data() FMT_NOEXCEPT { return ptr_; }
+  T* data() TURBO_NOEXCEPT { return ptr_; }
 
   /** Returns a pointer to the buffer data. */
-  const T* data() const FMT_NOEXCEPT { return ptr_; }
+  const T* data() const TURBO_NOEXCEPT { return ptr_; }
 
   /**
     Resizes the buffer. If T is a POD type new elements may not be initialized.
@@ -724,7 +568,7 @@ class container_buffer : public buffer<typename Container::value_type> {
   Container& container_;
 
  protected:
-  void grow(size_t capacity) FMT_OVERRIDE {
+  void grow(size_t capacity) TURBO_OVERRIDE {
     container_.resize(capacity);
     this->set(&container_[0], capacity);
   }
@@ -786,9 +630,9 @@ struct arg_data<T, Char, NUM_ARGS, 0> {
   T args_[NUM_ARGS != 0 ? NUM_ARGS : 1];
 
   template <typename... U>
-  FMT_INLINE arg_data(const U&... init) : args_{init...} {}
-  FMT_INLINE const T* args() const { return args_; }
-  FMT_INLINE std::nullptr_t named_args() { return nullptr; }
+  TURBO_FORCE_INLINE arg_data(const U&... init) : args_{init...} {}
+  TURBO_FORCE_INLINE const T* args() const { return args_; }
+  TURBO_FORCE_INLINE std::nullptr_t named_args() { return nullptr; }
 };
 
 template <typename Char>
@@ -809,7 +653,7 @@ void init_named_args(named_arg_info<Char>* named_args, int arg_count,
 }
 
 template <typename... Args>
-FMT_INLINE void init_named_args(std::nullptr_t, int, int, const Args&...) {}
+TURBO_FORCE_INLINE void init_named_args(std::nullptr_t, int, int, const Args&...) {}
 
 template <typename T> struct is_named_arg : std::false_type {};
 
@@ -919,27 +763,27 @@ template <typename Context> class value {
     named_arg_value<char_type> named_args;
   };
 
-  constexpr FMT_INLINE value(int val = 0) : int_value(val) {}
-  constexpr FMT_INLINE value(unsigned val) : uint_value(val) {}
-  FMT_INLINE value(long long val) : long_long_value(val) {}
-  FMT_INLINE value(unsigned long long val) : ulong_long_value(val) {}
-  FMT_INLINE value(int128_t val) : int128_value(val) {}
-  FMT_INLINE value(uint128_t val) : uint128_value(val) {}
-  FMT_INLINE value(float val) : float_value(val) {}
-  FMT_INLINE value(double val) : double_value(val) {}
-  FMT_INLINE value(long double val) : long_double_value(val) {}
-  FMT_INLINE value(bool val) : bool_value(val) {}
-  FMT_INLINE value(char_type val) : char_value(val) {}
-  FMT_INLINE value(const char_type* val) { string.data = val; }
-  FMT_INLINE value(basic_string_view<char_type> val) {
+  constexpr TURBO_FORCE_INLINE value(int val = 0) : int_value(val) {}
+  constexpr TURBO_FORCE_INLINE value(unsigned val) : uint_value(val) {}
+  TURBO_FORCE_INLINE value(long long val) : long_long_value(val) {}
+  TURBO_FORCE_INLINE value(unsigned long long val) : ulong_long_value(val) {}
+  TURBO_FORCE_INLINE value(int128_t val) : int128_value(val) {}
+  TURBO_FORCE_INLINE value(uint128_t val) : uint128_value(val) {}
+  TURBO_FORCE_INLINE value(float val) : float_value(val) {}
+  TURBO_FORCE_INLINE value(double val) : double_value(val) {}
+  TURBO_FORCE_INLINE value(long double val) : long_double_value(val) {}
+  TURBO_FORCE_INLINE value(bool val) : bool_value(val) {}
+  TURBO_FORCE_INLINE value(char_type val) : char_value(val) {}
+  TURBO_FORCE_INLINE value(const char_type* val) { string.data = val; }
+  TURBO_FORCE_INLINE value(basic_string_view<char_type> val) {
     string.data = val.data();
     string.size = val.size();
   }
-  FMT_INLINE value(const void* val) : pointer(val) {}
-  FMT_INLINE value(const named_arg_info<char_type>* args, size_t size)
+  TURBO_FORCE_INLINE value(const void* val) : pointer(val) {}
+  TURBO_FORCE_INLINE value(const named_arg_info<char_type>* args, size_t size)
       : named_args{args, size} {}
 
-  template <typename T> FMT_INLINE value(const T& val) {
+  template <typename T> TURBO_FORCE_INLINE value(const T& val) {
     custom.value = &val;
     // Get the formatter type through the context to allow different contexts
     // have different extension points, e.g. `formatter<T>` for `format` and
@@ -963,7 +807,7 @@ template <typename Context> class value {
 };
 
 template <typename Context, typename T>
-FMT_CONSTEXPR basic_format_arg<Context> make_arg(const T& value);
+TURBO_CONSTEXPR basic_format_arg<Context> make_arg(const T& value);
 
 // To minimize the number of types we need to deal with, long is translated
 // either to int or to long long depending on its size.
@@ -975,36 +819,36 @@ using ulong_type = conditional_t<long_short, unsigned, unsigned long long>;
 template <typename Context> struct arg_mapper {
   using char_type = typename Context::char_type;
 
-  FMT_CONSTEXPR int map(signed char val) { return val; }
-  FMT_CONSTEXPR unsigned map(unsigned char val) { return val; }
-  FMT_CONSTEXPR int map(short val) { return val; }
-  FMT_CONSTEXPR unsigned map(unsigned short val) { return val; }
-  FMT_CONSTEXPR int map(int val) { return val; }
-  FMT_CONSTEXPR unsigned map(unsigned val) { return val; }
-  FMT_CONSTEXPR long_type map(long val) { return val; }
-  FMT_CONSTEXPR ulong_type map(unsigned long val) { return val; }
-  FMT_CONSTEXPR long long map(long long val) { return val; }
-  FMT_CONSTEXPR unsigned long long map(unsigned long long val) { return val; }
-  FMT_CONSTEXPR int128_t map(int128_t val) { return val; }
-  FMT_CONSTEXPR uint128_t map(uint128_t val) { return val; }
-  FMT_CONSTEXPR bool map(bool val) { return val; }
+  TURBO_CONSTEXPR int map(signed char val) { return val; }
+  TURBO_CONSTEXPR unsigned map(unsigned char val) { return val; }
+  TURBO_CONSTEXPR int map(short val) { return val; }
+  TURBO_CONSTEXPR unsigned map(unsigned short val) { return val; }
+  TURBO_CONSTEXPR int map(int val) { return val; }
+  TURBO_CONSTEXPR unsigned map(unsigned val) { return val; }
+  TURBO_CONSTEXPR long_type map(long val) { return val; }
+  TURBO_CONSTEXPR ulong_type map(unsigned long val) { return val; }
+  TURBO_CONSTEXPR long long map(long long val) { return val; }
+  TURBO_CONSTEXPR unsigned long long map(unsigned long long val) { return val; }
+  TURBO_CONSTEXPR int128_t map(int128_t val) { return val; }
+  TURBO_CONSTEXPR uint128_t map(uint128_t val) { return val; }
+  TURBO_CONSTEXPR bool map(bool val) { return val; }
 
   template <typename T, FMT_ENABLE_IF(is_char<T>::value)>
-  FMT_CONSTEXPR char_type map(T val) {
+  TURBO_CONSTEXPR char_type map(T val) {
     static_assert(
         std::is_same<T, char>::value || std::is_same<T, char_type>::value,
         "mixing character types is disallowed");
     return val;
   }
 
-  FMT_CONSTEXPR float map(float val) { return val; }
-  FMT_CONSTEXPR double map(double val) { return val; }
-  FMT_CONSTEXPR long double map(long double val) { return val; }
+  TURBO_CONSTEXPR float map(float val) { return val; }
+  TURBO_CONSTEXPR double map(double val) { return val; }
+  TURBO_CONSTEXPR long double map(long double val) { return val; }
 
-  FMT_CONSTEXPR const char_type* map(char_type* val) { return val; }
-  FMT_CONSTEXPR const char_type* map(const char_type* val) { return val; }
+  TURBO_CONSTEXPR const char_type* map(char_type* val) { return val; }
+  TURBO_CONSTEXPR const char_type* map(const char_type* val) { return val; }
   template <typename T, FMT_ENABLE_IF(is_string<T>::value)>
-  FMT_CONSTEXPR basic_string_view<char_type> map(const T& val) {
+  TURBO_CONSTEXPR basic_string_view<char_type> map(const T& val) {
     static_assert(std::is_same<char_type, char_t<T>>::value,
                   "mixing character types is disallowed");
     return to_string_view(val);
@@ -1014,7 +858,7 @@ template <typename Context> struct arg_mapper {
                 std::is_constructible<basic_string_view<char_type>, T>::value &&
                 !is_string<T>::value && !has_formatter<T, Context>::value &&
                 !has_fallback_formatter<T, Context>::value)>
-  FMT_CONSTEXPR basic_string_view<char_type> map(const T& val) {
+  TURBO_CONSTEXPR basic_string_view<char_type> map(const T& val) {
     return basic_string_view<char_type>(val);
   }
   template <
@@ -1024,30 +868,30 @@ template <typename Context> struct arg_mapper {
           !std::is_constructible<basic_string_view<char_type>, T>::value &&
           !is_string<T>::value && !has_formatter<T, Context>::value &&
           !has_fallback_formatter<T, Context>::value)>
-  FMT_CONSTEXPR basic_string_view<char_type> map(const T& val) {
+  TURBO_CONSTEXPR basic_string_view<char_type> map(const T& val) {
     return std_string_view<char_type>(val);
   }
-  FMT_CONSTEXPR const char* map(const signed char* val) {
+  TURBO_CONSTEXPR const char* map(const signed char* val) {
     static_assert(std::is_same<char_type, char>::value, "invalid string type");
     return reinterpret_cast<const char*>(val);
   }
-  FMT_CONSTEXPR const char* map(const unsigned char* val) {
+  TURBO_CONSTEXPR const char* map(const unsigned char* val) {
     static_assert(std::is_same<char_type, char>::value, "invalid string type");
     return reinterpret_cast<const char*>(val);
   }
-  FMT_CONSTEXPR const char* map(signed char* val) {
+  TURBO_CONSTEXPR const char* map(signed char* val) {
     const auto* const_val = val;
     return map(const_val);
   }
-  FMT_CONSTEXPR const char* map(unsigned char* val) {
+  TURBO_CONSTEXPR const char* map(unsigned char* val) {
     const auto* const_val = val;
     return map(const_val);
   }
 
-  FMT_CONSTEXPR const void* map(void* val) { return val; }
-  FMT_CONSTEXPR const void* map(const void* val) { return val; }
-  FMT_CONSTEXPR const void* map(std::nullptr_t val) { return val; }
-  template <typename T> FMT_CONSTEXPR int map(const T*) {
+  TURBO_CONSTEXPR const void* map(void* val) { return val; }
+  TURBO_CONSTEXPR const void* map(const void* val) { return val; }
+  TURBO_CONSTEXPR const void* map(std::nullptr_t val) { return val; }
+  template <typename T> TURBO_CONSTEXPR int map(const T*) {
     // Formatting of arbitrary pointers is disallowed. If you want to output
     // a pointer cast it to "void *" or "const void *". In particular, this
     // forbids formatting of "[const] volatile char *" which is printed as bool
@@ -1060,7 +904,7 @@ template <typename Context> struct arg_mapper {
             FMT_ENABLE_IF(std::is_enum<T>::value &&
                           !has_formatter<T, Context>::value &&
                           !has_fallback_formatter<T, Context>::value)>
-  FMT_CONSTEXPR auto map(const T& val)
+  TURBO_CONSTEXPR auto map(const T& val)
       -> decltype(std::declval<arg_mapper>().map(
           static_cast<typename std::underlying_type<T>::type>(val))) {
     return map(static_cast<typename std::underlying_type<T>::type>(val));
@@ -1069,12 +913,12 @@ template <typename Context> struct arg_mapper {
             FMT_ENABLE_IF(!is_string<T>::value && !is_char<T>::value &&
                           (has_formatter<T, Context>::value ||
                            has_fallback_formatter<T, Context>::value))>
-  FMT_CONSTEXPR const T& map(const T& val) {
+  TURBO_CONSTEXPR const T& map(const T& val) {
     return val;
   }
 
   template <typename T>
-  FMT_CONSTEXPR auto map(const named_arg<char_type, T>& val)
+  TURBO_CONSTEXPR auto map(const named_arg<char_type, T>& val)
       -> decltype(std::declval<arg_mapper>().map(val.value)) {
     return map(val.value);
   }
@@ -1111,11 +955,11 @@ template <typename Context> class basic_format_arg {
   detail::type type_;
 
   template <typename ContextType, typename T>
-  friend FMT_CONSTEXPR basic_format_arg<ContextType> detail::make_arg(
+  friend TURBO_CONSTEXPR basic_format_arg<ContextType> detail::make_arg(
       const T& value);
 
   template <typename Visitor, typename Ctx>
-  friend FMT_CONSTEXPR auto visit_format_arg(Visitor&& vis,
+  friend TURBO_CONSTEXPR auto visit_format_arg(Visitor&& vis,
                                              const basic_format_arg<Ctx>& arg)
       -> decltype(vis(0));
 
@@ -1146,7 +990,7 @@ template <typename Context> class basic_format_arg {
 
   constexpr basic_format_arg() : type_(detail::type::none_type) {}
 
-  constexpr explicit operator bool() const FMT_NOEXCEPT {
+  constexpr explicit operator bool() const TURBO_NOEXCEPT {
     return type_ != detail::type::none_type;
   }
 
@@ -1164,7 +1008,7 @@ template <typename Context> class basic_format_arg {
   \endrst
  */
 template <typename Visitor, typename Context>
-FMT_CONSTEXPR_DECL FMT_INLINE auto visit_format_arg(
+TURBO_CONSTEXPR_FUNC TURBO_FORCE_INLINE auto visit_format_arg(
     Visitor&& vis, const basic_format_arg<Context>& arg) -> decltype(vis(0)) {
   using char_type = typename Context::char_type;
   switch (arg.type_) {
@@ -1243,7 +1087,7 @@ class locale_ref {
   locale_ref() : locale_(nullptr) {}
   template <typename Locale> explicit locale_ref(const Locale& loc);
 
-  explicit operator bool() const FMT_NOEXCEPT { return locale_ != nullptr; }
+  explicit operator bool() const TURBO_NOEXCEPT { return locale_ != nullptr; }
 
   template <typename Locale> Locale get() const;
 };
@@ -1257,7 +1101,7 @@ constexpr unsigned long long encode_types() {
 }
 
 template <typename Context, typename T>
-FMT_CONSTEXPR basic_format_arg<Context> make_arg(const T& value) {
+TURBO_CONSTEXPR basic_format_arg<Context> make_arg(const T& value) {
   basic_format_arg<Context> arg;
   arg.type_ = mapped_type_constant<T, Context>::value;
   arg.value_ = arg_mapper<Context>().map(value);
@@ -1301,10 +1145,10 @@ class dynamic_arg_list {
     T value;
 
     template <typename Arg>
-    FMT_CONSTEXPR typed_node(const Arg& arg) : value(arg) {}
+    TURBO_CONSTEXPR typed_node(const Arg& arg) : value(arg) {}
 
     template <typename Char>
-    FMT_CONSTEXPR typed_node(const basic_string_view<Char>& arg)
+    TURBO_CONSTEXPR typed_node(const basic_string_view<Char>& arg)
         : value(arg.data(), arg.size()) {}
   };
 
@@ -1382,12 +1226,7 @@ using wformat_context = buffer_context<wchar_t>;
   \endrst
  */
 template <typename Context, typename... Args>
-class format_arg_store
-#if FMT_GCC_VERSION && FMT_GCC_VERSION < 409
-    // Workaround a GCC template argument substitution bug.
-    : public basic_format_args<Context>
-#endif
-{
+class format_arg_store {
  private:
   static const size_t num_args = sizeof...(Args);
   static const size_t num_named_args = detail::count_named_args<Args...>();
@@ -1411,11 +1250,7 @@ class format_arg_store
 
  public:
   format_arg_store(const Args&... args)
-      :
-#if FMT_GCC_VERSION && FMT_GCC_VERSION < 409
-        basic_format_args<Context>(*this),
-#endif
-        data_{detail::make_arg<
+      : data_{detail::make_arg<
             is_packed, Context,
             detail::mapped_type_constant<Args, Context>::value>(args)...} {
     detail::init_named_args(data_.named_args(), 0, 0, args...);
@@ -1463,12 +1298,7 @@ inline detail::named_arg<Char, T> arg(const Char* name, const T& arg) {
   \endrst
  */
 template <typename Context>
-class dynamic_format_arg_store
-#if FMT_GCC_VERSION && FMT_GCC_VERSION < 409
-    // Workaround a GCC template argument substitution bug.
-    : public basic_format_args<Context>
-#endif
-{
+class dynamic_format_arg_store {
  private:
   using char_type = typename Context::char_type;
 
@@ -1682,7 +1512,7 @@ template <typename Context> class basic_format_args {
    \endrst
    */
   template <typename... Args>
-  FMT_INLINE basic_format_args(const format_arg_store<Context, Args...>& store)
+  TURBO_FORCE_INLINE basic_format_args(const format_arg_store<Context, Args...>& store)
       : basic_format_args(store.desc, store.data_.args()) {}
 
   /**
@@ -1691,7 +1521,7 @@ template <typename Context> class basic_format_args {
    `~fmt::dynamic_format_arg_store`.
    \endrst
    */
-  FMT_INLINE basic_format_args(const dynamic_format_arg_store<Context>& store)
+  TURBO_FORCE_INLINE basic_format_args(const dynamic_format_arg_store<Context>& store)
       : basic_format_args(store.get_types(), store.data()) {}
 
   /**
@@ -1743,7 +1573,7 @@ template <typename Context> class basic_format_args {
 // It is a separate type rather than an alias to make symbols readable.
 struct format_args : basic_format_args<format_context> {
   template <typename... Args>
-  FMT_INLINE format_args(const Args&... args) : basic_format_args(args...) {}
+  TURBO_FORCE_INLINE format_args(const Args&... args) : basic_format_args(args...) {}
 };
 struct wformat_args : basic_format_args<wformat_context> {
   using basic_format_args::basic_format_args;
@@ -1753,7 +1583,7 @@ namespace detail {
 
 // Reports a compile-time error if S is not a valid format string.
 template <typename..., typename S, FMT_ENABLE_IF(!is_compile_string<S>::value)>
-FMT_INLINE void check_format_string(const S&) {
+TURBO_FORCE_INLINE void check_format_string(const S&) {
 #ifdef FMT_ENFORCE_COMPILE_STRING
   static_assert(is_compile_string<S>::value,
                 "FMT_ENFORCE_COMPILE_STRING requires all format strings to use "
@@ -1790,7 +1620,7 @@ template <typename Char, typename Args,
           FMT_ENABLE_IF(!std::is_same<Char, char>::value)>
 inline void vprint_mojibake(std::FILE*, basic_string_view<Char>, const Args&) {}
 
-FMT_API void vprint_mojibake(std::FILE*, string_view, format_args);
+TURBO_DLL void vprint_mojibake(std::FILE*, string_view, format_args);
 #ifndef _WIN32
 inline void vprint_mojibake(std::FILE*, string_view, format_args) {}
 #endif
@@ -1822,7 +1652,7 @@ inline std::back_insert_iterator<Container> format_to(
 }
 
 template <typename S, typename Char = char_t<S>>
-FMT_INLINE std::basic_string<Char> vformat(
+TURBO_FORCE_INLINE std::basic_string<Char> vformat(
     const S& format_str,
     basic_format_args<buffer_context<type_identity_t<Char>>> args) {
   return detail::vformat(to_string_view(format_str), args);
@@ -1841,13 +1671,13 @@ FMT_INLINE std::basic_string<Char> vformat(
 // Pass char_t as a default template parameter instead of using
 // std::basic_string<char_t<S>> to reduce the symbol size.
 template <typename S, typename... Args, typename Char = char_t<S>>
-FMT_INLINE std::basic_string<Char> format(const S& format_str, Args&&... args) {
+TURBO_FORCE_INLINE std::basic_string<Char> format(const S& format_str, Args&&... args) {
   const auto& vargs = detail::make_args_checked<Args...>(format_str, args...);
   return detail::vformat(to_string_view(format_str), vargs);
 }
 
-FMT_API void vprint(string_view, format_args);
-FMT_API void vprint(std::FILE*, string_view, format_args);
+TURBO_DLL void vprint(string_view, format_args);
+TURBO_DLL void vprint(std::FILE*, string_view, format_args);
 
 /**
   \rst
@@ -1889,4 +1719,4 @@ inline void print(const S& format_str, Args&&... args) {
 }
 FMT_END_NAMESPACE
 
-#endif  // FMT_CORE_H_
+#endif  // TURBO_STRINGS_FMT_CORE_H_

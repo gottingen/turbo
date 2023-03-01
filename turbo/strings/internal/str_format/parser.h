@@ -65,15 +65,15 @@ bool ParseFormatString(string_view src, Consumer consumer) {
       return consumer.Append(string_view(p, static_cast<size_t>(end - p)));
     }
     // We found a percent, so push the text run then process the percent.
-    if (TURBO_PREDICT_FALSE(!consumer.Append(
+    if (TURBO_UNLIKELY(!consumer.Append(
             string_view(p, static_cast<size_t>(percent - p))))) {
       return false;
     }
-    if (TURBO_PREDICT_FALSE(percent + 1 >= end)) return false;
+    if (TURBO_UNLIKELY(percent + 1 >= end)) return false;
 
     auto tag = GetTagForChar(percent[1]);
     if (tag.is_conv()) {
-      if (TURBO_PREDICT_FALSE(next_arg < 0)) {
+      if (TURBO_UNLIKELY(next_arg < 0)) {
         // This indicates an error in the format string.
         // The only way to get `next_arg < 0` here is to have a positional
         // argument first which sets next_arg to -1 and then a non-positional
@@ -88,21 +88,21 @@ bool ParseFormatString(string_view src, Consumer consumer) {
       UnboundConversion conv;
       conv.conv = tag.as_conv();
       conv.arg_position = ++next_arg;
-      if (TURBO_PREDICT_FALSE(
+      if (TURBO_UNLIKELY(
               !consumer.ConvertOne(conv, string_view(percent + 1, 1)))) {
         return false;
       }
     } else if (percent[1] != '%') {
       UnboundConversion conv;
       p = ConsumeUnboundConversionNoInline(percent + 1, end, &conv, &next_arg);
-      if (TURBO_PREDICT_FALSE(p == nullptr)) return false;
-      if (TURBO_PREDICT_FALSE(!consumer.ConvertOne(
+      if (TURBO_UNLIKELY(p == nullptr)) return false;
+      if (TURBO_UNLIKELY(!consumer.ConvertOne(
               conv, string_view(percent + 1,
                                 static_cast<size_t>(p - (percent + 1)))))) {
         return false;
       }
     } else {
-      if (TURBO_PREDICT_FALSE(!consumer.Append("%"))) return false;
+      if (TURBO_UNLIKELY(!consumer.Append("%"))) return false;
       p = percent + 2;
       continue;
     }

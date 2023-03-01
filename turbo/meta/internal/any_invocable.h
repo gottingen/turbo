@@ -275,7 +275,7 @@ void LocalManagerNontrivial(FunctionToCall operation,
     case FunctionToCall::relocate_from_to:
       // NOTE: Requires that the left-hand operand is already empty.
       ::new (static_cast<void*>(&to->storage)) T(std::move(from_object));
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case FunctionToCall::dispose:
       from_object.~T();  // Must not throw. // NOLINT
       return;

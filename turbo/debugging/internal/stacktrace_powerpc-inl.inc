@@ -155,7 +155,7 @@ static void **NextStackFrame(void **old_sp, const void *uc) {
 }
 
 // This ensures that turbo::GetStackTrace sets up the Link Register properly.
-TURBO_ATTRIBUTE_NOINLINE static void TurboStacktracePowerPCDummyFunction() {
+TURBO_NO_INLINE static void TurboStacktracePowerPCDummyFunction() {
   TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 

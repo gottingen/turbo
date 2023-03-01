@@ -34,7 +34,7 @@ class TURBO_SCOPED_LOCKABLE CordzUpdateScope {
   CordzUpdateScope(CordzInfo* info, CordzUpdateTracker::MethodIdentifier method)
       TURBO_EXCLUSIVE_LOCK_FUNCTION(info)
       : info_(info) {
-    if (TURBO_PREDICT_FALSE(info_)) {
+    if (TURBO_UNLIKELY(info_)) {
       info->Lock(method);
     }
   }
@@ -46,13 +46,13 @@ class TURBO_SCOPED_LOCKABLE CordzUpdateScope {
   CordzUpdateScope& operator=(const CordzUpdateScope&) = delete;
 
   ~CordzUpdateScope() TURBO_UNLOCK_FUNCTION() {
-    if (TURBO_PREDICT_FALSE(info_)) {
+    if (TURBO_UNLIKELY(info_)) {
       info_->Unlock();
     }
   }
 
   void SetCordRep(CordRep* rep) const {
-    if (TURBO_PREDICT_FALSE(info_)) {
+    if (TURBO_UNLIKELY(info_)) {
       info_->SetCordRep(rep);
     }
   }

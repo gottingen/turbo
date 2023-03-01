@@ -36,7 +36,7 @@ using ::turbo::log_internal::TextMessage;
 using ::testing::HasSubstr;
 using ::testing::Not;
 
-auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_ALLOW_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 constexpr static turbo::LogSeverityAtLeast DefaultStderrThreshold() {

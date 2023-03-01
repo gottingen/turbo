@@ -871,7 +871,7 @@ bool ConsumeDurationUnit(const char** start, const char* end, Duration* unit) {
         default:
           break;
       }
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case 1:
       switch (**start) {
         case 's':

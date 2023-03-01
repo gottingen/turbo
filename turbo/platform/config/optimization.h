@@ -55,54 +55,10 @@
 #define TURBO_BLOCK_TAIL_CALL_OPTIMIZATION() if (volatile int x = 0) { (void)x; }
 #endif
 
-// TURBO_CACHELINE_SIZE
-//
-// Explicitly defines the size of the L1 cache for purposes of alignment.
-// Setting the cacheline size allows you to specify that certain objects be
-// aligned on a cacheline boundary with `TURBO_CACHELINE_ALIGNED` declarations.
-// (See below.)
-//
-// NOTE: this macro should be replaced with the following C++17 features, when
-// those are generally available:
-//
-//   * `std::hardware_constructive_interference_size`
-//   * `std::hardware_destructive_interference_size`
-//
-// See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0154r1.html
-// for more information.
-#if defined(__GNUC__)
-// Cache line alignment
-#if defined(__i386__) || defined(__x86_64__)
-#define TURBO_CACHELINE_SIZE 64
-#elif defined(__powerpc64__)
-#define TURBO_CACHELINE_SIZE 128
-#elif defined(__aarch64__)
-// We would need to read special register ctr_el0 to find out L1 dcache size.
-// This value is a good estimate based on a real aarch64 machine.
-#define TURBO_CACHELINE_SIZE 64
-#elif defined(__arm__)
-// Cache line sizes for ARM: These values are not strictly correct since
-// cache line sizes depend on implementations, not architectures.  There
-// are even implementations with cache line sizes configurable at boot
-// time.
-#if defined(__ARM_ARCH_5T__)
-#define TURBO_CACHELINE_SIZE 32
-#elif defined(__ARM_ARCH_7A__)
-#define TURBO_CACHELINE_SIZE 64
-#endif
-#endif
-#endif
-
-#ifndef TURBO_CACHELINE_SIZE
-// A reasonable default guess.  Note that overestimates tend to waste more
-// space, while underestimates tend to waste more time.
-#define TURBO_CACHELINE_SIZE 64
-#endif
-
-// TURBO_CACHELINE_ALIGNED
+// TURBO_CACHE_LINE_ALIGNED
 //
 // Indicates that the declared object be cache aligned using
-// `TURBO_CACHELINE_SIZE` (see above). Cacheline aligning objects allows you to
+// `TURBO_CACHE_LINE_SIZE` (see above). Cacheline aligning objects allows you to
 // load a set of related objects in the L1 cache for performance improvements.
 // Cacheline aligning objects properly allows constructive memory sharing and
 // prevents destructive (or "false") memory sharing.
@@ -115,7 +71,7 @@
 // See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0154r1.html
 // for more information.
 //
-// On some compilers, `TURBO_CACHELINE_ALIGNED` expands to an `__attribute__`
+// On some compilers, `TURBO_CACHE_LINE_ALIGNED` expands to an `__attribute__`
 // or `__declspec` attribute. For compilers where this is not known to work,
 // the macro expands to nothing.
 //
@@ -130,9 +86,9 @@
 // this attribute, so prefer to put it at the beginning of your declaration.
 // For example,
 //
-//   TURBO_CACHELINE_ALIGNED static Foo* foo = ...
+//   TURBO_CACHE_LINE_ALIGNED static Foo* foo = ...
 //
-//   class TURBO_CACHELINE_ALIGNED Bar { ...
+//   class TURBO_CACHE_LINE_ALIGNED Bar { ...
 //
 // Recommendations:
 //
@@ -143,42 +99,11 @@
 // 3) Prefer applying this attribute to individual variables. Avoid
 //    applying it to types. This tends to localize the effect.
 #if defined(__clang__) || defined(__GNUC__)
-#define TURBO_CACHELINE_ALIGNED __attribute__((aligned(TURBO_CACHELINE_SIZE)))
+#define TURBO_CACHE_LINE_ALIGNED __attribute__((aligned(TURBO_CACHE_LINE_SIZE)))
 #elif defined(_MSC_VER)
-#define TURBO_CACHELINE_ALIGNED __declspec(align(TURBO_CACHELINE_SIZE))
+#define TURBO_CACHE_LINE_ALIGNED __declspec(align(TURBO_CACHE_LINE_SIZE))
 #else
-#define TURBO_CACHELINE_ALIGNED
-#endif
-
-// TURBO_PREDICT_TRUE, TURBO_PREDICT_FALSE
-//
-// Enables the compiler to prioritize compilation using static analysis for
-// likely paths within a boolean branch.
-//
-// Example:
-//
-//   if (TURBO_PREDICT_TRUE(expression)) {
-//     return result;                        // Faster if more likely
-//   } else {
-//     return 0;
-//   }
-//
-// Compilers can use the information that a certain branch is not likely to be
-// taken (for instance, a CHECK failure) to optimize for the common case in
-// the absence of better information (ie. compiling gcc with `-fprofile-arcs`).
-//
-// Recommendation: Modern CPUs dynamically predict branch execution paths,
-// typically with accuracy greater than 97%. As a result, annotating every
-// branch in a codebase is likely counterproductive; however, annotating
-// specific branches that are both hot and consistently mispredicted is likely
-// to yield performance improvements.
-#if TURBO_HAVE_BUILTIN(__builtin_expect) || \
-    (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_PREDICT_FALSE(x) (__builtin_expect(false || (x), false))
-#define TURBO_PREDICT_TRUE(x) (__builtin_expect(false || (x), true))
-#else
-#define TURBO_PREDICT_FALSE(x) (x)
-#define TURBO_PREDICT_TRUE(x) (x)
+#define TURBO_CACHE_LINE_ALIGNED
 #endif
 
 // `TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL()` aborts the program in the fastest

@@ -153,20 +153,20 @@ class LogMessage {
 
   // This prevents non-const `char[]` arrays from looking like literals.
   template <int SIZE>
-  LogMessage& operator<<(char (&buf)[SIZE]) TURBO_ATTRIBUTE_NOINLINE;
+  LogMessage& operator<<(char (&buf)[SIZE]) TURBO_NO_INLINE;
 
   // Types that support `TurboStringify()` are serialized that way.
   template <typename T,
             typename std::enable_if<
                 strings_internal::HasTurboStringify<T>::value, int>::type = 0>
-  LogMessage& operator<<(const T& v) TURBO_ATTRIBUTE_NOINLINE;
+  LogMessage& operator<<(const T& v) TURBO_NO_INLINE;
 
   // Types that don't support `TurboStringify()` but do support streaming into a
   // `std::ostream&` are serialized that way.
   template <typename T,
             typename std::enable_if<
                 !strings_internal::HasTurboStringify<T>::value, int>::type = 0>
-  LogMessage& operator<<(const T& v) TURBO_ATTRIBUTE_NOINLINE;
+  LogMessage& operator<<(const T& v) TURBO_NO_INLINE;
 
   // Note: We explicitly do not support `operator<<` for non-const references
   // because it breaks logging of non-integer bitfield types (i.e., enums).
@@ -174,11 +174,11 @@ class LogMessage {
  protected:
   // Call `abort()` or similar to perform `LOG(FATAL)` crash.  It is assumed
   // that the caller has already generated and written the trace as appropriate.
-  TURBO_ATTRIBUTE_NORETURN static void FailWithoutStackTrace();
+  TURBO_NORETURN static void FailWithoutStackTrace();
 
   // Similar to `FailWithoutStackTrace()`, but without `abort()`.  Terminates
   // the process with an error exit code.
-  TURBO_ATTRIBUTE_NORETURN static void FailQuietly();
+  TURBO_NORETURN static void FailQuietly();
 
   // Dispatches the completed `turbo::LogEntry` to applicable `turbo::LogSink`s.
   // This might as well be inlined into `~LogMessage` except that
@@ -219,9 +219,9 @@ class LogMessage {
     kNotLiteral,
   };
   void CopyToEncodedBuffer(turbo::string_view str,
-                           StringType str_type) TURBO_ATTRIBUTE_NOINLINE;
+                           StringType str_type) TURBO_NO_INLINE;
   void CopyToEncodedBuffer(char ch, size_t num,
-                           StringType str_type) TURBO_ATTRIBUTE_NOINLINE;
+                           StringType str_type) TURBO_NO_INLINE;
 
   // Returns `true` if the message is fatal or enabled debug-fatal.
   bool IsFatal() const;
@@ -268,7 +268,7 @@ class StringifySink final {
   LogMessage& message_;
 };
 
-// Note: the following is declared `TURBO_ATTRIBUTE_NOINLINE`
+// Note: the following is declared `TURBO_NO_INLINE`
 template <typename T,
           typename std::enable_if<strings_internal::HasTurboStringify<T>::value,
                                   int>::type>
@@ -279,7 +279,7 @@ LogMessage& LogMessage::operator<<(const T& v) {
   return *this;
 }
 
-// Note: the following is declared `TURBO_ATTRIBUTE_NOINLINE`
+// Note: the following is declared `TURBO_NO_INLINE`
 template <typename T,
           typename std::enable_if<!strings_internal::HasTurboStringify<T>::value,
                                   int>::type>
@@ -295,14 +295,14 @@ LogMessage& LogMessage::operator<<(const char (&buf)[SIZE]) {
   return *this;
 }
 
-// Note: the following is declared `TURBO_ATTRIBUTE_NOINLINE`
+// Note: the following is declared `TURBO_NO_INLINE`
 template <int SIZE>
 LogMessage& LogMessage::operator<<(char (&buf)[SIZE]) {
   CopyToEncodedBuffer(buf, StringType::kNotLiteral);
   return *this;
 }
 // We instantiate these specializations in the library's TU to save space in
-// other TUs.  Since the template is marked `TURBO_ATTRIBUTE_NOINLINE` we will be
+// other TUs.  Since the template is marked `TURBO_NO_INLINE` we will be
 // emitting a function call either way.
 extern template LogMessage& LogMessage::operator<<(const char& v);
 extern template LogMessage& LogMessage::operator<<(const signed char& v);
@@ -333,7 +333,7 @@ class LogMessageFatal final : public LogMessage {
   LogMessageFatal(const char* file, int line) TURBO_COLD;
   LogMessageFatal(const char* file, int line,
                   turbo::string_view failure_msg) TURBO_COLD;
-  TURBO_ATTRIBUTE_NORETURN ~LogMessageFatal();
+  TURBO_NORETURN ~LogMessageFatal();
 };
 
 class LogMessageQuietlyFatal final : public LogMessage {
@@ -341,14 +341,14 @@ class LogMessageQuietlyFatal final : public LogMessage {
   LogMessageQuietlyFatal(const char* file, int line) TURBO_COLD;
   LogMessageQuietlyFatal(const char* file, int line,
                          turbo::string_view failure_msg) TURBO_COLD;
-  TURBO_ATTRIBUTE_NORETURN ~LogMessageQuietlyFatal();
+  TURBO_NORETURN ~LogMessageQuietlyFatal();
 };
 
 }  // namespace log_internal
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
+extern "C" TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(
     TurboInternalOnFatalLogMessage)(const turbo::LogEntry&);
 
 #endif  // TURBO_LOG_INTERNAL_LOG_MESSAGE_H_

@@ -360,7 +360,7 @@ struct FlagValue<T, FlagValueStorageKind::kValueAndInitBit> : FlagOneWordValue {
   constexpr FlagValue() : FlagOneWordValue(0) {}
   bool Get(const SequenceLock&, T& dst) const {
     int64_t storage = value.load(std::memory_order_acquire);
-    if (TURBO_PREDICT_FALSE(storage == 0)) {
+    if (TURBO_UNLIKELY(storage == 0)) {
       return false;
     }
     dst = turbo::bit_cast<FlagValueAndInitBit<T>>(storage).value;
@@ -373,7 +373,7 @@ struct FlagValue<T, FlagValueStorageKind::kOneWordAtomic> : FlagOneWordValue {
   constexpr FlagValue() : FlagOneWordValue(UninitializedFlagValue()) {}
   bool Get(const SequenceLock&, T& dst) const {
     int64_t one_word_val = value.load(std::memory_order_acquire);
-    if (TURBO_PREDICT_FALSE(one_word_val == UninitializedFlagValue())) {
+    if (TURBO_UNLIKELY(one_word_val == UninitializedFlagValue())) {
       return false;
     }
     std::memcpy(&dst, static_cast<const void*>(&one_word_val), sizeof(T));
@@ -669,7 +669,7 @@ class Flag {
     impl_.AssertValidType(base_internal::FastTypeId<T>(), &GenRuntimeTypeId<T>);
 #endif
 
-    if (TURBO_PREDICT_FALSE(!value_.Get(impl_.seq_lock_, u.value))) {
+    if (TURBO_UNLIKELY(!value_.Get(impl_.seq_lock_, u.value))) {
       impl_.Read(&u.value);
     }
     return std::move(u.value);

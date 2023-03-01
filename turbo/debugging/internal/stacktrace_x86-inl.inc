@@ -316,7 +316,7 @@ static void **NextStackFrame(void **old_fp, const void *uc,
 template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
 TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
 TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 static int UnwindImpl(void **result, int *sizes, int max_depth, int skip_count,
                       const void *ucp, int *min_dropped_frames) {
   int n = 0;

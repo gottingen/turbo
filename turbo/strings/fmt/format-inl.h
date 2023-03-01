@@ -50,7 +50,7 @@ inline fmt::detail::null<> strerror_s(char*, size_t, ...) { return {}; }
 FMT_BEGIN_NAMESPACE
 namespace detail {
 
-FMT_FUNC void assert_fail(const char* file, int line, const char* message) {
+void assert_fail(const char* file, int line, const char* message) {
   // Use unchecked std::fprintf to avoid triggering another assertion when
   // writing to stderr fails
   std::fprintf(stderr, "%s:%d: assertion failed: %s", file, line, message);
@@ -72,8 +72,8 @@ inline int fmt_snprintf(char* buffer, size_t size, const char* format, ...) {
 #  define FMT_SNPRINTF fmt_snprintf
 #endif  // _MSC_VER
 
-FMT_FUNC void format_error_code(detail::buffer<char>& out, int error_code,
-                                string_view message) FMT_NOEXCEPT {
+void format_error_code(detail::buffer<char>& out, int error_code,
+                                string_view message) TURBO_NOEXCEPT {
   // Report error code making sure that the output fits into
   // inline_buffer_size to avoid dynamic memory allocation and potential
   // bad_alloc.
@@ -95,8 +95,8 @@ FMT_FUNC void format_error_code(detail::buffer<char>& out, int error_code,
   assert(out.size() <= inline_buffer_size);
 }
 
-FMT_FUNC void report_error(format_func func, int error_code,
-                           string_view message) FMT_NOEXCEPT {
+void report_error(format_func func, int error_code,
+                           string_view message) TURBO_NOEXCEPT {
   memory_buffer full_message;
   func(full_message, error_code, message);
   // Don't use fwrite_fully because the latter may throw.
@@ -104,10 +104,10 @@ FMT_FUNC void report_error(format_func func, int error_code,
   std::fputc('\n', stderr);
 }
 
-FMT_FUNC void fwrite_fully(const void* ptr, size_t size, size_t count,
+void fwrite_fully(const void* ptr, size_t size, size_t count,
                            FILE* stream);
 // A wrapper around fwrite that throws on error.
-FMT_FUNC void fwrite_fully(const void* ptr, size_t size, size_t count,
+void fwrite_fully(const void* ptr, size_t size, size_t count,
                            FILE* stream) {
   size_t written = std::fwrite(ptr, size, count, stream);
   if (written < count) FMT_THROW(system_error(errno, "cannot write to file"));
@@ -127,35 +127,35 @@ template <typename Locale> Locale locale_ref::get() const {
   return locale_ ? *static_cast<const std::locale*>(locale_) : std::locale();
 }
 
-template <typename Char> FMT_FUNC std::string grouping_impl(locale_ref loc) {
+template <typename Char> std::string grouping_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>()).grouping();
 }
-template <typename Char> FMT_FUNC Char thousands_sep_impl(locale_ref loc) {
+template <typename Char> Char thousands_sep_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
       .thousands_sep();
 }
-template <typename Char> FMT_FUNC Char decimal_point_impl(locale_ref loc) {
+template <typename Char> Char decimal_point_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
       .decimal_point();
 }
 }  // namespace detail
 #else
 template <typename Char>
-FMT_FUNC std::string detail::grouping_impl(locale_ref) {
+std::string detail::grouping_impl(locale_ref) {
   return "\03";
 }
-template <typename Char> FMT_FUNC Char detail::thousands_sep_impl(locale_ref) {
+template <typename Char> Char detail::thousands_sep_impl(locale_ref) {
   return FMT_STATIC_THOUSANDS_SEPARATOR;
 }
-template <typename Char> FMT_FUNC Char detail::decimal_point_impl(locale_ref) {
+template <typename Char> Char detail::decimal_point_impl(locale_ref) {
   return '.';
 }
 #endif
 
-FMT_API FMT_FUNC format_error::~format_error() FMT_NOEXCEPT = default;
-FMT_API FMT_FUNC system_error::~system_error() FMT_NOEXCEPT = default;
+TURBO_DLL format_error::~format_error() TURBO_NOEXCEPT = default;
+TURBO_DLL system_error::~system_error() TURBO_NOEXCEPT = default;
 
-FMT_FUNC void system_error::init(int err_code, string_view format_str,
+void system_error::init(int err_code, string_view format_str,
                                  format_args args) {
   error_code_ = err_code;
   memory_buffer buffer;
@@ -166,7 +166,7 @@ FMT_FUNC void system_error::init(int err_code, string_view format_str,
 
 namespace detail {
 
-template <> FMT_FUNC int count_digits<4>(detail::fallback_uintptr n) {
+template <> int count_digits<4>(detail::fallback_uintptr n) {
   // fallback_uintptr is always stored in little endian.
   int i = static_cast<int>(sizeof(void*)) - 1;
   while (i > 0 && n.value[i] == 0) --i;
@@ -280,7 +280,7 @@ template <typename T>
 const char basic_data<T>::right_padding_shifts[] = {0, 31, 0, 1, 0};
 
 template <typename T> struct bits {
-  static FMT_CONSTEXPR_DECL const int value =
+  static TURBO_CONSTEXPR_FUNC const int value =
       static_cast<int>(sizeof(T) * std::numeric_limits<unsigned char>::digits);
 };
 
@@ -307,11 +307,11 @@ class fp {
   // All sizes are in bits.
   // Subtract 1 to account for an implicit most significant bit in the
   // normalized form.
-  static FMT_CONSTEXPR_DECL const int double_significand_size =
+  static TURBO_CONSTEXPR_FUNC const int double_significand_size =
       std::numeric_limits<double>::digits - 1;
-  static FMT_CONSTEXPR_DECL const uint64_t implicit_bit =
+  static TURBO_CONSTEXPR_FUNC const uint64_t implicit_bit =
       1ULL << double_significand_size;
-  static FMT_CONSTEXPR_DECL const int significand_size =
+  static TURBO_CONSTEXPR_FUNC const int significand_size =
       bits<significand_type>::value;
 
   fp() : f(0), e(0) {}
@@ -471,7 +471,7 @@ class bigint {
   bigit operator[](int index) const { return bigits_[to_unsigned(index)]; }
   bigit& operator[](int index) { return bigits_[to_unsigned(index)]; }
 
-  static FMT_CONSTEXPR_DECL const int bigit_bits = bits<bigit>::value;
+  static TURBO_CONSTEXPR_FUNC const int bigit_bits = bits<bigit>::value;
 
   friend struct formatter<bigint>;
 
@@ -556,7 +556,7 @@ class bigint {
 
   int num_bigits() const { return static_cast<int>(bigits_.size()) + exp_; }
 
-  FMT_NOINLINE bigint& operator<<=(int shift) {
+  TURBO_NO_INLINE bigint& operator<<=(int shift) {
     assert(shift >= 0);
     exp_ += shift / bigit_bits;
     shift %= bigit_bits;
@@ -740,7 +740,7 @@ inline int grisu_count_digits(uint32_t n) {
 // error: the size of the region (lower, upper) outside of which numbers
 // definitely do not round to value (Delta in Grisu3).
 template <typename Handler>
-FMT_ALWAYS_INLINE digits::result grisu_gen_digits(fp value, uint64_t error,
+TURBO_FORCE_INLINE digits::result grisu_gen_digits(fp value, uint64_t error,
                                                   int& exp, Handler& handler) {
   const fp one(1ULL << -value.e, value.e);
   // The integral part of scaled value (p1 in Grisu) = value / one. It cannot be
@@ -1176,7 +1176,7 @@ int snprintf_float(T value, int precision, float_specs specs,
   }
 }
 
-FMT_FUNC const char* utf8_decode(const char* buf, uint32_t* c, int* e);
+const char* utf8_decode(const char* buf, uint32_t* c, int* e);
 // A public domain branchless UTF-8 decoder by Christopher Wellons:
 // https://github.com/skeeto/branchless-utf8
 /* Decode the next character, c, from buf, reporting errors in e.
@@ -1194,7 +1194,7 @@ FMT_FUNC const char* utf8_decode(const char* buf, uint32_t* c, int* e);
  * occurs, this pointer will be a guess that depends on the particular
  * error, but it will always advance at least one byte.
  */
-FMT_FUNC const char* utf8_decode(const char* buf, uint32_t* c, int* e) {
+const char* utf8_decode(const char* buf, uint32_t* c, int* e) {
   static const char lengths[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                                  1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
                                  0, 0, 2, 2, 2, 2, 3, 3, 4, 0};
@@ -1257,7 +1257,7 @@ template <> struct formatter<detail::bigint> {
   }
 };
 
-FMT_FUNC detail::utf8_to_utf16::utf8_to_utf16(string_view s) {
+detail::utf8_to_utf16::utf8_to_utf16(string_view s) {
   auto transcode = [this](const char* p) {
     auto cp = uint32_t();
     auto error = 0;
@@ -1288,8 +1288,8 @@ FMT_FUNC detail::utf8_to_utf16::utf8_to_utf16(string_view s) {
   buffer_.push_back(0);
 }
 
-FMT_FUNC void format_system_error(detail::buffer<char>& out, int error_code,
-                                  string_view message) FMT_NOEXCEPT {
+void format_system_error(detail::buffer<char>& out, int error_code,
+                                  string_view message) TURBO_NOEXCEPT {
   FMT_TRY {
    // memory_buffer buf;
     //buf.resize(inline_buffer_size);
@@ -1300,17 +1300,17 @@ FMT_FUNC void format_system_error(detail::buffer<char>& out, int error_code,
   format_error_code(out, error_code, message);
 }
 
-FMT_FUNC void detail::error_handler::on_error(const char* message) {
+void detail::error_handler::on_error(const char* message) {
   FMT_THROW(format_error(message));
 }
 
-FMT_FUNC void report_system_error(int error_code,
-                                  fmt::string_view message) FMT_NOEXCEPT {
+void report_system_error(int error_code,
+                                  fmt::string_view message) TURBO_NOEXCEPT {
   report_error(format_system_error, error_code, message);
 }
 
 struct stringifier {
-  template <typename T> FMT_INLINE std::string operator()(T value) const {
+  template <typename T> TURBO_FORCE_INLINE std::string operator()(T value) const {
     return to_string(value);
   }
   std::string operator()(basic_format_arg<format_context>::handle h) const {
@@ -1323,7 +1323,7 @@ struct stringifier {
   }
 };
 
-FMT_FUNC std::string detail::vformat(string_view format_str, format_args args) {
+std::string detail::vformat(string_view format_str, format_args args) {
   if (format_str.size() == 2 && equal2(format_str.data(), "{}")) {
     auto arg = args.get(0);
     if (!arg) error_handler().on_error("argument not found");
@@ -1334,7 +1334,7 @@ FMT_FUNC std::string detail::vformat(string_view format_str, format_args args) {
   return to_string(buffer);
 }
 
-FMT_FUNC void vprint(std::FILE* f, string_view format_str, format_args args) {
+void vprint(std::FILE* f, string_view format_str, format_args args) {
   memory_buffer buffer;
   detail::vformat_to(buffer, format_str,
                      basic_format_args<buffer_context<char>>(args));
@@ -1356,7 +1356,7 @@ FMT_FUNC void vprint(std::FILE* f, string_view format_str, format_args args) {
 
 #ifdef _WIN32
 // Print assuming legacy (non-Unicode) encoding.
-FMT_FUNC void detail::vprint_mojibake(std::FILE* f, string_view format_str,
+void detail::vprint_mojibake(std::FILE* f, string_view format_str,
                                       format_args args) {
   memory_buffer buffer;
   detail::vformat_to(buffer, format_str,
@@ -1365,7 +1365,7 @@ FMT_FUNC void detail::vprint_mojibake(std::FILE* f, string_view format_str,
 }
 #endif
 
-FMT_FUNC void vprint(string_view format_str, format_args args) {
+void vprint(string_view format_str, format_args args) {
   vprint(stdout, format_str, args);
 }
 

@@ -28,9 +28,9 @@ TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 // Prefetch constants used in some Extend() implementations
-constexpr int kPrefetchHorizon = TURBO_CACHELINE_SIZE * 4;  // Prefetch this far
+constexpr int kPrefetchHorizon = TURBO_CACHE_LINE_SIZE * 4;  // Prefetch this far
 // Shorter prefetch distance for smaller buffers
-constexpr int kPrefetchHorizonMedium = TURBO_CACHELINE_SIZE * 1;
+constexpr int kPrefetchHorizonMedium = TURBO_CACHE_LINE_SIZE * 1;
 static_assert(kPrefetchHorizon >= 64, "CRCPrefetchHorizon less than loop len");
 
 // We require the Scramble() function:

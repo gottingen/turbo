@@ -252,23 +252,23 @@ class TURBO_LOCKABLE CordzInfo : public CordzHandle {
   const turbo::Time create_time_;
 };
 
-inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
+TURBO_FORCE_INLINE void CordzInfo::MaybeTrackCord(
     InlineData& cord, MethodIdentifier method) {
-  if (TURBO_PREDICT_FALSE(cordz_should_profile())) {
+  if (TURBO_UNLIKELY(cordz_should_profile())) {
     TrackCord(cord, method);
   }
 }
 
-inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeTrackCord(
+TURBO_FORCE_INLINE void CordzInfo::MaybeTrackCord(
     InlineData& cord, const InlineData& src, MethodIdentifier method) {
-  if (TURBO_PREDICT_FALSE(InlineData::is_either_profiled(cord, src))) {
+  if (TURBO_UNLIKELY(InlineData::is_either_profiled(cord, src))) {
     MaybeTrackCordImpl(cord, src, method);
   }
 }
 
-inline TURBO_ATTRIBUTE_ALWAYS_INLINE void CordzInfo::MaybeUntrackCord(
+TURBO_FORCE_INLINE void CordzInfo::MaybeUntrackCord(
     CordzInfo* info) {
-  if (TURBO_PREDICT_FALSE(info)) {
+  if (TURBO_UNLIKELY(info)) {
     info->Untrack();
   }
 }

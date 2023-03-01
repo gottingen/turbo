@@ -309,7 +309,7 @@ class Symbolizer {
     return dst;
   }
   ObjFile *FindObjFile(const void *const start,
-                       size_t size) TURBO_ATTRIBUTE_NOINLINE;
+                       size_t size) TURBO_NO_INLINE;
   static bool RegisterObjFile(const char *filename,
                               const void *const start_addr,
                               const void *const end_addr, uint64_t offset,
@@ -477,7 +477,7 @@ static int FileGetElfType(const int fd) {
 // and return true.  Otherwise, return false.
 // To keep stack consumption low, we would like this function to not get
 // inlined.
-static TURBO_ATTRIBUTE_NOINLINE bool GetSectionHeaderByType(
+static TURBO_NO_INLINE bool GetSectionHeaderByType(
     const int fd, ElfW(Half) sh_num, const off_t sh_offset, ElfW(Word) type,
     ElfW(Shdr) * out, char *tmp_buf, size_t tmp_buf_size) {
   ElfW(Shdr) *buf = reinterpret_cast<ElfW(Shdr) *>(tmp_buf);
@@ -670,7 +670,7 @@ static const char *ComputeOffset(const char *base, ptrdiff_t offset) {
 // If the symbol is not found, SYMBOL_NOT_FOUND is returned;
 // To keep stack consumption low, we would like this function to not get
 // inlined.
-static TURBO_ATTRIBUTE_NOINLINE FindSymbolResult FindSymbol(
+static TURBO_NO_INLINE FindSymbolResult FindSymbol(
     const void *const pc, const int fd, char *out, size_t out_size,
     ptrdiff_t relocation, const ElfW(Shdr) * strtab, const ElfW(Shdr) * symtab,
     const ElfW(Shdr) * opd, char *tmp_buf, size_t tmp_buf_size) {
@@ -983,7 +983,7 @@ static bool ShouldUseMapping(const char *const flags) {
 // Read /proc/self/maps and run "callback" for each mmapped file found.  If
 // "callback" returns false, stop scanning and return true. Else continue
 // scanning /proc/self/maps. Return true if no parse error is found.
-static TURBO_ATTRIBUTE_NOINLINE bool ReadAddrMap(
+static TURBO_NO_INLINE bool ReadAddrMap(
     bool (*callback)(const char *filename, const void *const start_addr,
                      const void *const end_addr, uint64_t offset, void *arg),
     void *arg, void *tmp_buf, size_t tmp_buf_size) {
@@ -1190,7 +1190,7 @@ bool Symbolizer::RegisterObjFile(const char *filename,
 // where the input symbol is demangled in-place.
 // To keep stack consumption low, we would like this function to not
 // get inlined.
-static TURBO_ATTRIBUTE_NOINLINE void DemangleInplace(char *out, size_t out_size,
+static TURBO_NO_INLINE void DemangleInplace(char *out, size_t out_size,
                                                     char *tmp_buf,
                                                     size_t tmp_buf_size) {
   if (Demangle(out, tmp_buf, tmp_buf_size)) {

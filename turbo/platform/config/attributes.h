@@ -36,25 +36,6 @@
 
 #include "turbo/platform/config/config.h"
 
-// TURBO_ATTRIBUTE_ALWAYS_INLINE
-// TURBO_ATTRIBUTE_NOINLINE
-//
-// Forces functions to either inline or not inline. Introduced in gcc 3.1.
-#if TURBO_HAVE_ATTRIBUTE(always_inline) || \
-    (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
-#define TURBO_HAVE_ATTRIBUTE_ALWAYS_INLINE 1
-#else
-#define TURBO_ATTRIBUTE_ALWAYS_INLINE
-#endif
-
-#if TURBO_HAVE_ATTRIBUTE(noinline) || (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_ATTRIBUTE_NOINLINE __attribute__((noinline))
-#define TURBO_HAVE_ATTRIBUTE_NOINLINE 1
-#else
-#define TURBO_ATTRIBUTE_NOINLINE
-#endif
-
 // TURBO_ATTRIBUTE_NO_TAIL_CALL
 //
 // Prevents the compiler from optimizing away stack frames for functions which
@@ -69,81 +50,6 @@
 #else
 #define TURBO_ATTRIBUTE_NO_TAIL_CALL
 #define TURBO_HAVE_ATTRIBUTE_NO_TAIL_CALL 0
-#endif
-
-// TURBO_ATTRIBUTE_WEAK
-//
-// Tags a function as weak for the purposes of compilation and linking.
-// Weak attributes did not work properly in LLVM's Windows backend before
-// 9.0.0, so disable them there. See https://bugs.llvm.org/show_bug.cgi?id=37598
-// for further information.
-// The MinGW compiler doesn't complain about the weak attribute until the link
-// step, presumably because Windows doesn't use ELF binaries.
-#if (TURBO_HAVE_ATTRIBUTE(weak) ||                                         \
-     (defined(__GNUC__) && !defined(__clang__))) &&                       \
-    (!defined(_WIN32) || (defined(__clang__) && __clang_major__ >= 9)) && \
-    !defined(__MINGW32__)
-#undef TURBO_ATTRIBUTE_WEAK
-#define TURBO_ATTRIBUTE_WEAK __attribute__((weak))
-#define TURBO_HAVE_ATTRIBUTE_WEAK 1
-#else
-#define TURBO_ATTRIBUTE_WEAK
-#define TURBO_HAVE_ATTRIBUTE_WEAK 0
-#endif
-
-// TURBO_ATTRIBUTE_NONNULL
-//
-// Tells the compiler either (a) that a particular function parameter
-// should be a non-null pointer, or (b) that all pointer arguments should
-// be non-null.
-//
-// Note: As the GCC manual states, "[s]ince non-static C++ methods
-// have an implicit 'this' argument, the arguments of such methods
-// should be counted from two, not one."
-//
-// Args are indexed starting at 1.
-//
-// For non-static class member functions, the implicit `this` argument
-// is arg 1, and the first explicit argument is arg 2. For static class member
-// functions, there is no implicit `this`, and the first explicit argument is
-// arg 1.
-//
-// Example:
-//
-//   /* arg_a cannot be null, but arg_b can */
-//   void Function(void* arg_a, void* arg_b) TURBO_ATTRIBUTE_NONNULL(1);
-//
-//   class C {
-//     /* arg_a cannot be null, but arg_b can */
-//     void Method(void* arg_a, void* arg_b) TURBO_ATTRIBUTE_NONNULL(2);
-//
-//     /* arg_a cannot be null, but arg_b can */
-//     static void StaticMethod(void* arg_a, void* arg_b)
-//     TURBO_ATTRIBUTE_NONNULL(1);
-//   };
-//
-// If no arguments are provided, then all pointer arguments should be non-null.
-//
-//  /* No pointer arguments may be null. */
-//  void Function(void* arg_a, void* arg_b, int arg_c) TURBO_ATTRIBUTE_NONNULL();
-//
-// NOTE: The GCC nonnull attribute actually accepts a list of arguments, but
-// TURBO_ATTRIBUTE_NONNULL does not.
-#if TURBO_HAVE_ATTRIBUTE(nonnull) || (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_ATTRIBUTE_NONNULL(arg_index) __attribute__((nonnull(arg_index)))
-#else
-#define TURBO_ATTRIBUTE_NONNULL(...)
-#endif
-
-// TURBO_ATTRIBUTE_NORETURN
-//
-// Tells the compiler that a given function never returns.
-#if TURBO_HAVE_ATTRIBUTE(noreturn) || (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_ATTRIBUTE_NORETURN __attribute__((noreturn))
-#elif defined(_MSC_VER)
-#define TURBO_ATTRIBUTE_NORETURN __declspec(noreturn)
-#else
-#define TURBO_ATTRIBUTE_NORETURN
 #endif
 
 // TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS
@@ -242,7 +148,7 @@
 #error TURBO_HAVE_ATTRIBUTE_SECTION cannot be directly set
 #elif (TURBO_HAVE_ATTRIBUTE(section) ||                \
        (defined(__GNUC__) && !defined(__clang__))) && \
-    !defined(__APPLE__) && TURBO_HAVE_ATTRIBUTE_WEAK
+    !defined(__APPLE__) && TURBO_WEAK_SUPPORTED
 #define TURBO_HAVE_ATTRIBUTE_SECTION 1
 
 // TURBO_ATTRIBUTE_SECTION
@@ -285,8 +191,8 @@
 //
 #ifndef TURBO_DECLARE_ATTRIBUTE_SECTION_VARS
 #define TURBO_DECLARE_ATTRIBUTE_SECTION_VARS(name)   \
-  extern char __start_##name[] TURBO_ATTRIBUTE_WEAK; \
-  extern char __stop_##name[] TURBO_ATTRIBUTE_WEAK
+  extern char __start_##name[] TURBO_WEAK; \
+  extern char __stop_##name[] TURBO_WEAK
 #endif
 #ifndef TURBO_DEFINE_ATTRIBUTE_SECTION_VARS
 #define TURBO_INIT_ATTRIBUTE_SECTION_VARS(name)
@@ -435,23 +341,6 @@
 // Variable Attributes
 // -----------------------------------------------------------------------------
 
-// TURBO_ATTRIBUTE_UNUSED
-//
-// Prevents the compiler from complaining about variables that appear unused.
-//
-// For code or headers that are assured to only build with C++17 and up, prefer
-// just using the standard '[[maybe_unused]]' directly over this macro.
-//
-// Due to differences in positioning requirements between the old, compiler
-// specific __attribute__ syntax and the now standard [[maybe_unused]], this
-// macro does not attempt to take advantage of '[[maybe_unused]]'.
-#if TURBO_HAVE_ATTRIBUTE(unused) || (defined(__GNUC__) && !defined(__clang__))
-#undef TURBO_ATTRIBUTE_UNUSED
-#define TURBO_ATTRIBUTE_UNUSED __attribute__((__unused__))
-#else
-#define TURBO_ATTRIBUTE_UNUSED
-#endif
-
 // TURBO_ATTRIBUTE_INITIAL_EXEC
 //
 // Tells the compiler to use "initial-exec" mode for a thread-local variable.
@@ -497,52 +386,6 @@
 #define TURBO_ATTRIBUTE_FUNC_ALIGN(bytes) __attribute__((aligned(bytes)))
 #else
 #define TURBO_ATTRIBUTE_FUNC_ALIGN(bytes)
-#endif
-
-// TURBO_FALLTHROUGH_INTENDED
-//
-// Annotates implicit fall-through between switch labels, allowing a case to
-// indicate intentional fallthrough and turn off warnings about any lack of a
-// `break` statement. The TURBO_FALLTHROUGH_INTENDED macro should be followed by
-// a semicolon and can be used in most places where `break` can, provided that
-// no statements exist between it and the next switch label.
-//
-// Example:
-//
-//  switch (x) {
-//    case 40:
-//    case 41:
-//      if (truth_is_out_there) {
-//        ++x;
-//        TURBO_FALLTHROUGH_INTENDED;  // Use instead of/along with annotations
-//                                    // in comments
-//      } else {
-//        return x;
-//      }
-//    case 42:
-//      ...
-//
-// Notes: When supported, GCC and Clang can issue a warning on switch labels
-// with unannotated fallthrough using the warning `-Wimplicit-fallthrough`. See
-// clang documentation on language extensions for details:
-// https://clang.llvm.org/docs/AttributeReference.html#fallthrough-clang-fallthrough
-//
-// When used with unsupported compilers, the TURBO_FALLTHROUGH_INTENDED macro has
-// no effect on diagnostics. In any case this macro has no effect on runtime
-// behavior and performance of code.
-
-#ifdef TURBO_FALLTHROUGH_INTENDED
-#error "TURBO_FALLTHROUGH_INTENDED should not be defined."
-#elif TURBO_HAVE_CPP_ATTRIBUTE(fallthrough)
-#define TURBO_FALLTHROUGH_INTENDED [[fallthrough]]
-#elif TURBO_HAVE_CPP_ATTRIBUTE(clang::fallthrough)
-#define TURBO_FALLTHROUGH_INTENDED [[clang::fallthrough]]
-#elif TURBO_HAVE_CPP_ATTRIBUTE(gnu::fallthrough)
-#define TURBO_FALLTHROUGH_INTENDED [[gnu::fallthrough]]
-#else
-#define TURBO_FALLTHROUGH_INTENDED \
-  do {                            \
-  } while (0)
 #endif
 
 // TURBO_CONST_INIT

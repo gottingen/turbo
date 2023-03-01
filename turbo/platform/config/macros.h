@@ -95,7 +95,7 @@ TURBO_NAMESPACE_END
   (false ? static_cast<void>(expr) : static_cast<void>(0))
 #else
 #define TURBO_ASSERT(expr)                           \
-  (TURBO_PREDICT_TRUE((expr)) ? static_cast<void>(0) \
+  (TURBO_LIKELY((expr)) ? static_cast<void>(0) \
                              : [] { assert(false && #expr); }())  // NOLINT
 #endif
 
@@ -122,7 +122,7 @@ TURBO_NAMESPACE_END
 // hardened mode.
 #if TURBO_OPTION_HARDENED == 1 && defined(NDEBUG)
 #define TURBO_HARDENING_ASSERT(expr)                 \
-  (TURBO_PREDICT_TRUE((expr)) ? static_cast<void>(0) \
+  (TURBO_LIKELY((expr)) ? static_cast<void>(0) \
                              : [] { TURBO_INTERNAL_HARDENING_ABORT(); }())
 #else
 #define TURBO_HARDENING_ASSERT(expr) TURBO_ASSERT(expr)

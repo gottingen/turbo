@@ -39,7 +39,7 @@ struct LargeFunctor {
 };
 
 template <typename Function, typename... Args>
-void TURBO_ATTRIBUTE_NOINLINE CallFunction(Function f, Args&&... args) {
+void TURBO_NO_INLINE CallFunction(Function f, Args&&... args) {
   f(std::forward<Args>(args)...);
 }
 

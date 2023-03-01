@@ -143,7 +143,7 @@ void DropDeletesWithoutResize(CommonFields& common,
     };
 
     // Element doesn't move.
-    if (TURBO_PREDICT_TRUE(probe_index(new_i) == probe_index(i))) {
+    if (TURBO_LIKELY(probe_index(new_i) == probe_index(i))) {
       SetCtrl(common, i, H2(hash), slot_size);
       continue;
     }

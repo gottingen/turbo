@@ -1090,7 +1090,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
                                  (significant2 << ((len - 1) * 8)));
   }
 
-  TURBO_ATTRIBUTE_ALWAYS_INLINE static uint64_t Mix(uint64_t state, uint64_t v) {
+  TURBO_FORCE_INLINE static uint64_t Mix(uint64_t state, uint64_t v) {
     // Though the 128-bit product on AArch64 needs two instructions, it is
     // still a good balance between speed and hash quality.
     using MultType =
@@ -1108,7 +1108,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
   // values for both the seed and salt parameters.
   static uint64_t LowLevelHashImpl(const unsigned char* data, size_t len);
 
-  TURBO_ATTRIBUTE_ALWAYS_INLINE static uint64_t Hash64(const unsigned char* data,
+  TURBO_FORCE_INLINE static uint64_t Hash64(const unsigned char* data,
                                                       size_t len) {
 #ifdef TURBO_HAVE_INTRINSIC_INT128
     return LowLevelHashImpl(data, len);
@@ -1133,7 +1133,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
   //
   // On other platforms this is still going to be non-deterministic but most
   // probably per-build and not per-process.
-  TURBO_ATTRIBUTE_ALWAYS_INLINE static uint64_t Seed() {
+  TURBO_FORCE_INLINE static uint64_t Seed() {
 #if (!defined(__clang__) || __clang_major__ > 11) && \
     !defined(__apple_build_version__)
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&kSeed));
@@ -1156,7 +1156,7 @@ inline uint64_t MixingHashState::CombineContiguousImpl(
   // multiplicative hash.
   uint64_t v;
   if (len > 8) {
-    if (TURBO_PREDICT_FALSE(len > PiecewiseChunkSize())) {
+    if (TURBO_UNLIKELY(len > PiecewiseChunkSize())) {
       return CombineLargeContiguousImpl32(state, first, len);
     }
     v = hash_internal::CityHash32(reinterpret_cast<const char*>(first), len);
@@ -1179,7 +1179,7 @@ inline uint64_t MixingHashState::CombineContiguousImpl(
   // for small ones we just use a multiplicative hash.
   uint64_t v;
   if (len > 16) {
-    if (TURBO_PREDICT_FALSE(len > PiecewiseChunkSize())) {
+    if (TURBO_UNLIKELY(len > PiecewiseChunkSize())) {
       return CombineLargeContiguousImpl64(state, first, len);
     }
     v = Hash64(first, len);

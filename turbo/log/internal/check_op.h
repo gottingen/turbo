@@ -57,7 +57,7 @@
 
 #define TURBO_LOG_INTERNAL_CHECK_OP(name, op, val1, val1_text, val2, val2_text) \
   while (                                                                      \
-      ::std::string* turbo_log_internal_check_op_result TURBO_ATTRIBUTE_UNUSED = \
+      ::std::string* turbo_log_internal_check_op_result TURBO_ALLOW_UNUSED = \
           ::turbo::log_internal::name##Impl(                                    \
               ::turbo::log_internal::GetReferenceableValue(val1),               \
               ::turbo::log_internal::GetReferenceableValue(val2),               \
@@ -117,13 +117,13 @@
        turbo_log_internal_check_ok_goo.first =                            \
            ::turbo::log_internal::AsStatus(val),                          \
        turbo_log_internal_check_ok_goo.second =                           \
-           TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok()) \
+           TURBO_LIKELY(turbo_log_internal_check_ok_goo.first->ok()) \
                ? nullptr                                                 \
                : ::turbo::status_internal::MakeCheckFailString(           \
                      turbo_log_internal_check_ok_goo.first,               \
                      TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text     \
                                                             " is OK")),  \
-       !TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok());)  \
+       !TURBO_LIKELY(turbo_log_internal_check_ok_goo.first->ok());)  \
   TURBO_LOG_INTERNAL_CHECK(*turbo_log_internal_check_ok_goo.second)        \
       .InternalStream()
 #define TURBO_LOG_INTERNAL_QCHECK_OK(val, val_text)                       \
@@ -132,13 +132,13 @@
        turbo_log_internal_check_ok_goo.first =                            \
            ::turbo::log_internal::AsStatus(val),                          \
        turbo_log_internal_check_ok_goo.second =                           \
-           TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok()) \
+           TURBO_LIKELY(turbo_log_internal_check_ok_goo.first->ok()) \
                ? nullptr                                                 \
                : ::turbo::status_internal::MakeCheckFailString(           \
                      turbo_log_internal_check_ok_goo.first,               \
                      TURBO_LOG_INTERNAL_STRIP_STRING_LITERAL(val_text     \
                                                             " is OK")),  \
-       !TURBO_PREDICT_TRUE(turbo_log_internal_check_ok_goo.first->ok());)  \
+       !TURBO_LIKELY(turbo_log_internal_check_ok_goo.first->ok());)  \
   TURBO_LOG_INTERNAL_QCHECK(*turbo_log_internal_check_ok_goo.second)       \
       .InternalStream()
 
@@ -283,7 +283,7 @@ using CheckOpStreamType = decltype(detect_specialization::Detect<T>(0));
 // Build the error message string.  Specify no inlining for code size.
 template <typename T1, typename T2>
 TURBO_ATTRIBUTE_RETURNS_NONNULL std::string* MakeCheckOpString(
-    T1 v1, T2 v2, const char* exprtext) TURBO_ATTRIBUTE_NOINLINE;
+    T1 v1, T2 v2, const char* exprtext) TURBO_NO_INLINE;
 
 template <typename T1, typename T2>
 std::string* MakeCheckOpString(T1 v1, T2 v2, const char* exprtext) {
@@ -322,7 +322,7 @@ TURBO_LOG_INTERNAL_DEFINE_MAKE_CHECK_OP_STRING_EXTERN(const void*);
                                              const char* exprtext) {     \
     using U1 = CheckOpStreamType<T1>;                                    \
     using U2 = CheckOpStreamType<T2>;                                    \
-    return TURBO_PREDICT_TRUE(v1 op v2)                                   \
+    return TURBO_LIKELY(v1 op v2)                                   \
                ? nullptr                                                 \
                : MakeCheckOpString<U1, U2>(v1, v2, exprtext);            \
   }                                                                      \

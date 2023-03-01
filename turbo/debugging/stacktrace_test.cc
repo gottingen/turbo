@@ -21,8 +21,8 @@ namespace {
 
 // This test is currently only known to pass on linux/x86_64.
 #if defined(__linux__) && defined(__x86_64__)
-TURBO_ATTRIBUTE_NOINLINE void Unwind(void* p) {
-  TURBO_ATTRIBUTE_UNUSED static void* volatile sink = p;
+TURBO_NO_INLINE void Unwind(void* p) {
+  TURBO_ALLOW_UNUSED static void* volatile sink = p;
   constexpr int kSize = 16;
   void* stack[kSize];
   int frames[kSize];
@@ -30,7 +30,7 @@ TURBO_ATTRIBUTE_NOINLINE void Unwind(void* p) {
   turbo::GetStackFrames(stack, frames, kSize, 0);
 }
 
-TURBO_ATTRIBUTE_NOINLINE void HugeFrame() {
+TURBO_NO_INLINE void HugeFrame() {
   char buffer[1 << 20];
   Unwind(buffer);
   TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();

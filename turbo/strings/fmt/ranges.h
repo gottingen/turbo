@@ -26,22 +26,22 @@ FMT_BEGIN_NAMESPACE
 
 template <typename Char> struct formatting_base {
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  TURBO_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     return ctx.begin();
   }
 };
 
 template <typename Char, typename Enable = void>
 struct formatting_range : formatting_base<Char> {
-  static FMT_CONSTEXPR_DECL const size_t range_length_limit =
+  static TURBO_CONSTEXPR_FUNC const size_t range_length_limit =
       FMT_RANGE_OUTPUT_LENGTH_LIMIT;  // output only up to N items from the
                                       // range.
   Char prefix;
   Char delimiter;
   Char postfix;
   formatting_range() : prefix('{'), delimiter(','), postfix('}') {}
-  static FMT_CONSTEXPR_DECL const bool add_delimiter_spaces = true;
-  static FMT_CONSTEXPR_DECL const bool add_prepostfix_space = false;
+  static TURBO_CONSTEXPR_FUNC const bool add_delimiter_spaces = true;
+  static TURBO_CONSTEXPR_FUNC const bool add_prepostfix_space = false;
 };
 
 template <typename Char, typename Enable = void>
@@ -50,8 +50,8 @@ struct formatting_tuple : formatting_base<Char> {
   Char delimiter;
   Char postfix;
   formatting_tuple() : prefix('('), delimiter(','), postfix(')') {}
-  static FMT_CONSTEXPR_DECL const bool add_delimiter_spaces = true;
-  static FMT_CONSTEXPR_DECL const bool add_prepostfix_space = false;
+  static TURBO_CONSTEXPR_FUNC const bool add_delimiter_spaces = true;
+  static TURBO_CONSTEXPR_FUNC const bool add_prepostfix_space = false;
 };
 
 namespace detail {
@@ -83,7 +83,7 @@ template <typename T> class is_like_std_string {
   template <typename> static void check(...);
 
  public:
-  static FMT_CONSTEXPR_DECL const bool value =
+  static TURBO_CONSTEXPR_FUNC const bool value =
       is_string<T>::value || !std::is_void<decltype(check<T>(nullptr))>::value;
 };
 
@@ -110,7 +110,7 @@ template <typename T> class is_tuple_like_ {
   template <typename> static void check(...);
 
  public:
-  static FMT_CONSTEXPR_DECL const bool value =
+  static TURBO_CONSTEXPR_FUNC const bool value =
       !std::is_void<decltype(check<T>(nullptr))>::value;
 };
 
@@ -124,7 +124,7 @@ template <size_t N> using make_index_sequence = std::make_index_sequence<N>;
 template <typename T, T... N> struct integer_sequence {
   using value_type = T;
 
-  static FMT_CONSTEXPR size_t size() { return sizeof...(N); }
+  static TURBO_CONSTEXPR size_t size() { return sizeof...(N); }
 };
 
 template <size_t... N> using index_sequence = integer_sequence<size_t, N...>;
@@ -139,7 +139,7 @@ using make_index_sequence = make_integer_sequence<size_t, N>;
 #endif
 
 template <class Tuple, class F, size_t... Is>
-void for_each(index_sequence<Is...>, Tuple&& tup, F&& f) FMT_NOEXCEPT {
+void for_each(index_sequence<Is...>, Tuple&& tup, F&& f) TURBO_NOEXCEPT {
   using std::get;
   // using free function get<I>(T) now.
   const int _[] = {0, ((void)f(get<Is>(tup)), 0)...};
@@ -147,7 +147,7 @@ void for_each(index_sequence<Is...>, Tuple&& tup, F&& f) FMT_NOEXCEPT {
 }
 
 template <class T>
-FMT_CONSTEXPR make_index_sequence<std::tuple_size<T>::value> get_indexes(
+TURBO_CONSTEXPR make_index_sequence<std::tuple_size<T>::value> get_indexes(
     T const&) {
   return {};
 }
@@ -159,34 +159,34 @@ template <class Tuple, class F> void for_each(Tuple&& tup, F&& f) {
 
 template <typename Arg, FMT_ENABLE_IF(!is_like_std_string<
                                       typename std::decay<Arg>::type>::value)>
-FMT_CONSTEXPR const char* format_str_quoted(bool add_space, const Arg&) {
+TURBO_CONSTEXPR const char* format_str_quoted(bool add_space, const Arg&) {
   return add_space ? " {}" : "{}";
 }
 
 template <typename Arg, FMT_ENABLE_IF(is_like_std_string<
                                       typename std::decay<Arg>::type>::value)>
-FMT_CONSTEXPR const char* format_str_quoted(bool add_space, const Arg&) {
+TURBO_CONSTEXPR const char* format_str_quoted(bool add_space, const Arg&) {
   return add_space ? " \"{}\"" : "\"{}\"";
 }
 
-FMT_CONSTEXPR const char* format_str_quoted(bool add_space, const char*) {
+TURBO_CONSTEXPR const char* format_str_quoted(bool add_space, const char*) {
   return add_space ? " \"{}\"" : "\"{}\"";
 }
-FMT_CONSTEXPR const wchar_t* format_str_quoted(bool add_space, const wchar_t*) {
+TURBO_CONSTEXPR const wchar_t* format_str_quoted(bool add_space, const wchar_t*) {
   return add_space ? L" \"{}\"" : L"\"{}\"";
 }
 
-FMT_CONSTEXPR const char* format_str_quoted(bool add_space, const char) {
+TURBO_CONSTEXPR const char* format_str_quoted(bool add_space, const char) {
   return add_space ? " '{}'" : "'{}'";
 }
-FMT_CONSTEXPR const wchar_t* format_str_quoted(bool add_space, const wchar_t) {
+TURBO_CONSTEXPR const wchar_t* format_str_quoted(bool add_space, const wchar_t) {
   return add_space ? L" '{}'" : L"'{}'";
 }
 
 }  // namespace detail
 
 template <typename T> struct is_tuple_like {
-  static FMT_CONSTEXPR_DECL const bool value =
+  static TURBO_CONSTEXPR_FUNC const bool value =
       detail::is_tuple_like_<T>::value && !detail::is_range_<T>::value;
 };
 
@@ -219,7 +219,7 @@ struct formatter<TupleT, Char, enable_if_t<fmt::is_tuple_like<TupleT>::value>> {
   formatting_tuple<Char> formatting;
 
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  TURBO_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     return formatting.parse(ctx);
   }
 
@@ -240,7 +240,7 @@ struct formatter<TupleT, Char, enable_if_t<fmt::is_tuple_like<TupleT>::value>> {
 };
 
 template <typename T, typename Char> struct is_range {
-  static FMT_CONSTEXPR_DECL const bool value =
+  static TURBO_CONSTEXPR_FUNC const bool value =
       detail::is_range_<T>::value && !detail::is_like_std_string<T>::value &&
       !std::is_convertible<T, std::basic_string<Char>>::value &&
       !std::is_constructible<detail::std_string_view<Char>, T>::value;
@@ -252,7 +252,7 @@ struct formatter<RangeT, Char,
   formatting_range<Char> formatting;
 
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  TURBO_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     return formatting.parse(ctx);
   }
 
@@ -293,7 +293,7 @@ template <typename Char, typename... T> struct tuple_arg_join : detail::view {
 template <typename Char, typename... T>
 struct formatter<tuple_arg_join<Char, T...>, Char> {
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  TURBO_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     return ctx.begin();
   }
 
@@ -347,13 +347,13 @@ struct formatter<tuple_arg_join<Char, T...>, Char> {
   \endrst
  */
 template <typename... T>
-FMT_CONSTEXPR tuple_arg_join<char, T...> join(const std::tuple<T...>& tuple,
+TURBO_CONSTEXPR tuple_arg_join<char, T...> join(const std::tuple<T...>& tuple,
                                               string_view sep) {
   return {tuple, sep};
 }
 
 template <typename... T>
-FMT_CONSTEXPR tuple_arg_join<wchar_t, T...> join(const std::tuple<T...>& tuple,
+TURBO_CONSTEXPR tuple_arg_join<wchar_t, T...> join(const std::tuple<T...>& tuple,
                                                  wstring_view sep) {
   return {tuple, sep};
 }

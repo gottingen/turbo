@@ -37,13 +37,13 @@ template <class Char> class formatbuf : public std::basic_streambuf<Char> {
   // to overflow. There is no disadvantage here for sputn since this always
   // results in a call to xsputn.
 
-  int_type overflow(int_type ch = traits_type::eof()) FMT_OVERRIDE {
+  int_type overflow(int_type ch = traits_type::eof()) TURBO_OVERRIDE {
     if (!traits_type::eq_int_type(ch, traits_type::eof()))
       buffer_.push_back(static_cast<Char>(ch));
     return ch;
   }
 
-  std::streamsize xsputn(const Char* s, std::streamsize count) FMT_OVERRIDE {
+  std::streamsize xsputn(const Char* s, std::streamsize count) TURBO_OVERRIDE {
     buffer_.append(s, s + count);
     return count;
   }
@@ -110,7 +110,7 @@ void format_value(buffer<Char>& buf, const T& value,
 template <typename T, typename Char>
 struct fallback_formatter<T, Char, enable_if_t<is_streamable<T, Char>::value>>
     : private formatter<basic_string_view<Char>, Char> {
-  FMT_CONSTEXPR auto parse(basic_format_parse_context<Char>& ctx)
+  TURBO_CONSTEXPR auto parse(basic_format_parse_context<Char>& ctx)
       -> decltype(ctx.begin()) {
     return formatter<basic_string_view<Char>, Char>::parse(ctx);
   }

@@ -549,29 +549,29 @@
 	#endif
 
 	// ------------------------------------------------------------------------
-	// TURBO_HAS_INCLUDE_AVAILABLE
+	// TURBO_HAVE_INCLUDE_AVAILABLE
 	//
-	// Used to guard against the TURBO_HAS_INCLUDE() macro on compilers that do not
+	// Used to guard against the TURBO_HAVE_INCLUDE() macro on compilers that do not
 	// support said feature.
 	//
 	// Example usage:
 	//
-	// #if TURBO_HAS_INCLUDE_AVAILABLE
-	//     #if TURBO_HAS_INCLUDE("myinclude.h")
+	// #if TURBO_HAVE_INCLUDE_AVAILABLE
+	//     #if TURBO_HAVE_INCLUDE("myinclude.h")
     //         #include "myinclude.h"
 	//     #endif
 	// #endif
-	#if !defined(TURBO_HAS_INCLUDE_AVAILABLE)
+	#if !defined(TURBO_HAVE_INCLUDE_AVAILABLE)
 		#if defined(TURBO_COMPILER_CPP17_ENABLED) || defined(TURBO_COMPILER_CLANG) || defined(TURBO_COMPILER_GNUC)
-			#define TURBO_HAS_INCLUDE_AVAILABLE 1
+			#define TURBO_HAVE_INCLUDE_AVAILABLE 1
 		#else
-			#define TURBO_HAS_INCLUDE_AVAILABLE 0
+			#define TURBO_HAVE_INCLUDE_AVAILABLE 0
 		#endif
 	#endif
 
 
 	// ------------------------------------------------------------------------
-	// TURBO_HAS_INCLUDE
+	// TURBO_HAVE_INCLUDE
 	//
 	// May be used in #if and #elif expressions to test for the existence
 	// of the header referenced in the operand. If possible it evaluates to a
@@ -580,21 +580,23 @@
 	//
 	// Example usage:
 	//
-	// #if TURBO_HAS_INCLUDE("myinclude.h")
+	// #if TURBO_HAVE_INCLUDE("myinclude.h")
 	//     #include "myinclude.h"
 	// #endif
 	//
-	// #if TURBO_HAS_INCLUDE(<myinclude.h>)
+	// #if TURBO_HAVE_INCLUDE(<myinclude.h>)
 	//     #include <myinclude.h>
 	// #endif
 
-	#if !defined(TURBO_HAS_INCLUDE)
+	#if !defined(TURBO_HAVE_INCLUDE)
 		#if defined(TURBO_COMPILER_CPP17_ENABLED)
-			#define TURBO_HAS_INCLUDE(x) __has_include(x)
+			#define TURBO_HAVE_INCLUDE(x) __has_include(x)
 		#elif defined(TURBO_COMPILER_CLANG)
-			#define TURBO_HAS_INCLUDE(x) __has_include(x)
+			#define TURBO_HAVE_INCLUDE(x) __has_include(x)
 		#elif TURBO_COMPILER_GNUC
-			#define TURBO_HAS_INCLUDE(x) __has_include(x)
+			#define TURBO_HAVE_INCLUDE(x) __has_include(x)
+                #else
+                        #define TURBO_HAVE_INCLUDE(x) 0
 		#endif
 	#endif
 
@@ -1558,14 +1560,16 @@
 	//
 	#ifndef TURBO_FORCE_INLINE
 		#if defined(TURBO_COMPILER_MSVC)
+                        #define TURBO_FORCE_INLINE_SUPPORTED 1
 			#define TURBO_FORCE_INLINE __forceinline
 		#elif defined(TURBO_COMPILER_GNUC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 301) || defined(TURBO_COMPILER_CLANG)
-			#if defined(__cplusplus)
+                        #define TURBO_FORCE_INLINE_SUPPORTED 1
+                        #if defined(__cplusplus)
 				#define TURBO_FORCE_INLINE inline __attribute__((always_inline))
 			#else
 				#define TURBO_FORCE_INLINE __inline__ __attribute__((always_inline))
 			#endif
-		#else
+                #else
 			#if defined(__cplusplus)
 				#define TURBO_FORCE_INLINE inline
 			#else
@@ -1633,9 +1637,11 @@
 	#ifndef TURBO_NO_INLINE
 		#if defined(TURBO_COMPILER_MSVC) && (TURBO_COMPILER_VERSION >= 1400) // If VC8 (VS2005) or later...
 			#define TURBO_NO_INLINE __declspec(noinline)
+                        #define TURBO_NO_INLINE_SUPPORTED 1
 		#elif defined(TURBO_COMPILER_MSVC)
 			#define TURBO_NO_INLINE
-		#else
+                #else
+                        #define TURBO_NO_INLINE_SUPPORTED 1
 			#define TURBO_NO_INLINE __attribute__((noinline))
 		#endif
 	#endif
@@ -2169,7 +2175,16 @@
 		#else
 			#define TURBO_CONSTEXPR constexpr
 		#endif
-	#endif
+        #endif
+
+        #if !defined(TURBO_CONSTEXPR_FUNC)
+        #if TURBO_HAVE_FEATURE(cxx_relaxed_constexpr) || FMT_MSC_VER >= 1910 || \
+             (defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 6000 && __cplusplus >= 201402L)
+              #define TURBO_CONSTEXPR_FUNC constexpr
+        #else
+              #define TURBO_CONSTEXPR_FUNC inline
+        #endif
+        #endif
 
 	#if !defined(TURBO_CONSTEXPR_OR_CONST)
 		#if defined(TURBO_COMPILER_NO_CONSTEXPR)
@@ -2272,11 +2287,55 @@
 		#elif defined(TURBO_COMPILER_NO_NORETURN)
 			#define TURBO_NORETURN
 		#else
-			#define TURBO_NORETURN [[noreturn]]
+			#define TURBO_NORETURN __attribute__((noreturn))
 		#endif
 	#endif
 
 
+
+        // TURBO_NONNULL
+        //
+        // Tells the compiler either (a) that a particular function parameter
+        // should be a non-null pointer, or (b) that all pointer arguments should
+        // be non-null.
+        //
+        // Note: As the GCC manual states, "[s]ince non-static C++ methods
+        // have an implicit 'this' argument, the arguments of such methods
+        // should be counted from two, not one."
+        //
+        // Args are indexed starting at 1.
+        //
+        // For non-static class member functions, the implicit `this` argument
+        // is arg 1, and the first explicit argument is arg 2. For static class member
+        // functions, there is no implicit `this`, and the first explicit argument is
+        // arg 1.
+        //
+        // Example:
+        //
+        //   /* arg_a cannot be null, but arg_b can */
+        //   void Function(void* arg_a, void* arg_b) TURBO_NONNULL(1);
+        //
+        //   class C {
+        //     /* arg_a cannot be null, but arg_b can */
+        //     void Method(void* arg_a, void* arg_b) TURBO_NONNULL(2);
+        //
+        //     /* arg_a cannot be null, but arg_b can */
+        //     static void StaticMethod(void* arg_a, void* arg_b)
+        //     TURBO_NONNULL(1);
+        //   };
+        //
+        // If no arguments are provided, then all pointer arguments should be non-null.
+        //
+        //  /* No pointer arguments may be null. */
+        //  void Function(void* arg_a, void* arg_b, int arg_c) TURBO_NONNULL();
+        //
+        // NOTE: The GCC nonnull attribute actually accepts a list of arguments, but
+        // TURBO_NONNULL does not.
+        #if TURBO_HAVE_ATTRIBUTE(nonnull) || (defined(__GNUC__) && !defined(__clang__))
+          #define TURBO_NONNULL(arg_index) __attribute__((nonnull(arg_index)))
+        #else
+          #define TURBO_NONNULL(...)
+        #endif
 	// ------------------------------------------------------------------------
 	// TURBO_CARRIES_DEPENDENCY
 	//
@@ -2743,6 +2802,30 @@
         #define TURBO_MUST_USE_RESULT __attribute__((warn_unused_result))
     #else
         #define TURBO_MUST_USE_RESULT
+    #endif
+
+    #ifndef TURBO_USE_USER_DEFINED_LITERALS
+                    // EDG based compilers (Intel, NVIDIA, Elbrus, etc), GCC and MSVC support UDLs.
+      #if TURBO_HAVE_FEATURE(cxx_user_literals) || \
+              (defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 4007) || \
+             ((defined(TURBO_COMPILER_MSVC) &&  TURBO_COMPILER_VERSION >= 1900) && (!defined(__EDG_VERSION__) || __EDG_VERSION__ >= /* UDL feature */ 480))
+          #define TURBO_USE_USER_DEFINED_LITERALS 1
+      #else
+          #define TURBO_USE_USER_DEFINED_LITERALS 0
+      #endif
+    #endif
+
+    #ifndef TURBO_USE_UDL_TEMPLATE
+                    // EDG frontend based compilers (icc, nvcc, etc) and GCC < 6.4 do not properly
+                    // support UDL templates and GCC >= 9 warns about them.
+    #  if TURBO_USE_USER_DEFINED_LITERALS &&                         \
+          (!defined(__EDG_VERSION__) || __EDG_VERSION__ >= 501) && \
+          ((defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 6004 && __cplusplus >= 201402L) ||   \
+           (defined(TURBO_COMPILER_CLANG) &&  TURBO_COMPILER_VERSION >= 304))
+    #    define TURBO_USE_UDL_TEMPLATE 1
+    #  else
+    #    define TURBO_USE_UDL_TEMPLATE 0
+    #  endif
     #endif
 
 #endif  // TURBO_PLATFORM_CONFIG_COMPILER_TRAITS_H_

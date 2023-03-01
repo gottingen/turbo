@@ -184,7 +184,7 @@ static bool SetupAlternateStackOnce() {
 // if the system supports using an alternate stack.
 static int MaybeSetupAlternateStack() {
 #ifdef TURBO_HAVE_SIGALTSTACK
-  TURBO_ATTRIBUTE_UNUSED static const bool kOnce = SetupAlternateStackOnce();
+  TURBO_ALLOW_UNUSED static const bool kOnce = SetupAlternateStackOnce();
   return SA_ONSTACK;
 #else
   return 0;
@@ -260,7 +260,7 @@ static void WriterFnWrapper(const char* data, void* arg) {
 // Convenient wrapper around DumpPCAndFrameSizesAndStackTrace() for signal
 // handlers. "noinline" so that GetStackFrames() skips the top-most stack
 // frame for this function.
-TURBO_ATTRIBUTE_NOINLINE static void WriteStackTrace(
+TURBO_NO_INLINE static void WriteStackTrace(
     void* ucontext, bool symbolize_stacktrace,
     void (*writerfn)(const char*, void*), void* writerfn_arg) {
   constexpr int kNumStackFrames = 32;

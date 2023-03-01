@@ -45,7 +45,7 @@ bool RegisterSyncLoggingFlags() {
   return true;
 }
 
-TURBO_ATTRIBUTE_UNUSED const bool unused = RegisterSyncLoggingFlags();
+TURBO_ALLOW_UNUSED const bool unused = RegisterSyncLoggingFlags();
 
 template <typename T>
 T GetFromEnv(const char* varname, T dflt) {

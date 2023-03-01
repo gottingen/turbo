@@ -269,7 +269,7 @@ void DumpPCAndFrameSizesAndStackTrace(void* const pc, void* const stack[],
 
 // Dump current stack trace as directed by writer.
 // Make sure this function is not inlined to avoid skipping too many top frames.
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 void DumpStackTrace(int min_dropped_frames, int max_num_frames,
                     bool symbolize_stacktrace, OutputWriter* writer,
                     void* writer_arg) {

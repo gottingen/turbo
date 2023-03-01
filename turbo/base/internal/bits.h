@@ -70,7 +70,7 @@ constexpr bool IsPowerOf2(unsigned int x) noexcept {
 }
 
 template <class T>
-TURBO_MUST_USE_RESULT TURBO_ATTRIBUTE_ALWAYS_INLINE constexpr T RotateRight(
+TURBO_MUST_USE_RESULT TURBO_FORCE_INLINE constexpr T RotateRight(
     T x, int s) noexcept {
   static_assert(std::is_unsigned<T>::value, "T must be unsigned");
   static_assert(IsPowerOf2(std::numeric_limits<T>::digits),
@@ -81,7 +81,7 @@ TURBO_MUST_USE_RESULT TURBO_ATTRIBUTE_ALWAYS_INLINE constexpr T RotateRight(
 }
 
 template <class T>
-TURBO_MUST_USE_RESULT TURBO_ATTRIBUTE_ALWAYS_INLINE constexpr T RotateLeft(
+TURBO_MUST_USE_RESULT TURBO_FORCE_INLINE constexpr T RotateLeft(
     T x, int s) noexcept {
   static_assert(std::is_unsigned<T>::value, "T must be unsigned");
   static_assert(IsPowerOf2(std::numeric_limits<T>::digits),
@@ -91,7 +91,7 @@ TURBO_MUST_USE_RESULT TURBO_ATTRIBUTE_ALWAYS_INLINE constexpr T RotateLeft(
          static_cast<T>(x >> ((-s) & (std::numeric_limits<T>::digits - 1)));
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_POPCOUNT inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_POPCOUNT int
 Popcount32(uint32_t x) noexcept {
 #if TURBO_NUMERIC_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_popcount)
   static_assert(sizeof(unsigned int) == sizeof(x),
@@ -104,7 +104,7 @@ Popcount32(uint32_t x) noexcept {
 #endif
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_POPCOUNT inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_POPCOUNT int
 Popcount64(uint64_t x) noexcept {
 #if TURBO_NUMERIC_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_popcountll)
   static_assert(sizeof(unsigned long long) == sizeof(x),  // NOLINT(runtime/int)
@@ -119,7 +119,7 @@ Popcount64(uint64_t x) noexcept {
 }
 
 template <class T>
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_POPCOUNT inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_POPCOUNT int
 Popcount(T x) noexcept {
   static_assert(std::is_unsigned<T>::value, "T must be unsigned");
   static_assert(IsPowerOf2(std::numeric_limits<T>::digits),
@@ -128,7 +128,7 @@ Popcount(T x) noexcept {
   return sizeof(x) <= sizeof(uint32_t) ? Popcount32(x) : Popcount64(x);
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ int
 CountLeadingZeroes32(uint32_t x) {
 #if TURBO_NUMERIC_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_clz)
   // Use __builtin_clz, which uses the following instructions:
@@ -164,7 +164,7 @@ CountLeadingZeroes32(uint32_t x) {
 #endif
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ int
 CountLeadingZeroes16(uint16_t x) {
 #if TURBO_HAVE_BUILTIN(__builtin_clzs)
   static_assert(sizeof(unsigned short) == sizeof(x),  // NOLINT(runtime/int)
@@ -175,7 +175,7 @@ CountLeadingZeroes16(uint16_t x) {
 #endif
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ int
 CountLeadingZeroes64(uint64_t x) {
 #if TURBO_NUMERIC_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_clzll)
   // Use __builtin_clzll, which uses the following instructions:
@@ -229,7 +229,7 @@ CountLeadingZeroes64(uint64_t x) {
 }
 
 template <typename T>
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ int
 CountLeadingZeroes(T x) {
   static_assert(std::is_unsigned<T>::value, "T must be unsigned");
   static_assert(IsPowerOf2(std::numeric_limits<T>::digits),
@@ -246,7 +246,7 @@ CountLeadingZeroes(T x) {
                     : CountLeadingZeroes64(x));
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ int
 CountTrailingZeroesNonzero32(uint32_t x) {
 #if TURBO_NUMERIC_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_ctz)
   static_assert(sizeof(unsigned int) == sizeof(x),
@@ -268,7 +268,7 @@ CountTrailingZeroesNonzero32(uint32_t x) {
 #endif
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ int
 CountTrailingZeroesNonzero64(uint64_t x) {
 #if TURBO_NUMERIC_INTERNAL_HAVE_BUILTIN_OR_GCC(__builtin_ctzll)
   static_assert(sizeof(unsigned long long) == sizeof(x),  // NOLINT(runtime/int)
@@ -300,7 +300,7 @@ CountTrailingZeroesNonzero64(uint64_t x) {
 #endif
 }
 
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ int
 CountTrailingZeroesNonzero16(uint16_t x) {
 #if TURBO_HAVE_BUILTIN(__builtin_ctzs)
   static_assert(sizeof(unsigned short) == sizeof(x),  // NOLINT(runtime/int)
@@ -312,7 +312,7 @@ CountTrailingZeroesNonzero16(uint16_t x) {
 }
 
 template <class T>
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ inline int
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CTZ int
 CountTrailingZeroes(T x) noexcept {
   static_assert(std::is_unsigned<T>::value, "T must be unsigned");
   static_assert(IsPowerOf2(std::numeric_limits<T>::digits),
@@ -331,14 +331,14 @@ CountTrailingZeroes(T x) noexcept {
 // want to force it to wraparound so that bit_ceil of an invalid value are not
 // core constant expressions.
 template <class T>
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ inline
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ
     typename std::enable_if<std::is_unsigned<T>::value, T>::type
     BitCeilPromotionHelper(T x, T promotion) {
   return (T{1} << (x + promotion)) >> promotion;
 }
 
 template <class T>
-TURBO_ATTRIBUTE_ALWAYS_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ inline
+TURBO_FORCE_INLINE TURBO_INTERNAL_CONSTEXPR_CLZ
     typename std::enable_if<std::is_unsigned<T>::value, T>::type
     BitCeilNonPowerOf2(T x) {
   // If T is narrower than unsigned, it undergoes promotion to unsigned when we

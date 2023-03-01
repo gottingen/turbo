@@ -45,7 +45,7 @@ inline bool IsFlatOrExternal(CordRep* rep) {
 
 // Verifies that n + extra <= kMaxCapacity: throws std::length_error otherwise.
 inline void CheckCapacity(size_t n, size_t extra) {
-  if (TURBO_PREDICT_FALSE(extra > CordRepRing::kMaxCapacity - n)) {
+  if (TURBO_UNLIKELY(extra > CordRepRing::kMaxCapacity - n)) {
     base_internal::ThrowStdLengthError("Maximum capacity exceeded");
   }
 }
@@ -596,7 +596,7 @@ CordRepRing::index_type CordRepRing::FindBinary(index_type head,
     head = larger ? after_mid : head;
     tail = larger ? tail : mid;
     assert(head != tail);
-  } while (TURBO_PREDICT_TRUE(count > kBinarySearchEndCount));
+  } while (TURBO_LIKELY(count > kBinarySearchEndCount));
   return head;
 }
 

@@ -190,12 +190,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // -----------------------------------------------------------------------------
 
 
-#ifdef __has_feature
-#define TURBO_HAVE_FEATURE(f) __has_feature(f)
-#else
-#define TURBO_HAVE_FEATURE(f) 0
-#endif
-
 // Portable check for GCC minimum version:
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
 #if defined(__GNUC__) && defined(__GNUC_MINOR__)

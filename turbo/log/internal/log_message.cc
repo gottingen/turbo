@@ -54,7 +54,7 @@
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 
-extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
+extern "C" TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(
     TurboInternalOnFatalLogMessage)(const turbo::LogEntry&) {
   // Default - Do nothing
 }
@@ -307,8 +307,8 @@ LogMessage& LogMessage::ToSinkOnly(turbo::LogSink* sink) {
 }
 
 #ifdef __ELF__
-extern "C" void __gcov_dump() TURBO_ATTRIBUTE_WEAK;
-extern "C" void __gcov_flush() TURBO_ATTRIBUTE_WEAK;
+extern "C" void __gcov_dump() TURBO_WEAK;
+extern "C" void __gcov_flush() TURBO_WEAK;
 #endif
 
 void LogMessage::FailWithoutStackTrace() {
@@ -570,7 +570,7 @@ LogMessageFatal::LogMessageFatal(const char* file, int line,
   *this << "Check failed: " << failure_msg << " ";
 }
 
-// TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+// TURBO_NORETURN doesn't seem to work on destructors with msvc, so
 // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
@@ -596,7 +596,7 @@ LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line,
   *this << "Check failed: " << failure_msg << " ";
 }
 
-// TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+// TURBO_NORETURN doesn't seem to work on destructors with msvc, so
 // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)

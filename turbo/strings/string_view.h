@@ -301,7 +301,7 @@ class string_view {
   // and an exception of type `std::out_of_range` will be thrown on invalid
   // access.
   constexpr const_reference at(size_type i) const {
-    return TURBO_PREDICT_TRUE(i < size())
+    return TURBO_LIKELY(i < size())
                ? ptr_[i]
                : ((void)base_internal::ThrowStdOutOfRange(
                       "turbo::string_view::at"),
@@ -375,7 +375,7 @@ class string_view {
   // Copies the contents of the `string_view` at offset `pos` and length `n`
   // into `buf`.
   size_type copy(char* buf, size_type n, size_type pos = 0) const {
-    if (TURBO_PREDICT_FALSE(pos > length_)) {
+    if (TURBO_UNLIKELY(pos > length_)) {
       base_internal::ThrowStdOutOfRange("turbo::string_view::copy");
     }
     size_type rlen = (std::min)(length_ - pos, n);
@@ -393,7 +393,7 @@ class string_view {
   // `pos > size`.
   // Use turbo::ClippedSubstr if you need a truncating substr operation.
   constexpr string_view substr(size_type pos = 0, size_type n = npos) const {
-    return TURBO_PREDICT_FALSE(pos > length_)
+    return TURBO_UNLIKELY(pos > length_)
                ? (base_internal::ThrowStdOutOfRange(
                       "turbo::string_view::substr"),
                   string_view())

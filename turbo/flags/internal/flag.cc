@@ -199,7 +199,7 @@ void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
   // visibile at the call site. `lhs_type_id` is the fast type id
   // corresponding to the type specified in flag definition. They must match
   //  for this operation to be well-defined.
-  if (TURBO_PREDICT_TRUE(lhs_type_id == rhs_type_id)) return;
+  if (TURBO_LIKELY(lhs_type_id == rhs_type_id)) return;
 
   const std::type_info* lhs_runtime_type_id =
       flags_internal::RuntimeTypeId(op_);
@@ -487,7 +487,7 @@ bool FlagImpl::ReadOneBool() const {
 void FlagImpl::ReadSequenceLockedData(void* dst) const {
   size_t size = Sizeof(op_);
   // Attempt to read using the sequence lock.
-  if (TURBO_PREDICT_TRUE(seq_lock_.TryRead(dst, AtomicBufferValue(), size))) {
+  if (TURBO_LIKELY(seq_lock_.TryRead(dst, AtomicBufferValue(), size))) {
     return;
   }
   // We failed due to contention. Acquire the lock to prevent contention

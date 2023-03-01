@@ -54,7 +54,7 @@
 // so that the args are not computed when not needed.
 #define TURBO_RAW_CHECK(condition, message)                             \
   do {                                                                 \
-    if (TURBO_PREDICT_FALSE(!(condition))) {                            \
+    if (TURBO_UNLIKELY(!(condition))) {                            \
       TURBO_RAW_LOG(FATAL, "Check %s failed: %s", #condition, message); \
     }                                                                  \
   } while (0)
@@ -80,7 +80,7 @@
 
 #define TURBO_INTERNAL_CHECK(condition, message)                    \
   do {                                                             \
-    if (TURBO_PREDICT_FALSE(!(condition))) {                        \
+    if (TURBO_UNLIKELY(!(condition))) {                        \
       std::string death_message = "Check " #condition " failed: "; \
       death_message += std::string(message);                       \
       TURBO_INTERNAL_LOG(FATAL, death_message);                     \

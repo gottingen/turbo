@@ -86,7 +86,7 @@
        turbo_log_internal_stateful_condition_do_log &&                     \
        turbo_log_internal_stateful_condition_state.ShouldLog(__VA_ARGS__); \
        turbo_log_internal_stateful_condition_do_log = false)               \
-    for (const uint32_t COUNTER TURBO_ATTRIBUTE_UNUSED =                   \
+    for (const uint32_t COUNTER TURBO_ALLOW_UNUSED =                   \
              turbo_log_internal_stateful_condition_state.counter();        \
          turbo_log_internal_stateful_condition_do_log;                     \
          turbo_log_internal_stateful_condition_do_log = false)
@@ -212,8 +212,8 @@ class LogEveryNSecState final {
 
 // Helper routines to abort the application quietly
 
-TURBO_ATTRIBUTE_NORETURN inline void AbortQuietly() { abort(); }
-TURBO_ATTRIBUTE_NORETURN inline void ExitQuietly() { _exit(1); }
+TURBO_NORETURN inline void AbortQuietly() { abort(); }
+TURBO_NORETURN inline void ExitQuietly() { _exit(1); }
 }  // namespace log_internal
 TURBO_NAMESPACE_END
 }  // namespace turbo

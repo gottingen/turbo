@@ -52,7 +52,7 @@ using ::testing::HasSubstr;
 using ::testing::IsEmpty;
 using ::testing::IsTrue;
 
-auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_ALLOW_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 void WriteToStream(turbo::string_view data, std::ostream* os) {

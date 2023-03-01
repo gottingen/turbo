@@ -21,7 +21,7 @@ TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
 // See hashtablez_sampler.h for details.
-extern "C" TURBO_ATTRIBUTE_WEAK bool TURBO_INTERNAL_C_SYMBOL(
+extern "C" TURBO_WEAK bool TURBO_INTERNAL_C_SYMBOL(
     TurboContainerInternalSampleEverything)() {
   return false;
 }

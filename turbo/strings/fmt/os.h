@@ -26,10 +26,10 @@
 #include "format.h"
 
 // UWP doesn't provide _pipe.
-#if FMT_HAS_INCLUDE("winapifamily.h")
+#if TURBO_HAVE_INCLUDE("winapifamily.h")
 #  include <winapifamily.h>
 #endif
-#if FMT_HAS_INCLUDE("fcntl.h") && \
+#if TURBO_HAVE_INCLUDE("fcntl.h") && \
     (!defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
 #  include <fcntl.h>  // for O_RDONLY
 #  define FMT_USE_FCNTL 1
@@ -127,9 +127,9 @@ class error_code {
   int value_;
 
  public:
-  explicit error_code(int value = 0) FMT_NOEXCEPT : value_(value) {}
+  explicit error_code(int value = 0) TURBO_NOEXCEPT : value_(value) {}
 
-  int get() const FMT_NOEXCEPT { return value_; }
+  int get() const TURBO_NOEXCEPT { return value_; }
 };
 
 #ifdef _WIN32
@@ -142,7 +142,7 @@ class utf16_to_utf8 {
 
  public:
   utf16_to_utf8() {}
-  FMT_API explicit utf16_to_utf8(wstring_view s);
+  TURBO_DLL explicit utf16_to_utf8(wstring_view s);
   operator string_view() const { return string_view(&buffer_[0], size()); }
   size_t size() const { return buffer_.size() - 1; }
   const char* c_str() const { return &buffer_[0]; }
@@ -151,17 +151,17 @@ class utf16_to_utf8 {
   // Performs conversion returning a system error code instead of
   // throwing exception on conversion error. This method may still throw
   // in case of memory allocation error.
-  FMT_API int convert(wstring_view s);
+  TURBO_DLL int convert(wstring_view s);
 };
 
-FMT_API void format_windows_error(buffer<char>& out, int error_code,
-                                  string_view message) FMT_NOEXCEPT;
+TURBO_DLL void format_windows_error(buffer<char>& out, int error_code,
+                                  string_view message) TURBO_NOEXCEPT;
 }  // namespace detail
 
 /** A Windows error. */
 class windows_error : public system_error {
  private:
-  FMT_API void init(int error_code, string_view format_str, format_args args);
+  TURBO_DLL void init(int error_code, string_view format_str, format_args args);
 
  public:
   /**
@@ -200,8 +200,8 @@ class windows_error : public system_error {
 
 // Reports a Windows error without throwing an exception.
 // Can be used to report errors from destructors.
-FMT_API void report_windows_error(int error_code,
-                                  string_view message) FMT_NOEXCEPT;
+TURBO_DLL void report_windows_error(int error_code,
+                                  string_view message) TURBO_NOEXCEPT;
 #endif  // _WIN32
 
 // A buffered file.
@@ -218,13 +218,13 @@ class buffered_file {
   void operator=(const buffered_file&) = delete;
 
   // Constructs a buffered_file object which doesn't represent any file.
-  buffered_file() FMT_NOEXCEPT : file_(nullptr) {}
+  buffered_file() TURBO_NOEXCEPT : file_(nullptr) {}
 
   // Destroys the object closing the file it represents if any.
-  FMT_API ~buffered_file() FMT_NOEXCEPT;
+  TURBO_DLL ~buffered_file() TURBO_NOEXCEPT;
 
  public:
-  buffered_file(buffered_file&& other) FMT_NOEXCEPT : file_(other.file_) {
+  buffered_file(buffered_file&& other) TURBO_NOEXCEPT : file_(other.file_) {
     other.file_ = nullptr;
   }
 
@@ -236,17 +236,17 @@ class buffered_file {
   }
 
   // Opens a file.
-  FMT_API buffered_file(cstring_view filename, cstring_view mode);
+  TURBO_DLL buffered_file(cstring_view filename, cstring_view mode);
 
   // Closes the file.
-  FMT_API void close();
+  TURBO_DLL void close();
 
   // Returns the pointer to a FILE object representing this file.
-  FILE* get() const FMT_NOEXCEPT { return file_; }
+  FILE* get() const TURBO_NOEXCEPT { return file_; }
 
   // We place parentheses around fileno to workaround a bug in some versions
   // of MinGW that define fileno as a macro.
-  FMT_API int(fileno)() const;
+  TURBO_DLL int(fileno)() const;
 
   void vprint(string_view format_str, format_args args) {
     fmt::vprint(file_, format_str, args);
@@ -260,7 +260,7 @@ class buffered_file {
 
 #if FMT_USE_FCNTL
 // A file. Closed file is represented by a file object with descriptor -1.
-// Methods that are not declared with FMT_NOEXCEPT may throw
+// Methods that are not declared with TURBO_NOEXCEPT may throw
 // fmt::system_error in case of failure. Note that some errors such as
 // closing the file multiple times will cause a crash on Windows rather
 // than an exception. You can get standard behavior by overriding the
@@ -282,18 +282,18 @@ class file {
   };
 
   // Constructs a file object which doesn't represent any file.
-  file() FMT_NOEXCEPT : fd_(-1) {}
+  file() TURBO_NOEXCEPT : fd_(-1) {}
 
   // Opens a file and constructs a file object representing this file.
-  FMT_API file(cstring_view path, int oflag);
+  TURBO_DLL file(cstring_view path, int oflag);
 
  public:
   file(const file&) = delete;
   void operator=(const file&) = delete;
 
-  file(file&& other) FMT_NOEXCEPT : fd_(other.fd_) { other.fd_ = -1; }
+  file(file&& other) TURBO_NOEXCEPT : fd_(other.fd_) { other.fd_ = -1; }
 
-  file& operator=(file&& other) FMT_NOEXCEPT {
+  file& operator=(file&& other) TURBO_NOEXCEPT {
     close();
     fd_ = other.fd_;
     other.fd_ = -1;
@@ -301,43 +301,43 @@ class file {
   }
 
   // Destroys the object closing the file it represents if any.
-  FMT_API ~file() FMT_NOEXCEPT;
+  TURBO_DLL ~file() TURBO_NOEXCEPT;
 
   // Returns the file descriptor.
-  int descriptor() const FMT_NOEXCEPT { return fd_; }
+  int descriptor() const TURBO_NOEXCEPT { return fd_; }
 
   // Closes the file.
-  FMT_API void close();
+  TURBO_DLL void close();
 
   // Returns the file size. The size has signed type for consistency with
   // stat::st_size.
-  FMT_API long long size() const;
+  TURBO_DLL long long size() const;
 
   // Attempts to read count bytes from the file into the specified buffer.
-  FMT_API size_t read(void* buffer, size_t count);
+  TURBO_DLL size_t read(void* buffer, size_t count);
 
   // Attempts to write count bytes from the specified buffer to the file.
-  FMT_API size_t write(const void* buffer, size_t count);
+  TURBO_DLL size_t write(const void* buffer, size_t count);
 
   // Duplicates a file descriptor with the dup function and returns
   // the duplicate as a file object.
-  FMT_API static file dup(int fd);
+  TURBO_DLL static file dup(int fd);
 
   // Makes fd be the copy of this file descriptor, closing fd first if
   // necessary.
-  FMT_API void dup2(int fd);
+  TURBO_DLL void dup2(int fd);
 
   // Makes fd be the copy of this file descriptor, closing fd first if
   // necessary.
-  FMT_API void dup2(int fd, error_code& ec) FMT_NOEXCEPT;
+  TURBO_DLL void dup2(int fd, error_code& ec) TURBO_NOEXCEPT;
 
   // Creates a pipe setting up read_end and write_end file objects for reading
   // and writing respectively.
-  FMT_API static void pipe(file& read_end, file& write_end);
+  TURBO_DLL static void pipe(file& read_end, file& write_end);
 
   // Creates a buffered_file object associated with this file and detaches
   // this file object from the file.
-  FMT_API buffered_file fdopen(const char* mode);
+  TURBO_DLL buffered_file fdopen(const char* mode);
 };
 
 // Returns the memory page size.
@@ -443,7 +443,7 @@ class locale {
     return result;
   }
 };
-using Locale FMT_DEPRECATED_ALIAS = locale;
+using Locale TURBO_DEPRECATED = locale;
 #endif  // FMT_LOCALE
 FMT_END_NAMESPACE
 

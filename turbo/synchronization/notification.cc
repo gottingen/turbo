@@ -27,7 +27,7 @@ void Notification::Notify() {
   MutexLock l(&this->mutex_);
 
 #ifndef NDEBUG
-  if (TURBO_PREDICT_FALSE(notified_yet_.load(std::memory_order_relaxed))) {
+  if (TURBO_UNLIKELY(notified_yet_.load(std::memory_order_relaxed))) {
     TURBO_RAW_LOG(
         FATAL,
         "Notify() method called more than once for Notification object %p",

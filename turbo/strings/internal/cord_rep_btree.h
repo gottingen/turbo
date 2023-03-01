@@ -659,7 +659,7 @@ inline CordRepBtree* CordRepBtree::New(CordRepBtree* front,
 
 inline void CordRepBtree::Unref(turbo::Span<CordRep* const> edges) {
   for (CordRep* edge : edges) {
-    if (TURBO_PREDICT_FALSE(!edge->refcount.Decrement())) {
+    if (TURBO_UNLIKELY(!edge->refcount.Decrement())) {
       CordRep::Destroy(edge);
     }
   }
@@ -718,7 +718,7 @@ inline void CordRepBtree::AlignBegin() {
   // effects, making the compiler emit register save/store/spills, and minimize
   // the size of code.
   const size_t delta = begin();
-  if (TURBO_PREDICT_FALSE(delta != 0)) {
+  if (TURBO_UNLIKELY(delta != 0)) {
     const size_t new_end = end() - delta;
     set_begin(0);
     set_end(new_end);
@@ -856,16 +856,16 @@ inline Span<char> CordRepBtree::GetAppendBuffer(size_t size) {
       tree = tree->Edge(kBack)->btree();
       if (!tree->refcount.IsOne()) return {};
       n2 = tree;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case 2:
       tree = tree->Edge(kBack)->btree();
       if (!tree->refcount.IsOne()) return {};
       n1 = tree;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case 1:
       tree = tree->Edge(kBack)->btree();
       if (!tree->refcount.IsOne()) return {};
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case 0:
       CordRep* edge = tree->Edge(kBack);
       if (!edge->refcount.IsOne()) return {};
@@ -878,13 +878,13 @@ inline Span<char> CordRepBtree::GetAppendBuffer(size_t size) {
       switch (height) {
         case 3:
           n3->length += delta;
-          TURBO_FALLTHROUGH_INTENDED;
+          TURBO_FALLTHROUGH;
         case 2:
           n2->length += delta;
-          TURBO_FALLTHROUGH_INTENDED;
+          TURBO_FALLTHROUGH;
         case 1:
           n1->length += delta;
-          TURBO_FALLTHROUGH_INTENDED;
+          TURBO_FALLTHROUGH;
         case 0:
           tree->length += delta;
           return span;
@@ -901,14 +901,14 @@ extern template CordRepBtree* CordRepBtree::AddCordRep<CordRepBtree::kFront>(
     CordRepBtree* tree, CordRep* rep);
 
 inline CordRepBtree* CordRepBtree::Append(CordRepBtree* tree, CordRep* rep) {
-  if (TURBO_PREDICT_TRUE(IsDataEdge(rep))) {
+  if (TURBO_LIKELY(IsDataEdge(rep))) {
     return CordRepBtree::AddCordRep<kBack>(tree, rep);
   }
   return AppendSlow(tree, rep);
 }
 
 inline CordRepBtree* CordRepBtree::Prepend(CordRepBtree* tree, CordRep* rep) {
-  if (TURBO_PREDICT_TRUE(IsDataEdge(rep))) {
+  if (TURBO_LIKELY(IsDataEdge(rep))) {
     return CordRepBtree::AddCordRep<kFront>(tree, rep);
   }
   return PrependSlow(tree, rep);

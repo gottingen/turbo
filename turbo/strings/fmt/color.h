@@ -185,11 +185,11 @@ enum class emphasis : uint8_t {
 // rgb is a struct for red, green and blue colors.
 // Using the name "rgb" makes some editors show the color in a tooltip.
 struct rgb {
-  FMT_CONSTEXPR rgb() : r(0), g(0), b(0) {}
-  FMT_CONSTEXPR rgb(uint8_t r_, uint8_t g_, uint8_t b_) : r(r_), g(g_), b(b_) {}
-  FMT_CONSTEXPR rgb(uint32_t hex)
+  TURBO_CONSTEXPR rgb() : r(0), g(0), b(0) {}
+  TURBO_CONSTEXPR rgb(uint8_t r_, uint8_t g_, uint8_t b_) : r(r_), g(g_), b(b_) {}
+  TURBO_CONSTEXPR rgb(uint32_t hex)
       : r((hex >> 16) & 0xFF), g((hex >> 8) & 0xFF), b(hex & 0xFF) {}
-  FMT_CONSTEXPR rgb(color hex)
+  TURBO_CONSTEXPR rgb(color hex)
       : r((uint32_t(hex) >> 16) & 0xFF),
         g((uint32_t(hex) >> 8) & 0xFF),
         b(uint32_t(hex) & 0xFF) {}
@@ -202,16 +202,16 @@ namespace detail {
 
 // color is a struct of either a rgb color or a terminal color.
 struct color_type {
-  FMT_CONSTEXPR color_type() FMT_NOEXCEPT : is_rgb(), value{} {}
-  FMT_CONSTEXPR color_type(color rgb_color) FMT_NOEXCEPT : is_rgb(true),
+  TURBO_CONSTEXPR color_type() TURBO_NOEXCEPT : is_rgb(), value{} {}
+  TURBO_CONSTEXPR color_type(color rgb_color) TURBO_NOEXCEPT : is_rgb(true),
                                                            value{} {
     value.rgb_color = static_cast<uint32_t>(rgb_color);
   }
-  FMT_CONSTEXPR color_type(rgb rgb_color) FMT_NOEXCEPT : is_rgb(true), value{} {
+  TURBO_CONSTEXPR color_type(rgb rgb_color) TURBO_NOEXCEPT : is_rgb(true), value{} {
     value.rgb_color = (static_cast<uint32_t>(rgb_color.r) << 16) |
                       (static_cast<uint32_t>(rgb_color.g) << 8) | rgb_color.b;
   }
-  FMT_CONSTEXPR color_type(terminal_color term_color) FMT_NOEXCEPT : is_rgb(),
+  TURBO_CONSTEXPR color_type(terminal_color term_color) TURBO_NOEXCEPT : is_rgb(),
                                                                      value{} {
     value.term_color = static_cast<uint8_t>(term_color);
   }
@@ -226,12 +226,12 @@ struct color_type {
 // Experimental text formatting support.
 class text_style {
  public:
-  FMT_CONSTEXPR text_style(emphasis em = emphasis()) FMT_NOEXCEPT
+  TURBO_CONSTEXPR text_style(emphasis em = emphasis()) TURBO_NOEXCEPT
       : set_foreground_color(),
         set_background_color(),
         ems(em) {}
 
-  FMT_CONSTEXPR text_style& operator|=(const text_style& rhs) {
+  TURBO_CONSTEXPR text_style& operator|=(const text_style& rhs) {
     if (!set_foreground_color) {
       set_foreground_color = rhs.set_foreground_color;
       foreground_color = rhs.foreground_color;
@@ -255,12 +255,12 @@ class text_style {
     return *this;
   }
 
-  friend FMT_CONSTEXPR text_style operator|(text_style lhs,
+  friend TURBO_CONSTEXPR text_style operator|(text_style lhs,
                                             const text_style& rhs) {
     return lhs |= rhs;
   }
 
-  FMT_CONSTEXPR text_style& operator&=(const text_style& rhs) {
+  TURBO_CONSTEXPR text_style& operator&=(const text_style& rhs) {
     if (!set_foreground_color) {
       set_foreground_color = rhs.set_foreground_color;
       foreground_color = rhs.foreground_color;
@@ -284,36 +284,36 @@ class text_style {
     return *this;
   }
 
-  friend FMT_CONSTEXPR text_style operator&(text_style lhs,
+  friend TURBO_CONSTEXPR text_style operator&(text_style lhs,
                                             const text_style& rhs) {
     return lhs &= rhs;
   }
 
-  FMT_CONSTEXPR bool has_foreground() const FMT_NOEXCEPT {
+  TURBO_CONSTEXPR bool has_foreground() const TURBO_NOEXCEPT {
     return set_foreground_color;
   }
-  FMT_CONSTEXPR bool has_background() const FMT_NOEXCEPT {
+  TURBO_CONSTEXPR bool has_background() const TURBO_NOEXCEPT {
     return set_background_color;
   }
-  FMT_CONSTEXPR bool has_emphasis() const FMT_NOEXCEPT {
+  TURBO_CONSTEXPR bool has_emphasis() const TURBO_NOEXCEPT {
     return static_cast<uint8_t>(ems) != 0;
   }
-  FMT_CONSTEXPR detail::color_type get_foreground() const FMT_NOEXCEPT {
+  TURBO_CONSTEXPR detail::color_type get_foreground() const TURBO_NOEXCEPT {
     FMT_ASSERT(has_foreground(), "no foreground specified for this style");
     return foreground_color;
   }
-  FMT_CONSTEXPR detail::color_type get_background() const FMT_NOEXCEPT {
+  TURBO_CONSTEXPR detail::color_type get_background() const TURBO_NOEXCEPT {
     FMT_ASSERT(has_background(), "no background specified for this style");
     return background_color;
   }
-  FMT_CONSTEXPR emphasis get_emphasis() const FMT_NOEXCEPT {
+  TURBO_CONSTEXPR emphasis get_emphasis() const TURBO_NOEXCEPT {
     FMT_ASSERT(has_emphasis(), "no emphasis specified for this style");
     return ems;
   }
 
  private:
-  FMT_CONSTEXPR text_style(bool is_foreground,
-                           detail::color_type text_color) FMT_NOEXCEPT
+  TURBO_CONSTEXPR text_style(bool is_foreground,
+                           detail::color_type text_color) TURBO_NOEXCEPT
       : set_foreground_color(),
         set_background_color(),
         ems() {
@@ -326,10 +326,10 @@ class text_style {
     }
   }
 
-  friend FMT_CONSTEXPR_DECL text_style fg(detail::color_type foreground)
-      FMT_NOEXCEPT;
-  friend FMT_CONSTEXPR_DECL text_style bg(detail::color_type background)
-      FMT_NOEXCEPT;
+  friend TURBO_CONSTEXPR_FUNC text_style fg(detail::color_type foreground)
+      TURBO_NOEXCEPT;
+  friend TURBO_CONSTEXPR_FUNC text_style bg(detail::color_type background)
+      TURBO_NOEXCEPT;
 
   detail::color_type foreground_color;
   detail::color_type background_color;
@@ -338,23 +338,23 @@ class text_style {
   emphasis ems;
 };
 
-FMT_CONSTEXPR text_style fg(detail::color_type foreground) FMT_NOEXCEPT {
+TURBO_CONSTEXPR text_style fg(detail::color_type foreground) TURBO_NOEXCEPT {
   return text_style(/*is_foreground=*/true, foreground);
 }
 
-FMT_CONSTEXPR text_style bg(detail::color_type background) FMT_NOEXCEPT {
+TURBO_CONSTEXPR text_style bg(detail::color_type background) TURBO_NOEXCEPT {
   return text_style(/*is_foreground=*/false, background);
 }
 
-FMT_CONSTEXPR text_style operator|(emphasis lhs, emphasis rhs) FMT_NOEXCEPT {
+TURBO_CONSTEXPR text_style operator|(emphasis lhs, emphasis rhs) TURBO_NOEXCEPT {
   return text_style(lhs) | rhs;
 }
 
 namespace detail {
 
 template <typename Char> struct ansi_color_escape {
-  FMT_CONSTEXPR ansi_color_escape(detail::color_type text_color,
-                                  const char* esc) FMT_NOEXCEPT {
+  TURBO_CONSTEXPR ansi_color_escape(detail::color_type text_color,
+                                  const char* esc) TURBO_NOEXCEPT {
     // If we have a terminal color, we need to output another escape code
     // sequence.
     if (!text_color.is_rgb) {
@@ -389,7 +389,7 @@ template <typename Char> struct ansi_color_escape {
     to_esc(color.b, buffer + 15, 'm');
     buffer[19] = static_cast<Char>(0);
   }
-  FMT_CONSTEXPR ansi_color_escape(emphasis em) FMT_NOEXCEPT {
+  TURBO_CONSTEXPR ansi_color_escape(emphasis em) TURBO_NOEXCEPT {
     uint8_t em_codes[4] = {};
     uint8_t em_bits = static_cast<uint8_t>(em);
     if (em_bits & static_cast<uint8_t>(emphasis::bold)) em_codes[0] = 1;
@@ -408,18 +408,18 @@ template <typename Char> struct ansi_color_escape {
     }
     buffer[index++] = static_cast<Char>(0);
   }
-  FMT_CONSTEXPR operator const Char*() const FMT_NOEXCEPT { return buffer; }
+  TURBO_CONSTEXPR operator const Char*() const TURBO_NOEXCEPT { return buffer; }
 
-  FMT_CONSTEXPR const Char* begin() const FMT_NOEXCEPT { return buffer; }
-  FMT_CONSTEXPR const Char* end() const FMT_NOEXCEPT {
+  TURBO_CONSTEXPR const Char* begin() const TURBO_NOEXCEPT { return buffer; }
+  TURBO_CONSTEXPR const Char* end() const TURBO_NOEXCEPT {
     return buffer + std::char_traits<Char>::length(buffer);
   }
 
  private:
   Char buffer[7u + 3u * 4u + 1u];
 
-  static FMT_CONSTEXPR void to_esc(uint8_t c, Char* out,
-                                   char delimiter) FMT_NOEXCEPT {
+  static TURBO_CONSTEXPR void to_esc(uint8_t c, Char* out,
+                                   char delimiter) TURBO_NOEXCEPT {
     out[0] = static_cast<Char>('0' + c / 100);
     out[1] = static_cast<Char>('0' + c / 10 % 10);
     out[2] = static_cast<Char>('0' + c % 10);
@@ -428,42 +428,42 @@ template <typename Char> struct ansi_color_escape {
 };
 
 template <typename Char>
-FMT_CONSTEXPR ansi_color_escape<Char> make_foreground_color(
-    detail::color_type foreground) FMT_NOEXCEPT {
+TURBO_CONSTEXPR ansi_color_escape<Char> make_foreground_color(
+    detail::color_type foreground) TURBO_NOEXCEPT {
   return ansi_color_escape<Char>(foreground, detail::data::foreground_color);
 }
 
 template <typename Char>
-FMT_CONSTEXPR ansi_color_escape<Char> make_background_color(
-    detail::color_type background) FMT_NOEXCEPT {
+TURBO_CONSTEXPR ansi_color_escape<Char> make_background_color(
+    detail::color_type background) TURBO_NOEXCEPT {
   return ansi_color_escape<Char>(background, detail::data::background_color);
 }
 
 template <typename Char>
-FMT_CONSTEXPR ansi_color_escape<Char> make_emphasis(emphasis em) FMT_NOEXCEPT {
+TURBO_CONSTEXPR ansi_color_escape<Char> make_emphasis(emphasis em) TURBO_NOEXCEPT {
   return ansi_color_escape<Char>(em);
 }
 
 template <typename Char>
-inline void fputs(const Char* chars, FILE* stream) FMT_NOEXCEPT {
+inline void fputs(const Char* chars, FILE* stream) TURBO_NOEXCEPT {
   std::fputs(chars, stream);
 }
 
 template <>
-inline void fputs<wchar_t>(const wchar_t* chars, FILE* stream) FMT_NOEXCEPT {
+inline void fputs<wchar_t>(const wchar_t* chars, FILE* stream) TURBO_NOEXCEPT {
   std::fputws(chars, stream);
 }
 
-template <typename Char> inline void reset_color(FILE* stream) FMT_NOEXCEPT {
+template <typename Char> inline void reset_color(FILE* stream) TURBO_NOEXCEPT {
   fputs(detail::data::reset_color, stream);
 }
 
-template <> inline void reset_color<wchar_t>(FILE* stream) FMT_NOEXCEPT {
+template <> inline void reset_color<wchar_t>(FILE* stream) TURBO_NOEXCEPT {
   fputs(detail::data::wreset_color, stream);
 }
 
 template <typename Char>
-inline void reset_color(basic_memory_buffer<Char>& buffer) FMT_NOEXCEPT {
+inline void reset_color(basic_memory_buffer<Char>& buffer) TURBO_NOEXCEPT {
   const char* begin = data::reset_color;
   const char* end = begin + sizeof(data::reset_color) - 1;
   buffer.append(begin, end);

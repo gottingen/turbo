@@ -36,7 +36,7 @@ template <typename To, typename From,
           FMT_ENABLE_IF(!std::is_same<From, To>::value &&
                         std::numeric_limits<From>::is_signed ==
                             std::numeric_limits<To>::is_signed)>
-FMT_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
+TURBO_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
   ec = 0;
   using F = std::numeric_limits<From>;
   using T = std::numeric_limits<To>;
@@ -65,7 +65,7 @@ template <typename To, typename From,
           FMT_ENABLE_IF(!std::is_same<From, To>::value &&
                         std::numeric_limits<From>::is_signed !=
                             std::numeric_limits<To>::is_signed)>
-FMT_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
+TURBO_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
   ec = 0;
   using F = std::numeric_limits<From>;
   using T = std::numeric_limits<To>;
@@ -112,7 +112,7 @@ FMT_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
 
 template <typename To, typename From,
           FMT_ENABLE_IF(std::is_same<From, To>::value)>
-FMT_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
+TURBO_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
   ec = 0;
   return from;
 }  // function
@@ -133,7 +133,7 @@ FMT_CONSTEXPR To lossless_integral_conversion(const From from, int& ec) {
 // clang-format on
 template <typename To, typename From,
           FMT_ENABLE_IF(!std::is_same<From, To>::value)>
-FMT_CONSTEXPR To safe_float_conversion(const From from, int& ec) {
+TURBO_CONSTEXPR To safe_float_conversion(const From from, int& ec) {
   ec = 0;
   using T = std::numeric_limits<To>;
   static_assert(std::is_floating_point<From>::value, "From must be floating");
@@ -155,7 +155,7 @@ FMT_CONSTEXPR To safe_float_conversion(const From from, int& ec) {
 
 template <typename To, typename From,
           FMT_ENABLE_IF(std::is_same<From, To>::value)>
-FMT_CONSTEXPR To safe_float_conversion(const From from, int& ec) {
+TURBO_CONSTEXPR To safe_float_conversion(const From from, int& ec) {
   ec = 0;
   static_assert(std::is_floating_point<From>::value, "From must be floating");
   return from;
@@ -440,30 +440,30 @@ template <typename Char> struct formatter<std::tm, Char> {
 };
 
 namespace detail {
-template <typename Period> FMT_CONSTEXPR const char* get_units() {
+template <typename Period> TURBO_CONSTEXPR const char* get_units() {
   return nullptr;
 }
-template <> FMT_CONSTEXPR const char* get_units<std::atto>() { return "as"; }
-template <> FMT_CONSTEXPR const char* get_units<std::femto>() { return "fs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::pico>() { return "ps"; }
-template <> FMT_CONSTEXPR const char* get_units<std::nano>() { return "ns"; }
-template <> FMT_CONSTEXPR const char* get_units<std::micro>() { return "µs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::milli>() { return "ms"; }
-template <> FMT_CONSTEXPR const char* get_units<std::centi>() { return "cs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::deci>() { return "ds"; }
-template <> FMT_CONSTEXPR const char* get_units<std::ratio<1>>() { return "s"; }
-template <> FMT_CONSTEXPR const char* get_units<std::deca>() { return "das"; }
-template <> FMT_CONSTEXPR const char* get_units<std::hecto>() { return "hs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::kilo>() { return "ks"; }
-template <> FMT_CONSTEXPR const char* get_units<std::mega>() { return "Ms"; }
-template <> FMT_CONSTEXPR const char* get_units<std::giga>() { return "Gs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::tera>() { return "Ts"; }
-template <> FMT_CONSTEXPR const char* get_units<std::peta>() { return "Ps"; }
-template <> FMT_CONSTEXPR const char* get_units<std::exa>() { return "Es"; }
-template <> FMT_CONSTEXPR const char* get_units<std::ratio<60>>() {
+template <> TURBO_CONSTEXPR const char* get_units<std::atto>() { return "as"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::femto>() { return "fs"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::pico>() { return "ps"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::nano>() { return "ns"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::micro>() { return "µs"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::milli>() { return "ms"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::centi>() { return "cs"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::deci>() { return "ds"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::ratio<1>>() { return "s"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::deca>() { return "das"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::hecto>() { return "hs"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::kilo>() { return "ks"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::mega>() { return "Ms"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::giga>() { return "Gs"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::tera>() { return "Ts"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::peta>() { return "Ps"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::exa>() { return "Es"; }
+template <> TURBO_CONSTEXPR const char* get_units<std::ratio<60>>() {
   return "m";
 }
-template <> FMT_CONSTEXPR const char* get_units<std::ratio<3600>>() {
+template <> TURBO_CONSTEXPR const char* get_units<std::ratio<3600>>() {
   return "h";
 }
 
@@ -475,7 +475,7 @@ enum class numeric_system {
 
 // Parses a put_time-like format string and invokes handler actions.
 template <typename Char, typename Handler>
-FMT_CONSTEXPR const Char* parse_chrono_format(const Char* begin,
+TURBO_CONSTEXPR const Char* parse_chrono_format(const Char* begin,
                                               const Char* end,
                                               Handler&& handler) {
   auto ptr = begin;
@@ -632,32 +632,32 @@ FMT_CONSTEXPR const Char* parse_chrono_format(const Char* begin,
 }
 
 struct chrono_format_checker {
-  FMT_NORETURN void report_no_date() { FMT_THROW(format_error("no date")); }
+  TURBO_NORETURN void report_no_date() { FMT_THROW(format_error("no date")); }
 
   template <typename Char> void on_text(const Char*, const Char*) {}
-  FMT_NORETURN void on_abbr_weekday() { report_no_date(); }
-  FMT_NORETURN void on_full_weekday() { report_no_date(); }
-  FMT_NORETURN void on_dec0_weekday(numeric_system) { report_no_date(); }
-  FMT_NORETURN void on_dec1_weekday(numeric_system) { report_no_date(); }
-  FMT_NORETURN void on_abbr_month() { report_no_date(); }
-  FMT_NORETURN void on_full_month() { report_no_date(); }
+  TURBO_NORETURN void on_abbr_weekday() { report_no_date(); }
+  TURBO_NORETURN void on_full_weekday() { report_no_date(); }
+  TURBO_NORETURN void on_dec0_weekday(numeric_system) { report_no_date(); }
+  TURBO_NORETURN void on_dec1_weekday(numeric_system) { report_no_date(); }
+  TURBO_NORETURN void on_abbr_month() { report_no_date(); }
+  TURBO_NORETURN void on_full_month() { report_no_date(); }
   void on_24_hour(numeric_system) {}
   void on_12_hour(numeric_system) {}
   void on_minute(numeric_system) {}
   void on_second(numeric_system) {}
-  FMT_NORETURN void on_datetime(numeric_system) { report_no_date(); }
-  FMT_NORETURN void on_loc_date(numeric_system) { report_no_date(); }
-  FMT_NORETURN void on_loc_time(numeric_system) { report_no_date(); }
-  FMT_NORETURN void on_us_date() { report_no_date(); }
-  FMT_NORETURN void on_iso_date() { report_no_date(); }
+  TURBO_NORETURN void on_datetime(numeric_system) { report_no_date(); }
+  TURBO_NORETURN void on_loc_date(numeric_system) { report_no_date(); }
+  TURBO_NORETURN void on_loc_time(numeric_system) { report_no_date(); }
+  TURBO_NORETURN void on_us_date() { report_no_date(); }
+  TURBO_NORETURN void on_iso_date() { report_no_date(); }
   void on_12_hour_time() {}
   void on_24_hour_time() {}
   void on_iso_time() {}
   void on_am_pm() {}
   void on_duration_value() {}
   void on_duration_unit() {}
-  FMT_NORETURN void on_utc_offset() { report_no_date(); }
-  FMT_NORETURN void on_tz_name() { report_no_date(); }
+  TURBO_NORETURN void on_utc_offset() { report_no_date(); }
+  TURBO_NORETURN void on_tz_name() { report_no_date(); }
 };
 
 template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
@@ -1028,17 +1028,17 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
     basic_format_parse_context<Char>& context;
     basic_string_view<Char> format_str;
 
-    template <typename Id> FMT_CONSTEXPR arg_ref_type make_arg_ref(Id arg_id) {
+    template <typename Id> TURBO_CONSTEXPR arg_ref_type make_arg_ref(Id arg_id) {
       context.check_arg_id(arg_id);
       return arg_ref_type(arg_id);
     }
 
-    FMT_CONSTEXPR arg_ref_type make_arg_ref(basic_string_view<Char> arg_id) {
+    TURBO_CONSTEXPR arg_ref_type make_arg_ref(basic_string_view<Char> arg_id) {
       context.check_arg_id(arg_id);
       return arg_ref_type(arg_id);
     }
 
-    FMT_CONSTEXPR arg_ref_type make_arg_ref(detail::auto_id) {
+    TURBO_CONSTEXPR arg_ref_type make_arg_ref(detail::auto_id) {
       return arg_ref_type(context.next_arg_id());
     }
 
@@ -1064,7 +1064,7 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
     iterator end;
   };
 
-  FMT_CONSTEXPR parse_range do_parse(basic_format_parse_context<Char>& ctx) {
+  TURBO_CONSTEXPR parse_range do_parse(basic_format_parse_context<Char>& ctx) {
     auto begin = ctx.begin(), end = ctx.end();
     if (begin == end || *begin == '}') return {begin, begin};
     spec_handler handler{*this, ctx, format_str};
@@ -1085,7 +1085,7 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
  public:
   formatter() : precision(-1) {}
 
-  FMT_CONSTEXPR auto parse(basic_format_parse_context<Char>& ctx)
+  TURBO_CONSTEXPR auto parse(basic_format_parse_context<Char>& ctx)
       -> decltype(ctx.begin()) {
     auto range = do_parse(ctx);
     format_str = basic_string_view<Char>(

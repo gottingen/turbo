@@ -33,7 +33,7 @@ extern "C" {
 
 // Additional report of fatal usage error message before we std::exit. Error is
 // fatal if is_fatal argument to ReportUsageError is true.
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(
     TurboInternalReportFatalUsageError)(turbo::string_view) {}
 
 }  // extern "C"

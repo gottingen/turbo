@@ -783,7 +783,7 @@ struct ConstexprTester {};
 
 #define TURBO_TEST_CONSTEXPR(expr)                       \
   do {                                                  \
-    TURBO_ATTRIBUTE_UNUSED ConstexprTester<(expr, 1)> t; \
+    TURBO_ALLOW_UNUSED ConstexprTester<(expr, 1)> t; \
   } while (0)
 
 struct ContainerWithConstexprMethods {
