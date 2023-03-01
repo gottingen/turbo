@@ -2385,14 +2385,19 @@
 	// 		}
 	//
 	#if !defined(TURBO_FALLTHROUGH)
-		#if defined(TURBO_COMPILER_NO_FALLTHROUGH)
-			#define TURBO_FALLTHROUGH
+		#if !defined(TURBO_COMPILER_NO_FALLTHROUGH)
+                    #define TURBO_FALLTHROUGH [[fallthrough]]
+                #elif __cplusplus == 201103L || __cplusplus == 201402L
+                    #if defined(__clang__)
+                      #define TURBO_FALLTHROUGH [[clang::fallthrough]]
+                    #elif defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 700 && \
+                        !defined(__PGI) &&  (!defined(__EDG_VERSION__) || __EDG_VERSION__ >= 520)
+                      #define define TURBO_FALLTHROUGH [[gnu::fallthrough]]
+                    #endif
 		#else
-			#define TURBO_FALLTHROUGH [[fallthrough]]
+			#define TURBO_FALLTHROUGH
 		#endif
-	#endif
-
-
+        #endif
 
 	// ------------------------------------------------------------------------
 	// TURBO_NODISCARD
