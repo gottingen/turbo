@@ -242,6 +242,7 @@ public:
     isMedium = kIsLittleEndian ? 0x80 : 0x2,
     isLarge = kIsLittleEndian ? 0x40 : 0x1,
   };
+
 public:
   inlined_string_core() noexcept { reset(); }
 
@@ -556,7 +557,6 @@ public:
   };
 
 public:
-
   Category category() const {
     // works for both big-endian and little-endian
     return static_cast<Category>(bytes_[lastChar] & categoryExtractMask);
@@ -703,7 +703,9 @@ inline void inlined_string_core<Char>::initSmall(const Char *const data,
   if ((reinterpret_cast<size_t>(data) & (sizeof(size_t) - 1)) == 0) {
     const size_t byteSize = size * sizeof(Char);
     constexpr size_t wordWidth = sizeof(size_t);
-    TURBO_DISABLE_GCC_WARNING(-Wimplicit - fallthrough =)
+    // clang-format off
+    TURBO_DISABLE_GCC_WARNING(-Wimplicit-fallthrough=)
+    // clang-format on
     switch ((byteSize + wordWidth - 1) / wordWidth) { // Number of words.
     case 3:
       ml_.capacity_ = reinterpret_cast<const size_t *>(data)[2];
