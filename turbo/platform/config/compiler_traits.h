@@ -2390,7 +2390,7 @@
                 #elif __cplusplus == 201103L || __cplusplus == 201402L
                     #if defined(__clang__)
                       #define TURBO_FALLTHROUGH [[clang::fallthrough]]
-                    #elif defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 700 && \
+                    #elif defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 7000 && \
                         !defined(__PGI) &&  (!defined(__EDG_VERSION__) || __EDG_VERSION__ >= 520)
                       #define define TURBO_FALLTHROUGH [[gnu::fallthrough]]
                     #endif
