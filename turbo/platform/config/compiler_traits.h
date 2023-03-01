@@ -2178,7 +2178,7 @@
         #endif
 
         #if !defined(TURBO_CONSTEXPR_FUNC)
-        #if TURBO_HAVE_FEATURE(cxx_relaxed_constexpr) || FMT_MSC_VER >= 1910 || \
+        #if TURBO_HAVE_FEATURE(cxx_relaxed_constexpr) || (defined(TURBO_COMPILER_MSVC) && TURBO_COMPILER_VERSION >= 1910) || \
              (defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 6000 && __cplusplus >= 201402L)
               #define TURBO_CONSTEXPR_FUNC constexpr
         #else
