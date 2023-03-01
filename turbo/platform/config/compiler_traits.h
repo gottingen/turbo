@@ -2387,7 +2387,7 @@
 	#if !defined(TURBO_FALLTHROUGH)
 		#if !defined(TURBO_COMPILER_NO_FALLTHROUGH)
                     #define TURBO_FALLTHROUGH [[fallthrough]]
-                #elif __cplusplus == 201103L || __cplusplus == 201402L
+                #elif __cplusplus >= 201103L
                     #if defined(__clang__)
                       #define TURBO_FALLTHROUGH [[clang::fallthrough]]
                     #elif defined(TURBO_COMPILER_GNUC) && TURBO_COMPILER_VERSION >= 7000
