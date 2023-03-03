@@ -29,7 +29,7 @@ TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 // CordRepBtreeReader implements logic to iterate over cord btrees.
-// References to the underlying data are returned as turbo::string_view values.
+// References to the underlying data are returned as turbo::string_piece values.
 // The most typical use case is a forward only iteration over tree data.
 // The class also provides `Skip()`, `Seek()` and `Read()` methods similar to
 // CordRepBtreeNavigator that allow more advanced navigation.
@@ -37,7 +37,7 @@ namespace cord_internal {
 // Example: iterate over all data inside a cord btree:
 //
 //   CordRepBtreeReader reader;
-//   for (string_view sv = reader.Init(tree); !sv.Empty(); sv = sv.Next()) {
+//   for (string_piece sv = reader.Init(tree); !sv.Empty(); sv = sv.Next()) {
 //     DoSomethingWithDataIn(sv);
 //   }
 //
@@ -49,7 +49,7 @@ namespace cord_internal {
 // Example: iterate over all data inside a btree skipping the first 100 bytes:
 //
 //   CordRepBtreeReader reader;
-//   turbo::string_view sv = reader.Init(tree);
+//   turbo::string_piece sv = reader.Init(tree);
 //   if (sv.length() > 100) {
 //     sv.RemovePrefix(100);
 //   } else {
@@ -57,7 +57,7 @@ namespace cord_internal {
 //   }
 //   while (!sv.empty()) {
 //     DoSomethingWithDataIn(sv);
-//     turbo::string_view sv = reader.Next();
+//     turbo::string_piece sv = reader.Next();
 //   }
 //
 // It is important to notice that `remaining` is based on the end position of
@@ -67,7 +67,7 @@ namespace cord_internal {
 // For example, consider a cord btree with five data edges: "abc", "def", "ghi",
 // "jkl" and "mno":
 //
-//   turbo::string_view sv;
+//   turbo::string_piece sv;
 //   CordRepBtreeReader reader;
 //
 //   sv = reader.Init(tree); // sv = "abc", remaining = 12
@@ -99,7 +99,7 @@ class CordRepBtreeReader {
   // number of bytes directly following the end of the last chunk returned.
   // This value will be zero if we iterated over the last edge in the bound
   // tree, in which case any call to Next() or Skip() will return an empty
-  // string_view reflecting the EOF state.
+  // string_piece reflecting the EOF state.
   // Note that a call to `Seek()` resets `remaining` to a value based on the
   // end position of the chunk returned by that call.
   size_t remaining() const { return remaining_; }
@@ -109,17 +109,17 @@ class CordRepBtreeReader {
 
   // Initializes this instance with `tree`. `tree` must not be null.
   // Returns a reference to the first data edge of the provided tree.
-  turbo::string_view Init(CordRepBtree* tree);
+  turbo::string_piece Init(CordRepBtree* tree);
 
   // Navigates to and returns the next data edge of the referenced tree.
-  // Returns an empty string_view if an attempt is made to read beyond the end
+  // Returns an empty string_piece if an attempt is made to read beyond the end
   // of the tree, i.e.: if `remaining()` is zero indicating an EOF condition.
   // Requires that the current instance is not empty.
-  turbo::string_view Next();
+  turbo::string_piece Next();
 
   // Skips the provided amount of bytes and returns a reference to the data
   // directly following the skipped bytes.
-  turbo::string_view Skip(size_t skip);
+  turbo::string_piece Skip(size_t skip);
 
   // Reads `n` bytes into `tree`.
   // If `chunk_size` is zero, starts reading at the next data edge. If
@@ -133,7 +133,7 @@ class CordRepBtreeReader {
   // data into a cord tree if the first chunk starts with "big:":
   //
   //   CordRepBtreeReader reader;
-  //   turbo::string_view sv = reader.Init(tree);
+  //   turbo::string_piece sv = reader.Init(tree);
   //   if (turbo::StartsWith(sv, "big:")) {
   //     CordRepBtree tree;
   //     sv = reader.Read(1000, sv.size() - 4 /* "big:" */, &tree);
@@ -143,7 +143,7 @@ class CordRepBtreeReader {
   // read. If `n` exceeded the amount of remaining data this function will
   // return an empty string view and `tree` will be set to nullptr.
   // In both cases, `consumed` will be set to `length`.
-  turbo::string_view Read(size_t n, size_t chunk_size, CordRep*& tree);
+  turbo::string_piece Read(size_t n, size_t chunk_size, CordRep*& tree);
 
   // Navigates to the chunk at offset `offset`.
   // Returns a reference into the navigated to chunk, adjusted for the relative
@@ -152,7 +152,7 @@ class CordRepBtreeReader {
   // a string view into the second chunk starting at offset 3 with a size of 17.
   // Returns an empty string view if `offset` is equal to or greater than the
   // length of the referenced tree.
-  turbo::string_view Seek(size_t offset);
+  turbo::string_piece Seek(size_t offset);
 
  private:
   size_t remaining_ = 0;
@@ -164,14 +164,14 @@ inline size_t CordRepBtreeReader::length() const {
   return btree()->length;
 }
 
-inline turbo::string_view CordRepBtreeReader::Init(CordRepBtree* tree) {
+inline turbo::string_piece CordRepBtreeReader::Init(CordRepBtree* tree) {
   assert(tree != nullptr);
   const CordRep* edge = navigator_.InitFirst(tree);
   remaining_ = tree->length - edge->length;
   return EdgeData(edge);
 }
 
-inline turbo::string_view CordRepBtreeReader::Next() {
+inline turbo::string_piece CordRepBtreeReader::Next() {
   if (remaining_ == 0) return {};
   const CordRep* edge = navigator_.Next();
   assert(edge != nullptr);
@@ -179,7 +179,7 @@ inline turbo::string_view CordRepBtreeReader::Next() {
   return EdgeData(edge);
 }
 
-inline turbo::string_view CordRepBtreeReader::Skip(size_t skip) {
+inline turbo::string_piece CordRepBtreeReader::Skip(size_t skip) {
   // As we are always positioned on the last 'consumed' edge, we
   // need to skip the current edge as well as `skip`.
   const size_t edge_length = navigator_.Current()->length;
@@ -194,13 +194,13 @@ inline turbo::string_view CordRepBtreeReader::Skip(size_t skip) {
   return EdgeData(pos.edge).substr(pos.offset);
 }
 
-inline turbo::string_view CordRepBtreeReader::Seek(size_t offset) {
+inline turbo::string_piece CordRepBtreeReader::Seek(size_t offset) {
   const CordRepBtreeNavigator::Position pos = navigator_.Seek(offset);
   if (TURBO_UNLIKELY(pos.edge == nullptr)) {
     remaining_ = 0;
     return {};
   }
-  turbo::string_view chunk = EdgeData(pos.edge).substr(pos.offset);
+  turbo::string_piece chunk = EdgeData(pos.edge).substr(pos.offset);
   remaining_ = length() - offset - chunk.length();
   return chunk;
 }

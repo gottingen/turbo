@@ -23,7 +23,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/container/internal/test_instance_tracker.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -143,9 +143,9 @@ TEST(PairArgs, Piecewise) {
 }
 
 TEST(WithConstructed, Simple) {
-  EXPECT_EQ(1, WithConstructed<turbo::string_view>(
+  EXPECT_EQ(1, WithConstructed<turbo::string_piece>(
                    std::make_tuple(std::string("a")),
-                   [](turbo::string_view str) { return str.size(); }));
+                   [](turbo::string_piece str) { return str.size(); }));
 }
 
 template <class F, class Arg>

@@ -36,7 +36,7 @@
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/time.h"
 #include "gtest/gtest.h"
 
@@ -62,7 +62,7 @@ struct UDT {
   UDT(const UDT&) = default;
   UDT& operator=(const UDT&) = default;
 };
-bool TurboParseFlag(turbo::string_view, UDT*, std::string*) { return true; }
+bool TurboParseFlag(turbo::string_piece, UDT*, std::string*) { return true; }
 std::string TurboUnparseFlag(const UDT&) { return ""; }
 
 class FlagTest : public testing::Test {
@@ -75,7 +75,7 @@ class FlagTest : public testing::Test {
   }
 
  private:
-  static std::string NormalizeFileName(turbo::string_view fname) {
+  static std::string NormalizeFileName(turbo::string_piece fname) {
 #ifdef _WIN32
     std::string normalized(fname);
     std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -274,7 +274,7 @@ namespace {
 
 #if !TURBO_FLAGS_STRIP_NAMES
 TEST_F(FlagTest, TestFlagDefinition) {
-  turbo::string_view expected_file_name = "turbo/flags/flag_test.cc";
+  turbo::string_piece expected_file_name = "turbo/flags/flag_test.cc";
 
   EXPECT_EQ(turbo::GetFlagReflectionHandle(FLAGS_test_flag_01).Name(),
             "test_flag_01");
@@ -467,7 +467,7 @@ struct NonTriviallyCopyableAggregate {
 
   int value;
 };
-bool TurboParseFlag(turbo::string_view src, NonTriviallyCopyableAggregate* f,
+bool TurboParseFlag(turbo::string_piece src, NonTriviallyCopyableAggregate* f,
                    std::string* e) {
   return turbo::ParseFlag(src, &f->value, e);
 }
@@ -700,8 +700,8 @@ struct CustomUDT {
   int a;
   int b;
 };
-bool TurboParseFlag(turbo::string_view in, CustomUDT* f, std::string*) {
-  std::vector<turbo::string_view> parts =
+bool TurboParseFlag(turbo::string_piece in, CustomUDT* f, std::string*) {
+  std::vector<turbo::string_piece> parts =
       turbo::StrSplit(in, ':', turbo::SkipWhitespace());
 
   if (parts.size() != 2) return false;
@@ -775,7 +775,7 @@ struct ConversionTestVal {
   int a;
 };
 
-bool TurboParseFlag(turbo::string_view in, ConversionTestVal* val_out,
+bool TurboParseFlag(turbo::string_piece in, ConversionTestVal* val_out,
                    std::string*) {
   if (!turbo::SimpleAtoi(in, &val_out->a)) {
     return false;
@@ -817,7 +817,7 @@ struct NonDfltConstructible {
   int value;
 };
 
-bool TurboParseFlag(turbo::string_view in, NonDfltConstructible* ndc_out,
+bool TurboParseFlag(turbo::string_piece in, NonDfltConstructible* ndc_out,
                    std::string*) {
   return turbo::SimpleAtoi(in, &ndc_out->value);
 }
@@ -892,7 +892,7 @@ struct SmallAlignUDT {
   char bytes[14];
 };
 
-bool TurboParseFlag(turbo::string_view, SmallAlignUDT*, std::string*) {
+bool TurboParseFlag(turbo::string_piece, SmallAlignUDT*, std::string*) {
   return true;
 }
 std::string TurboUnparseFlag(const SmallAlignUDT&) { return ""; }
@@ -909,7 +909,7 @@ struct NonTriviallyCopyableUDT {
   char c;
 };
 
-bool TurboParseFlag(turbo::string_view, NonTriviallyCopyableUDT*, std::string*) {
+bool TurboParseFlag(turbo::string_piece, NonTriviallyCopyableUDT*, std::string*) {
   return true;
 }
 std::string TurboUnparseFlag(const NonTriviallyCopyableUDT&) { return ""; }
@@ -958,7 +958,7 @@ struct EnumWrapper {
   TestE e;
 };
 
-bool TurboParseFlag(turbo::string_view, EnumWrapper*, std::string*) {
+bool TurboParseFlag(turbo::string_piece, EnumWrapper*, std::string*) {
   return true;
 }
 std::string TurboUnparseFlag(const EnumWrapper&) { return ""; }

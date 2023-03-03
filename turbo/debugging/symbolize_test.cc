@@ -30,7 +30,7 @@
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/per_thread_tls.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -419,7 +419,7 @@ TEST(Symbolize, ForEachSection) {
 
   std::vector<std::string> sections;
   ASSERT_TRUE(turbo::debugging_internal::ForEachSection(
-      fd, [&sections](const turbo::string_view name, const ElfW(Shdr) &) {
+      fd, [&sections](const turbo::string_piece name, const ElfW(Shdr) &) {
         sections.emplace_back(name);
         return true;
       }));

@@ -116,7 +116,7 @@ TEST(StrCat, Basics) {
     "std::World"
   };
 
-  turbo::string_view pieces[] = {"Hello", "Cruel", "World"};
+  turbo::string_piece pieces[] = {"Hello", "Cruel", "World"};
 
   const char* c_strs[] = {
     "Hello",
@@ -333,7 +333,7 @@ TEST(StrAppend, Basics) {
     "std::World"
   };
 
-  turbo::string_view pieces[] = {"Hello", "Cruel", "World"};
+  turbo::string_piece pieces[] = {"Hello", "Cruel", "World"};
 
   const char* c_strs[] = {
     "Hello",
@@ -432,14 +432,14 @@ TEST(StrCat, VectorBoolReferenceTypes) {
 // Passing nullptr to memcpy is undefined behavior and this test
 // provides coverage of codepaths that handle empty strings with nullptrs.
 TEST(StrCat, AvoidsMemcpyWithNullptr) {
-  EXPECT_EQ(turbo::StrCat(42, turbo::string_view{}), "42");
+  EXPECT_EQ(turbo::StrCat(42, turbo::string_piece{}), "42");
 
   // Cover CatPieces code.
-  EXPECT_EQ(turbo::StrCat(1, 2, 3, 4, 5, turbo::string_view{}), "12345");
+  EXPECT_EQ(turbo::StrCat(1, 2, 3, 4, 5, turbo::string_piece{}), "12345");
 
   // Cover AppendPieces.
   std::string result;
-  turbo::StrAppend(&result, 1, 2, 3, 4, 5, turbo::string_view{});
+  turbo::StrAppend(&result, 1, 2, 3, 4, 5, turbo::string_piece{});
   EXPECT_EQ(result, "12345");
 }
 

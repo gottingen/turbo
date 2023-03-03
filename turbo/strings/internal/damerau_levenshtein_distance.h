@@ -17,15 +17,15 @@
 
 #include <cstdint>
 
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 // Calculate DamerauLevenshtein distance between two strings.
 // When the distance is larger than cutoff, the code just returns cutoff + 1.
-uint8_t CappedDamerauLevenshteinDistance(turbo::string_view s1,
-                                         turbo::string_view s2, uint8_t cutoff);
+uint8_t CappedDamerauLevenshteinDistance(turbo::string_piece s1,
+                                         turbo::string_piece s2, uint8_t cutoff);
 
 }  // namespace strings_internal
 TURBO_NAMESPACE_END

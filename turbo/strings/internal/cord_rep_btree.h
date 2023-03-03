@@ -25,7 +25,7 @@
 #include "turbo/strings/internal/cord_data_edge.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -196,9 +196,9 @@ class CordRepBtree : public CordRep {
   // There is no limit on the size of `data`. If `data` can not be stored inside
   // a single flat, then the function will iteratively add flats until all data
   // has been consumed and appended or prepended to the tree.
-  static CordRepBtree* Append(CordRepBtree* tree, string_view data,
+  static CordRepBtree* Append(CordRepBtree* tree, string_piece data,
                               size_t extra = 0);
-  static CordRepBtree* Prepend(CordRepBtree* tree, string_view data,
+  static CordRepBtree* Prepend(CordRepBtree* tree, string_piece data,
                                size_t extra = 0);
 
   // Returns a new tree, containing `n` bytes of data from this instance
@@ -227,13 +227,13 @@ class CordRepBtree : public CordRep {
   // Returns true if this node holds a single data edge, and if so, sets
   // `fragment` to reference the contained data. `fragment` is an optional
   // output parameter and allowed to be null.
-  bool IsFlat(turbo::string_view* fragment) const;
+  bool IsFlat(turbo::string_piece* fragment) const;
 
   // Returns true if the data of `n` bytes starting at offset `offset`
   // is contained in a single data edge, and if so, sets fragment to reference
   // the contained data. `fragment` is an optional output parameter and allowed
   // to be null.
-  bool IsFlat(size_t offset, size_t n, turbo::string_view* fragment) const;
+  bool IsFlat(size_t offset, size_t n, turbo::string_piece* fragment) const;
 
   // Returns a span (mutable range of bytes) of up to `size` bytes into the
   // last FLAT data edge inside this tree under the following conditions:
@@ -260,7 +260,7 @@ class CordRepBtree : public CordRep {
   // pre-existing capacity, and add the modified rep back to the tree.
   //
   // Simplified such code would look similar to this:
-  //   void MyTreeBuilder::Append(string_view data) {
+  //   void MyTreeBuilder::Append(string_piece data) {
   //     ExtractResult result = CordRepBtree::ExtractAppendBuffer(tree_, 1);
   //     if (CordRep* rep = result.extracted) {
   //       size_t available = rep->Capacity() - rep->length;
@@ -309,7 +309,7 @@ class CordRepBtree : public CordRep {
 
   // Returns reference to the data edge at `index`.
   // Requires this instance to be a leaf node, and `index` to be valid index.
-  inline turbo::string_view Data(size_t index) const;
+  inline turbo::string_piece Data(size_t index) const;
 
   // Diagnostics: returns true if `tree` is valid and internally consistent.
   // If `shallow` is false, then the provided top level node and all child nodes
@@ -334,9 +334,9 @@ class CordRepBtree : public CordRep {
   // Diagnostics: dump the contents of this tree to `stream`.
   // This function is intended for debugging and testing purposes only.
   static void Dump(const CordRep* rep, std::ostream& stream);
-  static void Dump(const CordRep* rep, turbo::string_view label,
+  static void Dump(const CordRep* rep, turbo::string_piece label,
                    std::ostream& stream);
-  static void Dump(const CordRep* rep, turbo::string_view label,
+  static void Dump(const CordRep* rep, turbo::string_piece label,
                    bool include_contents, std::ostream& stream);
 
   // Adds the edge `edge` to this node if possible. `owned` indicates if the
@@ -443,7 +443,7 @@ class CordRepBtree : public CordRep {
   // was copied or not.
   // See the `Append/Prepend` function for the meaning and purpose of `extra`.
   template <EdgeType edge_type>
-  static CordRepBtree* NewLeaf(turbo::string_view data, size_t extra);
+  static CordRepBtree* NewLeaf(turbo::string_piece data, size_t extra);
 
   // Creates a raw copy of this Btree node with the specified length, copying
   // all properties, but without adding any references to existing edges.
@@ -523,7 +523,7 @@ class CordRepBtree : public CordRep {
   // suffix of the input.
   // See the `Append/Prepend` function for the meaning and purpose of `extra`.
   template <EdgeType edge_type>
-  turbo::string_view AddData(turbo::string_view data, size_t extra);
+  turbo::string_piece AddData(turbo::string_piece data, size_t extra);
 
   // Replace the front or back edge with the provided value.
   // Adopts a reference on `edge` and unrefs the old edge.
@@ -559,7 +559,7 @@ class CordRepBtree : public CordRep {
   // Adds `data` to the specified tree, returning the modified tree.
   // See the `Append/Prepend` function for the meaning and purpose of `extra`.
   template <EdgeType edge_type>
-  static CordRepBtree* AddData(CordRepBtree* tree, turbo::string_view data,
+  static CordRepBtree* AddData(CordRepBtree* tree, turbo::string_piece data,
                                size_t extra = 0);
 
   // Merges `src` into `dst` with `src` being added either before (kFront) or
@@ -625,7 +625,7 @@ inline turbo::Span<CordRep* const> CordRepBtree::Edges(size_t begin,
   return {edges_ + begin, static_cast<size_t>(end - begin)};
 }
 
-inline turbo::string_view CordRepBtree::Data(size_t index) const {
+inline turbo::string_piece CordRepBtree::Data(size_t index) const {
   assert(height() == 0);
   return EdgeData(Edge(index));
 }

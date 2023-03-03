@@ -24,7 +24,7 @@
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_ring.h"
 #include "turbo/strings/internal/cord_rep_ring_reader.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -34,14 +34,14 @@ namespace {
 using testing::Eq;
 
 // Creates a flat for testing
-CordRep* MakeFlat(turbo::string_view s) {
+CordRep* MakeFlat(turbo::string_piece s) {
   CordRepFlat* flat = CordRepFlat::New(s.length());
   memcpy(flat->Data(), s.data(), s.length());
   flat->length = s.length();
   return flat;
 }
 
-CordRepRing* FromFlats(Span<turbo::string_view const> flats) {
+CordRepRing* FromFlats(Span<turbo::string_piece const> flats) {
   CordRepRing* ring = CordRepRing::Create(MakeFlat(flats[0]), flats.size() - 1);
   for (int i = 1; i < flats.size(); ++i) {
     ring = CordRepRing::Append(ring, MakeFlat(flats[i]));
@@ -49,7 +49,7 @@ CordRepRing* FromFlats(Span<turbo::string_view const> flats) {
   return ring;
 }
 
-std::array<turbo::string_view, 12> TestFlats() {
+std::array<turbo::string_piece, 12> TestFlats() {
   return {"abcdefghij", "klmnopqrst", "uvwxyz",     "ABCDEFGHIJ",
           "KLMNOPQRST", "UVWXYZ",     "1234567890", "~!@#$%^&*()_",
           "+-=",        "[]\\{}|;':", ",/<>?",      "."};
@@ -73,7 +73,7 @@ TEST(CordRingReaderTest, Reset) {
   auto flats = TestFlats();
   CordRepRing* ring = FromFlats(flats);
 
-  turbo::string_view first = reader.Reset(ring);
+  turbo::string_piece first = reader.Reset(ring);
   EXPECT_THAT(first, Eq(flats[0]));
   EXPECT_TRUE(static_cast<bool>(reader));
   EXPECT_THAT(reader.ring(), Eq(ring));
@@ -103,7 +103,7 @@ TEST(CordRingReaderTest, Next) {
     CordRepRing::index_type index = ring->advance(head, i);
     consumed += flats[i].length();
     remaining -= flats[i].length();
-    turbo::string_view next = reader.Next();
+    turbo::string_piece next = reader.Next();
     ASSERT_THAT(next, Eq(flats[i]));
     ASSERT_THAT(reader.index(), Eq(index));
     ASSERT_THAT(reader.node(), Eq(ring->entry_child(index)));
@@ -133,7 +133,7 @@ TEST(CordRingReaderTest, SeekForward) {
     consumed += flats[i].length();
     remaining -= flats[i].length();
     for (int off = 0; off < flats[i].length(); ++off) {
-      turbo::string_view chunk = reader.Seek(offset + off);
+      turbo::string_piece chunk = reader.Seek(offset + off);
       ASSERT_THAT(chunk, Eq(flats[i].substr(off)));
       ASSERT_THAT(reader.index(), Eq(index));
       ASSERT_THAT(reader.node(), Eq(ring->entry_child(index)));
@@ -158,7 +158,7 @@ TEST(CordRingReaderTest, SeekBackward) {
     CordRepRing::index_type index = ring->advance(head, i);
     size_t offset = consumed - flats[i].length();
     for (int off = 0; off < flats[i].length(); ++off) {
-      turbo::string_view chunk = reader.Seek(offset + off);
+      turbo::string_piece chunk = reader.Seek(offset + off);
       ASSERT_THAT(chunk, Eq(flats[i].substr(off)));
       ASSERT_THAT(reader.index(), Eq(index));
       ASSERT_THAT(reader.node(), Eq(ring->entry_child(index)));

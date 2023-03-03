@@ -21,7 +21,7 @@
 #include "turbo/flags/internal/path_util.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
@@ -45,7 +45,7 @@ std::string ShortProgramInvocationName() {
                       : "UNKNOWN";
 }
 
-void SetProgramInvocationName(turbo::string_view prog_name_str) {
+void SetProgramInvocationName(turbo::string_piece prog_name_str) {
   turbo::MutexLock l(&program_name_guard);
 
   if (!program_name)

@@ -35,7 +35,7 @@ int countdown = -1;
 
 ConstructorTracker* ConstructorTracker::current_tracker_instance_ = nullptr;
 
-void MaybeThrow(turbo::string_view msg, bool throw_bad_alloc) {
+void MaybeThrow(turbo::string_piece msg, bool throw_bad_alloc) {
   if (countdown-- == 0) {
     if (throw_bad_alloc) throw TestBadAllocException(msg);
     throw TestException(msg);
@@ -49,8 +49,8 @@ testing::AssertionResult FailureMessage(const TestException& e,
 
 std::string GetSpecString(TypeSpec spec) {
   std::string out;
-  turbo::string_view sep;
-  const auto append = [&](turbo::string_view s) {
+  turbo::string_piece sep;
+  const auto append = [&](turbo::string_piece s) {
     turbo::StrAppend(&out, sep, s);
     sep = " | ";
   };

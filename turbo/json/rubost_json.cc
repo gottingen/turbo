@@ -90,14 +90,14 @@ RAPIDJSON_NAMESPACE_BEGIN
 
 
     template<typename OptionalRefRapidJsonValue>
-    turbo::string_view cast_string_view(OptionalRefRapidJsonValue v_) {
+    turbo::string_piece cast_string_view(OptionalRefRapidJsonValue v_) {
         if (v_.has_value() && v_.value().get().IsString()) {
-            return turbo::string_view{v_.value().get().GetString(), v_.value().get().GetStringLength()};
+            return turbo::string_piece{v_.value().get().GetString(), v_.value().get().GetStringLength()};
         }
-        return turbo::string_view{};
+        return turbo::string_piece{};
     }
 
-    ROBUST_JSON_DEFINE_BOTH_CAST(turbo::string_view, cast_string_view(v_));
+    ROBUST_JSON_DEFINE_BOTH_CAST(turbo::string_piece, cast_string_view(v_));
 
     template<typename OptionalRefRapidJsonValue>
     bool cast_bool(OptionalRefRapidJsonValue v_) {
@@ -183,7 +183,7 @@ RAPIDJSON_NAMESPACE_BEGIN
             }
             if (v.IsString()) {
                 uint64_t n;
-                if (!turbo::SimpleAtoi(turbo::string_view{v.GetString(), v.GetStringLength()}, &n)) {
+                if (!turbo::SimpleAtoi(turbo::string_piece{v.GetString(), v.GetStringLength()}, &n)) {
                     return turbo::nullopt;
                 }
                 return n;
@@ -204,7 +204,7 @@ RAPIDJSON_NAMESPACE_BEGIN
             }
             if (v.IsString()) {
                 int64_t n;
-                if (!turbo::SimpleAtoi(turbo::string_view{v.GetString(), v.GetStringLength()}, &n)) {
+                if (!turbo::SimpleAtoi(turbo::string_piece{v.GetString(), v.GetStringLength()}, &n)) {
                     return turbo::nullopt;
                 }
                 return n;
@@ -225,7 +225,7 @@ RAPIDJSON_NAMESPACE_BEGIN
             }
             if (v.IsString()) {
                 double n;
-                if (!turbo::SimpleAtod(turbo::string_view{v.GetString(), v.GetStringLength()}, &n)) {
+                if (!turbo::SimpleAtod(turbo::string_piece{v.GetString(), v.GetStringLength()}, &n)) {
                     return turbo::nullopt;
                 }
                 return n;

@@ -55,7 +55,7 @@
 #include "turbo/log/log.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/str_format.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace {
 using ::testing::_;
@@ -64,7 +64,7 @@ using ::testing::NotNull;
 
 using turbo::log_internal::kTurboMinLogLevel;
 
-std::string Base64UnescapeOrDie(turbo::string_view data) {
+std::string Base64UnescapeOrDie(turbo::string_piece data) {
   std::string decoded;
   CHECK(turbo::Base64Unescape(data, &decoded));
   return decoded;
@@ -91,7 +91,7 @@ std::string Base64UnescapeOrDie(turbo::string_view data) {
 
 class FileHasSubstrMatcher final : public ::testing::MatcherInterface<FILE*> {
  public:
-  explicit FileHasSubstrMatcher(turbo::string_view needle) : needle_(needle) {}
+  explicit FileHasSubstrMatcher(turbo::string_piece needle) : needle_(needle) {}
 
   bool MatchAndExplain(
       FILE* fp, ::testing::MatchResultListener* listener) const override {
@@ -114,7 +114,7 @@ class FileHasSubstrMatcher final : public ::testing::MatcherInterface<FILE*> {
         *listener << "error reading file";
         return false;
       }
-      const turbo::string_view haystack(&buf[0], buf_data_size);
+      const turbo::string_piece haystack(&buf[0], buf_data_size);
       const auto off = haystack.find(needle_);
       if (off != haystack.npos) {
         *listener << "string found at offset " << buf_start_offset + off;
@@ -238,7 +238,7 @@ class StrippingTest : public ::testing::Test {
 #endif
   }
 
-  ::testing::Matcher<FILE*> FileHasSubstr(turbo::string_view needle) {
+  ::testing::Matcher<FILE*> FileHasSubstr(turbo::string_piece needle) {
     return MakeMatcher(new FileHasSubstrMatcher(needle));
   }
 };

@@ -149,7 +149,7 @@ struct CordRepFlat : public CordRep {
   // Create a CordRepFlat containing `data`, with an optional additional
   // extra capacity of up to `extra` bytes. Requires that `data.size()`
   // is less than kMaxFlatLength.
-  static CordRepFlat* Create(turbo::string_view data, size_t extra = 0) {
+  static CordRepFlat* Create(turbo::string_piece data, size_t extra = 0) {
     assert(data.size() <= kMaxFlatLength);
     CordRepFlat* flat = New(data.size() + (std::min)(extra, kMaxFlatLength));
     memcpy(flat->Data(), data.data(), data.size());

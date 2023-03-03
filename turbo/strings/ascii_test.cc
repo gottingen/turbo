@@ -188,7 +188,7 @@ TEST(AsciiStrTo, Lower) {
   const char buf[] = "ABCDEF";
   const std::string str("GHIJKL");
   const std::string str2("MNOPQR");
-  const turbo::string_view sp(str2);
+  const turbo::string_piece sp(str2);
   std::string mutable_str("STUVWX");
 
   EXPECT_EQ("abcdef", turbo::AsciiStrToLower(buf));
@@ -208,7 +208,7 @@ TEST(AsciiStrTo, Upper) {
   const char buf[] = "abcdef";
   const std::string str("ghijkl");
   const std::string str2("mnopqr");
-  const turbo::string_view sp(str2);
+  const turbo::string_piece sp(str2);
 
   EXPECT_EQ("ABCDEF", turbo::AsciiStrToUpper(buf));
   EXPECT_EQ("GHIJKL", turbo::AsciiStrToUpper(str));
@@ -221,13 +221,13 @@ TEST(AsciiStrTo, Upper) {
 }
 
 TEST(StripLeadingAsciiWhitespace, FromStringView) {
-  EXPECT_EQ(turbo::string_view{},
-            turbo::StripLeadingAsciiWhitespace(turbo::string_view{}));
+  EXPECT_EQ(turbo::string_piece{},
+            turbo::StripLeadingAsciiWhitespace(turbo::string_piece{}));
   EXPECT_EQ("foo", turbo::StripLeadingAsciiWhitespace({"foo"}));
   EXPECT_EQ("foo", turbo::StripLeadingAsciiWhitespace({"\t  \n\f\r\n\vfoo"}));
   EXPECT_EQ("foo foo\n ",
             turbo::StripLeadingAsciiWhitespace({"\t  \n\f\r\n\vfoo foo\n "}));
-  EXPECT_EQ(turbo::string_view{}, turbo::StripLeadingAsciiWhitespace(
+  EXPECT_EQ(turbo::string_piece{}, turbo::StripLeadingAsciiWhitespace(
                                      {"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
@@ -252,7 +252,7 @@ void TestInPlace() {
 
   str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
   turbo::StripLeadingAsciiWhitespace(&str);
-  EXPECT_EQ(turbo::string_view{}, str);
+  EXPECT_EQ(turbo::string_piece{}, str);
 }
 TEST(StripLeadingAsciiWhitespace, InPlace) {
     TestInPlace<std::string>();
@@ -260,13 +260,13 @@ TEST(StripLeadingAsciiWhitespace, InPlace) {
 }
 
 TEST(StripTrailingAsciiWhitespace, FromStringView) {
-  EXPECT_EQ(turbo::string_view{},
-            turbo::StripTrailingAsciiWhitespace(turbo::string_view{}));
+  EXPECT_EQ(turbo::string_piece{},
+            turbo::StripTrailingAsciiWhitespace(turbo::string_piece{}));
   EXPECT_EQ("foo", turbo::StripTrailingAsciiWhitespace({"foo"}));
   EXPECT_EQ("foo", turbo::StripTrailingAsciiWhitespace({"foo\t  \n\f\r\n\v"}));
   EXPECT_EQ(" \nfoo foo",
             turbo::StripTrailingAsciiWhitespace({" \nfoo foo\t  \n\f\r\n\v"}));
-  EXPECT_EQ(turbo::string_view{}, turbo::StripTrailingAsciiWhitespace(
+  EXPECT_EQ(turbo::string_piece{}, turbo::StripTrailingAsciiWhitespace(
                                      {"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
@@ -291,7 +291,7 @@ void StripTrailingAsciiWhitespaceinplace() {
 
   str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
   turbo::StripTrailingAsciiWhitespace(&str);
-  EXPECT_EQ(turbo::string_view{}, str);
+  EXPECT_EQ(turbo::string_piece{}, str);
 }
 TEST(StripTrailingAsciiWhitespace, InPlace) {
     StripTrailingAsciiWhitespaceinplace<std::string>();
@@ -299,14 +299,14 @@ TEST(StripTrailingAsciiWhitespace, InPlace) {
 }
 
 TEST(StripAsciiWhitespace, FromStringView) {
-  EXPECT_EQ(turbo::string_view{},
-            turbo::StripAsciiWhitespace(turbo::string_view{}));
+  EXPECT_EQ(turbo::string_piece{},
+            turbo::StripAsciiWhitespace(turbo::string_piece{}));
   EXPECT_EQ("foo", turbo::StripAsciiWhitespace({"foo"}));
   EXPECT_EQ("foo",
             turbo::StripAsciiWhitespace({"\t  \n\f\r\n\vfoo\t  \n\f\r\n\v"}));
   EXPECT_EQ("foo foo", turbo::StripAsciiWhitespace(
                            {"\t  \n\f\r\n\vfoo foo\t  \n\f\r\n\v"}));
-  EXPECT_EQ(turbo::string_view{},
+  EXPECT_EQ(turbo::string_piece{},
             turbo::StripAsciiWhitespace({"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
@@ -331,7 +331,7 @@ void StripAsciiWhitespaceInPlace() {
 
   str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
   turbo::StripAsciiWhitespace(&str);
-  EXPECT_EQ(turbo::string_view{}, str);
+  EXPECT_EQ(turbo::string_piece{}, str);
 }
 TEST(StripAsciiWhitespace, InPlace) {
     StripAsciiWhitespaceInPlace<std::string>();

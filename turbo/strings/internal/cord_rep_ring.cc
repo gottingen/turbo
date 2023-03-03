@@ -504,7 +504,7 @@ CordRepRing* CordRepRing::Prepend(CordRepRing* rep, CordRep* child) {
   return PrependSlow(rep, child);
 }
 
-CordRepRing* CordRepRing::Append(CordRepRing* rep, turbo::string_view data,
+CordRepRing* CordRepRing::Append(CordRepRing* rep, turbo::string_piece data,
                                  size_t extra) {
   if (rep->refcount.IsOne()) {
     Span<char> avail = rep->GetAppendBuffer(data.length());
@@ -538,7 +538,7 @@ CordRepRing* CordRepRing::Append(CordRepRing* rep, turbo::string_view data,
   return Validate(rep);
 }
 
-CordRepRing* CordRepRing::Prepend(CordRepRing* rep, turbo::string_view data,
+CordRepRing* CordRepRing::Prepend(CordRepRing* rep, turbo::string_piece data,
                                   size_t extra) {
   if (rep->refcount.IsOne()) {
     Span<char> avail = rep->GetPrependBuffer(data.length());

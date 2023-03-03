@@ -19,7 +19,7 @@
 
 #include "gtest/gtest.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace {
 
@@ -49,7 +49,7 @@ TEST(FlagsPathUtilTest, TestProgamNameInterfaces) {
   EXPECT_EQ(flags::ProgramInvocationName(), "a/my_test");
   EXPECT_EQ(flags::ShortProgramInvocationName(), "my_test");
 
-  turbo::string_view not_null_terminated("turbo/aaa/bbb");
+  turbo::string_piece not_null_terminated("turbo/aaa/bbb");
   not_null_terminated = not_null_terminated.substr(1, 10);
 
   flags::SetProgramInvocationName(not_null_terminated);

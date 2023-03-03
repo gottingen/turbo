@@ -58,7 +58,7 @@ std::string Generator<std::string>::operator()() const {
   return res;
 }
 
-turbo::string_view Generator<turbo::string_view>::operator()() const {
+turbo::string_piece Generator<turbo::string_piece>::operator()() const {
   static auto* arena = new std::deque<std::string>();
   // NOLINTNEXTLINE(runtime/int)
   std::uniform_int_distribution<short> chars(0x20, 0x7E);

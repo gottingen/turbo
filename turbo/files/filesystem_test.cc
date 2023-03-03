@@ -2763,17 +2763,9 @@ TEST(FilesystemStatus, weakly_canonical) {
 }
 
 TEST(FilesystemStatus, string_view) {
-#if defined(GHC_HAS_STD_STRING_VIEW) || defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
 
-#if defined(GHC_HAS_STD_STRING_VIEW)
-    using namespace std::literals;
-    using string_view = std::string_view;
-    using wstring_view = std::wstring_view;
-#elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-    using string_view = std::experimental::string_view;
-    using wstring_view = std::experimental::wstring_view;
-#endif
-
+    using turbo::string_view;
+    using turbo::wstring_view;
     {
         std::string p("foo/bar");
         string_view sv(p);
@@ -2798,9 +2790,6 @@ TEST(FilesystemStatus, string_view) {
         ASSERT_TRUE(p2.compare(wstring_view(L"foo")) == 0);
     }
 
-#else
-    WARN("std::string_view specific tests are empty without std::string_view.");
-#endif
 }
 
 TEST(FilesystemStatus, win_long) {

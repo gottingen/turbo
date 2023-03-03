@@ -33,7 +33,7 @@
 
 #include "turbo/base/log_severity.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -45,7 +45,7 @@ namespace log_internal {
 // streamed in.
 class NullStream {
  public:
-  NullStream& AtLocation(turbo::string_view, int) { return *this; }
+  NullStream& AtLocation(turbo::string_piece, int) { return *this; }
   template <typename SourceLocationType>
   NullStream& AtLocation(SourceLocationType) {
     return *this;

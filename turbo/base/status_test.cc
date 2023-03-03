@@ -67,7 +67,7 @@ TEST(StatusCode, InsertionOperator) {
 struct ErrorTest {
   turbo::StatusCode code;
   using Creator = turbo::Status (*)(
-      turbo::string_view
+      turbo::string_piece
   );
   using Classifier = bool (*)(const turbo::Status&);
   Creator creator;
@@ -260,7 +260,7 @@ TEST(Status, TestComparePayloadsAfterErase) {
 PayloadsVec AllVisitedPayloads(const turbo::Status& s) {
   PayloadsVec result;
 
-  s.ForEachPayload([&](turbo::string_view type_url, const turbo::Cord& payload) {
+  s.ForEachPayload([&](turbo::string_piece type_url, const turbo::Cord& payload) {
     result.push_back(std::make_pair(std::string(type_url), payload));
   });
 
@@ -276,7 +276,7 @@ TEST(Status, TestForEachPayload) {
   int count = 0;
 
   bad_status.ForEachPayload(
-      [&count](turbo::string_view, const turbo::Cord&) { ++count; });
+      [&count](turbo::string_piece, const turbo::Cord&) { ++count; });
 
   EXPECT_EQ(count, 3);
 

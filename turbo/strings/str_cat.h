@@ -98,7 +98,7 @@
 #include "turbo/strings/internal/has_turbo_stringify.h"
 #include "turbo/strings/internal/stringify_sink.h"
 #include "turbo/strings/numbers.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -292,7 +292,7 @@ class AlphaNum {
 
   AlphaNum(const char* c_str)                     // NOLINT(runtime/explicit)
       : piece_(NullSafeStringView(c_str)) {}      // NOLINT(runtime/explicit)
-  AlphaNum(turbo::string_view pc) : piece_(pc) {}  // NOLINT(runtime/explicit)
+  AlphaNum(turbo::string_piece pc) : piece_(pc) {}  // NOLINT(runtime/explicit)
 
   template <typename T, typename = typename std::enable_if<
                             strings_internal::HasTurboStringify<T>::value>::type>
@@ -312,9 +312,9 @@ class AlphaNum {
   AlphaNum(const AlphaNum&) = delete;
   AlphaNum& operator=(const AlphaNum&) = delete;
 
-  turbo::string_view::size_type size() const { return piece_.size(); }
+  turbo::string_piece::size_type size() const { return piece_.size(); }
   const char* data() const { return piece_.data(); }
-  turbo::string_view Piece() const { return piece_; }
+  turbo::string_piece Piece() const { return piece_; }
 
   // Normal enums are already handled by the integer formatters.
   // This overload matches only scoped enums.
@@ -337,7 +337,7 @@ class AlphaNum {
   AlphaNum(T e) : AlphaNum(static_cast<bool>(e)) {}  // NOLINT(runtime/explicit)
 
  private:
-  turbo::string_view piece_;
+  turbo::string_piece piece_;
   char digits_[numbers_internal::kFastToBufferSize];
 };
 
@@ -372,9 +372,9 @@ class AlphaNum {
 namespace strings_internal {
 
 // Do not call directly - this is not part of the public API.
-std::string CatPieces(std::initializer_list<turbo::string_view> pieces);
+std::string CatPieces(std::initializer_list<turbo::string_piece> pieces);
 void AppendPieces(std::string* dest,
-                  std::initializer_list<turbo::string_view> pieces);
+                  std::initializer_list<turbo::string_piece> pieces);
 
 }  // namespace strings_internal
 
@@ -420,11 +420,11 @@ TURBO_MUST_USE_RESULT inline std::string StrCat(
 //   std::string s = "foo";
 //   StrAppend(&s, s);
 //
-// This output is undefined as well, since `turbo::string_view` does not own its
+// This output is undefined as well, since `turbo::string_piece` does not own its
 // data:
 //
 //   std::string s = "foobar";
-//   turbo::string_view p = s;
+//   turbo::string_piece p = s;
 //   StrAppend(&s, p);
 
 inline void StrAppend(std::string*) {}

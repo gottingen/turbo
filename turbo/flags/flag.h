@@ -36,7 +36,7 @@
 #include "turbo/flags/internal/flag.h"
 #include "turbo/flags/internal/registry.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -242,8 +242,8 @@ TURBO_NAMESPACE_END
     /* The expression is run in the caller as part of the   */               \
     /* default value argument. That keeps temporaries alive */               \
     /* long enough for NonConst to work correctly.          */               \
-    static constexpr turbo::string_view Value(                                \
-        turbo::string_view turbo_flag_help = TURBO_FLAG_IMPL_FLAGHELP(txt)) {   \
+    static constexpr turbo::string_piece Value(                                \
+        turbo::string_piece turbo_flag_help = TURBO_FLAG_IMPL_FLAGHELP(txt)) {   \
       return turbo_flag_help;                                                 \
     }                                                                        \
     static std::string NonConst() { return std::string(Value()); }           \

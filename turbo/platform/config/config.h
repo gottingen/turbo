@@ -585,24 +585,10 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #endif
 #endif
 
-// TURBO_HAVE_STD_STRING_VIEW
-//
-// Checks whether C++17 std::string_view is available.
-#ifdef TURBO_HAVE_STD_STRING_VIEW
-#error "TURBO_HAVE_STD_STRING_VIEW cannot be directly set."
-#endif
-
-#ifdef __has_include
-#if __has_include(<string_view>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L
-#define TURBO_HAVE_STD_STRING_VIEW 1
-#endif
-#endif
-
 // For MSVC, `__has_include` is supported in VS 2017 15.3, which is later than
-// the support for <optional>, <any>, <string_view>, <variant>. So we use
+// the support for <optional>, <any>, <string_piece>, <variant>. So we use
 // _MSC_VER to check whether we have VS 2017 RTM (when <optional>, <any>,
-// <string_view>, <variant> is implemented) or higher. Also, `__cplusplus` is
+// <string_piece>, <variant> is implemented) or higher. Also, `__cplusplus` is
 // not correctly set by MSVC, so we use `_MSVC_LANG` to check the language
 // version.
 // TODO(zhangxy): fix tests before enabling aliasing for `std::any`.
@@ -612,7 +598,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // #define TURBO_HAVE_STD_ANY 1
 #define TURBO_HAVE_STD_OPTIONAL 1
 #define TURBO_HAVE_STD_VARIANT 1
-#define TURBO_HAVE_STD_STRING_VIEW 1
 #endif
 
 // TURBO_USES_STD_ANY
@@ -656,23 +641,6 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #elif TURBO_OPTION_USE_STD_VARIANT == 1 || \
     (TURBO_OPTION_USE_STD_VARIANT == 2 && defined(TURBO_HAVE_STD_VARIANT))
 #define TURBO_USES_STD_VARIANT 1
-#else
-#error options.h is misconfigured.
-#endif
-
-// TURBO_USES_STD_STRING_VIEW
-//
-// Indicates whether turbo::string_view is an alias for std::string_view.
-#if !defined(TURBO_OPTION_USE_STD_STRING_VIEW)
-#error options.h is misconfigured.
-#elif TURBO_OPTION_USE_STD_STRING_VIEW == 0 || \
-    (TURBO_OPTION_USE_STD_STRING_VIEW == 2 &&  \
-     !defined(TURBO_HAVE_STD_STRING_VIEW))
-#undef TURBO_USES_STD_STRING_VIEW
-#elif TURBO_OPTION_USE_STD_STRING_VIEW == 1 || \
-    (TURBO_OPTION_USE_STD_STRING_VIEW == 2 &&  \
-     defined(TURBO_HAVE_STD_STRING_VIEW))
-#define TURBO_USES_STD_STRING_VIEW 1
 #else
 #error options.h is misconfigured.
 #endif

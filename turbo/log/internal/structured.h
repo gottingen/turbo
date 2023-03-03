@@ -23,7 +23,7 @@
 
 #include "turbo/log/internal/log_message.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -31,12 +31,12 @@ namespace log_internal {
 
 class TURBO_MUST_USE_RESULT AsLiteralImpl final {
  public:
-  explicit AsLiteralImpl(turbo::string_view str) : str_(str) {}
+  explicit AsLiteralImpl(turbo::string_piece str) : str_(str) {}
   AsLiteralImpl(const AsLiteralImpl&) = default;
   AsLiteralImpl& operator=(const AsLiteralImpl&) = default;
 
  private:
-  turbo::string_view str_;
+  turbo::string_piece str_;
 
   friend std::ostream& operator<<(std::ostream& os, AsLiteralImpl as_literal) {
     return os << as_literal.str_;

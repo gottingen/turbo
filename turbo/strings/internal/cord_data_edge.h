@@ -21,7 +21,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -40,9 +40,9 @@ inline bool IsDataEdge(const CordRep* edge) {
   return edge->tag == EXTERNAL || edge->tag >= FLAT;
 }
 
-// Returns the `turbo::string_view` data reference for the provided data edge.
+// Returns the `turbo::string_piece` data reference for the provided data edge.
 // Requires 'IsDataEdge(edge) == true`.
-inline turbo::string_view EdgeData(const CordRep* edge) {
+inline turbo::string_piece EdgeData(const CordRep* edge) {
   assert(IsDataEdge(edge));
 
   size_t offset = 0;
@@ -52,8 +52,8 @@ inline turbo::string_view EdgeData(const CordRep* edge) {
     edge = edge->substring()->child;
   }
   return edge->tag >= FLAT
-             ? turbo::string_view{edge->flat()->Data() + offset, length}
-             : turbo::string_view{edge->external()->base + offset, length};
+             ? turbo::string_piece{edge->flat()->Data() + offset, length}
+             : turbo::string_piece{edge->external()->base + offset, length};
 }
 
 }  // namespace cord_internal

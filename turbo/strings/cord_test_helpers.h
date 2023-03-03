@@ -24,7 +24,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/internal/cord_internal.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -56,7 +56,7 @@ enum class TestCordSize {
 };
 
 // To string helper
-inline turbo::string_view ToString(TestCordSize size) {
+inline turbo::string_piece ToString(TestCordSize size) {
   switch (size) {
     case TestCordSize::kEmpty:
       return "Empty";
@@ -105,15 +105,15 @@ Cord MakeFragmentedCord(const Container& c) {
   for (const auto& s : c) {
     auto* external = new std::string(s);
     Cord tmp = turbo::MakeCordFromExternal(
-        *external, [external](turbo::string_view) { delete external; });
+        *external, [external](turbo::string_piece) { delete external; });
     tmp.Prepend(result);
     result = tmp;
   }
   return result;
 }
 
-inline Cord MakeFragmentedCord(std::initializer_list<turbo::string_view> list) {
-  return MakeFragmentedCord<std::initializer_list<turbo::string_view>>(list);
+inline Cord MakeFragmentedCord(std::initializer_list<turbo::string_piece> list) {
+  return MakeFragmentedCord<std::initializer_list<turbo::string_piece>>(list);
 }
 
 TURBO_NAMESPACE_END

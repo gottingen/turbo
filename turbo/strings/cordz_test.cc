@@ -26,7 +26,7 @@
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -54,15 +54,15 @@ namespace {
 
 auto constexpr kMaxInline = cord_internal::kMaxInline;
 
-// Returns a string_view value of the specified length
+// Returns a string_piece value of the specified length
 // We do this to avoid 'consuming' large strings in Cord by default.
-turbo::string_view MakeString(size_t size) {
+turbo::string_piece MakeString(size_t size) {
   thread_local std::string str;
   str = std::string(size, '.');
   return str;
 }
 
-turbo::string_view MakeString(TestCordSize size) {
+turbo::string_piece MakeString(TestCordSize size) {
   return MakeString(Length(size));
 }
 
@@ -348,13 +348,13 @@ TEST_P(CordzStringTest, AppendStringToCord) {
 
 TEST(CordzTest, MakeCordFromExternal) {
   CordzSamplingIntervalHelper sample_every{1};
-  Cord cord = MakeCordFromExternal("Hello world", [](turbo::string_view) {});
+  Cord cord = MakeCordFromExternal("Hello world", [](turbo::string_piece) {});
   EXPECT_THAT(cord, HasValidCordzInfoOf(Method::kMakeCordFromExternal));
 }
 
 TEST(CordzTest, MakeCordFromEmptyExternal) {
   CordzSamplingIntervalHelper sample_every{1};
-  Cord cord = MakeCordFromExternal({}, [](turbo::string_view) {});
+  Cord cord = MakeCordFromExternal({}, [](turbo::string_piece) {});
   EXPECT_THAT(GetCordzInfoForTesting(cord), Eq(nullptr));
 }
 

@@ -33,7 +33,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_split.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/time.h"
 #include "gmock/gmock.h"
@@ -56,10 +56,10 @@ namespace log_internal {
 
 class LogEntryTestPeer {
  public:
-  LogEntryTestPeer(turbo::string_view base_filename, int line, bool prefix,
-                   turbo::LogSeverity severity, turbo::string_view timestamp,
+  LogEntryTestPeer(turbo::string_piece base_filename, int line, bool prefix,
+                   turbo::LogSeverity severity, turbo::string_piece timestamp,
                    turbo::LogEntry::tid_t tid, PrefixFormat format,
-                   turbo::string_view text_message)
+                   turbo::string_piece text_message)
       : format_{format}, buf_(15000, '\0') {
     entry_.base_filename_ = base_filename;
     entry_.line_ = line;
@@ -72,7 +72,7 @@ class LogEntryTestPeer {
         IsTrue())
         << "Failed to parse time " << timestamp << ": " << time_err;
     entry_.tid_ = tid;
-    std::pair<turbo::string_view, std::string> timestamp_bits =
+    std::pair<turbo::string_piece, std::string> timestamp_bits =
         turbo::StrSplit(timestamp, turbo::ByChar('.'));
     EXPECT_THAT(turbo::ParseCivilTime(timestamp_bits.first, &ci_.cs), IsTrue())
         << "Failed to parse time " << timestamp_bits.first;

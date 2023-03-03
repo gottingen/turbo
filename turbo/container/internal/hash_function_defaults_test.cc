@@ -22,7 +22,7 @@
 #include "turbo/random/random.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/cord_test_helpers.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -74,7 +74,7 @@ TEST(Hash, Enum) {
   }
 }
 
-using StringTypes = ::testing::Types<std::string, turbo::string_view>;
+using StringTypes = ::testing::Types<std::string, turbo::string_piece>;
 
 template <class T>
 struct EqString : ::testing::Test {
@@ -93,19 +93,19 @@ TYPED_TEST_SUITE(HashString, StringTypes);
 TYPED_TEST(EqString, Works) {
   auto eq = this->key_eq;
   EXPECT_TRUE(eq("a", "a"));
-  EXPECT_TRUE(eq("a", turbo::string_view("a")));
+  EXPECT_TRUE(eq("a", turbo::string_piece("a")));
   EXPECT_TRUE(eq("a", std::string("a")));
   EXPECT_FALSE(eq("a", "b"));
-  EXPECT_FALSE(eq("a", turbo::string_view("b")));
+  EXPECT_FALSE(eq("a", turbo::string_piece("b")));
   EXPECT_FALSE(eq("a", std::string("b")));
 }
 
 TYPED_TEST(HashString, Works) {
   auto hash = this->hasher;
   auto h = hash("a");
-  EXPECT_EQ(h, hash(turbo::string_view("a")));
+  EXPECT_EQ(h, hash(turbo::string_piece("a")));
   EXPECT_EQ(h, hash(std::string("a")));
-  EXPECT_NE(h, hash(turbo::string_view("b")));
+  EXPECT_NE(h, hash(turbo::string_piece("b")));
   EXPECT_NE(h, hash(std::string("b")));
 }
 
@@ -208,9 +208,9 @@ TYPED_TEST(HashPointer, Works) {
 
 TEST(EqCord, Works) {
   hash_default_eq<turbo::Cord> eq;
-  const turbo::string_view a_string_view = "a";
+  const turbo::string_piece a_string_view = "a";
   const turbo::Cord a_cord(a_string_view);
-  const turbo::string_view b_string_view = "b";
+  const turbo::string_piece b_string_view = "b";
   const turbo::Cord b_cord(b_string_view);
 
   EXPECT_TRUE(eq(a_cord, a_cord));
@@ -223,9 +223,9 @@ TEST(EqCord, Works) {
 
 TEST(HashCord, Works) {
   hash_default_hash<turbo::Cord> hash;
-  const turbo::string_view a_string_view = "a";
+  const turbo::string_piece a_string_view = "a";
   const turbo::Cord a_cord(a_string_view);
-  const turbo::string_view b_string_view = "b";
+  const turbo::string_piece b_string_view = "b";
   const turbo::Cord b_cord(b_string_view);
 
   EXPECT_EQ(hash(a_cord), hash(a_cord));
@@ -233,7 +233,7 @@ TEST(HashCord, Works) {
   EXPECT_EQ(hash(a_string_view), hash(a_cord));
   EXPECT_EQ(hash(b_string_view), hash(b_cord));
   EXPECT_EQ(hash(turbo::Cord("")), hash(""));
-  EXPECT_EQ(hash(turbo::Cord()), hash(turbo::string_view()));
+  EXPECT_EQ(hash(turbo::Cord()), hash(turbo::string_piece()));
 
   EXPECT_NE(hash(a_cord), hash(b_cord));
   EXPECT_NE(hash(a_cord), hash(b_string_view));
@@ -241,7 +241,7 @@ TEST(HashCord, Works) {
   EXPECT_NE(hash(a_string_view), hash(b_string_view));
 }
 
-void NoOpReleaser(turbo::string_view data, void* arg) {}
+void NoOpReleaser(turbo::string_piece data, void* arg) {}
 
 TEST(HashCord, FragmentedCordWorks) {
   hash_default_hash<turbo::Cord> hash;
@@ -280,21 +280,21 @@ TEST(HashCord, RandomCord) {
   }
 }
 
-// Cartesian product of (std::string, turbo::string_view)
-// with (std::string, turbo::string_view, const char*, turbo::Cord).
+// Cartesian product of (std::string, turbo::string_piece)
+// with (std::string, turbo::string_piece, const char*, turbo::Cord).
 using StringTypesCartesianProduct = Types<
     // clang-format off
     std::pair<turbo::Cord, std::string>,
-    std::pair<turbo::Cord, turbo::string_view>,
+    std::pair<turbo::Cord, turbo::string_piece>,
     std::pair<turbo::Cord, turbo::Cord>,
     std::pair<turbo::Cord, const char*>,
 
     std::pair<std::string, turbo::Cord>,
-    std::pair<turbo::string_view, turbo::Cord>,
+    std::pair<turbo::string_piece, turbo::Cord>,
 
-    std::pair<turbo::string_view, std::string>,
-    std::pair<turbo::string_view, turbo::string_view>,
-    std::pair<turbo::string_view, const char*>>;
+    std::pair<turbo::string_piece, std::string>,
+    std::pair<turbo::string_piece, turbo::string_piece>,
+    std::pair<turbo::string_piece, const char*>>;
 // clang-format on
 
 constexpr char kFirstString[] = "abc123";

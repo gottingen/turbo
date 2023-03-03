@@ -33,7 +33,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_split.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "gtest/gtest.h"
 
 namespace {
@@ -46,8 +46,8 @@ TEST(StrJoin, APIExamples) {
   }
 
   {
-    // Collection of turbo::string_view
-    std::vector<turbo::string_view> v = {"foo", "bar", "baz"};
+    // Collection of turbo::string_piece
+    std::vector<turbo::string_piece> v = {"foo", "bar", "baz"};
     EXPECT_EQ("foo-bar-baz", turbo::StrJoin(v, "-"));
   }
 
@@ -226,7 +226,7 @@ TEST(AlphaNumFormatter, FormatterAPI) {
   f(&s, static_cast<double>(5));
   f(&s, static_cast<unsigned>(6));
   f(&s, static_cast<size_t>(7));
-  f(&s, turbo::string_view(" OK"));
+  f(&s, turbo::string_piece(" OK"));
   EXPECT_EQ("Testing: 1234567 OK", s);
 }
 
@@ -268,7 +268,7 @@ TEST(StreamFormatter, FormatterAPI) {
   f(&s, static_cast<double>(5));
   f(&s, static_cast<unsigned>(6));
   f(&s, static_cast<size_t>(7));
-  f(&s, turbo::string_view(" OK "));
+  f(&s, turbo::string_piece(" OK "));
   StreamableType streamable = {"object"};
   f(&s, streamable);
   EXPECT_EQ("Testing: 1234567 OK Streamable:object", s);
@@ -380,7 +380,7 @@ TEST(StrJoin, PublicAPIOverloads) {
 }
 
 TEST(StrJoin, Array) {
-  const turbo::string_view a[] = {"a", "b", "c"};
+  const turbo::string_piece a[] = {"a", "b", "c"};
   EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
 }
 
@@ -403,7 +403,7 @@ TEST(StrJoin, InitializerList) {
   }
 
   {
-    std::initializer_list<turbo::string_view> a = {"a", "b", "c"};
+    std::initializer_list<turbo::string_piece> a = {"a", "b", "c"};
     EXPECT_EQ("a-b-c", turbo::StrJoin(a, "-"));
   }
 
@@ -475,7 +475,7 @@ TEST(StrJoin, Tuple) {
 
 // A minimal value type for `StrJoin` inputs.
 // Used to ensure we do not excessively require more a specific type, such as a
-// `string_view`.
+// `string_piece`.
 //
 // Anything that can be  `data()` and `size()` is OK.
 class TestValue {
@@ -504,7 +504,7 @@ class TestValue {
 //
 // The value type is a template parameter so that we can test the behaviour
 // of `StrJoin` specializations, e.g. the NoFormatter specialization for
-// `string_view`.
+// `string_piece`.
 template <typename ValueT>
 class TestIterator {
  public:
@@ -515,11 +515,11 @@ class TestIterator {
   using difference_type = int;
 
   // `data` must outlive the result.
-  static TestIterator begin(const std::vector<turbo::string_view>& data) {
+  static TestIterator begin(const std::vector<turbo::string_piece>& data) {
     return TestIterator(&data, 0);
   }
 
-  static TestIterator end(const std::vector<turbo::string_view>& data) {
+  static TestIterator end(const std::vector<turbo::string_piece>& data) {
     return TestIterator(nullptr, data.size());
   }
 
@@ -562,10 +562,10 @@ class TestIterator {
   }
 
  private:
-  TestIterator(const std::vector<turbo::string_view>* data, size_t pos)
+  TestIterator(const std::vector<turbo::string_piece>* data, size_t pos)
       : data_(data), pos_(pos) {}
 
-  const std::vector<turbo::string_view>* data_;
+  const std::vector<turbo::string_piece>* data_;
   size_t pos_;
 };
 
@@ -573,7 +573,7 @@ template <typename ValueT>
 class TestIteratorRange {
  public:
   // `data` must be non-null and must outlive the result.
-  explicit TestIteratorRange(const std::vector<turbo::string_view>& data)
+  explicit TestIteratorRange(const std::vector<turbo::string_piece>& data)
       : begin_(TestIterator<ValueT>::begin(data)),
         end_(TestIterator<ValueT>::end(data)) {}
 
@@ -586,22 +586,22 @@ class TestIteratorRange {
 };
 
 TEST(StrJoin, TestIteratorRequirementsNoFormatter) {
-  const std::vector<turbo::string_view> a = {"a", "b", "c"};
+  const std::vector<turbo::string_piece> a = {"a", "b", "c"};
 
-  // When the value type is string-like (`std::string` or `string_view`),
+  // When the value type is string-like (`std::string` or `string_piece`),
   // the NoFormatter template specialization is used internally.
   EXPECT_EQ("a-b-c",
-            turbo::StrJoin(TestIteratorRange<turbo::string_view>(a), "-"));
+            turbo::StrJoin(TestIteratorRange<turbo::string_piece>(a), "-"));
 }
 
 TEST(StrJoin, TestIteratorRequirementsCustomFormatter) {
-  const std::vector<turbo::string_view> a = {"a", "b", "c"};
+  const std::vector<turbo::string_piece> a = {"a", "b", "c"};
   EXPECT_EQ("a-b-c",
             turbo::StrJoin(TestIteratorRange<TestValue>(a), "-",
                           [](std::string* out, const TestValue& value) {
                             turbo::StrAppend(
                                 out,
-                                turbo::string_view(value.data(), value.size()));
+                                turbo::string_piece(value.data(), value.size()));
                           }));
 }
 

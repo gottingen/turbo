@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -29,22 +29,22 @@ class StringifySink {
  public:
   void Append(size_t count, char ch);
 
-  void Append(string_view v);
+  void Append(string_piece v);
 
   // Support `turbo::Format(&sink, format, args...)`.
-  friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
+  friend void TurboFormatFlush(StringifySink* sink, turbo::string_piece v) {
     sink->Append(v);
   }
 
  private:
   template <typename T>
-  friend string_view ExtractStringification(StringifySink& sink, const T& v);
+  friend string_piece ExtractStringification(StringifySink& sink, const T& v);
 
   std::string buffer_;
 };
 
 template <typename T>
-string_view ExtractStringification(StringifySink& sink, const T& v) {
+string_piece ExtractStringification(StringifySink& sink, const T& v) {
   TurboStringify(sink, v);
   return sink.buffer_;
 }

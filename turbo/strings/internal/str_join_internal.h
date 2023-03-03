@@ -101,7 +101,7 @@ class StreamFormatterImpl {
 template <typename F1, typename F2>
 class PairFormatterImpl {
  public:
-  PairFormatterImpl(F1 f1, turbo::string_view sep, F2 f2)
+  PairFormatterImpl(F1 f1, turbo::string_piece sep, F2 f2)
       : f1_(std::move(f1)), sep_(sep), f2_(std::move(f2)) {}
 
   template <typename T>
@@ -172,7 +172,7 @@ struct DefaultFormatter<std::string> {
   typedef NoFormatter Type;
 };
 template <>
-struct DefaultFormatter<turbo::string_view> {
+struct DefaultFormatter<turbo::string_piece> {
   typedef NoFormatter Type;
 };
 template <typename ValueType>
@@ -193,10 +193,10 @@ struct DefaultFormatter<std::unique_ptr<ValueType>>
 // iterator range, each separated by the given separator, into an output string,
 // and formats each element using the provided Formatter object.
 template <typename Iterator, typename Formatter>
-std::string JoinAlgorithm(Iterator start, Iterator end, turbo::string_view s,
+std::string JoinAlgorithm(Iterator start, Iterator end, turbo::string_piece s,
                           Formatter&& f) {
   std::string result;
-  turbo::string_view sep("");
+  turbo::string_piece sep("");
   for (Iterator it = start; it != end; ++it) {
     result.append(sep.data(), sep.size());
     f(&result, *it);
@@ -208,12 +208,12 @@ std::string JoinAlgorithm(Iterator start, Iterator end, turbo::string_view s,
 // A joining algorithm that's optimized for a forward iterator range of
 // string-like objects that do not need any additional formatting. This is to
 // optimize the common case of joining, say, a std::vector<string> or a
-// std::vector<turbo::string_view>.
+// std::vector<turbo::string_piece>.
 //
 // This is an overload of the previous JoinAlgorithm() function. Here the
 // Formatter argument is of type NoFormatter. Since NoFormatter is an internal
 // type, this overload is only invoked when strings::Join() is called with a
-// range of string-like objects (e.g., std::string, turbo::string_view), and an
+// range of string-like objects (e.g., std::string, turbo::string_piece), and an
 // explicit Formatter argument was NOT specified.
 //
 // The optimization is that the needed space will be reserved in the output
@@ -224,7 +224,7 @@ template <typename Iterator,
           typename = typename std::enable_if<std::is_convertible<
               typename std::iterator_traits<Iterator>::iterator_category,
               std::forward_iterator_tag>::value>::type>
-std::string JoinAlgorithm(Iterator start, Iterator end, turbo::string_view s,
+std::string JoinAlgorithm(Iterator start, Iterator end, turbo::string_piece s,
                           NoFormatter) {
   std::string result;
   if (start != end) {
@@ -265,7 +265,7 @@ std::string JoinAlgorithm(Iterator start, Iterator end, turbo::string_view s,
 template <size_t I, size_t N>
 struct JoinTupleLoop {
   template <typename Tup, typename Formatter>
-  void operator()(std::string* out, const Tup& tup, turbo::string_view sep,
+  void operator()(std::string* out, const Tup& tup, turbo::string_piece sep,
                   Formatter&& fmt) {
     if (I > 0) out->append(sep.data(), sep.size());
     fmt(out, std::get<I>(tup));
@@ -275,11 +275,11 @@ struct JoinTupleLoop {
 template <size_t N>
 struct JoinTupleLoop<N, N> {
   template <typename Tup, typename Formatter>
-  void operator()(std::string*, const Tup&, turbo::string_view, Formatter&&) {}
+  void operator()(std::string*, const Tup&, turbo::string_piece, Formatter&&) {}
 };
 
 template <typename... T, typename Formatter>
-std::string JoinAlgorithm(const std::tuple<T...>& tup, turbo::string_view sep,
+std::string JoinAlgorithm(const std::tuple<T...>& tup, turbo::string_piece sep,
                           Formatter&& fmt) {
   std::string result;
   JoinTupleLoop<0, sizeof...(T)>()(&result, tup, sep, fmt);
@@ -288,7 +288,7 @@ std::string JoinAlgorithm(const std::tuple<T...>& tup, turbo::string_view sep,
 
 template <typename Iterator>
 std::string JoinRange(Iterator first, Iterator last,
-                      turbo::string_view separator) {
+                      turbo::string_piece separator) {
   // No formatter was explicitly given, so a default must be chosen.
   typedef typename std::iterator_traits<Iterator>::value_type ValueType;
   typedef typename DefaultFormatter<ValueType>::Type Formatter;
@@ -296,7 +296,7 @@ std::string JoinRange(Iterator first, Iterator last,
 }
 
 template <typename Range, typename Formatter>
-std::string JoinRange(const Range& range, turbo::string_view separator,
+std::string JoinRange(const Range& range, turbo::string_piece separator,
                       Formatter&& fmt) {
   using std::begin;
   using std::end;
@@ -304,7 +304,7 @@ std::string JoinRange(const Range& range, turbo::string_view separator,
 }
 
 template <typename Range>
-std::string JoinRange(const Range& range, turbo::string_view separator) {
+std::string JoinRange(const Range& range, turbo::string_piece separator) {
   using std::begin;
   using std::end;
   return JoinRange(begin(range), end(range), separator);

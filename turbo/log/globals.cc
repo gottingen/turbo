@@ -23,7 +23,7 @@
 #include "turbo/hash/hash.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/atomic_hook.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -46,7 +46,7 @@ TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
 turbo::base_internal::AtomicHook<log_internal::LoggingGlobalsListener>
     logging_globals_listener;
 
-size_t HashSiteForLogBacktraceAt(turbo::string_view file, int line) {
+size_t HashSiteForLogBacktraceAt(turbo::string_piece file, int line) {
   return turbo::HashOf(file, line);
 }
 
@@ -120,7 +120,7 @@ ScopedStderrThreshold::~ScopedStderrThreshold() {
 
 namespace log_internal {
 
-bool ShouldLogBacktraceAt(turbo::string_view file, int line) {
+bool ShouldLogBacktraceAt(turbo::string_piece file, int line) {
   const size_t flag_hash =
       log_backtrace_at_hash.load(std::memory_order_acquire);
 
@@ -129,7 +129,7 @@ bool ShouldLogBacktraceAt(turbo::string_view file, int line) {
 
 }  // namespace log_internal
 
-void SetLogBacktraceLocation(turbo::string_view file, int line) {
+void SetLogBacktraceLocation(turbo::string_piece file, int line) {
   log_backtrace_at_hash.store(HashSiteForLogBacktraceAt(file, line),
                               std::memory_order_release);
 }

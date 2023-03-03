@@ -116,7 +116,7 @@ turbo_cc_test(
   NAME
     string_view_test
   SRCS
-    "string_view_test.cc"
+    "string_piece_test.cc"
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS

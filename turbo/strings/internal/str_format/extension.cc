@@ -55,14 +55,14 @@ constexpr FormatConversionCharSet FormatConversionCharSetInternal::kPointer;
 
 #endif  // TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
 
-bool FormatSinkImpl::PutPaddedString(string_view value, int width,
+bool FormatSinkImpl::PutPaddedString(string_piece value, int width,
                                      int precision, bool left) {
   size_t space_remaining = 0;
   if (width >= 0)
     space_remaining = static_cast<size_t>(width);
   size_t n = value.size();
   if (precision >= 0) n = std::min(n, static_cast<size_t>(precision));
-  string_view shown(value.data(), n);
+  string_piece shown(value.data(), n);
   space_remaining = Excess(shown.size(), space_remaining);
   if (!left) Append(space_remaining, ' ');
   Append(shown);

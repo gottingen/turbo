@@ -42,7 +42,7 @@
 #include "turbo/meta/span.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {

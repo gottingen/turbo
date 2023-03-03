@@ -25,7 +25,7 @@
 
 #include <functional>
 #include <optional>
-#include <string_view>
+#include "turbo/strings/string_piece.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 
@@ -59,7 +59,7 @@ RAPIDJSON_NAMESPACE_BEGIN
             return v_.value().get();
         }
 
-        robust_json operator[](const turbo::string_view &key) const noexcept {
+        robust_json operator[](const turbo::string_piece &key) const noexcept {
             if (!v_.has_value() || !v_.value().get().IsObject()) {
                 return robust_json{};
             }
@@ -107,7 +107,7 @@ RAPIDJSON_NAMESPACE_BEGIN
   template <>                                                            \
   turbo::optional<T> robust_json<const rapidjson::Value>::as<T>() const noexcept;
 
-    ROBUST_JSON_DECLARE_BOTH_CAST(turbo::string_view);
+    ROBUST_JSON_DECLARE_BOTH_CAST(turbo::string_piece);
 
     ROBUST_JSON_DECLARE_BOTH_CAST(bool);
 

@@ -21,13 +21,13 @@ TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 using FixedMapping =
-    std::initializer_list<std::pair<turbo::string_view, turbo::string_view>>;
+    std::initializer_list<std::pair<turbo::string_piece, turbo::string_piece>>;
 
-// Applies the ViableSubstitutions in subs_ptr to the turbo::string_view s, and
+// Applies the ViableSubstitutions in subs_ptr to the turbo::string_piece s, and
 // stores the result in *result_ptr. Returns the number of substitutions that
 // occurred.
 int ApplySubstitutions(
-    turbo::string_view s,
+    turbo::string_piece s,
     std::vector<strings_internal::ViableSubstitution>* subs_ptr,
     std::string* result_ptr) {
   auto& subs = *subs_ptr;
@@ -68,7 +68,7 @@ int ApplySubstitutions(
 // Note that we implement them here, rather than in the header, so that they
 // aren't inlined.
 
-std::string StrReplaceAll(turbo::string_view s,
+std::string StrReplaceAll(turbo::string_piece s,
                           strings_internal::FixedMapping replacements) {
   return StrReplaceAll<strings_internal::FixedMapping>(s, replacements);
 }

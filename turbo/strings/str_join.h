@@ -29,7 +29,7 @@
 // Ranges are specified by passing a container with `std::begin()` and
 // `std::end()` iterators, container-specific `begin()` and `end()` iterators, a
 // brace-initialized `std::initializer_list`, or a `std::tuple` of heterogeneous
-// objects. The separator string is specified as an `turbo::string_view`.
+// objects. The separator string is specified as an `turbo::string_piece`.
 //
 // Because the default formatter uses the `turbo::AlphaNum` class,
 // `turbo::StrJoin()`, like `turbo::StrCat()`, will work out-of-the-box on
@@ -57,7 +57,7 @@
 
 #include "turbo/platform/port.h"
 #include "turbo/strings/internal/str_join_internal.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -104,14 +104,14 @@ inline strings_internal::StreamFormatterImpl StreamFormatter() {
   return strings_internal::StreamFormatterImpl();
 }
 
-// Function Template: PairFormatter(Formatter, turbo::string_view, Formatter)
+// Function Template: PairFormatter(Formatter, turbo::string_piece, Formatter)
 //
 // Formats a `std::pair` by putting a given separator between the pair's
 // `.first` and `.second` members. This formatter allows you to specify
 // custom Formatters for both the first and second member of each pair.
 template <typename FirstFormatter, typename SecondFormatter>
 inline strings_internal::PairFormatterImpl<FirstFormatter, SecondFormatter>
-PairFormatter(FirstFormatter f1, turbo::string_view sep, SecondFormatter f2) {
+PairFormatter(FirstFormatter f1, turbo::string_piece sep, SecondFormatter f2) {
   return strings_internal::PairFormatterImpl<FirstFormatter, SecondFormatter>(
       std::move(f1), sep, std::move(f2));
 }
@@ -121,7 +121,7 @@ PairFormatter(FirstFormatter f1, turbo::string_view sep, SecondFormatter f2) {
 inline strings_internal::PairFormatterImpl<
     strings_internal::AlphaNumFormatterImpl,
     strings_internal::AlphaNumFormatterImpl>
-PairFormatter(turbo::string_view sep) {
+PairFormatter(turbo::string_piece sep) {
   return PairFormatter(AlphaNumFormatter(), sep, AlphaNumFormatter());
 }
 
@@ -161,7 +161,7 @@ DereferenceFormatter() {
 //
 // Example 1:
 //   // Joins a collection of strings. This pattern also works with a collection
-//   // of `turbo::string_view` or even `const char*`.
+//   // of `turbo::string_piece` or even `const char*`.
 //   std::vector<std::string> v = {"foo", "bar", "baz"};
 //   std::string s = turbo::StrJoin(v, "-");
 //   EXPECT_EQ("foo-bar-baz", s);
@@ -169,7 +169,7 @@ DereferenceFormatter() {
 // Example 2:
 //   // Joins the values in the given `std::initializer_list<>` specified using
 //   // brace initialization. This pattern also works with an initializer_list
-//   // of ints or `turbo::string_view` -- any `AlphaNum`-compatible type.
+//   // of ints or `turbo::string_piece` -- any `AlphaNum`-compatible type.
 //   std::string s = turbo::StrJoin({"foo", "bar", "baz"}, "-");
 //   EXPECT_EQ("foo-bar-baz", s);
 //
@@ -236,48 +236,48 @@ DereferenceFormatter() {
 //   EXPECT_EQ("123-abc-0.456", s);
 
 template <typename Iterator, typename Formatter>
-std::string StrJoin(Iterator start, Iterator end, turbo::string_view sep,
+std::string StrJoin(Iterator start, Iterator end, turbo::string_piece sep,
                     Formatter&& fmt) {
   return strings_internal::JoinAlgorithm(start, end, sep, fmt);
 }
 
 template <typename Range, typename Formatter>
-std::string StrJoin(const Range& range, turbo::string_view separator,
+std::string StrJoin(const Range& range, turbo::string_piece separator,
                     Formatter&& fmt) {
   return strings_internal::JoinRange(range, separator, fmt);
 }
 
 template <typename T, typename Formatter>
-std::string StrJoin(std::initializer_list<T> il, turbo::string_view separator,
+std::string StrJoin(std::initializer_list<T> il, turbo::string_piece separator,
                     Formatter&& fmt) {
   return strings_internal::JoinRange(il, separator, fmt);
 }
 
 template <typename... T, typename Formatter>
-std::string StrJoin(const std::tuple<T...>& value, turbo::string_view separator,
+std::string StrJoin(const std::tuple<T...>& value, turbo::string_piece separator,
                     Formatter&& fmt) {
   return strings_internal::JoinAlgorithm(value, separator, fmt);
 }
 
 template <typename Iterator>
-std::string StrJoin(Iterator start, Iterator end, turbo::string_view separator) {
+std::string StrJoin(Iterator start, Iterator end, turbo::string_piece separator) {
   return strings_internal::JoinRange(start, end, separator);
 }
 
 template <typename Range>
-std::string StrJoin(const Range& range, turbo::string_view separator) {
+std::string StrJoin(const Range& range, turbo::string_piece separator) {
   return strings_internal::JoinRange(range, separator);
 }
 
 template <typename T>
 std::string StrJoin(std::initializer_list<T> il,
-                    turbo::string_view separator) {
+                    turbo::string_piece separator) {
   return strings_internal::JoinRange(il, separator);
 }
 
 template <typename... T>
 std::string StrJoin(const std::tuple<T...>& value,
-                    turbo::string_view separator) {
+                    turbo::string_piece separator) {
   return strings_internal::JoinAlgorithm(value, separator, AlphaNumFormatter());
 }
 

@@ -156,8 +156,8 @@ class BinaryToDecimal {
   }
 
   // See the current block of digits.
-  turbo::string_view CurrentDigits() const {
-    return turbo::string_view(digits_ + kDigitsPerChunk - size_, size_);
+  turbo::string_piece CurrentDigits() const {
+    return turbo::string_piece(digits_ + kDigitsPerChunk - size_, size_);
   }
 
   // Advance the current view of digits.
@@ -481,10 +481,10 @@ Padding ExtraWidthToPadding(size_t total_size, const FormatState &state) {
 }
 
 void FinalPrint(const FormatState& state,
-                turbo::string_view data,
+                turbo::string_piece data,
                 size_t padding_offset,
                 size_t trailing_zeros,
-                turbo::string_view data_postfix) {
+                turbo::string_piece data_postfix) {
   if (state.conv.width() < 0) {
     // No width specified. Fast-path.
     if (state.sign_char != '\0') state.sink->Append(1, state.sign_char);
@@ -560,7 +560,7 @@ void FormatFFast(Int v, int exp, const FormatState &state) {
   // In `alt` mode (flag #) we keep the `.` even if there are no fractional
   // digits. In non-alt mode, we strip it.
   if (!state.ShouldPrintDot()) --size;
-  FinalPrint(state, turbo::string_view(integral_digits_start, size),
+  FinalPrint(state, turbo::string_piece(integral_digits_start, size),
              /*padding_offset=*/0,
              state.precision - static_cast<size_t>(fractional_digits_end -
                                                    fractional_digits_start),
@@ -930,7 +930,7 @@ void FormatA(const HexFloatTypeParams float_traits, Int mantissa, int exp,
     assert(state.precision >= digits_emitted);
     trailing_zeros = state.precision - digits_emitted;
   }
-  auto digits_result = string_view(
+  auto digits_result = string_piece(
       digits_buffer, static_cast<size_t>(digits_iter - digits_buffer));
 
   // =============== Exponent ==================
@@ -951,7 +951,7 @@ void FormatA(const HexFloatTypeParams float_traits, Int mantissa, int exp,
              exp_buffer);                          // exponent
 }
 
-char *CopyStringTo(turbo::string_view v, char *out) {
+char *CopyStringTo(turbo::string_piece v, char *out) {
   std::memcpy(out, v.data(), v.size());
   return out + v.size();
 }
@@ -975,12 +975,12 @@ bool FallbackToSnprintf(const Float v, const FormatConversionSpecImpl &conv,
     assert(fp < fmt + sizeof(fmt));
   }
   std::string space(512, '\0');
-  turbo::string_view result;
+  turbo::string_piece result;
   while (true) {
     int n = snprintf(&space[0], space.size(), fmt, w, p, v);
     if (n < 0) return false;
     if (static_cast<size_t>(n) < space.size()) {
-      result = turbo::string_view(space.data(), static_cast<size_t>(n));
+      result = turbo::string_piece(space.data(), static_cast<size_t>(n));
       break;
     }
     space.resize(static_cast<size_t>(n) + 1);
@@ -1050,7 +1050,7 @@ bool ConvertNonNumericFloats(char sign_char, Float v,
   }
 
   return sink->PutPaddedString(
-      string_view(text, static_cast<size_t>(ptr - text)), conv.width(), -1,
+      string_piece(text, static_cast<size_t>(ptr - text)), conv.width(), -1,
       conv.has_left_flag());
 }
 
@@ -1303,7 +1303,7 @@ bool FloatToBuffer(Decomposed<Float> decomposed,
   return false;
 }
 
-void WriteBufferToSink(char sign_char, turbo::string_view str,
+void WriteBufferToSink(char sign_char, turbo::string_piece str,
                        const FormatConversionSpecImpl &conv,
                        FormatSinkImpl *sink) {
   size_t left_spaces = 0, zeros = 0, right_spaces = 0;
@@ -1420,7 +1420,7 @@ bool FloatToSink(const Float v, const FormatConversionSpecImpl &conv,
 
   WriteBufferToSink(
       sign_char,
-      turbo::string_view(buffer.begin,
+      turbo::string_piece(buffer.begin,
                         static_cast<size_t>(buffer.end - buffer.begin)),
       conv, sink);
 

@@ -26,7 +26,7 @@
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -349,7 +349,7 @@ using ExternalReleaserInvoker = void (*)(CordRepExternal*);
 // releaser is stored in the memory directly following the CordRepExternal.
 struct CordRepExternal : public CordRep {
   CordRepExternal() = default;
-  explicit constexpr CordRepExternal(turbo::string_view str)
+  explicit constexpr CordRepExternal(turbo::string_piece str)
       : CordRep(RefcountAndFlags::Immortal{}, str.size()),
         base(str.data()),
         releaser_invoker(nullptr) {}
@@ -367,14 +367,14 @@ struct Rank1 {};
 struct Rank0 : Rank1 {};
 
 template <typename Releaser, typename = ::turbo::base_internal::invoke_result_t<
-                                 Releaser, turbo::string_view>>
-void InvokeReleaser(Rank0, Releaser&& releaser, turbo::string_view data) {
+                                 Releaser, turbo::string_piece>>
+void InvokeReleaser(Rank0, Releaser&& releaser, turbo::string_piece data) {
   ::turbo::base_internal::invoke(std::forward<Releaser>(releaser), data);
 }
 
 template <typename Releaser,
           typename = ::turbo::base_internal::invoke_result_t<Releaser>>
-void InvokeReleaser(Rank1, Releaser&& releaser, turbo::string_view) {
+void InvokeReleaser(Rank1, Releaser&& releaser, turbo::string_piece) {
   ::turbo::base_internal::invoke(std::forward<Releaser>(releaser));
 }
 
@@ -393,7 +393,7 @@ struct CordRepExternalImpl
 
   ~CordRepExternalImpl() {
     InvokeReleaser(Rank0{}, std::move(this->template get<0>()),
-                   turbo::string_view(base, length));
+                   turbo::string_piece(base, length));
   }
 
   static void Release(CordRepExternal* rep) {
@@ -462,7 +462,7 @@ enum {
   kMaxInline = 15,
 };
 
-constexpr char GetOrNull(turbo::string_view data, size_t pos) {
+constexpr char GetOrNull(turbo::string_piece data, size_t pos) {
   return pos < data.size() ? data[pos] : '\0';
 }
 
@@ -511,7 +511,7 @@ class InlineData {
   // Explicit constexpr constructor to create a constexpr InlineData
   // value. Creates an inlined SSO value if `rep` is null, otherwise
   // creates a tree instance value.
-  constexpr InlineData(turbo::string_view sv, CordRep* rep)
+  constexpr InlineData(turbo::string_piece sv, CordRep* rep)
       : rep_(rep ? Rep(rep) : Rep(sv)) {}
 
   constexpr InlineData(const InlineData& rhs) = default;
@@ -684,7 +684,7 @@ class InlineData {
 
     explicit constexpr Rep(CordRep* rep) : as_tree(rep) {}
 
-    explicit constexpr Rep(turbo::string_view chars)
+    explicit constexpr Rep(turbo::string_piece chars)
         : data{static_cast<char>((chars.size() << 1)),
                GetOrNull(chars, 0),
                GetOrNull(chars, 1),

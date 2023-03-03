@@ -23,7 +23,7 @@
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

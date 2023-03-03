@@ -27,7 +27,7 @@
 #include "turbo/strings/internal/cord_rep_consume.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -167,12 +167,12 @@ CordRep* ResizeEdge(CordRep* edge, size_t length, bool is_mutable) {
 }
 
 template <EdgeType edge_type>
-inline turbo::string_view Consume(turbo::string_view s, size_t n) {
+inline turbo::string_piece Consume(turbo::string_piece s, size_t n) {
   return edge_type == kBack ? s.substr(n) : s.substr(0, s.size() - n);
 }
 
 template <EdgeType edge_type>
-inline turbo::string_view Consume(char* dst, turbo::string_view s, size_t n) {
+inline turbo::string_piece Consume(char* dst, turbo::string_piece s, size_t n) {
   if (edge_type == kBack) {
     memcpy(dst, s.data(), n);
     return s.substr(n);
@@ -360,7 +360,7 @@ struct StackOperations {
 
 }  // namespace
 
-void CordRepBtree::Dump(const CordRep* rep, turbo::string_view label,
+void CordRepBtree::Dump(const CordRep* rep, turbo::string_piece label,
                         bool include_contents, std::ostream& stream) {
   stream << "===================================\n";
   if (!label.empty()) {
@@ -374,13 +374,13 @@ void CordRepBtree::Dump(const CordRep* rep, turbo::string_view label,
   }
 }
 
-void CordRepBtree::Dump(const CordRep* rep, turbo::string_view label,
+void CordRepBtree::Dump(const CordRep* rep, turbo::string_piece label,
                         std::ostream& stream) {
   Dump(rep, label, false, stream);
 }
 
 void CordRepBtree::Dump(const CordRep* rep, std::ostream& stream) {
-  Dump(rep, turbo::string_view(), false, stream);
+  Dump(rep, turbo::string_piece(), false, stream);
 }
 
 template <size_t size>
@@ -524,7 +524,7 @@ CordRepBtree* CordRepBtree::AddCordRep(CordRepBtree* tree, CordRep* rep) {
 }
 
 template <>
-CordRepBtree* CordRepBtree::NewLeaf<kBack>(turbo::string_view data,
+CordRepBtree* CordRepBtree::NewLeaf<kBack>(turbo::string_piece data,
                                            size_t extra) {
   CordRepBtree* leaf = CordRepBtree::New(0);
   size_t length = 0;
@@ -543,7 +543,7 @@ CordRepBtree* CordRepBtree::NewLeaf<kBack>(turbo::string_view data,
 }
 
 template <>
-CordRepBtree* CordRepBtree::NewLeaf<kFront>(turbo::string_view data,
+CordRepBtree* CordRepBtree::NewLeaf<kFront>(turbo::string_piece data,
                                             size_t extra) {
   CordRepBtree* leaf = CordRepBtree::New(0);
   size_t length = 0;
@@ -562,7 +562,7 @@ CordRepBtree* CordRepBtree::NewLeaf<kFront>(turbo::string_view data,
 }
 
 template <>
-turbo::string_view CordRepBtree::AddData<kBack>(turbo::string_view data,
+turbo::string_piece CordRepBtree::AddData<kBack>(turbo::string_piece data,
                                                size_t extra) {
   assert(!data.empty());
   assert(size() < capacity());
@@ -579,7 +579,7 @@ turbo::string_view CordRepBtree::AddData<kBack>(turbo::string_view data,
 }
 
 template <>
-turbo::string_view CordRepBtree::AddData<kFront>(turbo::string_view data,
+turbo::string_piece CordRepBtree::AddData<kFront>(turbo::string_piece data,
                                                 size_t extra) {
   assert(!data.empty());
   assert(size() < capacity());
@@ -595,7 +595,7 @@ turbo::string_view CordRepBtree::AddData<kFront>(turbo::string_view data,
 }
 
 template <EdgeType edge_type>
-CordRepBtree* CordRepBtree::AddData(CordRepBtree* tree, turbo::string_view data,
+CordRepBtree* CordRepBtree::AddData(CordRepBtree* tree, turbo::string_piece data,
                                     size_t extra) {
   if (TURBO_UNLIKELY(data.empty())) return tree;
 
@@ -959,7 +959,7 @@ CordRepBtree* CordRepBtree::MergeTrees(CordRepBtree* left,
                                            : Merge<kFront>(right, left);
 }
 
-bool CordRepBtree::IsFlat(turbo::string_view* fragment) const {
+bool CordRepBtree::IsFlat(turbo::string_piece* fragment) const {
   if (height() == 0 && size() == 1) {
     if (fragment) *fragment = Data(begin());
     return true;
@@ -968,7 +968,7 @@ bool CordRepBtree::IsFlat(turbo::string_view* fragment) const {
 }
 
 bool CordRepBtree::IsFlat(size_t offset, const size_t n,
-                          turbo::string_view* fragment) const {
+                          turbo::string_piece* fragment) const {
   assert(n <= this->length);
   assert(offset <= this->length - n);
   if (TURBO_UNLIKELY(n == 0)) return false;
@@ -1074,12 +1074,12 @@ CordRepBtree* CordRepBtree::PrependSlow(CordRepBtree* tree, CordRep* rep) {
   return tree;
 }
 
-CordRepBtree* CordRepBtree::Append(CordRepBtree* tree, turbo::string_view data,
+CordRepBtree* CordRepBtree::Append(CordRepBtree* tree, turbo::string_piece data,
                                    size_t extra) {
   return CordRepBtree::AddData<kBack>(tree, data, extra);
 }
 
-CordRepBtree* CordRepBtree::Prepend(CordRepBtree* tree, turbo::string_view data,
+CordRepBtree* CordRepBtree::Prepend(CordRepBtree* tree, turbo::string_piece data,
                                     size_t extra) {
   return CordRepBtree::AddData<kFront>(tree, data, extra);
 }
@@ -1089,10 +1089,10 @@ template CordRepBtree* CordRepBtree::AddCordRep<kFront>(CordRepBtree* tree,
 template CordRepBtree* CordRepBtree::AddCordRep<kBack>(CordRepBtree* tree,
                                                        CordRep* rep);
 template CordRepBtree* CordRepBtree::AddData<kFront>(CordRepBtree* tree,
-                                                     turbo::string_view data,
+                                                     turbo::string_piece data,
                                                      size_t extra);
 template CordRepBtree* CordRepBtree::AddData<kBack>(CordRepBtree* tree,
-                                                    turbo::string_view data,
+                                                    turbo::string_piece data,
                                                     size_t extra);
 
 void CordRepBtree::Rebuild(CordRepBtree** stack, CordRepBtree* tree,

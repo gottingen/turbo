@@ -23,7 +23,7 @@
 #include "turbo/log/log_sink_registry.h"
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -215,9 +215,9 @@ class ReentrancyTest : public ::testing::Test {
     LogMode mode_;
   };
 
-  static turbo::string_view LogAndReturn(turbo::LogSeverity severity,
-                                        turbo::string_view to_log,
-                                        turbo::string_view to_return) {
+  static turbo::string_piece LogAndReturn(turbo::LogSeverity severity,
+                                        turbo::string_piece to_log,
+                                        turbo::string_piece to_return) {
     LOG(LEVEL(severity)) << to_log;
     return to_return;
   }

@@ -190,8 +190,8 @@ void RawLogVA(turbo::LogSeverity severity, const char* file, int line,
 
 // Non-formatting version of RawLog().
 //
-// TODO(gfalcon): When string_view no longer depends on base, change this
-// interface to take its message as a string_view instead.
+// TODO(gfalcon): When string_piece no longer depends on base, change this
+// interface to take its message as a string_piece instead.
 void DefaultInternalLog(turbo::LogSeverity severity, const char* file, int line,
                         const std::string& message) {
   RawLog(severity, file, line, "%.*s", static_cast<int>(message.size()),

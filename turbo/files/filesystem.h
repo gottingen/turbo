@@ -228,33 +228,7 @@
 #endif
 #endif  // GHC_EXPAND_IMPL
 
-// After standard library includes.
-// Standard library support for std::string_view.
-#if defined(__cpp_lib_string_view)
-#define GHC_HAS_STD_STRING_VIEW
-#elif defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION >= 4000) && (__cplusplus >= 201402)
-#define GHC_HAS_STD_STRING_VIEW
-#elif defined(_GLIBCXX_RELEASE) && (_GLIBCXX_RELEASE >= 7) && (__cplusplus >= 201703)
-#define GHC_HAS_STD_STRING_VIEW
-#elif defined(_MSC_VER) && (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
-#define GHC_HAS_STD_STRING_VIEW
-#endif
-
-// Standard library support for std::experimental::string_view.
-#if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION >= 3700 && _LIBCPP_VERSION < 7000) && (__cplusplus >= 201402)
-#define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
-#elif defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)) && (__cplusplus >= 201402)
-#define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
-#elif defined(__GLIBCXX__) && defined(_GLIBCXX_USE_DUAL_ABI) && (__cplusplus >= 201402)
-// macro _GLIBCXX_USE_DUAL_ABI is always defined in libstdc++ from gcc-5 and newer
-#define GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW
-#endif
-
-#if defined(GHC_HAS_STD_STRING_VIEW)
-#include <string_view>
-#elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-#include <experimental/string_view>
-#endif
+#include "turbo/strings/string_view.h"
 
 #if !defined(GHC_OS_WINDOWS) && !defined(PATH_MAX)
 #define PATH_MAX 4096
@@ -319,15 +293,7 @@
 namespace turbo {
 namespace filesystem {
 
-#if defined(GHC_HAS_CUSTOM_STRING_VIEW)
-#define GHC_WITH_STRING_VIEW
-#elif defined(GHC_HAS_STD_STRING_VIEW)
-#define GHC_WITH_STRING_VIEW
-using std::basic_string_view;
-#elif defined(GHC_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-#define GHC_WITH_STRING_VIEW
-using std::experimental::basic_string_view;
-#endif
+using turbo::basic_string_view;
 
 // temporary existing exception type for yet unimplemented parts
 class GHC_FS_API_CLASS not_implemented_exception : public std::logic_error
@@ -406,7 +372,6 @@ public:
     struct _is_basic_string<std::basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT>>> : std::true_type
     {
     };
-#ifdef GHC_WITH_STRING_VIEW
     template <class CharT, class Traits>
     struct _is_basic_string<basic_string_view<CharT, Traits>> : std::true_type
     {
@@ -415,7 +380,6 @@ public:
     struct _is_basic_string<basic_string_view<CharT, std::char_traits<CharT>>> : std::true_type
     {
     };
-#endif
 
     template <typename T1, typename T2 = void>
     using path_type = typename std::enable_if<!std::is_same<path, T1>::value, path>::type;
@@ -479,9 +443,7 @@ public:
     // [fs.path.concat] concatenation
     path& operator+=(const path& x);
     path& operator+=(const string_type& x);
-#ifdef GHC_WITH_STRING_VIEW
     path& operator+=(basic_string_view<value_type> x);
-#endif
     path& operator+=(const value_type* x);
     path& operator+=(value_type x);
     template <class Source>
@@ -533,9 +495,7 @@ public:
     // [fs.path.compare] compare
     int compare(const path& p) const noexcept;
     int compare(const string_type& s) const;
-#ifdef GHC_WITH_STRING_VIEW
     int compare(basic_string_view<value_type> s) const;
-#endif
     int compare(const value_type* s) const;
 
     // [fs.path.decompose] decomposition
@@ -1653,11 +1613,7 @@ inline StringType fromUtf8(const Utf8String& utf8String, const typename StringTy
 template <class StringType, typename charT, std::size_t N>
 inline StringType fromUtf8(const charT (&utf8String)[N])
 {
-#ifdef GHC_WITH_STRING_VIEW
     return fromUtf8<StringType>(basic_string_view<charT>(utf8String, N - 1));
-#else
-    return fromUtf8<StringType>(std::basic_string<charT>(utf8String, N - 1));
-#endif
 }
 
 template <typename strT, typename std::enable_if<path::_is_basic_string<strT>::value && (sizeof(typename strT::value_type) == 1), int>::type size = 1>
@@ -1708,11 +1664,7 @@ inline std::string toUtf8(const strT& unicodeString)
 template <typename charT>
 inline std::string toUtf8(const charT* unicodeString)
 {
-#ifdef GHC_WITH_STRING_VIEW
     return toUtf8(basic_string_view<charT, std::char_traits<charT>>(unicodeString));
-#else
-    return toUtf8(std::basic_string<charT, std::char_traits<charT>>(unicodeString));
-#endif
 }
 
 #ifdef GHC_USE_WCHAR_T
@@ -1758,11 +1710,7 @@ inline std::wstring toWChar(const strT& unicodeString)
 template <typename charT>
 inline std::wstring toWChar(const charT* unicodeString)
 {
-#ifdef GHC_WITH_STRING_VIEW
     return toWChar(basic_string_view<charT, std::char_traits<charT>>(unicodeString));
-#else
-    return toWChar(std::basic_string<charT, std::char_traits<charT>>(unicodeString));
-#endif
 }
 #endif  // GHC_USE_WCHAR_T
 
@@ -2697,20 +2645,14 @@ GHC_INLINE path& path::operator+=(const string_type& x)
     return concat(x);
 }
 
-#ifdef GHC_WITH_STRING_VIEW
 GHC_INLINE path& path::operator+=(basic_string_view<value_type> x)
 {
     return concat(x);
 }
-#endif
 
 GHC_INLINE path& path::operator+=(const value_type* x)
 {
-#ifdef GHC_WITH_STRING_VIEW
     basic_string_view<value_type> part(x);
-#else
-    string_type part(x);
-#endif
     return concat(part);
 }
 
@@ -2739,11 +2681,7 @@ inline path::path_from_string<Source>& path::operator+=(const Source& x)
 template <class EcharT>
 inline path::path_type_EcharT<EcharT>& path::operator+=(EcharT x)
 {
-#ifdef GHC_WITH_STRING_VIEW
     basic_string_view<EcharT> part(&x, 1);
-#else
-    std::basic_string<EcharT> part(1, x);
-#endif
     concat(part);
     return *this;
 }
@@ -3041,12 +2979,10 @@ GHC_INLINE int path::compare(const string_type& s) const
     return compare(path(s));
 }
 
-#ifdef GHC_WITH_STRING_VIEW
 GHC_INLINE int path::compare(basic_string_view<value_type> s) const
 {
     return compare(path(s));
 }
-#endif
 
 GHC_INLINE int path::compare(const value_type* s) const
 {

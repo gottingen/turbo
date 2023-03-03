@@ -36,7 +36,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
@@ -257,7 +257,7 @@ void FlagImpl::StoreValue(const void* src) {
   InvokeCallback();
 }
 
-turbo::string_view FlagImpl::Name() const { return name_; }
+turbo::string_piece FlagImpl::Name() const { return name_; }
 
 std::string FlagImpl::Filename() const {
   return flags_internal::GetUsageConfig().normalize_filename(filename_);
@@ -431,12 +431,12 @@ std::atomic<int64_t>& FlagImpl::OneWordValue() const {
 // parsed value. In case if any error is encountered in either step, the error
 // message is stored in 'err'
 std::unique_ptr<void, DynValueDeleter> FlagImpl::TryParse(
-    turbo::string_view value, std::string& err) const {
+    turbo::string_piece value, std::string& err) const {
   std::unique_ptr<void, DynValueDeleter> tentative_value = MakeInitValue();
 
   std::string parse_err;
   if (!flags_internal::Parse(op_, value, tentative_value.get(), &parse_err)) {
-    turbo::string_view err_sep = parse_err.empty() ? "" : "; ";
+    turbo::string_piece err_sep = parse_err.empty() ? "" : "; ";
     err = turbo::StrCat("Illegal value '", value, "' specified for flag '",
                        Name(), "'", err_sep, parse_err);
     return nullptr;
@@ -523,7 +523,7 @@ void FlagImpl::Write(const void* src) {
 //  * Update the flag's default value
 //  * Update the current flag value if it was never set before
 // The mode is selected based on 'set_mode' parameter.
-bool FlagImpl::ParseFrom(turbo::string_view value, FlagSettingMode set_mode,
+bool FlagImpl::ParseFrom(turbo::string_piece value, FlagSettingMode set_mode,
                          ValueSource source, std::string& err) {
   turbo::MutexLock l(DataGuard());
 
@@ -601,7 +601,7 @@ void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
   // small changes, e.g., precision loss for floating point types.
 }
 
-bool FlagImpl::ValidateInputValue(turbo::string_view value) const {
+bool FlagImpl::ValidateInputValue(turbo::string_piece value) const {
   turbo::MutexLock l(DataGuard());
 
   auto obj = MakeInitValue();

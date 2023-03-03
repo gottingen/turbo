@@ -70,7 +70,7 @@ namespace turbo {
                                    << " fd: " << _fd << " size: " << n;
                 return ErrnoToStatus(errno,"");
             }
-            buf->Append(turbo::string_view(ptr, static_cast<size_t>(read_len)));
+            buf->Append(turbo::string_piece(ptr, static_cast<size_t>(read_len)));
             _has_read += static_cast<size_t>(read_len);
         }
         return turbo::OkStatus();

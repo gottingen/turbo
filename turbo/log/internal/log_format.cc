@@ -37,7 +37,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_format.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/time.h"
 
@@ -167,8 +167,8 @@ size_t FormatLineNumber(int line, turbo::Span<char>& buf) {
 std::string FormatLogMessage(turbo::LogSeverity severity,
                              turbo::CivilSecond civil_second,
                              turbo::Duration subsecond, log_internal::Tid tid,
-                             turbo::string_view basename, int line,
-                             PrefixFormat format, turbo::string_view message) {
+                             turbo::string_piece basename, int line,
+                             PrefixFormat format, turbo::string_piece message) {
   return turbo::StrFormat(
       "%c%02d%02d %02d:%02d:%02d.%06d %7d %s:%d] %s%s",
       turbo::LogSeverityName(severity)[0], civil_second.month(),
@@ -187,7 +187,7 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
 // 2. filename
 // 3. line number and bracket
 size_t FormatLogPrefix(turbo::LogSeverity severity, turbo::Time timestamp,
-                       log_internal::Tid tid, turbo::string_view basename,
+                       log_internal::Tid tid, turbo::string_piece basename,
                        int line, PrefixFormat format, turbo::Span<char>& buf) {
   auto prefix_size = FormatBoundedFields(severity, timestamp, tid, buf);
   prefix_size += log_internal::AppendTruncated(basename, buf);

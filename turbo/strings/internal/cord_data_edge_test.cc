@@ -69,21 +69,21 @@ TEST(CordDataEdgeTest, IsDataEdgeOnBadSubstr) {
 }
 
 TEST(CordDataEdgeTest, EdgeDataOnFlat) {
-  turbo::string_view value = "Lorem ipsum dolor sit amet, consectetur ...";
+  turbo::string_piece value = "Lorem ipsum dolor sit amet, consectetur ...";
   CordRep* rep = MakeFlat(value);
   EXPECT_EQ(EdgeData(rep), value);
   CordRep::Unref(rep);
 }
 
 TEST(CordDataEdgeTest, EdgeDataOnExternal) {
-  turbo::string_view value = "Lorem ipsum dolor sit amet, consectetur ...";
+  turbo::string_piece value = "Lorem ipsum dolor sit amet, consectetur ...";
   CordRep* rep = MakeExternal(value);
   EXPECT_EQ(EdgeData(rep), value);
   CordRep::Unref(rep);
 }
 
 TEST(CordDataEdgeTest, EdgeDataOnSubstringOfFlat) {
-  turbo::string_view value = "Lorem ipsum dolor sit amet, consectetur ...";
+  turbo::string_piece value = "Lorem ipsum dolor sit amet, consectetur ...";
   CordRep* rep = MakeFlat(value);
   CordRep* substr = MakeSubstring(1, 20, rep);
   EXPECT_EQ(EdgeData(substr), value.substr(1, 20));
@@ -91,7 +91,7 @@ TEST(CordDataEdgeTest, EdgeDataOnSubstringOfFlat) {
 }
 
 TEST(CordDataEdgeTest, EdgeDataOnSubstringOfExternal) {
-  turbo::string_view value = "Lorem ipsum dolor sit amet, consectetur ...";
+  turbo::string_piece value = "Lorem ipsum dolor sit amet, consectetur ...";
   CordRep* rep = MakeExternal(value);
   CordRep* substr = MakeSubstring(1, 20, rep);
   EXPECT_EQ(EdgeData(substr), value.substr(1, 20));

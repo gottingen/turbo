@@ -40,7 +40,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/errno_saver.h"
 #include "turbo/strings/internal/has_turbo_stringify.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/time.h"
 
 namespace turbo {
@@ -59,7 +59,7 @@ class LogMessage {
 
   // Overrides the location inferred from the callsite.  The string pointed to
   // by `file` must be valid until the end of the statement.
-  LogMessage& AtLocation(turbo::string_view file, int line);
+  LogMessage& AtLocation(turbo::string_piece file, int line);
   // Omits the prefix from this line.  The prefix includes metadata about the
   // logged data such as source code location and timestamp.
   LogMessage& NoPrefix();
@@ -130,7 +130,7 @@ class LogMessage {
 
   // These overloads are more efficient since no `ostream` is involved.
   LogMessage& operator<<(const std::string& v);
-  LogMessage& operator<<(turbo::string_view v);
+  LogMessage& operator<<(turbo::string_piece v);
 
   // Handle stream manipulators e.g. std::endl.
   LogMessage& operator<<(std::ostream& (*m)(std::ostream& os));
@@ -218,7 +218,7 @@ class LogMessage {
     kLiteral,
     kNotLiteral,
   };
-  void CopyToEncodedBuffer(turbo::string_view str,
+  void CopyToEncodedBuffer(turbo::string_piece str,
                            StringType str_type) TURBO_NO_INLINE;
   void CopyToEncodedBuffer(char ch, size_t num,
                            StringType str_type) TURBO_NO_INLINE;
@@ -255,12 +255,12 @@ class StringifySink final {
                                  LogMessage::StringType::kNotLiteral);
   }
 
-  void Append(turbo::string_view v) {
+  void Append(turbo::string_piece v) {
     message_.CopyToEncodedBuffer(v, LogMessage::StringType::kNotLiteral);
   }
 
   // For types that implement `TurboStringify` using `turbo::Format()`.
-  friend void TurboFormatFlush(StringifySink* sink, turbo::string_view v) {
+  friend void TurboFormatFlush(StringifySink* sink, turbo::string_piece v) {
     sink->Append(v);
   }
 
@@ -332,7 +332,7 @@ class LogMessageFatal final : public LogMessage {
  public:
   LogMessageFatal(const char* file, int line) TURBO_COLD;
   LogMessageFatal(const char* file, int line,
-                  turbo::string_view failure_msg) TURBO_COLD;
+                  turbo::string_piece failure_msg) TURBO_COLD;
   TURBO_NORETURN ~LogMessageFatal();
 };
 
@@ -340,7 +340,7 @@ class LogMessageQuietlyFatal final : public LogMessage {
  public:
   LogMessageQuietlyFatal(const char* file, int line) TURBO_COLD;
   LogMessageQuietlyFatal(const char* file, int line,
-                         turbo::string_view failure_msg) TURBO_COLD;
+                         turbo::string_piece failure_msg) TURBO_COLD;
   TURBO_NORETURN ~LogMessageQuietlyFatal();
 };
 

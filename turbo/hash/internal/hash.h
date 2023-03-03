@@ -54,7 +54,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -518,14 +518,14 @@ H TurboHashValue(H hash_state, const std::shared_ptr<T>& ptr) {
 //  - `turbo::Cord`
 //  - `std::string` (and std::basic_string<char, std::char_traits<char>, A> for
 //      any allocator A)
-//  - `turbo::string_view` and `std::string_view`
+//  - `turbo::string_piece` and `std::string_piece`
 //
 // For simplicity, we currently support only `char` strings. This support may
 // be broadened, if necessary, but with some caution - this overload would
 // misbehave in cases where the traits' `eq()` member isn't equivalent to `==`
 // on the underlying character type.
 template <typename H>
-H TurboHashValue(H hash_state, turbo::string_view str) {
+H TurboHashValue(H hash_state, turbo::string_piece str) {
   return H::combine(
       H::combine_contiguous(std::move(hash_state), str.data(), str.size()),
       str.size());

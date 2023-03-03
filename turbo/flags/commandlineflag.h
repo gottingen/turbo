@@ -33,7 +33,7 @@
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/meta/optional.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -118,7 +118,7 @@ class CommandLineFlag {
   // turbo::CommandLineFlag::Name()
   //
   // Returns name of this flag.
-  virtual turbo::string_view Name() const = 0;
+  virtual turbo::string_piece Name() const = 0;
 
   // turbo::CommandLineFlag::Filename()
   //
@@ -150,7 +150,7 @@ class CommandLineFlag {
   // Sets the value of the flag based on specified string `value`. If the flag
   // was successfully set to new value, it returns true. Otherwise, sets `error`
   // to indicate the error, leaves the flag unchanged, and returns false.
-  bool ParseFrom(turbo::string_view value, std::string* error);
+  bool ParseFrom(turbo::string_piece value, std::string* error);
 
  protected:
   ~CommandLineFlag() = default;
@@ -166,7 +166,7 @@ class CommandLineFlag {
   //  * Update the flag's default value
   //  * Update the current flag value if it was never set before
   // The mode is selected based on `set_mode` parameter.
-  virtual bool ParseFrom(turbo::string_view value,
+  virtual bool ParseFrom(turbo::string_piece value,
                          flags_internal::FlagSettingMode set_mode,
                          flags_internal::ValueSource source,
                          std::string& error) = 0;
@@ -187,7 +187,7 @@ class CommandLineFlag {
   virtual bool IsSpecifiedOnCommandLine() const = 0;
 
   // Validates supplied value usign validator or parseflag routine
-  virtual bool ValidateInputValue(turbo::string_view value) const = 0;
+  virtual bool ValidateInputValue(turbo::string_piece value) const = 0;
 
   // Checks that flags default value can be converted to string and back to the
   // flag's value type.
