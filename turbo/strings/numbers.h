@@ -23,6 +23,8 @@
 #ifndef TURBO_STRINGS_NUMBERS_H_
 #define TURBO_STRINGS_NUMBERS_H_
 
+#include "turbo/platform/port.h"
+
 #if TURBO_SSSE3
 #include <tmmintrin.h>
 #endif
