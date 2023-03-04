@@ -18,6 +18,7 @@
 #ifndef TURBO_PLATFORM_PORT_H_
 #define TURBO_PLATFORM_PORT_H_
 
+#include "turbo/platform/config/wchar_config.h"
 #include "turbo/platform/config/attributes.h"
 #include "turbo/platform/config/config.h"
 #include "turbo/platform/config/optimization.h"

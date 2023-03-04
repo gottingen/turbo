@@ -15,7 +15,7 @@
 
 // This file contains :int128 implementation details that depend on internal
 // representation when TURBO_HAVE_INTRINSIC_INT128 is *not* defined. This file
-// is included by int128.h and relies on TURBO_INTERNAL_WCHAR_T being defined.
+// is included by int128.h and relies on TURBO_WCHAR_T being defined.
 
 constexpr uint64_t Int128Low64(int128 v) { return v.lo_; }
 
@@ -91,9 +91,9 @@ constexpr int128::operator char32_t() const {
   return static_cast<char32_t>(lo_);
 }
 
-constexpr int128::operator TURBO_INTERNAL_WCHAR_T() const {
+constexpr int128::operator TURBO_WCHAR_T() const {
   // NOLINTNEXTLINE(runtime/int)
-  return static_cast<TURBO_INTERNAL_WCHAR_T>(static_cast<long long>(*this));
+  return static_cast<TURBO_WCHAR_T>(static_cast<long long>(*this));
 }
 
 constexpr int128::operator short() const {  // NOLINT(runtime/int)

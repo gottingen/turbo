@@ -25,23 +25,6 @@
 // Define common SI unit macros
 #include "units.h"
 
-
-// ------------------------------------------------------------------------
-// The C++ standard defines size_t as a built-in type. Some compilers are
-// not standards-compliant in this respect, so we need an additional include.
-// The case is similar with wchar_t under C++.
-
-#if defined(TURBO_COMPILER_GNUC) || defined(TURBO_COMPILER_MSVC) || defined(TURBO_WCHAR_T_NON_NATIVE) || defined(TURBO_PLATFORM_SONY)
-	#if defined(TURBO_COMPILER_MSVC)
-		#pragma warning(push, 0)
-		#pragma warning(disable: 4265 4365 4836 4574)
-	#endif
-	#include <stddef.h>
-	#if defined(TURBO_COMPILER_MSVC)
-		#pragma warning(pop)
-	#endif
-#endif
-
 // ------------------------------------------------------------------------
 // Include stddef.h on Apple's clang compiler to ensure the ptrdiff_t type
 // is defined.
