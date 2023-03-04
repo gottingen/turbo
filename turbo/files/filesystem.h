@@ -3648,7 +3648,7 @@ TURBO_FORCE_INLINE void copy(const path &from, const path &to,
   copy(from, to, copy_options::none, ec);
 }
 
-TURBO_FORCE_INLINE void copy(const path &from, const path &to,
+inline void copy(const path &from, const path &to,
                              copy_options options,
                              std::error_code &ec) noexcept {
   std::error_code tec;
