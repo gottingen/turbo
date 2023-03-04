@@ -58,7 +58,7 @@ class TurboModuleHelper {
 };
 
 #define TURBO_REGISTER_MODULE_INDEX(module_index, description)                   \
-    const int TURBO_ALLOW_UNUSED TURBO_CONCAT(turbo_module_dummy_, __LINE__) =              \
+    const int TURBO_MAYBE_UNUSED TURBO_CONCAT(turbo_module_dummy_, __LINE__) =              \
         ::turbo::DescribeCustomizedModule((module_index), #module_index, (description)); \
     template <> class TurboModuleHelper<(unsigned short int)(module_index)> {};
 

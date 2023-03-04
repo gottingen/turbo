@@ -34,7 +34,7 @@ namespace base_internal {
 
 #if TURBO_USE_UNSCALED_CYCLECLOCK
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr int32_t CycleClock::kShift;
 constexpr double CycleClock::kFrequencyScale;
 #endif

@@ -86,7 +86,7 @@ static void BM_EnabledLogOverhead(benchmark::State& state) {
       turbo::LogSeverityAtLeast::kInfinity);
   turbo::log_internal::ScopedMinLogLevel scoped_min_log_level(
       turbo::LogSeverityAtLeast::kInfo);
-  TURBO_ALLOW_UNUSED NullLogSink null_sink;
+  TURBO_MAYBE_UNUSED NullLogSink null_sink;
   for (auto _ : state) {
     LOG(INFO);
   }

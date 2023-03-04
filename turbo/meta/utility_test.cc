@@ -32,7 +32,7 @@ namespace {
 
 #ifdef _MSC_VER
 // Warnings for unused variables in this test are false positives.  On other
-// platforms, they are suppressed by TURBO_ALLOW_UNUSED, but that doesn't
+// platforms, they are suppressed by TURBO_MAYBE_UNUSED, but that doesn't
 // work on MSVC.
 // Both the unused variables and the name length warnings are due to calls
 // to turbo::make_index_sequence with very large values, creating very long type
@@ -89,7 +89,7 @@ template <size_t... Is>
 void CountAll(turbo::index_sequence<Is...>) {
   // We only need an alias here, but instantiate a variable to silence warnings
   // for unused typedefs in some compilers.
-  TURBO_ALLOW_UNUSED Counter<turbo::make_index_sequence<Is>...> seq;
+  TURBO_MAYBE_UNUSED Counter<turbo::make_index_sequence<Is>...> seq;
 }
 
 // This test verifies that turbo::make_index_sequence can handle large arguments
@@ -99,7 +99,7 @@ TEST(IntegerSequenceTest, MakeIndexSequencePerformance) {
   // O(log N) template instantiations.
   // We only need an alias here, but instantiate a variable to silence warnings
   // for unused typedefs in some compilers.
-  TURBO_ALLOW_UNUSED turbo::make_index_sequence<(1 << 16) - 1> seq;
+  TURBO_MAYBE_UNUSED turbo::make_index_sequence<(1 << 16) - 1> seq;
   // O(N) template instantiations.
   CountAll(turbo::make_index_sequence<(1 << 8) - 1>());
 }

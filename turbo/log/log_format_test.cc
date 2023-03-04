@@ -911,7 +911,7 @@ struct PointWithTurboStringifiyAndOstream {
   int y = 20;
 };
 
-TURBO_ALLOW_UNUSED std::ostream& operator<<(
+TURBO_MAYBE_UNUSED std::ostream& operator<<(
     std::ostream& os, const PointWithTurboStringifiyAndOstream&) {
   return os << "Default to TurboStringify()";
 }

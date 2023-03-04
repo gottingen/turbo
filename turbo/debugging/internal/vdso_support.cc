@@ -190,7 +190,7 @@ long VDSOSupport::InitAndGetCPU(unsigned *cpu,  // NOLINT(runtime/int)
 // This function must be very fast, and may be called from very
 // low level (e.g. tcmalloc). Hence I avoid things like
 // GoogleOnceInit() and ::operator new.
-TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY
+TURBO_NO_SANITIZE_MEMORY
 int GetCPU() {
   unsigned cpu;
   long ret_code =  // NOLINT(runtime/int)

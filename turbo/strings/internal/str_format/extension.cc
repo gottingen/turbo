@@ -33,7 +33,7 @@ std::string FlagsToString(Flags v) {
   return s;
 }
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 
 #define TURBO_INTERNAL_X_VAL(id) \
   constexpr turbo::FormatConversionChar FormatConversionCharInternal::id;
@@ -53,7 +53,7 @@ constexpr FormatConversionCharSet FormatConversionCharSetInternal::kFloating;
 constexpr FormatConversionCharSet FormatConversionCharSetInternal::kNumeric;
 constexpr FormatConversionCharSet FormatConversionCharSetInternal::kPointer;
 
-#endif  // TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#endif  // TURBO_COMPILER_CPP17_ENABLED
 
 bool FormatSinkImpl::PutPaddedString(string_piece value, int width,
                                      int precision, bool left) {

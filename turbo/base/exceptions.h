@@ -37,7 +37,7 @@ TURBO_DISABLE_GCC_WARNING(-Wnoexcept-type)
 // TODO COLD IT
 template <typename Ex>
 TURBO_NORETURN TURBO_NO_INLINE TURBO_COLD void throw_exception(Ex&& ex) {
-#if TURBO_HAVE_EXCEPTIONS
+#ifdef TURBO_HAVE_EXCEPTIONS
   throw static_cast<Ex&&>(ex);
 #else
   (void)ex;
@@ -152,7 +152,7 @@ template <
     std::enable_if_t<!std::is_function<FD>::value, int> = 0,
     typename R = decltype(TURBO_DECLVAL(F &&)(TURBO_DECLVAL(A &&)...))>
 TURBO_NO_INLINE TURBO_COLD R invoke_cold(F&& f, A&&... a) //
-    TURBO_NOEXCEPT_IF(TURBO_NOEXCEPT_EXPR(static_cast<F&&>(f)(static_cast<A&&>(a)...))) {
+    noexcept(noexcept(static_cast<F&&>(f)(static_cast<A&&>(a)...))) {
   return static_cast<F&&>(f)(static_cast<A&&>(a)...);
 }
 template <
@@ -162,7 +162,7 @@ template <
     std::enable_if_t<std::is_function<FD>::value, int> = 0,
     typename R = decltype(TURBO_DECLVAL(F &&)(TURBO_DECLVAL(A &&)...))>
 TURBO_INLINE_VISIBILITY R invoke_cold(F&& f, A&&... a)
-    TURBO_NOEXCEPT_IF(TURBO_NOEXCEPT_EXPR(f(static_cast<A&&>(a)...))) {
+    noexcept(noexcept(f(static_cast<A&&>(a)...))) {
   return f(static_cast<A&&>(a)...);
 }
 

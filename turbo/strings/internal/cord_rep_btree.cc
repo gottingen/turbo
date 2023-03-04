@@ -33,7 +33,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr size_t CordRepBtree::kMaxCapacity;
 #endif
 

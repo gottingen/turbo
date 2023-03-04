@@ -340,7 +340,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
   static constexpr size_t kMaxStreams = 3;
 };
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 alignas(16) constexpr uint64_t
     CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::k1k2[2];
 alignas(16) constexpr uint64_t
@@ -356,7 +356,7 @@ alignas(16) constexpr uint32_t
 constexpr size_t
     CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::kGroupsSmall;
 constexpr size_t CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::kMaxStreams;
-#endif  // TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#endif  // TURBO_COMPILER_CPP17_ENABLED
 
 template <size_t num_crc_streams, size_t num_pclmul_streams,
           CutoffStrategy strategy>

@@ -109,7 +109,7 @@ struct CordRepFlat : public CordRep {
 
   // Creates a new flat node.
   template <size_t max_flat_size, typename... Args>
-  static CordRepFlat* NewImpl(size_t len, Args... args TURBO_ALLOW_UNUSED) {
+  static CordRepFlat* NewImpl(size_t len, Args... args TURBO_MAYBE_UNUSED) {
     if (len <= kMinFlatLength) {
       len = kMinFlatLength;
     } else if (len > max_flat_size - kFlatOverhead) {

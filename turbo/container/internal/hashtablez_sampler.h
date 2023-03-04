@@ -216,7 +216,7 @@ extern TURBO_PER_THREAD_TLS_KEYWORD SamplingState global_next_sample;
 // Returns an RAII sampling handle that manages registration and unregistation
 // with the global sampler.
 inline HashtablezInfoHandle Sample(
-    size_t inline_element_size TURBO_ALLOW_UNUSED) {
+    size_t inline_element_size TURBO_MAYBE_UNUSED) {
 #if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
   if (TURBO_LIKELY(--global_next_sample.next_sample > 0)) {
     return HashtablezInfoHandle(nullptr);

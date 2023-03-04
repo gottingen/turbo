@@ -855,7 +855,7 @@ TURBO_RETIRED_FLAG(std::string, old_str_flag, "", turbo::StrCat("old ", "descr")
 
 namespace {
 
-bool initialization_order_fiasco_test TURBO_ALLOW_UNUSED = [] {
+bool initialization_order_fiasco_test TURBO_MAYBE_UNUSED = [] {
   // Iterate over all the flags during static initialization.
   // This should not trigger ASan's initialization-order-fiasco.
   auto* handle1 = turbo::FindCommandLineFlag("flag_on_separate_file");

@@ -185,7 +185,7 @@ const std::string* Status::EmptyString() {
   return &empty.str;
 }
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr const char Status::kMovedFromString[];
 #endif
 

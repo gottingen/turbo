@@ -23,7 +23,7 @@
 #ifndef TURBO_STRINGS_NUMBERS_H_
 #define TURBO_STRINGS_NUMBERS_H_
 
-#ifdef __SSSE3__
+#if TURBO_SSSE3
 #include <tmmintrin.h>
 #endif
 
@@ -241,7 +241,7 @@ TURBO_MUST_USE_RESULT bool safe_strtoi_base(turbo::string_piece s, int_type* out
 // Returns the number of non-pad digits of the output (it can never be zero
 // since 0 has one digit).
 inline size_t FastHexToBufferZeroPad16(uint64_t val, char* out) {
-#ifdef TURBO_INTERNAL_HAVE_SSSE3
+#if TURBO_SSSE3
   uint64_t be = turbo::big_endian::FromHost64(val);
   const auto kNibbleMask = _mm_set1_epi8(0xf);
   const auto kHexDigits = _mm_setr_epi8('0', '1', '2', '3', '4', '5', '6', '7',

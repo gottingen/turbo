@@ -57,7 +57,7 @@
 
 #define TURBO_LOG_INTERNAL_CHECK_OP(name, op, val1, val1_text, val2, val2_text) \
   while (                                                                      \
-      ::std::string* turbo_log_internal_check_op_result TURBO_ALLOW_UNUSED = \
+      ::std::string* turbo_log_internal_check_op_result TURBO_MAYBE_UNUSED = \
           ::turbo::log_internal::name##Impl(                                    \
               ::turbo::log_internal::GetReferenceableValue(val1),               \
               ::turbo::log_internal::GetReferenceableValue(val2),               \
@@ -282,7 +282,7 @@ using CheckOpStreamType = decltype(detect_specialization::Detect<T>(0));
 
 // Build the error message string.  Specify no inlining for code size.
 template <typename T1, typename T2>
-TURBO_ATTRIBUTE_RETURNS_NONNULL std::string* MakeCheckOpString(
+TURBO_RETURNS_NONNULL std::string* MakeCheckOpString(
     T1 v1, T2 v2, const char* exprtext) TURBO_NO_INLINE;
 
 template <typename T1, typename T2>

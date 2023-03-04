@@ -26,7 +26,7 @@
 
 namespace {
 
-auto* test_env TURBO_ALLOW_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_MAYBE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 // TODO(b/69907837): Revisit these tests with the goal of making them less

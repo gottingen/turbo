@@ -33,7 +33,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr int HashtablezInfo::kMaxStackDepth;
 #endif
 
@@ -159,7 +159,7 @@ void UnsampleSlow(HashtablezInfo* info) {
 }
 
 void RecordRehashSlow(HashtablezInfo* info, size_t total_probe_length) {
-#ifdef TURBO_INTERNAL_HAVE_SSE2
+#if TURBO_SSE2
   total_probe_length /= 16;
 #else
   total_probe_length /= 8;
@@ -200,7 +200,7 @@ void RecordInsertSlow(HashtablezInfo* info, size_t hash,
   // SwissTables probe in groups of 16, so scale this to count items probes and
   // not offset from desired.
   size_t probe_length = distance_from_desired;
-#ifdef TURBO_INTERNAL_HAVE_SSE2
+#if TURBO_SSE2
   probe_length /= 16;
 #else
   probe_length /= 8;

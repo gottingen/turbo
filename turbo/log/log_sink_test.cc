@@ -38,7 +38,7 @@ using ::testing::AnyNumber;
 using ::testing::HasSubstr;
 using ::testing::InSequence;
 
-auto* test_env TURBO_ALLOW_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_MAYBE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 // Tests for global log sink registration.

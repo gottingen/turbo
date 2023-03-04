@@ -301,7 +301,7 @@ TURBO_NAMESPACE_END
 // retired flags are cleaned up.
 #define TURBO_RETIRED_FLAG(type, name, default_value, explanation)      \
   static turbo::flags_internal::RetiredFlag<type> RETIRED_FLAGS_##name; \
-  TURBO_ALLOW_UNUSED static const auto RETIRED_FLAGS_REG_##name =   \
+  TURBO_MAYBE_UNUSED static const auto RETIRED_FLAGS_REG_##name =   \
       (RETIRED_FLAGS_##name.Retire(#name),                             \
        ::turbo::flags_internal::FlagRegistrarEmpty{})
 

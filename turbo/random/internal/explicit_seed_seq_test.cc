@@ -166,12 +166,12 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
 
     // Apply the assignment-operator.
     // GCC 12 has a false-positive -Wstringop-overflow warning here.
-#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
     another_seq = seq_from_entropy;
-#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic pop
 #endif
 

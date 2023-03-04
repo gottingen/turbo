@@ -161,7 +161,7 @@ static CordRep* CordRepFromString(std::string&& src) {
 // --------------------------------------------------------------------
 // Cord::InlineRep functions
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr unsigned char Cord::InlineRep::kMaxInline;
 #endif
 

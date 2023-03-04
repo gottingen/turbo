@@ -334,7 +334,7 @@ std::ostream& operator<<(std::ostream& os, int128 v) {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 namespace std {
 constexpr bool numeric_limits<turbo::uint128>::is_specialized;
 constexpr bool numeric_limits<turbo::uint128>::is_signed;

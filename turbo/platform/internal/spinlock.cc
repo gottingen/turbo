@@ -66,7 +66,7 @@ void RegisterSpinLockProfiler(void (*fn)(const void *contendedlock,
   submit_profile_data.Store(fn);
 }
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 // Static member variable definitions.
 constexpr uint32_t SpinLock::kSpinLockHeld;
 constexpr uint32_t SpinLock::kSpinLockCooperative;

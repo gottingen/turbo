@@ -129,7 +129,7 @@ class CordRepRing::Filler {
   index_type pos_;
 };
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr size_t CordRepRing::kMaxCapacity;
 #endif
 

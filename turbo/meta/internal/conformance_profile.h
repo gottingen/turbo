@@ -719,7 +719,7 @@ struct SyntacticConformanceProfileOf {
                                                          type##_support); \
   TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF_IMPL(bool, is_##type)
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF(default_constructible);
 TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF(move_constructible);
 TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF(copy_constructible);

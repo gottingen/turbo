@@ -21,7 +21,7 @@
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr size_t CordBuffer::kDefaultLimit;
 constexpr size_t CordBuffer::kCustomLimit;
 #endif

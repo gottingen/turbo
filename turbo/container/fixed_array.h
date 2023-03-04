@@ -488,7 +488,7 @@ class FixedArray {
   Storage storage_;
 };
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 template <typename T, size_t N, typename A>
 constexpr size_t FixedArray<T, N, A>::kInlineBytesDefault;
 

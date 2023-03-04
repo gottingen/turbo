@@ -50,7 +50,7 @@ struct StringConstant {
                 "The input string_piece must point to constant data.");
 };
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 template <typename T>
 constexpr turbo::string_piece StringConstant<T>::value;
 #endif

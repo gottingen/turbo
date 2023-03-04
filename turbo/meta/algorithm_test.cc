@@ -52,12 +52,12 @@ TEST(EqualTest, EmptyRange) {
   std::vector<int> empty2;
 
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105705
-#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnonnull"
 #endif
   EXPECT_FALSE(turbo::equal(v1.begin(), v1.end(), empty1.begin(), empty1.end()));
-#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic pop
 #endif
   EXPECT_FALSE(turbo::equal(empty1.begin(), empty1.end(), v1.begin(), v1.end()));

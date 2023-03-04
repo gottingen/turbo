@@ -35,7 +35,7 @@ alignas(16) TURBO_CONST_INIT TURBO_DLL const ctrl_t kEmptyGroup[17] = {
     ctrl_t::kEmpty,    ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     static_cast<ctrl_t>(0)};
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr size_t Group::kWidth;
 #endif
 

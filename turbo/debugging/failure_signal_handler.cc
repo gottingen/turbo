@@ -184,7 +184,7 @@ static bool SetupAlternateStackOnce() {
 // if the system supports using an alternate stack.
 static int MaybeSetupAlternateStack() {
 #ifdef TURBO_HAVE_SIGALTSTACK
-  TURBO_ALLOW_UNUSED static const bool kOnce = SetupAlternateStackOnce();
+  TURBO_MAYBE_UNUSED static const bool kOnce = SetupAlternateStackOnce();
   return SA_ONSTACK;
 #else
   return 0;

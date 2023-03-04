@@ -10,10 +10,6 @@
 #define TURBO_PLATFORM_CONFIG_UNITS_H_
 
 
-#if defined(TURBO_PRAGMA_ONCE_SUPPORTED)
-	#pragma once // Some compilers (e.g. VC++) benefit significantly from using this. We've measured 3-4% build speed improvements in apps as a result.
-#endif
-
 // Defining common SI unit macros.
 //
 // The mebibyte is a multiple of the unit byte for digital information. Technically a

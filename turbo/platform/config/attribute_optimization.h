@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Turbo Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@
 //
 // This header file defines portable macros for performance optimization.
 
-#ifndef TURBO_BASE_OPTIMIZATION_H_
-#define TURBO_BASE_OPTIMIZATION_H_
+#ifndef TURBO_PLATFORM_ATTRIBUTE_OPTIMIZATION_H_
+#define TURBO_PLATFORM_ATTRIBUTE_OPTIMIZATION_H_
 
-#include <assert.h>
+#include <cassert>
 
-#include "turbo/platform/config/config.h"
+#include "turbo/platform/config/compiler_traits.h"
+#include "turbo/platform/config/attribute_warning.h"
+#include "turbo/platform/options.h"
 
 // TURBO_BLOCK_TAIL_CALL_OPTIMIZATION
 //
@@ -106,52 +108,6 @@
 #define TURBO_CACHE_LINE_ALIGNED
 #endif
 
-// `TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL()` aborts the program in the fastest
-// possible way, with no attempt at logging. One use is to implement hardening
-// aborts with TURBO_OPTION_HARDENED.  Since this is an internal symbol, it
-// should not be used directly outside of Turbo.
-#if TURBO_HAVE_BUILTIN(__builtin_trap) || \
-    (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL() __builtin_trap()
-#else
-#define TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL() abort()
-#endif
-
-// `TURBO_INTERNAL_UNREACHABLE_IMPL()` is the platform specific directive to
-// indicate that a statement is unreachable, and to allow the compiler to
-// optimize accordingly. Clients should use `TURBO_UNREACHABLE()`, which is
-// defined below.
-#if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable >= 202202L
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() std::unreachable()
-#elif defined(__GNUC__) || TURBO_HAVE_BUILTIN(__builtin_unreachable)
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() __builtin_unreachable()
-#elif TURBO_HAVE_BUILTIN(__builtin_assume)
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() __builtin_assume(false)
-#elif defined(_MSC_VER)
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() __assume(false)
-#else
-#define TURBO_INTERNAL_UNREACHABLE_IMPL()
-#endif
-
-// `TURBO_UNREACHABLE()` is an unreachable statement.  A program which reaches
-// one has undefined behavior, and the compiler may optimize accordingly.
-#if TURBO_OPTION_HARDENED == 1 && defined(NDEBUG)
-// Abort in hardened mode to avoid dangerous undefined behavior.
-#define TURBO_UNREACHABLE()                \
-  do {                                    \
-    TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL(); \
-    TURBO_INTERNAL_UNREACHABLE_IMPL();     \
-  } while (false)
-#else
-// The assert only fires in debug mode to aid in debugging.
-// When NDEBUG is defined, reaching TURBO_UNREACHABLE() is undefined behavior.
-#define TURBO_UNREACHABLE()                       \
-  do {                                           \
-    /* NOLINTNEXTLINE: misc-static-assert */     \
-    assert(false && "TURBO_UNREACHABLE reached"); \
-    TURBO_INTERNAL_UNREACHABLE_IMPL();            \
-  } while (false)
-#endif
 
 // TURBO_INTERNAL_UNIQUE_SMALL_NAME(cond)
 // This macro forces small unique name on a static file level symbols like
@@ -179,4 +135,65 @@
 #define TURBO_INTERNAL_UNIQUE_SMALL_NAME()
 #endif
 
-#endif  // TURBO_BASE_OPTIMIZATION_H_
+
+// ------------------------------------------------------------------------
+// TURBO_OPTIMIZE_OFF / TURBO_OPTIMIZE_ON
+//
+// Implements portable inline optimization enabling/disabling.
+// Usage of these macros must be in order OFF then ON. This is
+// because the OFF macro pushes a set of settings and the ON
+// macro pops them. The nesting of OFF/ON sets (e.g. OFF, OFF, ON, ON)
+// is not guaranteed to work on all platforms.
+//
+// This is often used to allow debugging of some code that's
+// otherwise compiled with undebuggable optimizations. It's also
+// useful for working around compiler code generation problems
+// that occur in optimized builds.
+//
+// Some compilers (e.g. VC++) don't allow doing this within a function and
+// so the usage must be outside a function, as with the example below.
+// GCC on x86 appears to have some problem with argument passing when
+// using TURBO_OPTIMIZE_OFF in optimized builds.
+//
+// Example usage:
+//     // Disable optimizations for SomeFunction.
+//     TURBO_OPTIMIZE_OFF()
+//     void SomeFunction()
+//     {
+//         ...
+//     }
+//     TURBO_OPTIMIZE_ON()
+//
+#if !defined(TURBO_OPTIMIZE_OFF)
+#if   defined(TURBO_COMPILER_MSVC)
+#define TURBO_OPTIMIZE_OFF() __pragma(optimize("", off))
+#elif defined(TURBO_COMPILER_GNUC) && (TURBO_COMPILER_VERSION > 4004) && (defined(__i386__) || defined(__x86_64__)) // GCC 4.4+ - Seems to work only on x86/Linux so far. However, GCC 4.4 itself appears broken and screws up parameter passing conventions.
+#define TURBO_OPTIMIZE_OFF()            \
+				_Pragma("GCC push_options")      \
+				_Pragma("GCC optimize 0")
+#elif defined(TURBO_COMPILER_CLANG) && (!defined(TURBO_PLATFORM_ANDROID) || (TURBO_COMPILER_VERSION >= 380))
+#define TURBO_OPTIMIZE_OFF() \
+				TURBO_DISABLE_CLANG_WARNING(-Wunknown-pragmas) \
+				_Pragma("clang optimize off") \
+				TURBO_RESTORE_CLANG_WARNING()
+#else
+#define TURBO_OPTIMIZE_OFF()
+#endif
+#endif
+
+#if !defined(TURBO_OPTIMIZE_ON)
+#if   defined(TURBO_COMPILER_MSVC)
+#define TURBO_OPTIMIZE_ON() __pragma(optimize("", on))
+#elif defined(TURBO_COMPILER_GNUC) && (TURBO_COMPILER_VERSION > 4004) && (defined(__i386__) || defined(__x86_64__)) // GCC 4.4+ - Seems to work only on x86/Linux so far. However, GCC 4.4 itself appears broken and screws up parameter passing conventions.
+#define TURBO_OPTIMIZE_ON() _Pragma("GCC pop_options")
+#elif defined(TURBO_COMPILER_CLANG) && (!defined(TURBO_PLATFORM_ANDROID) || (TURBO_COMPILER_VERSION >= 380))
+#define TURBO_OPTIMIZE_ON() \
+				TURBO_DISABLE_CLANG_WARNING(-Wunknown-pragmas) \
+				_Pragma("clang optimize on") \
+				TURBO_RESTORE_CLANG_WARNING()
+#else
+#define TURBO_OPTIMIZE_ON()
+#endif
+#endif
+
+#endif  // TURBO_PLATFORM_ATTRIBUTE_OPTIMIZATION_H_

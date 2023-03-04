@@ -206,7 +206,7 @@ string_piece::size_type string_piece::find_last_not_of(
 }
 
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr string_piece::size_type string_piece::npos;
 constexpr string_piece::size_type string_piece::kMaxSize;
 #endif
