@@ -1384,7 +1384,7 @@ TURBO_FORCE_INLINE bool is_low_surrogate(uint32_t c) {
   return (c & 0xfffffc00) == 0xdc00;
 }
 
-TURBO_FORCE_INLINE void appendUTF8(std::string &str, uint32_t unicode) {
+inline void appendUTF8(std::string &str, uint32_t unicode) {
   if (unicode <= 0x7f) {
     str.push_back(static_cast<char>(unicode));
   } else if (unicode >= 0x80 && unicode <= 0x7ff) {
