@@ -458,6 +458,10 @@ TEST(HashValueTest, Strings) {
   // Make sure that hashing a `const char*` does not use its string-value.
   EXPECT_NE(SpyHash(static_cast<const char*>("ABC")),
             SpyHash(turbo::string_piece("ABC")));
+  EXPECT_NE(SpyHash(static_cast<const char*>("ABC")),
+            SpyHash(turbo::string_view("ABC")));
+  EXPECT_EQ(turbo::Hash<turbo::string_piece>{}("ABC"),
+            turbo::Hash<turbo::string_view>{}("ABC"));
 }
 
 TEST(HashValueTest, WString) {
