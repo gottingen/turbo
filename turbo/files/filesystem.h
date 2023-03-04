@@ -4699,7 +4699,7 @@ TURBO_FORCE_INLINE uintmax_t remove_all(const path &p) {
 }
 #endif
 
-TURBO_FORCE_INLINE uintmax_t remove_all(const path &p,
+inline uintmax_t remove_all(const path &p,
                                         std::error_code &ec) noexcept {
   ec.clear();
   uintmax_t count = 0;
