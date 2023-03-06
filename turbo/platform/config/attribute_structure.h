@@ -45,20 +45,19 @@
 //    };
 //
 #if !defined(TURBO_NON_COPYABLE)
-#if defined(TURBO_COMPILER_NO_DELETED_FUNCTIONS)
-#define TURBO_NON_COPYABLE(EAClass_)               \
-			  private:                                      \
-				TURBO_DISABLE_VC_WARNING(4822);	/* local class member function does not have a body	*/		\
-				EAClass_(const EAClass_&);                  \
-				void operator=(const EAClass_&);			\
-				TURBO_RESTORE_VC_WARNING();
-#else
-#define TURBO_NON_COPYABLE(EAClass_)               \
-				TURBO_DISABLE_VC_WARNING(4822);	/* local class member function does not have a body	*/		\
-				EAClass_(const EAClass_&) = delete;         \
-				void operator=(const EAClass_&) = delete;	\
-				TURBO_RESTORE_VC_WARNING();
+#define TURBO_NON_COPYABLE(TBClass_)               \
+        TURBO_DISABLE_VC_WARNING(4822);	/* local class member function does not have a body	*/		\
+        TBClass_(const TBClass_&) = delete;         \
+        void operator=(const TBClass_&) = delete;	\
+        TURBO_RESTORE_VC_WARNING();
 #endif
+
+#if !defined(TURBO_NON_MOVEABLE)
+#define TURBO_NON_MOVEABLE(TBClass_)               \
+        TURBO_DISABLE_VC_WARNING(4822);	/* local class member function does not have a body	*/		\
+        TBClass_(TBClass_*&) = delete;         \
+        void operator=(TBClass_&&) = delete;	\
+        TURBO_RESTORE_VC_WARNING();
 #endif
 
 // ------------------------------------------------------------------------

@@ -383,3 +383,22 @@ turbo_cc_test(
     GTest::gmock
     GTest::gtest_main
 )
+
+turbo_cc_test(
+        NAME
+        ansicolor_sink_test
+        SRCS
+        "sinks/ansicolor_sink_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        LINKOPTS
+        ${TURBO_DEFAULT_LINKOPTS}
+        DEPS
+        turbo::turbo
+        turbo::log_internal_test_helpers
+        turbo::log_internal_test_matchers
+        turbo::scoped_mock_log
+        GTest::gmock
+        GTest::gtest_main
+)
+
