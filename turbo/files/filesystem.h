@@ -435,6 +435,11 @@ public:
   iterator begin() const;
   iterator end() const;
 
+  template <typename H>
+  friend H TurboHashValue(H h, const path &p) {
+    return H::combine(std::move(h), p.string());
+  }
+
 private:
   using impl_value_type = value_type;
   using impl_string_type = std::basic_string<impl_value_type>;

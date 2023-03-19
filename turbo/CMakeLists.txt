@@ -79,6 +79,7 @@ set(TURBO_ALL_SRC
         "log/internal/nullguard.cc"
         "log/internal/proto.cc"
         "log/sinks/ansicolor_sink.cc"
+        "log/sinks/daily_file_sink.cc"
         "log/die_if_null.cc"
         "log/flags.cc"
         "log/globals.cc"

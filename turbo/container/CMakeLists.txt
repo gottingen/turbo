@@ -544,3 +544,15 @@ turbo_cc_test(
     turbo::turbo
     GTest::gmock_main
 )
+
+turbo_cc_test(
+        NAME
+        ring_buffer_test
+        SRCS
+        "ring_buffer_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
