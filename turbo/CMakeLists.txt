@@ -179,8 +179,6 @@ set(TURBO_ALL_SRC
         "time/internal/cctz/src/time_zone_lookup.cc"
         "time/internal/cctz/src/time_zone_posix.cc"
         "time/internal/cctz/src/zone_info_source.cc"
-        "unicode/encoding_types.cc"
-        "unicode/error.cc"
         )
 
 turbo_cc_library(
