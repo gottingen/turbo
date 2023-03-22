@@ -494,7 +494,8 @@
 #define TURBO_DLL
 #endif
 #else
-#define TURBO_DLL __attribute__ ((visibility("default")))
+#define TURBO_DLL
+//#define TURBO_DLL __attribute__ ((visibility("default")))
 #endif  // defined(_MSC_VER)
 
 #ifndef TURBO_HIDDEN

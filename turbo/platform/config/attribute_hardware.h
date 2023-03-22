@@ -189,4 +189,81 @@
 #endif
 
 
+
+///////////////////////////////////////////////////
+// It's possible to override AVX512 settings with cmake DCMAKE_CXX_FLAGS.
+//
+// All preprocessor directives has form `SIMDUTF_HAS_AVX512{feature}`,
+//    where a feature is a code name for extensions.
+//
+//    Please see the listing below to find which are supported.
+///////////////////////////////////////////////////
+
+#ifndef TURBO_HAVE_AVX512F
+# if defined(__AVX512F__) && __AVX512F__ == 1
+#   define TURBO_HAVE_AVX512F 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512DQ
+# if defined(__AVX512DQ__) && __AVX512DQ__ == 1
+#   define TURBO_HAVE_AVX512DQ 1
+# endif
+#endif
+
+#ifndef TUBO_HAVE_AVX512IFMA
+# if defined(__AVX512IFMA__) && __AVX512IFMA__ == 1
+#   define TUBO_HAVE_AVX512IFMA 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512CD
+# if defined(__AVX512CD__) && __AVX512CD__ == 1
+#   define TURBO_HAVE_AVX512CD 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512BW
+# if defined(__AVX512BW__) && __AVX512BW__ == 1
+#   define TURBO_HAVE_AVX512BW 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512VL
+# if defined(__AVX512VL__) && __AVX512VL__ == 1
+#   define TURBO_HAVE_AVX512VL 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512VBMI
+# if defined(__AVX512VBMI__) && __AVX512VBMI__ == 1
+#   define TURBO_HAVE_AVX512VBMI 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512VBMI2
+# if defined(__AVX512VBMI2__) && __AVX512VBMI2__ == 1
+#   define TURBO_HAVE_AVX512VBMI2 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512VNNI
+# if defined(__AVX512VNNI__) && __AVX512VNNI__ == 1
+#   define TURBO_HAVE_AVX512VNNI 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512BITALG
+# if defined(__AVX512BITALG__) && __AVX512BITALG__ == 1
+#   define TURBO_HAVE_AVX512BITALG 1
+# endif
+#endif
+
+#ifndef TURBO_HAVE_AVX512VPOPCNTDQ
+# if defined(__AVX512VPOPCNTDQ__) && __AVX512VPOPCNTDQ__ == 1
+#   define TURBO_HAVE_AVX512VPOPCNTDQ 1
+# endif
+#endif
+
+
 #endif // TURBO_PLATFORM_CONFIG_ATTRIBUTE_HARDWARE_H_

@@ -179,6 +179,7 @@ set(TURBO_ALL_SRC
         "time/internal/cctz/src/time_zone_lookup.cc"
         "time/internal/cctz/src/time_zone_posix.cc"
         "time/internal/cctz/src/zone_info_source.cc"
+        "unicode/utf.cc"
         )
 
 turbo_cc_library(
@@ -211,6 +212,7 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(strings)
     add_subdirectory(synchronization)
     add_subdirectory(time)
+    add_subdirectory(unicode)
 endif (TURBO_BUILD_TESTING)
 if (${TURBO_BUILD_DLL})
     turbo_make_dll()

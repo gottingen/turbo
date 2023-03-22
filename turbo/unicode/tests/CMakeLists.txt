@@ -1,0 +1,668 @@
+#
+# Copyright 2023 The Turbo Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+add_subdirectory(reference)
+add_subdirectory(helpers)
+
+turbo_cc_test(
+        NAME
+        convert_utf8_to_utf16be_test
+        SRCS
+        "convert_utf8_to_utf16be_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf8_to_utf16be_with_errors_test
+        SRCS
+        "convert_utf8_to_utf16be_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
+        NAME
+        convert_utf8_to_utf16le_test
+        SRCS
+        "convert_utf8_to_utf16le_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
+        NAME
+        convert_utf8_to_utf16le_with_errors_test
+        SRCS
+        "convert_utf8_to_utf16le_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf8_to_utf32_test
+        SRCS
+        "convert_utf8_to_utf32_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
+        NAME
+        convert_utf8_to_utf32_with_errors_test
+        SRCS
+        "convert_utf8_to_utf32_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16be_to_utf8_test
+        SRCS
+        "convert_utf16be_to_utf8_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16be_to_utf8_with_errors_test
+        SRCS
+        "convert_utf16be_to_utf8_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16be_to_utf32_test
+        SRCS
+        "convert_utf16be_to_utf32_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16be_to_utf32_with_errors_test
+        SRCS
+        "convert_utf16be_to_utf32_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16le_to_utf8_test
+        SRCS
+        "convert_utf16le_to_utf8_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16le_to_utf8_with_errors_test
+        SRCS
+        "convert_utf16le_to_utf8_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16le_to_utf32_test
+        SRCS
+        "convert_utf16le_to_utf32_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf16le_to_utf32_with_errors_test
+        SRCS
+        "convert_utf16le_to_utf32_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf32_to_utf8_test
+        SRCS
+        "convert_utf32_to_utf8_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf32_to_utf8_with_errors_test
+        SRCS
+        "convert_utf32_to_utf8_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf32_to_utf16be_test
+        SRCS
+        "convert_utf32_to_utf16be_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf32_to_utf16be_with_errors_test
+        SRCS
+        "convert_utf32_to_utf16be_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf32_to_utf16le_test
+        SRCS
+        "convert_utf32_to_utf16le_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_utf32_to_utf16le_with_errors_test
+        SRCS
+        "convert_utf32_to_utf16le_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf8_to_utf16be_test
+        SRCS
+        "convert_valid_utf8_to_utf16be_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf8_to_utf16le_test
+        SRCS
+        "convert_valid_utf8_to_utf16le_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf8_to_utf32_test
+        SRCS
+        "convert_valid_utf8_to_utf32_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf16be_to_utf8_test
+        SRCS
+        "convert_valid_utf16be_to_utf8_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf16be_to_utf32_test
+        SRCS
+        "convert_valid_utf16be_to_utf32_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf16le_to_utf8_test
+        SRCS
+        "convert_valid_utf16le_to_utf8_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf16le_to_utf32_test
+        SRCS
+        "convert_valid_utf16le_to_utf32_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf32_to_utf8_test
+        SRCS
+        "convert_valid_utf32_to_utf8_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf32_to_utf16be_test
+        SRCS
+        "convert_valid_utf32_to_utf16be_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
+        NAME
+        convert_valid_utf32_to_utf16le_test
+        SRCS
+        "convert_valid_utf32_to_utf16le_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        count_utf8_test
+        SRCS
+        "count_utf8_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        count_utf16be_test
+        SRCS
+        "count_utf16be_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
+        NAME
+        count_utf16le_test
+        SRCS
+        "count_utf16le_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        detect_encodings_test
+        SRCS
+        "detect_encodings_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
+        NAME
+        validate_ascii_basic_test
+        SRCS
+        "validate_ascii_basic_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_ascii_with_errors_test
+        SRCS
+        "validate_ascii_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+
+turbo_cc_test(
+        NAME
+        validate_utf8_basic_test
+        SRCS
+        "validate_utf8_basic_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf8_brute_force_test
+        SRCS
+        "validate_utf8_brute_force_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf8_puzzler_test
+        SRCS
+        "validate_utf8_puzzler_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf8_with_errors_test
+        SRCS
+        "validate_utf8_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf16be_basic_test
+        SRCS
+        "validate_utf16be_basic_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf16be_with_errors_test
+        SRCS
+        "validate_utf16be_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf16le_basic_test
+        SRCS
+        "validate_utf16le_basic_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf16le_with_errors_test
+        SRCS
+        "validate_utf16le_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf32_basic_test
+        SRCS
+        "validate_utf32_basic_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
+
+turbo_cc_test(
+        NAME
+        validate_utf32_with_errors_test
+        SRCS
+        "validate_utf32_with_errors_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::utf_helper
+        turbo::utf_ref
+        GTest::gtest_main
+)
