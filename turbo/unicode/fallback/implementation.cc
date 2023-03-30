@@ -14,23 +14,23 @@
 
 #include "turbo/unicode/simdutf/fallback/begin.h"
 
-#include "turbo/unicode/scalar/utf8_to_utf16/valid_utf8_to_utf16.h"
-#include "turbo/unicode/scalar/utf8_to_utf16/utf8_to_utf16.h"
+#include "turbo/unicode/scalar/valid_utf8_to_utf16.h"
+#include "turbo/unicode/scalar/utf8_to_utf16.h"
 
-#include "turbo/unicode/scalar/utf8_to_utf32/valid_utf8_to_utf32.h"
-#include "turbo/unicode/scalar/utf8_to_utf32/utf8_to_utf32.h"
+#include "turbo/unicode/scalar/valid_utf8_to_utf32.h"
+#include "turbo/unicode/scalar/utf8_to_utf32.h"
 
-#include "turbo/unicode/scalar/utf16_to_utf8/valid_utf16_to_utf8.h"
-#include "turbo/unicode/scalar/utf16_to_utf8/utf16_to_utf8.h"
+#include "turbo/unicode/scalar/valid_utf16_to_utf8.h"
+#include "turbo/unicode/scalar/utf16_to_utf8.h"
 
-#include "turbo/unicode/scalar/utf16_to_utf32/valid_utf16_to_utf32.h"
-#include "turbo/unicode/scalar/utf16_to_utf32/utf16_to_utf32.h"
+#include "turbo/unicode/scalar/valid_utf16_to_utf32.h"
+#include "turbo/unicode/scalar/utf16_to_utf32.h"
 
-#include "turbo/unicode/scalar/utf32_to_utf8/valid_utf32_to_utf8.h"
-#include "turbo/unicode/scalar/utf32_to_utf8/utf32_to_utf8.h"
+#include "turbo/unicode/scalar/valid_utf32_to_utf8.h"
+#include "turbo/unicode/scalar/utf32_to_utf8.h"
 
-#include "turbo/unicode/scalar/utf32_to_utf16/valid_utf32_to_utf16.h"
-#include "turbo/unicode/scalar/utf32_to_utf16/utf32_to_utf16.h"
+#include "turbo/unicode/scalar/valid_utf32_to_utf16.h"
+#include "turbo/unicode/scalar/utf32_to_utf16.h"
 
 #include "turbo/unicode/scalar/ascii.h"
 #include "turbo/unicode/scalar/utf8.h"

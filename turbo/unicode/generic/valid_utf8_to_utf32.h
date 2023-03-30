@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/scalar/utf8_to_utf32/valid_utf8_to_utf32.h"
+#include "turbo/unicode/scalar/valid_utf8_to_utf32.h"
 
 namespace simdutf {
 namespace SIMDUTF_IMPLEMENTATION {

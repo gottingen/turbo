@@ -14,10 +14,10 @@
 
 #include "turbo/unicode/simdutf/icelake/intrinsics.h"
 
-#include "turbo/unicode/scalar/utf16_to_utf8/valid_utf16_to_utf8.h"
-#include "turbo/unicode/scalar/utf16_to_utf8/utf16_to_utf8.h"
-#include "turbo/unicode/scalar/utf8_to_utf16/valid_utf8_to_utf16.h"
-#include "turbo/unicode/scalar/utf8_to_utf16/utf8_to_utf16.h"
+#include "turbo/unicode/scalar/valid_utf16_to_utf8.h"
+#include "turbo/unicode/scalar/utf16_to_utf8.h"
+#include "turbo/unicode/scalar/valid_utf8_to_utf16.h"
+#include "turbo/unicode/scalar/utf8_to_utf16.h"
 #include "turbo/unicode/scalar/utf8.h"
 #include "turbo/unicode/scalar/utf16.h"
 

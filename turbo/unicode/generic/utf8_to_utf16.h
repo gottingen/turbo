@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/scalar/utf8_to_utf32/utf8_to_utf32.h"
+#include "turbo/unicode/scalar/utf8_to_utf16.h"
 
 
 namespace simdutf {
 namespace SIMDUTF_IMPLEMENTATION {
 namespace {
-namespace utf8_to_utf32 {
+namespace utf8_to_utf16 {
 using namespace simd;
 
 
@@ -139,16 +139,16 @@ using namespace simd;
     }
 
 
-
-    simdutf_really_inline size_t convert(const char* in, size_t size, char32_t* utf32_output) {
+    template <endianness endian>
+    simdutf_really_inline size_t convert(const char* in, size_t size, char16_t* utf16_output) {
       size_t pos = 0;
-      char32_t* start{utf32_output};
+      char16_t* start{utf16_output};
       const size_t safety_margin = 16; // to avoid overruns!
       while(pos + 64 + safety_margin <= size) {
         simd8x64<int8_t> input(reinterpret_cast<const int8_t *>(in + pos));
         if(input.is_ascii()) {
-          input.store_ascii_as_utf32(utf32_output);
-          utf32_output += 64;
+          input.store_ascii_as_utf16<endian>(utf16_output);
+          utf16_output += 64;
           pos += 64;
         } else {
           // you might think that a for-loop would work, but under Visual Studio, it is not good enough.
@@ -182,8 +182,8 @@ using namespace simd;
             // for this section of the code. Hence, there is a limit
             // to how much we can further increase this latency before
             // it seriously harms performance.
-            size_t consumed = convert_masked_utf8_to_utf32(in + pos,
-                            utf8_end_of_code_point_mask, utf32_output);
+            size_t consumed = convert_masked_utf8_to_utf16<endian>(in + pos,
+                            utf8_end_of_code_point_mask, utf16_output);
             pos += consumed;
             utf8_end_of_code_point_mask >>= consumed;
           }
@@ -195,22 +195,23 @@ using namespace simd;
       }
       if(errors()) { return 0; }
       if(pos < size) {
-        size_t howmany  = scalar::utf8_to_utf32::convert(in + pos, size - pos, utf32_output);
+        size_t howmany  = scalar::utf8_to_utf16::convert<endian>(in + pos, size - pos, utf16_output);
         if(howmany == 0) { return 0; }
-        utf32_output += howmany;
+        utf16_output += howmany;
       }
-      return utf32_output - start;
+      return utf16_output - start;
     }
 
-    simdutf_really_inline result convert_with_errors(const char* in, size_t size, char32_t* utf32_output) {
+    template <endianness endian>
+    simdutf_really_inline result convert_with_errors(const char* in, size_t size, char16_t* utf16_output) {
       size_t pos = 0;
-      char32_t* start{utf32_output};
+      char16_t* start{utf16_output};
       const size_t safety_margin = 16; // to avoid overruns!
       while(pos + 64 + safety_margin <= size) {
         simd8x64<int8_t> input(reinterpret_cast<const int8_t *>(in + pos));
         if(input.is_ascii()) {
-          input.store_ascii_as_utf32(utf32_output);
-          utf32_output += 64;
+          input.store_ascii_as_utf16<endian>(utf16_output);
+          utf16_output += 64;
           pos += 64;
         } else {
           // you might think that a for-loop would work, but under Visual Studio, it is not good enough.
@@ -227,7 +228,9 @@ using namespace simd;
             this->check_utf8_bytes(input.chunks[3], input.chunks[2]);
           }
           if (errors()) {
-            result res = scalar::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos, utf32_output);
+            // rewind_and_convert_with_errors will seek a potential error from in+pos onward,
+            // with the ability to go back up to pos bytes, and read size-pos bytes forward.
+            result res = scalar::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos, in + pos, size - pos, utf16_output);
             res.count += pos;
             return res;
           }
@@ -249,8 +252,8 @@ using namespace simd;
             // for this section of the code. Hence, there is a limit
             // to how much we can further increase this latency before
             // it seriously harms performance.
-            size_t consumed = convert_masked_utf8_to_utf32(in + pos,
-                            utf8_end_of_code_point_mask, utf32_output);
+            size_t consumed = convert_masked_utf8_to_utf16<endian>(in + pos,
+                            utf8_end_of_code_point_mask, utf16_output);
             pos += consumed;
             utf8_end_of_code_point_mask >>= consumed;
           }
@@ -261,20 +264,24 @@ using namespace simd;
         }
       }
       if(errors()) {
-        result res = scalar::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos, utf32_output);
+        // rewind_and_convert_with_errors will seek a potential error from in+pos onward,
+        // with the ability to go back up to pos bytes, and read size-pos bytes forward.
+        result res = scalar::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos, in + pos, size - pos, utf16_output);
         res.count += pos;
         return res;
       }
       if(pos < size) {
-        result res = scalar::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos, utf32_output);
+        // rewind_and_convert_with_errors will seek a potential error from in+pos onward,
+        // with the ability to go back up to pos bytes, and read size-pos bytes forward.
+        result res = scalar::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos, in + pos, size - pos, utf16_output);
         if (res.error) {    // In case of error, we want the error position
           res.count += pos;
           return res;
         } else {    // In case of success, we want the number of word written
-          utf32_output += res.count;
+          utf16_output += res.count;
         }
       }
-      return result(error_code::SUCCESS, utf32_output - start);
+      return result(error_code::SUCCESS, utf16_output - start);
     }
 
     simdutf_really_inline bool errors() const {
@@ -282,7 +289,7 @@ using namespace simd;
     }
 
   }; // struct utf8_checker
-} // utf8_to_utf32 namespace
+} // utf8_to_utf16 namespace
 } // unnamed namespace
 } // namespace SIMDUTF_IMPLEMENTATION
 } // namespace simdutf

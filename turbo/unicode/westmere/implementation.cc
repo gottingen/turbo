@@ -59,14 +59,14 @@ simdutf_really_inline simd8<bool> must_be_2_3_continuation(const simd8<uint8_t> 
 } // namespace simdutf
 
 #include "turbo/unicode/generic/buf_block_reader.h"
-#include "turbo/unicode/generic/utf8_validation/utf8_lookup4_algorithm.h"
-#include "turbo/unicode/generic/utf8_validation/utf8_validator.h"
+#include "turbo/unicode/generic/utf8_lookup4_algorithm.h"
+#include "turbo/unicode/generic/utf8_validator.h"
 // transcoding from UTF-8 to UTF-16
-#include "turbo/unicode/generic/utf8_to_utf16/valid_utf8_to_utf16.h"
-#include "turbo/unicode/generic/utf8_to_utf16/utf8_to_utf16.h"
+#include "turbo/unicode/generic/valid_utf8_to_utf16.h"
+#include "turbo/unicode/generic/utf8_to_utf16.h"
 // transcoding from UTF-8 to UTF-32
-#include "turbo/unicode/generic/utf8_to_utf32/valid_utf8_to_utf32.h"
-#include "turbo/unicode/generic/utf8_to_utf32/utf8_to_utf32.h"
+#include "turbo/unicode/generic/valid_utf8_to_utf32.h"
+#include "turbo/unicode/generic/utf8_to_utf32.h"
 // other functions
 #include "turbo/unicode/generic/utf8.h"
 #include "turbo/unicode/generic/utf16.h"
