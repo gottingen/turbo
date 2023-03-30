@@ -52,19 +52,19 @@ namespace westmere {
 //
 // These two need to be included outside SIMDUTF_TARGET_REGION
 //
-#include "turbo/unicode/simdutf/westmere/implementation.h"
-#include "turbo/unicode/simdutf/westmere/intrinsics.h"
+#include "turbo/unicode/westmere/implementation.h"
+#include "turbo/unicode/westmere/intrinsics.h"
 
 //
 // The rest need to be inside the region
 //
-#include "turbo/unicode/simdutf/westmere/begin.h"
+#include "turbo/unicode/westmere/begin.h"
 
 // Declarations
-#include "turbo/unicode/simdutf/westmere/bitmanipulation.h"
-#include "turbo/unicode/simdutf/westmere/simd.h"
+#include "turbo/unicode/westmere/bitmanipulation.h"
+#include "turbo/unicode/westmere/simd.h"
 
-#include "turbo/unicode/simdutf/westmere/end.h"
+#include "turbo/unicode/westmere/end.h"
 
 #endif // SIMDUTF_IMPLEMENTATION_WESTMERE
 #endif // SIMDUTF_WESTMERE_COMMON_H

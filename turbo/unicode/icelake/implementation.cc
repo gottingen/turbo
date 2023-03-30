@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/simdutf/icelake/intrinsics.h"
+#include "turbo/unicode/icelake/intrinsics.h"
 
 #include "turbo/unicode/scalar/valid_utf16_to_utf8.h"
 #include "turbo/unicode/scalar/utf16_to_utf8.h"
@@ -21,7 +21,7 @@
 #include "turbo/unicode/scalar/utf8.h"
 #include "turbo/unicode/scalar/utf16.h"
 
-#include "turbo/unicode/simdutf/icelake/begin.h"
+#include "turbo/unicode/icelake/begin.h"
 namespace simdutf {
 namespace SIMDUTF_IMPLEMENTATION {
 namespace {
@@ -1151,4 +1151,4 @@ simdutf_warn_unused size_t implementation::utf32_length_from_utf8(const char * i
 } // namespace SIMDUTF_IMPLEMENTATION
 } // namespace simdutf
 
-#include "turbo/unicode/simdutf/icelake/end.h"
+#include "turbo/unicode/icelake/end.h"

@@ -21,7 +21,7 @@
 #include "turbo/unicode/scalar/utf8.h"
 #include "turbo/unicode/scalar/utf16.h"
 
-#include "turbo/unicode/simdutf/haswell/begin.h"
+#include "turbo/unicode/haswell/begin.h"
 namespace simdutf {
 namespace SIMDUTF_IMPLEMENTATION {
 namespace {
@@ -542,4 +542,4 @@ simdutf_warn_unused size_t implementation::utf32_length_from_utf8(const char * i
 } // namespace SIMDUTF_IMPLEMENTATION
 } // namespace simdutf
 
-#include "turbo/unicode/simdutf/haswell/end.h"
+#include "turbo/unicode/haswell/end.h"

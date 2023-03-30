@@ -34,7 +34,7 @@ SIMDUTF_DISABLE_UNDESIRED_WARNINGS
 // amalgamation working--otherwise, the first time a file is included, it might be put inside the
 // #ifdef SIMDUTF_IMPLEMENTATION_ARM64/FALLBACK/etc., which means the other implementations can't
 // compile unless that implementation is turned on).
-#include "simdutf/internal/isadetection.h"
+#include "turbo/unicode/internal/isadetection.h"
 
 
 SIMDUTF_POP_DISABLE_WARNINGS

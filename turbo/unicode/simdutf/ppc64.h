@@ -27,7 +27,7 @@
 #define SIMDUTF_CAN_ALWAYS_RUN_PPC64 SIMDUTF_IMPLEMENTATION_PPC64 && SIMDUTF_IS_PPC64
 
 
-#include "turbo/unicode/simdutf/internal/isadetection.h"
+#include "turbo/unicode/internal/isadetection.h"
 
 #if SIMDUTF_IMPLEMENTATION_PPC64
 

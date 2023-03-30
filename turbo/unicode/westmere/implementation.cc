@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/simdutf/westmere/begin.h"
+#include "turbo/unicode/westmere/begin.h"
 namespace simdutf {
 namespace SIMDUTF_IMPLEMENTATION {
 namespace {
@@ -537,4 +537,4 @@ simdutf_warn_unused size_t implementation::utf32_length_from_utf8(const char * i
 } // namespace SIMDUTF_IMPLEMENTATION
 } // namespace simdutf
 
-#include "turbo/unicode/simdutf/westmere/end.h"
+#include "turbo/unicode/westmere/end.h"

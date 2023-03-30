@@ -40,14 +40,14 @@ namespace fallback {
 } // namespace fallback
 } // namespace simdutf
 
-#include "turbo/unicode/simdutf/fallback/implementation.h"
+#include "turbo/unicode/fallback/implementation.h"
 
-#include "turbo/unicode/simdutf/fallback/begin.h"
+#include "turbo/unicode/fallback/begin.h"
 
 // Declarations
-#include "turbo/unicode/simdutf/fallback/bitmanipulation.h"
+#include "turbo/unicode/fallback/bitmanipulation.h"
 
-#include "turbo/unicode/simdutf/fallback/end.h"
+#include "turbo/unicode/fallback/end.h"
 
 #endif // SIMDUTF_IMPLEMENTATION_FALLBACK
 #endif // SIMDUTF_FALLBACK_H

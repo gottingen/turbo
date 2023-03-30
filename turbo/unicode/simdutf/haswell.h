@@ -57,18 +57,18 @@ namespace haswell {
 //
 // These two need to be included outside SIMDUTF_TARGET_REGION
 //
-#include "turbo/unicode/simdutf/haswell/implementation.h"
-#include "turbo/unicode/simdutf/haswell/intrinsics.h"
+#include "turbo/unicode/haswell/implementation.h"
+#include "turbo/unicode/haswell/intrinsics.h"
 
 //
 // The rest need to be inside the region
 //
-#include "turbo/unicode/simdutf/haswell/begin.h"
+#include "turbo/unicode/haswell/begin.h"
 // Declarations
-#include "turbo/unicode/simdutf/haswell/bitmanipulation.h"
-#include "turbo/unicode/simdutf/haswell/simd.h"
+#include "turbo/unicode/haswell/bitmanipulation.h"
+#include "turbo/unicode/haswell/simd.h"
 
-#include "turbo/unicode/simdutf/haswell/end.h"
+#include "turbo/unicode/haswell/end.h"
 
 #endif // SIMDUTF_IMPLEMENTATION_HASWELL
 #endif // SIMDUTF_HASWELL_COMMON_H

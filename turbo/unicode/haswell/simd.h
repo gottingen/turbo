@@ -406,7 +406,7 @@ namespace simd {
     }
   }; // struct simd8x64<T>
 
-  #include "turbo/unicode/simdutf/haswell/simd16-inl.h"
+  #include "turbo/unicode/haswell/simd16-inl.h"
 
 } // namespace simd
 

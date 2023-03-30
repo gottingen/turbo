@@ -27,7 +27,7 @@
 #define SIMDUTF_CAN_ALWAYS_RUN_ARM64 SIMDUTF_IMPLEMENTATION_ARM64 && SIMDUTF_IS_ARM64
 
 
-#include "turbo/unicode/simdutf/internal/isadetection.h"
+#include "turbo/unicode/internal/isadetection.h"
 
 #if SIMDUTF_IMPLEMENTATION_ARM64
 

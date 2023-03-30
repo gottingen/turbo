@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/simdutf/fallback/begin.h"
+#include "turbo/unicode/fallback/begin.h"
 
 #include "turbo/unicode/scalar/valid_utf8_to_utf16.h"
 #include "turbo/unicode/scalar/utf8_to_utf16.h"
@@ -267,4 +267,4 @@ simdutf_warn_unused size_t implementation::utf32_length_from_utf8(const char * i
 } // namespace SIMDUTF_IMPLEMENTATION
 } // namespace simdutf
 
-#include "turbo/unicode/simdutf/fallback/end.h"
+#include "turbo/unicode/fallback/end.h"

@@ -454,7 +454,7 @@ namespace simd {
     }
   }; // struct simd8x64<T>
 
-  #include "turbo/unicode/simdutf/westmere/simd16-inl.h"
+  #include "turbo/unicode/westmere/simd16-inl.h"
 
 } // namespace simd
 } // unnamed namespace

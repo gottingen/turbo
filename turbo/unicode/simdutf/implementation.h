@@ -21,7 +21,7 @@
 #include <vector>
 #include <tuple>
 #include "turbo/unicode/simdutf/common_defs.h"
-#include "turbo/unicode/simdutf/internal/isadetection.h"
+#include "turbo/unicode/internal/isadetection.h"
 
 
 namespace simdutf {
