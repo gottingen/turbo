@@ -15,7 +15,7 @@
 #ifndef SIMDUTF_PPC64_SIMD_H
 #define SIMDUTF_PPC64_SIMD_H
 
-#include "turbo/unicode/simdutf.h"
+#include "turbo/unicode/utf.h"
 #include "simdutf/ppc64/bitmanipulation.h"
 #include <type_traits>
 

@@ -15,7 +15,7 @@
 #ifndef SIMDUTF_PPC64_INTRINSICS_H
 #define SIMDUTF_PPC64_INTRINSICS_H
 
-#include "turbo/unicode/simdutf.h"
+#include "turbo/unicode/utf.h"
 
 // This should be the correct header whether
 // you use visual studio or other compilers.

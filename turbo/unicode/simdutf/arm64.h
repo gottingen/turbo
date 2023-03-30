@@ -39,16 +39,16 @@ namespace arm64 {
 } // namespace arm64
 } // namespace simdutf
 
-#include "simdutf/arm64/implementation.h"
+#include "turbo/unicode/simdutf/arm64/implementation.h"
 
-#include "simdutf/arm64/begin.h"
+#include "turbo/unicode/simdutf/arm64/begin.h"
 
 // Declarations
-#include "simdutf/arm64/intrinsics.h"
-#include "simdutf/arm64/bitmanipulation.h"
-#include "simdutf/arm64/simd.h"
+#include "turbo/unicode/simdutf/arm64/intrinsics.h"
+#include "turbo/unicode/simdutf/arm64/bitmanipulation.h"
+#include "turbo/unicode/simdutf/arm64/simd.h"
 
-#include "simdutf/arm64/end.h"
+#include "turbo/unicode/simdutf/arm64/end.h"
 
 #endif // SIMDUTF_IMPLEMENTATION_ARM64
 

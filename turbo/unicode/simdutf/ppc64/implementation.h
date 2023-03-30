@@ -15,7 +15,7 @@
 #ifndef SIMDUTF_PPC64_IMPLEMENTATION_H
 #define SIMDUTF_PPC64_IMPLEMENTATION_H
 
-#include "turbo/unicode/simdutf.h"
+#include "turbo/unicode/utf.h"
 #include "simdutf/internal/isadetection.h"
 
 namespace simdutf {

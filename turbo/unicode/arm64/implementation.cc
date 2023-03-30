@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "simdutf/arm64/begin.h"
+#include "turbo/unicode/simdutf/arm64/begin.h"
 namespace simdutf {
 namespace SIMDUTF_IMPLEMENTATION {
 namespace {
@@ -44,34 +44,34 @@ simdutf_really_inline simd8<bool> must_be_2_3_continuation(const simd8<uint8_t> 
     return is_third_byte ^ is_fourth_byte;
 }
 
-#include "arm64/arm_detect_encodings.cc"
+#include "turbo/unicode/arm64/arm_detect_encodings.cc"
 
-#include "arm64/arm_validate_utf16.cc"
-#include "arm64/arm_validate_utf32le.cc"
+#include "turbo/unicode/arm64/arm_validate_utf16.cc"
+#include "turbo/unicode/arm64/arm_validate_utf32le.cc"
 
-#include "arm64/arm_convert_utf8_to_utf16.cc"
-#include "arm64/arm_convert_utf8_to_utf32.cc"
+#include "turbo/unicode/arm64/arm_convert_utf8_to_utf16.cc"
+#include "turbo/unicode/arm64/arm_convert_utf8_to_utf32.cc"
 
-#include "arm64/arm_convert_utf16_to_utf8.cc"
-#include "arm64/arm_convert_utf16_to_utf32.cc"
+#include "turbo/unicode/arm64/arm_convert_utf16_to_utf8.cc"
+#include "turbo/unicode/arm64/arm_convert_utf16_to_utf32.cc"
 
-#include "arm64/arm_convert_utf32_to_utf8.cc"
-#include "arm64/arm_convert_utf32_to_utf16.cc"
+#include "turbo/unicode/arm64/arm_convert_utf32_to_utf8.cc"
+#include "turbo/unicode/arm64/arm_convert_utf32_to_utf16.cc"
 } // unnamed namespace
 } // namespace SIMDUTF_IMPLEMENTATION
 } // namespace simdutf
-#include "generic/buf_block_reader.h"
-#include "generic/utf8_validation/utf8_lookup4_algorithm.h"
-#include "generic/utf8_validation/utf8_validator.h"
+#include "turbo/unicode/generic/buf_block_reader.h"
+#include "turbo/unicode/generic/utf8_validation/utf8_lookup4_algorithm.h"
+#include "turbo/unicode/generic/utf8_validation/utf8_validator.h"
 // transcoding from UTF-8 to UTF-16
-#include "generic/utf8_to_utf16/valid_utf8_to_utf16.h"
-#include "generic/utf8_to_utf16/utf8_to_utf16.h"
+#include "turbo/unicode/generic/utf8_to_utf16/valid_utf8_to_utf16.h"
+#include "turbo/unicode/generic/utf8_to_utf16/utf8_to_utf16.h"
 // transcoding from UTF-8 to UTF-32
-#include "generic/utf8_to_utf32/valid_utf8_to_utf32.h"
-#include "generic/utf8_to_utf32/utf8_to_utf32.h"
+#include "turbo/unicode/generic/utf8_to_utf32/valid_utf8_to_utf32.h"
+#include "turbo/unicode/generic/utf8_to_utf32/utf8_to_utf32.h"
 // other functions
-#include "generic/utf8.h"
-#include "generic/utf16.h"
+#include "turbo/unicode/generic/utf8.h"
+#include "turbo/unicode/generic/utf16.h"
 //
 // Implementation-specific overrides
 //
@@ -542,4 +542,4 @@ simdutf_warn_unused size_t implementation::utf32_length_from_utf8(const char * i
 } // namespace SIMDUTF_IMPLEMENTATION
 } // namespace simdutf
 
-#include "simdutf/arm64/end.h"
+#include "turbo/unicode/simdutf/arm64/end.h"
