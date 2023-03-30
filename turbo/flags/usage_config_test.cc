@@ -102,9 +102,9 @@ TEST_F(FlagsUsageConfigTest, TestContainsHelpshortFlags) {
   turbo::SetFlagsUsageConfig(empty_config);
 
   EXPECT_TRUE(
-      flags::GetUsageConfig().contains_helpshort_flags("aaa/progname.cpp"));
+      flags::GetUsageConfig().contains_helpshort_flags("aaa/progname.cc"));
   EXPECT_FALSE(
-      flags::GetUsageConfig().contains_helpshort_flags("aaa/progmane.cpp"));
+      flags::GetUsageConfig().contains_helpshort_flags("aaa/progmane.cc"));
 }
 
 // --------------------------------------------------------------------
