@@ -16,7 +16,7 @@
 #define SIMDUTF_ARM64_IMPLEMENTATION_H
 
 #include "turbo/unicode/utf.h"
-#include "turbo/unicode/simdutf/internal/isadetection.h"
+#include "turbo/unicode/internal/isadetection.h"
 
 namespace simdutf {
 namespace arm64 {

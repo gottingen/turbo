@@ -16,7 +16,7 @@
 #define SIMDUTF_ARM64_SIMD_H
 
 #include "turbo/unicode/utf.h"
-#include "turbo/unicode/simdutf/arm64/bitmanipulation.h"
+#include "turbo/unicode/arm64/bitmanipulation.h"
 #include <type_traits>
 
 
@@ -625,7 +625,7 @@ simdutf_really_inline int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t
       ).to_bitmask();
     }
   }; // struct simd8x64<T>
-  #include "turbo/unicode/simdutf/arm64/simd16-inl.h"
+  #include "turbo/unicode/arm64/simd16-inl.h"
 } // namespace simd
 } // unnamed namespace
 } // namespace SIMDUTF_IMPLEMENTATION
