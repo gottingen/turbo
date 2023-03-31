@@ -29,8 +29,8 @@ std::pair<const char32_t*, char*> avx512_convert_utf32_to_utf8(const char32_t* b
   const size_t safety_margin = 11; // to avoid overruns, see issue https://github.com/simdutf/simdutf/issues/92
 
   while (buf + 16 + safety_margin <= end) {
-    __m256i in = _mm256_loadu_si256((__m256i*)buf);
-    __m256i nextin = _mm256_loadu_si256((__m256i*)buf+1);
+    __m256i in = _mm256_loadu_si256((__m256i*)const_cast<char32_t*>(buf));
+    __m256i nextin = _mm256_loadu_si256((__m256i*)const_cast<char32_t*>(buf)+1);
     running_max = _mm256_max_epu32(_mm256_max_epu32(in, running_max), nextin);
 
     // Pack 32-bit UTF-32 words to 16-bit UTF-16 words with unsigned saturation
@@ -86,8 +86,8 @@ std::pair<const char32_t*, char*> avx512_convert_utf32_to_utf8(const char32_t* b
       const uint8_t* row = &turbo::tables::utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2)][0];
       const uint8_t* row_2 = &turbo::tables::utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2>>16)][0];
 
-      const __m128i shuffle = _mm_loadu_si128((__m128i*)(row + 1));
-      const __m128i shuffle_2 = _mm_loadu_si128((__m128i*)(row_2 + 1));
+      const __m128i shuffle = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row + 1));
+      const __m128i shuffle_2 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row_2 + 1));
 
       const __m256i utf8_packed = _mm256_shuffle_epi8(utf8_unpacked, _mm256_setr_m128i(shuffle,shuffle_2));
       // 5. store bytes
@@ -183,23 +183,23 @@ std::pair<const char32_t*, char*> avx512_convert_utf32_to_utf8(const char32_t* b
       }*/
       const uint8_t mask0 = uint8_t(mask);
       const uint8_t* row0 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask0][0];
-      const __m128i shuffle0 = _mm_loadu_si128((__m128i*)(row0 + 1));
+      const __m128i shuffle0 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row0 + 1));
       const __m128i utf8_0 = _mm_shuffle_epi8(_mm256_castsi256_si128(out0), shuffle0);
 
       const uint8_t mask1 = static_cast<uint8_t>(mask >> 8);
       const uint8_t* row1 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask1][0];
-      const __m128i shuffle1 = _mm_loadu_si128((__m128i*)(row1 + 1));
+      const __m128i shuffle1 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row1 + 1));
       const __m128i utf8_1 = _mm_shuffle_epi8(_mm256_castsi256_si128(out1), shuffle1);
 
       const uint8_t mask2 = static_cast<uint8_t>(mask >> 16);
       const uint8_t* row2 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask2][0];
-      const __m128i shuffle2 = _mm_loadu_si128((__m128i*)(row2 + 1));
+      const __m128i shuffle2 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row2 + 1));
       const __m128i utf8_2 = _mm_shuffle_epi8(_mm256_extractf128_si256(out0,1), shuffle2);
 
 
       const uint8_t mask3 = static_cast<uint8_t>(mask >> 24);
       const uint8_t* row3 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask3][0];
-      const __m128i shuffle3 = _mm_loadu_si128((__m128i*)(row3 + 1));
+      const __m128i shuffle3 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row3 + 1));
       const __m128i utf8_3 = _mm_shuffle_epi8(_mm256_extractf128_si256(out1,1), shuffle3);
 
       _mm_storeu_si128((__m128i*)utf8_output, utf8_0);
@@ -270,8 +270,8 @@ std::pair<result, char*> avx512_convert_utf32_to_utf8_with_errors(const char32_t
   const size_t safety_margin = 11; // to avoid overruns, see issue https://github.com/simdutf/simdutf/issues/92
 
   while (buf + 16 + safety_margin <= end) {
-    __m256i in = _mm256_loadu_si256((__m256i*)buf);
-    __m256i nextin = _mm256_loadu_si256((__m256i*)buf+1);
+    __m256i in = _mm256_loadu_si256((__m256i*)const_cast<char32_t*>(buf));
+    __m256i nextin = _mm256_loadu_si256((__m256i*)const_cast<char32_t*>(buf)+1);
     // Check for too large input
     const __m256i max_input = _mm256_max_epu32(_mm256_max_epu32(in, nextin), v_10ffff);
     if(static_cast<uint32_t>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(max_input, v_10ffff))) != 0xffffffff) {
@@ -331,8 +331,8 @@ std::pair<result, char*> avx512_convert_utf32_to_utf8_with_errors(const char32_t
       const uint8_t* row = &turbo::tables::utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2)][0];
       const uint8_t* row_2 = &turbo::tables::utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2>>16)][0];
 
-      const __m128i shuffle = _mm_loadu_si128((__m128i*)(row + 1));
-      const __m128i shuffle_2 = _mm_loadu_si128((__m128i*)(row_2 + 1));
+      const __m128i shuffle = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row + 1));
+      const __m128i shuffle_2 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row_2 + 1));
 
       const __m256i utf8_packed = _mm256_shuffle_epi8(utf8_unpacked, _mm256_setr_m128i(shuffle,shuffle_2));
       // 5. store bytes
@@ -433,23 +433,23 @@ std::pair<result, char*> avx512_convert_utf32_to_utf8_with_errors(const char32_t
       }*/
       const uint8_t mask0 = uint8_t(mask);
       const uint8_t* row0 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask0][0];
-      const __m128i shuffle0 = _mm_loadu_si128((__m128i*)(row0 + 1));
+      const __m128i shuffle0 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row0 + 1));
       const __m128i utf8_0 = _mm_shuffle_epi8(_mm256_castsi256_si128(out0), shuffle0);
 
       const uint8_t mask1 = static_cast<uint8_t>(mask >> 8);
       const uint8_t* row1 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask1][0];
-      const __m128i shuffle1 = _mm_loadu_si128((__m128i*)(row1 + 1));
+      const __m128i shuffle1 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row1 + 1));
       const __m128i utf8_1 = _mm_shuffle_epi8(_mm256_castsi256_si128(out1), shuffle1);
 
       const uint8_t mask2 = static_cast<uint8_t>(mask >> 16);
       const uint8_t* row2 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask2][0];
-      const __m128i shuffle2 = _mm_loadu_si128((__m128i*)(row2 + 1));
+      const __m128i shuffle2 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row2 + 1));
       const __m128i utf8_2 = _mm_shuffle_epi8(_mm256_extractf128_si256(out0,1), shuffle2);
 
 
       const uint8_t mask3 = static_cast<uint8_t>(mask >> 24);
       const uint8_t* row3 = &turbo::tables::utf16_to_utf8::pack_1_2_3_utf8_bytes[mask3][0];
-      const __m128i shuffle3 = _mm_loadu_si128((__m128i*)(row3 + 1));
+      const __m128i shuffle3 = _mm_loadu_si128((__m128i*)const_cast<unsigned char*>(row3 + 1));
       const __m128i utf8_3 = _mm_shuffle_epi8(_mm256_extractf128_si256(out1,1), shuffle3);
 
       _mm_storeu_si128((__m128i*)utf8_output, utf8_0);
