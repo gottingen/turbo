@@ -42,11 +42,8 @@
 //   using Base::Base;
 // }
 // constexpr Foo foo(0);  // doesn't work on MSVC 2015
-#if defined(__clang__)
-#if __has_feature(cxx_inheriting_constructors)
-#define TURBO_OPTIONAL_USE_INHERITING_CONSTRUCTORS 1
-#endif
-#elif (defined(__GNUC__) &&                                       \
+
+#if TURBO_HAVE_FEATURE(cxx_inheriting_constructors) || (defined(__GNUC__) &&                                       \
        (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 8)) || \
     (__cpp_inheriting_constructors >= 200802) ||                  \
     (defined(_MSC_VER) && _MSC_VER >= 1910)
@@ -92,12 +89,12 @@ class optional_data_dtor_base {
   void destruct() noexcept {
     if (engaged_) {
       // `data_` must be initialized if `engaged_` is true.
-#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
       data_.~T();
-#if TURBO_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#if TURBO_HAVE_MIN_GNUC_VERSION(12, 0)
 #pragma GCC diagnostic pop
 #endif
       engaged_ = false;

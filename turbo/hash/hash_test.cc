@@ -409,18 +409,18 @@ struct WrapInTuple {
   }
 };
 
-turbo::Cord FlatCord(turbo::string_view sv) {
+turbo::Cord FlatCord(turbo::string_piece sv) {
   turbo::Cord c(sv);
   c.Flatten();
   return c;
 }
 
-turbo::Cord FragmentedCord(turbo::string_view sv) {
+turbo::Cord FragmentedCord(turbo::string_piece sv) {
   if (sv.size() < 2) {
     return turbo::Cord(sv);
   }
   size_t halfway = sv.size() / 2;
-  std::vector<turbo::string_view> parts = {sv.substr(0, halfway),
+  std::vector<turbo::string_piece> parts = {sv.substr(0, halfway),
                                           sv.substr(halfway)};
   return turbo::MakeFragmentedCord(parts);
 }
@@ -434,30 +434,34 @@ TEST(HashValueTest, Strings) {
   const std::string huge = std::string(5000, 'a');   // not a multiple
 
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(  //
-      std::string(), turbo::string_view(), turbo::Cord(),                     //
-      std::string(""), turbo::string_view(""), turbo::Cord(""),               //
-      std::string(small), turbo::string_view(small), turbo::Cord(small),      //
-      std::string(dup), turbo::string_view(dup), turbo::Cord(dup),            //
-      std::string(large), turbo::string_view(large), turbo::Cord(large),      //
-      std::string(huge), turbo::string_view(huge), FlatCord(huge),           //
+      std::string(), turbo::string_piece(), turbo::Cord(),                     //
+      std::string(""), turbo::string_piece(""), turbo::Cord(""),               //
+      std::string(small), turbo::string_piece(small), turbo::Cord(small),      //
+      std::string(dup), turbo::string_piece(dup), turbo::Cord(dup),            //
+      std::string(large), turbo::string_piece(large), turbo::Cord(large),      //
+      std::string(huge), turbo::string_piece(huge), FlatCord(huge),           //
       FragmentedCord(huge))));
 
   // Also check that nested types maintain the same hash.
   const WrapInTuple t{};
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(  //
-      t(std::string()), t(turbo::string_view()), t(turbo::Cord()),            //
-      t(std::string("")), t(turbo::string_view("")), t(turbo::Cord("")),      //
-      t(std::string(small)), t(turbo::string_view(small)),                   //
+      t(std::string()), t(turbo::string_piece()), t(turbo::Cord()),            //
+      t(std::string("")), t(turbo::string_piece("")), t(turbo::Cord("")),      //
+      t(std::string(small)), t(turbo::string_piece(small)),                   //
           t(turbo::Cord(small)),                                             //
-      t(std::string(dup)), t(turbo::string_view(dup)), t(turbo::Cord(dup)),   //
-      t(std::string(large)), t(turbo::string_view(large)),                   //
+      t(std::string(dup)), t(turbo::string_piece(dup)), t(turbo::Cord(dup)),   //
+      t(std::string(large)), t(turbo::string_piece(large)),                   //
           t(turbo::Cord(large)),                                             //
-      t(std::string(huge)), t(turbo::string_view(huge)),                     //
+      t(std::string(huge)), t(turbo::string_piece(huge)),                     //
           t(FlatCord(huge)), t(FragmentedCord(huge)))));
 
   // Make sure that hashing a `const char*` does not use its string-value.
   EXPECT_NE(SpyHash(static_cast<const char*>("ABC")),
+            SpyHash(turbo::string_piece("ABC")));
+  EXPECT_NE(SpyHash(static_cast<const char*>("ABC")),
             SpyHash(turbo::string_view("ABC")));
+  EXPECT_EQ(turbo::Hash<turbo::string_piece>{}("ABC"),
+            turbo::Hash<turbo::string_view>{}("ABC"));
 }
 
 TEST(HashValueTest, WString) {
@@ -655,18 +659,18 @@ struct Private {
   }
 };
 
-// Test helper for combine_piecewise_buffer.  It holds a string_view to the
+// Test helper for combine_piecewise_buffer.  It holds a string_piece to the
 // buffer-to-be-hashed.  Its TurboHashValue specialization will split up its
 // contents at the character offsets requested.
 class PiecewiseHashTester {
  public:
   // Create a hash view of a buffer to be hashed contiguously.
-  explicit PiecewiseHashTester(turbo::string_view buf)
+  explicit PiecewiseHashTester(turbo::string_piece buf)
       : buf_(buf), piecewise_(false), split_locations_() {}
 
   // Create a hash view of a buffer to be hashed piecewise, with breaks at the
   // given locations.
-  PiecewiseHashTester(turbo::string_view buf, std::set<size_t> split_locations)
+  PiecewiseHashTester(turbo::string_piece buf, std::set<size_t> split_locations)
       : buf_(buf),
         piecewise_(true),
         split_locations_(std::move(split_locations)) {}
@@ -683,11 +687,11 @@ class PiecewiseHashTester {
     }
     size_t begin = 0;
     for (size_t next : p.split_locations_) {
-      turbo::string_view chunk = p.buf_.substr(begin, next - begin);
+      turbo::string_piece chunk = p.buf_.substr(begin, next - begin);
       h = combiner.add_buffer(std::move(h), chunk.data(), chunk.size());
       begin = next;
     }
-    turbo::string_view last_chunk = p.buf_.substr(begin);
+    turbo::string_piece last_chunk = p.buf_.substr(begin);
     if (!last_chunk.empty()) {
       h = combiner.add_buffer(std::move(h), last_chunk.data(),
                               last_chunk.size());
@@ -696,7 +700,7 @@ class PiecewiseHashTester {
   }
 
  private:
-  turbo::string_view buf_;
+  turbo::string_piece buf_;
   bool piecewise_;
   std::set<size_t> split_locations_;
 };

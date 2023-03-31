@@ -192,7 +192,7 @@ inline CordRepBtreeNavigator::Position CordRepBtreeNavigator::Seek(
   assert(btree() != nullptr);
   int height = height_;
   CordRepBtree* edge = node_[height];
-  if (TURBO_PREDICT_FALSE(offset >= edge->length)) return {nullptr, 0};
+  if (TURBO_UNLIKELY(offset >= edge->length)) return {nullptr, 0};
   CordRepBtree::Position index = edge->IndexOf(offset);
   index_[height] = static_cast<uint8_t>(index.index);
   while (--height >= 0) {
@@ -208,7 +208,7 @@ inline CordRepBtreeNavigator::Position CordRepBtreeNavigator::InitOffset(
     CordRepBtree* tree, size_t offset) {
   assert(tree != nullptr);
   assert(tree->height() <= CordRepBtree::kMaxHeight);
-  if (TURBO_PREDICT_FALSE(offset >= tree->length)) return {nullptr, 0};
+  if (TURBO_UNLIKELY(offset >= tree->length)) return {nullptr, 0};
   height_ = tree->height();
   node_[height_] = tree;
   return Seek(offset);

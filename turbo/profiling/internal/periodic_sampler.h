@@ -77,7 +77,7 @@ class PeriodicSamplerBase {
   //   }
   //
   //   inline void Frobber() {
-  //     if (TURBO_PREDICT_FALSE(sampler.SubtleMaybeSample())) {
+  //     if (TURBO_UNLIKELY(sampler.SubtleMaybeSample())) {
   //       FrobberSampled();
   //     } else {
   //       FrobberImpl();
@@ -121,7 +121,7 @@ class PeriodicSamplerBase {
   //
   // Option 1:
   //   int64_t stride_;
-  //   if (TURBO_PREDICT_TRUE(++stride_ < 0)) { ... }
+  //   if (TURBO_LIKELY(++stride_ < 0)) { ... }
   //
   //   GCC   x64 (OK) : https://gcc.godbolt.org/z/R5MzzA
   //   GCC   ppc (OK) : https://gcc.godbolt.org/z/z7NZAt
@@ -131,7 +131,7 @@ class PeriodicSamplerBase {
   //
   // Option 2:
   //   int64_t stride_ = 0;
-  //   if (TURBO_PREDICT_TRUE(--stride_ >= 0)) { ... }
+  //   if (TURBO_LIKELY(--stride_ >= 0)) { ... }
   //
   //   GCC   x64 (OK) : https://gcc.godbolt.org/z/jSQxYK
   //   GCC   ppc (OK) : https://gcc.godbolt.org/z/VJdYaA
@@ -141,7 +141,7 @@ class PeriodicSamplerBase {
   //
   // Option 3:
   //   uint64_t stride_;
-  //   if (TURBO_PREDICT_TRUE(static_cast<int64_t>(++stride_) < 0)) { ... }
+  //   if (TURBO_LIKELY(static_cast<int64_t>(++stride_) < 0)) { ... }
   //
   //   GCC   x64 (OK) : https://gcc.godbolt.org/z/bFbfPy
   //   GCC   ppc (OK) : https://gcc.godbolt.org/z/S9KkUE
@@ -154,14 +154,14 @@ class PeriodicSamplerBase {
 
 inline bool PeriodicSamplerBase::SubtleMaybeSample() noexcept {
   // See comments on `stride_` for the unsigned increment / signed compare.
-  if (TURBO_PREDICT_TRUE(static_cast<int64_t>(++stride_) < 0)) {
+  if (TURBO_LIKELY(static_cast<int64_t>(++stride_) < 0)) {
     return false;
   }
   return true;
 }
 
 inline bool PeriodicSamplerBase::Sample() noexcept {
-  return TURBO_PREDICT_FALSE(SubtleMaybeSample()) ? SubtleConfirmSample()
+  return TURBO_UNLIKELY(SubtleMaybeSample()) ? SubtleConfirmSample()
                                                  : false;
 }
 

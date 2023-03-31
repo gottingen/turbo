@@ -19,13 +19,13 @@
 
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
 bool CommandLineFlag::IsRetired() const { return false; }
-bool CommandLineFlag::ParseFrom(turbo::string_view value, std::string* error) {
+bool CommandLineFlag::ParseFrom(turbo::string_piece value, std::string* error) {
   return ParseFrom(value, flags_internal::SET_FLAGS_VALUE,
                    flags_internal::kProgrammaticChange, *error);
 }

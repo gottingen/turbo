@@ -22,7 +22,7 @@
 // accepting function types that neither take ownership nor copy the type; using
 // the reference type in this case avoids a copy and an allocation. Best
 // practices of other non-owning reference-like objects (such as
-// `turbo::string_view`) apply here.
+// `turbo::string_piece`) apply here.
 //
 //  An `turbo::FunctionRef` is similar in usage to a `std::function` but has the
 //  following differences:
@@ -76,11 +76,11 @@ class FunctionRef;
 //
 //   // The following function takes a function callback by const reference
 //   bool Visitor(const std::function<void(my_proto&,
-//                                         turbo::string_view)>& callback);
+//                                         turbo::string_piece)>& callback);
 //
 //   // Assuming that the function is not stored or otherwise copied, it can be
 //   // replaced by an `turbo::FunctionRef`:
-//   bool Visitor(turbo::FunctionRef<void(my_proto&, turbo::string_view)>
+//   bool Visitor(turbo::FunctionRef<void(my_proto&, turbo::string_piece)>
 //                  callback);
 //
 // Note: the assignment operator within an `turbo::FunctionRef` is intentionally

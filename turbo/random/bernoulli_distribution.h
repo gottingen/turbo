@@ -153,7 +153,7 @@ bool bernoulli_distribution::Generate(double p,
     // returning v <= c would approximate P very well (up to an absolute error
     // of 1/2^32); the slow path (taken in that range of possible error, in the
     // case of equality) eliminates the remaining error.
-    if (TURBO_PREDICT_TRUE(v != c)) return v < c;
+    if (TURBO_LIKELY(v != c)) return v < c;
 
     // It is guaranteed that `q` is strictly less than 1, because if `q` were
     // greater than or equal to 1, the same would be true for `p`. Certainly `p`

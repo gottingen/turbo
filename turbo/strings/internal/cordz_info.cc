@@ -34,7 +34,7 @@ namespace cord_internal {
 
 using ::turbo::base_internal::SpinLockHolder;
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr size_t CordzInfo::kMaxStackDepth;
 #endif
 
@@ -324,7 +324,7 @@ CordzInfo::CordzInfo(CordRep* rep,
 CordzInfo::~CordzInfo() {
   // `rep_` is potentially kept alive if CordzInfo is included
   // in a collection snapshot (which should be rare).
-  if (TURBO_PREDICT_FALSE(rep_)) {
+  if (TURBO_UNLIKELY(rep_)) {
     CordRep::Unref(rep_);
   }
 }

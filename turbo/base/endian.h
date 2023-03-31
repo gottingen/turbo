@@ -68,7 +68,7 @@ inline uint16_t gbswap_16(uint16_t host_int) {
 #endif
 }
 
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
 
 static constexpr bool kIsLittleEndian = true;
 // Portable definitions for htonl (host-to-network) and friends on little-endian
@@ -77,7 +77,7 @@ inline uint16_t ghtons(uint16_t x) { return gbswap_16(x); }
 inline uint32_t ghtonl(uint32_t x) { return gbswap_32(x); }
 inline uint64_t ghtonll(uint64_t x) { return gbswap_64(x); }
 
-#elif defined TURBO_IS_BIG_ENDIAN
+#elif TURBO_IS_BIG_ENDIAN
 static constexpr bool kIsLittleEndian = false;
 // Portable definitions for htonl (host-to-network) etc on big-endian
 // architectures. These definitions are simpler since the host byte order is the
@@ -102,7 +102,7 @@ inline uint64_t gntohll(uint64_t x) { return ghtonll(x); }
 // Load/Store methods are alignment safe
 namespace little_endian {
 // Conversion functions.
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return x; }
 inline uint16_t ToHost16(uint16_t x) { return x; }
@@ -115,7 +115,7 @@ inline uint64_t ToHost64(uint64_t x) { return x; }
 
 inline constexpr bool IsLittleEndian() { return true; }
 
-#elif defined TURBO_IS_BIG_ENDIAN
+#elif TURBO_IS_BIG_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return gbswap_16(x); }
 inline uint16_t ToHost16(uint16_t x) { return gbswap_16(x); }
@@ -192,7 +192,7 @@ inline void Store64(void *p, uint64_t v) {
 //
 // Load/Store methods are alignment safe
 namespace big_endian {
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return gbswap_16(x); }
 inline uint16_t ToHost16(uint16_t x) { return gbswap_16(x); }
@@ -205,7 +205,7 @@ inline uint64_t ToHost64(uint64_t x) { return gbswap_64(x); }
 
 inline constexpr bool IsLittleEndian() { return true; }
 
-#elif defined TURBO_IS_BIG_ENDIAN
+#elif TURBO_IS_BIG_ENDIAN
 
 inline uint16_t FromHost16(uint16_t x) { return x; }
 inline uint16_t ToHost16(uint16_t x) { return x; }

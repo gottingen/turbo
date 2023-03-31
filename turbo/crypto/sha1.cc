@@ -9,7 +9,7 @@
 #include "turbo/base/bits.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/escaping.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 
@@ -198,7 +198,7 @@ namespace turbo {
     std::string SHA1::digest_hex() {
         uint8_t digest[kDigestLength];
         finalize(digest);
-        return turbo::BytesToHexString(turbo::string_view(reinterpret_cast<char*>(digest), kDigestLength));
+        return turbo::BytesToHexString(turbo::string_piece(reinterpret_cast<char*>(digest), kDigestLength));
     }
 
 

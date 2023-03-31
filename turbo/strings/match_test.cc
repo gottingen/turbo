@@ -20,9 +20,9 @@ namespace {
 
 TEST(MatchTest, StartsWith) {
   const std::string s1("123\0abc", 7);
-  const turbo::string_view a("foobar");
-  const turbo::string_view b(s1);
-  const turbo::string_view e;
+  const turbo::string_piece a("foobar");
+  const turbo::string_piece b(s1);
+  const turbo::string_piece e;
   EXPECT_TRUE(turbo::StartsWith(a, a));
   EXPECT_TRUE(turbo::StartsWith(a, "foo"));
   EXPECT_TRUE(turbo::StartsWith(a, e));
@@ -37,9 +37,9 @@ TEST(MatchTest, StartsWith) {
 
 TEST(MatchTest, EndsWith) {
   const std::string s1("123\0abc", 7);
-  const turbo::string_view a("foobar");
-  const turbo::string_view b(s1);
-  const turbo::string_view e;
+  const turbo::string_piece a("foobar");
+  const turbo::string_piece b(s1);
+  const turbo::string_piece e;
   EXPECT_TRUE(turbo::EndsWith(a, a));
   EXPECT_TRUE(turbo::EndsWith(a, "bar"));
   EXPECT_TRUE(turbo::EndsWith(a, e));
@@ -53,10 +53,10 @@ TEST(MatchTest, EndsWith) {
 }
 
 TEST(MatchTest, Contains) {
-  turbo::string_view a("abcdefg");
-  turbo::string_view b("abcd");
-  turbo::string_view c("efg");
-  turbo::string_view d("gh");
+  turbo::string_piece a("abcdefg");
+  turbo::string_piece b("abcd");
+  turbo::string_piece c("efg");
+  turbo::string_piece d("gh");
   EXPECT_TRUE(turbo::StrContains(a, a));
   EXPECT_TRUE(turbo::StrContains(a, b));
   EXPECT_TRUE(turbo::StrContains(a, c));
@@ -67,8 +67,8 @@ TEST(MatchTest, Contains) {
 }
 
 TEST(MatchTest, ContainsChar) {
-  turbo::string_view a("abcdefg");
-  turbo::string_view b("abcd");
+  turbo::string_piece a("abcdefg");
+  turbo::string_piece b("abcd");
   EXPECT_TRUE(turbo::StrContains(a, 'a'));
   EXPECT_TRUE(turbo::StrContains(a, 'b'));
   EXPECT_TRUE(turbo::StrContains(a, 'e'));
@@ -86,8 +86,8 @@ TEST(MatchTest, ContainsChar) {
 TEST(MatchTest, ContainsNull) {
   const std::string s = "foo";
   const char* cs = "foo";
-  const turbo::string_view sv("foo");
-  const turbo::string_view sv2("foo\0bar", 4);
+  const turbo::string_piece sv("foo");
+  const turbo::string_piece sv2("foo\0bar", 4);
   EXPECT_EQ(s, "foo");
   EXPECT_EQ(sv, "foo");
   EXPECT_NE(sv2, "foo");
@@ -99,7 +99,7 @@ TEST(MatchTest, ContainsNull) {
 
 TEST(MatchTest, EqualsIgnoreCase) {
   std::string text = "the";
-  turbo::string_view data(text);
+  turbo::string_piece data(text);
 
   EXPECT_TRUE(turbo::EqualsIgnoreCase(data, "The"));
   EXPECT_TRUE(turbo::EqualsIgnoreCase(data, "THE"));

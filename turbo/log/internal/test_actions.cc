@@ -23,7 +23,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/time.h"
 
 namespace turbo {
@@ -57,8 +57,8 @@ void WriteEntryToStderr::operator()(const turbo::LogEntry& entry) const {
 }
 
 void WriteEntryToStderr::operator()(turbo::LogSeverity severity,
-                                    turbo::string_view filename,
-                                    turbo::string_view log_message) const {
+                                    turbo::string_piece filename,
+                                    turbo::string_piece log_message) const {
   if (!message.empty()) std::cerr << message << "\n";
   const std::string source_filename = turbo::CHexEscape(filename);
   const std::string text_message = turbo::CHexEscape(log_message);

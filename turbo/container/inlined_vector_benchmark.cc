@@ -401,23 +401,23 @@ struct TrivialType {
 
 class NontrivialType {
  public:
-  TURBO_ATTRIBUTE_NOINLINE NontrivialType() : val_() {
+  TURBO_NO_INLINE NontrivialType() : val_() {
     benchmark::DoNotOptimize(*this);
   }
 
-  TURBO_ATTRIBUTE_NOINLINE NontrivialType(const NontrivialType& other)
+  TURBO_NO_INLINE NontrivialType(const NontrivialType& other)
       : val_(other.val_) {
     benchmark::DoNotOptimize(*this);
   }
 
-  TURBO_ATTRIBUTE_NOINLINE NontrivialType& operator=(
+  TURBO_NO_INLINE NontrivialType& operator=(
       const NontrivialType& other) {
     val_ = other.val_;
     benchmark::DoNotOptimize(*this);
     return *this;
   }
 
-  TURBO_ATTRIBUTE_NOINLINE ~NontrivialType() noexcept {
+  TURBO_NO_INLINE ~NontrivialType() noexcept {
     benchmark::DoNotOptimize(*this);
   }
 

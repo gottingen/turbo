@@ -100,7 +100,7 @@ namespace turbo {
 
     template<typename T, typename = std::enable_if_t<std::is_unsigned<T>::value>>
     bool checked_add(T *result, T a, T b) {
-#if TURBO_COMPILER_HAS_BUILTIN(__builtin_add_overflow)
+#if TURBO_HAVE_BUILTIN(__builtin_add_overflow)
         if (TURBO_LIKELY(!__builtin_add_overflow(a, b, result))) {
     return true;
   }
@@ -148,7 +148,7 @@ namespace turbo {
     template<typename T, typename = std::enable_if_t<std::is_unsigned<T>::value>>
     bool checked_mul(T *result, T a, T b) {
         assert(result != nullptr);
-#if TURBO_COMPILER_HAS_BUILTIN(__builtin_mul_overflow)
+#if TURBO_HAVE_BUILTIN(__builtin_mul_overflow)
         if (TURBO_LIKELY(!__builtin_mul_overflow(a, b, result))) {
             return true;
         }

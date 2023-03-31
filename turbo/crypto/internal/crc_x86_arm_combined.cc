@@ -214,7 +214,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
   // Computation for Generic Polynomials Using PCLMULQDQ Instruction"
   // https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
   // We are applying it to CRC32C polynomial.
-  TURBO_ATTRIBUTE_ALWAYS_INLINE void Process64BytesPclmul(
+   TURBO_FORCE_INLINE void Process64BytesPclmul(
       const uint8_t* p, V128* partialCRC) const {
     V128 loopMultiplicands = V128_Load(reinterpret_cast<const V128*>(k1k2));
 
@@ -251,7 +251,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
 
   // Reduce partialCRC produced by Process64BytesPclmul into a single value,
   // that represents crc checksum of all the processed bytes.
-  TURBO_ATTRIBUTE_ALWAYS_INLINE uint64_t
+  TURBO_FORCE_INLINE uint64_t
   FinalizePclmulStream(V128* partialCRC) const {
     V128 partialCRC1 = partialCRC[0];
     V128 partialCRC2 = partialCRC[1];
@@ -310,7 +310,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
   }
 
   // Update crc with 64 bytes of data from p.
-  TURBO_ATTRIBUTE_ALWAYS_INLINE uint64_t Process64BytesCRC(const uint8_t* p,
+  TURBO_FORCE_INLINE uint64_t Process64BytesCRC(const uint8_t* p,
                                                           uint64_t crc) const {
     for (int i = 0; i < 8; i++) {
       crc =
@@ -340,7 +340,7 @@ class CRC32AcceleratedX86ARMCombinedMultipleStreamsBase
   static constexpr size_t kMaxStreams = 3;
 };
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 alignas(16) constexpr uint64_t
     CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::k1k2[2];
 alignas(16) constexpr uint64_t
@@ -356,7 +356,7 @@ alignas(16) constexpr uint32_t
 constexpr size_t
     CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::kGroupsSmall;
 constexpr size_t CRC32AcceleratedX86ARMCombinedMultipleStreamsBase::kMaxStreams;
-#endif  // TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#endif  // TURBO_COMPILER_CPP17_ENABLED
 
 template <size_t num_crc_streams, size_t num_pclmul_streams,
           CutoffStrategy strategy>

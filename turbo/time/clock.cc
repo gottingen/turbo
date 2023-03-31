@@ -165,7 +165,7 @@ struct TimeSample {
   uint64_t min_cycles_per_sample = 0;  // approx cycles before next sample
 };
 
-struct TURBO_CACHELINE_ALIGNED TimeState {
+struct TURBO_CACHE_LINE_ALIGNED TimeState {
   std::atomic<uint64_t> seq{0};
   TimeSampleAtomic last_sample;  // the last sample; under seq
 
@@ -394,7 +394,7 @@ static uint64_t UpdateLastSample(
 //
 // TODO(turbo-team): Remove this attribute when our compiler is smart enough
 // to do the right thing.
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 static int64_t GetCurrentTimeNanosSlowPath()
     TURBO_LOCKS_EXCLUDED(time_state.lock) {
   // Serialize access to slow-path.  Fast-path readers are not blocked yet, and
@@ -575,7 +575,7 @@ TURBO_NAMESPACE_END
 
 extern "C" {
 
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(
     turbo::Duration duration) {
   while (duration > turbo::ZeroDuration()) {
     turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());

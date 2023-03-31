@@ -21,7 +21,7 @@
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -42,7 +42,7 @@ bool PrivateHandleAccessor::IsSpecifiedOnCommandLine(
 }
 
 bool PrivateHandleAccessor::ValidateInputValue(const CommandLineFlag& flag,
-                                               turbo::string_view value) {
+                                               turbo::string_piece value) {
   return flag.ValidateInputValue(value);
 }
 
@@ -52,7 +52,7 @@ void PrivateHandleAccessor::CheckDefaultValueParsingRoundtrip(
 }
 
 bool PrivateHandleAccessor::ParseFrom(CommandLineFlag& flag,
-                                      turbo::string_view value,
+                                      turbo::string_piece value,
                                       flags_internal::FlagSettingMode set_mode,
                                       flags_internal::ValueSource source,
                                       std::string& error) {

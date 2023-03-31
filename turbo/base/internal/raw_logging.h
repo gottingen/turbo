@@ -54,7 +54,7 @@
 // so that the args are not computed when not needed.
 #define TURBO_RAW_CHECK(condition, message)                             \
   do {                                                                 \
-    if (TURBO_PREDICT_FALSE(!(condition))) {                            \
+    if (TURBO_UNLIKELY(!(condition))) {                            \
       TURBO_RAW_LOG(FATAL, "Check %s failed: %s", #condition, message); \
     }                                                                  \
   } while (0)
@@ -80,7 +80,7 @@
 
 #define TURBO_INTERNAL_CHECK(condition, message)                    \
   do {                                                             \
-    if (TURBO_PREDICT_FALSE(!(condition))) {                        \
+    if (TURBO_UNLIKELY(!(condition))) {                        \
       std::string death_message = "Check " #condition " failed: "; \
       death_message += std::string(message);                       \
       TURBO_INTERNAL_LOG(FATAL, death_message);                     \
@@ -165,8 +165,8 @@ using AbortHook = void (*)(const char* file, int line, const char* buf_start,
 
 // Internal logging function for TURBO_INTERNAL_LOG to dispatch to.
 //
-// TODO(gfalcon): When string_view no longer depends on base, change this
-// interface to take its message as a string_view instead.
+// TODO(gfalcon): When string_piece no longer depends on base, change this
+// interface to take its message as a string_piece instead.
 using InternalLogFunction = void (*)(turbo::LogSeverity severity,
                                      const char* file, int line,
                                      const std::string& message);

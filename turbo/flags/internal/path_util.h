@@ -17,7 +17,7 @@
 #define TURBO_FLAGS_INTERNAL_PATH_UTIL_H_
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -31,10 +31,10 @@ namespace flags_internal {
 // returns "file.cc"
 //     flags_internal::Basename("file.cc")
 // returns "file.cc"
-inline turbo::string_view Basename(turbo::string_view filename) {
+inline turbo::string_piece Basename(turbo::string_piece filename) {
   auto last_slash_pos = filename.find_last_of("/\\");
 
-  return last_slash_pos == turbo::string_view::npos
+  return last_slash_pos == turbo::string_piece::npos
              ? filename
              : filename.substr(last_slash_pos + 1);
 }
@@ -47,11 +47,11 @@ inline turbo::string_view Basename(turbo::string_view filename) {
 // returns "a/b/prog/"
 //      flags_internal::Package("file.cc")
 // returns ""
-inline turbo::string_view Package(turbo::string_view filename) {
+inline turbo::string_piece Package(turbo::string_piece filename) {
   auto last_slash_pos = filename.find_last_of("/\\");
 
-  return last_slash_pos == turbo::string_view::npos
-             ? turbo::string_view()
+  return last_slash_pos == turbo::string_piece::npos
+             ? turbo::string_piece()
              : filename.substr(0, last_slash_pos + 1);
 }
 

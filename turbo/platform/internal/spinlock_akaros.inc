@@ -20,7 +20,7 @@
 
 extern "C" {
 
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
     std::atomic<uint32_t>* /* lock_word */, uint32_t /* value */,
     int /* loop */, turbo::base_internal::SchedulingMode /* mode */) {
   // In Akaros, one must take care not to call anything that could cause a
@@ -29,7 +29,7 @@ TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
   // arbitrary code.
 }
 
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockWake)(
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockWake)(
     std::atomic<uint32_t>* /* lock_word */, bool /* all */) {}
 
 }  // extern "C"

@@ -65,7 +65,7 @@ CordRepFlat* Flat(size_t size) {
 // Creates an external of the specified length
 CordRepExternal* External(size_t length = 512) {
   return static_cast<CordRepExternal*>(
-      NewExternalRep(turbo::string_view("", length), [](turbo::string_view) {}));
+      NewExternalRep(turbo::string_piece("", length), [](turbo::string_piece) {}));
 }
 
 // Creates a substring on the provided rep of length - 1

@@ -53,14 +53,14 @@ namespace log_internal {
 // `line` location. Called when `TURBO_DIE_IF_NULL` fails. Calling this function
 // generates less code than its implementation would if inlined, for a slight
 // code size reduction each time `TURBO_DIE_IF_NULL` is called.
-TURBO_ATTRIBUTE_NORETURN TURBO_ATTRIBUTE_NOINLINE void DieBecauseNull(
+TURBO_NORETURN TURBO_NO_INLINE void DieBecauseNull(
     const char* file, int line, const char* exprtext);
 
 // Helper for `TURBO_DIE_IF_NULL`.
 template <typename T>
 TURBO_MUST_USE_RESULT T DieIfNull(const char* file, int line,
                                  const char* exprtext, T&& t) {
-  if (TURBO_PREDICT_FALSE(t == nullptr)) {
+  if (TURBO_UNLIKELY(t == nullptr)) {
     // Call a non-inline helper function for a small code size improvement.
     DieBecauseNull(file, line, exprtext);
   }

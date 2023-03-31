@@ -54,7 +54,7 @@ namespace crc_internal {
 // copy. It is compatible to both 16-byte aligned and unaligned addresses. If
 // data at the destination is not immediately accessed, using non-temporal
 // memcpy can save 1 DRAM load of the destination cacheline.
-constexpr size_t kCacheLineSize = TURBO_CACHELINE_SIZE;
+constexpr size_t kCacheLineSize = TURBO_CACHE_LINE_SIZE;
 
 // If the objects overlap, the behavior is undefined.
 inline void *non_temporal_store_memcpy(void *__restrict dst,

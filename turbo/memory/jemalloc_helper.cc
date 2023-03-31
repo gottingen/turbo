@@ -154,7 +154,7 @@ size_t goodMallocSize(size_t minSize) noexcept {
 // never grow in place small blocks; they're already occupied to the
 // brim.  Blocks larger than or equal to 4096 bytes can in fact be
 // expanded in place, and this constant reflects that.
-TURBO_ALLOW_UNUSED static const size_t jemallocMinInPlaceExpandable = 4096;
+TURBO_MAYBE_UNUSED static const size_t jemallocMinInPlaceExpandable = 4096;
 
 /**
  * Trivial wrappers around malloc, calloc, realloc that check for allocation

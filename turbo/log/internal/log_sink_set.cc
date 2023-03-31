@@ -42,7 +42,7 @@
 #include "turbo/meta/span.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
@@ -72,7 +72,7 @@ bool& ThreadIsLoggingStatus() {
   bool* thread_is_logging_ptr =
       reinterpret_cast<bool*>(pthread_getspecific(thread_is_logging_key));
 
-  if (TURBO_PREDICT_FALSE(!thread_is_logging_ptr)) {
+  if (TURBO_UNLIKELY(!thread_is_logging_ptr)) {
     thread_is_logging_ptr = new bool{false};
     if (pthread_setspecific(thread_is_logging_key, thread_is_logging_ptr)) {
       perror("pthread_setspecific failed");

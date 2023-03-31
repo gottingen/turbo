@@ -350,7 +350,7 @@ void BM_Duration_ToTimespec_TurboTime(benchmark::State& state) {
 }
 BENCHMARK(BM_Duration_ToTimespec_TurboTime);
 
-TURBO_ATTRIBUTE_NOINLINE timespec DoubleToTimespec(double seconds) {
+TURBO_NO_INLINE timespec DoubleToTimespec(double seconds) {
   timespec ts;
   ts.tv_sec = seconds;
   ts.tv_nsec = (seconds - ts.tv_sec) * (1000 * 1000 * 1000);
@@ -378,7 +378,7 @@ void BM_Duration_FromTimespec_TurboTime(benchmark::State& state) {
 }
 BENCHMARK(BM_Duration_FromTimespec_TurboTime);
 
-TURBO_ATTRIBUTE_NOINLINE double TimespecToDouble(timespec ts) {
+TURBO_NO_INLINE double TimespecToDouble(timespec ts) {
   return ts.tv_sec + (ts.tv_nsec / (1000 * 1000 * 1000));
 }
 

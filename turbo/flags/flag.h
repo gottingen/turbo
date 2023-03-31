@@ -36,7 +36,7 @@
 #include "turbo/flags/internal/flag.h"
 #include "turbo/flags/internal/registry.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -242,8 +242,8 @@ TURBO_NAMESPACE_END
     /* The expression is run in the caller as part of the   */               \
     /* default value argument. That keeps temporaries alive */               \
     /* long enough for NonConst to work correctly.          */               \
-    static constexpr turbo::string_view Value(                                \
-        turbo::string_view turbo_flag_help = TURBO_FLAG_IMPL_FLAGHELP(txt)) {   \
+    static constexpr turbo::string_piece Value(                                \
+        turbo::string_piece turbo_flag_help = TURBO_FLAG_IMPL_FLAGHELP(txt)) {   \
       return turbo_flag_help;                                                 \
     }                                                                        \
     static std::string NonConst() { return std::string(Value()); }           \
@@ -301,7 +301,7 @@ TURBO_NAMESPACE_END
 // retired flags are cleaned up.
 #define TURBO_RETIRED_FLAG(type, name, default_value, explanation)      \
   static turbo::flags_internal::RetiredFlag<type> RETIRED_FLAGS_##name; \
-  TURBO_ATTRIBUTE_UNUSED static const auto RETIRED_FLAGS_REG_##name =   \
+  TURBO_MAYBE_UNUSED static const auto RETIRED_FLAGS_REG_##name =   \
       (RETIRED_FLAGS_##name.Retire(#name),                             \
        ::turbo::flags_internal::FlagRegistrarEmpty{})
 

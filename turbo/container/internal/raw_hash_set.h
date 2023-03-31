@@ -198,11 +198,11 @@
 #include "turbo/platform/internal/prefetch.h"
 #include "turbo/platform/port.h"
 
-#ifdef TURBO_INTERNAL_HAVE_SSE2
+#if  TURBO_SSE2
 #include <emmintrin.h>
 #endif
 
-#ifdef TURBO_INTERNAL_HAVE_SSSE3
+#if TURBO_SSSE3
 #include <tmmintrin.h>
 #endif
 
@@ -210,7 +210,7 @@
 #include <intrin.h>
 #endif
 
-#ifdef TURBO_INTERNAL_HAVE_ARM_NEON
+#if TURBO_NEON
 #include <arm_neon.h>
 #endif
 
@@ -519,7 +519,7 @@ inline bool IsFull(ctrl_t c) { return c >= static_cast<ctrl_t>(0); }
 inline bool IsDeleted(ctrl_t c) { return c == ctrl_t::kDeleted; }
 inline bool IsEmptyOrDeleted(ctrl_t c) { return c < ctrl_t::kSentinel; }
 
-#ifdef TURBO_INTERNAL_HAVE_SSE2
+#if TURBO_SSE2
 // Quick reference guide for intrinsics used below:
 //
 // * __m128i: An XMM (128-bit) word.
@@ -580,7 +580,7 @@ struct GroupSse2Impl {
 
   // Returns a bitmask representing the positions of empty slots.
   NonIterableBitMask<uint32_t, kWidth> MaskEmpty() const {
-#ifdef TURBO_INTERNAL_HAVE_SSSE3
+#if TURBO_SSSE3
     // This only works because ctrl_t::kEmpty is -128.
     return NonIterableBitMask<uint32_t, kWidth>(
         static_cast<uint32_t>(_mm_movemask_epi8(_mm_sign_epi8(ctrl, ctrl))));
@@ -608,7 +608,7 @@ struct GroupSse2Impl {
   void ConvertSpecialToEmptyAndFullToDeleted(ctrl_t* dst) const {
     auto msbs = _mm_set1_epi8(static_cast<char>(-128));
     auto x126 = _mm_set1_epi8(126);
-#ifdef TURBO_INTERNAL_HAVE_SSSE3
+#if TURBO_SSSE3
     auto res = _mm_or_si128(_mm_shuffle_epi8(x126, ctrl), msbs);
 #else
     auto zero = _mm_setzero_si128();
@@ -620,9 +620,9 @@ struct GroupSse2Impl {
 
   __m128i ctrl;
 };
-#endif  // TURBO_INTERNAL_RAW_HASH_SET_HAVE_SSE2
+#endif  // TURBO_SSE2
 
-#if defined(TURBO_INTERNAL_HAVE_ARM_NEON) && defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
 struct GroupAArch64Impl {
   static constexpr size_t kWidth = 8;
 
@@ -680,7 +680,7 @@ struct GroupAArch64Impl {
 
   uint8x8_t ctrl;
 };
-#endif  // TURBO_INTERNAL_HAVE_ARM_NEON && TURBO_IS_LITTLE_ENDIAN
+#endif  // TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
 
 struct GroupPortableImpl {
   static constexpr size_t kWidth = 8;
@@ -739,9 +739,9 @@ struct GroupPortableImpl {
   uint64_t ctrl;
 };
 
-#ifdef TURBO_INTERNAL_HAVE_SSE2
+#if TURBO_SSE2
 using Group = GroupSse2Impl;
-#elif defined(TURBO_INTERNAL_HAVE_ARM_NEON) && defined(TURBO_IS_LITTLE_ENDIAN)
+#elif TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
 using Group = GroupAArch64Impl;
 #else
 using Group = GroupPortableImpl;
@@ -1217,10 +1217,10 @@ inline size_t AllocSize(size_t capacity, size_t slot_size, size_t slot_align) {
 }
 
 template <typename Alloc, size_t SizeOfSlot, size_t AlignOfSlot>
-TURBO_ATTRIBUTE_NOINLINE void InitializeSlots(CommonFields& c, Alloc alloc) {
+TURBO_NO_INLINE void InitializeSlots(CommonFields& c, Alloc alloc) {
   assert(c.capacity_);
   // Folks with custom allocators often make unwarranted assumptions about the
-  // behavior of their classes vis-a-vis trivial destructability and what
+  // behavior of their classesTURBO_NO_INLINE vis-a-vis trivial destructability and what
   // calls they will or won't make.  Avoid sampling for people with custom
   // allocators to get us out of this mess.  This is not a hard guarantee but
   // a workaround while we plan the exact guarantee we want to provide.
@@ -1277,7 +1277,7 @@ void EraseMetaOnly(CommonFields& c, ctrl_t* it, size_t slot_size);
 // function body for raw_hash_set instantiations that have the
 // same slot alignment.
 template <size_t AlignOfSlot>
-TURBO_ATTRIBUTE_NOINLINE void DeallocateStandard(void*,
+TURBO_NO_INLINE void DeallocateStandard(void*,
                                                 const PolicyFunctions& policy,
                                                 ctrl_t* ctrl, void* slot_array,
                                                 size_t n) {
@@ -1293,7 +1293,7 @@ TURBO_ATTRIBUTE_NOINLINE void DeallocateStandard(void*,
 // share the same function body for raw_hash_set instantiations that have the
 // same slot size as long as they are relocatable.
 template <size_t SizeOfSlot>
-TURBO_ATTRIBUTE_NOINLINE void TransferRelocatable(void*, void* dst, void* src) {
+TURBO_NO_INLINE void TransferRelocatable(void*, void* dst, void* src) {
   memcpy(dst, src, SizeOfSlot);
 }
 
@@ -1479,7 +1479,7 @@ class raw_hash_set {
         ctrl_ += shift;
         slot_ += shift;
       }
-      if (TURBO_PREDICT_FALSE(*ctrl_ == ctrl_t::kSentinel)) ctrl_ = nullptr;
+      if (TURBO_UNLIKELY(*ctrl_ == ctrl_t::kSentinel)) ctrl_ = nullptr;
     }
 
     ctrl_t* ctrl_ = nullptr;
@@ -1539,7 +1539,7 @@ class raw_hash_set {
           std::is_nothrow_default_constructible<key_equal>::value&&
               std::is_nothrow_default_constructible<allocator_type>::value) {}
 
-  TURBO_ATTRIBUTE_NOINLINE explicit raw_hash_set(
+  TURBO_NO_INLINE explicit raw_hash_set(
       size_t bucket_count, const hasher& hash = hasher(),
       const key_equal& eq = key_equal(),
       const allocator_type& alloc = allocator_type())
@@ -1662,7 +1662,7 @@ class raw_hash_set {
     growth_left() -= that.size();
   }
 
-  TURBO_ATTRIBUTE_NOINLINE raw_hash_set(raw_hash_set&& that) noexcept(
+  TURBO_NO_INLINE raw_hash_set(raw_hash_set&& that) noexcept(
       std::is_nothrow_copy_constructible<hasher>::value&&
           std::is_nothrow_copy_constructible<key_equal>::value&&
               std::is_nothrow_copy_constructible<allocator_type>::value)
@@ -2138,12 +2138,12 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (TURBO_PREDICT_TRUE(PolicyTraits::apply(
+        if (TURBO_LIKELY(PolicyTraits::apply(
                 EqualElement<K>{key, eq_ref()},
                 PolicyTraits::element(slot_ptr + seq.offset(i)))))
           return iterator_at(seq.offset(i));
       }
-      if (TURBO_PREDICT_TRUE(g.MaskEmpty())) return end();
+      if (TURBO_LIKELY(g.MaskEmpty())) return end();
       seq.next();
       assert(seq.index() <= capacity() && "full table!");
     }
@@ -2307,7 +2307,7 @@ class raw_hash_set {
         common(), CharAlloc(alloc_ref()));
   }
 
-  TURBO_ATTRIBUTE_NOINLINE void resize(size_t new_capacity) {
+  TURBO_NO_INLINE void resize(size_t new_capacity) {
     assert(IsValidCapacity(new_capacity));
     auto* old_ctrl = control();
     auto* old_slots = slot_array();
@@ -2412,11 +2412,11 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (TURBO_PREDICT_TRUE(
+        if (TURBO_LIKELY(
                 PolicyTraits::element(slot_array() + seq.offset(i)) == elem))
           return true;
       }
-      if (TURBO_PREDICT_TRUE(g.MaskEmpty())) return false;
+      if (TURBO_LIKELY(g.MaskEmpty())) return false;
       seq.next();
       assert(seq.index() <= capacity() && "full table!");
     }
@@ -2448,12 +2448,12 @@ class raw_hash_set {
     while (true) {
       Group g{ctrl + seq.offset()};
       for (uint32_t i : g.Match(H2(hash))) {
-        if (TURBO_PREDICT_TRUE(PolicyTraits::apply(
+        if (TURBO_LIKELY(PolicyTraits::apply(
                 EqualElement<K>{key, eq_ref()},
                 PolicyTraits::element(slot_array() + seq.offset(i)))))
           return {seq.offset(i), false};
       }
-      if (TURBO_PREDICT_TRUE(g.MaskEmpty())) break;
+      if (TURBO_LIKELY(g.MaskEmpty())) break;
       seq.next();
       assert(seq.index() <= capacity() && "full table!");
     }
@@ -2464,7 +2464,7 @@ class raw_hash_set {
   // viable slot index to insert it at.
   //
   // REQUIRES: At least one non-full slot available.
-  size_t prepare_insert(size_t hash) TURBO_ATTRIBUTE_NOINLINE {
+  size_t prepare_insert(size_t hash) TURBO_NO_INLINE {
     const bool rehash_for_bug_detection =
         common().should_rehash_for_bug_detection_on_insert();
     if (rehash_for_bug_detection) {
@@ -2474,7 +2474,7 @@ class raw_hash_set {
     }
     auto target = find_first_non_full(common(), hash);
     if (!rehash_for_bug_detection &&
-        TURBO_PREDICT_FALSE(growth_left() == 0 &&
+        TURBO_UNLIKELY(growth_left() == 0 &&
                            !IsDeleted(control()[target.offset]))) {
       rehash_and_grow_if_necessary();
       target = find_first_non_full(common(), hash);

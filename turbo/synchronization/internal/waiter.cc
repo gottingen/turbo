@@ -112,7 +112,7 @@ void Waiter::Post() {
 void Waiter::Poke() {
   // Wake one thread waiting on the futex.
   const int err = Futex::Wake(&futex_, 1);
-  if (TURBO_PREDICT_FALSE(err < 0)) {
+  if (TURBO_UNLIKELY(err < 0)) {
     TURBO_RAW_LOG(FATAL, "Futex operation failed with error %d\n", err);
   }
 }
@@ -209,7 +209,7 @@ void Waiter::Poke() {
 void Waiter::InternalCondVarPoke() {
   if (waiter_count_ != 0) {
     const int err = pthread_cond_signal(&cv_);
-    if (TURBO_PREDICT_FALSE(err != 0)) {
+    if (TURBO_UNLIKELY(err != 0)) {
       TURBO_RAW_LOG(FATAL, "pthread_cond_signal failed: %d", err);
     }
   }

@@ -22,7 +22,7 @@
 #include "turbo/debugging/internal/demangle.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 extern "C" {
 const char* emscripten_pc_get_function(const void* pc);

@@ -40,7 +40,7 @@ namespace {
 // For example:
 //   Given: 5 (decimal) == 101 (binary)
 //   Returns: 2
-inline TURBO_ATTRIBUTE_ALWAYS_INLINE int Fls128(uint128 n) {
+TURBO_FORCE_INLINE int Fls128(uint128 n) {
   if (uint64_t hi = Uint128High64(n)) {
     TURBO_ASSUME(hi != 0);
     return 127 - countl_zero(hi);
@@ -334,7 +334,7 @@ std::ostream& operator<<(std::ostream& os, int128 v) {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 namespace std {
 constexpr bool numeric_limits<turbo::uint128>::is_specialized;
 constexpr bool numeric_limits<turbo::uint128>::is_signed;

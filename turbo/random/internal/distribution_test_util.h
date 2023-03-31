@@ -19,7 +19,7 @@
 #include <iostream>
 #include <vector>
 
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/meta/span.h"
 
 // NOTE: The functions in this file are test only, and are should not be used in
@@ -77,7 +77,7 @@ double beta(double p, double q);
 double InverseNormalSurvival(double x);
 
 // Returns whether actual is "near" expected, based on the bound.
-bool Near(turbo::string_view msg, double actual, double expected, double bound);
+bool Near(turbo::string_piece msg, double actual, double expected, double bound);
 
 // Implements the incomplete regularized beta function, AS63, BETAIN.
 //    https://www.jstor.org/stable/2346797

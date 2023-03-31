@@ -13,99 +13,101 @@
 // limitations under the License.
 
 #include "turbo/files/sequential_read_file.h"
-#include <cstdio>
-#include <unistd.h>
-#include <fcntl.h>
-#include <cerrno>
-#include <cstring>
-#include "turbo/log/logging.h"
 #include "turbo/base/casts.h"
+#include "turbo/log/logging.h"
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace turbo {
 
-    SequentialReadFile::~SequentialReadFile() {
-        if (_fd > 0) {
-            ::close(_fd);
-        }
-    }
+SequentialReadFile::~SequentialReadFile() {
+  if (_fd > 0) {
+    ::close(_fd);
+  }
+}
 
-    turbo::Status SequentialReadFile::open(const turbo::filesystem::path &path) noexcept {
-        TURBO_CHECK(_fd == -1) << "do not reopen";
-        turbo::Status rs;
-        _path = path;
-        _fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC, 0644);
-        if (_fd < 0) {
-            TURBO_LOG(ERROR) << "open file: " << path << "error: " << errno << " " << strerror(errno);
-            rs = ErrnoToStatus(errno, "{}");
-        }
-        return rs;
-    }
+turbo::Status
+SequentialReadFile::open(const turbo::filesystem::path &path) noexcept {
+  TURBO_CHECK(_fd == -1) << "do not reopen";
+  turbo::Status rs;
+  _path = path;
+  _fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC, 0644);
+  if (_fd < 0) {
+    TURBO_LOG(ERROR) << "open file: " << path << "error: " << errno << " "
+                     << strerror(errno);
+    rs = ErrnoToStatus(errno, "{}");
+  }
+  return rs;
+}
 
-    turbo::Status SequentialReadFile::read(std::string *content, size_t n) {
-        turbo::Cord portal;
-        auto frs = read(&portal, n);
-        if (frs.ok()) {
-            CopyCordToString(portal,content);
-        }
-        return frs;
-    }
+turbo::Status SequentialReadFile::read(std::string *content, size_t n) {
+  turbo::Cord portal;
+  auto frs = read(&portal, n);
+  if (frs.ok()) {
+    CopyCordToString(portal, content);
+  }
+  return frs;
+}
 
-    turbo::Status SequentialReadFile::read(turbo::Cord *buf, size_t n) {
-        size_t left = n;
-        turbo::Status frs;
-        std::vector<char> tmpBuf;
-        static const size_t kMaxTempSize = 4096;
-        tmpBuf.resize(kMaxTempSize);
-        char *ptr = tmpBuf.data();
-        while (left > 0) {
-            ssize_t read_len = ::read(_fd, ptr, std::min(left, kMaxTempSize));
-            if (read_len > 0) {
-                left -= static_cast<size_t>(read_len);
-            } else if (read_len == 0) {
-                break;
-            } else if (errno == EINTR) {
-                continue;
-            } else {
-                TURBO_LOG(WARNING) << "read failed, err: " << errno
-                                   << " fd: " << _fd << " size: " << n;
-                return ErrnoToStatus(errno,"");
-            }
-            buf->Append(turbo::string_view(ptr, static_cast<size_t>(read_len)));
-            _has_read += static_cast<size_t>(read_len);
-        }
-        return turbo::OkStatus();
+turbo::Status SequentialReadFile::read(turbo::Cord *buf, size_t n) {
+  size_t left = n;
+  turbo::Status frs;
+  std::vector<char> tmpBuf;
+  static const size_t kMaxTempSize = 4096;
+  tmpBuf.resize(kMaxTempSize);
+  char *ptr = tmpBuf.data();
+  while (left > 0) {
+    ssize_t read_len = ::read(_fd, ptr, std::min(left, kMaxTempSize));
+    if (read_len > 0) {
+      left -= static_cast<size_t>(read_len);
+    } else if (read_len == 0) {
+      break;
+    } else if (errno == EINTR) {
+      continue;
+    } else {
+      TURBO_LOG(WARNING) << "read failed, err: " << errno << " fd: " << _fd
+                         << " size: " << n;
+      return ErrnoToStatus(errno, "");
     }
+    buf->Append(turbo::string_piece(ptr, static_cast<size_t>(read_len)));
+    _has_read += static_cast<size_t>(read_len);
+  }
+  return turbo::OkStatus();
+}
 
-    void SequentialReadFile::close() {
-        if (_fd > 0) {
-            ::close(_fd);
-            _fd = -1;
-        }
+void SequentialReadFile::close() {
+  if (_fd > 0) {
+    ::close(_fd);
+    _fd = -1;
+  }
+}
+
+void SequentialReadFile::reset() {
+  if (_fd > 0) {
+    ::lseek(_fd, 0, SEEK_SET);
+  }
+}
+
+turbo::Status SequentialReadFile::skip(off_t n) {
+  if (_fd > 0) {
+    ::lseek(_fd, implicit_cast<off_t>(n), SEEK_CUR);
+  }
+  return turbo::OkStatus();
+}
+
+bool SequentialReadFile::is_eof(turbo::Status *frs) {
+  std::error_code ec;
+  auto size = turbo::filesystem::file_size(_path, ec);
+  if (ec) {
+    if (frs) {
+      *frs = ErrnoToStatus(errno, "");
     }
+    return false;
+  }
+  return _has_read == size;
+}
 
-    void SequentialReadFile::reset() {
-        if (_fd > 0) {
-            ::lseek(_fd, 0, SEEK_SET);
-        }
-    }
-
-    turbo::Status SequentialReadFile::skip(off_t n) {
-        if (_fd > 0) {
-            ::lseek(_fd, implicit_cast<off_t>(n), SEEK_CUR);
-        }
-        return turbo::OkStatus();
-    }
-
-    bool SequentialReadFile::is_eof(turbo::Status *frs) {
-        std::error_code ec;
-        auto size = turbo::filesystem::file_size(_path, ec);
-        if (ec) {
-            if (frs) {
-                *frs = ErrnoToStatus(errno, "");
-            }
-            return false;
-        }
-        return _has_read == size;
-    }
-
-}  // namespace turbo
+} // namespace turbo

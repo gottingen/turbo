@@ -49,12 +49,12 @@ BENCHMARK(BM_StringViewFromString)->Arg(12)->Arg(128);
 
 // Provide a forcibly out-of-line wrapper for operator== that can be used in
 // benchmarks to measure the impact of inlining.
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 bool NonInlinedEq(turbo::string_view a, turbo::string_view b) { return a == b; }
 
 // We use functions that cannot be inlined to perform the comparison loops so
 // that inlining of the operator== can't optimize away *everything*.
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 void DoEqualityComparisons(benchmark::State& state, turbo::string_view a,
                            turbo::string_view b) {
   for (auto _ : state) {
@@ -99,7 +99,7 @@ BENCHMARK(BM_EqualDifferent)->DenseRange(0, 3)->Range(4, 1 << 10);
 // each with the same size. Provided our comparison makes the implementation
 // inline-able by the compiler, it should fold all of these away into a single
 // size check once per loop iteration.
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 void DoConstantSizeInlinedEqualityComparisons(benchmark::State& state,
                                               turbo::string_view a) {
   for (auto _ : state) {
@@ -124,7 +124,7 @@ BENCHMARK(BM_EqualConstantSizeInlined)->DenseRange(2, 4);
 // This benchmark exists purely to give context to the above timings: this is
 // what they would look like if the compiler is completely unable to simplify
 // between two comparisons when they are comparing against constant strings.
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 void DoConstantSizeNonInlinedEqualityComparisons(benchmark::State& state,
                                                  turbo::string_view a) {
   for (auto _ : state) {

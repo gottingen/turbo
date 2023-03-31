@@ -77,7 +77,7 @@ TEST(LogHygieneTest, WorksForQualifiedSeverity) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeINFOSymbol) {
-  const double INFO TURBO_ATTRIBUTE_UNUSED = 7.77;
+  const double INFO TURBO_MAYBE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kInfo, _, "Hello world"));
@@ -87,7 +87,7 @@ TEST(LogHygieneTest, WorksWithAlternativeINFOSymbol) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeWARNINGSymbol) {
-  const double WARNING TURBO_ATTRIBUTE_UNUSED = 7.77;
+  const double WARNING TURBO_MAYBE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kWarning, _, "Hello world"));
@@ -97,7 +97,7 @@ TEST(LogHygieneTest, WorksWithAlternativeWARNINGSymbol) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeERRORSymbol) {
-  const double ERROR TURBO_ATTRIBUTE_UNUSED = 7.77;
+  const double ERROR TURBO_MAYBE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kError, _, "Hello world"));
@@ -107,7 +107,7 @@ TEST(LogHygieneTest, WorksWithAlternativeERRORSymbol) {
 }
 
 TEST(LogHygieneTest, WorksWithAlternativeLEVELSymbol) {
-  const double LEVEL TURBO_ATTRIBUTE_UNUSED = 7.77;
+  const double LEVEL TURBO_MAYBE_UNUSED = 7.77;
   turbo::ScopedMockLog test_sink(turbo::MockLogDefault::kDisallowUnexpected);
 
   EXPECT_CALL(test_sink, Log(turbo::LogSeverity::kError, _, "Hello world"));

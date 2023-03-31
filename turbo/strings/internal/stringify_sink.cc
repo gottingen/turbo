@@ -19,7 +19,7 @@ namespace strings_internal {
 
 void StringifySink::Append(size_t count, char ch) { buffer_.append(count, ch); }
 
-void StringifySink::Append(string_view v) {
+void StringifySink::Append(string_piece v) {
   buffer_.append(v.data(), v.size());
 }
 

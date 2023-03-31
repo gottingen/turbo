@@ -39,7 +39,7 @@ using ::testing::AllOf;
 using ::testing::HasSubstr;
 using ::testing::Not;
 
-auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_MAYBE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 #if GTEST_HAS_DEATH_TEST

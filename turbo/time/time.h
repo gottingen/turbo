@@ -85,7 +85,7 @@ struct timeval;
 #include <utility>
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/internal/cctz/include/cctz/time_zone.h"
 
@@ -616,14 +616,14 @@ inline std::ostream& operator<<(std::ostream& os, Duration d) {
 // suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
 // Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
 // `ZeroDuration()`. Parses "inf" and "-inf" as +/- `InfiniteDuration()`.
-bool ParseDuration(turbo::string_view dur_string, Duration* d);
+bool ParseDuration(turbo::string_piece dur_string, Duration* d);
 
 // TurboParseFlag()
 //
 // Parses a command-line flag string representation `text` into a Duration
 // value. Duration flags must be specified in a format that is valid input for
 // `turbo::ParseDuration()`.
-bool TurboParseFlag(turbo::string_view text, Duration* dst, std::string* error);
+bool TurboParseFlag(turbo::string_piece text, Duration* dst, std::string* error);
 
 
 // TurboUnparseFlag()
@@ -931,7 +931,7 @@ TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::system_clock::time_point
 // Additionally, if you'd like to specify a time as a count of
 // seconds/milliseconds/etc from the Unix epoch, use an turbo::Duration flag
 // and add that duration to turbo::UnixEpoch() to get an turbo::Time.
-bool TurboParseFlag(turbo::string_view text, Time* t, std::string* error);
+bool TurboParseFlag(turbo::string_piece text, Time* t, std::string* error);
 
 // TurboUnparseFlag()
 //
@@ -1135,7 +1135,7 @@ class TimeZone {
 // Loads the named zone. May perform I/O on the initial load of the named
 // zone. If the name is invalid, or some other kind of error occurs, returns
 // `false` and `*tz` is set to the UTC time zone.
-inline bool LoadTimeZone(turbo::string_view name, TimeZone* tz) {
+inline bool LoadTimeZone(turbo::string_piece name, TimeZone* tz) {
   if (name == "localtime") {
     *tz = TimeZone(time_internal::cctz::local_time_zone());
     return true;
@@ -1372,7 +1372,7 @@ TURBO_DLL extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
 // `turbo::InfinitePast()`, the returned string will be exactly "infinite-past".
 // In both cases the given format string and `turbo::TimeZone` are ignored.
 //
-TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(turbo::string_view format,
+TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(turbo::string_piece format,
                                                     Time t, TimeZone tz);
 
 // Convenience functions that format the given time using the RFC3339_full
@@ -1435,7 +1435,7 @@ inline std::ostream& operator<<(std::ostream& os, Time t) {
 // If the input string is "infinite-past", the returned `turbo::Time` will be
 // `turbo::InfinitePast()` and `true` will be returned.
 //
-bool ParseTime(turbo::string_view format, turbo::string_view input, Time* time,
+bool ParseTime(turbo::string_piece format, turbo::string_piece input, Time* time,
                std::string* err);
 
 // Like ParseTime() above, but if the format string does not contain a UTC
@@ -1445,7 +1445,7 @@ bool ParseTime(turbo::string_view format, turbo::string_view input, Time* time,
 // of ambiguity or non-existence, in which case the "pre" time (as defined
 // by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
 // all date/time strings include a UTC offset so they're context independent.
-bool ParseTime(turbo::string_view format, turbo::string_view input, TimeZone tz,
+bool ParseTime(turbo::string_piece format, turbo::string_piece input, TimeZone tz,
                Time* time, std::string* err);
 
 // ============================================================================

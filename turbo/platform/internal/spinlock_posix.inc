@@ -25,7 +25,7 @@
 
 extern "C" {
 
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
     std::atomic<uint32_t>* /* lock_word */, uint32_t /* value */, int loop,
     turbo::base_internal::SchedulingMode /* mode */) {
   turbo::base_internal::ErrnoSaver errno_saver;
@@ -40,7 +40,7 @@ TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockDelay)(
   }
 }
 
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockWake)(
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSpinLockWake)(
     std::atomic<uint32_t>* /* lock_word */, bool /* all */) {}
 
 }  // extern "C"

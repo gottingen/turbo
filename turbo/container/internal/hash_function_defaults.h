@@ -54,7 +54,7 @@
 #include "turbo/hash/hash.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -70,8 +70,8 @@ struct HashEq {
 struct StringHash {
   using is_transparent = void;
 
-  size_t operator()(turbo::string_view v) const {
-    return turbo::Hash<turbo::string_view>{}(v);
+  size_t operator()(turbo::string_piece v) const {
+    return turbo::Hash<turbo::string_piece>{}(v);
   }
   size_t operator()(const turbo::Cord& v) const {
     return turbo::Hash<turbo::Cord>{}(v);
@@ -80,16 +80,16 @@ struct StringHash {
 
 struct StringEq {
   using is_transparent = void;
-  bool operator()(turbo::string_view lhs, turbo::string_view rhs) const {
+  bool operator()(turbo::string_piece lhs, turbo::string_piece rhs) const {
     return lhs == rhs;
   }
   bool operator()(const turbo::Cord& lhs, const turbo::Cord& rhs) const {
     return lhs == rhs;
   }
-  bool operator()(const turbo::Cord& lhs, turbo::string_view rhs) const {
+  bool operator()(const turbo::Cord& lhs, turbo::string_piece rhs) const {
     return lhs == rhs;
   }
-  bool operator()(turbo::string_view lhs, const turbo::Cord& rhs) const {
+  bool operator()(turbo::string_piece lhs, const turbo::Cord& rhs) const {
     return lhs == rhs;
   }
 };
@@ -103,7 +103,7 @@ struct StringHashEq {
 template <>
 struct HashEq<std::string> : StringHashEq {};
 template <>
-struct HashEq<turbo::string_view> : StringHashEq {};
+struct HashEq<turbo::string_piece> : StringHashEq {};
 template <>
 struct HashEq<turbo::Cord> : StringHashEq {};
 

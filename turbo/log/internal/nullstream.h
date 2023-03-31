@@ -33,7 +33,7 @@
 
 #include "turbo/base/log_severity.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -45,7 +45,7 @@ namespace log_internal {
 // streamed in.
 class NullStream {
  public:
-  NullStream& AtLocation(turbo::string_view, int) { return *this; }
+  NullStream& AtLocation(turbo::string_piece, int) { return *this; }
   template <typename SourceLocationType>
   NullStream& AtLocation(SourceLocationType) {
     return *this;
@@ -114,13 +114,13 @@ class NullStreamMaybeFatal final : public NullStream {
 class NullStreamFatal final : public NullStream {
  public:
   NullStreamFatal() {}
-  // TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+  // TURBO_NORETURN doesn't seem to work on destructors with msvc, so
   // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
 #pragma warning(disable : 4722)
 #endif
-  TURBO_ATTRIBUTE_NORETURN ~NullStreamFatal() { _exit(1); }
+  TURBO_NORETURN ~NullStreamFatal() { _exit(1); }
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(pop)
 #endif

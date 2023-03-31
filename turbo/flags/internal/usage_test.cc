@@ -30,7 +30,7 @@
 #include "turbo/flags/usage.h"
 #include "turbo/flags/usage_config.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 TURBO_FLAG(int, usage_reporting_test_flag_01, 101,
           "usage_reporting_test_flag_01 help message");
@@ -48,7 +48,7 @@ struct UDT {
   UDT(const UDT&) = default;
   UDT& operator=(const UDT&) = default;
 };
-static bool TurboParseFlag(turbo::string_view, UDT*, std::string*) {
+static bool TurboParseFlag(turbo::string_piece, UDT*, std::string*) {
   return true;
 }
 static std::string TurboUnparseFlag(const UDT&) { return "UDT{}"; }
@@ -68,7 +68,7 @@ namespace {
 
 namespace flags = turbo::flags_internal;
 
-static std::string NormalizeFileName(turbo::string_view fname) {
+static std::string NormalizeFileName(turbo::string_piece fname) {
 #ifdef _WIN32
   std::string normalized(fname);
   std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -76,7 +76,7 @@ static std::string NormalizeFileName(turbo::string_view fname) {
 #endif
 
   auto turbo_pos = fname.rfind("turbo/");
-  if (turbo_pos != turbo::string_view::npos) {
+  if (turbo_pos != turbo::string_piece::npos) {
     fname = fname.substr(turbo_pos);
   }
   return std::string(fname);
@@ -243,7 +243,7 @@ path.
   flags::FlagsHelp(test_buf_05, "", flags::HelpFormat::kHumanReadable,
                    kTestUsageMessage);
   std::string test_out = test_buf_05.str();
-  turbo::string_view test_out_str(test_out);
+  turbo::string_piece test_out_str(test_out);
   EXPECT_TRUE(
       turbo::StartsWith(test_out_str, "usage_test: Custom usage message"));
   EXPECT_TRUE(turbo::StrContains(

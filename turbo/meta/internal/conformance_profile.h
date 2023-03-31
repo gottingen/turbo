@@ -46,7 +46,7 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "conformance_testing_helpers.h"
 #include "turbo/meta/utility.h"
 
@@ -87,7 +87,7 @@ class ConformanceErrors {
   // previously reported as failing. This behavior is useful for tests that
   // have multiple parts, where failures and successes are reported individually
   // with the same test name.
-  void addTestSuccess(turbo::string_view test_name) {
+  void addTestSuccess(turbo::string_piece test_name) {
     auto normalized_test_name = turbo::AsciiStrToLower(test_name);
 
     // If the test is already reported as failing, do not add it to the list of
@@ -105,7 +105,7 @@ class ConformanceErrors {
   //
   // TODO(calabrese) Determine desired behavior when if this function throws.
   template <class... P>
-  void addTestFailure(turbo::string_view test_name, const P&... args) {
+  void addTestFailure(turbo::string_piece test_name, const P&... args) {
     // Output a message related to the test failure.
     assertion_result_ << "\n\n"
                          "Failed test: "
@@ -719,7 +719,7 @@ struct SyntacticConformanceProfileOf {
                                                          type##_support); \
   TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF_IMPL(bool, is_##type)
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF(default_constructible);
 TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF(move_constructible);
 TURBO_INTERNAL_CONFORMANCE_TESTING_DATA_MEMBER_DEF(copy_constructible);

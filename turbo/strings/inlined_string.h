@@ -18,7 +18,8 @@
 // @author: Andrei Alexandrescu (aalexandre)
 // String type.
 
-#pragma once
+#ifndef TURBO_STRINGS_INLINED_STRING_H_
+#define TURBO_STRINGS_INLINED_STRING_H_
 
 #include <algorithm>
 #include <atomic>
@@ -39,7 +40,7 @@
 #include "turbo/base/internal/throw_delegate.h"
 #include "turbo/memory/jemalloc_helper.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 // Ignore shadowing warnings within this file, so includers can use -Wshadow.
 TURBO_DISABLE_GCC_WARNING(-Wshadow)
@@ -242,6 +243,7 @@ public:
     isMedium = kIsLittleEndian ? 0x80 : 0x2,
     isLarge = kIsLittleEndian ? 0x40 : 0x1,
   };
+
 public:
   inlined_string_core() noexcept { reset(); }
 
@@ -556,7 +558,6 @@ public:
   };
 
 public:
-
   Category category() const {
     // works for both big-endian and little-endian
     return static_cast<Category>(bytes_[lastChar] & categoryExtractMask);
@@ -703,7 +704,6 @@ inline void inlined_string_core<Char>::initSmall(const Char *const data,
   if ((reinterpret_cast<size_t>(data) & (sizeof(size_t) - 1)) == 0) {
     const size_t byteSize = size * sizeof(Char);
     constexpr size_t wordWidth = sizeof(size_t);
-    TURBO_DISABLE_GCC_WARNING(-Wimplicit - fallthrough =)
     switch ((byteSize + wordWidth - 1) / wordWidth) { // Number of words.
     case 3:
       ml_.capacity_ = reinterpret_cast<const size_t *>(data)[2];
@@ -1089,8 +1089,10 @@ public:
   template <typename A2>
   /* implicit */ basic_inlined_string(const std::basic_string<E, T, A2> &str)
       : store_(str.data(), str.size()) {}
+  /* implicit */ basic_inlined_string(const turbo::basic_string_view<E, T> &str)
+      : store_(str.data(), str.size()) {}
 
-  basic_inlined_string(const turbo::string_view &str)
+  basic_inlined_string(const turbo::string_piece &str)
       : store_(str.data(), str.size() / sizeof(E)) {}
 
   basic_inlined_string(const basic_inlined_string &str, size_type pos,
@@ -1183,8 +1185,12 @@ public:
     return assign(il.begin(), il.end());
   }
 
-  operator turbo::string_view() const noexcept {
+  operator turbo::string_piece() const noexcept {
     return {data(), size() * sizeof(E)};
+  }
+
+  operator turbo::basic_string_view<E, T>() const noexcept {
+    return {data(), size()};
   }
 
   // C++11 21.4.3 iterators:
@@ -1509,7 +1515,7 @@ public:
                                                    allocator_type> &str) {
     return H::combine(
         std::move(hash_state),
-        turbo::string_view(str.data(), str.size() * sizeof(value_type)));
+        turbo::string_piece(str.data(), str.size() * sizeof(value_type)));
   }
 
 private:
@@ -2707,3 +2713,4 @@ inline std::string &&toStdString(std::string &&s) { return std::move(s); }
 } // namespace turbo
 
 #undef INLINED_STRING_DISABLE_SSO
+#endif // TURBO_STRINGS_INLINED_STRING_H_

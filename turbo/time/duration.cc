@@ -69,7 +69,7 @@
 #include "turbo/base/casts.h"
 #include "turbo/base/int128.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/strings/strip.h"
 #include "turbo/time/time.h"
 
@@ -711,7 +711,7 @@ char* Format64(char* ep, int width, int64_t v) {
 // fractional digits, because it is in the noise of what a Duration can
 // represent.
 struct DisplayUnit {
-  turbo::string_view abbr;
+  turbo::string_piece abbr;
   int prec;
   double pow10;
 };
@@ -871,7 +871,7 @@ bool ConsumeDurationUnit(const char** start, const char* end, Duration* unit) {
         default:
           break;
       }
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case 1:
       switch (**start) {
         case 's':
@@ -899,7 +899,7 @@ bool ConsumeDurationUnit(const char** start, const char* end, Duration* unit) {
 //   a possibly signed sequence of decimal numbers, each with optional
 //   fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
 //   Valid time units are "ns", "us" "ms", "s", "m", "h".
-bool ParseDuration(turbo::string_view dur_sv, Duration* d) {
+bool ParseDuration(turbo::string_piece dur_sv, Duration* d) {
   int sign = 1;
   if (turbo::ConsumePrefix(&dur_sv, "-")) {
     sign = -1;
@@ -940,7 +940,7 @@ bool ParseDuration(turbo::string_view dur_sv, Duration* d) {
   return true;
 }
 
-bool TurboParseFlag(turbo::string_view text, Duration* dst, std::string*) {
+bool TurboParseFlag(turbo::string_piece text, Duration* dst, std::string*) {
   return ParseDuration(text, dst);
 }
 

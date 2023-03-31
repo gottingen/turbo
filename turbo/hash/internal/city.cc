@@ -32,7 +32,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace hash_internal {
 
-#ifdef TURBO_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 #define uint32_in_expected_order(x) (turbo::gbswap_32(x))
 #define uint64_in_expected_order(x) (turbo::gbswap_64(x))
 #else

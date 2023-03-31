@@ -38,7 +38,7 @@ turbo::crc32c_t FallbackCrcMemcpyEngine::Compute(void* __restrict dst,
   std::size_t offset = 0;
   for (; offset + kBlockSize < length; offset += kBlockSize) {
     crc = turbo::ExtendCrc32c(crc,
-                             turbo::string_view(src_bytes + offset, kBlockSize));
+                             turbo::string_piece(src_bytes + offset, kBlockSize));
     memcpy(dst_bytes + offset, src_bytes + offset, kBlockSize);
   }
 
@@ -46,7 +46,7 @@ turbo::crc32c_t FallbackCrcMemcpyEngine::Compute(void* __restrict dst,
   if (offset < length) {
     std::size_t final_copy_size = length - offset;
     crc = turbo::ExtendCrc32c(
-        crc, turbo::string_view(src_bytes + offset, final_copy_size));
+        crc, turbo::string_piece(src_bytes + offset, final_copy_size));
     memcpy(dst_bytes + offset, src_bytes + offset, final_copy_size);
   }
 

@@ -30,7 +30,7 @@
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/per_thread_tls.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -39,7 +39,7 @@ using testing::Contains;
 #ifdef _WIN32
 #define TURBO_SYMBOLIZE_TEST_NOINLINE __declspec(noinline)
 #else
-#define TURBO_SYMBOLIZE_TEST_NOINLINE TURBO_ATTRIBUTE_NOINLINE
+#define TURBO_SYMBOLIZE_TEST_NOINLINE TURBO_NO_INLINE
 #endif
 
 // Functions to symbolize. Use C linkage to avoid mangled names.
@@ -151,8 +151,8 @@ static const char *TrySymbolize(void *pc) {
     defined(TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE)
 
 // Test with a return address.
-void TURBO_ATTRIBUTE_NOINLINE TestWithReturnAddress() {
-#if defined(TURBO_HAVE_ATTRIBUTE_NOINLINE)
+void TURBO_NO_INLINE TestWithReturnAddress() {
+#if defined(TURBO_NO_INLINE_SUPPORTED)
   void *return_address = __builtin_return_address(0);
   const char *symbol = TrySymbolize(return_address);
   TURBO_RAW_CHECK(symbol != nullptr, "TestWithReturnAddress failed");
@@ -419,7 +419,7 @@ TEST(Symbolize, ForEachSection) {
 
   std::vector<std::string> sections;
   ASSERT_TRUE(turbo::debugging_internal::ForEachSection(
-      fd, [&sections](const turbo::string_view name, const ElfW(Shdr) &) {
+      fd, [&sections](const turbo::string_piece name, const ElfW(Shdr) &) {
         sections.emplace_back(name);
         return true;
       }));
@@ -438,7 +438,7 @@ TEST(Symbolize, ForEachSection) {
 
 // x86 specific tests.  Uses some inline assembler.
 extern "C" {
-inline void *TURBO_ATTRIBUTE_ALWAYS_INLINE inline_func() {
+TURBO_FORCE_INLINE void * inline_func() {
   void *pc = nullptr;
 #if defined(__i386__)
   __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
@@ -448,7 +448,7 @@ inline void *TURBO_ATTRIBUTE_ALWAYS_INLINE inline_func() {
   return pc;
 }
 
-void *TURBO_ATTRIBUTE_NOINLINE non_inline_func() {
+void *TURBO_NO_INLINE non_inline_func() {
   void *pc = nullptr;
 #if defined(__i386__)
   __asm__ __volatile__("call 1f;\n 1: pop %[PC]" : [ PC ] "=r"(pc));
@@ -458,8 +458,8 @@ void *TURBO_ATTRIBUTE_NOINLINE non_inline_func() {
   return pc;
 }
 
-void TURBO_ATTRIBUTE_NOINLINE TestWithPCInsideNonInlineFunction() {
-#if defined(TURBO_HAVE_ATTRIBUTE_NOINLINE) && \
+void TURBO_NO_INLINE TestWithPCInsideNonInlineFunction() {
+#if defined(TURBO_NO_INLINE_SUPPORTED) && \
     (defined(__i386__) || defined(__x86_64__))
   void *pc = non_inline_func();
   const char *symbol = TrySymbolize(pc);
@@ -470,8 +470,8 @@ void TURBO_ATTRIBUTE_NOINLINE TestWithPCInsideNonInlineFunction() {
 #endif
 }
 
-void TURBO_ATTRIBUTE_NOINLINE TestWithPCInsideInlineFunction() {
-#if defined(TURBO_HAVE_ATTRIBUTE_ALWAYS_INLINE) && \
+void TURBO_NO_INLINE TestWithPCInsideInlineFunction() {
+#if defined(TURBO_FORCE_INLINE_SUPPORTED) && \
     (defined(__i386__) || defined(__x86_64__))
   void *pc = inline_func();  // Must be inlined.
   const char *symbol = TrySymbolize(pc);
@@ -517,8 +517,8 @@ __attribute__((target("arm"))) int ArmThumbOverlapArm(int x) {
   return x * x * x;
 }
 
-void TURBO_ATTRIBUTE_NOINLINE TestArmThumbOverlap() {
-#if defined(TURBO_HAVE_ATTRIBUTE_NOINLINE)
+void TURBO_NO_INLINE TestArmThumbOverlap() {
+#if defined(TURBO_NO_INLINE_SUPPORTED)
   const char *symbol = TrySymbolize((void *)&ArmThumbOverlapArm);
   TURBO_RAW_CHECK(symbol != nullptr, "TestArmThumbOverlap failed");
   TURBO_RAW_CHECK(strcmp("ArmThumbOverlapArm()", symbol) == 0,

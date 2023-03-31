@@ -23,7 +23,7 @@
 
 #include "turbo/log/internal/test_helpers.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 #include "gmock/gmock.h"
@@ -47,13 +47,13 @@ using ::testing::ResultOf;
 using ::testing::Truly;
 
 class AsStringImpl final
-    : public MatcherInterface<turbo::string_view> {
+    : public MatcherInterface<turbo::string_piece> {
  public:
   explicit AsStringImpl(
       const Matcher<const std::string&>& str_matcher)
       : str_matcher_(str_matcher) {}
   bool MatchAndExplain(
-      turbo::string_view actual,
+      turbo::string_piece actual,
       MatchResultListener* listener) const override {
     return str_matcher_.MatchAndExplain(std::string(actual), listener);
   }
@@ -70,11 +70,11 @@ class AsStringImpl final
 };
 
 class MatchesOstreamImpl final
-    : public MatcherInterface<turbo::string_view> {
+    : public MatcherInterface<turbo::string_piece> {
  public:
   explicit MatchesOstreamImpl(std::string expected)
       : expected_(std::move(expected)) {}
-  bool MatchAndExplain(turbo::string_view actual,
+  bool MatchAndExplain(turbo::string_piece actual,
                        MatchResultListener*) const override {
     return actual == expected_;
   }
@@ -93,19 +93,19 @@ class MatchesOstreamImpl final
 };
 }  // namespace
 
-Matcher<turbo::string_view> AsString(
+Matcher<turbo::string_piece> AsString(
     const Matcher<const std::string&>& str_matcher) {
   return MakeMatcher(new AsStringImpl(str_matcher));
 }
 
 Matcher<const turbo::LogEntry&> SourceFilename(
-    const Matcher<turbo::string_view>& source_filename) {
+    const Matcher<turbo::string_piece>& source_filename) {
   return Property("source_filename", &turbo::LogEntry::source_filename,
                   source_filename);
 }
 
 Matcher<const turbo::LogEntry&> SourceBasename(
-    const Matcher<turbo::string_view>& source_basename) {
+    const Matcher<turbo::string_piece>& source_basename) {
   return Property("source_basename", &turbo::LogEntry::source_basename,
                   source_basename);
 }
@@ -143,7 +143,7 @@ Matcher<const turbo::LogEntry&> ThreadID(
 }
 
 Matcher<const turbo::LogEntry&> TextMessageWithPrefixAndNewline(
-    const Matcher<turbo::string_view>&
+    const Matcher<turbo::string_piece>&
         text_message_with_prefix_and_newline) {
   return Property("text_message_with_prefix_and_newline",
                   &turbo::LogEntry::text_message_with_prefix_and_newline,
@@ -151,29 +151,29 @@ Matcher<const turbo::LogEntry&> TextMessageWithPrefixAndNewline(
 }
 
 Matcher<const turbo::LogEntry&> TextMessageWithPrefix(
-    const Matcher<turbo::string_view>& text_message_with_prefix) {
+    const Matcher<turbo::string_piece>& text_message_with_prefix) {
   return Property("text_message_with_prefix",
                   &turbo::LogEntry::text_message_with_prefix,
                   text_message_with_prefix);
 }
 
 Matcher<const turbo::LogEntry&> TextMessage(
-    const Matcher<turbo::string_view>& text_message) {
+    const Matcher<turbo::string_piece>& text_message) {
   return Property("text_message", &turbo::LogEntry::text_message, text_message);
 }
 
 Matcher<const turbo::LogEntry&> TextPrefix(
-    const Matcher<turbo::string_view>& text_prefix) {
+    const Matcher<turbo::string_piece>& text_prefix) {
   return ResultOf(
       [](const turbo::LogEntry& entry) {
-        turbo::string_view msg = entry.text_message_with_prefix();
+        turbo::string_piece msg = entry.text_message_with_prefix();
         msg.remove_suffix(entry.text_message().size());
         return msg;
       },
       text_prefix);
 }
 Matcher<const turbo::LogEntry&> RawEncodedMessage(
-    const Matcher<turbo::string_view>& raw_encoded_message) {
+    const Matcher<turbo::string_piece>& raw_encoded_message) {
   return Property("encoded_message", &turbo::LogEntry::encoded_message,
                   raw_encoded_message);
 }
@@ -184,11 +184,11 @@ Matcher<const turbo::LogEntry&> Verbosity(
 }
 
 Matcher<const turbo::LogEntry&> Stacktrace(
-    const Matcher<turbo::string_view>& stacktrace) {
+    const Matcher<turbo::string_piece>& stacktrace) {
   return Property("stacktrace", &turbo::LogEntry::stacktrace, stacktrace);
 }
 
-Matcher<turbo::string_view> MatchesOstream(
+Matcher<turbo::string_piece> MatchesOstream(
     const std::ostringstream& stream) {
   return MakeMatcher(new MatchesOstreamImpl(stream.str()));
 }

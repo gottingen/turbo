@@ -107,17 +107,17 @@ TURBO_NAMESPACE_BEGIN
 //
 // Example: Binding arguments explicitly.
 //
-//   void LogStringView(turbo::string_view sv) {
+//   void LogStringView(turbo::string_piece sv) {
 //     LOG(INFO) << sv;
 //   }
 //
 //   Executor* e = Executor::DefaultExecutor();
 //   std::string s = "hello";
-//   turbo::string_view sv = s;
+//   turbo::string_piece sv = s;
 //
 //   // turbo::bind_front(LogStringView, arg) makes a copy of arg and stores it.
 //   e->Schedule(turbo::bind_front(LogStringView, sv)); // ERROR: dangling
-//                                                     // string_view.
+//                                                     // string_piece.
 //
 //   e->Schedule(turbo::bind_front(LogStringView, s));  // OK: stores a copy of
 //                                                     // s.
@@ -160,7 +160,7 @@ TURBO_NAMESPACE_BEGIN
 //
 // Example: Storing reference-like types.
 //
-//   void Print(turbo::string_view a, const std::string& b) {
+//   void Print(turbo::string_piece a, const std::string& b) {
 //     std::cerr << a << b;
 //   }
 //
@@ -169,11 +169,11 @@ TURBO_NAMESPACE_BEGIN
 //   turbo::bind_front(Print, hi)("Chuk");
 //
 //   // Compile error: std::reference_wrapper<const string> is not implicitly
-//   // convertible to string_view.
+//   // convertible to string_piece.
 //   // turbo::bind_front(Print, std::cref(hi))("Chuk");
 //
 //   // Doesn't copy "hi".
-//   turbo::bind_front(Print, turbo::string_view(hi))("Chuk");
+//   turbo::bind_front(Print, turbo::string_piece(hi))("Chuk");
 //
 #if defined(__cpp_lib_bind_front) && __cpp_lib_bind_front >= 201907L
 using std::bind_front;

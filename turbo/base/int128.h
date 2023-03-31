@@ -36,20 +36,6 @@
 
 #include "turbo/platform/port.h"
 
-#if defined(_MSC_VER)
-// In very old versions of MSVC and when the /Zc:wchar_t flag is off, wchar_t is
-// a typedef for unsigned short.  Otherwise wchar_t is mapped to the __wchar_t
-// builtin type.  We need to make sure not to define operator wchar_t()
-// alongside operator unsigned short() in these instances.
-#define TURBO_INTERNAL_WCHAR_T __wchar_t
-#if defined(_M_X64) && !defined(_M_ARM64EC)
-#include <intrin.h>
-#pragma intrinsic(_umul128)
-#endif  // defined(_M_X64)
-#else   // defined(_MSC_VER)
-#define TURBO_INTERNAL_WCHAR_T wchar_t
-#endif  // defined(_MSC_VER)
-
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
@@ -143,7 +129,7 @@ class
   constexpr explicit operator unsigned char() const;
   constexpr explicit operator char16_t() const;
   constexpr explicit operator char32_t() const;
-  constexpr explicit operator TURBO_INTERNAL_WCHAR_T() const;
+  constexpr explicit operator TURBO_WCHAR_T() const;
   constexpr explicit operator short() const;  // NOLINT(runtime/int)
   // NOLINTNEXTLINE(runtime/int)
   constexpr explicit operator unsigned short() const;
@@ -222,10 +208,10 @@ class
   // uint128 are fixed to not depend on alignof(uint128) == 8. Also add
   // alignas(16) to class definition to keep alignment consistent across
   // platforms.
-#if defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_IS_LITTLE_ENDIAN
   uint64_t lo_;
   uint64_t hi_;
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif TURBO_IS_BIG_ENDIAN
   uint64_t hi_;
   uint64_t lo_;
 #else  // byte order
@@ -371,7 +357,7 @@ class int128 {
   constexpr explicit operator unsigned char() const;
   constexpr explicit operator char16_t() const;
   constexpr explicit operator char32_t() const;
-  constexpr explicit operator TURBO_INTERNAL_WCHAR_T() const;
+  constexpr explicit operator TURBO_WCHAR_T() const;
   constexpr explicit operator short() const;  // NOLINT(runtime/int)
   // NOLINTNEXTLINE(runtime/int)
   constexpr explicit operator unsigned short() const;
@@ -458,10 +444,10 @@ class int128 {
 #if defined(TURBO_HAVE_INTRINSIC_INT128)
   __int128 v_;
 #else  // TURBO_HAVE_INTRINSIC_INT128
-#if defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_IS_LITTLE_ENDIAN
   uint64_t lo_;
   int64_t hi_;
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif TURBO_IS_BIG_ENDIAN
   int64_t hi_;
   uint64_t lo_;
 #else  // byte order
@@ -633,7 +619,7 @@ constexpr uint64_t Uint128High64(uint128 v) { return v.hi_; }
 
 // Constructors from integer types.
 
-#if defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_IS_LITTLE_ENDIAN
 
 constexpr uint128::uint128(uint64_t high, uint64_t low)
     : lo_{low}, hi_{high} {}
@@ -666,7 +652,7 @@ constexpr uint128::uint128(unsigned __int128 v)
 constexpr uint128::uint128(int128 v)
     : lo_{Int128Low64(v)}, hi_{static_cast<uint64_t>(Int128High64(v))} {}
 
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif TURBO_IS_BIG_ENDIAN
 
 constexpr uint128::uint128(uint64_t high, uint64_t low)
     : hi_{high}, lo_{low} {}
@@ -725,8 +711,8 @@ constexpr uint128::operator char32_t() const {
   return static_cast<char32_t>(lo_);
 }
 
-constexpr uint128::operator TURBO_INTERNAL_WCHAR_T() const {
-  return static_cast<TURBO_INTERNAL_WCHAR_T>(lo_);
+constexpr uint128::operator TURBO_WCHAR_T() const {
+  return static_cast<TURBO_WCHAR_T>(lo_);
 }
 
 // NOLINTNEXTLINE(runtime/int)
@@ -1158,6 +1144,6 @@ constexpr int64_t BitCastToSigned(uint64_t v) {
 TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#undef TURBO_INTERNAL_WCHAR_T
+#undef TURBO_WCHAR_T
 
 #endif  // TURBO_BASE_INT128_H_

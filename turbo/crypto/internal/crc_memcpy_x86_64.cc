@@ -57,7 +57,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/prefetch.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 #ifdef TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE
 
@@ -163,14 +163,14 @@ crc32c_t AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   constexpr std::size_t kCopyRoundSize = kRegions * kBlockSize;
 
   // Number of blocks per cacheline.
-  constexpr std::size_t kBlocksPerCacheLine = TURBO_CACHELINE_SIZE / kBlockSize;
+  constexpr std::size_t kBlocksPerCacheLine = TURBO_CACHE_LINE_SIZE / kBlockSize;
 
   char* dst_bytes = static_cast<char*>(dst);
   const char* src_bytes = static_cast<const char*>(src);
 
   // Make sure that one prefetch per big block is enough to cover the whole
   // dataset, and we don't prefetch too much.
-  static_assert(TURBO_CACHELINE_SIZE % kBlockSize == 0,
+  static_assert(TURBO_CACHE_LINE_SIZE % kBlockSize == 0,
                 "Cache lines are not divided evenly into blocks, may have "
                 "unintended behavior!");
 
@@ -181,12 +181,12 @@ crc32c_t AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
 
   // Experimentally-determined prefetch distance.  Main loop copies will
   // prefeth data 2 cache lines ahead.
-  constexpr std::size_t kPrefetchAhead = 2 * TURBO_CACHELINE_SIZE;
+  constexpr std::size_t kPrefetchAhead = 2 * TURBO_CACHE_LINE_SIZE;
 
   // Small-size CRC-memcpy : just do CRC + memcpy
   if (length < kCrcSmallSize) {
     crc32c_t crc =
-        ExtendCrc32c(initial_crc, std::string_view(src_bytes, length));
+        ExtendCrc32c(initial_crc, turbo::string_piece(src_bytes, length));
     memcpy(dst, src, length);
     return crc;
   }

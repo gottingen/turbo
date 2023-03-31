@@ -30,11 +30,11 @@ TEST(ConfigTest, Endianness) {
   number.data[1] = 0x01;
   number.data[2] = 0x02;
   number.data[3] = 0x03;
-#if defined(TURBO_IS_LITTLE_ENDIAN) && defined(TURBO_IS_BIG_ENDIAN)
+#if TURBO_IS_LITTLE_ENDIAN && TURBO_IS_BIG_ENDIAN
 #error Both TURBO_IS_LITTLE_ENDIAN and TURBO_IS_BIG_ENDIAN are defined
-#elif defined(TURBO_IS_LITTLE_ENDIAN)
+#elif TURBO_IS_LITTLE_ENDIAN
   EXPECT_EQ(UINT32_C(0x03020100), number.value);
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif TURBO_IS_BIG_ENDIAN
   EXPECT_EQ(UINT32_C(0x00010203), number.value);
 #else
 #error Unknown endianness

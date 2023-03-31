@@ -142,7 +142,7 @@ enum {
 };
 
 template <typename Callable, typename... Args>
-TURBO_ATTRIBUTE_NOINLINE
+TURBO_NO_INLINE
 void CallOnceImpl(std::atomic<uint32_t>* control,
                   base_internal::SchedulingMode scheduling_mode, Callable&& fn,
                   Args&&... args) {
@@ -192,7 +192,7 @@ template <typename Callable, typename... Args>
 void LowLevelCallOnce(turbo::once_flag* flag, Callable&& fn, Args&&... args) {
   std::atomic<uint32_t>* once = base_internal::ControlWord(flag);
   uint32_t s = once->load(std::memory_order_acquire);
-  if (TURBO_PREDICT_FALSE(s != base_internal::kOnceDone)) {
+  if (TURBO_UNLIKELY(s != base_internal::kOnceDone)) {
     base_internal::CallOnceImpl(once, base_internal::SCHEDULE_KERNEL_ONLY,
                                 std::forward<Callable>(fn),
                                 std::forward<Args>(args)...);
@@ -205,7 +205,7 @@ template <typename Callable, typename... Args>
 void call_once(turbo::once_flag& flag, Callable&& fn, Args&&... args) {
   std::atomic<uint32_t>* once = base_internal::ControlWord(&flag);
   uint32_t s = once->load(std::memory_order_acquire);
-  if (TURBO_PREDICT_FALSE(s != base_internal::kOnceDone)) {
+  if (TURBO_UNLIKELY(s != base_internal::kOnceDone)) {
     base_internal::CallOnceImpl(
         once, base_internal::SCHEDULE_COOPERATIVE_AND_KERNEL,
         std::forward<Callable>(fn), std::forward<Args>(args)...);

@@ -136,14 +136,14 @@ class Helper {
  public:
   // Move type-agnostic error handling to the .cc.
   static void HandleInvalidStatusCtorArg(Status*);
-  TURBO_ATTRIBUTE_NORETURN static void Crash(const turbo::Status& status);
+  TURBO_NORETURN static void Crash(const turbo::Status& status);
 };
 
 // Construct an instance of T in `p` through placement new, passing Args... to
 // the constructor.
 // This abstraction is here mostly for the gcc performance fix.
 template <typename T, typename... Args>
-TURBO_ATTRIBUTE_NONNULL(1) void PlacementNew(void* p, Args&&... args) {
+TURBO_NONNULL(1) void PlacementNew(void* p, Args&&... args) {
   new (p) T(std::forward<Args>(args)...);
 }
 
@@ -286,11 +286,11 @@ class ResultStatusData {
   }
 
   void EnsureOk() const {
-    if (TURBO_PREDICT_FALSE(!ok())) Helper::Crash(status_);
+    if (TURBO_UNLIKELY(!ok())) Helper::Crash(status_);
   }
 
   void EnsureNotOk() {
-    if (TURBO_PREDICT_FALSE(ok())) Helper::HandleInvalidStatusCtorArg(&status_);
+    if (TURBO_UNLIKELY(ok())) Helper::HandleInvalidStatusCtorArg(&status_);
   }
 
   // Construct the value (ie. data_) through placement new with the passed
@@ -387,7 +387,7 @@ struct MoveAssignBase<T, false> {
   MoveAssignBase& operator=(MoveAssignBase&&) = delete;
 };
 
-TURBO_ATTRIBUTE_NORETURN void ThrowBadResultStatusAccess(turbo::Status status);
+TURBO_NORETURN void ThrowBadResultStatusAccess(turbo::Status status);
 
 }  // namespace result_status_internal
 TURBO_NAMESPACE_END

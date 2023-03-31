@@ -64,12 +64,12 @@ TURBO_NAMESPACE_END
 
 extern "C" {
 
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemPost)(
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemPost)(
     turbo::base_internal::ThreadIdentity *identity) {
   turbo::synchronization_internal::Waiter::GetWaiter(identity)->Post();
 }
 
-TURBO_ATTRIBUTE_WEAK bool TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemWait)(
+TURBO_WEAK bool TURBO_INTERNAL_C_SYMBOL(TurboInternalPerThreadSemWait)(
     turbo::synchronization_internal::KernelTimeout t) {
   bool timeout = false;
   turbo::base_internal::ThreadIdentity *identity;

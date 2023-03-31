@@ -26,15 +26,15 @@
 
 #include <sanitizer/lsan_interface.h>
 
-#if TURBO_HAVE_ATTRIBUTE_WEAK
-extern "C" TURBO_ATTRIBUTE_WEAK int __lsan_is_turned_off();
+#if TURBO_WEAK_SUPPORTED
+extern "C" TURBO_WEAK int __lsan_is_turned_off();
 #endif
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 bool HaveLeakSanitizer() { return true; }
 
-#if TURBO_HAVE_ATTRIBUTE_WEAK
+#if TURBO_WEAK_SUPPORTED
 bool LeakCheckerIsActive() {
   return !(&__lsan_is_turned_off && __lsan_is_turned_off());
 }

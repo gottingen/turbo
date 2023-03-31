@@ -34,7 +34,7 @@
 
 #include "turbo/log/internal/structured.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -51,16 +51,16 @@ TURBO_NAMESPACE_BEGIN
 // Using `LogAsLiteral()` is occasionally appropriate and useful when proxying
 // data logged from another system or another language.  For example:
 //
-//   void Logger::LogString(turbo::string_view str, turbo::LogSeverity severity,
+//   void Logger::LogString(turbo::string_piece str, turbo::LogSeverity severity,
 //                          const char *file, int line) {
 //     LOG(LEVEL(severity)).AtLocation(file, line) << str;
 //   }
-//   void Logger::LogStringLiteral(turbo::string_view str,
+//   void Logger::LogStringLiteral(turbo::string_piece str,
 //                                 turbo::LogSeverity severity, const char *file,
 //                                 int line) {
 //     LOG(LEVEL(severity)).AtLocation(file, line) << turbo::LogAsLiteral(str);
 //   }
-inline log_internal::AsLiteralImpl LogAsLiteral(turbo::string_view s) {
+inline log_internal::AsLiteralImpl LogAsLiteral(turbo::string_piece s) {
   return log_internal::AsLiteralImpl(s);
 }
 

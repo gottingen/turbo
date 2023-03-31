@@ -35,7 +35,7 @@
 #include "turbo/strings/match.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_format.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/meta/optional.h"
 
 namespace {
@@ -911,7 +911,7 @@ struct PointWithTurboStringifiyAndOstream {
   int y = 20;
 };
 
-TURBO_ATTRIBUTE_UNUSED std::ostream& operator<<(
+TURBO_MAYBE_UNUSED std::ostream& operator<<(
     std::ostream& os, const PointWithTurboStringifiyAndOstream&) {
   return os << "Default to TurboStringify()";
 }
@@ -1366,7 +1366,7 @@ TEST(ManipulatorLogFormatTest, Ends) {
   EXPECT_CALL(
       test_sink,
       Send(AllOf(TextMessage(MatchesOstream(comparison_stream)),
-                 TextMessage(Eq(turbo::string_view("\0", 1))),
+                 TextMessage(Eq(turbo::string_piece("\0", 1))),
                  ENCODED_MESSAGE(EqualsProto(R"pb(value { str: "\0" })pb")))));
 
   test_sink.StartCapturingLogs();
@@ -1673,7 +1673,7 @@ TEST(StructuredLoggingOverflowTest, TruncatesStrings) {
 }
 
 struct StringLike {
-  turbo::string_view data;
+  turbo::string_piece data;
 };
 std::ostream& operator<<(std::ostream& os, StringLike str) {
   return os << str.data;
@@ -1710,7 +1710,7 @@ size_t MaxLogFieldLengthNoPrefix() {
     void Send(const turbo::LogEntry& entry) override {
       CHECK(!size_.has_value());
       CHECK_EQ(entry.text_message().find_first_not_of('x'),
-               turbo::string_view::npos);
+               turbo::string_piece::npos);
       size_.emplace(entry.text_message().size());
     }
     size_t size() const {

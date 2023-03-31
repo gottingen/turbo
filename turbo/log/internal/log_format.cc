@@ -37,7 +37,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/strings/str_format.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/time.h"
 
@@ -78,7 +78,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
   constexpr size_t kBoundedFieldsMaxLen =
       sizeof("SMMDD HH:MM:SS.NNNNNN  ") +
       (1 + std::numeric_limits<log_internal::Tid>::digits10 + 1) - sizeof("");
-  if (TURBO_PREDICT_FALSE(buf.size() < kBoundedFieldsMaxLen)) {
+  if (TURBO_UNLIKELY(buf.size() < kBoundedFieldsMaxLen)) {
     // We don't bother trying to truncate these fields if the buffer is too
     // short (or almost too short) because it would require doing a lot more
     // length checking (slow) and it should never happen.  A 15kB buffer should
@@ -92,7 +92,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
   // isn't async-signal-safe. We can only use the time zone if it has already
   // been loaded.
   const turbo::TimeZone* tz = turbo::log_internal::TimeZone();
-  if (TURBO_PREDICT_FALSE(tz == nullptr)) {
+  if (TURBO_UNLIKELY(tz == nullptr)) {
     // If a time zone hasn't been set yet because we are logging before the
     // logging library has been initialized, we fallback to a simpler, slower
     // method. Just report the raw Unix time in seconds. We cram this into the
@@ -146,7 +146,7 @@ size_t FormatBoundedFields(turbo::LogSeverity severity, turbo::Time timestamp,
 size_t FormatLineNumber(int line, turbo::Span<char>& buf) {
   constexpr size_t kLineFieldMaxLen =
       sizeof(":] ") + (1 + std::numeric_limits<int>::digits10 + 1) - sizeof("");
-  if (TURBO_PREDICT_FALSE(buf.size() < kLineFieldMaxLen)) {
+  if (TURBO_UNLIKELY(buf.size() < kLineFieldMaxLen)) {
     // As above, we don't bother trying to truncate this if the buffer is too
     // short and it should never happen.
     buf.remove_suffix(buf.size());
@@ -167,8 +167,8 @@ size_t FormatLineNumber(int line, turbo::Span<char>& buf) {
 std::string FormatLogMessage(turbo::LogSeverity severity,
                              turbo::CivilSecond civil_second,
                              turbo::Duration subsecond, log_internal::Tid tid,
-                             turbo::string_view basename, int line,
-                             PrefixFormat format, turbo::string_view message) {
+                             turbo::string_piece basename, int line,
+                             PrefixFormat format, turbo::string_piece message) {
   return turbo::StrFormat(
       "%c%02d%02d %02d:%02d:%02d.%06d %7d %s:%d] %s%s",
       turbo::LogSeverityName(severity)[0], civil_second.month(),
@@ -187,7 +187,7 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
 // 2. filename
 // 3. line number and bracket
 size_t FormatLogPrefix(turbo::LogSeverity severity, turbo::Time timestamp,
-                       log_internal::Tid tid, turbo::string_view basename,
+                       log_internal::Tid tid, turbo::string_piece basename,
                        int line, PrefixFormat format, turbo::Span<char>& buf) {
   auto prefix_size = FormatBoundedFields(severity, timestamp, tid, buf);
   prefix_size += log_internal::AppendTruncated(basename, buf);

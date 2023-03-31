@@ -99,7 +99,7 @@ class UntypedFormatSpec {
   UntypedFormatSpec(const UntypedFormatSpec&) = delete;
   UntypedFormatSpec& operator=(const UntypedFormatSpec&) = delete;
 
-  explicit UntypedFormatSpec(string_view s) : spec_(s) {}
+  explicit UntypedFormatSpec(string_piece s) : spec_(s) {}
 
  protected:
   explicit UntypedFormatSpec(const str_format_internal::ParsedFormatBase* pc)
@@ -171,7 +171,7 @@ class FormatCountCapture {
 // For a `FormatSpec` to be valid at compile-time, it must be provided as
 // either:
 //
-// * A `constexpr` literal or `turbo::string_view`, which is how it most often
+// * A `constexpr` literal or `turbo::string_piece`, which is how it most often
 //   used.
 // * A `ParsedFormat` instantiation, which ensures the format string is
 //   valid before use. (See below.)
@@ -181,8 +181,8 @@ class FormatCountCapture {
 //   // Provided as a string literal.
 //   turbo::StrFormat("Welcome to %s, Number %d!", "The Village", 6);
 //
-//   // Provided as a constexpr turbo::string_view.
-//   constexpr turbo::string_view formatString = "Welcome to %s, Number %d!";
+//   // Provided as a constexpr turbo::string_piece.
+//   constexpr turbo::string_piece formatString = "Welcome to %s, Number %d!";
 //   turbo::StrFormat(formatString, "The Village", 6);
 //
 //   // Provided as a pre-compiled ParsedFormat object.
@@ -248,7 +248,7 @@ class FormatCountCapture {
 // `v` uses `d` for signed integer values, `u` for unsigned integer values, `g`
 // for floating point values, and formats boolean values as "true"/"false"
 // (instead of 1 or 0 for booleans formatted using d). `const char*` is not
-// supported; please use `std:string` and `string_view`. `char` is also not
+// supported; please use `std:string` and `string_piece`. `char` is also not
 // supported due to ambiguity of the type. This specifier does not support
 // modifiers.
 //
@@ -261,7 +261,7 @@ class FormatCountCapture {
 //
 // However, in the `str_format` library, a format conversion specifies a broader
 // C++ conceptual category instead of an exact type. For example, `%s` binds to
-// any string-like argument, so `std::string`, `turbo::string_view`, and
+// any string-like argument, so `std::string`, `turbo::string_piece`, and
 // `const char*` are all accepted. Likewise, `%d` accepts any integer-like
 // argument, etc.
 
@@ -400,7 +400,7 @@ TURBO_MUST_USE_RESULT str_format_internal::Streamable StreamFormat(
 //
 // Example:
 //
-//   std::string_view s = "Ulaanbaatar";
+//   turbo::string_piece s = "Ulaanbaatar";
 //   turbo::PrintF("The capital of Mongolia is %s", s);
 //
 //   Outputs: "The capital of Mongolia is Ulaanbaatar"
@@ -420,7 +420,7 @@ int PrintF(const FormatSpec<Args...>& format, const Args&... args) {
 //
 // Example:
 //
-//   std::string_view s = "Ulaanbaatar";
+//   turbo::string_piece s = "Ulaanbaatar";
 //   turbo::FPrintF(stdout, "The capital of Mongolia is %s", s);
 //
 //   Outputs: "The capital of Mongolia is Ulaanbaatar"
@@ -447,7 +447,7 @@ int FPrintF(std::FILE* output, const FormatSpec<Args...>& format,
 //
 // Example:
 //
-//   std::string_view s = "Ulaanbaatar";
+//   turbo::string_piece s = "Ulaanbaatar";
 //   char output[128];
 //   turbo::SNPrintF(output, sizeof(output),
 //                  "The capital of Mongolia is %s", s);
@@ -475,7 +475,7 @@ int SNPrintF(char* output, std::size_t size, const FormatSpec<Args...>& format,
 // sink, usually by adding a ADL-based free function in the same namespace as
 // the sink:
 //
-//   void TurboFormatFlush(MySink* dest, turbo::string_view part);
+//   void TurboFormatFlush(MySink* dest, turbo::string_piece part);
 //
 // where `dest` is the pointer passed to `turbo::Format()`. The function should
 // append `part` to `dest`.
@@ -833,7 +833,7 @@ class FormatSink {
 
   // Overload of FormatSink::Append() for appending the characters of a string
   // view to a format sink.
-  void Append(string_view v) { sink_->Append(v); }
+  void Append(string_piece v) { sink_->Append(v); }
 
   // FormatSink::PutPaddedString()
   //
@@ -841,12 +841,12 @@ class FormatSink {
   // less than `width`, spaces will be appended first (if `left` is false), or
   // after (if `left` is true) to ensure the total amount appended is
   // at least `width`.
-  bool PutPaddedString(string_view v, int width, int precision, bool left) {
+  bool PutPaddedString(string_piece v, int width, int precision, bool left) {
     return sink_->PutPaddedString(v, width, precision, left);
   }
 
   // Support `turbo::Format(&sink, format, args...)`.
-  friend void TurboFormatFlush(FormatSink* sink, turbo::string_view v) {
+  friend void TurboFormatFlush(FormatSink* sink, turbo::string_piece v) {
     sink->Append(v);
   }
 

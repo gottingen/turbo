@@ -411,7 +411,7 @@
 		#define TURBO_PROCESSOR_X86_64 1
 		#define TURBO_SYSTEM_LITTLE_ENDIAN 1
 		#define TURBO_PLATFORM_DESCRIPTION "Linux on x64"
-	#elif defined(__powerpc64__)
+	#elif defined(__powerpc64__) || defined(__PPC64__) || defined(_M_PPC64)
 		#define TURBO_PROCESSOR_POWERPC 1
 		#define TURBO_PROCESSOR_POWERPC_64 1
 		#define TURBO_SYSTEM_BIG_ENDIAN 1

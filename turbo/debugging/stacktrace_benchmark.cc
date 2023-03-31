@@ -24,7 +24,7 @@ static constexpr int kMaxStackDepth = 100;
 static constexpr int kCacheSize = (1 << 16);
 void* pcs[kMaxStackDepth];
 
-TURBO_ATTRIBUTE_NOINLINE void func(benchmark::State& state, int x, int depth) {
+TURBO_NO_INLINE void func(benchmark::State& state, int x, int depth) {
   if (x <= 0) {
     // Touch a significant amount of memory so that the stack is likely to be
     // not cached in the L1 cache.

@@ -45,15 +45,15 @@ const char* ConsumeUnboundConversionNoInline(const char* p, const char* end,
 // Parse the format string provided in 'src' and pass the identified items into
 // 'consumer'.
 // Text runs will be passed by calling
-//   Consumer::Append(string_view);
+//   Consumer::Append(string_piece);
 // ConversionItems will be passed by calling
-//   Consumer::ConvertOne(UnboundConversion, string_view);
-// In the case of ConvertOne, the string_view that is passed is the
+//   Consumer::ConvertOne(UnboundConversion, string_piece);
+// In the case of ConvertOne, the string_piece that is passed is the
 // portion of the format string corresponding to the conversion, not including
 // the leading %. On success, it returns true. On failure, it stops and returns
 // false.
 template <typename Consumer>
-bool ParseFormatString(string_view src, Consumer consumer) {
+bool ParseFormatString(string_piece src, Consumer consumer) {
   int next_arg = 0;
   const char* p = src.data();
   const char* const end = p + src.size();
@@ -62,18 +62,18 @@ bool ParseFormatString(string_view src, Consumer consumer) {
         static_cast<const char*>(memchr(p, '%', static_cast<size_t>(end - p)));
     if (!percent) {
       // We found the last substring.
-      return consumer.Append(string_view(p, static_cast<size_t>(end - p)));
+      return consumer.Append(string_piece(p, static_cast<size_t>(end - p)));
     }
     // We found a percent, so push the text run then process the percent.
-    if (TURBO_PREDICT_FALSE(!consumer.Append(
-            string_view(p, static_cast<size_t>(percent - p))))) {
+    if (TURBO_UNLIKELY(!consumer.Append(
+            string_piece(p, static_cast<size_t>(percent - p))))) {
       return false;
     }
-    if (TURBO_PREDICT_FALSE(percent + 1 >= end)) return false;
+    if (TURBO_UNLIKELY(percent + 1 >= end)) return false;
 
     auto tag = GetTagForChar(percent[1]);
     if (tag.is_conv()) {
-      if (TURBO_PREDICT_FALSE(next_arg < 0)) {
+      if (TURBO_UNLIKELY(next_arg < 0)) {
         // This indicates an error in the format string.
         // The only way to get `next_arg < 0` here is to have a positional
         // argument first which sets next_arg to -1 and then a non-positional
@@ -88,21 +88,21 @@ bool ParseFormatString(string_view src, Consumer consumer) {
       UnboundConversion conv;
       conv.conv = tag.as_conv();
       conv.arg_position = ++next_arg;
-      if (TURBO_PREDICT_FALSE(
-              !consumer.ConvertOne(conv, string_view(percent + 1, 1)))) {
+      if (TURBO_UNLIKELY(
+              !consumer.ConvertOne(conv, string_piece(percent + 1, 1)))) {
         return false;
       }
     } else if (percent[1] != '%') {
       UnboundConversion conv;
       p = ConsumeUnboundConversionNoInline(percent + 1, end, &conv, &next_arg);
-      if (TURBO_PREDICT_FALSE(p == nullptr)) return false;
-      if (TURBO_PREDICT_FALSE(!consumer.ConvertOne(
-              conv, string_view(percent + 1,
+      if (TURBO_UNLIKELY(p == nullptr)) return false;
+      if (TURBO_UNLIKELY(!consumer.ConvertOne(
+              conv, string_piece(percent + 1,
                                 static_cast<size_t>(p - (percent + 1)))))) {
         return false;
       }
     } else {
-      if (TURBO_PREDICT_FALSE(!consumer.Append("%"))) return false;
+      if (TURBO_UNLIKELY(!consumer.Append("%"))) return false;
       p = percent + 2;
       continue;
     }
@@ -112,14 +112,14 @@ bool ParseFormatString(string_view src, Consumer consumer) {
 
 // Always returns true, or fails to compile in a constexpr context if s does not
 // point to a constexpr char array.
-constexpr bool EnsureConstexpr(string_view s) {
+constexpr bool EnsureConstexpr(string_piece s) {
   return s.empty() || s[0] == s[0];
 }
 
 class ParsedFormatBase {
  public:
   explicit ParsedFormatBase(
-      string_view format, bool allow_ignored,
+      string_piece format, bool allow_ignored,
       std::initializer_list<FormatConversionCharSet> convs);
 
   ParsedFormatBase(const ParsedFormatBase& other) { *this = other; }
@@ -149,11 +149,11 @@ class ParsedFormatBase {
   template <typename Consumer>
   bool ProcessFormat(Consumer consumer) const {
     const char* const base = data_.get();
-    string_view text(base, 0);
+    string_piece text(base, 0);
     for (const auto& item : items_) {
       const char* const end = text.data() + text.size();
       text =
-          string_view(end, static_cast<size_t>((base + item.text_end) - end));
+          string_piece(end, static_cast<size_t>((base + item.text_end) - end));
       if (item.is_conversion) {
         if (!consumer.ConvertOne(item.conv, text)) return false;
       } else {
@@ -218,7 +218,7 @@ class ParsedFormatBase {
 template <FormatConversionCharSet... C>
 class ExtendedParsedFormat : public str_format_internal::ParsedFormatBase {
  public:
-  explicit ExtendedParsedFormat(string_view format)
+  explicit ExtendedParsedFormat(string_piece format)
 #ifdef TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
       __attribute__((
           enable_if(str_format_internal::EnsureConstexpr(format),
@@ -241,16 +241,16 @@ class ExtendedParsedFormat : public str_format_internal::ParsedFormatBase {
   // consumed by the format and return NULL if any argument is being ignored.
   // The 'NewAllowIgnored' variant will not verify this and will allow formats
   // that ignore arguments.
-  static std::unique_ptr<ExtendedParsedFormat> New(string_view format) {
+  static std::unique_ptr<ExtendedParsedFormat> New(string_piece format) {
     return New(format, false);
   }
   static std::unique_ptr<ExtendedParsedFormat> NewAllowIgnored(
-      string_view format) {
+      string_piece format) {
     return New(format, true);
   }
 
  private:
-  static std::unique_ptr<ExtendedParsedFormat> New(string_view format,
+  static std::unique_ptr<ExtendedParsedFormat> New(string_piece format,
                                                    bool allow_ignored) {
     std::unique_ptr<ExtendedParsedFormat> conv(
         new ExtendedParsedFormat(format, allow_ignored));
@@ -258,7 +258,7 @@ class ExtendedParsedFormat : public str_format_internal::ParsedFormatBase {
     return conv;
   }
 
-  ExtendedParsedFormat(string_view s, bool allow_ignored)
+  ExtendedParsedFormat(string_piece s, bool allow_ignored)
       : ParsedFormatBase(s, allow_ignored, {C...}) {}
 };
 }  // namespace str_format_internal

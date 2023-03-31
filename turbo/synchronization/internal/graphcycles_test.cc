@@ -160,7 +160,7 @@ static void CheckEdges(Nodes *nodes, Edges *edges, const IdMap &id,
 }
 
 static void CheckInvariants(const GraphCycles &gc) {
-  if (TURBO_PREDICT_FALSE(!gc.CheckInvariants()))
+  if (TURBO_UNLIKELY(!gc.CheckInvariants()))
     TURBO_RAW_LOG(FATAL, "CheckInvariants");
 }
 

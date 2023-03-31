@@ -26,7 +26,7 @@
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -87,7 +87,7 @@ enum Constants {
 };
 
 // Emits a fatal error "Unexpected node type: xyz" and aborts the program.
-TURBO_ATTRIBUTE_NORETURN void LogFatalNodeType(CordRep* rep);
+TURBO_NORETURN void LogFatalNodeType(CordRep* rep);
 
 // Fast implementation of memmove for up to 15 bytes. This implementation is
 // safe for overlapping regions. If nullify_tail is true, the destination is
@@ -349,7 +349,7 @@ using ExternalReleaserInvoker = void (*)(CordRepExternal*);
 // releaser is stored in the memory directly following the CordRepExternal.
 struct CordRepExternal : public CordRep {
   CordRepExternal() = default;
-  explicit constexpr CordRepExternal(turbo::string_view str)
+  explicit constexpr CordRepExternal(turbo::string_piece str)
       : CordRep(RefcountAndFlags::Immortal{}, str.size()),
         base(str.data()),
         releaser_invoker(nullptr) {}
@@ -367,14 +367,14 @@ struct Rank1 {};
 struct Rank0 : Rank1 {};
 
 template <typename Releaser, typename = ::turbo::base_internal::invoke_result_t<
-                                 Releaser, turbo::string_view>>
-void InvokeReleaser(Rank0, Releaser&& releaser, turbo::string_view data) {
+                                 Releaser, turbo::string_piece>>
+void InvokeReleaser(Rank0, Releaser&& releaser, turbo::string_piece data) {
   ::turbo::base_internal::invoke(std::forward<Releaser>(releaser), data);
 }
 
 template <typename Releaser,
           typename = ::turbo::base_internal::invoke_result_t<Releaser>>
-void InvokeReleaser(Rank1, Releaser&& releaser, turbo::string_view) {
+void InvokeReleaser(Rank1, Releaser&& releaser, turbo::string_piece) {
   ::turbo::base_internal::invoke(std::forward<Releaser>(releaser));
 }
 
@@ -393,7 +393,7 @@ struct CordRepExternalImpl
 
   ~CordRepExternalImpl() {
     InvokeReleaser(Rank0{}, std::move(this->template get<0>()),
-                   turbo::string_view(base, length));
+                   turbo::string_piece(base, length));
   }
 
   static void Release(CordRepExternal* rep) {
@@ -411,7 +411,7 @@ inline CordRepSubstring* CordRepSubstring::Create(CordRep* child, size_t pos,
 
   // TODO(b/217376272): Harden internal logic.
   // Move to strategical places inside the Cord logic and make this an assert.
-  if (TURBO_PREDICT_FALSE(!(child->IsExternal() || child->IsFlat()))) {
+  if (TURBO_UNLIKELY(!(child->IsExternal() || child->IsFlat()))) {
     LogFatalNodeType(child);
   }
 
@@ -462,7 +462,7 @@ enum {
   kMaxInline = 15,
 };
 
-constexpr char GetOrNull(turbo::string_view data, size_t pos) {
+constexpr char GetOrNull(turbo::string_piece data, size_t pos) {
   return pos < data.size() ? data[pos] : '\0';
 }
 
@@ -481,7 +481,7 @@ static_assert(sizeof(cordz_info_t) >= sizeof(intptr_t), "");
 // a little endian value where the first byte in the host's representation
 // holds 'value`, with all other bytes being 0.
 static constexpr cordz_info_t LittleEndianByte(unsigned char value) {
-#if defined(TURBO_IS_BIG_ENDIAN)
+#if TURBO_IS_BIG_ENDIAN
   return static_cast<cordz_info_t>(value) << ((sizeof(cordz_info_t) - 1) * 8);
 #else
   return value;
@@ -511,7 +511,7 @@ class InlineData {
   // Explicit constexpr constructor to create a constexpr InlineData
   // value. Creates an inlined SSO value if `rep` is null, otherwise
   // creates a tree instance value.
-  constexpr InlineData(turbo::string_view sv, CordRep* rep)
+  constexpr InlineData(turbo::string_piece sv, CordRep* rep)
       : rep_(rep ? Rep(rep) : Rep(sv)) {}
 
   constexpr InlineData(const InlineData& rhs) = default;
@@ -684,7 +684,7 @@ class InlineData {
 
     explicit constexpr Rep(CordRep* rep) : as_tree(rep) {}
 
-    explicit constexpr Rep(turbo::string_view chars)
+    explicit constexpr Rep(turbo::string_piece chars)
         : data{static_cast<char>((chars.size() << 1)),
                GetOrNull(chars, 0),
                GetOrNull(chars, 1),
@@ -766,7 +766,7 @@ inline void CordRep::Unref(CordRep* rep) {
   assert(rep != nullptr);
   // Expect refcount to be 0. Avoiding the cost of an atomic decrement should
   // typically outweigh the cost of an extra branch checking for ref == 1.
-  if (TURBO_PREDICT_FALSE(!rep->refcount.DecrementExpectHighRefcount())) {
+  if (TURBO_UNLIKELY(!rep->refcount.DecrementExpectHighRefcount())) {
     Destroy(rep);
   }
 }

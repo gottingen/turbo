@@ -21,7 +21,7 @@
 
 #include "turbo/flags/declare.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 TURBO_DECLARE_FLAG(std::vector<std::string>, flagfile);
 TURBO_DECLARE_FLAG(std::vector<std::string>, fromenv);
@@ -50,11 +50,11 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
 
 // Returns true if flag with specified name was either present on the original
 // command line or specified in flag file present on the original command line.
-bool WasPresentOnCommandLine(turbo::string_view flag_name);
+bool WasPresentOnCommandLine(turbo::string_piece flag_name);
 
 // Return existing flags similar to the parameter, in order to help in case of
 // misspellings.
-std::vector<std::string> GetMisspellingHints(turbo::string_view flag);
+std::vector<std::string> GetMisspellingHints(turbo::string_piece flag);
 
 }  // namespace flags_internal
 TURBO_NAMESPACE_END

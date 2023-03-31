@@ -31,7 +31,7 @@ static const uint64_t kSalt[5] = {0xa0761d6478bd642f, 0xe7037ed1a0b428dbl,
 TEST(LowLevelHashTest, VerifyGolden) {
   constexpr size_t kNumGoldenOutputs = 134;
   static struct {
-    turbo::string_view base64_data;
+    turbo::string_piece base64_data;
     uint64_t seed;
   } cases[] = {
       {"", uint64_t{0xec42b7ab404b8acb}},
@@ -404,7 +404,7 @@ TEST(LowLevelHashTest, VerifyGolden) {
        uint64_t{0xc9ae5c8759b4877a}},
   };
 
-#if defined(TURBO_IS_BIG_ENDIAN)
+#if TURBO_IS_BIG_ENDIAN
   constexpr uint64_t kGolden[kNumGoldenOutputs] = {
       0xe5a40d39ab796423, 0x1766974bf7527d81, 0x5c3bbbe230db17a8,
       0xa6630143a7e6aa6f, 0x17645cb7318b86b,  0x218b175f30ba61f8,

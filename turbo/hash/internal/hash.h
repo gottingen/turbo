@@ -54,7 +54,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -518,14 +518,14 @@ H TurboHashValue(H hash_state, const std::shared_ptr<T>& ptr) {
 //  - `turbo::Cord`
 //  - `std::string` (and std::basic_string<char, std::char_traits<char>, A> for
 //      any allocator A)
-//  - `turbo::string_view` and `std::string_view`
+//  - `turbo::string_piece` and `turbo::string_piece`
 //
 // For simplicity, we currently support only `char` strings. This support may
 // be broadened, if necessary, but with some caution - this overload would
 // misbehave in cases where the traits' `eq()` member isn't equivalent to `==`
 // on the underlying character type.
 template <typename H>
-H TurboHashValue(H hash_state, turbo::string_view str) {
+H TurboHashValue(H hash_state, turbo::string_piece str) {
   return H::combine(
       H::combine_contiguous(std::move(hash_state), str.data(), str.size()),
       str.size());
@@ -606,7 +606,7 @@ TurboHashValue(H hash_state, const std::vector<T, Allocator>& vector) {
 
 // TurboHashValue special cases for hashing std::vector<bool>
 
-#if defined(TURBO_IS_BIG_ENDIAN) && \
+#if TURBO_IS_BIG_ENDIAN && \
     (defined(__GLIBCXX__) || defined(__GLIBCPP__))
 
 // std::hash in libstdc++ does not work correctly with vector<bool> on Big
@@ -788,7 +788,7 @@ TurboHashValue(H hash_state, const turbo::variant<T...>& v) {
 // It does not expose the raw bytes, and a fallback to std::hash<> is most
 // likely faster.
 
-#if defined(TURBO_IS_BIG_ENDIAN) && \
+#if TURBO_IS_BIG_ENDIAN && \
     (defined(__GLIBCXX__) || defined(__GLIBCPP__))
 // TurboHashValue for hashing std::bitset
 //
@@ -1046,7 +1046,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
                                                  size_t len) {
     uint64_t low_mem = turbo::base_internal::UnalignedLoad64(p);
     uint64_t high_mem = turbo::base_internal::UnalignedLoad64(p + len - 8);
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
     uint64_t most_significant = high_mem;
     uint64_t least_significant = low_mem;
 #else
@@ -1060,7 +1060,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
   static uint64_t Read4To8(const unsigned char* p, size_t len) {
     uint32_t low_mem = turbo::base_internal::UnalignedLoad32(p);
     uint32_t high_mem = turbo::base_internal::UnalignedLoad32(p + len - 4);
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
     uint32_t most_significant = high_mem;
     uint32_t least_significant = low_mem;
 #else
@@ -1076,7 +1076,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
     unsigned char mem0 = p[0];
     unsigned char mem1 = p[len / 2];
     unsigned char mem2 = p[len - 1];
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
     unsigned char significant2 = mem2;
     unsigned char significant1 = mem1;
     unsigned char significant0 = mem0;
@@ -1090,7 +1090,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
                                  (significant2 << ((len - 1) * 8)));
   }
 
-  TURBO_ATTRIBUTE_ALWAYS_INLINE static uint64_t Mix(uint64_t state, uint64_t v) {
+  TURBO_FORCE_INLINE static uint64_t Mix(uint64_t state, uint64_t v) {
     // Though the 128-bit product on AArch64 needs two instructions, it is
     // still a good balance between speed and hash quality.
     using MultType =
@@ -1108,7 +1108,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
   // values for both the seed and salt parameters.
   static uint64_t LowLevelHashImpl(const unsigned char* data, size_t len);
 
-  TURBO_ATTRIBUTE_ALWAYS_INLINE static uint64_t Hash64(const unsigned char* data,
+  TURBO_FORCE_INLINE static uint64_t Hash64(const unsigned char* data,
                                                       size_t len) {
 #ifdef TURBO_HAVE_INTRINSIC_INT128
     return LowLevelHashImpl(data, len);
@@ -1133,7 +1133,7 @@ class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
   //
   // On other platforms this is still going to be non-deterministic but most
   // probably per-build and not per-process.
-  TURBO_ATTRIBUTE_ALWAYS_INLINE static uint64_t Seed() {
+  TURBO_FORCE_INLINE static uint64_t Seed() {
 #if (!defined(__clang__) || __clang_major__ > 11) && \
     !defined(__apple_build_version__)
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&kSeed));
@@ -1156,7 +1156,7 @@ inline uint64_t MixingHashState::CombineContiguousImpl(
   // multiplicative hash.
   uint64_t v;
   if (len > 8) {
-    if (TURBO_PREDICT_FALSE(len > PiecewiseChunkSize())) {
+    if (TURBO_UNLIKELY(len > PiecewiseChunkSize())) {
       return CombineLargeContiguousImpl32(state, first, len);
     }
     v = hash_internal::CityHash32(reinterpret_cast<const char*>(first), len);
@@ -1179,7 +1179,7 @@ inline uint64_t MixingHashState::CombineContiguousImpl(
   // for small ones we just use a multiplicative hash.
   uint64_t v;
   if (len > 16) {
-    if (TURBO_PREDICT_FALSE(len > PiecewiseChunkSize())) {
+    if (TURBO_UNLIKELY(len > PiecewiseChunkSize())) {
       return CombineLargeContiguousImpl64(state, first, len);
     }
     v = Hash64(first, len);

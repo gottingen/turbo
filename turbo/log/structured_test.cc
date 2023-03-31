@@ -32,7 +32,7 @@ using ::turbo::log_internal::MatchesOstream;
 using ::turbo::log_internal::TextMessage;
 using ::testing::Eq;
 
-auto *test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto *test_env TURBO_MAYBE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 // Turbo Logging library uses these by default, so we set them on the

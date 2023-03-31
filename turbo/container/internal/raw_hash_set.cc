@@ -35,7 +35,7 @@ alignas(16) TURBO_CONST_INIT TURBO_DLL const ctrl_t kEmptyGroup[17] = {
     ctrl_t::kEmpty,    ctrl_t::kEmpty, ctrl_t::kEmpty, ctrl_t::kEmpty,
     static_cast<ctrl_t>(0)};
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr size_t Group::kWidth;
 #endif
 
@@ -143,7 +143,7 @@ void DropDeletesWithoutResize(CommonFields& common,
     };
 
     // Element doesn't move.
-    if (TURBO_PREDICT_TRUE(probe_index(new_i) == probe_index(i))) {
+    if (TURBO_LIKELY(probe_index(new_i) == probe_index(i))) {
       SetCtrl(common, i, H2(hash), slot_size);
       continue;
     }

@@ -51,7 +51,7 @@ bool cordz_should_profile_slow();
 
 // Returns true if the next cord should be sampled.
 inline bool cordz_should_profile() {
-  if (TURBO_PREDICT_TRUE(cordz_next_sample > 1)) {
+  if (TURBO_LIKELY(cordz_next_sample > 1)) {
     cordz_next_sample--;
     return false;
   }

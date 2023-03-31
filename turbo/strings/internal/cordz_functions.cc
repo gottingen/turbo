@@ -45,7 +45,7 @@ TURBO_CONST_INIT thread_local int64_t cordz_next_sample = kInitCordzNextSample;
 // before the code will confirm that cordz is still disabled.
 constexpr int64_t kIntervalIfDisabled = 1 << 16;
 
-TURBO_ATTRIBUTE_NOINLINE bool cordz_should_profile_slow() {
+TURBO_NO_INLINE bool cordz_should_profile_slow() {
 
   thread_local turbo::profiling_internal::ExponentialBiased
       exponential_biased_generator;

@@ -20,7 +20,7 @@
 #        find_path(CATCH_INCLUDE_DIR "catch.hpp")                                                  #
 #        include_directories(${INCLUDE_DIRECTORIES} ${CATCH_INCLUDE_DIR})                          #
 #                                                                                                  #
-#        file(GLOB SOURCE_FILES "*.cpp")                                                           #
+#        file(GLOB SOURCE_FILES "*.cc")                                                           #
 #        add_executable(${PROJECT_NAME} ${SOURCE_FILES})                                           #
 #                                                                                                  #
 #        include(ParseAndAddCatchTests)                                                            #

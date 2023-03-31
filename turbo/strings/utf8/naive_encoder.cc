@@ -29,7 +29,7 @@ TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 
 static constexpr uint32_t UTF8_BUF_SIZE = 8;
-static constexpr uint32_t TURBO_ALLOW_UNUSED UTF8_MAX = 0x7FFFFFFFu;
+static constexpr uint32_t TURBO_MAYBE_UNUSED UTF8_MAX = 0x7FFFFFFFu;
 // https://unicodebook.readthedocs.io/unicode_encodings.html
 static constexpr uint32_t UNICODE_MAX = 0x10FFFF;
 

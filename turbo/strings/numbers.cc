@@ -43,7 +43,7 @@
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 
-bool SimpleAtof(turbo::string_view str, float* out) {
+bool SimpleAtof(turbo::string_piece str, float* out) {
   *out = 0.0;
   str = StripAsciiWhitespace(str);
   // std::from_chars doesn't accept an initial +, but SimpleAtof does, so if one
@@ -74,7 +74,7 @@ bool SimpleAtof(turbo::string_view str, float* out) {
   return true;
 }
 
-bool SimpleAtod(turbo::string_view str, double* out) {
+bool SimpleAtod(turbo::string_piece str, double* out) {
   *out = 0.0;
   str = StripAsciiWhitespace(str);
   // std::from_chars doesn't accept an initial +, but SimpleAtod does, so if one
@@ -105,7 +105,7 @@ bool SimpleAtod(turbo::string_view str, double* out) {
   return true;
 }
 
-bool SimpleAtob(turbo::string_view str, bool* out) {
+bool SimpleAtob(turbo::string_piece str, bool* out) {
   TURBO_RAW_CHECK(out != nullptr, "Output pointer must not be nullptr.");
   if (EqualsIgnoreCase(str, "true") || EqualsIgnoreCase(str, "t") ||
       EqualsIgnoreCase(str, "yes") || EqualsIgnoreCase(str, "y") ||
@@ -567,15 +567,15 @@ size_t numbers_internal::SixDigitsToBuffer(double d, char* const buffer) {
     case -4:
       out[2] = '0';
       ++out;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case -3:
       out[2] = '0';
       ++out;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case -2:
       out[2] = '0';
       ++out;
-      TURBO_FALLTHROUGH_INTENDED;
+      TURBO_FALLTHROUGH;
     case -1:
       out += 2;
       memcpy(out, &digits[0], 6);
@@ -630,7 +630,7 @@ static const int8_t kAsciiToInt[256] = {
     36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36};
 
 // Parse the sign and optional hex or oct prefix in text.
-inline bool safe_parse_sign_and_base(turbo::string_view* text /*inout*/,
+inline bool safe_parse_sign_and_base(turbo::string_piece* text /*inout*/,
                                      int* base_ptr /*inout*/,
                                      bool* negative_ptr /*output*/) {
   if (text->data() == nullptr) {
@@ -696,7 +696,7 @@ inline bool safe_parse_sign_and_base(turbo::string_view* text /*inout*/,
   } else {
     return false;
   }
-  *text = turbo::string_view(start, static_cast<size_t>(end - start));
+  *text = turbo::string_piece(start, static_cast<size_t>(end - start));
   *base_ptr = base;
   return true;
 }
@@ -916,7 +916,7 @@ TURBO_CONST_INIT const IntType LookupTables<IntType>::kVminOverBase[] =
 #undef X_OVER_BASE_INITIALIZER
 
 template <typename IntType>
-inline bool safe_parse_positive_int(turbo::string_view text, int base,
+inline bool safe_parse_positive_int(turbo::string_piece text, int base,
                                     IntType* value_p) {
   IntType value = 0;
   const IntType vmax = std::numeric_limits<IntType>::max();
@@ -953,7 +953,7 @@ inline bool safe_parse_positive_int(turbo::string_view text, int base,
 }
 
 template <typename IntType>
-inline bool safe_parse_negative_int(turbo::string_view text, int base,
+inline bool safe_parse_negative_int(turbo::string_piece text, int base,
                                     IntType* value_p) {
   IntType value = 0;
   const IntType vmin = std::numeric_limits<IntType>::min();
@@ -998,7 +998,7 @@ inline bool safe_parse_negative_int(turbo::string_view text, int base,
 // Input format based on POSIX.1-2008 strtol
 // http://pubs.opengroup.org/onlinepubs/9699919799/functions/strtol.html
 template <typename IntType>
-inline bool safe_int_internal(turbo::string_view text, IntType* value_p,
+inline bool safe_int_internal(turbo::string_piece text, IntType* value_p,
                               int base) {
   *value_p = 0;
   bool negative;
@@ -1013,7 +1013,7 @@ inline bool safe_int_internal(turbo::string_view text, IntType* value_p,
 }
 
 template <typename IntType>
-inline bool safe_uint_internal(turbo::string_view text, IntType* value_p,
+inline bool safe_uint_internal(turbo::string_piece text, IntType* value_p,
                                int base) {
   *value_p = 0;
   bool negative;
@@ -1027,10 +1027,10 @@ inline bool safe_uint_internal(turbo::string_view text, IntType* value_p,
 namespace numbers_internal {
 
 // Digit conversion.
-TURBO_CONST_INIT TURBO_DLL const char kHexChar[] =
+TURBO_CONST_INIT const char kHexChar[] =
     "0123456789abcdef";
 
-TURBO_CONST_INIT TURBO_DLL const char kHexTable[513] =
+TURBO_CONST_INIT const char kHexTable[513] =
     "000102030405060708090a0b0c0d0e0f"
     "101112131415161718191a1b1c1d1e1f"
     "202122232425262728292a2b2c2d2e2f"
@@ -1048,7 +1048,7 @@ TURBO_CONST_INIT TURBO_DLL const char kHexTable[513] =
     "e0e1e2e3e4e5e6e7e8e9eaebecedeeef"
     "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff";
 
-TURBO_CONST_INIT TURBO_DLL const char two_ASCII_digits[100][2] = {
+TURBO_CONST_INIT const char two_ASCII_digits[100][2] = {
     {'0', '0'}, {'0', '1'}, {'0', '2'}, {'0', '3'}, {'0', '4'}, {'0', '5'},
     {'0', '6'}, {'0', '7'}, {'0', '8'}, {'0', '9'}, {'1', '0'}, {'1', '1'},
     {'1', '2'}, {'1', '3'}, {'1', '4'}, {'1', '5'}, {'1', '6'}, {'1', '7'},
@@ -1067,27 +1067,27 @@ TURBO_CONST_INIT TURBO_DLL const char two_ASCII_digits[100][2] = {
     {'9', '0'}, {'9', '1'}, {'9', '2'}, {'9', '3'}, {'9', '4'}, {'9', '5'},
     {'9', '6'}, {'9', '7'}, {'9', '8'}, {'9', '9'}};
 
-bool safe_strto32_base(turbo::string_view text, int32_t* value, int base) {
+bool safe_strto32_base(turbo::string_piece text, int32_t* value, int base) {
   return safe_int_internal<int32_t>(text, value, base);
 }
 
-bool safe_strto64_base(turbo::string_view text, int64_t* value, int base) {
+bool safe_strto64_base(turbo::string_piece text, int64_t* value, int base) {
   return safe_int_internal<int64_t>(text, value, base);
 }
 
-bool safe_strto128_base(turbo::string_view text, int128* value, int base) {
+bool safe_strto128_base(turbo::string_piece text, int128* value, int base) {
   return safe_int_internal<turbo::int128>(text, value, base);
 }
 
-bool safe_strtou32_base(turbo::string_view text, uint32_t* value, int base) {
+bool safe_strtou32_base(turbo::string_piece text, uint32_t* value, int base) {
   return safe_uint_internal<uint32_t>(text, value, base);
 }
 
-bool safe_strtou64_base(turbo::string_view text, uint64_t* value, int base) {
+bool safe_strtou64_base(turbo::string_piece text, uint64_t* value, int base) {
   return safe_uint_internal<uint64_t>(text, value, base);
 }
 
-bool safe_strtou128_base(turbo::string_view text, uint128* value, int base) {
+bool safe_strtou128_base(turbo::string_piece text, uint128* value, int base) {
   return safe_uint_internal<turbo::uint128>(text, value, base);
 }
 

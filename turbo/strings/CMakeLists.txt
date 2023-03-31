@@ -116,7 +116,7 @@ turbo_cc_test(
   NAME
     string_view_test
   SRCS
-    "string_view_test.cc"
+    "string_piece_test.cc"
   COPTS
     ${TURBO_TEST_COPTS}
   DEPS
@@ -625,18 +625,6 @@ turbo_cc_test(
         utf8_encoder_test
         SRCS
         "utf8/utf8_encoder_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        fmt_test
-        SRCS
-        "fmt_test.cc"
         COPTS
         ${TURBO_TEST_COPTS}
         DEPS

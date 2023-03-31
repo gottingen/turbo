@@ -27,7 +27,7 @@
 #include "turbo/random/random.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_format.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/strings/strip.h"
 
 namespace {
@@ -38,7 +38,7 @@ enum class OutputStyle { kRegular, kBenchmark };
 // This is populated from main().
 // When run in "benchmark" mode, we have different output. This allows
 // A/B comparisons with tools like `benchy`.
-turbo::string_view benchmarks;
+turbo::string_piece benchmarks;
 
 OutputStyle output() {
   return !benchmarks.empty() ? OutputStyle::kBenchmark : OutputStyle::kRegular;
@@ -459,7 +459,7 @@ std::string Name() {
 constexpr int kNameWidth = 15;
 constexpr int kDistWidth = 16;
 
-bool CanRunBenchmark(turbo::string_view name) {
+bool CanRunBenchmark(turbo::string_piece name) {
   static std::regex* const filter = []() -> std::regex* {
     return benchmarks.empty() || benchmarks == "all"
                ? nullptr
@@ -505,7 +505,7 @@ void RunForType(std::vector<Result>& results) {
 int main(int argc, char** argv) {
   // Parse the benchmark flags. Ignore all of them except the regex pattern.
   for (int i = 1; i < argc; ++i) {
-    turbo::string_view arg = argv[i];
+    turbo::string_piece arg = argv[i];
     const auto next = [&] { return argv[std::min(i + 1, argc - 1)]; };
 
     if (turbo::ConsumePrefix(&arg, "--benchmark_filter")) {
@@ -557,9 +557,9 @@ int main(int argc, char** argv) {
     case OutputStyle::kBenchmark: {
       turbo::PrintF("{\n");
       turbo::PrintF("  \"benchmarks\": [\n");
-      turbo::string_view comma;
+      turbo::string_piece comma;
       for (const auto& result : results) {
-        auto print = [&](turbo::string_view stat, double Ratios::*val) {
+        auto print = [&](turbo::string_piece stat, double Ratios::*val) {
           std::string name =
               turbo::StrCat(result.name, "/", result.dist_name, "/", stat);
           // Check the regex again. We might had have enabled only one of the

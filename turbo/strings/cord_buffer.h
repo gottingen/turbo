@@ -380,7 +380,7 @@ class CordBuffer {
     // memory is always on an even address, and uses the least significant bit
     // of the first or last byte (depending on endianness) as the inline size
     // indicator overlapping with the least significant byte of the CordRep*.
-#if defined(TURBO_IS_BIG_ENDIAN)
+#if TURBO_IS_BIG_ENDIAN
     struct Long {
       explicit Long(cord_internal::CordRepFlat* rep_arg) : rep(rep_arg) {}
       void* padding;
@@ -432,10 +432,10 @@ class CordBuffer {
   // `short_value` to the inlined data value. In either case, the current
   // instance length is reset to zero.
   // This method is intended to be used by Cord internal functions only.
-  cord_internal::CordRep* ConsumeValue(turbo::string_view& short_value) {
+  cord_internal::CordRep* ConsumeValue(turbo::string_piece& short_value) {
     cord_internal::CordRep* rep = nullptr;
     if (rep_.is_short()) {
-      short_value = turbo::string_view(rep_.data(), rep_.short_length());
+      short_value = turbo::string_piece(rep_.data(), rep_.short_length());
     } else {
       rep = rep_.rep();
     }

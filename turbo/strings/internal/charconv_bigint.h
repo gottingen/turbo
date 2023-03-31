@@ -23,7 +23,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/internal/charconv_parse.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -65,10 +65,10 @@ class BigUnsigned {
         words_{static_cast<uint32_t>(v & 0xffffffffu),
                static_cast<uint32_t>(v >> 32)} {}
 
-  // Constructs a BigUnsigned from the given string_view containing a decimal
+  // Constructs a BigUnsigned from the given string_piece containing a decimal
   // value.  If the input string is not a decimal integer, constructs a 0
   // instead.
-  explicit BigUnsigned(turbo::string_view sv) : size_(0), words_{} {
+  explicit BigUnsigned(turbo::string_piece sv) : size_(0), words_{} {
     // Check for valid input, returning a 0 otherwise.  This is reasonable
     // behavior only because this constructor is for unit tests.
     if (std::find_if_not(sv.begin(), sv.end(), ascii_isdigit) != sv.end() ||

@@ -18,7 +18,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -32,10 +32,10 @@ class UnimplementedSink {
  public:
   void Append(size_t count, char ch);
 
-  void Append(string_view v);
+  void Append(string_piece v);
 
   // Support `turbo::Format(&sink, format, args...)`.
-  friend void TurboFormatFlush(UnimplementedSink* sink, turbo::string_view v);
+  friend void TurboFormatFlush(UnimplementedSink* sink, turbo::string_piece v);
 };
 
 template <typename T, typename = void>

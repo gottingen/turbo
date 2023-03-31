@@ -29,7 +29,7 @@
 #include "turbo/base/log_severity.h"
 #include "turbo/log/log_entry.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -42,7 +42,7 @@ namespace log_internal {
 // `EXPECT_CALL`/`WillOnce` and `ON_CALL`/`WillByDefault` (for unexpected calls)
 // to write messages to stderr that the parent can match against.
 struct WriteToStderr final {
-  explicit WriteToStderr(turbo::string_view m) : message(m) {}
+  explicit WriteToStderr(turbo::string_piece m) : message(m) {}
   std::string message;
 
   template <typename... Args>
@@ -52,7 +52,7 @@ struct WriteToStderr final {
 };
 
 struct WriteToStderrWithFilename final {
-  explicit WriteToStderrWithFilename(turbo::string_view m) : message(m) {}
+  explicit WriteToStderrWithFilename(turbo::string_piece m) : message(m) {}
 
   std::string message;
 
@@ -60,13 +60,13 @@ struct WriteToStderrWithFilename final {
 };
 
 struct WriteEntryToStderr final {
-  explicit WriteEntryToStderr(turbo::string_view m) : message(m) {}
+  explicit WriteEntryToStderr(turbo::string_piece m) : message(m) {}
 
   std::string message = "";
 
   void operator()(const turbo::LogEntry& entry) const;
-  void operator()(turbo::LogSeverity, turbo::string_view,
-                  turbo::string_view) const;
+  void operator()(turbo::LogSeverity, turbo::string_piece,
+                  turbo::string_piece) const;
 };
 
 // See the documentation for `DeathTestValidateExpectations` above.

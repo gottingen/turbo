@@ -39,7 +39,7 @@
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/synchronization/mutex.h"
 
 namespace turbo {
@@ -120,7 +120,7 @@ inline void* Clone(FlagOpFn op, const void* obj) {
   return res;
 }
 // Returns true if parsing of input text is successfull.
-inline bool Parse(FlagOpFn op, turbo::string_view text, void* dst,
+inline bool Parse(FlagOpFn op, turbo::string_piece text, void* dst,
                   std::string* error) {
   return op(FlagOp::kParse, &text, dst, error) != nullptr;
 }
@@ -182,7 +182,7 @@ struct FixedCharArray {
 
   template <size_t... I>
   static constexpr FixedCharArray<N> FromLiteralString(
-      turbo::string_view str, turbo::index_sequence<I...>) {
+      turbo::string_piece str, turbo::index_sequence<I...>) {
     return (void)str, FixedCharArray<N>({{str[I]..., '\0'}});
   }
 };
@@ -360,7 +360,7 @@ struct FlagValue<T, FlagValueStorageKind::kValueAndInitBit> : FlagOneWordValue {
   constexpr FlagValue() : FlagOneWordValue(0) {}
   bool Get(const SequenceLock&, T& dst) const {
     int64_t storage = value.load(std::memory_order_acquire);
-    if (TURBO_PREDICT_FALSE(storage == 0)) {
+    if (TURBO_UNLIKELY(storage == 0)) {
       return false;
     }
     dst = turbo::bit_cast<FlagValueAndInitBit<T>>(storage).value;
@@ -373,7 +373,7 @@ struct FlagValue<T, FlagValueStorageKind::kOneWordAtomic> : FlagOneWordValue {
   constexpr FlagValue() : FlagOneWordValue(UninitializedFlagValue()) {}
   bool Get(const SequenceLock&, T& dst) const {
     int64_t one_word_val = value.load(std::memory_order_acquire);
-    if (TURBO_PREDICT_FALSE(one_word_val == UninitializedFlagValue())) {
+    if (TURBO_UNLIKELY(one_word_val == UninitializedFlagValue())) {
       return false;
     }
     std::memcpy(&dst, static_cast<const void*>(&one_word_val), sizeof(T));
@@ -521,7 +521,7 @@ class FlagImpl final : public CommandLineFlag {
 
   // Attempts to parse supplied `value` string. If parsing is successful,
   // returns new value. Otherwise returns nullptr.
-  std::unique_ptr<void, DynValueDeleter> TryParse(turbo::string_view value,
+  std::unique_ptr<void, DynValueDeleter> TryParse(turbo::string_piece value,
                                                   std::string& err) const
       TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
   // Stores the flag value based on the pointer to the source.
@@ -545,7 +545,7 @@ class FlagImpl final : public CommandLineFlag {
   }
 
   // CommandLineFlag interface implementation
-  turbo::string_view Name() const override;
+  turbo::string_piece Name() const override;
   std::string Filename() const override;
   std::string Help() const override;
   FlagFastTypeId TypeId() const override;
@@ -553,7 +553,7 @@ class FlagImpl final : public CommandLineFlag {
       TURBO_LOCKS_EXCLUDED(*DataGuard());
   std::string DefaultValue() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
   std::string CurrentValue() const override TURBO_LOCKS_EXCLUDED(*DataGuard());
-  bool ValidateInputValue(turbo::string_view value) const override
+  bool ValidateInputValue(turbo::string_piece value) const override
       TURBO_LOCKS_EXCLUDED(*DataGuard());
   void CheckDefaultValueParsingRoundtrip() const override
       TURBO_LOCKS_EXCLUDED(*DataGuard());
@@ -571,7 +571,7 @@ class FlagImpl final : public CommandLineFlag {
   bool RestoreState(const FlagState& flag_state)
       TURBO_LOCKS_EXCLUDED(*DataGuard());
 
-  bool ParseFrom(turbo::string_view value, FlagSettingMode set_mode,
+  bool ParseFrom(turbo::string_piece value, FlagSettingMode set_mode,
                  ValueSource source, std::string& error) override
       TURBO_LOCKS_EXCLUDED(*DataGuard());
 
@@ -641,7 +641,7 @@ class Flag {
         value_() {}
 
   // CommandLineFlag interface
-  turbo::string_view Name() const { return impl_.Name(); }
+  turbo::string_piece Name() const { return impl_.Name(); }
   std::string Filename() const { return impl_.Filename(); }
   std::string Help() const { return impl_.Help(); }
   // Do not use. To be removed.
@@ -669,7 +669,7 @@ class Flag {
     impl_.AssertValidType(base_internal::FastTypeId<T>(), &GenRuntimeTypeId<T>);
 #endif
 
-    if (TURBO_PREDICT_FALSE(!value_.Get(impl_.seq_lock_, u.value))) {
+    if (TURBO_UNLIKELY(!value_.Get(impl_.seq_lock_, u.value))) {
       impl_.Read(&u.value);
     }
     return std::move(u.value);
@@ -741,7 +741,7 @@ void* FlagOps(FlagOp op, const void* v1, void* v2, void* v3) {
       // Initialize the temporary instance of type T based on current value in
       // destination (which is going to be flag's default value).
       T temp(*static_cast<T*>(v2));
-      if (!turbo::ParseFlag<T>(*static_cast<const turbo::string_view*>(v1), &temp,
+      if (!turbo::ParseFlag<T>(*static_cast<const turbo::string_piece*>(v1), &temp,
                               static_cast<std::string*>(v3))) {
         return nullptr;
       }

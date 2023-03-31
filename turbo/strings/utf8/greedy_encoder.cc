@@ -22,8 +22,8 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace utf8_details {
 
-TURBO_ALLOW_UNUSED static constexpr uint32_t UTF8_BUF_SIZE = 8;
-TURBO_ALLOW_UNUSED static constexpr uint32_t UTF8_MAX = 0x7FFFFFFFu;
+TURBO_MAYBE_UNUSED static constexpr uint32_t UTF8_BUF_SIZE = 8;
+TURBO_MAYBE_UNUSED static constexpr uint32_t UTF8_MAX = 0x7FFFFFFFu;
 // https://unicodebook.readthedocs.io/unicode_encodings.html
 static constexpr uint32_t UNICODE_MAX = 0x10FFFF;
 

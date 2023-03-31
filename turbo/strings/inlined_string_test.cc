@@ -1725,10 +1725,10 @@ struct custom_traits : public std::char_traits<char> {};
 
 TEST(InlinedString, convertToStringView) {
   turbo::inlined_string s("foo");
-  turbo::string_view sv = s;
+  turbo::string_piece sv = s;
   EXPECT_EQ(sv, "foo");
   turbo::basic_inlined_string<char, custom_traits> s2("bar");
-  turbo::string_view sv2 = s2;
+  turbo::string_piece sv2 = s2;
   EXPECT_EQ(sv2, "bar");
 }
 

@@ -25,7 +25,7 @@
 #include "turbo/random/random.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/cord_test_helpers.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 namespace {
 
@@ -266,7 +266,7 @@ namespace {
 // measurements.
 static constexpr size_t kEntropySize = 16 << 10;
 static char entropy[kEntropySize + 1024];
-TURBO_ATTRIBUTE_UNUSED static const bool kInitialized = [] {
+TURBO_MAYBE_UNUSED static const bool kInitialized = [] {
   turbo::BitGen gen;
   static_assert(sizeof(entropy) % sizeof(uint64_t) == 0, "");
   for (int i = 0; i != sizeof(entropy); i += sizeof(uint64_t)) {
@@ -293,7 +293,7 @@ template <size_t N>
 struct StringRand {
   static_assert(kEntropySize + N < sizeof(entropy), "");
 
-  turbo::string_view Get(size_t i) const {
+  turbo::string_piece Get(size_t i) const {
     // This has a small bias towards small numbers. Because max N is ~200 this
     // is very small and prefer to be very fast instead of absolutely accurate.
     // Also we pass N = 2^K+1 so that mod reduces to a bitand.

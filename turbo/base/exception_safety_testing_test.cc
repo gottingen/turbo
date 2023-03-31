@@ -704,7 +704,7 @@ struct BasicGuaranteeWithExtraContracts : public NonNegative {
   static constexpr int kExceptionSentinel = 9999;
 };
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr int BasicGuaranteeWithExtraContracts::kExceptionSentinel;
 #endif
 

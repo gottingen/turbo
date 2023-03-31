@@ -50,11 +50,11 @@
 #include "turbo/meta/span.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/sysinfo.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 
-extern "C" TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(
+extern "C" TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(
     TurboInternalOnFatalLogMessage)(const turbo::LogEntry&) {
   // Default - Do nothing
 }
@@ -99,7 +99,7 @@ bool PrintValue(turbo::Span<char>& dst, turbo::Span<const char> buf) {
   return true;
 }
 
-turbo::string_view Basename(turbo::string_view filepath) {
+turbo::string_piece Basename(turbo::string_piece filepath) {
 #ifdef _WIN32
   size_t path = filepath.find_last_of("/\\");
 #else
@@ -243,7 +243,7 @@ LogMessage::~LogMessage() {
   Flush();
 }
 
-LogMessage& LogMessage::AtLocation(turbo::string_view file, int line) {
+LogMessage& LogMessage::AtLocation(turbo::string_piece file, int line) {
   data_->entry.full_filename_ = file;
   data_->entry.base_filename_ = Basename(file);
   data_->entry.line_ = line;
@@ -307,8 +307,8 @@ LogMessage& LogMessage::ToSinkOnly(turbo::LogSink* sink) {
 }
 
 #ifdef __ELF__
-extern "C" void __gcov_dump() TURBO_ATTRIBUTE_WEAK;
-extern "C" void __gcov_flush() TURBO_ATTRIBUTE_WEAK;
+extern "C" void __gcov_dump() TURBO_WEAK;
+extern "C" void __gcov_flush() TURBO_WEAK;
 #endif
 
 void LogMessage::FailWithoutStackTrace() {
@@ -348,7 +348,7 @@ LogMessage& LogMessage::operator<<(const std::string& v) {
   return *this;
 }
 
-LogMessage& LogMessage::operator<<(turbo::string_view v) {
+LogMessage& LogMessage::operator<<(turbo::string_piece v) {
   CopyToEncodedBuffer(v, StringType::kNotLiteral);
   return *this;
 }
@@ -404,7 +404,7 @@ void LogMessage::Flush() {
 
   data_->FinalizeEncodingAndFormat();
   data_->entry.encoding_ =
-      turbo::string_view(data_->encoded_buf.data(),
+      turbo::string_piece(data_->encoded_buf.data(),
                         static_cast<size_t>(data_->encoded_remaining.data() -
                                             data_->encoded_buf.data()));
   SendToLog();
@@ -517,7 +517,7 @@ void LogMessage::LogBacktraceIfNeeded() {
 // containing the specified string data using a `Value` field appropriate to
 // `str_type`.  Truncates `str` if necessary, but emits nothing and marks the
 // buffer full if  even the field headers do not fit.
-void LogMessage::CopyToEncodedBuffer(turbo::string_view str,
+void LogMessage::CopyToEncodedBuffer(turbo::string_piece str,
                                      StringType str_type) {
   auto encoded_remaining_copy = data_->encoded_remaining;
   auto start = EncodeMessageStart(
@@ -565,12 +565,12 @@ LogMessageFatal::LogMessageFatal(const char* file, int line)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {}
 
 LogMessageFatal::LogMessageFatal(const char* file, int line,
-                                 turbo::string_view failure_msg)
+                                 turbo::string_piece failure_msg)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {
   *this << "Check failed: " << failure_msg << " ";
 }
 
-// TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+// TURBO_NORETURN doesn't seem to work on destructors with msvc, so
 // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)
@@ -590,13 +590,13 @@ LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line)
 }
 
 LogMessageQuietlyFatal::LogMessageQuietlyFatal(const char* file, int line,
-                                               turbo::string_view failure_msg)
+                                               turbo::string_piece failure_msg)
     : LogMessage(file, line, turbo::LogSeverity::kFatal) {
   SetFailQuietly();
   *this << "Check failed: " << failure_msg << " ";
 }
 
-// TURBO_ATTRIBUTE_NORETURN doesn't seem to work on destructors with msvc, so
+// TURBO_NORETURN doesn't seem to work on destructors with msvc, so
 // disable msvc's warning about the d'tor never returning.
 #if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(push)

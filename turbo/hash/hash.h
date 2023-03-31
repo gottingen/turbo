@@ -111,13 +111,13 @@ TURBO_NAMESPACE_BEGIN
 //   * All string-like types including:
 //     * turbo::Cord
 //     * std::string
-//     * std::string_view (as well as any instance of std::basic_string that
+//     * turbo::string_piece (as well as any instance of std::basic_string that
 //       uses char and std::char_traits)
 //  * All the standard sequence containers (provided the elements are hashable)
 //  * All the standard associative containers (provided the elements are
 //    hashable)
 //  * turbo types such as the following:
-//    * turbo::string_view
+//    * turbo::string_piece
 //    * turbo::uint128
 //    * turbo::Time, turbo::Duration, and turbo::TimeZone
 //  * turbo containers (provided the elements are hashable) such as the

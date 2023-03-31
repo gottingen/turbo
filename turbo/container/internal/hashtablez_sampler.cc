@@ -33,7 +33,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr int HashtablezInfo::kMaxStackDepth;
 #endif
 
@@ -100,7 +100,7 @@ static bool ShouldForceSampling() {
   TURBO_CONST_INIT static std::atomic<ForceState> global_state{
       kUninitialized};
   ForceState state = global_state.load(std::memory_order_relaxed);
-  if (TURBO_PREDICT_TRUE(state == kDontForce)) return false;
+  if (TURBO_LIKELY(state == kDontForce)) return false;
 
   if (state == kUninitialized) {
     state = TURBO_INTERNAL_C_SYMBOL(TurboContainerInternalSampleEverything)()
@@ -113,7 +113,7 @@ static bool ShouldForceSampling() {
 
 HashtablezInfo* SampleSlow(SamplingState& next_sample,
                            size_t inline_element_size) {
-  if (TURBO_PREDICT_FALSE(ShouldForceSampling())) {
+  if (TURBO_UNLIKELY(ShouldForceSampling())) {
     next_sample.next_sample = 1;
     const int64_t old_stride = exchange(next_sample.sample_stride, 1);
     HashtablezInfo* result =
@@ -146,7 +146,7 @@ HashtablezInfo* SampleSlow(SamplingState& next_sample,
   // We will only be negative on our first count, so we should just retry in
   // that case.
   if (first) {
-    if (TURBO_PREDICT_TRUE(--next_sample.next_sample > 0)) return nullptr;
+    if (TURBO_LIKELY(--next_sample.next_sample > 0)) return nullptr;
     return SampleSlow(next_sample, inline_element_size);
   }
 
@@ -159,7 +159,7 @@ void UnsampleSlow(HashtablezInfo* info) {
 }
 
 void RecordRehashSlow(HashtablezInfo* info, size_t total_probe_length) {
-#ifdef TURBO_INTERNAL_HAVE_SSE2
+#if TURBO_SSE2
   total_probe_length /= 16;
 #else
   total_probe_length /= 8;
@@ -200,7 +200,7 @@ void RecordInsertSlow(HashtablezInfo* info, size_t hash,
   // SwissTables probe in groups of 16, so scale this to count items probes and
   // not offset from desired.
   size_t probe_length = distance_from_desired;
-#ifdef TURBO_INTERNAL_HAVE_SSE2
+#if TURBO_SSE2
   probe_length /= 16;
 #else
   probe_length /= 8;

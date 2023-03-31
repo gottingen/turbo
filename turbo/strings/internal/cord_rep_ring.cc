@@ -45,7 +45,7 @@ inline bool IsFlatOrExternal(CordRep* rep) {
 
 // Verifies that n + extra <= kMaxCapacity: throws std::length_error otherwise.
 inline void CheckCapacity(size_t n, size_t extra) {
-  if (TURBO_PREDICT_FALSE(extra > CordRepRing::kMaxCapacity - n)) {
+  if (TURBO_UNLIKELY(extra > CordRepRing::kMaxCapacity - n)) {
     base_internal::ThrowStdLengthError("Maximum capacity exceeded");
   }
 }
@@ -129,7 +129,7 @@ class CordRepRing::Filler {
   index_type pos_;
 };
 
-#ifdef TURBO_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+#ifndef TURBO_COMPILER_CPP17_ENABLED
 constexpr size_t CordRepRing::kMaxCapacity;
 #endif
 
@@ -504,7 +504,7 @@ CordRepRing* CordRepRing::Prepend(CordRepRing* rep, CordRep* child) {
   return PrependSlow(rep, child);
 }
 
-CordRepRing* CordRepRing::Append(CordRepRing* rep, turbo::string_view data,
+CordRepRing* CordRepRing::Append(CordRepRing* rep, turbo::string_piece data,
                                  size_t extra) {
   if (rep->refcount.IsOne()) {
     Span<char> avail = rep->GetAppendBuffer(data.length());
@@ -538,7 +538,7 @@ CordRepRing* CordRepRing::Append(CordRepRing* rep, turbo::string_view data,
   return Validate(rep);
 }
 
-CordRepRing* CordRepRing::Prepend(CordRepRing* rep, turbo::string_view data,
+CordRepRing* CordRepRing::Prepend(CordRepRing* rep, turbo::string_piece data,
                                   size_t extra) {
   if (rep->refcount.IsOne()) {
     Span<char> avail = rep->GetPrependBuffer(data.length());
@@ -596,7 +596,7 @@ CordRepRing::index_type CordRepRing::FindBinary(index_type head,
     head = larger ? after_mid : head;
     tail = larger ? tail : mid;
     assert(head != tail);
-  } while (TURBO_PREDICT_TRUE(count > kBinarySearchEndCount));
+  } while (TURBO_LIKELY(count > kBinarySearchEndCount));
   return head;
 }
 

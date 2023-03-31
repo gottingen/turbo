@@ -152,7 +152,7 @@ void BM_StrAppendImpl(benchmark::State& state, size_t total_bytes,
 void BM_StrAppend(benchmark::State& state) {
   const int total_bytes = state.range(0);
   const int chunks_at_a_time = state.range(1);
-  const turbo::string_view kChunk = "0123456789";
+  const turbo::string_piece kChunk = "0123456789";
 
   switch (chunks_at_a_time) {
     case 1:

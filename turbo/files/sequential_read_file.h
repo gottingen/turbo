@@ -22,43 +22,39 @@
 
 namespace turbo {
 
-    class SequentialReadFile {
-    public:
-        SequentialReadFile() noexcept = default;
+class SequentialReadFile {
+public:
+  SequentialReadFile() noexcept = default;
 
-        ~SequentialReadFile();
+  ~SequentialReadFile();
 
-        turbo::Status open(const turbo::filesystem::path &path) noexcept;
+  turbo::Status open(const turbo::filesystem::path &path) noexcept;
 
-        turbo::Status read(std::string *content, size_t n = npos);
+  turbo::Status read(std::string *content, size_t n = npos);
 
-        turbo::Status read(turbo::Cord *buf, size_t n = npos);
+  turbo::Status read(turbo::Cord *buf, size_t n = npos);
 
-        turbo::Status skip(off_t n);
+  turbo::Status skip(off_t n);
 
-        bool is_eof(turbo::Status *frs);
+  bool is_eof(turbo::Status *frs);
 
-        void close();
+  void close();
 
-        void reset();
+  void reset();
 
-        size_t has_read() const {
-            return _has_read;
-        }
+  size_t has_read() const { return _has_read; }
 
-        const turbo::filesystem::path &path() const {
-            return _path;
-        }
+  const turbo::filesystem::path &path() const { return _path; }
 
-    private:
-        TURBO_NON_COPYABLE(SequentialReadFile);
+private:
+  TURBO_NON_COPYABLE(SequentialReadFile);
 
-        static const size_t npos = std::numeric_limits<size_t>::max();
-        int _fd{-1};
-        turbo::filesystem::path _path;
-        size_t _has_read{0};
-    };
+  static const size_t npos = std::numeric_limits<size_t>::max();
+  int _fd{-1};
+  turbo::filesystem::path _path;
+  size_t _has_read{0};
+};
 
-}  // namespace turbo
+} // namespace turbo
 
-#endif  // TURBO_FILES_SEQUENTIAL_READ_FILE_H_
+#endif // TURBO_FILES_SEQUENTIAL_READ_FILE_H_

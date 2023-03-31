@@ -26,7 +26,7 @@
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 #include "turbo/synchronization/barrier.h"
 #include "turbo/synchronization/notification.h"
 #include "gmock/gmock.h"
@@ -48,7 +48,7 @@ using turbo::log_internal::SourceLine;
 using turbo::log_internal::TextMessageWithPrefix;
 using turbo::log_internal::ThreadID;
 
-auto* test_env TURBO_ATTRIBUTE_UNUSED = ::testing::AddGlobalTestEnvironment(
+auto* test_env TURBO_MAYBE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
 #if GTEST_HAS_DEATH_TEST
@@ -99,7 +99,7 @@ TEST(ScopedMockLogTest, LogMockCatchAndMatchSendExpectations) {
       Send(AllOf(SourceFilename(Eq("/my/very/very/very_long_source_file.cc")),
                  SourceBasename(Eq("very_long_source_file.cc")),
                  SourceLine(Eq(777)), ThreadID(Eq(turbo::LogEntry::tid_t{1234})),
-                 TextMessageWithPrefix(Truly([](turbo::string_view msg) {
+                 TextMessageWithPrefix(Truly([](turbo::string_piece msg) {
                    return turbo::EndsWith(
                        msg, " very_long_source_file.cc:777] Info message");
                  })))));

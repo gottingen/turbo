@@ -132,7 +132,7 @@ class alignas(8) randen_engine {
       const size_t requested_entropy = (entropy_size == 0) ? 8u : entropy_size;
       std::fill(buffer + requested_entropy, buffer + kBufferSize, 0);
       seq.generate(buffer, buffer + requested_entropy);
-#ifdef TURBO_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
       // Randen expects the seed buffer to be in Little Endian; reverse it on
       // Big Endian platforms.
       for (sequence_result_type& e : buffer) {

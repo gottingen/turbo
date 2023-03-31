@@ -53,6 +53,7 @@ set(TURBO_ALL_SRC
         "debugging/leak_check.cc"
         "files/file_watcher.cc"
         "files/sequential_read_file.cc"
+        "files/sequential_write_file.cc"
         "flags/internal/commandlineflag.cc"
         "flags/internal/flag.cc"
         "flags/internal/program_name.cc"
@@ -77,6 +78,8 @@ set(TURBO_ALL_SRC
         "log/internal/log_sink_set.cc"
         "log/internal/nullguard.cc"
         "log/internal/proto.cc"
+        "log/sinks/ansicolor_sink.cc"
+        "log/sinks/daily_file_sink.cc"
         "log/die_if_null.cc"
         "log/flags.cc"
         "log/globals.cc"
@@ -115,8 +118,6 @@ set(TURBO_ALL_SRC
         "strings/cord_analysis.cc"
         "strings/cord_buffer.cc"
         "strings/escaping.cc"
-        "strings/fmt/format.cc"
-        "strings/fmt/os.cc"
         "strings/internal/charconv_bigint.cc"
         "strings/internal/charconv_parse.cc"
         "strings/internal/cord_internal.cc"
@@ -142,7 +143,7 @@ set(TURBO_ALL_SRC
         "strings/str_cat.cc"
         "strings/str_replace.cc"
         "strings/str_split.cc"
-        "strings/string_view.cc"
+        "strings/string_piece.cc"
         "strings/substitute.cc"
         "strings/internal/escaping.cc"
         "strings/internal/memutil.cc"
@@ -178,6 +179,7 @@ set(TURBO_ALL_SRC
         "time/internal/cctz/src/time_zone_lookup.cc"
         "time/internal/cctz/src/time_zone_posix.cc"
         "time/internal/cctz/src/zone_info_source.cc"
+        "unicode/utf.cc"
         )
 
 turbo_cc_library(
@@ -187,6 +189,8 @@ turbo_cc_library(
         ${TURBO_ALL_SRC}
         COPTS
         ${TURBO_DEFAULT_COPTS}
+        ${TURBO_RANDOM_RANDEN_COPTS}
+        ${TURBO_SIMD_FLAGS}
         DEPS
         ${TURBO_DYLINK}
 )
@@ -210,6 +214,7 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(strings)
     add_subdirectory(synchronization)
     add_subdirectory(time)
+    add_subdirectory(unicode)
 endif (TURBO_BUILD_TESTING)
 if (${TURBO_BUILD_DLL})
     turbo_make_dll()

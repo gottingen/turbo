@@ -27,7 +27,7 @@
 #include "turbo/memory/memory.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 TURBO_FLAG(int, int_flag, 201, "int_flag help");
 TURBO_FLAG(std::string, string_flag, "dflt",
@@ -55,7 +55,7 @@ class CommandLineFlagTest : public testing::Test {
   void TearDown() override { flag_saver_.reset(); }
 
  private:
-  static std::string NormalizeFileName(turbo::string_view fname) {
+  static std::string NormalizeFileName(turbo::string_piece fname) {
 #ifdef _WIN32
     std::string normalized(fname);
     std::replace(normalized.begin(), normalized.end(), '\\', '/');

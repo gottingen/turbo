@@ -72,7 +72,7 @@ using turbo::synchronization_internal::KernelTimeout;
 using turbo::synchronization_internal::PerThreadSem;
 
 extern "C" {
-TURBO_ATTRIBUTE_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalMutexYield)() {
+TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalMutexYield)() {
   std::this_thread::yield();
 }
 }  // extern "C"
@@ -133,7 +133,7 @@ namespace {
 // See the comment in GetMutexGlobals() for more information.
 enum DelayMode { AGGRESSIVE, GENTLE };
 
-struct TURBO_CACHELINE_ALIGNED MutexGlobals {
+struct TURBO_CACHE_LINE_ALIGNED MutexGlobals {
   turbo::once_flag once;
   int spinloop_iterations = 0;
   int32_t mutex_sleep_spins[2] = {};
@@ -1808,7 +1808,7 @@ static intptr_t IgnoreWaitingWritersMask(int flag) {
 }
 
 // Internal version of LockWhen().  See LockSlowWithDeadline()
-TURBO_ATTRIBUTE_NOINLINE void Mutex::LockSlow(MuHow how, const Condition *cond,
+TURBO_NO_INLINE void Mutex::LockSlow(MuHow how, const Condition *cond,
                                              int flags) {
   TURBO_RAW_CHECK(
       this->LockSlowWithDeadline(how, cond, KernelTimeout::Never(), flags),
@@ -1930,7 +1930,7 @@ bool Mutex::LockSlowWithDeadline(MuHow how, const Condition *cond,
 // Arguments after the first are not evaluated unless the condition is true.
 #define RAW_CHECK_FMT(cond, ...)                                   \
   do {                                                             \
-    if (TURBO_PREDICT_FALSE(!(cond))) {                             \
+    if (TURBO_UNLIKELY(!(cond))) {                             \
       TURBO_RAW_LOG(FATAL, "Check " #cond " failed: " __VA_ARGS__); \
     }                                                              \
   } while (0)
@@ -1948,7 +1948,7 @@ static void CheckForMutexCorruption(intptr_t v, const char* label) {
   // save a branch in the common (correct) case of them not being coincident.
   static_assert(kMuReader << 3 == kMuWriter, "must match");
   static_assert(kMuWait << 3 == kMuWrWait, "must match");
-  if (TURBO_PREDICT_TRUE((w & (w << 3) & (kMuWriter | kMuWrWait)) == 0)) return;
+  if (TURBO_LIKELY((w & (w << 3) & (kMuWriter | kMuWrWait)) == 0)) return;
   RAW_CHECK_FMT((v & (kMuWriter | kMuReader)) != (kMuWriter | kMuReader),
                 "%s: Mutex corrupt: both reader and writer lock held: %p",
                 label, reinterpret_cast<void *>(v));
@@ -2083,7 +2083,7 @@ void Mutex::LockSlowLoop(SynchWaitParams *waitp, int flags) {
 // which holds the lock but is not runnable because its condition is false
 // or it is in the process of blocking on a condition variable; it must requeue
 // itself on the mutex/condvar to wait for its condition to become true.
-TURBO_ATTRIBUTE_NOINLINE void Mutex::UnlockSlow(SynchWaitParams *waitp) {
+TURBO_NO_INLINE void Mutex::UnlockSlow(SynchWaitParams *waitp) {
   SchedulingGuard::ScopedDisable disable_rescheduling;
   intptr_t v = mu_.load(std::memory_order_relaxed);
   this->AssertReaderHeld();

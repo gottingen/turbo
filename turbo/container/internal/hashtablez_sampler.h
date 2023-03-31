@@ -132,7 +132,7 @@ class HashtablezInfoHandle {
   // We do not have a destructor. Caller is responsible for calling Unregister
   // before destroying the handle.
   void Unregister() {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     UnsampleSlow(info_);
   }
 
@@ -142,7 +142,7 @@ class HashtablezInfoHandle {
   HashtablezInfoHandle(HashtablezInfoHandle&& o) noexcept
       : info_(turbo::exchange(o.info_, nullptr)) {}
   HashtablezInfoHandle& operator=(HashtablezInfoHandle&& o) noexcept {
-    if (TURBO_PREDICT_FALSE(info_ != nullptr)) {
+    if (TURBO_UNLIKELY(info_ != nullptr)) {
       UnsampleSlow(info_);
     }
     info_ = turbo::exchange(o.info_, nullptr);
@@ -150,32 +150,32 @@ class HashtablezInfoHandle {
   }
 
   inline void RecordStorageChanged(size_t size, size_t capacity) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordStorageChangedSlow(info_, size, capacity);
   }
 
   inline void RecordRehash(size_t total_probe_length) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordRehashSlow(info_, total_probe_length);
   }
 
   inline void RecordReservation(size_t target_capacity) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordReservationSlow(info_, target_capacity);
   }
 
   inline void RecordClearedReservation() {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordClearedReservationSlow(info_);
   }
 
   inline void RecordInsert(size_t hash, size_t distance_from_desired) {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordInsertSlow(info_, hash, distance_from_desired);
   }
 
   inline void RecordErase() {
-    if (TURBO_PREDICT_TRUE(info_ == nullptr)) return;
+    if (TURBO_LIKELY(info_ == nullptr)) return;
     RecordEraseSlow(info_);
   }
 
@@ -216,9 +216,9 @@ extern TURBO_PER_THREAD_TLS_KEYWORD SamplingState global_next_sample;
 // Returns an RAII sampling handle that manages registration and unregistation
 // with the global sampler.
 inline HashtablezInfoHandle Sample(
-    size_t inline_element_size TURBO_ATTRIBUTE_UNUSED) {
+    size_t inline_element_size TURBO_MAYBE_UNUSED) {
 #if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
-  if (TURBO_PREDICT_TRUE(--global_next_sample.next_sample > 0)) {
+  if (TURBO_LIKELY(--global_next_sample.next_sample > 0)) {
     return HashtablezInfoHandle(nullptr);
   }
   return HashtablezInfoHandle(

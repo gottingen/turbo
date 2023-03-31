@@ -64,8 +64,8 @@ static inline void *StacktracePowerPCGetLR(void **sp) {
 // checks (the strictness of which is controlled by the boolean parameter
 // "STRICT_UNWINDING") to reduce the chance that a bad pointer is returned.
 template<bool STRICT_UNWINDING, bool IS_WITH_CONTEXT>
-TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static void **NextStackFrame(void **old_sp, const void *uc) {
   void **new_sp = (void **) *old_sp;
   enum { kStackAlignment = 16 };
@@ -155,13 +155,13 @@ static void **NextStackFrame(void **old_sp, const void *uc) {
 }
 
 // This ensures that turbo::GetStackTrace sets up the Link Register properly.
-TURBO_ATTRIBUTE_NOINLINE static void TurboStacktracePowerPCDummyFunction() {
+TURBO_NO_INLINE static void TurboStacktracePowerPCDummyFunction() {
   TURBO_BLOCK_TAIL_CALL_OPTIMIZATION();
 }
 
 template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
-TURBO_ATTRIBUTE_NO_SANITIZE_ADDRESS  // May read random elements from stack.
-TURBO_ATTRIBUTE_NO_SANITIZE_MEMORY   // May read random elements from stack.
+TURBO_NO_SANITIZE_ADDRESS  // May read random elements from stack.
+TURBO_NO_SANITIZE_MEMORY   // May read random elements from stack.
 static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
                       const void *ucp, int *min_dropped_frames) {
   void **sp;

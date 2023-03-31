@@ -60,7 +60,7 @@ class TurboErrorHelper {
 };
 
 #define TURBO_REGISTER_ERRNO(error_code, description)                   \
-    const int TURBO_ALLOW_UNUSED TURBO_CONCAT(turbo_errno_dummy_, __LINE__) =              \
+    const int TURBO_MAYBE_UNUSED TURBO_CONCAT(turbo_errno_dummy_, __LINE__) =              \
         ::turbo::DescribeCustomizedErrno((error_code), #error_code, (description)); \
     template <> class TurboErrorHelper<(int)(error_code)> {};
 

@@ -52,7 +52,7 @@ struct CordRepCrc : public CordRep {
 // unref an outer CordRepCrc node.
 inline CordRep* RemoveCrcNode(CordRep* rep) {
   assert(rep != nullptr);
-  if (TURBO_PREDICT_FALSE(rep->IsCrc())) {
+  if (TURBO_UNLIKELY(rep->IsCrc())) {
     CordRep* child = rep->crc()->child;
     if (rep->refcount.IsOne()) {
       delete rep->crc();
@@ -69,7 +69,7 @@ inline CordRep* RemoveCrcNode(CordRep* rep) {
 // Does not consume or create a reference on `rep` or the returned value.
 inline CordRep* SkipCrcNode(CordRep* rep) {
   assert(rep != nullptr);
-  if (TURBO_PREDICT_FALSE(rep->IsCrc())) {
+  if (TURBO_UNLIKELY(rep->IsCrc())) {
     return rep->crc()->child;
   } else {
     return rep;
@@ -78,7 +78,7 @@ inline CordRep* SkipCrcNode(CordRep* rep) {
 
 inline const CordRep* SkipCrcNode(const CordRep* rep) {
   assert(rep != nullptr);
-  if (TURBO_PREDICT_FALSE(rep->IsCrc())) {
+  if (TURBO_UNLIKELY(rep->IsCrc())) {
     return rep->crc()->child;
   } else {
     return rep;

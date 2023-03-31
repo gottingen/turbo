@@ -19,7 +19,7 @@
 #include <string>
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_view.h"
+#include "turbo/strings/string_piece.h"
 
 // --------------------------------------------------------------------
 // Program name
@@ -41,7 +41,7 @@ std::string ShortProgramInvocationName();
 
 // Sets program invocation name to a new value. Should only be called once
 // during program initialization, before any threads are spawned.
-void SetProgramInvocationName(turbo::string_view prog_name_str);
+void SetProgramInvocationName(turbo::string_piece prog_name_str);
 
 }  // namespace flags_internal
 TURBO_NAMESPACE_END
