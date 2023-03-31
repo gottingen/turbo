@@ -400,7 +400,7 @@ TURBO_MUST_USE_RESULT str_format_internal::Streamable StreamFormat(
 //
 // Example:
 //
-//   std::string_piece s = "Ulaanbaatar";
+//   turbo::string_piece s = "Ulaanbaatar";
 //   turbo::PrintF("The capital of Mongolia is %s", s);
 //
 //   Outputs: "The capital of Mongolia is Ulaanbaatar"
@@ -420,7 +420,7 @@ int PrintF(const FormatSpec<Args...>& format, const Args&... args) {
 //
 // Example:
 //
-//   std::string_piece s = "Ulaanbaatar";
+//   turbo::string_piece s = "Ulaanbaatar";
 //   turbo::FPrintF(stdout, "The capital of Mongolia is %s", s);
 //
 //   Outputs: "The capital of Mongolia is Ulaanbaatar"
@@ -447,7 +447,7 @@ int FPrintF(std::FILE* output, const FormatSpec<Args...>& format,
 //
 // Example:
 //
-//   std::string_piece s = "Ulaanbaatar";
+//   turbo::string_piece s = "Ulaanbaatar";
 //   char output[128];
 //   turbo::SNPrintF(output, sizeof(output),
 //                  "The capital of Mongolia is %s", s);

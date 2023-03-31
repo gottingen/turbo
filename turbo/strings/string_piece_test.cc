@@ -31,7 +31,7 @@
 #include "gtest/gtest.h"
 
 #if defined(__ANDROID__)
-// We don't control the death messaging when using std::string_piece.
+// We don't control the death messaging when using turbo::string_piece.
 // Android assert messages only go to system log, so death tests cannot inspect
 // the message for matching.
 #define TURBO_EXPECT_DEATH_IF_SUPPORTED(statement, regex) \

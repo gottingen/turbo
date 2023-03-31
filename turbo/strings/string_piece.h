@@ -23,7 +23,7 @@
 // another `string_piece`.
 //
 // This `turbo::string_piece` abstraction is designed to be a drop-in
-// replacement for the C++17 `std::string_piece` abstraction.
+// replacement for the C++17 `turbo::string_piece` abstraction.
 #ifndef TURBO_STRINGS_STRING_PIECE_H_
 #define TURBO_STRINGS_STRING_PIECE_H_
 
@@ -685,7 +685,7 @@ TURBO_NAMESPACE_BEGIN
 // ClippedSubstr()
 //
 // Like `s.substr(pos, n)`, but clips `pos` to an upper bound of `s.size()`.
-// Provided because std::string_piece::substr throws if `pos > size()`
+// Provided because turbo::string_piece::substr throws if `pos > size()`
 inline string_piece ClippedSubstr(string_piece s, size_t pos,
                                  size_t n = string_piece::npos) {
   pos = (std::min)(pos, static_cast<size_t>(s.size()));

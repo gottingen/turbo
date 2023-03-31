@@ -91,6 +91,7 @@ include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 include(TurboDll)
 include(TurboHelpers)
+include(Simd)
 
 
 ##

@@ -189,6 +189,7 @@ turbo_cc_library(
         ${TURBO_ALL_SRC}
         COPTS
         ${TURBO_DEFAULT_COPTS}
+        ${TURBO_SIMD_FLAGS}
         DEPS
         ${TURBO_DYLINK}
 )
