@@ -26,6 +26,7 @@ turbo_cc_library(
         ${TURBO_DEFAULT_COPTS}
         DEPS
         turbo::turbo
+        turbo::reference
         TESTONLY
 )
 
