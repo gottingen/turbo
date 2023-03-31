@@ -14,7 +14,7 @@
 
 #include <string>
 
-namespace simdutf {
+namespace turbo {
 
 enum encoding_type {
         UTF8 = 1,       // BOM 0xef 0xbb 0xbf

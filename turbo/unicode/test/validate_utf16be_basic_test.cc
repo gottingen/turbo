@@ -29,7 +29,7 @@
 
 TEST(validate_utf16be__returns_true_for_valid_input__single_words) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512, seed)};
     std::vector<char16_t> flipped(utf16.size());
@@ -41,7 +41,7 @@ TEST(validate_utf16be__returns_true_for_valid_input__single_words) {
 
 TEST(validate_utf16be__returns_true_for_valid_input__surrogate_pairs_short) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 0, 1};
+  turbo::tests::helpers::random_utf16 generator{seed, 0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(8)};
     std::vector<char16_t> flipped(utf16.size());
@@ -55,7 +55,7 @@ TEST(validate_utf16be__returns_true_for_valid_input__surrogate_pairs_short) {
 
 TEST(validate_utf16be__returns_true_for_valid_input__surrogate_pairs) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 0, 1};
+  turbo::tests::helpers::random_utf16 generator{seed, 0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512)};
     std::vector<char16_t> flipped(utf16.size());
@@ -69,7 +69,7 @@ TEST(validate_utf16be__returns_true_for_valid_input__surrogate_pairs) {
 // mixed = either 16-bit or 32-bit codewords
 TEST(validate_utf16be__returns_true_for_valid_input__mixed) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 1};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 1};
   const auto utf16{generator.generate(512)};
   std::vector<char16_t> flipped(utf16.size());
   implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
@@ -101,7 +101,7 @@ TEST(validate_utf16be__returns_true_for_empty_string) {
 #else
 TEST(validate_utf16be__returns_false_when_input_has_wrong_first_word_value) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   for(size_t trial = 0; trial < 10; trial++) {
     auto utf16{generator.generate(128)};
     const size_t len = utf16.size();
@@ -134,7 +134,7 @@ TEST(validate_utf16be__returns_false_when_input_has_wrong_first_word_value) {
 #else
 TEST(validate_utf16be__returns_false_when_input_has_wrong_second_word_value) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   auto utf16{generator.generate(128)};
   const size_t len = utf16.size();
 
@@ -175,7 +175,7 @@ TEST(validate_utf16be__returns_false_when_input_has_wrong_second_word_value) {
 TEST(validate_utf16be__returns_false_when_input_is_truncated) {
   const char16_t valid_surrogate_W1 = 0x00d8;
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   for (size_t size = 1; size < 128; size++) {
     auto utf16{generator.generate(128)};
     const size_t len = utf16.size();
@@ -192,5 +192,5 @@ TEST(validate_utf16be__returns_false_when_input_is_truncated) {
 
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

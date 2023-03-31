@@ -15,17 +15,17 @@
 #ifndef SIMDUTF_UTF16_H
 #define SIMDUTF_UTF16_H
 
-namespace simdutf {
+namespace turbo {
 namespace scalar {
 namespace {
 namespace utf16 {
 
-inline simdutf_warn_unused uint16_t swap_bytes(const uint16_t word) {
+inline TURBO_MUST_USE_RESULT uint16_t swap_bytes(const uint16_t word) {
   return uint16_t((word >> 8) | (word << 8));
 }
 
 template <endianness big_endian>
-inline simdutf_warn_unused bool validate(const char16_t *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT bool validate(const char16_t *buf, size_t len) noexcept {
   const uint16_t *data = reinterpret_cast<const uint16_t *>(buf);
   uint64_t pos = 0;
   while (pos < len) {
@@ -46,7 +46,7 @@ inline simdutf_warn_unused bool validate(const char16_t *buf, size_t len) noexce
 }
 
 template <endianness big_endian>
-inline simdutf_warn_unused result validate_with_errors(const char16_t *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT result validate_with_errors(const char16_t *buf, size_t len) noexcept {
   const uint16_t *data = reinterpret_cast<const uint16_t *>(buf);
   size_t pos = 0;
   while (pos < len) {
@@ -109,7 +109,7 @@ inline size_t utf32_length_from_utf16(const char16_t* buf, size_t len) {
   return counter;
 }
 
-simdutf_really_inline void change_endianness_utf16(const char16_t* in, size_t size, char16_t* out) {
+TURBO_FORCE_INLINE void change_endianness_utf16(const char16_t* in, size_t size, char16_t* out) {
   const uint16_t * input = reinterpret_cast<const uint16_t *>(in);
   uint16_t * output = reinterpret_cast<uint16_t *>(out);
   for (size_t i = 0; i < size; i++) {
@@ -120,6 +120,6 @@ simdutf_really_inline void change_endianness_utf16(const char16_t* in, size_t si
 } // utf16 namespace
 } // unnamed namespace
 } // namespace scalar
-} // namespace simdutf
+} // namespace turbo
 
 #endif

@@ -37,7 +37,7 @@ std::tuple<const char16_t*, char32_t*, bool> convert_utf16_to_utf32(const char16
         );
   while (buf + 32 <= end) {
     // Always safe because buf + 32 <= end so that end - buf >= 32 bytes:
-    __m512i in = _mm512_loadu_si512((__m512i*)buf);
+    __m512i in = _mm512_loadu_si512((__m512i*)const_cast<char16_t*>(buf));
     if(big_endian) { in = _mm512_shuffle_epi8(in, byteflip); }
 
     // H - bitmask for high surrogates

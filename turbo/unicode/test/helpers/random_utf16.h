@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <random>
 
-namespace simdutf {
+namespace turbo {
 namespace tests {
 namespace helpers {
 
@@ -53,4 +53,4 @@ namespace helpers {
 
 } // namespace helpers
 } // namespace tests
-} // namespace simdutf
+} // namespace turbo

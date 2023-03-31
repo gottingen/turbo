@@ -16,7 +16,7 @@
 
 #include <stdexcept>
 
-namespace simdutf { namespace tests { namespace helpers {
+namespace turbo { namespace tests { namespace helpers {
 
     RandomInt::RandomInt(uint64_t lo, uint64_t hi, uint64_t seed) noexcept
       : gen(std::mt19937::result_type(seed)), distr{lo, hi} {}

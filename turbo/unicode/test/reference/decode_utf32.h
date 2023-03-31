@@ -16,7 +16,7 @@
 
 #include <cstdio>
 
-namespace simdutf { namespace tests { namespace reference { namespace utf32 {
+namespace turbo { namespace tests { namespace reference { namespace utf32 {
 
     enum class Error {
         too_large,

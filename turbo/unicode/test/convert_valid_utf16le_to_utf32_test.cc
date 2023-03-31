@@ -27,7 +27,7 @@
 namespace {
   std::array<size_t, 7> input_size{7, 16, 12, 64, 67, 128, 256};
 
-  using simdutf::tests::helpers::transcode_utf16_to_utf32_test_base;
+  using turbo::tests::helpers::transcode_utf16_to_utf32_test_base;
 
   constexpr int trials = 1000;
 }
@@ -36,7 +36,7 @@ TEST(convert_2_UTF16_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 2-byte UTF-16 (no surrogate pairs)
-    simdutf::tests::helpers::RandomIntRanges random({{0x0000, 0x007f},
+    turbo::tests::helpers::RandomIntRanges random({{0x0000, 0x007f},
                                                      {0x0080, 0x07ff},
                                                      {0x0800, 0xd7ff},
                                                      {0xe000, 0xffff}}, 0);
@@ -56,7 +56,7 @@ TEST(convert_with_surrogate_pairs) {
   for(size_t trial = 0; trial < trials; trial ++) {
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // some surrogate pairs
-    simdutf::tests::helpers::RandomIntRanges random({{0x0800, 0xd800-1},
+    turbo::tests::helpers::RandomIntRanges random({{0x0800, 0xd800-1},
                                                      {0xe000, 0x10ffff}}, 0);
 
     auto procedure = [&implementation](const char16_t* utf16, size_t size, char32_t* utf32) -> size_t {
@@ -154,7 +154,7 @@ TEST(all_possible_8_codepoint_combinations) {
   std::vector<char> output_utf32(256, ' ');
   const auto& combinations = all_combinations();
   for (const auto& input_utf16: combinations) {
-    if (simdutf::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size())) {
+    if (turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size())) {
       transcode_utf16_to_utf32_test_base test(input_utf16);
       ASSERT_TRUE(test(procedure));
     }
@@ -163,5 +163,5 @@ TEST(all_possible_8_codepoint_combinations) {
 #endif
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

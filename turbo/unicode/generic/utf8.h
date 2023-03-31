@@ -14,14 +14,14 @@
 
 #include "turbo/unicode/scalar/utf8.h"
 
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace utf8 {
 
 using namespace simd;
 
-simdutf_really_inline size_t count_code_points(const char* in, size_t size) {
+TURBO_FORCE_INLINE size_t count_code_points(const char* in, size_t size) {
     size_t pos = 0;
     size_t count = 0;
     for(;pos + 64 <= size; pos += 64) {
@@ -33,7 +33,7 @@ simdutf_really_inline size_t count_code_points(const char* in, size_t size) {
 }
 
 
-simdutf_really_inline size_t utf16_length_from_utf8(const char* in, size_t size) {
+TURBO_FORCE_INLINE size_t utf16_length_from_utf8(const char* in, size_t size) {
     size_t pos = 0;
     size_t count = 0;
     // This algorithm could no doubt be improved!
@@ -50,10 +50,10 @@ simdutf_really_inline size_t utf16_length_from_utf8(const char* in, size_t size)
 }
 
 
-simdutf_really_inline size_t utf32_length_from_utf8(const char* in, size_t size) {
+TURBO_FORCE_INLINE size_t utf32_length_from_utf8(const char* in, size_t size) {
     return count_code_points(in, size);
 }
 } // utf8 namespace
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo

@@ -15,9 +15,6 @@
 #ifndef SIMDUTF_COMPILER_CHECK_H
 #define SIMDUTF_COMPILER_CHECK_H
 
-#ifndef __cplusplus
-#error simdutf requires a C++ compiler
-#endif
 
 #ifndef SIMDUTF_CPLUSPLUS
 #if defined(_MSVC_LANG) && !defined(__clang__)

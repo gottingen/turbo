@@ -27,7 +27,7 @@
 namespace {
   std::array<size_t, 7> input_size{7, 16, 12, 64, 67, 128, 256};
 
-  using simdutf::tests::helpers::transcode_utf32_to_utf16_test_base;
+  using turbo::tests::helpers::transcode_utf32_to_utf16_test_base;
 
   constexpr int trials = 1000;
 }
@@ -36,13 +36,13 @@ TEST(convert_into_2_UTF16_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 2 UTF-16 bytes
-    simdutf::tests::helpers::RandomIntRanges random({{0x0000, 0xd7ff},
+    turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd7ff},
                                                      {0xe000, 0xffff}}, 0);
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(size);
-      simdutf::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
-      ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+      turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+      ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
       return res.count;
     };
@@ -61,12 +61,12 @@ TEST(convert_into_4_UTF16_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 4 UTF-16 bytes
-    simdutf::tests::helpers::RandomIntRanges random({{0x10000, 0x10ffff}}, 0);
+    turbo::tests::helpers::RandomIntRanges random({{0x10000, 0x10ffff}}, 0);
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);
-      simdutf::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
-      ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+      turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+      ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
       return res.count;
     };
@@ -85,14 +85,14 @@ TEST(convert_into_2_or_4_UTF16_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 2 or 4 UTF-16 bytes (all codepoints)
-    simdutf::tests::helpers::RandomIntRanges random({{0x0000, 0xd7ff},
+    turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd7ff},
                                                      {0xe000, 0xffff},
                                                      {0x10000, 0x10ffff}}, 0);
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);
-      simdutf::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
-      ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+      turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+      ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
       return res.count;
     };
@@ -115,8 +115,8 @@ TEST(convert_fails_if_there_is_surrogate) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [&implementation, &i](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
         std::vector<char16_t> utf16be(2*size);
-        simdutf::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
-        ASSERT_EQUAL(res.error, simdutf::error_code::SURROGATE);
+        turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+        ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
         ASSERT_EQUAL(res.count, i);
         return 0;
       };
@@ -130,7 +130,7 @@ TEST(convert_fails_if_there_is_surrogate) {
 
 TEST(convert_fails_if_input_too_large) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::RandomInt generator(0x110000, 0xffffffff, seed);
+  turbo::tests::helpers::RandomInt generator(0x110000, 0xffffffff, seed);
 
   const size_t size = 64;
   transcode_utf32_to_utf16_test_base test([](){return '*';}, size+32);
@@ -140,8 +140,8 @@ TEST(convert_fails_if_input_too_large) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [&implementation, &i](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
         std::vector<char16_t> utf16be(2*size);
-        simdutf::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
-        ASSERT_EQUAL(res.error, simdutf::error_code::TOO_LARGE);
+        turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+        ASSERT_EQUAL(res.error, turbo::error_code::TOO_LARGE);
         ASSERT_EQUAL(res.count, i);
         return 0;
       };
@@ -154,5 +154,5 @@ TEST(convert_fails_if_input_too_large) {
 }
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

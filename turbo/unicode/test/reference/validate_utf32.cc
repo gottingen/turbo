@@ -14,11 +14,11 @@
 
 #include "validate_utf32.h"
 
-namespace simdutf {
+namespace turbo {
 namespace tests {
 namespace reference {
 
-simdutf_warn_unused bool validate_utf32(const char32_t *buf, size_t len) noexcept {
+TURBO_MUST_USE_RESULT bool validate_utf32(const char32_t *buf, size_t len) noexcept {
   const char32_t* curr = buf;
   const char32_t* end = buf + len;
 
@@ -37,6 +37,6 @@ simdutf_warn_unused bool validate_utf32(const char32_t *buf, size_t len) noexcep
 
 } // namespace reference
 } // namespace tests
-} // namespace simdutf
+} // namespace turbo
 
 

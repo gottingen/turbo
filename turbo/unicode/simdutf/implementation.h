@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_IMPLEMENTATION_H
-#define SIMDUTF_IMPLEMENTATION_H
+#ifndef TURBO_UNICODE_IMPLEMENTATION_H
+#define TURBO_UNICODE_IMPLEMENTATION_H
 #include <string>
 #if !defined(SIMDUTF_NO_THREADS)
 #include <atomic>
@@ -24,27 +24,27 @@
 #include "turbo/unicode/internal/isadetection.h"
 
 
-namespace simdutf {
+namespace turbo {
 
 /**
  * Autodetect the encoding of the input, a single encoding is recommended.
- * E.g., the function might return simdutf::encoding_type::UTF8,
- * simdutf::encoding_type::UTF16_LE, simdutf::encoding_type::UTF16_BE, or
- * simdutf::encoding_type::UTF32_LE.
+ * E.g., the function might return turbo::encoding_type::UTF8,
+ * turbo::encoding_type::UTF16_LE, turbo::encoding_type::UTF16_BE, or
+ * turbo::encoding_type::UTF32_LE.
  *
  * @param input the string to analyze.
  * @param length the length of the string in bytes.
  * @return the detected encoding type
  */
-simdutf_warn_unused simdutf::encoding_type autodetect_encoding(const char * input, size_t length) noexcept;
-simdutf_really_inline simdutf_warn_unused simdutf::encoding_type autodetect_encoding(const uint8_t * input, size_t length) noexcept {
+TURBO_MUST_USE_RESULT turbo::encoding_type autodetect_encoding(const char * input, size_t length) noexcept;
+TURBO_FORCE_INLINE TURBO_MUST_USE_RESULT turbo::encoding_type autodetect_encoding(const uint8_t * input, size_t length) noexcept {
   return autodetect_encoding(reinterpret_cast<const char *>(input), length);
 }
 
 /**
  * Autodetect the possible encodings of the input in one pass.
  * E.g., if the input might be UTF-16LE or UTF-8, this function returns
- * the value (simdutf::encoding_type::UTF8 | simdutf::encoding_type::UTF16_LE).
+ * the value (turbo::encoding_type::UTF8 | turbo::encoding_type::UTF16_LE).
  *
  * Overriden by each implementation.
  *
@@ -52,8 +52,8 @@ simdutf_really_inline simdutf_warn_unused simdutf::encoding_type autodetect_enco
  * @param length the length of the string in bytes.
  * @return the detected encoding type
  */
-simdutf_warn_unused int detect_encodings(const char * input, size_t length) noexcept;
-simdutf_really_inline simdutf_warn_unused int detect_encodings(const uint8_t * input, size_t length) noexcept {
+TURBO_MUST_USE_RESULT int detect_encodings(const char * input, size_t length) noexcept;
+TURBO_FORCE_INLINE TURBO_MUST_USE_RESULT int detect_encodings(const uint8_t * input, size_t length) noexcept {
   return detect_encodings(reinterpret_cast<const char *>(input), length);
 }
 
@@ -69,7 +69,7 @@ simdutf_really_inline simdutf_warn_unused int detect_encodings(const uint8_t * i
  * @param len the length of the string in bytes.
  * @return true if and only if the string is valid UTF-8.
  */
-simdutf_warn_unused bool validate_utf8(const char *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT bool validate_utf8(const char *buf, size_t len) noexcept;
 
 /**
  * Validate the UTF-8 string and stop on error.
@@ -80,7 +80,7 @@ simdutf_warn_unused bool validate_utf8(const char *buf, size_t len) noexcept;
  * @param len the length of the string in bytes.
  * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
  */
-simdutf_warn_unused result validate_utf8_with_errors(const char *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT result validate_utf8_with_errors(const char *buf, size_t len) noexcept;
 
 /**
  * Validate the ASCII string.
@@ -91,7 +91,7 @@ simdutf_warn_unused result validate_utf8_with_errors(const char *buf, size_t len
  * @param len the length of the string in bytes.
  * @return true if and only if the string is valid ASCII.
  */
-simdutf_warn_unused bool validate_ascii(const char *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT bool validate_ascii(const char *buf, size_t len) noexcept;
 
 /**
  * Validate the ASCII string and stop on error. It might be faster than
@@ -103,7 +103,7 @@ simdutf_warn_unused bool validate_ascii(const char *buf, size_t len) noexcept;
  * @param len the length of the string in bytes.
  * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
  */
-simdutf_warn_unused result validate_ascii_with_errors(const char *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT result validate_ascii_with_errors(const char *buf, size_t len) noexcept;
 
 /**
  * Using native endianness; Validate the UTF-16 string.
@@ -118,7 +118,7 @@ simdutf_warn_unused result validate_ascii_with_errors(const char *buf, size_t le
  * @param len the length of the string in number of 2-byte words (char16_t).
  * @return true if and only if the string is valid UTF-16.
  */
-simdutf_warn_unused bool validate_utf16(const char16_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexcept;
 
 /**
  * Validate the UTF-16LE string. This function may be best when you expect
@@ -133,7 +133,7 @@ simdutf_warn_unused bool validate_utf16(const char16_t *buf, size_t len) noexcep
  * @param len the length of the string in number of 2-byte words (char16_t).
  * @return true if and only if the string is valid UTF-16LE.
  */
-simdutf_warn_unused bool validate_utf16le(const char16_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT bool validate_utf16le(const char16_t *buf, size_t len) noexcept;
 
 /**
  * Validate the UTF-16BE string. This function may be best when you expect
@@ -148,7 +148,7 @@ simdutf_warn_unused bool validate_utf16le(const char16_t *buf, size_t len) noexc
  * @param len the length of the string in number of 2-byte words (char16_t).
  * @return true if and only if the string is valid UTF-16BE.
  */
-simdutf_warn_unused bool validate_utf16be(const char16_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT bool validate_utf16be(const char16_t *buf, size_t len) noexcept;
 
 /**
  * Using native endianness; Validate the UTF-16 string and stop on error.
@@ -162,7 +162,7 @@ simdutf_warn_unused bool validate_utf16be(const char16_t *buf, size_t len) noexc
  * @param len the length of the string in number of 2-byte words (char16_t).
  * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
  */
-simdutf_warn_unused result validate_utf16_with_errors(const char16_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT result validate_utf16_with_errors(const char16_t *buf, size_t len) noexcept;
 
 /**
  * Validate the UTF-16LE string and stop on error. It might be faster than
@@ -176,7 +176,7 @@ simdutf_warn_unused result validate_utf16_with_errors(const char16_t *buf, size_
  * @param len the length of the string in number of 2-byte words (char16_t).
  * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
  */
-simdutf_warn_unused result validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT result validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept;
 
 /**
  * Validate the UTF-16BE string and stop on error. It might be faster than
@@ -190,7 +190,7 @@ simdutf_warn_unused result validate_utf16le_with_errors(const char16_t *buf, siz
  * @param len the length of the string in number of 2-byte words (char16_t).
  * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
  */
-simdutf_warn_unused result validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT result validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept;
 
 /**
  * Validate the UTF-32 string. This function may be best when you expect
@@ -205,7 +205,7 @@ simdutf_warn_unused result validate_utf16be_with_errors(const char16_t *buf, siz
  * @param len the length of the string in number of 4-byte words (char32_t).
  * @return true if and only if the string is valid UTF-32.
  */
-simdutf_warn_unused bool validate_utf32(const char32_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT bool validate_utf32(const char32_t *buf, size_t len) noexcept;
 
 /**
  * Validate the UTF-32 string and stop on error. It might be faster than
@@ -219,7 +219,7 @@ simdutf_warn_unused bool validate_utf32(const char32_t *buf, size_t len) noexcep
  * @param len the length of the string in number of 4-byte words (char32_t).
  * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
  */
-simdutf_warn_unused result validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept;
+TURBO_MUST_USE_RESULT result validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-8 string into UTF-16 string.
@@ -232,7 +232,7 @@ simdutf_warn_unused result validate_utf32_with_errors(const char32_t *buf, size_
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char16_t; 0 if the input was not valid UTF-8 string
  */
-simdutf_warn_unused size_t convert_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_output) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_output) noexcept;
 
 /**
  * Convert possibly broken UTF-8 string into UTF-16LE string.
@@ -245,7 +245,7 @@ simdutf_warn_unused size_t convert_utf8_to_utf16(const char * input, size_t leng
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char16_t; 0 if the input was not valid UTF-8 string
  */
-simdutf_warn_unused size_t convert_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_output) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_output) noexcept;
 
 /**
  * Convert possibly broken UTF-8 string into UTF-16BE string.
@@ -258,7 +258,7 @@ simdutf_warn_unused size_t convert_utf8_to_utf16le(const char * input, size_t le
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char16_t; 0 if the input was not valid UTF-8 string
  */
-simdutf_warn_unused size_t convert_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_output) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_output) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-8 string into UTF-16
@@ -272,7 +272,7 @@ simdutf_warn_unused size_t convert_utf8_to_utf16be(const char * input, size_t le
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
  */
-simdutf_warn_unused result convert_utf8_to_utf16_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf8_to_utf16_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept;
 
 /**
  * Convert possibly broken UTF-8 string into UTF-16LE string and stop on error.
@@ -285,7 +285,7 @@ simdutf_warn_unused result convert_utf8_to_utf16_with_errors(const char * input,
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
  */
-simdutf_warn_unused result convert_utf8_to_utf16le_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf8_to_utf16le_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept;
 
 /**
  * Convert possibly broken UTF-8 string into UTF-16BE string and stop on error.
@@ -298,7 +298,7 @@ simdutf_warn_unused result convert_utf8_to_utf16le_with_errors(const char * inpu
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
  */
-simdutf_warn_unused result convert_utf8_to_utf16be_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf8_to_utf16be_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept;
 
 /**
  * Convert possibly broken UTF-8 string into UTF-32 string.
@@ -311,7 +311,7 @@ simdutf_warn_unused result convert_utf8_to_utf16be_with_errors(const char * inpu
  * @param utf32_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char32_t; 0 if the input was not valid UTF-8 string
  */
-simdutf_warn_unused size_t convert_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_output) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_output) noexcept;
 
 /**
  * Convert possibly broken UTF-8 string into UTF-32 string and stop on error.
@@ -324,7 +324,7 @@ simdutf_warn_unused size_t convert_utf8_to_utf32(const char * input, size_t leng
  * @param utf32_buffer  the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char32_t written if successful.
  */
-simdutf_warn_unused result convert_utf8_to_utf32_with_errors(const char * input, size_t length, char32_t* utf32_output) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf8_to_utf32_with_errors(const char * input, size_t length, char32_t* utf32_output) noexcept;
 
 /**
  * Using native endianness; Convert valid UTF-8 string into UTF-16 string.
@@ -336,7 +336,7 @@ simdutf_warn_unused result convert_utf8_to_utf32_with_errors(const char * input,
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char16_t
  */
-simdutf_warn_unused size_t convert_valid_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert valid UTF-8 string into UTF-16LE string.
@@ -348,7 +348,7 @@ simdutf_warn_unused size_t convert_valid_utf8_to_utf16(const char * input, size_
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char16_t
  */
-simdutf_warn_unused size_t convert_valid_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert valid UTF-8 string into UTF-16BE string.
@@ -360,7 +360,7 @@ simdutf_warn_unused size_t convert_valid_utf8_to_utf16le(const char * input, siz
  * @param utf16_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char16_t
  */
-simdutf_warn_unused size_t convert_valid_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert valid UTF-8 string into UTF-32 string.
@@ -372,7 +372,7 @@ simdutf_warn_unused size_t convert_valid_utf8_to_utf16be(const char * input, siz
  * @param utf32_buffer  the pointer to buffer that can hold conversion result
  * @return the number of written char32_t
  */
-simdutf_warn_unused size_t convert_valid_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Compute the number of 2-byte words that this UTF-8 string would require in UTF-16LE format.
@@ -385,7 +385,7 @@ simdutf_warn_unused size_t convert_valid_utf8_to_utf32(const char * input, size_
  * @param length        the length of the string in bytes
  * @return the number of char16_t words required to encode the UTF-8 string as UTF-16LE
  */
-simdutf_warn_unused size_t utf16_length_from_utf8(const char * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf16_length_from_utf8(const char * input, size_t length) noexcept;
 
 /**
  * Compute the number of 4-byte words that this UTF-8 string would require in UTF-32 format.
@@ -400,7 +400,7 @@ simdutf_warn_unused size_t utf16_length_from_utf8(const char * input, size_t len
  * @param length        the length of the string in bytes
  * @return the number of char32_t words required to encode the UTF-8 string as UTF-32
  */
-simdutf_warn_unused size_t utf32_length_from_utf8(const char * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf32_length_from_utf8(const char * input, size_t length) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-16 string into UTF-8 string.
@@ -415,7 +415,7 @@ simdutf_warn_unused size_t utf32_length_from_utf8(const char * input, size_t len
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-16LE string
  */
-simdutf_warn_unused size_t convert_utf16_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf16_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16LE string into UTF-8 string.
@@ -430,7 +430,7 @@ simdutf_warn_unused size_t convert_utf16_to_utf8(const char16_t * input, size_t 
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-16LE string
  */
-simdutf_warn_unused size_t convert_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16BE string into UTF-8 string.
@@ -445,7 +445,7 @@ simdutf_warn_unused size_t convert_utf16le_to_utf8(const char16_t * input, size_
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-16LE string
  */
-simdutf_warn_unused size_t convert_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-16 string into UTF-8 string and stop on error.
@@ -460,7 +460,7 @@ simdutf_warn_unused size_t convert_utf16be_to_utf8(const char16_t * input, size_
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char written if successful.
  */
-simdutf_warn_unused result convert_utf16_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf16_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16LE string into UTF-8 string and stop on error.
@@ -475,7 +475,7 @@ simdutf_warn_unused result convert_utf16_to_utf8_with_errors(const char16_t * in
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char written if successful.
  */
-simdutf_warn_unused result convert_utf16le_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf16le_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16BE string into UTF-8 string and stop on error.
@@ -490,7 +490,7 @@ simdutf_warn_unused result convert_utf16le_to_utf8_with_errors(const char16_t * 
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char written if successful.
  */
-simdutf_warn_unused result convert_utf16be_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf16be_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Using native endianness; Convert valid UTF-16 string into UTF-8 string.
@@ -504,7 +504,7 @@ simdutf_warn_unused result convert_utf16be_to_utf8_with_errors(const char16_t * 
  * @param utf8_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf16_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf16_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert valid UTF-16LE string into UTF-8 string.
@@ -518,7 +518,7 @@ simdutf_warn_unused size_t convert_valid_utf16_to_utf8(const char16_t * input, s
  * @param utf8_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert valid UTF-16BE string into UTF-8 string.
@@ -532,7 +532,7 @@ simdutf_warn_unused size_t convert_valid_utf16le_to_utf8(const char16_t * input,
  * @param utf8_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-16 string into UTF-32 string.
@@ -547,7 +547,7 @@ simdutf_warn_unused size_t convert_valid_utf16be_to_utf8(const char16_t * input,
  * @param utf32_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-16LE string
  */
-simdutf_warn_unused size_t convert_utf16_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf16_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16LE string into UTF-32 string.
@@ -562,7 +562,7 @@ simdutf_warn_unused size_t convert_utf16_to_utf32(const char16_t * input, size_t
  * @param utf32_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-16LE string
  */
-simdutf_warn_unused size_t convert_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16BE string into UTF-32 string.
@@ -577,7 +577,7 @@ simdutf_warn_unused size_t convert_utf16le_to_utf32(const char16_t * input, size
  * @param utf32_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-16LE string
  */
-simdutf_warn_unused size_t convert_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-16 string into
@@ -593,7 +593,7 @@ simdutf_warn_unused size_t convert_utf16be_to_utf32(const char16_t * input, size
  * @param utf32_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char32_t written if successful.
  */
-simdutf_warn_unused result convert_utf16_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf16_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16LE string into UTF-32 string and stop on error.
@@ -608,7 +608,7 @@ simdutf_warn_unused result convert_utf16_to_utf32_with_errors(const char16_t * i
  * @param utf32_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char32_t written if successful.
  */
-simdutf_warn_unused result convert_utf16le_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf16le_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-16BE string into UTF-32 string and stop on error.
@@ -623,7 +623,7 @@ simdutf_warn_unused result convert_utf16le_to_utf32_with_errors(const char16_t *
  * @param utf32_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char32_t written if successful.
  */
-simdutf_warn_unused result convert_utf16be_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf16be_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Using native endianness; Convert valid UTF-16 string into UTF-32 string.
@@ -637,7 +637,7 @@ simdutf_warn_unused result convert_utf16be_to_utf32_with_errors(const char16_t *
  * @param utf32_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf16_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf16_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Convert valid UTF-16LE string into UTF-32 string.
@@ -651,7 +651,7 @@ simdutf_warn_unused size_t convert_valid_utf16_to_utf32(const char16_t * input, 
  * @param utf32_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Convert valid UTF-16BE string into UTF-32 string.
@@ -665,7 +665,7 @@ simdutf_warn_unused size_t convert_valid_utf16le_to_utf32(const char16_t * input
  * @param utf32_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) noexcept;
 
 /**
  * Using native endianness; Compute the number of bytes that this UTF-16
@@ -677,7 +677,7 @@ simdutf_warn_unused size_t convert_valid_utf16be_to_utf32(const char16_t * input
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return the number of bytes required to encode the UTF-16LE string as UTF-8
  */
-simdutf_warn_unused size_t utf8_length_from_utf16(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16(const char16_t * input, size_t length) noexcept;
 
 /**
  * Compute the number of bytes that this UTF-16LE string would require in UTF-8 format.
@@ -688,7 +688,7 @@ simdutf_warn_unused size_t utf8_length_from_utf16(const char16_t * input, size_t
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return the number of bytes required to encode the UTF-16LE string as UTF-8
  */
-simdutf_warn_unused size_t utf8_length_from_utf16le(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16le(const char16_t * input, size_t length) noexcept;
 
 /**
  * Compute the number of bytes that this UTF-16BE string would require in UTF-8 format.
@@ -699,7 +699,7 @@ simdutf_warn_unused size_t utf8_length_from_utf16le(const char16_t * input, size
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return the number of bytes required to encode the UTF-16BE string as UTF-8
  */
-simdutf_warn_unused size_t utf8_length_from_utf16be(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16be(const char16_t * input, size_t length) noexcept;
 
 /**
  * Convert possibly broken UTF-32 string into UTF-8 string.
@@ -714,7 +714,7 @@ simdutf_warn_unused size_t utf8_length_from_utf16be(const char16_t * input, size
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-32 string
  */
-simdutf_warn_unused size_t convert_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-32 string into UTF-8 string and stop on error.
@@ -729,7 +729,7 @@ simdutf_warn_unused size_t convert_utf32_to_utf8(const char32_t * input, size_t 
  * @param utf8_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char written if successful.
  */
-simdutf_warn_unused result convert_utf32_to_utf8_with_errors(const char32_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf32_to_utf8_with_errors(const char32_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Convert valid UTF-32 string into UTF-8 string.
@@ -743,7 +743,7 @@ simdutf_warn_unused result convert_utf32_to_utf8_with_errors(const char32_t * in
  * @param utf8_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-32 string into UTF-16 string.
@@ -758,7 +758,7 @@ simdutf_warn_unused size_t convert_valid_utf32_to_utf8(const char32_t * input, s
  * @param utf16_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-32 string
  */
-simdutf_warn_unused size_t convert_utf32_to_utf16(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-32 string into UTF-16LE string.
@@ -773,7 +773,7 @@ simdutf_warn_unused size_t convert_utf32_to_utf16(const char32_t * input, size_t
  * @param utf16_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-32 string
  */
-simdutf_warn_unused size_t convert_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-32 string into UTF-16BE string.
@@ -788,7 +788,7 @@ simdutf_warn_unused size_t convert_utf32_to_utf16le(const char32_t * input, size
  * @param utf16_buffer   the pointer to buffer that can hold conversion result
  * @return number of written words; 0 if input is not a valid UTF-32 string
  */
-simdutf_warn_unused size_t convert_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Using native endianness; Convert possibly broken UTF-32 string into UTF-16
@@ -804,7 +804,7 @@ simdutf_warn_unused size_t convert_utf32_to_utf16be(const char32_t * input, size
  * @param utf16_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
  */
-simdutf_warn_unused result convert_utf32_to_utf16_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf32_to_utf16_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-32 string into UTF-16LE string and stop on error.
@@ -819,7 +819,7 @@ simdutf_warn_unused result convert_utf32_to_utf16_with_errors(const char32_t * i
  * @param utf16_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
  */
-simdutf_warn_unused result convert_utf32_to_utf16le_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf32_to_utf16le_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert possibly broken UTF-32 string into UTF-16BE string and stop on error.
@@ -834,7 +834,7 @@ simdutf_warn_unused result convert_utf32_to_utf16le_with_errors(const char32_t *
  * @param utf16_buffer   the pointer to buffer that can hold conversion result
  * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
  */
-simdutf_warn_unused result convert_utf32_to_utf16be_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT result convert_utf32_to_utf16be_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Using native endianness; Convert valid UTF-32 string into UTF-16 string.
@@ -848,7 +848,7 @@ simdutf_warn_unused result convert_utf32_to_utf16be_with_errors(const char32_t *
  * @param utf16_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf32_to_utf16(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert valid UTF-32 string into UTF-16LE string.
@@ -862,7 +862,7 @@ simdutf_warn_unused size_t convert_valid_utf32_to_utf16(const char32_t * input, 
  * @param utf16_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Convert valid UTF-32 string into UTF-16BE string.
@@ -876,7 +876,7 @@ simdutf_warn_unused size_t convert_valid_utf32_to_utf16le(const char32_t * input
  * @param utf16_buffer   the pointer to buffer that can hold the conversion result
  * @return number of written words; 0 if conversion is not possible
  */
-simdutf_warn_unused size_t convert_valid_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
+TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) noexcept;
 
 /**
  * Change the endianness of the input. Can be used to go from UTF-16LE to UTF-16BE or
@@ -901,7 +901,7 @@ void change_endianness_utf16(const char16_t * input, size_t length, char16_t * o
  * @param length        the length of the string in 4-byte words (char32_t)
  * @return the number of bytes required to encode the UTF-32 string as UTF-8
  */
-simdutf_warn_unused size_t utf8_length_from_utf32(const char32_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf8_length_from_utf32(const char32_t * input, size_t length) noexcept;
 
 /**
  * Compute the number of two-byte words that this UTF-32 string would require in UTF-16 format.
@@ -912,7 +912,7 @@ simdutf_warn_unused size_t utf8_length_from_utf32(const char32_t * input, size_t
  * @param length        the length of the string in 4-byte words (char32_t)
  * @return the number of bytes required to encode the UTF-32 string as UTF-16
  */
-simdutf_warn_unused size_t utf16_length_from_utf32(const char32_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf16_length_from_utf32(const char32_t * input, size_t length) noexcept;
 
 /**
  * Using native endianness; Compute the number of bytes that this UTF-16
@@ -928,7 +928,7 @@ simdutf_warn_unused size_t utf16_length_from_utf32(const char32_t * input, size_
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return the number of bytes required to encode the UTF-16LE string as UTF-32
  */
-simdutf_warn_unused size_t utf32_length_from_utf16(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16(const char16_t * input, size_t length) noexcept;
 
 /**
  * Compute the number of bytes that this UTF-16LE string would require in UTF-32 format.
@@ -943,7 +943,7 @@ simdutf_warn_unused size_t utf32_length_from_utf16(const char16_t * input, size_
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return the number of bytes required to encode the UTF-16LE string as UTF-32
  */
-simdutf_warn_unused size_t utf32_length_from_utf16le(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16le(const char16_t * input, size_t length) noexcept;
 
 /**
  * Compute the number of bytes that this UTF-16BE string would require in UTF-32 format.
@@ -958,7 +958,7 @@ simdutf_warn_unused size_t utf32_length_from_utf16le(const char16_t * input, siz
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return the number of bytes required to encode the UTF-16BE string as UTF-32
  */
-simdutf_warn_unused size_t utf32_length_from_utf16be(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16be(const char16_t * input, size_t length) noexcept;
 
 /**
  * Count the number of code points (characters) in the string assuming that
@@ -972,7 +972,7 @@ simdutf_warn_unused size_t utf32_length_from_utf16be(const char16_t * input, siz
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return number of code points
  */
-simdutf_warn_unused size_t count_utf16(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t count_utf16(const char16_t * input, size_t length) noexcept;
 
 /**
  * Count the number of code points (characters) in the string assuming that
@@ -986,7 +986,7 @@ simdutf_warn_unused size_t count_utf16(const char16_t * input, size_t length) no
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return number of code points
  */
-simdutf_warn_unused size_t count_utf16le(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t count_utf16le(const char16_t * input, size_t length) noexcept;
 
 /**
  * Count the number of code points (characters) in the string assuming that
@@ -1000,7 +1000,7 @@ simdutf_warn_unused size_t count_utf16le(const char16_t * input, size_t length) 
  * @param length        the length of the string in 2-byte words (char16_t)
  * @return number of code points
  */
-simdutf_warn_unused size_t count_utf16be(const char16_t * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t count_utf16be(const char16_t * input, size_t length) noexcept;
 
 /**
  * Count the number of code points (characters) in the string assuming that
@@ -1012,7 +1012,7 @@ simdutf_warn_unused size_t count_utf16be(const char16_t * input, size_t length) 
  * @param length        the length of the string in bytes
  * @return number of code points
  */
-simdutf_warn_unused size_t count_utf8(const char * input, size_t length) noexcept;
+TURBO_MUST_USE_RESULT size_t count_utf8(const char * input, size_t length) noexcept;
 
 /**
  * An implementation of simdutf for a particular CPU architecture.
@@ -1026,7 +1026,7 @@ public:
   /**
    * The name of this implementation.
    *
-   *     const implementation *impl = simdutf::active_implementation;
+   *     const implementation *impl = turbo::active_implementation;
    *     cout << "simdutf is optimized for " << impl->name() << "(" << impl->description() << ")" << endl;
    *
    * @return the name of the implementation, e.g. "haswell", "westmere", "arm64"
@@ -1036,7 +1036,7 @@ public:
   /**
    * The description of this implementation.
    *
-   *     const implementation *impl = simdutf::active_implementation;
+   *     const implementation *impl = turbo::active_implementation;
    *     cout << "simdutf is optimized for " << impl->name() << "(" << impl->description() << ")" << endl;
    *
    * @return the name of the implementation, e.g. "haswell", "westmere", "arm64"
@@ -1088,7 +1088,7 @@ public:
    * @param len the length of the string in bytes.
    * @return true if and only if the string is valid UTF-8.
    */
-  simdutf_warn_unused virtual bool validate_utf8(const char *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual bool validate_utf8(const char *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the UTF-8 string and stop on errors.
@@ -1099,7 +1099,7 @@ public:
    * @param len the length of the string in bytes.
    * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
    */
-  simdutf_warn_unused virtual result validate_utf8_with_errors(const char *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result validate_utf8_with_errors(const char *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the ASCII string.
@@ -1110,7 +1110,7 @@ public:
    * @param len the length of the string in bytes.
    * @return true if and only if the string is valid ASCII.
    */
-  simdutf_warn_unused virtual bool validate_ascii(const char *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual bool validate_ascii(const char *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the ASCII string and stop on error.
@@ -1121,7 +1121,7 @@ public:
    * @param len the length of the string in bytes.
    * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
    */
-  simdutf_warn_unused virtual result validate_ascii_with_errors(const char *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result validate_ascii_with_errors(const char *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the UTF-16LE string.This function may be best when you expect
@@ -1136,7 +1136,7 @@ public:
    * @param len the length of the string in number of 2-byte words (char16_t).
    * @return true if and only if the string is valid UTF-16LE.
    */
-  simdutf_warn_unused virtual bool validate_utf16le(const char16_t *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual bool validate_utf16le(const char16_t *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the UTF-16BE string. This function may be best when you expect
@@ -1151,7 +1151,7 @@ public:
    * @param len the length of the string in number of 2-byte words (char16_t).
    * @return true if and only if the string is valid UTF-16BE.
    */
-  simdutf_warn_unused virtual bool validate_utf16be(const char16_t *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual bool validate_utf16be(const char16_t *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the UTF-16LE string and stop on error.  It might be faster than
@@ -1165,7 +1165,7 @@ public:
    * @param len the length of the string in number of 2-byte words (char16_t).
    * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
    */
-  simdutf_warn_unused virtual result validate_utf16le_with_errors(const char16_t *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result validate_utf16le_with_errors(const char16_t *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the UTF-16BE string and stop on error. It might be faster than
@@ -1179,7 +1179,7 @@ public:
    * @param len the length of the string in number of 2-byte words (char16_t).
    * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
    */
-  simdutf_warn_unused virtual result validate_utf16be_with_errors(const char16_t *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result validate_utf16be_with_errors(const char16_t *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the UTF-32 string.
@@ -1192,7 +1192,7 @@ public:
    * @param len the length of the string in number of 4-byte words (char32_t).
    * @return true if and only if the string is valid UTF-32.
    */
-  simdutf_warn_unused virtual bool validate_utf32(const char32_t *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual bool validate_utf32(const char32_t *buf, size_t len) const noexcept = 0;
 
   /**
    * Validate the UTF-32 string and stop on error.
@@ -1205,7 +1205,7 @@ public:
    * @param len the length of the string in number of 4-byte words (char32_t).
    * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
    */
-  simdutf_warn_unused virtual result validate_utf32_with_errors(const char32_t *buf, size_t len) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result validate_utf32_with_errors(const char32_t *buf, size_t len) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-8 string into UTF-16LE string.
@@ -1218,7 +1218,7 @@ public:
    * @param utf16_buffer  the pointer to buffer that can hold conversion result
    * @return the number of written char16_t; 0 if the input was not valid UTF-8 string
    */
-  simdutf_warn_unused virtual size_t convert_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-8 string into UTF-16BE string.
@@ -1231,7 +1231,7 @@ public:
    * @param utf16_buffer  the pointer to buffer that can hold conversion result
    * @return the number of written char16_t; 0 if the input was not valid UTF-8 string
    */
-  simdutf_warn_unused virtual size_t convert_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-8 string into UTF-16LE string and stop on error.
@@ -1244,7 +1244,7 @@ public:
    * @param utf16_buffer  the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
    */
-  simdutf_warn_unused virtual result convert_utf8_to_utf16le_with_errors(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf8_to_utf16le_with_errors(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-8 string into UTF-16BE string and stop on error.
@@ -1257,7 +1257,7 @@ public:
    * @param utf16_buffer  the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of words validated if successful.
    */
-  simdutf_warn_unused virtual result convert_utf8_to_utf16be_with_errors(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf8_to_utf16be_with_errors(const char * input, size_t length, char16_t* utf16_output) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-8 string into UTF-32 string.
@@ -1270,7 +1270,7 @@ public:
    * @param utf32_buffer  the pointer to buffer that can hold conversion result
    * @return the number of written char16_t; 0 if the input was not valid UTF-8 string
    */
-  simdutf_warn_unused virtual size_t convert_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_output) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_output) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-8 string into UTF-32 string and stop on error.
@@ -1283,7 +1283,7 @@ public:
    * @param utf32_buffer  the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char32_t written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf8_to_utf32_with_errors(const char * input, size_t length, char32_t* utf32_output) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf8_to_utf32_with_errors(const char * input, size_t length, char32_t* utf32_output) const noexcept = 0;
 
   /**
    * Convert valid UTF-8 string into UTF-16LE string.
@@ -1295,7 +1295,7 @@ public:
    * @param utf16_buffer  the pointer to buffer that can hold conversion result
    * @return the number of written char16_t
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
 /**
    * Convert valid UTF-8 string into UTF-16BE string.
@@ -1307,7 +1307,7 @@ public:
    * @param utf16_buffer  the pointer to buffer that can hold conversion result
    * @return the number of written char16_t
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-8 string into UTF-32 string.
@@ -1319,7 +1319,7 @@ public:
    * @param utf16_buffer  the pointer to buffer that can hold conversion result
    * @return the number of written char32_t
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
 
   /**
    * Compute the number of 2-byte words that this UTF-8 string would require in UTF-16LE format.
@@ -1330,7 +1330,7 @@ public:
    * @param length        the length of the string in bytes
    * @return the number of char16_t words required to encode the UTF-8 string as UTF-16LE
    */
-  simdutf_warn_unused virtual size_t utf16_length_from_utf8(const char * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf16_length_from_utf8(const char * input, size_t length) const noexcept = 0;
 
    /**
    * Compute the number of 4-byte words that this UTF-8 string would require in UTF-32 format.
@@ -1343,7 +1343,7 @@ public:
    * @param length        the length of the string in bytes
    * @return the number of char32_t words required to encode the UTF-8 string as UTF-32
    */
-  simdutf_warn_unused virtual size_t utf32_length_from_utf8(const char * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf32_length_from_utf8(const char * input, size_t length) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16LE string into UTF-8 string.
@@ -1358,7 +1358,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold conversion result
    * @return number of written words; 0 if input is not a valid UTF-16LE string
    */
-  simdutf_warn_unused virtual size_t convert_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16BE string into UTF-8 string.
@@ -1373,7 +1373,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold conversion result
    * @return number of written words; 0 if input is not a valid UTF-16BE string
    */
-  simdutf_warn_unused virtual size_t convert_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16LE string into UTF-8 string and stop on error.
@@ -1388,7 +1388,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf16le_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf16le_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16BE string into UTF-8 string and stop on error.
@@ -1403,7 +1403,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf16be_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf16be_to_utf8_with_errors(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-16LE string into UTF-8 string.
@@ -1417,7 +1417,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold the conversion result
    * @return number of written words; 0 if conversion is not possible
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf16le_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-16BE string into UTF-8 string.
@@ -1431,7 +1431,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold the conversion result
    * @return number of written words; 0 if conversion is not possible
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf16be_to_utf8(const char16_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16LE string into UTF-32 string.
@@ -1446,7 +1446,7 @@ public:
    * @param utf32_buffer   the pointer to buffer that can hold conversion result
    * @return number of written words; 0 if input is not a valid UTF-16LE string
    */
-  simdutf_warn_unused virtual size_t convert_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16BE string into UTF-32 string.
@@ -1461,7 +1461,7 @@ public:
    * @param utf32_buffer   the pointer to buffer that can hold conversion result
    * @return number of written words; 0 if input is not a valid UTF-16BE string
    */
-  simdutf_warn_unused virtual size_t convert_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16LE string into UTF-32 string and stop on error.
@@ -1476,7 +1476,7 @@ public:
    * @param utf32_buffer   the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char32_t written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf16le_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf16le_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-16BE string into UTF-32 string and stop on error.
@@ -1491,7 +1491,7 @@ public:
    * @param utf32_buffer   the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char32_t written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf16be_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf16be_to_utf32_with_errors(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-16LE string into UTF-32 string.
@@ -1505,7 +1505,7 @@ public:
    * @param utf32_buffer   the pointer to buffer that can hold the conversion result
    * @return number of written words; 0 if conversion is not possible
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf16le_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-16LE string into UTF-32BE string.
@@ -1519,7 +1519,7 @@ public:
    * @param utf32_buffer   the pointer to buffer that can hold the conversion result
    * @return number of written words; 0 if conversion is not possible
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf16be_to_utf32(const char16_t * input, size_t length, char32_t* utf32_buffer) const noexcept = 0;
 
   /**
    * Compute the number of bytes that this UTF-16LE string would require in UTF-8 format.
@@ -1532,7 +1532,7 @@ public:
    * @param length        the length of the string in 2-byte words (char16_t)
    * @return the number of bytes required to encode the UTF-16LE string as UTF-8
    */
-  simdutf_warn_unused virtual size_t utf8_length_from_utf16le(const char16_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf8_length_from_utf16le(const char16_t * input, size_t length) const noexcept = 0;
 
   /**
    * Compute the number of bytes that this UTF-16BE string would require in UTF-8 format.
@@ -1545,7 +1545,7 @@ public:
    * @param length        the length of the string in 2-byte words (char16_t)
    * @return the number of bytes required to encode the UTF-16BE string as UTF-8
    */
-  simdutf_warn_unused virtual size_t utf8_length_from_utf16be(const char16_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf8_length_from_utf16be(const char16_t * input, size_t length) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-32 string into UTF-8 string.
@@ -1560,7 +1560,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold conversion result
    * @return number of written words; 0 if input is not a valid UTF-32 string
    */
-  simdutf_warn_unused virtual size_t convert_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-32 string into UTF-8 string and stop on error.
@@ -1575,7 +1575,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf32_to_utf8_with_errors(const char32_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf32_to_utf8_with_errors(const char32_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-32 string into UTF-8 string.
@@ -1589,7 +1589,7 @@ public:
    * @param utf8_buffer   the pointer to buffer that can hold the conversion result
    * @return number of written words; 0 if conversion is not possible
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf32_to_utf8(const char32_t * input, size_t length, char* utf8_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-32 string into UTF-16LE string.
@@ -1604,7 +1604,7 @@ public:
    * @param utf16_buffer   the pointer to buffer that can hold conversion result
    * @return number of written words; 0 if input is not a valid UTF-32 string
    */
-  simdutf_warn_unused virtual size_t convert_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-32 string into UTF-16BE string.
@@ -1619,7 +1619,7 @@ public:
    * @param utf16_buffer   the pointer to buffer that can hold conversion result
    * @return number of written words; 0 if input is not a valid UTF-32 string
    */
-  simdutf_warn_unused virtual size_t convert_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-32 string into UTF-16LE string and stop on error.
@@ -1634,7 +1634,7 @@ public:
    * @param utf16_buffer   the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf32_to_utf16le_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf32_to_utf16le_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
   /**
    * Convert possibly broken UTF-32 string into UTF-16BE string and stop on error.
@@ -1649,7 +1649,7 @@ public:
    * @param utf16_buffer   the pointer to buffer that can hold conversion result
    * @return a result pair struct with an error code and either the position of the error if any or the number of char16_t written if successful.
    */
-  simdutf_warn_unused virtual result convert_utf32_to_utf16be_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual result convert_utf32_to_utf16be_with_errors(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-32 string into UTF-16LE string.
@@ -1663,7 +1663,7 @@ public:
    * @param utf16_buffer   the pointer to buffer that can hold the conversion result
    * @return number of written words; 0 if conversion is not possible
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf32_to_utf16le(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
   /**
    * Convert valid UTF-32 string into UTF-16BE string.
@@ -1677,7 +1677,7 @@ public:
    * @param utf16_buffer   the pointer to buffer that can hold the conversion result
    * @return number of written words; 0 if conversion is not possible
    */
-  simdutf_warn_unused virtual size_t convert_valid_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t convert_valid_utf32_to_utf16be(const char32_t * input, size_t length, char16_t* utf16_buffer) const noexcept = 0;
 
   /**
    * Change the endianness of the input. Can be used to go from UTF-16LE to UTF-16BE or
@@ -1702,7 +1702,7 @@ public:
    * @param length        the length of the string in 4-byte words (char32_t)
    * @return the number of bytes required to encode the UTF-32 string as UTF-8
    */
-  simdutf_warn_unused virtual size_t utf8_length_from_utf32(const char32_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf8_length_from_utf32(const char32_t * input, size_t length) const noexcept = 0;
 
   /**
    * Compute the number of two-byte words that this UTF-32 string would require in UTF-16 format.
@@ -1713,7 +1713,7 @@ public:
    * @param length        the length of the string in 4-byte words (char32_t)
    * @return the number of bytes required to encode the UTF-32 string as UTF-16
    */
-  simdutf_warn_unused virtual size_t utf16_length_from_utf32(const char32_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf16_length_from_utf32(const char32_t * input, size_t length) const noexcept = 0;
 
   /*
    * Compute the number of bytes that this UTF-16LE string would require in UTF-32 format.
@@ -1728,7 +1728,7 @@ public:
    * @param length        the length of the string in 2-byte words (char16_t)
    * @return the number of bytes required to encode the UTF-16LE string as UTF-32
    */
-  simdutf_warn_unused virtual size_t utf32_length_from_utf16le(const char16_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf32_length_from_utf16le(const char16_t * input, size_t length) const noexcept = 0;
 
   /*
    * Compute the number of bytes that this UTF-16BE string would require in UTF-32 format.
@@ -1743,7 +1743,7 @@ public:
    * @param length        the length of the string in 2-byte words (char16_t)
    * @return the number of bytes required to encode the UTF-16BE string as UTF-32
    */
-  simdutf_warn_unused virtual size_t utf32_length_from_utf16be(const char16_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t utf32_length_from_utf16be(const char16_t * input, size_t length) const noexcept = 0;
 
   /**
    * Count the number of code points (characters) in the string assuming that
@@ -1757,7 +1757,7 @@ public:
    * @param length        the length of the string in 2-byte words (char16_t)
    * @return number of code points
    */
-  simdutf_warn_unused virtual size_t count_utf16le(const char16_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t count_utf16le(const char16_t * input, size_t length) const noexcept = 0;
 
   /**
    * Count the number of code points (characters) in the string assuming that
@@ -1771,7 +1771,7 @@ public:
    * @param length        the length of the string in 2-byte words (char16_t)
    * @return number of code points
    */
-  simdutf_warn_unused virtual size_t count_utf16be(const char16_t * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t count_utf16be(const char16_t * input, size_t length) const noexcept = 0;
 
 
   /**
@@ -1784,13 +1784,13 @@ public:
    * @param length        the length of the string in bytes
    * @return number of code points
    */
-  simdutf_warn_unused virtual size_t count_utf8(const char * input, size_t length) const noexcept = 0;
+  TURBO_MUST_USE_RESULT virtual size_t count_utf8(const char * input, size_t length) const noexcept = 0;
 
 
 
 protected:
   /** @private Construct an implementation with the given name and description. For subclasses. */
-  simdutf_really_inline implementation(
+  TURBO_FORCE_INLINE implementation(
     std::string name,
     std::string description,
     uint32_t required_instruction_sets
@@ -1828,7 +1828,7 @@ namespace internal {
 class available_implementation_list {
 public:
   /** Get the list of available implementations compiled into simdutf */
-  simdutf_really_inline available_implementation_list() {}
+  TURBO_FORCE_INLINE available_implementation_list() {}
   /** Number of implementations */
   size_t size() const noexcept;
   /** STL const begin() iterator */
@@ -1841,10 +1841,10 @@ public:
    *
    * Case sensitive.
    *
-   *     const implementation *impl = simdutf::available_implementations["westmere"];
+   *     const implementation *impl = turbo::available_implementations["westmere"];
    *     if (!impl) { exit(1); }
    *     if (!imp->supported_by_runtime_system()) { exit(1); }
-   *     simdutf::active_implementation = impl;
+   *     turbo::active_implementation = impl;
    *
    * @param name the implementation to find, e.g. "westmere", "haswell", "arm64"
    * @return the implementation, or nullptr if the parse failed.
@@ -1861,8 +1861,8 @@ public:
    *
    * This is used to initialize the implementation on startup.
    *
-   *     const implementation *impl = simdutf::available_implementation::detect_best_supported();
-   *     simdutf::active_implementation = impl;
+   *     const implementation *impl = turbo::available_implementation::detect_best_supported();
+   *     turbo::active_implementation = impl;
    *
    * @return the most advanced supported implementation for the current host, or an
    *         implementation that returns UNSUPPORTED_ARCHITECTURE if there is no supported
@@ -1913,16 +1913,16 @@ class detect_best_supported_implementation_on_first_use;
 /**
  * The list of available implementations compiled into simdutf.
  */
-extern SIMDUTF_DLLIMPORTEXPORT const internal::available_implementation_list& get_available_implementations();
+extern TURBO_DLL const internal::available_implementation_list& get_available_implementations();
 
 /**
   * The active implementation.
   *
   * Automatically initialized on first use to the most advanced implementation supported by this hardware.
   */
-extern SIMDUTF_DLLIMPORTEXPORT internal::atomic_ptr<const implementation>& get_active_implementation();
+extern TURBO_DLL internal::atomic_ptr<const implementation>& get_active_implementation();
 
 
-} // namespace simdutf
+} // namespace turbo
 
-#endif // SIMDUTF_IMPLEMENTATION_H
+#endif // TURBO_UNICODE_IMPLEMENTATION_H

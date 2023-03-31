@@ -20,7 +20,7 @@
 #include <utility>
 #include <cstdint>
 
-namespace simdutf { namespace tests { namespace helpers {
+namespace turbo { namespace tests { namespace helpers {
 
   class RandomInt {
     std::mt19937 gen;

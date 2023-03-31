@@ -31,6 +31,7 @@
     - pair.first    - the first unprocessed input byte
     - pair.second   - the first unprocessed output word
 */
+TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion)
 template <endianness big_endian, typename OUTPUT>
 std::pair<const char*, OUTPUT*> valid_utf8_to_fixed_length(const char* str, size_t len, OUTPUT* dwords) {
     constexpr bool UTF32 = std::is_same<OUTPUT, uint32_t>::value;
@@ -129,12 +130,12 @@ std::pair<const char*, OUTPUT*> valid_utf8_to_fixed_length(const char* str, size
                 vec0 = _mm512_mask_expand_epi32(vec0, __mmask16(((1<<valid_count1)-1)<<valid_count0), vec1);
                 valid_count0 += valid_count1;
                 vec0 = expand_utf8_to_utf32(vec0);
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
+                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, static_cast<unsigned int>(valid_count0), true)
             } else {
                 vec0 = expand_utf8_to_utf32(vec0);
                 vec1 = expand_utf8_to_utf32(vec1);
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, true)
+                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, static_cast<unsigned int>(valid_count0), true)
+                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, static_cast<unsigned int>(valid_count1), true)
             }
 
             const __m512i lane3 = broadcast_epi128<3>(utf8);

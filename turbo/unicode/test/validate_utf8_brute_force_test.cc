@@ -25,7 +25,7 @@
 
 TEST(brute_force) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 gen_1_2_3_4(seed, 1, 1, 1, 1);
+  turbo::tests::helpers::random_utf8 gen_1_2_3_4(seed, 1, 1, 1, 1);
   size_t total = 1000;
   for (size_t i = 0; i < total; i++) {
 
@@ -41,7 +41,7 @@ TEST(brute_force) {
       bool is_ok =
           implementation.validate_utf8((const char *)UTF8.data(), UTF8.size());
       bool is_ok_basic =
-          simdutf::tests::reference::validate_utf8((const char *)UTF8.data(), UTF8.size());
+          turbo::tests::reference::validate_utf8((const char *)UTF8.data(), UTF8.size());
       if (is_ok != is_ok_basic) {
         std::cerr << "bug" << std::endl;
         ASSERT_TRUE(false);
@@ -53,5 +53,5 @@ TEST(brute_force) {
 
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

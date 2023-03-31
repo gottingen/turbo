@@ -15,8 +15,8 @@
 #include "turbo/unicode/simdutf/common_defs.h"
 
 
-namespace simdutf {  namespace tests { namespace reference {
+namespace turbo {  namespace tests { namespace reference {
     // validate UTF-16LE.
-    simdutf_warn_unused bool validate_utf16(const char16_t *buf, size_t len) noexcept;
+    TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexcept;
 
 }}}

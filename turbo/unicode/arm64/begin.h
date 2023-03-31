@@ -12,4 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define SIMDUTF_IMPLEMENTATION arm64
+#define TURBO_UNICODE_IMPLEMENTATION arm64

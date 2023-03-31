@@ -15,14 +15,14 @@
 #ifndef SIMDUTF_UTF8_H
 #define SIMDUTF_UTF8_H
 
-namespace simdutf {
+namespace turbo {
 namespace scalar {
 namespace {
 namespace utf8 {
-#if SIMDUTF_IMPLEMENTATION_FALLBACK
+#if TURBO_UNICODE_IMPLEMENTATION_FALLBACK
 // only used by the fallback kernel.
 // credit: based on code from Google Fuchsia (Apache Licensed)
-inline simdutf_warn_unused bool validate(const char *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT bool validate(const char *buf, size_t len) noexcept {
   const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
   uint64_t pos = 0;
   uint32_t code_point = 0;
@@ -88,7 +88,7 @@ inline simdutf_warn_unused bool validate(const char *buf, size_t len) noexcept {
 }
 #endif
 
-inline simdutf_warn_unused result validate_with_errors(const char *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT result validate_with_errors(const char *buf, size_t len) noexcept {
   const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
   size_t pos = 0;
   uint32_t code_point = 0;
@@ -155,7 +155,7 @@ inline simdutf_warn_unused result validate_with_errors(const char *buf, size_t l
 
 // Finds the previous leading byte and validates with errors from there
 // Used to pinpoint the location of an error when an invalid chunk is detected
-inline simdutf_warn_unused result rewind_and_validate_with_errors(const char *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT result rewind_and_validate_with_errors(const char *buf, size_t len) noexcept {
   size_t extra_len{0};
   // A leading byte cannot be further than 4 bytes away
   for(int i = 0; i < 5; i++) {
@@ -196,6 +196,6 @@ inline size_t utf16_length_from_utf8(const char* buf, size_t len) {
 } // utf8 namespace
 } // unnamed namespace
 } // namespace scalar
-} // namespace simdutf
+} // namespace turbo
 
 #endif

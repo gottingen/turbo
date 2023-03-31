@@ -39,7 +39,7 @@ utf8_to_utf16_result fast_avx512_convert_utf8_to_utf16(const char *in, size_t le
 }
 
 template <endianness big_endian>
-simdutf::result fast_avx512_convert_utf8_to_utf16_with_errors(const char *in, size_t len, char16_t *out) {
+turbo::result fast_avx512_convert_utf8_to_utf16_with_errors(const char *in, size_t len, char16_t *out) {
   const char *const init_in = in;
   const char16_t *const init_out = out;
   const char *const final_in = in + len;
@@ -54,11 +54,11 @@ simdutf::result fast_avx512_convert_utf8_to_utf16_with_errors(const char *in, si
   if(!result) {
     // rewind_and_convert_with_errors will seek a potential error from in onward,
     // with the ability to go back up to in - init_in bytes, and read final_in - in bytes forward.
-    simdutf::result res = scalar::utf8_to_utf16::rewind_and_convert_with_errors<big_endian>(in - init_in, in, final_in - in, out);
+    turbo::result res = scalar::utf8_to_utf16::rewind_and_convert_with_errors<big_endian>(in - init_in, in, final_in - in, out);
     res.count += (in - init_in);
     return res;
   } else {
-    return simdutf::result(error_code::SUCCESS,out - init_out);
+    return turbo::result(error_code::SUCCESS,out - init_out);
   }
 }
 

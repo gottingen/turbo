@@ -68,7 +68,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <cpuid.h>
 #endif
 
-namespace simdutf {
+namespace turbo {
 namespace internal {
 
 enum instruction_set {
@@ -228,6 +228,6 @@ static inline uint32_t detect_supported_architectures() {
 #endif // end SIMD extension detection code
 
 } // namespace internal
-} // namespace simdutf
+} // namespace turbo
 
 #endif // SIMDutf_INTERNAL_ISADETECTION_H

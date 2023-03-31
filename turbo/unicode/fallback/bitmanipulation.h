@@ -18,8 +18,8 @@
 #include "turbo/unicode/utf.h"
 #include <limits>
 
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 
 #if defined(_MSC_VER) && !defined(_M_ARM64) && !defined(_M_X64)
@@ -40,7 +40,7 @@ static unsigned char _BitScanReverse64(unsigned long* ret, uint64_t x) {
 #endif
 
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo
 
 #endif // SIMDUTF_FALLBACK_BITMANIPULATION_H

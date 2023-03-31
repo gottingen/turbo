@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 
 // Walks through a buffer in block-sized increments, loading the last part with spaces
 template<size_t STEP_SIZE>
 struct buf_block_reader {
 public:
-  simdutf_really_inline buf_block_reader(const uint8_t *_buf, size_t _len);
-  simdutf_really_inline size_t block_index();
-  simdutf_really_inline bool has_full_block() const;
-  simdutf_really_inline const uint8_t *full_block() const;
+  TURBO_FORCE_INLINE buf_block_reader(const uint8_t *_buf, size_t _len);
+  TURBO_FORCE_INLINE size_t block_index();
+  TURBO_FORCE_INLINE bool has_full_block() const;
+  TURBO_FORCE_INLINE const uint8_t *full_block() const;
   /**
    * Get the last block, padded with spaces.
    *
@@ -33,8 +33,8 @@ public:
    *
    * @return the number of effective characters in the last block.
    */
-  simdutf_really_inline size_t get_remainder(uint8_t *dst) const;
-  simdutf_really_inline void advance();
+  TURBO_FORCE_INLINE size_t get_remainder(uint8_t *dst) const;
+  TURBO_FORCE_INLINE void advance();
 private:
   const uint8_t *buf;
   const size_t len;
@@ -43,7 +43,7 @@ private:
 };
 
 // Routines to print masks and text for debugging bitmask operations
-simdutf_unused static char * format_input_text_64(const uint8_t *text) {
+TURBO_MAYBE_UNUSED static char * format_input_text_64(const uint8_t *text) {
   static char *buf = reinterpret_cast<char*>(malloc(sizeof(simd8x64<uint8_t>) + 1));
   for (size_t i=0; i<sizeof(simd8x64<uint8_t>); i++) {
     buf[i] = int8_t(text[i]) < ' ' ? '_' : int8_t(text[i]);
@@ -53,7 +53,7 @@ simdutf_unused static char * format_input_text_64(const uint8_t *text) {
 }
 
 // Routines to print masks and text for debugging bitmask operations
-simdutf_unused static char * format_input_text(const simd8x64<uint8_t>& in) {
+TURBO_MAYBE_UNUSED static char * format_input_text(const simd8x64<uint8_t>& in) {
   static char *buf = reinterpret_cast<char*>(malloc(sizeof(simd8x64<uint8_t>) + 1));
   in.store(reinterpret_cast<uint8_t*>(buf));
   for (size_t i=0; i<sizeof(simd8x64<uint8_t>); i++) {
@@ -63,7 +63,7 @@ simdutf_unused static char * format_input_text(const simd8x64<uint8_t>& in) {
   return buf;
 }
 
-simdutf_unused static char * format_mask(uint64_t mask) {
+TURBO_MAYBE_UNUSED static char * format_mask(uint64_t mask) {
   static char *buf = reinterpret_cast<char*>(malloc(64 + 1));
   for (size_t i=0; i<64; i++) {
     buf[i] = (mask & (size_t(1) << i)) ? 'X' : ' ';
@@ -73,23 +73,23 @@ simdutf_unused static char * format_mask(uint64_t mask) {
 }
 
 template<size_t STEP_SIZE>
-simdutf_really_inline buf_block_reader<STEP_SIZE>::buf_block_reader(const uint8_t *_buf, size_t _len) : buf{_buf}, len{_len}, lenminusstep{len < STEP_SIZE ? 0 : len - STEP_SIZE}, idx{0} {}
+TURBO_FORCE_INLINE buf_block_reader<STEP_SIZE>::buf_block_reader(const uint8_t *_buf, size_t _len) : buf{_buf}, len{_len}, lenminusstep{len < STEP_SIZE ? 0 : len - STEP_SIZE}, idx{0} {}
 
 template<size_t STEP_SIZE>
-simdutf_really_inline size_t buf_block_reader<STEP_SIZE>::block_index() { return idx; }
+TURBO_FORCE_INLINE size_t buf_block_reader<STEP_SIZE>::block_index() { return idx; }
 
 template<size_t STEP_SIZE>
-simdutf_really_inline bool buf_block_reader<STEP_SIZE>::has_full_block() const {
+TURBO_FORCE_INLINE bool buf_block_reader<STEP_SIZE>::has_full_block() const {
   return idx < lenminusstep;
 }
 
 template<size_t STEP_SIZE>
-simdutf_really_inline const uint8_t *buf_block_reader<STEP_SIZE>::full_block() const {
+TURBO_FORCE_INLINE const uint8_t *buf_block_reader<STEP_SIZE>::full_block() const {
   return &buf[idx];
 }
 
 template<size_t STEP_SIZE>
-simdutf_really_inline size_t buf_block_reader<STEP_SIZE>::get_remainder(uint8_t *dst) const {
+TURBO_FORCE_INLINE size_t buf_block_reader<STEP_SIZE>::get_remainder(uint8_t *dst) const {
   if(len == idx) { return 0; } // memcpy(dst, null, 0) will trigger an error with some sanitizers
   std::memset(dst, 0x20, STEP_SIZE); // std::memset STEP_SIZE because it's more efficient to write out 8 or 16 bytes at once.
   std::memcpy(dst, buf + idx, len - idx);
@@ -97,10 +97,10 @@ simdutf_really_inline size_t buf_block_reader<STEP_SIZE>::get_remainder(uint8_t 
 }
 
 template<size_t STEP_SIZE>
-simdutf_really_inline void buf_block_reader<STEP_SIZE>::advance() {
+TURBO_FORCE_INLINE void buf_block_reader<STEP_SIZE>::advance() {
   idx += STEP_SIZE;
 }
 
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo

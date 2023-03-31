@@ -29,7 +29,7 @@
 namespace {
 std::array<size_t, 7> input_size{7, 16, 12, 64, 67, 128, 256};
 
-using simdutf::tests::helpers::transcode_utf8_to_utf16_test_base;
+using turbo::tests::helpers::transcode_utf8_to_utf16_test_base;
 } // namespace
 
 TEST(count_just_one_word) {
@@ -40,7 +40,7 @@ TEST(count_just_one_word) {
     }
     uint32_t seed{1234};
 
-    simdutf::tests::helpers::random_utf16 random(seed, 1, 0);
+    turbo::tests::helpers::random_utf16 random(seed, 1, 0);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
@@ -59,7 +59,7 @@ TEST(count_1_or_2_UTF16_words) {
     }
     uint32_t seed{1234};
 
-    simdutf::tests::helpers::random_utf16 random(seed, 1, 1);
+    turbo::tests::helpers::random_utf16 random(seed, 1, 1);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
@@ -75,7 +75,7 @@ TEST(count_2_UTF16_words) {
   for (size_t trial = 0; trial < 10000; trial++) {
     uint32_t seed{1234};
 
-    simdutf::tests::helpers::random_utf16 random(seed, 0, 1);
+    turbo::tests::helpers::random_utf16 random(seed, 0, 1);
 
     for (size_t size : input_size) {
 
@@ -90,5 +90,5 @@ TEST(count_2_UTF16_words) {
 
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

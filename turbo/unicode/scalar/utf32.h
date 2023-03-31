@@ -15,12 +15,12 @@
 #ifndef SIMDUTF_UTF32_H
 #define SIMDUTF_UTF32_H
 
-namespace simdutf {
+namespace turbo {
 namespace scalar {
 namespace {
 namespace utf32 {
 
-inline simdutf_warn_unused bool validate(const char32_t *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT bool validate(const char32_t *buf, size_t len) noexcept {
   const uint32_t *data = reinterpret_cast<const uint32_t *>(buf);
   uint64_t pos = 0;
   for(;pos < len; pos++) {
@@ -32,7 +32,7 @@ inline simdutf_warn_unused bool validate(const char32_t *buf, size_t len) noexce
   return true;
 }
 
-inline simdutf_warn_unused result validate_with_errors(const char32_t *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT result validate_with_errors(const char32_t *buf, size_t len) noexcept {
   const uint32_t *data = reinterpret_cast<const uint32_t *>(buf);
   size_t pos = 0;
   for(;pos < len; pos++) {
@@ -80,6 +80,6 @@ inline size_t utf16_length_from_utf32(const char32_t* buf, size_t len) {
 } // utf32 namespace
 } // unnamed namespace
 } // namespace scalar
-} // namespace simdutf
+} // namespace turbo
 
 #endif

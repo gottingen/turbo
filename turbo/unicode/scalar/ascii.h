@@ -15,13 +15,13 @@
 #ifndef SIMDUTF_ASCII_H
 #define SIMDUTF_ASCII_H
 
-namespace simdutf {
+namespace turbo {
 namespace scalar {
 namespace {
 namespace ascii {
-#if SIMDUTF_IMPLEMENTATION_FALLBACK
+#if TURBO_UNICODE_IMPLEMENTATION_FALLBACK
 // Only used by the fallback kernel.
-inline simdutf_warn_unused bool validate(const char *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT bool validate(const char *buf, size_t len) noexcept {
     const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
     uint64_t pos = 0;
     // process in blocks of 16 bytes when possible
@@ -41,7 +41,7 @@ inline simdutf_warn_unused bool validate(const char *buf, size_t len) noexcept {
 }
 #endif
 
-inline simdutf_warn_unused result validate_with_errors(const char *buf, size_t len) noexcept {
+inline TURBO_MUST_USE_RESULT result validate_with_errors(const char *buf, size_t len) noexcept {
     const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
     size_t pos = 0;
     // process in blocks of 16 bytes when possible
@@ -67,6 +67,6 @@ inline simdutf_warn_unused result validate_with_errors(const char *buf, size_t l
 } // ascii namespace
 } // unnamed namespace
 } // namespace scalar
-} // namespace simdutf
+} // namespace turbo
 
 #endif

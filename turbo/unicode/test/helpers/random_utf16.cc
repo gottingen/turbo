@@ -18,7 +18,7 @@
 
 #include <stdexcept>
 
-namespace simdutf {
+namespace turbo {
 namespace tests {
 namespace helpers {
 
@@ -36,7 +36,7 @@ namespace helpers {
     while (result.size() < size) {
       count++;
       const uint32_t value = generate();
-      switch (simdutf::tests::reference::utf16::encode(value, W1, W2)) {
+      switch (turbo::tests::reference::utf16::encode(value, W1, W2)) {
         case 0:
           throw std::runtime_error("Random UTF-16 generator is broken");
         case 1:
@@ -78,4 +78,4 @@ namespace helpers {
 
 } // namespace helpers
 } // namespace tests
-} // namespace simdutf
+} // namespace turbo

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define SIMDUTF_IMPLEMENTATION haswell
+#define TURBO_UNICODE_IMPLEMENTATION haswell
 
 #if SIMDUTF_CAN_ALWAYS_RUN_HASWELL
 // nothing needed.

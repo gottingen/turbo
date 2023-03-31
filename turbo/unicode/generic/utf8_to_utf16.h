@@ -15,14 +15,14 @@
 #include "turbo/unicode/scalar/utf8_to_utf16.h"
 
 
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace utf8_to_utf16 {
 using namespace simd;
 
 
-  simdutf_really_inline simd8<uint8_t> check_special_cases(const simd8<uint8_t> input, const simd8<uint8_t> prev1) {
+  TURBO_FORCE_INLINE simd8<uint8_t> check_special_cases(const simd8<uint8_t> input, const simd8<uint8_t> prev1) {
 // Bit 0 = Too Short (lead byte/ASCII followed by lead byte/ASCII)
 // Bit 1 = Too Long (ASCII followed by continuation)
 // Bit 2 = Overlong 3-byte
@@ -112,7 +112,7 @@ using namespace simd;
     );
     return (byte_1_high & byte_1_low & byte_2_high);
   }
-  simdutf_really_inline simd8<uint8_t> check_multibyte_lengths(const simd8<uint8_t> input,
+  TURBO_FORCE_INLINE simd8<uint8_t> check_multibyte_lengths(const simd8<uint8_t> input,
       const simd8<uint8_t> prev_input, const simd8<uint8_t> sc) {
     simd8<uint8_t> prev2 = input.prev<2>(prev_input);
     simd8<uint8_t> prev3 = input.prev<3>(prev_input);
@@ -130,7 +130,7 @@ using namespace simd;
     //
     // Check whether the current bytes are valid UTF-8.
     //
-    simdutf_really_inline void check_utf8_bytes(const simd8<uint8_t> input, const simd8<uint8_t> prev_input) {
+    TURBO_FORCE_INLINE void check_utf8_bytes(const simd8<uint8_t> input, const simd8<uint8_t> prev_input) {
       // Flip prev1...prev3 so we can easily determine if they are 2+, 3+ or 4+ lead bytes
       // (2, 3, 4-byte leads become large positive numbers instead of small negative numbers)
       simd8<uint8_t> prev1 = input.prev<1>(prev_input);
@@ -140,7 +140,7 @@ using namespace simd;
 
 
     template <endianness endian>
-    simdutf_really_inline size_t convert(const char* in, size_t size, char16_t* utf16_output) {
+    TURBO_FORCE_INLINE size_t convert(const char* in, size_t size, char16_t* utf16_output) {
       size_t pos = 0;
       char16_t* start{utf16_output};
       const size_t safety_margin = 16; // to avoid overruns!
@@ -203,7 +203,7 @@ using namespace simd;
     }
 
     template <endianness endian>
-    simdutf_really_inline result convert_with_errors(const char* in, size_t size, char16_t* utf16_output) {
+    TURBO_FORCE_INLINE result convert_with_errors(const char* in, size_t size, char16_t* utf16_output) {
       size_t pos = 0;
       char16_t* start{utf16_output};
       const size_t safety_margin = 16; // to avoid overruns!
@@ -284,12 +284,12 @@ using namespace simd;
       return result(error_code::SUCCESS, utf16_output - start);
     }
 
-    simdutf_really_inline bool errors() const {
+    TURBO_FORCE_INLINE bool errors() const {
       return this->error.any_bits_set_anywhere();
     }
 
   }; // struct utf8_checker
 } // utf8_to_utf16 namespace
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo

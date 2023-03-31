@@ -26,33 +26,33 @@
 
 // Default Haswell to on if this is x86-64. Even if we're not compiled for it, it could be selected
 // at runtime.
-#ifndef SIMDUTF_IMPLEMENTATION_HASWELL
+#ifndef TURBO_UNICODE_IMPLEMENTATION_HASWELL
 //
 // You do not want to restrict it like so: SIMDUTF_IS_X86_64 && __AVX2__
 // because we want to rely on *runtime dispatch*.
 //
 #if SIMDUTF_CAN_ALWAYS_RUN_ICELAKE
-#define SIMDUTF_IMPLEMENTATION_HASWELL 0
+#define TURBO_UNICODE_IMPLEMENTATION_HASWELL 0
 #else
-#define SIMDUTF_IMPLEMENTATION_HASWELL (SIMDUTF_IS_X86_64)
+#define TURBO_UNICODE_IMPLEMENTATION_HASWELL (SIMDUTF_IS_X86_64)
 #endif
 
 #endif
 // To see why  (__BMI__) && (__PCLMUL__) && (__LZCNT__) are not part of this next line, see
 // https://github.com/simdutf/simdutf/issues/1247
-#define SIMDUTF_CAN_ALWAYS_RUN_HASWELL ((SIMDUTF_IMPLEMENTATION_HASWELL) && (SIMDUTF_IS_X86_64) && (__AVX2__))
+#define SIMDUTF_CAN_ALWAYS_RUN_HASWELL ((TURBO_UNICODE_IMPLEMENTATION_HASWELL) && (SIMDUTF_IS_X86_64) && (__AVX2__))
 
-#if SIMDUTF_IMPLEMENTATION_HASWELL
+#if TURBO_UNICODE_IMPLEMENTATION_HASWELL
 
 #define SIMDUTF_TARGET_HASWELL SIMDUTF_TARGET_REGION("avx2,bmi,pclmul,lzcnt")
 
-namespace simdutf {
+namespace turbo {
 /**
  * Implementation for Haswell (Intel AVX2).
  */
 namespace haswell {
 } // namespace haswell
-} // namespace simdutf
+} // namespace turbo
 
 //
 // These two need to be included outside SIMDUTF_TARGET_REGION
@@ -70,5 +70,5 @@ namespace haswell {
 
 #include "turbo/unicode/haswell/end.h"
 
-#endif // SIMDUTF_IMPLEMENTATION_HASWELL
+#endif // TURBO_UNICODE_IMPLEMENTATION_HASWELL
 #endif // SIMDUTF_HASWELL_COMMON_H

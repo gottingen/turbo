@@ -14,7 +14,7 @@
 
 #ifndef ERROR_H
 #define ERROR_H
-namespace simdutf {
+namespace turbo {
 
 enum error_code {
   SUCCESS = 0,
@@ -34,9 +34,9 @@ struct result {
   error_code error;
   size_t count;     // In case of error, indicates the position of the error. In case of success, indicates the number of words validated/written.
 
-  simdutf_really_inline result();
+  TURBO_FORCE_INLINE result();
 
-  simdutf_really_inline result(error_code, size_t);
+  TURBO_FORCE_INLINE result(error_code, size_t);
 };
 
 }

@@ -26,7 +26,7 @@ const char32_t* avx2_validate_utf32le(const char32_t* input, size_t size) {
     __m256i currentoffsetmax = _mm256_setzero_si256();
 
     while (input + 8 < end) {
-        const __m256i in = _mm256_loadu_si256((__m256i *)input);
+        const __m256i in = _mm256_loadu_si256((__m256i *)const_cast<char32_t*>(input));
         currentmax = _mm256_max_epu32(in,currentmax);
         currentoffsetmax = _mm256_max_epu32(_mm256_add_epi32(in, offset), currentoffsetmax);
         input += 8;
@@ -56,7 +56,7 @@ const result avx2_validate_utf32le_with_errors(const char32_t* input, size_t siz
     __m256i currentoffsetmax = _mm256_setzero_si256();
 
     while (input + 8 < end) {
-        const __m256i in = _mm256_loadu_si256((__m256i *)input);
+        const __m256i in = _mm256_loadu_si256((__m256i *)const_cast<char32_t*>(input));
         currentmax = _mm256_max_epu32(in,currentmax);
         currentoffsetmax = _mm256_max_epu32(_mm256_add_epi32(in, offset), currentoffsetmax);
 

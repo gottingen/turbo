@@ -24,7 +24,7 @@
 // strcasecmp, strncasecmp
 #include <strings.h>
 #endif
-
+#include "turbo/platform/port.h"
 /**
  * We want to check that it is actually a little endian system at
  * compile-time.

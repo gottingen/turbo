@@ -53,23 +53,23 @@ const size_t number_of_code_points = utf32_size;
 
 
 TEST(validate_utf8) {
-    simdutf::result res = implementation.validate_utf8_with_errors(utf8, utf8_size);
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    turbo::result res = implementation.validate_utf8_with_errors(utf8, utf8_size);
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
 TEST(validate_utf16le) {
-    simdutf::result res = implementation.validate_utf16le_with_errors(utf16le, utf16_size);
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    turbo::result res = implementation.validate_utf16le_with_errors(utf16le, utf16_size);
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
 TEST(validate_utf16be) {
-    simdutf::result res = implementation.validate_utf16be_with_errors(utf16be, utf16_size);
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    turbo::result res = implementation.validate_utf16be_with_errors(utf16be, utf16_size);
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
 TEST(validate_utf32) {
-    simdutf::result res = implementation.validate_utf32_with_errors(utf32, utf32_size);
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    turbo::result res = implementation.validate_utf32_with_errors(utf32, utf32_size);
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
 TEST(count_utf8) {
@@ -182,5 +182,5 @@ TEST(convert_utf16be_to_utf32) {
 }
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

@@ -60,10 +60,7 @@ void __asan_on_error() {
   const size_t buf_size = 4*MAX_SIZE + 3;
   char buffer[buf_size];
   for (int i = 0; i < input.size(); i++) {
-SIMDUTF_PUSH_DISABLE_WARNINGS
-SIMDUTF_DISABLE_DEPRECATED_WARNING
      sprintf(buffer + 4*i + 1, "\\x%02x", input[i]);
-SIMDUTF_POP_DISABLE_WARNINGS
   }
   buffer[0] = '"';
   buffer[buf_size - 2] = '"';
@@ -153,12 +150,12 @@ struct state_tracker {
     switch(current_state)
     {
       case ONE_VALID: {
-        simdutf::tests::reference::utf8::encode(generate(0x0, 0x7f), consume);
+        turbo::tests::reference::utf8::encode(generate(0x0, 0x7f), consume);
         count = 1;
         break;
       }
       case ONE_TOO_LONG: {
-        simdutf::tests::reference::utf8::encode(generate(0x0, 0x7f), consume);
+        turbo::tests::reference::utf8::encode(generate(0x0, 0x7f), consume);
         output.push_back(generate(0x80, 0xbf)); // Add random continuation byte
         count = 2;
         break;
@@ -169,7 +166,7 @@ struct state_tracker {
         break;
       }
       case TWO_VALID: {
-        simdutf::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
+        turbo::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
         count = 2;
         break;
       }
@@ -186,7 +183,7 @@ struct state_tracker {
         break;
       }
       case TWO_TOO_LONG: {
-        simdutf::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
+        turbo::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
         output.push_back(generate(0x80, 0xbf)); // Add random continuation byte
         count = 3;
         break;
@@ -203,7 +200,7 @@ struct state_tracker {
         while (codepoint >= 0xd800 && codepoint <= 0xdfff) {
           codepoint = generate(0x800, 0xffff);
         }
-        simdutf::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
+        turbo::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
         count = 3;
         break;
       }
@@ -233,7 +230,7 @@ struct state_tracker {
         while (codepoint >= 0xd800 && codepoint <= 0xdfff) {
           codepoint = generate(0x800, 0xffff);
         }
-        simdutf::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
+        turbo::tests::reference::utf8::encode(generate(0x80, 0x7ff), consume);
         output.push_back(generate(0x80, 0xbf)); // Add random continuation byte
         count = 4;
         break;
@@ -246,12 +243,12 @@ struct state_tracker {
         break;
       }
       case THREE_SURROGATE: {
-        simdutf::tests::reference::utf8::encode(generate(0xd800, 0xdfff), consume);
+        turbo::tests::reference::utf8::encode(generate(0xd800, 0xdfff), consume);
         count = 3;
         break;
       }
       case FOUR_VALID: {
-        simdutf::tests::reference::utf8::encode(generate(0x10000, 0x10ffff), consume);
+        turbo::tests::reference::utf8::encode(generate(0x10000, 0x10ffff), consume);
         count = 4;
         break;
       }
@@ -273,7 +270,7 @@ struct state_tracker {
         break;
       }
       case FOUR_TOO_LONG: {
-        simdutf::tests::reference::utf8::encode(generate(0x10000, 0x10ffff), consume);
+        turbo::tests::reference::utf8::encode(generate(0x10000, 0x10ffff), consume);
         output.push_back(generate(0x80, 0xbf)); // Add random continuation byte
         count = 5;
         break;
@@ -287,7 +284,7 @@ struct state_tracker {
         break;
       }
       case FOUR_TOO_LARGE: {
-        simdutf::tests::reference::utf8::encode(generate(0x110000, 0x1fffff), consume);
+        turbo::tests::reference::utf8::encode(generate(0x110000, 0x1fffff), consume);
         count = 4;
         break;
       }
@@ -336,7 +333,7 @@ TEST(garbage_utf8_fuzz_with_errors) {
               utf16_buffer.get());
     // r.count: In case of error, indicates the position of the error in the input.
     // In case of success, indicates the number of words validated/written.
-    if(r.error == simdutf::SUCCESS) {
+    if(r.error == turbo::SUCCESS) {
       ASSERT_TRUE((r.count == expected_utf16_length));
     } else {
       ASSERT_TRUE(r.count <  length);
@@ -344,7 +341,7 @@ TEST(garbage_utf8_fuzz_with_errors) {
     r = implementation.convert_utf8_to_utf16be_with_errors(
               utf8_buffer.get(), length,
               utf16_buffer.get());
-    if(r.error == simdutf::SUCCESS) {
+    if(r.error == turbo::SUCCESS) {
       ASSERT_TRUE((r.count == expected_utf16_length));
     } else {
       ASSERT_TRUE(r.count <  length);
@@ -354,7 +351,7 @@ TEST(garbage_utf8_fuzz_with_errors) {
     r = implementation.convert_utf8_to_utf32_with_errors(
               utf8_buffer.get(), length,
               utf32_buffer.get());
-    if(r.error == simdutf::SUCCESS) {
+    if(r.error == turbo::SUCCESS) {
       ASSERT_TRUE((r.count == expected_utf32_length));
     } else {
       ASSERT_TRUE(r.count <  length);
@@ -532,7 +529,7 @@ TEST(overflow_with_errors_fuzz) {
               input.data(), input.size(),
               reinterpret_cast<char16_t *>(output.data()));
           utf8_to_utf16.second = r.count;
-          utf8_to_utf16.first = (r.error == simdutf::SUCCESS);
+          utf8_to_utf16.first = (r.error == turbo::SUCCESS);
           ASSERT_TRUE(expected_length > 0 && (expected_length * sizeof(char16_t) == output.size()) && expected_length == utf8_to_utf16.second);
 
           expected_length = implementation.utf32_length_from_utf8(input.data(), input.size());
@@ -542,7 +539,7 @@ TEST(overflow_with_errors_fuzz) {
               input.data(), input.size(),
               reinterpret_cast<char32_t *>(output.data()));
           utf8_to_utf32.second = r.count;
-          utf8_to_utf32.first = (r.error == simdutf::SUCCESS);
+          utf8_to_utf32.first = (r.error == turbo::SUCCESS);
           ASSERT_TRUE(expected_length > 0 && (expected_length * sizeof(char32_t) == output.size()) && expected_length == utf8_to_utf32.second);
         }
         if (is_ok_utf16.second) {
@@ -553,7 +550,7 @@ TEST(overflow_with_errors_fuzz) {
               reinterpret_cast<char16_t *>(input.data()),
               input.size() / sizeof(char16_t), output.data());
           utf16_to_utf8.second = r.count;
-          utf16_to_utf8.first = (r.error == simdutf::SUCCESS);
+          utf16_to_utf8.first = (r.error == turbo::SUCCESS);
           ASSERT_TRUE(expected_length > 0 && expected_length == output.size() && expected_length == utf16_to_utf8.second);
 
           expected_length = implementation.utf32_length_from_utf16le(reinterpret_cast<char16_t *>(input.data()), input.size() / sizeof(char16_t));
@@ -574,7 +571,7 @@ TEST(overflow_with_errors_fuzz) {
           auto r = implementation.convert_utf32_to_utf8_with_errors(
               reinterpret_cast<char32_t *>(input.data()),
               input.size() / sizeof(char32_t), output.data());
-          utf32_to_utf8.first = (r.error == simdutf::SUCCESS);
+          utf32_to_utf8.first = (r.error == turbo::SUCCESS);
           utf32_to_utf8.second = r.count;
           ASSERT_TRUE(expected_length > 0 && expected_length == output.size() && expected_length == utf32_to_utf8.second);
 
@@ -584,7 +581,7 @@ TEST(overflow_with_errors_fuzz) {
           r = implementation.convert_utf32_to_utf16le_with_errors(
               reinterpret_cast<char32_t *>(input.data()),
               input.size() / sizeof(char32_t), reinterpret_cast<char16_t *>(output.data()));
-          utf32_to_utf16.first = (r.error == simdutf::SUCCESS);
+          utf32_to_utf16.first = (r.error == turbo::SUCCESS);
           utf32_to_utf16.second = r.count;
           ASSERT_TRUE(expected_length > 0 && (expected_length * sizeof(char16_t) == output.size()) && expected_length == utf32_to_utf16.second);
         }
@@ -685,5 +682,5 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < 20; i++) {
     input_size.push_back(std::uniform_int_distribution<uint32_t>{50, 800}(gen));  // Range must be less than max_size
   }
-  return simdutf::test::main((argc==2) ? 1 : argc, argv);
+  return turbo::test::main((argc==2) ? 1 : argc, argv);
 }

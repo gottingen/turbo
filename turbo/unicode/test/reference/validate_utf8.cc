@@ -14,12 +14,12 @@
 
 #include "validate_utf8.h"
 
-namespace simdutf {
+namespace turbo {
 namespace tests {
 namespace reference {
 
 // credit: based on code from Google Fuchsia (Apache Licensed)
-simdutf_warn_unused bool validate_utf8(const char *buf, size_t len) noexcept {
+TURBO_MUST_USE_RESULT bool validate_utf8(const char *buf, size_t len) noexcept {
   const uint8_t *data = (const uint8_t *)buf;
   uint64_t pos = 0;
   uint64_t next_pos = 0;
@@ -75,5 +75,5 @@ simdutf_warn_unused bool validate_utf8(const char *buf, size_t len) noexcept {
 
 } // namespace reference
 } // namespace tests
-} // namespace simdutf
+} // namespace turbo
 

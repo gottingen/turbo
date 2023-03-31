@@ -16,7 +16,7 @@
 #define SIMDUTF_UTF8_TO_UTF16_TABLES_H
 #include <cstdint>
 
-namespace simdutf {
+namespace turbo {
 namespace {
 namespace tables {
 namespace utf8_to_utf16 {
@@ -4345,6 +4345,6 @@ const uint8_t utf8bigindex[4096][2] =
 } // utf8_to_utf16 namespace
 } // tables namespace
 } // unnamed namespace
-} // namespace simdutf
+} // namespace turbo
 
 #endif // SIMDUTF_UTF8_TO_UTF16_TABLES_H

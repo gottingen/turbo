@@ -20,7 +20,7 @@
 /** The version of simdutf being used (major.minor.revision) */
 #define SIMDUTF_VERSION "3.2.2"
 
-namespace simdutf {
+namespace turbo {
 enum {
   /**
    * The major version (MAJOR.minor.revision) of simdutf being used.
@@ -35,6 +35,6 @@ enum {
    */
   SIMDUTF_VERSION_REVISION = 2
 };
-} // namespace simdutf
+} // namespace turbo
 
 #endif // SIMDUTF_SIMDUTF_VERSION_H

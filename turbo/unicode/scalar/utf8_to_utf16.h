@@ -15,7 +15,7 @@
 #ifndef SIMDUTF_UTF8_TO_UTF16_H
 #define SIMDUTF_UTF8_TO_UTF16_H
 
-namespace simdutf {
+namespace turbo {
 namespace scalar {
 namespace {
 namespace utf8_to_utf16 {
@@ -253,6 +253,6 @@ inline result rewind_and_convert_with_errors(size_t prior_bytes, const char* buf
 } // utf8_to_utf16 namespace
 } // unnamed namespace
 } // namespace scalar
-} // namespace simdutf
+} // namespace turbo
 
 #endif

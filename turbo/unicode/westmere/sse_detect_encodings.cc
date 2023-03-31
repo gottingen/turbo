@@ -201,19 +201,19 @@ int sse_detect_encodings(const char * buf, size_t len) {
             check.check_next_input(in);
         }
         if (!check.errors()) {
-            out |= simdutf::encoding_type::UTF8;
+            out |= turbo::encoding_type::UTF8;
         }
     }
 
     if (is_utf16 && scalar::utf16::validate<endianness::LITTLE>(reinterpret_cast<const char16_t*>(buf), (len - (buf - start))/2)) {
-        out |= simdutf::encoding_type::UTF16_LE;
+        out |= turbo::encoding_type::UTF16_LE;
     }
 
     if (is_utf32 && (len % 4 == 0)) {
         const __m128i standardmax = _mm_set1_epi32(0x10ffff);
         __m128i is_zero = _mm_xor_si128(_mm_max_epu32(currentmax, standardmax), standardmax);
         if (_mm_testz_si128(is_zero, is_zero) == 1 && scalar::utf32::validate(reinterpret_cast<const char32_t*>(buf), (len - (buf - start))/4)) {
-            out |= simdutf::encoding_type::UTF32_LE;
+            out |= turbo::encoding_type::UTF32_LE;
         }
     }
 

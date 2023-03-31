@@ -14,15 +14,15 @@
 
 #include "turbo/unicode/scalar/valid_utf8_to_utf32.h"
 
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace utf8_to_utf32 {
 
 using namespace simd;
 
 
-simdutf_warn_unused size_t convert_valid(const char* input, size_t size,
+TURBO_MUST_USE_RESULT size_t convert_valid(const char* input, size_t size,
     char32_t* utf32_output) noexcept {
   size_t pos = 0;
   char32_t* start{utf32_output};
@@ -54,5 +54,5 @@ simdutf_warn_unused size_t convert_valid(const char* input, size_t size,
 
 } // namespace utf8_to_utf32
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo

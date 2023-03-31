@@ -16,7 +16,7 @@
 
 #include <cstdint>
 
-namespace simdutf { namespace tests { namespace reference { namespace utf8 {
+namespace turbo { namespace tests { namespace reference { namespace utf8 {
 
   template <typename CONSUMER>
   int encode(uint32_t value, CONSUMER consumer) {

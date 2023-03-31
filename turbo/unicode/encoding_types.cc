@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace simdutf {
+namespace turbo {
 bool match_system(endianness e) {
 #if SIMDUTF_IS_BIG_ENDIAN
     return e == endianness::BIG;

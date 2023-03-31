@@ -21,23 +21,23 @@
 
 #include "turbo/unicode/simdutf/portability.h"
 
-#ifndef SIMDUTF_IMPLEMENTATION_PPC64
-#define SIMDUTF_IMPLEMENTATION_PPC64 (SIMDUTF_IS_PPC64)
+#ifndef TURBO_UNICODE_IMPLEMENTATION_PPC64
+#define TURBO_UNICODE_IMPLEMENTATION_PPC64 (SIMDUTF_IS_PPC64)
 #endif
-#define SIMDUTF_CAN_ALWAYS_RUN_PPC64 SIMDUTF_IMPLEMENTATION_PPC64 && SIMDUTF_IS_PPC64
+#define SIMDUTF_CAN_ALWAYS_RUN_PPC64 TURBO_UNICODE_IMPLEMENTATION_PPC64 && SIMDUTF_IS_PPC64
 
 
 #include "turbo/unicode/internal/isadetection.h"
 
-#if SIMDUTF_IMPLEMENTATION_PPC64
+#if TURBO_UNICODE_IMPLEMENTATION_PPC64
 
-namespace simdutf {
+namespace turbo {
 /**
  * Implementation for ALTIVEC (PPC64).
  */
 namespace ppc64 {
 } // namespace ppc64
-} // namespace simdutf
+} // namespace turbo
 
 #include "simdutf/ppc64/implementation.h"
 
@@ -50,6 +50,6 @@ namespace ppc64 {
 
 #include "simdutf/ppc64/end.h"
 
-#endif // SIMDUTF_IMPLEMENTATION_PPC64
+#endif // TURBO_UNICODE_IMPLEMENTATION_PPC64
 
 #endif // SIMDUTF_PPC64_H

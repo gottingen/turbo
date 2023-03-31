@@ -18,11 +18,11 @@
 #error "SIMDUTF_IS_BIG_ENDIAN should be defined."
 #endif
 
-namespace simdutf {
+namespace turbo {
 namespace tests {
 namespace reference {
 
-simdutf_warn_unused bool validate_utf16(const char16_t *buf, size_t len) noexcept {
+TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexcept {
   const char16_t* curr = buf;
   const char16_t* end = buf + len;
 
@@ -65,6 +65,6 @@ simdutf_warn_unused bool validate_utf16(const char16_t *buf, size_t len) noexcep
 
 } // namespace reference
 } // namespace tests
-} // namespace simdutf
+} // namespace turbo
 
 

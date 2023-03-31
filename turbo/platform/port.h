@@ -32,5 +32,6 @@
 #include "turbo/platform/config/config_have.h"
 #include "turbo/platform/config/config.h"
 #include "turbo/platform/config/wchar_config.h"
+#include "turbo/platform/config/config_avx512.h"
 
 #endif  // TURBO_PLATFORM_PORT_H_

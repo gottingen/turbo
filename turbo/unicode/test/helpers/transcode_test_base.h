@@ -19,7 +19,7 @@
 #include <functional>
 #include <cstdio>
 
-namespace simdutf { namespace tests { namespace helpers {
+namespace turbo { namespace tests { namespace helpers {
 
   /**
    * It would be nice to use a single helper for both UTF-8 => UTF-16LE
@@ -358,4 +358,4 @@ namespace simdutf { namespace tests { namespace helpers {
     bool is_input_valid() const;
   };
 
-}}} // namespace simdutf::tests::helpers
+}}} // namespace turbo::tests::helpers

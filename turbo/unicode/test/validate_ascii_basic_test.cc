@@ -92,5 +92,5 @@ TEST(hard_coded) {
 
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

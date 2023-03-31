@@ -11,22 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include "turbo/platform/port.h"
+
+TURBO_DISABLE_CLANG_WARNING(-Wcase-qual)
+TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion)
 
 #include "turbo/unicode/utf.h"
-#include "implementation.cc"
-#include "encoding_types.cc"
-#include "error.cc"
+#include "turbo/unicode/implementation.cc"
+#include "turbo/unicode/encoding_types.cc"
+#include "turbo/unicode/error.cc"
 // The large tables should be included once and they
 // should not depend on a kernel.
-#include "tables/utf8_to_utf16_tables.h"
-#include "tables/utf16_to_utf8_tables.h"
+#include "turbo/unicode/tables/utf8_to_utf16_tables.h"
+#include "turbo/unicode/tables/utf16_to_utf8_tables.h"
 // End of tables.
 
 // The scalar routines should be included once.
-#include "scalar/ascii.h"
-#include "scalar/utf8.h"
-#include "scalar/utf16.h"
-#include "scalar/utf32.h"
+#include "turbo/unicode/scalar/ascii.h"
+#include "turbo/unicode/scalar/utf8.h"
+#include "turbo/unicode/scalar/utf16.h"
+#include "turbo/unicode/scalar/utf32.h"
 
 #include "turbo/unicode/scalar/valid_utf32_to_utf8.h"
 #include "turbo/unicode/scalar/utf32_to_utf8.h"
@@ -48,27 +52,23 @@
 //
 
 
-SIMDUTF_PUSH_DISABLE_WARNINGS
-SIMDUTF_DISABLE_UNDESIRED_WARNINGS
-
-
-#if SIMDUTF_IMPLEMENTATION_ARM64
-#include "arm64/implementation.cc"
+#if TURBO_UNICODE_IMPLEMENTATION_ARM64
+#include "turbo/unicode/arm64/implementation.cc"
 #endif
-#if SIMDUTF_IMPLEMENTATION_FALLBACK
+#if TURBO_UNICODE_IMPLEMENTATION_FALLBACK
 #include "turbo/unicode/fallback/implementation.cc"
 #endif
-#if SIMDUTF_IMPLEMENTATION_ICELAKE
-#include "icelake/implementation.cc"
+#if TURBO_UNICODE_IMPLEMENTATION_ICELAKE
+#include "turbo/unicode/icelake/implementation.cc"
 #endif
-#if SIMDUTF_IMPLEMENTATION_HASWELL
-#include "haswell/implementation.cc"
+#if TURBO_UNICODE_IMPLEMENTATION_HASWELL
+#include "turbo/unicode/haswell/implementation.cc"
 #endif
-#if SIMDUTF_IMPLEMENTATION_PPC64
-#include "ppc64/implementation.cc"
+#if TURBO_UNICODE_IMPLEMENTATION_PPC64
+#include "turbo/unicode/ppc64/implementation.cc"
 #endif
-#if SIMDUTF_IMPLEMENTATION_WESTMERE
-#include "westmere/implementation.cc"
+#if TURBO_UNICODE_IMPLEMENTATION_WESTMERE
+#include "turbo/unicode/westmere/implementation.cc"
 #endif
 
-SIMDUTF_POP_DISABLE_WARNINGS
+TURBO_RESTORE_CLANG_WARNING()

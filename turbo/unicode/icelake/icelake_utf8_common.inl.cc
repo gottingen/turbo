@@ -30,7 +30,7 @@ using utf8_to_utf32_result = std::pair<const char*, uint32_t*>;
     bytes have been processed, upon success.
 */
 template <block_processing_mode tail, endianness big_endian>
-simdutf_really_inline bool process_block_utf8_to_utf16(const char *&in, char16_t *&out, size_t gap) {
+TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&out, size_t gap) {
   // constants
   __m512i mask_identity = _mm512_set_epi8(63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
   __m512i mask_c0c0c0c0 = _mm512_set1_epi32(0xc0c0c0c0);
@@ -348,7 +348,7 @@ simdutf_really_inline bool process_block_utf8_to_utf16(const char *&in, char16_t
     keep the value in a (constant) register.
 */
 template <endianness big_endian>
-simdutf_really_inline size_t utf32_to_utf16_masked(const __m512i byteflip, __m512i utf32, unsigned int count, char16_t* output) {
+TURBO_FORCE_INLINE size_t utf32_to_utf16_masked(const __m512i byteflip, __m512i utf32, unsigned int count, char16_t* output) {
 
     const __mmask16 valid = uint16_t((1 << count) - 1);
     // 1. check if we have any surrogate pairs
@@ -423,7 +423,7 @@ simdutf_really_inline size_t utf32_to_utf16_masked(const __m512i byteflip, __m51
     keep the value in a (constant) register.
 */
 template <endianness big_endian>
-simdutf_really_inline size_t utf32_to_utf16(const __m512i byteflip, __m512i utf32, unsigned int count, char16_t* output) {
+TURBO_FORCE_INLINE size_t utf32_to_utf16(const __m512i byteflip, __m512i utf32, unsigned int count, char16_t* output) {
     // check if we have any surrogate pairs
     const __m512i v_0000_ffff = _mm512_set1_epi32(0x0000ffff);
     const __mmask16 sp_mask = _mm512_cmpgt_epu32_mask(utf32, v_0000_ffff);
@@ -523,7 +523,7 @@ __m512i rotate_by_N_epi8(const __m512i input) {
     0x8080800N, where N is 4 higest bits from the leading byte; 0x80 resets
     corresponding bytes during pshufb.
 */
-simdutf_really_inline __m512i expanded_utf8_to_utf32(__m512i char_class, __m512i utf8) {
+TURBO_FORCE_INLINE __m512i expanded_utf8_to_utf32(__m512i char_class, __m512i utf8) {
     /*
         Input:
         - utf8: bytes stored at separate 32-bit words
@@ -645,7 +645,7 @@ simdutf_really_inline __m512i expanded_utf8_to_utf32(__m512i char_class, __m512i
 }
 
 
-simdutf_really_inline __m512i expand_and_identify(__m512i lane0, __m512i lane1, int &count) {
+TURBO_FORCE_INLINE __m512i expand_and_identify(__m512i lane0, __m512i lane1, int &count) {
     const __m512i merged = _mm512_mask_mov_epi32(lane0, 0x1000, lane1);
     const __m512i expand_ver2 = _mm512_setr_epi64(
                 0x0403020103020100,
@@ -666,7 +666,7 @@ simdutf_really_inline __m512i expand_and_identify(__m512i lane0, __m512i lane1, 
     return  _mm512_mask_compress_epi32(_mm512_setzero_si512(), leading_bytes, input);
 }
 
-simdutf_really_inline __m512i expand_utf8_to_utf32(__m512i input) {
+TURBO_FORCE_INLINE __m512i expand_utf8_to_utf32(__m512i input) {
     __m512i char_class = _mm512_srli_epi32(input, 4);
     /*  char_class = ((input >> 4) & 0x0f) | 0x80808000 */
     const __m512i v_0000_000f = _mm512_set1_epi32(0x0f);

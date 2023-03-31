@@ -32,7 +32,7 @@ size_t convert_masked_utf8_to_utf32(const char *input,
   // This results in more instructions but, potentially, also higher speeds.
   //
   // We first try a few fast paths.
-  const __m128i in = _mm_loadu_si128((__m128i *)input);
+  const __m128i in = _mm_loadu_si128((__m128i *)const_cast<char*>(input));
   const uint16_t input_utf8_end_of_code_point_mask =
       utf8_end_of_code_point_mask & 0xfff;
   if(((utf8_end_of_code_point_mask & 0xffff) == 0xffff)) {

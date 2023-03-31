@@ -22,32 +22,32 @@
 #include "turbo/unicode/simdutf/portability.h"
 
 // Default Westmere to on if this is x86-64, unless we'll always select Haswell.
-#ifndef SIMDUTF_IMPLEMENTATION_WESTMERE
+#ifndef TURBO_UNICODE_IMPLEMENTATION_WESTMERE
 //
 // You do not want to set it to (SIMDUTF_IS_X86_64 && !SIMDUTF_REQUIRES_HASWELL)
 // because you want to rely on runtime dispatch!
 //
 #if SIMDUTF_CAN_ALWAYS_RUN_ICELAKE || SIMDUTF_CAN_ALWAYS_RUN_HASWELL
-#define SIMDUTF_IMPLEMENTATION_WESTMERE 0
+#define TURBO_UNICODE_IMPLEMENTATION_WESTMERE 0
 #else
-#define SIMDUTF_IMPLEMENTATION_WESTMERE (SIMDUTF_IS_X86_64)
+#define TURBO_UNICODE_IMPLEMENTATION_WESTMERE (SIMDUTF_IS_X86_64)
 #endif
 
 #endif
 
-#define SIMDUTF_CAN_ALWAYS_RUN_WESTMERE (SIMDUTF_IMPLEMENTATION_WESTMERE && SIMDUTF_IS_X86_64 && __SSE4_2__ && __PCLMUL__)
+#define SIMDUTF_CAN_ALWAYS_RUN_WESTMERE (TURBO_UNICODE_IMPLEMENTATION_WESTMERE && SIMDUTF_IS_X86_64 && __SSE4_2__ && __PCLMUL__)
 
-#if SIMDUTF_IMPLEMENTATION_WESTMERE
+#if TURBO_UNICODE_IMPLEMENTATION_WESTMERE
 
 #define SIMDUTF_TARGET_WESTMERE SIMDUTF_TARGET_REGION("sse4.2,pclmul")
 
-namespace simdutf {
+namespace turbo {
 /**
  * Implementation for Westmere (Intel SSE4.2).
  */
 namespace westmere {
 } // namespace westmere
-} // namespace simdutf
+} // namespace turbo
 
 //
 // These two need to be included outside SIMDUTF_TARGET_REGION
@@ -66,5 +66,5 @@ namespace westmere {
 
 #include "turbo/unicode/westmere/end.h"
 
-#endif // SIMDUTF_IMPLEMENTATION_WESTMERE
+#endif // TURBO_UNICODE_IMPLEMENTATION_WESTMERE
 #endif // SIMDUTF_WESTMERE_COMMON_H

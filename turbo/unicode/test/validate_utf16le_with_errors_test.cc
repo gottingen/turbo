@@ -30,26 +30,26 @@
 
 TEST(validate_utf16le_with_errors__returns_success_for_valid_input__single_words) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512, seed)};
 
-    simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     ASSERT_EQUAL(res.count, utf16.size());
   }
 }
 
 TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pairs_short) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 0, 1};
+  turbo::tests::helpers::random_utf16 generator{seed, 0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(8)};
 
-    simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     ASSERT_EQUAL(res.count, utf16.size());
   }
 }
@@ -57,13 +57,13 @@ TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pa
 
 TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pairs) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 0, 1};
+  turbo::tests::helpers::random_utf16 generator{seed, 0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512)};
 
-    simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     ASSERT_EQUAL(res.count, utf16.size());
   }
 }
@@ -71,21 +71,21 @@ TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pa
 // mixed = either 16-bit or 32-bit codewords
 TEST(validate_utf16le_with_errors__returns_success_for_valid_input__mixed) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 1};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 1};
   const auto utf16{generator.generate(512)};
 
-  simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+  turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-  ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+  ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
   ASSERT_EQUAL(res.count, utf16.size());
 }
 
 TEST(validate_utf16le_with_errors__returns_success_for_empty_string) {
   const char16_t* buf = (char16_t*)"";
 
-  simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
+  turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
 
-  ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+  ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
   ASSERT_EQUAL(res.count, 0);
 }
 
@@ -106,7 +106,7 @@ TEST(validate_utf16le_with_errors__returns_success_for_empty_string) {
 #else
 TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word_value) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   for(size_t trial = 0; trial < 10; trial++) {
     auto utf16{generator.generate(128)};
     const char16_t*  buf = reinterpret_cast<const char16_t*>(utf16.data());
@@ -117,9 +117,9 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word
         const char16_t old = utf16[i];
         utf16[i] = wrong_value;
 
-        simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+        turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
-        ASSERT_EQUAL(res.error, simdutf::error_code::SURROGATE);
+        ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
         ASSERT_EQUAL(res.count, i);
 
         utf16[i] = old;
@@ -140,7 +140,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word
 #else
 TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_word_value) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   auto utf16{generator.generate(128)};
   const char16_t*  buf = reinterpret_cast<const char16_t*>(utf16.data());
   const size_t len = utf16.size();
@@ -158,9 +158,9 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_wor
       utf16[i + 0] = valid_surrogate_W1;
       utf16[i + 1] = W2;
 
-      simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+      turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
-      ASSERT_EQUAL(res.error, simdutf::error_code::SURROGATE);
+      ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
       ASSERT_EQUAL(res.count, i);
 
       utf16[i + 0] = old_W1;
@@ -182,7 +182,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_wor
 TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
   const char16_t valid_surrogate_W1 = 0xd800;
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf16 generator{seed, 1, 0};
+  turbo::tests::helpers::random_utf16 generator{seed, 1, 0};
   for (size_t size = 1; size < 128; size++) {
     auto utf16{generator.generate(128)};
     const char16_t*  buf = reinterpret_cast<const char16_t*>(utf16.data());
@@ -190,9 +190,9 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
 
     utf16[size - 1] = valid_surrogate_W1;
 
-    simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
-    ASSERT_EQUAL(res.error, simdutf::error_code::SURROGATE);
+    ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
     ASSERT_EQUAL(res.count, size - 1);
   }
 }
@@ -225,13 +225,13 @@ TEST(validate_utf16le_with_errors__extensive_tests) {
       continue;
 
     // format: [TF][VLH]{16}
-    simdutf::error_code valid = simdutf::error_code::SURROGATE;
+    turbo::error_code valid = turbo::error_code::SURROGATE;
     switch (line[0]) {
       case 'T':
-        valid = simdutf::error_code::SUCCESS;
+        valid = turbo::error_code::SUCCESS;
         break;
       case 'F':
-        valid = simdutf::error_code::SURROGATE;
+        valid = turbo::error_code::SURROGATE;
         break;
       default:
         throw std::invalid_argument("Error at line #" + std::to_string(lineno) +
@@ -261,7 +261,7 @@ TEST(validate_utf16le_with_errors__extensive_tests) {
     }
 
     // check
-    simdutf::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
     ASSERT_EQUAL(res.error, valid);
   }
@@ -269,5 +269,5 @@ TEST(validate_utf16le_with_errors__extensive_tests) {
 #endif
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

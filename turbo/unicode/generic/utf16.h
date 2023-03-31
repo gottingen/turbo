@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include "turbo/unicode/scalar/utf16.h"
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace utf16 {
 
 template <endianness big_endian>
-simdutf_really_inline size_t count_code_points(const char16_t* in, size_t size) {
+TURBO_FORCE_INLINE size_t count_code_points(const char16_t* in, size_t size) {
     size_t pos = 0;
     size_t count = 0;
     for(;pos + 32 <= size; pos += 32) {
@@ -32,7 +32,7 @@ simdutf_really_inline size_t count_code_points(const char16_t* in, size_t size) 
 }
 
 template <endianness big_endian>
-simdutf_really_inline size_t utf8_length_from_utf16(const char16_t* in, size_t size) {
+TURBO_FORCE_INLINE size_t utf8_length_from_utf16(const char16_t* in, size_t size) {
     size_t pos = 0;
     size_t count = 0;
     // This algorithm could no doubt be improved!
@@ -53,11 +53,11 @@ simdutf_really_inline size_t utf8_length_from_utf16(const char16_t* in, size_t s
 }
 
 template <endianness big_endian>
-simdutf_really_inline size_t utf32_length_from_utf16(const char16_t* in, size_t size) {
+TURBO_FORCE_INLINE size_t utf32_length_from_utf16(const char16_t* in, size_t size) {
     return count_code_points<big_endian>(in, size);
 }
 
-simdutf_really_inline void change_endianness_utf16(const char16_t* in, size_t size, char16_t* output) {
+TURBO_FORCE_INLINE void change_endianness_utf16(const char16_t* in, size_t size, char16_t* output) {
   size_t pos = 0;
 
   while (pos + 32 <= size) {
@@ -73,5 +73,5 @@ simdutf_really_inline void change_endianness_utf16(const char16_t* in, size_t si
 
 } // utf16
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo

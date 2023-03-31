@@ -26,11 +26,11 @@ AnsicolorSink::AnsicolorSink(FILE *target_file) : target_file_(target_file){
 
 void AnsicolorSink::Send(const turbo::LogEntry& entry) {
   string_piece color = colors_[static_cast<size_t>(entry.log_severity())];
-  string_piece reset = colors_[4];
+  string_piece reset_color = colors_[4];
   string_piece text =entry.text_message_with_prefix_and_newline();
   fwrite(color.data(),color.size(), 1,target_file_);
   fwrite(text.data(), text.size(), 1, target_file_);
-  fwrite(reset.data(), reset.size(), 1, target_file_);
+  fwrite(reset_color.data(), reset_color.size(), 1, target_file_);
 }
 
 void AnsicolorSink::Flush() {

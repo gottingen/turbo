@@ -24,7 +24,7 @@ std::pair<const char32_t*, char16_t*> avx512_convert_utf32_to_utf16(const char32
 
 
   while (buf + 8 + safety_margin <= end) {
-    __m256i in = _mm256_loadu_si256((__m256i*)buf);
+    __m256i in = _mm256_loadu_si256((__m256i*)const_cast<char32_t*>(buf));
 
     const __m256i v_00000000 = _mm256_setzero_si256();
     const __m256i v_ffff0000 = _mm256_set1_epi32((int32_t)0xffff0000);
@@ -89,7 +89,7 @@ std::pair<result, char16_t*> avx512_convert_utf32_to_utf16_with_errors(const cha
   const size_t safety_margin = 11; // to avoid overruns, see issue https://github.com/simdutf/simdutf/issues/92
 
   while (buf + 8 + safety_margin <= end) {
-    __m256i in = _mm256_loadu_si256((__m256i*)buf);
+    __m256i in = _mm256_loadu_si256((__m256i*)const_cast<char32_t*>(buf));
 
     const __m256i v_00000000 = _mm256_setzero_si256();
     const __m256i v_ffff0000 = _mm256_set1_epi32((int32_t)0xffff0000);

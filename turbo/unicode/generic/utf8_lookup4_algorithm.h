@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace utf8_validation {
 
 using namespace simd;
 
-  simdutf_really_inline simd8<uint8_t> check_special_cases(const simd8<uint8_t> input, const simd8<uint8_t> prev1) {
+  TURBO_FORCE_INLINE simd8<uint8_t> check_special_cases(const simd8<uint8_t> input, const simd8<uint8_t> prev1) {
 // Bit 0 = Too Short (lead byte/ASCII followed by lead byte/ASCII)
 // Bit 1 = Too Long (ASCII followed by continuation)
 // Bit 2 = Overlong 3-byte
@@ -109,7 +109,7 @@ using namespace simd;
     );
     return (byte_1_high & byte_1_low & byte_2_high);
   }
-  simdutf_really_inline simd8<uint8_t> check_multibyte_lengths(const simd8<uint8_t> input,
+  TURBO_FORCE_INLINE simd8<uint8_t> check_multibyte_lengths(const simd8<uint8_t> input,
       const simd8<uint8_t> prev_input, const simd8<uint8_t> sc) {
     simd8<uint8_t> prev2 = input.prev<2>(prev_input);
     simd8<uint8_t> prev3 = input.prev<3>(prev_input);
@@ -122,7 +122,7 @@ using namespace simd;
   // Return nonzero if there are incomplete multibyte characters at the end of the block:
   // e.g. if there is a 4-byte character, but it's 3 bytes from the end.
   //
-  simdutf_really_inline simd8<uint8_t> is_incomplete(const simd8<uint8_t> input) {
+  TURBO_FORCE_INLINE simd8<uint8_t> is_incomplete(const simd8<uint8_t> input) {
     // If the previous input's last 3 bytes match this, they're too short (they ended at EOF):
     // ... 1111____ 111_____ 11______
     static const uint8_t max_array[32] = {
@@ -146,7 +146,7 @@ using namespace simd;
     //
     // Check whether the current bytes are valid UTF-8.
     //
-    simdutf_really_inline void check_utf8_bytes(const simd8<uint8_t> input, const simd8<uint8_t> prev_input) {
+    TURBO_FORCE_INLINE void check_utf8_bytes(const simd8<uint8_t> input, const simd8<uint8_t> prev_input) {
       // Flip prev1...prev3 so we can easily determine if they are 2+, 3+ or 4+ lead bytes
       // (2, 3, 4-byte leads become large positive numbers instead of small negative numbers)
       simd8<uint8_t> prev1 = input.prev<1>(prev_input);
@@ -157,14 +157,14 @@ using namespace simd;
     // The only problem that can happen at EOF is that a multibyte character is too short
     // or a byte value too large in the last bytes: check_special_cases only checks for bytes
     // too large in the first of two bytes.
-    simdutf_really_inline void check_eof() {
+    TURBO_FORCE_INLINE void check_eof() {
       // If the previous block had incomplete UTF-8 characters at the end, an ASCII block can't
       // possibly finish them.
       this->error |= this->prev_incomplete;
     }
 
-    simdutf_really_inline void check_next_input(const simd8x64<uint8_t>& input) {
-      if(simdutf_likely(is_ascii(input))) {
+    TURBO_FORCE_INLINE void check_next_input(const simd8x64<uint8_t>& input) {
+      if(TURBO_LIKELY(is_ascii(input))) {
         this->error |= this->prev_incomplete;
       } else {
         // you might think that a for-loop would work, but under Visual Studio, it is not good enough.
@@ -186,7 +186,7 @@ using namespace simd;
     }
 
     // do not forget to call check_eof!
-    simdutf_really_inline bool errors() const {
+    TURBO_FORCE_INLINE bool errors() const {
       return this->error.any_bits_set_anywhere();
     }
 
@@ -196,5 +196,5 @@ using namespace simd;
 using utf8_validation::utf8_checker;
 
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo

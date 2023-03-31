@@ -15,15 +15,15 @@
 #include "turbo/unicode/scalar/utf8_to_utf16.h"
 
 
-namespace simdutf {
-namespace SIMDUTF_IMPLEMENTATION {
+namespace turbo {
+namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace utf8_to_utf16 {
 
 using namespace simd;
 
 template <endianness endian>
-simdutf_warn_unused size_t convert_valid(const char* input, size_t size,
+TURBO_MUST_USE_RESULT size_t convert_valid(const char* input, size_t size,
     char16_t* utf16_output) noexcept {
   // The implementation is not specific to haswell and should be moved to the generic directory.
   size_t pos = 0;
@@ -83,5 +83,5 @@ simdutf_warn_unused size_t convert_valid(const char* input, size_t size,
 
 } // namespace utf8_to_utf16
 } // unnamed namespace
-} // namespace SIMDUTF_IMPLEMENTATION
-} // namespace simdutf
+} // namespace TURBO_UNICODE_IMPLEMENTATION
+} // namespace turbo

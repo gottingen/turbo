@@ -117,7 +117,7 @@ Examples:
     fprintf(file, "Little-endian system detected.\n");
 #endif
     fprintf(file, "Available implementations:\n");
-    for (const auto& implementation: simdutf::get_available_implementations()) {
+    for (const auto& implementation: turbo::get_available_implementations()) {
       if (implementation == nullptr) {
         puts("implementation is null which is unexpected.");
         abort();
@@ -136,7 +136,7 @@ Examples:
 
   void print_tests(FILE *file) {
     fprintf(file, "Available tests:\n");
-    for (const auto& test: simdutf::test::test_procedures()) {
+    for (const auto& test: turbo::test::test_procedures()) {
       fprintf(file, "- %s\n", test.name.c_str());
     }
   }
@@ -162,7 +162,7 @@ Examples:
     }
     size_t matching_implementation{0};
 
-    for (const auto& implementation: simdutf::get_available_implementations()) {
+    for (const auto& implementation: turbo::get_available_implementations()) {
       if (implementation == nullptr) {
         puts("implementation is null which is unexpected");
         abort();
@@ -180,7 +180,7 @@ Examples:
 
       printf("Checking implementation %s\n", implementation->name().c_str());
 
-      auto filter = [&cmdline](const simdutf::test::test_entry& test) -> bool {
+      auto filter = [&cmdline](const turbo::test::test_entry& test) -> bool {
         if (cmdline.tests.empty())
           return true;
 
@@ -192,7 +192,7 @@ Examples:
         return false;
       };
 
-      for (auto test: simdutf::test::test_procedures()) {
+      for (auto test: turbo::test::test_procedures()) {
         if (filter(test)) { test(*implementation); }
       }
     }
@@ -204,7 +204,7 @@ Examples:
 
 } // namespace
 
-namespace simdutf { namespace test {
+namespace turbo { namespace test {
 
   std::list<test_entry>& test_procedures() {
     static std::list<test_entry> singleton;
@@ -224,4 +224,4 @@ namespace simdutf { namespace test {
     return 0;
   }
 
-}} // namespace namespace simdutf::test
+}} // namespace namespace turbo::test

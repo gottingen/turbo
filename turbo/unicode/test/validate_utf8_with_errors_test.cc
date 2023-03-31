@@ -27,11 +27,11 @@ constexpr size_t num_trials = 1000;
 
 TEST(no_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
+  turbo::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     const auto utf8{generator.generate(512, seed)};
-    simdutf::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-    ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+    turbo::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     ASSERT_EQUAL(res.count, utf8.size());
   }
 }
@@ -39,7 +39,7 @@ TEST(no_error) {
 
 TEST(header_bits_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
+  turbo::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     auto utf8{generator.generate(512, seed)};
 
@@ -47,8 +47,8 @@ TEST(header_bits_error) {
       if((utf8[i] & 0b11000000) != 0b10000000) {  // Only process leading bytes
         const unsigned char old = utf8[i];
         utf8[i] = uint8_t(0b11111000);
-        simdutf::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        ASSERT_EQUAL(res.error, simdutf::error_code::HEADER_BITS);
+        turbo::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        ASSERT_EQUAL(res.error, turbo::error_code::HEADER_BITS);
         ASSERT_EQUAL(res.count, i);
         utf8[i] = old;
       }
@@ -58,7 +58,7 @@ TEST(header_bits_error) {
 
 TEST(too_short_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
+  turbo::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     auto utf8{generator.generate(512, seed)};
     int leading_byte_pos = 0;
@@ -66,8 +66,8 @@ TEST(too_short_error) {
       if((utf8[i] & 0b11000000) == 0b10000000) {  // Only process continuation bytes by making them leading bytes
         const unsigned char old = utf8[i];
         utf8[i] = uint8_t(0b11100000);
-        simdutf::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        ASSERT_EQUAL(res.error, simdutf::error_code::TOO_SHORT);
+        turbo::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        ASSERT_EQUAL(res.error, turbo::error_code::TOO_SHORT);
         ASSERT_EQUAL(res.count, leading_byte_pos);
         utf8[i] = old;
       } else {
@@ -79,15 +79,15 @@ TEST(too_short_error) {
 
 TEST(too_long_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
+  turbo::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     auto utf8{generator.generate(512, seed)};
     for (int i = 1; i < 512; i++) {
       if(((utf8[i] & 0b11000000) != 0b10000000)) {  // Only process leading bytes by making them continuation bytes
         const unsigned char old = utf8[i];
         utf8[i] = uint8_t(0b10000000);
-        simdutf::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        ASSERT_EQUAL(res.error, simdutf::error_code::TOO_LONG);
+        turbo::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        ASSERT_EQUAL(res.error, turbo::error_code::TOO_LONG);
         ASSERT_EQUAL(res.count, i);
         utf8[i] = old;
       }
@@ -97,7 +97,7 @@ TEST(too_long_error) {
 
 TEST(overlong_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
+  turbo::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     auto utf8{generator.generate(512, seed)};
     for (int i = 1; i < 512; i++) {
@@ -113,8 +113,8 @@ TEST(overlong_error) {
           utf8[i] = 0b11110000;
           utf8[i+1] = utf8[i+1] & 0b11001111;
         }
-        simdutf::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        ASSERT_EQUAL(res.error, simdutf::error_code::OVERLONG);
+        turbo::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        ASSERT_EQUAL(res.error, turbo::error_code::OVERLONG);
         ASSERT_EQUAL(res.count, i);
         utf8[i] = old;
         utf8[i+1] = second_old;
@@ -125,14 +125,14 @@ TEST(overlong_error) {
 
 TEST(too_large_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
+  turbo::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     auto utf8{generator.generate(512, seed)};
     for (int i = 1; i < 512; i++) {
       if((utf8[i] & 0b11111000) == 0b11110000) { // Can only have too large error in 4-bytes case
         utf8[i] += ((utf8[i] & 0b100) == 0b100) ? 0b10 : 0b100;   // Make sure we get too large error and not header bits error
-        simdutf::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        ASSERT_EQUAL(res.error, simdutf::error_code::TOO_LARGE);
+        turbo::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        ASSERT_EQUAL(res.error, turbo::error_code::TOO_LARGE);
         ASSERT_EQUAL(res.count, i);
         utf8[i] -= 0b100;
       }
@@ -142,7 +142,7 @@ TEST(too_large_error) {
 
 TEST(surrogate_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
+  turbo::tests::helpers::random_utf8 generator{seed, 1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     auto utf8{generator.generate(512, seed)};
     for (int i = 1; i < 512; i++) {
@@ -152,8 +152,8 @@ TEST(surrogate_error) {
         utf8[i] = 0b11101101;                 // Leading byte is always the same
         for (int s = 0x8; s < 0xf; s++) {  // Modify second byte to create a surrogate codepoint
           utf8[i+1] = (utf8[i+1] & 0b11000011) | (s << 2);
-          simdutf::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-          ASSERT_EQUAL(res.error, simdutf::error_code::SURROGATE);
+          turbo::result res = implementation.validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+          ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
           ASSERT_EQUAL(res.count, i);
         }
         utf8[i] = old;
@@ -165,5 +165,5 @@ TEST(surrogate_error) {
 
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

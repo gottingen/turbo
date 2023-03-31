@@ -26,7 +26,7 @@
 namespace {
   std::array<size_t, 7> input_size{7, 16, 12, 64, 67, 128, 256};
 
-  using simdutf::tests::helpers::transcode_utf8_to_utf32_test_base;
+  using turbo::tests::helpers::transcode_utf8_to_utf32_test_base;
 
   constexpr size_t trials = 10000;
   constexpr size_t num_trials = 1000;
@@ -39,8 +39,8 @@ TEST(issue_213) {
   // that the predicted output might be zero.
   size_t expected_size = implementation.utf32_length_from_utf8(buf + 2, 1);
   std::unique_ptr<char32_t[]>buffer(new char32_t[expected_size]);
-  simdutf::result r = simdutf::convert_utf8_to_utf32_with_errors(buf + 2, 1, buffer.get());
-  ASSERT_TRUE(r.error != simdutf::SUCCESS);
+  turbo::result r = turbo::convert_utf8_to_utf32_with_errors(buf + 2, 1, buffer.get());
+  ASSERT_TRUE(r.error != turbo::SUCCESS);
   //r.count: In case of error, indicates the position of the error in the input.
   // In case of success, indicates the number of words validated/written.
   ASSERT_TRUE(r.count == 0);
@@ -55,8 +55,8 @@ TEST(convert_pure_ASCII) {
     };
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      simdutf::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-      ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+      turbo::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+      ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
@@ -75,11 +75,11 @@ TEST(convert_1_or_2_UTF8_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     uint32_t seed{1234+uint32_t(trial)};
     if((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
-    simdutf::tests::helpers::RandomInt random(0x0000, 0x07ff, seed); // range for 1 or 2 UTF-8 bytes
+    turbo::tests::helpers::RandomInt random(0x0000, 0x07ff, seed); // range for 1 or 2 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      simdutf::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-      ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+      turbo::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+      ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
@@ -98,12 +98,12 @@ TEST(convert_1_or_2_or_3_UTF8_bytes) {
     uint32_t seed{1234+uint32_t(trial)};
     if((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 1, 2 or 3 UTF-8 bytes
-    simdutf::tests::helpers::RandomIntRanges random({{0x0000, 0xd7ff},
+    turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd7ff},
                                                      {0xe000, 0xffff}}, seed);
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      simdutf::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-      ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+      turbo::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+      ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
@@ -121,12 +121,12 @@ TEST(convert_3_or_4_UTF8_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     uint32_t seed{1234+uint32_t(trial)};
     if((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
-    simdutf::tests::helpers::RandomIntRanges random({{0x0800, 0xd800-1},
+    turbo::tests::helpers::RandomIntRanges random({{0x0800, 0xd800-1},
                                                      {0xe000, 0x10ffff}}, seed); // range for 3 or 4 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      simdutf::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-      ASSERT_EQUAL(res.error, simdutf::error_code::SUCCESS);
+      turbo::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+      ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
@@ -142,15 +142,15 @@ TEST(convert_3_or_4_UTF8_bytes) {
 
 TEST(too_large_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
+  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
                                                 {0xe000, 0x10ffff}}, seed);
   for(size_t trial = 0; trial < num_trials; trial++) {
     transcode_utf8_to_utf32_test_base test(random, fix_size);
     for (int i = 1; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11111000) == 0b11110000) { // Can only have too large error in 4-bytes case
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-          simdutf::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-          ASSERT_EQUAL(res.error, simdutf::error_code::TOO_LARGE);
+          turbo::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+          ASSERT_EQUAL(res.error, turbo::error_code::TOO_LARGE);
           ASSERT_EQUAL(res.count, i);
           return 0;
         };
@@ -164,15 +164,15 @@ TEST(too_large_error) {
 
 TEST(surrogate_error) {
   uint32_t seed{1234};
-  simdutf::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
+  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
                                               {0xe000, 0x10ffff}}, seed);
   for(size_t trial = 0; trial < num_trials; trial++) {
     transcode_utf8_to_utf32_test_base test(random, fix_size);
     for (int i = 1; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11110000) == 0b11100000) { // Can only have surrogate error in 3-bytes case
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-          simdutf::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-          ASSERT_EQUAL(res.error, simdutf::error_code::SURROGATE);
+          turbo::result res = implementation.convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+          ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
           ASSERT_EQUAL(res.count, i);
           return 0;
         };
@@ -191,5 +191,5 @@ TEST(surrogate_error) {
 }
 
 int main(int argc, char* argv[]) {
-  return simdutf::test::main(argc, argv);
+  return turbo::test::main(argc, argv);
 }

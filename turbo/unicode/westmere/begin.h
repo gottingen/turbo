@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define SIMDUTF_IMPLEMENTATION westmere
+#define TURBO_UNICODE_IMPLEMENTATION westmere
 
 #if SIMDUTF_CAN_ALWAYS_RUN_WESTMERE
 // nothing needed.

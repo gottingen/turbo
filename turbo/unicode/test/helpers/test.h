@@ -21,15 +21,15 @@
 #include <iostream>
 
 
-namespace simdutf { namespace test {
+namespace turbo { namespace test {
 
   int main(int argc, char* argv[]);
-  using test_procedure = void (*)(const simdutf::implementation& impl);
+  using test_procedure = void (*)(const turbo::implementation& impl);
   struct test_entry {
     std::string name;
     test_procedure procedure;
 
-    void operator()(const simdutf::implementation& impl) {
+    void operator()(const turbo::implementation& impl) {
       procedure(impl);
     }
   };
@@ -40,20 +40,20 @@ namespace simdutf { namespace test {
     register_test(const char* name, test_procedure proc);
   };
 
-}} // namespace namespace simdutf::test
+}} // namespace namespace turbo::test
 
 
 #define TEST(name)                                          \
-void test_impl_##name(const simdutf::implementation& impl); \
-void name(const simdutf::implementation& impl) {            \
+void test_impl_##name(const turbo::implementation& impl); \
+void name(const turbo::implementation& impl) {            \
   std::string title = #name;                                \
   std::replace(title.begin(), title.end(), '_', ' ');       \
   printf("%s...", title.c_str()); fflush(stdout);           \
   test_impl_##name(impl);                                   \
   puts(" OK");                                              \
 }                                                           \
-static simdutf::test::register_test test_register_##name(#name, name); \
-void test_impl_##name(const simdutf::implementation& implementation)
+static turbo::test::register_test test_register_##name(#name, name); \
+void test_impl_##name(const turbo::implementation& implementation)
 
 #define ASSERT_EQUAL(a, b) {                                      \
   const auto expr = (a);                                          \

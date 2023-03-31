@@ -21,23 +21,23 @@
 
 #include "turbo/unicode/simdutf/portability.h"
 
-#ifndef SIMDUTF_IMPLEMENTATION_ARM64
-#define SIMDUTF_IMPLEMENTATION_ARM64 (SIMDUTF_IS_ARM64)
+#ifndef TURBO_UNICODE_IMPLEMENTATION_ARM64
+#define TURBO_UNICODE_IMPLEMENTATION_ARM64 (SIMDUTF_IS_ARM64)
 #endif
-#define SIMDUTF_CAN_ALWAYS_RUN_ARM64 SIMDUTF_IMPLEMENTATION_ARM64 && SIMDUTF_IS_ARM64
+#define SIMDUTF_CAN_ALWAYS_RUN_ARM64 TURBO_UNICODE_IMPLEMENTATION_ARM64 && SIMDUTF_IS_ARM64
 
 
 #include "turbo/unicode/internal/isadetection.h"
 
-#if SIMDUTF_IMPLEMENTATION_ARM64
+#if TURBO_UNICODE_IMPLEMENTATION_ARM64
 
-namespace simdutf {
+namespace turbo {
 /**
  * Implementation for NEON (ARMv8).
  */
 namespace arm64 {
 } // namespace arm64
-} // namespace simdutf
+} // namespace turbo
 
 #include "turbo/unicode/arm64/implementation.h"
 
@@ -50,6 +50,6 @@ namespace arm64 {
 
 #include "turbo/unicode/arm64/end.h"
 
-#endif // SIMDUTF_IMPLEMENTATION_ARM64
+#endif // TURBO_UNICODE_IMPLEMENTATION_ARM64
 
 #endif // SIMDUTF_ARM64_H

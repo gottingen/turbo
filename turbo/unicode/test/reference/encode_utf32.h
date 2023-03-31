@@ -16,7 +16,7 @@
 
 #include <cstdint>
 
-namespace simdutf { namespace tests { namespace reference { namespace utf32 {
+namespace turbo { namespace tests { namespace reference { namespace utf32 {
 
   // returns whether the value can be represented in the UTF-32
   bool valid_value(uint32_t value) {

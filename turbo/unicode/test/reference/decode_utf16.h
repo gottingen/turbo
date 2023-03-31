@@ -16,7 +16,7 @@
 
 #include <cstdio>
 
-namespace simdutf { namespace tests { namespace reference { namespace utf16 {
+namespace turbo { namespace tests { namespace reference { namespace utf16 {
 
     enum class Error {
         high_surrogate_out_of_range,

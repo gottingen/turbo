@@ -14,7 +14,7 @@
 
 #include "encode_utf16.h"
 
-namespace simdutf { namespace tests { namespace reference { namespace utf16 {
+namespace turbo { namespace tests { namespace reference { namespace utf16 {
 
   // returns whether the value can be represented in the UTF-16
   bool valid_value(uint32_t value) {

@@ -20,25 +20,25 @@
 // Note that fallback.h is always imported last.
 
 // Default Fallback to on unless a builtin implementation has already been selected.
-#ifndef SIMDUTF_IMPLEMENTATION_FALLBACK
+#ifndef TURBO_UNICODE_IMPLEMENTATION_FALLBACK
 #if SIMDUTF_CAN_ALWAYS_RUN_ARM64 || SIMDUTF_CAN_ALWAYS_RUN_ICELAKE || SIMDUTF_CAN_ALWAYS_RUN_HASWELL || SIMDUTF_CAN_ALWAYS_RUN_WESTMERE || SIMDUTF_CAN_ALWAYS_RUN_PPC64
-#define SIMDUTF_IMPLEMENTATION_FALLBACK 0
+#define TURBO_UNICODE_IMPLEMENTATION_FALLBACK 0
 #else
-#define SIMDUTF_IMPLEMENTATION_FALLBACK 1
+#define TURBO_UNICODE_IMPLEMENTATION_FALLBACK 1
 #endif
 #endif
 
-#define SIMDUTF_CAN_ALWAYS_RUN_FALLBACK (SIMDUTF_IMPLEMENTATION_FALLBACK)
+#define SIMDUTF_CAN_ALWAYS_RUN_FALLBACK (TURBO_UNICODE_IMPLEMENTATION_FALLBACK)
 
-#if SIMDUTF_IMPLEMENTATION_FALLBACK
+#if TURBO_UNICODE_IMPLEMENTATION_FALLBACK
 
-namespace simdutf {
+namespace turbo {
 /**
  * Fallback implementation (runs on any machine).
  */
 namespace fallback {
 } // namespace fallback
-} // namespace simdutf
+} // namespace turbo
 
 #include "turbo/unicode/fallback/implementation.h"
 
@@ -49,5 +49,5 @@ namespace fallback {
 
 #include "turbo/unicode/fallback/end.h"
 
-#endif // SIMDUTF_IMPLEMENTATION_FALLBACK
+#endif // TURBO_UNICODE_IMPLEMENTATION_FALLBACK
 #endif // SIMDUTF_FALLBACK_H
