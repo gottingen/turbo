@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_WESTMERE_SIMD_H
-#define SIMDUTF_WESTMERE_SIMD_H
+#ifndef TURBO_UNICODE_WESTMERE_SIMD_H_
+#define TURBO_UNICODE_WESTMERE_SIMD_H_
 
 namespace turbo {
 namespace TURBO_UNICODE_IMPLEMENTATION {
@@ -461,4 +461,4 @@ namespace simd {
 } // namespace TURBO_UNICODE_IMPLEMENTATION
 } // namespace turbo
 
-#endif // SIMDUTF_WESTMERE_SIMD_INPUT_H
+#endif // TURBO_UNICODE_WESTMERE_SIMD_H_

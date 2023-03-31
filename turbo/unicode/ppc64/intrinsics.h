@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_PPC64_INTRINSICS_H
-#define SIMDUTF_PPC64_INTRINSICS_H
+#ifndef TURBO_UNICODE_PPC64_INTRINSICS_H_
+#define TURBO_UNICODE_PPC64_INTRINSICS_H_
 
 #include "turbo/unicode/utf.h"
 
@@ -30,4 +30,4 @@
 #undef vector
 #endif
 
-#endif //  SIMDUTF_PPC64_INTRINSICS_H
+#endif // TURBO_UNICODE_PPC64_INTRINSICS_H_

@@ -12,20 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ARM64_H
-#define SIMDUTF_ARM64_H
+#ifndef TURBO_UNICODE_ARM64_H_
+#define TURBO_UNICODE_ARM64_H_
 
-#ifdef SIMDUTF_FALLBACK_H
+#ifdef TURBO_UNICODE_FALLBACK_H_
 #error "arm64.h must be included before fallback.h"
 #endif
 
-#include "turbo/unicode/simdutf/portability.h"
+#include "turbo/unicode/internal/config.h"
 
 #ifndef TURBO_UNICODE_IMPLEMENTATION_ARM64
-#define TURBO_UNICODE_IMPLEMENTATION_ARM64 (SIMDUTF_IS_ARM64)
+#if defined(TURBO_PROCESSOR_ARM64)
+#define TURBO_UNICODE_IMPLEMENTATION_ARM64 1
+#else
+#define TURBO_UNICODE_IMPLEMENTATION_ARM64 0
 #endif
-#define SIMDUTF_CAN_ALWAYS_RUN_ARM64 TURBO_UNICODE_IMPLEMENTATION_ARM64 && SIMDUTF_IS_ARM64
+#endif
 
+#if defined(TURBO_PROCESSOR_ARM64)
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_ARM64 TURBO_UNICODE_IMPLEMENTATION_ARM64
+#else
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_ARM64 0
+#endif
 
 #include "turbo/unicode/internal/isadetection.h"
 
@@ -52,4 +60,4 @@ namespace arm64 {
 
 #endif // TURBO_UNICODE_IMPLEMENTATION_ARM64
 
-#endif // SIMDUTF_ARM64_H
+#endif // TURBO_UNICODE_ARM64_H_

@@ -12,39 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_HASWELL_H
-#define SIMDUTF_HASWELL_H
+#ifndef TURBO_UNICODE_HASWELL_H_
+#define TURBO_UNICODE_HASWELL_H_
 
-#ifdef SIMDUTF_WESTMERE_H
+#ifdef TURBO_UNICODE_WESTMERE_H_
 #error "haswell.h must be included before westmere.h"
 #endif
-#ifdef SIMDUTF_FALLBACK_H
+#ifdef TURBO_UNICODE_FALLBACK_H_
 #error "haswell.h must be included before fallback.h"
 #endif
 
-#include "turbo/unicode/simdutf/portability.h"
+#include "turbo/unicode/internal/config.h"
 
 // Default Haswell to on if this is x86-64. Even if we're not compiled for it, it could be selected
 // at runtime.
 #ifndef TURBO_UNICODE_IMPLEMENTATION_HASWELL
 //
-// You do not want to restrict it like so: SIMDUTF_IS_X86_64 && __AVX2__
+// You do not want to restrict it like so: defined(TURBO_PROCESSOR_X86_64) && __AVX2__
 // because we want to rely on *runtime dispatch*.
 //
-#if SIMDUTF_CAN_ALWAYS_RUN_ICELAKE
+#if TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE
 #define TURBO_UNICODE_IMPLEMENTATION_HASWELL 0
-#else
-#define TURBO_UNICODE_IMPLEMENTATION_HASWELL (SIMDUTF_IS_X86_64)
+#elif defined(TURBO_PROCESSOR_X86_64)
+#define TURBO_UNICODE_IMPLEMENTATION_HASWELL 1
 #endif
 
 #endif
-// To see why  (__BMI__) && (__PCLMUL__) && (__LZCNT__) are not part of this next line, see
-// https://github.com/simdutf/simdutf/issues/1247
-#define SIMDUTF_CAN_ALWAYS_RUN_HASWELL ((TURBO_UNICODE_IMPLEMENTATION_HASWELL) && (SIMDUTF_IS_X86_64) && (__AVX2__))
+
+#if defined(TURBO_PROCESSOR_X86_64) && (TURBO_UNICODE_IMPLEMENTATION_HASWELL) && (__AVX2__)
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_HASWELL 1
+#else
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_HASWELL 0
+#endif
 
 #if TURBO_UNICODE_IMPLEMENTATION_HASWELL
 
-#define SIMDUTF_TARGET_HASWELL SIMDUTF_TARGET_REGION("avx2,bmi,pclmul,lzcnt")
+#define TURBO_TARGET_HASWELL TURBO_TARGET_REGION("avx2,bmi,pclmul,lzcnt")
 
 namespace turbo {
 /**
@@ -55,7 +58,7 @@ namespace haswell {
 } // namespace turbo
 
 //
-// These two need to be included outside SIMDUTF_TARGET_REGION
+// These two need to be included outside TURBO_TARGET_REGION
 //
 #include "turbo/unicode/haswell/implementation.h"
 #include "turbo/unicode/haswell/intrinsics.h"
@@ -71,4 +74,4 @@ namespace haswell {
 #include "turbo/unicode/haswell/end.h"
 
 #endif // TURBO_UNICODE_IMPLEMENTATION_HASWELL
-#endif // SIMDUTF_HASWELL_COMMON_H
+#endif // TURBO_UNICODE_HASWELL_H_

@@ -25,7 +25,7 @@
 namespace turbo {
 namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
-#ifndef SIMDUTF_ICELAKE_H
+#ifndef TURBO_UNICODE_ICELAKE_H_
 #error "icelake.h must be included"
 #endif
 #include "turbo/unicode/icelake/icelake_utf8_common.inl.cc"

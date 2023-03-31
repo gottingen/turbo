@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_FALLBACK_BITMANIPULATION_H
-#define SIMDUTF_FALLBACK_BITMANIPULATION_H
+#ifndef TURBO_UNICODE_FALLBACK_BITMANIPULATION_H_
+#define TURBO_UNICODE_FALLBACK_BITMANIPULATION_H_
 
 #include "turbo/unicode/utf.h"
 #include <limits>
@@ -43,4 +43,4 @@ static unsigned char _BitScanReverse64(unsigned long* ret, uint64_t x) {
 } // namespace TURBO_UNICODE_IMPLEMENTATION
 } // namespace turbo
 
-#endif // SIMDUTF_FALLBACK_BITMANIPULATION_H
+#endif // TURBO_UNICODE_FALLBACK_BITMANIPULATION_H_

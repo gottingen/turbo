@@ -12,12 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_COMMON_DEFS_H
-#define SIMDUTF_COMMON_DEFS_H
+#ifndef TURBO_UNICODE_INTERNAL_CONFIG_H_
+#define TURBO_UNICODE_INTERNAL_CONFIG_H_
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cfloat>
+#include <cassert>
+#ifndef _WIN32
+// strcasecmp, strncasecmp
+#include <strings.h>
+#endif
 #include <cassert>
 #include "turbo/platform/port.h"
-#include "turbo/unicode/simdutf/portability.h"
+#ifdef _MSC_VER
+// https://en.wikipedia.org/wiki/C_alternative_tokens
+// This header should have no effect, except maybe
+// under Visual Studio.
+#include <iso646.h>
+#endif
 
-
-#endif // SIMDUTF_COMMON_DEFS_H
+#endif // TURBO_UNICODE_INTERNAL_CONFIG_H_

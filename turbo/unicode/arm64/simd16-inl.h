@@ -103,7 +103,7 @@ struct base16_numeric: base16<T> {
 template<>
 struct simd16<int16_t> : base16_numeric<int16_t> {
   TURBO_FORCE_INLINE simd16() : base16_numeric<int16_t>() {}
-#ifndef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifndef _MSC_VER
   TURBO_FORCE_INLINE simd16(const uint16x8_t _value) : base16_numeric<int16_t>(_value) {}
 #endif
   TURBO_FORCE_INLINE simd16(const int16x8_t _value) : base16_numeric<int16_t>(vreinterpretq_u16_s16(_value)) {}
@@ -179,7 +179,7 @@ struct simd16<uint16_t>: base16_numeric<uint16_t>  {
 
   // Change the endianness
   TURBO_FORCE_INLINE simd16<uint16_t> swap_bytes() const {
-    #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+    #ifdef _MSC_VER
     const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
     #else
     const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -226,7 +226,7 @@ TURBO_FORCE_INLINE simd16<int16_t>::operator simd16<uint16_t>() const { return t
     }
 
     TURBO_FORCE_INLINE uint64_t to_bitmask() const {
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
       const uint8x16_t bit_mask = make_uint8x16_t(
         0x01, 0x02, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
         0x01, 0x02, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80

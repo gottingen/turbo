@@ -16,7 +16,7 @@
 namespace turbo {
 namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
-#ifndef SIMDUTF_WESTMERE_H
+#ifndef TURBO_UNICODE_WESTMERE_H_
 #error "westmere.h must be included"
 #endif
 using namespace simd;

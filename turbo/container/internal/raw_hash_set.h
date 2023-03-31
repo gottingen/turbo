@@ -622,7 +622,7 @@ struct GroupSse2Impl {
 };
 #endif  // TURBO_SSE2
 
-#if TURBO_NEON && defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
 struct GroupAArch64Impl {
   static constexpr size_t kWidth = 8;
 
@@ -741,7 +741,7 @@ struct GroupPortableImpl {
 
 #if TURBO_SSE2
 using Group = GroupSse2Impl;
-#elif TURBO_NEON && defined(TURBO_IS_LITTLE_ENDIAN)
+#elif TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
 using Group = GroupAArch64Impl;
 #else
 using Group = GroupPortableImpl;

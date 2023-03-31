@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_PPC64_IMPLEMENTATION_H
-#define SIMDUTF_PPC64_IMPLEMENTATION_H
+#ifndef TURBO_UNICODE_PPC64_IMPLEMENTATION_H_
+#define TURBO_UNICODE_PPC64_IMPLEMENTATION_H_
 
 #include "turbo/unicode/utf.h"
-#include "simdutf/internal/isadetection.h"
+#include "turbo/unicode/internal/isadetection.h"
 
 namespace turbo {
 namespace ppc64 {
@@ -88,4 +88,4 @@ public:
 } // namespace ppc64
 } // namespace turbo
 
-#endif // SIMDUTF_PPC64_IMPLEMENTATION_H
+#endif // TURBO_UNICODE_PPC64_IMPLEMENTATION_H_

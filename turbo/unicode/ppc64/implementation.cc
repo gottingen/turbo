@@ -27,11 +27,11 @@
 #include "scalar/utf32_to_utf16/valid_utf32_to_utf16.h"
 #include "scalar/utf32_to_utf16/utf32_to_utf16.h"
 
-#include "simdutf/ppc64/begin.h"
+#include "turbo/unicode/ppc64/begin.h"
 namespace turbo {
 namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
-#ifndef SIMDUTF_PPC64_H
+#ifndef TURBO_UNICODE_PPC64_H_
 #error "ppc64.h must be included"
 #endif
 using namespace simd;
@@ -307,4 +307,4 @@ TURBO_MUST_USE_RESULT size_t implementation::utf32_length_from_utf8(const char *
 } // namespace TURBO_UNICODE_IMPLEMENTATION
 } // namespace turbo
 
-#include "simdutf/ppc64/end.h"
+#include "turbo/unicode/ppc64/end.h"

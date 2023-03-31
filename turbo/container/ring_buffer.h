@@ -937,8 +937,7 @@ ring_buffer<T, Container, Allocator>::capacity() const noexcept {
       1); // This is required because even an empty ring_buffer has one unused
           // termination element, somewhat like a \0 at the end of a C string.
 
-  return (c.size() -
-          1); // Need to subtract one because the position at mEnd is unused.
+  return (c.size() - 1); // Need to subtract one because the position at mEnd is unused.
 }
 
 template <typename T, typename Container, typename Allocator>

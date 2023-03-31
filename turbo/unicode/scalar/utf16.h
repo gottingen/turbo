@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_UTF16_H
-#define SIMDUTF_UTF16_H
+#ifndef TURBO_UNICODE_SCALAR_UTF16_H_
+#define TURBO_UNICODE_SCALAR_UTF16_H_
 
 namespace turbo {
 namespace scalar {
@@ -122,4 +122,4 @@ TURBO_FORCE_INLINE void change_endianness_utf16(const char16_t* in, size_t size,
 } // namespace scalar
 } // namespace turbo
 
-#endif
+#endif  // TURBO_UNICODE_SCALAR_UTF16_H_

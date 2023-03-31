@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ICELAKE_H
-#define SIMDUTF_ICELAKE_H
+#ifndef TURBO_UNICODE_ICELAKE_H_
+#define TURBO_UNICODE_ICELAKE_H_
 
 
-#include "turbo/unicode/simdutf/portability.h"
+#include "turbo/unicode/internal/config.h"
 
 #ifdef __has_include
 // How do we detect that a compiler supports vbmi2?
 // For sure if the following header is found, we are ok?
 #if __has_include(<avx512vbmi2intrin.h>)
-#define SIMDUTF_COMPILER_SUPPORTS_VBMI2 1
+#define TURBO_UNICODE_COMPILER_SUPPORTS_VBMI2 1
 #endif
 #endif
 
@@ -30,27 +30,31 @@
 #if _MSC_VER >= 1920
 // Visual Studio 2019 and up support VBMI2 under x64 even if the header
 // avx512vbmi2intrin.h is not found.
-#define SIMDUTF_COMPILER_SUPPORTS_VBMI2 1
+#define TURBO_UNICODE_COMPILER_SUPPORTS_VBMI2 1
 #endif
 #endif
 
 // We allow icelake on x64 as long as the compiler is known to support VBMI2.
-#ifndef TURBO_UNICODE_IMPLEMENTATION_ICELAKE
-#define TURBO_UNICODE_IMPLEMENTATION_ICELAKE ((SIMDUTF_IS_X86_64) && (SIMDUTF_COMPILER_SUPPORTS_VBMI2))
+#if !defined(TURBO_UNICODE_IMPLEMENTATION_ICELAKE) && (defined(TURBO_PROCESSOR_X86_64) && (TURBO_UNICODE_COMPILER_SUPPORTS_VBMI2))
+#define TURBO_UNICODE_IMPLEMENTATION_ICELAKE 1
+#else
+#define TURBO_UNICODE_IMPLEMENTATION_ICELAKE 0
 #endif
 
-// To see why  (__BMI__) && (__PCLMUL__) && (__LZCNT__) are not part of this next line, see
-// https://github.com/simdutf/simdutf/issues/1247
-#define SIMDUTF_CAN_ALWAYS_RUN_ICELAKE ((TURBO_UNICODE_IMPLEMENTATION_ICELAKE) && (SIMDUTF_IS_X86_64) && (__AVX2__) && (TURBO_HAVE_AVX512F && \
+#if ((TURBO_UNICODE_IMPLEMENTATION_ICELAKE) && defined(TURBO_PROCESSOR_X86_64) && (__AVX2__) && (TURBO_HAVE_AVX512F && \
                                          TURBO_HAVE_AVX512DQ && \
                                          TURBO_HAVE_AVX512VL && \
-                                           TURBO_HAVE_AVX512VBMI2) && (!SIMDUTF_IS_32BITS))
+                                           TURBO_HAVE_AVX512VBMI2))
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE 1
+#else
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE 0
+#endif
 
 #if TURBO_UNICODE_IMPLEMENTATION_ICELAKE
-#if SIMDUTF_CAN_ALWAYS_RUN_ICELAKE
-#define SIMDUTF_TARGET_ICELAKE
+#if TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE
+#define TURBO_UNICODE_TARGET_ICELAKE
 #else
-#define SIMDUTF_TARGET_ICELAKE SIMDUTF_TARGET_REGION("avx512f,avx512dq,avx512cd,avx512bw,avx512vbmi,avx512vbmi2,avx512vl,avx2,bmi,bmi2,pclmul,lzcnt")
+#define TURBO_UNICODE_TARGET_ICELAKE TURBO_TARGET_REGION("avx512f,avx512dq,avx512cd,avx512bw,avx512vbmi,avx512vbmi2,avx512vl,avx2,bmi,bmi2,pclmul,lzcnt")
 #endif
 
 namespace turbo {
@@ -61,7 +65,7 @@ namespace icelake {
 
 
 //
-// These two need to be included outside SIMDUTF_TARGET_REGION
+// These two need to be included outside TURBO_TARGET_REGION
 //
 #include "turbo/unicode/icelake/intrinsics.h"
 #include "turbo/unicode/icelake/implementation.h"
@@ -77,4 +81,4 @@ namespace icelake {
 
 
 #endif // TURBO_UNICODE_IMPLEMENTATION_ICELAKE
-#endif // SIMDUTF_ICELAKE_H
+#endif // TURBO_UNICODE_ICELAKE_H_

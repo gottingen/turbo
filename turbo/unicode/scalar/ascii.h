@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ASCII_H
-#define SIMDUTF_ASCII_H
+#ifndef TURBO_UNICODE_SCALAR_ASCII_H_
+#define TURBO_UNICODE_SCALAR_ASCII_H_
 
 namespace turbo {
 namespace scalar {
@@ -69,4 +69,4 @@ inline TURBO_MUST_USE_RESULT result validate_with_errors(const char *buf, size_t
 } // namespace scalar
 } // namespace turbo
 
-#endif
+#endif  // TURBO_UNICODE_SCALAR_ASCII_H_

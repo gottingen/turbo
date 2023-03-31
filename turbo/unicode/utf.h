@@ -17,14 +17,12 @@
 
 #include <cstring>
 
-#include "turbo/unicode/simdutf/compiler_check.h"
-#include "turbo/unicode/simdutf/common_defs.h"
-#include "turbo/unicode/simdutf/encoding_types.h"
-#include "turbo/unicode/simdutf/error.h"
+#include "turbo/unicode/internal/config.h"
+#include "turbo/unicode/encoding_types.h"
+#include "turbo/unicode/error.h"
 
 // Public API
-#include "simdutf/simdutf_version.h"
-#include "simdutf/implementation.h"
+#include "turbo/unicode/implementation.h"
 
 
 // Implementation-internal files (must be included before the implementations themselves, to keep

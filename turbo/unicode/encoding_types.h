@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#ifndef TURBO_UNICODE_ENCODING_TYPES_H_
+#define TURBO_UNICODE_ENCODING_TYPES_H_
 
 #include <string>
 
@@ -56,4 +58,5 @@ encoding_type check_bom(const char* byte, size_t length);
 size_t bom_byte_size(encoding_type bom);
 
 } // BOM namespace
-} // simdutf namespace
+} // namespace turbo
+#endif  // TURBO_UNICODE_ENCODING_TYPES_H_

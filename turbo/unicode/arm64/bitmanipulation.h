@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ARM64_BITMANIPULATION_H
-#define SIMDUTF_ARM64_BITMANIPULATION_H
+#ifndef TURBO_UNICODE_ARM64_BITMANIPULATION_H_
+#define TURBO_UNICODE_ARM64_BITMANIPULATION_H_
 
 namespace turbo {
 namespace TURBO_UNICODE_IMPLEMENTATION {
@@ -28,4 +28,4 @@ TURBO_FORCE_INLINE int count_ones(uint64_t input_num) {
 } // namespace TURBO_UNICODE_IMPLEMENTATION
 } // namespace turbo
 
-#endif // SIMDUTF_ARM64_BITMANIPULATION_H
+#endif // TURBO_UNICODE_ARM64_BITMANIPULATION_H_

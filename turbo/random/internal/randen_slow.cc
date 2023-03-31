@@ -252,7 +252,7 @@ inline TURBO_RANDOM_INTERNAL_ATTRIBUTE_ALWAYS_INLINE void Vector128Store(
 inline TURBO_RANDOM_INTERNAL_ATTRIBUTE_ALWAYS_INLINE Vector128
 AesRound(const Vector128& state, const Vector128& round_key) {
   Vector128 result;
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
   result.s[0] = round_key.s[0] ^                  //
                 te0[uint8_t(state.s[0])] ^        //
                 te1[uint8_t(state.s[1] >> 8)] ^   //
@@ -398,7 +398,7 @@ inline TURBO_RANDOM_INTERNAL_ATTRIBUTE_ALWAYS_INLINE void Permute(
 // Enables native loads in the round loop by pre-swapping.
 inline TURBO_RANDOM_INTERNAL_ATTRIBUTE_ALWAYS_INLINE void SwapEndian(
     turbo::uint128* state) {
-#ifdef TURBO_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
   for (uint32_t block = 0; block < RandenTraits::kFeistelBlocks; ++block) {
     uint64_t new_lo = turbo::little_endian::ToHost64(
         static_cast<uint64_t>(state[block] >> 64));
@@ -421,7 +421,7 @@ namespace random_internal {
 const void* RandenSlow::GetKeys() {
   // Round keys for one AES per Feistel round and branch.
   // The canonical implementation uses first digits of Pi.
-#ifdef TURBO_IS_LITTLE_ENDIAN
+#if TURBO_IS_LITTLE_ENDIAN
   return kRandenRoundKeys;
 #else
   return kRandenRoundKeysBE;

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_UTF8_TO_UTF16_TABLES_H
-#define SIMDUTF_UTF8_TO_UTF16_TABLES_H
+#ifndef TURBO_UNICODE_UTF8_TO_UTF16_TABLES_H_
+#define TURBO_UNICODE_UTF8_TO_UTF16_TABLES_H_
 #include <cstdint>
 
 namespace turbo {
@@ -4347,4 +4347,4 @@ const uint8_t utf8bigindex[4096][2] =
 } // unnamed namespace
 } // namespace turbo
 
-#endif // SIMDUTF_UTF8_TO_UTF16_TABLES_H
+#endif // TURBO_UNICODE_UTF8_TO_UTF16_TABLES_H_

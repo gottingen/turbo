@@ -25,7 +25,7 @@
 namespace turbo {
 namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
-#ifndef SIMDUTF_HASWELL_H
+#ifndef TURBO_UNICODE_HASWELL_H_
 #error "haswell.h must be included"
 #endif
 using namespace simd;

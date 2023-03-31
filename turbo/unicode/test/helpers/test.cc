@@ -86,7 +86,7 @@ namespace {
 
   void print_help(FILE* file) {
     fputs(R"txt(
-Test utility for simdutf
+Test utility for unicode
 
 Usage:
 
@@ -111,7 +111,7 @@ Examples:
   }
 
   void print_architectures(FILE *file) {
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
     fprintf(file, "Big-endian system detected.\n");
 #else
     fprintf(file, "Little-endian system detected.\n");

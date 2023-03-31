@@ -57,8 +57,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SIMDutf_INTERNAL_ISADETECTION_H
-#define SIMDutf_INTERNAL_ISADETECTION_H
+#ifndef TURBO_UNICODE_INTERNAL_ISADETECTION_H_
+#define TURBO_UNICODE_INTERNAL_ISADETECTION_H_
 
 #include <cstdint>
 #include <cstdlib>
@@ -230,4 +230,4 @@ static inline uint32_t detect_supported_architectures() {
 } // namespace internal
 } // namespace turbo
 
-#endif // SIMDutf_INTERNAL_ISADETECTION_H
+#endif // TURBO_UNICODE_INTERNAL_ISADETECTION_H_

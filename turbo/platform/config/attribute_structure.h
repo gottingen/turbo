@@ -100,4 +100,31 @@
 #define TURBO_SIZEOF_MEMBER(struct_, member_) (sizeof(((struct_*)0)->member_))
 #endif
 
+// We are going to use runtime dispatch.
+#ifdef TURBO_PROCESSOR_X86_64
+#ifdef __clang__
+// clang does not have GCC push pop
+// warning: clang attribute push can't be used within a namespace in clang up
+// til 8.0 so TURBO_TARGET_REGION and TURBO_UNTARGET_REGION must be *outside* of a
+// namespace.
+#define TURBO_TARGET_REGION(T)                                                       \
+  _Pragma(TURBO_STRINGIFY(                                                           \
+      clang attribute push(__attribute__((target(T))), apply_to = function)))
+#define TURBO_UNTARGET_REGION _Pragma("clang attribute pop")
+#elif defined(__GNUC__)
+// GCC is easier
+#define TURBO_TARGET_REGION(T)                                                       \
+  _Pragma("GCC push_options") _Pragma(TURBO_STRINGIFY(GCC target(T)))
+#define TURBO_UNTARGET_REGION _Pragma("GCC pop_options")
+#endif // clang then gcc
+
+#endif // x86
+
+// Default target region macros don't do anything.
+#ifndef TURBO_TARGET_REGION
+#define TURBO_TARGET_REGION(T)
+#define TURBO_UNTARGET_REGION
+#endif
+
+
 #endif  // TURBO_PLATFORM_CONFIG_ATTRIBUTE_STRUCTURE_H_

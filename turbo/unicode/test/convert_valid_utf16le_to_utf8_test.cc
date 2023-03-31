@@ -33,7 +33,7 @@ namespace {
 }
 
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 TEST(issue_a73) {
@@ -100,7 +100,7 @@ TEST(issue_a73) {
 }
 #endif
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 TEST(issue_a72) {
@@ -196,7 +196,7 @@ TEST(convert_into_3_or_4_UTF8_bytes) {
   }
 }
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 namespace {

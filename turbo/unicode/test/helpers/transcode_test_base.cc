@@ -15,8 +15,8 @@
 #include "transcode_test_base.h"
 #include "turbo/unicode/utf.h"
 
-#ifndef SIMDUTF_IS_BIG_ENDIAN
-#error "SIMDUTF_IS_BIG_ENDIAN should be defined."
+#ifndef TURBO_IS_BIG_ENDIAN
+#error "TURBO_IS_BIG_ENDIAN should be defined."
 #endif
 
 #include <stdexcept>
@@ -54,7 +54,7 @@ namespace turbo { namespace tests { namespace helpers {
     char16_t W2;
     switch (::turbo::tests::reference::utf16::encode(codepoint, W1, W2)) {
       case 1:
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
         W1 = char16_t((uint16_t(W1)<<8)|(uint16_t(W1)>>8));
 
 #endif
@@ -62,7 +62,7 @@ namespace turbo { namespace tests { namespace helpers {
         break;
 
       case 2:
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
         W1 = char16_t((uint16_t(W1)<<8)|(uint16_t(W1)>>8));
         W2 = char16_t((uint16_t(W2)<<8)|(uint16_t(W2)>>8));
 #endif

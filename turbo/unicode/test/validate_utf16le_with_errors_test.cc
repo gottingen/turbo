@@ -14,8 +14,8 @@
 
 #include "turbo/unicode/utf.h"
 
-#ifndef SIMDUTF_IS_BIG_ENDIAN
-#error "SIMDUTF_IS_BIG_ENDIAN should be defined."
+#ifndef TURBO_IS_BIG_ENDIAN
+#error "TURBO_IS_BIG_ENDIAN should be defined."
 #endif
 
 #include <array>
@@ -101,7 +101,7 @@ TEST(validate_utf16le_with_errors__returns_success_for_empty_string) {
    2) Determine if W1 is between 0xD800 and 0xDBFF. If not, the sequence
       is in error [...]
 */
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word_value) {
@@ -135,7 +135,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word
  3) [..] if W2 is not between 0xDC00 and 0xDFFF, the sequence is in error.
     Terminate.
 */
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_word_value) {
@@ -176,7 +176,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_wor
  3) If there is no W2 (that is, the sequence ends with W1) [...]
     the sequence is in error. Terminate.
 */
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
@@ -198,7 +198,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
 }
 #endif
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le_with_errors__extensive_tests) {

@@ -203,12 +203,15 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 #if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
      __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define TURBO_IS_LITTLE_ENDIAN 1
+    #define TURBO_IS_LITTLE_ENDIAN 1
+    #define TURBO_IS_BIG_ENDIAN 0
 #elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && \
     __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define TURBO_IS_LITTLE_ENDIAN 0
 #define TURBO_IS_BIG_ENDIAN 1
 #elif defined(_WIN32)
 #define TURBO_IS_LITTLE_ENDIAN 1
+#define TURBO_IS_BIG_ENDIAN 0
 #else
 #error "turbo endian detection needs to be set up for your compiler"
 #endif

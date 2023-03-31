@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_WESTMERE_IMPLEMENTATION_H
-#define SIMDUTF_WESTMERE_IMPLEMENTATION_H
+#ifndef TURBO_UNICODE_WESTMERE_IMPLEMENTATION_H_
+#define TURBO_UNICODE_WESTMERE_IMPLEMENTATION_H_
 
-#include "turbo/unicode/simdutf/implementation.h"
+#include "turbo/unicode/implementation.h"
 
-// The constructor may be executed on any host, so we take care not to use SIMDUTF_TARGET_REGION
+// The constructor may be executed on any host, so we take care not to use TURBO_TARGET_REGION
 namespace turbo {
 namespace westmere {
 
@@ -86,4 +86,4 @@ public:
 } // namespace westmere
 } // namespace turbo
 
-#endif // SIMDUTF_WESTMERE_IMPLEMENTATION_H
+#endif // TURBO_UNICODE_WESTMERE_IMPLEMENTATION_H_

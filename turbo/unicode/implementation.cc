@@ -35,12 +35,12 @@ std::string toBinaryString(T b) {
 
 // Implementations
 // The best choice should always come first!
-#include "simdutf/arm64.h"
-#include "simdutf/icelake.h"
-#include "simdutf/haswell.h"
-#include "simdutf/westmere.h"
-#include "simdutf/ppc64.h"
-#include "simdutf/fallback.h" // have it always last.
+#include "turbo/unicode/arm64.h"
+#include "turbo/unicode/icelake.h"
+#include "turbo/unicode/haswell.h"
+#include "turbo/unicode/westmere.h"
+#include "turbo/unicode/ppc64.h"
+#include "turbo/unicode/fallback.h" // have it always last.
 
 namespace turbo {
 bool implementation::supported_by_runtime_system() const {
@@ -594,7 +594,7 @@ const implementation *available_implementation_list::detect_best_supported() con
 }
 
 const implementation *detect_best_supported_implementation_on_first_use::set_best() const noexcept {
-  char *force_implementation_name = getenv("SIMDUTF_FORCE_IMPLEMENTATION");
+  char *force_implementation_name = getenv("TURBO_UNICODE_FORCE_IMPLEMENTATION");
   if (force_implementation_name) {
     auto force_implementation = get_available_implementations()[force_implementation_name];
     if (force_implementation) {
@@ -612,7 +612,7 @@ const implementation *detect_best_supported_implementation_on_first_use::set_bes
 
 
 /**
- * The list of available implementations compiled into simdutf.
+ * The list of available implementations compiled into unicode.
  */
 TURBO_DLL const internal::available_implementation_list& get_available_implementations() {
   static const internal::available_implementation_list available_implementations{};
@@ -641,7 +641,7 @@ TURBO_MUST_USE_RESULT result validate_ascii_with_errors(const char *buf, size_t 
   return get_active_implementation()->validate_ascii_with_errors(buf, len);
 }
 TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_output) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf8_to_utf16be(input, length, utf16_output);
   #else
   return convert_utf8_to_utf16le(input, length, utf16_output);
@@ -654,7 +654,7 @@ TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16be(const char * input, size_t 
   return get_active_implementation()->convert_utf8_to_utf16be(input, length, utf16_output);
 }
 TURBO_MUST_USE_RESULT result convert_utf8_to_utf16_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf8_to_utf16be_with_errors(input, length, utf16_output);
   #else
   return convert_utf8_to_utf16le_with_errors(input, length, utf16_output);
@@ -673,7 +673,7 @@ TURBO_MUST_USE_RESULT result convert_utf8_to_utf32_with_errors(const char * inpu
   return get_active_implementation()->convert_utf8_to_utf32_with_errors(input, length, utf32_output);
 }
 TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t * buf, size_t len) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return validate_utf16be(buf, len);
   #else
   return validate_utf16le(buf, len);
@@ -686,7 +686,7 @@ TURBO_MUST_USE_RESULT bool validate_utf16be(const char16_t * buf, size_t len) no
   return get_active_implementation()->validate_utf16be(buf, len);
 }
 TURBO_MUST_USE_RESULT result validate_utf16_with_errors(const char16_t * buf, size_t len) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return validate_utf16be_with_errors(buf, len);
   #else
   return validate_utf16le_with_errors(buf, len);
@@ -705,7 +705,7 @@ TURBO_MUST_USE_RESULT result validate_utf32_with_errors(const char32_t * buf, si
   return get_active_implementation()->validate_utf32_with_errors(buf, len);
 }
 TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_valid_utf8_to_utf16be(input, length, utf16_buffer);
   #else
   return convert_valid_utf8_to_utf16le(input, length, utf16_buffer);
@@ -721,7 +721,7 @@ TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf32(const char * input, siz
   return get_active_implementation()->convert_valid_utf8_to_utf32(input, length, utf32_buffer);
 }
 TURBO_MUST_USE_RESULT size_t convert_utf16_to_utf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf16be_to_utf8(buf, len, utf8_buffer);
   #else
   return convert_utf16le_to_utf8(buf, len, utf8_buffer);
@@ -734,7 +734,7 @@ TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf8(const char16_t * buf, size_
   return get_active_implementation()->convert_utf16be_to_utf8(buf, len, utf8_buffer);
 }
 TURBO_MUST_USE_RESULT result convert_utf16_to_utf8_with_errors(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf16be_to_utf8_with_errors(buf, len, utf8_buffer);
   #else
   return convert_utf16le_to_utf8_with_errors(buf, len, utf8_buffer);
@@ -769,7 +769,7 @@ TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf8(const char32_t * buf, s
   return get_active_implementation()->convert_valid_utf32_to_utf8(buf, len, utf8_buffer);
 }
 TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf32_to_utf16be(buf, len, utf16_buffer);
   #else
   return convert_utf32_to_utf16le(buf, len, utf16_buffer);
@@ -782,7 +782,7 @@ TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16be(const char32_t * buf, size
   return get_active_implementation()->convert_utf32_to_utf16be(buf, len, utf16_buffer);
 }
 TURBO_MUST_USE_RESULT result convert_utf32_to_utf16_with_errors(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf32_to_utf16be_with_errors(buf, len, utf16_buffer);
   #else
   return convert_utf32_to_utf16le_with_errors(buf, len, utf16_buffer);
@@ -795,7 +795,7 @@ TURBO_MUST_USE_RESULT result convert_utf32_to_utf16be_with_errors(const char32_t
   return get_active_implementation()->convert_utf32_to_utf16be_with_errors(buf, len, utf16_buffer);
 }
 TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_valid_utf32_to_utf16be(buf, len, utf16_buffer);
   #else
   return convert_valid_utf32_to_utf16le(buf, len, utf16_buffer);
@@ -808,7 +808,7 @@ TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16be(const char32_t * buf
   return get_active_implementation()->convert_valid_utf32_to_utf16be(buf, len, utf16_buffer);
 }
 TURBO_MUST_USE_RESULT size_t convert_utf16_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf16be_to_utf32(buf, len, utf32_buffer);
   #else
   return convert_utf16le_to_utf32(buf, len, utf32_buffer);
@@ -821,7 +821,7 @@ TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf32(const char16_t * buf, size
   return get_active_implementation()->convert_utf16be_to_utf32(buf, len, utf32_buffer);
 }
 TURBO_MUST_USE_RESULT result convert_utf16_to_utf32_with_errors(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_utf16be_to_utf32_with_errors(buf, len, utf32_buffer);
   #else
   return convert_utf16le_to_utf32_with_errors(buf, len, utf32_buffer);
@@ -834,7 +834,7 @@ TURBO_MUST_USE_RESULT result convert_utf16be_to_utf32_with_errors(const char16_t
   return get_active_implementation()->convert_utf16be_to_utf32_with_errors(buf, len, utf32_buffer);
 }
 TURBO_MUST_USE_RESULT size_t convert_valid_utf16_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return convert_valid_utf16be_to_utf32(buf, len, utf32_buffer);
   #else
   return convert_valid_utf16le_to_utf32(buf, len, utf32_buffer);
@@ -850,7 +850,7 @@ void change_endianness_utf16(const char16_t * input, size_t length, char16_t * o
   get_active_implementation()->change_endianness_utf16(input, length, output);
 }
 TURBO_MUST_USE_RESULT size_t count_utf16(const char16_t * input, size_t length) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return count_utf16be(input, length);
   #else
   return count_utf16le(input, length);
@@ -866,7 +866,7 @@ TURBO_MUST_USE_RESULT size_t count_utf8(const char * input, size_t length) noexc
   return get_active_implementation()->count_utf8(input, length);
 }
 TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16(const char16_t * input, size_t length) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return utf8_length_from_utf16be(input, length);
   #else
   return utf8_length_from_utf16le(input, length);
@@ -879,7 +879,7 @@ TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16be(const char16_t * input, si
   return get_active_implementation()->utf8_length_from_utf16be(input, length);
 }
 TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16(const char16_t * input, size_t length) noexcept {
-  #if SIMDUTF_IS_BIG_ENDIAN
+  #if TURBO_IS_BIG_ENDIAN
   return utf32_length_from_utf16be(input, length);
   #else
   return utf32_length_from_utf16le(input, length);
@@ -911,7 +911,7 @@ TURBO_MUST_USE_RESULT int detect_encodings(const char * buf, size_t length) noex
 }
 
 const implementation * builtin_implementation() {
-  static const implementation * builtin_impl = get_available_implementations()[SIMDUTF_STRINGIFY(SIMDUTF_BUILTIN_IMPLEMENTATION)];
+  static const implementation * builtin_impl = get_available_implementations()[TURBO_STRINGIFY(TURBO_UNICODE_BUILTIN_IMPLEMENTATION)];
   return builtin_impl;
 }
 

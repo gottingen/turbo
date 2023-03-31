@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ARM64_INTRINSICS_H
-#define SIMDUTF_ARM64_INTRINSICS_H
+#ifndef TURBO_UNICODE_ARM64_INTRINSICS_H_
+#define TURBO_UNICODE_ARM64_INTRINSICS_H_
 
 #include "turbo/unicode/utf.h"
 
@@ -21,4 +21,4 @@
 // you use visual studio or other compilers.
 #include <arm_neon.h>
 
-#endif //  SIMDUTF_ARM64_INTRINSICS_H
+#endif //  TURBO_UNICODE_ARM64_INTRINSICS_H_

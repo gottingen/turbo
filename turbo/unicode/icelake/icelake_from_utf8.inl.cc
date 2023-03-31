@@ -29,9 +29,9 @@ utf8_to_utf16_result fast_avx512_convert_utf8_to_utf16(const char *in, size_t le
   bool result = true;
   while (result) {
     if (in + 64 <= final_in) {
-        result = process_block_utf8_to_utf16<SIMDUTF_FULL, big_endian>(in, out, final_in - in);
+        result = process_block_utf8_to_utf16<TURBO_UNICODE_FULL, big_endian>(in, out, final_in - in);
     } else if(in < final_in) {
-        result = process_block_utf8_to_utf16<SIMDUTF_TAIL, big_endian>(in, out, final_in - in);
+        result = process_block_utf8_to_utf16<TURBO_UNICODE_TAIL, big_endian>(in, out, final_in - in);
     } else { break; }
   }
   if(!result) { out = nullptr; }
@@ -46,9 +46,9 @@ turbo::result fast_avx512_convert_utf8_to_utf16_with_errors(const char *in, size
   bool  result = true;
   while (result) {
     if (in + 64 <= final_in) {
-        result = process_block_utf8_to_utf16<SIMDUTF_FULL, big_endian>(in, out, final_in - in);
+        result = process_block_utf8_to_utf16<TURBO_UNICODE_FULL, big_endian>(in, out, final_in - in);
     } else if(in < final_in) {
-        result = process_block_utf8_to_utf16<SIMDUTF_TAIL, big_endian>(in, out, final_in - in);
+        result = process_block_utf8_to_utf16<TURBO_UNICODE_TAIL, big_endian>(in, out, final_in - in);
     } else { break; }
   }
   if(!result) {
@@ -93,7 +93,7 @@ std::pair<const char*, OUTPUT*> validating_utf8_to_fixed_length(const char* str,
     while (ptr + 64 + 64 <= end) {
         const __m512i utf8 = _mm512_loadu_si512((const __m512i*)ptr);
         if(checker.check_next_input(utf8)) {
-            SIMDUTF_ICELAKE_STORE_ASCII(UTF32, utf8, output)
+            TURBO_UNICODE_ICELAKE_STORE_ASCII(UTF32, utf8, output)
             output += 64;
             ptr += 64;
             continue;
@@ -109,12 +109,12 @@ std::pair<const char*, OUTPUT*> validating_utf8_to_fixed_length(const char* str,
             vec0 = _mm512_mask_expand_epi32(vec0, __mmask16(((1<<valid_count1)-1)<<valid_count0), vec1);
             valid_count0 += valid_count1;
             vec0 = expand_utf8_to_utf32(vec0);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
         } else {
             vec0 = expand_utf8_to_utf32(vec0);
             vec1 = expand_utf8_to_utf32(vec1);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, false)
         }
         const __m512i lane3 = broadcast_epi128<3>(utf8);
         int valid_count2;
@@ -128,12 +128,12 @@ std::pair<const char*, OUTPUT*> validating_utf8_to_fixed_length(const char* str,
             vec2 = _mm512_mask_expand_epi32(vec2, __mmask16(((1<<valid_count3)-1)<<valid_count2), vec3);
             valid_count2 += valid_count3;
             vec2 = expand_utf8_to_utf32(vec2);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
         } else {
             vec2 = expand_utf8_to_utf32(vec2);
             vec3 = expand_utf8_to_utf32(vec3);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec3, valid_count3, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec3, valid_count3, false)
         }
         ptr += 4*16;
     }
@@ -144,7 +144,7 @@ std::pair<const char*, OUTPUT*> validating_utf8_to_fixed_length(const char* str,
     if (ptr + 64 <= end) {
         const __m512i utf8 = _mm512_loadu_si512((const __m512i*)ptr);
         if(checker.check_next_input(utf8)) {
-            SIMDUTF_ICELAKE_STORE_ASCII(UTF32, utf8, output)
+            TURBO_UNICODE_ICELAKE_STORE_ASCII(UTF32, utf8, output)
             output += 64;
             ptr += 64;
         } else {
@@ -159,16 +159,16 @@ std::pair<const char*, OUTPUT*> validating_utf8_to_fixed_length(const char* str,
                 vec0 = _mm512_mask_expand_epi32(vec0, __mmask16(((1<<valid_count1)-1)<<valid_count0), vec1);
                 valid_count0 += valid_count1;
                 vec0 = expand_utf8_to_utf32(vec0);
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
+                TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
             } else {
                 vec0 = expand_utf8_to_utf32(vec0);
                 vec1 = expand_utf8_to_utf32(vec1);
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, true)
+                TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
+                TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, true)
             }
 
             const __m512i lane3 = broadcast_epi128<3>(utf8);
-            SIMDUTF_ICELAKE_TRANSCODE16(lane2, lane3, true)
+            TURBO_UNICODE_ICELAKE_TRANSCODE16(lane2, lane3, true)
 
             ptr += 3*16;
         }
@@ -216,7 +216,7 @@ std::tuple<const char*, OUTPUT*, bool> validating_utf8_to_fixed_length_with_cons
     while (ptr + 64 + 64 <= end) {
         const __m512i utf8 = _mm512_loadu_si512((const __m512i*)ptr);
         if(checker.check_next_input(utf8)) {
-            SIMDUTF_ICELAKE_STORE_ASCII(UTF32, utf8, output)
+            TURBO_UNICODE_ICELAKE_STORE_ASCII(UTF32, utf8, output)
             output += 64;
             ptr += 64;
             continue;
@@ -235,12 +235,12 @@ std::tuple<const char*, OUTPUT*, bool> validating_utf8_to_fixed_length_with_cons
             vec0 = _mm512_mask_expand_epi32(vec0, __mmask16(((1<<valid_count1)-1)<<valid_count0), vec1);
             valid_count0 += valid_count1;
             vec0 = expand_utf8_to_utf32(vec0);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
         } else {
             vec0 = expand_utf8_to_utf32(vec0);
             vec1 = expand_utf8_to_utf32(vec1);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, false)
         }
         const __m512i lane3 = broadcast_epi128<3>(utf8);
         int valid_count2;
@@ -254,12 +254,12 @@ std::tuple<const char*, OUTPUT*, bool> validating_utf8_to_fixed_length_with_cons
             vec2 = _mm512_mask_expand_epi32(vec2, __mmask16(((1<<valid_count3)-1)<<valid_count2), vec3);
             valid_count2 += valid_count3;
             vec2 = expand_utf8_to_utf32(vec2);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
         } else {
             vec2 = expand_utf8_to_utf32(vec2);
             vec3 = expand_utf8_to_utf32(vec3);
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
-            SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec3, valid_count3, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec2, valid_count2, false)
+            TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec3, valid_count3, false)
         }
         ptr += 4*16;
     }
@@ -270,7 +270,7 @@ std::tuple<const char*, OUTPUT*, bool> validating_utf8_to_fixed_length_with_cons
     if (ptr + 64 <= end) {
         const __m512i utf8 = _mm512_loadu_si512((const __m512i*)ptr);
         if(checker.check_next_input(utf8)) {
-            SIMDUTF_ICELAKE_STORE_ASCII(UTF32, utf8, output)
+            TURBO_UNICODE_ICELAKE_STORE_ASCII(UTF32, utf8, output)
             output += 64;
             ptr += 64;
         } else if(checker.errors()) {
@@ -287,16 +287,16 @@ std::tuple<const char*, OUTPUT*, bool> validating_utf8_to_fixed_length_with_cons
                 vec0 = _mm512_mask_expand_epi32(vec0, __mmask16(((1<<valid_count1)-1)<<valid_count0), vec1);
                 valid_count0 += valid_count1;
                 vec0 = expand_utf8_to_utf32(vec0);
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
+                TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
             } else {
                 vec0 = expand_utf8_to_utf32(vec0);
                 vec1 = expand_utf8_to_utf32(vec1);
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
-                SIMDUTF_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, true)
+                TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec0, valid_count0, true)
+                TURBO_UNICODE_ICELAKE_WRITE_UTF16_OR_UTF32(vec1, valid_count1, true)
             }
 
             const __m512i lane3 = broadcast_epi128<3>(utf8);
-            SIMDUTF_ICELAKE_TRANSCODE16(lane2, lane3, true)
+            TURBO_UNICODE_ICELAKE_TRANSCODE16(lane2, lane3, true)
 
             ptr += 3*16;
         }

@@ -45,7 +45,7 @@ size_t convert_masked_utf8_to_utf32(const char *input,
   if((utf8_end_of_code_point_mask & 0xffff) == 0xaaaa) {
     // We want to take 8 2-byte UTF-8 words and turn them into 8 4-byte UTF-32 words.
     // There is probably a more efficient sequence, but the following might do.
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
     const uint8x16_t sh = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
 #else
     //const uint8x16_t sh = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -63,7 +63,7 @@ size_t convert_masked_utf8_to_utf32(const char *input,
   if(input_utf8_end_of_code_point_mask == 0x924) {
     // We want to take 4 3-byte UTF-8 words and turn them into 4 4-byte UTF-32 words.
     // There is probably a more efficient sequence, but the following might do.
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
     const uint8x16_t sh = make_uint8x16_t(2, 1, 0, 255, 5, 4, 3, 255, 8, 7, 6, 255, 11, 10, 9, 255);
 #else
     const uint8x16_t sh = {2, 1, 0, 255, 5, 4, 3, 255, 8, 7, 6, 255, 11, 10, 9, 255};

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_UTF32_H
-#define SIMDUTF_UTF32_H
+#ifndef TURBO_UNICODE_SCALAR_UTF32_H_
+#define TURBO_UNICODE_SCALAR_UTF32_H_
 
 namespace turbo {
 namespace scalar {
@@ -82,4 +82,4 @@ inline size_t utf16_length_from_utf32(const char32_t* buf, size_t len) {
 } // namespace scalar
 } // namespace turbo
 
-#endif
+#endif  // TURBO_UNICODE_SCALAR_UTF32_H_

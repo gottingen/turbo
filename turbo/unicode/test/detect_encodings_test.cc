@@ -110,7 +110,7 @@ TEST(pure_utf32_ASCII) {
   }
 }
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(no_utf8_bytes_no_surrogates) {
@@ -189,7 +189,7 @@ TEST(utf_16_surrogates) {
   }
 }
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(utf32_surrogates) {
@@ -219,7 +219,7 @@ TEST(utf32_surrogates) {
 #endif
 
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(edge_surrogate) {

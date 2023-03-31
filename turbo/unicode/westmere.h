@@ -12,34 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_WESTMERE_H
-#define SIMDUTF_WESTMERE_H
+#ifndef TURBO_UNICODE_WESTMERE_H_
+#define TURBO_UNICODE_WESTMERE_H_
 
-#ifdef SIMDUTF_FALLBACK_H
+#ifdef TURBO_UNICODE_FALLBACK_H_
 #error "westmere.h must be included before fallback.h"
 #endif
 
-#include "turbo/unicode/simdutf/portability.h"
+#include "turbo/unicode/internal/config.h"
 
 // Default Westmere to on if this is x86-64, unless we'll always select Haswell.
 #ifndef TURBO_UNICODE_IMPLEMENTATION_WESTMERE
 //
-// You do not want to set it to (SIMDUTF_IS_X86_64 && !SIMDUTF_REQUIRES_HASWELL)
+// You do not want to set it to (TURBO_PROCESSOR_X86_64 && !TURBO_UNICODE_REQUIRES_HASWELL)
 // because you want to rely on runtime dispatch!
 //
-#if SIMDUTF_CAN_ALWAYS_RUN_ICELAKE || SIMDUTF_CAN_ALWAYS_RUN_HASWELL
+#if TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE || TURBO_UNICODE_CAN_ALWAYS_RUN_HASWELL
 #define TURBO_UNICODE_IMPLEMENTATION_WESTMERE 0
+#elif defined(TURBO_PROCESSOR_X86_64)
+#define TURBO_UNICODE_IMPLEMENTATION_WESTMERE 1
 #else
-#define TURBO_UNICODE_IMPLEMENTATION_WESTMERE (SIMDUTF_IS_X86_64)
+#define TURBO_UNICODE_IMPLEMENTATION_WESTMERE 0
 #endif
 
 #endif
 
-#define SIMDUTF_CAN_ALWAYS_RUN_WESTMERE (TURBO_UNICODE_IMPLEMENTATION_WESTMERE && SIMDUTF_IS_X86_64 && __SSE4_2__ && __PCLMUL__)
+#if  TURBO_UNICODE_IMPLEMENTATION_WESTMERE && defined(TURBO_PROCESSOR_X86_64) && defined(__SSE4_2__) && defined(__PCLMUL__)
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_WESTMERE 1
+#else
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_WESTMERE 0
+#endif
 
 #if TURBO_UNICODE_IMPLEMENTATION_WESTMERE
 
-#define SIMDUTF_TARGET_WESTMERE SIMDUTF_TARGET_REGION("sse4.2,pclmul")
+#define TURBO_UNICODE_TARGET_WESTMERE TURBO_TARGET_REGION("sse4.2,pclmul")
 
 namespace turbo {
 /**
@@ -50,7 +56,7 @@ namespace westmere {
 } // namespace turbo
 
 //
-// These two need to be included outside SIMDUTF_TARGET_REGION
+// These two need to be included outside TURBO_TARGET_REGION
 //
 #include "turbo/unicode/westmere/implementation.h"
 #include "turbo/unicode/westmere/intrinsics.h"
@@ -67,4 +73,5 @@ namespace westmere {
 #include "turbo/unicode/westmere/end.h"
 
 #endif // TURBO_UNICODE_IMPLEMENTATION_WESTMERE
-#endif // SIMDUTF_WESTMERE_COMMON_H
+
+#endif // TURBO_UNICODE_WESTMERE_H_

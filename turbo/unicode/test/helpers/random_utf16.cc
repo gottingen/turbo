@@ -48,10 +48,10 @@ namespace helpers {
           break;
       }
     }
-#ifndef SIMDUTF_IS_BIG_ENDIAN
-#error "SIMDUTF_IS_BIG_ENDIAN should be defined."
+#ifndef TURBO_IS_BIG_ENDIAN
+#error "TURBO_IS_BIG_ENDIAN should be defined."
 #endif
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
     change_endianness_utf16(result.data(), result.size(), result.data());
 #endif
     return make_pair(result,count);

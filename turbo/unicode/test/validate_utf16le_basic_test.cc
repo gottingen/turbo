@@ -14,8 +14,8 @@
 
 #include "turbo/unicode/utf.h"
 
-#ifndef SIMDUTF_IS_BIG_ENDIAN
-#error "SIMDUTF_IS_BIG_ENDIAN should be defined."
+#ifndef TURBO_IS_BIG_ENDIAN
+#error "TURBO_IS_BIG_ENDIAN should be defined."
 #endif
 
 #include <array>
@@ -30,7 +30,7 @@
 TEST(issue92) {
   char16_t input[] = u"\u5d00\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041\u0041";
   size_t strlen = sizeof(input)/sizeof(char16_t)-1;
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
   std::cout << "Flipping bytes because you have big endian system." << std::endl;
   turbo::change_endianness_utf16(input, strlen, input);
 #endif
@@ -89,7 +89,7 @@ TEST(validate_utf16le__returns_true_for_valid_input__mixed) {
 }
 
 TEST(validate_utf16le__returns_true_for_empty_string) {
-  const char16_t* buf = (char16_t*)"";
+  const char16_t* buf = (const char16_t*)"";
 
   ASSERT_TRUE(implementation.validate_utf16le(buf, 0));
 }
@@ -106,7 +106,7 @@ TEST(validate_utf16le__returns_true_for_empty_string) {
    2) Determine if W1 is between 0xD800 and 0xDBFF. If not, the sequence
       is in error [...]
 */
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le__returns_false_when_input_has_wrong_first_word_value) {
@@ -137,7 +137,7 @@ TEST(validate_utf16le__returns_false_when_input_has_wrong_first_word_value) {
  3) [..] if W2 is not between 0xDC00 and 0xDFFF, the sequence is in error.
     Terminate.
 */
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le__returns_false_when_input_has_wrong_second_word_value) {
@@ -172,7 +172,7 @@ TEST(validate_utf16le__returns_false_when_input_has_wrong_second_word_value) {
  3) If there is no W2 (that is, the sequence ends with W1) [...]
     the sequence is in error. Terminate.
 */
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le__returns_false_when_input_is_truncated) {
@@ -191,7 +191,7 @@ TEST(validate_utf16le__returns_false_when_input_is_truncated) {
 }
 #endif
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 //t odo: port this test for big-endian platforms.
 #else
 TEST(validate_utf16le__extensive_tests) {

@@ -16,7 +16,7 @@
 namespace turbo {
 namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
-#ifndef SIMDUTF_ARM64_H
+#ifndef TURBO_UNICODE_ARM64_H_
 #error "arm64.h must be included"
 #endif
 using namespace simd;

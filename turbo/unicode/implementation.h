@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_UNICODE_IMPLEMENTATION_H
-#define TURBO_UNICODE_IMPLEMENTATION_H
+#ifndef TURBO_UNICODE_IMPLEMENTATION_H_
+#define TURBO_UNICODE_IMPLEMENTATION_H_
 #include <string>
-#if !defined(SIMDUTF_NO_THREADS)
 #include <atomic>
-#endif
 #include <vector>
 #include <tuple>
-#include "turbo/unicode/simdutf/common_defs.h"
+#include "turbo/unicode/internal/config.h"
 #include "turbo/unicode/internal/isadetection.h"
 
 
@@ -1015,7 +1013,7 @@ TURBO_MUST_USE_RESULT size_t count_utf16be(const char16_t * input, size_t length
 TURBO_MUST_USE_RESULT size_t count_utf8(const char * input, size_t length) noexcept;
 
 /**
- * An implementation of simdutf for a particular CPU architecture.
+ * An implementation of unicode for a particular CPU architecture.
  *
  * Also used to maintain the currently active implementation. The active implementation is
  * automatically initialized on first use to the most advanced implementation supported by the host.
@@ -1027,7 +1025,7 @@ public:
    * The name of this implementation.
    *
    *     const implementation *impl = turbo::active_implementation;
-   *     cout << "simdutf is optimized for " << impl->name() << "(" << impl->description() << ")" << endl;
+   *     cout << "unicode is optimized for " << impl->name() << "(" << impl->description() << ")" << endl;
    *
    * @return the name of the implementation, e.g. "haswell", "westmere", "arm64"
    */
@@ -1037,7 +1035,7 @@ public:
    * The description of this implementation.
    *
    *     const implementation *impl = turbo::active_implementation;
-   *     cout << "simdutf is optimized for " << impl->name() << "(" << impl->description() << ")" << endl;
+   *     cout << "unicode is optimized for " << impl->name() << "(" << impl->description() << ")" << endl;
    *
    * @return the name of the implementation, e.g. "haswell", "westmere", "arm64"
    */
@@ -1823,11 +1821,11 @@ private:
 namespace internal {
 
 /**
- * The list of available implementations compiled into simdutf.
+ * The list of available implementations compiled into unicode.
  */
 class available_implementation_list {
 public:
-  /** Get the list of available implementations compiled into simdutf */
+  /** Get the list of available implementations compiled into unicode */
   TURBO_FORCE_INLINE available_implementation_list() {}
   /** Number of implementations */
   size_t size() const noexcept;
@@ -1876,17 +1874,6 @@ class atomic_ptr {
 public:
   atomic_ptr(T *_ptr) : ptr{_ptr} {}
 
-#if defined(SIMDUTF_NO_THREADS)
-  operator const T*() const { return ptr; }
-  const T& operator*() const { return *ptr; }
-  const T* operator->() const { return ptr; }
-
-  operator T*() { return ptr; }
-  T& operator*() { return *ptr; }
-  T* operator->() { return ptr; }
-  atomic_ptr& operator=(T *_ptr) { ptr = _ptr; return *this; }
-
-#else
   operator const T*() const { return ptr.load(); }
   const T& operator*() const { return *ptr; }
   const T* operator->() const { return ptr.load(); }
@@ -1896,14 +1883,9 @@ public:
   T* operator->() { return ptr.load(); }
   atomic_ptr& operator=(T *_ptr) { ptr = _ptr; return *this; }
 
-#endif
 
 private:
-#if defined(SIMDUTF_NO_THREADS)
-  T* ptr;
-#else
   std::atomic<T*> ptr;
-#endif
 };
 
 class detect_best_supported_implementation_on_first_use;
@@ -1911,7 +1893,7 @@ class detect_best_supported_implementation_on_first_use;
 } // namespace internal
 
 /**
- * The list of available implementations compiled into simdutf.
+ * The list of available implementations compiled into unicode.
  */
 extern TURBO_DLL const internal::available_implementation_list& get_available_implementations();
 
@@ -1925,4 +1907,4 @@ extern TURBO_DLL internal::atomic_ptr<const implementation>& get_active_implemen
 
 } // namespace turbo
 
-#endif // TURBO_UNICODE_IMPLEMENTATION_H
+#endif // TURBO_UNICODE_IMPLEMENTATION_H_

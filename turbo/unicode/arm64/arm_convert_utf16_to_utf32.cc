@@ -75,7 +75,7 @@ std::pair<const char16_t*, char32_t*> arm_convert_utf16_to_utf32(const char16_t*
   while (buf + 16 <= end) {
     uint16x8_t in = vld1q_u16(reinterpret_cast<const uint16_t *>(buf));
     if (!match_system(big_endian)) {
-      #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+      #ifdef _MSC_VER
       const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
       #else
       const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -140,7 +140,7 @@ std::pair<result, char32_t*> arm_convert_utf16_to_utf32_with_errors(const char16
   while (buf + 16 <= end) {
     uint16x8_t in = vld1q_u16(reinterpret_cast<const uint16_t *>(buf));
     if (!match_system(big_endian)) {
-      #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+      #ifdef _MSC_VER
       const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
       #else
       const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};

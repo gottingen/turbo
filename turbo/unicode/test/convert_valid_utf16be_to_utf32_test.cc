@@ -74,7 +74,7 @@ TEST(convert_with_surrogate_pairs) {
   }
 }
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 namespace {

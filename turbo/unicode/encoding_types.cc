@@ -14,7 +14,7 @@
 
 namespace turbo {
 bool match_system(endianness e) {
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
     return e == endianness::BIG;
 #else
     return e == endianness::LITTLE;

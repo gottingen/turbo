@@ -12,20 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_PPC64_H
-#define SIMDUTF_PPC64_H
+#ifndef TURBO_UNICODE_PPC64_H_
+#define TURBO_UNICODE_PPC64_H_
 
-#ifdef SIMDUTF_FALLBACK_H
+#ifdef TURBO_UNICODE_FALLBACK_H_
 #error "ppc64.h must be included before fallback.h"
 #endif
 
-#include "turbo/unicode/simdutf/portability.h"
+#include "turbo/unicode/internal/config.h"
 
-#ifndef TURBO_UNICODE_IMPLEMENTATION_PPC64
-#define TURBO_UNICODE_IMPLEMENTATION_PPC64 (SIMDUTF_IS_PPC64)
+#if !defined(TURBO_UNICODE_IMPLEMENTATION_PPC64) && defined(TURBO_PROCESSOR_POWERPC)
+#define TURBO_UNICODE_IMPLEMENTATION_PPC64 1
+#else
+#define TURBO_UNICODE_IMPLEMENTATION_PPC64 0
 #endif
-#define SIMDUTF_CAN_ALWAYS_RUN_PPC64 TURBO_UNICODE_IMPLEMENTATION_PPC64 && SIMDUTF_IS_PPC64
 
+#if defined(TURBO_PROCESSOR_POWERPC)
+#define TURBO_CAN_ALWAYS_RUN_PPC64 TURBO_UNICODE_IMPLEMENTATION_PPC64
+#else
+#define TURBO_CAN_ALWAYS_RUN_PPC64 0
+#endif
 
 #include "turbo/unicode/internal/isadetection.h"
 
@@ -39,17 +45,17 @@ namespace ppc64 {
 } // namespace ppc64
 } // namespace turbo
 
-#include "simdutf/ppc64/implementation.h"
+#include "turbo/unicode/ppc64/implementation.h"
 
-#include "simdutf/ppc64/begin.h"
+#include "turbo/unicode/ppc64/begin.h"
 
 // Declarations
-#include "simdutf/ppc64/intrinsics.h"
-#include "simdutf/ppc64/bitmanipulation.h"
-#include "simdutf/ppc64/simd.h"
+#include "turbo/unicode/ppc64/intrinsics.h"
+#include "turbo/unicode/ppc64/bitmanipulation.h"
+#include "turbo/unicode/ppc64/simd.h"
 
-#include "simdutf/ppc64/end.h"
+#include "turbo/unicode/ppc64/end.h"
 
 #endif // TURBO_UNICODE_IMPLEMENTATION_PPC64
 
-#endif // SIMDUTF_PPC64_H
+#endif // TURBO_UNICODE_PPC64_H_

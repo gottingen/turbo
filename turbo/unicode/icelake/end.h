@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if SIMDUTF_CAN_ALWAYS_RUN_ICELAKE
+#if TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE
 // nothing needed.
 #else
-SIMDUTF_UNTARGET_REGION
+TURBO_UNTARGET_REGION
 #endif
 
 #undef TURBO_UNICODE_IMPLEMENTATION
 
-#if SIMDUTF_GCC11ORMORE // workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105593
-SIMDUTF_POP_DISABLE_WARNINGS
-#endif // end of workaround

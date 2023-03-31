@@ -481,7 +481,7 @@ static_assert(sizeof(cordz_info_t) >= sizeof(intptr_t), "");
 // a little endian value where the first byte in the host's representation
 // holds 'value`, with all other bytes being 0.
 static constexpr cordz_info_t LittleEndianByte(unsigned char value) {
-#if defined(TURBO_IS_BIG_ENDIAN)
+#if TURBO_IS_BIG_ENDIAN
   return static_cast<cordz_info_t>(value) << ((sizeof(cordz_info_t) - 1) * 8);
 #else
   return value;

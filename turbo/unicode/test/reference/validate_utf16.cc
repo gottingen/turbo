@@ -14,8 +14,8 @@
 
 #include "validate_utf16.h"
 
-#ifndef SIMDUTF_IS_BIG_ENDIAN
-#error "SIMDUTF_IS_BIG_ENDIAN should be defined."
+#ifndef TURBO_IS_BIG_ENDIAN
+#error "TURBO_IS_BIG_ENDIAN should be defined."
 #endif
 
 namespace turbo {
@@ -27,7 +27,7 @@ TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexc
   const char16_t* end = buf + len;
 
   while (curr != end) {
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
       // By convention, we always take as an input an UTF-16LE.
       const uint16_t W1 = uint16_t((uint16_t(*curr) << 8) | (uint16_t(*curr) >> 8));
 #else
@@ -47,7 +47,7 @@ TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexc
       if (curr == end) { // required the next word, but we're already at the end of data
         return false;
       }
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
       // By convention, we always take as an input an UTF-16LE.
       const uint16_t W2 = uint16_t((uint16_t(*curr) << 8) | (uint16_t(*curr) >> 8));
 #else

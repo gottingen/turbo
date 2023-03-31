@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef TURBO_UNICODE_ERROR_H_
+#define TURBO_UNICODE_ERROR_H_
 namespace turbo {
 
 enum error_code {
@@ -30,6 +30,7 @@ enum error_code {
   OTHER         // Not related to validation/transcoding.
 };
 
+
 struct result {
   error_code error;
   size_t count;     // In case of error, indicates the position of the error. In case of success, indicates the number of words validated/written.
@@ -40,4 +41,4 @@ struct result {
 };
 
 }
-#endif
+#endif  // TURBO_UNICODE_ERROR_H_

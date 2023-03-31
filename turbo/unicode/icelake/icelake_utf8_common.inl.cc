@@ -13,15 +13,15 @@
 // limitations under the License.
 
 // Common procedures for both validating and non-validating conversions from UTF-8.
-enum block_processing_mode { SIMDUTF_FULL, SIMDUTF_TAIL};
+enum block_processing_mode { TURBO_UNICODE_FULL, TURBO_UNICODE_TAIL};
 
 using utf8_to_utf16_result = std::pair<const char*, char16_t*>;
 using utf8_to_utf32_result = std::pair<const char*, uint32_t*>;
 
 /*
     process_block_utf8_to_utf16 converts up to 64 bytes from 'in' from UTF-8
-    to UTF-16. When tail = SIMDUTF_FULL, then the full input buffer (64 bytes)
-    might be used. When tail = SIMDUTF_TAIL, we take into account 'gap' which
+    to UTF-16. When tail = TURBO_UNICODE_FULL, then the full input buffer (64 bytes)
+    might be used. When tail = TURBO_UNICODE_TAIL, we take into account 'gap' which
     indicates how many input bytes are relevant.
 
     Returns true when the result is correct, otherwise it returns false.
@@ -52,12 +52,12 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
             0x0e0f0c0d0a0b0809
         );
   // Note that 'tail' is a compile-time constant !
-  __mmask64 b = (tail == SIMDUTF_FULL) ? 0xFFFFFFFFFFFFFFFF : (uint64_t(1) << gap) - 1;
-  __m512i input = (tail == SIMDUTF_FULL) ? _mm512_loadu_si512(in) : _mm512_maskz_loadu_epi8(b, in);
-  __mmask64 m1 = (tail == SIMDUTF_FULL) ? _mm512_cmplt_epu8_mask(input, mask_80808080) : _mm512_mask_cmplt_epu8_mask(b, input, mask_80808080);
+  __mmask64 b = (tail == TURBO_UNICODE_FULL) ? 0xFFFFFFFFFFFFFFFF : (uint64_t(1) << gap) - 1;
+  __m512i input = (tail == TURBO_UNICODE_FULL) ? _mm512_loadu_si512(in) : _mm512_maskz_loadu_epi8(b, in);
+  __mmask64 m1 = (tail == TURBO_UNICODE_FULL) ? _mm512_cmplt_epu8_mask(input, mask_80808080) : _mm512_mask_cmplt_epu8_mask(b, input, mask_80808080);
   if(_ktestc_mask64_u8(m1, b)) {// NOT(m1) AND b -- if all zeroes, then all ASCII
   // alternatively, we could do 'if (m1 == b) { '
-    if (tail == SIMDUTF_FULL) {
+    if (tail == TURBO_UNICODE_FULL) {
       in += 64;          // consumed 64 bytes
       // we convert a full 64-byte block, writing 128 bytes.
       __m512i input1 = _mm512_cvtepu8_epi16(_mm512_castsi512_si256(input));
@@ -107,7 +107,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
     __mmask64 m4 = _mm512_cmp_epu8_mask(input, mask_f0f0f0f0,
                                         _MM_CMPINT_NLT); // 0xf0 <= zmm0 (4 byte start bytes)
 
-    __mmask64 mask_not_ascii = (tail == SIMDUTF_FULL) ? _knot_mask64(m1) : _kand_mask64(_knot_mask64(m1), b);
+    __mmask64 mask_not_ascii = (tail == TURBO_UNICODE_FULL) ? _knot_mask64(m1) : _kand_mask64(_knot_mask64(m1), b);
 
     __mmask64 mp1 = _kshiftli_mask64(m234, 1);
     __mmask64 mp2 = _kshiftli_mask64(m34, 2);
@@ -119,7 +119,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
       __mmask64 mc = _kor_mask64(mp1, mp2); // expected continuation bytes
       __mmask64 m1234 = _kor_mask64(m1, m234);
       // mismatched continuation bytes:
-      if (tail == SIMDUTF_FULL) {
+      if (tail == TURBO_UNICODE_FULL) {
         __mmask64 xnormcm1234 = _kxnor_mask64(mc, m1234); // XNOR of mc and m1234 should be all zero if they differ
         // the presence of a 1 bit indicates that they overlap.
         // _kortestz_mask64_u8: compute the bitwise OR of 64-bit masksand return 1 if all zeroes.
@@ -130,7 +130,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
       }
       // mend: identifying the last bytes of each sequence to be decoded
       __mmask64 mend = _kshiftri_mask64(m1234, 1);
-      if (tail != SIMDUTF_FULL) {
+      if (tail != TURBO_UNICODE_FULL) {
         mend = _kor_mask64(mend, (uint64_t(1) << (gap - 1)));
       }
 
@@ -162,7 +162,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
       __m512i Wout = _mm512_ternarylogic_epi32(lastbytes, secondlastbytes, thirdlastbytes, 254);
       // the elements of Wout excluding the last element if it happens to be a high surrogate:
 
-      __mmask64 mprocessed = (tail == SIMDUTF_FULL) ? _pdep_u64(0xFFFFFFFF, mend) : _pdep_u64(0xFFFFFFFF, _kand_mask64(mend, b)); // we adjust mend at the end of the output.
+      __mmask64 mprocessed = (tail == TURBO_UNICODE_FULL) ? _pdep_u64(0xFFFFFFFF, mend) : _pdep_u64(0xFFFFFFFF, _kand_mask64(mend, b)); // we adjust mend at the end of the output.
 
 
       // Encodings out of range...
@@ -194,7 +194,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
 
     // mend: identifying the last bytes of each sequence to be decoded
     __mmask64 mend = _kor_mask64(_kshiftri_mask64(_kor_mask64(mp3, m1234), 1), mp3);
-    if (tail != SIMDUTF_FULL) {
+    if (tail != TURBO_UNICODE_FULL) {
       mend = _kor_mask64(mend, __mmask64(uint64_t(1) << (gap - 1)));
     }
     __m512i last_and_third = _mm512_maskz_compress_epi8(mend, mask_identity);
@@ -235,11 +235,11 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
                                          mask_d7c0d7c0); // hi sur: 110110vutsRQPNML, other:  unchanged
     // the elements of Wout excluding the last element if it happens to be a high surrogate:
     __mmask32 Mout = ~(Mhi & 0x80000000);
-    __mmask64 mprocessed = (tail == SIMDUTF_FULL) ? _pdep_u64(Mout, mend) : _pdep_u64(Mout, _kand_mask64(mend, b)); // we adjust mend at the end of the output.
+    __mmask64 mprocessed = (tail == TURBO_UNICODE_FULL) ? _pdep_u64(Mout, mend) : _pdep_u64(Mout, _kand_mask64(mend, b)); // we adjust mend at the end of the output.
 
 
     // mismatched continuation bytes:
-    if (tail == SIMDUTF_FULL) {
+    if (tail == TURBO_UNICODE_FULL) {
       __mmask64 xnormcm1234 = _kxnor_mask64(mc, m1234); // XNOR of mc and m1234 should be all zero if they differ
       // the presence of a 1 bit indicates that they overlap.
       // _kortestz_mask64_u8: compute the bitwise OR of 64-bit masksand return 1 if all zeroes.
@@ -271,12 +271,12 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
     return true; // ok
   }
   // Fast path 2: all ASCII or 2 byte
-  __mmask64 continuation_or_ascii = (tail == SIMDUTF_FULL) ? _knot_mask64(m234) : _kand_mask64(_knot_mask64(m234), b);
+  __mmask64 continuation_or_ascii = (tail == TURBO_UNICODE_FULL) ? _knot_mask64(m234) : _kand_mask64(_knot_mask64(m234), b);
   // on top of -0xc0 we substract -2 which we get back later of the
   // continuation byte tags
   __m512i leading2byte = _mm512_maskz_sub_epi8(m234, input, mask_c2c2c2c2);
-  __mmask64 leading = tail == (tail == SIMDUTF_FULL) ? _kor_mask64(m1, m234) : _kand_mask64(_kor_mask64(m1, m234), b); // first bytes of each sequence
-  if (tail == SIMDUTF_FULL) {
+  __mmask64 leading = tail == (tail == TURBO_UNICODE_FULL) ? _kor_mask64(m1, m234) : _kand_mask64(_kor_mask64(m1, m234), b); // first bytes of each sequence
+  if (tail == TURBO_UNICODE_FULL) {
     __mmask64 xnor234leading = _kxnor_mask64(_kshiftli_mask64(m234, 1), leading);
     if (!_kortestz_mask64_u8(xnor234leading, xnor234leading)) { return false; }
   } else {
@@ -284,7 +284,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
     if (_kshiftli_mask64(m234, 1) != bxorleading) { return false; }
   }
   //
-  if (tail == SIMDUTF_FULL) {
+  if (tail == TURBO_UNICODE_FULL) {
     // In the two-byte/ASCII scenario, we are easily latency bound, so we want
     // to increment the input buffer as quickly as possible.
     // We process 32 bytes unless the byte at index 32 is a continuation byte,
@@ -309,7 +309,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
   __m512i final = _mm512_add_epi16(follow, lead);                            // combining lead and follow
 
   if(big_endian) { final = _mm512_shuffle_epi8(final, byteflip); }
-  if (tail == SIMDUTF_FULL) {
+  if (tail == TURBO_UNICODE_FULL) {
     // Next part is UTF-16 specific and can be generalized to UTF-32.
     int nout = _mm_popcnt_u32(uint32_t(leading));
     _mm512_mask_storeu_epi16(out, __mmask32((uint64_t(1) << nout) - 1), final);
@@ -479,12 +479,12 @@ __m512i prev(__m512i input, __m512i previous) {
     static_assert(N<=32, "N must be no larger than 32");
     const __m512i movemask = _mm512_setr_epi32(28,29,30,31,0,1,2,3,4,5,6,7,8,9,10,11);
     const __m512i rotated = _mm512_permutex2var_epi32(input, movemask, previous);
-#if SIMDUTF_GCC8 || SIMDUTF_GCC9
+#if defined(__GNUC__) && (__GNUC__ == 8 || __GNUC__ == 9)
     constexpr int shift = 16-N; // workaround for GCC8,9
     return _mm512_alignr_epi8(input, rotated, shift);
 #else
     return _mm512_alignr_epi8(input, rotated, 16-N);
-#endif // SIMDUTF_GCC8 || SIMDUTF_GCC9
+#endif
 }
 
 template <unsigned idx0, unsigned idx1, unsigned idx2, unsigned idx3>

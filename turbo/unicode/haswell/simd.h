@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_HASWELL_SIMD_H
-#define SIMDUTF_HASWELL_SIMD_H
+#ifndef TURBO_UNICODE_HASWELL_SIMD_H_
+#define TURBO_UNICODE_HASWELL_SIMD_H_
 
 
 namespace turbo {
@@ -414,4 +414,4 @@ namespace simd {
 } // namespace TURBO_UNICODE_IMPLEMENTATION
 } // namespace turbo
 
-#endif // SIMDUTF_HASWELL_SIMD_H
+#endif // TURBO_UNICODE_HASWELL_SIMD_H_

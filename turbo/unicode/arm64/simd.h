@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ARM64_SIMD_H
-#define SIMDUTF_ARM64_SIMD_H
+#ifndef TURBO_UNICODE_ARM64_SIMD_H_
+#define TURBO_UNICODE_ARM64_SIMD_H_
 
 #include "turbo/unicode/utf.h"
 #include "turbo/unicode/arm64/bitmanipulation.h"
@@ -25,7 +25,7 @@ namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace simd {
 
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
 namespace {
 // Start of private section with Visual Studio workaround
 
@@ -145,7 +145,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
 
 // End of private section with Visual Studio workaround
 } // namespace
-#endif // SIMDUTF_REGULAR_VISUAL_STUDIO
+#endif // _MSC_VER
 
 
   template<typename T>
@@ -202,7 +202,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
     // We return uint32_t instead of uint16_t because that seems to be more efficient for most
     // purposes (cutting it down to uint16_t costs performance in some compilers).
     TURBO_FORCE_INLINE uint32_t to_bitmask() const {
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
       const uint8x16_t bit_mask =  make_uint8x16_t(0x01, 0x02, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
                                                    0x01, 0x02, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80);
 #else
@@ -246,7 +246,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
     // Splat constructor
     TURBO_FORCE_INLINE simd8(uint8_t _value) : simd8(splat(_value)) {}
     // Member-by-member initialization
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
     TURBO_FORCE_INLINE simd8(
       uint8_t v0,  uint8_t v1,  uint8_t v2,  uint8_t v3,  uint8_t v4,  uint8_t v5,  uint8_t v6,  uint8_t v7,
       uint8_t v8,  uint8_t v9,  uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15
@@ -353,7 +353,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
       uint16x8_t first = vmovl_u8(vget_low_u8 (vreinterpretq_u8_s8(this->value)));
       uint16x8_t second = vmovl_high_u8(vreinterpretq_u8_s8(this->value));
       if (!match_system(big_endian)) {
-        #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+        #ifdef _MSC_VER
         const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
         #else
         const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -383,7 +383,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
     // Array constructor
     TURBO_FORCE_INLINE simd8(const int8_t* values) : simd8(load(values)) {}
     // Member-by-member initialization
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
     TURBO_FORCE_INLINE simd8(
       int8_t v0,  int8_t v1,  int8_t v2,  int8_t v3, int8_t v4,  int8_t v5,  int8_t v6,  int8_t v7,
       int8_t v8,  int8_t v9,  int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15
@@ -418,7 +418,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
     // Under Visual Studio/ARM64 uint8x16_t and int8x16_t are apparently the same type.
     // In theory, we could check this occurrence with std::same_as and std::enabled_if but it is C++14
     // and relatively ugly and hard to read.
-#ifndef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifndef _MSC_VER
     TURBO_FORCE_INLINE explicit simd8(const uint8x16_t other): simd8(vreinterpretq_s8_u8(other)) {}
 #endif
     TURBO_FORCE_INLINE operator simd8<uint8_t>() const { return vreinterpretq_u8_s8(this->value); }
@@ -528,7 +528,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
     }
 
     TURBO_FORCE_INLINE uint64_t to_bitmask() const {
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
       const uint8x16_t bit_mask = make_uint8x16_t(
         0x01, 0x02, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
         0x01, 0x02, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80
@@ -631,4 +631,4 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
 } // namespace TURBO_UNICODE_IMPLEMENTATION
 } // namespace turbo
 
-#endif // SIMDUTF_ARM64_SIMD_H
+#endif // TURBO_UNICODE_ARM64_SIMD_H_

@@ -76,7 +76,7 @@ std::pair<const char16_t*, char*> arm_convert_utf16_to_utf8(const char16_t* buf,
   while (buf + 16 <= end) {
     uint16x8_t in = vld1q_u16(reinterpret_cast<const uint16_t *>(buf));
     if (!match_system(big_endian)) {
-      #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+      #ifdef _MSC_VER
       const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
       #else
       const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -87,7 +87,7 @@ std::pair<const char16_t*, char*> arm_convert_utf16_to_utf8(const char16_t* buf,
         // It is common enough that we have sequences of 16 consecutive ASCII characters.
         uint16x8_t nextin = vld1q_u16(reinterpret_cast<const uint16_t *>(buf) + 8);
         if (!match_system(big_endian)) {
-          #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+          #ifdef _MSC_VER
           const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
           #else
           const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -139,7 +139,7 @@ std::pair<const char16_t*, char*> arm_convert_utf16_to_utf8(const char16_t* buf,
           const uint16x8_t one_byte_bytemask = vcleq_u16(in, v_007f);
           const uint8x16_t utf8_unpacked = vreinterpretq_u8_u16(vbslq_u16(one_byte_bytemask, in, t4));
           // 3. prepare bitmask for 8-bit lookup
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
           const uint16x8_t mask = make_uint16x8_t(0x0001, 0x0004,
                                     0x0010, 0x0040,
                                     0x0002, 0x0008,
@@ -170,7 +170,7 @@ std::pair<const char16_t*, char*> arm_convert_utf16_to_utf8(const char16_t* buf,
     // it is likely an uncommon occurrence.
       if (vmaxvq_u16(surrogates_bytemask) == 0) {
       // case: words from register produce either 1, 2 or 3 UTF-8 bytes
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
         const uint16x8_t dup_even = make_uint16x8_t(0x0000, 0x0202, 0x0404, 0x0606,
                                      0x0808, 0x0a0a, 0x0c0c, 0x0e0e);
 #else
@@ -232,7 +232,7 @@ std::pair<const char16_t*, char*> arm_convert_utf16_to_utf8(const char16_t* buf,
         // 5. compress 32-bit words into 1, 2 or 3 bytes -- 2 x shuffle
         const uint16x8_t v_007f = vmovq_n_u16((uint16_t)0x007F);
         const uint16x8_t one_byte_bytemask = vcleq_u16(in, v_007f);
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
         const uint16x8_t onemask = make_uint16x8_t(0x0001, 0x0004,
                                     0x0010, 0x0040,
                                     0x0100, 0x0400,
@@ -343,7 +343,7 @@ std::pair<result, char*> arm_convert_utf16_to_utf8_with_errors(const char16_t* b
   while (buf + 16 <= end) {
     uint16x8_t in = vld1q_u16(reinterpret_cast<const uint16_t *>(buf));
     if (!match_system(big_endian)) {
-      #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+      #ifdef _MSC_VER
       const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
       #else
       const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -354,7 +354,7 @@ std::pair<result, char*> arm_convert_utf16_to_utf8_with_errors(const char16_t* b
         // It is common enough that we have sequences of 16 consecutive ASCII characters.
         uint16x8_t nextin = vld1q_u16(reinterpret_cast<const uint16_t *>(buf) + 8);
         if (!match_system(big_endian)) {
-          #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+          #ifdef _MSC_VER
           const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
           #else
           const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -406,7 +406,7 @@ std::pair<result, char*> arm_convert_utf16_to_utf8_with_errors(const char16_t* b
           const uint16x8_t one_byte_bytemask = vcleq_u16(in, v_007f);
           const uint8x16_t utf8_unpacked = vreinterpretq_u8_u16(vbslq_u16(one_byte_bytemask, in, t4));
           // 3. prepare bitmask for 8-bit lookup
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
           const uint16x8_t mask = make_uint16x8_t(0x0001, 0x0004,
                                     0x0010, 0x0040,
                                     0x0002, 0x0008,
@@ -437,7 +437,7 @@ std::pair<result, char*> arm_convert_utf16_to_utf8_with_errors(const char16_t* b
     // it is likely an uncommon occurrence.
       if (vmaxvq_u16(surrogates_bytemask) == 0) {
       // case: words from register produce either 1, 2 or 3 UTF-8 bytes
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
         const uint16x8_t dup_even = make_uint16x8_t(0x0000, 0x0202, 0x0404, 0x0606,
                                      0x0808, 0x0a0a, 0x0c0c, 0x0e0e);
 #else
@@ -499,7 +499,7 @@ std::pair<result, char*> arm_convert_utf16_to_utf8_with_errors(const char16_t* b
         // 5. compress 32-bit words into 1, 2 or 3 bytes -- 2 x shuffle
         const uint16x8_t v_007f = vmovq_n_u16((uint16_t)0x007F);
         const uint16x8_t one_byte_bytemask = vcleq_u16(in, v_007f);
-#ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+#ifdef _MSC_VER
         const uint16x8_t onemask = make_uint16x8_t(0x0001, 0x0004,
                                     0x0010, 0x0040,
                                     0x0100, 0x0400,

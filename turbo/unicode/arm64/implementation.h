@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ARM64_IMPLEMENTATION_H
-#define SIMDUTF_ARM64_IMPLEMENTATION_H
+#ifndef TURBO_UNICODE_ARM64_IMPLEMENTATION_H_
+#define TURBO_UNICODE_ARM64_IMPLEMENTATION_H_
 
 #include "turbo/unicode/utf.h"
 #include "turbo/unicode/internal/isadetection.h"
@@ -86,4 +86,4 @@ public:
 } // namespace arm64
 } // namespace turbo
 
-#endif // SIMDUTF_ARM64_IMPLEMENTATION_H
+#endif // TURBO_UNICODE_ARM64_IMPLEMENTATION_H_

@@ -124,7 +124,7 @@ TEST(convert_into_3_or_4_UTF8_bytes) {
   }
 }
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 TEST(convert_fails_if_there_is_sole_low_surrogate) {
@@ -148,7 +148,7 @@ TEST(convert_fails_if_there_is_sole_low_surrogate) {
 }
 #endif
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 TEST(convert_fails_if_there_is_sole_high_surrogate) {
@@ -172,7 +172,7 @@ TEST(convert_fails_if_there_is_sole_high_surrogate) {
 }
 #endif
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 TEST(convert_fails_if_there_is_low_surrogate_is_followed_by_another_low_surrogate) {
@@ -199,7 +199,7 @@ TEST(convert_fails_if_there_is_low_surrogate_is_followed_by_another_low_surrogat
 }
 #endif
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port the next test.
 #else
 TEST(convert_fails_if_there_is_surrogate_pair_is_followed_by_high_surrogate) {

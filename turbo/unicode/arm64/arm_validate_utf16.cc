@@ -26,7 +26,7 @@ const char16_t* arm_validate_utf16(const char16_t* input, size_t size) {
         auto in0 = simd16<uint16_t>(input);
         auto in1 = simd16<uint16_t>(input + simd16<uint16_t>::SIZE / sizeof(char16_t));
         if (!match_system(big_endian)) {
-            #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+            #ifdef _MSC_VER
             const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
             #else
             const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
@@ -102,7 +102,7 @@ const result arm_validate_utf16_with_errors(const char16_t* input, size_t size) 
         auto in1 = simd16<uint16_t>(input + simd16<uint16_t>::SIZE / sizeof(char16_t));
 
         if (!match_system(big_endian)) {
-            #ifdef SIMDUTF_REGULAR_VISUAL_STUDIO
+            #ifdef _MSC_VER
             const uint8x16_t swap = make_uint8x16_t(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
             #else
             const uint8x16_t swap = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};

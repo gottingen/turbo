@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_FALLBACK_H
-#define SIMDUTF_FALLBACK_H
+#ifndef TURBO_UNICODE_FALLBACK_H_
+#define TURBO_UNICODE_FALLBACK_H_
 
-#include "turbo/unicode/simdutf/portability.h"
+#include "turbo/unicode/internal/config.h"
 
 // Note that fallback.h is always imported last.
 
 // Default Fallback to on unless a builtin implementation has already been selected.
 #ifndef TURBO_UNICODE_IMPLEMENTATION_FALLBACK
-#if SIMDUTF_CAN_ALWAYS_RUN_ARM64 || SIMDUTF_CAN_ALWAYS_RUN_ICELAKE || SIMDUTF_CAN_ALWAYS_RUN_HASWELL || SIMDUTF_CAN_ALWAYS_RUN_WESTMERE || SIMDUTF_CAN_ALWAYS_RUN_PPC64
+#if TURBO_UNICODE_CAN_ALWAYS_RUN_ARM64 || TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE || TURBO_UNICODE_CAN_ALWAYS_RUN_HASWELL || TURBO_UNICODE_CAN_ALWAYS_RUN_WESTMERE || TURBO_CAN_ALWAYS_RUN_PPC64
 #define TURBO_UNICODE_IMPLEMENTATION_FALLBACK 0
 #else
 #define TURBO_UNICODE_IMPLEMENTATION_FALLBACK 1
 #endif
 #endif
 
-#define SIMDUTF_CAN_ALWAYS_RUN_FALLBACK (TURBO_UNICODE_IMPLEMENTATION_FALLBACK)
+#define TURBO_UNICODE_CAN_ALWAYS_RUN_FALLBACK (TURBO_UNICODE_IMPLEMENTATION_FALLBACK)
 
 #if TURBO_UNICODE_IMPLEMENTATION_FALLBACK
 
@@ -50,4 +50,4 @@ namespace fallback {
 #include "turbo/unicode/fallback/end.h"
 
 #endif // TURBO_UNICODE_IMPLEMENTATION_FALLBACK
-#endif // SIMDUTF_FALLBACK_H
+#endif // TURBO_UNICODE_FALLBACK_H_

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_ICELAKE_IMPLEMENTATION_H
-#define SIMDUTF_ICELAKE_IMPLEMENTATION_H
+#ifndef TURBO_UNICODE_ICELAKE_IMPLEMENTATION_H_
+#define TURBO_UNICODE_ICELAKE_IMPLEMENTATION_H_
 
-#include "turbo/unicode/simdutf/implementation.h"
+#include "turbo/unicode/implementation.h"
 
 namespace turbo {
 namespace icelake {
@@ -88,4 +88,4 @@ public:
 } // namespace icelake
 } // namespace turbo
 
-#endif // SIMDUTF_ICELAKE_IMPLEMENTATION_H
+#endif // TURBO_UNICODE_ICELAKE_IMPLEMENTATION_H_

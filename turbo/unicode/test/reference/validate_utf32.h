@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/simdutf/common_defs.h"
+#include "turbo/unicode/internal/config.h"
 
 
 namespace turbo {  namespace tests { namespace reference {

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_PPC64_SIMD_H
-#define SIMDUTF_PPC64_SIMD_H
+#ifndef TURBO_UNICODE_PPC64_SIMD_H_
+#define TURBO_UNICODE_PPC64_SIMD_H_
 
 #include "turbo/unicode/utf.h"
-#include "simdutf/ppc64/bitmanipulation.h"
+#include "turbo/unicode/ppc64/bitmanipulation.h"
 #include <type_traits>
 
 namespace turbo {
@@ -501,4 +501,4 @@ template <typename T> struct simd8x64 {
 } // namespace TURBO_UNICODE_IMPLEMENTATION
 } // namespace turbo
 
-#endif // SIMDUTF_PPC64_SIMD_INPUT_H
+#endif // TURBO_UNICODE_PPC64_SIMD_H_

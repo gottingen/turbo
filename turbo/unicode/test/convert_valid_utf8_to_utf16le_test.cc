@@ -14,8 +14,8 @@
 
 #include "turbo/unicode/utf.h"
 
-#ifndef SIMDUTF_IS_BIG_ENDIAN
-#error "SIMDUTF_IS_BIG_ENDIAN should be defined."
+#ifndef TURBO_IS_BIG_ENDIAN
+#error "TURBO_IS_BIG_ENDIAN should be defined."
 #endif
 
 #include <array>
@@ -143,7 +143,7 @@ TEST(convert_null_4_UTF8_bytes) {
   }
 }
 
-#if SIMDUTF_IS_BIG_ENDIAN
+#if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
 TEST(issue111) {

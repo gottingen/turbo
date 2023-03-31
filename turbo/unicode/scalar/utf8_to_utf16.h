@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMDUTF_UTF8_TO_UTF16_H
-#define SIMDUTF_UTF8_TO_UTF16_H
+#ifndef TURBO_UNICODE_SCALAR_UTF8_TO_UTF16_H_
+#define TURBO_UNICODE_SCALAR_UTF8_TO_UTF16_H_
 
 namespace turbo {
 namespace scalar {
@@ -255,4 +255,4 @@ inline result rewind_and_convert_with_errors(size_t prior_bytes, const char* buf
 } // namespace scalar
 } // namespace turbo
 
-#endif
+#endif  // TURBO_UNICODE_SCALAR_UTF8_TO_UTF16_H_

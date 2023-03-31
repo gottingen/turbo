@@ -208,10 +208,10 @@ class
   // uint128 are fixed to not depend on alignof(uint128) == 8. Also add
   // alignas(16) to class definition to keep alignment consistent across
   // platforms.
-#if defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_IS_LITTLE_ENDIAN
   uint64_t lo_;
   uint64_t hi_;
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif TURBO_IS_BIG_ENDIAN
   uint64_t hi_;
   uint64_t lo_;
 #else  // byte order
@@ -444,10 +444,10 @@ class int128 {
 #if defined(TURBO_HAVE_INTRINSIC_INT128)
   __int128 v_;
 #else  // TURBO_HAVE_INTRINSIC_INT128
-#if defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_IS_LITTLE_ENDIAN
   uint64_t lo_;
   int64_t hi_;
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif TURBO_IS_BIG_ENDIAN
   int64_t hi_;
   uint64_t lo_;
 #else  // byte order
@@ -619,7 +619,7 @@ constexpr uint64_t Uint128High64(uint128 v) { return v.hi_; }
 
 // Constructors from integer types.
 
-#if defined(TURBO_IS_LITTLE_ENDIAN)
+#if TURBO_IS_LITTLE_ENDIAN
 
 constexpr uint128::uint128(uint64_t high, uint64_t low)
     : lo_{low}, hi_{high} {}
@@ -652,7 +652,7 @@ constexpr uint128::uint128(unsigned __int128 v)
 constexpr uint128::uint128(int128 v)
     : lo_{Int128Low64(v)}, hi_{static_cast<uint64_t>(Int128High64(v))} {}
 
-#elif defined(TURBO_IS_BIG_ENDIAN)
+#elif TURBO_IS_BIG_ENDIAN
 
 constexpr uint128::uint128(uint64_t high, uint64_t low)
     : hi_{high}, lo_{low} {}
