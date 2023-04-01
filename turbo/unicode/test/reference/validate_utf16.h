@@ -17,6 +17,6 @@
 
 namespace turbo {  namespace tests { namespace reference {
     // validate UTF-16LE.
-    TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexcept;
+    TURBO_MUST_USE_RESULT bool ValidateUtf16(const char16_t *buf, size_t len) noexcept;
 
 }}}

@@ -43,16 +43,16 @@ std::string toBinaryString(T b) {
 #include "turbo/unicode/fallback.h" // have it always last.
 
 namespace turbo {
-bool implementation::supported_by_runtime_system() const {
-  uint32_t required_instruction_sets = this->required_instruction_sets();
+bool Implementation::supported_by_runtime_system() const {
+  uint32_t required_instruction_sets = this->RequiredInstructionSets();
   uint32_t supported_instruction_sets = internal::detect_supported_architectures();
   return ((supported_instruction_sets & required_instruction_sets) == required_instruction_sets);
 }
 
-TURBO_MUST_USE_RESULT encoding_type implementation::autodetect_encoding(const char * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT EncodingType Implementation::AutodetectEncoding(const char * input, size_t length) const noexcept {
     // If there is a BOM, then we trust it.
     auto bom_encoding = turbo::BOM::check_bom(input, length);
-    if(bom_encoding != encoding_type::unspecified) { return bom_encoding; }
+    if(bom_encoding != EncodingType::unspecified) { return bom_encoding; }
     // UTF8 is common, it includes ASCII, and is commonly represented
     // without a BOM, so if it fits, go with that. Note that it is still
     // possible to get it wrong, we are only 'guessing'. If some has UTF-16
@@ -60,17 +60,17 @@ TURBO_MUST_USE_RESULT encoding_type implementation::autodetect_encoding(const ch
     //
     // An interesting twist might be to check for UTF-16 ASCII first (every
     // other byte is zero).
-    if(validate_utf8(input, length)) { return encoding_type::UTF8; }
+    if(ValidateUtf8(input, length)) { return EncodingType::UTF8; }
     // The next most common encoding that might appear without BOM is probably
     // UTF-16LE, so try that next.
     if((length % 2) == 0) {
       // important: we need to divide by two
-      if(validate_utf16le(reinterpret_cast<const char16_t*>(input), length/2)) { return encoding_type::UTF16_LE; }
+      if(ValidateUtf16Le(reinterpret_cast<const char16_t*>(input), length/2)) { return EncodingType::UTF16_LE; }
     }
     if((length % 4) == 0) {
-      if(validate_utf32(reinterpret_cast<const char32_t*>(input), length/4)) { return encoding_type::UTF32_LE; }
+      if(ValidateUtf32(reinterpret_cast<const char32_t*>(input), length/4)) { return EncodingType::UTF32_LE; }
     }
-    return encoding_type::unspecified;
+    return EncodingType::unspecified;
 }
 
 namespace internal {
@@ -80,16 +80,16 @@ namespace internal {
 
 
 #if TURBO_UNICODE_IMPLEMENTATION_ICELAKE
-const icelake::implementation icelake_singleton{};
+const icelake::Implementation icelake_singleton{};
 #endif
 #if TURBO_UNICODE_IMPLEMENTATION_HASWELL
-const haswell::implementation haswell_singleton{};
+const haswell::Implementation haswell_singleton{};
 #endif
 #if TURBO_UNICODE_IMPLEMENTATION_WESTMERE
 const westmere::implementation westmere_singleton{};
 #endif
 #if TURBO_UNICODE_IMPLEMENTATION_ARM64
-const arm64::implementation arm64_singleton{};
+const arm64::Implementation arm64_singleton{};
 #endif
 #if TURBO_UNICODE_IMPLEMENTATION_PPC64
 const ppc64::implementation ppc64_singleton{};
@@ -101,232 +101,232 @@ const fallback::implementation fallback_singleton{};
 /**
  * @private Detects best supported implementation on first use, and sets it
  */
-class detect_best_supported_implementation_on_first_use final : public implementation {
+class detect_best_supported_implementation_on_first_use final : public Implementation {
 public:
-  const std::string &name() const noexcept final { return set_best()->name(); }
-  const std::string &description() const noexcept final { return set_best()->description(); }
-  uint32_t required_instruction_sets() const noexcept final { return set_best()->required_instruction_sets(); }
+  const std::string &Name() const noexcept final { return set_best()->Name(); }
+  const std::string &Description() const noexcept final { return set_best()->Description(); }
+  uint32_t RequiredInstructionSets() const noexcept final { return set_best()->RequiredInstructionSets(); }
 
-  TURBO_MUST_USE_RESULT int detect_encodings(const char * input, size_t length) const noexcept override {
-    return set_best()->detect_encodings(input, length);
+  TURBO_MUST_USE_RESULT int DetectEncodings(const char * input, size_t length) const noexcept override {
+    return set_best()->DetectEncodings(input, length);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf8(const char * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf8(buf, len);
+  TURBO_MUST_USE_RESULT bool ValidateUtf8(const char * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf8(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf8_with_errors(const char * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf8_with_errors(buf, len);
+  TURBO_MUST_USE_RESULT result ValidateUtf8WithErrors(const char * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf8WithErrors(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_ascii(const char * buf, size_t len) const noexcept final override {
-    return set_best()->validate_ascii(buf, len);
+  TURBO_MUST_USE_RESULT bool ValidateAscii(const char * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateAscii(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT result validate_ascii_with_errors(const char * buf, size_t len) const noexcept final override {
-    return set_best()->validate_ascii_with_errors(buf, len);
+  TURBO_MUST_USE_RESULT result ValidateAsciiWithErrors(const char * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateAsciiWithErrors(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf16le(const char16_t * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf16le(buf, len);
+  TURBO_MUST_USE_RESULT bool ValidateUtf16Le(const char16_t * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf16Le(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf16be(const char16_t * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf16be(buf, len);
+  TURBO_MUST_USE_RESULT bool ValidateUtf16Be(const char16_t * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf16Be(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf16le_with_errors(const char16_t * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf16le_with_errors(buf, len);
+  TURBO_MUST_USE_RESULT result ValidateUtf16LeWithErrors(const char16_t * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf16LeWithErrors(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf16be_with_errors(const char16_t * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf16be_with_errors(buf, len);
+  TURBO_MUST_USE_RESULT result ValidateUtf16BeWithErrors(const char16_t * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf16BeWithErrors(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf32(const char32_t * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf32(buf, len);
+  TURBO_MUST_USE_RESULT bool ValidateUtf32(const char32_t * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf32(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf32_with_errors(const char32_t * buf, size_t len) const noexcept final override {
-    return set_best()->validate_utf32_with_errors(buf, len);
+  TURBO_MUST_USE_RESULT result ValidateUtf32WithErrors(const char32_t * buf, size_t len) const noexcept final override {
+    return set_best()->ValidateUtf32WithErrors(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16le(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf8_to_utf16le(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf16Le(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf8ToUtf16Le(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16be(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf8_to_utf16be(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf16Be(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf8ToUtf16Be(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf8_to_utf16le_with_errors(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf8_to_utf16le_with_errors(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf16LeWithErrors(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf8ToUtf16LeWithErrors(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf8_to_utf16be_with_errors(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf8_to_utf16be_with_errors(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf16BeWithErrors(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf8ToUtf16BeWithErrors(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16le(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_valid_utf8_to_utf16le(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf16Le(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertValidUtf8ToUtf16Le(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16be(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_valid_utf8_to_utf16be(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf16Be(const char * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertValidUtf8ToUtf16Be(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf32(const char * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_utf8_to_utf32(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf32(const char * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertUtf8ToUtf32(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf8_to_utf32_with_errors(const char * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_utf8_to_utf32_with_errors(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf32WithErrors(const char * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertUtf8ToUtf32WithErrors(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf32(const char * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_valid_utf8_to_utf32(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf32(const char * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertValidUtf8ToUtf32(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_utf16le_to_utf8(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16LeToUtf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertUtf16LeToUtf8(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_utf16be_to_utf8(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16BeToUtf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertUtf16BeToUtf8(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16le_to_utf8_with_errors(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_utf16le_to_utf8_with_errors(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf16LeToUtf8WithErrors(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertUtf16LeToUtf8WithErrors(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16be_to_utf8_with_errors(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_utf16be_to_utf8_with_errors(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf16BeToUtf8WithErrors(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertUtf16BeToUtf8WithErrors(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_valid_utf16le_to_utf8(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16LeToUtf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertValidUtf16LeToUtf8(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_valid_utf16be_to_utf8(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16BeToUtf8(const char16_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertValidUtf16BeToUtf8(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf8(const char32_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_utf32_to_utf8(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf8(const char32_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertUtf32ToUtf8(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf32_to_utf8_with_errors(const char32_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_utf32_to_utf8_with_errors(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf8WithErrors(const char32_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertUtf32ToUtf8WithErrors(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf8(const char32_t * buf, size_t len, char* utf8_output) const noexcept final override {
-    return set_best()->convert_valid_utf32_to_utf8(buf, len, utf8_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf8(const char32_t * buf, size_t len, char* utf8_output) const noexcept final override {
+    return set_best()->ConvertValidUtf32ToUtf8(buf, len, utf8_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16le(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf32_to_utf16le(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf16Le(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf32ToUtf16Le(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16be(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf32_to_utf16be(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf16Be(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf32ToUtf16Be(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf32_to_utf16le_with_errors(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf32_to_utf16le_with_errors(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf16leWithErrors(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf32ToUtf16leWithErrors(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf32_to_utf16be_with_errors(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_utf32_to_utf16be_with_errors(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf16BeWithErrors(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertUtf32ToUtf16BeWithErrors(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16le(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_valid_utf32_to_utf16le(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf16Le(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertValidUtf32ToUtf16Le(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16be(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
-    return set_best()->convert_valid_utf32_to_utf16be(buf, len, utf16_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf16Be(const char32_t * buf, size_t len, char16_t* utf16_output) const noexcept final override {
+    return set_best()->ConvertValidUtf32ToUtf16Be(buf, len, utf16_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_utf16le_to_utf32(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16LeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertUtf16LeToUtf32(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_utf16be_to_utf32(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16BeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertUtf16BeToUtf32(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16le_to_utf32_with_errors(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_utf16le_to_utf32_with_errors(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf16LeToUtf32WithErrors(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertUtf16LeToUtf32WithErrors(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16be_to_utf32_with_errors(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_utf16be_to_utf32_with_errors(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT result ConvertUtf16BeToUtf32WithErrors(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertUtf16BeToUtf32WithErrors(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_valid_utf16le_to_utf32(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16LeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertValidUtf16LeToUtf32(buf, len, utf32_output);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
-    return set_best()->convert_valid_utf16be_to_utf32(buf, len, utf32_output);
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16BeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_output) const noexcept final override {
+    return set_best()->ConvertValidUtf16BeToUtf32(buf, len, utf32_output);
   }
 
-  void change_endianness_utf16(const char16_t * buf, size_t len, char16_t * output) const noexcept final override {
-    set_best()->change_endianness_utf16(buf, len, output);
+  void ChangeEndiannessUtf16(const char16_t * buf, size_t len, char16_t * output) const noexcept final override {
+    set_best()->ChangeEndiannessUtf16(buf, len, output);
   }
 
-  TURBO_MUST_USE_RESULT size_t count_utf16le(const char16_t * buf, size_t len) const noexcept final override {
-    return set_best()->count_utf16le(buf, len);
+  TURBO_MUST_USE_RESULT size_t CountUtf16Le(const char16_t * buf, size_t len) const noexcept final override {
+    return set_best()->CountUtf16Le(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t count_utf16be(const char16_t * buf, size_t len) const noexcept final override {
-    return set_best()->count_utf16be(buf, len);
+  TURBO_MUST_USE_RESULT size_t CountUtf16Be(const char16_t * buf, size_t len) const noexcept final override {
+    return set_best()->CountUtf16Be(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t count_utf8(const char * buf, size_t len) const noexcept final override {
-    return set_best()->count_utf8(buf, len);
+  TURBO_MUST_USE_RESULT size_t CountUtf8(const char * buf, size_t len) const noexcept final override {
+    return set_best()->CountUtf8(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16le(const char16_t * buf, size_t len) const noexcept override {
-    return set_best()->utf8_length_from_utf16le(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf16Le(const char16_t * buf, size_t len) const noexcept override {
+    return set_best()->Utf8LengthFromUtf16Le(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16be(const char16_t * buf, size_t len) const noexcept override {
-    return set_best()->utf8_length_from_utf16be(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf16be(const char16_t * buf, size_t len) const noexcept override {
+    return set_best()->Utf8LengthFromUtf16be(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16le(const char16_t * buf, size_t len) const noexcept override {
-    return set_best()->utf32_length_from_utf16le(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf16Le(const char16_t * buf, size_t len) const noexcept override {
+    return set_best()->Utf32LengthFromUtf16Le(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16be(const char16_t * buf, size_t len) const noexcept override {
-    return set_best()->utf32_length_from_utf16be(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf16Be(const char16_t * buf, size_t len) const noexcept override {
+    return set_best()->Utf32LengthFromUtf16Be(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf16_length_from_utf8(const char * buf, size_t len) const noexcept override {
-    return set_best()->utf16_length_from_utf8(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf16LengthFromUtf8(const char * buf, size_t len) const noexcept override {
+    return set_best()->Utf16LengthFromUtf8(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf8_length_from_utf32(const char32_t * buf, size_t len) const noexcept override {
-    return set_best()->utf8_length_from_utf32(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf32(const char32_t * buf, size_t len) const noexcept override {
+    return set_best()->Utf8LengthFromUtf32(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf16_length_from_utf32(const char32_t * buf, size_t len) const noexcept override {
-    return set_best()->utf16_length_from_utf32(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf16LengthFromUtf32(const char32_t * buf, size_t len) const noexcept override {
+    return set_best()->Utf16LengthFromUtf32(buf, len);
   }
 
-  TURBO_MUST_USE_RESULT size_t utf32_length_from_utf8(const char * buf, size_t len) const noexcept override {
-    return set_best()->utf32_length_from_utf8(buf, len);
+  TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf8(const char * buf, size_t len) const noexcept override {
+    return set_best()->Utf32LengthFromUtf8(buf, len);
   }
 
-  TURBO_FORCE_INLINE detect_best_supported_implementation_on_first_use() noexcept : implementation("best_supported_detector", "Detects the best supported implementation and sets it", 0) {}
+  TURBO_FORCE_INLINE detect_best_supported_implementation_on_first_use() noexcept : Implementation("best_supported_detector", "Detects the best supported implementation and sets it", 0) {}
 
 private:
-  const implementation *set_best() const noexcept;
+  const Implementation *set_best() const noexcept;
 };
 
 
-const std::initializer_list<const implementation *> available_implementation_pointers {
+const std::initializer_list<const Implementation *> available_implementation_pointers {
 #if TURBO_UNICODE_IMPLEMENTATION_ICELAKE
   &icelake_singleton,
 #endif
@@ -348,13 +348,13 @@ const std::initializer_list<const implementation *> available_implementation_poi
 }; // available_implementation_pointers
 
 // So we can return UNSUPPORTED_ARCHITECTURE from the parser when there is no support
-class unsupported_implementation final : public implementation {
+class unsupported_implementation final : public Implementation {
 public:
-  TURBO_MUST_USE_RESULT int detect_encodings(const char *, size_t) const noexcept override {
-    return encoding_type::unspecified;
+  TURBO_MUST_USE_RESULT int DetectEncodings(const char *, size_t) const noexcept override {
+    return EncodingType::unspecified;
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf8(const char *, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT bool ValidateUtf8(const char *, size_t) const noexcept final override {
     return false; // Just refuse to validate. Given that we have a fallback implementation
     // it seems unlikely that unsupported_implementation will ever be used. If it is used,
     // then it will flag all strings as invalid. The alternative is to return an error_code
@@ -365,211 +365,211 @@ public:
     // fallback, it implies that the programmer would need a fallback for our fallback.
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf8_with_errors(const char *, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ValidateUtf8WithErrors(const char *, size_t) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_ascii(const char *, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT bool ValidateAscii(const char *, size_t) const noexcept final override {
     return false;
   }
 
-  TURBO_MUST_USE_RESULT result validate_ascii_with_errors(const char *, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ValidateAsciiWithErrors(const char *, size_t) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf16le(const char16_t*, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT bool ValidateUtf16Le(const char16_t*, size_t) const noexcept final override {
     return false;
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf16be(const char16_t*, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT bool ValidateUtf16Be(const char16_t*, size_t) const noexcept final override {
     return false;
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf16le_with_errors(const char16_t*, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ValidateUtf16LeWithErrors(const char16_t*, size_t) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf16be_with_errors(const char16_t*, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ValidateUtf16BeWithErrors(const char16_t*, size_t) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT bool validate_utf32(const char32_t*, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT bool ValidateUtf32(const char32_t*, size_t) const noexcept final override {
     return false;
   }
 
-  TURBO_MUST_USE_RESULT result validate_utf32_with_errors(const char32_t*, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ValidateUtf32WithErrors(const char32_t*, size_t) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16le(const char*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf16Le(const char*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16be(const char*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf16Be(const char*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf8_to_utf16le_with_errors(const char*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf16LeWithErrors(const char*, size_t, char16_t*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf8_to_utf16be_with_errors(const char*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf16BeWithErrors(const char*, size_t, char16_t*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16le(const char*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf16Le(const char*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16be(const char*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf16Be(const char*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf32(const char*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf32(const char*, size_t, char32_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf8_to_utf32_with_errors(const char*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf32WithErrors(const char*, size_t, char32_t*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf32(const char*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf32(const char*, size_t, char32_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf8(const char16_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16LeToUtf8(const char16_t*, size_t, char*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf8(const char16_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16BeToUtf8(const char16_t*, size_t, char*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16le_to_utf8_with_errors(const char16_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf16LeToUtf8WithErrors(const char16_t*, size_t, char*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16be_to_utf8_with_errors(const char16_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf16BeToUtf8WithErrors(const char16_t*, size_t, char*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf8(const char16_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16LeToUtf8(const char16_t*, size_t, char*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf8(const char16_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16BeToUtf8(const char16_t*, size_t, char*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf8(const char32_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf8(const char32_t*, size_t, char*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf32_to_utf8_with_errors(const char32_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf8WithErrors(const char32_t*, size_t, char*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf8(const char32_t*, size_t, char*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf8(const char32_t*, size_t, char*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16le(const char32_t*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf16Le(const char32_t*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16be(const char32_t*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf16Be(const char32_t*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf32_to_utf16le_with_errors(const char32_t*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf16leWithErrors(const char32_t*, size_t, char16_t*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf32_to_utf16be_with_errors(const char32_t*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf16BeWithErrors(const char32_t*, size_t, char16_t*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16le(const char32_t*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf16Le(const char32_t*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16be(const char32_t*, size_t, char16_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf16Be(const char32_t*, size_t, char16_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf32(const char16_t*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16LeToUtf32(const char16_t*, size_t, char32_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf32(const char16_t*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertUtf16BeToUtf32(const char16_t*, size_t, char32_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16le_to_utf32_with_errors(const char16_t*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf16LeToUtf32WithErrors(const char16_t*, size_t, char32_t*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT result convert_utf16be_to_utf32_with_errors(const char16_t*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT result ConvertUtf16BeToUtf32WithErrors(const char16_t*, size_t, char32_t*) const noexcept final override {
     return result(error_code::OTHER, 0);
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf32(const char16_t*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16LeToUtf32(const char16_t*, size_t, char32_t*) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf32(const char16_t*, size_t, char32_t*) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t ConvertValidUtf16BeToUtf32(const char16_t*, size_t, char32_t*) const noexcept final override {
     return 0;
   }
 
-  void change_endianness_utf16(const char16_t *, size_t, char16_t *) const noexcept final override {
+  void ChangeEndiannessUtf16(const char16_t *, size_t, char16_t *) const noexcept final override {
 
   }
 
-  TURBO_MUST_USE_RESULT size_t count_utf16le(const char16_t *, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t CountUtf16Le(const char16_t *, size_t) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t count_utf16be(const char16_t *, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t CountUtf16Be(const char16_t *, size_t) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t count_utf8(const char *, size_t) const noexcept final override {
+  TURBO_MUST_USE_RESULT size_t CountUtf8(const char *, size_t) const noexcept final override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16le(const char16_t *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf16Le(const char16_t *, size_t) const noexcept override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16be(const char16_t *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf16be(const char16_t *, size_t) const noexcept override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16le(const char16_t *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf16Le(const char16_t *, size_t) const noexcept override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16be(const char16_t *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf16Be(const char16_t *, size_t) const noexcept override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf16_length_from_utf8(const char *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf16LengthFromUtf8(const char *, size_t) const noexcept override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf8_length_from_utf32(const char32_t *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf32(const char32_t *, size_t) const noexcept override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf16_length_from_utf32(const char32_t *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf16LengthFromUtf32(const char32_t *, size_t) const noexcept override {
     return 0;
   }
 
-  TURBO_MUST_USE_RESULT size_t utf32_length_from_utf8(const char *, size_t) const noexcept override {
+  TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf8(const char *, size_t) const noexcept override {
     return 0;
   }
 
-  unsupported_implementation() : implementation("unsupported", "Unsupported CPU (no detected SIMD instructions)", 0) {}
+  unsupported_implementation() : Implementation("unsupported", "Unsupported CPU (no detected SIMD instructions)", 0) {}
 };
 
 const unsupported_implementation unsupported_singleton{};
@@ -577,23 +577,23 @@ const unsupported_implementation unsupported_singleton{};
 size_t available_implementation_list::size() const noexcept {
   return internal::available_implementation_pointers.size();
 }
-const implementation * const *available_implementation_list::begin() const noexcept {
+const Implementation * const *available_implementation_list::begin() const noexcept {
   return internal::available_implementation_pointers.begin();
 }
-const implementation * const *available_implementation_list::end() const noexcept {
+const Implementation * const *available_implementation_list::end() const noexcept {
   return internal::available_implementation_pointers.end();
 }
-const implementation *available_implementation_list::detect_best_supported() const noexcept {
+const Implementation *available_implementation_list::detect_best_supported() const noexcept {
   // They are prelisted in priority order, so we just go down the list
   uint32_t supported_instruction_sets = internal::detect_supported_architectures();
-  for (const implementation *impl : internal::available_implementation_pointers) {
-    uint32_t required_instruction_sets = impl->required_instruction_sets();
+  for (const Implementation *impl : internal::available_implementation_pointers) {
+    uint32_t required_instruction_sets = impl->RequiredInstructionSets();
     if ((supported_instruction_sets & required_instruction_sets) == required_instruction_sets) { return impl; }
   }
   return &unsupported_singleton; // this should never happen?
 }
 
-const implementation *detect_best_supported_implementation_on_first_use::set_best() const noexcept {
+const Implementation *detect_best_supported_implementation_on_first_use::set_best() const noexcept {
   char *force_implementation_name = getenv("TURBO_UNICODE_FORCE_IMPLEMENTATION");
   if (force_implementation_name) {
     auto force_implementation = get_available_implementations()[force_implementation_name];
@@ -622,296 +622,296 @@ TURBO_DLL const internal::available_implementation_list& get_available_implement
 /**
   * The active implementation.
   */
-TURBO_DLL internal::atomic_ptr<const implementation>& get_active_implementation() {
+TURBO_DLL internal::atomic_ptr<const Implementation>& get_active_implementation() {
     static const internal::detect_best_supported_implementation_on_first_use detect_best_supported_implementation_on_first_use_singleton;
-    static internal::atomic_ptr<const implementation> active_implementation{&detect_best_supported_implementation_on_first_use_singleton};
+    static internal::atomic_ptr<const Implementation> active_implementation{&detect_best_supported_implementation_on_first_use_singleton};
     return active_implementation;
 }
 
-TURBO_MUST_USE_RESULT bool validate_utf8(const char *buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf8(buf, len);
+TURBO_MUST_USE_RESULT bool ValidateUtf8(const char *buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf8(buf, len);
 }
-TURBO_MUST_USE_RESULT result validate_utf8_with_errors(const char *buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf8_with_errors(buf, len);
+TURBO_MUST_USE_RESULT result ValidateUtf8WithErrors(const char *buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf8WithErrors(buf, len);
 }
-TURBO_MUST_USE_RESULT bool validate_ascii(const char *buf, size_t len) noexcept {
-  return get_active_implementation()->validate_ascii(buf, len);
+TURBO_MUST_USE_RESULT bool ValidateAscii(const char *buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateAscii(buf, len);
 }
-TURBO_MUST_USE_RESULT result validate_ascii_with_errors(const char *buf, size_t len) noexcept {
-  return get_active_implementation()->validate_ascii_with_errors(buf, len);
+TURBO_MUST_USE_RESULT result ValidateAsciiWithErrors(const char *buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateAsciiWithErrors(buf, len);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_output) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf16(const char * input, size_t length, char16_t* utf16_output) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf8_to_utf16be(input, length, utf16_output);
+  return ConvertUtf8ToUtf16Be(input, length, utf16_output);
   #else
-  return convert_utf8_to_utf16le(input, length, utf16_output);
+  return ConvertUtf8ToUtf16Le(input, length, utf16_output);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_output) noexcept {
-  return get_active_implementation()->convert_utf8_to_utf16le(input, length, utf16_output);
+TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf16Le(const char * input, size_t length, char16_t* utf16_output) noexcept {
+  return get_active_implementation()->ConvertUtf8ToUtf16Le(input, length, utf16_output);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_output) noexcept {
-  return get_active_implementation()->convert_utf8_to_utf16be(input, length, utf16_output);
+TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf16Be(const char * input, size_t length, char16_t* utf16_output) noexcept {
+  return get_active_implementation()->ConvertUtf8ToUtf16Be(input, length, utf16_output);
 }
-TURBO_MUST_USE_RESULT result convert_utf8_to_utf16_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept {
+TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf16WithErrors(const char * input, size_t length, char16_t* utf16_output) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf8_to_utf16be_with_errors(input, length, utf16_output);
+  return ConvertUtf8ToUtf16BeWithErrors(input, length, utf16_output);
   #else
-  return convert_utf8_to_utf16le_with_errors(input, length, utf16_output);
+  return ConvertUtf8ToUtf16LeWithErrors(input, length, utf16_output);
   #endif
 }
-TURBO_MUST_USE_RESULT result convert_utf8_to_utf16le_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept {
-  return get_active_implementation()->convert_utf8_to_utf16le_with_errors(input, length, utf16_output);
+TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf16LeWithErrors(const char * input, size_t length, char16_t* utf16_output) noexcept {
+  return get_active_implementation()->ConvertUtf8ToUtf16LeWithErrors(input, length, utf16_output);
 }
-TURBO_MUST_USE_RESULT result convert_utf8_to_utf16be_with_errors(const char * input, size_t length, char16_t* utf16_output) noexcept {
-  return get_active_implementation()->convert_utf8_to_utf16be_with_errors(input, length, utf16_output);
+TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf16BeWithErrors(const char * input, size_t length, char16_t* utf16_output) noexcept {
+  return get_active_implementation()->ConvertUtf8ToUtf16BeWithErrors(input, length, utf16_output);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_output) noexcept {
-  return get_active_implementation()->convert_utf8_to_utf32(input, length, utf32_output);
+TURBO_MUST_USE_RESULT size_t ConvertUtf8ToUtf32(const char * input, size_t length, char32_t* utf32_output) noexcept {
+  return get_active_implementation()->ConvertUtf8ToUtf32(input, length, utf32_output);
 }
-TURBO_MUST_USE_RESULT result convert_utf8_to_utf32_with_errors(const char * input, size_t length, char32_t* utf32_output) noexcept {
-  return get_active_implementation()->convert_utf8_to_utf32_with_errors(input, length, utf32_output);
+TURBO_MUST_USE_RESULT result ConvertUtf8ToUtf32WithErrors(const char * input, size_t length, char32_t* utf32_output) noexcept {
+  return get_active_implementation()->ConvertUtf8ToUtf32WithErrors(input, length, utf32_output);
 }
-TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t * buf, size_t len) noexcept {
+TURBO_MUST_USE_RESULT bool ValidateUtf16(const char16_t * buf, size_t len) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return validate_utf16be(buf, len);
+  return ValidateUtf16Be(buf, len);
   #else
-  return validate_utf16le(buf, len);
+  return ValidateUtf16Le(buf, len);
   #endif
 }
-TURBO_MUST_USE_RESULT bool validate_utf16le(const char16_t * buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf16le(buf, len);
+TURBO_MUST_USE_RESULT bool ValidateUtf16Le(const char16_t * buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf16Le(buf, len);
 }
-TURBO_MUST_USE_RESULT bool validate_utf16be(const char16_t * buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf16be(buf, len);
+TURBO_MUST_USE_RESULT bool ValidateUtf16Be(const char16_t * buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf16Be(buf, len);
 }
-TURBO_MUST_USE_RESULT result validate_utf16_with_errors(const char16_t * buf, size_t len) noexcept {
+TURBO_MUST_USE_RESULT result ValidateUtf16WithErrors(const char16_t * buf, size_t len) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return validate_utf16be_with_errors(buf, len);
+  return ValidateUtf16BeWithErrors(buf, len);
   #else
-  return validate_utf16le_with_errors(buf, len);
+  return ValidateUtf16LeWithErrors(buf, len);
   #endif
 }
-TURBO_MUST_USE_RESULT result validate_utf16le_with_errors(const char16_t * buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf16le_with_errors(buf, len);
+TURBO_MUST_USE_RESULT result ValidateUtf16LeWithErrors(const char16_t * buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf16LeWithErrors(buf, len);
 }
-TURBO_MUST_USE_RESULT result validate_utf16be_with_errors(const char16_t * buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf16be_with_errors(buf, len);
+TURBO_MUST_USE_RESULT result ValidateUtf16BeWithErrors(const char16_t * buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf16BeWithErrors(buf, len);
 }
-TURBO_MUST_USE_RESULT bool validate_utf32(const char32_t * buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf32(buf, len);
+TURBO_MUST_USE_RESULT bool ValidateUtf32(const char32_t * buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf32(buf, len);
 }
-TURBO_MUST_USE_RESULT result validate_utf32_with_errors(const char32_t * buf, size_t len) noexcept {
-  return get_active_implementation()->validate_utf32_with_errors(buf, len);
+TURBO_MUST_USE_RESULT result ValidateUtf32WithErrors(const char32_t * buf, size_t len) noexcept {
+  return get_active_implementation()->ValidateUtf32WithErrors(buf, len);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16(const char * input, size_t length, char16_t* utf16_buffer) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf16(const char * input, size_t length, char16_t* utf16_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_valid_utf8_to_utf16be(input, length, utf16_buffer);
+  return ConvertValidUtf8ToUtf16Be(input, length, utf16_buffer);
   #else
-  return convert_valid_utf8_to_utf16le(input, length, utf16_buffer);
+  return ConvertValidUtf8ToUtf16Le(input, length, utf16_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16le(const char * input, size_t length, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf8_to_utf16le(input, length, utf16_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf16Le(const char * input, size_t length, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf8ToUtf16Le(input, length, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf16be(const char * input, size_t length, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf8_to_utf16be(input, length, utf16_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf16Be(const char * input, size_t length, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf8ToUtf16Be(input, length, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf8_to_utf32(const char * input, size_t length, char32_t* utf32_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf8_to_utf32(input, length, utf32_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf8ToUtf32(const char * input, size_t length, char32_t* utf32_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf8ToUtf32(input, length, utf32_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf16_to_utf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertUtf16ToUtf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf16be_to_utf8(buf, len, utf8_buffer);
+  return ConvertUtf16BeToUtf8(buf, len, utf8_buffer);
   #else
-  return convert_utf16le_to_utf8(buf, len, utf8_buffer);
+  return ConvertUtf16LeToUtf8(buf, len, utf8_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_utf16le_to_utf8(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertUtf16LeToUtf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16LeToUtf8(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_utf16be_to_utf8(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertUtf16BeToUtf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16BeToUtf8(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT result convert_utf16_to_utf8_with_errors(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+TURBO_MUST_USE_RESULT result ConvertUtf16ToUtf8WithErrors(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf16be_to_utf8_with_errors(buf, len, utf8_buffer);
+  return ConvertUtf16BeToUtf8WithErrors(buf, len, utf8_buffer);
   #else
-  return convert_utf16le_to_utf8_with_errors(buf, len, utf8_buffer);
+  return ConvertUtf16LeToUtf8WithErrors(buf, len, utf8_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT result convert_utf16le_to_utf8_with_errors(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_utf16le_to_utf8_with_errors(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT result ConvertUtf16LeToUtf8WithErrors(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16LeToUtf8WithErrors(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT result convert_utf16be_to_utf8_with_errors(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_utf16be_to_utf8_with_errors(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT result ConvertUtf16BeToUtf8WithErrors(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16BeToUtf8WithErrors(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf16_to_utf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf16ToUtf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
   #if BIG_ENDIAN
-  return convert_valid_utf16be_to_utf8(buf, len, utf8_buffer);
+  return ConvertValidUtf16BeToUtf8(buf, len, utf8_buffer);
   #else
-  return convert_valid_utf16le_to_utf8(buf, len, utf8_buffer);
+  return ConvertValidUtf16LeToUtf8(buf, len, utf8_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf16le_to_utf8(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf16LeToUtf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf16LeToUtf8(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf16be_to_utf8(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf16BeToUtf8(const char16_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf16BeToUtf8(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf8(const char32_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_utf32_to_utf8(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf8(const char32_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf32ToUtf8(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT result convert_utf32_to_utf8_with_errors(const char32_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_utf32_to_utf8_with_errors(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf8WithErrors(const char32_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf32ToUtf8WithErrors(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf8(const char32_t * buf, size_t len, char* utf8_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf32_to_utf8(buf, len, utf8_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf8(const char32_t * buf, size_t len, char* utf8_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf32ToUtf8(buf, len, utf8_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf16(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf32_to_utf16be(buf, len, utf16_buffer);
+  return ConvertUtf32ToUtf16Be(buf, len, utf16_buffer);
   #else
-  return convert_utf32_to_utf16le(buf, len, utf16_buffer);
+  return ConvertUtf32ToUtf16Le(buf, len, utf16_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16le(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_utf32_to_utf16le(buf, len, utf16_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf16Le(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf32ToUtf16Le(buf, len, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf32_to_utf16be(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_utf32_to_utf16be(buf, len, utf16_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertUtf32ToUtf16Be(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf32ToUtf16Be(buf, len, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT result convert_utf32_to_utf16_with_errors(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf16WithErrors(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf32_to_utf16be_with_errors(buf, len, utf16_buffer);
+  return ConvertUtf32ToUtf16BeWithErrors(buf, len, utf16_buffer);
   #else
-  return convert_utf32_to_utf16le_with_errors(buf, len, utf16_buffer);
+  return ConvertUtf32ToUtf16leWithErrors(buf, len, utf16_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT result convert_utf32_to_utf16le_with_errors(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_utf32_to_utf16le_with_errors(buf, len, utf16_buffer);
+TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf16leWithErrors(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf32ToUtf16leWithErrors(buf, len, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT result convert_utf32_to_utf16be_with_errors(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_utf32_to_utf16be_with_errors(buf, len, utf16_buffer);
+TURBO_MUST_USE_RESULT result ConvertUtf32ToUtf16BeWithErrors(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf32ToUtf16BeWithErrors(buf, len, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf16(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_valid_utf32_to_utf16be(buf, len, utf16_buffer);
+  return ConvertValidUtf32ToUtf16Be(buf, len, utf16_buffer);
   #else
-  return convert_valid_utf32_to_utf16le(buf, len, utf16_buffer);
+  return ConvertValidUtf32ToUtf16Le(buf, len, utf16_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16le(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf32_to_utf16le(buf, len, utf16_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf16Le(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf32ToUtf16Le(buf, len, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf32_to_utf16be(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf32_to_utf16be(buf, len, utf16_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf32ToUtf16Be(const char32_t * buf, size_t len, char16_t* utf16_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf32ToUtf16Be(buf, len, utf16_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf16_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertUtf16ToUtf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf16be_to_utf32(buf, len, utf32_buffer);
+  return ConvertUtf16BeToUtf32(buf, len, utf32_buffer);
   #else
-  return convert_utf16le_to_utf32(buf, len, utf32_buffer);
+  return ConvertUtf16LeToUtf32(buf, len, utf32_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_utf16le_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  return get_active_implementation()->convert_utf16le_to_utf32(buf, len, utf32_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertUtf16LeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16LeToUtf32(buf, len, utf32_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_utf16be_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  return get_active_implementation()->convert_utf16be_to_utf32(buf, len, utf32_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertUtf16BeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16BeToUtf32(buf, len, utf32_buffer);
 }
-TURBO_MUST_USE_RESULT result convert_utf16_to_utf32_with_errors(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+TURBO_MUST_USE_RESULT result ConvertUtf16ToUtf32WithErrors(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_utf16be_to_utf32_with_errors(buf, len, utf32_buffer);
+  return ConvertUtf16BeToUtf32WithErrors(buf, len, utf32_buffer);
   #else
-  return convert_utf16le_to_utf32_with_errors(buf, len, utf32_buffer);
+  return ConvertUtf16LeToUtf32WithErrors(buf, len, utf32_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT result convert_utf16le_to_utf32_with_errors(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  return get_active_implementation()->convert_utf16le_to_utf32_with_errors(buf, len, utf32_buffer);
+TURBO_MUST_USE_RESULT result ConvertUtf16LeToUtf32WithErrors(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16LeToUtf32WithErrors(buf, len, utf32_buffer);
 }
-TURBO_MUST_USE_RESULT result convert_utf16be_to_utf32_with_errors(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  return get_active_implementation()->convert_utf16be_to_utf32_with_errors(buf, len, utf32_buffer);
+TURBO_MUST_USE_RESULT result ConvertUtf16BeToUtf32WithErrors(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+  return get_active_implementation()->ConvertUtf16BeToUtf32WithErrors(buf, len, utf32_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf16_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf16ToUtf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return convert_valid_utf16be_to_utf32(buf, len, utf32_buffer);
+  return ConvertValidUtf16BeToUtf32(buf, len, utf32_buffer);
   #else
-  return convert_valid_utf16le_to_utf32(buf, len, utf32_buffer);
+  return ConvertValidUtf16LeToUtf32(buf, len, utf32_buffer);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf16le_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf16le_to_utf32(buf, len, utf32_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf16LeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf16LeToUtf32(buf, len, utf32_buffer);
 }
-TURBO_MUST_USE_RESULT size_t convert_valid_utf16be_to_utf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
-  return get_active_implementation()->convert_valid_utf16be_to_utf32(buf, len, utf32_buffer);
+TURBO_MUST_USE_RESULT size_t ConvertValidUtf16BeToUtf32(const char16_t * buf, size_t len, char32_t* utf32_buffer) noexcept {
+  return get_active_implementation()->ConvertValidUtf16BeToUtf32(buf, len, utf32_buffer);
 }
-void change_endianness_utf16(const char16_t * input, size_t length, char16_t * output) noexcept {
-  get_active_implementation()->change_endianness_utf16(input, length, output);
+void ChangeEndiannessUtf16(const char16_t * input, size_t length, char16_t * output) noexcept {
+  get_active_implementation()->ChangeEndiannessUtf16(input, length, output);
 }
-TURBO_MUST_USE_RESULT size_t count_utf16(const char16_t * input, size_t length) noexcept {
+TURBO_MUST_USE_RESULT size_t CountUtf16(const char16_t * input, size_t length) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return count_utf16be(input, length);
+  return CountUtf16Be(input, length);
   #else
-  return count_utf16le(input, length);
+  return CountUtf16Le(input, length);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t count_utf16le(const char16_t * input, size_t length) noexcept {
-  return get_active_implementation()->count_utf16le(input, length);
+TURBO_MUST_USE_RESULT size_t CountUtf16Le(const char16_t * input, size_t length) noexcept {
+  return get_active_implementation()->CountUtf16Le(input, length);
 }
-TURBO_MUST_USE_RESULT size_t count_utf16be(const char16_t * input, size_t length) noexcept {
-  return get_active_implementation()->count_utf16be(input, length);
+TURBO_MUST_USE_RESULT size_t CountUtf16Be(const char16_t * input, size_t length) noexcept {
+  return get_active_implementation()->CountUtf16Be(input, length);
 }
-TURBO_MUST_USE_RESULT size_t count_utf8(const char * input, size_t length) noexcept {
-  return get_active_implementation()->count_utf8(input, length);
+TURBO_MUST_USE_RESULT size_t CountUtf8(const char * input, size_t length) noexcept {
+  return get_active_implementation()->CountUtf8(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16(const char16_t * input, size_t length) noexcept {
+TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf16(const char16_t * input, size_t length) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return utf8_length_from_utf16be(input, length);
+  return Utf8LengthFromUtf16be(input, length);
   #else
-  return utf8_length_from_utf16le(input, length);
+  return Utf8LengthFromUtf16Le(input, length);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16le(const char16_t * input, size_t length) noexcept {
-  return get_active_implementation()->utf8_length_from_utf16le(input, length);
+TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf16Le(const char16_t * input, size_t length) noexcept {
+  return get_active_implementation()->Utf8LengthFromUtf16Le(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf8_length_from_utf16be(const char16_t * input, size_t length) noexcept {
-  return get_active_implementation()->utf8_length_from_utf16be(input, length);
+TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf16be(const char16_t * input, size_t length) noexcept {
+  return get_active_implementation()->Utf8LengthFromUtf16be(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16(const char16_t * input, size_t length) noexcept {
+TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf16(const char16_t * input, size_t length) noexcept {
   #if TURBO_IS_BIG_ENDIAN
-  return utf32_length_from_utf16be(input, length);
+  return Utf32LengthFromUtf16Be(input, length);
   #else
-  return utf32_length_from_utf16le(input, length);
+  return Utf32LengthFromUtf16Le(input, length);
   #endif
 }
-TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16le(const char16_t * input, size_t length) noexcept {
-  return get_active_implementation()->utf32_length_from_utf16le(input, length);
+TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf16Le(const char16_t * input, size_t length) noexcept {
+  return get_active_implementation()->Utf32LengthFromUtf16Le(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf32_length_from_utf16be(const char16_t * input, size_t length) noexcept {
-  return get_active_implementation()->utf32_length_from_utf16be(input, length);
+TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf16Be(const char16_t * input, size_t length) noexcept {
+  return get_active_implementation()->Utf32LengthFromUtf16Be(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf16_length_from_utf8(const char * input, size_t length) noexcept {
-  return get_active_implementation()->utf16_length_from_utf8(input, length);
+TURBO_MUST_USE_RESULT size_t Utf16LengthFromUtf8(const char * input, size_t length) noexcept {
+  return get_active_implementation()->Utf16LengthFromUtf8(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf8_length_from_utf32(const char32_t * input, size_t length) noexcept {
-  return get_active_implementation()->utf8_length_from_utf32(input, length);
+TURBO_MUST_USE_RESULT size_t Utf8LengthFromUtf32(const char32_t * input, size_t length) noexcept {
+  return get_active_implementation()->Utf8LengthFromUtf32(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf16_length_from_utf32(const char32_t * input, size_t length) noexcept {
-  return get_active_implementation()->utf16_length_from_utf32(input, length);
+TURBO_MUST_USE_RESULT size_t Utf16LengthFromUtf32(const char32_t * input, size_t length) noexcept {
+  return get_active_implementation()->Utf16LengthFromUtf32(input, length);
 }
-TURBO_MUST_USE_RESULT size_t utf32_length_from_utf8(const char * input, size_t length) noexcept {
-  return get_active_implementation()->utf32_length_from_utf8(input, length);
+TURBO_MUST_USE_RESULT size_t Utf32LengthFromUtf8(const char * input, size_t length) noexcept {
+  return get_active_implementation()->Utf32LengthFromUtf8(input, length);
 }
-TURBO_MUST_USE_RESULT turbo::encoding_type autodetect_encoding(const char * buf, size_t length) noexcept {
-  return get_active_implementation()->autodetect_encoding(buf, length);
+TURBO_MUST_USE_RESULT turbo::EncodingType AutodetectEncoding(const char * buf, size_t length) noexcept {
+  return get_active_implementation()->AutodetectEncoding(buf, length);
 }
-TURBO_MUST_USE_RESULT int detect_encodings(const char * buf, size_t length) noexcept {
-  return get_active_implementation()->detect_encodings(buf, length);
+TURBO_MUST_USE_RESULT int DetectEncodings(const char * buf, size_t length) noexcept {
+  return get_active_implementation()->DetectEncodings(buf, length);
 }
 
-const implementation * builtin_implementation() {
-  static const implementation * builtin_impl = get_available_implementations()[TURBO_STRINGIFY(TURBO_UNICODE_BUILTIN_IMPLEMENTATION)];
+const Implementation * builtin_implementation() {
+  static const Implementation * builtin_impl = get_available_implementations()[TURBO_STRINGIFY(TURBO_UNICODE_BUILTIN_IMPLEMENTATION)];
   return builtin_impl;
 }
 

@@ -44,7 +44,7 @@ TEST(count_just_one_word) {
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_EQUAL(implementation.count_utf16le(
+      ASSERT_EQUAL(implementation.CountUtf16Le(
                       reinterpret_cast<const char16_t *>(generated.first.data()),
                       size), generated.second);
     }
@@ -62,7 +62,7 @@ TEST(count_1_or_2_UTF16_words) {
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_EQUAL(implementation.count_utf16le(
+      ASSERT_EQUAL(implementation.CountUtf16Le(
                       reinterpret_cast<const char16_t *>(generated.first.data()),
                       size),generated.second);
     }
@@ -78,7 +78,7 @@ TEST(count_2_UTF16_words) {
     for (size_t size : input_size) {
 
       auto generated = random.generate_counted(size);
-      ASSERT_EQUAL(implementation.count_utf16le(
+      ASSERT_EQUAL(implementation.CountUtf16Le(
                       reinterpret_cast<const char16_t *>(generated.first.data()),
                       size), generated.second);
     }

@@ -81,7 +81,7 @@ int avx2_detect_encodings(const char * buf, size_t len) {
                 } else if (c0 == 0x7fffffff) {
                     input += simd16<uint16_t>::ELEMENTS * 2 - 1;
                 } else {
-                    return turbo::encoding_type::unspecified;
+                    return turbo::EncodingType::unspecified;
                 }
 
                 while (input + simd16<uint16_t>::ELEMENTS * 2 < end16) {
@@ -116,7 +116,7 @@ int avx2_detect_encodings(const char * buf, size_t len) {
                         } else if (c == 0x7fffffff) {
                             input += simd16<uint16_t>::ELEMENTS * 2 - 1;
                         } else {
-                            return turbo::encoding_type::unspecified;
+                            return turbo::EncodingType::unspecified;
                         }
                     }
                 }
@@ -147,10 +147,10 @@ int avx2_detect_encodings(const char * buf, size_t len) {
 
                     __m256i forbidden_words = _mm256_xor_si256(_mm256_max_epu32(currentoffsetmax, standardoffsetmax), standardoffsetmax);
                     if(_mm256_testz_si256(forbidden_words, forbidden_words) == 0) {
-                        return turbo::encoding_type::unspecified;
+                        return turbo::EncodingType::unspecified;
                     }
                 } else {
-                    return turbo::encoding_type::unspecified;
+                    return turbo::EncodingType::unspecified;
                 }
             }
             break;
@@ -180,19 +180,19 @@ int avx2_detect_encodings(const char * buf, size_t len) {
             check.check_next_input(in);
         }
         if (!check.errors()) {
-            out |= turbo::encoding_type::UTF8;
+            out |= turbo::EncodingType::UTF8;
         }
     }
 
     if (is_utf16 && scalar::utf16::validate<endianness::LITTLE>(reinterpret_cast<const char16_t*>(buf), (len - (buf - start))/2)) {
-        out |= turbo::encoding_type::UTF16_LE;
+        out |= turbo::EncodingType::UTF16_LE;
     }
 
     if (is_utf32 && (len % 4 == 0)) {
         const __m256i standardmax = _mm256_set1_epi32(0x10ffff);
         __m256i is_zero = _mm256_xor_si256(_mm256_max_epu32(currentmax, standardmax), standardmax);
         if (_mm256_testz_si256(is_zero, is_zero) == 1 && scalar::utf32::validate(reinterpret_cast<const char32_t*>(buf), (len - (buf - start))/4)) {
-            out |= turbo::encoding_type::UTF32_LE;
+            out |= turbo::EncodingType::UTF32_LE;
         }
     }
 

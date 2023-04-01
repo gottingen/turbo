@@ -47,7 +47,7 @@ inline TURBO_MUST_USE_RESULT result validate_with_errors(const char32_t *buf, si
   return result(error_code::SUCCESS, pos);
 }
 
-inline size_t utf8_length_from_utf32(const char32_t* buf, size_t len) {
+inline size_t Utf8LengthFromUtf32(const char32_t* buf, size_t len) {
   // We are not BOM aware.
   const uint32_t * p = reinterpret_cast<const uint32_t *>(buf);
   size_t counter{0};
@@ -64,7 +64,7 @@ inline size_t utf8_length_from_utf32(const char32_t* buf, size_t len) {
   return counter;
 }
 
-inline size_t utf16_length_from_utf32(const char32_t* buf, size_t len) {
+inline size_t Utf16LengthFromUtf32(const char32_t* buf, size_t len) {
   // We are not BOM aware.
   const uint32_t * p = reinterpret_cast<const uint32_t *>(buf);
   size_t counter{0};

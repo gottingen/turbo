@@ -29,7 +29,7 @@ TEST(validate_utf32__returns_true_for_valid_input) {
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf32{generator.generate(256, seed)};
 
-    ASSERT_TRUE(implementation.validate_utf32(
+    ASSERT_TRUE(implementation.ValidateUtf32(
               reinterpret_cast<const char32_t*>(utf32.data()), utf32.size()));
   }
 }
@@ -37,7 +37,7 @@ TEST(validate_utf32__returns_true_for_valid_input) {
 TEST(validate_utf32__returns_true_for_empty_string) {
   const char32_t* buf = (char32_t*)"";
 
-  ASSERT_TRUE(implementation.validate_utf32(buf, 0));
+  ASSERT_TRUE(implementation.ValidateUtf32(buf, 0));
 }
 
 TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
@@ -53,7 +53,7 @@ TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
         const char32_t old = utf32[i];
         utf32[i] = wrong_value;
 
-        ASSERT_FALSE(implementation.validate_utf32(buf, len));
+        ASSERT_FALSE(implementation.ValidateUtf32(buf, len));
 
         utf32[i] = old;
       }
@@ -79,7 +79,7 @@ TEST(validate_utf32__returns_false_when_input_too_large) {
         const char32_t old = utf32[i];
         utf32[i] = wrong_value;
 
-        ASSERT_FALSE(implementation.validate_utf32(buf, len));
+        ASSERT_FALSE(implementation.ValidateUtf32(buf, len));
 
         utf32[i] = old;
       }

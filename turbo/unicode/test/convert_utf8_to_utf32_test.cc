@@ -40,10 +40,10 @@ TEST(convert_pure_ASCII) {
     };
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      return implementation.convert_utf8_to_utf32(utf8, size, utf32);
+      return implementation.ConvertUtf8ToUtf32(utf8, size, utf32);
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf32_length_from_utf8(utf8, size);
+      return implementation.Utf32LengthFromUtf8(utf8, size);
     };
 
     for (size_t size: input_size) {
@@ -61,10 +61,10 @@ TEST(convert_1_or_2_UTF8_bytes) {
     turbo::tests::helpers::RandomInt random(0x0000, 0x07ff, seed); // range for 1 or 2 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      return implementation.convert_utf8_to_utf32(utf8, size, utf32);
+      return implementation.ConvertUtf8ToUtf32(utf8, size, utf32);
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf32_length_from_utf8(utf8, size);
+      return implementation.Utf32LengthFromUtf8(utf8, size);
     };
     for (size_t size: input_size) {
       transcode_utf8_to_utf32_test_base test(random, size);
@@ -83,10 +83,10 @@ TEST(convert_1_or_2_or_3_UTF8_bytes) {
                                                      {0xe000, 0xffff}}, seed);
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      return implementation.convert_utf8_to_utf32(utf8, size, utf32);
+      return implementation.ConvertUtf8ToUtf32(utf8, size, utf32);
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf32_length_from_utf8(utf8, size);
+      return implementation.Utf32LengthFromUtf8(utf8, size);
     };
     for (size_t size: input_size) {
       transcode_utf8_to_utf32_test_base test(random, size);
@@ -104,10 +104,10 @@ TEST(convert_3_or_4_UTF8_bytes) {
                                                      {0xe000, 0x10ffff}}, seed); // range for 3 or 4 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      return implementation.convert_utf8_to_utf32(utf8, size, utf32);
+      return implementation.ConvertUtf8ToUtf32(utf8, size, utf32);
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf32_length_from_utf8(utf8, size);
+      return implementation.Utf32LengthFromUtf8(utf8, size);
     };
     for (size_t size: input_size) {
       transcode_utf8_to_utf32_test_base test(random, size);
@@ -126,7 +126,7 @@ TEST(convert_null_4_UTF8_bytes) {
                                                      {0x10000, 0x10ffff}}, seed); // range for 3 or 4 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char32_t* utf32) -> size_t {
-      return implementation.convert_utf8_to_utf32(utf8, size, utf32);
+      return implementation.ConvertUtf8ToUtf32(utf8, size, utf32);
     };
 
     for (size_t size: input_size) {

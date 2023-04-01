@@ -43,8 +43,8 @@ TEST(convert_2_UTF16_bytes) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char32_t* utf32) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf32(utf16be.data(), size, utf32);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      return implementation.ConvertValidUtf16BeToUtf32(utf16be.data(), size, utf32);
     };
 
     for (size_t size: input_size) {
@@ -63,8 +63,8 @@ TEST(convert_with_surrogate_pairs) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char32_t* utf32) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf32(utf16be.data(), size, utf32);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      return implementation.ConvertValidUtf16BeToUtf32(utf16be.data(), size, utf32);
     };
 
     for (size_t size: input_size) {
@@ -153,14 +153,14 @@ namespace {
 TEST(all_possible_8_codepoint_combinations) {
   auto procedure = [&implementation](const char16_t* utf16le, size_t size, char32_t* utf32) -> size_t {
     std::vector<char16_t> utf16be(size);
-    implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-    return implementation.convert_valid_utf16be_to_utf32(utf16be.data(), size, utf32);
+    implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+    return implementation.ConvertValidUtf16BeToUtf32(utf16be.data(), size, utf32);
   };
 
   std::vector<char> output_utf32(256, ' ');
   const auto& combinations = all_combinations();
   for (const auto& input_utf16: combinations) {
-    if (turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size())) {
+    if (turbo::tests::reference::ValidateUtf16(input_utf16.data(), input_utf16.size())) {
       transcode_utf16_to_utf32_test_base test(input_utf16);
       ASSERT_TRUE(test(procedure));
     }

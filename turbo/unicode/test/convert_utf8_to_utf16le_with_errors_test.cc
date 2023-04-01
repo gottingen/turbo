@@ -38,9 +38,9 @@ TEST(issue_213) {
   const char* buf = "\x01\x9a\x84";
   // We select the byte 0x84. It is a continuation byte so it is possible
   // that the predicted output might be zero.
-  size_t expected_size = implementation.utf16_length_from_utf8(buf + 2, 1);
+  size_t expected_size = implementation.Utf16LengthFromUtf8(buf + 2, 1);
   std::unique_ptr<char16_t[]>buffer(new char16_t[expected_size]);
-  turbo::result r = turbo::convert_utf8_to_utf16le_with_errors(buf + 2, 1, buffer.get());
+  turbo::result r = turbo::ConvertUtf8ToUtf16LeWithErrors(buf + 2, 1, buffer.get());
   ASSERT_TRUE(r.error != turbo::SUCCESS);
   // r.count: In case of error, indicates the position of the error in the input.
   // In case of success, indicates the number of words validated/written.
@@ -56,13 +56,13 @@ TEST(convert_pure_ASCII) {
     };
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-      turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+      turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       ASSERT_EQUAL(res.count, size);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf16_length_from_utf8(utf8, size);
+      return implementation.Utf16LengthFromUtf8(utf8, size);
     };
 
     for (size_t size: input_size) {
@@ -80,12 +80,12 @@ TEST(convert_1_or_2_UTF8_bytes) {
     turbo::tests::helpers::RandomInt random(0x0000, 0x07ff, seed); // range for 1 or 2 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-      turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+      turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf16_length_from_utf8(utf8, size);
+      return implementation.Utf16LengthFromUtf8(utf8, size);
     };
     for (size_t size: input_size) {
       transcode_utf8_to_utf16_test_base test(random, size);
@@ -104,12 +104,12 @@ TEST(convert_1_or_2_or_3_UTF8_bytes) {
                                                      {0xe000, 0xffff}}, seed);
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-      turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+      turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf16_length_from_utf8(utf8, size);
+      return implementation.Utf16LengthFromUtf8(utf8, size);
     };
     for (size_t size: input_size) {
       transcode_utf8_to_utf16_test_base test(random, size);
@@ -127,12 +127,12 @@ TEST(convert_3_or_4_UTF8_bytes) {
                                                      {0xe000, 0x10ffff}}, seed); // range for 3 or 4 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-      turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+      turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.utf16_length_from_utf8(utf8, size);
+      return implementation.Utf16LengthFromUtf8(utf8, size);
     };
     for (size_t size: input_size) {
       transcode_utf8_to_utf16_test_base test(random, size);
@@ -153,7 +153,7 @@ TEST(header_bits_error) {
     for (int i = 0; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11000000) != 0b10000000) {  // Only process leading bytes
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-          turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+          turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
           ASSERT_EQUAL(res.error, turbo::error_code::HEADER_BITS);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -177,7 +177,7 @@ TEST(too_short_error) {
     for (int i = 0; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11000000) == 0b10000000) {  // Only process continuation bytes by making them leading bytes
         auto procedure = [&implementation, &leading_byte_pos](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-          turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+          turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
           ASSERT_EQUAL(res.error, turbo::error_code::TOO_SHORT);
           ASSERT_EQUAL(res.count, leading_byte_pos);
           return 0;
@@ -202,7 +202,7 @@ TEST(too_long_error) {
     for (int i = 1; i < fix_size; i++) {
       if(((test.input_utf8[i] & 0b11000000) != 0b10000000)) {  // Only process leading bytes by making them continuation bytes
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-          turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+          turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
           ASSERT_EQUAL(res.error, turbo::error_code::TOO_LONG);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -225,7 +225,7 @@ TEST(overlong_error) {
     for (int i = 1; i < fix_size; i++) {
       if((unsigned char)test.input_utf8[i] >= (unsigned char)0b11000000) { // Only non-ASCII leading bytes can be overlong
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-          turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+          turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
           ASSERT_EQUAL(res.error, turbo::error_code::OVERLONG);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -258,7 +258,7 @@ TEST(too_large_error) {
     for (int i = 1; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11111000) == 0b11110000) { // Can only have too large error in 4-bytes case
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-          turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+          turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
           ASSERT_EQUAL(res.error, turbo::error_code::TOO_LARGE);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -280,7 +280,7 @@ TEST(surrogate_error) {
     for (int i = 1; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11110000) == 0b11100000) { // Can only have surrogate error in 3-bytes case
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16) -> size_t {
-          turbo::result res = implementation.convert_utf8_to_utf16le_with_errors(utf8, size, utf16);
+          turbo::result res = implementation.ConvertUtf8ToUtf16LeWithErrors(utf8, size, utf16);
           ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
           ASSERT_EQUAL(res.count, i);
           return 0;

@@ -30,7 +30,7 @@ TEST(brute_force) {
   for (size_t i = 0; i < total; i++) {
 
     auto UTF8 = gen_1_2_3_4.generate(rand() % 256);
-    if (!implementation.validate_utf8((const char *)UTF8.data(), UTF8.size())) {
+    if (!implementation.ValidateUtf8((const char *)UTF8.data(), UTF8.size())) {
       std::cerr << "bug" << std::endl;
       ASSERT_TRUE(false);
     }
@@ -39,9 +39,9 @@ TEST(brute_force) {
       const int bitflip{1 << (rand() % 8)};
       UTF8[rand() % UTF8.size()] = uint8_t(bitflip); // we flip exactly one bit
       bool is_ok =
-          implementation.validate_utf8((const char *)UTF8.data(), UTF8.size());
+          implementation.ValidateUtf8((const char *)UTF8.data(), UTF8.size());
       bool is_ok_basic =
-          turbo::tests::reference::validate_utf8((const char *)UTF8.data(), UTF8.size());
+          turbo::tests::reference::ValidateUtf8((const char *)UTF8.data(), UTF8.size());
       if (is_ok != is_ok_basic) {
         std::cerr << "bug" << std::endl;
         ASSERT_TRUE(false);

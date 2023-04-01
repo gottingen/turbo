@@ -18,7 +18,7 @@ namespace turbo {
 namespace tests {
 namespace reference {
 
-TURBO_MUST_USE_RESULT bool validate_utf32(const char32_t *buf, size_t len) noexcept {
+TURBO_MUST_USE_RESULT bool ValidateUtf32(const char32_t *buf, size_t len) noexcept {
   const char32_t* curr = buf;
   const char32_t* end = buf + len;
 

@@ -105,43 +105,42 @@ static inline uint32_t detect_supported_architectures() {
 
 #elif defined(__x86_64__) || defined(_M_AMD64) // x64
 
-
 namespace {
 namespace cpuid_bit {
-    // Can be found on Intel ISA Reference for CPUID
+// Can be found on Intel ISA Reference for CPUID
 
-    // EAX = 0x01
-    constexpr uint32_t pclmulqdq = uint32_t(1) << 1; ///< @private bit  1 of ECX for EAX=0x1
-    constexpr uint32_t sse42 = uint32_t(1) << 20;    ///< @private bit 20 of ECX for EAX=0x1
+// EAX = 0x01
+constexpr uint32_t pclmulqdq = uint32_t(1)
+                               << 1; ///< @private bit  1 of ECX for EAX=0x1
+constexpr uint32_t sse42 = uint32_t(1)
+                           << 20; ///< @private bit 20 of ECX for EAX=0x1
 
-    // EAX = 0x7f (Structured Extended Feature Flags), ECX = 0x00 (Sub-leaf)
-    // See: "Table 3-8. Information Returned by CPUID Instruction"
-    namespace ebx {
-      constexpr uint32_t bmi1 = uint32_t(1) << 3;
-      constexpr uint32_t avx2 = uint32_t(1) << 5;
-      constexpr uint32_t bmi2 = uint32_t(1) << 8;
-      constexpr uint32_t avx512f = uint32_t(1) << 16;
-      constexpr uint32_t avx512dq = uint32_t(1) << 17;
-      constexpr uint32_t avx512ifma = uint32_t(1) << 21;
-      constexpr uint32_t avx512cd = uint32_t(1) << 28;
-      constexpr uint32_t avx512bw = uint32_t(1) << 30;
-      constexpr uint32_t avx512vl = uint32_t(1) << 31;
-    }
+// EAX = 0x7f (Structured Extended Feature Flags), ECX = 0x00 (Sub-leaf)
+// See: "Table 3-8. Information Returned by CPUID Instruction"
+namespace ebx {
+constexpr uint32_t bmi1 = uint32_t(1) << 3;
+constexpr uint32_t avx2 = uint32_t(1) << 5;
+constexpr uint32_t bmi2 = uint32_t(1) << 8;
+constexpr uint32_t avx512f = uint32_t(1) << 16;
+constexpr uint32_t avx512dq = uint32_t(1) << 17;
+constexpr uint32_t avx512ifma = uint32_t(1) << 21;
+constexpr uint32_t avx512cd = uint32_t(1) << 28;
+constexpr uint32_t avx512bw = uint32_t(1) << 30;
+constexpr uint32_t avx512vl = uint32_t(1) << 31;
+} // namespace ebx
 
-    namespace ecx {
-      constexpr uint32_t avx512vbmi = uint32_t(1) << 1;
-      constexpr uint32_t avx512vbmi2 = uint32_t(1) << 6;
-      constexpr uint32_t avx512vnni = uint32_t(1) << 11;
-      constexpr uint32_t avx512bitalg = uint32_t(1) << 12;
-      constexpr uint32_t avx512vpopcnt = uint32_t(1) << 14;
-    }
-    namespace edx {
-      constexpr uint32_t avx512vp2intersect = uint32_t(1) << 8;
-    }
-  }
+namespace ecx {
+constexpr uint32_t avx512vbmi = uint32_t(1) << 1;
+constexpr uint32_t avx512vbmi2 = uint32_t(1) << 6;
+constexpr uint32_t avx512vnni = uint32_t(1) << 11;
+constexpr uint32_t avx512bitalg = uint32_t(1) << 12;
+constexpr uint32_t avx512vpopcnt = uint32_t(1) << 14;
+} // namespace ecx
+namespace edx {
+constexpr uint32_t avx512vp2intersect = uint32_t(1) << 8;
 }
-
-
+} // namespace cpuid_bit
+} // namespace
 
 static inline void cpuid(uint32_t *eax, uint32_t *ebx, uint32_t *ecx,
                          uint32_t *edx) {
@@ -223,7 +222,6 @@ static inline uint32_t detect_supported_architectures() {
 static inline uint32_t detect_supported_architectures() {
   return instruction_set::DEFAULT;
 }
-
 
 #endif // end SIMD extension detection code
 

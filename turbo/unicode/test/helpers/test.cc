@@ -99,8 +99,8 @@ Usage:
 Examples:
 
     # Test haswell implementations with tests having strings 'convert'
-    # and 'utf8' in their name -- for instance 'convert_utf8_to_utf16' and
-    # 'convert_utf16_to_utf8'.
+    # and 'utf8' in their name -- for instance 'ConvertUtf8ToUtf16' and
+    # 'ConvertUtf16ToUtf8'.
 
     $ test --arch haswell --test convert --test utf8
 )txt", file);
@@ -123,9 +123,9 @@ Examples:
         abort();
       }
       if (implementation->supported_by_runtime_system()) {
-        fprintf(file, "- %s\n", implementation->name().c_str());
+        fprintf(file, "- %s\n", implementation->Name().c_str());
       } else {
-        fprintf(file, "- %s [unsupported by current processor]\n", implementation->name().c_str());
+        fprintf(file, "- %s [unsupported by current processor]\n", implementation->Name().c_str());
       }
     }
   }
@@ -168,17 +168,17 @@ Examples:
         abort();
       }
       if (!implementation->supported_by_runtime_system()) {
-        printf("Implementation %s is unsupported by the current processor.\n", implementation->name().c_str());
+        printf("Implementation %s is unsupported by the current processor.\n", implementation->Name().c_str());
         continue;
       }
       if (not cmdline.architectures.empty()) {
-          if (cmdline.architectures.count(implementation->name()) == 0) {
+          if (cmdline.architectures.count(implementation->Name()) == 0) {
             continue;
           }
       }
       matching_implementation++;
 
-      printf("Checking implementation %s\n", implementation->name().c_str());
+      printf("Checking implementation %s\n", implementation->Name().c_str());
 
       auto filter = [&cmdline](const turbo::test::test_entry& test) -> bool {
         if (cmdline.tests.empty())
