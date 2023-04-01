@@ -123,6 +123,9 @@ include(CMakeDependentOption)
 option(TURBO_BUILD_TESTING
   "If ON, Turbo will build all of Turbo's own tests." ON)
 
+option(TURBO_BUILD_EXAMPLE
+        "If ON, Turbo will build all of Turbo's example." ON)
+
 option(TURBO_BUILD_TEST_HELPERS
   "If ON, Turbo will build libraries that you can use to write tests against Turbo code. This option requires that Turbo is configured to use GoogleTest."
   OFF)
@@ -189,6 +192,10 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 endif ()
 
 add_subdirectory(turbo)
+
+if(TURBO_BUILD_EXAMPLE)
+  add_subdirectory(examples)
+endif()
 
 if(TURBO_ENABLE_INSTALL)
   # turbo:lts-remove-begin(system installation is supported for LTS releases)
