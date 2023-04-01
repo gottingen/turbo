@@ -28,10 +28,10 @@
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/strings/internal/char_map.h"
 #include "turbo/strings/internal/resize_uninitialized.h"
-#include "turbo/strings/internal/utf8.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_join.h"
 #include "turbo/strings/string_piece.h"
+#include "turbo/unicode/utf.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -216,7 +216,9 @@ bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
           if (IsSurrogate(rune, turbo::string_piece(hex_start, 5), error)) {
             return false;
           }
-          d += strings_internal::EncodeUTF8Char(d, rune);
+
+          //d += strings_internal::EncodeUTF8Char(d, rune);
+          d += turbo::ConvertUtf32ToUtf8(&rune, 1, d);
           break;
         }
         case 'U': {
@@ -267,7 +269,8 @@ bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
           if (IsSurrogate(rune, turbo::string_piece(hex_start, 9), error)) {
             return false;
           }
-          d += strings_internal::EncodeUTF8Char(d, rune);
+          d += turbo::ConvertUtf32ToUtf8(&rune, 1, d);
+          //d += strings_internal::EncodeUTF8Char(d, rune);
           break;
         }
         default: {
