@@ -24,9 +24,9 @@ namespace {
 using namespace turbo;
 }
 
-class implementation final : public turbo::implementation {
+class Implementation final : public turbo::Implementation {
 public:
-  TURBO_FORCE_INLINE implementation() : turbo::implementation(
+  TURBO_FORCE_INLINE Implementation() : turbo::Implementation(
       "fallback",
       "Generic fallback implementation",
       0

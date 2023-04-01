@@ -25,9 +25,9 @@ namespace {
 using namespace turbo;
 }
 
-class implementation final : public turbo::implementation {
+class Implementation final : public turbo::Implementation {
 public:
-  TURBO_FORCE_INLINE implementation() : turbo::implementation("westmere", "Intel/AMD SSE4.2", internal::instruction_set::SSE42 | internal::instruction_set::PCLMULQDQ) {}
+  TURBO_FORCE_INLINE implementation() : turbo::Implementation("westmere", "Intel/AMD SSE4.2", internal::instruction_set::SSE42 | internal::instruction_set::PCLMULQDQ) {}
   TURBO_MUST_USE_RESULT int DetectEncodings(const char * input, size_t length) const noexcept final;
   TURBO_MUST_USE_RESULT bool ValidateUtf8(const char *buf, size_t len) const noexcept final;
   TURBO_MUST_USE_RESULT result ValidateUtf8WithErrors(const char *buf, size_t len) const noexcept final;

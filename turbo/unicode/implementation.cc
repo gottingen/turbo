@@ -80,10 +80,10 @@ namespace internal {
 
 
 #if TURBO_UNICODE_IMPLEMENTATION_ICELAKE
-const icelake::implementation icelake_singleton{};
+const icelake::Implementation icelake_singleton{};
 #endif
 #if TURBO_UNICODE_IMPLEMENTATION_HASWELL
-const haswell::implementation haswell_singleton{};
+const haswell::Implementation haswell_singleton{};
 #endif
 #if TURBO_UNICODE_IMPLEMENTATION_WESTMERE
 const westmere::implementation westmere_singleton{};

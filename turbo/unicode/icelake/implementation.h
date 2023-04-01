@@ -24,9 +24,9 @@ namespace {
 using namespace turbo;
 }
 
-class implementation final : public turbo::implementation {
+class Implementation final : public turbo::Implementation {
 public:
-  TURBO_FORCE_INLINE implementation() : turbo::implementation(
+  TURBO_FORCE_INLINE Implementation() : turbo::Implementation(
       "icelake",
       "Intel AVX512 (AVX-512BW, AVX-512CD, AVX-512VL, AVX-512VBMI2 extensions)",
       internal::instruction_set::AVX2 | internal::instruction_set::PCLMULQDQ | internal::instruction_set::BMI1 | internal::instruction_set::BMI2 | internal::instruction_set::AVX512BW | internal::instruction_set::AVX512CD | internal::instruction_set::AVX512VL | internal::instruction_set::AVX512VBMI2 ) {}

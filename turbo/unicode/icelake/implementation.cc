@@ -49,7 +49,7 @@ namespace TURBO_UNICODE_IMPLEMENTATION {
 
 
 TURBO_MUST_USE_RESULT int
-implementation::DetectEncodings(const char *input,
+Implementation::DetectEncodings(const char *input,
                                  size_t length) const noexcept {
   // If there is a BOM, then we trust it.
   auto bom_encoding = turbo::BOM::check_bom(input, length);
@@ -173,14 +173,14 @@ implementation::DetectEncodings(const char *input,
     }
 
     return out;
-  } else if (implementation::ValidateUtf8(input, length)) {
+  } else if (Implementation::ValidateUtf8(input, length)) {
     return turbo::EncodingType::UTF8;
   } else {
     return turbo::EncodingType::unspecified;
   }
 }
 
-TURBO_MUST_USE_RESULT bool implementation::ValidateUtf8(const char *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf8(const char *buf, size_t len) const noexcept {
     avx512_utf8_checker checker{};
     const char* ptr = buf;
     const char* end = ptr + len;
@@ -196,7 +196,7 @@ TURBO_MUST_USE_RESULT bool implementation::ValidateUtf8(const char *buf, size_t 
     return ! checker.errors();
 }
 
-TURBO_MUST_USE_RESULT result implementation::ValidateUtf8WithErrors(const char *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ValidateUtf8WithErrors(const char *buf, size_t len) const noexcept {
     avx512_utf8_checker checker{};
     const char* ptr = buf;
     const char* end = ptr + len;
@@ -226,11 +226,11 @@ TURBO_MUST_USE_RESULT result implementation::ValidateUtf8WithErrors(const char *
     }
 }
 
-TURBO_MUST_USE_RESULT bool implementation::ValidateAscii(const char *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT bool Implementation::ValidateAscii(const char *buf, size_t len) const noexcept {
   return icelake::ValidateAscii(buf, len);
 }
 
-TURBO_MUST_USE_RESULT result implementation::ValidateAsciiWithErrors(const char *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ValidateAsciiWithErrors(const char *buf, size_t len) const noexcept {
   const char* buf_orig = buf;
   const char* end = buf + len;
   const __m512i ascii = _mm512_set1_epi8((uint8_t)0x80);
@@ -251,7 +251,7 @@ TURBO_MUST_USE_RESULT result implementation::ValidateAsciiWithErrors(const char 
   return result(error_code::SUCCESS, len);
 }
 
-TURBO_MUST_USE_RESULT bool implementation::ValidateUtf16Le(const char16_t *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf16Le(const char16_t *buf, size_t len) const noexcept {
     const char16_t *end = buf + len;
 
     for(;buf + 32 <= end; ) {
@@ -291,7 +291,7 @@ TURBO_MUST_USE_RESULT bool implementation::ValidateUtf16Le(const char16_t *buf, 
     return true;
 }
 
-TURBO_MUST_USE_RESULT bool implementation::ValidateUtf16Be(const char16_t *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf16Be(const char16_t *buf, size_t len) const noexcept {
    const char16_t *end = buf + len;
    const __m512i byteflip = _mm512_setr_epi64(
             0x0607040502030001,
@@ -340,7 +340,7 @@ TURBO_MUST_USE_RESULT bool implementation::ValidateUtf16Be(const char16_t *buf, 
     return true;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ValidateUtf16LeWithErrors(const char16_t *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ValidateUtf16LeWithErrors(const char16_t *buf, size_t len) const noexcept {
     const char16_t *start_buf = buf;
     const char16_t *end = buf + len;
     for(;buf + 32 <= end; ) {
@@ -384,7 +384,7 @@ TURBO_MUST_USE_RESULT result implementation::ValidateUtf16LeWithErrors(const cha
     return result(error_code::SUCCESS, len);
 }
 
-TURBO_MUST_USE_RESULT result implementation::ValidateUtf16BeWithErrors(const char16_t *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ValidateUtf16BeWithErrors(const char16_t *buf, size_t len) const noexcept {
     const char16_t *start_buf = buf;
     const char16_t *end = buf + len;
     const __m512i byteflip = _mm512_setr_epi64(
@@ -438,7 +438,7 @@ TURBO_MUST_USE_RESULT result implementation::ValidateUtf16BeWithErrors(const cha
     return result(error_code::SUCCESS, len);
 }
 
-TURBO_MUST_USE_RESULT bool implementation::ValidateUtf32(const char32_t *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf32(const char32_t *buf, size_t len) const noexcept {
   const char32_t * tail = icelake::ValidateUtf32(buf, len);
   if (tail) {
     return scalar::utf32::validate(tail, len - (tail - buf));
@@ -447,7 +447,7 @@ TURBO_MUST_USE_RESULT bool implementation::ValidateUtf32(const char32_t *buf, si
   }
 }
 
-TURBO_MUST_USE_RESULT result implementation::ValidateUtf32WithErrors(const char32_t *buf, size_t len) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ValidateUtf32WithErrors(const char32_t *buf, size_t len) const noexcept {
 
     const char32_t* end = len >= 16 ? buf + len - 16 : nullptr;
     const char32_t* buf_orig = buf;
@@ -487,7 +487,7 @@ TURBO_MUST_USE_RESULT result implementation::ValidateUtf32WithErrors(const char3
     return result(error_code::SUCCESS, len);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf8ToUtf16Le(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf8ToUtf16Le(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16_result ret = fast_avx512_convert_utf8_to_utf16<endianness::LITTLE>(buf, len, utf16_output);
   if (ret.second == nullptr) {
     return 0;
@@ -495,7 +495,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf8ToUtf16Le(const char* bu
   return ret.second - utf16_output;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf8ToUtf16Be(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf8ToUtf16Be(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16_result ret = fast_avx512_convert_utf8_to_utf16<endianness::BIG>(buf, len, utf16_output);
   if (ret.second == nullptr) {
     return 0;
@@ -503,15 +503,15 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf8ToUtf16Be(const char* bu
   return ret.second - utf16_output;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf8ToUtf16LeWithErrors(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf8ToUtf16LeWithErrors(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
    return fast_avx512_convert_utf8_to_utf16_with_errors<endianness::LITTLE>(buf, len, utf16_output);
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf8ToUtf16BeWithErrors(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf8ToUtf16BeWithErrors(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
    return fast_avx512_convert_utf8_to_utf16_with_errors<endianness::BIG>(buf, len, utf16_output);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf8ToUtf16Le(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf8ToUtf16Le(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16_result ret = icelake::valid_utf8_to_fixed_length<endianness::LITTLE, char16_t>(buf, len, utf16_output);
   size_t saved_bytes = ret.second - utf16_output;
   const char* end = buf + len;
@@ -538,7 +538,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf8ToUtf16Le(const cha
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf8ToUtf16Be(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf8ToUtf16Be(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16_result ret = icelake::valid_utf8_to_fixed_length<endianness::BIG, char16_t>(buf, len, utf16_output);
   size_t saved_bytes = ret.second - utf16_output;
   const char* end = buf + len;
@@ -566,7 +566,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf8ToUtf16Be(const cha
 }
 
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf8ToUtf32(const char* buf, size_t len, char32_t* utf32_out) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf8ToUtf32(const char* buf, size_t len, char32_t* utf32_out) const noexcept {
   uint32_t * utf32_output = reinterpret_cast<uint32_t *>(utf32_out);
   utf8_to_utf32_result ret = icelake::validating_utf8_to_fixed_length<endianness::LITTLE, uint32_t>(buf, len, utf32_output);
   if (ret.second == nullptr)
@@ -597,7 +597,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf8ToUtf32(const char* buf,
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf8ToUtf32WithErrors(const char* buf, size_t len, char32_t* utf32) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf8ToUtf32WithErrors(const char* buf, size_t len, char32_t* utf32) const noexcept {
   uint32_t * utf32_output = reinterpret_cast<uint32_t *>(utf32);
   auto ret = icelake::validating_utf8_to_fixed_length_with_constant_checks<endianness::LITTLE, uint32_t>(buf, len, utf32_output);
   if (!std::get<2>(ret)) {
@@ -638,7 +638,7 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf8ToUtf32WithErrors(const 
 }
 
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf8ToUtf32(const char* buf, size_t len, char32_t* utf32_out) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf8ToUtf32(const char* buf, size_t len, char32_t* utf32_out) const noexcept {
   uint32_t * utf32_output = reinterpret_cast<uint32_t *>(utf32_out);
   utf8_to_utf32_result ret = icelake::valid_utf8_to_fixed_length<endianness::LITTLE, uint32_t>(buf, len, utf32_output);
   size_t saved_bytes = ret.second - utf32_output;
@@ -666,21 +666,21 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf8ToUtf32(const char*
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf16LeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   size_t outlen;
   size_t inlen = utf16_to_utf8_avx512i<endianness::LITTLE>(buf, len, (unsigned char*)utf8_output, &outlen);
   if(inlen != len) { return 0; }
   return outlen;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf16BeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   size_t outlen;
   size_t inlen = utf16_to_utf8_avx512i<endianness::BIG>(buf, len, (unsigned char*)utf8_output, &outlen);
   if(inlen != len) { return 0; }
   return outlen;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf16LeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   size_t outlen;
   size_t inlen = utf16_to_utf8_avx512i<endianness::LITTLE>(buf, len, (unsigned char*)utf8_output, &outlen);
   if(inlen != len) {
@@ -691,7 +691,7 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf16LeToUtf8WithErrors(cons
   return {turbo::SUCCESS, outlen};
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf16BeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16BeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   size_t outlen;
   size_t inlen = utf16_to_utf8_avx512i<endianness::BIG>(buf, len, (unsigned char*)utf8_output, &outlen);
   if(inlen != len) {
@@ -702,16 +702,16 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf16BeToUtf8WithErrors(cons
   return {turbo::SUCCESS, outlen};
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf16LeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16LeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   return ConvertUtf16LeToUtf8(buf, len, utf8_output);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf16BeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16BeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   return ConvertUtf16BeToUtf8(buf, len, utf8_output);
 }
 
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf32ToUtf8(const char32_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf8(const char32_t* buf, size_t len, char* utf8_output) const noexcept {
   std::pair<const char32_t*, char*> ret = avx512_convert_utf32_to_utf8(buf, len, utf8_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf8_output;
@@ -724,7 +724,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf32ToUtf8(const char32_t* 
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf32ToUtf8WithErrors(const char32_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf8WithErrors(const char32_t* buf, size_t len, char* utf8_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
   std::pair<result, char*> ret = icelake::avx512_convert_utf32_to_utf8_with_errors(buf, len, utf8_output);
   if (ret.first.count != len) {
@@ -741,11 +741,11 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf32ToUtf8WithErrors(const 
   return ret.first;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf32ToUtf8(const char32_t* buf, size_t len, char* utf8_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf32ToUtf8(const char32_t* buf, size_t len, char* utf8_output) const noexcept {
   return ConvertUtf32ToUtf8(buf, len, utf8_output);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf32ToUtf16Le(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Le(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   std::pair<const char32_t*, char16_t*> ret = avx512_convert_utf32_to_utf16<endianness::LITTLE>(buf, len, utf16_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf16_output;
@@ -758,7 +758,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf32ToUtf16Le(const char32_
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf32ToUtf16Be(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Be(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   std::pair<const char32_t*, char16_t*> ret = avx512_convert_utf32_to_utf16<endianness::BIG>(buf, len, utf16_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf16_output;
@@ -771,7 +771,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf32ToUtf16Be(const char32_
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf32ToUtf16leWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf16leWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
   std::pair<result, char16_t*> ret = avx512_convert_utf32_to_utf16_with_errors<endianness::LITTLE>(buf, len, utf16_output);
   if (ret.first.count != len) {
@@ -788,7 +788,7 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf32ToUtf16leWithErrors(con
   return ret.first;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf32ToUtf16BeWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf16BeWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
   std::pair<result, char16_t*> ret = avx512_convert_utf32_to_utf16_with_errors<endianness::BIG>(buf, len, utf16_output);
   if (ret.first.count != len) {
@@ -805,15 +805,15 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf32ToUtf16BeWithErrors(con
   return ret.first;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf32ToUtf16Le(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf32ToUtf16Le(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   return ConvertUtf32ToUtf16Le(buf, len, utf16_output);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf32ToUtf16Be(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf32ToUtf16Be(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   return ConvertUtf32ToUtf16Be(buf, len, utf16_output);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf16LeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   std::tuple<const char16_t*, char32_t*, bool> ret = icelake::ConvertUtf16ToUtf32<endianness::LITTLE>(buf, len, utf32_output);
   if (!std::get<2>(ret)) { return 0; }
   size_t saved_bytes = std::get<1>(ret) - utf32_output;
@@ -826,7 +826,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf16LeToUtf32(const char16_
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf16BeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   std::tuple<const char16_t*, char32_t*, bool> ret = icelake::ConvertUtf16ToUtf32<endianness::BIG>(buf, len, utf32_output);
   if (!std::get<2>(ret)) { return 0; }
   size_t saved_bytes = std::get<1>(ret) - utf32_output;
@@ -839,7 +839,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertUtf16BeToUtf32(const char16_
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf16LeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   std::tuple<const char16_t*, char32_t*, bool> ret = icelake::ConvertUtf16ToUtf32<endianness::LITTLE>(buf, len, utf32_output);
   if (!std::get<2>(ret)) {
     result scalar_res = scalar::utf16_to_utf32::convert_with_errors<endianness::LITTLE>(
@@ -862,7 +862,7 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf16LeToUtf32WithErrors(con
   return turbo::result(turbo::SUCCESS, saved_bytes);
 }
 
-TURBO_MUST_USE_RESULT result implementation::ConvertUtf16BeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
+TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16BeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   std::tuple<const char16_t*, char32_t*, bool> ret = icelake::ConvertUtf16ToUtf32<endianness::BIG>(buf, len, utf32_output);
   if (!std::get<2>(ret)) {
     result scalar_res = scalar::utf16_to_utf32::convert_with_errors<endianness::BIG>(
@@ -885,7 +885,7 @@ TURBO_MUST_USE_RESULT result implementation::ConvertUtf16BeToUtf32WithErrors(con
   return turbo::result(turbo::SUCCESS, saved_bytes);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf16LeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16LeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   std::tuple<const char16_t*, char32_t*, bool> ret = icelake::ConvertUtf16ToUtf32<endianness::LITTLE>(buf, len, utf32_output);
   if (!std::get<2>(ret)) { return 0; }
   size_t saved_bytes = std::get<1>(ret) - utf32_output;
@@ -898,7 +898,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf16LeToUtf32(const ch
   return saved_bytes;
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf16BeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16BeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   std::tuple<const char16_t*, char32_t*, bool> ret = icelake::ConvertUtf16ToUtf32<endianness::BIG>(buf, len, utf32_output);
   if (!std::get<2>(ret)) { return 0; }
   size_t saved_bytes = std::get<1>(ret) - utf32_output;
@@ -911,7 +911,7 @@ TURBO_MUST_USE_RESULT size_t implementation::ConvertValidUtf16BeToUtf32(const ch
   return saved_bytes;
 }
 
-void implementation::ChangeEndiannessUtf16(const char16_t * input, size_t length, char16_t * output) const noexcept {
+void Implementation::ChangeEndiannessUtf16(const char16_t * input, size_t length, char16_t * output) const noexcept {
   size_t pos = 0;
   const __m512i byteflip = _mm512_setr_epi64(
             0x0607040502030001,
@@ -938,7 +938,7 @@ void implementation::ChangeEndiannessUtf16(const char16_t * input, size_t length
 }
 
 
-TURBO_MUST_USE_RESULT size_t implementation::CountUtf16Le(const char16_t * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::CountUtf16Le(const char16_t * input, size_t length) const noexcept {
   const char16_t* end = length >= 32 ? input + length - 32 : nullptr;
   const char16_t* ptr = input;
 
@@ -957,7 +957,7 @@ TURBO_MUST_USE_RESULT size_t implementation::CountUtf16Le(const char16_t * input
   return count + scalar::utf16::count_code_points<endianness::LITTLE>(ptr, length - (ptr - input));
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::CountUtf16Be(const char16_t * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::CountUtf16Be(const char16_t * input, size_t length) const noexcept {
   const char16_t* end = length >= 32 ? input + length - 32 : nullptr;
   const char16_t* ptr = input;
 
@@ -986,7 +986,7 @@ TURBO_MUST_USE_RESULT size_t implementation::CountUtf16Be(const char16_t * input
 }
 
 
-TURBO_MUST_USE_RESULT size_t implementation::CountUtf8(const char * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::CountUtf8(const char * input, size_t length) const noexcept {
   const char* end = length >= 64 ? input + length - 64 : nullptr;
   const char* ptr = input;
 
@@ -1005,7 +1005,7 @@ TURBO_MUST_USE_RESULT size_t implementation::CountUtf8(const char * input, size_
 }
 
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf8LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::Utf8LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
   const char16_t* end = length >= 32 ? input + length - 32 : nullptr;
   const char16_t* ptr = input;
 
@@ -1035,7 +1035,7 @@ TURBO_MUST_USE_RESULT size_t implementation::Utf8LengthFromUtf16Le(const char16_
   return count + scalar::utf16::Utf8LengthFromUtf16<endianness::LITTLE>(ptr, length - (ptr - input));
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf8LengthFromUtf16be(const char16_t * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::Utf8LengthFromUtf16be(const char16_t * input, size_t length) const noexcept {
   const char16_t* end = length >= 32 ? input + length - 32 : nullptr;
   const char16_t* ptr = input;
 
@@ -1074,15 +1074,15 @@ TURBO_MUST_USE_RESULT size_t implementation::Utf8LengthFromUtf16be(const char16_
   return count + scalar::utf16::Utf8LengthFromUtf16<endianness::BIG>(ptr, length - (ptr - input));
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf32LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
-  return implementation::CountUtf16Le(input, length);
+TURBO_MUST_USE_RESULT size_t Implementation::Utf32LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
+  return Implementation::CountUtf16Le(input, length);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf32LengthFromUtf16Be(const char16_t * input, size_t length) const noexcept {
-  return implementation::CountUtf16Be(input, length);
+TURBO_MUST_USE_RESULT size_t Implementation::Utf32LengthFromUtf16Be(const char16_t * input, size_t length) const noexcept {
+  return Implementation::CountUtf16Be(input, length);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf16LengthFromUtf8(const char * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::Utf16LengthFromUtf8(const char * input, size_t length) const noexcept {
     size_t pos = 0;
     size_t count = 0;
     // This algorithm could no doubt be improved!
@@ -1098,7 +1098,7 @@ TURBO_MUST_USE_RESULT size_t implementation::Utf16LengthFromUtf8(const char * in
     return count + scalar::utf8::Utf16LengthFromUtf8(input + pos, length - pos);
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf8LengthFromUtf32(const char32_t * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::Utf8LengthFromUtf32(const char32_t * input, size_t length) const noexcept {
   const char32_t* end = length >= 16 ? input + length - 16 : nullptr;
   const char32_t* ptr = input;
 
@@ -1125,7 +1125,7 @@ TURBO_MUST_USE_RESULT size_t implementation::Utf8LengthFromUtf32(const char32_t 
   return count + scalar::utf32::Utf8LengthFromUtf32(ptr, length - (ptr - input));
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf16LengthFromUtf32(const char32_t * input, size_t length) const noexcept {
+TURBO_MUST_USE_RESULT size_t Implementation::Utf16LengthFromUtf32(const char32_t * input, size_t length) const noexcept {
   const char32_t* end = length >= 16 ? input + length - 16 : nullptr;
   const char32_t* ptr = input;
 
@@ -1144,8 +1144,8 @@ TURBO_MUST_USE_RESULT size_t implementation::Utf16LengthFromUtf32(const char32_t
   return count + scalar::utf32::Utf16LengthFromUtf32(ptr, length - (ptr - input));
 }
 
-TURBO_MUST_USE_RESULT size_t implementation::Utf32LengthFromUtf8(const char * input, size_t length) const noexcept {
-  return implementation::CountUtf8(input, length);
+TURBO_MUST_USE_RESULT size_t Implementation::Utf32LengthFromUtf8(const char * input, size_t length) const noexcept {
+  return Implementation::CountUtf8(input, length);
 }
 
 } // namespace TURBO_UNICODE_IMPLEMENTATION

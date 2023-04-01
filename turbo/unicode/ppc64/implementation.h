@@ -25,10 +25,10 @@ namespace {
 using namespace turbo;
 } // namespace
 
-class implementation final : public turbo::implementation {
+class Implementation final : public turbo::Implementation {
 public:
-  TURBO_FORCE_INLINE implementation()
-      : turbo::implementation("ppc64", "PPC64 ALTIVEC",
+  TURBO_FORCE_INLINE Implementation()
+      : turbo::Implementation("ppc64", "PPC64 ALTIVEC",
                                  internal::instruction_set::ALTIVEC) {}
   TURBO_MUST_USE_RESULT int DetectEncodings(const char * input, size_t length) const noexcept final;
   TURBO_MUST_USE_RESULT bool ValidateUtf8(const char *buf, size_t len) const noexcept final;
