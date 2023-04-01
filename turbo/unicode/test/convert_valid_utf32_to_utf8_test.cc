@@ -39,7 +39,7 @@ TEST(convert_pure_ASCII) {
   };
 
   auto procedure = [&implementation](const char32_t* utf32, size_t size, char* utf8) -> size_t {
-    return implementation.convert_valid_utf32_to_utf8(utf32, size, utf8);
+    return implementation.ConvertValidUtf32ToUtf8(utf32, size, utf8);
   };
 
   std::array<size_t, 5> input_size{16, 12, 64, 128, 256};
@@ -56,7 +56,7 @@ TEST(convert_into_1_or_2_UTF8_bytes) {
     turbo::tests::helpers::RandomInt random(0x0000, 0x07ff, seed); // range for 1 or 2 UTF-8 bytes
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char* utf8) -> size_t {
-      return implementation.convert_valid_utf32_to_utf8(utf32, size, utf8);
+      return implementation.ConvertValidUtf32ToUtf8(utf32, size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -76,7 +76,7 @@ TEST(convert_into_1_or_2_or_3_UTF8_bytes) {
                                                      {0xe000, 0xffff}}, 0);
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char* utf8) -> size_t {
-      return implementation.convert_valid_utf32_to_utf8(utf32, size, utf8);
+      return implementation.ConvertValidUtf32ToUtf8(utf32, size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -94,7 +94,7 @@ TEST(convert_into_3_or_4_UTF8_bytes) {
                                                      {0xe000, 0x10ffff}}, 0);
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char* utf8) -> size_t {
-      return implementation.convert_valid_utf32_to_utf8(utf32, size, utf8);
+      return implementation.ConvertValidUtf32ToUtf8(utf32, size, utf8);
     };
 
     for (size_t size: input_size) {

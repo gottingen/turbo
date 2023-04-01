@@ -43,7 +43,7 @@ TEST(count_pure_ASCII) {
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.count_utf8(
+      ASSERT_TRUE(implementation.CountUtf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }
@@ -62,7 +62,7 @@ TEST(count_1_or_2_UTF8_bytes) {
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.count_utf8(
+      ASSERT_TRUE(implementation.CountUtf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }
@@ -81,7 +81,7 @@ TEST(count_1_or_2_or_3_UTF8_bytes) {
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.count_utf8(
+      ASSERT_TRUE(implementation.CountUtf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }
@@ -96,7 +96,7 @@ TEST(count_1_2_3_or_4_UTF8_bytes) {
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.count_utf8(
+      ASSERT_TRUE(implementation.CountUtf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }

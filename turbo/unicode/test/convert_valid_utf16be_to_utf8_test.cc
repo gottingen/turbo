@@ -41,8 +41,8 @@ TEST(convert_pure_ASCII) {
 
   auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
     std::vector<char16_t> utf16be(size);
-    implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-    return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+    implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+    return implementation.ConvertValidUtf16BeToUtf8(utf16be.data(), size, utf8);
   };
 
   std::array<size_t, 1> input_size{16};
@@ -60,8 +60,8 @@ TEST(convert_into_1_or_2_UTF8_bytes) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      return implementation.ConvertValidUtf16BeToUtf8(utf16be.data(), size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -82,8 +82,8 @@ TEST(convert_into_1_or_2_or_3_UTF8_bytes) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      return implementation.ConvertValidUtf16BeToUtf8(utf16be.data(), size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -102,8 +102,8 @@ TEST(convert_into_3_or_4_UTF8_bytes) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      return implementation.ConvertValidUtf16BeToUtf8(utf16be.data(), size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -192,14 +192,14 @@ namespace {
 TEST(all_possible_8_codepoint_combinations) {
   auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
     std::vector<char16_t> utf16be(size);
-    implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-    return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+    implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+    return implementation.ConvertValidUtf16BeToUtf8(utf16be.data(), size, utf8);
   };
 
   std::vector<char> output_utf8(256, ' ');
   const auto& combinations = all_combinations();
   for (const auto& input_utf16: combinations) {
-    if (turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size())) {
+    if (turbo::tests::reference::ValidateUtf16(input_utf16.data(), input_utf16.size())) {
       transcode_utf16_to_utf8_test_base test(input_utf16);
       ASSERT_TRUE(test(procedure));
     }

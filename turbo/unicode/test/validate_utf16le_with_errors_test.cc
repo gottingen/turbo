@@ -34,7 +34,7 @@ TEST(validate_utf16le_with_errors__returns_success_for_valid_input__single_words
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512, seed)};
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     ASSERT_EQUAL(res.count, utf16.size());
@@ -47,7 +47,7 @@ TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pa
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(8)};
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     ASSERT_EQUAL(res.count, utf16.size());
@@ -61,7 +61,7 @@ TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pa
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512)};
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     ASSERT_EQUAL(res.count, utf16.size());
@@ -74,7 +74,7 @@ TEST(validate_utf16le_with_errors__returns_success_for_valid_input__mixed) {
   turbo::tests::helpers::random_utf16 generator{seed, 1, 1};
   const auto utf16{generator.generate(512)};
 
-  turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+  turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
   ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
   ASSERT_EQUAL(res.count, utf16.size());
@@ -83,7 +83,7 @@ TEST(validate_utf16le_with_errors__returns_success_for_valid_input__mixed) {
 TEST(validate_utf16le_with_errors__returns_success_for_empty_string) {
   const char16_t* buf = (char16_t*)"";
 
-  turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
+  turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(buf), 0);
 
   ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
   ASSERT_EQUAL(res.count, 0);
@@ -117,7 +117,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word
         const char16_t old = utf16[i];
         utf16[i] = wrong_value;
 
-        turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+        turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(buf), len);
 
         ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
         ASSERT_EQUAL(res.count, i);
@@ -158,7 +158,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_wor
       utf16[i + 0] = valid_surrogate_W1;
       utf16[i + 1] = W2;
 
-      turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+      turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(buf), len);
 
       ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
       ASSERT_EQUAL(res.count, i);
@@ -190,7 +190,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
 
     utf16[size - 1] = valid_surrogate_W1;
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+    turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(buf), len);
 
     ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
     ASSERT_EQUAL(res.count, size - 1);
@@ -261,7 +261,7 @@ TEST(validate_utf16le_with_errors__extensive_tests) {
     }
 
     // check
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+    turbo::result res = implementation.ValidateUtf16LeWithErrors(reinterpret_cast<const char16_t*>(buf), len);
 
     ASSERT_EQUAL(res.error, valid);
   }

@@ -41,13 +41,13 @@ TEST(convert_into_2_UTF16_bytes) {
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(size);
-      turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+      turbo::result res = implementation.ConvertUtf32ToUtf16BeWithErrors(utf32, size, utf16be.data());
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-      implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
+      implementation.ChangeEndiannessUtf16(utf16be.data(), res.count, utf16le);
       return res.count;
     };
     auto size_procedure = [&implementation](const char32_t* utf32, size_t size) -> size_t {
-      return implementation.utf16_length_from_utf32(utf32, size);
+      return implementation.Utf16LengthFromUtf32(utf32, size);
     };
     for (size_t size: input_size) {
       transcode_utf32_to_utf16_test_base test(random, size);
@@ -65,13 +65,13 @@ TEST(convert_into_4_UTF16_bytes) {
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);
-      turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+      turbo::result res = implementation.ConvertUtf32ToUtf16BeWithErrors(utf32, size, utf16be.data());
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-      implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
+      implementation.ChangeEndiannessUtf16(utf16be.data(), res.count, utf16le);
       return res.count;
     };
     auto size_procedure = [&implementation](const char32_t* utf32, size_t size) -> size_t {
-      return implementation.utf16_length_from_utf32(utf32, size);
+      return implementation.Utf16LengthFromUtf32(utf32, size);
     };
     for (size_t size: input_size) {
       transcode_utf32_to_utf16_test_base test(random, size);
@@ -91,13 +91,13 @@ TEST(convert_into_2_or_4_UTF16_bytes) {
 
     auto procedure = [&implementation](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);
-      turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+      turbo::result res = implementation.ConvertUtf32ToUtf16BeWithErrors(utf32, size, utf16be.data());
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-      implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
+      implementation.ChangeEndiannessUtf16(utf16be.data(), res.count, utf16le);
       return res.count;
     };
     auto size_procedure = [&implementation](const char32_t* utf32, size_t size) -> size_t {
-      return implementation.utf16_length_from_utf32(utf32, size);
+      return implementation.Utf16LengthFromUtf32(utf32, size);
     };
     for (size_t size: input_size) {
       transcode_utf32_to_utf16_test_base test(random, size);
@@ -115,7 +115,7 @@ TEST(convert_fails_if_there_is_surrogate) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [&implementation, &i](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
         std::vector<char16_t> utf16be(2*size);
-        turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+        turbo::result res = implementation.ConvertUtf32ToUtf16BeWithErrors(utf32, size, utf16be.data());
         ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
         ASSERT_EQUAL(res.count, i);
         return 0;
@@ -140,7 +140,7 @@ TEST(convert_fails_if_input_too_large) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [&implementation, &i](const char32_t* utf32, size_t size, char16_t* utf16le) -> size_t {
         std::vector<char16_t> utf16be(2*size);
-        turbo::result res = implementation.convert_utf32_to_utf16be_with_errors(utf32, size, utf16be.data());
+        turbo::result res = implementation.ConvertUtf32ToUtf16BeWithErrors(utf32, size, utf16be.data());
         ASSERT_EQUAL(res.error, turbo::error_code::TOO_LARGE);
         ASSERT_EQUAL(res.count, i);
         return 0;

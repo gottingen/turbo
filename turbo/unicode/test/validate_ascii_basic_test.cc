@@ -74,14 +74,14 @@ TEST(hard_coded) {
       "\xef\xbb\xbf"};
   for (size_t i = 0; i < sizeof(goodsequences)/sizeof(goodsequences[0]); i++) {
     size_t len = std::strlen(goodsequences[i]);
-    if (!implementation.validate_ascii(goodsequences[i], len)) {
+    if (!implementation.ValidateAscii(goodsequences[i], len)) {
       printf("bug goodsequences[%zu]\n", i);
       ASSERT_TRUE(false);
     }
   }
   for (size_t i = 0; i < sizeof(badsequences)/sizeof(badsequences[0]); i++) {
     size_t len = std::strlen(badsequences[i]);
-    if (implementation.validate_ascii(badsequences[i], len)) {
+    if (implementation.ValidateAscii(badsequences[i], len)) {
       printf("bug lookup2 badsequences[%zu]\n", i);
       ASSERT_TRUE(false);
     }

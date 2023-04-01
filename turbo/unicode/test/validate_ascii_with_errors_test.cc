@@ -30,7 +30,7 @@ TEST(no_error_ASCII) {
     for(size_t trial = 0; trial < 1000; trial++) {
         const auto ascii{generator.generate(512)};
 
-        turbo::result res = implementation.validate_ascii_with_errors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
+        turbo::result res = implementation.ValidateAsciiWithErrors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
 
         ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
         ASSERT_EQUAL(res.count, ascii.size());
@@ -47,7 +47,7 @@ TEST(error_ASCII) {
         for (int i = 0; i < ascii.size(); i++) {
             ascii[i] += 0b10000000;
 
-            turbo::result res = implementation.validate_ascii_with_errors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
+            turbo::result res = implementation.ValidateAsciiWithErrors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
 
             ASSERT_EQUAL(res.error, turbo::error_code::TOO_LARGE);
             ASSERT_EQUAL(res.count, i);

@@ -19,7 +19,7 @@
   A scalar routing should carry on the conversion of the tail.
 */
 template <endianness big_endian>
-std::tuple<const char16_t*, char32_t*, bool> convert_utf16_to_utf32(const char16_t* buf, size_t len, char32_t* utf32_output) {
+std::tuple<const char16_t*, char32_t*, bool> ConvertUtf16ToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) {
   const char16_t* end = buf + len;
   const __m512i v_fc00 = _mm512_set1_epi16((uint16_t)0xfc00);
   const __m512i v_d800 = _mm512_set1_epi16((uint16_t)0xd800);

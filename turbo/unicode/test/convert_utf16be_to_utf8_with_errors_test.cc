@@ -40,13 +40,13 @@ TEST(convert_pure_ASCII) {
 
   auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
     std::vector<char16_t> utf16be(size);
-    implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-    turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+    implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+    turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
     return res.count;
   };
   auto size_procedure = [&implementation](const char16_t* utf16, size_t size) -> size_t {
-    return implementation.utf8_length_from_utf16le(utf16, size);
+    return implementation.Utf8LengthFromUtf16Le(utf16, size);
   };
   std::array<size_t, 1> input_size{16};
   for (size_t size: input_size) {
@@ -64,13 +64,13 @@ TEST(convert_into_1_or_2_UTF8_bytes) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char16_t* utf16, size_t size) -> size_t {
-      return implementation.utf8_length_from_utf16le(utf16, size);
+      return implementation.Utf8LengthFromUtf16Le(utf16, size);
     };
     for (size_t size: input_size) {
       transcode_utf16_to_utf8_test_base test(random, size);
@@ -91,13 +91,13 @@ TEST(convert_into_1_or_2_or_3_UTF8_bytes) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char16_t* utf16, size_t size) -> size_t {
-      return implementation.utf8_length_from_utf16le(utf16, size);
+      return implementation.Utf8LengthFromUtf16Le(utf16, size);
     };
     for (size_t size: input_size) {
       transcode_utf16_to_utf8_test_base test(random, size);
@@ -116,13 +116,13 @@ TEST(convert_into_3_or_4_UTF8_bytes) {
 
     auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char16_t* utf16, size_t size) -> size_t {
-      return implementation.utf8_length_from_utf16le(utf16, size);
+      return implementation.Utf8LengthFromUtf16Le(utf16, size);
     };
     for (size_t size: input_size) {
       transcode_utf16_to_utf8_test_base test(random, size);
@@ -143,8 +143,8 @@ TEST(convert_fails_if_there_is_sole_low_surrogate) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [&implementation, &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
         std::vector<char16_t> utf16be(size);
-        implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-        turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+        implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+        turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
         ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
         ASSERT_EQUAL(res.count, i);
         return 0;
@@ -169,8 +169,8 @@ TEST(convert_fails_if_there_is_sole_high_surrogate) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [&implementation, &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
         std::vector<char16_t> utf16be(size);
-        implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-        turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+        implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+        turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
         ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
         ASSERT_EQUAL(res.count, i);
         return 0;
@@ -195,8 +195,8 @@ TEST(convert_fails_if_there_is_low_surrogate_is_followed_by_another_low_surrogat
     for (size_t i=0; i < size - 1; i++) {
       auto procedure = [&implementation, &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
         std::vector<char16_t> utf16be(size);
-        implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-        turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+        implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+        turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
         ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
         ASSERT_EQUAL(res.count, i);
         return 0;
@@ -225,8 +225,8 @@ TEST(convert_fails_if_there_is_surrogate_pair_is_followed_by_high_surrogate) {
   for (size_t i=0; i < size - 2; i++) {
     auto procedure = [&implementation, &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = implementation.convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      implementation.ChangeEndiannessUtf16(utf16le, size, utf16be.data());
+      turbo::result res = implementation.ConvertUtf16BeToUtf8WithErrors(utf16be.data(), size, utf8);
       ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
       ASSERT_EQUAL(res.count, i+2);
       return 0;

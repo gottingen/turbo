@@ -33,7 +33,7 @@ TURBO_FORCE_INLINE size_t count_code_points(const char* in, size_t size) {
 }
 
 
-TURBO_FORCE_INLINE size_t utf16_length_from_utf8(const char* in, size_t size) {
+TURBO_FORCE_INLINE size_t Utf16LengthFromUtf8(const char* in, size_t size) {
     size_t pos = 0;
     size_t count = 0;
     // This algorithm could no doubt be improved!
@@ -46,11 +46,11 @@ TURBO_FORCE_INLINE size_t utf16_length_from_utf8(const char* in, size_t size) {
       int64_t utf8_4byte = input.gteq_unsigned(240);
       count += count_ones(utf8_4byte);
     }
-    return count + scalar::utf8::utf16_length_from_utf8(in + pos, size - pos);
+    return count + scalar::utf8::Utf16LengthFromUtf8(in + pos, size - pos);
 }
 
 
-TURBO_FORCE_INLINE size_t utf32_length_from_utf8(const char* in, size_t size) {
+TURBO_FORCE_INLINE size_t Utf32LengthFromUtf8(const char* in, size_t size) {
     return count_code_points(in, size);
 }
 } // utf8 namespace

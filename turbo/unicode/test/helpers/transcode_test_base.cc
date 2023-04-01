@@ -100,7 +100,7 @@ namespace turbo { namespace tests { namespace helpers {
   }
 
   bool transcode_utf8_to_utf16_test_base::is_input_valid() const {
-    return turbo::tests::reference::validate_utf8(input_utf8.data(), input_utf8.size());
+    return turbo::tests::reference::ValidateUtf8(input_utf8.data(), input_utf8.size());
   }
 
   bool transcode_utf8_to_utf16_test_base::validate(size_t saved_chars) const {
@@ -163,7 +163,7 @@ namespace turbo { namespace tests { namespace helpers {
   }
 
   bool transcode_utf8_to_utf32_test_base::is_input_valid() const {
-    return turbo::tests::reference::validate_utf8(input_utf8.data(), input_utf8.size());
+    return turbo::tests::reference::ValidateUtf8(input_utf8.data(), input_utf8.size());
   }
 
   bool transcode_utf8_to_utf32_test_base::validate(size_t saved_chars) const {
@@ -243,7 +243,7 @@ namespace turbo { namespace tests { namespace helpers {
   }
 
   bool transcode_utf16_to_utf8_test_base::is_input_valid() const {
-    return turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size());
+    return turbo::tests::reference::ValidateUtf16(input_utf16.data(), input_utf16.size());
   }
 
   bool transcode_utf16_to_utf8_test_base::validate(size_t saved_chars) const {
@@ -337,7 +337,7 @@ namespace turbo { namespace tests { namespace helpers {
   }
 
   bool transcode_utf16_to_utf32_test_base::is_input_valid() const {
-    return turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size());
+    return turbo::tests::reference::ValidateUtf16(input_utf16.data(), input_utf16.size());
   }
 
   bool transcode_utf16_to_utf32_test_base::validate(size_t saved_chars) const {
@@ -429,7 +429,7 @@ namespace turbo { namespace tests { namespace helpers {
   }
 
   bool transcode_utf32_to_utf8_test_base::is_input_valid() const {
-    return turbo::tests::reference::validate_utf32(input_utf32.data(), input_utf32.size());
+    return turbo::tests::reference::ValidateUtf32(input_utf32.data(), input_utf32.size());
   }
 
   bool transcode_utf32_to_utf8_test_base::validate(size_t saved_chars) const {
@@ -506,7 +506,7 @@ namespace turbo { namespace tests { namespace helpers {
   }
 
   bool transcode_utf32_to_utf16_test_base::is_input_valid() const {
-    return turbo::tests::reference::validate_utf32(input_utf32.data(), input_utf32.size());
+    return turbo::tests::reference::ValidateUtf32(input_utf32.data(), input_utf32.size());
   }
 
   bool transcode_utf32_to_utf16_test_base::validate(size_t saved_chars) const {

@@ -52,7 +52,7 @@ namespace helpers {
 #error "TURBO_IS_BIG_ENDIAN should be defined."
 #endif
 #if TURBO_IS_BIG_ENDIAN
-    change_endianness_utf16(result.data(), result.size(), result.data());
+    ChangeEndiannessUtf16(result.data(), result.size(), result.data());
 #endif
     return make_pair(result,count);
   }

@@ -18,7 +18,7 @@
 
 namespace turbo {
 
-enum encoding_type {
+enum EncodingType {
         UTF8 = 1,       // BOM 0xef 0xbb 0xbf
         UTF16_LE = 2,   // BOM 0xff 0xfe
         UTF16_BE = 4,   // BOM 0xfe 0xff
@@ -35,7 +35,7 @@ enum endianness {
 
 bool match_system(endianness e);
 
-std::string to_string(encoding_type bom);
+std::string to_string(EncodingType bom);
 
 // Note that BOM for UTF8 is discouraged.
 namespace BOM {
@@ -47,15 +47,15 @@ namespace BOM {
  * @return the corresponding encoding
  */
 
-encoding_type check_bom(const uint8_t* byte, size_t length);
-encoding_type check_bom(const char* byte, size_t length);
+EncodingType check_bom(const uint8_t* byte, size_t length);
+EncodingType check_bom(const char* byte, size_t length);
 /**
  * Returns the size, in bytes, of the BOM for a given encoding type.
  * Note that UTF8 BOM are discouraged.
  * @param bom         the encoding type
  * @return the size in bytes of the corresponding BOM
  */
-size_t bom_byte_size(encoding_type bom);
+size_t bom_byte_size(EncodingType bom);
 
 } // BOM namespace
 } // namespace turbo

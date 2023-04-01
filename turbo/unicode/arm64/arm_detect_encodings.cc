@@ -198,19 +198,19 @@ int arm_detect_encodings(const char * buf, size_t len) {
             check.check_next_input(in);
         }
         if (!check.errors()) {
-            out |= turbo::encoding_type::UTF8;
+            out |= turbo::EncodingType::UTF8;
         }
     }
 
     if (is_utf16 && scalar::utf16::validate<endianness::LITTLE>(reinterpret_cast<const char16_t*>(buf), (len - (buf - start))/2)) {
-        out |= turbo::encoding_type::UTF16_LE;
+        out |= turbo::EncodingType::UTF16_LE;
     }
 
     if (is_utf32 && (len % 4 == 0)) {
         const uint32x4_t standardmax = vmovq_n_u32(0x10ffff);
         uint32x4_t is_zero = veorq_u32(vmaxq_u32(currentmax, standardmax), standardmax);
         if (vmaxvq_u32(is_zero) == 0 && scalar::utf32::validate(reinterpret_cast<const char32_t*>(buf), (len - (buf - start))/4)) {
-            out |= turbo::encoding_type::UTF32_LE;
+            out |= turbo::EncodingType::UTF32_LE;
         }
     }
 

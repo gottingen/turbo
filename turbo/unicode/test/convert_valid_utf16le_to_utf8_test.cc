@@ -56,7 +56,7 @@ TEST(issue_a73) {
       u"\uceae\ua8ab\u81f0\ub194\ua4c0\ua4c0\ub2f6\ub8a5\u9ff3\u3cbd\u81f4"
       u"\u82ae\u9efc\ufe88\ufabe\u9980\uf9b1\u8e95\u80df\ubdf6\ub4ad";
   size_t len = sizeof(utf16) / sizeof(char16_t) - 1;
-  size_t expected_length = implementation.utf8_length_from_utf16le(utf16, len);
+  size_t expected_length = implementation.Utf8LengthFromUtf16Le(utf16, len);
   std::vector<char> output(expected_length);
   const char expected[] =
       "\xeb\xb3\xad\xef\x9e\x99\xe8\x9e\x94\xef\x82\xa6\xe8\xaa\x83\xef\x82\xbb"
@@ -92,7 +92,7 @@ TEST(issue_a73) {
       "\xe9\xa6\x80\xef\xa6\xb1\xe8\xba\x95\xe8\x83\x9f\xeb\xb7\xb6\xeb\x92"
       "\xad";
   size_t utf8size =
-      implementation.convert_valid_utf16le_to_utf8(utf16, len, output.data());
+      implementation.ConvertValidUtf16LeToUtf8(utf16, len, output.data());
   ASSERT_TRUE(utf8size == expected_length);
   for (size_t i = 0; i < expected_length; i++) {
     ASSERT_TRUE(output[i] == expected[i]);
@@ -116,7 +116,7 @@ TEST(issue_a72) {
       "\xe7\xba\x85\xef\xb2\xbc\xe9\xae\x83\xeb\x9f\xad\xee\xb6\xa7\xe9\xa6\xbb"
       "\xe9\x93\xa1\xe9\x87\xbf";
   char utf8[96];
-  size_t utf8size = implementation.convert_valid_utf16le_to_utf8(utf16, 32, utf8);
+  size_t utf8size = implementation.ConvertValidUtf16LeToUtf8(utf16, 32, utf8);
   ASSERT_TRUE(utf8size == 96);
   for (size_t i = 0; i < 96; i++) {
     ASSERT_TRUE(utf8[i] == expected[i]);
@@ -131,7 +131,7 @@ TEST(convert_pure_ASCII) {
   };
 
   auto procedure = [&implementation](const char16_t* utf16, size_t size, char* utf8) -> size_t {
-    return implementation.convert_valid_utf16le_to_utf8(utf16, size, utf8);
+    return implementation.ConvertValidUtf16LeToUtf8(utf16, size, utf8);
   };
 
   std::array<size_t, 1> input_size{16};
@@ -148,7 +148,7 @@ TEST(convert_into_1_or_2_UTF8_bytes) {
     turbo::tests::helpers::RandomInt random(0x0000, 0x07ff, seed); // range for 1 or 2 UTF-8 bytes
 
     auto procedure = [&implementation](const char16_t* utf16, size_t size, char* utf8) -> size_t {
-      return implementation.convert_valid_utf16le_to_utf8(utf16, size, utf8);
+      return implementation.ConvertValidUtf16LeToUtf8(utf16, size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -168,7 +168,7 @@ TEST(convert_into_1_or_2_or_3_UTF8_bytes) {
                                                      {0xe000, 0xffff}}, 0);
 
     auto procedure = [&implementation](const char16_t* utf16, size_t size, char* utf8) -> size_t {
-      return implementation.convert_valid_utf16le_to_utf8(utf16, size, utf8);
+      return implementation.ConvertValidUtf16LeToUtf8(utf16, size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -186,7 +186,7 @@ TEST(convert_into_3_or_4_UTF8_bytes) {
                                                      {0xe000, 0x10ffff}}, 0);
 
     auto procedure = [&implementation](const char16_t* utf16, size_t size, char* utf8) -> size_t {
-      return implementation.convert_valid_utf16le_to_utf8(utf16, size, utf8);
+      return implementation.ConvertValidUtf16LeToUtf8(utf16, size, utf8);
     };
 
     for (size_t size: input_size) {
@@ -274,13 +274,13 @@ namespace {
 
 TEST(all_possible_8_codepoint_combinations) {
   auto procedure = [&implementation](const char16_t* utf16, size_t size, char* utf8) -> size_t {
-    return implementation.convert_valid_utf16le_to_utf8(utf16, size, utf8);
+    return implementation.ConvertValidUtf16LeToUtf8(utf16, size, utf8);
   };
 
   std::vector<char> output_utf8(256, ' ');
   const auto& combinations = all_combinations();
   for (const auto& input_utf16: combinations) {
-    if (turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size())) {
+    if (turbo::tests::reference::ValidateUtf16(input_utf16.data(), input_utf16.size())) {
       transcode_utf16_to_utf8_test_base test(input_utf16);
       ASSERT_TRUE(test(procedure));
     }

@@ -24,12 +24,12 @@
 namespace turbo { namespace test {
 
   int main(int argc, char* argv[]);
-  using test_procedure = void (*)(const turbo::implementation& impl);
+  using test_procedure = void (*)(const turbo::Implementation& impl);
   struct test_entry {
     std::string name;
     test_procedure procedure;
 
-    void operator()(const turbo::implementation& impl) {
+    void operator()(const turbo::Implementation& impl) {
       procedure(impl);
     }
   };
@@ -44,8 +44,8 @@ namespace turbo { namespace test {
 
 
 #define TEST(name)                                          \
-void test_impl_##name(const turbo::implementation& impl); \
-void name(const turbo::implementation& impl) {            \
+void test_impl_##name(const turbo::Implementation& impl); \
+void name(const turbo::Implementation& impl) {            \
   std::string title = #name;                                \
   std::replace(title.begin(), title.end(), '_', ' ');       \
   printf("%s...", title.c_str()); fflush(stdout);           \
@@ -53,7 +53,7 @@ void name(const turbo::implementation& impl) {            \
   puts(" OK");                                              \
 }                                                           \
 static turbo::test::register_test test_register_##name(#name, name); \
-void test_impl_##name(const turbo::implementation& implementation)
+void test_impl_##name(const turbo::Implementation& implementation)
 
 #define ASSERT_EQUAL(a, b) {                                      \
   const auto expr = (a);                                          \
