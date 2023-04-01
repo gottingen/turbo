@@ -14,5 +14,11 @@
 # limitations under the License.
 #
 
-add_subdirectory(json)
-add_subdirectory(strings)
+turbo_cc_binary(
+        NAME
+        string_cat_example
+        SRCS
+        "string_cat_example.cc"
+        DEPS
+        turbo::turbo
+)
