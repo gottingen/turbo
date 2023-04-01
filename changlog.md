@@ -1,5 +1,8 @@
 changelog
 ====
+# v0.7.0
+1. simd unicode
+
 
 # v6.16 plan
 
