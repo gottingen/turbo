@@ -90,18 +90,6 @@ turbo_cc_test(
 
 turbo_cc_test(
   NAME
-    utf8_test
-  SRCS
-    "internal/utf8_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gmock_main
-)
-
-turbo_cc_test(
-  NAME
     string_constant_test
   SRCS
     "internal/string_constant_test.cc"
@@ -607,27 +595,3 @@ turbo_cc_test(
     GTest::gmock_main
 )
 
-
-turbo_cc_test(
-        NAME
-        utf8_decoder_test
-        SRCS
-        "utf8/utf8_decoder_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        utf8_encoder_test
-        SRCS
-        "utf8/utf8_encoder_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
