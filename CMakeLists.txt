@@ -246,6 +246,7 @@ if(TURBO_ENABLE_INSTALL)
       PATTERN "*.h"
       PATTERN "copts" EXCLUDE
       PATTERN "testdata" EXCLUDE
+      PATTERN "synchronization" EXCLUDE
     )
 
   file(READ "turbo/platform/options.h" TURBO_INTERNAL_OPTIONS_H_CONTENTS)
