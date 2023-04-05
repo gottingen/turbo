@@ -1,33 +1,38 @@
-
-/****************************************************************
- * Copyright (c) 2022, liyinbin
- * All rights reserved.
- * Author by liyinbin (jeff.li) lijippy@163.com
- *****************************************************************/
+// Copyright 2023 The Turbo Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "turbo/base/turbo_module.h"
 #include "turbo/platform/port.h"
 #include <cstdlib> // EXIT_FAILURE
-#include <errno.h> // errno
-#include <stdio.h>  // snprintf
-#include <string.h> // strerror_r
-#include <unistd.h> // _exit
-
-#include "turbo/synchronization/mutex.h"
+#include <cerrno> // errno
+#include <cstdio>  // snprintf
+#include <cstring> // strerror_r
+#include <mutex>
 
 namespace turbo {
 
 const int INDEX_BEGIN = 0;
 const int INDEX_END = 4096;
 static const char* module_desc[INDEX_END - INDEX_BEGIN] = {};
-static turbo::Mutex modify_desc_mutex(turbo::kConstInit);
+static std::mutex modify_desc_mutex;
 
 const size_t MODULE_BUFSIZE = 64;
 __thread char tls_module_buf[MODULE_BUFSIZE];
 
 int DescribeCustomizedModule(
     int module_index, const char* module_name, const char* description) {
-    MutexLock l(&modify_desc_mutex);
+    std::unique_lock<std::mutex> l(modify_desc_mutex);
     if (module_index < INDEX_BEGIN || module_index >= INDEX_END) {
         // error() is a non-portable GNU extension that should not be used.
         fprintf(stderr, "Fail to define module %s(%d) which is out of range, abort.",
