@@ -61,7 +61,7 @@ TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 namespace {
 
-TURBO_CONST_INIT turbo::Mutex processing_checks_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::mutex processing_checks_guard;
 
 TURBO_CONST_INIT bool flagfile_needs_processing
     TURBO_GUARDED_BY(processing_checks_guard) = false;
@@ -70,7 +70,7 @@ TURBO_CONST_INIT bool fromenv_needs_processing
 TURBO_CONST_INIT bool tryfromenv_needs_processing
     TURBO_GUARDED_BY(processing_checks_guard) = false;
 
-TURBO_CONST_INIT turbo::Mutex specified_flags_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::mutex specified_flags_guard;
 TURBO_CONST_INIT std::vector<const CommandLineFlag*>* specified_flags
     TURBO_GUARDED_BY(specified_flags_guard) = nullptr;
 
@@ -101,7 +101,7 @@ TURBO_FLAG(std::vector<std::string>, flagfile, {},
     .OnUpdate([]() {
       if (turbo::GetFlag(FLAGS_flagfile).empty()) return;
 
-      turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
+        std::unique_lock<std::mutex> l(turbo::flags_internal::processing_checks_guard);
 
       // Setting this flag twice before it is handled most likely an internal
       // error and should be reviewed by developers.
@@ -117,7 +117,7 @@ TURBO_FLAG(std::vector<std::string>, fromenv, {},
     .OnUpdate([]() {
       if (turbo::GetFlag(FLAGS_fromenv).empty()) return;
 
-      turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
+      std::unique_lock<std::mutex> l(turbo::flags_internal::processing_checks_guard);
 
       // Setting this flag twice before it is handled most likely an internal
       // error and should be reviewed by developers.
@@ -133,7 +133,7 @@ TURBO_FLAG(std::vector<std::string>, tryfromenv, {},
     .OnUpdate([]() {
       if (turbo::GetFlag(FLAGS_tryfromenv).empty()) return;
 
-      turbo::MutexLock l(&turbo::flags_internal::processing_checks_guard);
+        std::unique_lock<std::mutex> l(turbo::flags_internal::processing_checks_guard);
 
       // Setting this flag twice before it is handled most likely an internal
       // error and should be reviewed by developers.
@@ -408,7 +408,7 @@ bool HandleGeneratorFlags(std::vector<ArgsList>& input_args,
                           std::vector<std::string>& flagfile_value) {
   bool success = true;
 
-  turbo::MutexLock l(&flags_internal::processing_checks_guard);
+  std::unique_lock<std::mutex> l(flags_internal::processing_checks_guard);
 
   // flagfile could have been set either on a command line or
   // programmatically before invoking ParseCommandLine. Note that we do not
@@ -471,7 +471,7 @@ void ResetGeneratorFlags(const std::vector<std::string>& flagfile_value) {
   // going to be {"f1", "f2"}
   if (!flagfile_value.empty()) {
     turbo::SetFlag(&FLAGS_flagfile, flagfile_value);
-    turbo::MutexLock l(&flags_internal::processing_checks_guard);
+    std::unique_lock<std::mutex> l(flags_internal::processing_checks_guard);
     flags_internal::flagfile_needs_processing = false;
   }
 
@@ -483,7 +483,7 @@ void ResetGeneratorFlags(const std::vector<std::string>& flagfile_value) {
     turbo::SetFlag(&FLAGS_tryfromenv, {});
   }
 
-  turbo::MutexLock l(&flags_internal::processing_checks_guard);
+  std::unique_lock<std::mutex> l(flags_internal::processing_checks_guard);
   flags_internal::fromenv_needs_processing = false;
   flags_internal::tryfromenv_needs_processing = false;
 }
@@ -602,7 +602,7 @@ bool CanIgnoreUndefinedFlag(turbo::string_piece flag_name) {
 // --------------------------------------------------------------------
 
 bool WasPresentOnCommandLine(turbo::string_piece flag_name) {
-  turbo::MutexLock l(&specified_flags_guard);
+  std::unique_lock<std::mutex> l(specified_flags_guard);
   TURBO_INTERNAL_CHECK(specified_flags != nullptr,
                       "ParseCommandLine is not invoked yet");
 
@@ -696,7 +696,7 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
   }
   output_args.push_back(argv[0]);
 
-  turbo::MutexLock l(&specified_flags_guard);
+  std::unique_lock<std::mutex> l(specified_flags_guard);
   if (specified_flags == nullptr) {
     specified_flags = new std::vector<const CommandLineFlag*>;
   } else {

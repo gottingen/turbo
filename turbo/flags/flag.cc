@@ -26,9 +26,9 @@ TURBO_NAMESPACE_BEGIN
 
 namespace flags_internal {
 
-TURBO_CONST_INIT static turbo::Mutex construction_guard(turbo::kConstInit);
+TURBO_CONST_INIT static std::mutex construction_guard(turbo::kConstInit);
 
-turbo::Mutex* GetGlobalConstructionGuard() { return &construction_guard; }
+std::mutex* GetGlobalConstructionGuard() { return &construction_guard; }
 
 }  // namespace flags_internal
 

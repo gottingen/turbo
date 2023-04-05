@@ -61,7 +61,7 @@ bool ShouldValidateFlagValue(FlagFastTypeId flag_type_id) {
   return true;
 }
 
-// RAII helper used to temporarily unlock and relock `turbo::Mutex`.
+// RAII helper used to temporarily unlock and relock `std::mutex`.
 // This is used when we need to ensure that locks are released while
 // invoking user supplied callbacks and then reacquired, since callbacks may
 // need to acquire these locks themselves.

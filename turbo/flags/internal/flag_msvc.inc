@@ -33,7 +33,7 @@
 // https://developercommunity.visualstudio.com/content/problem/336946/class-with-constexpr-constructor-not-using-static.html?childToView=648454#comment-648454
 
 namespace flags_internal {
-turbo::Mutex* GetGlobalConstructionGuard();
+std::mutex* GetGlobalConstructionGuard();
 }  // namespace flags_internal
 
 // Public methods of `turbo::Flag<T>` are NOT part of the Turbo Flags API.
