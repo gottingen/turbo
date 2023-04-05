@@ -16,37 +16,37 @@
 #include "turbo/flags/internal/program_name.h"
 
 #include <string>
+#include <mutex>
 
 #include "turbo/base/const_init.h"
 #include "turbo/flags/internal/path_util.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 
-TURBO_CONST_INIT static turbo::Mutex program_name_guard(turbo::kConstInit);
+TURBO_CONST_INIT static std::mutex program_name_guard;
 TURBO_CONST_INIT static std::string* program_name
     TURBO_GUARDED_BY(program_name_guard) = nullptr;
 
 std::string ProgramInvocationName() {
-  turbo::MutexLock l(&program_name_guard);
+  std::unique_lock<std::mutex> l(program_name_guard);
 
   return program_name ? *program_name : "UNKNOWN";
 }
 
 std::string ShortProgramInvocationName() {
-  turbo::MutexLock l(&program_name_guard);
+    std::unique_lock<std::mutex> l(program_name_guard);
 
   return program_name ? std::string(flags_internal::Basename(*program_name))
                       : "UNKNOWN";
 }
 
 void SetProgramInvocationName(turbo::string_piece prog_name_str) {
-  turbo::MutexLock l(&program_name_guard);
+    std::unique_lock<std::mutex> l(program_name_guard);
 
   if (!program_name)
     program_name = new std::string(prog_name_str);

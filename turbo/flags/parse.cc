@@ -53,7 +53,6 @@
 #include "turbo/strings/str_join.h"
 #include "turbo/strings/string_piece.h"
 #include "turbo/strings/strip.h"
-#include "turbo/synchronization/mutex.h"
 
 // --------------------------------------------------------------------
 

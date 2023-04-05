@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <mutex>
 #include <array>
 #include <atomic>
 #include <memory>
@@ -37,7 +38,6 @@
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -67,14 +67,14 @@ bool ShouldValidateFlagValue(FlagFastTypeId flag_type_id) {
 // need to acquire these locks themselves.
 class MutexRelock {
  public:
-  explicit MutexRelock(turbo::Mutex& mu) : mu_(mu) { mu_.Unlock(); }
-  ~MutexRelock() { mu_.Lock(); }
+  explicit MutexRelock(std::mutex& mu) : mu_(mu) { mu_.unlock(); }
+  ~MutexRelock() { mu_.unlock(); }
 
   MutexRelock(const MutexRelock&) = delete;
   MutexRelock& operator=(const MutexRelock&) = delete;
 
  private:
-  turbo::Mutex& mu_;
+  std::mutex& mu_;
 };
 
 }  // namespace
@@ -140,7 +140,7 @@ void DynValueDeleter::operator()(void* ptr) const {
 }
 
 void FlagImpl::Init() {
-  new (&data_guard_) turbo::Mutex;
+  new (&data_guard_) std::mutex;
 
   auto def_kind = static_cast<FlagDefaultKind>(def_kind_);
 
@@ -183,12 +183,12 @@ void FlagImpl::Init() {
   seq_lock_.MarkInitialized();
 }
 
-turbo::Mutex* FlagImpl::DataGuard() const {
+std::mutex* FlagImpl::DataGuard() const {
   turbo::call_once(const_cast<FlagImpl*>(this)->init_control_, &FlagImpl::Init,
                   const_cast<FlagImpl*>(this));
 
   // data_guard_ is initialized inside Init.
-  return reinterpret_cast<turbo::Mutex*>(&data_guard_);
+  return reinterpret_cast<std::mutex*>(&data_guard_);
 }
 
 void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
@@ -277,12 +277,12 @@ int64_t FlagImpl::ModificationCount() const {
 }
 
 bool FlagImpl::IsSpecifiedOnCommandLine() const {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
   return on_command_line_;
 }
 
 std::string FlagImpl::DefaultValue() const {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
 
   auto obj = MakeInitValue();
   return flags_internal::Unparse(op_, obj.get());
@@ -305,7 +305,7 @@ std::string FlagImpl::CurrentValue() const {
       return flags_internal::Unparse(op_, cloned.get());
     }
     case FlagValueStorageKind::kAlignedBuffer: {
-      turbo::MutexLock l(guard);
+      std::unique_lock<std::mutex> l(*guard);
       return flags_internal::Unparse(op_, AlignedBufferValue());
     }
   }
@@ -314,7 +314,7 @@ std::string FlagImpl::CurrentValue() const {
 }
 
 void FlagImpl::SetCallback(const FlagCallbackFunc mutation_callback) {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
 
   if (callback_ == nullptr) {
     callback_ = new FlagCallback;
@@ -343,12 +343,12 @@ void FlagImpl::InvokeCallback() const {
   // completed. Requires that *primary_lock be held in exclusive mode; it may be
   // released and reacquired by the implementation.
   MutexRelock relock(*DataGuard());
-  turbo::MutexLock lock(&callback_->guard);
+  std::unique_lock<std::mutex> lock(callback_->guard);
   cb();
 }
 
 std::unique_ptr<FlagStateInterface> FlagImpl::SaveState() {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
 
   bool modified = modified_;
   bool on_command_line = on_command_line_;
@@ -379,7 +379,7 @@ std::unique_ptr<FlagStateInterface> FlagImpl::SaveState() {
 }
 
 bool FlagImpl::RestoreState(const FlagState& flag_state) {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
   if (flag_state.counter_ == ModificationCount()) {
     return false;
   }
@@ -460,7 +460,7 @@ void FlagImpl::Read(void* dst) const {
       break;
     }
     case FlagValueStorageKind::kAlignedBuffer: {
-      turbo::MutexLock l(guard);
+      std::unique_lock<std::mutex> lock(*guard);
       flags_internal::CopyConstruct(op_, AlignedBufferValue(), dst);
       break;
     }
@@ -492,14 +492,14 @@ void FlagImpl::ReadSequenceLockedData(void* dst) const {
   }
   // We failed due to contention. Acquire the lock to prevent contention
   // and try again.
-  turbo::ReaderMutexLock l(DataGuard());
+  std::unique_lock<std::mutex> lock(*DataGuard());
   bool success = seq_lock_.TryRead(dst, AtomicBufferValue(), size);
   assert(success);
   static_cast<void>(success);
 }
 
 void FlagImpl::Write(const void* src) {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
 
   if (ShouldValidateFlagValue(flags_internal::FastTypeId(op_))) {
     std::unique_ptr<void, DynValueDeleter> obj{flags_internal::Clone(op_, src),
@@ -525,7 +525,7 @@ void FlagImpl::Write(const void* src) {
 // The mode is selected based on 'set_mode' parameter.
 bool FlagImpl::ParseFrom(turbo::string_piece value, FlagSettingMode set_mode,
                          ValueSource source, std::string& err) {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
 
   switch (set_mode) {
     case SET_FLAGS_VALUE: {
@@ -585,7 +585,7 @@ bool FlagImpl::ParseFrom(turbo::string_piece value, FlagSettingMode set_mode,
 void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
   std::string v = DefaultValue();
 
-  turbo::MutexLock lock(DataGuard());
+  std::unique_lock<std::mutex> lock(*DataGuard());
 
   auto dst = MakeInitValue();
   std::string error;
@@ -602,7 +602,7 @@ void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
 }
 
 bool FlagImpl::ValidateInputValue(turbo::string_piece value) const {
-  turbo::MutexLock l(DataGuard());
+  std::unique_lock<std::mutex> l(*DataGuard());
 
   auto obj = MakeInitValue();
   std::string ignored_error;

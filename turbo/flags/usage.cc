@@ -17,19 +17,20 @@
 #include <stdlib.h>
 
 #include <string>
+#include <mutex>
 
+#include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/const_init.h"
 #include "turbo/flags/internal/usage.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace flags_internal {
 namespace {
-TURBO_CONST_INIT turbo::Mutex usage_message_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::mutex usage_message_guard;
 TURBO_CONST_INIT std::string* program_usage_message
     TURBO_GUARDED_BY(usage_message_guard) = nullptr;
 }  // namespace
@@ -38,7 +39,7 @@ TURBO_CONST_INIT std::string* program_usage_message
 // --------------------------------------------------------------------
 // Sets the "usage" message to be used by help reporting routines.
 void SetProgramUsageMessage(turbo::string_piece new_usage_message) {
-  turbo::MutexLock l(&flags_internal::usage_message_guard);
+  std::unique_lock<std::mutex> lock(flags_internal::usage_message_guard);
 
   if (flags_internal::program_usage_message != nullptr) {
     TURBO_INTERNAL_LOG(FATAL, "SetProgramUsageMessage() called twice.");
@@ -53,7 +54,7 @@ void SetProgramUsageMessage(turbo::string_piece new_usage_message) {
 // Note: We able to return string_piece here only because calling
 // SetProgramUsageMessage twice is prohibited.
 turbo::string_piece ProgramUsageMessage() {
-  turbo::MutexLock l(&flags_internal::usage_message_guard);
+  std::unique_lock<std::mutex> l(flags_internal::usage_message_guard);
 
   return flags_internal::program_usage_message != nullptr
              ? turbo::string_piece(*flags_internal::program_usage_message)

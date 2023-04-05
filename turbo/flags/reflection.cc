@@ -19,6 +19,7 @@
 
 #include <atomic>
 #include <string>
+#include <mutex>
 
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/flags/commandlineflag.h"
@@ -29,7 +30,6 @@
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
