@@ -40,7 +40,6 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -411,7 +410,7 @@ using FlagCallbackFunc = void (*)();
 
 struct FlagCallback {
   FlagCallbackFunc func;
-  turbo::Mutex guard;  // Guard for concurrent callback invocations.
+  std::mutex guard;  // Guard for concurrent callback invocations.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -491,8 +490,8 @@ class FlagImpl final : public CommandLineFlag {
   friend class FlagState;
 
   // Ensures that `data_guard_` is initialized and returns it.
-  turbo::Mutex* DataGuard() const
-      TURBO_LOCK_RETURNED(reinterpret_cast<turbo::Mutex*>(data_guard_));
+  std::mutex* DataGuard() const
+      TURBO_LOCK_RETURNED(reinterpret_cast<std::mutex*>(data_guard_));
   // Returns heap allocated value of type T initialized with default value.
   std::unique_ptr<void, DynValueDeleter> MakeInitValue() const
       TURBO_EXCLUSIVE_LOCKS_REQUIRED(*DataGuard());
@@ -609,7 +608,7 @@ class FlagImpl final : public CommandLineFlag {
   // Sequence lock / mutation counter.
   flags_internal::SequenceLock seq_lock_;
 
-  // Optional flag's callback and turbo::Mutex to guard the invocations.
+  // Optional flag's callback and std::mutex to guard the invocations.
   FlagCallback* callback_ TURBO_GUARDED_BY(*DataGuard());
   // Either a pointer to the function generating the default value based on the
   // value specified in TURBO_FLAG or pointer to the dynamically set default
@@ -617,14 +616,14 @@ class FlagImpl final : public CommandLineFlag {
   // these two cases.
   FlagDefaultSrc default_value_;
 
-  // This is reserved space for an turbo::Mutex to guard flag data. It will be
+  // This is reserved space for an std::mutex to guard flag data. It will be
   // initialized in FlagImpl::Init via placement new.
-  // We can't use "turbo::Mutex data_guard_", since this class is not literal.
-  // We do not want to use "turbo::Mutex* data_guard_", since this would require
+  // We can't use "std::mutex data_guard_", since this class is not literal.
+  // We do not want to use "std::mutex* data_guard_", since this would require
   // heap allocation during initialization, which is both slows program startup
   // and can fail. Using reserved space + placement new allows us to avoid both
   // problems.
-  alignas(turbo::Mutex) mutable char data_guard_[sizeof(turbo::Mutex)];
+  alignas(std::mutex) mutable char data_guard_[sizeof(std::mutex)];
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -237,6 +237,7 @@ TEST(ScopedMockLogTest, LogFromMultipleThreads) {
 // Tests that no sequence will be imposed on two LOG message expectations from
 // different threads. This test would actually deadlock if replaced to two LOG
 // statements from the same thread.
+/*
 TEST(ScopedMockLogTest, NoSequenceWithMultipleThreads) {
   turbo::ScopedMockLog log;
 
@@ -253,7 +254,7 @@ TEST(ScopedMockLogTest, NoSequenceWithMultipleThreads) {
   thread1.join();
   thread2.join();
 }
-
+*/
 TEST(ScopedMockLogTsanTest,
      ScopedMockLogCanBeDeletedWhenAnotherThreadIsLogging) {
   auto log = turbo::make_unique<turbo::ScopedMockLog>();

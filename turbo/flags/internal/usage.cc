@@ -421,7 +421,7 @@ int HandleUsageFlags(std::ostream& out,
 
 namespace {
 
-TURBO_CONST_INIT turbo::Mutex help_attributes_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::mutex help_attributes_guard;
 TURBO_CONST_INIT std::string* match_substr
     TURBO_GUARDED_BY(help_attributes_guard) = nullptr;
 TURBO_CONST_INIT HelpMode help_mode TURBO_GUARDED_BY(help_attributes_guard) =
@@ -432,34 +432,34 @@ TURBO_CONST_INIT HelpFormat help_format TURBO_GUARDED_BY(help_attributes_guard) 
 }  // namespace
 
 std::string GetFlagsHelpMatchSubstr() {
-  turbo::MutexLock l(&help_attributes_guard);
+  std::unique_lock<std::mutex> l(help_attributes_guard);
   if (match_substr == nullptr) return "";
   return *match_substr;
 }
 
 void SetFlagsHelpMatchSubstr(turbo::string_piece substr) {
-  turbo::MutexLock l(&help_attributes_guard);
+  std::unique_lock<std::mutex> l(help_attributes_guard);
   if (match_substr == nullptr) match_substr = new std::string;
   match_substr->assign(substr.data(), substr.size());
 }
 
 HelpMode GetFlagsHelpMode() {
-  turbo::MutexLock l(&help_attributes_guard);
+  std::unique_lock<std::mutex> l(help_attributes_guard);
   return help_mode;
 }
 
 void SetFlagsHelpMode(HelpMode mode) {
-  turbo::MutexLock l(&help_attributes_guard);
+  std::unique_lock<std::mutex> l(help_attributes_guard);
   help_mode = mode;
 }
 
 HelpFormat GetFlagsHelpFormat() {
-  turbo::MutexLock l(&help_attributes_guard);
+  std::unique_lock<std::mutex> l(help_attributes_guard);
   return help_format;
 }
 
 void SetFlagsHelpFormat(HelpFormat format) {
-  turbo::MutexLock l(&help_attributes_guard);
+  std::unique_lock<std::mutex> l(help_attributes_guard);
   help_format = format;
 }
 

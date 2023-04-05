@@ -19,6 +19,7 @@
 
 #include <atomic>
 #include <string>
+#include <mutex>
 
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/flags/commandlineflag.h"
@@ -29,7 +30,6 @@
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -52,8 +52,8 @@ class FlagRegistry {
   // Store a flag in this registry. Takes ownership of *flag.
   void RegisterFlag(CommandLineFlag& flag, const char* filename);
 
-  void Lock() TURBO_EXCLUSIVE_LOCK_FUNCTION(lock_) { lock_.Lock(); }
-  void Unlock() TURBO_UNLOCK_FUNCTION(lock_) { lock_.Unlock(); }
+  void Lock() TURBO_EXCLUSIVE_LOCK_FUNCTION(lock_) { lock_.lock(); }
+  void Unlock() TURBO_UNLOCK_FUNCTION(lock_) { lock_.unlock(); }
 
   // Returns the flag object for the specified name, or nullptr if not found.
   // Will emit a warning if a 'retired' flag is specified.
@@ -75,7 +75,7 @@ class FlagRegistry {
   std::vector<CommandLineFlag*> flat_flags_;
   std::atomic<bool> finalized_flags_{false};
 
-  turbo::Mutex lock_;
+  std::mutex lock_;
 
   // Disallow
   FlagRegistry(const FlagRegistry&);

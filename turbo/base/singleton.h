@@ -16,8 +16,7 @@
 #define TURBO_BASE_SINGLETON_H_
 
 #include <cstdlib>
-
-#include "turbo/synchronization/mutex.h"
+#include <mutex>
 
 namespace turbo {
 
@@ -28,7 +27,7 @@ class LeakedSingleton {
 
   static T* instance() {
     if (_s_instance == NULL) {
-      turbo::MutexLock lock(&s_singleton_mutex_);
+      std::unique_lock<std::mutex> lock(s_singleton_mutex_);
       if (_s_instance == NULL) {
         _s_instance = new T;
       }
@@ -38,14 +37,14 @@ class LeakedSingleton {
 
  private:
   static T* _s_instance;
-  static turbo::Mutex s_singleton_mutex_;
+  static std::mutex s_singleton_mutex_;
 };
 
 template <class T>
 T* LeakedSingleton<T>::_s_instance = nullptr;
 
 template <class T>
-turbo::Mutex LeakedSingleton<T>::s_singleton_mutex_;
+std::mutex LeakedSingleton<T>::s_singleton_mutex_;
 
 }  // namespace turbo
 

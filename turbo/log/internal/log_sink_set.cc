@@ -43,7 +43,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/mutex.h"
+#include "turbo/concurrent/rw_lock.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -191,7 +191,7 @@ class GlobalLogSinkSet final {
         turbo::log_internal::WriteToStderr(
             entry.text_message_with_prefix_and_newline(), entry.log_severity());
       } else {
-        turbo::ReaderMutexLock global_sinks_lock(&guard_);
+          turbo::ScopedReadLock global_sinks_lock(guard_);
         ThreadIsLoggingStatus() = true;
         // Ensure the "thread is logging" status is reverted upon leaving the
         // scope even in case of exceptions.
@@ -204,7 +204,7 @@ class GlobalLogSinkSet final {
 
   void AddLogSink(turbo::LogSink* sink) TURBO_LOCKS_EXCLUDED(guard_) {
     {
-      turbo::WriterMutexLock global_sinks_lock(&guard_);
+        turbo::ScopedWriteLock global_sinks_lock(guard_);
       auto pos = std::find(sinks_.begin(), sinks_.end(), sink);
       if (pos == sinks_.end()) {
         sinks_.push_back(sink);
@@ -216,7 +216,7 @@ class GlobalLogSinkSet final {
 
   void RemoveLogSink(turbo::LogSink* sink) TURBO_LOCKS_EXCLUDED(guard_) {
     {
-      turbo::WriterMutexLock global_sinks_lock(&guard_);
+        turbo::ScopedWriteLock global_sinks_lock(guard_);
       auto pos = std::find(sinks_.begin(), sinks_.end(), sink);
       if (pos != sinks_.end()) {
         sinks_.erase(pos);
@@ -231,10 +231,9 @@ class GlobalLogSinkSet final {
       // The thread_local condition demonstrates that we're already holding the
       // lock in order to iterate over `sinks_` for dispatch.  The thread-safety
       // annotations don't know this, so we use `TURBO_NO_THREAD_SAFETY_ANALYSIS`
-      guard_.AssertReaderHeld();
       FlushLogSinksLocked();
     } else {
-      turbo::ReaderMutexLock global_sinks_lock(&guard_);
+      turbo::ScopedReadLock global_sinks_lock(guard_);
       // In case if LogSink::Flush overload decides to log
       ThreadIsLoggingStatus() = true;
       // Ensure the "thread is logging" status is reverted upon leaving the
@@ -261,7 +260,7 @@ class GlobalLogSinkSet final {
   }
 
   using LogSinksSet = std::vector<turbo::LogSink*>;
-  turbo::Mutex guard_;
+  turbo::RWLock guard_;
   LogSinksSet sinks_ TURBO_GUARDED_BY(guard_);
 };
 

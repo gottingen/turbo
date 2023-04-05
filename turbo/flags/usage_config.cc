@@ -18,6 +18,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #include "turbo/base/const_init.h"
 #include "turbo/flags/internal/path_util.h"
@@ -27,7 +28,6 @@
 #include "turbo/strings/match.h"
 #include "turbo/strings/string_piece.h"
 #include "turbo/strings/strip.h"
-#include "turbo/synchronization/mutex.h"
 
 extern "C" {
 
@@ -103,14 +103,14 @@ std::string NormalizeFilename(turbo::string_piece filename) {
 
 // --------------------------------------------------------------------
 
-TURBO_CONST_INIT turbo::Mutex custom_usage_config_guard(turbo::kConstInit);
+TURBO_CONST_INIT std::mutex custom_usage_config_guard;
 TURBO_CONST_INIT FlagsUsageConfig* custom_usage_config
     TURBO_GUARDED_BY(custom_usage_config_guard) = nullptr;
 
 }  // namespace
 
 FlagsUsageConfig GetUsageConfig() {
-  turbo::MutexLock l(&custom_usage_config_guard);
+  std::unique_lock<std::mutex> l(custom_usage_config_guard);
 
   if (custom_usage_config) return *custom_usage_config;
 
@@ -135,7 +135,7 @@ void ReportUsageError(turbo::string_piece msg, bool is_fatal) {
 }  // namespace flags_internal
 
 void SetFlagsUsageConfig(FlagsUsageConfig usage_config) {
-  turbo::MutexLock l(&flags_internal::custom_usage_config_guard);
+  std::unique_lock<std::mutex> l(flags_internal::custom_usage_config_guard);
 
   if (!usage_config.contains_helpshort_flags)
     usage_config.contains_helpshort_flags =

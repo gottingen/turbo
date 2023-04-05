@@ -26,7 +26,6 @@
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -373,7 +372,7 @@ void CordzInfo::Untrack() {
 
   // We are likely part of a snapshot, extend the life of the CordRep
   {
-    turbo::MutexLock lock(&mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     if (rep_) CordRep::Ref(rep_);
   }
   CordzHandle::Delete(this);
@@ -381,14 +380,14 @@ void CordzInfo::Untrack() {
 
 void CordzInfo::Lock(MethodIdentifier method)
     TURBO_EXCLUSIVE_LOCK_FUNCTION(mutex_) {
-  mutex_.Lock();
+  mutex_.lock();
   update_tracker_.LossyAdd(method);
   assert(rep_);
 }
 
 void CordzInfo::Unlock() TURBO_UNLOCK_FUNCTION(mutex_) {
   bool tracked = rep_ != nullptr;
-  mutex_.Unlock();
+  mutex_.unlock();
   if (!tracked) {
     Untrack();
   }

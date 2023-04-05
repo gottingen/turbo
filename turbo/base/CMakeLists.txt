@@ -47,6 +47,7 @@ turbo_cc_test(
         ${TURBO_TEST_COPTS}
         DEPS
         turbo::turbo
+        turbo::sync
         GTest::gtest_main
 )
 

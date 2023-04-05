@@ -21,7 +21,6 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/spinlock.h"
-#include "turbo/synchronization/mutex.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
