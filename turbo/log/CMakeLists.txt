@@ -331,6 +331,7 @@ turbo_cc_test(
     turbo::log_internal_test_helpers
     turbo::log_internal_test_matchers
     turbo::scoped_mock_log
+    turbo::sync
     GTest::gtest_main
 )
 

@@ -82,7 +82,7 @@ TEST(HashtablezInfoTest, PrepareForSampling) {
   const int64_t test_stride = 123;
   const size_t test_element_size = 17;
   HashtablezInfo info;
-  turbo::MutexLock l(&info.init_mu);
+        std::unique_lock<std::mutex> l(info.init_mu);
   info.PrepareForSampling(test_stride, test_element_size);
 
   EXPECT_EQ(info.capacity.load(), 0);
@@ -128,7 +128,7 @@ TEST(HashtablezInfoTest, PrepareForSampling) {
 
 TEST(HashtablezInfoTest, RecordStorageChanged) {
   HashtablezInfo info;
-  turbo::MutexLock l(&info.init_mu);
+        std::unique_lock<std::mutex> l(info.init_mu);
   const int64_t test_stride = 21;
   const size_t test_element_size = 19;
   info.PrepareForSampling(test_stride, test_element_size);
@@ -142,7 +142,7 @@ TEST(HashtablezInfoTest, RecordStorageChanged) {
 
 TEST(HashtablezInfoTest, RecordInsert) {
   HashtablezInfo info;
-  turbo::MutexLock l(&info.init_mu);
+  std::unique_lock<std::mutex> l(info.init_mu);
   const int64_t test_stride = 25;
   const size_t test_element_size = 23;
   info.PrepareForSampling(test_stride, test_element_size);
@@ -168,7 +168,7 @@ TEST(HashtablezInfoTest, RecordErase) {
   const int64_t test_stride = 31;
   const size_t test_element_size = 29;
   HashtablezInfo info;
-  turbo::MutexLock l(&info.init_mu);
+        std::unique_lock<std::mutex> l(info.init_mu);
   info.PrepareForSampling(test_stride, test_element_size);
   EXPECT_EQ(info.num_erases.load(), 0);
   EXPECT_EQ(info.size.load(), 0);
@@ -184,7 +184,7 @@ TEST(HashtablezInfoTest, RecordRehash) {
   const int64_t test_stride = 33;
   const size_t test_element_size = 31;
   HashtablezInfo info;
-  turbo::MutexLock l(&info.init_mu);
+        std::unique_lock<std::mutex> l(info.init_mu);
   info.PrepareForSampling(test_stride, test_element_size);
   RecordInsertSlow(&info, 0x1, 0);
   RecordInsertSlow(&info, 0x2, kProbeLength);
@@ -209,7 +209,7 @@ TEST(HashtablezInfoTest, RecordRehash) {
 
 TEST(HashtablezInfoTest, RecordReservation) {
   HashtablezInfo info;
-  turbo::MutexLock l(&info.init_mu);
+        std::unique_lock<std::mutex> l(info.init_mu);
   const int64_t test_stride = 35;
   const size_t test_element_size = 33;
   info.PrepareForSampling(test_stride, test_element_size);

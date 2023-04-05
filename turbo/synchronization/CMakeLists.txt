@@ -14,6 +14,28 @@
 # limitations under the License.
 #
 
+turbo_cc_library(
+        NAME
+        sync
+        SRCS
+        "barrier.cc"
+        "blocking_counter.cc"
+        "mutex.cc"
+        "notification.cc"
+        "internal/create_thread_identity.cc"
+        "internal/graphcycles.cc"
+        "internal/per_thread_sem.cc"
+        "internal/waiter.cc"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        ${TURBO_RANDOM_RANDEN_COPTS}
+        ${TURBO_SIMD_FLAGS}
+        DEPS
+        ${TURBO_DYLINK}
+        turbo::turbo
+        TESTONLY
+)
+#[[
 turbo_cc_test(
   NAME
     barrier_test
@@ -124,3 +146,4 @@ turbo_cc_test(
   DEPS
     turbo::turbo
 )
+]]

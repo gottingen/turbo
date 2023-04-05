@@ -71,6 +71,7 @@ turbo_cc_library(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::turbo
+    turbo::sync
     GTest::gtest
   TESTONLY
 )
@@ -85,6 +86,7 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::turbo
+    turbo::sync
     GTest::gtest_main
 )
 
@@ -114,6 +116,7 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::turbo
+    turbo::sync
     GTest::gtest_main
 )
 
@@ -138,6 +141,7 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::turbo
+    turbo::sync
     Threads::Threads
     GTest::gtest_main
 )
