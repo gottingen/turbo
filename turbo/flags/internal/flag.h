@@ -26,6 +26,7 @@
 #include <string>
 #include <type_traits>
 #include <typeinfo>
+#include <mutex>
 
 #include "turbo/base/call_once.h"
 #include "turbo/base/casts.h"
