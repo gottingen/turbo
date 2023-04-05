@@ -17,6 +17,7 @@
 #include <cerrno> // errno
 #include <cstdio>  // snprintf
 #include <mutex>
+#include <cstring>
 
 #include "turbo/platform/port.h"
 #include "turbo/base/internal/strerror.h"
