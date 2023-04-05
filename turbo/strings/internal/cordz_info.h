@@ -18,6 +18,7 @@
 #include <atomic>
 #include <cstdint>
 #include <functional>
+#include <mutex>
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/meta/span.h"
@@ -29,7 +30,7 @@
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/synchronization/mutex.h"
+#include "turbo/time/clock.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -239,7 +240,7 @@ class TURBO_LOCKABLE CordzInfo : public CordzHandle {
   std::atomic<CordzInfo*> ci_prev_{nullptr};
   std::atomic<CordzInfo*> ci_next_{nullptr};
 
-  mutable turbo::Mutex mutex_;
+  mutable std::mutex mutex_;
   CordRep* rep_ TURBO_GUARDED_BY(mutex_);
 
   void* stack_[kMaxStackDepth];
@@ -274,9 +275,7 @@ TURBO_FORCE_INLINE void CordzInfo::MaybeUntrackCord(
 }
 
 inline void CordzInfo::AssertHeld() TURBO_ASSERT_EXCLUSIVE_LOCK(mutex_) {
-#ifndef NDEBUG
-  mutex_.AssertHeld();
-#endif
+
 }
 
 inline void CordzInfo::SetCordRep(CordRep* rep) {
@@ -287,7 +286,7 @@ inline void CordzInfo::SetCordRep(CordRep* rep) {
 inline void CordzInfo::UnsafeSetCordRep(CordRep* rep) { rep_ = rep; }
 
 inline CordRep* CordzInfo::RefCordRep() const TURBO_LOCKS_EXCLUDED(mutex_) {
-  MutexLock lock(&mutex_);
+  std::unique_lock<std::mutex> lock(mutex_);
   return rep_ ? CordRep::Ref(rep_) : nullptr;
 }
 
