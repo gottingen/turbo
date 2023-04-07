@@ -21,7 +21,7 @@
 #include "turbo/flags/commandlineflag.h"
 #include "turbo/flags/internal/commandlineflag.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 // --------------------------------------------------------------------
 // Global flags registry API.

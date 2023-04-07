@@ -42,7 +42,7 @@ namespace str_format_internal {
 #ifdef TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
 template <FormatConversionCharSet... C>
-constexpr bool ValidFormatImpl(string_piece format) {
+constexpr bool ValidFormatImpl(std::string_view format) {
   int next_arg = 0;
   const char* p = format.data();
   const char* const end = p + format.size();

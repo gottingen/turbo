@@ -37,7 +37,7 @@
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -1794,7 +1794,7 @@ TEST(VariantTest, VisitSimple) {
 
   v = std::string("B");
 
-  turbo::string_piece piece = turbo::visit(ConvertTo<turbo::string_piece>{}, v);
+  std::string_view piece = turbo::visit(ConvertTo<std::string_view>{}, v);
   EXPECT_EQ("B", piece);
 
   struct StrLen {
@@ -1871,34 +1871,34 @@ TEST(VariantTest, VisitResultTypeDifferent) {
 
 TEST(VariantTest, VisitVariadic) {
   using A = variant<int, std::string>;
-  using B = variant<std::unique_ptr<int>, turbo::string_piece>;
+  using B = variant<std::unique_ptr<int>, std::string_view>;
 
   struct Visitor {
     std::pair<int, int> operator()(int a, std::unique_ptr<int> b) const {
       return {a, *b};
     }
-    std::pair<int, int> operator()(turbo::string_piece a,
+    std::pair<int, int> operator()(std::string_view a,
                                    std::unique_ptr<int> b) const {
       return {static_cast<int>(a.size()), static_cast<int>(*b)};
     }
-    std::pair<int, int> operator()(int a, turbo::string_piece b) const {
+    std::pair<int, int> operator()(int a, std::string_view b) const {
       return {a, static_cast<int>(b.size())};
     }
-    std::pair<int, int> operator()(turbo::string_piece a,
-                                   turbo::string_piece b) const {
+    std::pair<int, int> operator()(std::string_view a,
+                                   std::string_view b) const {
       return {static_cast<int>(a.size()), static_cast<int>(b.size())};
     }
   };
 
   EXPECT_THAT(turbo::visit(Visitor(), A(1), B(std::unique_ptr<int>(new int(7)))),
               ::testing::Pair(1, 7));
-  EXPECT_THAT(turbo::visit(Visitor(), A(1), B(turbo::string_piece("ABC"))),
+  EXPECT_THAT(turbo::visit(Visitor(), A(1), B(std::string_view("ABC"))),
               ::testing::Pair(1, 3));
   EXPECT_THAT(turbo::visit(Visitor(), A(std::string("BBBBB")),
                           B(std::unique_ptr<int>(new int(7)))),
               ::testing::Pair(5, 7));
   EXPECT_THAT(turbo::visit(Visitor(), A(std::string("BBBBB")),
-                          B(turbo::string_piece("ABC"))),
+                          B(std::string_view("ABC"))),
               ::testing::Pair(5, 3));
 }
 

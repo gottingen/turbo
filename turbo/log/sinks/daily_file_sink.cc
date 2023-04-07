@@ -122,7 +122,7 @@ void DailyFileSink::Send(const turbo::LogEntry &entry) {
   if (t >= rotation_tp_) {
     rotate(t);
   }
-  string_piece text = entry.text_message_with_prefix_and_newline();
+  std::string_view text = entry.text_message_with_prefix_and_newline();
   auto rs = log_file_->append(text);
   TURBO_UNUSED(rs);
 }

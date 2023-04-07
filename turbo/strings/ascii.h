@@ -56,7 +56,7 @@
 #include <string>
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
@@ -169,11 +169,11 @@ template <typename String>
 TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
 AsciiStrToLower(String* s);
 
-// Creates a lowercase string from a given turbo::string_piece.
+// Creates a lowercase string from a given std::string_view.
 
 template <typename String = std::string>
 TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-AsciiStrToLower(turbo::string_piece s) {
+AsciiStrToLower(std::string_view s) {
   String result(s);
   turbo::AsciiStrToLower(&result);
   return result;
@@ -192,19 +192,19 @@ template <typename String>
 TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
 AsciiStrToUpper(String* s);
 
-// Creates an uppercase string from a given turbo::string_piece.
+// Creates an uppercase string from a given std::string_view.
 template <typename String = std::string>
 TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-AsciiStrToUpper(turbo::string_piece s) {
+AsciiStrToUpper(std::string_view s) {
   String result(s);
   turbo::AsciiStrToUpper(&result);
   return result;
 }
 
-// Returns turbo::string_piece with whitespace stripped from the beginning of the
-// given string_piece.
-TURBO_MUST_USE_RESULT inline turbo::string_piece StripLeadingAsciiWhitespace(
-    turbo::string_piece str) {
+// Returns std::string_view with whitespace stripped from the beginning of the
+// given std::string_view.
+TURBO_MUST_USE_RESULT inline std::string_view StripLeadingAsciiWhitespace(
+    std::string_view str) {
   auto it = std::find_if_not(str.begin(), str.end(), turbo::ascii_isspace);
   return str.substr(static_cast<size_t>(it - str.begin()));
 }
@@ -217,10 +217,10 @@ StripLeadingAsciiWhitespace(String* str) {
   str->erase(str->begin(), it);
 }
 
-// Returns turbo::string_piece with whitespace stripped from the end of the given
-// string_piece.
-TURBO_MUST_USE_RESULT inline turbo::string_piece StripTrailingAsciiWhitespace(
-    turbo::string_piece str) {
+// Returns std::string_view with whitespace stripped from the end of the given
+// std::string_view.
+TURBO_MUST_USE_RESULT inline std::string_view StripTrailingAsciiWhitespace(
+    std::string_view str) {
   auto it = std::find_if_not(str.rbegin(), str.rend(), turbo::ascii_isspace);
   return str.substr(0, static_cast<size_t>(str.rend() - it));
 }
@@ -233,10 +233,10 @@ StripTrailingAsciiWhitespace(String* str) {
   str->erase(static_cast<size_t>(str->rend() - it));
 }
 
-// Returns turbo::string_piece with whitespace stripped from both ends of the
-// given string_piece.
-TURBO_MUST_USE_RESULT inline turbo::string_piece StripAsciiWhitespace(
-    turbo::string_piece str) {
+// Returns std::string_view with whitespace stripped from both ends of the
+// given std::string_view.
+TURBO_MUST_USE_RESULT inline std::string_view StripAsciiWhitespace(
+    std::string_view str) {
   return StripTrailingAsciiWhitespace(StripLeadingAsciiWhitespace(str));
 }
 

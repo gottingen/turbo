@@ -24,7 +24,7 @@
 
 #include "turbo/base/log_severity.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 
 namespace turbo {
@@ -40,7 +40,7 @@ void SetInitialized();
 
 // Unconditionally write a `message` to stderr. If `severity` exceeds kInfo
 // we also flush the stderr stream.
-void WriteToStderr(turbo::string_piece message, turbo::LogSeverity severity);
+void WriteToStderr(std::string_view message, turbo::LogSeverity severity);
 
 // Set the TimeZone used for human-friendly times (for example, the log message
 // prefix) printed by the logging library. This may only be called once.

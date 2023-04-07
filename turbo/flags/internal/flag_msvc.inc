@@ -79,7 +79,7 @@ class Flag {
   // Public methods of `turbo::Flag<T>` are NOT part of the Turbo Flags API.
   // See https://abseil.io/docs/cpp/guides/flags
   bool IsRetired() const { return GetImpl().IsRetired(); }
-  turbo::string_piece Name() const { return GetImpl().Name(); }
+  std::string_view Name() const { return GetImpl().Name(); }
   std::string Help() const { return GetImpl().Help(); }
   bool IsModified() const { return GetImpl().IsModified(); }
   bool IsSpecifiedOnCommandLine() const {

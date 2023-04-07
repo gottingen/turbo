@@ -75,7 +75,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/debugging/internal/demangle.h"
 #include "turbo/debugging/internal/vdso_support.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 #if defined(__FreeBSD__) && !defined(ElfW)
 #define ElfW(x) __ElfN(x)
@@ -525,7 +525,7 @@ static TURBO_NO_INLINE bool GetSectionHeaderByType(
 const int kMaxSectionNameLen = 64;
 
 bool ForEachSection(int fd,
-                    const std::function<bool(turbo::string_piece name,
+                    const std::function<bool(std::string_view name,
                                              const ElfW(Shdr) &)> &callback) {
   ElfW(Ehdr) elf_header;
   if (!ReadFromOffsetExact(fd, &elf_header, sizeof(elf_header), 0)) {
@@ -557,7 +557,7 @@ bool ForEachSection(int fd,
       return false;
     }
 
-    turbo::string_piece name(header_name,
+    std::string_view name(header_name,
                            strnlen(header_name, static_cast<size_t>(n_read)));
     if (!callback(name, out)) {
       break;

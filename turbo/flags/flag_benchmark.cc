@@ -22,7 +22,7 @@
 #include "turbo/flags/marshalling.h"
 #include "turbo/flags/parse.h"
 #include "turbo/flags/reflection.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 #include "turbo/meta/optional.h"
 #include "benchmark/benchmark.h"
@@ -40,7 +40,7 @@ struct OptionalInt : TurboOptionalInt {
   using TurboOptionalInt::TurboOptionalInt;
 };
 // Next two functions represent Turbo Flags marshalling for OptionalInt.
-bool TurboParseFlag(turbo::string_piece src, OptionalInt* flag,
+bool TurboParseFlag(std::string_view src, OptionalInt* flag,
                    std::string* error) {
   int val;
   if (src.empty())
@@ -59,7 +59,7 @@ struct OptionalString : TurboOptionalString {
   using TurboOptionalString::TurboOptionalString;
 };
 // Next two functions represent Turbo Flags marshalling for OptionalString.
-bool TurboParseFlag(turbo::string_piece src, OptionalString* flag,
+bool TurboParseFlag(std::string_view src, OptionalString* flag,
                    std::string* error) {
   std::string val;
   if (src.empty())
@@ -79,7 +79,7 @@ struct UDT {
   UDT& operator=(const UDT&) { return *this; }
 };
 // Next two functions represent Turbo Flags marshalling for UDT.
-bool TurboParseFlag(turbo::string_piece, UDT*, std::string*) { return true; }
+bool TurboParseFlag(std::string_view, UDT*, std::string*) { return true; }
 std::string TurboUnparseFlag(const UDT&) { return ""; }
 
 }  // namespace

@@ -23,8 +23,8 @@ namespace {
 using turbo::strings_internal::MakeStringConstant;
 
 struct Callable {
-  constexpr turbo::string_piece operator()() const {
-    return turbo::string_piece("Callable", 8);
+  constexpr std::string_view operator()() const {
+    return std::string_view("Callable", 8);
   }
 };
 

@@ -33,7 +33,7 @@
 #include "turbo/base/int128.h"
 #include "turbo/strings/internal/has_turbo_stringify.h"
 #include "turbo/strings/internal/str_format/extension.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -211,15 +211,9 @@ ArgConvertResult<FormatConversionCharSetInternal::p> FormatConvertImpl(
 StringConvertResult FormatConvertImpl(const std::string& v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-StringConvertResult FormatConvertImpl(string_piece v,
+StringConvertResult FormatConvertImpl(std::string_view v,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink);
-
-inline StringConvertResult FormatConvertImpl(turbo::string_view v,
-                                             FormatConversionSpecImpl conv,
-                                             FormatSinkImpl* sink) {
-  return FormatConvertImpl(turbo::string_piece(v.data(), v.size()), conv, sink);
-}
 
 ArgConvertResult<FormatConversionCharSetUnion(
     FormatConversionCharSetInternal::s, FormatConversionCharSetInternal::p)>
@@ -247,7 +241,7 @@ StringConvertResult FormatConvertImpl(const TurboCord& value,
 
   if (space_remaining > 0 && !is_left) sink->Append(space_remaining, ' ');
 
-  for (string_piece piece : value.Chunks()) {
+  for (std::string_view piece : value.Chunks()) {
     if (piece.size() > to_write) {
       piece.remove_suffix(piece.size() - to_write);
       to_write = 0;
@@ -610,7 +604,7 @@ class FormatArgImpl {
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(long double, __VA_ARGS__);        \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(const char*, __VA_ARGS__);        \
   TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string, __VA_ARGS__);        \
-  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(string_piece, __VA_ARGS__)
+  TURBO_INTERNAL_FORMAT_DISPATCH_INSTANTIATE_(std::string_view, __VA_ARGS__)
 
 TURBO_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
 

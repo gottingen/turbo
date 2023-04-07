@@ -41,11 +41,11 @@ class FlagSaverImpl;
 // Returns the reflection handle of an Turbo flag of the specified name, or
 // `nullptr` if not found. This function will emit a warning if the name of a
 // 'retired' flag is specified.
-turbo::CommandLineFlag* FindCommandLineFlag(turbo::string_piece name);
+turbo::CommandLineFlag* FindCommandLineFlag(std::string_view name);
 
 // Returns current state of the Flags registry in a form of mapping from flag
 // name to a flag reflection handle.
-turbo::flat_hash_map<turbo::string_piece, turbo::CommandLineFlag*> GetAllFlags();
+turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag*> GetAllFlags();
 
 //------------------------------------------------------------------------------
 // FlagSaver

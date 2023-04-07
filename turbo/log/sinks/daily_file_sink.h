@@ -17,7 +17,7 @@
 
 #include "turbo/files/filesystem.h"
 #include "turbo/log/log_sink.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/files/sequential_write_file.h"
 #include "turbo/container/ring_buffer.h"
 #include <array>

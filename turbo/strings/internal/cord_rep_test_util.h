@@ -26,7 +26,7 @@
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -42,7 +42,7 @@ inline cord_internal::CordRepSubstring* MakeSubstring(
   return sub;
 }
 
-inline cord_internal::CordRepFlat* MakeFlat(turbo::string_piece value) {
+inline cord_internal::CordRepFlat* MakeFlat(std::string_view value) {
   assert(value.length() <= cord_internal::kMaxFlatLength);
   auto* flat = cord_internal::CordRepFlat::New(value.length());
   flat->length = value.length();
@@ -51,10 +51,10 @@ inline cord_internal::CordRepFlat* MakeFlat(turbo::string_piece value) {
 }
 
 // Creates an external node for testing
-inline cord_internal::CordRepExternal* MakeExternal(turbo::string_piece s) {
+inline cord_internal::CordRepExternal* MakeExternal(std::string_view s) {
   struct Rep : public cord_internal::CordRepExternal {
     std::string s;
-    explicit Rep(turbo::string_piece sv) : s(sv) {
+    explicit Rep(std::string_view sv) : s(sv) {
       this->tag = cord_internal::EXTERNAL;
       this->base = s.data();
       this->length = s.length();
@@ -67,7 +67,7 @@ inline cord_internal::CordRepExternal* MakeExternal(turbo::string_piece s) {
 }
 
 inline std::string CreateRandomString(size_t n) {
-  turbo::string_piece data =
+  std::string_view data =
       "abcdefghijklmnopqrstuvwxyz"
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "0123456789~!@#$%^&*()_+=-<>?:\"{}[]|";
@@ -84,10 +84,10 @@ inline std::string CreateRandomString(size_t n) {
 // the provided string up into flats of size `chunk_size` characters
 // resulting in roughly `data.size() / chunk_size` total flats.
 inline std::vector<cord_internal::CordRep*> CreateFlatsFromString(
-    turbo::string_piece data, size_t chunk_size) {
+    std::string_view data, size_t chunk_size) {
   assert(chunk_size > 0);
   std::vector<cord_internal::CordRep*> flats;
-  for (turbo::string_piece s = data; !s.empty(); s.remove_prefix(chunk_size)) {
+  for (std::string_view s = data; !s.empty(); s.remove_prefix(chunk_size)) {
     flats.push_back(MakeFlat(s.substr(0, chunk_size)));
   }
   return flats;

@@ -29,7 +29,7 @@
 #include <ostream>
 
 #include "turbo/crypto/internal/crc32c_inline.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -69,7 +69,7 @@ namespace crc_internal {
 // Non-inline code path for `turbo::ExtendCrc32c()`. Do not call directly.
 // Call `turbo::ExtendCrc32c()` (defined below) instead.
 crc32c_t ExtendCrc32cInternal(crc32c_t initial_crc,
-                              turbo::string_piece buf_to_add);
+                              std::string_view buf_to_add);
 }  // namespace crc_internal
 
 // -----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ crc32c_t ExtendCrc32cInternal(crc32c_t initial_crc,
 // ComputeCrc32c()
 //
 // Returns the CRC32C value of the provided string.
-crc32c_t ComputeCrc32c(turbo::string_piece buf);
+crc32c_t ComputeCrc32c(std::string_view buf);
 
 // ExtendCrc32c()
 //
@@ -93,7 +93,7 @@ crc32c_t ComputeCrc32c(turbo::string_piece buf);
 //
 // This operation has a runtime cost of O(`buf_to_add.size()`)
 inline crc32c_t ExtendCrc32c(crc32c_t initial_crc,
-                             turbo::string_piece buf_to_add) {
+                             std::string_view buf_to_add) {
   // Approximately 75% of calls have size <= 64.
   if (buf_to_add.size() <= 64) {
     uint32_t crc = static_cast<uint32_t>(initial_crc);

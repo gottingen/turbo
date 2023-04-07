@@ -27,7 +27,7 @@
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/sysinfo.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -55,10 +55,10 @@ using ::testing::IsTrue;
 auto* test_env TURBO_MAYBE_UNUSED = ::testing::AddGlobalTestEnvironment(
     new turbo::log_internal::LogTestEnvironment);
 
-void WriteToStream(turbo::string_piece data, std::ostream* os) {
+void WriteToStream(std::string_view data, std::ostream* os) {
   *os << "WriteToStream: " << data;
 }
-void WriteToStreamRef(turbo::string_piece data, std::ostream& os) {
+void WriteToStreamRef(std::string_view data, std::ostream& os) {
   os << "WriteToStreamRef: " << data;
 }
 

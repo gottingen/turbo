@@ -190,7 +190,7 @@
 namespace turbo {
 namespace filesystem {
 
-using turbo::basic_string_view;
+using std::basic_string_view;
 
 // temporary existing exception type for yet unimplemented parts
 class TURBO_DLL not_implemented_exception : public std::logic_error {

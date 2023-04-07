@@ -29,7 +29,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -57,7 +57,7 @@ class FlagRegistry {
 
   // Returns the flag object for the specified name, or nullptr if not found.
   // Will emit a warning if a 'retired' flag is specified.
-  CommandLineFlag* FindFlag(turbo::string_piece name);
+  CommandLineFlag* FindFlag(std::string_view name);
 
   static FlagRegistry& GlobalRegistry();  // returns a singleton registry
 
@@ -68,7 +68,7 @@ class FlagRegistry {
   friend void FinalizeRegistry();
 
   // The map from name to flag, for FindFlag().
-  using FlagMap = turbo::flat_hash_map<turbo::string_piece, CommandLineFlag*>;
+  using FlagMap = turbo::flat_hash_map<std::string_view, CommandLineFlag*>;
   using FlagIterator = FlagMap::iterator;
   using FlagConstIterator = FlagMap::const_iterator;
   FlagMap flags_;
@@ -95,7 +95,7 @@ class FlagRegistryLock {
 
 }  // namespace
 
-CommandLineFlag* FlagRegistry::FindFlag(turbo::string_piece name) {
+CommandLineFlag* FlagRegistry::FindFlag(std::string_view name) {
   if (finalized_flags_.load(std::memory_order_acquire)) {
     // We could save some gcus here if we make `Name()` be non-virtual.
     // We could move the `const char*` name to the base class.
@@ -222,7 +222,7 @@ class RetiredFlagObj final : public CommandLineFlag {
       : name_(name), type_id_(type_id) {}
 
  private:
-  turbo::string_piece Name() const override { return name_; }
+  std::string_view Name() const override { return name_; }
   std::string Filename() const override {
     OnAccess();
     return "RETIRED";
@@ -247,7 +247,7 @@ class RetiredFlagObj final : public CommandLineFlag {
   }
 
   // Any input is valid
-  bool ValidateInputValue(turbo::string_piece) const override {
+  bool ValidateInputValue(std::string_view) const override {
     OnAccess();
     return true;
   }
@@ -256,7 +256,7 @@ class RetiredFlagObj final : public CommandLineFlag {
     return nullptr;
   }
 
-  bool ParseFrom(turbo::string_piece, flags_internal::FlagSettingMode,
+  bool ParseFrom(std::string_view, flags_internal::FlagSettingMode,
                  flags_internal::ValueSource, std::string&) override {
     OnAccess();
     return false;
@@ -333,7 +333,7 @@ FlagSaver::~FlagSaver() {
 
 // --------------------------------------------------------------------
 
-CommandLineFlag* FindCommandLineFlag(turbo::string_piece name) {
+CommandLineFlag* FindCommandLineFlag(std::string_view name) {
   if (name.empty()) return nullptr;
   flags_internal::FlagRegistry& registry =
       flags_internal::FlagRegistry::GlobalRegistry();
@@ -342,8 +342,8 @@ CommandLineFlag* FindCommandLineFlag(turbo::string_piece name) {
 
 // --------------------------------------------------------------------
 
-turbo::flat_hash_map<turbo::string_piece, turbo::CommandLineFlag*> GetAllFlags() {
-  turbo::flat_hash_map<turbo::string_piece, turbo::CommandLineFlag*> res;
+turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag*> GetAllFlags() {
+  turbo::flat_hash_map<std::string_view, turbo::CommandLineFlag*> res;
   flags_internal::ForEachFlag([&](CommandLineFlag& flag) {
     if (!flag.IsRetired()) res.insert({flag.Name(), &flag});
   });

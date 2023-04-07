@@ -24,7 +24,7 @@
 #include "turbo/flags/internal/usage.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -38,7 +38,7 @@ TURBO_CONST_INIT std::string* program_usage_message
 
 // --------------------------------------------------------------------
 // Sets the "usage" message to be used by help reporting routines.
-void SetProgramUsageMessage(turbo::string_piece new_usage_message) {
+void SetProgramUsageMessage(std::string_view new_usage_message) {
   std::unique_lock<std::mutex> lock(flags_internal::usage_message_guard);
 
   if (flags_internal::program_usage_message != nullptr) {
@@ -51,13 +51,13 @@ void SetProgramUsageMessage(turbo::string_piece new_usage_message) {
 
 // --------------------------------------------------------------------
 // Returns the usage message set by SetProgramUsageMessage().
-// Note: We able to return string_piece here only because calling
+// Note: We able to return std::string_view here only because calling
 // SetProgramUsageMessage twice is prohibited.
-turbo::string_piece ProgramUsageMessage() {
+std::string_view ProgramUsageMessage() {
   std::unique_lock<std::mutex> l(flags_internal::usage_message_guard);
 
   return flags_internal::program_usage_message != nullptr
-             ? turbo::string_piece(*flags_internal::program_usage_message)
+             ? std::string_view(*flags_internal::program_usage_message)
              : "Warning: SetProgramUsageMessage() never called";
 }
 

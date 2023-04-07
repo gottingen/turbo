@@ -21,7 +21,7 @@
 #include "turbo/flags/internal/path_util.h"
 #include "turbo/flags/internal/program_name.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace {
 
@@ -37,25 +37,25 @@ class FlagsUsageConfigTest : public testing::Test {
 
 namespace flags = turbo::flags_internal;
 
-bool TstContainsHelpshortFlags(turbo::string_piece f) {
+bool TstContainsHelpshortFlags(std::string_view f) {
   return turbo::StartsWith(flags::Basename(f), "progname.");
 }
 
-bool TstContainsHelppackageFlags(turbo::string_piece f) {
+bool TstContainsHelppackageFlags(std::string_view f) {
   return turbo::EndsWith(flags::Package(f), "aaa/");
 }
 
-bool TstContainsHelpFlags(turbo::string_piece f) {
+bool TstContainsHelpFlags(std::string_view f) {
   return turbo::EndsWith(flags::Package(f), "zzz/");
 }
 
 std::string TstVersionString() { return "program 1.0.0"; }
 
-std::string TstNormalizeFilename(turbo::string_piece filename) {
+std::string TstNormalizeFilename(std::string_view filename) {
   return std::string(filename.substr(2));
 }
 
-void TstReportUsageMessage(turbo::string_piece msg) {}
+void TstReportUsageMessage(std::string_view msg) {}
 
 // --------------------------------------------------------------------
 

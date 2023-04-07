@@ -44,15 +44,15 @@ namespace testing {
 
         {
             rapidjson::robust_json<> robust_json{root};
-            //EXPECT_EQ(robust_json["hello"]["subhello"].cast<turbo::string_piece>(), "world");
+            //EXPECT_EQ(robust_json["hello"]["subhello"].cast<std::string_view>(), "world");
             EXPECT_FALSE(robust_json["notexist"]["subhello"]);
-            //EXPECT_EQ(robust_json["notexist"]["subhello"].cast<turbo::string_piece>(), "");
+            //EXPECT_EQ(robust_json["notexist"]["subhello"].cast<std::string_view>(), "");
         }
 
         {
             rapidjson::robust_json<> rbdoc{root};
             rapidjson::robust_json<> rbhello = rbdoc["hello"];
-            //EXPECT_EQ(rbhello["subhello"].cast<turbo::string_piece>(), "world");
+            //EXPECT_EQ(rbhello["subhello"].cast<std::string_view>(), "world");
             EXPECT_EQ(rbhello["number"].as<int64_t>().value_or(-1), 1024);
             EXPECT_EQ(rbhello["number_str"].as<int64_t>().value_or(-1), 1024);
             EXPECT_EQ(rbhello["number"].as<uint64_t>().value_or(0), 1024);
@@ -76,7 +76,7 @@ namespace testing {
         EXPECT_TRUE(const_obj_hello.has_value());
         EXPECT_TRUE(mutable_obj_hello.has_value());
         mutable_obj_hello.value().AddMember("newkey", "newvalue", doc.GetAllocator());
-        //EXPECT_EQ(rbhello["newkey"].cast<turbo::string_piece>(), "newvalue");
+        //EXPECT_EQ(rbhello["newkey"].cast<std::string_view>(), "newvalue");
     }
 
     TEST(RobustJsonTest, UsageArray) {
@@ -90,7 +90,7 @@ namespace testing {
         EXPECT_EQ(rbarray_0.as<int64_t>().value_or(-1), 1);
         EXPECT_EQ(rbdoc["not_exist_arr"][0].as<int64_t>().value_or(-1), -1);
         EXPECT_EQ(rbdoc["arr"][9999].as<int64_t>().value_or(-1), -1);
-        //EXPECT_EQ(rbdoc["arr"][3]["inside_array_key"].cast<turbo::string_piece>(), "inside_array_value");
+        //EXPECT_EQ(rbdoc["arr"][3]["inside_array_key"].cast<std::string_view>(), "inside_array_value");
 
         turbo::optional<rapidjson::Value::ConstArray> const_array = rbarray.as<rapidjson::Value::ConstArray>();
         turbo::optional<rapidjson::Value::Array> mutable_array = rbarray.as<rapidjson::Value::Array>();
@@ -127,7 +127,7 @@ namespace testing {
             EXPECT_TRUE(rbobj.raw().IsNull());
         }
         rapidjson::robust_json<> robust_json{(rapidjson::Value &) newdoc};
-        //EXPECT_EQ(robust_json[0]["subhello"].cast<turbo::string_piece>(), "world");
+        //EXPECT_EQ(robust_json[0]["subhello"].cast<std::string_view>(), "world");
     }
 
 }  // namespace testing

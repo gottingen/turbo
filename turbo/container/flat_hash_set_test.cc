@@ -23,7 +23,7 @@
 #include "turbo/container/internal/unordered_set_members_test.h"
 #include "turbo/container/internal/unordered_set_modifiers_test.h"
 #include "turbo/memory/memory.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -62,7 +62,7 @@ INSTANTIATE_TYPED_TEST_SUITE_P(FlatHashSet, ModifiersTest, SetTypes);
 
 TEST(FlatHashSet, EmplaceString) {
   std::vector<std::string> v = {"a", "b"};
-  turbo::flat_hash_set<turbo::string_piece> hs(v.begin(), v.end());
+  turbo::flat_hash_set<std::string_view> hs(v.begin(), v.end());
   EXPECT_THAT(hs, UnorderedElementsAreArray(v));
 }
 

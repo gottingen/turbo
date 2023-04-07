@@ -31,7 +31,7 @@ struct ClearErrnoGuard {
 };
 }  // namespace
 
-void BufferRawSink::Write(string_piece v) {
+void BufferRawSink::Write(std::string_view v) {
   size_t to_write = std::min(v.size(), size_);
   std::memcpy(buffer_, v.data(), to_write);
   buffer_ += to_write;
@@ -39,7 +39,7 @@ void BufferRawSink::Write(string_piece v) {
   total_written_ += v.size();
 }
 
-void FILERawSink::Write(string_piece v) {
+void FILERawSink::Write(std::string_view v) {
   while (!v.empty() && !error_) {
     // Reset errno to zero in case the libc implementation doesn't set errno
     // when a failure occurs.

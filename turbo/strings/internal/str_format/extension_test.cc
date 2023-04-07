@@ -22,17 +22,17 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/strings/str_format.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace my_namespace {
 class UserDefinedType {
  public:
   UserDefinedType() = default;
 
-  void Append(turbo::string_piece str) { value_.append(str.data(), str.size()); }
+  void Append(std::string_view str) { value_.append(str.data(), str.size()); }
   const std::string& Value() const { return value_; }
 
-  friend void TurboFormatFlush(UserDefinedType* x, turbo::string_piece str) {
+  friend void TurboFormatFlush(UserDefinedType* x, std::string_view str) {
     x->Append(str);
   }
 

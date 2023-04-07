@@ -269,14 +269,14 @@ TEST(SubstituteTest, TurboStringifyWithEnum) {
 
 TEST(SubstituteDeathTest, SubstituteDeath) {
   EXPECT_DEBUG_DEATH(
-      static_cast<void>(turbo::Substitute(turbo::string_piece("-$2"), "a", "b")),
+      static_cast<void>(turbo::Substitute(std::string_view("-$2"), "a", "b")),
       "Invalid turbo::Substitute\\(\\) format string: asked for \"\\$2\", "
       "but only 2 args were given.");
   EXPECT_DEBUG_DEATH(
-      static_cast<void>(turbo::Substitute(turbo::string_piece("-$z-"))),
+      static_cast<void>(turbo::Substitute(std::string_view("-$z-"))),
       "Invalid turbo::Substitute\\(\\) format string: \"-\\$z-\"");
   EXPECT_DEBUG_DEATH(
-      static_cast<void>(turbo::Substitute(turbo::string_piece("-$"))),
+      static_cast<void>(turbo::Substitute(std::string_view("-$"))),
       "Invalid turbo::Substitute\\(\\) format string: \"-\\$\"");
 }
 

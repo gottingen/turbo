@@ -57,7 +57,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
 #include "turbo/platform/internal/prefetch.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 #ifdef TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE
 
@@ -186,7 +186,7 @@ crc32c_t AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   // Small-size CRC-memcpy : just do CRC + memcpy
   if (length < kCrcSmallSize) {
     crc32c_t crc =
-        ExtendCrc32c(initial_crc, turbo::string_piece(src_bytes, length));
+        ExtendCrc32c(initial_crc, std::string_view(src_bytes, length));
     memcpy(dst, src, length);
     return crc;
   }
