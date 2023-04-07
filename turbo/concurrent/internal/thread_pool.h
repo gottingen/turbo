@@ -49,7 +49,7 @@ namespace turbo {
 
             ~ThreadPool() {
                 {
-                    stop_.Notify();
+                    stop_ = true;
                     for(size_t i = 0; i < threads_.size(); ++i) {
                         StopOne(nullptr);
                     }
@@ -78,7 +78,7 @@ namespace turbo {
             }
 
             void WorkLoop() {
-                while (!stop_.HasBeenNotified()) {
+                while (!stop_) {
                     turbo::AnyInvocable<void()> func;
                     {
                         std::unique_lock l(mu_);
@@ -98,7 +98,7 @@ namespace turbo {
 
             std::mutex mu_;
             std::condition_variable cv_;
-            Notification stop_;
+            bool stop_{false};
             std::queue<turbo::AnyInvocable<void()>> queue_ TURBO_GUARDED_BY(mu_);
             std::vector<std::thread> threads_;
         };
