@@ -20,10 +20,9 @@
 
 #include "gmock/gmock.h"
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/synchronization/internal/thread_pool.h"
-#include "turbo/synchronization/mutex.h"
-#include "turbo/synchronization/notification.h"
-#include "turbo/time/time.h"
+#include "turbo/concurrent/internal/thread_pool.h"
+#include "turbo/time/clock.h"
+#include "turbo/concurrent/latch.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -107,7 +106,7 @@ TEST(SampleRecorderTest, Unregistration) {
 
 TEST(SampleRecorderTest, MultiThreaded) {
   SampleRecorder<Info> sampler;
-  Notification stop;
+  Latch stop(1);
   ThreadPool pool(10);
 
   for (int i = 0; i < 10; ++i) {
@@ -116,7 +115,7 @@ TEST(SampleRecorderTest, MultiThreaded) {
       std::mt19937 gen(rd());
 
       std::vector<Info*> infoz;
-      while (!stop.HasBeenNotified()) {
+      while (!stop.Arrived()) {
         if (infoz.empty()) {
           infoz.push_back(sampler.Register(i));
         }
@@ -150,7 +149,7 @@ TEST(SampleRecorderTest, MultiThreaded) {
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
   turbo::SleepFor(turbo::Seconds(3));
-  stop.Notify();
+  stop.CountDown();
 }
 
 TEST(SampleRecorderTest, Callback) {

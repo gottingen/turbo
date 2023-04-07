@@ -27,8 +27,8 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/match.h"
 #include "turbo/strings/string_piece.h"
-#include "turbo/synchronization/barrier.h"
-#include "turbo/synchronization/notification.h"
+#include "turbo/concurrent/barrier.h"
+#include "turbo/concurrent/latch.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest-spi.h"
 #include "gtest/gtest.h"
@@ -263,16 +263,16 @@ TEST(ScopedMockLogTsanTest,
 
   log->StartCapturingLogs();
 
-  turbo::Notification logging_started;
+  turbo::Latch logging_started(1);
 
   std::thread thread([&logging_started]() {
     for (int i = 0; i < 100; ++i) {
-      if (i == 50) logging_started.Notify();
+      if (i == 50) logging_started.CountDown();
       LOG(INFO) << "Thread log";
     }
   });
 
-  logging_started.WaitForNotification();
+  logging_started.Wait();
   log.reset();
   thread.join();
 }

@@ -16,12 +16,12 @@
 
 #include <thread>  // NOLINT(build/c++11)
 #include <vector>
+#include <mutex>
 
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/spinlock.h"
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/synchronization/internal/per_thread_sem.h"
-#include "turbo/synchronization/mutex.h"
 #include "gtest/gtest.h"
 
 namespace turbo {
@@ -104,14 +104,14 @@ TEST(ThreadIdentityTest, ReusedThreadIdentityMutexTest) {
   static const int kNumMutexes = 3;
   static const int kNumLockLoops = 5;
 
-  Mutex mutexes[kNumMutexes];
+  std::mutex mutexes[kNumMutexes];
   for (int iter = 0; iter < kNumLoops; ++iter) {
     std::vector<std::thread> threads;
     for (int thread = 0; thread < kNumThreads; ++thread) {
       threads.push_back(std::thread([&]() {
         for (int l = 0; l < kNumLockLoops; ++l) {
           for (int m = 0; m < kNumMutexes; ++m) {
-            MutexLock lock(&mutexes[m]);
+            std::unique_lock lock(mutexes[m]);
           }
         }
       }));

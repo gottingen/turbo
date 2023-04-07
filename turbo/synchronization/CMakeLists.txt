@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+#[[
 turbo_cc_library(
         NAME
         sync
@@ -35,7 +35,7 @@ turbo_cc_library(
         turbo::turbo
         TESTONLY
 )
-#[[
+
 turbo_cc_test(
   NAME
     barrier_test

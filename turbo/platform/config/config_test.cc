@@ -17,7 +17,7 @@
 #include <cstdint>
 
 #include "gtest/gtest.h"
-#include "turbo/synchronization/internal/thread_pool.h"
+#include "turbo/concurrent/internal/thread_pool.h"
 
 namespace {
 

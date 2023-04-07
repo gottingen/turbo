@@ -18,12 +18,10 @@
 #include <limits>
 #include <random>
 
+#include "turbo/concurrent/notification.h"
 #include "turbo/platform/port.h"
 #include "turbo/profiling/internal/sample_recorder.h"
-#include "turbo/synchronization/blocking_counter.h"
-#include "turbo/synchronization/internal/thread_pool.h"
-#include "turbo/synchronization/mutex.h"
-#include "turbo/synchronization/notification.h"
+#include "turbo/concurrent/internal/thread_pool.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 #include "gmock/gmock.h"
@@ -348,7 +346,7 @@ TEST(HashtablezSamplerTest, Unregistration) {
 
 TEST(HashtablezSamplerTest, MultiThreaded) {
   HashtablezSampler sampler;
-  Notification stop;
+  turbo::Notification stop;
   ThreadPool pool(10);
 
   for (int i = 0; i < 10; ++i) {

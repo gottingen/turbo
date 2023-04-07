@@ -26,8 +26,8 @@
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_info.h"
-#include "turbo/synchronization/internal/thread_pool.h"
-#include "turbo/synchronization/notification.h"
+#include "turbo/concurrent/internal/thread_pool.h"
+#include "turbo/concurrent/notification.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 

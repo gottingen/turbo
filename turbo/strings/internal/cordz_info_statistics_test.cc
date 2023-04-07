@@ -19,6 +19,7 @@
 #include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
+#include "turbo/concurrent/latch.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_crc.h"
@@ -29,8 +30,7 @@
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_scope.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/synchronization/internal/thread_pool.h"
-#include "turbo/synchronization/notification.h"
+#include "turbo/concurrent/internal/thread_pool.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -468,7 +468,7 @@ TEST(CordzInfoStatisticsTest, Crc) {
 }
 
 TEST(CordzInfoStatisticsTest, ThreadSafety) {
-  Notification stop;
+  Latch stop(1);
   static constexpr int kNumThreads = 8;
   int64_t sampled_node_count = 0;
 
@@ -477,7 +477,7 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
 
     // Run analyzer thread emulating a CordzHandler collection.
     pool.Schedule([&]() {
-      while (!stop.HasBeenNotified()) {
+      while (!stop.Arrived()) {
         // Run every 10us (about 100K total collections).
         turbo::SleepFor(turbo::Microseconds(10));
         CordzSampleToken token;
@@ -498,7 +498,7 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
         std::minstd_rand gen;
         std::uniform_int_distribution<int> coin_toss(0, 1);
 
-        while (!stop.HasBeenNotified()) {
+        while (!stop.Arrived()) {
           for (InlineData& cord : cords) {
             // 50/50 flip the state of the cord
             if (coin_toss(gen) != 0) {
@@ -545,7 +545,7 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
     // Run for 1 second to give memory and thread safety analyzers plenty of
     // time to detect any mishaps or undefined behaviors.
     turbo::SleepFor(turbo::Seconds(1));
-    stop.Notify();
+    stop.CountDown();
   }
 
   std::cout << "Sampled " << sampled_node_count << " nodes\n";
