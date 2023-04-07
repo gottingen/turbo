@@ -69,14 +69,7 @@ else()
   option(TURBO_ENABLE_INSTALL "Enable install rule" ON)
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
-
-option(TURBO_PROPAGATE_CXX_STD
-  "Use CMake C++ standard meta features (e.g. cxx_std_14) that propagate to targets that link to Turbo"
-  OFF)  # TODO: Default to ON for CMake 3.8 and greater.
-if(NOT TURBO_PROPAGATE_CXX_STD)
-  message(WARNING "A future Turbo release will default TURBO_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
-endif()
+set(CMAKE_CXX_STANDARD 17)
 
 option(TURBO_USE_SYSTEM_INCLUDES
   "Silence warnings in Turbo headers by marking them as SYSTEM includes"

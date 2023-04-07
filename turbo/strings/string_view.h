@@ -52,4 +52,30 @@ using std::experimental::wstring_view;
 
 }  // namespace turbo
 
+
+namespace turbo {
+    TURBO_NAMESPACE_BEGIN
+
+    // ClippedSubstr()
+    //
+    // Like `s.substr(pos, n)`, but clips `pos` to an upper bound of `s.size()`.
+    // Provided because turbo::string_piece::substr throws if `pos > size()`
+    inline string_view ClippedSubstr(string_view s, size_t pos,
+                                      size_t n = string_view::npos) {
+        pos = (std::min)(pos, static_cast<size_t>(s.size()));
+        return s.substr(pos, n);
+    }
+
+// NullSafeStringView()
+//
+// Creates an `turbo::string_piece` from a pointer `p` even if it's null-valued.
+// This function should be used where an `turbo::string_piece` can be created from
+// a possibly-null pointer.
+    constexpr string_view NullSafeStringView(const char* p) {
+        return p ? string_view(p) : string_view();
+    }
+
+    TURBO_NAMESPACE_END
+}  // namespace turbo
+
 #endif // TURBO_STRINGS_STRING_VIEW_H_

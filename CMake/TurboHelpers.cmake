@@ -283,13 +283,6 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
       set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/internal)
     endif()
 
-    if(TURBO_PROPAGATE_CXX_STD)
-      # Turbo libraries require C++14 as the current minimum standard. When
-      # compiled with C++17 (either because it is the compiler's default or
-      # explicitly requested), then Turbo requires C++17.
-      target_compile_features(${_NAME} PUBLIC ${TURBO_INTERNAL_CXX_STD_FEATURE})
-    endif()
-
     # When being installed, we lose the  prefix.  We want to put it back
     # to have properly named lib files.  This is a no-op when we are not being
     # installed.
@@ -320,12 +313,6 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     )
     target_compile_definitions(${_NAME} INTERFACE ${TURBO_CC_LIB_DEFINES})
 
-    if(TURBO_PROPAGATE_CXX_STD)
-      # Turbo libraries require C++14 as the current minimum standard.
-      # Top-level application CMake projects should ensure a consistent C++
-      # standard for all compiled sources by setting CMAKE_CXX_STANDARD.
-      target_compile_features(${_NAME} INTERFACE ${TURBO_INTERNAL_CXX_STD_FEATURE})
-    endif()
   endif()
 
   # TODO currently we don't install googletest alongside abseil sources, so
@@ -429,13 +416,6 @@ function(turbo_cc_test)
   # Add all Turbo targets to a folder in the IDE for organization.
   set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/test)
 
-  if(TURBO_PROPAGATE_CXX_STD)
-    # Turbo libraries require C++14 as the current minimum standard.
-    # Top-level application CMake projects should ensure a consistent C++
-    # standard for all compiled sources by setting CMAKE_CXX_STANDARD.
-    target_compile_features(${_NAME} INTERFACE ${TURBO_INTERNAL_CXX_STD_FEATURE})
-  endif()
-
   add_test(NAME ${_NAME} COMMAND ${_NAME})
 endfunction()
 
@@ -525,23 +505,16 @@ function(turbo_cc_binary)
   # Add all Turbo targets to a folder in the IDE for organization.
   set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/test)
 
-  if(TURBO_PROPAGATE_CXX_STD)
-    # Turbo libraries require C++14 as the current minimum standard.
-    # Top-level application CMake projects should ensure a consistent C++
-    # standard for all compiled sources by setting CMAKE_CXX_STANDARD.
-    _turbo_target_compile_features_if_available(${_NAME} PUBLIC ${TURBO_INTERNAL_CXX_STD_FEATURE})
-  else()
-    # Note: This is legacy (before CMake 3.8) behavior. Setting the
-    # target-level CXX_STANDARD property to TURBO_CXX_STANDARD (which is
-    # initialized by CMAKE_CXX_STANDARD) should have no real effect, since
-    # that is the default value anyway.
-    #
-    # CXX_STANDARD_REQUIRED does guard against the top-level CMake project
-    # not having enabled CMAKE_CXX_STANDARD_REQUIRED (which prevents
-    # "decaying" to an older standard if the requested one isn't available).
-    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${TURBO_CXX_STANDARD})
-    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-  endif()
+  # Note: This is legacy (before CMake 3.8) behavior. Setting the
+  # target-level CXX_STANDARD property to TURBO_CXX_STANDARD (which is
+  # initialized by CMAKE_CXX_STANDARD) should have no real effect, since
+  # that is the default value anyway.
+  #
+  # CXX_STANDARD_REQUIRED does guard against the top-level CMake project
+  # not having enabled CMAKE_CXX_STANDARD_REQUIRED (which prevents
+  # "decaying" to an older standard if the requested one isn't available).
+  set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${TURBO_CXX_STANDARD})
+  set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
 endfunction()
 

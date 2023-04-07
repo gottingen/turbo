@@ -228,8 +228,7 @@
 #error "TURBO_HAVE_STD_ANY cannot be directly set."
 #endif
 
-#if TURBO_HAVE_INCLUDE(<any>) && defined(__cplusplus) && __cplusplus >= 201703L && \
-    !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
+#if TURBO_HAVE_INCLUDE(<any>) && defined(__cplusplus) && __cplusplus >= 201703L
 #define TURBO_HAVE_STD_ANY 1
 #endif
 
@@ -243,7 +242,7 @@
 #endif
 
 #if TURBO_HAVE_INCLUDE(<optional>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L && !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
+    __cplusplus >= 201703L
 #define TURBO_HAVE_STD_OPTIONAL 1
 #endif
 
@@ -256,7 +255,7 @@
 #endif
 
 #if TURBO_HAVE_INCLUDE(<variant>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L && !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
+    __cplusplus >= 201703L
 #define TURBO_HAVE_STD_VARIANT 1
 #endif
 
