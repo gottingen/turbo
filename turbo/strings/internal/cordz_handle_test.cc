@@ -15,7 +15,7 @@
 
 #include <random>
 
-#include "turbo/concurrent/latch.h"
+#include "turbo/concurrent/notification.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/memory/memory.h"
@@ -177,7 +177,7 @@ TEST(CordzHandleTest, DiagnosticsGetSafeToInspectDeletedHandles) {
 // Create and delete CordzHandle and CordzSnapshot objects in multiple threads
 // so that tsan has some time to chew on it and look for memory problems.
 TEST(CordzHandleTest, MultiThreaded) {
-  Latch stop(1);
+  Notification stop;
   static constexpr int kNumThreads = 4;
   // Keep the number of handles relatively small so that the test will naturally
   // transition to an empty delete queue during the test. If there are, say, 100
@@ -206,7 +206,7 @@ TEST(CordzHandleTest, MultiThreaded) {
         std::uniform_int_distribution<int> dist_type(0, 2);
         std::uniform_int_distribution<int> dist_handle(0, kNumHandles - 1);
 
-        while (!stop.Arrived()) {
+        while (!stop.HasBeenNotified()) {
           CordzHandle* handle;
           switch (dist_type(gen)) {
             case 0:
@@ -249,7 +249,7 @@ TEST(CordzHandleTest, MultiThreaded) {
     // The threads will hammer away.  Give it a little bit of time for tsan to
     // spot errors.
     turbo::SleepFor(turbo::Seconds(3));
-    stop.CountDown();
+    stop.Notify();
   }
 
   // Confirm that the test did *something*. This check will be satisfied as
