@@ -33,7 +33,7 @@ namespace turbo {
     TURBO_NAMESPACE_BEGIN
     namespace synchronization_internal {
 
-// A simple ThreadPool implementation for tests.
+        // A simple ThreadPool implementation for tests.
         class ThreadPool {
         public:
             explicit ThreadPool(int num_threads) {
@@ -51,6 +51,9 @@ namespace turbo {
                 {
                     stop_.Notify();
                     std::unique_lock l(mu_);
+                    for(size_t i = 0; i < threads_.size(); ++i) {
+                        queue_.push(nullptr);
+                    }
                     cv_.notify_all();
                 }
                 for (auto &t: threads_) {
