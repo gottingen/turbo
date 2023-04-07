@@ -51,9 +51,8 @@ namespace turbo {
                 {
                     stop_ = true;
                     for(size_t i = 0; i < threads_.size(); ++i) {
-                        StopOne(nullptr);
+                        StopOne();
                     }
-                    cv_.notify_all();
                 }
                 for (auto &t: threads_) {
                     t.join();
@@ -67,9 +66,9 @@ namespace turbo {
                 queue_.push(std::move(func));
                 cv_.notify_one();
             }
-            void StopOne(turbo::AnyInvocable<void()> func) {
+            void StopOne() {
                 std::unique_lock l(mu_);
-                queue_.push(std::move(func));
+                queue_.push(nullptr);
                 cv_.notify_one();
             }
 
