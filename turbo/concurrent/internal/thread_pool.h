@@ -51,7 +51,7 @@ namespace turbo {
                 {
                     stop_.Notify();
                     for(size_t i = 0; i < threads_.size(); ++i) {
-                        Schedule(nullptr);
+                        StopOne(nullptr);
                     }
                 }
                 for (auto &t: threads_) {
@@ -62,6 +62,11 @@ namespace turbo {
             // Schedule a function to be run on a ThreadPool thread immediately.
             void Schedule(turbo::AnyInvocable<void()> func) {
                 assert(func != nullptr);
+                std::unique_lock l(mu_);
+                queue_.push(std::move(func));
+                cv_.notify_one();
+            }
+            void StopOne(turbo::AnyInvocable<void()> func) {
                 std::unique_lock l(mu_);
                 queue_.push(std::move(func));
                 cv_.notify_one();
