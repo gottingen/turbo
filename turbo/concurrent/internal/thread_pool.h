@@ -50,11 +50,9 @@ namespace turbo {
             ~ThreadPool() {
                 {
                     stop_.Notify();
-                    std::unique_lock l(mu_);
                     for(size_t i = 0; i < threads_.size(); ++i) {
-                        queue_.push(nullptr);
+                        Schedule(nullptr);
                     }
-                    cv_.notify_all();
                 }
                 for (auto &t: threads_) {
                     t.join();
