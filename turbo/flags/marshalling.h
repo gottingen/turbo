@@ -206,9 +206,9 @@
 #endif
 #include <string>
 #include <vector>
+#include <optional>
 
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/optional.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -239,10 +239,10 @@ bool TurboParseFlag(std::string_view, std::string*, std::string*);
 bool TurboParseFlag(std::string_view, std::vector<std::string>*, std::string*);
 
 template <typename T>
-bool TurboParseFlag(std::string_view text, turbo::optional<T>* f,
+bool TurboParseFlag(std::string_view text, std::optional<T>* f,
                    std::string* err) {
   if (text.empty()) {
-    *f = turbo::nullopt;
+    *f = std::nullopt;
     return true;
   }
   T value;
@@ -282,7 +282,7 @@ std::string TurboUnparseFlag(std::string_view v);
 std::string TurboUnparseFlag(const std::vector<std::string>&);
 
 template <typename T>
-std::string TurboUnparseFlag(const turbo::optional<T>& f) {
+std::string TurboUnparseFlag(const std::optional<T>& f) {
   return f.has_value() ? turbo::UnparseFlag(*f) : "";
 }
 

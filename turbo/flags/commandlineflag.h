@@ -28,10 +28,10 @@
 
 #include <memory>
 #include <string>
+#include <optional>
 
 #include "turbo/base/internal/fast_type_id.h"
 #include "turbo/flags/internal/commandlineflag.h"
-#include "turbo/meta/optional.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
@@ -78,11 +78,11 @@ class CommandLineFlag {
   // turbo::CommandLineFlag::TryGet()
   //
   // Attempts to retrieve the flag value. Returns value on success,
-  // turbo::nullopt otherwise.
+  // std::nullopt otherwise.
   template <typename T>
-  turbo::optional<T> TryGet() const {
+  std::optional<T> TryGet() const {
     if (IsRetired() || !IsOfType<T>()) {
-      return turbo::nullopt;
+      return std::nullopt;
     }
 
     // Implementation notes:
@@ -110,7 +110,7 @@ class CommandLineFlag {
     Read(&u.value);
     // allow retired flags to be "read", so we can report invalid access.
     if (IsRetired()) {
-      return turbo::nullopt;
+      return std::nullopt;
     }
     return std::move(u.value);
   }

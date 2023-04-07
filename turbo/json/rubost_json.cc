@@ -36,12 +36,12 @@
 #define ROBUST_JSON_DEFINE_BOTH_AS(T, TPL_FUNC)                                 \
   template <>                                                                   \
   template <>                                                                   \
-  turbo::optional<T> robust_json<rapidjson::Value>::as<T>() const noexcept {       \
+  std::optional<T> robust_json<rapidjson::Value>::as<T>() const noexcept {       \
     return TPL_FUNC;                                                            \
   }                                                                             \
   template <>                                                                   \
   template <>                                                                   \
-  turbo::optional<T> robust_json<const rapidjson::Value>::as<T>() const noexcept { \
+  std::optional<T> robust_json<const rapidjson::Value>::as<T>() const noexcept { \
     return TPL_FUNC;                                                            \
   }
 
@@ -135,103 +135,103 @@ RAPIDJSON_NAMESPACE_BEGIN
     ROBUST_JSON_DEFINE_BOTH_CAST(rapidjson::Value::ConstArray, cast_const_array(v_));
 
     template<typename OptionalRefRapidJsonValue>
-    turbo::optional<rapidjson::Value::ConstObject> as_const_object(OptionalRefRapidJsonValue v_) {
+    std::optional<rapidjson::Value::ConstObject> as_const_object(OptionalRefRapidJsonValue v_) {
         if (v_.has_value() && v_.value().get().IsObject()) {
-            return turbo::make_optional(static_cast<const rapidjson::Value &>(v_.value().get()).GetObject());
+            return std::make_optional(static_cast<const rapidjson::Value &>(v_.value().get()).GetObject());
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     ROBUST_JSON_DEFINE_BOTH_AS(rapidjson::Value::ConstObject, as_const_object(v_));
 
     template<>
     template<>
-    turbo::optional<rapidjson::Value::Object>
+    std::optional<rapidjson::Value::Object>
     robust_json<rapidjson::Value>::as<rapidjson::Value::Object>() const noexcept {
         if (v_.has_value() && v_.value().get().IsObject()) {
-            return turbo::make_optional(v_.value().get().GetObject());
+            return std::make_optional(v_.value().get().GetObject());
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     template<typename OptionalRefRapidJsonValue>
-    turbo::optional<rapidjson::Value::ConstArray> as_const_array(OptionalRefRapidJsonValue v_) {
+    std::optional<rapidjson::Value::ConstArray> as_const_array(OptionalRefRapidJsonValue v_) {
         if (v_.has_value() && v_.value().get().IsArray()) {
-            return turbo::make_optional(static_cast<const rapidjson::Value &>(v_.value().get()).GetArray());
+            return std::make_optional(static_cast<const rapidjson::Value &>(v_.value().get()).GetArray());
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     ROBUST_JSON_DEFINE_BOTH_AS(rapidjson::Value::ConstArray, as_const_array(v_));
 
     template<>
     template<>
-    turbo::optional<rapidjson::Value::Array> robust_json<rapidjson::Value>::as<rapidjson::Value::Array>() const noexcept {
+    std::optional<rapidjson::Value::Array> robust_json<rapidjson::Value>::as<rapidjson::Value::Array>() const noexcept {
         if (v_.has_value() && v_.value().get().IsArray()) {
-            return turbo::make_optional(v_.value().get().GetArray());
+            return std::make_optional(v_.value().get().GetArray());
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     template<typename OptionalRefRapidJsonValue>
-    turbo::optional<uint64_t> as_uint64(OptionalRefRapidJsonValue v_) {
+    std::optional<uint64_t> as_uint64(OptionalRefRapidJsonValue v_) {
         if (v_.has_value()) {
             auto &v = v_.value().get();
             if (v.IsUint64()) {
                 // compatible with kNumberUintFlag/kNumberUint64Flag values
-                return turbo::make_optional(v.GetUint64());
+                return std::make_optional(v.GetUint64());
             }
             if (v.IsString()) {
                 uint64_t n;
                 if (!turbo::SimpleAtoi(std::string_view{v.GetString(), v.GetStringLength()}, &n)) {
-                    return turbo::nullopt;
+                    return std::nullopt;
                 }
                 return n;
             }
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     ROBUST_JSON_DEFINE_BOTH_AS(uint64_t, as_uint64(v_));
 
     template<typename OptionalRefRapidJsonValue>
-    turbo::optional<int64_t> as_int64(OptionalRefRapidJsonValue v_) {
+    std::optional<int64_t> as_int64(OptionalRefRapidJsonValue v_) {
         if (v_.has_value()) {
             auto &v = v_.value().get();
             if (v.IsInt64()) {
                 // compatible with kNumberIntFlag/kNumberUintFlag/kNumberInt64Flag values
-                return turbo::make_optional(v.GetInt64());
+                return std::make_optional(v.GetInt64());
             }
             if (v.IsString()) {
                 int64_t n;
                 if (!turbo::SimpleAtoi(std::string_view{v.GetString(), v.GetStringLength()}, &n)) {
-                    return turbo::nullopt;
+                    return std::nullopt;
                 }
                 return n;
             }
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     ROBUST_JSON_DEFINE_BOTH_AS(int64_t, as_int64(v_));
 
     template<typename OptionalRefRapidJsonValue>
-    turbo::optional<double> as_double(OptionalRefRapidJsonValue v_) {
+    std::optional<double> as_double(OptionalRefRapidJsonValue v_) {
         if (v_.has_value()) {
             auto &v = v_.value().get();
             if (v.IsNumber()) {
                 // compatible with any number values
-                return turbo::make_optional(v.GetDouble());
+                return std::make_optional(v.GetDouble());
             }
             if (v.IsString()) {
                 double n;
                 if (!turbo::SimpleAtod(std::string_view{v.GetString(), v.GetStringLength()}, &n)) {
-                    return turbo::nullopt;
+                    return std::nullopt;
                 }
                 return n;
             }
         }
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     ROBUST_JSON_DEFINE_BOTH_AS(double, as_double(v_));

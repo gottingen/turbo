@@ -777,9 +777,9 @@ TEST(HashValueTest, PrivateSanity) {
 }
 
 TEST(HashValueTest, Optional) {
-  EXPECT_TRUE(is_hashable<turbo::optional<Private>>::value);
+  EXPECT_TRUE(is_hashable<std::optional<Private>>::value);
 
-  using O = turbo::optional<Private>;
+  using O = std::optional<Private>;
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(O{}, O{{1}}, O{{-1}}, O{{10}})));
 }

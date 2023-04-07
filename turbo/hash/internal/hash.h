@@ -40,6 +40,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <optional>
 #include <vector>
 
 #include "turbo/base/bits.h"
@@ -47,7 +48,6 @@
 #include "turbo/container/fixed_array.h"
 #include "turbo/hash/internal/city.h"
 #include "turbo/hash/internal/low_level_hash.h"
-#include "turbo/meta/optional.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
 #include "turbo/meta/variant.h"
@@ -751,10 +751,10 @@ typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
   return H::combine(std::move(hash_state), opt.get());
 }
 
-// TurboHashValue for hashing turbo::optional
+// TurboHashValue for hashing std::optional
 template <typename H, typename T>
 typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
-    H hash_state, const turbo::optional<T>& opt) {
+    H hash_state, const std::optional<T>& opt) {
   if (opt) hash_state = H::combine(std::move(hash_state), *opt);
   return H::combine(std::move(hash_state), opt.has_value());
 }

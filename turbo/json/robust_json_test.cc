@@ -71,8 +71,8 @@ namespace testing {
 
         rapidjson::robust_json<> rbdoc{root};
         rapidjson::robust_json<> rbhello = rbdoc["hello"];
-        turbo::optional<rapidjson::Value::ConstObject> const_obj_hello = rbhello.as<rapidjson::Value::ConstObject>();
-        turbo::optional<rapidjson::Value::Object> mutable_obj_hello = rbhello.as<rapidjson::Value::Object>();
+        std::optional<rapidjson::Value::ConstObject> const_obj_hello = rbhello.as<rapidjson::Value::ConstObject>();
+        std::optional<rapidjson::Value::Object> mutable_obj_hello = rbhello.as<rapidjson::Value::Object>();
         EXPECT_TRUE(const_obj_hello.has_value());
         EXPECT_TRUE(mutable_obj_hello.has_value());
         mutable_obj_hello.value().AddMember("newkey", "newvalue", doc.GetAllocator());
@@ -92,8 +92,8 @@ namespace testing {
         EXPECT_EQ(rbdoc["arr"][9999].as<int64_t>().value_or(-1), -1);
         //EXPECT_EQ(rbdoc["arr"][3]["inside_array_key"].cast<std::string_view>(), "inside_array_value");
 
-        turbo::optional<rapidjson::Value::ConstArray> const_array = rbarray.as<rapidjson::Value::ConstArray>();
-        turbo::optional<rapidjson::Value::Array> mutable_array = rbarray.as<rapidjson::Value::Array>();
+        std::optional<rapidjson::Value::ConstArray> const_array = rbarray.as<rapidjson::Value::ConstArray>();
+        std::optional<rapidjson::Value::Array> mutable_array = rbarray.as<rapidjson::Value::Array>();
         EXPECT_TRUE(const_array.has_value());
         EXPECT_TRUE(mutable_array.has_value());
         size_t pre_modify_size = mutable_array.value().Size();

@@ -42,7 +42,7 @@ RAPIDJSON_NAMESPACE_BEGIN
     public:
         explicit robust_json(RapidJsonValue &v) : v_(std::ref(v)) {}
 
-        robust_json() : v_(turbo::nullopt) {}
+        robust_json() : v_(std::nullopt) {}
 
         /**
          *  if current node is a rapidjson::Value
@@ -83,12 +83,12 @@ RAPIDJSON_NAMESPACE_BEGIN
         }
 
         template<typename TargetValue>
-        turbo::optional<TargetValue> as() const noexcept {
+        std::optional<TargetValue> as() const noexcept {
             return TargetValue::RobustJsonNotImplementedForThisTargetType();
         }
 
     private:
-        turbo::optional<std::reference_wrapper<RapidJsonValue>> v_;
+        std::optional<std::reference_wrapper<RapidJsonValue>> v_;
     };
 
 #define ROBUST_JSON_DECLARE_BOTH_CAST(T)                    \
@@ -102,10 +102,10 @@ RAPIDJSON_NAMESPACE_BEGIN
 #define ROBUST_JSON_DECLARE_BOTH_AS(T)                                   \
   template <>                                                            \
   template <>                                                            \
-  turbo::optional<T> robust_json<rapidjson::Value>::as<T>() const noexcept; \
+  std::optional<T> robust_json<rapidjson::Value>::as<T>() const noexcept; \
   template <>                                                            \
   template <>                                                            \
-  turbo::optional<T> robust_json<const rapidjson::Value>::as<T>() const noexcept;
+  std::optional<T> robust_json<const rapidjson::Value>::as<T>() const noexcept;
 
     ROBUST_JSON_DECLARE_BOTH_CAST(std::string_view);
 
@@ -118,14 +118,14 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     template<>
     template<>
-    turbo::optional<rapidjson::Value::Object>
+    std::optional<rapidjson::Value::Object>
     robust_json<rapidjson::Value>::as<rapidjson::Value::Object>() const noexcept;
 
     ROBUST_JSON_DECLARE_BOTH_AS(rapidjson::Value::ConstArray);
 
     template<>
     template<>
-    turbo::optional<rapidjson::Value::Array> robust_json<rapidjson::Value>::as<rapidjson::Value::Array>() const noexcept;
+    std::optional<rapidjson::Value::Array> robust_json<rapidjson::Value>::as<rapidjson::Value::Array>() const noexcept;
 
     ROBUST_JSON_DECLARE_BOTH_AS(uint64_t);
 

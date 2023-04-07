@@ -21,9 +21,9 @@
 #include <limits>
 #include <string>
 #include <thread>  // NOLINT
+#include <optional>
 
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/meta/optional.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/internal/str_format/bind.h"
 #include "turbo/strings/match.h"

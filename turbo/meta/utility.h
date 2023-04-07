@@ -169,7 +169,7 @@ using std::in_place;
 // in_place_t
 //
 // Tag type used to specify in-place construction, such as with
-// `turbo::optional`, designed to be a drop-in replacement for C++17's
+// `std::optional`, designed to be a drop-in replacement for C++17's
 // `std::in_place_t`.
 struct in_place_t {};
 

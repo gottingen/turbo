@@ -15,6 +15,7 @@
 #include "turbo/container/flat_hash_map.h"
 
 #include <memory>
+#include <any>
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/internal/hash_generator_testing.h"
@@ -22,7 +23,6 @@
 #include "turbo/container/internal/unordered_map_lookup_test.h"
 #include "turbo/container/internal/unordered_map_members_test.h"
 #include "turbo/container/internal/unordered_map_modifiers_test.h"
-#include "turbo/meta/any.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

@@ -26,7 +26,6 @@
 #include "turbo/base/int128.h"
 #include "turbo/base/internal/representation.h"
 #include "turbo/meta/function_ref.h"
-#include "turbo/meta/optional.h"
 #include "turbo/meta/span.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"

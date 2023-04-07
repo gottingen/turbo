@@ -87,8 +87,6 @@ set(TURBO_ALL_SRC
         "log/log_entry.cc"
         "log/log_sink.cc"
         "memory/jemalloc_helper.cc"
-        "meta/bad_any_cast.cc"
-        "meta/bad_optional_access.cc"
         "meta/bad_variant_access.cc"
         "platform/internal/cycleclock.cc"
         "platform/internal/spinlock.cc"

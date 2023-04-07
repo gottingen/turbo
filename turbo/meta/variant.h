@@ -30,7 +30,7 @@
 // value (known as a "valueless by exception" state), though this is not the
 // norm.
 //
-// As with `turbo::optional`, an `turbo::variant` -- when it holds a value --
+// As with `std::optional`, an `turbo::variant` -- when it holds a value --
 // allocates a value of that type directly within the `variant` itself; it
 // cannot hold a reference, array, or the type `void`; it can, however, hold a
 // pointer to externally managed memory.

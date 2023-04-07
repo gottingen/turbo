@@ -27,10 +27,10 @@
 #include <ostream>
 #include <string>
 #include <utility>
+#include <optional>
 
 #include "turbo/base/log_severity.h"
 #include "turbo/log/turbo_log.h"
-#include "turbo/meta/optional.h"
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/internal/ostringstream.h"
@@ -131,7 +131,7 @@ class LogStreamer final {
   std::string buf_;
   // A disengaged `stream_` indicates a moved-from `LogStreamer` that should not
   // `LOG` upon destruction.
-  turbo::optional<turbo::strings_internal::OStringStream> stream_;
+  std::optional<turbo::strings_internal::OStringStream> stream_;
 };
 
 // LogInfoStreamer()

@@ -54,9 +54,9 @@
 #include <ostream>
 #include <string>
 #include <utility>
+#include <optional>
 
 #include "turbo/meta/function_ref.h"
-#include "turbo/meta/optional.h"
 #include "turbo/base/internal/status_internal.h"
 #include "turbo/strings/cord.h"
 #include "turbo/strings/string_view.h"
@@ -578,7 +578,7 @@ class Status final {
   // Status::GetPayload()
   //
   // Gets the payload of a status given its unique `type_url` key, if present.
-  turbo::optional<turbo::Cord> GetPayload(std::string_view type_url) const;
+  std::optional<turbo::Cord> GetPayload(std::string_view type_url) const;
 
   // Status::SetPayload()
   //

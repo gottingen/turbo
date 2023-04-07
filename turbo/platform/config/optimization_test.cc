@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "attribute_optimization.h"
+#include "turbo/platform/port.h"
 
 #include "gtest/gtest.h"
-#include "turbo/meta/optional.h"
+#include <optional>
 
 namespace {
 
@@ -80,8 +80,8 @@ TEST(PredictTest, Pointer) {
 
 TEST(PredictTest, Optional) {
   // Note: An optional's truth value is the value's existence, not its truth.
-  turbo::optional<bool> has_value(false);
-  turbo::optional<bool> no_value;
+  std::optional<bool> has_value(false);
+  std::optional<bool> no_value;
   EXPECT_TRUE(TURBO_LIKELY(has_value));
   EXPECT_FALSE(TURBO_LIKELY(no_value));
   EXPECT_TRUE(TURBO_UNLIKELY(has_value));
