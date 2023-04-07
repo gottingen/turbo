@@ -83,9 +83,6 @@ namespace turbo {
                     {
                         std::unique_lock l(mu_);
                         cv_.wait(l);
-                        if (queue_.empty()) {
-                            continue;
-                        }
                         func = std::move(queue_.front());
                         queue_.pop();
                     }
