@@ -53,6 +53,7 @@ namespace turbo {
                     for(size_t i = 0; i < threads_.size(); ++i) {
                         StopOne(nullptr);
                     }
+                    cv_.notify_all();
                 }
                 for (auto &t: threads_) {
                     t.join();
