@@ -98,7 +98,6 @@ set(TURBO_ALL_SRC
         "platform/internal/spinlock_wait.cc"
         "platform/internal/sysinfo.cc"
         "platform/internal/scoped_set_env.cc"
-        "platform/internal/thread_identity.cc"
         "base/internal/throw_delegate.cc"
         "platform/internal/unscaledcycleclock.cc"
         "platform/internal/low_level_alloc.cc"
