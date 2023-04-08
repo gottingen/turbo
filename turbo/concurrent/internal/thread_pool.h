@@ -48,12 +48,8 @@ namespace turbo {
             ThreadPool &operator=(const ThreadPool &) = delete;
 
             ~ThreadPool() {
-                {
-                    stop_ = true;
-                    for(size_t i = 0; i < threads_.size(); ++i) {
-                        StopOne();
-                    }
-                }
+                stop_ = true;
+                cv_.notify_all();
                 for (auto &t: threads_) {
                     t.join();
                 }
@@ -66,11 +62,6 @@ namespace turbo {
                 queue_.push(std::move(func));
                 cv_.notify_one();
             }
-            void StopOne() {
-                std::unique_lock l(mu_);
-                queue_.push(nullptr);
-                cv_.notify_one();
-            }
 
         private:
             bool WorkAvailable() const TURBO_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
@@ -78,17 +69,15 @@ namespace turbo {
             }
 
             void WorkLoop() {
+                turbo::AnyInvocable<void()> func;
                 while (!stop_) {
-                    turbo::AnyInvocable<void()> func;
-                    {
-                        std::unique_lock l(mu_);
-                        cv_.wait(l);
-                        func = std::move(queue_.front());
-                        queue_.pop();
+                    std::unique_lock l(mu_);
+                    cv_.wait(l,  [this]{ return this->stop_ || !this->queue_.empty(); });
+                    if(queue_.empty() && stop_) {
+                        return;
                     }
-                    if (func == nullptr) {  // Shutdown signal.
-                        break;
-                    }
+                    func = std::move(queue_.front());
+                    queue_.pop();
                     func();
                 }
             }
