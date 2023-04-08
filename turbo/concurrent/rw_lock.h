@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <mutex>
 #include "turbo/platform/port.h"
+#include "turbo/concurrent/scoped_lock.h"
 
 namespace turbo {
 

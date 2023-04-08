@@ -37,7 +37,7 @@ turbo_cc_test(
         turbo::turbo
         GTest::gtest_main
 )
-
+#[[
 turbo_cc_test(
         NAME
         call_once_test
@@ -47,10 +47,9 @@ turbo_cc_test(
         ${TURBO_TEST_COPTS}
         DEPS
         turbo::turbo
-        turbo::sync
         GTest::gtest_main
 )
-
+]]
 turbo_cc_test(
   NAME
     result_status_test

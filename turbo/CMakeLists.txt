@@ -28,6 +28,9 @@ set(TURBO_ALL_SRC
         "container/internal/hashtablez_sampler.cc"
         "container/internal/hashtablez_sampler_force_weak_definition.cc"
         "container/internal/raw_hash_set.cc"
+        "concurrent/barrier.cc"
+        "concurrent/latch.cc"
+        "concurrent/notification.cc"
         "crypto/crc32c.cc"
         "crypto/md5.cc"
         "crypto/sha1.cc"
@@ -95,7 +98,6 @@ set(TURBO_ALL_SRC
         "platform/internal/spinlock_wait.cc"
         "platform/internal/sysinfo.cc"
         "platform/internal/scoped_set_env.cc"
-        "platform/internal/thread_identity.cc"
         "base/internal/throw_delegate.cc"
         "platform/internal/unscaledcycleclock.cc"
         "platform/internal/low_level_alloc.cc"
@@ -186,6 +188,7 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(base)
     add_subdirectory(cleanup)
     add_subdirectory(container)
+    add_subdirectory(concurrent)
     add_subdirectory(crypto)
     add_subdirectory(debugging)
     add_subdirectory(files)
@@ -198,7 +201,6 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(profiling)
     add_subdirectory(random)
     add_subdirectory(strings)
-    add_subdirectory(synchronization)
     add_subdirectory(time)
     add_subdirectory(unicode)
 endif (TURBO_BUILD_TESTING)

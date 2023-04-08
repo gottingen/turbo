@@ -18,7 +18,7 @@
 #include <thread>  // NOLINT
 
 #include "turbo/platform/port.h"
-#include "turbo/synchronization/notification.h"
+#include "turbo/concurrent/notification.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

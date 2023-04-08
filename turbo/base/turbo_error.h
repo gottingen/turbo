@@ -73,6 +73,6 @@ class TurboErrorHelper {
 
 const char *TurboError(int error_code);
 
-std::string SystemError();
+std::string StrError(int errnum);
 
 #endif  // TURBO_BASE_ERRNO_H_

@@ -189,6 +189,15 @@
 #endif
 
 #ifndef TURBO_MAYBE_UNUSED
+#if TURBO_HAVE_ATTRIBUTE(unused)
+#define TURBO_MAYBE_UNUSED __attribute__((unused))
+#else
+#define TURBO_MAYBE_UNUSED
+#endif
+#endif // TURBO_MAYBE_UNUSED
+
+/*
+#ifndef TURBO_MAYBE_UNUSED
 #if defined(TURBO_COMPILER_CPP17_ENABLED)
 #define TURBO_MAYBE_UNUSED [[maybe_unused]]
 #elif TURBO_HAVE_ATTRIBUTE(unused)
@@ -197,7 +206,7 @@
 #define TURBO_MAYBE_UNUSED
 #endif
 #endif // TURBO_MAYBE_UNUSED
-
+*/
 // ------------------------------------------------------------------------
 // TURBO_FORCE_INLINE              // Used as a prefix.
 // TURBO_PREFIX_FORCE_INLINE       // You should need this only for unusual

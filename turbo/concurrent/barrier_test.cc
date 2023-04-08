@@ -1,4 +1,4 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/synchronization/barrier.h"
+#include "turbo/concurrent/barrier.h"
 
 #include <thread>  // NOLINT(build/c++11)
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/synchronization/mutex.h"
 #include "turbo/time/clock.h"
 
 
@@ -26,7 +25,7 @@ TEST(Barrier, SanityTest) {
   constexpr int kNumThreads = 10;
   turbo::Barrier* barrier = new turbo::Barrier(kNumThreads);
 
-  turbo::Mutex mutex;
+  std::mutex mutex;
   int counter = 0;  // Guarded by mutex.
 
   auto thread_func = [&] {
@@ -37,7 +36,7 @@ TEST(Barrier, SanityTest) {
     }
 
     // Increment the counter.
-    turbo::MutexLock lock(&mutex);
+    std::unique_lock lock(mutex);
     ++counter;
   };
 
@@ -57,7 +56,7 @@ TEST(Barrier, SanityTest) {
   // The counter should still be zero since no thread should have
   // been able to pass the barrier yet.
   {
-    turbo::MutexLock lock(&mutex);
+    std::unique_lock lock(mutex);
     EXPECT_EQ(counter, 0);
   }
 
@@ -70,6 +69,6 @@ TEST(Barrier, SanityTest) {
   }
 
   // All threads should now have incremented the counter.
-  turbo::MutexLock lock(&mutex);
+  std::unique_lock lock(mutex);
   EXPECT_EQ(counter, kNumThreads);
 }

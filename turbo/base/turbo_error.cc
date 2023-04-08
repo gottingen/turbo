@@ -67,6 +67,6 @@ const char* TurboError(int error_code) {
     return "";
 }
 
-std::string SystemError() {
-    return turbo::base_internal::StrError(errno);
+std::string  StrError(int errnum) {
+    return turbo::base_internal::StrError(errnum);
 }

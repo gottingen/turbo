@@ -71,7 +71,6 @@ turbo_cc_library(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::turbo
-    turbo::sync
     GTest::gtest
   TESTONLY
 )
@@ -86,7 +85,6 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::turbo
-    turbo::sync
     GTest::gtest_main
 )
 
@@ -116,7 +114,6 @@ turbo_cc_test(
     ${TURBO_TEST_COPTS}
   DEPS
     turbo::turbo
-    turbo::sync
     GTest::gtest_main
 )
 
@@ -134,20 +131,6 @@ turbo_cc_test(
 
 turbo_cc_test(
   NAME
-    thread_identity_test
-  SRCS
-    "internal/thread_identity_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    turbo::sync
-    Threads::Threads
-    GTest::gtest_main
-)
-
-turbo_cc_test(
-  NAME
     scoped_set_env_test
   SRCS
     "internal/scoped_set_env_test.cc"
@@ -157,19 +140,6 @@ turbo_cc_test(
     turbo::turbo
     GTest::gtest_main
 )
-
-turbo_cc_test(
-  NAME
-    cmake_thread_test
-  SRCS
-    "internal/cmake_thread_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-)
-
-
 
 turbo_cc_test(
   NAME

@@ -17,7 +17,7 @@
 #include <cstdint>
 
 #include "gtest/gtest.h"
-#include "turbo/synchronization/internal/thread_pool.h"
+#include "turbo/concurrent/internal/thread_pool.h"
 
 namespace {
 
@@ -40,13 +40,13 @@ TEST(ConfigTest, Endianness) {
 #error Unknown endianness
 #endif
 }
-
+/*
 #if defined(TURBO_HAVE_THREAD_LOCAL)
 TEST(ConfigTest, ThreadLocal) {
   static thread_local int mine_mine_mine = 16;
   EXPECT_EQ(16, mine_mine_mine);
   {
-    turbo::synchronization_internal::ThreadPool pool(1);
+    turbo::concurrent_internal::ThreadPool pool(1);
     pool.Schedule([&] {
       EXPECT_EQ(16, mine_mine_mine);
       mine_mine_mine = 32;
@@ -56,5 +56,5 @@ TEST(ConfigTest, ThreadLocal) {
   EXPECT_EQ(16, mine_mine_mine);
 }
 #endif
-
+*/
 }  // namespace

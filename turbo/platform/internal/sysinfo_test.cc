@@ -24,8 +24,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "turbo/synchronization/barrier.h"
-#include "turbo/synchronization/mutex.h"
+#include "turbo/concurrent/barrier.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -52,14 +51,14 @@ TEST(SysinfoTest, GetTID) {
     Barrier all_threads_done(kNumThreads);
     std::vector<std::thread> threads;
 
-    Mutex mutex;
+    std::mutex mutex;
     std::unordered_set<pid_t> tids;
 
     for (int j = 0; j < kNumThreads; ++j) {
       threads.push_back(std::thread([&]() {
         pid_t id = GetTID();
         {
-          MutexLock lock(&mutex);
+          std::unique_lock lock(mutex);
           ASSERT_TRUE(tids.find(id) == tids.end());
           tids.insert(id);
         }

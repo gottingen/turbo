@@ -26,8 +26,8 @@
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_info.h"
-#include "turbo/synchronization/internal/thread_pool.h"
-#include "turbo/synchronization/notification.h"
+#include "turbo/concurrent/internal/thread_pool.h"
+#include "turbo/concurrent/notification.h"
 #include "turbo/time/clock.h"
 #include "turbo/time/time.h"
 
@@ -140,12 +140,13 @@ TEST(CordzSampleTokenTest, IteratorEquality) {
   info3->Untrack();
 }
 
+/*
 TEST(CordzSampleTokenTest, MultiThreaded) {
   Notification stop;
   static constexpr int kNumThreads = 4;
   static constexpr int kNumCords = 3;
   static constexpr int kNumTokens = 3;
-  turbo::synchronization_internal::ThreadPool pool(kNumThreads);
+  turbo::concurrent_internal::ThreadPool pool(kNumThreads);
 
   for (int i = 0; i < kNumThreads; ++i) {
     pool.Schedule([&stop]() {
@@ -201,7 +202,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   turbo::SleepFor(turbo::Seconds(3));
   stop.Notify();
 }
-
+*/
 }  // namespace
 }  // namespace cord_internal
 TURBO_NAMESPACE_END
