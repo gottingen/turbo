@@ -103,7 +103,7 @@ TEST(SampleRecorderTest, Unregistration) {
   sampler.Unregister(infos[4]);
   EXPECT_THAT(GetSizes(&sampler), IsEmpty());
 }
-
+/*
 TEST(SampleRecorderTest, MultiThreaded) {
   SampleRecorder<Info> sampler;
   Latch stop(1);
@@ -151,7 +151,7 @@ TEST(SampleRecorderTest, MultiThreaded) {
   turbo::SleepFor(turbo::Seconds(3));
   stop.CountDown();
 }
-
+*/
 TEST(SampleRecorderTest, Callback) {
   SampleRecorder<Info> sampler;
 

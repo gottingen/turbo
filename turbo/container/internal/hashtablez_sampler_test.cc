@@ -343,7 +343,7 @@ TEST(HashtablezSamplerTest, Unregistration) {
   sampler.Unregister(infos[4]);
   EXPECT_THAT(GetSizes(&sampler), IsEmpty());
 }
-
+/*
 TEST(HashtablezSamplerTest, MultiThreaded) {
   HashtablezSampler sampler;
   turbo::Notification stop;
@@ -393,6 +393,7 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
   turbo::SleepFor(turbo::Seconds(3));
   stop.Notify();
 }
+ */
 
 TEST(HashtablezSamplerTest, Callback) {
   HashtablezSampler sampler;

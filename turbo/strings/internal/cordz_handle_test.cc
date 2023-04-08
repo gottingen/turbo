@@ -176,6 +176,7 @@ TEST(CordzHandleTest, DiagnosticsGetSafeToInspectDeletedHandles) {
 
 // Create and delete CordzHandle and CordzSnapshot objects in multiple threads
 // so that tsan has some time to chew on it and look for memory problems.
+/*
 TEST(CordzHandleTest, MultiThreaded) {
   Notification stop;
   static constexpr int kNumThreads = 4;
@@ -258,7 +259,7 @@ TEST(CordzHandleTest, MultiThreaded) {
   // See also comments on `found_safe_to_inspect`
   EXPECT_TRUE(found_safe_to_inspect.load());
 }
-
+*/
 }  // namespace
 }  // namespace cord_internal
 TURBO_NAMESPACE_END

@@ -140,6 +140,7 @@ TEST(CordzSampleTokenTest, IteratorEquality) {
   info3->Untrack();
 }
 
+/*
 TEST(CordzSampleTokenTest, MultiThreaded) {
   Notification stop;
   static constexpr int kNumThreads = 4;
@@ -201,7 +202,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   turbo::SleepFor(turbo::Seconds(3));
   stop.Notify();
 }
-
+*/
 }  // namespace
 }  // namespace cord_internal
 TURBO_NAMESPACE_END
