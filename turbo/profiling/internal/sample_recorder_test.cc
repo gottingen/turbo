@@ -29,7 +29,7 @@ TURBO_NAMESPACE_BEGIN
 namespace profiling_internal {
 
 namespace {
-using ::turbo::synchronization_internal::ThreadPool;
+using ::turbo::concurrent_internal::ThreadPool;
 using ::testing::IsEmpty;
 using ::testing::UnorderedElementsAre;
 

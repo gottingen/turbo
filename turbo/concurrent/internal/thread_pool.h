@@ -1,4 +1,4 @@
-// Copyright 2020 The Turbo Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,10 +28,11 @@
 #include "turbo/platform/thread_annotations.h"
 #include "turbo/meta/any_invocable.h"
 #include "turbo/concurrent/notification.h"
+#include "turbo/concurrent/internal/block_queue.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
-    namespace synchronization_internal {
+    namespace concurrent_internal {
 
         // A simple ThreadPool implementation for tests.
         class ThreadPool {
@@ -73,7 +74,8 @@ namespace turbo {
                 while (!stop_) {
                     std::unique_lock l(mu_);
                     cv_.wait(l,  [this]{ return this->stop_ || !this->queue_.empty(); });
-                    if(queue_.empty() && stop_) {
+                    if(stop_) {
+                        TURBO_LOG(INFO)<<"stop thread";
                         return;
                     }
                     func = std::move(queue_.front());

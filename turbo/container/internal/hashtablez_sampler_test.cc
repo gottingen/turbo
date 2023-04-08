@@ -54,7 +54,7 @@ class HashtablezInfoHandlePeer {
 #endif  // defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
 
 namespace {
-using ::turbo::synchronization_internal::ThreadPool;
+using ::turbo::concurrent_internal::ThreadPool;
 using ::testing::IsEmpty;
 using ::testing::UnorderedElementsAre;
 

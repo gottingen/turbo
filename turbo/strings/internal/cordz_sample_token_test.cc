@@ -145,7 +145,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   static constexpr int kNumThreads = 4;
   static constexpr int kNumCords = 3;
   static constexpr int kNumTokens = 3;
-  turbo::synchronization_internal::ThreadPool pool(kNumThreads);
+  turbo::concurrent_internal::ThreadPool pool(kNumThreads);
 
   for (int i = 0; i < kNumThreads; ++i) {
     pool.Schedule([&stop]() {

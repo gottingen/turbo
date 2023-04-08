@@ -199,7 +199,7 @@ TEST(CordzHandleTest, MultiThreaded) {
   std::atomic<bool> found_safe_to_inspect(false);
 
   {
-    turbo::synchronization_internal::ThreadPool pool(kNumThreads);
+    turbo::concurrent_internal::ThreadPool pool(kNumThreads);
     for (int i = 0; i < kNumThreads; ++i) {
       pool.Schedule([&stop, &handles, &found_safe_to_inspect]() {
         std::minstd_rand gen;

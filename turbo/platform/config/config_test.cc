@@ -46,7 +46,7 @@ TEST(ConfigTest, ThreadLocal) {
   static thread_local int mine_mine_mine = 16;
   EXPECT_EQ(16, mine_mine_mine);
   {
-    turbo::synchronization_internal::ThreadPool pool(1);
+    turbo::concurrent_internal::ThreadPool pool(1);
     pool.Schedule([&] {
       EXPECT_EQ(16, mine_mine_mine);
       mine_mine_mine = 32;
