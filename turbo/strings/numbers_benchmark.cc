@@ -216,7 +216,7 @@ void BM_SimpleAtof(benchmark::State& state) {
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_SimpleAtof, turbo::string_piece)
+BENCHMARK_TEMPLATE(BM_SimpleAtof, std::string_view)
     ->ArgPair(10, 1)
     ->ArgPair(10, 2)
     ->ArgPair(10, 4)
@@ -246,7 +246,7 @@ void BM_SimpleAtod(benchmark::State& state) {
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_SimpleAtod, turbo::string_piece)
+BENCHMARK_TEMPLATE(BM_SimpleAtod, std::string_view)
     ->ArgPair(10, 1)
     ->ArgPair(10, 2)
     ->ArgPair(10, 4)

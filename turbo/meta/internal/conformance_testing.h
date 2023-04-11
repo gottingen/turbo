@@ -40,7 +40,7 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "conformance_aliases.h"
 #include "conformance_archetype.h"
 #include "conformance_profile.h"
@@ -158,9 +158,9 @@ std::string PrepareGivenContext(const Decls&... decls) {
 #define TURBO_INTERNAL_EXPECT_OP(name, op)                                   \
   struct Expect##name {                                                     \
     template <class T>                                                      \
-    void operator()(turbo::string_piece test_name, turbo::string_piece context, \
-                    const T& lhs, const T& rhs, turbo::string_piece lhs_name, \
-                    turbo::string_piece rhs_name) const {                     \
+    void operator()(std::string_view test_name, std::string_view context, \
+                    const T& lhs, const T& rhs, std::string_view lhs_name, \
+                    std::string_view rhs_name) const {                     \
       if (!static_cast<bool>(lhs op rhs)) {                                 \
         errors->addTestFailure(                                             \
             test_name, turbo::StrCat(context,                                \
@@ -183,9 +183,9 @@ std::string PrepareGivenContext(const Decls&... decls) {
                                                                             \
   struct ExpectNot##name {                                                  \
     template <class T>                                                      \
-    void operator()(turbo::string_piece test_name, turbo::string_piece context, \
-                    const T& lhs, const T& rhs, turbo::string_piece lhs_name, \
-                    turbo::string_piece rhs_name) const {                     \
+    void operator()(std::string_view test_name, std::string_view context, \
+                    const T& lhs, const T& rhs, std::string_view lhs_name, \
+                    std::string_view rhs_name) const {                     \
       if (lhs op rhs) {                                                     \
         errors->addTestFailure(                                             \
             test_name, turbo::StrCat(context,                                \
@@ -219,9 +219,9 @@ TURBO_INTERNAL_EXPECT_OP(Gt, >);
 // way of the std::hash specialization.
 struct ExpectSameHash {
   template <class T>
-  void operator()(turbo::string_piece test_name, turbo::string_piece context,
-                  const T& lhs, const T& rhs, turbo::string_piece lhs_name,
-                  turbo::string_piece rhs_name) const {
+  void operator()(std::string_view test_name, std::string_view context,
+                  const T& lhs, const T& rhs, std::string_view lhs_name,
+                  std::string_view rhs_name) const {
     if (std::hash<T>()(lhs) != std::hash<T>()(rhs)) {
       errors->addTestFailure(
           test_name, turbo::StrCat(context,
@@ -251,10 +251,10 @@ struct ExpectSameHash {
 // of the two possible orders whenever lhs and rhs are not the same initializer.
 template <class T, class Prof>
 void ExpectOneWayEquality(ConformanceErrors* errors,
-                          turbo::string_piece test_name,
-                          turbo::string_piece context, const T& lhs, const T& rhs,
-                          turbo::string_piece lhs_name,
-                          turbo::string_piece rhs_name) {
+                          std::string_view test_name,
+                          std::string_view context, const T& lhs, const T& rhs,
+                          std::string_view lhs_name,
+                          std::string_view rhs_name) {
   If<PropertiesOfT<Prof>::is_equality_comparable>::Invoke(
       ExpectEq{errors}, test_name, context, lhs, rhs, lhs_name, rhs_name);
 
@@ -282,9 +282,9 @@ void ExpectOneWayEquality(ConformanceErrors* errors,
 // differs from ExpectOneWayEquality in that this will do checks with argument
 // order reversed in addition to in-order.
 template <class T, class Prof>
-void ExpectEquality(ConformanceErrors* errors, turbo::string_piece test_name,
-                    turbo::string_piece context, const T& lhs, const T& rhs,
-                    turbo::string_piece lhs_name, turbo::string_piece rhs_name) {
+void ExpectEquality(ConformanceErrors* errors, std::string_view test_name,
+                    std::string_view context, const T& lhs, const T& rhs,
+                    std::string_view lhs_name, std::string_view rhs_name) {
   (ExpectOneWayEquality<T, Prof>)(errors, test_name, context, lhs, rhs,
                                   lhs_name, rhs_name);
   (ExpectOneWayEquality<T, Prof>)(errors, test_name, context, rhs, lhs,
@@ -660,10 +660,10 @@ struct ExpectEquivalenceClassConsistency {
 // Given a "lesser" object and a "greater" object, perform every combination of
 // comparison operators supported for the type, expecting consistent results.
 template <class T, class Prof>
-void ExpectOrdered(ConformanceErrors* errors, turbo::string_piece context,
-                   const T& small, const T& big, turbo::string_piece small_name,
-                   turbo::string_piece big_name) {
-  const turbo::string_piece test_name = "Comparison";
+void ExpectOrdered(ConformanceErrors* errors, std::string_view context,
+                   const T& small, const T& big, std::string_view small_name,
+                   std::string_view big_name) {
+  const std::string_view test_name = "Comparison";
 
   If<PropertiesOfT<Prof>::is_equality_comparable>::Invoke(
       ExpectNotEq{errors}, test_name, context, small, big, small_name,
@@ -1171,12 +1171,12 @@ struct ExpectConformanceOf {
   template <class... TestNames,
             turbo::enable_if_t<!ExpectSuccess && sizeof...(EqClasses) == 0 &&
                               turbo::conjunction<std::is_convertible<
-                                  TestNames, turbo::string_piece>...>::value>** =
+                                  TestNames, std::string_view>...>::value>** =
                 nullptr>
   TURBO_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
   due_to(TestNames&&... test_names) && {
     (InsertEach)(&expected_failed_tests,
-                 turbo::AsciiStrToLower(turbo::string_piece(test_names))...);
+                 turbo::AsciiStrToLower(std::string_view(test_names))...);
 
     return {turbo::move(ordered_vals), std::move(expected_failed_tests)};
   }
@@ -1184,7 +1184,7 @@ struct ExpectConformanceOf {
   template <class... TestNames, int = 0,  // MSVC disambiguator
             turbo::enable_if_t<ExpectSuccess && sizeof...(EqClasses) == 0 &&
                               turbo::conjunction<std::is_convertible<
-                                  TestNames, turbo::string_piece>...>::value>** =
+                                  TestNames, std::string_view>...>::value>** =
                 nullptr>
   TURBO_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
   due_to(TestNames&&... test_names) && {

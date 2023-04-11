@@ -32,7 +32,7 @@
 #include "turbo/flags/internal/usage.h"
 #include "turbo/flags/reflection.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/strings/substitute.h"
 #include "turbo/meta/span.h"
 
@@ -83,7 +83,7 @@ struct UDT {
   int value;
 };
 
-bool TurboParseFlag(turbo::string_piece in, UDT* udt, std::string* err) {
+bool TurboParseFlag(std::string_view in, UDT* udt, std::string* err) {
   if (in == "A") {
     udt->value = 1;
     return true;
@@ -168,7 +168,7 @@ const std::string& GetTestTempDir() {
 }
 
 struct FlagfileData {
-  const turbo::string_piece file_name;
+  const std::string_view file_name;
   const turbo::Span<const char* const> file_lines;
 };
 
@@ -206,7 +206,7 @@ constexpr const char* const ff2_data[] = {
 const char* GetFlagfileFlag(const std::vector<FlagfileData>& ffd,
                             std::string& flagfile_flag) {
   flagfile_flag = "--flagfile=";
-  turbo::string_piece separator;
+  std::string_view separator;
   for (const auto& flagfile_data : ffd) {
     std::string flagfile_name =
         turbo::StrCat(GetTestTempDir(), flagfile_data.file_name);
@@ -258,7 +258,7 @@ std::vector<char*> InvokeParse(const char* (&in_argv)[N]) {
 
 template <int N>
 void TestParse(const char* (&in_argv)[N], int int_flag_value,
-               double double_flag_val, turbo::string_piece string_flag_val,
+               double double_flag_val, std::string_view string_flag_val,
                bool bool_flag_val, int exp_position_args = 0) {
   auto out_args = InvokeParse(in_argv);
 
@@ -866,9 +866,9 @@ TEST_F(ParseTest, TestKeepParsedArgs) {
 
   EXPECT_THAT(
       out_args1,
-      ElementsAreArray({turbo::string_piece("testbin"), turbo::string_piece("arg1"),
-                        turbo::string_piece("arg2"), turbo::string_piece("arg3"),
-                        turbo::string_piece("arg4")}));
+      ElementsAreArray({std::string_view("testbin"), std::string_view("arg1"),
+                        std::string_view("arg2"), std::string_view("arg3"),
+                        std::string_view("arg4")}));
 
   auto out_args2 = flags::ParseCommandLineImpl(
       11, const_cast<char**>(in_args1), flags::ArgvListAction::kKeepParsedArgs,
@@ -877,14 +877,14 @@ TEST_F(ParseTest, TestKeepParsedArgs) {
 
   EXPECT_THAT(
       out_args2,
-      ElementsAreArray({turbo::string_piece("testbin"),
-                        turbo::string_piece("--bool_flag"),
-                        turbo::string_piece("--int_flag=211"),
-                        turbo::string_piece("--double_flag=1.1"),
-                        turbo::string_piece("--string_flag"),
-                        turbo::string_piece("asd"), turbo::string_piece("--"),
-                        turbo::string_piece("arg1"), turbo::string_piece("arg2"),
-                        turbo::string_piece("arg3"), turbo::string_piece("arg4")}));
+      ElementsAreArray({std::string_view("testbin"),
+                        std::string_view("--bool_flag"),
+                        std::string_view("--int_flag=211"),
+                        std::string_view("--double_flag=1.1"),
+                        std::string_view("--string_flag"),
+                        std::string_view("asd"), std::string_view("--"),
+                        std::string_view("arg1"), std::string_view("arg2"),
+                        std::string_view("arg3"), std::string_view("arg4")}));
 }
 
 // --------------------------------------------------------------------
@@ -902,8 +902,8 @@ TEST_F(ParseTest, TestIgnoreUndefinedFlags) {
       flags::UsageFlagsAction::kHandleUsage,
       flags::OnUndefinedFlag::kIgnoreUndefined);
 
-  EXPECT_THAT(out_args1, ElementsAreArray({turbo::string_piece("testbin"),
-                                           turbo::string_piece("arg1")}));
+  EXPECT_THAT(out_args1, ElementsAreArray({std::string_view("testbin"),
+                                           std::string_view("arg1")}));
 
   EXPECT_EQ(turbo::GetFlag(FLAGS_int_flag), 21);
 
@@ -922,8 +922,8 @@ TEST_F(ParseTest, TestIgnoreUndefinedFlags) {
   EXPECT_THAT(
       out_args2,
       ElementsAreArray(
-          {turbo::string_piece("testbin"), turbo::string_piece("--undef_flag=aa"),
-           turbo::string_piece("--string_flag=AA"), turbo::string_piece("arg1")}));
+          {std::string_view("testbin"), std::string_view("--undef_flag=aa"),
+           std::string_view("--string_flag=AA"), std::string_view("arg1")}));
 
   EXPECT_EQ(turbo::GetFlag(FLAGS_string_flag), "AA");
 }

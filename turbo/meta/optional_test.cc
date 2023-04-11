@@ -24,7 +24,7 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "gtest/gtest.h"
 
 #if defined(__cplusplus) && __cplusplus >= 202002L
@@ -1301,8 +1301,8 @@ TEST(optionalTest, Comparisons) {
   // compare turbo::optional<std::string> with turbo::optional<const char*>
   turbo::optional<const char*> opt_cstr = cstr;
   EXPECT_TRUE(opt_str == opt_cstr);
-  // compare turbo::optional<std::string> with turbo::optional<turbo::string_piece>
-  turbo::optional<turbo::string_piece> e1;
+  // compare turbo::optional<std::string> with turbo::optional<std::string_view>
+  turbo::optional<std::string_view> e1;
   turbo::optional<std::string> e2;
   EXPECT_TRUE(e1 == e2);
 }

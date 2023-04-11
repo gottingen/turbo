@@ -24,7 +24,7 @@
 #include <cstdint>
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 #ifdef TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE
 #error TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE cannot be directly set
@@ -48,7 +48,7 @@ namespace debugging_internal {
 //
 // This is not async-signal-safe.
 bool ForEachSection(int fd,
-                    const std::function<bool(turbo::string_piece name,
+                    const std::function<bool(std::string_view name,
                                              const ElfW(Shdr) &)>& callback);
 
 // Gets the section header for the given name, if it exists. Returns true on

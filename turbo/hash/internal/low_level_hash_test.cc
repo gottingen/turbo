@@ -31,7 +31,7 @@ static const uint64_t kSalt[5] = {0xa0761d6478bd642f, 0xe7037ed1a0b428dbl,
 TEST(LowLevelHashTest, VerifyGolden) {
   constexpr size_t kNumGoldenOutputs = 134;
   static struct {
-    turbo::string_piece base64_data;
+    std::string_view base64_data;
     uint64_t seed;
   } cases[] = {
       {"", uint64_t{0xec42b7ab404b8acb}},

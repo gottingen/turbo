@@ -2911,8 +2911,8 @@ TEST(FilesystemStatus, weakly_canonical) {
 
 TEST(FilesystemStatus, string_view) {
 
-  using turbo::string_view;
-  using turbo::wstring_view;
+  using std::string_view;
+  using std::wstring_view;
   {
     std::string p("foo/bar");
     string_view sv(p);

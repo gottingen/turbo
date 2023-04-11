@@ -30,7 +30,7 @@
 #include "turbo/strings/internal/resize_uninitialized.h"
 #include "turbo/strings/str_cat.h"
 #include "turbo/strings/str_join.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/unicode/utf.h"
 
 namespace turbo {
@@ -53,7 +53,7 @@ inline unsigned int hex_digit_to_int(char c) {
   return x & 0xf;
 }
 
-inline bool IsSurrogate(char32_t c, turbo::string_piece src, std::string* error) {
+inline bool IsSurrogate(char32_t c, std::string_view src, std::string* error) {
   if (c >= 0xD800 && c <= 0xDFFF) {
     if (error) {
       *error = turbo::StrCat("invalid surrogate character (0xD800-DFFF): \\",
@@ -81,7 +81,7 @@ inline bool IsSurrogate(char32_t c, turbo::string_piece src, std::string* error)
 //     NOTE: any changes to this function must also be reflected in the older
 //     UnescapeCEscapeSequences().
 // ----------------------------------------------------------------------
-bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
+bool CUnescapeInternal(std::string_view source, bool leave_nulls_escaped,
                        char* dest, ptrdiff_t* dest_len, std::string* error) {
   char* d = dest;
   const char* p = source.data();
@@ -213,7 +213,7 @@ bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
             d += 5;
             break;
           }
-          if (IsSurrogate(rune, turbo::string_piece(hex_start, 5), error)) {
+          if (IsSurrogate(rune, std::string_view(hex_start, 5), error)) {
             return false;
           }
 
@@ -266,7 +266,7 @@ bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
             d += 9;
             break;
           }
-          if (IsSurrogate(rune, turbo::string_piece(hex_start, 9), error)) {
+          if (IsSurrogate(rune, std::string_view(hex_start, 9), error)) {
             return false;
           }
           d += turbo::ConvertUtf32ToUtf8(&rune, 1, d);
@@ -291,7 +291,7 @@ bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
 //    Same as above but uses a std::string for output. 'source' and 'dest'
 //    may be the same.
 // ----------------------------------------------------------------------
-bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
+bool CUnescapeInternal(std::string_view source, bool leave_nulls_escaped,
                        std::string* dest, std::string* error) {
   strings_internal::STLStringResizeUninitialized(dest, source.size());
 
@@ -318,7 +318,7 @@ bool CUnescapeInternal(turbo::string_piece source, bool leave_nulls_escaped,
 //
 //    Escaped chars: \n, \r, \t, ", ', \, and !turbo::ascii_isprint().
 // ----------------------------------------------------------------------
-std::string CEscapeInternal(turbo::string_piece src, bool use_hex,
+std::string CEscapeInternal(std::string_view src, bool use_hex,
                             bool utf8_safe) {
   std::string dest;
   bool last_hex_escape = false;  // true if last output char was \xNN.
@@ -387,14 +387,14 @@ constexpr unsigned char c_escaped_len[256] = {
 // Calculates the length of the C-style escaped version of 'src'.
 // Assumes that non-printable characters are escaped using octal sequences, and
 // that UTF-8 bytes are not handled specially.
-inline size_t CEscapedLength(turbo::string_piece src) {
+inline size_t CEscapedLength(std::string_view src) {
   size_t escaped_len = 0;
   for (char c : src)
     escaped_len += c_escaped_len[static_cast<unsigned char>(c)];
   return escaped_len;
 }
 
-void CEscapeAndAppendInternal(turbo::string_piece src, std::string* dest) {
+void CEscapeAndAppendInternal(std::string_view src, std::string* dest) {
   size_t escaped_len = CEscapedLength(src);
   if (escaped_len == src.size()) {
     dest->append(src.data(), src.size());
@@ -860,26 +860,26 @@ void BytesToHexStringInternal(const unsigned char* src, T dest, size_t num) {
 //
 // See CUnescapeInternal() for implementation details.
 // ----------------------------------------------------------------------
-bool CUnescape(turbo::string_piece source, std::string* dest,
+bool CUnescape(std::string_view source, std::string* dest,
                std::string* error) {
   return CUnescapeInternal(source, kUnescapeNulls, dest, error);
 }
 
-std::string CEscape(turbo::string_piece src) {
+std::string CEscape(std::string_view src) {
   std::string dest;
   CEscapeAndAppendInternal(src, &dest);
   return dest;
 }
 
-std::string CHexEscape(turbo::string_piece src) {
+std::string CHexEscape(std::string_view src) {
   return CEscapeInternal(src, true, false);
 }
 
-std::string Utf8SafeCEscape(turbo::string_piece src) {
+std::string Utf8SafeCEscape(std::string_view src) {
   return CEscapeInternal(src, false, true);
 }
 
-std::string Utf8SafeCHexEscape(turbo::string_piece src) {
+std::string Utf8SafeCHexEscape(std::string_view src) {
   return CEscapeInternal(src, true, true);
 }
 
@@ -908,64 +908,64 @@ std::string Utf8SafeCHexEscape(turbo::string_piece src) {
 // ----------------------------------------------------------------------
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
-Base64Unescape(turbo::string_piece src, String* dest) {
+Base64Unescape(std::string_view src, String* dest) {
   return Base64UnescapeInternal(src.data(), src.size(), dest, kUnBase64);
 }
 
-template bool Base64Unescape(turbo::string_piece, std::string*);
-template bool Base64Unescape(turbo::string_piece, turbo::inlined_string *);
+template bool Base64Unescape(std::string_view, std::string*);
+template bool Base64Unescape(std::string_view, turbo::inlined_string *);
 
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
-WebSafeBase64Unescape(turbo::string_piece src, String* dest) {
+WebSafeBase64Unescape(std::string_view src, String* dest) {
   return Base64UnescapeInternal(src.data(), src.size(), dest, kUnWebSafeBase64);
 }
 
-template bool WebSafeBase64Unescape(turbo::string_piece, std::string*);
-template bool WebSafeBase64Unescape(turbo::string_piece, turbo::inlined_string *);
+template bool WebSafeBase64Unescape(std::string_view, std::string*);
+template bool WebSafeBase64Unescape(std::string_view, turbo::inlined_string *);
 
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-Base64Escape(turbo::string_piece src, String* dest) {
+Base64Escape(std::string_view src, String* dest) {
   strings_internal::Base64EscapeInternal(
       reinterpret_cast<const unsigned char*>(src.data()), src.size(), dest,
       true, strings_internal::kBase64Chars);
 }
 
-template void Base64Escape(turbo::string_piece, std::string*);
-template void Base64Escape(turbo::string_piece, inlined_string*);
+template void Base64Escape(std::string_view, std::string*);
+template void Base64Escape(std::string_view, inlined_string*);
 
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-WebSafeBase64Escape(turbo::string_piece src, String* dest) {
+WebSafeBase64Escape(std::string_view src, String* dest) {
   strings_internal::Base64EscapeInternal(
       reinterpret_cast<const unsigned char*>(src.data()), src.size(), dest,
       false, kWebSafeBase64Chars);
 }
-template void WebSafeBase64Escape(turbo::string_piece, std::string*);
-template void WebSafeBase64Escape(turbo::string_piece, inlined_string*);
+template void WebSafeBase64Escape(std::string_view, std::string*);
+template void WebSafeBase64Escape(std::string_view, inlined_string*);
 
 
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-HexStringToBytes(turbo::string_piece from, String *dest) {
+HexStringToBytes(std::string_view from, String *dest) {
   const auto num = from.size() / 2;
   strings_internal::STLStringResizeUninitialized(dest, num);
   turbo::HexStringToBytesInternal<String&>(from.data(), *dest, num);
 }
 
-template void HexStringToBytes(turbo::string_piece from, std::string *dest);
-template void HexStringToBytes(turbo::string_piece from, turbo::inlined_string *dest);
+template void HexStringToBytes(std::string_view from, std::string *dest);
+template void HexStringToBytes(std::string_view from, turbo::inlined_string *dest);
 
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-BytesToHexString(turbo::string_piece from, String *dest) {
+BytesToHexString(std::string_view from, String *dest) {
   strings_internal::STLStringResizeUninitialized(dest, 2 * from.size());
   turbo::BytesToHexStringInternal<String&>(
       reinterpret_cast<const unsigned char*>(from.data()), *dest, from.size());
 }
 
-template void BytesToHexString(turbo::string_piece, std::string*);
-template void BytesToHexString(turbo::string_piece, turbo::inlined_string *);
+template void BytesToHexString(std::string_view, std::string*);
+template void BytesToHexString(std::string_view, turbo::inlined_string *);
 TURBO_NAMESPACE_END
 }  // namespace turbo

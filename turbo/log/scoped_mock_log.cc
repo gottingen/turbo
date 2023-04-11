@@ -23,7 +23,7 @@
 #include "turbo/log/log_sink.h"
 #include "turbo/log/log_sink_registry.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 
 namespace turbo {

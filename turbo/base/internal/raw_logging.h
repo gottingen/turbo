@@ -165,8 +165,8 @@ using AbortHook = void (*)(const char* file, int line, const char* buf_start,
 
 // Internal logging function for TURBO_INTERNAL_LOG to dispatch to.
 //
-// TODO(gfalcon): When string_piece no longer depends on base, change this
-// interface to take its message as a string_piece instead.
+// TODO(gfalcon): When std::string_view no longer depends on base, change this
+// interface to take its message as a std::string_view instead.
 using InternalLogFunction = void (*)(turbo::LogSeverity severity,
                                      const char* file, int line,
                                      const std::string& message);

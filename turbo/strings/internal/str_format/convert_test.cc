@@ -231,9 +231,9 @@ TEST_F(FormatConvertTest, BasicString) {
   TestStringConvert("hello");  // As char array.
   TestStringConvert(static_cast<const char*>("hello"));
   TestStringConvert(std::string("hello"));
-  TestStringConvert(string_piece("hello"));
+  TestStringConvert(std::string_view("hello"));
 #if defined(TURBO_COMPILER_CPP17_ENABLED)
-  TestStringConvert(turbo::string_view("hello"));
+  TestStringConvert(std::string_view("hello"));
 #endif
 }
 
@@ -591,7 +591,7 @@ void TestWithMultipleFormatsHelper(const std::vector<Floating> &floats,
                    'e', 'E'}) {
       std::string fmt_str = std::string(fmt) + f;
 
-      if (fmt == turbo::string_piece("%.5000") && f != 'f' && f != 'F' &&
+      if (fmt == std::string_view("%.5000") && f != 'f' && f != 'F' &&
           f != 'a' && f != 'A') {
         // This particular test takes way too long with snprintf.
         // Disable for the case we are not implementing natively.
@@ -1058,11 +1058,11 @@ TEST_F(FormatConvertTest, LongDoubleRoundA) {
 // We don't actually store the results. This is just to exercise the rest of the
 // machinery.
 struct NullSink {
-  friend void TurboFormatFlush(NullSink *sink, string_piece str) {}
+  friend void TurboFormatFlush(NullSink *sink, std::string_view str) {}
 };
 
 template <typename... T>
-bool FormatWithNullSink(turbo::string_piece fmt, const T &... a) {
+bool FormatWithNullSink(std::string_view fmt, const T &... a) {
   NullSink sink;
   FormatArgImpl args[] = {FormatArgImpl(a)...};
   return FormatUntyped(&sink, UntypedFormatSpecImpl(fmt), turbo::MakeSpan(args));
@@ -1124,7 +1124,7 @@ TEST_F(FormatConvertTest, LongDouble) {
                    'e', 'E'}) {
       std::string fmt_str = std::string(fmt) + 'L' + f;
 
-      if (fmt == turbo::string_piece("%.5000") && f != 'f' && f != 'F' &&
+      if (fmt == std::string_view("%.5000") && f != 'f' && f != 'F' &&
           f != 'a' && f != 'A') {
         // This particular test takes way too long with snprintf.
         // Disable for the case we are not implementing natively.

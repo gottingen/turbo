@@ -277,8 +277,6 @@ set(TURBO_INTERNAL_DLL_FILES
   "strings/str_replace.h"
   "strings/str_split.cc"
   "strings/str_split.h"
-  "strings/string_piece.cc"
-  "strings/string_piece.h"
   "strings/strip.h"
   "strings/substitute.cc"
   "strings/substitute.h"

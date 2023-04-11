@@ -102,18 +102,6 @@ turbo_cc_test(
 
 turbo_cc_test(
   NAME
-    string_view_test
-  SRCS
-    "string_piece_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gmock_main
-)
-
-turbo_cc_test(
-  NAME
     substitute_test
   SRCS
     "substitute_test.cc"

@@ -39,7 +39,7 @@ TURBO_NAMESPACE_BEGIN
 class CordBufferTestPeer {
  public:
   static cord_internal::CordRep* ConsumeValue(CordBuffer& buffer,
-                                              turbo::string_piece& short_value) {
+                                              std::string_view& short_value) {
     return buffer.ConsumeValue(short_value);
   }
 };
@@ -94,10 +94,10 @@ TEST(CordBufferTest, CreateSsoWithDefaultLimit) {
   memcpy(buffer.data(), "Abc", 3);
   buffer.SetLength(3);
   EXPECT_THAT(buffer.length(), Eq(3));
-  turbo::string_piece short_value;
+  std::string_view short_value;
   EXPECT_THAT(CordBufferTestPeer::ConsumeValue(buffer, short_value),
               Eq(nullptr));
-  EXPECT_THAT(turbo::string_piece(buffer.data(), 3), Eq("Abc"));
+  EXPECT_THAT(std::string_view(buffer.data(), 3), Eq("Abc"));
   EXPECT_THAT(short_value, Eq("Abc"));
 }
 
@@ -155,7 +155,7 @@ TEST_P(CordBufferTest, CreateWithDefaultLimit) {
   buffer.SetLength(requested);
 
   EXPECT_THAT(buffer.length(), Eq(requested));
-  EXPECT_THAT(turbo::string_piece(buffer.data()), Eq(data));
+  EXPECT_THAT(std::string_view(buffer.data()), Eq(data));
 }
 
 TEST(CordBufferTest, CreateWithDefaultLimitAskingFor2GB) {
@@ -180,7 +180,7 @@ TEST_P(CordBufferTest, MoveConstruct) {
   CordBuffer to(std::move(from));
   EXPECT_THAT(to.capacity(), Eq(capacity));
   EXPECT_THAT(to.length(), Eq(4));
-  EXPECT_THAT(turbo::string_piece(to.data()), Eq("Abc"));
+  EXPECT_THAT(std::string_view(to.data()), Eq("Abc"));
 
   EXPECT_THAT(from.length(), Eq(0));  // NOLINT
 }
@@ -196,7 +196,7 @@ TEST_P(CordBufferTest, MoveAssign) {
   to = std::move(from);
   EXPECT_THAT(to.capacity(), Eq(capacity));
   EXPECT_THAT(to.length(), Eq(4));
-  EXPECT_THAT(turbo::string_piece(to.data()), Eq("Abc"));
+  EXPECT_THAT(std::string_view(to.data()), Eq("Abc"));
 
   EXPECT_THAT(from.length(), Eq(0));  // NOLINT
 }
@@ -207,7 +207,7 @@ TEST_P(CordBufferTest, ConsumeValue) {
   memcpy(buffer.data(), "Abc", 4);
   buffer.SetLength(3);
 
-  turbo::string_piece short_value;
+  std::string_view short_value;
   if (cord_internal::CordRep* rep =
           CordBufferTestPeer::ConsumeValue(buffer, short_value)) {
     EXPECT_THAT(CordToString(rep), Eq("Abc"));
@@ -233,7 +233,7 @@ TEST_P(CordBufferTest, CreateWithCustomLimitWithinDefaultLimit) {
   buffer.SetLength(requested);
 
   EXPECT_THAT(buffer.length(), Eq(requested));
-  EXPECT_THAT(turbo::string_piece(buffer.data()), Eq(data));
+  EXPECT_THAT(std::string_view(buffer.data()), Eq(data));
 }
 
 TEST(CordLargeBufferTest, CreateAtOrBelowDefaultLimit) {

@@ -32,7 +32,7 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/escaping.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/strings/strip.h"
 
 #if defined(__native_client__)

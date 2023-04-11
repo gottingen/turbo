@@ -57,7 +57,7 @@ using Payloads = turbo::InlinedVector<Payload, 1>;
 
 // Reference-counted representation of Status data.
 struct StatusRep {
-  StatusRep(unsigned short int index_arg, turbo::StatusCode code_arg, turbo::string_piece message_arg,
+  StatusRep(unsigned short int index_arg, turbo::StatusCode code_arg, std::string_view message_arg,
             std::unique_ptr<status_internal::Payloads> payloads_arg)
       : ref(int32_t{1}),
         code(code_arg),

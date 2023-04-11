@@ -556,3 +556,14 @@ turbo_cc_test(
         turbo::turbo
         GTest::gmock_main
 )
+turbo_cc_test(
+        NAME
+        linked_list_test
+        SRCS
+        "linked_list_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)

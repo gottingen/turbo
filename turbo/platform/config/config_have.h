@@ -302,9 +302,9 @@
 
 
 // For MSVC, `__has_include` is supported in VS 2017 15.3, which is later than
-// the support for <optional>, <any>, <string_piece>, <variant>. So we use
+// the support for <optional>, <any>, <std::string_view>, <variant>. So we use
 // _MSC_VER to check whether we have VS 2017 RTM (when <optional>, <any>,
-// <string_piece>, <variant> is implemented) or higher. Also, `__cplusplus` is
+// <std::string_view>, <variant> is implemented) or higher. Also, `__cplusplus` is
 // not correctly set by MSVC, so we use `_MSVC_LANG` to check the language
 // version.
 // TODO(zhangxy): fix tests before enabling aliasing for `std::any`.

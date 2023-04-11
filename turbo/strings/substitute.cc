@@ -20,14 +20,14 @@
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/internal/resize_uninitialized.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace substitute_internal {
 
-void SubstituteAndAppendArray(std::string* output, turbo::string_piece format,
-                              const turbo::string_piece* args_array,
+void SubstituteAndAppendArray(std::string* output, std::string_view format,
+                              const std::string_view* args_array,
                               size_t num_args) {
   // Determine total size needed.
   size_t size = 0;
@@ -82,7 +82,7 @@ void SubstituteAndAppendArray(std::string* output, turbo::string_piece format,
   for (size_t i = 0; i < format.size(); i++) {
     if (format[i] == '$') {
       if (turbo::ascii_isdigit(static_cast<unsigned char>(format[i + 1]))) {
-        const turbo::string_piece src = args_array[format[i + 1] - '0'];
+        const std::string_view src = args_array[format[i + 1] - '0'];
         target = std::copy(src.begin(), src.end(), target);
         ++i;  // Skip next char.
       } else if (format[i + 1] == '$') {
@@ -111,7 +111,7 @@ Arg::Arg(const void* value) {
     } while (num != 0);
     *--ptr = 'x';
     *--ptr = '0';
-    piece_ = turbo::string_piece(
+    piece_ = std::string_view(
         ptr, static_cast<size_t>(scratch_ + sizeof(scratch_) - ptr));
   }
 }
@@ -134,7 +134,7 @@ Arg::Arg(Hex hex) {
     beg = writer;
   }
 
-  piece_ = turbo::string_piece(beg, static_cast<size_t>(end - beg));
+  piece_ = std::string_view(beg, static_cast<size_t>(end - beg));
 }
 
 // TODO(jorg): Don't duplicate so much code between here and str_cat.cc
@@ -166,7 +166,7 @@ Arg::Arg(Dec dec) {
     if (add_sign_again) *--writer = '-';
   }
 
-  piece_ = turbo::string_piece(writer, static_cast<size_t>(end - writer));
+  piece_ = std::string_view(writer, static_cast<size_t>(end - writer));
 }
 
 }  // namespace substitute_internal

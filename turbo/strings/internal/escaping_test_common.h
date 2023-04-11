@@ -19,15 +19,15 @@
 #define TURBO_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_
 
 #include <array>
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace strings_internal {
 
 struct base64_testcase {
-  turbo::string_piece plaintext;
-  turbo::string_piece cyphertext;
+  std::string_view plaintext;
+  std::string_view cyphertext;
 };
 
 inline const std::array<base64_testcase, 5>& base64_strings() {

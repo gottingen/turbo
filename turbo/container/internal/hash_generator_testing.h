@@ -32,7 +32,7 @@
 #include "turbo/container/internal/hash_policy_testing.h"
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -108,8 +108,8 @@ struct Generator<std::string> {
 };
 
 template <>
-struct Generator<turbo::string_piece> {
-  turbo::string_piece operator()() const;
+struct Generator<std::string_view> {
+  std::string_view operator()() const;
 };
 
 template <>

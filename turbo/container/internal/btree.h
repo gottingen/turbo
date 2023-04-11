@@ -70,7 +70,7 @@
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -102,15 +102,15 @@ struct StringBtreeDefaultLess {
 
   // Compatibility constructor.
   StringBtreeDefaultLess(std::less<std::string>) {}        // NOLINT
-  StringBtreeDefaultLess(std::less<turbo::string_piece>) {}  // NOLINT
+  StringBtreeDefaultLess(std::less<std::string_view>) {}  // NOLINT
 
   // Allow converting to std::less for use in key_comp()/value_comp().
   explicit operator std::less<std::string>() const { return {}; }
-  explicit operator std::less<turbo::string_piece>() const { return {}; }
+  explicit operator std::less<std::string_view>() const { return {}; }
   explicit operator std::less<turbo::Cord>() const { return {}; }
 
-  turbo::weak_ordering operator()(turbo::string_piece lhs,
-                                 turbo::string_piece rhs) const {
+  turbo::weak_ordering operator()(std::string_view lhs,
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(lhs.compare(rhs));
   }
   StringBtreeDefaultLess(std::less<turbo::Cord>) {}  // NOLINT
@@ -119,10 +119,10 @@ struct StringBtreeDefaultLess {
     return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
-                                 turbo::string_piece rhs) const {
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
   }
-  turbo::weak_ordering operator()(turbo::string_piece lhs,
+  turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
     return compare_internal::compare_result_as_ordering(-rhs.Compare(lhs));
   }
@@ -134,15 +134,15 @@ struct StringBtreeDefaultGreater {
   StringBtreeDefaultGreater() = default;
 
   StringBtreeDefaultGreater(std::greater<std::string>) {}        // NOLINT
-  StringBtreeDefaultGreater(std::greater<turbo::string_piece>) {}  // NOLINT
+  StringBtreeDefaultGreater(std::greater<std::string_view>) {}  // NOLINT
 
   // Allow converting to std::greater for use in key_comp()/value_comp().
   explicit operator std::greater<std::string>() const { return {}; }
-  explicit operator std::greater<turbo::string_piece>() const { return {}; }
+  explicit operator std::greater<std::string_view>() const { return {}; }
   explicit operator std::greater<turbo::Cord>() const { return {}; }
 
-  turbo::weak_ordering operator()(turbo::string_piece lhs,
-                                 turbo::string_piece rhs) const {
+  turbo::weak_ordering operator()(std::string_view lhs,
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(rhs.compare(lhs));
   }
   StringBtreeDefaultGreater(std::greater<turbo::Cord>) {}  // NOLINT
@@ -151,10 +151,10 @@ struct StringBtreeDefaultGreater {
     return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
-                                 turbo::string_piece rhs) const {
+                                 std::string_view rhs) const {
     return compare_internal::compare_result_as_ordering(-lhs.Compare(rhs));
   }
-  turbo::weak_ordering operator()(turbo::string_piece lhs,
+  turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
     return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
   }
@@ -181,8 +181,8 @@ struct BtreeTestOnlyCheckedCompareOptOutBase {};
 // (1) When using common Turbo string types with common comparison functors,
 // convert a boolean comparison into a three-way comparison that returns an
 // `turbo::weak_ordering`. This helper class is specialized for
-// less<std::string>, greater<std::string>, less<string_piece>,
-// greater<string_piece>, less<turbo::Cord>, and greater<turbo::Cord>.
+// less<std::string>, greater<std::string>, less<std::string_view>,
+// greater<std::string_view>, less<turbo::Cord>, and greater<turbo::Cord>.
 // (2) Adapt the comparator to diagnose cases of non-strict-weak-ordering (see
 // https://en.cppreference.com/w/cpp/named_req/Compare) in debug mode. Whenever
 // a comparison is made, we will make assertions to verify that the comparator
@@ -278,12 +278,12 @@ struct key_compare_adapter<std::greater<std::string>, std::string> {
 };
 
 template <>
-struct key_compare_adapter<std::less<turbo::string_piece>, turbo::string_piece> {
+struct key_compare_adapter<std::less<std::string_view>, std::string_view> {
   using type = StringBtreeDefaultLess;
 };
 
 template <>
-struct key_compare_adapter<std::greater<turbo::string_piece>, turbo::string_piece> {
+struct key_compare_adapter<std::greater<std::string_view>, std::string_view> {
   using type = StringBtreeDefaultGreater;
 };
 

@@ -26,7 +26,7 @@
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/concurrent/barrier.h"
 #include "turbo/concurrent/latch.h"
 #include "gmock/gmock.h"
@@ -99,7 +99,7 @@ TEST(ScopedMockLogTest, LogMockCatchAndMatchSendExpectations) {
       Send(AllOf(SourceFilename(Eq("/my/very/very/very_long_source_file.cc")),
                  SourceBasename(Eq("very_long_source_file.cc")),
                  SourceLine(Eq(777)), ThreadID(Eq(turbo::LogEntry::tid_t{1234})),
-                 TextMessageWithPrefix(Truly([](turbo::string_piece msg) {
+                 TextMessageWithPrefix(Truly([](std::string_view msg) {
                    return turbo::EndsWith(
                        msg, " very_long_source_file.cc:777] Info message");
                  })))));

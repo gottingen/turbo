@@ -24,7 +24,7 @@
 #include "turbo/log/log_sink.h"
 #include "turbo/log/scoped_mock_log.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 
 namespace {
@@ -67,7 +67,7 @@ TEST(TailCallsModifiesTest, AtLocationFileLine) {
           SourceBasename(Eq("very_long_source_file.cc")), SourceLine(Eq(777)),
           // The logged line should change too, even though the prefix must
           // grow to fit the new metadata.
-          TextMessageWithPrefix(Truly([](turbo::string_piece msg) {
+          TextMessageWithPrefix(Truly([](std::string_view msg) {
             return turbo::EndsWith(msg,
                                   " very_long_source_file.cc:777] hello world");
           })))));
