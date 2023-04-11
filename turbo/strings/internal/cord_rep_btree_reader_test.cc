@@ -25,7 +25,7 @@
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -59,7 +59,7 @@ TEST(CordRepBtreeReaderTest, Next) {
 
     CordRepBtreeReader reader;
     size_t remaining = data.length();
-    turbo::string_piece chunk = reader.Init(node);
+    std::string_view chunk = reader.Init(node);
     EXPECT_THAT(chunk, Eq(data.substr(0, chunk.length())));
 
     remaining -= chunk.length();
@@ -76,7 +76,7 @@ TEST(CordRepBtreeReaderTest, Next) {
 
     EXPECT_THAT(reader.remaining(), Eq(0u));
 
-    // Verify trying to read beyond EOF returns empty string_piece
+    // Verify trying to read beyond EOF returns empty std::string_view
     EXPECT_THAT(reader.Next(), testing::IsEmpty());
 
     CordRep::Unref(node);
@@ -97,7 +97,7 @@ TEST(CordRepBtreeReaderTest, Skip) {
       for (size_t skip2 = 0; skip2 < data.length() - kChars; ++skip2) {
         CordRepBtreeReader reader;
         size_t remaining = data.length();
-        turbo::string_piece chunk = reader.Init(node);
+        std::string_view chunk = reader.Init(node);
         remaining -= chunk.length();
 
         chunk = reader.Skip(skip1);
@@ -142,7 +142,7 @@ TEST(CordRepBtreeReaderTest, Seek) {
     for (size_t seek = 0; seek < data.length() - 1; ++seek) {
       CordRepBtreeReader reader;
       reader.Init(node);
-      turbo::string_piece chunk = reader.Seek(seek);
+      std::string_view chunk = reader.Seek(seek);
       ASSERT_THAT(chunk, Not(IsEmpty()));
       ASSERT_THAT(chunk, Eq(data.substr(seek, chunk.length())));
       ASSERT_THAT(reader.remaining(),
@@ -172,7 +172,7 @@ TEST(CordRepBtreeReaderTest, Read) {
 
   CordRep* tree;
   CordRepBtreeReader reader;
-  turbo::string_piece chunk;
+  std::string_view chunk;
 
   // Read zero bytes
   chunk = reader.Init(node);
@@ -254,7 +254,7 @@ TEST(CordRepBtreeReaderTest, ReadExhaustive) {
 
     for (size_t read_size : {kChars - 1, kChars, kChars + 7, cap * cap}) {
       CordRepBtreeReader reader;
-      turbo::string_piece chunk = reader.Init(node);
+      std::string_view chunk = reader.Init(node);
 
       // `consumed` tracks the end of last consumed chunk which is the start of
       // the next chunk: we always read with `chunk_size = chunk.length()`.

@@ -21,7 +21,7 @@
 
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_ring.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -73,7 +73,7 @@ class CordRepRingReader {
 
   // Resets this instance to the start of `ring`. `ring` must not be null.
   // Returns a reference into the first chunk of the provided ring.
-  turbo::string_piece Reset(CordRepRing* ring) {
+  std::string_view Reset(CordRepRing* ring) {
     assert(ring);
     ring_ = ring;
     index_ = ring_->head();
@@ -83,7 +83,7 @@ class CordRepRingReader {
   // Navigates to the next chunk inside the reference ring buffer.
   // Returns a reference into the navigated-to chunk.
   // Requires remaining() to be non zero.
-  turbo::string_piece Next() {
+  std::string_view Next() {
     assert(remaining());
     index_ = ring_->advance(index_);
     return ring_->entry_data(index_);
@@ -95,7 +95,7 @@ class CordRepRingReader {
   // ring buffer containing 2 chunks of 10 and 20 bytes respectively will return
   // a string view into the second chunk starting at offset 3 with a size of 17.
   // Requires `offset` to be less than `length()`
-  turbo::string_piece Seek(size_t offset) {
+  std::string_view Seek(size_t offset) {
     assert(offset < length());
     size_t current = ring_->entry_end_offset(index_);
     CordRepRing::index_type hint = (offset >= current) ? index_ : ring_->head();

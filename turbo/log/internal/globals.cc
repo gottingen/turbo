@@ -20,7 +20,7 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/log_severity.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/time/time.h"
 
 namespace turbo {
@@ -53,7 +53,7 @@ void SetInitialized() {
   logging_initialized.store(true, std::memory_order_release);
 }
 
-void WriteToStderr(turbo::string_piece message, turbo::LogSeverity severity) {
+void WriteToStderr(std::string_view message, turbo::LogSeverity severity) {
   // Avoid using std::cerr from this module since we may get called during
   // exit code, and cerr may be partially or fully destroyed by then.
   std::fwrite(message.data(), message.size(), 1, stderr);

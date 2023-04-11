@@ -23,7 +23,7 @@
 
 #include "turbo/base/log_severity.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -116,14 +116,14 @@ class ScopedStderrThreshold final {
 //
 // Returns true if we should log a backtrace at the specified location.
 namespace log_internal {
-TURBO_MUST_USE_RESULT bool ShouldLogBacktraceAt(turbo::string_piece file,
+TURBO_MUST_USE_RESULT bool ShouldLogBacktraceAt(std::string_view file,
                                                int line);
 }  // namespace log_internal
 
 // SetLogBacktraceLocation()
 //
 // Sets the location the backtrace should be logged at.
-void SetLogBacktraceLocation(turbo::string_piece file, int line);
+void SetLogBacktraceLocation(std::string_view file, int line);
 
 //------------------------------------------------------------------------------
 // Prepend Log Prefix

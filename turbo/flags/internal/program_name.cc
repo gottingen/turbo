@@ -22,7 +22,7 @@
 #include "turbo/flags/internal/path_util.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -45,7 +45,7 @@ std::string ShortProgramInvocationName() {
                       : "UNKNOWN";
 }
 
-void SetProgramInvocationName(turbo::string_piece prog_name_str) {
+void SetProgramInvocationName(std::string_view prog_name_str) {
     std::unique_lock<std::mutex> l(program_name_guard);
 
   if (!program_name)

@@ -18,13 +18,13 @@
 // -----------------------------------------------------------------------------
 //
 // This file contains simple utilities for performing string matching checks.
-// All of these function parameters are specified as `turbo::string_piece`,
-// meaning that these functions can accept `std::string`, `turbo::string_piece` or
+// All of these function parameters are specified as `std::string_view`,
+// meaning that these functions can accept `std::string`, `std::string_view` or
 // NUL-terminated C-style strings.
 //
 // Examples:
 //   std::string s = "foo";
-//   turbo::string_piece sv = "f";
+//   std::string_view sv = "f";
 //   assert(turbo::StrContains(s, sv));
 //
 // Note: The order of parameters in these functions is designed to mimic the
@@ -35,7 +35,7 @@
 
 #include <cstring>
 
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -43,20 +43,20 @@ TURBO_NAMESPACE_BEGIN
 // StrContains()
 //
 // Returns whether a given string `haystack` contains the substring `needle`.
-inline bool StrContains(turbo::string_piece haystack,
-                        turbo::string_piece needle) noexcept {
+inline bool StrContains(std::string_view haystack,
+                        std::string_view needle) noexcept {
   return haystack.find(needle, 0) != haystack.npos;
 }
 
-inline bool StrContains(turbo::string_piece haystack, char needle) noexcept {
+inline bool StrContains(std::string_view haystack, char needle) noexcept {
   return haystack.find(needle) != haystack.npos;
 }
 
 // StartsWith()
 //
 // Returns whether a given string `text` begins with `prefix`.
-inline bool StartsWith(turbo::string_piece text,
-                       turbo::string_piece prefix) noexcept {
+inline bool StartsWith(std::string_view text,
+                       std::string_view prefix) noexcept {
   return prefix.empty() ||
          (text.size() >= prefix.size() &&
           memcmp(text.data(), prefix.data(), prefix.size()) == 0);
@@ -65,8 +65,8 @@ inline bool StartsWith(turbo::string_piece text,
 // EndsWith()
 //
 // Returns whether a given string `text` ends with `suffix`.
-inline bool EndsWith(turbo::string_piece text,
-                     turbo::string_piece suffix) noexcept {
+inline bool EndsWith(std::string_view text,
+                     std::string_view suffix) noexcept {
   return suffix.empty() ||
          (text.size() >= suffix.size() &&
           memcmp(text.data() + (text.size() - suffix.size()), suffix.data(),
@@ -77,22 +77,22 @@ inline bool EndsWith(turbo::string_piece text,
 //
 // Returns whether given ASCII strings `piece1` and `piece2` are equal, ignoring
 // case in the comparison.
-bool EqualsIgnoreCase(turbo::string_piece piece1,
-                      turbo::string_piece piece2) noexcept;
+bool EqualsIgnoreCase(std::string_view piece1,
+                      std::string_view piece2) noexcept;
 
 // StartsWithIgnoreCase()
 //
 // Returns whether a given ASCII string `text` starts with `prefix`,
 // ignoring case in the comparison.
-bool StartsWithIgnoreCase(turbo::string_piece text,
-                          turbo::string_piece prefix) noexcept;
+bool StartsWithIgnoreCase(std::string_view text,
+                          std::string_view prefix) noexcept;
 
 // EndsWithIgnoreCase()
 //
 // Returns whether a given ASCII string `text` ends with `suffix`, ignoring
 // case in the comparison.
-bool EndsWithIgnoreCase(turbo::string_piece text,
-                        turbo::string_piece suffix) noexcept;
+bool EndsWithIgnoreCase(std::string_view text,
+                        std::string_view suffix) noexcept;
 
 TURBO_NAMESPACE_END
 }  // namespace turbo

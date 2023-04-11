@@ -27,7 +27,7 @@ namespace turbo {
 TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
-turbo::string_piece CordRepBtreeReader::Read(size_t n, size_t chunk_size,
+std::string_view CordRepBtreeReader::Read(size_t n, size_t chunk_size,
                                            CordRep*& tree) {
   assert(chunk_size <= navigator_.Current()->length);
 

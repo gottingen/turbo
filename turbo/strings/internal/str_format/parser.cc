@@ -69,7 +69,7 @@ struct ParsedFormatBase::ParsedFormatConsumer {
   explicit ParsedFormatConsumer(ParsedFormatBase *parsedformat)
       : parsed(parsedformat), data_pos(parsedformat->data_.get()) {}
 
-  bool Append(string_piece s) {
+  bool Append(std::string_view s) {
     if (s.empty()) return true;
 
     size_t text_end = AppendText(s);
@@ -84,13 +84,13 @@ struct ParsedFormatBase::ParsedFormatConsumer {
     return true;
   }
 
-  bool ConvertOne(const UnboundConversion &conv, string_piece s) {
+  bool ConvertOne(const UnboundConversion &conv, std::string_view s) {
     size_t text_end = AppendText(s);
     parsed->items_.push_back({true, text_end, conv});
     return true;
   }
 
-  size_t AppendText(string_piece s) {
+  size_t AppendText(std::string_view s) {
     memcpy(data_pos, s.data(), s.size());
     data_pos += s.size();
     return static_cast<size_t>(data_pos - parsed->data_.get());
@@ -101,7 +101,7 @@ struct ParsedFormatBase::ParsedFormatConsumer {
 };
 
 ParsedFormatBase::ParsedFormatBase(
-    string_piece format, bool allow_ignored,
+        std::string_view format, bool allow_ignored,
     std::initializer_list<FormatConversionCharSet> convs)
     : data_(format.empty() ? nullptr : new char[format.size()]) {
   has_error_ = !ParseFormatString(format, ParsedFormatConsumer(this)) ||

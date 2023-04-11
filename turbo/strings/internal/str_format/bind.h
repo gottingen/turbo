@@ -48,7 +48,7 @@ class UntypedFormatSpecImpl {
  public:
   UntypedFormatSpecImpl() = delete;
 
-  explicit UntypedFormatSpecImpl(string_piece s)
+  explicit UntypedFormatSpecImpl(std::string_view s)
       : data_(s.data()), size_(s.size()) {}
   explicit UntypedFormatSpecImpl(
       const str_format_internal::ParsedFormatBase* pc)
@@ -56,9 +56,9 @@ class UntypedFormatSpecImpl {
 
   bool has_parsed_conversion() const { return size_ == ~size_t{}; }
 
-  string_piece str() const {
+    std::string_view str() const {
     assert(!has_parsed_conversion());
-    return string_piece(static_cast<const char*>(data_), size_);
+    return std::string_view(static_cast<const char*>(data_), size_);
   }
   const str_format_internal::ParsedFormatBase* parsed_conversion() const {
     assert(has_parsed_conversion());
@@ -80,7 +80,7 @@ struct MakeDependent {
   using type = T;
 };
 
-// Implicitly convertible from `const char*`, `string_piece`, and the
+// Implicitly convertible from `const char*`, `std::string_view`, and the
 // `ExtendedParsedFormat` type. This abstraction allows all format functions to
 // operate on any without providing too many overloads.
 template <FormatConversionCharSet... Args>
@@ -141,7 +141,7 @@ class FormatSpecTemplate
               "Format specified does not match the arguments passed.")));
 
   template <typename T = void>
-  FormatSpecTemplate(string_piece s)  // NOLINT
+  FormatSpecTemplate(std::string_view s)  // NOLINT
       __attribute__((enable_if(str_format_internal::EnsureConstexpr(s),
                                "constexpr trap")))
       : Base("to avoid noise in the compiler error") {
@@ -154,14 +154,14 @@ class FormatSpecTemplate
       __attribute__((enable_if(ValidFormatImpl<Args...>(s), "bad format trap")))
       : Base(s) {}
 
-  FormatSpecTemplate(string_piece s)  // NOLINT
+  FormatSpecTemplate(std::string_view s)  // NOLINT
       __attribute__((enable_if(ValidFormatImpl<Args...>(s), "bad format trap")))
       : Base(s) {}
 
 #else  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 
   FormatSpecTemplate(const char* s) : Base(s) {}  // NOLINT
-  FormatSpecTemplate(string_piece s) : Base(s) {}  // NOLINT
+  FormatSpecTemplate(std::string_view s) : Base(s) {}  // NOLINT
 
 #endif  // TURBO_INTERNAL_ENABLE_FORMAT_CHECKER
 

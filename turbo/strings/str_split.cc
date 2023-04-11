@@ -35,44 +35,44 @@ namespace {
 // shared between the ByString and ByAnyChar delimiters. The FindPolicy
 // template parameter allows each delimiter to customize the actual find
 // function to use and the length of the found delimiter. For example, the
-// Literal delimiter will ultimately use turbo::string_piece::find(), and the
-// AnyOf delimiter will use turbo::string_piece::find_first_of().
+// Literal delimiter will ultimately use std::string_view::find(), and the
+// AnyOf delimiter will use std::string_view::find_first_of().
 template <typename FindPolicy>
-turbo::string_piece GenericFind(turbo::string_piece text,
-                              turbo::string_piece delimiter, size_t pos,
+std::string_view GenericFind(std::string_view text,
+                              std::string_view delimiter, size_t pos,
                               FindPolicy find_policy) {
   if (delimiter.empty() && text.length() > 0) {
     // Special case for empty string delimiters: always return a zero-length
-    // turbo::string_piece referring to the item at position 1 past pos.
-    return turbo::string_piece(text.data() + pos + 1, 0);
+    // std::string_view referring to the item at position 1 past pos.
+    return std::string_view(text.data() + pos + 1, 0);
   }
-  size_t found_pos = turbo::string_piece::npos;
-  turbo::string_piece found(text.data() + text.size(),
+  size_t found_pos = std::string_view::npos;
+  std::string_view found(text.data() + text.size(),
                           0);  // By default, not found
   found_pos = find_policy.Find(text, delimiter, pos);
-  if (found_pos != turbo::string_piece::npos) {
-    found = turbo::string_piece(text.data() + found_pos,
+  if (found_pos != std::string_view::npos) {
+    found = std::string_view(text.data() + found_pos,
                               find_policy.Length(delimiter));
   }
   return found;
 }
 
-// Finds using turbo::string_piece::find(), therefore the length of the found
+// Finds using std::string_view::find(), therefore the length of the found
 // delimiter is delimiter.length().
 struct LiteralPolicy {
-  size_t Find(turbo::string_piece text, turbo::string_piece delimiter, size_t pos) {
+  size_t Find(std::string_view text, std::string_view delimiter, size_t pos) {
     return text.find(delimiter, pos);
   }
-  size_t Length(turbo::string_piece delimiter) { return delimiter.length(); }
+  size_t Length(std::string_view delimiter) { return delimiter.length(); }
 };
 
-// Finds using turbo::string_piece::find_first_of(), therefore the length of the
+// Finds using std::string_view::find_first_of(), therefore the length of the
 // found delimiter is 1.
 struct AnyOfPolicy {
-  size_t Find(turbo::string_piece text, turbo::string_piece delimiter, size_t pos) {
+  size_t Find(std::string_view text, std::string_view delimiter, size_t pos) {
     return text.find_first_of(delimiter, pos);
   }
-  size_t Length(turbo::string_piece /* delimiter */) { return 1; }
+  size_t Length(std::string_view /* delimiter */) { return 1; }
 };
 
 }  // namespace
@@ -81,15 +81,15 @@ struct AnyOfPolicy {
 // ByString
 //
 
-ByString::ByString(turbo::string_piece sp) : delimiter_(sp) {}
+ByString::ByString(std::string_view sp) : delimiter_(sp) {}
 
-turbo::string_piece ByString::Find(turbo::string_piece text, size_t pos) const {
+std::string_view ByString::Find(std::string_view text, size_t pos) const {
   if (delimiter_.length() == 1) {
     // Much faster to call find on a single character than on an
-    // turbo::string_piece.
+    // std::string_view.
     size_t found_pos = text.find(delimiter_[0], pos);
-    if (found_pos == turbo::string_piece::npos)
-      return turbo::string_piece(text.data() + text.size(), 0);
+    if (found_pos == std::string_view::npos)
+      return std::string_view(text.data() + text.size(), 0);
     return text.substr(found_pos, 1);
   }
   return GenericFind(text, delimiter_, pos, LiteralPolicy());
@@ -99,10 +99,10 @@ turbo::string_piece ByString::Find(turbo::string_piece text, size_t pos) const {
 // ByChar
 //
 
-turbo::string_piece ByChar::Find(turbo::string_piece text, size_t pos) const {
+std::string_view ByChar::Find(std::string_view text, size_t pos) const {
   size_t found_pos = text.find(c_, pos);
-  if (found_pos == turbo::string_piece::npos)
-    return turbo::string_piece(text.data() + text.size(), 0);
+  if (found_pos == std::string_view::npos)
+    return std::string_view(text.data() + text.size(), 0);
   return text.substr(found_pos, 1);
 }
 
@@ -110,9 +110,9 @@ turbo::string_piece ByChar::Find(turbo::string_piece text, size_t pos) const {
 // ByAnyChar
 //
 
-ByAnyChar::ByAnyChar(turbo::string_piece sp) : delimiters_(sp) {}
+ByAnyChar::ByAnyChar(std::string_view sp) : delimiters_(sp) {}
 
-turbo::string_piece ByAnyChar::Find(turbo::string_piece text, size_t pos) const {
+std::string_view ByAnyChar::Find(std::string_view text, size_t pos) const {
   return GenericFind(text, delimiters_, pos, AnyOfPolicy());
 }
 
@@ -123,16 +123,16 @@ ByLength::ByLength(ptrdiff_t length) : length_(length) {
   TURBO_RAW_CHECK(length > 0, "");
 }
 
-turbo::string_piece ByLength::Find(turbo::string_piece text,
+std::string_view ByLength::Find(std::string_view text,
                                       size_t pos) const {
   pos = std::min(pos, text.size());  // truncate `pos`
-  turbo::string_piece substr = text.substr(pos);
+  std::string_view substr = text.substr(pos);
   // If the string is shorter than the chunk size we say we
   // "can't find the delimiter" so this will be the last chunk.
   if (substr.length() <= static_cast<size_t>(length_))
-    return turbo::string_piece(text.data() + text.size(), 0);
+    return std::string_view(text.data() + text.size(), 0);
 
-  return turbo::string_piece(substr.data() + length_, 0);
+  return std::string_view(substr.data() + length_, 0);
 }
 
 TURBO_NAMESPACE_END

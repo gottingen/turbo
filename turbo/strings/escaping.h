@@ -30,7 +30,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/str_join.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/strings/internal/escaping.h"
 
 namespace turbo {
@@ -70,10 +70,10 @@ TURBO_NAMESPACE_BEGIN
 //     ...
 //   }
 //   EXPECT_EQ(unescaped_s, "foo\rbar\nbaz\t");
-bool CUnescape(turbo::string_piece source, std::string* dest, std::string* error);
+bool CUnescape(std::string_view source, std::string* dest, std::string* error);
 
 // Overload of `CUnescape()` with no error reporting.
-inline bool CUnescape(turbo::string_piece source, std::string* dest) {
+inline bool CUnescape(std::string_view source, std::string* dest) {
   return CUnescape(source, dest, nullptr);
 }
 
@@ -88,7 +88,7 @@ inline bool CUnescape(turbo::string_piece source, std::string* dest) {
 //   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
 //   std::string escaped_s = turbo::CEscape(s);
 //   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\010\\t\\n\\013\\014\\r\\n");
-std::string CEscape(turbo::string_piece src);
+std::string CEscape(std::string_view src);
 
 // CHexEscape()
 //
@@ -101,7 +101,7 @@ std::string CEscape(turbo::string_piece src);
 //   std::string s = "foo\rbar\tbaz\010\011\012\013\014\x0d\n";
 //   std::string escaped_s = turbo::CHexEscape(s);
 //   EXPECT_EQ(escaped_s, "foo\\rbar\\tbaz\\x08\\t\\n\\x0b\\x0c\\r\\n");
-std::string CHexEscape(turbo::string_piece src);
+std::string CHexEscape(std::string_view src);
 
 // Utf8SafeCEscape()
 //
@@ -109,14 +109,14 @@ std::string CHexEscape(turbo::string_piece src);
 // octal sequences, and passing through UTF-8 characters without conversion.
 // I.e., when encountering any bytes with their high bit set, this function
 // will not escape those values, whether or not they are valid UTF-8.
-std::string Utf8SafeCEscape(turbo::string_piece src);
+std::string Utf8SafeCEscape(std::string_view src);
 
 // Utf8SafeCHexEscape()
 //
 // Escapes a 'src' string using C-style escape sequences, escaping bytes as
 // hexadecimal sequences, and passing through UTF-8 characters without
 // conversion.
-std::string Utf8SafeCHexEscape(turbo::string_piece src);
+std::string Utf8SafeCHexEscape(std::string_view src);
 
 // Base64Escape()
 //
@@ -125,10 +125,10 @@ std::string Utf8SafeCHexEscape(turbo::string_piece src);
 // 2045. See also CalculateBase64EscapedLen().
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-Base64Escape(turbo::string_piece src, String* dest);
+Base64Escape(std::string_view src, String* dest);
 template <typename String = std::string>
 typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-Base64Escape(turbo::string_piece src) {
+Base64Escape(std::string_view src) {
   String dest;
   strings_internal::Base64EscapeInternal(
       reinterpret_cast<const unsigned char*>(src.data()), src.size(), &dest,
@@ -143,10 +143,10 @@ Base64Escape(turbo::string_piece src) {
 // This function conforms with RFC 4648 section 5 (base64url).
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-WebSafeBase64Escape(turbo::string_piece src, String* dest);
+WebSafeBase64Escape(std::string_view src, String* dest);
 template <typename String = std::string>
 typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-WebSafeBase64Escape(turbo::string_piece src) {
+WebSafeBase64Escape(std::string_view src) {
   String dest;
   WebSafeBase64Escape(src, &dest);
   return dest;
@@ -161,7 +161,7 @@ WebSafeBase64Escape(turbo::string_piece src) {
 // be correct. In the padding, '=' and '.' are treated identically.
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
-Base64Unescape(turbo::string_piece src, String* dest);
+Base64Unescape(std::string_view src, String* dest);
 
 // WebSafeBase64Unescape()
 //
@@ -172,7 +172,7 @@ Base64Unescape(turbo::string_piece src, String* dest);
 // correct. In the padding, '=' and '.' are treated identically.
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value, bool>::type
-WebSafeBase64Unescape(turbo::string_piece src, String* dest);
+WebSafeBase64Unescape(std::string_view src, String* dest);
 
 // HexStringToBytes()
 //
@@ -180,10 +180,10 @@ WebSafeBase64Unescape(turbo::string_piece src, String* dest);
 // `from.size()/2`.
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-HexStringToBytes(turbo::string_piece from, String *dest);
+HexStringToBytes(std::string_view from, String *dest);
 template <typename String = std::string>
 typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-HexStringToBytes(turbo::string_piece from) {
+HexStringToBytes(std::string_view from) {
   String result;
   HexStringToBytes(from, &result);
   return result;
@@ -195,11 +195,11 @@ HexStringToBytes(turbo::string_piece from) {
 // `2*from.size()`.
 template <typename String>
 typename std::enable_if<turbo::is_string_type<String>::value>::type
-BytesToHexString(turbo::string_piece from, String *dest);
+BytesToHexString(std::string_view from, String *dest);
 
 template <typename String = std::string>
 typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-BytesToHexString(turbo::string_piece from) {
+BytesToHexString(std::string_view from) {
     String result;
     BytesToHexString(from, &result);
     return result;

@@ -40,7 +40,7 @@
 #include "turbo/base/internal/throw_delegate.h"
 #include "turbo/memory/jemalloc_helper.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 // Ignore shadowing warnings within this file, so includers can use -Wshadow.
 TURBO_DISABLE_GCC_WARNING(-Wshadow)
@@ -1089,11 +1089,8 @@ public:
   template <typename A2>
   /* implicit */ basic_inlined_string(const std::basic_string<E, T, A2> &str)
       : store_(str.data(), str.size()) {}
-  /* implicit */ basic_inlined_string(const turbo::basic_string_view<E, T> &str)
+  /* implicit */ basic_inlined_string(const std::basic_string_view<E, T> &str)
       : store_(str.data(), str.size()) {}
-
-  basic_inlined_string(const turbo::string_piece &str)
-      : store_(str.data(), str.size() / sizeof(E)) {}
 
   basic_inlined_string(const basic_inlined_string &str, size_type pos,
                        size_type n = npos, const A & /* a */ = A()) {
@@ -1185,11 +1182,7 @@ public:
     return assign(il.begin(), il.end());
   }
 
-  operator turbo::string_piece() const noexcept {
-    return {data(), size() * sizeof(E)};
-  }
-
-  operator turbo::basic_string_view<E, T>() const noexcept {
+  operator std::basic_string_view<E, T>() const noexcept {
     return {data(), size()};
   }
 
@@ -1323,6 +1316,10 @@ public:
   basic_inlined_string &append(std::initializer_list<value_type> il) {
     return append(il.begin(), il.end());
   }
+
+    basic_inlined_string &append(std::basic_string_view<value_type> il) {
+        return append(il.begin(), il.end());
+    }
 
   void push_back(const value_type c) { // primitive
     store_.push_back(c);
@@ -1515,7 +1512,7 @@ public:
                                                    allocator_type> &str) {
     return H::combine(
         std::move(hash_state),
-        turbo::string_piece(str.data(), str.size() * sizeof(value_type)));
+        std::string_view(str.data(), str.size() * sizeof(value_type)));
   }
 
 private:

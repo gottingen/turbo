@@ -30,7 +30,7 @@
 #include "turbo/log/internal/config.h"
 #include "turbo/meta/span.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/time/civil_time.h"
 #include "turbo/time/time.h"
 
@@ -47,8 +47,8 @@ enum class PrefixFormat {
 std::string FormatLogMessage(turbo::LogSeverity severity,
                              turbo::CivilSecond civil_second,
                              turbo::Duration subsecond, log_internal::Tid tid,
-                             turbo::string_piece basename, int line,
-                             PrefixFormat format, turbo::string_piece message);
+                             std::string_view basename, int line,
+                             PrefixFormat format, std::string_view message);
 
 // Formats various entry metadata into a text string meant for use as a
 // prefix on a log message string.  Writes into `buf`, advances `buf` to point
@@ -68,7 +68,7 @@ std::string FormatLogMessage(turbo::LogSeverity severity,
 // message data from being written into the space where a reader would expect to
 // see a thread ID.
 size_t FormatLogPrefix(turbo::LogSeverity severity, turbo::Time timestamp,
-                       log_internal::Tid tid, turbo::string_piece basename,
+                       log_internal::Tid tid, std::string_view basename,
                        int line, PrefixFormat format, turbo::Span<char>& buf);
 
 }  // namespace log_internal

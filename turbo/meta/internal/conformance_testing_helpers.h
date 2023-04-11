@@ -37,7 +37,7 @@
 #include <utility>
 
 #include "turbo/meta/type_traits.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/meta/utility.h"
 
 #if TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE
@@ -52,7 +52,7 @@ namespace types_internal {
 
 // Return a readable name for type T.
 template <class T>
-turbo::string_piece NameOfImpl() {
+std::string_view NameOfImpl() {
 // TODO(calabrese) Investigate using debugging:internal_demangle as a fallback.
 #if TURBO_TYPES_INTERNAL_HAS_CXA_DEMANGLE
   int status = 0;
@@ -79,7 +79,7 @@ turbo::string_piece NameOfImpl() {
 // because we only use this internally with unqualified object types.
 template <class T>
 std::string NameOf() {
-  static const turbo::string_piece result = NameOfImpl<T>();
+  static const std::string_view result = NameOfImpl<T>();
   return std::string(result);
 }
 

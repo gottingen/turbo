@@ -67,13 +67,13 @@ TEST_F(ReflectionTest, TestGetAllFlags) {
   EXPECT_EQ(all_flags.find("bool_retired_flag"), all_flags.end());
   EXPECT_EQ(all_flags.find("some_undefined_flag"), all_flags.end());
 
-  std::vector<turbo::string_piece> flag_names_first_attempt;
+  std::vector<std::string_view> flag_names_first_attempt;
   auto all_flags_1 = turbo::GetAllFlags();
   for (auto f : all_flags_1) {
     flag_names_first_attempt.push_back(f.first);
   }
 
-  std::vector<turbo::string_piece> flag_names_second_attempt;
+  std::vector<std::string_view> flag_names_second_attempt;
   auto all_flags_2 = turbo::GetAllFlags();
   for (auto f : all_flags_2) {
     flag_names_second_attempt.push_back(f.first);
@@ -96,8 +96,8 @@ struct CustomUDT {
   int a;
   int b;
 };
-bool TurboParseFlag(turbo::string_piece in, CustomUDT* f, std::string*) {
-  std::vector<turbo::string_piece> parts =
+bool TurboParseFlag(std::string_view in, CustomUDT* f, std::string*) {
+  std::vector<std::string_view> parts =
       turbo::StrSplit(in, ':', turbo::SkipWhitespace());
 
   if (parts.size() != 2) return false;

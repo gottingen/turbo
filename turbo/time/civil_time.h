@@ -74,7 +74,7 @@
 #include <string>
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "turbo/time/internal/cctz/include/cctz/civil_time.h"
 
 namespace turbo {
@@ -464,7 +464,7 @@ std::string FormatCivilTime(CivilYear c);
 
 // turbo::ParseCivilTime()
 //
-// Parses a civil-time value from the specified `turbo::string_piece` into the
+// Parses a civil-time value from the specified `std::string_view` into the
 // passed output parameter. Returns `true` upon successful parsing.
 //
 // The expected form of the input string is as follows:
@@ -486,12 +486,12 @@ std::string FormatCivilTime(CivilYear c);
 // Note that parsing will fail if the string's format does not match the
 // expected type exactly. `ParseLenientCivilTime()` below is more lenient.
 //
-bool ParseCivilTime(turbo::string_piece s, CivilSecond* c);
-bool ParseCivilTime(turbo::string_piece s, CivilMinute* c);
-bool ParseCivilTime(turbo::string_piece s, CivilHour* c);
-bool ParseCivilTime(turbo::string_piece s, CivilDay* c);
-bool ParseCivilTime(turbo::string_piece s, CivilMonth* c);
-bool ParseCivilTime(turbo::string_piece s, CivilYear* c);
+bool ParseCivilTime(std::string_view s, CivilSecond* c);
+bool ParseCivilTime(std::string_view s, CivilMinute* c);
+bool ParseCivilTime(std::string_view s, CivilHour* c);
+bool ParseCivilTime(std::string_view s, CivilDay* c);
+bool ParseCivilTime(std::string_view s, CivilMonth* c);
+bool ParseCivilTime(std::string_view s, CivilYear* c);
 
 // ParseLenientCivilTime()
 //
@@ -506,12 +506,12 @@ bool ParseCivilTime(turbo::string_piece s, CivilYear* c);
 //   ok = turbo::ParseLenientCivilTime("1969-07-20T10", &d);   // OK: T10 floored
 //   ok = turbo::ParseLenientCivilTime("1969-07", &d);   // OK: day defaults to 1
 //
-bool ParseLenientCivilTime(turbo::string_piece s, CivilSecond* c);
-bool ParseLenientCivilTime(turbo::string_piece s, CivilMinute* c);
-bool ParseLenientCivilTime(turbo::string_piece s, CivilHour* c);
-bool ParseLenientCivilTime(turbo::string_piece s, CivilDay* c);
-bool ParseLenientCivilTime(turbo::string_piece s, CivilMonth* c);
-bool ParseLenientCivilTime(turbo::string_piece s, CivilYear* c);
+bool ParseLenientCivilTime(std::string_view s, CivilSecond* c);
+bool ParseLenientCivilTime(std::string_view s, CivilMinute* c);
+bool ParseLenientCivilTime(std::string_view s, CivilHour* c);
+bool ParseLenientCivilTime(std::string_view s, CivilDay* c);
+bool ParseLenientCivilTime(std::string_view s, CivilMonth* c);
+bool ParseLenientCivilTime(std::string_view s, CivilYear* c);
 
 namespace time_internal {  // For functions found via ADL on civil-time tags.
 
@@ -537,12 +537,12 @@ std::ostream& operator<<(std::ostream& os, CivilSecond s);
 // Parses the command-line flag string representation `s` into a civil-time
 // value. Flags must be specified in a format that is valid for
 // `turbo::ParseLenientCivilTime()`.
-bool TurboParseFlag(turbo::string_piece s, CivilSecond* c, std::string* error);
-bool TurboParseFlag(turbo::string_piece s, CivilMinute* c, std::string* error);
-bool TurboParseFlag(turbo::string_piece s, CivilHour* c, std::string* error);
-bool TurboParseFlag(turbo::string_piece s, CivilDay* c, std::string* error);
-bool TurboParseFlag(turbo::string_piece s, CivilMonth* c, std::string* error);
-bool TurboParseFlag(turbo::string_piece s, CivilYear* c, std::string* error);
+bool TurboParseFlag(std::string_view s, CivilSecond* c, std::string* error);
+bool TurboParseFlag(std::string_view s, CivilMinute* c, std::string* error);
+bool TurboParseFlag(std::string_view s, CivilHour* c, std::string* error);
+bool TurboParseFlag(std::string_view s, CivilDay* c, std::string* error);
+bool TurboParseFlag(std::string_view s, CivilMonth* c, std::string* error);
+bool TurboParseFlag(std::string_view s, CivilYear* c, std::string* error);
 
 // TurboUnparseFlag()
 //

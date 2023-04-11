@@ -27,7 +27,7 @@
 #include "turbo/random/distributions.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/str_cat.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "gtest/gtest.h"
 
 namespace {
@@ -120,7 +120,7 @@ TEST_P(x86ParamTest, SmallCorrectnessCheckSourceAlignment) {
       ASSERT_EQ(mem_comparison, 0);
       turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(
           initial_crc,
-          turbo::string_piece(
+          std::string_view(
               static_cast<char*>(source_.get()) + source_alignment, size));
       ASSERT_EQ(baseline_crc, experiment_crc);
     }
@@ -151,7 +151,7 @@ TEST_P(x86ParamTest, SmallCorrectnessCheckDestAlignment) {
       ASSERT_EQ(mem_comparison, 0);
       turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(
           initial_crc,
-          turbo::string_piece(static_cast<char*>(source_.get()), size));
+          std::string_view(static_cast<char*>(source_.get()), size));
       ASSERT_EQ(baseline_crc, experiment_crc);
     }
   }

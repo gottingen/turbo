@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "turbo/platform/port.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 #include "gtest/gtest.h"
 
 // This test by itself does not do anything fancy, but it serves as binary I can
@@ -35,7 +35,7 @@ char very_long_str_variable_name[] TURBO_INTERNAL_UNIQUE_SMALL_NAME() = "abc";
 
 TEST(UniqueSmallName, NonAutomaticVar) {
   EXPECT_EQ(very_long_int_variable_name, 0);
-  EXPECT_EQ(turbo::string_piece(very_long_str_variable_name), "abc");
+  EXPECT_EQ(std::string_view(very_long_str_variable_name), "abc");
 }
 
 int VeryLongFreeFunctionName() TURBO_INTERNAL_UNIQUE_SMALL_NAME();

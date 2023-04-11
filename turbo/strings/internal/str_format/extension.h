@@ -27,7 +27,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/internal/str_format/output.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -42,11 +42,11 @@ class FormatRawSinkImpl {
   // Implicitly convert from any type that provides the hook function as
   // described above.
   template <typename T, decltype(str_format_internal::InvokeFlush(
-                            std::declval<T*>(), string_piece()))* = nullptr>
+                            std::declval<T*>(), std::string_view()))* = nullptr>
   FormatRawSinkImpl(T* raw)  // NOLINT
       : sink_(raw), write_(&FormatRawSinkImpl::Flush<T>) {}
 
-  void Write(string_piece s) { write_(sink_, s); }
+  void Write(std::string_view s) { write_(sink_, s); }
 
   template <typename T>
   static FormatRawSinkImpl Extract(T s) {
@@ -55,12 +55,12 @@ class FormatRawSinkImpl {
 
  private:
   template <typename T>
-  static void Flush(void* r, string_piece s) {
+  static void Flush(void* r, std::string_view s) {
     str_format_internal::InvokeFlush(static_cast<T*>(r), s);
   }
 
   void* sink_;
-  void (*write_)(void*, string_piece);
+  void (*write_)(void*, std::string_view);
 };
 
 // An abstraction to which conversions write their string data.
@@ -71,7 +71,7 @@ class FormatSinkImpl {
   ~FormatSinkImpl() { Flush(); }
 
   void Flush() {
-    raw_.Write(string_piece(buf_, static_cast<size_t>(pos_ - buf_)));
+    raw_.Write(std::string_view(buf_, static_cast<size_t>(pos_ - buf_)));
     pos_ = buf_;
   }
 
@@ -92,7 +92,7 @@ class FormatSinkImpl {
     raw_append(n);
   }
 
-  void Append(string_piece v) {
+  void Append(std::string_view v) {
     size_t n = v.size();
     if (n == 0) return;
     size_ += n;
@@ -108,7 +108,7 @@ class FormatSinkImpl {
   size_t size() const { return size_; }
 
   // Put 'v' to 'sink' with specified width, precision, and left flag.
-  bool PutPaddedString(string_piece v, int width, int precision, bool left);
+  bool PutPaddedString(std::string_view v, int width, int precision, bool left);
 
   template <typename T>
   T Wrap() {

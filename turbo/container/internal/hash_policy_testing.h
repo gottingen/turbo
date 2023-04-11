@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "turbo/hash/hash.h"
-#include "turbo/strings/string_piece.h"
+#include "turbo/strings/string_view.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

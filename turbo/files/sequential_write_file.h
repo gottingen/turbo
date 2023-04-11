@@ -34,7 +34,7 @@ public:
 
   turbo::ResultStatus<ssize_t> append(const char *data, size_t size);
 
-  turbo::ResultStatus<ssize_t> append(turbo::string_piece str) {
+  turbo::ResultStatus<ssize_t> append(std::string_view str) {
     return append(str.data(), str.size());
   }
 

@@ -275,7 +275,7 @@ void VerifySimpleAtoiBad(in_val_type in_value) {
 }
 
 TEST(NumbersTest, Atoi) {
-  // SimpleAtoi(turbo::string_piece, int32_t)
+  // SimpleAtoi(std::string_view, int32_t)
   VerifySimpleAtoiGood<int32_t>(0, 0);
   VerifySimpleAtoiGood<int32_t>(42, 42);
   VerifySimpleAtoiGood<int32_t>(-42, -42);
@@ -285,7 +285,7 @@ TEST(NumbersTest, Atoi) {
   VerifySimpleAtoiGood<int32_t>(std::numeric_limits<int32_t>::max(),
                                 std::numeric_limits<int32_t>::max());
 
-  // SimpleAtoi(turbo::string_piece, uint32_t)
+  // SimpleAtoi(std::string_view, uint32_t)
   VerifySimpleAtoiGood<uint32_t>(0, 0);
   VerifySimpleAtoiGood<uint32_t>(42, 42);
   VerifySimpleAtoiBad<uint32_t>(-42);
@@ -299,7 +299,7 @@ TEST(NumbersTest, Atoi) {
   VerifySimpleAtoiBad<uint32_t>(std::numeric_limits<int64_t>::max());
   VerifySimpleAtoiBad<uint32_t>(std::numeric_limits<uint64_t>::max());
 
-  // SimpleAtoi(turbo::string_piece, int64_t)
+  // SimpleAtoi(std::string_view, int64_t)
   VerifySimpleAtoiGood<int64_t>(0, 0);
   VerifySimpleAtoiGood<int64_t>(42, 42);
   VerifySimpleAtoiGood<int64_t>(-42, -42);
@@ -316,7 +316,7 @@ TEST(NumbersTest, Atoi) {
                                 std::numeric_limits<int64_t>::max());
   VerifySimpleAtoiBad<int64_t>(std::numeric_limits<uint64_t>::max());
 
-  // SimpleAtoi(turbo::string_piece, uint64_t)
+  // SimpleAtoi(std::string_view, uint64_t)
   VerifySimpleAtoiGood<uint64_t>(0, 0);
   VerifySimpleAtoiGood<uint64_t>(42, 42);
   VerifySimpleAtoiBad<uint64_t>(-42);
@@ -332,7 +332,7 @@ TEST(NumbersTest, Atoi) {
   VerifySimpleAtoiGood<uint64_t>(std::numeric_limits<uint64_t>::max(),
                                  std::numeric_limits<uint64_t>::max());
 
-  // SimpleAtoi(turbo::string_piece, turbo::uint128)
+  // SimpleAtoi(std::string_view, turbo::uint128)
   VerifySimpleAtoiGood<turbo::uint128>(0, 0);
   VerifySimpleAtoiGood<turbo::uint128>(42, 42);
   VerifySimpleAtoiBad<turbo::uint128>(-42);
@@ -351,7 +351,7 @@ TEST(NumbersTest, Atoi) {
       std::numeric_limits<turbo::uint128>::max(),
       std::numeric_limits<turbo::uint128>::max());
 
-  // SimpleAtoi(turbo::string_piece, turbo::int128)
+  // SimpleAtoi(std::string_view, turbo::int128)
   VerifySimpleAtoiGood<turbo::int128>(0, 0);
   VerifySimpleAtoiGood<turbo::int128>(42, 42);
   VerifySimpleAtoiGood<turbo::int128>(-42, -42);
@@ -709,7 +709,7 @@ void VerifySimpleHexAtoiBad(in_val_type in_value) {
 }
 
 TEST(NumbersTest, HexAtoi) {
-  // SimpleHexAtoi(turbo::string_piece, int32_t)
+  // SimpleHexAtoi(std::string_view, int32_t)
   VerifySimpleHexAtoiGood<int32_t>(0, 0);
   VerifySimpleHexAtoiGood<int32_t>(0x42, 0x42);
   VerifySimpleHexAtoiGood<int32_t>(-0x42, -0x42);
@@ -719,7 +719,7 @@ TEST(NumbersTest, HexAtoi) {
   VerifySimpleHexAtoiGood<int32_t>(std::numeric_limits<int32_t>::max(),
                                    std::numeric_limits<int32_t>::max());
 
-  // SimpleHexAtoi(turbo::string_piece, uint32_t)
+  // SimpleHexAtoi(std::string_view, uint32_t)
   VerifySimpleHexAtoiGood<uint32_t>(0, 0);
   VerifySimpleHexAtoiGood<uint32_t>(0x42, 0x42);
   VerifySimpleHexAtoiBad<uint32_t>(-0x42);
@@ -733,7 +733,7 @@ TEST(NumbersTest, HexAtoi) {
   VerifySimpleHexAtoiBad<uint32_t>(std::numeric_limits<int64_t>::max());
   VerifySimpleHexAtoiBad<uint32_t>(std::numeric_limits<uint64_t>::max());
 
-  // SimpleHexAtoi(turbo::string_piece, int64_t)
+  // SimpleHexAtoi(std::string_view, int64_t)
   VerifySimpleHexAtoiGood<int64_t>(0, 0);
   VerifySimpleHexAtoiGood<int64_t>(0x42, 0x42);
   VerifySimpleHexAtoiGood<int64_t>(-0x42, -0x42);
@@ -750,7 +750,7 @@ TEST(NumbersTest, HexAtoi) {
                                    std::numeric_limits<int64_t>::max());
   VerifySimpleHexAtoiBad<int64_t>(std::numeric_limits<uint64_t>::max());
 
-  // SimpleHexAtoi(turbo::string_piece, uint64_t)
+  // SimpleHexAtoi(std::string_view, uint64_t)
   VerifySimpleHexAtoiGood<uint64_t>(0, 0);
   VerifySimpleHexAtoiGood<uint64_t>(0x42, 0x42);
   VerifySimpleHexAtoiBad<uint64_t>(-0x42);
@@ -766,7 +766,7 @@ TEST(NumbersTest, HexAtoi) {
   VerifySimpleHexAtoiGood<uint64_t>(std::numeric_limits<uint64_t>::max(),
                                     std::numeric_limits<uint64_t>::max());
 
-  // SimpleHexAtoi(turbo::string_piece, turbo::uint128)
+  // SimpleHexAtoi(std::string_view, turbo::uint128)
   VerifySimpleHexAtoiGood<turbo::uint128>(0, 0);
   VerifySimpleHexAtoiGood<turbo::uint128>(0x42, 0x42);
   VerifySimpleHexAtoiBad<turbo::uint128>(-0x42);
@@ -1030,7 +1030,7 @@ TEST(stringtest, safe_strto64_base) {
 const size_t kNumRandomTests = 10000;
 
 template <typename IntType>
-void test_random_integer_parse_base(bool (*parse_func)(turbo::string_piece,
+void test_random_integer_parse_base(bool (*parse_func)(std::string_view,
                                                        IntType* value,
                                                        int base)) {
   using RandomEngine = std::minstd_rand0;
@@ -1185,7 +1185,7 @@ TEST(stringtest, safe_strtou32_base_length_delimited) {
 
     uint32_t value;
     EXPECT_EQ(e.expect_ok,
-              safe_strtou32_base(turbo::string_piece(tmp.data(), strlen(e.str)),
+              safe_strtou32_base(std::string_view(tmp.data(), strlen(e.str)),
                                  &value, e.base))
         << "str=\"" << e.str << "\" base=" << e.base;
     if (e.expect_ok) {
@@ -1215,7 +1215,7 @@ TEST(stringtest, safe_strtou64_base_length_delimited) {
 
     uint64_t value;
     EXPECT_EQ(e.expect_ok,
-              safe_strtou64_base(turbo::string_piece(tmp.data(), strlen(e.str)),
+              safe_strtou64_base(std::string_view(tmp.data(), strlen(e.str)),
                                  &value, e.base))
         << "str=\"" << e.str << "\" base=" << e.base;
     if (e.expect_ok) {
@@ -1464,7 +1464,7 @@ TEST(StrToInt32, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = -2;
-    status = safe_strto32_base(turbo::string_piece(test_line.input), &value, 10);
+    status = safe_strto32_base(std::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1495,7 +1495,7 @@ TEST(StrToUint32, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = 2;
-    status = safe_strtou32_base(turbo::string_piece(test_line.input), &value, 10);
+    status = safe_strtou32_base(std::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1528,7 +1528,7 @@ TEST(StrToInt64, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = -2;
-    status = safe_strto64_base(turbo::string_piece(test_line.input), &value, 10);
+    status = safe_strto64_base(std::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1559,7 +1559,7 @@ TEST(StrToUint64, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = 2;
-    status = safe_strtou64_base(turbo::string_piece(test_line.input), &value, 10);
+    status = safe_strtou64_base(std::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1592,7 +1592,7 @@ TEST(StrToInt32Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strto32_base(turbo::string_piece(line.input), &value, base);
+      status = safe_strto32_base(std::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1623,7 +1623,7 @@ TEST(StrToUint32Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strtou32_base(turbo::string_piece(line.input), &value, base);
+      status = safe_strtou32_base(std::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1657,7 +1657,7 @@ TEST(StrToInt64Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strto64_base(turbo::string_piece(line.input), &value, base);
+      status = safe_strto64_base(std::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1688,7 +1688,7 @@ TEST(StrToUint64Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strtou64_base(turbo::string_piece(line.input), &value, base);
+      status = safe_strtou64_base(std::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1698,7 +1698,7 @@ TEST(StrToUint64Base, PrefixOnly) {
 void TestFastHexToBufferZeroPad16(uint64_t v) {
   char buf[16];
   auto digits = turbo::numbers_internal::FastHexToBufferZeroPad16(v, buf);
-  turbo::string_piece res(buf, 16);
+  std::string_view res(buf, 16);
   char buf2[17];
   snprintf(buf2, sizeof(buf2), "%016" PRIx64, v);
   EXPECT_EQ(res, buf2) << v;
