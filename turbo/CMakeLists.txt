@@ -155,6 +155,7 @@ set(TURBO_ALL_SRC
         "time/clock.cc"
         "time/duration.cc"
         "time/format.cc"
+        "time/stop_watcher.cc"
         "time/time.cc"
         "time/internal/cctz/src/civil_time_detail.cc"
         "time/internal/cctz/src/time_zone_fixed.cc"
