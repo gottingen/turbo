@@ -91,7 +91,7 @@
 
     // TURBO_HAVE_FEATURE
     #ifndef TURBO_HAVE_FEATURE
-        #if defined(__has_builtin)
+        #if defined(__has_feature)
             #define TURBO_HAVE_FEATURE(x) __has_feature(x)
         #else
             #define TURBO_HAVE_FEATURE(x) 0
