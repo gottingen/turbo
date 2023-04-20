@@ -199,25 +199,6 @@
 		#define INTERNAL_PRIMITIVE_STRINGIZE(x) #x
 	#endif
 
-	// TURBO_HAVE_FEATURE
-	#ifndef TURBO_HAVE_FEATURE
-		#if defined(__clang__)
-			#define TURBO_HAVE_FEATURE(x) __has_feature(x)
-		#else
-			#define TURBO_HAVE_FEATURE(x) 0
-		#endif
-	#endif
-
-
-	// TURBO_HAVE_BUILTIN
-	#ifndef TURBO_HAVE_BUILTIN
-		#if defined(__clang__)
-			#define TURBO_HAVE_BUILTIN(x) __has_builtin(x)
-		#else
-			#define TURBO_HAVE_BUILTIN(x) 0
-		#endif
-	#endif
-
 
 	// EDG (EDG compiler front-end, used by other compilers such as SN)
 	#if defined(__EDG_VERSION__)
