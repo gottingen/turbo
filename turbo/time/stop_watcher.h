@@ -32,23 +32,23 @@ namespace turbo {
         void Stop();
 
         // Get the elapse from start() to stop(), in various units.
-        [[nodiscard]] constexpr turbo::Duration Elapsed() const { return _stop - _start; }
+        [[nodiscard]] turbo::Duration Elapsed() const { return _stop - _start; }
 
-        [[nodiscard]] constexpr int64_t ElapsedNano() const { return turbo::ToInt64Nanoseconds(_stop - _start); }
+        [[nodiscard]] int64_t ElapsedNano() const { return turbo::ToInt64Nanoseconds(_stop - _start); }
 
-        [[nodiscard]] constexpr int64_t ElapsedMicro() const { return turbo::ToInt64Microseconds(_stop - _start); }
+        [[nodiscard]] int64_t ElapsedMicro() const { return turbo::ToInt64Microseconds(_stop - _start); }
 
-        [[nodiscard]] constexpr int64_t ElapsedMill() const { return turbo::ToInt64Milliseconds(_stop - _start); }
+        [[nodiscard]] int64_t ElapsedMill() const { return turbo::ToInt64Milliseconds(_stop - _start); }
 
-        [[nodiscard]] constexpr int64_t ElapsedSec() const { return turbo::ToInt64Seconds(_stop - _start);; }
+        [[nodiscard]] int64_t ElapsedSec() const { return turbo::ToInt64Seconds(_stop - _start);; }
 
-        [[nodiscard]] constexpr double ElapsedNano(double) const { return turbo::ToDoubleNanoseconds(_stop - _start); }
+        [[nodiscard]] double ElapsedNano(double) const { return turbo::ToDoubleNanoseconds(_stop - _start); }
 
-        [[nodiscard]] constexpr double ElapsedMicro(double) const { return turbo::ToDoubleMicroseconds(_stop - _start); }
+        [[nodiscard]] double ElapsedMicro(double) const { return turbo::ToDoubleMicroseconds(_stop - _start); }
 
-        [[nodiscard]] constexpr double ElapsedMill(double) const { return turbo::ToDoubleMilliseconds(_stop - _start); }
+        [[nodiscard]] double ElapsedMill(double) const { return turbo::ToDoubleMilliseconds(_stop - _start); }
 
-        [[nodiscard]] constexpr double ElapsedSec(double) const { return turbo::ToDoubleSeconds(_stop - _start); }
+        [[nodiscard]] double ElapsedSec(double) const { return turbo::ToDoubleSeconds(_stop - _start); }
 
     private:
         turbo::Time _start;
