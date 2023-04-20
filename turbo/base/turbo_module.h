@@ -15,8 +15,6 @@
 #ifndef TURBO_BASE_TURBO_MOULE_H_
 #define TURBO_BASE_TURBO_MOULE_H_
 
-#define __const__
-
 #include "turbo/platform/port.h"
 #include <errno.h> // errno
 
