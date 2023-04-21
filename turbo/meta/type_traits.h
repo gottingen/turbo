@@ -38,7 +38,7 @@
 #include <cstddef>
 #include <functional>
 #include <type_traits>
-
+#include <string>
 #include "turbo/platform/port.h"
 
 // MSVC constructibility traits do not detect destructor properties and so our

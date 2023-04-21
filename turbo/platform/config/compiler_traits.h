@@ -89,6 +89,15 @@
 #include "turbo/platform/config/compiler.h"
 
 
+    // TURBO_HAVE_FEATURE
+    #ifndef TURBO_HAVE_FEATURE
+        #if defined(__has_feature)
+            #define TURBO_HAVE_FEATURE(x) __has_feature(x)
+        #else
+            #define TURBO_HAVE_FEATURE(x) 0
+        #endif
+    #endif
+
     // TURBO_HAVE_ATTRIBUTE
     //
     // A function-like feature checking macro that is a wrapper around
@@ -99,11 +108,14 @@
     //
     // GCC: https://gcc.gnu.org/gcc-5/changes.html
     // Clang: https://clang.llvm.org/docs/LanguageExtensions.html
-    #ifdef __has_attribute
-    #define TURBO_HAVE_ATTRIBUTE(x) __has_attribute(x)
-    #else
-    #define TURBO_HAVE_ATTRIBUTE(x) 0
+    #ifndef TURBO_HAVE_ATTRIBUTE
+        #ifdef __has_attribute
+            #define TURBO_HAVE_ATTRIBUTE(x) __has_attribute(x)
+        #else
+            #define TURBO_HAVE_ATTRIBUTE(x) 0
+        #endif
     #endif
+
 
     // TURBO_HAVE_BUILTIN()
     //
@@ -114,10 +126,12 @@
     //
     // Note: Use this macro to avoid an extra level of #ifdef __has_builtin check.
     // http://releases.llvm.org/3.3/tools/clang/docs/LanguageExtensions.html
-    #ifdef __has_builtin
-    #define TURBO_HAVE_BUILTIN(x) __has_builtin(x)
-    #else
-    #define TURBO_HAVE_BUILTIN(x) 0
+    #ifndef TURBO_HAVE_BUILTIN
+        #ifdef __has_builtin
+            #define TURBO_HAVE_BUILTIN(x) __has_builtin(x)
+        #else
+            #define TURBO_HAVE_BUILTIN(x) 0
+        #endif
     #endif
     // TURBO_HAVE_CPP_ATTRIBUTE
     //
