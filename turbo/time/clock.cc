@@ -59,7 +59,7 @@ TURBO_NAMESPACE_END
 #if defined(__APPLE__) || defined(_WIN32)
 #include "turbo/time/internal/get_current_time_chrono.inc"
 #else
-#include "turbo/time/internal/get_current_time_posix.inc"
+#include "turbo/time/internal/get_current_time_posix.h"
 #endif
 
 // Allows override by test.

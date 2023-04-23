@@ -24,7 +24,7 @@
 #if defined(_WIN32)
 #include "turbo/platform/internal/spinlock_win32.inc"
 #elif defined(__linux__)
-#include "turbo/platform/internal/spinlock_linux.inc"
+#include "turbo/platform/internal/spinlock_linux.h"
 #elif defined(__akaros__)
 #include "turbo/platform/internal/spinlock_akaros.inc"
 #else

@@ -1136,7 +1136,7 @@ constexpr int64_t BitCastToSigned(uint64_t v) {
 }  // namespace int128_internal
 
 #if defined(TURBO_HAVE_INTRINSIC_INT128)
-#include "int128_have_intrinsic.inc"  // IWYU pragma: export
+#include "int128_have_intrinsic.h"  // IWYU pragma: export
 #else  // TURBO_HAVE_INTRINSIC_INT128
 #include "turbo/numeric/int128_no_intrinsic.inc"  // IWYU pragma: export
 #endif  // TURBO_HAVE_INTRINSIC_INT128

@@ -54,6 +54,9 @@ TURBO_GCC_FLAGS = [
     "-Wvla",
     "-Wwrite-strings",
     "-DNOMINMAX",
+    "-maes",
+    "-msse4.1",
+    "-mavx2"
 ]
 
 TURBO_GCC_TEST_FLAGS = [

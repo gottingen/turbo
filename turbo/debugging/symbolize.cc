@@ -29,7 +29,7 @@
 #endif
 
 #if defined(TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE)
-#include "turbo/debugging/symbolize_elf.inc"
+#include "turbo/debugging/symbolize_elf.h"
 #elif defined(TURBO_INTERNAL_HAVE_SYMBOLIZE_WIN32)
 // The Windows Symbolizer only works if PDB files containing the debug info
 // are available to the program at runtime.
