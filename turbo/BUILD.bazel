@@ -20,6 +20,7 @@ load(
     "TURBO_DEFAULT_LINKOPTS",
     "TURBO_TEST_COPTS",
 )
+package(default_visibility = ["//visibility:public"])
 
 TURBO_ALL_SRC = [
         "base/internal/raw_logging.cc",
