@@ -73,7 +73,7 @@ TURBO_NAMESPACE_BEGIN
 template <typename T>
 using Flag = flags_internal::Flag<T>;
 #else
-#include "turbo/flags/internal/flag_msvc.inc"
+#include "turbo/flags/internal/flag_msvc.h"
 #endif
 
 // GetFlag()

@@ -46,15 +46,15 @@
 #else
 # error Cannot calculate stack trace: will need to write for your environment
 
-# include "turbo/debugging/internal/stacktrace_aarch64-inl.inc"
-# include "turbo/debugging/internal/stacktrace_arm-inl.inc"
-# include "turbo/debugging/internal/stacktrace_emscripten-inl.inc"
-# include "turbo/debugging/internal/stacktrace_generic-inl.inc"
-# include "turbo/debugging/internal/stacktrace_powerpc-inl.inc"
-# include "turbo/debugging/internal/stacktrace_riscv-inl.inc"
-# include "turbo/debugging/internal/stacktrace_unimplemented-inl.inc"
-# include "turbo/debugging/internal/stacktrace_win32-inl.inc"
-# include "turbo/debugging/internal/stacktrace_x86-inl.inc"
+# include "turbo/debugging/internal/stacktrace_aarch64-inl.h"
+# include "turbo/debugging/internal/stacktrace_arm-inl.h"
+# include "turbo/debugging/internal/stacktrace_emscripten-inl.h"
+# include "turbo/debugging/internal/stacktrace_generic-inl.h"
+# include "turbo/debugging/internal/stacktrace_powerpc-inl.h"
+# include "turbo/debugging/internal/stacktrace_riscv-inl.h"
+# include "turbo/debugging/internal/stacktrace_unimplemented-inl.h"
+# include "turbo/debugging/internal/stacktrace_win32-inl.h"
+# include "turbo/debugging/internal/stacktrace_x86-inl.h"
 #endif
 
 namespace turbo {

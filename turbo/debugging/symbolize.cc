@@ -33,11 +33,11 @@
 #elif defined(TURBO_INTERNAL_HAVE_SYMBOLIZE_WIN32)
 // The Windows Symbolizer only works if PDB files containing the debug info
 // are available to the program at runtime.
-#include "turbo/debugging/symbolize_win32.inc"
+#include "turbo/debugging/symbolize_win32.h"
 #elif defined(__APPLE__)
-#include "turbo/debugging/symbolize_darwin.inc"
+#include "turbo/debugging/symbolize_darwin.h"
 #elif defined(TURBO_INTERNAL_HAVE_SYMBOLIZE_WASM)
-#include "turbo/debugging/symbolize_emscripten.inc"
+#include "turbo/debugging/symbolize_emscripten.h"
 #else
-#include "turbo/debugging/symbolize_unimplemented.inc"
+#include "turbo/debugging/symbolize_unimplemented.h"
 #endif
