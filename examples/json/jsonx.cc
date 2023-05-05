@@ -44,12 +44,12 @@ public:
     
     bool Int64(int64_t i) {
         char buffer[21];
-        return WriteNumberElement(buffer, snprintf(buffer, 20, "%" PRId64, i));
+        return WriteNumberElement(buffer, snprintf(buffer, 20, "%ld", i));
     }
     
     bool Uint64(uint64_t i) {
         char buffer[21];
-        return WriteNumberElement(buffer, snprintf(buffer, 20,"%" PRIu64, i));
+        return WriteNumberElement(buffer, snprintf(buffer, 20,"%lu", i));
     }
     
     bool Double(double d) {
