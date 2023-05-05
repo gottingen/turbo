@@ -118,7 +118,7 @@ endif()
 if(TURBO_USE_CXX_ABI)
   add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 else ()
-  add_definitions(-D-D_GLIBCXX_USE_CXX11_ABI=0)
+  add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 endif ()
 
 # find dependencies
