@@ -86,7 +86,7 @@ TEST(CHECKTest, TestPlacementsInCompoundStatements) {
   case 0:
     TURBO_TEST_CHECK(true);  // NOLINT
 
-#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG > 201703L
   constexpr auto var = [](int i) {
     TURBO_TEST_CHECK(i > 0);  // NOLINT
     return i + 1;
@@ -351,7 +351,7 @@ TEST(CHECKTest, TestComparisonPlacementsInCompoundStatements) {
   case 0:
     TURBO_TEST_CHECK_STRCASEEQ("A", "a");
 
-#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG > 201703L
   constexpr auto var = [](int i) {
     TURBO_TEST_CHECK_GT(i, 0);
     return i + 1;
@@ -438,7 +438,7 @@ TEST(CHECKTest, TestQCHECKPlacementsInCompoundStatements) {
   case 0:
     TURBO_TEST_QCHECK(true);
 
-#if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
+#if TURBO_INTERNAL_CPLUSPLUS_LANG > 201703L
   constexpr auto var = [](int i) {
     TURBO_TEST_QCHECK(i > 0);  // NOLINT
     return i + 1;
