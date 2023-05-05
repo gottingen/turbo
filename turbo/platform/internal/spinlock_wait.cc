@@ -22,13 +22,13 @@
 #include "turbo/platform/internal/spinlock_wait.h"
 
 #if defined(_WIN32)
-#include "turbo/platform/internal/spinlock_win32.inc"
+#include "turbo/platform/internal/spinlock_win32.h"
 #elif defined(__linux__)
-#include "turbo/platform/internal/spinlock_linux.inc"
+#include "turbo/platform/internal/spinlock_linux.h"
 #elif defined(__akaros__)
-#include "turbo/platform/internal/spinlock_akaros.inc"
+#include "turbo/platform/internal/spinlock_akaros.h"
 #else
-#include "turbo/platform/internal/spinlock_posix.inc"
+#include "turbo/platform/internal/spinlock_posix.h"
 #endif
 
 namespace turbo {

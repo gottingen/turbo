@@ -28,19 +28,19 @@
 
 #elif defined(_WIN32)
 #define TURBO_STACKTRACE_INL_HEADER \
-    "turbo/debugging/internal/stacktrace_win32-inl.inc"
+    "turbo/debugging/internal/stacktrace_win32-inl.h"
 
 #elif defined(__APPLE__)
 #ifdef TURBO_HAVE_THREAD_LOCAL
 // Thread local support required for UnwindImpl.
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_generic-inl.inc"
+  "turbo/debugging/internal/stacktrace_generic-inl.h"
 #endif  // defined(TURBO_HAVE_THREAD_LOCAL)
 
 // Emscripten stacktraces rely on JS. Do not use them in standalone mode.
 #elif defined(__EMSCRIPTEN__) && !defined(STANDALONE_WASM)
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_emscripten-inl.inc"
+  "turbo/debugging/internal/stacktrace_emscripten-inl.h"
 
 #elif defined(__linux__) && !defined(__ANDROID__)
 
@@ -49,31 +49,31 @@
 // Note: The libunwind-based implementation is not available to open-source
 // users.
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_libunwind-inl.inc"
+  "turbo/debugging/internal/stacktrace_libunwind-inl.h"
 #define STACKTRACE_USES_LIBUNWIND 1
 #elif defined(NO_FRAME_POINTER) && defined(__has_include)
 #if __has_include(<execinfo.h>)
 // Note: When using glibc this may require -funwind-tables to function properly.
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_generic-inl.inc"
+  "turbo/debugging/internal/stacktrace_generic-inl.h"
 #endif  // __has_include(<execinfo.h>)
 #elif defined(__i386__) || defined(__x86_64__)
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_x86-inl.inc"
+  "turbo/debugging/internal/stacktrace_x86-inl.h"
 #elif defined(__ppc__) || defined(__PPC__)
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_powerpc-inl.inc"
+  "turbo/debugging/internal/stacktrace_powerpc-inl.h"
 #elif defined(__aarch64__)
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_aarch64-inl.inc"
+  "turbo/debugging/internal/stacktrace_aarch64-inl.h"
 #elif defined(__riscv)
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_riscv-inl.inc"
+  "turbo/debugging/internal/stacktrace_riscv-inl.h"
 #elif defined(__has_include)
 #if __has_include(<execinfo.h>)
 // Note: When using glibc this may require -funwind-tables to function properly.
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_generic-inl.inc"
+  "turbo/debugging/internal/stacktrace_generic-inl.h"
 #endif  // __has_include(<execinfo.h>)
 #endif  // defined(__has_include)
 
@@ -82,7 +82,7 @@
 // Fallback to the empty implementation.
 #if !defined(TURBO_STACKTRACE_INL_HEADER)
 #define TURBO_STACKTRACE_INL_HEADER \
-  "turbo/debugging/internal/stacktrace_unimplemented-inl.inc"
+  "turbo/debugging/internal/stacktrace_unimplemented-inl.h"
 #endif
 
 #endif  // TURBO_DEBUGGING_INTERNAL_STACKTRACE_CONFIG_H_

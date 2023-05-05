@@ -17,7 +17,7 @@
 // Functions to provide smarter use of jemalloc, if jemalloc is being used.
 // http://www.canonware.com/download/jemalloc/jemalloc-latest/doc/jemalloc.html
 
-#include <turbo/memory/jemalloc_helper.h>
+#include "turbo/memory/jemalloc_helper.h"
 
 /**
  * Define various MALLOCX_* macros normally provided by jemalloc.  We define

@@ -5,7 +5,7 @@ change Turbo copts, edit turbo/copts/copts.py
 """
 
 load(
-    "//turbo:copts/GENERATED_copts.bzl",
+    "//:copts/GENERATED_copts.bzl",
     "TURBO_CLANG_CL_FLAGS",
     "TURBO_CLANG_CL_TEST_FLAGS",
     "TURBO_GCC_FLAGS",
@@ -22,23 +22,23 @@ load(
 )
 
 TURBO_DEFAULT_COPTS = select({
-    "//turbo:msvc_compiler": TURBO_MSVC_FLAGS,
-    "//turbo:clang-cl_compiler": TURBO_CLANG_CL_FLAGS,
-    "//turbo:clang_compiler": TURBO_LLVM_FLAGS,
-    "//turbo:gcc_compiler": TURBO_GCC_FLAGS,
+    "//:msvc_compiler": TURBO_MSVC_FLAGS,
+    "//:clang-cl_compiler": TURBO_CLANG_CL_FLAGS,
+    "//:clang_compiler": TURBO_LLVM_FLAGS,
+    "//:gcc_compiler": TURBO_GCC_FLAGS,
     "//conditions:default": TURBO_GCC_FLAGS,
 })
 
 TURBO_TEST_COPTS = select({
-    "//turbo:msvc_compiler": TURBO_MSVC_TEST_FLAGS,
-    "//turbo:clang-cl_compiler": TURBO_CLANG_CL_TEST_FLAGS,
-    "//turbo:clang_compiler": TURBO_LLVM_TEST_FLAGS,
-    "//turbo:gcc_compiler": TURBO_GCC_TEST_FLAGS,
+    "//:msvc_compiler": TURBO_MSVC_TEST_FLAGS,
+    "//:clang-cl_compiler": TURBO_CLANG_CL_TEST_FLAGS,
+    "//:clang_compiler": TURBO_LLVM_TEST_FLAGS,
+    "//:gcc_compiler": TURBO_GCC_TEST_FLAGS,
     "//conditions:default": TURBO_GCC_TEST_FLAGS,
 })
 
 TURBO_DEFAULT_LINKOPTS = select({
-    "//turbo:msvc_compiler": TURBO_MSVC_LINKOPTS,
+    "//:msvc_compiler": TURBO_MSVC_LINKOPTS,
     "//conditions:default": [],
 })
 
