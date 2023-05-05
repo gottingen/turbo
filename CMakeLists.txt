@@ -81,6 +81,7 @@ endif()
 option(TURBO_USE_SYSTEM_INCLUDES
   "Silence warnings in Turbo headers by marking them as SYSTEM includes"
   OFF)
+option(TURBO_USE_CXX_ABI "USE_CXX11_ABI" OFF)
 
 list(APPEND CMAKE_MODULE_PATH
   ${CMAKE_CURRENT_LIST_DIR}/CMake
@@ -113,6 +114,12 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 else()
   set(TURBO_USING_CLANG OFF)
 endif()
+
+if(TURBO_USE_CXX_ABI)
+  add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
+else ()
+  add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+endif ()
 
 # find dependencies
 ## pthread
