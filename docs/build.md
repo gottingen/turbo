@@ -6,6 +6,12 @@ build turbo
 * Cmake 3.17 is the minimum supported version.
 * gcc >= 7.3 or Apple Clang > 12
 
+## centos docker
+
+```shell
+docker run -it bohuli2048/centos7:v1.0.0 /bin/bash 
+scl enable devtoolset-7 bash
+```
 ## centos
 
 ```shell
@@ -43,6 +49,7 @@ cd turbo
 mkdir build
 cd build
 cmake ..
+make
 make test
 ```
 
