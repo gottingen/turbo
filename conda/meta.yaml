@@ -27,9 +27,6 @@ outputs:
       string: "h{{ GIT_DESCRIBE_HASH }}_{{ number }}"
       run_exports:
         - {{ pin_compatible('turbo', exact=True) }}
-    requirements:
-      build:
-        - {{ compiler('cxx') }}
     test:
       commands:
         - test -f $PREFIX/lib/libturbo.so              # [linux]
