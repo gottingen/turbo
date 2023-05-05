@@ -13,3 +13,4 @@ python:
 channel_sources:
   - mgottingen
   - conda-forge
+  - default
