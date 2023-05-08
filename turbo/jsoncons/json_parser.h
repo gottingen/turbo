@@ -110,11 +110,6 @@ namespace turbo {
         }
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG(
-            "Instead, use default_json_parsing") typedef default_json_parsing default_parse_error_handler;
-    JSONCONS_DEPRECATED_MSG("Instead, use strict_json_parsing") typedef strict_json_parsing strict_parse_error_handler;
-#endif
 
     template<class CharT, class TempAllocator = std::allocator<char>>
     class basic_json_parser : public ser_context {
@@ -2492,32 +2487,6 @@ namespace turbo {
             }
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use finish_parse(basic_json_visitor<char_type>&)")
-        void end_parse(basic_json_visitor<char_type> &visitor) {
-            std::error_code ec;
-            finish_parse(visitor, ec);
-            if (ec) {
-                JSONCONS_THROW(ser_error(ec, line_, column()));
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use finish_parse(basic_json_visitor<char_type>&, std::error_code&)")
-        void end_parse(basic_json_visitor<char_type> &visitor, std::error_code &ec) {
-            while (!finished()) {
-                parse_some(visitor, ec);
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use update(const char_type*, std::size_t)")
-        void set_source(const char_type *data, std::size_t length) {
-            begin_input_ = data;
-            end_input_ = data + length;
-            input_ptr_ = begin_input_;
-        }
-
-#endif
 
         std::size_t line() const override {
             return line_;

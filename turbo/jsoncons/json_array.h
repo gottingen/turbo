@@ -149,17 +149,6 @@ namespace turbo {
 
         void resize(std::size_t n, const Json &val) { elements_.resize(n, val); }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use erase(const_iterator, const_iterator)")
-        void remove_range(std::size_t from_index, std::size_t to_index) {
-            TURBO_ASSERT(from_index <= to_index);
-            TURBO_ASSERT(to_index <= elements_.size());
-            elements_.erase(elements_.cbegin() + from_index, elements_.cbegin() + to_index);
-        }
-
-#endif
-
         iterator erase(const_iterator pos) {
             return elements_.erase(pos);
         }

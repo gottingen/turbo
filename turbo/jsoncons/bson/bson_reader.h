@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef JSONCONS_BSON_BSON_READER_HPP
-#define JSONCONS_BSON_BSON_READER_HPP
+#ifndef TURBO_JSONCONS_BSON_BSON_READER_H_
+#define TURBO_JSONCONS_BSON_BSON_READER_H_
 
 #include <string>
 #include <vector>
@@ -29,7 +29,7 @@
 #include "turbo/jsoncons/bson/bson_error.h"
 #include "turbo/jsoncons/bson/bson_parser.h"
 
-namespace turbo { namespace bson {
+namespace turbo::bson {
 
 template <class Source,class Allocator=std::allocator<char>>
 class basic_bson_reader 
@@ -92,11 +92,8 @@ public:
 using bson_stream_reader = basic_bson_reader<turbo::binary_stream_source>;
 using bson_bytes_reader = basic_bson_reader<turbo::bytes_source>;
 
-#if !defined(JSONCONS_NO_DEPRECATED) 
-JSONCONS_DEPRECATED_MSG("Instead, use bson_stream_reader") typedef bson_stream_reader bson_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use bson_bytes_reader") typedef bson_bytes_reader bson_buffer_reader;
-#endif
 
-}}
+}  // namespace turbo::bson
 
-#endif
+#endif  // TURBO_JSONCONS_BSON_BSON_READER_H_
+

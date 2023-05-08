@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef JSONCONS_CBOR_CBOR_READER_HPP
-#define JSONCONS_CBOR_CBOR_READER_HPP
+#ifndef TURBO_JSONCONS_CBOR_CBOR_READER_H_
+#define TURBO_JSONCONS_CBOR_CBOR_READER_H_
 
 #include <string>
 #include <vector>
@@ -29,98 +29,84 @@
 #include "turbo/jsoncons/cbor/cbor_detail.h"
 #include "turbo/jsoncons/cbor/cbor_parser.h"
 
-namespace turbo { namespace cbor {
+namespace turbo::cbor {
 
-template <class Source,class Allocator=std::allocator<char>>
-class basic_cbor_reader 
-{
-    using char_type = char;
+    template<class Source, class Allocator=std::allocator<char>>
+    class basic_cbor_reader {
+        using char_type = char;
 
-    basic_cbor_parser<Source,Allocator> parser_;
-    basic_item_event_visitor_to_json_visitor<char_type,Allocator> adaptor_;
-    item_event_visitor& visitor_;
-public:
-    template <class Sourceable>
-    basic_cbor_reader(Sourceable&& source, 
-                      json_visitor& visitor, 
-                      const Allocator alloc)
-       : basic_cbor_reader(std::forward<Sourceable>(source),
-                           visitor,
-                           cbor_decode_options(),
-                           alloc)
-    {
-    }
-
-    template <class Sourceable>
-    basic_cbor_reader(Sourceable&& source, 
-                      json_visitor& visitor, 
-                      const cbor_decode_options& options = cbor_decode_options(),
-                      const Allocator alloc=Allocator())
-       : parser_(std::forward<Sourceable>(source), options, alloc),
-         adaptor_(visitor, alloc), visitor_(adaptor_)
-    {
-    }
-    template <class Sourceable>
-    basic_cbor_reader(Sourceable&& source, 
-                      item_event_visitor& visitor, 
-                      const Allocator alloc)
-       : basic_cbor_reader(std::forward<Sourceable>(source),
-                           visitor,
-                           cbor_decode_options(),
-                           alloc)
-    {
-    }
-
-    template <class Sourceable>
-    basic_cbor_reader(Sourceable&& source, 
-                      item_event_visitor& visitor, 
-                      const cbor_decode_options& options = cbor_decode_options(),
-                      const Allocator alloc=Allocator())
-       : parser_(std::forward<Sourceable>(source), options, alloc),
-         visitor_(visitor)
-    {
-    }
-
-    void read()
-    {
-        std::error_code ec;
-        read(ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec,line(),column()));
+        basic_cbor_parser<Source, Allocator> parser_;
+        basic_item_event_visitor_to_json_visitor<char_type, Allocator> adaptor_;
+        item_event_visitor &visitor_;
+    public:
+        template<class Sourceable>
+        basic_cbor_reader(Sourceable &&source,
+                          json_visitor &visitor,
+                          const Allocator alloc)
+                : basic_cbor_reader(std::forward<Sourceable>(source),
+                                    visitor,
+                                    cbor_decode_options(),
+                                    alloc) {
         }
-    }
 
-    void read(std::error_code& ec)
-    {
-        parser_.reset();
-        parser_.parse(visitor_, ec);
-        if (ec)
-        {
-            return;
+        template<class Sourceable>
+        basic_cbor_reader(Sourceable &&source,
+                          json_visitor &visitor,
+                          const cbor_decode_options &options = cbor_decode_options(),
+                          const Allocator alloc = Allocator())
+                : parser_(std::forward<Sourceable>(source), options, alloc),
+                  adaptor_(visitor, alloc), visitor_(adaptor_) {
         }
-    }
 
-    std::size_t line() const
-    {
-        return parser_.line();
-    }
+        template<class Sourceable>
+        basic_cbor_reader(Sourceable &&source,
+                          item_event_visitor &visitor,
+                          const Allocator alloc)
+                : basic_cbor_reader(std::forward<Sourceable>(source),
+                                    visitor,
+                                    cbor_decode_options(),
+                                    alloc) {
+        }
 
-    std::size_t column() const
-    {
-        return parser_.column();
-    }
-};
+        template<class Sourceable>
+        basic_cbor_reader(Sourceable &&source,
+                          item_event_visitor &visitor,
+                          const cbor_decode_options &options = cbor_decode_options(),
+                          const Allocator alloc = Allocator())
+                : parser_(std::forward<Sourceable>(source), options, alloc),
+                  visitor_(visitor) {
+        }
 
-using cbor_stream_reader = basic_cbor_reader<turbo::binary_stream_source>;
+        void read() {
+            std::error_code ec;
+            read(ec);
+            if (ec) {
+                JSONCONS_THROW(ser_error(ec, line(), column()));
+            }
+        }
 
-using cbor_bytes_reader = basic_cbor_reader<turbo::bytes_source>;
+        void read(std::error_code &ec) {
+            parser_.reset();
+            parser_.parse(visitor_, ec);
+            if (ec) {
+                return;
+            }
+        }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_stream_reader") typedef cbor_stream_reader cbor_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_reader") typedef cbor_bytes_reader cbor_buffer_reader;
-#endif
+        std::size_t line() const {
+            return parser_.line();
+        }
 
-}}
+        std::size_t column() const {
+            return parser_.column();
+        }
+    };
 
-#endif
+    using cbor_stream_reader = basic_cbor_reader<turbo::binary_stream_source>;
+
+    using cbor_bytes_reader = basic_cbor_reader<turbo::bytes_source>;
+
+}  // namespace turbo::cbor
+
+#endif  // TURBO_JSONCONS_CBOR_CBOR_READER_H_
+

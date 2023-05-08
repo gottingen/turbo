@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef JSONCONS_JSON_OPTIONS_HPP
-#define JSONCONS_JSON_OPTIONS_HPP
+#ifndef TURBO_JSONCONS_JSON_OPTIONS_H_
+#define TURBO_JSONCONS_JSON_OPTIONS_H_
 
 #include <string>
 #include <limits> // std::numeric_limits
@@ -28,10 +28,6 @@ namespace turbo {
     enum class float_chars_format : uint8_t {
         general, fixed, scientific, hex
     };
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use float_chars_format") typedef float_chars_format chars_format;
-#endif
 
     enum class indenting : uint8_t {
         no_indent = 0, indent = 1
@@ -47,11 +43,6 @@ namespace turbo {
         , integer = number
 #endif
     };
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use bigint_chars_format") typedef bigint_chars_format bignum_chars_format;
-    JSONCONS_DEPRECATED_MSG("Instead, use bigint_chars_format") typedef bigint_chars_format big_integer_chars_format;
-#endif
 
     enum class byte_string_chars_format : uint8_t {
         none = 0, base16, base64, base64url
@@ -299,15 +290,6 @@ namespace turbo {
         bool lossless_number() const {
             return lossless_number_;
         }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use lossless_number()")
-        bool dec_to_str() const {
-            return lossless_number_;
-        }
-
-#endif
     };
 
     template<class CharT>
@@ -440,30 +422,6 @@ namespace turbo {
         bool escape_solidus() const {
             return escape_solidus_;
         }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use bigint_format()")
-        bigint_chars_format bignum_format() const { return bigint_format_; }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use indent_size()")
-        uint8_t indent() const {
-            return indent_size();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_object_line_splits()")
-        line_split_kind object_object_split_lines() const { return object_object_line_splits_; }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_object_line_splits()")
-        line_split_kind array_object_split_lines() const { return array_object_line_splits_; }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_array_line_splits()")
-        line_split_kind object_array_split_lines() const { return object_array_line_splits_; }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_array_line_splits()")
-        line_split_kind array_array_split_lines() const { return array_array_line_splits_; }
-
-#endif
     };
 
     template<class CharT>
@@ -563,48 +521,6 @@ namespace turbo {
             return *this;
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num(const string_type&) or inf_to_str(const string_type&)")
-        basic_json_options &replace_inf(bool replace) {
-            this->can_read_pos_inf_replacement_ = replace;
-            this->can_read_neg_inf_replacement_ = replace;
-            return *this;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num(const string_type&) or inf_to_str(const string_type&)")
-        basic_json_options &replace_pos_inf(bool replace) {
-            this->can_read_pos_inf_replacement_ = replace;
-            return *this;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use neginf_to_num(const string_type&) or neginf_to_str(const string_type&)")
-        basic_json_options &replace_neg_inf(bool replace) {
-            this->can_read_neg_inf_replacement_ = replace;
-            return *this;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use nan_to_num(const string_type&) or nan_to_str(const string_type&)")
-        basic_json_options &nan_replacement(const string_type &value) {
-            this->nan_replacement_ = value;
-
-            this->can_read_nan_replacement_ = is_string(value);
-
-            return *this;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num(const string_type&) or inf_to_str(const string_type&)")
-        basic_json_options &pos_inf_replacement(const string_type &value) {
-            this->pos_inf_replacement_ = value;
-            this->can_read_pos_inf_replacement_ = is_string(value);
-            return *this;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use neginf_to_num(const string_type&) or neginf_to_str(const string_type&)")
-        basic_json_options &neg_inf_replacement(const string_type &value) {
-            this->neg_inf_replacement_ = value;
-            this->can_read_neg_inf_replacement_ = is_string(value);
-            return *this;
-        }
-
         basic_json_options &byte_string_format(byte_string_chars_format value) {
             this->byte_string_format_ = value;
             return *this;
@@ -699,6 +615,7 @@ namespace turbo {
             this->max_nesting_depth_ = value;
             return *this;
         }
+
     private:
         enum class input_state {
             initial, begin_quote, character, end_quote, escape, error
@@ -748,9 +665,6 @@ namespace turbo {
     using json_options = basic_json_options<char>;
     using wjson_options = basic_json_options<wchar_t>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("json_options") typedef json_options output_format;
-#endif
 
 }
-#endif
+#endif  // TURBO_JSONCONS_JSON_OPTIONS_H_

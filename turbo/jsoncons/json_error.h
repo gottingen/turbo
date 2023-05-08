@@ -4,16 +4,15 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_ERROR_HPP
-#define JSONCONS_JSON_ERROR_HPP
+#ifndef TURBO_JSONCONS_JSON_ERROR_H_
+#define TURBO_JSONCONS_JSON_ERROR_H_
 
 #include <system_error>
 #include "turbo/jsoncons/config/jsoncons_config.h"
 
 namespace turbo {
 
-    enum class json_errc
-    {
+    enum class json_errc {
         success = 0,
         unexpected_eof = 1,
         source_error,
@@ -48,17 +47,14 @@ namespace turbo {
     };
 
     class json_error_category_impl
-       : public std::error_category
-    {
+            : public std::error_category {
     public:
-        const char* name() const noexcept override
-        {
+        const char *name() const noexcept override {
             return "jsoncons/json";
         }
-        std::string message(int ev) const override
-        {
-            switch (static_cast<json_errc>(ev))
-            {
+
+        std::string message(int ev) const override {
+            switch (static_cast<json_errc>(ev)) {
                 case json_errc::unexpected_eof:
                     return "Unexpected end of file";
                 case json_errc::source_error:
@@ -121,36 +117,28 @@ namespace turbo {
                     return "Illegal unicode character";
                 default:
                     return "Unknown JSON parser error";
-                }
+            }
         }
     };
 
     inline
-    const std::error_category& json_error_category()
-    {
-      static json_error_category_impl instance;
-      return instance;
+    const std::error_category &json_error_category() {
+        static json_error_category_impl instance;
+        return instance;
     }
 
-    inline 
-    std::error_code make_error_code(json_errc result)
-    {
-        return std::error_code(static_cast<int>(result),json_error_category());
+    inline
+    std::error_code make_error_code(json_errc result) {
+        return std::error_code(static_cast<int>(result), json_error_category());
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use json_errc") typedef json_errc json_parser_errc;
-
-JSONCONS_DEPRECATED_MSG("Instead, use json_errc") typedef json_errc json_parse_errc;
-#endif
 
 } // jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<turbo::json_errc> : public true_type
-    {
+    struct is_error_code_enum<turbo::json_errc> : public true_type {
     };
 }
 
-#endif
+#endif  // TURBO_JSONCONS_JSON_ERROR_H_

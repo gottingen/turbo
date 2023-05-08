@@ -1602,10 +1602,6 @@ private:
 
 using bigint = basic_bigint<std::allocator<uint8_t>>;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use bigint") typedef bigint bignum;
-#endif
-
 }
 
 
