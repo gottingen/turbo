@@ -68,9 +68,6 @@ set(unit_tests_src
         corelib/byte_string_tests.cc
         corelib/value_converter_tests.cc
         corelib/decode_traits_tests.cc
-        corelib/detail/optional_tests.cc
-        corelib/detail/span_tests.cc
-        corelib/detail/string_view_tests.cc
         corelib/detail/string_wrapper_tests.cc
         corelib/detail/to_integer_tests.cc
         corelib/double_round_trip_tests.cc

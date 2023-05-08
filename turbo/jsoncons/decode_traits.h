@@ -296,7 +296,7 @@ namespace turbo {
             return true;
         }
 
-        bool visit_typed_array(const turbo::span<const value_type>& data,
+        bool visit_typed_array(const turbo::Span<const value_type>& data,
                             semantic_tag,
                             const ser_context&,
                             std::error_code&) override

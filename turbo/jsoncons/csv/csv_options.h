@@ -519,14 +519,6 @@ namespace turbo::csv {
                                                                 : csv_mapping_kind::n_rows);
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        csv_mapping_kind mapping() const {
-            return mapping_kind();
-        }
-
-#endif
-
         std::size_t max_lines() const {
             return max_lines_;
         }
@@ -622,7 +614,7 @@ namespace turbo::csv {
         using basic_csv_decode_options<CharT>::infer_types;
         using basic_csv_decode_options<CharT>::lossless_number;
         using basic_csv_decode_options<CharT>::comment_starter;
-        using basic_csv_decode_options<CharT>::mapping;
+        using basic_csv_decode_options<CharT>::mapping_kind;
         using basic_csv_decode_options<CharT>::max_lines;
         using basic_csv_decode_options<CharT>::column_types;
         using basic_csv_decode_options<CharT>::column_defaults;
@@ -772,12 +764,10 @@ namespace turbo::csv {
             return *this;
         }
 
-//#if !defined(JSONCONS_NO_DEPRECATED)
         basic_csv_options &mapping(csv_mapping_kind value) {
             this->mapping_ = value;
             return *this;
         }
-//#endif
 
         basic_csv_options &mapping_kind(csv_mapping_kind value) {
             this->mapping_ = value;

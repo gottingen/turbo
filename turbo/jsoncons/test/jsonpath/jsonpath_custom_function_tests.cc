@@ -35,7 +35,7 @@ TEST_CASE("jsonpath custom function test")
     jsonpath::custom_functions<json> functions;
     functions.register_function("divide", // function name
          2,        // number of arguments   
-         [](turbo::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json
+         [](turbo::Span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json
          {
             if (!(params[0].value().is_number() && params[1].value().is_number())) 
             {

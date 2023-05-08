@@ -760,7 +760,7 @@ namespace {
         {
             this->register_function("divide", // function name
                  2,                           // number of arguments   
-                 [](turbo::span<const jsonpath::parameter<Json>> params,
+                 [](turbo::Span<const jsonpath::parameter<Json>> params,
                     std::error_code& ec) -> Json 
                  {
                    const Json& arg0 = params[0].value();    

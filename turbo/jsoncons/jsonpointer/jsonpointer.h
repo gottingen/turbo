@@ -1125,9 +1125,6 @@ namespace turbo {
 
         enum class unflatten_options {
             none, assume_object = 1
-#if !defined(JSONCONS_NO_DEPRECATED)
-            , object = assume_object
-#endif
         };
 
         template<class Json>

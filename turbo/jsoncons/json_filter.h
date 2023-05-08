@@ -132,56 +132,56 @@ namespace turbo {
             return destination_->null_value(tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint8_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint8_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint16_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint16_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint32_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint32_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint64_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint64_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int8_t> &s,
+        bool visit_typed_array(const turbo::Span<const int8_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int16_t> &s,
+        bool visit_typed_array(const turbo::Span<const int16_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int32_t> &s,
+        bool visit_typed_array(const turbo::Span<const int32_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int64_t> &s,
+        bool visit_typed_array(const turbo::Span<const int64_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
@@ -189,28 +189,28 @@ namespace turbo {
         }
 
         bool visit_typed_array(half_arg_t,
-                               const turbo::span<const uint16_t> &s,
+                               const turbo::Span<const uint16_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(half_arg, s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const float> &s,
+        bool visit_typed_array(const turbo::Span<const float> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const double> &s,
+        bool visit_typed_array(const turbo::Span<const double> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_begin_multi_dim(const turbo::span<const size_t> &shape,
+        bool visit_begin_multi_dim(const turbo::Span<const size_t> &shape,
                                    semantic_tag tag,
                                    const ser_context &context,
                                    std::error_code &ec) override {
@@ -354,56 +354,56 @@ namespace turbo {
             return destination_->null_value(tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint8_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint8_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint16_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint16_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint32_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint32_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const uint64_t> &s,
+        bool visit_typed_array(const turbo::Span<const uint64_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int8_t> &s,
+        bool visit_typed_array(const turbo::Span<const int8_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int16_t> &s,
+        bool visit_typed_array(const turbo::Span<const int16_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int32_t> &s,
+        bool visit_typed_array(const turbo::Span<const int32_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const int64_t> &s,
+        bool visit_typed_array(const turbo::Span<const int64_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
@@ -411,28 +411,28 @@ namespace turbo {
         }
 
         bool visit_typed_array(half_arg_t,
-                               const turbo::span<const uint16_t> &s,
+                               const turbo::Span<const uint16_t> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(half_arg, s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const float> &s,
+        bool visit_typed_array(const turbo::Span<const float> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_typed_array(const turbo::span<const double> &s,
+        bool visit_typed_array(const turbo::Span<const double> &s,
                                semantic_tag tag,
                                const ser_context &context,
                                std::error_code &ec) override {
             return destination_->typed_array(s, tag, context, ec);
         }
 
-        bool visit_begin_multi_dim(const turbo::span<const size_t> &shape,
+        bool visit_begin_multi_dim(const turbo::Span<const size_t> &shape,
                                    semantic_tag tag,
                                    const ser_context &context,
                                    std::error_code &ec) override {

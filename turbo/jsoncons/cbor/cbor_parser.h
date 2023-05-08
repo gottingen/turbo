@@ -1341,7 +1341,7 @@ namespace turbo {
                             }
                             uint8_t *data = reinterpret_cast<uint8_t *>(typed_array_.data());
                             std::size_t size = typed_array_.size();
-                            more_ = visitor.typed_array(turbo::span<const uint8_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const uint8_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1354,7 +1354,7 @@ namespace turbo {
                             }
                             uint8_t *data = reinterpret_cast<uint8_t *>(typed_array_.data());
                             std::size_t size = typed_array_.size();
-                            more_ = visitor.typed_array(turbo::span<const uint8_t>(data, size), semantic_tag::clamped,
+                            more_ = visitor.typed_array(turbo::Span<const uint8_t>(data, size), semantic_tag::clamped,
                                                         *this, ec);
                             break;
                         }
@@ -1378,7 +1378,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<uint16_t>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const uint16_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const uint16_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1401,7 +1401,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<uint32_t>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const uint32_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const uint32_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1424,7 +1424,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<uint64_t>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const uint64_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const uint64_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1437,7 +1437,7 @@ namespace turbo {
                             }
                             int8_t *data = reinterpret_cast<int8_t *>(typed_array_.data());
                             std::size_t size = typed_array_.size();
-                            more_ = visitor.typed_array(turbo::span<const int8_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const int8_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1460,7 +1460,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<int16_t>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const int16_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const int16_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1483,7 +1483,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<int32_t>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const int32_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const int32_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1506,7 +1506,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<int64_t>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const int64_t>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const int64_t>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }
@@ -1529,7 +1529,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<uint16_t>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(half_arg, turbo::span<const uint16_t>(data, size),
+                            more_ = visitor.typed_array(half_arg, turbo::Span<const uint16_t>(data, size),
                                                         semantic_tag::none, *this, ec);
                             break;
                         }
@@ -1552,7 +1552,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<float>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const float>(data, size), semantic_tag::none, *this,
+                            more_ = visitor.typed_array(turbo::Span<const float>(data, size), semantic_tag::none, *this,
                                                         ec);
                             break;
                         }
@@ -1576,7 +1576,7 @@ namespace turbo {
                                     data[i] = binary::byte_swap<double>(data[i]);
                                 }
                             }
-                            more_ = visitor.typed_array(turbo::span<const double>(data, size), semantic_tag::none,
+                            more_ = visitor.typed_array(turbo::Span<const double>(data, size), semantic_tag::none,
                                                         *this, ec);
                             break;
                         }

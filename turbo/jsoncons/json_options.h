@@ -39,9 +39,6 @@ namespace turbo {
 
     enum class bigint_chars_format : uint8_t {
         number, base10, base64, base64url
-#if !defined(JSONCONS_NO_DEPRECATED)
-        , integer = number
-#endif
     };
 
     enum class byte_string_chars_format : uint8_t {
@@ -63,14 +60,6 @@ namespace turbo {
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
     private:
-#if !defined(JSONCONS_NO_DEPRECATED)
-        bool can_read_nan_replacement_;
-        bool can_read_pos_inf_replacement_;
-        bool can_read_neg_inf_replacement_;
-        string_type nan_replacement_;
-        string_type pos_inf_replacement_;
-        string_type neg_inf_replacement_;
-#endif
 
         bool enable_nan_to_num_: 1;
         bool enable_inf_to_num_: 1;
@@ -92,22 +81,16 @@ namespace turbo {
 
     protected:
         basic_json_options_common()
-                :
-#if !defined(JSONCONS_NO_DEPRECATED)
-                can_read_nan_replacement_(false),
-                can_read_pos_inf_replacement_(false),
-                can_read_neg_inf_replacement_(false),
-#endif
-                enable_nan_to_num_(false),
-                enable_inf_to_num_(false),
-                enable_neginf_to_num_(false),
-                enable_nan_to_str_(false),
-                enable_inf_to_str_(false),
-                enable_neginf_to_str_(false),
-                enable_str_to_nan_(false),
-                enable_str_to_inf_(false),
-                enable_str_to_neginf_(false),
-                max_nesting_depth_(1024) {}
+                : enable_nan_to_num_(false),
+                  enable_inf_to_num_(false),
+                  enable_neginf_to_num_(false),
+                  enable_nan_to_str_(false),
+                  enable_inf_to_str_(false),
+                  enable_neginf_to_str_(false),
+                  enable_str_to_nan_(false),
+                  enable_str_to_inf_(false),
+                  enable_str_to_neginf_(false),
+                  max_nesting_depth_(1024) {}
 
         virtual ~basic_json_options_common() noexcept = default;
 
@@ -160,14 +143,7 @@ namespace turbo {
         string_type nan_to_num() const {
             if (enable_nan_to_num_) {
                 return nan_to_num_;
-            }
-#if !defined(JSONCONS_NO_DEPRECATED)
-            else if (!can_read_nan_replacement_) // not string
-            {
-                return nan_replacement_;
-            }
-#endif
-            else {
+            } else {
                 return nan_to_num_; // empty string
             }
         }
@@ -175,14 +151,7 @@ namespace turbo {
         string_type inf_to_num() const {
             if (enable_inf_to_num_) {
                 return inf_to_num_;
-            }
-#if !defined(JSONCONS_NO_DEPRECATED)
-            else if (!can_read_pos_inf_replacement_) // not string
-            {
-                return pos_inf_replacement_;
-            }
-#endif
-            else {
+            } else {
                 return inf_to_num_; // empty string
             }
         }
@@ -195,14 +164,7 @@ namespace turbo {
                 s.push_back('-');
                 s.append(inf_to_num_);
                 return s;
-            }
-#if !defined(JSONCONS_NO_DEPRECATED)
-            else if (!can_read_neg_inf_replacement_) // not string
-            {
-                return neg_inf_replacement_;
-            }
-#endif
-            else {
+            } else {
                 return neginf_to_num_; // empty string
             }
         }
@@ -210,14 +172,7 @@ namespace turbo {
         string_type nan_to_str() const {
             if (enable_nan_to_str_) {
                 return nan_to_str_;
-            }
-#if !defined(JSONCONS_NO_DEPRECATED)
-            else if (can_read_nan_replacement_ && nan_replacement_.size() >= 2) // string
-            {
-                return nan_replacement_.substr(1, nan_replacement_.size() - 2); // Remove quotes
-            }
-#endif
-            else {
+            } else {
                 return nan_to_str_; // empty string
             }
         }
@@ -225,14 +180,7 @@ namespace turbo {
         string_type inf_to_str() const {
             if (enable_inf_to_str_) {
                 return inf_to_str_;
-            }
-#if !defined(JSONCONS_NO_DEPRECATED)
-            else if (can_read_pos_inf_replacement_ && pos_inf_replacement_.size() >= 2) // string
-            {
-                return pos_inf_replacement_.substr(1, pos_inf_replacement_.size() - 2); // Strip quotes
-            }
-#endif
-            else {
+            } else {
                 return inf_to_str_; // empty string
             }
         }
@@ -245,14 +193,7 @@ namespace turbo {
                 s.push_back('-');
                 s.append(inf_to_str_);
                 return s;
-            }
-#if !defined(JSONCONS_NO_DEPRECATED)
-            else if (can_read_neg_inf_replacement_ && neg_inf_replacement_.size() >= 2) // string
-            {
-                return neg_inf_replacement_.substr(1, neg_inf_replacement_.size() - 2); // Strip quotes
-            }
-#endif
-            else {
+            } else {
                 return neginf_to_str_; // empty string
             }
         }

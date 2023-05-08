@@ -21,36 +21,16 @@
 #include <limits>
 #include "turbo/jsoncons/config/compiler_support.h"
 #include "turbo/jsoncons/config/binary_config.h"
+#include "turbo/strings/string_view.h"
+#include "turbo/meta/span.h"
 
-#if !defined(JSONCONS_HAS_STD_STRING_VIEW)
-#include "turbo/jsoncons/detail/string_view.h"
-namespace turbo {
-using turbo::detail::basic_string_view;
-using string_view = basic_string_view<char, std::char_traits<char>>;
-using wstring_view = basic_string_view<wchar_t, std::char_traits<wchar_t>>;
-}
-#else 
-#include <string_view>
 namespace turbo {
 using std::basic_string_view;
 using std::string_view;
 using std::wstring_view;
 }
-#endif
 
 #include <optional>
-
-#if !defined(JSONCONS_HAS_STD_SPAN)
-#include "turbo/jsoncons/detail/span.h"
-namespace turbo {
-using turbo::detail::span;
-}
-#else 
-#include <span>
-namespace turbo {
-using std::span;
-}
-#endif
 
 #if !defined(JSONCONS_HAS_STD_ENDIAN)
 #include "turbo/jsoncons/detail/endian.h"

@@ -21,6 +21,8 @@
 #include <initializer_list> // std::initializer_list
 #include <type_traits> // std::enable_if
 #include "turbo/jsoncons/config/jsoncons_config.h"
+#include "turbo/jsoncons/traits_extension.h"
+#include "turbo/jsoncons/traits_extension.h"
 
 namespace turbo {
 

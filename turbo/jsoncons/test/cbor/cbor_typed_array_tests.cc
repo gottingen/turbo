@@ -4,6 +4,7 @@
 #if defined(_MSC_VER)
 #include "windows.h"
 #endif
+
 #include "turbo/jsoncons/json.h"
 #include "turbo/jsoncons/cbor/cbor.h"
 #include <sstream>
@@ -15,43 +16,36 @@
 
 using namespace turbo;
 
-static void check_native(std::true_type, 
-                         const std::vector<uint8_t>& u,
-                         const std::vector<uint8_t>& v)
-{
-    if (u != v)
-    {
-        for (auto c : u)
-        {
-            std::cout << std::hex  << std::setw(2) << std::setfill('0') << (int)c << " ";
+static void check_native(std::true_type,
+                         const std::vector<uint8_t> &u,
+                         const std::vector<uint8_t> &v) {
+    if (u != v) {
+        for (auto c: u) {
+            std::cout << std::hex << std::setw(2) << std::setfill('0') << (int) c << " ";
         }
         std::cout << "\n";
-        for (auto c : v)
-        {
-            std::cout << std::hex  << std::setw(2) << std::setfill('0') << (int)c << " ";
+        for (auto c: v) {
+            std::cout << std::hex << std::setw(2) << std::setfill('0') << (int) c << " ";
         }
         std::cout << "\n\n";
     }
     CHECK((u == v));
 }
 
-static void check_native(std::false_type, 
-                         const std::vector<uint8_t>&,
-                         const std::vector<uint8_t>&)
-{
+static void check_native(std::false_type,
+                         const std::vector<uint8_t> &,
+                         const std::vector<uint8_t> &) {
 }
 
-struct my_cbor_visitor : public default_json_visitor
-{
+struct my_cbor_visitor : public default_json_visitor {
     std::vector<double> v;
 private:
-    bool visit_typed_array(const span<const double>& data,  
-                        semantic_tag,
-                        const ser_context&,
-                        std::error_code&) override
-    {
+    bool visit_typed_array(const turbo::Span<const double> &data,
+                           semantic_tag,
+                           const ser_context &,
+                           std::error_code &) override {
         //std::cout << "visit_typed_array size: " << data.size() << "\n";
-        v = std::vector<double>(data.begin(),data.end());
+        v = std::vector<double>(data.begin(), data.end());
         return false;
     }
 };
@@ -63,12 +57,11 @@ TEST_CASE("cbor multi dim row major cursor tests")
         //std::cout << "CBOR multi dim typed array Tag 86, float64, little endian" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8,0x28,0x82,0x82,0x02,0x03,0x86,0x02,0x04,0x08,0x04,0x10,0x19,0x01,0x00
+                0xd8, 0x28, 0x82, 0x82, 0x02, 0x03, 0x86, 0x02, 0x04, 0x08, 0x04, 0x10, 0x19, 0x01, 0x00
         };
 
         cbor::cbor_bytes_cursor cursor(input);
-        for (; !cursor.done(); cursor.next())
-        {
+        for (; !cursor.done(); cursor.next()) {
             //const auto& event = cursor.current();
             //std::cout << event.event_type() << " " << event.tag() << "\n";
         }
@@ -82,11 +75,11 @@ TEST_CASE("cbor typed array cursor tests")
         //std::cout << "CBOR cursor typed array Tag 86, float64, little endian" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x56, // Tag 86, float64, little endian, Typed Array
-            0x50, // Byte string value of length 16
-                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0xff,
-                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
+                0x50, // Byte string value of length 16
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xef, 0xff,
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xef, 0x7f
         };
 
         cbor::cbor_bytes_cursor cursor(input);
@@ -111,10 +104,10 @@ TEST_CASE("cbor typed array tests")
         //std::cout << (int)detail::endian::native << "\n";
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x40, // Tag 64, uint8, Typed Array
-            0x43, // Byte string value of length 3
-                0x00,0x01,0xff
+                0x43, // Byte string value of length 3
+                0x00, 0x01, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -136,10 +129,10 @@ TEST_CASE("cbor typed array tests")
     SECTION("Tags 65 (uint16, big endian)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x41, // Tag 65, uint16, big endian, Typed Array
-            0x46, // Byte string value of length 6
-                0x00,0x00,0x00,0x01,0xff,0xff
+                0x46, // Byte string value of length 6
+                0x00, 0x00, 0x00, 0x01, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -155,18 +148,17 @@ TEST_CASE("cbor typed array tests")
         cbor::cbor_options options;
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
-        check_native(std::integral_constant<bool,turbo::endian::native == turbo::endian::big>(),
+        check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
                      input, v);
-    }
-    SECTION("Tag 66 (uint32, big endian)")
+    }SECTION("Tag 66 (uint32, big endian)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x42, // Tag 66, uint32, big endian, Typed Array
-            0x4c, // Byte string value of length 12
-                0x00,0x00,0x00,0x00,
-                0x00,0x00,0x00,0x01,
-                0xff,0xff,0xff,0xff
+                0x4c, // Byte string value of length 12
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x01,
+                0xff, 0xff, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -183,18 +175,18 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
-            input, v);
+                     input, v);
     }
 
     SECTION("Tags 67 (uint64,big endian)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x43, // Tag 67, uint64, big endian, Typed Array
-            0x58,0x18, // Byte string value of length 24
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,
-                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+                0x58, 0x18, // Byte string value of length 24
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -211,16 +203,16 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
-            input, v);
+                     input, v);
     }
 
     SECTION("Tag 68 (uint8, Typed Array, clamped arithmetic)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x44, // Tag 68, uint8, Typed Array, clamped arithmetic
-            0x43, // Byte string value of length 3
-                0x00,0x01,0xff
+                0x43, // Byte string value of length 3
+                0x00, 0x01, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -244,10 +236,10 @@ TEST_CASE("cbor typed array tests")
         //std::cout << "CBOR typed array Tags 69 (uint16, little endian)" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x45, // Tag 69, uint16, little endian, Typed Array
-            0x46, // Byte string value of length 6
-                0x00,0x00,0x01,0x00,0xff,0xff
+                0x46, // Byte string value of length 6
+                0x00, 0x00, 0x01, 0x00, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -281,7 +273,7 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
+                     input, buf);
     }
 
     SECTION("Tags 70 (uint32, little endian)")
@@ -289,12 +281,12 @@ TEST_CASE("cbor typed array tests")
         //std::cout << "CBOR typed array Tags 70 (uint32, little endian)" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x46, // Tag 70, uint32, little endian, Typed Array
-            0x4c, // Byte string value of length 12
-                0x00,0x00,0x00,0x00,
-                0x01,0x00,0x00,0x00,
-                0xff,0xff,0xff,0xff
+                0x4c, // Byte string value of length 12
+                0x00, 0x00, 0x00, 0x00,
+                0x01, 0x00, 0x00, 0x00,
+                0xff, 0xff, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -322,19 +314,18 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
-    }
-    SECTION("Tag 71 (uint64,little endian)")
+                     input, buf);
+    }SECTION("Tag 71 (uint64,little endian)")
     {
         //std::cout << "CBOR typed array Tag 71 (uint64,little endian)" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x47, // Tag 71, uint64, little endian, Typed Array
-            0x58,0x18, // Byte string value of length 24
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+                0x58, 0x18, // Byte string value of length 24
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -356,15 +347,14 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
-    }
-    SECTION("Tag 72 (int8)")
+                     input, buf);
+    }SECTION("Tag 72 (int8)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x48, // Tag 72, sint8, Typed Array
-            0x43, // Byte string value of length 3
-                0x80,0x01,0x7f
+                0x43, // Byte string value of length 3
+                0x80, 0x01, 0x7f
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -382,17 +372,16 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
-    }
-    SECTION("Tag 73 (int16, big endian)")
+                     input, buf);
+    }SECTION("Tag 73 (int16, big endian)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x49, // Tag 73, sint16, big endian, Typed Array
-            0x46, // Byte string value of length 6
-                0x80,0x00,
-                0x00,0x01,
-                0x7f,0xff        
+                0x46, // Byte string value of length 6
+                0x80, 0x00,
+                0x00, 0x01,
+                0x7f, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -426,18 +415,18 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
-            input, buf);
+                     input, buf);
     }
 
     SECTION("Tag 74 (int32, big endian)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x4a, // Tag 74, sint32, big endian, Typed Array
-            0x4c, // Byte string value of length 12
-            0x80,0x00,0x00,0x00,
-            0x00,0x00,0x00,0x01,
-            0x7f,0xff,0xff,0xff
+                0x4c, // Byte string value of length 12
+                0x80, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x01,
+                0x7f, 0xff, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -465,17 +454,16 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
-            input, buf);
-    }
-    SECTION("Tag 75 (int64,big endian)")
+                     input, buf);
+    }SECTION("Tag 75 (int64,big endian)")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x4b, // Tag 75, sint64, big endian, Typed Array
-            0x58,0x18, // Byte string value of length 24
-                0x80,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
-                0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,
-                0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+                0x58, 0x18, // Byte string value of length 24
+                0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+                0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1,
+                0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -497,19 +485,18 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
-            input, buf);
-    }
-    SECTION("Tag 77 (int16, little endian)")
+                     input, buf);
+    }SECTION("Tag 77 (int16, little endian)")
     {
         //std::cout << "CBOR typed array Tag 77 (int16, little endian)" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x4d, // Tag 77, sint16, little endian, Typed Array
-            0x46, // Byte string value of length 6
-                0x00,0x80,
-                0x01,0x00,
-                0xff,0x7f
+                0x46, // Byte string value of length 6
+                0x00, 0x80,
+                0x01, 0x00,
+                0xff, 0x7f
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -543,19 +530,18 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
-    }
-    SECTION("Tags 78 (int32, little endian)")
+                     input, buf);
+    }SECTION("Tags 78 (int32, little endian)")
     {
         //std::cout << "CBOR typed array Tags 78 (int32, little endian)" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x4e, // Tag 78, sint32, little endian, Typed Array
-            0x4c, // Byte string value of length 12
-                0x00,0x00,0x00,0x80,
-                0x01,0x00,0x00,0x00,
-                0xff,0xff,0xff,0x7f
+                0x4c, // Byte string value of length 12
+                0x00, 0x00, 0x00, 0x80,
+                0x01, 0x00, 0x00, 0x00,
+                0xff, 0xff, 0xff, 0x7f
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -583,7 +569,7 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
+                     input, buf);
     }
 
     SECTION("Tag 79 (int64,little endian)")
@@ -591,12 +577,12 @@ TEST_CASE("cbor typed array tests")
         //std::cout << "CBOR typed array Tag 79 (int64,little endian)" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x4f, // Tag 79, sint64, little endian, Typed Array
-            0x58,0x18, // Byte string value of length 24
-                0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x80,
-                0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
-                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x7f
+                0x58, 0x18, // Byte string value of length 24
+                0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80,
+                0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -618,19 +604,19 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
+                     input, buf);
     }
 
     SECTION("Tag 80, float16, big endian")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x50, // Tag 80, float16, big endian, Typed Array
-            0x48, // Byte string value of length 8
-                0x00,0x01,
-                0x03,0xff,
-                0x04,0x00,
-                0x7b,0xff
+                0x48, // Byte string value of length 8
+                0x00, 0x01,
+                0x03, 0xff,
+                0x04, 0x00,
+                0x7b, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -646,11 +632,11 @@ TEST_CASE("cbor typed array tests")
     SECTION("Tag 81, float32, big endian")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x51, // Tag 81, float32, big endian, Typed Array
-            0x48, // Byte string value of length 8
-                0xff,0x7f,0xff,0xff,
-                0x7f,0x7f,0xff,0xff
+                0x48, // Byte string value of length 8
+                0xff, 0x7f, 0xff, 0xff,
+                0x7f, 0x7f, 0xff, 0xff
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -667,15 +653,15 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
-            input, buf);
+                     input, buf);
     }
 
     SECTION("Tag 82, float64, big endian")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x52, // Tag 82, float64, big endian, Typed Array
-            0x50, // Byte string value of length 16
+                0x50, // Byte string value of length 16
                 0xff, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
                 0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
         };
@@ -691,19 +677,19 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::big>(),
-            input, buf);
+                     input, buf);
     }
 
     SECTION("Tag 83, float128, big endian")
     {
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x53, // Tag 83, float128, big endian, Typed Array
-            0x58,0x40, // Byte string value of length 64
-                0xff,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-                0x7f,0xfe,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-                0xbf,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x3f,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+                0x58, 0x40, // Byte string value of length 64
+                0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+                0x7f, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+                0xbf, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x3f, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
         //json j = cbor::decode_cbor<json>(input);
@@ -719,13 +705,13 @@ TEST_CASE("cbor typed array tests")
         //std::cout << "CBOR typed array Tag 84, float16, little endian" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x54, // Tag 84, float16, little endian, Typed Array
-            0x48, // Byte string value of length 8
-                0x01,0x00,
-                0xff,0x03,
-                0x00,0x04,
-                0xff,0x7b
+                0x48, // Byte string value of length 8
+                0x01, 0x00,
+                0xff, 0x03,
+                0x00, 0x04,
+                0xff, 0x7b
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -736,17 +722,16 @@ TEST_CASE("cbor typed array tests")
         CHECK(j[1].as<float>() == Approx(0.000060976).epsilon(0.00001));
         CHECK(j[2].as<float>() == Approx(0.000061035).epsilon(0.00001));
         CHECK(j[3].as<float>() == 65504);
-    }
-    SECTION("Tag 85, float32, little endian")
+    }SECTION("Tag 85, float32, little endian")
     {
         //std::cout << "CBOR typed array Tag 85, float32, little endian" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x55, // Tag 85, float64, little endian, Typed Array
-            0x48, // Byte string value of length 8
-                0xff,0xff,0x7f,0xff,
-                0xff,0xff,0x7f,0x7f 
+                0x48, // Byte string value of length 8
+                0xff, 0xff, 0x7f, 0xff,
+                0xff, 0xff, 0x7f, 0x7f
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -766,18 +751,17 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
-    }
-    SECTION("Tag 86, float64, little endian")
+                     input, buf);
+    }SECTION("Tag 86, float64, little endian")
     {
         //std::cout << "CBOR typed array Tag 86, float64, little endian" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x56, // Tag 86, float64, little endian, Typed Array
-            0x50, // Byte string value of length 16
-                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0xff,
-                0xff,0xff,0xff,0xff,0xff,0xff,0xef,0x7f
+                0x50, // Byte string value of length 16
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xef, 0xff,
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xef, 0x7f
         };
 
         json j = cbor::decode_cbor<json>(input);
@@ -797,7 +781,7 @@ TEST_CASE("cbor typed array tests")
         options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, turbo::endian::native == turbo::endian::little>(),
-            input, buf);
+                     input, buf);
     }
 
     SECTION("Tag 87, float128, little endian")
@@ -805,13 +789,13 @@ TEST_CASE("cbor typed array tests")
         //std::cout << "CBOR typed array Tag 87, float128, little endian" << std::endl;
 
         const std::vector<uint8_t> input = {
-            0xd8, // Tag
+                0xd8, // Tag
                 0x57, // Tag 87, float128, little endian, Typed Array
-            0x58,0x40, // Byte string value of length 64
-                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0xff,
-                0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe,0x7f,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xbf,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0x3f 
+                0x58, 0x40, // Byte string value of length 64
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff,
+                0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0x7f,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xbf,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x3f
         };
 
         //json j = cbor::decode_cbor<json>(input);

@@ -21,7 +21,6 @@
 #include "turbo/jsoncons/encode_json.h"
 #include "turbo/jsoncons/decode_json.h"
 #include "turbo/jsoncons/json_traits_macros.h"
-#include "turbo/jsoncons/json_traits_macros_deprecated.h"
 #include "turbo/jsoncons/staj_iterator.h"
 
 #endif

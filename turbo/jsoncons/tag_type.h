@@ -90,14 +90,6 @@ namespace turbo {
         id = 0x12,
         regex = 0x13,
         code = 0x14
-#if !defined(JSONCONS_NO_DEPRECATED)
-        ,
-        big_integer = bigint,
-        big_decimal = bigdec,
-        big_float = bigfloat,
-        date_time = datetime,
-        timestamp = epoch_second
-#endif
     };
 
     template<class CharT>

@@ -68,7 +68,7 @@ class my_json_visitor : public default_json_visitor
         return true;
     }
 
-    bool visit_typed_array(const span<const uint16_t>& s, 
+    bool visit_typed_array(const turbo::Span<const uint16_t>& s, 
                                 semantic_tag tag, 
                                 const ser_context&, 
                                 std::error_code&) override  
@@ -82,7 +82,7 @@ class my_json_visitor : public default_json_visitor
         return true;
     }
 
-    bool visit_typed_array(half_arg_t, const span<const uint16_t>& s,
+    bool visit_typed_array(half_arg_t, const turbo::Span<const uint16_t>& s,
         semantic_tag tag,
         const ser_context&,
         std::error_code&) override

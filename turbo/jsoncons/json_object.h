@@ -113,15 +113,15 @@ namespace turbo {
                                      std::tuple<U2...>
                                      b) noexcept(noexcept(key_value(std::declval<std::tuple<U1...> &>(),
                                                                     std::declval<std::tuple<U2...> &>(),
-                                                                    turbo::traits_extension::index_sequence_for<U1...>(),
-                                                                    turbo::traits_extension::index_sequence_for<U2...>())))
-                : key_value(a, b, turbo::traits_extension::index_sequence_for<U1...>(),
-                            turbo::traits_extension::index_sequence_for<U2...>()) {
+                                                                    std::index_sequence_for<U1...>(),
+                                                                    std::index_sequence_for<U2...>())))
+                : key_value(a, b, std::index_sequence_for<U1...>(),
+                            std::index_sequence_for<U2...>()) {
         }
 
         template<typename... U1, size_t... I1, typename... U2, size_t... I2>
-        key_value(std::tuple<U1...> &a, std::tuple<U2...> &b, turbo::traits_extension::index_sequence<I1...> /*unused*/,
-                  turbo::traits_extension::index_sequence<I2...> /*unused*/) noexcept(
+        key_value(std::tuple<U1...> &a, std::tuple<U2...> &b, std::index_sequence<I1...> /*unused*/,
+                  std::index_sequence<I2...> /*unused*/) noexcept(
         noexcept(KeyT(std::forward<U1>(std::get<I1>(
                 std::declval<std::tuple<
                         U1...> &>()))...)) && noexcept(ValueT(std::

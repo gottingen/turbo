@@ -28,44 +28,6 @@
 #define JSONCONS_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
 
-// Deprecated symbols markup
-#if (defined(__cplusplus) && __cplusplus >= 201402L)
-#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
-#endif
-
-#if !defined(JSONCONS_DEPRECATED_MSG) && defined(__GNUC__) && defined(__has_extension)
-#if __has_extension(attribute_deprecated_with_message)
-#define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
-#endif
-#endif
-
-#if !defined(JSONCONS_DEPRECATED_MSG) && defined(_MSC_VER)
-#if (_MSC_VER) >= 1920
-#define JSONCONS_DEPRECATED_MSG(msg) [[deprecated(msg)]]
-#else
-#define JSONCONS_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
-#endif
-#endif
-
-// Following boost/atomic/detail/config.hpp
-#if !defined(JSONCONS_DEPRECATED_MSG) && (\
-    (defined(__GNUC__) && ((__GNUC__ + 0) * 100 + (__GNUC_MINOR__ + 0)) >= 405) ||\
-    (defined(__SUNPRO_CC) && (__SUNPRO_CC + 0) >= 0x5130))
-    #define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
-#endif
-
-#if !defined(JSONCONS_DEPRECATED_MSG) && defined(__clang__) && defined(__has_extension)
-    #if __has_extension(attribute_deprecated_with_message)
-        #define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
-    #else
-        #define JSONCONS_DEPRECATED_MSG(msg) __attribute__((deprecated))
-    #endif
-#endif
-
-#if !defined(JSONCONS_DEPRECATED_MSG)
-#define JSONCONS_DEPRECATED_MSG(msg)
-#endif
-
 #if defined(ANDROID) || defined(__ANDROID__)
 #if __ANDROID_API__ >= 21
 #define JSONCONS_HAS_STRTOLD_L
@@ -77,16 +39,6 @@
 #if defined(_MSC_VER)
 #define JSONCONS_HAS_MSC_STRTOD_L
 #define JSONCONS_HAS_FOPEN_S
-#endif
-
-#ifndef JSONCONS_HAS_CP14
-   #if defined(_MSVC_LANG)
-       #if _MSVC_LANG >= 201402L
-           #define JSONCONS_HAS_CP14
-       #endif
-   #elif __cplusplus >= 201402L
-        #define JSONCONS_HAS_CP14
-   #endif
 #endif
 
 #if defined(JSONCONS_HAS_STD_FROM_CHARS) && JSONCONS_HAS_STD_FROM_CHARS
@@ -178,89 +130,5 @@
     #define JSONCONS_CATCH(exception) if (false)
 #endif
 
-// Follows boost
 
-// gcc and clang
-#if (defined(__clang__) || defined(__GNUC__)) && defined(__cplusplus)
-#if defined(__SIZEOF_INT128__) && !defined(_MSC_VER)
-#  define JSONCONS_HAS_INT128
-#endif
-
-#if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
-#if defined(__clang_major__) && (__clang_major__ >= 4) && defined(__has_include)
-#if __has_include(<quadmath.h>)
-#  define JSONCONS_HAS_FLOAT128
-#endif
-#endif
-#endif
-#endif
-
-#if defined(__GNUC__)
-#if defined(_GLIBCXX_USE_FLOAT128)
-# define JSONCONS_HAS_FLOAT128
-#endif
-#endif
-
-#if defined(__clang__)
-#if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
-#if (__clang_major__ >= 4) && defined(__has_include)
-#if __has_include(<quadmath.h>)
-#  define JSONCONS_HAS_FLOAT128
-#endif
-#endif
-#endif
-#endif
-
-// Follows boost config/detail/suffix.hpp
-#if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
-namespace turbo{
-#  ifdef __GNUC__
-   __extension__ typedef __int128 int128_type;
-   __extension__ typedef unsigned __int128 uint128_type;
-#  else
-   typedef __int128 int128_type;
-   typedef unsigned __int128 uint128_type;
-#  endif
-}
-#endif
-#if defined(JSONCONS_HAS_FLOAT128) && defined(__cplusplus)
-namespace turbo {
-#  ifdef __GNUC__
-   __extension__ typedef __float128 float128_type;
-#  else
-   typedef __float128 float128_type;
-#  endif
-}
-#endif
-/*
-namespace turbo {
-
-    class assertion_error : public std::runtime_error
-    {
-    public:
-        assertion_error(const std::string& s) noexcept
-            : std::runtime_error(s)
-        {
-        }
-        const char* what() const noexcept override
-        {
-            return std::runtime_error::what();
-        }
-    };
-
-} // namespace turbo
-
-#define JSONCONS_STR2(x)  #x
-#define JSONCONS_STR(x)  JSONCONS_STR2(x)
-
-#ifdef _DEBUG
-#define TURBO_ASSERT(x) if (!(x)) { \
-    JSONCONS_THROW(turbo::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
-            JSONCONS_STR(__LINE__))); }
-#else
-#define TURBO_ASSERT(x) if (!(x)) { \
-    JSONCONS_THROW(turbo::assertion_error("assertion '" #x "' failed at  <> :" \
-            JSONCONS_STR( 0 ))); }
-#endif // _DEBUG
-*/
 #endif // JSONCONS_COMPILER_SUPPORT_HPP

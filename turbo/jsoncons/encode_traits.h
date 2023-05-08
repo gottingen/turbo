@@ -290,7 +290,7 @@ namespace turbo {
                            const Json&,
                            std::error_code& ec)
         {
-            encoder.typed_array(turbo::span<const value_type>(val), semantic_tag::none, ser_context(), ec);
+            encoder.typed_array(turbo::Span<const value_type>(val), semantic_tag::none, ser_context(), ec);
         }
     };
 

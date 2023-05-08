@@ -602,10 +602,6 @@ namespace turbo {
         }
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    using json_reader = legacy_basic_json_reader<char>;
-    using wjson_reader = legacy_basic_json_reader<wchar_t>;
-#endif
     using json_string_reader = basic_json_reader<char, string_source<char>>;
     using wjson_string_reader = basic_json_reader<wchar_t, string_source<wchar_t>>;
     using json_stream_reader = basic_json_reader<char, stream_source<char>>;

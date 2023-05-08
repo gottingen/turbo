@@ -191,7 +191,7 @@ ojson j1 = ojson::parse(R"(
     CHECK(j3 == j1);
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
+#if (defined(__GNUC__) || defined(__clang__)) && defined(TURBO_HAVE_INTRINSIC_INT128)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 TEST_CASE("cbor json constructor __int64 tests")

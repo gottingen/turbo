@@ -64,11 +64,11 @@ namespace turbo {
             return source_.is_error();  
         }
 
-        span<const value_type> read_buffer(std::error_code& ec)
+        turbo::Span<const value_type> read_buffer(std::error_code& ec)
         {
             if (source_.eof())
             {
-                return span<const value_type>();
+                return turbo::Span<const value_type>();
             }
 
             auto s = source_.read_buffer();
@@ -81,13 +81,13 @@ namespace turbo {
                 if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                 {
                     ec = json_errc::illegal_unicode_character;
-                    return span<const value_type>();
+                    return turbo::Span<const value_type>();
                 }
                 length -= (r.ptr - data);
                 data = r.ptr;
                 bof_ = false;
             }
-            return span<const value_type>(data, length);           
+            return turbo::Span<const value_type>(data, length);           
         }
     };
 
@@ -124,11 +124,11 @@ namespace turbo {
             return source_.is_error();  
         }
 
-        span<const value_type> read_buffer(std::error_code& ec)
+        turbo::Span<const value_type> read_buffer(std::error_code& ec)
         {
             if (source_.eof())
             {
-                return span<const value_type>();
+                return turbo::Span<const value_type>();
             }
 
             auto s = source_.read_buffer();
@@ -141,14 +141,14 @@ namespace turbo {
                 if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                 {
                     ec = json_errc::illegal_unicode_character;
-                    return span<const value_type>();
+                    return turbo::Span<const value_type>();
                 }
                 length -= (r.ptr - data);
                 data = r.ptr;
                 bof_ = false;
             }
             
-            return span<const value_type>(data, length);           
+            return turbo::Span<const value_type>(data, length);           
         }
     };
 

@@ -304,10 +304,6 @@ namespace turbo {
         using const_array_iterator_type = typename ImplementationPolicy::template const_array_iterator_type<Json>;
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    using preserve_order_policy = order_preserving_policy;
-#endif
-
     template<class IteratorT, class ConstIteratorT>
     class range {
     public:
@@ -407,13 +403,6 @@ namespace turbo {
         using const_pointer = const basic_json *;
 
         using key_value_type = key_value<key_type, basic_json>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-        JSONCONS_DEPRECATED_MSG("no replacement") typedef basic_json value_type;
-        //JSONCONS_DEPRECATED_MSG("no replacement") typedef std::basic_string<char_type> string_type;
-        JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type kvp_type;
-        JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
-#endif
 
         using array = typename implementation_policy::template array<basic_json>;
 
@@ -1430,285 +1419,6 @@ namespace turbo {
                 }
                 return evaluate().template is_integer<IntegerType>();
             }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-            const basic_json &get_with_default(const string_view_type &name) const {
-                return evaluate().at_or_null(name);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use tag()")
-            semantic_tag get_semantic_tag() const {
-                return evaluate().tag();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::datetime")
-            bool is_datetime() const noexcept {
-                if (!parent_.contains(key_)) {
-                    return false;
-                }
-                return evaluate().tag() == semantic_tag::datetime;
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_second")
-            bool is_epoch_time() const noexcept {
-                if (!parent_.contains(key_)) {
-                    return false;
-                }
-                return evaluate().tag() == semantic_tag::epoch_second;
-            }
-
-            template<class T>
-            JSONCONS_DEPRECATED_MSG("Instead, use push_back(T&&)")
-            void add(T &&val) {
-                evaluate_with_default().push_back(std::forward<T>(val));
-            }
-
-            template<class T>
-            JSONCONS_DEPRECATED_MSG("Instead, use insert(const_array_iterator, T&&)")
-            array_iterator add(const_array_iterator pos, T &&val) {
-                return evaluate_with_default().insert(pos, std::forward<T>(val));
-            }
-
-            template<class T>
-            JSONCONS_DEPRECATED_MSG("Instead, use insert_or_assign(const string_view_type&, T&&)")
-            std::pair<object_iterator, bool> set(const string_view_type &name, T &&val) {
-                return evaluate().insert_or_assign(name, std::forward<T>(val));
-            }
-
-            template<class T>
-            JSONCONS_DEPRECATED_MSG("Instead, use insert_or_assign(object_iterator, const string_view_type&, T&&)")
-            object_iterator set(object_iterator hint, const string_view_type &name, T &&val) {
-                return evaluate().insert_or_assign(hint, name, std::forward<T>(val));
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-            bool has_key(const string_view_type &name) const noexcept {
-                return contains(name);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
-            bool is_ulonglong() const noexcept {
-                if (!parent_.contains(key_)) {
-                    return false;
-                }
-                return evaluate().template is<unsigned long long>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use is<long long>()")
-            bool is_longlong() const noexcept {
-                if (!parent_.contains(key_)) {
-                    return false;
-                }
-                return evaluate().template is<long long>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use as<int>()")
-            int as_int() const {
-                return evaluate().template as<int>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned int>()")
-            unsigned int as_uint() const {
-                return evaluate().template as<unsigned int>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use as<long>()")
-            long as_long() const {
-                return evaluate().template as<long>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned long>()")
-            unsigned long as_ulong() const {
-                return evaluate().template as<unsigned long>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use as<long long>()")
-            long long as_longlong() const {
-                return evaluate().template as<long long>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned long long>()")
-            unsigned long long as_ulonglong() const {
-                return evaluate().template as<unsigned long long>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use as<uint64_t>()")
-            uint64_t as_uinteger() const {
-                return evaluate().template as<uint64_t>();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
-            void write(basic_json_visitor<char_type> &visitor) const {
-                evaluate().dump(visitor);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
-            void write(std::basic_ostream<char_type> &os) const {
-                evaluate().dump(os);
-            }
-
-            JSONCONS_DEPRECATED_MSG(
-                    "Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
-            void write(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options) const {
-                evaluate().dump(os, options);
-            }
-
-            JSONCONS_DEPRECATED_MSG(
-                    "Instead, use dump_pretty(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
-            void write(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options,
-                       bool pprint) const {
-                if (pprint) {
-                    evaluate().dump_pretty(os, options);
-                } else {
-                    evaluate().dump(os, options);
-                }
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
-            void to_stream(basic_json_visitor<char_type> &visitor) const {
-                evaluate().dump(visitor);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
-            void to_stream(std::basic_ostream<char_type> &os) const {
-                evaluate().dump(os);
-            }
-
-            JSONCONS_DEPRECATED_MSG(
-                    "Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
-            void
-            to_stream(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options) const {
-                evaluate().dump(os, options);
-            }
-
-            JSONCONS_DEPRECATED_MSG(
-                    "Instead, use dump_pretty(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
-            void to_stream(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options,
-                           bool pprint) const {
-                if (pprint) {
-                    evaluate().dump_pretty(os, options);
-                } else {
-                    evaluate().dump(os, options);
-                }
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t)")
-            void resize_array(std::size_t n) {
-                evaluate().resize(n);
-            }
-
-            template<class T>
-            JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t, T)")
-            void resize_array(std::size_t n, T val) {
-                evaluate().resize(n, val);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-            range<object_iterator, const_object_iterator> members() {
-                return evaluate().object_range();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-            range<const_object_iterator, const_object_iterator> members() const {
-                return evaluate().object_range();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-            range<array_iterator, const_array_iterator> elements() {
-                return evaluate().array_range();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-            range<const_array_iterator, const_array_iterator> elements() const {
-                return evaluate().array_range();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use object_range().begin()")
-            object_iterator begin_members() {
-                return evaluate().object_range().begin();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use object_range().begin()")
-            const_object_iterator begin_members() const {
-                return evaluate().object_range().begin();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use object_range().end()")
-            object_iterator end_members() {
-                return evaluate().object_range().end();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use object_range().end()")
-            const_object_iterator end_members() const {
-                return evaluate().object_range().end();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use array_range().begin()")
-            array_iterator begin_elements() {
-                return evaluate().array_range().begin();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use array_range().begin()")
-            const_array_iterator begin_elements() const {
-                return evaluate().array_range().begin();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use array_range().end()")
-            array_iterator end_elements() {
-                return evaluate().array_range().end();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use array_range().end()")
-            const_array_iterator end_elements() const {
-                return evaluate().array_range().end();
-            }
-
-            template<class T>
-            JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&, T&&)")
-            basic_json get(const string_view_type &name, T &&default_value) const {
-                return evaluate().get_with_default(name, std::forward<T>(default_value));
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
-            const basic_json &get(const string_view_type &name) const {
-                return evaluate().at_or_null(name);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-            bool has_member(const string_view_type &name) const noexcept {
-                return contains(name);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
-            void remove_range(std::size_t from_index, std::size_t to_index) {
-                evaluate().remove_range(from_index, to_index);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use erase(const string_view_type& name)")
-            void remove(const string_view_type &name) {
-                evaluate().remove(name);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use erase(const string_view_type& name)")
-            void remove_member(const string_view_type &name) {
-                evaluate().remove(name);
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use empty()")
-            bool is_empty() const noexcept {
-                return empty();
-            }
-
-            JSONCONS_DEPRECATED_MSG("Instead, use is_number()")
-            bool is_numeric() const noexcept {
-                if (!parent_.contains(key_)) {
-                    return false;
-                }
-                return is_number();
-            }
-
-#endif
         };
 
         using proxy_type = proxy<basic_json>;
@@ -2627,15 +2337,6 @@ namespace turbo {
             construct<empty_object_storage>(tag);
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(json_object_t,semantic_tag,const Allocator&)")
-        explicit basic_json(const Allocator &alloc, semantic_tag tag = semantic_tag::none) {
-            construct<object_storage>(object(alloc), tag);
-        }
-
-#endif
-
         basic_json(const basic_json &other) {
             Init_(other);
         }
@@ -2847,7 +2548,7 @@ namespace turbo {
                    semantic_tag tag = semantic_tag::none,
                    const Allocator &alloc = Allocator(),
                    typename std::enable_if<traits_extension::is_byte_sequence<Source>::value, int>::type = 0) {
-            auto bytes = turbo::span<const uint8_t>(reinterpret_cast<const uint8_t *>(source.data()), source.size());
+            auto bytes = turbo::Span<const uint8_t>(reinterpret_cast<const uint8_t *>(source.data()), source.size());
             construct<byte_string_storage>(tag, bytes.data(), bytes.size(), 0, alloc);
         }
 
@@ -2856,7 +2557,7 @@ namespace turbo {
                    uint64_t ext_tag,
                    const Allocator &alloc = Allocator(),
                    typename std::enable_if<traits_extension::is_byte_sequence<Source>::value, int>::type = 0) {
-            auto bytes = turbo::span<const uint8_t>(reinterpret_cast<const uint8_t *>(source.data()), source.size());
+            auto bytes = turbo::Span<const uint8_t>(reinterpret_cast<const uint8_t *>(source.data()), source.size());
             construct<byte_string_storage>(semantic_tag::ext, bytes.data(), bytes.size(), ext_tag, alloc);
         }
 
@@ -2887,7 +2588,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     return proxy_type(*this, name);
                     break;
@@ -3921,7 +3622,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value: {
                     auto result = object_value().insert_or_assign(name, std::forward<T>(val));
                     return std::make_pair(object_iterator(result.first), result.second);
@@ -3937,7 +3638,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value: {
                     auto result = object_value().try_emplace(name, std::forward<Args>(args)...);
                     return std::make_pair(object_iterator(result.first), result.second);
@@ -3954,7 +3655,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge(source.object_value());
                     break;
@@ -3969,7 +3670,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge(std::move(source.object_value()));
                     break;
@@ -3984,7 +3685,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge(hint, source.object_value());
                     break;
@@ -3999,7 +3700,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge(hint, std::move(source.object_value()));
                     break;
@@ -4016,13 +3717,13 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge_or_update(source.object_value());
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to merge or update a value that is not an object"));
+                                           "Attempting to merge or update a value that is not an object"));
                 }
             }
         }
@@ -4031,13 +3732,13 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge_or_update(std::move(source.object_value()));
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to merge or update a value that is not an object"));
+                                           "Attempting to merge or update a value that is not an object"));
                 }
             }
         }
@@ -4046,13 +3747,13 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge_or_update(hint, source.object_value());
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to merge or update a value that is not an object"));
+                                           "Attempting to merge or update a value that is not an object"));
                 }
             }
         }
@@ -4061,13 +3762,13 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     object_value().merge_or_update(hint, std::move(source.object_value()));
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to merge or update a value that is not an object"));
+                                           "Attempting to merge or update a value that is not an object"));
                 }
             }
         }
@@ -4077,7 +3778,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     return object_iterator(object_value().insert_or_assign(hint, name, std::forward<T>(val)));
                 default: {
@@ -4091,7 +3792,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     return object_iterator(object_value().try_emplace(hint, name, std::forward<Args>(args)...));
                 default: {
@@ -4108,7 +3809,7 @@ namespace turbo {
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to insert into a value that is not an array"));
+                                           "Attempting to insert into a value that is not an array"));
                 }
             }
         }
@@ -4121,7 +3822,7 @@ namespace turbo {
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to insert into a value that is not an array"));
+                                           "Attempting to insert into a value that is not an array"));
                 }
             }
         }
@@ -4135,7 +3836,7 @@ namespace turbo {
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to insert into a value that is not an object"));
+                                           "Attempting to insert into a value that is not an object"));
                 }
             }
         }
@@ -4149,7 +3850,7 @@ namespace turbo {
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to insert into a value that is not an object"));
+                                           "Attempting to insert into a value that is not an object"));
                 }
             }
         }
@@ -4162,7 +3863,7 @@ namespace turbo {
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to insert into a value that is not an array"));
+                                           "Attempting to insert into a value that is not an array"));
                 }
             }
         }
@@ -4174,7 +3875,7 @@ namespace turbo {
                     return array_value().emplace_back(std::forward<Args>(args)...);
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to insert into a value that is not an array"));
+                                           "Attempting to insert into a value that is not an array"));
                 }
             }
         }
@@ -4191,7 +3892,7 @@ namespace turbo {
                     break;
                 default: {
                     JSONCONS_THROW(json_runtime_error<std::domain_error>(
-                            "Attempting to insert into a value that is not an array"));
+                                           "Attempting to insert into a value that is not an array"));
                 }
             }
         }
@@ -4250,462 +3951,6 @@ namespace turbo {
             return s;
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use basic_json(byte_string_arg_t, const Source&, semantic_tag=semantic_tag::none,const Allocator& = Allocator())")
-        basic_json(const byte_string_view &bytes,
-                   semantic_tag tag,
-                   const Allocator &alloc = Allocator())
-                : basic_json(byte_string_arg, bytes, tag, alloc) {
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
-        const basic_json &get_with_default(const string_view_type &name) const {
-            return at_or_null(name);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&)")
-        static basic_json parse(const char_type *s, std::size_t length) {
-            parse_error_handler_type err_handler;
-            return parse(s, length, err_handler);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&, parse_error_handler)")
-        static basic_json
-        parse(const char_type *s, std::size_t length, std::function<bool(json_errc, const ser_context &)> err_handler) {
-            return parse(string_view_type(s, length), err_handler);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&)")
-        static basic_json parse_file(const std::basic_string<char_type, char_traits_type> &filename) {
-            parse_error_handler_type err_handler;
-            return parse_file(filename, err_handler);
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use parse(std::basic_istream<char_type>&, std::function<bool(json_errc,const ser_context&)>)")
-        static basic_json parse_file(const std::basic_string<char_type, char_traits_type> &filename,
-                                     std::function<bool(json_errc, const ser_context &)> err_handler) {
-            std::basic_ifstream<char_type> is(filename);
-            return parse(is, err_handler);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use parse(std::basic_istream<char_type>&)")
-        static basic_json parse_stream(std::basic_istream<char_type> &is) {
-            return parse(is);
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use parse(std::basic_istream<char_type>&, std::function<bool(json_errc,const ser_context&)>)")
-        static basic_json parse_stream(std::basic_istream<char_type> &is,
-                                       std::function<bool(json_errc, const ser_context &)> err_handler) {
-            return parse(is, err_handler);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use parse(const string_view_type&)")
-        static basic_json parse_string(const string_view_type &s) {
-            return parse(s);
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use parse(parse(const string_view_type&, std::function<bool(json_errc,const ser_context&)>)")
-        static const basic_json
-        parse_string(const string_view_type &s, std::function<bool(json_errc, const ser_context &)> err_handler) {
-            return parse(s, err_handler);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(double)")
-        basic_json(double val, uint8_t)
-                : basic_json(val, semantic_tag::none) {
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use basic_json(const byte_string_view& ,semantic_tag)")
-        basic_json(const byte_string_view &bytes,
-                   byte_string_chars_format encoding_hint,
-                   semantic_tag tag = semantic_tag::none)
-                : basic_json(bytes, tag) {
-            switch (encoding_hint) {
-                case byte_string_chars_format::base16:
-                    *this = basic_json(bytes, semantic_tag::base16);
-                    break;
-                case byte_string_chars_format::base64:
-                    *this = basic_json(bytes, semantic_tag::base64);
-                    break;
-                case byte_string_chars_format::base64url:
-                    *this = basic_json(bytes, semantic_tag::base64url);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        template<class InputIterator>
-        basic_json(InputIterator first, InputIterator last, const Allocator &alloc = Allocator())
-                : basic_json(json_array_arg, first, last, alloc) {
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
-        void dump_fragment(basic_json_visitor<char_type> &visitor) const {
-            dump(visitor);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
-        void dump_body(basic_json_visitor<char_type> &visitor) const {
-            dump(visitor);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, indenting)")
-        void dump(std::basic_ostream<char_type> &os, bool pprint) const {
-            if (pprint) {
-                basic_json_encoder<char_type> encoder(os);
-                dump(encoder);
-            } else {
-                basic_compact_json_encoder<char_type> encoder(os);
-                dump(encoder);
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
-        void dump(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options,
-                  bool pprint) const {
-            if (pprint) {
-                basic_json_encoder<char_type> encoder(os, options);
-                dump(encoder);
-            } else {
-                basic_compact_json_encoder<char_type> encoder(os, options);
-                dump(encoder);
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
-        void write_body(basic_json_visitor<char_type> &visitor) const {
-            dump(visitor);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
-        void write(basic_json_visitor<char_type> &visitor) const {
-            dump(visitor);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
-        void write(std::basic_ostream<char_type> &os) const {
-            dump(os);
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
-        void write(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options) const {
-            dump(os, options);
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
-        void write(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options,
-                   bool pprint) const {
-            dump(os, options, pprint);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
-        void to_stream(basic_json_visitor<char_type> &visitor) const {
-            dump(visitor);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
-        void to_stream(std::basic_ostream<char_type> &os) const {
-            dump(os);
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
-        void to_stream(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options) const {
-            dump(os, options);
-        }
-
-        JSONCONS_DEPRECATED_MSG(
-                "Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
-        void to_stream(std::basic_ostream<char_type> &os, const basic_json_encode_options<char_type> &options,
-                       bool pprint) const {
-            dump(os, options, pprint ? indenting::indent : indenting::no_indent);
-        }
-
-        JSONCONS_DEPRECATED_MSG("No replacement")
-        std::size_t precision() const {
-            switch (storage_kind()) {
-                case json_storage_kind::double_value:
-                    return 0;
-                default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a double"));
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("No replacement")
-        std::size_t decimal_places() const {
-            switch (storage_kind()) {
-                case json_storage_kind::double_value:
-                    return 0;
-                default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a double"));
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::datetime")
-        bool is_datetime() const noexcept {
-            return tag() == semantic_tag::datetime;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_second")
-        bool is_epoch_time() const noexcept {
-            return tag() == semantic_tag::epoch_second;
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-        bool has_key(const string_view_type &name) const noexcept {
-            return contains(name);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use as<uint64_t>()")
-        uint64_t as_uinteger() const {
-            return as<uint64_t>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("No replacement")
-        std::size_t double_precision() const {
-            switch (storage_kind()) {
-                case json_storage_kind::double_value:
-                    return 0;
-                default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a double"));
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use insert(const_array_iterator, T&&)")
-        void add(std::size_t index, const basic_json &value) {
-            evaluate_with_default().add(index, value);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use insert(const_array_iterator, T&&)")
-        void add(std::size_t index, basic_json &&value) {
-            evaluate_with_default().add(index, std::forward<basic_json>(value));
-        }
-
-        template<class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use push_back(T&&)")
-        void add(T &&val) {
-            push_back(std::forward<T>(val));
-        }
-
-        template<class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use insert(const_array_iterator, T&&)")
-        array_iterator add(const_array_iterator pos, T &&val) {
-            return insert(pos, std::forward<T>(val));
-        }
-
-        template<class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use insert_or_assign(const string_view_type&, T&&)")
-        std::pair<object_iterator, bool> set(const string_view_type &name, T &&val) {
-            return insert_or_assign(name, std::forward<T>(val));
-        }
-
-        template<class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use insert_or_assign(const string_view_type&, T&&)")
-        object_iterator set(object_iterator hint, const string_view_type &name, T &&val) {
-            return insert_or_assign(hint, name, std::forward<T>(val));
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t)")
-        void resize_array(std::size_t n) {
-            resize(n);
-        }
-
-        template<class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use resize(std::size_t, T)")
-        void resize_array(std::size_t n, T val) {
-            resize(n, val);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_range().begin()")
-        object_iterator begin_members() {
-            return object_range().begin();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_range().begin()")
-        const_object_iterator begin_members() const {
-            return object_range().begin();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_range().end()")
-        object_iterator end_members() {
-            return object_range().end();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_range().end()")
-        const_object_iterator end_members() const {
-            return object_range().end();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_range().begin()")
-        array_iterator begin_elements() {
-            return array_range().begin();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_range().begin()")
-        const_array_iterator begin_elements() const {
-            return array_range().begin();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_range().end()")
-        array_iterator end_elements() {
-            return array_range().end();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_range().end()")
-        const_array_iterator end_elements() const {
-            return array_range().end();
-        }
-
-        template<class T>
-        JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&, T&&)")
-        basic_json get(const string_view_type &name, T &&default_value) const {
-            switch (storage_kind()) {
-                case json_storage_kind::empty_object_value: {
-                    return basic_json(std::forward<T>(default_value));
-                }
-                case json_storage_kind::object_value: {
-                    auto it = object_value().find(name);
-                    if (it != object_value().end()) {
-                        return it->value();
-                    } else {
-                        return basic_json(std::forward<T>(default_value));
-                    }
-                }
-                default: {
-                    JSONCONS_THROW(not_an_object(name.data(), name.length()));
-                }
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
-        const basic_json &get(const string_view_type &name) const {
-            static const basic_json a_null = null_type();
-
-            switch (storage_kind()) {
-                case json_storage_kind::empty_object_value:
-                    return a_null;
-                case json_storage_kind::object_value: {
-                    auto it = object_value().find(name);
-                    return it != object_value().end() ? it->value() : a_null;
-                }
-                default: {
-                    JSONCONS_THROW(not_an_object(name.data(), name.length()));
-                }
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use is<long long>()")
-        bool is_longlong() const noexcept {
-            return is<long long>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
-        bool is_ulonglong() const noexcept {
-            return is<unsigned long long>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use as<long long>()")
-        long long as_longlong() const {
-            return as<long long>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned long long>()")
-        unsigned long long as_ulonglong() const {
-            return as<unsigned long long>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use as<int>()")
-        int as_int() const {
-            return as<int>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned int>()")
-        unsigned int as_uint() const {
-            return as<unsigned int>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use as<long>()")
-        long as_long() const {
-            return as<long>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned long>()")
-        unsigned long as_ulong() const {
-            return as<unsigned long>();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-        bool has_member(const string_view_type &key) const noexcept {
-            return contains(key);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
-        void remove_range(std::size_t from_index, std::size_t to_index) {
-            switch (storage_kind()) {
-                case json_storage_kind::array_value:
-                    array_value().remove_range(from_index, to_index);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use erase(const string_view_type& name)")
-        void remove(const string_view_type &name) {
-            erase(name);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use erase(const string_view_type& name)")
-        void remove_member(const string_view_type &name) {
-            erase(name);
-        }
-        // Removes a member from an object value
-
-        JSONCONS_DEPRECATED_MSG("Instead, use empty()")
-        bool is_empty() const noexcept {
-            return empty();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use is_number()")
-        bool is_numeric() const noexcept {
-            return is_number();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-        range<object_iterator, const_object_iterator> members() {
-            return object_range();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-        range<const_object_iterator, const_object_iterator> members() const {
-            return object_range();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-        range<array_iterator, const_array_iterator> elements() {
-            return array_range();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-        range<const_array_iterator, const_array_iterator> elements() const {
-            return array_range();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use storage_kind()")
-        json_storage_kind get_stor_type() const {
-            return storage_kind();
-        }
-
-#endif
 
         range<object_iterator, const_object_iterator> object_range() {
             switch (storage_kind()) {
@@ -4782,7 +4027,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     create_object_implicitly();
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     return cast<object_storage>().value();
                 default:
@@ -4795,7 +4040,7 @@ namespace turbo {
             switch (storage_kind()) {
                 case json_storage_kind::empty_object_value:
                     const_cast<basic_json *>(this)->create_object_implicitly(); // HERE
-                            TURBO_FALLTHROUGH;
+                    TURBO_FALLTHROUGH;
                 case json_storage_kind::object_value:
                     return cast<object_storage>().value();
                 case json_storage_kind::json_const_pointer:
@@ -5159,15 +4404,6 @@ namespace turbo {
     using wjson = basic_json<wchar_t, sorted_policy, std::allocator<char>>;
     using ojson = basic_json<char, order_preserving_policy, std::allocator<char>>;
     using wojson = basic_json<wchar_t, order_preserving_policy, std::allocator<char>>;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG(
-            "Instead, use wojson") typedef basic_json<wchar_t, order_preserving_policy, std::allocator<wchar_t>> owjson;
-    JSONCONS_DEPRECATED_MSG("Instead, use json_decoder<json>") typedef json_decoder<json> json_deserializer;
-    JSONCONS_DEPRECATED_MSG("Instead, use json_decoder<wjson>") typedef json_decoder<wjson> wjson_deserializer;
-    JSONCONS_DEPRECATED_MSG("Instead, use json_decoder<ojson>") typedef json_decoder<ojson> ojson_deserializer;
-    JSONCONS_DEPRECATED_MSG("Instead, use json_decoder<wojson>") typedef json_decoder<wojson> wojson_deserializer;
-#endif
 
     inline namespace literals {
 

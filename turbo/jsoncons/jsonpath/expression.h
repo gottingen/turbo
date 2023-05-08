@@ -305,7 +305,7 @@ namespace jsonpath {
         using value_type = Json;
         using char_type = typename Json::char_type;
         using parameter_type = parameter<Json>;
-        using function_type = std::function<value_type(turbo::span<const parameter_type>, std::error_code& ec)>;
+        using function_type = std::function<value_type(turbo::Span<const parameter_type>, std::error_code& ec)>;
         using string_type = typename Json::string_type;
 
         string_type function_name_;
@@ -357,7 +357,7 @@ namespace jsonpath {
         using string_type = typename Json::string_type;
         using value_type = Json;
         using parameter_type = parameter<Json>;
-        using function_type = std::function<value_type(turbo::span<const parameter_type>, std::error_code& ec)>;
+        using function_type = std::function<value_type(turbo::Span<const parameter_type>, std::error_code& ec)>;
         using const_iterator = typename std::vector<custom_function<Json>>::const_iterator;
 
         std::vector<custom_function<Json>> functions_;
@@ -1060,7 +1060,7 @@ namespace detail {
         using value_type = Json;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
-        using function_type = std::function<value_type(turbo::span<const parameter_type>, std::error_code& ec)>;
+        using function_type = std::function<value_type(turbo::Span<const parameter_type>, std::error_code& ec)>;
     private:
         function_type f_;
     public:

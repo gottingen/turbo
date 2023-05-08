@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef JSONCONS_SOURCE_HPP
-#define JSONCONS_SOURCE_HPP
+#ifndef TURBO_JSONCONS_SOURCE_H_
+#define TURBO_JSONCONS_SOURCE_H_
 
 #include <stdexcept>
 #include <string>
@@ -192,7 +192,7 @@ namespace turbo {
             }
         }
 
-        span<const value_type> read_buffer() {
+        turbo::Span<const value_type> read_buffer() {
             if (buffer_length_ == 0) {
                 fill_buffer();
             }
@@ -202,7 +202,7 @@ namespace turbo {
             position_ += buffer_length_;
             buffer_length_ = 0;
 
-            return span<const value_type>(data, length);
+            return turbo::Span<const value_type>(data, length);
         }
 
         std::size_t read(value_type *p, std::size_t length) {
@@ -334,12 +334,12 @@ namespace turbo {
             return current_ < end_ ? char_result<value_type>{*current_, false} : char_result<value_type>{0, true};
         }
 
-        span<const value_type> read_buffer() {
+        turbo::Span<const value_type> read_buffer() {
             const value_type *data = current_;
             std::size_t length = end_ - current_;
             current_ = end_;
 
-            return span<const value_type>(data, length);
+            return turbo::Span<const value_type>(data, length);
         }
 
         std::size_t read(value_type *p, std::size_t length) {
@@ -411,14 +411,14 @@ namespace turbo {
             return current_ != end_ ? char_result<value_type>{*current_, false} : char_result<value_type>{0, true};
         }
 
-        span<const value_type> read_buffer() {
+        turbo::Span<const value_type> read_buffer() {
             if (buffer_length_ == 0) {
                 buffer_length_ = read(buffer_.data(), buffer_.size());
             }
             std::size_t length = buffer_length_;
             buffer_length_ = 0;
 
-            return span<const value_type>(buffer_.data(), length);
+            return turbo::Span<const value_type>(buffer_.data(), length);
         }
 
         template<class Category = iterator_category>
@@ -516,12 +516,12 @@ namespace turbo {
             return current_ < end_ ? char_result<value_type>{*current_, false} : char_result<value_type>{0, true};
         }
 
-        span<const value_type> read_buffer() {
+        turbo::Span<const value_type> read_buffer() {
             const value_type *data = current_;
             std::size_t length = end_ - current_;
             current_ = end_;
 
-            return span<const value_type>(data, length);
+            return turbo::Span<const value_type>(data, length);
         }
 
         std::size_t read(value_type *p, std::size_t length) {
@@ -594,14 +594,14 @@ namespace turbo {
                                     : char_result<value_type>{0, true};
         }
 
-        span<const value_type> read_buffer() {
+        turbo::Span<const value_type> read_buffer() {
             if (buffer_length_ == 0) {
                 buffer_length_ = read(buffer_.data(), buffer_.size());
             }
             std::size_t length = buffer_length_;
             buffer_length_ = 0;
 
-            return span<const value_type>(buffer_.data(), length);
+            return turbo::Span<const value_type>(buffer_.data(), length);
         }
 
         template<class Category = iterator_category>
@@ -695,10 +695,7 @@ namespace turbo {
     template<class Source>
     constexpr std::size_t source_reader<Source>::max_buffer_length;
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    using bin_stream_source = binary_stream_source;
-#endif
 
 } // namespace turbo
 
-#endif
+#endif  // TURBO_JSONCONS_SOURCE_H_

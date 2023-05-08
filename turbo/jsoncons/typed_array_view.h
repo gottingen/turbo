@@ -180,70 +180,70 @@ namespace turbo {
             return size_;
         }
 
-        turbo::span<const uint8_t> data(uint8_array_arg_t) const
+        turbo::Span<const uint8_t> data(uint8_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::uint8_value);
-            return turbo::span<const uint8_t>(data_.uint8_data_, size_);
+            return turbo::Span<const uint8_t>(data_.uint8_data_, size_);
         }
 
-        turbo::span<const uint16_t> data(uint16_array_arg_t) const
+        turbo::Span<const uint16_t> data(uint16_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::uint16_value);
-            return turbo::span<const uint16_t>(data_.uint16_data_, size_);
+            return turbo::Span<const uint16_t>(data_.uint16_data_, size_);
         }
 
-        turbo::span<const uint32_t> data(uint32_array_arg_t) const
+        turbo::Span<const uint32_t> data(uint32_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::uint32_value);
-            return turbo::span<const uint32_t>(data_.uint32_data_, size_);
+            return turbo::Span<const uint32_t>(data_.uint32_data_, size_);
         }
 
-        turbo::span<const uint64_t> data(uint64_array_arg_t) const
+        turbo::Span<const uint64_t> data(uint64_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::uint64_value);
-            return turbo::span<const uint64_t>(data_.uint64_data_, size_);
+            return turbo::Span<const uint64_t>(data_.uint64_data_, size_);
         }
 
-        turbo::span<const int8_t> data(int8_array_arg_t) const
+        turbo::Span<const int8_t> data(int8_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::int8_value);
-            return turbo::span<const int8_t>(data_.int8_data_, size_);
+            return turbo::Span<const int8_t>(data_.int8_data_, size_);
         }
 
-        turbo::span<const int16_t> data(int16_array_arg_t) const
+        turbo::Span<const int16_t> data(int16_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::int16_value);
-            return turbo::span<const int16_t>(data_.int16_data_, size_);
+            return turbo::Span<const int16_t>(data_.int16_data_, size_);
         }
 
-        turbo::span<const int32_t> data(int32_array_arg_t) const
+        turbo::Span<const int32_t> data(int32_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::int32_value);
-            return turbo::span<const int32_t>(data_.int32_data_, size_);
+            return turbo::Span<const int32_t>(data_.int32_data_, size_);
         }
 
-        turbo::span<const int64_t> data(int64_array_arg_t) const
+        turbo::Span<const int64_t> data(int64_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::int64_value);
-            return turbo::span<const int64_t>(data_.int64_data_, size_);
+            return turbo::Span<const int64_t>(data_.int64_data_, size_);
         }
 
-        turbo::span<const uint16_t> data(half_array_arg_t) const
+        turbo::Span<const uint16_t> data(half_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::half_value);
-            return turbo::span<const uint16_t>(data_.uint16_data_, size_);
+            return turbo::Span<const uint16_t>(data_.uint16_data_, size_);
         }
 
-        turbo::span<const float> data(float_array_arg_t) const
+        turbo::Span<const float> data(float_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::float_value);
-            return turbo::span<const float>(data_.float_data_, size_);
+            return turbo::Span<const float>(data_.float_data_, size_);
         }
 
-        turbo::span<const double> data(double_array_arg_t) const
+        turbo::Span<const double> data(double_array_arg_t) const
         {
             TURBO_ASSERT(type_ == typed_array_type::double_value);
-            return turbo::span<const double>(data_.double_data_, size_);
+            return turbo::Span<const double>(data_.double_data_, size_);
         }
 
         friend void swap(typed_array_view& a, typed_array_view& b) noexcept
