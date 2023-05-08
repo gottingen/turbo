@@ -245,10 +245,10 @@ void MixIntoSeedMaterial(turbo::Span<const uint32_t> sequence,
   }
 }
 
-turbo::optional<uint32_t> GetSaltMaterial() {
+std::optional<uint32_t> GetSaltMaterial() {
   // Salt must be common for all generators within the same process so read it
   // only once and store in static variable.
-  static const auto salt_material = []() -> turbo::optional<uint32_t> {
+  static const auto salt_material = []() -> std::optional<uint32_t> {
     uint32_t salt_value = 0;
 
     if (random_internal::ReadSeedMaterialFromOSEntropy(

@@ -884,7 +884,7 @@ const crc_internal::CrcCordState* Cord::MaybeGetCrcCordState() const {
   return &contents_.tree()->crc()->crc_cord_state;
 }
 
-turbo::optional<uint32_t> Cord::ExpectedChecksum() const {
+std::optional<uint32_t> Cord::ExpectedChecksum() const {
   if (!contents_.is_tree() || !contents_.tree()->IsCrc()) {
     return turbo::nullopt;
   }

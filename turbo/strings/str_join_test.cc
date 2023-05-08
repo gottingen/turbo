@@ -464,12 +464,12 @@ TEST(StrJoin, Tuple) {
             turbo::StrJoin(std::make_tuple(&x, &y, &z), "-",
                           turbo::DereferenceFormatter(TestFormatter())));
   EXPECT_EQ("0x0000000a-hell-3.",
-            turbo::StrJoin(std::make_tuple(turbo::make_unique<int>(x),
-                                          turbo::make_unique<std::string>(y),
-                                          turbo::make_unique<double>(z)),
+            turbo::StrJoin(std::make_tuple(std::make_unique<int>(x),
+                                          std::make_unique<std::string>(y),
+                                          std::make_unique<double>(z)),
                           "-", turbo::DereferenceFormatter(TestFormatter())));
   EXPECT_EQ("0x0000000a-hell-3.",
-            turbo::StrJoin(std::make_tuple(turbo::make_unique<int>(x), &y, &z),
+            turbo::StrJoin(std::make_tuple(std::make_unique<int>(x), &y, &z),
                           "-", turbo::DereferenceFormatter(TestFormatter())));
 }
 

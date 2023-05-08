@@ -80,7 +80,7 @@ class CommandLineFlag {
   // Attempts to retrieve the flag value. Returns value on success,
   // turbo::nullopt otherwise.
   template <typename T>
-  turbo::optional<T> TryGet() const {
+  std::optional<T> TryGet() const {
     if (IsRetired() || !IsOfType<T>()) {
       return turbo::nullopt;
     }

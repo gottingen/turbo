@@ -132,7 +132,7 @@ void BM_Memcpy(benchmark::State& state) {
   int string_len = state.range(0);
 
   std::string source = TestString(string_len);
-  auto dest = turbo::make_unique<char[]>(string_len);
+  auto dest = std::make_unique<char[]>(string_len);
 
   for (auto s : state) {
     benchmark::DoNotOptimize(source);

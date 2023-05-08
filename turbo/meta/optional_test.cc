@@ -14,7 +14,7 @@
 
 #include "optional.h"
 
-// This test is a no-op when turbo::optional is an alias for std::optional.
+// This test is a no-op when std::optional is an alias for std::optional.
 #if !defined(TURBO_USES_STD_OPTIONAL)
 
 #include <string>
@@ -53,8 +53,8 @@ class GccIce {
 TEST(OptionalTest, InternalCompilerErrorInGcc5ToGcc10) {
   GccIce<int> instantiate_ice_with_same_type_as_optional;
   static_cast<void>(instantiate_ice_with_same_type_as_optional);
-  turbo::optional<int> val1;
-  turbo::optional<int> val2;
+  std::optional<int> val1;
+  std::optional<int> val2;
   val1 = val2;
 }
 
@@ -202,65 +202,65 @@ struct ConvertsFromInPlaceT {
 };
 
 TEST(optionalTest, DefaultConstructor) {
-  turbo::optional<int> empty;
+  std::optional<int> empty;
   EXPECT_FALSE(empty);
-  constexpr turbo::optional<int> cempty;
+  constexpr std::optional<int> cempty;
   static_assert(!cempty.has_value(), "");
   EXPECT_TRUE(
-      std::is_nothrow_default_constructible<turbo::optional<int>>::value);
+      std::is_nothrow_default_constructible<std::optional<int>>::value);
 }
 
 TEST(optionalTest, nulloptConstructor) {
-  turbo::optional<int> empty(turbo::nullopt);
+  std::optional<int> empty(turbo::nullopt);
   EXPECT_FALSE(empty);
-  constexpr turbo::optional<int> cempty{turbo::nullopt};
+  constexpr std::optional<int> cempty{turbo::nullopt};
   static_assert(!cempty.has_value(), "");
-  EXPECT_TRUE((std::is_nothrow_constructible<turbo::optional<int>,
+  EXPECT_TRUE((std::is_nothrow_constructible<std::optional<int>,
                                              turbo::nullopt_t>::value));
 }
 
 TEST(optionalTest, CopyConstructor) {
   {
-    turbo::optional<int> empty, opt42 = 42;
-    turbo::optional<int> empty_copy(empty);
+    std::optional<int> empty, opt42 = 42;
+    std::optional<int> empty_copy(empty);
     EXPECT_FALSE(empty_copy);
-    turbo::optional<int> opt42_copy(opt42);
+    std::optional<int> opt42_copy(opt42);
     EXPECT_TRUE(opt42_copy);
     EXPECT_EQ(42, *opt42_copy);
   }
   {
-    turbo::optional<const int> empty, opt42 = 42;
-    turbo::optional<const int> empty_copy(empty);
+    std::optional<const int> empty, opt42 = 42;
+    std::optional<const int> empty_copy(empty);
     EXPECT_FALSE(empty_copy);
-    turbo::optional<const int> opt42_copy(opt42);
+    std::optional<const int> opt42_copy(opt42);
     EXPECT_TRUE(opt42_copy);
     EXPECT_EQ(42, *opt42_copy);
   }
 #if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   {
-    turbo::optional<volatile int> empty, opt42 = 42;
-    turbo::optional<volatile int> empty_copy(empty);
+    std::optional<volatile int> empty, opt42 = 42;
+    std::optional<volatile int> empty_copy(empty);
     EXPECT_FALSE(empty_copy);
-    turbo::optional<volatile int> opt42_copy(opt42);
+    std::optional<volatile int> opt42_copy(opt42);
     EXPECT_TRUE(opt42_copy);
     EXPECT_EQ(42, *opt42_copy);
   }
 #endif
   // test copyablility
-  EXPECT_TRUE(std::is_copy_constructible<turbo::optional<int>>::value);
-  EXPECT_TRUE(std::is_copy_constructible<turbo::optional<Copyable>>::value);
+  EXPECT_TRUE(std::is_copy_constructible<std::optional<int>>::value);
+  EXPECT_TRUE(std::is_copy_constructible<std::optional<Copyable>>::value);
   EXPECT_FALSE(
-      std::is_copy_constructible<turbo::optional<MoveableThrow>>::value);
+      std::is_copy_constructible<std::optional<MoveableThrow>>::value);
   EXPECT_FALSE(
-      std::is_copy_constructible<turbo::optional<MoveableNoThrow>>::value);
-  EXPECT_FALSE(std::is_copy_constructible<turbo::optional<NonMovable>>::value);
+      std::is_copy_constructible<std::optional<MoveableNoThrow>>::value);
+  EXPECT_FALSE(std::is_copy_constructible<std::optional<NonMovable>>::value);
 
   EXPECT_FALSE(
-      turbo::is_trivially_copy_constructible<turbo::optional<Copyable>>::value);
+      turbo::is_trivially_copy_constructible<std::optional<Copyable>>::value);
   EXPECT_TRUE(
-      turbo::is_trivially_copy_constructible<turbo::optional<int>>::value);
+      turbo::is_trivially_copy_constructible<std::optional<int>>::value);
   EXPECT_TRUE(
-      turbo::is_trivially_copy_constructible<turbo::optional<const int>>::value);
+      turbo::is_trivially_copy_constructible<std::optional<const int>>::value);
 #if !defined(_MSC_VER) && !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   // See defect report "Trivial copy/move constructor for class with volatile
   // member" at
@@ -269,18 +269,18 @@ TEST(optionalTest, CopyConstructor) {
   // have a trivial copy constructor if the data member is trivial.
   // Also a cv-qualified scalar type should be trivially copyable.
   EXPECT_TRUE(turbo::is_trivially_copy_constructible<
-              turbo::optional<volatile int>>::value);
+              std::optional<volatile int>>::value);
 #endif  // !defined(_MSC_VER) && !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
 
   // constexpr copy constructor for trivially copyable types
   {
-    constexpr turbo::optional<int> o1;
-    constexpr turbo::optional<int> o2 = o1;
+    constexpr std::optional<int> o1;
+    constexpr std::optional<int> o2 = o1;
     static_assert(!o2, "");
   }
   {
-    constexpr turbo::optional<int> o1 = 42;
-    constexpr turbo::optional<int> o2 = o1;
+    constexpr std::optional<int> o1 = 42;
+    constexpr std::optional<int> o2 = o1;
     static_assert(o2, "");
     static_assert(*o2 == 42, "");
   }
@@ -290,44 +290,44 @@ TEST(optionalTest, CopyConstructor) {
       constexpr explicit TrivialCopyable(int i) : x(i) {}
       int x;
     };
-    constexpr turbo::optional<TrivialCopyable> o1(42);
-    constexpr turbo::optional<TrivialCopyable> o2 = o1;
+    constexpr std::optional<TrivialCopyable> o1(42);
+    constexpr std::optional<TrivialCopyable> o2 = o1;
     static_assert(o2, "");
     static_assert((*o2).x == 42, "");
 #ifndef TURBO_GLIBCXX_OPTIONAL_TRIVIALITY_BUG
     EXPECT_TRUE(turbo::is_trivially_copy_constructible<
-                turbo::optional<TrivialCopyable>>::value);
+                std::optional<TrivialCopyable>>::value);
     EXPECT_TRUE(turbo::is_trivially_copy_constructible<
-                turbo::optional<const TrivialCopyable>>::value);
+                std::optional<const TrivialCopyable>>::value);
 #endif
 #if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
     EXPECT_FALSE(std::is_copy_constructible<
-                 turbo::optional<volatile TrivialCopyable>>::value);
+                 std::optional<volatile TrivialCopyable>>::value);
 #endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   }
 }
 
 TEST(optionalTest, MoveConstructor) {
-  turbo::optional<int> empty, opt42 = 42;
-  turbo::optional<int> empty_move(std::move(empty));
+  std::optional<int> empty, opt42 = 42;
+  std::optional<int> empty_move(std::move(empty));
   EXPECT_FALSE(empty_move);
-  turbo::optional<int> opt42_move(std::move(opt42));
+  std::optional<int> opt42_move(std::move(opt42));
   EXPECT_TRUE(opt42_move);
   EXPECT_EQ(42, opt42_move);
   // test movability
-  EXPECT_TRUE(std::is_move_constructible<turbo::optional<int>>::value);
-  EXPECT_TRUE(std::is_move_constructible<turbo::optional<Copyable>>::value);
-  EXPECT_TRUE(std::is_move_constructible<turbo::optional<MoveableThrow>>::value);
+  EXPECT_TRUE(std::is_move_constructible<std::optional<int>>::value);
+  EXPECT_TRUE(std::is_move_constructible<std::optional<Copyable>>::value);
+  EXPECT_TRUE(std::is_move_constructible<std::optional<MoveableThrow>>::value);
   EXPECT_TRUE(
-      std::is_move_constructible<turbo::optional<MoveableNoThrow>>::value);
-  EXPECT_FALSE(std::is_move_constructible<turbo::optional<NonMovable>>::value);
+      std::is_move_constructible<std::optional<MoveableNoThrow>>::value);
+  EXPECT_FALSE(std::is_move_constructible<std::optional<NonMovable>>::value);
   // test noexcept
-  EXPECT_TRUE(std::is_nothrow_move_constructible<turbo::optional<int>>::value);
+  EXPECT_TRUE(std::is_nothrow_move_constructible<std::optional<int>>::value);
   EXPECT_EQ(
       turbo::default_allocator_is_nothrow::value,
-      std::is_nothrow_move_constructible<turbo::optional<MoveableThrow>>::value);
+      std::is_nothrow_move_constructible<std::optional<MoveableThrow>>::value);
   EXPECT_TRUE(std::is_nothrow_move_constructible<
-              turbo::optional<MoveableNoThrow>>::value);
+              std::optional<MoveableNoThrow>>::value);
 }
 
 TEST(optionalTest, Destructor) {
@@ -339,63 +339,63 @@ TEST(optionalTest, Destructor) {
     ~NonTrivial() {}
   };
 
-  EXPECT_TRUE(std::is_trivially_destructible<turbo::optional<int>>::value);
-  EXPECT_TRUE(std::is_trivially_destructible<turbo::optional<Trivial>>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<std::optional<int>>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<std::optional<Trivial>>::value);
   EXPECT_FALSE(
-      std::is_trivially_destructible<turbo::optional<NonTrivial>>::value);
+      std::is_trivially_destructible<std::optional<NonTrivial>>::value);
 }
 
 TEST(optionalTest, InPlaceConstructor) {
-  constexpr turbo::optional<ConstexprType> opt0{turbo::in_place_t()};
+  constexpr std::optional<ConstexprType> opt0{turbo::in_place_t()};
   static_assert(opt0, "");
   static_assert((*opt0).x == ConstexprType::kCtorDefault, "");
-  constexpr turbo::optional<ConstexprType> opt1{turbo::in_place_t(), 1};
+  constexpr std::optional<ConstexprType> opt1{turbo::in_place_t(), 1};
   static_assert(opt1, "");
   static_assert((*opt1).x == ConstexprType::kCtorInt, "");
 #ifndef TURBO_HAVE_NO_CONSTEXPR_INITIALIZER_LIST
-  constexpr turbo::optional<ConstexprType> opt2{turbo::in_place_t(), {1, 2}};
+  constexpr std::optional<ConstexprType> opt2{turbo::in_place_t(), {1, 2}};
   static_assert(opt2, "");
   static_assert((*opt2).x == ConstexprType::kCtorInitializerList, "");
 #endif
 
-  EXPECT_FALSE((std::is_constructible<turbo::optional<ConvertsFromInPlaceT>,
+  EXPECT_FALSE((std::is_constructible<std::optional<ConvertsFromInPlaceT>,
                                       turbo::in_place_t>::value));
-  EXPECT_FALSE((std::is_constructible<turbo::optional<ConvertsFromInPlaceT>,
+  EXPECT_FALSE((std::is_constructible<std::optional<ConvertsFromInPlaceT>,
                                       const turbo::in_place_t&>::value));
   EXPECT_TRUE(
-      (std::is_constructible<turbo::optional<ConvertsFromInPlaceT>,
+      (std::is_constructible<std::optional<ConvertsFromInPlaceT>,
                              turbo::in_place_t, turbo::in_place_t>::value));
 
-  EXPECT_FALSE((std::is_constructible<turbo::optional<NoDefault>,
+  EXPECT_FALSE((std::is_constructible<std::optional<NoDefault>,
                                       turbo::in_place_t>::value));
-  EXPECT_FALSE((std::is_constructible<turbo::optional<NoDefault>,
+  EXPECT_FALSE((std::is_constructible<std::optional<NoDefault>,
                                       turbo::in_place_t&&>::value));
 }
 
 // template<U=T> optional(U&&);
 TEST(optionalTest, ValueConstructor) {
-  constexpr turbo::optional<int> opt0(0);
+  constexpr std::optional<int> opt0(0);
   static_assert(opt0, "");
   static_assert(*opt0 == 0, "");
-  EXPECT_TRUE((std::is_convertible<int, turbo::optional<int>>::value));
+  EXPECT_TRUE((std::is_convertible<int, std::optional<int>>::value));
   // Copy initialization ( = "abc") won't work due to optional(optional&&)
   // is not constexpr. Use list initialization instead. This invokes
-  // turbo::optional<ConstexprType>::turbo::optional<U>(U&&), with U = const char
+  // std::optional<ConstexprType>::std::optional<U>(U&&), with U = const char
   // (&) [4], which direct-initializes the ConstexprType value held by the
   // optional via ConstexprType::ConstexprType(const char*).
-  constexpr turbo::optional<ConstexprType> opt1 = {"abc"};
+  constexpr std::optional<ConstexprType> opt1 = {"abc"};
   static_assert(opt1, "");
   static_assert(ConstexprType::kCtorConstChar == (*opt1).x, "");
   EXPECT_TRUE(
-      (std::is_convertible<const char*, turbo::optional<ConstexprType>>::value));
+      (std::is_convertible<const char*, std::optional<ConstexprType>>::value));
   // direct initialization
-  constexpr turbo::optional<ConstexprType> opt2{2};
+  constexpr std::optional<ConstexprType> opt2{2};
   static_assert(opt2, "");
   static_assert(ConstexprType::kCtorInt == (*opt2).x, "");
   EXPECT_FALSE(
-      (std::is_convertible<int, turbo::optional<ConstexprType>>::value));
+      (std::is_convertible<int, std::optional<ConstexprType>>::value));
 
-  // this invokes turbo::optional<int>::optional(int&&)
+  // this invokes std::optional<int>::optional(int&&)
   // NOTE: this has different behavior than assignment, e.g.
   // "opt3 = {};" clears the optional rather than setting the value to 0
   // According to C++17 standard N4659 [over.ics.list] 16.3.3.1.5, (9.2)- "if
@@ -409,14 +409,14 @@ TEST(optionalTest, ValueConstructor) {
 #define TURBO_GCC7_OVER_ICS_LIST_BUG 1
 #endif
 #ifndef TURBO_GCC7_OVER_ICS_LIST_BUG
-  constexpr turbo::optional<int> opt3({});
+  constexpr std::optional<int> opt3({});
   static_assert(opt3, "");
   static_assert(*opt3 == 0, "");
 #endif
 
   // this invokes the move constructor with a default constructed optional
   // because non-template function is a better match than template function.
-  turbo::optional<ConstexprType> opt4({});
+  std::optional<ConstexprType> opt4({});
   EXPECT_FALSE(opt4);
 }
 
@@ -442,17 +442,17 @@ struct ConvertFromOptional {
   ConvertFromOptional(Implicit&&)  // NOLINT(runtime/explicit)
       : implicit(true), move(true), from_optional(false) {}
   ConvertFromOptional(
-      const turbo::optional<Implicit>&)  // NOLINT(runtime/explicit)
+      const std::optional<Implicit>&)  // NOLINT(runtime/explicit)
       : implicit(true), move(false), from_optional(true) {}
-  ConvertFromOptional(turbo::optional<Implicit>&&)  // NOLINT(runtime/explicit)
+  ConvertFromOptional(std::optional<Implicit>&&)  // NOLINT(runtime/explicit)
       : implicit(true), move(true), from_optional(true) {}
   explicit ConvertFromOptional(const Explicit&)
       : implicit(false), move(false), from_optional(false) {}
   explicit ConvertFromOptional(Explicit&&)
       : implicit(false), move(true), from_optional(false) {}
-  explicit ConvertFromOptional(const turbo::optional<Explicit>&)
+  explicit ConvertFromOptional(const std::optional<Explicit>&)
       : implicit(false), move(false), from_optional(true) {}
-  explicit ConvertFromOptional(turbo::optional<Explicit>&&)
+  explicit ConvertFromOptional(std::optional<Explicit>&&)
       : implicit(false), move(true), from_optional(true) {}
 
   bool implicit;
@@ -461,83 +461,83 @@ struct ConvertFromOptional {
 };
 
 TEST(optionalTest, ConvertingConstructor) {
-  turbo::optional<Implicit> i_empty;
-  turbo::optional<Implicit> i(turbo::in_place);
-  turbo::optional<Explicit> e_empty;
-  turbo::optional<Explicit> e(turbo::in_place);
+  std::optional<Implicit> i_empty;
+  std::optional<Implicit> i(turbo::in_place);
+  std::optional<Explicit> e_empty;
+  std::optional<Explicit> e(turbo::in_place);
   {
-    // implicitly constructing turbo::optional<Convert> from
-    // turbo::optional<Implicit>
-    turbo::optional<Convert> empty = i_empty;
+    // implicitly constructing std::optional<Convert> from
+    // std::optional<Implicit>
+    std::optional<Convert> empty = i_empty;
     EXPECT_FALSE(empty);
-    turbo::optional<Convert> opt_copy = i;
+    std::optional<Convert> opt_copy = i;
     EXPECT_TRUE(opt_copy);
     EXPECT_TRUE(opt_copy->implicit);
     EXPECT_FALSE(opt_copy->move);
-    turbo::optional<Convert> opt_move = turbo::optional<Implicit>(turbo::in_place);
+    std::optional<Convert> opt_move = std::optional<Implicit>(turbo::in_place);
     EXPECT_TRUE(opt_move);
     EXPECT_TRUE(opt_move->implicit);
     EXPECT_TRUE(opt_move->move);
   }
   {
-    // explicitly constructing turbo::optional<Convert> from
-    // turbo::optional<Explicit>
-    turbo::optional<Convert> empty(e_empty);
+    // explicitly constructing std::optional<Convert> from
+    // std::optional<Explicit>
+    std::optional<Convert> empty(e_empty);
     EXPECT_FALSE(empty);
-    turbo::optional<Convert> opt_copy(e);
+    std::optional<Convert> opt_copy(e);
     EXPECT_TRUE(opt_copy);
     EXPECT_FALSE(opt_copy->implicit);
     EXPECT_FALSE(opt_copy->move);
-    EXPECT_FALSE((std::is_convertible<const turbo::optional<Explicit>&,
-                                      turbo::optional<Convert>>::value));
-    turbo::optional<Convert> opt_move{turbo::optional<Explicit>(turbo::in_place)};
+    EXPECT_FALSE((std::is_convertible<const std::optional<Explicit>&,
+                                      std::optional<Convert>>::value));
+    std::optional<Convert> opt_move{std::optional<Explicit>(turbo::in_place)};
     EXPECT_TRUE(opt_move);
     EXPECT_FALSE(opt_move->implicit);
     EXPECT_TRUE(opt_move->move);
-    EXPECT_FALSE((std::is_convertible<turbo::optional<Explicit>&&,
-                                      turbo::optional<Convert>>::value));
+    EXPECT_FALSE((std::is_convertible<std::optional<Explicit>&&,
+                                      std::optional<Convert>>::value));
   }
   {
-    // implicitly constructing turbo::optional<ConvertFromOptional> from
-    // turbo::optional<Implicit> via
-    // ConvertFromOptional(turbo::optional<Implicit>&&) check that
+    // implicitly constructing std::optional<ConvertFromOptional> from
+    // std::optional<Implicit> via
+    // ConvertFromOptional(std::optional<Implicit>&&) check that
     // ConvertFromOptional(Implicit&&) is NOT called
     static_assert(
-        std::is_convertible<turbo::optional<Implicit>,
-                            turbo::optional<ConvertFromOptional>>::value,
+        std::is_convertible<std::optional<Implicit>,
+                            std::optional<ConvertFromOptional>>::value,
         "");
-    turbo::optional<ConvertFromOptional> opt0 = i_empty;
+    std::optional<ConvertFromOptional> opt0 = i_empty;
     EXPECT_TRUE(opt0);
     EXPECT_TRUE(opt0->implicit);
     EXPECT_FALSE(opt0->move);
     EXPECT_TRUE(opt0->from_optional);
-    turbo::optional<ConvertFromOptional> opt1 = turbo::optional<Implicit>();
+    std::optional<ConvertFromOptional> opt1 = std::optional<Implicit>();
     EXPECT_TRUE(opt1);
     EXPECT_TRUE(opt1->implicit);
     EXPECT_TRUE(opt1->move);
     EXPECT_TRUE(opt1->from_optional);
   }
   {
-    // implicitly constructing turbo::optional<ConvertFromOptional> from
-    // turbo::optional<Explicit> via
-    // ConvertFromOptional(turbo::optional<Explicit>&&) check that
+    // implicitly constructing std::optional<ConvertFromOptional> from
+    // std::optional<Explicit> via
+    // ConvertFromOptional(std::optional<Explicit>&&) check that
     // ConvertFromOptional(Explicit&&) is NOT called
-    turbo::optional<ConvertFromOptional> opt0(e_empty);
+    std::optional<ConvertFromOptional> opt0(e_empty);
     EXPECT_TRUE(opt0);
     EXPECT_FALSE(opt0->implicit);
     EXPECT_FALSE(opt0->move);
     EXPECT_TRUE(opt0->from_optional);
     EXPECT_FALSE(
-        (std::is_convertible<const turbo::optional<Explicit>&,
-                             turbo::optional<ConvertFromOptional>>::value));
-    turbo::optional<ConvertFromOptional> opt1{turbo::optional<Explicit>()};
+        (std::is_convertible<const std::optional<Explicit>&,
+                             std::optional<ConvertFromOptional>>::value));
+    std::optional<ConvertFromOptional> opt1{std::optional<Explicit>()};
     EXPECT_TRUE(opt1);
     EXPECT_FALSE(opt1->implicit);
     EXPECT_TRUE(opt1->move);
     EXPECT_TRUE(opt1->from_optional);
     EXPECT_FALSE(
-        (std::is_convertible<turbo::optional<Explicit>&&,
-                             turbo::optional<ConvertFromOptional>>::value));
+        (std::is_convertible<std::optional<Explicit>&&,
+                             std::optional<ConvertFromOptional>>::value));
   }
 }
 
@@ -545,13 +545,13 @@ TEST(optionalTest, StructorBasic) {
   StructorListener listener;
   Listenable::listener = &listener;
   {
-    turbo::optional<Listenable> empty;
+    std::optional<Listenable> empty;
     EXPECT_FALSE(empty);
-    turbo::optional<Listenable> opt0(turbo::in_place);
+    std::optional<Listenable> opt0(turbo::in_place);
     EXPECT_TRUE(opt0);
-    turbo::optional<Listenable> opt1(turbo::in_place, 1);
+    std::optional<Listenable> opt1(turbo::in_place, 1);
     EXPECT_TRUE(opt1);
-    turbo::optional<Listenable> opt2(turbo::in_place, 1, 2);
+    std::optional<Listenable> opt2(turbo::in_place, 1, 2);
     EXPECT_TRUE(opt2);
   }
   EXPECT_EQ(1, listener.construct0);
@@ -563,15 +563,15 @@ TEST(optionalTest, StructorBasic) {
 TEST(optionalTest, CopyMoveStructor) {
   StructorListener listener;
   Listenable::listener = &listener;
-  turbo::optional<Listenable> original(turbo::in_place);
+  std::optional<Listenable> original(turbo::in_place);
   EXPECT_EQ(1, listener.construct0);
   EXPECT_EQ(0, listener.copy);
   EXPECT_EQ(0, listener.move);
-  turbo::optional<Listenable> copy(original);
+  std::optional<Listenable> copy(original);
   EXPECT_EQ(1, listener.construct0);
   EXPECT_EQ(1, listener.copy);
   EXPECT_EQ(0, listener.move);
-  turbo::optional<Listenable> move(std::move(original));
+  std::optional<Listenable> move(std::move(original));
   EXPECT_EQ(1, listener.construct0);
   EXPECT_EQ(1, listener.copy);
   EXPECT_EQ(1, listener.move);
@@ -580,33 +580,33 @@ TEST(optionalTest, CopyMoveStructor) {
 TEST(optionalTest, ListInit) {
   StructorListener listener;
   Listenable::listener = &listener;
-  turbo::optional<Listenable> listinit1(turbo::in_place, {1});
-  turbo::optional<Listenable> listinit2(turbo::in_place, {1, 2});
+  std::optional<Listenable> listinit1(turbo::in_place, {1});
+  std::optional<Listenable> listinit2(turbo::in_place, {1, 2});
   EXPECT_EQ(2, listener.listinit);
 }
 
 TEST(optionalTest, AssignFromNullopt) {
-  turbo::optional<int> opt(1);
+  std::optional<int> opt(1);
   opt = turbo::nullopt;
   EXPECT_FALSE(opt);
 
   StructorListener listener;
   Listenable::listener = &listener;
-  turbo::optional<Listenable> opt1(turbo::in_place);
+  std::optional<Listenable> opt1(turbo::in_place);
   opt1 = turbo::nullopt;
   EXPECT_FALSE(opt1);
   EXPECT_EQ(1, listener.construct0);
   EXPECT_EQ(1, listener.destruct);
 
   EXPECT_TRUE((
-      std::is_nothrow_assignable<turbo::optional<int>, turbo::nullopt_t>::value));
-  EXPECT_TRUE((std::is_nothrow_assignable<turbo::optional<Listenable>,
+      std::is_nothrow_assignable<std::optional<int>, turbo::nullopt_t>::value));
+  EXPECT_TRUE((std::is_nothrow_assignable<std::optional<Listenable>,
                                           turbo::nullopt_t>::value));
 }
 
 TEST(optionalTest, CopyAssignment) {
-  const turbo::optional<int> empty, opt1 = 1, opt2 = 2;
-  turbo::optional<int> empty_to_opt1, opt1_to_opt2, opt2_to_empty;
+  const std::optional<int> empty, opt1 = 1, opt2 = 2;
+  std::optional<int> empty_to_opt1, opt1_to_opt2, opt2_to_empty;
 
   EXPECT_FALSE(empty_to_opt1);
   empty_to_opt1 = empty;
@@ -630,12 +630,12 @@ TEST(optionalTest, CopyAssignment) {
   opt2_to_empty = empty;
   EXPECT_FALSE(opt2_to_empty);
 
-  EXPECT_FALSE(turbo::is_copy_assignable<turbo::optional<const int>>::value);
-  EXPECT_TRUE(turbo::is_copy_assignable<turbo::optional<Copyable>>::value);
-  EXPECT_FALSE(turbo::is_copy_assignable<turbo::optional<MoveableThrow>>::value);
+  EXPECT_FALSE(turbo::is_copy_assignable<std::optional<const int>>::value);
+  EXPECT_TRUE(turbo::is_copy_assignable<std::optional<Copyable>>::value);
+  EXPECT_FALSE(turbo::is_copy_assignable<std::optional<MoveableThrow>>::value);
   EXPECT_FALSE(
-      turbo::is_copy_assignable<turbo::optional<MoveableNoThrow>>::value);
-  EXPECT_FALSE(turbo::is_copy_assignable<turbo::optional<NonMovable>>::value);
+      turbo::is_copy_assignable<std::optional<MoveableNoThrow>>::value);
+  EXPECT_FALSE(turbo::is_copy_assignable<std::optional<NonMovable>>::value);
 
   EXPECT_TRUE(turbo::is_trivially_copy_assignable<int>::value);
   EXPECT_TRUE(turbo::is_trivially_copy_assignable<volatile int>::value);
@@ -659,9 +659,9 @@ TEST(optionalTest, CopyAssignment) {
     StructorListener listener;
     Listenable::listener = &listener;
 
-    turbo::optional<volatile Listenable> empty, set(turbo::in_place);
+    std::optional<volatile Listenable> empty, set(turbo::in_place);
     EXPECT_EQ(1, listener.construct0);
-    turbo::optional<volatile Listenable> empty_to_empty, empty_to_set,
+    std::optional<volatile Listenable> empty_to_empty, empty_to_set,
         set_to_empty(turbo::in_place), set_to_set(turbo::in_place);
     EXPECT_EQ(3, listener.construct0);
     empty_to_empty = empty;  // no effect
@@ -681,10 +681,10 @@ TEST(optionalTest, MoveAssignment) {
     StructorListener listener;
     Listenable::listener = &listener;
 
-    turbo::optional<Listenable> empty1, empty2, set1(turbo::in_place),
+    std::optional<Listenable> empty1, empty2, set1(turbo::in_place),
         set2(turbo::in_place);
     EXPECT_EQ(2, listener.construct0);
-    turbo::optional<Listenable> empty_to_empty, empty_to_set,
+    std::optional<Listenable> empty_to_empty, empty_to_set,
         set_to_empty(turbo::in_place), set_to_set(turbo::in_place);
     EXPECT_EQ(4, listener.construct0);
     empty_to_empty = std::move(empty1);
@@ -701,10 +701,10 @@ TEST(optionalTest, MoveAssignment) {
     StructorListener listener;
     Listenable::listener = &listener;
 
-    turbo::optional<volatile Listenable> empty1, empty2, set1(turbo::in_place),
+    std::optional<volatile Listenable> empty1, empty2, set1(turbo::in_place),
         set2(turbo::in_place);
     EXPECT_EQ(2, listener.construct0);
-    turbo::optional<volatile Listenable> empty_to_empty, empty_to_set,
+    std::optional<volatile Listenable> empty_to_empty, empty_to_set,
         set_to_empty(turbo::in_place), set_to_set(turbo::in_place);
     EXPECT_EQ(4, listener.construct0);
     empty_to_empty = std::move(empty1);  // no effect
@@ -717,21 +717,21 @@ TEST(optionalTest, MoveAssignment) {
     EXPECT_EQ(1, listener.volatile_move_assign);
   }
 #endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
-  EXPECT_FALSE(turbo::is_move_assignable<turbo::optional<const int>>::value);
-  EXPECT_TRUE(turbo::is_move_assignable<turbo::optional<Copyable>>::value);
-  EXPECT_TRUE(turbo::is_move_assignable<turbo::optional<MoveableThrow>>::value);
-  EXPECT_TRUE(turbo::is_move_assignable<turbo::optional<MoveableNoThrow>>::value);
-  EXPECT_FALSE(turbo::is_move_assignable<turbo::optional<NonMovable>>::value);
+  EXPECT_FALSE(turbo::is_move_assignable<std::optional<const int>>::value);
+  EXPECT_TRUE(turbo::is_move_assignable<std::optional<Copyable>>::value);
+  EXPECT_TRUE(turbo::is_move_assignable<std::optional<MoveableThrow>>::value);
+  EXPECT_TRUE(turbo::is_move_assignable<std::optional<MoveableNoThrow>>::value);
+  EXPECT_FALSE(turbo::is_move_assignable<std::optional<NonMovable>>::value);
 
   EXPECT_FALSE(
-      std::is_nothrow_move_assignable<turbo::optional<MoveableThrow>>::value);
+      std::is_nothrow_move_assignable<std::optional<MoveableThrow>>::value);
   EXPECT_TRUE(
-      std::is_nothrow_move_assignable<turbo::optional<MoveableNoThrow>>::value);
+      std::is_nothrow_move_assignable<std::optional<MoveableNoThrow>>::value);
 }
 
 struct NoConvertToOptional {
   // disable implicit conversion from const NoConvertToOptional&
-  // to turbo::optional<NoConvertToOptional>.
+  // to std::optional<NoConvertToOptional>.
   NoConvertToOptional(const NoConvertToOptional&) = delete;
 };
 
@@ -743,11 +743,11 @@ struct CopyConvert {
 
 struct CopyConvertFromOptional {
   CopyConvertFromOptional(const NoConvertToOptional&);
-  CopyConvertFromOptional(const turbo::optional<NoConvertToOptional>&);
+  CopyConvertFromOptional(const std::optional<NoConvertToOptional>&);
   CopyConvertFromOptional& operator=(const CopyConvertFromOptional&) = delete;
   CopyConvertFromOptional& operator=(const NoConvertToOptional&);
   CopyConvertFromOptional& operator=(
-      const turbo::optional<NoConvertToOptional>&);
+      const std::optional<NoConvertToOptional>&);
 };
 
 struct MoveConvert {
@@ -758,15 +758,15 @@ struct MoveConvert {
 
 struct MoveConvertFromOptional {
   MoveConvertFromOptional(NoConvertToOptional&&);
-  MoveConvertFromOptional(turbo::optional<NoConvertToOptional>&&);
+  MoveConvertFromOptional(std::optional<NoConvertToOptional>&&);
   MoveConvertFromOptional& operator=(const MoveConvertFromOptional&) = delete;
   MoveConvertFromOptional& operator=(NoConvertToOptional&&);
-  MoveConvertFromOptional& operator=(turbo::optional<NoConvertToOptional>&&);
+  MoveConvertFromOptional& operator=(std::optional<NoConvertToOptional>&&);
 };
 
-// template <typename U = T> turbo::optional<T>& operator=(U&& v);
+// template <typename U = T> std::optional<T>& operator=(U&& v);
 TEST(optionalTest, ValueAssignment) {
-  turbo::optional<int> opt;
+  std::optional<int> opt;
   EXPECT_FALSE(opt);
   opt = 42;
   EXPECT_TRUE(opt);
@@ -787,91 +787,91 @@ TEST(optionalTest, ValueAssignment) {
   EXPECT_EQ(44, opt.value());
 
   // U = const NoConvertToOptional&
-  EXPECT_TRUE((std::is_assignable<turbo::optional<CopyConvert>&,
+  EXPECT_TRUE((std::is_assignable<std::optional<CopyConvert>&,
                                   const NoConvertToOptional&>::value));
-  // U = const turbo::optional<NoConvertToOptional>&
-  EXPECT_TRUE((std::is_assignable<turbo::optional<CopyConvertFromOptional>&,
+  // U = const std::optional<NoConvertToOptional>&
+  EXPECT_TRUE((std::is_assignable<std::optional<CopyConvertFromOptional>&,
                                   const NoConvertToOptional&>::value));
   // U = const NoConvertToOptional& triggers SFINAE because
   // std::is_constructible_v<MoveConvert, const NoConvertToOptional&> is false
-  EXPECT_FALSE((std::is_assignable<turbo::optional<MoveConvert>&,
+  EXPECT_FALSE((std::is_assignable<std::optional<MoveConvert>&,
                                    const NoConvertToOptional&>::value));
   // U = NoConvertToOptional
-  EXPECT_TRUE((std::is_assignable<turbo::optional<MoveConvert>&,
+  EXPECT_TRUE((std::is_assignable<std::optional<MoveConvert>&,
                                   NoConvertToOptional&&>::value));
   // U = const NoConvertToOptional& triggers SFINAE because
   // std::is_constructible_v<MoveConvertFromOptional, const
   // NoConvertToOptional&> is false
-  EXPECT_FALSE((std::is_assignable<turbo::optional<MoveConvertFromOptional>&,
+  EXPECT_FALSE((std::is_assignable<std::optional<MoveConvertFromOptional>&,
                                    const NoConvertToOptional&>::value));
   // U = NoConvertToOptional
-  EXPECT_TRUE((std::is_assignable<turbo::optional<MoveConvertFromOptional>&,
+  EXPECT_TRUE((std::is_assignable<std::optional<MoveConvertFromOptional>&,
                                   NoConvertToOptional&&>::value));
-  // U = const turbo::optional<NoConvertToOptional>&
+  // U = const std::optional<NoConvertToOptional>&
   EXPECT_TRUE(
-      (std::is_assignable<turbo::optional<CopyConvertFromOptional>&,
-                          const turbo::optional<NoConvertToOptional>&>::value));
-  // U = turbo::optional<NoConvertToOptional>
+      (std::is_assignable<std::optional<CopyConvertFromOptional>&,
+                          const std::optional<NoConvertToOptional>&>::value));
+  // U = std::optional<NoConvertToOptional>
   EXPECT_TRUE(
-      (std::is_assignable<turbo::optional<MoveConvertFromOptional>&,
-                          turbo::optional<NoConvertToOptional>&&>::value));
+      (std::is_assignable<std::optional<MoveConvertFromOptional>&,
+                          std::optional<NoConvertToOptional>&&>::value));
 }
 
-// template <typename U> turbo::optional<T>& operator=(const turbo::optional<U>&
-// rhs); template <typename U> turbo::optional<T>& operator=(turbo::optional<U>&&
+// template <typename U> std::optional<T>& operator=(const std::optional<U>&
+// rhs); template <typename U> std::optional<T>& operator=(std::optional<U>&&
 // rhs);
 TEST(optionalTest, ConvertingAssignment) {
-  turbo::optional<int> opt_i;
-  turbo::optional<char> opt_c('c');
+  std::optional<int> opt_i;
+  std::optional<char> opt_c('c');
   opt_i = opt_c;
   EXPECT_TRUE(opt_i);
   EXPECT_EQ(*opt_c, *opt_i);
-  opt_i = turbo::optional<char>();
+  opt_i = std::optional<char>();
   EXPECT_FALSE(opt_i);
-  opt_i = turbo::optional<char>('d');
+  opt_i = std::optional<char>('d');
   EXPECT_TRUE(opt_i);
   EXPECT_EQ('d', *opt_i);
 
-  turbo::optional<std::string> opt_str;
-  turbo::optional<const char*> opt_cstr("abc");
+  std::optional<std::string> opt_str;
+  std::optional<const char*> opt_cstr("abc");
   opt_str = opt_cstr;
   EXPECT_TRUE(opt_str);
   EXPECT_EQ(std::string("abc"), *opt_str);
-  opt_str = turbo::optional<const char*>();
+  opt_str = std::optional<const char*>();
   EXPECT_FALSE(opt_str);
-  opt_str = turbo::optional<const char*>("def");
+  opt_str = std::optional<const char*>("def");
   EXPECT_TRUE(opt_str);
   EXPECT_EQ(std::string("def"), *opt_str);
 
-  // operator=(const turbo::optional<U>&) with U = NoConvertToOptional
+  // operator=(const std::optional<U>&) with U = NoConvertToOptional
   EXPECT_TRUE(
-      (std::is_assignable<turbo::optional<CopyConvert>,
-                          const turbo::optional<NoConvertToOptional>&>::value));
-  // operator=(const turbo::optional<U>&) with U = NoConvertToOptional
+      (std::is_assignable<std::optional<CopyConvert>,
+                          const std::optional<NoConvertToOptional>&>::value));
+  // operator=(const std::optional<U>&) with U = NoConvertToOptional
   // triggers SFINAE because
   // std::is_constructible_v<MoveConvert, const NoConvertToOptional&> is false
   EXPECT_FALSE(
-      (std::is_assignable<turbo::optional<MoveConvert>&,
-                          const turbo::optional<NoConvertToOptional>&>::value));
-  // operator=(turbo::optional<U>&&) with U = NoConvertToOptional
+      (std::is_assignable<std::optional<MoveConvert>&,
+                          const std::optional<NoConvertToOptional>&>::value));
+  // operator=(std::optional<U>&&) with U = NoConvertToOptional
   EXPECT_TRUE(
-      (std::is_assignable<turbo::optional<MoveConvert>&,
-                          turbo::optional<NoConvertToOptional>&&>::value));
-  // operator=(const turbo::optional<U>&) with U = NoConvertToOptional triggers
+      (std::is_assignable<std::optional<MoveConvert>&,
+                          std::optional<NoConvertToOptional>&&>::value));
+  // operator=(const std::optional<U>&) with U = NoConvertToOptional triggers
   // SFINAE because std::is_constructible_v<MoveConvertFromOptional, const
   // NoConvertToOptional&> is false. operator=(U&&) with U = const
-  // turbo::optional<NoConverToOptional>& triggers SFINAE because
+  // std::optional<NoConverToOptional>& triggers SFINAE because
   // std::is_constructible<MoveConvertFromOptional,
-  // turbo::optional<NoConvertToOptional>&&> is true.
+  // std::optional<NoConvertToOptional>&&> is true.
   EXPECT_FALSE(
-      (std::is_assignable<turbo::optional<MoveConvertFromOptional>&,
-                          const turbo::optional<NoConvertToOptional>&>::value));
+      (std::is_assignable<std::optional<MoveConvertFromOptional>&,
+                          const std::optional<NoConvertToOptional>&>::value));
 }
 
 TEST(optionalTest, ResetAndHasValue) {
   StructorListener listener;
   Listenable::listener = &listener;
-  turbo::optional<Listenable> opt;
+  std::optional<Listenable> opt;
   EXPECT_FALSE(opt);
   EXPECT_FALSE(opt.has_value());
   opt.emplace();
@@ -885,16 +885,16 @@ TEST(optionalTest, ResetAndHasValue) {
   EXPECT_FALSE(opt);
   EXPECT_FALSE(opt.has_value());
 
-  constexpr turbo::optional<int> empty;
+  constexpr std::optional<int> empty;
   static_assert(!empty.has_value(), "");
-  constexpr turbo::optional<int> nonempty(1);
+  constexpr std::optional<int> nonempty(1);
   static_assert(nonempty.has_value(), "");
 }
 
 TEST(optionalTest, Emplace) {
   StructorListener listener;
   Listenable::listener = &listener;
-  turbo::optional<Listenable> opt;
+  std::optional<Listenable> opt;
   EXPECT_FALSE(opt);
   opt.emplace(1);
   EXPECT_TRUE(opt);
@@ -903,7 +903,7 @@ TEST(optionalTest, Emplace) {
   EXPECT_EQ(1, listener.construct2);
   EXPECT_EQ(1, listener.destruct);
 
-  turbo::optional<std::string> o;
+  std::optional<std::string> o;
   EXPECT_TRUE((std::is_same<std::string&, decltype(o.emplace("abc"))>::value));
   std::string& ref = o.emplace("abc");
   EXPECT_EQ(&ref, &o.value());
@@ -912,7 +912,7 @@ TEST(optionalTest, Emplace) {
 TEST(optionalTest, ListEmplace) {
   StructorListener listener;
   Listenable::listener = &listener;
-  turbo::optional<Listenable> opt;
+  std::optional<Listenable> opt;
   EXPECT_FALSE(opt);
   opt.emplace({1});
   EXPECT_TRUE(opt);
@@ -920,14 +920,14 @@ TEST(optionalTest, ListEmplace) {
   EXPECT_EQ(2, listener.listinit);
   EXPECT_EQ(1, listener.destruct);
 
-  turbo::optional<Listenable> o;
+  std::optional<Listenable> o;
   EXPECT_TRUE((std::is_same<Listenable&, decltype(o.emplace({1}))>::value));
   Listenable& ref = o.emplace({1});
   EXPECT_EQ(&ref, &o.value());
 }
 
 TEST(optionalTest, Swap) {
-  turbo::optional<int> opt_empty, opt1 = 1, opt2 = 2;
+  std::optional<int> opt_empty, opt1 = 1, opt2 = 2;
   EXPECT_FALSE(opt_empty);
   EXPECT_TRUE(opt1);
   EXPECT_EQ(1, opt1.value());
@@ -965,18 +965,18 @@ struct DeletedOpAddr {
 };
 
 // The static_assert featuring a constexpr call to operator->() is commented out
-// to document the fact that the current implementation of turbo::optional<T>
+// to document the fact that the current implementation of std::optional<T>
 // expects such usecases to be malformed and not compile.
 TEST(optionalTest, OperatorAddr) {
   constexpr int v = -1;
   {  // constexpr
-    constexpr turbo::optional<DeletedOpAddr<v>> opt(turbo::in_place_t{});
+    constexpr std::optional<DeletedOpAddr<v>> opt(turbo::in_place_t{});
     static_assert(opt.has_value(), "");
     // static_assert(opt->value == v, "");
     static_assert((*opt).value == v, "");
   }
   {  // non-constexpr
-    const turbo::optional<DeletedOpAddr<v>> opt(turbo::in_place_t{});
+    const std::optional<DeletedOpAddr<v>> opt(turbo::in_place_t{});
     EXPECT_TRUE(opt.has_value());
     EXPECT_TRUE(opt->value == v);
     EXPECT_TRUE((*opt).value == v);
@@ -984,14 +984,14 @@ TEST(optionalTest, OperatorAddr) {
 }
 
 TEST(optionalTest, PointerStuff) {
-  turbo::optional<std::string> opt(turbo::in_place, "foo");
+  std::optional<std::string> opt(turbo::in_place, "foo");
   EXPECT_EQ("foo", *opt);
   const auto& opt_const = opt;
   EXPECT_EQ("foo", *opt_const);
   EXPECT_EQ(opt->size(), 3u);
   EXPECT_EQ(opt_const->size(), 3u);
 
-  constexpr turbo::optional<ConstexprType> opt1(1);
+  constexpr std::optional<ConstexprType> opt1(1);
   static_assert((*opt1).x == ConstexprType::kCtorInt, "");
 }
 
@@ -1018,7 +1018,7 @@ TEST(optionalTest, PointerStuff) {
 //   constexpr const T&& value() const &&;
 // }
 //
-// using COI = const turbo::optional<int>;
+// using COI = const std::optional<int>;
 // static_assert(2 == COI(2).value(), "");  // const &&
 //
 // This should invoke the "const &&" overload but since it ignores the const
@@ -1028,9 +1028,9 @@ TEST(optionalTest, PointerStuff) {
 #endif
 
 TEST(optionalTest, Value) {
-  using O = turbo::optional<std::string>;
-  using CO = const turbo::optional<std::string>;
-  using OC = turbo::optional<const std::string>;
+  using O = std::optional<std::string>;
+  using CO = const std::optional<std::string>;
+  using OC = std::optional<const std::string>;
   O lvalue(turbo::in_place, "lvalue");
   CO clvalue(turbo::in_place, "clvalue");
   OC lvalue_c(turbo::in_place, "lvalue_c");
@@ -1054,7 +1054,7 @@ TEST(optionalTest, Value) {
 
 #if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   // test on volatile type
-  using OV = turbo::optional<volatile int>;
+  using OV = std::optional<volatile int>;
   OV lvalue_v(turbo::in_place, 42);
   EXPECT_EQ(42, lvalue_v.value());
   EXPECT_EQ(42, OV(42).value());
@@ -1063,7 +1063,7 @@ TEST(optionalTest, Value) {
 #endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
 
   // test exception throw on value()
-  turbo::optional<int> empty;
+  std::optional<int> empty;
 #ifdef TURBO_HAVE_EXCEPTIONS
   EXPECT_THROW((void)empty.value(), turbo::bad_optional_access);
 #else
@@ -1071,18 +1071,18 @@ TEST(optionalTest, Value) {
 #endif
 
   // test constexpr value()
-  constexpr turbo::optional<int> o1(1);
+  constexpr std::optional<int> o1(1);
   static_assert(1 == o1.value(), "");  // const &
 #if !defined(_MSC_VER) && !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
-  using COI = const turbo::optional<int>;
+  using COI = const std::optional<int>;
   static_assert(2 == COI(2).value(), "");  // const &&
 #endif
 }
 
 TEST(optionalTest, DerefOperator) {
-  using O = turbo::optional<std::string>;
-  using CO = const turbo::optional<std::string>;
-  using OC = turbo::optional<const std::string>;
+  using O = std::optional<std::string>;
+  using CO = const std::optional<std::string>;
+  using OC = std::optional<const std::string>;
   O lvalue(turbo::in_place, "lvalue");
   CO clvalue(turbo::in_place, "clvalue");
   OC lvalue_c(turbo::in_place, "lvalue_c");
@@ -1105,7 +1105,7 @@ TEST(optionalTest, DerefOperator) {
 
 #if !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
   // test on volatile type
-  using OV = turbo::optional<volatile int>;
+  using OV = std::optional<volatile int>;
   OV lvalue_v(turbo::in_place, 42);
   EXPECT_EQ(42, *lvalue_v);
   EXPECT_EQ(42, *OV(42));
@@ -1113,26 +1113,26 @@ TEST(optionalTest, DerefOperator) {
   EXPECT_TRUE((std::is_same<volatile int&&, decltype(*OV(42))>::value));
 #endif  // !defined(TURBO_VOLATILE_RETURN_TYPES_DEPRECATED)
 
-  constexpr turbo::optional<int> opt1(1);
+  constexpr std::optional<int> opt1(1);
   static_assert(*opt1 == 1, "");
 #if !defined(_MSC_VER) && !defined(TURBO_SKIP_OVERLOAD_TEST_DUE_TO_GCC_BUG)
-  using COI = const turbo::optional<int>;
+  using COI = const std::optional<int>;
   static_assert(*COI(2) == 2, "");
 #endif
 }
 
 TEST(optionalTest, ValueOr) {
-  turbo::optional<double> opt_empty, opt_set = 1.2;
+  std::optional<double> opt_empty, opt_set = 1.2;
   EXPECT_EQ(42.0, opt_empty.value_or(42));
   EXPECT_EQ(1.2, opt_set.value_or(42));
-  EXPECT_EQ(42.0, turbo::optional<double>().value_or(42));
-  EXPECT_EQ(1.2, turbo::optional<double>(1.2).value_or(42));
+  EXPECT_EQ(42.0, std::optional<double>().value_or(42));
+  EXPECT_EQ(1.2, std::optional<double>(1.2).value_or(42));
 
-  constexpr turbo::optional<double> copt_empty, copt_set = {1.2};
+  constexpr std::optional<double> copt_empty, copt_set = {1.2};
   static_assert(42.0 == copt_empty.value_or(42), "");
   static_assert(1.2 == copt_set.value_or(42), "");
 #ifndef TURBO_SKIP_OVERLOAD_TEST_DUE_TO_MSVC_BUG
-  using COD = const turbo::optional<double>;
+  using COD = const std::optional<double>;
   static_assert(42.0 == COD().value_or(42), "");
   static_assert(1.2 == COD(1.2).value_or(42), "");
 #endif
@@ -1141,20 +1141,20 @@ TEST(optionalTest, ValueOr) {
 // make_optional cannot be constexpr until C++17
 TEST(optionalTest, make_optional) {
   auto opt_int = turbo::make_optional(42);
-  EXPECT_TRUE((std::is_same<decltype(opt_int), turbo::optional<int>>::value));
+  EXPECT_TRUE((std::is_same<decltype(opt_int), std::optional<int>>::value));
   EXPECT_EQ(42, opt_int);
 
   StructorListener listener;
   Listenable::listener = &listener;
 
-  turbo::optional<Listenable> opt0 = turbo::make_optional<Listenable>();
+  std::optional<Listenable> opt0 = turbo::make_optional<Listenable>();
   EXPECT_EQ(1, listener.construct0);
-  turbo::optional<Listenable> opt1 = turbo::make_optional<Listenable>(1);
+  std::optional<Listenable> opt1 = turbo::make_optional<Listenable>(1);
   EXPECT_EQ(1, listener.construct1);
-  turbo::optional<Listenable> opt2 = turbo::make_optional<Listenable>(1, 2);
+  std::optional<Listenable> opt2 = turbo::make_optional<Listenable>(1, 2);
   EXPECT_EQ(1, listener.construct2);
-  turbo::optional<Listenable> opt3 = turbo::make_optional<Listenable>({1});
-  turbo::optional<Listenable> opt4 = turbo::make_optional<Listenable>({1, 2});
+  std::optional<Listenable> opt3 = turbo::make_optional<Listenable>({1});
+  std::optional<Listenable> opt4 = turbo::make_optional<Listenable>({1, 2});
   EXPECT_EQ(2, listener.listinit);
 
   // Constexpr tests on trivially copyable types
@@ -1162,7 +1162,7 @@ TEST(optionalTest, make_optional) {
   // For nontrivial types with constexpr constructors, we need copy elision in
   // C++17 for make_optional to be constexpr.
   {
-    constexpr turbo::optional<int> c_opt = turbo::make_optional(42);
+    constexpr std::optional<int> c_opt = turbo::make_optional(42);
     static_assert(c_opt.value() == 42, "");
   }
   {
@@ -1173,12 +1173,12 @@ TEST(optionalTest, make_optional) {
     };
 
     constexpr TrivialCopyable v;
-    constexpr turbo::optional<TrivialCopyable> c_opt0 = turbo::make_optional(v);
+    constexpr std::optional<TrivialCopyable> c_opt0 = turbo::make_optional(v);
     static_assert((*c_opt0).x == 0, "");
-    constexpr turbo::optional<TrivialCopyable> c_opt1 =
+    constexpr std::optional<TrivialCopyable> c_opt1 =
         turbo::make_optional<TrivialCopyable>();
     static_assert((*c_opt1).x == 0, "");
-    constexpr turbo::optional<TrivialCopyable> c_opt2 =
+    constexpr std::optional<TrivialCopyable> c_opt2 =
         turbo::make_optional<TrivialCopyable>(42);
     static_assert((*c_opt2).x == 42, "");
   }
@@ -1217,8 +1217,8 @@ void optionalTest_Comparisons_EXPECT_GREATER(T x, U y) {
 
 template <typename T, typename U, typename V>
 void TestComparisons() {
-  turbo::optional<T> ae, a2{2}, a4{4};
-  turbo::optional<U> be, b2{2}, b4{4};
+  std::optional<T> ae, a2{2}, a4{4};
+  std::optional<U> be, b2{2}, b4{4};
   V v3 = 3;
 
   // LHS: turbo::nullopt, ae, a2, v3, a4
@@ -1294,16 +1294,16 @@ TEST(optionalTest, Comparisons) {
   TestComparisons<int, Int2, int>();
   TestComparisons<Int1, Int2, int>();
 
-  // compare turbo::optional<std::string> with const char*
-  turbo::optional<std::string> opt_str = "abc";
+  // compare std::optional<std::string> with const char*
+  std::optional<std::string> opt_str = "abc";
   const char* cstr = "abc";
   EXPECT_TRUE(opt_str == cstr);
-  // compare turbo::optional<std::string> with turbo::optional<const char*>
-  turbo::optional<const char*> opt_cstr = cstr;
+  // compare std::optional<std::string> with std::optional<const char*>
+  std::optional<const char*> opt_cstr = cstr;
   EXPECT_TRUE(opt_str == opt_cstr);
-  // compare turbo::optional<std::string> with turbo::optional<std::string_view>
-  turbo::optional<std::string_view> e1;
-  turbo::optional<std::string> e2;
+  // compare std::optional<std::string> with std::optional<std::string_view>
+  std::optional<std::string_view> e1;
+  std::optional<std::string> e2;
   EXPECT_TRUE(e1 == e2);
 }
 
@@ -1313,8 +1313,8 @@ TEST(optionalTest, SwapRegression) {
   Listenable::listener = &listener;
 
   {
-    turbo::optional<Listenable> a;
-    turbo::optional<Listenable> b(turbo::in_place);
+    std::optional<Listenable> a;
+    std::optional<Listenable> b(turbo::in_place);
     a.swap(b);
   }
 
@@ -1323,8 +1323,8 @@ TEST(optionalTest, SwapRegression) {
   EXPECT_EQ(2, listener.destruct);
 
   {
-    turbo::optional<Listenable> a(turbo::in_place);
-    turbo::optional<Listenable> b;
+    std::optional<Listenable> a(turbo::in_place);
+    std::optional<Listenable> b;
     a.swap(b);
   }
 
@@ -1336,7 +1336,7 @@ TEST(optionalTest, SwapRegression) {
 TEST(optionalTest, BigStringLeakCheck) {
   constexpr size_t n = 1 << 16;
 
-  using OS = turbo::optional<std::string>;
+  using OS = std::optional<std::string>;
 
   OS a;
   OS b = turbo::nullopt;
@@ -1487,7 +1487,7 @@ TEST(optionalTest, MoveAssignRegression) {
   Listenable::listener = &listener;
 
   {
-    turbo::optional<Listenable> a;
+    std::optional<Listenable> a;
     Listenable b;
     a = std::move(b);
   }
@@ -1498,11 +1498,11 @@ TEST(optionalTest, MoveAssignRegression) {
 }
 
 TEST(optionalTest, ValueType) {
-  EXPECT_TRUE((std::is_same<turbo::optional<int>::value_type, int>::value));
-  EXPECT_TRUE((std::is_same<turbo::optional<std::string>::value_type,
+  EXPECT_TRUE((std::is_same<std::optional<int>::value_type, int>::value));
+  EXPECT_TRUE((std::is_same<std::optional<std::string>::value_type,
                             std::string>::value));
   EXPECT_FALSE(
-      (std::is_same<turbo::optional<int>::value_type, turbo::nullopt_t>::value));
+      (std::is_same<std::optional<int>::value_type, turbo::nullopt_t>::value));
 }
 
 template <typename T>
@@ -1517,7 +1517,7 @@ struct is_hash_enabled_for {
 };
 
 TEST(optionalTest, Hash) {
-  std::hash<turbo::optional<int>> hash;
+  std::hash<std::optional<int>> hash;
   std::set<size_t> hashcodes;
   hashcodes.insert(hash(turbo::nullopt));
   for (int i = 0; i < 100; ++i) {
@@ -1525,20 +1525,20 @@ TEST(optionalTest, Hash) {
   }
   EXPECT_GT(hashcodes.size(), 90u);
 
-  static_assert(is_hash_enabled_for<turbo::optional<int>>::value, "");
-  static_assert(is_hash_enabled_for<turbo::optional<Hashable>>::value, "");
+  static_assert(is_hash_enabled_for<std::optional<int>>::value, "");
+  static_assert(is_hash_enabled_for<std::optional<Hashable>>::value, "");
   static_assert(
-      turbo::type_traits_internal::IsHashable<turbo::optional<int>>::value, "");
+      turbo::type_traits_internal::IsHashable<std::optional<int>>::value, "");
   static_assert(
-      turbo::type_traits_internal::IsHashable<turbo::optional<Hashable>>::value,
+      turbo::type_traits_internal::IsHashable<std::optional<Hashable>>::value,
       "");
-  turbo::type_traits_internal::AssertHashEnabled<turbo::optional<int>>();
-  turbo::type_traits_internal::AssertHashEnabled<turbo::optional<Hashable>>();
+  turbo::type_traits_internal::AssertHashEnabled<std::optional<int>>();
+  turbo::type_traits_internal::AssertHashEnabled<std::optional<Hashable>>();
 
 #if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
-  static_assert(!is_hash_enabled_for<turbo::optional<NonHashable>>::value, "");
+  static_assert(!is_hash_enabled_for<std::optional<NonHashable>>::value, "");
   static_assert(!turbo::type_traits_internal::IsHashable<
-                    turbo::optional<NonHashable>>::value,
+                    std::optional<NonHashable>>::value,
                 "");
 #endif
 
@@ -1546,9 +1546,9 @@ TEST(optionalTest, Hash) {
   // std::hash<T> rather than std::hash<std::remove_const_t<T>>.
   // Reference: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82262
 #ifndef __GLIBCXX__
-  static_assert(is_hash_enabled_for<turbo::optional<const int>>::value, "");
-  static_assert(is_hash_enabled_for<turbo::optional<const Hashable>>::value, "");
-  std::hash<turbo::optional<const int>> c_hash;
+  static_assert(is_hash_enabled_for<std::optional<const int>>::value, "");
+  static_assert(is_hash_enabled_for<std::optional<const Hashable>>::value, "");
+  std::hash<std::optional<const int>> c_hash;
   for (int i = 0; i < 100; ++i) {
     EXPECT_EQ(hash(i), c_hash(i));
   }
@@ -1574,13 +1574,13 @@ struct MoveMeThrow {
 
 TEST(optionalTest, NoExcept) {
   static_assert(
-      std::is_nothrow_move_constructible<turbo::optional<MoveMeNoThrow>>::value,
+      std::is_nothrow_move_constructible<std::optional<MoveMeNoThrow>>::value,
       "");
   static_assert(turbo::default_allocator_is_nothrow::value ==
                     std::is_nothrow_move_constructible<
-                        turbo::optional<MoveMeThrow>>::value,
+                        std::optional<MoveMeThrow>>::value,
                 "");
-  std::vector<turbo::optional<MoveMeNoThrow>> v;
+  std::vector<std::optional<MoveMeNoThrow>> v;
   for (int i = 0; i < 10; ++i) v.emplace_back();
 }
 
@@ -1612,37 +1612,37 @@ struct AnyLike {
 };
 
 TEST(optionalTest, ConstructionConstraints) {
-  EXPECT_TRUE((std::is_constructible<AnyLike, turbo::optional<AnyLike>>::value));
+  EXPECT_TRUE((std::is_constructible<AnyLike, std::optional<AnyLike>>::value));
 
   EXPECT_TRUE(
-      (std::is_constructible<AnyLike, const turbo::optional<AnyLike>&>::value));
+      (std::is_constructible<AnyLike, const std::optional<AnyLike>&>::value));
 
-  EXPECT_TRUE((std::is_constructible<turbo::optional<AnyLike>, AnyLike>::value));
+  EXPECT_TRUE((std::is_constructible<std::optional<AnyLike>, AnyLike>::value));
   EXPECT_TRUE(
-      (std::is_constructible<turbo::optional<AnyLike>, const AnyLike&>::value));
+      (std::is_constructible<std::optional<AnyLike>, const AnyLike&>::value));
 
-  EXPECT_TRUE((std::is_convertible<turbo::optional<AnyLike>, AnyLike>::value));
+  EXPECT_TRUE((std::is_convertible<std::optional<AnyLike>, AnyLike>::value));
 
   EXPECT_TRUE(
-      (std::is_convertible<const turbo::optional<AnyLike>&, AnyLike>::value));
+      (std::is_convertible<const std::optional<AnyLike>&, AnyLike>::value));
 
-  EXPECT_TRUE((std::is_convertible<AnyLike, turbo::optional<AnyLike>>::value));
+  EXPECT_TRUE((std::is_convertible<AnyLike, std::optional<AnyLike>>::value));
   EXPECT_TRUE(
-      (std::is_convertible<const AnyLike&, turbo::optional<AnyLike>>::value));
+      (std::is_convertible<const AnyLike&, std::optional<AnyLike>>::value));
 
-  EXPECT_TRUE(std::is_move_constructible<turbo::optional<AnyLike>>::value);
-  EXPECT_TRUE(std::is_copy_constructible<turbo::optional<AnyLike>>::value);
+  EXPECT_TRUE(std::is_move_constructible<std::optional<AnyLike>>::value);
+  EXPECT_TRUE(std::is_copy_constructible<std::optional<AnyLike>>::value);
 }
 
 TEST(optionalTest, AssignmentConstraints) {
-  EXPECT_TRUE((std::is_assignable<AnyLike&, turbo::optional<AnyLike>>::value));
+  EXPECT_TRUE((std::is_assignable<AnyLike&, std::optional<AnyLike>>::value));
   EXPECT_TRUE(
-      (std::is_assignable<AnyLike&, const turbo::optional<AnyLike>&>::value));
-  EXPECT_TRUE((std::is_assignable<turbo::optional<AnyLike>&, AnyLike>::value));
+      (std::is_assignable<AnyLike&, const std::optional<AnyLike>&>::value));
+  EXPECT_TRUE((std::is_assignable<std::optional<AnyLike>&, AnyLike>::value));
   EXPECT_TRUE(
-      (std::is_assignable<turbo::optional<AnyLike>&, const AnyLike&>::value));
-  EXPECT_TRUE(std::is_move_assignable<turbo::optional<AnyLike>>::value);
-  EXPECT_TRUE(turbo::is_copy_assignable<turbo::optional<AnyLike>>::value);
+      (std::is_assignable<std::optional<AnyLike>&, const AnyLike&>::value));
+  EXPECT_TRUE(std::is_move_assignable<std::optional<AnyLike>>::value);
+  EXPECT_TRUE(turbo::is_copy_assignable<std::optional<AnyLike>>::value);
 }
 
 #if !defined(__EMSCRIPTEN__)
@@ -1650,7 +1650,7 @@ struct NestedClassBug {
   struct Inner {
     bool dummy = false;
   };
-  turbo::optional<Inner> value;
+  std::optional<Inner> value;
 };
 
 TEST(optionalTest, InPlaceTSFINAEBug) {
@@ -1661,9 +1661,9 @@ TEST(optionalTest, InPlaceTSFINAEBug) {
   EXPECT_TRUE((std::is_default_constructible<Inner>::value));
   EXPECT_TRUE((std::is_constructible<Inner>::value));
   EXPECT_TRUE(
-      (std::is_constructible<turbo::optional<Inner>, turbo::in_place_t>::value));
+      (std::is_constructible<std::optional<Inner>, turbo::in_place_t>::value));
 
-  turbo::optional<Inner> o(turbo::in_place);
+  std::optional<Inner> o(turbo::in_place);
   EXPECT_TRUE(o.has_value());
   o.emplace();
   EXPECT_TRUE(o.has_value());

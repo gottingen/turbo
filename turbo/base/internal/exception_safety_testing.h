@@ -834,7 +834,7 @@ template <typename T>
 class DefaultFactory {
  public:
   explicit DefaultFactory(const T& t) : t_(t) {}
-  std::unique_ptr<T> operator()() const { return turbo::make_unique<T>(t_); }
+  std::unique_ptr<T> operator()() const { return std::make_unique<T>(t_); }
 
  private:
   T t_;

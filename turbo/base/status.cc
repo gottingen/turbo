@@ -62,7 +62,7 @@ std::ostream& operator<<(std::ostream& os, StatusCode code) {
 
 namespace status_internal {
 
-static turbo::optional<size_t> FindPayloadIndexByUrl(
+static std::optional<size_t> FindPayloadIndexByUrl(
     const Payloads* payloads,
     std::string_view type_url) {
   if (payloads == nullptr)
@@ -103,10 +103,10 @@ turbo::StatusCode MapToLocalCode(int value) {
 }
 }  // namespace status_internal
 
-turbo::optional<turbo::Cord> Status::GetPayload(
+std::optional<turbo::Cord> Status::GetPayload(
     std::string_view type_url) const {
   const auto* payloads = GetPayloads();
-  turbo::optional<size_t> index =
+  std::optional<size_t> index =
       status_internal::FindPayloadIndexByUrl(payloads, type_url);
   if (index.has_value())
     return (*payloads)[index.value()].payload;
@@ -121,10 +121,10 @@ void Status::SetPayload(std::string_view type_url, turbo::Cord payload) {
 
   status_internal::StatusRep* rep = RepToPointer(rep_);
   if (!rep->payloads) {
-    rep->payloads = turbo::make_unique<status_internal::Payloads>();
+    rep->payloads = std::make_unique<status_internal::Payloads>();
   }
 
-  turbo::optional<size_t> index =
+  std::optional<size_t> index =
       status_internal::FindPayloadIndexByUrl(rep->payloads.get(), type_url);
   if (index.has_value()) {
     (*rep->payloads)[index.value()].payload = std::move(payload);
@@ -135,7 +135,7 @@ void Status::SetPayload(std::string_view type_url, turbo::Cord payload) {
 }
 
 bool Status::ErasePayload(std::string_view type_url) {
-  turbo::optional<size_t> index =
+  std::optional<size_t> index =
       status_internal::FindPayloadIndexByUrl(GetPayloads(), type_url);
   if (index.has_value()) {
     PrepareToModify();
@@ -261,7 +261,7 @@ void Status::PrepareToModify() {
   if (rep->ref.load(std::memory_order_acquire) != 1) {
     std::unique_ptr<status_internal::Payloads> payloads;
     if (rep->payloads) {
-      payloads = turbo::make_unique<status_internal::Payloads>(*rep->payloads);
+      payloads = std::make_unique<status_internal::Payloads>(*rep->payloads);
     }
     status_internal::StatusRep* const new_rep = new status_internal::StatusRep(
             rep->index,
@@ -324,7 +324,7 @@ std::string Status::ToStringSlow(StatusToStringMode mode) const {
         status_internal::GetStatusPayloadPrinter();
     this->ForEachPayload([&](std::string_view type_url,
                              const turbo::Cord& payload) {
-      turbo::optional<std::string> result;
+      std::optional<std::string> result;
       if (printer) result = printer(type_url, payload);
       turbo::StrAppend(
           &text, " [", type_url, "='",

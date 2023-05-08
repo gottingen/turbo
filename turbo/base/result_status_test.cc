@@ -222,7 +222,7 @@ class CopyNoAssign {
 
 turbo::ResultStatus<std::unique_ptr<int>> ReturnUniquePtr() {
   // Uses implicit constructor from T&&
-  return turbo::make_unique<int>(0);
+  return std::make_unique<int>(0);
 }
 
 TEST(ResultStatus, ElementType) {
@@ -478,7 +478,7 @@ struct InPlaceHelper {
 
 TEST(ResultStatus, InPlaceInitListConstruction) {
   turbo::ResultStatus<InPlaceHelper> status_or(turbo::in_place, {10, 11, 12},
-                                          turbo::make_unique<int>(13));
+                                          std::make_unique<int>(13));
   EXPECT_THAT(status_or, IsOkAndHolds(AllOf(
                              Field(&InPlaceHelper::x, ElementsAre(10, 11, 12)),
                              Field(&InPlaceHelper::y, Pointee(13)))));
@@ -498,8 +498,8 @@ TEST(ResultStatus, Emplace) {
 
 TEST(ResultStatus, EmplaceInitializerList) {
   turbo::ResultStatus<InPlaceHelper> status_or(turbo::in_place, {10, 11, 12},
-                                          turbo::make_unique<int>(13));
-  status_or.emplace({1, 2, 3}, turbo::make_unique<int>(4));
+                                          std::make_unique<int>(13));
+  status_or.emplace({1, 2, 3}, std::make_unique<int>(4));
   EXPECT_THAT(status_or,
               IsOkAndHolds(AllOf(Field(&InPlaceHelper::x, ElementsAre(1, 2, 3)),
                                  Field(&InPlaceHelper::y, Pointee(4)))));
@@ -507,7 +507,7 @@ TEST(ResultStatus, EmplaceInitializerList) {
   EXPECT_FALSE(status_or.ok());
   EXPECT_EQ(status_or.status().code(), turbo::kInvalidArgument);
   EXPECT_EQ(status_or.status().message(), "msg");
-  status_or.emplace({1, 2, 3}, turbo::make_unique<int>(4));
+  status_or.emplace({1, 2, 3}, std::make_unique<int>(4));
   EXPECT_THAT(status_or,
               IsOkAndHolds(AllOf(Field(&InPlaceHelper::x, ElementsAre(1, 2, 3)),
                                  Field(&InPlaceHelper::y, Pointee(4)))));
@@ -818,7 +818,7 @@ TEST(ResultStatus, ImplicitConstructionFromInitliazerList) {
 
 TEST(ResultStatus, UniquePtrImplicitConstruction) {
   auto status_or = turbo::implicit_cast<turbo::ResultStatus<std::unique_ptr<Base1>>>(
-      turbo::make_unique<Derived>());
+      std::make_unique<Derived>());
   EXPECT_THAT(status_or, IsOkAndHolds(Ne(nullptr)));
 }
 
@@ -1010,7 +1010,7 @@ TEST(ResultStatus, ImplicitCastFromInitializerList) {
 
 TEST(ResultStatus, UniquePtrImplicitAssignment) {
   turbo::ResultStatus<std::unique_ptr<Base1>> status_or;
-  status_or = turbo::make_unique<Derived>();
+  status_or = std::make_unique<Derived>();
   EXPECT_THAT(status_or, IsOkAndHolds(Ne(nullptr)));
 }
 
@@ -1505,14 +1505,14 @@ TEST(ResultStatus, ValueOrDefault) {
 }
 
 TEST(ResultStatus, MoveOnlyValueOrOk) {
-  EXPECT_THAT(turbo::ResultStatus<std::unique_ptr<int>>(turbo::make_unique<int>(0))
-                  .value_or(turbo::make_unique<int>(-1)),
+  EXPECT_THAT(turbo::ResultStatus<std::unique_ptr<int>>(std::make_unique<int>(0))
+                  .value_or(std::make_unique<int>(-1)),
               Pointee(0));
 }
 
 TEST(ResultStatus, MoveOnlyValueOrDefault) {
   EXPECT_THAT(turbo::ResultStatus<std::unique_ptr<int>>(turbo::CancelledError())
-                  .value_or(turbo::make_unique<int>(-1)),
+                  .value_or(std::make_unique<int>(-1)),
               Pointee(-1));
 }
 

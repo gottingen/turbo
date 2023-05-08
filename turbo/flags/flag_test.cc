@@ -997,14 +997,14 @@ TEST_F(FlagTest, MacroWithinTurboFlag) {
 #endif
 
 #ifndef TURBO_SKIP_OPTIONAL_BOOL_TEST_DUE_TO_GCC_BUG
-TURBO_FLAG(turbo::optional<bool>, optional_bool, turbo::nullopt, "help");
+TURBO_FLAG(std::optional<bool>, optional_bool, turbo::nullopt, "help");
 #endif
-TURBO_FLAG(turbo::optional<int>, optional_int, {}, "help");
-TURBO_FLAG(turbo::optional<double>, optional_double, 9.3, "help");
-TURBO_FLAG(turbo::optional<std::string>, optional_string, turbo::nullopt, "help");
-TURBO_FLAG(turbo::optional<turbo::Duration>, optional_duration, turbo::nullopt,
+TURBO_FLAG(std::optional<int>, optional_int, {}, "help");
+TURBO_FLAG(std::optional<double>, optional_double, 9.3, "help");
+TURBO_FLAG(std::optional<std::string>, optional_string, turbo::nullopt, "help");
+TURBO_FLAG(std::optional<turbo::Duration>, optional_duration, turbo::nullopt,
           "help");
-TURBO_FLAG(turbo::optional<turbo::optional<int>>, optional_optional_int,
+TURBO_FLAG(std::optional<std::optional<int>>, optional_optional_int,
           turbo::nullopt, "help");
 #if defined(TURBO_HAVE_STD_OPTIONAL) && !defined(TURBO_USES_STD_OPTIONAL)
 TURBO_FLAG(std::optional<int64_t>, std_optional_int64, std::nullopt, "help");
@@ -1115,22 +1115,22 @@ TEST_F(FlagTest, TestOptionalOptional) {
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::nullopt);
 
-  turbo::optional<int> nullint{turbo::nullopt};
+  std::optional<int> nullint{turbo::nullopt};
 
   turbo::SetFlag(&FLAGS_optional_optional_int, nullint);
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
   EXPECT_NE(turbo::GetFlag(FLAGS_optional_optional_int), nullint);
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int),
-            turbo::optional<turbo::optional<int>>{nullint});
+            std::optional<std::optional<int>>{nullint});
 
   turbo::SetFlag(&FLAGS_optional_optional_int, 0);
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), 0);
 
-  turbo::SetFlag(&FLAGS_optional_optional_int, turbo::optional<int>{0});
+  turbo::SetFlag(&FLAGS_optional_optional_int, std::optional<int>{0});
   EXPECT_TRUE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());
   EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), 0);
-  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), turbo::optional<int>{0});
+  EXPECT_EQ(turbo::GetFlag(FLAGS_optional_optional_int), std::optional<int>{0});
 
   turbo::SetFlag(&FLAGS_optional_optional_int, turbo::nullopt);
   EXPECT_FALSE(turbo::GetFlag(FLAGS_optional_optional_int).has_value());

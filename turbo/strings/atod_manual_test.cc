@@ -85,7 +85,7 @@ static constexpr uint8_t kUnhex[256] = {
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,  //
 };
 
-static turbo::optional<std::string> ReadFileToString(const char* filename) {
+static std::optional<std::string> ReadFileToString(const char* filename) {
   FILE* f = fopen(filename, "rb");
   if (!f) {
     return turbo::nullopt;
@@ -103,7 +103,7 @@ static turbo::optional<std::string> ReadFileToString(const char* filename) {
 }
 
 static bool ProcessOneTestFile(const char* filename) {
-  turbo::optional<std::string> contents = ReadFileToString(filename);
+  std::optional<std::string> contents = ReadFileToString(filename);
   if (!contents) {
     turbo::FPrintF(stderr, "Invalid file: %s\n", filename);
     return false;

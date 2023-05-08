@@ -34,7 +34,7 @@ namespace status_internal {
 // NOTE: This is an internal API and the design is subject to change in the
 // future in a non-backward-compatible way. Since it's only meant for debugging
 // purpose, you should not rely on it in any critical logic.
-using StatusPayloadPrinter = turbo::optional<std::string> (*)(std::string_view,
+using StatusPayloadPrinter = std::optional<std::string> (*)(std::string_view,
                                                              const turbo::Cord&);
 
 // Sets the global payload printer. Only one printer should be set per process.

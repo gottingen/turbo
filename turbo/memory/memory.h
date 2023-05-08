@@ -58,7 +58,7 @@ TURBO_NAMESPACE_BEGIN
 //   std::unique_ptr<X> x(NewX(1, 2));
 //
 // While `turbo::WrapUnique` is useful for capturing the output of a raw
-// pointer factory, prefer 'turbo::make_unique<T>(args...)' over
+// pointer factory, prefer 'std::make_unique<T>(args...)' over
 // 'turbo::WrapUnique(new T(args...))'.
 //
 //   auto x = WrapUnique(new X(1, 2));  // works, but nonideal.
@@ -80,7 +80,7 @@ std::unique_ptr<T> WrapUnique(T* ptr) {
 // -----------------------------------------------------------------------------
 //
 // Creates a `std::unique_ptr<>`, while avoiding issues creating temporaries
-// during the construction process. `turbo::make_unique<>` also avoids redundant
+// during the construction process. `std::make_unique<>` also avoids redundant
 // type declarations, by avoiding the need to explicitly use the `new` operator.
 //
 // https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
@@ -92,7 +92,7 @@ std::unique_ptr<T> WrapUnique(T* ptr) {
 //
 // Historical note: Turbo once provided a C++11 compatible implementation of
 // the C++14's `std::make_unique`. Now that C++11 support has been sunsetted,
-// `turbo::make_unique` simply uses the STL-provided implementation. New code
+// `std::make_unique` simply uses the STL-provided implementation. New code
 // should use `std::make_unique`.
 using std::make_unique;
 
@@ -120,7 +120,7 @@ inline std::nullptr_t RawPtr(std::nullptr_t) { return nullptr; }
 //
 // Example:
 //
-//     auto up = turbo::make_unique<int>(10);
+//     auto up = std::make_unique<int>(10);
 //     auto sp = turbo::ShareUniquePtr(std::move(up));  // shared_ptr<int>
 //     CHECK_EQ(*sp, 10);
 //     CHECK(up == nullptr);

@@ -45,12 +45,12 @@ TURBO_NAMESPACE_BEGIN
 // -----------------------------------------------------------------------------
 //
 // An `turbo::bad_optional_access` type is an exception type that is thrown when
-// attempting to access an `turbo::optional` object that does not contain a
+// attempting to access an `std::optional` object that does not contain a
 // value.
 //
 // Example:
 //
-//   turbo::optional<int> o;
+//   std::optional<int> o;
 //
 //   try {
 //     int n = o.value();

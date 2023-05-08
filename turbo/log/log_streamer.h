@@ -131,7 +131,7 @@ class LogStreamer final {
   std::string buf_;
   // A disengaged `stream_` indicates a moved-from `LogStreamer` that should not
   // `LOG` upon destruction.
-  turbo::optional<turbo::strings_internal::OStringStream> stream_;
+  std::optional<turbo::strings_internal::OStringStream> stream_;
 };
 
 // LogInfoStreamer()

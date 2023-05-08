@@ -16,7 +16,7 @@
 
 #include "turbo/platform/port.h"
 
-// This test is a no-op when turbo::optional is an alias for std::optional and
+// This test is a no-op when std::optional is an alias for std::optional and
 // when exceptions are not enabled.
 #if !defined(TURBO_USES_STD_OPTIONAL) && defined(TURBO_HAVE_EXCEPTIONS)
 
@@ -34,10 +34,10 @@ using ::testing::AssertionSuccess;
 using ::testing::MakeExceptionSafetyTester;
 
 using Thrower = testing::ThrowingValue<testing::TypeSpec::kEverythingThrows>;
-using Optional = turbo::optional<Thrower>;
+using Optional = std::optional<Thrower>;
 
 using MoveThrower = testing::ThrowingValue<testing::TypeSpec::kNoThrowMove>;
-using MoveOptional = turbo::optional<MoveThrower>;
+using MoveOptional = std::optional<MoveThrower>;
 
 constexpr int kInitialInteger = 5;
 constexpr int kUpdatedInteger = 10;
@@ -109,13 +109,13 @@ TEST(OptionalExceptionSafety, ThrowingConstructors) {
   auto thrower_nonempty = Optional(Thrower(kInitialInteger));
   testing::TestThrowingCtor<Optional>(thrower_nonempty);
 
-  auto integer_nonempty = turbo::optional<int>(kInitialInteger);
+  auto integer_nonempty = std::optional<int>(kInitialInteger);
   testing::TestThrowingCtor<Optional>(integer_nonempty);
   testing::TestThrowingCtor<Optional>(std::move(integer_nonempty));  // NOLINT
 
   testing::TestThrowingCtor<Optional>(kInitialInteger);
   using ThrowerVec = std::vector<Thrower, testing::ThrowingAllocator<Thrower>>;
-  testing::TestThrowingCtor<turbo::optional<ThrowerVec>>(
+  testing::TestThrowingCtor<std::optional<ThrowerVec>>(
       turbo::in_place,
       std::initializer_list<Thrower>{Thrower(), Thrower(), Thrower()},
       testing::ThrowingAllocator<Thrower>());

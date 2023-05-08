@@ -16,7 +16,7 @@
 // optional.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the `turbo::optional` type for holding a value which
+// This header file defines the `std::optional` type for holding a value which
 // may or may not be present. This type is useful for providing value semantics
 // for operations that may either wish to return or hold "something-or-nothing".
 //
@@ -26,10 +26,10 @@
 //   // parameter and a bool return type:
 //   bool AcquireResource(const Input&, Resource * out);
 //
-//   // Providing an turbo::optional return type provides a cleaner API:
-//   turbo::optional<Resource> AcquireResource(const Input&);
+//   // Providing an std::optional return type provides a cleaner API:
+//   std::optional<Resource> AcquireResource(const Input&);
 //
-// `turbo::optional` is a C++11 compatible version of the C++17 `std::optional`
+// `std::optional` is a C++11 compatible version of the C++17 `std::optional`
 // abstraction and is designed to be a drop-in replacement for code compliant
 // with C++17.
 #ifndef TURBO_TYPES_OPTIONAL_H_
@@ -71,7 +71,7 @@ TURBO_NAMESPACE_BEGIN
 
 // nullopt_t
 //
-// Class type for `turbo::nullopt` used to indicate an `turbo::optional<T>` type
+// Class type for `turbo::nullopt` used to indicate an `std::optional<T>` type
 // that does not contain a value.
 struct nullopt_t {
   // It must not be default-constructible to avoid ambiguity for opt = {}.
@@ -81,15 +81,15 @@ struct nullopt_t {
 // nullopt
 //
 // A tag constant of type `turbo::nullopt_t` used to indicate an empty
-// `turbo::optional` in certain functions, such as construction or assignment.
+// `std::optional` in certain functions, such as construction or assignment.
 TURBO_INTERNAL_INLINE_CONSTEXPR(nullopt_t, nullopt,
                                nullopt_t(optional_internal::init_t()));
 
 // -----------------------------------------------------------------------------
-// turbo::optional
+// std::optional
 // -----------------------------------------------------------------------------
 //
-// A value of type `turbo::optional<T>` holds either a value of `T` or an
+// A value of type `std::optional<T>` holds either a value of `T` or an
 // "empty" value.  When it holds a value of `T`, it stores it as a direct
 // sub-object, so `sizeof(optional<T>)` is approximately
 // `sizeof(T) + sizeof(bool)`.
@@ -97,7 +97,7 @@ TURBO_INTERNAL_INLINE_CONSTEXPR(nullopt_t, nullopt,
 // This implementation is based on the specification in the latest draft of the
 // C++17 `std::optional` specification as of May 2017, section 20.6.
 //
-// Differences between `turbo::optional<T>` and `std::optional<T>` include:
+// Differences between `std::optional<T>` and `std::optional<T>` include:
 //
 //    * `constexpr` is not used for non-const member functions.
 //      (dependency on some differences between C++11 and C++14.)
@@ -338,7 +338,7 @@ class optional : private optional_internal::optional_data<T>,
 
   // optional::reset()
   //
-  // Destroys the inner `T` value of an `turbo::optional` if one is present.
+  // Destroys the inner `T` value of an `std::optional` if one is present.
   TURBO_ATTRIBUTE_REINITIALIZES void reset() noexcept { this->destruct(); }
 
   // optional::emplace()
@@ -543,7 +543,7 @@ class optional : private optional_internal::optional_data<T>,
 
 // swap()
 //
-// Performs a swap between two `turbo::optional` objects, using standard
+// Performs a swap between two `std::optional` objects, using standard
 // semantics.
 template <typename T, typename std::enable_if<
                           std::is_move_constructible<T>::value &&
@@ -556,7 +556,7 @@ void swap(optional<T>& a, optional<T>& b) noexcept(noexcept(a.swap(b))) {
 // make_optional()
 //
 // Creates a non-empty `optional<T>` where the type of `T` is deduced. An
-// `turbo::optional` can also be explicitly instantiated with
+// `std::optional` can also be explicitly instantiated with
 // `make_optional<T>(v)`.
 //
 // Note: `make_optional()` constructions may be declared `constexpr` for
@@ -566,7 +566,7 @@ void swap(optional<T>& a, optional<T>& b) noexcept(noexcept(a.swap(b))) {
 //
 // Example:
 //
-//   constexpr turbo::optional<int> opt = turbo::make_optional(1);
+//   constexpr std::optional<int> opt = turbo::make_optional(1);
 //   static_assert(opt.value() == 1, "");
 template <typename T>
 constexpr optional<typename std::decay<T>::type> make_optional(T&& v) {
@@ -765,9 +765,9 @@ TURBO_NAMESPACE_END
 
 namespace std {
 
-// std::hash specialization for turbo::optional.
+// std::hash specialization for std::optional.
 template <typename T>
-struct hash<turbo::optional<T> >
+struct hash<std::optional<T> >
     : turbo::optional_internal::optional_hash_base<T> {};
 
 }  // namespace std

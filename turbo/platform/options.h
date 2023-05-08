@@ -99,7 +99,7 @@
 
 // TURBO_OPTION_USE_STD_OPTIONAL
 //
-// This option controls whether turbo::optional is implemented as an alias to
+// This option controls whether std::optional is implemented as an alias to
 // std::optional, or as an independent implementation.
 //
 // A value of 0 means to use Turbo's implementation.  This requires only C++11
@@ -112,13 +112,13 @@
 // and use an alias only if a working std::optional is available.  This option
 // is useful when you are building your program from source.  It should not be
 // used otherwise -- for example, if you are distributing Turbo in a binary
-// package manager -- since in mode 2, turbo::optional will name a different
+// package manager -- since in mode 2, std::optional will name a different
 // type, with a different mangled name and binary layout, depending on the
 // compiler flags passed by the end user.  For more info, see
 // https://abseil.io/about/design/dropin-types.
 
 // User code should not inspect this macro.  To check in the preprocessor if
-// turbo::optional is a typedef of std::optional, use the feature macro
+// std::optional is a typedef of std::optional, use the feature macro
 // TURBO_USES_STD_OPTIONAL.
 
 #define TURBO_OPTION_USE_STD_OPTIONAL 2
