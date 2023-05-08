@@ -578,7 +578,7 @@ class Status final {
   // Status::GetPayload()
   //
   // Gets the payload of a status given its unique `type_url` key, if present.
-  turbo::optional<turbo::Cord> GetPayload(std::string_view type_url) const;
+  std::optional<turbo::Cord> GetPayload(std::string_view type_url) const;
 
   // Status::SetPayload()
   //

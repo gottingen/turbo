@@ -128,7 +128,7 @@ static const char *TrySymbolizeWithLimit(void *pc, int limit) {
 
   // Use the heap to facilitate heap and buffer sanitizer tools.
   TURBO_LOG(INFO)<<"limit size:"<<limit;
-  auto heap_buffer = turbo::make_unique<char[]>(sizeof(try_symbolize_buffer));
+  auto heap_buffer = std::make_unique<char[]>(sizeof(try_symbolize_buffer));
   bool found = turbo::Symbolize(pc, heap_buffer.get(), limit);
   if (found) {
     TURBO_RAW_CHECK(strnlen(heap_buffer.get(), limit) < limit,

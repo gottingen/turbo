@@ -387,7 +387,7 @@ TEST(HashValueTest, SmartPointers) {
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::forward_as_tuple(&i, nullptr,                    //
                             unique1, unique2, unique_null,  //
-                            turbo::make_unique<int>(),       //
+                            std::make_unique<int>(),       //
                             shared1, shared2, shared_null,  //
                             std::make_shared<int>()),
       SmartPointerEq{}));
@@ -777,9 +777,9 @@ TEST(HashValueTest, PrivateSanity) {
 }
 
 TEST(HashValueTest, Optional) {
-  EXPECT_TRUE(is_hashable<turbo::optional<Private>>::value);
+  EXPECT_TRUE(is_hashable<std::optional<Private>>::value);
 
-  using O = turbo::optional<Private>;
+  using O = std::optional<Private>;
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
       std::make_tuple(O{}, O{{1}}, O{{-1}}, O{{10}})));
 }

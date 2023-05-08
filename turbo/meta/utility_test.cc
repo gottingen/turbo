@@ -168,7 +168,7 @@ int Function(int a, int b) { return a - b; }
 
 int Sink(std::unique_ptr<int> p) { return *p; }
 
-std::unique_ptr<int> Factory(int n) { return turbo::make_unique<int>(n); }
+std::unique_ptr<int> Factory(int n) { return std::make_unique<int>(n); }
 
 void NoOp() {}
 
@@ -225,7 +225,7 @@ TEST(ApplyTest, Function) {
 }
 
 TEST(ApplyTest, NonCopyableArgument) {
-  EXPECT_EQ(42, turbo::apply(Sink, std::make_tuple(turbo::make_unique<int>(42))));
+  EXPECT_EQ(42, turbo::apply(Sink, std::make_tuple(std::make_unique<int>(42))));
 }
 
 TEST(ApplyTest, NonCopyableResult) {
@@ -299,12 +299,12 @@ TEST(ApplyTest, MemberFunction) {
                            std::tuple<const Class&, int, int>(*cp, 3, 2)));
 
   EXPECT_EQ(1, turbo::apply(&Class::Method,
-                           std::make_tuple(turbo::make_unique<Class>(), 3, 2)));
+                           std::make_tuple(std::make_unique<Class>(), 3, 2)));
   EXPECT_EQ(1, turbo::apply(&Class::ConstMethod,
-                           std::make_tuple(turbo::make_unique<Class>(), 3, 2)));
+                           std::make_tuple(std::make_unique<Class>(), 3, 2)));
   EXPECT_EQ(
       1, turbo::apply(&Class::ConstMethod,
-                     std::make_tuple(turbo::make_unique<const Class>(), 3, 2)));
+                     std::make_tuple(std::make_unique<const Class>(), 3, 2)));
 }
 
 TEST(ApplyTest, DataMember) {
@@ -354,7 +354,7 @@ TEST(MakeFromTupleTest, MoveOnlyParameter) {
     int value = 0;
   };
   auto tup =
-      std::make_tuple(turbo::make_unique<int>(3), turbo::make_unique<int>(4));
+      std::make_tuple(std::make_unique<int>(3), std::make_unique<int>(4));
   auto s = turbo::make_from_tuple<S>(std::move(tup));
   EXPECT_EQ(s.value, 7);
 }

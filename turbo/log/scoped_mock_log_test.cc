@@ -257,7 +257,7 @@ TEST(ScopedMockLogTest, NoSequenceWithMultipleThreads) {
 */
 TEST(ScopedMockLogTsanTest,
      ScopedMockLogCanBeDeletedWhenAnotherThreadIsLogging) {
-  auto log = turbo::make_unique<turbo::ScopedMockLog>();
+  auto log = std::make_unique<turbo::ScopedMockLog>();
   EXPECT_CALL(*log, Log(turbo::LogSeverity::kInfo, __FILE__, "Thread log"))
       .Times(AnyNumber());
 

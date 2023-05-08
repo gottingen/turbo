@@ -673,14 +673,14 @@ template <int Size>
 struct BigTypePtr {
   BigTypePtr() : BigTypePtr(0) {}
   explicit BigTypePtr(int x) {
-    ptr = turbo::make_unique<BigType<Size, Size>>(x);
+    ptr = std::make_unique<BigType<Size, Size>>(x);
   }
   BigTypePtr(const BigTypePtr& other) {
-    ptr = turbo::make_unique<BigType<Size, Size>>(*other.ptr);
+    ptr = std::make_unique<BigType<Size, Size>>(*other.ptr);
   }
   BigTypePtr(BigTypePtr&& other) noexcept = default;
   BigTypePtr& operator=(const BigTypePtr& other) {
-    ptr = turbo::make_unique<BigType<Size, Size>>(*other.ptr);
+    ptr = std::make_unique<BigType<Size, Size>>(*other.ptr);
   }
   BigTypePtr& operator=(BigTypePtr&& other) noexcept = default;
 

@@ -36,7 +36,7 @@ namespace {
 
 class ReflectionTest : public testing::Test {
  protected:
-  void SetUp() override { flag_saver_ = turbo::make_unique<turbo::FlagSaver>(); }
+  void SetUp() override { flag_saver_ = std::make_unique<turbo::FlagSaver>(); }
   void TearDown() override { flag_saver_.reset(); }
 
  private:

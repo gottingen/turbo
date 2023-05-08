@@ -197,7 +197,7 @@ class MockingBitGen {
     using ImplT = FunctionHolderImpl<WrappedFnType, ResultT, ArgTupleT>;
     auto& mock = mocks_[type];
     if (!mock) {
-      mock = turbo::make_unique<ImplT>();
+      mock = std::make_unique<ImplT>();
     }
     return static_cast<ImplT*>(mock.get())->mock_fn_;
   }

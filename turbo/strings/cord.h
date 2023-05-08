@@ -713,7 +713,7 @@ class Cord {
   //
   // If this cord's representation is a single flat array, returns a
   // std::string_view referencing that array.  Otherwise returns nullopt.
-  turbo::optional<std::string_view> TryFlat() const;
+  std::optional<std::string_view> TryFlat() const;
 
   // Cord::Flatten()
   //
@@ -748,11 +748,11 @@ class Cord {
 
   // Returns this cord's expected checksum, if it has one.  Otherwise, returns
   // nullopt.
-  turbo::optional<uint32_t> ExpectedChecksum() const;
+  std::optional<uint32_t> ExpectedChecksum() const;
 
   template <typename H>
   friend H TurboHashValue(H hash_state, const turbo::Cord& c) {
-    turbo::optional<std::string_view> maybe_flat = c.TryFlat();
+    std::optional<std::string_view> maybe_flat = c.TryFlat();
     if (maybe_flat.has_value()) {
       return H::combine(std::move(hash_state), *maybe_flat);
     }
@@ -1279,7 +1279,7 @@ inline size_t Cord::EstimatedMemoryUsage(
   return result;
 }
 
-inline turbo::optional<std::string_view> Cord::TryFlat() const {
+inline std::optional<std::string_view> Cord::TryFlat() const {
   turbo::cord_internal::CordRep* rep = contents_.tree();
   if (rep == nullptr) {
     return std::string_view(contents_.data(), contents_.size());

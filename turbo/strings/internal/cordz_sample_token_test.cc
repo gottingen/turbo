@@ -188,7 +188,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
             }
           } else {
             // 5) Sample
-            token = turbo::make_unique<CordzSampleToken>();
+            token = std::make_unique<CordzSampleToken>();
           }
         }
       }

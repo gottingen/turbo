@@ -671,7 +671,7 @@ class NotTriviallyDestructible {
       : p_(new int(*other.p_)) {}
 
   NotTriviallyDestructible& operator=(const NotTriviallyDestructible& other) {
-    p_ = turbo::make_unique<int>(*other.p_);
+    p_ = std::make_unique<int>(*other.p_);
     return *this;
   }
 

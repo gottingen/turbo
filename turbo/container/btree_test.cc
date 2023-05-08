@@ -1307,7 +1307,7 @@ TEST(Btree, BtreeMapCanHoldMoveOnlyTypes) {
 
   std::unique_ptr<std::string> &v = m["A"];
   EXPECT_TRUE(v == nullptr);
-  v = turbo::make_unique<std::string>("X");
+  v = std::make_unique<std::string>("X");
 
   auto iter = m.find("A");
   EXPECT_EQ("X", *iter->second);

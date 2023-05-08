@@ -300,11 +300,11 @@ TEST(CompressedTupleTest, NoElements) {
 
 TEST(CompressedTupleTest, MoveOnlyElements) {
   CompressedTuple<std::unique_ptr<std::string>> str_tup(
-      turbo::make_unique<std::string>("str"));
+      std::make_unique<std::string>("str"));
 
   CompressedTuple<CompressedTuple<std::unique_ptr<std::string>>,
                   std::unique_ptr<int>>
-  x(std::move(str_tup), turbo::make_unique<int>(5));
+  x(std::move(str_tup), std::make_unique<int>(5));
 
   EXPECT_EQ(*x.get<0>().get<0>(), "str");
   EXPECT_EQ(*x.get<1>(), 5);
@@ -318,7 +318,7 @@ TEST(CompressedTupleTest, MoveOnlyElements) {
 
 TEST(CompressedTupleTest, MoveConstructionMoveOnlyElements) {
   CompressedTuple<std::unique_ptr<std::string>> base(
-      turbo::make_unique<std::string>("str"));
+      std::make_unique<std::string>("str"));
   EXPECT_EQ(*base.get<0>(), "str");
 
   CompressedTuple<std::unique_ptr<std::string>> copy(std::move(base));
@@ -369,11 +369,11 @@ TEST(CompressedTupleTest, Constexpr) {
   EXPECT_EQ(trivial2, 0);
 #endif
 
-  constexpr CompressedTuple<Empty<0>, NonTrivialStruct, turbo::optional<int>>
+  constexpr CompressedTuple<Empty<0>, NonTrivialStruct, std::optional<int>>
       non_trivial = {};
   constexpr CallType non_trivial0 = non_trivial.get<0>().value();
   constexpr int non_trivial1 = non_trivial.get<1>().value();
-  constexpr turbo::optional<int> non_trivial2 = non_trivial.get<2>();
+  constexpr std::optional<int> non_trivial2 = non_trivial.get<2>();
 
   EXPECT_EQ(non_trivial0, CallType::kConstRef);
   EXPECT_EQ(non_trivial1, 5);

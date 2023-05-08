@@ -1719,7 +1719,7 @@ size_t MaxLogFieldLengthNoPrefix() {
     }
 
    private:
-    turbo::optional<size_t> size_;
+    std::optional<size_t> size_;
   } extractor_sink;
   LOG(INFO).NoPrefix().ToSinkOnly(&extractor_sink)
       << std::string(2 * turbo::log_internal::kLogMessageBufferSize, 'x');

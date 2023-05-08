@@ -220,7 +220,7 @@ void LogMessage::LogMessageData::FinalizeEncodingAndFormat() {
 }
 
 LogMessage::LogMessage(const char* file, int line, turbo::LogSeverity severity)
-    : data_(turbo::make_unique<LogMessageData>(file, line, severity,
+    : data_(std::make_unique<LogMessageData>(file, line, severity,
                                               turbo::Now())) {
   data_->first_fatal = false;
   data_->is_perror = false;

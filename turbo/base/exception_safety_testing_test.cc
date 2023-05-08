@@ -236,8 +236,8 @@ void TestAllocatingOp(const F& f) {
 TEST(ThrowingValueTest, ThrowingAllocatingOps) {
   // make_unique calls unqualified operator new, so these exercise the
   // ThrowingValue overloads.
-  TestAllocatingOp([]() { return turbo::make_unique<ThrowingValue<>>(1); });
-  TestAllocatingOp([]() { return turbo::make_unique<ThrowingValue<>[]>(2); });
+  TestAllocatingOp([]() { return std::make_unique<ThrowingValue<>>(1); });
+  TestAllocatingOp([]() { return std::make_unique<ThrowingValue<>[]>(2); });
 }
 
 TEST(ThrowingValueTest, NonThrowingMoveCtor) {
@@ -545,7 +545,7 @@ TEST(ExceptionSafetyTesterTest, IncompleteTypesAreNotTestable) {
   using T = exceptions_internal::UninitializedT;
   auto op = [](T* t) {};
   auto inv = [](T*) { return testing::AssertionSuccess(); };
-  auto fac = []() { return turbo::make_unique<T>(); };
+  auto fac = []() { return std::make_unique<T>(); };
 
   // Test that providing operation and inveriants still does not allow for the
   // the invocation of .Test() and .Test(op) because it lacks a factory
@@ -574,7 +574,7 @@ TEST(ExceptionSafetyTesterTest, IncompleteTypesAreNotTestable) {
 struct ExampleStruct {};
 
 std::unique_ptr<ExampleStruct> ExampleFunctionFactory() {
-  return turbo::make_unique<ExampleStruct>();
+  return std::make_unique<ExampleStruct>();
 }
 
 void ExampleFunctionOperation(ExampleStruct*) {}
@@ -795,7 +795,7 @@ struct NonCopyable : public NonNegative {
 };
 
 TEST(ExceptionCheckTest, NonCopyable) {
-  auto factory = []() { return turbo::make_unique<NonCopyable>(); };
+  auto factory = []() { return std::make_unique<NonCopyable>(); };
   EXPECT_TRUE(tester.WithFactory(factory).Test());
   EXPECT_TRUE(strong_tester.WithFactory(factory).Test());
 }

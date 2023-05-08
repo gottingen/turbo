@@ -656,53 +656,53 @@ CRCImpl* TryNewCRC32AcceleratedX86ARMCombined() {
 
 std::vector<std::unique_ptr<CRCImpl>> NewCRC32AcceleratedX86ARMCombinedAll() {
   auto ret = std::vector<std::unique_ptr<CRCImpl>>();
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 0, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 1, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 2, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 3, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 0, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 1, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 2, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 3, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 0, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 1, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 2, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 3, CutoffStrategy::Fold3>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 0, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 1, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 2, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     1, 3, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 0, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 1, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 2, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     2, 3, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 0, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 1, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 2, CutoffStrategy::Unroll64CRC>>());
-  ret.push_back(turbo::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
+  ret.push_back(std::make_unique<CRC32AcceleratedX86ARMCombinedMultipleStreams<
                     3, 3, CutoffStrategy::Unroll64CRC>>());
 
   return ret;

@@ -169,7 +169,7 @@ using std::in_place;
 // in_place_t
 //
 // Tag type used to specify in-place construction, such as with
-// `turbo::optional`, designed to be a drop-in replacement for C++17's
+// `std::optional`, designed to be a drop-in replacement for C++17's
 // `std::in_place_t`.
 struct in_place_t {};
 
@@ -271,12 +271,12 @@ auto apply_helper(Functor&& functor, Tuple&& t, index_sequence<Indexes...>)
 //       // Invokes the first user function on int, std::string.
 //       turbo::apply(&user_function1, tuple1);
 //
-//       std::tuple<std::unique_ptr<Foo>> tuple2(turbo::make_unique<Foo>());
+//       std::tuple<std::unique_ptr<Foo>> tuple2(std::make_unique<Foo>());
 //       // Invokes the user function that takes ownership of the unique
 //       // pointer.
 //       turbo::apply(&user_function2, std::move(tuple2));
 //
-//       auto foo = turbo::make_unique<Foo>();
+//       auto foo = std::make_unique<Foo>();
 //       std::tuple<Foo*, int> tuple3(foo.get(), 42);
 //       // Invokes the method Bar on foo with one argument, 42.
 //       turbo::apply(&Foo::Bar, tuple3);

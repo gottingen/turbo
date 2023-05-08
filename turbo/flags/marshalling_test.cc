@@ -661,7 +661,7 @@ TEST(MarshallingTest, TestVectorOfStringParsing) {
 
 TEST(MarshallingTest, TestOptionalBoolParsing) {
   std::string err;
-  turbo::optional<bool> value;
+  std::optional<bool> value;
 
   EXPECT_TRUE(turbo::ParseFlag("", &value, &err));
   EXPECT_FALSE(value.has_value());
@@ -681,7 +681,7 @@ TEST(MarshallingTest, TestOptionalBoolParsing) {
 
 TEST(MarshallingTest, TestOptionalIntParsing) {
   std::string err;
-  turbo::optional<int> value;
+  std::optional<int> value;
 
   EXPECT_TRUE(turbo::ParseFlag("", &value, &err));
   EXPECT_FALSE(value.has_value());
@@ -701,7 +701,7 @@ TEST(MarshallingTest, TestOptionalIntParsing) {
 
 TEST(MarshallingTest, TestOptionalDoubleParsing) {
   std::string err;
-  turbo::optional<double> value;
+  std::optional<double> value;
 
   EXPECT_TRUE(turbo::ParseFlag("", &value, &err));
   EXPECT_FALSE(value.has_value());
@@ -721,7 +721,7 @@ TEST(MarshallingTest, TestOptionalDoubleParsing) {
 
 TEST(MarshallingTest, TestOptionalStringParsing) {
   std::string err;
-  turbo::optional<std::string> value;
+  std::optional<std::string> value;
 
   EXPECT_TRUE(turbo::ParseFlag("", &value, &err));
   EXPECT_FALSE(value.has_value());
@@ -891,7 +891,7 @@ TEST(MarshallingTest, TestStringUnparsing) {
 // --------------------------------------------------------------------
 
 TEST(MarshallingTest, TestOptionalBoolUnparsing) {
-  turbo::optional<bool> value;
+  std::optional<bool> value;
 
   EXPECT_EQ(turbo::UnparseFlag(value), "");
   value = true;
@@ -905,7 +905,7 @@ TEST(MarshallingTest, TestOptionalBoolUnparsing) {
 // --------------------------------------------------------------------
 
 TEST(MarshallingTest, TestOptionalIntUnparsing) {
-  turbo::optional<int> value;
+  std::optional<int> value;
 
   EXPECT_EQ(turbo::UnparseFlag(value), "");
   value = 0;
@@ -919,7 +919,7 @@ TEST(MarshallingTest, TestOptionalIntUnparsing) {
 // --------------------------------------------------------------------
 
 TEST(MarshallingTest, TestOptionalDoubleUnparsing) {
-  turbo::optional<double> value;
+  std::optional<double> value;
 
   EXPECT_EQ(turbo::UnparseFlag(value), "");
   value = 1.;
@@ -933,7 +933,7 @@ TEST(MarshallingTest, TestOptionalDoubleUnparsing) {
 // --------------------------------------------------------------------
 
 TEST(MarshallingTest, TestOptionalStringUnparsing) {
-  turbo::optional<std::string> strvalue;
+  std::optional<std::string> strvalue;
   EXPECT_EQ(turbo::UnparseFlag(strvalue), "");
 
   strvalue = "asdfg";

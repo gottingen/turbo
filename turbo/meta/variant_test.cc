@@ -758,7 +758,7 @@ TEST(VariantTest, TestAssign) {
   std::unique_ptr<IncrementInDtor> counter_adjustor[kSize];
   for (int i = 0; i != kSize; i++) {
     counter[i] = 0;
-    counter_adjustor[i] = turbo::make_unique<IncrementInDtor>(&counter[i]);
+    counter_adjustor[i] = std::make_unique<IncrementInDtor>(&counter[i]);
   }
 
   value_type1 v1(*counter_adjustor[0]);
@@ -1935,9 +1935,9 @@ TEST(VariantTest, VisitReferenceWrapper) {
 // libstdc++ std::variant doesn't support the INVOKE semantics.
 #if !(defined(TURBO_USES_STD_VARIANT) && defined(__GLIBCXX__))
 TEST(VariantTest, VisitMemberFunction) {
-  turbo::variant<std::unique_ptr<Class>> p(turbo::make_unique<Class>());
+  turbo::variant<std::unique_ptr<Class>> p(std::make_unique<Class>());
   turbo::variant<std::unique_ptr<const Class>> cp(
-      turbo::make_unique<const Class>());
+      std::make_unique<const Class>());
   turbo::variant<int> three = 3;
   turbo::variant<int> two = 2;
 
@@ -1947,9 +1947,9 @@ TEST(VariantTest, VisitMemberFunction) {
 }
 
 TEST(VariantTest, VisitDataMember) {
-  turbo::variant<std::unique_ptr<Class>> p(turbo::make_unique<Class>(Class{42}));
+  turbo::variant<std::unique_ptr<Class>> p(std::make_unique<Class>(Class{42}));
   turbo::variant<std::unique_ptr<const Class>> cp(
-      turbo::make_unique<const Class>(Class{42}));
+      std::make_unique<const Class>(Class{42}));
   EXPECT_EQ(42, turbo::visit(&Class::member, p));
 
   turbo::visit(&Class::member, p) = 5;
@@ -2236,7 +2236,7 @@ TEST(VariantTest, TestMoveSemantics) {
   EXPECT_EQ(nullptr, turbo::get<std::unique_ptr<int>>(v));
 
   // Assign a variant from an element value by move.
-  v = turbo::make_unique<std::string>("foo");
+  v = std::make_unique<std::string>("foo");
   ASSERT_TRUE(turbo::holds_alternative<std::unique_ptr<std::string>>(v));
   EXPECT_EQ("foo", *turbo::get<std::unique_ptr<std::string>>(v));
 
@@ -2383,13 +2383,13 @@ TEST(VariantTest, TestMoveConversion) {
       variant<std::unique_ptr<int>, std::unique_ptr<std::string>>;
 
   Variant var(
-      ConvertVariantTo<Variant>(OtherVariant{turbo::make_unique<int>(0)}));
+      ConvertVariantTo<Variant>(OtherVariant{std::make_unique<int>(0)}));
   ASSERT_TRUE(turbo::holds_alternative<std::unique_ptr<const int>>(var));
   ASSERT_NE(turbo::get<std::unique_ptr<const int>>(var), nullptr);
   EXPECT_EQ(0, *turbo::get<std::unique_ptr<const int>>(var));
 
   var = ConvertVariantTo<Variant>(
-      OtherVariant(turbo::make_unique<std::string>("foo")));
+      OtherVariant(std::make_unique<std::string>("foo")));
   ASSERT_TRUE(turbo::holds_alternative<std::unique_ptr<const std::string>>(var));
   EXPECT_EQ("foo", *turbo::get<std::unique_ptr<const std::string>>(var));
 }
@@ -2520,12 +2520,12 @@ TEST(VariantTest, TestMoveConversionViaConvertVariantTo) {
       variant<std::unique_ptr<int>, std::unique_ptr<std::string>>;
 
   Variant var(
-      ConvertVariantTo<Variant>(OtherVariant{turbo::make_unique<int>(3)}));
+      ConvertVariantTo<Variant>(OtherVariant{std::make_unique<int>(3)}));
   EXPECT_THAT(turbo::get_if<std::unique_ptr<const int>>(&var),
               Pointee(Pointee(3)));
 
   var = ConvertVariantTo<Variant>(
-      OtherVariant(turbo::make_unique<std::string>("foo")));
+      OtherVariant(std::make_unique<std::string>("foo")));
   EXPECT_THAT(turbo::get_if<std::unique_ptr<const std::string>>(&var),
               Pointee(Pointee(std::string("foo"))));
 }
@@ -2564,7 +2564,7 @@ TEST(VariantTest, TestCopyAndMoveTypeTraits) {
 TEST(VariantTest, TestVectorOfMoveonlyVariant) {
   // Verify that variant<MoveonlyType> works correctly as a std::vector element.
   std::vector<variant<std::unique_ptr<int>, std::string>> vec;
-  vec.push_back(turbo::make_unique<int>(42));
+  vec.push_back(std::make_unique<int>(42));
   vec.emplace_back("Hello");
   vec.reserve(3);
   auto another_vec = turbo::move(vec);
