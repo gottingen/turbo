@@ -637,12 +637,6 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
       TURBO_CONSUME_DLL
   )
 
-  if(TURBO_PROPAGATE_CXX_STD)
-    # Turbo libraries require C++14 as the current minimum standard. When
-    # compiled with C++17 (either because it is the compiler's default or
-    # explicitly requested), then Turbo requires C++17.
-    _turbo_target_compile_features_if_available(${_NAME} PUBLIC ${TURBO_INTERNAL_CXX_STD_FEATURE})
-  else()
     # Note: This is legacy (before CMake 3.8) behavior. Setting the
     # target-level CXX_STANDARD property to TURBO_CXX_STANDARD (which is
     # initialized by CMAKE_CXX_STANDARD) should have no real effect, since
@@ -653,7 +647,6 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     # "decaying" to an older standard if the requested one isn't available).
     set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${TURBO_CXX_STANDARD})
     set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-  endif()
 
   install(TARGETS turbo_dll EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
