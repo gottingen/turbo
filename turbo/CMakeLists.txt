@@ -69,8 +69,6 @@ set(TURBO_ALL_SRC
         "flags/reflection.cc"
         "flags/usage.cc"
         "flags/usage_config.cc"
-        "format/fmt/format.cc"
-        "format/fmt/os.cc"
         "hash/internal/city.cc"
         "hash/internal/hash.cc"
         "hash/internal/low_level_hash.cc"
