@@ -275,6 +275,7 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     target_compile_definitions(${_NAME} PUBLIC ${TURBO_CC_LIB_DEFINES})
 
     # Add all Turbo targets to a a folder in the IDE for organization.
+    set_property(TARGET ${_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
     if(TURBO_CC_LIB_PUBLIC)
       set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER})
     elseif(TURBO_CC_LIB_TESTONLY)
@@ -282,7 +283,6 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     else()
       set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/internal)
     endif()
-
     if(TURBO_PROPAGATE_CXX_STD)
       # Turbo libraries require C++14 as the current minimum standard. When
       # compiled with C++17 (either because it is the compiler's default or
