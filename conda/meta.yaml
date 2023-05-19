@@ -27,6 +27,15 @@ outputs:
       string: "h{{ GIT_DESCRIBE_HASH }}_{{ number }}"
       run_exports:
         - {{ pin_compatible('turbo', exact=True) }}
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - sysroot_linux-64 =2.17  # [linux64]
+        - cmake =3.23.1
+      host:
+        - sysroot_linux-64 =2.17  # [linux64]
+      run:
+        - sysroot_linux-64 =2.17  # [linux64]
     test:
       commands:
         - test -f $PREFIX/lib/libturbo.so              # [linux]
