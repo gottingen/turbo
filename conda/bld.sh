@@ -8,6 +8,7 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX \
         -DTURBO_BUILD_TESTING=OFF \
         -DCMAKE_INSTALL_LIBDIR=lib \
         -DTURBO_BUILD_EXAMPLE=OFF \
+        -DTURBO_USE_CXX_ABI=ON
         -DBUILD_SHARED_LIBS=ON
 
 cmake --build .
