@@ -37,6 +37,10 @@ public:
     using size_type = std::size_t;
     using propagate_on_container_move_assignment = std::true_type;
 
+#if !_GLIBCXX_USE_CXX11_ABI
+    FreeListAllocator() noexcept {}
+#endif
+
     FreeListAllocator(int) noexcept 
     {}
     FreeListAllocator(const FreeListAllocator&) noexcept {}

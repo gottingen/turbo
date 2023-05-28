@@ -1,5 +1,5 @@
 #
-# Copyright 2020 The Turbo Authors.
+# Copyright 2023 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ include(CTest)
 # /bin directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# when turbo is included as subproject (i.e. using add_subdirectory(abseil-cpp))
+# when turbo is included as subproject (i.e. using add_subdirectory(turbo))
 # in the source tree of a project that uses it, install rules are disabled.
 if (NOT CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     option(TURBO_ENABLE_INSTALL "Enable install rule" OFF)
@@ -75,17 +75,12 @@ endif ()
 
 set(CMAKE_CXX_STANDARD 17)
 
-option(TURBO_PROPAGATE_CXX_STD
-        "Use CMake C++ standard meta features (e.g. cxx_std_14) that propagate to targets that link to Turbo"
-        OFF)  # TODO: Default to ON for CMake 3.8 and greater.
-if (NOT TURBO_PROPAGATE_CXX_STD)
-    message(STATUS "A future Turbo release will default TURBO_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
-endif ()
-
 option(TURBO_USE_SYSTEM_INCLUDES
         "Silence warnings in Turbo headers by marking them as SYSTEM includes"
         OFF)
-option(TURBO_USE_CXX_ABI "USE_CXX11_ABI" ON)
+option(TURBO_USE_CXX_ABI "_GLIBCXX_USE_CXX11_ABI  default is on _GLIBCXX_USE_CXX11_ABI = 1" OFF)
+
+option(TURBO_ENABLE_PIC "POSITION_INDEPENDENT_CODE" ON)
 
 list(APPEND CMAKE_MODULE_PATH
         ${CMAKE_CURRENT_LIST_DIR}/CMake
@@ -137,31 +132,9 @@ option(TURBO_BUILD_TESTING
 option(TURBO_BUILD_EXAMPLE
         "If ON, Turbo will build all of Turbo's example." ON)
 
-option(TURBO_BUILD_TEST_HELPERS
-        "If ON, Turbo will build libraries that you can use to write tests against Turbo code. This option requires that Turbo is configured to use GoogleTest."
-        OFF)
-
-option(TURBO_USE_EXTERNAL_GOOGLETEST
-        "If ON, Turbo will assume that the targets for GoogleTest are already provided by the including project. This makes sense when Turbo is used with add_subdirectory." OFF)
-
-cmake_dependent_option(TURBO_FIND_GOOGLETEST
-        "If ON, Turbo will use find_package(GTest) rather than assuming that GoogleTest is already provided by the including project."
-        ON
-        "TURBO_USE_EXTERNAL_GOOGLETEST"
-        OFF)
-
-
-option(TURBO_USE_GOOGLETEST_HEAD
-        "If ON, abseil will download HEAD from GoogleTest at config time." ON)
-
-set(TURBO_GOOGLETEST_DOWNLOAD_URL "" CACHE STRING "If set, download GoogleTest from this URL")
-
-set(TURBO_LOCAL_GOOGLETEST_DIR "/usr/src/googletest" CACHE PATH
-        "If TURBO_USE_GOOGLETEST_HEAD is OFF and TURBO_GOOGLETEST_URL is not set, specifies the directory of a local GoogleTest checkout."
-        )
-
-if ((BUILD_TESTING AND TURBO_BUILD_TESTING) OR TURBO_BUILD_TEST_HELPERS)
-    include(gtest)
+if ((BUILD_TESTING AND TURBO_BUILD_TESTING))
+    include(deps)
+    include_directories(${gtest_SOURCE_DIR})
 endif ()
 
 set(TURBO_DYLINK)
