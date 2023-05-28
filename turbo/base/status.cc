@@ -340,7 +340,7 @@ std::ostream& operator<<(std::ostream& os, const Status& x) {
   os << x.ToString(StatusToStringMode::kWithEverything);
   return os;
 }
-
+/*
 Status AbortedError(std::string_view message) {
   return Status(turbo::kAborted, message);
 }
@@ -404,7 +404,7 @@ Status UnimplementedError(std::string_view message) {
 Status UnknownError(std::string_view message) {
   return Status(turbo::kUnknown, message);
 }
-
+*/
 bool IsAborted(const Status& status) {
   return status.code() == turbo::kAborted;
 }
