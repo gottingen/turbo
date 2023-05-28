@@ -346,92 +346,92 @@ namespace turbo {
         return lhs;
     }
 
-// turbo::Status
-//
-// The `turbo::Status` class is generally used to gracefully handle errors
-// across API boundaries (and in particular across RPC boundaries). Some of
-// these errors may be recoverable, but others may not. Most
-// functions which can produce a recoverable error should be designed to return
-// either an `turbo::Status` (or the similar `turbo::ResultStatus<T>`, which holds
-// either an object of type `T` or an error).
-//
-// API developers should construct their functions to return `turbo::OkStatus()`
-// upon success, or an `turbo::StatusCode` upon another type of error (e.g
-// an `turbo::StatusCode::kInvalidArgument` error). The API provides convenience
-// functions to construct each status code.
-//
-// Example:
-//
-// turbo::Status myFunction(std::string_view fname, ...) {
-//   ...
-//   // encounter error
-//   if (error condition) {
-//     // Construct an turbo::StatusCode::kInvalidArgument error
-//     return turbo::InvalidArgumentError("bad mode");
-//   }
-//   // else, return OK
-//   return turbo::OkStatus();
-// }
-//
-// Users handling status error codes should prefer checking for an OK status
-// using the `ok()` member function. Handling multiple error codes may justify
-// use of switch statement, but only check for error codes you know how to
-// handle; do not try to exhaustively match against all canonical error codes.
-// Errors that cannot be handled should be logged and/or propagated for higher
-// levels to deal with. If you do use a switch statement, make sure that you
-// also provide a `default:` switch case, so that code does not break as other
-// canonical codes are added to the API.
-//
-// Example:
-//
-//   turbo::Status result = DoSomething();
-//   if (!result.ok()) {
-//     TURBO_LOG(ERROR) << result;
-//   }
-//
-//   // Provide a default if switching on multiple error codes
-//   switch (result.code()) {
-//     // The user hasn't authenticated. Ask them to reauth
-//     case turbo::StatusCode::kUnauthenticated:
-//       DoReAuth();
-//       break;
-//     // The user does not have permission. Log an error.
-//     case turbo::StatusCode::kPermissionDenied:
-//       TURBO_LOG(ERROR) << result;
-//       break;
-//     // Propagate the error otherwise.
-//     default:
-//       return true;
-//   }
-//
-// An `turbo::Status` can optionally include a payload with more information
-// about the error. Typically, this payload serves one of several purposes:
-//
-//   * It may provide more fine-grained semantic information about the error to
-//     facilitate actionable remedies.
-//   * It may provide human-readable contexual information that is more
-//     appropriate to display to an end user.
-//
-// Example:
-//
-//   turbo::Status result = DoSomething();
-//   // Inform user to retry after 30 seconds
-//   // See more error details in googleapis/google/rpc/error_details.proto
-//   if (turbo::IsResourceExhausted(result)) {
-//     google::rpc::RetryInfo info;
-//     info.retry_delay().seconds() = 30;
-//     // Payloads require a unique key (a URL to ensure no collisions with
-//     // other payloads), and an `turbo::Cord` to hold the encoded data.
-//     std::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
-//     result.SetPayload(url, info.SerializeAsCord());
-//     return result;
-//   }
-//
-// For documentation see https://abseil.io/docs/cpp/guides/status.
-//
-// Returned Status objects may not be ignored. status_internal.h has a forward
-// declaration of the form
-// class TURBO_MUST_USE_RESULT Status;
+    // turbo::Status
+    //
+    // The `turbo::Status` class is generally used to gracefully handle errors
+    // across API boundaries (and in particular across RPC boundaries). Some of
+    // these errors may be recoverable, but others may not. Most
+    // functions which can produce a recoverable error should be designed to return
+    // either an `turbo::Status` (or the similar `turbo::ResultStatus<T>`, which holds
+    // either an object of type `T` or an error).
+    //
+    // API developers should construct their functions to return `turbo::OkStatus()`
+    // upon success, or an `turbo::StatusCode` upon another type of error (e.g
+    // an `turbo::StatusCode::kInvalidArgument` error). The API provides convenience
+    // functions to construct each status code.
+    //
+    // Example:
+    //
+    // turbo::Status myFunction(std::string_view fname, ...) {
+    //   ...
+    //   // encounter error
+    //   if (error condition) {
+    //     // Construct an turbo::StatusCode::kInvalidArgument error
+    //     return turbo::InvalidArgumentError("bad mode");
+    //   }
+    //   // else, return OK
+    //   return turbo::OkStatus();
+    // }
+    //
+    // Users handling status error codes should prefer checking for an OK status
+    // using the `ok()` member function. Handling multiple error codes may justify
+    // use of switch statement, but only check for error codes you know how to
+    // handle; do not try to exhaustively match against all canonical error codes.
+    // Errors that cannot be handled should be logged and/or propagated for higher
+    // levels to deal with. If you do use a switch statement, make sure that you
+    // also provide a `default:` switch case, so that code does not break as other
+    // canonical codes are added to the API.
+    //
+    // Example:
+    //
+    //   turbo::Status result = DoSomething();
+    //   if (!result.ok()) {
+    //     TURBO_LOG(ERROR) << result;
+    //   }
+    //
+    //   // Provide a default if switching on multiple error codes
+    //   switch (result.code()) {
+    //     // The user hasn't authenticated. Ask them to reauth
+    //     case turbo::StatusCode::kUnauthenticated:
+    //       DoReAuth();
+    //       break;
+    //     // The user does not have permission. Log an error.
+    //     case turbo::StatusCode::kPermissionDenied:
+    //       TURBO_LOG(ERROR) << result;
+    //       break;
+    //     // Propagate the error otherwise.
+    //     default:
+    //       return true;
+    //   }
+    //
+    // An `turbo::Status` can optionally include a payload with more information
+    // about the error. Typically, this payload serves one of several purposes:
+    //
+    //   * It may provide more fine-grained semantic information about the error to
+    //     facilitate actionable remedies.
+    //   * It may provide human-readable contexual information that is more
+    //     appropriate to display to an end user.
+    //
+    // Example:
+    //
+    //   turbo::Status result = DoSomething();
+    //   // Inform user to retry after 30 seconds
+    //   // See more error details in googleapis/google/rpc/error_details.proto
+    //   if (turbo::IsResourceExhausted(result)) {
+    //     google::rpc::RetryInfo info;
+    //     info.retry_delay().seconds() = 30;
+    //     // Payloads require a unique key (a URL to ensure no collisions with
+    //     // other payloads), and an `turbo::Cord` to hold the encoded data.
+    //     std::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
+    //     result.SetPayload(url, info.SerializeAsCord());
+    //     return result;
+    //   }
+    //
+    // For documentation see https://abseil.io/docs/cpp/guides/status.
+    //
+    // Returned Status objects may not be ignored. status_internal.h has a forward
+    // declaration of the form
+    // class TURBO_MUST_USE_RESULT Status;
     class Status final {
     public:
         // Constructors
@@ -689,36 +689,36 @@ namespace turbo {
         uintptr_t rep_;
     };
 
-// OkStatus()
-//
-// Returns an OK status, equivalent to a default constructed instance. Prefer
-// usage of `turbo::OkStatus()` when constructing such an OK status.
+    // OkStatus()
+    //
+    // Returns an OK status, equivalent to a default constructed instance. Prefer
+    // usage of `turbo::OkStatus()` when constructing such an OK status.
     Status OkStatus();
 
-// operator<<()
-//
-// Prints a human-readable representation of `x` to `os`.
+    // operator<<()
+    //
+    // Prints a human-readable representation of `x` to `os`.
     std::ostream &operator<<(std::ostream &os, const Status &x);
 
-// IsAborted()
-// IsAlreadyExists()
-// IsCancelled()
-// IsDataLoss()
-// IsDeadlineExceeded()
-// IsFailedPrecondition()
-// IsInternal()
-// IsInvalidArgument()
-// IsNotFound()
-// IsOutOfRange()
-// IsPermissionDenied()
-// IsResourceExhausted()
-// IsUnauthenticated()
-// IsUnavailable()
-// IsUnimplemented()
-// IsUnknown()
-//
-// These convenience functions return `true` if a given status matches the
-// `turbo::StatusCode` error code of its associated function.
+    // IsAborted()
+    // IsAlreadyExists()
+    // IsCancelled()
+    // IsDataLoss()
+    // IsDeadlineExceeded()
+    // IsFailedPrecondition()
+    // IsInternal()
+    // IsInvalidArgument()
+    // IsNotFound()
+    // IsOutOfRange()
+    // IsPermissionDenied()
+    // IsResourceExhausted()
+    // IsUnauthenticated()
+    // IsUnavailable()
+    // IsUnimplemented()
+    // IsUnknown()
+    //
+    // These convenience functions return `true` if a given status matches the
+    // `turbo::StatusCode` error code of its associated function.
     TURBO_MUST_USE_RESULT bool IsAborted(const Status &status);
 
     TURBO_MUST_USE_RESULT bool IsAlreadyExists(const Status &status);
