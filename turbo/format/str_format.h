@@ -18,18 +18,41 @@
 
 #include <string>
 #include "turbo/format/fmt/format.h"
+#include "turbo/format/fmt/ranges.h"
+#include "turbo/format/fmt/printf.h"
 
 namespace turbo {
 
-    template <typename String = std::string, typename ...Args>
-    String Format(std::string_view fmt, Args &&... args) {
-        return fmt::format(fmt, std::forward<Args>(args)...);
+    template<typename String = std::string, typename ...Args>
+    TURBO_MUST_USE_RESULT inline String Format(std::string_view fmt, Args &&... args) {
+        String result;
+        fmt::memory_buffer buf;
+        fmt::format_to(std::back_inserter(buf), fmt, std::forward<Args>(args)...);
+        return String(buf.data(), buf.size());
     }
 
-    template <typename String = std::string, typename ...Args>
-    void FormatAppend(String *dst, std::string_view fmt, Args &&... args) {
-        fmt::format_to(std::back_inserter(*dst), fmt, std::forward<Args>(args)...);
+    template<typename String = std::string, typename T>
+    TURBO_MUST_USE_RESULT inline String Format(const T &t) {
+        String result;
+        fmt::memory_buffer buf;
+        fmt::format_to(std::back_inserter(buf), "{}", t);
+        return String(buf.data(), buf.size());
     }
+
+    template<typename String = std::string, typename ...Args>
+    void FormatAppend(String *dst, std::string_view fmt, Args &&... args) {
+        fmt::memory_buffer buf;
+        fmt::format_to(std::back_inserter(buf), fmt, std::forward<Args>(args)...);
+        dst->append(buf.data(), buf.size());
+    }
+
+    template<typename String = std::string, typename T>
+    void FormatAppend(String *dst, const T &t) {
+        fmt::memory_buffer buf;
+        fmt::format_to(std::back_inserter(buf), "{}", t);
+        dst->append(buf.data(), buf.size());
+    }
+
 }  // namespace turbo
 
 #endif  // TURBO_FORMAT_STR_FORMAT_H_
