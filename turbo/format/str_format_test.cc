@@ -27,3 +27,11 @@ TEST(Format, InlinedString) {
     std::string stdstr  = turbo::Format(42);
     ASSERT_EQ(stdstr, "42");
 }
+
+TEST(Format, range) {
+    std::vector<int> array = {1, 2, 4};
+    auto s = turbo::FormatRange("{}",array, ", ");
+    ASSERT_EQ(s, "1, 2, 4");
+    turbo::FormatRangeAppend(&s,"{}",array, ", ");
+    ASSERT_EQ(s, "1, 2, 41, 2, 4");
+}
