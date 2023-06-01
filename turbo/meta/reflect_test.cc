@@ -150,38 +150,38 @@ const SomeClass<int> volatile *ptr_c = nullptr;
 const Color color = Color::RED;
 
 TEST(REFLECTION, variable) {
-    constexpr auto name = NAMEOF(othervar);
+    constexpr auto name = REFLECT(othervar);
     ASSERT_TRUE(name == "othervar");
-    ASSERT_TRUE(NAMEOF(struct_var) == "struct_var");
-    ASSERT_TRUE(NAMEOF(::struct_var) == "struct_var");
-    ASSERT_TRUE(NAMEOF(ptr_s) == "ptr_s");
-    ASSERT_TRUE(NAMEOF(color) == "color");
+    ASSERT_TRUE(REFLECT(struct_var) == "struct_var");
+    ASSERT_TRUE(REFLECT(::struct_var) == "struct_var");
+    ASSERT_TRUE(REFLECT(ptr_s) == "ptr_s");
+    ASSERT_TRUE(REFLECT(color) == "color");
 }
 
 TEST(REFLECTION, member) {
-    ASSERT_TRUE(NAMEOF(struct_var.somefield) == "somefield");
-    ASSERT_TRUE(NAMEOF((&struct_var)->somefield) == "somefield");
-    ASSERT_TRUE(NAMEOF(othervar.ll.field) == "field");
+    ASSERT_TRUE(REFLECT(struct_var.somefield) == "somefield");
+    ASSERT_TRUE(REFLECT((&struct_var)->somefield) == "somefield");
+    ASSERT_TRUE(REFLECT(othervar.ll.field) == "field");
 }
 
 TEST(REFLECTION, function) {
-    ASSERT_TRUE(NAMEOF(&SomeStruct::SomeMethod1) == "SomeMethod1");
-    ASSERT_TRUE(NAMEOF(struct_var.SomeMethod1(1)) == "SomeMethod1");
-    ASSERT_TRUE(NAMEOF(&SomeStruct::SomeMethod2) == "SomeMethod2");
-    ASSERT_TRUE(NAMEOF(struct_var.SomeMethod2()) == "SomeMethod2");
-    ASSERT_TRUE(NAMEOF(SomeMethod3) == "SomeMethod3");
-    ASSERT_TRUE(NAMEOF(SomeMethod3()) == "SomeMethod3");
-    ASSERT_TRUE(NAMEOF(SomeMethod4<int, float>) == "SomeMethod4");
-    ASSERT_TRUE(NAMEOF(SomeMethod4<int, float>(1.0f)) == "SomeMethod4");
-    ASSERT_TRUE(NAMEOF(&SomeClass<int>::SomeMethod5) == "SomeMethod5");
-    ASSERT_TRUE(NAMEOF(class_var.SomeMethod5()) == "SomeMethod5");
-    ASSERT_TRUE(NAMEOF(&SomeClass<int>::SomeMethod6<long int>) == "SomeMethod6");
-    ASSERT_TRUE(NAMEOF(class_var.SomeMethod6<long int>()) == "SomeMethod6");
+    ASSERT_TRUE(REFLECT(&SomeStruct::SomeMethod1) == "SomeMethod1");
+    ASSERT_TRUE(REFLECT(struct_var.SomeMethod1(1)) == "SomeMethod1");
+    ASSERT_TRUE(REFLECT(&SomeStruct::SomeMethod2) == "SomeMethod2");
+    ASSERT_TRUE(REFLECT(struct_var.SomeMethod2()) == "SomeMethod2");
+    ASSERT_TRUE(REFLECT(SomeMethod3) == "SomeMethod3");
+    ASSERT_TRUE(REFLECT(SomeMethod3()) == "SomeMethod3");
+    ASSERT_TRUE(REFLECT(SomeMethod4<int, float>) == "SomeMethod4");
+    ASSERT_TRUE(REFLECT(SomeMethod4<int, float>(1.0f)) == "SomeMethod4");
+    ASSERT_TRUE(REFLECT(&SomeClass<int>::SomeMethod5) == "SomeMethod5");
+    ASSERT_TRUE(REFLECT(class_var.SomeMethod5()) == "SomeMethod5");
+    ASSERT_TRUE(REFLECT(&SomeClass<int>::SomeMethod6<long int>) == "SomeMethod6");
+    ASSERT_TRUE(REFLECT(class_var.SomeMethod6<long int>()) == "SomeMethod6");
 }
 
 TEST(REFLECTION, enum) {
-    ASSERT_TRUE(NAMEOF(Color::RED) == "RED");
-    ASSERT_TRUE(NAMEOF(Color::BLUE) == "BLUE");
+    ASSERT_TRUE(REFLECT(Color::RED) == "RED");
+    ASSERT_TRUE(REFLECT(Color::BLUE) == "BLUE");
 }
 
 TEST(REFLECTION_FULL, variable) {

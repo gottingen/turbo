@@ -1022,7 +1022,7 @@ namespace turbo {
             return n<V>();
           } else {
             constexpr bool is_defined = sizeof(decltype(get_base_type(V))) != 0;
-            static_assert(is_defined, "turbo::nameof_member member name can use only if the struct is already fully defined. Please use NAMEOF macro, or separate definition and declaration.");
+            static_assert(is_defined, "turbo::nameof_member member name can use only if the struct is already fully defined. Please use REFLECT macro, or separate definition and declaration.");
             if constexpr (is_defined) {
                 return n<V, &(union_type_holder<decltype(get_base_type(V))>::value.f.*V)>();
             } else {
@@ -1239,7 +1239,7 @@ namespace turbo {
 } // namespace turbo
 
 // Obtains name of variable, function, macro.
-#define NAMEOF(...) []() constexpr noexcept {                         \
+#define REFLECT(...) []() constexpr noexcept {                         \
   ::std::void_t<decltype(__VA_ARGS__)>();                             \
   constexpr auto _name = ::turbo::detail::pretty_name(#__VA_ARGS__); \
   static_assert(!_name.empty(), "Expression does not have a name.");  \
