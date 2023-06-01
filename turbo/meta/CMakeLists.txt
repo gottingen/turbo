@@ -14,6 +14,17 @@
 # limitations under the License.
 #
 
+turbo_cc_test(
+        NAME
+        reflect_test
+        SRCS
+        "reflect_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gtest_main
+)
 
 
 turbo_cc_test(
