@@ -30,12 +30,11 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
-        - sysroot_linux-64 =2.17  # [linux64]
-        - cmake >=3.20, <=3.23
+        - sysroot_linux-64 >=2.17  # [linux64]
       host:
-        - sysroot_linux-64 =2.17  # [linux64]
+        - sysroot_linux-64 >=2.17  # [linux64]
       run:
-        - sysroot_linux-64 =2.17  # [linux64]
+        - sysroot_linux-64 >=2.17  # [linux64]
     test:
       commands:
         - test -f $PREFIX/lib/libturbo.so              # [linux]
