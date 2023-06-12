@@ -14,6 +14,5 @@
 # limitations under the License.
 #
 
-#add_subdirectory(json)
-add_subdirectory(jsoncons)
+add_subdirectory(meta)
 add_subdirectory(strings)

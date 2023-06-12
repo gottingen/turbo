@@ -14,38 +14,16 @@
 # limitations under the License.
 #
 
-turbo_cc_test(
-        NAME
-        latch_test
-        SRCS
-        "latch_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
 
 turbo_cc_test(
         NAME
-        barrier_test
+        str_format1_test
         SRCS
-        "barrier_test.cc"
+        "str_format_test.cc"
         COPTS
         ${TURBO_TEST_COPTS}
         DEPS
-        turbo::turbo
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        doubly_buffered_data_test
-        SRCS
-        "doubly_buffered_data_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
+        turbo::hash_testing
         turbo::turbo
         GTest::gmock_main
 )

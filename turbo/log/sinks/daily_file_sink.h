@@ -28,37 +28,42 @@
 
 namespace turbo {
 
-class DailyFileSink : public LogSink {
-public:
-  DailyFileSink(const turbo::filesystem::path &file_name, int rotation_hour,
-                int rotation_minute, bool truncate = false,
-                uint16_t max_files = 0);
-  ~DailyFileSink() override = default;
+    class DailyFileSink : public LogSink {
+    public:
+        DailyFileSink(const turbo::filesystem::path &file_name, int rotation_hour,
+                      int rotation_minute, bool truncate = false,
+                      uint16_t max_files = 0);
 
-  turbo::Status init();
-  void Send(const turbo::LogEntry &entry) override;
+        ~DailyFileSink() override = default;
 
-  void Flush() override;
+        turbo::Status init();
 
-private:
-  TURBO_NON_COPYABLE(DailyFileSink);
-  TURBO_NON_MOVEABLE(DailyFileSink);
-private:
-  turbo::filesystem::path calc_filename(const turbo::Time &now);
-  turbo::Time next_rotate_time();
-  void init_file_queue();
-  void remove_old_files();
-  void rotate(const turbo::Time &t);
-private:
-  turbo::filesystem::path base_filename_;
-  int rotation_h_;
-  int rotation_m_;
-  bool truncate_;
-  uint16_t max_files_;
-  std::unique_ptr<turbo::SequentialWriteFile> log_file_;
-  turbo::Time rotation_tp_;
-  turbo::ring_buffer<turbo::filesystem::path> filenames_q_;
-};
+        void Send(const turbo::LogEntry &entry) override;
+
+        void Flush() override;
+
+    private:TURBO_NON_COPYABLE(DailyFileSink);TURBO_NON_MOVEABLE(DailyFileSink);
+    private:
+        turbo::filesystem::path calc_filename(const turbo::Time &now);
+
+        turbo::Time next_rotate_time();
+
+        void init_file_queue();
+
+        void remove_old_files();
+
+        void rotate(const turbo::Time &t);
+
+    private:
+        turbo::filesystem::path base_filename_;
+        int rotation_h_;
+        int rotation_m_;
+        bool truncate_;
+        uint16_t max_files_;
+        std::unique_ptr<turbo::SequentialWriteFile> log_file_;
+        turbo::Time rotation_tp_;
+        turbo::ring_buffer<turbo::filesystem::path> filenames_q_;
+    };
 
 } // namespace turbo
 

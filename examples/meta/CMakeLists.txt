@@ -1,5 +1,5 @@
 #
-# Copyright 2023 The Turbo Authors.
+# Copyright 2023 The titan-search Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,38 +14,20 @@
 # limitations under the License.
 #
 
-turbo_cc_test(
+turbo_cc_binary(
         NAME
-        latch_test
+        reflect_example
         SRCS
-        "latch_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
+        "reflect_example.cc"
         DEPS
         turbo::turbo
-        GTest::gmock_main
 )
 
-turbo_cc_test(
+turbo_cc_binary(
         NAME
-        barrier_test
+        reflect_custom_name
         SRCS
-        "barrier_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
+        "reflect_custom_name.cc"
         DEPS
         turbo::turbo
-        GTest::gmock_main
-)
-
-turbo_cc_test(
-        NAME
-        doubly_buffered_data_test
-        SRCS
-        "doubly_buffered_data_test.cc"
-        COPTS
-        ${TURBO_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        GTest::gmock_main
 )

@@ -137,6 +137,18 @@ turbo_cc_test(
 )
 
 turbo_cc_test(
+        NAME
+        cord_buffer_test
+        SRCS
+        "cord_buffer_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        GTest::gmock_main
+)
+
+turbo_cc_test(
   NAME
     ostringstream_test
   SRCS

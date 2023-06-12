@@ -17,7 +17,8 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-void LogSink::KeyFunction() const {}
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_BEGIN
+    void LogSink::KeyFunction() const {}
+
+    TURBO_NAMESPACE_END
 }  // namespace turbo

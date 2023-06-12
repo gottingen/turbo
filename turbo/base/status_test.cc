@@ -145,6 +145,13 @@ TEST(Status, OkStatus) {
   EXPECT_EQ("", status.message());
 }
 
+TEST(Status, MakeStatus) {
+    turbo::Status status = turbo::MakeStatus(100, "this is {} error", 100);
+    EXPECT_FALSE(status.ok());
+    EXPECT_EQ(100, status.code());
+    EXPECT_EQ("this is 100 error", status.message());
+}
+
 TEST(Status, ConstructorWithCodeMessage) {
   {
     turbo::Status status(turbo::kCancelled, "");
