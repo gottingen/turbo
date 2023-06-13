@@ -280,7 +280,12 @@ void trace_example() {
     TLOG_CHECK(true);
     TLOG_CHECK(true, "abc");
     TLOG_CHECK(false, "abc{}", 42);
-    //TLOG_CHECK(1 == 2);
+    TLOG_CHECK_EQ(12, 12);
+    TLOG_CHECK_EQ(12, 11, "aaa {}", "some reason");
+    int a = 10;
+    size_t bb = 12;
+    TLOG_CHECK_EQ(a, bb);
+    TLOG_CHECK(1 == 2);
 }
 
 // stopwatch example
