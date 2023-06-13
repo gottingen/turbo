@@ -78,7 +78,7 @@
 #    define TLOG_TRACE_IF_FIRST_N(cond, N, ...) TLOG_LOGGER_TRACE_IF_FIRST_N(turbo::tlog::default_logger_raw(), cond, N, __VA_ARGS__)
 #    define TLOG_TRACE_FIRST_N(N, ...) TLOG_LOGGER_TRACE_FIRST_N(turbo::tlog::default_logger_raw(), N, __VA_ARGS__)
 #    define TLOG_TRACE_IF_ONCE(cond, ...) TLOG_LOGGER_TRACE_IF_ONCE(turbo::tlog::default_logger_raw(), cond, __VA_ARGS__)
-#    define TLOG_TRACE_ONCE( ...) TLOG_LOGGER_TRACE_ONCE(turbo::tlog::default_logger_raw(), __VA_ARGS__)
+#    define TLOG_TRACE_ONCE(...) TLOG_LOGGER_TRACE_ONCE(turbo::tlog::default_logger_raw(), __VA_ARGS__)
 #    define TLOG_TRACE_IF_EVERY_N_SEC(cond, N, ...) TLOG_LOGGER_TRACE_IF_EVERY_N_SEC(turbo::tlog::default_logger_raw(), cond, N, __VA_ARGS__)
 #    define TLOG_TRACE_EVERY_N_SEC(N, ...) TLOG_LOGGER_TRACE_EVERY_N_SEC(turbo::tlog::default_logger_raw(), N, __VA_ARGS__)
 #else
@@ -207,7 +207,7 @@
 #    define TLOG_WARN_EVERY_N(N, ...) TLOG_LOGGER_WARN_EVERY_N(turbo::tlog::default_logger_raw(), N, __VA_ARGS__)
 #    define TLOG_WARN_IF_FIRST_N(cond, N, ...) TLOG_LOGGER_WARN_IF_FIRST_N(turbo::tlog::default_logger_raw(), cond, N, __VA_ARGS__)
 #    define TLOG_WARN_FIRST_N(N, ...) TLOG_LOGGER_WARN_FIRST_N(turbo::tlog::default_logger_raw(), N, __VA_ARGS__)
-#    define TLOG_WARN_IF_ONCE(cond,  ...) TLOG_LOGGER_WARN_IF_ONCE(turbo::tlog::default_logger_raw(), cond, __VA_ARGS__)
+#    define TLOG_WARN_IF_ONCE(cond, ...) TLOG_LOGGER_WARN_IF_ONCE(turbo::tlog::default_logger_raw(), cond, __VA_ARGS__)
 #    define TLOG_WARN_ONCE(...) TLOG_LOGGER_WARN_ONCE(turbo::tlog::default_logger_raw(), __VA_ARGS__)
 #    define TLOG_WARN_IF_EVERY_N_SEC(cond, N, ...) TLOG_LOGGER_WARN_IF_EVERY_N_SEC(turbo::tlog::default_logger_raw(), cond, N, __VA_ARGS__)
 #    define TLOG_WARN_EVERY_N_SEC(N, ...) TLOG_LOGGER_WARN_EVERY_N_SEC(turbo::tlog::default_logger_raw(), N, __VA_ARGS__)
@@ -324,13 +324,16 @@
 
 namespace turbo::tlog::details {
 
-    std::string FormatLog() {
-        return "";
-    }
-
-    template <typename ...Args>
-    std::string FormatLog(Args&&...args) {
-        return turbo::Format(std::forward<Args>(args)...);
+    template<typename ...Args>
+    std::string FormatLog(const std::string_view &prefix, const std::string_view &expr, Args &&...args) {
+        std::string result;
+        result.append(prefix);
+        result.append(expr);
+        if constexpr (sizeof...(args) != 0) {
+            result.append(" ");
+            turbo::FormatAppend(&result, std::forward<Args>(args)...);
+        }
+        return result;
     }
 
 }  // namespace turbo::tlog::details
@@ -338,7 +341,7 @@ namespace turbo::tlog::details {
 #define TLOG_CHECK(expr, ...) \
        do {                   \
            if(TURBO_UNLIKELY(!(expr))) {        \
-              TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), "Check failed: "#expr" " +::turbo::tlog::details::FormatLog(__VA_ARGS__)); \
+              TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), ::turbo::tlog::details::FormatLog("Check failed: ", #expr, ##__VA_ARGS__)); \
               std::abort();                \
            }                    \
        }while(0)
