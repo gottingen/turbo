@@ -75,7 +75,6 @@ namespace turbo {
                     std::unique_lock l(mu_);
                     cv_.wait(l,  [this]{ return this->stop_ || !this->queue_.empty(); });
                     if(stop_) {
-                        TURBO_LOG(INFO)<<"stop thread";
                         return;
                     }
                     func = std::move(queue_.front());

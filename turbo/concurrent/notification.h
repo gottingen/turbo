@@ -19,7 +19,7 @@
 #include <atomic>
 #include <memory>
 #include "turbo/time/time.h"
-#include "turbo/log/logging.h"
+#include "turbo/tlog/logging.h"
 
 namespace turbo {
 
@@ -58,7 +58,7 @@ namespace turbo {
         bool WaitForNotificationWithTimeout(const turbo::Duration &d) const {
             std::chrono::microseconds timeout = turbo::ToChronoMicroseconds(d);
             std::unique_lock lk(_data->mutex);
-            TURBO_CHECK_GE(_data->count, 0ul);
+            TLOG_CHECK_GE(_data->count, 0ul);
             return _data->cond.wait_for(lk, timeout, [this] { return _data->count == 0; });
         }
 
@@ -70,7 +70,7 @@ namespace turbo {
         bool WaitForNotificationWithDeadline(const turbo::Time &deadline) const {
             auto d = turbo::ToChronoTime(deadline);
             std::unique_lock lk(_data->mutex);
-            TURBO_CHECK_GE(_data->count, 0ul);
+            TLOG_CHECK_GE(_data->count, 0ul);
             return _data->cond.wait_until(lk, d, [this] { return _data->count == 0; });
         }
 

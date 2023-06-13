@@ -75,22 +75,6 @@ set(TURBO_ALL_SRC
         "hash/internal/city.cc"
         "hash/internal/hash.cc"
         "hash/internal/low_level_hash.cc"
-        "log/internal/check_op.cc"
-        "log/internal/conditions.cc"
-        "log/internal/globals.cc"
-        "log/internal/log_format.cc"
-        "log/internal/log_message.cc"
-        "log/internal/log_sink_set.cc"
-        "log/internal/nullguard.cc"
-        "log/internal/proto.cc"
-        "log/sinks/ansicolor_sink.cc"
-        "log/sinks/daily_file_sink.cc"
-        "log/die_if_null.cc"
-        "log/flags.cc"
-        "log/globals.cc"
-        "log/initialize.cc"
-        "log/log_entry.cc"
-        "log/log_sink.cc"
         "memory/jemalloc_helper.cc"
         "meta/bad_any_cast.cc"
         "meta/bad_optional_access.cc"
@@ -205,7 +189,6 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(flags)
     add_subdirectory(format)
     add_subdirectory(hash)
-    add_subdirectory(log)
     add_subdirectory(memory)
     add_subdirectory(meta)
     add_subdirectory(profiling)
