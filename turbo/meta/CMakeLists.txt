@@ -303,3 +303,16 @@ turbo_cc_test(
         turbo::test_instance_tracker
         GTest::gmock_main
 )
+
+turbo_cc_test(
+        NAME
+        function_test
+        SRCS
+        "function_test.cc"
+        COPTS
+        ${TURBO_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        turbo::test_instance_tracker
+        GTest::gmock_main
+)
