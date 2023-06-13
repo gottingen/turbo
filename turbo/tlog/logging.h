@@ -322,10 +322,23 @@
 #    define TLOG_CRITICAL_EVERY_N_SEC(...) (void)0
 #endif
 
+namespace turbo::tlog::details {
+
+    std::string FormatLog() {
+        return "";
+    }
+
+    template <typename ...Args>
+    std::string FormatLog(Args&&...args) {
+        return turbo::Format(std::forward<Args>(args)...);
+    }
+
+}  // namespace turbo::tlog::details
+
 #define TLOG_CHECK(expr, ...) \
        do {                   \
            if(TURBO_UNLIKELY(!(expr))) {        \
-              TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), "Check failed: "#expr" "##__VA_ARGS__); \
+              TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), "Check failed: "#expr" " +::turbo::tlog::details::FormatLog(__VA_ARGS__)); \
               std::abort();                \
            }                    \
        }while(0)

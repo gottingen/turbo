@@ -278,6 +278,8 @@ void trace_example() {
     auto logger = turbo::tlog::get("file_logger");
     TLOG_LOGGER_TRACE(logger, "another trace message");
     TLOG_CHECK(true);
+    TLOG_CHECK(true, "abc");
+    TLOG_CHECK(false, "abc{}", 42);
     //TLOG_CHECK(1 == 2);
 }
 
