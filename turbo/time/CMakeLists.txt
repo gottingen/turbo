@@ -47,15 +47,3 @@ turbo_cc_test(
     turbo::turbo
     GTest::gmock_main
 )
-
-turbo_cc_test(
-  NAME
-    flag_test
-  SRCS
-    "flag_test.cc"
-  COPTS
-    ${TURBO_TEST_COPTS}
-  DEPS
-    turbo::turbo
-    GTest::gmock_main
-)

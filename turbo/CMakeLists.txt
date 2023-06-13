@@ -58,18 +58,6 @@ set(TURBO_ALL_SRC
         "files/file_watcher.cc"
         "files/sequential_read_file.cc"
         "files/sequential_write_file.cc"
-        "flags/internal/commandlineflag.cc"
-        "flags/internal/flag.cc"
-        "flags/internal/program_name.cc"
-        "flags/internal/usage.cc"
-        "flags/internal/private_handle_accessor.cc"
-        "flags/commandlineflag.cc"
-        "flags/flag.cc"
-        "flags/marshalling.cc"
-        "flags/parse.cc"
-        "flags/reflection.cc"
-        "flags/usage.cc"
-        "flags/usage_config.cc"
         "format/fmt/format.cc"
         "format/fmt/os.cc"
         "hash/internal/city.cc"
@@ -186,7 +174,6 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(crypto)
     add_subdirectory(debugging)
     add_subdirectory(files)
-    add_subdirectory(flags)
     add_subdirectory(format)
     add_subdirectory(hash)
     add_subdirectory(memory)
