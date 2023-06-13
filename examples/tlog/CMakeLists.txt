@@ -19,6 +19,8 @@ turbo_cc_binary(
         log_ex
         SRCS
         "log_ex.cc"
+        DEFINES
+        "-DNDEBUG"
         DEPS
         turbo::turbo
 )
