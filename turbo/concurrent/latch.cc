@@ -20,7 +20,7 @@ namespace turbo {
     }
 
     void Latch::CountDown(uint32_t update) {
-        TURBO_CHECK(_data->count > 0) << "melon::Latch::CountDown() called too many times";
+        TLOG_CHECK(_data->count > 0, "turbo::Latch::CountDown() called too many times");
         _data->count -= update;
         if (_data->count == 0) {
             std::unique_lock lk(_data->mutex);
@@ -34,13 +34,13 @@ namespace turbo {
 
     bool Latch::TryWait() const noexcept {
         std::unique_lock lk(_data->mutex);
-        TURBO_CHECK_GE(_data->count, 0u);
+        TLOG_CHECK_GE(_data->count, 0u);
         return !_data->count;
     }
 
     void Latch::Wait() const {
         std::unique_lock lk(_data->mutex);
-        TURBO_CHECK_GE(_data->count, 0u);
+        TLOG_CHECK_GE(_data->count, 0u);
         return _data->cond.wait(lk, [this] { return _data->count == 0; });
     }
 

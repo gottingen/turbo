@@ -286,7 +286,7 @@ namespace turbo {
         _wrappers.reserve(64);
         const int rc = pthread_key_create(&_wrapper_key, delete_object<Wrapper>);
         if (rc != 0) {
-            TURBO_PLOG(ERROR) << "Fail to pthread_key_create: " << rc;
+            TLOG_ERROR("Fail to pthread_key_create: {} errno: ", rc, errno);
         } else {
             _created_key = true;
         }
@@ -376,7 +376,7 @@ namespace turbo {
 
         const size_t ret2 = fn(_data[bg_index]);
         if (ret2 != ret) {
-            TURBO_PLOG(ERROR) << "something worong happened, index=" << _index.load(std::memory_order_relaxed);
+            TLOG_ERROR("something worong happened, index={}", _index.load(std::memory_order_relaxed));
         }
         return ret2;
     }

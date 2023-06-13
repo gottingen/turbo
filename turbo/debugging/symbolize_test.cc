@@ -26,7 +26,7 @@
 #include "turbo/base/casts.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/debugging/internal/stack_consumption.h"
-#include "turbo/log/turbo_log.h"
+#include "turbo/log/logging.h"
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/per_thread_tls.h"
@@ -127,7 +127,7 @@ static const char *TrySymbolizeWithLimit(void *pc, int limit) {
                  "try_symbolize_buffer is too small");
 
   // Use the heap to facilitate heap and buffer sanitizer tools.
-  TURBO_LOG(INFO)<<"limit size:"<<limit;
+  TLOG_INFO("limit size:{}", limit);
   auto heap_buffer = std::make_unique<char[]>(sizeof(try_symbolize_buffer));
   bool found = turbo::Symbolize(pc, heap_buffer.get(), limit);
   if (found) {
@@ -137,7 +137,7 @@ static const char *TrySymbolizeWithLimit(void *pc, int limit) {
             sizeof(try_symbolize_buffer) - 1);
     try_symbolize_buffer[sizeof(try_symbolize_buffer) - 1] = '\0';
   }
-  TURBO_LOG(INFO)<<"found:"<<(found ? "true" : "false");
+  TLOG_INFO("found: {}",(found ? "true" : "false"));
   return found ? try_symbolize_buffer : nullptr;
 }
 

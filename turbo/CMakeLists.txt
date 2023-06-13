@@ -58,39 +58,19 @@ set(TURBO_ALL_SRC
         "files/file_watcher.cc"
         "files/sequential_read_file.cc"
         "files/sequential_write_file.cc"
-        "flags/internal/commandlineflag.cc"
-        "flags/internal/flag.cc"
-        "flags/internal/program_name.cc"
-        "flags/internal/usage.cc"
-        "flags/internal/private_handle_accessor.cc"
-        "flags/commandlineflag.cc"
-        "flags/flag.cc"
-        "flags/marshalling.cc"
-        "flags/parse.cc"
-        "flags/reflection.cc"
-        "flags/usage.cc"
-        "flags/usage_config.cc"
         "format/fmt/format.cc"
         "format/fmt/os.cc"
         "hash/internal/city.cc"
         "hash/internal/hash.cc"
         "hash/internal/low_level_hash.cc"
-        "log/internal/check_op.cc"
-        "log/internal/conditions.cc"
-        "log/internal/globals.cc"
-        "log/internal/log_format.cc"
-        "log/internal/log_message.cc"
-        "log/internal/log_sink_set.cc"
-        "log/internal/nullguard.cc"
-        "log/internal/proto.cc"
-        "log/sinks/ansicolor_sink.cc"
-        "log/sinks/daily_file_sink.cc"
-        "log/die_if_null.cc"
-        "log/flags.cc"
-        "log/globals.cc"
-        "log/initialize.cc"
-        "log/log_entry.cc"
-        "log/log_sink.cc"
+        "log/async.cc"
+        "log/cfg.cc"
+        "log/condition.cc"
+        "log/color_sinks.cc"
+        "log/file_sinks.cc"
+        "log/logging.cc"
+        "log/tlog.cc"
+        "log/stdout_sinks.cc"
         "memory/jemalloc_helper.cc"
         "meta/bad_any_cast.cc"
         "meta/bad_optional_access.cc"
@@ -194,10 +174,8 @@ if (TURBO_BUILD_TESTING)
     add_subdirectory(crypto)
     add_subdirectory(debugging)
     add_subdirectory(files)
-    add_subdirectory(flags)
     add_subdirectory(format)
     add_subdirectory(hash)
-    add_subdirectory(log)
     add_subdirectory(memory)
     add_subdirectory(meta)
     add_subdirectory(profiling)

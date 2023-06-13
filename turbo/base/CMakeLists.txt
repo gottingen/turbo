@@ -201,16 +201,6 @@ turbo_cc_test(
         GTest::gtest_main
 )
 
-turbo_cc_test(
-        NAME
-        log_severity_test
-        SRCS
-        "log_severity_test.cc"
-        DEPS
-        turbo::turbo
-        GTest::gmock
-        GTest::gtest_main
-)
 
 
 turbo_cc_test(
