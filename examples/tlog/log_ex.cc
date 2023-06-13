@@ -7,20 +7,20 @@
 #include <cstdio>
 #include <chrono>
 #include "turbo/format/str_format.h"
-#include "turbo/tlog/tlog.h"
-#include "turbo/tlog/cfg/env.h"  // support for loading levels from the environment variable
-#include "turbo/tlog/sinks/basic_file_sink.h"
-#include "turbo/tlog/sinks/stdout_color_sinks.h"
-#include "turbo/tlog/async.h"
-#include "turbo/tlog/sinks/rotating_file_sink.h"
-#include "turbo/tlog/pattern_formatter.h"
-#include "turbo/tlog/stopwatch.h"
+#include "turbo/log/tlog.h"
+#include "turbo/log/cfg/env.h"  // support for loading levels from the environment variable
+#include "turbo/log/sinks/basic_file_sink.h"
+#include "turbo/log/sinks/stdout_color_sinks.h"
+#include "turbo/log/async.h"
+#include "turbo/log/sinks/rotating_file_sink.h"
+#include "turbo/log/pattern_formatter.h"
+#include "turbo/log/stopwatch.h"
 #include <thread>
-#include "turbo/tlog/fmt/bin_to_hex.h"
-#include "turbo/tlog/sinks/daily_file_sink.h"
-#include "turbo/tlog/cfg/env.h"
-#include "turbo/tlog/sinks/udp_sink.h"
-#include "turbo/tlog/logging.h"
+#include "turbo/log/fmt/bin_to_hex.h"
+#include "turbo/log/sinks/daily_file_sink.h"
+#include "turbo/log/cfg/env.h"
+#include "turbo/log/sinks/udp_sink.h"
+#include "turbo/log/logging.h"
 
 
 void load_levels_example();
@@ -168,7 +168,7 @@ void load_levels_example() {
     turbo::tlog::cfg::load_env_levels();
     // or from command line:
     // ./example TLOG_LEVEL=info,mylogger=trace
-    // #include "turbo/tlog/cfg/argv.h" // for loading levels from argv
+    // #include "turbo/log/cfg/argv.h" // for loading levels from argv
     // turbo::tlog::cfg::load_argv_levels(args, argv);
 }
 
@@ -355,7 +355,7 @@ void err_handler_example() {
 // syslog example (linux/osx/freebsd)
 #ifndef _WIN32
 
-#    include "turbo/tlog/sinks/syslog_sink.h"
+#    include "turbo/log/sinks/syslog_sink.h"
 
 void syslog_example() {
     std::string ident = "tlog-example";
@@ -367,7 +367,7 @@ void syslog_example() {
 
 // Android example.
 #if defined(__ANDROID__)
-#    include "turbo/tlog/sinks/android_sink.h"
+#    include "turbo/log/sinks/android_sink.h"
 void android_example()
 {
     std::string tag = "tlog-android";

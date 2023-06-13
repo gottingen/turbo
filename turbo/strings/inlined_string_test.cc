@@ -25,7 +25,7 @@
 #include <list>
 #include <random>
 #include <sstream>
-#include <turbo/tlog/logging.h>
+#include <turbo/log/logging.h>
 #include <turbo/time/clock.h>
 #include <turbo/strings/str_split.h>
 #include "turbo/container/for_each.h"

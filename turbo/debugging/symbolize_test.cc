@@ -26,7 +26,7 @@
 #include "turbo/base/casts.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/debugging/internal/stack_consumption.h"
-#include "turbo/tlog/logging.h"
+#include "turbo/log/logging.h"
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/per_thread_tls.h"
