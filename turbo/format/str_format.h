@@ -18,9 +18,11 @@
 
 #include <string>
 #include "turbo/format/fmt/format.h"
+#include "turbo/format/fmt/core.h"
 #include "turbo/format/fmt/ranges.h"
 #include "turbo/format/fmt/printf.h"
 #include "turbo/format/fmt/std.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 

@@ -1,5 +1,5 @@
 #
-# Copyright 2023 The Turbo Authors.
+# Copyright 2023 The titan-search Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,11 @@
 # limitations under the License.
 #
 
-add_subdirectory(meta)
-add_subdirectory(strings)
-add_subdirectory(tlog)
+turbo_cc_binary(
+        NAME
+        log_ex
+        SRCS
+        "log_ex.cc"
+        DEPS
+        turbo::turbo
+)

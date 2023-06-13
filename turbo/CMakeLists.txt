@@ -169,6 +169,14 @@ set(TURBO_ALL_SRC
         "time/internal/cctz/src/time_zone_lookup.cc"
         "time/internal/cctz/src/time_zone_posix.cc"
         "time/internal/cctz/src/zone_info_source.cc"
+        "tlog/async.cc"
+        "tlog/cfg.cc"
+        "tlog/condition.cc"
+        "tlog/color_sinks.cc"
+        "tlog/file_sinks.cc"
+        "tlog/logging.cc"
+        "tlog/tlog.cc"
+        "tlog/stdout_sinks.cc"
         "unicode/utf.cc"
         )
 
