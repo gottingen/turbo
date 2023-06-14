@@ -20,7 +20,7 @@
 #include "turbo/simd/types/utils.h"
 #include "turbo/simd/simd.h"
 
-#include "doctest/doctest.h"
+#include "tests/doctest/doctest.h"
 
 template<class T>
 struct scalar_type {

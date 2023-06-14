@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "doctest/doctest.h"
+#include "tests/doctest/doctest.h"
 
 #include "turbo/simd/memory/aligned_allocator.h"
 #include "turbo/simd/memory/alignment.h"

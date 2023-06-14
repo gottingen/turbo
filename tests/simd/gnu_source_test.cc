@@ -26,7 +26,7 @@
 
 #include "turbo/simd/simd.h"
 
-#include "doctest/doctest.h"
+#include "tests/doctest/doctest.h"
 
 TEST_CASE("[GNU_SOURCE support]")
 {

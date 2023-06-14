@@ -27,7 +27,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "doctest/doctest.h"
+#include "tests/doctest/doctest.h"
 
 #ifndef TEST_UTILS_H_
 #define TEST_UTILS_H_
