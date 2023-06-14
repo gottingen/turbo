@@ -16,7 +16,7 @@
 
 #ifndef TURBO_REFLECT_REFLECT_H_
 #define TURBO_REFLECT_REFLECT_H_
-
+/*
 #include "../../../../../../../usr/include/c++/11/array"
 #include "../../../../../../../usr/include/c++/11/cassert"
 #include "../../../../../../../usr/include/c++/11/cstdint"
@@ -26,7 +26,21 @@
 #include "../../../../../../../usr/include/c++/11/limits"
 #include "../../../../../../../usr/include/c++/11/type_traits"
 #include "../../../../../../../usr/include/c++/11/utility"
-
+*/
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <cstddef>
+#include <iosfwd>
+#include <iterator>
+#include <limits>
+#include <type_traits>
+#include <utility>
+#include <string>
+#include <string_view>
+#include <cxxabi.h>
+#include <cstdlib>
+/*
 #if !defined(REFLECT_USING_ALIAS_STRING)
 
 #include "../../../../../../../usr/include/c++/11/string"
@@ -44,7 +58,7 @@
 #include "../../../../../../../usr/include/c++/11/cstdlib"
 
 #endif
-
+*/
 #if defined(__clang__)
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wunknown-warning-option"

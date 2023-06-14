@@ -123,7 +123,7 @@ namespace turbo {
     //
     //     auto up = std::make_unique<int>(10);
     //     auto sp = turbo::ShareUniquePtr(std::move(up));  // shared_ptr<int>
-    //     CHECK_EQ(*sp, 10);
+    //     ASSERT_EQ(*sp, 10);
     //     CHECK(up == nullptr);
     //
     // Note that this conversion is correct even when T is an array type, and more
@@ -150,7 +150,7 @@ namespace turbo {
     //
     //    auto sp = std::make_shared<int>(10);
     //    auto wp = turbo::WeakenPtr(sp);
-    //    CHECK_EQ(sp.get(), wp.lock().get());
+    //    ASSERT_EQ(sp.get(), wp.lock().get());
     //    sp.reset();
     //    CHECK(wp.lock() == nullptr);
     //`
