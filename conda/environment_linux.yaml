@@ -8,3 +8,4 @@ dependencies:
   - sysroot_linux-64 >=2.17 # [linux]
   - gtest
   - gmock
+  - benchmark

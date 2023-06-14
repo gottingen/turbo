@@ -179,7 +179,7 @@ typedef int8_t bool8_t;
 
 #ifndef CHAR8_T_DEFINED // If the user hasn't already defined these...
 #define CHAR8_T_DEFINED
-using char8_t = unsigned char;
+//using char8_t = unsigned char;
 /*
 #if defined(TURBO_PLATFORM_APPLE)
         #define char8_t char    // The Apple debugger is too stupid to realize char8_t is typedef'd to char, so we #define it.

@@ -14,12 +14,12 @@
 # limitations under the License.
 #
 
-turbo_cc_binary(
+carbin_cc_binary(
         NAME
         log_ex
-        SRCS
+        SOURCES
         "log_ex.cc"
-        DEFINES
+        DEFINITIONS
         "-DNDEBUG"
         DEPS
         turbo::turbo

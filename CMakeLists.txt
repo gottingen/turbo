@@ -1,11 +1,11 @@
 #
-# Copyright 2023 The Turbo Authors.
+# Copyright 2023 The titan-search Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
+#    https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +14,8 @@
 # limitations under the License.
 #
 
-# https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md
-# As of 2022-09-06, CMake 3.10 is the minimum supported version.
 cmake_minimum_required(VERSION 3.20)
+
 
 # Compiler id for Apple Clang is now AppleClang.
 if (POLICY CMP0025)
@@ -56,172 +55,111 @@ if (POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW)
 endif (POLICY CMP0135)
 
-project(turbo LANGUAGES CXX)
-include(CTest)
 
-# Output directory is correct by default for most build setups. However, when
-# building Turbo as a DLL, it is important to have the DLL in the same
-# directory as the executable using it. Thus, we put all executables in a single
-# /bin directory.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+project(turbo CXX)
 
-# when turbo is included as subproject (i.e. using add_subdirectory(turbo))
-# in the source tree of a project that uses it, install rules are disabled.
-if (NOT CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-    option(TURBO_ENABLE_INSTALL "Enable install rule" OFF)
-else ()
-    option(TURBO_ENABLE_INSTALL "Enable install rule" ON)
-endif ()
+set(PROJECT_DESCRIPTION "Hercules is an ahead of time compiler for a subset of the Python language framework.")
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 1)
+set(PROJECT_VERSION_PATCH 5)
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-set(CMAKE_CXX_STANDARD 17)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/package)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/recipes)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/simd)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/copts)
 
-option(TURBO_USE_SYSTEM_INCLUDES
-        "Silence warnings in Turbo headers by marking them as SYSTEM includes"
-        OFF)
-option(TURBO_USE_CXX_ABI "_GLIBCXX_USE_CXX11_ABI  default is on _GLIBCXX_USE_CXX11_ABI = 1" OFF)
-
-option(TURBO_ENABLE_PIC "POSITION_INDEPENDENT_CODE" ON)
-
-list(APPEND CMAKE_MODULE_PATH
-        ${CMAKE_CURRENT_LIST_DIR}/CMake
-        ${CMAKE_CURRENT_LIST_DIR}/copts
-        )
-
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
-include(TurboDll)
-include(TurboHelpers)
-include(Simd)
-
-
-##
-## Using turbo targets
-##
-## all public turbo targets are
-## exported with the turbo:: prefix
-##
-## e.g turbo::base turbo::synchronization turbo::strings ....
-##
-## DO NOT rely on the internal targets outside of the prefix
-
-
-# include current path
-list(APPEND TURBO_COMMON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
-
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(TURBO_USING_CLANG ON)
-else ()
-    set(TURBO_USING_CLANG OFF)
-endif ()
-
-if (TURBO_USE_CXX_ABI)
-    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
-else ()
-    add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
-endif ()
-
-# find dependencies
-## pthread
-find_package(Threads REQUIRED)
-
-include(CMakeDependentOption)
-
-option(TURBO_BUILD_TESTING
-        "If ON, Turbo will build all of Turbo's own tests." ON)
-
-option(TURBO_BUILD_EXAMPLE
-        "If ON, Turbo will build all of Turbo's example." ON)
-
-if ((BUILD_TESTING AND TURBO_BUILD_TESTING))
-    include(deps)
-    include_directories(${gtest_SOURCE_DIR})
-endif ()
-
-set(CMAKE_VERBOSE_MAKEFILE ON)
-set(TURBO_DYLINK)
-if (APPLE)
-    find_library(CoreFoundation CoreFoundation)
-    list(APPEND TURBO_DYLINK ${CoreFoundation} pthread)
-elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    list(APPEND TURBO_DYLINK rt dl pthread)
-endif ()
+include(carbin_module)
 
 add_subdirectory(turbo)
 
-if (TURBO_BUILD_EXAMPLE)
+if (CARBIN_BUILD_TEST)
+    add_subdirectory(tests)
+endif ()
+
+if (CARBIN_BUILD_BENCHMARK)
+    add_subdirectory(benchmark)
+endif ()
+
+if (CARBIN_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
 
-if (TURBO_ENABLE_INSTALL)
-    # turbo:lts-remove-begin(system installation is supported for LTS releases)
-    # We don't support system-wide installation
-    list(APPEND SYSTEM_INSTALL_DIRS "/usr/local" "/usr" "/opt/" "/opt/local" "c:/Program Files/${PROJECT_NAME}")
-    if (NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX IN_LIST SYSTEM_INSTALL_DIRS)
-        message(WARNING "\
-  The default and system-level install directories are unsupported except in LTS \
-  releases of Turbo.  Please set CMAKE_INSTALL_PREFIX to install Turbo in your \
-  source or build tree directly.\
-    ")
-    endif ()
-    # turbo:lts-remove-end
-
-    # install as a subdirectory only
-    install(EXPORT ${PROJECT_NAME}Targets
-            NAMESPACE turbo::
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-            )
-
-    configure_package_config_file(
-            CMake/turboConfig.cmake.in
-            "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-            INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    )
-    install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-            )
-
-    # Turbo only has a version in LTS releases.  This mechanism is accomplished
-    # Turbo's internal Copybara (https://github.com/google/copybara) workflows and
-    # isn't visible in the CMake buildsystem itself.
-    if (turbo_VERSION)
-        write_basic_package_version_file(
-                "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-                COMPATIBILITY ExactVersion
+install(DIRECTORY ${PROJECT_NAME}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING
+        PATTERN "*.inc"
+        PATTERN "*.h"
         )
 
-        install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-                DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-                )
-    endif ()  # turbo_VERSION
+install(DIRECTORY ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING
+        PATTERN "*.inc"
+        PATTERN "*.h"
+        )
 
-    install(DIRECTORY turbo
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-            FILES_MATCHING
-            PATTERN "*.inc"
-            PATTERN "*.h"
-            PATTERN "copts" EXCLUDE
-            PATTERN "testdata" EXCLUDE
-            PATTERN "synchronization" EXCLUDE
-            )
+# Layout. This works for all platforms:
+#   * <prefix>/lib*/cmake/<PROJECT-NAME>
+#   * <prefix>/lib*/
+#   * <prefix>/include/
+set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-    file(READ "turbo/platform/options.h" TURBO_INTERNAL_OPTIONS_H_CONTENTS)
-    if (TURBO_INTERNAL_AT_LEAST_CXX17)
-        string(REGEX REPLACE
-                "#define TURBO_OPTION_USE_STD_([^ ]*) 2"
-                "#define TURBO_OPTION_USE_STD_\\1 1"
-                TURBO_INTERNAL_OPTIONS_H_PINNED
-                "${TURBO_INTERNAL_OPTIONS_H_CONTENTS}")
-    else ()
-        string(REGEX REPLACE
-                "#define TURBO_OPTION_USE_STD_([^ ]*) 2"
-                "#define TURBO_OPTION_USE_STD_\\1 0"
-                TURBO_INTERNAL_OPTIONS_H_PINNED
-                "${TURBO_INTERNAL_OPTIONS_H_CONTENTS}")
-    endif ()
-    file(WRITE "${CMAKE_BINARY_DIR}/options-pinned.h" "${TURBO_INTERNAL_OPTIONS_H_PINNED}")
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
-    install(FILES "${CMAKE_BINARY_DIR}/options-pinned.h"
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/turbo/platform
-            RENAME "options.h")
+# Configuration
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
 
-endif ()  # TURBO_ENABLE_INSTALL
+# Include module with fuction 'write_basic_package_version_file'
+include(CMakePackageConfigHelpers)
+
+# Configure '<PROJECT-NAME>ConfigVersion.cmake'
+# Use:
+#   * PROJECT_VERSION
+write_basic_package_version_file(
+        "${version_config}" COMPATIBILITY SameMajorVersion
+)
+
+# Configure '<PROJECT-NAME>Config.cmake'
+# Use variables:
+#   * TARGETS_EXPORT_NAME
+#   * PROJECT_NAME
+configure_package_config_file(
+        "cmake/package/carbin_config.cmake.in"
+        "${project_config}"
+        INSTALL_DESTINATION "${config_install_dir}"
+)
+
+#Targets:
+#  * <prefix>/lib/libbar.a
+#  * <prefix>/lib/libbaz.a
+#  * header location after install: <prefix>/include/foo/Bar.h
+#  * headers can be included by C++ code `#include <foo/Bar.h"`
+
+
+# Config
+#   * <prefix>/lib/cmake/Foo/FooConfig.cmake
+#   * <prefix>/lib/cmake/Foo/FooConfigVersion.cmake
+install(
+        FILES
+        "${project_config}" "${version_config}"
+        DESTINATION
+        "${config_install_dir}"
+)
+
+# Config
+#   * <prefix>/lib/cmake/Foo/FooTargets.cmake
+
+install(
+        EXPORT
+        "${TARGETS_EXPORT_NAME}"
+        NAMESPACE
+        "${namespace}"
+        DESTINATION
+        "${config_install_dir}"
+)

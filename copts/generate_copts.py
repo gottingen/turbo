@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
-"""Generate Turbo compile compile option configs.
+#!/usr/bin/python
+"""Generate abel compile compile option configs.
 
-Usage: <path_to_turbo>/copts/generate_copts.py
+Usage: <path_to_abel>/copts/generate_copts.py
 
 The configs are generated from copts.py.
 """
@@ -15,8 +15,8 @@ from copts import COPT_VARS
 def file_header_lines():
   return [
       "GENERATED! DO NOT MANUALLY EDIT THIS FILE.", "",
-      "(1) Edit turbo/copts/copts.py.",
-      "(2) Run `python <path_to_turbo>/copts/generate_copts.py`."
+      "(1) Edit abel/copts/copts.py.",
+      "(2) Run `python <path_to_abel>/copts/generate_copts.py`."
   ]
 
 
@@ -46,7 +46,7 @@ class CMakeStyle(object):
     return "\n".join((("# " + line).strip() for line in file_header_lines()))
 
   def filename(self):
-    return "GENERATED_TurboCopts.cmake"
+    return "carbin_generated_copts.cmake"
 
 
 class StarlarkStyle(object):
@@ -67,7 +67,7 @@ class StarlarkStyle(object):
         flatten(file_header_lines(), [docstring_quotes]))
 
   def filename(self):
-    return "GENERATED_copts.bzl"
+    return "carbin_generated_copts.bzl"
 
 
 def copt_list(name, arg_list, style):

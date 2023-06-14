@@ -15,16 +15,18 @@
 #
 message(STATUS ${TURBO_DEFAULT_COPTS})
 message(STATUS ${TURBO_RANDOM_RANDEN_COPTS})
-message(STATUS ${TURBO_SIMD_FLAGS})
-turbo_cc_binary(
+message(STATUS ${CARBIN_SIMD_FLAGS})
+carbin_cc_binary(
         NAME
         mandelbrot
-        SRCS
+        SOURCES
         "mandelbrot.cc"
         COPTS
         ${TURBO_DEFAULT_COPTS}
         ${TURBO_RANDOM_RANDEN_COPTS}
-        ${TURBO_SIMD_FLAGS}
+        ${CARBIN_SIMD_FLAGS}
+        "-fopenmp"
+        "-Wno-unused-variable"
         DEPS
         turbo::turbo
 )

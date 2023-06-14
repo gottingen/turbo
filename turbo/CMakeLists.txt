@@ -1,11 +1,11 @@
 #
-# Copyright 2020 The Turbo Authors.
+# Copyright 2023 The titan-search Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
+#    https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,7 +52,7 @@ set(TURBO_ALL_SRC
         "debugging/internal/demangle.cc"
         "debugging/internal/elf_mem_image.cc"
         "debugging/internal/examine_stack.cc"
-        "debugging/internal/stack_consumption.cc"
+        "../tests/debugging/stack_consumption.cc"
         "debugging/internal/vdso_support.cc"
         "debugging/leak_check.cc"
         "files/file_watcher.cc"
@@ -126,63 +126,49 @@ set(TURBO_ALL_SRC
         "strings/internal/escaping.cc"
         "strings/internal/memutil.cc"
         "strings/internal/ostringstream.cc"
-        "strings/internal/pow10_helper.cc"
         "strings/internal/str_format/arg.cc"
         "strings/internal/str_format/bind.cc"
         "strings/internal/str_format/extension.cc"
         "strings/internal/str_format/float_conversion.cc"
         "strings/internal/str_format/output.cc"
         "strings/internal/str_format/parser.cc"
-        "time/civil_time.cc"
-        "time/clock.cc"
-        "time/duration.cc"
-        "time/format.cc"
-        "time/stop_watcher.cc"
-        "time/time.cc"
-        "time/internal/cctz/src/civil_time_detail.cc"
-        "time/internal/cctz/src/time_zone_fixed.cc"
-        "time/internal/cctz/src/time_zone_format.cc"
-        "time/internal/cctz/src/time_zone_if.cc"
-        "time/internal/cctz/src/time_zone_impl.cc"
-        "time/internal/cctz/src/time_zone_info.cc"
-        "time/internal/cctz/src/time_zone_libc.cc"
-        "time/internal/cctz/src/time_zone_lookup.cc"
-        "time/internal/cctz/src/time_zone_posix.cc"
-        "time/internal/cctz/src/zone_info_source.cc"
+        "times/civil_time.cc"
+        "times/clock.cc"
+        "times/duration.cc"
+        "times/format.cc"
+        "times/stop_watcher.cc"
+        "times/time.cc"
+        "times/cctz/civil_time_detail.cc"
+        "times/cctz/time_zone_fixed.cc"
+        "times/cctz/time_zone_format.cc"
+        "times/cctz/time_zone_if.cc"
+        "times/cctz/time_zone_impl.cc"
+        "times/cctz/time_zone_info.cc"
+        "times/cctz/time_zone_libc.cc"
+        "times/cctz/time_zone_lookup.cc"
+        "times/cctz/time_zone_posix.cc"
+        "times/cctz/zone_info_source.cc"
         "unicode/utf.cc"
         )
 
-turbo_cc_library(
+carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         turbo
-        SRCS
+        SOURCES
         ${TURBO_ALL_SRC}
         COPTS
-        ${TURBO_DEFAULT_COPTS}
-        ${TURBO_RANDOM_RANDEN_COPTS}
-        ${TURBO_SIMD_FLAGS}
+        ${CARBIN_DEFAULT_COPTS}
+        ${CARBIN_RANDOM_RANDEN_COPTS}
+        ${CARBIN_SIMD_FLAGS}
         DEPS
-        ${TURBO_DYLINK}
+        ${CARBIN_DEPS_LINK}
+        PUBLIC
 )
 
 if (TURBO_BUILD_TESTING)
-    add_subdirectory(platform)
-    add_subdirectory(base)
-    add_subdirectory(cleanup)
-    add_subdirectory(container)
-    add_subdirectory(concurrent)
-    add_subdirectory(crypto)
-    add_subdirectory(debugging)
-    add_subdirectory(files)
-    add_subdirectory(format)
-    add_subdirectory(hash)
-    add_subdirectory(memory)
-    add_subdirectory(meta)
-    add_subdirectory(profiling)
-    add_subdirectory(random)
-    add_subdirectory(strings)
     add_subdirectory(time)
-    add_subdirectory(unicode)
 endif (TURBO_BUILD_TESTING)
 if (${TURBO_BUILD_DLL})
     turbo_make_dll()
