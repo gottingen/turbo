@@ -22,7 +22,7 @@
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_btree.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -77,7 +77,7 @@ class CordRepBtreeNavigatorTest : public testing::TestWithParam<size_t> {
   const std::vector<CordRep*>& flats() const { return flats_; }
 
   static std::string ToString(testing::TestParamInfo<size_t> param) {
-    return turbo::StrCat(param.param, "_Flats");
+    return turbo::Format("{}{}", param.param, "_Flats");
   }
 
  private:

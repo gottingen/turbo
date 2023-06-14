@@ -22,7 +22,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/memory/memory.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -63,18 +63,18 @@ namespace turbo {
 
             struct OverloadedFunctor {
                 template<typename... Args>
-                std::string operator()(const Args &... args) &{
-                    return StrCat("&", args...);
+                std::string operator()(std::string_view fmt, const Args &... args) &{
+                    return "&" + Format(fmt, args...);
                 }
 
                 template<typename... Args>
-                std::string operator()(const Args &... args) const &{
-                    return StrCat("const&", args...);
+                std::string operator()(std::string_view fmt, const Args &... args) const &{
+                    return "const&" + Format(fmt,  args...);
                 }
 
                 template<typename... Args>
-                std::string operator()(const Args &... args) &&{
-                    return StrCat("&&", args...);
+                std::string operator()(std::string_view fmt, const Args &... args) &&{
+                    return "&&" + Format(fmt, args...);
                 }
             };
 
@@ -151,13 +151,13 @@ namespace turbo {
                 OverloadedFunctor f;
                 const OverloadedFunctor &cf = f;
 
-                EXPECT_EQ("&", base_internal::invoke(f));
+                EXPECT_EQ("&", base_internal::invoke(f, ""));
                 EXPECT_EQ("& 42", base_internal::invoke(f, " 42"));
 
-                EXPECT_EQ("const&", base_internal::invoke(cf));
+                EXPECT_EQ("const&", base_internal::invoke(cf, ""));
                 EXPECT_EQ("const& 42", base_internal::invoke(cf, " 42"));
 
-                EXPECT_EQ("&&", base_internal::invoke(std::move(f)));
+                EXPECT_EQ("&&", base_internal::invoke(std::move(f), ""));
 
                 OverloadedFunctor f2;
                 EXPECT_EQ("&& 42", base_internal::invoke(std::move(f2), " 42"));

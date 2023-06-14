@@ -267,20 +267,6 @@ carbin_cc_test(
 )
 
 
-carbin_cc_test(
-        NAME
-        str_format_test
-        SOURCES
-        "str_format_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
-)
-
-
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
         NAME
@@ -517,6 +503,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${GMOCK_MAIN_LIB}
 )
 

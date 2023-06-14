@@ -66,8 +66,7 @@
 // nor for its non-allocating nature, but rather because raw logging has very
 // few other dependencies.
 //
-// The API is a subset of the above: each macro only takes two arguments.  Use
-// StrCat if you need to build a richer message.
+// The API is a subset of the above: each macro only takes two arguments.
 #define TURBO_INTERNAL_LOG(severity, message)                              \
   do {                                                                    \
     constexpr const char* turbo_raw_log_internal_filename = __FILE__;      \

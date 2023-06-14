@@ -31,8 +31,7 @@
 #include "turbo/random/internal/pcg_engine.h"
 #include "turbo/random/internal/sequence_urbg.h"
 #include "turbo/random/random.h"
-#include "turbo/strings/str_cat.h"
-#include "turbo/strings/str_format.h"
+#include "turbo/format/str_format.h"
 #include "turbo/strings/str_replace.h"
 #include "turbo/strings/strip.h"
 #include "gmock/gmock.h"
@@ -134,8 +133,8 @@ TYPED_TEST(PoissonDistributionInterfaceTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
 
-    TURBO_INTERNAL_LOG(INFO, turbo::StrCat("Range {", param.mean(), "}: ",
-                                         +sample_min, ", ", +sample_max));
+    TURBO_INTERNAL_LOG(INFO, turbo::Format("Range {{{}}}: {}, {}", param.mean(),
+                                         +sample_min,+sample_max));
 
     // Validate stream serialization.
     std::stringstream ss;
@@ -188,10 +187,10 @@ class PoissonModel {
   }
 
   void LogCDF() {
-    TURBO_INTERNAL_LOG(INFO, turbo::StrCat("CDF (mean = ", mean_, ")"));
+    TURBO_INTERNAL_LOG(INFO, turbo::Format("CDF (mean = {})", mean_));
     for (const auto c : cdf_) {
       TURBO_INTERNAL_LOG(INFO,
-                        turbo::StrCat(c.index, ": pmf=", c.pmf, " cdf=", c.cdf));
+                        turbo::Format("{}: pmf={} cdf={}", c.index,c.pmf, c.cdf));
     }
   }
 
@@ -287,12 +286,12 @@ bool PoissonDistributionZTest::SingleZTest(const double p,
 
   if (!pass) {
     TURBO_INTERNAL_LOG(
-        INFO, turbo::StrFormat("p=%f max_err=%f\n"
-                              " mean=%f vs. %f\n"
-                              " stddev=%f vs. %f\n"
-                              " skewness=%f vs. %f\n"
-                              " kurtosis=%f vs. %f\n"
-                              " z=%f",
+        INFO, turbo::Format("p={} max_err={}\n"
+                              " mean={} vs. {}\n"
+                              " stddev={} vs. {}\n"
+                              " skewness={} vs. {}\n"
+                              " kurtosis={} vs. {}\n"
+                              " z={}",
                               p, max_err, m.mean, mean(), std::sqrt(m.variance),
                               stddev(), m.skewness, skew(), m.kurtosis,
                               kurtosis(), z));
@@ -339,7 +338,7 @@ std::vector<ZParam> GetZParams() {
 
 std::string ZParamName(const ::testing::TestParamInfo<ZParam>& info) {
   const auto& p = info.param;
-  std::string name = turbo::StrCat("mean_", turbo::SixDigits(p.mean));
+  std::string name = turbo::Format("mean_{:.6g}", p.mean);
   return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
@@ -439,17 +438,16 @@ double PoissonDistributionChiSquaredTest::ChiSquaredTestImpl() {
   if (chi_square > threshold) {
     LogCDF();
 
-    TURBO_INTERNAL_LOG(INFO, turbo::StrCat("VALUES  buckets=", counts.size(),
-                                         "  samples=", kSamples));
+    TURBO_INTERNAL_LOG(INFO, turbo::Format("VALUES  buckets={} samples={}", counts.size(), kSamples));
     for (size_t i = 0; i < counts.size(); i++) {
       TURBO_INTERNAL_LOG(
-          INFO, turbo::StrCat(cutoffs_[i], ": ", counts[i], " vs. E=", e[i]));
+          INFO, turbo::Format("{}: {} vs. E={}", cutoffs_[i], counts[i], e[i]));
     }
 
     TURBO_INTERNAL_LOG(
         INFO,
-        turbo::StrCat(kChiSquared, "(data, dof=", dof, ") = ", chi_square, " (",
-                     p, ")\n", " vs.\n", kChiSquared, " @ 0.98 = ", threshold));
+        turbo::Format("{}(data, dof={}) = {} ({})\n vs. \n {}  @ 0.98 = {}", kChiSquared,  dof, chi_square,
+                     p,  kChiSquared, threshold));
   }
   return p;
 }

@@ -28,7 +28,7 @@
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/strings/internal/char_map.h"
 #include "turbo/strings/internal/resize_uninitialized.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "turbo/strings/str_join.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/unicode/utf.h"
@@ -56,7 +56,7 @@ namespace turbo {
         inline bool IsSurrogate(char32_t c, std::string_view src, std::string *error) {
             if (c >= 0xD800 && c <= 0xDFFF) {
                 if (error) {
-                    *error = turbo::StrCat("invalid surrogate character (0xD800-DFFF): \\",
+                    *error = turbo::Format("invalid surrogate character (0xD800-DFFF): \\{}",
                                            src);
                 }
                 return true;

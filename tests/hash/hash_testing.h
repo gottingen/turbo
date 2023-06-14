@@ -24,7 +24,7 @@
 #include "gtest/gtest.h"
 #include "spy_hash_state.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "turbo/meta/variant.h"
 
 namespace turbo {
@@ -163,7 +163,7 @@ struct PrintVisitor {
   size_t index;
   template <typename T>
   std::string operator()(const T* value) const {
-    return turbo::StrCat("#", index, "(", testing::PrintToString(*value), ")");
+    return turbo::Format("#{}({})", index, testing::PrintToString(*value));
   }
 };
 

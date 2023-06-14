@@ -31,7 +31,7 @@
 #include "tests/random/distribution_test_util.h"
 #include "turbo/random/internal/sequence_urbg.h"
 #include "turbo/random/random.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "turbo/strings/str_format.h"
 #include "turbo/strings/str_replace.h"
 #include "turbo/strings/strip.h"
@@ -117,7 +117,7 @@ TYPED_TEST(GaussianDistributionInterfaceTest, SerializeTest) {
         }
         if (!std::is_same<TypeParam, long double>::value) {
           TURBO_INTERNAL_LOG(
-              INFO, turbo::StrFormat("Range{%f, %f}: %f, %f", mean, stddev,
+              INFO, turbo::Format("Range{{{}, {}}}: {}, {}", mean, stddev,
                                     sample_min, sample_max));
         }
 
@@ -241,13 +241,13 @@ bool GaussianDistributionTests::SingleZTest(const double p,
 
   if (!pass || jb > 9.21) {
     TURBO_INTERNAL_LOG(
-        INFO, turbo::StrFormat("p=%f max_err=%f\n"
-                              " mean=%f vs. %f\n"
-                              " stddev=%f vs. %f\n"
-                              " skewness=%f vs. %f\n"
-                              " kurtosis=%f vs. %f\n"
-                              " z=%f vs. 0\n"
-                              " jb=%f vs. 9.21",
+        INFO, turbo::Format("p={} max_err={}\n"
+                              " mean={} vs. {}\n"
+                              " stddev={} vs. {}\n"
+                              " skewness={} vs. {}\n"
+                              " kurtosis={} vs. {}\n"
+                              " z={} vs. 0\n"
+                              " jb={} vs. 9.21",
                               p, max_err, m.mean, mean(), std::sqrt(m.variance),
                               stddev(), m.skewness, skew(), m.kurtosis,
                               kurtosis(), z, jb));
@@ -299,14 +299,14 @@ double GaussianDistributionTests::SingleChiSquaredTest() {
   if (chi_square > threshold) {
     for (int i = 0; i < cutoffs.size(); i++) {
       TURBO_INTERNAL_LOG(
-          INFO, turbo::StrFormat("%d : (%f) = %d", i, cutoffs[i], counts[i]));
+          INFO, turbo::Format("{} : ({}) = {}", i, cutoffs[i], counts[i]));
     }
 
     TURBO_INTERNAL_LOG(
-        INFO, turbo::StrCat("mean=", mean(), " stddev=", stddev(), "\n",   //
-                           " expected ", expected, "\n",                  //
-                           kChiSquared, " ", chi_square, " (", p, ")\n",  //
-                           kChiSquared, " @ 0.98 = ", threshold));
+        INFO, turbo::Format("mean={} stddev={}\n expected {}\n{} {} ({})\n {}  @ 0.98 = {}", mean(), stddev(),
+                           expected,             //
+                           kChiSquared, chi_square, p,
+                           kChiSquared, threshold));
   }
   return p;
 }
@@ -379,8 +379,7 @@ std::vector<Param> GenParams() {
 
 std::string ParamName(const ::testing::TestParamInfo<Param>& info) {
   const auto& p = info.param;
-  std::string name = turbo::StrCat("mean_", turbo::SixDigits(p.mean), "__stddev_",
-                                  turbo::SixDigits(p.stddev));
+  std::string name = turbo::Format("mean_{:.6g}__stddev_{:.6g}",p.mean, p.stddev);
   return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 

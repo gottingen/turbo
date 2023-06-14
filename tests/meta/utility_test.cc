@@ -24,7 +24,7 @@
 
 #include "turbo/memory/memory.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -192,16 +192,16 @@ struct OverloadedFunctor {
   OverloadedFunctor(const OverloadedFunctor&) {}
   OverloadedFunctor(OverloadedFunctor&&) {}
   template <typename... Args>
-  std::string operator()(const Args&... args) & {
-    return turbo::StrCat("&", args...);
+  std::string operator()(std::string_view fmt,const Args&... args) & {
+      return "&" + turbo::Format(fmt, args...);
   }
   template <typename... Args>
-  std::string operator()(const Args&... args) const& {
-    return turbo::StrCat("const&", args...);
+  std::string operator()(std::string_view fmt, const Args&... args) const& {
+    return "const&" + turbo::Format(fmt, args...);
   }
   template <typename... Args>
-  std::string operator()(const Args&... args) && {
-    return turbo::StrCat("&&", args...);
+  std::string operator()(std::string_view fmt,const Args&... args) && {
+    return "&&" + turbo::Format(fmt, args...);
   }
 };
 
@@ -252,15 +252,15 @@ TEST(ApplyTest, OverloadedFunctor) {
   OverloadedFunctor f;
   const OverloadedFunctor& cf = f;
 
-  EXPECT_EQ("&", turbo::apply(f, std::tuple<>{}));
-  EXPECT_EQ("& 42", turbo::apply(f, std::make_tuple(" 42")));
+  EXPECT_EQ("&", turbo::apply(f, std::make_tuple("")));
+  EXPECT_EQ("& 42", turbo::apply(f, std::make_tuple("{}", " 42")));
 
-  EXPECT_EQ("const&", turbo::apply(cf, std::tuple<>{}));
-  EXPECT_EQ("const& 42", turbo::apply(cf, std::make_tuple(" 42")));
+  EXPECT_EQ("const&", turbo::apply(cf, std::tuple<std::string_view>{""}));
+  EXPECT_EQ("const& 42", turbo::apply(cf, std::make_tuple("{}", " 42")));
 
-  EXPECT_EQ("&&", turbo::apply(std::move(f), std::tuple<>{}));
+  EXPECT_EQ("&&", turbo::apply(std::move(f), std::tuple<std::string_view>{""}));
   OverloadedFunctor f2;
-  EXPECT_EQ("&& 42", turbo::apply(std::move(f2), std::make_tuple(" 42")));
+  EXPECT_EQ("&& 42", turbo::apply(std::move(f2), std::make_tuple("{}", " 42")));
 }
 
 TEST(ApplyTest, ReferenceWrapper) {

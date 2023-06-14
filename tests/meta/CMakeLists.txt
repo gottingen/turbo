@@ -85,55 +85,6 @@ carbin_cc_test(
         ${GMOCK_MAIN_LIB}
 )
 
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAME
-        conformance_testing
-        HEADERS
-        "conformance_aliases.h"
-        "conformance_archetype.h"
-        "conformance_profile.h"
-        "conformance_testing.h"
-        "conformance_testing_helpers.h"
-        "parentheses.h"
-        "transform_args.h"
-        COPTS
-        ${CARBIN_DEFAULT_COPTS}
-        DEPS
-        turbo::turbo
-        ${GMOCK_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        conformance_testing_test
-        SOURCES
-        "conformance_testing_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        ${TURBO_EXCEPTIONS_FLAG}
-        DEPS
-        turbo::conformance_testing
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        conformance_testing_test_no_exceptions
-        SOURCES
-        "conformance_testing_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::conformance_testing
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
-)
-
-
 carbin_cc_test(
         NAME
         compare_test

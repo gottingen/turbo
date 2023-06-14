@@ -599,7 +599,6 @@ TURBO_MUST_USE_RESULT inline bool FormatUntyped(
 // Note that unlike with TurboFormatConvert(), TurboStringify() does not allow
 // customization of allowed conversion characters. TurboStringify() uses `%v` as
 // the underlying conversion specififer. Additionally, TurboStringify() supports
-// use with turbo::StrCat while TurboFormatConvert() does not.
 //
 // Example:
 //

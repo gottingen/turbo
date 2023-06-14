@@ -24,7 +24,7 @@
 #include "turbo/strings/internal/cordz_sample_token.h"
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -79,7 +79,7 @@ MATCHER_P(HasValidCordzInfoOf, method, "CordzInfo matches cord") {
 // Matcher on Cord that verifies that the cord is sampled and that the CordzInfo
 // update tracker has 'method' with a call count of 'n'
 MATCHER_P2(CordzMethodCountEq, method, n,
-           turbo::StrCat("CordzInfo method count equals ", n)) {
+           turbo::Format("CordzInfo method count equals {}", n)) {
   const cord_internal::CordzInfo* cord_info = GetCordzInfoForTesting(arg);
   if (cord_info == nullptr) {
     *result_listener << "cord is not sampled";

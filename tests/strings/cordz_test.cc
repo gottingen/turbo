@@ -25,7 +25,7 @@
 #include "turbo/strings/internal/cordz_sample_token.h"
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -75,7 +75,7 @@ turbo::Cord MakeAppendStringCord(TestCordSize size) {
 }
 
 std::string TestParamToString(::testing::TestParamInfo<TestCordSize> size) {
-  return turbo::StrCat("On", ToString(size.param), "Cord");
+  return turbo::Format("On{}{}", ToString(size.param), "Cord");
 }
 
 class CordzUpdateTest : public testing::TestWithParam<TestCordSize> {

@@ -23,7 +23,7 @@
 #include "gtest/gtest.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/random/internal/explicit_seed_seq.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "turbo/times/clock.h"
 
 #define UPDATE_GOLDEN 0
@@ -645,7 +645,7 @@ TEST(RandenTest, IsFastOrSlow) {
   }
   auto duration = turbo::GetCurrentTimeNanos() - start;
 
-  TURBO_INTERNAL_LOG(INFO, turbo::StrCat(static_cast<double>(duration) /
+  TURBO_INTERNAL_LOG(INFO, turbo::Format("{}{}", static_cast<double>(duration) /
                                            static_cast<double>(kCount),
                                        "ns"));
 

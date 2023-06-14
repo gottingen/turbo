@@ -40,7 +40,7 @@
 #include "turbo/meta/container.h"
 #include "turbo/platform/port.h"
 #include "turbo/random/random.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "turbo/strings/str_split.h"
 #include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
@@ -935,11 +935,11 @@ namespace turbo {
                 }
 
                 bool operator()(const std::string &a, int b) const {
-                    return a < turbo::StrCat(b);
+                    return a < turbo::Format(b);
                 }
 
                 bool operator()(int a, const std::string &b) const {
-                    return turbo::StrCat(a) < b;
+                    return turbo::Format(a) < b;
                 }
 
                 using is_transparent = void;
@@ -1112,7 +1112,7 @@ namespace turbo {
                 using StringSet = turbo::btree_set<StringLike>;
                 StringSet s;
                 for (int i = 0; i < 100; ++i) {
-                    ASSERT_TRUE(s.insert(turbo::StrCat(i).c_str()).second);
+                    ASSERT_TRUE(s.insert(turbo::Format(i).c_str()).second);
                 }
                 StringLike::clear_constructor_call_count();
                 s.find("50");
@@ -2195,19 +2195,19 @@ namespace turbo {
                 turbo::btree_multimap<std::string, int> map;
                 for (int i = 0; i < 100; ++i) {
                     for (int j = 0; j < 100; ++j) {
-                        map.insert({turbo::StrCat(i), j});
+                        map.insert({turbo::Format(i), j});
                     }
                 }
 
                 for (int i = 0; i < 100; ++i) {
-                    const std::string key = turbo::StrCat(i);
+                    const std::string key = turbo::Format(i);
                     auto node_handle = map.extract(key);
                     EXPECT_EQ(node_handle.key(), key);
                     EXPECT_EQ(node_handle.mapped(), 0) << i;
                 }
 
                 for (int i = 0; i < 100; ++i) {
-                    const std::string key = turbo::StrCat(i);
+                    const std::string key = turbo::Format(i);
                     auto node_handle = map.extract(key);
                     EXPECT_EQ(node_handle.key(), key);
                     EXPECT_EQ(node_handle.mapped(), 1) << i;

@@ -26,6 +26,21 @@
 
 namespace turbo {
 
+    template<typename T>
+    auto Ptr(T p) -> const void * {
+        return fmt::ptr(p);
+    }
+
+    template<typename T, typename Deleter>
+    auto Ptr(const std::unique_ptr<T, Deleter> &p) -> const void * {
+        return fmt::ptr(p);
+    }
+
+    template<typename T>
+    auto Ptr(const std::shared_ptr<T> &p) -> const void * {
+        return fmt::ptr(p);
+    }
+
     template<typename String = std::string, typename ...Args>
     TURBO_MUST_USE_RESULT inline String Format(std::string_view fmt, Args &&... args) {
         String result;
@@ -75,7 +90,8 @@ namespace turbo {
     template<typename It, typename Sentinel, typename String = std::string>
     String FormatRange(std::string_view fmt, It begin, Sentinel end, std::string_view sep) {
         fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(std::forward<It>(begin), std::forward<Sentinel>(end), sep));
+        fmt::format_to(std::back_inserter(view_buf), fmt,
+                       fmt::join(std::forward<It>(begin), std::forward<Sentinel>(end), sep));
         return String(view_buf.data(), view_buf.size());
     }
 
