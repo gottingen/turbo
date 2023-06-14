@@ -20,7 +20,7 @@
 #include "turbo/random/internal/platform.h"
 #include "turbo/random/internal/randen_detect.h"
 #include "turbo/random/internal/randen_traits.h"
-#include "turbo/strings/str_format.h"
+#include "turbo/format/str_format.h"
 
 namespace {
 

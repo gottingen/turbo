@@ -20,7 +20,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/strings/str_cat.h"
 
 using turbo::chars_format;
 using turbo::strings_internal::FloatType;

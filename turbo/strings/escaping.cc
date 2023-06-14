@@ -29,8 +29,8 @@
 #include "turbo/strings/internal/char_map.h"
 #include "turbo/strings/internal/resize_uninitialized.h"
 #include "turbo/format/str_format.h"
-#include "turbo/strings/str_join.h"
 #include "turbo/strings/string_view.h"
+#include "turbo/strings/numbers.h"
 #include "turbo/unicode/utf.h"
 
 namespace turbo {

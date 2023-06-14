@@ -17,7 +17,7 @@
 #include <cmath>
 
 #include "gtest/gtest.h"
-#include "turbo/strings/str_format.h"
+#include "turbo/format/str_format.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -110,7 +110,7 @@ TEST(Pow10HelperTest, Works) {
   for (const TestCase& test_case : kTestCases) {
     EXPECT_EQ(Pow10(test_case.power),
               std::ldexp(test_case.significand, test_case.radix))
-        << turbo::StrFormat("Failure for Pow10(%d): %a vs %a", test_case.power,
+        << turbo::Format("Failure for Pow10({}): {:a} vs {:a}", test_case.power,
                            Pow10(test_case.power),
                            std::ldexp(test_case.significand, test_case.radix));
   }

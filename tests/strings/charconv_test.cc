@@ -21,7 +21,6 @@
 #include "gtest/gtest.h"
 #include "tests/strings/pow10_helper.h"
 #include "turbo/format/str_format.h"
-#include "turbo/strings/str_format.h"
 
 #ifdef _MSC_FULL_VER
 #define TURBO_COMPILER_DOES_EXACT_ROUNDING 0
@@ -693,7 +692,7 @@ namespace {
                     turbo::from_chars(input.data(), input.data() + input.size(), actual);
             EXPECT_EQ(result.ec, std::errc());
             EXPECT_EQ(expected, actual)
-                                << turbo::StrFormat("%a vs %a", expected, actual);
+                                << turbo::Format("{:a} vs {:a}", expected, actual);
         }
         // test legal values near upper_bound
         for (index = upper_bound, step = 1; index > lower_bound;
@@ -706,7 +705,7 @@ namespace {
                     turbo::from_chars(input.data(), input.data() + input.size(), actual);
             EXPECT_EQ(result.ec, std::errc());
             EXPECT_EQ(expected, actual)
-                                << turbo::StrFormat("%a vs %a", expected, actual);
+                                << turbo::Format("{:a} vs {:a}", expected, actual);
         }
         // Test underflow values below lower_bound
         for (index = lower_bound - 1, step = 1; index > -1000000;

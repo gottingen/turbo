@@ -22,7 +22,6 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/port.h"
 #include "turbo/format/str_format.h"
-#include "turbo/strings/str_format.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -72,7 +71,7 @@ namespace turbo {
         }
 
         std::ostream &operator<<(std::ostream &os, const DistributionMoments &moments) {
-            return os << turbo::StrFormat("mean=%f, stddev=%f, skewness=%f, kurtosis=%f",
+            return os << turbo::Format("mean={}, stddev={}, skewness={}, kurtosis={}",
                                           moments.mean, std::sqrt(moments.variance),
                                           moments.skewness, moments.kurtosis);
         }

@@ -31,7 +31,6 @@
 #include "turbo/random/internal/sequence_urbg.h"
 #include "turbo/random/random.h"
 #include "turbo/format/str_format.h"
-#include "turbo/strings/str_format.h"
 #include "turbo/strings/str_replace.h"
 #include "turbo/strings/strip.h"
 
@@ -188,9 +187,9 @@ namespace {
                 TURBO_INTERNAL_LOG(INFO, turbo::Format("{}: {}", i, buckets[i]));
             }
             TURBO_INTERNAL_LOG(INFO,
-                               turbo::StrFormat("trials=%d\n"
-                                                "%s(data, %d) = %f (%f)\n"
-                                                "%s @ 0.98 = %f",
+                               turbo::Format("trials={}\n"
+                                                "{}(data, {}) = {} ({})\n"
+                                                "{} @ 0.98 = {}",
                                                 trials, kChiSquared, dof, chi_square, p,
                                                 kChiSquared, threshold));
         }

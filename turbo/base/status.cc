@@ -311,9 +311,9 @@ Status::Status(unsigned short int module_index, turbo::StatusCode code, const Fo
                                  StatusToStringMode::kWithModule;
 
         if (with_module) {
-            turbo::StrAppend(&text, TurboModule(index()), "::", StatusCodeToString(code()), ": ", message());
+            turbo::FormatAppend(&text, "{}::{}: {}", TurboModule(index()),StatusCodeToString(code()), message());
         } else {
-            turbo::StrAppend(&text, StatusCodeToString(code()), ": ", message());
+            turbo::FormatAppend(&text, "{}: {}", StatusCodeToString(code()), message());
         }
 
         const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
@@ -326,10 +326,9 @@ Status::Status(unsigned short int module_index, turbo::StatusCode code, const Fo
                                      const turbo::Cord &payload) {
                 std::optional<std::string> result;
                 if (printer) result = printer(type_url, payload);
-                turbo::StrAppend(
-                        &text, " [", type_url, "='",
-                        result.has_value() ? *result : turbo::CHexEscape(std::string(payload)),
-                        "']");
+                turbo::FormatAppend(
+                        &text, " [{}='{}']", type_url,
+                        result.has_value() ? *result : turbo::CHexEscape(std::string(payload)));
             });
         }
 

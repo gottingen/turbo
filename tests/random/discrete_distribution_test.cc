@@ -32,8 +32,8 @@
 #include "turbo/random/internal/pcg_engine.h"
 #include "turbo/random/internal/sequence_urbg.h"
 #include "turbo/random/random.h"
-#include "turbo/strings/str_cat.h"
 #include "turbo/strings/strip.h"
+#include "turbo/format/str_format.h"
 
 namespace {
 
@@ -189,10 +189,10 @@ TEST(DiscreteDistributionTest, ChiSquaredTest50) {
     // Chi-squared test failed. Output does not appear to be uniform.
     std::string msg;
     for (size_t i = 0; i < counts.size(); i++) {
-      turbo::StrAppend(&msg, i, ": ", counts[i], " vs ", weights[i], "\n");
+      turbo::FormatAppend(&msg, "{}: {} vs {}\n", i, counts[i],  weights[i]);
     }
-    turbo::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
-    turbo::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
+    turbo::FormatAppend(&msg, "{} p-value {}\n", kChiSquared, p_value);
+    turbo::FormatAppend(&msg, "High {} value: {} > {}", kChiSquared, chi_square,
                     kThreshold);
     TURBO_RAW_LOG(INFO, "%s", msg.c_str());
     FAIL() << msg;

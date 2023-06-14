@@ -24,7 +24,6 @@
 #include "gtest/gtest.h"
 #include "turbo/random/distributions.h"
 #include "turbo/random/random.h"
-#include "turbo/strings/str_cat.h"
 
 namespace {
 

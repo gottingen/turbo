@@ -22,8 +22,7 @@
 
 #include "turbo/hash/hash.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/str_format.h"
-#include "turbo/strings/str_join.h"
+#include "turbo/format/str_format.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -113,8 +112,8 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
 
   static CompareResult Compare(const SpyHashStateImpl& a,
                                const SpyHashStateImpl& b) {
-    const std::string a_flat = turbo::StrJoin(a.hash_representation_, "");
-    const std::string b_flat = turbo::StrJoin(b.hash_representation_, "");
+    const std::string a_flat = turbo::FormatRange("{}", a.hash_representation_, "");
+    const std::string b_flat = turbo::FormatRange("{}", b.hash_representation_, "");
     if (a_flat == b_flat) return CompareResult::kEqual;
     if (turbo::EndsWith(a_flat, b_flat)) return CompareResult::kBSuffixA;
     if (turbo::EndsWith(b_flat, a_flat)) return CompareResult::kASuffixB;
@@ -130,12 +129,12 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
       size_t offset = 0;
       for (char c : s) {
         if (offset % 16 == 0) {
-          out << turbo::StreamFormat("\n0x%04x: ", offset);
+          out << turbo::Format("\n{:#04x}: ", offset);
         }
         if (offset % 2 == 0) {
           out << " ";
         }
-        out << turbo::StreamFormat("%02x", c);
+        out << turbo::Format("{:02x}", c);
         ++offset;
       }
       out << "\n";
@@ -205,7 +204,7 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
     template <typename U>
     void operator()(SpyHashStateImpl<U>& inner) {
       element_hash_representations.push_back(
-          turbo::StrJoin(inner.hash_representation_, ""));
+          turbo::FormatRange("{}", inner.hash_representation_, ""));
       if (inner.error_->has_value()) {
         error = std::move(inner.error_);
       }

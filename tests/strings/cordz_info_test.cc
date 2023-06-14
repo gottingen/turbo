@@ -25,7 +25,7 @@
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -57,7 +57,7 @@ std::string FormatStack(turbo::Span<void* const> raw_stack) {
   std::string output;
   for (void* stackp : raw_stack) {
     if (turbo::Symbolize(stackp, buf.get(), buf_size)) {
-      turbo::StrAppend(&output, "    ", buf.get(), "\n");
+      turbo::FormatAppend(&output, "    {}\n", buf.get());
     }
   }
   return output;

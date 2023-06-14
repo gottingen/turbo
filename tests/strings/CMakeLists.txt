@@ -67,18 +67,6 @@ carbin_cc_test(
         ${GMOCK_MAIN_LIB}
 )
 
-carbin_cc_test(
-        NAME
-        damerau_levenshtein_distance_test
-        SOURCES
-        "damerau_levenshtein_distance_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
-)
 
 carbin_cc_test(
         NAME
@@ -164,19 +152,6 @@ carbin_cc_test(
         resize_uninitialized_test
         SOURCES
         "resize_uninitialized_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        str_join_test
-        SOURCES
-        "str_join_test.cc"
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS
