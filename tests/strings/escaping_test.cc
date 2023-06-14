@@ -24,7 +24,7 @@
 #include "gtest/gtest.h"
 #include "turbo/container/fixed_array.h"
 
-#include "turbo/strings/internal/escaping_test_common.h"
+#include "escaping_test_common.h"
 
 
 ///TODO(mulan.wang) inlined_string test
