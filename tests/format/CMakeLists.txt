@@ -23,8 +23,5 @@ carbin_cc_test(
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS
-        turbo::hash_testing
         turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
 )
