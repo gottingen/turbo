@@ -27,7 +27,7 @@
 #include <emmintrin.h>
 #endif
 
-#ifdef __SSE3__
+#if TURBO_WITH_SSE3
 #include <pmmintrin.h>
 #endif
 
@@ -59,7 +59,7 @@ constexpr size_t kCacheLineSize = TURBO_CACHE_LINE_SIZE;
 // If the objects overlap, the behavior is undefined.
 inline void *non_temporal_store_memcpy(void *__restrict dst,
                                        const void *__restrict src, size_t len) {
-#if defined(__SSE3__) || defined(__aarch64__) || \
+#if TURBO_WITH_SSE3 || defined(__aarch64__) || \
     (defined(_MSC_VER) && defined(__AVX__))
   // This implementation requires SSE3.
   // MSVC cannot target SSE3 directly, but when MSVC targets AVX,
@@ -115,7 +115,7 @@ inline void *non_temporal_store_memcpy(void *__restrict dst,
 #else
   // Fallback to regular memcpy.
   return memcpy(dst, src, len);
-#endif  // __SSE3__ || __aarch64__ || (_MSC_VER && __AVX__)
+#endif  // TURBO_WITH_SSE3 || __aarch64__ || (_MSC_VER && __AVX__)
 }
 
 inline void *non_temporal_store_memcpy_avx(void *__restrict dst,

@@ -160,7 +160,7 @@ void UnsampleSlow(HashtablezInfo* info) {
 }
 
 void RecordRehashSlow(HashtablezInfo* info, size_t total_probe_length) {
-#if TURBO_SSE2
+#if TURBO_WITH_SSE2
   total_probe_length /= 16;
 #else
   total_probe_length /= 8;
@@ -201,7 +201,7 @@ void RecordInsertSlow(HashtablezInfo* info, size_t hash,
   // SwissTables probe in groups of 16, so scale this to count items probes and
   // not offset from desired.
   size_t probe_length = distance_from_desired;
-#if TURBO_SSE2
+#if TURBO_WITH_SSE2
   probe_length /= 16;
 #else
   probe_length /= 8;

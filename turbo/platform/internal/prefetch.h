@@ -17,11 +17,11 @@
 
 #include "turbo/platform/port.h"
 
-#if TURBO_SSE
+#if TURBO_WITH_SSE3 || TURBO_WITH_SSE2
 #include <xmmintrin.h>
 #endif
 
-#if defined(_MSC_VER) && TURBO_SSE
+#if defined(_MSC_VER) && (TURBO_WITH_SSE3 || TURBO_WITH_SSE2)
 #include <intrin.h>
 #pragma intrinsic(_mm_prefetch)
 #endif
@@ -107,7 +107,7 @@ inline void PrefetchNta(const void* addr) {
   __builtin_prefetch(addr, 0, 0);
 }
 
-#elif TURBO_SSE
+#elif (TURBO_WITH_SSE3 || TURBO_WITH_SSE2)
 
 #define TURBO_INTERNAL_HAVE_PREFETCH 1
 

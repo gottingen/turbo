@@ -137,6 +137,7 @@ if ((BUILD_TESTING AND TURBO_BUILD_TESTING))
     include_directories(${gtest_SOURCE_DIR})
 endif ()
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
 set(TURBO_DYLINK)
 if (APPLE)
     find_library(CoreFoundation CoreFoundation)

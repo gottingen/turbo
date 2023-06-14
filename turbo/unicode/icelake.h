@@ -41,8 +41,8 @@
 #define TURBO_UNICODE_IMPLEMENTATION_ICELAKE 0
 #endif
 
-#if ((TURBO_UNICODE_IMPLEMENTATION_ICELAKE) && defined(TURBO_PROCESSOR_X86_64) && (__AVX2__) && (TURBO_HAVE_AVX512F && \
-                                         TURBO_HAVE_AVX512DQ && \
+#if ((TURBO_UNICODE_IMPLEMENTATION_ICELAKE) && defined(TURBO_PROCESSOR_X86_64) && (__AVX2__) && (TURBO_WITH_AVX512F && \
+                                         TURBO_WITH_AVX512DQ && \
                                          TURBO_HAVE_AVX512VL && \
                                            TURBO_HAVE_AVX512VBMI2))
 #define TURBO_UNICODE_CAN_ALWAYS_RUN_ICELAKE 1

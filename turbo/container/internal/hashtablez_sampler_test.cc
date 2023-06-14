@@ -27,7 +27,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#if TURBO_SSE2
+#if TURBO_WITH_SSE2
 constexpr int kProbeLength = 16;
 #else
 constexpr int kProbeLength = 8;

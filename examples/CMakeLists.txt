@@ -17,3 +17,4 @@
 add_subdirectory(meta)
 add_subdirectory(strings)
 add_subdirectory(tlog)
+add_subdirectory(simd)

@@ -362,7 +362,7 @@ TEST(REFLECTION_ENUM, nameof_enum_flag) {
     REFLECT_DEBUG_REQUIRE(turbo::nameof_enum_flag(static_cast<BigFlags>(1 | 2)).empty());
     ASSERT_TRUE(turbo::nameof_enum_flag(static_cast<BigFlags>(1 | (static_cast<std::uint64_t>(0x1) << 20))) == "A|B");
     ASSERT_TRUE(turbo::nameof_enum_flag(static_cast<BigFlags>(1 | (static_cast<std::uint64_t>(0x1) << 20) |
-                                                               (static_cast<std::uint64_t>(0x1) << 63))) == "A|B|D");
+                                                              (static_cast<std::uint64_t>(0x1) << 63))) == "A|B|D");
     ASSERT_TRUE(
             turbo::nameof_enum_flag(static_cast<BigFlags>(1 | 0 | (static_cast<std::uint64_t>(0x1) << 40))) == "A|C");
     ASSERT_TRUE(
@@ -462,10 +462,11 @@ TEST(REFLECTION_ENUM, REFLECT_ENUM_FLAG) {
     REFLECT_DEBUG_REQUIRE(REFLECT_ENUM_FLAG(static_cast<BigFlags>(1 | 2)).empty());
     ASSERT_TRUE(REFLECT_ENUM_FLAG(static_cast<BigFlags>(1 | (static_cast<std::uint64_t>(0x1) << 20))) == "A|B");
     ASSERT_TRUE(REFLECT_ENUM_FLAG(static_cast<BigFlags>(1 | (static_cast<std::uint64_t>(0x1) << 20) |
-                                                       (static_cast<std::uint64_t>(0x1) << 63))) == "A|B|D");
+                                                        (static_cast<std::uint64_t>(0x1) << 63))) == "A|B|D");
     ASSERT_TRUE(REFLECT_ENUM_FLAG(static_cast<BigFlags>((static_cast<std::uint64_t>(0x1) << 63) | 1)) == "A|D");
     REFLECT_DEBUG_REQUIRE(REFLECT_ENUM_FLAG(static_cast<BigFlags>(2)).empty());
-    REFLECT_DEBUG_REQUIRE(REFLECT_ENUM_FLAG(static_cast<BigFlags>((static_cast<std::uint64_t>(0x1) << 63) | 2)).empty());
+    REFLECT_DEBUG_REQUIRE(
+            REFLECT_ENUM_FLAG(static_cast<BigFlags>((static_cast<std::uint64_t>(0x1) << 63) | 2)).empty());
 }
 
 TEST(REFLECTION_ENUM, nameof_enum_or) {
@@ -664,7 +665,7 @@ TEST(REFLECTION_ENUM, REFLECT_TYPE) {
 
     ASSERT_TRUE(REFLECT_TYPE(Color) == "enum Color");
 #elif defined(__GNUC__)
-    ASSERT_TRUE(type_name == "SomeStruct")<<type_name;
+    ASSERT_TRUE(type_name == "SomeStruct") << type_name;
     ASSERT_TRUE(REFLECT_TYPE(decltype(ptr_s)) == "SomeStruct*");
     ASSERT_TRUE(REFLECT_TYPE(decltype(ref_s)) == "SomeStruct");
     ASSERT_TRUE(REFLECT_TYPE(SomeStruct) == "SomeStruct");

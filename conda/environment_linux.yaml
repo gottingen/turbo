@@ -3,6 +3,8 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - gcc =8.5 # [linux]
-  - gxx =8.5 # [linux]
+  - gcc
+  - gxx
   - sysroot_linux-64 >=2.17 # [linux]
+  - gtest
+  - gmock

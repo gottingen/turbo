@@ -498,7 +498,7 @@ function(turbo_cc_binary)
             )
   endif()
   target_compile_options(${_NAME}
-          PRIVATE ${TURBO_CC_LIB_COPTS}
+          PRIVATE ${TURBO_CC_BINARY_COPTS}
           )
 
   target_link_libraries(${_NAME}
