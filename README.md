@@ -25,11 +25,11 @@ you can get it as below.
 * Modules:
   * [platform](docs/platform.md)
   * [base](docs/base.md)
-  * [simd](docs/json.md) rapidjson docs
-  * [strings](docs/workflow.md)
-  * [concurrent]()
-  * [files]()
-  * [times]()
+  * [simd](docs/simd.md)
+  * [strings](docs/strings.md)
+  * [concurrent](docs/concurrent.md)
+  * [status](docs/status.md)
+  * [times](docs/times.md)
 
 # Acknowledgement
 
