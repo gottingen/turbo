@@ -18,7 +18,7 @@ load(
     "//:copts/configure_copts.bzl",
     "TURBO_DEFAULT_COPTS",
     "TURBO_DEFAULT_LINKOPTS",
-    "TURBO_TEST_COPTS",
+    "CARBIN_TEST_COPTS",
 )
 package(default_visibility = ["//visibility:public"])
 

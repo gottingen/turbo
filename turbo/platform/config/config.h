@@ -364,6 +364,29 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #endif
 
 
+// TURBO_HAVE_THREAD_LOCAL
+//
+// Checks whether C++11's `thread_local` storage duration specifier is
+// supported.
+#ifdef TURBO_HAVE_THREAD_LOCAL
+#error TURBO_HAVE_THREAD_LOCAL cannot be directly set
+#elif defined(__APPLE__)
+// Notes:
+// * Xcode's clang did not support `thread_local` until version 8, and
+//   even then not for all iOS < 9.0.
+// * Xcode 9.3 started disallowing `thread_local` for 32-bit iOS simulator
+//   targeting iOS 9.x.
+// * Xcode 10 moves the deployment target check for iOS < 9.0 to link time
+//   making TURBO_HAVE_FEATURE unreliable there.
+//
+#if TURBO_HAVE_FEATURE(cxx_thread_local) && \
+    !(TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_9_0)
+#define TURBO_HAVE_THREAD_LOCAL 1
+#endif
+#else  // !defined(__APPLE__)
+#define TURBO_HAVE_THREAD_LOCAL 1
+#endif
+
 // TURBO_ARRAY_SIZE()
 //
 // Returns the number of elements in an array as a compile-time constant, which

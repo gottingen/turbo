@@ -571,9 +571,9 @@ private:
 };
 
 struct space_info {
-  uintmax_t capacity;
-  uintmax_t free;
-  uintmax_t available;
+  uintmax_t capacity{0};
+  uintmax_t free{0};
+  uintmax_t available{0};
 };
 
 // [fs.enum] enumerations

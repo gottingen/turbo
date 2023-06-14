@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 #include <iostream>
 #include <string>
 
@@ -26,6 +26,6 @@ void str_cat_example() {
   int a = 1;
   std::string b = "hello";
 
-  /// "1hello"
-  std::cout << turbo::StrCat(a,b)<<std::endl;
+  /// "1 hello"
+  std::cout << turbo::Format("{} {}", a,b)<<std::endl;
 }

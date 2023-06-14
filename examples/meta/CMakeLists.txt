@@ -14,19 +14,19 @@
 # limitations under the License.
 #
 
-turbo_cc_binary(
+carbin_cc_binary(
         NAME
         reflect_example
-        SRCS
+        SOURCES
         "reflect_example.cc"
         DEPS
         turbo::turbo
 )
 
-turbo_cc_binary(
+carbin_cc_binary(
         NAME
         reflect_custom_name
-        SRCS
+        SOURCES
         "reflect_custom_name.cc"
         DEPS
         turbo::turbo

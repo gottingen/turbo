@@ -23,55 +23,55 @@
 #include "turbo/strings/internal/cord_rep_crc.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
 #include "turbo/strings/internal/cord_rep_ring.h"
-#include "turbo/strings/str_cat.h"
+#include "turbo/format/str_format.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace cord_internal {
+    TURBO_NAMESPACE_BEGIN
+    namespace cord_internal {
 
-TURBO_CONST_INIT std::atomic<bool> cord_ring_buffer_enabled(
-    kCordEnableRingBufferDefault);
-TURBO_CONST_INIT std::atomic<bool> shallow_subcords_enabled(
-    kCordShallowSubcordsDefault);
-TURBO_CONST_INIT std::atomic<bool> cord_btree_exhaustive_validation(false);
+        TURBO_CONST_INIT std::atomic<bool> cord_ring_buffer_enabled(
+                kCordEnableRingBufferDefault);
+        TURBO_CONST_INIT std::atomic<bool> shallow_subcords_enabled(
+                kCordShallowSubcordsDefault);
+        TURBO_CONST_INIT std::atomic<bool> cord_btree_exhaustive_validation(false);
 
-void LogFatalNodeType(CordRep* rep) {
-  TURBO_INTERNAL_LOG(FATAL, turbo::StrCat("Unexpected node type: ",
-                                        static_cast<int>(rep->tag)));
-}
+        void LogFatalNodeType(CordRep *rep) {
+            TURBO_INTERNAL_LOG(FATAL, turbo::Format("Unexpected node type: {}",
+                                                    static_cast<int>(rep->tag)));
+        }
 
-void CordRep::Destroy(CordRep* rep) {
-  assert(rep != nullptr);
+        void CordRep::Destroy(CordRep *rep) {
+            assert(rep != nullptr);
 
-  while (true) {
-    assert(!rep->refcount.IsImmortal());
-    if (rep->tag == BTREE) {
-      CordRepBtree::Destroy(rep->btree());
-      return;
-    } else if (rep->tag == RING) {
-      CordRepRing::Destroy(rep->ring());
-      return;
-    } else if (rep->tag == EXTERNAL) {
-      CordRepExternal::Delete(rep);
-      return;
-    } else if (rep->tag == SUBSTRING) {
-      CordRepSubstring* rep_substring = rep->substring();
-      rep = rep_substring->child;
-      delete rep_substring;
-      if (rep->refcount.Decrement()) {
-        return;
-      }
-    } else if (rep->tag == CRC) {
-      CordRepCrc::Destroy(rep->crc());
-      return;
-    } else {
-      assert(rep->IsFlat());
-      CordRepFlat::Delete(rep);
-      return;
-    }
-  }
-}
+            while (true) {
+                assert(!rep->refcount.IsImmortal());
+                if (rep->tag == BTREE) {
+                    CordRepBtree::Destroy(rep->btree());
+                    return;
+                } else if (rep->tag == RING) {
+                    CordRepRing::Destroy(rep->ring());
+                    return;
+                } else if (rep->tag == EXTERNAL) {
+                    CordRepExternal::Delete(rep);
+                    return;
+                } else if (rep->tag == SUBSTRING) {
+                    CordRepSubstring *rep_substring = rep->substring();
+                    rep = rep_substring->child;
+                    delete rep_substring;
+                    if (rep->refcount.Decrement()) {
+                        return;
+                    }
+                } else if (rep->tag == CRC) {
+                    CordRepCrc::Destroy(rep->crc());
+                    return;
+                } else {
+                    assert(rep->IsFlat());
+                    CordRepFlat::Delete(rep);
+                    return;
+                }
+            }
+        }
 
-}  // namespace cord_internal
-TURBO_NAMESPACE_END
+    }  // namespace cord_internal
+    TURBO_NAMESPACE_END
 }  // namespace turbo

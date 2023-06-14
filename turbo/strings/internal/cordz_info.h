@@ -30,7 +30,7 @@
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_statistics.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
-#include "turbo/time/clock.h"
+#include "turbo/times/clock.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

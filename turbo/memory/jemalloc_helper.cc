@@ -24,7 +24,7 @@
  * them so that we don't have to include jemalloc.h, in case the program is
  * built without jemalloc support.
  */
-#if (defined(USE_JEMALLOC) || defined(MATX_USE_JEMALLOC))
+#if (defined(USE_JEMALLOC) || defined(TURBO_USE_JEMALLOC))
 // We have JEMalloc, so use it.
 // JEMalloc provides it's own implementation of
 // malloc_usable_size, and that's what we should be using.
@@ -58,14 +58,15 @@ namespace turbo {
 /**
  * Determine if we are using jemalloc or not.
  */
-#if defined(USE_JEMALLOC) || defined(MATX_USE_JEMALLOC)
-inline bool usingJEMalloc() noexcept {
-  return true;
-}
+#if defined(USE_JEMALLOC) || defined(TURBO_USE_JEMALLOC)
+    inline bool usingJEMalloc() noexcept {
+      return true;
+    }
 #else
-inline bool usingJEMalloc() noexcept {
-  return false;
-}
+
+    inline bool usingJEMalloc() noexcept {
+        return false;
+    }
 
 // MATX_NO_INLINE bool usingJEMalloc() noexcept {
 //  // Checking for rallocx != nullptr is not sufficient; we may be in a
@@ -118,109 +119,109 @@ inline bool usingJEMalloc() noexcept {
 //}
 #endif
 
-void sizedFree(void* ptr, size_t size);
+    void sizedFree(void *ptr, size_t size);
 
     TURBO_NO_INLINE inline bool canSdallocx() noexcept {
-  static bool rv = usingJEMalloc();
-  return rv;
-}
+        static bool rv = usingJEMalloc();
+        return rv;
+    }
 
-TURBO_NO_INLINE inline bool canNallocx() noexcept {
-  static bool rv = usingJEMalloc();
-  return rv;
-}
+    TURBO_NO_INLINE inline bool canNallocx() noexcept {
+        static bool rv = usingJEMalloc();
+        return rv;
+    }
 
-size_t goodMallocSize(size_t minSize) noexcept {
-  if (minSize == 0) {
-    return 0;
-  }
+    size_t goodMallocSize(size_t minSize) noexcept {
+        if (minSize == 0) {
+            return 0;
+        }
 
-#if defined(USE_JEMALLOC) || defined(MATX_USE_JEMALLOC)
-  if (!canNallocx()) {
-    // No nallocx - no smarts
-    return minSize;
-  }
+#if defined(USE_JEMALLOC) || defined(TURBO_USE_JEMALLOC)
+        if (!canNallocx()) {
+          // No nallocx - no smarts
+          return minSize;
+        }
 
-  // nallocx returns 0 if minSize can't succeed, but 0 is not actually
-  // a goodMallocSize if you want minSize
-  auto rv = nallocx(minSize, 0);
-  return rv ? rv : minSize;
+        // nallocx returns 0 if minSize can't succeed, but 0 is not actually
+        // a goodMallocSize if you want minSize
+        auto rv = nallocx(minSize, 0);
+        return rv ? rv : minSize;
 #else
-  return minSize;
+        return minSize;
 #endif
-}
+    }
 
-// We always request "good" sizes for allocation, so jemalloc can
-// never grow in place small blocks; they're already occupied to the
-// brim.  Blocks larger than or equal to 4096 bytes can in fact be
-// expanded in place, and this constant reflects that.
-TURBO_MAYBE_UNUSED static const size_t jemallocMinInPlaceExpandable = 4096;
+    // We always request "good" sizes for allocation, so jemalloc can
+    // never grow in place small blocks; they're already occupied to the
+    // brim.  Blocks larger than or equal to 4096 bytes can in fact be
+    // expanded in place, and this constant reflects that.
+    TURBO_MAYBE_UNUSED static const size_t jemallocMinInPlaceExpandable = 4096;
 
-/**
- * Trivial wrappers around malloc, calloc, realloc that check for allocation
- * failure and throw std::bad_alloc in that case.
- */
-void* checkedMalloc(size_t size) {
-  void* p = malloc(size);
-  if (!p) {
-    throw std::bad_alloc();
-  }
-  return p;
-}
+    /**
+     * Trivial wrappers around malloc, calloc, realloc that check for allocation
+     * failure and throw std::bad_alloc in that case.
+     */
+    void *checkedMalloc(size_t size) {
+        void *p = malloc(size);
+        if (!p) {
+            throw std::bad_alloc();
+        }
+        return p;
+    }
 
-void* checkedCalloc(size_t n, size_t size) {
-  void* p = calloc(n, size);
-  if (!p) {
-    throw std::bad_alloc();
-  }
-  return p;
-}
+    void *checkedCalloc(size_t n, size_t size) {
+        void *p = calloc(n, size);
+        if (!p) {
+            throw std::bad_alloc();
+        }
+        return p;
+    }
 
-void* checkedRealloc(void* ptr, size_t size) {
-  void* p = realloc(ptr, size);
-  if (!p) {
-    throw std::bad_alloc();
-  }
-  return p;
-}
+    void *checkedRealloc(void *ptr, size_t size) {
+        void *p = realloc(ptr, size);
+        if (!p) {
+            throw std::bad_alloc();
+        }
+        return p;
+    }
 
-void sizedFree(void* ptr, size_t size) {
-  TURBO_UNUSED(size);
-#if defined(USE_JEMALLOC) || defined(MATX_USE_JEMALLOC)
-  if (canSdallocx()) {
-    sdallocx(ptr, size, 0);
-  } else
+    void sizedFree(void *ptr, size_t size) {
+        TURBO_UNUSED(size);
+#if defined(USE_JEMALLOC) || defined(TURBO_USE_JEMALLOC)
+        if (canSdallocx()) {
+          sdallocx(ptr, size, 0);
+        } else
 #endif
-  {
-    free(ptr);
-  }
-}
+        {
+            free(ptr);
+        }
+    }
 
-/**
- * This function tries to reallocate a buffer of which only the first
- * currentSize bytes are used. The problem with using realloc is that
- * if currentSize is relatively small _and_ if realloc decides it
- * needs to move the memory chunk to a new buffer, then realloc ends
- * up copying data that is not used. It's generally not a win to try
- * to hook in to realloc() behavior to avoid copies - at least in
- * jemalloc, realloc() almost always ends up doing a copy, because
- * there is little fragmentation / slack space to take advantage of.
- */
-TURBO_CHECKED_MALLOC TURBO_NO_INLINE void* smartRealloc(
-    void* p, const size_t currentSize, const size_t currentCapacity, const size_t newCapacity) {
-  assert(p);
-  assert(currentSize <= currentCapacity && currentCapacity < newCapacity);
+    /**
+     * This function tries to reallocate a buffer of which only the first
+     * currentSize bytes are used. The problem with using realloc is that
+     * if currentSize is relatively small _and_ if realloc decides it
+     * needs to move the memory chunk to a new buffer, then realloc ends
+     * up copying data that is not used. It's generally not a win to try
+     * to hook in to realloc() behavior to avoid copies - at least in
+     * jemalloc, realloc() almost always ends up doing a copy, because
+     * there is little fragmentation / slack space to take advantage of.
+     */
+    TURBO_CHECKED_MALLOC TURBO_NO_INLINE void *smartRealloc(
+            void *p, const size_t currentSize, const size_t currentCapacity, const size_t newCapacity) {
+        assert(p);
+        assert(currentSize <= currentCapacity && currentCapacity < newCapacity);
 
-  auto const slack = currentCapacity - currentSize;
-  if (slack * 2 > currentSize) {
-    // Too much slack, malloc-copy-free cycle:
-    auto const result = checkedMalloc(newCapacity);
-    std::memcpy(result, p, currentSize);
-    free(p);
-    return result;
-  }
-  // If there's not too much slack, we realloc in hope of coalescing
-  return checkedRealloc(p, newCapacity);
-}
+        auto const slack = currentCapacity - currentSize;
+        if (slack * 2 > currentSize) {
+            // Too much slack, malloc-copy-free cycle:
+            auto const result = checkedMalloc(newCapacity);
+            std::memcpy(result, p, currentSize);
+            free(p);
+            return result;
+        }
+        // If there's not too much slack, we realloc in hope of coalescing
+        return checkedRealloc(p, newCapacity);
+    }
 
 }  // namespace turbo

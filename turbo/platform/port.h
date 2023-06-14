@@ -18,8 +18,8 @@
 #ifndef TURBO_PLATFORM_PORT_H_
 #define TURBO_PLATFORM_PORT_H_
 
+#include "turbo/platform/config/attribute_simd.h"
 #include "turbo/platform/config/attribute_function.h"
-#include "turbo/platform/config/attribute_hardware.h"
 #include "turbo/platform/config/attribute_literal.h"
 #include "turbo/platform/config/attribute_optimization.h"
 #include "turbo/platform/config/attribute_sanitize.h"
@@ -32,6 +32,6 @@
 #include "turbo/platform/config/config_have.h"
 #include "turbo/platform/config/config.h"
 #include "turbo/platform/config/wchar_config.h"
-#include "turbo/platform/config/config_avx512.h"
+
 
 #endif  // TURBO_PLATFORM_PORT_H_

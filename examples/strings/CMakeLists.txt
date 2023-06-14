@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 
-turbo_cc_binary(
+carbin_cc_binary(
         NAME
         string_cat_example
-        SRCS
+        SOURCES
         "string_cat_example.cc"
         DEPS
         turbo::turbo

@@ -14,12 +14,16 @@
 # limitations under the License.
 #
 
-turbo_cc_binary(
+carbin_cc_binary(
         NAME
         log_ex
-        SRCS
+        SOURCES
         "log_ex.cc"
-        DEFINES
+        COPTS
+        ${CARBIN_DEFAULT_COPTS}
+        ${CARBIN_RANDOM_RANDEN_COPTS}
+        ${CARBIN_SIMD_FLAGS}
+        DEFINITIONS
         "-DNDEBUG"
         DEPS
         turbo::turbo

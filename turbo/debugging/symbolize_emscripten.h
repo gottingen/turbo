@@ -21,7 +21,6 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/debugging/internal/demangle.h"
 #include "turbo/strings/numbers.h"
-#include "turbo/strings/str_cat.h"
 #include "turbo/strings/string_view.h"
 
 extern "C" {

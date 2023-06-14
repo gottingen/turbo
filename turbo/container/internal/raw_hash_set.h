@@ -198,11 +198,11 @@
 #include "turbo/platform/internal/prefetch.h"
 #include "turbo/platform/port.h"
 
-#if  TURBO_SSE2
+#if  TURBO_WITH_SSE2
 #include <emmintrin.h>
 #endif
 
-#if TURBO_SSSE3
+#if TURBO_WITH_SSSE3
 #include <tmmintrin.h>
 #endif
 
@@ -210,7 +210,7 @@
 #include <intrin.h>
 #endif
 
-#if TURBO_NEON
+#if TURBO_WITH_NEON
 #include <arm_neon.h>
 #endif
 
@@ -519,7 +519,7 @@ inline bool IsFull(ctrl_t c) { return c >= static_cast<ctrl_t>(0); }
 inline bool IsDeleted(ctrl_t c) { return c == ctrl_t::kDeleted; }
 inline bool IsEmptyOrDeleted(ctrl_t c) { return c < ctrl_t::kSentinel; }
 
-#if TURBO_SSE2
+#if TURBO_WITH_SSE2
 // Quick reference guide for intrinsics used below:
 //
 // * __m128i: An XMM (128-bit) word.
@@ -580,7 +580,7 @@ struct GroupSse2Impl {
 
   // Returns a bitmask representing the positions of empty slots.
   NonIterableBitMask<uint32_t, kWidth> MaskEmpty() const {
-#if TURBO_SSSE3
+#if TURBO_WITH_SSSE3
     // This only works because ctrl_t::kEmpty is -128.
     return NonIterableBitMask<uint32_t, kWidth>(
         static_cast<uint32_t>(_mm_movemask_epi8(_mm_sign_epi8(ctrl, ctrl))));
@@ -608,7 +608,7 @@ struct GroupSse2Impl {
   void ConvertSpecialToEmptyAndFullToDeleted(ctrl_t* dst) const {
     auto msbs = _mm_set1_epi8(static_cast<char>(-128));
     auto x126 = _mm_set1_epi8(126);
-#if TURBO_SSSE3
+#if TURBO_WITH_SSSE3
     auto res = _mm_or_si128(_mm_shuffle_epi8(x126, ctrl), msbs);
 #else
     auto zero = _mm_setzero_si128();
@@ -620,9 +620,9 @@ struct GroupSse2Impl {
 
   __m128i ctrl;
 };
-#endif  // TURBO_SSE2
+#endif  // TURBO_WITH_SSE2
 
-#if TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
+#if TURBO_WITH_NEON && TURBO_IS_LITTLE_ENDIAN
 struct GroupAArch64Impl {
   static constexpr size_t kWidth = 8;
 
@@ -680,7 +680,7 @@ struct GroupAArch64Impl {
 
   uint8x8_t ctrl;
 };
-#endif  // TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
+#endif  // TURBO_WITH_NEON && TURBO_IS_LITTLE_ENDIAN
 
 struct GroupPortableImpl {
   static constexpr size_t kWidth = 8;
@@ -739,9 +739,9 @@ struct GroupPortableImpl {
   uint64_t ctrl;
 };
 
-#if TURBO_SSE2
+#if TURBO_WITH_SSE2
 using Group = GroupSse2Impl;
-#elif TURBO_NEON && TURBO_IS_LITTLE_ENDIAN
+#elif TURBO_WITH_NEON && TURBO_IS_LITTLE_ENDIAN
 using Group = GroupAArch64Impl;
 #else
 using Group = GroupPortableImpl;

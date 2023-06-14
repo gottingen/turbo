@@ -15,7 +15,7 @@
 #ifndef TURBO_VERSION_H_
 #define TURBO_VERSION_H_
 
-#include "turbo/strings/str_format.h"
+#include "turbo/format/str_format.h"
 
 // TURBO_VERSION % 100 is the patch level
 // TURBO_VERSION / 100 % 1000 is the minor version
@@ -31,8 +31,8 @@
 namespace turbo {
 
 const std::string &version() {
-  static const std::string vstr = turbo::StrFormat(
-      "%d.%d%d", TURBO_MAJOR_VERSION, TURBO_MINOR_VERSION, TURBO_PATCH_VERSION);
+  static const std::string vstr = turbo::Format(
+      "{}.{}.{}", TURBO_MAJOR_VERSION, TURBO_MINOR_VERSION, TURBO_PATCH_VERSION);
   return vstr;
 }
 

@@ -22,24 +22,25 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
+    TURBO_NAMESPACE_BEGIN
+    namespace base_internal {
 
-class ScopedSetEnv {
- public:
-  ScopedSetEnv(const char* var_name, const char* new_value);
-  ~ScopedSetEnv();
+        class ScopedSetEnv {
+        public:
+            ScopedSetEnv(const char *var_name, const char *new_value);
 
- private:
-  std::string var_name_;
-  std::string old_value_;
+            ~ScopedSetEnv();
 
-  // True if the environment variable was initially not set.
-  bool was_unset_;
-};
+        private:
+            std::string var_name_;
+            std::string old_value_;
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
+            // True if the environment variable was initially not set.
+            bool was_unset_;
+        };
+
+    }  // namespace base_internal
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_PLATFORM_INTERNAL_SCOPED_SET_ENV_H_
