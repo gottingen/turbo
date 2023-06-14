@@ -23,11 +23,13 @@ you can get it as below.
 * Read [overview](docs/overview.md) to know the goals of turbo and its advantages. 
 * Read [getting start](docs/getting_start.md) for building turbo and work with [examples](examples).
 * Modules:
-  * [platform](docs/platform.md) 
-  * [Status](docs/status.md)
+  * [platform](docs/platform.md)
   * [base](docs/base.md)
-  * [json](docs/json.md) rapidjson docs
-  * [workflow](docs/workflow.md)
+  * [simd](docs/json.md) rapidjson docs
+  * [strings](docs/workflow.md)
+  * [concurrent]()
+  * [files]()
+  * [times]()
 
 # Acknowledgement
 
