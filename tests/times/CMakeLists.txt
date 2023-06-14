@@ -38,6 +38,9 @@ carbin_cc_test(
         "format_test.cc"
         "time_test.cc"
         "time_zone_test.cc"
+        "time_zone_format_test.cc"
+        "time_zone_lookup_test.cc"
+        "cctz_civil_time_test.cc"
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS

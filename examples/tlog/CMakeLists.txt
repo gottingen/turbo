@@ -19,6 +19,10 @@ carbin_cc_binary(
         log_ex
         SOURCES
         "log_ex.cc"
+        COPTS
+        ${CARBIN_DEFAULT_COPTS}
+        ${CARBIN_RANDOM_RANDEN_COPTS}
+        ${CARBIN_SIMD_FLAGS}
         DEFINITIONS
         "-DNDEBUG"
         DEPS
