@@ -14,89 +14,86 @@
 #include "turbo/base/result_status.h"
 
 #include <utility>
-
-#include "turbo/base/call_once.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/base/status.h"
-#include "turbo/strings/str_cat.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+    TURBO_NAMESPACE_BEGIN
 
-BadResultStatusAccess::BadResultStatusAccess(turbo::Status status)
-    : status_(std::move(status)) {}
+    BadResultStatusAccess::BadResultStatusAccess(turbo::Status status)
+            : status_(std::move(status)) {}
 
-BadResultStatusAccess::BadResultStatusAccess(const BadResultStatusAccess& other)
-    : status_(other.status_) {}
+    BadResultStatusAccess::BadResultStatusAccess(const BadResultStatusAccess &other)
+            : status_(other.status_) {}
 
-BadResultStatusAccess& BadResultStatusAccess::operator=(
-    const BadResultStatusAccess& other) {
-  // Ensure assignment is correct regardless of whether this->InitWhat() has
-  // already been called.
-  other.InitWhat();
-  status_ = other.status_;
-  what_ = other.what_;
-  return *this;
-}
+    BadResultStatusAccess &BadResultStatusAccess::operator=(
+            const BadResultStatusAccess &other) {
+        // Ensure assignment is correct regardless of whether this->InitWhat() has
+        // already been called.
+        other.InitWhat();
+        status_ = other.status_;
+        what_ = other.what_;
+        return *this;
+    }
 
-BadResultStatusAccess& BadResultStatusAccess::operator=(BadResultStatusAccess&& other) noexcept {
-  // Ensure assignment is correct regardless of whether this->InitWhat() has
-  // already been called.
-  other.InitWhat();
-  status_ = std::move(other.status_);
-  what_ = std::move(other.what_);
-  return *this;
-}
+    BadResultStatusAccess &BadResultStatusAccess::operator=(BadResultStatusAccess &&other) noexcept {
+        // Ensure assignment is correct regardless of whether this->InitWhat() has
+        // already been called.
+        other.InitWhat();
+        status_ = std::move(other.status_);
+        what_ = std::move(other.what_);
+        return *this;
+    }
 
-BadResultStatusAccess::BadResultStatusAccess(BadResultStatusAccess&& other) noexcept
-    : status_(std::move(other.status_)) {}
+    BadResultStatusAccess::BadResultStatusAccess(BadResultStatusAccess &&other) noexcept
+            : status_(std::move(other.status_)) {}
 
-const char* BadResultStatusAccess::what() const noexcept {
-  InitWhat();
-  return what_.c_str();
-}
+    const char *BadResultStatusAccess::what() const noexcept {
+        InitWhat();
+        return what_.c_str();
+    }
 
-const turbo::Status& BadResultStatusAccess::status() const { return status_; }
+    const turbo::Status &BadResultStatusAccess::status() const { return status_; }
 
-void BadResultStatusAccess::InitWhat() const {
-  turbo::call_once(init_what_, [this] {
-    what_ = turbo::StrCat("Bad ResultStatus access: ", status_.ToString());
-  });
-}
+    void BadResultStatusAccess::InitWhat() const {
+        std::call_once(init_what_, [this] {
+            what_ = turbo::Format("Bad ResultStatus access: {}", status_.ToString());
+        });
+    }
 
-namespace result_status_internal {
+    namespace result_status_internal {
 
-void Helper::HandleInvalidStatusCtorArg(turbo::Status* status) {
-  const char* kMessage =
-      "An OK status is not a valid constructor argument to ResultStatus<T>";
+        void Helper::HandleInvalidStatusCtorArg(turbo::Status *status) {
+            const char *kMessage =
+                    "An OK status is not a valid constructor argument to ResultStatus<T>";
 #ifdef NDEBUG
-  TURBO_INTERNAL_LOG(ERROR, kMessage);
+            TURBO_INTERNAL_LOG(ERROR, kMessage);
 #else
-  TURBO_INTERNAL_LOG(FATAL, kMessage);
+            TURBO_INTERNAL_LOG(FATAL, kMessage);
 #endif
-  // In optimized builds, we will fall back to InternalError.
-  *status = turbo::InternalError(kMessage);
-}
+            // In optimized builds, we will fall back to InternalError.
+            *status = turbo::InternalError(kMessage);
+        }
 
-void Helper::Crash(const turbo::Status& status) {
-  TURBO_INTERNAL_LOG(
-      FATAL,
-      turbo::StrCat("Attempting to fetch value instead of handling error ",
-                   status.ToString()));
-}
+        void Helper::Crash(const turbo::Status &status) {
+            TURBO_INTERNAL_LOG(
+                    FATAL,
+                    turbo::Format("Attempting to fetch value instead of handling error {}",
+                                  status.ToString()));
+        }
 
-void ThrowBadResultStatusAccess(turbo::Status status) {
+        void ThrowBadResultStatusAccess(turbo::Status status) {
 #ifdef TURBO_HAVE_EXCEPTIONS
-  throw turbo::BadResultStatusAccess(std::move(status));
+            throw turbo::BadResultStatusAccess(std::move(status));
 #else
-  TURBO_INTERNAL_LOG(
-      FATAL,
-      turbo::StrCat("Attempting to fetch value instead of handling error ",
-                   status.ToString()));
-  std::abort();
+            TURBO_INTERNAL_LOG(
+                FATAL,
+                turbo::Format("Attempting to fetch value instead of handling error {}",
+                             status.ToString()));
+            std::abort();
 #endif
-}
+        }
 
-}  // namespace result_status_internal
-TURBO_NAMESPACE_END
+    }  // namespace result_status_internal
+    TURBO_NAMESPACE_END
 }  // namespace turbo

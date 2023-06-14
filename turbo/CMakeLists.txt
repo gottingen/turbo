@@ -122,7 +122,6 @@ set(TURBO_ALL_SRC
         "strings/str_cat.cc"
         "strings/str_replace.cc"
         "strings/str_split.cc"
-        "strings/substitute.cc"
         "strings/internal/escaping.cc"
         "strings/internal/memutil.cc"
         "strings/internal/ostringstream.cc"

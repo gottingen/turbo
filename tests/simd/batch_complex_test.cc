@@ -633,7 +633,7 @@ private:
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd complex batches]", B, BATCH_COMPLEX_TYPES)
+TEST_CASE_TEMPLATE("[simd complex batches]", B, BATCH_COMPLEX_TYPES)
 {
     batch_complex_test<B> Test;
     SUBCASE("load_store") { Test.test_load_store(); }

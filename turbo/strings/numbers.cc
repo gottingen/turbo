@@ -38,7 +38,6 @@
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/internal/memutil.h"
 #include "turbo/strings/match.h"
-#include "turbo/strings/str_cat.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

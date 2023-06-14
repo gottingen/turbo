@@ -18,15 +18,15 @@
 
 
 #include "turbo/simd/simd.h"
+
 #ifndef TURBO_NO_SUPPORTED_ARCHITECTURE
 
 #include <random>
 
 #include "test_utils.h"
 
-template <class B>
-struct xsimd_api_test
-{
+template<class B>
+struct SimdApiTest {
     using batch_type = B;
     using value_type = typename B::value_type;
     static constexpr size_t size = B::size;
@@ -55,8 +55,7 @@ struct xsimd_api_test
 
     array_type expected;
 
-    xsimd_api_test()
-    {
+    SimdApiTest() {
         init_test_vector(i8_vec);
         init_test_vector(ui8_vec);
         init_test_vector(i16_vec);
@@ -71,8 +70,7 @@ struct xsimd_api_test
 #endif
     }
 
-    void test_load()
-    {
+    void test_load() {
         test_load_impl(i8_vec, "load int8_t");
         test_load_impl(ui8_vec, "load uint8_t");
         test_load_impl(i16_vec, "load int16_t");
@@ -87,8 +85,7 @@ struct xsimd_api_test
 #endif
     }
 
-    void test_store()
-    {
+    void test_store() {
         test_store_impl(i8_vec, "load int8_t");
         test_store_impl(ui8_vec, "load uint8_t");
         test_store_impl(i16_vec, "load int16_t");
@@ -103,8 +100,7 @@ struct xsimd_api_test
 #endif
     }
 
-    void test_set()
-    {
+    void test_set() {
         test_set_impl<int8_t>("set int8_t");
         test_set_impl<uint8_t>("set uint8_t");
         test_set_impl<int16_t>("set int16_t");
@@ -120,9 +116,8 @@ struct xsimd_api_test
     }
 
 private:
-    template <class V>
-    void test_load_impl(const V& v, const std::string& name)
-    {
+    template<class V>
+    void test_load_impl(const V &v, const std::string &name) {
         batch_type b;
         std::copy(v.cbegin(), v.cend(), expected.begin());
 
@@ -135,9 +130,8 @@ private:
         CHECK_BATCH_EQ(b, expected);
     }
 
-    template <class V>
-    void test_store_impl(const V& v, const std::string& name)
-    {
+    template<class V>
+    void test_store_impl(const V &v, const std::string &name) {
         batch_type b = batch_type::load(v.data(), turbo::simd::aligned_mode());
         V res(size);
 
@@ -150,9 +144,8 @@ private:
         CHECK_VECTOR_EQ(res, v);
     }
 
-    template <class T>
-    void test_set_impl(const std::string& name)
-    {
+    template<class T>
+    void test_set_impl(const std::string &name) {
         T v = T(1);
         batch_type expected(v);
         batch_type res = turbo::simd::broadcast<value_type>(v);
@@ -160,9 +153,8 @@ private:
         CHECK_BATCH_EQ(res, expected);
     }
 
-    template <class V>
-    void init_test_vector(V& vec)
-    {
+    template<class V>
+    void init_test_vector(V &vec) {
         vec.resize(size);
 
         value_type min = value_type(0);
@@ -171,8 +163,7 @@ private:
         std::default_random_engine generator;
         std::uniform_int_distribution<int> distribution(min, max);
 
-        auto gen = [&distribution, &generator]()
-        {
+        auto gen = [&distribution, &generator]() {
             return static_cast<value_type>(distribution(generator));
         };
 
@@ -182,20 +173,18 @@ private:
 
 TEST_CASE_TEMPLATE("[basic api]", B, BATCH_TYPES)
 {
-    xsimd_api_test<B> Test;
-    SUBCASE("load")
-    {
+    SimdApiTest<B> Test;
+    SUBCASE("load") {
         Test.test_load();
     }
 
-    SUBCASE("store")
-    {
+    SUBCASE("store") {
         Test.test_store();
     }
 
-    SUBCASE("set")
-    {
+    SUBCASE("set") {
         Test.test_set();
     }
 }
+
 #endif

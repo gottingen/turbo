@@ -199,7 +199,7 @@ private:
 
     struct test_load_char
     {
-        /* Make sure xsimd doesn't try to be smart with char types */
+        /* Make sure simd doesn't try to be smart with char types */
         static_assert(std::is_same<turbo::simd::batch<char>, decltype(turbo::simd::load_as<char>(std::declval<char*>(), turbo::simd::aligned_mode()))>::value,
                       "honor explicit type request");
         static_assert(std::is_same<turbo::simd::batch<unsigned char>, decltype(turbo::simd::load_as<unsigned char>(std::declval<unsigned char*>(), turbo::simd::aligned_mode()))>::value,

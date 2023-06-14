@@ -35,8 +35,8 @@
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/strings/substitute.h"
 #include "gtest/gtest.h"
+#include "turbo/format/str_format.h"
 
 namespace testing {
 
@@ -88,11 +88,11 @@ namespace testing {
             std::string msg_;
         };
 
-// TestBadAllocException exists because allocation functions must throw an
-// exception which can be caught by a handler of std::bad_alloc.  We use a child
-// class of std::bad_alloc so we can customise the error message, and also
-// derive from TestException so we don't accidentally end up catching an actual
-// bad_alloc exception in TestExceptionSafety.
+        // TestBadAllocException exists because allocation functions must throw an
+        // exception which can be caught by a handler of std::bad_alloc.  We use a child
+        // class of std::bad_alloc so we can customise the error message, and also
+        // derive from TestException so we don't accidentally end up catching an actual
+        // bad_alloc exception in TestExceptionSafety.
         class TestBadAllocException : public std::bad_alloc, public TestException {
         public:
             explicit TestBadAllocException(std::string_view msg) : TestException(msg) {}
@@ -102,11 +102,11 @@ namespace testing {
 
         extern int countdown;
 
-// Allows the countdown variable to be set manually (defaulting to the initial
-// value of 0)
+        // Allows the countdown variable to be set manually (defaulting to the initial
+        // value of 0)
         inline void SetCountdown(int i = 0) { countdown = i; }
 
-// Sets the countdown to the terminal value -1
+        // Sets the countdown to the terminal value -1
         inline void UnsetCountdown() { SetCountdown(-1); }
 
         void MaybeThrow(std::string_view msg, bool throw_bad_alloc = false);
@@ -119,9 +119,9 @@ namespace testing {
             std::string description;
         };
 
-// Inspects the constructions and destructions of anything inheriting from
-// TrackedObject. This allows us to safely "leak" TrackedObjects, as
-// ConstructorTracker will destroy everything left over in its destructor.
+        // Inspects the constructions and destructions of anything inheriting from
+        // TrackedObject. This allows us to safely "leak" TrackedObjects, as
+        // ConstructorTracker will destroy everything left over in its destructor.
         class ConstructorTracker {
         public:
             explicit ConstructorTracker(int count) : countdown_(count) {
@@ -183,11 +183,11 @@ namespace testing {
                                             const std::string &address_description,
                                             int countdown,
                                             const std::string &error_description) {
-                return turbo::Substitute(
-                        "With coundtown at $0:\n"
-                        "  $1\n"
-                        "  Object originally constructed by $2\n"
-                        "  Object address: $3\n",
+                return turbo::Format(
+                        "With coundtown at {}:\n"
+                        "  {}\n"
+                        "  Object originally constructed by {}\n"
+                        "  Object address: {}\n",
                         countdown, error_description, address_description, address);
             }
 
@@ -230,16 +230,16 @@ namespace testing {
         bool b_;
     };
 
-/*
- * Configuration enum for the ThrowingValue type that defines behavior for the
- * lifetime of the instance. Use testing::nothrow_ctor to prevent the integer
- * constructor from throwing.
- *
- * kEverythingThrows: Every operation can throw an exception
- * kNoThrowCopy: Copy construction and copy assignment will not throw
- * kNoThrowMove: Move construction and move assignment will not throw
- * kNoThrowNew: Overloaded operators new and new[] will not throw
- */
+    /*
+     * Configuration enum for the ThrowingValue type that defines behavior for the
+     * lifetime of the instance. Use testing::nothrow_ctor to prevent the integer
+     * constructor from throwing.
+     *
+     * kEverythingThrows: Every operation can throw an exception
+     * kNoThrowCopy: Copy construction and copy assignment will not throw
+     * kNoThrowMove: Move construction and move assignment will not throw
+     * kNoThrowNew: Overloaded operators new and new[] will not throw
+     */
     enum class TypeSpec {
         kEverythingThrows = 0,
         kNoThrowCopy = 1,
@@ -607,9 +607,8 @@ namespace testing {
 
     private:
         static std::string GetInstanceString(int dummy) {
-            return turbo::StrCat("ThrowingValue<",
-                                 exceptions_internal::GetSpecString(Spec), ">(", dummy,
-                                 ")");
+            return turbo::Format("ThrowingValue<{}>({})",
+                                 exceptions_internal::GetSpecString(Spec), dummy);
         }
 
         int dummy_;
@@ -771,9 +770,8 @@ namespace testing {
 
     private:
         static std::string GetInstanceString(int dummy) {
-            return turbo::StrCat("ThrowingAllocator<",
-                                 exceptions_internal::GetSpecString(Spec), ">(", dummy,
-                                 ")");
+            return turbo::Format("ThrowingAllocator<{}>({})",
+                                 exceptions_internal::GetSpecString(Spec), dummy);
         }
 
         const std::shared_ptr<const int> &State() const { return dummy_; }
@@ -789,7 +787,7 @@ namespace testing {
         void ReadStateAndMaybeThrow(std::string_view msg) const {
             if (!IsSpecified(AllocSpec::kNoThrowAllocate)) {
                 exceptions_internal::MaybeThrow(
-                        turbo::Substitute("Allocator id $0 threw from $1", *dummy_, msg));
+                        turbo::Format("Allocator id {} threw from {}", *dummy_, msg));
             }
         }
 
@@ -800,9 +798,9 @@ namespace testing {
     template<typename T, AllocSpec Spec>
     int ThrowingAllocator<T, Spec>::next_id_ = 0;
 
-// Tests for resource leaks by attempting to construct a T using args repeatedly
-// until successful, using the countdown method.  Side effects can then be
-// tested for resource leaks.
+    // Tests for resource leaks by attempting to construct a T using args repeatedly
+    // until successful, using the countdown method.  Side effects can then be
+    // tested for resource leaks.
     template<typename T, typename... Args>
     void TestThrowingCtor(Args &&... args) {
         struct Cleanup {

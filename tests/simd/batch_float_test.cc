@@ -134,7 +134,7 @@ private:
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd batch float]", B, BATCH_FLOAT_TYPES)
+TEST_CASE_TEMPLATE("[simd batch float]", B, BATCH_FLOAT_TYPES)
 {
     batch_float_test<B> Test;
 

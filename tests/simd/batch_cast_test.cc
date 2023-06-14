@@ -18,57 +18,56 @@
 
 
 #include "turbo/simd/simd.h"
+
 #ifndef TURBO_NO_SUPPORTED_ARCHITECTURE
 
 #include "test_utils.h"
 
 #if !TURBO_WITH_NEON || TURBO_WITH_NEON64
-namespace detail
-{
-    template <class T_out, class T_in>
+namespace detail {
+    template<class T_out, class T_in>
     inline typename std::enable_if<std::is_unsigned<T_in>::value && std::is_integral<T_out>::value, bool>::type
-    is_convertible(T_in value)
-    {
+    is_convertible(T_in value) {
         return static_cast<uint64_t>(value) <= static_cast<uint64_t>(std::numeric_limits<T_out>::max());
     }
 
-    template <class T_out, class T_in>
-    inline typename std::enable_if<std::is_integral<T_in>::value && std::is_signed<T_in>::value && std::is_integral<T_out>::value && std::is_signed<T_out>::value, bool>::type
-    is_convertible(T_in value)
-    {
+    template<class T_out, class T_in>
+    inline typename std::enable_if<
+            std::is_integral<T_in>::value && std::is_signed<T_in>::value && std::is_integral<T_out>::value &&
+            std::is_signed<T_out>::value, bool>::type
+    is_convertible(T_in value) {
         int64_t signed_value = static_cast<int64_t>(value);
-        return signed_value <= static_cast<int64_t>(std::numeric_limits<T_out>::max()) && signed_value >= static_cast<int64_t>(std::numeric_limits<T_out>::lowest());
+        return signed_value <= static_cast<int64_t>(std::numeric_limits<T_out>::max()) &&
+               signed_value >= static_cast<int64_t>(std::numeric_limits<T_out>::lowest());
     }
 
-    template <class T_out, class T_in>
-    inline typename std::enable_if<std::is_integral<T_in>::value && std::is_signed<T_in>::value && std::is_unsigned<T_out>::value, bool>::type
-    is_convertible(T_in value)
-    {
+    template<class T_out, class T_in>
+    inline typename std::enable_if<
+            std::is_integral<T_in>::value && std::is_signed<T_in>::value && std::is_unsigned<T_out>::value, bool>::type
+    is_convertible(T_in value) {
         return value >= 0 && is_convertible<T_out>(static_cast<uint64_t>(value));
     }
 
-    template <class T_out, class T_in>
+    template<class T_out, class T_in>
     inline typename std::enable_if<std::is_floating_point<T_in>::value && std::is_integral<T_out>::value, bool>::type
-    is_convertible(T_in value)
-    {
-        return value <= static_cast<T_in>(std::numeric_limits<T_out>::max()) && value >= static_cast<T_in>(std::numeric_limits<T_out>::lowest());
+    is_convertible(T_in value) {
+        return value <= static_cast<T_in>(std::numeric_limits<T_out>::max()) &&
+               value >= static_cast<T_in>(std::numeric_limits<T_out>::lowest());
     }
 
-    template <class T_out, class T_in>
+    template<class T_out, class T_in>
     inline typename std::enable_if<std::is_floating_point<T_out>::value, bool>::type
-    is_convertible(T_in)
-    {
+    is_convertible(T_in) {
         return true;
     }
 
-    template <typename Arch, typename From, typename To>
+    template<typename Arch, typename From, typename To>
     using uses_fast_cast = std::is_same<turbo::simd::kernel::detail::conversion_type<Arch, From, To>,
-                                        turbo::simd::kernel::detail::with_fast_conversion>;
+            turbo::simd::kernel::detail::with_fast_conversion>;
 }
 
-template <class CP>
-struct batch_cast_test
-{
+template<class CP>
+struct batch_cast_test {
     static constexpr size_t N = CP::size;
     static constexpr size_t A = CP::alignment;
 
@@ -87,81 +86,79 @@ struct batch_cast_test
     std::vector<float> float_test_values;
     std::vector<double> double_test_values;
 
-    batch_cast_test()
-    {
+    batch_cast_test() {
         int_test_values = {
-            0,
-            0x01,
-            0x7f,
-            0x80,
-            0xff,
-            0x0100,
-            0x7fff,
-            0x8000,
-            0xffff,
-            0x00010000,
-            0x7fffffff,
-            0x80000000,
-            0xffffffff,
-            0x0000000100000000,
-            0x7fffffffffffffff,
-            0x8000000000000000,
-            0xffffffffffffffff
+                0,
+                0x01,
+                0x7f,
+                0x80,
+                0xff,
+                0x0100,
+                0x7fff,
+                0x8000,
+                0xffff,
+                0x00010000,
+                0x7fffffff,
+                0x80000000,
+                0xffffffff,
+                0x0000000100000000,
+                0x7fffffffffffffff,
+                0x8000000000000000,
+                0xffffffffffffffff
         };
 
         float_test_values = {
-            0.0f,
-            1.0f,
-            -1.0f,
-            127.0f,
-            128.0f,
-            -128.0f,
-            255.0f,
-            256.0f,
-            -256.0f,
-            32767.0f,
-            32768.0f,
-            -32768.0f,
-            65535.0f,
-            65536.0f,
-            -65536.0f,
-            2147483647.0f,
-            2147483648.0f,
-            -2147483648.0f,
-            4294967167.0f
+                0.0f,
+                1.0f,
+                -1.0f,
+                127.0f,
+                128.0f,
+                -128.0f,
+                255.0f,
+                256.0f,
+                -256.0f,
+                32767.0f,
+                32768.0f,
+                -32768.0f,
+                65535.0f,
+                65536.0f,
+                -65536.0f,
+                2147483647.0f,
+                2147483648.0f,
+                -2147483648.0f,
+                4294967167.0f
         };
 
         double_test_values = {
-            0.0,
-            1.0,
-            -1.0,
-            127.0,
-            128.0,
-            -128.0,
-            255.0,
-            256.0,
-            -256.0,
-            32767.0,
-            32768.0,
-            -32768.0,
-            65535.0,
-            65536.0,
-            -65536.0,
-            2147483647.0,
-            2147483648.0,
-            -2147483648.0,
-            4294967295.0,
-            4294967296.0,
-            -4294967296.0,
-            9223372036854775807.0,
-            9223372036854775808.0,
-            -9223372036854775808.0,
-            18446744073709550591.0
+                0.0,
+                1.0,
+                -1.0,
+                127.0,
+                128.0,
+                -128.0,
+                255.0,
+                256.0,
+                -256.0,
+                32767.0,
+                32768.0,
+                -32768.0,
+                65535.0,
+                65536.0,
+                -65536.0,
+                2147483647.0,
+                2147483648.0,
+                -2147483648.0,
+                4294967295.0,
+                4294967296.0,
+                -4294967296.0,
+                9223372036854775807.0,
+                9223372036854775808.0,
+                -9223372036854775808.0,
+                18446744073709550591.0
         };
     }
 
-    void test_bool_cast() const
-    {
+    void test_bool_cast() const {
         test_bool_cast_impl<float_batch, int32_batch>("batch bool cast float -> int32");
         test_bool_cast_impl<float_batch, uint32_batch>("batch bool cast float -> uint32");
         test_bool_cast_impl<int32_batch, float_batch>("batch bool cast int32 -> float");
@@ -169,10 +166,8 @@ struct batch_cast_test
         test_bool_cast_impl<float_batch, float_batch>("batch bool cast float -> float");
     }
 
-    void test_cast() const
-    {
-        for (const auto& test_value : int_test_values)
-        {
+    void test_cast() const {
+        for (const auto &test_value: int_test_values) {
             test_cast_impl<int8_batch, int8_batch>(test_value, "batch cast int8 -> int8");
             test_cast_impl<int8_batch, uint8_batch>(test_value, "batch cast int8 -> uint8");
             test_cast_impl<uint8_batch, int8_batch>(test_value, "batch cast uint8 -> int8");
@@ -198,15 +193,13 @@ struct batch_cast_test
             test_cast_impl<uint64_batch, double_batch>(test_value, "batch cast uint64 -> double");
         }
 
-        for (const auto& test_value : float_test_values)
-        {
+        for (const auto &test_value: float_test_values) {
             test_cast_impl<float_batch, int32_batch>(test_value, "batch cast float -> int32");
             test_cast_impl<float_batch, uint32_batch>(test_value, "batch cast float -> uint32");
             test_cast_impl<float_batch, float_batch>(test_value, "batch cast float -> float");
         }
 
-        for (const auto& test_value : double_test_values)
-        {
+        for (const auto &test_value: double_test_values) {
             test_cast_impl<double_batch, int64_batch>(test_value, "batch cast double -> int64");
             test_cast_impl<double_batch, uint64_batch>(test_value, "batch cast double -> uint64");
             test_cast_impl<double_batch, double_batch>(test_value, "batch cast double -> double");
@@ -328,26 +321,23 @@ struct batch_cast_test
 #endif
 
 private:
-    template <class B_in, class B_out, class T>
-    void test_cast_impl(T test_value, const std::string& name) const
-    {
+    template<class B_in, class B_out, class T>
+    void test_cast_impl(T test_value, const std::string &name) const {
         using T_in = typename B_in::value_type;
         using T_out = typename B_out::value_type;
         using B_common_in = turbo::simd::batch<T_in>;
         using B_common_out = turbo::simd::batch<T_out>;
 
         T_in in_test_value = static_cast<T_in>(test_value);
-        if (detail::is_convertible<T_out>(in_test_value))
-        {
+        if (detail::is_convertible<T_out>(in_test_value)) {
             B_common_out res = turbo::simd::batch_cast<T_out>(B_common_in(in_test_value));
             INFO(name);
             CHECK_SCALAR_EQ(res.get(0), static_cast<T_out>(in_test_value));
         }
     }
 
-    template <class B_in, class B_out>
-    void test_bool_cast_impl(const std::string& name) const
-    {
+    template<class B_in, class B_out>
+    void test_bool_cast_impl(const std::string &name) const {
         using T_in = typename B_in::value_type;
         using T_out = typename B_out::value_type;
         using B_common_in = turbo::simd::batch_bool<T_in>;
@@ -365,20 +355,19 @@ private:
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd cast tests]", B, CONVERSION_TYPES)
+TEST_CASE_TEMPLATE("[simd cast tests]", B, CONVERSION_TYPES)
 {
     batch_cast_test<B> Test;
 
-    SUBCASE("bool cast")
-    {
+    SUBCASE("bool cast") {
         Test.test_bool_cast();
     }
 
-    SUBCASE("cast")
-    {
+    SUBCASE("cast") {
         Test.test_cast();
     }
 }
+
 #endif
 #if 0 && TURBO_SIMD_X86_INSTR_SET >= TURBO_SIMD_X86_AVX_VERSION
 TYPED_TEST(batch_cast_test, cast_sizeshift1)
@@ -395,10 +384,10 @@ TYPED_TEST(batch_cast_test, cast_sizeshift2)
 #endif
 
 #if TURBO_WITH_SSE2
-TEST_CASE_TEMPLATE("[xsimd cast tests]", B, CONVERSION_TYPES)
+
+TEST_CASE_TEMPLATE("[simd cast tests]", B, CONVERSION_TYPES)
 {
-    SUBCASE("use fastcast")
-    {
+    SUBCASE("use fastcast") {
         using A = turbo::simd::default_arch;
         static_assert(detail::uses_fast_cast<A, int32_t, float>::value,
                       "expected int32 to float conversion to use fast_cast");
@@ -406,5 +395,6 @@ TEST_CASE_TEMPLATE("[xsimd cast tests]", B, CONVERSION_TYPES)
                       "expected float to int32 conversion to use fast_cast");
     }
 }
+
 #endif
 #endif

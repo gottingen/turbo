@@ -113,7 +113,7 @@ bool extract(turbo::simd::batch_bool<T, A> const &batch) { return batch.get(0); 
  */
 
 template<typename T>
-struct xsimd_api_scalar_types_functions {
+struct SimdApiScalarTypesFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_bitofsign() {
@@ -184,7 +184,7 @@ struct xsimd_api_scalar_types_functions {
         value_type val1(2);
         value_type val2(3);
         CHECK_EQ(extract(turbo::simd::clip(T(val0), T(val1), T(val2))),
-                  val0 <= val1 ? val1 : (val0 >= val2 ? val2 : val0));
+                 val0 <= val1 ? val1 : (val0 >= val2 ? val2 : val0));
     }
 
     void test_ge() {
@@ -227,152 +227,104 @@ struct xsimd_api_scalar_types_functions {
         value_type val0(1);
         value_type val1(3);
         CHECK_EQ(extract(turbo::simd::remainder(T(val0), T(val1))),
-                  val0 - turbo::simd::as_integer_t<value_type>(val0) / turbo::simd::as_integer_t<value_type>(val1));
+                 val0 - turbo::simd::as_integer_t<value_type>(val0) / turbo::simd::as_integer_t<value_type>(val1));
     }
 
     void test_sign() {
         value_type val(1);
         CHECK_EQ(extract(turbo::simd::sign(T(val))), val == 0 ? 0 : val > 0 ? 1
-                                                                             : -1);
+                                                                            : -1);
     }
 
     void test_signnz() {
         value_type val(1);
         CHECK_EQ(extract(turbo::simd::signnz(T(val))), val == 0 ? 1 : val > 0 ? 1
-                                                                               : -1);
+                                                                              : -1);
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | scalar types]", B, SCALAR_TYPES)
+TEST_CASE_TEMPLATE("[simd api | scalar types]", B, SCALAR_TYPES)
 {
-xsimd_api_scalar_types_functions<B> Test;
-SUBCASE("bitofsign")
-{
-Test.
+    SimdApiScalarTypesFunctions<B> Test;
+    SUBCASE("bitofsign") {
+        Test.test_bitofsign();
 
-test_bitofsign();
+    }
 
-}
+    SUBCASE("bitwise_and") {
+        Test.test_bitwise_and();
 
-SUBCASE("bitwise_and")
-{
-Test.
+    }
 
-test_bitwise_and();
+    SUBCASE("bitwise_andnot") {
+        Test.test_bitwise_andnot();
 
-}
+    }
 
-SUBCASE("bitwise_andnot")
-{
-Test.
+    SUBCASE("bitwise_not") {
+        Test.test_bitwise_not();
 
-test_bitwise_andnot();
+    }
 
-}
+    SUBCASE("bitwise_or") {
+        Test.test_bitwise_or();
 
-SUBCASE("bitwise_not")
-{
-Test.
+    }
 
-test_bitwise_not();
+    SUBCASE("bitwise_xor") {
+        Test.test_bitwise_xor();
 
-}
+    }
 
-SUBCASE("bitwise_or")
-{
-Test.
+    SUBCASE("clip") {
+        Test.test_clip();
 
-test_bitwise_or();
+    }
 
-}
+    SUBCASE("ge") {
+        Test.test_ge();
 
-SUBCASE("bitwise_xor")
-{
-Test.
+    }
 
-test_bitwise_xor();
+    SUBCASE("gt") {
+        Test.test_gt();
 
-}
+    }
 
-SUBCASE("clip")
-{
-Test.
+    SUBCASE("le") {
+        Test.test_le();
 
-test_clip();
+    }
 
-}
+    SUBCASE("lt") {
+        Test.test_lt();
 
-SUBCASE("ge")
-{
-Test.
+    }
 
-test_ge();
+    SUBCASE("max") {
+        Test.test_max();
 
-}
+    }
 
-SUBCASE("gt")
-{
-Test.
+    SUBCASE("min") {
+        Test.test_min();
 
-test_gt();
+    }
 
-}
+    SUBCASE("remainder") {
+        Test.test_remainder();
 
-SUBCASE("le")
-{
-Test.
+    }
 
-test_le();
+    SUBCASE("sign") {
+        Test.test_sign();
 
-}
+    }
 
-SUBCASE("lt")
-{
-Test.
+    SUBCASE("signnz") {
+        Test.test_signnz();
 
-test_lt();
-
-}
-
-SUBCASE("max")
-{
-Test.
-
-test_max();
-
-}
-
-SUBCASE("min")
-{
-Test.
-
-test_min();
-
-}
-
-SUBCASE("remainder")
-{
-Test.
-
-test_remainder();
-
-}
-
-SUBCASE("sign")
-{
-Test.
-
-test_sign();
-
-}
-
-SUBCASE("signnz")
-{
-Test.
-
-test_signnz();
-
-}
+    }
 }
 
 /*
@@ -380,7 +332,7 @@ test_signnz();
  */
 
 template<typename T>
-struct xsimd_api_integral_types_functions {
+struct SimdApiIntegralTypesFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_mod() {
@@ -393,46 +345,37 @@ struct xsimd_api_integral_types_functions {
         value_type val0(122);
         value_type val1(std::numeric_limits<value_type>::max());
         CHECK_EQ(extract(turbo::simd::sadd(T(val0), T(val1))),
-                  (val0 > std::numeric_limits<value_type>::max() - val1) ? std::numeric_limits<value_type>::max() : (
-                          val0 + val1));
+                 (val0 > std::numeric_limits<value_type>::max() - val1) ? std::numeric_limits<value_type>::max() : (
+                         val0 + val1));
     }
 
     void test_ssub() {
         value_type val0(122);
         value_type val1(121);
         CHECK_EQ(extract(turbo::simd::ssub(T(val0), T(val1))),
-                  (val0 < std::numeric_limits<value_type>::min() + val1) ? std::numeric_limits<value_type>::min() : (
-                          val0 - val1));
+                 (val0 < std::numeric_limits<value_type>::min() + val1) ? std::numeric_limits<value_type>::min() : (
+                         val0 - val1));
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | integral types functions]", B, INTEGRAL_TYPES)
+TEST_CASE_TEMPLATE("[simd api | integral types functions]", B, INTEGRAL_TYPES)
 {
-xsimd_api_integral_types_functions<B> Test;
+    SimdApiIntegralTypesFunctions<B> Test;
 
-SUBCASE("mod")
-{
-Test.
+    SUBCASE("mod") {
+        Test.test_mod();
 
-test_mod();
+    }
 
-}
+    SUBCASE("sadd") {
+        Test.test_sadd();
 
-SUBCASE("sadd")
-{
-Test.
+    }
 
-test_sadd();
+    SUBCASE("ssub") {
+        Test.test_ssub();
 
-}
-
-SUBCASE("ssub")
-{
-Test.
-
-test_ssub();
-
-}
+    }
 }
 
 /*
@@ -440,7 +383,7 @@ test_ssub();
  */
 
 template<typename T>
-struct xsimd_api_float_types_functions {
+struct SimdApiFloatTypesFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_acos() {
@@ -738,439 +681,274 @@ struct xsimd_api_float_types_functions {
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | float types functions]", B, FLOAT_TYPES)
+TEST_CASE_TEMPLATE("[simd api | float types functions]", B, FLOAT_TYPES)
 {
-xsimd_api_float_types_functions<B> Test;
+    SimdApiFloatTypesFunctions<B> Test;
 
-SUBCASE("acos")
-{
-Test.
+    SUBCASE("acos") {
+        Test.test_acos();
 
-test_acos();
+    }
 
-}
+    SUBCASE("acosh") {
+        Test.test_acosh();
 
-SUBCASE("acosh")
-{
-Test.
+    }
 
-test_acosh();
+    SUBCASE("asin") {
+        Test.test_asin();
 
-}
+    }
 
-SUBCASE("asin")
-{
-Test.
+    SUBCASE("asinh") {
+        Test.test_asinh();
 
-test_asin();
+    }
 
-}
+    SUBCASE("atan") {
+        Test.test_atan();
 
-SUBCASE("asinh")
-{
-Test.
+    }
 
-test_asinh();
+    SUBCASE("atan2") {
+        Test.test_atan2();
 
-}
+    }
 
-SUBCASE("atan")
-{
-Test.
+    SUBCASE("atanh") {
+        Test.test_atanh();
 
-test_atan();
+    }
 
-}
+    SUBCASE("cbrt") {
+        Test.test_cbrt();
 
-SUBCASE("atan2")
-{
-Test.
+    }
 
-test_atan2();
+    SUBCASE("ceil") {
+        Test.test_ceil();
 
-}
+    }
 
-SUBCASE("atanh")
-{
-Test.
+    SUBCASE("copysign") {
+        Test.test_copysign();
 
-test_atanh();
+    }
 
-}
+    SUBCASE("cos") {
+        Test.test_cos();
 
-SUBCASE("cbrt")
-{
-Test.
+    }
 
-test_cbrt();
+    SUBCASE("cosh") {
+        Test.test_cosh();
 
-}
+    }
 
-SUBCASE("ceil")
-{
-Test.
+    SUBCASE("exp") {
+        Test.test_exp();
 
-test_ceil();
+    }
 
-}
+    SUBCASE("exp10") {
+        Test.test_exp10();
 
-SUBCASE("copysign")
-{
-Test.
+    }
 
-test_copysign();
+    SUBCASE("exp2") {
+        Test.test_exp2();
 
-}
+    }
 
-SUBCASE("cos")
-{
-Test.
+    SUBCASE("expm1") {
+        Test.test_expm1();
 
-test_cos();
+    }
 
-}
+    SUBCASE("erf") {
+        Test.test_erf();
 
-SUBCASE("cosh")
-{
-Test.
+    }
 
-test_cosh();
+    SUBCASE("erfc") {
+        Test.test_erfc();
 
-}
+    }
 
-SUBCASE("exp")
-{
-Test.
+    SUBCASE("fabs") {
+        Test.test_fabs();
 
-test_exp();
+    }
 
-}
+    SUBCASE("fdim") {
+        Test.test_fdim();
 
-SUBCASE("exp10")
-{
-Test.
+    }
 
-test_exp10();
+    SUBCASE("floor") {
+        Test.test_floor();
 
-}
+    }
 
-SUBCASE("exp2")
-{
-Test.
+    SUBCASE("fmax") {
+        Test.test_fmax();
 
-test_exp2();
+    }
 
-}
+    SUBCASE("fmin") {
+        Test.test_fmin();
 
-SUBCASE("expm1")
-{
-Test.
+    }
 
-test_expm1();
+    SUBCASE("fmod") {
+        Test.test_fmod();
 
-}
+    }
+    SUBCASE("frexp") {
+        Test.test_frexp();
 
-SUBCASE("erf")
-{
-Test.
+    }
+    SUBCASE("hypot") {
+        Test.test_hypot();
 
-test_erf();
+    }
+    SUBCASE("is_even") {
+        Test.test_is_even();
 
-}
+    }
+    SUBCASE("is_flint") {
+        Test.test_is_flint();
 
-SUBCASE("erfc")
-{
-Test.
+    }
+    SUBCASE("is_odd") {
+        Test.test_is_odd();
 
-test_erfc();
+    }
+    SUBCASE("isinf") {
+        Test.test_isinf();
 
-}
+    }
+    SUBCASE("isfinite") {
+        Test.test_isfinite();
 
-SUBCASE("fabs")
-{
-Test.
+    }
+    SUBCASE("isnan") {
+        Test.test_isnan();
 
-test_fabs();
+    }
+    SUBCASE("ldexp") {
+        Test.test_ldexp();
 
-}
+    }
+    SUBCASE("lgamma") {
+        Test.test_lgamma();
 
-SUBCASE("fdim")
-{
-Test.
+    }
 
-test_fdim();
+    SUBCASE("log") {
+        Test.test_log();
 
-}
+    }
 
-SUBCASE("floor")
-{
-Test.
+    SUBCASE("log2") {
+        Test.test_log2();
 
-test_floor();
+    }
 
-}
+    SUBCASE("log10") {
+        Test.test_log10();
 
-SUBCASE("fmax")
-{
-Test.
+    }
 
-test_fmax();
+    SUBCASE("log1p") {
+        Test.test_log1p();
 
-}
+    }
 
-SUBCASE("fmin")
-{
-Test.
+    SUBCASE("nearbyint") {
+        Test.test_nearbyint();
 
-test_fmin();
+    }
 
-}
+    SUBCASE("nearbyint_as_int") {
+        Test.test_nearbyint_as_int();
 
-SUBCASE("fmod")
-{
-Test.
+    }
 
-test_fmod();
+    SUBCASE("nextafter") {
+        Test.test_nextafter();
 
-}
-SUBCASE("frexp")
-{
-Test.
+    }
 
-test_frexp();
+    SUBCASE("polar") {
+        Test.test_polar();
 
-}
-SUBCASE("hypot")
-{
-Test.
+    }
 
-test_hypot();
+    SUBCASE("pow") {
+        Test.test_pow();
 
-}
-SUBCASE("is_even")
-{
-Test.
+    }
 
-test_is_even();
+    SUBCASE("reciprocal") {
+        Test.test_reciprocal();
 
-}
-SUBCASE("is_flint")
-{
-Test.
+    }
 
-test_is_flint();
+    SUBCASE("rint") {
+        Test.test_rint();
 
-}
-SUBCASE("is_odd")
-{
-Test.
+    }
 
-test_is_odd();
+    SUBCASE("round") {
+        Test.test_round();
 
-}
-SUBCASE("isinf")
-{
-Test.
+    }
 
-test_isinf();
+    SUBCASE("rsqrt") {
+        Test.test_rsqrt();
 
-}
-SUBCASE("isfinite")
-{
-Test.
+    }
 
-test_isfinite();
+    SUBCASE("sin") {
+        Test.test_sin();
 
-}
-SUBCASE("isnan")
-{
-Test.
+    }
 
-test_isnan();
+    SUBCASE("sincos") {
+        Test.test_sincos();
 
-}
-SUBCASE("ldexp")
-{
-Test.
+    }
 
-test_ldexp();
+    SUBCASE("sinh") {
+        Test.test_sinh();
 
-}
-SUBCASE("lgamma")
-{
-Test.
+    }
 
-test_lgamma();
+    SUBCASE("sqrt") {
+        Test.test_sqrt();
 
-}
+    }
 
-SUBCASE("log")
-{
-Test.
+    SUBCASE("tan") {
+        Test.test_tan();
 
-test_log();
+    }
 
-}
+    SUBCASE("tanh") {
+        Test.test_tanh();
 
-SUBCASE("log2")
-{
-Test.
+    }
 
-test_log2();
+    SUBCASE("tgamma") {
+        Test.test_tgamma();
 
-}
+    }
 
-SUBCASE("log10")
-{
-Test.
+    SUBCASE("trunc") {
+        Test.test_trunc();
 
-test_log10();
-
-}
-
-SUBCASE("log1p")
-{
-Test.
-
-test_log1p();
-
-}
-
-SUBCASE("nearbyint")
-{
-Test.
-
-test_nearbyint();
-
-}
-
-SUBCASE("nearbyint_as_int")
-{
-Test.
-
-test_nearbyint_as_int();
-
-}
-
-SUBCASE("nextafter")
-{
-Test.
-
-test_nextafter();
-
-}
-
-SUBCASE("polar")
-{
-Test.
-
-test_polar();
-
-}
-
-SUBCASE("pow")
-{
-Test.
-
-test_pow();
-
-}
-
-SUBCASE("reciprocal")
-{
-Test.
-
-test_reciprocal();
-
-}
-
-SUBCASE("rint")
-{
-Test.
-
-test_rint();
-
-}
-
-SUBCASE("round")
-{
-Test.
-
-test_round();
-
-}
-
-SUBCASE("rsqrt")
-{
-Test.
-
-test_rsqrt();
-
-}
-
-SUBCASE("sin")
-{
-Test.
-
-test_sin();
-
-}
-
-SUBCASE("sincos")
-{
-Test.
-
-test_sincos();
-
-}
-
-SUBCASE("sinh")
-{
-Test.
-
-test_sinh();
-
-}
-
-SUBCASE("sqrt")
-{
-Test.
-
-test_sqrt();
-
-}
-
-SUBCASE("tan")
-{
-Test.
-
-test_tan();
-
-}
-
-SUBCASE("tanh")
-{
-Test.
-
-test_tanh();
-
-}
-
-SUBCASE("tgamma")
-{
-Test.
-
-test_tgamma();
-
-}
-
-SUBCASE("trunc")
-{
-Test.
-
-test_trunc();
-
-}
+    }
 }
 
 /*
@@ -1178,7 +956,7 @@ test_trunc();
  */
 
 template<typename T>
-struct xsimd_api_complex_types_functions {
+struct SimdApiComplexTypesFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_arg() {
@@ -1202,47 +980,35 @@ struct xsimd_api_complex_types_functions {
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | complex types functions]", B, COMPLEX_TYPES)
+TEST_CASE_TEMPLATE("[simd api | complex types functions]", B, COMPLEX_TYPES)
 {
-xsimd_api_complex_types_functions<B> Test;
-SUBCASE("arg")
-{
-Test.
+    SimdApiComplexTypesFunctions<B> Test;
+    SUBCASE("arg") {
+        Test.test_arg();
 
-test_arg();
+    }
 
-}
+    SUBCASE("conj") {
+        Test.test_conj();
 
-SUBCASE("conj")
-{
-Test.
+    }
 
-test_conj();
+    SUBCASE("norm") {
+        Test.test_norm();
 
-}
+    }
 
-SUBCASE("norm")
-{
-Test.
+    SUBCASE("proj") {
+        Test.test_proj();
 
-test_norm();
-
-}
-
-SUBCASE("proj")
-{
-Test.
-
-test_proj();
-
-}
+    }
 }
 
 /*
  * Functions that apply on all signed types
  */
 template<typename T>
-struct xsimd_api_all_signed_types_functions {
+struct SimdApiAllSignedTypesFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_abs() {
@@ -1263,31 +1029,22 @@ struct xsimd_api_all_signed_types_functions {
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | all signed types functions]", B, ALL_SIGNED_TYPES)
+TEST_CASE_TEMPLATE("[simd api | all signed types functions]", B, ALL_SIGNED_TYPES)
 {
-xsimd_api_all_signed_types_functions<B> Test;
+    SimdApiAllSignedTypesFunctions<B> Test;
 
-SUBCASE("abs")
-{
-Test.
+    SUBCASE("abs") {
+        Test.test_abs();
 
-test_abs();
+    }
+    SUBCASE("fnms") {
+        Test.test_fnms();
 
-}
-SUBCASE("fnms")
-{
-Test.
+    }
+    SUBCASE("neg") {
+        Test.test_neg();
 
-test_fnms();
-
-}
-SUBCASE("neg")
-{
-Test.
-
-test_neg();
-
-}
+    }
 }
 
 /*
@@ -1295,7 +1052,7 @@ test_neg();
  */
 
 template<typename T>
-struct xsimd_api_all_types_functions {
+struct SimdApiAllTypesFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_add() {
@@ -1387,126 +1144,83 @@ struct xsimd_api_all_types_functions {
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | all types functions]", B, ALL_TYPES)
+TEST_CASE_TEMPLATE("[simd api | all types functions]", B, ALL_TYPES)
 {
-xsimd_api_all_types_functions<B> Test;
+    SimdApiAllTypesFunctions<B> Test;
 
-SUBCASE("add")
-{
-Test.
+    SUBCASE("add") {
+        Test.test_add();
 
-test_add();
+    }
 
-}
+    SUBCASE("decr") {
+        Test.test_decr();
 
-SUBCASE("decr")
-{
-Test.
+        Test.test_decr_if();
 
-test_decr();
+    }
 
-Test.
+    SUBCASE("div") {
+        Test.test_div();
 
-test_decr_if();
+    }
 
-}
+    SUBCASE("eq") {
+        Test.test_eq();
 
-SUBCASE("div")
-{
-Test.
+    }
 
-test_div();
+    SUBCASE("fma") {
+        Test.test_fma();
 
-}
+    }
 
-SUBCASE("eq")
-{
-Test.
+    SUBCASE("fms") {
+        Test.test_fms();
 
-test_eq();
+    }
 
-}
+    SUBCASE("fnma") {
+        Test.test_fnma();
 
-SUBCASE("fma")
-{
-Test.
+    }
 
-test_fma();
+    SUBCASE("incr") {
+        Test.test_incr();
 
-}
+        Test.test_incr_if();
 
-SUBCASE("fms")
-{
-Test.
+    }
 
-test_fms();
+    SUBCASE("mul") {
+        Test.test_mul();
 
-}
+    }
 
-SUBCASE("fnma")
-{
-Test.
+    SUBCASE("neq") {
+        Test.test_neq();
 
-test_fnma();
+    }
 
-}
+    SUBCASE("pos") {
+        Test.test_pos();
 
-SUBCASE("incr")
-{
-Test.
+    }
+    SUBCASE("select") {
+        Test.test_select();
 
-test_incr();
+    }
+    SUBCASE("sub") {
+        Test.test_sub();
 
-Test.
-
-test_incr_if();
-
-}
-
-SUBCASE("mul")
-{
-Test.
-
-test_mul();
-
-}
-
-SUBCASE("neq")
-{
-Test.
-
-test_neq();
-
-}
-
-SUBCASE("pos")
-{
-Test.
-
-test_pos();
-
-}
-SUBCASE("select")
-{
-Test.
-
-test_select();
-
-}
-SUBCASE("sub")
-{
-Test.
-
-test_sub();
-
-}
+    }
 }
 
 /*
  * Functions that apply only to floating point types
  */
 template<typename T>
-struct xsimd_api_all_floating_point_types_functions {
+struct SimdApiAllFloatingPointTypesFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_neq_nan() {
@@ -1516,12 +1230,10 @@ struct xsimd_api_all_floating_point_types_functions {
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | all floating point types functions]", B, ALL_FLOATING_POINT_TYPES)
+TEST_CASE_TEMPLATE("[simd api | all floating point types functions]", B, ALL_FLOATING_POINT_TYPES)
 {
-xsimd_api_all_floating_point_types_functions<B> Test;
-Test.
-
-test_neq_nan();
+    SimdApiAllFloatingPointTypesFunctions<B> Test;
+    Test.test_neq_nan();
 
 }
 
@@ -1529,7 +1241,7 @@ test_neq_nan();
  * Functions that apply only to mask type
  */
 template<typename T>
-struct xsimd_api_all_mask_functions {
+struct SimdApiAllMaskFunctions {
     using value_type = typename scalar_type<T>::type;
 
     void test_all() {
@@ -1548,19 +1260,13 @@ struct xsimd_api_all_mask_functions {
     }
 };
 
-TEST_CASE_TEMPLATE("[xsimd api | all mask functions]", B, ALL_TYPES)
+TEST_CASE_TEMPLATE("[simd api | all mask functions]", B, ALL_TYPES)
 {
-xsimd_api_all_mask_functions<B> Test;
-Test.
+    SimdApiAllMaskFunctions<B> Test;
+    Test.test_all();
 
-test_all();
+    Test.test_any();
 
-Test.
-
-test_any();
-
-Test.
-
-test_none();
+    Test.test_none();
 
 }
