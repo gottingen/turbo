@@ -40,7 +40,7 @@ carbin_cc_test(
         turbo::hash_testing
         turbo::test_instance_tracker
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -55,7 +55,8 @@ carbin_cc_test(
         turbo::turbo
         turbo::test_instance_tracker
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -69,7 +70,7 @@ carbin_cc_test(
         turbo::exception_testing
         turbo::hash_testing
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -83,7 +84,8 @@ carbin_cc_test(
         turbo::exception_safety_testing
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -100,7 +102,7 @@ carbin_cc_test(
         turbo::hash_testing
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -114,7 +116,8 @@ carbin_cc_test(
         turbo::turbo
         turbo::exception_safety_testing
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 # Internal-only target, do not depend on directly.
@@ -129,6 +132,7 @@ carbin_cc_library(
         ${TURBO_DEFAULT_COPTS}
         DEPS
         turbo::turbo
+        ${GMOCK_LIB}
         ${GTEST_LIB}
 )
 
@@ -141,7 +145,8 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::test_instance_tracker
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -159,7 +164,8 @@ carbin_cc_test(
         turbo::unordered_map_modifiers_test
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -169,7 +175,7 @@ carbin_cc_test(
         "flat_hash_set_test.cc"
         COPTS
         ${CARBIN_TEST_COPTS}
-        "-DUNORDERED_SET_CXX17"
+        #"-DUNORDERED_SET_CXX17"
         DEPS
         turbo::hash_generator_testing
         turbo::unordered_set_constructor_test
@@ -178,7 +184,8 @@ carbin_cc_test(
         turbo::unordered_set_modifiers_test
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -196,7 +203,7 @@ carbin_cc_test(
         turbo::unordered_map_members_test
         turbo::unordered_map_modifiers_test
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -216,7 +223,7 @@ carbin_cc_test(
         turbo::unordered_set_members_test
         turbo::unordered_set_modifiers_test
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -229,7 +236,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         turbo::test_instance_tracker
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -242,7 +249,8 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 # Internal-only target, do not depend on directly.
@@ -284,7 +292,8 @@ carbin_cc_test(
         DEPS
         ${GTEST_LIB}
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -299,7 +308,7 @@ carbin_cc_test(
         ${GTEST_LIB}
         ${GMOCK_LIB}
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -314,7 +323,7 @@ carbin_cc_test(
         ${GTEST_LIB}
         ${GMOCK_LIB}
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -329,7 +338,7 @@ carbin_cc_test(
         ${GTEST_LIB}
         ${GMOCK_LIB}
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -343,7 +352,8 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -358,7 +368,7 @@ carbin_cc_test(
         ${GMOCK_LIB}
         turbo::hash_policy_testing
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -371,7 +381,8 @@ carbin_cc_test(
         DEPS
         ${GTEST_LIB}
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -386,7 +397,7 @@ carbin_cc_test(
         ${GTEST_LIB}
         ${GMOCK_LIB}
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 # Internal-only target, do not depend on directly.
@@ -539,7 +550,7 @@ carbin_cc_test(
         turbo::unordered_set_members_test
         turbo::unordered_set_modifiers_test
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -555,7 +566,7 @@ carbin_cc_test(
         turbo::unordered_map_members_test
         turbo::unordered_map_modifiers_test
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -568,7 +579,8 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -581,7 +593,8 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
 carbin_cc_test(
         NAME
@@ -593,5 +606,6 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )

@@ -25,7 +25,6 @@ carbin_cc_binary(
         ${TURBO_DEFAULT_COPTS}
         ${TURBO_RANDOM_RANDEN_COPTS}
         ${CARBIN_SIMD_FLAGS}
-        "-fopenmp"
         "-Wno-unused-variable"
         DEPS
         turbo::turbo

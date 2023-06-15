@@ -40,7 +40,7 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${CARBIN_DEPS_LINK}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 # Internal-only target, do not depend on directly.
@@ -73,8 +73,9 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${CARBIN_DEPS_LINK}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -88,6 +89,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${CARBIN_DEPS_LINK}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )

@@ -38,7 +38,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -52,7 +52,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -68,7 +68,7 @@ carbin_cc_test(
         turbo::hash_testing
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -82,7 +82,7 @@ carbin_cc_test(
         turbo::exception_testing
         turbo::hash_testing
         turbo::turbo
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -95,7 +95,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -110,7 +110,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -125,7 +125,7 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -139,7 +139,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -152,7 +152,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         turbo::test_instance_tracker
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -166,5 +166,5 @@ carbin_cc_test(
         turbo::turbo
         turbo::test_instance_tracker
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )

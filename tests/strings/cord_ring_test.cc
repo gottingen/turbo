@@ -17,6 +17,9 @@
 #include <memory>
 #include <random>
 #include <sstream>
+#include <string>
+#include <string_view>
+#include <tuple>
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/debugging/leak_check.h"

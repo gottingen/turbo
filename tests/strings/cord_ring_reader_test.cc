@@ -17,7 +17,8 @@
 #include <memory>
 #include <random>
 #include <sstream>
-
+#include <string_view>
+#include <array>
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/debugging/leak_check.h"

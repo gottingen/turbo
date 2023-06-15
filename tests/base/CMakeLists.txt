@@ -26,7 +26,7 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -56,7 +56,7 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -72,7 +72,7 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -132,6 +132,7 @@ carbin_cc_library(
         ${CARBIN_TEST_COPTS}
         DEPS
         ${GTEST_LIB}
+        turbo::turbo
 )
 
 
