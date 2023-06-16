@@ -180,8 +180,8 @@ namespace testing {
             });
         }
 
-// Tests the operator<< of ThrowingValue by forcing ConstructorTracker to emit
-// a nonfatal failure that contains the string representation of the Thrower
+        // Tests the operator<< of ThrowingValue by forcing ConstructorTracker to emit
+        // a nonfatal failure that contains the string representation of the Thrower
         TEST(ThrowingValueTest, StreamOpsOutput) {
             using ::testing::TypeSpec;
             exceptions_internal::ConstructorTracker ct(exceptions_internal::countdown);
