@@ -67,9 +67,9 @@ namespace {
         EXPECT_EQ(0, DestructorVerifier::instance_count());
     }
 
-// InitializationVerifier fills in a pattern when allocated so we can
-// distinguish between its default and value initialized states (without
-// accessing truly uninitialized memory).
+    // InitializationVerifier fills in a pattern when allocated so we can
+    // distinguish between its default and value initialized states (without
+    // accessing truly uninitialized memory).
     struct InitializationVerifier {
         static constexpr int kDefaultScalar = 0x43;
         static constexpr int kDefaultArray = 0x4B;

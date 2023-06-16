@@ -16,9 +16,10 @@
 
 #include <cinttypes>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "tests/doctest/doctest.h"
 #include "turbo/strings/escaping.h"
+#include "turbo/format/str_format.h"
 
 #define UPDATE_GOLDEN 0
 
@@ -28,7 +29,7 @@ static const uint64_t kSalt[5] = {0xa0761d6478bd642f, 0xe7037ed1a0b428dbl,
                                   0x8ebc6af09c88c6e3, 0x589965cc75374cc3l,
                                   0x1d8e4e27c47d124f};
 
-TEST(LowLevelHashTest, VerifyGolden) {
+TEST_CASE("LowLevelHashTest- VerifyGolden") {
   constexpr size_t kNumGoldenOutputs = 134;
   static struct {
     std::string_view base64_data;
@@ -518,11 +519,10 @@ TEST(LowLevelHashTest, VerifyGolden) {
   EXPECT_FALSE(true);
 #else
   for (size_t i = 0; i < kNumGoldenOutputs; ++i) {
-    SCOPED_TRACE(::testing::Message()
-                 << "i = " << i << "; input = " << cases[i].base64_data);
+    CAPTURE(turbo::Format("i = {}; input = {}", i, cases[i].base64_data));
     std::string str;
-    ASSERT_TRUE(turbo::Base64Unescape(cases[i].base64_data, &str));
-    EXPECT_EQ(turbo::hash_internal::LowLevelHash(str.data(), str.size(),
+      REQUIRE(turbo::Base64Unescape(cases[i].base64_data, &str));
+      CHECK_EQ(turbo::hash_internal::LowLevelHash(str.data(), str.size(),
                                                 cases[i].seed, kSalt),
               kGolden[i]);
   }
