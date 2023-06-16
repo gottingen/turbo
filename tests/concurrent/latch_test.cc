@@ -17,7 +17,9 @@
 #include <thread>
 #include "turbo/concurrent/latch.h"
 #include "turbo/times/clock.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 
 namespace turbo {
 
@@ -47,35 +49,40 @@ namespace turbo {
         std::cout << local_count << " " << remote_count << std::endl;
     }
 
-    TEST(Latch, Torture) {
-        std::thread ts[10];
-        for (auto &&t : ts) {
-            t = std::thread(RunTest);
+    TEST_CASE("Latch") {
+        SUBCASE("Torture") {
+            std::thread ts[10];
+            for (auto &&t: ts) {
+                t = std::thread(RunTest);
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            exiting = true;
+            for (auto &&t: ts) {
+                t.join();
+            }
         }
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        exiting = true;
-        for (auto &&t : ts) {
-            t.join();
+
+        SUBCASE("CountDownTwo")
+        {
+            Latch l(2);
+            l.ArriveAndWait(2);
+            REQUIRE(1);
         }
-    }
 
-    TEST(Latch, CountDownTwo) {
-        Latch l(2);
-        l.ArriveAndWait(2);
-        ASSERT_TRUE(1);
-    }
+        SUBCASE("WaitFor")
+        {
+            Latch l(1);
+            REQUIRE_FALSE(l.WaitFor(turbo::Milliseconds(100)));
+            l.CountDown();
+            REQUIRE(l.WaitFor(turbo::ZeroDuration()));
+        }
 
-    TEST(Latch, WaitFor) {
-        Latch l(1);
-        ASSERT_FALSE(l.WaitFor(turbo::Milliseconds(100)));
-        l.CountDown();
-        ASSERT_TRUE(l.WaitFor(turbo::ZeroDuration()));
-    }
-
-    TEST(Latch, WaitUntil) {
-        Latch l(1);
-        ASSERT_FALSE(l.WaitUntil(turbo::Now() + turbo::Milliseconds(100)));
-        l.CountDown();
-        ASSERT_TRUE(l.WaitUntil(turbo::Now()));
+        SUBCASE("WaitUntil")
+        {
+            Latch l(1);
+            REQUIRE_FALSE(l.WaitUntil(turbo::Now() + turbo::Milliseconds(100)));
+            l.CountDown();
+            REQUIRE(l.WaitUntil(turbo::Now()));
+        }
     }
 }  // namespace turbo

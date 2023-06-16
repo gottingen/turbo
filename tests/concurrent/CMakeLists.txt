@@ -23,8 +23,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -36,9 +34,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -50,6 +45,4 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
