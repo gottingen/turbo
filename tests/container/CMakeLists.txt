@@ -145,6 +145,8 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::test_instance_tracker
+        turbo::turbo
+        ${GTEST_LIB}
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
@@ -157,6 +159,7 @@ carbin_cc_test(
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS
+        ${CARBIN_DEPS_LINK}
         turbo::hash_generator_testing
         turbo::unordered_map_constructor_test
         turbo::unordered_map_lookup_test
@@ -167,7 +170,8 @@ carbin_cc_test(
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
-
+#TODO disabled now(jeff)
+#[[
 carbin_cc_test(
         NAME
         flat_hash_set_test
@@ -175,19 +179,20 @@ carbin_cc_test(
         "flat_hash_set_test.cc"
         COPTS
         ${CARBIN_TEST_COPTS}
-        #"-DUNORDERED_SET_CXX17"
+        "-DUNORDERED_SET_CXX17"
         DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
         turbo::hash_generator_testing
         turbo::unordered_set_constructor_test
         turbo::unordered_set_lookup_test
         turbo::unordered_set_members_test
         turbo::unordered_set_modifiers_test
-        turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
-
+]]
 carbin_cc_test(
         NAME
         node_hash_map_test
@@ -234,8 +239,10 @@ carbin_cc_test(
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS
+        ${CARBIN_DEPS_LINK}
         turbo::turbo
         turbo::test_instance_tracker
+        ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
 

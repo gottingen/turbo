@@ -68,6 +68,7 @@ function(carbin_cc_binary)
             )
     if (CARBIN_CC_BINARY_PUBLIC)
         install(TARGETS ${exec_case}
+                EXPORT ${PROJECT_NAME}Targets
                 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
                 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

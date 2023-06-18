@@ -38,7 +38,6 @@ find_package(Threads REQUIRED)
 set(CARBIN_DEPS_LINK
 #        ${TURBO_LIB}
         ${CARBIN_SYSTEM_DYLINK}
-        Threads::Threads
         )
 
 

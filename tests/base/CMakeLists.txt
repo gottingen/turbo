@@ -169,8 +169,8 @@ carbin_cc_test(
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS
-        turbo::turbo
         ${CARBIN_DEPS_LINK}
+        turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )

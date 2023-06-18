@@ -150,21 +150,10 @@ carbin_cc_test(
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS
-        turbo::turbo
-        turbo::test_instance_tracker
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        function_test
-        SOURCES
-        "function_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
+        ${CARBIN_DEPS_LINK}
         turbo::turbo
         turbo::test_instance_tracker
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
+

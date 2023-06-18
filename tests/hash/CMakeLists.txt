@@ -25,7 +25,6 @@ carbin_cc_library(
         turbo::turbo
         ${GMOCK_LIB}
         ${CARBIN_DEPS_LINK}
-        PUBLIC
 )
 
 carbin_cc_test(
@@ -36,10 +35,10 @@ carbin_cc_test(
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS
+        ${CARBIN_DEPS_LINK}
         turbo::hash_testing
         turbo::turbo
         ${GTEST_LIB}
-        ${CARBIN_DEPS_LINK}
         ${GTEST_MAIN_LIB}
 )
 
