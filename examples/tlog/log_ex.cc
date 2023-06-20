@@ -14,13 +14,13 @@
 #include "turbo/log/async.h"
 #include "turbo/log/sinks/rotating_file_sink.h"
 #include "turbo/log/pattern_formatter.h"
-#include "turbo/log/stopwatch.h"
 #include <thread>
 #include "turbo/log/fmt/bin_to_hex.h"
 #include "turbo/log/sinks/daily_file_sink.h"
 #include "turbo/log/cfg/env.h"
 #include "turbo/log/sinks/udp_sink.h"
 #include "turbo/log/logging.h"
+#include "turbo/times/stop_watcher.h"
 
 
 void load_levels_example();
@@ -298,7 +298,7 @@ void trace_example() {
 
 
 void stopwatch_example() {
-    turbo::tlog::stopwatch sw;
+    turbo::StopWatcher sw;
     std::this_thread::sleep_for(std::chrono::milliseconds(123));
     turbo::tlog::info("Stopwatch: {} seconds", sw);
 }
