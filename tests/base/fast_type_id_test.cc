@@ -18,7 +18,8 @@
 #include <map>
 #include <vector>
 
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "tests/doctest/doctest.h"
 
 namespace {
     namespace bi = turbo::base_internal;
@@ -38,7 +39,7 @@ namespace {
   A(double)             \
   A(long double)
 
-    TEST(FastTypeIdTest, PrimitiveTypes) {
+    TEST_CASE("FastTypeIdTest, PrimitiveTypes") {
         bi::FastTypeIdType type_ids[] = {
 #define A(T) bi::FastTypeId<T>(),
                 PRIM_TYPES(A)
@@ -56,9 +57,9 @@ namespace {
         size_t total_type_ids = sizeof(type_ids) / sizeof(bi::FastTypeIdType);
 
         for (int i = 0; i < total_type_ids; ++i) {
-            EXPECT_EQ(type_ids[i], type_ids[i]);
+            CHECK_EQ(type_ids[i], type_ids[i]);
             for (int j = 0; j < i; ++j) {
-                EXPECT_NE(type_ids[i], type_ids[j]);
+                CHECK_NE(type_ids[i], type_ids[j]);
             }
         }
     }
@@ -73,7 +74,7 @@ namespace {
   A(int64_t)                 \
   A(uint64_t)
 
-    TEST(FastTypeIdTest, FixedWidthTypes) {
+    TEST_CASE("FastTypeIdTest, FixedWidthTypes") {
         bi::FastTypeIdType type_ids[] = {
 #define A(T) bi::FastTypeId<T>(),
                 FIXED_WIDTH_TYPES(A)
@@ -91,23 +92,23 @@ namespace {
         size_t total_type_ids = sizeof(type_ids) / sizeof(bi::FastTypeIdType);
 
         for (int i = 0; i < total_type_ids; ++i) {
-            EXPECT_EQ(type_ids[i], type_ids[i]);
+            CHECK_EQ(type_ids[i], type_ids[i]);
             for (int j = 0; j < i; ++j) {
-                EXPECT_NE(type_ids[i], type_ids[j]);
+                CHECK_NE(type_ids[i], type_ids[j]);
             }
         }
     }
 
-    TEST(FastTypeIdTest, AliasTypes) {
+    TEST_CASE("FastTypeIdTest, AliasTypes") {
         using int_alias = int;
-        EXPECT_EQ(bi::FastTypeId<int_alias>(), bi::FastTypeId<int>());
+        CHECK_EQ(bi::FastTypeId<int_alias>(), bi::FastTypeId<int>());
     }
 
-    TEST(FastTypeIdTest, TemplateSpecializations) {
-        EXPECT_NE(bi::FastTypeId<std::vector<int>>(),
+    TEST_CASE("FastTypeIdTest, TemplateSpecializations") {
+        CHECK_NE(bi::FastTypeId<std::vector<int>>(),
                   bi::FastTypeId<std::vector<long>>());
 
-        EXPECT_NE((bi::FastTypeId<std::map<int, float>>()),
+        CHECK_NE((bi::FastTypeId<std::map<int, float>>()),
                   (bi::FastTypeId<std::map<int, double>>()));
     }
 
@@ -118,9 +119,9 @@ namespace {
     struct PDerived : private Base {
     };
 
-    TEST(FastTypeIdTest, Inheritance) {
-        EXPECT_NE(bi::FastTypeId<Base>(), bi::FastTypeId<Derived>());
-        EXPECT_NE(bi::FastTypeId<Base>(), bi::FastTypeId<PDerived>());
+    TEST_CASE("FastTypeIdTest, Inheritance") {
+        CHECK_NE(bi::FastTypeId<Base>(), bi::FastTypeId<Derived>());
+        CHECK_NE(bi::FastTypeId<Base>(), bi::FastTypeId<PDerived>());
     }
 
 }  // namespace

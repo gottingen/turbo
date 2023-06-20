@@ -13,27 +13,29 @@
 #include "turbo/crypto/sha256.h"
 #include "turbo/crypto/sha512.h"
 #include "turbo/strings/escaping.h"
-#include <gtest/gtest.h>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 
 namespace turbo {
 
-TEST(crpto, sha256) {
-  EXPECT_EQ(AsciiStrToUpper(sha256_hex("")),
+TEST_CASE("crpto, sha256") {
+  CHECK_EQ(AsciiStrToUpper(sha256_hex("")),
             "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855");
 
-  EXPECT_EQ(AsciiStrToUpper(sha256_hex("abc")),
+  CHECK_EQ(AsciiStrToUpper(sha256_hex("abc")),
             "BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD");
 
-  EXPECT_EQ(
+  CHECK_EQ(
       AsciiStrToUpper(sha256_hex("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")),
       "248D6A61D20638B8E5C026930C3E6039A33CE45964FF2167F6ECEDD419DB06C1");
 
-  EXPECT_EQ(
+  CHECK_EQ(
       AsciiStrToUpper(sha256_hex("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmn"
                     "hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu")),
       "CF5B16A778AF8380036CE59E7B0492370B249B11E8F07A51AFAC45037AFEE9D1");
 
-  EXPECT_EQ(AsciiStrToUpper(sha256_hex(std::string(1000000, 'a'))),
+  CHECK_EQ(AsciiStrToUpper(sha256_hex(std::string(1000000, 'a'))),
             "CDC76E5C9914FB9281A1C7E284D73E67F1809A48A497200E046D39CCC7112CD0");
 
   std::vector<std::pair<const char *, const char *>> test_vectors = {
@@ -199,31 +201,31 @@ TEST(crpto, sha256) {
        "42e61e174fbb3897d6dd6cef3dd2802fe67b331953b06114a65c772859dfc1aa"}};
 
   for (const auto &p : test_vectors) {
-    EXPECT_EQ(sha256_hex(HexStringToBytes(p.first)), p.second);
+    CHECK_EQ(sha256_hex(HexStringToBytes(p.first)), p.second);
   }
 }
 
-TEST(crpto, sha512) {
-  EXPECT_EQ(AsciiStrToUpper(sha512_hex("")),
+TEST_CASE("crpto, sha512") {
+  CHECK_EQ(AsciiStrToUpper(sha512_hex("")),
             "CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE"
             "47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E");
 
-  EXPECT_EQ(AsciiStrToUpper(sha512_hex("abc")),
+  CHECK_EQ(AsciiStrToUpper(sha512_hex("abc")),
             "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A"
             "2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F");
 
-  EXPECT_EQ(
+  CHECK_EQ(
       AsciiStrToUpper(sha512_hex("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")),
       "204A8FC6DDA82F0A0CED7BEB8E08A41657C16EF468B228A8279BE331A703C335"
       "96FD15C13B1B07F9AA1D3BEA57789CA031AD85C7A71DD70354EC631238CA3445");
 
-  EXPECT_EQ(
+  CHECK_EQ(
       AsciiStrToUpper(sha512_hex("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmn"
                     "hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu")),
       "8E959B75DAE313DA8CF4F72814FC143F8F7779C6EB9F7FA17299AEADB6889018"
       "501D289E4900F7E4331B99DEC4B5433AC7D329EEB6DD26545E96E55B874BE909");
 
-  EXPECT_EQ(AsciiStrToUpper(sha512_hex(std::string(1000000, 'a'))),
+  CHECK_EQ(AsciiStrToUpper(sha512_hex(std::string(1000000, 'a'))),
             "E718483D0CE769644E2E42C7BC15B4638E1F98B13B2044285632A803AFA973EB"
             "DE0FF244877EA60A4CB0432CE577C31BEB009C5C2C49AA2E4EADB217AD8CC09B");
 
@@ -326,32 +328,32 @@ TEST(crpto, sha512) {
        "1d5bca579c271b9f2d806730d88f58252fd0c2587851c3ac8a0e72b4e1dc0da6"}};
 
   for (const auto &p : test_vectors) {
-    EXPECT_EQ(sha512_hex(HexStringToBytes(p.first)), p.second);
+    CHECK_EQ(sha512_hex(HexStringToBytes(p.first)), p.second);
   }
 }
 
-TEST(crpto, md5) {
-  EXPECT_EQ(md5_hex(""), "d41d8cd98f00b204e9800998ecf8427e");
-  EXPECT_EQ(md5_hex("a"), "0cc175b9c0f1b6a831c399e269772661");
-  EXPECT_EQ(md5_hex("abc"), "900150983cd24fb0d6963f7d28e17f72");
-  EXPECT_EQ(md5_hex("message digest"), "f96b697d7cb7938d525a2f31aaf161d0");
-  EXPECT_EQ(md5_hex("abcdefghijklmnopqrstuvwxyz"),
+TEST_CASE("crpto, md5") {
+  CHECK_EQ(md5_hex(""), "d41d8cd98f00b204e9800998ecf8427e");
+  CHECK_EQ(md5_hex("a"), "0cc175b9c0f1b6a831c399e269772661");
+  CHECK_EQ(md5_hex("abc"), "900150983cd24fb0d6963f7d28e17f72");
+  CHECK_EQ(md5_hex("message digest"), "f96b697d7cb7938d525a2f31aaf161d0");
+  CHECK_EQ(md5_hex("abcdefghijklmnopqrstuvwxyz"),
             "c3fcd3d76192e4007dfb496cca67e13b");
-  EXPECT_EQ(
+  CHECK_EQ(
       md5_hex("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"),
       "d174ab98d277d9f5a5611c2c9f419d9f");
-  EXPECT_EQ(md5_hex("12345678901234567890123456789012345678901234567890123456789012345678901234567890"),
+  CHECK_EQ(md5_hex("12345678901234567890123456789012345678901234567890123456789012345678901234567890"),
             "57edf4a22be3c955ac49da2e2107b67a");
 }
 
-TEST(crypto, sha1) {
-  EXPECT_EQ(sha1_hex(""), "da39a3ee5e6b4b0d3255bfef95601890afd80709");
-  EXPECT_EQ(sha1_hex("abc"), "a9993e364706816aba3e25717850c26c9cd0d89d");
-  EXPECT_EQ(
+TEST_CASE("crypto, sha1") {
+  CHECK_EQ(sha1_hex(""), "da39a3ee5e6b4b0d3255bfef95601890afd80709");
+  CHECK_EQ(sha1_hex("abc"), "a9993e364706816aba3e25717850c26c9cd0d89d");
+  CHECK_EQ(
       sha1_hex(
           "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"),
       "761c457bf73b14d27e9e9265c46f4b4dda11f940");
-  EXPECT_EQ(sha1_hex("12345678901234567890123456789012345678901234567890123456789012345678901234567890"),
+  CHECK_EQ(sha1_hex("12345678901234567890123456789012345678901234567890123456789012345678901234567890"),
             "50abf5706a150990a08b2c5ea40fa0e585554732");
 }
 }

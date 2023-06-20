@@ -20,105 +20,108 @@
 #include <utility>
 
 #include "turbo/crypto/crc32c.h"
-#include "gtest/gtest.h"
+
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 
 namespace {
 
-TEST(CrcCordState, Default) {
-  turbo::crc_internal::CrcCordState state;
-  EXPECT_TRUE(state.IsNormalized());
-  EXPECT_EQ(state.Checksum(), turbo::crc32c_t{0});
-  state.Normalize();
-  EXPECT_EQ(state.Checksum(), turbo::crc32c_t{0});
-}
+    TEST_CASE("CrcCordState, Default") {
+        turbo::crc_internal::CrcCordState state;
+        CHECK(state.IsNormalized());
+        CHECK_EQ(state.Checksum(), turbo::crc32c_t{0});
+        state.Normalize();
+        CHECK_EQ(state.Checksum(), turbo::crc32c_t{0});
+    }
 
-TEST(CrcCordState, Normalize) {
-  turbo::crc_internal::CrcCordState state;
-  auto* rep = state.mutable_rep();
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(2000, turbo::crc32c_t{2000}));
-  rep->removed_prefix =
-      turbo::crc_internal::CrcCordState::PrefixCrc(500, turbo::crc32c_t{500});
+    TEST_CASE("CrcCordState, Normalize") {
+        turbo::crc_internal::CrcCordState state;
+        auto *rep = state.mutable_rep();
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(2000, turbo::crc32c_t{2000}));
+        rep->removed_prefix =
+                turbo::crc_internal::CrcCordState::PrefixCrc(500, turbo::crc32c_t{500});
 
-  // The removed_prefix means state is not normalized.
-  EXPECT_FALSE(state.IsNormalized());
+        // The removed_prefix means state is not normalized.
+        CHECK_FALSE(state.IsNormalized());
 
-  turbo::crc32c_t crc = state.Checksum();
-  state.Normalize();
-  EXPECT_TRUE(state.IsNormalized());
+        turbo::crc32c_t crc = state.Checksum();
+        state.Normalize();
+        CHECK(state.IsNormalized());
 
-  // The checksum should not change as a result of calling Normalize().
-  EXPECT_EQ(state.Checksum(), crc);
-  EXPECT_EQ(rep->removed_prefix.length, 0);
-}
+        // The checksum should not change as a result of calling Normalize().
+        CHECK_EQ(state.Checksum(), crc);
+        CHECK_EQ(rep->removed_prefix.length, 0);
+    }
 
-TEST(CrcCordState, Copy) {
-  turbo::crc_internal::CrcCordState state;
-  auto* rep = state.mutable_rep();
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
+    TEST_CASE("CrcCordState, Copy") {
+        turbo::crc_internal::CrcCordState state;
+        auto *rep = state.mutable_rep();
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
 
-  turbo::crc_internal::CrcCordState copy = state;
+        turbo::crc_internal::CrcCordState copy = state;
 
-  EXPECT_EQ(state.Checksum(), turbo::crc32c_t{1000});
-  EXPECT_EQ(copy.Checksum(), turbo::crc32c_t{1000});
-}
+        CHECK_EQ(state.Checksum(), turbo::crc32c_t{1000});
+        CHECK_EQ(copy.Checksum(), turbo::crc32c_t{1000});
+    }
 
-TEST(CrcCordState, UnsharedSelfCopy) {
-  turbo::crc_internal::CrcCordState state;
-  auto* rep = state.mutable_rep();
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
+    TEST_CASE("CrcCordState, UnsharedSelfCopy") {
+        turbo::crc_internal::CrcCordState state;
+        auto *rep = state.mutable_rep();
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
 
-  const turbo::crc_internal::CrcCordState& ref = state;
-  state = ref;
+        const turbo::crc_internal::CrcCordState &ref = state;
+        state = ref;
 
-  EXPECT_EQ(state.Checksum(), turbo::crc32c_t{1000});
-}
+        CHECK_EQ(state.Checksum(), turbo::crc32c_t{1000});
+    }
 
-TEST(CrcCordState, Move) {
-  turbo::crc_internal::CrcCordState state;
-  auto* rep = state.mutable_rep();
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
+    TEST_CASE("CrcCordState, Move") {
+        turbo::crc_internal::CrcCordState state;
+        auto *rep = state.mutable_rep();
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
 
-  turbo::crc_internal::CrcCordState moved = std::move(state);
-  EXPECT_EQ(moved.Checksum(), turbo::crc32c_t{1000});
-}
+        turbo::crc_internal::CrcCordState moved = std::move(state);
+        CHECK_EQ(moved.Checksum(), turbo::crc32c_t{1000});
+    }
 
-TEST(CrcCordState, UnsharedSelfMove) {
-  turbo::crc_internal::CrcCordState state;
-  auto* rep = state.mutable_rep();
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
+    TEST_CASE("CrcCordState, UnsharedSelfMove") {
+        turbo::crc_internal::CrcCordState state;
+        auto *rep = state.mutable_rep();
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
 
-  turbo::crc_internal::CrcCordState& ref = state;
-  state = std::move(ref);
+        turbo::crc_internal::CrcCordState &ref = state;
+        state = std::move(ref);
 
-  EXPECT_EQ(state.Checksum(), turbo::crc32c_t{1000});
-}
+        CHECK_EQ(state.Checksum(), turbo::crc32c_t{1000});
+    }
 
-TEST(CrcCordState, PoisonDefault) {
-  turbo::crc_internal::CrcCordState state;
-  state.Poison();
-  EXPECT_NE(state.Checksum(), turbo::crc32c_t{0});
-}
+    TEST_CASE("CrcCordState, PoisonDefault") {
+        turbo::crc_internal::CrcCordState state;
+        state.Poison();
+        CHECK_NE(state.Checksum(), turbo::crc32c_t{0});
+    }
 
-TEST(CrcCordState, PoisonData) {
-  turbo::crc_internal::CrcCordState state;
-  auto* rep = state.mutable_rep();
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
-  rep->prefix_crc.push_back(
-      turbo::crc_internal::CrcCordState::PrefixCrc(2000, turbo::crc32c_t{2000}));
-  rep->removed_prefix =
-      turbo::crc_internal::CrcCordState::PrefixCrc(500, turbo::crc32c_t{500});
+    TEST_CASE("CrcCordState, PoisonData") {
+        turbo::crc_internal::CrcCordState state;
+        auto *rep = state.mutable_rep();
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(1000, turbo::crc32c_t{1000}));
+        rep->prefix_crc.push_back(
+                turbo::crc_internal::CrcCordState::PrefixCrc(2000, turbo::crc32c_t{2000}));
+        rep->removed_prefix =
+                turbo::crc_internal::CrcCordState::PrefixCrc(500, turbo::crc32c_t{500});
 
-  turbo::crc32c_t crc = state.Checksum();
-  state.Poison();
-  EXPECT_NE(state.Checksum(), crc);
-}
+        turbo::crc32c_t crc = state.Checksum();
+        state.Poison();
+        CHECK_NE(state.Checksum(), crc);
+    }
 
 }  // namespace
