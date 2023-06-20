@@ -274,21 +274,21 @@ namespace turbo {
     // case ensures that code will compile when new codes are added.
     static constexpr StatusCode kDoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_ = 20;
 
-// StatusCodeToString()
-//
-// Returns the name for the status code, or "" if it is an unknown value.
+    // StatusCodeToString()
+    //
+    // Returns the name for the status code, or "" if it is an unknown value.
     std::string StatusCodeToString(StatusCode code);
 
-// operator<<
-//
-// Streams StatusCodeToString(code) to `os`.
+    // operator<<
+    //
+    // Streams StatusCodeToString(code) to `os`.
     std::ostream &operator<<(std::ostream &os, StatusCode code);
 
-// turbo::StatusToStringMode
-//
-// An `turbo::StatusToStringMode` is an enumerated type indicating how
-// `turbo::Status::ToString()` should construct the output string for a non-ok
-// status.
+    // turbo::StatusToStringMode
+    //
+    // An `turbo::StatusToStringMode` is an enumerated type indicating how
+    // `turbo::Status::ToString()` should construct the output string for a non-ok
+    // status.
     enum class StatusToStringMode : int {
         // ToString will not contain any extra data (such as payloads). It will only
         // contain the error code and message, if any.
@@ -854,6 +854,11 @@ namespace turbo {
         return Status(errcode, Format(fmt, std::forward<Args>(args)...));
     }
 
+    template<typename ...Args>
+    Status MakeStatus(short module_index, int errcode, std::string_view fmt, Args &&...args) {
+        return Status(module_index, errcode, Format(fmt, std::forward<Args>(args)...));
+    }
+
     // ErrnoToStatusCode()
     //
     // Returns the StatusCode for `error_number`, which should be an `errno` value.
@@ -1010,9 +1015,9 @@ namespace turbo {
 
     inline Status OkStatus() { return Status(); }
 
-// Creates a `Status` object with the `turbo::StatusCode::kCancelled` error code
-// and an empty message. It is provided only for efficiency, given that
-// message-less kCancelled errors are common in the infrastructure.
+    // Creates a `Status` object with the `turbo::StatusCode::kCancelled` error code
+    // and an empty message. It is provided only for efficiency, given that
+    // message-less kCancelled errors are common in the infrastructure.
     inline Status CancelledError() { return Status(turbo::kCancelled); }
 
     TURBO_NAMESPACE_END
