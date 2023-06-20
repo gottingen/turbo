@@ -17,18 +17,20 @@
 #include <thread>  // NOLINT(build/c++11)
 #include <vector>
 
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-TEST(CONCURRENT, doubly_data) {
+#include "tests/doctest/doctest.h"
+
+TEST_CASE("doubly_data") {
 
     typedef turbo::DoublyBufferedData<std::map<std::string, std::string>> double_map;
     double_map dmap;
-    auto f = [](std::map<std::string, std::string> &m){
+    auto f = [](std::map<std::string, std::string> &m) {
         m["hello"] = "world";
         return 1;
     };
     dmap.Modify(f);
     double_map::ScopedPtr ptr;
     dmap.Read(&ptr);
-    ASSERT_EQ(ptr.get()->find("hello")->second, "world");
+    REQUIRE_EQ(ptr.get()->find("hello")->second, "world");
 }

@@ -3,13 +3,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - clang # [osx]
-  - clangxx #   [osx]
-  - gflags =2.2.2
-  - protobuf >=3.9.2, <=3.19.1
-  - openssl =1.1.1
-  - gperftools=2.9.1
-  - zlib
-  - gtest =1.11.0
-  - gmock =1.11.0
+  - gtest
+  - gmock
   - benchmark

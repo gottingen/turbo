@@ -18,15 +18,14 @@
 namespace turbo {
 
     StopWatcher::StopWatcher() : _start(), _stop() {
-        Start();
+        reset();
     }
 
-    void StopWatcher::Start() {
+    void StopWatcher::reset() {
         _start = turbo::Now();
-        _stop = _start;
     }
 
-    void StopWatcher::Stop() {
-        _stop = turbo::Now();
+    turbo::Duration StopWatcher::elapsed() const{
+        return turbo::Now() - _start;
     }
 }  // namespace turbo

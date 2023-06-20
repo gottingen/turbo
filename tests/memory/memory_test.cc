@@ -25,16 +25,16 @@
 #include <utility>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
+
 
 namespace {
 
-    using ::testing::ElementsAre;
-    using ::testing::Return;
 
-// This class creates observable behavior to verify that a destructor has
-// been called, via the instance_count variable.
+    // This class creates observable behavior to verify that a destructor has
+    // been called, via the instance_count variable.
     class DestructorVerifier {
     public:
         DestructorVerifier() { ++instance_count_; }
@@ -55,21 +55,21 @@ namespace {
 
     int DestructorVerifier::instance_count_ = 0;
 
-    TEST(WrapUniqueTest, WrapUnique) {
+    TEST_CASE("WrapUniqueTest - WrapUnique") {
         // Test that the unique_ptr is constructed properly by verifying that the
         // destructor for its payload gets called at the proper time.
         {
             auto dv = new DestructorVerifier;
-            EXPECT_EQ(1, DestructorVerifier::instance_count());
+            CHECK_EQ(1, DestructorVerifier::instance_count());
             std::unique_ptr<DestructorVerifier> ptr = turbo::WrapUnique(dv);
-            EXPECT_EQ(1, DestructorVerifier::instance_count());
+            CHECK_EQ(1, DestructorVerifier::instance_count());
         }
-        EXPECT_EQ(0, DestructorVerifier::instance_count());
+        CHECK_EQ(0, DestructorVerifier::instance_count());
     }
 
-// InitializationVerifier fills in a pattern when allocated so we can
-// distinguish between its default and value initialized states (without
-// accessing truly uninitialized memory).
+    // InitializationVerifier fills in a pattern when allocated so we can
+    // distinguish between its default and value initialized states (without
+    // accessing truly uninitialized memory).
     struct InitializationVerifier {
         static constexpr int kDefaultScalar = 0x43;
         static constexpr int kDefaultArray = 0x4B;
@@ -104,17 +104,6 @@ namespace {
         }
     };
 
-    TEST(RawPtrTest, RawPointer) {
-        int i = 5;
-        EXPECT_EQ(&i, turbo::RawPtr(&i));
-    }
-
-    TEST(RawPtrTest, SmartPointer) {
-        int *o = new int(5);
-        std::unique_ptr<int> p(o);
-        EXPECT_EQ(o, turbo::RawPtr(p));
-    }
-
     class IntPointerNonConstDeref {
     public:
         explicit IntPointerNonConstDeref(int *p) : p_(p) {}
@@ -129,103 +118,121 @@ namespace {
         std::unique_ptr<int> p_;
     };
 
-    TEST(RawPtrTest, SmartPointerNonConstDereference) {
-        int *o = new int(5);
-        IntPointerNonConstDeref p(o);
-        EXPECT_EQ(o, turbo::RawPtr(p));
+    TEST_CASE("RawPtrTest") {
+        SUBCASE("RawPointer") {
+            int i = 5;
+            CHECK_EQ(&i, turbo::RawPtr(&i));
+        }
+
+        SUBCASE("SmartPointer") {
+            int *o = new int(5);
+            std::unique_ptr<int> p(o);
+            CHECK_EQ(o, turbo::RawPtr(p));
+        }
+
+
+        SUBCASE("SmartPointerNonConstDereference") {
+            int *o = new int(5);
+            IntPointerNonConstDeref p(o);
+            CHECK_EQ(o, turbo::RawPtr(p));
+        }
+
+        SUBCASE("NullValuedRawPointer") {
+            int *p = nullptr;
+            CHECK_EQ(nullptr, turbo::RawPtr(p));
+        }
+
+        SUBCASE("NullValuedSmartPointer") {
+            std::unique_ptr<int> p;
+            CHECK_EQ(nullptr, turbo::RawPtr(p));
+        }
+
+        SUBCASE("Nullptr") {
+            auto p = turbo::RawPtr(nullptr);
+            CHECK((std::is_same<std::nullptr_t, decltype(p)>::value));
+            CHECK_EQ(nullptr, p);
+        }
+
+        SUBCASE("Null") {
+            auto p = turbo::RawPtr(nullptr);
+            CHECK((std::is_same<std::nullptr_t, decltype(p)>::value));
+            CHECK_EQ(nullptr, p);
+        }
+
+        SUBCASE("Zero") {
+            auto p = turbo::RawPtr(nullptr);
+            CHECK((std::is_same<std::nullptr_t, decltype(p)>::value));
+            CHECK_EQ(nullptr, p);
+        }
     }
 
-    TEST(RawPtrTest, NullValuedRawPointer) {
-        int *p = nullptr;
-        EXPECT_EQ(nullptr, turbo::RawPtr(p));
+    TEST_CASE("ShareUniquePtrTest") {
+        SUBCASE("Share") {
+            auto up = std::make_unique<int>();
+            int *rp = up.get();
+            auto sp = turbo::ShareUniquePtr(std::move(up));
+            CHECK_EQ(sp.get(), rp);
+        }
+
+        SUBCASE("ShareNull") {
+            struct NeverDie {
+                using pointer = void *;
+
+                void operator()(pointer) {
+                    REQUIRE(false);
+                }
+            };
+
+            std::unique_ptr<void, NeverDie> up;
+            auto sp = turbo::ShareUniquePtr(std::move(up));
+        }
     }
 
-    TEST(RawPtrTest, NullValuedSmartPointer) {
-        std::unique_ptr<int> p;
-        EXPECT_EQ(nullptr, turbo::RawPtr(p));
-    }
-
-    TEST(RawPtrTest, Nullptr) {
-        auto p = turbo::RawPtr(nullptr);
-        EXPECT_TRUE((std::is_same<std::nullptr_t, decltype(p)>::value));
-        EXPECT_EQ(nullptr, p);
-    }
-
-    TEST(RawPtrTest, Null) {
-        auto p = turbo::RawPtr(nullptr);
-        EXPECT_TRUE((std::is_same<std::nullptr_t, decltype(p)>::value));
-        EXPECT_EQ(nullptr, p);
-    }
-
-    TEST(RawPtrTest, Zero) {
-        auto p = turbo::RawPtr(nullptr);
-        EXPECT_TRUE((std::is_same<std::nullptr_t, decltype(p)>::value));
-        EXPECT_EQ(nullptr, p);
-    }
-
-    TEST(ShareUniquePtrTest, Share) {
-        auto up = std::make_unique<int>();
-        int *rp = up.get();
-        auto sp = turbo::ShareUniquePtr(std::move(up));
-        EXPECT_EQ(sp.get(), rp);
-    }
-
-    TEST(ShareUniquePtrTest, ShareNull) {
-        struct NeverDie {
-            using pointer = void *;
-
-            void operator()(pointer) {
-                ASSERT_TRUE(false) << "Deleter should not have been called.";
-            }
-        };
-
-        std::unique_ptr<void, NeverDie> up;
-        auto sp = turbo::ShareUniquePtr(std::move(up));
-    }
-
-    TEST(WeakenPtrTest, Weak) {
+    TEST_CASE("WeakenPtrTest - Weak") {
         auto sp = std::make_shared<int>();
         auto wp = turbo::WeakenPtr(sp);
-        EXPECT_EQ(sp.get(), wp.lock().get());
-        sp.reset();
-        EXPECT_TRUE(wp.expired());
+        CHECK_EQ(sp.get(), wp.lock().get());
+        sp.
+
+                reset();
+        CHECK(wp.expired());
     }
 
 // Should not compile.
 /*
-TEST(RawPtrTest, NotAPointer) {
+SUBCASE("NotAPointer) {
   turbo::RawPtr(1.5);
 }
 */
-
-    TEST(AllocatorNoThrowTest, DefaultAllocator) {
+    TEST_CASE("AllocatorNoThrowTest") {
+        SUBCASE("DefaultAllocator") {
 #if defined(TURBO_ALLOCATOR_NOTHROW) && TURBO_ALLOCATOR_NOTHROW
-        EXPECT_TRUE(turbo::default_allocator_is_nothrow::value);
+            CHECK(turbo::default_allocator_is_nothrow::value);
 #else
-        EXPECT_FALSE(turbo::default_allocator_is_nothrow::value);
+            CHECK_FALSE(turbo::default_allocator_is_nothrow::value);
 #endif
-    }
+        }
 
-    TEST(AllocatorNoThrowTest, StdAllocator) {
+        SUBCASE("StdAllocator") {
 #if defined(TURBO_ALLOCATOR_NOTHROW) && TURBO_ALLOCATOR_NOTHROW
-        EXPECT_TRUE(turbo::allocator_is_nothrow<std::allocator<int>>::value);
+            CHECK(turbo::allocator_is_nothrow<std::allocator<int>>::value);
 #else
-        EXPECT_FALSE(turbo::allocator_is_nothrow<std::allocator<int>>::value);
+            CHECK_FALSE(turbo::allocator_is_nothrow<std::allocator<int>>::value);
 #endif
-    }
+        }
 
-    TEST(AllocatorNoThrowTest, CustomAllocator) {
-        struct NoThrowAllocator {
-            using is_nothrow = std::true_type;
-        };
-        struct CanThrowAllocator {
-            using is_nothrow = std::false_type;
-        };
-        struct UnspecifiedAllocator {
-        };
-        EXPECT_TRUE(turbo::allocator_is_nothrow<NoThrowAllocator>::value);
-        EXPECT_FALSE(turbo::allocator_is_nothrow<CanThrowAllocator>::value);
-        EXPECT_FALSE(turbo::allocator_is_nothrow<UnspecifiedAllocator>::value);
+        SUBCASE("CustomAllocator") {
+            struct NoThrowAllocator {
+                using is_nothrow = std::true_type;
+            };
+            struct CanThrowAllocator {
+                using is_nothrow = std::false_type;
+            };
+            struct UnspecifiedAllocator {
+            };
+            CHECK(turbo::allocator_is_nothrow<NoThrowAllocator>::value);
+            CHECK_FALSE(turbo::allocator_is_nothrow<CanThrowAllocator>::value);
+            CHECK_FALSE(turbo::allocator_is_nothrow<UnspecifiedAllocator>::value);
+        }
     }
-
 }  // namespace

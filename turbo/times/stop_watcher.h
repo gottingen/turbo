@@ -17,6 +17,7 @@
 #define TURBO_TIME_STOP_WATCHER_H_
 
 #include "turbo/times/clock.h"
+#include "turbo/format/str_format.h"
 
 namespace turbo {
 
@@ -26,29 +27,27 @@ namespace turbo {
         StopWatcher();
 
         // Start this timer
-        void Start();
-
-        // Stop this timer
-        void Stop();
+        void reset();
 
         // Get the elapse from start() to stop(), in various units.
-        [[nodiscard]] turbo::Duration Elapsed() const { return _stop - _start; }
+        [[nodiscard]] turbo::Duration elapsed() const;
 
-        [[nodiscard]] int64_t ElapsedNano() const { return turbo::ToInt64Nanoseconds(_stop - _start); }
+        [[nodiscard]] int64_t elapsed_nano() { return turbo::ToInt64Nanoseconds(elapsed()); }
 
-        [[nodiscard]] int64_t ElapsedMicro() const { return turbo::ToInt64Microseconds(_stop - _start); }
+        [[nodiscard]] int64_t elapsed_micro() { return turbo::ToInt64Microseconds(elapsed()); }
 
-        [[nodiscard]] int64_t ElapsedMill() const { return turbo::ToInt64Milliseconds(_stop - _start); }
+        [[nodiscard]] int64_t elapsed_mill() { return turbo::ToInt64Milliseconds(elapsed()); }
 
-        [[nodiscard]] int64_t ElapsedSec() const { return turbo::ToInt64Seconds(_stop - _start);; }
+        [[nodiscard]] int64_t elapsed_sec() { return turbo::ToInt64Seconds(elapsed());; }
 
-        [[nodiscard]] double ElapsedNano(double) const { return turbo::ToDoubleNanoseconds(_stop - _start); }
+        [[nodiscard]] double elapsed_nano(double) { return turbo::ToDoubleNanoseconds(elapsed()); }
 
-        [[nodiscard]] double ElapsedMicro(double) const { return turbo::ToDoubleMicroseconds(_stop - _start); }
+        [[nodiscard]] double elapsed_micro(double) { return turbo::ToDoubleMicroseconds(elapsed()); }
 
-        [[nodiscard]] double ElapsedMill(double) const { return turbo::ToDoubleMilliseconds(_stop - _start); }
+        [[nodiscard]] double elapsed_mill(double) { return turbo::ToDoubleMilliseconds(elapsed()); }
 
-        [[nodiscard]] double ElapsedSec(double) const { return turbo::ToDoubleSeconds(_stop - _start); }
+        [[nodiscard]] double elapsed_sec(double) { return turbo::ToDoubleSeconds(elapsed()); }
+        [[nodiscard]] std::chrono::duration<double> elapsed_chrono() const { return turbo::ToChronoNanoseconds(elapsed()); }
 
     private:
         turbo::Time _start;
@@ -56,5 +55,18 @@ namespace turbo {
     };
 
 }  // namespace turbo
+
+namespace fmt {
+
+    // Support for fmt formatting  (e.g. "{:012.9}" or just "{}")
+    template<>
+    struct formatter<turbo::StopWatcher> : formatter<double> {
+        template<typename FormatContext>
+        auto format(const turbo::StopWatcher &sw, FormatContext &ctx) -> decltype(ctx.out()) {
+            return formatter<double>::format(sw.elapsed_chrono().count(), ctx);
+        }
+    };
+} // namespace std
+
 
 #endif  // TURBO_TIME_STOP_WATCHER_H_

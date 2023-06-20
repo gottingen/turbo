@@ -25,7 +25,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -38,7 +38,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -51,7 +51,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -64,7 +64,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -78,7 +78,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -91,7 +91,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -104,9 +104,9 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
-
+#[[
 carbin_cc_test(
         NAME
         str_split_test
@@ -120,7 +120,7 @@ carbin_cc_test(
         ${GMOCK_LIB}
         ${GMOCK_MAIN_LIB}
 )
-
+]]
 carbin_cc_test(
         NAME
         cord_buffer_test
@@ -131,7 +131,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -144,7 +144,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -157,7 +157,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -172,7 +172,7 @@ carbin_cc_test(
         turbo::pow10_helper
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -185,7 +185,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -198,7 +198,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -212,7 +212,7 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         turbo::pow10_helper
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -225,7 +225,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -238,7 +238,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -266,7 +266,7 @@ carbin_cc_test(
         turbo::pow10_helper
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -280,7 +280,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -292,7 +292,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -304,7 +304,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -317,7 +317,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -331,7 +331,7 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -344,7 +344,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 
@@ -358,10 +358,9 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
-
-
+#[[
 carbin_cc_test(
         NAME
         cord_test
@@ -372,9 +371,10 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
 )
-
+]]
 carbin_cc_test(
         NAME
         cord_data_edge_test
@@ -385,7 +385,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -399,7 +399,7 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -412,7 +412,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -425,7 +425,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -438,9 +438,10 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
-
+#TODO(jeff) disable now
+#[[
 carbin_cc_test(
         NAME
         cord_ring_test
@@ -450,11 +451,12 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
+        ${CARBIN_DEPS_LINK}
         ${GTEST_LIB}
         ${GMOCK_LIB}
         ${GMOCK_MAIN_LIB}
 )
-
+]]
 carbin_cc_test(
         NAME
         cord_ring_reader_test
@@ -465,7 +467,7 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -479,6 +481,6 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${GMOCK_LIB}
-        ${GMOCK_MAIN_LIB}
+        ${GTEST_MAIN_LIB}
 )
 

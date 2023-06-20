@@ -18,6 +18,13 @@ you can get it as below.
     conda install -c mgottingen turbo
 ```
 
+it also can be install by [carbin](https://github.com/gottingen/carbin).
+
+```shell
+pip install carbin
+carbin install gottingen/turbo
+```
+
 # Try Try Try
 
 * Read [overview](docs/overview.md) to know the goals of turbo and its advantages. 

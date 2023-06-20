@@ -141,25 +141,40 @@ set(TURBO_ALL_SRC
         "unicode/utf.cc"
         )
 
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        turbo
-        SOURCES
-        ${TURBO_ALL_SRC}
-        COPTS
-        ${CARBIN_DEFAULT_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        PUBLIC
-)
+if (BUILD_STATIC_LIBRARY)
+    carbin_cc_library(
+            NAMESPACE
+            turbo
+            NAME
+            turbo
+            SOURCES
+            ${TURBO_ALL_SRC}
+            COPTS
+            ${CARBIN_DEFAULT_COPTS}
+            ${CARBIN_RANDOM_RANDEN_COPTS}
+            ${CARBIN_SIMD_FLAGS}
+            DEPS
+            ${CARBIN_DEPS_LINK}
+            PUBLIC
+    )
+endif (BUILD_STATIC_LIBRARY)
 
-if (TURBO_BUILD_TESTING)
-    add_subdirectory(time)
-endif (TURBO_BUILD_TESTING)
-if (${TURBO_BUILD_DLL})
-    turbo_make_dll()
-endif ()
+if (BUILD_SHARED_LIBRARY)
+    carbin_cc_library(
+            NAMESPACE
+            turbo
+            NAME
+            turbo
+            SOURCES
+            ${TURBO_ALL_SRC}
+            COPTS
+            ${CARBIN_DEFAULT_COPTS}
+            ${CARBIN_RANDOM_RANDEN_COPTS}
+            ${CARBIN_SIMD_FLAGS}
+            DEPS
+            ${CARBIN_DEPS_LINK}
+            SHARED
+            PUBLIC
+    )
+endif (BUILD_SHARED_LIBRARY)
+

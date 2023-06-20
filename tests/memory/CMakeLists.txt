@@ -23,6 +23,4 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_MAIN_LIB}
 )

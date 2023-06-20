@@ -17,58 +17,60 @@
 #include <thread>  // NOLINT(build/c++11)
 #include <vector>
 
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 #include "turbo/times/clock.h"
 
 
-TEST(Barrier, SanityTest) {
-  constexpr int kNumThreads = 10;
-  turbo::Barrier* barrier = new turbo::Barrier(kNumThreads);
+TEST_CASE("Barrier SanityTest") {
+    constexpr int kNumThreads = 10;
+    turbo::Barrier *barrier = new turbo::Barrier(kNumThreads);
 
-  std::mutex mutex;
-  int counter = 0;  // Guarded by mutex.
+    std::mutex mutex;
+    int counter = 0;  // Guarded by mutex.
 
-  auto thread_func = [&] {
-    if (barrier->Block()) {
-      // This thread is the last thread to reach the barrier so it is
-      // responsible for deleting it.
-      delete barrier;
+    auto thread_func = [&] {
+        if (barrier->Block()) {
+            // This thread is the last thread to reach the barrier so it is
+            // responsible for deleting it.
+            delete barrier;
+        }
+
+        // Increment the counter.
+        std::unique_lock lock(mutex);
+        ++counter;
+    };
+
+    // Start (kNumThreads - 1) threads running thread_func.
+    std::vector<std::thread> threads;
+    for (int i = 0; i < kNumThreads - 1; ++i) {
+        threads.push_back(std::thread(thread_func));
     }
 
-    // Increment the counter.
-    std::unique_lock lock(mutex);
-    ++counter;
-  };
+    // Give (kNumThreads - 1) threads a chance to reach the barrier.
+    // This test assumes at least one thread will have run after the
+    // sleep has elapsed. Sleeping in a test is usually bad form, but we
+    // need to make sure that we are testing the barrier instead of some
+    // other synchronization method.
+    turbo::SleepFor(turbo::Seconds(1));
 
-  // Start (kNumThreads - 1) threads running thread_func.
-  std::vector<std::thread> threads;
-  for (int i = 0; i < kNumThreads - 1; ++i) {
+    // The counter should still be zero since no thread should have
+    // been able to pass the barrier yet.
+    {
+        std::unique_lock lock(mutex);
+        CHECK_EQ(counter, 0);
+    }
+
+    // Start 1 more thread. This should make all threads pass the barrier.
     threads.push_back(std::thread(thread_func));
-  }
 
-  // Give (kNumThreads - 1) threads a chance to reach the barrier.
-  // This test assumes at least one thread will have run after the
-  // sleep has elapsed. Sleeping in a test is usually bad form, but we
-  // need to make sure that we are testing the barrier instead of some
-  // other synchronization method.
-  turbo::SleepFor(turbo::Seconds(1));
+    // All threads should now be able to proceed and finish.
+    for (auto &thread: threads) {
+        thread.join();
+    }
 
-  // The counter should still be zero since no thread should have
-  // been able to pass the barrier yet.
-  {
+    // All threads should now have incremented the counter.
     std::unique_lock lock(mutex);
-    EXPECT_EQ(counter, 0);
-  }
-
-  // Start 1 more thread. This should make all threads pass the barrier.
-  threads.push_back(std::thread(thread_func));
-
-  // All threads should now be able to proceed and finish.
-  for (auto& thread : threads) {
-    thread.join();
-  }
-
-  // All threads should now have incremented the counter.
-  std::unique_lock lock(mutex);
-  EXPECT_EQ(counter, kNumThreads);
+    CHECK_EQ(counter, kNumThreads);
 }

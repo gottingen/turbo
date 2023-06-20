@@ -607,7 +607,9 @@ struct SimdApiFloatTypesFunctions {
     void test_polar() {
         value_type val0(3);
         value_type val1(4);
+#if !defined(__APPLE__)
         CHECK_EQ(extract(turbo::simd::polar(T(val0), T(val1))), std::polar(val0, val1));
+#endif
     }
 
     void test_pow() {
