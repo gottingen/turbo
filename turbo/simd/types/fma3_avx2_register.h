@@ -22,9 +22,8 @@
 
 #include "turbo/simd/types/avx2_register.h"
 
-namespace turbo::simd
-{
-    template <typename arch>
+namespace turbo::simd {
+    template<typename arch>
     struct fma3;
 
     /**
@@ -32,18 +31,19 @@ namespace turbo::simd
      *
      * AVX2 + FMA instructions
      */
-    template <>
-    struct fma3<avx2> : avx2
-    {
+    template<>
+    struct fma3<avx2> : avx2 {
         static constexpr bool supported() noexcept { return TURBO_WITH_FMA3_AVX2; }
+
         static constexpr bool available() noexcept { return true; }
+
         static constexpr unsigned version() noexcept { return generic::version(2, 2, 1); }
-        static constexpr char const* name() noexcept { return "fma3+avx2"; }
+
+        static constexpr char const *name() noexcept { return "fma3+avx2"; }
     };
 
 #if TURBO_WITH_FMA3_AVX2
-    namespace types
-    {
+    namespace types {
 
         TURBO_SIMD_DECLARE_SIMD_REGISTER_ALIAS(fma3<avx2>, avx2);
 

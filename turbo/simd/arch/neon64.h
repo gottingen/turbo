@@ -27,13 +27,11 @@
 #include "turbo/simd/types/neon64_register.h"
 #include "turbo/simd/types/utils.h"
 
-namespace turbo::simd
-{
+namespace turbo::simd {
     template <class batch_type, bool... Values>
     struct batch_bool_constant;
 
-    namespace kernel
-    {
+    namespace kernel {
         using namespace types;
 
         /*******
