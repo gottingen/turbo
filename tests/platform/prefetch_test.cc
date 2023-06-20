@@ -14,30 +14,33 @@
 
 #include "turbo/platform/internal/prefetch.h"
 
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 
 namespace {
 
-int number = 42;
+    int number = 42;
 
-TEST(Prefetch, TemporalLocalityNone) {
-  turbo::base_internal::PrefetchNta(&number);
-  EXPECT_EQ(number, 42);
-}
+    TEST_CASE("Prefetch") {
+        SUBCASE("TemporalLocalityNone") {
+            turbo::base_internal::PrefetchNta(&number);
+            CHECK_EQ(number, 42);
+        }
 
-TEST(Prefetch, TemporalLocalityLow) {
-  turbo::base_internal::PrefetchT2(&number);
-  EXPECT_EQ(number, 42);
-}
+        SUBCASE("TemporalLocalityLow") {
+            turbo::base_internal::PrefetchT2(&number);
+            CHECK_EQ(number, 42);
+        }
 
-TEST(Prefetch, TemporalLocalityMedium) {
-  turbo::base_internal::PrefetchT1(&number);
-  EXPECT_EQ(number, 42);
-}
+        SUBCASE("TemporalLocalityMedium") {
+            turbo::base_internal::PrefetchT1(&number);
+            CHECK_EQ(number, 42);
+        }
 
-TEST(Prefetch, TemporalLocalityHigh) {
-  turbo::base_internal::PrefetchT0(&number);
-  EXPECT_EQ(number, 42);
-}
-
+        SUBCASE("TemporalLocalityHigh") {
+            turbo::base_internal::PrefetchT0(&number);
+            CHECK_EQ(number, 42);
+        }
+    }
 }  // namespace

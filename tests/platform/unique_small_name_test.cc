@@ -14,7 +14,9 @@
 
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 
 // This test by itself does not do anything fancy, but it serves as binary I can
 // query in shell test.
@@ -33,17 +35,17 @@ void DoNotOptimize(const T& var) {
 int very_long_int_variable_name TURBO_INTERNAL_UNIQUE_SMALL_NAME() = 0;
 char very_long_str_variable_name[] TURBO_INTERNAL_UNIQUE_SMALL_NAME() = "abc";
 
-TEST(UniqueSmallName, NonAutomaticVar) {
-  EXPECT_EQ(very_long_int_variable_name, 0);
-  EXPECT_EQ(std::string_view(very_long_str_variable_name), "abc");
+TEST_CASE("UniqueSmallName, NonAutomaticVar") {
+  CHECK_EQ(very_long_int_variable_name, 0);
+  CHECK_EQ(std::string_view(very_long_str_variable_name), "abc");
 }
 
 int VeryLongFreeFunctionName() TURBO_INTERNAL_UNIQUE_SMALL_NAME();
 
-TEST(UniqueSmallName, FreeFunction) {
+TEST_CASE("UniqueSmallName, FreeFunction") {
   DoNotOptimize(&VeryLongFreeFunctionName);
 
-  EXPECT_EQ(VeryLongFreeFunctionName(), 456);
+  CHECK_EQ(VeryLongFreeFunctionName(), 456);
 }
 
 int VeryLongFreeFunctionName() { return 456; }
@@ -59,15 +61,15 @@ struct VeryLongStructName {
   int fld;
 };
 
-TEST(UniqueSmallName, Struct) {
+TEST_CASE("UniqueSmallName, Struct") {
   VeryLongStructName var(10);
 
   DoNotOptimize(var);
   DoNotOptimize(&VeryLongStructName::VeryLongMethodName);
   DoNotOptimize(&VeryLongStructName::VeryLongStaticMethodName);
 
-  EXPECT_EQ(var.VeryLongMethodName(), 10);
-  EXPECT_EQ(VeryLongStructName::VeryLongStaticMethodName(), 123);
+  CHECK_EQ(var.VeryLongMethodName(), 10);
+  CHECK_EQ(VeryLongStructName::VeryLongStaticMethodName(), 123);
 }
 
 VeryLongStructName::VeryLongStructName(int i) : fld(i) {}
