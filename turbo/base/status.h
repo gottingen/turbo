@@ -858,7 +858,13 @@ namespace turbo {
     Status MakeStatus(short module_index, int errcode, std::string_view fmt, Args &&...args) {
         return Status(module_index, errcode, Format(fmt, std::forward<Args>(args)...));
     }
+    TURBO_FORCE_INLINE Status MakeStatus(int errcode) {
+        return Status(errcode, "");
+    }
 
+    TURBO_FORCE_INLINE Status MakeStatus(short module_index, int errcode) {
+        return Status(module_index, errcode, "");
+    }
     // ErrnoToStatusCode()
     //
     // Returns the StatusCode for `error_number`, which should be an `errno` value.
