@@ -150,9 +150,7 @@ if (BUILD_STATIC_LIBRARY)
             SOURCES
             ${TURBO_ALL_SRC}
             COPTS
-            ${CARBIN_DEFAULT_COPTS}
-            ${CARBIN_RANDOM_RANDEN_COPTS}
-            ${CARBIN_SIMD_FLAGS}
+            ${CARBIN_CXX_OPTIONS}
             DEPS
             ${CARBIN_DEPS_LINK}
             PUBLIC
@@ -168,9 +166,7 @@ if (BUILD_SHARED_LIBRARY)
             SOURCES
             ${TURBO_ALL_SRC}
             COPTS
-            ${CARBIN_DEFAULT_COPTS}
-            ${CARBIN_RANDOM_RANDEN_COPTS}
-            ${CARBIN_SIMD_FLAGS}
+            ${CARBIN_CXX_OPTIONS}
             DEPS
             ${CARBIN_DEPS_LINK}
             SHARED

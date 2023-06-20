@@ -102,6 +102,7 @@ carbin_cc_test(
         turbo::hash_testing
         turbo::turbo
         ${GTEST_LIB}
+        ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
 
