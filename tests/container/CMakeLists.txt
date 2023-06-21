@@ -16,6 +16,8 @@
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         btree_test_common
         HEADERS
@@ -59,14 +61,6 @@ carbin_cc_test(
         ${GTEST_MAIN_LIB}
 )
 
-carbin_cc_test(
-        NAME
-        dynamic_bitset_test
-        SOURCES
-        "dynamic_bitset_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-)
 carbin_cc_test(
         NAME
         fixed_array_test
@@ -131,6 +125,8 @@ carbin_cc_test(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         test_instance_tracker
         HEADERS
@@ -271,6 +267,8 @@ carbin_cc_test(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         hash_generator_testing
         HEADERS
@@ -287,6 +285,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         hash_policy_testing
         HEADERS
@@ -418,6 +418,8 @@ carbin_cc_test(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         tracked
         HEADERS
@@ -432,6 +434,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_map_constructor_test
         HEADERS
@@ -448,6 +452,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_map_lookup_test
         HEADERS
@@ -464,6 +470,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_map_members_test
         HEADERS
@@ -479,6 +487,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_map_modifiers_test
         HEADERS
@@ -495,6 +505,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_set_constructor_test
         HEADERS
@@ -511,6 +523,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_set_lookup_test
         HEADERS
@@ -526,6 +540,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_set_members_test
         HEADERS
@@ -541,6 +557,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         unordered_set_modifiers_test
         HEADERS

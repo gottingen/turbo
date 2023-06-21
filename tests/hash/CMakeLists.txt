@@ -15,6 +15,8 @@
 #
 
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         hash_testing
         HEADERS
@@ -48,6 +50,8 @@ carbin_cc_test(
 # directly, it must be marked PUBLIC since it is a dependency of
 # hash_testing.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         spy_hash_state
         HEADERS

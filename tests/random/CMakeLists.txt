@@ -332,6 +332,8 @@ carbin_cc_test(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         random_internal_distribution_test_util
         SOURCES

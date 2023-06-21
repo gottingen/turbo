@@ -106,26 +106,26 @@ function(carbin_cc_library)
 
     if (CARBIN_CC_LIB_SHARED)
         set(CARBIN_BUILD_TYPE "SHARED")
+    elseif (CARBIN_CC_LIB_IS_INTERFACE)
+        set(CARBIN_BUILD_TYPE "INTERFACE")
     else ()
         set(CARBIN_BUILD_TYPE "STATIC")
     endif ()
 
 
     carbin_raw("-----------------------------------")
-    carbin_print_label("Create Library" "${CARBIN_CC_LIB_NAMESPACE}::${CARBIN_CC_LIB_NAME}")
+    if(CARBIN_CC_LIB_PUBLIC)
+        set(CARBIN_LIB_INFO "${CARBIN_CC_LIB_NAMESPACE}::${CARBIN_CC_LIB_NAME}  ${CARBIN_BUILD_TYPE} PUBLIC")
+    else()
+        set(CARBIN_LIB_INFO "${CARBIN_CC_LIB_NAMESPACE}::${CARBIN_CC_LIB_NAME}  ${CARBIN_BUILD_TYPE} INTERNAL")
+    endif ()
+    carbin_print_label("Create Library" "${CARBIN_LIB_INFO}")
     carbin_raw("-----------------------------------")
     if (VERBOSE_CARBIN_BUILD)
         carbin_print_list_label("Sources" CARBIN_CC_LIB_SOURCES)
         carbin_print_list_label("DEPS" CARBIN_CC_LIB_DEPS)
         carbin_print_list_label("COPTS" CARBIN_CC_LIB_COPTS)
         carbin_print_list_label("DEFINITIONS" CARBIN_CC_LIB_DEFINITIONS)
-        if (CARBIN_CC_LIB_PUBLIC)
-            carbin_print_label("Public" "true")
-        else ()
-            carbin_print_label("Public" "false")
-        endif ()
-        carbin_print_label("Libaray type" ${CARBIN_BUILD_TYPE})
-        carbin_print_label("Interface" ${CARBIN_CC_LIB_IS_INTERFACE})
         carbin_raw("-----------------------------------")
     endif ()
     if (NOT CARBIN_CC_LIB_IS_INTERFACE)
@@ -182,7 +182,7 @@ function(carbin_cc_library)
             add_library(${CARBIN_CC_LIB_NAMESPACE}::${CARBIN_CC_LIB_NAME}_shared ALIAS ${CARBIN_CC_LIB_NAME}_SHARED)
         endif ()
 
-    else ()
+    else (CARBIN_CC_LIB_IS_INTERFACE)
         add_library(${CARBIN_CC_LIB_NAME} INTERFACE)
         add_library(${CARBIN_CC_LIB_NAMESPACE}::${CARBIN_CC_LIB_NAME} ALIAS ${CARBIN_CC_LIB_NAME})
         target_compile_options(${CARBIN_CC_LIB_NAME} INTERFACE ${CARBIN_CC_LIB_COPTS})
@@ -203,6 +203,14 @@ function(carbin_cc_library)
     if (CARBIN_CC_LIB_PUBLIC)
         if (CARBIN_CC_LIB_SHARED)
             install(TARGETS ${CARBIN_CC_LIB_NAME}_SHARED
+                    EXPORT ${PROJECT_NAME}Targets
+                    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+                    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+                    )
+        elseif (CARBIN_CC_LIB_IS_INTERFACE)
+            install(TARGETS ${CARBIN_CC_LIB_NAME}
                     EXPORT ${PROJECT_NAME}Targets
                     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
                     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

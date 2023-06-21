@@ -17,6 +17,8 @@
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         time_internal_test_util
         SOURCES

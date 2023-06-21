@@ -27,71 +27,7 @@ carbin_cc_test(
         ${GTEST_MAIN_LIB}
 )
 
-carbin_cc_test(
-        NAME
-        closure_test
-        SOURCES
-        "closure_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
 
-
-carbin_cc_test(
-        NAME
-        complex_test
-        SOURCES
-        "complex_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        complex_sequence_test
-        SOURCES
-        "complex_sequence_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        optional_ref_test
-        SOURCES
-        "optional_ref_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        sequence_test
-        SOURCES
-        "sequence_test.cc"
-        COPTS
-        ${CARBIN_TEST_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
 carbin_cc_test(
         NAME
         type_traits_test

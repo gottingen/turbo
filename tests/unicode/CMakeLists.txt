@@ -19,6 +19,8 @@
 # Internal-only target, do not depend on directly.
 file(GLOB REF_SRC "reference/*.cc")
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         test_reference
         SOURCES
@@ -33,6 +35,8 @@ carbin_cc_library(
 # Internal-only target, do not depend on directly.
 file(GLOB HELPER_SRC "helpers/*.cc")
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         test_helper
         SOURCES
