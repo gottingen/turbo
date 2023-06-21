@@ -219,7 +219,7 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // TURBO_USES_STD_ANY
 //
-// Indicates whether turbo::any is an alias for std::any.
+// Indicates whether std::any is an alias for std::any.
 #if !defined(TURBO_OPTION_USE_STD_ANY)
 #error options.h is misconfigured.
 #elif TURBO_OPTION_USE_STD_ANY == 0 || \

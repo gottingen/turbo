@@ -41,13 +41,13 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <optional>
 
 #include "turbo/base/bits.h"
 #include "turbo/base/int128.h"
 #include "turbo/container/fixed_array.h"
 #include "turbo/hash/internal/city.h"
 #include "turbo/hash/internal/low_level_hash.h"
-#include "turbo/meta/optional.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
 #include "turbo/meta/variant.h"

@@ -64,13 +64,13 @@ namespace turbo {
                 const Payloads *payloads,
                 std::string_view type_url) {
             if (payloads == nullptr)
-                return turbo::nullopt;
+                return std::nullopt;
 
             for (size_t i = 0; i < payloads->size(); ++i) {
                 if ((*payloads)[i].type_url == type_url) return i;
             }
 
-            return turbo::nullopt;
+            return std::nullopt;
         }
 
         // Convert canonical code to a value known to this binary.
@@ -109,7 +109,7 @@ namespace turbo {
         if (index.has_value())
             return (*payloads)[index.value()].payload;
 
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     void Status::SetPayload(std::string_view type_url, turbo::Cord payload) {

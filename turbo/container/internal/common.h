@@ -17,9 +17,9 @@
 
 #include <cassert>
 #include <type_traits>
+#include <optional>
 
 #include "turbo/meta/type_traits.h"
-#include "turbo/meta/optional.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -100,7 +100,7 @@ class node_handle_base {
 
   void reset() {
     assert(alloc_.has_value());
-    alloc_ = turbo::nullopt;
+    alloc_ = std::nullopt;
   }
 
   slot_type* slot() const {

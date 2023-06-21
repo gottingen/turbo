@@ -1,4 +1,4 @@
-// Copyright 2018 The Turbo Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,18 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+//
 #include "turbo/container/internal/compressed_tuple.h"
 
 #include <memory>
 #include <string>
+#include <any>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "test_instance_tracker.h"
 #include "turbo/memory/memory.h"
-#include "turbo/meta/any.h"
-#include "turbo/meta/optional.h"
 #include "turbo/meta/utility.h"
 
 // These are declared at global scope purely so that error messages
@@ -326,13 +325,13 @@ TEST(CompressedTupleTest, MoveConstructionMoveOnlyElements) {
 }
 
 TEST(CompressedTupleTest, AnyElements) {
-  any a(std::string("str"));
-  CompressedTuple<any, any&> x(any(5), a);
-  EXPECT_EQ(turbo::any_cast<int>(x.get<0>()), 5);
-  EXPECT_EQ(turbo::any_cast<std::string>(x.get<1>()), "str");
+  std::any a(std::string("str"));
+  CompressedTuple<std::any, std::any&> x(std::any(5), a);
+  EXPECT_EQ(std::any_cast<int>(x.get<0>()), 5);
+  EXPECT_EQ(std::any_cast<std::string>(x.get<1>()), "str");
 
   a = 0.5f;
-  EXPECT_EQ(turbo::any_cast<float>(x.get<1>()), 0.5);
+  EXPECT_EQ(std::any_cast<float>(x.get<1>()), 0.5);
 }
 
 TEST(CompressedTupleTest, Constexpr) {
@@ -377,7 +376,7 @@ TEST(CompressedTupleTest, Constexpr) {
 
   EXPECT_EQ(non_trivial0, CallType::kConstRef);
   EXPECT_EQ(non_trivial1, 5);
-  EXPECT_EQ(non_trivial2, turbo::nullopt);
+  EXPECT_EQ(non_trivial2, std::nullopt);
 
   static constexpr char data[] = "DEF";
   constexpr CompressedTuple<const char*> z(data);

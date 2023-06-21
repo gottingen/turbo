@@ -1,5 +1,5 @@
 //
-// Copyright 2020 The Turbo Authors.
+// Copyright 2023 The Turbo Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@
 #include <functional>
 #include <type_traits>
 #include <string>
+#include <complex>
+#include <chrono>
 #include "turbo/platform/port.h"
 
 // MSVC constructibility traits do not detect destructor properties and so our
@@ -56,17 +58,17 @@
 #endif  // defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+    TURBO_NAMESPACE_BEGIN
 
 // Defined and documented later on in this file.
-template <typename T>
-struct is_trivially_destructible;
+    template<typename T>
+    struct is_trivially_destructible;
 
 // Defined and documented later on in this file.
-template <typename T>
-struct is_trivially_move_assignable;
+    template<typename T>
+    struct is_trivially_move_assignable;
 
-namespace type_traits_internal {
+    namespace type_traits_internal {
 
 // Silence MSVC warnings about the destructor being defined as deleted.
 #if defined(_MSC_VER) && !defined(__GNUC__)
@@ -74,45 +76,50 @@ namespace type_traits_internal {
 #pragma warning(disable : 4624)
 #endif  // defined(_MSC_VER) && !defined(__GNUC__)
 
-template <class T>
-union SingleMemberUnion {
-  T t;
-};
+        template<class T>
+        union SingleMemberUnion {
+            T t;
+        };
 
 // Restore the state of the destructor warning that was silenced above.
 #if defined(_MSC_VER) && !defined(__GNUC__)
 #pragma warning(pop)
 #endif  // defined(_MSC_VER) && !defined(__GNUC__)
 
-template <class T>
-struct IsTriviallyMoveConstructibleObject
-    : std::integral_constant<
-          bool, std::is_move_constructible<
-                    type_traits_internal::SingleMemberUnion<T>>::value &&
-                    turbo::is_trivially_destructible<T>::value> {};
+        template<class T>
+        struct IsTriviallyMoveConstructibleObject
+                : std::integral_constant<
+                        bool, std::is_move_constructible<
+                                type_traits_internal::SingleMemberUnion<T>>::value &&
+                              turbo::is_trivially_destructible<T>::value> {
+        };
 
-template <class T>
-struct IsTriviallyCopyConstructibleObject
-    : std::integral_constant<
-          bool, std::is_copy_constructible<
-                    type_traits_internal::SingleMemberUnion<T>>::value &&
-                    turbo::is_trivially_destructible<T>::value> {};
+        template<class T>
+        struct IsTriviallyCopyConstructibleObject
+                : std::integral_constant<
+                        bool, std::is_copy_constructible<
+                                type_traits_internal::SingleMemberUnion<T>>::value &&
+                              turbo::is_trivially_destructible<T>::value> {
+        };
 
-template <class T>
-struct IsTriviallyMoveAssignableReference : std::false_type {};
+        template<class T>
+        struct IsTriviallyMoveAssignableReference : std::false_type {
+        };
 
-template <class T>
-struct IsTriviallyMoveAssignableReference<T&>
-    : turbo::is_trivially_move_assignable<T>::type {};
+        template<class T>
+        struct IsTriviallyMoveAssignableReference<T &>
+                : turbo::is_trivially_move_assignable<T>::type {
+        };
 
-template <class T>
-struct IsTriviallyMoveAssignableReference<T&&>
-    : turbo::is_trivially_move_assignable<T>::type {};
+        template<class T>
+        struct IsTriviallyMoveAssignableReference<T &&>
+                : turbo::is_trivially_move_assignable<T>::type {
+        };
 
-template <typename... Ts>
-struct VoidTImpl {
-  using type = void;
-};
+        template<typename... Ts>
+        struct VoidTImpl {
+            using type = void;
+        };
 
 ////////////////////////////////
 // Library Fundamentals V2 TS //
@@ -128,411 +135,421 @@ struct VoidTImpl {
 // way that the standard traits are (this "defect" of the detection idiom
 // specifications has been reported).
 
-template <class Enabler, template <class...> class Op, class... Args>
-struct is_detected_impl {
-  using type = std::false_type;
-};
+        template<class Enabler, template<class...> class Op, class... Args>
+        struct is_detected_impl {
+            using type = std::false_type;
+        };
 
-template <template <class...> class Op, class... Args>
-struct is_detected_impl<typename VoidTImpl<Op<Args...>>::type, Op, Args...> {
-  using type = std::true_type;
-};
+        template<template<class...> class Op, class... Args>
+        struct is_detected_impl<typename VoidTImpl<Op<Args...>>::type, Op, Args...> {
+            using type = std::true_type;
+        };
 
-template <template <class...> class Op, class... Args>
-struct is_detected : is_detected_impl<void, Op, Args...>::type {};
+        template<template<class...> class Op, class... Args>
+        struct is_detected : is_detected_impl<void, Op, Args...>::type {
+        };
 
-template <class Enabler, class To, template <class...> class Op, class... Args>
-struct is_detected_convertible_impl {
-  using type = std::false_type;
-};
+        template<class Enabler, class To, template<class...> class Op, class... Args>
+        struct is_detected_convertible_impl {
+            using type = std::false_type;
+        };
 
-template <class To, template <class...> class Op, class... Args>
-struct is_detected_convertible_impl<
-    typename std::enable_if<std::is_convertible<Op<Args...>, To>::value>::type,
-    To, Op, Args...> {
-  using type = std::true_type;
-};
+        template<class To, template<class...> class Op, class... Args>
+        struct is_detected_convertible_impl<
+                typename std::enable_if<std::is_convertible<Op<Args...>, To>::value>::type,
+                To, Op, Args...> {
+            using type = std::true_type;
+        };
 
-template <class To, template <class...> class Op, class... Args>
-struct is_detected_convertible
-    : is_detected_convertible_impl<void, To, Op, Args...>::type {};
+        template<class To, template<class...> class Op, class... Args>
+        struct is_detected_convertible
+                : is_detected_convertible_impl<void, To, Op, Args...>::type {
+        };
 
-template <typename T>
-using IsCopyAssignableImpl =
-    decltype(std::declval<T&>() = std::declval<const T&>());
+        template<typename T>
+        using IsCopyAssignableImpl =
+                decltype(std::declval<T &>() = std::declval<const T &>());
 
-template <typename T>
-using IsMoveAssignableImpl = decltype(std::declval<T&>() = std::declval<T&&>());
+        template<typename T>
+        using IsMoveAssignableImpl = decltype(std::declval<T &>() = std::declval<T &&>());
 
-}  // namespace type_traits_internal
+    }  // namespace type_traits_internal
 
 // MSVC 19.20 has a regression that causes our workarounds to fail, but their
 // std forms now appear to be compliant.
 #if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER >= 1920)
 
-template <typename T>
-using is_copy_assignable = std::is_copy_assignable<T>;
+    template <typename T>
+    using is_copy_assignable = std::is_copy_assignable<T>;
 
-template <typename T>
-using is_move_assignable = std::is_move_assignable<T>;
+    template <typename T>
+    using is_move_assignable = std::is_move_assignable<T>;
 
 #else
 
-template <typename T>
-struct is_copy_assignable : type_traits_internal::is_detected<
-                                type_traits_internal::IsCopyAssignableImpl, T> {
-};
+    template<typename T>
+    struct is_copy_assignable : type_traits_internal::is_detected<
+            type_traits_internal::IsCopyAssignableImpl, T> {
+    };
 
-template <typename T>
-struct is_move_assignable : type_traits_internal::is_detected<
-                                type_traits_internal::IsMoveAssignableImpl, T> {
-};
+    template<typename T>
+    struct is_move_assignable : type_traits_internal::is_detected<
+            type_traits_internal::IsMoveAssignableImpl, T> {
+    };
 
 #endif
 
-// void_t()
-//
-// Ignores the type of any its arguments and returns `void`. In general, this
-// metafunction allows you to create a general case that maps to `void` while
-// allowing specializations that map to specific types.
-//
-// This metafunction is designed to be a drop-in replacement for the C++17
-// `std::void_t` metafunction.
-//
-// NOTE: `turbo::void_t` does not use the standard-specified implementation so
-// that it can remain compatible with gcc < 5.1. This can introduce slightly
-// different behavior, such as when ordering partial specializations.
-template <typename... Ts>
-using void_t = typename type_traits_internal::VoidTImpl<Ts...>::type;
+    // void_t()
+    //
+    // Ignores the type of any its arguments and returns `void`. In general, this
+    // metafunction allows you to create a general case that maps to `void` while
+    // allowing specializations that map to specific types.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++17
+    // `std::void_t` metafunction.
+    //
+    // NOTE: `turbo::void_t` does not use the standard-specified implementation so
+    // that it can remain compatible with gcc < 5.1. This can introduce slightly
+    // different behavior, such as when ordering partial specializations.
+    template<typename... Ts>
+    using void_t = typename type_traits_internal::VoidTImpl<Ts...>::type;
 
-// conjunction
-//
-// Performs a compile-time logical AND operation on the passed types (which
-// must have  `::value` members convertible to `bool`. Short-circuits if it
-// encounters any `false` members (and does not compare the `::value` members
-// of any remaining arguments).
-//
-// This metafunction is designed to be a drop-in replacement for the C++17
-// `std::conjunction` metafunction.
-template <typename... Ts>
-struct conjunction : std::true_type {};
+    // conjunction
+    //
+    // Performs a compile-time logical AND operation on the passed types (which
+    // must have  `::value` members convertible to `bool`. Short-circuits if it
+    // encounters any `false` members (and does not compare the `::value` members
+    // of any remaining arguments).
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++17
+    // `std::conjunction` metafunction.
+    template<typename... Ts>
+    struct conjunction : std::true_type {
+    };
 
-template <typename T, typename... Ts>
-struct conjunction<T, Ts...>
-    : std::conditional<T::value, conjunction<Ts...>, T>::type {};
+    template<typename T, typename... Ts>
+    struct conjunction<T, Ts...>
+            : std::conditional<T::value, conjunction<Ts...>, T>::type {
+    };
 
-template <typename T>
-struct conjunction<T> : T {};
+    template<typename T>
+    struct conjunction<T> : T {
+    };
 
-// disjunction
-//
-// Performs a compile-time logical OR operation on the passed types (which
-// must have  `::value` members convertible to `bool`. Short-circuits if it
-// encounters any `true` members (and does not compare the `::value` members
-// of any remaining arguments).
-//
-// This metafunction is designed to be a drop-in replacement for the C++17
-// `std::disjunction` metafunction.
-template <typename... Ts>
-struct disjunction : std::false_type {};
+    // disjunction
+    //
+    // Performs a compile-time logical OR operation on the passed types (which
+    // must have  `::value` members convertible to `bool`. Short-circuits if it
+    // encounters any `true` members (and does not compare the `::value` members
+    // of any remaining arguments).
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++17
+    // `std::disjunction` metafunction.
+    template<typename... Ts>
+    struct disjunction : std::false_type {
+    };
 
-template <typename T, typename... Ts>
-struct disjunction<T, Ts...> :
-      std::conditional<T::value, T, disjunction<Ts...>>::type {};
+    template<typename T, typename... Ts>
+    struct disjunction<T, Ts...> :
+            std::conditional<T::value, T, disjunction<Ts...>>::type {
+    };
 
-template <typename T>
-struct disjunction<T> : T {};
+    template<typename T>
+    struct disjunction<T> : T {
+    };
 
-// negation
-//
-// Performs a compile-time logical NOT operation on the passed type (which
-// must have  `::value` members convertible to `bool`.
-//
-// This metafunction is designed to be a drop-in replacement for the C++17
-// `std::negation` metafunction.
-template <typename T>
-struct negation : std::integral_constant<bool, !T::value> {};
+    // negation
+    //
+    // Performs a compile-time logical NOT operation on the passed type (which
+    // must have  `::value` members convertible to `bool`.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++17
+    // `std::negation` metafunction.
+    template<typename T>
+    struct negation : std::integral_constant<bool, !T::value> {
+    };
 
-// is_function()
-//
-// Determines whether the passed type `T` is a function type.
-//
-// This metafunction is designed to be a drop-in replacement for the C++11
-// `std::is_function()` metafunction for platforms that have incomplete C++11
-// support (such as libstdc++ 4.x).
-//
-// This metafunction works because appending `const` to a type does nothing to
-// function types and reference types (and forms a const-qualified type
-// otherwise).
-template <typename T>
-struct is_function
-    : std::integral_constant<
-          bool, !(std::is_reference<T>::value ||
-                  std::is_const<typename std::add_const<T>::type>::value)> {};
+    // is_function()
+    //
+    // Determines whether the passed type `T` is a function type.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++11
+    // `std::is_function()` metafunction for platforms that have incomplete C++11
+    // support (such as libstdc++ 4.x).
+    //
+    // This metafunction works because appending `const` to a type does nothing to
+    // function types and reference types (and forms a const-qualified type
+    // otherwise).
+    template<typename T>
+    struct is_function
+            : std::integral_constant<
+                    bool, !(std::is_reference<T>::value ||
+                            std::is_const<typename std::add_const<T>::type>::value)> {
+    };
 
-// is_trivially_destructible()
-//
-// Determines whether the passed type `T` is trivially destructible.
-//
-// This metafunction is designed to be a drop-in replacement for the C++11
-// `std::is_trivially_destructible()` metafunction for platforms that have
-// incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
-// fully support C++11, we check whether this yields the same result as the std
-// implementation.
-//
-// NOTE: the extensions (__has_trivial_xxx) are implemented in gcc (version >=
-// 4.3) and clang. Since we are supporting libstdc++ > 4.7, they should always
-// be present. These  extensions are documented at
-// https://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html#Type-Traits.
-template <typename T>
-struct is_trivially_destructible
+    // is_trivially_destructible()
+    //
+    // Determines whether the passed type `T` is trivially destructible.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++11
+    // `std::is_trivially_destructible()` metafunction for platforms that have
+    // incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
+    // fully support C++11, we check whether this yields the same result as the std
+    // implementation.
+    //
+    // NOTE: the extensions (__has_trivial_xxx) are implemented in gcc (version >=
+    // 4.3) and clang. Since we are supporting libstdc++ > 4.7, they should always
+    // be present. These  extensions are documented at
+    // https://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html#Type-Traits.
+    template<typename T>
+    struct is_trivially_destructible
 #ifdef TURBO_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
-    : std::is_trivially_destructible<T> {
+            : std::is_trivially_destructible<T> {
 #else
-    : std::integral_constant<bool, __has_trivial_destructor(T) &&
-                                   std::is_destructible<T>::value> {
+        : std::integral_constant<bool, __has_trivial_destructor(T) &&
+                                       std::is_destructible<T>::value> {
 #endif
 #ifdef TURBO_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
- private:
-  static constexpr bool compliant = std::is_trivially_destructible<T>::value ==
-                                    is_trivially_destructible::value;
-  static_assert(compliant || std::is_trivially_destructible<T>::value,
-                "Not compliant with std::is_trivially_destructible; "
-                "Standard: false, Implementation: true");
-  static_assert(compliant || !std::is_trivially_destructible<T>::value,
-                "Not compliant with std::is_trivially_destructible; "
-                "Standard: true, Implementation: false");
+    private:
+        static constexpr bool compliant = std::is_trivially_destructible<T>::value ==
+                                          is_trivially_destructible::value;
+        static_assert(compliant || std::is_trivially_destructible<T>::value,
+                      "Not compliant with std::is_trivially_destructible; "
+                      "Standard: false, Implementation: true");
+        static_assert(compliant || !std::is_trivially_destructible<T>::value,
+                      "Not compliant with std::is_trivially_destructible; "
+                      "Standard: true, Implementation: false");
 #endif  // TURBO_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
-};
+    };
 
-// is_trivially_default_constructible()
-//
-// Determines whether the passed type `T` is trivially default constructible.
-//
-// This metafunction is designed to be a drop-in replacement for the C++11
-// `std::is_trivially_default_constructible()` metafunction for platforms that
-// have incomplete C++11 support (such as libstdc++ 4.x). On any platforms that
-// do fully support C++11, we check whether this yields the same result as the
-// std implementation.
-//
-// NOTE: according to the C++ standard, Section: 20.15.4.3 [meta.unary.prop]
-// "The predicate condition for a template specialization is_constructible<T,
-// Args...> shall be satisfied if and only if the following variable
-// definition would be well-formed for some invented variable t:
-//
-// T t(declval<Args>()...);
-//
-// is_trivially_constructible<T, Args...> additionally requires that the
-// variable definition does not call any operation that is not trivial.
-// For the purposes of this check, the call to std::declval is considered
-// trivial."
-//
-// Notes from https://en.cppreference.com/w/cpp/types/is_constructible:
-// In many implementations, is_nothrow_constructible also checks if the
-// destructor throws because it is effectively noexcept(T(arg)). Same
-// applies to is_trivially_constructible, which, in these implementations, also
-// requires that the destructor is trivial.
-// GCC bug 51452: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51452
-// LWG issue 2116: http://cplusplus.github.io/LWG/lwg-active.html#2116.
-//
-// "T obj();" need to be well-formed and not call any nontrivial operation.
-// Nontrivially destructible types will cause the expression to be nontrivial.
-template <typename T>
-struct is_trivially_default_constructible
+    // is_trivially_default_constructible()
+    //
+    // Determines whether the passed type `T` is trivially default constructible.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++11
+    // `std::is_trivially_default_constructible()` metafunction for platforms that
+    // have incomplete C++11 support (such as libstdc++ 4.x). On any platforms that
+    // do fully support C++11, we check whether this yields the same result as the
+    // std implementation.
+    //
+    // NOTE: according to the C++ standard, Section: 20.15.4.3 [meta.unary.prop]
+    // "The predicate condition for a template specialization is_constructible<T,
+    // Args...> shall be satisfied if and only if the following variable
+    // definition would be well-formed for some invented variable t:
+    //
+    // T t(declval<Args>()...);
+    //
+    // is_trivially_constructible<T, Args...> additionally requires that the
+    // variable definition does not call any operation that is not trivial.
+    // For the purposes of this check, the call to std::declval is considered
+    // trivial."
+    //
+    // Notes from https://en.cppreference.com/w/cpp/types/is_constructible:
+    // In many implementations, is_nothrow_constructible also checks if the
+    // destructor throws because it is effectively noexcept(T(arg)). Same
+    // applies to is_trivially_constructible, which, in these implementations, also
+    // requires that the destructor is trivial.
+    // GCC bug 51452: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51452
+    // LWG issue 2116: http://cplusplus.github.io/LWG/lwg-active.html#2116.
+    //
+    // "T obj();" need to be well-formed and not call any nontrivial operation.
+    // Nontrivially destructible types will cause the expression to be nontrivial.
+    template<typename T>
+    struct is_trivially_default_constructible
 #if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
-    : std::is_trivially_default_constructible<T> {
+            : std::is_trivially_default_constructible<T> {
 #else
-    : std::integral_constant<bool, __has_trivial_constructor(T) &&
-                                   std::is_default_constructible<T>::value &&
-                                   is_trivially_destructible<T>::value> {
+        : std::integral_constant<bool, __has_trivial_constructor(T) &&
+                                       std::is_default_constructible<T>::value &&
+                                       is_trivially_destructible<T>::value> {
 #endif
 #if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
         TURBO_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
- private:
-  static constexpr bool compliant =
-      std::is_trivially_default_constructible<T>::value ==
-      is_trivially_default_constructible::value;
-  static_assert(compliant || std::is_trivially_default_constructible<T>::value,
-                "Not compliant with std::is_trivially_default_constructible; "
-                "Standard: false, Implementation: true");
-  static_assert(compliant || !std::is_trivially_default_constructible<T>::value,
-                "Not compliant with std::is_trivially_default_constructible; "
-                "Standard: true, Implementation: false");
+    private:
+        static constexpr bool compliant =
+                std::is_trivially_default_constructible<T>::value ==
+                is_trivially_default_constructible::value;
+        static_assert(compliant || std::is_trivially_default_constructible<T>::value,
+                      "Not compliant with std::is_trivially_default_constructible; "
+                      "Standard: false, Implementation: true");
+        static_assert(compliant || !std::is_trivially_default_constructible<T>::value,
+                      "Not compliant with std::is_trivially_default_constructible; "
+                      "Standard: true, Implementation: false");
 #endif  // TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
-};
+    };
 
-// is_trivially_move_constructible()
-//
-// Determines whether the passed type `T` is trivially move constructible.
-//
-// This metafunction is designed to be a drop-in replacement for the C++11
-// `std::is_trivially_move_constructible()` metafunction for platforms that have
-// incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
-// fully support C++11, we check whether this yields the same result as the std
-// implementation.
-//
-// NOTE: `T obj(declval<T>());` needs to be well-formed and not call any
-// nontrivial operation.  Nontrivially destructible types will cause the
-// expression to be nontrivial.
-template <typename T>
-struct is_trivially_move_constructible
+    // is_trivially_move_constructible()
+    //
+    // Determines whether the passed type `T` is trivially move constructible.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++11
+    // `std::is_trivially_move_constructible()` metafunction for platforms that have
+    // incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
+    // fully support C++11, we check whether this yields the same result as the std
+    // implementation.
+    //
+    // NOTE: `T obj(declval<T>());` needs to be well-formed and not call any
+    // nontrivial operation.  Nontrivially destructible types will cause the
+    // expression to be nontrivial.
+    template<typename T>
+    struct is_trivially_move_constructible
 #if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
-    : std::is_trivially_move_constructible<T> {
+            : std::is_trivially_move_constructible<T> {
 #else
-    : std::conditional<
-          std::is_object<T>::value && !std::is_array<T>::value,
-          type_traits_internal::IsTriviallyMoveConstructibleObject<T>,
-          std::is_reference<T>>::type::type {
+        : std::conditional<
+              std::is_object<T>::value && !std::is_array<T>::value,
+              type_traits_internal::IsTriviallyMoveConstructibleObject<T>,
+              std::is_reference<T>>::type::type {
 #endif
 #if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
         TURBO_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
- private:
-  static constexpr bool compliant =
-      std::is_trivially_move_constructible<T>::value ==
-      is_trivially_move_constructible::value;
-  static_assert(compliant || std::is_trivially_move_constructible<T>::value,
-                "Not compliant with std::is_trivially_move_constructible; "
-                "Standard: false, Implementation: true");
-  static_assert(compliant || !std::is_trivially_move_constructible<T>::value,
-                "Not compliant with std::is_trivially_move_constructible; "
-                "Standard: true, Implementation: false");
+    private:
+        static constexpr bool compliant =
+                std::is_trivially_move_constructible<T>::value ==
+                is_trivially_move_constructible::value;
+        static_assert(compliant || std::is_trivially_move_constructible<T>::value,
+                      "Not compliant with std::is_trivially_move_constructible; "
+                      "Standard: false, Implementation: true");
+        static_assert(compliant || !std::is_trivially_move_constructible<T>::value,
+                      "Not compliant with std::is_trivially_move_constructible; "
+                      "Standard: true, Implementation: false");
 #endif  // TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
-};
+    };
 
-// is_trivially_copy_constructible()
-//
-// Determines whether the passed type `T` is trivially copy constructible.
-//
-// This metafunction is designed to be a drop-in replacement for the C++11
-// `std::is_trivially_copy_constructible()` metafunction for platforms that have
-// incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
-// fully support C++11, we check whether this yields the same result as the std
-// implementation.
-//
-// NOTE: `T obj(declval<const T&>());` needs to be well-formed and not call any
-// nontrivial operation.  Nontrivially destructible types will cause the
-// expression to be nontrivial.
-template <typename T>
-struct is_trivially_copy_constructible
-    : std::conditional<
-          std::is_object<T>::value && !std::is_array<T>::value,
-          type_traits_internal::IsTriviallyCopyConstructibleObject<T>,
-          std::is_lvalue_reference<T>>::type::type {
+    // is_trivially_copy_constructible()
+    //
+    // Determines whether the passed type `T` is trivially copy constructible.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++11
+    // `std::is_trivially_copy_constructible()` metafunction for platforms that have
+    // incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
+    // fully support C++11, we check whether this yields the same result as the std
+    // implementation.
+    //
+    // NOTE: `T obj(declval<const T&>());` needs to be well-formed and not call any
+    // nontrivial operation.  Nontrivially destructible types will cause the
+    // expression to be nontrivial.
+    template<typename T>
+    struct is_trivially_copy_constructible
+            : std::conditional<
+                    std::is_object<T>::value && !std::is_array<T>::value,
+                    type_traits_internal::IsTriviallyCopyConstructibleObject<T>,
+                    std::is_lvalue_reference<T>>::type::type {
 #if defined(TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
         TURBO_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
- private:
-  static constexpr bool compliant =
-      std::is_trivially_copy_constructible<T>::value ==
-      is_trivially_copy_constructible::value;
-  static_assert(compliant || std::is_trivially_copy_constructible<T>::value,
-                "Not compliant with std::is_trivially_copy_constructible; "
-                "Standard: false, Implementation: true");
-  static_assert(compliant || !std::is_trivially_copy_constructible<T>::value,
-                "Not compliant with std::is_trivially_copy_constructible; "
-                "Standard: true, Implementation: false");
+    private:
+        static constexpr bool compliant =
+                std::is_trivially_copy_constructible<T>::value ==
+                is_trivially_copy_constructible::value;
+        static_assert(compliant || std::is_trivially_copy_constructible<T>::value,
+                      "Not compliant with std::is_trivially_copy_constructible; "
+                      "Standard: false, Implementation: true");
+        static_assert(compliant || !std::is_trivially_copy_constructible<T>::value,
+                      "Not compliant with std::is_trivially_copy_constructible; "
+                      "Standard: true, Implementation: false");
 #endif  // TURBO_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
-};
+    };
 
-// is_trivially_move_assignable()
-//
-// Determines whether the passed type `T` is trivially move assignable.
-//
-// This metafunction is designed to be a drop-in replacement for the C++11
-// `std::is_trivially_move_assignable()` metafunction for platforms that have
-// incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
-// fully support C++11, we check whether this yields the same result as the std
-// implementation.
-//
-// NOTE: `is_assignable<T, U>::value` is `true` if the expression
-// `declval<T>() = declval<U>()` is well-formed when treated as an unevaluated
-// operand. `is_trivially_assignable<T, U>` requires the assignment to call no
-// operation that is not trivial. `is_trivially_copy_assignable<T>` is simply
-// `is_trivially_assignable<T&, T>`.
-template <typename T>
-struct is_trivially_move_assignable
-    : std::conditional<
-          std::is_object<T>::value && !std::is_array<T>::value &&
-              std::is_move_assignable<T>::value,
-          std::is_move_assignable<type_traits_internal::SingleMemberUnion<T>>,
-          type_traits_internal::IsTriviallyMoveAssignableReference<T>>::type::
-          type {
+    // is_trivially_move_assignable()
+    //
+    // Determines whether the passed type `T` is trivially move assignable.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++11
+    // `std::is_trivially_move_assignable()` metafunction for platforms that have
+    // incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
+    // fully support C++11, we check whether this yields the same result as the std
+    // implementation.
+    //
+    // NOTE: `is_assignable<T, U>::value` is `true` if the expression
+    // `declval<T>() = declval<U>()` is well-formed when treated as an unevaluated
+    // operand. `is_trivially_assignable<T, U>` requires the assignment to call no
+    // operation that is not trivial. `is_trivially_copy_assignable<T>` is simply
+    // `is_trivially_assignable<T&, T>`.
+    template<typename T>
+    struct is_trivially_move_assignable
+            : std::conditional<
+                    std::is_object<T>::value && !std::is_array<T>::value &&
+                    std::is_move_assignable<T>::value,
+                    std::is_move_assignable<type_traits_internal::SingleMemberUnion<T>>,
+                    type_traits_internal::IsTriviallyMoveAssignableReference<T>>::type::
+              type {
 #ifdef TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
- private:
-  static constexpr bool compliant =
-      std::is_trivially_move_assignable<T>::value ==
-      is_trivially_move_assignable::value;
-  static_assert(compliant || std::is_trivially_move_assignable<T>::value,
-                "Not compliant with std::is_trivially_move_assignable; "
-                "Standard: false, Implementation: true");
-  static_assert(compliant || !std::is_trivially_move_assignable<T>::value,
-                "Not compliant with std::is_trivially_move_assignable; "
-                "Standard: true, Implementation: false");
+    private:
+        static constexpr bool compliant =
+                std::is_trivially_move_assignable<T>::value ==
+                is_trivially_move_assignable::value;
+        static_assert(compliant || std::is_trivially_move_assignable<T>::value,
+                      "Not compliant with std::is_trivially_move_assignable; "
+                      "Standard: false, Implementation: true");
+        static_assert(compliant || !std::is_trivially_move_assignable<T>::value,
+                      "Not compliant with std::is_trivially_move_assignable; "
+                      "Standard: true, Implementation: false");
 #endif  // TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
-};
+    };
 
-// is_trivially_copy_assignable()
-//
-// Determines whether the passed type `T` is trivially copy assignable.
-//
-// This metafunction is designed to be a drop-in replacement for the C++11
-// `std::is_trivially_copy_assignable()` metafunction for platforms that have
-// incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
-// fully support C++11, we check whether this yields the same result as the std
-// implementation.
-//
-// NOTE: `is_assignable<T, U>::value` is `true` if the expression
-// `declval<T>() = declval<U>()` is well-formed when treated as an unevaluated
-// operand. `is_trivially_assignable<T, U>` requires the assignment to call no
-// operation that is not trivial. `is_trivially_copy_assignable<T>` is simply
-// `is_trivially_assignable<T&, const T&>`.
-template <typename T>
-struct is_trivially_copy_assignable
+    // is_trivially_copy_assignable()
+    //
+    // Determines whether the passed type `T` is trivially copy assignable.
+    //
+    // This metafunction is designed to be a drop-in replacement for the C++11
+    // `std::is_trivially_copy_assignable()` metafunction for platforms that have
+    // incomplete C++11 support (such as libstdc++ 4.x). On any platforms that do
+    // fully support C++11, we check whether this yields the same result as the std
+    // implementation.
+    //
+    // NOTE: `is_assignable<T, U>::value` is `true` if the expression
+    // `declval<T>() = declval<U>()` is well-formed when treated as an unevaluated
+    // operand. `is_trivially_assignable<T, U>` requires the assignment to call no
+    // operation that is not trivial. `is_trivially_copy_assignable<T>` is simply
+    // `is_trivially_assignable<T&, const T&>`.
+    template<typename T>
+    struct is_trivially_copy_assignable
 #ifdef TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
-    : std::is_trivially_copy_assignable<T> {
+            : std::is_trivially_copy_assignable<T> {
 #else
-    : std::integral_constant<
-          bool, __has_trivial_assign(typename std::remove_reference<T>::type) &&
-                    turbo::is_copy_assignable<T>::value> {
+        : std::integral_constant<
+              bool, __has_trivial_assign(typename std::remove_reference<T>::type) &&
+                        turbo::is_copy_assignable<T>::value> {
 #endif
 #ifdef TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
- private:
-  static constexpr bool compliant =
-      std::is_trivially_copy_assignable<T>::value ==
-      is_trivially_copy_assignable::value;
-  static_assert(compliant || std::is_trivially_copy_assignable<T>::value,
-                "Not compliant with std::is_trivially_copy_assignable; "
-                "Standard: false, Implementation: true");
-  static_assert(compliant || !std::is_trivially_copy_assignable<T>::value,
-                "Not compliant with std::is_trivially_copy_assignable; "
-                "Standard: true, Implementation: false");
+    private:
+        static constexpr bool compliant =
+                std::is_trivially_copy_assignable<T>::value ==
+                is_trivially_copy_assignable::value;
+        static_assert(compliant || std::is_trivially_copy_assignable<T>::value,
+                      "Not compliant with std::is_trivially_copy_assignable; "
+                      "Standard: false, Implementation: true");
+        static_assert(compliant || !std::is_trivially_copy_assignable<T>::value,
+                      "Not compliant with std::is_trivially_copy_assignable; "
+                      "Standard: true, Implementation: false");
 #endif  // TURBO_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
-};
+    };
 
 #if defined(__cpp_lib_remove_cvref) && __cpp_lib_remove_cvref >= 201711L
-template <typename T>
-using remove_cvref = std::remove_cvref<T>;
+    template <typename T>
+    using remove_cvref = std::remove_cvref<T>;
 
-template <typename T>
-using remove_cvref_t = typename std::remove_cvref<T>::type;
+    template <typename T>
+    using remove_cvref_t = typename std::remove_cvref<T>::type;
 #else
 // remove_cvref()
 //
 // C++11 compatible implementation of std::remove_cvref which was added in
 // C++20.
-template <typename T>
-struct remove_cvref {
-  using type =
-      typename std::remove_cv<typename std::remove_reference<T>::type>::type;
-};
+    template<typename T>
+    struct remove_cvref {
+        using type =
+                typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+    };
 
-template <typename T>
-using remove_cvref_t = typename remove_cvref<T>::type;
+    template<typename T>
+    using remove_cvref_t = typename remove_cvref<T>::type;
 #endif
 
-namespace type_traits_internal {
+    namespace type_traits_internal {
 // is_trivially_copyable()
 //
 // Determines whether the passed type `T` is trivially copyable.
@@ -550,139 +567,143 @@ namespace type_traits_internal {
 // We expose this metafunction only for internal use within turbo.
 
 #if defined(TURBO_HAVE_STD_IS_TRIVIALLY_COPYABLE)
-template <typename T>
-struct is_trivially_copyable : std::is_trivially_copyable<T> {};
+        template <typename T>
+        struct is_trivially_copyable : std::is_trivially_copyable<T> {};
 #else
-template <typename T>
-class is_trivially_copyable_impl {
-  using ExtentsRemoved = typename std::remove_all_extents<T>::type;
-  static constexpr bool kIsCopyOrMoveConstructible =
-      std::is_copy_constructible<ExtentsRemoved>::value ||
-      std::is_move_constructible<ExtentsRemoved>::value;
-  static constexpr bool kIsCopyOrMoveAssignable =
-      turbo::is_copy_assignable<ExtentsRemoved>::value ||
-      turbo::is_move_assignable<ExtentsRemoved>::value;
 
- public:
-  static constexpr bool kValue =
-      (__has_trivial_copy(ExtentsRemoved) || !kIsCopyOrMoveConstructible) &&
-      (__has_trivial_assign(ExtentsRemoved) || !kIsCopyOrMoveAssignable) &&
-      (kIsCopyOrMoveConstructible || kIsCopyOrMoveAssignable) &&
-      is_trivially_destructible<ExtentsRemoved>::value &&
-      // We need to check for this explicitly because otherwise we'll say
-      // references are trivial copyable when compiled by MSVC.
-      !std::is_reference<ExtentsRemoved>::value;
-};
+        template<typename T>
+        class is_trivially_copyable_impl {
+            using ExtentsRemoved = typename std::remove_all_extents<T>::type;
+            static constexpr bool kIsCopyOrMoveConstructible =
+                    std::is_copy_constructible<ExtentsRemoved>::value ||
+                    std::is_move_constructible<ExtentsRemoved>::value;
+            static constexpr bool kIsCopyOrMoveAssignable =
+                    turbo::is_copy_assignable<ExtentsRemoved>::value ||
+                    turbo::is_move_assignable<ExtentsRemoved>::value;
 
-template <typename T>
-struct is_trivially_copyable
-    : std::integral_constant<
-          bool, type_traits_internal::is_trivially_copyable_impl<T>::kValue> {};
+        public:
+            static constexpr bool kValue =
+                    (__has_trivial_copy(ExtentsRemoved) || !kIsCopyOrMoveConstructible) &&
+                    (__has_trivial_assign(ExtentsRemoved) || !kIsCopyOrMoveAssignable) &&
+                    (kIsCopyOrMoveConstructible || kIsCopyOrMoveAssignable) &&
+                    is_trivially_destructible<ExtentsRemoved>::value &&
+                    // We need to check for this explicitly because otherwise we'll say
+                    // references are trivial copyable when compiled by MSVC.
+                    !std::is_reference<ExtentsRemoved>::value;
+        };
+
+        template<typename T>
+        struct is_trivially_copyable
+                : std::integral_constant<
+                        bool, type_traits_internal::is_trivially_copyable_impl<T>::kValue> {
+        };
 #endif
-}  // namespace type_traits_internal
+    }  // namespace type_traits_internal
 
-// -----------------------------------------------------------------------------
-// C++14 "_t" trait aliases
-// -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // C++14 "_t" trait aliases
+    // -----------------------------------------------------------------------------
 
-template <typename T>
-using remove_cv_t = typename std::remove_cv<T>::type;
+    template<typename T>
+    using remove_cv_t = typename std::remove_cv<T>::type;
 
-template <typename T>
-using remove_const_t = typename std::remove_const<T>::type;
+    template<typename T>
+    using remove_const_t = typename std::remove_const<T>::type;
 
-template <typename T>
-using remove_volatile_t = typename std::remove_volatile<T>::type;
+    template<typename T>
+    using remove_volatile_t = typename std::remove_volatile<T>::type;
 
-template <typename T>
-using add_cv_t = typename std::add_cv<T>::type;
+    template<typename T>
+    using add_cv_t = typename std::add_cv<T>::type;
 
-template <typename T>
-using add_const_t = typename std::add_const<T>::type;
+    template<typename T>
+    using add_const_t = typename std::add_const<T>::type;
 
-template <typename T>
-using add_volatile_t = typename std::add_volatile<T>::type;
+    template<typename T>
+    using add_volatile_t = typename std::add_volatile<T>::type;
 
-template <typename T>
-using remove_reference_t = typename std::remove_reference<T>::type;
+    template<typename T>
+    using remove_reference_t = typename std::remove_reference<T>::type;
 
-template <typename T>
-using add_lvalue_reference_t = typename std::add_lvalue_reference<T>::type;
+    template<typename T>
+    using add_lvalue_reference_t = typename std::add_lvalue_reference<T>::type;
 
-template <typename T>
-using add_rvalue_reference_t = typename std::add_rvalue_reference<T>::type;
+    template<typename T>
+    using add_rvalue_reference_t = typename std::add_rvalue_reference<T>::type;
 
-template <typename T>
-using remove_pointer_t = typename std::remove_pointer<T>::type;
+    template<typename T>
+    using remove_pointer_t = typename std::remove_pointer<T>::type;
 
-template <typename T>
-using add_pointer_t = typename std::add_pointer<T>::type;
+    template<typename T>
+    using add_pointer_t = typename std::add_pointer<T>::type;
 
-template <typename T>
-using make_signed_t = typename std::make_signed<T>::type;
+    template<typename T>
+    using make_signed_t = typename std::make_signed<T>::type;
 
-template <typename T>
-using make_unsigned_t = typename std::make_unsigned<T>::type;
+    template<typename T>
+    using make_unsigned_t = typename std::make_unsigned<T>::type;
 
-template <typename T>
-using remove_extent_t = typename std::remove_extent<T>::type;
+    template<typename T>
+    using remove_extent_t = typename std::remove_extent<T>::type;
 
-template <typename T>
-using remove_all_extents_t = typename std::remove_all_extents<T>::type;
+    template<typename T>
+    using remove_all_extents_t = typename std::remove_all_extents<T>::type;
 
-namespace type_traits_internal {
-// This trick to retrieve a default alignment is necessary for our
-// implementation of aligned_storage_t to be consistent with any
-// implementation of std::aligned_storage.
-template <size_t Len, typename T = std::aligned_storage<Len>>
-struct default_alignment_of_aligned_storage;
+    namespace type_traits_internal {
+        // This trick to retrieve a default alignment is necessary for our
+        // implementation of aligned_storage_t to be consistent with any
+        // implementation of std::aligned_storage.
+        template<size_t Len, typename T = std::aligned_storage<Len>>
+        struct default_alignment_of_aligned_storage;
 
-template <size_t Len, size_t Align>
-struct default_alignment_of_aligned_storage<
-    Len, std::aligned_storage<Len, Align>> {
-  static constexpr size_t value = Align;
-};
-}  // namespace type_traits_internal
+        template<size_t Len, size_t Align>
+        struct default_alignment_of_aligned_storage<
+                Len, std::aligned_storage<Len, Align>> {
+            static constexpr size_t value = Align;
+        };
+    }  // namespace type_traits_internal
 
-// TODO(b/260219225): std::aligned_storage(_t) is deprecated in C++23.
-template <size_t Len, size_t Align = type_traits_internal::
-                          default_alignment_of_aligned_storage<Len>::value>
-using aligned_storage_t = typename std::aligned_storage<Len, Align>::type;
+    // TODO(b/260219225): std::aligned_storage(_t) is deprecated in C++23.
+    template<size_t Len, size_t Align = type_traits_internal::
+    default_alignment_of_aligned_storage<Len>::value>
+    using aligned_storage_t = typename std::aligned_storage<Len, Align>::type;
 
-template <typename T>
-using decay_t = typename std::decay<T>::type;
+    template<typename T>
+    using decay_t = typename std::decay<T>::type;
 
-template <bool B, typename T = void>
-using enable_if_t = typename std::enable_if<B, T>::type;
+    template<bool B, typename T = void>
+    using enable_if_t = typename std::enable_if<B, T>::type;
 
-template <bool B, typename T, typename F>
-using conditional_t = typename std::conditional<B, T, F>::type;
+    template<bool B, typename T, typename F>
+    using conditional_t = typename std::conditional<B, T, F>::type;
 
-template <typename... T>
-using common_type_t = typename std::common_type<T...>::type;
+    template<typename... T>
+    using common_type_t = typename std::common_type<T...>::type;
 
-template <typename T>
-using underlying_type_t = typename std::underlying_type<T>::type;
+    template<typename T>
+    using underlying_type_t = typename std::underlying_type<T>::type;
 
 
-namespace type_traits_internal {
+    namespace type_traits_internal {
 
 #if (defined(__cpp_lib_is_invocable) && __cpp_lib_is_invocable >= 201703L) || \
     (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
 // std::result_of is deprecated (C++17) or removed (C++20)
-template<typename> struct result_of;
-template<typename F, typename... Args>
-struct result_of<F(Args...)> : std::invoke_result<F, Args...> {};
+        template<typename>
+        struct result_of;
+        template<typename F, typename... Args>
+        struct result_of<F(Args...)> : std::invoke_result<F, Args...> {
+        };
 #else
-template<typename F> using result_of = std::result_of<F>;
+        template<typename F> using result_of = std::result_of<F>;
 #endif
 
-}  // namespace type_traits_internal
+    }  // namespace type_traits_internal
 
-template<typename F>
-using result_of_t = typename type_traits_internal::result_of<F>::type;
+    template<typename F>
+    using result_of_t = typename type_traits_internal::result_of<F>::type;
 
-namespace type_traits_internal {
+    namespace type_traits_internal {
 // In MSVC we can't probe std::hash or stdext::hash because it triggers a
 // static_assert instead of failing substitution. Libc++ prior to 4.0
 // also used a static_assert.
@@ -695,127 +716,134 @@ namespace type_traits_internal {
 #endif
 
 #if !TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
-template <typename Key, typename = size_t>
-struct IsHashable : std::true_type {};
+        template <typename Key, typename = size_t>
+        struct IsHashable : std::true_type {};
 #else   // TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
-template <typename Key, typename = void>
-struct IsHashable : std::false_type {};
+        template<typename Key, typename = void>
+        struct IsHashable : std::false_type {
+        };
 
-template <typename Key>
-struct IsHashable<
-    Key,
-    turbo::enable_if_t<std::is_convertible<
-        decltype(std::declval<std::hash<Key>&>()(std::declval<Key const&>())),
-        std::size_t>::value>> : std::true_type {};
+        template<typename Key>
+        struct IsHashable<
+                Key,
+                turbo::enable_if_t<std::is_convertible<
+                        decltype(std::declval<std::hash<Key> &>()(std::declval<Key const &>())),
+                        std::size_t>::value>> : std::true_type {
+        };
 #endif  // !TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 
-struct AssertHashEnabledHelper {
- private:
-  static void Sink(...) {}
-  struct NAT {};
+        struct AssertHashEnabledHelper {
+        private:
+            static void Sink(...) {}
 
-  template <class Key>
-  static auto GetReturnType(int)
-      -> decltype(std::declval<std::hash<Key>>()(std::declval<Key const&>()));
-  template <class Key>
-  static NAT GetReturnType(...);
+            struct NAT {
+            };
 
-  template <class Key>
-  static std::nullptr_t DoIt() {
-    static_assert(IsHashable<Key>::value,
-                  "std::hash<Key> does not provide a call operator");
-    static_assert(
-        std::is_default_constructible<std::hash<Key>>::value,
-        "std::hash<Key> must be default constructible when it is enabled");
-    static_assert(
-        std::is_copy_constructible<std::hash<Key>>::value,
-        "std::hash<Key> must be copy constructible when it is enabled");
-    static_assert(turbo::is_copy_assignable<std::hash<Key>>::value,
-                  "std::hash<Key> must be copy assignable when it is enabled");
-    // is_destructible is unchecked as it's implied by each of the
-    // is_constructible checks.
-    using ReturnType = decltype(GetReturnType<Key>(0));
-    static_assert(std::is_same<ReturnType, NAT>::value ||
-                      std::is_same<ReturnType, size_t>::value,
-                  "std::hash<Key> must return size_t");
-    return nullptr;
-  }
+            template<class Key>
+            static auto GetReturnType(int)
+            -> decltype(std::declval<std::hash<Key>>()(std::declval<Key const &>()));
 
-  template <class... Ts>
-  friend void AssertHashEnabled();
-};
+            template<class Key>
+            static NAT GetReturnType(...);
 
-template <class... Ts>
-inline void AssertHashEnabled() {
-  using Helper = AssertHashEnabledHelper;
-  Helper::Sink(Helper::DoIt<Ts>()...);
-}
+            template<class Key>
+            static std::nullptr_t DoIt() {
+                static_assert(IsHashable<Key>::value,
+                              "std::hash<Key> does not provide a call operator");
+                static_assert(
+                        std::is_default_constructible<std::hash<Key>>::value,
+                        "std::hash<Key> must be default constructible when it is enabled");
+                static_assert(
+                        std::is_copy_constructible<std::hash<Key>>::value,
+                        "std::hash<Key> must be copy constructible when it is enabled");
+                static_assert(turbo::is_copy_assignable<std::hash<Key>>::value,
+                              "std::hash<Key> must be copy assignable when it is enabled");
+                // is_destructible is unchecked as it's implied by each of the
+                // is_constructible checks.
+                using ReturnType = decltype(GetReturnType<Key>(0));
+                static_assert(std::is_same<ReturnType, NAT>::value ||
+                              std::is_same<ReturnType, size_t>::value,
+                              "std::hash<Key> must return size_t");
+                return nullptr;
+            }
 
-}  // namespace type_traits_internal
+            template<class... Ts>
+            friend void AssertHashEnabled();
+        };
 
-// An internal namespace that is required to implement the C++17 swap traits.
-// It is not further nested in type_traits_internal to avoid long symbol names.
-namespace swap_internal {
+        template<class... Ts>
+        inline void AssertHashEnabled() {
+            using Helper = AssertHashEnabledHelper;
+            Helper::Sink(Helper::DoIt<Ts>()...);
+        }
 
-// Necessary for the traits.
-using std::swap;
+    }  // namespace type_traits_internal
 
-// This declaration prevents global `swap` and `turbo::swap` overloads from being
-// considered unless ADL picks them up.
-void swap();
+    // An internal namespace that is required to implement the C++17 swap traits.
+    // It is not further nested in type_traits_internal to avoid long symbol names.
+    namespace swap_internal {
 
-template <class T>
-using IsSwappableImpl = decltype(swap(std::declval<T&>(), std::declval<T&>()));
+        // Necessary for the traits.
+        using std::swap;
 
-// NOTE: This dance with the default template parameter is for MSVC.
-template <class T,
-          class IsNoexcept = std::integral_constant<
-              bool, noexcept(swap(std::declval<T&>(), std::declval<T&>()))>>
-using IsNothrowSwappableImpl = typename std::enable_if<IsNoexcept::value>::type;
+        // This declaration prevents global `swap` and `turbo::swap` overloads from being
+        // considered unless ADL picks them up.
+        void swap();
 
-// IsSwappable
-//
-// Determines whether the standard swap idiom is a valid expression for
-// arguments of type `T`.
-template <class T>
-struct IsSwappable
-    : turbo::type_traits_internal::is_detected<IsSwappableImpl, T> {};
+        template<class T>
+        using IsSwappableImpl = decltype(swap(std::declval<T &>(), std::declval<T &>()));
 
-// IsNothrowSwappable
-//
-// Determines whether the standard swap idiom is a valid expression for
-// arguments of type `T` and is noexcept.
-template <class T>
-struct IsNothrowSwappable
-    : turbo::type_traits_internal::is_detected<IsNothrowSwappableImpl, T> {};
+        // NOTE: This dance with the default template parameter is for MSVC.
+        template<class T,
+                class IsNoexcept = std::integral_constant<
+                        bool, noexcept(swap(std::declval<T &>(), std::declval<T &>()))>>
+        using IsNothrowSwappableImpl = typename std::enable_if<IsNoexcept::value>::type;
 
-// Swap()
-//
-// Performs the swap idiom from a namespace where valid candidates may only be
-// found in `std` or via ADL.
-template <class T, turbo::enable_if_t<IsSwappable<T>::value, int> = 0>
-void Swap(T& lhs, T& rhs) noexcept(IsNothrowSwappable<T>::value) {
-  swap(lhs, rhs);
-}
+        // IsSwappable
+        //
+        // Determines whether the standard swap idiom is a valid expression for
+        // arguments of type `T`.
+        template<class T>
+        struct IsSwappable
+                : turbo::type_traits_internal::is_detected<IsSwappableImpl, T> {
+        };
 
-// StdSwapIsUnconstrained
-//
-// Some standard library implementations are broken in that they do not
-// constrain `std::swap`. This will effectively tell us if we are dealing with
-// one of those implementations.
-using StdSwapIsUnconstrained = IsSwappable<void()>;
+        // IsNothrowSwappable
+        //
+        // Determines whether the standard swap idiom is a valid expression for
+        // arguments of type `T` and is noexcept.
+        template<class T>
+        struct IsNothrowSwappable
+                : turbo::type_traits_internal::is_detected<IsNothrowSwappableImpl, T> {
+        };
 
-}  // namespace swap_internal
+        // Swap()
+        //
+        // Performs the swap idiom from a namespace where valid candidates may only be
+        // found in `std` or via ADL.
+        template<class T, turbo::enable_if_t<IsSwappable<T>::value, int> = 0>
+        void Swap(T &lhs, T &rhs) noexcept(IsNothrowSwappable<T>::value) {
+            swap(lhs, rhs);
+        }
 
-namespace type_traits_internal {
+        // StdSwapIsUnconstrained
+        //
+        // Some standard library implementations are broken in that they do not
+        // constrain `std::swap`. This will effectively tell us if we are dealing with
+        // one of those implementations.
+        using StdSwapIsUnconstrained = IsSwappable<void()>;
 
-// Make the swap-related traits/function accessible from this namespace.
-using swap_internal::IsNothrowSwappable;
-using swap_internal::IsSwappable;
-using swap_internal::Swap;
-using swap_internal::StdSwapIsUnconstrained;
+    }  // namespace swap_internal
 
-}  // namespace type_traits_internal
+    namespace type_traits_internal {
+
+        // Make the swap-related traits/function accessible from this namespace.
+        using swap_internal::IsNothrowSwappable;
+        using swap_internal::IsSwappable;
+        using swap_internal::Swap;
+        using swap_internal::StdSwapIsUnconstrained;
+
+    }  // namespace type_traits_internal
 
 // turbo::is_trivially_relocatable<T>
 // Detects whether a type is "trivially relocatable" -- meaning it can be
@@ -836,12 +864,13 @@ using swap_internal::StdSwapIsUnconstrained;
 // https://clang.llvm.org/docs/LanguageExtensions.html#:~:text=__is_trivially_relocatable
 //
 #if TURBO_HAVE_BUILTIN(__is_trivially_relocatable)
-template <class T>
-struct is_trivially_relocatable
-    : std::integral_constant<bool, __is_trivially_relocatable(T)> {};
+    template <class T>
+    struct is_trivially_relocatable
+        : std::integral_constant<bool, __is_trivially_relocatable(T)> {};
 #else
-template <class T>
-struct is_trivially_relocatable : std::integral_constant<bool, false> {};
+    template<class T>
+    struct is_trivially_relocatable : std::integral_constant<bool, false> {
+    };
 #endif
 
 // turbo::is_constant_evaluated()
@@ -875,15 +904,15 @@ struct is_trivially_relocatable : std::integral_constant<bool, false> {};
 // http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#:~:text=__builtin_is_constant_evaluated
 //
 #if defined(TURBO_HAVE_CONSTANT_EVALUATED)
-constexpr bool is_constant_evaluated() noexcept {
+    constexpr bool is_constant_evaluated() noexcept {
 #ifdef __cpp_lib_is_constant_evaluated
-  return std::is_constant_evaluated();
+      return std::is_constant_evaluated();
 #elif TURBO_HAVE_BUILTIN(__builtin_is_constant_evaluated)
-  return __builtin_is_constant_evaluated();
+      return __builtin_is_constant_evaluated();
 #endif
-}
+    }
 #endif  // TURBO_HAVE_CONSTANT_EVALUATED
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_END
 
 #ifdef TURBO_COMPILER_HAVE_RTTI
 #define TURBO_TYPE_INFO_OF(...) (&typeid(__VA_ARGS__))
@@ -892,31 +921,364 @@ TURBO_NAMESPACE_END
   ((sizeof(__VA_ARGS__)), static_cast<std::type_info const*>(nullptr))
 #endif
 
-//  type_info_of
-//
-//  Returns &typeid(T) if RTTI is available, nullptr otherwise.
-//
-//  This overload works on the static type of the template parameter.
-template <typename T>
-TURBO_FORCE_INLINE static std::type_info const* type_info_of() {
-  return TURBO_TYPE_INFO_OF(T);
-}
+    //  type_info_of
+    //
+    //  Returns &typeid(T) if RTTI is available, nullptr otherwise.
+    //
+    //  This overload works on the static type of the template parameter.
+    template<typename T>
+    TURBO_FORCE_INLINE static std::type_info const *type_info_of() {
+        return TURBO_TYPE_INFO_OF(T);
+    }
 
-//  type_info_of
-//
-//  Returns &typeid(t) if RTTI is available, nullptr otherwise.
-//
-//  This overload works on the dynamic type of the non-template parameter.
-template <typename T>
-TURBO_FORCE_INLINE static std::type_info const* type_info_of(
-    TURBO_MAYBE_UNUSED T const& t) {
-  return FOLLY_TYPE_INFO_OF(t);
-}
+    //  type_info_of
+    //
+    //  Returns &typeid(t) if RTTI is available, nullptr otherwise.
+    //
+    //  This overload works on the dynamic type of the non-template parameter.
+    template<typename T>
+    TURBO_FORCE_INLINE static std::type_info const *type_info_of(
+            TURBO_MAYBE_UNUSED T const &t) {
+        return FOLLY_TYPE_INFO_OF(t);
+    }
 
-template <typename T>
-struct is_string_type : public  std::false_type {};
-template <>
-struct is_string_type<std::string> : public  std::true_type {};
+    template<typename T>
+    struct is_string_type : public std::false_type {
+    };
+    template<>
+    struct is_string_type<std::string> : public std::true_type {
+    };
+
+    /************************************
+    * arithmetic type promotion traits *
+    ************************************/
+
+    /**
+     * Traits class for the result type of mixed arithmetic expressions.
+     * For example, <tt>promote_type<unsigned char, unsigned char>::type</tt> tells
+     * the user that <tt>unsigned char + unsigned char => int</tt>.
+     */
+    template<class... T>
+    struct promote_type;
+
+    template<>
+    struct promote_type<> {
+        using type = void;
+    };
+
+    template<class T>
+    struct promote_type<T> {
+        using type = typename promote_type<T, T>::type;
+    };
+
+    template<class C, class D1, class D2>
+    struct promote_type<std::chrono::time_point<C, D1>, std::chrono::time_point<C, D2>> {
+        using type = std::chrono::time_point<C, typename promote_type<D1, D2>::type>;
+    };
+
+    template<class T0, class T1>
+    struct promote_type<T0, T1> {
+        using type = decltype(std::declval<std::decay_t<T0>>() + std::declval<std::decay_t<T1>>());
+    };
+
+    template<class T0, class... REST>
+    struct promote_type<T0, REST...> {
+        using type = decltype(std::declval<std::decay_t<T0>>() + std::declval<typename promote_type<REST...>::type>());
+    };
+
+    template<>
+    struct promote_type<bool> {
+        using type = bool;
+    };
+
+    template<class T>
+    struct promote_type<bool, T> {
+        using type = T;
+    };
+
+    template<class T>
+    struct promote_type<bool, std::complex<T>> {
+        using type = std::complex<T>;
+    };
+
+    template<class T1, class T2>
+    struct promote_type<T1, std::complex<T2>> {
+        using type = std::complex<typename promote_type<T1, T2>::type>;
+    };
+
+    template<class T1, class T2>
+    struct promote_type<std::complex<T1>, T2>
+            : promote_type<T2, std::complex<T1>> {
+    };
+
+    template<class T>
+    struct promote_type<std::complex<T>, std::complex<T>> {
+        using type = std::complex<T>;
+    };
+
+    template<class T1, class T2>
+    struct promote_type<std::complex<T1>, std::complex<T2>> {
+        using type = std::complex<typename promote_type<T1, T2>::type>;
+    };
+
+    template<class... REST>
+    struct promote_type<bool, REST...> {
+        using type = typename promote_type<bool, typename promote_type<REST...>::type>::type;
+    };
+
+    /**
+     * Abbreviation of 'typename promote_type<T>::type'.
+     */
+    template<class... T>
+    using promote_type_t = typename promote_type<T...>::type;
+
+    /**
+     * Traits class to find the biggest type of the same kind.
+     *
+     * For example, <tt>big_promote_type<unsigned char>::type</tt> is <tt>unsigned long long</tt>.
+     * The default implementation only supports built-in types and <tt>std::complex</tt>. All
+     * other types remain unchanged unless <tt>big_promote_type</tt> gets specialized for them.
+     */
+    template<class T>
+    struct big_promote_type {
+    private:
+
+        using V = std::decay_t<T>;
+        static constexpr bool is_arithmetic = std::is_arithmetic<V>::value;
+        static constexpr bool is_signed = std::is_signed<V>::value;
+        static constexpr bool is_integral = std::is_integral<V>::value;
+        static constexpr bool is_long_double = std::is_same<V, long double>::value;
+
+    public:
+
+        using type = std::conditional_t<is_arithmetic,
+                std::conditional_t<is_integral,
+                        std::conditional_t<is_signed, long long, unsigned long long>,
+                        std::conditional_t<is_long_double, long double, double>
+                >,
+                V
+        >;
+    };
+
+    template<class T>
+    struct big_promote_type<std::complex<T>> {
+        using type = std::complex<typename big_promote_type<T>::type>;
+    };
+
+    /**
+     * Abbreviation of 'typename big_promote_type<T>::type'.
+     */
+    template<class T>
+    using big_promote_type_t = typename big_promote_type<T>::type;
+
+    namespace traits_detail {
+        using std::sqrt;
+
+        template<class T>
+        using real_promote_type_t = decltype(sqrt(std::declval<std::decay_t<T>>()));
+    }
+
+    /**
+     * Result type of algebraic expressions.
+     *
+     * For example, <tt>real_promote_type<int>::type</tt> tells the
+     * user that <tt>sqrt(int) => double</tt>.
+     */
+    template<class T>
+    struct real_promote_type {
+        using type = traits_detail::real_promote_type_t<T>;
+    };
+
+    /**
+     * Abbreviation of 'typename real_promote_type<T>::type'.
+     */
+    template<class T>
+    using real_promote_type_t = typename real_promote_type<T>::type;
+
+    /**
+     * Traits class to replace 'bool' with 'uint8_t' and keep everything else.
+     *
+     * This is useful for scientific computing, where a boolean mask array is
+     * usually implemented as an array of bytes.
+     */
+    template<class T>
+    struct bool_promote_type {
+        using type = typename std::conditional<std::is_same<T, bool>::value, uint8_t, T>::type;
+    };
+
+    /**
+     * Abbreviation for typename bool_promote_type<T>::type
+     */
+    template<class T>
+    using bool_promote_type_t = typename bool_promote_type<T>::type;
+
+    /************
+     * apply_cv *
+     ************/
+
+    namespace detail {
+        template<class T, class U, bool = std::is_const<std::remove_reference_t<T>>::value,
+                bool = std::is_volatile<std::remove_reference_t<T>>::value>
+        struct apply_cv_impl {
+            using type = U;
+        };
+
+        template<class T, class U>
+        struct apply_cv_impl<T, U, true, false> {
+            using type = const U;
+        };
+
+        template<class T, class U>
+        struct apply_cv_impl<T, U, false, true> {
+            using type = volatile U;
+        };
+
+        template<class T, class U>
+        struct apply_cv_impl<T, U, true, true> {
+            using type = const volatile U;
+        };
+
+        template<class T, class U>
+        struct apply_cv_impl<T &, U, false, false> {
+            using type = U &;
+        };
+
+        template<class T, class U>
+        struct apply_cv_impl<T &, U, true, false> {
+            using type = const U &;
+        };
+
+        template<class T, class U>
+        struct apply_cv_impl<T &, U, false, true> {
+            using type = volatile U &;
+        };
+
+        template<class T, class U>
+        struct apply_cv_impl<T &, U, true, true> {
+            using type = const volatile U &;
+        };
+    }
+
+    template<class T, class U>
+    struct apply_cv {
+        using type = typename detail::apply_cv_impl<T, U>::type;
+    };
+
+    template<class T, class U>
+    using apply_cv_t = typename apply_cv<T, U>::type;
+
+
+
+    /************
+     * concepts *
+     ************/
+
+#if !defined(__GNUC__) || (defined(__GNUC__) && (__GNUC__ >= 5))
+
+    template<class... C>
+    constexpr bool trubo_require = conjunction<C...>::value;
+
+    template<class... C>
+    constexpr bool either = disjunction<C...>::value;
+
+    template<class... C>
+    constexpr bool disallow = std::negation<std::conjunction<C...>>::value;
+
+    template<class... C>
+    constexpr bool disallow_one = std::negation<std::disjunction<C...>>::value;
+
+    template<class... C>
+    using check_requires = std::enable_if_t<trubo_require<C...>, int>;
+
+    template<class... C>
+    using check_either = std::enable_if_t<either<C...>, int>;
+
+    template<class... C>
+    using check_disallow = std::enable_if_t<disallow<C...>, int>;
+
+    template<class... C>
+    using check_disallow_one = std::enable_if_t<disallow_one<C...>, int>;
+
+#else
+
+    template <class... C>
+    using check_requires = std::enable_if_t<conjunction<C...>::value, int>;
+
+    template <class... C>
+    using check_either = std::enable_if_t<disjunction<C...>::value, int>;
+
+    template <class... C>
+    using check_disallow = std::enable_if_t<turbo::negation<turbo::conjunction<C...>>::value, int>;
+
+    template <class... C>
+    using check_disallow_one = std::enable_if_t<turbo::negation<turbo::disjunction<C...>>::value, int>;
+
+#endif
+
+#define TURBO_REQUIRES_IMPL(...) turbo::check_requires<__VA_ARGS__>
+#define TURBO_REQUIRES(...) TURBO_REQUIRES_IMPL(__VA_ARGS__) = 0
+
+#define TURBO_EITHER_IMPL(...) turbo::check_either<__VA_ARGS__>
+#define TURBO_EITHER(...) TURBO_EITHER_IMPL(__VA_ARGS__) = 0
+
+#define TURBO_DISALLOW_IMPL(...) turbo::check_disallow<__VA_ARGS__>
+#define TURBO_DISALLOW(...) TURBO_DISALLOW_IMPL(__VA_ARGS__) = 0
+
+#define TURBO_DISALLOW_ONE_IMPL(...) turbo::check_disallow_one<__VA_ARGS__>
+#define TURBO_DISALLOW_ONE(...) TURBO_DISALLOW_ONE_IMPL(__VA_ARGS__) = 0
+
+    // For backward compatibility
+    template<class... C>
+    using check_concept = check_requires<C...>;
+
+    /**************
+     * all_scalar *
+     **************/
+
+    template<class... Args>
+    struct all_scalar : conjunction<std::is_scalar<Args>...> {
+    };
+
+/************
+ * constify *
+ ************/
+
+// Adds const to the underlying type of a reference or pointer, or to the type itself
+// if it's not a reference nor a pointer
+
+    template<class T>
+    struct constify {
+        using type = std::add_const_t<T>;
+    };
+
+    template<class T>
+    struct constify<T *> {
+        using type = std::add_const_t<T> *;
+    };
+
+    template<class T>
+    struct constify<T &> {
+        using type = std::add_const_t<T> &;
+    };
+
+    template<class T>
+    using constify_t = typename constify<T>::type;
+
+    struct identity {
+        template<class T>
+        T &&operator()(T &&x) const {
+            return std::forward<T>(x);
+        }
+    };
+
+    /*************************
+     * select implementation *
+     *************************/
+
+    template<class B, class T1, class T2, TURBO_REQUIRES(all_scalar < B, T1, T2 >)>
+    inline std::common_type_t<T1, T2> select(const B &cond, const T1 &v1, const T2 &v2) noexcept {
+        return cond ? v1 : v2;
+    }
 }  // namespace turbo
 
 

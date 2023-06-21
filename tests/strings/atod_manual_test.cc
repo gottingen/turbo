@@ -40,12 +40,12 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <optional>
 
 #include "turbo/base/casts.h"
 #include "turbo/strings/numbers.h"
 #include "turbo/format/str_format.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/meta/optional.h"
 
 static constexpr uint8_t kUnhex[256] = {
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,  //
@@ -88,7 +88,7 @@ static constexpr uint8_t kUnhex[256] = {
 static std::optional<std::string> ReadFileToString(const char* filename) {
   FILE* f = fopen(filename, "rb");
   if (!f) {
-    return turbo::nullopt;
+    return std::nullopt;
   }
   fseek(f, 0, SEEK_END);
   size_t size = ftell(f);
@@ -97,7 +97,7 @@ static std::optional<std::string> ReadFileToString(const char* filename) {
   size_t n = fread(&s[0], 1, size, f);
   fclose(f);
   if (n != size) {
-    return turbo::nullopt;
+    return std::nullopt;
   }
   return s;
 }

@@ -61,6 +61,14 @@ carbin_cc_test(
 
 carbin_cc_test(
         NAME
+        dynamic_bitset_test
+        SOURCES
+        "dynamic_bitset_test.cc"
+        COPTS
+        ${CARBIN_TEST_COPTS}
+)
+carbin_cc_test(
+        NAME
         fixed_array_test
         SOURCES
         "fixed_array_test.cc"

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 #include "turbo/platform/config/attribute_optimization.h"
-
+#include <optional>
+#include "turbo/platform/port.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include "tests/doctest/doctest.h"
-#include "turbo/meta/optional.h"
 
 namespace {
 

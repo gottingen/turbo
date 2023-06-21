@@ -256,7 +256,7 @@ std::optional<uint32_t> GetSaltMaterial() {
       return salt_value;
     }
 
-    return turbo::nullopt;
+    return std::nullopt;
   }();
 
   return salt_material;

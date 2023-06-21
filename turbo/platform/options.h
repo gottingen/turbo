@@ -73,7 +73,7 @@
 //
 // TURBO_OPTION_USE_STD_ANY
 //
-// This option controls whether turbo::any is implemented as an alias to
+// This option controls whether std::any is implemented as an alias to
 // std::any, or as an independent implementation.
 //
 // A value of 0 means to use Turbo's implementation.  This requires only C++11
@@ -87,12 +87,12 @@
 // useful when you are building your entire program, including all of its
 // dependencies, from source.  It should not be used otherwise -- for example,
 // if you are distributing Turbo in a binary package manager -- since in
-// mode 2, turbo::any will name a different type, with a different mangled name
+// mode 2, std::any will name a different type, with a different mangled name
 // and binary layout, depending on the compiler flags passed by the end user.
 // For more info, see https://abseil.io/about/design/dropin-types.
 //
 // User code should not inspect this macro.  To check in the preprocessor if
-// turbo::any is a typedef of std::any, use the feature macro TURBO_USES_STD_ANY.
+// std::any is a typedef of std::any, use the feature macro TURBO_USES_STD_ANY.
 
 #define TURBO_OPTION_USE_STD_ANY 2
 

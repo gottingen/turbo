@@ -86,3 +86,15 @@ carbin_cc_test(
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )
+
+carbin_cc_test(
+        NAME
+        murmur_test
+        SOURCES
+        "murmur_test.cc"
+        COPTS
+        ${CARBIN_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        ${CARBIN_DEPS_LINK}
+)

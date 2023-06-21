@@ -26,1620 +26,1258 @@
 #include <cmath>
 #include <cassert>
 #include "turbo/base/bits.h"
-
+#include "turbo/meta/span.h"
+#include "turbo/meta/closure.h"
+#include "turbo/meta/iterator_base.h"
 
 namespace turbo {
 
+    template<class B, bool is_const>
+    class bitset_reference;
 
-    template<typename Block = unsigned long long, typename Allocator = std::allocator<Block>>
-    class dynamic_bitset {
-        static_assert(std::is_unsigned<Block>::value, "Block is not an unsigned integral type");
+    template<class B, bool is_const>
+    class bitset_iterator;
 
-    public:
-        typedef size_t size_type;
-        typedef Block block_type;
-        typedef Allocator allocator_type;
-        static constexpr size_type bits_per_block = std::numeric_limits<block_type>::digits;
-        static constexpr size_type npos = std::numeric_limits<size_type>::max();
+    /******************
+     * dyamic_bitset *
+     ******************/
 
-        class reference {
-        public:
-            constexpr reference(dynamic_bitset<Block, Allocator> &bitset, size_type bit_pos);
+    template<class B>
+    class dynamic_bitset_base;
 
-            constexpr reference(const reference &) noexcept = default;
+    template<class B, class A>
+    class dynamic_bitset;
 
-            constexpr reference(reference &&) noexcept = default;
+    template<class X>
+    class dynamic_bitset_view;
 
-            ~reference() noexcept = default;
+    template<class X>
+    struct dynamic_bitset_traits;
 
-            constexpr reference &operator=(bool v);
-
-            constexpr reference &operator=(const reference &rhs);
-
-            constexpr reference &operator=(reference &&rhs) noexcept;
-
-            constexpr reference &operator&=(bool v);
-
-            constexpr reference &operator|=(bool v);
-
-            constexpr reference &operator^=(bool v);
-
-            constexpr reference &operator-=(bool v);
-
-            [[nodiscard]] constexpr bool operator~() const;
-
-            [[nodiscard]] constexpr operator bool() const;
-
-            constexpr void operator&() = delete;
-
-            constexpr reference &set();
-            constexpr reference &reset();
-            constexpr reference &flip();
-            constexpr reference &assign(bool v);
-
-        private:
-            block_type &m_block;
-            block_type m_mask;
-        };
-
-        typedef bool const_reference;
-
-        constexpr dynamic_bitset(const dynamic_bitset<Block, Allocator> &other) = default;
-
-        constexpr dynamic_bitset(dynamic_bitset<Block, Allocator> &&other) noexcept = default;
-
-        constexpr dynamic_bitset<Block, Allocator> &operator=(
-                const dynamic_bitset<Block, Allocator> &other) = default;
-
-        constexpr dynamic_bitset<Block, Allocator> &operator=(
-                dynamic_bitset<Block, Allocator> &&other) noexcept = default;
-
-        constexpr explicit dynamic_bitset(const allocator_type &allocator = allocator_type());
-
-        constexpr explicit dynamic_bitset(size_type nbits,
-                                          unsigned long long init_val = 0,
-                                          const allocator_type &allocator = allocator_type());
-
-        constexpr dynamic_bitset(std::initializer_list<block_type> init_vals,
-                                 const allocator_type &allocator = allocator_type());
-
-        template<typename _CharT, typename _Traits>
-        constexpr explicit dynamic_bitset(
-                std::basic_string_view<_CharT, _Traits> str,
-                typename std::basic_string_view<_CharT, _Traits>::size_type pos = 0,
-                typename std::basic_string_view<_CharT, _Traits>::size_type n =
-                std::basic_string_view<_CharT, _Traits>::npos,
-                _CharT zero = _CharT('0'),
-                _CharT one = _CharT('1'),
-                const allocator_type &allocator = allocator_type());
-
-        template<typename _CharT, typename _Traits, typename _Alloc>
-        constexpr explicit dynamic_bitset(
-                const std::basic_string<_CharT, _Traits, _Alloc> &str,
-                typename std::basic_string<_CharT, _Traits, _Alloc>::size_type pos = 0,
-                typename std::basic_string<_CharT, _Traits, _Alloc>::size_type n =
-                std::basic_string<_CharT, _Traits, _Alloc>::npos,
-                _CharT zero = _CharT('0'),
-                _CharT one = _CharT('1'),
-                const allocator_type &allocator = allocator_type());
-
-        template<typename _CharT, typename _Traits = std::char_traits<_CharT>>
-        constexpr explicit dynamic_bitset(
-                const _CharT *str,
-                typename std::basic_string<_CharT>::size_type pos = 0,
-                typename std::basic_string<_CharT>::size_type n = std::basic_string<_CharT>::npos,
-                _CharT zero = _CharT('0'),
-                _CharT one = _CharT('1'),
-                const allocator_type &allocator = allocator_type());
-
-        ~dynamic_bitset() noexcept = default;
-
-        constexpr void resize(size_type nbits, bool value = false);
-
-        constexpr void clear();
-
-        constexpr void push_back(bool value);
-
-        constexpr void pop_back();
-
-        constexpr void append(block_type block);
-
-        constexpr void append(std::initializer_list<block_type> blocks);
-
-        template<typename BlockInputIterator>
-        constexpr void append(BlockInputIterator first, BlockInputIterator last);
-
-        constexpr dynamic_bitset<Block, Allocator> &operator&=(
-                const dynamic_bitset<Block, Allocator> &rhs);
-
-        constexpr dynamic_bitset<Block, Allocator> &operator|=(
-                const dynamic_bitset<Block, Allocator> &rhs);
-
-        constexpr dynamic_bitset<Block, Allocator> &operator^=(
-                const dynamic_bitset<Block, Allocator> &rhs);
-
-        constexpr dynamic_bitset<Block, Allocator> &operator-=(
-                const dynamic_bitset<Block, Allocator> &rhs);
-
-        constexpr dynamic_bitset<Block, Allocator> &operator<<=(size_type shift);
-
-        constexpr dynamic_bitset<Block, Allocator> &operator>>=(size_type shift);
-
-        [[nodiscard]] constexpr dynamic_bitset<Block, Allocator> operator<<(size_type shift) const;
-
-        [[nodiscard]] constexpr dynamic_bitset<Block, Allocator> operator>>(size_type shift) const;
-
-        [[nodiscard]] constexpr dynamic_bitset<Block, Allocator> operator~() const;
-
-        constexpr dynamic_bitset<Block, Allocator> &set(size_type pos, size_type len, bool value);
-
-        constexpr dynamic_bitset<Block, Allocator> &set(size_type pos, bool value = true);
-
-        constexpr dynamic_bitset<Block, Allocator> &set();
-
-        constexpr dynamic_bitset<Block, Allocator> &reset(size_type pos, size_type len);
-
-        constexpr dynamic_bitset<Block, Allocator> &reset(size_type pos);
-
-        constexpr dynamic_bitset<Block, Allocator> &reset();
-
-        constexpr dynamic_bitset<Block, Allocator> &flip(size_type pos, size_type len);
-
-        constexpr dynamic_bitset<Block, Allocator> &flip(size_type pos);
-        constexpr dynamic_bitset<Block, Allocator> &flip();
-
-        [[nodiscard]] constexpr bool test(size_type pos) const;
-
-        [[nodiscard]] constexpr bool test_set(size_type pos, bool value = true);
-
-        [[nodiscard]] constexpr bool all() const;
-
-        [[nodiscard]] constexpr bool any() const;
-
-        [[nodiscard]] constexpr bool none() const;
-
-        [[nodiscard]] constexpr size_type count() const noexcept;
-
-        [[nodiscard]] constexpr reference operator[](size_type pos);
-
-        [[nodiscard]] constexpr const_reference operator[](size_type pos) const;
-
-        [[nodiscard]] constexpr size_type size() const noexcept;
-
-        [[nodiscard]] constexpr size_type num_blocks() const noexcept;
-
-        [[nodiscard]] constexpr size_type num_bytes() const noexcept;
-
-        [[nodiscard]] constexpr bool empty() const noexcept;
-
-        [[nodiscard]] constexpr size_type capacity() const noexcept;
-
-        constexpr void reserve(size_type num_bits);
-
-        constexpr void shrink_to_fit();
-
-        [[nodiscard]] constexpr bool is_subset_of(const dynamic_bitset<Block, Allocator> &bitset) const;
-
-        [[nodiscard]] constexpr bool is_proper_subset_of(
-                const dynamic_bitset<Block, Allocator> &bitset) const;
-
-        [[nodiscard]] constexpr bool intersects(const dynamic_bitset<Block, Allocator> &bitset) const;
-
-
-        [[nodiscard]] constexpr size_type find_first() const;
-
-
-        [[nodiscard]] constexpr size_type find_next(size_type prev) const;
-
-        constexpr void swap(dynamic_bitset<Block, Allocator> &other);
-
-        [[nodiscard]] constexpr allocator_type get_allocator() const;
-
-        template<typename _CharT = char,
-                typename _Traits = std::char_traits<_CharT>,
-                typename _Alloc = std::allocator<_CharT>>
-        [[nodiscard]] constexpr std::basic_string<_CharT, _Traits, _Alloc> to_string(
-                _CharT zero = _CharT('0'),
-                _CharT one = _CharT('1')) const;
-
-        template<typename Function, typename... Parameters>
-        constexpr void iterate_bits_on(Function &&function, Parameters &&... parameters) const;
-
-        [[nodiscard]] constexpr block_type *data() noexcept;
-
-        [[nodiscard]] constexpr const block_type *data() const noexcept;
-
-        template<typename Block_, typename Allocator_>
-        friend constexpr bool operator==(const dynamic_bitset<Block_, Allocator_> &lhs,
-                                         const dynamic_bitset<Block_, Allocator_> &rhs);
-
-        template<typename Block_, typename Allocator_>
-        friend constexpr bool operator<(const dynamic_bitset<Block_, Allocator_> &lhs,
-                                        const dynamic_bitset<Block_, Allocator_> &rhs);
-
-    private:
-        template<typename T>
-        struct dependent_false : public std::false_type {
-        };
-
-        std::vector<Block, Allocator> m_blocks;
-        size_type m_bits_number;
-
-        static constexpr block_type zero_block = block_type(0);
-        static constexpr block_type one_block = block_type(~zero_block);
-        static constexpr size_type block_last_bit_index = bits_per_block - 1;
-
-        static constexpr size_type blocks_required(size_type nbits) noexcept;
-
-        static constexpr size_type block_index(size_type pos) noexcept;
-
-        static constexpr size_type bit_index(size_type pos) noexcept;
-
-        static constexpr block_type bit_mask(size_type pos) noexcept;
-
-        static constexpr block_type bit_mask(size_type first, size_type last) noexcept;
-
-        static constexpr void set_block_bits(block_type &block,
-                                             size_type first,
-                                             size_type last,
-                                             bool val = true) noexcept;
-
-        static constexpr void flip_block_bits(block_type &block,
-                                              size_type first,
-                                              size_type last) noexcept;
-
-        static constexpr size_type block_count(const block_type &block) noexcept;
-
-        static constexpr size_type block_count(const block_type &block, size_type nbits) noexcept;
-
-        static constexpr size_type count_block_trailing_zero(const block_type &block) noexcept;
-
-        template<typename _CharT, typename _Traits>
-        constexpr void init_from_string(std::basic_string_view<_CharT, _Traits> str,
-                                        typename std::basic_string_view<_CharT, _Traits>::size_type pos,
-                                        typename std::basic_string_view<_CharT, _Traits>::size_type n,
-                                        _CharT zero,
-                                        _CharT one);
-
-        constexpr block_type &get_block(size_type pos);
-
-        constexpr const block_type &get_block(size_type pos) const;
-
-        constexpr block_type &last_block();
-
-        constexpr block_type last_block() const;
-
-        // used bits in the last block
-        constexpr size_type extra_bits_number() const noexcept;
-
-        // unused bits in the last block
-        constexpr size_type unused_bits_number() const noexcept;
-
-        template<typename BinaryOperation>
-        constexpr void apply(const dynamic_bitset<Block, Allocator> &other, BinaryOperation binary_op);
-
-        template<typename UnaryOperation>
-        constexpr void apply(UnaryOperation unary_op);
-
-        constexpr void apply_left_shift(size_type shift);
-
-        constexpr void apply_right_shift(size_type shift);
-
-        // reset unused bits to 0
-        constexpr void sanitize();
-
-        // check functions used in asserts
-        constexpr bool check_unused_bits() const noexcept;
-
-        constexpr bool check_size() const noexcept;
-
-        constexpr bool check_consistency() const noexcept;
+    template<class B, class A>
+    struct dynamic_bitset_traits<dynamic_bitset<B, A>> {
+        using storage_type = std::vector<B, A>;
+        using block_type = typename storage_type::value_type;
     };
 
-    // Deduction guideline for expressions like "dynamic_bitset a(32);" with an integral type as parameter
-    // to use the constructor with the initial size instead of the constructor with the allocator.
-    template<typename integral_type, typename = std::enable_if_t<std::is_integral_v<integral_type>>>
-    dynamic_bitset(integral_type) -> dynamic_bitset<>;
+    template<class X>
+    struct dynamic_bitset_traits<dynamic_bitset_view<X>> {
+        using storage_type = turbo::Span<X>;
+        using block_type = typename storage_type::value_type;
+    };
 
-    //=================================================================================================
-    // dynamic_bitset external functions declarations
-    //=================================================================================================
+    template<class X>
+    struct container_internals;
 
-    template<typename Block, typename Allocator>
-    constexpr bool operator!=(const dynamic_bitset<Block, Allocator> &lhs,
-                              const dynamic_bitset<Block, Allocator> &rhs);
+    template<class X>
+    struct container_internals<turbo::Span<X>> {
+        using value_type = typename turbo::Span<X>::value_type;
+        static_assert(std::is_scalar<value_type>::value, "");
+        using allocator_type = std::allocator<value_type>;
+        using size_type = std::size_t;
+        using difference_type = typename turbo::Span<X>::difference_type;
+    };
 
-    template<typename Block, typename Allocator>
-    constexpr bool operator<=(const dynamic_bitset<Block, Allocator> &lhs,
-                              const dynamic_bitset<Block, Allocator> &rhs);
+    template<class X, class A>
+    struct container_internals<std::vector<X, A>> {
+        using value_type = X;
+        static_assert(std::is_scalar<value_type>::value, "");
+        using allocator_type = A;
+        using size_type = typename std::vector<X>::size_type;
+        using difference_type = typename std::vector<X>::difference_type;
+    };
 
-    template<typename Block, typename Allocator>
-    constexpr bool operator>(const dynamic_bitset<Block, Allocator> &lhs,
-                             const dynamic_bitset<Block, Allocator> &rhs);
+    template<class B>
+    class dynamic_bitset_base {
+    public:
 
-    template<typename Block, typename Allocator>
-    constexpr bool operator>=(const dynamic_bitset<Block, Allocator> &lhs,
-                              const dynamic_bitset<Block, Allocator> &rhs);
+        using self_type = dynamic_bitset_base<B>;
+        using derived_class = B;
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator&(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs);
+        using storage_type = typename dynamic_bitset_traits<B>::storage_type;
+        using block_type = typename dynamic_bitset_traits<B>::block_type;
+        using temporary_type = dynamic_bitset<block_type, std::allocator<block_type>>;
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator|(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs);
+        using allocator_type = typename container_internals<storage_type>::allocator_type;
+        using value_type = bool;
+        using reference = bitset_reference<derived_class, false>;
+        using const_reference = bitset_reference<derived_class, true>;
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator^(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs);
+        using pointer = typename reference::pointer;
+        using const_pointer = typename const_reference::pointer;
+        using size_type = typename container_internals<storage_type>::size_type;
+        using difference_type = typename storage_type::difference_type;
+        using iterator = bitset_iterator<derived_class, false>;
+        using const_iterator = bitset_iterator<derived_class, true>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator-(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs);
+        using const_block_iterator = typename storage_type::const_iterator;
 
-    template<typename _CharT, typename _Traits, typename Block, typename Allocator>
-    constexpr std::basic_ostream<_CharT, _Traits> &operator<<(
-            std::basic_ostream<_CharT, _Traits> &os,
-            const dynamic_bitset<Block, Allocator> &bitset);
+        bool empty() const noexcept;
 
-    template<typename _CharT, typename _Traits, typename Block, typename Allocator>
-    constexpr std::basic_istream<_CharT, _Traits> &operator>>(std::basic_istream<_CharT, _Traits> &is,
-                                                              dynamic_bitset<Block, Allocator> &bitset);
+        size_type size() const noexcept;
 
-    template<typename Block, typename Allocator>
-    constexpr void swap(dynamic_bitset<Block, Allocator> &bitset1,
-                        dynamic_bitset<Block, Allocator> &bitset2);
+        void swap(self_type &rhs);
 
-    //=================================================================================================
-    // dynamic_bitset::reference functions implementations
-    //=================================================================================================
+        reference at(size_type i);
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator>::reference::reference(
-            dynamic_bitset<Block, Allocator> &bitset,
-            size_type bit_pos)
-            : m_block(bitset.get_block(bit_pos)), m_mask(dynamic_bitset<Block, Allocator>::bit_mask(bit_pos)) {
+        const_reference at(size_type i) const;
+
+        reference operator[](size_type i);
+
+        const_reference operator[](size_type i) const;
+
+        reference front();
+
+        const_reference front() const;
+
+        reference back();
+
+        const_reference back() const;
+
+        iterator begin() noexcept;
+
+        iterator end() noexcept;
+
+        const_iterator begin() const noexcept;
+
+        const_iterator end() const noexcept;
+
+        const_iterator cbegin() const noexcept;
+
+        const_iterator cend() const noexcept;
+
+        reverse_iterator rbegin() noexcept;
+
+        reverse_iterator rend() noexcept;
+
+        const_reverse_iterator rbegin() const noexcept;
+
+        const_reverse_iterator rend() const noexcept;
+
+        const_reverse_iterator crbegin() const noexcept;
+
+        const_reverse_iterator crend() const noexcept;
+
+        const_block_iterator block_begin() const noexcept;
+
+        const_block_iterator block_end() const noexcept;
+
+        template<class R>
+        self_type &operator&=(const dynamic_bitset_base<R> &rhs);
+
+        template<class R>
+        self_type &operator|=(const dynamic_bitset_base<R> &rhs);
+
+        template<class R>
+        self_type &operator^=(const dynamic_bitset_base<R> &rhs);
+
+        temporary_type operator<<(size_type pos);
+
+        self_type &operator<<=(size_type pos);
+
+        temporary_type operator>>(size_type pos);
+
+        self_type &operator>>=(size_type pos);
+
+        self_type &set();
+
+        self_type &set(size_type pos, value_type value = true);
+
+        self_type &reset();
+
+        self_type &reset(size_type pos);
+
+        self_type &flip();
+
+        self_type &flip(size_type pos);
+
+        bool all() const noexcept;
+
+        bool any() const noexcept;
+
+        bool none() const noexcept;
+
+        size_type count() const noexcept;
+
+        size_type block_count() const noexcept;
+
+        block_type *data() noexcept;
+
+        const block_type *data() const noexcept;
+
+        template<class Y>
+        bool operator==(const dynamic_bitset_base<Y> &rhs) const noexcept;
+
+        template<class Y>
+        bool operator!=(const dynamic_bitset_base<Y> &rhs) const noexcept;
+
+        derived_class &derived_cast();
+
+        const derived_class &derived_cast() const;
+
+    protected:
+
+        dynamic_bitset_base(const storage_type &buffer, std::size_t size);
+
+        ~dynamic_bitset_base() = default;
+
+        dynamic_bitset_base(const dynamic_bitset_base &rhs) = default;
+
+        dynamic_bitset_base(dynamic_bitset_base &&rhs) = default;
+
+        dynamic_bitset_base &operator=(const dynamic_bitset_base &rhs) = default;
+
+        dynamic_bitset_base &operator=(dynamic_bitset_base &&rhs) = default;
+
+        size_type m_size;
+        storage_type m_buffer;
+
+        static constexpr std::size_t s_bits_per_block = CHAR_BIT * sizeof(block_type);
+
+        size_type compute_block_count(size_type bits_count) const noexcept;
+
+        size_type block_index(size_type pos) const noexcept;
+
+        size_type bit_index(size_type pos) const noexcept;
+
+        block_type bit_mask(size_type pos) const noexcept;
+
+        size_type count_extra_bits() const noexcept;
+
+        void zero_unused_bits();
+
+    private:
+
+        // Make views and buffers friends
+        template<typename BB>
+        friend
+        class dynamic_bitset_base;
+    };
+
+// NOTE this view ZEROS out remaining bits!
+    template<class X>
+    class dynamic_bitset_view
+            : public dynamic_bitset_base<dynamic_bitset_view<X>> {
+    public:
+
+        using base_class = dynamic_bitset_base<dynamic_bitset_view<X>>;
+        using storage_type = typename base_class::storage_type;
+        using block_type = typename base_class::block_type;
+
+        dynamic_bitset_view(block_type *ptr, std::size_t size);
+
+        dynamic_bitset_view() = default;
+
+        ~dynamic_bitset_view() = default;
+
+        dynamic_bitset_view(const dynamic_bitset_view &rhs) = default;
+
+        dynamic_bitset_view(dynamic_bitset_view &&rhs) = default;
+
+        dynamic_bitset_view &operator=(const dynamic_bitset_view &rhs) = default;
+
+        dynamic_bitset_view &operator=(dynamic_bitset_view &&rhs) = default;
+
+        void resize(std::size_t sz);
+    };
+
+    namespace detail_bitset {
+        template<class T>
+        constexpr T integer_ceil(T n, T div) {
+            return (n + div - T(1)) / div;
+        }
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::operator=(bool v) {
-        assign(v);
+    template<class X>
+    inline dynamic_bitset_view<X>::dynamic_bitset_view(block_type *ptr, std::size_t size)
+            : base_class(storage_type(ptr, detail_bitset::integer_ceil(size, base_class::s_bits_per_block)), size) {
+        base_class::zero_unused_bits();
+    }
+
+    template<class X>
+    inline void dynamic_bitset_view<X>::resize(std::size_t sz) {
+        if (sz != this->m_size) {
+#if defined(XTL_NO_EXCEPTIONS)
+            std::fprintf(stderr, "cannot resize bitset_view\n");
+        std::terminate();
+#else
+            throw std::runtime_error("cannot resize bitset_view");
+#endif
+        }
+    }
+
+    template<class B, class A = std::allocator<B>>
+    class dynamic_bitset;
+
+    template<class B>
+    auto operator~(const dynamic_bitset_base<B> &lhs);
+
+    template<class L, class R>
+    auto operator&(const dynamic_bitset_base<L> &lhs, const dynamic_bitset_base<R> &rhs);
+
+    template<class L, class R>
+    auto operator|(const dynamic_bitset_base<L> &lhs, const dynamic_bitset_base<R> &rhs);
+
+    template<class L, class R>
+    auto operator^(const dynamic_bitset_base<L> &lhs, const dynamic_bitset_base<R> &rhs);
+
+    template<class B>
+    void swap(const dynamic_bitset_base<B> &lhs, const dynamic_bitset_base<B> &rhs);
+
+/*********************
+ * bitset_reference *
+ *********************/
+
+    template<class B, bool is_const>
+    class bitset_reference {
+    public:
+
+        using self_type = bitset_reference<B, is_const>;
+        using pointer = std::conditional_t<is_const,
+                const closure_pointer<const self_type>,
+                closure_pointer<self_type>>;
+
+        operator bool() const noexcept;
+
+        bitset_reference(const self_type &) = default;
+
+        bitset_reference(self_type &&) = default;
+
+        self_type &operator=(const self_type &) noexcept;
+
+        self_type &operator=(self_type &&) noexcept;
+
+        self_type &operator=(bool) noexcept;
+
+        bool operator~() const noexcept;
+
+        self_type &operator&=(bool) noexcept;
+
+        self_type &operator|=(bool) noexcept;
+
+        self_type &operator^=(bool) noexcept;
+
+        self_type &flip() noexcept;
+
+        pointer operator&() noexcept;
+
+    private:
+
+        using block_type = typename dynamic_bitset_traits<B>::block_type;
+        using closure_type = std::conditional_t<is_const, const block_type &, block_type &>;
+
+        bitset_reference(closure_type block, block_type pos);
+
+        void assign(bool) noexcept;
+
+        void set() noexcept;
+
+        void reset() noexcept;
+
+        closure_type m_block;
+        const block_type m_mask;
+
+        template<class BO, bool is_const_other>
+        friend
+        class bitset_reference;
+
+        friend class dynamic_bitset_base<B>;
+    };
+
+/********************
+ * bitset_iterator *
+ ********************/
+
+    template<class B, bool is_const>
+    class bitset_iterator : public random_access_iterator_base<bitset_iterator<B, is_const>,
+            typename dynamic_bitset_base<B>::value_type,
+            typename dynamic_bitset_base<B>::difference_type,
+            std::conditional_t<is_const,
+                    typename dynamic_bitset_base<B>::const_pointer,
+                    typename dynamic_bitset_base<B>::pointer>,
+            std::conditional_t<is_const,
+                    typename dynamic_bitset_base<B>::const_reference,
+                    typename dynamic_bitset_base<B>::reference>> {
+    public:
+
+        using self_type = bitset_iterator<B, is_const>;
+        using container_type = dynamic_bitset_base<B>;
+        using value_type = typename container_type::value_type;
+        using reference = std::conditional_t<is_const,
+                typename container_type::const_reference,
+                typename container_type::reference>;
+        using pointer = std::conditional_t<is_const,
+                typename container_type::const_pointer,
+                typename container_type::pointer>;
+        using size_type = typename container_type::size_type;
+        using difference_type = typename container_type::difference_type;
+        using base_type = random_access_iterator_base<self_type, value_type, difference_type, pointer, reference>;
+
+        using container_reference = std::conditional_t<is_const, const container_type &, container_type &>;
+        using container_pointer = std::conditional_t<is_const, const container_type *, container_type *>;
+
+        bitset_iterator() noexcept;
+
+        bitset_iterator(container_reference c, size_type index) noexcept;
+
+        self_type &operator++();
+
+        self_type &operator--();
+
+        self_type &operator+=(difference_type n);
+
+        self_type &operator-=(difference_type n);
+
+        difference_type operator-(const self_type &rhs) const;
+
+        reference operator*() const;
+
+        pointer operator->() const;
+
+        bool operator==(const self_type &rhs) const;
+
+        bool operator<(const self_type &rhs) const;
+
+    private:
+
+        container_pointer p_container;
+        size_type m_index;
+    };
+
+    template<class B, class Allocator>
+    class dynamic_bitset
+            : public dynamic_bitset_base<dynamic_bitset<B, Allocator>> {
+    public:
+
+        using allocator_type = Allocator;
+        using storage_type = std::vector<B, Allocator>;
+
+        using base_type = dynamic_bitset_base<dynamic_bitset<B, Allocator>>;
+        using self_type = dynamic_bitset<B, Allocator>;
+        using block_type = B;
+
+        using reference = typename base_type::reference;
+        using const_reference = typename base_type::const_reference;
+
+        using pointer = typename reference::pointer;
+        using const_pointer = typename const_reference::pointer;
+        using size_type = typename storage_type::size_type;
+        using difference_type = typename storage_type::difference_type;
+        using iterator = bitset_iterator<self_type, false>;
+        using const_iterator = bitset_iterator<self_type, true>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+        using base_type::base_type;
+        using base_type::begin;
+        using base_type::cbegin;
+        using base_type::end;
+        using base_type::cend;
+        using base_type::rbegin;
+        using base_type::rend;
+        using base_type::size;
+
+        dynamic_bitset();
+
+        explicit dynamic_bitset(const allocator_type &allocator);
+
+        dynamic_bitset(size_type count, bool b, const allocator_type &alloc = allocator_type());
+
+        explicit dynamic_bitset(size_type count, const allocator_type &alloc = allocator_type());
+
+        dynamic_bitset(std::initializer_list<bool> init, const allocator_type &alloc = allocator_type());
+
+        template<class BlockInputIt>
+        dynamic_bitset(BlockInputIt first, BlockInputIt last, const allocator_type &alloc = allocator_type());
+
+        dynamic_bitset(const dynamic_bitset &rhs);
+
+        // Allow creation from views for e.g. temporary creation
+        template<class Y>
+        dynamic_bitset(const dynamic_bitset_base<Y> &rhs);
+
+        ~dynamic_bitset() = default;
+
+        dynamic_bitset(dynamic_bitset &&rhs) = default;
+
+        dynamic_bitset &operator=(const dynamic_bitset &rhs) = default;
+
+        dynamic_bitset &operator=(dynamic_bitset &&rhs) = default;
+
+        void assign(size_type count, bool b);
+
+        template<class BlockInputIt>
+        void assign(BlockInputIt first, BlockInputIt last);
+
+        void assign(std::initializer_list<bool> init);
+
+        size_type max_size() const noexcept;
+
+        void reserve(size_type new_cap);
+
+        size_type capacity() const noexcept;
+
+        allocator_type get_allocator() const;
+
+        void resize(size_type size, bool b = false);
+
+        void clear() noexcept;
+
+        void push_back(bool b);
+
+        void pop_back();
+    };
+
+/**********************************
+ * dynamic_bitset implementation *
+ **********************************/
+
+    template<class B, class A>
+    inline dynamic_bitset<B, A>::dynamic_bitset()
+            : base_type(storage_type(), size_type(0)) {
+    }
+
+    template<class B, class A>
+    inline dynamic_bitset<B, A>::dynamic_bitset(const allocator_type &allocator)
+            : base_type(storage_type(allocator), size_type(0)) {
+    }
+
+    template<class B, class A>
+    inline dynamic_bitset<B, A>::dynamic_bitset(size_type count, bool b, const allocator_type &alloc)
+            : base_type(storage_type(this->compute_block_count(count), b ? ~block_type(0) : block_type(0), alloc),
+                        count) {
+        this->zero_unused_bits();
+    }
+
+    template<class B, class A>
+    inline dynamic_bitset<B, A>::dynamic_bitset(size_type count, const allocator_type &alloc)
+            : base_type(storage_type(this->compute_block_count(count), block_type(0), alloc), count) {
+    }
+
+    template<class B, class A>
+    template<class BlockInputIt>
+    inline dynamic_bitset<B, A>::dynamic_bitset(BlockInputIt first, BlockInputIt last, const allocator_type &alloc)
+            : base_type(storage_type(first, last, alloc),
+                        size_type(std::distance(first, last)) * base_type::s_bits_per_block) {
+    }
+
+    template<class B, class A>
+    inline dynamic_bitset<B, A>::dynamic_bitset(std::initializer_list<bool> init, const allocator_type &alloc)
+            : dynamic_bitset(init.size(), alloc) {
+        std::copy(init.begin(), init.end(), begin());
+    }
+
+    template<class B, class A>
+    inline dynamic_bitset<B, A>::dynamic_bitset(const dynamic_bitset &rhs)
+            : base_type(storage_type(rhs.block_begin(), rhs.block_end()), rhs.size()) {
+    }
+
+    template<class B, class A>
+    template<class Y>
+    inline dynamic_bitset<B, A>::dynamic_bitset(const dynamic_bitset_base<Y> &rhs)
+            : base_type(storage_type(rhs.block_begin(), rhs.block_end()), rhs.size()) {
+    }
+
+    template<class B, class A>
+    inline void dynamic_bitset<B, A>::assign(size_type count, bool b) {
+        resize(count);
+        b ? this->set() : this->reset();
+    }
+
+    template<class B, class A>
+    template<class BlockInputIt>
+    inline void dynamic_bitset<B, A>::assign(BlockInputIt first, BlockInputIt last) {
+        resize(size_type(std::distance(first, last)) * base_type::s_bits_per_block);
+        std::copy(first, last, this->m_buffer.begin());
+    }
+
+    template<class B, class A>
+    inline void dynamic_bitset<B, A>::assign(std::initializer_list<bool> init) {
+        resize(init.size());
+        std::copy(init.begin(), init.end(), begin());
+    }
+
+    template<class B, class A>
+    inline auto dynamic_bitset<B, A>::get_allocator() const -> allocator_type {
+        return base_type::m_buffer.get_allocator();
+    }
+
+    template<class B>
+    inline bool dynamic_bitset_base<B>::empty() const noexcept {
+        return m_size == 0;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::size() const noexcept -> size_type {
+        return m_size;
+    }
+
+    template<class B, class A>
+    inline auto dynamic_bitset<B, A>::max_size() const noexcept -> size_type {
+        return base_type::m_buffer.max_size() * base_type::s_bits_per_block;
+    }
+
+    template<class B, class A>
+    inline void dynamic_bitset<B, A>::reserve(size_type new_cap) {
+        base_type::m_buffer.reserve(this->compute_block_count(new_cap));
+    }
+
+    template<class B, class A>
+    inline auto dynamic_bitset<B, A>::capacity() const noexcept -> size_type {
+        return base_type::m_buffer.capacity() * base_type::s_bits_per_block;
+    }
+
+    template<class B, class A>
+    inline void dynamic_bitset<B, A>::resize(size_type asize, bool b) {
+        size_type old_block_count = base_type::block_count();
+        size_type new_block_count = base_type::compute_block_count(asize);
+        block_type value = b ? ~block_type(0) : block_type(0);
+
+        if (new_block_count != old_block_count) {
+            base_type::m_buffer.resize(new_block_count, value);
+        }
+
+        if (b && asize > base_type::m_size) {
+            size_type extra_bits = base_type::count_extra_bits();
+            if (extra_bits > 0) {
+                base_type::m_buffer[old_block_count - 1] |= (value << extra_bits);
+            }
+        }
+
+        base_type::m_size = asize;
+        base_type::zero_unused_bits();
+    }
+
+    template<class B, class A>
+    inline void dynamic_bitset<B, A>::clear() noexcept {
+        base_type::m_buffer.clear();
+        base_type::m_size = size_type(0);
+    }
+
+    template<class B, class A>
+    inline void dynamic_bitset<B, A>::push_back(bool b) {
+        size_type s = size();
+        resize(s + 1);
+        this->set(s, b);
+    }
+
+    template<class B, class A>
+    inline void dynamic_bitset<B, A>::pop_back() {
+        size_type old_block_count = base_type::m_buffer.size();
+        size_type new_block_count = base_type::compute_block_count(base_type::m_size - 1);
+
+        if (new_block_count != old_block_count) {
+            base_type::m_buffer.pop_back();
+        }
+
+        --base_type::m_size;
+        base_type::zero_unused_bits();
+    }
+
+    template<class B>
+    inline void dynamic_bitset_base<B>::swap(self_type &rhs) {
+        using std::swap;
+        swap(m_buffer, rhs.m_buffer);
+        swap(m_size, rhs.m_size);
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::at(size_type i) -> reference {
+        // TODO add real check, remove m_buffer.at ...
+        return reference(m_buffer.at(block_index(i)), bit_index(i));
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::at(size_type i) const -> const_reference {
+        // TODO add real check, remove m_buffer.at ...
+        return const_reference(m_buffer.at(block_index(i)), bit_index(i));
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::operator[](size_type i) -> reference {
+        return reference(m_buffer[block_index(i)], bit_index(i));
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::operator[](size_type i) const -> const_reference {
+        return const_reference(m_buffer[block_index(i)], bit_index(i));
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::front() -> reference {
+        return (*this)[0];
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::front() const -> const_reference {
+        return (*this)[0];
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::back() -> reference {
+        return (*this)[m_size - 1];
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::back() const -> const_reference {
+        return (*this)[m_size - 1];
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::begin() noexcept -> iterator {
+        return iterator(*this, size_type(0));
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::end() noexcept -> iterator {
+        return iterator(*this, size());
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::begin() const noexcept -> const_iterator {
+        return cbegin();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::end() const noexcept -> const_iterator {
+        return cend();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::cbegin() const noexcept -> const_iterator {
+        return const_iterator(*this, size_type(0));
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::cend() const noexcept -> const_iterator {
+        return const_iterator(*this, size());
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::rbegin() noexcept -> reverse_iterator {
+        return reverse_iterator(end());
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::rend() noexcept -> reverse_iterator {
+        return reverse_iterator(begin());
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::rbegin() const noexcept -> const_reverse_iterator {
+        return crbegin();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::rend() const noexcept -> const_reverse_iterator {
+        return crend();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::crbegin() const noexcept -> const_reverse_iterator {
+        return const_reverse_iterator(cend());
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::crend() const noexcept -> const_reverse_iterator {
+        return const_reverse_iterator(cbegin());
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::block_begin() const noexcept -> const_block_iterator {
+        return m_buffer.begin();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::block_end() const noexcept -> const_block_iterator {
+        return m_buffer.end();
+    }
+
+    template<class B>
+    template<class R>
+    inline auto dynamic_bitset_base<B>::operator&=(const dynamic_bitset_base<R> &rhs) -> self_type & {
+        size_type size = block_count();
+        for (size_type i = 0; i < size; ++i) {
+            m_buffer[i] &= rhs.m_buffer[i];
+        }
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::operator=(const dynamic_bitset<Block, Allocator>::reference &rhs) {
+    template<class B>
+    template<class R>
+    inline auto dynamic_bitset_base<B>::operator|=(const dynamic_bitset_base<R> &rhs) -> self_type & {
+        size_type size = block_count();
+        for (size_type i = 0; i < size; ++i) {
+            m_buffer[i] |= rhs.m_buffer[i];
+        }
+        return *this;
+    }
+
+    template<class B>
+    template<class R>
+    inline auto dynamic_bitset_base<B>::operator^=(const dynamic_bitset_base<R> &rhs) -> self_type & {
+        size_type size = block_count();
+        for (size_type i = 0; i < size; ++i) {
+            m_buffer[i] ^= rhs.m_buffer[i];
+        }
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::operator<<(size_type pos) -> temporary_type {
+        temporary_type tmp(this->derived_cast());
+        tmp <<= pos;
+        return tmp;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::operator<<=(size_type pos) -> self_type & {
+        if (pos >= m_size) {
+            return reset();
+        }
+
+        if (pos > 0) {
+            size_type last = block_count() - 1;
+            size_type div = pos / s_bits_per_block;
+            size_type r = bit_index(pos);
+            block_type *b = &m_buffer[0];
+
+            if (r != 0) {
+                size_type rs = s_bits_per_block - r;
+                for (size_type i = last - div; i > 0; --i) {
+                    b[i + div] = (b[i] << r) | (b[i - 1] >> rs);
+                }
+                b[div] = b[0] << r;
+            } else {
+                for (size_type i = last - div; i > 0; --i) {
+                    b[i + div] = b[i];
+                }
+                b[div] = b[0];
+            }
+
+            std::fill_n(m_buffer.begin(), div, block_type(0));
+            zero_unused_bits();
+        }
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::operator>>(size_type pos) -> temporary_type {
+        temporary_type tmp(this->derived_cast());
+        tmp >>= pos;
+        return tmp;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::operator>>=(size_type pos) -> self_type & {
+        if (pos >= m_size) {
+            return reset();
+        }
+
+        if (pos > 0) {
+            size_type last = block_count() - 1;
+            size_type div = pos / s_bits_per_block;
+            size_type r = bit_index(pos);
+            block_type *b = &m_buffer[0];
+
+            if (r != 0) {
+                size_type ls = s_bits_per_block - r;
+                for (size_type i = div; i < last; ++i) {
+                    b[i - div] = (b[i] >> r) | (b[i + 1] << ls);
+                }
+                b[last - div] = b[last] >> r;
+            } else {
+                for (size_type i = div; i <= last; ++i) {
+                    b[i - div] = b[i];
+                }
+            }
+
+            std::fill_n(m_buffer.begin() + static_cast<std::ptrdiff_t>(block_count() - div), div, block_type(0));
+        }
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::set() -> self_type & {
+        std::fill(m_buffer.begin(), m_buffer.end(), ~block_type(0));
+        zero_unused_bits();
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::set(size_type pos, value_type value) -> self_type & {
+        if (value) {
+            m_buffer[block_index(pos)] |= bit_mask(pos);
+        } else {
+            reset(pos);
+        }
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::reset() -> self_type & {
+        std::fill(m_buffer.begin(), m_buffer.end(), block_type(0));
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::reset(size_type pos) -> self_type & {
+        m_buffer[block_index(pos)] &= ~bit_mask(pos);
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::flip() -> self_type & {
+        size_type size = block_count();
+        for (size_type i = 0; i < size; ++i) {
+            m_buffer[i] = ~m_buffer[i];
+        }
+        zero_unused_bits();
+        return *this;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::flip(size_type pos) -> self_type & {
+        m_buffer[block_index(pos)] ^= bit_mask(pos);
+        return *this;
+    }
+
+    template<class B>
+    inline bool dynamic_bitset_base<B>::all() const noexcept {
+        if (empty())
+            return true;
+
+        size_type extra_bits = count_extra_bits();
+        constexpr block_type all_ones = ~block_type(0);
+
+        size_type size = extra_bits != 0 ? block_count() - 1 : block_count();
+        for (size_type i = 0; i < size; ++i) {
+            if (m_buffer[i] != all_ones)
+                return false;
+        }
+
+        if (extra_bits != 0) {
+            block_type mask = ~(~block_type(0) << extra_bits);
+            if (m_buffer.back() != mask)
+                return false;
+        }
+
+        return true;
+    }
+
+    template<class B>
+    inline bool dynamic_bitset_base<B>::any() const noexcept {
+        size_type size = block_count();
+        for (size_type i = 0; i < size; ++i) {
+            if (m_buffer[i])
+                return true;
+        }
+        return false;
+    }
+
+    template<class B>
+    inline bool dynamic_bitset_base<B>::none() const noexcept {
+        return !any();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::count() const noexcept -> size_type {
+        static constexpr unsigned char table[] =
+                {
+                        0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+                        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+                        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+                        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+                        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+                        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+                        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+                        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+                };
+        size_type res = 0;
+        const unsigned char *p = static_cast<const unsigned char *>(static_cast<const void *>(&m_buffer[0]));
+        size_type length = m_buffer.size() * sizeof(block_type);
+        for (size_type i = 0; i < length; ++i, ++p) {
+            res += table[*p];
+        }
+        return res;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::block_count() const noexcept -> size_type {
+        return m_buffer.size();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::data() noexcept -> block_type * {
+        return m_buffer.data();
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::data() const noexcept -> const block_type * {
+        return m_buffer.data();
+    }
+
+    template<class B>
+    template<class Y>
+    inline bool dynamic_bitset_base<B>::operator==(const dynamic_bitset_base<Y> &rhs) const noexcept {
+        bool is_equal = m_size == rhs.m_size;
+        if (!is_equal) { return false; }
+
+        // we know that block type of lhs & rhs is the same
+        auto n_blocks = block_count();
+
+        for (std::size_t i = 0; i < n_blocks; ++i) {
+            if (m_buffer[i] != rhs.m_buffer[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    template<class B>
+    template<class Y>
+    inline bool dynamic_bitset_base<B>::operator!=(const dynamic_bitset_base<Y> &rhs) const noexcept {
+        return !(*this == rhs);
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::derived_cast() -> derived_class & {
+        return *(reinterpret_cast<derived_class *>(this));
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::derived_cast() const -> const derived_class & {
+        return *(reinterpret_cast<const derived_class *>(this));
+    }
+
+    template<class B>
+    inline dynamic_bitset_base<B>::dynamic_bitset_base(const storage_type &buffer, std::size_t size)
+            : m_size(size), m_buffer(buffer) {
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::compute_block_count(size_type bits_count) const noexcept -> size_type {
+        return bits_count / s_bits_per_block
+               + static_cast<size_type>(bits_count % s_bits_per_block != 0);
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::block_index(size_type pos) const noexcept -> size_type {
+        return pos / s_bits_per_block;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::bit_index(size_type pos) const noexcept -> size_type {
+        return pos % s_bits_per_block;
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::bit_mask(size_type pos) const noexcept -> block_type {
+        return block_type(1) << bit_index(pos);
+    }
+
+    template<class B>
+    inline auto dynamic_bitset_base<B>::count_extra_bits() const noexcept -> size_type {
+        return bit_index(size());
+    }
+
+    template<class B>
+    inline void dynamic_bitset_base<B>::zero_unused_bits() {
+        size_type extra_bits = count_extra_bits();
+        if (extra_bits != 0) {
+            m_buffer.back() &= ~(~block_type(0) << extra_bits);
+        }
+    }
+
+    template<class B>
+    inline auto operator~(const dynamic_bitset_base<B> &lhs) {
+        using temporary_type = typename dynamic_bitset_base<B>::temporary_type;
+        temporary_type res(lhs.derived_cast());
+        res.flip();
+        return res;
+    }
+
+    template<class L, class R>
+    inline auto operator&(const dynamic_bitset_base<L> &lhs, const dynamic_bitset_base<R> &rhs) {
+        using temporary_type = typename dynamic_bitset_base<L>::temporary_type;
+        temporary_type res(lhs.derived_cast());
+        res &= rhs;
+        return res;
+    }
+
+    template<class L, class R>
+    inline auto operator|(const dynamic_bitset_base<L> &lhs, const dynamic_bitset_base<R> &rhs) {
+        using temporary_type = typename dynamic_bitset_base<L>::temporary_type;
+        temporary_type res(lhs.derived_cast());
+        res |= rhs;
+        return res;
+    }
+
+    template<class L, class R>
+    inline auto operator^(const dynamic_bitset_base<L> &lhs, const dynamic_bitset_base<R> &rhs) {
+        using temporary_type = typename dynamic_bitset_base<L>::temporary_type;
+        temporary_type res(lhs.derived_cast());
+        res ^= rhs;
+        return res;
+    }
+
+    template<class B>
+    inline void swap(const dynamic_bitset_base<B> &lhs, const dynamic_bitset_base<B> &rhs) {
+        return lhs.swap(rhs);
+    }
+
+/************************************
+ * bitset_reference implementation *
+ ************************************/
+
+    template<class B, bool C>
+    inline bitset_reference<B, C>::bitset_reference(closure_type block, block_type pos)
+            : m_block(block), m_mask(block_type(1) << pos) {
+    }
+
+    template<class B, bool C>
+    inline bitset_reference<B, C>::operator bool() const noexcept {
+        return (m_block & m_mask) != 0;
+    }
+
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::operator=(const self_type &rhs) noexcept -> self_type & {
         assign(rhs);
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::operator=(dynamic_bitset::reference &&rhs) noexcept {
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::operator=(self_type &&rhs) noexcept -> self_type & {
         assign(rhs);
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::operator&=(bool v) {
-        if (!v) {
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::operator=(bool rhs) noexcept -> self_type & {
+        assign(rhs);
+        return *this;
+    }
+
+    template<class B, bool C>
+    inline bool bitset_reference<B, C>::operator~() const noexcept {
+        return (m_block & m_mask) == 0;
+    }
+
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::operator&=(bool rhs) noexcept -> self_type & {
+        if (!rhs) {
             reset();
         }
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::operator|=(bool v) {
-        if (v) {
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::operator|=(bool rhs) noexcept -> self_type & {
+        if (rhs) {
             set();
         }
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::operator^=(bool v) {
-        if (v) {
-            flip();
-        }
-        return *this;
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::operator^=(bool rhs) noexcept -> self_type & {
+        return rhs ? flip() : *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::operator-=(bool v) {
-        if (v) {
-            reset();
-        }
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::reference::operator~() const {
-        return (m_block & m_mask) == zero_block;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator>::reference::operator bool() const {
-        return (m_block & m_mask) != zero_block;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::set() {
-        m_block |= m_mask;
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::reset() {
-        m_block &= ~m_mask;
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::flip() {
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::flip() noexcept -> self_type & {
         m_block ^= m_mask;
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference &dynamic_bitset<Block, Allocator>::
-    reference::assign(bool v) {
-        if (v) {
-            set();
-        } else {
-            reset();
-        }
+    template<class B, bool C>
+    inline auto bitset_reference<B, C>::operator&() noexcept -> pointer {
+        return pointer(*this);
+    }
+
+    template<class B, bool C>
+    inline void bitset_reference<B, C>::assign(bool rhs) noexcept {
+        rhs ? set() : reset();
+    }
+
+    template<class B, bool C>
+    inline void bitset_reference<B, C>::set() noexcept {
+        m_block |= m_mask;
+    }
+
+    template<class B, bool C>
+    inline void bitset_reference<B, C>::reset() noexcept {
+        m_block &= ~m_mask;
+    }
+
+/***********************************
+ * bitset_iterator implementation *
+ ***********************************/
+
+    template<class B, bool C>
+    inline bitset_iterator<B, C>::bitset_iterator() noexcept
+            : p_container(nullptr), m_index(0) {
+    }
+
+    template<class B, bool C>
+    inline bitset_iterator<B, C>::bitset_iterator(container_reference c, size_type index) noexcept
+            : p_container(&c), m_index(index) {
+    }
+
+    template<class B, bool C>
+    inline auto bitset_iterator<B, C>::operator++() -> self_type & {
+        ++m_index;
         return *this;
     }
 
-//=================================================================================================
-// dynamic_bitset public functions implementations
-//=================================================================================================
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator>::dynamic_bitset(const allocator_type &allocator)
-            : m_blocks(allocator), m_bits_number(0) {
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator>::dynamic_bitset(size_type nbits,
-                                                               unsigned long long init_val,
-                                                               const allocator_type &allocator)
-            : m_blocks(blocks_required(nbits), allocator), m_bits_number(nbits) {
-        if (nbits == 0 || init_val == 0) {
-            return;
-        }
-
-        constexpr size_t ull_bits_number = std::numeric_limits<unsigned long long>::digits;
-        constexpr size_t init_val_required_blocks = ull_bits_number / bits_per_block;
-        if constexpr(init_val_required_blocks == 1) {
-            m_blocks[0] = init_val;
-        } else {
-            const unsigned long long block_mask = static_cast<unsigned long long>(one_block);
-            const size_t blocks_to_init = std::min(m_blocks.size(), init_val_required_blocks);
-            for (size_t i = 0; i < blocks_to_init; ++i) {
-                m_blocks[i] = block_type((init_val >> (i * bits_per_block) & block_mask));
-            }
-        }
-        sanitize();
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator>::dynamic_bitset(
-            std::initializer_list<block_type> init_vals,
-            const allocator_type &allocator)
-            : m_blocks(allocator), m_bits_number(0) {
-        append(init_vals);
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename _CharT, typename _Traits>
-    constexpr dynamic_bitset<Block, Allocator>::dynamic_bitset(
-            std::basic_string_view<_CharT, _Traits> str,
-            typename std::basic_string_view<_CharT, _Traits>::size_type pos,
-            typename std::basic_string_view<_CharT, _Traits>::size_type n,
-            _CharT zero,
-            _CharT one,
-            const allocator_type &allocator)
-            : m_blocks(allocator), m_bits_number(0) {
-        assert(pos < str.size());
-        init_from_string(str, pos, n, zero, one);
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename _CharT, typename _Traits, typename _Alloc>
-    constexpr dynamic_bitset<Block, Allocator>::dynamic_bitset(
-            const std::basic_string<_CharT, _Traits, _Alloc> &str,
-            typename std::basic_string<_CharT, _Traits, _Alloc>::size_type pos,
-            typename std::basic_string<_CharT, _Traits, _Alloc>::size_type n,
-            _CharT zero,
-            _CharT one,
-            const allocator_type &allocator)
-            : m_blocks(allocator), m_bits_number(0) {
-        assert(pos < str.size());
-        init_from_string(std::basic_string_view<_CharT, _Traits>(str), pos, n, zero, one);
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename _CharT, typename _Traits>
-    constexpr dynamic_bitset<Block, Allocator>::dynamic_bitset(
-            const _CharT *str,
-            typename std::basic_string<_CharT>::size_type pos,
-            typename std::basic_string<_CharT>::size_type n,
-            _CharT zero,
-            _CharT one,
-            const allocator_type &allocator)
-            : m_blocks(allocator), m_bits_number(0) {
-        init_from_string(std::basic_string_view<_CharT, _Traits>(str), pos, n, zero, one);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::resize(size_type nbits, bool value) {
-        if (nbits == m_bits_number) {
-            return;
-        }
-
-        const size_type old_num_blocks = num_blocks();
-        const size_type new_num_blocks = blocks_required(nbits);
-
-        const block_type init_value = value ? one_block : zero_block;
-        if (new_num_blocks != old_num_blocks) {
-            m_blocks.resize(new_num_blocks, init_value);
-        }
-
-        if (value && nbits > m_bits_number && old_num_blocks > 0) {
-            // set value of the new bits in the old last block
-            const size_type extra_bits = extra_bits_number();
-            if (extra_bits > 0) {
-                m_blocks[old_num_blocks - 1] |= (init_value << extra_bits);
-            }
-        }
-
-        m_bits_number = nbits;
-        sanitize();
-        assert(check_consistency());
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::clear() {
-        m_blocks.clear();
-        m_bits_number = 0;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::push_back(bool value) {
-        const size_type new_last_bit = m_bits_number++;
-        if (m_bits_number <= m_blocks.size() * bits_per_block) {
-            if (value) {
-                set(new_last_bit, value);
-            }
-        } else {
-            m_blocks.push_back(block_type(value));
-        }
-        assert(operator[](new_last_bit) == value);
-        assert(check_consistency());
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::pop_back() {
-        if (empty()) {
-            return;
-        }
-
-        --m_bits_number;
-        if (m_blocks.size() > blocks_required(m_bits_number)) {
-            m_blocks.pop_back();
-            // no extra bits: sanitize not required
-            assert(extra_bits_number() == 0);
-        } else {
-            sanitize();
-        }
-        assert(check_consistency());
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::append(block_type block) {
-        const size_type extra_bits = extra_bits_number();
-        if (extra_bits == 0) {
-            m_blocks.push_back(block);
-        } else {
-            last_block() |= (block << extra_bits);
-            m_blocks.push_back(block_type(block >> (bits_per_block - extra_bits)));
-        }
-
-        m_bits_number += bits_per_block;
-        assert(check_consistency());
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::append(std::initializer_list<block_type> blocks) {
-        if (blocks.size() == 0) {
-            return;
-        }
-
-        append(std::cbegin(blocks), std::cend(blocks));
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename BlockInputIterator>
-    constexpr void dynamic_bitset<Block, Allocator>::append(BlockInputIterator first,
-                                                            BlockInputIterator last) {
-        if (first == last) {
-            return;
-        }
-
-        // if random access iterators, std::distance complexity is constant
-        if constexpr(std::is_same_v<
-                typename std::iterator_traits<BlockInputIterator>::iterator_category,
-                std::random_access_iterator_tag>) {
-            assert(std::distance(first, last) > 0);
-            m_blocks.reserve(m_blocks.size() + static_cast<size_type>(std::distance(first, last)));
-        }
-
-        const size_type extra_bits = extra_bits_number();
-        const size_type unused_bits = unused_bits_number();
-        if (extra_bits == 0) {
-            auto pos = m_blocks.insert(std::end(m_blocks), first, last);
-            assert(std::distance(pos, std::end(m_blocks)) > 0);
-            m_bits_number +=
-                    static_cast<size_type>(std::distance(pos, std::end(m_blocks))) * bits_per_block;
-        } else {
-            last_block() |= (*first << extra_bits);
-            block_type block = block_type(*first >> unused_bits);
-            ++first;
-            while (first != last) {
-                block |= (*first << extra_bits);
-                m_blocks.push_back(block);
-                m_bits_number += bits_per_block;
-                block = block_type(*first >> unused_bits);
-                ++first;
-            }
-            m_blocks.push_back(block);
-            m_bits_number += bits_per_block;
-        }
-
-        assert(check_consistency());
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::operator&=(
-            const dynamic_bitset<Block, Allocator> &rhs) {
-        assert(size() == rhs.size());
-        //apply(rhs, std::bit_and());
-        for (size_type i = 0; i < m_blocks.size(); ++i) {
-            m_blocks[i] &= rhs.m_blocks[i];
-        }
+    template<class B, bool C>
+    inline auto bitset_iterator<B, C>::operator--() -> self_type & {
+        --m_index;
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::operator|=(
-            const dynamic_bitset<Block, Allocator> &rhs) {
-        assert(size() == rhs.size());
-        //apply(rhs, std::bit_or());
-        for (size_type i = 0; i < m_blocks.size(); ++i) {
-            m_blocks[i] |= rhs.m_blocks[i];
-        }
+    template<class B, bool C>
+    inline auto bitset_iterator<B, C>::operator+=(difference_type n) -> self_type & {
+        difference_type res = static_cast<difference_type>(m_index) + n;
+        m_index = static_cast<size_type>(res);
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::operator^=(
-            const dynamic_bitset<Block, Allocator> &rhs) {
-        assert(size() == rhs.size());
-        //apply(rhs, std::bit_xor());
-        for (size_type i = 0; i < m_blocks.size(); ++i) {
-            m_blocks[i] ^= rhs.m_blocks[i];
-        }
+    template<class B, bool C>
+    inline auto bitset_iterator<B, C>::operator-=(difference_type n) -> self_type & {
+        difference_type res = static_cast<difference_type>(m_index) - n;
+        m_index = static_cast<size_type>(res);
         return *this;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::operator-=(
-            const dynamic_bitset<Block, Allocator> &rhs) {
-        assert(size() == rhs.size());
-        //apply(rhs, [](const block_type& x, const block_type& y) { return (x & ~y); });
-        for (size_type i = 0; i < m_blocks.size(); ++i) {
-            m_blocks[i] &= ~rhs.m_blocks[i];
-        }
-        return *this;
+    template<class B, bool C>
+    inline auto bitset_iterator<B, C>::operator-(const self_type &rhs) const -> difference_type {
+        return difference_type(m_index - rhs.m_index);
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::operator<<=(
-            size_type shift) {
-        if (shift != 0) {
-            if (shift >= m_bits_number) {
-                reset();
-            } else {
-                apply_left_shift(shift);
-                sanitize(); // unused bits can have changed, reset them to 0
-            }
-        }
-        return *this;
+    template<class B, bool C>
+    inline auto bitset_iterator<B, C>::operator*() const -> reference {
+        return (*p_container)[m_index];
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::operator>>=(
-            size_type shift) {
-        if (shift != 0) {
-            if (shift >= m_bits_number) {
-                reset();
-            } else {
-                apply_right_shift(shift);
-            }
-        }
-        return *this;
+    template<class B, bool C>
+    inline auto bitset_iterator<B, C>::operator->() const -> pointer {
+        return &(operator*());
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> dynamic_bitset<Block, Allocator>::operator<<(
-            size_type shift) const {
-        return dynamic_bitset<Block, Allocator>(*this) <<= shift;
+    template<class B, bool C>
+    inline bool bitset_iterator<B, C>::operator==(const self_type &rhs) const {
+        return p_container == rhs.p_container && m_index == rhs.m_index;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> dynamic_bitset<Block, Allocator>::operator>>(
-            size_type shift) const {
-        return dynamic_bitset<Block, Allocator>(*this) >>= shift;
+    template<class B, bool C>
+    inline bool bitset_iterator<B, C>::operator<(const self_type &rhs) const {
+        return p_container == rhs.p_container && m_index < rhs.m_index;
     }
 
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> dynamic_bitset<Block, Allocator>::operator~() const {
-        dynamic_bitset<Block, Allocator> bitset(*this);
-        bitset.flip();
-        return bitset;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::set(size_type pos,
-                                                                                      size_type len,
-                                                                                      bool value) {
-        assert(pos < size());
-        if (len == 0) {
-            return *this;
-        }
-        assert(pos + len - 1 < size());
-
-        const size_type first_block = block_index(pos);
-        const size_type last_block = block_index(pos + len - 1);
-        const size_type first_bit_index = bit_index(pos);
-        const size_type last_bit_index = bit_index(pos + len - 1);
-
-        if (first_block == last_block) {
-            set_block_bits(m_blocks[first_block], first_bit_index, last_bit_index, value);
-        } else {
-            size_type first_full_block = first_block;
-            size_type last_full_block = last_block;
-
-            if (first_bit_index != 0) {
-                ++first_full_block; // first block is not full
-                set_block_bits(m_blocks[first_block], first_bit_index, block_last_bit_index, value);
-            }
-
-            if (last_bit_index != block_last_bit_index) {
-                --last_full_block; // last block is not full
-                set_block_bits(m_blocks[last_block], 0, last_bit_index, value);
-            }
-
-            const block_type full_block = value ? one_block : zero_block;
-            for (size_type i = first_full_block; i <= last_full_block; ++i) {
-                m_blocks[i] = full_block;
-            }
-        }
-
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::set(size_type pos,
-                                                                                      bool value) {
-        assert(pos < size());
-
-        if (value) {
-            m_blocks[block_index(pos)] |= bit_mask(pos);
-        } else {
-            m_blocks[block_index(pos)] &= ~bit_mask(pos);
-        }
-
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::set() {
-        std::fill(std::begin(m_blocks), std::end(m_blocks), one_block);
-        sanitize();
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::reset(size_type pos,
-                                                                                        size_type len) {
-        return set(pos, len, false);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::reset(size_type pos) {
-        return set(pos, false);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::reset() {
-        std::fill(std::begin(m_blocks), std::end(m_blocks), zero_block);
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::flip(size_type pos,
-                                                                                       size_type len) {
-        assert(pos < size());
-        if (len == 0) {
-            return *this;
-        }
-        assert(pos + len - 1 < size());
-
-        const size_type first_block = block_index(pos);
-        const size_type last_block = block_index(pos + len - 1);
-        const size_type first_bit_index = bit_index(pos);
-        const size_type last_bit_index = bit_index(pos + len - 1);
-
-        if (first_block == last_block) {
-            flip_block_bits(m_blocks[first_block], first_bit_index, last_bit_index);
-        } else {
-            size_type first_full_block = first_block;
-            size_type last_full_block = last_block;
-
-            if (first_bit_index != 0) {
-                ++first_full_block; // first block is not full
-                flip_block_bits(m_blocks[first_block], first_bit_index, block_last_bit_index);
-            }
-
-            if (last_bit_index != block_last_bit_index) {
-                --last_full_block; // last block is not full
-                flip_block_bits(m_blocks[last_block], 0, last_bit_index);
-            }
-
-            for (size_type i = first_full_block; i <= last_full_block; ++i) {
-                m_blocks[i] = block_type(~m_blocks[i]);
-            }
-        }
-
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::flip(size_type pos) {
-        assert(pos < size());
-        m_blocks[block_index(pos)] ^= bit_mask(pos);
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> &dynamic_bitset<Block, Allocator>::flip() {
-        std::transform(
-                std::cbegin(m_blocks), std::cend(m_blocks), std::begin(m_blocks), std::bit_not<block_type>());
-        sanitize();
-        return *this;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::test(size_type pos) const {
-        assert(pos < size());
-        return (m_blocks[block_index(pos)] & bit_mask(pos)) != zero_block;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::test_set(size_type pos, bool value) {
-        bool const result = test(pos);
-        if (result != value) {
-            set(pos, value);
-        }
-        return result;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::all() const {
-        if (empty()) {
-            return true;
-        }
-
-        const block_type full_block = one_block;
-        if (extra_bits_number() == 0) {
-            for (const block_type &block: m_blocks) {
-                if (block != full_block) {
-                    return false;
-                }
-            }
-        } else {
-            for (size_type i = 0; i < m_blocks.size() - 1; ++i) {
-                if (m_blocks[i] != full_block) {
-                    return false;
-                }
-            }
-            if (last_block() != (full_block >> unused_bits_number())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::any() const {
-        for (const block_type &block: m_blocks) {
-            if (block != zero_block) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::none() const {
-        return !any();
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block,
-            Allocator>::count()
-    const noexcept {
-        if (empty()) {
-            return 0;
-        }
-        size_type count = 0;
-
-        // full blocks
-        for (size_type i = 0; i < m_blocks.size() - 1; ++i) {
-            count += block_count(m_blocks[i]);
-        }
-
-        // last block
-        const block_type &block = last_block();
-        const size_type extra_bits = extra_bits_number();
-        if (extra_bits == 0) {
-            count += block_count(block);
-        } else {
-            count += block_count(block, extra_bits);
-        }
-        return count;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::reference dynamic_bitset<Block, Allocator>::
-    operator[](size_type pos) {
-        assert(pos < size());
-        return dynamic_bitset<Block, Allocator>::reference(*this, pos);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::const_reference dynamic_bitset<
-            Block,
-            Allocator>::operator[](size_type pos) const {
-        return test(pos);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block,
-            Allocator>::size()
-    const noexcept {
-        return m_bits_number;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    num_blocks() const noexcept {
-        return m_blocks.size();
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    num_bytes() const noexcept {
-        return m_blocks.size() * sizeof(Block);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::empty() const noexcept {
-        return size() == 0;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block,
-            Allocator>::capacity()
-    const noexcept {
-        return m_blocks.capacity() * bits_per_block;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::reserve(size_type num_bits) {
-        m_blocks.reserve(blocks_required(num_bits));
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::shrink_to_fit() {
-        m_blocks.shrink_to_fit();
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::is_subset_of(
-            const dynamic_bitset<Block, Allocator> &bitset) const {
-        assert(size() == bitset.size());
-        for (size_type i = 0; i < m_blocks.size(); ++i) {
-            if ((m_blocks[i] & ~bitset.m_blocks[i]) != zero_block) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::is_proper_subset_of(
-            const dynamic_bitset<Block, Allocator> &bitset) const {
-        assert(size() == bitset.size());
-        bool is_proper = false;
-        for (size_type i = 0; i < m_blocks.size(); ++i) {
-            const block_type &self_block = m_blocks[i];
-            const block_type &other_block = bitset.m_blocks[i];
-
-            if ((self_block & ~other_block) != zero_block) {
-                return false;
-            }
-            if ((~self_block & other_block) != zero_block) {
-                is_proper = true;
-            }
-        }
-        return is_proper;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::intersects(
-            const dynamic_bitset<Block, Allocator> &bitset) const {
-        const size_type min_blocks_number = std::min(m_blocks.size(), bitset.m_blocks.size());
-        for (size_type i = 0; i < min_blocks_number; ++i) {
-            if ((m_blocks[i] & bitset.m_blocks[i]) != zero_block) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    find_first() const {
-        for (size_type i = 0; i < m_blocks.size(); ++i) {
-            if (m_blocks[i] != zero_block) {
-                return i * bits_per_block + count_block_trailing_zero(m_blocks[i]);
-            }
-        }
-        return npos;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    find_next(size_type prev) const {
-        if (empty() || prev >= (size() - 1)) {
-            return npos;
-        }
-
-        const size_type first_bit = prev + 1;
-        const size_type first_block = block_index(first_bit);
-        const size_type first_bit_index = bit_index(first_bit);
-        const block_type first_block_shifted = block_type(m_blocks[first_block] >> first_bit_index);
-
-        if (first_block_shifted != zero_block) {
-            return first_bit + count_block_trailing_zero(first_block_shifted);
-        } else {
-            for (size_type i = first_block + 1; i < m_blocks.size(); ++i) {
-                if (m_blocks[i] != zero_block) {
-                    return i * bits_per_block + count_block_trailing_zero(m_blocks[i]);
-                }
-            }
-        }
-        return npos;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::swap(dynamic_bitset<Block, Allocator> &other) {
-        std::swap(m_blocks, other.m_blocks);
-        std::swap(m_bits_number, other.m_bits_number);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::allocator_type dynamic_bitset<
-            Block,
-            Allocator>::get_allocator() const {
-        return m_blocks.get_allocator();
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename _CharT, typename _Traits, typename _Alloc>
-    constexpr std::basic_string<_CharT, _Traits, _Alloc> dynamic_bitset<Block, Allocator>::to_string(
-            _CharT zero,
-            _CharT one) const {
-        const size_type len = size();
-        std::basic_string<_CharT, _Traits, _Alloc> str(len, zero);
-        for (size_type i_block = 0; i_block < m_blocks.size(); ++i_block) {
-            if (m_blocks[i_block] == zero_block) {
-                continue;
-            }
-            block_type mask = block_type(1);
-            const size_type limit =
-                    i_block * bits_per_block < len ? len - i_block * bits_per_block : bits_per_block;
-            for (size_type i_bit = 0; i_bit < limit; ++i_bit) {
-                if ((m_blocks[i_block] & mask) != zero_block) {
-                    _Traits::assign(str[len - (i_block * bits_per_block + i_bit + 1)], one);
-                }
-                mask <<= 1;
-            }
-        }
-        return str;
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename Function, typename... Parameters>
-    constexpr void dynamic_bitset<Block, Allocator>::iterate_bits_on(Function &&function,
-                                                                     Parameters &&... parameters) const {
-        if constexpr(!std::is_invocable_v<Function, size_t, Parameters...>) {
-            static_assert(dependent_false<Function>::value, "Function take invalid arguments");
-            // function should take (size_t, parameters...) as arguments
-        }
-
-        if constexpr(std::is_same_v<std::invoke_result_t<Function, size_t, Parameters...>, void>) {
-            size_type i_bit = find_first();
-            while (i_bit != npos) {
-                std::invoke(
-                        std::forward<Function>(function), i_bit, std::forward<Parameters>(parameters)...);
-                i_bit = find_next(i_bit);
-            }
-        } else if constexpr(std::is_convertible_v<std::invoke_result_t<Function, size_t, Parameters...>,
-                bool>) {
-            size_type i_bit = find_first();
-            while (i_bit != npos) {
-                if (!std::invoke(
-                        std::forward<Function>(function), i_bit, std::forward<Parameters>(parameters)...)) {
-                    break;
-                }
-                i_bit = find_next(i_bit);
-            }
-        } else {
-            static_assert(dependent_false<Function>::value, "Function have invalid return type");
-            // return type should be void, or convertible to bool
-        }
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::block_type *dynamic_bitset<Block, Allocator>::
-    data() noexcept {
-        return m_blocks.data();
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr const typename dynamic_bitset<Block, Allocator>::block_type *dynamic_bitset<
-            Block,
-            Allocator>::data() const noexcept {
-        return m_blocks.data();
-    }
-
-    template<typename Block_, typename Allocator_>
-    [[nodiscard]] constexpr bool operator==(const dynamic_bitset<Block_, Allocator_> &lhs,
-                                            const dynamic_bitset<Block_, Allocator_> &rhs) {
-        return (lhs.m_bits_number == rhs.m_bits_number) && (lhs.m_blocks == rhs.m_blocks);
-    }
-
-    template<typename Block_, typename Allocator_>
-    [[nodiscard]] constexpr bool operator<(const dynamic_bitset<Block_, Allocator_> &lhs,
-                                           const dynamic_bitset<Block_, Allocator_> &rhs) {
-        using size_type = typename dynamic_bitset<Block_, Allocator_>::size_type;
-        using block_type = typename dynamic_bitset<Block_, Allocator_>::block_type;
-        const size_type lhs_size = lhs.size();
-        const size_type rhs_size = rhs.size();
-        const size_type lhs_blocks_size = lhs.m_blocks.size();
-        const size_type rhs_blocks_size = rhs.m_blocks.size();
-
-        if (lhs_size == rhs_size) {
-            // if comparison of two empty bitsets
-            if (lhs_size == 0) {
-                return false;
-            }
-
-            for (size_type i = lhs_blocks_size - 1; i > 0; --i) {
-                if (lhs.m_blocks[i] != rhs.m_blocks[i]) {
-                    return lhs.m_blocks[i] < rhs.m_blocks[i];
-                }
-            }
-            return lhs.m_blocks[0] < rhs.m_blocks[0];
-        }
-
-        // empty bitset inferior to 0-only bitset
-        if (lhs_size == 0) {
-            return true;
-        }
-        if (rhs_size == 0) {
-            return false;
-        }
-
-        const bool rhs_longer = rhs_size > lhs_size;
-        const dynamic_bitset<Block_, Allocator_> &longest_bitset = rhs_longer ? rhs : lhs;
-        const size_type longest_blocks_size = std::max(lhs_blocks_size, rhs_blocks_size);
-        const size_type shortest_blocks_size = std::min(lhs_blocks_size, rhs_blocks_size);
-        for (size_type i = longest_blocks_size - 1; i >= shortest_blocks_size; --i) {
-            if (longest_bitset.m_blocks[i] != block_type(0)) {
-                return rhs_longer;
-            }
-        }
-
-        for (size_type i = shortest_blocks_size - 1; i > 0; --i) {
-            if (lhs.m_blocks[i] != rhs.m_blocks[i]) {
-                return lhs.m_blocks[i] < rhs.m_blocks[i];
-            }
-        }
-        if (lhs.m_blocks[0] != rhs.m_blocks[0]) {
-            return lhs.m_blocks[0] < rhs.m_blocks[0];
-        }
-        return lhs_size < rhs_size;
-    }
-
-//=================================================================================================
-// dynamic_bitset private functions implementations
-//=================================================================================================
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    blocks_required(size_type nbits) noexcept {
-        return nbits / bits_per_block + static_cast<size_type>(nbits % bits_per_block > 0);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    block_index(size_type pos) noexcept {
-        return pos / bits_per_block;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    bit_index(size_type pos) noexcept {
-        return pos % bits_per_block;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::block_type dynamic_bitset<Block, Allocator>::
-    bit_mask(size_type pos) noexcept {
-        return block_type(block_type(1) << bit_index(pos));
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::block_type dynamic_bitset<Block, Allocator>::
-    bit_mask(size_type first, size_type last) noexcept {
-        first = bit_index(first);
-        last = bit_index(last);
-        if (last == (block_last_bit_index)) {
-            return block_type(one_block << first);
-        } else {
-            return block_type(((block_type(1) << (last + 1)) - 1) ^ ((block_type(1) << first) - 1));
-        }
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::set_block_bits(block_type &block,
-                                                                    size_type first,
-                                                                    size_type last,
-                                                                    bool val) noexcept {
-        if (val) {
-            block |= bit_mask(first, last);
-        } else {
-            block &= ~bit_mask(first, last);
-        }
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::flip_block_bits(block_type &block,
-                                                                     size_type first,
-                                                                     size_type last) noexcept {
-        block ^= bit_mask(first, last);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    block_count(const block_type &block) noexcept {
-        return static_cast<size_type>(turbo::popcount(block));
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    block_count(const block_type &block, size_type nbits) noexcept {
-        assert(nbits <= bits_per_block);
-        const block_type shifted_block = block_type(block << (bits_per_block - nbits));
-        return static_cast<size_type>(turbo::popcount(shifted_block));
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    count_block_trailing_zero(const block_type &block) noexcept {
-        assert(block != zero_block);
-        return static_cast<size_type>(turbo::countr_zero(block));
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename _CharT, typename _Traits>
-    constexpr void dynamic_bitset<Block, Allocator>::init_from_string(
-            std::basic_string_view<_CharT, _Traits> str,
-            typename std::basic_string_view<_CharT, _Traits>::size_type pos,
-            typename std::basic_string_view<_CharT, _Traits>::size_type n,
-            [[maybe_unused]] _CharT zero,
-            _CharT one) {
-        assert(pos < str.size());
-
-        const size_type size = std::min(n, str.size() - pos);
-        m_bits_number = size;
-
-        m_blocks.clear();
-        m_blocks.resize(blocks_required(size));
-        for (size_t i = 0; i < size; ++i) {
-            const _CharT c = str[(pos + size - 1) - i];
-            assert(c == zero || c == one);
-            if (c == one) {
-                set(i);
-            }
-        }
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::block_type &dynamic_bitset<Block, Allocator>::
-    get_block(size_type pos) {
-        return m_blocks[block_index(pos)];
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr const typename dynamic_bitset<Block, Allocator>::block_type &dynamic_bitset<
-            Block,
-            Allocator>::get_block(size_type pos) const {
-        return m_blocks[block_index(pos)];
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::block_type &dynamic_bitset<Block, Allocator>::
-    last_block() {
-        return m_blocks[m_blocks.size() - 1];
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::block_type dynamic_bitset<Block, Allocator>::
-    last_block() const {
-        return m_blocks[m_blocks.size() - 1];
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    extra_bits_number() const noexcept {
-        return bit_index(m_bits_number);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr typename dynamic_bitset<Block, Allocator>::size_type dynamic_bitset<Block, Allocator>::
-    unused_bits_number() const noexcept {
-        return bits_per_block - extra_bits_number();
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename BinaryOperation>
-    constexpr void dynamic_bitset<Block, Allocator>::apply(
-            const dynamic_bitset<Block, Allocator> &other,
-            BinaryOperation binary_op) {
-        assert(num_blocks() == other.num_blocks());
-        std::transform(std::cbegin(m_blocks),
-                       std::cend(m_blocks),
-                       std::cbegin(other.m_blocks),
-                       std::begin(m_blocks),
-                       binary_op);
-    }
-
-    template<typename Block, typename Allocator>
-    template<typename UnaryOperation>
-    constexpr void dynamic_bitset<Block, Allocator>::apply(UnaryOperation unary_op) {
-        std::transform(std::cbegin(m_blocks), std::cend(m_blocks), std::begin(m_blocks), unary_op);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::apply_left_shift(size_type shift) {
-        assert(shift > 0);
-        assert(shift < capacity());
-
-        const size_type blocks_shift = shift / bits_per_block;
-        const size_type bits_offset = shift % bits_per_block;
-
-        if (bits_offset == 0) {
-            for (size_type i = m_blocks.size() - 1; i >= blocks_shift; --i) {
-                m_blocks[i] = m_blocks[i - blocks_shift];
-            }
-        } else {
-            const size_type reverse_bits_offset = bits_per_block - bits_offset;
-            for (size_type i = m_blocks.size() - 1; i > blocks_shift; --i) {
-                m_blocks[i] =
-                        block_type((m_blocks[i - blocks_shift] << bits_offset)
-                                   | block_type(m_blocks[i - blocks_shift - 1] >> reverse_bits_offset));
-            }
-            m_blocks[blocks_shift] = block_type(m_blocks[0] << bits_offset);
-        }
-
-        // set bit that came at the right to 0 in unmodified blocks
-        std::fill(std::begin(m_blocks),
-                  std::begin(m_blocks)
-                  + static_cast<typename decltype(m_blocks)::difference_type>(blocks_shift),
-                  zero_block);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::apply_right_shift(size_type shift) {
-        assert(shift > 0);
-        assert(shift < capacity());
-
-        const size_type blocks_shift = shift / bits_per_block;
-        const size_type bits_offset = shift % bits_per_block;
-        const size_type last_block_to_shift = m_blocks.size() - blocks_shift - 1;
-
-        if (bits_offset == 0) {
-            for (size_type i = 0; i <= last_block_to_shift; ++i) {
-                m_blocks[i] = m_blocks[i + blocks_shift];
-            }
-        } else {
-            const size_type reverse_bits_offset = bits_per_block - bits_offset;
-            for (size_type i = 0; i < last_block_to_shift; ++i) {
-                m_blocks[i] =
-                        block_type((m_blocks[i + blocks_shift] >> bits_offset)
-                                   | block_type(m_blocks[i + blocks_shift + 1] << reverse_bits_offset));
-            }
-            m_blocks[last_block_to_shift] = block_type(m_blocks[m_blocks.size() - 1] >> bits_offset);
-        }
-
-        // set bit that came at the left to 0 in unmodified blocks
-        std::fill(
-                std::begin(m_blocks)
-                + static_cast<typename decltype(m_blocks)::difference_type>(last_block_to_shift + 1),
-                std::end(m_blocks),
-                zero_block);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void dynamic_bitset<Block, Allocator>::sanitize() {
-        size_type shift = m_bits_number % bits_per_block;
-        if (shift > 0) {
-            last_block() &= ~(one_block << shift);
-        }
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::check_unused_bits() const noexcept {
-        const size_type extra_bits = extra_bits_number();
-        if (extra_bits > 0) {
-            return (last_block() & (one_block << extra_bits)) == zero_block;
-        }
-        return true;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::check_size() const noexcept {
-        return blocks_required(size()) == m_blocks.size();
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool dynamic_bitset<Block, Allocator>::check_consistency() const noexcept {
-        return check_unused_bits() && check_size();
-    }
-
-//=================================================================================================
-// dynamic_bitset external functions implementations
-//=================================================================================================
-
-    template<typename Block, typename Allocator>
-    constexpr bool operator!=(const dynamic_bitset<Block, Allocator> &lhs,
-                              const dynamic_bitset<Block, Allocator> &rhs) {
-        return !(lhs == rhs);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool operator<=(const dynamic_bitset<Block, Allocator> &lhs,
-                              const dynamic_bitset<Block, Allocator> &rhs) {
-        return !(rhs < lhs);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool operator>(const dynamic_bitset<Block, Allocator> &lhs,
-                             const dynamic_bitset<Block, Allocator> &rhs) {
-        return rhs < lhs;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr bool operator>=(const dynamic_bitset<Block, Allocator> &lhs,
-                              const dynamic_bitset<Block, Allocator> &rhs) {
-        return !(lhs < rhs);
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator&(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs) {
-        dynamic_bitset<Block, Allocator> result(lhs);
-        return result &= rhs;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator|(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs) {
-        dynamic_bitset<Block, Allocator> result(lhs);
-        return result |= rhs;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator^(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs) {
-        dynamic_bitset<Block, Allocator> result(lhs);
-        return result ^= rhs;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr dynamic_bitset<Block, Allocator> operator-(const dynamic_bitset<Block, Allocator> &lhs,
-                                                         const dynamic_bitset<Block, Allocator> &rhs) {
-        dynamic_bitset<Block, Allocator> result(lhs);
-        return result -= rhs;
-    }
-
-    template<typename _CharT, typename _Traits, typename Block, typename Allocator>
-    constexpr std::basic_ostream<_CharT, _Traits> &operator<<(
-            std::basic_ostream<_CharT, _Traits> &os,
-            const dynamic_bitset<Block, Allocator> &bitset) {
-        // A better implementation is possible
-        return os << bitset.template to_string<_CharT, _Traits>();
-    }
-
-    template<typename _CharT, typename _Traits, typename Block, typename Allocator>
-    constexpr std::basic_istream<_CharT, _Traits> &operator>>(std::basic_istream<_CharT, _Traits> &is,
-                                                              dynamic_bitset<Block, Allocator> &bitset) {
-        // A better implementation is possible
-        constexpr _CharT zero = _CharT('0');
-        constexpr _CharT one = _CharT('1');
-        typename std::basic_istream<_CharT, _Traits>::sentry s(is);
-        if (!s) {
-            return is;
-        }
-
-        dynamic_bitset<Block, Allocator> reverse_bitset;
-        _CharT val;
-        is.get(val);
-        while (is.good()) {
-            if (val == one) {
-                reverse_bitset.push_back(true);
-            } else if (val == zero) {
-                reverse_bitset.push_back(false);
-            } else {
-                is.unget();
-                break;
-            }
-            is.get(val);
-        }
-
-        bitset.clear();
-        if (!reverse_bitset.empty()) {
-            for (typename dynamic_bitset<Block, Allocator>::size_type i = reverse_bitset.size() - 1;
-                 i > 0;
-                 --i) {
-                bitset.push_back(reverse_bitset.test(i));
-            }
-            bitset.push_back(reverse_bitset.test(0));
-        }
-
-        return is;
-    }
-
-    template<typename Block, typename Allocator>
-    constexpr void swap(dynamic_bitset<Block, Allocator> &bitset1,
-                        dynamic_bitset<Block, Allocator> &bitset2) {
-        bitset1.swap(bitset2);
-    }
 
 } // namespace turbo
 

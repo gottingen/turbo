@@ -20,8 +20,8 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <optional>
 
-#include "turbo/meta/optional.h"
 #include "turbo/meta/span.h"
 #include "turbo/platform/port.h"
 #include "turbo/random/internal/fast_uniform_bits.h"

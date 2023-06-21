@@ -29,6 +29,19 @@ carbin_cc_test(
 
 carbin_cc_test(
         NAME
+        filess_system_test
+        SOURCES
+        "filess_system_test.cc"
+        COPTS
+        ${CARBIN_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        ${GTEST_LIB}
+        ${GTEST_MAIN_LIB}
+)
+
+carbin_cc_test(
+        NAME
         multi2_test
         SOURCES
         "multi2_test.cc"
