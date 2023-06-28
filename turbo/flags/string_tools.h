@@ -31,7 +31,7 @@ namespace turbo {
 
 
     /// Include the items in this namespace to get free conversion of enums to/from streams.
-    /// (This is available inside CLI as well, so FLAGS will use this without a using statement).
+    /// (This is available inside flags as well, so FLAGS will use this without a using statement).
     namespace enums {
 
         /// output streaming for enumerations
@@ -43,7 +43,7 @@ namespace turbo {
 
     }  // namespace enums
 
-        /// Export to CLI namespace
+        /// Export to flags namespace
     using enums::operator<<;
 
     namespace detail {
