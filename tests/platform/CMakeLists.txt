@@ -164,3 +164,17 @@ carbin_cc_test(
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
+
+carbin_cc_test(
+        NAME
+        unique_small_name_test
+        SOURCES
+        "unique_small_name_test.cc"
+        COPTS
+        ${CARBIN_TEST_COPTS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+        ${GTEST_LIB}
+        ${GTEST_MAIN_LIB}
+)

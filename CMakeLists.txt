@@ -13,48 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+####################################################################################
+# generate by carbin package manager tools for titan-search
+# https://github.com/gottingen/carbin
+####################################################################################
 cmake_minimum_required(VERSION 3.15)
-
-
-# Compiler id for Apple Clang is now AppleClang.
-if (POLICY CMP0025)
-    cmake_policy(SET CMP0025 NEW)
-endif (POLICY CMP0025)
-
-# if command can use IN_LIST
-if (POLICY CMP0057)
-    cmake_policy(SET CMP0057 NEW)
-endif (POLICY CMP0057)
-
-# Project version variables are the empty string if version is unspecified
-if (POLICY CMP0048)
-    cmake_policy(SET CMP0048 NEW)
-endif (POLICY CMP0048)
-
-# option() honor variables
-if (POLICY CMP0077)
-    cmake_policy(SET CMP0077 NEW)
-endif (POLICY CMP0077)
-
-# Allow the user to specify the MSVC runtime
-if (POLICY CMP0091)
-    cmake_policy(SET CMP0091 NEW)
-endif (POLICY CMP0091)
-
-# try_compile() honors the CMAKE_CXX_STANDARD value
-if (POLICY CMP0067)
-    cmake_policy(SET CMP0067 NEW)
-endif (POLICY CMP0067)
-
-if (POLICY CMP0110)
-    cmake_policy(SET CMP0110 NEW)
-endif (POLICY CMP0110)
-
-if (POLICY CMP0135)
-    cmake_policy(SET CMP0135 NEW)
-endif (POLICY CMP0135)
-
 
 project(turbo CXX)
 
@@ -63,18 +26,33 @@ set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
 set(PROJECT_VERSION_PATCH 5)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-
+set(CARBIN_VERSION 0.2.0)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/carbin_cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/package)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/recipes)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/simd)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/copts)
-
+#################################################################
+#
+# modify the CARBIN_DEPS_PREFIX to you prefix if needed.
+# for example when you install you deps to "/opt/handsome/guy
+# modify as set(CARBIN_DEPS_PREFIX /opt/handsome/guy)
+#################################################################
+set(CARBIN_DEPS_PREFIX ${PROJECT_SOURCE_DIR}/carbin)
+#######################################################################
+# warning
+# in carbin_cmake directory, caution to modify files in that dir
+######################################################################
 include(carbin_module)
 
-add_subdirectory(turbo)
+##################################################################
+#
+# your cmake directory ${PROJECT_SOURCE_DIR}/cmake, do things here
+#################################################################
+include(user_deps)
+include(user_cxx_config)
 
+add_subdirectory(turbo)
+####################################################################
+# belows are auto, edit it be cation
+####################################################################
 if (CARBIN_BUILD_TEST)
     add_subdirectory(tests)
 endif ()
@@ -87,14 +65,10 @@ if (CARBIN_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
 
+##############################################
+# header installing
+#############################################
 install(DIRECTORY ${PROJECT_NAME}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        FILES_MATCHING
-        PATTERN "*.inc"
-        PATTERN "*.h"
-        )
-
-install(DIRECTORY ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         FILES_MATCHING
         PATTERN "*.inc"
@@ -105,7 +79,7 @@ install(DIRECTORY ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
 #   * <prefix>/lib*/cmake/<PROJECT-NAME>
 #   * <prefix>/lib*/
 #   * <prefix>/include/
-set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/carbin_cmake/${PROJECT_NAME}")
 
 set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
@@ -130,7 +104,7 @@ write_basic_package_version_file(
 #   * TARGETS_EXPORT_NAME
 #   * PROJECT_NAME
 configure_package_config_file(
-        "cmake/package/carbin_config.cmake.in"
+        "carbin_cmake/package/carbin_config.cmake.in"
         "${project_config}"
         INSTALL_DESTINATION "${config_install_dir}"
 )
@@ -138,8 +112,8 @@ configure_package_config_file(
 #Targets:
 #  * <prefix>/lib/libbar.a
 #  * <prefix>/lib/libbaz.a
-#  * header location after install: <prefix>/include/foo/Bar.h
-#  * headers can be included by C++ code `#include <foo/Bar.h"`
+#  * header location after install: <prefix>/include/foo/Bar.hpp
+#  * headers can be included by C++ code `#include <foo/Bar.hpp>`
 
 
 # Config

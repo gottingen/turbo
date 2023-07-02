@@ -58,6 +58,13 @@ set(TURBO_ALL_SRC
         "files/file_watcher.cc"
         "files/sequential_read_file.cc"
         "files/sequential_write_file.cc"
+        "flags/app.cc"
+        "flags/config.cc"
+        "flags/formatter.cc"
+        "flags/option.cc"
+        "flags/split.cc"
+        "flags/string_tools.cc"
+        "flags/validators.cc"
         "format/fmt/format.cc"
         "format/fmt/os.cc"
         "hash/internal/city.cc"
@@ -72,9 +79,6 @@ set(TURBO_ALL_SRC
         "log/tlog.cc"
         "log/stdout_sinks.cc"
         "memory/jemalloc_helper.cc"
-        "meta/bad_any_cast.cc"
-        "meta/bad_optional_access.cc"
-        "meta/bad_variant_access.cc"
         "platform/internal/cycleclock.cc"
         "platform/internal/spinlock.cc"
         "platform/internal/spinlock_wait.cc"
@@ -150,9 +154,7 @@ if (BUILD_STATIC_LIBRARY)
             SOURCES
             ${TURBO_ALL_SRC}
             COPTS
-            ${CARBIN_DEFAULT_COPTS}
-            ${CARBIN_RANDOM_RANDEN_COPTS}
-            ${CARBIN_SIMD_FLAGS}
+            ${CARBIN_CXX_OPTIONS}
             DEPS
             ${CARBIN_DEPS_LINK}
             PUBLIC
@@ -168,9 +170,7 @@ if (BUILD_SHARED_LIBRARY)
             SOURCES
             ${TURBO_ALL_SRC}
             COPTS
-            ${CARBIN_DEFAULT_COPTS}
-            ${CARBIN_RANDOM_RANDEN_COPTS}
-            ${CARBIN_SIMD_FLAGS}
+            ${CARBIN_CXX_OPTIONS}
             DEPS
             ${CARBIN_DEPS_LINK}
             SHARED

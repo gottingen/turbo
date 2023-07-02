@@ -64,16 +64,16 @@ namespace turbo {
                 const Payloads *payloads,
                 std::string_view type_url) {
             if (payloads == nullptr)
-                return turbo::nullopt;
+                return std::nullopt;
 
             for (size_t i = 0; i < payloads->size(); ++i) {
                 if ((*payloads)[i].type_url == type_url) return i;
             }
 
-            return turbo::nullopt;
+            return std::nullopt;
         }
 
-// Convert canonical code to a value known to this binary.
+        // Convert canonical code to a value known to this binary.
         turbo::StatusCode MapToLocalCode(int value) {
             turbo::StatusCode code = static_cast<turbo::StatusCode>(value);
             switch (code) {
@@ -109,7 +109,7 @@ namespace turbo {
         if (index.has_value())
             return (*payloads)[index.value()].payload;
 
-        return turbo::nullopt;
+        return std::nullopt;
     }
 
     void Status::SetPayload(std::string_view type_url, turbo::Cord payload) {
@@ -218,13 +218,13 @@ namespace turbo {
         }
     }
 
-/*
-template <typename... Args>
-Status::Status(unsigned short int module_index, turbo::StatusCode code, const FormatSpec<Args...>& format,
-       const Args&... args) {
+    /*
+    template <typename... Args>
+    Status::Status(unsigned short int module_index, turbo::StatusCode code, const FormatSpec<Args...>& format,
+           const Args&... args) {
 
-}
-*/
+    }
+    */
     int Status::raw_code() const {
         if (IsInlined(rep_)) {
             return static_cast<int>(InlinedRepToCode(rep_));
@@ -340,71 +340,6 @@ Status::Status(unsigned short int module_index, turbo::StatusCode code, const Fo
         return os;
     }
 
-/*
-Status AbortedError(std::string_view message) {
-  return Status(turbo::kAborted, message);
-}
-
-Status AlreadyExistsError(std::string_view message) {
-  return Status(turbo::kAlreadyExists, message);
-}
-
-Status CancelledError(std::string_view message) {
-  return Status(turbo::kCancelled, message);
-}
-
-Status DataLossError(std::string_view message) {
-  return Status(turbo::kDataLoss, message);
-}
-
-Status DeadlineExceededError(std::string_view message) {
-  return Status(turbo::kDeadlineExceeded, message);
-}
-
-Status FailedPreconditionError(std::string_view message) {
-  return Status(turbo::kFailedPrecondition, message);
-}
-
-Status InternalError(std::string_view message) {
-  return Status(turbo::kInternal, message);
-}
-
-Status InvalidArgumentError(std::string_view message) {
-  return Status(turbo::kInvalidArgument, message);
-}
-
-Status NotFoundError(std::string_view message) {
-  return Status(turbo::kNotFound, message);
-}
-
-Status OutOfRangeError(std::string_view message) {
-  return Status(turbo::kOutOfRange, message);
-}
-
-Status PermissionDeniedError(std::string_view message) {
-  return Status(turbo::kPermissionDenied, message);
-}
-
-Status ResourceExhaustedError(std::string_view message) {
-  return Status(turbo::kResourceExhausted, message);
-}
-
-Status UnauthenticatedError(std::string_view message) {
-  return Status(turbo::kUnauthenticated, message);
-}
-
-Status UnavailableError(std::string_view message) {
-  return Status(turbo::kUnavailable, message);
-}
-
-Status UnimplementedError(std::string_view message) {
-  return Status(turbo::kUnimplemented, message);
-}
-
-Status UnknownError(std::string_view message) {
-  return Status(turbo::kUnknown, message);
-}
-*/
     bool IsAborted(const Status &status) {
         return status.code() == turbo::kAborted;
     }

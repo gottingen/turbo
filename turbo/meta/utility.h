@@ -185,7 +185,7 @@ using std::in_place_type_t;
 // in_place_type_t
 //
 // Tag type used for in-place construction when the type to construct needs to
-// be specified, such as with `turbo::any`, designed to be a drop-in replacement
+// be specified, such as with `std::any`, designed to be a drop-in replacement
 // for C++17's `std::in_place_type_t`.
 template <typename T>
 using in_place_type_t = void (*)(utility_internal::InPlaceTypeTag<T>);
@@ -202,7 +202,7 @@ using std::in_place_index_t;
 // in_place_index_t
 //
 // Tag type used for in-place construction when the type to construct needs to
-// be specified, such as with `turbo::any`, designed to be a drop-in replacement
+// be specified, such as with `std::any`, designed to be a drop-in replacement
 // for C++17's `std::in_place_index_t`.
 template <size_t I>
 using in_place_index_t = void (*)(utility_internal::InPlaceIndexTag<I>);

@@ -68,12 +68,12 @@
 #include <iterator>
 #include <string>
 #include <type_traits>
+#include <optional>
 
 #include "turbo/base/endian.h"
 #include "turbo/container/inlined_vector.h"
 #include "turbo/crypto/internal/crc_cord_state.h"
 #include "turbo/meta/function_ref.h"
-#include "turbo/meta/optional.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/internal/per_thread_tls.h"
 #include "turbo/platform/port.h"
@@ -1288,7 +1288,7 @@ inline std::optional<std::string_view> Cord::TryFlat() const {
   if (GetFlatAux(rep, &fragment)) {
     return fragment;
   }
-  return turbo::nullopt;
+  return std::nullopt;
 }
 
 inline std::string_view Cord::Flatten() {

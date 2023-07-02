@@ -19,9 +19,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <optional>
 
 #include "turbo/base/internal/fast_type_id.h"
-#include "turbo/meta/optional.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -63,7 +63,7 @@ class MockHelpers {
   template <typename KeyT, typename ReturnT, typename ArgTupleT, typename URBG,
             typename... Args>
   static std::optional<ReturnT> InvokeMockImpl(char, URBG*, Args&&...) {
-    return turbo::nullopt;
+    return std::nullopt;
   }
 
   // Non-empty implementation of InvokeMock.
@@ -77,7 +77,7 @@ class MockHelpers {
                          &result)) {
       return result;
     }
-    return turbo::nullopt;
+    return std::nullopt;
   }
 
  public:

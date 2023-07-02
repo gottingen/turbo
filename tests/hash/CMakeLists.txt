@@ -15,6 +15,8 @@
 #
 
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         hash_testing
         HEADERS
@@ -48,6 +50,8 @@ carbin_cc_test(
 # directly, it must be marked PUBLIC since it is a dependency of
 # hash_testing.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         spy_hash_state
         HEADERS
@@ -80,6 +84,18 @@ carbin_cc_test(
         low_level_hash_test
         SOURCES
         "low_level_hash_test.cc"
+        COPTS
+        ${CARBIN_TEST_COPTS}
+        DEPS
+        turbo::turbo
+        ${CARBIN_DEPS_LINK}
+)
+
+carbin_cc_test(
+        NAME
+        murmur_test
+        SOURCES
+        "murmur_test.cc"
         COPTS
         ${CARBIN_TEST_COPTS}
         DEPS

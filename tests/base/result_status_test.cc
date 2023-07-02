@@ -18,6 +18,7 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <any>
 #include <type_traits>
 #include <utility>
 #include "gmock/gmock.h"
@@ -27,7 +28,6 @@
 #include "turbo/base/status.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/meta/utility.h"
-#include "turbo/meta/any.h"
 #include "turbo/meta/variant.h"
 
 namespace {
@@ -936,49 +936,49 @@ namespace {
     }
 
     TEST(ResultStatus, ResultStatusAnyCopyAndMoveConstructorTests) {
-        turbo::ResultStatus<turbo::any> status_or = CopyDetector(10);
-        turbo::ResultStatus<turbo::any> status_error = turbo::InvalidArgumentError("foo");
+        turbo::ResultStatus<std::any> status_or = CopyDetector(10);
+        turbo::ResultStatus<std::any> status_error = turbo::InvalidArgumentError("foo");
         EXPECT_THAT(
                 status_or,
                 IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, true, false))));
-        turbo::ResultStatus<turbo::any> a = status_or;
+        turbo::ResultStatus<std::any> a = status_or;
         EXPECT_THAT(
                 a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-        turbo::ResultStatus<turbo::any> a_err = status_error;
+        turbo::ResultStatus<std::any> a_err = status_error;
         EXPECT_THAT(a_err, Not(IsOk()));
 
-        const turbo::ResultStatus<turbo::any> &cref = status_or;
+        const turbo::ResultStatus<std::any> &cref = status_or;
         // No lint for no-change copy.
-        turbo::ResultStatus<turbo::any> b = cref;  // NOLINT
+        turbo::ResultStatus<std::any> b = cref;  // NOLINT
         EXPECT_THAT(
                 b, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-        const turbo::ResultStatus<turbo::any> &cref_err = status_error;
+        const turbo::ResultStatus<std::any> &cref_err = status_error;
         // No lint for no-change copy.
-        turbo::ResultStatus<turbo::any> b_err = cref_err;  // NOLINT
+        turbo::ResultStatus<std::any> b_err = cref_err;  // NOLINT
         EXPECT_THAT(b_err, Not(IsOk()));
 
-        turbo::ResultStatus<turbo::any> c = std::move(status_or);
+        turbo::ResultStatus<std::any> c = std::move(status_or);
         EXPECT_THAT(
                 c, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, true, false))));
-        turbo::ResultStatus<turbo::any> c_err = std::move(status_error);
+        turbo::ResultStatus<std::any> c_err = std::move(status_error);
         EXPECT_THAT(c_err, Not(IsOk()));
     }
 
     TEST(ResultStatus, ResultStatusAnyCopyAndMoveAssignment) {
-        turbo::ResultStatus<turbo::any> status_or = CopyDetector(10);
-        turbo::ResultStatus<turbo::any> status_error = turbo::InvalidArgumentError("foo");
-        turbo::ResultStatus<turbo::any> a;
+        turbo::ResultStatus<std::any> status_or = CopyDetector(10);
+        turbo::ResultStatus<std::any> status_error = turbo::InvalidArgumentError("foo");
+        turbo::ResultStatus<std::any> a;
         a = status_or;
         EXPECT_THAT(
                 a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
         a = status_error;
         EXPECT_THAT(a, Not(IsOk()));
 
-        const turbo::ResultStatus<turbo::any> &cref = status_or;
+        const turbo::ResultStatus<std::any> &cref = status_or;
         a = cref;
         EXPECT_THAT(
                 a, IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, false, true))));
-        const turbo::ResultStatus<turbo::any> &cref_err = status_error;
+        const turbo::ResultStatus<std::any> &cref_err = status_error;
         a = cref_err;
         EXPECT_THAT(a, Not(IsOk()));
         a = std::move(status_or);
@@ -1016,9 +1016,9 @@ namespace {
     }
 
     TEST(ResultStatus, TurboAnyAssignment) {
-        EXPECT_FALSE((std::is_assignable<turbo::ResultStatus<turbo::any>,
+        EXPECT_FALSE((std::is_assignable<turbo::ResultStatus<std::any>,
                 turbo::ResultStatus<int>>::value));
-        turbo::ResultStatus<turbo::any> status_or;
+        turbo::ResultStatus<std::any> status_or;
         status_or = turbo::InvalidArgumentError("foo");
         EXPECT_THAT(status_or, Not(IsOk()));
     }

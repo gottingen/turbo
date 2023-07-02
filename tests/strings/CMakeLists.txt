@@ -16,6 +16,8 @@
 
 
 carbin_cc_test(
+        NAMESPACE
+        turbo
         NAME
         match_test
         SOURCES
@@ -29,6 +31,8 @@ carbin_cc_test(
 )
 
 carbin_cc_test(
+        NAMESPACE
+        turbo
         NAME
         inlined_string_test
         SOURCES
@@ -42,6 +46,8 @@ carbin_cc_test(
 )
 
 carbin_cc_test(
+        NAMESPACE
+        turbo
         NAME
         escaping_test
         SOURCES
@@ -55,6 +61,8 @@ carbin_cc_test(
 )
 
 carbin_cc_test(
+        NAMESPACE
+        turbo
         NAME
         ascii_test
         SOURCES
@@ -82,6 +90,8 @@ carbin_cc_test(
 )
 
 carbin_cc_test(
+        NAMESPACE
+        turbo
         NAME
         string_constant_test
         SOURCES
@@ -95,6 +105,8 @@ carbin_cc_test(
 )
 
 carbin_cc_test(
+        NAMESPACE
+        turbo
         NAME
         str_replace_test
         SOURCES
@@ -122,6 +134,8 @@ carbin_cc_test(
 )
 ]]
 carbin_cc_test(
+        NAMESPACE
+        turbo
         NAME
         cord_buffer_test
         SOURCES
@@ -244,6 +258,8 @@ carbin_cc_test(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         pow10_helper
         SOURCES

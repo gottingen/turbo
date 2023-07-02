@@ -102,6 +102,8 @@ carbin_cc_test(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         exception_testing
         HDRS
@@ -116,6 +118,8 @@ carbin_cc_library(
 
 # Internal-only target, do not depend on directly.
 carbin_cc_library(
+        NAMESPACE
+        turbo
         NAME
         exception_safety_testing
         HDRS

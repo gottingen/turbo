@@ -16,12 +16,14 @@
 
 #include <cstdint>
 
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 #include "turbo/concurrent/internal/thread_pool.h"
 
 namespace {
 
-TEST(ConfigTest, Endianness) {
+TEST_CASE("ConfigTest, Endianness") {
   union {
     uint32_t value;
     uint8_t data[sizeof(uint32_t)];
@@ -33,7 +35,7 @@ TEST(ConfigTest, Endianness) {
 #if TURBO_IS_LITTLE_ENDIAN && TURBO_IS_BIG_ENDIAN
 #error Both TURBO_IS_LITTLE_ENDIAN and TURBO_IS_BIG_ENDIAN are defined
 #elif TURBO_IS_LITTLE_ENDIAN
-  EXPECT_EQ(UINT32_C(0x03020100), number.value);
+  CHECK_EQ(UINT32_C(0x03020100), number.value);
 #elif TURBO_IS_BIG_ENDIAN
   EXPECT_EQ(UINT32_C(0x00010203), number.value);
 #else

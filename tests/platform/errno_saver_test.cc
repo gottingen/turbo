@@ -16,30 +16,31 @@
 
 #include <cerrno>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 #include "turbo/base/internal/strerror.h"
 
 namespace {
-using ::testing::Eq;
+    struct ErrnoPrinter {
+        int no;
+    };
 
-struct ErrnoPrinter {
-  int no;
-};
-std::ostream &operator<<(std::ostream &os, ErrnoPrinter ep) {
-  return os << turbo::base_internal::StrError(ep.no) << " [" << ep.no << "]";
-}
-bool operator==(ErrnoPrinter one, ErrnoPrinter two) { return one.no == two.no; }
+    std::ostream &operator<<(std::ostream &os, ErrnoPrinter ep) {
+        return os << turbo::base_internal::StrError(ep.no) << " [" << ep.no << "]";
+    }
 
-TEST(ErrnoSaverTest, Works) {
-  errno = EDOM;
-  {
-    turbo::base_internal::ErrnoSaver errno_saver;
-    EXPECT_THAT(ErrnoPrinter{errno}, Eq(ErrnoPrinter{EDOM}));
-    errno = ERANGE;
-    EXPECT_THAT(ErrnoPrinter{errno}, Eq(ErrnoPrinter{ERANGE}));
-    EXPECT_THAT(ErrnoPrinter{errno_saver()}, Eq(ErrnoPrinter{EDOM}));
-  }
-  EXPECT_THAT(ErrnoPrinter{errno}, Eq(ErrnoPrinter{EDOM}));
-}
+    bool operator==(ErrnoPrinter one, ErrnoPrinter two) { return one.no == two.no; }
+
+    TEST_CASE("ErrnoSaverTest, Works") {
+        errno = EDOM;
+        {
+            turbo::base_internal::ErrnoSaver errno_saver;
+            CHECK_EQ(ErrnoPrinter{errno}, ErrnoPrinter{EDOM});
+            errno = ERANGE;
+            CHECK_EQ(ErrnoPrinter{errno}, ErrnoPrinter{ERANGE});
+            CHECK_EQ(ErrnoPrinter{errno_saver()}, ErrnoPrinter{EDOM});
+        }
+        CHECK_EQ(ErrnoPrinter{errno}, ErrnoPrinter{EDOM});
+    }
 }  // namespace

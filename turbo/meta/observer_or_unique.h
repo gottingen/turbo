@@ -17,46 +17,52 @@
 
 #include <memory>
 
-enum class ObserverOrUnique : char { Observer, Unique };
+enum class ObserverOrUnique : char {
+    Observer, Unique
+};
 
-template <typename T, typename D = std::default_delete<T>>
+template<typename T, typename D = std::default_delete<T>>
 struct ObserverOrUniquePtr : private D {
-  explicit ObserverOrUniquePtr(T* ptr, ObserverOrUnique own) : ptr_(ptr), own_(own) {}
+    explicit ObserverOrUniquePtr(T *ptr, ObserverOrUnique own) : ptr_(ptr), own_(own) {}
 
-  ObserverOrUniquePtr(ObserverOrUniquePtr&& p) : ptr_(p.ptr_), own_(p.own_) { p.Release(); }
-  ObserverOrUniquePtr& operator=(ObserverOrUniquePtr&& p) {
-    Reset(p.ptr_);
-    own_ = p.own_;
-    p.Release();
+    ObserverOrUniquePtr(ObserverOrUniquePtr &&p) : ptr_(p.ptr_), own_(p.own_) { p.Release(); }
 
-    return *this;
-  }
+    ObserverOrUniquePtr &operator=(ObserverOrUniquePtr &&p) {
+        Reset(p.ptr_);
+        own_ = p.own_;
+        p.Release();
 
-  ObserverOrUniquePtr(const ObserverOrUniquePtr&) = delete;
-  ObserverOrUniquePtr& operator=(const ObserverOrUniquePtr&) = delete;
-
-  ~ObserverOrUniquePtr() {
-    if (own_ == ObserverOrUnique::Unique) {
-      (*this)(ptr_);
-    }
-  }
-
-  T* operator->() const { return ptr_; }
-  T* Get() const { return ptr_; }
-  T* Release() {
-    own_ = ObserverOrUnique::Observer;
-    return ptr_;
-  }
-
-  void Reset(T* ptr = nullptr) {
-    if (own_ == ObserverOrUnique::Unique) {
-      (*this)(ptr_);
+        return *this;
     }
 
-    ptr_ = ptr;
-  }
+    ObserverOrUniquePtr(const ObserverOrUniquePtr &) = delete;
 
- private:
-  T* ptr_;
-  ObserverOrUnique own_;
+    ObserverOrUniquePtr &operator=(const ObserverOrUniquePtr &) = delete;
+
+    ~ObserverOrUniquePtr() {
+        if (own_ == ObserverOrUnique::Unique) {
+            (*this)(ptr_);
+        }
+    }
+
+    T *operator->() const { return ptr_; }
+
+    T *Get() const { return ptr_; }
+
+    T *Release() {
+        own_ = ObserverOrUnique::Observer;
+        return ptr_;
+    }
+
+    void Reset(T *ptr = nullptr) {
+        if (own_ == ObserverOrUnique::Unique) {
+            (*this)(ptr_);
+        }
+
+        ptr_ = ptr;
+    }
+
+private:
+    T *ptr_;
+    ObserverOrUnique own_;
 };
