@@ -33,7 +33,7 @@
 #include "turbo/strings/ascii.h"
 #include "turbo/strings/escaping.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/strings/strip.h"
+#include "turbo/strings/str_strip.h"
 
 #if defined(__native_client__)
 

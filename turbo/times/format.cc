@@ -141,21 +141,5 @@ bool ParseTime(std::string_view format, std::string_view input,
   return b;
 }
 
-// Functions required to support turbo::Time flags.
-bool TurboParseFlag(std::string_view text, turbo::Time* t, std::string* error) {
-  return turbo::ParseTime(RFC3339_full, text, turbo::UTCTimeZone(), t, error);
-}
-
-std::string TurboUnparseFlag(turbo::Time t) {
-  return turbo::FormatTime(RFC3339_full, t, turbo::UTCTimeZone());
-}
-bool ParseFlag(const std::string& text, turbo::Time* t, std::string* error) {
-  return turbo::ParseTime(RFC3339_full, text, turbo::UTCTimeZone(), t, error);
-}
-
-std::string UnparseFlag(turbo::Time t) {
-  return turbo::FormatTime(RFC3339_full, t, turbo::UTCTimeZone());
-}
-
 TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -33,7 +33,7 @@
 #include "turbo/random/random.h"
 #include "turbo/format/str_format.h"
 #include "turbo/strings/str_replace.h"
-#include "turbo/strings/strip.h"
+#include "turbo/strings/str_strip.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

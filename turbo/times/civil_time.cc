@@ -188,42 +188,6 @@ namespace turbo {
             return os << FormatCivilTime(s);
         }
 
-        bool TurboParseFlag(std::string_view s, CivilSecond *c, std::string *) {
-            return ParseLenientCivilTime(s, c);
-        }
-
-        bool TurboParseFlag(std::string_view s, CivilMinute *c, std::string *) {
-            return ParseLenientCivilTime(s, c);
-        }
-
-        bool TurboParseFlag(std::string_view s, CivilHour *c, std::string *) {
-            return ParseLenientCivilTime(s, c);
-        }
-
-        bool TurboParseFlag(std::string_view s, CivilDay *c, std::string *) {
-            return ParseLenientCivilTime(s, c);
-        }
-
-        bool TurboParseFlag(std::string_view s, CivilMonth *c, std::string *) {
-            return ParseLenientCivilTime(s, c);
-        }
-
-        bool TurboParseFlag(std::string_view s, CivilYear *c, std::string *) {
-            return ParseLenientCivilTime(s, c);
-        }
-
-        std::string TurboUnparseFlag(CivilSecond c) { return FormatCivilTime(c); }
-
-        std::string TurboUnparseFlag(CivilMinute c) { return FormatCivilTime(c); }
-
-        std::string TurboUnparseFlag(CivilHour c) { return FormatCivilTime(c); }
-
-        std::string TurboUnparseFlag(CivilDay c) { return FormatCivilTime(c); }
-
-        std::string TurboUnparseFlag(CivilMonth c) { return FormatCivilTime(c); }
-
-        std::string TurboUnparseFlag(CivilYear c) { return FormatCivilTime(c); }
-
     }  // namespace time_internal
 
     TURBO_NAMESPACE_END
