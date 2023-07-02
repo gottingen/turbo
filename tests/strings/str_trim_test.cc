@@ -179,3 +179,14 @@ TEST_CASE("TrimAll, InPlace") {
     RemoveExtraAsciiWhitespaceInplace<std::string>();
     RemoveExtraAsciiWhitespaceInplace<turbo::inlined_string>();
 }
+
+TEST_CASE("pred") {
+    std::string a = "abc ; ";
+    turbo::ByAnyOf ba(" ;\t");
+    auto trimed = turbo::TrimRight(a, ba);
+    CHECK_EQ(trimed, "abc");
+
+    std::string b = " ; \tabc ; ";
+    trimed = turbo::Trim(b, ba);
+    CHECK_EQ(trimed, "abc");
+}

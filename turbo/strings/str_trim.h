@@ -24,48 +24,77 @@ namespace turbo {
 
     // Returns std::string_view with whitespace stripped from the beginning of the
     // given std::string_view.
-    TURBO_MUST_USE_RESULT inline std::string_view TrimLeft(std::string_view str) {
-        auto it = std::find_if_not(str.begin(), str.end(), turbo::ascii_isspace);
+    struct ByAnyOf {
+        explicit ByAnyOf(std::string_view str) : trimmer(str) {
+
+        }
+
+        bool operator()(char c) {
+            return trimmer.find(c) != std::string_view::npos;
+        }
+
+        bool operator()(unsigned char c) {
+            return trimmer.find(c) != std::string_view::npos;
+        }
+
+    private:
+        std::string_view trimmer;
+    };
+
+    struct ByWhitespace {
+        ByWhitespace() = default;
+
+        bool operator()(unsigned char c) {
+            return turbo::ascii_isspace(c);
+        }
+
+    private:
+        std::string_view trimmer;
+    };
+
+    template<typename Pred = ByWhitespace>
+    TURBO_MUST_USE_RESULT inline std::string_view TrimLeft(std::string_view str, Pred pred = Pred()) {
+        auto it = std::find_if_not(str.begin(), str.end(), pred);
         return str.substr(static_cast<size_t>(it - str.begin()));
     }
 
     // Strips in place whitespace from the beginning of the given string.
-    template<typename String>
+    template<typename String, typename Pred = ByWhitespace>
     inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-    TrimLeft(String *str) {
-        auto it = std::find_if_not(str->begin(), str->end(), turbo::ascii_isspace);
+    TrimLeft(String *str, Pred pred = Pred()) {
+        auto it = std::find_if_not(str->begin(), str->end(), pred);
         str->erase(str->begin(), it);
     }
 
     // Returns std::string_view with whitespace stripped from the end of the given
     // std::string_view.
-    TURBO_MUST_USE_RESULT inline std::string_view TrimRight(
-            std::string_view str) {
-        auto it = std::find_if_not(str.rbegin(), str.rend(), turbo::ascii_isspace);
+    template<typename Pred = ByWhitespace>
+    TURBO_MUST_USE_RESULT inline std::string_view TrimRight(std::string_view str, Pred pred = Pred()) {
+        auto it = std::find_if_not(str.rbegin(), str.rend(), pred);
         return str.substr(0, static_cast<size_t>(str.rend() - it));
     }
 
     // Strips in place whitespace from the end of the given string
-    template<typename String>
+    template<typename String, typename Pred = ByWhitespace>
     inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-    TrimRight(String *str) {
-        auto it = std::find_if_not(str->rbegin(), str->rend(), turbo::ascii_isspace);
+    TrimRight(String *str, Pred pred = Pred()) {
+        auto it = std::find_if_not(str->rbegin(), str->rend(), pred);
         str->erase(static_cast<size_t>(str->rend() - it));
     }
 
     // Returns std::string_view with whitespace stripped from both ends of the
     // given std::string_view.
-    TURBO_MUST_USE_RESULT inline std::string_view Trim(
-            std::string_view str) {
-        return TrimRight(TrimLeft(str));
+    template<typename Pred = ByWhitespace>
+    TURBO_MUST_USE_RESULT inline std::string_view Trim(std::string_view str, Pred pred = Pred()) {
+        return TrimRight(TrimLeft(str, pred), pred);
     }
 
     // Strips in place whitespace from both ends of the given string
-    template<typename String>
+    template<typename String, typename Pred = ByWhitespace>
     inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-    Trim(String *str) {
-        TrimRight(str);
-        TrimLeft(str);
+    Trim(String *str, Pred pred = Pred()) {
+        TrimRight(str, pred);
+        TrimLeft(str, pred);
     }
 
     // Removes leading, trailing, and consecutive internal whitespace.
