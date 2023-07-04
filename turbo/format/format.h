@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_FORMAT_STR_FORMAT_H_
-#define TURBO_FORMAT_STR_FORMAT_H_
+#ifndef TURBO_FORMAT_FORMAT_H_
+#define TURBO_FORMAT_FORMAT_H_
 
 #include <string>
 #include "turbo/format/fmt/format.h"
@@ -133,4 +133,4 @@ namespace turbo {
     }
 }  // namespace turbo
 
-#endif  // TURBO_FORMAT_STR_FORMAT_H_
+#endif  // TURBO_FORMAT_FORMAT_H_

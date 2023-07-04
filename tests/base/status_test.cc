@@ -19,7 +19,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "tests/doctest/doctest.h"
 
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/base/turbo_error.h"
 #include "turbo/base/turbo_module.h"
 

@@ -43,7 +43,7 @@
 #include "tests/strings/numbers_test_common.h"
 #include "turbo/strings/internal/ostringstream.h"
 #include "tests/strings/pow10_helper.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 
 namespace {
 

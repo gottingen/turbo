@@ -14,8 +14,11 @@
 # limitations under the License.
 #
 
-add_subdirectory(meta)
-add_subdirectory(strings)
-add_subdirectory(tlog)
-add_subdirectory(flags)
-add_subdirectory(format)
+carbin_cc_binary(
+        NAME
+        string_print
+        SOURCES
+        "string_print.cc"
+        DEPS
+        turbo::turbo
+)

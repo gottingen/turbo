@@ -19,7 +19,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "tests/doctest/doctest.h"
 #include "turbo/strings/escaping.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 
 #define UPDATE_GOLDEN 0
 

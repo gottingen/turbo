@@ -23,7 +23,7 @@
 #include "gtest/gtest.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/random/internal/explicit_seed_seq.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/times/clock.h"
 
 #define UPDATE_GOLDEN 0

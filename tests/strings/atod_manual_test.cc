@@ -44,7 +44,7 @@
 
 #include "turbo/base/casts.h"
 #include "turbo/strings/numbers.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 
 static constexpr uint8_t kUnhex[256] = {

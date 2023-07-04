@@ -46,7 +46,7 @@
 #include "turbo/strings/internal/cordz_update_scope.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 #include "turbo/strings/internal/resize_uninitialized.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

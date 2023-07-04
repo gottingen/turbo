@@ -26,7 +26,7 @@
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_consume.h"
 #include "turbo/strings/internal/cord_rep_flat.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

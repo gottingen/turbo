@@ -17,7 +17,7 @@
 #include <cmath>
 
 #include "gtest/gtest.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

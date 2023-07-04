@@ -23,7 +23,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "tests/doctest/doctest.h"
 #include "turbo/crypto/internal/crc32c.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 
 namespace {

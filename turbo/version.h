@@ -15,7 +15,7 @@
 #ifndef TURBO_VERSION_H_
 #define TURBO_VERSION_H_
 
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 
 // TURBO_VERSION % 100 is the patch level
 // TURBO_VERSION / 100 % 1000 is the minor version

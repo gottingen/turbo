@@ -6,7 +6,7 @@
 
 #include <cstdio>
 #include <chrono>
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/log/tlog.h"
 #include "turbo/log/cfg/env.h"  // support for loading levels from the environment variable
 #include "turbo/log/sinks/basic_file_sink.h"
