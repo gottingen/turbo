@@ -14,114 +14,142 @@
 
 #include "turbo/strings/match.h"
 
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 
 namespace {
 
-TEST(MatchTest, StartsWith) {
-  const std::string s1("123\0abc", 7);
-  const std::string_view a("foobar");
-  const std::string_view b(s1);
-  const std::string_view e;
-  EXPECT_TRUE(turbo::StartsWith(a, a));
-  EXPECT_TRUE(turbo::StartsWith(a, "foo"));
-  EXPECT_TRUE(turbo::StartsWith(a, e));
-  EXPECT_TRUE(turbo::StartsWith(b, s1));
-  EXPECT_TRUE(turbo::StartsWith(b, b));
-  EXPECT_TRUE(turbo::StartsWith(b, e));
-  EXPECT_TRUE(turbo::StartsWith(e, ""));
-  EXPECT_FALSE(turbo::StartsWith(a, b));
-  EXPECT_FALSE(turbo::StartsWith(b, a));
-  EXPECT_FALSE(turbo::StartsWith(e, a));
-}
+    TEST_CASE("MatchTest, StartsWith") {
+        const std::string s1("123\0abc", 7);
+        const std::string_view a("foobar");
+        const std::string_view b(s1);
+        const std::string_view e;
+        CHECK(turbo::StartsWith(a, a));
+        CHECK(turbo::StartsWith(a, "foo"));
+        CHECK(turbo::StartsWith(a, e));
+        CHECK(turbo::StartsWith(b, s1));
+        CHECK(turbo::StartsWith(b, b));
+        CHECK(turbo::StartsWith(b, e));
+        CHECK(turbo::StartsWith(e, ""));
+        CHECK_FALSE(turbo::StartsWith(a, b));
+        CHECK_FALSE(turbo::StartsWith(b, a));
+        CHECK_FALSE(turbo::StartsWith(e, a));
+    }
 
-TEST(MatchTest, EndsWith) {
-  const std::string s1("123\0abc", 7);
-  const std::string_view a("foobar");
-  const std::string_view b(s1);
-  const std::string_view e;
-  EXPECT_TRUE(turbo::EndsWith(a, a));
-  EXPECT_TRUE(turbo::EndsWith(a, "bar"));
-  EXPECT_TRUE(turbo::EndsWith(a, e));
-  EXPECT_TRUE(turbo::EndsWith(b, s1));
-  EXPECT_TRUE(turbo::EndsWith(b, b));
-  EXPECT_TRUE(turbo::EndsWith(b, e));
-  EXPECT_TRUE(turbo::EndsWith(e, ""));
-  EXPECT_FALSE(turbo::EndsWith(a, b));
-  EXPECT_FALSE(turbo::EndsWith(b, a));
-  EXPECT_FALSE(turbo::EndsWith(e, a));
-}
+    TEST_CASE("MatchTest, EndsWith") {
+        const std::string s1("123\0abc", 7);
+        const std::string_view a("foobar");
+        const std::string_view b(s1);
+        const std::string_view e;
+        CHECK(turbo::EndsWith(a, a));
+        CHECK(turbo::EndsWith(a, "bar"));
+        CHECK(turbo::EndsWith(a, e));
+        CHECK(turbo::EndsWith(b, s1));
+        CHECK(turbo::EndsWith(b, b));
+        CHECK(turbo::EndsWith(b, e));
+        CHECK(turbo::EndsWith(e, ""));
+        CHECK_FALSE(turbo::EndsWith(a, b));
+        CHECK_FALSE(turbo::EndsWith(b, a));
+        CHECK_FALSE(turbo::EndsWith(e, a));
+    }
 
-TEST(MatchTest, Contains) {
-  std::string_view a("abcdefg");
-  std::string_view b("abcd");
-  std::string_view c("efg");
-  std::string_view d("gh");
-  EXPECT_TRUE(turbo::StrContains(a, a));
-  EXPECT_TRUE(turbo::StrContains(a, b));
-  EXPECT_TRUE(turbo::StrContains(a, c));
-  EXPECT_FALSE(turbo::StrContains(a, d));
-  EXPECT_TRUE(turbo::StrContains("", ""));
-  EXPECT_TRUE(turbo::StrContains("abc", ""));
-  EXPECT_FALSE(turbo::StrContains("", "a"));
-}
+    TEST_CASE("MatchTest, Contains") {
+        std::string_view a("abcdefg");
+        std::string_view b("abcd");
+        std::string_view c("efg");
+        std::string_view d("gh");
+        CHECK(turbo::StrContains(a, a));
+        CHECK(turbo::StrContains(a, b));
+        CHECK(turbo::StrContains(a, c));
+        CHECK_FALSE(turbo::StrContains(a, d));
+        CHECK(turbo::StrContains("", ""));
+        CHECK(turbo::StrContains("abc", ""));
+        CHECK_FALSE(turbo::StrContains("", "a"));
+    }
 
-TEST(MatchTest, ContainsChar) {
-  std::string_view a("abcdefg");
-  std::string_view b("abcd");
-  EXPECT_TRUE(turbo::StrContains(a, 'a'));
-  EXPECT_TRUE(turbo::StrContains(a, 'b'));
-  EXPECT_TRUE(turbo::StrContains(a, 'e'));
-  EXPECT_FALSE(turbo::StrContains(a, 'h'));
+    TEST_CASE("MatchTest, ContainsChar") {
+        std::string_view a("abcdefg");
+        std::string_view b("abcd");
+        CHECK(turbo::StrContains(a, 'a'));
+        CHECK(turbo::StrContains(a, 'b'));
+        CHECK(turbo::StrContains(a, 'e'));
+        CHECK_FALSE(turbo::StrContains(a, 'h'));
 
-  EXPECT_TRUE(turbo::StrContains(b, 'a'));
-  EXPECT_TRUE(turbo::StrContains(b, 'b'));
-  EXPECT_FALSE(turbo::StrContains(b, 'e'));
-  EXPECT_FALSE(turbo::StrContains(b, 'h'));
+        CHECK(turbo::StrContains(b, 'a'));
+        CHECK(turbo::StrContains(b, 'b'));
+        CHECK_FALSE(turbo::StrContains(b, 'e'));
+        CHECK_FALSE(turbo::StrContains(b, 'h'));
 
-  EXPECT_FALSE(turbo::StrContains("", 'a'));
-  EXPECT_FALSE(turbo::StrContains("", 'a'));
-}
+        CHECK_FALSE(turbo::StrContains("", 'a'));
+        CHECK_FALSE(turbo::StrContains("", 'a'));
+    }
 
-TEST(MatchTest, ContainsNull) {
-  const std::string s = "foo";
-  const char* cs = "foo";
-  const std::string_view sv("foo");
-  const std::string_view sv2("foo\0bar", 4);
-  EXPECT_EQ(s, "foo");
-  EXPECT_EQ(sv, "foo");
-  EXPECT_NE(sv2, "foo");
-  EXPECT_TRUE(turbo::EndsWith(s, sv));
-  EXPECT_TRUE(turbo::StartsWith(cs, sv));
-  EXPECT_TRUE(turbo::StrContains(cs, sv));
-  EXPECT_FALSE(turbo::StrContains(cs, sv2));
-}
+    TEST_CASE("MatchTest, ContainsIgnoreCaseChar") {
+        std::string_view a("abcdefg");
+        std::string_view b("ABCD");
+        CHECK(turbo::StrIgnoreCaseContains(a, 'a'));
+        CHECK(turbo::StrIgnoreCaseContains(a, 'A'));
+        CHECK(turbo::StrIgnoreCaseContains(a, 'b'));
+        CHECK(turbo::StrIgnoreCaseContains(a, 'B'));
+        CHECK(turbo::StrIgnoreCaseContains(a, 'e'));
+        CHECK(turbo::StrIgnoreCaseContains(a, 'E'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains(a, 'h'));
 
-TEST(MatchTest, EqualsIgnoreCase) {
-  std::string text = "the";
-  std::string_view data(text);
+        CHECK(turbo::StrIgnoreCaseContains(b, 'a'));
+        CHECK(turbo::StrIgnoreCaseContains(b, 'A'));
+        CHECK(turbo::StrIgnoreCaseContains(b, 'b'));
+        CHECK(turbo::StrIgnoreCaseContains(b, 'B'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains(b, 'e'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains(b, 'E'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains(b, 'h'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains(b, 'H'));
 
-  EXPECT_TRUE(turbo::EqualsIgnoreCase(data, "The"));
-  EXPECT_TRUE(turbo::EqualsIgnoreCase(data, "THE"));
-  EXPECT_TRUE(turbo::EqualsIgnoreCase(data, "the"));
-  EXPECT_FALSE(turbo::EqualsIgnoreCase(data, "Quick"));
-  EXPECT_FALSE(turbo::EqualsIgnoreCase(data, "then"));
-}
+        CHECK_FALSE(turbo::StrIgnoreCaseContains("", 'a'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains("", 'A'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains("", 'a'));
+        CHECK_FALSE(turbo::StrIgnoreCaseContains("", 'A'));
+    }
 
-TEST(MatchTest, StartsWithIgnoreCase) {
-  EXPECT_TRUE(turbo::StartsWithIgnoreCase("foo", "foo"));
-  EXPECT_TRUE(turbo::StartsWithIgnoreCase("foo", "Fo"));
-  EXPECT_TRUE(turbo::StartsWithIgnoreCase("foo", ""));
-  EXPECT_FALSE(turbo::StartsWithIgnoreCase("foo", "fooo"));
-  EXPECT_FALSE(turbo::StartsWithIgnoreCase("", "fo"));
-}
+    TEST_CASE("MatchTest, ContainsNull") {
+        const std::string s = "foo";
+        const char *cs = "foo";
+        const std::string_view sv("foo");
+        const std::string_view sv2("foo\0bar", 4);
+        CHECK_EQ(s, "foo");
+        CHECK_EQ(sv, "foo");
+        CHECK_NE(sv2, "foo");
+        CHECK(turbo::EndsWith(s, sv));
+        CHECK(turbo::StartsWith(cs, sv));
+        CHECK(turbo::StrContains(cs, sv));
+        CHECK_FALSE(turbo::StrContains(cs, sv2));
+    }
 
-TEST(MatchTest, EndsWithIgnoreCase) {
-  EXPECT_TRUE(turbo::EndsWithIgnoreCase("foo", "foo"));
-  EXPECT_TRUE(turbo::EndsWithIgnoreCase("foo", "Oo"));
-  EXPECT_TRUE(turbo::EndsWithIgnoreCase("foo", ""));
-  EXPECT_FALSE(turbo::EndsWithIgnoreCase("foo", "fooo"));
-  EXPECT_FALSE(turbo::EndsWithIgnoreCase("", "fo"));
-}
+    TEST_CASE("MatchTest, EqualsIgnoreCase") {
+        std::string text = "the";
+        std::string_view data(text);
+
+        CHECK(turbo::EqualsIgnoreCase(data, "The"));
+        CHECK(turbo::EqualsIgnoreCase(data, "THE"));
+        CHECK(turbo::EqualsIgnoreCase(data, "the"));
+        CHECK_FALSE(turbo::EqualsIgnoreCase(data, "Quick"));
+        CHECK_FALSE(turbo::EqualsIgnoreCase(data, "then"));
+    }
+
+    TEST_CASE("MatchTest, StartsWithIgnoreCase") {
+        CHECK(turbo::StartsWithIgnoreCase("foo", "foo"));
+        CHECK(turbo::StartsWithIgnoreCase("foo", "Fo"));
+        CHECK(turbo::StartsWithIgnoreCase("foo", ""));
+        CHECK_FALSE(turbo::StartsWithIgnoreCase("foo", "fooo"));
+        CHECK_FALSE(turbo::StartsWithIgnoreCase("", "fo"));
+    }
+
+    TEST_CASE("MatchTest, EndsWithIgnoreCase") {
+        CHECK(turbo::EndsWithIgnoreCase("foo", "foo"));
+        CHECK(turbo::EndsWithIgnoreCase("foo", "Oo"));
+        CHECK(turbo::EndsWithIgnoreCase("foo", ""));
+        CHECK_FALSE(turbo::EndsWithIgnoreCase("foo", "fooo"));
+        CHECK_FALSE(turbo::EndsWithIgnoreCase("", "fo"));
+    }
 
 }  // namespace

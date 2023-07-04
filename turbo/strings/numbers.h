@@ -44,6 +44,7 @@
 #include "turbo/base/bits.h"
 #include "turbo/base/endian.h"
 #include "turbo/base/int128.h"
+#include "turbo/base/result_status.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
@@ -122,25 +123,25 @@ namespace turbo {
     TURBO_NAMESPACE_BEGIN
     namespace numbers_internal {
 
-// Digit conversion.
+        // Digit conversion.
         TURBO_DLL extern const char kHexChar[17];  // 0123456789abcdef
         TURBO_DLL extern const char
                 kHexTable[513];  // 000102030405060708090a0b0c0d0e0f1011...
         TURBO_DLL extern const char
                 two_ASCII_digits[100][2];  // 00, 01, 02, 03...
 
-// Writes a two-character representation of 'i' to 'buf'. 'i' must be in the
-// range 0 <= i < 100, and buf must have space for two characters. Example:
-//   char buf[2];
-//   PutTwoDigits(42, buf);
-//   // buf[0] == '4'
-//   // buf[1] == '2'
+        // Writes a two-character representation of 'i' to 'buf'. 'i' must be in the
+        // range 0 <= i < 100, and buf must have space for two characters. Example:
+        //   char buf[2];
+        //   PutTwoDigits(42, buf);
+        //   // buf[0] == '4'
+        //   // buf[1] == '2'
         inline void PutTwoDigits(size_t i, char *buf) {
             assert(i < 100);
             memcpy(buf, two_ASCII_digits[i], 2);
         }
 
-// safe_strto?() functions for implementing SimpleAtoi()
+        // safe_strto?() functions for implementing SimpleAtoi()
 
         bool safe_strto32_base(std::string_view text, int32_t *value, int base);
 
@@ -159,17 +160,17 @@ namespace turbo {
         static const int kFastToBufferSize = 32;
         static const int kSixDigitsToBufferSize = 16;
 
-// Helper function for fast formatting of floating-point values.
-// The result is the same as printf's "%g", a.k.a. "%.6g"; that is, six
-// significant digits are returned, trailing zeros are removed, and numbers
-// outside the range 0.0001-999999 are output using scientific notation
-// (1.23456e+06). This routine is heavily optimized.
-// Required buffer size is `kSixDigitsToBufferSize`.
+        // Helper function for fast formatting of floating-point values.
+        // The result is the same as printf's "%g", a.k.a. "%.6g"; that is, six
+        // significant digits are returned, trailing zeros are removed, and numbers
+        // outside the range 0.0001-999999 are output using scientific notation
+        // (1.23456e+06). This routine is heavily optimized.
+        // Required buffer size is `kSixDigitsToBufferSize`.
         size_t SixDigitsToBuffer(double d, char *buffer);
 
-// These functions are intended for speed. All functions take an output buffer
-// as an argument and return a pointer to the last byte they wrote, which is the
-// terminating '\0'. At most `kFastToBufferSize` bytes are written.
+        // These functions are intended for speed. All functions take an output buffer
+        // as an argument and return a pointer to the last byte they wrote, which is the
+        // terminating '\0'. At most `kFastToBufferSize` bytes are written.
         char *FastIntToBuffer(int32_t, char *);
 
         char *FastIntToBuffer(uint32_t, char *);
@@ -178,8 +179,8 @@ namespace turbo {
 
         char *FastIntToBuffer(uint64_t, char *);
 
-// For enums and integer types that are not an exact match for the types above,
-// use templates to call the appropriate one of the four overloads above.
+        // For enums and integer types that are not an exact match for the types above,
+        // use templates to call the appropriate one of the four overloads above.
         template<typename int_type>
         char *FastIntToBuffer(int_type i, char *buffer) {
             static_assert(sizeof(i) <= 64 / 8,
@@ -205,8 +206,8 @@ namespace turbo {
             }
         }
 
-// Implementation of SimpleAtoi, generalized to support arbitrary base (used
-// with base different from 10 elsewhere in Turbo implementation).
+        // Implementation of SimpleAtoi, generalized to support arbitrary base (used
+        // with base different from 10 elsewhere in Turbo implementation).
         template<typename int_type>
         TURBO_MUST_USE_RESULT bool safe_strtoi_base(std::string_view s, int_type *out,
                                                     int base) {
@@ -245,12 +246,12 @@ namespace turbo {
             return parsed;
         }
 
-// FastHexToBufferZeroPad16()
-//
-// Outputs `val` into `out` as if by `snprintf(out, 17, "%016x", val)` but
-// without the terminating null character. Thus `out` must be of length >= 16.
-// Returns the number of non-pad digits of the output (it can never be zero
-// since 0 has one digit).
+        // FastHexToBufferZeroPad16()
+        //
+        // Outputs `val` into `out` as if by `snprintf(out, 17, "%016x", val)` but
+        // without the terminating null character. Thus `out` must be of length >= 16.
+        // Returns the number of non-pad digits of the output (it can never be zero
+        // since 0 has one digit).
         inline size_t FastHexToBufferZeroPad16(uint64_t val, char *out) {
 #if TURBO_WITH_SSSE3
             uint64_t be = turbo::big_endian::FromHost64(val);
@@ -304,6 +305,47 @@ namespace turbo {
     TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(std::string_view str,
                                                     turbo::uint128 *out) {
         return numbers_internal::safe_strtou128_base(str, out, 16);
+    }
+
+    template<typename int_type>
+    TURBO_MUST_USE_RESULT ResultStatus<int_type> Atoi(std::string_view str, int base = 10) {
+        int_type out;
+        if(numbers_internal::safe_strtoi_base(str, &out, base)) {
+            return out;
+        }
+        return turbo::UnavailableError("");
+    }
+
+    TURBO_MUST_USE_RESULT inline ResultStatus<turbo::int128> Atoi(std::string_view str, int base = 10) {
+        turbo::int128 out;
+        if(numbers_internal::safe_strto128_base(str, &out, base)) {
+            return out;
+        }
+        return turbo::UnavailableError("");
+    }
+
+    TURBO_MUST_USE_RESULT inline ResultStatus<float> Atof(std::string_view str) {
+        float out;
+        if(SimpleAtof(str, &out)) {
+            return out;
+        }
+        return turbo::UnavailableError("");
+    }
+
+    TURBO_MUST_USE_RESULT inline ResultStatus<double> Atod(std::string_view str) {
+        double out;
+        if(SimpleAtod(str, &out)) {
+            return out;
+        }
+        return turbo::UnavailableError("");
+    }
+
+    TURBO_MUST_USE_RESULT inline ResultStatus<bool> Atob(std::string_view str) {
+        bool out;
+        if(SimpleAtob(str, &out)) {
+            return out;
+        }
+        return turbo::UnavailableError("");
     }
 
     TURBO_NAMESPACE_END

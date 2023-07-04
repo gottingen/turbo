@@ -26,8 +26,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -85,8 +83,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -198,8 +194,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -211,8 +205,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -224,9 +216,7 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
         turbo::pow10_helper
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -238,8 +228,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -251,8 +239,6 @@ carbin_cc_test(
         ${CARBIN_TEST_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -500,3 +486,24 @@ carbin_cc_test(
         ${GTEST_MAIN_LIB}
 )
 
+carbin_cc_test(
+        NAME
+        str_case_conv_test
+        SOURCES
+        "str_case_conv_test.cc"
+        COPTS
+        ${CARBIN_TEST_COPTS}
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        str_trim_test
+        SOURCES
+        "str_trim_test.cc"
+        COPTS
+        ${CARBIN_TEST_COPTS}
+        DEPS
+        turbo::turbo
+)

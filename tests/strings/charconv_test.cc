@@ -17,8 +17,9 @@
 #include <cstdlib>
 #include <string>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "tests/doctest/doctest.h"
 #include "tests/strings/pow10_helper.h"
 #include "turbo/format/str_format.h"
 
@@ -39,23 +40,23 @@ namespace {
 // Tests that the given string is accepted by turbo::from_chars, and that it
 // converts exactly equal to the given number.
     void TestDoubleParse(std::string_view str, double expected_number) {
-        SCOPED_TRACE(str);
+        CAPTURE(str);
         double actual_number = 0.0;
         turbo::from_chars_result result =
                 turbo::from_chars(str.data(), str.data() + str.length(), actual_number);
-        EXPECT_EQ(result.ec, std::errc());
-        EXPECT_EQ(result.ptr, str.data() + str.length());
-        EXPECT_EQ(actual_number, expected_number);
+        CHECK_EQ(result.ec, std::errc());
+        CHECK_EQ(result.ptr, str.data() + str.length());
+        CHECK_EQ(actual_number, expected_number);
     }
 
     void TestFloatParse(std::string_view str, float expected_number) {
-        SCOPED_TRACE(str);
+        CAPTURE(str);
         float actual_number = 0.0;
         turbo::from_chars_result result =
                 turbo::from_chars(str.data(), str.data() + str.length(), actual_number);
-        EXPECT_EQ(result.ec, std::errc());
-        EXPECT_EQ(result.ptr, str.data() + str.length());
-        EXPECT_EQ(actual_number, expected_number);
+        CHECK_EQ(result.ec, std::errc());
+        CHECK_EQ(result.ptr, str.data() + str.length());
+        CHECK_EQ(actual_number, expected_number);
     }
 
 // Tests that the given double or single precision floating point literal is
@@ -75,7 +76,7 @@ namespace {
     TestFloatParse("-" #number, -number##f); \
   }
 
-    TEST(FromChars, NearRoundingCases) {
+    TEST_CASE("FromChars, NearRoundingCases") {
         // Cases from "A Program for Testing IEEE Decimal-Binary Conversion"
         // by Vern Paxson.
 
@@ -173,84 +174,84 @@ namespace {
     // expected values expressed with integers, using ldexp/ldexpf.  These test
     // cases will work even on compilers that do not accurately round floating point
     // literals.
-    TEST(FromChars, NearRoundingCasesExplicit) {
-        EXPECT_EQ(ToDouble("5.e125"), ldexp(6653062250012735, 365));
-        EXPECT_EQ(ToDouble("69.e267"), ldexp(4705683757438170, 841));
-        EXPECT_EQ(ToDouble("999.e-026"), ldexp(6798841691080350, -129));
-        EXPECT_EQ(ToDouble("7861.e-034"), ldexp(8975675289889240, -153));
-        EXPECT_EQ(ToDouble("75569.e-254"), ldexp(6091718967192243, -880));
-        EXPECT_EQ(ToDouble("928609.e-261"), ldexp(7849264900213743, -900));
-        EXPECT_EQ(ToDouble("9210917.e080"), ldexp(8341110837370930, 236));
-        EXPECT_EQ(ToDouble("84863171.e114"), ldexp(4625202867375927, 353));
-        EXPECT_EQ(ToDouble("653777767.e273"), ldexp(5068902999763073, 884));
-        EXPECT_EQ(ToDouble("5232604057.e-298"), ldexp(5741343011915040, -1010));
-        EXPECT_EQ(ToDouble("27235667517.e-109"), ldexp(6707124626673586, -380));
-        EXPECT_EQ(ToDouble("653532977297.e-123"), ldexp(7078246407265384, -422));
-        EXPECT_EQ(ToDouble("3142213164987.e-294"), ldexp(8219991337640559, -988));
-        EXPECT_EQ(ToDouble("46202199371337.e-072"), ldexp(5224462102115359, -246));
-        EXPECT_EQ(ToDouble("231010996856685.e-073"), ldexp(5224462102115359, -247));
-        EXPECT_EQ(ToDouble("9324754620109615.e212"), ldexp(5539753864394442, 705));
-        EXPECT_EQ(ToDouble("78459735791271921.e049"), ldexp(8388176519442766, 166));
-        EXPECT_EQ(ToDouble("272104041512242479.e200"), ldexp(5554409530847367, 670));
-        EXPECT_EQ(ToDouble("6802601037806061975.e198"), ldexp(5554409530847367, 668));
-        EXPECT_EQ(ToDouble("20505426358836677347.e-221"),
-                  ldexp(4524032052079546, -722));
-        EXPECT_EQ(ToDouble("836168422905420598437.e-234"),
-                  ldexp(5070963299887562, -760));
-        EXPECT_EQ(ToDouble("4891559871276714924261.e222"),
-                  ldexp(6452687840519111, 757));
-        EXPECT_EQ(ToFloat("5.e-20"), ldexpf(15474250, -88));
-        EXPECT_EQ(ToFloat("67.e14"), ldexpf(12479722, 29));
-        EXPECT_EQ(ToFloat("985.e15"), ldexpf(14333636, 36));
-        EXPECT_EQ(ToFloat("7693.e-42"), ldexpf(10979816, -150));
-        EXPECT_EQ(ToFloat("55895.e-16"), ldexpf(12888509, -61));
-        EXPECT_EQ(ToFloat("996622.e-44"), ldexpf(14224264, -150));
-        EXPECT_EQ(ToFloat("7038531.e-32"), ldexpf(11420669, -107));
-        EXPECT_EQ(ToFloat("60419369.e-46"), ldexpf(8623340, -150));
-        EXPECT_EQ(ToFloat("702990899.e-20"), ldexpf(16209866, -61));
-        EXPECT_EQ(ToFloat("6930161142.e-48"), ldexpf(9891056, -150));
-        EXPECT_EQ(ToFloat("25933168707.e-13"), ldexpf(11138211, -32));
-        EXPECT_EQ(ToFloat("596428896559.e20"), ldexpf(12333860, 82));
+    TEST_CASE("FromChars, NearRoundingCasesExplicit") {
+        CHECK_EQ(ToDouble("5.e125"), ldexp(6653062250012735, 365));
+        CHECK_EQ(ToDouble("69.e267"), ldexp(4705683757438170, 841));
+        CHECK_EQ(ToDouble("999.e-026"), ldexp(6798841691080350, -129));
+        CHECK_EQ(ToDouble("7861.e-034"), ldexp(8975675289889240, -153));
+        CHECK_EQ(ToDouble("75569.e-254"), ldexp(6091718967192243, -880));
+        CHECK_EQ(ToDouble("928609.e-261"), ldexp(7849264900213743, -900));
+        CHECK_EQ(ToDouble("9210917.e080"), ldexp(8341110837370930, 236));
+        CHECK_EQ(ToDouble("84863171.e114"), ldexp(4625202867375927, 353));
+        CHECK_EQ(ToDouble("653777767.e273"), ldexp(5068902999763073, 884));
+        CHECK_EQ(ToDouble("5232604057.e-298"), ldexp(5741343011915040, -1010));
+        CHECK_EQ(ToDouble("27235667517.e-109"), ldexp(6707124626673586, -380));
+        CHECK_EQ(ToDouble("653532977297.e-123"), ldexp(7078246407265384, -422));
+        CHECK_EQ(ToDouble("3142213164987.e-294"), ldexp(8219991337640559, -988));
+        CHECK_EQ(ToDouble("46202199371337.e-072"), ldexp(5224462102115359, -246));
+        CHECK_EQ(ToDouble("231010996856685.e-073"), ldexp(5224462102115359, -247));
+        CHECK_EQ(ToDouble("9324754620109615.e212"), ldexp(5539753864394442, 705));
+        CHECK_EQ(ToDouble("78459735791271921.e049"), ldexp(8388176519442766, 166));
+        CHECK_EQ(ToDouble("272104041512242479.e200"), ldexp(5554409530847367, 670));
+        CHECK_EQ(ToDouble("6802601037806061975.e198"), ldexp(5554409530847367, 668));
+        CHECK_EQ(ToDouble("20505426358836677347.e-221"),
+                 ldexp(4524032052079546, -722));
+        CHECK_EQ(ToDouble("836168422905420598437.e-234"),
+                 ldexp(5070963299887562, -760));
+        CHECK_EQ(ToDouble("4891559871276714924261.e222"),
+                 ldexp(6452687840519111, 757));
+        CHECK_EQ(ToFloat("5.e-20"), ldexpf(15474250, -88));
+        CHECK_EQ(ToFloat("67.e14"), ldexpf(12479722, 29));
+        CHECK_EQ(ToFloat("985.e15"), ldexpf(14333636, 36));
+        CHECK_EQ(ToFloat("7693.e-42"), ldexpf(10979816, -150));
+        CHECK_EQ(ToFloat("55895.e-16"), ldexpf(12888509, -61));
+        CHECK_EQ(ToFloat("996622.e-44"), ldexpf(14224264, -150));
+        CHECK_EQ(ToFloat("7038531.e-32"), ldexpf(11420669, -107));
+        CHECK_EQ(ToFloat("60419369.e-46"), ldexpf(8623340, -150));
+        CHECK_EQ(ToFloat("702990899.e-20"), ldexpf(16209866, -61));
+        CHECK_EQ(ToFloat("6930161142.e-48"), ldexpf(9891056, -150));
+        CHECK_EQ(ToFloat("25933168707.e-13"), ldexpf(11138211, -32));
+        CHECK_EQ(ToFloat("596428896559.e20"), ldexpf(12333860, 82));
 
 
-        EXPECT_EQ(ToDouble("9.e-265"), ldexp(8168427841980010, -930));
-        EXPECT_EQ(ToDouble("85.e-037"), ldexp(6360455125664090, -169));
-        EXPECT_EQ(ToDouble("623.e100"), ldexp(6263531988747231, 289));
-        EXPECT_EQ(ToDouble("3571.e263"), ldexp(6234526311072170, 833));
-        EXPECT_EQ(ToDouble("81661.e153"), ldexp(6696636728760206, 472));
-        EXPECT_EQ(ToDouble("920657.e-023"), ldexp(5975405561110124, -109));
-        EXPECT_EQ(ToDouble("4603285.e-024"), ldexp(5975405561110124, -110));
-        EXPECT_EQ(ToDouble("87575437.e-309"), ldexp(8452160731874668, -1053));
-        EXPECT_EQ(ToDouble("245540327.e122"), ldexp(4985336549131723, 381));
-        EXPECT_EQ(ToDouble("6138508175.e120"), ldexp(4985336549131723, 379));
-        EXPECT_EQ(ToDouble("83356057653.e193"), ldexp(5986732817132056, 625));
-        EXPECT_EQ(ToDouble("619534293513.e124"), ldexp(4798406992060657, 399));
-        EXPECT_EQ(ToDouble("2335141086879.e218"), ldexp(5419088166961646, 713));
-        EXPECT_EQ(ToDouble("36167929443327.e-159"), ldexp(8135819834632444, -536));
-        EXPECT_EQ(ToDouble("609610927149051.e-255"), ldexp(4576664294594737, -850));
-        EXPECT_EQ(ToDouble("3743626360493413.e-165"), ldexp(6898586531774201, -549));
-        EXPECT_EQ(ToDouble("94080055902682397.e-242"), ldexp(6273271706052298, -800));
-        EXPECT_EQ(ToDouble("899810892172646163.e283"), ldexp(7563892574477827, 947));
-        EXPECT_EQ(ToDouble("7120190517612959703.e120"), ldexp(5385467232557565, 409));
-        EXPECT_EQ(ToDouble("25188282901709339043.e-252"),
-                  ldexp(5635662608542340, -825));
-        EXPECT_EQ(ToDouble("308984926168550152811.e-052"),
-                  ldexp(5644774693823803, -157));
-        EXPECT_EQ(ToDouble("6372891218502368041059.e064"),
-                  ldexp(4616868614322430, 233));
+        CHECK_EQ(ToDouble("9.e-265"), ldexp(8168427841980010, -930));
+        CHECK_EQ(ToDouble("85.e-037"), ldexp(6360455125664090, -169));
+        CHECK_EQ(ToDouble("623.e100"), ldexp(6263531988747231, 289));
+        CHECK_EQ(ToDouble("3571.e263"), ldexp(6234526311072170, 833));
+        CHECK_EQ(ToDouble("81661.e153"), ldexp(6696636728760206, 472));
+        CHECK_EQ(ToDouble("920657.e-023"), ldexp(5975405561110124, -109));
+        CHECK_EQ(ToDouble("4603285.e-024"), ldexp(5975405561110124, -110));
+        CHECK_EQ(ToDouble("87575437.e-309"), ldexp(8452160731874668, -1053));
+        CHECK_EQ(ToDouble("245540327.e122"), ldexp(4985336549131723, 381));
+        CHECK_EQ(ToDouble("6138508175.e120"), ldexp(4985336549131723, 379));
+        CHECK_EQ(ToDouble("83356057653.e193"), ldexp(5986732817132056, 625));
+        CHECK_EQ(ToDouble("619534293513.e124"), ldexp(4798406992060657, 399));
+        CHECK_EQ(ToDouble("2335141086879.e218"), ldexp(5419088166961646, 713));
+        CHECK_EQ(ToDouble("36167929443327.e-159"), ldexp(8135819834632444, -536));
+        CHECK_EQ(ToDouble("609610927149051.e-255"), ldexp(4576664294594737, -850));
+        CHECK_EQ(ToDouble("3743626360493413.e-165"), ldexp(6898586531774201, -549));
+        CHECK_EQ(ToDouble("94080055902682397.e-242"), ldexp(6273271706052298, -800));
+        CHECK_EQ(ToDouble("899810892172646163.e283"), ldexp(7563892574477827, 947));
+        CHECK_EQ(ToDouble("7120190517612959703.e120"), ldexp(5385467232557565, 409));
+        CHECK_EQ(ToDouble("25188282901709339043.e-252"),
+                 ldexp(5635662608542340, -825));
+        CHECK_EQ(ToDouble("308984926168550152811.e-052"),
+                 ldexp(5644774693823803, -157));
+        CHECK_EQ(ToDouble("6372891218502368041059.e064"),
+                 ldexp(4616868614322430, 233));
 
-        EXPECT_EQ(ToFloat("3.e-23"), ldexpf(9507380, -98));
-        EXPECT_EQ(ToFloat("57.e18"), ldexpf(12960300, 42));
-        EXPECT_EQ(ToFloat("789.e-35"), ldexpf(10739312, -130));
-        EXPECT_EQ(ToFloat("2539.e-18"), ldexpf(11990089, -72));
-        EXPECT_EQ(ToFloat("76173.e28"), ldexpf(9845130, 86));
-        EXPECT_EQ(ToFloat("887745.e-11"), ldexpf(9760860, -40));
-        EXPECT_EQ(ToFloat("5382571.e-37"), ldexpf(11447463, -124));
-        EXPECT_EQ(ToFloat("82381273.e-35"), ldexpf(8554961, -113));
-        EXPECT_EQ(ToFloat("750486563.e-38"), ldexpf(9975678, -120));
-        EXPECT_EQ(ToFloat("3752432815.e-39"), ldexpf(9975678, -121));
-        EXPECT_EQ(ToFloat("75224575729.e-45"), ldexpf(13105970, -137));
-        EXPECT_EQ(ToFloat("459926601011.e15"), ldexpf(12466336, 65));
+        CHECK_EQ(ToFloat("3.e-23"), ldexpf(9507380, -98));
+        CHECK_EQ(ToFloat("57.e18"), ldexpf(12960300, 42));
+        CHECK_EQ(ToFloat("789.e-35"), ldexpf(10739312, -130));
+        CHECK_EQ(ToFloat("2539.e-18"), ldexpf(11990089, -72));
+        CHECK_EQ(ToFloat("76173.e28"), ldexpf(9845130, 86));
+        CHECK_EQ(ToFloat("887745.e-11"), ldexpf(9760860, -40));
+        CHECK_EQ(ToFloat("5382571.e-37"), ldexpf(11447463, -124));
+        CHECK_EQ(ToFloat("82381273.e-35"), ldexpf(8554961, -113));
+        CHECK_EQ(ToFloat("750486563.e-38"), ldexpf(9975678, -120));
+        CHECK_EQ(ToFloat("3752432815.e-39"), ldexpf(9975678, -121));
+        CHECK_EQ(ToFloat("75224575729.e-45"), ldexpf(13105970, -137));
+        CHECK_EQ(ToFloat("459926601011.e15"), ldexpf(12466336, 65));
     }
 
     // Common test logic for converting a string which lies exactly halfway between
@@ -276,23 +277,23 @@ namespace {
 
         FloatType actual_low = 0;
         turbo::from_chars(low_rep.data(), low_rep.data() + low_rep.size(), actual_low);
-        EXPECT_EQ(expected_low, actual_low);
+        CHECK_EQ(expected_low, actual_low);
 
         std::string high_rep =
                 turbo::Format("{}{}{}{}", mantissa, std::string(1000, '0'), "1e", exponent);
         FloatType actual_high = 0;
         turbo::from_chars(high_rep.data(), high_rep.data() + high_rep.size(),
                           actual_high);
-        EXPECT_EQ(expected_high, actual_high);
+        CHECK_EQ(expected_high, actual_high);
 
         std::string halfway_rep = turbo::Format("{}{}{}", mantissa, "e", exponent);
         FloatType actual_half = 0;
         turbo::from_chars(halfway_rep.data(), halfway_rep.data() + halfway_rep.size(),
                           actual_half);
-        EXPECT_EQ(expected_half, actual_half);
+        CHECK_EQ(expected_half, actual_half);
     }
 
-    TEST(FromChars, DoubleRounding) {
+    TEST_CASE("FromChars, DoubleRounding") {
         const double zero = 0.0;
         const double first_subnormal = nextafter(zero, 1.0);
         const double second_subnormal = nextafter(first_subnormal, 1.0);
@@ -385,7 +386,7 @@ namespace {
 
     // Same test cases as DoubleRounding, now with new and improved Much Smaller
     // Precision!
-    TEST(FromChars, FloatRounding) {
+    TEST_CASE("FromChars, FloatRounding") {
         const float zero = 0.0;
         const float first_subnormal = nextafterf(zero, 1.0);
         const float second_subnormal = nextafterf(first_subnormal, 1.0);
@@ -430,7 +431,7 @@ namespace {
                          penultimate_normal, last_normal, penultimate_normal);
     }
 
-    TEST(FromChars, Underflow) {
+    TEST_CASE("FromChars, Underflow") {
         // Check that underflow is handled correctly, according to the specification
         // in DR 3081.
         double d;
@@ -442,35 +443,35 @@ namespace {
         const char *end = begin + negative_underflow.size();
         d = 100.0;
         result = turbo::from_chars(begin, end, d);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_TRUE(std::signbit(d));  // negative
-        EXPECT_GE(d, -std::numeric_limits<double>::min());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK(std::signbit(d));  // negative
+        CHECK_GE(d, -std::numeric_limits<double>::min());
         f = 100.0;
         result = turbo::from_chars(begin, end, f);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_TRUE(std::signbit(f));  // negative
-        EXPECT_GE(f, -std::numeric_limits<float>::min());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK(std::signbit(f));  // negative
+        CHECK_GE(f, -std::numeric_limits<float>::min());
 
         std::string positive_underflow = "1e-1000";
         begin = positive_underflow.data();
         end = begin + positive_underflow.size();
         d = -100.0;
         result = turbo::from_chars(begin, end, d);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_FALSE(std::signbit(d));  // positive
-        EXPECT_LE(d, std::numeric_limits<double>::min());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK_FALSE(std::signbit(d));  // positive
+        CHECK_LE(d, std::numeric_limits<double>::min());
         f = -100.0;
         result = turbo::from_chars(begin, end, f);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_FALSE(std::signbit(f));  // positive
-        EXPECT_LE(f, std::numeric_limits<float>::min());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK_FALSE(std::signbit(f));  // positive
+        CHECK_LE(f, std::numeric_limits<float>::min());
     }
 
-    TEST(FromChars, Overflow) {
+    TEST_CASE("FromChars, Overflow") {
         // Check that overflow is handled correctly, according to the specification
         // in DR 3081.
         double d;
@@ -482,42 +483,42 @@ namespace {
         const char *end = begin + negative_overflow.size();
         d = 100.0;
         result = turbo::from_chars(begin, end, d);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_TRUE(std::signbit(d));  // negative
-        EXPECT_EQ(d, -std::numeric_limits<double>::max());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK(std::signbit(d));  // negative
+        CHECK_EQ(d, -std::numeric_limits<double>::max());
         f = 100.0;
         result = turbo::from_chars(begin, end, f);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_TRUE(std::signbit(f));  // negative
-        EXPECT_EQ(f, -std::numeric_limits<float>::max());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK(std::signbit(f));  // negative
+        CHECK_EQ(f, -std::numeric_limits<float>::max());
 
         std::string positive_overflow = "1e1000";
         begin = positive_overflow.data();
         end = begin + positive_overflow.size();
         d = -100.0;
         result = turbo::from_chars(begin, end, d);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_FALSE(std::signbit(d));  // positive
-        EXPECT_EQ(d, std::numeric_limits<double>::max());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK_FALSE(std::signbit(d));  // positive
+        CHECK_EQ(d, std::numeric_limits<double>::max());
         f = -100.0;
         result = turbo::from_chars(begin, end, f);
-        EXPECT_EQ(result.ptr, end);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_FALSE(std::signbit(f));  // positive
-        EXPECT_EQ(f, std::numeric_limits<float>::max());
+        CHECK_EQ(result.ptr, end);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK_FALSE(std::signbit(f));  // positive
+        CHECK_EQ(f, std::numeric_limits<float>::max());
     }
 
-    TEST(FromChars, RegressionTestsFromFuzzer) {
+    TEST_CASE("FromChars, RegressionTestsFromFuzzer") {
         std::string_view src = "0x21900000p00000000099";
         float f;
         auto result = turbo::from_chars(src.data(), src.data() + src.size(), f);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
     }
 
-    TEST(FromChars, ReturnValuePtr) {
+    TEST_CASE("FromChars, ReturnValuePtr") {
         // Check that `ptr` points one past the number scanned, even if that number
         // is not representable.
         double d;
@@ -525,20 +526,20 @@ namespace {
 
         std::string normal = "3.14@#$%@#$%";
         result = turbo::from_chars(normal.data(), normal.data() + normal.size(), d);
-        EXPECT_EQ(result.ec, std::errc());
-        EXPECT_EQ(result.ptr - normal.data(), 4);
+        CHECK_EQ(result.ec, std::errc());
+        CHECK_EQ(result.ptr - normal.data(), 4);
 
         std::string overflow = "1e1000@#$%@#$%";
         result = turbo::from_chars(overflow.data(),
                                    overflow.data() + overflow.size(), d);
-        EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-        EXPECT_EQ(result.ptr - overflow.data(), 6);
+        CHECK_EQ(result.ec, std::errc::result_out_of_range);
+        CHECK_EQ(result.ptr - overflow.data(), 6);
 
         std::string garbage = "#$%@#$%";
         result = turbo::from_chars(garbage.data(),
                                    garbage.data() + garbage.size(), d);
-        EXPECT_EQ(result.ec, std::errc::invalid_argument);
-        EXPECT_EQ(result.ptr - garbage.data(), 0);
+        CHECK_EQ(result.ec, std::errc::invalid_argument);
+        CHECK_EQ(result.ptr - garbage.data(), 0);
     }
 
     // Check for a wide range of inputs that strtod() and turbo::from_chars() exactly
@@ -546,7 +547,7 @@ namespace {
     //
     // This test assumes the platform's strtod() uses perfect round_to_nearest
     // rounding.
-    TEST(FromChars, TestVersusStrtod) {
+    TEST_CASE("FromChars, TestVersusStrtod") {
         for (int mantissa = 1000000; mantissa <= 9999999; mantissa += 501) {
             for (int exponent = -300; exponent < 300; ++exponent) {
                 std::string candidate = turbo::Format("{}{}{}", mantissa, "e", exponent);
@@ -554,7 +555,7 @@ namespace {
                 double turbo_value = 0;
                 turbo::from_chars(candidate.data(), candidate.data() + candidate.size(),
                                   turbo_value);
-                ASSERT_EQ(strtod_value, turbo_value) << candidate;
+                REQUIRE_EQ(strtod_value, turbo_value);
             }
         }
     }
@@ -564,7 +565,7 @@ namespace {
     //
     // This test assumes the platform's strtof() uses perfect round_to_nearest
     // rounding.
-    TEST(FromChars, TestVersusStrtof) {
+    TEST_CASE("FromChars, TestVersusStrtof") {
         for (int mantissa = 1000000; mantissa <= 9999999; mantissa += 501) {
             for (int exponent = -43; exponent < 32; ++exponent) {
                 std::string candidate = turbo::Format("{}{}{}", mantissa, "e", exponent);
@@ -572,12 +573,12 @@ namespace {
                 float turbo_value = 0;
                 turbo::from_chars(candidate.data(), candidate.data() + candidate.size(),
                                   turbo_value);
-                ASSERT_EQ(strtod_value, turbo_value) << candidate;
+                REQUIRE_EQ(strtod_value, turbo_value);
             }
         }
     }
 
-    // Tests if two floating point values have identical bit layouts.  (EXPECT_EQ
+    // Tests if two floating point values have identical bit layouts.  (CHECK_EQ
     // is not suitable for NaN testing, since NaNs are never equal.)
     template<typename Float>
     bool Identical(Float a, Float b) {
@@ -591,24 +592,24 @@ namespace {
     //
     // (In Linux, this parses the value as a number and stuffs that number into the
     // free bits of a quiet NaN.)
-    TEST(FromChars, NaNDoubles) {
+    TEST_CASE("FromChars, NaNDoubles") {
         for (std::string n_char_sequence:
                 {"", "1", "2", "3", "fff", "FFF", "200000", "400000", "4000000000000",
                  "8000000000000", "abc123", "legal_but_unexpected",
                  "99999999999999999999999", "_"}) {
             std::string input = turbo::Format("nan({})", n_char_sequence);
-            SCOPED_TRACE(input);
+            CAPTURE(input);
             double from_chars_double;
             turbo::from_chars(input.data(), input.data() + input.size(),
                               from_chars_double);
             double std_nan_double = std::nan(n_char_sequence.c_str());
-            EXPECT_TRUE(Identical(from_chars_double, std_nan_double));
+            CHECK(Identical(from_chars_double, std_nan_double));
 
             // Also check that we match strtod()'s behavior.  This test assumes that the
             // platform has a compliant strtod().
 #if TURBO_STRTOD_HANDLES_NAN_CORRECTLY
             double strtod_double = strtod(input.c_str(), nullptr);
-            EXPECT_TRUE(Identical(from_chars_double, strtod_double));
+            CHECK(Identical(from_chars_double, strtod_double));
 #endif  // TURBO_STRTOD_HANDLES_NAN_CORRECTLY
 
             // Check that we can parse a negative NaN
@@ -617,31 +618,31 @@ namespace {
             turbo::from_chars(negative_input.data(),
                               negative_input.data() + negative_input.size(),
                               negative_from_chars_double);
-            EXPECT_TRUE(std::signbit(negative_from_chars_double));
-            EXPECT_FALSE(Identical(negative_from_chars_double, from_chars_double));
+            CHECK(std::signbit(negative_from_chars_double));
+            CHECK_FALSE(Identical(negative_from_chars_double, from_chars_double));
             from_chars_double = std::copysign(from_chars_double, -1.0);
-            EXPECT_TRUE(Identical(negative_from_chars_double, from_chars_double));
+            CHECK(Identical(negative_from_chars_double, from_chars_double));
         }
     }
 
-    TEST(FromChars, NaNFloats) {
+    TEST_CASE("FromChars, NaNFloats") {
         for (std::string n_char_sequence:
                 {"", "1", "2", "3", "fff", "FFF", "200000", "400000", "4000000000000",
                  "8000000000000", "abc123", "legal_but_unexpected",
                  "99999999999999999999999", "_"}) {
             std::string input = turbo::Format("nan({})", n_char_sequence);
-            SCOPED_TRACE(input);
+            CAPTURE(input);
             float from_chars_float;
             turbo::from_chars(input.data(), input.data() + input.size(),
                               from_chars_float);
             float std_nan_float = std::nanf(n_char_sequence.c_str());
-            EXPECT_TRUE(Identical(from_chars_float, std_nan_float));
+            CHECK(Identical(from_chars_float, std_nan_float));
 
             // Also check that we match strtof()'s behavior.  This test assumes that the
             // platform has a compliant strtof().
 #if TURBO_STRTOD_HANDLES_NAN_CORRECTLY
             float strtof_float = strtof(input.c_str(), nullptr);
-            EXPECT_TRUE(Identical(from_chars_float, strtof_float));
+            CHECK(Identical(from_chars_float, strtof_float));
 #endif  // TURBO_STRTOD_HANDLES_NAN_CORRECTLY
 
             // Check that we can parse a negative NaN
@@ -650,12 +651,12 @@ namespace {
             turbo::from_chars(negative_input.data(),
                               negative_input.data() + negative_input.size(),
                               negative_from_chars_float);
-            EXPECT_TRUE(std::signbit(negative_from_chars_float));
-            EXPECT_FALSE(Identical(negative_from_chars_float, from_chars_float));
+            CHECK(std::signbit(negative_from_chars_float));
+            CHECK_FALSE(Identical(negative_from_chars_float, from_chars_float));
             // Use the (float, float) overload of std::copysign to prevent narrowing;
             // see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98251.
             from_chars_float = std::copysign(from_chars_float, -1.0f);
-            EXPECT_TRUE(Identical(negative_from_chars_float, from_chars_float));
+            CHECK(Identical(negative_from_chars_float, from_chars_float));
         }
     }
 
@@ -685,49 +686,47 @@ namespace {
         for (index = lower_bound, step = 1; index < upper_bound;
              index += step, step = NextStep(step)) {
             std::string input = input_generator(index);
-            SCOPED_TRACE(input);
+            CAPTURE(input);
             Float expected = expected_generator(index);
             Float actual;
             auto result =
                     turbo::from_chars(input.data(), input.data() + input.size(), actual);
-            EXPECT_EQ(result.ec, std::errc());
-            EXPECT_EQ(expected, actual)
-                                << turbo::Format("{:a} vs {:a}", expected, actual);
+            CHECK_EQ(result.ec, std::errc());
+            CHECK_EQ(expected, actual);
         }
         // test legal values near upper_bound
         for (index = upper_bound, step = 1; index > lower_bound;
              index -= step, step = NextStep(step)) {
             std::string input = input_generator(index);
-            SCOPED_TRACE(input);
+            CAPTURE(input);
             Float expected = expected_generator(index);
             Float actual;
             auto result =
                     turbo::from_chars(input.data(), input.data() + input.size(), actual);
-            EXPECT_EQ(result.ec, std::errc());
-            EXPECT_EQ(expected, actual)
-                                << turbo::Format("{:a} vs {:a}", expected, actual);
+            CHECK_EQ(result.ec, std::errc());
+            CHECK_EQ(expected, actual);
         }
         // Test underflow values below lower_bound
         for (index = lower_bound - 1, step = 1; index > -1000000;
              index -= step, step = NextStep(step)) {
             std::string input = input_generator(index);
-            SCOPED_TRACE(input);
+            CAPTURE(input);
             Float actual;
             auto result =
                     turbo::from_chars(input.data(), input.data() + input.size(), actual);
-            EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-            EXPECT_LT(actual, 1.0);  // check for underflow
+            CHECK_EQ(result.ec, std::errc::result_out_of_range);
+            CHECK_LT(actual, 1.0);  // check for underflow
         }
         // Test overflow values above upper_bound
         for (index = upper_bound + 1, step = 1; index < 1000000;
              index += step, step = NextStep(step)) {
             std::string input = input_generator(index);
-            SCOPED_TRACE(input);
+            CAPTURE(input);
             Float actual;
             auto result =
                     turbo::from_chars(input.data(), input.data() + input.size(), actual);
-            EXPECT_EQ(result.ec, std::errc::result_out_of_range);
-            EXPECT_GT(actual, 1.0);  // check for overflow
+            CHECK_EQ(result.ec, std::errc::result_out_of_range);
+            CHECK_GT(actual, 1.0);  // check for overflow
         }
     }
 
@@ -737,7 +736,7 @@ namespace {
     // smallest representable subnormal is 0x0.0000000000001p-1022, which equals
     // 0x1p-1074.  Therefore 1023 and -1074 are the limits of acceptable exponents
     // in this test.
-    TEST(FromChars, HexdecimalDoubleLimits) {
+    TEST_CASE("FromChars, HexdecimalDoubleLimits") {
         auto input_gen = [](int index) { return turbo::Format("0x1.0p{}", index); };
         auto expected_gen = [](int index) { return std::ldexp(1.0, index); };
         TestOverflowAndUnderflow<double>(input_gen, expected_gen, -1074, 1023);
@@ -748,7 +747,7 @@ namespace {
     // The largest representable float is 0x1.fffffep+127, and the smallest
     // representable subnormal is 0x0.000002p-126, which equals 0x1p-149.
     // Therefore 127 and -149 are the limits of acceptable exponents in this test.
-    TEST(FromChars, HexdecimalFloatLimits) {
+    TEST_CASE("FromChars, HexdecimalFloatLimits") {
         auto input_gen = [](int index) { return turbo::Format("0x1.0p{}", index); };
         auto expected_gen = [](int index) { return std::ldexp(1.0f, index); };
         TestOverflowAndUnderflow<float>(input_gen, expected_gen, -149, 127);
@@ -760,7 +759,7 @@ namespace {
     // representable subnormal is about 5e-324.  '1e-324' therefore rounds away from
     // the smallest representable positive value.  -323 and 308 are the limits of
     // acceptable exponents in this test.
-    TEST(FromChars, DecimalDoubleLimits) {
+    TEST_CASE("FromChars, DecimalDoubleLimits") {
         auto input_gen = [](int index) { return turbo::Format("1.0e{}", index); };
         auto expected_gen = [](int index) { return Pow10(index); };
         TestOverflowAndUnderflow<double>(input_gen, expected_gen, -323, 308);
@@ -772,7 +771,7 @@ namespace {
     // representable subnormal is about 1.45e-45.  '1e-45' therefore rounds towards
     // the smallest representable positive value.  -45 and 38 are the limits of
     // acceptable exponents in this test.
-    TEST(FromChars, DecimalFloatLimits) {
+    TEST_CASE("FromChars, DecimalFloatLimits") {
         auto input_gen = [](int index) { return turbo::Format("1.0e{}", index); };
         auto expected_gen = [](int index) { return Pow10(index); };
         TestOverflowAndUnderflow<float>(input_gen, expected_gen, -45, 38);

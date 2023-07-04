@@ -23,9 +23,9 @@ namespace turbo {
         using FixedMapping =
                 std::initializer_list<std::pair<std::string_view, std::string_view>>;
 
-// Applies the ViableSubstitutions in subs_ptr to the std::string_view s, and
-// stores the result in *result_ptr. Returns the number of substitutions that
-// occurred.
+        // Applies the ViableSubstitutions in subs_ptr to the std::string_view s, and
+        // stores the result in *result_ptr. Returns the number of substitutions that
+        // occurred.
         int ApplySubstitutions(
                 std::string_view s,
                 std::vector<strings_internal::ViableSubstitution> *subs_ptr,

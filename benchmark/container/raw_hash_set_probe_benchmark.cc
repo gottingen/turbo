@@ -27,7 +27,7 @@
 #include "turbo/random/random.h"
 #include "turbo/format/str_format.h"
 #include "turbo/strings/string_view.h"
-#include "turbo/strings/strip.h"
+#include "turbo/strings/str_strip.h"
 
 namespace {
 

@@ -60,200 +60,121 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace ascii_internal {
+    TURBO_NAMESPACE_BEGIN
+    namespace ascii_internal {
 
-// Declaration for an array of bitfields holding character information.
-TURBO_DLL extern const unsigned char kPropertyBits[256];
+        // Declaration for an array of bitfields holding character information.
+        TURBO_DLL extern const unsigned char kPropertyBits[256];
 
-// Declaration for the array of characters to upper-case characters.
-TURBO_DLL extern const char kToUpper[256];
+        // Declaration for the array of characters to upper-case characters.
+        TURBO_DLL extern const char kToUpper[256];
 
-// Declaration for the array of characters to lower-case characters.
-TURBO_DLL extern const char kToLower[256];
+        // Declaration for the array of characters to lower-case characters.
+        TURBO_DLL extern const char kToLower[256];
 
-}  // namespace ascii_internal
+    }  // namespace ascii_internal
 
-// ascii_isalpha()
-//
-// Determines whether the given character is an alphabetic character.
-inline bool ascii_isalpha(unsigned char c) {
-  return (ascii_internal::kPropertyBits[c] & 0x01) != 0;
-}
+    // ascii_isalpha()
+    //
+    // Determines whether the given character is an alphabetic character.
+    inline bool ascii_isalpha(unsigned char c) {
+        return (ascii_internal::kPropertyBits[c] & 0x01) != 0;
+    }
 
-// ascii_isalnum()
-//
-// Determines whether the given character is an alphanumeric character.
-inline bool ascii_isalnum(unsigned char c) {
-  return (ascii_internal::kPropertyBits[c] & 0x04) != 0;
-}
+    // ascii_isalnum()
+    //
+    // Determines whether the given character is an alphanumeric character.
+    inline bool ascii_isalnum(unsigned char c) {
+        return (ascii_internal::kPropertyBits[c] & 0x04) != 0;
+    }
 
-// ascii_isspace()
-//
-// Determines whether the given character is a whitespace character (space,
-// tab, vertical tab, formfeed, linefeed, or carriage return).
-inline bool ascii_isspace(unsigned char c) {
-  return (ascii_internal::kPropertyBits[c] & 0x08) != 0;
-}
+    // ascii_isspace()
+    //
+    // Determines whether the given character is a whitespace character (space,
+    // tab, vertical tab, formfeed, linefeed, or carriage return).
+    inline bool ascii_isspace(unsigned char c) {
+        return (ascii_internal::kPropertyBits[c] & 0x08) != 0;
+    }
 
-// ascii_ispunct()
-//
-// Determines whether the given character is a punctuation character.
-inline bool ascii_ispunct(unsigned char c) {
-  return (ascii_internal::kPropertyBits[c] & 0x10) != 0;
-}
+    // ascii_ispunct()
+    //
+    // Determines whether the given character is a punctuation character.
+    inline bool ascii_ispunct(unsigned char c) {
+        return (ascii_internal::kPropertyBits[c] & 0x10) != 0;
+    }
 
-// ascii_isblank()
-//
-// Determines whether the given character is a blank character (tab or space).
-inline bool ascii_isblank(unsigned char c) {
-  return (ascii_internal::kPropertyBits[c] & 0x20) != 0;
-}
+    // ascii_isblank()
+    //
+    // Determines whether the given character is a blank character (tab or space).
+    inline bool ascii_isblank(unsigned char c) {
+        return (ascii_internal::kPropertyBits[c] & 0x20) != 0;
+    }
 
-// ascii_iscntrl()
-//
-// Determines whether the given character is a control character.
-inline bool ascii_iscntrl(unsigned char c) {
-  return (ascii_internal::kPropertyBits[c] & 0x40) != 0;
-}
+    // ascii_iscntrl()
+    //
+    // Determines whether the given character is a control character.
+    inline bool ascii_iscntrl(unsigned char c) {
+        return (ascii_internal::kPropertyBits[c] & 0x40) != 0;
+    }
 
-// ascii_isxdigit()
-//
-// Determines whether the given character can be represented as a hexadecimal
-// digit character (i.e. {0-9} or {A-F}).
-inline bool ascii_isxdigit(unsigned char c) {
-  return (ascii_internal::kPropertyBits[c] & 0x80) != 0;
-}
+    // ascii_isxdigit()
+    //
+    // Determines whether the given character can be represented as a hexadecimal
+    // digit character (i.e. {0-9} or {A-F}).
+    inline bool ascii_isxdigit(unsigned char c) {
+        return (ascii_internal::kPropertyBits[c] & 0x80) != 0;
+    }
 
-// ascii_isdigit()
-//
-// Determines whether the given character can be represented as a decimal
-// digit character (i.e. {0-9}).
-inline bool ascii_isdigit(unsigned char c) { return c >= '0' && c <= '9'; }
+    // ascii_isdigit()
+    //
+    // Determines whether the given character can be represented as a decimal
+    // digit character (i.e. {0-9}).
+    inline bool ascii_isdigit(unsigned char c) { return c >= '0' && c <= '9'; }
 
-// ascii_isprint()
-//
-// Determines whether the given character is printable, including spaces.
-inline bool ascii_isprint(unsigned char c) { return c >= 32 && c < 127; }
+    // ascii_isprint()
+    //
+    // Determines whether the given character is printable, including spaces.
+    inline bool ascii_isprint(unsigned char c) { return c >= 32 && c < 127; }
 
-// ascii_isgraph()
-//
-// Determines whether the given character has a graphical representation.
-inline bool ascii_isgraph(unsigned char c) { return c > 32 && c < 127; }
+    // ascii_isgraph()
+    //
+    // Determines whether the given character has a graphical representation.
+    inline bool ascii_isgraph(unsigned char c) { return c > 32 && c < 127; }
 
-// ascii_isupper()
-//
-// Determines whether the given character is uppercase.
-inline bool ascii_isupper(unsigned char c) { return c >= 'A' && c <= 'Z'; }
+    // ascii_isupper()
+    //
+    // Determines whether the given character is uppercase.
+    inline bool ascii_isupper(unsigned char c) { return c >= 'A' && c <= 'Z'; }
 
-// ascii_islower()
-//
-// Determines whether the given character is lowercase.
-inline bool ascii_islower(unsigned char c) { return c >= 'a' && c <= 'z'; }
+    // ascii_islower()
+    //
+    // Determines whether the given character is lowercase.
+    inline bool ascii_islower(unsigned char c) { return c >= 'a' && c <= 'z'; }
 
-// ascii_isascii()
-//
-// Determines whether the given character is ASCII.
-inline bool ascii_isascii(unsigned char c) { return c < 128; }
+    // ascii_isascii()
+    //
+    // Determines whether the given character is ASCII.
+    inline bool ascii_isascii(unsigned char c) { return c < 128; }
 
-// ascii_tolower()
-//
-// Returns an ASCII character, converting to lowercase if uppercase is
-// passed. Note that character values > 127 are simply returned.
-inline char ascii_tolower(unsigned char c) {
-  return ascii_internal::kToLower[c];
-}
+    // ascii_tolower()
+    //
+    // Returns an ASCII character, converting to lowercase if uppercase is
+    // passed. Note that character values > 127 are simply returned.
+    inline char ascii_tolower(unsigned char c) {
+        return ascii_internal::kToLower[c];
+    }
 
-// Converts the characters in `s` to lowercase, changing the contents of `s`.
-template <typename String>
-TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
-AsciiStrToLower(String* s);
 
-// Creates a lowercase string from a given std::string_view.
+    // ascii_toupper()
+    //
+    // Returns the ASCII character, converting to upper-case if lower-case is
+    // passed. Note that characters values > 127 are simply returned.
+    inline char ascii_toupper(unsigned char c) {
+        return ascii_internal::kToUpper[c];
+    }
 
-template <typename String = std::string>
-TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-AsciiStrToLower(std::string_view s) {
-  String result(s);
-  turbo::AsciiStrToLower(&result);
-  return result;
-}
 
-// ascii_toupper()
-//
-// Returns the ASCII character, converting to upper-case if lower-case is
-// passed. Note that characters values > 127 are simply returned.
-inline char ascii_toupper(unsigned char c) {
-  return ascii_internal::kToUpper[c];
-}
-
-// Converts the characters in `s` to uppercase, changing the contents of `s`.
-template <typename String>
-TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
-AsciiStrToUpper(String* s);
-
-// Creates an uppercase string from a given std::string_view.
-template <typename String = std::string>
-TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-AsciiStrToUpper(std::string_view s) {
-  String result(s);
-  turbo::AsciiStrToUpper(&result);
-  return result;
-}
-
-// Returns std::string_view with whitespace stripped from the beginning of the
-// given std::string_view.
-TURBO_MUST_USE_RESULT inline std::string_view StripLeadingAsciiWhitespace(
-    std::string_view str) {
-  auto it = std::find_if_not(str.begin(), str.end(), turbo::ascii_isspace);
-  return str.substr(static_cast<size_t>(it - str.begin()));
-}
-
-// Strips in place whitespace from the beginning of the given string.
-template <typename String>
-inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-StripLeadingAsciiWhitespace(String* str) {
-  auto it = std::find_if_not(str->begin(), str->end(), turbo::ascii_isspace);
-  str->erase(str->begin(), it);
-}
-
-// Returns std::string_view with whitespace stripped from the end of the given
-// std::string_view.
-TURBO_MUST_USE_RESULT inline std::string_view StripTrailingAsciiWhitespace(
-    std::string_view str) {
-  auto it = std::find_if_not(str.rbegin(), str.rend(), turbo::ascii_isspace);
-  return str.substr(0, static_cast<size_t>(str.rend() - it));
-}
-
-// Strips in place whitespace from the end of the given string
-template <typename String>
-inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-StripTrailingAsciiWhitespace(String* str) {
-  auto it = std::find_if_not(str->rbegin(), str->rend(), turbo::ascii_isspace);
-  str->erase(static_cast<size_t>(str->rend() - it));
-}
-
-// Returns std::string_view with whitespace stripped from both ends of the
-// given std::string_view.
-TURBO_MUST_USE_RESULT inline std::string_view StripAsciiWhitespace(
-    std::string_view str) {
-  return StripTrailingAsciiWhitespace(StripLeadingAsciiWhitespace(str));
-}
-
-// Strips in place whitespace from both ends of the given string
-template <typename String>
-inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-StripAsciiWhitespace(String* str) {
-  StripTrailingAsciiWhitespace(str);
-  StripLeadingAsciiWhitespace(str);
-}
-
-// Removes leading, trailing, and consecutive internal whitespace.
-template <typename String>
-typename std::enable_if<turbo::is_string_type<String>::value>::type
-RemoveExtraAsciiWhitespace(String*);
-
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_ASCII_H_

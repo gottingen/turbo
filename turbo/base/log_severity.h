@@ -40,9 +40,6 @@ TURBO_NAMESPACE_BEGIN
 //   // Effectively disables all logging:
 //   SetMinLogLevel(static_cast<turbo::LogSeverity>(100));
 //
-// Turbo flags may be defined with type `LogSeverity`. Dependency layering
-// constraints require that the `TurboParseFlag()` overload be declared and
-// defined in the flags library itself rather than here. The `TurboUnparseFlag()`
 // overload is defined there as well for consistency.
 //
 // turbo::LogSeverity Flag String Representation

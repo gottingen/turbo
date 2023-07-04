@@ -103,7 +103,7 @@ static void BM_StrToLower(benchmark::State& state) {
   const int size = state.range(0);
   std::string s(size, 'X');
   for (auto _ : state) {
-    benchmark::DoNotOptimize(turbo::AsciiStrToLower(s));
+    benchmark::DoNotOptimize(turbo::StrToLower(s));
   }
 }
 BENCHMARK(BM_StrToLower)->Range(1, 1 << 20);
@@ -112,7 +112,7 @@ static void BM_StrToUpper(benchmark::State& state) {
   const int size = state.range(0);
   std::string s(size, 'x');
   for (auto _ : state) {
-    benchmark::DoNotOptimize(turbo::AsciiStrToUpper(s));
+    benchmark::DoNotOptimize(turbo::StrToUpper(s));
   }
 }
 BENCHMARK(BM_StrToUpper)->Range(1, 1 << 20);
