@@ -22,3 +22,174 @@ carbin_cc_binary(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_binary(
+        NAME
+        asciidoc_export
+        SOURCES
+        "asciidoc_export.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        class_diagram
+        SOURCES
+        "class_diagram.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        colors
+        SOURCES
+        "colors.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        employees
+        SOURCES
+        "employees.cc"
+        DEPS
+        turbo::turbo
+)
+carbin_cc_binary(
+        NAME
+        font_styles
+        SOURCES
+        "font_styles.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        iterators
+        SOURCES
+        "iterators.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        latex_export
+        SOURCES
+        "latex_export.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        mario
+        SOURCES
+        "mario.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        markdown_export
+        SOURCES
+        "markdown_export.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        movies
+        SOURCES
+        "movies.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        padding
+        SOURCES
+        "padding.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        refresh_table
+        SOURCES
+        "refresh_table.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        runic
+        SOURCES
+        "runic.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        shape
+        SOURCES
+        "shape.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        string_view_in_row
+        SOURCES
+        "string_view_in_row.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        summary
+        SOURCES
+        "summary.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        unicode
+        SOURCES
+        "unicode.cc"
+        DEPS
+        turbo::turbo
+)
+
+
+carbin_cc_binary(
+        NAME
+        universal_constants
+        SOURCES
+        "universal_constants.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
+        word_wrapping
+        SOURCES
+        "word_wrapping.cc"
+        DEPS
+        turbo::turbo
+)
