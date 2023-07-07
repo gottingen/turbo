@@ -24,7 +24,7 @@
 #include "gtest/gtest.h"
 #include "spy_hash_state.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/meta/variant.h"
 
 namespace turbo {

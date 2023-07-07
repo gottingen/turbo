@@ -18,7 +18,7 @@
 
 #include "tests/doctest/doctest.h"
 #include "turbo/strings/inlined_string.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 
 TEST_CASE("Format -InlinedString") {
 

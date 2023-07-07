@@ -35,7 +35,7 @@
 #include "tests/strings/cord_test_helpers.h"
 #include "tests/strings/cordz_test_helpers.h"
 #include "turbo/strings/match.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

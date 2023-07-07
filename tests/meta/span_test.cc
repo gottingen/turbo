@@ -28,7 +28,7 @@
 #include "tests/hash/hash_testing.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/options.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

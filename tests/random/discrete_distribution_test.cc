@@ -33,7 +33,7 @@
 #include "turbo/random/internal/sequence_urbg.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/str_strip.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 
 namespace {
 

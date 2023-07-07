@@ -28,7 +28,7 @@
 #include <functional>
 #include <cstdio>
 #include <string_view>
-#include <turbo/format/str_format.h>
+#include <turbo/format/format.h>
 
 // disable thread local on msvc 2013
 #ifndef TLOG_NO_TLS

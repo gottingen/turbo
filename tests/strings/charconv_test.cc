@@ -21,7 +21,7 @@
 
 #include "tests/doctest/doctest.h"
 #include "tests/strings/pow10_helper.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 
 #ifdef _MSC_FULL_VER
 #define TURBO_COMPILER_DOES_EXACT_ROUNDING 0

@@ -50,7 +50,7 @@
 #include "turbo/platform/port.h"
 
 // TODO(rogeeff): Remove after the backward compatibility period.
-#include "turbo/platform/internal/dynamic_annotations.h"  // IWYU pragma: export
+//#include "turbo/platform/internal/dynamic_annotations.h"  // IWYU pragma: export
 
 // -------------------------------------------------------------------------
 // Decide which features are enabled.

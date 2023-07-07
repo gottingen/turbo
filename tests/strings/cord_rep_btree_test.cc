@@ -26,7 +26,7 @@
 #include "turbo/strings/internal/cord_data_edge.h"
 #include "turbo/strings/internal/cord_internal.h"
 #include "turbo/strings/internal/cord_rep_test_util.h"
-#include "turbo/format/str_format.h"
+#include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
