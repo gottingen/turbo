@@ -20,7 +20,7 @@ carbin_cc_test(
         SOURCES
         "status_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -35,7 +35,7 @@ carbin_cc_test(
         SOURCES
         "throw_delegate_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -50,7 +50,7 @@ carbin_cc_test(
         SOURCES
         "result_status_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -66,7 +66,7 @@ carbin_cc_test(
         SOURCES
         "bits_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
@@ -78,7 +78,7 @@ carbin_cc_test(
         SOURCES
         "endian_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
@@ -91,7 +91,7 @@ carbin_cc_test(
         "int128_stream_test.cc"
         "int128_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -127,7 +127,7 @@ carbin_cc_library(
         SOURCES
         "exception_safety_testing.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         turbo::turbo
@@ -140,7 +140,7 @@ carbin_cc_test(
         SOURCES
         "exception_safety_testing_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -156,7 +156,7 @@ carbin_cc_test(
         SOURCES
         "bit_cast_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
@@ -171,7 +171,7 @@ carbin_cc_test(
         "inline_variable_test_a.cc"
         "inline_variable_test_b.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -186,7 +186,7 @@ carbin_cc_test(
         SOURCES
         "invoke_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -201,7 +201,7 @@ carbin_cc_test(
         SOURCES
         "raw_logging_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -215,7 +215,7 @@ carbin_cc_test(
         SOURCES
         "fast_type_id_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -229,7 +229,7 @@ carbin_cc_test(
         SOURCES
         "strerror_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}

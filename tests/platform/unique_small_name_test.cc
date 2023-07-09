@@ -16,7 +16,7 @@
 #include "turbo/strings/string_view.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "tests/doctest/doctest.h"
+#include "doctest/doctest.h"
 
 // This test by itself does not do anything fancy, but it serves as binary I can
 // query in shell test.

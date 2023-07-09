@@ -20,11 +20,9 @@ carbin_cc_test(
         SOURCES
         "multi1_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -33,11 +31,9 @@ carbin_cc_test(
         SOURCES
         "filess_system_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -46,11 +42,9 @@ carbin_cc_test(
         SOURCES
         "multi2_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -59,11 +53,9 @@ carbin_cc_test(
         SOURCES
         "impl_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -73,11 +65,9 @@ carbin_cc_test(
         SOURCES
         "fs_exception_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -86,9 +76,7 @@ carbin_cc_test(
         SOURCES
         "filesystem_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )

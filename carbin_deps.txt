@@ -1,1 +1,2 @@
 google/googletest@v1.13.0
+doctest/doctest@v2.4.11 -DDOCTEST_WITH_MAIN_IN_STATIC_LIB=OFF -DDOCTEST_WITH_TESTS=OFF

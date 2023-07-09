@@ -25,7 +25,7 @@ carbin_cc_library(
         SOURCES
         "atomic_hook_test_helper.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -37,7 +37,7 @@ carbin_cc_test(
         SOURCES
         "atomic_hook_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::atomic_hook_test_helper
@@ -54,7 +54,7 @@ carbin_cc_test(
         SOURCES
         "errno_saver_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -71,7 +71,7 @@ carbin_cc_test(
         SOURCES
         "spinlock_common_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -86,7 +86,7 @@ carbin_cc_test(
         SOURCES
         "config_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -101,7 +101,7 @@ carbin_cc_test(
         SOURCES
         "sysinfo_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -115,7 +115,7 @@ carbin_cc_test(
         SOURCES
         "low_level_alloc_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         ${GTEST_LIB}
@@ -129,7 +129,7 @@ carbin_cc_test(
         SOURCES
         "scoped_set_env_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -143,7 +143,7 @@ carbin_cc_test(
         SOURCES
         "prefetch_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -157,7 +157,7 @@ carbin_cc_test(
         SOURCES
         "optimization_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -171,7 +171,7 @@ carbin_cc_test(
         SOURCES
         "unique_small_name_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo

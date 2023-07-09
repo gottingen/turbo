@@ -16,7 +16,7 @@
 #include <string>
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "tests/doctest/doctest.h"
+#include "doctest/doctest.h"
 #include "turbo/strings/inlined_string.h"
 #include "turbo/format/format.h"
 

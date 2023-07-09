@@ -21,7 +21,8 @@
 // SOFTWARE.
 //
 //---------------------------------------------------------------------------------------
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest/doctest.h"
 #include "turbo/files/filesystem.h"
 
 namespace fs = turbo::filesystem;
@@ -29,12 +30,12 @@ namespace fs = turbo::filesystem;
 // This test and the one in multi1.cpp doesn't actualy test relevant functionality,
 // it is just used to check that it is possible to include filesystem.h in multiple
 // source files.
-TEST(Multifile, multi_1) {
-    ASSERT_TRUE("/usr/local/bin" == fs::path("/usr/local/bin").generic_string());
+TEST_CASE("Multifile, multi_1") {
+    REQUIRE_EQ("/usr/local/bin", fs::path("/usr/local/bin").generic_string());
     std::string str = "/usr/local/bin";
     std::u16string u16str = u"/usr/local/bin";
     std::u32string u32str = U"/usr/local/bin";
-    ASSERT_TRUE(str == fs::path(str.begin(), str.end()));
-    ASSERT_TRUE(str == fs::path(u16str.begin(), u16str.end()));
-    ASSERT_TRUE(str == fs::path(u32str.begin(), u32str.end()));
+    REQUIRE_EQ(str,  fs::path(str.begin(), str.end()));
+    REQUIRE_EQ(str , fs::path(u16str.begin(), u16str.end()));
+    REQUIRE_EQ(str, fs::path(u32str.begin(), u32str.end()));
 }

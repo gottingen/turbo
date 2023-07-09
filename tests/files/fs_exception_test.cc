@@ -1,6 +1,7 @@
 #include "turbo/files/filesystem.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest/doctest.h"
 
-TEST(fs_exception, empty) {
+TEST_CASE("fs_exception, empty") {
 
 }

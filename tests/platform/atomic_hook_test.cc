@@ -18,7 +18,7 @@
 #include "atomic_hook_test_helper.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "tests/doctest/doctest.h"
+#include "doctest/doctest.h"
 
 namespace {
     int value = 0;

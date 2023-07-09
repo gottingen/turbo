@@ -24,7 +24,7 @@ carbin_cc_library(
         SOURCES
         "test_util.cc"
         COPTS
-        ${TURBO_DEFAULT_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         turbo::turbo
@@ -44,7 +44,7 @@ carbin_cc_test(
         "time_zone_lookup_test.cc"
         "cctz_civil_time_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::time_internal_test_util
         turbo::turbo

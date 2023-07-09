@@ -21,7 +21,7 @@ carbin_cc_test(
         SOURCES
         "sample_recorder_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -35,7 +35,7 @@ carbin_cc_test(
         SOURCES
         "exponential_biased_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -49,7 +49,7 @@ carbin_cc_test(
         SOURCES
         "periodic_sampler_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}

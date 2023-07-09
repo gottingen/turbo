@@ -19,7 +19,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "tests/doctest/doctest.h"
+#include "doctest/doctest.h"
 #include "turbo/base/internal/raw_logging.h"
 
 using turbo::chars_format;

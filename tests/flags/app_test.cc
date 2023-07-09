@@ -22,7 +22,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "tests/doctest/doctest.h"
+#include "doctest/doctest.h"
 
 TEST_CASE_FIXTURE(TApp, "OneFlagShort [app]") {
     app.add_flag("-c,--count");

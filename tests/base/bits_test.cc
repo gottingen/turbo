@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "tests/doctest/doctest.h"
+#include "doctest/doctest.h"
 #include "turbo/base/bits.h"
 
 #include <limits>

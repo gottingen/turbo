@@ -23,7 +23,7 @@ carbin_cc_test(
         SOURCES
         "match_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -36,7 +36,7 @@ carbin_cc_test(
         SOURCES
         "inlined_string_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -51,7 +51,7 @@ carbin_cc_test(
         SOURCES
         "escaping_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -66,7 +66,7 @@ carbin_cc_test(
         SOURCES
         "ascii_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -80,7 +80,7 @@ carbin_cc_test(
         SOURCES
         "memutil_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -93,7 +93,7 @@ carbin_cc_test(
         SOURCES
         "string_constant_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -108,7 +108,7 @@ carbin_cc_test(
         SOURCES
         "str_replace_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -121,7 +121,7 @@ carbin_cc_test(
         SOURCES
         "str_split_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -137,7 +137,7 @@ carbin_cc_test(
         SOURCES
         "cord_buffer_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -150,7 +150,7 @@ carbin_cc_test(
         SOURCES
         "ostringstream_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -163,7 +163,7 @@ carbin_cc_test(
         SOURCES
         "resize_uninitialized_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -177,7 +177,7 @@ carbin_cc_test(
         "numbers_test_common.h"
         "numbers_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::pow10_helper
         turbo::turbo
@@ -191,7 +191,7 @@ carbin_cc_test(
         SOURCES
         "strip_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -202,7 +202,7 @@ carbin_cc_test(
         SOURCES
         "char_map_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -213,7 +213,7 @@ carbin_cc_test(
         SOURCES
         "charconv_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::pow10_helper
@@ -225,7 +225,7 @@ carbin_cc_test(
         SOURCES
         "charconv_parse_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -236,7 +236,7 @@ carbin_cc_test(
         SOURCES
         "charconv_bigint_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -251,7 +251,7 @@ carbin_cc_library(
         SOURCES
         "pow10_helper.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -263,7 +263,7 @@ carbin_cc_test(
         SOURCES
         "pow10_helper_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::pow10_helper
         turbo::turbo
@@ -278,7 +278,7 @@ carbin_cc_test(
         SOURCES
         "cordz_update_tracker_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -315,7 +315,7 @@ carbin_cc_test(
         SOURCES
         "cordz_info_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -328,7 +328,7 @@ carbin_cc_test(
         SOURCES
         "cordz_info_statistics_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -342,7 +342,7 @@ carbin_cc_test(
         SOURCES
         "cordz_sample_token_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -356,7 +356,7 @@ carbin_cc_test(
         SOURCES
         "cordz_update_scope_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -369,7 +369,7 @@ carbin_cc_test(
         SOURCES
         "cord_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -383,7 +383,7 @@ carbin_cc_test(
         SOURCES
         "cord_data_edge_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -396,7 +396,7 @@ carbin_cc_test(
         SOURCES
         "cord_rep_btree_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -410,7 +410,7 @@ carbin_cc_test(
         SOURCES
         "cord_rep_btree_navigator_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -423,7 +423,7 @@ carbin_cc_test(
         SOURCES
         "cord_rep_btree_reader_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -436,7 +436,7 @@ carbin_cc_test(
         SOURCES
         "cord_rep_crc_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -450,7 +450,7 @@ carbin_cc_test(
         SOURCES
         "cord_ring_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
@@ -465,7 +465,7 @@ carbin_cc_test(
         SOURCES
         "cord_ring_reader_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -478,7 +478,7 @@ carbin_cc_test(
         SOURCES
         "cordz_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -492,7 +492,7 @@ carbin_cc_test(
         SOURCES
         "str_case_conv_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -503,7 +503,7 @@ carbin_cc_test(
         SOURCES
         "str_trim_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )

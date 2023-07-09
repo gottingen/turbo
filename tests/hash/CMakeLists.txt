@@ -22,7 +22,7 @@ carbin_cc_library(
         HEADERS
         "hash_testing.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -35,7 +35,7 @@ carbin_cc_test(
         SOURCES
         "hash_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::hash_testing
@@ -72,7 +72,7 @@ carbin_cc_test(
         SOURCES
         "city_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
@@ -85,7 +85,7 @@ carbin_cc_test(
         SOURCES
         "low_level_hash_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
@@ -97,7 +97,7 @@ carbin_cc_test(
         SOURCES
         "murmur_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${CARBIN_DEPS_LINK}
