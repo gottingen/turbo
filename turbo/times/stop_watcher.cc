@@ -14,6 +14,7 @@
 //
 
 #include "turbo/times/stop_watcher.h"
+#include <cassert>
 
 namespace turbo {
 
@@ -25,7 +26,15 @@ namespace turbo {
         _start = turbo::Now();
     }
 
+    const StopWatcher& StopWatcher::stop() {
+        auto n = turbo::Now();
+        if(_stop <= _start) {
+            _stop = n;
+        }
+        return *this;
+    }
     turbo::Duration StopWatcher::elapsed() const{
-        return turbo::Now() - _start;
+        TURBO_ASSERT(_stop > _start);
+        return _stop - _start;
     }
 }  // namespace turbo

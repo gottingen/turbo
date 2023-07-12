@@ -60,11 +60,11 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-// Defined and documented later on in this file.
+    // Defined and documented later on in this file.
     template<typename T>
     struct is_trivially_destructible;
 
-// Defined and documented later on in this file.
+    // Defined and documented later on in this file.
     template<typename T>
     struct is_trivially_move_assignable;
 

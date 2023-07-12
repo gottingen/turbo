@@ -16,17 +16,7 @@
 
 #ifndef TURBO_REFLECT_REFLECT_H_
 #define TURBO_REFLECT_REFLECT_H_
-/*
-#include "../../../../../../../usr/include/c++/11/array"
-#include "../../../../../../../usr/include/c++/11/cassert"
-#include "../../../../../../../usr/include/c++/11/cstdint"
-#include "../../../../../../../usr/include/c++/11/cstddef"
-#include "../../../../../../../usr/include/c++/11/iosfwd"
-#include "../../../../../../../usr/include/c++/11/iterator"
-#include "../../../../../../../usr/include/c++/11/limits"
-#include "../../../../../../../usr/include/c++/11/type_traits"
-#include "../../../../../../../usr/include/c++/11/utility"
-*/
+
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -40,25 +30,7 @@
 #include <string_view>
 #include <cxxabi.h>
 #include <cstdlib>
-/*
-#if !defined(REFLECT_USING_ALIAS_STRING)
 
-#include "../../../../../../../usr/include/c++/11/string"
-
-#endif
-#if !defined(REFLECT_USING_ALIAS_STRING_VIEW)
-
-#include "../../../../../../../usr/include/c++/11/string_view"
-
-#endif
-
-#if __has_include(<cxxabi.h>)
-
-#include "../../../../../../../usr/include/c++/11/cxxabi.h"
-#include "../../../../../../../usr/include/c++/11/cstdlib"
-
-#endif
-*/
 #if defined(__clang__)
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -188,13 +160,13 @@ namespace turbo {
             return {};
         }
 
-// If you need custom name for member, add specialization member_name for necessary type.
+        // If you need custom name for member, add specialization member_name for necessary type.
         template<auto V>
         constexpr string_view member_name() noexcept {
             return {};
         }
 
-// If you need custom name for a pointer, add specialization pointer_name for necessary type.
+        // If you need custom name for a pointer, add specialization pointer_name for necessary type.
         template<auto V>
         constexpr string_view pointer_name() noexcept {
             return {};

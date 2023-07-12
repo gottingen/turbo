@@ -29,29 +29,30 @@ namespace turbo {
         // Start this timer
         void reset();
 
+        const StopWatcher& stop();
         // Get the elapse from start() to stop(), in various units.
         [[nodiscard]] turbo::Duration elapsed() const;
 
-        [[nodiscard]] int64_t elapsed_nano() { return turbo::ToInt64Nanoseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_nano() const { return turbo::ToInt64Nanoseconds(elapsed()); }
 
-        [[nodiscard]] int64_t elapsed_micro() { return turbo::ToInt64Microseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_micro() const { return turbo::ToInt64Microseconds(elapsed()); }
 
-        [[nodiscard]] int64_t elapsed_mill() { return turbo::ToInt64Milliseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_mill() const { return turbo::ToInt64Milliseconds(elapsed()); }
 
-        [[nodiscard]] int64_t elapsed_sec() { return turbo::ToInt64Seconds(elapsed());; }
+        [[nodiscard]] int64_t elapsed_sec() const { return turbo::ToInt64Seconds(elapsed());; }
 
-        [[nodiscard]] double elapsed_nano(double) { return turbo::ToDoubleNanoseconds(elapsed()); }
+        [[nodiscard]] double elapsed_nano(double) const { return turbo::ToDoubleNanoseconds(elapsed()); }
 
-        [[nodiscard]] double elapsed_micro(double) { return turbo::ToDoubleMicroseconds(elapsed()); }
+        [[nodiscard]] double elapsed_micro(double) const { return turbo::ToDoubleMicroseconds(elapsed()); }
 
-        [[nodiscard]] double elapsed_mill(double) { return turbo::ToDoubleMilliseconds(elapsed()); }
+        [[nodiscard]] double elapsed_mill(double) const { return turbo::ToDoubleMilliseconds(elapsed()); }
 
-        [[nodiscard]] double elapsed_sec(double) { return turbo::ToDoubleSeconds(elapsed()); }
+        [[nodiscard]] double elapsed_sec(double) const { return turbo::ToDoubleSeconds(elapsed()); }
         [[nodiscard]] std::chrono::duration<double> elapsed_chrono() const { return turbo::ToChronoNanoseconds(elapsed()); }
 
     private:
         turbo::Time _start;
-        turbo::Time _stop;
+        mutable turbo::Time _stop;
     };
 
 }  // namespace turbo
