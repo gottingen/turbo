@@ -157,14 +157,12 @@ namespace turbo::tlog {
 
         private:
             void init_filenames_q_() {
-                using details::os::path_exists;
-
                 filenames_q_ = details::circular_q<filename_t>(static_cast<size_t>(max_files_));
                 std::vector<filename_t> filenames;
                 auto now = log_clock::now();
                 while (filenames.size() < max_files_) {
                     auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(now));
-                    if (!path_exists(filename)) {
+                    if (!turbo::filesystem::exists(filename)) {
                         break;
                     }
                     filenames.emplace_back(filename);
@@ -197,13 +195,19 @@ namespace turbo::tlog {
             // Throw tlog_ex on failure to delete the old file.
             void delete_old_() {
                 using details::os::filename_to_str;
-                using details::os::remove_if_exists;
 
                 filename_t current_file = file_writer_.file_path().native();
                 if (filenames_q_.full()) {
                     auto old_filename = std::move(filenames_q_.front());
                     filenames_q_.pop_front();
-                    bool ok = remove_if_exists(old_filename) == 0;
+                    std::error_code ec;
+                    bool ok = true;
+                    if(turbo::filesystem::exists(old_filename, ec)) {
+                        turbo::filesystem::remove(old_filename, ec);
+                        if(ec) {
+                            ok = false;
+                        }
+                    }
                     if (!ok) {
                         filenames_q_.push_back(std::move(current_file));
                         throw_tlog_ex("Failed removing daily file " + filename_to_str(old_filename), errno);

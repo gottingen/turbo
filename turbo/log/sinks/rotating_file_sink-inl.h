@@ -123,12 +123,11 @@ namespace turbo::tlog {
         template<typename Mutex>
         void rotating_file_sink<Mutex>::rotate_() {
             using details::os::filename_to_str;
-            using details::os::path_exists;
 
             file_writer_.close();
             for (auto i = max_files_; i > 0; --i) {
                 filename_t src = calc_filename(base_filename_, i - 1);
-                if (!path_exists(src)) {
+                if (!turbo::filesystem::exists(src)) {
                     continue;
                 }
                 filename_t target = calc_filename(base_filename_, i);
@@ -137,7 +136,7 @@ namespace turbo::tlog {
                     // if failed try again after a small delay.
                     // this is a workaround to a windows issue, where very high rotation
                     // rates can cause the rename to fail with permission denied (because of antivirus?).
-                    details::os::sleep_for_millis(100);
+                    turbo::SleepFor(turbo::Milliseconds(100));
                     if (!rename_file_(src, target)) {
                         auto r = file_writer_.reopen(
                                 true); // truncate the log file anyway to prevent it to grow beyond its limit!
@@ -160,8 +159,13 @@ namespace turbo::tlog {
         bool
         rotating_file_sink<Mutex>::rename_file_(const filename_t &src_filename, const filename_t &target_filename) {
             // try to delete the target file in case it already exists.
-            (void) details::os::remove(target_filename);
-            return details::os::rename(src_filename, target_filename) == 0;
+            (void) turbo::filesystem::remove(target_filename);
+            std::error_code ec;
+            turbo::filesystem::rename(src_filename, target_filename, ec);
+            if(ec) {
+                return false;
+            }
+            return true;
         }
 
     } // namespace sinks

@@ -23,6 +23,7 @@ set(TURBO_ALL_SRC
         "base/result_status.cc"
         "base/int128.cc"
         "base/status_payload_printer.cc"
+        "base/sysinfo.cc"
         "base/turbo_error.cc"
         "base/turbo_module.cc"
         "container/internal/hashtablez_sampler.cc"

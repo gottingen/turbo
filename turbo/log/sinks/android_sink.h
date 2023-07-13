@@ -33,7 +33,7 @@
 #    if !defined(TLOG_ANDROID_RETRIES)
 #        define TLOG_ANDROID_RETRIES 2
 #    endif
-
+#include "turbo/times/clock.h"
 namespace turbo::tlog {
 namespace sinks {
 
@@ -71,7 +71,7 @@ protected:
         int retry_count = 0;
         while ((ret == -11 /*EAGAIN*/) && (retry_count < TLOG_ANDROID_RETRIES))
         {
-            details::os::sleep_for_millis(5);
+            turbo::turbo::SleepFor(turbo::Milliseconds(5));
             ret = android_log(priority, tag_.c_str(), msg_output);
             retry_count++;
         }

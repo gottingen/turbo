@@ -21,6 +21,7 @@
 #include "turbo/log/details/os.h"
 #include <turbo/format/format.h>
 #include "turbo/log/formatter.h"
+#include "turbo/base/sysinfo.h"
 
 #include <algorithm>
 #include <array>
@@ -678,7 +679,7 @@ public:
 
     void format(const details::log_msg &, const std::tm &, memory_buf_t &dest) override
     {
-        const auto pid = static_cast<uint32_t>(details::os::pid());
+        const auto pid = static_cast<uint32_t>(turbo::pid());
         auto field_size = ScopedPadder::count_digits(pid);
         ScopedPadder p(field_size, padinfo_, dest);
         fmt_helper::append_int(pid, dest);

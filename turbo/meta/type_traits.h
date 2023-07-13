@@ -1279,6 +1279,16 @@ namespace turbo {
     inline std::common_type_t<T1, T2> select(const B &cond, const T1 &v1, const T2 &v2) noexcept {
         return cond ? v1 : v2;
     }
+    // to avoid useless casts (see https://github.com/nlohmann/json/issues/2893#issuecomment-889152324)
+    template<typename T, typename U, enable_if_t<!std::is_same<T, U>::value, int> = 0>
+    constexpr T conditional_static_cast(U value) {
+        return static_cast<T>(value);
+    }
+
+    template<typename T, typename U, enable_if_t<std::is_same<T, U>::value, int> = 0>
+    constexpr T conditional_static_cast(U value) {
+        return value;
+    }
 }  // namespace turbo
 
 
