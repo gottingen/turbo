@@ -28,7 +28,7 @@
 #include "turbo/base/status.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/meta/utility.h"
-#include "turbo/meta/variant.h"
+#include <variant>
 
 namespace {
 
@@ -828,7 +828,7 @@ namespace {
     TEST(ResultStatus, ImplicitConstruction) {
         // Check implicit casting works.
         auto status_or =
-                turbo::implicit_cast<turbo::ResultStatus<turbo::variant<int, std::string>>>(10);
+                turbo::implicit_cast<turbo::ResultStatus<std::variant<int, std::string>>>(10);
         EXPECT_THAT(status_or, IsOkAndHolds(VariantWith<int>(10)));
     }
 
@@ -1024,7 +1024,7 @@ namespace {
     }
 
     TEST(ResultStatus, ImplicitAssignment) {
-        turbo::ResultStatus<turbo::variant<int, std::string>> status_or;
+        turbo::ResultStatus<std::variant<int, std::string>> status_or;
         status_or = 10;
         EXPECT_THAT(status_or, IsOkAndHolds(VariantWith<int>(10)));
     }

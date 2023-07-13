@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#pragma once
+#ifndef TURBO_FLAGS_FLAGS_H_
+#define TURBO_FLAGS_FLAGS_H_
 
 #include "turbo/platform/port.h"
 
@@ -37,3 +38,5 @@
 #include "turbo/flags/config.h"
 
 #include "turbo/flags/formatter.h"
+
+#endif  // TURBO_FLAGS_FLAGS_H_

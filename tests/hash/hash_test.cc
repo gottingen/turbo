@@ -785,7 +785,7 @@ TEST(HashValueTest, Optional) {
 }
 
 TEST(HashValueTest, Variant) {
-  using V = turbo::variant<Private, std::string>;
+  using V = std::variant<Private, std::string>;
   EXPECT_TRUE(is_hashable<V>::value);
 
   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(std::make_tuple(
@@ -793,7 +793,7 @@ TEST(HashValueTest, Variant) {
 
 #if TURBO_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
   struct S {};
-  EXPECT_FALSE(is_hashable<turbo::variant<S>>::value);
+  EXPECT_FALSE(is_hashable<std::variant<S>>::value);
 #endif
 }
 

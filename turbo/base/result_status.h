@@ -46,7 +46,7 @@
 #include "turbo/base/status.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
-#include "turbo/meta/variant.h"
+#include <variant>
 #include "turbo/platform/port.h"
 
 namespace turbo {

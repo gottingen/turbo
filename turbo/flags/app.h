@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#pragma once
+#ifndef TURBO_FLAGS_APP_H_
+#define TURBO_FLAGS_APP_H_
 
 #include <algorithm>
 #include <cstdint>
@@ -1295,7 +1296,7 @@ namespace turbo {
         void _move_option(Option *opt, App *app);
     };  // namespace turbo
 
-/// Extension of App to better manage groups of options
+    /// Extension of App to better manage groups of options
     class OptionGroup : public App {
     public:
         OptionGroup(std::string group_description, std::string group_name, App *parent)
@@ -1397,3 +1398,4 @@ namespace turbo {
     }  // namespace detail
 
 }  // namespace turbo
+#endif  // TURBO_FLAGS_APP_H_
