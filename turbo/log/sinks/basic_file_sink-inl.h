@@ -21,34 +21,41 @@
 #include "turbo/log/details/os.h"
 
 namespace turbo::tlog {
-namespace sinks {
+    namespace sinks {
 
-template<typename Mutex>
- basic_file_sink<Mutex>::basic_file_sink(const filename_t &filename, bool truncate, const file_event_handlers &event_handlers)
-    : file_helper_{event_handlers}
-{
-    file_helper_.open(filename, truncate);
-}
+        template<typename Mutex>
+        basic_file_sink<Mutex>::basic_file_sink(const filename_t &filename, bool truncate,
+                                                const turbo::FileEventListener &event_handlers)
+                : file_writer_{event_handlers} {
+            file_writer_.set_option(turbo::tlog::kLogFileOption);
+            auto r = file_writer_.open(filename, truncate);
+            if (!r.ok()) {
+                throw_tlog_ex(r.ToString());
+            }
+        }
 
-template<typename Mutex>
- const filename_t &basic_file_sink<Mutex>::filename() const
-{
-    return file_helper_.filename();
-}
+        template<typename Mutex>
+        filename_t basic_file_sink<Mutex>::filename() const {
+            return file_writer_.file_path().native();
+        }
 
-template<typename Mutex>
- void basic_file_sink<Mutex>::sink_it_(const details::log_msg &msg)
-{
-    memory_buf_t formatted;
-    base_sink<Mutex>::formatter_->format(msg, formatted);
-    file_helper_.write(formatted);
-}
+        template<typename Mutex>
+        void basic_file_sink<Mutex>::sink_it_(const details::log_msg &msg) {
+            memory_buf_t formatted;
+            base_sink<Mutex>::formatter_->format(msg, formatted);
+            auto r = file_writer_.write(formatted);
+            if (!r.ok()) {
+                throw_tlog_ex(r.ToString());
+            }
+        }
 
-template<typename Mutex>
- void basic_file_sink<Mutex>::flush_()
-{
-    file_helper_.flush();
-}
+        template<typename Mutex>
+        void basic_file_sink<Mutex>::flush_() {
+            auto r = file_writer_.flush();
+            if (!r.ok()) {
+                throw_tlog_ex(r.ToString());
+            }
+        }
 
-} // namespace sinks
+    } // namespace sinks
 } // namespace turbo::tlog

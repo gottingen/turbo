@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <turbo/log/details/file_helper.h>
+#include "turbo/files/sequential_write_file.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/log/sinks/base_sink.h>
 #include "turbo/log/details/synchronous_factory.h"
@@ -24,46 +24,48 @@
 #include <string>
 
 namespace turbo::tlog {
-namespace sinks {
+    namespace sinks {
 /*
  * Trivial file sink with single file as target
  */
-template<typename Mutex>
-class basic_file_sink final : public base_sink<Mutex>
-{
-public:
-    explicit basic_file_sink(const filename_t &filename, bool truncate = false, const file_event_handlers &event_handlers = {});
-    const filename_t &filename() const;
+        template<typename Mutex>
+        class basic_file_sink final : public base_sink<Mutex> {
+        public:
+            explicit basic_file_sink(const filename_t &filename, bool truncate = false,
+                                     const turbo::FileEventListener &event_handlers = {});
 
-protected:
-    void sink_it_(const details::log_msg &msg) override;
-    void flush_() override;
+            [[nodiscard]] filename_t filename() const;
 
-private:
-    details::file_helper file_helper_;
-};
+        protected:
+            void sink_it_(const details::log_msg &msg) override;
 
-using basic_file_sink_mt = basic_file_sink<std::mutex>;
-using basic_file_sink_st = basic_file_sink<details::null_mutex>;
+            void flush_() override;
 
-} // namespace sinks
+        private:
+            turbo::SequentialWriteFile file_writer_;
+        };
 
-//
-// factory functions
-//
-template<typename Factory = turbo::tlog::synchronous_factory>
-inline std::shared_ptr<logger> basic_logger_mt(
-    const std::string &logger_name, const filename_t &filename, bool truncate = false, const file_event_handlers &event_handlers = {})
-{
-    return Factory::template create<sinks::basic_file_sink_mt>(logger_name, filename, truncate, event_handlers);
-}
+        using basic_file_sink_mt = basic_file_sink<std::mutex>;
+        using basic_file_sink_st = basic_file_sink<details::null_mutex>;
 
-template<typename Factory = turbo::tlog::synchronous_factory>
-inline std::shared_ptr<logger> basic_logger_st(
-    const std::string &logger_name, const filename_t &filename, bool truncate = false, const file_event_handlers &event_handlers = {})
-{
-    return Factory::template create<sinks::basic_file_sink_st>(logger_name, filename, truncate, event_handlers);
-}
+    } // namespace sinks
+
+    //
+    // factory functions
+    //
+    template<typename Factory = turbo::tlog::synchronous_factory>
+    inline std::shared_ptr<logger> basic_logger_mt(
+            const std::string &logger_name, const filename_t &filename, bool truncate = false,
+            const turbo::FileEventListener &event_handlers = {}) {
+        return Factory::template create<sinks::basic_file_sink_mt>(logger_name, filename, truncate, event_handlers);
+    }
+
+    template<typename Factory = turbo::tlog::synchronous_factory>
+    inline std::shared_ptr<logger> basic_logger_st(
+            const std::string &logger_name, const filename_t &filename, bool truncate = false,
+            const turbo::FileEventListener &event_handlers = {}) {
+        return Factory::template create<sinks::basic_file_sink_st>(logger_name, filename, truncate, event_handlers);
+    }
 
 } // namespace turbo::tlog
 

@@ -17,6 +17,7 @@
 
 #include <turbo/log/tweakme.h>
 #include "turbo/log/details/null_mutex.h"
+#include "turbo/files/file_option.h"
 
 #include <atomic>
 #include <chrono>
@@ -235,16 +236,6 @@ namespace turbo::tlog {
         const char *funcname{nullptr};
     };
 
-    struct file_event_handlers {
-        file_event_handlers()
-                : before_open(nullptr), after_open(nullptr), before_close(nullptr), after_close(nullptr) {}
-
-        std::function<void(const filename_t &filename)> before_open;
-        std::function<void(const filename_t &filename, std::FILE *file_stream)> after_open;
-        std::function<void(const filename_t &filename, std::FILE *file_stream)> before_close;
-        std::function<void(const filename_t &filename)> after_close;
-    };
-
     namespace details {
 
         using std::enable_if_t;
@@ -262,5 +253,11 @@ namespace turbo::tlog {
         }
 
     } // namespace details
+    static constexpr turbo::FileOption kLogFileOption{
+            .open_tries = 5,
+            .open_interval = 10,
+            .create_dir_if_miss = true,
+            .prevent_child = false
+    };
 } // namespace turbo::tlog
 

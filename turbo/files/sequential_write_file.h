@@ -32,7 +32,7 @@ namespace turbo {
 
         ~SequentialWriteFile();
 
-        void set(const FileOption &option);
+        void set_option(const FileOption &option);
 
         turbo::Status open(const turbo::filesystem::path &fname,
                            bool truncate = false);

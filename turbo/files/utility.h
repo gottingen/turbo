@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
-#ifndef TURBO_FILES_FIO_H_
-#define TURBO_FILES_FIO_H_
+#ifndef TURBO_FILES_UTILITY_H_
+#define TURBO_FILES_UTILITY_H_
 
 #include <string>
 #include <cstdio>
@@ -23,18 +22,26 @@
 #include "turbo/files/filesystem.h"
 #include "turbo/base/result_status.h"
 
-
 namespace turbo {
 
-    class Fio {
+    class FileUtility {
     public:
-
-        static turbo::ResultStatus<std::FILE *> file_open(const turbo::filesystem::path &filename, const std::string &mode,
-                                                      const FileOption &option = FileOption());
-
-        static turbo::ResultStatus<size_t> file_size(std::FILE *fp);
+        //
+        // return file path and its extension:
+        //
+        // "mylog.txt" => ("mylog", ".txt")
+        // "mylog" => ("mylog", "")
+        // "mylog." => ("mylog.", "")
+        // "/dir1/dir2/mylog.txt" => ("/dir1/dir2/mylog", ".txt")
+        //
+        // the starting dot in filenames is ignored (hidden files):
+        //
+        // ".mylog" => (".mylog". "")
+        // "my_folder/.mylog" => ("my_folder/.mylog", "")
+        // "my_folder/.mylog.txt" => ("my_folder/.mylog", ".txt")
+        static std::tuple<std::string, std::string> split_by_extension(const std::string &fname);
 
     };
+}  // namespace turbo
 
-}
-#endif  // TURBO_FILES_FIO_H_
+#endif // TURBO_FILES_UTILITY_H_

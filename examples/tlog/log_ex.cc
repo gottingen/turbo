@@ -62,6 +62,9 @@ void replace_default_logger_example();
 
 int main(int, char *[]) {
     // Log levels can be loaded from argv/env using "TLOG_LEVEL"
+    if(turbo::filesystem::exists("logs")) {
+        turbo::filesystem::remove_all("logs");
+    }
     load_levels_example();
 
     turbo::tlog::info("Welcome to tlog version {}.{}.{}  !", TLOG_VER_MAJOR, TLOG_VER_MINOR, TLOG_VER_PATCH);
@@ -140,12 +143,10 @@ void stdout_logger_example() {
 }
 
 
-
 void basic_example() {
     // Create basic file logger (not rotated).
     auto my_logger = turbo::tlog::basic_logger_mt("file_logger", "logs/basic-log.txt", true);
 }
-
 
 
 void rotating_example() {
@@ -154,12 +155,10 @@ void rotating_example() {
 }
 
 
-
 void daily_example() {
     // Create a daily logger - a new file is created every day on 2:30am.
     auto daily_logger = turbo::tlog::daily_logger_mt("daily_logger", "logs/daily.txt", 2, 30);
 }
-
 
 
 void load_levels_example() {
@@ -173,11 +172,11 @@ void load_levels_example() {
 }
 
 
-
 void async_example() {
     // Default thread pool settings can be modified *before* creating the async logger:
     // turbo::tlog::init_thread_pool(32768, 1); // queue with max 32k items 1 backing thread.
-    auto async_file = turbo::tlog::basic_logger_mt<turbo::tlog::async_factory>("async_file_logger", "logs/async_log.txt");
+    auto async_file = turbo::tlog::basic_logger_mt<turbo::tlog::async_factory>("async_file_logger",
+                                                                               "logs/async_log.txt");
     // alternatively:
     // auto async_file = turbo::tlog::create_async<turbo::tlog::sinks::basic_file_sink_mt>("async_file_logger", "logs/async_log.txt");
 
@@ -237,7 +236,7 @@ void trace_example() {
     TLOG_WARN_IF(false, "this should not display, Some info message.. {} ,{}", 1, 3.23);
     TLOG_ERROR_IF(false, "this should not display, Some info message.. {} ,{}", 1, 3.23);
 
-    for(size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 10; i++) {
         TLOG_TRACE_EVERY_N(10, "this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_DEBUG_EVERY_N(10, "this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_INFO_EVERY_N(10, "this should display once, Some info message.. {} ,{}", 1, 3.23);
@@ -246,7 +245,7 @@ void trace_example() {
         TLOG_CRITICAL_EVERY_N(10, "this should display once, Some info message.. {} ,{}", 1, 3.23);
     }
 
-    for(size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 10; i++) {
         TLOG_TRACE_FIRST_N(1, "this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_DEBUG_FIRST_N(1, "this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_INFO_FIRST_N(1, "this should display once, Some info message.. {} ,{}", 1, 3.23);
@@ -255,8 +254,8 @@ void trace_example() {
         TLOG_CRITICAL_FIRST_N(1, "this should display once, Some info message.. {} ,{}", 1, 3.23);
     }
 
-    for(size_t i = 0; i < 10; i++) {
-        TLOG_TRACE_ONCE( "this should display once, Some info message.. {} ,{}", 1, 3.23);
+    for (size_t i = 0; i < 10; i++) {
+        TLOG_TRACE_ONCE("this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_DEBUG_ONCE("this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_INFO_ONCE("this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_WARN_ONCE("this should display once, Some info message.. {} ,{}", 1, 3.23);
@@ -264,7 +263,7 @@ void trace_example() {
         TLOG_CRITICAL_ONCE("this should display once, Some info message.. {} ,{}", 1, 3.23);
     }
 
-    for(size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 10; i++) {
         // 10 sec is enough not round-trip
         TLOG_TRACE_EVERY_N_SEC(10, "this should display once, Some info message.. {} ,{}", 1, 3.23);
         TLOG_DEBUG_EVERY_N_SEC(10, "this should display once, Some info message.. {} ,{}", 1, 3.23);
@@ -401,8 +400,8 @@ void custom_flags_example() {
 }
 
 void file_events_example() {
-    // pass the turbo::tlog::file_event_handlers to file sinks for open/close log file notifications
-    turbo::tlog::file_event_handlers handlers;
+    // pass the turbo::tlog::turbo::FileEventListener to file sinks for open/close log file notifications
+    turbo::FileEventListener handlers;
     handlers.before_open = [](turbo::tlog::filename_t filename) { turbo::tlog::info("Before opening {}", filename); };
     handlers.after_open = [](turbo::tlog::filename_t filename, std::FILE *fstream) {
         turbo::tlog::info("After opening {}", filename);

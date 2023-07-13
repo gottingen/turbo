@@ -30,7 +30,7 @@ namespace turbo {
         close();
     }
 
-    void SequentialWriteFile::set(const FileOption &option) {
+    void SequentialWriteFile::set_option(const FileOption &option) {
         _option = option;
     }
 
@@ -93,6 +93,7 @@ namespace turbo {
     }
 
     turbo::Status SequentialWriteFile::write(const char *data, size_t size) {
+        TURBO_ASSERT(_fd != nullptr);
         if (std::fwrite(data, 1, size, _fd) != size) {
             return turbo::ErrnoToStatus(errno, turbo::Format("Failed writing to file {}", _file_path.c_str()));
         }

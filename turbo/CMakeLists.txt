@@ -57,6 +57,7 @@ set(TURBO_ALL_SRC
         "debugging/leak_check.cc"
         "files/file_watcher.cc"
         "files/fio.cc"
+        "files/utility.cc"
         "files/sequential_read_file.cc"
         "files/sequential_write_file.cc"
         "flags/app.cc"

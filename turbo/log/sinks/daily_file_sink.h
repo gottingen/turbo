@@ -16,7 +16,8 @@
 #pragma once
 
 #include "turbo/log/common.h"
-#include <turbo/log/details/file_helper.h>
+#include "turbo/files/sequential_write_file.h"
+#include "turbo/files/utility.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/format/format.h>
 #include <turbo/format/fmt/chrono.h>
@@ -34,27 +35,27 @@
 namespace turbo::tlog {
     namespace sinks {
 
-/*
- * Generator of daily log file names in format basename.YYYY-MM-DD.ext
- */
+        /*
+         * Generator of daily log file names in format basename.YYYY-MM-DD.ext
+         */
         struct daily_filename_calculator {
             // Create filename for the form basename.YYYY-MM-DD
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 filename_t basename, ext;
-                std::tie(basename, ext) = details::file_helper::split_by_extension(filename);
+                std::tie(basename, ext) = turbo::FileUtility::split_by_extension(filename);
                 return fmt_lib::format(FMT_STRING(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}{}")), basename,
                                        now_tm.tm_year + 1900,
                                        now_tm.tm_mon + 1, now_tm.tm_mday, ext);
             }
         };
 
-/*
- * Generator of daily log file names with strftime format.
- * Usages:
- *    auto sink =  std::make_shared<turbo::tlog::sinks::daily_file_format_sink_mt>("myapp-%Y-%m-%d:%H:%M:%S.log", hour, minute);"
- *    auto logger = turbo::tlog::daily_logger_format_mt("loggername, "myapp-%Y-%m-%d:%X.log", hour,  minute)"
- *
- */
+        /*
+         * Generator of daily log file names with strftime format.
+         * Usages:
+         *    auto sink =  std::make_shared<turbo::tlog::sinks::daily_file_format_sink_mt>("myapp-%Y-%m-%d:%H:%M:%S.log", hour, minute);"
+         *    auto logger = turbo::tlog::daily_logger_format_mt("loggername, "myapp-%Y-%m-%d:%X.log", hour,  minute)"
+         *
+         */
         struct daily_filename_format_calculator {
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 // generate fmt datetime format string, e.g. {:%Y-%m-%d}.
@@ -84,20 +85,20 @@ namespace turbo::tlog {
 #endif
         };
 
-/*
- * Rotating file sink based on date.
- * If truncate != false , the created file will be truncated.
- * If max_files > 0, retain only the last max_files and delete previous.
- */
+        /*
+         * Rotating file sink based on date.
+         * If truncate != false , the created file will be truncated.
+         * If max_files > 0, retain only the last max_files and delete previous.
+         */
         template<typename Mutex, typename FileNameCalc = daily_filename_calculator>
         class daily_file_sink final : public base_sink<Mutex> {
         public:
             // create daily file sink which rotates on given time
             daily_file_sink(filename_t base_filename, int rotation_hour, int rotation_minute, bool truncate = false,
                             uint16_t max_files = 0,
-                            const file_event_handlers &event_handlers = {})
+                            const turbo::FileEventListener &event_handlers = {})
                     : base_filename_(std::move(base_filename)), rotation_h_(rotation_hour),
-                      rotation_m_(rotation_minute), file_helper_{event_handlers}, truncate_(truncate),
+                      rotation_m_(rotation_minute), file_writer_{event_handlers}, truncate_(truncate),
                       max_files_(max_files), filenames_q_() {
                 if (rotation_hour < 0 || rotation_hour > 23 || rotation_minute < 0 || rotation_minute > 59) {
                     throw_tlog_ex("daily_file_sink: Invalid rotation time in ctor");
@@ -105,7 +106,11 @@ namespace turbo::tlog {
 
                 auto now = log_clock::now();
                 auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(now));
-                file_helper_.open(filename, truncate_);
+                file_writer_.set_option(kLogFileOption);
+                auto r = file_writer_.open(filename, truncate_);
+                if(!r.ok()) {
+                    throw_tlog_ex(r.ToString());
+                }
                 rotation_tp_ = next_rotation_tp_();
 
                 if (max_files_ > 0) {
@@ -115,7 +120,7 @@ namespace turbo::tlog {
 
             filename_t filename() {
                 std::lock_guard<Mutex> lock(base_sink<Mutex>::mutex_);
-                return file_helper_.filename();
+                return file_writer_.file_path().native();
             }
 
         protected:
@@ -124,12 +129,18 @@ namespace turbo::tlog {
                 bool should_rotate = time >= rotation_tp_;
                 if (should_rotate) {
                     auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
-                    file_helper_.open(filename, truncate_);
+                    auto r = file_writer_.open(filename, truncate_);
+                    if(!r.ok()) {
+                        throw_tlog_ex(r.ToString());
+                    }
                     rotation_tp_ = next_rotation_tp_();
                 }
                 memory_buf_t formatted;
                 base_sink<Mutex>::formatter_->format(msg, formatted);
-                file_helper_.write(formatted);
+                auto r = file_writer_.write(formatted);
+                if(!r.ok()) {
+                    throw_tlog_ex(r.ToString());
+                }
 
                 // Do the cleaning only at the end because it might throw on failure.
                 if (should_rotate && max_files_ > 0) {
@@ -138,7 +149,10 @@ namespace turbo::tlog {
             }
 
             void flush_() override {
-                file_helper_.flush();
+                auto  r = file_writer_.flush();
+                if(!r.ok()) {
+                    throw_tlog_ex(r.ToString());
+                }
             }
 
         private:
@@ -185,7 +199,7 @@ namespace turbo::tlog {
                 using details::os::filename_to_str;
                 using details::os::remove_if_exists;
 
-                filename_t current_file = file_helper_.filename();
+                filename_t current_file = file_writer_.file_path().native();
                 if (filenames_q_.full()) {
                     auto old_filename = std::move(filenames_q_.front());
                     filenames_q_.pop_front();
@@ -202,7 +216,7 @@ namespace turbo::tlog {
             int rotation_h_;
             int rotation_m_;
             log_clock::time_point rotation_tp_;
-            details::file_helper file_helper_;
+            turbo::SequentialWriteFile file_writer_;
             bool truncate_;
             uint16_t max_files_;
             details::circular_q<filename_t> filenames_q_;
@@ -215,13 +229,13 @@ namespace turbo::tlog {
 
     } // namespace sinks
 
-//
-// factory functions
-//
+    //
+    // factory functions
+    //
     template<typename Factory = turbo::tlog::synchronous_factory>
     inline std::shared_ptr<logger>
     daily_logger_mt(const std::string &logger_name, const filename_t &filename, int hour = 0, int minute = 0,
-                    bool truncate = false, uint16_t max_files = 0, const file_event_handlers &event_handlers = {}) {
+                    bool truncate = false, uint16_t max_files = 0, const turbo::FileEventListener &event_handlers = {}) {
         return Factory::template create<sinks::daily_file_sink_mt>(logger_name, filename, hour, minute, truncate,
                                                                    max_files, event_handlers);
     }
@@ -230,7 +244,7 @@ namespace turbo::tlog {
     inline std::shared_ptr<logger>
     daily_logger_format_mt(const std::string &logger_name, const filename_t &filename, int hour = 0,
                            int minute = 0, bool truncate = false, uint16_t max_files = 0,
-                           const file_event_handlers &event_handlers = {}) {
+                           const turbo::FileEventListener &event_handlers = {}) {
         return Factory::template create<sinks::daily_file_format_sink_mt>(
                 logger_name, filename, hour, minute, truncate, max_files, event_handlers);
     }
@@ -238,7 +252,7 @@ namespace turbo::tlog {
     template<typename Factory = turbo::tlog::synchronous_factory>
     inline std::shared_ptr<logger>
     daily_logger_st(const std::string &logger_name, const filename_t &filename, int hour = 0, int minute = 0,
-                    bool truncate = false, uint16_t max_files = 0, const file_event_handlers &event_handlers = {}) {
+                    bool truncate = false, uint16_t max_files = 0, const turbo::FileEventListener &event_handlers = {}) {
         return Factory::template create<sinks::daily_file_sink_st>(logger_name, filename, hour, minute, truncate,
                                                                    max_files, event_handlers);
     }
@@ -247,7 +261,7 @@ namespace turbo::tlog {
     inline std::shared_ptr<logger>
     daily_logger_format_st(const std::string &logger_name, const filename_t &filename, int hour = 0,
                            int minute = 0, bool truncate = false, uint16_t max_files = 0,
-                           const file_event_handlers &event_handlers = {}) {
+                           const turbo::FileEventListener &event_handlers = {}) {
         return Factory::template create<sinks::daily_file_format_sink_st>(
                 logger_name, filename, hour, minute, truncate, max_files, event_handlers);
     }
