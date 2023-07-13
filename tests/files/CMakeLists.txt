@@ -47,17 +47,6 @@ carbin_cc_test(
         turbo::turbo
 )
 
-carbin_cc_test(
-        NAME
-        impl_test
-        SOURCES
-        "impl_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-)
-
 
 carbin_cc_test(
         NAME
