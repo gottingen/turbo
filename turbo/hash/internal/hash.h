@@ -50,7 +50,7 @@
 #include "turbo/hash/internal/low_level_hash.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
-#include "turbo/meta/variant.h"
+#include <variant>
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/port.h"
@@ -781,12 +781,12 @@ namespace turbo {
             }
         };
 
-        // TurboHashValue for hashing turbo::variant
+        // TurboHashValue for hashing std::variant
         template<typename H, typename... T>
         typename std::enable_if<conjunction<is_hashable<T>...>::value, H>::type
-        TurboHashValue(H hash_state, const turbo::variant<T...> &v) {
+        TurboHashValue(H hash_state, const std::variant<T...> &v) {
             if (!v.valueless_by_exception()) {
-                hash_state = turbo::visit(VariantVisitor<H>{std::move(hash_state)}, v);
+                hash_state = std::visit(VariantVisitor<H>{std::move(hash_state)}, v);
             }
             return H::combine(std::move(hash_state), v.index());
         }

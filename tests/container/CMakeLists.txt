@@ -23,7 +23,7 @@ carbin_cc_library(
         HEADERS
         "btree_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -34,7 +34,7 @@ carbin_cc_test(
         SOURCES
         "btree_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -52,7 +52,7 @@ carbin_cc_test(
         SOURCES
         "compressed_tuple_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::test_instance_tracker
@@ -67,7 +67,7 @@ carbin_cc_test(
         SOURCES
         "fixed_array_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::exception_testing
         turbo::hash_testing
@@ -81,7 +81,7 @@ carbin_cc_test(
         SOURCES
         "fixed_array_exception_safety_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::exception_safety_testing
         turbo::turbo
@@ -97,7 +97,7 @@ carbin_cc_test(
         SOURCES
         "inlined_vector_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::test_instance_tracker
         turbo::exception_testing
@@ -114,7 +114,7 @@ carbin_cc_test(
         SOURCES
         "inlined_vector_exception_safety_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::exception_safety_testing
@@ -134,7 +134,7 @@ carbin_cc_library(
         SOURCES
         "test_instance_tracker.cc"
         COPTS
-        ${TURBO_DEFAULT_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -147,7 +147,7 @@ carbin_cc_test(
         SOURCES
         "test_instance_tracker_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::test_instance_tracker
         turbo::turbo
@@ -162,7 +162,7 @@ carbin_cc_test(
         SOURCES
         "flat_hash_map_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::hash_generator_testing
@@ -183,7 +183,7 @@ carbin_cc_test(
         SOURCES
         "flat_hash_set_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         "-DUNORDERED_SET_CXX17"
         DEPS
         ${CARBIN_DEPS_LINK}
@@ -204,7 +204,7 @@ carbin_cc_test(
         SOURCES
         "node_hash_map_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::hash_generator_testing
         turbo::turbo
@@ -223,7 +223,7 @@ carbin_cc_test(
         SOURCES
         "node_hash_set_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         "-DUNORDERED_SET_CXX17"
         DEPS
         turbo::hash_generator_testing
@@ -242,7 +242,7 @@ carbin_cc_test(
         SOURCES
         "container_memory_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
@@ -257,7 +257,7 @@ carbin_cc_test(
         SOURCES
         "hash_function_defaults_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -276,7 +276,7 @@ carbin_cc_library(
         SOURCES
         "hash_generator_testing.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         turbo::hash_policy_testing
@@ -292,7 +292,7 @@ carbin_cc_library(
         HEADERS
         "hash_policy_testing.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         turbo::turbo
@@ -304,7 +304,7 @@ carbin_cc_test(
         SOURCES
         "hash_policy_testing_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         turbo::turbo
@@ -319,7 +319,7 @@ carbin_cc_test(
         SOURCES
         "hash_policy_traits_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -334,7 +334,7 @@ carbin_cc_test(
         SOURCES
         "common_policy_traits_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -349,7 +349,7 @@ carbin_cc_test(
         SOURCES
         "hashtablez_sampler_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -364,7 +364,7 @@ carbin_cc_test(
         SOURCES
         "node_slot_policy_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -378,7 +378,7 @@ carbin_cc_test(
         SOURCES
         "raw_hash_set_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -393,7 +393,7 @@ carbin_cc_test(
         SOURCES
         "raw_hash_set_allocator_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         turbo::turbo
@@ -408,7 +408,7 @@ carbin_cc_test(
         SOURCES
         "layout_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         ${GMOCK_LIB}
@@ -425,7 +425,7 @@ carbin_cc_library(
         HEADERS
         "tracked.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${GTEST_LIB}
         turbo::turbo
@@ -441,7 +441,7 @@ carbin_cc_library(
         HEADERS
         "unordered_map_constructor_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::hash_generator_testing
         turbo::hash_policy_testing
@@ -459,7 +459,7 @@ carbin_cc_library(
         HEADERS
         "unordered_map_lookup_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::hash_generator_testing
         turbo::hash_policy_testing
@@ -477,7 +477,7 @@ carbin_cc_library(
         HEADERS
         "unordered_map_members_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -494,7 +494,7 @@ carbin_cc_library(
         HEADERS
         "unordered_map_modifiers_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::hash_generator_testing
         turbo::hash_policy_testing
@@ -512,7 +512,7 @@ carbin_cc_library(
         HEADERS
         "unordered_set_constructor_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::hash_generator_testing
         turbo::hash_policy_testing
@@ -530,7 +530,7 @@ carbin_cc_library(
         HEADERS
         "unordered_set_lookup_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::hash_generator_testing
         turbo::hash_policy_testing
@@ -547,7 +547,7 @@ carbin_cc_library(
         HEADERS
         "unordered_set_members_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -564,7 +564,7 @@ carbin_cc_library(
         HEADERS
         "unordered_set_modifiers_test.h"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::hash_generator_testing
         turbo::hash_policy_testing
@@ -577,7 +577,7 @@ carbin_cc_test(
         SOURCES
         "unordered_set_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::unordered_set_constructor_test
         turbo::unordered_set_lookup_test
@@ -593,7 +593,7 @@ carbin_cc_test(
         SOURCES
         "unordered_map_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::unordered_map_constructor_test
         turbo::unordered_map_lookup_test
@@ -609,7 +609,7 @@ carbin_cc_test(
         SOURCES
         "sample_element_size_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -623,7 +623,7 @@ carbin_cc_test(
         SOURCES
         "ring_buffer_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -636,7 +636,7 @@ carbin_cc_test(
         SOURCES
         "linked_list_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}

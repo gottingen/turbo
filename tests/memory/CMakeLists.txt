@@ -20,7 +20,7 @@ carbin_cc_test(
         SOURCES
         "memory_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )

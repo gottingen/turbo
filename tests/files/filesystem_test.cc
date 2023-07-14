@@ -85,11 +85,9 @@ namespace fs {
 
 #endif
 
-#ifndef TURBO_FILESYSTEM_FWD_TEST
-#define CATCH_CONFIG_MAIN
-#endif
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "gtest/gtest.h"
+#include "doctest/doctest.h"
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //- - - - - - - - -
@@ -129,61 +127,6 @@ TP from_time_t(std::time_t t) {
     return tp;
 }
 
-/*
-namespace Catch {
-template <>
-struct StringMaker<fs::path>
-{
-    static std::string convert(fs::path const& value) { return '"' +
-value.string() + '"'; }
-};
-
-template <>
-struct StringMaker<fs::perms>
-{
-    static std::string convert(fs::perms const& value) { return
-std::to_string(static_cast<unsigned int>(value)); }
-};
-
-template <>
-struct StringMaker<fs::file_status>
-{
-    static std::string convert(fs::file_status const& value) {
-        return std::string("[") + std::to_string(static_cast<unsigned
-int>(value.type())) + "," + std::to_string(static_cast<unsigned
-int>(value.permissions())) + "]";
-    }
-};
-
-#ifdef __cpp_lib_char8_t
-template <>
-struct StringMaker<char8_t>
-{
-    static std::string convert(char8_t const& value) { return
-std::to_string(static_cast<unsigned int>(value)); }
-};
-#endif
-
-template <>
-struct StringMaker<fs::file_time_type>
-{
-    static std::string convert(fs::file_time_type const& value)
-    {
-        std::time_t t = to_time_t(value);
-        std::tm* ptm = std::localtime(&t);
-        std::ostringstream os;
-        if (ptm) {
-            std::tm ttm = *ptm;
-            os << std::put_time(&ttm, "%Y-%m-%d %H:%M:%S");
-        }
-        else {
-            os << "(invalid-time)";
-        }
-        return os.str();
-    }
-};
-}  // namespace Catch
-*/
 enum class TempOpt {
     none, change_path
 };
@@ -337,71 +280,73 @@ bool operator!=(TestAllocator<T> const &x, TestAllocator<U> const &y) noexcept {
     return !(x == y);
 }
 
-TEST(TemporaryDirectory, fsTestTempdir) {
+TEST_CASE("TemporaryDirectory, fsTestTempdir") {
     fs::path tempPath;
     {
         TemporaryDirectory t;
         tempPath = t.path();
-        ASSERT_TRUE(fs::exists(fs::path(t.path())));
-        ASSERT_TRUE(fs::is_directory(t.path()));
+        REQUIRE(fs::exists(fs::path(t.path())));
+        REQUIRE(fs::is_directory(t.path()));
     }
-    ASSERT_TRUE(!fs::exists(tempPath));
+    REQUIRE(!fs::exists(tempPath));
 }
 
 #ifdef TURBO_FILESYSTEM_VERSION
-TEST(Filesystem, detail_utf8) {
-    ASSERT_TRUE(fs::detail::fromUtf8<std::wstring>("foobar").length() == 6);
-    ASSERT_TRUE(fs::detail::fromUtf8<std::wstring>("foobar") == L"foobar");
-    ASSERT_TRUE(fs::detail::fromUtf8<std::wstring>(u8"föobar").length() == 6);
-    ASSERT_TRUE(fs::detail::fromUtf8<std::wstring>(u8"föobar") == L"föobar");
 
-    ASSERT_TRUE(fs::detail::toUtf8(std::wstring(L"foobar")).length() == 6);
-    ASSERT_TRUE(fs::detail::toUtf8(std::wstring(L"foobar")) == "foobar");
-    ASSERT_TRUE(fs::detail::toUtf8(std::wstring(L"föobar")).length() == 7);
-    // ASSERT_TRUE(fs::detail::toUtf8(std::wstring(L"föobar")) == u8"föobar");
+TEST_CASE("Filesystem, detail_utf8") {
+    REQUIRE(fs::detail::fromUtf8<std::wstring>("foobar").length() == 6);
+    REQUIRE(fs::detail::fromUtf8<std::wstring>("foobar") == L"foobar");
+    REQUIRE(fs::detail::fromUtf8<std::wstring>(u8"föobar").length() == 6);
+    REQUIRE(fs::detail::fromUtf8<std::wstring>(u8"föobar") == L"föobar");
+
+    REQUIRE(fs::detail::toUtf8(std::wstring(L"foobar")).length() == 6);
+    REQUIRE(fs::detail::toUtf8(std::wstring(L"foobar")) == "foobar");
+    REQUIRE(fs::detail::toUtf8(std::wstring(L"föobar")).length() == 7);
+    // REQUIRE(fs::detail::toUtf8(std::wstring(L"föobar")) == u8"föobar");
 
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-    ASSERT_THROW(
+    REQUIRE_THROWS_AS(
         fs::detail::fromUtf8<std::u16string>(std::string("\xed\xa0\x80")),
         fs::filesystem_error);
-    ASSERT_THROW(fs::detail::fromUtf8<std::u16string>(std::string("\xc3")),
+    REQUIRE_THROWS_AS(fs::detail::fromUtf8<std::u16string>(std::string("\xc3")),
                  fs::filesystem_error);
 #else
-    ASSERT_TRUE(std::u16string(2, 0xfffd) == fs::detail::fromUtf8<std::u16string>(
+    REQUIRE(std::u16string(2, 0xfffd) == fs::detail::fromUtf8<std::u16string>(
             std::string("\xed\xa0\x80")));
-    ASSERT_TRUE(std::u16string(1, 0xfffd) ==
-                fs::detail::fromUtf8<std::u16string>(std::string("\xc3")));
+    REQUIRE(std::u16string(1, 0xfffd) ==
+            fs::detail::fromUtf8<std::u16string>(std::string("\xc3")));
 #endif
 }
 
-TEST(fs_utf, detail_utf8) {
+TEST_CASE("fs_utf, detail_utf8") {
     std::string t;
-    ASSERT_TRUE(std::string("\xc3\xa4/\xe2\x82\xac\xf0\x9d\x84\x9e") ==
-                fs::detail::toUtf8(std::u16string(u"\u00E4/\u20AC\U0001D11E")));
+    REQUIRE(std::string("\xc3\xa4/\xe2\x82\xac\xf0\x9d\x84\x9e") ==
+            fs::detail::toUtf8(std::u16string(u"\u00E4/\u20AC\U0001D11E")));
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-    ASSERT_THROW(fs::detail::toUtf8(std::u16string(1, 0xd800)),
+    REQUIRE_THROWS_AS(fs::detail::toUtf8(std::u16string(1, 0xd800)),
                  fs::filesystem_error);
-    ASSERT_THROW(fs::detail::appendUTF8(t, 0x200000), fs::filesystem_error);
+    REQUIRE_THROWS_AS(fs::detail::appendUTF8(t, 0x200000), fs::filesystem_error);
 #else
-    ASSERT_TRUE(std::string("\xEF\xBF\xBD") ==
-                fs::detail::toUtf8(std::u16string(1, 0xd800)));
+    REQUIRE(std::string("\xEF\xBF\xBD") ==
+            fs::detail::toUtf8(std::u16string(1, 0xd800)));
     fs::detail::appendUTF8(t, 0x200000);
-    ASSERT_TRUE(std::string("\xEF\xBF\xBD") == t);
+    REQUIRE(std::string("\xEF\xBF\xBD") == t);
 #endif
 }
 
 #endif
 
-TEST(Filesystem, generic) {
+TEST_CASE("Filesystem, generic") {
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path::preferred_separator == '\\');
+    REQUIRE(fs::path::preferred_separator == '\\');
 #else
-    ASSERT_TRUE(fs::path::preferred_separator == '/');
+    REQUIRE(fs::path::preferred_separator == '/');
 #endif
 }
 
 #ifndef TURBO_PLATFORM_WINDOWS
-TEST(Filesystem, path_gen) {
+
+TEST_CASE("Filesystem, path_gen") {
     if (!has_host_root_name_support()) {
         TLOG_WARN("This implementation doesn't support "
                   "path(\"//host\").has_root_name() == true [C++17 "
@@ -412,8 +357,8 @@ TEST(Filesystem, path_gen) {
 
 #endif
 
-TEST(Filesystem, construct) {
-    ASSERT_TRUE("/usr/local/bin" == fs::path("/usr/local/bin").generic_string());
+TEST_CASE("Filesystem, construct") {
+    REQUIRE("/usr/local/bin" == fs::path("/usr/local/bin").generic_string());
     std::string str = "/usr/local/bin";
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
     std::u8string u8str = u8"/usr/local/bin";
@@ -421,30 +366,30 @@ TEST(Filesystem, construct) {
     std::u16string u16str = u"/usr/local/bin";
     std::u32string u32str = U"/usr/local/bin";
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-    ASSERT_TRUE(u8str == fs::path(u8str).generic_u8string());
+    REQUIRE(u8str == fs::path(u8str).generic_u8string());
 #endif
-    ASSERT_TRUE(u16str == fs::path(u16str).generic_u16string());
-    ASSERT_TRUE(u32str == fs::path(u32str).generic_u32string());
-    ASSERT_TRUE(str == fs::path(str, fs::path::format::generic_format));
-    ASSERT_TRUE(str == fs::path(str.begin(), str.end()));
-    ASSERT_TRUE(fs::path(std::wstring(3, 67)) == "CCC");
+    REQUIRE(u16str == fs::path(u16str).generic_u16string());
+    REQUIRE(u32str == fs::path(u32str).generic_u32string());
+    REQUIRE(str == fs::path(str, fs::path::format::generic_format));
+    REQUIRE(str == fs::path(str.begin(), str.end()));
+    REQUIRE(fs::path(std::wstring(3, 67)) == "CCC");
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-    ASSERT_TRUE(str == fs::path(u8str.begin(), u8str.end()));
+    REQUIRE(str == fs::path(u8str.begin(), u8str.end()));
 #endif
-    ASSERT_TRUE(str == fs::path(u16str.begin(), u16str.end()));
-    ASSERT_TRUE(str == fs::path(u32str.begin(), u32str.end()));
+    REQUIRE(str == fs::path(u16str.begin(), u16str.end()));
+    REQUIRE(str == fs::path(u32str.begin(), u32str.end()));
 #ifdef TURBO_FILESYSTEM_VERSION
-    ASSERT_TRUE(fs::path("///foo/bar") == "/foo/bar");
-    ASSERT_TRUE(fs::path("//foo//bar") == "//foo/bar");
+    REQUIRE(fs::path("///foo/bar") == "/foo/bar");
+    REQUIRE(fs::path("//foo//bar") == "//foo/bar");
 #endif
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE("\\usr\\local\\bin" == fs::path("/usr/local/bin"));
-    ASSERT_TRUE("C:\\usr\\local\\bin" == fs::path("C:\\usr\\local\\bin"));
+    REQUIRE("\\usr\\local\\bin" == fs::path("/usr/local/bin"));
+    REQUIRE("C:\\usr\\local\\bin" == fs::path("C:\\usr\\local\\bin"));
 #else
-    ASSERT_TRUE("/usr/local/bin" == fs::path("/usr/local/bin"));
+    REQUIRE("/usr/local/bin" == fs::path("/usr/local/bin"));
 #endif
     if (has_host_root_name_support()) {
-        ASSERT_TRUE("//host/foo/bar" == fs::path("//host/foo/bar"));
+        REQUIRE("//host/foo/bar" == fs::path("//host/foo/bar"));
     }
 
 #if !defined(TURBO_PLATFORM_WINDOWS) && \
@@ -468,595 +413,595 @@ TEST(Filesystem, construct) {
         TLOG_WARN("Couldn't create an UTF-8 locale!");
     }
     if (testUTF8Locale) {
-        ASSERT_TRUE("/usr/local/bin" == fs::path("/usr/local/bin", loc));
-        ASSERT_TRUE(str == fs::path(str.begin(), str.end(), loc));
-        ASSERT_TRUE(str == fs::path(u16str.begin(), u16str.end(), loc));
-        ASSERT_TRUE(str == fs::path(u32str.begin(), u32str.end(), loc));
+        REQUIRE("/usr/local/bin" == fs::path("/usr/local/bin", loc));
+        REQUIRE(str == fs::path(str.begin(), str.end(), loc));
+        REQUIRE(str == fs::path(u16str.begin(), u16str.end(), loc));
+        REQUIRE(str == fs::path(u32str.begin(), u32str.end(), loc));
     }
 #endif
 }
 
-TEST(FilesystemPath, assign) {
+TEST_CASE("FilesystemPath, assign") {
     fs::path p1{"/foo/bar"};
     fs::path p2{"/usr/local"};
     fs::path p3;
     p3 = p1;
-    ASSERT_TRUE(p1 == p3);
+    REQUIRE(p1 == p3);
     p3 = fs::path{"/usr/local"};
-    ASSERT_TRUE(p2 == p3);
+    REQUIRE(p2 == p3);
     p3 = fs::path{L"/usr/local"};
-    ASSERT_TRUE(p2 == p3);
+    REQUIRE(p2 == p3);
     p3.assign(L"/usr/local");
-    ASSERT_TRUE(p2 == p3);
+    REQUIRE(p2 == p3);
 #if defined(IS_WCHAR_PATH) || defined(GHC_USE_WCHAR_T)
     p3 = fs::path::string_type{L"/foo/bar"};
-    ASSERT_TRUE(p1 == p3);
+    REQUIRE(p1 == p3);
     p3.assign(fs::path::string_type{L"/usr/local"});
-    ASSERT_TRUE(p2 == p3);
+    REQUIRE(p2 == p3);
 #else
     p3 = fs::path::string_type{"/foo/bar"};
-    ASSERT_TRUE(p1 == p3);
+    REQUIRE(p1 == p3);
     p3.assign(fs::path::string_type{"/usr/local"});
-    ASSERT_TRUE(p2 == p3);
+    REQUIRE(p2 == p3);
 #endif
     p3 = std::u16string(u"/foo/bar");
-    ASSERT_TRUE(p1 == p3);
+    REQUIRE(p1 == p3);
     p3 = U"/usr/local";
-    ASSERT_TRUE(p2 == p3);
+    REQUIRE(p2 == p3);
     p3.assign(std::u16string(u"/foo/bar"));
-    ASSERT_TRUE(p1 == p3);
+    REQUIRE(p1 == p3);
     std::string s{"/usr/local"};
     p3.assign(s.begin(), s.end());
-    ASSERT_TRUE(p2 == p3);
+    REQUIRE(p2 == p3);
 }
 
-TEST(FilesystemPath, append) {
+TEST_CASE("FilesystemPath, append") {
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("foo") / "c:/bar" == "c:/bar");
-    ASSERT_TRUE(fs::path("foo") / "c:" == "c:");
-    ASSERT_TRUE(fs::path("c:") / "" == "c:");
-    ASSERT_TRUE(fs::path("c:foo") / "/bar" == "c:/bar");
-    ASSERT_TRUE(fs::path("c:foo") / "c:bar" == "c:foo/bar");
+    REQUIRE(fs::path("foo") / "c:/bar" == "c:/bar");
+    REQUIRE(fs::path("foo") / "c:" == "c:");
+    REQUIRE(fs::path("c:") / "" == "c:");
+    REQUIRE(fs::path("c:foo") / "/bar" == "c:/bar");
+    REQUIRE(fs::path("c:foo") / "c:bar" == "c:foo/bar");
 #else
-    ASSERT_TRUE(fs::path("foo") / "" == "foo/");
-    ASSERT_TRUE(fs::path("foo") / "/bar" == "/bar");
-    ASSERT_TRUE(fs::path("/foo") / "/" == "/");
+    REQUIRE(fs::path("foo") / "" == "foo/");
+    REQUIRE(fs::path("foo") / "/bar" == "/bar");
+    REQUIRE(fs::path("/foo") / "/" == "/");
     if (has_host_root_name_support()) {
-        ASSERT_TRUE(fs::path("//host/foo") / "/bar" == "/bar");
-        ASSERT_TRUE(fs::path("//host") / "/" == "//host/");
-        ASSERT_TRUE(fs::path("//host/foo") / "/" == "/");
+        REQUIRE(fs::path("//host/foo") / "/bar" == "/bar");
+        REQUIRE(fs::path("//host") / "/" == "//host/");
+        REQUIRE(fs::path("//host/foo") / "/" == "/");
     }
 #endif
-    ASSERT_TRUE(fs::path("/foo/bar") / "some///other" == "/foo/bar/some/other");
+    REQUIRE(fs::path("/foo/bar") / "some///other" == "/foo/bar/some/other");
     fs::path p1{"/tmp/test"};
     fs::path p2{"foobar.txt"};
     fs::path p3 = p1 / p2;
-    ASSERT_TRUE("/tmp/test/foobar.txt" == p3);
+    REQUIRE("/tmp/test/foobar.txt" == p3);
     // TODO: append(first, last)
 }
 
-TEST(FilesystemPath, concat) {
-    ASSERT_TRUE((fs::path("foo") += fs::path("bar")) == "foobar");
-    ASSERT_TRUE((fs::path("foo") += fs::path("/bar")) == "foo/bar");
+TEST_CASE("FilesystemPath, concat") {
+    REQUIRE((fs::path("foo") += fs::path("bar")) == "foobar");
+    REQUIRE((fs::path("foo") += fs::path("/bar")) == "foo/bar");
 
-    ASSERT_TRUE((fs::path("foo") += std::string("bar")) == "foobar");
-    ASSERT_TRUE((fs::path("foo") += std::string("/bar")) == "foo/bar");
+    REQUIRE((fs::path("foo") += std::string("bar")) == "foobar");
+    REQUIRE((fs::path("foo") += std::string("/bar")) == "foo/bar");
 
-    ASSERT_TRUE((fs::path("foo") += "bar") == "foobar");
-    ASSERT_TRUE((fs::path("foo") += "/bar") == "foo/bar");
-    ASSERT_TRUE((fs::path("foo") += L"bar") == "foobar");
-    ASSERT_TRUE((fs::path("foo") += L"/bar") == "foo/bar");
+    REQUIRE((fs::path("foo") += "bar") == "foobar");
+    REQUIRE((fs::path("foo") += "/bar") == "foo/bar");
+    REQUIRE((fs::path("foo") += L"bar") == "foobar");
+    REQUIRE((fs::path("foo") += L"/bar") == "foo/bar");
 
-    ASSERT_TRUE((fs::path("foo") += 'b') == "foob");
-    ASSERT_TRUE((fs::path("foo") += '/') == "foo/");
-    ASSERT_TRUE((fs::path("foo") += L'b') == "foob");
-    ASSERT_TRUE((fs::path("foo") += L'/') == "foo/");
+    REQUIRE((fs::path("foo") += 'b') == "foob");
+    REQUIRE((fs::path("foo") += '/') == "foo/");
+    REQUIRE((fs::path("foo") += L'b') == "foob");
+    REQUIRE((fs::path("foo") += L'/') == "foo/");
 
-    ASSERT_TRUE((fs::path("foo") += std::string("bar")) == "foobar");
-    ASSERT_TRUE((fs::path("foo") += std::string("/bar")) == "foo/bar");
+    REQUIRE((fs::path("foo") += std::string("bar")) == "foobar");
+    REQUIRE((fs::path("foo") += std::string("/bar")) == "foo/bar");
 
-    ASSERT_TRUE((fs::path("foo") += std::u16string(u"bar")) == "foobar");
-    ASSERT_TRUE((fs::path("foo") += std::u16string(u"/bar")) == "foo/bar");
+    REQUIRE((fs::path("foo") += std::u16string(u"bar")) == "foobar");
+    REQUIRE((fs::path("foo") += std::u16string(u"/bar")) == "foo/bar");
 
-    ASSERT_TRUE((fs::path("foo") += std::u32string(U"bar")) == "foobar");
-    ASSERT_TRUE((fs::path("foo") += std::u32string(U"/bar")) == "foo/bar");
+    REQUIRE((fs::path("foo") += std::u32string(U"bar")) == "foobar");
+    REQUIRE((fs::path("foo") += std::u32string(U"/bar")) == "foo/bar");
 
-    ASSERT_TRUE(fs::path("foo").concat("bar") == "foobar");
-    ASSERT_TRUE(fs::path("foo").concat("/bar") == "foo/bar");
-    ASSERT_TRUE(fs::path("foo").concat(L"bar") == "foobar");
-    ASSERT_TRUE(fs::path("foo").concat(L"/bar") == "foo/bar");
+    REQUIRE(fs::path("foo").concat("bar") == "foobar");
+    REQUIRE(fs::path("foo").concat("/bar") == "foo/bar");
+    REQUIRE(fs::path("foo").concat(L"bar") == "foobar");
+    REQUIRE(fs::path("foo").concat(L"/bar") == "foo/bar");
     std::string bar = "bar";
-    ASSERT_TRUE(fs::path("foo").concat(bar.begin(), bar.end()) == "foobar");
+    REQUIRE(fs::path("foo").concat(bar.begin(), bar.end()) == "foobar");
 #ifndef USE_STD_FS
-    ASSERT_TRUE((fs::path("/foo/bar") += "/some///other") ==
-                "/foo/bar/some/other");
+    REQUIRE((fs::path("/foo/bar") += "/some///other") ==
+            "/foo/bar/some/other");
 #endif
     // TODO: contat(first, last)
 }
 
-TEST(FilesystemPath, modifiers) {
+TEST_CASE("FilesystemPath, modifiers") {
     fs::path p = fs::path("/foo/bar");
     p.clear();
-    ASSERT_TRUE(p == "");
+    REQUIRE(p == "");
 
     // make_preferred() is a no-op
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("foo\\bar") == "foo/bar");
-    ASSERT_TRUE(fs::path("foo\\bar").make_preferred() == "foo/bar");
+    REQUIRE(fs::path("foo\\bar") == "foo/bar");
+    REQUIRE(fs::path("foo\\bar").make_preferred() == "foo/bar");
 #else
-    ASSERT_TRUE(fs::path("foo\\bar") == "foo\\bar");
-    ASSERT_TRUE(fs::path("foo\\bar").make_preferred() == "foo\\bar");
+    REQUIRE(fs::path("foo\\bar") == "foo\\bar");
+    REQUIRE(fs::path("foo\\bar").make_preferred() == "foo\\bar");
 #endif
-    ASSERT_TRUE(fs::path("foo/bar").make_preferred() == "foo/bar");
+    REQUIRE(fs::path("foo/bar").make_preferred() == "foo/bar");
 
-    ASSERT_TRUE(fs::path("foo/bar").remove_filename() == "foo/");
-    ASSERT_TRUE(fs::path("foo/").remove_filename() == "foo/");
-    ASSERT_TRUE(fs::path("/foo").remove_filename() == "/");
-    ASSERT_TRUE(fs::path("/").remove_filename() == "/");
+    REQUIRE(fs::path("foo/bar").remove_filename() == "foo/");
+    REQUIRE(fs::path("foo/").remove_filename() == "foo/");
+    REQUIRE(fs::path("/foo").remove_filename() == "/");
+    REQUIRE(fs::path("/").remove_filename() == "/");
 
-    ASSERT_TRUE(fs::path("/foo").replace_filename("bar") == "/bar");
-    ASSERT_TRUE(fs::path("/").replace_filename("bar") == "/bar");
-    ASSERT_TRUE(fs::path("/foo").replace_filename("b//ar") == "/b/ar");
+    REQUIRE(fs::path("/foo").replace_filename("bar") == "/bar");
+    REQUIRE(fs::path("/").replace_filename("bar") == "/bar");
+    REQUIRE(fs::path("/foo").replace_filename("b//ar") == "/b/ar");
 
-    ASSERT_TRUE(fs::path("/foo/bar.txt").replace_extension("odf") ==
-                "/foo/bar.odf");
-    ASSERT_TRUE(fs::path("/foo/bar.txt").replace_extension() == "/foo/bar");
-    ASSERT_TRUE(fs::path("/foo/bar").replace_extension("odf") == "/foo/bar.odf");
-    ASSERT_TRUE(fs::path("/foo/bar").replace_extension(".odf") == "/foo/bar.odf");
-    ASSERT_TRUE(fs::path("/foo/bar.").replace_extension(".odf") ==
-                "/foo/bar.odf");
-    ASSERT_TRUE(fs::path("/foo/bar/").replace_extension("odf") ==
-                "/foo/bar/.odf");
+    REQUIRE(fs::path("/foo/bar.txt").replace_extension("odf") ==
+            "/foo/bar.odf");
+    REQUIRE(fs::path("/foo/bar.txt").replace_extension() == "/foo/bar");
+    REQUIRE(fs::path("/foo/bar").replace_extension("odf") == "/foo/bar.odf");
+    REQUIRE(fs::path("/foo/bar").replace_extension(".odf") == "/foo/bar.odf");
+    REQUIRE(fs::path("/foo/bar.").replace_extension(".odf") ==
+            "/foo/bar.odf");
+    REQUIRE(fs::path("/foo/bar/").replace_extension("odf") ==
+            "/foo/bar/.odf");
 
     fs::path p1 = "foo";
     fs::path p2 = "bar";
     p1.swap(p2);
-    ASSERT_TRUE(p1 == "bar");
-    ASSERT_TRUE(p2 == "foo");
+    REQUIRE(p1 == "bar");
+    REQUIRE(p2 == "foo");
 }
 
-TEST(FilesystemPath, obs) {
+TEST_CASE("FilesystemPath, obs") {
 #ifdef TURBO_PLATFORM_WINDOWS
 #if defined(IS_WCHAR_PATH) || defined(GHC_USE_WCHAR_T)
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").native() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").native() ==
                 fs::path::string_type(L"\u00E4\\\u20AC"));
-    // ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").string() ==
+    // REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").string() ==
     // std::string("ä\\€")); // MSVCs returns local DBCS encoding
 #else
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").native() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").native() ==
                 fs::path::string_type("\xc3\xa4\\\xe2\x82\xac"));
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").string() ==
                 std::string("\xc3\xa4\\\xe2\x82\xac"));
-    ASSERT_TRUE(!::strcmp(fs::u8path("\xc3\xa4\\\xe2\x82\xac").c_str(),
+    REQUIRE(!::strcmp(fs::u8path("\xc3\xa4\\\xe2\x82\xac").c_str(),
                           "\xc3\xa4\\\xe2\x82\xac"));
-    ASSERT_TRUE((std::string)fs::u8path("\xc3\xa4\\\xe2\x82\xac") ==
+    REQUIRE((std::string)fs::u8path("\xc3\xa4\\\xe2\x82\xac") ==
                 std::string("\xc3\xa4\\\xe2\x82\xac"));
 #endif
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").wstring() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").wstring() ==
                 std::wstring(L"\u00E4\\\u20AC"));
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u8string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u8string() ==
                 std::u8string(u8"\u00E4\\\u20AC"));
 #else
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u8string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u8string() ==
                 std::string("\xc3\xa4\\\xe2\x82\xac"));
 #endif
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u16string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u16string() ==
                 std::u16string(u"\u00E4\\\u20AC"));
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u32string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").u32string() ==
                 std::u32string(U"\U000000E4\\\U000020AC"));
 #else
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").native() ==
-                fs::path::string_type("\xc3\xa4/\xe2\x82\xac"));
-    ASSERT_TRUE(!::strcmp(fs::u8path("\xc3\xa4/\xe2\x82\xac").c_str(),
-                          "\xc3\xa4/\xe2\x82\xac"));
-    ASSERT_TRUE((std::string) fs::u8path("\xc3\xa4/\xe2\x82\xac") ==
-                std::string("\xc3\xa4/\xe2\x82\xac"));
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").string() ==
-                std::string("\xc3\xa4/\xe2\x82\xac"));
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").wstring() ==
-                std::wstring(L"ä/€"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").native() ==
+            fs::path::string_type("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(!::strcmp(fs::u8path("\xc3\xa4/\xe2\x82\xac").c_str(),
+                      "\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE((std::string) fs::u8path("\xc3\xa4/\xe2\x82\xac") ==
+            std::string("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").string() ==
+            std::string("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").wstring() ==
+            std::wstring(L"ä/€"));
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u8string() ==
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u8string() ==
                 std::u8string(u8"\xc3\xa4/\xe2\x82\xac"));
 #else
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u8string() ==
-                std::string("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u8string() ==
+            std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u16string() ==
-                std::u16string(u"\u00E4/\u20AC"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u16string() ==
+            std::u16string(u"\u00E4/\u20AC"));
     TLOG_WARN("This check might fail on GCC8 (with \"Illegal byte sequence\") due "
               "to not detecting the valid unicode codepoint U+1D11E.");
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac\xf0\x9d\x84\x9e").u16string() ==
-                std::u16string(u"\u00E4/\u20AC\U0001D11E"));
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u32string() ==
-                std::u32string(U"\U000000E4/\U000020AC"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac\xf0\x9d\x84\x9e").u16string() ==
+            std::u16string(u"\u00E4/\u20AC\U0001D11E"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").u32string() ==
+            std::u32string(U"\U000000E4/\U000020AC"));
 #endif
 }
 
-TEST(FilesystemPath, generic_obs) {
+TEST_CASE("FilesystemPath, generic_obs") {
 #ifdef TURBO_PLATFORM_WINDOWS
 #ifndef IS_WCHAR_PATH
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_string() ==
                 std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
 #ifndef USE_STD_FS
     auto t =
         fs::u8path("\xc3\xa4\\\xe2\x82\xac")
             .generic_string<char, std::char_traits<char>, TestAllocator<char>>();
-    ASSERT_TRUE(t.c_str() == std::string("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(t.c_str() == std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_wstring() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_wstring() ==
                 std::wstring(L"\U000000E4/\U000020AC"));
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u8string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u8string() ==
                 std::u8string(u8"\u00E4/\u20AC"));
 #else
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u8string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u8string() ==
                 std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u16string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u16string() ==
                 std::u16string(u"\u00E4/\u20AC"));
-    ASSERT_TRUE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u32string() ==
+    REQUIRE(fs::u8path("\xc3\xa4\\\xe2\x82\xac").generic_u32string() ==
                 std::u32string(U"\U000000E4/\U000020AC"));
 #else
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_string() ==
-                std::string("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_string() ==
+            std::string("\xc3\xa4/\xe2\x82\xac"));
 #ifndef USE_STD_FS
     auto t =
             fs::u8path("\xc3\xa4/\xe2\x82\xac")
                     .generic_string<char, std::char_traits<char>, TestAllocator<char>>();
-    ASSERT_TRUE(t.c_str() == std::string("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(t.c_str() == std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_wstring() ==
-                std::wstring(L"ä/€"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_wstring() ==
+            std::wstring(L"ä/€"));
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u8string() ==
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u8string() ==
                 std::u8string(u8"\xc3\xa4/\xe2\x82\xac"));
 #else
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u8string() ==
-                std::string("\xc3\xa4/\xe2\x82\xac"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u8string() ==
+            std::string("\xc3\xa4/\xe2\x82\xac"));
 #endif
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u16string() ==
-                std::u16string(u"\u00E4/\u20AC"));
-    ASSERT_TRUE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u32string() ==
-                std::u32string(U"\U000000E4/\U000020AC"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u16string() ==
+            std::u16string(u"\u00E4/\u20AC"));
+    REQUIRE(fs::u8path("\xc3\xa4/\xe2\x82\xac").generic_u32string() ==
+            std::u32string(U"\U000000E4/\U000020AC"));
 #endif
 }
 
-TEST(FilesystemPath, compare) {
-    ASSERT_TRUE(fs::path("/foo/b").compare("/foo/a") > 0);
-    ASSERT_TRUE(fs::path("/foo/b").compare("/foo/b") == 0);
-    ASSERT_TRUE(fs::path("/foo/b").compare("/foo/c") < 0);
+TEST_CASE("FilesystemPath, compare") {
+    REQUIRE(fs::path("/foo/b").compare("/foo/a") > 0);
+    REQUIRE(fs::path("/foo/b").compare("/foo/b") == 0);
+    REQUIRE(fs::path("/foo/b").compare("/foo/c") < 0);
 
-    ASSERT_TRUE(fs::path("/foo/b").compare(std::string("/foo/a")) > 0);
-    ASSERT_TRUE(fs::path("/foo/b").compare(std::string("/foo/b")) == 0);
-    ASSERT_TRUE(fs::path("/foo/b").compare(std::string("/foo/c")) < 0);
+    REQUIRE(fs::path("/foo/b").compare(std::string("/foo/a")) > 0);
+    REQUIRE(fs::path("/foo/b").compare(std::string("/foo/b")) == 0);
+    REQUIRE(fs::path("/foo/b").compare(std::string("/foo/c")) < 0);
 
-    ASSERT_TRUE(fs::path("/foo/b").compare(fs::path("/foo/a")) > 0);
-    ASSERT_TRUE(fs::path("/foo/b").compare(fs::path("/foo/b")) == 0);
-    ASSERT_TRUE(fs::path("/foo/b").compare(fs::path("/foo/c")) < 0);
+    REQUIRE(fs::path("/foo/b").compare(fs::path("/foo/a")) > 0);
+    REQUIRE(fs::path("/foo/b").compare(fs::path("/foo/b")) == 0);
+    REQUIRE(fs::path("/foo/b").compare(fs::path("/foo/c")) < 0);
 
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("c:\\a\\b").compare("C:\\a\\b") == 0);
-    ASSERT_TRUE(fs::path("c:\\a\\b").compare("d:\\a\\b") != 0);
-    ASSERT_TRUE(fs::path("c:\\a\\b").compare("C:\\A\\b") != 0);
+    REQUIRE(fs::path("c:\\a\\b").compare("C:\\a\\b") == 0);
+    REQUIRE(fs::path("c:\\a\\b").compare("d:\\a\\b") != 0);
+    REQUIRE(fs::path("c:\\a\\b").compare("C:\\A\\b") != 0);
 #endif
 
 #ifdef LWG_2936_BEHAVIOUR
-    ASSERT_TRUE(fs::path("/a/b/").compare("/a/b/c") < 0);
-    ASSERT_TRUE(fs::path("/a/b/").compare("a/c") > 0);
+    REQUIRE(fs::path("/a/b/").compare("/a/b/c") < 0);
+    REQUIRE(fs::path("/a/b/").compare("a/c") > 0);
 #endif // LWG_2936_BEHAVIOUR
 }
 
-TEST(FilesystemPath, decompose) {
+TEST_CASE("FilesystemPath, decompose") {
     // root_name()
-    ASSERT_TRUE(fs::path("").root_name() == "");
-    ASSERT_TRUE(fs::path(".").root_name() == "");
-    ASSERT_TRUE(fs::path("..").root_name() == "");
-    ASSERT_TRUE(fs::path("foo").root_name() == "");
-    ASSERT_TRUE(fs::path("/").root_name() == "");
-    ASSERT_TRUE(fs::path("/foo").root_name() == "");
-    ASSERT_TRUE(fs::path("foo/").root_name() == "");
-    ASSERT_TRUE(fs::path("/foo/").root_name() == "");
-    ASSERT_TRUE(fs::path("foo/bar").root_name() == "");
-    ASSERT_TRUE(fs::path("/foo/bar").root_name() == "");
-    ASSERT_TRUE(fs::path("///foo/bar").root_name() == "");
+    REQUIRE(fs::path("").root_name() == "");
+    REQUIRE(fs::path(".").root_name() == "");
+    REQUIRE(fs::path("..").root_name() == "");
+    REQUIRE(fs::path("foo").root_name() == "");
+    REQUIRE(fs::path("/").root_name() == "");
+    REQUIRE(fs::path("/foo").root_name() == "");
+    REQUIRE(fs::path("foo/").root_name() == "");
+    REQUIRE(fs::path("/foo/").root_name() == "");
+    REQUIRE(fs::path("foo/bar").root_name() == "");
+    REQUIRE(fs::path("/foo/bar").root_name() == "");
+    REQUIRE(fs::path("///foo/bar").root_name() == "");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:/foo").root_name() == "C:");
-    ASSERT_TRUE(fs::path("C:\\foo").root_name() == "C:");
-    ASSERT_TRUE(fs::path("C:foo").root_name() == "C:");
+    REQUIRE(fs::path("C:/foo").root_name() == "C:");
+    REQUIRE(fs::path("C:\\foo").root_name() == "C:");
+    REQUIRE(fs::path("C:foo").root_name() == "C:");
 #endif
 
     // root_directory()
-    ASSERT_TRUE(fs::path("").root_directory() == "");
-    ASSERT_TRUE(fs::path(".").root_directory() == "");
-    ASSERT_TRUE(fs::path("..").root_directory() == "");
-    ASSERT_TRUE(fs::path("foo").root_directory() == "");
-    ASSERT_TRUE(fs::path("/").root_directory() == "/");
-    ASSERT_TRUE(fs::path("/foo").root_directory() == "/");
-    ASSERT_TRUE(fs::path("foo/").root_directory() == "");
-    ASSERT_TRUE(fs::path("/foo/").root_directory() == "/");
-    ASSERT_TRUE(fs::path("foo/bar").root_directory() == "");
-    ASSERT_TRUE(fs::path("/foo/bar").root_directory() == "/");
-    ASSERT_TRUE(fs::path("///foo/bar").root_directory() == "/");
+    REQUIRE(fs::path("").root_directory() == "");
+    REQUIRE(fs::path(".").root_directory() == "");
+    REQUIRE(fs::path("..").root_directory() == "");
+    REQUIRE(fs::path("foo").root_directory() == "");
+    REQUIRE(fs::path("/").root_directory() == "/");
+    REQUIRE(fs::path("/foo").root_directory() == "/");
+    REQUIRE(fs::path("foo/").root_directory() == "");
+    REQUIRE(fs::path("/foo/").root_directory() == "/");
+    REQUIRE(fs::path("foo/bar").root_directory() == "");
+    REQUIRE(fs::path("/foo/bar").root_directory() == "/");
+    REQUIRE(fs::path("///foo/bar").root_directory() == "/");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:/foo").root_directory() == "/");
-    ASSERT_TRUE(fs::path("C:\\foo").root_directory() == "/");
-    ASSERT_TRUE(fs::path("C:foo").root_directory() == "");
+    REQUIRE(fs::path("C:/foo").root_directory() == "/");
+    REQUIRE(fs::path("C:\\foo").root_directory() == "/");
+    REQUIRE(fs::path("C:foo").root_directory() == "");
 #endif
 
     // root_path()
-    ASSERT_TRUE(fs::path("").root_path() == "");
-    ASSERT_TRUE(fs::path(".").root_path() == "");
-    ASSERT_TRUE(fs::path("..").root_path() == "");
-    ASSERT_TRUE(fs::path("foo").root_path() == "");
-    ASSERT_TRUE(fs::path("/").root_path() == "/");
-    ASSERT_TRUE(fs::path("/foo").root_path() == "/");
-    ASSERT_TRUE(fs::path("foo/").root_path() == "");
-    ASSERT_TRUE(fs::path("/foo/").root_path() == "/");
-    ASSERT_TRUE(fs::path("foo/bar").root_path() == "");
-    ASSERT_TRUE(fs::path("/foo/bar").root_path() == "/");
-    ASSERT_TRUE(fs::path("///foo/bar").root_path() == "/");
+    REQUIRE(fs::path("").root_path() == "");
+    REQUIRE(fs::path(".").root_path() == "");
+    REQUIRE(fs::path("..").root_path() == "");
+    REQUIRE(fs::path("foo").root_path() == "");
+    REQUIRE(fs::path("/").root_path() == "/");
+    REQUIRE(fs::path("/foo").root_path() == "/");
+    REQUIRE(fs::path("foo/").root_path() == "");
+    REQUIRE(fs::path("/foo/").root_path() == "/");
+    REQUIRE(fs::path("foo/bar").root_path() == "");
+    REQUIRE(fs::path("/foo/bar").root_path() == "/");
+    REQUIRE(fs::path("///foo/bar").root_path() == "/");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:/foo").root_path() == "C:/");
-    ASSERT_TRUE(fs::path("C:\\foo").root_path() == "C:/");
-    ASSERT_TRUE(fs::path("C:foo").root_path() == "C:");
+    REQUIRE(fs::path("C:/foo").root_path() == "C:/");
+    REQUIRE(fs::path("C:\\foo").root_path() == "C:/");
+    REQUIRE(fs::path("C:foo").root_path() == "C:");
 #endif
 
     // relative_path()
-    ASSERT_TRUE(fs::path("").relative_path() == "");
-    ASSERT_TRUE(fs::path(".").relative_path() == ".");
-    ASSERT_TRUE(fs::path("..").relative_path() == "..");
-    ASSERT_TRUE(fs::path("foo").relative_path() == "foo");
-    ASSERT_TRUE(fs::path("/").relative_path() == "");
-    ASSERT_TRUE(fs::path("/foo").relative_path() == "foo");
-    ASSERT_TRUE(fs::path("foo/").relative_path() == "foo/");
-    ASSERT_TRUE(fs::path("/foo/").relative_path() == "foo/");
-    ASSERT_TRUE(fs::path("foo/bar").relative_path() == "foo/bar");
-    ASSERT_TRUE(fs::path("/foo/bar").relative_path() == "foo/bar");
-    ASSERT_TRUE(fs::path("///foo/bar").relative_path() == "foo/bar");
+    REQUIRE(fs::path("").relative_path() == "");
+    REQUIRE(fs::path(".").relative_path() == ".");
+    REQUIRE(fs::path("..").relative_path() == "..");
+    REQUIRE(fs::path("foo").relative_path() == "foo");
+    REQUIRE(fs::path("/").relative_path() == "");
+    REQUIRE(fs::path("/foo").relative_path() == "foo");
+    REQUIRE(fs::path("foo/").relative_path() == "foo/");
+    REQUIRE(fs::path("/foo/").relative_path() == "foo/");
+    REQUIRE(fs::path("foo/bar").relative_path() == "foo/bar");
+    REQUIRE(fs::path("/foo/bar").relative_path() == "foo/bar");
+    REQUIRE(fs::path("///foo/bar").relative_path() == "foo/bar");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:/foo").relative_path() == "foo");
-    ASSERT_TRUE(fs::path("C:\\foo").relative_path() == "foo");
-    ASSERT_TRUE(fs::path("C:foo").relative_path() == "foo");
+    REQUIRE(fs::path("C:/foo").relative_path() == "foo");
+    REQUIRE(fs::path("C:\\foo").relative_path() == "foo");
+    REQUIRE(fs::path("C:foo").relative_path() == "foo");
 #endif
 
     // parent_path()
-    ASSERT_TRUE(fs::path("").parent_path() == "");
-    ASSERT_TRUE(fs::path(".").parent_path() == "");
-    ASSERT_TRUE(fs::path("..").parent_path() ==
-                ""); // unintuitive but as defined in the standard
-    ASSERT_TRUE(fs::path("foo").parent_path() == "");
-    ASSERT_TRUE(fs::path("/").parent_path() == "/");
-    ASSERT_TRUE(fs::path("/foo").parent_path() == "/");
-    ASSERT_TRUE(fs::path("foo/").parent_path() == "foo");
-    ASSERT_TRUE(fs::path("/foo/").parent_path() == "/foo");
-    ASSERT_TRUE(fs::path("foo/bar").parent_path() == "foo");
-    ASSERT_TRUE(fs::path("/foo/bar").parent_path() == "/foo");
-    ASSERT_TRUE(fs::path("///foo/bar").parent_path() == "/foo");
+    REQUIRE(fs::path("").parent_path() == "");
+    REQUIRE(fs::path(".").parent_path() == "");
+    REQUIRE(fs::path("..").parent_path() ==
+            ""); // unintuitive but as defined in the standard
+    REQUIRE(fs::path("foo").parent_path() == "");
+    REQUIRE(fs::path("/").parent_path() == "/");
+    REQUIRE(fs::path("/foo").parent_path() == "/");
+    REQUIRE(fs::path("foo/").parent_path() == "foo");
+    REQUIRE(fs::path("/foo/").parent_path() == "/foo");
+    REQUIRE(fs::path("foo/bar").parent_path() == "foo");
+    REQUIRE(fs::path("/foo/bar").parent_path() == "/foo");
+    REQUIRE(fs::path("///foo/bar").parent_path() == "/foo");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:/foo").parent_path() == "C:/");
-    ASSERT_TRUE(fs::path("C:\\foo").parent_path() == "C:/");
-    ASSERT_TRUE(fs::path("C:foo").parent_path() == "C:");
+    REQUIRE(fs::path("C:/foo").parent_path() == "C:/");
+    REQUIRE(fs::path("C:\\foo").parent_path() == "C:/");
+    REQUIRE(fs::path("C:foo").parent_path() == "C:");
 #endif
 
     // filename()
-    ASSERT_TRUE(fs::path("").filename() == "");
-    ASSERT_TRUE(fs::path(".").filename() == ".");
-    ASSERT_TRUE(fs::path("..").filename() == "..");
-    ASSERT_TRUE(fs::path("foo").filename() == "foo");
-    ASSERT_TRUE(fs::path("/").filename() == "");
-    ASSERT_TRUE(fs::path("/foo").filename() == "foo");
-    ASSERT_TRUE(fs::path("foo/").filename() == "");
-    ASSERT_TRUE(fs::path("/foo/").filename() == "");
-    ASSERT_TRUE(fs::path("foo/bar").filename() == "bar");
-    ASSERT_TRUE(fs::path("/foo/bar").filename() == "bar");
-    ASSERT_TRUE(fs::path("///foo/bar").filename() == "bar");
+    REQUIRE(fs::path("").filename() == "");
+    REQUIRE(fs::path(".").filename() == ".");
+    REQUIRE(fs::path("..").filename() == "..");
+    REQUIRE(fs::path("foo").filename() == "foo");
+    REQUIRE(fs::path("/").filename() == "");
+    REQUIRE(fs::path("/foo").filename() == "foo");
+    REQUIRE(fs::path("foo/").filename() == "");
+    REQUIRE(fs::path("/foo/").filename() == "");
+    REQUIRE(fs::path("foo/bar").filename() == "bar");
+    REQUIRE(fs::path("/foo/bar").filename() == "bar");
+    REQUIRE(fs::path("///foo/bar").filename() == "bar");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:/foo").filename() == "foo");
-    ASSERT_TRUE(fs::path("C:\\foo").filename() == "foo");
-    ASSERT_TRUE(fs::path("C:foo").filename() == "foo");
+    REQUIRE(fs::path("C:/foo").filename() == "foo");
+    REQUIRE(fs::path("C:\\foo").filename() == "foo");
+    REQUIRE(fs::path("C:foo").filename() == "foo");
 #endif
 
     // stem()
-    ASSERT_TRUE(fs::path("/foo/bar.txt").stem() == "bar");
+    REQUIRE(fs::path("/foo/bar.txt").stem() == "bar");
     {
         fs::path p = "foo.bar.baz.tar";
-        ASSERT_TRUE(p.extension() == ".tar");
+        REQUIRE(p.extension() == ".tar");
         p = p.stem();
-        ASSERT_TRUE(p.extension() == ".baz");
+        REQUIRE(p.extension() == ".baz");
         p = p.stem();
-        ASSERT_TRUE(p.extension() == ".bar");
+        REQUIRE(p.extension() == ".bar");
         p = p.stem();
-        ASSERT_TRUE(p == "foo");
+        REQUIRE(p == "foo");
     }
-    ASSERT_TRUE(fs::path("/foo/.profile").stem() == ".profile");
-    ASSERT_TRUE(fs::path(".bar").stem() == ".bar");
-    ASSERT_TRUE(fs::path("..bar").stem() == ".");
+    REQUIRE(fs::path("/foo/.profile").stem() == ".profile");
+    REQUIRE(fs::path(".bar").stem() == ".bar");
+    REQUIRE(fs::path("..bar").stem() == ".");
 
     // extension()
-    ASSERT_TRUE(fs::path("/foo/bar.txt").extension() == ".txt");
-    ASSERT_TRUE(fs::path("/foo/bar").extension() == "");
-    ASSERT_TRUE(fs::path("/foo/.profile").extension() == "");
-    ASSERT_TRUE(fs::path(".bar").extension() == "");
-    ASSERT_TRUE(fs::path("..bar").extension() == ".bar");
+    REQUIRE(fs::path("/foo/bar.txt").extension() == ".txt");
+    REQUIRE(fs::path("/foo/bar").extension() == "");
+    REQUIRE(fs::path("/foo/.profile").extension() == "");
+    REQUIRE(fs::path(".bar").extension() == "");
+    REQUIRE(fs::path("..bar").extension() == ".bar");
 
     if (has_host_root_name_support()) {
         // //host-based root-names
-        ASSERT_TRUE(fs::path("//host").root_name() == "//host");
-        ASSERT_TRUE(fs::path("//host/foo").root_name() == "//host");
-        ASSERT_TRUE(fs::path("//host").root_directory() == "");
-        ASSERT_TRUE(fs::path("//host/foo").root_directory() == "/");
-        ASSERT_TRUE(fs::path("//host").root_path() == "//host");
-        ASSERT_TRUE(fs::path("//host/foo").root_path() == "//host/");
-        ASSERT_TRUE(fs::path("//host").relative_path() == "");
-        ASSERT_TRUE(fs::path("//host/foo").relative_path() == "foo");
-        ASSERT_TRUE(fs::path("//host").parent_path() == "//host");
-        ASSERT_TRUE(fs::path("//host/foo").parent_path() == "//host/");
-        ASSERT_TRUE(fs::path("//host").filename() == "");
-        ASSERT_TRUE(fs::path("//host/foo").filename() == "foo");
+        REQUIRE(fs::path("//host").root_name() == "//host");
+        REQUIRE(fs::path("//host/foo").root_name() == "//host");
+        REQUIRE(fs::path("//host").root_directory() == "");
+        REQUIRE(fs::path("//host/foo").root_directory() == "/");
+        REQUIRE(fs::path("//host").root_path() == "//host");
+        REQUIRE(fs::path("//host/foo").root_path() == "//host/");
+        REQUIRE(fs::path("//host").relative_path() == "");
+        REQUIRE(fs::path("//host/foo").relative_path() == "foo");
+        REQUIRE(fs::path("//host").parent_path() == "//host");
+        REQUIRE(fs::path("//host/foo").parent_path() == "//host/");
+        REQUIRE(fs::path("//host").filename() == "");
+        REQUIRE(fs::path("//host/foo").filename() == "foo");
     }
 }
 
-TEST(FilesystemPath, query) {
+TEST_CASE("FilesystemPath, query") {
     // empty
-    ASSERT_TRUE(fs::path("").empty());
-    ASSERT_TRUE(!fs::path("foo").empty());
+    REQUIRE(fs::path("").empty());
+    REQUIRE(!fs::path("foo").empty());
 
     // has_root_path()
-    ASSERT_TRUE(!fs::path("foo").has_root_path());
-    ASSERT_TRUE(!fs::path("foo/bar").has_root_path());
-    ASSERT_TRUE(fs::path("/foo").has_root_path());
+    REQUIRE(!fs::path("foo").has_root_path());
+    REQUIRE(!fs::path("foo/bar").has_root_path());
+    REQUIRE(fs::path("/foo").has_root_path());
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:foo").has_root_path());
-    ASSERT_TRUE(fs::path("C:/foo").has_root_path());
+    REQUIRE(fs::path("C:foo").has_root_path());
+    REQUIRE(fs::path("C:/foo").has_root_path());
 #endif
 
     // has_root_name()
-    ASSERT_TRUE(!fs::path("foo").has_root_name());
-    ASSERT_TRUE(!fs::path("foo/bar").has_root_name());
-    ASSERT_TRUE(!fs::path("/foo").has_root_name());
+    REQUIRE(!fs::path("foo").has_root_name());
+    REQUIRE(!fs::path("foo/bar").has_root_name());
+    REQUIRE(!fs::path("/foo").has_root_name());
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("C:foo").has_root_name());
-    ASSERT_TRUE(fs::path("C:/foo").has_root_name());
+    REQUIRE(fs::path("C:foo").has_root_name());
+    REQUIRE(fs::path("C:/foo").has_root_name());
 #endif
 
     // has_root_directory()
-    ASSERT_TRUE(!fs::path("foo").has_root_directory());
-    ASSERT_TRUE(!fs::path("foo/bar").has_root_directory());
-    ASSERT_TRUE(fs::path("/foo").has_root_directory());
+    REQUIRE(!fs::path("foo").has_root_directory());
+    REQUIRE(!fs::path("foo/bar").has_root_directory());
+    REQUIRE(fs::path("/foo").has_root_directory());
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(!fs::path("C:foo").has_root_directory());
-    ASSERT_TRUE(fs::path("C:/foo").has_root_directory());
+    REQUIRE(!fs::path("C:foo").has_root_directory());
+    REQUIRE(fs::path("C:/foo").has_root_directory());
 #endif
 
     // has_relative_path()
-    ASSERT_TRUE(!fs::path("").has_relative_path());
-    ASSERT_TRUE(!fs::path("/").has_relative_path());
-    ASSERT_TRUE(fs::path("/foo").has_relative_path());
+    REQUIRE(!fs::path("").has_relative_path());
+    REQUIRE(!fs::path("/").has_relative_path());
+    REQUIRE(fs::path("/foo").has_relative_path());
 
     // has_parent_path()
-    ASSERT_TRUE(!fs::path("").has_parent_path());
-    ASSERT_TRUE(!fs::path(".").has_parent_path());
-    ASSERT_TRUE(
+    REQUIRE(!fs::path("").has_parent_path());
+    REQUIRE(!fs::path(".").has_parent_path());
+    REQUIRE(
             !fs::path("..")
                     .has_parent_path()); // unintuitive but as defined in the standard
-    ASSERT_TRUE(!fs::path("foo").has_parent_path());
-    ASSERT_TRUE(fs::path("/").has_parent_path());
-    ASSERT_TRUE(fs::path("/foo").has_parent_path());
-    ASSERT_TRUE(fs::path("foo/").has_parent_path());
-    ASSERT_TRUE(fs::path("/foo/").has_parent_path());
+    REQUIRE(!fs::path("foo").has_parent_path());
+    REQUIRE(fs::path("/").has_parent_path());
+    REQUIRE(fs::path("/foo").has_parent_path());
+    REQUIRE(fs::path("foo/").has_parent_path());
+    REQUIRE(fs::path("/foo/").has_parent_path());
 
     // has_filename()
-    ASSERT_TRUE(fs::path("foo").has_filename());
-    ASSERT_TRUE(fs::path("foo/bar").has_filename());
-    ASSERT_TRUE(!fs::path("/foo/bar/").has_filename());
+    REQUIRE(fs::path("foo").has_filename());
+    REQUIRE(fs::path("foo/bar").has_filename());
+    REQUIRE(!fs::path("/foo/bar/").has_filename());
 
     // has_stem()
-    ASSERT_TRUE(fs::path("foo").has_stem());
-    ASSERT_TRUE(fs::path("foo.bar").has_stem());
-    ASSERT_TRUE(fs::path(".profile").has_stem());
-    ASSERT_TRUE(!fs::path("/foo/").has_stem());
+    REQUIRE(fs::path("foo").has_stem());
+    REQUIRE(fs::path("foo.bar").has_stem());
+    REQUIRE(fs::path(".profile").has_stem());
+    REQUIRE(!fs::path("/foo/").has_stem());
 
     // has_extension()
-    ASSERT_TRUE(!fs::path("foo").has_extension());
-    ASSERT_TRUE(fs::path("foo.bar").has_extension());
-    ASSERT_TRUE(!fs::path(".profile").has_extension());
+    REQUIRE(!fs::path("foo").has_extension());
+    REQUIRE(fs::path("foo.bar").has_extension());
+    REQUIRE(!fs::path(".profile").has_extension());
 
     // is_absolute()
-    ASSERT_TRUE(!fs::path("foo/bar").is_absolute());
+    REQUIRE(!fs::path("foo/bar").is_absolute());
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(!fs::path("/foo").is_absolute());
-    ASSERT_TRUE(!fs::path("c:foo").is_absolute());
-    ASSERT_TRUE(fs::path("c:/foo").is_absolute());
+    REQUIRE(!fs::path("/foo").is_absolute());
+    REQUIRE(!fs::path("c:foo").is_absolute());
+    REQUIRE(fs::path("c:/foo").is_absolute());
 #else
-    ASSERT_TRUE(fs::path("/foo").is_absolute());
+    REQUIRE(fs::path("/foo").is_absolute());
 #endif
 
     // is_relative()
-    ASSERT_TRUE(fs::path("foo/bar").is_relative());
+    REQUIRE(fs::path("foo/bar").is_relative());
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("/foo").is_relative());
-    ASSERT_TRUE(fs::path("c:foo").is_relative());
-    ASSERT_TRUE(!fs::path("c:/foo").is_relative());
+    REQUIRE(fs::path("/foo").is_relative());
+    REQUIRE(fs::path("c:foo").is_relative());
+    REQUIRE(!fs::path("c:/foo").is_relative());
 #else
-    ASSERT_TRUE(!fs::path("/foo").is_relative());
+    REQUIRE(!fs::path("/foo").is_relative());
 #endif
 
     if (has_host_root_name_support()) {
-        ASSERT_TRUE(fs::path("//host").has_root_name());
-        ASSERT_TRUE(fs::path("//host/foo").has_root_name());
-        ASSERT_TRUE(fs::path("//host").has_root_path());
-        ASSERT_TRUE(fs::path("//host/foo").has_root_path());
-        ASSERT_TRUE(!fs::path("//host").has_root_directory());
-        ASSERT_TRUE(fs::path("//host/foo").has_root_directory());
-        ASSERT_TRUE(!fs::path("//host").has_relative_path());
-        ASSERT_TRUE(fs::path("//host/foo").has_relative_path());
-        ASSERT_TRUE(fs::path("//host/foo").is_absolute());
-        ASSERT_TRUE(!fs::path("//host/foo").is_relative());
+        REQUIRE(fs::path("//host").has_root_name());
+        REQUIRE(fs::path("//host/foo").has_root_name());
+        REQUIRE(fs::path("//host").has_root_path());
+        REQUIRE(fs::path("//host/foo").has_root_path());
+        REQUIRE(!fs::path("//host").has_root_directory());
+        REQUIRE(fs::path("//host/foo").has_root_directory());
+        REQUIRE(!fs::path("//host").has_relative_path());
+        REQUIRE(fs::path("//host/foo").has_relative_path());
+        REQUIRE(fs::path("//host/foo").is_absolute());
+        REQUIRE(!fs::path("//host/foo").is_relative());
     }
 }
 
-TEST(FilesystemPath, fs_path_gen) {
+TEST_CASE("FilesystemPath, fs_path_gen") {
     // lexically_normal()
-    ASSERT_TRUE(fs::path("foo/./bar/..").lexically_normal() == "foo/");
-    ASSERT_TRUE(fs::path("foo/.///bar/../").lexically_normal() == "foo/");
-    ASSERT_TRUE(fs::path("/foo/../..").lexically_normal() == "/");
-    ASSERT_TRUE(fs::path("foo/..").lexically_normal() == ".");
-    ASSERT_TRUE(fs::path("ab/cd/ef/../../qw").lexically_normal() == "ab/qw");
-    ASSERT_TRUE(fs::path("a/b/../../../c").lexically_normal() == "../c");
-    ASSERT_TRUE(fs::path("../").lexically_normal() == "..");
+    REQUIRE(fs::path("foo/./bar/..").lexically_normal() == "foo/");
+    REQUIRE(fs::path("foo/.///bar/../").lexically_normal() == "foo/");
+    REQUIRE(fs::path("/foo/../..").lexically_normal() == "/");
+    REQUIRE(fs::path("foo/..").lexically_normal() == ".");
+    REQUIRE(fs::path("ab/cd/ef/../../qw").lexically_normal() == "ab/qw");
+    REQUIRE(fs::path("a/b/../../../c").lexically_normal() == "../c");
+    REQUIRE(fs::path("../").lexically_normal() == "..");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("\\/\\///\\/").lexically_normal() == "/");
-    ASSERT_TRUE(fs::path("a/b/..\\//..///\\/../c\\\\/").lexically_normal() ==
+    REQUIRE(fs::path("\\/\\///\\/").lexically_normal() == "/");
+    REQUIRE(fs::path("a/b/..\\//..///\\/../c\\\\/").lexically_normal() ==
                 "../c/");
-    ASSERT_TRUE(fs::path("..a/b/..\\//..///\\/../c\\\\/").lexically_normal() ==
+    REQUIRE(fs::path("..a/b/..\\//..///\\/../c\\\\/").lexically_normal() ==
                 "../c/");
-    ASSERT_TRUE(fs::path("..\\").lexically_normal() == "..");
+    REQUIRE(fs::path("..\\").lexically_normal() == "..");
 #endif
 
     // lexically_relative()
-    ASSERT_TRUE(fs::path("/a/d").lexically_relative("/a/b/c") == "../../d");
-    ASSERT_TRUE(fs::path("/a/b/c").lexically_relative("/a/d") == "../b/c");
-    ASSERT_TRUE(fs::path("a/b/c").lexically_relative("a") == "b/c");
-    ASSERT_TRUE(fs::path("a/b/c").lexically_relative("a/b/c/x/y") == "../..");
-    ASSERT_TRUE(fs::path("a/b/c").lexically_relative("a/b/c") == ".");
-    ASSERT_TRUE(fs::path("a/b").lexically_relative("c/d") == "../../a/b");
-    ASSERT_TRUE(fs::path("a/b").lexically_relative("a/") == "b");
+    REQUIRE(fs::path("/a/d").lexically_relative("/a/b/c") == "../../d");
+    REQUIRE(fs::path("/a/b/c").lexically_relative("/a/d") == "../b/c");
+    REQUIRE(fs::path("a/b/c").lexically_relative("a") == "b/c");
+    REQUIRE(fs::path("a/b/c").lexically_relative("a/b/c/x/y") == "../..");
+    REQUIRE(fs::path("a/b/c").lexically_relative("a/b/c") == ".");
+    REQUIRE(fs::path("a/b").lexically_relative("c/d") == "../../a/b");
+    REQUIRE(fs::path("a/b").lexically_relative("a/") == "b");
     if (has_host_root_name_support()) {
-        ASSERT_TRUE(fs::path("//host1/foo").lexically_relative("//host2.bar") ==
-                    "");
+        REQUIRE(fs::path("//host1/foo").lexically_relative("//host2.bar") ==
+                "");
     }
 #ifdef TURBO_PLATFORM_WINDOWS
-        ASSERT_TRUE(fs::path("c:/foo").lexically_relative("/bar") == "");
-        ASSERT_TRUE(fs::path("c:foo").lexically_relative("c:/bar") == "");
-        ASSERT_TRUE(fs::path("foo").lexically_relative("/bar") == "");
-        ASSERT_TRUE(fs::path("c:/foo/bar.txt").lexically_relative("c:/foo/") ==
+        REQUIRE(fs::path("c:/foo").lexically_relative("/bar") == "");
+        REQUIRE(fs::path("c:foo").lexically_relative("c:/bar") == "");
+        REQUIRE(fs::path("foo").lexically_relative("/bar") == "");
+        REQUIRE(fs::path("c:/foo/bar.txt").lexically_relative("c:/foo/") ==
                     "bar.txt");
-        ASSERT_TRUE(fs::path("c:/foo/bar.txt").lexically_relative("C:/foo/") ==
+        REQUIRE(fs::path("c:/foo/bar.txt").lexically_relative("C:/foo/") ==
                     "bar.txt");
 #else
-    ASSERT_TRUE(fs::path("/foo").lexically_relative("bar") == "");
-    ASSERT_TRUE(fs::path("foo").lexically_relative("/bar") == "");
+    REQUIRE(fs::path("/foo").lexically_relative("bar") == "");
+    REQUIRE(fs::path("foo").lexically_relative("/bar") == "");
 #endif
 
     // lexically_proximate()
-    ASSERT_TRUE(fs::path("/a/d").lexically_proximate("/a/b/c") == "../../d");
+    REQUIRE(fs::path("/a/d").lexically_proximate("/a/b/c") == "../../d");
     if (has_host_root_name_support()) {
-        ASSERT_TRUE(fs::path("//host1/a/d").lexically_proximate("//host2/a/b/c") ==
-                    "//host1/a/d");
+        REQUIRE(fs::path("//host1/a/d").lexically_proximate("//host2/a/b/c") ==
+                "//host1/a/d");
     }
-    ASSERT_TRUE(fs::path("a/d").lexically_proximate("/a/b/c") == "a/d");
+    REQUIRE(fs::path("a/d").lexically_proximate("/a/b/c") == "a/d");
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE(fs::path("c:/a/d").lexically_proximate("c:/a/b/c") == "../../d");
-    ASSERT_TRUE(fs::path("c:/a/d").lexically_proximate("d:/a/b/c") == "c:/a/d");
-    ASSERT_TRUE(fs::path("c:/foo").lexically_proximate("/bar") == "c:/foo");
-    ASSERT_TRUE(fs::path("c:foo").lexically_proximate("c:/bar") == "c:foo");
-    ASSERT_TRUE(fs::path("foo").lexically_proximate("/bar") == "foo");
+    REQUIRE(fs::path("c:/a/d").lexically_proximate("c:/a/b/c") == "../../d");
+    REQUIRE(fs::path("c:/a/d").lexically_proximate("d:/a/b/c") == "c:/a/d");
+    REQUIRE(fs::path("c:/foo").lexically_proximate("/bar") == "c:/foo");
+    REQUIRE(fs::path("c:foo").lexically_proximate("c:/bar") == "c:foo");
+    REQUIRE(fs::path("foo").lexically_proximate("/bar") == "foo");
 #else
-    ASSERT_TRUE(fs::path("/foo").lexically_proximate("bar") == "/foo");
-    ASSERT_TRUE(fs::path("foo").lexically_proximate("/bar") == "foo");
+    REQUIRE(fs::path("/foo").lexically_proximate("bar") == "/foo");
+    REQUIRE(fs::path("foo").lexically_proximate("/bar") == "foo");
 #endif
 }
 
@@ -1088,53 +1033,53 @@ static std::string reverseIterateResult(const fs::path &path) {
     return result.str();
 }
 
-TEST(FilesystemPath, itr) {
-    ASSERT_TRUE(iterateResult(fs::path()).empty());
-    ASSERT_TRUE("." == iterateResult(fs::path(".")));
-    ASSERT_TRUE(".." == iterateResult(fs::path("..")));
-    ASSERT_TRUE("foo" == iterateResult(fs::path("foo")));
-    ASSERT_TRUE("/" == iterateResult(fs::path("/")));
-    ASSERT_TRUE("/,foo" == iterateResult(fs::path("/foo")));
-    ASSERT_TRUE("foo," == iterateResult(fs::path("foo/")));
-    ASSERT_TRUE("/,foo," == iterateResult(fs::path("/foo/")));
-    ASSERT_TRUE("foo,bar" == iterateResult(fs::path("foo/bar")));
-    ASSERT_TRUE("/,foo,bar" == iterateResult(fs::path("/foo/bar")));
+TEST_CASE("FilesystemPath, itr") {
+    REQUIRE(iterateResult(fs::path()).empty());
+    REQUIRE("." == iterateResult(fs::path(".")));
+    REQUIRE(".." == iterateResult(fs::path("..")));
+    REQUIRE("foo" == iterateResult(fs::path("foo")));
+    REQUIRE("/" == iterateResult(fs::path("/")));
+    REQUIRE("/,foo" == iterateResult(fs::path("/foo")));
+    REQUIRE("foo," == iterateResult(fs::path("foo/")));
+    REQUIRE("/,foo," == iterateResult(fs::path("/foo/")));
+    REQUIRE("foo,bar" == iterateResult(fs::path("foo/bar")));
+    REQUIRE("/,foo,bar" == iterateResult(fs::path("/foo/bar")));
 #ifndef USE_STD_FS
     // turbo::filesystem enforces redundant slashes to be reduced to one
-    ASSERT_TRUE("/,foo,bar" == iterateResult(fs::path("///foo/bar")));
+    REQUIRE("/,foo,bar" == iterateResult(fs::path("///foo/bar")));
 #else
     // typically std::filesystem keeps them
-    ASSERT_TRUE("///,foo,bar" == iterateResult(fs::path("///foo/bar")));
+    REQUIRE("///,foo,bar" == iterateResult(fs::path("///foo/bar")));
 #endif
-    ASSERT_TRUE("/,foo,bar," == iterateResult(fs::path("/foo/bar///")));
-    ASSERT_TRUE("foo,.,bar,..," == iterateResult(fs::path("foo/.///bar/../")));
+    REQUIRE("/,foo,bar," == iterateResult(fs::path("/foo/bar///")));
+    REQUIRE("foo,.,bar,..," == iterateResult(fs::path("foo/.///bar/../")));
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE("C:,/,foo" == iterateResult(fs::path("C:/foo")));
+    REQUIRE("C:,/,foo" == iterateResult(fs::path("C:/foo")));
 #endif
 
-    ASSERT_TRUE(reverseIterateResult(fs::path()).empty());
-    ASSERT_TRUE("." == reverseIterateResult(fs::path(".")));
-    ASSERT_TRUE(".." == reverseIterateResult(fs::path("..")));
-    ASSERT_TRUE("foo" == reverseIterateResult(fs::path("foo")));
-    ASSERT_TRUE("/" == reverseIterateResult(fs::path("/")));
-    ASSERT_TRUE("foo,/" == reverseIterateResult(fs::path("/foo")));
-    ASSERT_TRUE(",foo" == reverseIterateResult(fs::path("foo/")));
-    ASSERT_TRUE(",foo,/" == reverseIterateResult(fs::path("/foo/")));
-    ASSERT_TRUE("bar,foo" == reverseIterateResult(fs::path("foo/bar")));
-    ASSERT_TRUE("bar,foo,/" == reverseIterateResult(fs::path("/foo/bar")));
+    REQUIRE(reverseIterateResult(fs::path()).empty());
+    REQUIRE("." == reverseIterateResult(fs::path(".")));
+    REQUIRE(".." == reverseIterateResult(fs::path("..")));
+    REQUIRE("foo" == reverseIterateResult(fs::path("foo")));
+    REQUIRE("/" == reverseIterateResult(fs::path("/")));
+    REQUIRE("foo,/" == reverseIterateResult(fs::path("/foo")));
+    REQUIRE(",foo" == reverseIterateResult(fs::path("foo/")));
+    REQUIRE(",foo,/" == reverseIterateResult(fs::path("/foo/")));
+    REQUIRE("bar,foo" == reverseIterateResult(fs::path("foo/bar")));
+    REQUIRE("bar,foo,/" == reverseIterateResult(fs::path("/foo/bar")));
 #ifndef USE_STD_FS
     // turbo::filesystem enforces redundant slashes to be reduced to one
-    ASSERT_TRUE("bar,foo,/" == reverseIterateResult(fs::path("///foo/bar")));
+    REQUIRE("bar,foo,/" == reverseIterateResult(fs::path("///foo/bar")));
 #else
     // typically std::filesystem keeps them
-    ASSERT_TRUE("bar,foo,///" == reverseIterateResult(fs::path("///foo/bar")));
+    REQUIRE("bar,foo,///" == reverseIterateResult(fs::path("///foo/bar")));
 #endif
-    ASSERT_TRUE(",bar,foo,/" == reverseIterateResult(fs::path("/foo/bar///")));
-    ASSERT_TRUE(",..,bar,.,foo" ==
-                reverseIterateResult(fs::path("foo/.///bar/../")));
+    REQUIRE(",bar,foo,/" == reverseIterateResult(fs::path("/foo/bar///")));
+    REQUIRE(",..,bar,.,foo" ==
+            reverseIterateResult(fs::path("foo/.///bar/../")));
 #ifdef TURBO_PLATFORM_WINDOWS
-    ASSERT_TRUE("foo,/,C:" == reverseIterateResult(fs::path("C:/foo")));
-    ASSERT_TRUE("foo,C:" == reverseIterateResult(fs::path("C:foo")));
+    REQUIRE("foo,/,C:" == reverseIterateResult(fs::path("C:/foo")));
+    REQUIRE("foo,C:" == reverseIterateResult(fs::path("C:foo")));
 #endif
     {
         fs::path p1 = "/foo/bar/test.txt";
@@ -1142,73 +1087,73 @@ TEST(FilesystemPath, itr) {
         for (auto pe: p1) {
             p2 /= pe;
         }
-        ASSERT_TRUE(p1 == p2);
-        ASSERT_TRUE("bar" == *(--fs::path("/foo/bar").end()));
+        REQUIRE(p1 == p2);
+        REQUIRE("bar" == *(--fs::path("/foo/bar").end()));
         auto p = fs::path("/foo/bar");
         auto pi = p.end();
         pi--;
-        ASSERT_TRUE("bar" == *pi);
+        REQUIRE("bar" == *pi);
     }
 
     if (has_host_root_name_support()) {
-        ASSERT_TRUE("foo" == *(--fs::path("//host/foo").end()));
+        REQUIRE("foo" == *(--fs::path("//host/foo").end()));
         auto p = fs::path("//host/foo");
         auto pi = p.end();
         pi--;
-        ASSERT_TRUE("foo" == *pi);
-        ASSERT_TRUE("//host" == iterateResult(fs::path("//host")));
-        ASSERT_TRUE("//host,/,foo" == iterateResult(fs::path("//host/foo")));
-        ASSERT_TRUE("//host" == reverseIterateResult(fs::path("//host")));
-        ASSERT_TRUE("foo,/,//host" == reverseIterateResult(fs::path("//host/foo")));
+        REQUIRE("foo" == *pi);
+        REQUIRE("//host" == iterateResult(fs::path("//host")));
+        REQUIRE("//host,/,foo" == iterateResult(fs::path("//host/foo")));
+        REQUIRE("//host" == reverseIterateResult(fs::path("//host")));
+        REQUIRE("foo,/,//host" == reverseIterateResult(fs::path("//host/foo")));
         {
             fs::path p1 = "//host/foo/bar/test.txt";
             fs::path p2;
             for (auto pe: p1) {
                 p2 /= pe;
             }
-            ASSERT_TRUE(p1 == p2);
+            REQUIRE(p1 == p2);
         }
     }
 }
 
-TEST(FilesystemPath, nonmember) {
+TEST_CASE("FilesystemPath, nonmember") {
     fs::path p1("foo/bar");
     fs::path p2("some/other");
     fs::swap(p1, p2);
-    ASSERT_TRUE(p1 == "some/other");
-    ASSERT_TRUE(p2 == "foo/bar");
-    ASSERT_TRUE(hash_value(p1));
-    ASSERT_TRUE(p2 < p1);
-    ASSERT_TRUE(p2 <= p1);
-    ASSERT_TRUE(p1 <= p1);
-    ASSERT_TRUE(!(p1 < p2));
-    ASSERT_TRUE(!(p1 <= p2));
-    ASSERT_TRUE(p1 > p2);
-    ASSERT_TRUE(p1 >= p2);
-    ASSERT_TRUE(p1 >= p1);
-    ASSERT_TRUE(!(p2 > p1));
-    ASSERT_TRUE(!(p2 >= p1));
-    ASSERT_TRUE(p1 != p2);
-    ASSERT_TRUE(p1 / p2 == "some/other/foo/bar");
+    REQUIRE(p1 == "some/other");
+    REQUIRE(p2 == "foo/bar");
+    REQUIRE(hash_value(p1));
+    REQUIRE(p2 < p1);
+    REQUIRE(p2 <= p1);
+    REQUIRE(p1 <= p1);
+    REQUIRE(!(p1 < p2));
+    REQUIRE(!(p1 <= p2));
+    REQUIRE(p1 > p2);
+    REQUIRE(p1 >= p2);
+    REQUIRE(p1 >= p1);
+    REQUIRE(!(p2 > p1));
+    REQUIRE(!(p2 >= p1));
+    REQUIRE(p1 != p2);
+    REQUIRE(p1 / p2 == "some/other/foo/bar");
 }
 
-TEST(FilesystemPath, io) {
+TEST_CASE("FilesystemPath, io") {
     {
         std::ostringstream os;
         os << fs::path("/root/foo bar");
 #ifdef TURBO_PLATFORM_WINDOWS
-        ASSERT_TRUE(os.str() == "\"\\\\root\\\\foo bar\"");
+        REQUIRE(os.str() == "\"\\\\root\\\\foo bar\"");
 #else
-        ASSERT_TRUE(os.str() == "\"/root/foo bar\"");
+        REQUIRE(os.str() == "\"/root/foo bar\"");
 #endif
     }
     {
         std::ostringstream os;
         os << fs::path("/root/foo\"bar");
 #ifdef TURBO_PLATFORM_WINDOWS
-        ASSERT_TRUE(os.str() == "\"\\\\root\\\\foo\\\"bar\"");
+        REQUIRE(os.str() == "\"\\\\root\\\\foo\\\"bar\"");
 #else
-        ASSERT_TRUE(os.str() == "\"/root/foo\\\"bar\"");
+        REQUIRE(os.str() == "\"/root/foo\\\"bar\"");
 #endif
     }
 
@@ -1216,112 +1161,112 @@ TEST(FilesystemPath, io) {
         std::istringstream is("\"/root/foo bar\"");
         fs::path p;
         is >> p;
-        ASSERT_TRUE(p == fs::path("/root/foo bar"));
-        ASSERT_TRUE((is.flags() & std::ios_base::skipws) == std::ios_base::skipws);
+        REQUIRE(p == fs::path("/root/foo bar"));
+        REQUIRE((is.flags() & std::ios_base::skipws) == std::ios_base::skipws);
     }
     {
         std::istringstream is("\"/root/foo bar\"");
         is >> std::noskipws;
         fs::path p;
         is >> p;
-        ASSERT_TRUE(p == fs::path("/root/foo bar"));
-        ASSERT_TRUE((is.flags() & std::ios_base::skipws) != std::ios_base::skipws);
+        REQUIRE(p == fs::path("/root/foo bar"));
+        REQUIRE((is.flags() & std::ios_base::skipws) != std::ios_base::skipws);
     }
     {
         std::istringstream is("\"/root/foo\\\"bar\"");
         fs::path p;
         is >> p;
-        ASSERT_TRUE(p == fs::path("/root/foo\"bar"));
+        REQUIRE(p == fs::path("/root/foo\"bar"));
     }
     {
         std::istringstream is("/root/foo");
         fs::path p;
         is >> p;
-        ASSERT_TRUE(p == fs::path("/root/foo"));
+        REQUIRE(p == fs::path("/root/foo"));
     }
 }
 
-TEST(FilesystemPath, factory) {
-    ASSERT_TRUE(fs::u8path("foo/bar") == fs::path("foo/bar"));
-    ASSERT_TRUE(fs::u8path("foo/bar") == fs::path("foo/bar"));
+TEST_CASE("FilesystemPath, factory") {
+    REQUIRE(fs::u8path("foo/bar") == fs::path("foo/bar"));
+    REQUIRE(fs::u8path("foo/bar") == fs::path("foo/bar"));
     std::string str("/foo/bar/test.txt");
-    ASSERT_TRUE(fs::u8path(str.begin(), str.end()) == str);
+    REQUIRE(fs::u8path(str.begin(), str.end()) == str);
 }
 
-TEST(FilesystemPath, filesystem_error) {
+TEST_CASE("FilesystemPath, filesystem_error") {
     std::error_code ec(1, std::system_category());
     fs::filesystem_error fse("None", std::error_code());
     fse = fs::filesystem_error("Some error", ec);
-    ASSERT_TRUE(fse.code().value() == 1);
-    ASSERT_TRUE(!std::string(fse.what()).empty());
-    ASSERT_TRUE(fse.path1().empty());
-    ASSERT_TRUE(fse.path2().empty());
+    REQUIRE(fse.code().value() == 1);
+    REQUIRE(!std::string(fse.what()).empty());
+    REQUIRE(fse.path1().empty());
+    REQUIRE(fse.path2().empty());
     fse = fs::filesystem_error("Some error", fs::path("foo/bar"), ec);
-    ASSERT_TRUE(!std::string(fse.what()).empty());
-    ASSERT_TRUE(fse.path1() == "foo/bar");
-    ASSERT_TRUE(fse.path2().empty());
+    REQUIRE(!std::string(fse.what()).empty());
+    REQUIRE(fse.path1() == "foo/bar");
+    REQUIRE(fse.path2().empty());
     fse = fs::filesystem_error("Some error", fs::path("foo/bar"),
                                fs::path("some/other"), ec);
-    ASSERT_TRUE(!std::string(fse.what()).empty());
-    ASSERT_TRUE(fse.path1() == "foo/bar");
-    ASSERT_TRUE(fse.path2() == "some/other");
+    REQUIRE(!std::string(fse.what()).empty());
+    REQUIRE(fse.path1() == "foo/bar");
+    REQUIRE(fse.path2() == "some/other");
 }
 
 constexpr fs::perms constExprOwnerAll() {
     return fs::perms::owner_read | fs::perms::owner_write | fs::perms::owner_exec;
 }
 
-TEST(FilesystemPath, fs_enum) {
+TEST_CASE("FilesystemPath, fs_enum") {
     static_assert(constExprOwnerAll() == fs::perms::owner_all,
                   "constexpr didn't result in owner_all");
-    ASSERT_TRUE((fs::perms::owner_read | fs::perms::owner_write |
-                 fs::perms::owner_exec) == fs::perms::owner_all);
-    ASSERT_TRUE((fs::perms::group_read | fs::perms::group_write |
-                 fs::perms::group_exec) == fs::perms::group_all);
-    ASSERT_TRUE((fs::perms::others_read | fs::perms::others_write |
-                 fs::perms::others_exec) == fs::perms::others_all);
-    ASSERT_TRUE((fs::perms::owner_all | fs::perms::group_all |
-                 fs::perms::others_all) == fs::perms::all);
-    ASSERT_TRUE((fs::perms::all | fs::perms::set_uid | fs::perms::set_gid |
-                 fs::perms::sticky_bit) == fs::perms::mask);
+    REQUIRE((fs::perms::owner_read | fs::perms::owner_write |
+             fs::perms::owner_exec) == fs::perms::owner_all);
+    REQUIRE((fs::perms::group_read | fs::perms::group_write |
+             fs::perms::group_exec) == fs::perms::group_all);
+    REQUIRE((fs::perms::others_read | fs::perms::others_write |
+             fs::perms::others_exec) == fs::perms::others_all);
+    REQUIRE((fs::perms::owner_all | fs::perms::group_all |
+             fs::perms::others_all) == fs::perms::all);
+    REQUIRE((fs::perms::all | fs::perms::set_uid | fs::perms::set_gid |
+             fs::perms::sticky_bit) == fs::perms::mask);
 }
 
-TEST(FilesystemPath, file_status) {
+TEST_CASE("FilesystemPath, file_status") {
     {
         fs::file_status fs;
-        ASSERT_TRUE(fs.type() == fs::file_type::none);
-        ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
+        REQUIRE(fs.type() == fs::file_type::none);
+        REQUIRE(fs.permissions() == fs::perms::unknown);
     }
     {
         fs::file_status fs{fs::file_type::regular};
-        ASSERT_TRUE(fs.type() == fs::file_type::regular);
-        ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
+        REQUIRE(fs.type() == fs::file_type::regular);
+        REQUIRE(fs.permissions() == fs::perms::unknown);
     }
     {
         fs::file_status fs{fs::file_type::directory, fs::perms::owner_read |
                                                      fs::perms::owner_write |
                                                      fs::perms::owner_exec};
-        ASSERT_TRUE(fs.type() == fs::file_type::directory);
-        ASSERT_TRUE(fs.permissions() == fs::perms::owner_all);
+        REQUIRE(fs.type() == fs::file_type::directory);
+        REQUIRE(fs.permissions() == fs::perms::owner_all);
         fs.type(fs::file_type::block);
-        ASSERT_TRUE(fs.type() == fs::file_type::block);
+        REQUIRE(fs.type() == fs::file_type::block);
         fs.type(fs::file_type::character);
-        ASSERT_TRUE(fs.type() == fs::file_type::character);
+        REQUIRE(fs.type() == fs::file_type::character);
         fs.type(fs::file_type::fifo);
-        ASSERT_TRUE(fs.type() == fs::file_type::fifo);
+        REQUIRE(fs.type() == fs::file_type::fifo);
         fs.type(fs::file_type::symlink);
-        ASSERT_TRUE(fs.type() == fs::file_type::symlink);
+        REQUIRE(fs.type() == fs::file_type::symlink);
         fs.type(fs::file_type::socket);
-        ASSERT_TRUE(fs.type() == fs::file_type::socket);
+        REQUIRE(fs.type() == fs::file_type::socket);
         fs.permissions(fs.permissions() | fs::perms::group_all |
                        fs::perms::others_all);
-        ASSERT_TRUE(fs.permissions() == fs::perms::all);
+        REQUIRE(fs.permissions() == fs::perms::all);
     }
     {
         fs::file_status fst(fs::file_type::regular);
         fs::file_status fs(std::move(fst));
-        ASSERT_TRUE(fs.type() == fs::file_type::regular);
-        ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
+        REQUIRE(fs.type() == fs::file_type::regular);
+        REQUIRE(fs.permissions() == fs::perms::unknown);
     }
 #if !defined(USE_STD_FS) || defined(TURBO_FILESYSTEM_RUNNING_CPP20)
     {
@@ -1336,179 +1281,179 @@ TEST(FilesystemPath, file_status) {
                                                       fs::perms::owner_exec};
         fs::file_status fs4{fs::file_type::regular,
                             fs::perms::owner_read | fs::perms::owner_write};
-        ASSERT_TRUE(fs1 == fs2);
-        ASSERT_FALSE(fs1 == fs3);
-        ASSERT_FALSE(fs1 == fs4);
+        REQUIRE(fs1 == fs2);
+        REQUIRE_FALSE(fs1 == fs3);
+        REQUIRE_FALSE(fs1 == fs4);
     }
 #endif
 }
 
-TEST(FilesystemDir, dir_entry) {
+TEST_CASE("FilesystemDir, dir_entry") {
     TemporaryDirectory t;
     std::error_code ec;
     auto de = fs::directory_entry(t.path());
-    ASSERT_TRUE(de.path() == t.path());
-    ASSERT_TRUE((fs::path) de == t.path());
-    ASSERT_TRUE(de.exists());
-    ASSERT_TRUE(!de.is_block_file());
-    ASSERT_TRUE(!de.is_character_file());
-    ASSERT_TRUE(de.is_directory());
-    ASSERT_TRUE(!de.is_fifo());
-    ASSERT_TRUE(!de.is_other());
-    ASSERT_TRUE(!de.is_regular_file());
-    ASSERT_TRUE(!de.is_socket());
-    ASSERT_TRUE(!de.is_symlink());
-    ASSERT_TRUE(de.status().type() == fs::file_type::directory);
+    REQUIRE(de.path() == t.path());
+    REQUIRE((fs::path) de == t.path());
+    REQUIRE(de.exists());
+    REQUIRE(!de.is_block_file());
+    REQUIRE(!de.is_character_file());
+    REQUIRE(de.is_directory());
+    REQUIRE(!de.is_fifo());
+    REQUIRE(!de.is_other());
+    REQUIRE(!de.is_regular_file());
+    REQUIRE(!de.is_socket());
+    REQUIRE(!de.is_symlink());
+    REQUIRE(de.status().type() == fs::file_type::directory);
     ec.clear();
-    ASSERT_TRUE(de.status(ec).type() == fs::file_type::directory);
-    ASSERT_TRUE(!ec);
-    ASSERT_NO_THROW(de.refresh());
+    REQUIRE(de.status(ec).type() == fs::file_type::directory);
+    REQUIRE(!ec);
+    REQUIRE_NOTHROW(de.refresh());
     fs::directory_entry none;
-    ASSERT_THROW(none.refresh(), fs::filesystem_error);
+    REQUIRE_THROWS_AS(none.refresh(), fs::filesystem_error);
     ec.clear();
-    ASSERT_NO_THROW(none.refresh(ec));
-    ASSERT_TRUE(ec);
-    ASSERT_THROW(de.assign(""), fs::filesystem_error);
+    REQUIRE_NOTHROW(none.refresh(ec));
+    REQUIRE(ec);
+    REQUIRE_THROWS_AS(de.assign(""), fs::filesystem_error);
     ec.clear();
-    ASSERT_NO_THROW(de.assign("", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(de.assign("", ec));
+    REQUIRE(ec);
     generateFile(t.path() / "foo", 1234);
     auto now = fs::file_time_type::clock::now();
-    ASSERT_NO_THROW(de.assign(t.path() / "foo"));
-    ASSERT_NO_THROW(de.assign(t.path() / "foo", ec));
-    ASSERT_TRUE(!ec);
+    REQUIRE_NOTHROW(de.assign(t.path() / "foo"));
+    REQUIRE_NOTHROW(de.assign(t.path() / "foo", ec));
+    REQUIRE(!ec);
     de = fs::directory_entry(t.path() / "foo");
-    ASSERT_TRUE(de.path() == t.path() / "foo");
-    ASSERT_TRUE(de.exists());
-    ASSERT_TRUE(de.exists(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!de.is_block_file());
-    ASSERT_TRUE(!de.is_block_file(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!de.is_character_file());
-    ASSERT_TRUE(!de.is_character_file(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!de.is_directory());
-    ASSERT_TRUE(!de.is_directory(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!de.is_fifo());
-    ASSERT_TRUE(!de.is_fifo(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!de.is_other());
-    ASSERT_TRUE(!de.is_other(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(de.is_regular_file());
-    ASSERT_TRUE(de.is_regular_file(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!de.is_socket());
-    ASSERT_TRUE(!de.is_socket(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!de.is_symlink());
-    ASSERT_TRUE(!de.is_symlink(ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(de.file_size() == 1234);
-    ASSERT_TRUE(de.file_size(ec) == 1234);
-    ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
+    REQUIRE(de.path() == t.path() / "foo");
+    REQUIRE(de.exists());
+    REQUIRE(de.exists(ec));
+    REQUIRE(!ec);
+    REQUIRE(!de.is_block_file());
+    REQUIRE(!de.is_block_file(ec));
+    REQUIRE(!ec);
+    REQUIRE(!de.is_character_file());
+    REQUIRE(!de.is_character_file(ec));
+    REQUIRE(!ec);
+    REQUIRE(!de.is_directory());
+    REQUIRE(!de.is_directory(ec));
+    REQUIRE(!ec);
+    REQUIRE(!de.is_fifo());
+    REQUIRE(!de.is_fifo(ec));
+    REQUIRE(!ec);
+    REQUIRE(!de.is_other());
+    REQUIRE(!de.is_other(ec));
+    REQUIRE(!ec);
+    REQUIRE(de.is_regular_file());
+    REQUIRE(de.is_regular_file(ec));
+    REQUIRE(!ec);
+    REQUIRE(!de.is_socket());
+    REQUIRE(!de.is_socket(ec));
+    REQUIRE(!ec);
+    REQUIRE(!de.is_symlink());
+    REQUIRE(!de.is_symlink(ec));
+    REQUIRE(!ec);
+    REQUIRE(de.file_size() == 1234);
+    REQUIRE(de.file_size(ec) == 1234);
+    REQUIRE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
             de.last_write_time() - now)
-                                 .count()) < 3);
+                             .count()) < 3);
     ec.clear();
-    ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
+    REQUIRE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
             de.last_write_time(ec) - now)
-                                 .count()) < 3);
-    ASSERT_TRUE(!ec);
+                             .count()) < 3);
+    REQUIRE(!ec);
 #ifndef TURBO_PLATFORM_WEB
-    ASSERT_TRUE(de.hard_link_count() == 1);
-    ASSERT_TRUE(de.hard_link_count(ec) == 1);
-    ASSERT_TRUE(!ec);
+    REQUIRE(de.hard_link_count() == 1);
+    REQUIRE(de.hard_link_count(ec) == 1);
+    REQUIRE(!ec);
 #endif
-    ASSERT_THROW(de.replace_filename("bar"), fs::filesystem_error);
-    ASSERT_NO_THROW(de.replace_filename("foo"));
+    REQUIRE_THROWS_AS(de.replace_filename("bar"), fs::filesystem_error);
+    REQUIRE_NOTHROW(de.replace_filename("foo"));
     ec.clear();
-    ASSERT_NO_THROW(de.replace_filename("bar", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(de.replace_filename("bar", ec));
+    REQUIRE(ec);
     auto de2none = fs::directory_entry();
     ec.clear();
 #ifndef TURBO_PLATFORM_WEB
-    ASSERT_TRUE(de2none.hard_link_count(ec) == static_cast<uintmax_t>(-1));
-    ASSERT_THROW(de2none.hard_link_count(), fs::filesystem_error);
-    ASSERT_TRUE(ec);
+    REQUIRE(de2none.hard_link_count(ec) == static_cast<uintmax_t>(-1));
+    REQUIRE_THROWS_AS(de2none.hard_link_count(), fs::filesystem_error);
+    REQUIRE(ec);
 #endif
     ec.clear();
-    ASSERT_NO_THROW(de2none.last_write_time(ec));
-    ASSERT_THROW(de2none.last_write_time(), fs::filesystem_error);
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(de2none.last_write_time(ec));
+    REQUIRE_THROWS_AS(de2none.last_write_time(), fs::filesystem_error);
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_THROW(de2none.file_size(), fs::filesystem_error);
-    ASSERT_TRUE(de2none.file_size(ec) == static_cast<uintmax_t>(-1));
-    ASSERT_TRUE(ec);
+    REQUIRE_THROWS_AS(de2none.file_size(), fs::filesystem_error);
+    REQUIRE(de2none.file_size(ec) == static_cast<uintmax_t>(-1));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(de2none.status().type() == fs::file_type::not_found);
-    ASSERT_TRUE(de2none.status(ec).type() == fs::file_type::not_found);
-    ASSERT_TRUE(ec);
+    REQUIRE(de2none.status().type() == fs::file_type::not_found);
+    REQUIRE(de2none.status(ec).type() == fs::file_type::not_found);
+    REQUIRE(ec);
     generateFile(t.path() / "a");
     generateFile(t.path() / "b");
     auto d1 = fs::directory_entry(t.path() / "a");
     auto d2 = fs::directory_entry(t.path() / "b");
-    ASSERT_TRUE(d1 < d2);
-    ASSERT_TRUE(!(d2 < d1));
-    ASSERT_TRUE(d1 <= d2);
-    ASSERT_TRUE(!(d2 <= d1));
-    ASSERT_TRUE(d2 > d1);
-    ASSERT_TRUE(!(d1 > d2));
-    ASSERT_TRUE(d2 >= d1);
-    ASSERT_TRUE(!(d1 >= d2));
-    ASSERT_TRUE(d1 != d2);
-    ASSERT_TRUE(!(d2 != d2));
-    ASSERT_TRUE(d1 == d1);
-    ASSERT_TRUE(!(d1 == d2));
+    REQUIRE(d1 < d2);
+    REQUIRE(!(d2 < d1));
+    REQUIRE(d1 <= d2);
+    REQUIRE(!(d2 <= d1));
+    REQUIRE(d2 > d1);
+    REQUIRE(!(d1 > d2));
+    REQUIRE(d2 >= d1);
+    REQUIRE(!(d1 >= d2));
+    REQUIRE(d1 != d2);
+    REQUIRE(!(d2 != d2));
+    REQUIRE(d1 == d1);
+    REQUIRE(!(d1 == d2));
 }
 
-TEST(FilesystemDir, directory_iterator) {
+TEST_CASE("FilesystemDir, directory_iterator") {
     {
         TemporaryDirectory t;
-        ASSERT_TRUE(fs::directory_iterator(t.path()) == fs::directory_iterator());
+        REQUIRE(fs::directory_iterator(t.path()) == fs::directory_iterator());
         generateFile(t.path() / "test", 1234);
-        ASSERT_TRUE(fs::directory_iterator(t.path()) != fs::directory_iterator());
+        REQUIRE(fs::directory_iterator(t.path()) != fs::directory_iterator());
         auto iter = fs::directory_iterator(t.path());
         fs::directory_iterator iter2(iter);
         fs::directory_iterator iter3, iter4;
         iter3 = iter;
-        ASSERT_TRUE(iter->path().filename() == "test");
-        ASSERT_TRUE(iter2->path().filename() == "test");
-        ASSERT_TRUE(iter3->path().filename() == "test");
+        REQUIRE(iter->path().filename() == "test");
+        REQUIRE(iter2->path().filename() == "test");
+        REQUIRE(iter3->path().filename() == "test");
         iter4 = std::move(iter3);
-        ASSERT_TRUE(iter4->path().filename() == "test");
-        ASSERT_TRUE(iter->path() == t.path() / "test");
-        ASSERT_TRUE(!iter->is_symlink());
-        ASSERT_TRUE(iter->is_regular_file());
-        ASSERT_TRUE(!iter->is_directory());
-        ASSERT_TRUE(iter->file_size() == 1234);
-        ASSERT_TRUE(++iter == fs::directory_iterator());
-        ASSERT_THROW(fs::directory_iterator(t.path() / "non-existing"),
-                     fs::filesystem_error);
+        REQUIRE(iter4->path().filename() == "test");
+        REQUIRE(iter->path() == t.path() / "test");
+        REQUIRE(!iter->is_symlink());
+        REQUIRE(iter->is_regular_file());
+        REQUIRE(!iter->is_directory());
+        REQUIRE(iter->file_size() == 1234);
+        REQUIRE(++iter == fs::directory_iterator());
+        REQUIRE_THROWS_AS(fs::directory_iterator(t.path() / "non-existing"),
+                          fs::filesystem_error);
         int cnt = 0;
         for (auto de: fs::directory_iterator(t.path())) {
             ++cnt;
         }
-        ASSERT_TRUE(cnt == 1);
+        REQUIRE(cnt == 1);
     }
     if (is_symlink_creation_supported()) {
         TemporaryDirectory t;
         fs::path td = t.path() / "testdir";
-        ASSERT_TRUE(fs::directory_iterator(t.path()) == fs::directory_iterator());
+        REQUIRE(fs::directory_iterator(t.path()) == fs::directory_iterator());
         generateFile(t.path() / "test", 1234);
         fs::create_directory(td);
-        ASSERT_NO_THROW(fs::create_symlink(t.path() / "test", td / "testlink"));
+        REQUIRE_NOTHROW(fs::create_symlink(t.path() / "test", td / "testlink"));
         std::error_code ec;
-        ASSERT_TRUE(fs::directory_iterator(td) != fs::directory_iterator());
+        REQUIRE(fs::directory_iterator(td) != fs::directory_iterator());
         auto iter = fs::directory_iterator(td);
-        ASSERT_TRUE(iter->path().filename() == "testlink");
-        ASSERT_TRUE(iter->path() == td / "testlink");
-        ASSERT_TRUE(iter->is_symlink());
-        ASSERT_TRUE(iter->is_regular_file());
-        ASSERT_TRUE(!iter->is_directory());
-        ASSERT_TRUE(iter->file_size() == 1234);
-        ASSERT_TRUE(++iter == fs::directory_iterator());
+        REQUIRE(iter->path().filename() == "testlink");
+        REQUIRE(iter->path() == td / "testlink");
+        REQUIRE(iter->is_symlink());
+        REQUIRE(iter->is_regular_file());
+        REQUIRE(!iter->is_directory());
+        REQUIRE(iter->file_size() == 1234);
+        REQUIRE(++iter == fs::directory_iterator());
     }
     {
         // Issue #8: check if resources are freed when iterator reaches end()
@@ -1519,32 +1464,32 @@ TEST(FilesystemDir, directory_iterator) {
         while (iter != fs::directory_iterator()) {
             ++iter;
         }
-        ASSERT_TRUE(fs::remove_all(p) == 1);
-        ASSERT_NO_THROW(fs::create_directory(p));
+        REQUIRE(fs::remove_all(p) == 1);
+        REQUIRE_NOTHROW(fs::create_directory(p));
     }
 }
 
-TEST(FilesystemDir, rec_dir_itr) {
+TEST_CASE("FilesystemDir, rec_dir_itr") {
     {
         auto iter = fs::recursive_directory_iterator(".");
         iter.pop();
-        ASSERT_TRUE(iter == fs::recursive_directory_iterator());
+        REQUIRE(iter == fs::recursive_directory_iterator());
     }
     {
         TemporaryDirectory t;
-        ASSERT_TRUE(fs::recursive_directory_iterator(t.path()) ==
-                    fs::recursive_directory_iterator());
+        REQUIRE(fs::recursive_directory_iterator(t.path()) ==
+                fs::recursive_directory_iterator());
         generateFile(t.path() / "test", 1234);
-        ASSERT_TRUE(fs::recursive_directory_iterator(t.path()) !=
-                    fs::recursive_directory_iterator());
+        REQUIRE(fs::recursive_directory_iterator(t.path()) !=
+                fs::recursive_directory_iterator());
         auto iter = fs::recursive_directory_iterator(t.path());
-        ASSERT_TRUE(iter->path().filename() == "test");
-        ASSERT_TRUE(iter->path() == t.path() / "test");
-        ASSERT_TRUE(!iter->is_symlink());
-        ASSERT_TRUE(iter->is_regular_file());
-        ASSERT_TRUE(!iter->is_directory());
-        ASSERT_TRUE(iter->file_size() == 1234);
-        ASSERT_TRUE(++iter == fs::recursive_directory_iterator());
+        REQUIRE(iter->path().filename() == "test");
+        REQUIRE(iter->path() == t.path() / "test");
+        REQUIRE(!iter->is_symlink());
+        REQUIRE(iter->is_regular_file());
+        REQUIRE(!iter->is_directory());
+        REQUIRE(iter->file_size() == 1234);
+        REQUIRE(++iter == fs::recursive_directory_iterator());
     }
 
     {
@@ -1552,55 +1497,55 @@ TEST(FilesystemDir, rec_dir_itr) {
         fs::path td = t.path() / "testdir";
         fs::create_directories(td);
         generateFile(td / "test", 1234);
-        ASSERT_TRUE(fs::recursive_directory_iterator(t.path()) !=
-                    fs::recursive_directory_iterator());
+        REQUIRE(fs::recursive_directory_iterator(t.path()) !=
+                fs::recursive_directory_iterator());
         auto iter = fs::recursive_directory_iterator(t.path());
 
-        ASSERT_TRUE(iter->path().filename() == "testdir");
-        ASSERT_TRUE(iter->path() == td);
-        ASSERT_TRUE(!iter->is_symlink());
-        ASSERT_TRUE(!iter->is_regular_file());
-        ASSERT_TRUE(iter->is_directory());
+        REQUIRE(iter->path().filename() == "testdir");
+        REQUIRE(iter->path() == td);
+        REQUIRE(!iter->is_symlink());
+        REQUIRE(!iter->is_regular_file());
+        REQUIRE(iter->is_directory());
 
-        ASSERT_TRUE(++iter != fs::recursive_directory_iterator());
+        REQUIRE(++iter != fs::recursive_directory_iterator());
 
-        ASSERT_TRUE(iter->path().filename() == "test");
-        ASSERT_TRUE(iter->path() == td / "test");
-        ASSERT_TRUE(!iter->is_symlink());
-        ASSERT_TRUE(iter->is_regular_file());
-        ASSERT_TRUE(!iter->is_directory());
-        ASSERT_TRUE(iter->file_size() == 1234);
+        REQUIRE(iter->path().filename() == "test");
+        REQUIRE(iter->path() == td / "test");
+        REQUIRE(!iter->is_symlink());
+        REQUIRE(iter->is_regular_file());
+        REQUIRE(!iter->is_directory());
+        REQUIRE(iter->file_size() == 1234);
 
-        ASSERT_TRUE(++iter == fs::recursive_directory_iterator());
+        REQUIRE(++iter == fs::recursive_directory_iterator());
     }
     {
         TemporaryDirectory t;
         std::error_code ec;
-        ASSERT_TRUE(fs::recursive_directory_iterator(t.path(),
-                                                     fs::directory_options::none) ==
-                    fs::recursive_directory_iterator());
-        ASSERT_TRUE(fs::recursive_directory_iterator(
+        REQUIRE(fs::recursive_directory_iterator(t.path(),
+                                                 fs::directory_options::none) ==
+                fs::recursive_directory_iterator());
+        REQUIRE(fs::recursive_directory_iterator(
                 t.path(), fs::directory_options::none, ec) ==
-                    fs::recursive_directory_iterator());
-        ASSERT_TRUE(!ec);
-        ASSERT_TRUE(fs::recursive_directory_iterator(t.path(), ec) ==
-                    fs::recursive_directory_iterator());
-        ASSERT_TRUE(!ec);
+                fs::recursive_directory_iterator());
+        REQUIRE(!ec);
+        REQUIRE(fs::recursive_directory_iterator(t.path(), ec) ==
+                fs::recursive_directory_iterator());
+        REQUIRE(!ec);
         generateFile(t.path() / "test");
         fs::recursive_directory_iterator rd1(t.path());
-        ASSERT_TRUE(fs::recursive_directory_iterator(rd1) !=
-                            fs::recursive_directory_iterator());
+        REQUIRE(fs::recursive_directory_iterator(rd1) !=
+                        fs::recursive_directory_iterator());
         fs::recursive_directory_iterator rd2(t.path());
-        ASSERT_TRUE(fs::recursive_directory_iterator(std::move(rd2)) !=
-                    fs::recursive_directory_iterator());
+        REQUIRE(fs::recursive_directory_iterator(std::move(rd2)) !=
+                fs::recursive_directory_iterator());
         fs::recursive_directory_iterator rd3(
                 t.path(), fs::directory_options::skip_permission_denied);
-        ASSERT_TRUE(rd3.options() == fs::directory_options::skip_permission_denied);
+        REQUIRE(rd3.options() == fs::directory_options::skip_permission_denied);
         fs::recursive_directory_iterator rd4;
         rd4 = std::move(rd3);
-        ASSERT_TRUE(rd4 != fs::recursive_directory_iterator());
-        ASSERT_NO_THROW(++rd4);
-        ASSERT_TRUE(rd4 == fs::recursive_directory_iterator());
+        REQUIRE(rd4 != fs::recursive_directory_iterator());
+        REQUIRE_NOTHROW(++rd4);
+        REQUIRE(rd4 == fs::recursive_directory_iterator());
         fs::recursive_directory_iterator rd5;
         rd5 = rd4;
     }
@@ -1624,8 +1569,8 @@ TEST(FilesystemDir, rec_dir_itr) {
         for (auto p: result) {
             os << "[" << p.first << "," << p.second << "],";
         }
-        ASSERT_TRUE(os.str() == "[./a,0],[./d1,0],[./d1/b,1],[./d1/c,1],[./d1/"
-                                "d2,1],[./d1/d2/d,2],[./e,0],");
+        REQUIRE(os.str() == "[./a,0],[./d1,0],[./d1/b,1],[./d1/c,1],[./d1/"
+                            "d2,1],[./d1/d2/d,2],[./e,0],");
     }
     {
         TemporaryDirectory t(TempOpt::change_path);
@@ -1644,7 +1589,7 @@ TEST(FilesystemDir, rec_dir_itr) {
         for (auto p: result) {
             os << p << ",";
         }
-        ASSERT_TRUE(os.str() == "./a,./d1,./d1/b,./d1/c,./d1/d2,./d1/d2/d,./e,");
+        REQUIRE(os.str() == "./a,./d1,./d1/b,./d1/c,./d1/d2,./d1/d2/d,./e,");
     }
     {
         TemporaryDirectory t(TempOpt::change_path);
@@ -1667,7 +1612,7 @@ TEST(FilesystemDir, rec_dir_itr) {
         for (auto p: result) {
             os << "[" << p.first << "," << p.second << "],";
         }
-        ASSERT_TRUE(os.str() == "[./a,0],[./d1,0],[./d1/d2,1],[./e,0],");
+        REQUIRE(os.str() == "[./a,0],[./d1,0],[./d1/d2,1],[./e,0],");
     }
     {
         TemporaryDirectory t(TempOpt::change_path);
@@ -1691,7 +1636,7 @@ TEST(FilesystemDir, rec_dir_itr) {
         for (auto p: result) {
             os << "[" << p.first << "," << p.second << "],";
         }
-        ASSERT_TRUE(os.str() == "[./a,0],[./d1,0],[./d1/d2,1],[./e,0],");
+        REQUIRE(os.str() == "[./a,0],[./d1,0],[./d1/d2,1],[./e,0],");
     }
     if (is_symlink_creation_supported()) {
         TemporaryDirectory t(TempOpt::change_path);
@@ -1702,7 +1647,7 @@ TEST(FilesystemDir, rec_dir_itr) {
         fs::create_directory_symlink("../d1", "d2/ds1");
         fs::create_directory_symlink("d3", "d2/ds2");
         std::multiset<std::string> result;
-        ASSERT_NO_THROW([&]() {
+        REQUIRE_NOTHROW([&]() {
             for (const auto &de: fs::recursive_directory_iterator(
                     "d2", fs::directory_options::follow_directory_symlink)) {
                 result.insert(de.path().generic_string());
@@ -1712,10 +1657,10 @@ TEST(FilesystemDir, rec_dir_itr) {
         for (const auto &p: result) {
             os << p << ",";
         }
-        ASSERT_TRUE(os.str() == "d2/b,d2/ds1,d2/ds1/a,d2/ds2,");
+        REQUIRE(os.str() == "d2/b,d2/ds1,d2/ds1/a,d2/ds2,");
         os.str("");
         result.clear();
-        ASSERT_NO_THROW([&]() {
+        REQUIRE_NOTHROW([&]() {
             for (const auto &de: fs::recursive_directory_iterator("d2")) {
                 result.insert(de.path().generic_string());
             }
@@ -1723,41 +1668,41 @@ TEST(FilesystemDir, rec_dir_itr) {
         for (const auto &p: result) {
             os << p << ",";
         }
-        ASSERT_TRUE(os.str() == "d2/b,d2/ds1,d2/ds2,");
+        REQUIRE(os.str() == "d2/b,d2/ds1,d2/ds2,");
     }
 }
 
-TEST(FilesystemDir, op_absolute) {
-    ASSERT_TRUE(fs::absolute("") == fs::current_path() / "");
-    ASSERT_TRUE(fs::absolute(fs::current_path()) == fs::current_path());
-    ASSERT_TRUE(fs::absolute(".") == fs::current_path() / ".");
-    ASSERT_TRUE((fs::absolute("..") == fs::current_path().parent_path() ||
-                 fs::absolute("..") == fs::current_path() / ".."));
-    ASSERT_TRUE(fs::absolute("foo") == fs::current_path() / "foo");
+TEST_CASE("FilesystemDir, op_absolute") {
+    REQUIRE(fs::absolute("") == fs::current_path() / "");
+    REQUIRE(fs::absolute(fs::current_path()) == fs::current_path());
+    REQUIRE(fs::absolute(".") == fs::current_path() / ".");
+    REQUIRE((fs::absolute("..") == fs::current_path().parent_path() ||
+             fs::absolute("..") == fs::current_path() / ".."));
+    REQUIRE(fs::absolute("foo") == fs::current_path() / "foo");
     std::error_code ec;
-    ASSERT_TRUE(fs::absolute("", ec) == fs::current_path() / "");
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::absolute("foo", ec) == fs::current_path() / "foo");
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::absolute("", ec) == fs::current_path() / "");
+    REQUIRE(!ec);
+    REQUIRE(fs::absolute("foo", ec) == fs::current_path() / "foo");
+    REQUIRE(!ec);
 }
 
-TEST(FilesystemDir, op_canonical) {
-    ASSERT_THROW(fs::canonical(""), fs::filesystem_error);
+TEST_CASE("FilesystemDir, op_canonical") {
+    REQUIRE_THROWS_AS(fs::canonical(""), fs::filesystem_error);
     {
         std::error_code ec;
-        ASSERT_TRUE(fs::canonical("", ec) == "");
-        ASSERT_TRUE(ec);
+        REQUIRE(fs::canonical("", ec) == "");
+        REQUIRE(ec);
     }
-    ASSERT_TRUE(fs::canonical(fs::current_path()) == fs::current_path());
+    REQUIRE(fs::canonical(fs::current_path()) == fs::current_path());
 
-    ASSERT_TRUE(fs::canonical(".") == fs::current_path());
-    ASSERT_TRUE(fs::canonical("..") == fs::current_path().parent_path());
-    ASSERT_TRUE(fs::canonical("/") == fs::current_path().root_path());
-    ASSERT_THROW(fs::canonical("foo"), fs::filesystem_error);
+    REQUIRE(fs::canonical(".") == fs::current_path());
+    REQUIRE(fs::canonical("..") == fs::current_path().parent_path());
+    REQUIRE(fs::canonical("/") == fs::current_path().root_path());
+    REQUIRE_THROWS_AS(fs::canonical("foo"), fs::filesystem_error);
     {
         std::error_code ec;
-        ASSERT_NO_THROW(fs::canonical("foo", ec));
-        ASSERT_TRUE(ec);
+        REQUIRE_NOTHROW(fs::canonical("foo", ec));
+        REQUIRE(ec);
     }
     {
         TemporaryDirectory t(TempOpt::change_path);
@@ -1765,12 +1710,12 @@ TEST(FilesystemDir, op_canonical) {
         fs::create_directories(dir / "d1");
         generateFile(dir / "f0");
         fs::path rel(dir.filename());
-        ASSERT_TRUE(fs::canonical(dir) == dir);
-        ASSERT_TRUE(fs::canonical(rel) == dir);
-        ASSERT_TRUE(fs::canonical(dir / "f0") == dir / "f0");
-        ASSERT_TRUE(fs::canonical(rel / "f0") == dir / "f0");
-        ASSERT_TRUE(fs::canonical(rel / "./f0") == dir / "f0");
-        ASSERT_TRUE(fs::canonical(rel / "d1/../f0") == dir / "f0");
+        REQUIRE(fs::canonical(dir) == dir);
+        REQUIRE(fs::canonical(rel) == dir);
+        REQUIRE(fs::canonical(dir / "f0") == dir / "f0");
+        REQUIRE(fs::canonical(rel / "f0") == dir / "f0");
+        REQUIRE(fs::canonical(rel / "./f0") == dir / "f0");
+        REQUIRE(fs::canonical(rel / "d1/../f0") == dir / "f0");
     }
 
     if (is_symlink_creation_supported()) {
@@ -1779,12 +1724,12 @@ TEST(FilesystemDir, op_canonical) {
         generateFile(t.path() / "dir1/test1");
         fs::create_directory(t.path() / "dir2");
         fs::create_directory_symlink(t.path() / "dir1", t.path() / "dir2/dirSym");
-        ASSERT_TRUE(fs::canonical(t.path() / "dir2/dirSym/test1") ==
-                    t.path() / "dir1/test1");
+        REQUIRE(fs::canonical(t.path() / "dir2/dirSym/test1") ==
+                t.path() / "dir1/test1");
     }
 }
 
-TEST(FilesystemDir, op_copy) {
+TEST_CASE("FilesystemDir, op_copy") {
     {
         TemporaryDirectory t(TempOpt::change_path);
         std::error_code ec;
@@ -1793,19 +1738,19 @@ TEST(FilesystemDir, op_copy) {
         generateFile("dir1/file2");
         fs::create_directory("dir1/dir2");
         generateFile("dir1/dir2/file3");
-        ASSERT_NO_THROW(fs::copy("dir1", "dir3"));
-        ASSERT_TRUE(fs::exists("dir3/file1"));
-        ASSERT_TRUE(fs::exists("dir3/file2"));
-        ASSERT_TRUE(!fs::exists("dir3/dir2"));
-        ASSERT_NO_THROW(fs::copy("dir1", "dir4", fs::copy_options::recursive, ec));
-        ASSERT_TRUE(!ec);
-        ASSERT_TRUE(fs::exists("dir4/file1"));
-        ASSERT_TRUE(fs::exists("dir4/file2"));
-        ASSERT_TRUE(fs::exists("dir4/dir2/file3"));
+        REQUIRE_NOTHROW(fs::copy("dir1", "dir3"));
+        REQUIRE(fs::exists("dir3/file1"));
+        REQUIRE(fs::exists("dir3/file2"));
+        REQUIRE(!fs::exists("dir3/dir2"));
+        REQUIRE_NOTHROW(fs::copy("dir1", "dir4", fs::copy_options::recursive, ec));
+        REQUIRE(!ec);
+        REQUIRE(fs::exists("dir4/file1"));
+        REQUIRE(fs::exists("dir4/file2"));
+        REQUIRE(fs::exists("dir4/dir2/file3"));
         fs::create_directory("dir5");
         generateFile("dir5/file1");
-        ASSERT_THROW(fs::copy("dir1/file1", "dir5/file1"), fs::filesystem_error);
-        ASSERT_NO_THROW(
+        REQUIRE_THROWS_AS(fs::copy("dir1/file1", "dir5/file1"), fs::filesystem_error);
+        REQUIRE_NOTHROW(
                 fs::copy("dir1/file1", "dir5/file1", fs::copy_options::skip_existing));
     }
     if (is_symlink_creation_supported()) {
@@ -1817,21 +1762,21 @@ TEST(FilesystemDir, op_copy) {
         fs::create_directory("dir1/dir2");
         generateFile("dir1/dir2/file3");
 #ifdef TEST_LWG_2682_BEHAVIOUR
-        ASSERT_THROW(fs::copy("dir1", "dir3",
-                              fs::copy_options::create_symlinks |
-                              fs::copy_options::recursive),
-                     fs::filesystem_error);
+        REQUIRE_THROWS_AS(fs::copy("dir1", "dir3",
+                                   fs::copy_options::create_symlinks |
+                                   fs::copy_options::recursive),
+                          fs::filesystem_error);
 #else
-        ASSERT_NO_THROW(fs::copy("dir1", "dir3",
+        REQUIRE_NOTHROW(fs::copy("dir1", "dir3",
                                  fs::copy_options::create_symlinks |
                                      fs::copy_options::recursive));
-        ASSERT_TRUE(!ec);
-        ASSERT_TRUE(fs::exists("dir3/file1"));
-        ASSERT_TRUE(fs::is_symlink("dir3/file1"));
-        ASSERT_TRUE(fs::exists("dir3/file2"));
-        ASSERT_TRUE(fs::is_symlink("dir3/file2"));
-        ASSERT_TRUE(fs::exists("dir3/dir2/file3"));
-        ASSERT_TRUE(fs::is_symlink("dir3/dir2/file3"));
+        REQUIRE(!ec);
+        REQUIRE(fs::exists("dir3/file1"));
+        REQUIRE(fs::is_symlink("dir3/file1"));
+        REQUIRE(fs::exists("dir3/file2"));
+        REQUIRE(fs::is_symlink("dir3/file2"));
+        REQUIRE(fs::exists("dir3/dir2/file3"));
+        REQUIRE(fs::is_symlink("dir3/dir2/file3"));
 #endif
     }
 #ifndef TURBO_PLATFORM_WEB
@@ -1846,46 +1791,46 @@ TEST(FilesystemDir, op_copy) {
         auto f1hl = fs::hard_link_count("dir1/file1");
         auto f2hl = fs::hard_link_count("dir1/file2");
         auto f3hl = fs::hard_link_count("dir1/dir2/file3");
-        ASSERT_NO_THROW(fs::copy(
+        REQUIRE_NOTHROW(fs::copy(
                 "dir1", "dir3",
                 fs::copy_options::create_hard_links | fs::copy_options::recursive, ec));
-        ASSERT_TRUE(!ec);
-        ASSERT_TRUE(fs::exists("dir3/file1"));
-        ASSERT_TRUE(fs::hard_link_count("dir1/file1") == f1hl + 1);
-        ASSERT_TRUE(fs::exists("dir3/file2"));
-        ASSERT_TRUE(fs::hard_link_count("dir1/file2") == f2hl + 1);
-        ASSERT_TRUE(fs::exists("dir3/dir2/file3"));
-        ASSERT_TRUE(fs::hard_link_count("dir1/dir2/file3") == f3hl + 1);
+        REQUIRE(!ec);
+        REQUIRE(fs::exists("dir3/file1"));
+        REQUIRE(fs::hard_link_count("dir1/file1") == f1hl + 1);
+        REQUIRE(fs::exists("dir3/file2"));
+        REQUIRE(fs::hard_link_count("dir1/file2") == f2hl + 1);
+        REQUIRE(fs::exists("dir3/dir2/file3"));
+        REQUIRE(fs::hard_link_count("dir1/dir2/file3") == f3hl + 1);
     }
 #endif
 }
 
-TEST(Filesystem, copy_file) {
+TEST_CASE("Filesystem, copy_file") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 100);
-    ASSERT_TRUE(!fs::exists("bar"));
-    ASSERT_TRUE(fs::copy_file("foo", "bar"));
-    ASSERT_TRUE(fs::exists("bar"));
-    ASSERT_TRUE(fs::file_size("foo") == fs::file_size("bar"));
-    ASSERT_TRUE(fs::copy_file("foo", "bar2", ec));
-    ASSERT_TRUE(!ec);
+    REQUIRE(!fs::exists("bar"));
+    REQUIRE(fs::copy_file("foo", "bar"));
+    REQUIRE(fs::exists("bar"));
+    REQUIRE(fs::file_size("foo") == fs::file_size("bar"));
+    REQUIRE(fs::copy_file("foo", "bar2", ec));
+    REQUIRE(!ec);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     generateFile("foo2", 200);
-    ASSERT_TRUE(fs::copy_file("foo2", "bar", fs::copy_options::update_existing));
-    ASSERT_TRUE(fs::file_size("bar") == 200);
-    ASSERT_TRUE(!fs::copy_file("foo", "bar", fs::copy_options::update_existing));
-    ASSERT_TRUE(fs::file_size("bar") == 200);
-    ASSERT_TRUE(
+    REQUIRE(fs::copy_file("foo2", "bar", fs::copy_options::update_existing));
+    REQUIRE(fs::file_size("bar") == 200);
+    REQUIRE(!fs::copy_file("foo", "bar", fs::copy_options::update_existing));
+    REQUIRE(fs::file_size("bar") == 200);
+    REQUIRE(
             fs::copy_file("foo", "bar", fs::copy_options::overwrite_existing));
-    ASSERT_TRUE(fs::file_size("bar") == 100);
-    ASSERT_THROW(fs::copy_file("foobar", "foobar2"), fs::filesystem_error);
-    ASSERT_NO_THROW(fs::copy_file("foobar", "foobar2", ec));
-    ASSERT_TRUE(ec);
-    ASSERT_TRUE(!fs::exists("foobar"));
+    REQUIRE(fs::file_size("bar") == 100);
+    REQUIRE_THROWS_AS(fs::copy_file("foobar", "foobar2"), fs::filesystem_error);
+    REQUIRE_NOTHROW(fs::copy_file("foobar", "foobar2", ec));
+    REQUIRE(ec);
+    REQUIRE(!fs::exists("foobar"));
 }
 
-TEST(FilesystemDir, copy_symlink) {
+TEST_CASE("FilesystemDir, copy_symlink") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo");
@@ -1893,289 +1838,289 @@ TEST(FilesystemDir, copy_symlink) {
     if (is_symlink_creation_supported()) {
         fs::create_symlink("foo", "sfoo");
         fs::create_directory_symlink("dir", "sdir");
-        ASSERT_NO_THROW(fs::copy_symlink("sfoo", "sfooc"));
-        ASSERT_TRUE(fs::exists("sfooc"));
-        ASSERT_NO_THROW(fs::copy_symlink("sfoo", "sfooc2", ec));
-        ASSERT_TRUE(fs::exists("sfooc2"));
-        ASSERT_TRUE(!ec);
-        ASSERT_NO_THROW(fs::copy_symlink("sdir", "sdirc"));
-        ASSERT_TRUE(fs::exists("sdirc"));
-        ASSERT_NO_THROW(fs::copy_symlink("sdir", "sdirc2", ec));
-        ASSERT_TRUE(fs::exists("sdirc2"));
-        ASSERT_TRUE(!ec);
+        REQUIRE_NOTHROW(fs::copy_symlink("sfoo", "sfooc"));
+        REQUIRE(fs::exists("sfooc"));
+        REQUIRE_NOTHROW(fs::copy_symlink("sfoo", "sfooc2", ec));
+        REQUIRE(fs::exists("sfooc2"));
+        REQUIRE(!ec);
+        REQUIRE_NOTHROW(fs::copy_symlink("sdir", "sdirc"));
+        REQUIRE(fs::exists("sdirc"));
+        REQUIRE_NOTHROW(fs::copy_symlink("sdir", "sdirc2", ec));
+        REQUIRE(fs::exists("sdirc2"));
+        REQUIRE(!ec);
     }
-    ASSERT_THROW(fs::copy_symlink("bar", "barc"), fs::filesystem_error);
-    ASSERT_NO_THROW(fs::copy_symlink("bar", "barc", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE_THROWS_AS(fs::copy_symlink("bar", "barc"), fs::filesystem_error);
+    REQUIRE_NOTHROW(fs::copy_symlink("bar", "barc", ec));
+    REQUIRE(ec);
 }
 
-TEST(FilesystemDir, create_directories) {
+TEST_CASE("FilesystemDir, create_directories") {
     TemporaryDirectory t;
     fs::path p = t.path() / "testdir";
     fs::path p2 = p / "nested";
-    ASSERT_TRUE(!fs::exists(p));
-    ASSERT_TRUE(!fs::exists(p2));
-    ASSERT_TRUE(fs::create_directories(p2));
-    ASSERT_TRUE(fs::is_directory(p));
-    ASSERT_TRUE(fs::is_directory(p2));
-    ASSERT_TRUE(!fs::create_directories(p2));
+    REQUIRE(!fs::exists(p));
+    REQUIRE(!fs::exists(p2));
+    REQUIRE(fs::create_directories(p2));
+    REQUIRE(fs::is_directory(p));
+    REQUIRE(fs::is_directory(p2));
+    REQUIRE(!fs::create_directories(p2));
 #ifdef TEST_LWG_2935_BEHAVIOUR
     INFO("This test expects LWG #2935 result conformance.");
     p = t.path() / "testfile";
     generateFile(p);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
     bool created = false;
-    ASSERT_NO_THROW((created = fs::create_directories(p)));
-    ASSERT_TRUE(!created);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
+    REQUIRE_NOTHROW((created = fs::create_directories(p)));
+    REQUIRE(!created);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
     std::error_code ec;
-    ASSERT_NO_THROW((created = fs::create_directories(p, ec)));
-    ASSERT_TRUE(!created);
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
-    ASSERT_TRUE(!fs::create_directories(p, ec));
+    REQUIRE_NOTHROW((created = fs::create_directories(p, ec)));
+    REQUIRE(!created);
+    REQUIRE(!ec);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
+    REQUIRE(!fs::create_directories(p, ec));
 #else
     TLOG_INFO("This test expects conformance with P1164R1. (implemented "
               "by GCC with issue #86910.)");
     p = t.path() / "testfile";
     generateFile(p);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
-    ASSERT_THROW(fs::create_directories(p), fs::filesystem_error);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
+    REQUIRE_THROWS_AS(fs::create_directories(p), fs::filesystem_error);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
     std::error_code ec;
-    ASSERT_NO_THROW(fs::create_directories(p, ec));
-    ASSERT_TRUE(ec);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
-    ASSERT_TRUE(!fs::create_directories(p, ec));
+    REQUIRE_NOTHROW(fs::create_directories(p, ec));
+    REQUIRE(ec);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
+    REQUIRE(!fs::create_directories(p, ec));
 #endif
 }
 
-TEST(FilesystemDir, create_directory) {
+TEST_CASE("FilesystemDir, create_directory") {
     TemporaryDirectory t;
     fs::path p = t.path() / "testdir";
-    ASSERT_TRUE(!fs::exists(p));
-    ASSERT_TRUE(fs::create_directory(p));
-    ASSERT_TRUE(fs::is_directory(p));
-    ASSERT_TRUE(!fs::is_regular_file(p));
-    ASSERT_TRUE(fs::create_directory(p / "nested", p));
-    ASSERT_TRUE(fs::is_directory(p / "nested"));
-    ASSERT_TRUE(!fs::is_regular_file(p / "nested"));
+    REQUIRE(!fs::exists(p));
+    REQUIRE(fs::create_directory(p));
+    REQUIRE(fs::is_directory(p));
+    REQUIRE(!fs::is_regular_file(p));
+    REQUIRE(fs::create_directory(p / "nested", p));
+    REQUIRE(fs::is_directory(p / "nested"));
+    REQUIRE(!fs::is_regular_file(p / "nested"));
 #ifdef TEST_LWG_2935_BEHAVIOUR
     TURBO_LOG(INFO) << "This test expects LWG #2935 result conformance.";
     p = t.path() / "testfile";
     generateFile(p);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
     bool created = false;
-    ASSERT_NO_THROW((created = fs::create_directory(p)));
-    ASSERT_TRUE(!created);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
+    REQUIRE_NOTHROW((created = fs::create_directory(p)));
+    REQUIRE(!created);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
     std::error_code ec;
-    ASSERT_NO_THROW((created = fs::create_directory(p, ec)));
-    ASSERT_TRUE(!created);
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
-    ASSERT_TRUE(!fs::create_directories(p, ec));
+    REQUIRE_NOTHROW((created = fs::create_directory(p, ec)));
+    REQUIRE(!created);
+    REQUIRE(!ec);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
+    REQUIRE(!fs::create_directories(p, ec));
 #else
     TLOG_INFO("This test expects conformance with P1164R1. (implemented "
               "by GCC with issue #86910.)");
     p = t.path() / "testfile";
     generateFile(p);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
-    ASSERT_THROW(fs::create_directory(p), fs::filesystem_error);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
+    REQUIRE_THROWS_AS(fs::create_directory(p), fs::filesystem_error);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
     std::error_code ec;
-    ASSERT_NO_THROW(fs::create_directory(p, ec));
-    ASSERT_TRUE(ec);
-    ASSERT_TRUE(fs::is_regular_file(p));
-    ASSERT_TRUE(!fs::is_directory(p));
-    ASSERT_TRUE(!fs::create_directory(p, ec));
+    REQUIRE_NOTHROW(fs::create_directory(p, ec));
+    REQUIRE(ec);
+    REQUIRE(fs::is_regular_file(p));
+    REQUIRE(!fs::is_directory(p));
+    REQUIRE(!fs::create_directory(p, ec));
 #endif
 }
 
-TEST(FilesystemDir, create_directory_symlink) {
+TEST_CASE("FilesystemDir, create_directory_symlink") {
     if (is_symlink_creation_supported()) {
         TemporaryDirectory t;
         fs::create_directory(t.path() / "dir1");
         generateFile(t.path() / "dir1/test1");
         fs::create_directory(t.path() / "dir2");
         fs::create_directory_symlink(t.path() / "dir1", t.path() / "dir2/dirSym");
-        ASSERT_TRUE(fs::exists(t.path() / "dir2/dirSym"));
-        ASSERT_TRUE(fs::is_symlink(t.path() / "dir2/dirSym"));
-        ASSERT_TRUE(fs::exists(t.path() / "dir2/dirSym/test1"));
-        ASSERT_TRUE(fs::is_regular_file(t.path() / "dir2/dirSym/test1"));
-        ASSERT_THROW(fs::create_directory_symlink(t.path() / "dir1",
-                                                  t.path() / "dir2/dirSym"),
-                     fs::filesystem_error);
+        REQUIRE(fs::exists(t.path() / "dir2/dirSym"));
+        REQUIRE(fs::is_symlink(t.path() / "dir2/dirSym"));
+        REQUIRE(fs::exists(t.path() / "dir2/dirSym/test1"));
+        REQUIRE(fs::is_regular_file(t.path() / "dir2/dirSym/test1"));
+        REQUIRE_THROWS_AS(fs::create_directory_symlink(t.path() / "dir1",
+                                                       t.path() / "dir2/dirSym"),
+                          fs::filesystem_error);
         std::error_code ec;
-        ASSERT_NO_THROW(fs::create_directory_symlink(t.path() / "dir1",
+        REQUIRE_NOTHROW(fs::create_directory_symlink(t.path() / "dir1",
                                                      t.path() / "dir2/dirSym", ec));
-        ASSERT_TRUE(ec);
+        REQUIRE(ec);
     }
 }
 
-TEST(FilesystemDir, create_hard_link) {
+TEST_CASE("FilesystemDir, create_hard_link") {
 #ifndef TURBO_PLATFORM_WEB
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 1234);
-    ASSERT_NO_THROW(fs::create_hard_link("foo", "bar"));
-    ASSERT_TRUE(fs::exists("bar"));
-    ASSERT_TRUE(!fs::is_symlink("bar"));
-    ASSERT_NO_THROW(fs::create_hard_link("foo", "bar2", ec));
-    ASSERT_TRUE(fs::exists("bar2"));
-    ASSERT_TRUE(!fs::is_symlink("bar2"));
-    ASSERT_TRUE(!ec);
-    ASSERT_THROW(fs::create_hard_link("nofoo", "bar"), fs::filesystem_error);
-    ASSERT_NO_THROW(fs::create_hard_link("nofoo", "bar", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(fs::create_hard_link("foo", "bar"));
+    REQUIRE(fs::exists("bar"));
+    REQUIRE(!fs::is_symlink("bar"));
+    REQUIRE_NOTHROW(fs::create_hard_link("foo", "bar2", ec));
+    REQUIRE(fs::exists("bar2"));
+    REQUIRE(!fs::is_symlink("bar2"));
+    REQUIRE(!ec);
+    REQUIRE_THROWS_AS(fs::create_hard_link("nofoo", "bar"), fs::filesystem_error);
+    REQUIRE_NOTHROW(fs::create_hard_link("nofoo", "bar", ec));
+    REQUIRE(ec);
 #endif
 }
 
-TEST(FilesystemDir, create_symlink) {
+TEST_CASE("FilesystemDir, create_symlink") {
     if (is_symlink_creation_supported()) {
         TemporaryDirectory t;
         fs::create_directory(t.path() / "dir1");
         generateFile(t.path() / "dir1/test1");
         fs::create_directory(t.path() / "dir2");
         fs::create_symlink(t.path() / "dir1/test1", t.path() / "dir2/fileSym");
-        ASSERT_TRUE(fs::exists(t.path() / "dir2/fileSym"));
-        ASSERT_TRUE(fs::is_symlink(t.path() / "dir2/fileSym"));
-        ASSERT_TRUE(fs::exists(t.path() / "dir2/fileSym"));
-        ASSERT_TRUE(fs::is_regular_file(t.path() / "dir2/fileSym"));
-        ASSERT_THROW(
+        REQUIRE(fs::exists(t.path() / "dir2/fileSym"));
+        REQUIRE(fs::is_symlink(t.path() / "dir2/fileSym"));
+        REQUIRE(fs::exists(t.path() / "dir2/fileSym"));
+        REQUIRE(fs::is_regular_file(t.path() / "dir2/fileSym"));
+        REQUIRE_THROWS_AS(
                 fs::create_symlink(t.path() / "dir1", t.path() / "dir2/fileSym"),
                 fs::filesystem_error);
         std::error_code ec;
-        ASSERT_NO_THROW(
+        REQUIRE_NOTHROW(
                 fs::create_symlink(t.path() / "dir1", t.path() / "dir2/fileSym", ec));
-        ASSERT_TRUE(ec);
+        REQUIRE(ec);
     }
 }
 
-TEST(FilesystemDir, current_path) {
+TEST_CASE("FilesystemDir, current_path") {
     TemporaryDirectory t;
     std::error_code ec;
     fs::path p1 = fs::current_path();
-    ASSERT_NO_THROW(fs::current_path(t.path()));
-    ASSERT_TRUE(p1 != fs::current_path());
-    ASSERT_NO_THROW(fs::current_path(p1, ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_THROW(fs::current_path(t.path() / "foo"), fs::filesystem_error);
-    ASSERT_TRUE(p1 == fs::current_path());
-    ASSERT_NO_THROW(fs::current_path(t.path() / "foo", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(fs::current_path(t.path()));
+    REQUIRE(p1 != fs::current_path());
+    REQUIRE_NOTHROW(fs::current_path(p1, ec));
+    REQUIRE(!ec);
+    REQUIRE_THROWS_AS(fs::current_path(t.path() / "foo"), fs::filesystem_error);
+    REQUIRE(p1 == fs::current_path());
+    REQUIRE_NOTHROW(fs::current_path(t.path() / "foo", ec));
+    REQUIRE(ec);
 }
 
-TEST(FilesystemDir, equivalent) {
+TEST_CASE("FilesystemDir, equivalent") {
     TemporaryDirectory t(TempOpt::change_path);
     generateFile("foo", 1234);
-    ASSERT_TRUE(fs::equivalent(t.path() / "foo", "foo"));
+    REQUIRE(fs::equivalent(t.path() / "foo", "foo"));
     if (is_symlink_creation_supported()) {
         std::error_code ec(42, std::system_category());
         fs::create_symlink("foo", "foo2");
-        ASSERT_TRUE(fs::equivalent("foo", "foo2"));
-        ASSERT_TRUE(fs::equivalent("foo", "foo2", ec));
-        ASSERT_TRUE(!ec);
+        REQUIRE(fs::equivalent("foo", "foo2"));
+        REQUIRE(fs::equivalent("foo", "foo2", ec));
+        REQUIRE(!ec);
     }
 #ifdef TEST_LWG_2937_BEHAVIOUR
     TLOG_INFO("This test expects LWG #2937 result conformance.");
     std::error_code ec;
     bool result = false;
-    ASSERT_THROW(fs::equivalent("foo", "foo3"), fs::filesystem_error);
-    ASSERT_NO_THROW(result = fs::equivalent("foo", "foo3", ec));
-    ASSERT_TRUE(!result);
-    ASSERT_TRUE(ec);
+    REQUIRE_THROWS_AS(fs::equivalent("foo", "foo3"), fs::filesystem_error);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo", "foo3", ec));
+    REQUIRE(!result);
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_THROW(fs::equivalent("foo3", "foo"), fs::filesystem_error);
-    ASSERT_NO_THROW(result = fs::equivalent("foo3", "foo", ec));
-    ASSERT_TRUE(!result);
-    ASSERT_TRUE(ec);
+    REQUIRE_THROWS_AS(fs::equivalent("foo3", "foo"), fs::filesystem_error);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo3", "foo", ec));
+    REQUIRE(!result);
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_THROW(fs::equivalent("foo3", "foo4"), fs::filesystem_error);
-    ASSERT_NO_THROW(result = fs::equivalent("foo3", "foo4", ec));
-    ASSERT_TRUE(!result);
-    ASSERT_TRUE(ec);
+    REQUIRE_THROWS_AS(fs::equivalent("foo3", "foo4"), fs::filesystem_error);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo3", "foo4", ec));
+    REQUIRE(!result);
+    REQUIRE(ec);
 #else
     TURBO_LOG(INFO)
         << "This test expects conformance predating LWG #2937 result.";
     std::error_code ec;
     bool result = false;
-    ASSERT_NO_THROW(result = fs::equivalent("foo", "foo3"));
-    ASSERT_TRUE(!result);
-    ASSERT_NO_THROW(result = fs::equivalent("foo", "foo3", ec));
-    ASSERT_TRUE(!result);
-    ASSERT_TRUE(!ec);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo", "foo3"));
+    REQUIRE(!result);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo", "foo3", ec));
+    REQUIRE(!result);
+    REQUIRE(!ec);
     ec.clear();
-    ASSERT_NO_THROW(result = fs::equivalent("foo3", "foo"));
-    ASSERT_TRUE(!result);
-    ASSERT_NO_THROW(result = fs::equivalent("foo3", "foo", ec));
-    ASSERT_TRUE(!result);
-    ASSERT_TRUE(!ec);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo3", "foo"));
+    REQUIRE(!result);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo3", "foo", ec));
+    REQUIRE(!result);
+    REQUIRE(!ec);
     ec.clear();
-    ASSERT_THROW(result = fs::equivalent("foo4", "foo3"), fs::filesystem_error);
-    ASSERT_TRUE(!result);
-    ASSERT_NO_THROW(result = fs::equivalent("foo4", "foo3", ec));
-    ASSERT_TRUE(!result);
-    ASSERT_TRUE(ec);
+    REQUIRE_THROWS_AS(result = fs::equivalent("foo4", "foo3"), fs::filesystem_error);
+    REQUIRE(!result);
+    REQUIRE_NOTHROW(result = fs::equivalent("foo4", "foo3", ec));
+    REQUIRE(!result);
+    REQUIRE(ec);
 #endif
 }
 
-TEST(Filesystem, exists) {
+TEST_CASE("Filesystem, exists") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
-    ASSERT_TRUE(!fs::exists(""));
-    ASSERT_TRUE(!fs::exists("foo"));
-    ASSERT_TRUE(!fs::exists("foo", ec));
-    ASSERT_TRUE(!ec);
+    REQUIRE(!fs::exists(""));
+    REQUIRE(!fs::exists("foo"));
+    REQUIRE(!fs::exists("foo", ec));
+    REQUIRE(!ec);
     ec = std::error_code(42, std::system_category());
-    ASSERT_TRUE(!fs::exists("foo", ec));
+    REQUIRE(!fs::exists("foo", ec));
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-    ASSERT_TRUE(!fs::exists(u8"foo"));
+    REQUIRE(!fs::exists(u8"foo"));
 #endif
-    ASSERT_TRUE(!ec);
+    REQUIRE(!ec);
     ec.clear();
-    ASSERT_TRUE(fs::exists(t.path()));
-    ASSERT_TRUE(fs::exists(t.path(), ec));
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::exists(t.path()));
+    REQUIRE(fs::exists(t.path(), ec));
+    REQUIRE(!ec);
     ec = std::error_code(42, std::system_category());
-    ASSERT_TRUE(fs::exists(t.path(), ec));
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::exists(t.path(), ec));
+    REQUIRE(!ec);
 #if defined(TURBO_PLATFORM_WINDOWS)
     if (::GetFileAttributesW(L"C:\\fs-test") != INVALID_FILE_ATTRIBUTES) {
-      ASSERT_TRUE(fs::exists("C:\\fs-test"));
+      REQUIRE(fs::exists("C:\\fs-test"));
     }
 #endif
 }
 
-TEST(Filesystem, file_size) {
+TEST_CASE("Filesystem, file_size") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 0);
     generateFile("bar", 1234);
-    ASSERT_TRUE(fs::file_size("foo") == 0);
+    REQUIRE(fs::file_size("foo") == 0);
     ec = std::error_code(42, std::system_category());
-    ASSERT_TRUE(fs::file_size("foo", ec) == 0);
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::file_size("foo", ec) == 0);
+    REQUIRE(!ec);
     ec.clear();
-    ASSERT_TRUE(fs::file_size("bar") == 1234);
+    REQUIRE(fs::file_size("bar") == 1234);
     ec = std::error_code(42, std::system_category());
-    ASSERT_TRUE(fs::file_size("bar", ec) == 1234);
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::file_size("bar", ec) == 1234);
+    REQUIRE(!ec);
     ec.clear();
-    ASSERT_THROW(fs::file_size("foobar"), fs::filesystem_error);
-    ASSERT_TRUE(fs::file_size("foobar", ec) == static_cast<uintmax_t>(-1));
-    ASSERT_TRUE(ec);
+    REQUIRE_THROWS_AS(fs::file_size("foobar"), fs::filesystem_error);
+    REQUIRE(fs::file_size("foobar", ec) == static_cast<uintmax_t>(-1));
+    REQUIRE(ec);
     ec.clear();
 }
 
@@ -2189,32 +2134,32 @@ static uintmax_t getHardlinkCount(const fs::path &p) {
 
 #endif
 
-TEST(Filesystem, hard_link_count) {
+TEST_CASE("Filesystem, hard_link_count") {
 #ifndef TURBO_PLATFORM_WEB
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
 #ifdef TURBO_PLATFORM_WINDOWS
     // windows doesn't implement "."/".." as hardlinks, so it
     // starts with 1 and subdirectories don't change the count
-    ASSERT_TRUE(fs::hard_link_count(t.path()) == 1);
+    REQUIRE(fs::hard_link_count(t.path()) == 1);
     fs::create_directory("dir");
-    ASSERT_TRUE(fs::hard_link_count(t.path()) == 1);
+    REQUIRE(fs::hard_link_count(t.path()) == 1);
 #else
     // unix/bsd/linux typically implements "."/".." as hardlinks
     // so an empty dir has 2 (from parent and the ".") and
     // adding a subdirectory adds one due to its ".."
-    ASSERT_TRUE(fs::hard_link_count(t.path()) == getHardlinkCount(t.path()));
+    REQUIRE(fs::hard_link_count(t.path()) == getHardlinkCount(t.path()));
     fs::create_directory("dir");
-    ASSERT_TRUE(fs::hard_link_count(t.path()) == getHardlinkCount(t.path()));
+    REQUIRE(fs::hard_link_count(t.path()) == getHardlinkCount(t.path()));
 #endif
     generateFile("foo");
-    ASSERT_TRUE(fs::hard_link_count(t.path() / "foo") == 1);
+    REQUIRE(fs::hard_link_count(t.path() / "foo") == 1);
     ec = std::error_code(42, std::system_category());
-    ASSERT_TRUE(fs::hard_link_count(t.path() / "foo", ec) == 1);
-    ASSERT_TRUE(!ec);
-    ASSERT_THROW(fs::hard_link_count(t.path() / "bar"), fs::filesystem_error);
-    ASSERT_NO_THROW(fs::hard_link_count(t.path() / "bar", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE(fs::hard_link_count(t.path() / "foo", ec) == 1);
+    REQUIRE(!ec);
+    REQUIRE_THROWS_AS(fs::hard_link_count(t.path() / "bar"), fs::filesystem_error);
+    REQUIRE_NOTHROW(fs::hard_link_count(t.path() / "bar", ec));
+    REQUIRE(ec);
     ec.clear();
 #else
     WARN("Test for unsupportet features are disabled on JS/Wasm target.");
@@ -2232,7 +2177,7 @@ public:
             fs::create_directory_symlink("directory", "dir_symlink");
         }
 #if !defined(TURBO_PLATFORM_WINDOWS) && !defined(TURBO_PLATFORM_WEB)
-        EXPECT_TRUE(::mkfifo("fifo", 0644) == 0);
+        CHECK(::mkfifo("fifo", 0644) == 0);
         _hasFifo = true;
         struct ::sockaddr_un addr;
         addr.sun_family = AF_UNIX;
@@ -2277,277 +2222,275 @@ private:
     bool _hasSocket;
 };
 
-/*
-TEST_F(FileTypeMixFixture, is_block_file) {
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "is_block_file") {
     std::error_code ec;
-    ASSERT_TRUE(!fs::is_block_file("directory"));
-    ASSERT_TRUE(!fs::is_block_file("regular"));
+    REQUIRE(!fs::is_block_file("directory"));
+    REQUIRE(!fs::is_block_file("regular"));
     if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(!fs::is_block_file("dir_symlink"));
-        ASSERT_TRUE(!fs::is_block_file("file_symlink"));
+        REQUIRE(!fs::is_block_file("dir_symlink"));
+        REQUIRE(!fs::is_block_file("file_symlink"));
     }
-    ASSERT_TRUE((has_fifo() ? !fs::is_block_file("fifo") : true));
-    ASSERT_TRUE((has_socket() ? !fs::is_block_file("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true :
-fs::is_block_file(block_path()))); ASSERT_TRUE((character_path().empty() ? true
-: !fs::is_block_file(character_path())));
-    ASSERT_NO_THROW(fs::is_block_file("notfound"));
-    ASSERT_NO_THROW(fs::is_block_file("notfound", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE((has_fifo() ? !fs::is_block_file("fifo") : true));
+    REQUIRE((has_socket() ? !fs::is_block_file("socket") : true));
+    REQUIRE((block_path().empty() ? true :
+             fs::is_block_file(block_path())));
+    REQUIRE((character_path().empty() ? true
+                                      : !fs::is_block_file(character_path())));
+    REQUIRE_NOTHROW(fs::is_block_file("notfound"));
+    REQUIRE_NOTHROW(fs::is_block_file("notfound", ec));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(fs::is_block_file(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(!fs::is_block_file(fs::file_status(fs::file_type::unknown)));
-}
-*/
-/*
-TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_character_file -
-is_character_file", "[filesystem][operations][fs.op.is_character_file]")
-{
-    std::error_code ec;
-    ASSERT_TRUE(!fs::is_character_file("directory"));
-    ASSERT_TRUE(!fs::is_character_file("regular"));
-    if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(!fs::is_character_file("dir_symlink"));
-        ASSERT_TRUE(!fs::is_character_file("file_symlink"));
-    }
-    ASSERT_TRUE((has_fifo() ? !fs::is_character_file("fifo") : true));
-    ASSERT_TRUE((has_socket() ? !fs::is_character_file("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true :
-!fs::is_character_file(block_path()))); ASSERT_TRUE((character_path().empty() ?
-true : fs::is_character_file(character_path())));
-    ASSERT_NO_THROW(fs::is_character_file("notfound"));
-    ASSERT_NO_THROW(fs::is_character_file("notfound", ec));
-    ASSERT_TRUE(ec);
-    ec.clear();
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(fs::is_character_file(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(!fs::is_character_file(fs::file_status(fs::file_type::unknown)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::regular)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::directory)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(fs::is_block_file(fs::file_status(fs::file_type::block)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::character)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::socket)));
+    REQUIRE(!fs::is_block_file(fs::file_status(fs::file_type::unknown)));
 }
 
-TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_directory - is_directory",
-"[filesystem][operations][fs.op.is_directory]")
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "fs.op")
 {
     std::error_code ec;
-    ASSERT_TRUE(fs::is_directory("directory"));
-    ASSERT_TRUE(!fs::is_directory("regular"));
+    REQUIRE(!fs::is_character_file("directory"));
+    REQUIRE(!fs::is_character_file("regular"));
     if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(fs::is_directory("dir_symlink"));
-        ASSERT_TRUE(!fs::is_directory("file_symlink"));
+        REQUIRE(!fs::is_character_file("dir_symlink"));
+        REQUIRE(!fs::is_character_file("file_symlink"));
     }
-    ASSERT_TRUE((has_fifo() ? !fs::is_directory("fifo") : true));
-    ASSERT_TRUE((has_socket() ? !fs::is_directory("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true :
-!fs::is_directory(block_path()))); ASSERT_TRUE((character_path().empty() ? true
-: !fs::is_directory(character_path())));
-    ASSERT_NO_THROW(fs::is_directory("notfound"));
-    ASSERT_NO_THROW(fs::is_directory("notfound", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE((has_fifo() ? !fs::is_character_file("fifo") : true));
+    REQUIRE((has_socket() ? !fs::is_character_file("socket") : true));
+    REQUIRE((block_path().empty() ? true :
+             !fs::is_character_file(block_path())));
+    REQUIRE((character_path().empty() ?
+             true : fs::is_character_file(character_path())));
+    REQUIRE_NOTHROW(fs::is_character_file("notfound"));
+    REQUIRE_NOTHROW(fs::is_character_file("notfound", ec));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(fs::is_directory(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(!fs::is_directory(fs::file_status(fs::file_type::unknown)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::regular)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::directory)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::block)));
+    REQUIRE(fs::is_character_file(fs::file_status(fs::file_type::character)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::socket)));
+    REQUIRE(!fs::is_character_file(fs::file_status(fs::file_type::unknown)));
 }
-*/
-TEST(Filesystem, is_empty) {
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "fs.op.is_directory - is_directory")
+{
+    std::error_code ec;
+    REQUIRE(fs::is_directory("directory"));
+    REQUIRE(!fs::is_directory("regular"));
+    if (is_symlink_creation_supported()) {
+        REQUIRE(fs::is_directory("dir_symlink"));
+        REQUIRE(!fs::is_directory("file_symlink"));
+    }
+    REQUIRE((has_fifo() ? !fs::is_directory("fifo") : true));
+    REQUIRE((has_socket() ? !fs::is_directory("socket") : true));
+    REQUIRE((block_path().empty() ? true :
+             !fs::is_directory(block_path())));
+    REQUIRE((character_path().empty() ? true
+                                      : !fs::is_directory(character_path())));
+    REQUIRE_NOTHROW(fs::is_directory("notfound"));
+    REQUIRE_NOTHROW(fs::is_directory("notfound", ec));
+    REQUIRE(ec);
+    ec.clear();
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::regular)));
+    REQUIRE(fs::is_directory(fs::file_status(fs::file_type::directory)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::block)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::character)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::socket)));
+    REQUIRE(!fs::is_directory(fs::file_status(fs::file_type::unknown)));
+}
+
+TEST_CASE("Filesystem, is_empty") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
-    ASSERT_TRUE(fs::is_empty(t.path()));
-    ASSERT_TRUE(fs::is_empty(t.path(), ec));
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::is_empty(t.path()));
+    REQUIRE(fs::is_empty(t.path(), ec));
+    REQUIRE(!ec);
     generateFile("foo", 0);
     generateFile("bar", 1234);
-    ASSERT_TRUE(fs::is_empty("foo"));
-    ASSERT_TRUE(fs::is_empty("foo", ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(!fs::is_empty("bar"));
-    ASSERT_TRUE(!fs::is_empty("bar", ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_THROW(fs::is_empty("foobar"), fs::filesystem_error);
+    REQUIRE(fs::is_empty("foo"));
+    REQUIRE(fs::is_empty("foo", ec));
+    REQUIRE(!ec);
+    REQUIRE(!fs::is_empty("bar"));
+    REQUIRE(!fs::is_empty("bar", ec));
+    REQUIRE(!ec);
+    REQUIRE_THROWS_AS(fs::is_empty("foobar"), fs::filesystem_error);
     bool result = false;
-    ASSERT_NO_THROW(result = fs::is_empty("foobar", ec));
-    ASSERT_TRUE(!result);
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(result = fs::is_empty("foobar", ec));
+    REQUIRE(!result);
+    REQUIRE(ec);
 }
 
-/*
-TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_fifo - is_fifo",
-"[filesystem][operations][fs.op.is_fifo]")
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "fs.op.is_fifo - is_fifo")
 {
     std::error_code ec;
-    ASSERT_TRUE(!fs::is_fifo("directory"));
-    ASSERT_TRUE(!fs::is_fifo("regular"));
+    REQUIRE(!fs::is_fifo("directory"));
+    REQUIRE(!fs::is_fifo("regular"));
     if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(!fs::is_fifo("dir_symlink"));
-        ASSERT_TRUE(!fs::is_fifo("file_symlink"));
+        REQUIRE(!fs::is_fifo("dir_symlink"));
+        REQUIRE(!fs::is_fifo("file_symlink"));
     }
-    ASSERT_TRUE((has_fifo() ? fs::is_fifo("fifo") : true));
-    ASSERT_TRUE((has_socket() ? !fs::is_fifo("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true : !fs::is_fifo(block_path())));
-    ASSERT_TRUE((character_path().empty() ? true :
-!fs::is_fifo(character_path()))); ASSERT_NO_THROW(fs::is_fifo("notfound"));
-    ASSERT_NO_THROW(fs::is_fifo("notfound", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE((has_fifo() ? fs::is_fifo("fifo") : true));
+    REQUIRE((has_socket() ? !fs::is_fifo("socket") : true));
+    REQUIRE((block_path().empty() ? true : !fs::is_fifo(block_path())));
+    REQUIRE((character_path().empty() ? true :
+             !fs::is_fifo(character_path())));
+    REQUIRE_NOTHROW(fs::is_fifo("notfound"));
+    REQUIRE_NOTHROW(fs::is_fifo("notfound", ec));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(fs::is_fifo(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(!fs::is_fifo(fs::file_status(fs::file_type::unknown)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::regular)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::directory)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::block)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::character)));
+    REQUIRE(fs::is_fifo(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::socket)));
+    REQUIRE(!fs::is_fifo(fs::file_status(fs::file_type::unknown)));
 }
-*/
-/*
-TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_other - is_other",
-"[filesystem][operations][fs.op.is_other]")
+
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "fs.op.is_other - is_other")
 {
     std::error_code ec;
-    ASSERT_TRUE(!fs::is_other("directory"));
-    ASSERT_TRUE(!fs::is_other("regular"));
+    REQUIRE(!fs::is_other("directory"));
+    REQUIRE(!fs::is_other("regular"));
     if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(!fs::is_other("dir_symlink"));
-        ASSERT_TRUE(!fs::is_other("file_symlink"));
+        REQUIRE(!fs::is_other("dir_symlink"));
+        REQUIRE(!fs::is_other("file_symlink"));
     }
-    ASSERT_TRUE((has_fifo() ? fs::is_other("fifo") : true));
-    ASSERT_TRUE((has_socket() ? fs::is_other("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true : fs::is_other(block_path())));
-    ASSERT_TRUE((character_path().empty() ? true :
-fs::is_other(character_path()))); ASSERT_NO_THROW(fs::is_other("notfound"));
-    ASSERT_NO_THROW(fs::is_other("notfound", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE((has_fifo() ? fs::is_other("fifo") : true));
+    REQUIRE((has_socket() ? fs::is_other("socket") : true));
+    REQUIRE((block_path().empty() ? true : fs::is_other(block_path())));
+    REQUIRE((character_path().empty() ? true :
+             fs::is_other(character_path())));
+    REQUIRE_NOTHROW(fs::is_other("notfound"));
+    REQUIRE_NOTHROW(fs::is_other("notfound", ec));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(!fs::is_other(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_other(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(!fs::is_other(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(!fs::is_other(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(!fs::is_other(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(fs::is_other(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(fs::is_other(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(fs::is_other(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(fs::is_other(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(fs::is_other(fs::file_status(fs::file_type::unknown)));
+    REQUIRE(!fs::is_other(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_other(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(!fs::is_other(fs::file_status(fs::file_type::regular)));
+    REQUIRE(!fs::is_other(fs::file_status(fs::file_type::directory)));
+    REQUIRE(!fs::is_other(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(fs::is_other(fs::file_status(fs::file_type::block)));
+    REQUIRE(fs::is_other(fs::file_status(fs::file_type::character)));
+    REQUIRE(fs::is_other(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(fs::is_other(fs::file_status(fs::file_type::socket)));
+    REQUIRE(fs::is_other(fs::file_status(fs::file_type::unknown)));
 }
-*/
-/*
-TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_regular_file - is_regular_file",
-"[filesystem][operations][fs.op.is_regular_file]")
+
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "fs.op.is_regular_file - is_regular_file")
 {
     std::error_code ec;
-    ASSERT_TRUE(!fs::is_regular_file("directory"));
-    ASSERT_TRUE(fs::is_regular_file("regular"));
+    REQUIRE(!fs::is_regular_file("directory"));
+    REQUIRE(fs::is_regular_file("regular"));
     if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(!fs::is_regular_file("dir_symlink"));
-        ASSERT_TRUE(fs::is_regular_file("file_symlink"));
+        REQUIRE(!fs::is_regular_file("dir_symlink"));
+        REQUIRE(fs::is_regular_file("file_symlink"));
     }
-    ASSERT_TRUE((has_fifo() ? !fs::is_regular_file("fifo") : true));
-    ASSERT_TRUE((has_socket() ? !fs::is_regular_file("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true :
-!fs::is_regular_file(block_path()))); ASSERT_TRUE((character_path().empty() ?
-true : !fs::is_regular_file(character_path())));
-    ASSERT_NO_THROW(fs::is_regular_file("notfound"));
-    ASSERT_NO_THROW(fs::is_regular_file("notfound", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE((has_fifo() ? !fs::is_regular_file("fifo") : true));
+    REQUIRE((has_socket() ? !fs::is_regular_file("socket") : true));
+    REQUIRE((block_path().empty() ? true :
+             !fs::is_regular_file(block_path())));
+    REQUIRE((character_path().empty() ?
+             true : !fs::is_regular_file(character_path())));
+    REQUIRE_NOTHROW(fs::is_regular_file("notfound"));
+    REQUIRE_NOTHROW(fs::is_regular_file("notfound", ec));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(fs::is_regular_file(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(!fs::is_regular_file(fs::file_status(fs::file_type::unknown)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(fs::is_regular_file(fs::file_status(fs::file_type::regular)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::directory)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::block)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::character)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::socket)));
+    REQUIRE(!fs::is_regular_file(fs::file_status(fs::file_type::unknown)));
 }
- */
-/*
-TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_socket - is_socket",
-"[filesystem][operations][fs.op.is_socket]")
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "fs.op.is_socket - is_socket")
 {
     std::error_code ec;
-    ASSERT_TRUE(!fs::is_socket("directory"));
-    ASSERT_TRUE(!fs::is_socket("regular"));
+    REQUIRE(!fs::is_socket("directory"));
+    REQUIRE(!fs::is_socket("regular"));
     if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(!fs::is_socket("dir_symlink"));
-        ASSERT_TRUE(!fs::is_socket("file_symlink"));
+        REQUIRE(!fs::is_socket("dir_symlink"));
+        REQUIRE(!fs::is_socket("file_symlink"));
     }
-    ASSERT_TRUE((has_fifo() ? !fs::is_socket("fifo") : true));
-    ASSERT_TRUE((has_socket() ? fs::is_socket("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true : !fs::is_socket(block_path())));
-    ASSERT_TRUE((character_path().empty() ? true :
-!fs::is_socket(character_path()))); ASSERT_NO_THROW(fs::is_socket("notfound"));
-    ASSERT_NO_THROW(fs::is_socket("notfound", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE((has_fifo() ? !fs::is_socket("fifo") : true));
+    REQUIRE((has_socket() ? fs::is_socket("socket") : true));
+    REQUIRE((block_path().empty() ? true : !fs::is_socket(block_path())));
+    REQUIRE((character_path().empty() ? true :
+             !fs::is_socket(character_path())));
+    REQUIRE_NOTHROW(fs::is_socket("notfound"));
+    REQUIRE_NOTHROW(fs::is_socket("notfound", ec));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(fs::is_socket(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(!fs::is_socket(fs::file_status(fs::file_type::unknown)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::regular)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::directory)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::block)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::character)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(fs::is_socket(fs::file_status(fs::file_type::socket)));
+    REQUIRE(!fs::is_socket(fs::file_status(fs::file_type::unknown)));
 }
-*/
-/*
-TEST_CASE_METHOD(FileTypeMixFixture, "fs.op.is_symlink - is_symlink",
-"[filesystem][operations][fs.op.is_symlink]")
+
+TEST_CASE_FIXTURE(FileTypeMixFixture, "fs.op.is_symlink - is_symlink")
 {
     std::error_code ec;
-    ASSERT_TRUE(!fs::is_symlink("directory"));
-    ASSERT_TRUE(!fs::is_symlink("regular"));
+    REQUIRE(!fs::is_symlink("directory"));
+    REQUIRE(!fs::is_symlink("regular"));
     if (is_symlink_creation_supported()) {
-        ASSERT_TRUE(fs::is_symlink("dir_symlink"));
-        ASSERT_TRUE(fs::is_symlink("file_symlink"));
+        REQUIRE(fs::is_symlink("dir_symlink"));
+        REQUIRE(fs::is_symlink("file_symlink"));
     }
-    ASSERT_TRUE((has_fifo() ? !fs::is_symlink("fifo") : true));
-    ASSERT_TRUE((has_socket() ? !fs::is_symlink("socket") : true));
-    ASSERT_TRUE((block_path().empty() ? true : !fs::is_symlink(block_path())));
-    ASSERT_TRUE((character_path().empty() ? true :
-!fs::is_symlink(character_path())));
-    ASSERT_NO_THROW(fs::is_symlink("notfound"));
-    ASSERT_NO_THROW(fs::is_symlink("notfound", ec));
-    ASSERT_TRUE(ec);
+    REQUIRE((has_fifo() ? !fs::is_symlink("fifo") : true));
+    REQUIRE((has_socket() ? !fs::is_symlink("socket") : true));
+    REQUIRE((block_path().empty() ? true : !fs::is_symlink(block_path())));
+    REQUIRE((character_path().empty() ? true :
+             !fs::is_symlink(character_path())));
+    REQUIRE_NOTHROW(fs::is_symlink("notfound"));
+    REQUIRE_NOTHROW(fs::is_symlink("notfound", ec));
+    REQUIRE(ec);
     ec.clear();
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::none)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(fs::is_symlink(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::block)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(!fs::is_symlink(fs::file_status(fs::file_type::unknown)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::none)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::regular)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::directory)));
+    REQUIRE(fs::is_symlink(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::block)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::character)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::socket)));
+    REQUIRE(!fs::is_symlink(fs::file_status(fs::file_type::unknown)));
 }
-*/
+
 #ifndef TURBO_PLATFORM_WEB
 
 static fs::file_time_type timeFromString(const std::string &str) {
@@ -2563,354 +2506,354 @@ static fs::file_time_type timeFromString(const std::string &str) {
 
 #endif
 
-TEST(Filesystem, last_write_time) {
+TEST_CASE("Filesystem, last_write_time") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     fs::file_time_type ft;
     generateFile("foo");
     auto now = fs::file_time_type::clock::now();
-    ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
+    REQUIRE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
             fs::last_write_time(t.path()) - now)
-                                 .count()) < 3);
-    ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
+                             .count()) < 3);
+    REQUIRE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
             fs::last_write_time("foo") - now)
-                                 .count()) < 3);
-    ASSERT_THROW(fs::last_write_time("bar"), fs::filesystem_error);
-    ASSERT_NO_THROW(ft = fs::last_write_time("bar", ec));
-    ASSERT_TRUE(ft == fs::file_time_type::min());
-    ASSERT_TRUE(ec);
+                             .count()) < 3);
+    REQUIRE_THROWS_AS(fs::last_write_time("bar"), fs::filesystem_error);
+    REQUIRE_NOTHROW(ft = fs::last_write_time("bar", ec));
+    REQUIRE(ft == fs::file_time_type::min());
+    REQUIRE(ec);
     ec.clear();
     if (is_symlink_creation_supported()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         fs::create_symlink("foo", "foo2");
         ft = fs::last_write_time("foo");
         // checks that the time of the symlink is fetched
-        ASSERT_TRUE(ft == fs::last_write_time("foo2"));
+        REQUIRE(ft == fs::last_write_time("foo2"));
     }
 #ifndef TURBO_PLATFORM_WEB
     auto nt = timeFromString("2015-10-21T04:30:00");
-    ASSERT_NO_THROW(fs::last_write_time(t.path() / "foo", nt));
-    ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
+    REQUIRE_NOTHROW(fs::last_write_time(t.path() / "foo", nt));
+    REQUIRE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
             fs::last_write_time("foo") - nt)
-                                 .count()) < 1);
+                             .count()) < 1);
     nt = timeFromString("2015-10-21T04:29:00");
-    ASSERT_NO_THROW(fs::last_write_time("foo", nt, ec));
-    ASSERT_TRUE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
+    REQUIRE_NOTHROW(fs::last_write_time("foo", nt, ec));
+    REQUIRE(std::abs(std::chrono::duration_cast<std::chrono::seconds>(
             fs::last_write_time("foo") - nt)
-                                 .count()) < 1);
-    ASSERT_TRUE(!ec);
-    ASSERT_THROW(fs::last_write_time("bar", nt), fs::filesystem_error);
-    ASSERT_NO_THROW(fs::last_write_time("bar", nt, ec));
-    ASSERT_TRUE(ec);
+                             .count()) < 1);
+    REQUIRE(!ec);
+    REQUIRE_THROWS_AS(fs::last_write_time("bar", nt), fs::filesystem_error);
+    REQUIRE_NOTHROW(fs::last_write_time("bar", nt, ec));
+    REQUIRE(ec);
 #endif
 }
 
-TEST(Filesystem, permissions) {
+TEST_CASE("Filesystem, permissions") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 512);
     auto allWrite =
             fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write;
-    ASSERT_NO_THROW(fs::permissions("foo", allWrite, fs::perm_options::remove));
-    ASSERT_TRUE((fs::status("foo").permissions() & fs::perms::owner_write) !=
-                fs::perms::owner_write);
+    REQUIRE_NOTHROW(fs::permissions("foo", allWrite, fs::perm_options::remove));
+    REQUIRE((fs::status("foo").permissions() & fs::perms::owner_write) !=
+            fs::perms::owner_write);
 #if !defined(TURBO_PLATFORM_WINDOWS)
     if (geteuid() != 0)
 #endif
     {
-        ASSERT_THROW(fs::resize_file("foo", 1024), fs::filesystem_error);
-        ASSERT_TRUE(fs::file_size("foo") == 512);
+        REQUIRE_THROWS_AS(fs::resize_file("foo", 1024), fs::filesystem_error);
+        REQUIRE(fs::file_size("foo") == 512);
     }
-    ASSERT_NO_THROW(
+    REQUIRE_NOTHROW(
             fs::permissions("foo", fs::perms::owner_write, fs::perm_options::add));
-    ASSERT_TRUE((fs::status("foo").permissions() & fs::perms::owner_write) ==
-                fs::perms::owner_write);
-    ASSERT_NO_THROW(fs::resize_file("foo", 2048));
-    ASSERT_TRUE(fs::file_size("foo") == 2048);
-    ASSERT_THROW(
+    REQUIRE((fs::status("foo").permissions() & fs::perms::owner_write) ==
+            fs::perms::owner_write);
+    REQUIRE_NOTHROW(fs::resize_file("foo", 2048));
+    REQUIRE(fs::file_size("foo") == 2048);
+    REQUIRE_THROWS_AS(
             fs::permissions("bar", fs::perms::owner_write, fs::perm_options::add),
             fs::filesystem_error);
-    ASSERT_NO_THROW(fs::permissions("bar", fs::perms::owner_write,
+    REQUIRE_NOTHROW(fs::permissions("bar", fs::perms::owner_write,
                                     fs::perm_options::add, ec));
-    ASSERT_TRUE(ec);
-    ASSERT_THROW(fs::permissions("bar", fs::perms::owner_write,
-                                 static_cast<fs::perm_options>(0)),
-                 fs::filesystem_error);
+    REQUIRE(ec);
+    REQUIRE_THROWS_AS(fs::permissions("bar", fs::perms::owner_write,
+                                      static_cast<fs::perm_options>(0)),
+                      fs::filesystem_error);
 }
 
-TEST(Filesystem, proximate) {
+TEST_CASE("Filesystem, proximate") {
     std::error_code ec;
-    ASSERT_TRUE(fs::proximate("/a/d", "/a/b/c") == "../../d");
-    ASSERT_TRUE(fs::proximate("/a/d", "/a/b/c", ec) == "../../d");
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::proximate("/a/b/c", "/a/d") == "../b/c");
-    ASSERT_TRUE(fs::proximate("/a/b/c", "/a/d", ec) == "../b/c");
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::proximate("a/b/c", "a") == "b/c");
-    ASSERT_TRUE(fs::proximate("a/b/c", "a", ec) == "b/c");
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::proximate("a/b/c", "a/b/c/x/y") == "../..");
-    ASSERT_TRUE(fs::proximate("a/b/c", "a/b/c/x/y", ec) == "../..");
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::proximate("a/b/c", "a/b/c") == ".");
-    ASSERT_TRUE(fs::proximate("a/b/c", "a/b/c", ec) == ".");
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::proximate("a/b", "c/d") == "../../a/b");
-    ASSERT_TRUE(fs::proximate("a/b", "c/d", ec) == "../../a/b");
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::proximate("/a/d", "/a/b/c") == "../../d");
+    REQUIRE(fs::proximate("/a/d", "/a/b/c", ec) == "../../d");
+    REQUIRE(!ec);
+    REQUIRE(fs::proximate("/a/b/c", "/a/d") == "../b/c");
+    REQUIRE(fs::proximate("/a/b/c", "/a/d", ec) == "../b/c");
+    REQUIRE(!ec);
+    REQUIRE(fs::proximate("a/b/c", "a") == "b/c");
+    REQUIRE(fs::proximate("a/b/c", "a", ec) == "b/c");
+    REQUIRE(!ec);
+    REQUIRE(fs::proximate("a/b/c", "a/b/c/x/y") == "../..");
+    REQUIRE(fs::proximate("a/b/c", "a/b/c/x/y", ec) == "../..");
+    REQUIRE(!ec);
+    REQUIRE(fs::proximate("a/b/c", "a/b/c") == ".");
+    REQUIRE(fs::proximate("a/b/c", "a/b/c", ec) == ".");
+    REQUIRE(!ec);
+    REQUIRE(fs::proximate("a/b", "c/d") == "../../a/b");
+    REQUIRE(fs::proximate("a/b", "c/d", ec) == "../../a/b");
+    REQUIRE(!ec);
 #ifndef TURBO_PLATFORM_WINDOWS
     if (has_host_root_name_support()) {
-        ASSERT_TRUE(fs::proximate("//host1/a/d", "//host2/a/b/c") == "//host1/a/d");
-        ASSERT_TRUE(fs::proximate("//host1/a/d", "//host2/a/b/c", ec) ==
-                    "//host1/a/d");
-        ASSERT_TRUE(!ec);
+        REQUIRE(fs::proximate("//host1/a/d", "//host2/a/b/c") == "//host1/a/d");
+        REQUIRE(fs::proximate("//host1/a/d", "//host2/a/b/c", ec) ==
+                "//host1/a/d");
+        REQUIRE(!ec);
     }
 #endif
 }
 
-TEST(Filesystem, read_symlink) {
+TEST_CASE("Filesystem, read_symlink") {
     if (is_symlink_creation_supported()) {
         TemporaryDirectory t(TempOpt::change_path);
         std::error_code ec;
         generateFile("foo");
         fs::create_symlink(t.path() / "foo", "bar");
-        ASSERT_TRUE(fs::read_symlink("bar") == t.path() / "foo");
-        ASSERT_TRUE(fs::read_symlink("bar", ec) == t.path() / "foo");
-        ASSERT_TRUE(!ec);
-        ASSERT_THROW(fs::read_symlink("foobar"), fs::filesystem_error);
-        ASSERT_TRUE(fs::read_symlink("foobar", ec) == fs::path());
-        ASSERT_TRUE(ec);
+        REQUIRE(fs::read_symlink("bar") == t.path() / "foo");
+        REQUIRE(fs::read_symlink("bar", ec) == t.path() / "foo");
+        REQUIRE(!ec);
+        REQUIRE_THROWS_AS(fs::read_symlink("foobar"), fs::filesystem_error);
+        REQUIRE(fs::read_symlink("foobar", ec) == fs::path());
+        REQUIRE(ec);
     }
 }
 
-TEST(Filesystem, fs_op_relative) {
-    ASSERT_TRUE(fs::relative("/a/d", "/a/b/c") == "../../d");
-    ASSERT_TRUE(fs::relative("/a/b/c", "/a/d") == "../b/c");
-    ASSERT_TRUE(fs::relative("a/b/c", "a") == "b/c");
-    ASSERT_TRUE(fs::relative("a/b/c", "a/b/c/x/y") == "../..");
-    ASSERT_TRUE(fs::relative("a/b/c", "a/b/c") == ".");
-    ASSERT_TRUE(fs::relative("a/b", "c/d") == "../../a/b");
+TEST_CASE("Filesystem, fs_op_relative") {
+    REQUIRE(fs::relative("/a/d", "/a/b/c") == "../../d");
+    REQUIRE(fs::relative("/a/b/c", "/a/d") == "../b/c");
+    REQUIRE(fs::relative("a/b/c", "a") == "b/c");
+    REQUIRE(fs::relative("a/b/c", "a/b/c/x/y") == "../..");
+    REQUIRE(fs::relative("a/b/c", "a/b/c") == ".");
+    REQUIRE(fs::relative("a/b", "c/d") == "../../a/b");
     std::error_code ec;
-    ASSERT_TRUE(fs::relative(fs::current_path() / "foo", ec) == "foo");
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::relative(fs::current_path() / "foo", ec) == "foo");
+    REQUIRE(!ec);
 }
 
-TEST(filesystem, remove) {
+TEST_CASE("filesystem, remove") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo");
-    ASSERT_TRUE(fs::remove("foo"));
-    ASSERT_TRUE(!fs::exists("foo"));
-    ASSERT_TRUE(!fs::remove("foo"));
+    REQUIRE(fs::remove("foo"));
+    REQUIRE(!fs::exists("foo"));
+    REQUIRE(!fs::remove("foo"));
     generateFile("foo");
-    ASSERT_TRUE(fs::remove("foo", ec));
-    ASSERT_TRUE(!fs::exists("foo"));
+    REQUIRE(fs::remove("foo", ec));
+    REQUIRE(!fs::exists("foo"));
     if (is_symlink_creation_supported()) {
         generateFile("foo");
         fs::create_symlink("foo", "bar");
-        ASSERT_TRUE(fs::exists(fs::symlink_status("bar")));
-        ASSERT_TRUE(fs::remove("bar", ec));
-        ASSERT_TRUE(fs::exists("foo"));
-        ASSERT_TRUE(!fs::exists(fs::symlink_status("bar")));
+        REQUIRE(fs::exists(fs::symlink_status("bar")));
+        REQUIRE(fs::remove("bar", ec));
+        REQUIRE(fs::exists("foo"));
+        REQUIRE(!fs::exists(fs::symlink_status("bar")));
     }
-    ASSERT_TRUE(!fs::remove("bar"));
-    ASSERT_TRUE(!fs::remove("bar", ec));
-    ASSERT_TRUE(!ec);
+    REQUIRE(!fs::remove("bar"));
+    REQUIRE(!fs::remove("bar", ec));
+    REQUIRE(!ec);
 }
 
-TEST(Filesystem, remove_all) {
+TEST_CASE("Filesystem, remove_all") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo");
-    ASSERT_TRUE(fs::remove_all("foo", ec) == 1);
-    ASSERT_TRUE(!ec);
+    REQUIRE(fs::remove_all("foo", ec) == 1);
+    REQUIRE(!ec);
     ec.clear();
-    ASSERT_TRUE(fs::directory_iterator(t.path()) == fs::directory_iterator());
+    REQUIRE(fs::directory_iterator(t.path()) == fs::directory_iterator());
     fs::create_directories("dir1/dir1a");
     fs::create_directories("dir1/dir1b");
     generateFile("dir1/dir1a/f1");
     generateFile("dir1/dir1b/f2");
-    ASSERT_NO_THROW(fs::remove_all("dir1/non-existing", ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::remove_all("dir1/non-existing", ec) == 0);
+    REQUIRE_NOTHROW(fs::remove_all("dir1/non-existing", ec));
+    REQUIRE(!ec);
+    REQUIRE(fs::remove_all("dir1/non-existing", ec) == 0);
     if (is_symlink_creation_supported()) {
         fs::create_directory_symlink("dir1", "dir1link");
-        ASSERT_TRUE(fs::remove_all("dir1link") == 1);
+        REQUIRE(fs::remove_all("dir1link") == 1);
     }
-    ASSERT_TRUE(fs::remove_all("dir1") == 5);
-    ASSERT_TRUE(fs::directory_iterator(t.path()) == fs::directory_iterator());
+    REQUIRE(fs::remove_all("dir1") == 5);
+    REQUIRE(fs::directory_iterator(t.path()) == fs::directory_iterator());
 }
 
-TEST(Filesystem, rename) {
+TEST_CASE("Filesystem, rename") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 123);
     fs::create_directory("dir1");
-    ASSERT_NO_THROW(fs::rename("foo", "bar"));
-    ASSERT_TRUE(!fs::exists("foo"));
-    ASSERT_TRUE(fs::exists("bar"));
-    ASSERT_NO_THROW(fs::rename("dir1", "dir2"));
-    ASSERT_TRUE(fs::exists("dir2"));
+    REQUIRE_NOTHROW(fs::rename("foo", "bar"));
+    REQUIRE(!fs::exists("foo"));
+    REQUIRE(fs::exists("bar"));
+    REQUIRE_NOTHROW(fs::rename("dir1", "dir2"));
+    REQUIRE(fs::exists("dir2"));
     generateFile("foo2", 42);
-    ASSERT_NO_THROW(fs::rename("bar", "foo2"));
-    ASSERT_TRUE(fs::exists("foo2"));
-    ASSERT_TRUE(fs::file_size("foo2") == 123u);
-    ASSERT_TRUE(!fs::exists("bar"));
-    ASSERT_NO_THROW(fs::rename("foo2", "foo", ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_THROW(fs::rename("foobar", "barfoo"), fs::filesystem_error);
-    ASSERT_NO_THROW(fs::rename("foobar", "barfoo", ec));
-    ASSERT_TRUE(ec);
-    ASSERT_TRUE(!fs::exists("barfoo"));
+    REQUIRE_NOTHROW(fs::rename("bar", "foo2"));
+    REQUIRE(fs::exists("foo2"));
+    REQUIRE(fs::file_size("foo2") == 123u);
+    REQUIRE(!fs::exists("bar"));
+    REQUIRE_NOTHROW(fs::rename("foo2", "foo", ec));
+    REQUIRE(!ec);
+    REQUIRE_THROWS_AS(fs::rename("foobar", "barfoo"), fs::filesystem_error);
+    REQUIRE_NOTHROW(fs::rename("foobar", "barfoo", ec));
+    REQUIRE(ec);
+    REQUIRE(!fs::exists("barfoo"));
 }
 
-TEST(Filesystem, resize_file) {
+TEST_CASE("Filesystem, resize_file") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 1024);
-    ASSERT_TRUE(fs::file_size("foo") == 1024);
-    ASSERT_NO_THROW(fs::resize_file("foo", 2048));
-    ASSERT_TRUE(fs::file_size("foo") == 2048);
-    ASSERT_NO_THROW(fs::resize_file("foo", 1000, ec));
-    ASSERT_TRUE(!ec);
-    ASSERT_TRUE(fs::file_size("foo") == 1000);
-    ASSERT_THROW(fs::resize_file("bar", 2048), fs::filesystem_error);
-    ASSERT_TRUE(!fs::exists("bar"));
-    ASSERT_NO_THROW(fs::resize_file("bar", 4096, ec));
-    ASSERT_TRUE(ec);
-    ASSERT_TRUE(!fs::exists("bar"));
+    REQUIRE(fs::file_size("foo") == 1024);
+    REQUIRE_NOTHROW(fs::resize_file("foo", 2048));
+    REQUIRE(fs::file_size("foo") == 2048);
+    REQUIRE_NOTHROW(fs::resize_file("foo", 1000, ec));
+    REQUIRE(!ec);
+    REQUIRE(fs::file_size("foo") == 1000);
+    REQUIRE_THROWS_AS(fs::resize_file("bar", 2048), fs::filesystem_error);
+    REQUIRE(!fs::exists("bar"));
+    REQUIRE_NOTHROW(fs::resize_file("bar", 4096, ec));
+    REQUIRE(ec);
+    REQUIRE(!fs::exists("bar"));
 }
 
-TEST(Filesystem, fs_op_space) {
+TEST_CASE("Filesystem, fs_op_space") {
     {
         fs::space_info si;
-        ASSERT_NO_THROW(si = fs::space(fs::current_path()));
-        ASSERT_TRUE(si.capacity > 1024 * 1024);
-        ASSERT_TRUE(si.capacity > si.free);
-        ASSERT_TRUE(si.free >= si.available);
+        REQUIRE_NOTHROW(si = fs::space(fs::current_path()));
+        REQUIRE(si.capacity > 1024 * 1024);
+        REQUIRE(si.capacity > si.free);
+        REQUIRE(si.free >= si.available);
     }
     {
         std::error_code ec;
         fs::space_info si;
-        ASSERT_NO_THROW(si = fs::space(fs::current_path(), ec));
-        ASSERT_TRUE(si.capacity > 1024 * 1024);
-        ASSERT_TRUE(si.capacity > si.free);
-        ASSERT_TRUE(si.free >= si.available);
-        ASSERT_TRUE(!ec);
+        REQUIRE_NOTHROW(si = fs::space(fs::current_path(), ec));
+        REQUIRE(si.capacity > 1024 * 1024);
+        REQUIRE(si.capacity > si.free);
+        REQUIRE(si.free >= si.available);
+        REQUIRE(!ec);
     }
 #ifndef TURBO_PLATFORM_WEB // statvfs under emscripten always returns a result,
     // so this tests would fail
     {
         std::error_code ec;
         fs::space_info si;
-        ASSERT_NO_THROW(si = fs::space("foobar42", ec));
-        ASSERT_TRUE(si.capacity == static_cast<uintmax_t>(-1));
-        ASSERT_TRUE(si.free == static_cast<uintmax_t>(-1));
-        ASSERT_TRUE(si.available == static_cast<uintmax_t>(-1));
-        ASSERT_TRUE(ec);
+        REQUIRE_NOTHROW(si = fs::space("foobar42", ec));
+        REQUIRE(si.capacity == static_cast<uintmax_t>(-1));
+        REQUIRE(si.free == static_cast<uintmax_t>(-1));
+        REQUIRE(si.available == static_cast<uintmax_t>(-1));
+        REQUIRE(ec);
     }
-    ASSERT_THROW(fs::space("foobar42"), fs::filesystem_error);
+    REQUIRE_THROWS_AS(fs::space("foobar42"), fs::filesystem_error);
 #endif
 }
 
-TEST(Filesystem, op_and_status) {
+TEST_CASE("Filesystem, op_and_status") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     fs::file_status fs;
-    ASSERT_NO_THROW(fs = fs::status("foo"));
-    ASSERT_TRUE(fs.type() == fs::file_type::not_found);
-    ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
-    ASSERT_NO_THROW(fs = fs::status("bar", ec));
-    ASSERT_TRUE(fs.type() == fs::file_type::not_found);
-    ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(fs = fs::status("foo"));
+    REQUIRE(fs.type() == fs::file_type::not_found);
+    REQUIRE(fs.permissions() == fs::perms::unknown);
+    REQUIRE_NOTHROW(fs = fs::status("bar", ec));
+    REQUIRE(fs.type() == fs::file_type::not_found);
+    REQUIRE(fs.permissions() == fs::perms::unknown);
+    REQUIRE(ec);
     ec.clear();
     fs = fs::status(t.path());
-    ASSERT_TRUE(fs.type() == fs::file_type::directory);
-    ASSERT_TRUE(
+    REQUIRE(fs.type() == fs::file_type::directory);
+    REQUIRE(
             (fs.permissions() & (fs::perms::owner_read | fs::perms::owner_write)) ==
             (fs::perms::owner_read | fs::perms::owner_write));
     generateFile("foobar");
     fs = fs::status(t.path() / "foobar");
-    ASSERT_TRUE(fs.type() == fs::file_type::regular);
-    ASSERT_TRUE(
+    REQUIRE(fs.type() == fs::file_type::regular);
+    REQUIRE(
             (fs.permissions() & (fs::perms::owner_read | fs::perms::owner_write)) ==
             (fs::perms::owner_read | fs::perms::owner_write));
     if (is_symlink_creation_supported()) {
         fs::create_symlink(t.path() / "foobar", t.path() / "barfoo");
         fs = fs::status(t.path() / "barfoo");
-        ASSERT_TRUE(fs.type() == fs::file_type::regular);
-        ASSERT_TRUE(
+        REQUIRE(fs.type() == fs::file_type::regular);
+        REQUIRE(
                 (fs.permissions() & (fs::perms::owner_read | fs::perms::owner_write)) ==
                 (fs::perms::owner_read | fs::perms::owner_write));
     }
 }
 
-TEST(FilesystemStatus, status_known) {
-    ASSERT_TRUE(!fs::status_known(fs::file_status()));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::not_found)));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::regular)));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::directory)));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::symlink)));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::character)));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::fifo)));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::socket)));
-    ASSERT_TRUE(fs::status_known(fs::file_status(fs::file_type::unknown)));
+TEST_CASE("FilesystemStatus, status_known") {
+    REQUIRE(!fs::status_known(fs::file_status()));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::not_found)));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::regular)));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::directory)));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::symlink)));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::character)));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::fifo)));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::socket)));
+    REQUIRE(fs::status_known(fs::file_status(fs::file_type::unknown)));
 }
 
-TEST(FilesystemStatus, symlink_status) {
+TEST_CASE("FilesystemStatus, symlink_status") {
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     fs::file_status fs;
-    ASSERT_NO_THROW(fs = fs::symlink_status("foo"));
-    ASSERT_TRUE(fs.type() == fs::file_type::not_found);
-    ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
-    ASSERT_NO_THROW(fs = fs::symlink_status("bar", ec));
-    ASSERT_TRUE(fs.type() == fs::file_type::not_found);
-    ASSERT_TRUE(fs.permissions() == fs::perms::unknown);
-    ASSERT_TRUE(ec);
+    REQUIRE_NOTHROW(fs = fs::symlink_status("foo"));
+    REQUIRE(fs.type() == fs::file_type::not_found);
+    REQUIRE(fs.permissions() == fs::perms::unknown);
+    REQUIRE_NOTHROW(fs = fs::symlink_status("bar", ec));
+    REQUIRE(fs.type() == fs::file_type::not_found);
+    REQUIRE(fs.permissions() == fs::perms::unknown);
+    REQUIRE(ec);
     ec.clear();
     fs = fs::symlink_status(t.path());
-    ASSERT_TRUE(fs.type() == fs::file_type::directory);
-    ASSERT_TRUE(
+    REQUIRE(fs.type() == fs::file_type::directory);
+    REQUIRE(
             (fs.permissions() & (fs::perms::owner_read | fs::perms::owner_write)) ==
             (fs::perms::owner_read | fs::perms::owner_write));
     generateFile("foobar");
     fs = fs::symlink_status(t.path() / "foobar");
-    ASSERT_TRUE(fs.type() == fs::file_type::regular);
-    ASSERT_TRUE(
+    REQUIRE(fs.type() == fs::file_type::regular);
+    REQUIRE(
             (fs.permissions() & (fs::perms::owner_read | fs::perms::owner_write)) ==
             (fs::perms::owner_read | fs::perms::owner_write));
     if (is_symlink_creation_supported()) {
         fs::create_symlink(t.path() / "foobar", t.path() / "barfoo");
         fs = fs::symlink_status(t.path() / "barfoo");
-        ASSERT_TRUE(fs.type() == fs::file_type::symlink);
+        REQUIRE(fs.type() == fs::file_type::symlink);
     }
 }
 
-TEST(FilesystemStatus, temp_dir_path) {
+TEST_CASE("FilesystemStatus, temp_dir_path") {
     std::error_code ec;
-    ASSERT_NO_THROW(fs::exists(fs::temp_directory_path()));
-    ASSERT_NO_THROW(fs::exists(fs::temp_directory_path(ec)));
-    ASSERT_TRUE(!fs::temp_directory_path().empty());
-    ASSERT_TRUE(!ec);
+    REQUIRE_NOTHROW(fs::exists(fs::temp_directory_path()));
+    REQUIRE_NOTHROW(fs::exists(fs::temp_directory_path(ec)));
+    REQUIRE(!fs::temp_directory_path().empty());
+    REQUIRE(!ec);
 }
 
-TEST(FilesystemStatus, weakly_canonical) {
+TEST_CASE("FilesystemStatus, weakly_canonical") {
     TLOG_INFO("This might fail on std::implementations that return "
-                       "fs::current_path() for fs::canonical(\"\")");
-    ASSERT_TRUE(fs::weakly_canonical("") == ".");
+              "fs::current_path() for fs::canonical(\"\")");
+    REQUIRE(fs::weakly_canonical("") == ".");
     if (fs::weakly_canonical("") == ".") {
-        ASSERT_TRUE(fs::weakly_canonical("foo/bar") == "foo/bar");
-        ASSERT_TRUE(fs::weakly_canonical("foo/./bar") == "foo/bar");
-        ASSERT_TRUE(fs::weakly_canonical("foo/../bar") == "bar");
+        REQUIRE(fs::weakly_canonical("foo/bar") == "foo/bar");
+        REQUIRE(fs::weakly_canonical("foo/./bar") == "foo/bar");
+        REQUIRE(fs::weakly_canonical("foo/../bar") == "bar");
     } else {
-        ASSERT_TRUE(fs::weakly_canonical("foo/bar") ==
-                    fs::current_path() / "foo/bar");
-        ASSERT_TRUE(fs::weakly_canonical("foo/./bar") ==
-                    fs::current_path() / "foo/bar");
-        ASSERT_TRUE(fs::weakly_canonical("foo/../bar") ==
-                    fs::current_path() / "bar");
+        REQUIRE(fs::weakly_canonical("foo/bar") ==
+                fs::current_path() / "foo/bar");
+        REQUIRE(fs::weakly_canonical("foo/./bar") ==
+                fs::current_path() / "foo/bar");
+        REQUIRE(fs::weakly_canonical("foo/../bar") ==
+                fs::current_path() / "bar");
     }
 
     {
@@ -2919,56 +2862,56 @@ TEST(FilesystemStatus, weakly_canonical) {
         fs::create_directories(dir / "d1");
         generateFile(dir / "f0");
         fs::path rel(dir.filename());
-        ASSERT_TRUE(fs::weakly_canonical(dir) == dir);
-        ASSERT_TRUE(fs::weakly_canonical(rel) == dir);
-        ASSERT_TRUE(fs::weakly_canonical(dir / "f0") == dir / "f0");
-        ASSERT_TRUE(fs::weakly_canonical(dir / "f0/") == dir / "f0/");
-        ASSERT_TRUE(fs::weakly_canonical(dir / "f1") == dir / "f1");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "f0") == dir / "f0");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "f0/") == dir / "f0/");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "f1") == dir / "f1");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "./f0") == dir / "f0");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "./f1") == dir / "f1");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "d1/../f0") == dir / "f0");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "d1/../f1") == dir / "f1");
-        ASSERT_TRUE(fs::weakly_canonical(rel / "d1/../f1/../f2") == dir / "f2");
+        REQUIRE(fs::weakly_canonical(dir) == dir);
+        REQUIRE(fs::weakly_canonical(rel) == dir);
+        REQUIRE(fs::weakly_canonical(dir / "f0") == dir / "f0");
+        REQUIRE(fs::weakly_canonical(dir / "f0/") == dir / "f0/");
+        REQUIRE(fs::weakly_canonical(dir / "f1") == dir / "f1");
+        REQUIRE(fs::weakly_canonical(rel / "f0") == dir / "f0");
+        REQUIRE(fs::weakly_canonical(rel / "f0/") == dir / "f0/");
+        REQUIRE(fs::weakly_canonical(rel / "f1") == dir / "f1");
+        REQUIRE(fs::weakly_canonical(rel / "./f0") == dir / "f0");
+        REQUIRE(fs::weakly_canonical(rel / "./f1") == dir / "f1");
+        REQUIRE(fs::weakly_canonical(rel / "d1/../f0") == dir / "f0");
+        REQUIRE(fs::weakly_canonical(rel / "d1/../f1") == dir / "f1");
+        REQUIRE(fs::weakly_canonical(rel / "d1/../f1/../f2") == dir / "f2");
     }
 }
 
-TEST(FilesystemStatus, string_view) {
+TEST_CASE("FilesystemStatus, string_view") {
 
     using std::string_view;
     using std::wstring_view;
     {
         std::string p("foo/bar");
         string_view sv(p);
-        ASSERT_TRUE(
+        REQUIRE(
                 fs::path(sv, fs::path::format::generic_format).generic_string() ==
                 "foo/bar");
         fs::path p2("fo");
         p2 += string_view("o");
-        ASSERT_TRUE(p2 == "foo");
-        ASSERT_TRUE(p2.compare(string_view("foo")) == 0);
+        REQUIRE(p2 == "foo");
+        REQUIRE(p2.compare(string_view("foo")) == 0);
     }
     {
         auto p = fs::path{"XYZ"};
         p /= string_view("Appendix");
-        ASSERT_TRUE(p == "XYZ/Appendix");
+        REQUIRE(p == "XYZ/Appendix");
     }
     {
         std::wstring p(L"foo/bar");
         wstring_view sv(p);
-        ASSERT_TRUE(
+        REQUIRE(
                 fs::path(sv, fs::path::format::generic_format).generic_string() ==
                 "foo/bar");
         fs::path p2(L"fo");
         p2 += wstring_view(L"o");
-        ASSERT_TRUE(p2 == "foo");
-        ASSERT_TRUE(p2.compare(wstring_view(L"foo")) == 0);
+        REQUIRE(p2 == "foo");
+        REQUIRE(p2.compare(wstring_view(L"foo")) == 0);
     }
 }
 
-TEST(FilesystemStatus, win_long) {
+TEST_CASE("FilesystemStatus, win_long") {
 #ifdef TURBO_PLATFORM_WINDOWS
     TemporaryDirectory t(TempOpt::change_path);
     char c = 'A';
@@ -2977,33 +2920,33 @@ TEST(FilesystemStatus, win_long) {
     for (; c <= 'Z'; ++c) {
       std::string part = std::string(16, c);
       dir /= part;
-      ASSERT_NO_THROW(fs::create_directory(dir));
-      ASSERT_TRUE(fs::exists(dir));
+      REQUIRE_NOTHROW(fs::create_directory(dir));
+      REQUIRE(fs::exists(dir));
       generateFile(dir / "f0");
-      ASSERT_TRUE(fs::exists(dir / "f0"));
+      REQUIRE(fs::exists(dir / "f0"));
     }
-    ASSERT_TRUE(c > 'Z');
+    REQUIRE(c > 'Z');
     fs::remove_all(fs::current_path() / std::string(16, 'A'));
-    ASSERT_TRUE(!fs::exists(fs::current_path() / std::string(16, 'A')));
-    ASSERT_NO_THROW(fs::create_directories(dir));
-    ASSERT_TRUE(fs::exists(dir));
+    REQUIRE(!fs::exists(fs::current_path() / std::string(16, 'A')));
+    REQUIRE_NOTHROW(fs::create_directories(dir));
+    REQUIRE(fs::exists(dir));
     generateFile(dir / "f0");
-    ASSERT_TRUE(fs::exists(dir / "f0"));
+    REQUIRE(fs::exists(dir / "f0"));
 #else
     TLOG_WARN("Windows specific tests are empty on non-Windows systems.");
 #endif
 }
 
-TEST(Filesystem, win_namespaces) {
+TEST_CASE("Filesystem, win_namespaces") {
 #ifdef TURBO_PLATFORM_WINDOWS
     {
       std::error_code ec;
       fs::path p(R"(\\localhost\c$\Windows)");
       auto symstat = fs::symlink_status(p, ec);
-      ASSERT_TRUE(!ec);
+      REQUIRE(!ec);
       auto p2 = fs::canonical(p, ec);
-      ASSERT_TRUE(!ec);
-      ASSERT_TRUE(p2 == p);
+      REQUIRE(!ec);
+      REQUIRE(p2 == p);
     }
 
     struct TestInfo {
@@ -3061,23 +3004,23 @@ TEST(Filesystem, win_namespaces) {
     for (auto ti : variants) {
       INFO("Used path: " + ti._path);
       auto p = fs::path(ti._path);
-      ASSERT_TRUE(p.string() == ti._string);
-      ASSERT_TRUE(p.is_absolute());
-      ASSERT_TRUE(p.root_name().string() == ti._rootName);
-      ASSERT_TRUE(p.root_path().string() == ti._rootPath);
-      ASSERT_TRUE(iterateResult(p) == ti._iterateResult);
+      REQUIRE(p.string() == ti._string);
+      REQUIRE(p.is_absolute());
+      REQUIRE(p.root_name().string() == ti._rootName);
+      REQUIRE(p.root_path().string() == ti._rootPath);
+      REQUIRE(iterateResult(p) == ti._iterateResult);
     }
 #else
     TLOG_WARN("Windows specific tests are empty on non-Windows systems.");
 #endif
 }
 
-TEST(Filesystem, win_mapped) {
+TEST_CASE("Filesystem, win_mapped") {
 #ifdef TURBO_PLATFORM_WINDOWS
     // this test expects a mapped volume on C:\\fs-test as is the case on the
     // development test system does nothing on other systems
     if (fs::exists("C:\\fs-test")) {
-      ASSERT_TRUE(fs::canonical("C:\\fs-test\\Test.txt").string() ==
+      REQUIRE(fs::canonical("C:\\fs-test\\Test.txt").string() ==
                   "C:\\fs-test\\Test.txt");
     }
 #else
@@ -3085,16 +3028,16 @@ TEST(Filesystem, win_mapped) {
 #endif
 }
 
-TEST(Filesystem, win_remove) {
+TEST_CASE("Filesystem, win_remove") {
 #ifdef TURBO_PLATFORM_WINDOWS
     TemporaryDirectory t(TempOpt::change_path);
     std::error_code ec;
     generateFile("foo", 512);
     auto allWrite =
         fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write;
-    ASSERT_NO_THROW(fs::permissions("foo", allWrite, fs::perm_options::remove));
-    ASSERT_NO_THROW(fs::remove("foo"));
-    ASSERT_TRUE(!fs::exists("foo"));
+    REQUIRE_NOTHROW(fs::permissions("foo", allWrite, fs::perm_options::remove));
+    REQUIRE_NOTHROW(fs::remove("foo"));
+    REQUIRE(!fs::exists("foo"));
 #else
     TLOG_WARN("Windows specific tests are empty on non-Windows systems.");
 #endif

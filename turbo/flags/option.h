@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#pragma once
-
+#ifndef TURBO_FLAGS_OPTION_H_
+#define TURBO_FLAGS_OPTION_H_
 
 #include <algorithm>
 #include <functional>
@@ -34,7 +34,7 @@
 namespace turbo {
 
     using results_t = std::vector<std::string>;
-/// callback function definition
+    /// callback function definition
     using callback_t = std::function<bool(const results_t &)>;
 
     class Option;
@@ -42,7 +42,7 @@ namespace turbo {
     class App;
 
     using Option_p = std::unique_ptr<Option>;
-/// Enumeration of the multiOption Policy selection
+    /// Enumeration of the multiOption Policy selection
     enum class MultiOptionPolicy : char {
         Throw,      //!< Throw an error if any extra arguments were given
         TakeLast,   //!< take only the last Expected number of arguments
@@ -887,3 +887,4 @@ namespace turbo {
     }
 
 }  // namespace turbo
+#endif  // TURBO_FLAGS_OPTION_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#pragma once
-
+#ifndef TURBO_FLAGS_TYPE_TOOLS_H_
+#define TURBO_FLAGS_TYPE_TOOLS_H_
 
 #include <cmath>
 #include <cstdint>
@@ -87,19 +87,19 @@ namespace turbo {
     struct is_shared_ptr<const std::shared_ptr<T>> : std::true_type {
     };
 
-        /// Check to see if something is copyable pointer
+    /// Check to see if something is copyable pointer
     template<typename T>
     struct is_copyable_ptr {
         static bool const value = is_shared_ptr<T>::value || std::is_pointer<T>::value;
     };
 
-        /// This can be specialized to override the type deduction for IsMember.
+    /// This can be specialized to override the type deduction for IsMember.
     template<typename T>
     struct IsMemberType {
         using type = T;
     };
 
-        /// The main custom type needed here is const char * should be a string.
+    /// The main custom type needed here is const char * should be a string.
     template<>
     struct IsMemberType<const char *> {
         using type = std::string;
@@ -654,7 +654,7 @@ namespace turbo {
             static constexpr object_category value{object_category::integral_value};
         };
 
-    /// Unsigned integers
+        /// Unsigned integers
         template<typename T>
         struct classify_object<T,
                 typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value &&
@@ -1700,3 +1700,4 @@ namespace turbo {
 
     }  // namespace detail
 }  // namespace turbo
+#endif  // TURBO_FLAGS_TYPE_TOOLS_H_

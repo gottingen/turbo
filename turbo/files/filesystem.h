@@ -46,12 +46,15 @@
 // #define BSD manifest constant only in
 // sys/param.h
 #ifndef _WIN32
+
 #include <sys/param.h>
+
 #endif
+
 #include "turbo/platform/port.h"
 
 #ifdef TURBO_PLATFORM_WINDOWS
-#include <windows.h>
+                                                                                                                        #include <windows.h>
 // additional includes
 #include <shellapi.h>
 #include <sys/stat.h>
@@ -59,6 +62,7 @@
 #include <wchar.h>
 #include <winioctl.h>
 #else
+
 #include <dirent.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -67,21 +71,26 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #ifdef TURBO_PLATFORM_ANDROID
-#include <android/api-level.h>
+                                                                                                                        #include <android/api-level.h>
 #if __ANDROID_API__ < 12
 #include <sys/syscall.h>
 #endif
 #include <sys/vfs.h>
 #define statvfs statfs
 #else
+
 #include <sys/statvfs.h>
+
 #endif
 #ifdef TURBO_PLATFORM_CYGWIN
 #include <strings.h>
 #endif
 #if !defined(__ANDROID__) || __ANDROID_API__ >= 26
+
 #include <langinfo.h>
+
 #endif
 #endif
 #ifdef TURBO_PLATFORM_OSX
@@ -89,7 +98,7 @@
 #endif
 
 #if defined(__cpp_impl_three_way_comparison) && defined(__has_include)
-#if __has_include(<compare>)
+                                                                                                                        #if __has_include(<compare>)
 #define TURBO_HAVE_THREEWAY_COMP
 #include <compare>
 #endif
@@ -188,44 +197,45 @@
 #endif
 
 namespace turbo {
-namespace filesystem {
+    namespace filesystem {
 
-using std::basic_string_view;
+        using std::basic_string_view;
 
 // temporary existing exception type for yet unimplemented parts
-class TURBO_DLL not_implemented_exception : public std::logic_error {
-public:
-  not_implemented_exception()
-      : std::logic_error("function not implemented yet.") {}
-};
+        class TURBO_DLL not_implemented_exception : public std::logic_error {
+        public:
+            not_implemented_exception()
+                    : std::logic_error("function not implemented yet.") {}
+        };
 
-template <typename char_type> class path_helper_base {
-public:
-  using value_type = char_type;
+        template<typename char_type>
+        class path_helper_base {
+        public:
+            using value_type = char_type;
 #ifdef TURBO_PLATFORM_WINDOWS
-  static constexpr value_type preferred_separator = '\\';
+            static constexpr value_type preferred_separator = '\\';
 #else
-  static constexpr value_type preferred_separator = '/';
+            static constexpr value_type preferred_separator = '/';
 #endif
-};
+        };
 
 #if __cplusplus < 201703L
-template <typename char_type>
+                                                                                                                                template <typename char_type>
 constexpr char_type path_helper_base<char_type>::preferred_separator;
 #endif
 
 #ifdef TURBO_PLATFORM_WINDOWS
-class path;
+                                                                                                                                class path;
 namespace detail {
 bool has_executable_extension(const path &p);
 }
 #endif
 
 // [fs.class.path] class path
-class TURBO_DLL path
-#if defined(TURBO_PLATFORM_WINDOWS) &&                                         \
+        class TURBO_DLL path
+#if defined(TURBO_PLATFORM_WINDOWS) && \
     !defined(TURBO_WIN_DISABLE_WSTRING_STORAGE_TYPE)
-#define GHC_USE_WCHAR_T
+                                                                                                                                    #define GHC_USE_WCHAR_T
 #define TURBO_NATIVEWP(p) p.c_str()
 #define TURBO_PLATFORM_LITERAL(str) L##str
     : private path_helper_base<std::wstring::value_type> {
@@ -234,43 +244,49 @@ public:
 #else
 #define TURBO_NATIVEWP(p) p.wstring().c_str()
 #define TURBO_PLATFORM_LITERAL(str) str
-    : private path_helper_base<std::string::value_type> {
-public:
-  using path_helper_base<std::string::value_type>::value_type;
+                : private path_helper_base<std::string::value_type> {
+        public:
+            using path_helper_base<std::string::value_type>::value_type;
 #endif
-  using string_type = std::basic_string<value_type>;
-  using path_helper_base<value_type>::preferred_separator;
+            using string_type = std::basic_string<value_type>;
+            using path_helper_base<value_type>::preferred_separator;
 
-  // [fs.enum.path.format] enumeration format
-  /// The path format in which the constructor argument is given.
-  enum format {
-    generic_format, ///< The generic format, internally used by
-                    ///< turbo::filesystem::path with slashes
-    native_format,  ///< The format native to the current platform this code
-                    ///< is build for
-    auto_format,    ///< Try to auto-detect the format, fallback to native
-  };
+            // [fs.enum.path.format] enumeration format
+            /// The path format in which the constructor argument is given.
+            enum format {
+                generic_format, ///< The generic format, internally used by
+                ///< turbo::filesystem::path with slashes
+                native_format,  ///< The format native to the current platform this code
+                ///< is build for
+                auto_format,    ///< Try to auto-detect the format, fallback to native
+            };
 
-  template <class T> struct _is_basic_string : std::false_type {};
-  template <class CharT, class Traits, class Alloc>
-  struct _is_basic_string<std::basic_string<CharT, Traits, Alloc>>
-      : std::true_type {};
-  template <class CharT>
-  struct _is_basic_string<
-      std::basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT>>>
-      : std::true_type {};
-  template <class CharT, class Traits>
-  struct _is_basic_string<basic_string_view<CharT, Traits>> : std::true_type {};
-  template <class CharT>
-  struct _is_basic_string<basic_string_view<CharT, std::char_traits<CharT>>>
-      : std::true_type {};
+            template<class T>
+            struct _is_basic_string : std::false_type {
+            };
+            template<class CharT, class Traits, class Alloc>
+            struct _is_basic_string<std::basic_string<CharT, Traits, Alloc>>
+                    : std::true_type {
+            };
+            template<class CharT>
+            struct _is_basic_string<
+                    std::basic_string<CharT, std::char_traits<CharT>, std::allocator<CharT>>>
+                    : std::true_type {
+            };
+            template<class CharT, class Traits>
+            struct _is_basic_string<basic_string_view<CharT, Traits>> : std::true_type {
+            };
+            template<class CharT>
+            struct _is_basic_string<basic_string_view<CharT, std::char_traits<CharT>>>
+                    : std::true_type {
+            };
 
-  template <typename T1, typename T2 = void>
-  using path_type =
-      typename std::enable_if<!std::is_same<path, T1>::value, path>::type;
-  template <typename T>
+            template<typename T1, typename T2 = void>
+            using path_type =
+                    typename std::enable_if<!std::is_same<path, T1>::value, path>::type;
+            template<typename T>
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-  using path_from_string = typename std::enable_if<
+                                                                                                                                        using path_from_string = typename std::enable_if<
       _is_basic_string<T>::value ||
           std::is_same<char const *, typename std::decay<T>::type>::value ||
           std::is_same<char *, typename std::decay<T>::type>::value ||
@@ -290,188 +306,284 @@ public:
           std::is_same<T, char32_t>::value || std::is_same<T, wchar_t>::value,
       path>::type;
 #else
-  using path_from_string = typename std::enable_if<
-      _is_basic_string<T>::value ||
-          std::is_same<char const *, typename std::decay<T>::type>::value ||
-          std::is_same<char *, typename std::decay<T>::type>::value ||
-          std::is_same<char16_t const *, typename std::decay<T>::type>::value ||
-          std::is_same<char16_t *, typename std::decay<T>::type>::value ||
-          std::is_same<char32_t const *, typename std::decay<T>::type>::value ||
-          std::is_same<char32_t *, typename std::decay<T>::type>::value ||
-          std::is_same<wchar_t const *, typename std::decay<T>::type>::value ||
-          std::is_same<wchar_t *, typename std::decay<T>::type>::value,
-      path>::type;
-  template <typename T>
-  using path_type_EcharT = typename std::enable_if<
-      std::is_same<T, char>::value || std::is_same<T, char16_t>::value ||
-          std::is_same<T, char32_t>::value || std::is_same<T, wchar_t>::value,
-      path>::type;
+            using path_from_string = typename std::enable_if<
+                    _is_basic_string<T>::value ||
+                    std::is_same<char const *, typename std::decay<T>::type>::value ||
+                    std::is_same<char *, typename std::decay<T>::type>::value ||
+                    std::is_same<char16_t const *, typename std::decay<T>::type>::value ||
+                    std::is_same<char16_t *, typename std::decay<T>::type>::value ||
+                    std::is_same<char32_t const *, typename std::decay<T>::type>::value ||
+                    std::is_same<char32_t *, typename std::decay<T>::type>::value ||
+                    std::is_same<wchar_t const *, typename std::decay<T>::type>::value ||
+                    std::is_same<wchar_t *, typename std::decay<T>::type>::value,
+                    path>::type;
+            template<typename T>
+            using path_type_EcharT = typename std::enable_if<
+                    std::is_same<T, char>::value || std::is_same<T, char16_t>::value ||
+                    std::is_same<T, char32_t>::value || std::is_same<T, wchar_t>::value,
+                    path>::type;
 #endif
-  // [fs.path.construct] constructors and destructor
-  path() noexcept;
-  path(const path &p);
-  path(path &&p) noexcept;
-  path(string_type &&source, format fmt = auto_format);
-  template <class Source, typename = path_from_string<Source>>
-  path(const Source &source, format fmt = auto_format);
-  template <class InputIterator>
-  path(InputIterator first, InputIterator last, format fmt = auto_format);
+
+            // [fs.path.construct] constructors and destructor
+            path() noexcept;
+
+            path(const path &p);
+
+            path(path &&p) noexcept;
+
+            path(string_type &&source, format fmt = auto_format);
+
+            template<class Source, typename = path_from_string<Source>>
+            path(const Source &source, format fmt = auto_format);
+
+            template<class InputIterator>
+            path(InputIterator first, InputIterator last, format fmt = auto_format);
+
 #ifdef TURBO_HAVE_EXCEPTIONS
-  template <class Source, typename = path_from_string<Source>>
-  path(const Source &source, const std::locale &loc, format fmt = auto_format);
-  template <class InputIterator>
-  path(InputIterator first, InputIterator last, const std::locale &loc,
-       format fmt = auto_format);
+
+            template<class Source, typename = path_from_string<Source>>
+            path(const Source &source, const std::locale &loc, format fmt = auto_format);
+
+            template<class InputIterator>
+            path(InputIterator first, InputIterator last, const std::locale &loc,
+                 format fmt = auto_format);
+
 #endif
-  ~path();
 
-  // [fs.path.assign] assignments
-  path &operator=(const path &p);
-  path &operator=(path &&p) noexcept;
-  path &operator=(string_type &&source);
-  path &assign(string_type &&source);
-  template <class Source> path &operator=(const Source &source);
-  template <class Source> path &assign(const Source &source);
-  template <class InputIterator>
-  path &assign(InputIterator first, InputIterator last);
+            ~path();
 
-  // [fs.path.append] appends
-  path &operator/=(const path &p);
-  template <class Source> path &operator/=(const Source &source);
-  template <class Source> path &append(const Source &source);
-  template <class InputIterator>
-  path &append(InputIterator first, InputIterator last);
+            // [fs.path.assign] assignments
+            path &operator=(const path &p);
 
-  // [fs.path.concat] concatenation
-  path &operator+=(const path &x);
-  path &operator+=(const string_type &x);
-  path &operator+=(basic_string_view<value_type> x);
-  path &operator+=(const value_type *x);
-  path &operator+=(value_type x);
-  template <class Source> path_from_string<Source> &operator+=(const Source &x);
-  template <class EcharT> path_type_EcharT<EcharT> &operator+=(EcharT x);
-  template <class Source> path &concat(const Source &x);
-  template <class InputIterator>
-  path &concat(InputIterator first, InputIterator last);
+            path &operator=(path &&p) noexcept;
 
-  // [fs.path.modifiers] modifiers
-  void clear() noexcept;
-  path &make_preferred();
-  path &remove_filename();
-  path &replace_filename(const path &replacement);
-  path &replace_extension(const path &replacement = path());
-  void swap(path &rhs) noexcept;
+            path &operator=(string_type &&source);
 
-  // [fs.path.native.obs] native format observers
-  const string_type &native() const noexcept;
-  const value_type *c_str() const noexcept;
-  operator string_type() const;
-  template <class EcharT, class traits = std::char_traits<EcharT>,
-            class Allocator = std::allocator<EcharT>>
-  std::basic_string<EcharT, traits, Allocator>
-  string(const Allocator &a = Allocator()) const;
-  std::string string() const;
-  std::wstring wstring() const;
+            path &assign(string_type &&source);
+
+            template<class Source>
+            path &operator=(const Source &source);
+
+            template<class Source>
+            path &assign(const Source &source);
+
+            template<class InputIterator>
+            path &assign(InputIterator first, InputIterator last);
+
+            // [fs.path.append] appends
+            path &operator/=(const path &p);
+
+            template<class Source>
+            path &operator/=(const Source &source);
+
+            template<class Source>
+            path &append(const Source &source);
+
+            template<class InputIterator>
+            path &append(InputIterator first, InputIterator last);
+
+            // [fs.path.concat] concatenation
+            path &operator+=(const path &x);
+
+            path &operator+=(const string_type &x);
+
+            path &operator+=(basic_string_view<value_type> x);
+
+            path &operator+=(const value_type *x);
+
+            path &operator+=(value_type x);
+
+            template<class Source>
+            path_from_string<Source> &operator+=(const Source &x);
+
+            template<class EcharT>
+            path_type_EcharT<EcharT> &operator+=(EcharT x);
+
+            template<class Source>
+            path &concat(const Source &x);
+
+            template<class InputIterator>
+            path &concat(InputIterator first, InputIterator last);
+
+            // [fs.path.modifiers] modifiers
+            void clear() noexcept;
+
+            path &make_preferred();
+
+            path &remove_filename();
+
+            path &replace_filename(const path &replacement);
+
+            path &replace_extension(const path &replacement = path());
+
+            void swap(path &rhs) noexcept;
+
+            // [fs.path.native.obs] native format observers
+            const string_type &native() const noexcept;
+
+            const value_type *c_str() const noexcept;
+
+            operator string_type() const;
+
+            template<class EcharT, class traits = std::char_traits<EcharT>,
+                    class Allocator = std::allocator<EcharT>>
+            std::basic_string<EcharT, traits, Allocator>
+            string(const Allocator &a = Allocator()) const;
+
+            std::string string() const;
+
+            std::wstring wstring() const;
+
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-  std::u8string u8string() const;
+            std::u8string u8string() const;
 #else
-  std::string u8string() const;
-#endif
-  std::u16string u16string() const;
-  std::u32string u32string() const;
 
-  // [fs.path.generic.obs] generic format observers
-  template <class EcharT, class traits = std::char_traits<EcharT>,
-            class Allocator = std::allocator<EcharT>>
-  std::basic_string<EcharT, traits, Allocator>
-  generic_string(const Allocator &a = Allocator()) const;
-  std::string generic_string() const;
-  std::wstring generic_wstring() const;
+            std::string u8string() const;
+
+#endif
+
+            std::u16string u16string() const;
+
+            std::u32string u32string() const;
+
+            // [fs.path.generic.obs] generic format observers
+            template<class EcharT, class traits = std::char_traits<EcharT>,
+                    class Allocator = std::allocator<EcharT>>
+            std::basic_string<EcharT, traits, Allocator>
+            generic_string(const Allocator &a = Allocator()) const;
+
+            std::string generic_string() const;
+
+            std::wstring generic_wstring() const;
+
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-  std::u8string generic_u8string() const;
+            std::u8string generic_u8string() const;
 #else
-  std::string generic_u8string() const;
+
+            std::string generic_u8string() const;
+
 #endif
-  std::u16string generic_u16string() const;
-  std::u32string generic_u32string() const;
 
-  // [fs.path.compare] compare
-  int compare(const path &p) const noexcept;
-  int compare(const string_type &s) const;
-  int compare(basic_string_view<value_type> s) const;
-  int compare(const value_type *s) const;
+            std::u16string generic_u16string() const;
 
-  // [fs.path.decompose] decomposition
-  path root_name() const;
-  path root_directory() const;
-  path root_path() const;
-  path relative_path() const;
-  path parent_path() const;
-  path filename() const;
-  path stem() const;
-  path extension() const;
+            std::u32string generic_u32string() const;
 
-  // [fs.path.query] query
-  bool empty() const noexcept;
-  bool has_root_name() const;
-  bool has_root_directory() const;
-  bool has_root_path() const;
-  bool has_relative_path() const;
-  bool has_parent_path() const;
-  bool has_filename() const;
-  bool has_stem() const;
-  bool has_extension() const;
-  bool is_absolute() const;
-  bool is_relative() const;
+            // [fs.path.compare] compare
+            int compare(const path &p) const noexcept;
 
-  // [fs.path.gen] generation
-  path lexically_normal() const;
-  path lexically_relative(const path &base) const;
-  path lexically_proximate(const path &base) const;
+            int compare(const string_type &s) const;
 
-  // [fs.path.itr] iterators
-  class iterator;
-  using const_iterator = iterator;
-  iterator begin() const;
-  iterator end() const;
+            int compare(basic_string_view<value_type> s) const;
 
-  template <typename H>
-  friend H TurboHashValue(H h, const path &p) {
-    return H::combine(std::move(h), p.string());
-  }
+            int compare(const value_type *s) const;
 
-private:
-  using impl_value_type = value_type;
-  using impl_string_type = std::basic_string<impl_value_type>;
-  friend class directory_iterator;
-  void append_name(const value_type *name);
-  static constexpr impl_value_type generic_separator = '/';
-  template <typename InputIterator> class input_iterator_range {
-  public:
-    typedef InputIterator iterator;
-    typedef InputIterator const_iterator;
-    typedef typename InputIterator::difference_type difference_type;
+            // [fs.path.decompose] decomposition
+            path root_name() const;
 
-    input_iterator_range(const InputIterator &first, const InputIterator &last)
-        : _first(first), _last(last) {}
+            path root_directory() const;
 
-    InputIterator begin() const { return _first; }
-    InputIterator end() const { return _last; }
+            path root_path() const;
 
-  private:
-    InputIterator _first;
-    InputIterator _last;
-  };
-  friend void swap(path &lhs, path &rhs) noexcept;
-  friend size_t hash_value(const path &p) noexcept;
-  friend path canonical(const path &p, std::error_code &ec);
-  friend bool create_directories(const path &p, std::error_code &ec) noexcept;
-  string_type::size_type root_name_length() const noexcept;
-  void postprocess_path_with_format(format fmt);
-  void check_long_path();
-  impl_string_type _path;
+            path relative_path() const;
+
+            path parent_path() const;
+
+            path filename() const;
+
+            path stem() const;
+
+            path extension() const;
+
+            // [fs.path.query] query
+            bool empty() const noexcept;
+
+            bool has_root_name() const;
+
+            bool has_root_directory() const;
+
+            bool has_root_path() const;
+
+            bool has_relative_path() const;
+
+            bool has_parent_path() const;
+
+            bool has_filename() const;
+
+            bool has_stem() const;
+
+            bool has_extension() const;
+
+            bool is_absolute() const;
+
+            bool is_relative() const;
+
+            // [fs.path.gen] generation
+            path lexically_normal() const;
+
+            path lexically_relative(const path &base) const;
+
+            path lexically_proximate(const path &base) const;
+
+            // [fs.path.itr] iterators
+            class iterator;
+
+            using const_iterator = iterator;
+
+            iterator begin() const;
+
+            iterator end() const;
+
+            template<typename H>
+            friend H TurboHashValue(H h, const path &p) {
+                return H::combine(std::move(h), p.string());
+            }
+
+        private:
+            using impl_value_type = value_type;
+            using impl_string_type = std::basic_string<impl_value_type>;
+
+            friend class directory_iterator;
+
+            void append_name(const value_type *name);
+
+            static constexpr impl_value_type generic_separator = '/';
+
+            template<typename InputIterator>
+            class input_iterator_range {
+            public:
+                typedef InputIterator iterator;
+                typedef InputIterator const_iterator;
+                typedef typename InputIterator::difference_type difference_type;
+
+                input_iterator_range(const InputIterator &first, const InputIterator &last)
+                        : _first(first), _last(last) {}
+
+                InputIterator begin() const { return _first; }
+
+                InputIterator end() const { return _last; }
+
+            private:
+                InputIterator _first;
+                InputIterator _last;
+            };
+
+            friend void swap(path &lhs, path &rhs) noexcept;
+
+            friend size_t hash_value(const path &p) noexcept;
+
+            friend path canonical(const path &p, std::error_code &ec);
+
+            friend bool create_directories(const path &p, std::error_code &ec) noexcept;
+
+            string_type::size_type root_name_length() const noexcept;
+
+            void postprocess_path_with_format(format fmt);
+
+            void check_long_path();
+
+            impl_string_type _path;
 #ifdef TURBO_PLATFORM_WINDOWS
-  void handle_prefixes();
+                                                                                                                                    void handle_prefixes();
   friend bool detail::has_executable_extension(const path &p);
 #ifdef TURBO_WIN_AUTO_PREFIX_LONG_PATH
   string_type::size_type _prefixLength{0};
@@ -479,646 +591,918 @@ private:
   static const string_type::size_type _prefixLength{0};
 #endif // TURBO_WIN_AUTO_PREFIX_LONG_PATH
 #else
-  static const string_type::size_type _prefixLength{0};
+            static const string_type::size_type _prefixLength{0};
 #endif
-};
+        };
 
 // [fs.path.nonmember] path non-member functions
-TURBO_DLL void swap(path &lhs, path &rhs) noexcept;
-TURBO_DLL size_t hash_value(const path &p) noexcept;
+        TURBO_DLL void swap(path & lhs, path & rhs)
+        noexcept;
+        TURBO_DLL size_t hash_value(const path &p) noexcept;
+
 #ifdef TURBO_HAVE_THREEWAY_COMP
-TURBO_DLL std::strong_ordering operator<=>(const path &lhs,
+                                                                                                                                TURBO_DLL std::strong_ordering operator<=>(const path &lhs,
                                            const path &rhs) noexcept;
 #endif
-TURBO_DLL bool operator==(const path &lhs, const path &rhs) noexcept;
-TURBO_DLL bool operator!=(const path &lhs, const path &rhs) noexcept;
-TURBO_DLL bool operator<(const path &lhs, const path &rhs) noexcept;
-TURBO_DLL bool operator<=(const path &lhs, const path &rhs) noexcept;
-TURBO_DLL bool operator>(const path &lhs, const path &rhs) noexcept;
-TURBO_DLL bool operator>=(const path &lhs, const path &rhs) noexcept;
-TURBO_DLL path operator/(const path &lhs, const path &rhs);
+        TURBO_DLL bool operator==(const path &lhs, const path &rhs) noexcept;
+
+        TURBO_DLL bool operator!=(const path &lhs, const path &rhs) noexcept;
+
+        TURBO_DLL bool operator<(const path &lhs, const path &rhs) noexcept;
+
+        TURBO_DLL bool operator<=(const path &lhs, const path &rhs) noexcept;
+
+        TURBO_DLL bool operator>(const path &lhs, const path &rhs) noexcept;
+
+        TURBO_DLL bool operator>=(const path &lhs, const path &rhs) noexcept;
+
+        TURBO_DLL path operator/(const path &lhs, const path &rhs);
 
 // [fs.path.io] path inserter and extractor
-template <class charT, class traits>
-std::basic_ostream<charT, traits> &
-operator<<(std::basic_ostream<charT, traits> &os, const path &p);
-template <class charT, class traits>
-std::basic_istream<charT, traits> &
-operator>>(std::basic_istream<charT, traits> &is, path &p);
+        template<class charT, class traits>
+        std::basic_ostream<charT, traits> &
+        operator<<(std::basic_ostream<charT, traits> &os, const path &p);
+
+        template<class charT, class traits>
+        std::basic_istream<charT, traits> &
+        operator>>(std::basic_istream<charT, traits> &is, path &p);
 
 // [pfs.path.factory] path factory functions
-template <class Source, typename = path::path_from_string<Source>>
+        template<class Source, typename = path::path_from_string<Source>>
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-[[deprecated("use turbo::filesystem::path::path() with std::u8string instead")]]
+        [[deprecated("use turbo::filesystem::path::path() with std::u8string instead")]]
 #endif
-path u8path(const Source& source);
-template <class InputIterator>
+        path u8path(const Source &source);
+
+        template<class InputIterator>
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-[[deprecated("use turbo::filesystem::path::path() with std::u8string instead")]]
+        [[deprecated("use turbo::filesystem::path::path() with std::u8string instead")]]
 #endif
-path u8path(InputIterator first, InputIterator last);
+        path u8path(InputIterator first, InputIterator last);
 
 // [fs.class.filesystem_error] class filesystem_error
-class TURBO_DLL filesystem_error : public std::system_error {
-public:
-  filesystem_error(const std::string &what_arg, std::error_code ec);
-  filesystem_error(const std::string &what_arg, const path &p1,
-                   std::error_code ec);
-  filesystem_error(const std::string &what_arg, const path &p1, const path &p2,
-                   std::error_code ec);
-  const path &path1() const noexcept;
-  const path &path2() const noexcept;
-  const char *what() const noexcept override;
+        class TURBO_DLL filesystem_error : public std::system_error {
+        public:
+            filesystem_error(const std::string &what_arg, std::error_code ec);
 
-private:
-  std::string _what_arg;
-  std::error_code _ec;
-  path _p1, _p2;
-};
+            filesystem_error(const std::string &what_arg, const path &p1,
+                             std::error_code ec);
 
-class TURBO_DLL path::iterator {
-public:
-  using value_type = const path;
-  using difference_type = std::ptrdiff_t;
-  using pointer = const path *;
-  using reference = const path &;
-  using iterator_category = std::bidirectional_iterator_tag;
+            filesystem_error(const std::string &what_arg, const path &p1, const path &p2,
+                             std::error_code ec);
 
-  iterator();
-  iterator(const path &p, const impl_string_type::const_iterator &pos);
-  iterator &operator++();
-  iterator operator++(int);
-  iterator &operator--();
-  iterator operator--(int);
-  bool operator==(const iterator &other) const;
-  bool operator!=(const iterator &other) const;
-  reference operator*() const;
-  pointer operator->() const;
+            const path &path1() const noexcept;
 
-private:
-  friend class path;
-  impl_string_type::const_iterator
-  increment(const impl_string_type::const_iterator &pos) const;
-  impl_string_type::const_iterator
-  decrement(const impl_string_type::const_iterator &pos) const;
-  void updateCurrent();
-  impl_string_type::const_iterator _first;
-  impl_string_type::const_iterator _last;
-  impl_string_type::const_iterator _prefix;
-  impl_string_type::const_iterator _root;
-  impl_string_type::const_iterator _iter;
-  path _current;
-};
+            const path &path2() const noexcept;
 
-struct space_info {
-  uintmax_t capacity{0};
-  uintmax_t free{0};
-  uintmax_t available{0};
-};
+            const char *what() const noexcept override;
+
+        private:
+            std::string _what_arg;
+            std::error_code _ec;
+            path _p1, _p2;
+        };
+
+        class TURBO_DLL path::iterator {
+        public:
+            using value_type = const path;
+            using difference_type = std::ptrdiff_t;
+            using pointer = const path *;
+            using reference = const path &;
+            using iterator_category = std::bidirectional_iterator_tag;
+
+            iterator();
+
+            iterator(const path &p, const impl_string_type::const_iterator &pos);
+
+            iterator &operator++();
+
+            iterator operator++(int);
+
+            iterator &operator--();
+
+            iterator operator--(int);
+
+            bool operator==(const iterator &other) const;
+
+            bool operator!=(const iterator &other) const;
+
+            reference operator*() const;
+
+            pointer operator->() const;
+
+        private:
+            friend class path;
+
+            impl_string_type::const_iterator
+            increment(const impl_string_type::const_iterator &pos) const;
+
+            impl_string_type::const_iterator
+            decrement(const impl_string_type::const_iterator &pos) const;
+
+            void updateCurrent();
+
+            impl_string_type::const_iterator _first;
+            impl_string_type::const_iterator _last;
+            impl_string_type::const_iterator _prefix;
+            impl_string_type::const_iterator _root;
+            impl_string_type::const_iterator _iter;
+            path _current;
+        };
+
+        struct space_info {
+            uintmax_t capacity{0};
+            uintmax_t free{0};
+            uintmax_t available{0};
+        };
 
 // [fs.enum] enumerations
 // [fs.enum.file_type]
-enum class file_type {
-  none,
-  not_found,
-  regular,
-  directory,
-  symlink,
-  block,
-  character,
-  fifo,
-  socket,
-  unknown,
-};
+        enum class file_type {
+            none,
+            not_found,
+            regular,
+            directory,
+            symlink,
+            block,
+            character,
+            fifo,
+            socket,
+            unknown,
+        };
 
 // [fs.enum.perms]
-enum class perms : uint16_t {
-  none = 0,
+        enum class perms : uint16_t {
+            none = 0,
 
-  owner_read = 0400,
-  owner_write = 0200,
-  owner_exec = 0100,
-  owner_all = 0700,
+            owner_read = 0400,
+            owner_write = 0200,
+            owner_exec = 0100,
+            owner_all = 0700,
 
-  group_read = 040,
-  group_write = 020,
-  group_exec = 010,
-  group_all = 070,
+            group_read = 040,
+            group_write = 020,
+            group_exec = 010,
+            group_all = 070,
 
-  others_read = 04,
-  others_write = 02,
-  others_exec = 01,
-  others_all = 07,
+            others_read = 04,
+            others_write = 02,
+            others_exec = 01,
+            others_all = 07,
 
-  all = 0777,
-  set_uid = 04000,
-  set_gid = 02000,
-  sticky_bit = 01000,
+            all = 0777,
+            set_uid = 04000,
+            set_gid = 02000,
+            sticky_bit = 01000,
 
-  mask = 07777,
-  unknown = 0xffff
-};
+            mask = 07777,
+            unknown = 0xffff
+        };
 
 // [fs.enum.perm.opts]
-enum class perm_options : uint16_t {
-  replace = 3,
-  add = 1,
-  remove = 2,
-  nofollow = 4,
-};
+        enum class perm_options : uint16_t {
+            replace = 3,
+            add = 1,
+            remove = 2,
+            nofollow = 4,
+        };
 
 // [fs.enum.copy.opts]
-enum class copy_options : uint16_t {
-  none = 0,
+        enum class copy_options : uint16_t {
+            none = 0,
 
-  skip_existing = 1,
-  overwrite_existing = 2,
-  update_existing = 4,
+            skip_existing = 1,
+            overwrite_existing = 2,
+            update_existing = 4,
 
-  recursive = 8,
+            recursive = 8,
 
-  copy_symlinks = 0x10,
-  skip_symlinks = 0x20,
+            copy_symlinks = 0x10,
+            skip_symlinks = 0x20,
 
-  directories_only = 0x40,
-  create_symlinks = 0x80,
+            directories_only = 0x40,
+            create_symlinks = 0x80,
 #ifndef TURBO_PLATFORM_WEB
-  create_hard_links = 0x100
+            create_hard_links = 0x100
 #endif
-};
+        };
 
 // [fs.enum.dir.opts]
-enum class directory_options : uint16_t {
-  none = 0,
-  follow_directory_symlink = 1,
-  skip_permission_denied = 2,
-};
+        enum class directory_options : uint16_t {
+            none = 0,
+            follow_directory_symlink = 1,
+            skip_permission_denied = 2,
+        };
 
 // [fs.class.file_status] class file_status
-class TURBO_DLL file_status {
-public:
-  // [fs.file_status.cons] constructors and destructor
-  file_status() noexcept;
-  explicit file_status(file_type ft, perms prms = perms::unknown) noexcept;
-  file_status(const file_status &) noexcept;
-  file_status(file_status &&) noexcept;
-  ~file_status();
-  // assignments:
-  file_status &operator=(const file_status &) noexcept;
-  file_status &operator=(file_status &&) noexcept;
-  // [fs.file_status.mods] modifiers
-  void type(file_type ft) noexcept;
-  void permissions(perms prms) noexcept;
-  // [fs.file_status.obs] observers
-  file_type type() const noexcept;
-  perms permissions() const noexcept;
-  friend bool operator==(const file_status &lhs,
-                         const file_status &rhs) noexcept {
-    return lhs.type() == rhs.type() && lhs.permissions() == rhs.permissions();
-  }
+        class TURBO_DLL file_status {
+        public:
+            // [fs.file_status.cons] constructors and destructor
+            file_status() noexcept;
 
-private:
-  file_type _type;
-  perms _perms;
-};
+            explicit file_status(file_type ft, perms prms = perms::unknown) noexcept;
 
-using file_time_type = std::chrono::time_point<std::chrono::system_clock>;
+            file_status(const file_status &) noexcept;
+
+            file_status(file_status &&) noexcept;
+
+            ~file_status();
+
+            // assignments:
+            file_status &operator=(const file_status &) noexcept;
+
+            file_status &operator=(file_status &&) noexcept;
+
+            // [fs.file_status.mods] modifiers
+            void type(file_type ft) noexcept;
+
+            void permissions(perms prms) noexcept;
+
+            // [fs.file_status.obs] observers
+            file_type type() const noexcept;
+
+            perms permissions() const noexcept;
+
+            friend bool operator==(const file_status &lhs,
+                                   const file_status &rhs) noexcept {
+                return lhs.type() == rhs.type() && lhs.permissions() == rhs.permissions();
+            }
+
+        private:
+            file_type _type;
+            perms _perms;
+        };
+
+        using file_time_type = std::chrono::time_point<std::chrono::system_clock>;
 
 // [fs.class.directory_entry] Class directory_entry
-class TURBO_DLL directory_entry {
-public:
-  // [fs.dir.entry.cons] constructors and destructor
-  directory_entry() noexcept = default;
-  directory_entry(const directory_entry &) = default;
-  directory_entry(directory_entry &&) noexcept = default;
-#ifdef TURBO_HAVE_EXCEPTIONS
-  explicit directory_entry(const path &p);
-#endif
-  directory_entry(const path &p, std::error_code &ec);
-  ~directory_entry();
+        class TURBO_DLL directory_entry {
+        public:
+            // [fs.dir.entry.cons] constructors and destructor
+            directory_entry() noexcept = default;
 
-  // assignments:
-  directory_entry &operator=(const directory_entry &) = default;
-  directory_entry &operator=(directory_entry &&) noexcept = default;
+            directory_entry(const directory_entry &) = default;
 
-  // [fs.dir.entry.mods] modifiers
-#ifdef TURBO_HAVE_EXCEPTIONS
-  void assign(const path &p);
-  void replace_filename(const path &p);
-  void refresh();
-#endif
-  void assign(const path &p, std::error_code &ec);
-  void replace_filename(const path &p, std::error_code &ec);
-  void refresh(std::error_code &ec) noexcept;
+            directory_entry(directory_entry &&) noexcept = default;
 
-  // [fs.dir.entry.obs] observers
-  const filesystem::path &path() const noexcept;
-  operator const filesystem::path &() const noexcept;
 #ifdef TURBO_HAVE_EXCEPTIONS
-  bool exists() const;
-  bool is_block_file() const;
-  bool is_character_file() const;
-  bool is_directory() const;
-  bool is_fifo() const;
-  bool is_other() const;
-  bool is_regular_file() const;
-  bool is_socket() const;
-  bool is_symlink() const;
-  uintmax_t file_size() const;
-  file_time_type last_write_time() const;
-  file_status status() const;
-  file_status symlink_status() const;
+
+            explicit directory_entry(const path &p);
+
 #endif
-  bool exists(std::error_code &ec) const noexcept;
-  bool is_block_file(std::error_code &ec) const noexcept;
-  bool is_character_file(std::error_code &ec) const noexcept;
-  bool is_directory(std::error_code &ec) const noexcept;
-  bool is_fifo(std::error_code &ec) const noexcept;
-  bool is_other(std::error_code &ec) const noexcept;
-  bool is_regular_file(std::error_code &ec) const noexcept;
-  bool is_socket(std::error_code &ec) const noexcept;
-  bool is_symlink(std::error_code &ec) const noexcept;
-  uintmax_t file_size(std::error_code &ec) const noexcept;
-  file_time_type last_write_time(std::error_code &ec) const noexcept;
-  file_status status(std::error_code &ec) const noexcept;
-  file_status symlink_status(std::error_code &ec) const noexcept;
+
+            directory_entry(const path &p, std::error_code &ec);
+
+            ~directory_entry();
+
+            // assignments:
+            directory_entry &operator=(const directory_entry &) = default;
+
+            directory_entry &operator=(directory_entry &&) noexcept = default;
+
+            // [fs.dir.entry.mods] modifiers
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+            void assign(const path &p);
+
+            void replace_filename(const path &p);
+
+            void refresh();
+
+#endif
+
+            void assign(const path &p, std::error_code &ec);
+
+            void replace_filename(const path &p, std::error_code &ec);
+
+            void refresh(std::error_code &ec) noexcept;
+
+            // [fs.dir.entry.obs] observers
+            const filesystem::path &path() const noexcept;
+
+            operator const filesystem::path &() const noexcept;
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+            bool exists() const;
+
+            bool is_block_file() const;
+
+            bool is_character_file() const;
+
+            bool is_directory() const;
+
+            bool is_fifo() const;
+
+            bool is_other() const;
+
+            bool is_regular_file() const;
+
+            bool is_socket() const;
+
+            bool is_symlink() const;
+
+            uintmax_t file_size() const;
+
+            file_time_type last_write_time() const;
+
+            file_status status() const;
+
+            file_status symlink_status() const;
+
+#endif
+
+            bool exists(std::error_code &ec) const noexcept;
+
+            bool is_block_file(std::error_code &ec) const noexcept;
+
+            bool is_character_file(std::error_code &ec) const noexcept;
+
+            bool is_directory(std::error_code &ec) const noexcept;
+
+            bool is_fifo(std::error_code &ec) const noexcept;
+
+            bool is_other(std::error_code &ec) const noexcept;
+
+            bool is_regular_file(std::error_code &ec) const noexcept;
+
+            bool is_socket(std::error_code &ec) const noexcept;
+
+            bool is_symlink(std::error_code &ec) const noexcept;
+
+            uintmax_t file_size(std::error_code &ec) const noexcept;
+
+            file_time_type last_write_time(std::error_code &ec) const noexcept;
+
+            file_status status(std::error_code &ec) const noexcept;
+
+            file_status symlink_status(std::error_code &ec) const noexcept;
 
 #ifndef TURBO_PLATFORM_WEB
 #ifdef TURBO_HAVE_EXCEPTIONS
-  uintmax_t hard_link_count() const;
+
+            uintmax_t hard_link_count() const;
+
 #endif
-  uintmax_t hard_link_count(std::error_code &ec) const noexcept;
+
+            uintmax_t hard_link_count(std::error_code &ec) const noexcept;
+
 #endif
 
 #ifdef TURBO_HAVE_THREEWAY_COMP
-  std::strong_ordering operator<=>(const directory_entry &rhs) const noexcept;
+            std::strong_ordering operator<=>(const directory_entry &rhs) const noexcept;
 #endif
-  bool operator<(const directory_entry &rhs) const noexcept;
-  bool operator==(const directory_entry &rhs) const noexcept;
-  bool operator!=(const directory_entry &rhs) const noexcept;
-  bool operator<=(const directory_entry &rhs) const noexcept;
-  bool operator>(const directory_entry &rhs) const noexcept;
-  bool operator>=(const directory_entry &rhs) const noexcept;
 
-private:
-  friend class directory_iterator;
+            bool operator<(const directory_entry &rhs) const noexcept;
+
+            bool operator==(const directory_entry &rhs) const noexcept;
+
+            bool operator!=(const directory_entry &rhs) const noexcept;
+
+            bool operator<=(const directory_entry &rhs) const noexcept;
+
+            bool operator>(const directory_entry &rhs) const noexcept;
+
+            bool operator>=(const directory_entry &rhs) const noexcept;
+
+        private:
+            friend class directory_iterator;
+
 #ifdef TURBO_HAVE_EXCEPTIONS
-  file_type status_file_type() const;
+
+            file_type status_file_type() const;
+
 #endif
-  file_type status_file_type(std::error_code &ec) const noexcept;
-  filesystem::path _path;
-  file_status _status;
-  file_status _symlink_status;
-  uintmax_t _file_size = static_cast<uintmax_t>(-1);
+
+            file_type status_file_type(std::error_code &ec) const noexcept;
+
+            filesystem::path _path;
+            file_status _status;
+            file_status _symlink_status;
+            uintmax_t _file_size = static_cast<uintmax_t>(-1);
 #ifndef TURBO_PLATFORM_WINDOWS
-  uintmax_t _hard_link_count = static_cast<uintmax_t>(-1);
+            uintmax_t _hard_link_count = static_cast<uintmax_t>(-1);
 #endif
-  time_t _last_write_time = 0;
-};
+            time_t _last_write_time = 0;
+        };
 
 // [fs.class.directory.iterator] Class directory_iterator
-class TURBO_DLL directory_iterator {
-public:
-  class TURBO_DLL proxy {
-  public:
-    const directory_entry &operator*() const &noexcept { return _dir_entry; }
-    directory_entry operator*() &&noexcept { return std::move(_dir_entry); }
+        class TURBO_DLL directory_iterator {
+        public:
+            class TURBO_DLL proxy {
+            public:
+                const directory_entry &operator*() const & noexcept { return _dir_entry; }
 
-  private:
-    explicit proxy(const directory_entry &dir_entry) : _dir_entry(dir_entry) {}
-    friend class directory_iterator;
-    friend class recursive_directory_iterator;
-    directory_entry _dir_entry;
-  };
-  using iterator_category = std::input_iterator_tag;
-  using value_type = directory_entry;
-  using difference_type = std::ptrdiff_t;
-  using pointer = const directory_entry *;
-  using reference = const directory_entry &;
+                directory_entry operator*() && noexcept { return std::move(_dir_entry); }
 
-  // [fs.dir.itr.members] member functions
-  directory_iterator() noexcept;
+            private:
+                explicit proxy(const directory_entry &dir_entry) : _dir_entry(dir_entry) {}
+
+                friend class directory_iterator;
+
+                friend class recursive_directory_iterator;
+
+                directory_entry _dir_entry;
+            };
+
+            using iterator_category = std::input_iterator_tag;
+            using value_type = directory_entry;
+            using difference_type = std::ptrdiff_t;
+            using pointer = const directory_entry *;
+            using reference = const directory_entry &;
+
+            // [fs.dir.itr.members] member functions
+            directory_iterator() noexcept;
+
 #ifdef TURBO_HAVE_EXCEPTIONS
-  explicit directory_iterator(const path &p);
-  directory_iterator(const path &p, directory_options options);
-#endif
-  directory_iterator(const path &p, std::error_code &ec) noexcept;
-  directory_iterator(const path &p, directory_options options,
-                     std::error_code &ec) noexcept;
-  directory_iterator(const directory_iterator &rhs);
-  directory_iterator(directory_iterator &&rhs) noexcept;
-  ~directory_iterator();
-  directory_iterator &operator=(const directory_iterator &rhs);
-  directory_iterator &operator=(directory_iterator &&rhs) noexcept;
-  const directory_entry &operator*() const;
-  const directory_entry *operator->() const;
-#ifdef TURBO_HAVE_EXCEPTIONS
-  directory_iterator &operator++();
-#endif
-  directory_iterator &increment(std::error_code &ec) noexcept;
 
-  // other members as required by [input.iterators]
-#ifdef TURBO_HAVE_EXCEPTIONS
-  proxy operator++(int) {
-    proxy p{**this};
-    ++*this;
-    return p;
-  }
-#endif
-  bool operator==(const directory_iterator &rhs) const;
-  bool operator!=(const directory_iterator &rhs) const;
+            explicit directory_iterator(const path &p);
 
-private:
-  friend class recursive_directory_iterator;
-  class impl;
-  std::shared_ptr<impl> _impl;
-};
+            directory_iterator(const path &p, directory_options options);
+
+#endif
+
+            directory_iterator(const path &p, std::error_code &ec) noexcept;
+
+            directory_iterator(const path &p, directory_options options,
+                               std::error_code &ec) noexcept;
+
+            directory_iterator(const directory_iterator &rhs);
+
+            directory_iterator(directory_iterator &&rhs) noexcept;
+
+            ~directory_iterator();
+
+            directory_iterator &operator=(const directory_iterator &rhs);
+
+            directory_iterator &operator=(directory_iterator &&rhs) noexcept;
+
+            const directory_entry &operator*() const;
+
+            const directory_entry *operator->() const;
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+            directory_iterator &operator++();
+
+#endif
+
+            directory_iterator &increment(std::error_code &ec) noexcept;
+
+            // other members as required by [input.iterators]
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+            proxy operator++(int) {
+                proxy p{**this};
+                ++*this;
+                return p;
+            }
+
+#endif
+
+            bool operator==(const directory_iterator &rhs) const;
+
+            bool operator!=(const directory_iterator &rhs) const;
+
+        private:
+            friend class recursive_directory_iterator;
+
+            class impl;
+
+            std::shared_ptr<impl> _impl;
+        };
 
 // [fs.dir.itr.nonmembers] directory_iterator non-member functions
-TURBO_DLL directory_iterator begin(directory_iterator iter) noexcept;
-TURBO_DLL directory_iterator end(const directory_iterator &) noexcept;
+        TURBO_DLL directory_iterator begin(directory_iterator iter) noexcept;
+
+        TURBO_DLL directory_iterator end(const directory_iterator &) noexcept;
 
 // [fs.class.re.dir.itr] class recursive_directory_iterator
-class TURBO_DLL recursive_directory_iterator {
-public:
-  using iterator_category = std::input_iterator_tag;
-  using value_type = directory_entry;
-  using difference_type = std::ptrdiff_t;
-  using pointer = const directory_entry *;
-  using reference = const directory_entry &;
+        class TURBO_DLL recursive_directory_iterator {
+        public:
+            using iterator_category = std::input_iterator_tag;
+            using value_type = directory_entry;
+            using difference_type = std::ptrdiff_t;
+            using pointer = const directory_entry *;
+            using reference = const directory_entry &;
 
-  // [fs.rec.dir.itr.members] constructors and destructor
-  recursive_directory_iterator() noexcept;
-#ifdef TURBO_HAVE_EXCEPTIONS
-  explicit recursive_directory_iterator(const path &p);
-  recursive_directory_iterator(const path &p, directory_options options);
-#endif
-  recursive_directory_iterator(const path &p, directory_options options,
-                               std::error_code &ec) noexcept;
-  recursive_directory_iterator(const path &p, std::error_code &ec) noexcept;
-  recursive_directory_iterator(const recursive_directory_iterator &rhs);
-  recursive_directory_iterator(recursive_directory_iterator &&rhs) noexcept;
-  ~recursive_directory_iterator();
-
-  // [fs.rec.dir.itr.members] observers
-  directory_options options() const;
-  int depth() const;
-  bool recursion_pending() const;
-
-  const directory_entry &operator*() const;
-  const directory_entry *operator->() const;
-
-  // [fs.rec.dir.itr.members] modifiers recursive_directory_iterator&
-  recursive_directory_iterator &
-  operator=(const recursive_directory_iterator &rhs);
-  recursive_directory_iterator &
-  operator=(recursive_directory_iterator &&rhs) noexcept;
-#ifdef TURBO_HAVE_EXCEPTIONS
-  recursive_directory_iterator &operator++();
-#endif
-  recursive_directory_iterator &increment(std::error_code &ec) noexcept;
+            // [fs.rec.dir.itr.members] constructors and destructor
+            recursive_directory_iterator() noexcept;
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-  void pop();
-#endif
-  void pop(std::error_code &ec);
-  void disable_recursion_pending();
 
-  // other members as required by [input.iterators]
+            explicit recursive_directory_iterator(const path &p);
+
+            recursive_directory_iterator(const path &p, directory_options options);
+
+#endif
+
+            recursive_directory_iterator(const path &p, directory_options options,
+                                         std::error_code &ec) noexcept;
+
+            recursive_directory_iterator(const path &p, std::error_code &ec) noexcept;
+
+            recursive_directory_iterator(const recursive_directory_iterator &rhs);
+
+            recursive_directory_iterator(recursive_directory_iterator &&rhs) noexcept;
+
+            ~recursive_directory_iterator();
+
+            // [fs.rec.dir.itr.members] observers
+            directory_options options() const;
+
+            int depth() const;
+
+            bool recursion_pending() const;
+
+            const directory_entry &operator*() const;
+
+            const directory_entry *operator->() const;
+
+            // [fs.rec.dir.itr.members] modifiers recursive_directory_iterator&
+            recursive_directory_iterator &
+            operator=(const recursive_directory_iterator &rhs);
+
+            recursive_directory_iterator &
+            operator=(recursive_directory_iterator &&rhs) noexcept;
+
 #ifdef TURBO_HAVE_EXCEPTIONS
-  directory_iterator::proxy operator++(int) {
-    directory_iterator::proxy proxy{**this};
-    ++*this;
-    return proxy;
-  }
-#endif
-  bool operator==(const recursive_directory_iterator &rhs) const;
-  bool operator!=(const recursive_directory_iterator &rhs) const;
 
-private:
-  struct recursive_directory_iterator_impl {
-    directory_options _options;
-    bool _recursion_pending;
-    std::stack<directory_iterator> _dir_iter_stack;
-    recursive_directory_iterator_impl(directory_options options,
-                                      bool recursion_pending)
-        : _options(options), _recursion_pending(recursion_pending) {}
-  };
-  std::shared_ptr<recursive_directory_iterator_impl> _impl;
-};
+            recursive_directory_iterator &operator++();
+
+#endif
+
+            recursive_directory_iterator &increment(std::error_code &ec) noexcept;
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+            void pop();
+
+#endif
+
+            void pop(std::error_code &ec);
+
+            void disable_recursion_pending();
+
+            // other members as required by [input.iterators]
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+            directory_iterator::proxy operator++(int) {
+                directory_iterator::proxy proxy{**this};
+                ++*this;
+                return proxy;
+            }
+
+#endif
+
+            bool operator==(const recursive_directory_iterator &rhs) const;
+
+            bool operator!=(const recursive_directory_iterator &rhs) const;
+
+        private:
+            struct recursive_directory_iterator_impl {
+                directory_options _options;
+                bool _recursion_pending;
+                std::stack<directory_iterator> _dir_iter_stack;
+
+                recursive_directory_iterator_impl(directory_options options,
+                                                  bool recursion_pending)
+                        : _options(options), _recursion_pending(recursion_pending) {}
+            };
+
+            std::shared_ptr<recursive_directory_iterator_impl> _impl;
+        };
 
 // [fs.rec.dir.itr.nonmembers] directory_iterator non-member functions
-TURBO_DLL recursive_directory_iterator
-begin(recursive_directory_iterator iter) noexcept;
-TURBO_DLL recursive_directory_iterator
-end(const recursive_directory_iterator &) noexcept;
+        TURBO_DLL recursive_directory_iterator
+        begin(recursive_directory_iterator iter) noexcept;
+
+        TURBO_DLL recursive_directory_iterator
+        end(const recursive_directory_iterator &) noexcept;
 
 // [fs.op.funcs] filesystem operations
 #ifdef TURBO_HAVE_EXCEPTIONS
-TURBO_DLL path absolute(const path &p);
-TURBO_DLL path canonical(const path &p);
-TURBO_DLL void copy(const path &from, const path &to);
-TURBO_DLL void copy(const path &from, const path &to, copy_options options);
-TURBO_DLL bool copy_file(const path &from, const path &to);
-TURBO_DLL bool copy_file(const path &from, const path &to, copy_options option);
-TURBO_DLL void copy_symlink(const path &existing_symlink,
-                            const path &new_symlink);
-TURBO_DLL bool create_directories(const path &p);
-TURBO_DLL bool create_directory(const path &p);
-TURBO_DLL bool create_directory(const path &p, const path &attributes);
-TURBO_DLL void create_directory_symlink(const path &to,
-                                        const path &new_symlink);
-TURBO_DLL void create_symlink(const path &to, const path &new_symlink);
-TURBO_DLL path current_path();
-TURBO_DLL void current_path(const path &p);
-TURBO_DLL bool exists(const path &p);
-TURBO_DLL bool equivalent(const path &p1, const path &p2);
-TURBO_DLL uintmax_t file_size(const path &p);
-TURBO_DLL bool is_block_file(const path &p);
-TURBO_DLL bool is_character_file(const path &p);
-TURBO_DLL bool is_directory(const path &p);
-TURBO_DLL bool is_empty(const path &p);
-TURBO_DLL bool is_fifo(const path &p);
-TURBO_DLL bool is_other(const path &p);
-TURBO_DLL bool is_regular_file(const path &p);
-TURBO_DLL bool is_socket(const path &p);
-TURBO_DLL bool is_symlink(const path &p);
-TURBO_DLL file_time_type last_write_time(const path &p);
-TURBO_DLL void last_write_time(const path &p, file_time_type new_time);
-TURBO_DLL void permissions(const path &p, perms prms,
-                           perm_options opts = perm_options::replace);
-TURBO_DLL path proximate(const path &p, const path &base = current_path());
-TURBO_DLL path read_symlink(const path &p);
-TURBO_DLL path relative(const path &p, const path &base = current_path());
-TURBO_DLL bool remove(const path &p);
-TURBO_DLL uintmax_t remove_all(const path &p);
-TURBO_DLL void rename(const path &from, const path &to);
-TURBO_DLL void resize_file(const path &p, uintmax_t size);
-TURBO_DLL space_info space(const path &p);
-TURBO_DLL file_status status(const path &p);
-TURBO_DLL file_status symlink_status(const path &p);
-TURBO_DLL path temp_directory_path();
-TURBO_DLL path weakly_canonical(const path &p);
+        TURBO_DLL path absolute(const path &p);
+
+        TURBO_DLL path canonical(const path &p);
+
+        TURBO_DLL void copy(const path &from, const path &to);
+
+        TURBO_DLL void copy(const path &from, const path &to, copy_options options);
+
+        TURBO_DLL bool copy_file(const path &from, const path &to);
+
+        TURBO_DLL bool copy_file(const path &from, const path &to, copy_options option);
+
+        TURBO_DLL void copy_symlink(const path &existing_symlink,
+                                    const path &new_symlink);
+
+        TURBO_DLL bool create_directories(const path &p);
+
+        TURBO_DLL bool create_directory(const path &p);
+
+        TURBO_DLL bool create_directory(const path &p, const path &attributes);
+
+        TURBO_DLL void create_directory_symlink(const path &to,
+                                                const path &new_symlink);
+
+        TURBO_DLL void create_symlink(const path &to, const path &new_symlink);
+
+        TURBO_DLL path current_path();
+
+        TURBO_DLL void current_path(const path &p);
+
+        TURBO_DLL bool exists(const path &p);
+
+        TURBO_DLL bool equivalent(const path &p1, const path &p2);
+
+        TURBO_DLL uintmax_t file_size(const path &p);
+
+        TURBO_DLL bool is_block_file(const path &p);
+
+        TURBO_DLL bool is_character_file(const path &p);
+
+        TURBO_DLL bool is_directory(const path &p);
+
+        TURBO_DLL bool is_empty(const path &p);
+
+        TURBO_DLL bool is_fifo(const path &p);
+
+        TURBO_DLL bool is_other(const path &p);
+
+        TURBO_DLL bool is_regular_file(const path &p);
+
+        TURBO_DLL bool is_socket(const path &p);
+
+        TURBO_DLL bool is_symlink(const path &p);
+
+        TURBO_DLL file_time_type last_write_time(const path &p);
+
+        TURBO_DLL void last_write_time(const path &p, file_time_type new_time);
+
+        TURBO_DLL void permissions(const path &p, perms prms,
+                                   perm_options opts = perm_options::replace);
+
+        TURBO_DLL path proximate(const path &p, const path &base = current_path());
+
+        TURBO_DLL path read_symlink(const path &p);
+
+        TURBO_DLL path relative(const path &p, const path &base = current_path());
+
+        TURBO_DLL bool remove(const path &p);
+
+        TURBO_DLL uintmax_t remove_all(const path &p);
+
+        TURBO_DLL void rename(const path &from, const path &to);
+
+        TURBO_DLL void resize_file(const path &p, uintmax_t size);
+
+        TURBO_DLL space_info space(const path &p);
+
+        TURBO_DLL file_status status(const path &p);
+
+        TURBO_DLL file_status symlink_status(const path &p);
+
+        TURBO_DLL path temp_directory_path();
+
+        TURBO_DLL path weakly_canonical(const path &p);
+
 #endif
-TURBO_DLL path absolute(const path &p, std::error_code &ec);
-TURBO_DLL path canonical(const path &p, std::error_code &ec);
-TURBO_DLL void copy(const path &from, const path &to,
-                    std::error_code &ec) noexcept;
-TURBO_DLL void copy(const path &from, const path &to, copy_options options,
-                    std::error_code &ec) noexcept;
-TURBO_DLL bool copy_file(const path &from, const path &to,
-                         std::error_code &ec) noexcept;
-TURBO_DLL bool copy_file(const path &from, const path &to, copy_options option,
-                         std::error_code &ec) noexcept;
-TURBO_DLL void copy_symlink(const path &existing_symlink,
-                            const path &new_symlink,
+        TURBO_DLL path absolute(const path &p, std::error_code &ec);
+
+        TURBO_DLL path canonical(const path &p, std::error_code &ec);
+
+        TURBO_DLL void copy(const path &from, const path &to,
                             std::error_code &ec) noexcept;
-TURBO_DLL bool create_directories(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool create_directory(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool create_directory(const path &p, const path &attributes,
-                                std::error_code &ec) noexcept;
-TURBO_DLL void create_directory_symlink(const path &to, const path &new_symlink,
+
+        TURBO_DLL void copy(const path &from, const path &to, copy_options options,
+                            std::error_code &ec) noexcept;
+
+        TURBO_DLL bool copy_file(const path &from, const path &to,
+                                 std::error_code &ec) noexcept;
+
+        TURBO_DLL bool copy_file(const path &from, const path &to, copy_options option,
+                                 std::error_code &ec) noexcept;
+
+        TURBO_DLL void copy_symlink(const path &existing_symlink,
+                                    const path &new_symlink,
+                                    std::error_code &ec) noexcept;
+
+        TURBO_DLL bool create_directories(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool create_directory(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool create_directory(const path &p, const path &attributes,
                                         std::error_code &ec) noexcept;
-TURBO_DLL void create_symlink(const path &to, const path &new_symlink,
+
+        TURBO_DLL void create_directory_symlink(const path &to, const path &new_symlink,
+                                                std::error_code &ec) noexcept;
+
+        TURBO_DLL void create_symlink(const path &to, const path &new_symlink,
+                                      std::error_code &ec) noexcept;
+
+        TURBO_DLL path current_path(std::error_code &ec);
+
+        TURBO_DLL void current_path(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool exists(file_status s) noexcept;
+
+        TURBO_DLL bool exists(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool equivalent(const path &p1, const path &p2,
+                                  std::error_code &ec) noexcept;
+
+        TURBO_DLL uintmax_t file_size(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_block_file(file_status s) noexcept;
+
+        TURBO_DLL bool is_block_file(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_character_file(file_status s) noexcept;
+
+        TURBO_DLL bool is_character_file(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_directory(file_status s) noexcept;
+
+        TURBO_DLL bool is_directory(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_empty(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_fifo(file_status s) noexcept;
+
+        TURBO_DLL bool is_fifo(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_other(file_status s) noexcept;
+
+        TURBO_DLL bool is_other(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_regular_file(file_status s) noexcept;
+
+        TURBO_DLL bool is_regular_file(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_socket(file_status s) noexcept;
+
+        TURBO_DLL bool is_socket(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool is_symlink(file_status s) noexcept;
+
+        TURBO_DLL bool is_symlink(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL file_time_type last_write_time(const path &p,
+                                                 std::error_code &ec) noexcept;
+
+        TURBO_DLL void last_write_time(const path &p, file_time_type new_time,
+                                       std::error_code &ec) noexcept;
+
+        TURBO_DLL void permissions(const path &p, perms prms,
+                                   std::error_code &ec) noexcept;
+
+        TURBO_DLL void permissions(const path &p, perms prms, perm_options opts,
+                                   std::error_code &ec) noexcept;
+
+        TURBO_DLL path proximate(const path &p, std::error_code &ec);
+
+        TURBO_DLL path proximate(const path &p, const path &base, std::error_code &ec);
+
+        TURBO_DLL path read_symlink(const path &p, std::error_code &ec);
+
+        TURBO_DLL path relative(const path &p, std::error_code &ec);
+
+        TURBO_DLL path relative(const path &p, const path &base, std::error_code &ec);
+
+        TURBO_DLL bool remove(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL uintmax_t remove_all(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL void rename(const path &from, const path &to,
                               std::error_code &ec) noexcept;
-TURBO_DLL path current_path(std::error_code &ec);
-TURBO_DLL void current_path(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool exists(file_status s) noexcept;
-TURBO_DLL bool exists(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool equivalent(const path &p1, const path &p2,
-                          std::error_code &ec) noexcept;
-TURBO_DLL uintmax_t file_size(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_block_file(file_status s) noexcept;
-TURBO_DLL bool is_block_file(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_character_file(file_status s) noexcept;
-TURBO_DLL bool is_character_file(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_directory(file_status s) noexcept;
-TURBO_DLL bool is_directory(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_empty(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_fifo(file_status s) noexcept;
-TURBO_DLL bool is_fifo(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_other(file_status s) noexcept;
-TURBO_DLL bool is_other(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_regular_file(file_status s) noexcept;
-TURBO_DLL bool is_regular_file(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_socket(file_status s) noexcept;
-TURBO_DLL bool is_socket(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool is_symlink(file_status s) noexcept;
-TURBO_DLL bool is_symlink(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL file_time_type last_write_time(const path &p,
-                                         std::error_code &ec) noexcept;
-TURBO_DLL void last_write_time(const path &p, file_time_type new_time,
-                               std::error_code &ec) noexcept;
-TURBO_DLL void permissions(const path &p, perms prms,
-                           std::error_code &ec) noexcept;
-TURBO_DLL void permissions(const path &p, perms prms, perm_options opts,
-                           std::error_code &ec) noexcept;
-TURBO_DLL path proximate(const path &p, std::error_code &ec);
-TURBO_DLL path proximate(const path &p, const path &base, std::error_code &ec);
-TURBO_DLL path read_symlink(const path &p, std::error_code &ec);
-TURBO_DLL path relative(const path &p, std::error_code &ec);
-TURBO_DLL path relative(const path &p, const path &base, std::error_code &ec);
-TURBO_DLL bool remove(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL uintmax_t remove_all(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL void rename(const path &from, const path &to,
-                      std::error_code &ec) noexcept;
-TURBO_DLL void resize_file(const path &p, uintmax_t size,
-                           std::error_code &ec) noexcept;
-TURBO_DLL space_info space(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL file_status status(const path &p, std::error_code &ec) noexcept;
-TURBO_DLL bool status_known(file_status s) noexcept;
-TURBO_DLL file_status symlink_status(const path &p,
-                                     std::error_code &ec) noexcept;
-TURBO_DLL path temp_directory_path(std::error_code &ec) noexcept;
-TURBO_DLL path weakly_canonical(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL void resize_file(const path &p, uintmax_t size,
+                                   std::error_code &ec) noexcept;
+
+        TURBO_DLL space_info space(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL file_status status(const path &p, std::error_code &ec) noexcept;
+
+        TURBO_DLL bool status_known(file_status s) noexcept;
+
+        TURBO_DLL file_status symlink_status(const path &p,
+                                             std::error_code &ec) noexcept;
+
+        TURBO_DLL path temp_directory_path(std::error_code &ec) noexcept;
+
+        TURBO_DLL path weakly_canonical(const path &p, std::error_code &ec) noexcept;
 
 #ifndef TURBO_PLATFORM_WEB
 #ifdef TURBO_HAVE_EXCEPTIONS
-TURBO_DLL void create_hard_link(const path &to, const path &new_hard_link);
-TURBO_DLL uintmax_t hard_link_count(const path &p);
+        TURBO_DLL void create_hard_link(const path &to, const path &new_hard_link);
+
+        TURBO_DLL uintmax_t hard_link_count(const path &p);
+
 #endif
-TURBO_DLL void create_hard_link(const path &to, const path &new_hard_link,
-                                std::error_code &ec) noexcept;
-TURBO_DLL uintmax_t hard_link_count(const path &p,
-                                    std::error_code &ec) noexcept;
+        TURBO_DLL void create_hard_link(const path &to, const path &new_hard_link,
+                                        std::error_code &ec) noexcept;
+
+        TURBO_DLL uintmax_t hard_link_count(const path &p,
+                                            std::error_code &ec) noexcept;
+
 #endif
 
 // Non-C++17 add-on std::fstream wrappers with path
-template <class charT, class traits = std::char_traits<charT>>
-class basic_filebuf : public std::basic_filebuf<charT, traits> {
-public:
-  basic_filebuf() {}
-  ~basic_filebuf() override {}
-  basic_filebuf(const basic_filebuf &) = delete;
-  const basic_filebuf &operator=(const basic_filebuf &) = delete;
-  basic_filebuf<charT, traits> *open(const path &p,
-                                     std::ios_base::openmode mode) {
+        template<class charT, class traits = std::char_traits<charT>>
+        class basic_filebuf : public std::basic_filebuf<charT, traits> {
+        public:
+            basic_filebuf() {}
+
+            ~basic_filebuf() override {}
+
+            basic_filebuf(const basic_filebuf &) = delete;
+
+            const basic_filebuf &operator=(const basic_filebuf &) = delete;
+
+            basic_filebuf<charT, traits> *open(const path &p,
+                                               std::ios_base::openmode mode) {
 #if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
-    return std::basic_filebuf<charT, traits>::open(p.wstring().c_str(), mode)
+                                                                                                                                        return std::basic_filebuf<charT, traits>::open(p.wstring().c_str(), mode)
                ? this
                : 0;
 #else
-    return std::basic_filebuf<charT, traits>::open(p.string().c_str(), mode)
-               ? this
-               : 0;
+                return std::basic_filebuf<charT, traits>::open(p.string().c_str(), mode)
+                       ? this
+                       : 0;
 #endif
-  }
-};
+            }
+        };
 
-template <class charT, class traits = std::char_traits<charT>>
-class basic_ifstream : public std::basic_ifstream<charT, traits> {
-public:
-  basic_ifstream() {}
+        template<class charT, class traits = std::char_traits<charT>>
+        class basic_ifstream : public std::basic_ifstream<charT, traits> {
+        public:
+            basic_ifstream() {}
+
 #if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
-  explicit basic_ifstream(const path &p,
+                                                                                                                                    explicit basic_ifstream(const path &p,
                           std::ios_base::openmode mode = std::ios_base::in)
       : std::basic_ifstream<charT, traits>(p.wstring().c_str(), mode) {}
   void open(const path &p, std::ios_base::openmode mode = std::ios_base::in) {
     std::basic_ifstream<charT, traits>::open(p.wstring().c_str(), mode);
   }
 #else
-  explicit basic_ifstream(const path &p,
-                          std::ios_base::openmode mode = std::ios_base::in)
-      : std::basic_ifstream<charT, traits>(p.string().c_str(), mode) {}
-  void open(const path &p, std::ios_base::openmode mode = std::ios_base::in) {
-    std::basic_ifstream<charT, traits>::open(p.string().c_str(), mode);
-  }
-#endif
-  basic_ifstream(const basic_ifstream &) = delete;
-  const basic_ifstream &operator=(const basic_ifstream &) = delete;
-  ~basic_ifstream() override {}
-};
 
-template <class charT, class traits = std::char_traits<charT>>
-class basic_ofstream : public std::basic_ofstream<charT, traits> {
-public:
-  basic_ofstream() {}
+            explicit basic_ifstream(const path &p,
+                                    std::ios_base::openmode mode = std::ios_base::in)
+                    : std::basic_ifstream<charT, traits>(p.string().c_str(), mode) {}
+
+            void open(const path &p, std::ios_base::openmode mode = std::ios_base::in) {
+                std::basic_ifstream<charT, traits>::open(p.string().c_str(), mode);
+            }
+
+#endif
+
+            basic_ifstream(const basic_ifstream &) = delete;
+
+            const basic_ifstream &operator=(const basic_ifstream &) = delete;
+
+            ~basic_ifstream() override {}
+        };
+
+        template<class charT, class traits = std::char_traits<charT>>
+        class basic_ofstream : public std::basic_ofstream<charT, traits> {
+        public:
+            basic_ofstream() {}
+
 #if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
-  explicit basic_ofstream(const path &p,
+                                                                                                                                    explicit basic_ofstream(const path &p,
                           std::ios_base::openmode mode = std::ios_base::out)
       : std::basic_ofstream<charT, traits>(p.wstring().c_str(), mode) {}
   void open(const path &p, std::ios_base::openmode mode = std::ios_base::out) {
     std::basic_ofstream<charT, traits>::open(p.wstring().c_str(), mode);
   }
 #else
-  explicit basic_ofstream(const path &p,
-                          std::ios_base::openmode mode = std::ios_base::out)
-      : std::basic_ofstream<charT, traits>(p.string().c_str(), mode) {}
-  void open(const path &p, std::ios_base::openmode mode = std::ios_base::out) {
-    std::basic_ofstream<charT, traits>::open(p.string().c_str(), mode);
-  }
-#endif
-  basic_ofstream(const basic_ofstream &) = delete;
-  const basic_ofstream &operator=(const basic_ofstream &) = delete;
-  ~basic_ofstream() override {}
-};
 
-template <class charT, class traits = std::char_traits<charT>>
-class basic_fstream : public std::basic_fstream<charT, traits> {
-public:
-  basic_fstream() {}
+            explicit basic_ofstream(const path &p,
+                                    std::ios_base::openmode mode = std::ios_base::out)
+                    : std::basic_ofstream<charT, traits>(p.string().c_str(), mode) {}
+
+            void open(const path &p, std::ios_base::openmode mode = std::ios_base::out) {
+                std::basic_ofstream<charT, traits>::open(p.string().c_str(), mode);
+            }
+
+#endif
+
+            basic_ofstream(const basic_ofstream &) = delete;
+
+            const basic_ofstream &operator=(const basic_ofstream &) = delete;
+
+            ~basic_ofstream() override {}
+        };
+
+        template<class charT, class traits = std::char_traits<charT>>
+        class basic_fstream : public std::basic_fstream<charT, traits> {
+        public:
+            basic_fstream() {}
+
 #if defined(TURBO_PLATFORM_WINDOWS) && !defined(__GLIBCXX__)
-  explicit basic_fstream(const path &p,
+                                                                                                                                    explicit basic_fstream(const path &p,
                          std::ios_base::openmode mode = std::ios_base::in |
                                                         std::ios_base::out)
       : std::basic_fstream<charT, traits>(p.wstring().c_str(), mode) {}
@@ -1127,143 +1511,162 @@ public:
     std::basic_fstream<charT, traits>::open(p.wstring().c_str(), mode);
   }
 #else
-  explicit basic_fstream(const path &p,
-                         std::ios_base::openmode mode = std::ios_base::in |
-                                                        std::ios_base::out)
-      : std::basic_fstream<charT, traits>(p.string().c_str(), mode) {}
-  void open(const path &p, std::ios_base::openmode mode = std::ios_base::in |
-                                                          std::ios_base::out) {
-    std::basic_fstream<charT, traits>::open(p.string().c_str(), mode);
-  }
+
+            explicit basic_fstream(const path &p,
+                                   std::ios_base::openmode mode = std::ios_base::in |
+                                                                  std::ios_base::out)
+                    : std::basic_fstream<charT, traits>(p.string().c_str(), mode) {}
+
+            void open(const path &p, std::ios_base::openmode mode = std::ios_base::in |
+                                                                    std::ios_base::out) {
+                std::basic_fstream<charT, traits>::open(p.string().c_str(), mode);
+            }
+
 #endif
-  basic_fstream(const basic_fstream &) = delete;
-  const basic_fstream &operator=(const basic_fstream &) = delete;
-  ~basic_fstream() override {}
-};
 
-typedef basic_filebuf<char> filebuf;
-typedef basic_filebuf<wchar_t> wfilebuf;
-typedef basic_ifstream<char> ifstream;
-typedef basic_ifstream<wchar_t> wifstream;
-typedef basic_ofstream<char> ofstream;
-typedef basic_ofstream<wchar_t> wofstream;
-typedef basic_fstream<char> fstream;
-typedef basic_fstream<wchar_t> wfstream;
+            basic_fstream(const basic_fstream &) = delete;
 
-class TURBO_DLL u8arguments {
-public:
-  u8arguments(int &argc, char **&argv);
-  ~u8arguments() {
-    _refargc = _argc;
-    _refargv = _argv;
-  }
+            const basic_fstream &operator=(const basic_fstream &) = delete;
 
-  bool valid() const { return _isvalid; }
+            ~basic_fstream() override {}
+        };
 
-private:
-  int _argc;
-  char **_argv;
-  int &_refargc;
-  char **&_refargv;
-  bool _isvalid;
+        typedef basic_filebuf<char> filebuf;
+        typedef basic_filebuf<wchar_t> wfilebuf;
+        typedef basic_ifstream<char> ifstream;
+        typedef basic_ifstream<wchar_t> wifstream;
+        typedef basic_ofstream<char> ofstream;
+        typedef basic_ofstream<wchar_t> wofstream;
+        typedef basic_fstream<char> fstream;
+        typedef basic_fstream<wchar_t> wfstream;
+
+        class TURBO_DLL u8arguments {
+        public:
+            u8arguments(int &argc, char **&argv);
+
+            ~u8arguments() {
+                _refargc = _argc;
+                _refargv = _argv;
+            }
+
+            bool valid() const { return _isvalid; }
+
+        private:
+            int _argc;
+            char **_argv;
+            int &_refargc;
+            char **&_refargv;
+            bool _isvalid;
 #ifdef TURBO_PLATFORM_WINDOWS
-  std::vector<std::string> _args;
+                                                                                                                                    std::vector<std::string> _args;
   std::vector<char *> _argp;
 #endif
-};
+        };
 
 //-------------------------------------------------------------------------------------------------
 //  Implementation
 //-------------------------------------------------------------------------------------------------
 
-namespace detail {
-enum utf8_states_t { S_STRT = 0, S_RJCT = 8 };
-TURBO_DLL void appendUTF8(std::string &str, uint32_t unicode);
-TURBO_DLL bool is_surrogate(uint32_t c);
-TURBO_DLL bool is_high_surrogate(uint32_t c);
-TURBO_DLL bool is_low_surrogate(uint32_t c);
-TURBO_DLL unsigned consumeUtf8Fragment(const unsigned state,
-                                       const uint8_t fragment,
-                                       uint32_t &codepoint);
-enum class portable_error {
-  none = 0,
-  exists,
-  not_found,
-  not_supported,
-  not_implemented,
-  invalid_argument,
-  is_a_directory,
-};
-TURBO_DLL std::error_code make_error_code(portable_error err);
+        namespace detail {
+            enum utf8_states_t {
+                S_STRT = 0, S_RJCT = 8
+            };
+            TURBO_DLL void appendUTF8(std::string &str, uint32_t unicode);
+
+            TURBO_DLL bool is_surrogate(uint32_t c);
+
+            TURBO_DLL bool is_high_surrogate(uint32_t c);
+
+            TURBO_DLL bool is_low_surrogate(uint32_t c);
+
+            TURBO_DLL unsigned consumeUtf8Fragment(const unsigned state,
+                                                   const uint8_t fragment,
+                                                   uint32_t &codepoint);
+
+            enum class portable_error {
+                none = 0,
+                exists,
+                not_found,
+                not_supported,
+                not_implemented,
+                invalid_argument,
+                is_a_directory,
+            };
+            TURBO_DLL std::error_code make_error_code(portable_error err);
+
 #ifdef TURBO_PLATFORM_WINDOWS
-TURBO_DLL std::error_code make_system_error(uint32_t err = 0);
+            TURBO_DLL std::error_code make_system_error(uint32_t err = 0);
 #else
-TURBO_DLL std::error_code make_system_error(int err = 0);
+            TURBO_DLL std::error_code make_system_error(int err = 0);
 
-template <typename T, typename = int> struct has_d_type : std::false_type {};
+            template<typename T, typename = int>
+            struct has_d_type : std::false_type {
+            };
 
-template <typename T>
-struct has_d_type<T, decltype((void)T::d_type, 0)> : std::true_type {};
+            template<typename T>
+            struct has_d_type<T, decltype((void) T::d_type, 0)> : std::true_type {
+            };
 
-template <typename T>
-inline file_type file_type_from_dirent_impl(const T &,
+            template<typename T>
+            inline file_type file_type_from_dirent_impl(const T &,
                                                         std::false_type) {
-  return file_type::none;
-}
+                return file_type::none;
+            }
 
-template <typename T>
-inline file_type file_type_from_dirent_impl(const T &t,
+            template<typename T>
+            inline file_type file_type_from_dirent_impl(const T &t,
                                                         std::true_type) {
-  switch (t.d_type) {
+                switch (t.d_type) {
 #ifdef DT_BLK
-  case DT_BLK:
-    return file_type::block;
+                    case DT_BLK:
+                        return file_type::block;
 #endif
 #ifdef DT_CHR
-  case DT_CHR:
-    return file_type::character;
+                    case DT_CHR:
+                        return file_type::character;
 #endif
 #ifdef DT_DIR
-  case DT_DIR:
-    return file_type::directory;
+                    case DT_DIR:
+                        return file_type::directory;
 #endif
 #ifdef DT_FIFO
-  case DT_FIFO:
-    return file_type::fifo;
+                    case DT_FIFO:
+                        return file_type::fifo;
 #endif
 #ifdef DT_LNK
-  case DT_LNK:
-    return file_type::symlink;
+                    case DT_LNK:
+                        return file_type::symlink;
 #endif
 #ifdef DT_REG
-  case DT_REG:
-    return file_type::regular;
+                    case DT_REG:
+                        return file_type::regular;
 #endif
 #ifdef DT_SOCK
-  case DT_SOCK:
-    return file_type::socket;
+                    case DT_SOCK:
+                        return file_type::socket;
 #endif
 #ifdef DT_UNKNOWN
-  case DT_UNKNOWN:
-    return file_type::none;
+                    case DT_UNKNOWN:
+                        return file_type::none;
 #endif
-  default:
-    return file_type::unknown;
-  }
-}
+                    default:
+                        return file_type::unknown;
+                }
+            }
 
-template <class T>
-inline file_type file_type_from_dirent(const T &t) {
-  return file_type_from_dirent_impl(t, has_d_type<T>{});
-}
+            template<class T>
+            inline file_type file_type_from_dirent(const T &t) {
+                return file_type_from_dirent_impl(t, has_d_type < T > {});
+            }
+
 #endif
-} // namespace detail
+        } // namespace detail
 
-namespace detail {
+        namespace detail {
 
-inline std::error_code make_error_code(portable_error err) {
+            inline std::error_code make_error_code(portable_error err) {
 #ifdef TURBO_PLATFORM_WINDOWS
-  switch (err) {
+                                                                                                                                        switch (err) {
   case portable_error::none:
     return std::error_code();
   case portable_error::exists:
@@ -1285,354 +1688,356 @@ inline std::error_code make_error_code(portable_error err) {
 #endif
   }
 #else
-  switch (err) {
-  case portable_error::none:
-    return std::error_code();
-  case portable_error::exists:
-    return std::error_code(EEXIST, std::system_category());
-  case portable_error::not_found:
-    return std::error_code(ENOENT, std::system_category());
-  case portable_error::not_supported:
-    return std::error_code(ENOTSUP, std::system_category());
-  case portable_error::not_implemented:
-    return std::error_code(ENOSYS, std::system_category());
-  case portable_error::invalid_argument:
-    return std::error_code(EINVAL, std::system_category());
-  case portable_error::is_a_directory:
-    return std::error_code(EISDIR, std::system_category());
-  }
+                switch (err) {
+                    case portable_error::none:
+                        return std::error_code();
+                    case portable_error::exists:
+                        return std::error_code(EEXIST, std::system_category());
+                    case portable_error::not_found:
+                        return std::error_code(ENOENT, std::system_category());
+                    case portable_error::not_supported:
+                        return std::error_code(ENOTSUP, std::system_category());
+                    case portable_error::not_implemented:
+                        return std::error_code(ENOSYS, std::system_category());
+                    case portable_error::invalid_argument:
+                        return std::error_code(EINVAL, std::system_category());
+                    case portable_error::is_a_directory:
+                        return std::error_code(EISDIR, std::system_category());
+                }
 #endif
-  return std::error_code();
-}
+                return std::error_code();
+            }
 
 #ifdef TURBO_PLATFORM_WINDOWS
-inline std::error_code make_system_error(uint32_t err) {
+                                                                                                                                    inline std::error_code make_system_error(uint32_t err) {
   return std::error_code(err ? static_cast<int>(err)
                              : static_cast<int>(::GetLastError()),
                          std::system_category());
 }
 #else
-inline std::error_code make_system_error(int err) {
-  return std::error_code(err ? err : errno, std::system_category());
-}
+
+            inline std::error_code make_system_error(int err) {
+                return std::error_code(err ? err : errno, std::system_category());
+            }
+
 #endif
 
-template <typename Enum>
-using EnableBitmask =
-    typename std::enable_if<std::is_same<Enum, perms>::value ||
-                                std::is_same<Enum, perm_options>::value ||
-                                std::is_same<Enum, copy_options>::value ||
-                                std::is_same<Enum, directory_options>::value,
+            template<typename Enum>
+            using EnableBitmask =
+                    typename std::enable_if<std::is_same<Enum, perms>::value ||
+                                            std::is_same<Enum, perm_options>::value ||
+                                            std::is_same<Enum, copy_options>::value ||
+                                            std::is_same<Enum, directory_options>::value,
                             Enum>::type;
-} // namespace detail
+        } // namespace detail
 
-template <typename Enum>
-constexpr detail::EnableBitmask<Enum> operator&(Enum X, Enum Y) {
-  using underlying = typename std::underlying_type<Enum>::type;
-  return static_cast<Enum>(static_cast<underlying>(X) &
-                           static_cast<underlying>(Y));
-}
+        template<typename Enum>
+        constexpr detail::EnableBitmask<Enum> operator&(Enum X, Enum Y) {
+            using underlying = typename std::underlying_type<Enum>::type;
+            return static_cast<Enum>(static_cast<underlying>(X) &
+                                     static_cast<underlying>(Y));
+        }
 
-template <typename Enum>
-constexpr detail::EnableBitmask<Enum> operator|(Enum X, Enum Y) {
-  using underlying = typename std::underlying_type<Enum>::type;
-  return static_cast<Enum>(static_cast<underlying>(X) |
-                           static_cast<underlying>(Y));
-}
+        template<typename Enum>
+        constexpr detail::EnableBitmask<Enum> operator|(Enum X, Enum Y) {
+            using underlying = typename std::underlying_type<Enum>::type;
+            return static_cast<Enum>(static_cast<underlying>(X) |
+                                     static_cast<underlying>(Y));
+        }
 
-template <typename Enum>
-constexpr detail::EnableBitmask<Enum> operator^(Enum X, Enum Y) {
-  using underlying = typename std::underlying_type<Enum>::type;
-  return static_cast<Enum>(static_cast<underlying>(X) ^
-                           static_cast<underlying>(Y));
-}
+        template<typename Enum>
+        constexpr detail::EnableBitmask<Enum> operator^(Enum X, Enum Y) {
+            using underlying = typename std::underlying_type<Enum>::type;
+            return static_cast<Enum>(static_cast<underlying>(X) ^
+                                     static_cast<underlying>(Y));
+        }
 
-template <typename Enum>
-constexpr detail::EnableBitmask<Enum> operator~(Enum X) {
-  using underlying = typename std::underlying_type<Enum>::type;
-  return static_cast<Enum>(~static_cast<underlying>(X));
-}
+        template<typename Enum>
+        constexpr detail::EnableBitmask<Enum> operator~(Enum X) {
+            using underlying = typename std::underlying_type<Enum>::type;
+            return static_cast<Enum>(~static_cast<underlying>(X));
+        }
 
-template <typename Enum>
-detail::EnableBitmask<Enum> &operator&=(Enum &X, Enum Y) {
-  X = X & Y;
-  return X;
-}
+        template<typename Enum>
+        detail::EnableBitmask<Enum> &operator&=(Enum &X, Enum Y) {
+            X = X & Y;
+            return X;
+        }
 
-template <typename Enum>
-detail::EnableBitmask<Enum> &operator|=(Enum &X, Enum Y) {
-  X = X | Y;
-  return X;
-}
+        template<typename Enum>
+        detail::EnableBitmask<Enum> &operator|=(Enum &X, Enum Y) {
+            X = X | Y;
+            return X;
+        }
 
-template <typename Enum>
-detail::EnableBitmask<Enum> &operator^=(Enum &X, Enum Y) {
-  X = X ^ Y;
-  return X;
-}
+        template<typename Enum>
+        detail::EnableBitmask<Enum> &operator^=(Enum &X, Enum Y) {
+            X = X ^ Y;
+            return X;
+        }
 
-namespace detail {
+        namespace detail {
 
-inline bool in_range(uint32_t c, uint32_t lo, uint32_t hi) {
-  return (static_cast<uint32_t>(c - lo) < (hi - lo + 1));
-}
+            inline bool in_range(uint32_t c, uint32_t lo, uint32_t hi) {
+                return (static_cast<uint32_t>(c - lo) < (hi - lo + 1));
+            }
 
-inline bool is_surrogate(uint32_t c) {
-  return in_range(c, 0xd800, 0xdfff);
-}
+            inline bool is_surrogate(uint32_t c) {
+                return in_range(c, 0xd800, 0xdfff);
+            }
 
-inline bool is_high_surrogate(uint32_t c) {
-  return (c & 0xfffffc00) == 0xd800;
-}
+            inline bool is_high_surrogate(uint32_t c) {
+                return (c & 0xfffffc00) == 0xd800;
+            }
 
-inline bool is_low_surrogate(uint32_t c) {
-  return (c & 0xfffffc00) == 0xdc00;
-}
+            inline bool is_low_surrogate(uint32_t c) {
+                return (c & 0xfffffc00) == 0xdc00;
+            }
 
-inline void appendUTF8(std::string &str, uint32_t unicode) {
-  if (unicode <= 0x7f) {
-    str.push_back(static_cast<char>(unicode));
-  } else if (unicode >= 0x80 && unicode <= 0x7ff) {
-    str.push_back(static_cast<char>((unicode >> 6) + 192));
-    str.push_back(static_cast<char>((unicode & 0x3f) + 128));
-  } else if ((unicode >= 0x800 && unicode <= 0xd7ff) ||
-             (unicode >= 0xe000 && unicode <= 0xffff)) {
-    str.push_back(static_cast<char>((unicode >> 12) + 224));
-    str.push_back(static_cast<char>(((unicode & 0xfff) >> 6) + 128));
-    str.push_back(static_cast<char>((unicode & 0x3f) + 128));
-  } else if (unicode >= 0x10000 && unicode <= 0x10ffff) {
-    str.push_back(static_cast<char>((unicode >> 18) + 240));
-    str.push_back(static_cast<char>(((unicode & 0x3ffff) >> 12) + 128));
-    str.push_back(static_cast<char>(((unicode & 0xfff) >> 6) + 128));
-    str.push_back(static_cast<char>((unicode & 0x3f) + 128));
-  } else {
+            inline void appendUTF8(std::string &str, uint32_t unicode) {
+                if (unicode <= 0x7f) {
+                    str.push_back(static_cast<char>(unicode));
+                } else if (unicode >= 0x80 && unicode <= 0x7ff) {
+                    str.push_back(static_cast<char>((unicode >> 6) + 192));
+                    str.push_back(static_cast<char>((unicode & 0x3f) + 128));
+                } else if ((unicode >= 0x800 && unicode <= 0xd7ff) ||
+                           (unicode >= 0xe000 && unicode <= 0xffff)) {
+                    str.push_back(static_cast<char>((unicode >> 12) + 224));
+                    str.push_back(static_cast<char>(((unicode & 0xfff) >> 6) + 128));
+                    str.push_back(static_cast<char>((unicode & 0x3f) + 128));
+                } else if (unicode >= 0x10000 && unicode <= 0x10ffff) {
+                    str.push_back(static_cast<char>((unicode >> 18) + 240));
+                    str.push_back(static_cast<char>(((unicode & 0x3ffff) >> 12) + 128));
+                    str.push_back(static_cast<char>(((unicode & 0xfff) >> 6) + 128));
+                    str.push_back(static_cast<char>((unicode & 0x3f) + 128));
+                } else {
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-    throw filesystem_error(
+                                                                                                                                            throw filesystem_error(
         "Illegal code point for unicode character.", str,
         std::make_error_code(std::errc::illegal_byte_sequence));
 #else
-    appendUTF8(str, 0xfffd);
+                    appendUTF8(str, 0xfffd);
 #endif
-  }
-}
+                }
+            }
 
 // Thanks to Bjoern Hoehrmann (https://bjoern.hoehrmann.de/utf-8/decoder/dfa/)
 // and Taylor R Campbell for the ideas to this DFA approach of UTF-8 decoding;
 // Generating debugging and shrinking my own DFA from scratch was a day of fun!
-inline unsigned consumeUtf8Fragment(const unsigned state,
+            inline unsigned consumeUtf8Fragment(const unsigned state,
                                                 const uint8_t fragment,
                                                 uint32_t &codepoint) {
-  static const uint32_t utf8_state_info[] = {
-      // encoded states
-      0x11111111u, 0x11111111u, 0x77777777u, 0x77777777u, 0x88888888u,
-      0x88888888u, 0x88888888u, 0x88888888u, 0x22222299u, 0x22222222u,
-      0x22222222u, 0x22222222u, 0x3333333au, 0x33433333u, 0x9995666bu,
-      0x99999999u, 0x88888880u, 0x22818108u, 0x88888881u, 0x88888882u,
-      0x88888884u, 0x88888887u, 0x88888886u, 0x82218108u, 0x82281108u,
-      0x88888888u, 0x88888883u, 0x88888885u, 0u,          0u,
-      0u,          0u,
-  };
-  uint8_t category =
-      fragment < 128
-          ? 0
-          : (utf8_state_info[(fragment >> 3) & 0xf] >> ((fragment & 7) << 2)) &
-                0xf;
-  codepoint = (state ? (codepoint << 6) | (fragment & 0x3fu)
-                     : (0xffu >> category) & fragment);
-  return state == S_RJCT
-             ? static_cast<unsigned>(S_RJCT)
-             : static_cast<unsigned>(
-                   (utf8_state_info[category + 16] >> (state << 2)) & 0xf);
-}
+                static const uint32_t utf8_state_info[] = {
+                        // encoded states
+                        0x11111111u, 0x11111111u, 0x77777777u, 0x77777777u, 0x88888888u,
+                        0x88888888u, 0x88888888u, 0x88888888u, 0x22222299u, 0x22222222u,
+                        0x22222222u, 0x22222222u, 0x3333333au, 0x33433333u, 0x9995666bu,
+                        0x99999999u, 0x88888880u, 0x22818108u, 0x88888881u, 0x88888882u,
+                        0x88888884u, 0x88888887u, 0x88888886u, 0x82218108u, 0x82281108u,
+                        0x88888888u, 0x88888883u, 0x88888885u, 0u, 0u,
+                        0u, 0u,
+                };
+                uint8_t category =
+                        fragment < 128
+                        ? 0
+                        : (utf8_state_info[(fragment >> 3) & 0xf] >> ((fragment & 7) << 2)) &
+                          0xf;
+                codepoint = (state ? (codepoint << 6) | (fragment & 0x3fu)
+                                   : (0xffu >> category) & fragment);
+                return state == S_RJCT
+                       ? static_cast<unsigned>(S_RJCT)
+                       : static_cast<unsigned>(
+                               (utf8_state_info[category + 16] >> (state << 2)) & 0xf);
+            }
 
-inline bool validUtf8(const std::string &utf8String) {
-  std::string::const_iterator iter = utf8String.begin();
-  unsigned utf8_state = S_STRT;
-  std::uint32_t codepoint = 0;
-  while (iter < utf8String.end()) {
-    if ((utf8_state = consumeUtf8Fragment(
-             utf8_state, static_cast<uint8_t>(*iter++), codepoint)) == S_RJCT) {
-      return false;
-    }
-  }
-  if (utf8_state) {
-    return false;
-  }
-  return true;
-}
+            inline bool validUtf8(const std::string &utf8String) {
+                std::string::const_iterator iter = utf8String.begin();
+                unsigned utf8_state = S_STRT;
+                std::uint32_t codepoint = 0;
+                while (iter < utf8String.end()) {
+                    if ((utf8_state = consumeUtf8Fragment(
+                            utf8_state, static_cast<uint8_t>(*iter++), codepoint)) == S_RJCT) {
+                        return false;
+                    }
+                }
+                if (utf8_state) {
+                    return false;
+                }
+                return true;
+            }
 
-} // namespace detail
+        } // namespace detail
 
-namespace detail {
+        namespace detail {
 
-template <class StringType, class Utf8String,
-          typename std::enable_if<
-              path::_is_basic_string<Utf8String>::value &&
-              (sizeof(typename Utf8String::value_type) == 1) &&
-              (sizeof(typename StringType::value_type) == 1)>::type * = nullptr>
-inline StringType fromUtf8(const Utf8String &utf8String,
-                           const typename StringType::allocator_type &alloc =
-                               typename StringType::allocator_type()) {
-  return StringType(utf8String.begin(), utf8String.end(), alloc);
-}
+            template<class StringType, class Utf8String,
+                    typename std::enable_if<
+                            path::_is_basic_string<Utf8String>::value &&
+                            (sizeof(typename Utf8String::value_type) == 1) &&
+                            (sizeof(typename StringType::value_type) == 1)>::type * = nullptr>
+            inline StringType fromUtf8(const Utf8String &utf8String,
+                                       const typename StringType::allocator_type &alloc =
+                                       typename StringType::allocator_type()) {
+                return StringType(utf8String.begin(), utf8String.end(), alloc);
+            }
 
-template <class StringType, class Utf8String,
-          typename std::enable_if<
-              path::_is_basic_string<Utf8String>::value &&
-              (sizeof(typename Utf8String::value_type) == 1) &&
-              (sizeof(typename StringType::value_type) == 2)>::type * = nullptr>
-inline StringType fromUtf8(const Utf8String &utf8String,
-                           const typename StringType::allocator_type &alloc =
-                               typename StringType::allocator_type()) {
-  StringType result(alloc);
-  result.reserve(utf8String.length());
-  auto iter = utf8String.cbegin();
-  unsigned utf8_state = S_STRT;
-  std::uint32_t codepoint = 0;
-  while (iter < utf8String.cend()) {
-    if ((utf8_state = consumeUtf8Fragment(
-             utf8_state, static_cast<uint8_t>(*iter++), codepoint)) == S_STRT) {
-      if (codepoint <= 0xffff) {
-        result += static_cast<typename StringType::value_type>(codepoint);
-      } else {
-        codepoint -= 0x10000;
-        result += static_cast<typename StringType::value_type>(
-            (codepoint >> 10) + 0xd800);
-        result += static_cast<typename StringType::value_type>(
-            (codepoint & 0x3ff) + 0xdc00);
-      }
-      codepoint = 0;
-    } else if (utf8_state == S_RJCT) {
+            template<class StringType, class Utf8String,
+                    typename std::enable_if<
+                            path::_is_basic_string<Utf8String>::value &&
+                            (sizeof(typename Utf8String::value_type) == 1) &&
+                            (sizeof(typename StringType::value_type) == 2)>::type * = nullptr>
+            inline StringType fromUtf8(const Utf8String &utf8String,
+                                       const typename StringType::allocator_type &alloc =
+                                       typename StringType::allocator_type()) {
+                StringType result(alloc);
+                result.reserve(utf8String.length());
+                auto iter = utf8String.cbegin();
+                unsigned utf8_state = S_STRT;
+                std::uint32_t codepoint = 0;
+                while (iter < utf8String.cend()) {
+                    if ((utf8_state = consumeUtf8Fragment(
+                            utf8_state, static_cast<uint8_t>(*iter++), codepoint)) == S_STRT) {
+                        if (codepoint <= 0xffff) {
+                            result += static_cast<typename StringType::value_type>(codepoint);
+                        } else {
+                            codepoint -= 0x10000;
+                            result += static_cast<typename StringType::value_type>(
+                                    (codepoint >> 10) + 0xd800);
+                            result += static_cast<typename StringType::value_type>(
+                                    (codepoint & 0x3ff) + 0xdc00);
+                        }
+                        codepoint = 0;
+                    } else if (utf8_state == S_RJCT) {
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-      throw filesystem_error(
+                                                                                                                                                throw filesystem_error(
           "Illegal byte sequence for unicode character.", utf8String,
           std::make_error_code(std::errc::illegal_byte_sequence));
 #else
-      result += static_cast<typename StringType::value_type>(0xfffd);
-      utf8_state = S_STRT;
-      codepoint = 0;
+                        result += static_cast<typename StringType::value_type>(0xfffd);
+                        utf8_state = S_STRT;
+                        codepoint = 0;
 #endif
-    }
-  }
-  if (utf8_state) {
+                    }
+                }
+                if (utf8_state) {
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-    throw filesystem_error(
+                                                                                                                                            throw filesystem_error(
         "Illegal byte sequence for unicode character.", utf8String,
         std::make_error_code(std::errc::illegal_byte_sequence));
 #else
-    result += static_cast<typename StringType::value_type>(0xfffd);
+                    result += static_cast<typename StringType::value_type>(0xfffd);
 #endif
-  }
-  return result;
-}
+                }
+                return result;
+            }
 
-template <class StringType, class Utf8String,
-          typename std::enable_if<
-              path::_is_basic_string<Utf8String>::value &&
-              (sizeof(typename Utf8String::value_type) == 1) &&
-              (sizeof(typename StringType::value_type) == 4)>::type * = nullptr>
-inline StringType fromUtf8(const Utf8String &utf8String,
-                           const typename StringType::allocator_type &alloc =
-                               typename StringType::allocator_type()) {
-  StringType result(alloc);
-  result.reserve(utf8String.length());
-  auto iter = utf8String.cbegin();
-  unsigned utf8_state = S_STRT;
-  std::uint32_t codepoint = 0;
-  while (iter < utf8String.cend()) {
-    if ((utf8_state = consumeUtf8Fragment(
-             utf8_state, static_cast<uint8_t>(*iter++), codepoint)) == S_STRT) {
-      result += static_cast<typename StringType::value_type>(codepoint);
-      codepoint = 0;
-    } else if (utf8_state == S_RJCT) {
+            template<class StringType, class Utf8String,
+                    typename std::enable_if<
+                            path::_is_basic_string<Utf8String>::value &&
+                            (sizeof(typename Utf8String::value_type) == 1) &&
+                            (sizeof(typename StringType::value_type) == 4)>::type * = nullptr>
+            inline StringType fromUtf8(const Utf8String &utf8String,
+                                       const typename StringType::allocator_type &alloc =
+                                       typename StringType::allocator_type()) {
+                StringType result(alloc);
+                result.reserve(utf8String.length());
+                auto iter = utf8String.cbegin();
+                unsigned utf8_state = S_STRT;
+                std::uint32_t codepoint = 0;
+                while (iter < utf8String.cend()) {
+                    if ((utf8_state = consumeUtf8Fragment(
+                            utf8_state, static_cast<uint8_t>(*iter++), codepoint)) == S_STRT) {
+                        result += static_cast<typename StringType::value_type>(codepoint);
+                        codepoint = 0;
+                    } else if (utf8_state == S_RJCT) {
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-      throw filesystem_error(
+                                                                                                                                                throw filesystem_error(
           "Illegal byte sequence for unicode character.", utf8String,
           std::make_error_code(std::errc::illegal_byte_sequence));
 #else
-      result += static_cast<typename StringType::value_type>(0xfffd);
-      utf8_state = S_STRT;
-      codepoint = 0;
+                        result += static_cast<typename StringType::value_type>(0xfffd);
+                        utf8_state = S_STRT;
+                        codepoint = 0;
 #endif
-    }
-  }
-  if (utf8_state) {
+                    }
+                }
+                if (utf8_state) {
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-    throw filesystem_error(
+                                                                                                                                            throw filesystem_error(
         "Illegal byte sequence for unicode character.", utf8String,
         std::make_error_code(std::errc::illegal_byte_sequence));
 #else
-    result += static_cast<typename StringType::value_type>(0xfffd);
+                    result += static_cast<typename StringType::value_type>(0xfffd);
 #endif
-  }
-  return result;
-}
+                }
+                return result;
+            }
 
-template <class StringType, typename charT, std::size_t N>
-inline StringType fromUtf8(const charT (&utf8String)[N]) {
-  return fromUtf8<StringType>(basic_string_view<charT>(utf8String, N - 1));
-}
+            template<class StringType, typename charT, std::size_t N>
+            inline StringType fromUtf8(const charT (&utf8String)[N]) {
+                return fromUtf8 < StringType > (basic_string_view<charT>(utf8String, N - 1));
+            }
 
-template <typename strT,
-          typename std::enable_if<path::_is_basic_string<strT>::value &&
-                                      (sizeof(typename strT::value_type) == 1),
-                                  int>::type size = 1>
-inline std::string toUtf8(const strT &unicodeString) {
-  return std::string(unicodeString.begin(), unicodeString.end());
-}
+            template<typename strT,
+                    typename std::enable_if<path::_is_basic_string<strT>::value &&
+                                            (sizeof(typename strT::value_type) == 1),
+                            int>::type size = 1>
+            inline std::string toUtf8(const strT &unicodeString) {
+                return std::string(unicodeString.begin(), unicodeString.end());
+            }
 
-template <typename strT,
-          typename std::enable_if<path::_is_basic_string<strT>::value &&
-                                      (sizeof(typename strT::value_type) == 2),
-                                  int>::type size = 2>
-inline std::string toUtf8(const strT &unicodeString) {
-  std::string result;
-  for (auto iter = unicodeString.begin(); iter != unicodeString.end(); ++iter) {
-    char32_t c = *iter;
-    if (is_surrogate(c)) {
-      ++iter;
-      if (iter != unicodeString.end() && is_high_surrogate(c) &&
-          is_low_surrogate(*iter)) {
-        appendUTF8(result, (char32_t(c) << 10) + *iter - 0x35fdc00);
-      } else {
+            template<typename strT,
+                    typename std::enable_if<path::_is_basic_string<strT>::value &&
+                                            (sizeof(typename strT::value_type) == 2),
+                            int>::type size = 2>
+            inline std::string toUtf8(const strT &unicodeString) {
+                std::string result;
+                for (auto iter = unicodeString.begin(); iter != unicodeString.end(); ++iter) {
+                    char32_t c = *iter;
+                    if (is_surrogate(c)) {
+                        ++iter;
+                        if (iter != unicodeString.end() && is_high_surrogate(c) &&
+                            is_low_surrogate(*iter)) {
+                            appendUTF8(result, (char32_t(c) << 10) + *iter - 0x35fdc00);
+                        } else {
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-        throw filesystem_error(
+                                                                                                                                                    throw filesystem_error(
             "Illegal code point for unicode character.", result,
             std::make_error_code(std::errc::illegal_byte_sequence));
 #else
-        appendUTF8(result, 0xfffd);
-        if (iter == unicodeString.end()) {
-          break;
-        }
+                            appendUTF8(result, 0xfffd);
+                            if (iter == unicodeString.end()) {
+                                break;
+                            }
 #endif
-      }
-    } else {
-      appendUTF8(result, c);
-    }
-  }
-  return result;
-}
+                        }
+                    } else {
+                        appendUTF8(result, c);
+                    }
+                }
+                return result;
+            }
 
-template <typename strT,
-          typename std::enable_if<path::_is_basic_string<strT>::value &&
-                                      (sizeof(typename strT::value_type) == 4),
-                                  int>::type size = 4>
-inline std::string toUtf8(const strT &unicodeString) {
-  std::string result;
-  for (auto c : unicodeString) {
-    appendUTF8(result, static_cast<uint32_t>(c));
-  }
-  return result;
-}
+            template<typename strT,
+                    typename std::enable_if<path::_is_basic_string<strT>::value &&
+                                            (sizeof(typename strT::value_type) == 4),
+                            int>::type size = 4>
+            inline std::string toUtf8(const strT &unicodeString) {
+                std::string result;
+                for (auto c: unicodeString) {
+                    appendUTF8(result, static_cast<uint32_t>(c));
+                }
+                return result;
+            }
 
-template <typename charT>
-inline std::string toUtf8(const charT *unicodeString) {
-  return toUtf8(
-      basic_string_view<charT, std::char_traits<charT>>(unicodeString));
-}
+            template<typename charT>
+            inline std::string toUtf8(const charT *unicodeString) {
+                return toUtf8(
+                        basic_string_view<charT, std::char_traits<charT>>(unicodeString));
+            }
 
 #ifdef GHC_USE_WCHAR_T
-template <
+                                                                                                                                    template <
     class StringType, class WString,
     typename std::enable_if<path::_is_basic_string<WString>::value &&
                                 (sizeof(typename WString::value_type) == 2) &&
@@ -1702,41 +2107,41 @@ inline std::wstring toWChar(const charT *unicodeString) {
 }
 #endif // GHC_USE_WCHAR_T
 
-} // namespace detail
+        } // namespace detail
 
-namespace detail {
+        namespace detail {
 
-template <typename strT,
-          typename std::enable_if<path::_is_basic_string<strT>::value,
-                                  bool>::type = true>
-inline bool startsWith(const strT &what, const strT &with) {
-  return with.length() <= what.length() &&
-         equal(with.begin(), with.end(), what.begin());
-}
+            template<typename strT,
+                    typename std::enable_if<path::_is_basic_string<strT>::value,
+                            bool>::type = true>
+            inline bool startsWith(const strT &what, const strT &with) {
+                return with.length() <= what.length() &&
+                       equal(with.begin(), with.end(), what.begin());
+            }
 
-template <typename strT,
-          typename std::enable_if<path::_is_basic_string<strT>::value,
-                                  bool>::type = true>
-inline bool endsWith(const strT &what, const strT &with) {
-  return with.length() <= what.length() &&
-         what.compare(what.length() - with.length(), with.size(), with) == 0;
-}
+            template<typename strT,
+                    typename std::enable_if<path::_is_basic_string<strT>::value,
+                            bool>::type = true>
+            inline bool endsWith(const strT &what, const strT &with) {
+                return with.length() <= what.length() &&
+                       what.compare(what.length() - with.length(), with.size(), with) == 0;
+            }
 
-} // namespace detail
+        } // namespace detail
 
-inline void path::check_long_path() {
+        inline void path::check_long_path() {
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-  if (is_absolute() && _path.length() >= MAX_PATH - 12 &&
+                                                                                                                                    if (is_absolute() && _path.length() >= MAX_PATH - 12 &&
       !detail::startsWith(
           _path, impl_string_type(TURBO_PLATFORM_LITERAL("\\\\?\\")))) {
     postprocess_path_with_format(native_format);
   }
 #endif
-}
+        }
 
-inline void path::postprocess_path_with_format(path::format fmt) {
+        inline void path::postprocess_path_with_format(path::format fmt) {
 #ifdef TURBO_RAISE_UNICODE_ERRORS
-  if (!detail::validUtf8(_path)) {
+                                                                                                                                    if (!detail::validUtf8(_path)) {
     path t;
     t._path = _path;
     throw filesystem_error(
@@ -1744,9 +2149,9 @@ inline void path::postprocess_path_with_format(path::format fmt) {
         std::make_error_code(std::errc::illegal_byte_sequence));
   }
 #endif
-  switch (fmt) {
+            switch (fmt) {
 #ifdef TURBO_PLATFORM_WINDOWS
-  case path::native_format:
+                                                                                                                                        case path::native_format:
   case path::auto_format:
   case path::generic_format:
     for (auto &c : _path) {
@@ -1764,70 +2169,72 @@ inline void path::postprocess_path_with_format(path::format fmt) {
     handle_prefixes();
     break;
 #else
-  case path::auto_format:
-  case path::native_format:
-  case path::generic_format:
-    // nothing to do
-    break;
+                case path::auto_format:
+                case path::native_format:
+                case path::generic_format:
+                    // nothing to do
+                    break;
 #endif
-  }
-  if (_path.length() > _prefixLength + 2 &&
-      _path[_prefixLength] == preferred_separator &&
-      _path[_prefixLength + 1] == preferred_separator &&
-      _path[_prefixLength + 2] != preferred_separator) {
-    impl_string_type::iterator new_end = std::unique(
-        _path.begin() +
-            static_cast<string_type::difference_type>(_prefixLength) + 2,
-        _path.end(), [](path::value_type lhs, path::value_type rhs) {
-          return lhs == rhs && lhs == preferred_separator;
-        });
-    _path.erase(new_end, _path.end());
-  } else {
-    impl_string_type::iterator new_end = std::unique(
-        _path.begin() +
-            static_cast<string_type::difference_type>(_prefixLength),
-        _path.end(), [](path::value_type lhs, path::value_type rhs) {
-          return lhs == rhs && lhs == preferred_separator;
-        });
-    _path.erase(new_end, _path.end());
-  }
-}
+            }
+            if (_path.length() > _prefixLength + 2 &&
+                _path[_prefixLength] == preferred_separator &&
+                _path[_prefixLength + 1] == preferred_separator &&
+                _path[_prefixLength + 2] != preferred_separator) {
+                impl_string_type::iterator new_end = std::unique(
+                        _path.begin() +
+                        static_cast<string_type::difference_type>(_prefixLength) + 2,
+                        _path.end(), [](path::value_type lhs, path::value_type rhs) {
+                            return lhs == rhs && lhs == preferred_separator;
+                        });
+                _path.erase(new_end, _path.end());
+            } else {
+                impl_string_type::iterator new_end = std::unique(
+                        _path.begin() +
+                        static_cast<string_type::difference_type>(_prefixLength),
+                        _path.end(), [](path::value_type lhs, path::value_type rhs) {
+                            return lhs == rhs && lhs == preferred_separator;
+                        });
+                _path.erase(new_end, _path.end());
+            }
+        }
 
-template <class Source, typename>
-inline path::path(const Source &source, format fmt)
+        template<class Source, typename>
+        inline path::path(const Source &source, format fmt)
 #ifdef GHC_USE_WCHAR_T
-    : _path(detail::toWChar(source))
+        : _path(detail::toWChar(source))
 #else
-    : _path(detail::toUtf8(source))
+                : _path(detail::toUtf8(source))
 #endif
-{
-  postprocess_path_with_format(fmt);
-}
+        {
+            postprocess_path_with_format(fmt);
+        }
 
-template <class Source, typename> inline path u8path(const Source &source) {
-  return path(source);
-}
-template <class InputIterator>
-inline path u8path(InputIterator first, InputIterator last) {
-  return path(first, last);
-}
+        template<class Source, typename>
+        inline path u8path(const Source &source) {
+            return path(source);
+        }
 
-template <class InputIterator>
-inline path::path(InputIterator first, InputIterator last, format fmt)
-    : path(std::basic_string<
-               typename std::iterator_traits<InputIterator>::value_type>(first,
-                                                                         last),
-           fmt) {
-  // delegated
-}
+        template<class InputIterator>
+        inline path u8path(InputIterator first, InputIterator last) {
+            return path(first, last);
+        }
 
-namespace detail {
+        template<class InputIterator>
+        inline path::path(InputIterator first, InputIterator last, format fmt)
+                : path(std::basic_string<
+                               typename std::iterator_traits<InputIterator>::value_type>(first,
+                                                                                         last),
+                       fmt) {
+            // delegated
+        }
 
-inline bool
-equals_simple_insensitive(const path::value_type *str1,
-                          const path::value_type *str2) {
+        namespace detail {
+
+            inline bool
+            equals_simple_insensitive(const path::value_type *str1,
+                                      const path::value_type *str2) {
 #ifdef TURBO_PLATFORM_WINDOWS
-#ifdef __GNUC__
+                                                                                                                                        #ifdef __GNUC__
   while (::tolower((unsigned char)*str1) == ::tolower((unsigned char)*str2++)) {
     if (*str1++ == 0)
       return true;
@@ -1841,46 +2248,46 @@ equals_simple_insensitive(const path::value_type *str1,
 #endif // GHC_USE_WCHAR_T
 #endif // __GNUC__
 #else  // TURBO_PLATFORM_WINDOWS
-  return 0 == ::strcasecmp(str1, str2);
+                return 0 == ::strcasecmp(str1, str2);
 #endif // TURBO_PLATFORM_WINDOWS
-}
+            }
 
-inline int compare_simple_insensitive(const path::value_type *str1,
+            inline int compare_simple_insensitive(const path::value_type *str1,
                                                   size_t len1,
                                                   const path::value_type *str2,
                                                   size_t len2) {
-  while (len1 > 0 && len2 > 0 &&
-         ::tolower(static_cast<unsigned char>(*str1)) ==
-             ::tolower(static_cast<unsigned char>(*str2))) {
-    --len1;
-    --len2;
-    ++str1;
-    ++str2;
-  }
-  if (len1 && len2) {
-    return *str1 < *str2 ? -1 : 1;
-  }
-  if (len1 == 0 && len2 == 0) {
-    return 0;
-  }
-  return len1 == 0 ? -1 : 1;
-}
+                while (len1 > 0 && len2 > 0 &&
+                       ::tolower(static_cast<unsigned char>(*str1)) ==
+                       ::tolower(static_cast<unsigned char>(*str2))) {
+                    --len1;
+                    --len2;
+                    ++str1;
+                    ++str2;
+                }
+                if (len1 && len2) {
+                    return *str1 < *str2 ? -1 : 1;
+                }
+                if (len1 == 0 && len2 == 0) {
+                    return 0;
+                }
+                return len1 == 0 ? -1 : 1;
+            }
 
-inline const char *strerror_adapter(char *gnu, char *) {
-  return gnu;
-}
+            inline const char *strerror_adapter(char *gnu, char *) {
+                return gnu;
+            }
 
-inline const char *strerror_adapter(int posix, char *buffer) {
-  if (posix) {
-    return "Error in strerror_r!";
-  }
-  return buffer;
-}
+            inline const char *strerror_adapter(int posix, char *buffer) {
+                if (posix) {
+                    return "Error in strerror_r!";
+                }
+                return buffer;
+            }
 
-template <typename ErrorNumber>
-inline std::string systemErrorText(ErrorNumber code = 0) {
+            template<typename ErrorNumber>
+            inline std::string systemErrorText(ErrorNumber code = 0) {
 #if defined(TURBO_PLATFORM_WINDOWS)
-  LPVOID msgBuf;
+                                                                                                                                        LPVOID msgBuf;
   DWORD dw = code ? static_cast<DWORD>(code) : ::GetLastError();
   FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                      FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -1890,14 +2297,14 @@ inline std::string systemErrorText(ErrorNumber code = 0) {
   LocalFree(msgBuf);
   return msg;
 #else
-  char buffer[512];
-  return strerror_adapter(
-      strerror_r(code ? code : errno, buffer, sizeof(buffer)), buffer);
+                char buffer[512];
+                return strerror_adapter(
+                        strerror_r(code ? code : errno, buffer, sizeof(buffer)), buffer);
 #endif
-}
+            }
 
 #ifdef TURBO_PLATFORM_WINDOWS
-using CreateSymbolicLinkW_fp = BOOLEAN(WINAPI *)(LPCWSTR, LPCWSTR, DWORD);
+                                                                                                                                    using CreateSymbolicLinkW_fp = BOOLEAN(WINAPI *)(LPCWSTR, LPCWSTR, DWORD);
 using CreateHardLinkW_fp = BOOLEAN(WINAPI *)(LPCWSTR, LPCWSTR,
                                              LPSECURITY_ATTRIBUTES);
 
@@ -1973,29 +2380,32 @@ inline path getFullPathName(const wchar_t *p, std::error_code &ec) {
 }
 
 #else
-inline void create_symlink(const path &target_name,
+
+            inline void create_symlink(const path &target_name,
                                        const path &new_symlink, bool,
                                        std::error_code &ec) {
-  if (::symlink(target_name.c_str(), new_symlink.c_str()) != 0) {
-    ec = detail::make_system_error();
-  }
-}
+                if (::symlink(target_name.c_str(), new_symlink.c_str()) != 0) {
+                    ec = detail::make_system_error();
+                }
+            }
 
 #ifndef TURBO_PLATFORM_WEB
-inline void create_hardlink(const path &target_name,
+
+            inline void create_hardlink(const path &target_name,
                                         const path &new_hardlink,
                                         std::error_code &ec) {
-  if (::link(target_name.c_str(), new_hardlink.c_str()) != 0) {
-    ec = detail::make_system_error();
-  }
-}
+                if (::link(target_name.c_str(), new_hardlink.c_str()) != 0) {
+                    ec = detail::make_system_error();
+                }
+            }
+
 #endif
 #endif
 
-template <typename T>
-inline file_status file_status_from_st_mode(T mode) {
+            template<typename T>
+            inline file_status file_status_from_st_mode(T mode) {
 #ifdef TURBO_PLATFORM_WINDOWS
-  file_type ft = file_type::unknown;
+                                                                                                                                        file_type ft = file_type::unknown;
   if ((mode & _S_IFDIR) == _S_IFDIR) {
     ft = file_type::directory;
   } else if ((mode & _S_IFREG) == _S_IFREG) {
@@ -2006,30 +2416,30 @@ inline file_status file_status_from_st_mode(T mode) {
   perms prms = static_cast<perms>(mode & 0xfff);
   return file_status(ft, prms);
 #else
-  file_type ft = file_type::unknown;
-  if (S_ISDIR(mode)) {
-    ft = file_type::directory;
-  } else if (S_ISREG(mode)) {
-    ft = file_type::regular;
-  } else if (S_ISCHR(mode)) {
-    ft = file_type::character;
-  } else if (S_ISBLK(mode)) {
-    ft = file_type::block;
-  } else if (S_ISFIFO(mode)) {
-    ft = file_type::fifo;
-  } else if (S_ISLNK(mode)) {
-    ft = file_type::symlink;
-  } else if (S_ISSOCK(mode)) {
-    ft = file_type::socket;
-  }
-  perms prms = static_cast<perms>(mode & 0xfff);
-  return file_status(ft, prms);
+                file_type ft = file_type::unknown;
+                if (S_ISDIR(mode)) {
+                    ft = file_type::directory;
+                } else if (S_ISREG(mode)) {
+                    ft = file_type::regular;
+                } else if (S_ISCHR(mode)) {
+                    ft = file_type::character;
+                } else if (S_ISBLK(mode)) {
+                    ft = file_type::block;
+                } else if (S_ISFIFO(mode)) {
+                    ft = file_type::fifo;
+                } else if (S_ISLNK(mode)) {
+                    ft = file_type::symlink;
+                } else if (S_ISSOCK(mode)) {
+                    ft = file_type::socket;
+                }
+                perms prms = static_cast<perms>(mode & 0xfff);
+                return file_status(ft, prms);
 #endif
-}
+            }
 
 #ifdef TURBO_PLATFORM_WINDOWS
 
-class unique_handle {
+                                                                                                                                    class unique_handle {
 public:
   typedef HANDLE element_type;
 
@@ -2125,9 +2535,9 @@ inline
 }
 #endif
 
-inline path resolveSymlink(const path &p, std::error_code &ec) {
+            inline path resolveSymlink(const path &p, std::error_code &ec) {
 #ifdef TURBO_PLATFORM_WINDOWS
-  path result;
+                                                                                                                                        path result;
   auto reparseData = detail::getReparseData(p, ec);
   if (!ec) {
     if (reparseData && IsReparseTagMicrosoft(reparseData->ReparseTag)) {
@@ -2172,25 +2582,25 @@ inline path resolveSymlink(const path &p, std::error_code &ec) {
   }
   return result;
 #else
-  size_t bufferSize = 256;
-  while (true) {
-    std::vector<char> buffer(bufferSize, static_cast<char>(0));
-    auto rc = ::readlink(p.c_str(), buffer.data(), buffer.size());
-    if (rc < 0) {
-      ec = detail::make_system_error();
-      return path();
-    } else if (rc < static_cast<int>(bufferSize)) {
-      return path(
-          std::string(buffer.data(), static_cast<std::string::size_type>(rc)));
-    }
-    bufferSize *= 2;
-  }
-  return path();
+                size_t bufferSize = 256;
+                while (true) {
+                    std::vector<char> buffer(bufferSize, static_cast<char>(0));
+                    auto rc = ::readlink(p.c_str(), buffer.data(), buffer.size());
+                    if (rc < 0) {
+                        ec = detail::make_system_error();
+                        return path();
+                    } else if (rc < static_cast<int>(bufferSize)) {
+                        return path(
+                                std::string(buffer.data(), static_cast<std::string::size_type>(rc)));
+                    }
+                    bufferSize *= 2;
+                }
+                return path();
 #endif
-}
+            }
 
 #ifdef TURBO_PLATFORM_WINDOWS
-inline time_t timeFromFILETIME(const FILETIME &ft) {
+                                                                                                                                    inline time_t timeFromFILETIME(const FILETIME &ft) {
   ULARGE_INTEGER ull;
   ull.LowPart = ft.dwLowDateTime;
   ull.HighPart = ft.dwHighDateTime;
@@ -2273,20 +2683,20 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
 
 #endif
 
-inline bool is_not_found_error(std::error_code &ec) {
+            inline bool is_not_found_error(std::error_code &ec) {
 #ifdef TURBO_PLATFORM_WINDOWS
-  return ec.value() == ERROR_FILE_NOT_FOUND ||
+                                                                                                                                        return ec.value() == ERROR_FILE_NOT_FOUND ||
          ec.value() == ERROR_PATH_NOT_FOUND || ec.value() == ERROR_INVALID_NAME;
 #else
-  return ec.value() == ENOENT || ec.value() == ENOTDIR;
+                return ec.value() == ENOENT || ec.value() == ENOTDIR;
 #endif
-}
+            }
 
-inline file_status
-symlink_status_ex(const path &p, std::error_code &ec, uintmax_t *sz = nullptr,
-                  uintmax_t *nhl = nullptr, time_t *lwt = nullptr) noexcept {
+            inline file_status
+            symlink_status_ex(const path &p, std::error_code &ec, uintmax_t *sz = nullptr,
+                              uintmax_t *nhl = nullptr, time_t *lwt = nullptr) noexcept {
 #ifdef TURBO_PLATFORM_WINDOWS
-  file_status fs;
+                                                                                                                                        file_status fs;
   WIN32_FILE_ATTRIBUTE_DATA attr;
   if (!GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
     ec = detail::make_system_error();
@@ -2302,33 +2712,33 @@ symlink_status_ex(const path &p, std::error_code &ec, uintmax_t *sz = nullptr,
   }
   return ec ? file_status(file_type::none) : fs;
 #else
-  (void)sz;
-  (void)nhl;
-  (void)lwt;
-  struct ::stat fs;
-  auto result = ::lstat(p.c_str(), &fs);
-  if (result == 0) {
-    ec.clear();
-    file_status f_s = detail::file_status_from_st_mode(fs.st_mode);
-    return f_s;
-  }
-  ec = detail::make_system_error();
-  if (detail::is_not_found_error(ec)) {
-    return file_status(file_type::not_found, perms::unknown);
-  }
-  return file_status(file_type::none);
+                (void) sz;
+                (void) nhl;
+                (void) lwt;
+                struct ::stat fs;
+                auto result = ::lstat(p.c_str(), &fs);
+                if (result == 0) {
+                    ec.clear();
+                    file_status f_s = detail::file_status_from_st_mode(fs.st_mode);
+                    return f_s;
+                }
+                ec = detail::make_system_error();
+                if (detail::is_not_found_error(ec)) {
+                    return file_status(file_type::not_found, perms::unknown);
+                }
+                return file_status(file_type::none);
 #endif
-}
+            }
 
-inline file_status status_ex(const path &p, std::error_code &ec,
+            inline file_status status_ex(const path &p, std::error_code &ec,
                                          file_status *sls = nullptr,
                                          uintmax_t *sz = nullptr,
                                          uintmax_t *nhl = nullptr,
                                          time_t *lwt = nullptr,
                                          int recurse_count = 0) noexcept {
-  ec.clear();
+                ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (recurse_count > 16) {
+                                                                                                                                        if (recurse_count > 16) {
     ec = detail::make_system_error(0x2A9 /*ERROR_STOPPED_ON_SYMLINK*/);
     return file_status(file_type::unknown);
   }
@@ -2363,54 +2773,54 @@ inline file_status status_ex(const path &p, std::error_code &ec,
   }
   return detail::status_from_INFO(p, &attr, ec, sz, lwt);
 #else
-  (void)recurse_count;
-  struct ::stat st;
-  auto result = ::lstat(p.c_str(), &st);
-  if (result == 0) {
-    ec.clear();
-    file_status fs = detail::file_status_from_st_mode(st.st_mode);
-    if (sls) {
-      *sls = fs;
-    }
-    if (fs.type() == file_type::symlink) {
-      result = ::stat(p.c_str(), &st);
-      if (result == 0) {
-        fs = detail::file_status_from_st_mode(st.st_mode);
-      } else {
-        ec = detail::make_system_error();
-        if (detail::is_not_found_error(ec)) {
-          return file_status(file_type::not_found, perms::unknown);
-        }
-        return file_status(file_type::none);
-      }
-    }
-    if (sz) {
-      *sz = static_cast<uintmax_t>(st.st_size);
-    }
-    if (nhl) {
-      *nhl = st.st_nlink;
-    }
-    if (lwt) {
-      *lwt = st.st_mtime;
-    }
-    return fs;
-  } else {
-    ec = detail::make_system_error();
-    if (detail::is_not_found_error(ec)) {
-      return file_status(file_type::not_found, perms::unknown);
-    }
-    return file_status(file_type::none);
-  }
+                (void) recurse_count;
+                struct ::stat st;
+                auto result = ::lstat(p.c_str(), &st);
+                if (result == 0) {
+                    ec.clear();
+                    file_status fs = detail::file_status_from_st_mode(st.st_mode);
+                    if (sls) {
+                        *sls = fs;
+                    }
+                    if (fs.type() == file_type::symlink) {
+                        result = ::stat(p.c_str(), &st);
+                        if (result == 0) {
+                            fs = detail::file_status_from_st_mode(st.st_mode);
+                        } else {
+                            ec = detail::make_system_error();
+                            if (detail::is_not_found_error(ec)) {
+                                return file_status(file_type::not_found, perms::unknown);
+                            }
+                            return file_status(file_type::none);
+                        }
+                    }
+                    if (sz) {
+                        *sz = static_cast<uintmax_t>(st.st_size);
+                    }
+                    if (nhl) {
+                        *nhl = st.st_nlink;
+                    }
+                    if (lwt) {
+                        *lwt = st.st_mtime;
+                    }
+                    return fs;
+                } else {
+                    ec = detail::make_system_error();
+                    if (detail::is_not_found_error(ec)) {
+                        return file_status(file_type::not_found, perms::unknown);
+                    }
+                    return file_status(file_type::none);
+                }
 #endif
-}
+            }
 
-} // namespace detail
+        } // namespace detail
 
-inline u8arguments::u8arguments(int &argc, char **&argv)
-    : _argc(argc), _argv(argv), _refargc(argc), _refargv(argv),
-      _isvalid(false) {
+        inline u8arguments::u8arguments(int &argc, char **&argv)
+                : _argc(argc), _argv(argv), _refargc(argc), _refargv(argv),
+                  _isvalid(false) {
 #ifdef TURBO_PLATFORM_WINDOWS
-  LPWSTR *p;
+                                                                                                                                    LPWSTR *p;
   p = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
   _args.reserve(static_cast<size_t>(argc));
   _argp.reserve(static_cast<size_t>(argc));
@@ -2422,351 +2832,361 @@ inline u8arguments::u8arguments(int &argc, char **&argv)
   ::LocalFree(p);
   _isvalid = true;
 #else
-  std::setlocale(LC_ALL, "");
+            std::setlocale(LC_ALL, "");
 #if defined(__ANDROID__) && __ANDROID_API__ < 26
-  _isvalid = true;
+            _isvalid = true;
 #else
-  if (detail::equals_simple_insensitive(::nl_langinfo(CODESET), "UTF-8")) {
-    _isvalid = true;
-  }
+            if (detail::equals_simple_insensitive(::nl_langinfo(CODESET), "UTF-8")) {
+                _isvalid = true;
+            }
 #endif
 #endif
-}
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.construct] constructors and destructor
 
-inline path::path() noexcept {}
+        inline path::path() noexcept {}
 
-inline path::path(const path &p)
-    : _path(p._path)
+        inline path::path(const path &p)
+                : _path(p._path)
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-      ,
+                                                                                                                                ,
       _prefixLength(p._prefixLength)
 #endif
-{
-}
+        {
+        }
 
-inline path::path(path &&p) noexcept
-    : _path(std::move(p._path))
+        inline path::path(path &&p) noexcept
+                : _path(std::move(p._path))
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-      ,
+                                                                                                                                ,
       _prefixLength(p._prefixLength)
 #endif
-{
-}
+        {
+        }
 
-inline path::path(string_type &&source, format fmt)
-    : _path(std::move(source)) {
-  postprocess_path_with_format(fmt);
-}
+        inline path::path(string_type &&source, format fmt)
+                : _path(std::move(source)) {
+            postprocess_path_with_format(fmt);
+        }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-template <class Source, typename>
-inline path::path(const Source &source, const std::locale &loc, format fmt)
-    : path(source, fmt) {
-  std::string locName = loc.name();
-  if (!(locName.length() >= 5 &&
-        (locName.substr(locName.length() - 5) == "UTF-8" ||
-         locName.substr(locName.length() - 5) == "utf-8"))) {
-    throw filesystem_error(
-        "This implementation only supports UTF-8 locales!", path(_path),
-        detail::make_error_code(detail::portable_error::not_supported));
-  }
-}
 
-template <class InputIterator>
-inline path::path(InputIterator first, InputIterator last,
-                  const std::locale &loc, format fmt)
-    : path(std::basic_string<
-               typename std::iterator_traits<InputIterator>::value_type>(first,
-                                                                         last),
-           fmt) {
-  std::string locName = loc.name();
-  if (!(locName.length() >= 5 &&
-        (locName.substr(locName.length() - 5) == "UTF-8" ||
-         locName.substr(locName.length() - 5) == "utf-8"))) {
-    throw filesystem_error(
-        "This implementation only supports UTF-8 locales!", path(_path),
-        detail::make_error_code(detail::portable_error::not_supported));
-  }
-}
+        template<class Source, typename>
+        inline path::path(const Source &source, const std::locale &loc, format fmt)
+                : path(source, fmt) {
+            std::string locName = loc.name();
+            if (!(locName.length() >= 5 &&
+                  (locName.substr(locName.length() - 5) == "UTF-8" ||
+                   locName.substr(locName.length() - 5) == "utf-8"))) {
+                throw filesystem_error(
+                        "This implementation only supports UTF-8 locales!", path(_path),
+                        detail::make_error_code(detail::portable_error::not_supported));
+            }
+        }
+
+        template<class InputIterator>
+        inline path::path(InputIterator first, InputIterator last,
+                          const std::locale &loc, format fmt)
+                : path(std::basic_string<
+                               typename std::iterator_traits<InputIterator>::value_type>(first,
+                                                                                         last),
+                       fmt) {
+            std::string locName = loc.name();
+            if (!(locName.length() >= 5 &&
+                  (locName.substr(locName.length() - 5) == "UTF-8" ||
+                   locName.substr(locName.length() - 5) == "utf-8"))) {
+                throw filesystem_error(
+                        "This implementation only supports UTF-8 locales!", path(_path),
+                        detail::make_error_code(detail::portable_error::not_supported));
+            }
+        }
+
 #endif
 
-inline path::~path() {}
+        inline path::~path() {}
 
 //-----------------------------------------------------------------------------
 // [fs.path.assign] assignments
 
-inline path &path::operator=(const path &p) {
-  _path = p._path;
+        inline path &path::operator=(const path &p) {
+            _path = p._path;
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-  _prefixLength = p._prefixLength;
+            _prefixLength = p._prefixLength;
 #endif
-  return *this;
-}
+            return *this;
+        }
 
-inline path &path::operator=(path &&p) noexcept {
-  _path = std::move(p._path);
+        inline path &path::operator=(path &&p) noexcept {
+            _path = std::move(p._path);
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-  _prefixLength = p._prefixLength;
+            _prefixLength = p._prefixLength;
 #endif
-  return *this;
-}
+            return *this;
+        }
 
-inline path &path::operator=(path::string_type &&source) {
-  return assign(source);
-}
+        inline path &path::operator=(path::string_type &&source) {
+            return assign(source);
+        }
 
-inline path &path::assign(path::string_type &&source) {
-  _path = std::move(source);
-  postprocess_path_with_format(native_format);
-  return *this;
-}
+        inline path &path::assign(path::string_type &&source) {
+            _path = std::move(source);
+            postprocess_path_with_format(native_format);
+            return *this;
+        }
 
-template <class Source> inline path &path::operator=(const Source &source) {
-  return assign(source);
-}
+        template<class Source>
+        inline path &path::operator=(const Source &source) {
+            return assign(source);
+        }
 
-template <class Source> inline path &path::assign(const Source &source) {
+        template<class Source>
+        inline path &path::assign(const Source &source) {
 #ifdef GHC_USE_WCHAR_T
-  _path.assign(detail::toWChar(source));
+            _path.assign(detail::toWChar(source));
 #else
-  _path.assign(detail::toUtf8(source));
+            _path.assign(detail::toUtf8(source));
 #endif
-  postprocess_path_with_format(native_format);
-  return *this;
-}
+            postprocess_path_with_format(native_format);
+            return *this;
+        }
 
-template <> inline path &path::assign<path>(const path &source) {
-  _path = source._path;
+        template<>
+        inline path &path::assign<path>(const path &source) {
+            _path = source._path;
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-  _prefixLength = source._prefixLength;
+            _prefixLength = source._prefixLength;
 #endif
-  return *this;
-}
+            return *this;
+        }
 
-template <class InputIterator>
-inline path &path::assign(InputIterator first, InputIterator last) {
-  _path.assign(first, last);
-  postprocess_path_with_format(native_format);
-  return *this;
-}
+        template<class InputIterator>
+        inline path &path::assign(InputIterator first, InputIterator last) {
+            _path.assign(first, last);
+            postprocess_path_with_format(native_format);
+            return *this;
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.append] appends
 
-inline path &path::operator/=(const path &p) {
-  if (p.empty()) {
-    // was: if ((!has_root_directory() && is_absolute()) || has_filename())
-    if (!_path.empty() && _path[_path.length() - 1] != preferred_separator &&
-        _path[_path.length() - 1] != ':') {
-      _path += preferred_separator;
-    }
-    return *this;
-  }
-  if ((p.is_absolute() && (_path != root_name()._path || p._path != "/")) ||
-      (p.has_root_name() && p.root_name() != root_name())) {
-    assign(p);
-    return *this;
-  }
-  if (p.has_root_directory()) {
-    assign(root_name());
-  } else if ((!has_root_directory() && is_absolute()) || has_filename()) {
-    _path += preferred_separator;
-  }
-  auto iter = p.begin();
-  bool first = true;
-  if (p.has_root_name()) {
-    ++iter;
-  }
-  while (iter != p.end()) {
-    if (!first &&
-        !(!_path.empty() && _path[_path.length() - 1] == preferred_separator)) {
-      _path += preferred_separator;
-    }
-    first = false;
-    _path += (*iter++).native();
-  }
-  check_long_path();
-  return *this;
-}
+        inline path &path::operator/=(const path &p) {
+            if (p.empty()) {
+                // was: if ((!has_root_directory() && is_absolute()) || has_filename())
+                if (!_path.empty() && _path[_path.length() - 1] != preferred_separator &&
+                    _path[_path.length() - 1] != ':') {
+                    _path += preferred_separator;
+                }
+                return *this;
+            }
+            if ((p.is_absolute() && (_path != root_name()._path || p._path != "/")) ||
+                (p.has_root_name() && p.root_name() != root_name())) {
+                assign(p);
+                return *this;
+            }
+            if (p.has_root_directory()) {
+                assign(root_name());
+            } else if ((!has_root_directory() && is_absolute()) || has_filename()) {
+                _path += preferred_separator;
+            }
+            auto iter = p.begin();
+            bool first = true;
+            if (p.has_root_name()) {
+                ++iter;
+            }
+            while (iter != p.end()) {
+                if (!first &&
+                    !(!_path.empty() && _path[_path.length() - 1] == preferred_separator)) {
+                    _path += preferred_separator;
+                }
+                first = false;
+                _path += (*iter++).native();
+            }
+            check_long_path();
+            return *this;
+        }
 
-inline void path::append_name(const value_type *name) {
-  if (_path.empty()) {
-    this->operator/=(path(name));
-  } else {
-    if (_path.back() != path::preferred_separator) {
-      _path.push_back(path::preferred_separator);
-    }
-    _path += name;
-    check_long_path();
-  }
-}
+        inline void path::append_name(const value_type *name) {
+            if (_path.empty()) {
+                this->operator/=(path(name));
+            } else {
+                if (_path.back() != path::preferred_separator) {
+                    _path.push_back(path::preferred_separator);
+                }
+                _path += name;
+                check_long_path();
+            }
+        }
 
-template <class Source> inline path &path::operator/=(const Source &source) {
-  return append(source);
-}
+        template<class Source>
+        inline path &path::operator/=(const Source &source) {
+            return append(source);
+        }
 
-template <class Source> inline path &path::append(const Source &source) {
-  return this->operator/=(path(source));
-}
+        template<class Source>
+        inline path &path::append(const Source &source) {
+            return this->operator/=(path(source));
+        }
 
-template <> inline path &path::append<path>(const path &p) {
-  return this->operator/=(p);
-}
+        template<>
+        inline path &path::append<path>(const path &p) {
+            return this->operator/=(p);
+        }
 
-template <class InputIterator>
-inline path &path::append(InputIterator first, InputIterator last) {
-  std::basic_string<typename std::iterator_traits<InputIterator>::value_type>
-      part(first, last);
-  return append(part);
-}
+        template<class InputIterator>
+        inline path &path::append(InputIterator first, InputIterator last) {
+            std::basic_string<typename std::iterator_traits<InputIterator>::value_type>
+                    part(first, last);
+            return append(part);
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.concat] concatenation
 
-inline path &path::operator+=(const path &x) {
-  return concat(x._path);
-}
+        inline path &path::operator+=(const path &x) {
+            return concat(x._path);
+        }
 
-inline path &path::operator+=(const string_type &x) {
-  return concat(x);
-}
+        inline path &path::operator+=(const string_type &x) {
+            return concat(x);
+        }
 
-inline path &path::operator+=(basic_string_view<value_type> x) {
-  return concat(x);
-}
+        inline path &path::operator+=(basic_string_view<value_type> x) {
+            return concat(x);
+        }
 
-inline path &path::operator+=(const value_type *x) {
-  basic_string_view<value_type> part(x);
-  return concat(part);
-}
+        inline path &path::operator+=(const value_type *x) {
+            basic_string_view<value_type> part(x);
+            return concat(part);
+        }
 
-inline path &path::operator+=(value_type x) {
+        inline path &path::operator+=(value_type x) {
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (x == generic_separator) {
+                                                                                                                                    if (x == generic_separator) {
     x = preferred_separator;
   }
 #endif
-  if (_path.empty() || _path.back() != preferred_separator) {
-    _path += x;
-  }
-  check_long_path();
-  return *this;
-}
+            if (_path.empty() || _path.back() != preferred_separator) {
+                _path += x;
+            }
+            check_long_path();
+            return *this;
+        }
 
-template <class Source>
-inline path::path_from_string<Source> &path::operator+=(const Source &x) {
-  return concat(x);
-}
+        template<class Source>
+        inline path::path_from_string<Source> &path::operator+=(const Source &x) {
+            return concat(x);
+        }
 
-template <class EcharT>
-inline path::path_type_EcharT<EcharT> &path::operator+=(EcharT x) {
-  basic_string_view<EcharT> part(&x, 1);
-  concat(part);
-  return *this;
-}
+        template<class EcharT>
+        inline path::path_type_EcharT<EcharT> &path::operator+=(EcharT x) {
+            basic_string_view<EcharT> part(&x, 1);
+            concat(part);
+            return *this;
+        }
 
-template <class Source> inline path &path::concat(const Source &x) {
-  path p(x);
-  _path += p._path;
-  postprocess_path_with_format(native_format);
-  return *this;
-}
-template <class InputIterator>
-inline path &path::concat(InputIterator first, InputIterator last) {
-  _path.append(first, last);
-  postprocess_path_with_format(native_format);
-  return *this;
-}
+        template<class Source>
+        inline path &path::concat(const Source &x) {
+            path p(x);
+            _path += p._path;
+            postprocess_path_with_format(native_format);
+            return *this;
+        }
+
+        template<class InputIterator>
+        inline path &path::concat(InputIterator first, InputIterator last) {
+            _path.append(first, last);
+            postprocess_path_with_format(native_format);
+            return *this;
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.modifiers] modifiers
-inline void path::clear() noexcept {
-  _path.clear();
+        inline void path::clear() noexcept {
+            _path.clear();
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-  _prefixLength = 0;
+            _prefixLength = 0;
 #endif
-}
+        }
 
-inline path &path::make_preferred() {
-  // as this filesystem implementation only uses generic_format
-  // internally, this must be a no-op
-  return *this;
-}
+        inline path &path::make_preferred() {
+            // as this filesystem implementation only uses generic_format
+            // internally, this must be a no-op
+            return *this;
+        }
 
-inline path &path::remove_filename() {
-  if (has_filename()) {
-    _path.erase(_path.size() - filename()._path.size());
-  }
-  return *this;
-}
+        inline path &path::remove_filename() {
+            if (has_filename()) {
+                _path.erase(_path.size() - filename()._path.size());
+            }
+            return *this;
+        }
 
-inline path &path::replace_filename(const path &replacement) {
-  remove_filename();
-  return append(replacement);
-}
+        inline path &path::replace_filename(const path &replacement) {
+            remove_filename();
+            return append(replacement);
+        }
 
-inline path &path::replace_extension(const path &replacement) {
-  if (has_extension()) {
-    _path.erase(_path.size() - extension()._path.size());
-  }
-  if (!replacement.empty() && replacement._path[0] != '.') {
-    _path += '.';
-  }
-  return concat(replacement);
-}
+        inline path &path::replace_extension(const path &replacement) {
+            if (has_extension()) {
+                _path.erase(_path.size() - extension()._path.size());
+            }
+            if (!replacement.empty() && replacement._path[0] != '.') {
+                _path += '.';
+            }
+            return concat(replacement);
+        }
 
-inline void path::swap(path &rhs) noexcept {
-  _path.swap(rhs._path);
+        inline void path::swap(path &rhs) noexcept {
+            _path.swap(rhs._path);
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-  std::swap(_prefixLength, rhs._prefixLength);
+            std::swap(_prefixLength, rhs._prefixLength);
 #endif
-}
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.native.obs] native format observers
-inline const path::string_type &path::native() const noexcept {
-  return _path;
-}
+        inline const path::string_type &path::native() const noexcept {
+            return _path;
+        }
 
-inline const path::value_type *path::c_str() const noexcept {
-  return native().c_str();
-}
+        inline const path::value_type *path::c_str() const noexcept {
+            return native().c_str();
+        }
 
-inline path::operator path::string_type() const { return native(); }
+        inline path::operator path::string_type() const { return native(); }
 
-template <class EcharT, class traits, class Allocator>
-inline std::basic_string<EcharT, traits, Allocator>
-path::string(const Allocator &a) const {
+        template<class EcharT, class traits, class Allocator>
+        inline std::basic_string<EcharT, traits, Allocator>
+        path::string(const Allocator &a) const {
 #ifdef GHC_USE_WCHAR_T
-  return detail::fromWChar<std::basic_string<EcharT, traits, Allocator>>(_path,
+                                                                                                                                    return detail::fromWChar<std::basic_string<EcharT, traits, Allocator>>(_path,
                                                                          a);
 #else
-  return detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(_path,
-                                                                        a);
+            return detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(_path,
+                                                                                  a);
 #endif
-}
+        }
 
-inline std::string path::string() const {
+        inline std::string path::string() const {
 #ifdef GHC_USE_WCHAR_T
-  return detail::toUtf8(native());
+            return detail::toUtf8(native());
 #else
-  return native();
+            return native();
 #endif
-}
+        }
 
-inline std::wstring path::wstring() const {
+        inline std::wstring path::wstring() const {
 #ifdef GHC_USE_WCHAR_T
-  return native();
+            return native();
 #else
-  return detail::fromUtf8<std::wstring>(native());
+            return detail::fromUtf8<std::wstring>(native());
 #endif
-}
+        }
 
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-inline std::u8string path::u8string() const {
+                                                                                                                                inline std::u8string path::u8string() const {
 #ifdef GHC_USE_WCHAR_T
   return std::u8string(
       reinterpret_cast<const char8_t *>(detail::toUtf8(native()).c_str()));
@@ -2775,32 +3195,34 @@ inline std::u8string path::u8string() const {
 #endif
 }
 #else
-inline std::string path::u8string() const {
+
+        inline std::string path::u8string() const {
 #ifdef GHC_USE_WCHAR_T
-  return detail::toUtf8(native());
+            return detail::toUtf8(native());
 #else
-  return native();
+            return native();
 #endif
-}
+        }
+
 #endif
 
-inline std::u16string path::u16string() const {
-  // TODO: optimize
-  return detail::fromUtf8<std::u16string>(string());
-}
+        inline std::u16string path::u16string() const {
+            // TODO: optimize
+            return detail::fromUtf8<std::u16string>(string());
+        }
 
-inline std::u32string path::u32string() const {
-  // TODO: optimize
-  return detail::fromUtf8<std::u32string>(string());
-}
+        inline std::u32string path::u32string() const {
+            // TODO: optimize
+            return detail::fromUtf8<std::u32string>(string());
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.generic.obs] generic format observers
-template <class EcharT, class traits, class Allocator>
-inline std::basic_string<EcharT, traits, Allocator>
-path::generic_string(const Allocator &a) const {
+        template<class EcharT, class traits, class Allocator>
+        inline std::basic_string<EcharT, traits, Allocator>
+        path::generic_string(const Allocator &a) const {
 #ifdef TURBO_PLATFORM_WINDOWS
-#ifdef GHC_USE_WCHAR_T
+                                                                                                                                    #ifdef GHC_USE_WCHAR_T
   auto result = detail::fromWChar<std::basic_string<EcharT, traits, Allocator>,
                                   path::string_type>(_path, a);
 #else
@@ -2814,31 +3236,31 @@ path::generic_string(const Allocator &a) const {
   }
   return result;
 #else
-  return detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(_path,
-                                                                        a);
+            return detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(_path,
+                                                                                  a);
 #endif
-}
+        }
 
-inline std::string path::generic_string() const {
+        inline std::string path::generic_string() const {
 #ifdef TURBO_PLATFORM_WINDOWS
-  return generic_string<std::string::value_type, std::string::traits_type,
+                                                                                                                                    return generic_string<std::string::value_type, std::string::traits_type,
                         std::string::allocator_type>();
 #else
-  return _path;
+            return _path;
 #endif
-}
+        }
 
-inline std::wstring path::generic_wstring() const {
+        inline std::wstring path::generic_wstring() const {
 #ifdef TURBO_PLATFORM_WINDOWS
-  return generic_string<std::wstring::value_type, std::wstring::traits_type,
+                                                                                                                                    return generic_string<std::wstring::value_type, std::wstring::traits_type,
                         std::wstring::allocator_type>();
 #else
-  return detail::fromUtf8<std::wstring>(_path);
+            return detail::fromUtf8<std::wstring>(_path);
 #endif
-} // namespace filesystem
+        } // namespace filesystem
 
 #if defined(__cpp_lib_char8_t) && !defined(TURBO_FILESYSTEM_ENFORCE_CPP17_API)
-inline std::u8string path::generic_u8string() const {
+                                                                                                                                inline std::u8string path::generic_u8string() const {
 #ifdef TURBO_PLATFORM_WINDOWS
   return generic_string<std::u8string::value_type, std::u8string::traits_type,
                         std::u8string::allocator_type>();
@@ -2847,78 +3269,80 @@ inline std::u8string path::generic_u8string() const {
 #endif
 }
 #else
-inline std::string path::generic_u8string() const {
+
+        inline std::string path::generic_u8string() const {
 #ifdef TURBO_PLATFORM_WINDOWS
-  return generic_string<std::string::value_type, std::string::traits_type,
+                                                                                                                                    return generic_string<std::string::value_type, std::string::traits_type,
                         std::string::allocator_type>();
 #else
-  return _path;
+            return _path;
 #endif
-}
+        }
+
 #endif
 
-inline std::u16string path::generic_u16string() const {
+        inline std::u16string path::generic_u16string() const {
 #ifdef TURBO_PLATFORM_WINDOWS
-  return generic_string<std::u16string::value_type, std::u16string::traits_type,
+                                                                                                                                    return generic_string<std::u16string::value_type, std::u16string::traits_type,
                         std::u16string::allocator_type>();
 #else
-  return detail::fromUtf8<std::u16string>(_path);
+            return detail::fromUtf8<std::u16string>(_path);
 #endif
-}
+        }
 
-inline std::u32string path::generic_u32string() const {
+        inline std::u32string path::generic_u32string() const {
 #ifdef TURBO_PLATFORM_WINDOWS
-  return generic_string<std::u32string::value_type, std::u32string::traits_type,
+                                                                                                                                    return generic_string<std::u32string::value_type, std::u32string::traits_type,
                         std::u32string::allocator_type>();
 #else
-  return detail::fromUtf8<std::u32string>(_path);
+            return detail::fromUtf8<std::u32string>(_path);
 #endif
-}
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.compare] compare
-inline int path::compare(const path &p) const noexcept {
+        inline int path::compare(const path &p) const noexcept {
 #ifdef LWG_2936_BEHAVIOUR
-  auto rnl1 = root_name_length();
-  auto rnl2 = p.root_name_length();
+            auto rnl1 = root_name_length();
+            auto rnl2 = p.root_name_length();
 #ifdef TURBO_PLATFORM_WINDOWS
-  auto rnc = detail::compare_simple_insensitive(_path.c_str(), rnl1,
+                                                                                                                                    auto rnc = detail::compare_simple_insensitive(_path.c_str(), rnl1,
                                                 p._path.c_str(), rnl2);
 #else
-  auto rnc = _path.compare(0, rnl1, p._path, 0, (std::min(rnl1, rnl2)));
+            auto rnc = _path.compare(0, rnl1, p._path, 0, (std::min(rnl1, rnl2)));
 #endif
-  if (rnc) {
-    return rnc;
-  }
-  bool hrd1 = has_root_directory(), hrd2 = p.has_root_directory();
-  if (hrd1 != hrd2) {
-    return hrd1 ? 1 : -1;
-  }
-  if (hrd1) {
-    ++rnl1;
-    ++rnl2;
-  }
-  auto iter1 = _path.begin() + static_cast<int>(rnl1);
-  auto iter2 = p._path.begin() + static_cast<int>(rnl2);
-  while (iter1 != _path.end() && iter2 != p._path.end() && *iter1 == *iter2) {
-    ++iter1;
-    ++iter2;
-  }
-  if (iter1 == _path.end()) {
-    return iter2 == p._path.end() ? 0 : -1;
-  }
-  if (iter2 == p._path.end()) {
-    return 1;
-  }
-  if (*iter1 == preferred_separator) {
-    return -1;
-  }
-  if (*iter2 == preferred_separator) {
-    return 1;
-  }
-  return *iter1 < *iter2 ? -1 : 1;
+            if (rnc) {
+                return rnc;
+            }
+            bool hrd1 = has_root_directory(), hrd2 = p.has_root_directory();
+            if (hrd1 != hrd2) {
+                return hrd1 ? 1 : -1;
+            }
+            if (hrd1) {
+                ++rnl1;
+                ++rnl2;
+            }
+            auto iter1 = _path.begin() + static_cast<int>(rnl1);
+            auto iter2 = p._path.begin() + static_cast<int>(rnl2);
+            while (iter1 != _path.end() && iter2 != p._path.end() && *iter1 == *iter2) {
+                ++iter1;
+                ++iter2;
+            }
+            if (iter1 == _path.end()) {
+                return iter2 == p._path.end() ? 0 : -1;
+            }
+            if (iter2 == p._path.end()) {
+                return 1;
+            }
+            if (*iter1 == preferred_separator) {
+                return -1;
+            }
+            if (*iter2 == preferred_separator) {
+                return 1;
+            }
+            return *iter1 < *iter2 ? -1 : 1;
 #else // LWG_2936_BEHAVIOUR
-#ifdef TURBO_PLATFORM_WINDOWS
+                                                                                                                                    #ifdef TURBO_PLATFORM_WINDOWS
   auto rnl1 = root_name_length();
   auto rnl2 = p.root_name_length();
   auto rnc = detail::compare_simple_insensitive(_path.c_str(), rnl1,
@@ -2932,24 +3356,24 @@ inline int path::compare(const path &p) const noexcept {
   return _path.compare(p._path);
 #endif
 #endif
-}
+        }
 
-inline int path::compare(const string_type &s) const {
-  return compare(path(s));
-}
+        inline int path::compare(const string_type &s) const {
+            return compare(path(s));
+        }
 
-inline int path::compare(basic_string_view<value_type> s) const {
-  return compare(path(s));
-}
+        inline int path::compare(basic_string_view<value_type> s) const {
+            return compare(path(s));
+        }
 
-inline int path::compare(const value_type *s) const {
-  return compare(path(s));
-}
+        inline int path::compare(const value_type *s) const {
+            return compare(path(s));
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.decompose] decomposition
 #ifdef TURBO_PLATFORM_WINDOWS
-inline void path::handle_prefixes() {
+                                                                                                                                inline void path::handle_prefixes() {
 #if defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
   _prefixLength = 0;
   if (_path.length() >= 6 && _path[2] == '?' &&
@@ -2967,105 +3391,105 @@ inline void path::handle_prefixes() {
 }
 #endif
 
-inline path::string_type::size_type
-path::root_name_length() const noexcept {
+        inline path::string_type::size_type
+        path::root_name_length() const noexcept {
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (_path.length() >= _prefixLength + 2 &&
+                                                                                                                                    if (_path.length() >= _prefixLength + 2 &&
       std::toupper(static_cast<unsigned char>(_path[_prefixLength])) >= 'A' &&
       std::toupper(static_cast<unsigned char>(_path[_prefixLength])) <= 'Z' &&
       _path[_prefixLength + 1] == ':') {
     return 2;
   }
 #endif
-  if (_path.length() > _prefixLength + 2 &&
-      _path[_prefixLength] == preferred_separator &&
-      _path[_prefixLength + 1] == preferred_separator &&
-      _path[_prefixLength + 2] != preferred_separator &&
-      std::isprint(_path[_prefixLength + 2])) {
-    impl_string_type::size_type pos =
-        _path.find(preferred_separator, _prefixLength + 3);
-    if (pos == impl_string_type::npos) {
-      return _path.length();
-    } else {
-      return pos;
-    }
-  }
-  return 0;
-}
+            if (_path.length() > _prefixLength + 2 &&
+                _path[_prefixLength] == preferred_separator &&
+                _path[_prefixLength + 1] == preferred_separator &&
+                _path[_prefixLength + 2] != preferred_separator &&
+                std::isprint(_path[_prefixLength + 2])) {
+                impl_string_type::size_type pos =
+                        _path.find(preferred_separator, _prefixLength + 3);
+                if (pos == impl_string_type::npos) {
+                    return _path.length();
+                } else {
+                    return pos;
+                }
+            }
+            return 0;
+        }
 
-inline path path::root_name() const {
-  return path(_path.substr(_prefixLength, root_name_length()), native_format);
-}
+        inline path path::root_name() const {
+            return path(_path.substr(_prefixLength, root_name_length()), native_format);
+        }
 
-inline path path::root_directory() const {
-  if (has_root_directory()) {
-    static const path _root_dir(std::string(1, preferred_separator),
-                                native_format);
-    return _root_dir;
-  }
-  return path();
-}
+        inline path path::root_directory() const {
+            if (has_root_directory()) {
+                static const path _root_dir(std::string(1, preferred_separator),
+                                            native_format);
+                return _root_dir;
+            }
+            return path();
+        }
 
-inline path path::root_path() const {
-  return path(root_name().string() + root_directory().string(), native_format);
-}
+        inline path path::root_path() const {
+            return path(root_name().string() + root_directory().string(), native_format);
+        }
 
-inline path path::relative_path() const {
-  auto rootPathLen =
-      _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
-  return path(_path.substr((std::min)(rootPathLen, _path.length())),
-              generic_format);
-}
+        inline path path::relative_path() const {
+            auto rootPathLen =
+                    _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
+            return path(_path.substr((std::min)(rootPathLen, _path.length())),
+                        generic_format);
+        }
 
-inline path path::parent_path() const {
-  auto rootPathLen =
-      _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
-  if (rootPathLen < _path.length()) {
-    if (empty()) {
-      return path();
-    } else {
-      auto piter = end();
-      auto iter = piter.decrement(_path.end());
-      if (iter > _path.begin() + static_cast<long>(rootPathLen) &&
-          *iter != preferred_separator) {
-        --iter;
-      }
-      return path(_path.begin(), iter, native_format);
-    }
-  } else {
-    return *this;
-  }
-}
+        inline path path::parent_path() const {
+            auto rootPathLen =
+                    _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
+            if (rootPathLen < _path.length()) {
+                if (empty()) {
+                    return path();
+                } else {
+                    auto piter = end();
+                    auto iter = piter.decrement(_path.end());
+                    if (iter > _path.begin() + static_cast<long>(rootPathLen) &&
+                        *iter != preferred_separator) {
+                        --iter;
+                    }
+                    return path(_path.begin(), iter, native_format);
+                }
+            } else {
+                return *this;
+            }
+        }
 
-inline path path::filename() const {
-  return !has_relative_path() ? path() : path(*--end());
-}
+        inline path path::filename() const {
+            return !has_relative_path() ? path() : path(*--end());
+        }
 
-inline path path::stem() const {
-  impl_string_type fn = filename().native();
-  if (fn != "." && fn != "..") {
-    impl_string_type::size_type pos = fn.rfind('.');
-    if (pos != impl_string_type::npos && pos > 0) {
-      return path{fn.substr(0, pos), native_format};
-    }
-  }
-  return path{fn, native_format};
-}
+        inline path path::stem() const {
+            impl_string_type fn = filename().native();
+            if (fn != "." && fn != "..") {
+                impl_string_type::size_type pos = fn.rfind('.');
+                if (pos != impl_string_type::npos && pos > 0) {
+                    return path{fn.substr(0, pos), native_format};
+                }
+            }
+            return path{fn, native_format};
+        }
 
-inline path path::extension() const {
-  if (has_relative_path()) {
-    auto iter = end();
-    const auto &fn = *--iter;
-    impl_string_type::size_type pos = fn._path.rfind('.');
-    if (pos != std::string::npos && pos > 0) {
-      return path(fn._path.substr(pos), native_format);
-    }
-  }
-  return path();
-}
+        inline path path::extension() const {
+            if (has_relative_path()) {
+                auto iter = end();
+                const auto &fn = *--iter;
+                impl_string_type::size_type pos = fn._path.rfind('.');
+                if (pos != std::string::npos && pos > 0) {
+                    return path(fn._path.substr(pos), native_format);
+                }
+            }
+            return path();
+        }
 
 #ifdef TURBO_PLATFORM_WINDOWS
-namespace detail {
+                                                                                                                                namespace detail {
 inline bool has_executable_extension(const path &p) {
   if (p.has_relative_path()) {
     auto iter = p.end();
@@ -3089,187 +3513,187 @@ inline bool has_executable_extension(const path &p) {
 
 //-----------------------------------------------------------------------------
 // [fs.path.query] query
-inline bool path::empty() const noexcept { return _path.empty(); }
+        inline bool path::empty() const noexcept { return _path.empty(); }
 
-inline bool path::has_root_name() const {
-  return root_name_length() > 0;
-}
+        inline bool path::has_root_name() const {
+            return root_name_length() > 0;
+        }
 
-inline bool path::has_root_directory() const {
-  auto rootLen = _prefixLength + root_name_length();
-  return (_path.length() > rootLen && _path[rootLen] == preferred_separator);
-}
+        inline bool path::has_root_directory() const {
+            auto rootLen = _prefixLength + root_name_length();
+            return (_path.length() > rootLen && _path[rootLen] == preferred_separator);
+        }
 
-inline bool path::has_root_path() const {
-  return has_root_name() || has_root_directory();
-}
+        inline bool path::has_root_path() const {
+            return has_root_name() || has_root_directory();
+        }
 
-inline bool path::has_relative_path() const {
-  auto rootPathLen =
-      _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
-  return rootPathLen < _path.length();
-}
+        inline bool path::has_relative_path() const {
+            auto rootPathLen =
+                    _prefixLength + root_name_length() + (has_root_directory() ? 1 : 0);
+            return rootPathLen < _path.length();
+        }
 
-inline bool path::has_parent_path() const {
-  return !parent_path().empty();
-}
+        inline bool path::has_parent_path() const {
+            return !parent_path().empty();
+        }
 
-inline bool path::has_filename() const {
-  return has_relative_path() && !filename().empty();
-}
+        inline bool path::has_filename() const {
+            return has_relative_path() && !filename().empty();
+        }
 
-inline bool path::has_stem() const { return !stem().empty(); }
+        inline bool path::has_stem() const { return !stem().empty(); }
 
-inline bool path::has_extension() const {
-  return !extension().empty();
-}
+        inline bool path::has_extension() const {
+            return !extension().empty();
+        }
 
-inline bool path::is_absolute() const {
+        inline bool path::is_absolute() const {
 #ifdef TURBO_PLATFORM_WINDOWS
-  return has_root_name() && has_root_directory();
+            return has_root_name() && has_root_directory();
 #else
-  return has_root_directory();
+            return has_root_directory();
 #endif
-}
+        }
 
-inline bool path::is_relative() const { return !is_absolute(); }
+        inline bool path::is_relative() const { return !is_absolute(); }
 
 //-----------------------------------------------------------------------------
 // [fs.path.gen] generation
-inline path path::lexically_normal() const {
-  path dest;
-  bool lastDotDot = false;
-  for (string_type s : *this) {
-    if (s == ".") {
-      dest /= "";
-      continue;
-    } else if (s == ".." && !dest.empty()) {
-      auto root = root_path();
-      if (dest == root) {
-        continue;
-      } else if (*(--dest.end()) != "..") {
-        if (dest._path.back() == preferred_separator) {
-          dest._path.pop_back();
+        inline path path::lexically_normal() const {
+            path dest;
+            bool lastDotDot = false;
+            for (string_type s: *this) {
+                if (s == ".") {
+                    dest /= "";
+                    continue;
+                } else if (s == ".." && !dest.empty()) {
+                    auto root = root_path();
+                    if (dest == root) {
+                        continue;
+                    } else if (*(--dest.end()) != "..") {
+                        if (dest._path.back() == preferred_separator) {
+                            dest._path.pop_back();
+                        }
+                        dest.remove_filename();
+                        continue;
+                    }
+                }
+                if (!(s.empty() && lastDotDot)) {
+                    dest /= s;
+                }
+                lastDotDot = s == "..";
+            }
+            if (dest.empty()) {
+                dest = ".";
+            }
+            return dest;
         }
-        dest.remove_filename();
-        continue;
-      }
-    }
-    if (!(s.empty() && lastDotDot)) {
-      dest /= s;
-    }
-    lastDotDot = s == "..";
-  }
-  if (dest.empty()) {
-    dest = ".";
-  }
-  return dest;
-}
 
-inline path path::lexically_relative(const path &base) const {
-  if (root_name() != base.root_name() || is_absolute() != base.is_absolute() ||
-      (!has_root_directory() && base.has_root_directory())) {
-    return path();
-  }
-  const_iterator a = begin(), b = base.begin();
-  while (a != end() && b != base.end() && *a == *b) {
-    ++a;
-    ++b;
-  }
-  if (a == end() && b == base.end()) {
-    return path(".");
-  }
-  int count = 0;
-  for (const auto &element :
-       input_iterator_range<const_iterator>(b, base.end())) {
-    if (element != "." && element != "" && element != "..") {
-      ++count;
-    } else if (element == "..") {
-      --count;
-    }
-  }
-  if (count < 0) {
-    return path();
-  }
-  path result;
-  for (int i = 0; i < count; ++i) {
-    result /= "..";
-  }
-  for (const auto &element : input_iterator_range<const_iterator>(a, end())) {
-    result /= element;
-  }
-  return result;
-}
+        inline path path::lexically_relative(const path &base) const {
+            if (root_name() != base.root_name() || is_absolute() != base.is_absolute() ||
+                (!has_root_directory() && base.has_root_directory())) {
+                return path();
+            }
+            const_iterator a = begin(), b = base.begin();
+            while (a != end() && b != base.end() && *a == *b) {
+                ++a;
+                ++b;
+            }
+            if (a == end() && b == base.end()) {
+                return path(".");
+            }
+            int count = 0;
+            for (const auto &element:
+                    input_iterator_range<const_iterator>(b, base.end())) {
+                if (element != "." && element != "" && element != "..") {
+                    ++count;
+                } else if (element == "..") {
+                    --count;
+                }
+            }
+            if (count < 0) {
+                return path();
+            }
+            path result;
+            for (int i = 0; i < count; ++i) {
+                result /= "..";
+            }
+            for (const auto &element: input_iterator_range<const_iterator>(a, end())) {
+                result /= element;
+            }
+            return result;
+        }
 
-inline path path::lexically_proximate(const path &base) const {
-  path result = lexically_relative(base);
-  return result.empty() ? *this : result;
-}
+        inline path path::lexically_proximate(const path &base) const {
+            path result = lexically_relative(base);
+            return result.empty() ? *this : result;
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.itr] iterators
-inline path::iterator::iterator() {}
+        inline path::iterator::iterator() {}
 
-inline
-path::iterator::iterator(const path &p,
-                         const impl_string_type::const_iterator &pos)
-    : _first(p._path.begin()), _last(p._path.end()),
-      _prefix(_first +
-              static_cast<string_type::difference_type>(p._prefixLength)),
-      _root(p.has_root_directory()
-                ? _first + static_cast<string_type::difference_type>(
-                               p._prefixLength + p.root_name_length())
-                : _last),
-      _iter(pos) {
-  if (pos != _last) {
-    updateCurrent();
-  }
-}
-
-inline path::impl_string_type::const_iterator
-path::iterator::increment(
-    const path::impl_string_type::const_iterator &pos) const {
-  path::impl_string_type::const_iterator i = pos;
-  bool fromStart = i == _first || i == _prefix;
-  if (i != _last) {
-    if (fromStart && i == _first && _prefix > _first) {
-      i = _prefix;
-    } else if (*i++ == preferred_separator) {
-      // we can only sit on a slash if it is a network name or a root
-      if (i != _last && *i == preferred_separator) {
-        if (fromStart && !(i + 1 != _last && *(i + 1) == preferred_separator)) {
-          // leadind double slashes detected, treat this and the
-          // following until a slash as one unit
-          i = std::find(++i, _last, preferred_separator);
-        } else {
-          // skip redundant slashes
-          while (i != _last && *i == preferred_separator) {
-            ++i;
-          }
+        inline
+        path::iterator::iterator(const path &p,
+                                 const impl_string_type::const_iterator &pos)
+                : _first(p._path.begin()), _last(p._path.end()),
+                  _prefix(_first +
+                          static_cast<string_type::difference_type>(p._prefixLength)),
+                  _root(p.has_root_directory()
+                        ? _first + static_cast<string_type::difference_type>(
+                                  p._prefixLength + p.root_name_length())
+                        : _last),
+                  _iter(pos) {
+            if (pos != _last) {
+                updateCurrent();
+            }
         }
-      }
-    } else {
-      if (fromStart && i != _last && *i == ':') {
-        ++i;
-      } else {
-        i = std::find(i, _last, preferred_separator);
-      }
-    }
-  }
-  return i;
-}
 
-inline path::impl_string_type::const_iterator
-path::iterator::decrement(
-    const path::impl_string_type::const_iterator &pos) const {
-  path::impl_string_type::const_iterator i = pos;
-  if (i != _first) {
-    --i;
-    // if this is now the root slash or the trailing slash, we are done,
-    // else check for network name
-    if (i != _root && (pos != _last || *i != preferred_separator)) {
+        inline path::impl_string_type::const_iterator
+        path::iterator::increment(
+                const path::impl_string_type::const_iterator &pos) const {
+            path::impl_string_type::const_iterator i = pos;
+            bool fromStart = i == _first || i == _prefix;
+            if (i != _last) {
+                if (fromStart && i == _first && _prefix > _first) {
+                    i = _prefix;
+                } else if (*i++ == preferred_separator) {
+                    // we can only sit on a slash if it is a network name or a root
+                    if (i != _last && *i == preferred_separator) {
+                        if (fromStart && !(i + 1 != _last && *(i + 1) == preferred_separator)) {
+                            // leadind double slashes detected, treat this and the
+                            // following until a slash as one unit
+                            i = std::find(++i, _last, preferred_separator);
+                        } else {
+                            // skip redundant slashes
+                            while (i != _last && *i == preferred_separator) {
+                                ++i;
+                            }
+                        }
+                    }
+                } else {
+                    if (fromStart && i != _last && *i == ':') {
+                        ++i;
+                    } else {
+                        i = std::find(i, _last, preferred_separator);
+                    }
+                }
+            }
+            return i;
+        }
+
+        inline path::impl_string_type::const_iterator
+        path::iterator::decrement(
+                const path::impl_string_type::const_iterator &pos) const {
+            path::impl_string_type::const_iterator i = pos;
+            if (i != _first) {
+                --i;
+                // if this is now the root slash or the trailing slash, we are done,
+                // else check for network name
+                if (i != _root && (pos != _last || *i != preferred_separator)) {
 #ifdef TURBO_PLATFORM_WINDOWS
-      static const impl_string_type seps = TURBO_PLATFORM_LITERAL("\\:");
+                                                                                                                                            static const impl_string_type seps = TURBO_PLATFORM_LITERAL("\\:");
       i = std::find_first_of(
               std::reverse_iterator<path::impl_string_type::const_iterator>(i),
               std::reverse_iterator<path::impl_string_type::const_iterator>(
@@ -3280,247 +3704,251 @@ path::iterator::decrement(
         i++;
       }
 #else
-      i = std::find(
-              std::reverse_iterator<path::impl_string_type::const_iterator>(i),
-              std::reverse_iterator<path::impl_string_type::const_iterator>(
-                  _first),
-              preferred_separator)
-              .base();
+                    i = std::find(
+                            std::reverse_iterator<path::impl_string_type::const_iterator>(i),
+                            std::reverse_iterator<path::impl_string_type::const_iterator>(
+                                    _first),
+                            preferred_separator)
+                            .base();
 #endif
-      // Now we have to check if this is a network name
-      if (i - _first == 2 && *_first == preferred_separator &&
-          *(_first + 1) == preferred_separator) {
-        i -= 2;
-      }
-    }
-  }
-  return i;
-}
+                    // Now we have to check if this is a network name
+                    if (i - _first == 2 && *_first == preferred_separator &&
+                        *(_first + 1) == preferred_separator) {
+                        i -= 2;
+                    }
+                }
+            }
+            return i;
+        }
 
-inline void path::iterator::updateCurrent() {
-  if ((_iter == _last) || (_iter != _first && _iter != _last &&
-                           (*_iter == preferred_separator && _iter != _root) &&
-                           (_iter + 1 == _last))) {
-    _current.clear();
-  } else {
-    _current.assign(_iter, increment(_iter));
-  }
-}
+        inline void path::iterator::updateCurrent() {
+            if ((_iter == _last) || (_iter != _first && _iter != _last &&
+                                     (*_iter == preferred_separator && _iter != _root) &&
+                                     (_iter + 1 == _last))) {
+                _current.clear();
+            } else {
+                _current.assign(_iter, increment(_iter));
+            }
+        }
 
-inline path::iterator &path::iterator::operator++() {
-  _iter = increment(_iter);
-  while (_iter != _last &&                // we didn't reach the end
-         _iter != _root &&                // this is not a root position
-         *_iter == preferred_separator && // we are on a separator
-         (_iter + 1) != _last             // the slash is not the last char
-  ) {
-    ++_iter;
-  }
-  updateCurrent();
-  return *this;
-}
+        inline path::iterator &path::iterator::operator++() {
+            _iter = increment(_iter);
+            while (_iter != _last &&                // we didn't reach the end
+                   _iter != _root &&                // this is not a root position
+                   *_iter == preferred_separator && // we are on a separator
+                   (_iter + 1) != _last             // the slash is not the last char
+                    ) {
+                ++_iter;
+            }
+            updateCurrent();
+            return *this;
+        }
 
-inline path::iterator path::iterator::operator++(int) {
-  path::iterator i{*this};
-  ++(*this);
-  return i;
-}
+        inline path::iterator path::iterator::operator++(int) {
+            path::iterator i{*this};
+            ++(*this);
+            return i;
+        }
 
-inline path::iterator &path::iterator::operator--() {
-  _iter = decrement(_iter);
-  updateCurrent();
-  return *this;
-}
+        inline path::iterator &path::iterator::operator--() {
+            _iter = decrement(_iter);
+            updateCurrent();
+            return *this;
+        }
 
-inline path::iterator path::iterator::operator--(int) {
-  auto i = *this;
-  --(*this);
-  return i;
-}
+        inline path::iterator path::iterator::operator--(int) {
+            auto i = *this;
+            --(*this);
+            return i;
+        }
 
-inline bool
-path::iterator::operator==(const path::iterator &other) const {
-  return _iter == other._iter;
-}
+        inline bool
+        path::iterator::operator==(const path::iterator &other) const {
+            return _iter == other._iter;
+        }
 
-inline bool
-path::iterator::operator!=(const path::iterator &other) const {
-  return _iter != other._iter;
-}
+        inline bool
+        path::iterator::operator!=(const path::iterator &other) const {
+            return _iter != other._iter;
+        }
 
-inline path::iterator::reference path::iterator::operator*() const {
-  return _current;
-}
+        inline path::iterator::reference path::iterator::operator*() const {
+            return _current;
+        }
 
-inline path::iterator::pointer path::iterator::operator->() const {
-  return &_current;
-}
+        inline path::iterator::pointer path::iterator::operator->() const {
+            return &_current;
+        }
 
-inline path::iterator path::begin() const {
-  return iterator(*this, _path.begin());
-}
+        inline path::iterator path::begin() const {
+            return iterator(*this, _path.begin());
+        }
 
-inline path::iterator path::end() const {
-  return iterator(*this, _path.end());
-}
+        inline path::iterator path::end() const {
+            return iterator(*this, _path.end());
+        }
 
 //-----------------------------------------------------------------------------
 // [fs.path.nonmember] path non-member functions
-inline void swap(path &lhs, path &rhs) noexcept {
-  swap(lhs._path, rhs._path);
-}
+        inline void swap(path & lhs, path & rhs)
+        noexcept {
+        swap(lhs
+        ._path, rhs._path);
+    }
 
-inline size_t hash_value(const path &p) noexcept {
-  return std::hash<std::string>()(p.generic_string());
-}
+    inline size_t hash_value(const path &p) noexcept {
+        return std::hash<std::string>()(p.generic_string());
+    }
 
 #ifdef TURBO_HAVE_THREEWAY_COMP
-inline std::strong_ordering operator<=>(const path &lhs,
+                                                                                                                            inline std::strong_ordering operator<=>(const path &lhs,
                                                     const path &rhs) noexcept {
   return lhs.compare(rhs) <=> 0;
 }
 #endif
 
-inline bool operator==(const path &lhs, const path &rhs) noexcept {
-  return lhs.compare(rhs) == 0;
-}
+    inline bool operator==(const path &lhs, const path &rhs) noexcept {
+        return lhs.compare(rhs) == 0;
+    }
 
-inline bool operator!=(const path &lhs, const path &rhs) noexcept {
-  return !(lhs == rhs);
-}
+    inline bool operator!=(const path &lhs, const path &rhs) noexcept {
+        return !(lhs == rhs);
+    }
 
-inline bool operator<(const path &lhs, const path &rhs) noexcept {
-  return lhs.compare(rhs) < 0;
-}
+    inline bool operator<(const path &lhs, const path &rhs) noexcept {
+        return lhs.compare(rhs) < 0;
+    }
 
-inline bool operator<=(const path &lhs, const path &rhs) noexcept {
-  return lhs.compare(rhs) <= 0;
-}
+    inline bool operator<=(const path &lhs, const path &rhs) noexcept {
+        return lhs.compare(rhs) <= 0;
+    }
 
-inline bool operator>(const path &lhs, const path &rhs) noexcept {
-  return lhs.compare(rhs) > 0;
-}
+    inline bool operator>(const path &lhs, const path &rhs) noexcept {
+        return lhs.compare(rhs) > 0;
+    }
 
-inline bool operator>=(const path &lhs, const path &rhs) noexcept {
-  return lhs.compare(rhs) >= 0;
-}
+    inline bool operator>=(const path &lhs, const path &rhs) noexcept {
+        return lhs.compare(rhs) >= 0;
+    }
 
-inline path operator/(const path &lhs, const path &rhs) {
-  path result(lhs);
-  result /= rhs;
-  return result;
-}
+    inline path operator/(const path &lhs, const path &rhs) {
+        path result(lhs);
+        result /= rhs;
+        return result;
+    }
 
 //-----------------------------------------------------------------------------
 // [fs.path.io] path inserter and extractor
-template <class charT, class traits>
-inline std::basic_ostream<charT, traits> &
-operator<<(std::basic_ostream<charT, traits> &os, const path &p) {
-  os << "\"";
-  auto ps = p.string<charT, traits>();
-  for (auto c : ps) {
-    if (c == '"' || c == '\\') {
-      os << '\\';
-    }
-    os << c;
-  }
-  os << "\"";
-  return os;
-}
-
-template <class charT, class traits>
-inline std::basic_istream<charT, traits> &
-operator>>(std::basic_istream<charT, traits> &is, path &p) {
-  std::basic_string<charT, traits> tmp;
-  charT c;
-  is >> c;
-  if (c == '"') {
-    auto sf = is.flags();
-    is >> std::noskipws;
-    while (is) {
-      auto c2 = is.get();
-      if (is) {
-        if (c2 == '\\') {
-          c2 = is.get();
-          if (is) {
-            tmp += static_cast<charT>(c2);
-          }
-        } else if (c2 == '"') {
-          break;
-        } else {
-          tmp += static_cast<charT>(c2);
+    template<class charT, class traits>
+    inline std::basic_ostream<charT, traits> &
+    operator<<(std::basic_ostream<charT, traits> &os, const path &p) {
+        os << "\"";
+        auto ps = p.string<charT, traits>();
+        for (auto c: ps) {
+            if (c == '"' || c == '\\') {
+                os << '\\';
+            }
+            os << c;
         }
-      }
+        os << "\"";
+        return os;
     }
-    if ((sf & std::ios_base::skipws) == std::ios_base::skipws) {
-      is >> std::skipws;
+
+    template<class charT, class traits>
+    inline std::basic_istream<charT, traits> &
+    operator>>(std::basic_istream<charT, traits> &is, path &p) {
+        std::basic_string<charT, traits> tmp;
+        charT c;
+        is >> c;
+        if (c == '"') {
+            auto sf = is.flags();
+            is >> std::noskipws;
+            while (is) {
+                auto c2 = is.get();
+                if (is) {
+                    if (c2 == '\\') {
+                        c2 = is.get();
+                        if (is) {
+                            tmp += static_cast<charT>(c2);
+                        }
+                    } else if (c2 == '"') {
+                        break;
+                    } else {
+                        tmp += static_cast<charT>(c2);
+                    }
+                }
+            }
+            if ((sf & std::ios_base::skipws) == std::ios_base::skipws) {
+                is >> std::skipws;
+            }
+            p = path(tmp);
+        } else {
+            is >> tmp;
+            p = path(static_cast<charT>(c) + tmp);
+        }
+        return is;
     }
-    p = path(tmp);
-  } else {
-    is >> tmp;
-    p = path(static_cast<charT>(c) + tmp);
-  }
-  return is;
-}
 
 //-----------------------------------------------------------------------------
 // [fs.class.filesystem_error] Class filesystem_error
-inline
-filesystem_error::filesystem_error(const std::string &what_arg,
-                                   std::error_code ec)
-    : std::system_error(ec, what_arg), _what_arg(what_arg), _ec(ec) {}
+    inline
+    filesystem_error::filesystem_error(const std::string &what_arg,
+                                       std::error_code ec)
+            : std::system_error(ec, what_arg), _what_arg(what_arg), _ec(ec) {}
 
-inline
-filesystem_error::filesystem_error(const std::string &what_arg, const path &p1,
-                                   std::error_code ec)
-    : std::system_error(ec, what_arg), _what_arg(what_arg), _ec(ec), _p1(p1) {
-  if (!_p1.empty()) {
-    _what_arg += ": '" + _p1.string() + "'";
-  }
-}
+    inline
+    filesystem_error::filesystem_error(const std::string &what_arg, const path &p1,
+                                       std::error_code ec)
+            : std::system_error(ec, what_arg), _what_arg(what_arg), _ec(ec), _p1(p1) {
+        if (!_p1.empty()) {
+            _what_arg += ": '" + _p1.string() + "'";
+        }
+    }
 
-inline
-filesystem_error::filesystem_error(const std::string &what_arg, const path &p1,
-                                   const path &p2, std::error_code ec)
-    : std::system_error(ec, what_arg), _what_arg(what_arg), _ec(ec), _p1(p1),
-      _p2(p2) {
-  if (!_p1.empty()) {
-    _what_arg += ": '" + _p1.string() + "'";
-  }
-  if (!_p2.empty()) {
-    _what_arg += ", '" + _p2.string() + "'";
-  }
-}
+    inline
+    filesystem_error::filesystem_error(const std::string &what_arg, const path &p1,
+                                       const path &p2, std::error_code ec)
+            : std::system_error(ec, what_arg), _what_arg(what_arg), _ec(ec), _p1(p1),
+              _p2(p2) {
+        if (!_p1.empty()) {
+            _what_arg += ": '" + _p1.string() + "'";
+        }
+        if (!_p2.empty()) {
+            _what_arg += ", '" + _p2.string() + "'";
+        }
+    }
 
-inline const path &filesystem_error::path1() const noexcept {
-  return _p1;
-}
+    inline const path &filesystem_error::path1() const noexcept {
+        return _p1;
+    }
 
-inline const path &filesystem_error::path2() const noexcept {
-  return _p2;
-}
+    inline const path &filesystem_error::path2() const noexcept {
+        return _p2;
+    }
 
-inline const char *filesystem_error::what() const noexcept {
-  return _what_arg.c_str();
-}
+    inline const char *filesystem_error::what() const noexcept {
+        return _what_arg.c_str();
+    }
 
 //-----------------------------------------------------------------------------
 // [fs.op.funcs] filesystem operations
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline path absolute(const path &p) {
-  std::error_code ec;
-  path result = absolute(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline path absolute(const path &p) {
+        std::error_code ec;
+        path result = absolute(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline path absolute(const path &p, std::error_code &ec) {
-  ec.clear();
+    inline path absolute(const path &p, std::error_code &ec) {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (p.empty()) {
+                                                                                                                                if (p.empty()) {
     return absolute(current_path(ec), ec) / "";
   }
   ULONG size = ::GetFullPathNameW(TURBO_NATIVEWP(p), 0, 0, 0);
@@ -3538,430 +3966,444 @@ inline path absolute(const path &p, std::error_code &ec) {
   ec = detail::make_system_error();
   return path();
 #else
-  path base = current_path(ec);
-  if (!ec) {
-    if (p.empty()) {
-      return base / p;
-    }
-    if (p.has_root_name()) {
-      if (p.has_root_directory()) {
-        return p;
-      } else {
-        return p.root_name() / base.root_directory() / base.relative_path() /
-               p.relative_path();
-      }
-    } else {
-      if (p.has_root_directory()) {
-        return base.root_name() / p;
-      } else {
-        return base / p;
-      }
-    }
-  }
-  ec = detail::make_system_error();
-  return path();
-#endif
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline path canonical(const path &p) {
-  std::error_code ec;
-  auto result = canonical(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
-#endif
-
-inline path canonical(const path &p, std::error_code &ec) {
-  if (p.empty()) {
-    ec = detail::make_error_code(detail::portable_error::not_found);
-    return path();
-  }
-  path work = p.is_absolute() ? p : absolute(p, ec);
-  path result;
-
-  auto fs = status(work, ec);
-  if (ec) {
-    return path();
-  }
-  if (fs.type() == file_type::not_found) {
-    ec = detail::make_error_code(detail::portable_error::not_found);
-    return path();
-  }
-  bool redo;
-  do {
-    auto rootPathLen = work._prefixLength + work.root_name_length() +
-                       (work.has_root_directory() ? 1 : 0);
-    redo = false;
-    result.clear();
-    for (auto pe : work) {
-      if (pe.empty() || pe == ".") {
-        continue;
-      } else if (pe == "..") {
-        result = result.parent_path();
-        continue;
-      } else if ((result / pe).string().length() <= rootPathLen) {
-        result /= pe;
-        continue;
-      }
-      auto sls = symlink_status(result / pe, ec);
-      if (ec) {
+        path base = current_path(ec);
+        if (!ec) {
+            if (p.empty()) {
+                return base / p;
+            }
+            if (p.has_root_name()) {
+                if (p.has_root_directory()) {
+                    return p;
+                } else {
+                    return p.root_name() / base.root_directory() / base.relative_path() /
+                           p.relative_path();
+                }
+            } else {
+                if (p.has_root_directory()) {
+                    return base.root_name() / p;
+                } else {
+                    return base / p;
+                }
+            }
+        }
+        ec = detail::make_system_error();
         return path();
-      }
-      if (is_symlink(sls)) {
-        redo = true;
-        auto target = read_symlink(result / pe, ec);
+#endif
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline path canonical(const path &p) {
+        std::error_code ec;
+        auto result = canonical(p, ec);
         if (ec) {
-          return path();
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
         }
-        if (target.is_absolute()) {
-          result = target;
-          continue;
+        return result;
+    }
+
+#endif
+
+    inline path canonical(const path &p, std::error_code &ec) {
+        if (p.empty()) {
+            ec = detail::make_error_code(detail::portable_error::not_found);
+            return path();
+        }
+        path work = p.is_absolute() ? p : absolute(p, ec);
+        path result;
+
+        auto fs = status(work, ec);
+        if (ec) {
+            return path();
+        }
+        if (fs.type() == file_type::not_found) {
+            ec = detail::make_error_code(detail::portable_error::not_found);
+            return path();
+        }
+        bool redo;
+        do {
+            auto rootPathLen = work._prefixLength + work.root_name_length() +
+                               (work.has_root_directory() ? 1 : 0);
+            redo = false;
+            result.clear();
+            for (auto pe: work) {
+                if (pe.empty() || pe == ".") {
+                    continue;
+                } else if (pe == "..") {
+                    result = result.parent_path();
+                    continue;
+                } else if ((result / pe).string().length() <= rootPathLen) {
+                    result /= pe;
+                    continue;
+                }
+                auto sls = symlink_status(result / pe, ec);
+                if (ec) {
+                    return path();
+                }
+                if (is_symlink(sls)) {
+                    redo = true;
+                    auto target = read_symlink(result / pe, ec);
+                    if (ec) {
+                        return path();
+                    }
+                    if (target.is_absolute()) {
+                        result = target;
+                        continue;
+                    } else {
+                        result /= target;
+                        continue;
+                    }
+                } else {
+                    result /= pe;
+                }
+            }
+            work = result;
+        } while (redo);
+        ec.clear();
+        return result;
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline void copy(const path &from, const path &to) {
+        copy(from, to, copy_options::none);
+    }
+
+    inline void copy(const path &from, const path &to,
+                     copy_options options) {
+        std::error_code ec;
+        copy(from, to, options, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
+        }
+    }
+
+#endif
+
+    inline void copy(const path &from, const path &to,
+                     std::error_code &ec) noexcept {
+        copy(from, to, copy_options::none, ec);
+    }
+
+    inline void copy(const path &from, const path &to,
+                     copy_options options,
+                     std::error_code &ec) noexcept {
+        std::error_code tec;
+        file_status fs_from, fs_to;
+        ec.clear();
+        if ((options & (copy_options::skip_symlinks | copy_options::copy_symlinks |
+                        copy_options::create_symlinks)) != copy_options::none) {
+            fs_from = symlink_status(from, ec);
         } else {
-          result /= target;
-          continue;
+            fs_from = status(from, ec);
         }
-      } else {
-        result /= pe;
-      }
-    }
-    work = result;
-  } while (redo);
-  ec.clear();
-  return result;
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline void copy(const path &from, const path &to) {
-  copy(from, to, copy_options::none);
-}
-
-inline void copy(const path &from, const path &to,
-                             copy_options options) {
-  std::error_code ec;
-  copy(from, to, options, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
-  }
-}
-#endif
-
-inline void copy(const path &from, const path &to,
-                             std::error_code &ec) noexcept {
-  copy(from, to, copy_options::none, ec);
-}
-
-inline void copy(const path &from, const path &to,
-                             copy_options options,
-                             std::error_code &ec) noexcept {
-  std::error_code tec;
-  file_status fs_from, fs_to;
-  ec.clear();
-  if ((options & (copy_options::skip_symlinks | copy_options::copy_symlinks |
-                  copy_options::create_symlinks)) != copy_options::none) {
-    fs_from = symlink_status(from, ec);
-  } else {
-    fs_from = status(from, ec);
-  }
-  if (!exists(fs_from)) {
-    if (!ec) {
-      ec = detail::make_error_code(detail::portable_error::not_found);
-    }
-    return;
-  }
-  if ((options & (copy_options::skip_symlinks |
-                  copy_options::create_symlinks)) != copy_options::none) {
-    fs_to = symlink_status(to, tec);
-  } else {
-    fs_to = status(to, tec);
-  }
-  if (is_other(fs_from) || is_other(fs_to) ||
-      (is_directory(fs_from) && is_regular_file(fs_to)) ||
-      (exists(fs_to) && equivalent(from, to, ec))) {
-    ec = detail::make_error_code(detail::portable_error::invalid_argument);
-  } else if (is_symlink(fs_from)) {
-    if ((options & copy_options::skip_symlinks) == copy_options::none) {
-      if (!exists(fs_to) &&
-          (options & copy_options::copy_symlinks) != copy_options::none) {
-        copy_symlink(from, to, ec);
-      } else {
-        ec = detail::make_error_code(detail::portable_error::invalid_argument);
-      }
-    }
-  } else if (is_regular_file(fs_from)) {
-    if ((options & copy_options::directories_only) == copy_options::none) {
-      if ((options & copy_options::create_symlinks) != copy_options::none) {
-        create_symlink(from.is_absolute() ? from : canonical(from, ec), to, ec);
-      }
+        if (!exists(fs_from)) {
+            if (!ec) {
+                ec = detail::make_error_code(detail::portable_error::not_found);
+            }
+            return;
+        }
+        if ((options & (copy_options::skip_symlinks |
+                        copy_options::create_symlinks)) != copy_options::none) {
+            fs_to = symlink_status(to, tec);
+        } else {
+            fs_to = status(to, tec);
+        }
+        if (is_other(fs_from) || is_other(fs_to) ||
+            (is_directory(fs_from) && is_regular_file(fs_to)) ||
+            (exists(fs_to) && equivalent(from, to, ec))) {
+            ec = detail::make_error_code(detail::portable_error::invalid_argument);
+        } else if (is_symlink(fs_from)) {
+            if ((options & copy_options::skip_symlinks) == copy_options::none) {
+                if (!exists(fs_to) &&
+                    (options & copy_options::copy_symlinks) != copy_options::none) {
+                    copy_symlink(from, to, ec);
+                } else {
+                    ec = detail::make_error_code(detail::portable_error::invalid_argument);
+                }
+            }
+        } else if (is_regular_file(fs_from)) {
+            if ((options & copy_options::directories_only) == copy_options::none) {
+                if ((options & copy_options::create_symlinks) != copy_options::none) {
+                    create_symlink(from.is_absolute() ? from : canonical(from, ec), to, ec);
+                }
 #ifndef TURBO_PLATFORM_WEB
-      else if ((options & copy_options::create_hard_links) !=
-               copy_options::none) {
-        create_hard_link(from, to, ec);
-      }
+                else if ((options & copy_options::create_hard_links) !=
+                         copy_options::none) {
+                    create_hard_link(from, to, ec);
+                }
 #endif
-      else if (is_directory(fs_to)) {
-        copy_file(from, to / from.filename(), options, ec);
-      } else {
-        copy_file(from, to, options, ec);
-      }
-    }
-  }
+                else if (is_directory(fs_to)) {
+                    copy_file(from, to / from.filename(), options, ec);
+                } else {
+                    copy_file(from, to, options, ec);
+                }
+            }
+        }
 #ifdef LWG_2682_BEHAVIOUR
-  else if (is_directory(fs_from) &&
-           (options & copy_options::create_symlinks) != copy_options::none) {
-    ec = detail::make_error_code(detail::portable_error::is_a_directory);
-  }
+        else if (is_directory(fs_from) &&
+                 (options & copy_options::create_symlinks) != copy_options::none) {
+            ec = detail::make_error_code(detail::portable_error::is_a_directory);
+        }
 #endif
-  else if (is_directory(fs_from) &&
-           (options == copy_options::none ||
-            (options & copy_options::recursive) != copy_options::none)) {
-    if (!exists(fs_to)) {
-      create_directory(to, from, ec);
-      if (ec) {
+        else if (is_directory(fs_from) &&
+                 (options == copy_options::none ||
+                  (options & copy_options::recursive) != copy_options::none)) {
+            if (!exists(fs_to)) {
+                create_directory(to, from, ec);
+                if (ec) {
+                    return;
+                }
+            }
+            for (auto iter = directory_iterator(from, ec); iter != directory_iterator();
+                 iter.increment(ec)) {
+                if (!ec) {
+                    copy(iter->path(), to / iter->path().filename(),
+                         options | static_cast<copy_options>(0x8000), ec);
+                }
+                if (ec) {
+                    return;
+                }
+            }
+        }
         return;
-      }
     }
-    for (auto iter = directory_iterator(from, ec); iter != directory_iterator();
-         iter.increment(ec)) {
-      if (!ec) {
-        copy(iter->path(), to / iter->path().filename(),
-             options | static_cast<copy_options>(0x8000), ec);
-      }
-      if (ec) {
-        return;
-      }
-    }
-  }
-  return;
-}
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool copy_file(const path &from, const path &to) {
-  return copy_file(from, to, copy_options::none);
-}
 
-inline bool copy_file(const path &from, const path &to,
-                                  copy_options option) {
-  std::error_code ec;
-  auto result = copy_file(from, to, option, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
-  }
-  return result;
-}
+    inline bool copy_file(const path &from, const path &to) {
+        return copy_file(from, to, copy_options::none);
+    }
+
+    inline bool copy_file(const path &from, const path &to,
+                          copy_options option) {
+        std::error_code ec;
+        auto result = copy_file(from, to, option, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline bool copy_file(const path &from, const path &to,
-                                  std::error_code &ec) noexcept {
-  return copy_file(from, to, copy_options::none, ec);
-}
-
-inline bool copy_file(const path &from, const path &to,
-                                  copy_options options,
-                                  std::error_code &ec) noexcept {
-  std::error_code tecf, tect;
-  auto sf = status(from, tecf);
-  auto st = status(to, tect);
-  bool overwrite = false;
-  ec.clear();
-  if (!is_regular_file(sf)) {
-    ec = tecf;
-    return false;
-  }
-  if (exists(st) &&
-      (!is_regular_file(st) || equivalent(from, to, ec) ||
-       (options &
-        (copy_options::skip_existing | copy_options::overwrite_existing |
-         copy_options::update_existing)) == copy_options::none)) {
-    ec = tect ? tect : detail::make_error_code(detail::portable_error::exists);
-    return false;
-  }
-  if (exists(st)) {
-    if ((options & copy_options::update_existing) ==
-        copy_options::update_existing) {
-      auto from_time = last_write_time(from, ec);
-      if (ec) {
-        ec = detail::make_system_error();
-        return false;
-      }
-      auto to_time = last_write_time(to, ec);
-      if (ec) {
-        ec = detail::make_system_error();
-        return false;
-      }
-      if (from_time <= to_time) {
-        return false;
-      }
+    inline bool copy_file(const path &from, const path &to,
+                          std::error_code &ec) noexcept {
+        return copy_file(from, to, copy_options::none, ec);
     }
-    overwrite = true;
-  }
+
+    inline bool copy_file(const path &from, const path &to,
+                          copy_options options,
+                          std::error_code &ec) noexcept {
+        std::error_code tecf, tect;
+        auto sf = status(from, tecf);
+        auto st = status(to, tect);
+        bool overwrite = false;
+        ec.clear();
+        if (!is_regular_file(sf)) {
+            ec = tecf;
+            return false;
+        }
+        if (exists(st) &&
+            (!is_regular_file(st) || equivalent(from, to, ec) ||
+             (options &
+              (copy_options::skip_existing | copy_options::overwrite_existing |
+               copy_options::update_existing)) == copy_options::none)) {
+            ec = tect ? tect : detail::make_error_code(detail::portable_error::exists);
+            return false;
+        }
+        if (exists(st)) {
+            if ((options & copy_options::update_existing) ==
+                copy_options::update_existing) {
+                auto from_time = last_write_time(from, ec);
+                if (ec) {
+                    ec = detail::make_system_error();
+                    return false;
+                }
+                auto to_time = last_write_time(to, ec);
+                if (ec) {
+                    ec = detail::make_system_error();
+                    return false;
+                }
+                if (from_time <= to_time) {
+                    return false;
+                }
+            }
+            overwrite = true;
+        }
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (!::CopyFileW(TURBO_NATIVEWP(from), TURBO_NATIVEWP(to), !overwrite)) {
+                                                                                                                                if (!::CopyFileW(TURBO_NATIVEWP(from), TURBO_NATIVEWP(to), !overwrite)) {
     ec = detail::make_system_error();
     return false;
   }
   return true;
 #else
-  std::vector<char> buffer(16384, '\0');
-  int in = -1, out = -1;
-  if ((in = ::open(from.c_str(), O_RDONLY)) < 0) {
-    ec = detail::make_system_error();
-    return false;
-  }
-  int mode = O_CREAT | O_WRONLY | O_TRUNC;
-  if (!overwrite) {
-    mode |= O_EXCL;
-  }
-  if ((out = ::open(to.c_str(), mode,
-                    static_cast<int>(sf.permissions() & perms::all))) < 0) {
-    ec = detail::make_system_error();
-    ::close(in);
-    return false;
-  }
-  ssize_t br, bw;
-  while ((br = ::read(in, buffer.data(), buffer.size())) > 0) {
-    ssize_t offset = 0;
-    do {
-      if ((bw = ::write(out, buffer.data() + offset, static_cast<size_t>(br))) >
-          0) {
-        br -= bw;
-        offset += bw;
-      } else if (bw < 0) {
-        ec = detail::make_system_error();
+        std::vector<char> buffer(16384, '\0');
+        int in = -1, out = -1;
+        if ((in = ::open(from.c_str(), O_RDONLY)) < 0) {
+            ec = detail::make_system_error();
+            return false;
+        }
+        int mode = O_CREAT | O_WRONLY | O_TRUNC;
+        if (!overwrite) {
+            mode |= O_EXCL;
+        }
+        if ((out = ::open(to.c_str(), mode,
+                          static_cast<int>(sf.permissions() & perms::all))) < 0) {
+            ec = detail::make_system_error();
+            ::close(in);
+            return false;
+        }
+        ssize_t br, bw;
+        while ((br = ::read(in, buffer.data(), buffer.size())) > 0) {
+            ssize_t offset = 0;
+            do {
+                if ((bw = ::write(out, buffer.data() + offset, static_cast<size_t>(br))) >
+                    0) {
+                    br -= bw;
+                    offset += bw;
+                } else if (bw < 0) {
+                    ec = detail::make_system_error();
+                    ::close(in);
+                    ::close(out);
+                    return false;
+                }
+            } while (br);
+        }
         ::close(in);
         ::close(out);
-        return false;
-      }
-    } while (br);
-  }
-  ::close(in);
-  ::close(out);
-  return true;
+        return true;
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void copy_symlink(const path &existing_symlink,
-                                     const path &new_symlink) {
-  std::error_code ec;
-  copy_symlink(existing_symlink, new_symlink, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()),
-                           existing_symlink, new_symlink, ec);
-  }
-}
-#endif
 
-inline void copy_symlink(const path &existing_symlink,
-                                     const path &new_symlink,
-                                     std::error_code &ec) noexcept {
-  ec.clear();
-  auto to = read_symlink(existing_symlink, ec);
-  if (!ec) {
-    if (exists(to, ec) && is_directory(to, ec)) {
-      create_directory_symlink(to, new_symlink, ec);
-    } else {
-      create_symlink(to, new_symlink, ec);
-    }
-  }
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline bool create_directories(const path &p) {
-  std::error_code ec;
-  auto result = create_directories(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
-#endif
-
-inline bool create_directories(const path &p,
-                                           std::error_code &ec) noexcept {
-  path current;
-  ec.clear();
-  bool didCreate = false;
-  auto rootPathLen =
-      p._prefixLength + p.root_name_length() + (p.has_root_directory() ? 1 : 0);
-  current = p.native().substr(0, rootPathLen);
-  path folders(p._path.substr(rootPathLen));
-  for (path::string_type part : folders) {
-    current /= part;
-    std::error_code tec;
-    auto fs = status(current, tec);
-    if (tec && fs.type() != file_type::not_found) {
-      ec = tec;
-      return false;
-    }
-    if (!exists(fs)) {
-      create_directory(current, ec);
-      if (ec) {
-        std::error_code tmp_ec;
-        if (is_directory(current, tmp_ec)) {
-          ec.clear();
-        } else {
-          return false;
+    inline void copy_symlink(const path &existing_symlink,
+                             const path &new_symlink) {
+        std::error_code ec;
+        copy_symlink(existing_symlink, new_symlink, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()),
+                                   existing_symlink, new_symlink, ec);
         }
-      }
-      didCreate = true;
     }
+
+#endif
+
+    inline void copy_symlink(const path &existing_symlink,
+                             const path &new_symlink,
+                             std::error_code &ec) noexcept {
+        ec.clear();
+        auto to = read_symlink(existing_symlink, ec);
+        if (!ec) {
+            if (exists(to, ec) && is_directory(to, ec)) {
+                create_directory_symlink(to, new_symlink, ec);
+            } else {
+                create_symlink(to, new_symlink, ec);
+            }
+        }
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline bool create_directories(const path &p) {
+        std::error_code ec;
+        auto result = create_directories(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
+#endif
+
+    inline bool create_directories(const path &p,
+                                   std::error_code &ec) noexcept {
+        path current;
+        ec.clear();
+        bool didCreate = false;
+        auto rootPathLen =
+                p._prefixLength + p.root_name_length() + (p.has_root_directory() ? 1 : 0);
+        current = p.native().substr(0, rootPathLen);
+        path folders(p._path.substr(rootPathLen));
+        for (path::string_type part: folders) {
+            current /= part;
+            std::error_code tec;
+            auto fs = status(current, tec);
+            if (tec && fs.type() != file_type::not_found) {
+                ec = tec;
+                return false;
+            }
+            if (!exists(fs)) {
+                create_directory(current, ec);
+                if (ec) {
+                    std::error_code tmp_ec;
+                    if (is_directory(current, tmp_ec)) {
+                        ec.clear();
+                    } else {
+                        return false;
+                    }
+                }
+                didCreate = true;
+            }
 #ifndef LWG_2935_BEHAVIOUR
-    else if (!is_directory(fs)) {
-      ec = detail::make_error_code(detail::portable_error::exists);
-      return false;
+            else if (!is_directory(fs)) {
+                ec = detail::make_error_code(detail::portable_error::exists);
+                return false;
+            }
+#endif
+        }
+        return didCreate;
     }
-#endif
-  }
-  return didCreate;
-}
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool create_directory(const path &p) {
-  std::error_code ec;
-  auto result = create_directory(p, path(), ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline bool create_directory(const path &p) {
+        std::error_code ec;
+        auto result = create_directory(p, path(), ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline bool create_directory(const path &p,
-                                         std::error_code &ec) noexcept {
-  return create_directory(p, path(), ec);
-}
+    inline bool create_directory(const path &p,
+                                 std::error_code &ec) noexcept {
+        return create_directory(p, path(), ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool create_directory(const path &p,
-                                         const path &attributes) {
-  std::error_code ec;
-  auto result = create_directory(p, attributes, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline bool create_directory(const path &p,
+                                 const path &attributes) {
+        std::error_code ec;
+        auto result = create_directory(p, attributes, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline bool create_directory(const path &p, const path &attributes,
-                                         std::error_code &ec) noexcept {
-  std::error_code tec;
-  ec.clear();
-  auto fs = status(p, tec);
+    inline bool create_directory(const path &p, const path &attributes,
+                                 std::error_code &ec) noexcept {
+        std::error_code tec;
+        ec.clear();
+        auto fs = status(p, tec);
 #ifdef LWG_2935_BEHAVIOUR
-  if (status_known(fs) && exists(fs)) {
+                                                                                                                                if (status_known(fs) && exists(fs)) {
     return false;
   }
 #else
-  if (status_known(fs) && exists(fs) && is_directory(fs)) {
-    return false;
-  }
+        if (status_known(fs) && exists(fs) && is_directory(fs)) {
+            return false;
+        }
 #endif
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (!attributes.empty()) {
+                                                                                                                                if (!attributes.empty()) {
     if (!::CreateDirectoryExW(TURBO_NATIVEWP(attributes), TURBO_NATIVEWP(p),
                               NULL)) {
       ec = detail::make_system_error();
@@ -3972,93 +4414,102 @@ inline bool create_directory(const path &p, const path &attributes,
     return false;
   }
 #else
-  ::mode_t attribs = static_cast<mode_t>(perms::all);
-  if (!attributes.empty()) {
-    struct ::stat fileStat;
-    if (::stat(attributes.c_str(), &fileStat) != 0) {
-      ec = detail::make_system_error();
-      return false;
-    }
-    attribs = fileStat.st_mode;
-  }
-  if (::mkdir(p.c_str(), attribs) != 0) {
-    ec = detail::make_system_error();
-    return false;
-  }
+        ::mode_t attribs = static_cast<mode_t>(perms::all);
+        if (!attributes.empty()) {
+            struct ::stat fileStat;
+            if (::stat(attributes.c_str(), &fileStat) != 0) {
+                ec = detail::make_system_error();
+                return false;
+            }
+            attribs = fileStat.st_mode;
+        }
+        if (::mkdir(p.c_str(), attribs) != 0) {
+            ec = detail::make_system_error();
+            return false;
+        }
 #endif
-  return true;
-}
+        return true;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void create_directory_symlink(const path &to,
-                                                 const path &new_symlink) {
-  std::error_code ec;
-  create_directory_symlink(to, new_symlink, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), to, new_symlink,
-                           ec);
-  }
-}
+
+    inline void create_directory_symlink(const path &to,
+                                         const path &new_symlink) {
+        std::error_code ec;
+        create_directory_symlink(to, new_symlink, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), to, new_symlink,
+                                   ec);
+        }
+    }
+
 #endif
 
-inline void create_directory_symlink(const path &to,
-                                                 const path &new_symlink,
-                                                 std::error_code &ec) noexcept {
-  detail::create_symlink(to, new_symlink, true, ec);
-}
+    inline void create_directory_symlink(const path &to,
+                                         const path &new_symlink,
+                                         std::error_code &ec) noexcept {
+        detail::create_symlink(to, new_symlink, true, ec);
+    }
 
 #ifndef TURBO_PLATFORM_WEB
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void create_hard_link(const path &to,
-                                         const path &new_hard_link) {
-  std::error_code ec;
-  create_hard_link(to, new_hard_link, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), to,
-                           new_hard_link, ec);
-  }
-}
+
+    inline void create_hard_link(const path &to,
+                                 const path &new_hard_link) {
+        std::error_code ec;
+        create_hard_link(to, new_hard_link, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), to,
+                                   new_hard_link, ec);
+        }
+    }
+
 #endif
 
-inline void create_hard_link(const path &to,
-                                         const path &new_hard_link,
-                                         std::error_code &ec) noexcept {
-  detail::create_hardlink(to, new_hard_link, ec);
-}
+    inline void create_hard_link(const path &to,
+                                 const path &new_hard_link,
+                                 std::error_code &ec) noexcept {
+        detail::create_hardlink(to, new_hard_link, ec);
+    }
+
 #endif
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void create_symlink(const path &to,
-                                       const path &new_symlink) {
-  std::error_code ec;
-  create_symlink(to, new_symlink, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), to, new_symlink,
-                           ec);
-  }
-}
+
+    inline void create_symlink(const path &to,
+                               const path &new_symlink) {
+        std::error_code ec;
+        create_symlink(to, new_symlink, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), to, new_symlink,
+                                   ec);
+        }
+    }
+
 #endif
 
-inline void create_symlink(const path &to, const path &new_symlink,
-                                       std::error_code &ec) noexcept {
-  detail::create_symlink(to, new_symlink, false, ec);
-}
+    inline void create_symlink(const path &to, const path &new_symlink,
+                               std::error_code &ec) noexcept {
+        detail::create_symlink(to, new_symlink, false, ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline path current_path() {
-  std::error_code ec;
-  auto result = current_path(ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), ec);
-  }
-  return result;
-}
+
+    inline path current_path() {
+        std::error_code ec;
+        auto result = current_path(ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline path current_path(std::error_code &ec) {
-  ec.clear();
+    inline path current_path(std::error_code &ec) {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  DWORD pathlen = ::GetCurrentDirectoryW(0, 0);
+                                                                                                                                DWORD pathlen = ::GetCurrentDirectoryW(0, 0);
   std::unique_ptr<wchar_t[]> buffer(new wchar_t[size_t(pathlen) + 1]);
   if (::GetCurrentDirectoryW(pathlen, buffer.get()) == 0) {
     ec = detail::make_system_error();
@@ -4066,73 +4517,79 @@ inline path current_path(std::error_code &ec) {
   }
   return path(std::wstring(buffer.get()), path::native_format);
 #else
-  size_t pathlen = static_cast<size_t>(
-      std::max(int(::pathconf(".", _PC_PATH_MAX)), int(PATH_MAX)));
-  std::unique_ptr<char[]> buffer(new char[pathlen + 1]);
-  if (::getcwd(buffer.get(), pathlen) == nullptr) {
-    ec = detail::make_system_error();
-    return path();
-  }
-  return path(buffer.get());
+        size_t pathlen = static_cast<size_t>(
+                std::max(int(::pathconf(".", _PC_PATH_MAX)), int(PATH_MAX)));
+        std::unique_ptr<char[]> buffer(new char[pathlen + 1]);
+        if (::getcwd(buffer.get(), pathlen) == nullptr) {
+            ec = detail::make_system_error();
+            return path();
+        }
+        return path(buffer.get());
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void current_path(const path &p) {
-  std::error_code ec;
-  current_path(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-}
+
+    inline void current_path(const path &p) {
+        std::error_code ec;
+        current_path(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+    }
+
 #endif
 
-inline void current_path(const path &p,
-                                     std::error_code &ec) noexcept {
-  ec.clear();
+    inline void current_path(const path &p,
+                             std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (!::SetCurrentDirectoryW(TURBO_NATIVEWP(p))) {
+                                                                                                                                if (!::SetCurrentDirectoryW(TURBO_NATIVEWP(p))) {
     ec = detail::make_system_error();
   }
 #else
-  if (::chdir(p.string().c_str()) == -1) {
-    ec = detail::make_system_error();
-  }
+        if (::chdir(p.string().c_str()) == -1) {
+            ec = detail::make_system_error();
+        }
 #endif
-}
+    }
 
-inline bool exists(file_status s) noexcept {
-  return status_known(s) && s.type() != file_type::not_found;
-}
+    inline bool exists(file_status s) noexcept {
+        return status_known(s) && s.type() != file_type::not_found;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool exists(const path &p) { return exists(status(p)); }
+
+    inline bool exists(const path &p) { return exists(status(p)); }
+
 #endif
 
-inline bool exists(const path &p, std::error_code &ec) noexcept {
-  file_status s = status(p, ec);
-  if (status_known(s)) {
-    ec.clear();
-  }
-  return exists(s);
-}
+    inline bool exists(const path &p, std::error_code &ec) noexcept {
+        file_status s = status(p, ec);
+        if (status_known(s)) {
+            ec.clear();
+        }
+        return exists(s);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool equivalent(const path &p1, const path &p2) {
-  std::error_code ec;
-  bool result = equivalent(p1, p2, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p1, p2, ec);
-  }
-  return result;
-}
+
+    inline bool equivalent(const path &p1, const path &p2) {
+        std::error_code ec;
+        bool result = equivalent(p1, p2, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p1, p2, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline bool equivalent(const path &p1, const path &p2,
-                                   std::error_code &ec) noexcept {
-  ec.clear();
+    inline bool equivalent(const path &p1, const path &p2,
+                           std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  detail::unique_handle file1(
+                                                                                                                                detail::unique_handle file1(
       ::CreateFileW(TURBO_NATIVEWP(p1), 0,
                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0,
                     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
@@ -4170,41 +4627,43 @@ inline bool equivalent(const path &p1, const path &p2,
          inf1.nFileSizeLow == inf2.nFileSizeLow &&
          inf1.dwVolumeSerialNumber == inf2.dwVolumeSerialNumber;
 #else
-  struct ::stat s1, s2;
-  auto rc1 = ::stat(p1.c_str(), &s1);
-  auto e1 = errno;
-  auto rc2 = ::stat(p2.c_str(), &s2);
-  if (rc1 || rc2) {
+        struct ::stat s1, s2;
+        auto rc1 = ::stat(p1.c_str(), &s1);
+        auto e1 = errno;
+        auto rc2 = ::stat(p2.c_str(), &s2);
+        if (rc1 || rc2) {
 #ifdef LWG_2937_BEHAVIOUR
-    ec = detail::make_system_error(e1 ? e1 : errno);
+            ec = detail::make_system_error(e1 ? e1 : errno);
 #else
-    if (rc1 && rc2) {
+                                                                                                                                    if (rc1 && rc2) {
       ec = detail::make_system_error(e1 ? e1 : errno);
     }
 #endif
-    return false;
-  }
-  return s1.st_dev == s2.st_dev && s1.st_ino == s2.st_ino &&
-         s1.st_size == s2.st_size && s1.st_mtime == s2.st_mtime;
+            return false;
+        }
+        return s1.st_dev == s2.st_dev && s1.st_ino == s2.st_ino &&
+               s1.st_size == s2.st_size && s1.st_mtime == s2.st_mtime;
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline uintmax_t file_size(const path &p) {
-  std::error_code ec;
-  auto result = file_size(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline uintmax_t file_size(const path &p) {
+        std::error_code ec;
+        auto result = file_size(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline uintmax_t file_size(const path &p,
-                                       std::error_code &ec) noexcept {
-  ec.clear();
+    inline uintmax_t file_size(const path &p,
+                               std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  WIN32_FILE_ATTRIBUTE_DATA attr;
+                                                                                                                                WIN32_FILE_ATTRIBUTE_DATA attr;
   if (!GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
     ec = detail::make_system_error();
     return static_cast<uintmax_t>(-1);
@@ -4213,32 +4672,34 @@ inline uintmax_t file_size(const path &p,
              << (sizeof(attr.nFileSizeHigh) * 8) |
          attr.nFileSizeLow;
 #else
-  struct ::stat fileStat;
-  if (::stat(p.c_str(), &fileStat) == -1) {
-    ec = detail::make_system_error();
-    return static_cast<uintmax_t>(-1);
-  }
-  return static_cast<uintmax_t>(fileStat.st_size);
+        struct ::stat fileStat;
+        if (::stat(p.c_str(), &fileStat) == -1) {
+            ec = detail::make_system_error();
+            return static_cast<uintmax_t>(-1);
+        }
+        return static_cast<uintmax_t>(fileStat.st_size);
 #endif
-}
+    }
 
 #ifndef TURBO_PLATFORM_WEB
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline uintmax_t hard_link_count(const path &p) {
-  std::error_code ec;
-  auto result = hard_link_count(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline uintmax_t hard_link_count(const path &p) {
+        std::error_code ec;
+        auto result = hard_link_count(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline uintmax_t hard_link_count(const path &p,
-                                             std::error_code &ec) noexcept {
-  ec.clear();
+    inline uintmax_t hard_link_count(const path &p,
+                                     std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  uintmax_t result = static_cast<uintmax_t>(-1);
+                                                                                                                                uintmax_t result = static_cast<uintmax_t>(-1);
   detail::unique_handle file(
       ::CreateFileW(TURBO_NATIVEWP(p), 0,
                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0,
@@ -4255,196 +4716,219 @@ inline uintmax_t hard_link_count(const path &p,
   }
   return result;
 #else
-  uintmax_t result = 0;
-  file_status fs = detail::status_ex(p, ec, nullptr, nullptr, &result, nullptr);
-  if (fs.type() == file_type::not_found) {
-    ec = detail::make_error_code(detail::portable_error::not_found);
-  }
-  return ec ? static_cast<uintmax_t>(-1) : result;
+        uintmax_t result = 0;
+        file_status fs = detail::status_ex(p, ec, nullptr, nullptr, &result, nullptr);
+        if (fs.type() == file_type::not_found) {
+            ec = detail::make_error_code(detail::portable_error::not_found);
+        }
+        return ec ? static_cast<uintmax_t>(-1) : result;
 #endif
-}
-#endif
-
-inline bool is_block_file(file_status s) noexcept {
-  return s.type() == file_type::block;
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_block_file(const path &p) {
-  return is_block_file(status(p));
-}
-#endif
-
-inline bool is_block_file(const path &p,
-                                      std::error_code &ec) noexcept {
-  return is_block_file(status(p, ec));
-}
-
-inline bool is_character_file(file_status s) noexcept {
-  return s.type() == file_type::character;
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_character_file(const path &p) {
-  return is_character_file(status(p));
-}
-#endif
-
-inline bool is_character_file(const path &p,
-                                          std::error_code &ec) noexcept {
-  return is_character_file(status(p, ec));
-}
-
-inline bool is_directory(file_status s) noexcept {
-  return s.type() == file_type::directory;
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_directory(const path &p) {
-  return is_directory(status(p));
-}
-#endif
-
-inline bool is_directory(const path &p,
-                                     std::error_code &ec) noexcept {
-  return is_directory(status(p, ec));
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_empty(const path &p) {
-  if (is_directory(p)) {
-    return directory_iterator(p) == directory_iterator();
-  } else {
-    return file_size(p) == 0;
-  }
-}
-#endif
-
-inline bool is_empty(const path &p, std::error_code &ec) noexcept {
-  auto fs = status(p, ec);
-  if (ec) {
-    return false;
-  }
-  if (is_directory(fs)) {
-    directory_iterator iter(p, ec);
-    if (ec) {
-      return false;
     }
-    return iter == directory_iterator();
-  } else {
-    auto sz = file_size(p, ec);
-    if (ec) {
-      return false;
+
+#endif
+
+    inline bool is_block_file(file_status s) noexcept {
+        return s.type() == file_type::block;
     }
-    return sz == 0;
-  }
-}
-
-inline bool is_fifo(file_status s) noexcept {
-  return s.type() == file_type::fifo;
-}
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_fifo(const path &p) { return is_fifo(status(p)); }
+
+    inline bool is_block_file(const path &p) {
+        return is_block_file(status(p));
+    }
+
 #endif
 
-inline bool is_fifo(const path &p, std::error_code &ec) noexcept {
-  return is_fifo(status(p, ec));
-}
+    inline bool is_block_file(const path &p,
+                              std::error_code &ec) noexcept {
+        return is_block_file(status(p, ec));
+    }
 
-inline bool is_other(file_status s) noexcept {
-  return exists(s) && !is_regular_file(s) && !is_directory(s) && !is_symlink(s);
-}
+    inline bool is_character_file(file_status s) noexcept {
+        return s.type() == file_type::character;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_other(const path &p) { return is_other(status(p)); }
+
+    inline bool is_character_file(const path &p) {
+        return is_character_file(status(p));
+    }
+
 #endif
 
-inline bool is_other(const path &p, std::error_code &ec) noexcept {
-  return is_other(status(p, ec));
-}
+    inline bool is_character_file(const path &p,
+                                  std::error_code &ec) noexcept {
+        return is_character_file(status(p, ec));
+    }
 
-inline bool is_regular_file(file_status s) noexcept {
-  return s.type() == file_type::regular;
-}
+    inline bool is_directory(file_status s) noexcept {
+        return s.type() == file_type::directory;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_regular_file(const path &p) {
-  return is_regular_file(status(p));
-}
+
+    inline bool is_directory(const path &p) {
+        return is_directory(status(p));
+    }
+
 #endif
 
-inline bool is_regular_file(const path &p,
-                                        std::error_code &ec) noexcept {
-  return is_regular_file(status(p, ec));
-}
-
-inline bool is_socket(file_status s) noexcept {
-  return s.type() == file_type::socket;
-}
+    inline bool is_directory(const path &p,
+                             std::error_code &ec) noexcept {
+        return is_directory(status(p, ec));
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_socket(const path &p) {
-  return is_socket(status(p));
-}
+
+    inline bool is_empty(const path &p) {
+        if (is_directory(p)) {
+            return directory_iterator(p) == directory_iterator();
+        } else {
+            return file_size(p) == 0;
+        }
+    }
+
 #endif
 
-inline bool is_socket(const path &p, std::error_code &ec) noexcept {
-  return is_socket(status(p, ec));
-}
+    inline bool is_empty(const path &p, std::error_code &ec) noexcept {
+        auto fs = status(p, ec);
+        if (ec) {
+            return false;
+        }
+        if (is_directory(fs)) {
+            directory_iterator iter(p, ec);
+            if (ec) {
+                return false;
+            }
+            return iter == directory_iterator();
+        } else {
+            auto sz = file_size(p, ec);
+            if (ec) {
+                return false;
+            }
+            return sz == 0;
+        }
+    }
 
-inline bool is_symlink(file_status s) noexcept {
-  return s.type() == file_type::symlink;
-}
+    inline bool is_fifo(file_status s) noexcept {
+        return s.type() == file_type::fifo;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool is_symlink(const path &p) {
-  return is_symlink(symlink_status(p));
-}
+
+    inline bool is_fifo(const path &p) { return is_fifo(status(p)); }
+
 #endif
 
-inline bool is_symlink(const path &p,
-                                   std::error_code &ec) noexcept {
-  return is_symlink(symlink_status(p, ec));
-}
+    inline bool is_fifo(const path &p, std::error_code &ec) noexcept {
+        return is_fifo(status(p, ec));
+    }
+
+    inline bool is_other(file_status s) noexcept {
+        return exists(s) && !is_regular_file(s) && !is_directory(s) && !is_symlink(s);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline file_time_type last_write_time(const path &p) {
-  std::error_code ec;
-  auto result = last_write_time(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline bool is_other(const path &p) { return is_other(status(p)); }
+
 #endif
 
-inline file_time_type
-last_write_time(const path &p, std::error_code &ec) noexcept {
-  time_t result = 0;
-  ec.clear();
-  file_status fs = detail::status_ex(p, ec, nullptr, nullptr, nullptr, &result);
-  return ec ? (file_time_type::min)()
-            : std::chrono::system_clock::from_time_t(result);
-}
+    inline bool is_other(const path &p, std::error_code &ec) noexcept {
+        return is_other(status(p, ec));
+    }
+
+    inline bool is_regular_file(file_status s) noexcept {
+        return s.type() == file_type::regular;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void last_write_time(const path &p,
-                                        file_time_type new_time) {
-  std::error_code ec;
-  last_write_time(p, new_time, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-}
+
+    inline bool is_regular_file(const path &p) {
+        return is_regular_file(status(p));
+    }
+
 #endif
 
-inline void last_write_time(const path &p, file_time_type new_time,
-                                        std::error_code &ec) noexcept {
-  ec.clear();
-  auto d = new_time.time_since_epoch();
+    inline bool is_regular_file(const path &p,
+                                std::error_code &ec) noexcept {
+        return is_regular_file(status(p, ec));
+    }
+
+    inline bool is_socket(file_status s) noexcept {
+        return s.type() == file_type::socket;
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline bool is_socket(const path &p) {
+        return is_socket(status(p));
+    }
+
+#endif
+
+    inline bool is_socket(const path &p, std::error_code &ec) noexcept {
+        return is_socket(status(p, ec));
+    }
+
+    inline bool is_symlink(file_status s) noexcept {
+        return s.type() == file_type::symlink;
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline bool is_symlink(const path &p) {
+        return is_symlink(symlink_status(p));
+    }
+
+#endif
+
+    inline bool is_symlink(const path &p,
+                           std::error_code &ec) noexcept {
+        return is_symlink(symlink_status(p, ec));
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline file_time_type last_write_time(const path &p) {
+        std::error_code ec;
+        auto result = last_write_time(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
+#endif
+
+    inline file_time_type
+    last_write_time(const path &p, std::error_code &ec) noexcept {
+        time_t result = 0;
+        ec.clear();
+        file_status fs = detail::status_ex(p, ec, nullptr, nullptr, nullptr, &result);
+        return ec ? (file_time_type::min)()
+                  : std::chrono::system_clock::from_time_t(result);
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline void last_write_time(const path &p,
+                                file_time_type new_time) {
+        std::error_code ec;
+        last_write_time(p, new_time, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+    }
+
+#endif
+
+    inline void last_write_time(const path &p, file_time_type new_time,
+                                std::error_code &ec) noexcept {
+        ec.clear();
+        auto d = new_time.time_since_epoch();
 #ifdef TURBO_PLATFORM_WINDOWS
-  detail::unique_handle file(
+                                                                                                                                detail::unique_handle file(
       ::CreateFileW(TURBO_NATIVEWP(p), FILE_WRITE_ATTRIBUTES,
                     FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
                     NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL));
@@ -4458,7 +4942,7 @@ inline void last_write_time(const path &p, file_time_type new_time,
     ec = detail::make_system_error();
   }
 #elif defined(TURBO_PLATFORM_OSX)
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+                                                                                                                                #ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 101300
   struct ::stat fs;
   if (::stat(p.c_str(), &fs) == 0) {
@@ -4492,60 +4976,62 @@ inline void last_write_time(const path &p, file_time_type new_time,
 #ifndef UTIME_OMIT
 #define UTIME_OMIT ((1l << 30) - 2l)
 #endif
-  struct ::timespec times[2];
-  times[0].tv_sec = 0;
-  times[0].tv_nsec = UTIME_OMIT;
-  times[1].tv_sec = static_cast<decltype(times[1].tv_sec)>(
-      std::chrono::duration_cast<std::chrono::seconds>(d).count());
-  times[1].tv_nsec = static_cast<decltype(times[1].tv_nsec)>(
-      std::chrono::duration_cast<std::chrono::nanoseconds>(d).count() %
-      1000000000);
+        struct ::timespec times[2];
+        times[0].tv_sec = 0;
+        times[0].tv_nsec = UTIME_OMIT;
+        times[1].tv_sec = static_cast<decltype(times[1].tv_sec)>(
+                std::chrono::duration_cast<std::chrono::seconds>(d).count());
+        times[1].tv_nsec = static_cast<decltype(times[1].tv_nsec)>(
+                std::chrono::duration_cast<std::chrono::nanoseconds>(d).count() %
+                1000000000);
 #if defined(__ANDROID_API__) && __ANDROID_API__ < 12
-  if (syscall(__NR_utimensat, AT_FDCWD, p.c_str(), times,
+                                                                                                                                if (syscall(__NR_utimensat, AT_FDCWD, p.c_str(), times,
               AT_SYMLINK_NOFOLLOW) != 0) {
 #else
-  if (::utimensat((int)AT_FDCWD, p.c_str(), times, AT_SYMLINK_NOFOLLOW) != 0) {
+        if (::utimensat((int) AT_FDCWD, p.c_str(), times, AT_SYMLINK_NOFOLLOW) != 0) {
 #endif
-    ec = detail::make_system_error();
-  }
-  return;
+            ec = detail::make_system_error();
+        }
+        return;
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void permissions(const path &p, perms prms,
-                                    perm_options opts) {
-  std::error_code ec;
-  permissions(p, prms, opts, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-}
+
+    inline void permissions(const path &p, perms prms,
+                            perm_options opts) {
+        std::error_code ec;
+        permissions(p, prms, opts, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+    }
+
 #endif
 
-inline void permissions(const path &p, perms prms,
-                                    std::error_code &ec) noexcept {
-  permissions(p, prms, perm_options::replace, ec);
-}
-
-inline void permissions(const path &p, perms prms,
-                                    perm_options opts,
-                                    std::error_code &ec) noexcept {
-  if (static_cast<int>(opts & (perm_options::replace | perm_options::add |
-                               perm_options::remove)) == 0) {
-    ec = detail::make_error_code(detail::portable_error::invalid_argument);
-    return;
-  }
-  auto fs = symlink_status(p, ec);
-  if ((opts & perm_options::replace) != perm_options::replace) {
-    if ((opts & perm_options::add) == perm_options::add) {
-      prms = fs.permissions() | prms;
-    } else {
-      prms = fs.permissions() & ~prms;
+    inline void permissions(const path &p, perms prms,
+                            std::error_code &ec) noexcept {
+        permissions(p, prms, perm_options::replace, ec);
     }
-  }
+
+    inline void permissions(const path &p, perms prms,
+                            perm_options opts,
+                            std::error_code &ec) noexcept {
+        if (static_cast<int>(opts & (perm_options::replace | perm_options::add |
+                                     perm_options::remove)) == 0) {
+            ec = detail::make_error_code(detail::portable_error::invalid_argument);
+            return;
+        }
+        auto fs = symlink_status(p, ec);
+        if ((opts & perm_options::replace) != perm_options::replace) {
+            if ((opts & perm_options::add) == perm_options::add) {
+                prms = fs.permissions() | prms;
+            } else {
+                prms = fs.permissions() & ~prms;
+            }
+        }
 #ifdef TURBO_PLATFORM_WINDOWS
-#ifdef __GNUC__
+                                                                                                                                #ifdef __GNUC__
   auto oldAttr = GetFileAttributesW(TURBO_NATIVEWP(p));
   if (oldAttr != INVALID_FILE_ATTRIBUTES) {
     DWORD newAttr =
@@ -4570,87 +5056,97 @@ inline void permissions(const path &p, perms prms,
   }
 #endif
 #else
-  if ((opts & perm_options::nofollow) != perm_options::nofollow) {
-    if (::chmod(p.c_str(), static_cast<mode_t>(prms)) != 0) {
-      ec = detail::make_system_error();
+        if ((opts & perm_options::nofollow) != perm_options::nofollow) {
+            if (::chmod(p.c_str(), static_cast<mode_t>(prms)) != 0) {
+                ec = detail::make_system_error();
+            }
+        }
+#endif
     }
-  }
-#endif
-}
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline path proximate(const path &p, std::error_code &ec) {
-  auto cp = current_path(ec);
-  if (!ec) {
-    return proximate(p, cp, ec);
-  }
-  return path();
-}
+
+    inline path proximate(const path &p, std::error_code &ec) {
+        auto cp = current_path(ec);
+        if (!ec) {
+            return proximate(p, cp, ec);
+        }
+        return path();
+    }
+
 #endif
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline path proximate(const path &p, const path &base) {
-  return weakly_canonical(p).lexically_proximate(weakly_canonical(base));
-}
+
+    inline path proximate(const path &p, const path &base) {
+        return weakly_canonical(p).lexically_proximate(weakly_canonical(base));
+    }
+
 #endif
 
-inline path proximate(const path &p, const path &base,
-                                  std::error_code &ec) {
-  return weakly_canonical(p, ec).lexically_proximate(
-      weakly_canonical(base, ec));
-}
+    inline path proximate(const path &p, const path &base,
+                          std::error_code &ec) {
+        return weakly_canonical(p, ec).lexically_proximate(
+                weakly_canonical(base, ec));
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline path read_symlink(const path &p) {
-  std::error_code ec;
-  auto result = read_symlink(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline path read_symlink(const path &p) {
+        std::error_code ec;
+        auto result = read_symlink(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline path read_symlink(const path &p, std::error_code &ec) {
-  file_status fs = symlink_status(p, ec);
-  if (fs.type() != file_type::symlink) {
-    ec = detail::make_error_code(detail::portable_error::invalid_argument);
-    return path();
-  }
-  auto result = detail::resolveSymlink(p, ec);
-  return ec ? path() : result;
-}
+    inline path read_symlink(const path &p, std::error_code &ec) {
+        file_status fs = symlink_status(p, ec);
+        if (fs.type() != file_type::symlink) {
+            ec = detail::make_error_code(detail::portable_error::invalid_argument);
+            return path();
+        }
+        auto result = detail::resolveSymlink(p, ec);
+        return ec ? path() : result;
+    }
 
-inline path relative(const path &p, std::error_code &ec) {
-  return relative(p, current_path(ec), ec);
-}
+    inline path relative(const path &p, std::error_code &ec) {
+        return relative(p, current_path(ec), ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline path relative(const path &p, const path &base) {
-  return weakly_canonical(p).lexically_relative(weakly_canonical(base));
-}
+
+    inline path relative(const path &p, const path &base) {
+        return weakly_canonical(p).lexically_relative(weakly_canonical(base));
+    }
+
 #endif
 
-inline path relative(const path &p, const path &base,
-                                 std::error_code &ec) {
-  return weakly_canonical(p, ec).lexically_relative(weakly_canonical(base, ec));
-}
+    inline path relative(const path &p, const path &base,
+                         std::error_code &ec) {
+        return weakly_canonical(p, ec).lexically_relative(weakly_canonical(base, ec));
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool remove(const path &p) {
-  std::error_code ec;
-  auto result = remove(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline bool remove(const path &p) {
+        std::error_code ec;
+        auto result = remove(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline bool remove(const path &p, std::error_code &ec) noexcept {
-  ec.clear();
+    inline bool remove(const path &p, std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-#ifdef GHC_USE_WCHAR_T
+                                                                                                                                #ifdef GHC_USE_WCHAR_T
   auto cstr = p.c_str();
 #else
   std::wstring np = detail::fromUtf8<std::wstring>(p.u8string());
@@ -4682,118 +5178,124 @@ inline bool remove(const path &p, std::error_code &ec) noexcept {
     }
   }
 #else
-  if (::remove(p.c_str()) == -1) {
-    auto error = errno;
-    if (error == ENOENT) {
-      return false;
-    }
-    ec = detail::make_system_error();
-  }
+        if (::remove(p.c_str()) == -1) {
+            auto error = errno;
+            if (error == ENOENT) {
+                return false;
+            }
+            ec = detail::make_system_error();
+        }
 #endif
-  return ec ? false : true;
-}
+        return ec ? false : true;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline uintmax_t remove_all(const path &p) {
-  std::error_code ec;
-  auto result = remove_all(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline uintmax_t remove_all(const path &p) {
+        std::error_code ec;
+        auto result = remove_all(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline uintmax_t remove_all(const path &p,
-                                        std::error_code &ec) noexcept {
-  ec.clear();
-  uintmax_t count = 0;
-  if (p == "/") {
-    ec = detail::make_error_code(detail::portable_error::not_supported);
-    return static_cast<uintmax_t>(-1);
-  }
-  std::error_code tec;
-  auto fs = symlink_status(p, tec);
-  if (exists(fs) && is_directory(fs)) {
-    for (auto iter = directory_iterator(p, ec); iter != directory_iterator();
-         iter.increment(ec)) {
-      if (ec && !detail::is_not_found_error(ec)) {
-        break;
-      }
-      bool is_symlink_result = iter->is_symlink(ec);
-      if (ec)
-        return static_cast<uintmax_t>(-1);
-      if (!is_symlink_result && iter->is_directory(ec)) {
-        count += remove_all(iter->path(), ec);
-        if (ec) {
-          return static_cast<uintmax_t>(-1);
+    inline uintmax_t remove_all(const path &p,
+                                std::error_code &ec) noexcept {
+        ec.clear();
+        uintmax_t count = 0;
+        if (p == "/") {
+            ec = detail::make_error_code(detail::portable_error::not_supported);
+            return static_cast<uintmax_t>(-1);
         }
-      } else {
+        std::error_code tec;
+        auto fs = symlink_status(p, tec);
+        if (exists(fs) && is_directory(fs)) {
+            for (auto iter = directory_iterator(p, ec); iter != directory_iterator();
+                 iter.increment(ec)) {
+                if (ec && !detail::is_not_found_error(ec)) {
+                    break;
+                }
+                bool is_symlink_result = iter->is_symlink(ec);
+                if (ec)
+                    return static_cast<uintmax_t>(-1);
+                if (!is_symlink_result && iter->is_directory(ec)) {
+                    count += remove_all(iter->path(), ec);
+                    if (ec) {
+                        return static_cast<uintmax_t>(-1);
+                    }
+                } else {
+                    if (!ec) {
+                        remove(iter->path(), ec);
+                    }
+                    if (ec) {
+                        return static_cast<uintmax_t>(-1);
+                    }
+                    ++count;
+                }
+            }
+        }
         if (!ec) {
-          remove(iter->path(), ec);
+            if (remove(p, ec)) {
+                ++count;
+            }
         }
         if (ec) {
-          return static_cast<uintmax_t>(-1);
+            return static_cast<uintmax_t>(-1);
         }
-        ++count;
-      }
+        return count;
     }
-  }
-  if (!ec) {
-    if (remove(p, ec)) {
-      ++count;
-    }
-  }
-  if (ec) {
-    return static_cast<uintmax_t>(-1);
-  }
-  return count;
-}
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void rename(const path &from, const path &to) {
-  std::error_code ec;
-  rename(from, to, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
-  }
-}
+
+    inline void rename(const path &from, const path &to) {
+        std::error_code ec;
+        rename(from, to, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), from, to, ec);
+        }
+    }
+
 #endif
 
-inline void rename(const path &from, const path &to,
-                               std::error_code &ec) noexcept {
-  ec.clear();
+    inline void rename(const path &from, const path &to,
+                       std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  if (from != to) {
+                                                                                                                                if (from != to) {
     if (!MoveFileExW(TURBO_NATIVEWP(from), TURBO_NATIVEWP(to),
                      (DWORD)MOVEFILE_REPLACE_EXISTING)) {
       ec = detail::make_system_error();
     }
   }
 #else
-  if (from != to) {
-    if (::rename(from.c_str(), to.c_str()) != 0) {
-      ec = detail::make_system_error();
-    }
-  }
+        if (from != to) {
+            if (::rename(from.c_str(), to.c_str()) != 0) {
+                ec = detail::make_system_error();
+            }
+        }
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void resize_file(const path &p, uintmax_t size) {
-  std::error_code ec;
-  resize_file(p, size, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-}
+
+    inline void resize_file(const path &p, uintmax_t size) {
+        std::error_code ec;
+        resize_file(p, size, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+    }
+
 #endif
 
-inline void resize_file(const path &p, uintmax_t size,
-                                    std::error_code &ec) noexcept {
-  ec.clear();
+    inline void resize_file(const path &p, uintmax_t size,
+                            std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  LARGE_INTEGER lisize;
+                                                                                                                                LARGE_INTEGER lisize;
   lisize.QuadPart = static_cast<LONGLONG>(size);
   if (lisize.QuadPart < 0) {
 #ifdef ERROR_FILE_TOO_LARGE
@@ -4812,28 +5314,30 @@ inline void resize_file(const path &p, uintmax_t size,
     ec = detail::make_system_error();
   }
 #else
-  if (::truncate(p.c_str(), static_cast<off_t>(size)) != 0) {
-    ec = detail::make_system_error();
-  }
+        if (::truncate(p.c_str(), static_cast<off_t>(size)) != 0) {
+            ec = detail::make_system_error();
+        }
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline space_info space(const path &p) {
-  std::error_code ec;
-  auto result = space(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline space_info space(const path &p) {
+        std::error_code ec;
+        auto result = space(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline space_info space(const path &p,
-                                    std::error_code &ec) noexcept {
-  ec.clear();
+    inline space_info space(const path &p,
+                            std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  ULARGE_INTEGER freeBytesAvailableToCaller = {{0, 0}};
+                                                                                                                                ULARGE_INTEGER freeBytesAvailableToCaller = {{0, 0}};
   ULARGE_INTEGER totalNumberOfBytes = {{0, 0}};
   ULARGE_INTEGER totalNumberOfFreeBytes = {{0, 0}};
   if (!GetDiskFreeSpaceExW(TURBO_NATIVEWP(p), &freeBytesAvailableToCaller,
@@ -4846,72 +5350,78 @@ inline space_info space(const path &p,
           static_cast<uintmax_t>(totalNumberOfFreeBytes.QuadPart),
           static_cast<uintmax_t>(freeBytesAvailableToCaller.QuadPart)};
 #else
-  struct ::statvfs sfs;
-  if (::statvfs(p.c_str(), &sfs) != 0) {
-    ec = detail::make_system_error();
-    return {static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1),
-            static_cast<uintmax_t>(-1)};
-  }
-  return {static_cast<uintmax_t>(sfs.f_blocks) *
-              static_cast<uintmax_t>(sfs.f_frsize),
-          static_cast<uintmax_t>(sfs.f_bfree) *
-              static_cast<uintmax_t>(sfs.f_frsize),
-          static_cast<uintmax_t>(sfs.f_bavail) *
-              static_cast<uintmax_t>(sfs.f_frsize)};
+        struct ::statvfs sfs;
+        if (::statvfs(p.c_str(), &sfs) != 0) {
+            ec = detail::make_system_error();
+            return {static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1),
+                    static_cast<uintmax_t>(-1)};
+        }
+        return {static_cast<uintmax_t>(sfs.f_blocks) *
+                static_cast<uintmax_t>(sfs.f_frsize),
+                static_cast<uintmax_t>(sfs.f_bfree) *
+                static_cast<uintmax_t>(sfs.f_frsize),
+                static_cast<uintmax_t>(sfs.f_bavail) *
+                static_cast<uintmax_t>(sfs.f_frsize)};
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline file_status status(const path &p) {
-  std::error_code ec;
-  auto result = status(p, ec);
-  if (result.type() == file_type::none) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline file_status status(const path &p) {
+        std::error_code ec;
+        auto result = status(p, ec);
+        if (result.type() == file_type::none) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline file_status status(const path &p,
+    inline file_status status(const path &p,
+                              std::error_code &ec) noexcept {
+        return detail::status_ex(p, ec);
+    }
+
+    inline bool status_known(file_status s) noexcept {
+        return s.type() != file_type::none;
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline file_status symlink_status(const path &p) {
+        std::error_code ec;
+        auto result = symlink_status(p, ec);
+        if (result.type() == file_type::none) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), ec);
+        }
+        return result;
+    }
+
+#endif
+
+    inline file_status symlink_status(const path &p,
                                       std::error_code &ec) noexcept {
-  return detail::status_ex(p, ec);
-}
-
-inline bool status_known(file_status s) noexcept {
-  return s.type() != file_type::none;
-}
+        return detail::symlink_status_ex(p, ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline file_status symlink_status(const path &p) {
-  std::error_code ec;
-  auto result = symlink_status(p, ec);
-  if (result.type() == file_type::none) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), ec);
-  }
-  return result;
-}
+
+    inline path temp_directory_path() {
+        std::error_code ec;
+        path result = temp_directory_path(ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline file_status symlink_status(const path &p,
-                                              std::error_code &ec) noexcept {
-  return detail::symlink_status_ex(p, ec);
-}
-
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline path temp_directory_path() {
-  std::error_code ec;
-  path result = temp_directory_path(ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), ec);
-  }
-  return result;
-}
-#endif
-
-inline path temp_directory_path(std::error_code &ec) noexcept {
-  ec.clear();
+    inline path temp_directory_path(std::error_code &ec) noexcept {
+        ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-  wchar_t buffer[512];
+                                                                                                                                wchar_t buffer[512];
   auto rc = GetTempPathW(511, buffer);
   if (!rc || rc > 511) {
     ec = detail::make_system_error();
@@ -4919,113 +5429,115 @@ inline path temp_directory_path(std::error_code &ec) noexcept {
   }
   return path(std::wstring(buffer));
 #else
-  static const char *temp_vars[] = {"TMPDIR", "TMP", "TEMP", "TEMPDIR",
-                                    nullptr};
-  const char *temp_path = nullptr;
-  for (auto temp_name = temp_vars; *temp_name != nullptr; ++temp_name) {
-    temp_path = std::getenv(*temp_name);
-    if (temp_path) {
-      return path(temp_path);
-    }
-  }
-  return path("/tmp");
+        static const char *temp_vars[] = {"TMPDIR", "TMP", "TEMP", "TEMPDIR",
+                                          nullptr};
+        const char *temp_path = nullptr;
+        for (auto temp_name = temp_vars; *temp_name != nullptr; ++temp_name) {
+            temp_path = std::getenv(*temp_name);
+            if (temp_path) {
+                return path(temp_path);
+            }
+        }
+        return path("/tmp");
 #endif
-}
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline path weakly_canonical(const path &p) {
-  std::error_code ec;
-  auto result = weakly_canonical(p, ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
-  }
-  return result;
-}
+
+    inline path weakly_canonical(const path &p) {
+        std::error_code ec;
+        auto result = weakly_canonical(p, ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), p, ec);
+        }
+        return result;
+    }
+
 #endif
 
-inline path weakly_canonical(const path &p,
-                                         std::error_code &ec) noexcept {
-  path result;
-  ec.clear();
-  bool scan = true;
-  for (auto pe : p) {
-    if (scan) {
-      std::error_code tec;
-      if (exists(result / pe, tec)) {
-        result /= pe;
-      } else {
-        if (ec) {
-          return path();
+    inline path weakly_canonical(const path &p,
+                                 std::error_code &ec) noexcept {
+        path result;
+        ec.clear();
+        bool scan = true;
+        for (auto pe: p) {
+            if (scan) {
+                std::error_code tec;
+                if (exists(result / pe, tec)) {
+                    result /= pe;
+                } else {
+                    if (ec) {
+                        return path();
+                    }
+                    scan = false;
+                    if (!result.empty()) {
+                        result = canonical(result, ec) / pe;
+                        if (ec) {
+                            break;
+                        }
+                    } else {
+                        result /= pe;
+                    }
+                }
+            } else {
+                result /= pe;
+            }
         }
-        scan = false;
-        if (!result.empty()) {
-          result = canonical(result, ec) / pe;
-          if (ec) {
-            break;
-          }
-        } else {
-          result /= pe;
+        if (scan) {
+            if (!result.empty()) {
+                result = canonical(result, ec);
+            }
         }
-      }
-    } else {
-      result /= pe;
+        return ec ? path() : result.lexically_normal();
     }
-  }
-  if (scan) {
-    if (!result.empty()) {
-      result = canonical(result, ec);
-    }
-  }
-  return ec ? path() : result.lexically_normal();
-}
 
 //-----------------------------------------------------------------------------
 // [fs.class.file_status] class file_status
 // [fs.file_status.cons] constructors and destructor
-inline file_status::file_status() noexcept
-    : file_status(file_type::none) {}
+    inline file_status::file_status() noexcept
+            : file_status(file_type::none) {}
 
-inline file_status::file_status(file_type ft, perms prms) noexcept
-    : _type(ft), _perms(prms) {}
+    inline file_status::file_status(file_type ft, perms prms) noexcept
+            : _type(ft), _perms(prms) {}
 
-inline file_status::file_status(const file_status &other) noexcept
-    : _type(other._type), _perms(other._perms) {}
+    inline file_status::file_status(const file_status &other) noexcept
+            : _type(other._type), _perms(other._perms) {}
 
-inline file_status::file_status(file_status &&other) noexcept
-    : _type(other._type), _perms(other._perms) {}
+    inline file_status::file_status(file_status &&other) noexcept
+            : _type(other._type), _perms(other._perms) {}
 
-inline file_status::~file_status() {}
+    inline file_status::~file_status() {}
 
 // assignments:
-inline file_status &
-file_status::operator=(const file_status &rhs) noexcept {
-  _type = rhs._type;
-  _perms = rhs._perms;
-  return *this;
-}
+    inline file_status &
+    file_status::operator=(const file_status &rhs) noexcept {
+        _type = rhs._type;
+        _perms = rhs._perms;
+        return *this;
+    }
 
-inline file_status &
-file_status::operator=(file_status &&rhs) noexcept {
-  _type = rhs._type;
-  _perms = rhs._perms;
-  return *this;
-}
+    inline file_status &
+    file_status::operator=(file_status &&rhs) noexcept {
+        _type = rhs._type;
+        _perms = rhs._perms;
+        return *this;
+    }
 
 // [fs.file_status.mods] modifiers
-inline void file_status::type(file_type ft) noexcept { _type = ft; }
+    inline void file_status::type(file_type ft) noexcept { _type = ft; }
 
-inline void file_status::permissions(perms prms) noexcept {
-  _perms = prms;
-}
+    inline void file_status::permissions(perms prms) noexcept {
+        _perms = prms;
+    }
 
 // [fs.file_status.obs] observers
-inline file_type file_status::type() const noexcept {
-  return _type;
-}
+    inline file_type file_status::type() const noexcept {
+        return _type;
+    }
 
-inline perms file_status::permissions() const noexcept {
-  return _perms;
-}
+    inline perms file_status::permissions() const noexcept {
+        return _perms;
+    }
 
 //-----------------------------------------------------------------------------
 // [fs.class.directory_entry] class directory_entry
@@ -5034,31 +5546,33 @@ inline perms file_status::permissions() const noexcept {
 // directory_entry::directory_entry(const directory_entry&) = default;
 // directory_entry::directory_entry(directory_entry&&) noexcept = default;
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline directory_entry::directory_entry(const filesystem::path &p)
-    : _path(p), _file_size(static_cast<uintmax_t>(-1))
+
+    inline directory_entry::directory_entry(const filesystem::path &p)
+            : _path(p), _file_size(static_cast<uintmax_t>(-1))
 #ifndef TURBO_PLATFORM_WINDOWS
-      ,
-      _hard_link_count(static_cast<uintmax_t>(-1))
+            ,
+              _hard_link_count(static_cast<uintmax_t>(-1))
 #endif
-      ,
-      _last_write_time(0) {
-  refresh();
-}
+            ,
+              _last_write_time(0) {
+        refresh();
+    }
+
 #endif
 
-inline directory_entry::directory_entry(const filesystem::path &p,
-                                                    std::error_code &ec)
-    : _path(p), _file_size(static_cast<uintmax_t>(-1))
+    inline directory_entry::directory_entry(const filesystem::path &p,
+                                            std::error_code &ec)
+            : _path(p), _file_size(static_cast<uintmax_t>(-1))
 #ifndef TURBO_PLATFORM_WINDOWS
-      ,
-      _hard_link_count(static_cast<uintmax_t>(-1))
+            ,
+              _hard_link_count(static_cast<uintmax_t>(-1))
 #endif
-      ,
-      _last_write_time(0) {
-  refresh(ec);
-}
+            ,
+              _last_write_time(0) {
+        refresh(ec);
+    }
 
-inline directory_entry::~directory_entry() {}
+    inline directory_entry::~directory_entry() {}
 
 // assignments:
 // directory_entry& directory_entry::operator=(const directory_entry&) =
@@ -5067,333 +5581,371 @@ inline directory_entry::~directory_entry() {}
 
 // [fs.dir.entry.mods] directory_entry modifiers
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void directory_entry::assign(const filesystem::path &p) {
-  _path = p;
-  refresh();
-}
+
+    inline void directory_entry::assign(const filesystem::path &p) {
+        _path = p;
+        refresh();
+    }
+
 #endif
 
-inline void directory_entry::assign(const filesystem::path &p,
-                                                std::error_code &ec) {
-  _path = p;
-  refresh(ec);
-}
+    inline void directory_entry::assign(const filesystem::path &p,
+                                        std::error_code &ec) {
+        _path = p;
+        refresh(ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void
-directory_entry::replace_filename(const filesystem::path &p) {
-  _path.replace_filename(p);
-  refresh();
-}
+
+    inline void
+    directory_entry::replace_filename(const filesystem::path &p) {
+        _path.replace_filename(p);
+        refresh();
+    }
+
 #endif
 
-inline void
-directory_entry::replace_filename(const filesystem::path &p,
-                                  std::error_code &ec) {
-  _path.replace_filename(p);
-  refresh(ec);
-}
+    inline void
+    directory_entry::replace_filename(const filesystem::path &p,
+                                      std::error_code &ec) {
+        _path.replace_filename(p);
+        refresh(ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void directory_entry::refresh() {
-  std::error_code ec;
-  refresh(ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()), _path, ec);
-  }
-}
+
+    inline void directory_entry::refresh() {
+        std::error_code ec;
+        refresh(ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()), _path, ec);
+        }
+    }
+
 #endif
 
-inline void directory_entry::refresh(std::error_code &ec) noexcept {
+    inline void directory_entry::refresh(std::error_code &ec) noexcept {
 #ifdef TURBO_PLATFORM_WINDOWS
-  _status = detail::status_ex(_path, ec, &_symlink_status, &_file_size, nullptr,
+                                                                                                                                _status = detail::status_ex(_path, ec, &_symlink_status, &_file_size, nullptr,
                               &_last_write_time);
 #else
-  _status = detail::status_ex(_path, ec, &_symlink_status, &_file_size,
-                              &_hard_link_count, &_last_write_time);
+        _status = detail::status_ex(_path, ec, &_symlink_status, &_file_size,
+                                    &_hard_link_count, &_last_write_time);
 #endif
-}
+    }
 
 // [fs.dir.entry.obs] directory_entry observers
-inline const filesystem::path &
-directory_entry::path() const noexcept {
-  return _path;
-}
+    inline const filesystem::path &
+    directory_entry::path() const noexcept {
+        return _path;
+    }
 
-inline
+    inline
     directory_entry::operator const filesystem::path &() const noexcept {
-  return _path;
-}
+        return _path;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline file_type directory_entry::status_file_type() const {
-  return _status.type() != file_type::none ? _status.type()
-                                           : filesystem::status(path()).type();
-}
+
+    inline file_type directory_entry::status_file_type() const {
+        return _status.type() != file_type::none ? _status.type()
+                                                 : filesystem::status(path()).type();
+    }
+
 #endif
 
-inline file_type
-directory_entry::status_file_type(std::error_code &ec) const noexcept {
-  if (_status.type() != file_type::none) {
-    ec.clear();
-    return _status.type();
-  }
-  return filesystem::status(path(), ec).type();
-}
+    inline file_type
+    directory_entry::status_file_type(std::error_code &ec) const noexcept {
+        if (_status.type() != file_type::none) {
+            ec.clear();
+            return _status.type();
+        }
+        return filesystem::status(path(), ec).type();
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::exists() const {
-  return status_file_type() != file_type::not_found;
-}
+
+    inline bool directory_entry::exists() const {
+        return status_file_type() != file_type::not_found;
+    }
+
 #endif
 
-inline bool
-directory_entry::exists(std::error_code &ec) const noexcept {
-  return status_file_type(ec) != file_type::not_found;
-}
+    inline bool
+    directory_entry::exists(std::error_code &ec) const noexcept {
+        return status_file_type(ec) != file_type::not_found;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_block_file() const {
-  return status_file_type() == file_type::block;
-}
+
+    inline bool directory_entry::is_block_file() const {
+        return status_file_type() == file_type::block;
+    }
+
 #endif
-inline bool
-directory_entry::is_block_file(std::error_code &ec) const noexcept {
-  return status_file_type(ec) == file_type::block;
-}
+
+    inline bool
+    directory_entry::is_block_file(std::error_code &ec) const noexcept {
+        return status_file_type(ec) == file_type::block;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_character_file() const {
-  return status_file_type() == file_type::character;
-}
+
+    inline bool directory_entry::is_character_file() const {
+        return status_file_type() == file_type::character;
+    }
+
 #endif
 
-inline bool
-directory_entry::is_character_file(std::error_code &ec) const noexcept {
-  return status_file_type(ec) == file_type::character;
-}
+    inline bool
+    directory_entry::is_character_file(std::error_code &ec) const noexcept {
+        return status_file_type(ec) == file_type::character;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_directory() const {
-  return status_file_type() == file_type::directory;
-}
+
+    inline bool directory_entry::is_directory() const {
+        return status_file_type() == file_type::directory;
+    }
+
 #endif
 
-inline bool
-directory_entry::is_directory(std::error_code &ec) const noexcept {
-  return status_file_type(ec) == file_type::directory;
-}
+    inline bool
+    directory_entry::is_directory(std::error_code &ec) const noexcept {
+        return status_file_type(ec) == file_type::directory;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_fifo() const {
-  return status_file_type() == file_type::fifo;
-}
+
+    inline bool directory_entry::is_fifo() const {
+        return status_file_type() == file_type::fifo;
+    }
+
 #endif
 
-inline bool
-directory_entry::is_fifo(std::error_code &ec) const noexcept {
-  return status_file_type(ec) == file_type::fifo;
-}
+    inline bool
+    directory_entry::is_fifo(std::error_code &ec) const noexcept {
+        return status_file_type(ec) == file_type::fifo;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_other() const {
-  auto ft = status_file_type();
-  return ft != file_type::none && ft != file_type::not_found &&
-         ft != file_type::regular && ft != file_type::directory &&
-         !is_symlink();
-}
-#endif
 
-inline bool
-directory_entry::is_other(std::error_code &ec) const noexcept {
-  auto ft = status_file_type(ec);
-  bool other = ft != file_type::none && ft != file_type::not_found &&
+    inline bool directory_entry::is_other() const {
+        auto ft = status_file_type();
+        return ft != file_type::none && ft != file_type::not_found &&
                ft != file_type::regular && ft != file_type::directory &&
-               !is_symlink(ec);
-  return !ec && other;
-}
+               !is_symlink();
+    }
 
-#ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_regular_file() const {
-  return status_file_type() == file_type::regular;
-}
 #endif
 
-inline bool
-directory_entry::is_regular_file(std::error_code &ec) const noexcept {
-  return status_file_type(ec) == file_type::regular;
-}
+    inline bool
+    directory_entry::is_other(std::error_code &ec) const noexcept {
+        auto ft = status_file_type(ec);
+        bool other = ft != file_type::none && ft != file_type::not_found &&
+                     ft != file_type::regular && ft != file_type::directory &&
+                     !is_symlink(ec);
+        return !ec && other;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_socket() const {
-  return status_file_type() == file_type::socket;
-}
+
+    inline bool directory_entry::is_regular_file() const {
+        return status_file_type() == file_type::regular;
+    }
+
 #endif
 
-inline bool
-directory_entry::is_socket(std::error_code &ec) const noexcept {
-  return status_file_type(ec) == file_type::socket;
-}
+    inline bool
+    directory_entry::is_regular_file(std::error_code &ec) const noexcept {
+        return status_file_type(ec) == file_type::regular;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline bool directory_entry::is_symlink() const {
-  return _symlink_status.type() != file_type::none
-             ? _symlink_status.type() == file_type::symlink
-             : filesystem::is_symlink(symlink_status());
-}
+
+    inline bool directory_entry::is_socket() const {
+        return status_file_type() == file_type::socket;
+    }
+
 #endif
 
-inline bool
-directory_entry::is_symlink(std::error_code &ec) const noexcept {
-  if (_symlink_status.type() != file_type::none) {
-    ec.clear();
-    return _symlink_status.type() == file_type::symlink;
-  }
-  return filesystem::is_symlink(symlink_status(ec));
-}
+    inline bool
+    directory_entry::is_socket(std::error_code &ec) const noexcept {
+        return status_file_type(ec) == file_type::socket;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline uintmax_t directory_entry::file_size() const {
-  if (_file_size != static_cast<uintmax_t>(-1)) {
-    return _file_size;
-  }
-  return filesystem::file_size(path());
-}
+
+    inline bool directory_entry::is_symlink() const {
+        return _symlink_status.type() != file_type::none
+               ? _symlink_status.type() == file_type::symlink
+               : filesystem::is_symlink(symlink_status());
+    }
+
 #endif
 
-inline uintmax_t
-directory_entry::file_size(std::error_code &ec) const noexcept {
-  if (_file_size != static_cast<uintmax_t>(-1)) {
-    ec.clear();
-    return _file_size;
-  }
-  return filesystem::file_size(path(), ec);
-}
+    inline bool
+    directory_entry::is_symlink(std::error_code &ec) const noexcept {
+        if (_symlink_status.type() != file_type::none) {
+            ec.clear();
+            return _symlink_status.type() == file_type::symlink;
+        }
+        return filesystem::is_symlink(symlink_status(ec));
+    }
+
+#ifdef TURBO_HAVE_EXCEPTIONS
+
+    inline uintmax_t directory_entry::file_size() const {
+        if (_file_size != static_cast<uintmax_t>(-1)) {
+            return _file_size;
+        }
+        return filesystem::file_size(path());
+    }
+
+#endif
+
+    inline uintmax_t
+    directory_entry::file_size(std::error_code &ec) const noexcept {
+        if (_file_size != static_cast<uintmax_t>(-1)) {
+            ec.clear();
+            return _file_size;
+        }
+        return filesystem::file_size(path(), ec);
+    }
 
 #ifndef TURBO_PLATFORM_WEB
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline uintmax_t directory_entry::hard_link_count() const {
+
+    inline uintmax_t directory_entry::hard_link_count() const {
 #ifndef TURBO_PLATFORM_WINDOWS
-  if (_hard_link_count != static_cast<uintmax_t>(-1)) {
-    return _hard_link_count;
-  }
+        if (_hard_link_count != static_cast<uintmax_t>(-1)) {
+            return _hard_link_count;
+        }
 #endif
-  return filesystem::hard_link_count(path());
-}
+        return filesystem::hard_link_count(path());
+    }
+
 #endif
 
-inline uintmax_t
-directory_entry::hard_link_count(std::error_code &ec) const noexcept {
+    inline uintmax_t
+    directory_entry::hard_link_count(std::error_code &ec) const noexcept {
 #ifndef TURBO_PLATFORM_WINDOWS
-  if (_hard_link_count != static_cast<uintmax_t>(-1)) {
-    ec.clear();
-    return _hard_link_count;
-  }
+        if (_hard_link_count != static_cast<uintmax_t>(-1)) {
+            ec.clear();
+            return _hard_link_count;
+        }
 #endif
-  return filesystem::hard_link_count(path(), ec);
-}
+        return filesystem::hard_link_count(path(), ec);
+    }
+
 #endif
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline file_time_type directory_entry::last_write_time() const {
-  if (_last_write_time != 0) {
-    return std::chrono::system_clock::from_time_t(_last_write_time);
-  }
-  return filesystem::last_write_time(path());
-}
+
+    inline file_time_type directory_entry::last_write_time() const {
+        if (_last_write_time != 0) {
+            return std::chrono::system_clock::from_time_t(_last_write_time);
+        }
+        return filesystem::last_write_time(path());
+    }
+
 #endif
 
-inline file_time_type
-directory_entry::last_write_time(std::error_code &ec) const noexcept {
-  if (_last_write_time != 0) {
-    ec.clear();
-    return std::chrono::system_clock::from_time_t(_last_write_time);
-  }
-  return filesystem::last_write_time(path(), ec);
-}
+    inline file_time_type
+    directory_entry::last_write_time(std::error_code &ec) const noexcept {
+        if (_last_write_time != 0) {
+            ec.clear();
+            return std::chrono::system_clock::from_time_t(_last_write_time);
+        }
+        return filesystem::last_write_time(path(), ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline file_status directory_entry::status() const {
-  if (_status.type() != file_type::none &&
-      _status.permissions() != perms::unknown) {
-    return _status;
-  }
-  return filesystem::status(path());
-}
+
+    inline file_status directory_entry::status() const {
+        if (_status.type() != file_type::none &&
+            _status.permissions() != perms::unknown) {
+            return _status;
+        }
+        return filesystem::status(path());
+    }
+
 #endif
 
-inline file_status
-directory_entry::status(std::error_code &ec) const noexcept {
-  if (_status.type() != file_type::none &&
-      _status.permissions() != perms::unknown) {
-    ec.clear();
-    return _status;
-  }
-  return filesystem::status(path(), ec);
-}
+    inline file_status
+    directory_entry::status(std::error_code &ec) const noexcept {
+        if (_status.type() != file_type::none &&
+            _status.permissions() != perms::unknown) {
+            ec.clear();
+            return _status;
+        }
+        return filesystem::status(path(), ec);
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline file_status directory_entry::symlink_status() const {
-  if (_symlink_status.type() != file_type::none &&
-      _symlink_status.permissions() != perms::unknown) {
-    return _symlink_status;
-  }
-  return filesystem::symlink_status(path());
-}
+
+    inline file_status directory_entry::symlink_status() const {
+        if (_symlink_status.type() != file_type::none &&
+            _symlink_status.permissions() != perms::unknown) {
+            return _symlink_status;
+        }
+        return filesystem::symlink_status(path());
+    }
+
 #endif
 
-inline file_status
-directory_entry::symlink_status(std::error_code &ec) const noexcept {
-  if (_symlink_status.type() != file_type::none &&
-      _symlink_status.permissions() != perms::unknown) {
-    ec.clear();
-    return _symlink_status;
-  }
-  return filesystem::symlink_status(path(), ec);
-}
+    inline file_status
+    directory_entry::symlink_status(std::error_code &ec) const noexcept {
+        if (_symlink_status.type() != file_type::none &&
+            _symlink_status.permissions() != perms::unknown) {
+            ec.clear();
+            return _symlink_status;
+        }
+        return filesystem::symlink_status(path(), ec);
+    }
 
 #ifdef TURBO_HAVE_THREEWAY_COMP
-inline std::strong_ordering
+                                                                                                                            inline std::strong_ordering
 directory_entry::operator<=>(const directory_entry &rhs) const noexcept {
   return _path <=> rhs._path;
 }
 #endif
 
-inline bool
-directory_entry::operator<(const directory_entry &rhs) const noexcept {
-  return _path < rhs._path;
-}
+    inline bool
+    directory_entry::operator<(const directory_entry &rhs) const noexcept {
+        return _path < rhs._path;
+    }
 
-inline bool
-directory_entry::operator==(const directory_entry &rhs) const noexcept {
-  return _path == rhs._path;
-}
+    inline bool
+    directory_entry::operator==(const directory_entry &rhs) const noexcept {
+        return _path == rhs._path;
+    }
 
-inline bool
-directory_entry::operator!=(const directory_entry &rhs) const noexcept {
-  return _path != rhs._path;
-}
+    inline bool
+    directory_entry::operator!=(const directory_entry &rhs) const noexcept {
+        return _path != rhs._path;
+    }
 
-inline bool
-directory_entry::operator<=(const directory_entry &rhs) const noexcept {
-  return _path <= rhs._path;
-}
+    inline bool
+    directory_entry::operator<=(const directory_entry &rhs) const noexcept {
+        return _path <= rhs._path;
+    }
 
-inline bool
-directory_entry::operator>(const directory_entry &rhs) const noexcept {
-  return _path > rhs._path;
-}
+    inline bool
+    directory_entry::operator>(const directory_entry &rhs) const noexcept {
+        return _path > rhs._path;
+    }
 
-inline bool
-directory_entry::operator>=(const directory_entry &rhs) const noexcept {
-  return _path >= rhs._path;
-}
+    inline bool
+    directory_entry::operator>=(const directory_entry &rhs) const noexcept {
+        return _path >= rhs._path;
+    }
 
 //-----------------------------------------------------------------------------
 // [fs.class.directory_iterator] class directory_iterator
 
 #ifdef TURBO_PLATFORM_WINDOWS
-class directory_iterator::impl {
+                                                                                                                            class directory_iterator::impl {
 public:
   impl(const path &p, directory_options options)
       : _base(p), _options(options), _dirHandle(INVALID_HANDLE_VALUE) {
@@ -5493,384 +6045,400 @@ public:
   std::error_code _ec;
 };
 #else
-// POSIX implementation
-class directory_iterator::impl {
-public:
-  impl(const path &path, directory_options options)
-      : _base(path), _options(options), _dir(nullptr), _entry(nullptr) {
-    if (!path.empty()) {
-      _dir = ::opendir(path.native().c_str());
-      if (!_dir) {
-        auto error = errno;
-        _base = filesystem::path();
-        if ((error != EACCES && error != EPERM) ||
-            (options & directory_options::skip_permission_denied) ==
-                directory_options::none) {
-          _ec = detail::make_system_error();
-        }
-      } else {
-        increment(_ec);
-      }
-    }
-  }
-  impl(const impl &other) = delete;
-  ~impl() {
-    if (_dir) {
-      ::closedir(_dir);
-    }
-  }
-  void increment(std::error_code &ec) {
-    if (_dir) {
-      bool skip;
-      do {
-        skip = false;
-        errno = 0;
-        _entry = ::readdir(_dir);
-        if (_entry) {
-          _dir_entry._path = _base;
-          _dir_entry._path.append_name(_entry->d_name);
-          copyToDirEntry();
-          if (ec && (ec.value() == EACCES || ec.value() == EPERM) &&
-              (_options & directory_options::skip_permission_denied) ==
-                  directory_options::skip_permission_denied) {
-            ec.clear();
-            skip = true;
-          }
-        } else {
-          ::closedir(_dir);
-          _dir = nullptr;
-          _dir_entry._path.clear();
-          if (errno) {
-            ec = detail::make_system_error();
-          }
-          break;
-        }
-      } while (skip || std::strcmp(_entry->d_name, ".") == 0 ||
-               std::strcmp(_entry->d_name, "..") == 0);
-    }
-  }
 
-  void copyToDirEntry() {
-    _dir_entry._symlink_status.permissions(perms::unknown);
-    auto ft = detail::file_type_from_dirent(*_entry);
-    _dir_entry._symlink_status.type(ft);
-    if (ft != file_type::symlink) {
-      _dir_entry._status = _dir_entry._symlink_status;
-    } else {
-      _dir_entry._status.type(file_type::none);
-      _dir_entry._status.permissions(perms::unknown);
-    }
-    _dir_entry._file_size = static_cast<uintmax_t>(-1);
-    _dir_entry._hard_link_count = static_cast<uintmax_t>(-1);
-    _dir_entry._last_write_time = 0;
-  }
-  path _base;
-  directory_options _options;
-  DIR *_dir;
-  struct ::dirent *_entry;
-  directory_entry _dir_entry;
-  std::error_code _ec;
-};
+// POSIX implementation
+    class directory_iterator::impl {
+    public:
+        impl(const path &path, directory_options options)
+                : _base(path), _options(options), _dir(nullptr), _entry(nullptr) {
+            if (!path.empty()) {
+                _dir = ::opendir(path.native().c_str());
+                if (!_dir) {
+                    auto error = errno;
+                    _base = filesystem::path();
+                    if ((error != EACCES && error != EPERM) ||
+                        (options & directory_options::skip_permission_denied) ==
+                        directory_options::none) {
+                        _ec = detail::make_system_error();
+                    }
+                } else {
+                    increment(_ec);
+                }
+            }
+        }
+
+        impl(const impl &other) = delete;
+
+        ~impl() {
+            if (_dir) {
+                ::closedir(_dir);
+            }
+        }
+
+        void increment(std::error_code &ec) {
+            if (_dir) {
+                bool skip;
+                do {
+                    skip = false;
+                    errno = 0;
+                    _entry = ::readdir(_dir);
+                    if (_entry) {
+                        _dir_entry._path = _base;
+                        _dir_entry._path.append_name(_entry->d_name);
+                        copyToDirEntry();
+                        if (ec && (ec.value() == EACCES || ec.value() == EPERM) &&
+                            (_options & directory_options::skip_permission_denied) ==
+                            directory_options::skip_permission_denied) {
+                            ec.clear();
+                            skip = true;
+                        }
+                    } else {
+                        ::closedir(_dir);
+                        _dir = nullptr;
+                        _dir_entry._path.clear();
+                        if (errno) {
+                            ec = detail::make_system_error();
+                        }
+                        break;
+                    }
+                } while (skip || std::strcmp(_entry->d_name, ".") == 0 ||
+                         std::strcmp(_entry->d_name, "..") == 0);
+            }
+        }
+
+        void copyToDirEntry() {
+            _dir_entry._symlink_status.permissions(perms::unknown);
+            auto ft = detail::file_type_from_dirent(*_entry);
+            _dir_entry._symlink_status.type(ft);
+            if (ft != file_type::symlink) {
+                _dir_entry._status = _dir_entry._symlink_status;
+            } else {
+                _dir_entry._status.type(file_type::none);
+                _dir_entry._status.permissions(perms::unknown);
+            }
+            _dir_entry._file_size = static_cast<uintmax_t>(-1);
+            _dir_entry._hard_link_count = static_cast<uintmax_t>(-1);
+            _dir_entry._last_write_time = 0;
+        }
+
+        path _base;
+        directory_options _options;
+        DIR *_dir;
+        struct ::dirent *_entry;
+        directory_entry _dir_entry;
+        std::error_code _ec;
+    };
+
 #endif
 
 // [fs.dir.itr.members] member functions
-inline directory_iterator::directory_iterator() noexcept
-    : _impl(new impl(path(), directory_options::none)) {}
+    inline directory_iterator::directory_iterator() noexcept
+            : _impl(new impl(path(), directory_options::none)) {}
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline directory_iterator::directory_iterator(const path &p)
-    : _impl(new impl(p, directory_options::none)) {
-  if (_impl->_ec) {
-    throw filesystem_error(detail::systemErrorText(_impl->_ec.value()), p,
-                           _impl->_ec);
-  }
-  _impl->_ec.clear();
-}
 
-inline
-directory_iterator::directory_iterator(const path &p, directory_options options)
-    : _impl(new impl(p, options)) {
-  if (_impl->_ec) {
-    throw filesystem_error(detail::systemErrorText(_impl->_ec.value()), p,
-                           _impl->_ec);
-  }
-}
+    inline directory_iterator::directory_iterator(const path &p)
+            : _impl(new impl(p, directory_options::none)) {
+        if (_impl->_ec) {
+            throw filesystem_error(detail::systemErrorText(_impl->_ec.value()), p,
+                                   _impl->_ec);
+        }
+        _impl->_ec.clear();
+    }
+
+    inline
+    directory_iterator::directory_iterator(const path &p, directory_options options)
+            : _impl(new impl(p, options)) {
+        if (_impl->_ec) {
+            throw filesystem_error(detail::systemErrorText(_impl->_ec.value()), p,
+                                   _impl->_ec);
+        }
+    }
+
 #endif
 
-inline
-directory_iterator::directory_iterator(const path &p,
-                                       std::error_code &ec) noexcept
-    : _impl(new impl(p, directory_options::none)) {
-  if (_impl->_ec) {
-    ec = _impl->_ec;
-  }
-}
+    inline
+    directory_iterator::directory_iterator(const path &p,
+                                           std::error_code &ec) noexcept
+            : _impl(new impl(p, directory_options::none)) {
+        if (_impl->_ec) {
+            ec = _impl->_ec;
+        }
+    }
 
-inline
-directory_iterator::directory_iterator(const path &p, directory_options options,
-                                       std::error_code &ec) noexcept
-    : _impl(new impl(p, options)) {
-  if (_impl->_ec) {
-    ec = _impl->_ec;
-  }
-}
+    inline
+    directory_iterator::directory_iterator(const path &p, directory_options options,
+                                           std::error_code &ec) noexcept
+            : _impl(new impl(p, options)) {
+        if (_impl->_ec) {
+            ec = _impl->_ec;
+        }
+    }
 
-inline
-directory_iterator::directory_iterator(const directory_iterator &rhs)
-    : _impl(rhs._impl) {}
+    inline
+    directory_iterator::directory_iterator(const directory_iterator &rhs)
+            : _impl(rhs._impl) {}
 
-inline
-directory_iterator::directory_iterator(directory_iterator &&rhs) noexcept
-    : _impl(std::move(rhs._impl)) {}
+    inline
+    directory_iterator::directory_iterator(directory_iterator &&rhs) noexcept
+            : _impl(std::move(rhs._impl)) {}
 
-inline directory_iterator::~directory_iterator() {}
+    inline directory_iterator::~directory_iterator() {}
 
-inline directory_iterator &
-directory_iterator::operator=(const directory_iterator &rhs) {
-  _impl = rhs._impl;
-  return *this;
-}
+    inline directory_iterator &
+    directory_iterator::operator=(const directory_iterator &rhs) {
+        _impl = rhs._impl;
+        return *this;
+    }
 
-inline directory_iterator &
-directory_iterator::operator=(directory_iterator &&rhs) noexcept {
-  _impl = std::move(rhs._impl);
-  return *this;
-}
+    inline directory_iterator &
+    directory_iterator::operator=(directory_iterator &&rhs) noexcept {
+        _impl = std::move(rhs._impl);
+        return *this;
+    }
 
-inline const directory_entry &
-directory_iterator::operator*() const {
-  return _impl->_dir_entry;
-}
+    inline const directory_entry &
+    directory_iterator::operator*() const {
+        return _impl->_dir_entry;
+    }
 
-inline const directory_entry *
-directory_iterator::operator->() const {
-  return &_impl->_dir_entry;
-}
+    inline const directory_entry *
+    directory_iterator::operator->() const {
+        return &_impl->_dir_entry;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline directory_iterator &directory_iterator::operator++() {
-  std::error_code ec;
-  _impl->increment(ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()),
-                           _impl->_dir_entry._path, ec);
-  }
-  return *this;
-}
+
+    inline directory_iterator &directory_iterator::operator++() {
+        std::error_code ec;
+        _impl->increment(ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()),
+                                   _impl->_dir_entry._path, ec);
+        }
+        return *this;
+    }
+
 #endif
 
-inline directory_iterator &
-directory_iterator::increment(std::error_code &ec) noexcept {
-  _impl->increment(ec);
-  return *this;
-}
+    inline directory_iterator &
+    directory_iterator::increment(std::error_code &ec) noexcept {
+        _impl->increment(ec);
+        return *this;
+    }
 
-inline bool
-directory_iterator::operator==(const directory_iterator &rhs) const {
-  return _impl->_dir_entry._path == rhs._impl->_dir_entry._path;
-}
+    inline bool
+    directory_iterator::operator==(const directory_iterator &rhs) const {
+        return _impl->_dir_entry._path == rhs._impl->_dir_entry._path;
+    }
 
-inline bool
-directory_iterator::operator!=(const directory_iterator &rhs) const {
-  return _impl->_dir_entry._path != rhs._impl->_dir_entry._path;
-}
+    inline bool
+    directory_iterator::operator!=(const directory_iterator &rhs) const {
+        return _impl->_dir_entry._path != rhs._impl->_dir_entry._path;
+    }
 
 // [fs.dir.itr.nonmembers] directory_iterator non-member functions
 
-inline directory_iterator begin(directory_iterator iter) noexcept {
-  return iter;
-}
+    inline directory_iterator begin(directory_iterator iter) noexcept {
+        return iter;
+    }
 
-inline directory_iterator end(const directory_iterator &) noexcept {
-  return directory_iterator();
-}
+    inline directory_iterator end(const directory_iterator &) noexcept {
+        return directory_iterator();
+    }
 
 //-----------------------------------------------------------------------------
 // [fs.class.rec.dir.itr] class recursive_directory_iterator
 
-inline
-recursive_directory_iterator::recursive_directory_iterator() noexcept
-    : _impl(new recursive_directory_iterator_impl(directory_options::none,
-                                                  true)) {
-  _impl->_dir_iter_stack.push(directory_iterator());
-}
+    inline
+    recursive_directory_iterator::recursive_directory_iterator() noexcept
+            : _impl(new recursive_directory_iterator_impl(directory_options::none,
+                                                          true)) {
+        _impl->_dir_iter_stack.push(directory_iterator());
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline
-recursive_directory_iterator::recursive_directory_iterator(const path &p)
-    : _impl(new recursive_directory_iterator_impl(directory_options::none,
-                                                  true)) {
-  _impl->_dir_iter_stack.push(directory_iterator(p));
-}
 
-inline recursive_directory_iterator::recursive_directory_iterator(
-    const path &p, directory_options options)
-    : _impl(new recursive_directory_iterator_impl(options, true)) {
-  _impl->_dir_iter_stack.push(directory_iterator(p, options));
-}
+    inline
+    recursive_directory_iterator::recursive_directory_iterator(const path &p)
+            : _impl(new recursive_directory_iterator_impl(directory_options::none,
+                                                          true)) {
+        _impl->_dir_iter_stack.push(directory_iterator(p));
+    }
+
+    inline recursive_directory_iterator::recursive_directory_iterator(
+            const path &p, directory_options options)
+            : _impl(new recursive_directory_iterator_impl(options, true)) {
+        _impl->_dir_iter_stack.push(directory_iterator(p, options));
+    }
+
 #endif
 
-inline recursive_directory_iterator::recursive_directory_iterator(
-    const path &p, directory_options options, std::error_code &ec) noexcept
-    : _impl(new recursive_directory_iterator_impl(options, true)) {
-  _impl->_dir_iter_stack.push(directory_iterator(p, options, ec));
-}
+    inline recursive_directory_iterator::recursive_directory_iterator(
+            const path &p, directory_options options, std::error_code &ec) noexcept
+            : _impl(new recursive_directory_iterator_impl(options, true)) {
+        _impl->_dir_iter_stack.push(directory_iterator(p, options, ec));
+    }
 
-inline recursive_directory_iterator::recursive_directory_iterator(
-    const path &p, std::error_code &ec) noexcept
-    : _impl(new recursive_directory_iterator_impl(directory_options::none,
-                                                  true)) {
-  _impl->_dir_iter_stack.push(directory_iterator(p, ec));
-}
+    inline recursive_directory_iterator::recursive_directory_iterator(
+            const path &p, std::error_code &ec) noexcept
+            : _impl(new recursive_directory_iterator_impl(directory_options::none,
+                                                          true)) {
+        _impl->_dir_iter_stack.push(directory_iterator(p, ec));
+    }
 
-inline recursive_directory_iterator::recursive_directory_iterator(
-    const recursive_directory_iterator &rhs)
-    : _impl(rhs._impl) {}
+    inline recursive_directory_iterator::recursive_directory_iterator(
+            const recursive_directory_iterator &rhs)
+            : _impl(rhs._impl) {}
 
-inline recursive_directory_iterator::recursive_directory_iterator(
-    recursive_directory_iterator &&rhs) noexcept
-    : _impl(std::move(rhs._impl)) {}
+    inline recursive_directory_iterator::recursive_directory_iterator(
+            recursive_directory_iterator &&rhs) noexcept
+            : _impl(std::move(rhs._impl)) {}
 
-inline
+    inline
     recursive_directory_iterator::~recursive_directory_iterator() {}
 
 // [fs.rec.dir.itr.members] observers
-inline directory_options
-recursive_directory_iterator::options() const {
-  return _impl->_options;
-}
+    inline directory_options
+    recursive_directory_iterator::options() const {
+        return _impl->_options;
+    }
 
-inline int recursive_directory_iterator::depth() const {
-  return static_cast<int>(_impl->_dir_iter_stack.size() - 1);
-}
+    inline int recursive_directory_iterator::depth() const {
+        return static_cast<int>(_impl->_dir_iter_stack.size() - 1);
+    }
 
-inline bool
-recursive_directory_iterator::recursion_pending() const {
-  return _impl->_recursion_pending;
-}
+    inline bool
+    recursive_directory_iterator::recursion_pending() const {
+        return _impl->_recursion_pending;
+    }
 
-inline const directory_entry &
-recursive_directory_iterator::operator*() const {
-  return *(_impl->_dir_iter_stack.top());
-}
+    inline const directory_entry &
+    recursive_directory_iterator::operator*() const {
+        return *(_impl->_dir_iter_stack.top());
+    }
 
-inline const directory_entry *
-recursive_directory_iterator::operator->() const {
-  return &(*(_impl->_dir_iter_stack.top()));
-}
+    inline const directory_entry *
+    recursive_directory_iterator::operator->() const {
+        return &(*(_impl->_dir_iter_stack.top()));
+    }
 
 // [fs.rec.dir.itr.members] modifiers recursive_directory_iterator&
-inline recursive_directory_iterator &
-recursive_directory_iterator::operator=(
-    const recursive_directory_iterator &rhs) {
-  _impl = rhs._impl;
-  return *this;
-}
+    inline recursive_directory_iterator &
+    recursive_directory_iterator::operator=(
+            const recursive_directory_iterator &rhs) {
+        _impl = rhs._impl;
+        return *this;
+    }
 
-inline recursive_directory_iterator &
-recursive_directory_iterator::operator=(
-    recursive_directory_iterator &&rhs) noexcept {
-  _impl = std::move(rhs._impl);
-  return *this;
-}
+    inline recursive_directory_iterator &
+    recursive_directory_iterator::operator=(
+            recursive_directory_iterator &&rhs) noexcept {
+        _impl = std::move(rhs._impl);
+        return *this;
+    }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline recursive_directory_iterator &
-recursive_directory_iterator::operator++() {
-  std::error_code ec;
-  increment(ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()),
-                           _impl->_dir_iter_stack.empty()
-                               ? path()
-                               : _impl->_dir_iter_stack.top()->path(),
-                           ec);
-  }
-  return *this;
-}
+
+    inline recursive_directory_iterator &
+    recursive_directory_iterator::operator++() {
+        std::error_code ec;
+        increment(ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()),
+                                   _impl->_dir_iter_stack.empty()
+                                   ? path()
+                                   : _impl->_dir_iter_stack.top()->path(),
+                                   ec);
+        }
+        return *this;
+    }
+
 #endif
 
-inline recursive_directory_iterator &
-recursive_directory_iterator::increment(std::error_code &ec) noexcept {
-  bool isSymLink = (*this)->is_symlink(ec);
-  bool isDir = !ec && (*this)->is_directory(ec);
-  if (isSymLink && detail::is_not_found_error(ec)) {
-    ec.clear();
-  }
-  if (!ec) {
-    if (recursion_pending() && isDir &&
-        (!isSymLink ||
-         (options() & directory_options::follow_directory_symlink) !=
-             directory_options::none)) {
-      _impl->_dir_iter_stack.push(
-          directory_iterator((*this)->path(), _impl->_options, ec));
-    } else {
-      _impl->_dir_iter_stack.top().increment(ec);
+    inline recursive_directory_iterator &
+    recursive_directory_iterator::increment(std::error_code &ec) noexcept {
+        bool isSymLink = (*this)->is_symlink(ec);
+        bool isDir = !ec && (*this)->is_directory(ec);
+        if (isSymLink && detail::is_not_found_error(ec)) {
+            ec.clear();
+        }
+        if (!ec) {
+            if (recursion_pending() && isDir &&
+                (!isSymLink ||
+                 (options() & directory_options::follow_directory_symlink) !=
+                 directory_options::none)) {
+                _impl->_dir_iter_stack.push(
+                        directory_iterator((*this)->path(), _impl->_options, ec));
+            } else {
+                _impl->_dir_iter_stack.top().increment(ec);
+            }
+            if (!ec) {
+                while (depth() && _impl->_dir_iter_stack.top() == directory_iterator()) {
+                    _impl->_dir_iter_stack.pop();
+                    _impl->_dir_iter_stack.top().increment(ec);
+                }
+            } else if (!_impl->_dir_iter_stack.empty()) {
+                _impl->_dir_iter_stack.pop();
+            }
+            _impl->_recursion_pending = true;
+        }
+        return *this;
     }
-    if (!ec) {
-      while (depth() && _impl->_dir_iter_stack.top() == directory_iterator()) {
-        _impl->_dir_iter_stack.pop();
-        _impl->_dir_iter_stack.top().increment(ec);
-      }
-    } else if (!_impl->_dir_iter_stack.empty()) {
-      _impl->_dir_iter_stack.pop();
-    }
-    _impl->_recursion_pending = true;
-  }
-  return *this;
-}
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-inline void recursive_directory_iterator::pop() {
-  std::error_code ec;
-  pop(ec);
-  if (ec) {
-    throw filesystem_error(detail::systemErrorText(ec.value()),
-                           _impl->_dir_iter_stack.empty()
-                               ? path()
-                               : _impl->_dir_iter_stack.top()->path(),
-                           ec);
-  }
-}
+
+    inline void recursive_directory_iterator::pop() {
+        std::error_code ec;
+        pop(ec);
+        if (ec) {
+            throw filesystem_error(detail::systemErrorText(ec.value()),
+                                   _impl->_dir_iter_stack.empty()
+                                   ? path()
+                                   : _impl->_dir_iter_stack.top()->path(),
+                                   ec);
+        }
+    }
+
 #endif
 
-inline void recursive_directory_iterator::pop(std::error_code &ec) {
-  if (depth() == 0) {
-    *this = recursive_directory_iterator();
-  } else {
-    do {
-      _impl->_dir_iter_stack.pop();
-      _impl->_dir_iter_stack.top().increment(ec);
-    } while (depth() && _impl->_dir_iter_stack.top() == directory_iterator());
-  }
-}
+    inline void recursive_directory_iterator::pop(std::error_code &ec) {
+        if (depth() == 0) {
+            *this = recursive_directory_iterator();
+        } else {
+            do {
+                _impl->_dir_iter_stack.pop();
+                _impl->_dir_iter_stack.top().increment(ec);
+            } while (depth() && _impl->_dir_iter_stack.top() == directory_iterator());
+        }
+    }
 
-inline void
-recursive_directory_iterator::disable_recursion_pending() {
-  _impl->_recursion_pending = false;
-}
+    inline void
+    recursive_directory_iterator::disable_recursion_pending() {
+        _impl->_recursion_pending = false;
+    }
 
 // other members as required by [input.iterators]
-inline bool recursive_directory_iterator::operator==(
-    const recursive_directory_iterator &rhs) const {
-  return _impl->_dir_iter_stack.top() == rhs._impl->_dir_iter_stack.top();
-}
+    inline bool recursive_directory_iterator::operator==(
+            const recursive_directory_iterator &rhs) const {
+        return _impl->_dir_iter_stack.top() == rhs._impl->_dir_iter_stack.top();
+    }
 
-inline bool recursive_directory_iterator::operator!=(
-    const recursive_directory_iterator &rhs) const {
-  return _impl->_dir_iter_stack.top() != rhs._impl->_dir_iter_stack.top();
-}
+    inline bool recursive_directory_iterator::operator!=(
+            const recursive_directory_iterator &rhs) const {
+        return _impl->_dir_iter_stack.top() != rhs._impl->_dir_iter_stack.top();
+    }
 
-// [fs.rec.dir.itr.nonmembers] directory_iterator non-member functions
-inline recursive_directory_iterator
-begin(recursive_directory_iterator iter) noexcept {
-  return iter;
-}
+    // [fs.rec.dir.itr.nonmembers] directory_iterator non-member functions
+    inline recursive_directory_iterator
+    begin(recursive_directory_iterator iter) noexcept {
+        return iter;
+    }
 
-inline recursive_directory_iterator
-end(const recursive_directory_iterator &) noexcept {
-  return recursive_directory_iterator();
-}
+    inline recursive_directory_iterator
+    end(const recursive_directory_iterator &) noexcept {
+        return recursive_directory_iterator();
+    }
 
 } // namespace filesystem
 } // namespace turbo

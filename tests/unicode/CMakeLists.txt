@@ -26,8 +26,7 @@ carbin_cc_library(
         SOURCES
         ${REF_SRC}
         COPTS
-        ${TURBO_DEFAULT_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -42,8 +41,7 @@ carbin_cc_library(
         SOURCES
         ${HELPER_SRC}
         COPTS
-        ${TURBO_DEFAULT_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::test_reference
@@ -58,8 +56,7 @@ foreach (UNICODE_UT ${UNICODE_TEST_SRCS})
             SOURCES
             ${UNICODE_UT}
             COPTS
-            ${CARBIN_TEST_COPTS}
-            ${CARBIN_SIMD_FLAGS}
+            ${CARBIN_CXX_OPTIONS}
             DEPS
             turbo::test_reference
             turbo::test_helper

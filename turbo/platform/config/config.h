@@ -249,7 +249,7 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // TURBO_USES_STD_VARIANT
 //
-// Indicates whether turbo::variant is an alias for std::variant.
+// Indicates whether std::variant is an alias for std::variant.
 #if !defined(TURBO_OPTION_USE_STD_VARIANT)
 #error options.h is misconfigured.
 #elif TURBO_OPTION_USE_STD_VARIANT == 0 || \

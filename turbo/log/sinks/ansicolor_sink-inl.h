@@ -16,7 +16,7 @@
 #pragma once
 
 #include <turbo/log/sinks/ansicolor_sink.h>
-
+#include "turbo/base/sysinfo.h"
 #include <turbo/log/pattern_formatter.h>
 #include "turbo/log/details/os.h"
 
@@ -111,7 +111,7 @@ template<typename ConsoleMutex>
         should_do_colors_ = true;
         return;
     case color_mode::automatic:
-        should_do_colors_ = details::os::in_terminal(target_file_) && details::os::is_color_terminal();
+        should_do_colors_ = turbo::in_terminal(target_file_) && turbo::is_color_terminal();
         return;
     case color_mode::never:
         should_do_colors_ = false;

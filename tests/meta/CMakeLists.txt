@@ -20,7 +20,7 @@ carbin_cc_test(
         SOURCES
         "reflect_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -34,7 +34,7 @@ carbin_cc_test(
         SOURCES
         "type_traits_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -48,7 +48,7 @@ carbin_cc_test(
         SOURCES
         "utility_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -62,7 +62,7 @@ carbin_cc_test(
         SOURCES
         "span_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::exception_testing
         turbo::hash_testing
@@ -77,7 +77,7 @@ carbin_cc_test(
         SOURCES
         "span_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::exception_testing
         turbo::hash_testing
@@ -91,11 +91,9 @@ carbin_cc_test(
         SOURCES
         "compare_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -106,11 +104,9 @@ carbin_cc_test(
         SOURCES
         "algorithm_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -120,7 +116,7 @@ carbin_cc_test(
         SOURCES
         "container_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -138,8 +134,6 @@ carbin_cc_test(
         ${TURBO_DEFAULT_COPTS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -148,7 +142,7 @@ carbin_cc_test(
         SOURCES
         "function_ref_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo

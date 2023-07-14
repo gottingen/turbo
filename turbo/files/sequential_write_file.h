@@ -18,42 +18,53 @@
 #include "turbo/base/result_status.h"
 #include "turbo/files/filesystem.h"
 #include "turbo/strings/cord.h"
+#include "turbo/files/file_event_listener.h"
+#include "turbo/files/file_option.h"
+#include "turbo/format/format.h"
 
 namespace turbo {
 
-class SequentialWriteFile {
-public:
-  SequentialWriteFile() = default;
-  ~SequentialWriteFile();
+    class SequentialWriteFile {
+    public:
+        SequentialWriteFile() = default;
 
-  turbo::Status open(const turbo::filesystem::path &fname,
-                     bool truncate = false);
+        explicit SequentialWriteFile(const FileEventListener &listener);
 
-  turbo::Status reopen(const turbo::filesystem::path &fname,
-                       bool truncate = false);
+        ~SequentialWriteFile();
 
-  turbo::ResultStatus<ssize_t> append(const char *data, size_t size);
+        void set_option(const FileOption &option);
 
-  turbo::ResultStatus<ssize_t> append(std::string_view str) {
-    return append(str.data(), str.size());
-  }
+        turbo::Status open(const turbo::filesystem::path &fname,
+                           bool truncate = false);
 
-  size_t have_write() const;
+        turbo::Status reopen(bool truncate = false);
 
-  turbo::ResultStatus<size_t> size() const;
+        turbo::Status write(const char *data, size_t size);
 
-  void close();
+        turbo::Status write(std::string_view str) {
+            return write(str.data(), str.size());
+        }
 
-  void flush();
+        template<typename Char, size_t N>
+        turbo::Status write(const fmt::basic_memory_buffer<Char, N> &buffer) {
+            return write(buffer.data(), buffer.size() * sizeof(Char));
+        }
 
-  const turbo::filesystem::path &file_path() const;
+        turbo::ResultStatus<size_t> size() const;
 
-private:
-  static const size_t npos = std::numeric_limits<size_t>::max();
-  int _fd{-1};
-  turbo::filesystem::path _path;
-  size_t _has_write{0};
-};
+        void close();
+
+        turbo::Status flush();
+
+        const turbo::filesystem::path &file_path() const;
+
+    private:
+        static const size_t npos = std::numeric_limits<size_t>::max();
+        std::FILE *_fd{nullptr};
+        turbo::filesystem::path _file_path;
+        turbo::FileOption _option;
+        FileEventListener _listener;
+    };
 } // namespace turbo
 
 #endif // TURBO_FILES_SEQUENTIAL_WRITE_FILE_H_

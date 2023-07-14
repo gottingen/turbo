@@ -13,12 +13,13 @@
 // limitations under the License.
 //
 #include "turbo/flags/flags.h"
-#include "turbo/flags/timer.h"
+#include "turbo/times/stop_watcher.h"
 #include <iostream>
 #include <string>
 
 int main(int argc, char **argv) {
-    turbo::AutoTimer give_me_a_name("This is a timer");
+    turbo::StopWatcher watcher("This is a timer");
+    turbo::AutoWatcher give_me_a_name(&watcher, true);
 
     turbo::App app("K3Pi goofit fitter");
 

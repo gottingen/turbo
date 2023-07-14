@@ -23,7 +23,7 @@ carbin_cc_test(
         SOURCES
         "stacktrace_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -36,7 +36,7 @@ carbin_cc_test(
         SOURCES
         "symbolize_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -50,7 +50,7 @@ carbin_cc_test(
         SOURCES
         "failure_signal_handler_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         Threads::Threads
@@ -65,7 +65,7 @@ carbin_cc_test(
         SOURCES
         "demangle_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -79,7 +79,7 @@ carbin_cc_test(
         SOURCES
         "leak_check_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -109,7 +109,7 @@ carbin_cc_test(
         SOURCES
         "stack_consumption_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::stack_consumption
         turbo::turbo

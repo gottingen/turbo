@@ -21,9 +21,7 @@ carbin_cc_test(
         SOURCES
         "bit_gen_ref_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -38,9 +36,7 @@ carbin_cc_test(
         SOURCES
         "mock_distributions_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -54,9 +50,7 @@ carbin_cc_test(
         SOURCES
         "mocking_bit_gen_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -71,9 +65,7 @@ carbin_cc_test(
         SOURCES
         "bernoulli_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -87,9 +79,7 @@ carbin_cc_test(
         SOURCES
         "beta_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -104,9 +94,7 @@ carbin_cc_test(
         SOURCES
         "distributions_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -121,9 +109,7 @@ carbin_cc_test(
         SOURCES
         "generators_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -137,9 +123,7 @@ carbin_cc_test(
         SOURCES
         "log_uniform_int_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -154,9 +138,7 @@ carbin_cc_test(
         SOURCES
         "discrete_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -171,9 +153,7 @@ carbin_cc_test(
         SOURCES
         "poisson_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -188,9 +168,7 @@ carbin_cc_test(
         SOURCES
         "exponential_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -205,9 +183,7 @@ carbin_cc_test(
         SOURCES
         "gaussian_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -221,9 +197,7 @@ carbin_cc_test(
         SOURCES
         "uniform_int_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -238,9 +212,7 @@ carbin_cc_test(
         SOURCES
         "uniform_real_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -255,9 +227,7 @@ carbin_cc_test(
         SOURCES
         "zipf_distribution_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -272,9 +242,7 @@ carbin_cc_test(
         SOURCES
         "examples_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -287,9 +255,7 @@ carbin_cc_test(
         SOURCES
         "seed_sequences_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -305,9 +271,7 @@ carbin_cc_test(
         SOURCES
         "traits_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -321,9 +285,7 @@ carbin_cc_test(
         SOURCES
         "generate_real_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -357,9 +319,7 @@ carbin_cc_test(
         SOURCES
         "distribution_test_util_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -374,9 +334,7 @@ carbin_cc_test(
         SOURCES
         "fastmath_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -390,9 +348,7 @@ carbin_cc_test(
         SOURCES
         "explicit_seed_seq_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -407,9 +363,7 @@ carbin_cc_test(
         SOURCES
         "salted_seed_seq_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -424,9 +378,7 @@ carbin_cc_test(
         SOURCES
         "chi_square_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
@@ -441,9 +393,7 @@ carbin_cc_test(
         SOURCES
         "fast_uniform_bits_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -457,9 +407,7 @@ carbin_cc_test(
         SOURCES
         "nonsecure_base_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -473,9 +421,7 @@ carbin_cc_test(
         SOURCES
         "seed_material_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -490,9 +436,7 @@ carbin_cc_test(
         SOURCES
         "pool_urbg_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -506,9 +450,7 @@ carbin_cc_test(
         SOURCES
         "pcg_engine_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -523,9 +465,7 @@ carbin_cc_test(
         SOURCES
         "randen_engine_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}
@@ -540,9 +480,7 @@ carbin_cc_test(
         SOURCES
         "randen_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -556,9 +494,7 @@ carbin_cc_test(
         SOURCES
         "randen_slow_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -572,9 +508,7 @@ carbin_cc_test(
         SOURCES
         "randen_hwaes_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -590,9 +524,7 @@ carbin_cc_test(
         SOURCES
         "uniform_helper_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -606,9 +538,7 @@ carbin_cc_test(
         SOURCES
         "iostream_state_saver_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GTEST_LIB}
@@ -622,9 +552,7 @@ carbin_cc_test(
         SOURCES
         wide_multiply_test.cc
         COPTS
-        ${CARBIN_TEST_COPTS}
-        ${CARBIN_RANDOM_RANDEN_COPTS}
-        ${CARBIN_SIMD_FLAGS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
         ${GMOCK_LIB}

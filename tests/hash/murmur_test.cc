@@ -18,7 +18,8 @@
 #include <cstring>
 
 #include "turbo/base/endian.h"
-#include "tests/doctest/test_common_macros.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest/doctest.h"
 
 
 namespace turbo {
@@ -149,7 +150,7 @@ namespace turbo {
         return result;
     }
 
-    TEST(hash, verification)
+    TEST_CASE("hash, verification")
     {
 #if INTPTR_MAX == INT64_MAX
       uint32_t res;
@@ -165,12 +166,12 @@ namespace turbo {
 #endif
         uint32_t actual = verification_test(&hash_bytes, sizeof(std::size_t));
 
-        EXPECT_EQ(actual, res);
+        CHECK_EQ(actual, res);
     }
 
-    TEST(hash, sanity)
+    TEST_CASE("hash, sanity")
     {
-        EXPECT_TRUE(sanity_test(&hash_bytes, sizeof(std::size_t)));
+        CHECK(sanity_test(&hash_bytes, sizeof(std::size_t)));
     }
 }
 

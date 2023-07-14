@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#pragma once
 
+#ifndef TURBO_FLAGS_SPLIT_H_
+#define TURBO_FLAGS_SPLIT_H_
 
 #include <string>
 #include <tuple>
@@ -46,3 +47,4 @@ namespace turbo::detail {
     get_names(const std::vector<std::string> &input);
 
 }  // namespace turbo::detail
+#endif  // TURBO_FLAGS_SPLIT_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#pragma once
-
+#ifndef TURBO_FLAGS_CONFIG_H_
+#define TURBO_FLAGS_CONFIG_H_
 
 #include <algorithm>
 #include <cctype>
@@ -28,24 +28,24 @@
 #include "turbo/flags/config_fwd.h"
 #include "turbo/flags/string_tools.h"
 
-namespace turbo {
-namespace detail {
+namespace turbo::detail {
 
-std::string convert_arg_for_ini(const std::string &arg, char stringQuote = '"', char characterQuote = '\'');
+    std::string convert_arg_for_ini(const std::string &arg, char stringQuote = '"', char characterQuote = '\'');
 
-/// Comma separated join, adds quotes if needed
-std::string ini_join(const std::vector<std::string> &args,
-                     char sepChar = ',',
-                     char arrayStart = '[',
-                     char arrayEnd = ']',
-                     char stringQuote = '"',
-                     char characterQuote = '\'');
+    /// Comma separated join, adds quotes if needed
+    std::string ini_join(const std::vector<std::string> &args,
+                         char sepChar = ',',
+                         char arrayStart = '[',
+                         char arrayEnd = ']',
+                         char stringQuote = '"',
+                         char characterQuote = '\'');
 
-std::vector<std::string> generate_parents(const std::string &section, std::string &name, char parentSeparator);
+    std::vector<std::string> generate_parents(const std::string &section, std::string &name, char parentSeparator);
 
-/// assuming non default segments do a check on the close and open of the segments in a configItem structure
-void checkParentSegments(std::vector<ConfigItem> &output, const std::string &currentSection, char parentSeparator);
-}  // namespace detail
+    /// assuming non default segments do a check on the close and open of the segments in a configItem structure
+    void
+    checkParentSegments(std::vector<ConfigItem> &output, const std::string &currentSection, char parentSeparator);
 
-}  // namespace turbo
+}  // namespace turbo::detail
 
+#endif  // TURBO_FLAGS_CONFIG_H_

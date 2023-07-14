@@ -18,88 +18,125 @@
 #include <cerrno>
 #include <cstring>
 #include "turbo/base/casts.h"
+#include "turbo/files/fio.h"
+#include <iostream>
+#include "turbo/platform/port.h"
 
 namespace turbo {
 
-SequentialWriteFile::~SequentialWriteFile() {
-    close();
-}
+    SequentialWriteFile::SequentialWriteFile(const FileEventListener &listener) : _listener(listener) {
 
-turbo::Status SequentialWriteFile::open(const turbo::filesystem::path&fname, bool truncate) {
-  if(fname.empty()) {
-    return InvalidArgumentError("invalid file name");
-  }
-  _path = fname;
-  int flag = O_WRONLY | O_CLOEXEC | O_CREAT;
-  if(truncate) {
-    flag |= O_TRUNC;
-  }
-  _fd = ::open(_path.c_str(), flag, 0644);
-  if (_fd < 0) {
-    return ErrnoToStatus(errno, "{}");
-  }
-  return OkStatus();
-}
-
-turbo::Status SequentialWriteFile::reopen(const turbo::filesystem::path&fname, bool truncate) {
-  close();
-  _has_write = 0;
-  return  open(fname, truncate);
-}
-
-turbo::ResultStatus<ssize_t> SequentialWriteFile::append(const char *data, size_t size) {
-  size_t wr = size;
-  while (size > 0) {
-    ssize_t write_result = ::write(_fd, data, size);
-    if (write_result < 0) {
-      if (errno == EINTR) {
-        continue;  // Retry
-      }
-      return ErrnoToStatus( errno, _path.c_str());
     }
-    data += write_result;
-    size -= static_cast<size_t>(write_result);
-  }
-  _has_write += wr;
-  return static_cast<ssize_t>(wr);
-}
 
-size_t SequentialWriteFile::have_write() const {
-    return _has_write;
-}
-
-turbo::ResultStatus<size_t> SequentialWriteFile::size() const {
-    std::error_code ec;
-    auto size = turbo::filesystem::file_size(_path, ec);
-    if(ec) {
-      return turbo::ErrnoToStatus(errno, "");
+    SequentialWriteFile::~SequentialWriteFile() {
+        close();
     }
-    return size;
-}
 
-void SequentialWriteFile::close() {
-    if (_fd > 0) {
-      ::close(_fd);
-      _fd = -1;
+    void SequentialWriteFile::set_option(const FileOption &option) {
+        _option = option;
     }
-}
 
-void SequentialWriteFile::flush() {
-#ifdef TURBO_PLATFORM_OSX
-    if(_fd > 0) {
-      ::fsync(_fd);
-    }
-#elif TURBO_PLATFORM_LINUX
-    if(_fd > 0) {
-      ::fdatasync(_fd);
-    }
-#else
-#error unkown how to work
-#endif
-}
+    turbo::Status SequentialWriteFile::open(const turbo::filesystem::path &fname, bool truncate) {
+        close();
+        _file_path = fname;
+        TURBO_ASSERT(!_file_path.empty());
+        auto *mode = "ab";
+        auto *trunc_mode = "wb";
 
-const turbo::filesystem::path& SequentialWriteFile::file_path() const {
-    return _path;
-}
+        if (_listener.before_open) {
+            _listener.before_open(_file_path);
+        }
+        for (int tries = 0; tries < _option.open_tries; ++tries) {
+            // create containing folder if not exists already.
+            if (_option.create_dir_if_miss) {
+                auto pdir = _file_path.parent_path();
+                if(!pdir.empty()) {
+                    std::error_code ec;
+                    if (!turbo::filesystem::exists(pdir, ec)) {
+                        if (ec) {
+                            continue;
+                        }
+                        if (!turbo::filesystem::create_directories(pdir, ec)) {
+                            continue;
+                        }
+                    }
+                }
+            }
+            if (truncate) {
+                // Truncate by opening-and-closing a tmp file in "wb" mode, always
+                // opening the actual log-we-write-to in "ab" mode, since that
+                // interacts more politely with eternal processes that might
+                // rotate/truncate the file underneath us.
+                auto rs = Fio::file_open_write(_file_path, trunc_mode, _option);
+                if (!rs.ok()) {
+                    continue;
+                }
+                std::fclose(rs.value());
+            }
+            auto rs = Fio::file_open_write(_file_path, mode, _option);
+            if (rs.ok()) {
+                _fd = rs.value();
+                if (_listener.after_open) {
+                    _listener.after_open(_file_path, _fd);
+                }
+                return turbo::OkStatus();
+            }
+            if (_option.open_interval > 0) {
+                turbo::SleepFor(turbo::Milliseconds(_option.open_interval));
+            }
+        }
+        return turbo::ErrnoToStatus(errno, turbo::Format("Failed opening file {} for writing", _file_path.c_str()));
+    }
+
+    turbo::Status SequentialWriteFile::reopen(bool truncate) {
+        close();
+        if (_file_path.empty()) {
+            return turbo::InvalidArgumentError("file name empty");
+        }
+        return open(_file_path, truncate);
+    }
+
+    turbo::Status SequentialWriteFile::write(const char *data, size_t size) {
+        TURBO_ASSERT(_fd != nullptr);
+        if (std::fwrite(data, 1, size, _fd) != size) {
+            return turbo::ErrnoToStatus(errno, turbo::Format("Failed writing to file {}", _file_path.c_str()));
+        }
+        return turbo::OkStatus();
+    }
+
+    turbo::ResultStatus<size_t> SequentialWriteFile::size() const {
+        if (_fd == nullptr) {
+            return turbo::InvalidArgumentError("Failed getting file size. fp is null");
+        }
+        auto rs = Fio::file_size(_fd);
+        return rs;
+    }
+
+    void SequentialWriteFile::close() {
+        if (_fd != nullptr) {
+            if (_listener.before_close) {
+                _listener.before_close(_file_path, _fd);
+            }
+
+            std::fclose(_fd);
+            _fd = nullptr;
+
+            if (_listener.after_close) {
+                _listener.after_close(_file_path);
+            }
+        }
+    }
+
+    turbo::Status SequentialWriteFile::flush() {
+        if (std::fflush(_fd) != 0) {
+            return turbo::ErrnoToStatus(errno,
+                                        turbo::Format("Failed flush to file {}", _file_path.c_str()));
+        }
+        return turbo::OkStatus();
+    }
+
+    const turbo::filesystem::path &SequentialWriteFile::file_path() const {
+        return _file_path;
+    }
 
 }  // namespace turbo

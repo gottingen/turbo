@@ -20,7 +20,7 @@ carbin_cc_test(
         SOURCES
         "latch_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -31,7 +31,7 @@ carbin_cc_test(
         SOURCES
         "barrier_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )
@@ -42,7 +42,7 @@ carbin_cc_test(
         SOURCES
         "doubly_buffered_data_test.cc"
         COPTS
-        ${CARBIN_TEST_COPTS}
+        ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
 )

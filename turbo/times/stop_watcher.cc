@@ -14,18 +14,33 @@
 //
 
 #include "turbo/times/stop_watcher.h"
+#include <cassert>
 
 namespace turbo {
 
-    StopWatcher::StopWatcher() : _start(), _stop() {
-        reset();
+    StopWatcher::StopWatcher(const std::string &title, time_print_t time_print)
+    : _start(turbo::Now()), _title(title),
+    _time_print(std::move(time_print)),
+    _duration(turbo::Nanoseconds(0)) {
     }
 
     void StopWatcher::reset() {
         _start = turbo::Now();
+        _duration = turbo::Duration();
     }
 
-    turbo::Duration StopWatcher::elapsed() const{
+    const StopWatcher &StopWatcher::stop() {
+        auto n = turbo::Now();
+        if (_duration <= kZero) {
+            _duration = n - _start;
+        }
+        return *this;
+    }
+
+    turbo::Duration StopWatcher::elapsed() const {
+        if (_duration > kZero) {
+            return  _duration;
+        }
         return turbo::Now() - _start;
     }
 }  // namespace turbo

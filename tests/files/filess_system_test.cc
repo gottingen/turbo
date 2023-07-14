@@ -13,24 +13,24 @@
 // limitations under the License.
 //
 #include "turbo/files/system.h"
-
-#include "tests/doctest/test_common_macros.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest/doctest.h"
 
 namespace turbo {
-    TEST(system, executable_path)
+    TEST_CASE("system, executable_path")
     {
         std::string exec_path = executable_path();
-        EXPECT_TRUE(!exec_path.empty());
+        CHECK(!exec_path.empty());
     }
 
-    TEST(system, prefix_path)
+    TEST_CASE("system, prefix_path")
     {
         std::string prefix = prefix_path();
         std::string exec_path = executable_path();
 
-        EXPECT_NE(prefix.size(), exec_path.size());
-        EXPECT_TRUE(std::equal(prefix.cbegin(), prefix.cend(), exec_path.cbegin()));
-        EXPECT_TRUE((exec_path.find("test_turbo") != std::string::npos) ||
-                    (exec_path.find("system_test") != std::string::npos));
+        CHECK_NE(prefix.size(), exec_path.size());
+        CHECK(std::equal(prefix.cbegin(), prefix.cend(), exec_path.cbegin()));
+        CHECK(((exec_path.find("test_turbo") != std::string::npos) ||
+                    (exec_path.find("system_test") != std::string::npos)));
     }
 }

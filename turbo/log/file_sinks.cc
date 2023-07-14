@@ -14,7 +14,6 @@
 //
 
 #include "turbo/log/details/null_mutex.h"
-#include "turbo/log/details/file_helper-inl.h"
 #include <turbo/log/sinks/basic_file_sink-inl.h>
 #include <turbo/log/sinks/base_sink-inl.h>
 #include <turbo/log/sinks/rotating_file_sink-inl.h>

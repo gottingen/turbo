@@ -44,7 +44,7 @@
 #include "turbo/random/internal/distribution_caller.h"
 #include "turbo/random/random.h"
 #include "turbo/meta/span.h"
-#include "turbo/meta/variant.h"
+#include <variant>
 #include "turbo/meta/utility.h"
 
 namespace turbo {
