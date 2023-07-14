@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_FILES_SEQUENTIAL_READ_FILE_H_
-#define TURBO_FILES_SEQUENTIAL_READ_FILE_H_
+#ifndef TURBO_FILES_RANDOM_READ_FILE_H_
+#define TURBO_FILES_RANDOM_READ_FILE_H_
 
 #include "turbo/base/result_status.h"
 #include "turbo/files/filesystem.h"
@@ -21,24 +21,25 @@
 #include "turbo/strings/cord.h"
 #include "turbo/files/file_event_listener.h"
 #include "turbo/files/file_option.h"
+#include "turbo/files/fio.h"
 
 namespace turbo {
 
-    class SequentialReadFile {
+    class RandomReadFile {
     public:
-        SequentialReadFile() noexcept = default;
+        RandomReadFile() noexcept = default;
 
-        explicit SequentialReadFile(const FileEventListener &listener);
+        explicit RandomReadFile(const FileEventListener &listener);
 
-        ~SequentialReadFile();
+        ~RandomReadFile();
 
         turbo::Status open(const turbo::filesystem::path &path) noexcept;
 
-        turbo::ResultStatus<size_t> read(std::string *content, size_t n = npos);
+        turbo::ResultStatus<size_t> read(size_t offset, std::string *content, size_t n = npos);
 
-        turbo::ResultStatus<size_t> read(turbo::Cord *buf, size_t n = npos);
+        turbo::ResultStatus<size_t> read(size_t offset, turbo::Cord *buf, size_t n = npos);
 
-        turbo::ResultStatus<size_t> read(void *buff, size_t len);
+        turbo::ResultStatus<size_t> read(size_t offset, void *buff, size_t len);
 
         turbo::Status skip(off_t n);
 
@@ -50,7 +51,7 @@ namespace turbo {
 
     private:
         // no lint
-        TURBO_NON_COPYABLE(SequentialReadFile);
+        TURBO_NON_COPYABLE(RandomReadFile);
 
         static const size_t npos = std::numeric_limits<size_t>::max();
         std::FILE *_fd{nullptr};
@@ -61,4 +62,4 @@ namespace turbo {
 
 } // namespace turbo
 
-#endif  // TURBO_FILES_SEQUENTIAL_READ_FILE_H_
+#endif  // TURBO_FILES_RANDOM_READ_FILE_H_

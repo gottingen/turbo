@@ -22,15 +22,15 @@ namespace turbo {
 /**
  * @function for_each
  *
- * folly::for_each is a generalized iteration algorithm. Example:
+ * turbo::for_each is a generalized iteration algorithm. Example:
  *
  *  auto one = std::make_tuple(1, 2, 3);
  *  auto two = std::vector<int>{1, 2, 3};
  *  auto func = [](auto element, auto index) {
  *    cout << index << " : " << element << endl;
  *  };
- *  folly::for_each(one, func);
- *  folly::for_each(two, func);
+ *  turbo::for_each(one, func);
+ *  turbo::for_each(two, func);
  *
  * The for_each function allows iteration through sequences, these can either be
  * runtime sequences (i.e. entities for which std::begin and std::end work) or
@@ -56,9 +56,9 @@ namespace turbo {
  *  auto func = [](auto ele, auto index) {
  *    cout << "Element at index " << index << " : " << ele;
  *    if (index == 1) {
- *      return folly::loop_break;
+ *      return turbo::loop_break;
  *    }
- *    return folly::loop_continue;
+ *    return turbo::loop_continue;
  *  };
  *  folly_for_each(range_one, func);
  *  folly_for_each(range_two, func);
@@ -68,14 +68,14 @@ namespace turbo {
  *
  *  auto vec = std::vector<std::future<int>>{request_one(), ...};
  *  when_all(vec.begin(), vec.end()).then([](auto futures) {
- *    folly::for_each(futures, [](auto& fut) { ... });
+ *    turbo::for_each(futures, [](auto& fut) { ... });
  *  });
  *
  * Now when this code switches to use tuples instead of the runtime std::vector,
  * then the loop does not need to change, the code will still work just fine:
  *
  *  when_all(future_one, future_two, future_three).then([](auto futures) {
- *    folly::for_each(futures, [](auto& fut) { ... });
+ *    turbo::for_each(futures, [](auto& fut) { ... });
  *  });
  */
 template <typename Range, typename Func>
@@ -103,8 +103,8 @@ constexpr auto loop_continue = for_each_detail::LoopControl::CONTINUE;
  *
  *  auto range_one = std::make_tuple(1, 2, 3);
  *  auto range_two = std::make_tuple(4, 5, 6);
- *  folly::for_each(range_one, [&range_two](auto ele, auto index) {
- *    folly::fetch(range_two, index) = ele;
+ *  turbo::for_each(range_one, [&range_two](auto ele, auto index) {
+ *    turbo::fetch(range_two, index) = ele;
  *  });
  *
  * For ranges, this works by first trying to use the iterator class if the
@@ -117,7 +117,7 @@ constexpr auto loop_continue = for_each_detail::LoopControl::CONTINUE;
 template <typename Sequence, typename Index>
 constexpr decltype(auto) fetch(Sequence&& sequence, Index&& index);
 
-} // namespace folly
+} // namespace turbo
 
 /**
  * Everything below is deprecated.
@@ -155,7 +155,7 @@ constexpr decltype(auto) fetch(Sequence&& sequence, Index&& index);
     for (auto&& _FE_ANON(s2_) = (c); !_FE_ANON(s1_); _FE_ANON(s1_) = true) \
       for (auto i = _FE_ANON(s2_).rbegin(); i != _FE_ANON(s2_).rend(); ++i)
 
-namespace folly {
+namespace turbo {
 namespace detail {
 
 /**
@@ -189,7 +189,7 @@ notThereYet(T& iter, const U& end) {
 }
 
 } // namespace detail
-} // namespace folly
+} // namespace turbo
 
 /*
  * Look at the Ranges-v3 views and you'll probably find an easier way to build
@@ -199,7 +199,7 @@ notThereYet(T& iter, const U& end) {
  */
 #define FOR_EACH_RANGE(i, begin, end)          \
   for (auto i = (true ? (begin) : (end));      \
-       ::folly::detail::notThereYet(i, (end)); \
+       ::turbo::detail::notThereYet(i, (end)); \
        ++i)
 
 

@@ -112,8 +112,8 @@ uint32_t multiply(uint32_t a, uint32_t b) {
 }
 
 // Powers of crc32c polynomial, for faster ExtendByZeros.
-// Verified against folly:
-// folly/hash/detail/Crc32CombineDetail.cpp
+// Verified against turbo:
+// turbo/hash/detail/Crc32CombineDetail.cpp
 constexpr uint32_t kCRC32CPowers[] = {
     0x82f63b78, 0x6ea2d55c, 0x18b8ea18, 0x510ac59a, 0xb82be955, 0xb8fdb1e7,
     0x88e56f72, 0x74c360a4, 0xe4172b16, 0x0d65762a, 0x35d73a62, 0x28461564,
