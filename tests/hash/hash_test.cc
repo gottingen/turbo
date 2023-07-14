@@ -892,8 +892,8 @@ TEST(IsHashableTest, ValidHash) {
   EXPECT_TRUE(std::is_default_constructible<turbo::Hash<int>>::value);
   EXPECT_TRUE(std::is_copy_constructible<turbo::Hash<int>>::value);
   EXPECT_TRUE(std::is_move_constructible<turbo::Hash<int>>::value);
-  EXPECT_TRUE(turbo::is_copy_assignable<turbo::Hash<int>>::value);
-  EXPECT_TRUE(turbo::is_move_assignable<turbo::Hash<int>>::value);
+  EXPECT_TRUE(std::is_copy_assignable<turbo::Hash<int>>::value);
+  EXPECT_TRUE(std::is_move_assignable<turbo::Hash<int>>::value);
   EXPECT_TRUE(IsHashCallable<int>::value);
   EXPECT_TRUE(IsAggregateInitializable<turbo::Hash<int>>::value);
 }
@@ -905,8 +905,8 @@ TEST(IsHashableTest, PoisonHash) {
   EXPECT_FALSE(std::is_default_constructible<turbo::Hash<X>>::value);
   EXPECT_FALSE(std::is_copy_constructible<turbo::Hash<X>>::value);
   EXPECT_FALSE(std::is_move_constructible<turbo::Hash<X>>::value);
-  EXPECT_FALSE(turbo::is_copy_assignable<turbo::Hash<X>>::value);
-  EXPECT_FALSE(turbo::is_move_assignable<turbo::Hash<X>>::value);
+  EXPECT_FALSE(std::is_copy_assignable<turbo::Hash<X>>::value);
+  EXPECT_FALSE(std::is_move_assignable<turbo::Hash<X>>::value);
   EXPECT_FALSE(IsHashCallable<X>::value);
 #if !defined(__GNUC__) || defined(__clang__)
   // TODO(b/144368551): As of GCC 8.4 this does not compile.

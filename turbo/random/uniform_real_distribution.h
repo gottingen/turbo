@@ -157,7 +157,7 @@ uniform_real_distribution<RealType>::operator()(
   using random_internal::GeneratePositiveTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      turbo::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      std::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   while (true) {
     const result_type sample =

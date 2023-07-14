@@ -124,13 +124,13 @@ using RemoveCVRef =
 // specified return type. If "R" is void, the function is executed and the
 // return value is simply ignored.
 template <class ReturnType, class F, class... P,
-          typename = turbo::enable_if_t<std::is_void<ReturnType>::value>>
+          typename = std::enable_if_t<std::is_void<ReturnType>::value>>
 void InvokeR(F&& f, P&&... args) {
   turbo::base_internal::invoke(std::forward<F>(f), std::forward<P>(args)...);
 }
 
 template <class ReturnType, class F, class... P,
-          turbo::enable_if_t<!std::is_void<ReturnType>::value, int> = 0>
+          std::enable_if_t<!std::is_void<ReturnType>::value, int> = 0>
 ReturnType InvokeR(F&& f, P&&... args) {
   return turbo::base_internal::invoke(std::forward<F>(f),
                                      std::forward<P>(args)...);
@@ -508,7 +508,7 @@ class CoreImpl {
   }
 
   template <int target_type, class QualDecayedTRef, class F,
-            turbo::enable_if_t<target_type == 0, int> = 0>
+            std::enable_if_t<target_type == 0, int> = 0>
   void Initialize(F&& f) {
 // This condition handles types that decay into pointers, which includes
 // function references. Since function references cannot be null, GCC warns
@@ -533,7 +533,7 @@ class CoreImpl {
   }
 
   template <int target_type, class QualDecayedTRef, class F,
-            turbo::enable_if_t<target_type == 1, int> = 0>
+            std::enable_if_t<target_type == 1, int> = 0>
   void Initialize(F&& f) {
     // In this case we can "steal the guts" of the other AnyInvocable.
     f.manager_(FunctionToCall::relocate_from_to, &f.state_, &state_);
@@ -545,7 +545,7 @@ class CoreImpl {
   }
 
   template <int target_type, class QualDecayedTRef, class F,
-            turbo::enable_if_t<target_type == 2, int> = 0>
+            std::enable_if_t<target_type == 2, int> = 0>
   void Initialize(F&& f) {
     if (f.HasValue()) {
       InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
@@ -556,14 +556,14 @@ class CoreImpl {
   }
 
   template <int target_type, class QualDecayedTRef, class F,
-            typename = turbo::enable_if_t<target_type == 3>>
+            typename = std::enable_if_t<target_type == 3>>
   void Initialize(F&& f) {
     InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
   }
 
   // Use local (inline) storage for applicable target object types.
   template <class QualTRef, class... Args,
-            typename = turbo::enable_if_t<
+            typename = std::enable_if_t<
                 IsStoredLocally<RemoveCVRef<QualTRef>>::value>>
   void InitializeStorage(Args&&... args) {
     using RawT = RemoveCVRef<QualTRef>;
@@ -577,7 +577,7 @@ class CoreImpl {
 
   // Use remote storage for target objects that cannot be stored locally.
   template <class QualTRef, class... Args,
-            turbo::enable_if_t<!IsStoredLocally<RemoveCVRef<QualTRef>>::value,
+            std::enable_if_t<!IsStoredLocally<RemoveCVRef<QualTRef>>::value,
                               int> = 0>
   void InitializeStorage(Args&&... args) {
     InitializeRemoteManager<RemoveCVRef<QualTRef>>(std::forward<Args>(args)...);
@@ -587,13 +587,13 @@ class CoreImpl {
   }
 
   template <class T,
-            typename = turbo::enable_if_t<std::is_trivially_copyable<T>::value>>
+            typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
   void InitializeLocalManager() {
     manager_ = LocalManagerTrivial;
   }
 
   template <class T,
-            turbo::enable_if_t<!std::is_trivially_copyable<T>::value, int> = 0>
+            std::enable_if_t<!std::is_trivially_copyable<T>::value, int> = 0>
   void InitializeLocalManager() {
     manager_ = LocalManagerNontrivial<T>;
   }
@@ -605,7 +605,7 @@ class CoreImpl {
                                            TURBO_INTERNAL_DEFAULT_NEW_ALIGNMENT>;
 
   template <class T, class... Args,
-            typename = turbo::enable_if_t<HasTrivialRemoteStorage<T>::value>>
+            typename = std::enable_if_t<HasTrivialRemoteStorage<T>::value>>
   void InitializeRemoteManager(Args&&... args) {
     // unique_ptr is used for exception-safety in case construction throws.
     std::unique_ptr<void, TrivialDeleter> uninitialized_target(
@@ -617,7 +617,7 @@ class CoreImpl {
   }
 
   template <class T, class... Args,
-            turbo::enable_if_t<!HasTrivialRemoteStorage<T>::value, int> = 0>
+            std::enable_if_t<!HasTrivialRemoteStorage<T>::value, int> = 0>
   void InitializeRemoteManager(Args&&... args) {
     state_.remote.target = ::new T(std::forward<Args>(args)...);
     manager_ = RemoteManagerNontrivial<T>;
@@ -687,39 +687,39 @@ using TrueAlias =
 
 /*SFINAE constraints for the conversion-constructor.*/
 template <class Sig, class F,
-          class = turbo::enable_if_t<
+          class = std::enable_if_t<
               !std::is_same<RemoveCVRef<F>, AnyInvocable<Sig>>::value>>
 using CanConvert = TrueAlias<
-    turbo::enable_if_t<!IsInPlaceType<RemoveCVRef<F>>::value>,
-    turbo::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
-    turbo::enable_if_t<
+    std::enable_if_t<!IsInPlaceType<RemoveCVRef<F>>::value>,
+    std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
+    std::enable_if_t<
         Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
-    turbo::enable_if_t<std::is_constructible<turbo::decay_t<F>, F>::value>>;
+    std::enable_if_t<std::is_constructible<std::decay_t<F>, F>::value>>;
 
 /*SFINAE constraints for the std::in_place constructors.*/
 template <class Sig, class F, class... Args>
 using CanEmplace = TrueAlias<
-    turbo::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
-    turbo::enable_if_t<
+    std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
+    std::enable_if_t<
         Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
-    turbo::enable_if_t<std::is_constructible<turbo::decay_t<F>, Args...>::value>>;
+    std::enable_if_t<std::is_constructible<std::decay_t<F>, Args...>::value>>;
 
 /*SFINAE constraints for the conversion-assign operator.*/
 template <class Sig, class F,
-          class = turbo::enable_if_t<
+          class = std::enable_if_t<
               !std::is_same<RemoveCVRef<F>, AnyInvocable<Sig>>::value>>
 using CanAssign = TrueAlias<
-    turbo::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
-    turbo::enable_if_t<
+    std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
+    std::enable_if_t<
         Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
-    turbo::enable_if_t<std::is_constructible<turbo::decay_t<F>, F>::value>>;
+    std::enable_if_t<std::is_constructible<std::decay_t<F>, F>::value>>;
 
 /*SFINAE constraints for the reference-wrapper conversion-assign operator.*/
 template <class Sig, class F>
 using CanAssignReferenceWrapper = TrueAlias<
-    turbo::enable_if_t<
+    std::enable_if_t<
         Impl<Sig>::template CallIsValid<std::reference_wrapper<F>>::value>,
-    turbo::enable_if_t<Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<
+    std::enable_if_t<Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<
         std::reference_wrapper<F>>::value>>;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -738,17 +738,17 @@ using CanAssignReferenceWrapper = TrueAlias<
 // don't treat non-moveable result types correctly. For example this was the
 // case in libc++ before commit c3a24882 (2022-05).
 #define TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_true(inv_quals)      \
-  turbo::enable_if_t<turbo::disjunction<                                       \
+  std::enable_if_t<turbo::disjunction<                                       \
       std::is_nothrow_invocable_r<                                           \
-          ReturnType, UnwrapStdReferenceWrapper<turbo::decay_t<F>> inv_quals, \
+          ReturnType, UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals, \
           P...>,                                                             \
       std::conjunction<                                                      \
           std::is_nothrow_invocable<                                         \
-              UnwrapStdReferenceWrapper<turbo::decay_t<F>> inv_quals, P...>,  \
+              UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals, P...>,  \
           std::is_same<                                                      \
               ReturnType,                                                    \
               turbo::base_internal::invoke_result_t<                          \
-                  UnwrapStdReferenceWrapper<turbo::decay_t<F>> inv_quals,     \
+                  UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals,     \
                   P...>>>>::value>
 
 #define TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_false(inv_quals)
@@ -777,12 +777,12 @@ using CanAssignReferenceWrapper = TrueAlias<
                                                                                \
     /*SFINAE constraint to check if F is invocable with the proper signature*/ \
     template <class F>                                                         \
-    using CallIsValid = TrueAlias<turbo::enable_if_t<turbo::disjunction<         \
+    using CallIsValid = TrueAlias<std::enable_if_t<turbo::disjunction<         \
         turbo::base_internal::is_invocable_r<ReturnType,                        \
-                                            turbo::decay_t<F> inv_quals, P...>, \
+                                            std::decay_t<F> inv_quals, P...>, \
         std::is_same<ReturnType,                                               \
                      turbo::base_internal::invoke_result_t<                     \
-                         turbo::decay_t<F> inv_quals, P...>>>::value>>;         \
+                         std::decay_t<F> inv_quals, P...>>>::value>>;         \
                                                                                \
     /*SFINAE constraint to check if F is nothrow-invocable when necessary*/    \
     template <class F>                                                         \
@@ -805,7 +805,7 @@ using CanAssignReferenceWrapper = TrueAlias<
     /*Forward along the in-place construction parameters.*/                    \
     template <class T, class... Args>                                          \
     explicit Impl(turbo::in_place_type_t<T>, Args&&... args)                    \
-        : Core(turbo::in_place_type<turbo::decay_t<T> inv_quals>,                \
+        : Core(turbo::in_place_type<std::decay_t<T> inv_quals>,                \
                std::forward<Args>(args)...) {}                                 \
                                                                                \
     InvokerType<noex, ReturnType, P...>* ExtractInvoker() cv {                 \

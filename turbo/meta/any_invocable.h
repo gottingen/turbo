@@ -180,7 +180,7 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
   // Upon construction, `*this` is only empty if `f` is a function pointer or
   // member pointer type and is null, or if `f` is an `AnyInvocable` that is
   // empty.
-  template <class F, typename = turbo::enable_if_t<
+  template <class F, typename = std::enable_if_t<
                          internal_any_invocable::CanConvert<Sig, F>::value>>
   AnyInvocable(F&& f)  // NOLINT
       : Impl(internal_any_invocable::ConversionConstruct(),
@@ -195,25 +195,25 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
   //       turbo::in_place_type<PossiblyImmovableType>, arg1, arg2);
   //
   template <class T, class... Args,
-            typename = turbo::enable_if_t<
+            typename = std::enable_if_t<
                 internal_any_invocable::CanEmplace<Sig, T, Args...>::value>>
   explicit AnyInvocable(turbo::in_place_type_t<T>, Args&&... args)
-      : Impl(turbo::in_place_type<turbo::decay_t<T>>,
+      : Impl(turbo::in_place_type<std::decay_t<T>>,
              std::forward<Args>(args)...) {
-    static_assert(std::is_same<T, turbo::decay_t<T>>::value,
+    static_assert(std::is_same<T, std::decay_t<T>>::value,
                   "The explicit template argument of in_place_type is required "
                   "to be an unqualified object type.");
   }
 
   // Overload of the above constructor to support list-initialization.
   template <class T, class U, class... Args,
-            typename = turbo::enable_if_t<internal_any_invocable::CanEmplace<
+            typename = std::enable_if_t<internal_any_invocable::CanEmplace<
                 Sig, T, std::initializer_list<U>&, Args...>::value>>
   explicit AnyInvocable(turbo::in_place_type_t<T>,
                         std::initializer_list<U> ilist, Args&&... args)
-      : Impl(turbo::in_place_type<turbo::decay_t<T>>, ilist,
+      : Impl(turbo::in_place_type<std::decay_t<T>>, ilist,
              std::forward<Args>(args)...) {
-    static_assert(std::is_same<T, turbo::decay_t<T>>::value,
+    static_assert(std::is_same<T, std::decay_t<T>>::value,
                   "The explicit template argument of in_place_type is required "
                   "to be an unqualified object type.");
   }
@@ -237,7 +237,7 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
   // Upon assignment, `*this` is only empty if `f` is a function pointer or
   // member pointer type and is null, or if `f` is an `AnyInvocable` that is
   // empty.
-  template <class F, typename = turbo::enable_if_t<
+  template <class F, typename = std::enable_if_t<
                          internal_any_invocable::CanAssign<Sig, F>::value>>
   AnyInvocable& operator=(F&& f) {
     *this = AnyInvocable(std::forward<F>(f));
@@ -249,7 +249,7 @@ class AnyInvocable : private internal_any_invocable::Impl<Sig> {
   // `AnyInvocable` instance.
   template <
       class F,
-      typename = turbo::enable_if_t<
+      typename = std::enable_if_t<
           internal_any_invocable::CanAssignReferenceWrapper<Sig, F>::value>>
   AnyInvocable& operator=(std::reference_wrapper<F> f) noexcept {
     *this = AnyInvocable(f);

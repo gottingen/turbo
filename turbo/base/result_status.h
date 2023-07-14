@@ -239,7 +239,7 @@ namespace turbo {
         // underlying constructor.)
         template<
                 typename U,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 turbo::negation<std::is_same<T, U>>,
                                 std::is_constructible<T, const U &>,
@@ -253,7 +253,7 @@ namespace turbo {
 
         template<
                 typename U,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 turbo::negation<std::is_same<T, U>>,
                                 std::is_constructible<T, const U &>,
@@ -267,7 +267,7 @@ namespace turbo {
 
         template<
                 typename U,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 turbo::negation<std::is_same<T, U>>, std::is_constructible<T, U &&>,
                                 std::is_convertible<U &&, T>,
@@ -280,7 +280,7 @@ namespace turbo {
 
         template<
                 typename U,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 turbo::negation<std::is_same<T, U>>, std::is_constructible<T, U &&>,
                                 turbo::negation<std::is_convertible<U &&, T>>,
@@ -312,7 +312,7 @@ namespace turbo {
         // assigned from `ResultStatus<U>`.
         template<
                 typename U,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 turbo::negation<std::is_same<T, U>>,
                                 std::is_constructible<T, const U &>,
@@ -329,7 +329,7 @@ namespace turbo {
 
         template<
                 typename U,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 turbo::negation<std::is_same<T, U>>, std::is_constructible<T, U &&>,
                                 std::is_assignable<T, U &&>,
@@ -356,13 +356,13 @@ namespace turbo {
         // of passing turbo::StatusCode::kInternal as a fallback.
         template<
                 typename U = turbo::Status,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 std::is_convertible<U &&, turbo::Status>,
                                 std::is_constructible<turbo::Status, U &&>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, T>>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, turbo::ResultStatus<T>>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, T>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, turbo::in_place_t>>,
                                 turbo::negation<result_status_internal::HasConversionOperatorToResultStatus<
                                         T, U &&>>>::value,
                         int> = 0>
@@ -370,13 +370,13 @@ namespace turbo {
 
         template<
                 typename U = turbo::Status,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 turbo::negation<std::is_convertible<U &&, turbo::Status>>,
                                 std::is_constructible<turbo::Status, U &&>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, T>>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, turbo::ResultStatus<T>>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, T>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, turbo::in_place_t>>,
                                 turbo::negation<result_status_internal::HasConversionOperatorToResultStatus<
                                         T, U &&>>>::value,
                         int> = 0>
@@ -384,13 +384,13 @@ namespace turbo {
 
         template<
                 typename U = turbo::Status,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 std::is_convertible<U &&, turbo::Status>,
                                 std::is_constructible<turbo::Status, U &&>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, turbo::ResultStatus<T>>>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, T>>,
-                                turbo::negation<std::is_same<turbo::decay_t<U>, turbo::in_place_t>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, turbo::ResultStatus<T>>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, T>>,
+                                turbo::negation<std::is_same<std::decay_t<U>, turbo::in_place_t>>,
                                 turbo::negation<result_status_internal::HasConversionOperatorToResultStatus<
                                         T, U &&>>>::value,
                         int> = 0>
@@ -449,7 +449,7 @@ namespace turbo {
         // `J` is convertible to `T`.
         template<
                 typename U = T,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 result_status_internal::IsDirectInitializationValid<T, U &&>,
                                 std::is_constructible<T, U &&>, std::is_convertible<U &&, T>,
@@ -467,7 +467,7 @@ namespace turbo {
 
         template<
                 typename U = T,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         turbo::conjunction<
                                 result_status_internal::IsDirectInitializationValid<T, U &&>,
                                 turbo::disjunction<
@@ -616,7 +616,7 @@ namespace turbo {
 
         template<
                 typename U, typename... Args,
-                turbo::enable_if_t<
+                std::enable_if_t<
                         std::is_constructible<T, std::initializer_list<U> &, Args &&...>::value,
                         int> = 0>
         T &emplace(std::initializer_list<U> ilist, Args &&... args) {

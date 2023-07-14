@@ -59,6 +59,7 @@ set(TURBO_ALL_SRC
         "files/file_watcher.cc"
         "files/fio.cc"
         "files/utility.cc"
+        "files/random_read_file.cc"
         "files/sequential_read_file.cc"
         "files/sequential_write_file.cc"
         "flags/app.cc"

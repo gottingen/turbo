@@ -169,13 +169,13 @@ TYPED_TEST(PCGEngineTest, RandomNumberEngineInterface) {
   static_assert(std::is_copy_constructible<E>::value,
                 "engine_type must be copy constructible");
 
-  static_assert(turbo::is_copy_assignable<E>::value,
+  static_assert(std::is_copy_assignable<E>::value,
                 "engine_type must be copy assignable");
 
   static_assert(std::is_move_constructible<E>::value,
                 "engine_type must be move constructible");
 
-  static_assert(turbo::is_move_assignable<E>::value,
+  static_assert(std::is_move_assignable<E>::value,
                 "engine_type must be move assignable");
 
   static_assert(std::is_same<decltype(std::declval<E>()()), T>::value,

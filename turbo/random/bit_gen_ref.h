@@ -44,13 +44,13 @@ struct is_urbg : std::false_type {};
 template <typename URBG>
 struct is_urbg<
     URBG,
-    turbo::enable_if_t<std::is_same<
+    std::enable_if_t<std::is_same<
         typename URBG::result_type,
         typename std::decay<decltype((URBG::min)())>::type>::value>,
-    turbo::enable_if_t<std::is_same<
+    std::enable_if_t<std::is_same<
         typename URBG::result_type,
         typename std::decay<decltype((URBG::max)())>::type>::value>,
-    turbo::enable_if_t<std::is_same<
+    std::enable_if_t<std::is_same<
         typename URBG::result_type,
         typename std::decay<decltype(std::declval<URBG>()())>::type>::value>>
     : std::true_type {};
@@ -110,7 +110,7 @@ class BitGenRef {
   BitGenRef& operator=(const BitGenRef&) = default;
   BitGenRef& operator=(BitGenRef&&) = default;
 
-  template <typename URBG, typename turbo::enable_if_t<
+  template <typename URBG, typename std::enable_if_t<
                                (!std::is_same<URBG, BitGenRef>::value &&
                                 random_internal::is_urbg<URBG>::value &&
                                 !HasInvokeMock<URBG>::value)>* = nullptr>
@@ -120,7 +120,7 @@ class BitGenRef {
         generate_impl_fn_(ImplFn<URBG>) {}
 
   template <typename URBG,
-            typename turbo::enable_if_t<(!std::is_same<URBG, BitGenRef>::value &&
+            typename std::enable_if_t<(!std::is_same<URBG, BitGenRef>::value &&
                                         random_internal::is_urbg<URBG>::value &&
                                         HasInvokeMock<URBG>::value)>* = nullptr>
   BitGenRef(URBG& gen)  // NOLINT

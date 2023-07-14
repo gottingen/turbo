@@ -94,11 +94,11 @@ TEST(Uint128, IntrinsicTypeTraitsTest) {
 #endif  // TURBO_HAVE_INTRINSIC_INT128
 
 TEST(Uint128, TrivialTraitsTest) {
-  static_assert(turbo::is_trivially_default_constructible<turbo::uint128>::value,
+  static_assert(std::is_trivially_default_constructible<turbo::uint128>::value,
                 "");
-  static_assert(turbo::is_trivially_copy_constructible<turbo::uint128>::value,
+  static_assert(std::is_trivially_copy_constructible<turbo::uint128>::value,
                 "");
-  static_assert(turbo::is_trivially_copy_assignable<turbo::uint128>::value, "");
+  static_assert(std::is_trivially_copy_assignable<turbo::uint128>::value, "");
   static_assert(std::is_trivially_destructible<turbo::uint128>::value, "");
 }
 
@@ -581,10 +581,10 @@ TEST(Int128, IntrinsicTypeTraitsTest) {
 #endif  // TURBO_HAVE_INTRINSIC_INT128
 
 TEST(Int128, TrivialTraitsTest) {
-  static_assert(turbo::is_trivially_default_constructible<turbo::int128>::value,
+  static_assert(std::is_trivially_default_constructible<turbo::int128>::value,
                 "");
-  static_assert(turbo::is_trivially_copy_constructible<turbo::int128>::value, "");
-  static_assert(turbo::is_trivially_copy_assignable<turbo::int128>::value, "");
+  static_assert(std::is_trivially_copy_constructible<turbo::int128>::value, "");
+  static_assert(std::is_trivially_copy_assignable<turbo::int128>::value, "");
   static_assert(std::is_trivially_destructible<turbo::int128>::value, "");
 }
 

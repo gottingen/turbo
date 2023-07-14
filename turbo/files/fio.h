@@ -39,5 +39,13 @@ namespace turbo {
 
     };
 
-}
+#if defined(TURBO_PLATFORM_LINUX)
+    typedef int FILE_HANDLER;
+    static constexpr FILE_HANDLER INVALID_FILE_HANDLER = -1;
+#elif defined(TURBO_PLATFORM_WINDOWS)
+
+#endif
+
+}  // namespace turbo
+
 #endif  // TURBO_FILES_FIO_H_

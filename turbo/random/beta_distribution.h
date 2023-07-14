@@ -280,7 +280,7 @@ beta_distribution<RealType>::AlgorithmJoehnk(
   using random_internal::GeneratePositiveTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      turbo::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      std::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   // Based on Joehnk, M. D. Erzeugung von betaverteilten und gammaverteilten
   // Zufallszahlen. Metrika 8.1 (1964): 5-15.
@@ -338,7 +338,7 @@ beta_distribution<RealType>::AlgorithmCheng(
   using random_internal::GeneratePositiveTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      turbo::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      std::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   // Based on Cheng, Russell CH. Generating beta variates with nonintegral
   // shape parameters. Communications of the ACM 21.4 (1978): 317-322.
