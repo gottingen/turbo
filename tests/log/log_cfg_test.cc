@@ -21,6 +21,7 @@
 #include <turbo/log/cfg/argv.h>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
 #include "doctest/doctest.h"
 
 using turbo::tlog::cfg::load_argv_levels;
@@ -37,9 +38,9 @@ TEST_CASE("env [cfg]")
     ::setenv("TLOG_LEVEL", "l1=warn", 1);
 #endif
     load_env_levels();
-    REQUIRE_EQ(l1->level() , turbo::tlog::level::warn);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::warn);
     turbo::tlog::set_default_logger(turbo::tlog::create<test_sink_st>("cfg-default"));
-    REQUIRE_EQ(turbo::tlog::default_logger()->level() , turbo::tlog::level::info);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::info);
 }
 
 TEST_CASE("argv1 [cfg]")
@@ -48,8 +49,8 @@ TEST_CASE("argv1 [cfg]")
     const char *argv[] = {"ignore", "TLOG_LEVEL=l1=warn"};
     load_argv_levels(2, argv);
     auto l1 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l1");
-    REQUIRE(l1->level() == turbo::tlog::level::warn);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::info);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::warn);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::info);
 }
 
 TEST_CASE("argv2 [cfg]")
@@ -58,8 +59,8 @@ TEST_CASE("argv2 [cfg]")
     const char *argv[] = {"ignore", "TLOG_LEVEL=l1=warn,trace"};
     load_argv_levels(2, argv);
     auto l1 = turbo::tlog::create<test_sink_st>("l1");
-    REQUIRE(l1->level() == turbo::tlog::level::warn);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::trace);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::warn);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::trace);
 }
 
 TEST_CASE("argv3 [cfg]")
@@ -70,8 +71,8 @@ TEST_CASE("argv3 [cfg]")
     const char *argv[] = {"ignore", "TLOG_LEVEL=junk_name=warn"};
     load_argv_levels(2, argv);
     auto l1 = turbo::tlog::create<test_sink_st>("l1");
-    REQUIRE(l1->level() == turbo::tlog::level::trace);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::trace);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::trace);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::trace);
 }
 
 TEST_CASE("argv4 [cfg]")
@@ -81,7 +82,7 @@ TEST_CASE("argv4 [cfg]")
     const char *argv[] = {"ignore", "TLOG_LEVEL=junk"};
     load_argv_levels(2, argv);
     auto l1 = turbo::tlog::create<test_sink_st>("l1");
-    REQUIRE(l1->level() == turbo::tlog::level::info);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::info);
 }
 
 TEST_CASE("argv5 [cfg]")
@@ -91,8 +92,8 @@ TEST_CASE("argv5 [cfg]")
     const char *argv[] = {"ignore", "ignore", "TLOG_LEVEL=l1=warn,trace"};
     load_argv_levels(3, argv);
     auto l1 = turbo::tlog::create<test_sink_st>("l1");
-    REQUIRE(l1->level() == turbo::tlog::level::warn);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::trace);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::warn);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::trace);
     turbo::tlog::set_level(turbo::tlog::level::info);
 }
 
@@ -101,7 +102,7 @@ TEST_CASE("argv6 [cfg]")
     turbo::tlog::set_level(turbo::tlog::level::err);
     const char *argv[] = {""};
     load_argv_levels(1, argv);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::err);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::err);
     turbo::tlog::set_level(turbo::tlog::level::info);
 }
 
@@ -110,7 +111,7 @@ TEST_CASE("argv7 [cfg]")
     turbo::tlog::set_level(turbo::tlog::level::err);
     const char *argv[] = {""};
     load_argv_levels(0, argv);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::err);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::err);
     turbo::tlog::set_level(turbo::tlog::level::info);
 }
 
@@ -121,8 +122,8 @@ TEST_CASE("level-not-set-test1 [cfg]")
     load_argv_levels(2, argv);
     auto l1 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l1");
     l1->set_level(turbo::tlog::level::trace);
-    REQUIRE(l1->level() == turbo::tlog::level::trace);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::info);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::trace);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::info);
 }
 
 TEST_CASE("level-not-set-test2 [cfg]")
@@ -138,9 +139,9 @@ TEST_CASE("level-not-set-test2 [cfg]")
 
     load_argv_levels(2, argv);
 
-    REQUIRE(l1->level() == turbo::tlog::level::trace);
-    REQUIRE(l2->level() == turbo::tlog::level::warn);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::info);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::trace);
+    REQUIRE_EQ(l2->level(), turbo::tlog::level::warn);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::info);
 }
 
 TEST_CASE("level-not-set-test3 [cfg]")
@@ -154,9 +155,9 @@ TEST_CASE("level-not-set-test3 [cfg]")
     auto l1 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l1");
     auto l2 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l2");
 
-    REQUIRE(l1->level() == turbo::tlog::level::trace);
-    REQUIRE(l2->level() == turbo::tlog::level::info);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::info);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::trace);
+    REQUIRE_EQ(l2->level(), turbo::tlog::level::info);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::info);
 }
 
 TEST_CASE("level-not-set-test4 [cfg]")
@@ -170,9 +171,9 @@ TEST_CASE("level-not-set-test4 [cfg]")
     auto l1 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l1");
     auto l2 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l2");
 
-    REQUIRE(l1->level() == turbo::tlog::level::trace);
-    REQUIRE(l2->level() == turbo::tlog::level::warn);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::warn);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::trace);
+    REQUIRE_EQ(l2->level(), turbo::tlog::level::warn);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::warn);
 }
 
 TEST_CASE("level-not-set-test5 [cfg]")
@@ -186,9 +187,9 @@ TEST_CASE("level-not-set-test5 [cfg]")
     auto l1 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l1");
     auto l2 = turbo::tlog::create<turbo::tlog::sinks::test_sink_st>("l2");
 
-    REQUIRE(l1->level() == turbo::tlog::level::warn);
-    REQUIRE(l2->level() == turbo::tlog::level::warn);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::warn);
+    REQUIRE_EQ(l1->level(), turbo::tlog::level::warn);
+    REQUIRE_EQ(l2->level(), turbo::tlog::level::warn);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::warn);
 }
 
 TEST_CASE("restore-to-default [cfg]")
@@ -197,5 +198,5 @@ TEST_CASE("restore-to-default [cfg]")
     turbo::tlog::drop("l2");
     const char *argv[] = {"ignore", "TLOG_LEVEL=info"};
     load_argv_levels(2, argv);
-    REQUIRE(turbo::tlog::default_logger()->level() == turbo::tlog::level::info);
+    REQUIRE_EQ(turbo::tlog::default_logger()->level(), turbo::tlog::level::info);
 }
