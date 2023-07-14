@@ -15,45 +15,49 @@
 #ifndef TURBO_FILES_SEQUENTIAL_READ_FILE_H_
 #define TURBO_FILES_SEQUENTIAL_READ_FILE_H_
 
-#include "turbo/base/status.h"
+#include "turbo/base/result_status.h"
 #include "turbo/files/filesystem.h"
 #include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
+#include "turbo/files/file_event_listener.h"
+#include "turbo/files/file_option.h"
 
 namespace turbo {
 
-class SequentialReadFile {
-public:
-  SequentialReadFile() noexcept = default;
+    class SequentialReadFile {
+    public:
+        SequentialReadFile() noexcept = default;
 
-  ~SequentialReadFile();
+        explicit SequentialReadFile(const FileEventListener &listener);
 
-  turbo::Status open(const turbo::filesystem::path &path) noexcept;
+        ~SequentialReadFile();
 
-  turbo::Status read(std::string *content, size_t n = npos);
+        turbo::Status open(const turbo::filesystem::path &path) noexcept;
 
-  turbo::Status read(turbo::Cord *buf, size_t n = npos);
+        turbo::ResultStatus<size_t> read(std::string *content, size_t n = npos);
 
-  turbo::Status skip(off_t n);
+        turbo::ResultStatus<size_t> read(turbo::Cord *buf, size_t n = npos);
 
-  bool is_eof(turbo::Status *frs);
+        turbo::ResultStatus<size_t> read(void *buff, size_t len);
 
-  void close();
+        turbo::Status skip(off_t n);
 
-  void reset();
+        bool is_eof(turbo::Status *frs);
 
-  size_t has_read() const { return _has_read; }
+        void close();
 
-  const turbo::filesystem::path &path() const { return _path; }
+        const turbo::filesystem::path &path() const { return _file_path; }
 
-private:
-  TURBO_NON_COPYABLE(SequentialReadFile);
+    private:
+        // no lint
+        TURBO_NON_COPYABLE(SequentialReadFile);
 
-  static const size_t npos = std::numeric_limits<size_t>::max();
-  int _fd{-1};
-  turbo::filesystem::path _path;
-  size_t _has_read{0};
-};
+        static const size_t npos = std::numeric_limits<size_t>::max();
+        std::FILE *_fd{nullptr};
+        turbo::filesystem::path _file_path;
+        turbo::FileOption _option;
+        FileEventListener _listener;
+    };
 
 } // namespace turbo
 

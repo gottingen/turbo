@@ -64,7 +64,6 @@ namespace turbo {
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;
         FileEventListener _listener;
-        size_t _has_write{0};
     };
 } // namespace turbo
 

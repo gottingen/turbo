@@ -67,13 +67,13 @@ namespace turbo {
                 // opening the actual log-we-write-to in "ab" mode, since that
                 // interacts more politely with eternal processes that might
                 // rotate/truncate the file underneath us.
-                auto rs = Fio::file_open(_file_path, trunc_mode, _option);
+                auto rs = Fio::file_open_write(_file_path, trunc_mode, _option);
                 if (!rs.ok()) {
                     continue;
                 }
                 std::fclose(rs.value());
             }
-            auto rs = Fio::file_open(_file_path, mode, _option);
+            auto rs = Fio::file_open_write(_file_path, mode, _option);
             if (rs.ok()) {
                 _fd = rs.value();
                 if (_listener.after_open) {

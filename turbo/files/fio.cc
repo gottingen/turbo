@@ -19,7 +19,7 @@
 namespace turbo {
 
     turbo::ResultStatus<std::FILE *>
-    Fio::file_open(const turbo::filesystem::path &filename, const std::string &mode, const FileOption &option) {
+    Fio::file_open_write(const turbo::filesystem::path &filename, const std::string &mode, const FileOption &option) {
         std::FILE *fp = nullptr;
 #ifdef TURBO_PLATFORM_WINDOWS
 #ifdef TURBO_WCHAR_FILENAMES
@@ -27,20 +27,59 @@ namespace turbo {
 #else
         fp = ::_fsopen((filename.c_str()), mode.c_str(), _SH_DENYNO);
 #endif
-#if defined(TURBO_PREVENT_CHILD_FD)
-        if (fp != nullptr) {
-            auto file_handle = reinterpret_cast<HANDLE>(_get_osfhandle(::_fileno(fp)));
-            if (!::SetHandleInformation(file_handle, HANDLE_FLAG_INHERIT, 0))
-            {
-                ::fclose(fp);
-                fp = nullptr;
-            }
+        if (option.prevent_child) {
+                if (fp != nullptr) {
+                    auto file_handle = reinterpret_cast<HANDLE>(_get_osfhandle(::_fileno(fp)));
+                    if (!::SetHandleInformation(file_handle, HANDLE_FLAG_INHERIT, 0))
+                    {
+                        ::fclose(fp);
+                        fp = nullptr;
+                    }
+                }
         }
-#endif
 #else // unix
         if (option.prevent_child) {
             const int mode_flag = (mode == "ab") ? O_APPEND : O_TRUNC;
             const int fd = ::open((filename.c_str()), O_CREAT | O_WRONLY | O_CLOEXEC | mode_flag, mode_t(0644));
+            if (fd == -1) {
+                return turbo::ErrnoToStatus(errno, "");
+            }
+            fp = ::fdopen(fd, mode.c_str());
+            if (fp == nullptr) {
+                ::close(fd);
+            }
+        } else {
+            fp = ::fopen((filename.c_str()), mode.c_str());
+        }
+#endif
+        if (fp == nullptr) {
+            return turbo::ErrnoToStatus(errno, "");
+        }
+        return fp;
+    }
+
+    turbo::ResultStatus<std::FILE *>
+    Fio::file_open_read(const turbo::filesystem::path &filename, const std::string &mode, const FileOption &option) {
+        std::FILE *fp = nullptr;
+#ifdef TURBO_PLATFORM_WINDOWS
+        #ifdef TURBO_WCHAR_FILENAMES
+        fp = ::_wfsopen((filename.c_str()), mode.c_str(), _SH_DENYNO);
+#else
+        fp = ::_fsopen((filename.c_str()), mode.c_str(), _SH_DENYNO);
+#endif
+        if (option.prevent_child) {
+                if (fp != nullptr) {
+                    auto file_handle = reinterpret_cast<HANDLE>(_get_osfhandle(::_fileno(fp)));
+                    if (!::SetHandleInformation(file_handle, HANDLE_FLAG_INHERIT, 0))
+                    {
+                        ::fclose(fp);
+                        fp = nullptr;
+                    }
+                }
+        }
+#else // unix
+        if (option.prevent_child) {
+            const int fd = ::open((filename.c_str()), O_RDONLY | O_CLOEXEC, mode_t(0644));
             if (fd == -1) {
                 return turbo::ErrnoToStatus(errno, "");
             }

@@ -29,8 +29,11 @@ namespace turbo {
     class Fio {
     public:
 
-        static turbo::ResultStatus<std::FILE *> file_open(const turbo::filesystem::path &filename, const std::string &mode,
+        static turbo::ResultStatus<std::FILE *> file_open_write(const turbo::filesystem::path &filename, const std::string &mode,
                                                       const FileOption &option = FileOption());
+
+        static turbo::ResultStatus<std::FILE *> file_open_read(const turbo::filesystem::path &filename, const std::string &mode,
+                                                                const FileOption &option = FileOption());
 
         static turbo::ResultStatus<size_t> file_size(std::FILE *fp);
 
