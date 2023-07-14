@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#ifndef TANN_CONTAINER_ARRAY_VIEW_H_
-#define TANN_CONTAINER_ARRAY_VIEW_H_
+#ifndef TURBO_CONTAINER_ARRAY_VIEW_H_
+#define TURBO_CONTAINER_ARRAY_VIEW_H_
 
 #include <cstdint>
 #include <memory>
 #include <cstddef>
 
-namespace tann {
+namespace turbo {
 
     template<typename T>
     class array_view {
@@ -212,7 +212,7 @@ namespace tann {
 
     typedef array_view<std::uint8_t> byte_array_view;
 
-}  // namespace tann
+}  // namespace turbo
 
-#endif  // TANN_CONTAINER_ARRAY_VIEW_H_
+#endif  // TURBO_CONTAINER_ARRAY_VIEW_H_
 

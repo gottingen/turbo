@@ -9,7 +9,17 @@ augments to stl. Turbo is the foundation of gottingen ai inf.
 # build
 
 Since designed the Turbo, easy to build and ingest is one of its goals.
-so we make it's using as easy as we can. details see [build](docs/build.md)
+so we make it's using as easy as we can.
+```shell
+git clone https://github.com/gottingen/turbo.git
+pip install carbin
+cd turbo
+carbin install
+mkdir build && cd build
+cmake ..
+make -j 8
+make test
+```
 
 for easy to ingest, Turbo have package on anaconda. When you on conda environment,
 you can get it as below.
@@ -33,6 +43,7 @@ carbin install gottingen/turbo
   * [platform](docs/platform.md)
   * [base](docs/base.md)
   * [simd](docs/simd.md)
+  * [flags]()
   * [strings](docs/strings.md)
   * [concurrent](docs/concurrent.md)
   * [status](docs/status.md)
