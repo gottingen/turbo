@@ -46,6 +46,7 @@ namespace turbo::tlog {
             if (max_files > 200000) {
                 throw_tlog_ex("rotating sink constructor: max_files arg cannot exceed 200000");
             }
+            file_writer_.set_option(kLogFileOption);
             auto r = file_writer_.open(calc_filename(base_filename_, 0));
             if (!r.ok()) {
                 throw_tlog_ex(r.ToString());

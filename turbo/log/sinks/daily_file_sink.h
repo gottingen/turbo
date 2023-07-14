@@ -25,7 +25,8 @@
 #include "turbo/log/details/os.h"
 #include <turbo/log/details/circular_q.h>
 #include "turbo/log/details/synchronous_factory.h"
-
+#include "turbo/strings/str_split.h"
+#include <iostream>
 #include <chrono>
 #include <cstdio>
 #include <ctime>
@@ -59,8 +60,7 @@ namespace turbo::tlog {
         struct daily_filename_format_calculator {
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 // generate fmt datetime format string, e.g. {:%Y-%m-%d}.
-                filename_t fmt_filename = fmt::format(FMT_STRING(TLOG_FILENAME_T("{{:{}}}")), filename);
-
+                filename_t fmt_filename = fmt::format(FMT_STRING(TLOG_FILENAME_T("{{:{}}}")),filename);
                 // MSVC doesn't allow fmt::runtime(..) with wchar, with fmtlib versions < 9.1.x
                 return fmt::format(fmt::runtime(fmt_filename), now_tm);
 
@@ -129,6 +129,7 @@ namespace turbo::tlog {
                 bool should_rotate = time >= rotation_tp_;
                 if (should_rotate) {
                     auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
+                    file_writer_.set_option(kLogFileOption);
                     auto r = file_writer_.open(filename, truncate_);
                     if(!r.ok()) {
                         throw_tlog_ex(r.ToString());

@@ -19,6 +19,8 @@
 #include <cstring>
 #include "turbo/base/casts.h"
 #include "turbo/files/fio.h"
+#include <iostream>
+#include "turbo/platform/port.h"
 
 namespace turbo {
 
@@ -37,7 +39,7 @@ namespace turbo {
     turbo::Status SequentialWriteFile::open(const turbo::filesystem::path &fname, bool truncate) {
         close();
         _file_path = fname;
-
+        TURBO_ASSERT(!_file_path.empty());
         auto *mode = "ab";
         auto *trunc_mode = "wb";
 
@@ -48,13 +50,15 @@ namespace turbo {
             // create containing folder if not exists already.
             if (_option.create_dir_if_miss) {
                 auto pdir = _file_path.parent_path();
-                std::error_code ec;
-                if (!turbo::filesystem::exists(pdir, ec)) {
-                    if (ec) {
-                        continue;
-                    }
-                    if (!turbo::filesystem::create_directories(pdir, ec)) {
-                        continue;
+                if(!pdir.empty()) {
+                    std::error_code ec;
+                    if (!turbo::filesystem::exists(pdir, ec)) {
+                        if (ec) {
+                            continue;
+                        }
+                        if (!turbo::filesystem::create_directories(pdir, ec)) {
+                            continue;
+                        }
                     }
                 }
             }
