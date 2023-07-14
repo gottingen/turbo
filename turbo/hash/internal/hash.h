@@ -542,7 +542,7 @@ namespace turbo {
 
         // Support std::wstring, std::u16string and std::u32string.
         template<typename Char, typename Alloc, typename H,
-                typename = turbo::enable_if_t<std::is_same<Char, wchar_t>::value ||
+                typename = std::enable_if_t<std::is_same<Char, wchar_t>::value ||
                                               std::is_same<Char, char16_t>::value ||
                                               std::is_same<Char, char32_t>::value>>
         H TurboHashValue(
@@ -870,14 +870,14 @@ namespace turbo {
             struct UniquelyRepresentedProbe {
                 template<typename H, typename T>
                 static auto Invoke(H state, const T &value)
-                -> turbo::enable_if_t<is_uniquely_represented<T>::value, H> {
+                -> std::enable_if_t<is_uniquely_represented<T>::value, H> {
                     return hash_internal::hash_bytes(std::move(state), value);
                 }
             };
 
             struct HashValueProbe {
                 template<typename H, typename T>
-                static auto Invoke(H state, const T &value) -> turbo::enable_if_t<
+                static auto Invoke(H state, const T &value) -> std::enable_if_t<
                         std::is_same<H,
                                 decltype(TurboHashValue(std::move(state), value))>::value,
                         H> {
@@ -888,7 +888,7 @@ namespace turbo {
             struct LegacyHashProbe {
 #if TURBO_HASH_INTERNAL_SUPPORT_LEGACY_HASH_
                 template <typename H, typename T>
-                static auto Invoke(H state, const T& value) -> turbo::enable_if_t<
+                static auto Invoke(H state, const T& value) -> std::enable_if_t<
                     std::is_convertible<
                         decltype(TURBO_INTERNAL_LEGACY_HASH_NAMESPACE::hash<T>()(value)),
                         size_t>::value,
@@ -903,7 +903,7 @@ namespace turbo {
             struct StdHashProbe {
                 template<typename H, typename T>
                 static auto Invoke(H state, const T &value)
-                -> turbo::enable_if_t<type_traits_internal::IsHashable<T>::value, H> {
+                -> std::enable_if_t<type_traits_internal::IsHashable<T>::value, H> {
                     return hash_internal::hash_bytes(std::move(state), std::hash<T>{}(value));
                 }
             };
@@ -984,13 +984,13 @@ namespace turbo {
             // Otherwise we would be instantiating and calling dozens of functions for
             // something that is just one multiplication and a couple xor's.
             // The result should be the same as running the whole algorithm, but faster.
-            template<typename T, turbo::enable_if_t<IntegralFastPath<T>::value, int> = 0>
+            template<typename T, std::enable_if_t<IntegralFastPath<T>::value, int> = 0>
             static size_t hash(T value) {
                 return static_cast<size_t>(Mix(Seed(), static_cast<uint64_t>(value)));
             }
 
             // Overload of MixingHashState::hash()
-            template<typename T, turbo::enable_if_t<!IntegralFastPath<T>::value, int> = 0>
+            template<typename T, std::enable_if_t<!IntegralFastPath<T>::value, int> = 0>
             static size_t hash(const T &value) {
                 return static_cast<size_t>(combine(MixingHashState{}, value).state_);
             }
@@ -1113,7 +1113,7 @@ namespace turbo {
                 // Though the 128-bit product on AArch64 needs two instructions, it is
                 // still a good balance between speed and hash quality.
                 using MultType =
-                        turbo::conditional_t<sizeof(size_t) == 4, uint64_t, uint128>;
+                        std::conditional_t<sizeof(size_t) == 4, uint64_t, uint128>;
                 // We do the addition in 64-bit space to make sure the 128-bit
                 // multiplication is fast. If we were to do it as MultType the compiler has
                 // to assume that the high word is non-zero and needs to perform 2
@@ -1256,7 +1256,7 @@ namespace turbo {
 
         template<typename T>
         struct Hash
-                : turbo::conditional_t<is_hashable<T>::value, HashImpl<T>, PoisonedHash> {
+                : std::conditional_t<is_hashable<T>::value, HashImpl<T>, PoisonedHash> {
         };
 
         template<typename H>

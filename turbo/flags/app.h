@@ -73,14 +73,14 @@ namespace turbo {
     namespace detail {
         /// helper functions for adding in appropriate flag modifiers for add_flag
 
-        template<typename T, enable_if_t<
+        template<typename T, std::enable_if_t<
                 !std::is_integral<T>::value || (sizeof(T) <= 1U), detail::enabler> = detail::dummy>
         Option *default_flag_modifiers(Option *opt) {
             return opt->always_capture_default();
         }
 
         /// summing modifiers
-        template<typename T, enable_if_t<
+        template<typename T, std::enable_if_t<
                 std::is_integral<T>::value && (sizeof(T) > 1U), detail::enabler> = detail::dummy>
         Option *default_flag_modifiers(Option *opt) {
             return opt->multi_option_policy(MultiOptionPolicy::Sum)->default_str("0")->force_callback();
@@ -517,7 +517,7 @@ namespace turbo {
         /// Add option for assigning to a variable
         template<typename AssignTo,
                 typename ConvertTo = AssignTo,
-                enable_if_t<!std::is_const<ConvertTo>::value, detail::enabler> = detail::dummy>
+                std::enable_if_t<!std::is_const<ConvertTo>::value, detail::enabler> = detail::dummy>
         Option *add_option(std::string option_name,
                            AssignTo &variable,  ///< The variable to set
                            std::string option_description = "") {
@@ -541,7 +541,7 @@ namespace turbo {
         }
 
         /// Add option for assigning to a variable
-        template<typename AssignTo, enable_if_t<!std::is_const<AssignTo>::value, detail::enabler> = detail::dummy>
+        template<typename AssignTo, std::enable_if_t<!std::is_const<AssignTo>::value, detail::enabler> = detail::dummy>
         Option *add_option_no_stream(std::string option_name,
                                      AssignTo &variable,  ///< The variable to set
                                      std::string option_description = "") {
@@ -587,7 +587,7 @@ namespace turbo {
 
         /// Add option with description but with no variable assignment or callback
         template<typename T,
-                enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
+                std::enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
                 detail::dummy>
         Option *add_option(std::string option_name, T &option_description) {
             return add_option(option_name, turbo::callback_t(), option_description, false);
@@ -623,7 +623,7 @@ namespace turbo {
         /// takes a constant string,  if a variable string is passed that variable will be assigned the results from the
         /// flag
         template<typename T,
-                enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
+                std::enable_if_t<std::is_const<T>::value && std::is_constructible<std::string, T>::value, detail::enabler> =
                 detail::dummy>
         Option *add_flag(std::string flag_name, T &flag_description) {
             return _add_flag_internal(flag_name, turbo::callback_t(), flag_description);
@@ -632,7 +632,7 @@ namespace turbo {
         /// Other type version accepts all other types that are not vectors such as bool, enum, string or other classes
         /// that can be converted from a string
         template<typename T,
-                enable_if_t<!detail::is_mutable_container<T>::value && !std::is_const<T>::value &&
+                std::enable_if_t<!detail::is_mutable_container<T>::value && !std::is_const<T>::value &&
                             !std::is_constructible<std::function<void(int)>, T>::value,
                         detail::enabler> = detail::dummy>
         Option *add_flag(std::string flag_name,
@@ -649,7 +649,7 @@ namespace turbo {
 
         /// Vector version to capture multiple flags.
         template<typename T,
-                enable_if_t<!std::is_assignable<std::function<void(std::int64_t)> &, T>::value, detail::enabler> =
+                std::enable_if_t<!std::is_assignable<std::function<void(std::int64_t)> &, T>::value, detail::enabler> =
                 detail::dummy>
         Option *add_flag(std::string flag_name,
                          std::vector<T> &flag_results,  ///< A vector of values with the flag results

@@ -43,8 +43,8 @@ union VoidPtr {
 template <typename T>
 constexpr bool PassByValue() {
   return !std::is_lvalue_reference<T>::value &&
-         turbo::is_trivially_copy_constructible<T>::value &&
-         turbo::is_trivially_copy_assignable<
+         std::is_trivially_copy_constructible<T>::value &&
+         std::is_trivially_copy_assignable<
              typename std::remove_cv<T>::type>::value &&
          std::is_trivially_destructible<T>::value &&
          sizeof(T) <= 2 * sizeof(void*);

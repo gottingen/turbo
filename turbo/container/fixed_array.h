@@ -81,7 +81,7 @@ class FixedArray {
   // std::iterator_traits isn't guaranteed to be SFINAE-friendly until C++17,
   // but this seems to be mostly pedantic.
   template <typename Iterator>
-  using EnableIfForwardIterator = turbo::enable_if_t<std::is_convertible<
+  using EnableIfForwardIterator = std::enable_if_t<std::is_convertible<
       typename std::iterator_traits<Iterator>::iterator_category,
       std::forward_iterator_tag>::value>;
   static constexpr bool NoexceptCopyable() {
@@ -93,7 +93,7 @@ class FixedArray {
            turbo::allocator_is_nothrow<allocator_type>::value;
   }
   static constexpr bool DefaultConstructorIsNonTrivial() {
-    return !turbo::is_trivially_default_constructible<StorageElement>::value;
+    return !std::is_trivially_default_constructible<StorageElement>::value;
   }
 
  public:
@@ -390,14 +390,14 @@ class FixedArray {
   //     error: call to int __builtin___sprintf_chk(etc...)
   //     will always overflow destination buffer [-Werror]
   //
-  template <typename OuterT, typename InnerT = turbo::remove_extent_t<OuterT>,
+  template <typename OuterT, typename InnerT = std::remove_extent_t<OuterT>,
             size_t InnerN = std::extent<OuterT>::value>
   struct StorageElementWrapper {
     InnerT array[InnerN];
   };
 
   using StorageElement =
-      turbo::conditional_t<std::is_array<value_type>::value,
+      std::conditional_t<std::is_array<value_type>::value,
                           StorageElementWrapper<value_type>, value_type>;
 
   static pointer AsValueType(pointer ptr) { return ptr; }
@@ -433,7 +433,7 @@ class FixedArray {
   };
 
   using InlinedStorage =
-      turbo::conditional_t<inline_elements == 0, EmptyInlinedStorage,
+      std::conditional_t<inline_elements == 0, EmptyInlinedStorage,
                           NonEmptyInlinedStorage>;
 
   // Storage

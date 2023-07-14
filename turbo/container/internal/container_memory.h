@@ -330,11 +330,11 @@ union map_slot_type {
   ~map_slot_type() = delete;
   using value_type = std::pair<const K, V>;
   using mutable_value_type =
-      std::pair<turbo::remove_const_t<K>, turbo::remove_const_t<V>>;
+      std::pair<std::remove_const_t<K>, std::remove_const_t<V>>;
 
   value_type value;
   mutable_value_type mutable_value;
-  turbo::remove_const_t<K> key;
+  std::remove_const_t<K> key;
 };
 
 template <class K, class V>
@@ -342,7 +342,7 @@ struct map_slot_policy {
   using slot_type = map_slot_type<K, V>;
   using value_type = std::pair<const K, V>;
   using mutable_value_type =
-      std::pair<turbo::remove_const_t<K>, turbo::remove_const_t<V>>;
+      std::pair<std::remove_const_t<K>, std::remove_const_t<V>>;
 
  private:
   static void emplace(slot_type* slot) {

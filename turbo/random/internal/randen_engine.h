@@ -62,7 +62,7 @@ class alignas(8) randen_engine {
   explicit randen_engine(result_type seed_value) { seed(seed_value); }
 
   template <class SeedSequence,
-            typename = typename turbo::enable_if_t<
+            typename = typename std::enable_if_t<
                 !std::is_same<SeedSequence, randen_engine>::value>>
   explicit randen_engine(SeedSequence&& seq) {
     seed(seq);
@@ -92,7 +92,7 @@ class alignas(8) randen_engine {
   }
 
   template <class SeedSequence>
-  typename turbo::enable_if_t<
+  typename std::enable_if_t<
       !std::is_convertible<SeedSequence, result_type>::value>
   seed(SeedSequence&& seq) {
     // Zeroes the state.

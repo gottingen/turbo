@@ -620,7 +620,7 @@ namespace turbo {
         // or three-way comparator.
         // SFINAE prevents implicit conversions to bool (such as from int).
         template<typename BoolT,
-                turbo::enable_if_t<std::is_same<bool, BoolT>::value, int> = 0>
+                std::enable_if_t<std::is_same<bool, BoolT>::value, int> = 0>
         constexpr bool compare_result_as_less_than(const BoolT r) { return r; }
 
         constexpr bool compare_result_as_less_than(const turbo::weak_ordering r) {
@@ -637,7 +637,7 @@ namespace turbo {
         // three-way comparator.
         // SFINAE prevents implicit conversions to int (such as from bool).
         template<typename Int,
-                turbo::enable_if_t<std::is_same<int, Int>::value, int> = 0>
+                std::enable_if_t<std::is_same<int, Int>::value, int> = 0>
         constexpr turbo::weak_ordering compare_result_as_ordering(const Int c) {
             return c < 0 ? turbo::weak_ordering::less
                          : c == 0 ? turbo::weak_ordering::equivalent
@@ -651,7 +651,7 @@ namespace turbo {
 
         template<
                 typename Compare, typename K, typename LK,
-                turbo::enable_if_t<!std::is_same<bool, turbo::result_of_t<Compare(
+                std::enable_if_t<!std::is_same<bool, turbo::result_of_t<Compare(
                         const K &, const LK &)>>::value,
                         int> = 0>
         constexpr turbo::weak_ordering do_three_way_comparison(const Compare &compare,
@@ -661,7 +661,7 @@ namespace turbo {
 
         template<
                 typename Compare, typename K, typename LK,
-                turbo::enable_if_t<std::is_same<bool, turbo::result_of_t<Compare(
+                std::enable_if_t<std::is_same<bool, turbo::result_of_t<Compare(
                         const K &, const LK &)>>::value,
                         int> = 0>
         constexpr turbo::weak_ordering do_three_way_comparison(const Compare &compare,

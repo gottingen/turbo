@@ -40,7 +40,7 @@ struct hash_policy_traits : common_policy_traits<Policy> {
     // access to the key for use in node handle.
 #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
     template <class Key,
-              turbo::enable_if_t<std::is_lvalue_reference<Key>::value, int> = 0>
+              std::enable_if_t<std::is_lvalue_reference<Key>::value, int> = 0>
     static key_type& Impl(Key&& k, int) {
       return *std::launder(
           const_cast<key_type*>(std::addressof(std::forward<Key>(k))));

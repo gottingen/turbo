@@ -119,11 +119,11 @@ TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalOpenClosedTag, IntervalOpenClosed, {});
 //   auto x = turbo::Uniform<float>(bitgen, 0, 1);
 //
 template <typename R = void, typename TagType, typename URBG>
-typename turbo::enable_if_t<!std::is_same<R, void>::value, R>  //
+typename std::enable_if_t<!std::is_same<R, void>::value, R>  //
 Uniform(TagType tag,
         URBG&& urbg,  // NOLINT(runtime/references)
         R lo, R hi) {
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = random_internal::UniformDistributionWrapper<R>;
 
   auto a = random_internal::uniform_lower_bound(tag, lo, hi);
@@ -139,10 +139,10 @@ Uniform(TagType tag,
 // Overload of `Uniform()` using the default closed-open interval of [lo, hi),
 // and returning values of type `T`
 template <typename R = void, typename URBG>
-typename turbo::enable_if_t<!std::is_same<R, void>::value, R>  //
+typename std::enable_if_t<!std::is_same<R, void>::value, R>  //
 Uniform(URBG&& urbg,  // NOLINT(runtime/references)
         R lo, R hi) {
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = random_internal::UniformDistributionWrapper<R>;
   constexpr auto tag = turbo::IntervalClosedOpen;
 
@@ -161,12 +161,12 @@ Uniform(URBG&& urbg,  // NOLINT(runtime/references)
 // correctly from the passed types.
 template <typename R = void, typename TagType, typename URBG, typename A,
           typename B>
-typename turbo::enable_if_t<std::is_same<R, void>::value,
+typename std::enable_if_t<std::is_same<R, void>::value,
                            random_internal::uniform_inferred_return_t<A, B>>
 Uniform(TagType tag,
         URBG&& urbg,  // NOLINT(runtime/references)
         A lo, B hi) {
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using return_t = typename random_internal::uniform_inferred_return_t<A, B>;
   using distribution_t = random_internal::UniformDistributionWrapper<return_t>;
 
@@ -185,11 +185,11 @@ Uniform(TagType tag,
 // default closed-open interval of [lo, hi). Note that a compile-error will
 // result if the return type cannot be deduced correctly from the passed types.
 template <typename R = void, typename URBG, typename A, typename B>
-typename turbo::enable_if_t<std::is_same<R, void>::value,
+typename std::enable_if_t<std::is_same<R, void>::value,
                            random_internal::uniform_inferred_return_t<A, B>>
 Uniform(URBG&& urbg,  // NOLINT(runtime/references)
         A lo, B hi) {
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using return_t = typename random_internal::uniform_inferred_return_t<A, B>;
   using distribution_t = random_internal::UniformDistributionWrapper<return_t>;
 
@@ -208,9 +208,9 @@ Uniform(URBG&& urbg,  // NOLINT(runtime/references)
 // Overload of Uniform() using the minimum and maximum values of a given type
 // `T` (which must be unsigned), returning a value of type `unsigned T`
 template <typename R, typename URBG>
-typename turbo::enable_if_t<!std::is_signed<R>::value, R>  //
+typename std::enable_if_t<!std::is_signed<R>::value, R>  //
 Uniform(URBG&& urbg) {  // NOLINT(runtime/references)
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = random_internal::UniformDistributionWrapper<R>;
 
   return random_internal::DistributionCaller<gen_t>::template Call<
@@ -240,7 +240,7 @@ Uniform(URBG&& urbg) {  // NOLINT(runtime/references)
 template <typename URBG>
 bool Bernoulli(URBG&& urbg,  // NOLINT(runtime/references)
                double p) {
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = turbo::bernoulli_distribution;
 
   return random_internal::DistributionCaller<gen_t>::template Call<
@@ -272,7 +272,7 @@ RealType Beta(URBG&& urbg,  // NOLINT(runtime/references)
       "Template-argument 'RealType' must be a floating-point type, in "
       "turbo::Beta<RealType, URBG>(...)");
 
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = typename turbo::beta_distribution<RealType>;
 
   return random_internal::DistributionCaller<gen_t>::template Call<
@@ -304,7 +304,7 @@ RealType Exponential(URBG&& urbg,  // NOLINT(runtime/references)
       "Template-argument 'RealType' must be a floating-point type, in "
       "turbo::Exponential<RealType, URBG>(...)");
 
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = typename turbo::exponential_distribution<RealType>;
 
   return random_internal::DistributionCaller<gen_t>::template Call<
@@ -335,7 +335,7 @@ RealType Gaussian(URBG&& urbg,  // NOLINT(runtime/references)
       "Template-argument 'RealType' must be a floating-point type, in "
       "turbo::Gaussian<RealType, URBG>(...)");
 
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = typename turbo::gaussian_distribution<RealType>;
 
   return random_internal::DistributionCaller<gen_t>::template Call<
@@ -377,7 +377,7 @@ IntType LogUniform(URBG&& urbg,  // NOLINT(runtime/references)
                 "Template-argument 'IntType' must be an integral type, in "
                 "turbo::LogUniform<IntType, URBG>(...)");
 
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = typename turbo::log_uniform_int_distribution<IntType>;
 
   return random_internal::DistributionCaller<gen_t>::template Call<
@@ -407,7 +407,7 @@ IntType Poisson(URBG&& urbg,  // NOLINT(runtime/references)
                 "Template-argument 'IntType' must be an integral type, in "
                 "turbo::Poisson<IntType, URBG>(...)");
 
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = typename turbo::poisson_distribution<IntType>;
 
   return random_internal::DistributionCaller<gen_t>::template Call<
@@ -439,7 +439,7 @@ IntType Zipf(URBG&& urbg,  // NOLINT(runtime/references)
                 "Template-argument 'IntType' must be an integral type, in "
                 "turbo::Zipf<IntType, URBG>(...)");
 
-  using gen_t = turbo::decay_t<URBG>;
+  using gen_t = std::decay_t<URBG>;
   using distribution_t = typename turbo::zipf_distribution<IntType>;
 
   return random_internal::DistributionCaller<gen_t>::template Call<

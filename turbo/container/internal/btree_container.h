@@ -375,7 +375,7 @@ class btree_set_container : public btree_container<Tree> {
   // `this`, it is left unmodified in `src`.
   template <
       typename T,
-      typename turbo::enable_if_t<
+      typename std::enable_if_t<
           turbo::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
@@ -394,7 +394,7 @@ class btree_set_container : public btree_container<Tree> {
 
   template <
       typename T,
-      typename turbo::enable_if_t<
+      typename std::enable_if_t<
           turbo::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
@@ -470,13 +470,13 @@ class btree_map_container : public btree_set_container<Tree> {
   }
 
   template <typename K = key_type, typename... Args,
-            typename turbo::enable_if_t<
+            typename std::enable_if_t<
                 !std::is_convertible<K, const_iterator>::value, int> = 0>
   std::pair<iterator, bool> try_emplace(const key_arg<K> &k, Args &&... args) {
     return try_emplace_impl(k, std::forward<Args>(args)...);
   }
   template <typename K = key_type, typename... Args,
-            typename turbo::enable_if_t<
+            typename std::enable_if_t<
                 !std::is_convertible<K, const_iterator>::value, int> = 0>
   std::pair<iterator, bool> try_emplace(key_arg<K> &&k, Args &&... args) {
     return try_emplace_impl(std::forward<K>(k), std::forward<Args>(args)...);
@@ -663,7 +663,7 @@ class btree_multiset_container : public btree_container<Tree> {
   // Moves all elements from `src` into `this`.
   template <
       typename T,
-      typename turbo::enable_if_t<
+      typename std::enable_if_t<
           turbo::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
@@ -679,7 +679,7 @@ class btree_multiset_container : public btree_container<Tree> {
 
   template <
       typename T,
-      typename turbo::enable_if_t<
+      typename std::enable_if_t<
           turbo::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,

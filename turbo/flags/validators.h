@@ -357,14 +357,14 @@ namespace turbo {
 
     namespace detail {
         template<typename T,
-                enable_if_t<is_copyable_ptr<typename std::remove_reference<T>::type>::value, detail::enabler> = detail::dummy>
+                std::enable_if_t<is_copyable_ptr<typename std::remove_reference<T>::type>::value, detail::enabler> = detail::dummy>
         auto smart_deref(T value) -> decltype(*value) {
             return *value;
         }
 
         template<
                 typename T,
-                enable_if_t<!is_copyable_ptr<typename std::remove_reference<T>::type>::value, detail::enabler> = detail::dummy>
+                std::enable_if_t<!is_copyable_ptr<typename std::remove_reference<T>::type>::value, detail::enabler> = detail::dummy>
         typename std::remove_reference<T>::type &smart_deref(T &value) {
             return value;
         }
@@ -418,7 +418,7 @@ namespace turbo {
         };
 
 /// A search function
-        template<typename T, typename V, enable_if_t<!has_find<T, V>::value, detail::enabler> = detail::dummy>
+        template<typename T, typename V, std::enable_if_t<!has_find<T, V>::value, detail::enabler> = detail::dummy>
         auto search(const T &set, const V &val) -> std::pair<bool, decltype(std::begin(detail::smart_deref(set)))> {
             using element_t = typename detail::element_type<T>::type;
             auto &setref = detail::smart_deref(set);
@@ -429,7 +429,7 @@ namespace turbo {
         }
 
 /// A search function that uses the built in find function
-        template<typename T, typename V, enable_if_t<has_find<T, V>::value, detail::enabler> = detail::dummy>
+        template<typename T, typename V, std::enable_if_t<has_find<T, V>::value, detail::enabler> = detail::dummy>
         auto search(const T &set, const V &val) -> std::pair<bool, decltype(std::begin(detail::smart_deref(set)))> {
             auto &setref = detail::smart_deref(set);
             auto it = setref.find(val);

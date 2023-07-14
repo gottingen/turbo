@@ -1408,9 +1408,9 @@ class raw_hash_set {
     using iterator_category = std::forward_iterator_tag;
     using value_type = typename raw_hash_set::value_type;
     using reference =
-        turbo::conditional_t<PolicyTraits::constant_iterators::value,
+        std::conditional_t<PolicyTraits::constant_iterators::value,
                             const value_type&, value_type&>;
-    using pointer = turbo::remove_reference_t<reference>*;
+    using pointer = std::remove_reference_t<reference>*;
     using difference_type = typename raw_hash_set::difference_type;
 
     iterator() {}

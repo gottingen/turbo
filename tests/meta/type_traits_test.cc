@@ -49,13 +49,13 @@ struct StructC {};
 
 struct TypeWithBarFunction {
   template <class T,
-            turbo::enable_if_t<std::is_same<T&&, StructA&>::value, int> = 0>
+            std::enable_if_t<std::is_same<T&&, StructA&>::value, int> = 0>
   ReturnType bar(T&&, const StructB&, StructC&&) &&;  // NOLINT
 };
 
 struct TypeWithBarFunctionAndConvertibleReturnType {
   template <class T,
-            turbo::enable_if_t<std::is_same<T&&, StructA&>::value, int> = 0>
+            std::enable_if_t<std::is_same<T&&, StructA&>::value, int> = 0>
   ConvertibleToReturnType bar(T&&, const StructB&, StructC&&) &&;  // NOLINT
 };
 
@@ -392,144 +392,144 @@ TEST(TypeTraitsTest, TestIsFunction) {
 
 TEST(TypeTraitsTest, TestTrivialDestructor) {
   // Verify that arithmetic types and pointers have trivial destructors.
-  EXPECT_TRUE(turbo::is_trivially_destructible<bool>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<char>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<unsigned char>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<signed char>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<wchar_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<int>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<unsigned int>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<int16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<uint16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<int64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<uint64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<float>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<double>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<long double>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<const std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<const Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<std::string**>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<Trivial**>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<bool>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<char>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<unsigned char>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<signed char>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<wchar_t>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<int>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<unsigned int>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<int16_t>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<uint16_t>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<int64_t>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<uint64_t>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<float>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<double>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<long double>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<const std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<const Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<std::string**>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<Trivial**>::value);
 
   // classes with destructors
-  EXPECT_TRUE(turbo::is_trivially_destructible<Trivial>::value);
-  EXPECT_TRUE(turbo::is_trivially_destructible<TrivialDestructor>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<Trivial>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<TrivialDestructor>::value);
 
   // Verify that types with a nontrivial or deleted destructor
   // are marked as such.
-  EXPECT_FALSE(turbo::is_trivially_destructible<NontrivialDestructor>::value);
+  EXPECT_FALSE(std::is_trivially_destructible<NontrivialDestructor>::value);
 #ifdef TURBO_TRIVIALLY_DESTRUCTIBLE_CONSIDER_DELETED_DESTRUCTOR_NOT_TRIVIAL
-  EXPECT_FALSE(turbo::is_trivially_destructible<DeletedDestructor>::value);
+  EXPECT_FALSE(std::is_trivially_destructible<DeletedDestructor>::value);
 #endif
 
   // simple_pair of such types is trivial
-  EXPECT_TRUE((turbo::is_trivially_destructible<simple_pair<int, int>>::value));
-  EXPECT_TRUE((turbo::is_trivially_destructible<
+  EXPECT_TRUE((std::is_trivially_destructible<simple_pair<int, int>>::value));
+  EXPECT_TRUE((std::is_trivially_destructible<
                simple_pair<Trivial, TrivialDestructor>>::value));
 
   // Verify that types without trivial destructors are correctly marked as such.
-  EXPECT_FALSE(turbo::is_trivially_destructible<std::string>::value);
-  EXPECT_FALSE(turbo::is_trivially_destructible<std::vector<int>>::value);
+  EXPECT_FALSE(std::is_trivially_destructible<std::string>::value);
+  EXPECT_FALSE(std::is_trivially_destructible<std::vector<int>>::value);
 
   // Verify that simple_pairs of types without trivial destructors
   // are not marked as trivial.
-  EXPECT_FALSE((turbo::is_trivially_destructible<
+  EXPECT_FALSE((std::is_trivially_destructible<
                 simple_pair<int, std::string>>::value));
-  EXPECT_FALSE((turbo::is_trivially_destructible<
+  EXPECT_FALSE((std::is_trivially_destructible<
                 simple_pair<std::string, int>>::value));
 
   // array of such types is trivial
   using int10 = int[10];
-  EXPECT_TRUE(turbo::is_trivially_destructible<int10>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<int10>::value);
   using Trivial10 = Trivial[10];
-  EXPECT_TRUE(turbo::is_trivially_destructible<Trivial10>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<Trivial10>::value);
   using TrivialDestructor10 = TrivialDestructor[10];
-  EXPECT_TRUE(turbo::is_trivially_destructible<TrivialDestructor10>::value);
+  EXPECT_TRUE(std::is_trivially_destructible<TrivialDestructor10>::value);
 
   // Conversely, the opposite also holds.
   using NontrivialDestructor10 = NontrivialDestructor[10];
-  EXPECT_FALSE(turbo::is_trivially_destructible<NontrivialDestructor10>::value);
+  EXPECT_FALSE(std::is_trivially_destructible<NontrivialDestructor10>::value);
 }
 
 TEST(TypeTraitsTest, TestTrivialDefaultCtor) {
   // arithmetic types and pointers have trivial default constructors.
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<bool>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<char>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<unsigned char>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<signed char>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<wchar_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<int>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<unsigned int>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<int16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<uint16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<int64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<uint64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<float>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<double>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<long double>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<bool>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<char>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<unsigned char>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<signed char>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<wchar_t>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<int>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<unsigned int>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<int16_t>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<uint16_t>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<int64_t>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<uint64_t>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<float>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<double>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<long double>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<Trivial*>::value);
   EXPECT_TRUE(
-      turbo::is_trivially_default_constructible<const std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<const Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<std::string**>::value);
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<Trivial**>::value);
+      std::is_trivially_default_constructible<const std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<const Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<std::string**>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<Trivial**>::value);
 
   // types with compiler generated default ctors
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<Trivial>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<Trivial>::value);
   EXPECT_TRUE(
-      turbo::is_trivially_default_constructible<TrivialDefaultCtor>::value);
+      std::is_trivially_default_constructible<TrivialDefaultCtor>::value);
 
   // Verify that types without them are not.
   EXPECT_FALSE(
-      turbo::is_trivially_default_constructible<NontrivialDefaultCtor>::value);
+      std::is_trivially_default_constructible<NontrivialDefaultCtor>::value);
   EXPECT_FALSE(
-      turbo::is_trivially_default_constructible<DeletedDefaultCtor>::value);
+      std::is_trivially_default_constructible<DeletedDefaultCtor>::value);
 
   // types with nontrivial destructor are nontrivial
   EXPECT_FALSE(
-      turbo::is_trivially_default_constructible<NontrivialDestructor>::value);
+      std::is_trivially_default_constructible<NontrivialDestructor>::value);
 
   // types with vtables
-  EXPECT_FALSE(turbo::is_trivially_default_constructible<Base>::value);
+  EXPECT_FALSE(std::is_trivially_default_constructible<Base>::value);
 
   // Verify that simple_pair has trivial constructors where applicable.
-  EXPECT_TRUE((turbo::is_trivially_default_constructible<
+  EXPECT_TRUE((std::is_trivially_default_constructible<
                simple_pair<int, char*>>::value));
-  EXPECT_TRUE((turbo::is_trivially_default_constructible<
+  EXPECT_TRUE((std::is_trivially_default_constructible<
                simple_pair<int, Trivial>>::value));
-  EXPECT_TRUE((turbo::is_trivially_default_constructible<
+  EXPECT_TRUE((std::is_trivially_default_constructible<
                simple_pair<int, TrivialDefaultCtor>>::value));
 
   // Verify that types without trivial constructors are
   // correctly marked as such.
-  EXPECT_FALSE(turbo::is_trivially_default_constructible<std::string>::value);
+  EXPECT_FALSE(std::is_trivially_default_constructible<std::string>::value);
   EXPECT_FALSE(
-      turbo::is_trivially_default_constructible<std::vector<int>>::value);
+      std::is_trivially_default_constructible<std::vector<int>>::value);
 
   // Verify that simple_pairs of types without trivial constructors
   // are not marked as trivial.
-  EXPECT_FALSE((turbo::is_trivially_default_constructible<
+  EXPECT_FALSE((std::is_trivially_default_constructible<
                 simple_pair<int, std::string>>::value));
-  EXPECT_FALSE((turbo::is_trivially_default_constructible<
+  EXPECT_FALSE((std::is_trivially_default_constructible<
                 simple_pair<std::string, int>>::value));
 
   // Verify that arrays of such types are trivially default constructible
   using int10 = int[10];
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<int10>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<int10>::value);
   using Trivial10 = Trivial[10];
-  EXPECT_TRUE(turbo::is_trivially_default_constructible<Trivial10>::value);
+  EXPECT_TRUE(std::is_trivially_default_constructible<Trivial10>::value);
   using TrivialDefaultCtor10 = TrivialDefaultCtor[10];
   EXPECT_TRUE(
-      turbo::is_trivially_default_constructible<TrivialDefaultCtor10>::value);
+      std::is_trivially_default_constructible<TrivialDefaultCtor10>::value);
 
   // Conversely, the opposite also holds.
 #ifdef TURBO_GCC_BUG_TRIVIALLY_CONSTRUCTIBLE_ON_ARRAY_OF_NONTRIVIAL
   using NontrivialDefaultCtor10 = NontrivialDefaultCtor[10];
   EXPECT_FALSE(
-      turbo::is_trivially_default_constructible<NontrivialDefaultCtor10>::value);
+      std::is_trivially_default_constructible<NontrivialDefaultCtor10>::value);
 #endif
 }
 
@@ -550,400 +550,400 @@ struct BadConstructors {
 TEST(TypeTraitsTest, TestTrivialityBadConstructors) {
   using BadType = BadConstructors<int>;
 
-  EXPECT_FALSE(turbo::is_trivially_default_constructible<BadType>::value);
-  EXPECT_FALSE(turbo::is_trivially_move_constructible<BadType>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_constructible<BadType>::value);
+  EXPECT_FALSE(std::is_trivially_default_constructible<BadType>::value);
+  EXPECT_FALSE(std::is_trivially_move_constructible<BadType>::value);
+  EXPECT_FALSE(std::is_trivially_copy_constructible<BadType>::value);
 }
 
 TEST(TypeTraitsTest, TestTrivialMoveCtor) {
   // Verify that arithmetic types and pointers have trivial move
   // constructors.
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<bool>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<char>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<unsigned char>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<signed char>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<wchar_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<int>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<unsigned int>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<int16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<uint16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<int64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<uint64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<float>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<double>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<long double>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<const std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<const Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<std::string**>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<Trivial**>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<bool>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<char>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<unsigned char>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<signed char>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<wchar_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<int>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<unsigned int>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<int16_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<uint16_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<int64_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<uint64_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<float>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<double>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<long double>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<const std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<const Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<std::string**>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<Trivial**>::value);
 
   // Reference types
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<int&>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<int&&>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<int&>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<int&&>::value);
 
   // types with compiler generated move ctors
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<Trivial>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_constructible<TrivialMoveCtor>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<Trivial>::value);
+  EXPECT_TRUE(std::is_trivially_move_constructible<TrivialMoveCtor>::value);
 
   // Verify that types without them (i.e. nontrivial or deleted) are not.
   EXPECT_FALSE(
-      turbo::is_trivially_move_constructible<NontrivialCopyCtor>::value);
-  EXPECT_FALSE(turbo::is_trivially_move_constructible<DeletedCopyCtor>::value);
+      std::is_trivially_move_constructible<NontrivialCopyCtor>::value);
+  EXPECT_FALSE(std::is_trivially_move_constructible<DeletedCopyCtor>::value);
   EXPECT_FALSE(
-      turbo::is_trivially_move_constructible<NonCopyableOrMovable>::value);
+      std::is_trivially_move_constructible<NonCopyableOrMovable>::value);
 
   // type with nontrivial destructor are nontrivial move construbtible
   EXPECT_FALSE(
-      turbo::is_trivially_move_constructible<NontrivialDestructor>::value);
+      std::is_trivially_move_constructible<NontrivialDestructor>::value);
 
   // types with vtables
-  EXPECT_FALSE(turbo::is_trivially_move_constructible<Base>::value);
+  EXPECT_FALSE(std::is_trivially_move_constructible<Base>::value);
 
   // Verify that simple_pair of such types is trivially move constructible
   EXPECT_TRUE(
-      (turbo::is_trivially_move_constructible<simple_pair<int, char*>>::value));
+      (std::is_trivially_move_constructible<simple_pair<int, char*>>::value));
   EXPECT_TRUE((
-      turbo::is_trivially_move_constructible<simple_pair<int, Trivial>>::value));
-  EXPECT_TRUE((turbo::is_trivially_move_constructible<
+      std::is_trivially_move_constructible<simple_pair<int, Trivial>>::value));
+  EXPECT_TRUE((std::is_trivially_move_constructible<
                simple_pair<int, TrivialMoveCtor>>::value));
 
   // Verify that types without trivial move constructors are
   // correctly marked as such.
-  EXPECT_FALSE(turbo::is_trivially_move_constructible<std::string>::value);
-  EXPECT_FALSE(turbo::is_trivially_move_constructible<std::vector<int>>::value);
+  EXPECT_FALSE(std::is_trivially_move_constructible<std::string>::value);
+  EXPECT_FALSE(std::is_trivially_move_constructible<std::vector<int>>::value);
 
   // Verify that simple_pairs of types without trivial move constructors
   // are not marked as trivial.
-  EXPECT_FALSE((turbo::is_trivially_move_constructible<
+  EXPECT_FALSE((std::is_trivially_move_constructible<
                 simple_pair<int, std::string>>::value));
-  EXPECT_FALSE((turbo::is_trivially_move_constructible<
+  EXPECT_FALSE((std::is_trivially_move_constructible<
                 simple_pair<std::string, int>>::value));
 
   // Verify that arrays are not
   using int10 = int[10];
-  EXPECT_FALSE(turbo::is_trivially_move_constructible<int10>::value);
+  EXPECT_FALSE(std::is_trivially_move_constructible<int10>::value);
 }
 
 TEST(TypeTraitsTest, TestTrivialCopyCtor) {
   // Verify that arithmetic types and pointers have trivial copy
   // constructors.
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<bool>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<char>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<unsigned char>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<signed char>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<wchar_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<int>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<unsigned int>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<int16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<uint16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<int64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<uint64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<float>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<double>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<long double>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<const std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<const Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<std::string**>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<Trivial**>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<bool>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<char>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<unsigned char>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<signed char>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<wchar_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<int>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<unsigned int>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<int16_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<uint16_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<int64_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<uint64_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<float>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<double>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<long double>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<const std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<const Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<std::string**>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<Trivial**>::value);
 
   // Reference types
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<int&>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_constructible<int&&>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<int&>::value);
+  EXPECT_FALSE(std::is_trivially_copy_constructible<int&&>::value);
 
   // types with compiler generated copy ctors
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<Trivial>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_constructible<TrivialCopyCtor>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<Trivial>::value);
+  EXPECT_TRUE(std::is_trivially_copy_constructible<TrivialCopyCtor>::value);
 
   // Verify that types without them (i.e. nontrivial or deleted) are not.
   EXPECT_FALSE(
-      turbo::is_trivially_copy_constructible<NontrivialCopyCtor>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_constructible<DeletedCopyCtor>::value);
+      std::is_trivially_copy_constructible<NontrivialCopyCtor>::value);
+  EXPECT_FALSE(std::is_trivially_copy_constructible<DeletedCopyCtor>::value);
   EXPECT_FALSE(
-      turbo::is_trivially_copy_constructible<MovableNonCopyable>::value);
+      std::is_trivially_copy_constructible<MovableNonCopyable>::value);
   EXPECT_FALSE(
-      turbo::is_trivially_copy_constructible<NonCopyableOrMovable>::value);
+      std::is_trivially_copy_constructible<NonCopyableOrMovable>::value);
 
   // type with nontrivial destructor are nontrivial copy construbtible
   EXPECT_FALSE(
-      turbo::is_trivially_copy_constructible<NontrivialDestructor>::value);
+      std::is_trivially_copy_constructible<NontrivialDestructor>::value);
 
   // types with vtables
-  EXPECT_FALSE(turbo::is_trivially_copy_constructible<Base>::value);
+  EXPECT_FALSE(std::is_trivially_copy_constructible<Base>::value);
 
   // Verify that simple_pair of such types is trivially copy constructible
   EXPECT_TRUE(
-      (turbo::is_trivially_copy_constructible<simple_pair<int, char*>>::value));
+      (std::is_trivially_copy_constructible<simple_pair<int, char*>>::value));
   EXPECT_TRUE((
-      turbo::is_trivially_copy_constructible<simple_pair<int, Trivial>>::value));
-  EXPECT_TRUE((turbo::is_trivially_copy_constructible<
+      std::is_trivially_copy_constructible<simple_pair<int, Trivial>>::value));
+  EXPECT_TRUE((std::is_trivially_copy_constructible<
                simple_pair<int, TrivialCopyCtor>>::value));
 
   // Verify that types without trivial copy constructors are
   // correctly marked as such.
-  EXPECT_FALSE(turbo::is_trivially_copy_constructible<std::string>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_constructible<std::vector<int>>::value);
+  EXPECT_FALSE(std::is_trivially_copy_constructible<std::string>::value);
+  EXPECT_FALSE(std::is_trivially_copy_constructible<std::vector<int>>::value);
 
   // Verify that simple_pairs of types without trivial copy constructors
   // are not marked as trivial.
-  EXPECT_FALSE((turbo::is_trivially_copy_constructible<
+  EXPECT_FALSE((std::is_trivially_copy_constructible<
                 simple_pair<int, std::string>>::value));
-  EXPECT_FALSE((turbo::is_trivially_copy_constructible<
+  EXPECT_FALSE((std::is_trivially_copy_constructible<
                 simple_pair<std::string, int>>::value));
 
   // Verify that arrays are not
   using int10 = int[10];
-  EXPECT_FALSE(turbo::is_trivially_copy_constructible<int10>::value);
+  EXPECT_FALSE(std::is_trivially_copy_constructible<int10>::value);
 }
 
 TEST(TypeTraitsTest, TestTrivialMoveAssign) {
   // Verify that arithmetic types and pointers have trivial move
   // assignment operators.
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<bool>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<char>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<unsigned char>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<signed char>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<wchar_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<int>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<unsigned int>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<int16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<uint16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<int64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<uint64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<float>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<double>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<long double>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<const std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<const Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<std::string**>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<Trivial**>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<bool>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<char>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<unsigned char>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<signed char>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<wchar_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<int>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<unsigned int>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<int16_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<uint16_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<int64_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<uint64_t>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<float>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<double>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<long double>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<const std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<const Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<std::string**>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<Trivial**>::value);
 
   // const qualified types are not assignable
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<const int>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<const int>::value);
 
   // types with compiler generated move assignment
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<Trivial>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<TrivialMoveAssign>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<Trivial>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<TrivialMoveAssign>::value);
 
   // Verify that types without them (i.e. nontrivial or deleted) are not.
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<NontrivialCopyAssign>::value);
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<DeletedCopyAssign>::value);
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<NonCopyableOrMovable>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<NontrivialCopyAssign>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<DeletedCopyAssign>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<NonCopyableOrMovable>::value);
 
   // types with vtables
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<Base>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<Base>::value);
 
   // Verify that simple_pair is trivially assignable
   EXPECT_TRUE(
-      (turbo::is_trivially_move_assignable<simple_pair<int, char*>>::value));
+      (std::is_trivially_move_assignable<simple_pair<int, char*>>::value));
   EXPECT_TRUE(
-      (turbo::is_trivially_move_assignable<simple_pair<int, Trivial>>::value));
-  EXPECT_TRUE((turbo::is_trivially_move_assignable<
+      (std::is_trivially_move_assignable<simple_pair<int, Trivial>>::value));
+  EXPECT_TRUE((std::is_trivially_move_assignable<
                simple_pair<int, TrivialMoveAssign>>::value));
 
   // Verify that types not trivially move assignable are
   // correctly marked as such.
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<std::string>::value);
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<std::vector<int>>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<std::string>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<std::vector<int>>::value);
 
   // Verify that simple_pairs of types not trivially move assignable
   // are not marked as trivial.
-  EXPECT_FALSE((turbo::is_trivially_move_assignable<
+  EXPECT_FALSE((std::is_trivially_move_assignable<
                 simple_pair<int, std::string>>::value));
-  EXPECT_FALSE((turbo::is_trivially_move_assignable<
+  EXPECT_FALSE((std::is_trivially_move_assignable<
                 simple_pair<std::string, int>>::value));
 
   // Verify that arrays are not trivially move assignable
   using int10 = int[10];
-  EXPECT_FALSE(turbo::is_trivially_move_assignable<int10>::value);
+  EXPECT_FALSE(std::is_trivially_move_assignable<int10>::value);
 
   // Verify that references are handled correctly
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<Trivial&&>::value);
-  EXPECT_TRUE(turbo::is_trivially_move_assignable<Trivial&>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<Trivial&&>::value);
+  EXPECT_TRUE(std::is_trivially_move_assignable<Trivial&>::value);
 }
 
 TEST(TypeTraitsTest, TestTrivialCopyAssign) {
   // Verify that arithmetic types and pointers have trivial copy
   // assignment operators.
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<bool>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<char>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<unsigned char>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<signed char>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<wchar_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<int>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<unsigned int>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<int16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<uint16_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<int64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<uint64_t>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<float>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<double>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<long double>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<const std::string*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<const Trivial*>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<std::string**>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<Trivial**>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<bool>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<char>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<unsigned char>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<signed char>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<wchar_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<int>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<unsigned int>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<int16_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<uint16_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<int64_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<uint64_t>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<float>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<double>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<long double>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<const std::string*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<const Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<std::string**>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<Trivial**>::value);
 
   // const qualified types are not assignable
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<const int>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<const int>::value);
 
   // types with compiler generated copy assignment
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<Trivial>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<TrivialCopyAssign>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<Trivial>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<TrivialCopyAssign>::value);
 
   // Verify that types without them (i.e. nontrivial or deleted) are not.
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<NontrivialCopyAssign>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<DeletedCopyAssign>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<MovableNonCopyable>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<NonCopyableOrMovable>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<NontrivialCopyAssign>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<DeletedCopyAssign>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<MovableNonCopyable>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<NonCopyableOrMovable>::value);
 
   // types with vtables
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<Base>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<Base>::value);
 
   // Verify that simple_pair is trivially assignable
   EXPECT_TRUE(
-      (turbo::is_trivially_copy_assignable<simple_pair<int, char*>>::value));
+      (std::is_trivially_copy_assignable<simple_pair<int, char*>>::value));
   EXPECT_TRUE(
-      (turbo::is_trivially_copy_assignable<simple_pair<int, Trivial>>::value));
-  EXPECT_TRUE((turbo::is_trivially_copy_assignable<
+      (std::is_trivially_copy_assignable<simple_pair<int, Trivial>>::value));
+  EXPECT_TRUE((std::is_trivially_copy_assignable<
                simple_pair<int, TrivialCopyAssign>>::value));
 
   // Verify that types not trivially copy assignable are
   // correctly marked as such.
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<std::string>::value);
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<std::vector<int>>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<std::string>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<std::vector<int>>::value);
 
   // Verify that simple_pairs of types not trivially copy assignable
   // are not marked as trivial.
-  EXPECT_FALSE((turbo::is_trivially_copy_assignable<
+  EXPECT_FALSE((std::is_trivially_copy_assignable<
                 simple_pair<int, std::string>>::value));
-  EXPECT_FALSE((turbo::is_trivially_copy_assignable<
+  EXPECT_FALSE((std::is_trivially_copy_assignable<
                 simple_pair<std::string, int>>::value));
 
   // Verify that arrays are not trivially copy assignable
   using int10 = int[10];
-  EXPECT_FALSE(turbo::is_trivially_copy_assignable<int10>::value);
+  EXPECT_FALSE(std::is_trivially_copy_assignable<int10>::value);
 
   // Verify that references are handled correctly
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<Trivial&&>::value);
-  EXPECT_TRUE(turbo::is_trivially_copy_assignable<Trivial&>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<Trivial&&>::value);
+  EXPECT_TRUE(std::is_trivially_copy_assignable<Trivial&>::value);
 }
 
 TEST(TypeTraitsTest, TestTriviallyCopyable) {
   // Verify that arithmetic types and pointers are trivially copyable.
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<bool>::value);
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<char>::value);
+  EXPECT_TRUE(std::is_trivially_copyable<bool>::value);
+  EXPECT_TRUE(std::is_trivially_copyable<char>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<unsigned char>::value);
+      std::is_trivially_copyable<unsigned char>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<signed char>::value);
+      std::is_trivially_copyable<signed char>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<wchar_t>::value);
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<int>::value);
+      std::is_trivially_copyable<wchar_t>::value);
+  EXPECT_TRUE(std::is_trivially_copyable<int>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<unsigned int>::value);
+      std::is_trivially_copyable<unsigned int>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<int16_t>::value);
+      std::is_trivially_copyable<int16_t>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<uint16_t>::value);
+      std::is_trivially_copyable<uint16_t>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<int64_t>::value);
+      std::is_trivially_copyable<int64_t>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<uint64_t>::value);
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<float>::value);
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<double>::value);
+      std::is_trivially_copyable<uint64_t>::value);
+  EXPECT_TRUE(std::is_trivially_copyable<float>::value);
+  EXPECT_TRUE(std::is_trivially_copyable<double>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<long double>::value);
+      std::is_trivially_copyable<long double>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<std::string*>::value);
+      std::is_trivially_copyable<std::string*>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<Trivial*>::value);
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<
+      std::is_trivially_copyable<Trivial*>::value);
+  EXPECT_TRUE(std::is_trivially_copyable<
               const std::string*>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<const Trivial*>::value);
+      std::is_trivially_copyable<const Trivial*>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<std::string**>::value);
+      std::is_trivially_copyable<std::string**>::value);
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<Trivial**>::value);
+      std::is_trivially_copyable<Trivial**>::value);
 
   // const qualified types are not assignable but are constructible
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<const int>::value);
+      std::is_trivially_copyable<const int>::value);
 
   // Trivial copy constructor/assignment and destructor.
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<Trivial>::value);
+      std::is_trivially_copyable<Trivial>::value);
   // Trivial copy assignment, but non-trivial copy constructor/destructor.
-  EXPECT_FALSE(turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE(std::is_trivially_copyable<
                TrivialCopyAssign>::value);
   // Trivial copy constructor, but non-trivial assignment.
-  EXPECT_FALSE(turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE(std::is_trivially_copyable<
                TrivialCopyCtor>::value);
 
   // Types with a non-trivial copy constructor/assignment
-  EXPECT_FALSE(turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE(std::is_trivially_copyable<
                NontrivialCopyCtor>::value);
-  EXPECT_FALSE(turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE(std::is_trivially_copyable<
                NontrivialCopyAssign>::value);
 
   // Types without copy constructor/assignment, but with move
   // MSVC disagrees with other compilers about this:
-  // EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<
+  // EXPECT_TRUE(std::is_trivially_copyable<
   //             MovableNonCopyable>::value);
 
   // Types without copy/move constructor/assignment
-  EXPECT_FALSE(turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE(std::is_trivially_copyable<
                NonCopyableOrMovable>::value);
 
   // No copy assign, but has trivial copy constructor.
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_TRUE(std::is_trivially_copyable<
               DeletedCopyAssign>::value);
 
   // types with vtables
-  EXPECT_FALSE(turbo::type_traits_internal::is_trivially_copyable<Base>::value);
+  EXPECT_FALSE(std::is_trivially_copyable<Base>::value);
 
   // Verify that simple_pair is trivially copyable if members are
-  EXPECT_TRUE((turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_TRUE((std::is_trivially_copyable<
                simple_pair<int, char*>>::value));
-  EXPECT_TRUE((turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_TRUE((std::is_trivially_copyable<
                simple_pair<int, Trivial>>::value));
 
   // Verify that types not trivially copyable are
   // correctly marked as such.
   EXPECT_FALSE(
-      turbo::type_traits_internal::is_trivially_copyable<std::string>::value);
-  EXPECT_FALSE(turbo::type_traits_internal::is_trivially_copyable<
+      std::is_trivially_copyable<std::string>::value);
+  EXPECT_FALSE(std::is_trivially_copyable<
                std::vector<int>>::value);
 
   // Verify that simple_pairs of types not trivially copyable
   // are not marked as trivial.
-  EXPECT_FALSE((turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE((std::is_trivially_copyable<
                 simple_pair<int, std::string>>::value));
-  EXPECT_FALSE((turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE((std::is_trivially_copyable<
                 simple_pair<std::string, int>>::value));
-  EXPECT_FALSE((turbo::type_traits_internal::is_trivially_copyable<
+  EXPECT_FALSE((std::is_trivially_copyable<
                 simple_pair<int, TrivialCopyAssign>>::value));
 
   // Verify that arrays of trivially copyable types are trivially copyable
   using int10 = int[10];
-  EXPECT_TRUE(turbo::type_traits_internal::is_trivially_copyable<int10>::value);
+  EXPECT_TRUE(std::is_trivially_copyable<int10>::value);
   using int10x10 = int[10][10];
   EXPECT_TRUE(
-      turbo::type_traits_internal::is_trivially_copyable<int10x10>::value);
+      std::is_trivially_copyable<int10x10>::value);
 
   // Verify that references are handled correctly
   EXPECT_FALSE(
-      turbo::type_traits_internal::is_trivially_copyable<Trivial&&>::value);
+      std::is_trivially_copyable<Trivial&&>::value);
   EXPECT_FALSE(
-      turbo::type_traits_internal::is_trivially_copyable<Trivial&>::value);
+      std::is_trivially_copyable<Trivial&>::value);
 }
 
 TEST(TypeTraitsTest, TestRemoveCVRef) {
@@ -976,7 +976,7 @@ TEST(TypeTraitsTest, TestRemoveCVRef) {
 
 #define TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(trait_name, ...)          \
   EXPECT_TRUE((std::is_same<typename std::trait_name<__VA_ARGS__>::type, \
-                            turbo::trait_name##_t<__VA_ARGS__>>::value))
+                            std::trait_name##_t<__VA_ARGS__>>::value))
 
 TEST(TypeTraitsTest, TestRemoveCVAliases) {
   TURBO_INTERNAL_EXPECT_ALIAS_EQUIVALENCE(remove_cv, int);
@@ -1174,19 +1174,19 @@ enum class TypeEnum { A, B, C, D };
 
 struct GetTypeT {
   template <typename T,
-            turbo::enable_if_t<std::is_same<T, TypeA>::value, int> = 0>
+            std::enable_if_t<std::is_same<T, TypeA>::value, int> = 0>
   TypeEnum operator()(Wrap<T>) const {
     return TypeEnum::A;
   }
 
   template <typename T,
-            turbo::enable_if_t<std::is_same<T, TypeB>::value, int> = 0>
+            std::enable_if_t<std::is_same<T, TypeB>::value, int> = 0>
   TypeEnum operator()(Wrap<T>) const {
     return TypeEnum::B;
   }
 
   template <typename T,
-            turbo::enable_if_t<std::is_same<T, TypeC>::value, int> = 0>
+            std::enable_if_t<std::is_same<T, TypeC>::value, int> = 0>
   TypeEnum operator()(Wrap<T>) const {
     return TypeEnum::C;
   }
@@ -1242,7 +1242,7 @@ TEST(TypeTraitsTest, TestResultOf) {
 
 template <typename T>
 bool TestCopyAssign() {
-  return turbo::is_copy_assignable<T>::value ==
+  return std::is_copy_assignable<T>::value ==
          std::is_copy_assignable<T>::value;
 }
 
@@ -1279,7 +1279,7 @@ TEST(TypeTraitsTest, IsCopyAssignable) {
 
 template <typename T>
 bool TestMoveAssign() {
-  return turbo::is_move_assignable<T>::value ==
+  return std::is_move_assignable<T>::value ==
          std::is_move_assignable<T>::value;
 }
 

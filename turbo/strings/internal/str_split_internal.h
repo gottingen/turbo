@@ -415,7 +415,7 @@ class Splitter {
     // Inserts the key and an empty value into the map, returning an iterator to
     // the inserted item. We use emplace() if available, otherwise insert().
     template <typename M>
-    static turbo::enable_if_t<HasEmplace<M>::value, iterator> InsertOrEmplace(
+    static std::enable_if_t<HasEmplace<M>::value, iterator> InsertOrEmplace(
         M* m, std::string_view key) {
       // Use piecewise_construct to support old versions of gcc in which pair
       // constructor can't otherwise construct string from std::string_view.
@@ -423,7 +423,7 @@ class Splitter {
                                std::tuple<>()));
     }
     template <typename M>
-    static turbo::enable_if_t<!HasEmplace<M>::value, iterator> InsertOrEmplace(
+    static std::enable_if_t<!HasEmplace<M>::value, iterator> InsertOrEmplace(
         M* m, std::string_view key) {
       return ToIter(m->insert(std::make_pair(First(key), Second(""))));
     }

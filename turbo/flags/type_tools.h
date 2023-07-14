@@ -43,12 +43,12 @@ namespace turbo {
         constexpr enabler dummy = {};
     }  // namespace detail
 
-    /// A copy of enable_if_t from C++14, compatible with C++11.
+    /// A copy of std::enable_if_t from C++14, compatible with C++11.
     ///
     /// We could check to see if C++14 is being used, but it does not hurt to redefine this
     /// (even Google does this: https://github.com/google/skia/blob/main/include/private/SkTLogic.h)
     /// It is not in the std namespace anyway, so no harm done.
-    //template<bool B, class T = void> using enable_if_t = typename std::enable_if<B, T>::type;
+    //template<bool B, class T = void> using std::enable_if_t = typename std::enable_if<B, T>::type;
 
     /// A copy of std::void_t from C++17 (helper for C++11 and C++14)
     //template<typename... Ts>
@@ -56,10 +56,10 @@ namespace turbo {
     //    using type = void;
     //};
 
-    /// A copy of std::void_t from C++17 - same reasoning as enable_if_t, it does not hurt to redefine
+    /// A copy of std::void_t from C++17 - same reasoning as std::enable_if_t, it does not hurt to redefine
     //template<typename... Ts> using void_t = typename make_void<Ts...>::type;
 
-    /// A copy of std::conditional_t from C++14 - same reasoning as enable_if_t, it does not hurt to redefine
+    /// A copy of std::conditional_t from C++14 - same reasoning as std::enable_if_t, it does not hurt to redefine
     template<bool B, class T, class F> using conditional_t = typename std::conditional<B, T, F>::type;
 
     /// Check to see if something is bool (fail check by default)
@@ -257,7 +257,7 @@ namespace turbo {
         };
 
         /// Templated operation to get a value from a stream
-        template<typename T, enable_if_t<is_istreamable<T>::value, detail::enabler> = detail::dummy>
+        template<typename T, std::enable_if_t<is_istreamable<T>::value, detail::enabler> = detail::dummy>
         bool from_stream(const std::string &istring, T &obj) {
             std::istringstream is;
             is.str(istring);
@@ -265,7 +265,7 @@ namespace turbo {
             return !is.fail() && !is.rdbuf()->in_avail();
         }
 
-        template<typename T, enable_if_t<!is_istreamable<T>::value, detail::enabler> = detail::dummy>
+        template<typename T, std::enable_if_t<!is_istreamable<T>::value, detail::enabler> = detail::dummy>
         bool from_stream(const std::string & /*istring*/, T & /*obj*/) {
             return false;
         }
@@ -332,14 +332,14 @@ namespace turbo {
         };
 
         /// Convert an object to a string (directly forward if this can become a string)
-        template<typename T, enable_if_t<std::is_convertible<T, std::string>::value, detail::enabler> = detail::dummy>
+        template<typename T, std::enable_if_t<std::is_convertible<T, std::string>::value, detail::enabler> = detail::dummy>
         auto to_string(T &&value) -> decltype(std::forward<T>(value)) {
             return std::forward<T>(value);
         }
 
         /// Construct a string from the object
         template<typename T,
-                enable_if_t<std::is_constructible<std::string, T>::value && !std::is_convertible<T, std::string>::value,
+                std::enable_if_t<std::is_constructible<std::string, T>::value && !std::is_convertible<T, std::string>::value,
                         detail::enabler> = detail::dummy>
         std::string to_string(const T &value) {
             return std::string(value);  // NOLINT(google-readability-casting)
@@ -347,7 +347,7 @@ namespace turbo {
 
         /// Convert an object to a string (streaming must be supported for that type)
         template<typename T,
-                enable_if_t<
+                std::enable_if_t<
                         !std::is_convertible<std::string, T>::value && !std::is_constructible<std::string, T>::value &&
                         is_ostreamable<T>::value,
                         detail::enabler> = detail::dummy>
@@ -359,7 +359,7 @@ namespace turbo {
 
         /// If conversion is not supported, return an empty string (streaming is not supported for that type)
         template<typename T,
-                enable_if_t<!std::is_constructible<std::string, T>::value && !is_ostreamable<T>::value &&
+                std::enable_if_t<!std::is_constructible<std::string, T>::value && !is_ostreamable<T>::value &&
                             !is_readable_container<typename std::remove_const<T>::type>::value,
                         detail::enabler> = detail::dummy>
         std::string to_string(T &&) {
@@ -368,7 +368,7 @@ namespace turbo {
 
         /// convert a readable container to a string
         template<typename T,
-                enable_if_t<!std::is_constructible<std::string, T>::value && !is_ostreamable<T>::value &&
+                std::enable_if_t<!std::is_constructible<std::string, T>::value && !is_ostreamable<T>::value &&
                             is_readable_container<T>::value,
                         detail::enabler> = detail::dummy>
         std::string to_string(T &&variable) {
@@ -389,7 +389,7 @@ namespace turbo {
         template<typename T1,
                 typename T2,
                 typename T,
-                enable_if_t<std::is_same<T1, T2>::value, detail::enabler> = detail::dummy>
+                std::enable_if_t<std::is_same<T1, T2>::value, detail::enabler> = detail::dummy>
         auto checked_to_string(T &&value) -> decltype(to_string(std::forward<T>(value))) {
             return to_string(std::forward<T>(value));
         }
@@ -398,26 +398,26 @@ namespace turbo {
         template<typename T1,
                 typename T2,
                 typename T,
-                enable_if_t<!std::is_same<T1, T2>::value, detail::enabler> = detail::dummy>
+                std::enable_if_t<!std::is_same<T1, T2>::value, detail::enabler> = detail::dummy>
         std::string checked_to_string(T &&) {
             return std::string{};
         }
 
         /// get a string as a convertible value for arithmetic types
-        template<typename T, enable_if_t<std::is_arithmetic<T>::value, detail::enabler> = detail::dummy>
+        template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, detail::enabler> = detail::dummy>
         std::string value_string(const T &value) {
             return std::to_string(value);
         }
 
         /// get a string as a convertible value for enumerations
-        template<typename T, enable_if_t<std::is_enum<T>::value, detail::enabler> = detail::dummy>
+        template<typename T, std::enable_if_t<std::is_enum<T>::value, detail::enabler> = detail::dummy>
         std::string value_string(const T &value) {
             return std::to_string(static_cast<typename std::underlying_type<T>::type>(value));
         }
 
         /// for other types just use the regular to_string function
         template<typename T,
-                enable_if_t<!std::is_enum<T>::value && !std::is_arithmetic<T>::value, detail::enabler> = detail::dummy>
+                std::enable_if_t<!std::is_enum<T>::value && !std::is_arithmetic<T>::value, detail::enabler> = detail::dummy>
         auto value_string(const T &value) -> decltype(to_string(value)) {
             return to_string(value);
         }
@@ -789,13 +789,13 @@ namespace turbo {
         /// But this is cleaner and works better in this case
 
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::char_value, detail::enabler> = detail::dummy>
+                std::enable_if_t<classify_object<T>::value == object_category::char_value, detail::enabler> = detail::dummy>
         constexpr const char *type_name() {
             return "CHAR";
         }
 
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::integral_value ||
+                std::enable_if_t<classify_object<T>::value == object_category::integral_value ||
                             classify_object<T>::value == object_category::integer_constructible,
                         detail::enabler> = detail::dummy>
         constexpr const char *type_name() {
@@ -803,14 +803,14 @@ namespace turbo {
         }
 
         template<typename T,
-                enable_if_t<classify_object<T>::value ==
+                std::enable_if_t<classify_object<T>::value ==
                             object_category::unsigned_integral, detail::enabler> = detail::dummy>
         constexpr const char *type_name() {
             return "UINT";
         }
 
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::floating_point ||
+                std::enable_if_t<classify_object<T>::value == object_category::floating_point ||
                             classify_object<T>::value == object_category::number_constructible ||
                             classify_object<T>::value == object_category::double_constructible,
                         detail::enabler> = detail::dummy>
@@ -820,14 +820,14 @@ namespace turbo {
 
         /// Print name for enumeration types
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::enumeration, detail::enabler> = detail::dummy>
+                std::enable_if_t<classify_object<T>::value == object_category::enumeration, detail::enabler> = detail::dummy>
         constexpr const char *type_name() {
             return "ENUM";
         }
 
         /// Print name for enumeration types
         template<typename T,
-                enable_if_t<
+                std::enable_if_t<
                         classify_object<T>::value == object_category::boolean_value, detail::enabler> = detail::dummy>
         constexpr const char *type_name() {
             return "BOOLEAN";
@@ -835,7 +835,7 @@ namespace turbo {
 
         /// Print name for enumeration types
         template<typename T,
-                enable_if_t<
+                std::enable_if_t<
                         classify_object<T>::value == object_category::complex_number, detail::enabler> = detail::dummy>
         constexpr const char *type_name() {
             return "COMPLEX";
@@ -843,7 +843,7 @@ namespace turbo {
 
         /// Print for all other types
         template<typename T,
-                enable_if_t<classify_object<T>::value >= object_category::string_assignable &&
+                std::enable_if_t<classify_object<T>::value >= object_category::string_assignable &&
                             classify_object<T>::value <= object_category::other,
                         detail::enabler> = detail::dummy>
         constexpr const char *type_name() {
@@ -852,20 +852,20 @@ namespace turbo {
 
         /// typename for tuple value
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::tuple_value && type_count_base<T>::value >= 2,
+                std::enable_if_t<classify_object<T>::value == object_category::tuple_value && type_count_base<T>::value >= 2,
                         detail::enabler> = detail::dummy>
         std::string type_name();  // forward declaration
 
         /// Generate type name for a wrapper or container value
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::container_value ||
+                std::enable_if_t<classify_object<T>::value == object_category::container_value ||
                             classify_object<T>::value == object_category::wrapper_value,
                         detail::enabler> = detail::dummy>
         std::string type_name();  // forward declaration
 
         /// Print name for single element tuple types
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::tuple_value && type_count_base<T>::value == 1,
+                std::enable_if_t<classify_object<T>::value == object_category::tuple_value && type_count_base<T>::value == 1,
                         detail::enabler> = detail::dummy>
         inline std::string type_name() {
             return type_name<typename std::decay<typename std::tuple_element<0, T>::type>::type>();
@@ -890,7 +890,7 @@ namespace turbo {
 
         /// Print type name for tuples with 2 or more elements
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::tuple_value && type_count_base<T>::value >= 2,
+                std::enable_if_t<classify_object<T>::value == object_category::tuple_value && type_count_base<T>::value >= 2,
                         detail::enabler>>
         inline std::string type_name() {
             auto tname = std::string(1, '[') + tuple_name<T, 0>();
@@ -900,7 +900,7 @@ namespace turbo {
 
         /// get the type name for a type that has a value_type member
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::container_value ||
+                std::enable_if_t<classify_object<T>::value == object_category::container_value ||
                             classify_object<T>::value == object_category::wrapper_value,
                         detail::enabler>>
         inline std::string type_name() {
@@ -910,7 +910,7 @@ namespace turbo {
         // Lexical cast
 
         /// Convert to an unsigned integral
-        template<typename T, enable_if_t<std::is_unsigned<T>::value, detail::enabler> = detail::dummy>
+        template<typename T, std::enable_if_t<std::is_unsigned<T>::value, detail::enabler> = detail::dummy>
         bool integral_conversion(const std::string &input, T &output) noexcept {
             if (input.empty() || input.front() == '-') {
                 return false;
@@ -935,7 +935,7 @@ namespace turbo {
         }
 
         /// Convert to a signed integral
-        template<typename T, enable_if_t<std::is_signed<T>::value, detail::enabler> = detail::dummy>
+        template<typename T, std::enable_if_t<std::is_signed<T>::value, detail::enabler> = detail::dummy>
         bool integral_conversion(const std::string &input, T &output) noexcept {
             if (input.empty()) {
                 return false;
@@ -1003,7 +1003,7 @@ namespace turbo {
 
         /// Integer conversion
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::integral_value ||
+                std::enable_if_t<classify_object<T>::value == object_category::integral_value ||
                             classify_object<T>::value == object_category::unsigned_integral,
                         detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
@@ -1012,7 +1012,7 @@ namespace turbo {
 
         /// char values
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::char_value, detail::enabler> = detail::dummy>
+                std::enable_if_t<classify_object<T>::value == object_category::char_value, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             if (input.size() == 1) {
                 output = static_cast<T>(input[0]);
@@ -1023,7 +1023,7 @@ namespace turbo {
 
         /// Boolean values
         template<typename T,
-                enable_if_t<
+                std::enable_if_t<
                         classify_object<T>::value == object_category::boolean_value, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             try {
@@ -1042,7 +1042,7 @@ namespace turbo {
 
         /// Floats
         template<typename T,
-                enable_if_t<
+                std::enable_if_t<
                         classify_object<T>::value == object_category::floating_point, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             if (input.empty()) {
@@ -1056,7 +1056,7 @@ namespace turbo {
 
         /// complex
         template<typename T,
-                enable_if_t<
+                std::enable_if_t<
                         classify_object<T>::value == object_category::complex_number, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             using XC = typename wrapped_type<T, double>::type;
@@ -1089,7 +1089,7 @@ namespace turbo {
 
         /// String and similar direct assignment
         template<typename T,
-                enable_if_t<classify_object<T>::value ==
+                std::enable_if_t<classify_object<T>::value ==
                             object_category::string_assignable, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             output = input;
@@ -1099,7 +1099,7 @@ namespace turbo {
         /// String and similar constructible and copy assignment
         template<
                 typename T,
-                enable_if_t<classify_object<T>::value ==
+                std::enable_if_t<classify_object<T>::value ==
                             object_category::string_constructible, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             output = T(input);
@@ -1108,7 +1108,7 @@ namespace turbo {
 
         /// Enumerations
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::enumeration, detail::enabler> = detail::dummy>
+                std::enable_if_t<classify_object<T>::value == object_category::enumeration, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             typename std::underlying_type<T>::type val;
             if (!integral_conversion(input, val)) {
@@ -1120,7 +1120,7 @@ namespace turbo {
 
         /// wrapper types
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::wrapper_value &&
+                std::enable_if_t<classify_object<T>::value == object_category::wrapper_value &&
                             std::is_assignable<T &, typename T::value_type>::value,
                         detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
@@ -1133,7 +1133,7 @@ namespace turbo {
         }
 
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::wrapper_value &&
+                std::enable_if_t<classify_object<T>::value == object_category::wrapper_value &&
                             !std::is_assignable<T &, typename T::value_type>::value &&
                             std::is_assignable<T &, T>::value,
                         detail::enabler> = detail::dummy>
@@ -1149,7 +1149,7 @@ namespace turbo {
         /// Assignable from double or int
         template<
                 typename T,
-                enable_if_t<classify_object<T>::value ==
+                std::enable_if_t<classify_object<T>::value ==
                             object_category::number_constructible, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             int val = 0;
@@ -1170,7 +1170,7 @@ namespace turbo {
         /// Assignable from int
         template<
                 typename T,
-                enable_if_t<classify_object<T>::value ==
+                std::enable_if_t<classify_object<T>::value ==
                             object_category::integer_constructible, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             int val = 0;
@@ -1184,7 +1184,7 @@ namespace turbo {
         /// Assignable from double
         template<
                 typename T,
-                enable_if_t<classify_object<T>::value ==
+                std::enable_if_t<classify_object<T>::value ==
                             object_category::double_constructible, detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             double val = 0.0;
@@ -1197,7 +1197,7 @@ namespace turbo {
 
         /// Non-string convertible from an int
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::other && std::is_assignable<T &, int>::value,
+                std::enable_if_t<classify_object<T>::value == object_category::other && std::is_assignable<T &, int>::value,
                         detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             int val = 0;
@@ -1223,7 +1223,7 @@ namespace turbo {
 
         /// Non-string parsable by a stream
         template<typename T,
-                enable_if_t<classify_object<T>::value == object_category::other && !std::is_assignable<T &, int>::value,
+                std::enable_if_t<classify_object<T>::value == object_category::other && !std::is_assignable<T &, int>::value,
                         detail::enabler> = detail::dummy>
         bool lexical_cast(const std::string &input, T &output) {
             static_assert(is_istreamable<T>::value,
@@ -1236,7 +1236,7 @@ namespace turbo {
         /// Strings can be empty so we need to do a little different
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<std::is_same<AssignTo, ConvertTo>::value &&
+                std::enable_if_t<std::is_same<AssignTo, ConvertTo>::value &&
                             (classify_object<AssignTo>::value == object_category::string_assignable ||
                              classify_object<AssignTo>::value == object_category::string_constructible),
                         detail::enabler> = detail::dummy>
@@ -1247,7 +1247,7 @@ namespace turbo {
         /// Assign a value through lexical cast operations
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<
+                std::enable_if_t<
                         std::is_same<AssignTo, ConvertTo>::value && std::is_assignable<AssignTo &, AssignTo>::value &&
                         classify_object<AssignTo>::value != object_category::string_assignable &&
                         classify_object<AssignTo>::value != object_category::string_constructible,
@@ -1264,7 +1264,7 @@ namespace turbo {
         /// Assign a value through lexical cast operations
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<
+                std::enable_if_t<
                         std::is_same<AssignTo, ConvertTo>::value && !std::is_assignable<AssignTo &, AssignTo>::value &&
                         classify_object<AssignTo>::value == object_category::wrapper_value,
                         detail::enabler> = detail::dummy>
@@ -1281,7 +1281,7 @@ namespace turbo {
         /// mainly for atomic operations on some compilers
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<
+                std::enable_if_t<
                         std::is_same<AssignTo, ConvertTo>::value && !std::is_assignable<AssignTo &, AssignTo>::value &&
                         classify_object<AssignTo>::value != object_category::wrapper_value &&
                         std::is_assignable<AssignTo &, int>::value,
@@ -1302,7 +1302,7 @@ namespace turbo {
         /// Assign a value converted from a string in lexical cast to the output value directly
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<
+                std::enable_if_t<
                         !std::is_same<AssignTo, ConvertTo>::value && std::is_assignable<AssignTo &, ConvertTo &>::value,
                         detail::enabler> = detail::dummy>
         bool lexical_assign(const std::string &input, AssignTo &output) {
@@ -1318,7 +1318,7 @@ namespace turbo {
         template<
                 typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<!std::is_same<AssignTo, ConvertTo>::value &&
+                std::enable_if_t<!std::is_same<AssignTo, ConvertTo>::value &&
                             !std::is_assignable<AssignTo &, ConvertTo &>::value &&
                             std::is_move_assignable<AssignTo>::value,
                         detail::enabler> = detail::dummy>
@@ -1334,7 +1334,7 @@ namespace turbo {
         /// primary lexical conversion operation, 1 string to 1 type of some kind
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<classify_object<ConvertTo>::value <= object_category::other &&
+                std::enable_if_t<classify_object<ConvertTo>::value <= object_category::other &&
                             classify_object<AssignTo>::value <= object_category::wrapper_value,
                         detail::enabler> = detail::dummy>
         bool lexical_conversion(const std::vector<std::string> &strings, AssignTo &output) {
@@ -1345,7 +1345,7 @@ namespace turbo {
         /// constructor
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<(type_count<AssignTo>::value <= 2) && expected_count<AssignTo>::value == 1 &&
+                std::enable_if_t<(type_count<AssignTo>::value <= 2) && expected_count<AssignTo>::value == 1 &&
                             is_tuple_like<ConvertTo>::value && type_count_base<ConvertTo>::value == 2,
                         detail::enabler> = detail::dummy>
         bool lexical_conversion(const std::vector<std::string> &strings, AssignTo &output) {
@@ -1365,7 +1365,7 @@ namespace turbo {
         /// Lexical conversion of a container types of single elements
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
+                std::enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
                             type_count<ConvertTo>::value == 1,
                         detail::enabler> = detail::dummy>
         bool lexical_conversion(const std::vector<std::string> &strings, AssignTo &output) {
@@ -1392,7 +1392,7 @@ namespace turbo {
         }
 
         /// Lexical conversion for complex types
-        template<class AssignTo, class ConvertTo, enable_if_t<is_complex<ConvertTo>::value, detail::enabler> = detail::dummy>
+        template<class AssignTo, class ConvertTo, std::enable_if_t<is_complex<ConvertTo>::value, detail::enabler> = detail::dummy>
         bool lexical_conversion(const std::vector<std::string> &strings, AssignTo &output) {
 
             if (strings.size() >= 2 && !strings[1].empty()) {
@@ -1414,7 +1414,7 @@ namespace turbo {
         /// Conversion to a vector type using a particular single type as the conversion type
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_mutable_container<AssignTo>::value && (expected_count<ConvertTo>::value == 1) &&
+                std::enable_if_t<is_mutable_container<AssignTo>::value && (expected_count<ConvertTo>::value == 1) &&
                             (type_count<ConvertTo>::value == 1),
                         detail::enabler> = detail::dummy>
         bool lexical_conversion(const std::vector<std::string> &strings, AssignTo &output) {
@@ -1434,7 +1434,7 @@ namespace turbo {
         /// Lexical conversion of a container types with conversion type of two elements
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
+                std::enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
                             type_count_base<ConvertTo>::value == 2,
                         detail::enabler> = detail::dummy>
         bool lexical_conversion(std::vector<std::string> strings, AssignTo &output);
@@ -1442,7 +1442,7 @@ namespace turbo {
         /// Lexical conversion of a vector types with type_size >2 forward declaration
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
+                std::enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
                             type_count_base<ConvertTo>::value != 2 &&
                             ((type_count<ConvertTo>::value > 2) ||
                              (type_count<ConvertTo>::value > type_count_base<ConvertTo>::value)),
@@ -1452,7 +1452,7 @@ namespace turbo {
         /// Conversion for tuples
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_tuple_like<AssignTo>::value && is_tuple_like<ConvertTo>::value &&
+                std::enable_if_t<is_tuple_like<AssignTo>::value && is_tuple_like<ConvertTo>::value &&
                             (type_count_base<ConvertTo>::value != type_count<ConvertTo>::value ||
                              type_count<ConvertTo>::value > 2),
                         detail::enabler> = detail::dummy>
@@ -1462,7 +1462,7 @@ namespace turbo {
         /// tuple
         template<typename AssignTo,
                 typename ConvertTo,
-                enable_if_t<!is_tuple_like<AssignTo>::value && !is_mutable_container<AssignTo>::value &&
+                std::enable_if_t<!is_tuple_like<AssignTo>::value && !is_mutable_container<AssignTo>::value &&
                             classify_object<ConvertTo>::value != object_category::wrapper_value &&
                             (is_mutable_container<ConvertTo>::value || type_count<ConvertTo>::value > 2),
                         detail::enabler> = detail::dummy>
@@ -1549,7 +1549,7 @@ namespace turbo {
         /// Lexical conversion of a container types with tuple elements of size 2
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
+                std::enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
                             type_count_base<ConvertTo>::value == 2,
                         detail::enabler>>
         bool lexical_conversion(std::vector<std::string> strings, AssignTo &output) {
@@ -1574,7 +1574,7 @@ namespace turbo {
         /// lexical conversion of tuples with type count>2 or tuples of types of some element with a type size>=2
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_tuple_like<AssignTo>::value && is_tuple_like<ConvertTo>::value &&
+                std::enable_if_t<is_tuple_like<AssignTo>::value && is_tuple_like<ConvertTo>::value &&
                             (type_count_base<ConvertTo>::value != type_count<ConvertTo>::value ||
                              type_count<ConvertTo>::value > 2),
                         detail::enabler>>
@@ -1589,7 +1589,7 @@ namespace turbo {
         /// Lexical conversion of a vector types for everything but tuples of two elements and types of size 1
         template<class AssignTo,
                 class ConvertTo,
-                enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
+                std::enable_if_t<is_mutable_container<AssignTo>::value && is_mutable_container<ConvertTo>::value &&
                             type_count_base<ConvertTo>::value != 2 &&
                             ((type_count<ConvertTo>::value > 2) ||
                              (type_count<ConvertTo>::value > type_count_base<ConvertTo>::value)),
@@ -1628,7 +1628,7 @@ namespace turbo {
         /// conversion for wrapper types
         template<typename AssignTo,
                 class ConvertTo,
-                enable_if_t<classify_object<ConvertTo>::value == object_category::wrapper_value &&
+                std::enable_if_t<classify_object<ConvertTo>::value == object_category::wrapper_value &&
                             std::is_assignable<ConvertTo &, ConvertTo>::value,
                         detail::enabler> = detail::dummy>
         bool lexical_conversion(const std::vector<std::string> &strings, AssignTo &output) {
@@ -1647,7 +1647,7 @@ namespace turbo {
         /// conversion for wrapper types
         template<typename AssignTo,
                 class ConvertTo,
-                enable_if_t<classify_object<ConvertTo>::value == object_category::wrapper_value &&
+                std::enable_if_t<classify_object<ConvertTo>::value == object_category::wrapper_value &&
                             !std::is_assignable<AssignTo &, ConvertTo>::value,
                         detail::enabler> = detail::dummy>
         bool lexical_conversion(const std::vector<std::string> &strings, AssignTo &output) {

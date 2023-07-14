@@ -242,11 +242,11 @@ class TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTuple
       : CompressedTuple::CompressedTupleImpl(turbo::in_place, base...) {}
 
   template <typename First, typename... Vs,
-            turbo::enable_if_t<
+            std::enable_if_t<
                 turbo::conjunction<
                     // Ensure we are not hiding default copy/move constructors.
                     turbo::negation<std::is_same<void(CompressedTuple),
-                                                void(turbo::decay_t<First>)>>,
+                                                void(std::decay_t<First>)>>,
                     internal_compressed_tuple::TupleItemsMoveConstructible<
                         CompressedTuple<Ts...>, First, Vs...>>::value,
                 bool> = true>

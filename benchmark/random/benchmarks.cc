@@ -100,7 +100,7 @@ using use_default_initialization = std::false_type;
 // either via the default constructor, when use_default_initialization<T>
 // is true, or via the indicated seed sequence, SSeq.
 template <typename Engine, typename SSeq = PrecompiledSeedSeq>
-typename turbo::enable_if_t<!use_default_initialization<Engine>::value, Engine>
+typename std::enable_if_t<!use_default_initialization<Engine>::value, Engine>
 make_engine() {
   // Initialize the random engine using the seed sequence SSeq, which
   // is constructed from the precompiled seed data.
@@ -109,7 +109,7 @@ make_engine() {
 }
 
 template <typename Engine, typename SSeq = PrecompiledSeedSeq>
-typename turbo::enable_if_t<use_default_initialization<Engine>::value, Engine>
+typename std::enable_if_t<use_default_initialization<Engine>::value, Engine>
 make_engine() {
   // Initialize the random engine using the default constructor.
   return Engine();

@@ -48,21 +48,21 @@ struct IsSpecializationImpl : std::false_type {};
 template <template <typename...> class T, typename... Args>
 struct IsSpecializationImpl<T<Args...>, T> : std::true_type {};
 template <typename C, template <typename...> class T>
-using IsSpecialization = IsSpecializationImpl<turbo::decay_t<C>, T>;
+using IsSpecialization = IsSpecializationImpl<std::decay_t<C>, T>;
 
 template <typename C>
 struct IsArrayImpl : std::false_type {};
 template <template <typename, size_t> class A, typename T, size_t N>
 struct IsArrayImpl<A<T, N>> : std::is_same<A<T, N>, std::array<T, N>> {};
 template <typename C>
-using IsArray = IsArrayImpl<turbo::decay_t<C>>;
+using IsArray = IsArrayImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsBitsetImpl : std::false_type {};
 template <template <size_t> class B, size_t N>
 struct IsBitsetImpl<B<N>> : std::is_same<B<N>, std::bitset<N>> {};
 template <typename C>
-using IsBitset = IsBitsetImpl<turbo::decay_t<C>>;
+using IsBitset = IsBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsSTLContainer
@@ -123,7 +123,7 @@ struct IsBaseOfSpecializationImpl<
                            typename C::hasher, typename C::key_equal,
                            typename C::allocator_type>> {};
 template <typename C, template <typename...> class T>
-using IsBaseOfSpecialization = IsBaseOfSpecializationImpl<turbo::decay_t<C>, T>;
+using IsBaseOfSpecialization = IsBaseOfSpecializationImpl<std::decay_t<C>, T>;
 
 template <typename C>
 struct IsBaseOfArrayImpl : std::false_type {};
@@ -131,14 +131,14 @@ template <template <typename, size_t> class A, typename T, size_t N>
 struct IsBaseOfArrayImpl<A<T, N>> : std::is_base_of<A<T, N>, std::array<T, N>> {
 };
 template <typename C>
-using IsBaseOfArray = IsBaseOfArrayImpl<turbo::decay_t<C>>;
+using IsBaseOfArray = IsBaseOfArrayImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsBaseOfBitsetImpl : std::false_type {};
 template <template <size_t> class B, size_t N>
 struct IsBaseOfBitsetImpl<B<N>> : std::is_base_of<B<N>, std::bitset<N>> {};
 template <typename C>
-using IsBaseOfBitset = IsBaseOfBitsetImpl<turbo::decay_t<C>>;
+using IsBaseOfBitset = IsBaseOfBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsBaseOfSTLContainer
@@ -201,7 +201,7 @@ struct IsConvertibleToSpecializationImpl<
                                typename C::allocator_type>> {};
 template <typename C, template <typename...> class T>
 using IsConvertibleToSpecialization =
-    IsConvertibleToSpecializationImpl<turbo::decay_t<C>, T>;
+    IsConvertibleToSpecializationImpl<std::decay_t<C>, T>;
 
 template <typename C>
 struct IsConvertibleToArrayImpl : std::false_type {};
@@ -209,7 +209,7 @@ template <template <typename, size_t> class A, typename T, size_t N>
 struct IsConvertibleToArrayImpl<A<T, N>>
     : std::is_convertible<A<T, N>, std::array<T, N>> {};
 template <typename C>
-using IsConvertibleToArray = IsConvertibleToArrayImpl<turbo::decay_t<C>>;
+using IsConvertibleToArray = IsConvertibleToArrayImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsConvertibleToBitsetImpl : std::false_type {};
@@ -217,7 +217,7 @@ template <template <size_t> class B, size_t N>
 struct IsConvertibleToBitsetImpl<B<N>>
     : std::is_convertible<B<N>, std::bitset<N>> {};
 template <typename C>
-using IsConvertibleToBitset = IsConvertibleToBitsetImpl<turbo::decay_t<C>>;
+using IsConvertibleToBitset = IsConvertibleToBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsConvertibleToSTLContainer

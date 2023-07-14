@@ -123,7 +123,7 @@ exponential_distribution<RealType>::operator()(
   using random_internal::GenerateNegativeTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      turbo::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      std::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   const result_type u = GenerateRealFromBits<real_type, GenerateNegativeTag,
                                              false>(fast_u64_(g));  // U(-1, 0)

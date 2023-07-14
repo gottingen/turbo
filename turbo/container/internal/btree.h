@@ -223,7 +223,7 @@ struct key_compare_adapter {
     explicit operator Compare() const { return comp(); }
 
     template <typename T, typename U,
-              turbo::enable_if_t<
+              std::enable_if_t<
                   std::is_same<bool, compare_result_t<Compare, T, U>>::value,
                   int> = 0>
     bool operator()(const T &lhs, const U &rhs) const {
@@ -239,7 +239,7 @@ struct key_compare_adapter {
 
     template <
         typename T, typename U,
-        turbo::enable_if_t<std::is_convertible<compare_result_t<Compare, T, U>,
+        std::enable_if_t<std::is_convertible<compare_result_t<Compare, T, U>,
                                               turbo::weak_ordering>::value,
                           int> = 0>
     turbo::weak_ordering operator()(const T &lhs, const U &rhs) const {
@@ -262,7 +262,7 @@ struct key_compare_adapter {
       return lhs_comp_rhs;
     }
   };
-  using type = turbo::conditional_t<
+  using type = std::conditional_t<
       std::is_base_of<BtreeTestOnlyCheckedCompareOptOutBase, Compare>::value,
       Compare, checked_compare>;
 };
@@ -369,7 +369,7 @@ struct common_params : common_policy_traits<SlotPolicy> {
   // this, then there will be cascading compilation failures that are confusing
   // for users.
   using key_compare =
-      turbo::conditional_t<!compare_has_valid_result_type<Compare, Key>(),
+      std::conditional_t<!compare_has_valid_result_type<Compare, Key>(),
                           Compare,
                           typename key_compare_adapter<Compare, Key>::type>;
 
@@ -404,7 +404,7 @@ struct common_params : common_policy_traits<SlotPolicy> {
   using const_reference = const value_type &;
 
   using value_compare =
-      turbo::conditional_t<IsMap,
+      std::conditional_t<IsMap,
                           map_value_compare<original_key_compare, value_type>,
                           original_key_compare>;
   using is_map_container = std::integral_constant<bool, IsMap>;
@@ -436,7 +436,7 @@ struct common_params : common_policy_traits<SlotPolicy> {
   // This is an integral type large enough to hold as many slots as will fit a
   // node of TargetNodeSize bytes.
   using node_count_type =
-      turbo::conditional_t<(kNodeSlotSpace / sizeof(slot_type) >
+      std::conditional_t<(kNodeSlotSpace / sizeof(slot_type) >
                            (std::numeric_limits<uint8_t>::max)()),
                           uint16_t, uint8_t>;  // NOLINT
 };
@@ -1112,7 +1112,7 @@ class btree_iterator : private btree_iterator_generation_info {
   // const_iterator, but it specifically avoids hiding the copy constructor so
   // that the trivial one will be used when possible.
   template <typename N, typename R, typename P,
-            turbo::enable_if_t<
+            std::enable_if_t<
                 std::is_same<btree_iterator<N, R, P>, iterator>::value &&
                     std::is_same<btree_iterator, const_iterator>::value,
                 int> = 0>
@@ -1198,7 +1198,7 @@ class btree_iterator : private btree_iterator_generation_info {
   // NOTE: the const_cast is safe because this constructor is only called by
   // non-const methods and the container owns the nodes.
   template <typename N, typename R, typename P,
-            turbo::enable_if_t<
+            std::enable_if_t<
                 std::is_same<btree_iterator<N, R, P>, const_iterator>::value &&
                     std::is_same<btree_iterator, iterator>::value,
                 int> = 0>
@@ -2180,7 +2180,7 @@ constexpr bool btree<P>::static_assert_validation() {
                 "Key comparison must be nothrow copy constructible");
   static_assert(std::is_nothrow_copy_constructible<allocator_type>::value,
                 "Allocator must be nothrow copy constructible");
-  static_assert(type_traits_internal::is_trivially_copyable<iterator>::value,
+  static_assert(std::is_trivially_copyable<iterator>::value,
                 "iterator not trivially copyable.");
 
   // Note: We assert that kTargetValues, which is computed from

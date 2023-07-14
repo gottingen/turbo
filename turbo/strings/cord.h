@@ -151,7 +151,7 @@ namespace turbo {
     private:
         template<typename T>
         using EnableIfString =
-                turbo::enable_if_t<std::is_same<T, std::string>::value, int>;
+                std::enable_if_t<std::is_same<T, std::string>::value, int>;
 
     public:
         // Cord::Cord() Constructors.
@@ -1096,7 +1096,7 @@ namespace turbo {
 // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
         CordRep *NewExternalRep(std::string_view data, Releaser &&releaser) {
             assert(!data.empty());
-            using ReleaserType = turbo::decay_t<Releaser>;
+            using ReleaserType = std::decay_t<Releaser>;
             CordRepExternal *rep = new CordRepExternalImpl<ReleaserType>(
                     std::forward<Releaser>(releaser), 0);
             InitializeCordRepExternal(data, rep);
@@ -1121,7 +1121,7 @@ namespace turbo {
                                                data, std::forward<Releaser>(releaser)),
                                        Cord::MethodIdentifier::kMakeCordFromExternal);
         } else {
-            using ReleaserType = turbo::decay_t<Releaser>;
+            using ReleaserType = std::decay_t<Releaser>;
             cord_internal::InvokeReleaser(
                     cord_internal::Rank0{}, ReleaserType(std::forward<Releaser>(releaser)),
                     data);

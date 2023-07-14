@@ -152,8 +152,8 @@ using std::bit_cast;
 template <typename Dest, typename Source,
           typename std::enable_if<
               sizeof(Dest) == sizeof(Source) &&
-                  type_traits_internal::is_trivially_copyable<Source>::value &&
-                  type_traits_internal::is_trivially_copyable<Dest>::value
+                  std::is_trivially_copyable<Source>::value &&
+                  std::is_trivially_copyable<Dest>::value
 #if !TURBO_HAVE_BUILTIN(__builtin_bit_cast)
                   && std::is_default_constructible<Dest>::value
 #endif  // !TURBO_HAVE_BUILTIN(__builtin_bit_cast)

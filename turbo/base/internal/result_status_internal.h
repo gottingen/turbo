@@ -68,7 +68,7 @@ using IsConstructibleOrConvertibleOrAssignableFromResultStatus =
 // when `U` is `ResultStatus<V>` and `T` is constructible or convertible from `V`.
 template <typename T, typename U>
 struct IsDirectInitializationAmbiguous
-    : public turbo::conditional_t<
+    : public std::conditional_t<
           std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
@@ -106,7 +106,7 @@ using IsDirectInitializationValid = turbo::disjunction<
 //   s1 = s2;  // ambiguous, `s1 = s2.ValueOrDie()` or `s1 = bool(s2)`?
 template <typename T, typename U>
 struct IsForwardingAssignmentAmbiguous
-    : public turbo::conditional_t<
+    : public std::conditional_t<
           std::is_same<std::remove_cv_t<std::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
@@ -210,7 +210,7 @@ class ResultStatusData {
   }
 
   template <typename U,
-            turbo::enable_if_t<std::is_constructible<turbo::Status, U&&>::value,
+            std::enable_if_t<std::is_constructible<turbo::Status, U&&>::value,
                               int> = 0>
   explicit ResultStatusData(U&& v) : status_(std::forward<U>(v)) {
     EnsureNotOk();

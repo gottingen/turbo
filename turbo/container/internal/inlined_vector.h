@@ -78,9 +78,9 @@ using IsAtLeastForwardIterator = std::is_convertible<
 template <typename A>
 using IsMemcpyOk =
     turbo::conjunction<std::is_same<A, std::allocator<ValueType<A>>>,
-                      turbo::is_trivially_copy_constructible<ValueType<A>>,
-                      turbo::is_trivially_copy_assignable<ValueType<A>>,
-                      turbo::is_trivially_destructible<ValueType<A>>>;
+                      std::is_trivially_copy_constructible<ValueType<A>>,
+                      std::is_trivially_copy_assignable<ValueType<A>>,
+                      std::is_trivially_destructible<ValueType<A>>>;
 
 template <typename A>
 using IsMoveAssignOk = std::is_move_assignable<ValueType<A>>;
@@ -98,7 +98,7 @@ template <typename T>
 using NoTypeDeduction = typename TypeIdentity<T>::type;
 
 template <typename A, bool IsTriviallyDestructible =
-                          turbo::is_trivially_destructible<ValueType<A>>::value>
+                          std::is_trivially_destructible<ValueType<A>>::value>
 struct DestroyAdapter;
 
 template <typename A>
@@ -306,13 +306,13 @@ class Storage {
   struct ElementwiseSwapPolicy {};
   struct ElementwiseConstructPolicy {};
 
-  using MoveAssignmentPolicy = turbo::conditional_t<
+  using MoveAssignmentPolicy = std::conditional_t<
       IsMemcpyOk<A>::value, MemcpyPolicy,
-      turbo::conditional_t<IsMoveAssignOk<A>::value, ElementwiseAssignPolicy,
+      std::conditional_t<IsMoveAssignOk<A>::value, ElementwiseAssignPolicy,
                           ElementwiseConstructPolicy>>;
-  using SwapPolicy = turbo::conditional_t<
+  using SwapPolicy = std::conditional_t<
       IsMemcpyOk<A>::value, MemcpyPolicy,
-      turbo::conditional_t<IsSwapOk<A>::value, ElementwiseSwapPolicy,
+      std::conditional_t<IsSwapOk<A>::value, ElementwiseSwapPolicy,
                           ElementwiseConstructPolicy>>;
 
   static SizeType<A> NextCapacity(SizeType<A> current_capacity) {

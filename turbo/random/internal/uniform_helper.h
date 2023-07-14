@@ -76,7 +76,7 @@ namespace random_internal {
 // Return-type for turbo::Uniform() when the return-type is inferred.
 template <typename A, typename B>
 using uniform_inferred_return_t =
-    turbo::enable_if_t<turbo::disjunction<is_widening_convertible<A, B>,
+    std::enable_if_t<turbo::disjunction<is_widening_convertible<A, B>,
                                         is_widening_convertible<B, A>>::value,
                       typename std::conditional<
                           is_widening_convertible<A, B>::value, B, A>::type>;
@@ -98,7 +98,7 @@ using uniform_inferred_return_t =
 //               uniform_upper_bound(IntervalOpenClosed, a, b)]
 //
 template <typename IntType, typename Tag>
-typename turbo::enable_if_t<
+typename std::enable_if_t<
     turbo::conjunction<
         IsIntegral<IntType>,
         turbo::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
@@ -109,7 +109,7 @@ uniform_lower_bound(Tag, IntType a, IntType) {
 }
 
 template <typename FloatType, typename Tag>
-typename turbo::enable_if_t<
+typename std::enable_if_t<
     turbo::conjunction<
         std::is_floating_point<FloatType>,
         turbo::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
@@ -120,7 +120,7 @@ uniform_lower_bound(Tag, FloatType a, FloatType b) {
 }
 
 template <typename NumType, typename Tag>
-typename turbo::enable_if_t<
+typename std::enable_if_t<
     turbo::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
                       std::is_same<Tag, IntervalClosedOpenTag>>::value,
     NumType>
@@ -129,7 +129,7 @@ uniform_lower_bound(Tag, NumType a, NumType) {
 }
 
 template <typename IntType, typename Tag>
-typename turbo::enable_if_t<
+typename std::enable_if_t<
     turbo::conjunction<
         IsIntegral<IntType>,
         turbo::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
@@ -140,7 +140,7 @@ uniform_upper_bound(Tag, IntType, IntType b) {
 }
 
 template <typename FloatType, typename Tag>
-typename turbo::enable_if_t<
+typename std::enable_if_t<
     turbo::conjunction<
         std::is_floating_point<FloatType>,
         turbo::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
@@ -151,7 +151,7 @@ uniform_upper_bound(Tag, FloatType, FloatType b) {
 }
 
 template <typename IntType, typename Tag>
-typename turbo::enable_if_t<
+typename std::enable_if_t<
     turbo::conjunction<
         IsIntegral<IntType>,
         turbo::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
@@ -162,7 +162,7 @@ uniform_upper_bound(Tag, IntType, IntType b) {
 }
 
 template <typename FloatType, typename Tag>
-typename turbo::enable_if_t<
+typename std::enable_if_t<
     turbo::conjunction<
         std::is_floating_point<FloatType>,
         turbo::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
@@ -195,13 +195,13 @@ uniform_upper_bound(Tag, FloatType, FloatType b) {
 // (0, 0] is not legal, but (0, 0+epsilon] is.
 //
 template <typename FloatType>
-turbo::enable_if_t<std::is_floating_point<FloatType>::value, bool>
+std::enable_if_t<std::is_floating_point<FloatType>::value, bool>
 is_uniform_range_valid(FloatType a, FloatType b) {
   return a <= b && std::isfinite(b - a);
 }
 
 template <typename IntType>
-turbo::enable_if_t<IsIntegral<IntType>::value, bool>
+std::enable_if_t<IsIntegral<IntType>::value, bool>
 is_uniform_range_valid(IntType a, IntType b) {
   return a <= b;
 }
