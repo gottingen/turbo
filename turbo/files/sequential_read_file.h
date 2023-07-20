@@ -26,7 +26,7 @@ namespace turbo {
 
     class SequentialReadFile {
     public:
-        SequentialReadFile() noexcept = default;
+        SequentialReadFile() = default;
 
         explicit SequentialReadFile(const FileEventListener &listener);
 
