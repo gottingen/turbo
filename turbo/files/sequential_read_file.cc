@@ -62,6 +62,9 @@ namespace turbo {
         if (_fd == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
+        if(len == 0) {
+            return 0;
+        }
         size_t has_read = 0;
         char *pdata = static_cast<char *>(buff);
         while (has_read < len && !std::feof(_fd)) {
@@ -71,6 +74,9 @@ namespace turbo {
             }
             has_read += n;
         };
+        if(has_read == 0) {
+            return turbo::ReachFileEnd("");
+        }
         return has_read;
     }
 
@@ -110,13 +116,13 @@ namespace turbo {
             }
             len = r.value();
         }
-        auto slice = buf->GetAppendBuffer(len);
+        auto slice = buf->get_append_buffer(len);
         auto rs = read(slice.data(), len);
         if(!rs.ok()) {
             return rs;
         }
         slice.SetLength(rs.value());
-        buf->Append(std::move(slice));
+        buf->append(std::move(slice));
 
         return rs.value();
     }
@@ -143,7 +149,7 @@ namespace turbo {
         return turbo::OkStatus();
     }
 
-    bool SequentialReadFile::is_eof(turbo::Status *frs) {
+    bool SequentialReadFile::is_eof() {
         return std::feof(_fd);
     }
 

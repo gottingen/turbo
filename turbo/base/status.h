@@ -263,6 +263,11 @@ namespace turbo {
     // the authentication and try again.
     static constexpr StatusCode kUnauthenticated = 16;
 
+    static constexpr StatusCode kFileNotExist = 17;
+
+    static constexpr StatusCode kReachFileEnd = 18;
+
+    static constexpr StatusCode kDiskIOError = 19;
     // StatusCode::DoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_
     //
     // NOTE: this error code entry should not be used and you should not rely on
@@ -303,8 +308,8 @@ namespace turbo {
         kDefault = kWithPayload,
     };
 
-// turbo::StatusToStringMode is specified as a bitmask type, which means the
-// following operations must be provided:
+    // turbo::StatusToStringMode is specified as a bitmask type, which means the
+    // following operations must be provided:
     inline constexpr StatusToStringMode operator&(StatusToStringMode lhs,
                                                   StatusToStringMode rhs) {
         return static_cast<StatusToStringMode>(static_cast<int>(lhs) &
@@ -715,6 +720,9 @@ namespace turbo {
     // IsUnavailable()
     // IsUnimplemented()
     // IsUnknown()
+    // IsFileNotExist()
+    // IsReachFileEnd()
+    // IsDiskIOError()
     //
     // These convenience functions return `true` if a given status matches the
     // `turbo::StatusCode` error code of its associated function.
@@ -750,6 +758,12 @@ namespace turbo {
 
     TURBO_MUST_USE_RESULT bool IsUnknown(const Status &status);
 
+    TURBO_MUST_USE_RESULT bool IsFileNotExist(const Status &status);
+
+    TURBO_MUST_USE_RESULT bool IsReachFileEnd(const Status &status);
+
+    TURBO_MUST_USE_RESULT bool IsDiskIOError(const Status &status);
+
     // AbortedError()
     // AlreadyExistsError()
     // CancelledError()
@@ -766,7 +780,8 @@ namespace turbo {
     // UnavailableError()
     // UnimplementedError()
     // UnknownError()
-    //
+    // FileNotExist()
+    // ReachFileEnd()
     // These convenience functions create an `turbo::Status` object with an error
     // code as indicated by the associated function name, using the error message
     // passed in `message`.
@@ -844,9 +859,25 @@ namespace turbo {
     Status UnimplementedError(std::string_view fmt, Args &&...args) {
         return Status(turbo::kUnimplemented, Format(fmt, std::forward<Args>(args)...));
     }
+
     template<typename ...Args>
     Status UnknownError(std::string_view fmt, Args &&...args) {
         return Status(turbo::kUnknown, Format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename ...Args>
+    Status FileNotExist(std::string_view fmt, Args &&...args) {
+        return Status(turbo::kFileNotExist, Format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename ...Args>
+    Status ReachFileEnd(std::string_view fmt, Args &&...args) {
+        return Status(turbo::kReachFileEnd, Format(fmt, std::forward<Args>(args)...));
+    }
+
+    template<typename ...Args>
+    Status DiskIOError(std::string_view fmt, Args &&...args) {
+        return Status(turbo::kDiskIOError, Format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename ...Args>
@@ -858,6 +889,7 @@ namespace turbo {
     Status MakeStatus(short module_index, int errcode, std::string_view fmt, Args &&...args) {
         return Status(module_index, errcode, Format(fmt, std::forward<Args>(args)...));
     }
+
     TURBO_FORCE_INLINE Status MakeStatus(int errcode) {
         return Status(errcode, "");
     }
@@ -865,6 +897,7 @@ namespace turbo {
     TURBO_FORCE_INLINE Status MakeStatus(short module_index, int errcode) {
         return Status(module_index, errcode, "");
     }
+
     // ErrnoToStatusCode()
     //
     // Returns the StatusCode for `error_number`, which should be an `errno` value.

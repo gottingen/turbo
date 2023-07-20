@@ -361,7 +361,7 @@ namespace turbo {
 // --------------------------------------------------------------------
 // Mutators
 
-    void Cord::Clear() {
+    void Cord::clear() {
         if (CordRep *tree = contents_.clear()) {
             CordRep::Unref(tree);
         }
@@ -512,12 +512,12 @@ namespace turbo {
             }
             if (&src == this) {
                 // ChunkIterator below assumes that src is not modified during traversal.
-                Append(Cord(src));
+                append(Cord(src));
                 return;
             }
             // TODO(mec): Should we only do this if "dst" has space?
-            for (std::string_view chunk: src.Chunks()) {
-                Append(chunk);
+            for (std::string_view chunk: src.chunks()) {
+                append(chunk);
             }
             return;
         }
@@ -573,27 +573,27 @@ namespace turbo {
         return CreateAppendBuffer(contents_.data_, block_size, capacity);
     }
 
-    void Cord::Append(const Cord &src) {
+    void Cord::append(const Cord &src) {
         AppendImpl(src);
     }
 
-    void Cord::Append(Cord &&src) {
+    void Cord::append(Cord &&src) {
         AppendImpl(std::move(src));
     }
 
     template<typename T, Cord::EnableIfString<T>>
-    void Cord::Append(T &&src) {
+    void Cord::append(T &&src) {
         if (src.size() <= kMaxBytesToCopy) {
-            Append(std::string_view(src));
+            append(std::string_view(src));
         } else {
             CordRep *rep = CordRepFromString(std::forward<T>(src));
             contents_.AppendTree(rep, CordzUpdateTracker::kAppendString);
         }
     }
 
-    template void Cord::Append(std::string &&src);
+    template void Cord::append(std::string &&src);
 
-    void Cord::Prepend(const Cord &src) {
+    void Cord::prepend(const Cord &src) {
         contents_.MaybeRemoveEmptyCrcNode();
         if (src.empty()) return;
 
@@ -607,7 +607,7 @@ namespace turbo {
 
         // `src` cord is inlined.
         std::string_view src_contents(src.contents_.data(), src.contents_.size());
-        return Prepend(src_contents);
+        return prepend(src_contents);
     }
 
     void Cord::PrependArray(std::string_view src, MethodIdentifier method) {
@@ -658,18 +658,18 @@ namespace turbo {
     }
 
     template<typename T, Cord::EnableIfString<T>>
-    inline void Cord::Prepend(T &&src) {
+    inline void Cord::prepend(T &&src) {
         if (src.size() <= kMaxBytesToCopy) {
-            Prepend(std::string_view(src));
+            prepend(std::string_view(src));
         } else {
             CordRep *rep = CordRepFromString(std::forward<T>(src));
             contents_.PrependTree(rep, CordzUpdateTracker::kPrependString);
         }
     }
 
-    template void Cord::Prepend(std::string &&src);
+    template void Cord::prepend(std::string &&src);
 
-    void Cord::RemovePrefix(size_t n) {
+    void Cord::remove_prefix(size_t n) {
         TURBO_INTERNAL_CHECK(n <= size(),
                              turbo::Format("Requested prefix size {} exceeds Cord's size {}", n, size()));
         contents_.MaybeRemoveEmptyCrcNode();
@@ -699,7 +699,7 @@ namespace turbo {
         }
     }
 
-    void Cord::RemoveSuffix(size_t n) {
+    void Cord::remove_suffix(size_t n) {
         TURBO_INTERNAL_CHECK(n <= size(),
                              turbo::Format("Requested suffix size {} exceeds Cord's size {}", n, size()));
         contents_.MaybeRemoveEmptyCrcNode();
@@ -727,7 +727,7 @@ namespace turbo {
         }
     }
 
-    Cord Cord::Subcord(size_t pos, size_t new_size) const {
+    Cord Cord::subcord(size_t pos, size_t new_size) const {
         Cord sub_cord;
         size_t length = size();
         if (pos > length) pos = length;
@@ -868,7 +868,7 @@ namespace turbo {
         }
     }
 
-    void Cord::SetExpectedChecksum(uint32_t crc) {
+    void Cord::set_expected_checksum(uint32_t crc) {
         // Construct a CrcCordState with a single chunk.
         crc_internal::CrcCordState state;
         state.mutable_rep()->prefix_crc.push_back(
@@ -883,7 +883,7 @@ namespace turbo {
         return &contents_.tree()->crc()->crc_cord_state;
     }
 
-    std::optional<uint32_t> Cord::ExpectedChecksum() const {
+    std::optional<uint32_t> Cord::expected_checksum() const {
         if (!contents_.is_tree() || !contents_.tree()->IsCrc()) {
             return std::nullopt;
         }
@@ -1007,7 +1007,7 @@ namespace turbo {
         return data_comp_res == 0 ? +1 : data_comp_res;
     }
 
-    int Cord::Compare(std::string_view rhs) const {
+    int Cord::compare(std::string_view rhs) const {
         return SharedCompareImpl(*this, rhs);
     }
 
@@ -1015,25 +1015,25 @@ namespace turbo {
         return SharedCompareImpl(*this, rhs);
     }
 
-    bool Cord::EndsWith(std::string_view rhs) const {
+    bool Cord::ends_with(std::string_view rhs) const {
         size_t my_size = size();
         size_t rhs_size = rhs.size();
 
         if (my_size < rhs_size) return false;
 
         Cord tmp(*this);
-        tmp.RemovePrefix(my_size - rhs_size);
+        tmp.remove_prefix(my_size - rhs_size);
         return tmp.EqualsImpl(rhs, rhs_size);
     }
 
-    bool Cord::EndsWith(const Cord &rhs) const {
+    bool Cord::ends_with(const Cord &rhs) const {
         size_t my_size = size();
         size_t rhs_size = rhs.size();
 
         if (my_size < rhs_size) return false;
 
         Cord tmp(*this);
-        tmp.RemovePrefix(my_size - rhs_size);
+        tmp.remove_prefix(my_size - rhs_size);
         return tmp.EqualsImpl(rhs, rhs_size);
     }
 
@@ -1062,7 +1062,7 @@ namespace turbo {
             memcpy(dst, fragment.data(), fragment.size());
             return;
         }
-        for (std::string_view chunk: Chunks()) {
+        for (std::string_view chunk: chunks()) {
             memcpy(dst, chunk.data(), chunk.size());
             dst += chunk.size();
         }
@@ -1352,7 +1352,7 @@ namespace turbo {
     }
 
     std::ostream &operator<<(std::ostream &out, const Cord &cord) {
-        for (std::string_view chunk: cord.Chunks()) {
+        for (std::string_view chunk: cord.chunks()) {
             out.write(chunk.data(), static_cast<std::streamsize>(chunk.size()));
         }
         return out;

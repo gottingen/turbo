@@ -45,6 +45,9 @@ TURBO_REGISTER_ERRNO(turbo::kUnimplemented, "UNIMPLEMENTED");
 TURBO_REGISTER_ERRNO(turbo::kInternal, "INTERNAL");
 TURBO_REGISTER_ERRNO(turbo::kUnavailable, "UNAVAILABLE");
 TURBO_REGISTER_ERRNO(turbo::kDataLoss, "DATA_LOSS");
+TURBO_REGISTER_ERRNO(turbo::kFileNotExist, "FILE_NOT_EXIST");
+TURBO_REGISTER_ERRNO(turbo::kReachFileEnd, "REACH_FILE_END");
+TURBO_REGISTER_ERRNO(turbo::kDiskIOError, "DISK_IO_ERROR");
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -311,7 +314,7 @@ namespace turbo {
                                  StatusToStringMode::kWithModule;
 
         if (with_module) {
-            turbo::FormatAppend(&text, "{}::{}: {}", TurboModule(index()),StatusCodeToString(code()), message());
+            turbo::FormatAppend(&text, "{}::{}: {}", TurboModule(index()), StatusCodeToString(code()), message());
         } else {
             turbo::FormatAppend(&text, "{}: {}", StatusCodeToString(code()), message());
         }
@@ -403,6 +406,19 @@ namespace turbo {
     bool IsUnknown(const Status &status) {
         return status.code() == turbo::kUnknown;
     }
+
+    bool IsFileNotExist(const Status &status) {
+        return status.code() == turbo::kFileNotExist;
+    }
+
+    bool IsReachFileEnd(const Status &status) {
+        return status.code() == turbo::kReachFileEnd;
+    }
+
+    bool IsDiskIOError(const Status &status) {
+        return status.code() == turbo::kDiskIOError;
+    }
+
 
     StatusCode ErrnoToStatusCode(int error_number) {
         switch (error_number) {

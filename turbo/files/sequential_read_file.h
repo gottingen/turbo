@@ -42,7 +42,7 @@ namespace turbo {
 
         turbo::Status skip(off_t n);
 
-        bool is_eof(turbo::Status *frs);
+        bool is_eof();
 
         void close();
 
