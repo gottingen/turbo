@@ -116,15 +116,15 @@ struct StringBtreeDefaultLess {
   StringBtreeDefaultLess(std::less<turbo::Cord>) {}  // NOLINT
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
+    return compare_internal::compare_result_as_ordering(lhs.compare(rhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  std::string_view rhs) const {
-    return compare_internal::compare_result_as_ordering(lhs.Compare(rhs));
+    return compare_internal::compare_result_as_ordering(lhs.compare(rhs));
   }
   turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(-rhs.Compare(lhs));
+    return compare_internal::compare_result_as_ordering(-rhs.compare(lhs));
   }
 };
 
@@ -148,15 +148,15 @@ struct StringBtreeDefaultGreater {
   StringBtreeDefaultGreater(std::greater<turbo::Cord>) {}  // NOLINT
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
+    return compare_internal::compare_result_as_ordering(rhs.compare(lhs));
   }
   turbo::weak_ordering operator()(const turbo::Cord &lhs,
                                  std::string_view rhs) const {
-    return compare_internal::compare_result_as_ordering(-lhs.Compare(rhs));
+    return compare_internal::compare_result_as_ordering(-lhs.compare(rhs));
   }
   turbo::weak_ordering operator()(std::string_view lhs,
                                  const turbo::Cord &rhs) const {
-    return compare_internal::compare_result_as_ordering(rhs.Compare(lhs));
+    return compare_internal::compare_result_as_ordering(rhs.compare(lhs));
   }
 };
 

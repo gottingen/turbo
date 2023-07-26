@@ -62,6 +62,9 @@ namespace turbo {
         if (_fd == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
+        if(len == 0) {
+            return 0;
+        }
         size_t has_read = 0;
         char *pdata = static_cast<char *>(buff);
         while (has_read < len && !std::feof(_fd)) {
@@ -71,6 +74,9 @@ namespace turbo {
             }
             has_read += n;
         };
+        if(has_read == 0) {
+            return turbo::ReachFileEnd("");
+        }
         return has_read;
     }
 
@@ -110,15 +116,28 @@ namespace turbo {
             }
             len = r.value();
         }
-        auto slice = buf->GetAppendBuffer(len);
-        auto rs = read(slice.data(), len);
-        if(!rs.ok()) {
-            return rs;
+        bool first = true;
+        size_t has_read = 0;
+        while(has_read < len) {
+            CordBuffer buffer = first ? buf->get_append_buffer(len) : CordBuffer::CreateWithDefaultLimit(len - has_read);
+            turbo::Span<char> slice = buffer.available_up_to(n);
+            auto rs = read(slice.data(), slice.size());
+            if(!rs.ok()) {
+                if(turbo::IsReachFileEnd(rs.status())) {
+                    break;
+                }
+                return rs;
+            }
+            first = false;
+            buf->append(std::move(buffer));
+            has_read += rs.value();
         }
-        slice.SetLength(rs.value());
-        buf->Append(std::move(slice));
+        // any data read from file yet, it already reach end last time
+        if(has_read == 0) {
+            return turbo::ReachFileEnd("");
+        }
 
-        return rs.value();
+        return has_read;
     }
 
     void SequentialReadFile::close() {
@@ -143,7 +162,7 @@ namespace turbo {
         return turbo::OkStatus();
     }
 
-    bool SequentialReadFile::is_eof(turbo::Status *frs) {
+    bool SequentialReadFile::is_eof() {
         return std::feof(_fd);
     }
 

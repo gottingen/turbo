@@ -250,7 +250,7 @@ namespace turbo {
             TEST(HashCord, FragmentedCordWorks) {
                 hash_default_hash<turbo::Cord> hash;
                 turbo::Cord c = turbo::MakeFragmentedCord({"a", "b", "c"});
-                EXPECT_FALSE(c.TryFlat().has_value());
+                EXPECT_FALSE(c.try_flat().has_value());
                 EXPECT_EQ(hash(c), hash("abc"));
             }
 
@@ -260,7 +260,7 @@ namespace turbo {
                 std::string a(65536, 'a');
                 std::string b(65536, 'b');
                 turbo::Cord c = turbo::MakeFragmentedCord({a, b});
-                EXPECT_FALSE(c.TryFlat().has_value());
+                EXPECT_FALSE(c.try_flat().has_value());
                 EXPECT_EQ(hash(c), hash(a + b));
             }
 

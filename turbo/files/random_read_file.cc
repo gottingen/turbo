@@ -109,13 +109,13 @@ namespace turbo {
             }
             len = r.value();
         }
-        auto slice = buf->GetAppendBuffer(len);
+        auto slice = buf->get_append_buffer(len);
         auto rs = read(offset, slice.data(), len);
         if(!rs.ok()) {
             return rs;
         }
         slice.SetLength(rs.value());
-        buf->Append(std::move(slice));
+        buf->append(std::move(slice));
 
         return rs.value();
     }

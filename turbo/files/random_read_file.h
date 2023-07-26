@@ -27,7 +27,7 @@ namespace turbo {
 
     class RandomReadFile {
     public:
-        RandomReadFile() noexcept = default;
+        RandomReadFile() = default;
 
         explicit RandomReadFile(const FileEventListener &listener);
 
