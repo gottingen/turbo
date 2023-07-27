@@ -120,7 +120,7 @@ namespace turbo {
         size_t has_read = 0;
         while(has_read < len) {
             CordBuffer buffer = first ? buf->get_append_buffer(len) : CordBuffer::CreateWithDefaultLimit(len - has_read);
-            turbo::Span<char> slice = buffer.available_up_to(n);
+            turbo::Span<char> slice = buffer.available_up_to(len - has_read);
             auto rs = read(slice.data(), slice.size());
             if(!rs.ok()) {
                 if(turbo::IsReachFileEnd(rs.status())) {
