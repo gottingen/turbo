@@ -57,22 +57,22 @@ namespace turbo {
             return (1U << _hash_power);
         }
 
-        std::shared_mutex* get_lock(const T &key) {
-            return  _mutex_pool[HashImpl(key)].get();
+        std::shared_mutex* get_lock(const T &key) const {
+            return  _mutex_pool[Hash_impl(key)].get();
         }
 
         template<typename C, TURBO_REQUIRES(std::is_same<typename C::value_type, T>)>
-        std::vector<std::shared_mutex *> multi_get(const C &keys) {
+        std::vector<std::shared_mutex *> multi_get(const C &keys) const {
             std::set<unsigned, std::greater<unsigned>> to_acquire_indexes;
             // We are using the `set` to avoid retrieving the mutex, as well as guarantee to retrieve
             // the order of locks.
             //
-            // For example, we need lock the key `A` and `B` and they have the same lock HashImpl
+            // For example, we need lock the key `A` and `B` and they have the same lock Hash_impl
             // index, it will be deadlock if lock the same mutex twice. Besides, we also need
             // to order the mutex before acquiring locks since different threads may acquire
             // same keys with different order.
             for (const auto &key: keys) {
-                to_acquire_indexes.insert(HashImpl(key));
+                to_acquire_indexes.insert(Hash_impl(key));
             }
 
             std::vector<std::shared_mutex *> locks;
@@ -88,7 +88,7 @@ namespace turbo {
         unsigned _hash_mask;
         std::vector<std::unique_ptr<std::shared_mutex>> _mutex_pool;
 
-        unsigned HashImpl(const T &key) const {
+        unsigned Hash_impl(const T &key) const {
             return std::hash<T>{}(key) & _hash_mask;
         }
     };
