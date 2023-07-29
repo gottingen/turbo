@@ -21,82 +21,118 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <set>
+#include <thread>
 #include <string_view>
 #include "turbo/platform/port.h"
+#include "turbo/meta/span.h"
+#include "turbo/meta/type_traits.h"
 
 
 namespace turbo {
 
 
+    template <typename T>
     class HashLock {
     public:
-        explicit HashLock(int hash_power);
+        static constexpr int kDefaultHashPower = 16;
+        HashLock() :_hash_mask((1U << _hash_power) - 1) {
+            for (unsigned i = 0; i < size(); i++) {
+                _mutex_pool.emplace_back(new std::shared_mutex{});
+            }
+        }
 
+        explicit HashLock(int hash_power): _hash_power(hash_power),_hash_mask((1U << _hash_power) - 1) {
+            for (unsigned i = 0; i < size(); i++) {
+                _mutex_pool.emplace_back(new std::shared_mutex{});
+            }
+        }
         ~HashLock() = default;
 
         HashLock(const HashLock &) = delete;
 
         HashLock &operator=(const HashLock &) = delete;
 
-        unsigned Size() const;
+        unsigned size() const {
+            return (1U << _hash_power);
+        }
 
-        void Lock(const std::string_view &key);
+        std::shared_mutex* get_lock(const T &key) const {
+            return  _mutex_pool[Hash_impl(key)].get();
+        }
 
-        void UnLock(const std::string_view &key);
+        template<typename C, TURBO_REQUIRES(std::is_same<typename C::value_type, T>)>
+        std::vector<std::shared_mutex *> multi_get(const C &keys) const {
+            std::set<unsigned, std::greater<unsigned>> to_acquire_indexes;
+            // We are using the `set` to avoid retrieving the mutex, as well as guarantee to retrieve
+            // the order of locks.
+            //
+            // For example, we need lock the key `A` and `B` and they have the same lock Hash_impl
+            // index, it will be deadlock if lock the same mutex twice. Besides, we also need
+            // to order the mutex before acquiring locks since different threads may acquire
+            // same keys with different order.
+            for (const auto &key: keys) {
+                to_acquire_indexes.insert(Hash_impl(key));
+            }
 
-        void LockShared(const std::string_view &key);
-
-        void UnLockShared(const std::string_view &key);
-
-        std::vector<std::shared_mutex *> MultiGet(const std::vector<std::string> &keys);
+            std::vector<std::shared_mutex *> locks;
+            locks.reserve(to_acquire_indexes.size());
+            for (auto index: to_acquire_indexes) {
+                locks.emplace_back(_mutex_pool[index].get());
+            }
+            return locks;
+        }
 
     private:
-        int hash_power_;
-        unsigned hash_mask_;
-        std::vector<std::unique_ptr<std::shared_mutex>> mutex_pool_;
+        int _hash_power{kDefaultHashPower};
+        unsigned _hash_mask;
+        std::vector<std::unique_ptr<std::shared_mutex>> _mutex_pool;
 
-        unsigned HashImpl(const std::string_view &key) const;
+        unsigned Hash_impl(const T &key) const {
+            return std::hash<T>{}(key) & _hash_mask;
+        }
     };
 
     class SharedLockGuard {
     public:
-        explicit SharedLockGuard(HashLock *lock_mgr, std::string_view key) : lock_mgr_(lock_mgr), key_(key) {
-            lock_mgr->Lock(key_);
+        template<typename T>
+        explicit SharedLockGuard(HashLock<T> &lock_mgr, const T &key) : _smutex(lock_mgr.get_lock(key)) {
+            _smutex->lock_shared();
         }
 
-        ~SharedLockGuard() { lock_mgr_->UnLock(key_); }
+        ~SharedLockGuard() { _smutex->unlock_shared(); }
 
         SharedLockGuard(const SharedLockGuard &) = delete;
 
         SharedLockGuard &operator=(const SharedLockGuard &) = delete;
 
     private:
-        HashLock *lock_mgr_ = nullptr;
-        std::string_view key_;
+        std::shared_mutex *_smutex{nullptr};
     };
-
 
     class LockGuard {
     public:
-        explicit LockGuard(HashLock *lock_mgr, std::string_view key) : lock_mgr_(lock_mgr), key_(key) {
-            lock_mgr->Lock(key_);
+        template<typename T>
+        explicit LockGuard(HashLock<T> &lock_mgr,const T &key) : _smutex(lock_mgr.get_lock(key)){
+            _smutex->lock();
         }
 
-        ~LockGuard() { lock_mgr_->UnLock(key_); }
+        ~LockGuard() { _smutex->unlock(); }
 
         LockGuard(const LockGuard &) = delete;
 
         LockGuard &operator=(const LockGuard &) = delete;
 
     private:
-        HashLock *lock_mgr_ = nullptr;
-        std::string_view key_;
+        std::shared_mutex *_smutex{nullptr};
     };
 
+    template<typename T>
     class MultiSharedLockGuard {
     public:
-        explicit MultiSharedLockGuard(HashLock *lock_mgr, const std::vector<std::string> &keys) : lock_mgr_(lock_mgr) {
-            locks_ = lock_mgr_->MultiGet(keys);
+        template<typename C, TURBO_REQUIRES(std::is_same<typename C::value_type, T>)>
+        explicit MultiSharedLockGuard(HashLock<T> *lock_mgr, const C &keys) : lock_mgr_(lock_mgr) {
+            locks_ = lock_mgr_->multi_get(keys);
             for (const auto &iter: locks_) {
                 iter->lock_shared();
             }
@@ -113,14 +149,16 @@ namespace turbo {
         MultiSharedLockGuard &operator=(const MultiSharedLockGuard &) = delete;
 
     private:
-        HashLock *lock_mgr_ = nullptr;
+        HashLock<T> *lock_mgr_ = nullptr;
         std::vector<std::shared_mutex *> locks_;
     };
 
+    template<typename T>
     class MultiLockGuard {
     public:
-        explicit MultiLockGuard(HashLock *lock_mgr, const std::vector<std::string> &keys) : lock_mgr_(lock_mgr) {
-            locks_ = lock_mgr_->MultiGet(keys);
+        template<typename C, TURBO_REQUIRES(std::is_same<typename C::value_type, T>)>
+        explicit MultiLockGuard(HashLock<T> *lock_mgr, const C &keys) : lock_mgr_(lock_mgr) {
+            locks_ = lock_mgr_->multi_get(keys);
             for (const auto &iter: locks_) {
                 iter->lock();
             }
@@ -137,7 +175,7 @@ namespace turbo {
         MultiLockGuard &operator=(const MultiLockGuard &) = delete;
 
     private:
-        HashLock *lock_mgr_ = nullptr;
+        HashLock<T> *lock_mgr_ = nullptr;
         std::vector<std::shared_mutex *> locks_;
     };
 

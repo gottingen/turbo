@@ -14,9 +14,11 @@
 # limitations under the License.
 #
 
-add_subdirectory(meta)
-add_subdirectory(strings)
-add_subdirectory(tlog)
-add_subdirectory(flags)
-add_subdirectory(format)
-add_subdirectory(concurrent)
+carbin_cc_binary(
+        NAME
+        hash_lock
+        SOURCES
+        "hash_lock.cc"
+        DEPS
+        turbo::turbo
+)

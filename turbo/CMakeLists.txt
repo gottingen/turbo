@@ -30,7 +30,6 @@ set(TURBO_ALL_SRC
         "container/internal/hashtablez_sampler_force_weak_definition.cc"
         "container/internal/raw_hash_set.cc"
         "concurrent/barrier.cc"
-        "concurrent/hash_lock.cc"
         "concurrent/latch.cc"
         "concurrent/notification.cc"
         "crypto/crc32c.cc"
