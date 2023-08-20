@@ -23,6 +23,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include "turbo/format/format.h"
 
 #if __has_include(<charconv>)
 
@@ -864,7 +865,56 @@ namespace turbo {
 
     } // namespace turbo::range
 
-} // namespace semver
+} // namespace turbo
+
+
+template<>
+struct fmt::formatter<turbo::ModuleVersion> {
+    // show major version
+    bool show_major = false;
+    // show minor version
+    bool show_minor = false;
+    // show patch version
+    bool show_patch = false;
+
+    // Parses format specifications of the form ['M' | 'm' | 'p'].
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        auto it = ctx.begin(), end = ctx.end();
+        if (it == end || *it == '}') {
+            show_major = show_minor = show_patch = true;
+            return it;
+        }
+        do {
+            switch (*it) {
+                case 'M': show_major = true; break;
+                case 'm': show_minor = true; break;
+                case 'p': show_patch = true; break;
+                default: throw format_error("invalid format");
+            }
+            ++it;
+        } while (it != end && *it != '}');
+        return it;
+    }
+
+    template<typename FormatContext>
+    auto format(const turbo::ModuleVersion& ver, FormatContext& ctx)
+    -> decltype(ctx.out()) {
+        if (ver.major == uint16_t(-1)) return format_to(ctx.out(), "N/A");
+        if (ver.minor == uint16_t(-1)) show_minor = false;
+        if (ver.patch == uint16_t(-1)) show_patch = false;
+        if (show_major && !show_minor && !show_patch) {
+            return format_to(ctx.out(), "{}", ver.major);
+        }
+        if (show_major && show_minor && !show_patch) {
+            return format_to(ctx.out(), "{}.{}", ver.major, ver.minor);
+        }
+        if (show_major && show_minor && show_patch) {
+            return format_to(ctx.out(), "{}.{}.{}", ver.major, ver.minor,
+                             ver.patch);
+        }
+        return ctx.out();
+    }
+};
 
 #if defined(__clang__)
 #  pragma clang diagnostic pop

@@ -99,6 +99,6 @@ namespace turbo {
 
 /// Dynamically loads the function pointer at runtime
 #define MODULE_FUNCTION_INIT(m, NAME) \
-    NAME = m.getSymbol<decltype(&::NAME)>(#NAME);
+    NAME = m.get_symbol<decltype(&::NAME)>(#NAME);
 
 #endif  // TURBO_MODULE_MODULE_H_

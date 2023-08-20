@@ -33,7 +33,7 @@ namespace turbo {
 #error unknown platform
 #endif
 
-    static constexpr ModuleVersion kNullVersion{0,0,0};
+    static constexpr ModuleVersion kNullVersion{uint16_t(-1),uint16_t(-1),uint16_t(-1)};
 
 }  // namespace turbo
 
