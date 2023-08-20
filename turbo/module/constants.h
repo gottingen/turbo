@@ -11,30 +11,30 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#ifndef TURBO_BASE_SYSINFO_H_
-#define TURBO_BASE_SYSINFO_H_
+//
+#ifndef TURBO_MODULE_CONSTANTS_H_
+#define TURBO_MODULE_CONSTANTS_H_
 
 #include "turbo/platform/port.h"
-#include <cstdio>
+#include "turbo/module/module_version.h"
 
 namespace turbo {
 
-    TURBO_DLL int pid() noexcept;
+#ifdef TURBO_PLATFORM_WINDOWS
+    static const char* kModuleSuffix = ".dll";
+    static const char* kModulePrefix = "lib";
+#elif defined(TURBO_PLATFORM_LINUX)
+    static const char* kModuleSuffix = ".so";
+    static const char* kModulePrefix = "lib";
+#elif defined(TURBO_PLATFORM_OSX)
+    static const char* kModuleSuffix = ".dylib";
+    static const char* kModulePrefix = "lib";
+#else
+#error unknown platform
+#endif
 
-    // Determine if the terminal supports colors
-    // Source: https://github.com/agauniyal/rang/
-    TURBO_DLL bool is_color_terminal() noexcept;
-
-    // Determine if the terminal attached
-    // Source: https://github.com/agauniyal/rang/
-    TURBO_DLL bool in_terminal(std::FILE *file) noexcept;
-
-    // Return current thread id as size_t (from thread local storage)
-    TURBO_DLL size_t thread_id() noexcept;
-
-    TURBO_DLL size_t get_host_memory_size();
+    static constexpr ModuleVersion kNullVersion{0,0,0};
 
 }  // namespace turbo
 
-#endif  // TURBO_BASE_SYSINFO_H_
+#endif  // TURBO_MODULE_CONSTANTS_H_

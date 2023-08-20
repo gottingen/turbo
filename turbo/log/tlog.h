@@ -24,7 +24,6 @@
 #include "turbo/log/common.h"
 #include "turbo/log/details/registry.h"
 #include "turbo/log/logger.h"
-#include "turbo/log/version.h"
 #include "turbo/log/details/synchronous_factory.h"
 
 #include <chrono>

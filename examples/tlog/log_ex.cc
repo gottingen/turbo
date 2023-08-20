@@ -67,8 +67,6 @@ int main(int, char *[]) {
     }
     load_levels_example();
 
-    turbo::tlog::info("Welcome to tlog version {}.{}.{}  !", TLOG_VER_MAJOR, TLOG_VER_MINOR, TLOG_VER_PATCH);
-
     turbo::tlog::warn("Easy padding in numbers like {:08d}", 12);
     turbo::tlog::critical("Support for int: {0:d};  hex: {0:x};  oct: {0:o}; bin: {0:b}", 42);
     turbo::tlog::info("Support for floats {:03.2f}", 1.23456);
