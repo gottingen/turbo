@@ -46,27 +46,36 @@ namespace turbo {
     Module::Module(
             const std::string &plugin_file_name, const std::vector<std::string> &suffixes,
             const std::vector<std::string> &paths,
-            const std::vector<ModuleVersion> &versions) {
+            const std::vector<ModuleVersion> &versions, std::function<ModuleVersion(const ModuleHandle&)> f) {
         TURBO_UNUSED(suffixes);
         if (plugin_file_name.empty()) {
             return;
         }
 
         // try rpath
-        for(auto &v : versions) {
-            auto rpath_m = load_module(plugin_file_name,v);
+        for (auto &v: versions) {
+            auto rpath_m = load_module(plugin_file_name, v);
             if (rpath_m.is_loaded()) {
                 *this = std::move(rpath_m);
                 return;
             }
         }
         // try rpath
-        for(auto &v : versions) {
-            auto path_m = load_module(plugin_file_name,v, paths);
+        for (auto &v: versions) {
+            auto path_m = load_module(plugin_file_name, v, paths);
             if (path_m.is_loaded()) {
                 *this = std::move(path_m);
                 return;
             }
+        }
+        // version empty
+        auto m = load_module(plugin_file_name, kNullVersion, paths);
+        if (m.is_loaded() && f) {
+            m._version = f(m._handle);
+        }
+        if (m.is_loaded()) {
+            *this = std::move(m);
+            return;
         }
         TLOG_ERROR("Unable to open {}", plugin_file_name);
     }

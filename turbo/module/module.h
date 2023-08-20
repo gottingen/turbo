@@ -46,7 +46,8 @@ namespace turbo {
                 const std::string &plugin_base_file_name,
                 const std::vector<std::string> &suffixes,
                 const std::vector<std::string> &paths,
-                const std::vector<ModuleVersion> &versions = {});
+                const std::vector<ModuleVersion> &versions = {},
+                std::function<ModuleVersion(const ModuleHandle&)> f = {});
         Module() = default;
         ~Module() noexcept;
 
