@@ -68,8 +68,17 @@ namespace turbo {
                 return;
             }
         }
-        // version empty
-        auto m = load_module(plugin_file_name, kNullVersion, paths);
+        // version empty path empty
+        auto m = load_module(plugin_file_name, kNullVersion);
+        if (m.is_loaded() && f) {
+            m._version = f(m._handle);
+        }
+        if (m.is_loaded()) {
+            *this = std::move(m);
+            return;
+        }
+
+        m = load_module(plugin_file_name, kNullVersion, paths);
         if (m.is_loaded() && f) {
             m._version = f(m._handle);
         }
