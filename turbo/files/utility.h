@@ -41,6 +41,10 @@ namespace turbo {
         // "my_folder/.mylog.txt" => ("my_folder/.mylog", ".txt")
         static std::tuple<std::string, std::string> split_by_extension(const std::string &fname);
 
+        static turbo::ResultStatus<std::string> md5_sum_file(const std::string_view &path, int64_t *size = nullptr);
+
+        static turbo::ResultStatus<std::string> sha1_sum_file(const std::string_view &path, int64_t *size = nullptr);
+
     };
 }  // namespace turbo
 
