@@ -13,6 +13,9 @@
 // limitations under the License.
 //
 #include "turbo/files/utility.h"
+#include "turbo/files/sequential_read_file.h"
+#include "turbo/crypto/md5.h"
+#include "turbo/crypto/sha1.h"
 
 namespace turbo {
 
@@ -33,5 +36,67 @@ namespace turbo {
 
         // finally - return a valid base and extension tuple
         return std::make_tuple(fname.substr(0, ext_index), fname.substr(ext_index));
+    }
+
+    turbo::ResultStatus<std::string> FileUtility::md5_sum_file(const std::string_view &path, int64_t *size) {
+        static const size_t kBuffSize = 4096;
+        turbo::SequentialReadFile file;
+        auto rs = file.open(path);
+        if (!rs.ok()) {
+            return rs;
+        }
+        turbo::MD5 sum;
+        size_t cnt = 0;
+        std::error_code ec;
+        auto len = turbo::filesystem::file_size(path, ec);
+        if (ec) {
+            return turbo::InternalError(ec.message());
+        }
+        std::string buf;
+        buf.reserve(kBuffSize);
+        do {
+            buf.clear();
+            auto r = file.read(&buf, kBuffSize);
+            if (!r.ok()) {
+                return r.status();
+            }
+            cnt += r.value();
+            sum.process(buf);
+        } while (cnt < len);
+        if (size) {
+            *size = cnt;
+        }
+        return sum.digest_hex();
+    }
+
+    turbo::ResultStatus<std::string> FileUtility::sha1_sum_file(const std::string_view &path, int64_t *size) {
+        static const size_t kBuffSize = 4096;
+        turbo::SequentialReadFile file;
+        auto rs = file.open(path);
+        if (!rs.ok()) {
+            return rs;
+        }
+        turbo::SHA1 sum;
+        size_t cnt = 0;
+        std::error_code ec;
+        auto len = turbo::filesystem::file_size(path, ec);
+        if (ec) {
+            return turbo::InternalError(ec.message());
+        }
+        std::string buf;
+        buf.reserve(kBuffSize);
+        do {
+            buf.clear();
+            auto r = file.read(&buf, kBuffSize);
+            if (!r.ok()) {
+                return r.status();
+            }
+            cnt += r.value();
+            sum.process(buf);
+        } while (cnt < len);
+        if (size) {
+            *size = cnt;
+        }
+        return sum.digest_hex();
     }
 }  // namespace turbo
