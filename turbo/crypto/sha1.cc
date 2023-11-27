@@ -198,7 +198,7 @@ namespace turbo {
     std::string SHA1::digest_hex() {
         uint8_t digest[kDigestLength];
         finalize(digest);
-        return turbo::BytesToHexString(std::string_view(reinterpret_cast<char*>(digest), kDigestLength));
+        return turbo::bytes_to_hex(std::string_view(reinterpret_cast<char*>(digest), kDigestLength));
     }
 
 

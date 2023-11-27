@@ -52,8 +52,8 @@ namespace turbo {
         Sum         //!< sum all the arguments together if numerical or concatenate directly without delimiter
     };
 
-/// This is the CRTP base class for Option and OptionDefaults. It was designed this way
-/// to share parts of the class; an OptionDefaults can copy to an Option.
+    /// This is the CRTP base class for Option and OptionDefaults. It was designed this way
+    /// to share parts of the class; an OptionDefaults can copy to an Option.
     template<typename CRTP>
     class OptionBase {
         friend App;
@@ -196,8 +196,8 @@ namespace turbo {
         }
     };
 
-/// This is a version of OptionBase that only supports setting values,
-/// for defaults. It is stored as the default option in an App.
+    /// This is a version of OptionBase that only supports setting values,
+    /// for defaults. It is stored as the default option in an App.
     class OptionDefaults : public OptionBase<OptionDefaults> {
     public:
         OptionDefaults() = default;

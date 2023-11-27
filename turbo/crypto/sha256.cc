@@ -212,7 +212,7 @@ namespace turbo {
     std::string SHA256::digest_hex() {
         uint8_t digest[kDigestLength];
         finalize(digest);
-        return turbo::BytesToHexString(std::string_view(reinterpret_cast<char*>(digest), kDigestLength));
+        return turbo::bytes_to_hex(std::string_view(reinterpret_cast<char*>(digest), kDigestLength));
     }
 
     std::string sha256_hex(const void *data, uint32_t size) {

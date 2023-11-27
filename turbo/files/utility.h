@@ -41,10 +41,43 @@ namespace turbo {
         // "my_folder/.mylog.txt" => ("my_folder/.mylog", ".txt")
         static std::tuple<std::string, std::string> split_by_extension(const std::string &fname);
 
+        ///
+        /// \param path
+        /// \param size
+        /// \return
         static turbo::ResultStatus<std::string> md5_sum_file(const std::string_view &path, int64_t *size = nullptr);
 
+        ///
+        /// \param path
+        /// \param size
+        /// \return
         static turbo::ResultStatus<std::string> sha1_sum_file(const std::string_view &path, int64_t *size = nullptr);
 
+        ///
+        /// \param root_path
+        /// \param result
+        /// \param full_path
+        /// \return
+        static turbo::Status list_files(const std::string_view &root_path,std::vector<std::string> &result, bool full_path = true) noexcept;
+
+        ///
+        /// \param root_path
+        /// \param result
+        /// \param full_path
+        /// \return
+        static turbo::Status list_directories(const std::string_view &root_path,std::vector<std::string> &result, bool full_path = true) noexcept;
+
+        ///
+        /// \param file_path
+        /// \return
+        static turbo::Status read_file(const std::string_view &file_path, std::string &result, bool append = false) noexcept;
+
+        ///
+        /// \param file_path
+        /// \param result
+        /// \param truncate
+        /// \return
+        static turbo::Status write_file(const std::string_view &file_path, const std::string_view &result, bool truncate = true) noexcept;
     };
 }  // namespace turbo
 

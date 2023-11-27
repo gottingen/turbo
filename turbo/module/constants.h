@@ -21,14 +21,14 @@
 namespace turbo {
 
 #ifdef TURBO_PLATFORM_WINDOWS
-    static const char* kModuleSuffix = ".dll";
-    static const char* kModulePrefix = "lib";
+    TURBO_MAYBE_UNUSED static const char* kModuleSuffix = ".dll";
+    TURBO_MAYBE_UNUSED static const char* kModulePrefix = "lib";
 #elif defined(TURBO_PLATFORM_LINUX)
-    static const char* kModuleSuffix = ".so";
-    static const char* kModulePrefix = "lib";
+    TURBO_MAYBE_UNUSED static const char* kModuleSuffix = ".so";
+    TURBO_MAYBE_UNUSED static const char* kModulePrefix = "lib";
 #elif defined(TURBO_PLATFORM_OSX)
-    static const char* kModuleSuffix = ".dylib";
-    static const char* kModulePrefix = "lib";
+    TURBO_MAYBE_UNUSED static const char* kModuleSuffix = ".dylib";
+    TURBO_MAYBE_UNUSED static const char* kModulePrefix = "lib";
 #else
 #error unknown platform
 #endif

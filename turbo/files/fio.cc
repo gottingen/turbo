@@ -142,4 +142,42 @@ namespace turbo {
         return turbo::ErrnoToStatus(errno, "Failed getting file size from fd");
     }
 
+    turbo::ResultStatus<size_t> Fio::file_size(int fd) {
+        if (fd == -1) {
+            return turbo::InvalidArgumentError("Failed getting file size. fp is null");
+        }
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#    if defined(_WIN64) // 64 bits
+                __int64 ret = ::_filelengthi64(fd);
+                if (ret >= 0)
+                {
+                    return static_cast<size_t>(ret);
+                }
+
+#    else // windows 32 bits
+                long ret = ::_filelength(fd);
+                if (ret >= 0)
+                {
+                    return static_cast<size_t>(ret);
+                }
+#    endif
+
+#else // unix
+// 64 bits(but not in osx or cygwin, where fstat64 is deprecated)
+#    if (defined(__linux__) || defined(__sun) || defined(_AIX)) && (defined(__LP64__) || defined(_LP64))
+        struct stat64 st;
+        if (::fstat64(fd, &st) == 0) {
+            return static_cast<size_t>(st.st_size);
+        }
+#    else // other unix or linux 32 bits or cygwin
+        struct stat st;
+                if (::fstat(fd, &st) == 0)
+                {
+                    return static_cast<size_t>(st.st_size);
+                }
+#    endif
+#endif
+        return turbo::ErrnoToStatus(errno, "Failed getting file size from fd");
+    }
+
 }  // namespace turbo

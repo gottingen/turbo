@@ -46,10 +46,11 @@ namespace turbo {
         for (int tries = 0; tries < _option.open_tries; ++tries) {
             auto rs = Fio::file_open_read(_file_path, "rb", _option);
             if (rs.ok()) {
-                _fd = rs.value();
+                _fp = rs.value();
                 if (_listener.after_open) {
-                    _listener.after_open(_file_path, _fd);
+                    _listener.after_open(_file_path, _fp);
                 }
+                _fd = fileno(_fp);
                 return turbo::OkStatus();
             }
             if (_option.open_interval > 0) {
@@ -60,12 +61,12 @@ namespace turbo {
     }
 
     turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, void *buff, size_t len) {
-        if (_fd == nullptr) {
+        if (_fp == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
         size_t has_read = 0;
-        FILE_HANDLER fd = fileno(_fd);
-        ssize_t read_size = ::pread(fd, buff, len, static_cast<off_t>(offset));
+        /// _fd may > 0 with _fp valid
+        ssize_t read_size = ::pread(_fd, buff, len, static_cast<off_t>(offset));
         if(read_size < 0 ) {
             return turbo::ErrnoToStatus(errno, _file_path.c_str());
         }
@@ -74,12 +75,12 @@ namespace turbo {
     }
 
     turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, std::string *content, size_t n) {
-        if (_fd == nullptr) {
+        if (_fp == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
         size_t len = n;
         if(len == npos) {
-            auto r = Fio::file_size(_fd);
+            auto r = Fio::file_size(_fp);
             if(!r.ok()) {
                 return r;
             }
@@ -98,12 +99,12 @@ namespace turbo {
     }
 
     turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, turbo::Cord *buf, size_t n) {
-        if (_fd == nullptr) {
+        if (_fp == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
         size_t len = n;
         if(len == npos) {
-            auto r = Fio::file_size(_fd);
+            auto r = Fio::file_size(_fp);
             if(!r.ok()) {
                 return r;
             }
@@ -121,13 +122,14 @@ namespace turbo {
     }
 
     void RandomReadFile::close() {
-        if (_fd != nullptr) {
+        _fd = -1;
+        if (_fp != nullptr) {
             if (_listener.before_close) {
-                _listener.before_close(_file_path, _fd);
+                _listener.before_close(_file_path, _fp);
             }
 
-            std::fclose(_fd);
-            _fd = nullptr;
+            std::fclose(_fp);
+            _fp = nullptr;
 
             if (_listener.after_close) {
                 _listener.after_close(_file_path);
@@ -135,15 +137,5 @@ namespace turbo {
         }
     }
 
-    turbo::Status RandomReadFile::skip(off_t n) {
-        if (_fd != nullptr) {
-            std::fseek(_fd, implicit_cast<off_t>(n), SEEK_CUR);
-        }
-        return turbo::OkStatus();
-    }
-
-    bool RandomReadFile::is_eof(turbo::Status *frs) {
-        return std::feof(_fd);
-    }
 
 } // namespace turbo

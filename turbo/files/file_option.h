@@ -13,7 +13,7 @@ namespace turbo {
         int32_t open_tries{1};
         uint32_t open_interval{0};
         bool create_dir_if_miss{false};
-        bool prevent_child{false};
+        bool prevent_child{true};
     };
 }  // namespace turbo
 

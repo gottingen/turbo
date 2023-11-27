@@ -202,7 +202,7 @@ TEST_CASE("crpto, sha256") {
        "42e61e174fbb3897d6dd6cef3dd2802fe67b331953b06114a65c772859dfc1aa"}};
 
   for (const auto &p : test_vectors) {
-    CHECK_EQ(sha256_hex(HexStringToBytes(p.first)), p.second);
+    CHECK_EQ(sha256_hex(hex_to_bytes(p.first)), p.second);
   }
 }
 
@@ -329,7 +329,7 @@ TEST_CASE("crpto, sha512") {
        "1d5bca579c271b9f2d806730d88f58252fd0c2587851c3ac8a0e72b4e1dc0da6"}};
 
   for (const auto &p : test_vectors) {
-    CHECK_EQ(sha512_hex(HexStringToBytes(p.first)), p.second);
+    CHECK_EQ(sha512_hex(hex_to_bytes(p.first)), p.second);
   }
 }
 

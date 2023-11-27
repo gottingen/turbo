@@ -32,28 +32,50 @@ namespace turbo {
 
         ~SequentialReadFile();
 
-        turbo::Status open(const turbo::filesystem::path &path) noexcept;
+        ///
+        /// \param path
+        /// \return
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path) noexcept;
 
-        turbo::ResultStatus<size_t> read(std::string *content, size_t n = npos);
+        ///
+        /// \param content
+        /// \param n
+        /// \return
+        [[nodiscard]] turbo::ResultStatus<size_t> read(std::string *content, size_t n = npos);
 
-        turbo::ResultStatus<size_t> read(turbo::Cord *buf, size_t n = npos);
+        ///
+        /// \param buf
+        /// \param n
+        /// \return
+        [[nodiscard]] turbo::ResultStatus<size_t> read(turbo::Cord *buf, size_t n = npos);
 
-        turbo::ResultStatus<size_t> read(void *buff, size_t len);
+        ///
+        /// \param buff
+        /// \param len
+        /// \return
+        [[nodiscard]] turbo::ResultStatus<size_t> read(void *buff, size_t len);
 
-        turbo::Status skip(off_t n);
+        ///
+        /// \param n
+        /// \return
+        [[nodiscard]] turbo::Status skip(off_t n);
 
-        bool is_eof();
+        ///
+        /// \return
+        turbo::ResultStatus<bool> is_eof();
 
         void close();
 
-        const turbo::filesystem::path &path() const { return _file_path; }
+        ///
+        /// \return
+        [[nodiscard]] const turbo::filesystem::path &path() const { return _file_path; }
 
     private:
         // no lint
         TURBO_NON_COPYABLE(SequentialReadFile);
 
         static const size_t npos = std::numeric_limits<size_t>::max();
-        std::FILE *_fd{nullptr};
+        std::FILE *_fp{nullptr};
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;
         FileEventListener _listener;
