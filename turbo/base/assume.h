@@ -18,6 +18,11 @@
 #include <cstdlib>
 #include "turbo/platform/port.h"
 
+        /**
+        * @defgroup turbo_base meta client operators
+        *
+        */
+
 namespace turbo {
 
 TURBO_FORCE_INLINE void assume(bool cond) {
