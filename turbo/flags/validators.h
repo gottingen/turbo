@@ -38,16 +38,16 @@ namespace turbo {
 
     class Option;
 
-/// @defgroup validator_group Validators
+    /// @defgroup validator_group Validators
 
-/// @brief Some validators that are provided
-///
-/// These are simple `std::string(const std::string&)` validators that are useful. They return
-/// a string if the validation fails. A custom struct is provided, as well, with the same user
-/// semantics, but with the ability to provide a new type name.
-/// @{
+    /// @brief Some validators that are provided
+    ///
+    /// These are simple `std::string(const std::string&)` validators that are useful. They return
+    /// a string if the validation fails. A custom struct is provided, as well, with the same user
+    /// semantics, but with the ability to provide a new type name.
+    /// @{
 
-///
+    ///
     class Validator {
     protected:
         /// This is the description function, if empty the description_ will be used
@@ -187,48 +187,48 @@ namespace turbo {
         void _merge_description(const Validator &val1, const Validator &val2, const std::string &merger);
     };
 
-/// Class wrapping some of the accessors of Validator
+    /// Class wrapping some of the accessors of Validator
     class CustomValidator : public Validator {
     public:
     };
-// The implementation of the built in validators is using the Validator class;
-// the user is only expected to use the const (static) versions (since there's no setup).
-// Therefore, this is in detail.
+    // The implementation of the built in validators is using the Validator class;
+    // the user is only expected to use the const (static) versions (since there's no setup).
+    // Therefore, this is in detail.
     namespace detail {
 
-/// CLI enumeration of different file types
+        /// CLI enumeration of different file types
         enum class path_type {
             nonexistent, file, directory
         };
 
-/// get the type of the path from a file name
+        /// get the type of the path from a file name
         path_type check_path(const char *file) noexcept;
 
-/// Check for an existing file (returns error message if check fails)
+        /// Check for an existing file (returns error message if check fails)
         class ExistingFileValidator : public Validator {
         public:
             ExistingFileValidator();
         };
 
-/// Check for an existing directory (returns error message if check fails)
+        /// Check for an existing directory (returns error message if check fails)
         class ExistingDirectoryValidator : public Validator {
         public:
             ExistingDirectoryValidator();
         };
 
-/// Check for an existing path
+        /// Check for an existing path
         class ExistingPathValidator : public Validator {
         public:
             ExistingPathValidator();
         };
 
-/// Check for an non-existing path
+        /// Check for an non-existing path
         class NonexistentPathValidator : public Validator {
         public:
             NonexistentPathValidator();
         };
 
-/// Validate the given string is a legal ipv4 address
+        /// Validate the given string is a legal ipv4 address
         class IPV4Validator : public Validator {
         public:
             IPV4Validator();
@@ -236,24 +236,24 @@ namespace turbo {
 
     }  // namespace detail
 
-// Static is not needed here, because global const implies static.
+    // Static is not needed here, because global const implies static.
 
-/// Check for existing file (returns error message if check fails)
+    /// Check for existing file (returns error message if check fails)
     const detail::ExistingFileValidator ExistingFile;
 
-/// Check for an existing directory (returns error message if check fails)
+    /// Check for an existing directory (returns error message if check fails)
     const detail::ExistingDirectoryValidator ExistingDirectory;
 
-/// Check for an existing path
+    /// Check for an existing path
     const detail::ExistingPathValidator ExistingPath;
 
-/// Check for an non-existing path
+    /// Check for an non-existing path
     const detail::NonexistentPathValidator NonexistentPath;
 
-/// Check for an IP4 address
+    /// Check for an IP4 address
     const detail::IPV4Validator ValidIPV4;
 
-/// Validate the input as a particular type
+    /// Validate the input as a particular type
     template<typename DesiredType>
     class TypeValidator : public Validator {
     public:
@@ -270,17 +270,17 @@ namespace turbo {
         TypeValidator() : TypeValidator(detail::type_name<DesiredType>()) {}
     };
 
-/// Check for a number
+    /// Check for a number
     const TypeValidator<double> Number("NUMBER");
 
-/// Modify a path if the file is a particular default location, can be used as Check or transform
-/// with the error return optionally disabled
+    /// Modify a path if the file is a particular default location, can be used as Check or transform
+    /// with the error return optionally disabled
     class FileOnDefaultPath : public Validator {
     public:
         explicit FileOnDefaultPath(std::string default_path, bool enableErrorReturn = true);
     };
 
-/// Produce a range (factory). Min and max are inclusive.
+    /// Produce a range (factory). Min and max are inclusive.
     class Range : public Validator {
     public:
         /// This produces a range with min and max inclusive.
@@ -315,13 +315,13 @@ namespace turbo {
                 : Range(static_cast<T>(0), max_val, validator_name) {}
     };
 
-/// Check for a non negative number
+    /// Check for a non negative number
     const Range NonNegativeNumber((std::numeric_limits<double>::max)(), "NONNEGATIVE");
 
-/// Check for a positive valued number (val>0.0), <double>::min  here is the smallest positive number
+    /// Check for a positive valued number (val>0.0), <double>::min  here is the smallest positive number
     const Range PositiveNumber((std::numeric_limits<double>::min)(), (std::numeric_limits<double>::max)(), "POSITIVE");
 
-/// Produce a bounded range (factory). Min and max are inclusive.
+    /// Produce a bounded range (factory). Min and max are inclusive.
     class Bound : public Validator {
     public:
         /// This bounds a value with min and max inclusive.
@@ -369,7 +369,7 @@ namespace turbo {
             return value;
         }
 
-/// Generate a string representation of a set
+        /// Generate a string representation of a set
         template<typename T>
         std::string generate_set(const T &set) {
             using element_t = typename detail::element_type<T>::type;
@@ -383,7 +383,7 @@ namespace turbo {
             return out;
         }
 
-/// Generate a string representation of a map
+        /// Generate a string representation of a map
         template<typename T>
         std::string generate_map(const T &map, bool key_only = false) {
             using element_t = typename detail::element_type<T>::type;
@@ -417,7 +417,7 @@ namespace turbo {
             using type = std::integral_constant<bool, value>;
         };
 
-/// A search function
+        /// A search function
         template<typename T, typename V, std::enable_if_t<!has_find<T, V>::value, detail::enabler> = detail::dummy>
         auto search(const T &set, const V &val) -> std::pair<bool, decltype(std::begin(detail::smart_deref(set)))> {
             using element_t = typename detail::element_type<T>::type;
@@ -428,7 +428,7 @@ namespace turbo {
             return {(it != std::end(setref)), it};
         }
 
-/// A search function that uses the built in find function
+        /// A search function that uses the built in find function
         template<typename T, typename V, std::enable_if_t<has_find<T, V>::value, detail::enabler> = detail::dummy>
         auto search(const T &set, const V &val) -> std::pair<bool, decltype(std::begin(detail::smart_deref(set)))> {
             auto &setref = detail::smart_deref(set);
@@ -436,7 +436,7 @@ namespace turbo {
             return {(it != std::end(setref)), it};
         }
 
-/// A search function with a filter function
+        /// A search function with a filter function
         template<typename T, typename V>
         auto search(const T &set, const V &val, const std::function<V(V)> &filter_function)
         -> std::pair<bool, decltype(std::begin(detail::smart_deref(set)))> {
@@ -456,10 +456,10 @@ namespace turbo {
             return {(it != std::end(setref)), it};
         }
 
-// the following suggestion was made by Nikita Ofitserov(@himikof)
-// done in templates to prevent compiler warnings on negation of unsigned numbers
+        // the following suggestion was made by Nikita Ofitserov(@himikof)
+        // done in templates to prevent compiler warnings on negation of unsigned numbers
 
-/// Do a check for overflow on signed numbers
+        /// Do a check for overflow on signed numbers
         template<typename T>
         inline typename std::enable_if<std::is_signed<T>::value, T>::type overflowCheck(const T &a, const T &b) {
             if ((a > 0) == (b > 0)) {
@@ -468,13 +468,13 @@ namespace turbo {
             return ((std::numeric_limits<T>::min)() / (std::abs)(a) > -(std::abs)(b));
         }
 
-/// Do a check for overflow on unsigned numbers
+        /// Do a check for overflow on unsigned numbers
         template<typename T>
         inline typename std::enable_if<!std::is_signed<T>::value, T>::type overflowCheck(const T &a, const T &b) {
             return ((std::numeric_limits<T>::max)() / a < b);
         }
 
-/// Performs a *= b; if it doesn't cause integer overflow. Returns false otherwise.
+        /// Performs a *= b; if it doesn't cause integer overflow. Returns false otherwise.
         template<typename T>
         typename std::enable_if<std::is_integral<T>::value, bool>::type checked_multiply(T &a, T b) {
             if (a == 0 || b == 0 || a == 1 || b == 1) {
@@ -491,7 +491,7 @@ namespace turbo {
             return true;
         }
 
-/// Performs a *= b; if it doesn't equal infinity. Returns false otherwise.
+        /// Performs a *= b; if it doesn't equal infinity. Returns false otherwise.
         template<typename T>
         typename std::enable_if<std::is_floating_point<T>::value, bool>::type checked_multiply(T &a, T b) {
             T c = a * b;
@@ -503,7 +503,7 @@ namespace turbo {
         }
 
     }  // namespace detail
-/// Verify items are in a set
+    /// Verify items are in a set
     class IsMember : public Validator {
     public:
         using filter_fn_t = std::function<std::string(std::string)>;

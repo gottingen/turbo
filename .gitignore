@@ -43,3 +43,4 @@ bazel-out
 bazel-*
 .clwb
 carbin
+docs/xml

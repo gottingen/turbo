@@ -54,7 +54,7 @@
 #include "turbo/platform/port.h"
 
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                        #include <windows.h>
+#include <windows.h>
 // additional includes
 #include <shellapi.h>
 #include <sys/stat.h>

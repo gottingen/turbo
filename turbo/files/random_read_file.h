@@ -33,20 +33,38 @@ namespace turbo {
 
         ~RandomReadFile();
 
-        turbo::Status open(const turbo::filesystem::path &path) noexcept;
+        ///
+        /// \param path
+        /// \return
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path) noexcept;
 
-        turbo::ResultStatus<size_t> read(size_t offset, std::string *content, size_t n = npos);
+        ///
+        /// \param offset
+        /// \param content
+        /// \param n
+        /// \return
+        [[nodiscard]] turbo::ResultStatus<size_t> read(size_t offset, std::string *content, size_t n = npos);
 
-        turbo::ResultStatus<size_t> read(size_t offset, turbo::Cord *buf, size_t n = npos);
+        ///
+        /// \param offset
+        /// \param buf
+        /// \param n
+        /// \return
+        [[nodiscard]] turbo::ResultStatus<size_t> read(size_t offset, turbo::Cord *buf, size_t n = npos);
 
-        turbo::ResultStatus<size_t> read(size_t offset, void *buff, size_t len);
+        ///
+        /// \param offset
+        /// \param buff
+        /// \param len
+        /// \return
+        [[nodiscard]] turbo::ResultStatus<size_t> read(size_t offset, void *buff, size_t len);
 
-        turbo::Status skip(off_t n);
-
-        bool is_eof(turbo::Status *frs);
-
+        ///
+        /// \brief close file
         void close();
 
+        ///
+        /// \return
         const turbo::filesystem::path &path() const { return _file_path; }
 
     private:
@@ -54,7 +72,8 @@ namespace turbo {
         TURBO_NON_COPYABLE(RandomReadFile);
 
         static const size_t npos = std::numeric_limits<size_t>::max();
-        std::FILE *_fd{nullptr};
+        std::FILE *_fp{nullptr};
+        int        _fd;
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;
         FileEventListener _listener;

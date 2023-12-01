@@ -331,7 +331,7 @@ namespace turbo {
                 if (printer) result = printer(type_url, payload);
                 turbo::FormatAppend(
                         &text, " [{}='{}']", type_url,
-                        result.has_value() ? *result : turbo::CHexEscape(std::string(payload)));
+                        result.has_value() ? *result : turbo::c_hex_encode(std::string(payload)));
             });
         }
 

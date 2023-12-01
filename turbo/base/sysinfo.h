@@ -20,19 +20,39 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_base
+     * @return
+     */
     TURBO_DLL int pid() noexcept;
-
+`
     // Determine if the terminal supports colors
     // Source: https://github.com/agauniyal/rang/
+    /**
+     * @ingroup turbo_base
+     * @return
+     */
     TURBO_DLL bool is_color_terminal() noexcept;
 
     // Determine if the terminal attached
     // Source: https://github.com/agauniyal/rang/
+    /**
+     * @ingroup turbo_base
+     * @return
+     */
     TURBO_DLL bool in_terminal(std::FILE *file) noexcept;
 
     // Return current thread id as size_t (from thread local storage)
+    /**
+     * @ingroup turbo_base
+     * @return
+     */
     TURBO_DLL size_t thread_id() noexcept;
 
+    /**
+     * @ingroup turbo_base
+     * @return
+     */
     TURBO_DLL size_t get_host_memory_size();
 
 }  // namespace turbo

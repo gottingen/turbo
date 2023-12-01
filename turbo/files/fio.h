@@ -37,6 +37,8 @@ namespace turbo {
 
         static turbo::ResultStatus<size_t> file_size(std::FILE *fp);
 
+        static turbo::ResultStatus<size_t> file_size(int fd);
+
     };
 
 #if defined(TURBO_PLATFORM_LINUX)

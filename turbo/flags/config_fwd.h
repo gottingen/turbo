@@ -30,7 +30,7 @@ namespace turbo {
 
     class App;
 
-/// Holds values to load into Options
+    /// Holds values to load into Options
     struct ConfigItem {
         /// This is the list of parents
         std::vector<std::string> parents{};

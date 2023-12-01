@@ -1281,12 +1281,12 @@ namespace turbo {
                 if (rep->IsExternal()) {
                     *os << "EXTERNAL [";
                     if (include_data)
-                        *os << turbo::CEscape(std::string(rep->external()->base, rep->length));
+                        *os << turbo::c_encode(std::string(rep->external()->base, rep->length));
                     *os << "]\n";
                 } else if (rep->IsFlat()) {
                     *os << "FLAT cap=" << rep->flat()->Capacity() << " [";
                     if (include_data)
-                        *os << turbo::CEscape(std::string(rep->flat()->Data(), rep->length));
+                        *os << turbo::c_encode(std::string(rep->flat()->Data(), rep->length));
                     *os << "]\n";
                 } else {
                     CordRepBtree::Dump(rep, /*label=*/ "", include_data, *os);

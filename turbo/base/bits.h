@@ -59,6 +59,12 @@ namespace turbo {
         return numeric_internal::RotateLeft(x, s);
     }
 
+    /**
+     * @tparam T
+     * @param x
+     * @param s
+     * @return
+     */
     template<class T>
     TURBO_MUST_USE_RESULT constexpr
     typename std::enable_if<std::is_unsigned<T>::value, T>::type
@@ -67,7 +73,6 @@ namespace turbo {
     }
 
     // Counting functions
-    //
     // While these functions are typically constexpr, on some platforms, they may
     // not be marked as constexpr due to constraints of the compiler/available
     // intrinsics.

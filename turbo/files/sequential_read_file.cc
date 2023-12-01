@@ -45,9 +45,9 @@ namespace turbo {
         for (int tries = 0; tries < _option.open_tries; ++tries) {
             auto rs = Fio::file_open_read(_file_path, "rb", _option);
             if (rs.ok()) {
-                _fd = rs.value();
+                _fp = rs.value();
                 if (_listener.after_open) {
-                    _listener.after_open(_file_path, _fd);
+                    _listener.after_open(_file_path, _fp);
                 }
                 return turbo::OkStatus();
             }
@@ -59,7 +59,7 @@ namespace turbo {
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(void *buff, size_t len) {
-        if (_fd == nullptr) {
+        if (_fp == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
         if(len == 0) {
@@ -67,9 +67,9 @@ namespace turbo {
         }
         size_t has_read = 0;
         char *pdata = static_cast<char *>(buff);
-        while (has_read < len && !std::feof(_fd)) {
-            auto n = std::fread(pdata + static_cast<std::ptrdiff_t>(has_read), 1, len - has_read, _fd);
-            if (std::ferror(_fd)) {
+        while (has_read < len && !std::feof(_fp)) {
+            auto n = std::fread(pdata + static_cast<std::ptrdiff_t>(has_read), 1, len - has_read, _fp);
+            if (std::ferror(_fp)) {
                 return turbo::ErrnoToStatus(errno, "");
             }
             has_read += n;
@@ -81,12 +81,12 @@ namespace turbo {
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(std::string *content, size_t n) {
-        if (_fd == nullptr) {
+        if (_fp == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
         size_t len = n;
         if(len == npos) {
-            auto r = Fio::file_size(_fd);
+            auto r = Fio::file_size(_fp);
             if(!r.ok()) {
                 return r;
             }
@@ -105,12 +105,12 @@ namespace turbo {
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(turbo::Cord *buf, size_t n) {
-        if (_fd == nullptr) {
+        if (_fp == nullptr) {
             return turbo::UnavailableError("file not open for read yet");
         }
         size_t len = n;
         if(len == npos) {
-            auto r = Fio::file_size(_fd);
+            auto r = Fio::file_size(_fp);
             if(!r.ok()) {
                 return r;
             }
@@ -141,13 +141,13 @@ namespace turbo {
     }
 
     void SequentialReadFile::close() {
-        if (_fd != nullptr) {
+        if (_fp != nullptr) {
             if (_listener.before_close) {
-                _listener.before_close(_file_path, _fd);
+                _listener.before_close(_file_path, _fp);
             }
 
-            std::fclose(_fd);
-            _fd = nullptr;
+            std::fclose(_fp);
+            _fp = nullptr;
 
             if (_listener.after_close) {
                 _listener.after_close(_file_path);
@@ -156,14 +156,18 @@ namespace turbo {
     }
 
     turbo::Status SequentialReadFile::skip(off_t n) {
-        if (_fd != nullptr) {
-            std::fseek(_fd, implicit_cast<off_t>(n), SEEK_CUR);
+        if (_fp != nullptr) {
+            std::fseek(_fp, implicit_cast<off_t>(n), SEEK_CUR);
         }
         return turbo::OkStatus();
     }
 
-    bool SequentialReadFile::is_eof() {
-        return std::feof(_fd);
+    turbo::ResultStatus<bool> SequentialReadFile::is_eof() {
+        auto ret = std::feof(_fp);
+        if(ret < 0) {
+            return turbo::ErrnoToStatus(errno, turbo::Format("test file eof {}", _file_path.c_str()));
+        }
+        return ret == 0;
     }
 
 } // namespace turbo

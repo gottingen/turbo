@@ -1,5 +1,5 @@
-// Copyright 2023 The Turbo Authors.
-//
+// Copyright 2023 The Elastic-AI Authors.
+// part of Elastic AI Search
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,28 +11,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+//
+// Created by jeff on 23-11-28.
+//
 
-#ifndef TURBO_FILES_SEQUENTIAL_WRITE_FILE_H_
-#define TURBO_FILES_SEQUENTIAL_WRITE_FILE_H_
+#ifndef TURBO_FILES_RANDOM_WRITE_FILE_H_
+#define TURBO_FILES_RANDOM_WRITE_FILE_H_
 
 #include "turbo/base/result_status.h"
 #include "turbo/files/filesystem.h"
+#include "turbo/platform/port.h"
 #include "turbo/strings/cord.h"
 #include "turbo/files/file_event_listener.h"
 #include "turbo/files/file_option.h"
-#include "turbo/format/format.h"
+#include "turbo/files/fio.h"
 
 namespace turbo {
 
-    class SequentialWriteFile {
+    class RandomWriteFile {
     public:
-        SequentialWriteFile() = default;
+
+        RandomWriteFile() = default;
+
+        explicit RandomWriteFile(const FileEventListener &listener);
 
         ///
-        /// \param listener
-        explicit SequentialWriteFile(const FileEventListener &listener);
 
-        ~SequentialWriteFile();
+        ~RandomWriteFile();
 
         ///
         /// \param option
@@ -44,32 +50,27 @@ namespace turbo {
         /// \return
         [[nodiscard]] turbo::Status open(const turbo::filesystem::path &fname,
                            bool truncate = false);
+
         ///
         /// \param truncate
         /// \return
         [[nodiscard]] turbo::Status reopen(bool truncate = false);
 
         ///
+        /// \param offset
         /// \param data
         /// \param size
+        /// \param truncate
         /// \return
-        [[nodiscard]] turbo::Status write(const char *data, size_t size);
+        [[nodiscard]] turbo::Status write(size_t offset,const char *data, size_t size, bool truncate = false);
 
         ///
+        /// \param offset
         /// \param str
+        /// \param truncate
         /// \return
-        [[nodiscard]] turbo::Status write(std::string_view str) {
-            return write(str.data(), str.size());
-        }
-
-        ///
-        /// \tparam Char
-        /// \tparam N
-        /// \param buffer
-        /// \return
-        template<typename Char, size_t N>
-        [[nodiscard]] turbo::Status write(const fmt::basic_memory_buffer<Char, N> &buffer) {
-            return write(buffer.data(), buffer.size() * sizeof(Char));
+        [[nodiscard]] turbo::Status write(size_t offset, std::string_view str, bool truncate = false) {
+            return write(offset, str.data(), str.size(), truncate);
         }
 
         ///
@@ -81,8 +82,12 @@ namespace turbo {
         /// \return
         [[nodiscard]] turbo::ResultStatus<size_t> size() const;
 
+        ///
+
         void close();
 
+        ///
+        /// \return
         turbo::Status flush();
 
         ///
@@ -91,11 +96,12 @@ namespace turbo {
 
     private:
         static const size_t npos = std::numeric_limits<size_t>::max();
-        std::FILE *_fd{nullptr};
+        std::FILE *_fp{nullptr};
+        int        _fd{-1};
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;
         FileEventListener _listener;
     };
-} // namespace turbo
+}  // namespace turbo
 
-#endif // TURBO_FILES_SEQUENTIAL_WRITE_FILE_H_
+#endif  // TURBO_FILES_RANDOM_WRITE_FILE_H_
