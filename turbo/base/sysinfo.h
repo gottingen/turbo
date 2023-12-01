@@ -25,7 +25,7 @@ namespace turbo {
      * @return
      */
     TURBO_DLL int pid() noexcept;
-
+`
     // Determine if the terminal supports colors
     // Source: https://github.com/agauniyal/rang/
     /**
