@@ -34,11 +34,13 @@ namespace turbo {
     }
 
     turbo::Status
-    RandomReadFile::open(const turbo::filesystem::path &path) noexcept {
+    RandomReadFile::open(const turbo::filesystem::path &path, const turbo::FileOption &option) noexcept {
         close();
+        _option = option;
         _file_path = path;
-        TURBO_ASSERT(!_file_path.empty());
-        turbo::Status rs;
+        if(_file_path.empty()) {
+            return turbo::InvalidArgumentError("file path is empty");
+        }
         if (_listener.before_open) {
             _listener.before_open(_file_path);
         }

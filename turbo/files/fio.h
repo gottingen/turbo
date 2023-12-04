@@ -26,6 +26,11 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_files
+     * @brief Fio is a file io utility class.
+     *        It is not recommended to use this class directly.
+     */
     class Fio {
     public:
 

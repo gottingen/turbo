@@ -24,6 +24,10 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_files
+     * @brief SequentialReadFile is a file io utility class.
+     */
     class SequentialReadFile {
     public:
         SequentialReadFile() = default;
@@ -32,42 +36,66 @@ namespace turbo {
 
         ~SequentialReadFile();
 
-        ///
-        /// \param path
-        /// \return
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path) noexcept;
+        /**
+         * @brief open file with path and option specified by user.
+         *        If the file does not exist, it will be returned with an error.
+         * @param path file path
+         * @param option file option
+         */
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept;
 
-        ///
-        /// \param content
-        /// \param n
-        /// \return
+        /**
+         * @brief read file content sequentially from the current position to the specified length.
+         * @param content [output] file content, can not be nullptr.
+         * @param n [input] read length, default is npos, which means read all. If the length is greater than the file
+         *          size, the file content will be read from the current position to the end of the file.
+         * @return the length of the file content read and the status of the operation.
+         */
         [[nodiscard]] turbo::ResultStatus<size_t> read(std::string *content, size_t n = npos);
 
-        ///
-        /// \param buf
-        /// \param n
-        /// \return
+        /**
+         * @brief read file content sequentially from the current position to the specified length.
+         * @param buf [output] file content, can not be nullptr.
+         * @param n [input] read length, default is npos, which means read all. If the length is greater than the file
+         *          size, the file content will be read from the current position to the end of the file.
+         * @return the length of the file content read and the status of the operation.
+         */
         [[nodiscard]] turbo::ResultStatus<size_t> read(turbo::Cord *buf, size_t n = npos);
 
-        ///
-        /// \param buff
-        /// \param len
-        /// \return
+
+        /**
+         * @brief read file content sequentially from the current position to the specified length.
+         * @param buff [output] file content, can not be nullptr.
+         * @param len [input] read length, The length must be less than or equal to the size of the buff.
+         *        If the length is greater than the file size, the file content will be read from the current position to the end of the file.
+         *        If the length is less than the file size, the file content will be read from the current position to the length.
+         * @return the length of the file content read and the status of the operation.
+         */
         [[nodiscard]] turbo::ResultStatus<size_t> read(void *buff, size_t len);
 
-        ///
-        /// \param n
-        /// \return
+        /**
+         * @brief skip file descriptor sequentially from the current position to the position specified by offset.
+         *        after skip, the current position will be offset + current position.
+         * @param n [input] skip length, if n + current position is greater than the file size, the current position will be set to the end of the file.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status skip(off_t n);
 
-        ///
-        /// \return
+        /**
+         * @brief if the current position is the end of the file, return true, otherwise return false.
+         * @return the status of the operation.
+         */
         turbo::ResultStatus<bool> is_eof();
 
+        /**
+         * @brief close file.
+         */
         void close();
 
-        ///
-        /// \return
+        /**
+         * @brief get file path.
+         * @return file path.
+         */
         [[nodiscard]] const turbo::filesystem::path &path() const { return _file_path; }
 
     private:

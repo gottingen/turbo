@@ -27,6 +27,7 @@ Contents
 
     en/api/platform
     en/api/base
+    en/api/files
 
 
 .. toctree::

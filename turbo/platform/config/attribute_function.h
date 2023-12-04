@@ -214,7 +214,6 @@
 #endif // TURBO_MAYBE_UNUSED
 
 /**
- * @def   TURBO_FORCE_INLINE
  * @ingroup turbo_platform
  * @brief This macro is used to force inline a function.
  * @details The `TURBO_FORCE_INLINE` macro is used to force inline a function.

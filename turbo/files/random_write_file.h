@@ -29,6 +29,10 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_files
+     * @brief RandomWriteFile is a file io utility class.
+     */
     class RandomWriteFile {
     public:
 
@@ -40,58 +44,89 @@ namespace turbo {
 
         ~RandomWriteFile();
 
-        ///
-        /// \param option
+        /**
+         * @brief set_option set file option before open file.
+         *        default option is FileOption::kDefault.
+         *        If you want to set the file option, you must call this function before open file.
+         */
         void set_option(const FileOption &option);
 
-        ///
-        /// \param fname
-        /// \param truncate
-        /// \return
+        /**
+         * @brief open file with path and option specified by user.
+         *        The option can be set by set_option function. @see set_option.
+         *        If the file does not exist, it will be created.
+         *        If the file exists, it will be opened.
+         *        If the file exists and the truncate option is true, the file will be truncated.
+         * @param fname file path
+         * @param truncate truncate file if true, default is false.
+         * @return the status of the operation. If the file is opened successfully, the status is OK.
+         */
         [[nodiscard]] turbo::Status open(const turbo::filesystem::path &fname,
                            bool truncate = false);
 
-        ///
-        /// \param truncate
-        /// \return
+        /**
+         * @brief reopen file with path and option specified by user.
+         *        The option can be set by set_option function. @see set_option.
+         *        If the file does not exist, it will be created.
+         *        If the file exists, it will be opened.
+         *        If the file exists and the truncate option is true, the file will be truncated.
+         * @param truncate truncate file if true, default is false.
+         * @return the status of the operation. If the file is opened successfully, the status is OK.
+         */
         [[nodiscard]] turbo::Status reopen(bool truncate = false);
 
-        ///
-        /// \param offset
-        /// \param data
-        /// \param size
-        /// \param truncate
-        /// \return
+        /**
+         * @brief write file content from offset to the specified length.
+         * @param offset [input] file offset
+         * @param data [input] file content, can not be nullptr.
+         * @param size [input] write length.
+         * @param truncate [input] truncate file if true, default is false.
+         *        If set to true, the file will be truncated to the length + offset.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status write(size_t offset,const char *data, size_t size, bool truncate = false);
 
-        ///
-        /// \param offset
-        /// \param str
-        /// \param truncate
-        /// \return
+        /**
+         * @brief write file content from offset to the specified length.
+         * @param offset [input] file offset
+         * @param str [input] file content, can not be empty.
+         * @param truncate [input] truncate file if true, default is false.
+         *       If set to true, the file will be truncated to the str.size() + offset.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status write(size_t offset, std::string_view str, bool truncate = false) {
             return write(offset, str.data(), str.size(), truncate);
         }
 
-        ///
-        /// \param size
-        /// \return
+        /**
+         * @brief truncate file to the specified length.
+         * @param size [input] file length.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status truncate(size_t size);
 
-        ///
-        /// \return
+        /**
+         * @brief get file size.
+         * @return the file size and the status of the operation.
+         */
         [[nodiscard]] turbo::ResultStatus<size_t> size() const;
 
-        ///
-
+        /**
+         * @brief close file.
+         */
         void close();
 
-        ///
-        /// \return
+        /**
+         * @brief flush file.
+         * @return the status of the operation.
+         */
+        [[nodiscard]]
         turbo::Status flush();
 
-        ///
-        /// \return
+        /**
+         * @brief get file path.
+         * @return file path.
+         */
         [[nodiscard]] const turbo::filesystem::path &file_path() const;
 
     private:

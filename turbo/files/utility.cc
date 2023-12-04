@@ -162,14 +162,14 @@ namespace turbo {
         return turbo::OkStatus();
     }
 
-    turbo::Status FileUtility::write_file(const std::string_view &file_path, const std::string_view &result, bool truncate) noexcept {
+    turbo::Status FileUtility::write_file(const std::string_view &file_path, const std::string_view &content, bool truncate) noexcept {
         SequentialWriteFile file;
         auto rs = file.open(file_path, truncate);
         if(!rs.ok()) {
             return rs;
         }
 
-        rs = file.write(result);
+        rs = file.write(content);
         if(!rs.ok()) {
             return rs;
         }

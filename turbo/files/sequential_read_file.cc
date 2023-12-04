@@ -34,8 +34,9 @@ namespace turbo {
     }
 
     turbo::Status
-    SequentialReadFile::open(const turbo::filesystem::path &path) noexcept {
+    SequentialReadFile::open(const turbo::filesystem::path &path, const turbo::FileOption &option) noexcept {
         close();
+        _option = option;
         _file_path = path;
         TURBO_ASSERT(!_file_path.empty());
         if (_listener.before_open) {
