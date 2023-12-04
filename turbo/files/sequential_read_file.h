@@ -27,6 +27,32 @@ namespace turbo {
     /**
      * @ingroup turbo_files
      * @brief SequentialReadFile is a file io utility class.
+     * eg.
+     * @code
+     *     SequentialReadFile file;
+     *     auto rs = file.open("test.txt");
+     *     if (!rs.ok()) {
+     *          std::cout << rs.status().message() << std::endl;
+     *          return;
+     *     }
+     *     std::string content;
+     *     // read all content.
+     *     rs = file.read(&content);
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *     }
+     *     std::cout << content << std::endl;
+     *     // read 10 bytes.
+     *     rs = file.read(&content, 10);
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *     }
+     *     std::cout << content << std::endl;
+     *     // close file or use RAII.
+     *     file.close();
+     * @endcode
      */
     class SequentialReadFile {
     public:

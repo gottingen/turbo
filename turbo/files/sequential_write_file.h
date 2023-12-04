@@ -27,6 +27,32 @@ namespace turbo {
     /**
      * @ingroup turbo_files
      * @brief SequentialWriteFile is a file io utility class.
+     * eg.
+     * @code
+     *     SequentialWriteFile file;
+     *     auto rs = file.open("test.txt");
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *     }
+     *     std::string content = "hello world";
+     *     // write content to file.
+     *     rs = file.write(content);
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *     }
+     *     // flush file.
+     *     rs = file.flush();
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *      }
+     *      // close file or use RAII, it is not necessary to call flush before close.
+     *      // and recommend to use close manually.
+     *      file.close();
+     *      // or use RAII.
+     * @endcode
      */
     class SequentialWriteFile {
     public:

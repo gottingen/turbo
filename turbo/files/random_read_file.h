@@ -28,6 +28,35 @@ namespace turbo {
     /**
      * @ingroup turbo_files
      * @brief RandomReadFile is a file io utility class.
+     * eg.
+     * @code
+     *    RandomReadFile file;
+     *    auto rs = file.open("test.txt");
+     *    if (!rs.ok()) {
+     *        std::cout << rs.status().message() << std::endl;
+     *        return;
+     *        // or throw exception.
+     *    }
+     *    std::string content;
+     *    // read all content.
+     *    rs = file.read(0, &content);
+     *    if (!rs.ok()) {
+     *        std::cout << rs.status().message() << std::endl;
+     *        // or throw exception.
+     *        return;
+     *    }
+     *    std::cout << content << std::endl;
+     *    // read 10 bytes from offset 10.
+     *    rs = file.read(10, &content, 10);
+     *    if (!rs.ok()) {
+     *        std::cout << rs.status().message() << std::endl;
+     *        // or throw exception.
+     *        return;
+     *    }
+     *    std::cout << content << std::endl;
+     *    // close file or use RAII.
+     *    file.close();
+     * @endcode
      */
     class RandomReadFile {
     public:

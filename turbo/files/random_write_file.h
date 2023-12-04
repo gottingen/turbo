@@ -32,6 +32,42 @@ namespace turbo {
     /**
      * @ingroup turbo_files
      * @brief RandomWriteFile is a file io utility class.
+     * eg.
+     * @code
+     *      RandomWriteFile file;
+     *      auto rs = file.open("test.txt");
+     *      if (!rs.ok()) {
+     *          std::cout << rs.status().message() << std::endl;
+     *          // or throw exception.
+     *          return;
+     *      }
+     *      std::string content = "hello world";
+     *      // write content to file.
+     *      rs = file.write(0, content);
+     *      if (!rs.ok()) {
+     *          std::cout << rs.status().message() << std::endl;
+     *          // or throw exception.
+     *          return;
+     *      }
+     *      // write content to file from offset 10.
+     *      rs = file.write(10, content);
+     *      if (!rs.ok()) {
+     *          std::cout << rs.status().message() << std::endl;
+     *          // or throw exception.
+     *          return;
+     *       }
+     *       // write content to file from offset 10 and truncate file.
+     *       rs = file.write(10, content, true);
+     *       if (!rs.ok()) {
+     *           std::cout << rs.status().message() << std::endl;
+     *           // or throw exception.
+     *           return;
+     *       }
+     *       // when write file recommend to call flush function.
+     *       file.flush();
+     *       // close file or use RAII,  it is recommended to call flush function before close file.
+     *       file.close();
+     * @endcode
      */
     class RandomWriteFile {
     public:
