@@ -400,9 +400,9 @@ inline TURBO_RANDOM_INTERNAL_ATTRIBUTE_ALWAYS_INLINE void SwapEndian(
     turbo::uint128* state) {
 #if TURBO_IS_BIG_ENDIAN
   for (uint32_t block = 0; block < RandenTraits::kFeistelBlocks; ++block) {
-    uint64_t new_lo = turbo::little_endian::ToHost64(
+    uint64_t new_lo = turbo::little_endian::to_host64(
         static_cast<uint64_t>(state[block] >> 64));
-    uint64_t new_hi = turbo::little_endian::ToHost64(
+    uint64_t new_hi = turbo::little_endian::to_host64(
         static_cast<uint64_t>((state[block] << 64) >> 64));
     state[block] = (static_cast<turbo::uint128>(new_hi) << 64) | new_lo;
   }

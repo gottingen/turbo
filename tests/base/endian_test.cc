@@ -187,21 +187,21 @@ namespace turbo {
 
             SUBCASE("little_endian") {
                 // Check little_endian uint16_t.
-                uint64_t comp = little_endian::FromHost16(k16Value);
+                uint64_t comp = little_endian::from_host16(k16Value);
                 CHECK_EQ(comp, k16ValueLE);
-                comp = little_endian::ToHost16(k16ValueLE);
+                comp = little_endian::to_host16(k16ValueLE);
                 CHECK_EQ(comp, k16Value);
 
                 // Check little_endian uint32_t.
-                comp = little_endian::FromHost32(k32Value);
+                comp = little_endian::from_host32(k32Value);
                 CHECK_EQ(comp, k32ValueLE);
-                comp = little_endian::ToHost32(k32ValueLE);
+                comp = little_endian::to_host32(k32ValueLE);
                 CHECK_EQ(comp, k32Value);
 
                 // Check little_endian uint64_t.
-                comp = little_endian::FromHost64(k64Value);
+                comp = little_endian::from_host64(k64Value);
                 CHECK_EQ(comp, k64ValueLE);
-                comp = little_endian::ToHost64(k64ValueLE);
+                comp = little_endian::to_host64(k64ValueLE);
                 CHECK_EQ(comp, k64Value);
 
                 // Check little-endian Load and store functions.
@@ -209,19 +209,19 @@ namespace turbo {
                 uint32_t u32Buf;
                 uint64_t u64Buf;
 
-                little_endian::Store16(&u16Buf, k16Value);
+                little_endian::store16(&u16Buf, k16Value);
                 CHECK_EQ(u16Buf, k16ValueLE);
-                comp = little_endian::Load16(&u16Buf);
+                comp = little_endian::load16(&u16Buf);
                 CHECK_EQ(comp, k16Value);
 
-                little_endian::Store32(&u32Buf, k32Value);
+                little_endian::store32(&u32Buf, k32Value);
                 CHECK_EQ(u32Buf, k32ValueLE);
-                comp = little_endian::Load32(&u32Buf);
+                comp = little_endian::load32(&u32Buf);
                 CHECK_EQ(comp, k32Value);
 
-                little_endian::Store64(&u64Buf, k64Value);
+                little_endian::store64(&u64Buf, k64Value);
                 CHECK_EQ(u64Buf, k64ValueLE);
-                comp = little_endian::Load64(&u64Buf);
+                comp = little_endian::load64(&u64Buf);
                 CHECK_EQ(comp, k64Value);
             }
 
@@ -232,34 +232,34 @@ namespace turbo {
                 uint64_t u64Buf;
 
                 unsigned char buffer[10];
-                big_endian::Store16(&u16Buf, k16Value);
+                big_endian::store16(&u16Buf, k16Value);
                 CHECK_EQ(u16Buf, k16ValueBE);
-                uint64_t comp = big_endian::Load16(&u16Buf);
+                uint64_t comp = big_endian::load16(&u16Buf);
                 CHECK_EQ(comp, k16Value);
 
-                big_endian::Store32(&u32Buf, k32Value);
+                big_endian::store32(&u32Buf, k32Value);
                 CHECK_EQ(u32Buf, k32ValueBE);
-                comp = big_endian::Load32(&u32Buf);
+                comp = big_endian::load32(&u32Buf);
                 CHECK_EQ(comp, k32Value);
 
-                big_endian::Store64(&u64Buf, k64Value);
+                big_endian::store64(&u64Buf, k64Value);
                 CHECK_EQ(u64Buf, k64ValueBE);
-                comp = big_endian::Load64(&u64Buf);
+                comp = big_endian::load64(&u64Buf);
                 CHECK_EQ(comp, k64Value);
 
-                big_endian::Store16(buffer + 1, k16Value);
+                big_endian::store16(buffer + 1, k16Value);
                 CHECK_EQ(u16Buf, k16ValueBE);
-                comp = big_endian::Load16(buffer + 1);
+                comp = big_endian::load16(buffer + 1);
                 CHECK_EQ(comp, k16Value);
 
-                big_endian::Store32(buffer + 1, k32Value);
+                big_endian::store32(buffer + 1, k32Value);
                 CHECK_EQ(u32Buf, k32ValueBE);
-                comp = big_endian::Load32(buffer + 1);
+                comp = big_endian::load32(buffer + 1);
                 CHECK_EQ(comp, k32Value);
 
-                big_endian::Store64(buffer + 1, k64Value);
+                big_endian::store64(buffer + 1, k64Value);
                 CHECK_EQ(u64Buf, k64ValueBE);
-                comp = big_endian::Load64(buffer + 1);
+                comp = big_endian::load64(buffer + 1);
                 CHECK_EQ(comp, k64Value);
             }
         }

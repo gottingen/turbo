@@ -39,17 +39,17 @@ inline bool ExtendCrc32cInline(uint32_t* crc, const char* p, size_t n) {
     p++;
   }
   if (n & 2) {
-    *crc = CRC32_u16(*crc, turbo::little_endian::Load16(p));
+    *crc = CRC32_u16(*crc, turbo::little_endian::load16(p));
     n -= 2;
     p += 2;
   }
   if (n & 4) {
-    *crc = CRC32_u32(*crc, turbo::little_endian::Load32(p));
+    *crc = CRC32_u32(*crc, turbo::little_endian::load32(p));
     n -= 4;
     p += 4;
   }
   while (n) {
-    *crc = CRC32_u64(*crc, turbo::little_endian::Load64(p));
+    *crc = CRC32_u64(*crc, turbo::little_endian::load64(p));
     n -= 8;
     p += 8;
   }
