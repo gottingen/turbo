@@ -25,6 +25,7 @@ Contents
 .. toctree::
     :caption: API REFERENCE
 
+    en/api/platform
     en/api/base
 
 

@@ -27,11 +27,6 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-    const uint16_t SIGN_MASK_08 = 0x80;
-    const uint16_t SIGN_MASK_16 = 0x8000;
-    const uint32_t SIGN_MASK_32 = 0x80000000;
-    const uint64_t SIGN_MASK_64 = 0x8000000000000000;
-
     inline uint64_t gbswap_64(uint64_t host_int) {
 #if TURBO_HAVE_BUILTIN(__builtin_bswap64) || defined(__GNUC__)
         return __builtin_bswap64(host_int);
@@ -75,23 +70,70 @@ namespace turbo {
 
 #if TURBO_IS_LITTLE_ENDIAN
 
+    /**
+     * @ingroup turbo_base
+     * @brief Determine if the current host is little-endian.
+     * @return True if the host is little-endian, false otherwise
+     */
     static constexpr bool kIsLittleEndian = true;
 
-    // Portable definitions for htonl (host-to-network) and friends on little-endian
-    // architectures.
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 16-bit quantity from host byte order to network byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint16_t ghtons(uint16_t x) { return gbswap_16(x); }
 
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 32-bit quantity from host byte order to network byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint32_t ghtonl(uint32_t x) { return gbswap_32(x); }
 
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 64-bit quantity from host byte order to network byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint64_t ghtonll(uint64_t x) { return gbswap_64(x); }
 
 #elif TURBO_IS_BIG_ENDIAN
+
+    /**
+     * @ingroup turbo_base
+     * @brief Determine if the current host is little-endian.
+     * @return True if the host is little-endian, false otherwise
+     */
     static constexpr bool kIsLittleEndian = false;
     // Portable definitions for htonl (host-to-network) etc on big-endian
     // architectures. These definitions are simpler since the host byte order is the
     // same as network byte order.
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 16-bit quantity from host byte order to network byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint16_t ghtons(uint16_t x) { return x; }
+
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 32-bit quantity from host byte order to network byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint32_t ghtonl(uint32_t x) { return x; }
+
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 64-bit quantity from host byte order to network byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint64_t ghtonll(uint64_t x) { return x; }
 
 #else
@@ -100,10 +142,28 @@ namespace turbo {
        "TURBO_IS_LITTLE_ENDIAN must be defined"
 #endif  // byte order
 
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 16-bit quantity from network byte order to host byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint16_t gntohs(uint16_t x) { return ghtons(x); }
 
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 32-bit quantity from network byte order to host byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint32_t gntohl(uint32_t x) { return ghtonl(x); }
 
+    /**
+     * @ingroup turbo_base
+     * @brief Convert a 64-bit quantity from network byte order to host byte order.
+     * @param x The value to convert
+     * @return The converted value
+     */
     inline uint64_t gntohll(uint64_t x) { return ghtonll(x); }
 
     // Utilities to convert numbers between the current hosts's native byte
@@ -114,100 +174,315 @@ namespace turbo {
     // Conversion functions.
 #if TURBO_IS_LITTLE_ENDIAN
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t from_host16(uint16_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t to_host16(uint16_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t from_host32(uint32_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t to_host32(uint32_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t from_host64(uint64_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t to_host64(uint64_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Determine if the current host is little-endian.
+         * @return True if the host is little-endian, false otherwise
+         */
         inline constexpr bool is_little_endian() { return true; }
 
 #elif TURBO_IS_BIG_ENDIAN
-
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t from_host16(uint16_t x) { return gbswap_16(x); }
+
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t to_host16(uint16_t x) { return gbswap_16(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t from_host32(uint32_t x) { return gbswap_32(x); }
+
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t to_host32(uint32_t x) { return gbswap_32(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t from_host64(uint64_t x) { return gbswap_64(x); }
+
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t to_host64(uint64_t x) { return gbswap_64(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Determine if the current host is little-endian.
+         * @return True if the host is little-endian, false otherwise
+         */
         inline constexpr bool is_little_endian() { return false; }
 
 #endif /* ENDIAN */
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint8_t from_host(uint8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t from_host(uint16_t x) { return from_host16(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t from_host(uint32_t x) { return from_host32(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t from_host(uint64_t x) { return from_host64(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint8_t to_host(uint8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t to_host(uint16_t x) { return to_host16(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t to_host(uint32_t x) { return to_host32(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t to_host(uint64_t x) { return to_host64(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int8_t from_host(int8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int16_t from_host(int16_t x) {
             return bit_cast<int16_t>(from_host16(bit_cast<uint16_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int32_t from_host(int32_t x) {
             return bit_cast<int32_t>(from_host32(bit_cast<uint32_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int64_t from_host(int64_t x) {
             return bit_cast<int64_t>(from_host64(bit_cast<uint64_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int8_t to_host(int8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int16_t to_host(int16_t x) {
             return bit_cast<int16_t>(to_host16(bit_cast<uint16_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int32_t to_host(int32_t x) {
             return bit_cast<int32_t>(to_host32(bit_cast<uint32_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int64_t to_host(int64_t x) {
             return bit_cast<int64_t>(to_host64(bit_cast<uint64_t>(x)));
         }
 
-        // Functions to do unaligned loads and stores in little-endian order.
+        /**
+         * @ingroup turbo_base
+         * @brief Load a 16-bit quantity from a byte array even if it's unaligned.
+         * @param p The address to load from
+         * @return The converted value
+         */
         inline uint16_t load16(const void *p) {
             return to_host16(TURBO_INTERNAL_UNALIGNED_LOAD16(p));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Store a 16-bit quantity to a byte array even if it's unaligned.
+         * @param p The address to store to
+         * @param v The value to store
+         */
         inline void store16(void *p, uint16_t v) {
             TURBO_INTERNAL_UNALIGNED_STORE16(p, from_host16(v));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Load a 32-bit quantity from a byte array even if it's unaligned.
+         * @param p The address to load from
+         * @return The converted value
+         */
         inline uint32_t load32(const void *p) {
             return to_host32(TURBO_INTERNAL_UNALIGNED_LOAD32(p));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Store a 32-bit quantity to a byte array even if it's unaligned.
+         * @param p The address to store to
+         * @param v The value to store
+         */
         inline void store32(void *p, uint32_t v) {
             TURBO_INTERNAL_UNALIGNED_STORE32(p, from_host32(v));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Load a 64-bit quantity from a byte array even if it's unaligned.
+         * @param p The address to load from
+         * @return The converted value
+         */
         inline uint64_t load64(const void *p) {
             return to_host64(TURBO_INTERNAL_UNALIGNED_LOAD64(p));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Store a 64-bit quantity to a byte array even if it's unaligned.
+         * @param p The address to store to
+         * @param v The value to store
+         */
         inline void store64(void *p, uint64_t v) {
             TURBO_INTERNAL_UNALIGNED_STORE64(p, from_host64(v));
         }
@@ -221,84 +496,276 @@ namespace turbo {
     namespace big_endian {
 #if TURBO_IS_LITTLE_ENDIAN
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t from_host16(uint16_t x) { return gbswap_16(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t to_host16(uint16_t x) { return gbswap_16(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t from_host32(uint32_t x) { return gbswap_32(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t to_host32(uint32_t x) { return gbswap_32(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t from_host64(uint64_t x) { return gbswap_64(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t to_host64(uint64_t x) { return gbswap_64(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Determine if the current host is little-endian.
+         * @return True if the host is little-endian, false otherwise
+         */
         inline constexpr bool is_little_endian() { return true; }
 
 #elif TURBO_IS_BIG_ENDIAN
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t from_host16(uint16_t x) { return x; }
+
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t to_host16(uint16_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t from_host32(uint32_t x) { return x; }
+
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t to_host32(uint32_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t from_host64(uint64_t x) { return x; }
+
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t to_host64(uint64_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Determine if the current host is little-endian.
+         * @return True if the host is little-endian, false otherwise
+         */
         inline constexpr bool is_little_endian() { return false; }
 
 #endif /* ENDIAN */
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint8_t from_host(uint8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t from_host(uint16_t x) { return from_host16(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t from_host(uint32_t x) { return from_host32(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t from_host(uint64_t x) { return from_host64(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint8_t to_host(uint8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint16_t to_host(uint16_t x) { return to_host16(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint32_t to_host(uint32_t x) { return to_host32(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline uint64_t to_host(uint64_t x) { return to_host64(x); }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int8_t from_host(int8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int16_t from_host(int16_t x) {
             return bit_cast<int16_t>(from_host16(bit_cast<uint16_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int32_t from_host(int32_t x) {
             return bit_cast<int32_t>(from_host32(bit_cast<uint32_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int64_t from_host(int64_t x) {
             return bit_cast<int64_t>(from_host64(bit_cast<uint64_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 8-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int8_t to_host(int8_t x) { return x; }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int16_t to_host(int16_t x) {
             return bit_cast<int16_t>(to_host16(bit_cast<uint16_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int32_t to_host(int32_t x) {
             return bit_cast<int32_t>(to_host32(bit_cast<uint32_t>(x)));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
+         * @param x The value to convert
+         * @return The converted value
+         */
         inline int64_t to_host(int64_t x) {
             return bit_cast<int64_t>(to_host64(bit_cast<uint64_t>(x)));
         }
 
-        // Functions to do unaligned loads and stores in big-endian order.
+        /**
+         * @ingroup turbo_base
+         * @brief Load a 16-bit quantity from a byte array even if it's unaligned.
+         * @param p The address to load from
+         * @return The converted value
+         */
         inline uint16_t load16(const void *p) {
             return to_host16(TURBO_INTERNAL_UNALIGNED_LOAD16(p));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Store a 16-bit quantity to a byte array even if it's unaligned.
+         * @param p The address to store to
+         * @param v The value to store
+         */
         inline void store16(void *p, uint16_t v) {
             TURBO_INTERNAL_UNALIGNED_STORE16(p, from_host16(v));
         }
@@ -307,14 +774,32 @@ namespace turbo {
             return to_host32(TURBO_INTERNAL_UNALIGNED_LOAD32(p));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Store a 32-bit quantity to a byte array even if it's unaligned.
+         * @param p The address to store to
+         * @param v The value to store
+         */
         inline void store32(void *p, uint32_t v) {
             TURBO_INTERNAL_UNALIGNED_STORE32(p, from_host32(v));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Load a 64-bit quantity from a byte array even if it's unaligned.
+         * @param p The address to load from
+         * @return The converted value
+         */
         inline uint64_t load64(const void *p) {
             return to_host64(TURBO_INTERNAL_UNALIGNED_LOAD64(p));
         }
 
+        /**
+         * @ingroup turbo_base
+         * @brief Store a 64-bit quantity to a byte array even if it's unaligned.
+         * @param p The address to store to
+         * @param v The value to store
+         */
         inline void store64(void *p, uint64_t v) {
             TURBO_INTERNAL_UNALIGNED_STORE64(p, from_host64(v));
         }

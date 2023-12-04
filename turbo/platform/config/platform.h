@@ -628,22 +628,12 @@
 	#endif
 #endif
 
-// TURBO_PLATFORM_PTR_SIZE
-// Platform pointer size; same as sizeof(void*).
-// This is not the same as sizeof(int), as int is usually 32 bits on
-// even 64 bit platforms.
-//
-// _WIN64 is defined by Win64 compilers, such as VC++.
-// _M_IA64 is defined by VC++ and Intel compilers for IA64 processors.
-// __LP64__ is defined by HP compilers for the LP64 standard.
-// _LP64 is defined by the GCC and Sun compilers for the LP64 standard.
-// __ia64__ is defined by the GCC compiler for IA64 processors.
-// __arch64__ is defined by the Sparc compiler for 64 bit processors.
-// __mips64__ is defined by the GCC compiler for MIPS processors.
-// __powerpc64__ is defined by the GCC compiler for PowerPC processors.
-// __64BIT__ is defined by the AIX compiler for 64 bit processors.
-// __sizeof_ptr is defined by the ARM compiler (armcc, armcpp).
-//
+/**
+ * @def TURBO_PLATFORM_PTR_SIZE
+ * @brief Platform pointer size; same as sizeof(void*).
+ * This is not the same as sizeof(int), as int is usually 32 bits on
+ * even 64 bit platforms.
+ */
 #ifndef TURBO_PLATFORM_PTR_SIZE
 	#if defined(__WORDSIZE) // Defined by some variations of GCC.
 		#define TURBO_PLATFORM_PTR_SIZE ((__WORDSIZE) / 8)
@@ -657,13 +647,12 @@
 #endif
 
 
-
-// TURBO_PLATFORM_WORD_SIZE
-// This defines the size of a machine word. This will be the same as
-// the size of registers on the machine but not necessarily the same
-// as the size of pointers on the machine. A number of 64 bit platforms
-// have 64 bit registers but 32 bit pointers.
-//
+/**
+ * @def TURBO_PLATFORM_WORD_SIZE
+ * @brief Platform word size; same as sizeof(void*).
+ * This is not the same as sizeof(int), as int is usually 32 bits on
+ * even 64 bit platforms.
+ */
 #ifndef TURBO_PLATFORM_WORD_SIZE
 	#define TURBO_PLATFORM_WORD_SIZE TURBO_PLATFORM_PTR_SIZE
 #endif
@@ -705,11 +694,13 @@
 	#define TURBO_WINAPI_FAMILY_PARTITION(Partition) (0)
 #endif
 
-
-// TURBO_CACHE_LINE_SIZE
-// Specifies the cache line size broken down by compile target.
-// This the expected best guess values for the targets that we can make at compilation time.
-
+/**
+ * @def TURBO_CACHE_LINE_SIZE
+ * @brief Platform cache line size.
+ *        This is the size of the cache line in bytes. This is the size of the
+ *        cache line in bytes. This is the minimum possible value. This the
+ *        expected best guess values for the targets that we can make at compilation time.
+ */
 #ifndef TURBO_CACHE_LINE_SIZE
 	#if   defined(TURBO_PROCESSOR_X86)
 		#define TURBO_CACHE_LINE_SIZE 32    // This is the minimum possible value.

@@ -18,40 +18,58 @@
 #include <cstdlib>
 #include "turbo/platform/port.h"
 
-        /**
-        * @defgroup turbo_base meta client operators
-        *
-        */
+/**
+* @defgroup turbo_base meta client operators
+*
+*/
 
 namespace turbo {
 
-TURBO_FORCE_INLINE void assume(bool cond) {
+    /**
+     * @ingroup turbo_base
+     * @brief This function is used to make assumptions about the condition.
+     *        It uses different compiler intrinsics based on the compiler being used.
+     * @details The `assume_unreachable` function is used to indicate to the compiler
+     *          that a certain code path is unreachable. This function uses different
+     *          compiler intrinsics based on the compiler being used. It is used when
+     *          the condition is always false. This can be useful for optimization
+     *          purposes, as it allows the compiler to make assumptions about the code
+     *          that can potentially lead to more efficient code generation.
+     * @param cond The condition that is assumed to be true.
+     */
+    TURBO_FORCE_INLINE void assume(bool cond) {
 #if defined(__clang__) // Must go first because Clang also defines __GNUC__.
-  __builtin_assume(cond);
+        __builtin_assume(cond);
 #elif defined(__GNUC__)
-  if (!cond) {
-    __builtin_unreachable();
-  }
+        if (!cond) {
+            __builtin_unreachable();
+        }
 #elif defined(_MSC_VER)
-  __assume(cond);
+        __assume(cond);
 #else
-  // Do nothing.
+        // Do nothing.
 #endif
-}
+    }
 
-TURBO_FORCE_INLINE void assume_unreachable() {
-  assume(false);
-  // Do a bit more to get the compiler to understand
-  // that this function really will never return.
+    /**
+     * @ingroup turbo_base
+     * @brief This function is used to make assumptions about the condition.
+     *        It uses different compiler intrinsics based on the compiler being used.
+     *        @see assume(bool cond), this function is used when the condition is always false.
+     */
+    TURBO_FORCE_INLINE void assume_unreachable() {
+        assume(false);
+        // Do a bit more to get the compiler to understand
+        // that this function really will never return.
 #if defined(__GNUC__)
-  __builtin_unreachable();
+        __builtin_unreachable();
 #elif defined(_MSC_VER)
-  __assume(0);
+        __assume(0);
 #else
-  // Well, it's better than nothing.
-  std::abort();
+        // Well, it's better than nothing.
+        std::abort();
 #endif
-}
+    }
 
 } // namespace turbo
 

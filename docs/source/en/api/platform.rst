@@ -1,11 +1,11 @@
 .. Copyright 2020 The Turbo Authors.
 
-.. _turbo_base_module:
+.. _turbo_platform_module:
 
 
-turbo base module
+turbo platform module
 =========================
 
-.. doxygengroup:: turbo_base
+.. doxygengroup:: turbo_platform
    :project: turbo-docs
    :members:
