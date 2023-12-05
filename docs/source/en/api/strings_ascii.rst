@@ -5,6 +5,6 @@
 ascii
 ==================================================
 
-.. doxxygengroup:: turbo_strings_ascii
+.. doxygengroup:: turbo_strings_ascii
    :project: turbo-docs
    :members:
