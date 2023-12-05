@@ -3,7 +3,7 @@
 .. _turbo_files_module:
 
 
-turbo files module
+files module
 =========================
 
 .. doxygengroup:: turbo_files
