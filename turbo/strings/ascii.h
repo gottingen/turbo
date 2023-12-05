@@ -74,7 +74,7 @@ namespace turbo {
 
     }  // namespace ascii_internal
 
-    /*
+    /**
      * @ingroup turbo_strings_ascii
      * @brief Determines whether the given character is an alphabetic character.
      */

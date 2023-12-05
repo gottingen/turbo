@@ -2,7 +2,7 @@
 
 .. _turbo_strings_replace_module:
 
-split
+replace
 ====================================================
 
 ..  doxygengroup:: turbo_strings_replace
