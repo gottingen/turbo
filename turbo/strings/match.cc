@@ -17,7 +17,6 @@
 #include "turbo/strings/internal/memutil.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     bool str_ignore_case_contains(std::string_view haystack,
                            std::string_view needle) noexcept {
@@ -57,5 +56,4 @@ namespace turbo {
                str_equals_ignore_case(text.substr(text.size() - suffix.size()), suffix);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

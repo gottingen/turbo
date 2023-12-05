@@ -30,8 +30,6 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-
     /**
      * @ingroup turbo_strings_trim
      * @brief Strips the `expected` prefix, if found, from the start of `str`.
@@ -102,7 +100,7 @@ namespace turbo {
      * @param prefix The prefix to strip.
      * @return A view into the input string `str` with the given `prefix` removed.
      */
-    TURBO_MUST_USE_RESULT inline std::string_view strip_prefix(
+    [[nodiscard]] inline std::string_view strip_prefix(
             std::string_view str, std::string_view prefix) {
         if (turbo::starts_with(str, prefix)) str.remove_prefix(prefix.size());
         return str;
@@ -123,13 +121,11 @@ namespace turbo {
      * @param suffix The suffix to strip.
      * @return A view into the input string `str` with the given `suffix` removed.
      */
-    TURBO_MUST_USE_RESULT inline std::string_view strip_suffix(
+    [[nodiscard]] inline std::string_view strip_suffix(
             std::string_view str, std::string_view suffix) {
         if (turbo::ends_with(str, suffix)) str.remove_suffix(suffix.size());
         return str;
     }
-
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_STRIP_H_

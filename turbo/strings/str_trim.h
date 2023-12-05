@@ -72,7 +72,7 @@ namespace turbo {
      *         given std::string_view.
      */
     template<typename Pred = by_white_space>
-    TURBO_MUST_USE_RESULT inline std::string_view trim_left(std::string_view str, Pred pred = Pred()) {
+    [[nodiscard]] inline std::string_view trim_left(std::string_view str, Pred pred = Pred()) {
         auto it = std::find_if_not(str.begin(), str.end(), pred);
         return str.substr(static_cast<size_t>(it - str.begin()));
     }
@@ -119,7 +119,7 @@ namespace turbo {
      *         given std::string_view.
      */
     template<typename Pred = by_white_space>
-    TURBO_MUST_USE_RESULT inline std::string_view trim_right(std::string_view str, Pred pred = Pred()) {
+    [[nodiscard]] inline std::string_view trim_right(std::string_view str, Pred pred = Pred()) {
         auto it = std::find_if_not(str.rbegin(), str.rend(), pred);
         return str.substr(0, static_cast<size_t>(str.rend() - it));
     }
@@ -166,7 +166,7 @@ namespace turbo {
      *        given std::string_view.
      */
     template<typename Pred = by_white_space>
-    TURBO_MUST_USE_RESULT inline std::string_view trim_all(std::string_view str, Pred pred = Pred()) {
+    [[nodiscard]] inline std::string_view trim_all(std::string_view str, Pred pred = Pred()) {
         return trim_right(trim_left(str, pred), pred);
     }
 

@@ -13,3 +13,4 @@ turbo string module
     strings_trim
     strings_match
     strings_split
+    strings_replace

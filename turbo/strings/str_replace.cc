@@ -17,7 +17,6 @@
 #include "turbo/format/format.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace strings_internal {
 
         using FixedMapping =
@@ -78,5 +77,4 @@ namespace turbo {
         return str_replace_all<strings_internal::FixedMapping>(replacements, target);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -11,6 +11,7 @@
  * @defgroup turbo_strings_trim String trimming utilities
  * @defgroup turbo_strings_match String matching utilities
  * @defgroup turbo_strings_split String matching utilities
+ * @defgroup turbo_strings_replace String matching utilities
  */
 
 #include "turbo/strings/str_case_conv.h"

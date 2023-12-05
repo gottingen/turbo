@@ -41,7 +41,6 @@
 #include "turbo/strings/match.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     bool simple_atof(std::string_view str, float *out) {
         *out = 0.0;
@@ -1183,5 +1182,4 @@ namespace turbo {
         }
 
     }  // namespace numbers_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -476,6 +476,7 @@ namespace turbo {
      *          // members, respectively. The remaining split substrings are discarded. If there
      *          // are less than two split substrings, the empty string is used for the
      *          // corresponding `std::pair` member.
+     *          @endcode
      *          // Example:
      *          @code
      *          // Stores first two split strings as the members in a std::pair.

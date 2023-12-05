@@ -38,7 +38,6 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     /**
      * @ingroup turbo_strings_match
@@ -168,7 +167,6 @@ namespace turbo {
     bool ends_with_ignore_case(std::string_view text,
                             std::string_view suffix) noexcept;
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_MATCH_H_

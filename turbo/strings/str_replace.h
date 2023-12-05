@@ -17,7 +17,7 @@
 /**
  * @file str_replace.h
  * @brief replace string
- * @ingroup turbo_string_convert
+ * @ingroup turbo_strings_replace
  * @details This file defines `turbo::str_replace_all()`, a general-purpose string
  *          replacement function designed for large, arbitrary text substitutions,
  *          especially on strings which you are receiving from some other system for
@@ -48,10 +48,8 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-
     /**
-     * @ingroup turbo_string_convert
+     * @ingroup turbo_strings_replace
      * @brief replace string
      * @details Replaces character sequences within a given string with replacements provided
      *          within an initializer list of key/value pairs. Candidate replacements are
@@ -72,13 +70,13 @@ namespace turbo {
      * @param replacements The string to replace.
      * @return The replaced string.
      */
-    TURBO_MUST_USE_RESULT std::string str_replace_all(
+    [[nodiscard]] std::string str_replace_all(
             std::string_view s,
             std::initializer_list<std::pair<std::string_view, std::string_view>>
             replacements);
 
     /**
-     * @ingroup turbo_string_convert
+     * @ingroup turbo_strings_replace
      * @brief replace string
      * @details Overload of `str_replace_all()` to accept a container of key/value replacement
      *          pairs (typically either an associative map or a `std::vector` of `std::pair`
@@ -113,7 +111,7 @@ namespace turbo {
                               const StrToStrMapping &replacements);
 
     /**
-     * @ingroup turbo_string_convert
+     * @ingroup turbo_strings_replace
      * @brief replace string
      * @details Overload of `str_replace_all()` to replace character sequences within a given
      *          output string *in place* with replacements provided within an initializer
@@ -138,7 +136,7 @@ namespace turbo {
             std::string *target);
 
     /**
-     * @ingroup turbo_string_convert
+     * @ingroup turbo_strings_replace
      * @brief replace string
      * @details Overload of `str_replace_all()` to replace patterns within a given output
      *          string *in place* with replacements provided within a container of key/value
@@ -154,7 +152,7 @@ namespace turbo {
      *          @endcode
      * @param replacements The string to replace.
      * @param target The string to be replaced.
-     * @return The replaced string.
+     * @return The replaced string count.
      */
     template<typename StrToStrMapping>
     int str_replace_all(const StrToStrMapping &replacements, std::string *target);
@@ -242,7 +240,6 @@ namespace turbo {
         return substitutions;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_STR_REPLACE_H_
