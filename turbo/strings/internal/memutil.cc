@@ -26,8 +26,8 @@ namespace turbo {
 
             for (size_t i = 0; i < len; i++) {
                 const int diff =
-                        int{static_cast<unsigned char>(turbo::ascii_tolower(us1[i]))} -
-                        int{static_cast<unsigned char>(turbo::ascii_tolower(us2[i]))};
+                        int{static_cast<unsigned char>(turbo::ascii_to_lower(us1[i]))} -
+                        int{static_cast<unsigned char>(turbo::ascii_to_lower(us2[i]))};
                 if (diff != 0) return diff;
             }
             return 0;

@@ -25,35 +25,4 @@ namespace turbo {
         return str_contains(ih, in);
     }
 
-    bool str_ignore_case_contains(std::string_view haystack, char needle) noexcept {
-        auto lc = turbo::ascii_tolower(needle);
-        auto uc = turbo::ascii_toupper(needle);
-        for (auto c: haystack) {
-            if (c == lc || c == uc) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool str_equals_ignore_case(std::string_view piece1,
-                          std::string_view piece2) noexcept {
-        return (piece1.size() == piece2.size() &&
-                0 == turbo::strings_internal::memcasecmp(piece1.data(), piece2.data(),
-                                                         piece1.size()));
-        // memcasecmp uses turbo::ascii_tolower().
-    }
-
-    bool starts_with_ignore_case(std::string_view text,
-                              std::string_view prefix) noexcept {
-        return (text.size() >= prefix.size()) &&
-               str_equals_ignore_case(text.substr(0, prefix.size()), prefix);
-    }
-
-    bool ends_with_ignore_case(std::string_view text,
-                            std::string_view suffix) noexcept {
-        return (text.size() >= suffix.size()) &&
-               str_equals_ignore_case(text.substr(text.size() - suffix.size()), suffix);
-    }
-
 }  // namespace turbo

@@ -36,6 +36,7 @@
 #include <cstring>
 #include <algorithm>
 #include "turbo/strings/string_view.h"
+#include "turbo/strings/ascii.h"
 
 namespace turbo {
 
@@ -51,13 +52,13 @@ namespace turbo {
      * @param needle The substring to search for.
      * @return true if the substring is found, false otherwise.
      */
-    [[nodiscard]] inline bool str_contains(std::string_view haystack,
+    [[nodiscard]] constexpr bool str_contains(std::string_view haystack,
                             std::string_view needle) noexcept {
 
         return haystack.find(needle, 0) != haystack.npos;
     }
 
-    [[nodiscard]] inline bool str_contains(std::string_view haystack, char needle) noexcept {
+    [[nodiscard]] constexpr bool str_contains(std::string_view haystack, char needle) noexcept {
         return haystack.find(needle) != haystack.npos;
     }
 
@@ -76,7 +77,29 @@ namespace turbo {
     [[nodiscard]] bool str_ignore_case_contains(std::string_view haystack,
                             std::string_view needle) noexcept;
 
-    [[nodiscard]] bool str_ignore_case_contains(std::string_view haystack, char needle) noexcept;
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether a given string `haystack` contains the substring `needle` ignore case.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::str_ignore_case_contains(input, 'B'));
+     *        @endcode
+     * @note This function is constexpr if and only if the compiler supports.
+     * @param haystack The string to search in.
+     * @param needle The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    [[nodiscard]] constexpr bool str_ignore_case_contains(std::string_view haystack, char needle) noexcept {
+        auto lc = turbo::ascii_to_lower(needle);
+        auto uc = turbo::ascii_to_upper(needle);
+        for(auto c : haystack) {
+            if(c == lc || c == uc) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     /**
@@ -87,11 +110,12 @@ namespace turbo {
      *        std::string_view input("abc");
      *        EXPECT_TRUE(turbo::starts_with(input, "a"));
      *        @endcode
+     * @note This function is constexpr if and only if the compiler supports.
      * @param text The string to search in.
      * @param prefix The substring to search for.
      * @return true if the substring is found, false otherwise.
      */
-    inline bool starts_with(std::string_view text,
+    constexpr bool starts_with(std::string_view text,
                            std::string_view prefix) noexcept {
         return prefix.empty() ||
                (text.size() >= prefix.size() &&
@@ -110,12 +134,38 @@ namespace turbo {
      * @param suffix The substring to search for.
      * @return true if the substring is found, false otherwise.
      */
-    inline bool ends_with(std::string_view text,
+    constexpr bool ends_with(std::string_view text,
                          std::string_view suffix) noexcept {
         return suffix.empty() ||
                (text.size() >= suffix.size() &&
                 memcmp(text.data() + (text.size() - suffix.size()), suffix.data(),
                        suffix.size()) == 0);
+    }
+
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether given ASCII strings `first` and `last` are equal, ignoring
+     *        case in the comparison.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::str_equals_ignore_case(input.data(), input.end(), "ABC"));
+     *        @endcode
+     * @note This function is constexpr if and only if the compiler supports.
+     * @param first The first string to compare.
+     * @param last The last string to compare.
+     * @param str The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    [[nodiscard]]
+    constexpr bool str_equals_ignore_case(const char *first, const char *last, std::string_view str) noexcept {
+        for (std::size_t i = 0; first != last && i < str.length(); ++i, ++first) {
+            if (ascii_to_lower(*first) != ascii_to_lower(str[i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -127,13 +177,16 @@ namespace turbo {
      *        std::string_view input("abc");
      *        EXPECT_TRUE(turbo::str_equals_ignore_case(input, "ABC"));
      *        @endcode
+     * @note This function is constexpr if and only if the compiler supports.
      * @param piece1 The first string to compare.
      * @param piece2 The second string to compare.
      * @return true if the strings are equal, false otherwise.
      */
     [[nodiscard]]
-    bool str_equals_ignore_case(std::string_view piece1,
-                          std::string_view piece2) noexcept;
+    constexpr bool str_equals_ignore_case(std::string_view piece1,
+                          std::string_view piece2) noexcept {
+        return str_equals_ignore_case(piece1.data(), piece1.end(), piece2);
+    }
 
     /**
      * @ingroup turbo_strings_match
@@ -148,8 +201,11 @@ namespace turbo {
      * @param prefix The substring to search for.
      * @return true if the substring is found, false otherwise.
      */
-    bool starts_with_ignore_case(std::string_view text,
-                              std::string_view prefix) noexcept;
+    constexpr bool starts_with_ignore_case(std::string_view text,
+                              std::string_view prefix) noexcept {
+        return (text.size() >= prefix.size()) &&
+               str_equals_ignore_case(text.substr(0, prefix.size()), prefix);
+    }
 
     /**
      * @ingroup turbo_strings_match
@@ -164,8 +220,11 @@ namespace turbo {
      * @param suffix The substring to search for.
      * @return true if the substring is found, false otherwise.
      */
-    bool ends_with_ignore_case(std::string_view text,
-                            std::string_view suffix) noexcept;
+    constexpr bool ends_with_ignore_case(std::string_view text,
+                            std::string_view suffix) noexcept {
+        return (text.size() >= suffix.size()) &&
+               str_equals_ignore_case(text.substr(text.size() - suffix.size()), suffix);
+    }
 
 }  // namespace turbo
 

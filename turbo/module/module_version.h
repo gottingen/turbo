@@ -24,6 +24,8 @@
 #include <string>
 #include <string_view>
 #include "turbo/format/format.h"
+#include "turbo/strings/ascii.h"
+#include "turbo/strings/match.h"
 
 #if __has_include(<charconv>)
 
@@ -37,17 +39,17 @@
 #include SEMVER_CONFIG_FILE
 #endif
 
-#if defined(SEMVER_THROW)
-// define SEMVER_THROW(msg) to override semver throw behavior.
+#if defined(TURBO_MODULE_THROW)
+// define TURBO_MODULE_THROW(msg) to override turbo throw behavior.
 #elif defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)
 
 #  include <stdexcept>
 
-#  define SEMVER_THROW(msg) (throw std::invalid_argument{msg})
+#  define TURBO_MODULE_THROW(msg) (throw std::invalid_argument{msg})
 #else
 #  include <cassert>
 #  include <cstdlib>
-#  define SEMVER_THROW(msg) (assert(!msg), std::abort())
+#  define TURBO_MODULE_THROW(msg) (assert(!msg), std::abort())
 #endif
 
 #if defined(__clang__)
@@ -90,7 +92,7 @@ namespace turbo {
     };
 #endif
 
-// Max version string length = 5(<major>) + 1(.) + 5(<minor>) + 1(.) + 5(<patch>) + 1(-) + 5(<prerelease>) + 1(.) + 5(<prereleaseversion>) = 29.
+    // Max version string length = 5(<major>) + 1(.) + 5(<minor>) + 1(.) + 5(<patch>) + 1(-) + 5(<prerelease>) + 1(.) + 5(<prereleaseversion>) = 29.
     inline constexpr auto max_version_string_length = std::size_t{29};
 
     namespace detail {
@@ -99,44 +101,8 @@ namespace turbo {
         inline constexpr auto beta = std::string_view{"beta", 4};
         inline constexpr auto rc = std::string_view{"rc", 2};
 
-// Min version string length = 1(<major>) + 1(.) + 1(<minor>) + 1(.) + 1(<patch>) = 5.
+        // Min version string length = 1(<major>) + 1(.) + 1(<minor>) + 1(.) + 1(<patch>) = 5.
         inline constexpr auto min_version_string_length = 5;
-
-        constexpr char to_lower(char c) noexcept {
-            return (c >= 'A' && c <= 'Z') ? static_cast<char>(c + ('a' - 'A')) : c;
-        }
-
-        constexpr bool is_digit(char c) noexcept {
-            return c >= '0' && c <= '9';
-        }
-
-        constexpr bool is_space(char c) noexcept {
-            return c == ' ';
-        }
-
-        constexpr bool is_operator(char c) noexcept {
-            return c == '<' || c == '>' || c == '=';
-        }
-
-        constexpr bool is_dot(char c) noexcept {
-            return c == '.';
-        }
-
-        constexpr bool is_logical_or(char c) noexcept {
-            return c == '|';
-        }
-
-        constexpr bool is_hyphen(char c) noexcept {
-            return c == '-';
-        }
-
-        constexpr bool is_letter(char c) noexcept {
-            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-        }
-
-        constexpr std::uint16_t to_digit(char c) noexcept {
-            return static_cast<std::uint16_t>(c - '0');
-        }
 
         constexpr std::uint8_t length(std::uint16_t x) noexcept {
             if (x < 10) {
@@ -166,15 +132,6 @@ namespace turbo {
             return 0;
         }
 
-        constexpr bool equals(const char *first, const char *last, std::string_view str) noexcept {
-            for (std::size_t i = 0; first != last && i < str.length(); ++i, ++first) {
-                if (to_lower(*first) != to_lower(str[i])) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
 
         constexpr char *to_chars(char *str, std::uint16_t x, bool dot = true) noexcept {
             do {
@@ -209,10 +166,10 @@ namespace turbo {
         }
 
         constexpr const char *from_chars(const char *first, const char *last, std::uint16_t &d) noexcept {
-            if (first != last && is_digit(*first)) {
+            if (first != last && ascii_is_digit(*first)) {
                 std::int32_t t = 0;
-                for (; first != last && is_digit(*first); ++first) {
-                    t = t * 10 + to_digit(*first);
+                for (; first != last && ascii_is_digit(*first); ++first) {
+                    t = t * 10 + ascii_to_digit(*first);
                 }
                 if (t <= (std::numeric_limits<std::uint16_t>::max)()) {
                     d = static_cast<std::uint16_t>(t);
@@ -225,10 +182,10 @@ namespace turbo {
 
         constexpr const char *
         from_chars(const char *first, const char *last, std::optional<std::uint16_t> &d) noexcept {
-            if (first != last && is_digit(*first)) {
+            if (first != last && ascii_is_digit(*first)) {
                 std::int32_t t = 0;
-                for (; first != last && is_digit(*first); ++first) {
-                    t = t * 10 + to_digit(*first);
+                for (; first != last && ascii_is_digit(*first); ++first) {
+                    t = t * 10 + ascii_to_digit(*first);
                 }
                 if (t <= (std::numeric_limits<std::uint16_t>::max)()) {
                     d = static_cast<std::uint16_t>(t);
@@ -240,17 +197,17 @@ namespace turbo {
         }
 
         constexpr const char *from_chars(const char *first, const char *last, prerelease &p) noexcept {
-            if (is_hyphen(*first)) {
+            if (ascii_is_hyphen(*first)) {
                 ++first;
             }
 
-            if (equals(first, last, alpha)) {
+            if (str_equals_ignore_case(first, last, alpha)) {
                 p = prerelease::alpha;
                 return first + alpha.length();
-            } else if (equals(first, last, beta)) {
+            } else if (str_equals_ignore_case(first, last, beta)) {
                 p = prerelease::beta;
                 return first + beta.length();
-            } else if (equals(first, last, rc)) {
+            } else if (str_equals_ignore_case(first, last, rc)) {
                 p = prerelease::rc;
                 return first + rc.length();
             }
@@ -314,7 +271,7 @@ namespace turbo {
             from_string(str);
         }
 
-        constexpr ModuleVersion() = default; // https://semver.org/#how-should-i-deal-with-revisions-in-the-0yz-initial-development-phase
+        constexpr ModuleVersion() = default;
 
         constexpr ModuleVersion(const ModuleVersion &) = default;
 
@@ -380,7 +337,7 @@ namespace turbo {
 
         constexpr ModuleVersion &from_string(std::string_view str) {
             if (!from_string_noexcept(str)) {
-                SEMVER_THROW("turbo::version::from_string invalid version.");
+                TURBO_MODULE_THROW("turbo::version::from_string invalid version.");
             }
 
             return *this;
@@ -390,7 +347,7 @@ namespace turbo {
             auto str = std::string{};
             detail::resize_uninitialized<std::string>::resize(str, string_length());
             if (!to_chars(str.data(), str.data() + str.length())) {
-                SEMVER_THROW("turbo::version::to_string invalid version.");
+                TURBO_MODULE_THROW("turbo::version::to_string invalid version.");
             }
 
             return str;
@@ -630,7 +587,7 @@ namespace turbo {
                             case range_operator::less_or_equal:
                                 return version <= ver;
                             default:
-                                SEMVER_THROW("turbo::range unexpected operator.");
+                                TURBO_MODULE_THROW("turbo::range unexpected operator.");
                         }
                     }
                 };
@@ -662,37 +619,37 @@ namespace turbo {
                     constexpr range_token get_next_token() noexcept {
                         while (!end_of_line()) {
 
-                            if (is_space(text[pos])) {
+                            if (ascii_is_space(text[pos])) {
                                 advance(1);
                                 continue;
                             }
 
-                            if (is_logical_or(text[pos])) {
+                            if (ascii_is_logical_or(text[pos])) {
                                 advance(2);
                                 return {range_token_type::logical_or};
                             }
 
-                            if (is_operator(text[pos])) {
+                            if (ascii_is_operator(text[pos])) {
                                 const auto op = get_operator();
                                 return {range_token_type::range_operator, 0, op};
                             }
 
-                            if (is_digit(text[pos])) {
+                            if (ascii_is_digit(text[pos])) {
                                 const auto number = get_number();
                                 return {range_token_type::number, number};
                             }
 
-                            if (is_dot(text[pos])) {
+                            if (ascii_is_dot(text[pos])) {
                                 advance(1);
                                 return {range_token_type::dot};
                             }
 
-                            if (is_hyphen(text[pos])) {
+                            if (ascii_is_hyphen(text[pos])) {
                                 advance(1);
                                 return {range_token_type::hyphen};
                             }
 
-                            if (is_letter(text[pos])) {
+                            if (ascii_is_letter(text[pos])) {
                                 const auto prerelease = get_prerelease();
                                 return {range_token_type::prerelease, 0, range_operator::equal, prerelease};
                             }
@@ -771,7 +728,7 @@ namespace turbo {
 
                     constexpr void advance_token(range_token_type token_type) {
                         if (current_token.type != token_type) {
-                            SEMVER_THROW("turbo::range unexpected token.");
+                            TURBO_MODULE_THROW("turbo::range unexpected token.");
                         }
                         current_token = lexer.get_next_token();
                     }
@@ -859,7 +816,7 @@ namespace turbo {
                 case satisfies_option::include_prerelease:
                     return detail::range{str}.satisfies(ver, true);
                 default:
-                    SEMVER_THROW("turbo::range unexpected satisfies_option.");
+                    TURBO_MODULE_THROW("turbo::range unexpected satisfies_option.");
             }
         }
 

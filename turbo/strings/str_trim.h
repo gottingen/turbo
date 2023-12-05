@@ -51,7 +51,7 @@ namespace turbo {
         by_white_space() = default;
 
         bool operator()(unsigned char c) {
-            return turbo::ascii_isspace(c);
+            return turbo::ascii_is_space(c);
         }
     };
 

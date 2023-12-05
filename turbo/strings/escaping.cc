@@ -45,7 +45,7 @@ namespace turbo {
         inline unsigned int hex_digit_to_int(char c) {
             static_assert('0' == 0x30 && 'A' == 0x41 && 'a' == 0x61,
                           "Character set must be ASCII.");
-            assert(turbo::ascii_isxdigit(static_cast<unsigned char>(c)));
+            assert(turbo::ascii_is_xdigit(static_cast<unsigned char>(c)));
             unsigned int x = static_cast<unsigned char>(c);
             if (x > '9') {
                 x += 9;
@@ -173,14 +173,14 @@ namespace turbo {
                             if (p >= last_byte) {
                                 if (error) *error = "String cannot end with \\x";
                                 return false;
-                            } else if (!turbo::ascii_isxdigit(static_cast<unsigned char>(p[1]))) {
+                            } else if (!turbo::ascii_is_xdigit(static_cast<unsigned char>(p[1]))) {
                                 if (error) *error = "\\x cannot be followed by a non-hex digit";
                                 return false;
                             }
                             unsigned int ch = 0;
                             const char *hex_start = p;
                             while (p < last_byte &&
-                                   turbo::ascii_isxdigit(static_cast<unsigned char>(p[1])))
+                                   turbo::ascii_is_xdigit(static_cast<unsigned char>(p[1])))
                                 // Arbitrarily many hex digits
                                 ch = (ch << 4) + hex_digit_to_int(*++p);
                             if (ch > 0xFF) {
@@ -217,7 +217,7 @@ namespace turbo {
                             }
                             for (int i = 0; i < 4; ++i) {
                                 // Look one char ahead.
-                                if (turbo::ascii_isxdigit(static_cast<unsigned char>(p[1]))) {
+                                if (turbo::ascii_is_xdigit(static_cast<unsigned char>(p[1]))) {
                                     rune = (rune << 4) + hex_digit_to_int(*++p);  // Advance p.
                                 } else {
                                     if (error) {
@@ -257,7 +257,7 @@ namespace turbo {
                             }
                             for (int i = 0; i < 8; ++i) {
                                 // Look one char ahead.
-                                if (turbo::ascii_isxdigit(static_cast<unsigned char>(p[1]))) {
+                                if (turbo::ascii_is_xdigit(static_cast<unsigned char>(p[1]))) {
                                     // Don't change rune until we're sure this
                                     // is within the Unicode limit, but do advance p.
                                     uint32_t newrune = (rune << 4) + hex_digit_to_int(*++p);
@@ -338,7 +338,7 @@ namespace turbo {
         //    preparing query flags.  The 'Hex' version uses hexadecimal rather than
         //    octal sequences.  The 'Utf8Safe' version does not touch UTF-8 bytes.
         //
-        //    Escaped chars: \n, \r, \t, ", ', \, and !turbo::ascii_isprint().
+        //    Escaped chars: \n, \r, \t, ", ', \, and !turbo::ascii_is_print().
         // ----------------------------------------------------------------------
         std::string CEscapeInternal(std::string_view src, bool use_hex,
                                     bool utf8_safe) {
@@ -372,8 +372,8 @@ namespace turbo {
                         // interpreted as part of the character code by C.
                         const unsigned char uc = static_cast<unsigned char>(c);
                         if ((!utf8_safe || uc < 0x80) &&
-                            (!turbo::ascii_isprint(uc) ||
-                             (last_hex_escape && turbo::ascii_isxdigit(uc)))) {
+                            (!turbo::ascii_is_print(uc) ||
+                             (last_hex_escape && turbo::ascii_is_xdigit(uc)))) {
                             if (use_hex) {
                                 dest.append("\\" "x");
                                 dest.push_back(numbers_internal::kHexChar[uc / 16]);
@@ -509,7 +509,7 @@ namespace turbo {
   ch = *src++;                                                  \
   decode = unbase64[ch];                                        \
   if (decode < 0) {                                             \
-    if (turbo::ascii_isspace(ch) && szsrc >= remain) goto label; \
+    if (turbo::ascii_is_space(ch) && szsrc >= remain) goto label; \
     state = 4 - remain;                                         \
     break;                                                      \
   }
@@ -599,7 +599,7 @@ namespace turbo {
             // if the loop terminated because we read a bad character, return
             // now.
             if (decode < 0 && ch != kPad64Equals && ch != kPad64Dot &&
-                !turbo::ascii_isspace(ch))
+                !turbo::ascii_is_space(ch))
                 return false;
 
             if (ch == kPad64Equals || ch == kPad64Dot) {
@@ -618,7 +618,7 @@ namespace turbo {
                     ch = *src++;
                     decode = unbase64[ch];
                     if (decode < 0) {
-                        if (turbo::ascii_isspace(ch)) {
+                        if (turbo::ascii_is_space(ch)) {
                             continue;
                         } else if (ch == kPad64Equals || ch == kPad64Dot) {
                             // back up one character; we'll read it again when we check
@@ -702,7 +702,7 @@ namespace turbo {
             while (szsrc > 0) {
                 if (*src == kPad64Equals || *src == kPad64Dot)
                     ++equals;
-                else if (!turbo::ascii_isspace(*src))
+                else if (!turbo::ascii_is_space(*src))
                     return false;
                 --szsrc;
                 ++src;

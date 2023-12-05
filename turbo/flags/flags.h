@@ -15,6 +15,11 @@
 #ifndef TURBO_FLAGS_FLAGS_H_
 #define TURBO_FLAGS_FLAGS_H_
 
+/**
+ * @defgroup turbo_flags
+ * @brief Turbo flags is a command line flags library.
+ */
+
 #include "turbo/platform/port.h"
 
 #include "turbo/flags/string_tools.h"

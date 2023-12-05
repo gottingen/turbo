@@ -35,7 +35,7 @@ TEST_CASE("AsciiStrTo, Lower") {
 
     char mutable_buf[] = "Mutable";
     std::transform(mutable_buf, mutable_buf + strlen(mutable_buf),
-                   mutable_buf, turbo::ascii_tolower);
+                   mutable_buf, turbo::ascii_to_lower);
     CHECK_EQ("mutable", std::string_view(mutable_buf));
 }
 
@@ -51,7 +51,7 @@ TEST_CASE("AsciiStrTo, Upper") {
 
     char mutable_buf[] = "Mutable";
     std::transform(mutable_buf, mutable_buf + strlen(mutable_buf),
-                   mutable_buf, turbo::ascii_toupper);
+                   mutable_buf, turbo::ascii_to_upper);
     CHECK_EQ("MUTABLE", std::string_view(mutable_buf));
 }
 

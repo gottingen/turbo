@@ -650,11 +650,11 @@ namespace turbo {
 
             // Consume whitespace.
             while (start < end &&
-                   turbo::ascii_isspace(static_cast<unsigned char>(start[0]))) {
+                   turbo::ascii_is_space(static_cast<unsigned char>(start[0]))) {
                 ++start;
             }
             while (start < end &&
-                   turbo::ascii_isspace(static_cast<unsigned char>(end[-1]))) {
+                   turbo::ascii_is_space(static_cast<unsigned char>(end[-1]))) {
                 --end;
             }
             if (start >= end) {

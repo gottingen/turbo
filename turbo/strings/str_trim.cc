@@ -39,10 +39,10 @@ namespace turbo {
         for (; input_it < input_end; ++input_it) {
             if (is_ws) {
                 // Consecutive whitespace?  Keep only the last.
-                is_ws = turbo::ascii_isspace(static_cast<unsigned char>(*input_it));
+                is_ws = turbo::ascii_is_space(static_cast<unsigned char>(*input_it));
                 if (is_ws) --output_it;
             } else {
-                is_ws = turbo::ascii_isspace(static_cast<unsigned char>(*input_it));
+                is_ws = turbo::ascii_is_space(static_cast<unsigned char>(*input_it));
             }
 
             *output_it = *input_it;

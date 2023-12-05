@@ -17,7 +17,8 @@
 /**
  * @file str_replace.h
  * @brief replace string
- * @ingroup turbo_strings_replace
+ * @addtogroup turbo_strings_replace
+ * @{
  * @details This file defines `turbo::str_replace_all()`, a general-purpose string
  *          replacement function designed for large, arbitrary text substitutions,
  *          especially on strings which you are receiving from some other system for
@@ -35,7 +36,7 @@
  *                                           {"\"", "&quot;"},
  *                                           {"'", "&#39;"}});
  *          @endcode
- *
+ * @}
  */
 #ifndef TURBO_STRINGS_STR_REPLACE_H_
 #define TURBO_STRINGS_STR_REPLACE_H_

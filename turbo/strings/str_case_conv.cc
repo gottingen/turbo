@@ -24,7 +24,7 @@ namespace turbo {
     typename std::enable_if<turbo::is_string_type<String>::value>::type
     str_to_lower(String *s) {
         for (auto &ch: *s) {
-            ch = turbo::ascii_tolower(static_cast<unsigned char>(ch));
+            ch = turbo::ascii_to_lower(static_cast<unsigned char>(ch));
         }
     }
 
@@ -32,7 +32,7 @@ namespace turbo {
     TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
     str_to_upper(String *s) {
         for (auto &ch: *s) {
-            ch = turbo::ascii_toupper(static_cast<unsigned char>(ch));
+            ch = turbo::ascii_to_upper(static_cast<unsigned char>(ch));
         }
     }
 
