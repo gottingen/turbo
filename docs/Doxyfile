@@ -1,7 +1,31 @@
 PROJECT_NAME      = "turbo-docs"
 XML_OUTPUT        = xml
-INPUT             = ../turbo/base/assume.h \
-                    ../turbo/base/sysinfo.h
+INPUT             = ./turbo/platform/part.h \
+                    ./turbo/platform/attribute_functions.h \
+                    ../turbo/base/assume.h \
+                    ../turbo/base/sysinfo.h \
+                    ../turbo/base/endian.h  \
+                    ../turbo/base/status.h  \
+                    ../turbo/files/filesystem.h \
+                    ../turbo/files/file_event_listener.h \
+                    ../turbo/files/file_option.h \
+                    ../turbo/files/fio.h \
+                    ../turbo/files/random_read_file.h \
+                    ../turbo/files/random_write_file.h \
+                    ../turbo/files/sequential_read_file.h \
+                    ../turbo/files/sequential_write_file.h \
+                    ../turbo/files/utility.h               \
+                    ../turbo/strings/utility.h \
+                    ../turbo/strings/ascii.h \
+                    ../turbo/strings/escaping.h \
+                    ../turbo/strings/str_strip.h \
+                    ../turbo/strings/str_trim.h \
+                    ../turbo/strings/match.h     \
+                    ../turbo/strings/numbers.h    \
+                    ../turbo/strings/charconv.h   \
+                    ../turbo/strings/str_case_conv.h \
+                    ../turbo/strings/str_split.h    \
+                    ../turbo/strings/str_replace.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

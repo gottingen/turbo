@@ -24,69 +24,137 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_files
+     * @brief SequentialWriteFile is a file io utility class.
+     * eg.
+     * @code
+     *     SequentialWriteFile file;
+     *     auto rs = file.open("test.txt");
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *     }
+     *     std::string content = "hello world";
+     *     // write content to file.
+     *     rs = file.write(content);
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *     }
+     *     // flush file.
+     *     rs = file.flush();
+     *     if (!rs.ok()) {
+     *         std::cout << rs.status().message() << std::endl;
+     *         return;
+     *      }
+     *      // close file or use RAII, it is not necessary to call flush before close.
+     *      // and recommend to use close manually.
+     *      file.close();
+     *      // or use RAII.
+     * @endcode
+     */
     class SequentialWriteFile {
     public:
         SequentialWriteFile() = default;
 
-        ///
-        /// \param listener
+        /**
+         * @brief set_option set file option before open file.
+         *        default option is FileOption::kDefault.
+         *        If you want to set the file option, you must call this function before open file.
+         */
         explicit SequentialWriteFile(const FileEventListener &listener);
 
         ~SequentialWriteFile();
 
-        ///
-        /// \param option
+        /**
+         * @brief set_option set file option before open file.
+         *        default option is FileOption::kDefault.
+         *        If you want to set the file option, you must call this function before open file.
+         */
         void set_option(const FileOption &option);
 
-        ///
-        /// \param fname
-        /// \param truncate
-        /// \return
+        /**
+         * @brief open file with path and option specified by user.
+         *        The option can be set by set_option function. @see set_option.
+         *        If the file does not exist, it will be created.
+         *        If the file exists, it will be opened.
+         *        If the file exists and the truncate option is true, the file will be truncated.
+         * @param fname file path
+         * @param truncate if true, the file will be truncated.
+         * @return the status of the operation.
+         */
+
         [[nodiscard]] turbo::Status open(const turbo::filesystem::path &fname,
                            bool truncate = false);
-        ///
-        /// \param truncate
-        /// \return
+
+        /**
+         * @brief reopen file with path and option specified by user.
+         *        The option can be set by set_option function. @see set_option.
+         *        If the file does not exist, it will be created.
+         *        If the file exists, it will be opened.
+         *        If the file exists and the truncate option is true, the file will be truncated.
+         * @param fname file path
+         * @param truncate if true, the file will be truncated.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status reopen(bool truncate = false);
 
-        ///
-        /// \param data
-        /// \param size
-        /// \return
+        /**
+         * @brief write file content to the end of the file.
+         * @param data [input] file content, can not be nullptr.
+         * @param size [input] write length.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status write(const char *data, size_t size);
 
-        ///
-        /// \param str
-        /// \return
+        /**
+         * @brief write file content to the end of the file.
+         * @param str [input] file content, can not be empty.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status write(std::string_view str) {
             return write(str.data(), str.size());
         }
 
-        ///
-        /// \tparam Char
-        /// \tparam N
-        /// \param buffer
-        /// \return
+        /**
+         * @brief write file content to the end of the file.
+         * @param buffer [input] file content, can not be empty.
+         * @return the status of the operation.
+         */
         template<typename Char, size_t N>
         [[nodiscard]] turbo::Status write(const fmt::basic_memory_buffer<Char, N> &buffer) {
             return write(buffer.data(), buffer.size() * sizeof(Char));
         }
 
-        ///
-        /// \param size
-        /// \return
+        /**
+         * @brief truncate file to the specified length.
+         * @param size [input] file length.
+         * @return the status of the operation.
+         */
         [[nodiscard]] turbo::Status truncate(size_t size);
 
-        ///
-        /// \return
+        /**
+         * @brief get file size.
+         * @return the file size and the status of the operation.
+         */
         [[nodiscard]] turbo::ResultStatus<size_t> size() const;
 
+        /**
+         * @brief close file.
+         */
         void close();
 
+        /**
+         * @brief flush file.
+         */
+        [[nodiscard]]
         turbo::Status flush();
 
-        ///
-        /// \return
+        /**
+         * @brief get file path.
+         * @return file path.
+         */
         [[nodiscard]] const turbo::filesystem::path &file_path() const;
 
     private:

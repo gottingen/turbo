@@ -117,7 +117,7 @@ bool ParseTime(std::string_view format, std::string_view input,
   };
   strip_leading_space(&input);
   for (const auto& lit : literals) {
-    if (turbo::StartsWith(input, std::string_view(lit.name, lit.size))) {
+    if (turbo::starts_with(input, std::string_view(lit.name, lit.size))) {
       std::string_view tail = input;
       tail.remove_prefix(lit.size);
       strip_leading_space(&tail);

@@ -20,14 +20,14 @@
 
 #include "doctest/doctest.h"
 
-TEST_CASE("TrimLeft, FromStringView") {
+TEST_CASE("trim_left, FromStringView") {
     CHECK_EQ(std::string_view{},
-             turbo::TrimLeft(std::string_view{}));
-    CHECK_EQ("foo", turbo::TrimLeft({"foo"}));
-    CHECK_EQ("foo", turbo::TrimLeft({"\t  \n\f\r\n\vfoo"}));
+             turbo::trim_left(std::string_view{}));
+    CHECK_EQ("foo", turbo::trim_left({"foo"}));
+    CHECK_EQ("foo", turbo::trim_left({"\t  \n\f\r\n\vfoo"}));
     CHECK_EQ("foo foo\n ",
-             turbo::TrimLeft({"\t  \n\f\r\n\vfoo foo\n "}));
-    CHECK_EQ(std::string_view{}, turbo::TrimLeft(
+             turbo::trim_left({"\t  \n\f\r\n\vfoo foo\n "}));
+    CHECK_EQ(std::string_view{}, turbo::trim_left(
             {"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
@@ -36,106 +36,106 @@ template<typename Str>
 void TestInPlace() {
     Str str;
 
-    turbo::TrimLeft(&str);
+    turbo::trim_left(&str);
     CHECK_EQ("", str);
 
     str = "foo";
-    turbo::TrimLeft(&str);
+    turbo::trim_left(&str);
     CHECK_EQ("foo", str);
 
     str = "\t  \n\f\r\n\vfoo";
-    turbo::TrimLeft(&str);
+    turbo::trim_left(&str);
     CHECK_EQ("foo", str);
 
     str = "\t  \n\f\r\n\vfoo foo\n ";
-    turbo::TrimLeft(&str);
+    turbo::trim_left(&str);
     CHECK_EQ("foo foo\n ", str);
 
     str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
-    turbo::TrimLeft(&str);
+    turbo::trim_left(&str);
     CHECK_EQ(std::string_view{}, str);
 }
 
-TEST_CASE("TrimLeft, InPlace") {
+TEST_CASE("trim_left, InPlace") {
     TestInPlace<std::string>();
 
     TestInPlace<turbo::inlined_string>();
 
 }
 
-TEST_CASE("TrimRight, FromStringView") {
-    CHECK_EQ(std::string_view{}, turbo::TrimRight(std::string_view{}));
-    CHECK_EQ("foo", turbo::TrimRight({"foo"}));
-    CHECK_EQ("foo", turbo::TrimRight({"foo\t  \n\f\r\n\v"}));
-    CHECK_EQ(" \nfoo foo", turbo::TrimRight({" \nfoo foo\t  \n\f\r\n\v"}));
-    CHECK_EQ(std::string_view{}, turbo::TrimRight({"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
+TEST_CASE("trim_right, FromStringView") {
+    CHECK_EQ(std::string_view{}, turbo::trim_right(std::string_view{}));
+    CHECK_EQ("foo", turbo::trim_right({"foo"}));
+    CHECK_EQ("foo", turbo::trim_right({"foo\t  \n\f\r\n\v"}));
+    CHECK_EQ(" \nfoo foo", turbo::trim_right({" \nfoo foo\t  \n\f\r\n\v"}));
+    CHECK_EQ(std::string_view{}, turbo::trim_right({"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
 template<typename String>
 void StripTrailingAsciiWhitespaceinplace() {
     String str;
 
-    turbo::TrimRight(&str);
+    turbo::trim_right(&str);
     CHECK_EQ("", str);
 
     str = "foo";
-    turbo::TrimRight(&str);
+    turbo::trim_right(&str);
     CHECK_EQ("foo", str);
 
     str = "foo\t  \n\f\r\n\v";
-    turbo::TrimRight(&str);
+    turbo::trim_right(&str);
     CHECK_EQ("foo", str);
 
     str = " \nfoo foo\t  \n\f\r\n\v";
-    turbo::TrimRight(&str);
+    turbo::trim_right(&str);
     CHECK_EQ(" \nfoo foo", str);
 
     str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
-    turbo::TrimRight(&str);
+    turbo::trim_right(&str);
     CHECK_EQ(std::string_view{}, str);
 }
 
-TEST_CASE("TrimRight, InPlace") {
+TEST_CASE("trim_right, InPlace") {
     StripTrailingAsciiWhitespaceinplace<std::string>();
 
     StripTrailingAsciiWhitespaceinplace<turbo::inlined_string>();
 
 }
 
-TEST_CASE("Trim, FromStringView") {
+TEST_CASE("trim_all, FromStringView") {
     CHECK_EQ(std::string_view{},
-             turbo::Trim(std::string_view{}));
-    CHECK_EQ("foo", turbo::Trim({"foo"}));
-    CHECK_EQ("foo", turbo::Trim({"\t  \n\f\r\n\vfoo\t  \n\f\r\n\v"}));
-    CHECK_EQ("foo foo", turbo::Trim({"\t  \n\f\r\n\vfoo foo\t  \n\f\r\n\v"}));
-    CHECK_EQ(std::string_view{}, turbo::Trim({"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
+             turbo::trim_all(std::string_view{}));
+    CHECK_EQ("foo", turbo::trim_all({"foo"}));
+    CHECK_EQ("foo", turbo::trim_all({"\t  \n\f\r\n\vfoo\t  \n\f\r\n\v"}));
+    CHECK_EQ("foo foo", turbo::trim_all({"\t  \n\f\r\n\vfoo foo\t  \n\f\r\n\v"}));
+    CHECK_EQ(std::string_view{}, turbo::trim_all({"\t  \n\f\r\v\n\t  \n\f\r\v\n"}));
 }
 
 template<typename Str>
 void StripAsciiWhitespaceInPlace() {
     Str str;
 
-    turbo::Trim(&str);
+    turbo::trim_all(&str);
     CHECK_EQ("", str);
 
     str = "foo";
-    turbo::Trim(&str);
+    turbo::trim_all(&str);
     CHECK_EQ("foo", str);
 
     str = "\t  \n\f\r\n\vfoo\t  \n\f\r\n\v";
-    turbo::Trim(&str);
+    turbo::trim_all(&str);
     CHECK_EQ("foo", str);
 
     str = "\t  \n\f\r\n\vfoo foo\t  \n\f\r\n\v";
-    turbo::Trim(&str);
+    turbo::trim_all(&str);
     CHECK_EQ("foo foo", str);
 
     str = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
-    turbo::Trim(&str);
+    turbo::trim_all(&str);
     CHECK_EQ(std::string_view{}, str);
 }
 
-TEST_CASE("Trim, InPlace") {
+TEST_CASE("trim_all, InPlace") {
     StripAsciiWhitespaceInPlace<std::string>();
 
     StripAsciiWhitespaceInPlace<turbo::inlined_string>();
@@ -170,23 +170,23 @@ void RemoveExtraAsciiWhitespaceInplace() {
 
     for (int i = 0; i < NUM_TESTS; i++) {
         String s(inputs[i]);
-        turbo::TrimAll(&s);
+        turbo::trim_complete(&s);
         CHECK_EQ(outputs[i], s);
     }
 }
 
-TEST_CASE("TrimAll, InPlace") {
+TEST_CASE("trim_complete, InPlace") {
     RemoveExtraAsciiWhitespaceInplace<std::string>();
     RemoveExtraAsciiWhitespaceInplace<turbo::inlined_string>();
 }
 
 TEST_CASE("pred") {
     std::string a = "abc ; ";
-    turbo::ByAnyOf ba(" ;\t");
-    auto trimed = turbo::TrimRight(a, ba);
+    turbo::by_any_of ba(" ;\t");
+    auto trimed = turbo::trim_right(a, ba);
     CHECK_EQ(trimed, "abc");
 
     std::string b = " ; \tabc ; ";
-    trimed = turbo::Trim(b, ba);
+    trimed = turbo::trim_all(b, ba);
     CHECK_EQ(trimed, "abc");
 }

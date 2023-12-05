@@ -53,7 +53,7 @@ void RunAll(const int argc, char* argv[]) {
   // Avoid migrating between cores - important on multi-socket systems.
   int cpu = -1;
   if (argc == 2) {
-    if (!turbo::SimpleAtoi(argv[1], &cpu)) {
+    if (!turbo::simple_atoi(argv[1], &cpu)) {
       TURBO_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
     }
   }

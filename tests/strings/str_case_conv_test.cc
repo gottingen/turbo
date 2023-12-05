@@ -26,16 +26,16 @@ TEST_CASE("AsciiStrTo, Lower") {
     const std::string_view sp(str2);
     std::string mutable_str("STUVWX");
 
-    CHECK_EQ("abcdef", turbo::StrToLower(buf));
-    CHECK_EQ("ghijkl", turbo::StrToLower(str));
-    CHECK_EQ("mnopqr", turbo::StrToLower(sp));
+    CHECK_EQ("abcdef", turbo::str_to_lower(buf));
+    CHECK_EQ("ghijkl", turbo::str_to_lower(str));
+    CHECK_EQ("mnopqr", turbo::str_to_lower(sp));
 
-    turbo::StrToLower(&mutable_str);
+    turbo::str_to_lower(&mutable_str);
     CHECK_EQ("stuvwx", mutable_str);
 
     char mutable_buf[] = "Mutable";
     std::transform(mutable_buf, mutable_buf + strlen(mutable_buf),
-                   mutable_buf, turbo::ascii_tolower);
+                   mutable_buf, turbo::ascii_to_lower);
     CHECK_EQ("mutable", std::string_view(mutable_buf));
 }
 
@@ -45,13 +45,13 @@ TEST_CASE("AsciiStrTo, Upper") {
     const std::string str2("mnopqr");
     const std::string_view sp(str2);
 
-    CHECK_EQ("ABCDEF", turbo::StrToUpper(buf));
-    CHECK_EQ("GHIJKL", turbo::StrToUpper(str));
-    CHECK_EQ("MNOPQR", turbo::StrToUpper(sp));
+    CHECK_EQ("ABCDEF", turbo::str_to_upper(buf));
+    CHECK_EQ("GHIJKL", turbo::str_to_upper(str));
+    CHECK_EQ("MNOPQR", turbo::str_to_upper(sp));
 
     char mutable_buf[] = "Mutable";
     std::transform(mutable_buf, mutable_buf + strlen(mutable_buf),
-                   mutable_buf, turbo::ascii_toupper);
+                   mutable_buf, turbo::ascii_to_upper);
     CHECK_EQ("MUTABLE", std::string_view(mutable_buf));
 }
 

@@ -38,7 +38,7 @@ std::string MakeTestString(int desired_length) {
 void BM_Split2StringView(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   for (auto _ : state) {
-    std::vector<std::string_view> result = turbo::StrSplit(test, ';');
+    std::vector<std::string_view> result = turbo::str_split(test, ';');
     benchmark::DoNotOptimize(result);
   }
 }
@@ -56,12 +56,12 @@ std::string MakeMultiDelimiterTestString(int desired_length) {
   return test;
 }
 
-// Measure StrSplit with ByAnyChar with four delimiters to choose from.
+// Measure str_split with by_any_char with four delimiters to choose from.
 void BM_Split2StringViewByAnyChar(benchmark::State& state) {
   std::string test = MakeMultiDelimiterTestString(state.range(0));
   for (auto _ : state) {
     std::vector<std::string_view> result =
-        turbo::StrSplit(test, turbo::ByAnyChar(kDelimiters));
+        turbo::str_split(test, turbo::by_any_char(kDelimiters));
     benchmark::DoNotOptimize(result);
   }
 }
@@ -71,7 +71,7 @@ void BM_Split2StringViewLifted(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   std::vector<std::string_view> result;
   for (auto _ : state) {
-    result = turbo::StrSplit(test, ';');
+    result = turbo::str_split(test, ';');
   }
   benchmark::DoNotOptimize(result);
 }
@@ -80,20 +80,20 @@ BENCHMARK_RANGE(BM_Split2StringViewLifted, 0, 1 << 20);
 void BM_Split2String(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   for (auto _ : state) {
-    std::vector<std::string> result = turbo::StrSplit(test, ';');
+    std::vector<std::string> result = turbo::str_split(test, ';');
     benchmark::DoNotOptimize(result);
   }
 }
 BENCHMARK_RANGE(BM_Split2String, 0, 1 << 20);
 
 // This benchmark is for comparing Split2 to Split1 (SplitStringUsing). In
-// particular, this benchmark uses SkipEmpty() to match SplitStringUsing's
+// particular, this benchmark uses skip_empty() to match SplitStringUsing's
 // behavior.
 void BM_Split2SplitStringUsing(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   for (auto _ : state) {
     std::vector<std::string> result =
-        turbo::StrSplit(test, ';', turbo::SkipEmpty());
+        turbo::str_split(test, ';', turbo::skip_empty());
     benchmark::DoNotOptimize(result);
   }
 }
@@ -107,7 +107,7 @@ void BM_SplitStringToUnorderedSet(benchmark::State& state) {
   }
   for (auto _ : state) {
     std::unordered_set<std::string> result =
-        turbo::StrSplit(test, ':', turbo::SkipEmpty());
+        turbo::str_split(test, ':', turbo::skip_empty());
     benchmark::DoNotOptimize(result);
   }
 }
@@ -121,7 +121,7 @@ void BM_SplitStringToUnorderedMap(benchmark::State& state) {
   }
   for (auto _ : state) {
     std::unordered_map<std::string, std::string> result =
-        turbo::StrSplit(test, ':', turbo::SkipEmpty());
+        turbo::str_split(test, ':', turbo::skip_empty());
     benchmark::DoNotOptimize(result);
   }
 }
@@ -134,7 +134,7 @@ void BM_SplitStringAllowEmpty(benchmark::State& state) {
     test[i] = ';';
   }
   for (auto _ : state) {
-    std::vector<std::string> result = turbo::StrSplit(test, ';');
+    std::vector<std::string> result = turbo::str_split(test, ';');
     benchmark::DoNotOptimize(result);
   }
 }
@@ -154,7 +154,7 @@ void BM_SplitStringWithOneChar(benchmark::State& state) {
   std::vector<std::string_view> pieces;
   size_t v = 0;
   for (auto _ : state) {
-    pieces = turbo::StrSplit("The quick brown fox jumps over the lazy dog",
+    pieces = turbo::str_split("The quick brown fox jumps over the lazy dog",
                             delimiter);
     v += pieces.size();
   }
@@ -168,7 +168,7 @@ void BM_SplitStringWithOneCharNoVector(benchmark::State& state) {
   const auto delimiter = DelimiterFactory()();
   size_t v = 0;
   for (auto _ : state) {
-    auto splitter = turbo::StrSplit(
+    auto splitter = turbo::str_split(
         "The quick brown fox jumps over the lazy dog", delimiter);
     v += std::distance(splitter.begin(), splitter.end());
   }

@@ -352,7 +352,7 @@ namespace turbo {
         // type `turbo::Status` and the conversion from `U` to `Status` is explicit.
         //
         // REQUIRES: !Status(std::forward<U>(v)).ok(). This requirement is DCHECKed.
-        // In optimized builds, passing turbo::OkStatus() here will have the effect
+        // In optimized builds, passing turbo::ok_status() here will have the effect
         // of passing turbo::StatusCode::kInternal as a fallback.
         template<
                 typename U = turbo::Status,
@@ -504,7 +504,7 @@ namespace turbo {
         //
         // Returns a reference to the current `turbo::Status` contained within the
         // `turbo::ResultStatus<T>`. If `turbo::ResultStatus<T>` contains a `T`, then this
-        // function returns `turbo::OkStatus()`.
+        // function returns `turbo::ok_status()`.
         const Status &status() const &;
 
         Status status() &&;
@@ -609,7 +609,7 @@ namespace turbo {
                 this->MakeValue(std::forward<Args>(args)...);
             } else {
                 this->MakeValue(std::forward<Args>(args)...);
-                this->status_ = turbo::OkStatus();
+                this->status_ = turbo::ok_status();
             }
             return this->data_;
         }
@@ -625,7 +625,7 @@ namespace turbo {
                 this->MakeValue(ilist, std::forward<Args>(args)...);
             } else {
                 this->MakeValue(ilist, std::forward<Args>(args)...);
-                this->status_ = turbo::OkStatus();
+                this->status_ = turbo::ok_status();
             }
             return this->data_;
         }
@@ -703,7 +703,7 @@ namespace turbo {
 
     template<typename T>
     Status ResultStatus<T>::status() &&{
-        return ok() ? OkStatus() : std::move(this->status_);
+        return ok() ? ok_status() : std::move(this->status_);
     }
 
     template<typename T>

@@ -76,50 +76,50 @@ namespace turbo {
                     _listener.after_open(_file_path, _fp);
                 }
                 _fd = fileno(_fp);
-                return turbo::OkStatus();
+                return turbo::ok_status();
             }
             if (_option.open_interval > 0) {
                 turbo::SleepFor(turbo::Milliseconds(_option.open_interval));
             }
         }
-        return turbo::ErrnoToStatus(errno, turbo::Format("Failed opening file {} for writing", _file_path.c_str()));
+        return turbo::errno_to_status(errno, turbo::Format("Failed opening file {} for writing", _file_path.c_str()));
     }
 
     turbo::Status RandomWriteFile::reopen(bool truncate) {
         close();
         if (_file_path.empty()) {
-            return turbo::InvalidArgumentError("file name empty");
+            return turbo::invalid_argument_error("file name empty");
         }
         return open(_file_path, truncate);
     }
 
     turbo::Status RandomWriteFile::write(size_t offset, const char *data, size_t size, bool truncate) {
         if (_fd == -1) {
-            return turbo::UnavailableError("file not open for read yet");
+            return turbo::unavailable_error("file not open for read yet");
         }
 
         ssize_t write_size = ::pwrite(_fd, data, size, static_cast<off_t>(offset));
         if(write_size < 0 ) {
-            return turbo::ErrnoToStatus(errno, _file_path.c_str());
+            return turbo::errno_to_status(errno, _file_path.c_str());
         }
         if(truncate) {
             if(::ftruncate(_fd, static_cast<off_t>(offset + size)) != 0) {
-                return turbo::ErrnoToStatus(errno, turbo::Format("Failed truncate file {} for size:{} ", _file_path.c_str(), static_cast<off_t>(offset + size)));
+                return turbo::errno_to_status(errno, turbo::Format("Failed truncate file {} for size:{} ", _file_path.c_str(), static_cast<off_t>(offset + size)));
             }
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     turbo::Status RandomWriteFile::truncate(size_t size) {
         if(::ftruncate(_fd, static_cast<off_t>(size)) != 0) {
-            return turbo::ErrnoToStatus(errno, turbo::Format("Failed truncate file {} for size:{} ", _file_path.c_str(), static_cast<off_t>(size)));
+            return turbo::errno_to_status(errno, turbo::Format("Failed truncate file {} for size:{} ", _file_path.c_str(), static_cast<off_t>(size)));
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     turbo::ResultStatus<size_t> RandomWriteFile::size() const {
         if (_fp == nullptr) {
-            return turbo::InvalidArgumentError("Failed getting file size. fp is null");
+            return turbo::invalid_argument_error("Failed getting file size. fp is null");
         }
         auto rs = Fio::file_size(_fp);
         return rs;
@@ -143,10 +143,10 @@ namespace turbo {
 
     turbo::Status RandomWriteFile::flush() {
         if (std::fflush(_fp) != 0) {
-            return turbo::ErrnoToStatus(errno,
+            return turbo::errno_to_status(errno,
                                         turbo::Format("Failed flush to file {}", _file_path.c_str()));
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     const turbo::filesystem::path &RandomWriteFile::file_path() const {

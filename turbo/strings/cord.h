@@ -375,14 +375,14 @@ namespace turbo {
 
         int compare(const Cord &rhs) const;
 
-        // Cord::StartsWith()
+        // Cord::starts_with()
         //
         // Determines whether the Cord starts with the passed string data `rhs`.
         bool starts_with(const Cord &rhs) const;
 
         bool starts_with(std::string_view rhs) const;
 
-        // Cord::EndsWith()
+        // Cord::ends_with()
         //
         // Determines whether the Cord ends with the passed string data `rhs`.
         bool ends_with(std::string_view rhs) const;

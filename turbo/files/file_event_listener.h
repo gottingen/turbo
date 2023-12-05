@@ -21,6 +21,13 @@
 #include "turbo/files/filesystem.h"
 
 namespace turbo {
+
+    /**
+     * @ingroup turbo_files
+     * @brief FileEventListener is a listener for file events. It is used to
+     *        monitor file events, such as open, close, etc. It is used in the
+     *        FileMonitor class.
+     */
     struct FileEventListener {
         FileEventListener()
                 : before_open(nullptr), after_open(nullptr), before_close(nullptr), after_close(nullptr) {}

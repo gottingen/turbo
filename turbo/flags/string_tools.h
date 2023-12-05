@@ -103,22 +103,22 @@ namespace turbo {
 
         // Based roughly on http://stackoverflow.com/questions/25829143/c-trim-whitespace-from-a-string
 
-        /// Trim whitespace from left of string
+        /// trim_all whitespace from left of string
         std::string &ltrim(std::string &str);
 
-        /// Trim anything from left of string
+        /// trim_all anything from left of string
         std::string &ltrim(std::string &str, const std::string &filter);
 
-        /// Trim whitespace from right of string
+        /// trim_all whitespace from right of string
         std::string &rtrim(std::string &str);
 
-        /// Trim anything from right of string
+        /// trim_all anything from right of string
         std::string &rtrim(std::string &str, const std::string &filter);
 
-        /// Trim whitespace from string
+        /// trim_all whitespace from string
         inline std::string &trim(std::string &str) { return ltrim(rtrim(str)); }
 
-        /// Trim anything from string
+        /// trim_all anything from string
         inline std::string &trim(std::string &str, const std::string filter) {
             return ltrim(rtrim(str, filter), filter);
         }

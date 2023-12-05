@@ -17,7 +17,6 @@
 #include "turbo/format/format.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace strings_internal {
 
         using FixedMapping =
@@ -60,7 +59,7 @@ namespace turbo {
 
     }  // namespace strings_internal
 
-    // We can implement this in terms of the generic StrReplaceAll, but
+    // We can implement this in terms of the generic str_replace_all, but
     // we must specify the template overload because C++ cannot deduce the type
     // of an initializer_list parameter to a function, and also if we don't specify
     // the type, we just call ourselves.
@@ -68,15 +67,14 @@ namespace turbo {
     // Note that we implement them here, rather than in the header, so that they
     // aren't inlined.
 
-    std::string StrReplaceAll(std::string_view s,
+    std::string str_replace_all(std::string_view s,
                               strings_internal::FixedMapping replacements) {
-        return StrReplaceAll<strings_internal::FixedMapping>(s, replacements);
+        return str_replace_all<strings_internal::FixedMapping>(s, replacements);
     }
 
-    int StrReplaceAll(strings_internal::FixedMapping replacements,
+    int str_replace_all(strings_internal::FixedMapping replacements,
                       std::string *target) {
-        return StrReplaceAll<strings_internal::FixedMapping>(replacements, target);
+        return str_replace_all<strings_internal::FixedMapping>(replacements, target);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

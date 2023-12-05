@@ -32,7 +32,7 @@ namespace turbo {
     namespace {
 
         // This GenericFind() template function encapsulates the finding algorithm
-        // shared between the ByString and ByAnyChar delimiters. The FindPolicy
+        // shared between the by_string and by_any_char delimiters. The FindPolicy
         // template parameter allows each delimiter to customize the actual find
         // function to use and the length of the found delimiter. For example, the
         // Literal delimiter will ultimately use std::string_view::find(), and the
@@ -80,12 +80,12 @@ namespace turbo {
     }  // namespace
 
     //
-    // ByString
+    // by_string
     //
 
-    ByString::ByString(std::string_view sp) : delimiter_(sp) {}
+    by_string::by_string(std::string_view sp) : delimiter_(sp) {}
 
-    std::string_view ByString::Find(std::string_view text, size_t pos) const {
+    std::string_view by_string::Find(std::string_view text, size_t pos) const {
         if (delimiter_.length() == 1) {
             // Much faster to call find on a single character than on an
             // std::string_view.
@@ -98,10 +98,10 @@ namespace turbo {
     }
 
     //
-    // ByChar
+    // by_char
     //
 
-    std::string_view ByChar::Find(std::string_view text, size_t pos) const {
+    std::string_view by_char::Find(std::string_view text, size_t pos) const {
         size_t found_pos = text.find(c_, pos);
         if (found_pos == std::string_view::npos)
             return std::string_view(text.data() + text.size(), 0);
@@ -109,23 +109,23 @@ namespace turbo {
     }
 
     //
-    // ByAnyChar
+    // by_any_char
     //
 
-    ByAnyChar::ByAnyChar(std::string_view sp) : delimiters_(sp) {}
+    by_any_char::by_any_char(std::string_view sp) : delimiters_(sp) {}
 
-    std::string_view ByAnyChar::Find(std::string_view text, size_t pos) const {
+    std::string_view by_any_char::Find(std::string_view text, size_t pos) const {
         return GenericFind(text, delimiters_, pos, AnyOfPolicy());
     }
 
     //
-    // ByLength
+    // by_length
     //
-    ByLength::ByLength(ptrdiff_t length) : length_(length) {
+    by_length::by_length(ptrdiff_t length) : length_(length) {
         TURBO_RAW_CHECK(length > 0, "");
     }
 
-    std::string_view ByLength::Find(std::string_view text,
+    std::string_view by_length::Find(std::string_view text,
                                     size_t pos) const {
         pos = std::min(pos, text.size());  // truncate `pos`
         std::string_view substr = text.substr(pos);

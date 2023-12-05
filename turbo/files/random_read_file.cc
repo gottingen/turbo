@@ -34,11 +34,13 @@ namespace turbo {
     }
 
     turbo::Status
-    RandomReadFile::open(const turbo::filesystem::path &path) noexcept {
+    RandomReadFile::open(const turbo::filesystem::path &path, const turbo::FileOption &option) noexcept {
         close();
+        _option = option;
         _file_path = path;
-        TURBO_ASSERT(!_file_path.empty());
-        turbo::Status rs;
+        if(_file_path.empty()) {
+            return turbo::invalid_argument_error("file path is empty");
+        }
         if (_listener.before_open) {
             _listener.before_open(_file_path);
         }
@@ -51,24 +53,24 @@ namespace turbo {
                     _listener.after_open(_file_path, _fp);
                 }
                 _fd = fileno(_fp);
-                return turbo::OkStatus();
+                return turbo::ok_status();
             }
             if (_option.open_interval > 0) {
                 turbo::SleepFor(turbo::Milliseconds(_option.open_interval));
             }
         }
-        return turbo::ErrnoToStatus(errno, turbo::Format("Failed opening file {} for reading", _file_path.c_str()));
+        return turbo::errno_to_status(errno, turbo::Format("Failed opening file {} for reading", _file_path.c_str()));
     }
 
     turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, void *buff, size_t len) {
         if (_fp == nullptr) {
-            return turbo::UnavailableError("file not open for read yet");
+            return turbo::unavailable_error("file not open for read yet");
         }
         size_t has_read = 0;
         /// _fd may > 0 with _fp valid
         ssize_t read_size = ::pread(_fd, buff, len, static_cast<off_t>(offset));
         if(read_size < 0 ) {
-            return turbo::ErrnoToStatus(errno, _file_path.c_str());
+            return turbo::errno_to_status(errno, _file_path.c_str());
         }
         // read_size > 0 means read the end of file
         return has_read;
@@ -76,7 +78,7 @@ namespace turbo {
 
     turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, std::string *content, size_t n) {
         if (_fp == nullptr) {
-            return turbo::UnavailableError("file not open for read yet");
+            return turbo::unavailable_error("file not open for read yet");
         }
         size_t len = n;
         if(len == npos) {
@@ -100,7 +102,7 @@ namespace turbo {
 
     turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, turbo::Cord *buf, size_t n) {
         if (_fp == nullptr) {
-            return turbo::UnavailableError("file not open for read yet");
+            return turbo::unavailable_error("file not open for read yet");
         }
         size_t len = n;
         if(len == npos) {

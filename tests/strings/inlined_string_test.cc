@@ -1238,7 +1238,7 @@ id eros. Mauris vulputate tortor nec neque pellentesque sagittis quis \n\
 sed nisl. In diam lacus, lobortis ut posuere nec, ornare id quam.";
 
     std::vector<inlined_string> v;
-    v = turbo::StrSplit(s1, turbo::ByAnyChar("\n"));
+    v = turbo::str_split(s1, turbo::by_any_char("\n"));
     {
         istringstream input(s1);
         inlined_string line;

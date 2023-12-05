@@ -23,8 +23,8 @@ namespace turbo {
 
     template<typename String>
     typename std::enable_if<turbo::is_string_type<String>::value>::type
-    TrimAll(String *str) {
-        auto stripped = Trim(*str);
+    trim_complete(String *str) {
+        auto stripped = trim_all(*str);
 
         if (stripped.empty()) {
             str->clear();
@@ -39,10 +39,10 @@ namespace turbo {
         for (; input_it < input_end; ++input_it) {
             if (is_ws) {
                 // Consecutive whitespace?  Keep only the last.
-                is_ws = turbo::ascii_isspace(static_cast<unsigned char>(*input_it));
+                is_ws = turbo::ascii_is_space(static_cast<unsigned char>(*input_it));
                 if (is_ws) --output_it;
             } else {
-                is_ws = turbo::ascii_isspace(static_cast<unsigned char>(*input_it));
+                is_ws = turbo::ascii_is_space(static_cast<unsigned char>(*input_it));
             }
 
             *output_it = *input_it;
@@ -52,9 +52,9 @@ namespace turbo {
         str->erase(static_cast<size_t>(output_it - &(*str)[0]));
     }
 
-    template void TrimAll(std::string *str);
+    template void trim_complete(std::string *str);
 
-    template void TrimAll(turbo::inlined_string *str);
+    template void trim_complete(turbo::inlined_string *str);
 
     TURBO_NAMESPACE_END
 }  // namespace turbo

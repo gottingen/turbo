@@ -47,8 +47,8 @@
 
 namespace {
 
-    using turbo::SimpleAtoi;
-    using turbo::SimpleHexAtoi;
+    using turbo::simple_atoi;
+    using turbo::simple_hex_atoi;
     using turbo::numbers_internal::kSixDigitsToBufferSize;
     using turbo::numbers_internal::safe_strto32_base;
     using turbo::numbers_internal::safe_strto64_base;
@@ -265,11 +265,11 @@ namespace {
         std::string s;
         turbo::strings_internal::OStringStream(&s) << in_value;
         int_type x = static_cast<int_type>(~exp_value);
-        EXPECT_TRUE(SimpleAtoi(s, &x))
+        EXPECT_TRUE(simple_atoi(s, &x))
                             << "in_value=" << in_value << " s=" << s << " x=" << x;
         EXPECT_EQ(exp_value, x);
         x = static_cast<int_type>(~exp_value);
-        EXPECT_TRUE(SimpleAtoi(s.c_str(), &x));
+        EXPECT_TRUE(simple_atoi(s.c_str(), &x));
         EXPECT_EQ(exp_value, x);
     }
 
@@ -278,12 +278,12 @@ namespace {
         std::string s;
         turbo::strings_internal::OStringStream(&s) << in_value;
         int_type x;
-        EXPECT_FALSE(SimpleAtoi(s, &x));
-        EXPECT_FALSE(SimpleAtoi(s.c_str(), &x));
+        EXPECT_FALSE(simple_atoi(s, &x));
+        EXPECT_FALSE(simple_atoi(s.c_str(), &x));
     }
 
     TEST(NumbersTest, Atoi) {
-        // SimpleAtoi(std::string_view, int32_t)
+        // simple_atoi(std::string_view, int32_t)
         VerifySimpleAtoiGood<int32_t>(0, 0);
         VerifySimpleAtoiGood<int32_t>(42, 42);
         VerifySimpleAtoiGood<int32_t>(-42, -42);
@@ -293,7 +293,7 @@ namespace {
         VerifySimpleAtoiGood<int32_t>(std::numeric_limits<int32_t>::max(),
                                       std::numeric_limits<int32_t>::max());
 
-        // SimpleAtoi(std::string_view, uint32_t)
+        // simple_atoi(std::string_view, uint32_t)
         VerifySimpleAtoiGood<uint32_t>(0, 0);
         VerifySimpleAtoiGood<uint32_t>(42, 42);
         VerifySimpleAtoiBad<uint32_t>(-42);
@@ -307,7 +307,7 @@ namespace {
         VerifySimpleAtoiBad<uint32_t>(std::numeric_limits<int64_t>::max());
         VerifySimpleAtoiBad<uint32_t>(std::numeric_limits<uint64_t>::max());
 
-        // SimpleAtoi(std::string_view, int64_t)
+        // simple_atoi(std::string_view, int64_t)
         VerifySimpleAtoiGood<int64_t>(0, 0);
         VerifySimpleAtoiGood<int64_t>(42, 42);
         VerifySimpleAtoiGood<int64_t>(-42, -42);
@@ -324,7 +324,7 @@ namespace {
                                       std::numeric_limits<int64_t>::max());
         VerifySimpleAtoiBad<int64_t>(std::numeric_limits<uint64_t>::max());
 
-        // SimpleAtoi(std::string_view, uint64_t)
+        // simple_atoi(std::string_view, uint64_t)
         VerifySimpleAtoiGood<uint64_t>(0, 0);
         VerifySimpleAtoiGood<uint64_t>(42, 42);
         VerifySimpleAtoiBad<uint64_t>(-42);
@@ -340,7 +340,7 @@ namespace {
         VerifySimpleAtoiGood<uint64_t>(std::numeric_limits<uint64_t>::max(),
                                        std::numeric_limits<uint64_t>::max());
 
-        // SimpleAtoi(std::string_view, turbo::uint128)
+        // simple_atoi(std::string_view, turbo::uint128)
         VerifySimpleAtoiGood<turbo::uint128>(0, 0);
         VerifySimpleAtoiGood<turbo::uint128>(42, 42);
         VerifySimpleAtoiBad<turbo::uint128>(-42);
@@ -359,7 +359,7 @@ namespace {
                 std::numeric_limits<turbo::uint128>::max(),
                 std::numeric_limits<turbo::uint128>::max());
 
-        // SimpleAtoi(std::string_view, turbo::int128)
+        // simple_atoi(std::string_view, turbo::int128)
         VerifySimpleAtoiGood<turbo::int128>(0, 0);
         VerifySimpleAtoiGood<turbo::int128>(42, 42);
         VerifySimpleAtoiGood<turbo::int128>(-42, -42);
@@ -411,31 +411,31 @@ namespace {
         float f;
 
         // NaN can be spelled in multiple ways.
-        EXPECT_TRUE(turbo::SimpleAtod("NaN", &d));
+        EXPECT_TRUE(turbo::simple_atod("NaN", &d));
         EXPECT_TRUE(std::isnan(d));
-        EXPECT_TRUE(turbo::SimpleAtod("nAN", &d));
+        EXPECT_TRUE(turbo::simple_atod("nAN", &d));
         EXPECT_TRUE(std::isnan(d));
-        EXPECT_TRUE(turbo::SimpleAtod("-nan", &d));
+        EXPECT_TRUE(turbo::simple_atod("-nan", &d));
         EXPECT_TRUE(std::isnan(d));
 
         // Likewise for Infinity.
-        EXPECT_TRUE(turbo::SimpleAtod("inf", &d));
+        EXPECT_TRUE(turbo::simple_atod("inf", &d));
         EXPECT_TRUE(std::isinf(d) && (d > 0));
-        EXPECT_TRUE(turbo::SimpleAtod("+Infinity", &d));
+        EXPECT_TRUE(turbo::simple_atod("+Infinity", &d));
         EXPECT_TRUE(std::isinf(d) && (d > 0));
-        EXPECT_TRUE(turbo::SimpleAtod("-INF", &d));
+        EXPECT_TRUE(turbo::simple_atod("-INF", &d));
         EXPECT_TRUE(std::isinf(d) && (d < 0));
 
         // Parse DBL_MAX. Parsing something more than twice as big should also
         // produce infinity.
-        EXPECT_TRUE(turbo::SimpleAtod("1.7976931348623157e+308", &d));
+        EXPECT_TRUE(turbo::simple_atod("1.7976931348623157e+308", &d));
         EXPECT_EQ(d, 1.7976931348623157e+308);
-        EXPECT_TRUE(turbo::SimpleAtod("5e308", &d));
+        EXPECT_TRUE(turbo::simple_atod("5e308", &d));
         EXPECT_TRUE(std::isinf(d) && (d > 0));
         // Ditto, but for FLT_MAX.
-        EXPECT_TRUE(turbo::SimpleAtof("3.4028234663852886e+38", &f));
+        EXPECT_TRUE(turbo::simple_atof("3.4028234663852886e+38", &f));
         EXPECT_EQ(f, 3.4028234663852886e+38f);
-        EXPECT_TRUE(turbo::SimpleAtof("7e38", &f));
+        EXPECT_TRUE(turbo::simple_atof("7e38", &f));
         EXPECT_TRUE(std::isinf(f) && (f > 0));
 
         // Parse the largest N such that parsing 1eN produces a finite value and the
@@ -443,16 +443,16 @@ namespace {
         //
         // The 309 exponent (and 39) confirms the "definition of
         // kEiselLemireMaxExclExp10" comment in charconv.cc.
-        EXPECT_TRUE(turbo::SimpleAtod("1e308", &d));
+        EXPECT_TRUE(turbo::simple_atod("1e308", &d));
         EXPECT_EQ(d, 1e308);
         EXPECT_FALSE(std::isinf(d));
-        EXPECT_TRUE(turbo::SimpleAtod("1e309", &d));
+        EXPECT_TRUE(turbo::simple_atod("1e309", &d));
         EXPECT_TRUE(std::isinf(d));
         // Ditto, but for Atof instead of Atod.
-        EXPECT_TRUE(turbo::SimpleAtof("1e38", &f));
+        EXPECT_TRUE(turbo::simple_atof("1e38", &f));
         EXPECT_EQ(f, 1e38f);
         EXPECT_FALSE(std::isinf(f));
-        EXPECT_TRUE(turbo::SimpleAtof("1e39", &f));
+        EXPECT_TRUE(turbo::simple_atof("1e39", &f));
         EXPECT_TRUE(std::isinf(f));
 
         // Parse the largest N such that parsing 9.999999999999999999eN, with 19
@@ -460,56 +460,56 @@ namespace {
         //
         // 9999999999999999999, with 19 nines but no decimal point, is the largest
         // "repeated nines" integer that fits in a uint64_t.
-        EXPECT_TRUE(turbo::SimpleAtod("9.999999999999999999e307", &d));
+        EXPECT_TRUE(turbo::simple_atod("9.999999999999999999e307", &d));
         EXPECT_EQ(d, 9.999999999999999999e307);
         EXPECT_FALSE(std::isinf(d));
-        EXPECT_TRUE(turbo::SimpleAtod("9.999999999999999999e308", &d));
+        EXPECT_TRUE(turbo::simple_atod("9.999999999999999999e308", &d));
         EXPECT_TRUE(std::isinf(d));
         // Ditto, but for Atof instead of Atod.
-        EXPECT_TRUE(turbo::SimpleAtof("9.999999999999999999e37", &f));
+        EXPECT_TRUE(turbo::simple_atof("9.999999999999999999e37", &f));
         EXPECT_EQ(f, 9.999999999999999999e37f);
         EXPECT_FALSE(std::isinf(f));
-        EXPECT_TRUE(turbo::SimpleAtof("9.999999999999999999e38", &f));
+        EXPECT_TRUE(turbo::simple_atof("9.999999999999999999e38", &f));
         EXPECT_TRUE(std::isinf(f));
 
         // Parse DBL_MIN (normal), DBL_TRUE_MIN (subnormal) and (DBL_TRUE_MIN / 10)
         // (effectively zero).
-        EXPECT_TRUE(turbo::SimpleAtod("2.2250738585072014e-308", &d));
+        EXPECT_TRUE(turbo::simple_atod("2.2250738585072014e-308", &d));
         EXPECT_EQ(d, 2.2250738585072014e-308);
-        EXPECT_TRUE(turbo::SimpleAtod("4.9406564584124654e-324", &d));
+        EXPECT_TRUE(turbo::simple_atod("4.9406564584124654e-324", &d));
         EXPECT_EQ(d, 4.9406564584124654e-324);
-        EXPECT_TRUE(turbo::SimpleAtod("4.9406564584124654e-325", &d));
+        EXPECT_TRUE(turbo::simple_atod("4.9406564584124654e-325", &d));
         EXPECT_EQ(d, 0);
         // Ditto, but for FLT_MIN, FLT_TRUE_MIN and (FLT_TRUE_MIN / 10).
-        EXPECT_TRUE(turbo::SimpleAtof("1.1754943508222875e-38", &f));
+        EXPECT_TRUE(turbo::simple_atof("1.1754943508222875e-38", &f));
         EXPECT_EQ(f, 1.1754943508222875e-38f);
-        EXPECT_TRUE(turbo::SimpleAtof("1.4012984643248171e-45", &f));
+        EXPECT_TRUE(turbo::simple_atof("1.4012984643248171e-45", &f));
         EXPECT_EQ(f, 1.4012984643248171e-45f);
-        EXPECT_TRUE(turbo::SimpleAtof("1.4012984643248171e-46", &f));
+        EXPECT_TRUE(turbo::simple_atof("1.4012984643248171e-46", &f));
         EXPECT_EQ(f, 0);
 
         // Parse the largest N (the most negative -N) such that parsing 1e-N produces
         // a normal or subnormal (but still positive) or zero value.
-        EXPECT_TRUE(turbo::SimpleAtod("1e-307", &d));
+        EXPECT_TRUE(turbo::simple_atod("1e-307", &d));
         EXPECT_EQ(d, 1e-307);
         EXPECT_GE(d, DBL_MIN);
         EXPECT_LT(d, DBL_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtod("1e-323", &d));
+        EXPECT_TRUE(turbo::simple_atod("1e-323", &d));
         EXPECT_EQ(d, 1e-323);
         EXPECT_GE(d, DBL_TRUE_MIN);
         EXPECT_LT(d, DBL_TRUE_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtod("1e-324", &d));
+        EXPECT_TRUE(turbo::simple_atod("1e-324", &d));
         EXPECT_EQ(d, 0);
         // Ditto, but for Atof instead of Atod.
-        EXPECT_TRUE(turbo::SimpleAtof("1e-37", &f));
+        EXPECT_TRUE(turbo::simple_atof("1e-37", &f));
         EXPECT_EQ(f, 1e-37f);
         EXPECT_GE(f, FLT_MIN);
         EXPECT_LT(f, FLT_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtof("1e-45", &f));
+        EXPECT_TRUE(turbo::simple_atof("1e-45", &f));
         EXPECT_EQ(f, 1e-45f);
         EXPECT_GE(f, FLT_TRUE_MIN);
         EXPECT_LT(f, FLT_TRUE_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtof("1e-46", &f));
+        EXPECT_TRUE(turbo::simple_atof("1e-46", &f));
         EXPECT_EQ(f, 0);
 
         // Parse the largest N (the most negative -N) such that parsing
@@ -521,106 +521,106 @@ namespace {
         //
         // The -324/-325 exponents (and -46/-47) confirms the "definition of
         // kEiselLemireMinInclExp10" comment in charconv.cc.
-        EXPECT_TRUE(turbo::SimpleAtod("9.999999999999999999e-308", &d));
+        EXPECT_TRUE(turbo::simple_atod("9.999999999999999999e-308", &d));
         EXPECT_EQ(d, 9.999999999999999999e-308);
         EXPECT_GE(d, DBL_MIN);
         EXPECT_LT(d, DBL_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtod("9.999999999999999999e-324", &d));
+        EXPECT_TRUE(turbo::simple_atod("9.999999999999999999e-324", &d));
         EXPECT_EQ(d, 9.999999999999999999e-324);
         EXPECT_GE(d, DBL_TRUE_MIN);
         EXPECT_LT(d, DBL_TRUE_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtod("9.999999999999999999e-325", &d));
+        EXPECT_TRUE(turbo::simple_atod("9.999999999999999999e-325", &d));
         EXPECT_EQ(d, 0);
         // Ditto, but for Atof instead of Atod.
-        EXPECT_TRUE(turbo::SimpleAtof("9.999999999999999999e-38", &f));
+        EXPECT_TRUE(turbo::simple_atof("9.999999999999999999e-38", &f));
         EXPECT_EQ(f, 9.999999999999999999e-38f);
         EXPECT_GE(f, FLT_MIN);
         EXPECT_LT(f, FLT_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtof("9.999999999999999999e-46", &f));
+        EXPECT_TRUE(turbo::simple_atof("9.999999999999999999e-46", &f));
         EXPECT_EQ(f, 9.999999999999999999e-46f);
         EXPECT_GE(f, FLT_TRUE_MIN);
         EXPECT_LT(f, FLT_TRUE_MIN * 10);
-        EXPECT_TRUE(turbo::SimpleAtof("9.999999999999999999e-47", &f));
+        EXPECT_TRUE(turbo::simple_atof("9.999999999999999999e-47", &f));
         EXPECT_EQ(f, 0);
 
         // Leading and/or trailing whitespace is OK.
-        EXPECT_TRUE(turbo::SimpleAtod("  \t\r\n  2.718", &d));
+        EXPECT_TRUE(turbo::simple_atod("  \t\r\n  2.718", &d));
         EXPECT_EQ(d, 2.718);
-        EXPECT_TRUE(turbo::SimpleAtod("  3.141  ", &d));
+        EXPECT_TRUE(turbo::simple_atod("  3.141  ", &d));
         EXPECT_EQ(d, 3.141);
 
         // Leading or trailing not-whitespace is not OK.
-        EXPECT_FALSE(turbo::SimpleAtod("n 0", &d));
-        EXPECT_FALSE(turbo::SimpleAtod("0n ", &d));
+        EXPECT_FALSE(turbo::simple_atod("n 0", &d));
+        EXPECT_FALSE(turbo::simple_atod("0n ", &d));
 
         // Multiple leading 0s are OK.
-        EXPECT_TRUE(turbo::SimpleAtod("000123", &d));
+        EXPECT_TRUE(turbo::simple_atod("000123", &d));
         EXPECT_EQ(d, 123);
-        EXPECT_TRUE(turbo::SimpleAtod("000.456", &d));
+        EXPECT_TRUE(turbo::simple_atod("000.456", &d));
         EXPECT_EQ(d, 0.456);
 
         // An absent leading 0 (for a fraction < 1) is OK.
-        EXPECT_TRUE(turbo::SimpleAtod(".5", &d));
+        EXPECT_TRUE(turbo::simple_atod(".5", &d));
         EXPECT_EQ(d, 0.5);
-        EXPECT_TRUE(turbo::SimpleAtod("-.707", &d));
+        EXPECT_TRUE(turbo::simple_atod("-.707", &d));
         EXPECT_EQ(d, -0.707);
 
         // Unary + is OK.
-        EXPECT_TRUE(turbo::SimpleAtod("+6.0221408e+23", &d));
+        EXPECT_TRUE(turbo::simple_atod("+6.0221408e+23", &d));
         EXPECT_EQ(d, 6.0221408e+23);
 
         // Underscores are not OK.
-        EXPECT_FALSE(turbo::SimpleAtod("123_456", &d));
+        EXPECT_FALSE(turbo::simple_atod("123_456", &d));
 
         // The decimal separator must be '.' and is never ','.
-        EXPECT_TRUE(turbo::SimpleAtod("8.9", &d));
-        EXPECT_FALSE(turbo::SimpleAtod("8,9", &d));
+        EXPECT_TRUE(turbo::simple_atod("8.9", &d));
+        EXPECT_FALSE(turbo::simple_atod("8,9", &d));
 
         // These examples are called out in the EiselLemire function's comments.
-        EXPECT_TRUE(turbo::SimpleAtod("4503599627370497.5", &d));
+        EXPECT_TRUE(turbo::simple_atod("4503599627370497.5", &d));
         EXPECT_EQ(d, 4503599627370497.5);
-        EXPECT_TRUE(turbo::SimpleAtod("1e+23", &d));
+        EXPECT_TRUE(turbo::simple_atod("1e+23", &d));
         EXPECT_EQ(d, 1e+23);
-        EXPECT_TRUE(turbo::SimpleAtod("9223372036854775807", &d));
+        EXPECT_TRUE(turbo::simple_atod("9223372036854775807", &d));
         EXPECT_EQ(d, 9223372036854775807);
         // Ditto, but for Atof instead of Atod.
-        EXPECT_TRUE(turbo::SimpleAtof("0.0625", &f));
+        EXPECT_TRUE(turbo::simple_atof("0.0625", &f));
         EXPECT_EQ(f, 0.0625f);
-        EXPECT_TRUE(turbo::SimpleAtof("20040229.0", &f));
+        EXPECT_TRUE(turbo::simple_atof("20040229.0", &f));
         EXPECT_EQ(f, 20040229.0f);
-        EXPECT_TRUE(turbo::SimpleAtof("2147483647.0", &f));
+        EXPECT_TRUE(turbo::simple_atof("2147483647.0", &f));
         EXPECT_EQ(f, 2147483647.0f);
 
-        // Some parsing algorithms don't always round correctly (but turbo::SimpleAtod
+        // Some parsing algorithms don't always round correctly (but turbo::simple_atod
         // should). This test case comes from
         // https://github.com/serde-rs/json/issues/707
         //
         // See also atod_manual_test.cc for running many more test cases.
-        EXPECT_TRUE(turbo::SimpleAtod("122.416294033786585", &d));
+        EXPECT_TRUE(turbo::simple_atod("122.416294033786585", &d));
         EXPECT_EQ(d, 122.416294033786585);
-        EXPECT_TRUE(turbo::SimpleAtof("122.416294033786585", &f));
+        EXPECT_TRUE(turbo::simple_atof("122.416294033786585", &f));
         EXPECT_EQ(f, 122.416294033786585f);
     }
 
     TEST(NumbersTest, Prefixes) {
         double d;
-        EXPECT_FALSE(turbo::SimpleAtod("++1", &d));
-        EXPECT_FALSE(turbo::SimpleAtod("+-1", &d));
-        EXPECT_FALSE(turbo::SimpleAtod("-+1", &d));
-        EXPECT_FALSE(turbo::SimpleAtod("--1", &d));
-        EXPECT_TRUE(turbo::SimpleAtod("-1", &d));
+        EXPECT_FALSE(turbo::simple_atod("++1", &d));
+        EXPECT_FALSE(turbo::simple_atod("+-1", &d));
+        EXPECT_FALSE(turbo::simple_atod("-+1", &d));
+        EXPECT_FALSE(turbo::simple_atod("--1", &d));
+        EXPECT_TRUE(turbo::simple_atod("-1", &d));
         EXPECT_EQ(d, -1.);
-        EXPECT_TRUE(turbo::SimpleAtod("+1", &d));
+        EXPECT_TRUE(turbo::simple_atod("+1", &d));
         EXPECT_EQ(d, +1.);
 
         float f;
-        EXPECT_FALSE(turbo::SimpleAtof("++1", &f));
-        EXPECT_FALSE(turbo::SimpleAtof("+-1", &f));
-        EXPECT_FALSE(turbo::SimpleAtof("-+1", &f));
-        EXPECT_FALSE(turbo::SimpleAtof("--1", &f));
-        EXPECT_TRUE(turbo::SimpleAtof("-1", &f));
+        EXPECT_FALSE(turbo::simple_atof("++1", &f));
+        EXPECT_FALSE(turbo::simple_atof("+-1", &f));
+        EXPECT_FALSE(turbo::simple_atof("-+1", &f));
+        EXPECT_FALSE(turbo::simple_atof("--1", &f));
+        EXPECT_TRUE(turbo::simple_atof("-1", &f));
         EXPECT_EQ(f, -1.f);
-        EXPECT_TRUE(turbo::SimpleAtof("+1", &f));
+        EXPECT_TRUE(turbo::simple_atof("+1", &f));
         EXPECT_EQ(f, +1.f);
     }
 
@@ -689,11 +689,11 @@ namespace {
             strm << "-" << std::hex << -turbo::uint128(in_value);
         }
         int_type x = static_cast<int_type>(~exp_value);
-        EXPECT_TRUE(SimpleHexAtoi(s, &x))
+        EXPECT_TRUE(simple_hex_atoi(s, &x))
                             << "in_value=" << std::hex << in_value << " s=" << s << " x=" << x;
         EXPECT_EQ(exp_value, x);
         x = static_cast<int_type>(~exp_value);
-        EXPECT_TRUE(SimpleHexAtoi(
+        EXPECT_TRUE(simple_hex_atoi(
                 s.c_str(), &x));  // NOLINT: readability-redundant-string-conversions
         EXPECT_EQ(exp_value, x);
     }
@@ -709,13 +709,13 @@ namespace {
             strm << "-" << std::hex << -turbo::uint128(in_value);
         }
         int_type x;
-        EXPECT_FALSE(SimpleHexAtoi(s, &x));
-        EXPECT_FALSE(SimpleHexAtoi(
+        EXPECT_FALSE(simple_hex_atoi(s, &x));
+        EXPECT_FALSE(simple_hex_atoi(
                 s.c_str(), &x));  // NOLINT: readability-redundant-string-conversions
     }
 
     TEST(NumbersTest, HexAtoi) {
-        // SimpleHexAtoi(std::string_view, int32_t)
+        // simple_hex_atoi(std::string_view, int32_t)
         VerifySimpleHexAtoiGood<int32_t>(0, 0);
         VerifySimpleHexAtoiGood<int32_t>(0x42, 0x42);
         VerifySimpleHexAtoiGood<int32_t>(-0x42, -0x42);
@@ -725,7 +725,7 @@ namespace {
         VerifySimpleHexAtoiGood<int32_t>(std::numeric_limits<int32_t>::max(),
                                          std::numeric_limits<int32_t>::max());
 
-        // SimpleHexAtoi(std::string_view, uint32_t)
+        // simple_hex_atoi(std::string_view, uint32_t)
         VerifySimpleHexAtoiGood<uint32_t>(0, 0);
         VerifySimpleHexAtoiGood<uint32_t>(0x42, 0x42);
         VerifySimpleHexAtoiBad<uint32_t>(-0x42);
@@ -739,7 +739,7 @@ namespace {
         VerifySimpleHexAtoiBad<uint32_t>(std::numeric_limits<int64_t>::max());
         VerifySimpleHexAtoiBad<uint32_t>(std::numeric_limits<uint64_t>::max());
 
-        // SimpleHexAtoi(std::string_view, int64_t)
+        // simple_hex_atoi(std::string_view, int64_t)
         VerifySimpleHexAtoiGood<int64_t>(0, 0);
         VerifySimpleHexAtoiGood<int64_t>(0x42, 0x42);
         VerifySimpleHexAtoiGood<int64_t>(-0x42, -0x42);
@@ -756,7 +756,7 @@ namespace {
                                          std::numeric_limits<int64_t>::max());
         VerifySimpleHexAtoiBad<int64_t>(std::numeric_limits<uint64_t>::max());
 
-        // SimpleHexAtoi(std::string_view, uint64_t)
+        // simple_hex_atoi(std::string_view, uint64_t)
         VerifySimpleHexAtoiGood<uint64_t>(0, 0);
         VerifySimpleHexAtoiGood<uint64_t>(0x42, 0x42);
         VerifySimpleHexAtoiBad<uint64_t>(-0x42);
@@ -772,7 +772,7 @@ namespace {
         VerifySimpleHexAtoiGood<uint64_t>(std::numeric_limits<uint64_t>::max(),
                                           std::numeric_limits<uint64_t>::max());
 
-        // SimpleHexAtoi(std::string_view, turbo::uint128)
+        // simple_hex_atoi(std::string_view, turbo::uint128)
         VerifySimpleHexAtoiGood<turbo::uint128>(0, 0);
         VerifySimpleHexAtoiGood<turbo::uint128>(0x42, 0x42);
         VerifySimpleHexAtoiBad<turbo::uint128>(-0x42);

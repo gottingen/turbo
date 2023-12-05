@@ -45,6 +45,10 @@
 
 // #define BSD manifest constant only in
 // sys/param.h
+
+/**
+ * @defgroup turbo_files filesystem - A C++17-like filesystem implementation for
+ */
 #ifndef _WIN32
 
 #include <sys/param.h>
@@ -231,7 +235,7 @@ bool has_executable_extension(const path &p);
 }
 #endif
 
-// [fs.class.path] class path
+        // [fs.class.path] class path
         class TURBO_DLL path
 #if defined(TURBO_PLATFORM_WINDOWS) && \
     !defined(TURBO_WIN_DISABLE_WSTRING_STORAGE_TYPE)
@@ -324,11 +328,23 @@ public:
                     path>::type;
 #endif
 
-            // [fs.path.construct] constructors and destructor
+            /**
+             * @brief Construct a new path object
+             */
             path() noexcept;
 
+            /**
+             * @brief Construct a new path object
+             *
+             * @param p
+             */
             path(const path &p);
 
+            /**
+             * @brief Construct a new path object
+             *
+             * @param p [input] path, which will be moved and p will be empty.
+             */
             path(path &&p) noexcept;
 
             path(string_type &&source, format fmt = auto_format);

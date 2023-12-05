@@ -22,36 +22,41 @@ namespace turbo {
 
     /**
      * @ingroup turbo_base
-     * @return
+     * @brief Get the current process id
+     * @return The current process id
      */
     TURBO_DLL int pid() noexcept;
-`
-    // Determine if the terminal supports colors
-    // Source: https://github.com/agauniyal/rang/
+
     /**
      * @ingroup turbo_base
+     * @brief Determine if the terminal supports colors
+     *        Source: https://github.com/agauniyal/rang/
      * @return
      */
     TURBO_DLL bool is_color_terminal() noexcept;
 
-    // Determine if the terminal attached
-    // Source: https://github.com/agauniyal/rang/
     /**
      * @ingroup turbo_base
-     * @return
+     * @brief Determine if the terminal attached
+     *        Source: https://github.com/agauniyal/rang/
+     *        @see is_color_terminal()
+     * @param file The file to check
+     * @return True if the terminal is attached, false otherwise
      */
     TURBO_DLL bool in_terminal(std::FILE *file) noexcept;
 
-    // Return current thread id as size_t (from thread local storage)
     /**
      * @ingroup turbo_base
-     * @return
+     * @brief Get the current thread id, this is thread local, so it is unique per thread.
+     *        different from std::this_thread::get_id(). actually it is act as gettid() in linux.
+     * @return The current thread id
      */
     TURBO_DLL size_t thread_id() noexcept;
 
     /**
      * @ingroup turbo_base
-     * @return
+     * @brief Get the host memory size.
+     * @return The host memory size
      */
     TURBO_DLL size_t get_host_memory_size();
 

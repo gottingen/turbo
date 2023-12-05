@@ -115,8 +115,8 @@ class SpyHashStateImpl : public HashStateBase<SpyHashStateImpl<T>> {
     const std::string a_flat = turbo::FormatRange("{}", a.hash_representation_, "");
     const std::string b_flat = turbo::FormatRange("{}", b.hash_representation_, "");
     if (a_flat == b_flat) return CompareResult::kEqual;
-    if (turbo::EndsWith(a_flat, b_flat)) return CompareResult::kBSuffixA;
-    if (turbo::EndsWith(b_flat, a_flat)) return CompareResult::kASuffixB;
+    if (turbo::ends_with(a_flat, b_flat)) return CompareResult::kBSuffixA;
+    if (turbo::ends_with(b_flat, a_flat)) return CompareResult::kASuffixB;
     return CompareResult::kUnequal;
   }
 

@@ -49,11 +49,11 @@ namespace turbo::tlog {
             file_writer_.set_option(kLogFileOption);
             auto r = file_writer_.open(calc_filename(base_filename_, 0));
             if (!r.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
             auto rs = file_writer_.size();
             if (!rs.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
             current_size_ = rs.value(); // expensive. called only once
             if (rotate_on_open && current_size_ > 0) {
@@ -93,7 +93,7 @@ namespace turbo::tlog {
             if (new_size > max_size_) {
                 auto r = file_writer_.flush();
                 if(!r.ok()) {
-                    throw_tlog_ex(r.ToString());
+                    throw_tlog_ex(r.to_string());
                 }
 
                 if (file_writer_.size().value_or(0) > 0) {
@@ -103,7 +103,7 @@ namespace turbo::tlog {
             }
             auto r = file_writer_.write(formatted);
             if(!r.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
             current_size_ = new_size;
         }
@@ -112,7 +112,7 @@ namespace turbo::tlog {
         void rotating_file_sink<Mutex>::flush_() {
             auto r = file_writer_.flush();
             if(!r.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
         }
 
@@ -150,7 +150,7 @@ namespace turbo::tlog {
             }
             auto r = file_writer_.reopen(true);
             if(!r.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
         }
 

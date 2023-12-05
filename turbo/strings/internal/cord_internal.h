@@ -553,7 +553,7 @@ class InlineData {
   // Requires the current instance to hold a tree value.
   CordzInfo* cordz_info() const {
     assert(is_tree());
-    intptr_t info = static_cast<intptr_t>(turbo::little_endian::ToHost64(
+    intptr_t info = static_cast<intptr_t>(turbo::little_endian::to_host64(
         static_cast<uint64_t>(rep_.cordz_info())));
     assert(info & 1);
     return reinterpret_cast<CordzInfo*>(info - 1);
@@ -566,7 +566,7 @@ class InlineData {
     assert(is_tree());
     uintptr_t info = reinterpret_cast<uintptr_t>(cordz_info) | 1;
     rep_.set_cordz_info(
-        static_cast<cordz_info_t>(turbo::little_endian::FromHost64(info)));
+        static_cast<cordz_info_t>(turbo::little_endian::from_host64(info)));
   }
 
   // Resets the current cordz_info to null / empty.
@@ -662,8 +662,8 @@ class InlineData {
         return inline_size() < rhs.inline_size() ? -1 : 1;
       }
     }
-    x = turbo::big_endian::FromHost64(x);
-    y = turbo::big_endian::FromHost64(y);
+    x = turbo::big_endian::from_host64(x);
+    y = turbo::big_endian::from_host64(y);
     return x < y ? -1 : 1;
   }
 

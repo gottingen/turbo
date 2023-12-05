@@ -31,97 +31,97 @@ namespace {
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-                CHECK(turbo::ascii_isalpha(c));
+                CHECK(turbo::ascii_is_alpha(c));
             else
-                CHECK(!turbo::ascii_isalpha(c));
+                CHECK(!turbo::ascii_is_alpha(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if ((c >= '0' && c <= '9'))
-                CHECK(turbo::ascii_isdigit(c));
+                CHECK(turbo::ascii_is_digit(c));
             else
-                CHECK(!turbo::ascii_isdigit(c));
+                CHECK(!turbo::ascii_is_digit(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
-            if (turbo::ascii_isalpha(c) || turbo::ascii_isdigit(c))
-                CHECK(turbo::ascii_isalnum(c));
+            if (turbo::ascii_is_alpha(c) || turbo::ascii_is_digit(c))
+                CHECK(turbo::ascii_is_alnum(c));
             else
-                CHECK(!turbo::ascii_isalnum(c));
+                CHECK(!turbo::ascii_is_alnum(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if (i != '\0' && strchr(" \r\n\t\v\f", i))
-                CHECK(turbo::ascii_isspace(c));
+                CHECK(turbo::ascii_is_space(c));
             else
-                CHECK(!turbo::ascii_isspace(c));
+                CHECK(!turbo::ascii_is_space(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if (i >= 32 && i < 127)
-                CHECK(turbo::ascii_isprint(c));
+                CHECK(turbo::ascii_is_print(c));
             else
-                CHECK(!turbo::ascii_isprint(c));
+                CHECK(!turbo::ascii_is_print(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
-            if (turbo::ascii_isprint(c) && !turbo::ascii_isspace(c) &&
-                !turbo::ascii_isalnum(c)) {
-                CHECK(turbo::ascii_ispunct(c));
+            if (turbo::ascii_is_print(c) && !turbo::ascii_is_space(c) &&
+                !turbo::ascii_is_alnum(c)) {
+                CHECK(turbo::ascii_is_punct(c));
             } else {
-                CHECK(!turbo::ascii_ispunct(c));
+                CHECK(!turbo::ascii_is_punct(c));
             }
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if (i == ' ' || i == '\t')
-                CHECK(turbo::ascii_isblank(c));
+                CHECK(turbo::ascii_is_blank(c));
             else
-                CHECK(!turbo::ascii_isblank(c));
+                CHECK(!turbo::ascii_is_blank(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if (i < 32 || i == 127)
-                CHECK(turbo::ascii_iscntrl(c));
+                CHECK(turbo::ascii_is_cntrl(c));
             else
-                CHECK(!turbo::ascii_iscntrl(c));
+                CHECK(!turbo::ascii_is_cntrl(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
-            if (turbo::ascii_isdigit(c) || (i >= 'A' && i <= 'F') ||
+            if (turbo::ascii_is_digit(c) || (i >= 'A' && i <= 'F') ||
                 (i >= 'a' && i <= 'f')) {
-                CHECK(turbo::ascii_isxdigit(c));
+                CHECK(turbo::ascii_is_xdigit(c));
             } else {
-                CHECK(!turbo::ascii_isxdigit(c));
+                CHECK(!turbo::ascii_is_xdigit(c));
             }
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if (i > 32 && i < 127)
-                CHECK(turbo::ascii_isgraph(c));
+                CHECK(turbo::ascii_is_graph(c));
             else
-                CHECK(!turbo::ascii_isgraph(c));
+                CHECK(!turbo::ascii_is_graph(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if (i >= 'A' && i <= 'Z')
-                CHECK(turbo::ascii_isupper(c));
+                CHECK(turbo::ascii_is_upper(c));
             else
-                CHECK(!turbo::ascii_isupper(c));
+                CHECK(!turbo::ascii_is_upper(c));
         }
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
             if (i >= 'a' && i <= 'z')
-                CHECK(turbo::ascii_islower(c));
+                CHECK(turbo::ascii_is_lower(c));
             else
-                CHECK(!turbo::ascii_islower(c));
+                CHECK(!turbo::ascii_is_lower(c));
         }
         for (unsigned char c = 0; c < 128; c++) {
-            CHECK(turbo::ascii_isascii(c));
+            CHECK(turbo::ascii_is_ascii(c));
         }
         for (int i = 128; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
-            CHECK(!turbo::ascii_isascii(c));
+            CHECK(!turbo::ascii_is_ascii(c));
         }
     }
 
@@ -136,19 +136,19 @@ namespace {
 
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
-            CHECK_EQ(isalpha(c) != 0, turbo::ascii_isalpha(c));
-            CHECK_EQ(isdigit(c) != 0, turbo::ascii_isdigit(c));
-            CHECK_EQ(isalnum(c) != 0, turbo::ascii_isalnum(c));
-            CHECK_EQ(isspace(c) != 0, turbo::ascii_isspace(c));
-            CHECK_EQ(ispunct(c) != 0, turbo::ascii_ispunct(c));
-            CHECK_EQ(isblank(c) != 0, turbo::ascii_isblank(c));
-            CHECK_EQ(iscntrl(c) != 0, turbo::ascii_iscntrl(c));
-            CHECK_EQ(isxdigit(c) != 0, turbo::ascii_isxdigit(c));
-            CHECK_EQ(isprint(c) != 0, turbo::ascii_isprint(c));
-            CHECK_EQ(isgraph(c) != 0, turbo::ascii_isgraph(c));
-            CHECK_EQ(isupper(c) != 0, turbo::ascii_isupper(c));
-            CHECK_EQ(islower(c) != 0, turbo::ascii_islower(c));
-            CHECK_EQ(isascii(c) != 0, turbo::ascii_isascii(c));
+            CHECK_EQ(isalpha(c) != 0, turbo::ascii_is_alpha(c));
+            CHECK_EQ(isdigit(c) != 0, turbo::ascii_is_digit(c));
+            CHECK_EQ(isalnum(c) != 0, turbo::ascii_is_alnum(c));
+            CHECK_EQ(isspace(c) != 0, turbo::ascii_is_space(c));
+            CHECK_EQ(ispunct(c) != 0, turbo::ascii_is_punct(c));
+            CHECK_EQ(isblank(c) != 0, turbo::ascii_is_blank(c));
+            CHECK_EQ(iscntrl(c) != 0, turbo::ascii_is_cntrl(c));
+            CHECK_EQ(isxdigit(c) != 0, turbo::ascii_is_xdigit(c));
+            CHECK_EQ(isprint(c) != 0, turbo::ascii_is_print(c));
+            CHECK_EQ(isgraph(c) != 0, turbo::ascii_is_graph(c));
+            CHECK_EQ(isupper(c) != 0, turbo::ascii_is_upper(c));
+            CHECK_EQ(islower(c) != 0, turbo::ascii_is_lower(c));
+            CHECK_EQ(isascii(c) != 0, turbo::ascii_is_ascii(c));
         }
 
 #ifndef __ANDROID__
@@ -167,19 +167,19 @@ namespace {
 
         for (int i = 0; i < 256; i++) {
             const auto c = static_cast<unsigned char>(i);
-            if (turbo::ascii_islower(c))
-                CHECK_EQ(turbo::ascii_toupper(c), 'A' + (i - 'a'));
+            if (turbo::ascii_is_lower(c))
+                CHECK_EQ(turbo::ascii_to_upper(c), 'A' + (i - 'a'));
             else
-                CHECK_EQ(turbo::ascii_toupper(c), static_cast<char>(i));
+                CHECK_EQ(turbo::ascii_to_upper(c), static_cast<char>(i));
 
-            if (turbo::ascii_isupper(c))
-                CHECK_EQ(turbo::ascii_tolower(c), 'a' + (i - 'A'));
+            if (turbo::ascii_is_upper(c))
+                CHECK_EQ(turbo::ascii_to_lower(c), 'a' + (i - 'A'));
             else
-                CHECK_EQ(turbo::ascii_tolower(c), static_cast<char>(i));
+                CHECK_EQ(turbo::ascii_to_lower(c), static_cast<char>(i));
 
             // These CHECKs only hold in a C locale.
-            CHECK_EQ(static_cast<char>(tolower(i)), turbo::ascii_tolower(c));
-            CHECK_EQ(static_cast<char>(toupper(i)), turbo::ascii_toupper(c));
+            CHECK_EQ(static_cast<char>(tolower(i)), turbo::ascii_to_lower(c));
+            CHECK_EQ(static_cast<char>(toupper(i)), turbo::ascii_to_upper(c));
         }
 #ifndef __ANDROID__
         // restore the old locale.

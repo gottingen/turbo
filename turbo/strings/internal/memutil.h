@@ -24,7 +24,7 @@
 // The difference between the mem and str versions is the mem version
 // takes a pointer and a length, rather than a '\0'-terminated string.
 // The memcase* routines defined here assume the locale is "C"
-// (they use turbo::ascii_tolower instead of tolower).
+// (they use turbo::ascii_to_lower instead of tolower).
 //
 // These routines are based on the BSD library.
 //
@@ -66,7 +66,7 @@
 #include <cstring>
 
 #include "turbo/platform/port.h"  // disable some warnings on Windows
-#include "turbo/strings/ascii.h"  // for turbo::ascii_tolower
+#include "turbo/strings/ascii.h"  // for turbo::ascii_to_lower
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -98,10 +98,10 @@ const char* int_memmatch(const char* haystack, size_t haylen,
   for (; haystack < hayend; ++haystack) {
     char hay = case_sensitive
                    ? *haystack
-                   : turbo::ascii_tolower(static_cast<unsigned char>(*haystack));
+                   : turbo::ascii_to_lower(static_cast<unsigned char>(*haystack));
     char nee = case_sensitive
                    ? *needle
-                   : turbo::ascii_tolower(static_cast<unsigned char>(*needle));
+                   : turbo::ascii_to_lower(static_cast<unsigned char>(*needle));
     if (hay == nee) {
       if (++needle == needleend) {
         return haystack + 1 - neelen;

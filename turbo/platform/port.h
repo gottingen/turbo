@@ -18,6 +18,12 @@
 #ifndef TURBO_PLATFORM_PORT_H_
 #define TURBO_PLATFORM_PORT_H_
 
+
+/**
+* @defgroup turbo_platform platform
+*
+*/
+
 #include "turbo/platform/config/attribute_simd.h"
 #include "turbo/platform/config/attribute_function.h"
 #include "turbo/platform/config/attribute_literal.h"

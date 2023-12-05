@@ -22,10 +22,12 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-    // Returns std::string_view with whitespace stripped from the beginning of the
-    // given std::string_view.
-    struct ByAnyOf {
-        explicit ByAnyOf(std::string_view str) : trimmer(str) {
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief operator()() is used to check if a character is in the given string.
+     */
+    struct by_any_of {
+        explicit by_any_of(std::string_view str) : trimmer(str) {
 
         }
 
@@ -41,66 +43,173 @@ namespace turbo {
         std::string_view trimmer;
     };
 
-    struct ByWhitespace {
-        ByWhitespace() = default;
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief operator()() is used to check if a character is a whitespace.
+     */
+    struct by_white_space {
+        by_white_space() = default;
 
         bool operator()(unsigned char c) {
-            return turbo::ascii_isspace(c);
+            return turbo::ascii_is_space(c);
         }
-
-    private:
-        std::string_view trimmer;
     };
 
-    template<typename Pred = ByWhitespace>
-    TURBO_MUST_USE_RESULT inline std::string_view TrimLeft(std::string_view str, Pred pred = Pred()) {
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief trim_left() removes whitespace from the beginning of the given string.
+     *         pred defaults to by_white_space.
+     *         Example:
+     *         @code
+     *         std::string_view input("\t abc");
+     *         EXPECT_EQ(turbo::trim_left(input), "abc");
+     *         EXPECT_EQ(turbo::trim_left(input, turbo::by_any_of("\t a")), "bc");
+     *         @endcode
+     * @param str The string to trim.
+     * @param pred The predicate to use to determine if a character should be trimmed.
+     *        Defaults to by_white_space.
+     * @return A std::string_view with whitespace stripped from the beginning of the
+     *         given std::string_view.
+     */
+    template<typename Pred = by_white_space>
+    [[nodiscard]] inline std::string_view trim_left(std::string_view str, Pred pred = Pred()) {
         auto it = std::find_if_not(str.begin(), str.end(), pred);
         return str.substr(static_cast<size_t>(it - str.begin()));
     }
 
-    // Strips in place whitespace from the beginning of the given string.
-    template<typename String, typename Pred = ByWhitespace>
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief trim_left() removes specified characters that match the predicate from the beginning of the given string.
+     *        pred defaults to by_white_space.
+     *        Example:
+     *        @code
+     *        std::string input("\t abc");
+     *        turbo::trim_left(&input);
+     *        EXPECT_EQ(input, "abc");
+     *        std::string input2("\t abc");
+     *        turbo::trim_left(&input2, turbo::by_any_of("\t a"));
+     *        EXPECT_EQ(input2, "bc");
+     *        @endcode
+     * @attention This function will modify the given string.
+     * @param str The string to trim.
+     * @param pred The predicate to use to determine if a character should be trimmed.
+     *       Defaults to by_white_space.
+     */
+    template<typename String, typename Pred = by_white_space>
     inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-    TrimLeft(String *str, Pred pred = Pred()) {
+    trim_left(String *str, Pred pred = Pred()) {
         auto it = std::find_if_not(str->begin(), str->end(), pred);
         str->erase(str->begin(), it);
     }
 
-    // Returns std::string_view with whitespace stripped from the end of the given
-    // std::string_view.
-    template<typename Pred = ByWhitespace>
-    TURBO_MUST_USE_RESULT inline std::string_view TrimRight(std::string_view str, Pred pred = Pred()) {
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief trim_right() removes whitespace from the end of the given string.
+     *        pred defaults to by_white_space.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc \t");
+     *        EXPECT_EQ(turbo::trim_right(input), "abc");
+     *        EXPECT_EQ(turbo::trim_right(input, turbo::by_any_of("\t a")), "abc");
+     *        @endcode
+     * @param str The string to trim.
+     * @param pred The predicate to use to determine if a character should be trimmed.
+     *        Defaults to by_white_space.
+     * @return A std::string_view with whitespace stripped from the end of the
+     *         given std::string_view.
+     */
+    template<typename Pred = by_white_space>
+    [[nodiscard]] inline std::string_view trim_right(std::string_view str, Pred pred = Pred()) {
         auto it = std::find_if_not(str.rbegin(), str.rend(), pred);
         return str.substr(0, static_cast<size_t>(str.rend() - it));
     }
 
-    // Strips in place whitespace from the end of the given string
-    template<typename String, typename Pred = ByWhitespace>
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief trim_right() removes specified characters that match the predicate from the end of the given string.
+     *        pred defaults to by_white_space.
+     *        Example:
+     *        @code
+     *        std::string input("abc \t");
+     *        turbo::trim_right(&input);
+     *        EXPECT_EQ(input, "abc");
+     *        std::string input2("abc \t");
+     *        turbo::trim_right(&input2, turbo::by_any_of("\t a"));
+     *        EXPECT_EQ(input2, "abc");
+     *        @endcode
+     * @attention This function will modify the given string.
+     * @param str The string to trim.
+     * @param pred The predicate to use to determine if a character should be trimmed.
+     *        Defaults to by_white_space.
+     */
+    template<typename String, typename Pred = by_white_space>
     inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-    TrimRight(String *str, Pred pred = Pred()) {
+    trim_right(String *str, Pred pred = Pred()) {
         auto it = std::find_if_not(str->rbegin(), str->rend(), pred);
         str->erase(static_cast<size_t>(str->rend() - it));
     }
 
-    // Returns std::string_view with whitespace stripped from both ends of the
-    // given std::string_view.
-    template<typename Pred = ByWhitespace>
-    TURBO_MUST_USE_RESULT inline std::string_view Trim(std::string_view str, Pred pred = Pred()) {
-        return TrimRight(TrimLeft(str, pred), pred);
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief trim_all() removes specified characters that match the predicate from both ends of the given string.
+     *        pred defaults to by_white_space.
+     *        Example:
+     *        @code
+     *        std::string_view input(" \t abc \t");
+     *        EXPECT_EQ(turbo::trim_all(input), "abc");
+     *        EXPECT_EQ(turbo::trim_all(input, turbo::by_any_of("\t a")), "bc");
+     *        @endcode
+     * @param str The string to trim.
+     * @param pred The predicate to use to determine if a character should be trimmed.
+     *       Defaults to by_white_space.
+     * @return A std::string_view with whitespace stripped from both ends of the
+     *        given std::string_view.
+     */
+    template<typename Pred = by_white_space>
+    [[nodiscard]] inline std::string_view trim_all(std::string_view str, Pred pred = Pred()) {
+        return trim_right(trim_left(str, pred), pred);
     }
 
-    // Strips in place whitespace from both ends of the given string
-    template<typename String, typename Pred = ByWhitespace>
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief trim_all() removes specified characters that match the predicate from both ends of the given string.
+     *        pred defaults to by_white_space.
+     *        Example:
+     *        @code
+     *        std::string input(" \t abc \t");
+     *        turbo::trim_all(&input);
+     *        EXPECT_EQ(input, "abc");
+     *        std::string input2(" \t abc \t");
+     *        turbo::trim_all(&input2, turbo::by_any_of("\t a"));
+     *        EXPECT_EQ(input2, "bc");
+     *        @endcode
+     * @attention This function will modify the given string.
+     * @param str The string to trim.
+     * @param pred The predicate to use to determine if a character should be trimmed.
+     *        Defaults to by_white_space.
+     */
+    template<typename String, typename Pred = by_white_space>
     inline typename std::enable_if<turbo::is_string_type<String>::value>::type
-    Trim(String *str, Pred pred = Pred()) {
-        TrimRight(str, pred);
-        TrimLeft(str, pred);
+    trim_all(String *str, Pred pred = Pred()) {
+        trim_right(str, pred);
+        trim_left(str, pred);
     }
 
-    // Removes leading, trailing, and consecutive internal whitespace.
+    /**
+     * @ingroup turbo_strings_trim
+     * @brief trim_complete() removes leading, trailing, and consecutive internal whitespace.
+     *        Example:
+     *        @code
+     *        std::string input(" \t ab c \t");
+     *        turbo::trim_complete(&input);
+     *        EXPECT_EQ(input, "abc");
+     *        @endcode
+     * @attention This function will modify the given string.
+     * @param str The string to trim.
+     */
     template<typename String>
     typename std::enable_if<turbo::is_string_type<String>::value>::type
-    TrimAll(String *);
+    trim_complete(String *);
 
     TURBO_NAMESPACE_END
 }

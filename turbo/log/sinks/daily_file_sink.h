@@ -109,7 +109,7 @@ namespace turbo::tlog {
                 file_writer_.set_option(kLogFileOption);
                 auto r = file_writer_.open(filename, truncate_);
                 if(!r.ok()) {
-                    throw_tlog_ex(r.ToString());
+                    throw_tlog_ex(r.to_string());
                 }
                 rotation_tp_ = next_rotation_tp_();
 
@@ -132,7 +132,7 @@ namespace turbo::tlog {
                     file_writer_.set_option(kLogFileOption);
                     auto r = file_writer_.open(filename, truncate_);
                     if(!r.ok()) {
-                        throw_tlog_ex(r.ToString());
+                        throw_tlog_ex(r.to_string());
                     }
                     rotation_tp_ = next_rotation_tp_();
                 }
@@ -140,7 +140,7 @@ namespace turbo::tlog {
                 base_sink<Mutex>::formatter_->format(msg, formatted);
                 auto r = file_writer_.write(formatted);
                 if(!r.ok()) {
-                    throw_tlog_ex(r.ToString());
+                    throw_tlog_ex(r.to_string());
                 }
 
                 // Do the cleaning only at the end because it might throw on failure.
@@ -152,7 +152,7 @@ namespace turbo::tlog {
             void flush_() override {
                 auto  r = file_writer_.flush();
                 if(!r.ok()) {
-                    throw_tlog_ex(r.ToString());
+                    throw_tlog_ex(r.to_string());
                 }
             }
 

@@ -236,7 +236,7 @@ struct SplitterIsConvertibleTo
           HasMappedType<C>::value> {
 };
 
-// This class implements the range that is returned by turbo::StrSplit(). This
+// This class implements the range that is returned by turbo::str_split(). This
 // class has templated conversion operators that allow it to be implicitly
 // converted to a variety of types that the caller may have specified on the
 // left-hand side of an assignment.

@@ -33,16 +33,33 @@
 #define TURBO_HAVE_ATTRIBUTE_NO_TAIL_CALL 0
 #endif
 
-// TURBO_HOT, TURBO_COLD
-//
-// Tells GCC that a function is hot or cold. GCC can use this information to
-// improve static analysis, i.e. a conditional branch to a cold function
-// is likely to be not-taken.
-// This annotation is used for function declarations.
-//
-// Example:
-//
-//   int foo() TURBO_HOT;
+/**
+ * @ingroup turbo_platform
+ * @brief This macro is used to mark a function as hot.
+ * @details The `TURBO_HOT` macro is used to mark a function as hot. This
+ *          attribute is used to inform the compiler that a function is a hot
+ *          spot in the program. The function is optimized more aggressively
+ *          and on many platforms special calling sequences are used. For
+ *          example, on ARM targets a function marked as hot is expected to
+ *          be called more often than a cold function. This attribute is
+ *          often used to mark functions that are called frequently inside
+ *          loops.
+ * @code
+ *          int foo() TURBO_HOT;
+ * @endcode
+ * @note    This attribute is not implemented in GCC versions earlier than
+ *          4.3.0.
+ * @note    This attribute is not implemented in Clang versions earlier than
+ *          3.0.
+ * @note    This attribute is not implemented in MSVC.
+ * @note    This attribute is not implemented in ICC.
+ * @note    This attribute is not implemented in IBM XL C/C++.
+ * @note    This attribute is not implemented in TI C/C++.
+ * @note    This attribute is not implemented in ARM C/C++.
+ * @note    This attribute is not implemented in TI C/C++.
+ * @note    This attribute is not implemented in TI C/C++.
+ * @note    This attribute is not implemented in TI C/C++.
+ */
 #if TURBO_HAVE_ATTRIBUTE(hot) || (defined(__GNUC__) && !defined(__clang__))
 #define TURBO_HOT __attribute__((hot))
 #else
@@ -196,40 +213,29 @@
 #endif
 #endif // TURBO_MAYBE_UNUSED
 
-/*
-#ifndef TURBO_MAYBE_UNUSED
-#if defined(TURBO_COMPILER_CPP17_ENABLED)
-#define TURBO_MAYBE_UNUSED [[maybe_unused]]
-#elif TURBO_HAVE_ATTRIBUTE(unused)
-#define TURBO_MAYBE_UNUSED __attribute__((unused))
-#else
-#define TURBO_MAYBE_UNUSED
-#endif
-#endif // TURBO_MAYBE_UNUSED
-*/
-// ------------------------------------------------------------------------
-// TURBO_FORCE_INLINE              // Used as a prefix.
-// TURBO_PREFIX_FORCE_INLINE       // You should need this only for unusual
-// compilers. TURBO_POSTFIX_FORCE_INLINE      // You should need this only for
-// unusual compilers.
-//
-// Example usage:
-//     TURBO_FORCE_INLINE void Foo();                                //
-//     Implementation elsewhere. TURBO_PREFIX_FORCE_INLINE void Foo()
-//     TURBO_POSTFIX_FORCE_INLINE; // Implementation elsewhere.
-//
-// Note that when the prefix version of this function is used, it replaces
-// the regular C++ 'inline' statement. Thus you should not use both the
-// C++ inline statement and this macro with the same function declaration.
-//
-// To force inline usage under GCC 3.1+, you use this:
-//    inline void Foo() __attribute__((always_inline));
-//       or
-//    inline __attribute__((always_inline)) void Foo();
-//
-// The CodeWarrior compiler doesn't have the concept of forcing inlining per
-// function.
-//
+/**
+ * @ingroup turbo_platform
+ * @brief This macro is used to force inline a function.
+ * @details The `TURBO_FORCE_INLINE` macro is used to force inline a function.
+ *          This attribute is used to inform the compiler that a function is a
+ *          hot spot in the program. The function is optimized more aggressively
+ *          and on many platforms special calling sequences are used. For
+ *          example, on ARM targets a function marked as hot is expected to
+ *          be called more often than a cold function. This attribute is
+ *          often used to mark functions that are called frequently inside
+ *          loops.
+ * @code
+ *          TUROB_FORCE_INLINE int foo();
+ * @endcode
+ * @note    This attribute is not implemented in GCC versions earlier than
+ *         3.1.0. This attribute is not implemented in Clang versions earlier
+ *         than 3.0.0. This attribute is not implemented in MSVC. This
+ *         attribute is not implemented in ICC. This attribute is not
+ *         implemented in IBM XL C/C++. This attribute is not implemented in
+ *         TI C/C++. This attribute is not implemented in ARM C/C++. This
+ *         attribute is not implemented in TI C/C++. This attribute is not
+ *         implemented in TI C/C++.
+ */
 #ifndef TURBO_FORCE_INLINE
 #if defined(TURBO_COMPILER_MSVC)
 #define TURBO_FORCE_INLINE_SUPPORTED 1

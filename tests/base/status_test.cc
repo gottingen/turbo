@@ -74,31 +74,31 @@ namespace {
     };
 
     constexpr ErrorTest kErrorTests[]{
-            {turbo::kCancelled,          turbo::CancelledError,  turbo::IsCancelled},
-            {turbo::kUnknown,            turbo::UnknownError,    turbo::IsUnknown},
-            {turbo::kInvalidArgument,    turbo::InvalidArgumentError,
-                                                                 turbo::IsInvalidArgument},
-            {turbo::kDeadlineExceeded,   turbo::DeadlineExceededError,
-                                                                 turbo::IsDeadlineExceeded},
-            {turbo::kNotFound,           turbo::NotFoundError,   turbo::IsNotFound},
-            {turbo::kAlreadyExists,      turbo::AlreadyExistsError,
-                                                                 turbo::IsAlreadyExists},
-            {turbo::kPermissionDenied,   turbo::PermissionDeniedError,
-                                                                 turbo::IsPermissionDenied},
-            {turbo::kResourceExhausted,  turbo::ResourceExhaustedError,
-                                                                 turbo::IsResourceExhausted},
-            {turbo::kFailedPrecondition, turbo::FailedPreconditionError,
-                                                                 turbo::IsFailedPrecondition},
-            {turbo::kAborted,            turbo::AbortedError,    turbo::IsAborted},
-            {turbo::kOutOfRange,         turbo::OutOfRangeError, turbo::IsOutOfRange},
-            {turbo::kUnimplemented,      turbo::UnimplementedError,
-                                                                 turbo::IsUnimplemented},
-            {turbo::kInternal,           turbo::InternalError,   turbo::IsInternal},
-            {turbo::kUnavailable,        turbo::UnavailableError,
-                                                                 turbo::IsUnavailable},
-            {turbo::kDataLoss,           turbo::DataLossError,   turbo::IsDataLoss},
-            {turbo::kUnauthenticated,    turbo::UnauthenticatedError,
-                                                                 turbo::IsUnauthenticated},
+            {turbo::kCancelled,          turbo::cancelled_error,  turbo::is_cancelled},
+            {turbo::kUnknown,            turbo::unknown_error,    turbo::is_unknown},
+            {turbo::kInvalidArgument,    turbo::invalid_argument_error,
+                                                                 turbo::is_invalid_argument},
+            {turbo::kDeadlineExceeded,   turbo::deadline_exceeded_error,
+                                                                 turbo::is_deadline_exceeded},
+            {turbo::kNotFound,           turbo::not_found_error,   turbo::is_not_found},
+            {turbo::kAlreadyExists,      turbo::already_exists_error,
+                                                                 turbo::is_already_exists},
+            {turbo::kPermissionDenied,   turbo::permission_denied_error,
+                                                                 turbo::is_permission_denied},
+            {turbo::kResourceExhausted,  turbo::resource_exhausted_error,
+                                                                 turbo::is_resource_exhausted},
+            {turbo::kFailedPrecondition, turbo::failed_precondition_error,
+                                                                 turbo::is_failed_precondition},
+            {turbo::kAborted,            turbo::aborted_error,    turbo::is_aborted},
+            {turbo::kOutOfRange,         turbo::out_of_range_error, turbo::is_out_of_range},
+            {turbo::kUnimplemented,      turbo::unimplemented_error,
+                                                                 turbo::is_unimplemented},
+            {turbo::kInternal,           turbo::internal_error,   turbo::is_internal},
+            {turbo::kUnavailable,        turbo::unavailable_error,
+                                                                 turbo::is_unavailable},
+            {turbo::kDataLoss,           turbo::data_loss_error,   turbo::is_data_loss},
+            {turbo::kUnauthenticated,    turbo::unauthenticated_error,
+                                                                 turbo::is_unauthenticated},
     };
 
     constexpr char kUrl1[] = "url.payload.1";
@@ -111,14 +111,14 @@ namespace {
     constexpr char kPayload3[] = "ccccc";
     turbo::Status EraseAndReturn(const turbo::Status &base) {
         turbo::Status copy = base;
-        REQUIRE(copy.ErasePayload(kUrl1));
+        REQUIRE(copy.erase_payload(kUrl1));
         return copy;
     }
     using PayloadsVec = std::vector<std::pair<std::string, turbo::Cord>>;
     PayloadsVec AllVisitedPayloads(const turbo::Status &s) {
         PayloadsVec result;
 
-        s.ForEachPayload([&](std::string_view type_url, const turbo::Cord &payload) {
+        s.for_each_payload([&](std::string_view type_url, const turbo::Cord &payload) {
             result.push_back(std::make_pair(std::string(type_url), payload));
         });
 
@@ -163,14 +163,14 @@ namespace {
         }
 
         SUBCASE(" OkStatus") {
-            turbo::Status status = turbo::OkStatus();
+            turbo::Status status = turbo::ok_status();
             REQUIRE(status.ok());
             REQUIRE_EQ(turbo::kOk, status.code());
             REQUIRE_EQ("", status.message());
         }
 
-        SUBCASE(" MakeStatus") {
-            turbo::Status status = turbo::MakeStatus(100, "this is {} error", 100);
+        SUBCASE(" make_status") {
+            turbo::Status status = turbo::make_status(100, "this is {} error", 100);
             REQUIRE_FALSE(status.ok());
             REQUIRE_EQ(100, status.code());
             REQUIRE_EQ("this is 100 error", status.message());
@@ -204,79 +204,79 @@ namespace {
 
         /*
         SUBCASE(" TestGetSetPayload") {
-            turbo::Status ok_status = turbo::OkStatus();
-            ok_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
-            ok_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
+            turbo::Status ok_status = turbo::ok_status();
+            ok_status.set_payload(kUrl1, turbo::Cord(kPayload1));
+            ok_status.set_payload(kUrl2, turbo::Cord(kPayload2));
 
-            REQUIRE_FALSE(ok_status.GetPayload(kUrl1));
-            REQUIRE_FALSE(ok_status.GetPayload(kUrl2));
+            REQUIRE_FALSE(ok_status.get_payload(kUrl1));
+            REQUIRE_FALSE(ok_status.get_payload(kUrl2));
 
             turbo::Status bad_status(turbo::kInternal, "fail");
-            bad_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
-            bad_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
+            bad_status.set_payload(kUrl1, turbo::Cord(kPayload1));
+            bad_status.set_payload(kUrl2, turbo::Cord(kPayload2));
 
-            EXPECT_THAT(bad_status.GetPayload(kUrl1), Optional(Eq(kPayload1)));
-            EXPECT_THAT(bad_status.GetPayload(kUrl2), Optional(Eq(kPayload2)));
+            EXPECT_THAT(bad_status.get_payload(kUrl1), Optional(Eq(kPayload1)));
+            EXPECT_THAT(bad_status.get_payload(kUrl2), Optional(Eq(kPayload2)));
 
-            REQUIRE_FALSE(bad_status.GetPayload(kUrl3));
+            REQUIRE_FALSE(bad_status.get_payload(kUrl3));
 
-            bad_status.SetPayload(kUrl1, turbo::Cord(kPayload3));
-            EXPECT_THAT(bad_status.GetPayload(kUrl1), Optional(Eq(kPayload3)));
+            bad_status.set_payload(kUrl1, turbo::Cord(kPayload3));
+            EXPECT_THAT(bad_status.get_payload(kUrl1), Optional(Eq(kPayload3)));
 
             // Testing dynamically generated type_url
-            bad_status.SetPayload(turbo::Format("{}{}", kUrl1, ".1"), turbo::Cord(kPayload1));
-            EXPECT_THAT(bad_status.GetPayload(turbo::Format("{}{}", kUrl1, ".1")),
+            bad_status.set_payload(turbo::Format("{}{}", kUrl1, ".1"), turbo::Cord(kPayload1));
+            EXPECT_THAT(bad_status.get_payload(turbo::Format("{}{}", kUrl1, ".1")),
                         Optional(Eq(kPayload1)));
         }
         */
         SUBCASE(" TestErasePayload") {
             turbo::Status bad_status(turbo::kInternal, "fail");
-            bad_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
-            bad_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
-            bad_status.SetPayload(kUrl3, turbo::Cord(kPayload3));
+            bad_status.set_payload(kUrl1, turbo::Cord(kPayload1));
+            bad_status.set_payload(kUrl2, turbo::Cord(kPayload2));
+            bad_status.set_payload(kUrl3, turbo::Cord(kPayload3));
 
-            REQUIRE_FALSE(bad_status.ErasePayload(kUrl4));
+            REQUIRE_FALSE(bad_status.erase_payload(kUrl4));
 
-            REQUIRE(bad_status.GetPayload(kUrl2));
-            REQUIRE(bad_status.ErasePayload(kUrl2));
-            REQUIRE_FALSE(bad_status.GetPayload(kUrl2));
-            REQUIRE_FALSE(bad_status.ErasePayload(kUrl2));
+            REQUIRE(bad_status.get_payload(kUrl2));
+            REQUIRE(bad_status.erase_payload(kUrl2));
+            REQUIRE_FALSE(bad_status.get_payload(kUrl2));
+            REQUIRE_FALSE(bad_status.erase_payload(kUrl2));
 
-            REQUIRE(bad_status.ErasePayload(kUrl1));
-            REQUIRE(bad_status.ErasePayload(kUrl3));
+            REQUIRE(bad_status.erase_payload(kUrl1));
+            REQUIRE(bad_status.erase_payload(kUrl3));
 
-            bad_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
-            REQUIRE(bad_status.ErasePayload(kUrl1));
+            bad_status.set_payload(kUrl1, turbo::Cord(kPayload1));
+            REQUIRE(bad_status.erase_payload(kUrl1));
         }
 
         SUBCASE(" TestComparePayloads") {
             turbo::Status bad_status1(turbo::kInternal, "fail");
-            bad_status1.SetPayload(kUrl1, turbo::Cord(kPayload1));
-            bad_status1.SetPayload(kUrl2, turbo::Cord(kPayload2));
-            bad_status1.SetPayload(kUrl3, turbo::Cord(kPayload3));
+            bad_status1.set_payload(kUrl1, turbo::Cord(kPayload1));
+            bad_status1.set_payload(kUrl2, turbo::Cord(kPayload2));
+            bad_status1.set_payload(kUrl3, turbo::Cord(kPayload3));
 
             turbo::Status bad_status2(turbo::kInternal, "fail");
-            bad_status2.SetPayload(kUrl2, turbo::Cord(kPayload2));
-            bad_status2.SetPayload(kUrl3, turbo::Cord(kPayload3));
-            bad_status2.SetPayload(kUrl1, turbo::Cord(kPayload1));
+            bad_status2.set_payload(kUrl2, turbo::Cord(kPayload2));
+            bad_status2.set_payload(kUrl3, turbo::Cord(kPayload3));
+            bad_status2.set_payload(kUrl1, turbo::Cord(kPayload1));
 
             REQUIRE_EQ(bad_status1, bad_status2);
         }
 
         SUBCASE(" TestComparePayloadsAfterErase") {
             turbo::Status payload_status(turbo::kInternal, "");
-            payload_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
-            payload_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
+            payload_status.set_payload(kUrl1, turbo::Cord(kPayload1));
+            payload_status.set_payload(kUrl2, turbo::Cord(kPayload2));
 
             turbo::Status empty_status(turbo::kInternal, "");
 
             // Different payloads, not equal
             REQUIRE_NE(payload_status, empty_status);
-            REQUIRE(payload_status.ErasePayload(kUrl1));
+            REQUIRE(payload_status.erase_payload(kUrl1));
 
             // Still Different payloads, still not equal.
             REQUIRE_NE(payload_status, empty_status);
-            REQUIRE(payload_status.ErasePayload(kUrl2));
+            REQUIRE(payload_status.erase_payload(kUrl2));
 
             // Both empty payloads, should be equal
             REQUIRE_EQ(payload_status, empty_status);
@@ -286,13 +286,13 @@ namespace {
         /*
         SUBCASE(" TestForEachPayload") {
             turbo::Status bad_status(turbo::kInternal, "fail");
-            bad_status.SetPayload(kUrl1, turbo::Cord(kPayload1));
-            bad_status.SetPayload(kUrl2, turbo::Cord(kPayload2));
-            bad_status.SetPayload(kUrl3, turbo::Cord(kPayload3));
+            bad_status.set_payload(kUrl1, turbo::Cord(kPayload1));
+            bad_status.set_payload(kUrl2, turbo::Cord(kPayload2));
+            bad_status.set_payload(kUrl3, turbo::Cord(kPayload3));
 
             int count = 0;
 
-            bad_status.ForEachPayload(
+            bad_status.for_each_payload(
                     [&count](std::string_view, const turbo::Cord &) { ++count; });
 
             REQUIRE_EQ(count, 3);
@@ -310,9 +310,9 @@ namespace {
             while (true) {
                 scratch.emplace_back(turbo::kInternal, "fail");
 
-                scratch.back().SetPayload(kUrl1, turbo::Cord(kPayload1));
-                scratch.back().SetPayload(kUrl2, turbo::Cord(kPayload2));
-                scratch.back().SetPayload(kUrl3, turbo::Cord(kPayload3));
+                scratch.back().set_payload(kUrl1, turbo::Cord(kPayload1));
+                scratch.back().set_payload(kUrl2, turbo::Cord(kPayload2));
+                scratch.back().set_payload(kUrl3, turbo::Cord(kPayload3));
 
                 if (AllVisitedPayloads(scratch.back()) != visited_payloads) {
                     break;
@@ -322,13 +322,13 @@ namespace {
 
         SUBCASE(" ToString") {
             turbo::Status s(turbo::kInternal, "fail");
-            REQUIRE_EQ("INTERNAL: fail", s.ToString());
-            s.SetPayload("foo", turbo::Cord("bar"));
-            REQUIRE_EQ("INTERNAL: fail [foo='bar']", s.ToString());
-            s.SetPayload("bar", turbo::Cord("\377"));
-            std::cout<<s.ToString()<<std::endl;
+            REQUIRE_EQ("INTERNAL: fail", s.to_string());
+            s.set_payload("foo", turbo::Cord("bar"));
+            REQUIRE_EQ("INTERNAL: fail [foo='bar']", s.to_string());
+            s.set_payload("bar", turbo::Cord("\377"));
+            std::cout<<s.to_string()<<std::endl;
             /*
-            EXPECT_THAT(s.ToString(),
+            EXPECT_THAT(s.to_string(),
                         AllOf(HasSubstr("INTERNAL: fail"), HasSubstr("[foo='bar']"),
                               HasSubstr("[bar='\\xff']")));
                               */
@@ -336,11 +336,11 @@ namespace {
 
         SUBCASE(" ToStringMode") {
             turbo::Status s(turbo::kInternal, "fail");
-            s.SetPayload("foo", turbo::Cord("bar"));
-            s.SetPayload("bar", turbo::Cord("\377"));
+            s.set_payload("foo", turbo::Cord("bar"));
+            s.set_payload("bar", turbo::Cord("\377"));
 
             REQUIRE_EQ("INTERNAL: fail",
-                       s.ToString(turbo::StatusToStringMode::kWithNoExtraData));
+                       s.to_string(turbo::StatusToStringMode::kWithNoExtraData));
             /*
             EXPECT_THAT(s.ToString(turbo::StatusToStringMode::kWithPayload),
                         AllOf(HasSubstr("INTERNAL: fail"), HasSubstr("[foo='bar']"),
@@ -359,24 +359,24 @@ namespace {
         SUBCASE(" CopyOnWriteForErasePayload") {
             {
                 turbo::Status base(turbo::kInvalidArgument, "fail");
-                base.SetPayload(kUrl1, turbo::Cord(kPayload1));
-                REQUIRE(base.GetPayload(kUrl1).has_value());
+                base.set_payload(kUrl1, turbo::Cord(kPayload1));
+                REQUIRE(base.get_payload(kUrl1).has_value());
                 turbo::Status copy = EraseAndReturn(base);
-                REQUIRE(base.GetPayload(kUrl1).has_value());
-                REQUIRE_FALSE(copy.GetPayload(kUrl1).has_value());
+                REQUIRE(base.get_payload(kUrl1).has_value());
+                REQUIRE_FALSE(copy.get_payload(kUrl1).has_value());
             }
             {
                 turbo::Status base(turbo::kInvalidArgument, "fail");
-                base.SetPayload(kUrl1, turbo::Cord(kPayload1));
+                base.set_payload(kUrl1, turbo::Cord(kPayload1));
                 turbo::Status copy = base;
 
-                REQUIRE(base.GetPayload(kUrl1).has_value());
-                REQUIRE(copy.GetPayload(kUrl1).has_value());
+                REQUIRE(base.get_payload(kUrl1).has_value());
+                REQUIRE(copy.get_payload(kUrl1).has_value());
 
-                REQUIRE(base.ErasePayload(kUrl1));
+                REQUIRE(base.erase_payload(kUrl1));
 
-                REQUIRE_FALSE(base.GetPayload(kUrl1).has_value());
-                REQUIRE(copy.GetPayload(kUrl1).has_value());
+                REQUIRE_FALSE(base.get_payload(kUrl1).has_value());
+                REQUIRE(copy.get_payload(kUrl1).has_value());
             }
         }
 
@@ -393,7 +393,7 @@ namespace {
             }
             {
                 turbo::Status status(turbo::kInvalidArgument, "message");
-                status.SetPayload(kUrl1, turbo::Cord(kPayload1));
+                status.set_payload(kUrl1, turbo::Cord(kPayload1));
                 turbo::Status copy(status);
                 REQUIRE_EQ(copy, status);
             }
@@ -413,7 +413,7 @@ namespace {
             }
             {
                 turbo::Status status(turbo::kInvalidArgument, "message");
-                status.SetPayload(kUrl1, turbo::Cord(kPayload1));
+                status.set_payload(kUrl1, turbo::Cord(kPayload1));
                 assignee = status;
                 REQUIRE_EQ(assignee, status);
             }
@@ -423,7 +423,7 @@ namespace {
             const turbo::Status status_orig(turbo::kInvalidArgument, "message");
             turbo::Status status_copy = status_orig;
             REQUIRE_EQ(status_orig, status_copy);
-            status_copy.SetPayload(kUrl1, turbo::Cord(kPayload1));
+            status_copy.set_payload(kUrl1, turbo::Cord(kPayload1));
             REQUIRE_NE(status_orig, status_copy);
         }
 
@@ -441,7 +441,7 @@ namespace {
             }
             {
                 turbo::Status status(turbo::kInvalidArgument, "message");
-                status.SetPayload(kUrl1, turbo::Cord(kPayload1));
+                status.set_payload(kUrl1, turbo::Cord(kPayload1));
                 turbo::Status copy1(status);
                 turbo::Status copy2(std::move(status));
                 REQUIRE_EQ(copy1, copy2);
@@ -462,7 +462,7 @@ namespace {
             }
             {
                 turbo::Status status(turbo::kInvalidArgument, "message");
-                status.SetPayload(kUrl1, turbo::Cord(kPayload1));
+                status.set_payload(kUrl1, turbo::Cord(kPayload1));
                 turbo::Status copy(status);
                 assignee = std::move(status);
                 REQUIRE_EQ(assignee, copy);
@@ -477,7 +477,7 @@ namespace {
 
         SUBCASE(" Update") {
             turbo::Status s;
-            s.Update(turbo::OkStatus());
+            s.Update(turbo::ok_status());
             REQUIRE(s.ok());
             const turbo::Status a(turbo::kCancelled, "message");
             s.Update(a);
@@ -485,18 +485,18 @@ namespace {
             const turbo::Status b(turbo::kInternal, "other message");
             s.Update(b);
             REQUIRE_EQ(s, a);
-            s.Update(turbo::OkStatus());
+            s.Update(turbo::ok_status());
             REQUIRE_EQ(s, a);
             REQUIRE_FALSE(s.ok());
         }
 
         SUBCASE(" Equality") {
             turbo::Status ok;
-            turbo::Status no_payload = turbo::CancelledError("no payload");
-            turbo::Status one_payload = turbo::InvalidArgumentError("one payload");
-            one_payload.SetPayload(kUrl1, turbo::Cord(kPayload1));
+            turbo::Status no_payload = turbo::cancelled_error("no payload");
+            turbo::Status one_payload = turbo::invalid_argument_error("one payload");
+            one_payload.set_payload(kUrl1, turbo::Cord(kPayload1));
             turbo::Status two_payloads = one_payload;
-            two_payloads.SetPayload(kUrl2, turbo::Cord(kPayload2));
+            two_payloads.set_payload(kUrl2, turbo::Cord(kPayload2));
             const std::array<turbo::Status, 4> status_arr = {ok, no_payload, one_payload,
                                                              two_payloads};
             for (int i = 0; i < status_arr.size(); i++) {
@@ -522,7 +522,7 @@ namespace {
             const turbo::Status ok;
             const turbo::Status no_payload(turbo::kAlreadyExists, "no payload");
             turbo::Status with_payload(turbo::kInternal, "with payload");
-            with_payload.SetPayload(kUrl1, turbo::Cord(kPayload1));
+            with_payload.set_payload(kUrl1, turbo::Cord(kPayload1));
             test_swap(ok, no_payload);
             test_swap(no_payload, ok);
             test_swap(ok, with_payload);
@@ -532,20 +532,20 @@ namespace {
         }
     }
     TEST_CASE("StatusErrno") {
-        SUBCASE("ErrnoToStatusCode") {
-            REQUIRE_EQ(turbo::ErrnoToStatusCode(0), turbo::kOk);
+        SUBCASE("errno_to_status_code") {
+            REQUIRE_EQ(turbo::errno_to_status_code(0), turbo::kOk);
 
             // Spot-check a few errno values.
-            REQUIRE_EQ(turbo::ErrnoToStatusCode(EINVAL),
+            REQUIRE_EQ(turbo::errno_to_status_code(EINVAL),
                        turbo::kInvalidArgument);
-            REQUIRE_EQ(turbo::ErrnoToStatusCode(ENOENT), turbo::kNotFound);
+            REQUIRE_EQ(turbo::errno_to_status_code(ENOENT), turbo::kNotFound);
 
             // We'll pick a very large number so it hopefully doesn't collide to errno.
-            REQUIRE_EQ(turbo::ErrnoToStatusCode(19980927), turbo::kUnknown);
+            REQUIRE_EQ(turbo::errno_to_status_code(19980927), turbo::kUnknown);
         }
 
-        SUBCASE("ErrnoToStatus") {
-            turbo::Status status = turbo::ErrnoToStatus(ENOENT, "Cannot open 'path'");
+        SUBCASE("errno_to_status") {
+            turbo::Status status = turbo::errno_to_status(ENOENT, "Cannot open 'path'");
             REQUIRE_EQ(status.code(), turbo::kNotFound);
             REQUIRE_EQ(status.message(), "Cannot open 'path': No such file or directory");
         }

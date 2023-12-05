@@ -67,65 +67,65 @@ namespace {
                 "");
 }
 
-// This tests the overall split API, which is made up of the turbo::StrSplit()
+// This tests the overall split API, which is made up of the turbo::str_split()
 // function and the Delimiter objects in the turbo:: namespace.
 // This TEST macro is outside of any namespace to require full specification of
 // namespaces just like callers will need to use.
 SUBCASE(" APIExamples") {
   {
-    // Passes string delimiter. Assumes the default of ByString.
-    std::vector<std::string> v = turbo::StrSplit("a,b,c", ",");  // NOLINT
+    // Passes string delimiter. Assumes the default of by_string.
+    std::vector<std::string> v = turbo::str_split("a,b,c", ",");  // NOLINT
       REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
 
     // Equivalent to...
-    using turbo::ByString;
-    v = turbo::StrSplit("a,b,c", ByString(","));
+    using turbo::by_string;
+    v = turbo::str_split("a,b,c", by_string(","));
       REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
 
     // Equivalent to...
-      //REQUIRE_EQ(turbo::StrSplit("a,b,c", ByString(",")),
+      //REQUIRE_EQ(turbo::str_split("a,b,c", by_string(",")),
       //          std::vector<std::string_view>{"a", "b", "c"});
   }
 
   {
     // Same as above, but using a single character as the delimiter.
-    std::vector<std::string> v = turbo::StrSplit("a,b,c", ',');
+    std::vector<std::string> v = turbo::str_split("a,b,c", ',');
       REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
 
     // Equivalent to...
-    using turbo::ByChar;
-    v = turbo::StrSplit("a,b,c", ByChar(','));
+    using turbo::by_char;
+    v = turbo::str_split("a,b,c", by_char(','));
       REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
   {
     // Uses the Literal string "=>" as the delimiter.
-    const std::vector<std::string> v = turbo::StrSplit("a=>b=>c", "=>");
+    const std::vector<std::string> v = turbo::str_split("a=>b=>c", "=>");
       REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
   {
     // The substrings are returned as string_views, eliminating copying.
-    std::vector<std::string_view> v = turbo::StrSplit("a,b,c", ',');
+    std::vector<std::string_view> v = turbo::str_split("a,b,c", ',');
       REQUIRE_EQ(v, std::vector<std::string_view>{"a", "b", "c"});
   }
 
   {
     // Leading and trailing empty substrings.
-    std::vector<std::string> v = turbo::StrSplit(",a,b,c,", ',');
+    std::vector<std::string> v = turbo::str_split(",a,b,c,", ',');
       REQUIRE_EQ(v, std::vector<std::string>{"", "a", "b", "c", ""});
   }
 
   {
     // Splits on a delimiter that is not found.
-    std::vector<std::string> v = turbo::StrSplit("abc", ',');
+    std::vector<std::string> v = turbo::str_split("abc", ',');
       REQUIRE_EQ(v, std::vector<std::string>{"abc"});
   }
 
   {
     // Splits the input string into individual characters by using an empty
     // string as the delimiter.
-    std::vector<std::string> v = turbo::StrSplit("abc", "");
+    std::vector<std::string> v = turbo::str_split("abc", "");
     REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
@@ -137,13 +137,13 @@ SUBCASE(" APIExamples") {
     // delimiter.
     std::string embedded_nulls("a\0b\0c", 5);
     std::string null_delim("\0", 1);
-    std::vector<std::string> v = turbo::StrSplit(embedded_nulls, null_delim);
+    std::vector<std::string> v = turbo::str_split(embedded_nulls, null_delim);
     REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
   {
     // Stores first two split strings as the members in a std::pair.
-    std::pair<std::string, std::string> p = turbo::StrSplit("a,b,c", ',');
+    std::pair<std::string, std::string> p = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ("a", p.first);
     REQUIRE_EQ("b", p.second);
     // "c" is omitted because std::pair can hold only two elements.
@@ -151,7 +151,7 @@ SUBCASE(" APIExamples") {
 
   {
     // Results stored in std::set<std::string>
-    std::set<std::string> v = turbo::StrSplit("a,b,c,a,b,c,a,b,c", ',');
+    std::set<std::string> v = turbo::str_split("a,b,c,a,b,c,a,b,c", ',');
     REQUIRE_EQ(v, std::set<std::string>{"a", "b", "c"});
   }
 
@@ -159,47 +159,47 @@ SUBCASE(" APIExamples") {
     // Uses a non-const char* delimiter.
     char a[] = ",";
     char* d = a + 0;
-    std::vector<std::string> v = turbo::StrSplit("a,b,c", d);
+    std::vector<std::string> v = turbo::str_split("a,b,c", d);
     REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
   {
     // Results split using either of , or ;
-    using turbo::ByAnyChar;
-    std::vector<std::string> v = turbo::StrSplit("a,b;c", ByAnyChar(",;"));
+    using turbo::by_any_char;
+    std::vector<std::string> v = turbo::str_split("a,b;c", by_any_char(",;"));
     REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
   {
-    // Uses the SkipWhitespace predicate.
-    using turbo::SkipWhitespace;
+    // Uses the skip_whitespace predicate.
+    using turbo::skip_whitespace;
     std::vector<std::string> v =
-        turbo::StrSplit(" a , ,,b,", ',', SkipWhitespace());
+        turbo::str_split(" a , ,,b,", ',', skip_whitespace());
     REQUIRE_EQ(v, std::vector<std::string>{" a ", "b"});
   }
 
   {
-    // Uses the ByLength delimiter.
-    using turbo::ByLength;
-    std::vector<std::string> v = turbo::StrSplit("abcdefg", ByLength(3));
+    // Uses the by_length delimiter.
+    using turbo::by_length;
+    std::vector<std::string> v = turbo::str_split("abcdefg", by_length(3));
     REQUIRE_EQ(v, std::vector<std::string>{"abc", "def", "g"});
   }
 
   {
     // Different forms of initialization / conversion.
-    std::vector<std::string> v1 = turbo::StrSplit("a,b,c", ',');
+    std::vector<std::string> v1 = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ(v1, std::vector<std::string>{"a", "b", "c"});
-    std::vector<std::string> v2(turbo::StrSplit("a,b,c", ','));
+    std::vector<std::string> v2(turbo::str_split("a,b,c", ','));
     REQUIRE_EQ(v2, std::vector<std::string>{"a", "b", "c"});
-    auto v3 = std::vector<std::string>(turbo::StrSplit("a,b,c", ','));
+    auto v3 = std::vector<std::string>(turbo::str_split("a,b,c", ','));
     REQUIRE_EQ(v3, std::vector<std::string>{"a", "b", "c"});
-    v3 = turbo::StrSplit("a,b,c", ',');
+    v3 = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ(v3, std::vector<std::string>{"a", "b", "c"});
   }
 
   {
     // Results stored in a std::map.
-    std::map<std::string, std::string> m = turbo::StrSplit("a,1,b,2,a,3", ',');
+    std::map<std::string, std::string> m = turbo::str_split("a,1,b,2,a,3", ',');
     REQUIRE_EQ(2, m.size());
     REQUIRE_EQ("3", m["a"]);
     REQUIRE_EQ("2", m["b"]);
@@ -208,7 +208,7 @@ SUBCASE(" APIExamples") {
   {
     // Results stored in a std::multimap.
     std::multimap<std::string, std::string> m =
-        turbo::StrSplit("a,1,b,2,a,3", ',');
+        turbo::str_split("a,1,b,2,a,3", ',');
     REQUIRE_EQ(3, m.size());
     auto it = m.find("a");
     REQUIRE_EQ("1", it->second);
@@ -221,28 +221,28 @@ SUBCASE(" APIExamples") {
   {
     // Demonstrates use in a range-based for loop in C++11.
     std::string s = "x,x,x,x,x,x,x";
-    for (std::string_view sp : turbo::StrSplit(s, ',')) {
+    for (std::string_view sp : turbo::str_split(s, ',')) {
       REQUIRE_EQ("x", sp);
     }
   }
 
   {
     // Demonstrates use with a Predicate in a range-based for loop.
-    using turbo::SkipWhitespace;
+    using turbo::skip_whitespace;
     std::string s = " ,x,,x,,x,x,x,,";
-    for (std::string_view sp : turbo::StrSplit(s, ',', SkipWhitespace())) {
+    for (std::string_view sp : turbo::str_split(s, ',', skip_whitespace())) {
       REQUIRE_EQ("x", sp);
     }
   }
 
   {
     // Demonstrates a "smart" split to std::map using two separate calls to
-    // turbo::StrSplit. One call to split the records, and another call to split
+    // turbo::str_split. One call to split the records, and another call to split
     // the keys and values. This also uses the Limit delimiter so that the
     // std::string "a=b=c" will split to "a" -> "b=c".
     std::map<std::string, std::string> m;
-    for (std::string_view sp : turbo::StrSplit("a=b=c,d=e,f=,g", ',')) {
-      m.insert(turbo::StrSplit(sp, turbo::MaxSplits('=', 1)));
+    for (std::string_view sp : turbo::str_split("a=b=c,d=e,f=,g", ',')) {
+      m.insert(turbo::str_split(sp, turbo::max_splits('=', 1)));
     }
     REQUIRE_EQ("b=c", m.find("a")->second);
     REQUIRE_EQ("e", m.find("d")->second);
@@ -270,7 +270,7 @@ SUBCASE(" APIExamples") {
 
         TEST_CASE("SplitIterator") {
             SUBCASE(" Basics") {
-                auto splitter = turbo::StrSplit("a,b", ',');
+                auto splitter = turbo::str_split("a,b", ',');
                 auto it = splitter.begin();
                 auto end = splitter.end();
 
@@ -286,7 +286,7 @@ SUBCASE(" APIExamples") {
 
 
             SUBCASE(" Predicate") {
-                auto splitter = turbo::StrSplit("a,b,c", ',', Skip("b"));
+                auto splitter = turbo::str_split("a,b,c", ',', Skip("b"));
                 auto it = splitter.begin();
                 auto end = splitter.end();
 
@@ -304,7 +304,7 @@ SUBCASE(" APIExamples") {
                 // Expected input and output, assuming a delimiter of ','
                 for (const auto &spec: specs) {
                     SCOPED_TRACE(spec.in);
-                    auto splitter = turbo::StrSplit(spec.in, ',');
+                    auto splitter = turbo::str_split(spec.in, ',');
                     auto it = splitter.begin();
                     auto end = splitter.end();
                     for (const auto &expected: spec.expect) {
@@ -317,7 +317,7 @@ SUBCASE(" APIExamples") {
         }
         /*
         SUBCASE("Splitter Const") {
-  const auto splitter = turbo::StrSplit("a,b,c", ',');
+  const auto splitter = turbo::str_split("a,b,c", ',');
   REQUIRE_EQ(splitter, ssplitter{"a", "b", "c"});
 }*/
 /*
@@ -328,12 +328,12 @@ SUBCASE(" EmptyAndNull") {
   // maintain backward compatibility, there is a small "hack" in
   // str_split_internal.h that preserves this behavior. If that behavior is ever
   // changed/fixed, this test will need to be updated.
-  REQUIRE_EQ(turbo::StrSplit(std::string_view(""), '-'), std::vector<std::string>{""});
-  REQUIRE_EQ(turbo::StrSplit(std::string_view(), '-'), std::vector<std::string>{});
+  REQUIRE_EQ(turbo::str_split(std::string_view(""), '-'), std::vector<std::string>{""});
+  REQUIRE_EQ(turbo::str_split(std::string_view(), '-'), std::vector<std::string>{});
 }
 */
  SUBCASE(" EqualityAsEndCondition") {
-  auto splitter = turbo::StrSplit("a,b,c", ',');
+  auto splitter = turbo::str_split("a,b,c", ',');
   auto it = splitter.begin();
   auto it2 = it;
 
@@ -358,7 +358,7 @@ SUBCASE(" EmptyAndNull") {
 //
 
 TEST(Splitter, RangeIterators) {
-  auto splitter = turbo::StrSplit("a,b,c", ',');
+  auto splitter = turbo::str_split("a,b,c", ',');
   std::vector<std::string_view> output;
   for (std::string_view p : splitter) {
     output.push_back(p);
@@ -386,7 +386,7 @@ void TestPairConversionOperator(const Splitter& splitter) {
 }
 
 TEST(Splitter, ConversionOperator) {
-  auto splitter = turbo::StrSplit("a,b,c,d", ',');
+  auto splitter = turbo::str_split("a,b,c,d", ',');
 
   TestConversionOperator<std::vector<std::string_view>>(splitter);
   TestConversionOperator<std::vector<std::string>>(splitter);
@@ -464,35 +464,35 @@ TEST(Splitter, ConversionOperator) {
 TEST(Splitter, ToPair) {
   {
     // Empty string
-    std::pair<std::string, std::string> p = turbo::StrSplit("", ',');
+    std::pair<std::string, std::string> p = turbo::str_split("", ',');
     REQUIRE_EQ("", p.first);
     REQUIRE_EQ("", p.second);
   }
 
   {
     // Only first
-    std::pair<std::string, std::string> p = turbo::StrSplit("a", ',');
+    std::pair<std::string, std::string> p = turbo::str_split("a", ',');
     REQUIRE_EQ("a", p.first);
     REQUIRE_EQ("", p.second);
   }
 
   {
     // Only second
-    std::pair<std::string, std::string> p = turbo::StrSplit(",b", ',');
+    std::pair<std::string, std::string> p = turbo::str_split(",b", ',');
     REQUIRE_EQ("", p.first);
     REQUIRE_EQ("b", p.second);
   }
 
   {
     // First and second.
-    std::pair<std::string, std::string> p = turbo::StrSplit("a,b", ',');
+    std::pair<std::string, std::string> p = turbo::str_split("a,b", ',');
     REQUIRE_EQ("a", p.first);
     REQUIRE_EQ("b", p.second);
   }
 
   {
     // First and second and then more stuff that will be ignored.
-    std::pair<std::string, std::string> p = turbo::StrSplit("a,b,c", ',');
+    std::pair<std::string, std::string> p = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ("a", p.first);
     REQUIRE_EQ("b", p.second);
     // "c" is omitted.
@@ -501,62 +501,62 @@ TEST(Splitter, ToPair) {
 
 TEST(Splitter, Predicates) {
   static const char kTestChars[] = ",a, ,b,";
-  using turbo::AllowEmpty;
-  using turbo::SkipEmpty;
-  using turbo::SkipWhitespace;
+  using turbo::allow_empty;
+  using turbo::skip_empty;
+  using turbo::skip_whitespace;
 
   {
     // No predicate. Does not skip empties.
-    auto splitter = turbo::StrSplit(kTestChars, ',');
+    auto splitter = turbo::str_split(kTestChars, ',');
     std::vector<std::string> v = splitter;
     REQUIRE_EQ(v, ElementsAre("", "a", " ", "b", ""));
   }
 
   {
     // Allows empty strings. Same behavior as no predicate at all.
-    auto splitter = turbo::StrSplit(kTestChars, ',', AllowEmpty());
+    auto splitter = turbo::str_split(kTestChars, ',', allow_empty());
     std::vector<std::string> v_allowempty = splitter;
     REQUIRE_EQ(v_allowempty, ElementsAre("", "a", " ", "b", ""));
 
-    // Ensures AllowEmpty equals the behavior with no predicate.
-    auto splitter_nopredicate = turbo::StrSplit(kTestChars, ',');
+    // Ensures allow_empty equals the behavior with no predicate.
+    auto splitter_nopredicate = turbo::str_split(kTestChars, ',');
     std::vector<std::string> v_nopredicate = splitter_nopredicate;
     REQUIRE_EQ(v_allowempty, v_nopredicate);
   }
 
   {
     // Skips empty strings.
-    auto splitter = turbo::StrSplit(kTestChars, ',', SkipEmpty());
+    auto splitter = turbo::str_split(kTestChars, ',', skip_empty());
     std::vector<std::string> v = splitter;
     REQUIRE_EQ(v, ElementsAre("a", " ", "b"));
   }
 
   {
     // Skips empty and all-whitespace strings.
-    auto splitter = turbo::StrSplit(kTestChars, ',', SkipWhitespace());
+    auto splitter = turbo::str_split(kTestChars, ',', skip_whitespace());
     std::vector<std::string> v = splitter;
     REQUIRE_EQ(v, ElementsAre("a", "b"));
   }
 }
 
 //
-// Tests for StrSplit()
+// Tests for str_split()
 //
 
 SUBCASE(" Basics) {
   {
     // Doesn't really do anything useful because the return value is ignored,
     // but it should work.
-    turbo::StrSplit("a,b,c", ',');
+    turbo::str_split("a,b,c", ',');
   }
 
   {
-    std::vector<std::string_view> v = turbo::StrSplit("a,b,c", ',');
+    std::vector<std::string_view> v = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
   {
-    std::vector<std::string> v = turbo::StrSplit("a,b,c", ',');
+    std::vector<std::string> v = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
   }
 
@@ -564,14 +564,14 @@ SUBCASE(" Basics) {
     // Ensures that assignment works. This requires a little extra work with
     // C++11 because of overloads with initializer_list.
     std::vector<std::string> v;
-    v = turbo::StrSplit("a,b,c", ',');
+    v = turbo::str_split("a,b,c", ',');
 
     REQUIRE_EQ(v, std::vector<std::string>{"a", "b", "c"});
     std::map<std::string, std::string> m;
-    m = turbo::StrSplit("a,b,c", ',');
+    m = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ(2, m.size());
     std::unordered_map<std::string, std::string> hm;
-    hm = turbo::StrSplit("a,b,c", ',');
+    hm = turbo::str_split("a,b,c", ',');
     REQUIRE_EQ(2, hm.size());
   }
 }
@@ -582,11 +582,11 @@ char* ReturnCharP() { return const_cast<char*>("Hello World"); }
 
 SUBCASE(" AcceptsCertainTemporaries") {
   std::vector<std::string> v;
-  v = turbo::StrSplit(ReturnStringView(), ' ');
+  v = turbo::str_split(ReturnStringView(), ' ');
   REQUIRE_EQ(v, ElementsAre("Hello", "World"));
-  v = turbo::StrSplit(ReturnConstCharP(), ' ');
+  v = turbo::str_split(ReturnConstCharP(), ' ');
   REQUIRE_EQ(v, ElementsAre("Hello", "World"));
-  v = turbo::StrSplit(ReturnCharP(), ' ');
+  v = turbo::str_split(ReturnCharP(), ' ');
   REQUIRE_EQ(v, ElementsAre("Hello", "World"));
 }
 
@@ -599,7 +599,7 @@ SUBCASE(" Temporary") {
       << "Input should be larger than fits on the stack.";
 
   // This happens more often in C++11 as part of a range-based for loop.
-  auto splitter = turbo::StrSplit(std::string(input), ',');
+  auto splitter = turbo::str_split(std::string(input), ',');
   std::string expected = "a";
   for (std::string_view letter : splitter) {
     REQUIRE_EQ(expected, letter);
@@ -608,7 +608,7 @@ SUBCASE(" Temporary") {
   REQUIRE_EQ("v", expected);
 
   // This happens more often in C++11 as part of a range-based for loop.
-  auto std_splitter = turbo::StrSplit(std::string(input), ',');
+  auto std_splitter = turbo::str_split(std::string(input), ',');
   expected = "a";
   for (std::string_view letter : std_splitter) {
     REQUIRE_EQ(expected, letter);
@@ -624,7 +624,7 @@ static std::unique_ptr<T> CopyToHeap(const T& value) {
 
 SUBCASE(" LvalueCaptureIsCopyable") {
   std::string input = "a,b";
-  auto heap_splitter = CopyToHeap(turbo::StrSplit(input, ','));
+  auto heap_splitter = CopyToHeap(turbo::str_split(input, ','));
   auto stack_splitter = *heap_splitter;
   heap_splitter.reset();
   std::vector<std::string> result = stack_splitter;
@@ -632,7 +632,7 @@ SUBCASE(" LvalueCaptureIsCopyable") {
 }
 
 SUBCASE(" TemporaryCaptureIsCopyable") {
-  auto heap_splitter = CopyToHeap(turbo::StrSplit(std::string("a,b"), ','));
+  auto heap_splitter = CopyToHeap(turbo::str_split(std::string("a,b"), ','));
   auto stack_splitter = *heap_splitter;
   heap_splitter.reset();
   std::vector<std::string> result = stack_splitter;
@@ -640,7 +640,7 @@ SUBCASE(" TemporaryCaptureIsCopyable") {
 }
 
 SUBCASE(" SplitterIsCopyableAndMoveable") {
-  auto a = turbo::StrSplit("foo", '-');
+  auto a = turbo::str_split("foo", '-');
 
   // Ensures that the following expressions compile.
   auto b = a;             // Copy construct
@@ -653,18 +653,18 @@ SUBCASE(" SplitterIsCopyableAndMoveable") {
 
 SUBCASE(" StringDelimiter") {
   {
-    std::vector<std::string_view> v = turbo::StrSplit("a,b", ',');
+    std::vector<std::string_view> v = turbo::str_split("a,b", ',');
     REQUIRE_EQ(v, ElementsAre("a", "b"));
   }
 
   {
-    std::vector<std::string_view> v = turbo::StrSplit("a,b", std::string(","));
+    std::vector<std::string_view> v = turbo::str_split("a,b", std::string(","));
     REQUIRE_EQ(v, ElementsAre("a", "b"));
   }
 
   {
     std::vector<std::string_view> v =
-        turbo::StrSplit("a,b", std::string_view(","));
+        turbo::str_split("a,b", std::string_view(","));
     REQUIRE_EQ(v, ElementsAre("a", "b"));
   }
 }
@@ -680,7 +680,7 @@ SUBCASE(" UTF8") {
   {
     // A utf8 input string with an ascii delimiter.
     std::string to_split = "a," + utf8_string;
-    std::vector<std::string_view> v = turbo::StrSplit(to_split, ',');
+    std::vector<std::string_view> v = turbo::str_split(to_split, ',');
     REQUIRE_EQ(v, ElementsAre("a", utf8_string));
   }
 
@@ -689,14 +689,14 @@ SUBCASE(" UTF8") {
     std::string to_split = "a," + utf8_string + ",b";
     std::string unicode_delimiter = "," + utf8_string + ",";
     std::vector<std::string_view> v =
-        turbo::StrSplit(to_split, unicode_delimiter);
+        turbo::str_split(to_split, unicode_delimiter);
     REQUIRE_EQ(v, ElementsAre("a", "b"));
   }
 
   {
-    // A utf8 input string and ByAnyChar with ascii chars.
+    // A utf8 input string and by_any_char with ascii chars.
     std::vector<std::string_view> v =
-        turbo::StrSplit(u8"Foo h\u00E4llo th\u4E1Ere", turbo::ByAnyChar(" \t"));
+        turbo::str_split(u8"Foo h\u00E4llo th\u4E1Ere", turbo::by_any_char(" \t"));
     REQUIRE_EQ(v, ElementsAre("Foo", u8"h\u00E4llo", u8"th\u4E1Ere"));
   }
 }
@@ -707,22 +707,22 @@ SUBCASE(" UTF8") {
 
 SUBCASE(" EmptyStringDelimiter") {
   {
-    std::vector<std::string> v = turbo::StrSplit("", "");
+    std::vector<std::string> v = turbo::str_split("", "");
     REQUIRE_EQ(v, ElementsAre(""));
   }
 
   {
-    std::vector<std::string> v = turbo::StrSplit("a", "");
+    std::vector<std::string> v = turbo::str_split("a", "");
     REQUIRE_EQ(v, ElementsAre("a"));
   }
 
   {
-    std::vector<std::string> v = turbo::StrSplit("ab", "");
+    std::vector<std::string> v = turbo::str_split("ab", "");
     REQUIRE_EQ(v, ElementsAre("a", "b"));
   }
 
   {
-    std::vector<std::string> v = turbo::StrSplit("a b", "");
+    std::vector<std::string> v = turbo::str_split("a b", "");
     REQUIRE_EQ(v, ElementsAre("a", " ", "b"));
   }
 }
@@ -731,62 +731,62 @@ SUBCASE(" SubstrDelimiter") {
   std::vector<std::string_view> results;
   std::string_view delim("//");
 
-  results = turbo::StrSplit("", delim);
+  results = turbo::str_split("", delim);
   REQUIRE_EQ(results, ElementsAre(""));
 
-  results = turbo::StrSplit("//", delim);
+  results = turbo::str_split("//", delim);
   REQUIRE_EQ(results, ElementsAre("", ""));
 
-  results = turbo::StrSplit("ab", delim);
+  results = turbo::str_split("ab", delim);
   REQUIRE_EQ(results, ElementsAre("ab"));
 
-  results = turbo::StrSplit("ab//", delim);
+  results = turbo::str_split("ab//", delim);
   REQUIRE_EQ(results, ElementsAre("ab", ""));
 
-  results = turbo::StrSplit("ab/", delim);
+  results = turbo::str_split("ab/", delim);
   REQUIRE_EQ(results, ElementsAre("ab/"));
 
-  results = turbo::StrSplit("a/b", delim);
+  results = turbo::str_split("a/b", delim);
   REQUIRE_EQ(results, ElementsAre("a/b"));
 
-  results = turbo::StrSplit("a//b", delim);
+  results = turbo::str_split("a//b", delim);
   REQUIRE_EQ(results, ElementsAre("a", "b"));
 
-  results = turbo::StrSplit("a///b", delim);
+  results = turbo::str_split("a///b", delim);
   REQUIRE_EQ(results, ElementsAre("a", "/b"));
 
-  results = turbo::StrSplit("a////b", delim);
+  results = turbo::str_split("a////b", delim);
   REQUIRE_EQ(results, ElementsAre("a", "", "b"));
 }
 
 SUBCASE(" EmptyResults") {
   std::vector<std::string_view> results;
 
-  results = turbo::StrSplit("", '#');
+  results = turbo::str_split("", '#');
   REQUIRE_EQ(results, ElementsAre(""));
 
-  results = turbo::StrSplit("#", '#');
+  results = turbo::str_split("#", '#');
   REQUIRE_EQ(results, ElementsAre("", ""));
 
-  results = turbo::StrSplit("#cd", '#');
+  results = turbo::str_split("#cd", '#');
   REQUIRE_EQ(results, ElementsAre("", "cd"));
 
-  results = turbo::StrSplit("ab#cd#", '#');
+  results = turbo::str_split("ab#cd#", '#');
   REQUIRE_EQ(results, ElementsAre("ab", "cd", ""));
 
-  results = turbo::StrSplit("ab##cd", '#');
+  results = turbo::str_split("ab##cd", '#');
   REQUIRE_EQ(results, ElementsAre("ab", "", "cd"));
 
-  results = turbo::StrSplit("ab##", '#');
+  results = turbo::str_split("ab##", '#');
   REQUIRE_EQ(results, ElementsAre("ab", "", ""));
 
-  results = turbo::StrSplit("ab#ab#", '#');
+  results = turbo::str_split("ab#ab#", '#');
   REQUIRE_EQ(results, ElementsAre("ab", "ab", ""));
 
-  results = turbo::StrSplit("aaaa", 'a');
+  results = turbo::str_split("aaaa", 'a');
   REQUIRE_EQ(results, ElementsAre("", "", "", "", ""));
 
-  results = turbo::StrSplit("", '#', turbo::SkipEmpty());
+  results = turbo::str_split("", '#', turbo::skip_empty());
   REQUIRE_EQ(results, ElementsAre());
 }
 
@@ -813,7 +813,7 @@ static bool IsFoundAt(std::string_view text, Delimiter d, int expected_pos) {
 }
 
 //
-// Tests for ByString
+// Tests for by_string
 //
 
 // Tests using any delimiter that represents a single comma.
@@ -833,44 +833,44 @@ void TestComma(Delimiter d) {
   EXPECT_FALSE(IsFoundAt(";", d, -1));
 }
 
-TEST(Delimiter, ByString) {
-  using turbo::ByString;
-  TestComma(ByString(","));
+TEST(Delimiter, by_string) {
+  using turbo::by_string;
+  TestComma(by_string(","));
 
   // Works as named variable.
-  ByString comma_string(",");
+  by_string comma_string(",");
   TestComma(comma_string);
 
   // The first occurrence of empty string ("") in a string is at position 0.
   // There is a test below that demonstrates this for std::string_view::find().
-  // If the ByString delimiter returned position 0 for this, there would
+  // If the by_string delimiter returned position 0 for this, there would
   // be an infinite loop in the SplitIterator code. To avoid this, empty string
   // is a special case in that it always returns the item at position 1.
   std::string_view abc("abc");
   REQUIRE_EQ(0, abc.find(""));  // "" is found at position 0
-  ByString empty("");
+  by_string empty("");
   EXPECT_FALSE(IsFoundAt("", empty, 0));
   EXPECT_FALSE(IsFoundAt("a", empty, 0));
   EXPECT_TRUE(IsFoundAt("ab", empty, 1));
   EXPECT_TRUE(IsFoundAt("abc", empty, 1));
 }
 
-SUBCASE(" ByChar") {
-  using turbo::ByChar;
-  TestComma(ByChar(','));
+SUBCASE(" by_char") {
+  using turbo::by_char;
+  TestComma(by_char(','));
 
   // Works as named variable.
-  ByChar comma_char(',');
+  by_char comma_char(',');
   TestComma(comma_char);
 }
 
 //
-// Tests for ByAnyChar
+// Tests for by_any_char
 //
 
-TEST(Delimiter, ByAnyChar) {
-  using turbo::ByAnyChar;
-  ByAnyChar one_delim(",");
+TEST(Delimiter, by_any_char) {
+  using turbo::by_any_char;
+  by_any_char one_delim(",");
   // Found
   EXPECT_TRUE(IsFoundAt(",", one_delim, 0));
   EXPECT_TRUE(IsFoundAt("a,", one_delim, 1));
@@ -883,7 +883,7 @@ TEST(Delimiter, ByAnyChar) {
   EXPECT_FALSE(IsFoundAt("a;b;c", one_delim, -1));
   EXPECT_FALSE(IsFoundAt(";", one_delim, -1));
 
-  ByAnyChar two_delims(",;");
+  by_any_char two_delims(",;");
   // Found
   EXPECT_TRUE(IsFoundAt(",", two_delims, 0));
   EXPECT_TRUE(IsFoundAt(";", two_delims, 0));
@@ -902,10 +902,10 @@ TEST(Delimiter, ByAnyChar) {
   EXPECT_FALSE(IsFoundAt("a=b=c", two_delims, -1));
   EXPECT_FALSE(IsFoundAt("=", two_delims, -1));
 
-  // ByAnyChar behaves just like ByString when given a delimiter of empty
+  // by_any_char behaves just like by_string when given a delimiter of empty
   // string. That is, it always returns a zero-length std::string_view
   // referring to the item at position 1, not position 0.
-  ByAnyChar empty("");
+  by_any_char empty("");
   EXPECT_FALSE(IsFoundAt("", empty, 0));
   EXPECT_FALSE(IsFoundAt("a", empty, 0));
   EXPECT_TRUE(IsFoundAt("ab", empty, 1));
@@ -913,13 +913,13 @@ TEST(Delimiter, ByAnyChar) {
 }
 
 //
-// Tests for ByLength
+// Tests for by_length
 //
 
-TEST(Delimiter, ByLength) {
-  using turbo::ByLength;
+TEST(Delimiter, by_length) {
+  using turbo::by_length;
 
-  ByLength four_char_delim(4);
+  by_length four_char_delim(4);
 
   // Found
   EXPECT_TRUE(IsFoundAt("abcde", four_char_delim, 4));
@@ -943,10 +943,10 @@ SUBCASE(" WorksWithLargeStrings") {
   if (sizeof(size_t) > 4) {
     std::string s(kSize, 'x');
     s.back() = '-';
-    std::vector<std::string_view> v = turbo::StrSplit(s, '-');
+    std::vector<std::string_view> v = turbo::str_split(s, '-');
     REQUIRE_EQ(2, v.size());
     // The first element will contain 2G of 'x's.
-    // testing::StartsWith is too slow with a 2G string.
+    // testing::starts_with is too slow with a 2G string.
     REQUIRE_EQ('x', v[0][0]);
     REQUIRE_EQ('x', v[0][1]);
     REQUIRE_EQ('x', v[0][3]);

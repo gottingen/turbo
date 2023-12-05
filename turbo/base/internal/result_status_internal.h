@@ -161,18 +161,18 @@ class ResultStatusData {
   ResultStatusData(const ResultStatusData& other) {
     if (other.ok()) {
       MakeValue(other.data_);
-      MakeStatus();
+      make_status();
     } else {
-      MakeStatus(other.status_);
+      make_status(other.status_);
     }
   }
 
   ResultStatusData(ResultStatusData&& other) noexcept {
     if (other.ok()) {
       MakeValue(std::move(other.data_));
-      MakeStatus();
+      make_status();
     } else {
-      MakeStatus(std::move(other.status_));
+      make_status(std::move(other.status_));
     }
   }
 
@@ -180,9 +180,9 @@ class ResultStatusData {
   explicit ResultStatusData(const ResultStatusData<U>& other) {
     if (other.ok()) {
       MakeValue(other.data_);
-      MakeStatus();
+      make_status();
     } else {
-      MakeStatus(other.status_);
+      make_status(other.status_);
     }
   }
 
@@ -190,23 +190,23 @@ class ResultStatusData {
   explicit ResultStatusData(ResultStatusData<U>&& other) {
     if (other.ok()) {
       MakeValue(std::move(other.data_));
-      MakeStatus();
+      make_status();
     } else {
-      MakeStatus(std::move(other.status_));
+      make_status(std::move(other.status_));
     }
   }
 
   template <typename... Args>
   explicit ResultStatusData(turbo::in_place_t, Args&&... args)
       : data_(std::forward<Args>(args)...) {
-    MakeStatus();
+    make_status();
   }
 
   explicit ResultStatusData(const T& value) : data_(value) {
-    MakeStatus();
+    make_status();
   }
   explicit ResultStatusData(T&& value) : data_(std::move(value)) {
-    MakeStatus();
+    make_status();
   }
 
   template <typename U,
@@ -249,7 +249,7 @@ class ResultStatusData {
       data_ = std::forward<U>(value);
     } else {
       MakeValue(std::forward<U>(value));
-      status_ = OkStatus();
+      status_ = ok_status();
     }
   }
 
@@ -303,7 +303,7 @@ class ResultStatusData {
   // Construct the status (ie. status_) through placement new with the passed
   // argument.
   template <typename... Args>
-  void MakeStatus(Args&&... args) {
+  void make_status(Args&&... args) {
     result_status_internal::PlacementNew<Status>(&status_,
                                             std::forward<Args>(args)...);
   }

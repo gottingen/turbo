@@ -42,7 +42,7 @@ namespace turbo {
             const int mode_flag = (mode == "ab") ? O_APPEND : O_TRUNC;
             const int fd = ::open((filename.c_str()), O_CREAT | O_WRONLY | O_CLOEXEC | mode_flag, mode_t(0644));
             if (fd == -1) {
-                return turbo::ErrnoToStatus(errno, "");
+                return turbo::errno_to_status(errno, "");
             }
             fp = ::fdopen(fd, mode.c_str());
             if (fp == nullptr) {
@@ -53,7 +53,7 @@ namespace turbo {
         }
 #endif
         if (fp == nullptr) {
-            return turbo::ErrnoToStatus(errno, "");
+            return turbo::errno_to_status(errno, "");
         }
         return fp;
     }
@@ -81,7 +81,7 @@ namespace turbo {
         if (option.prevent_child) {
             const int fd = ::open((filename.c_str()), O_RDONLY | O_CLOEXEC, mode_t(0644));
             if (fd == -1) {
-                return turbo::ErrnoToStatus(errno, "");
+                return turbo::errno_to_status(errno, "");
             }
             fp = ::fdopen(fd, mode.c_str());
             if (fp == nullptr) {
@@ -92,14 +92,14 @@ namespace turbo {
         }
 #endif
         if (fp == nullptr) {
-            return turbo::ErrnoToStatus(errno, "");
+            return turbo::errno_to_status(errno, "");
         }
         return fp;
     }
 
     turbo::ResultStatus<size_t> Fio::file_size(std::FILE *fp) {
         if (fp == nullptr) {
-            return turbo::InvalidArgumentError("Failed getting file size. fp is null");
+            return turbo::invalid_argument_error("Failed getting file size. fp is null");
         }
 #if defined(_WIN32) && !defined(__CYGWIN__)
         int fd = ::_fileno(f);
@@ -139,12 +139,12 @@ namespace turbo {
                 }
 #    endif
 #endif
-        return turbo::ErrnoToStatus(errno, "Failed getting file size from fd");
+        return turbo::errno_to_status(errno, "Failed getting file size from fd");
     }
 
     turbo::ResultStatus<size_t> Fio::file_size(int fd) {
         if (fd == -1) {
-            return turbo::InvalidArgumentError("Failed getting file size. fp is null");
+            return turbo::invalid_argument_error("Failed getting file size. fp is null");
         }
 #if defined(_WIN32) && !defined(__CYGWIN__)
 #    if defined(_WIN64) // 64 bits
@@ -177,7 +177,7 @@ namespace turbo {
                 }
 #    endif
 #endif
-        return turbo::ErrnoToStatus(errno, "Failed getting file size from fd");
+        return turbo::errno_to_status(errno, "Failed getting file size from fd");
     }
 
 }  // namespace turbo

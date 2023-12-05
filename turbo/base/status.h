@@ -36,10 +36,10 @@
 //   ...
 //   // encounter error
 //   if (error condition) {
-//     return turbo::InvalidArgumentError("bad mode");
+//     return turbo::invalid_argument_error("bad mode");
 //   }
 //   // else, return OK
-//   return turbo::OkStatus();
+//   return turbo::ok_status();
 // }
 //
 // An `turbo::Status` is designed to either return "OK" or one of a number of
@@ -64,6 +64,9 @@
 #include "turbo/base/turbo_module.h"
 #include "turbo/format/format.h"
 
+/**
+ * @defgroup turbo_base_status
+ */
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
@@ -90,8 +93,8 @@ namespace turbo {
     // The string value of these RPC codes is denoted within each enum below.
     //
     // If your error handling code requires more context, you can attach payloads
-    // to your status. See `turbo::Status::SetPayload()` and
-    // `turbo::Status::GetPayload()` below.
+    // to your status. See `turbo::Status::set_payload()` and
+    // `turbo::Status::get_payload()` below.
     ///  using StatusCode =  int;
     // StatusCode::kOk
     //
@@ -350,123 +353,132 @@ namespace turbo {
         return lhs;
     }
 
-    // turbo::Status
-    //
-    // The `turbo::Status` class is generally used to gracefully handle errors
-    // across API boundaries (and in particular across RPC boundaries). Some of
-    // these errors may be recoverable, but others may not. Most
-    // functions which can produce a recoverable error should be designed to return
-    // either an `turbo::Status` (or the similar `turbo::ResultStatus<T>`, which holds
-    // either an object of type `T` or an error).
-    //
-    // API developers should construct their functions to return `turbo::OkStatus()`
-    // upon success, or an `turbo::StatusCode` upon another type of error (e.g
-    // an `turbo::StatusCode::kInvalidArgument` error). The API provides convenience
-    // functions to construct each status code.
-    //
-    // Example:
-    //
-    // turbo::Status myFunction(std::string_view fname, ...) {
-    //   ...
-    //   // encounter error
-    //   if (error condition) {
-    //     // Construct an turbo::StatusCode::kInvalidArgument error
-    //     return turbo::InvalidArgumentError("bad mode");
-    //   }
-    //   // else, return OK
-    //   return turbo::OkStatus();
-    // }
-    //
-    // Users handling status error codes should prefer checking for an OK status
-    // using the `ok()` member function. Handling multiple error codes may justify
-    // use of switch statement, but only check for error codes you know how to
-    // handle; do not try to exhaustively match against all canonical error codes.
-    // Errors that cannot be handled should be logged and/or propagated for higher
-    // levels to deal with. If you do use a switch statement, make sure that you
-    // also provide a `default:` switch case, so that code does not break as other
-    // canonical codes are added to the API.
-    //
-    // Example:
-    //
-    //   turbo::Status result = DoSomething();
-    //   if (!result.ok()) {
-    //     TURBO_LOG(ERROR) << result;
-    //   }
-    //
-    //   // Provide a default if switching on multiple error codes
-    //   switch (result.code()) {
-    //     // The user hasn't authenticated. Ask them to reauth
-    //     case turbo::StatusCode::kUnauthenticated:
-    //       DoReAuth();
-    //       break;
-    //     // The user does not have permission. Log an error.
-    //     case turbo::StatusCode::kPermissionDenied:
-    //       TURBO_LOG(ERROR) << result;
-    //       break;
-    //     // Propagate the error otherwise.
-    //     default:
-    //       return true;
-    //   }
-    //
-    // An `turbo::Status` can optionally include a payload with more information
-    // about the error. Typically, this payload serves one of several purposes:
-    //
-    //   * It may provide more fine-grained semantic information about the error to
-    //     facilitate actionable remedies.
-    //   * It may provide human-readable contexual information that is more
-    //     appropriate to display to an end user.
-    //
-    // Example:
-    //
-    //   turbo::Status result = DoSomething();
-    //   // Inform user to retry after 30 seconds
-    //   // See more error details in googleapis/google/rpc/error_details.proto
-    //   if (turbo::IsResourceExhausted(result)) {
-    //     google::rpc::RetryInfo info;
-    //     info.retry_delay().seconds() = 30;
-    //     // Payloads require a unique key (a URL to ensure no collisions with
-    //     // other payloads), and an `turbo::Cord` to hold the encoded data.
-    //     std::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
-    //     result.SetPayload(url, info.SerializeAsCord());
-    //     return result;
-    //   }
-    //
-    // For documentation see https://abseil.io/docs/cpp/guides/status.
-    //
-    // Returned Status objects may not be ignored. status_internal.h has a forward
-    // declaration of the form
-    // class TURBO_MUST_USE_RESULT Status;
+    /**
+     * @ingroup turbo_base_status
+     * @brief The `turbo::Status` class is generally used to gracefully handle errors
+     * across API boundaries (and in particular across RPC boundaries). Some of
+     * these errors may be recoverable, but others may not. Most
+     * functions which can produce a recoverable error should be designed to return
+     * either an `turbo::Status` (or the similar `turbo::ResultStatus<T>`, which holds
+     * either an object of type `T` or an error).
+     *
+     * API developers should construct their functions to return `turbo::ok_status()`
+     * upon success, or an `turbo::StatusCode` upon another type of error (e.g
+     * an `turbo::StatusCode::kInvalidArgument` error). The API provides convenience
+     * functions to construct each status code.
+     *
+     * Example:
+     * @code
+     * turbo::Status myFunction(std::string_view fname, ...) {
+     *   ...
+     *   // encounter error
+     *   if (error condition) {
+     *     // Construct an turbo::StatusCode::kInvalidArgument error
+     *     return turbo::invalid_argument_error("bad mode");
+     *   }
+     *   // else, return OK
+     *   return turbo::ok_status();
+     * }
+     * @endcode
+     * Users handling status error codes should prefer checking for an OK status
+     * using the `ok()` member function. Handling multiple error codes may justify
+     * use of switch statement, but only check for error codes you know how to
+     * handle; do not try to exhaustively match against all canonical error codes.
+     * Errors that cannot be handled should be logged and/or propagated for higher
+     * levels to deal with. If you do use a switch statement, make sure that you
+     * also provide a `default:` switch case, so that code does not break as other
+     * canonical codes are added to the API.
+     *
+     * Example:
+     * @code
+     *      turbo::Status result = DoSomething();
+     *      if (!result.ok()) {
+     *          TLOG_ERROR("",result);
+     *      }
+     *
+     *      // Provide a default if switching on multiple error codes
+     *      switch (result.code()) {
+     *          // The user hasn't authenticated. Ask them to reauth
+     *          case turbo::StatusCode::kUnauthenticated:
+     *              DoReAuth();
+     *              break;
+     *          // The user does not have permission. Log an error.
+     *          case turbo::StatusCode::kPermissionDenied:
+     *              TLOG_ERROR("",result);
+     *               break;
+     *              // Propagate the error otherwise.
+     *          default:
+     *          return true;
+     *      }
+     *     @endcode
+     *     An `turbo::Status` can optionally include a payload with more information
+     *     about the error. Typically, this payload serves one of several purposes:
+     *     - It may provide more fine-grained semantic information about the error to
+     *     facilitate actionable remedies.
+     *     - It may provide human-readable contexual information that is more
+     *     appropriate to display to an end user.
+     *     For documentation see https://turbo-docs.readthedocs.io/en/latest/en/api/base_status.html
+     *     Returned Status objects may not be ignored. status_internal.h has a forward
+     *     declaration of the form
+     *     class [[nodiscard]] Status;
+     */
     class Status final {
     public:
-        // Constructors
 
-        // This default constructor creates an OK status with no message or payload.
-        // Avoid this constructor and prefer explicit construction of an OK status
-        // with `turbo::OkStatus()`.
+        /**
+         * @brief This default constructor creates an OK status with no message or payload.
+         * Avoid this constructor and prefer explicit construction of an OK status
+         * with `turbo::ok_status()`.
+         */
         Status();
 
-        // Creates a status in the canonical error space with the specified
-        // `turbo::StatusCode` and error message.  If `code == turbo::StatusCode::kOk`,  // NOLINT
-        // `msg` is ignored and an object identical to an OK status is constructed.
-        //
-        // The `msg` string must be in UTF-8. The implementation may complain (e.g.,  // NOLINT
-        // by printing a warning) if it is not.
+        /**
+         * @brief Creates a status in the canonical error space with the specified
+         * `      turbo::StatusCode` and error message.  If `code == turbo::StatusCode::kOk`,  // NOLINT
+         *       `msg` is ignored and an object identical to an OK status is constructed.
+         *
+         *       The `msg` string must be in UTF-8. The implementation may complain (e.g.,  // NOLINT
+         *       by printing a warning) if it is not.
+         * @param code The canonical error code.
+         * @param msg The error message.
+         */
         Status(turbo::StatusCode code, std::string_view msg);
 
+        /**
+         * @brief Creates a status in the canonical error space with the specified
+         * `      turbo::StatusCode` and error message.  If `code == turbo::StatusCode::kOk`,  // NOLINT
+         *       `msg` is ignored and an object identical to an OK status is constructed.
+         *
+         *       The `msg` string must be in UTF-8. The implementation may complain (e.g.,  // NOLINT
+         *       by printing a warning) if it is not.
+         *
+         *       addtional: index is the module index, which is used to identify the module
+         *       that generates the error. The default value is 0, which means turbo self module.
+         *       The index should be greater than 0. The index is defined in turbo_module.h.
+         *       using turbo::ModuleIndex will define the index unqiue in the whole project.
+         * @param index The module index.
+         * @param code The canonical error code.
+         * @param msg The error message.
+         */
         Status(unsigned short int index, turbo::StatusCode code, std::string_view msg);
 
-        /*
-        template <typename... Args>
-        Status(unsigned short int module_index, turbo::StatusCode code, const FormatSpec<Args...>& format,
-               const Args&... args);
-               */
+        /**
+         * @brief copy constructor
+         * @param x
+         */
         Status(const Status &);
 
+        /**
+         * @brief copy assignment
+         * @param x
+         * @return Status&
+         */
         Status &operator=(const Status &x);
 
-        // Move operators
-
-        // The moved-from state is valid but unspecified.
+        /**
+         * @brief move constructor
+         * @param x
+         */
         Status(Status &&) noexcept;
 
         Status &operator=(Status &&);
@@ -488,16 +500,49 @@ namespace turbo {
         //   // Instead of "if (overall_status.ok()) overall_status = new_status"
         //   overall_status.Update(new_status);
         //
+        /**
+         * @brief Updates the existing status with `new_status` provided that `this->ok()`.
+         *        If the existing status already contains a non-OK error, this update has no
+         *        effect and preserves the current data. Note that this behavior may change
+         *        in the future to augment a current non-ok status with additional
+         *        information about `new_status`.
+         *        `Update()` provides a convenient way of keeping track of the first error
+         *        encountered.
+         *        Example:
+         *        @code
+         *        // Instead of "if (overall_status.ok()) overall_status = new_status"
+         *        overall_status.Update(new_status);
+         *        @endcode
+         * @param new_status
+         */
         void Update(const Status &new_status);
 
+        /**
+         * @brief Updates the existing status with `new_status` provided that `this->ok()`.
+         *        If the existing status already contains a non-OK error, this update has no
+         *        effect and preserves the current data. Note that this behavior may change
+         *        in the future to augment a current non-ok status with additional
+         *        information about `new_status`.
+         *        `Update()` provides a convenient way of keeping track of the first error
+         *        encountered.
+         *        Example:
+         *        @code
+         *        // Instead of "if (overall_status.ok()) overall_status = new_status"
+         *        overall_status.Update(new_status);
+         *        @endcode
+         * @note This function will move the `new_status` to `this`. Thus, the `new_status`
+         *       will be empty after this function.
+         * @param new_status
+         */
         void Update(Status &&new_status);
 
-        // Status::ok()
-        //
-        // Returns `true` if `this->code()` == `turbo::StatusCode::kOk`,
-        // indicating the absence of an error.
-        // Prefer checking for an OK status using this member function.
-        TURBO_MUST_USE_RESULT bool ok() const;
+        /**
+         * @brief Returns `true` if `this->code()` == `turbo::StatusCode::kOk`,
+         *        indicating the absence of an error.
+         *        Prefer checking for an OK status using this member function.
+         * @return bool
+         */
+        [[nodiscard]] bool ok() const;
 
         // Status::code()
         //
@@ -514,117 +559,148 @@ namespace turbo {
         //
         // NOTE: This function should only be called when converting to an associated
         // wire format. Use `Status::code()` for error handling.
+
         int raw_code() const;
 
-        unsigned short int index() const;
+        /**
+         * @brief Returns the module index of this status.
+         * @return unsigned short int
+         */
+        [[nodiscard]] unsigned short int index() const;
 
-        // Status::message()
-        //
-        // Returns the error message associated with this error code, if available.
-        // Note that this message rarely describes the error code.  It is not unusual
-        // for the error message to be the empty string. As a result, prefer
-        // `operator<<` or `Status::ToString()` for debug logging.
+        /**
+         * @brief Returns the error message associated with this error code, if available.
+         *        Note that this message rarely describes the error code.  It is not unusual
+         *        for the error message to be the empty string. As a result, prefer
+         *        `operator<<` or `Status::ToString()` for debug logging.
+         * @return std::string_view
+         */
+        [[nodiscard]]
         std::string_view message() const;
 
         friend bool operator==(const Status &, const Status &);
 
         friend bool operator!=(const Status &, const Status &);
 
-        // Status::ToString()
-        //
-        // Returns a string based on the `mode`. By default, it returns combination of
-        // the error code name, the message and any associated payload messages. This
-        // string is designed simply to be human readable and its exact format should
-        // not be load bearing. Do not depend on the exact format of the result of
-        // `ToString()` which is subject to change.
-        //
-        // The printed code name and the message are generally substrings of the
-        // result, and the payloads to be printed use the status payload printer
-        // mechanism (which is internal).
-        std::string ToString(
+
+        /**
+         * @brief Returns a string based on the `mode`. By default, it returns combination of
+         *        the error code name, the message and any associated payload messages. This
+         *        string is designed simply to be human readable and its exact format should
+         *        not be load bearing. Do not depend on the exact format of the result of
+         *        `to_string()` which is subject to change.
+         *        The printed code name and the message are generally substrings of the
+         *        result, and the payloads to be printed use the status payload printer
+         *        mechanism (which is internal).
+         * @param mode
+         * @return std::string
+         */
+        [[nodiscard]] std::string to_string(
                 StatusToStringMode mode = StatusToStringMode::kDefault) const;
 
-        // Status::IgnoreError()
-        //
-        // Ignores any errors. This method does nothing except potentially suppress
-        // complaints from any tools that are checking that errors are not dropped on
-        // the floor.
-        void IgnoreError() const;
+        /**
+         * @brief Ignores any errors. This method does nothing except potentially suppress
+         *        complaints from any tools that are checking that errors are not dropped on
+         *        the floor.
+         */
+        void ignore_error() const;
 
-        // swap()
-        //
-        // Swap the contents of one status with another.
+
+        /**
+         * @brief Swap the contents of one status with another.
+         * @param a
+         * @param b
+         */
         friend void swap(Status &a, Status &b);
 
-        //----------------------------------------------------------------------------
-        // Payload Management APIs
-        //----------------------------------------------------------------------------
+        /**
+         * @brief Gets the payload of a status given its unique `type_url` key, if present.
+         *        A payload may be attached to a status to provide additional context to an
+         *        error that may not be satisfied by an existing `turbo::StatusCode`.
+         *        Typically, this payload serves one of several purposes:
+         *        * It may provide more fine-grained semantic information about the error
+         *        to facilitate actionable remedies.
+         *        * It may provide human-readable contexual information that is more
+         *        appropriate to display to an end user.
+         *        A payload consists of a [key,value] pair, where the key is a string
+         *        referring to a unique "type URL" and the value is an object of type
+         *        `turbo::Cord` to hold the contextual data.
+         *        The "type URL" should be unique and follow the format of a URL
+         *        (https://en.wikipedia.org/wiki/URL) and, ideally, provide some
+         *        documentation or schema on how to interpret its associated data. For
+         *        example, the default type URL for a protobuf message type is
+         *        "type.googleapis.com/packagename.messagename". Other custom wire formats
+         *        should define the format of type URL in a similar practice so as to
+         *        minimize the chance of conflict between type URLs.
+         *        Users should ensure that the type URL can be mapped to a concrete
+         *        C++ type if they want to deserialize the payload and read it effectively.
+         *        To attach a payload to a status object, call `Status::set_payload()`,
+         *        passing it the type URL and an `turbo::Cord` of associated data. Similarly,
+         *        to extract the payload from a status, call `Status::get_payload()`. You
+         *        may attach multiple payloads (with differing type URLs) to any given
+         *        status object, provided that the status is currently exhibiting an error
+         *        code (i.e. is not OK).
+         *        @code
+         *        turbo::Status status = turbo::invalid_argument_error("bad mode");
+         *        status.set_payload("type.googleapis.com/google.rpc.BadRequest",
+         *        SerializeToCord(request));
+         *        @endcode
+         *        To retrieve the payload, call `Status::get_payload()` with the same
+         *        `type_url` key.
+         *        @code
+         *        turbo::Cord payload = status.get_payload("type.googleapis.com/google.rpc.BadRequest");
+         *        @endcode
+         *        If the payload is not present, `Status::get_payload()` will return an empty
+         *        `turbo::Cord`.
+         *        @code
+         *        turbo::Cord payload = status.get_payload("type.googleapis.com/google.rpc.DebugInfo");
+         *        assert(payload.empty());
+         *        @endcode
+         *        If the status is OK, `Status::get_payload()` will return an empty
+         *        `turbo::Cord`.
+         *        @code
+         *        turbo::Status status = turbo::ok_status();
+         *        turbo::Cord payload = status.get_payload("type.googleapis.com/google.rpc.DebugInfo");
+         *        assert(payload.empty());
+         *        @endcode
+         * @param type_url The unique type URL key.
+         * @return std::optional<turbo::Cord>
+         */
+        std::optional<turbo::Cord> get_payload(std::string_view type_url) const;
 
-        // A payload may be attached to a status to provide additional context to an
-        // error that may not be satisfied by an existing `turbo::StatusCode`.
-        // Typically, this payload serves one of several purposes:
-        //
-        //   * It may provide more fine-grained semantic information about the error
-        //     to facilitate actionable remedies.
-        //   * It may provide human-readable contexual information that is more
-        //     appropriate to display to an end user.
-        //
-        // A payload consists of a [key,value] pair, where the key is a string
-        // referring to a unique "type URL" and the value is an object of type
-        // `turbo::Cord` to hold the contextual data.
-        //
-        // The "type URL" should be unique and follow the format of a URL
-        // (https://en.wikipedia.org/wiki/URL) and, ideally, provide some
-        // documentation or schema on how to interpret its associated data. For
-        // example, the default type URL for a protobuf message type is
-        // "type.googleapis.com/packagename.messagename". Other custom wire formats
-        // should define the format of type URL in a similar practice so as to
-        // minimize the chance of conflict between type URLs.
-        // Users should ensure that the type URL can be mapped to a concrete
-        // C++ type if they want to deserialize the payload and read it effectively.
-        //
-        // To attach a payload to a status object, call `Status::SetPayload()`,
-        // passing it the type URL and an `turbo::Cord` of associated data. Similarly,
-        // to extract the payload from a status, call `Status::GetPayload()`. You
-        // may attach multiple payloads (with differing type URLs) to any given
-        // status object, provided that the status is currently exhibiting an error
-        // code (i.e. is not OK).
+        /**
+         * @brief Sets the payload for a non-ok status using a `type_url` key, overwriting
+         *        any existing payload for that `type_url`.
+         * @note This function does nothing if the Status is ok.
+         * @param type_url The unique type URL key.
+         * @param payload The payload to set.
+         */
+        void set_payload(std::string_view type_url, turbo::Cord payload);
 
-        // Status::GetPayload()
-        //
-        // Gets the payload of a status given its unique `type_url` key, if present.
-        std::optional<turbo::Cord> GetPayload(std::string_view type_url) const;
+        /**
+         * @brief Erases the payload corresponding to the `type_url` key.  Returns `true` if
+         *        the payload was present.
+         * @note This function does nothing if the Status is ok.
+         * @param type_url The unique type URL key.
+         * @return bool
+         */
+        bool erase_payload(std::string_view type_url);
 
-        // Status::SetPayload()
-        //
-        // Sets the payload for a non-ok status using a `type_url` key, overwriting
-        // any existing payload for that `type_url`.
-        //
-        // NOTE: This function does nothing if the Status is ok.
-        void SetPayload(std::string_view type_url, turbo::Cord payload);
-
-        // Status::ErasePayload()
-        //
-        // Erases the payload corresponding to the `type_url` key.  Returns `true` if
-        // the payload was present.
-        bool ErasePayload(std::string_view type_url);
-
-        // Status::ForEachPayload()
-        //
-        // Iterates over the stored payloads and calls the
-        // `visitor(type_key, payload)` callable for each one.
-        //
-        // NOTE: The order of calls to `visitor()` is not specified and may change at
-        // any time.
-        //
-        // NOTE: Any mutation on the same 'turbo::Status' object during visitation is
-        // forbidden and could result in undefined behavior.
-        void ForEachPayload(
+        /**
+         * @brief Iterates over the stored payloads and calls the
+         *        `visitor(type_key, payload)` callable for each one.
+         * @note The order of calls to `visitor()` is not specified and may change at
+         *       any time.
+         * @note Any mutation on the same 'turbo::Status' object during visitation is
+         *       forbidden and could result in undefined behavior.
+         * @param visitor
+         */
+        void for_each_payload(
                 turbo::FunctionRef<void(std::string_view, const turbo::Cord &)> visitor)
         const;
 
     private:
-        friend Status CancelledError();
+        friend Status cancelled_error();
 
         // Creates a status in the canonical error space with the specified
         // code, and an empty error message.
@@ -693,223 +769,635 @@ namespace turbo {
         uintptr_t rep_;
     };
 
-    // OkStatus()
+    // ok_status()
     //
     // Returns an OK status, equivalent to a default constructed instance. Prefer
-    // usage of `turbo::OkStatus()` when constructing such an OK status.
-    Status OkStatus();
+    // usage of `turbo::ok_status()` when constructing such an OK status.
+    Status ok_status();
 
     // operator<<()
     //
     // Prints a human-readable representation of `x` to `os`.
     std::ostream &operator<<(std::ostream &os, const Status &x);
 
-    // IsAborted()
-    // IsAlreadyExists()
-    // IsCancelled()
-    // IsDataLoss()
-    // IsDeadlineExceeded()
-    // IsFailedPrecondition()
-    // IsInternal()
-    // IsInvalidArgument()
-    // IsNotFound()
-    // IsOutOfRange()
-    // IsPermissionDenied()
-    // IsResourceExhausted()
-    // IsUnauthenticated()
-    // IsUnavailable()
-    // IsUnimplemented()
-    // IsUnknown()
-    // IsFileNotExist()
-    // IsReachFileEnd()
-    // IsDiskIOError()
-    //
-    // These convenience functions return `true` if a given status matches the
-    // `turbo::StatusCode` error code of its associated function.
-    TURBO_MUST_USE_RESULT bool IsAborted(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::KAbrted.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_aborted(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsAlreadyExists(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kAlreadyExists.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_already_exists(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsCancelled(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kCancelled.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_cancelled(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsDataLoss(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kDataLoss.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_data_loss(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsDeadlineExceeded(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kDeadlineExceeded.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_deadline_exceeded(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsFailedPrecondition(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kFailedPrecondition.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_failed_precondition(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsInternal(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kInternal.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_internal(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsInvalidArgument(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kInvalidArgument.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_invalid_argument(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsNotFound(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kNotFound.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_not_found(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsOutOfRange(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kOutOfRange.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_out_of_range(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsPermissionDenied(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kPermissionDenied.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_permission_denied(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsResourceExhausted(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kResourceExhausted.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_resource_exhausted(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsUnauthenticated(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kUnauthenticated.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_unauthenticated(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsUnavailable(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kUnavailable.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_unavailable(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsUnimplemented(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kUnimplemented.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_unimplemented(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsUnknown(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kUnknown.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_unknown(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsFileNotExist(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kFileNotExist.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_file_not_exist(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsReachFileEnd(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kReachFileEnd.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_reach_file_end(const Status &status);
 
-    TURBO_MUST_USE_RESULT bool IsDiskIOError(const Status &status);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kDiskIOError.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_disk_io_error(const Status &status);
 
-    // AbortedError()
-    // AlreadyExistsError()
-    // CancelledError()
-    // DataLossError()
-    // DeadlineExceededError()
-    // FailedPreconditionError()
-    // InternalError()
-    // InvalidArgumentError()
-    // NotFoundError()
-    // OutOfRangeError()
-    // PermissionDeniedError()
-    // ResourceExhaustedError()
-    // UnauthenticatedError()
-    // UnavailableError()
-    // UnimplementedError()
-    // UnknownError()
-    // FileNotExist()
-    // ReachFileEnd()
-    // These convenience functions create an `turbo::Status` object with an error
-    // code as indicated by the associated function name, using the error message
-    // passed in `message`.
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::aborted_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::aborted_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status AbortedError(std::string_view fmt, Args &&...args) {
+    Status aborted_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kAborted, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::already_exists_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::already_exists_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status AlreadyExistsError(std::string_view fmt, Args &&...args) {
+    Status already_exists_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kAlreadyExists, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::cancelled_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::cancelled_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status CancelledError(std::string_view fmt, Args &&...args) {
+    Status cancelled_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kCancelled, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::data_loss_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::data_loss_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status DataLossError(std::string_view fmt, Args &&...args) {
+    Status data_loss_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kDataLoss, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::deadline_exceeded_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::deadline_exceeded_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status DeadlineExceededError(std::string_view fmt, Args &&...args) {
+    Status deadline_exceeded_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kDeadlineExceeded, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::failed_precondition_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::failed_precondition_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status FailedPreconditionError(std::string_view fmt, Args &&...args) {
+    Status failed_precondition_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kFailedPrecondition, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::internal_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::internal_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status InternalError(std::string_view fmt, Args &&...args) {
+    Status internal_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kInternal, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::invalid_argument_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::invalid_argument_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status InvalidArgumentError(std::string_view fmt, Args &&...args) {
+    Status invalid_argument_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kInvalidArgument, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::not_found_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::not_found_error("bad mode: {}", mode);
+     *        @endcode
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status NotFoundError(std::string_view fmt, Args &&...args) {
+    Status not_found_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kNotFound, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::out_of_range_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::out_of_range_error("bad mode: {}", mode);
+     *        @endcode
+     *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     * @deprecated
+     */
     template<typename ...Args>
-    Status OutOfRangeError(std::string_view fmt, Args &&...args) {
+    Status out_of_range_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kOutOfRange, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message. This function is recommended to use instead of
+     *        `turbo::out_of_range_error()`.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
+     *        @endcode
+     *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @deprecated
+     * @return Status
+     */
     template<typename ...Args>
-    Status PermissionDeniedError(std::string_view fmt, Args &&...args) {
+    Status permission_denied_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kPermissionDenied, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message. This function is recommended to use instead of
+     *        `turbo::out_of_range_error()`.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
+     *        @endcode
+     *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @deprecated
+     * @return Status
+     */
     template<typename ...Args>
-    Status ResourceExhaustedError(std::string_view fmt, Args &&...args) {
+    Status resource_exhausted_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kResourceExhausted, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message. This function is recommended to use instead of
+     *        `turbo::out_of_range_error()`.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
+     *        @endcode
+     *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @deprecated
+     * @return Status
+     */
     template<typename ...Args>
-    Status UnauthenticatedError(std::string_view fmt, Args &&...args) {
+    Status unauthenticated_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kUnauthenticated, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message. This function is recommended to use instead of
+     *        `turbo::out_of_range_error()`.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
+     *        @endcode
+     *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @deprecated
+     * @return Status
+     */
     template<typename ...Args>
-    Status UnavailableError(std::string_view fmt, Args &&...args) {
+    Status unavailable_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kUnavailable, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
+     *        using the fmt and args to format the error message. This function is recommended to use instead of
+     *        `turbo::out_of_range_error()`.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode");
+     *        @endcode
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
+     *        @endcode
+     *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @deprecated
+     * @return Status
+     */
     template<typename ...Args>
-    Status UnimplementedError(std::string_view fmt, Args &&...args) {
+    Status unimplemented_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kUnimplemented, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::unknown_error("");
+     *        @endcode
+     * @return Status
+     */
     template<typename ...Args>
-    Status UnknownError(std::string_view fmt, Args &&...args) {
+    Status unknown_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kUnknown, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::file_not_exist_error("");
+     *        @endcode
+     * @return Status
+     */
     template<typename ...Args>
-    Status FileNotExist(std::string_view fmt, Args &&...args) {
+    Status file_not_exist_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kFileNotExist, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::reach_file_end_error("");
+     *        @endcode
+     * @return Status
+     */
     template<typename ...Args>
-    Status ReachFileEnd(std::string_view fmt, Args &&...args) {
+    Status reach_file_end_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kReachFileEnd, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::disk_io_error("");
+     *        @endcode
+     * @return Status
+     */
     template<typename ...Args>
-    Status DiskIOError(std::string_view fmt, Args &&...args) {
+    Status disk_io_error(std::string_view fmt, Args &&...args) {
         return Status(turbo::kDiskIOError, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code and the error message.
+     *       Example:
+     *       @code
+     *       turbo::Status status = turbo::make_status(turbo::kAborted, "bad mode");
+     *       @endcode
+     *       @code
+     *       turbo::Status status = turbo::make_status(turbo::kAborted, "bad mode: {}", mode);
+     *       @endcode
+     * @param errcode The error code.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status MakeStatus(int errcode, std::string_view fmt, Args &&...args) {
+    Status make_status(int errcode, std::string_view fmt, Args &&...args) {
         return Status(errcode, Format(fmt, std::forward<Args>(args)...));
     }
 
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with defined module index, error code and the error message.
+     *      Example:
+     *      @code
+     *      turbo::Status status = turbo::make_status(1, turbo::kAborted, "bad mode");
+     *      @endcode
+     *      @code
+     *      turbo::Status status = turbo::make_status(1, turbo::kAborted, "bad mode: {}", mode);
+     *      @endcode
+     * @param module_index The module index.
+     * @param errcode The error code.
+     * @param fmt The format string. @see turbo::Format()
+     * @param args The arguments to format the error message.
+     * @return Status
+     */
     template<typename ...Args>
-    Status MakeStatus(short module_index, int errcode, std::string_view fmt, Args &&...args) {
+    Status make_status(short module_index, int errcode, std::string_view fmt, Args &&...args) {
         return Status(module_index, errcode, Format(fmt, std::forward<Args>(args)...));
     }
 
-    TURBO_FORCE_INLINE Status MakeStatus(int errcode) {
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code.
+     *       Example:
+     *       @code
+     *       turbo::Status status = turbo::make_status(turbo::kAborted);
+     *       @endcode
+     * @note This function will create an `turbo::Status` object with an empty error message.
+     * @param errcode The error code.
+     * @return Status
+     */
+    TURBO_FORCE_INLINE Status make_status(int errcode) {
         return Status(errcode, "");
     }
 
-    TURBO_FORCE_INLINE Status MakeStatus(short module_index, int errcode) {
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with defined module index and error code.
+     *      Example:
+     *      @code
+     *      turbo::Status status = turbo::make_status(1, turbo::kAborted);
+     *      @endcode
+     * @note This function will create an `turbo::Status` object with an empty error message.
+     * @param module_index The module index.
+     * @param errcode The error code.
+     * @return Status
+     */
+    TURBO_FORCE_INLINE Status make_status(short module_index, int errcode) {
         return Status(module_index, errcode, "");
     }
 
-    // ErrnoToStatusCode()
-    //
-    // Returns the StatusCode for `error_number`, which should be an `errno` value.
-    // See https://en.cppreference.com/w/cpp/error/errno_macros and similar
-    // references.
-    turbo::StatusCode ErrnoToStatusCode(int error_number);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns the StatusCode for `error_number`, which should be an `errno` value.
+     *        See https://en.cppreference.com/w/cpp/error/errno_macros and similar
+     *        references.
+     * @param error_number The error number.
+     * @return StatusCode
+     */
+    turbo::StatusCode errno_to_status_code(int error_number);
 
-    // ErrnoToStatus()
-    //
-    // Convenience function that creates a `turbo::Status` using an `error_number`,
-    // which should be an `errno` value.
-    Status ErrnoToStatus(int error_number, std::string_view message);
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::errno_to_status(1);
+     *        @endcode
+     * @param error_number The error number.
+     * @return Status
+     */
+    Status errno_to_status(int error_number, std::string_view message);
 
     //------------------------------------------------------------------------------
     // Implementation details follow
@@ -978,11 +1466,11 @@ namespace turbo {
         return !(lhs == rhs);
     }
 
-    inline std::string Status::ToString(StatusToStringMode mode) const {
+    inline std::string Status::to_string(StatusToStringMode mode) const {
         return ok() ? "OK" : ToStringSlow(mode);
     }
 
-    inline void Status::IgnoreError() const {
+    inline void Status::ignore_error() const {
         // no-op
     }
 
@@ -1052,12 +1540,12 @@ namespace turbo {
         }
     }
 
-    inline Status OkStatus() { return Status(); }
+    inline Status ok_status() { return Status(); }
 
     // Creates a `Status` object with the `turbo::StatusCode::kCancelled` error code
     // and an empty message. It is provided only for efficiency, given that
     // message-less kCancelled errors are common in the infrastructure.
-    inline Status CancelledError() { return Status(turbo::kCancelled); }
+    inline Status cancelled_error() { return Status(turbo::kCancelled); }
 
     TURBO_NAMESPACE_END
 }  // namespace turbo

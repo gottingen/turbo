@@ -26,9 +26,9 @@
 namespace {
 
     static char *memcasechr(const char *s, int c, size_t slen) {
-        c = turbo::ascii_tolower(c);
+        c = turbo::ascii_to_lower(c);
         for (; slen; ++s, --slen) {
-            if (turbo::ascii_tolower(*s) == c) return const_cast<char *>(s);
+            if (turbo::ascii_to_lower(*s) == c) return const_cast<char *>(s);
         }
         return nullptr;
     }

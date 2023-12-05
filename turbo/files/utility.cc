@@ -51,7 +51,7 @@ namespace turbo {
         std::error_code ec;
         auto len = turbo::filesystem::file_size(path, ec);
         if (ec) {
-            return turbo::InternalError(ec.message());
+            return turbo::internal_error(ec.message());
         }
         std::string buf;
         buf.reserve(kBuffSize);
@@ -82,7 +82,7 @@ namespace turbo {
         std::error_code ec;
         auto len = turbo::filesystem::file_size(path, ec);
         if (ec) {
-            return turbo::InternalError(ec.message());
+            return turbo::internal_error(ec.message());
         }
         std::string buf;
         buf.reserve(kBuffSize);
@@ -105,13 +105,13 @@ namespace turbo {
         std::error_code ec;
         turbo::filesystem::directory_iterator itr(root_path, ec);
         if(ec) {
-            return turbo::MakeStatus(ec.value(), "open directory error:{}", ec.message());
+            return turbo::make_status(ec.value(), "open directory error:{}", ec.message());
         }
         turbo::filesystem::directory_iterator end;
         for(;itr != end;++itr) {
             if(!itr->is_directory(ec)) {
                 if(ec) {
-                    return turbo::MakeStatus(ec.value(), "test if file error:{}", ec.message());
+                    return turbo::make_status(ec.value(), "test if file error:{}", ec.message());
                 }
                 if(full_path) {
                     result.emplace_back(itr->path().string());
@@ -120,20 +120,20 @@ namespace turbo {
                 }
             }
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     turbo::Status FileUtility::list_directories(const std::string_view &root_path,std::vector<std::string> &result, bool full_path) noexcept {
         std::error_code ec;
         turbo::filesystem::directory_iterator itr(root_path, ec);
         if(ec) {
-            return turbo::MakeStatus(ec.value(), "open directory error:{}", ec.message());
+            return turbo::make_status(ec.value(), "open directory error:{}", ec.message());
         }
         turbo::filesystem::directory_iterator end;
         for(;itr != end;++itr) {
             if(itr->is_directory(ec)) {
                 if(ec) {
-                    return turbo::MakeStatus(ec.value(), "test if file error:{}", ec.message());
+                    return turbo::make_status(ec.value(), "test if file error:{}", ec.message());
                 }
                 if(full_path) {
                     result.emplace_back(itr->path().string());
@@ -142,7 +142,7 @@ namespace turbo {
                 }
             }
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     turbo::Status FileUtility::read_file(const std::string_view &file_path, std::string &result, bool append) noexcept {
@@ -159,21 +159,21 @@ namespace turbo {
             return r.status();
         }
         file.close();
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
-    turbo::Status FileUtility::write_file(const std::string_view &file_path, const std::string_view &result, bool truncate) noexcept {
+    turbo::Status FileUtility::write_file(const std::string_view &file_path, const std::string_view &content, bool truncate) noexcept {
         SequentialWriteFile file;
         auto rs = file.open(file_path, truncate);
         if(!rs.ok()) {
             return rs;
         }
 
-        rs = file.write(result);
+        rs = file.write(content);
         if(!rs.ok()) {
             return rs;
         }
         file.close();
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 }  // namespace turbo

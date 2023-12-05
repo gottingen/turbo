@@ -25,7 +25,10 @@ Contents
 .. toctree::
     :caption: API REFERENCE
 
+    en/api/platform
     en/api/base
+    en/api/files
+    en/api/strings
 
 
 .. toctree::

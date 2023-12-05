@@ -301,7 +301,7 @@ namespace {
         vec.resize(2);
         auto another_vec = std::move(vec);
         EXPECT_EQ(0, **another_vec[0]);
-        EXPECT_EQ(turbo::UnknownError(""), another_vec[1].status());
+        EXPECT_EQ(turbo::unknown_error(""), another_vec[1].status());
     }
 
     TEST(ResultStatus, TestDefaultCtor) {
@@ -323,38 +323,38 @@ namespace {
 
     TEST(BadResultStatusAccessTest, CopyConstructionWhatOk) {
         turbo::Status error =
-                turbo::InternalError("some arbitrary message too big for the sso buffer");
+                turbo::internal_error("some arbitrary message too big for the sso buffer");
         turbo::BadResultStatusAccess e1{error};
         turbo::BadResultStatusAccess e2{e1};
-        EXPECT_THAT(e1.what(), HasSubstr(error.ToString()));
-        EXPECT_THAT(e2.what(), HasSubstr(error.ToString()));
+        EXPECT_THAT(e1.what(), HasSubstr(error.to_string()));
+        EXPECT_THAT(e2.what(), HasSubstr(error.to_string()));
     }
 
     TEST(BadResultStatusAccessTest, CopyAssignmentWhatOk) {
         turbo::Status error =
-                turbo::InternalError("some arbitrary message too big for the sso buffer");
+                turbo::internal_error("some arbitrary message too big for the sso buffer");
         turbo::BadResultStatusAccess e1{error};
-        turbo::BadResultStatusAccess e2{turbo::InternalError("other")};
+        turbo::BadResultStatusAccess e2{turbo::internal_error("other")};
         e2 = e1;
-        EXPECT_THAT(e1.what(), HasSubstr(error.ToString()));
-        EXPECT_THAT(e2.what(), HasSubstr(error.ToString()));
+        EXPECT_THAT(e1.what(), HasSubstr(error.to_string()));
+        EXPECT_THAT(e2.what(), HasSubstr(error.to_string()));
     }
 
     TEST(BadResultStatusAccessTest, MoveConstructionWhatOk) {
         turbo::Status error =
-                turbo::InternalError("some arbitrary message too big for the sso buffer");
+                turbo::internal_error("some arbitrary message too big for the sso buffer");
         turbo::BadResultStatusAccess e1{error};
         turbo::BadResultStatusAccess e2{std::move(e1)};
-        EXPECT_THAT(e2.what(), HasSubstr(error.ToString()));
+        EXPECT_THAT(e2.what(), HasSubstr(error.to_string()));
     }
 
     TEST(BadResultStatusAccessTest, MoveAssignmentWhatOk) {
         turbo::Status error =
-                turbo::InternalError("some arbitrary message too big for the sso buffer");
+                turbo::internal_error("some arbitrary message too big for the sso buffer");
         turbo::BadResultStatusAccess e1{error};
-        turbo::BadResultStatusAccess e2{turbo::InternalError("other")};
+        turbo::BadResultStatusAccess e2{turbo::internal_error("other")};
         e2 = std::move(e1);
-        EXPECT_THAT(e2.what(), HasSubstr(error.ToString()));
+        EXPECT_THAT(e2.what(), HasSubstr(error.to_string()));
     }
 
 // Define `EXPECT_DEATH_OR_THROW` to test the behavior of `ResultStatus::value`,
@@ -368,46 +368,46 @@ namespace {
           statement;                                               \
         } catch (const turbo::BadResultStatusAccess& e) {               \
           EXPECT_EQ(e.status(), status_);                          \
-          EXPECT_THAT(e.what(), HasSubstr(e.status().ToString())); \
+          EXPECT_THAT(e.what(), HasSubstr(e.status().to_string())); \
           throw;                                                   \
         }                                                          \
       },                                                           \
       turbo::BadResultStatusAccess);
 #else  // TURBO_HAVE_EXCEPTIONS
 #define EXPECT_DEATH_OR_THROW(statement, status) \
-  EXPECT_DEATH_IF_SUPPORTED(statement, status.ToString());
+  EXPECT_DEATH_IF_SUPPORTED(statement, status.to_string());
 #endif  // TURBO_HAVE_EXCEPTIONS
 
     TEST(ResultStatusDeathTest, TestDefaultCtorValue) {
         turbo::ResultStatus<int> thing;
-        EXPECT_DEATH_OR_THROW(thing.value(), turbo::UnknownError(""));
+        EXPECT_DEATH_OR_THROW(thing.value(), turbo::unknown_error(""));
         const turbo::ResultStatus<int> thing2;
-        EXPECT_DEATH_OR_THROW(thing2.value(), turbo::UnknownError(""));
+        EXPECT_DEATH_OR_THROW(thing2.value(), turbo::unknown_error(""));
     }
 
     TEST(ResultStatusDeathTest, TestValueNotOk) {
-        turbo::ResultStatus<int> thing(turbo::CancelledError());
-        EXPECT_DEATH_OR_THROW(thing.value(), turbo::CancelledError());
+        turbo::ResultStatus<int> thing(turbo::cancelled_error());
+        EXPECT_DEATH_OR_THROW(thing.value(), turbo::cancelled_error());
     }
 
     TEST(ResultStatusDeathTest, TestValueNotOkConst) {
-        const turbo::ResultStatus<int> thing(turbo::UnknownError(""));
-        EXPECT_DEATH_OR_THROW(thing.value(), turbo::UnknownError(""));
+        const turbo::ResultStatus<int> thing(turbo::unknown_error(""));
+        EXPECT_DEATH_OR_THROW(thing.value(), turbo::unknown_error(""));
     }
 
     TEST(ResultStatusDeathTest, TestPointerDefaultCtorValue) {
         turbo::ResultStatus<int *> thing;
-        EXPECT_DEATH_OR_THROW(thing.value(), turbo::UnknownError(""));
+        EXPECT_DEATH_OR_THROW(thing.value(), turbo::unknown_error(""));
     }
 
     TEST(ResultStatusDeathTest, TestPointerValueNotOk) {
-        turbo::ResultStatus<int *> thing(turbo::CancelledError());
-        EXPECT_DEATH_OR_THROW(thing.value(), turbo::CancelledError());
+        turbo::ResultStatus<int *> thing(turbo::cancelled_error());
+        EXPECT_DEATH_OR_THROW(thing.value(), turbo::cancelled_error());
     }
 
     TEST(ResultStatusDeathTest, TestPointerValueNotOkConst) {
-        const turbo::ResultStatus<int *> thing(turbo::CancelledError());
-        EXPECT_DEATH_OR_THROW(thing.value(), turbo::CancelledError());
+        const turbo::ResultStatus<int *> thing(turbo::cancelled_error());
+        EXPECT_DEATH_OR_THROW(thing.value(), turbo::cancelled_error());
     }
 
 #if GTEST_HAS_DEATH_TEST
@@ -415,7 +415,7 @@ namespace {
         EXPECT_DEBUG_DEATH(
                 {
                     // This will DCHECK
-                    turbo::ResultStatus<int> thing(turbo::OkStatus());
+                    turbo::ResultStatus<int> thing(turbo::ok_status());
                     // In optimized mode, we are actually going to get error::INTERNAL for
                     // status here, rather than crashing, so check that.
                     EXPECT_FALSE(thing.ok());
@@ -427,7 +427,7 @@ namespace {
     TEST(ResultStatusDeathTest, TestPointerStatusCtorStatusOk) {
         EXPECT_DEBUG_DEATH(
                 {
-                    turbo::ResultStatus<int *> thing(turbo::OkStatus());
+                    turbo::ResultStatus<int *> thing(turbo::ok_status());
                     // In optimized mode, we are actually going to get error::INTERNAL for
                     // status here, rather than crashing, so check that.
                     EXPECT_FALSE(thing.ok());
@@ -457,13 +457,13 @@ namespace {
     }
 
     TEST(ResultStatus, BadValueAccess) {
-        const turbo::Status kError = turbo::CancelledError("message");
+        const turbo::Status kError = turbo::cancelled_error("message");
         turbo::ResultStatus<int> status_or(kError);
         EXPECT_DEATH_OR_THROW(status_or.value(), kError);
     }
 
     TEST(ResultStatus, TestStatusCtor) {
-        turbo::ResultStatus<int> thing(turbo::CancelledError());
+        turbo::ResultStatus<int> thing(turbo::cancelled_error());
         EXPECT_FALSE(thing.ok());
         EXPECT_EQ(thing.status().code(), turbo::kCancelled);
     }
@@ -506,7 +506,7 @@ namespace {
         turbo::ResultStatus<Foo> status_or_foo(10);
         status_or_foo.emplace(20);
         EXPECT_THAT(status_or_foo, IsOkAndHolds(Field(&Foo::x, 20)));
-        status_or_foo = turbo::InvalidArgumentError("msg");
+        status_or_foo = turbo::invalid_argument_error("msg");
         EXPECT_FALSE(status_or_foo.ok());
         EXPECT_EQ(status_or_foo.status().code(), turbo::kInvalidArgument);
         EXPECT_EQ(status_or_foo.status().message(), "msg");
@@ -521,7 +521,7 @@ namespace {
         EXPECT_THAT(status_or,
                     IsOkAndHolds(AllOf(Field(&InPlaceHelper::x, ElementsAre(1, 2, 3)),
                                        Field(&InPlaceHelper::y, Pointee(4)))));
-        status_or = turbo::InvalidArgumentError("msg");
+        status_or = turbo::invalid_argument_error("msg");
         EXPECT_FALSE(status_or.ok());
         EXPECT_EQ(status_or.status().code(), turbo::kInvalidArgument);
         EXPECT_EQ(status_or.status().message(), "msg");
@@ -540,7 +540,7 @@ namespace {
     }
 
     TEST(ResultStatus, TestCopyCtorStatusNotOk) {
-        turbo::ResultStatus<int> original(turbo::CancelledError());
+        turbo::ResultStatus<int> original(turbo::cancelled_error());
         turbo::ResultStatus<int> copy(original);
         EXPECT_EQ(copy.status().code(), turbo::kCancelled);
     }
@@ -563,7 +563,7 @@ namespace {
     }
 
     TEST(ResultStatus, TestCopyCtorStatusNotOkConverting) {
-        turbo::ResultStatus<int> original(turbo::CancelledError());
+        turbo::ResultStatus<int> original(turbo::cancelled_error());
         turbo::ResultStatus<double> copy(original);
         EXPECT_EQ(copy.status(), original.status());
     }
@@ -607,7 +607,7 @@ namespace {
     TEST(ResultStatus, TestAssignmentStatusNotOk) {
         // Copy assignment
         {
-            const turbo::Status expected = turbo::CancelledError();
+            const turbo::Status expected = turbo::cancelled_error();
             turbo::ResultStatus<int> source(expected);
 
             turbo::ResultStatus<int> target;
@@ -622,7 +622,7 @@ namespace {
 
         // Move assignment
         {
-            const turbo::Status expected = turbo::CancelledError();
+            const turbo::Status expected = turbo::cancelled_error();
             turbo::ResultStatus<int> source(expected);
 
             turbo::ResultStatus<int> target;
@@ -764,7 +764,7 @@ namespace {
                 IsOkAndHolds(Field(&ImplicitConstructibleFromBool::x, false)));
         EXPECT_THAT(
                 turbo::ResultStatus<ImplicitConstructibleFromBool>{
-                        turbo::ResultStatus<bool>(turbo::InvalidArgumentError(""))},
+                        turbo::ResultStatus<bool>(turbo::invalid_argument_error(""))},
                 Not(IsOk()));
 
         EXPECT_THAT(
@@ -773,7 +773,7 @@ namespace {
                 IsOkAndHolds(Field(&ImplicitConstructibleFromBool::x, false)));
         EXPECT_THAT(
                 turbo::ResultStatus<ImplicitConstructibleFromBool>{
-                        turbo::ResultStatus<ConvertibleToBool>(turbo::InvalidArgumentError(""))},
+                        turbo::ResultStatus<ConvertibleToBool>(turbo::invalid_argument_error(""))},
                 Not(IsOk()));
     }
 
@@ -849,7 +849,7 @@ namespace {
     TEST(ResultStatus, NestedResultStatusCopyAndMoveConstructorTests) {
         turbo::ResultStatus<turbo::ResultStatus<CopyDetector>> status_or = CopyDetector(10);
         turbo::ResultStatus<turbo::ResultStatus<CopyDetector>> status_error =
-                turbo::InvalidArgumentError("foo");
+                turbo::invalid_argument_error("foo");
         EXPECT_THAT(status_or,
                     IsOkAndHolds(IsOkAndHolds(CopyDetectorHas(10, true, false))));
         turbo::ResultStatus<turbo::ResultStatus<CopyDetector>> a = status_or;
@@ -873,7 +873,7 @@ namespace {
     TEST(ResultStatus, NestedResultStatusCopyAndMoveAssignment) {
         turbo::ResultStatus<turbo::ResultStatus<CopyDetector>> status_or = CopyDetector(10);
         turbo::ResultStatus<turbo::ResultStatus<CopyDetector>> status_error =
-                turbo::InvalidArgumentError("foo");
+                turbo::invalid_argument_error("foo");
         turbo::ResultStatus<turbo::ResultStatus<CopyDetector>> a;
         a = status_or;
         EXPECT_THAT(a, IsOkAndHolds(IsOkAndHolds(CopyDetectorHas(10, false, true))));
@@ -937,7 +937,7 @@ namespace {
 
     TEST(ResultStatus, ResultStatusAnyCopyAndMoveConstructorTests) {
         turbo::ResultStatus<std::any> status_or = CopyDetector(10);
-        turbo::ResultStatus<std::any> status_error = turbo::InvalidArgumentError("foo");
+        turbo::ResultStatus<std::any> status_error = turbo::invalid_argument_error("foo");
         EXPECT_THAT(
                 status_or,
                 IsOkAndHolds(AnyWith<CopyDetector>(CopyDetectorHas(10, true, false))));
@@ -966,7 +966,7 @@ namespace {
 
     TEST(ResultStatus, ResultStatusAnyCopyAndMoveAssignment) {
         turbo::ResultStatus<std::any> status_or = CopyDetector(10);
-        turbo::ResultStatus<std::any> status_error = turbo::InvalidArgumentError("foo");
+        turbo::ResultStatus<std::any> status_error = turbo::invalid_argument_error("foo");
         turbo::ResultStatus<std::any> a;
         a = status_or;
         EXPECT_THAT(
@@ -1019,7 +1019,7 @@ namespace {
         EXPECT_FALSE((std::is_assignable<turbo::ResultStatus<std::any>,
                 turbo::ResultStatus<int>>::value));
         turbo::ResultStatus<std::any> status_or;
-        status_or = turbo::InvalidArgumentError("foo");
+        status_or = turbo::invalid_argument_error("foo");
         EXPECT_THAT(status_or, Not(IsOk()));
     }
 
@@ -1063,7 +1063,7 @@ namespace {
     TEST(ResultStatus, TestAssignmentStatusNotOkConverting) {
         // Copy assignment
         {
-            const turbo::Status expected = turbo::CancelledError();
+            const turbo::Status expected = turbo::cancelled_error();
             turbo::ResultStatus<int> source(expected);
 
             turbo::ResultStatus<double> target;
@@ -1078,7 +1078,7 @@ namespace {
 
         // Move assignment
         {
-            const turbo::Status expected = turbo::CancelledError();
+            const turbo::Status expected = turbo::cancelled_error();
             turbo::ResultStatus<int> source(expected);
 
             turbo::ResultStatus<double> target;
@@ -1109,7 +1109,7 @@ namespace {
 
         // Copy-assignment, error status
         {
-            turbo::ResultStatus<int> so = turbo::NotFoundError("taco");
+            turbo::ResultStatus<int> so = turbo::not_found_error("taco");
             so = *&so;
 
             EXPECT_FALSE(so.ok());
@@ -1132,7 +1132,7 @@ namespace {
 
         // Move-assignment with copyable type, error status
         {
-            turbo::ResultStatus<int> so = turbo::NotFoundError("taco");
+            turbo::ResultStatus<int> so = turbo::not_found_error("taco");
 
             // Fool the compiler, which otherwise complains.
             auto &same = so;
@@ -1159,7 +1159,7 @@ namespace {
 
         // Move-assignment with non-copyable type, error status
         {
-            turbo::ResultStatus<std::unique_ptr<int>> so = turbo::NotFoundError("taco");
+            turbo::ResultStatus<std::unique_ptr<int>> so = turbo::not_found_error("taco");
 
             // Fool the compiler, which otherwise complains.
             auto &same = so;
@@ -1283,7 +1283,7 @@ namespace {
     TEST(ResultStatus, TestStatus) {
         turbo::ResultStatus<int> good(4);
         EXPECT_TRUE(good.ok());
-        turbo::ResultStatus<int> bad(turbo::CancelledError());
+        turbo::ResultStatus<int> bad(turbo::cancelled_error());
         EXPECT_FALSE(bad.ok());
         EXPECT_EQ(bad.status().code(), turbo::kCancelled);
     }
@@ -1351,7 +1351,7 @@ namespace {
     }
 
     TEST(ResultStatus, RValueStatus) {
-        turbo::ResultStatus<int> so(turbo::NotFoundError("taco"));
+        turbo::ResultStatus<int> so(turbo::not_found_error("taco"));
         const turbo::Status s = std::move(so).status();
 
         EXPECT_EQ(s.code(), turbo::kNotFound);
@@ -1384,7 +1384,7 @@ namespace {
     }
 
     TEST(ResultStatus, TestPointerStatusCtor) {
-        turbo::ResultStatus<int *> thing(turbo::CancelledError());
+        turbo::ResultStatus<int *> thing(turbo::cancelled_error());
         EXPECT_FALSE(thing.ok());
         EXPECT_EQ(thing.status().code(), turbo::kCancelled);
     }
@@ -1428,7 +1428,7 @@ namespace {
     }
 
     TEST(ResultStatus, TestPointerCopyCtorStatusNotOk) {
-        turbo::ResultStatus<int *> original(turbo::CancelledError());
+        turbo::ResultStatus<int *> original(turbo::cancelled_error());
         turbo::ResultStatus<int *> copy(original);
         EXPECT_EQ(copy.status().code(), turbo::kCancelled);
     }
@@ -1442,7 +1442,7 @@ namespace {
     }
 
     TEST(ResultStatus, TestPointerCopyCtorStatusNotOkConverting) {
-        turbo::ResultStatus<Derived *> original(turbo::CancelledError());
+        turbo::ResultStatus<Derived *> original(turbo::cancelled_error());
         turbo::ResultStatus<Base2 *> copy(original);
         EXPECT_EQ(copy.status().code(), turbo::kCancelled);
     }
@@ -1457,7 +1457,7 @@ namespace {
     }
 
     TEST(ResultStatus, TestPointerAssignmentStatusNotOk) {
-        turbo::ResultStatus<int *> source(turbo::CancelledError());
+        turbo::ResultStatus<int *> source(turbo::cancelled_error());
         turbo::ResultStatus<int *> target;
         target = source;
         EXPECT_EQ(target.status().code(), turbo::kCancelled);
@@ -1473,7 +1473,7 @@ namespace {
     }
 
     TEST(ResultStatus, TestPointerAssignmentStatusNotOkConverting) {
-        turbo::ResultStatus<Derived *> source(turbo::CancelledError());
+        turbo::ResultStatus<Derived *> source(turbo::cancelled_error());
         turbo::ResultStatus<Base2 *> target;
         target = source;
         EXPECT_EQ(target.status(), source.status());
@@ -1483,7 +1483,7 @@ namespace {
         const int kI = 0;
         turbo::ResultStatus<const int *> good(&kI);
         EXPECT_TRUE(good.ok());
-        turbo::ResultStatus<const int *> bad(turbo::CancelledError());
+        turbo::ResultStatus<const int *> bad(turbo::cancelled_error());
         EXPECT_EQ(bad.status().code(), turbo::kCancelled);
     }
 
@@ -1545,7 +1545,7 @@ namespace {
     }
 
     TEST(ResultStatus, ValueOrDefault) {
-        const turbo::ResultStatus<int> status_or = turbo::CancelledError();
+        const turbo::ResultStatus<int> status_or = turbo::cancelled_error();
         EXPECT_EQ(status_or.value_or(-1), -1);
     }
 
@@ -1556,25 +1556,25 @@ namespace {
     }
 
     TEST(ResultStatus, MoveOnlyValueOrDefault) {
-        EXPECT_THAT(turbo::ResultStatus<std::unique_ptr<int>>(turbo::CancelledError())
+        EXPECT_THAT(turbo::ResultStatus<std::unique_ptr<int>>(turbo::cancelled_error())
                             .value_or(std::make_unique<int>(-1)),
                     Pointee(-1));
     }
 
-    static turbo::ResultStatus<int> MakeStatus() { return 100; }
+    static turbo::ResultStatus<int> make_status() { return 100; }
 
-    TEST(ResultStatus, TestIgnoreError) { MakeStatus().IgnoreError(); }
+    TEST(ResultStatus, TestIgnoreError) { make_status().IgnoreError(); }
 
     TEST(ResultStatus, EqualityOperator) {
         constexpr size_t kNumCases = 4;
         std::array<turbo::ResultStatus<int>, kNumCases> group1 = {
                 turbo::ResultStatus<int>(1), turbo::ResultStatus<int>(2),
-                turbo::ResultStatus<int>(turbo::InvalidArgumentError("msg")),
-                turbo::ResultStatus<int>(turbo::InternalError("msg"))};
+                turbo::ResultStatus<int>(turbo::invalid_argument_error("msg")),
+                turbo::ResultStatus<int>(turbo::internal_error("msg"))};
         std::array<turbo::ResultStatus<int>, kNumCases> group2 = {
                 turbo::ResultStatus<int>(1), turbo::ResultStatus<int>(2),
-                turbo::ResultStatus<int>(turbo::InvalidArgumentError("msg")),
-                turbo::ResultStatus<int>(turbo::InternalError("msg"))};
+                turbo::ResultStatus<int>(turbo::invalid_argument_error("msg")),
+                turbo::ResultStatus<int>(turbo::internal_error("msg"))};
         for (size_t i = 0; i < kNumCases; ++i) {
             for (size_t j = 0; j < kNumCases; ++j) {
                 if (i == j) {
@@ -1605,22 +1605,22 @@ namespace {
     template<typename T>
     struct ResultStatusConversionBase<T, ConvTraits::kImplicit> {
         operator turbo::ResultStatus<T>() const & {  // NOLINT
-            return turbo::InvalidArgumentError("conversion to turbo::ResultStatus");
+            return turbo::invalid_argument_error("conversion to turbo::ResultStatus");
         }
 
         operator turbo::ResultStatus<T>() && {  // NOLINT
-            return turbo::InvalidArgumentError("conversion to turbo::ResultStatus");
+            return turbo::invalid_argument_error("conversion to turbo::ResultStatus");
         }
     };
 
     template<typename T>
     struct ResultStatusConversionBase<T, ConvTraits::kExplicit> {
         explicit operator turbo::ResultStatus<T>() const & {
-            return turbo::InvalidArgumentError("conversion to turbo::ResultStatus");
+            return turbo::invalid_argument_error("conversion to turbo::ResultStatus");
         }
 
         explicit operator turbo::ResultStatus<T>() && {
-            return turbo::InvalidArgumentError("conversion to turbo::ResultStatus");
+            return turbo::invalid_argument_error("conversion to turbo::ResultStatus");
         }
     };
 
@@ -1655,22 +1655,22 @@ namespace {
     template<>
     struct StatusConversionBase<ConvTraits::kImplicit> {
         operator turbo::Status() const & {  // NOLINT
-            return turbo::InternalError("conversion to Status");
+            return turbo::internal_error("conversion to Status");
         }
 
         operator turbo::Status() && {  // NOLINT
-            return turbo::InternalError("conversion to Status");
+            return turbo::internal_error("conversion to Status");
         }
     };
 
     template<>
     struct StatusConversionBase<ConvTraits::kExplicit> {
         explicit operator turbo::Status() const & {  // NOLINT
-            return turbo::InternalError("conversion to Status");
+            return turbo::internal_error("conversion to Status");
         }
 
         explicit operator turbo::Status() && {  // NOLINT
-            return turbo::InternalError("conversion to Status");
+            return turbo::internal_error("conversion to Status");
         }
     };
 
@@ -1698,7 +1698,7 @@ namespace {
     struct ConvertibleToAnyResultStatus {
         template<typename T>
         operator turbo::ResultStatus<T>() const {  // NOLINT
-            return turbo::InvalidArgumentError("Conversion to turbo::ResultStatus");
+            return turbo::invalid_argument_error("Conversion to turbo::ResultStatus");
         }
     };
 

@@ -531,7 +531,7 @@ bool TimeZoneInfo::Load(ZoneInfoSource* zip) {
     version_ = zip->Version();
   }
 
-  // Trim redundant transitions. zic may have added these to work around
+  // trim_all redundant transitions. zic may have added these to work around
   // differences between the glibc and reference implementations (see
   // zic.c:dontmerge) or to avoid bugs in old readers. For us, they just
   // get in the way when we do future_spec_ extension.
