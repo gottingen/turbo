@@ -6,37 +6,10 @@
 turbo string module
 =========================
 
-ascii
----------------------------
+.. toctree::
 
-.. doxxygengroup:: turbo_strings_ascii
-   :project: turbo-docs
-   :members:
-
-convert
----------------------------
-
-.. doxygengroup:: turbo_strings_convert
-   :project: turbo-docs
-   :members:
-
-trim
----------------------------
-
-.. doxygengroup:: turbo_strings_trim
-   :project: turbo-docs
-   :members:
-
-match
----------------------------
-
-..  doxygengroup:: turbo_strings_match
-    :project: turbo-docs
-    :members:
-
-split
----------------------------
-
-..  doxygengroup:: turbo_strings_split
-    :project: turbo-docs
-    :members:
+    strings_ascii
+    strings_convert
+    strings_trim
+    strings_match
+    strings_split
