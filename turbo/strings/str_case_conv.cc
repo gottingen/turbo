@@ -22,7 +22,7 @@ namespace turbo {
 
     template<typename String>
     typename std::enable_if<turbo::is_string_type<String>::value>::type
-    StrToLower(String *s) {
+    str_to_lower(String *s) {
         for (auto &ch: *s) {
             ch = turbo::ascii_tolower(static_cast<unsigned char>(ch));
         }
@@ -30,19 +30,19 @@ namespace turbo {
 
     template<typename String>
     TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
-    StrToUpper(String *s) {
+    str_to_upper(String *s) {
         for (auto &ch: *s) {
             ch = turbo::ascii_toupper(static_cast<unsigned char>(ch));
         }
     }
 
-    template void StrToLower(std::string *);
+    template void str_to_lower(std::string *);
 
-    template void StrToLower(turbo::inlined_string *);
+    template void str_to_lower(turbo::inlined_string *);
 
-    template void StrToUpper(std::string *);
+    template void str_to_upper(std::string *);
 
-    template void StrToUpper(turbo::inlined_string *);
+    template void str_to_upper(turbo::inlined_string *);
 
     TURBO_NAMESPACE_END
 }  // namespace turbo

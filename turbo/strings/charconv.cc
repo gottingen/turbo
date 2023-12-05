@@ -676,7 +676,7 @@ bool EiselLemire(const strings_internal::ParsedFloat& input, bool negative,
     return true;
   } else if (exp10 >= FloatTraits<FloatType>::kEiselLemireMaxExclusiveExp10) {
     // Return max (a finite value) consistent with from_chars and DR 3081. For
-    // SimpleAtod and SimpleAtof, post-processing will return infinity.
+    // simple_atod and simple_atof, post-processing will return infinity.
     *value = negative ? -std::numeric_limits<FloatType>::max()
                       : std::numeric_limits<FloatType>::max();
     *ec = std::errc::result_out_of_range;

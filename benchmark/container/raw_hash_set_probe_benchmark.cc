@@ -507,18 +507,18 @@ int main(int argc, char** argv) {
     std::string_view arg = argv[i];
     const auto next = [&] { return argv[std::min(i + 1, argc - 1)]; };
 
-    if (turbo::ConsumePrefix(&arg, "--benchmark_filter")) {
+    if (turbo::consume_prefix(&arg, "--benchmark_filter")) {
       if (arg == "") {
         // --benchmark_filter X
         benchmarks = next();
-      } else if (turbo::ConsumePrefix(&arg, "=")) {
+      } else if (turbo::consume_prefix(&arg, "=")) {
         // --benchmark_filter=X
         benchmarks = arg;
       }
     }
 
     // Any --benchmark flag turns on the mode.
-    if (turbo::ConsumePrefix(&arg, "--benchmark")) {
+    if (turbo::consume_prefix(&arg, "--benchmark")) {
       if (benchmarks.empty()) benchmarks="all";
     }
   }

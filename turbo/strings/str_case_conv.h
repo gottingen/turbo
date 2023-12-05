@@ -21,35 +21,76 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-
-    // Converts the characters in `s` to lowercase, changing the contents of `s`.
+    /**
+     * @ingroup turbo_string_convert
+     * @brief Converts the characters in `s` to lowercase, changing the contents of `s`.
+     *        This function is a no-op if `String` is not a string type.
+     *        Example:
+     *        @code
+     *        std::string s = "Hello World!";
+     *        turbo::str_to_lower(&s);
+     *        assert(s == "hello world!");
+     *        @endcode
+     * @param s The string to convert to lowercase.
+     */
     template<typename String>
     TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
-    StrToLower(String *s);
+    str_to_lower(String *s);
 
 
-    // Creates a lowercase string from a given std::string_view.
-
+    /**
+     * @ingroup turbo_string_convert
+     * @brief Creates a lowercase string from a given std::string_view.
+     *        String is a string type.
+     *        Example:
+     *        @code
+     *        std::string s = "Hello World!";
+     *        std::string s1 = turbo::str_to_lower(s);
+     *        assert(s1 == "hello world!");
+     *        @endcode
+     * @param s The string to convert to lowercase.
+     */
     template<typename String = std::string>
     TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-    StrToLower(std::string_view s) {
+    str_to_lower(std::string_view s) {
         String result(s);
-        turbo::StrToLower(&result);
+        turbo::str_to_lower(&result);
         return result;
     }
 
-
-    // Converts the characters in `s` to uppercase, changing the contents of `s`.
+    /**
+     * @ingroup turbo_string_convert
+     * @brief str_to_upper Converts the characters in `s` to uppercase, changing the contents of `s`.
+     *        This function is a no-op if `String` is not a string type.
+     *        Example:
+     *        @code
+     *        std::string s = "Hello World!";
+     *        turbo::str_to_upper(&s);
+     *        assert(s == "HELLO WORLD!");
+     *        @endcode
+     * @param s The string to convert to uppercase.
+     */
     template<typename String>
     TURBO_MUST_USE_RESULT typename std::enable_if<turbo::is_string_type<String>::value>::type
-    StrToUpper(String *s);
+    str_to_upper(String *s);
 
-    // Creates an uppercase string from a given std::string_view.
+    /**
+     * @ingroup turbo_string_convert
+     * @brief Creates an uppercase string from a given std::string_view.
+     *        String is a string type.
+     *        Example:
+     *        @code
+     *        std::string s = "Hello World!";
+     *        std::string s1 = turbo::str_to_upper(s);
+     *        assert(s1 == "HELLO WORLD!");
+     *        @endcode
+     * @param s The string to convert to uppercase.
+     */
     template<typename String = std::string>
     TURBO_MUST_USE_RESULT inline typename std::enable_if<turbo::is_string_type<String>::value, String>::type
-    StrToUpper(std::string_view s) {
+    str_to_upper(std::string_view s) {
         String result(s);
-        turbo::StrToUpper(&result);
+        turbo::str_to_upper(&result);
         return result;
     }
 

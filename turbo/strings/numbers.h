@@ -51,7 +51,7 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-    // SimpleAtoi()
+    // simple_atoi()
     //
     // Converts the given string (optionally followed or preceded by ASCII
     // whitespace) into an integer value, returning `true` if successful. The string
@@ -59,60 +59,135 @@ namespace turbo {
     // integer type (optionally preceded by a `+` or `-`). If any errors are
     // encountered, this function returns `false`, leaving `out` in an unspecified
     // state.
+    /**
+     * @ingroup turbo_strings_convert
+     * @brief Converts the given string (optionally followed or preceded by ASCII
+     *        whitespace) into an integer value, returning `true` if successful. The string
+     *        must reflect a base-10 integer whose value falls within the range of the
+     *        integer type (optionally preceded by a `+` or `-`). If any errors are
+     *        encountered, this function returns `false`, leaving `out` in an unspecified
+     *        state.
+     *        Example:
+     *        @code
+     *        int32_t i;
+     *        EXPECT_TRUE(turbo::simple_atoi("123", &i, 10));
+     *        EXPECT_EQ(i, 123);
+     *        EXPECT_TRUE(turbo::simple_atoi("123", &i, 16));
+     *        EXPECT_EQ(i, 291);
+     *        EXPECT_TRUE(turbo::simple_atoi("123", &i, 8));
+     *        EXPECT_EQ(i, 83);
+     *        EXPECT_TRUE(turbo::simple_atoi("123", &i, 0));
+     *        EXPECT_EQ(i, 123);
+     *        EXPECT_TRUE(turbo::simple_atoi("-123", &i, 2));
+     *        EXPECT_EQ(i, -3);
+     *        EXPECT_TRUE(turbo::simple_atoi(" 123", &i, 10));
+     *        EXPECT_EQ(i, 123);
+     *        @endcode
+     * @param str [input] The string to convert.
+     * @param out [output] The converted integer.
+     * @param base [input] The base of the string to convert. default is 10.
+     *             if base is 0, the base is determined by the format in the string.
+     *             if str begins with "0x" or "0X", base is 16, else if str begins with "0", base is 8,
+     *             else if str begins with "0b" or "0B", base is 2, else base is 10.
+     * @return true if the string is converted successfully, false otherwise.
+     */
     template<typename int_type>
-    TURBO_MUST_USE_RESULT bool SimpleAtoi(std::string_view str, int_type *out);
+    TURBO_MUST_USE_RESULT bool simple_atoi(std::string_view str, int_type *out, int base = 10);
 
-    // SimpleAtof()
-    //
-    // Converts the given string (optionally followed or preceded by ASCII
-    // whitespace) into a float, which may be rounded on overflow or underflow,
-    // returning `true` if successful.
-    // See https://en.cppreference.com/w/c/string/byte/strtof for details about the
-    // allowed formats for `str`, except SimpleAtof() is locale-independent and will
-    // always use the "C" locale. If any errors are encountered, this function
-    // returns `false`, leaving `out` in an unspecified state.
-    TURBO_MUST_USE_RESULT bool SimpleAtof(std::string_view str, float *out);
+    /**
+     * @ingroup turbo_strings_convert
+     * @brief Converts the given string (optionally followed or preceded by ASCII
+     *        whitespace) into a float, which may be rounded on overflow or underflow,
+     *        returning `true` if successful.
+     *        See https://en.cppreference.com/w/c/string/byte/strtof for details about the
+     *        allowed formats for `str`, except simple_atof() is locale-independent and will
+     *        always use the "C" locale. If any errors are encountered, this function
+     *        returns `false`, leaving `out` in an unspecified state.
+     *        Example:
+     *        @code
+     *        float f;
+     *        EXPECT_TRUE(turbo::simple_atof("123.456", &f));
+     *        EXPECT_EQ(f, 123.456f);
+     *        @endcode
+     * @param str [input] The string to convert.
+     * @param out [output] The converted float.
+     * @return true if the string is converted successfully, false otherwise.
+     */
+    TURBO_MUST_USE_RESULT bool simple_atof(std::string_view str, float *out);
 
-    // SimpleAtod()
-    //
-    // Converts the given string (optionally followed or preceded by ASCII
-    // whitespace) into a double, which may be rounded on overflow or underflow,
-    // returning `true` if successful.
-    // See https://en.cppreference.com/w/c/string/byte/strtof for details about the
-    // allowed formats for `str`, except SimpleAtod is locale-independent and will
-    // always use the "C" locale. If any errors are encountered, this function
-    // returns `false`, leaving `out` in an unspecified state.
-    TURBO_MUST_USE_RESULT bool SimpleAtod(std::string_view str, double *out);
+    /**
+     * @ingroup turbo_strings_convert
+     * @brief Converts the given string (optionally followed or preceded by ASCII
+     *        whitespace) into a double, which may be rounded on overflow or underflow,
+     *        returning `true` if successful.
+     *        See https://en.cppreference.com/w/c/string/byte/strtof for details about the
+     *        allowed formats for `str`, except simple_atod is locale-independent and will
+     *        always use the "C" locale. If any errors are encountered, this function
+     *        returns `false`, leaving `out` in an unspecified state.
+     *        Example:
+     *        @code
+     *        double d;
+     *        EXPECT_TRUE(turbo::simple_atod("123.456", &d));
+     *        EXPECT_EQ(d, 123.456);
+     *        @endcode
+     * @param str [input] The string to convert.
+     * @param out [output] The converted double.
+     * @return true if the string is converted successfully, false otherwise.
+     */
+    TURBO_MUST_USE_RESULT bool simple_atod(std::string_view str, double *out);
 
-    // SimpleAtob()
-    //
-    // Converts the given string into a boolean, returning `true` if successful.
-    // The following case-insensitive strings are interpreted as boolean `true`:
-    // "true", "t", "yes", "y", "1". The following case-insensitive strings
-    // are interpreted as boolean `false`: "false", "f", "no", "n", "0". If any
-    // errors are encountered, this function returns `false`, leaving `out` in an
-    // unspecified state.
-    TURBO_MUST_USE_RESULT bool SimpleAtob(std::string_view str, bool *out);
+    /**
+     * @ingroup turbo_strings_convert
+     * @brief Converts the given string into a boolean, returning `true` if successful.
+     *        The following case-insensitive strings are interpreted as boolean `true`:
+     *        "true", "t", "yes", "y", "1". The following case-insensitive strings
+     *        are interpreted as boolean `false`: "false", "f", "no", "n", "0". If any
+     *        errors are encountered, this function returns `false`, leaving `out` in an
+     *        unspecified state.
+     *        Example:
+     *        @code
+     *        bool b;
+     *        EXPECT_TRUE(turbo::simple_atob("true", &b));
+     *        EXPECT_EQ(b, true);
+     *        EXPECT_TRUE(turbo::simple_atob("false", &b));
+     *        EXPECT_EQ(b, false);
+     *        @endcode
+     * @param str [input] The string to convert.
+     * @param out [output] The converted boolean.
+     * @return true if the string is converted successfully, false otherwise.
+     */
+    TURBO_MUST_USE_RESULT bool simple_atob(std::string_view str, bool *out);
 
-    // SimpleHexAtoi()
-    //
-    // Converts a hexadecimal string (optionally followed or preceded by ASCII
-    // whitespace) to an integer, returning `true` if successful. Only valid base-16
-    // hexadecimal integers whose value falls within the range of the integer type
-    // (optionally preceded by a `+` or `-`) can be converted. A valid hexadecimal
-    // value may include both upper and lowercase character symbols, and may
-    // optionally include a leading "0x" (or "0X") number prefix, which is ignored
-    // by this function. If any errors are encountered, this function returns
-    // `false`, leaving `out` in an unspecified state.
+    /**
+     * @ingroup turbo_strings_convert
+     * @brief Converts a hexadecimal string (optionally followed or preceded by ASCII
+     *        whitespace) to an integer, returning `true` if successful. Only valid base-16
+     *        hexadecimal integers whose value falls within the range of the integer type
+     *        (optionally preceded by a `+` or `-`) can be converted. A valid hexadecimal
+     *        value may include both upper and lowercase character symbols, and may
+     *        optionally include a leading "0x" (or "0X") number prefix, which is ignored
+     *        by this function. If any errors are encountered, this function returns
+     *        `false`, leaving `out` in an unspecified state.
+     *        Example:
+     *        @code
+     *        int32_t i;
+     *        EXPECT_TRUE(turbo::simple_hex_atoi("123", &i));
+     *        EXPECT_EQ(i, 291);
+     *        @endcode
+     * @param str [input] The string to convert.
+     * @param out [output] The converted integer.
+     * @param base [input] The base of the string to convert. default is 16.
+     * @return true if the string is converted successfully, false otherwise.
+     */
     template<typename int_type>
-    TURBO_MUST_USE_RESULT bool SimpleHexAtoi(std::string_view str, int_type *out);
+    TURBO_MUST_USE_RESULT bool simple_hex_atoi(std::string_view str, int_type *out, int base = 16);
 
-    // Overloads of SimpleHexAtoi() for 128 bit integers.
-    TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(std::string_view str,
-                                                    turbo::int128 *out);
+    // Overloads of simple_hex_atoi() for 128 bit integers.
+    TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(std::string_view str,
+                                                    turbo::int128 *out, int base = 16);
 
-    TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(std::string_view str,
-                                                    turbo::uint128 *out);
+    TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(std::string_view str,
+                                                    turbo::uint128 *out, int base = 16);
 
     TURBO_NAMESPACE_END
 }  // namespace turbo
@@ -141,7 +216,7 @@ namespace turbo {
             memcpy(buf, two_ASCII_digits[i], 2);
         }
 
-        // safe_strto?() functions for implementing SimpleAtoi()
+        // safe_strto?() functions for implementing simple_atoi()
 
         bool safe_strto32_base(std::string_view text, int32_t *value, int base);
 
@@ -206,15 +281,15 @@ namespace turbo {
             }
         }
 
-        // Implementation of SimpleAtoi, generalized to support arbitrary base (used
+        // Implementation of simple_atoi, generalized to support arbitrary base (used
         // with base different from 10 elsewhere in Turbo implementation).
         template<typename int_type>
         TURBO_MUST_USE_RESULT bool safe_strtoi_base(std::string_view s, int_type *out,
                                                     int base) {
             static_assert(sizeof(*out) == 4 || sizeof(*out) == 8,
-                          "SimpleAtoi works only with 32-bit or 64-bit integers.");
+                          "simple_atoi works only with 32-bit or 64-bit integers.");
             static_assert(!std::is_floating_point<int_type>::value,
-                          "Use SimpleAtof or SimpleAtod instead.");
+                          "Use simple_atof or simple_atod instead.");
             bool parsed;
             // TODO(jorg): This signed-ness check is used because it works correctly
             // with enums, and it also serves to check that int_type is not a pointer.
@@ -278,74 +353,33 @@ namespace turbo {
     }  // namespace numbers_internal
 
     template<typename int_type>
-    TURBO_MUST_USE_RESULT bool SimpleAtoi(std::string_view str, int_type *out) {
-        return numbers_internal::safe_strtoi_base(str, out, 10);
+    TURBO_MUST_USE_RESULT bool simple_atoi(std::string_view str, int_type *out, int base) {
+        return numbers_internal::safe_strtoi_base(str, out, base);
     }
 
-    TURBO_MUST_USE_RESULT inline bool SimpleAtoi(std::string_view str,
-                                                 turbo::int128 *out) {
-        return numbers_internal::safe_strto128_base(str, out, 10);
+    TURBO_MUST_USE_RESULT inline bool simple_atoi(std::string_view str,
+                                                 turbo::int128 *out, int base = 10) {
+        return numbers_internal::safe_strto128_base(str, out, base);
     }
 
-    TURBO_MUST_USE_RESULT inline bool SimpleAtoi(std::string_view str,
-                                                 turbo::uint128 *out) {
-        return numbers_internal::safe_strtou128_base(str, out, 10);
-    }
-
-    template<typename int_type>
-    TURBO_MUST_USE_RESULT bool SimpleHexAtoi(std::string_view str, int_type *out) {
-        return numbers_internal::safe_strtoi_base(str, out, 16);
-    }
-
-    TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(std::string_view str,
-                                                    turbo::int128 *out) {
-        return numbers_internal::safe_strto128_base(str, out, 16);
-    }
-
-    TURBO_MUST_USE_RESULT inline bool SimpleHexAtoi(std::string_view str,
-                                                    turbo::uint128 *out) {
-        return numbers_internal::safe_strtou128_base(str, out, 16);
+    TURBO_MUST_USE_RESULT inline bool simple_atoi(std::string_view str,
+                                                 turbo::uint128 *out, int base = 10) {
+        return numbers_internal::safe_strtou128_base(str, out, base);
     }
 
     template<typename int_type>
-    TURBO_MUST_USE_RESULT ResultStatus<int_type> Atoi(std::string_view str, int base = 10) {
-        int_type out;
-        if(numbers_internal::safe_strtoi_base(str, &out, base)) {
-            return out;
-        }
-        return turbo::UnavailableError("");
+    TURBO_MUST_USE_RESULT bool simple_hex_atoi(std::string_view str, int_type *out, int base) {
+        return numbers_internal::safe_strtoi_base(str, out, base);
     }
 
-    TURBO_MUST_USE_RESULT inline ResultStatus<turbo::int128> Atoi(std::string_view str, int base = 10) {
-        turbo::int128 out;
-        if(numbers_internal::safe_strto128_base(str, &out, base)) {
-            return out;
-        }
-        return turbo::UnavailableError("");
+    TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(std::string_view str,
+                                                    turbo::int128 *out, int base) {
+        return numbers_internal::safe_strto128_base(str, out, base);
     }
 
-    TURBO_MUST_USE_RESULT inline ResultStatus<float> Atof(std::string_view str) {
-        float out;
-        if(SimpleAtof(str, &out)) {
-            return out;
-        }
-        return turbo::UnavailableError("");
-    }
-
-    TURBO_MUST_USE_RESULT inline ResultStatus<double> Atod(std::string_view str) {
-        double out;
-        if(SimpleAtod(str, &out)) {
-            return out;
-        }
-        return turbo::UnavailableError("");
-    }
-
-    TURBO_MUST_USE_RESULT inline ResultStatus<bool> Atob(std::string_view str) {
-        bool out;
-        if(SimpleAtob(str, &out)) {
-            return out;
-        }
-        return turbo::UnavailableError("");
+    TURBO_MUST_USE_RESULT inline bool simple_hex_atoi(std::string_view str,
+                                                    turbo::uint128 *out, int base) {
+        return numbers_internal::safe_strtou128_base(str, out, base);
     }
 
     TURBO_NAMESPACE_END

@@ -23,8 +23,8 @@ namespace turbo {
 
     template<typename String>
     typename std::enable_if<turbo::is_string_type<String>::value>::type
-    TrimAll(String *str) {
-        auto stripped = Trim(*str);
+    trim_complete(String *str) {
+        auto stripped = trim_all(*str);
 
         if (stripped.empty()) {
             str->clear();
@@ -52,9 +52,9 @@ namespace turbo {
         str->erase(static_cast<size_t>(output_it - &(*str)[0]));
     }
 
-    template void TrimAll(std::string *str);
+    template void trim_complete(std::string *str);
 
-    template void TrimAll(turbo::inlined_string *str);
+    template void trim_complete(turbo::inlined_string *str);
 
     TURBO_NAMESPACE_END
 }  // namespace turbo

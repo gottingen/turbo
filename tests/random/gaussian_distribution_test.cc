@@ -379,7 +379,7 @@ std::vector<Param> GenParams() {
 std::string ParamName(const ::testing::TestParamInfo<Param>& info) {
   const auto& p = info.param;
   std::string name = turbo::Format("mean_{:.6g}__stddev_{:.6g}",p.mean, p.stddev);
-  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, GaussianDistributionTests,

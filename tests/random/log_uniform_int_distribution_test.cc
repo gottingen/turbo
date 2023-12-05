@@ -243,7 +243,7 @@ namespace {
         const auto &p = info.param;
         std::string name =
                 turbo::Format("min_{}__max_{}__base_{}", p.min(), p.max(), p.base());
-        return turbo::StrReplaceAll(name, {{"+", "_"},
+        return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},
                                            {".", "_"}});
     }

@@ -25,11 +25,11 @@
 // Examples:
 //   std::string s = "foo";
 //   std::string_view sv = "f";
-//   assert(turbo::StrContains(s, sv));
+//   assert(turbo::str_contains(s, sv));
 //
 // Note: The order of parameters in these functions is designed to mimic the
 // order an equivalent member function would exhibit;
-// e.g. `s.Contains(x)` ==> `turbo::StrContains(s, x).
+// e.g. `s.Contains(x)` ==> `turbo::str_contains(s, x).
 #ifndef TURBO_STRINGS_MATCH_H_
 #define TURBO_STRINGS_MATCH_H_
 
@@ -40,40 +40,78 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-    // StrContains()
-    //
-    // Returns whether a given string `haystack` contains the substring `needle`.
-    inline bool StrContains(std::string_view haystack,
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether a given string `haystack` contains the substring `needle`.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::str_contains(input, "b"));
+     *        @endcode
+     * @param haystack The string to search in.
+     * @param needle The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    [[nodiscard]] inline bool str_contains(std::string_view haystack,
                             std::string_view needle) noexcept {
 
         return haystack.find(needle, 0) != haystack.npos;
     }
 
-    inline bool StrContains(std::string_view haystack, char needle) noexcept {
+    [[nodiscard]] inline bool str_contains(std::string_view haystack, char needle) noexcept {
         return haystack.find(needle) != haystack.npos;
     }
-    // StrIgnoreContains()
-    //
-    // Returns whether a given string `haystack` contains the substring `needle` ignore case.
-    bool StrIgnoreCaseContains(std::string_view haystack,
+
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether a given string `haystack` contains the substring `needle` ignore case.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::str_ignore_case_contains(input, "B"));
+     *        @endcode
+     * @param haystack The string to search in.
+     * @param needle The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    [[nodiscard]] bool str_ignore_case_contains(std::string_view haystack,
                             std::string_view needle) noexcept;
 
-    bool StrIgnoreCaseContains(std::string_view haystack, char needle) noexcept;
+    [[nodiscard]] bool str_ignore_case_contains(std::string_view haystack, char needle) noexcept;
 
-    // StartsWith()
-    //
-    // Returns whether a given string `text` begins with `prefix`.
-    inline bool StartsWith(std::string_view text,
+
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether a given string `text` begins with `prefix`.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::starts_with(input, "a"));
+     *        @endcode
+     * @param text The string to search in.
+     * @param prefix The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    inline bool starts_with(std::string_view text,
                            std::string_view prefix) noexcept {
         return prefix.empty() ||
                (text.size() >= prefix.size() &&
                 memcmp(text.data(), prefix.data(), prefix.size()) == 0);
     }
 
-    // EndsWith()
-    //
-    // Returns whether a given string `text` ends with `suffix`.
-    inline bool EndsWith(std::string_view text,
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether a given string `text` ends with `suffix`.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::ends_with(input, "c"));
+     *        @endcode
+     * @param text The string to search in.
+     * @param suffix The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    inline bool ends_with(std::string_view text,
                          std::string_view suffix) noexcept {
         return suffix.empty() ||
                (text.size() >= suffix.size() &&
@@ -81,25 +119,53 @@ namespace turbo {
                        suffix.size()) == 0);
     }
 
-    // EqualsIgnoreCase()
-    //
-    // Returns whether given ASCII strings `piece1` and `piece2` are equal, ignoring
-    // case in the comparison.
-    bool EqualsIgnoreCase(std::string_view piece1,
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether given ASCII strings `piece1` and `piece2` are equal, ignoring
+     *        case in the comparison.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::str_equals_ignore_case(input, "ABC"));
+     *        @endcode
+     * @param piece1 The first string to compare.
+     * @param piece2 The second string to compare.
+     * @return true if the strings are equal, false otherwise.
+     */
+    [[nodiscard]]
+    bool str_equals_ignore_case(std::string_view piece1,
                           std::string_view piece2) noexcept;
 
-    // StartsWithIgnoreCase()
-    //
-    // Returns whether a given ASCII string `text` starts with `prefix`,
-    // ignoring case in the comparison.
-    bool StartsWithIgnoreCase(std::string_view text,
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether a given ASCII string `text` starts with `prefix`,
+     *        ignoring case in the comparison.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::starts_with_ignore_case(input, "A"));
+     *        @endcode
+     * @param text The string to search in.
+     * @param prefix The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    bool starts_with_ignore_case(std::string_view text,
                               std::string_view prefix) noexcept;
 
-    // EndsWithIgnoreCase()
-    //
-    // Returns whether a given ASCII string `text` ends with `suffix`, ignoring
-    // case in the comparison.
-    bool EndsWithIgnoreCase(std::string_view text,
+    /**
+     * @ingroup turbo_strings_match
+     * @brief Returns whether a given ASCII string `text` ends with `suffix`, ignoring
+     *        case in the comparison.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::ends_with_ignore_case(input, "C"));
+     *        @endcode
+     * @param text The string to search in.
+     * @param suffix The substring to search for.
+     * @return true if the substring is found, false otherwise.
+     */
+    bool ends_with_ignore_case(std::string_view text,
                             std::string_view suffix) noexcept;
 
     TURBO_NAMESPACE_END

@@ -5,6 +5,14 @@
 #ifndef TURBO_STRINGS_UTILITY_H_
 #define TURBO_STRINGS_UTILITY_H_
 
+/**
+ * @defgroup turbo_strings_ascii ASCII utilities
+ * @defgroup turbo_strings_convert String conversion utilities
+ * @defgroup turbo_strings_trim String trimming utilities
+ * @defgroup turbo_strings_match String matching utilities
+ * @defgroup turbo_strings_split String matching utilities
+ */
+
 #include "turbo/strings/str_case_conv.h"
 #include "turbo/strings/str_replace.h"
 #include "turbo/strings/str_split.h"

@@ -30,91 +30,91 @@ namespace {
 
 TEST_CASE("Strip, ConsumePrefixOneChar") {
   std::string_view input("abc");
-  CHECK(turbo::ConsumePrefix(&input, "a"));
+  CHECK(turbo::consume_prefix(&input, "a"));
   CHECK_EQ(input, "bc");
 
-  CHECK_FALSE(turbo::ConsumePrefix(&input, "x"));
+  CHECK_FALSE(turbo::consume_prefix(&input, "x"));
   CHECK_EQ(input, "bc");
 
-  CHECK(turbo::ConsumePrefix(&input, "b"));
+  CHECK(turbo::consume_prefix(&input, "b"));
   CHECK_EQ(input, "c");
 
-  CHECK(turbo::ConsumePrefix(&input, "c"));
+  CHECK(turbo::consume_prefix(&input, "c"));
   CHECK_EQ(input, "");
 
-  CHECK_FALSE(turbo::ConsumePrefix(&input, "a"));
+  CHECK_FALSE(turbo::consume_prefix(&input, "a"));
   CHECK_EQ(input, "");
 }
 
-TEST_CASE("Strip, ConsumePrefix") {
+TEST_CASE("Strip, consume_prefix") {
   std::string_view input("abcdef");
-  CHECK_FALSE(turbo::ConsumePrefix(&input, "abcdefg"));
+  CHECK_FALSE(turbo::consume_prefix(&input, "abcdefg"));
   CHECK_EQ(input, "abcdef");
 
-  CHECK_FALSE(turbo::ConsumePrefix(&input, "abce"));
+  CHECK_FALSE(turbo::consume_prefix(&input, "abce"));
   CHECK_EQ(input, "abcdef");
 
-  CHECK(turbo::ConsumePrefix(&input, ""));
+  CHECK(turbo::consume_prefix(&input, ""));
   CHECK_EQ(input, "abcdef");
 
-  CHECK_FALSE(turbo::ConsumePrefix(&input, "abcdeg"));
+  CHECK_FALSE(turbo::consume_prefix(&input, "abcdeg"));
   CHECK_EQ(input, "abcdef");
 
-  CHECK(turbo::ConsumePrefix(&input, "abcdef"));
+  CHECK(turbo::consume_prefix(&input, "abcdef"));
   CHECK_EQ(input, "");
 
   input = "abcdef";
-  CHECK(turbo::ConsumePrefix(&input, "abcde"));
+  CHECK(turbo::consume_prefix(&input, "abcde"));
   CHECK_EQ(input, "f");
 }
 
-TEST_CASE("Strip, ConsumeSuffix") {
+TEST_CASE("Strip, consume_suffix") {
   std::string_view input("abcdef");
-  CHECK_FALSE(turbo::ConsumeSuffix(&input, "abcdefg"));
+  CHECK_FALSE(turbo::consume_suffix(&input, "abcdefg"));
   CHECK_EQ(input, "abcdef");
 
-  CHECK(turbo::ConsumeSuffix(&input, ""));
+  CHECK(turbo::consume_suffix(&input, ""));
   CHECK_EQ(input, "abcdef");
 
-  CHECK(turbo::ConsumeSuffix(&input, "def"));
+  CHECK(turbo::consume_suffix(&input, "def"));
   CHECK_EQ(input, "abc");
 
   input = "abcdef";
-  CHECK_FALSE(turbo::ConsumeSuffix(&input, "abcdeg"));
+  CHECK_FALSE(turbo::consume_suffix(&input, "abcdeg"));
   CHECK_EQ(input, "abcdef");
 
-  CHECK(turbo::ConsumeSuffix(&input, "f"));
+  CHECK(turbo::consume_suffix(&input, "f"));
   CHECK_EQ(input, "abcde");
 
-  CHECK(turbo::ConsumeSuffix(&input, "abcde"));
+  CHECK(turbo::consume_suffix(&input, "abcde"));
   CHECK_EQ(input, "");
 }
 
-TEST_CASE("Strip, StripPrefix") {
+TEST_CASE("Strip, strip_prefix") {
   const std::string_view null_str;
 
-  CHECK_EQ(turbo::StripPrefix("foobar", "foo"), "bar");
-  CHECK_EQ(turbo::StripPrefix("foobar", ""), "foobar");
-  CHECK_EQ(turbo::StripPrefix("foobar", null_str), "foobar");
-  CHECK_EQ(turbo::StripPrefix("foobar", "foobar"), "");
-  CHECK_EQ(turbo::StripPrefix("foobar", "bar"), "foobar");
-  CHECK_EQ(turbo::StripPrefix("foobar", "foobarr"), "foobar");
-  CHECK_EQ(turbo::StripPrefix("", ""), "");
+  CHECK_EQ(turbo::strip_prefix("foobar", "foo"), "bar");
+  CHECK_EQ(turbo::strip_prefix("foobar", ""), "foobar");
+  CHECK_EQ(turbo::strip_prefix("foobar", null_str), "foobar");
+  CHECK_EQ(turbo::strip_prefix("foobar", "foobar"), "");
+  CHECK_EQ(turbo::strip_prefix("foobar", "bar"), "foobar");
+  CHECK_EQ(turbo::strip_prefix("foobar", "foobarr"), "foobar");
+  CHECK_EQ(turbo::strip_prefix("", ""), "");
 }
 
-TEST_CASE("Strip, StripSuffix") {
+TEST_CASE("Strip, strip_suffix") {
   const std::string_view null_str;
 
-  CHECK_EQ(turbo::StripSuffix("foobar", "bar"), "foo");
-  CHECK_EQ(turbo::StripSuffix("foobar", ""), "foobar");
-  CHECK_EQ(turbo::StripSuffix("foobar", null_str), "foobar");
-  CHECK_EQ(turbo::StripSuffix("foobar", "foobar"), "");
-  CHECK_EQ(turbo::StripSuffix("foobar", "foo"), "foobar");
-  CHECK_EQ(turbo::StripSuffix("foobar", "ffoobar"), "foobar");
-  CHECK_EQ(turbo::StripSuffix("", ""), "");
+  CHECK_EQ(turbo::strip_suffix("foobar", "bar"), "foo");
+  CHECK_EQ(turbo::strip_suffix("foobar", ""), "foobar");
+  CHECK_EQ(turbo::strip_suffix("foobar", null_str), "foobar");
+  CHECK_EQ(turbo::strip_suffix("foobar", "foobar"), "");
+  CHECK_EQ(turbo::strip_suffix("foobar", "foo"), "foobar");
+  CHECK_EQ(turbo::strip_suffix("foobar", "ffoobar"), "foobar");
+  CHECK_EQ(turbo::strip_suffix("", ""), "");
 }
 
-TEST_CASE("Strip, TrimAll") {
+TEST_CASE("Strip, trim_complete") {
   const char* inputs[] = {
       "No extra space",
       "  Leading whitespace",
@@ -137,62 +137,62 @@ TEST_CASE("Strip, TrimAll") {
 
   for (int i = 0; i < NUM_TESTS; i++) {
     std::string s(inputs[i]);
-    turbo::TrimAll(&s);
+    turbo::trim_complete(&s);
     CHECK_EQ(std::string_view(outputs[i]), s);
   }
 
-  // Test that turbo::TrimAll returns immediately for empty
+  // Test that turbo::trim_complete returns immediately for empty
   // strings (It was adding the \0 character to the C++ std::string, which broke
   // tests involving empty())
   std::string zero_string = "";
   assert(zero_string.empty());
-  turbo::TrimAll(&zero_string);
+  turbo::trim_complete(&zero_string);
   CHECK_EQ(zero_string.size(), 0);
   CHECK(zero_string.empty());
 }
 
-TEST_CASE("Strip, TrimRight") {
+TEST_CASE("Strip, trim_right") {
   std::string test = "foo  ";
-  turbo::TrimRight(&test);
+  turbo::trim_right(&test);
   CHECK_EQ(test, "foo");
 
   test = "   ";
-  turbo::TrimRight(&test);
+  turbo::trim_right(&test);
   CHECK_EQ(test, "");
 
   test = "";
-  turbo::TrimRight(&test);
+  turbo::trim_right(&test);
   CHECK_EQ(test, "");
 
   test = " abc\t";
-  turbo::TrimRight(&test);
+  turbo::trim_right(&test);
   CHECK_EQ(test, " abc");
 }
 
-TEST_CASE("String, TrimLeft") {
+TEST_CASE("String, trim_left") {
   std::string_view orig = "\t  \n\f\r\n\vfoo";
-  CHECK_EQ("foo", turbo::TrimLeft(orig));
+  CHECK_EQ("foo", turbo::trim_left(orig));
   orig = "\t  \n\f\r\v\n\t  \n\f\r\v\n";
-  CHECK_EQ(std::string_view(), turbo::TrimLeft(orig));
+  CHECK_EQ(std::string_view(), turbo::trim_left(orig));
 }
 
-TEST_CASE("Strip, Trim") {
+TEST_CASE("Strip, trim_all") {
   std::string test2 = "\t  \f\r\n\vfoo \t\f\r\v\n";
-  turbo::Trim(&test2);
+  turbo::trim_all(&test2);
   CHECK_EQ(test2, "foo");
   std::string test3 = "bar";
-  turbo::Trim(&test3);
+  turbo::trim_all(&test3);
   CHECK_EQ(test3, "bar");
   std::string test4 = "\t  \f\r\n\vfoo";
-  turbo::Trim(&test4);
+  turbo::trim_all(&test4);
   CHECK_EQ(test4, "foo");
   std::string test5 = "foo \t\f\r\v\n";
-  turbo::Trim(&test5);
+  turbo::trim_all(&test5);
   CHECK_EQ(test5, "foo");
   std::string_view test6("\t  \f\r\n\vfoo \t\f\r\v\n");
-  test6 = turbo::Trim(test6);
+  test6 = turbo::trim_all(test6);
   CHECK_EQ(test6, "foo");
-  test6 = turbo::Trim(test6);
+  test6 = turbo::trim_all(test6);
   CHECK_EQ(test6, "foo");  // already stripped
 }
 

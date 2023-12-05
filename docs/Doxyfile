@@ -13,7 +13,17 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/files/random_write_file.h \
                     ../turbo/files/sequential_read_file.h \
                     ../turbo/files/sequential_write_file.h \
-                    ../turbo/files/utility.h
+                    ../turbo/files/utility.h               \
+                    ../turbo/strings/ascii.h \
+                    ../turbo/strings/escaping.h \
+                    ../turbo/strings/str_strip.h \
+                    ../turbo/strings/str_trim.h \
+                    ../turbo/strings/match.h     \
+                    ../turbo/strings/numbers.h    \
+                    ../turbo/strings/charconv.h   \
+                    ../turbo/strings/str_case_conv.h \
+                    ../turbo/strings/str_split.h    \
+                    ../turbo/strings/str_replace.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

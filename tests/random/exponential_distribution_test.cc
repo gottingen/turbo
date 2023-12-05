@@ -343,7 +343,7 @@ namespace {
     std::string ParamName(const ::testing::TestParamInfo<Param> &info) {
         const auto &p = info.param;
         std::string name = turbo::Format("lambda_{:.6f}", p.lambda);
-        return turbo::StrReplaceAll(name, {{"+", "_"},
+        return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},
                                            {".", "_"}});
     }

@@ -339,7 +339,7 @@ std::vector<ZParam> GetZParams() {
 std::string ZParamName(const ::testing::TestParamInfo<ZParam>& info) {
   const auto& p = info.param;
   std::string name = turbo::Format("mean_{:.6g}", p.mean);
-  return turbo::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, PoissonDistributionZTest,

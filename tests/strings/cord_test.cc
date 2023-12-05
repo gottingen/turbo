@@ -2961,7 +2961,7 @@ TEST_P(CordTest, expected_checksum) {
             bool first_pass = true;
             for (std::string_view chunk: cc3.chunks()) {
                 if (first_pass) {
-                    EXPECT_TRUE(turbo::StartsWith(chunk, "abcde"));
+                    EXPECT_TRUE(turbo::starts_with(chunk, "abcde"));
                 }
                 first_pass = false;
             }
@@ -2972,7 +2972,7 @@ TEST_P(CordTest, expected_checksum) {
                 }
                 first_pass = false;
             }
-            EXPECT_TRUE(turbo::StartsWith(*cc3.chunk_begin(), "abcde"));
+            EXPECT_TRUE(turbo::starts_with(*cc3.chunk_begin(), "abcde"));
             EXPECT_EQ(*cc3.char_begin(), 'a');
 
             auto char_it = cc3.char_begin();
@@ -2981,7 +2981,7 @@ TEST_P(CordTest, expected_checksum) {
             EXPECT_EQ(*char_it, 'e');
             char_it = cc3.char_begin();
             turbo::Cord::advance(&char_it, 2);
-            EXPECT_TRUE(turbo::StartsWith(turbo::Cord::chunk_remaining(char_it), "cde"));
+            EXPECT_TRUE(turbo::starts_with(turbo::Cord::chunk_remaining(char_it), "cde"));
 
             EXPECT_EQ(cc3[0], 'a');
             EXPECT_EQ(cc3[4], 'e');

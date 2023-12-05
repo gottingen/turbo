@@ -343,7 +343,7 @@ namespace {
             const ::testing::TestParamInfo<zipf_u64::param_type> &info) {
         const auto &p = info.param;
         std::string name = turbo::Format("k_{}__q_{:.6g}__v_{:.6g}", p.k(), p.q(),p.v());
-        return turbo::StrReplaceAll(name, {{"+", "_"},
+        return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},
                                            {".", "_"}});
     }

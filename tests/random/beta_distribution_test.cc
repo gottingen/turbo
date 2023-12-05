@@ -439,7 +439,7 @@ namespace {
             const ::testing::TestParamInfo<::testing::tuple<double, double>> &info) {
         std::string name = turbo::Format("alpha_{}__beta_{}", ::testing::get<0>(info.param),
                                          ::testing::get<1>(info.param));
-        return turbo::StrReplaceAll(name, {{"+", "_"},
+        return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},
                                            {".", "_"}});
     }

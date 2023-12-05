@@ -43,10 +43,10 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-    bool SimpleAtof(std::string_view str, float *out) {
+    bool simple_atof(std::string_view str, float *out) {
         *out = 0.0;
-        str = Trim(str);
-        // std::from_chars doesn't accept an initial +, but SimpleAtof does, so if one
+        str = trim_all(str);
+        // std::from_chars doesn't accept an initial +, but simple_atof does, so if one
         // is present, skip it, while avoiding accepting "+-0" as valid.
         if (!str.empty() && str[0] == '+') {
             str.remove_prefix(1);
@@ -63,7 +63,7 @@ namespace turbo {
             return false;
         }
         // from_chars() with DR 3081's current wording will return max() on
-        // overflow.  SimpleAtof returns infinity instead.
+        // overflow.  simple_atof returns infinity instead.
         if (result.ec == std::errc::result_out_of_range) {
             if (*out > 1.0) {
                 *out = std::numeric_limits<float>::infinity();
@@ -74,10 +74,10 @@ namespace turbo {
         return true;
     }
 
-    bool SimpleAtod(std::string_view str, double *out) {
+    bool simple_atod(std::string_view str, double *out) {
         *out = 0.0;
-        str = Trim(str);
-        // std::from_chars doesn't accept an initial +, but SimpleAtod does, so if one
+        str = trim_all(str);
+        // std::from_chars doesn't accept an initial +, but simple_atod does, so if one
         // is present, skip it, while avoiding accepting "+-0" as valid.
         if (!str.empty() && str[0] == '+') {
             str.remove_prefix(1);
@@ -94,7 +94,7 @@ namespace turbo {
             return false;
         }
         // from_chars() with DR 3081's current wording will return max() on
-        // overflow.  SimpleAtod returns infinity instead.
+        // overflow.  simple_atod returns infinity instead.
         if (result.ec == std::errc::result_out_of_range) {
             if (*out > 1.0) {
                 *out = std::numeric_limits<double>::infinity();
@@ -105,17 +105,17 @@ namespace turbo {
         return true;
     }
 
-    bool SimpleAtob(std::string_view str, bool *out) {
+    bool simple_atob(std::string_view str, bool *out) {
         TURBO_RAW_CHECK(out != nullptr, "Output pointer must not be nullptr.");
-        if (EqualsIgnoreCase(str, "true") || EqualsIgnoreCase(str, "t") ||
-            EqualsIgnoreCase(str, "yes") || EqualsIgnoreCase(str, "y") ||
-            EqualsIgnoreCase(str, "1")) {
+        if (str_equals_ignore_case(str, "true") || str_equals_ignore_case(str, "t") ||
+            str_equals_ignore_case(str, "yes") || str_equals_ignore_case(str, "y") ||
+            str_equals_ignore_case(str, "1")) {
             *out = true;
             return true;
         }
-        if (EqualsIgnoreCase(str, "false") || EqualsIgnoreCase(str, "f") ||
-            EqualsIgnoreCase(str, "no") || EqualsIgnoreCase(str, "n") ||
-            EqualsIgnoreCase(str, "0")) {
+        if (str_equals_ignore_case(str, "false") || str_equals_ignore_case(str, "f") ||
+            str_equals_ignore_case(str, "no") || str_equals_ignore_case(str, "n") ||
+            str_equals_ignore_case(str, "0")) {
             *out = false;
             return true;
         }
