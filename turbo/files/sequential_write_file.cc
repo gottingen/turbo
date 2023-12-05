@@ -79,19 +79,19 @@ namespace turbo {
                 if (_listener.after_open) {
                     _listener.after_open(_file_path, _fd);
                 }
-                return turbo::OkStatus();
+                return turbo::ok_status();
             }
             if (_option.open_interval > 0) {
                 turbo::SleepFor(turbo::Milliseconds(_option.open_interval));
             }
         }
-        return turbo::ErrnoToStatus(errno, turbo::Format("Failed opening file {} for writing", _file_path.c_str()));
+        return turbo::errno_to_status(errno, turbo::Format("Failed opening file {} for writing", _file_path.c_str()));
     }
 
     turbo::Status SequentialWriteFile::reopen(bool truncate) {
         close();
         if (_file_path.empty()) {
-            return turbo::InvalidArgumentError("file name empty");
+            return turbo::invalid_argument_error("file name empty");
         }
         return open(_file_path, truncate);
     }
@@ -99,14 +99,14 @@ namespace turbo {
     turbo::Status SequentialWriteFile::write(const char *data, size_t size) {
         TURBO_ASSERT(_fd != nullptr);
         if (std::fwrite(data, 1, size, _fd) != size) {
-            return turbo::ErrnoToStatus(errno, turbo::Format("Failed writing to file {}", _file_path.c_str()));
+            return turbo::errno_to_status(errno, turbo::Format("Failed writing to file {}", _file_path.c_str()));
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     turbo::ResultStatus<size_t> SequentialWriteFile::size() const {
         if (_fd == nullptr) {
-            return turbo::InvalidArgumentError("Failed getting file size. fp is null");
+            return turbo::invalid_argument_error("Failed getting file size. fp is null");
         }
         auto rs = Fio::file_size(_fd);
         return rs;
@@ -129,26 +129,26 @@ namespace turbo {
 
     turbo::Status SequentialWriteFile::truncate(size_t size) {
         if (_fd == nullptr) {
-            return turbo::InvalidArgumentError("Failed getting file size. fp is null");
+            return turbo::invalid_argument_error("Failed getting file size. fp is null");
         }
         auto fd = ::fileno(_fd);
         if (::ftruncate(fd, static_cast<off_t>(size)) != 0) {
-            return turbo::ErrnoToStatus(errno, turbo::Format("Failed truncate file {} for size:{} ", _file_path.c_str(),
+            return turbo::errno_to_status(errno, turbo::Format("Failed truncate file {} for size:{} ", _file_path.c_str(),
                                                              static_cast<off_t>(size)));
         }
         if(std::fseek(_fd, static_cast<off_t>(size), SEEK_SET) != 0) {
-            return turbo::ErrnoToStatus(errno, turbo::Format("Failed seek file end {} for size:{} ", _file_path.c_str(),
+            return turbo::errno_to_status(errno, turbo::Format("Failed seek file end {} for size:{} ", _file_path.c_str(),
                                                              static_cast<off_t>(size)));
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     turbo::Status SequentialWriteFile::flush() {
         if (std::fflush(_fd) != 0) {
-            return turbo::ErrnoToStatus(errno,
+            return turbo::errno_to_status(errno,
                                         turbo::Format("Failed flush to file {}", _file_path.c_str()));
         }
-        return turbo::OkStatus();
+        return turbo::ok_status();
     }
 
     const turbo::filesystem::path &SequentialWriteFile::file_path() const {

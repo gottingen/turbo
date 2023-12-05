@@ -3,9 +3,11 @@
 .. _turbo_base_module:
 
 
-turbo base module
+base module
 =========================
 
-.. doxygengroup:: turbo_base
-   :project: turbo-docs
-   :members:
+.. toctree::
+
+    base_endian
+    base_utility
+    base_status

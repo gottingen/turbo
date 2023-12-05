@@ -30,7 +30,7 @@ namespace turbo::tlog {
             file_writer_.set_option(turbo::tlog::kLogFileOption);
             auto r = file_writer_.open(filename, truncate);
             if (!r.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
         }
 
@@ -45,7 +45,7 @@ namespace turbo::tlog {
             base_sink<Mutex>::formatter_->format(msg, formatted);
             auto r = file_writer_.write(formatted);
             if (!r.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
         }
 
@@ -53,7 +53,7 @@ namespace turbo::tlog {
         void basic_file_sink<Mutex>::flush_() {
             auto r = file_writer_.flush();
             if (!r.ok()) {
-                throw_tlog_ex(r.ToString());
+                throw_tlog_ex(r.to_string());
             }
         }
 

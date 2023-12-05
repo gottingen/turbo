@@ -69,10 +69,10 @@ turbo::Status MyFunction(absl::string_view filename, ...) {
   ...
   // encounter error
   if (error condition) {
-    return turbo::InvalidArgumentError("bad mode");
+    return turbo::invalid_argument_error("bad mode");
   }
   // else, return OK
-  return absl::OkStatus();
+  return absl::ok_status();
 }
 ```
 

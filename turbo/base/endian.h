@@ -24,6 +24,12 @@
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/port.h"
 
+
+/**
+* @defgroup turbo_base_endian base functions
+*
+*/
+
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
@@ -71,14 +77,14 @@ namespace turbo {
 #if TURBO_IS_LITTLE_ENDIAN
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Determine if the current host is little-endian.
-     * @return True if the host is little-endian, false otherwise
      */
+
     static constexpr bool kIsLittleEndian = true;
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 16-bit quantity from host byte order to network byte order.
      * @param x The value to convert
      * @return The converted value
@@ -86,7 +92,7 @@ namespace turbo {
     inline uint16_t ghtons(uint16_t x) { return gbswap_16(x); }
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 32-bit quantity from host byte order to network byte order.
      * @param x The value to convert
      * @return The converted value
@@ -94,7 +100,7 @@ namespace turbo {
     inline uint32_t ghtonl(uint32_t x) { return gbswap_32(x); }
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 64-bit quantity from host byte order to network byte order.
      * @param x The value to convert
      * @return The converted value
@@ -104,7 +110,7 @@ namespace turbo {
 #elif TURBO_IS_BIG_ENDIAN
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Determine if the current host is little-endian.
      * @return True if the host is little-endian, false otherwise
      */
@@ -113,7 +119,7 @@ namespace turbo {
     // architectures. These definitions are simpler since the host byte order is the
     // same as network byte order.
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 16-bit quantity from host byte order to network byte order.
      * @param x The value to convert
      * @return The converted value
@@ -121,7 +127,7 @@ namespace turbo {
     inline uint16_t ghtons(uint16_t x) { return x; }
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 32-bit quantity from host byte order to network byte order.
      * @param x The value to convert
      * @return The converted value
@@ -129,7 +135,7 @@ namespace turbo {
     inline uint32_t ghtonl(uint32_t x) { return x; }
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 64-bit quantity from host byte order to network byte order.
      * @param x The value to convert
      * @return The converted value
@@ -143,7 +149,7 @@ namespace turbo {
 #endif  // byte order
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 16-bit quantity from network byte order to host byte order.
      * @param x The value to convert
      * @return The converted value
@@ -151,7 +157,7 @@ namespace turbo {
     inline uint16_t gntohs(uint16_t x) { return ghtons(x); }
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 32-bit quantity from network byte order to host byte order.
      * @param x The value to convert
      * @return The converted value
@@ -159,7 +165,7 @@ namespace turbo {
     inline uint32_t gntohl(uint32_t x) { return ghtonl(x); }
 
     /**
-     * @ingroup turbo_base
+     * @ingroup turbo_base_endian
      * @brief Convert a 64-bit quantity from network byte order to host byte order.
      * @param x The value to convert
      * @return The converted value
@@ -175,7 +181,7 @@ namespace turbo {
 #if TURBO_IS_LITTLE_ENDIAN
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -183,7 +189,7 @@ namespace turbo {
         inline uint16_t from_host16(uint16_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -191,7 +197,7 @@ namespace turbo {
         inline uint16_t to_host16(uint16_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -199,7 +205,7 @@ namespace turbo {
         inline uint32_t from_host32(uint32_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -207,7 +213,7 @@ namespace turbo {
         inline uint32_t to_host32(uint32_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -215,7 +221,7 @@ namespace turbo {
         inline uint64_t from_host64(uint64_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -223,7 +229,7 @@ namespace turbo {
         inline uint64_t to_host64(uint64_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Determine if the current host is little-endian.
          * @return True if the host is little-endian, false otherwise
          */
@@ -231,7 +237,7 @@ namespace turbo {
 
 #elif TURBO_IS_BIG_ENDIAN
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -239,7 +245,7 @@ namespace turbo {
         inline uint16_t from_host16(uint16_t x) { return gbswap_16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -247,7 +253,7 @@ namespace turbo {
         inline uint16_t to_host16(uint16_t x) { return gbswap_16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -255,7 +261,7 @@ namespace turbo {
         inline uint32_t from_host32(uint32_t x) { return gbswap_32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -263,7 +269,7 @@ namespace turbo {
         inline uint32_t to_host32(uint32_t x) { return gbswap_32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -271,7 +277,7 @@ namespace turbo {
         inline uint64_t from_host64(uint64_t x) { return gbswap_64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -279,7 +285,7 @@ namespace turbo {
         inline uint64_t to_host64(uint64_t x) { return gbswap_64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Determine if the current host is little-endian.
          * @return True if the host is little-endian, false otherwise
          */
@@ -288,7 +294,7 @@ namespace turbo {
 #endif /* ENDIAN */
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -296,7 +302,7 @@ namespace turbo {
         inline uint8_t from_host(uint8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -304,7 +310,7 @@ namespace turbo {
         inline uint16_t from_host(uint16_t x) { return from_host16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -312,7 +318,7 @@ namespace turbo {
         inline uint32_t from_host(uint32_t x) { return from_host32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -320,7 +326,7 @@ namespace turbo {
         inline uint64_t from_host(uint64_t x) { return from_host64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -328,7 +334,7 @@ namespace turbo {
         inline uint8_t to_host(uint8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -336,7 +342,7 @@ namespace turbo {
         inline uint16_t to_host(uint16_t x) { return to_host16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -344,7 +350,7 @@ namespace turbo {
         inline uint32_t to_host(uint32_t x) { return to_host32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -352,7 +358,7 @@ namespace turbo {
         inline uint64_t to_host(uint64_t x) { return to_host64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -360,7 +366,7 @@ namespace turbo {
         inline int8_t from_host(int8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -370,7 +376,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -380,7 +386,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to little-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -390,7 +396,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -398,7 +404,7 @@ namespace turbo {
         inline int8_t to_host(int8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -408,7 +414,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -418,7 +424,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from little-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -428,7 +434,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Load a 16-bit quantity from a byte array even if it's unaligned.
          * @param p The address to load from
          * @return The converted value
@@ -438,7 +444,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Store a 16-bit quantity to a byte array even if it's unaligned.
          * @param p The address to store to
          * @param v The value to store
@@ -448,7 +454,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Load a 32-bit quantity from a byte array even if it's unaligned.
          * @param p The address to load from
          * @return The converted value
@@ -458,7 +464,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Store a 32-bit quantity to a byte array even if it's unaligned.
          * @param p The address to store to
          * @param v The value to store
@@ -468,7 +474,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Load a 64-bit quantity from a byte array even if it's unaligned.
          * @param p The address to load from
          * @return The converted value
@@ -478,7 +484,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Store a 64-bit quantity to a byte array even if it's unaligned.
          * @param p The address to store to
          * @param v The value to store
@@ -497,7 +503,7 @@ namespace turbo {
 #if TURBO_IS_LITTLE_ENDIAN
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -505,7 +511,7 @@ namespace turbo {
         inline uint16_t from_host16(uint16_t x) { return gbswap_16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -513,7 +519,7 @@ namespace turbo {
         inline uint16_t to_host16(uint16_t x) { return gbswap_16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -521,7 +527,7 @@ namespace turbo {
         inline uint32_t from_host32(uint32_t x) { return gbswap_32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -529,7 +535,7 @@ namespace turbo {
         inline uint32_t to_host32(uint32_t x) { return gbswap_32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -537,7 +543,7 @@ namespace turbo {
         inline uint64_t from_host64(uint64_t x) { return gbswap_64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -545,7 +551,7 @@ namespace turbo {
         inline uint64_t to_host64(uint64_t x) { return gbswap_64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Determine if the current host is little-endian.
          * @return True if the host is little-endian, false otherwise
          */
@@ -554,7 +560,7 @@ namespace turbo {
 #elif TURBO_IS_BIG_ENDIAN
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -562,7 +568,7 @@ namespace turbo {
         inline uint16_t from_host16(uint16_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -570,7 +576,7 @@ namespace turbo {
         inline uint16_t to_host16(uint16_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -578,7 +584,7 @@ namespace turbo {
         inline uint32_t from_host32(uint32_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -586,7 +592,7 @@ namespace turbo {
         inline uint32_t to_host32(uint32_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -594,7 +600,7 @@ namespace turbo {
         inline uint64_t from_host64(uint64_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -602,7 +608,7 @@ namespace turbo {
         inline uint64_t to_host64(uint64_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Determine if the current host is little-endian.
          * @return True if the host is little-endian, false otherwise
          */
@@ -611,7 +617,7 @@ namespace turbo {
 #endif /* ENDIAN */
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -619,7 +625,7 @@ namespace turbo {
         inline uint8_t from_host(uint8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -627,7 +633,7 @@ namespace turbo {
         inline uint16_t from_host(uint16_t x) { return from_host16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -635,7 +641,7 @@ namespace turbo {
         inline uint32_t from_host(uint32_t x) { return from_host32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -643,7 +649,7 @@ namespace turbo {
         inline uint64_t from_host(uint64_t x) { return from_host64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -651,7 +657,7 @@ namespace turbo {
         inline uint8_t to_host(uint8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -659,7 +665,7 @@ namespace turbo {
         inline uint16_t to_host(uint16_t x) { return to_host16(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -667,7 +673,7 @@ namespace turbo {
         inline uint32_t to_host(uint32_t x) { return to_host32(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -675,7 +681,7 @@ namespace turbo {
         inline uint64_t to_host(uint64_t x) { return to_host64(x); }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -683,7 +689,7 @@ namespace turbo {
         inline int8_t from_host(int8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -693,7 +699,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -703,7 +709,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from host byte order to big-endian byte order.
          * @param x The value to convert
          * @return The converted value
@@ -713,7 +719,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 8-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -721,7 +727,7 @@ namespace turbo {
         inline int8_t to_host(int8_t x) { return x; }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 16-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -731,7 +737,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 32-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -741,7 +747,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Convert a 64-bit quantity from big-endian byte order to host byte order.
          * @param x The value to convert
          * @return The converted value
@@ -751,7 +757,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Load a 16-bit quantity from a byte array even if it's unaligned.
          * @param p The address to load from
          * @return The converted value
@@ -761,7 +767,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Store a 16-bit quantity to a byte array even if it's unaligned.
          * @param p The address to store to
          * @param v The value to store
@@ -775,7 +781,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Store a 32-bit quantity to a byte array even if it's unaligned.
          * @param p The address to store to
          * @param v The value to store
@@ -785,7 +791,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Load a 64-bit quantity from a byte array even if it's unaligned.
          * @param p The address to load from
          * @return The converted value
@@ -795,7 +801,7 @@ namespace turbo {
         }
 
         /**
-         * @ingroup turbo_base
+         * @ingroup turbo_base_endian
          * @brief Store a 64-bit quantity to a byte array even if it's unaligned.
          * @param p The address to store to
          * @param v The value to store

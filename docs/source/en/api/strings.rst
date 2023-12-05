@@ -3,7 +3,7 @@
 .. _turbo_strings_module:
 
 
-turbo string module
+string module
 =========================
 
 .. toctree::

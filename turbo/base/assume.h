@@ -19,7 +19,7 @@
 #include "turbo/platform/port.h"
 
 /**
-* @defgroup turbo_base meta client operators
+* @defgroup turbo_base base functions
 *
 */
 

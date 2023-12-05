@@ -104,7 +104,7 @@ namespace turbo {
         }
     }  // namespace status_internal
 
-    std::optional<turbo::Cord> Status::GetPayload(
+    std::optional<turbo::Cord> Status::get_payload(
             std::string_view type_url) const {
         const auto *payloads = GetPayloads();
         std::optional<size_t> index =
@@ -115,7 +115,7 @@ namespace turbo {
         return std::nullopt;
     }
 
-    void Status::SetPayload(std::string_view type_url, turbo::Cord payload) {
+    void Status::set_payload(std::string_view type_url, turbo::Cord payload) {
         if (ok()) return;
 
         PrepareToModify();
@@ -135,7 +135,7 @@ namespace turbo {
         rep->payloads->push_back({std::string(type_url), std::move(payload)});
     }
 
-    bool Status::ErasePayload(std::string_view type_url) {
+    bool Status::erase_payload(std::string_view type_url) {
         std::optional<size_t> index =
                 status_internal::FindPayloadIndexByUrl(GetPayloads(), type_url);
         if (index.has_value()) {
@@ -154,7 +154,7 @@ namespace turbo {
         return false;
     }
 
-    void Status::ForEachPayload(
+    void Status::for_each_payload(
             turbo::FunctionRef<void(std::string_view, const turbo::Cord &)> visitor)
     const {
         if (auto *payloads = GetPayloads()) {
@@ -325,7 +325,7 @@ namespace turbo {
         if (with_payload) {
             status_internal::StatusPayloadPrinter printer =
                     status_internal::GetStatusPayloadPrinter();
-            this->ForEachPayload([&](std::string_view type_url,
+            this->for_each_payload([&](std::string_view type_url,
                                      const turbo::Cord &payload) {
                 std::optional<std::string> result;
                 if (printer) result = printer(type_url, payload);
@@ -339,88 +339,88 @@ namespace turbo {
     }
 
     std::ostream &operator<<(std::ostream &os, const Status &x) {
-        os << x.ToString(StatusToStringMode::kWithEverything);
+        os << x.to_string(StatusToStringMode::kWithEverything);
         return os;
     }
 
-    bool IsAborted(const Status &status) {
+    bool is_aborted(const Status &status) {
         return status.code() == turbo::kAborted;
     }
 
-    bool IsAlreadyExists(const Status &status) {
+    bool is_already_exists(const Status &status) {
         return status.code() == turbo::kAlreadyExists;
     }
 
-    bool IsCancelled(const Status &status) {
+    bool is_cancelled(const Status &status) {
         return status.code() == turbo::kCancelled;
     }
 
-    bool IsDataLoss(const Status &status) {
+    bool is_data_loss(const Status &status) {
         return status.code() == turbo::kDataLoss;
     }
 
-    bool IsDeadlineExceeded(const Status &status) {
+    bool is_deadline_exceeded(const Status &status) {
         return status.code() == turbo::kDeadlineExceeded;
     }
 
-    bool IsFailedPrecondition(const Status &status) {
+    bool is_failed_precondition(const Status &status) {
         return status.code() == turbo::kFailedPrecondition;
     }
 
-    bool IsInternal(const Status &status) {
+    bool is_internal(const Status &status) {
         return status.code() == turbo::kInternal;
     }
 
-    bool IsInvalidArgument(const Status &status) {
+    bool is_invalid_argument(const Status &status) {
         return status.code() == turbo::kInvalidArgument;
     }
 
-    bool IsNotFound(const Status &status) {
+    bool is_not_found(const Status &status) {
         return status.code() == turbo::kNotFound;
     }
 
-    bool IsOutOfRange(const Status &status) {
+    bool is_out_of_range(const Status &status) {
         return status.code() == turbo::kOutOfRange;
     }
 
-    bool IsPermissionDenied(const Status &status) {
+    bool is_permission_denied(const Status &status) {
         return status.code() == turbo::kPermissionDenied;
     }
 
-    bool IsResourceExhausted(const Status &status) {
+    bool is_resource_exhausted(const Status &status) {
         return status.code() == turbo::kResourceExhausted;
     }
 
-    bool IsUnauthenticated(const Status &status) {
+    bool is_unauthenticated(const Status &status) {
         return status.code() == turbo::kUnauthenticated;
     }
 
-    bool IsUnavailable(const Status &status) {
+    bool is_unavailable(const Status &status) {
         return status.code() == turbo::kUnavailable;
     }
 
-    bool IsUnimplemented(const Status &status) {
+    bool is_unimplemented(const Status &status) {
         return status.code() == turbo::kUnimplemented;
     }
 
-    bool IsUnknown(const Status &status) {
+    bool is_unknown(const Status &status) {
         return status.code() == turbo::kUnknown;
     }
 
-    bool IsFileNotExist(const Status &status) {
+    bool is_file_not_exist(const Status &status) {
         return status.code() == turbo::kFileNotExist;
     }
 
-    bool IsReachFileEnd(const Status &status) {
+    bool is_reach_file_end(const Status &status) {
         return status.code() == turbo::kReachFileEnd;
     }
 
-    bool IsDiskIOError(const Status &status) {
+    bool is_disk_io_error(const Status &status) {
         return status.code() == turbo::kDiskIOError;
     }
 
 
-    StatusCode ErrnoToStatusCode(int error_number) {
+    StatusCode errno_to_status_code(int error_number) {
         switch (error_number) {
             case 0:
                 return kOk;
@@ -568,8 +568,8 @@ namespace turbo {
         }
     }  // namespace
 
-    Status ErrnoToStatus(int error_number, std::string_view message) {
-        return Status(ErrnoToStatusCode(error_number),
+    Status errno_to_status(int error_number, std::string_view message) {
+        return Status(errno_to_status_code(error_number),
                       MessageForErrnoToStatus(error_number, message));
     }
 
@@ -579,7 +579,7 @@ namespace turbo {
                                          const char *prefix) {
             return new std::string(
                     turbo::Format("{} ({})", prefix,
-                                  status->ToString(StatusToStringMode::kWithEverything)));
+                                  status->to_string(StatusToStringMode::kWithEverything)));
         }
 
     }  // namespace status_internal
