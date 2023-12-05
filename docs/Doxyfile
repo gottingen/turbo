@@ -5,6 +5,7 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/base/assume.h \
                     ../turbo/base/sysinfo.h \
                     ../turbo/base/endian.h  \
+                    ../turbo/base/status.h  \
                     ../turbo/files/filesystem.h \
                     ../turbo/files/file_event_listener.h \
                     ../turbo/files/file_option.h \
