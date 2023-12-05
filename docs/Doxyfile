@@ -14,6 +14,7 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/files/sequential_read_file.h \
                     ../turbo/files/sequential_write_file.h \
                     ../turbo/files/utility.h               \
+                    ../turbo/strings/utility.h \
                     ../turbo/strings/ascii.h \
                     ../turbo/strings/escaping.h \
                     ../turbo/strings/str_strip.h \

@@ -1,6 +1,6 @@
 .. Copyright 2023 The Turbo Authors.
 
-.. _turbo_base_module:
+.. _turbo_strings_module:
 
 
 turbo string module
@@ -9,34 +9,34 @@ turbo string module
 ascii
 ---------------------------
 
-.. doxxygengroup:: turbo_string_ascii
+.. doxxygengroup:: turbo_strings_ascii
    :project: turbo-docs
    :members:
 
 convert
 ---------------------------
 
-.. doxygengroup:: turbo_string_convert
+.. doxygengroup:: turbo_strings_convert
    :project: turbo-docs
    :members:
 
 trim
 ---------------------------
 
-.. doxygengroup:: turbo_string_trim
+.. doxygengroup:: turbo_strings_trim
    :project: turbo-docs
    :members:
 
 match
 ---------------------------
 
-..  doxygengroup:: turbo_string_match
+..  doxygengroup:: turbo_strings_match
     :project: turbo-docs
     :members:
 
 split
 ---------------------------
 
-..  doxygengroup:: turbo_string_split
+..  doxygengroup:: turbo_strings_split
     :project: turbo-docs
     :members:
