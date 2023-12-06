@@ -29,6 +29,7 @@ Contents
     en/api/base
     en/api/files
     en/api/strings
+    en/api/memory
 
 
 .. toctree::

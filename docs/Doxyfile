@@ -25,7 +25,8 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/strings/charconv.h   \
                     ../turbo/strings/str_case_conv.h \
                     ../turbo/strings/str_split.h    \
-                    ../turbo/strings/str_replace.h
+                    ../turbo/strings/str_replace.h  \
+                    ../turbo/memory/object_pool.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

@@ -16,6 +16,7 @@
 
 
 set(TURBO_ALL_SRC
+        "base/atexit.cc"
         "base/internal/raw_logging.cc"
         "base/internal/strerror.cc"
         "base/log_severity.cc"
@@ -55,6 +56,7 @@ set(TURBO_ALL_SRC
         "../tests/debugging/stack_consumption.cc"
         "debugging/internal/vdso_support.cc"
         "debugging/leak_check.cc"
+        "fiber/context.cc"
         "files/file_watcher.cc"
         "files/fio.cc"
         "files/utility.cc"
@@ -84,6 +86,7 @@ set(TURBO_ALL_SRC
         "log/tlog.cc"
         "log/stdout_sinks.cc"
         "memory/jemalloc_helper.cc"
+        "memory/memory.cc"
         "module/module_loader.cc"
         "module/module.cc"
         "platform/internal/cycleclock.cc"
