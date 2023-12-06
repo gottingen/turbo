@@ -16,3 +16,4 @@
 // Created by jeff on 23-12-6.
 //
 #include "turbo/memory/object_pool.h"
+#include "turbo/memory/resource_pool.h"

@@ -27,6 +27,7 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/strings/str_split.h    \
                     ../turbo/strings/str_replace.h  \
                     ../turbo/memory/object_pool.h
+                    ../turbo/memory/resource_pool.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

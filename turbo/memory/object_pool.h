@@ -134,7 +134,7 @@ namespace turbo {
      *         obj->clear();
      *         @endcode
      *         The above code will get an object typed MyObject, and the object should be cleared before usage.
-     * @note: MyObject must have a default constructor.
+     * @note MyObject must have a default constructor.
      * @return T* the object typed T
      */
     template <typename T>
