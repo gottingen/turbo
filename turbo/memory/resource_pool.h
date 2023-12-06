@@ -63,7 +63,7 @@ namespace turbo {
         }
     };
 
-/**
+    /**
      * @ingroup turbo_memory_pool
      * @brief ResourcePoolTraits is used to define redefine the default value of ResourcePoolTraitsBase
      *        Example:
