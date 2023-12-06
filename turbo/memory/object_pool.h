@@ -134,8 +134,8 @@ namespace turbo {
      *         obj->clear();
      *         @endcode
      *         The above code will get an object typed MyObject, and the object should be cleared before usage.
-     *         NOTE: MyObject must have a default constructor.
-     *         @return T* the object typed T
+     * @note: MyObject must have a default constructor.
+     * @return T* the object typed T
      */
     template <typename T>
     inline T* get_object() {
@@ -163,7 +163,7 @@ namespace turbo {
      *         obj->clear();
      *         @endcode
      *         The above code will get an object typed MyObject with arguments 1 and 2.
-     *         @return T* the object typed T
+     * @return T* the object typed T
      */
     template <typename T, typename ...Args>
     inline T* get_object(const Args &...args) {
@@ -192,8 +192,8 @@ namespace turbo {
      *        // a is empty now
      *        @endcode
      *        The above code will get an object typed MyObject with arguments lvalue a and 2.
-     *        @return T* the object typed T
-     *        @note the arguments will be moved to the object
+     * @return T* the object typed T
+     * @note the arguments will be moved to the object
      */
     template <typename T, typename ...Args>
     inline T* get_object(Args &&...args) {
