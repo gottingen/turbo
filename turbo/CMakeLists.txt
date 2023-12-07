@@ -154,6 +154,7 @@ set(TURBO_ALL_SRC
         "times/cctz/time_zone_posix.cc"
         "times/cctz/zone_info_source.cc"
         "unicode/utf.cc"
+        "utf/encoding_types.cc"
         )
 
 if (BUILD_STATIC_LIBRARY)

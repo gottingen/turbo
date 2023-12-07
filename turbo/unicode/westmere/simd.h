@@ -32,11 +32,11 @@ namespace simd {
     // Conversion to SIMD register
     TURBO_FORCE_INLINE operator const __m128i&() const { return this->value; }
     TURBO_FORCE_INLINE operator __m128i&() { return this->value; }
-    template <endianness big_endian>
+    template <EndianNess big_endian>
     TURBO_FORCE_INLINE void store_ascii_as_utf16(char16_t * p) const {
       __m128i first = _mm_cvtepu8_epi16(*this);
       __m128i second = _mm_cvtepu8_epi16(_mm_srli_si128(*this,8));
-      if (big_endian) {
+      if (is_big_endian(big_endian)) {
         const __m128i swap = _mm_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
         first = _mm_shuffle_epi8(first, swap);
         second = _mm_shuffle_epi8(second, swap);
@@ -342,7 +342,7 @@ namespace simd {
       return this->reduce_or().is_ascii();
     }
 
-    template <endianness endian>
+    template <EndianNess endian>
     TURBO_FORCE_INLINE void store_ascii_as_utf16(char16_t * ptr) const {
       this->chunks[0].template store_ascii_as_utf16<endian>(ptr+sizeof(simd8<T>)*0);
       this->chunks[1].template store_ascii_as_utf16<endian>(ptr+sizeof(simd8<T>)*1);

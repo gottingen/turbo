@@ -29,7 +29,7 @@ using utf8_to_utf32_result = std::pair<const char*, uint32_t*>;
     The provided in and out pointers are advanced according to how many input
     bytes have been processed, upon success.
 */
-template <block_processing_mode tail, endianness big_endian>
+template <block_processing_mode tail, EndianNess big_endian>
 TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&out, size_t gap) {
   // constants
   __m512i mask_identity = _mm512_set_epi8(63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
@@ -61,11 +61,11 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
       in += 64;          // consumed 64 bytes
       // we convert a full 64-byte block, writing 128 bytes.
       __m512i input1 = _mm512_cvtepu8_epi16(_mm512_castsi512_si256(input));
-      if(big_endian) { input1 = _mm512_shuffle_epi8(input1, byteflip); }
+      if(is_big_endian(big_endian)) { input1 = _mm512_shuffle_epi8(input1, byteflip); }
       _mm512_storeu_si512(out, input1);
       out += 32;
       __m512i input2 = _mm512_cvtepu8_epi16(_mm512_extracti64x4_epi64(input, 1));
-      if(big_endian) { input2 = _mm512_shuffle_epi8(input2, byteflip); }
+      if(is_big_endian(big_endian)) { input2 = _mm512_shuffle_epi8(input2, byteflip); }
       _mm512_storeu_si512(out, input2);
       out += 32;
       return true; // we are done
@@ -73,16 +73,16 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
       in += gap;
       if (gap <= 32) {
         __m512i input1 = _mm512_cvtepu8_epi16(_mm512_castsi512_si256(input));
-        if(big_endian) { input1 = _mm512_shuffle_epi8(input1, byteflip); }
+        if(is_big_endian(big_endian)) { input1 = _mm512_shuffle_epi8(input1, byteflip); }
         _mm512_mask_storeu_epi16(out, __mmask32((uint64_t(1) << (gap)) - 1), input1);
         out += gap;
       } else {
         __m512i input1 = _mm512_cvtepu8_epi16(_mm512_castsi512_si256(input));
-        if(big_endian) { input1 = _mm512_shuffle_epi8(input1, byteflip); }
+        if(is_big_endian(big_endian)) { input1 = _mm512_shuffle_epi8(input1, byteflip); }
         _mm512_storeu_si512(out, input1);
         out += 32;
         __m512i input2 = _mm512_cvtepu8_epi16(_mm512_extracti64x4_epi64(input, 1));
-        if(big_endian) { input2 = _mm512_shuffle_epi8(input2, byteflip); }
+        if(is_big_endian(big_endian)) { input2 = _mm512_shuffle_epi8(input2, byteflip); }
         _mm512_mask_storeu_epi16(out, __mmask32((uint32_t(1) << (gap - 32)) - 1), input2);
         out += gap - 32;
       }
@@ -180,7 +180,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
       }
       int64_t nout = _mm_popcnt_u64(mprocessed);
       in +=  64 - _lzcnt_u64(mprocessed);
-      if(big_endian) { Wout = _mm512_shuffle_epi8(Wout, byteflip); }
+      if(is_big_endian(big_endian)) { Wout = _mm512_shuffle_epi8(Wout, byteflip); }
       _mm512_mask_storeu_epi16(out, __mmask32((uint64_t(1) << nout) - 1), Wout);
       out += nout;
       return true; // ok
@@ -265,7 +265,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
     }
     in += 64 - _lzcnt_u64(mprocessed);
     int64_t nout = _mm_popcnt_u64(mprocessed);
-    if(big_endian) { Wout = _mm512_shuffle_epi8(Wout, byteflip); }
+    if(is_big_endian(big_endian)) { Wout = _mm512_shuffle_epi8(Wout, byteflip); }
     _mm512_mask_storeu_epi16(out, __mmask32((uint64_t(1) << nout) - 1), Wout);
     out += nout;
     return true; // ok
@@ -308,7 +308,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
   lead = _mm512_slli_epi16(lead, 6);                                         // shifted into position
   __m512i final = _mm512_add_epi16(follow, lead);                            // combining lead and follow
 
-  if(big_endian) { final = _mm512_shuffle_epi8(final, byteflip); }
+  if(is_big_endian(big_endian)) { final = _mm512_shuffle_epi8(final, byteflip); }
   if (tail == TURBO_UNICODE_FULL) {
     // Next part is UTF-16 specific and can be generalized to UTF-32.
     int nout = _mm_popcnt_u32(uint32_t(leading));
@@ -347,7 +347,7 @@ TURBO_FORCE_INLINE bool process_block_utf8_to_utf16(const char *&in, char16_t *&
     We pass it to the (always inlined) function to encourage the compiler to
     keep the value in a (constant) register.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 TURBO_FORCE_INLINE size_t utf32_to_utf16_masked(const __m512i byteflip, __m512i utf32, unsigned int count, char16_t* output) {
 
     const __mmask16 valid = uint16_t((1 << count) - 1);
@@ -356,7 +356,7 @@ TURBO_FORCE_INLINE size_t utf32_to_utf16_masked(const __m512i byteflip, __m512i 
     const __mmask16 sp_mask = _mm512_mask_cmpgt_epu32_mask(valid, utf32, v_0000_ffff);
 
     if (sp_mask == 0) {
-        if(big_endian) {
+        if(is_big_endian(big_endian)) {
           _mm256_mask_storeu_epi16((__m256i*)output, valid, _mm256_shuffle_epi8(_mm512_cvtepi32_epi16(utf32), _mm512_castsi512_si256(byteflip)));
 
         } else {
@@ -392,7 +392,7 @@ TURBO_FORCE_INLINE size_t utf32_to_utf16_masked(const __m512i byteflip, __m512i 
         // sp_mask or the following... It can be more optimized!
         const  __mmask32 nonzero = _kor_mask32(0xaaaaaaaa,_mm512_cmpneq_epi16_mask(t5, _mm512_setzero_si512()));
         const  __mmask32 nonzero_masked = _kand_mask32(nonzero, __mmask32((uint64_t(1) << (2*count)) - 1));
-        if(big_endian) { t5 = _mm512_shuffle_epi8(t5, byteflip); }
+        if(is_big_endian(big_endian)) { t5 = _mm512_shuffle_epi8(t5, byteflip); }
         // we deliberately avoid _mm512_mask_compressstoreu_epi16 for portability (zen4)
         __m512i compressed = _mm512_maskz_compress_epi16(nonzero_masked, t5);
         _mm512_mask_storeu_epi16(output, (1<<(count + static_cast<unsigned int>(count_ones(sp_mask)))) - 1, compressed);
@@ -422,7 +422,7 @@ TURBO_FORCE_INLINE size_t utf32_to_utf16_masked(const __m512i byteflip, __m512i 
     We pass it to the (always inlined) function to encourage the compiler to
     keep the value in a (constant) register.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 TURBO_FORCE_INLINE size_t utf32_to_utf16(const __m512i byteflip, __m512i utf32, unsigned int count, char16_t* output) {
     // check if we have any surrogate pairs
     const __m512i v_0000_ffff = _mm512_set1_epi32(0x0000ffff);
@@ -430,7 +430,7 @@ TURBO_FORCE_INLINE size_t utf32_to_utf16(const __m512i byteflip, __m512i utf32, 
 
     if (sp_mask == 0) {
         // technically, it should be _mm256_storeu_epi16
-        if(big_endian) {
+        if(is_big_endian(big_endian)) {
           _mm256_storeu_si256((__m256i*)output, _mm256_shuffle_epi8(_mm512_cvtepi32_epi16(utf32),_mm512_castsi512_si256(byteflip)));
         } else {
           _mm256_storeu_si256((__m256i*)output, _mm512_cvtepi32_epi16(utf32));
@@ -461,7 +461,7 @@ TURBO_FORCE_INLINE size_t utf32_to_utf16(const __m512i byteflip, __m512i utf32, 
         const __m512i t4 = _mm512_mask_blend_epi32(sp_mask, utf32, t3);
         __m512i t5 = _mm512_ror_epi32(t4, 16);
         const  __mmask32 nonzero = _kor_mask32(0xaaaaaaaa,_mm512_cmpneq_epi16_mask(t5, _mm512_setzero_si512()));
-        if(big_endian) { t5 = _mm512_shuffle_epi8(t5, byteflip); }
+        if(is_big_endian(big_endian)) { t5 = _mm512_shuffle_epi8(t5, byteflip); }
         // we deliberately avoid _mm512_mask_compressstoreu_epi16 for portability (zen4)
         __m512i compressed = _mm512_maskz_compress_epi16(nonzero, t5);
         _mm512_mask_storeu_epi16(output, (1<<(count + static_cast<unsigned int>(count_ones(sp_mask)))) - 1, compressed);

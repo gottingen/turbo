@@ -58,7 +58,7 @@
    - pointer to the last unprocessed character (a scalar fallback should check the rest);
    - nullptr if an error was detected.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 const char16_t* sse_validate_utf16(const char16_t* input, size_t size) {
     const char16_t* end = input + size;
 
@@ -73,7 +73,7 @@ const char16_t* sse_validate_utf16(const char16_t* input, size_t size) {
         //    consists only the higher bytes.
         auto in0 = simd16<uint16_t>(input);
         auto in1 = simd16<uint16_t>(input + simd16<uint16_t>::SIZE / sizeof(char16_t));
-        if (big_endian) {
+        if (is_big_endian(big_endian)) {
             in0 = in0.swap_bytes();
             in1 = in1.swap_bytes();
         }
@@ -134,7 +134,7 @@ const char16_t* sse_validate_utf16(const char16_t* input, size_t size) {
 }
 
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 const result sse_validate_utf16_with_errors(const char16_t* input, size_t size) {
     const char16_t* start = input;
     const char16_t* end = input + size;
@@ -151,7 +151,7 @@ const result sse_validate_utf16_with_errors(const char16_t* input, size_t size) 
         auto in0 = simd16<uint16_t>(input);
         auto in1 = simd16<uint16_t>(input + simd16<uint16_t>::SIZE / sizeof(char16_t));
 
-        if (big_endian) {
+        if (is_big_endian(big_endian)) {
             in0 = in0.swap_bytes();
             in1 = in1.swap_bytes();
         }

@@ -18,7 +18,7 @@ namespace TURBO_UNICODE_IMPLEMENTATION {
 namespace {
 namespace utf16 {
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 TURBO_FORCE_INLINE size_t count_code_points(const char16_t* in, size_t size) {
     size_t pos = 0;
     size_t count = 0;
@@ -31,7 +31,7 @@ TURBO_FORCE_INLINE size_t count_code_points(const char16_t* in, size_t size) {
     return count + scalar::utf16::count_code_points<big_endian>(in + pos, size - pos);
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 TURBO_FORCE_INLINE size_t Utf8LengthFromUtf16(const char16_t* in, size_t size) {
     size_t pos = 0;
     size_t count = 0;
@@ -52,7 +52,7 @@ TURBO_FORCE_INLINE size_t Utf8LengthFromUtf16(const char16_t* in, size_t size) {
     return count + scalar::utf16::Utf8LengthFromUtf16<big_endian>(in + pos, size - pos);
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 TURBO_FORCE_INLINE size_t Utf32LengthFromUtf16(const char16_t* in, size_t size) {
     return count_code_points<big_endian>(in, size);
 }

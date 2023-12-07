@@ -22,7 +22,7 @@ namespace utf8_to_utf16 {
 
 using namespace simd;
 
-template <endianness endian>
+template <EndianNess endian>
 TURBO_MUST_USE_RESULT size_t convert_valid(const char* input, size_t size,
     char16_t* utf16_output) noexcept {
   // The implementation is not specific to haswell and should be moved to the generic directory.

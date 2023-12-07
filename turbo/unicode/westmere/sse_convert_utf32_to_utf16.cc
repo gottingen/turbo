@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 std::pair<const char32_t*, char16_t*> sse_convert_utf32_to_utf16(const char32_t* buf, size_t len, char16_t* utf16_output) {
 
   const char32_t* end = buf + len;
@@ -37,7 +37,7 @@ std::pair<const char32_t*, char16_t*> sse_convert_utf32_to_utf16(const char32_t*
       const __m128i v_d800 = _mm_set1_epi16((uint16_t)0xd800);
       forbidden_bytemask = _mm_or_si128(forbidden_bytemask, _mm_cmpeq_epi16(_mm_and_si128(utf16_packed, v_f800), v_d800));
 
-      if (big_endian) {
+        if (is_big_endian(big_endian)) {
         const __m128i swap = _mm_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
         utf16_packed = _mm_shuffle_epi8(utf16_packed, swap);
       }
@@ -54,14 +54,14 @@ std::pair<const char32_t*, char16_t*> sse_convert_utf32_to_utf16(const char32_t*
         if((word & 0xFFFF0000)==0) {
           // will not generate a surrogate pair
           if (word >= 0xD800 && word <= 0xDFFF) { return std::make_pair(nullptr, utf16_output); }
-          *utf16_output++ = big_endian ? char16_t((uint16_t(word) >> 8) | (uint16_t(word) << 8)) : char16_t(word);
+          *utf16_output++ = is_big_endian(big_endian) ? char16_t((uint16_t(word) >> 8) | (uint16_t(word) << 8)) : char16_t(word);
         } else {
           // will generate a surrogate pair
           if (word > 0x10FFFF) { return std::make_pair(nullptr, utf16_output); }
           word -= 0x10000;
           uint16_t high_surrogate = uint16_t(0xD800 + (word >> 10));
           uint16_t low_surrogate = uint16_t(0xDC00 + (word & 0x3FF));
-          if (big_endian) {
+          if (is_big_endian(big_endian)) {
             high_surrogate = uint16_t((high_surrogate >> 8) | (high_surrogate << 8));
             low_surrogate = uint16_t((low_surrogate >> 8) | (low_surrogate << 8));
           }
@@ -80,7 +80,7 @@ std::pair<const char32_t*, char16_t*> sse_convert_utf32_to_utf16(const char32_t*
 }
 
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 std::pair<result, char16_t*> sse_convert_utf32_to_utf16_with_errors(const char32_t* buf, size_t len, char16_t* utf16_output) {
   const char32_t* start = buf;
   const char32_t* end = buf + len;
@@ -106,7 +106,7 @@ std::pair<result, char16_t*> sse_convert_utf32_to_utf16_with_errors(const char32
         return std::make_pair(result(error_code::SURROGATE, buf - start), utf16_output);
       }
 
-      if (big_endian) {
+      if (is_big_endian(big_endian)) {
         const __m128i swap = _mm_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
         utf16_packed = _mm_shuffle_epi8(utf16_packed, swap);
       }
@@ -123,14 +123,14 @@ std::pair<result, char16_t*> sse_convert_utf32_to_utf16_with_errors(const char32
         if((word & 0xFFFF0000)==0) {
           // will not generate a surrogate pair
           if (word >= 0xD800 && word <= 0xDFFF) { return std::make_pair(result(error_code::SURROGATE, buf - start + k), utf16_output); }
-          *utf16_output++ = big_endian ? char16_t((uint16_t(word) >> 8) | (uint16_t(word) << 8)) : char16_t(word);
+          *utf16_output++ = is_big_endian(big_endian) ? char16_t((uint16_t(word) >> 8) | (uint16_t(word) << 8)) : char16_t(word);
         } else {
           // will generate a surrogate pair
           if (word > 0x10FFFF) { return std::make_pair(result(error_code::TOO_LARGE, buf - start + k), utf16_output); }
           word -= 0x10000;
           uint16_t high_surrogate = uint16_t(0xD800 + (word >> 10));
           uint16_t low_surrogate = uint16_t(0xDC00 + (word & 0x3FF));
-          if (big_endian) {
+          if (is_big_endian(big_endian)) {
             high_surrogate = uint16_t((high_surrogate >> 8) | (high_surrogate << 8));
             low_surrogate = uint16_t((low_surrogate >> 8) | (low_surrogate << 8));
           }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 const char16_t* arm_validate_utf16(const char16_t* input, size_t size) {
     const char16_t* end = input + size;
     const auto v_d8 = simd8<uint8_t>::splat(0xd8);
@@ -85,7 +85,7 @@ const char16_t* arm_validate_utf16(const char16_t* input, size_t size) {
 }
 
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 const result arm_validate_utf16_with_errors(const char16_t* input, size_t size) {
     const char16_t* start = input;
     const char16_t* end = input + size;

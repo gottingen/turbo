@@ -20,7 +20,7 @@ namespace scalar {
 namespace {
 namespace utf8_to_utf16 {
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline size_t convert_valid(const char* buf, size_t len, char16_t* utf16_output) {
  const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
   size_t pos = 0;

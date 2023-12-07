@@ -24,7 +24,7 @@ inline TURBO_MUST_USE_RESULT uint16_t swap_bytes(const uint16_t word) {
   return uint16_t((word >> 8) | (word << 8));
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline TURBO_MUST_USE_RESULT bool validate(const char16_t *buf, size_t len) noexcept {
   const uint16_t *data = reinterpret_cast<const uint16_t *>(buf);
   uint64_t pos = 0;
@@ -45,7 +45,7 @@ inline TURBO_MUST_USE_RESULT bool validate(const char16_t *buf, size_t len) noex
   return true;
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline TURBO_MUST_USE_RESULT result validate_with_errors(const char16_t *buf, size_t len) noexcept {
   const uint16_t *data = reinterpret_cast<const uint16_t *>(buf);
   size_t pos = 0;
@@ -66,7 +66,7 @@ inline TURBO_MUST_USE_RESULT result validate_with_errors(const char16_t *buf, si
   return result(error_code::SUCCESS, pos);
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline size_t count_code_points(const char16_t* buf, size_t len) {
   // We are not BOM aware.
   const uint16_t * p = reinterpret_cast<const uint16_t *>(buf);
@@ -78,7 +78,7 @@ inline size_t count_code_points(const char16_t* buf, size_t len) {
   return counter;
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline size_t Utf8LengthFromUtf16(const char16_t* buf, size_t len) {
   // We are not BOM aware.
   const uint16_t * p = reinterpret_cast<const uint16_t *>(buf);
@@ -97,7 +97,7 @@ inline size_t Utf8LengthFromUtf16(const char16_t* buf, size_t len) {
   return counter;
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline size_t Utf32LengthFromUtf16(const char16_t* buf, size_t len) {
   // We are not BOM aware.
   const uint16_t * p = reinterpret_cast<const uint16_t *>(buf);

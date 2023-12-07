@@ -184,7 +184,7 @@ int avx2_detect_encodings(const char * buf, size_t len) {
         }
     }
 
-    if (is_utf16 && scalar::utf16::validate<endianness::LITTLE>(reinterpret_cast<const char16_t*>(buf), (len - (buf - start))/2)) {
+    if (is_utf16 && scalar::utf16::validate<EndianNess::SYS_LITTLE_ENDIAN>(reinterpret_cast<const char16_t*>(buf), (len - (buf - start))/2)) {
         out |= turbo::EncodingType::UTF16_LE;
     }
 

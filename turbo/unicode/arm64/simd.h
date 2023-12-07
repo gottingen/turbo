@@ -348,7 +348,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
     static TURBO_FORCE_INLINE simd8<int8_t> splat(int8_t _value) { return vmovq_n_s8(_value); }
     static TURBO_FORCE_INLINE simd8<int8_t> zero() { return vdupq_n_s8(0); }
     static TURBO_FORCE_INLINE simd8<int8_t> load(const int8_t values[16]) { return vld1q_s8(values); }
-    template <endianness big_endian>
+    template <EndianNess big_endian>
     TURBO_FORCE_INLINE void store_ascii_as_utf16(char16_t * p) const {
       uint16x8_t first = vmovl_u8(vget_low_u8 (vreinterpretq_u8_s8(this->value)));
       uint16x8_t second = vmovl_high_u8(vreinterpretq_u8_s8(this->value));
@@ -512,7 +512,7 @@ TURBO_FORCE_INLINE int16x8_t make_int16x8_t(int16_t x1,  int16_t x2,  int16_t x3
       return reduce_or().is_ascii();
     }
 
-    template <endianness endian>
+    template <EndianNess endian>
     TURBO_FORCE_INLINE void store_ascii_as_utf16(char16_t * ptr) const {
       this->chunks[0].template store_ascii_as_utf16<endian>(ptr+sizeof(simd8<T>)*0);
       this->chunks[1].template store_ascii_as_utf16<endian>(ptr+sizeof(simd8<T>)*1);

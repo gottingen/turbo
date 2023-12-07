@@ -18,7 +18,6 @@ TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion)
 
 #include "turbo/unicode/utf.h"
 #include "turbo/unicode/implementation.cc"
-#include "turbo/unicode/encoding_types.cc"
 #include "turbo/unicode/error.cc"
 // The large tables should be included once and they
 // should not depend on a kernel.

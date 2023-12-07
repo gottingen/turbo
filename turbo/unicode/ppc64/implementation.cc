@@ -113,19 +113,19 @@ TURBO_MUST_USE_RESULT result Implementation::ValidateAsciiWithErrors(const char 
 }
 
 TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf16Le(const char16_t *buf, size_t len) const noexcept {
-  return scalar::utf16::validate<endianness::LITTLE>(buf, len);
+  return scalar::utf16::validate<EndianNess::SYS_LITTLE_ENDIAN>(buf, len);
 }
 
 TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf16Be(const char16_t *buf, size_t len) const noexcept {
-  return scalar::utf16::validate<endianness::BIG>(buf, len);
+  return scalar::utf16::validate<EndianNess::SYS_BIG_ENDIAN>(buf, len);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ValidateUtf16LeWithErrors(const char16_t *buf, size_t len) const noexcept {
-  return scalar::utf16::validate_with_errors<endianness::LITTLE>(buf, len);
+  return scalar::utf16::validate_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ValidateUtf16BeWithErrors(const char16_t *buf, size_t len) const noexcept {
-  return scalar::utf16::validate_with_errors<endianness::BIG>(buf, len);
+  return scalar::utf16::validate_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ValidateUtf32WithErrors(const char32_t *buf, size_t len) const noexcept {
@@ -173,27 +173,27 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf8ToUtf32(const char*
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  return scalar::utf16_to_utf8::convert<endianness::LITTLE>(buf, len, utf8_output);
+  return scalar::utf16_to_utf8::convert<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf8_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  return scalar::utf16_to_utf8::convert<endianness::BIG>(buf, len, utf8_output);
+  return scalar::utf16_to_utf8::convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf8_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  return scalar::utf16_to_utf8::convert_with_errors<endianness::LITTLE>(buf, len, utf8_output);
+  return scalar::utf16_to_utf8::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf8_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16BeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  return scalar::utf16_to_utf8::convert_with_errors<endianness::BIG>(buf, len, utf8_output);
+  return scalar::utf16_to_utf8::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf8_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16LeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  return scalar::utf16_to_utf8::convert_valid<endianness::LITTLE>(buf, len, utf8_output);
+  return scalar::utf16_to_utf8::convert_valid<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf8_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16BeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  return scalar::utf16_to_utf8::convert_valid<endianness::BIG>(buf, len, utf8_output);
+  return scalar::utf16_to_utf8::convert_valid<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf8_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf8(const char32_t* buf, size_t len, char* utf8_output) const noexcept {
@@ -209,51 +209,51 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf32ToUtf8(const char3
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Le(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  return scalar::utf32_to_utf16::convert<endianness::LITTLE>(buf, len, utf16_output);
+  return scalar::utf32_to_utf16::convert<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Be(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  return scalar::utf32_to_utf16::convert<endianness::BIG>(buf, len, utf16_output);
+  return scalar::utf32_to_utf16::convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf16leWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  return scalar::utf32_to_utf16::convert_with_errors<endianness::LITTLE>(buf, len, utf16_output);
+  return scalar::utf32_to_utf16::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf16BeWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  return scalar::utf32_to_utf16::convert_with_errors<endianness::BIG>(buf, len, utf16_output);
+  return scalar::utf32_to_utf16::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf32ToUtf16Le(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  return scalar::utf32_to_utf16::convert_valid<endianness::LITTLE>(buf, len, utf16_output);
+  return scalar::utf32_to_utf16::convert_valid<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf32ToUtf16Be(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  return scalar::utf32_to_utf16::convert_valid<endianness::BIG>(buf, len, utf16_output);
+  return scalar::utf32_to_utf16::convert_valid<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  return scalar::utf16_to_utf32::convert<endianness::LITTLE>(buf, len, utf32_output);
+  return scalar::utf16_to_utf32::convert<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf32_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  return scalar::utf16_to_utf32::convert<endianness::BIG>(buf, len, utf32_output);
+  return scalar::utf16_to_utf32::convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf32_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  return scalar::utf16_to_utf32::convert_with_errors<endianness::LITTLE>(buf, len, utf32_output);
+  return scalar::utf16_to_utf32::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf32_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16BeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  return scalar::utf16_to_utf32::convert_with_errors<endianness::BIG>(buf, len, utf32_output);
+  return scalar::utf16_to_utf32::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf32_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16LeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  return scalar::utf16_to_utf32::convert_valid<endianness::LITTLE>(buf, len, utf32_output);
+  return scalar::utf16_to_utf32::convert_valid<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf32_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf16BeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  return scalar::utf16_to_utf32::convert_valid<endianness::BIG>(buf, len, utf32_output);
+  return scalar::utf16_to_utf32::convert_valid<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf32_output);
 }
 
 void Implementation::ChangeEndiannessUtf16(const char16_t * input, size_t length, char16_t * output) const noexcept {
@@ -261,11 +261,11 @@ void Implementation::ChangeEndiannessUtf16(const char16_t * input, size_t length
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::CountUtf16Le(const char16_t * input, size_t length) const noexcept {
-  return scalar::utf16::count_code_points<endianness::LITTLE>(input, length);
+  return scalar::utf16::count_code_points<EndianNess::SYS_LITTLE_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::CountUtf16Be(const char16_t * input, size_t length) const noexcept {
-  return scalar::utf16::count_code_points<endianness::BIG>(input, length);
+  return scalar::utf16::count_code_points<EndianNess::SYS_BIG_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::CountUtf8(const char * input, size_t length) const noexcept {
@@ -273,19 +273,19 @@ TURBO_MUST_USE_RESULT size_t Implementation::CountUtf8(const char * input, size_
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf8LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
-  return scalar::utf16::Utf8LengthFromUtf16<endianness::LITTLE>(input, length);
+  return scalar::utf16::Utf8LengthFromUtf16<EndianNess::SYS_LITTLE_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf8LengthFromUtf16be(const char16_t * input, size_t length) const noexcept {
-  return scalar::utf16::Utf8LengthFromUtf16<endianness::BIG>(input, length);
+  return scalar::utf16::Utf8LengthFromUtf16<EndianNess::SYS_BIG_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf32LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
-  return scalar::utf16::Utf32LengthFromUtf16<endianness::LITTLE>(input, length);
+  return scalar::utf16::Utf32LengthFromUtf16<EndianNess::SYS_LITTLE_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf32LengthFromUtf16Be(const char16_t * input, size_t length) const noexcept {
-  return scalar::utf16::Utf32LengthFromUtf16<endianness::BIG>(input, length);
+  return scalar::utf16::Utf32LengthFromUtf16<EndianNess::SYS_BIG_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf16LengthFromUtf8(const char * input, size_t length) const noexcept {

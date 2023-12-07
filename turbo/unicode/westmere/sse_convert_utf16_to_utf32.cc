@@ -66,7 +66,7 @@
   Returns a pair: the first unprocessed byte from buf and utf8_output
   A scalar routing should carry on the conversion of the tail.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 std::pair<const char16_t*, char32_t*> sse_convert_utf16_to_utf32(const char16_t* buf, size_t len, char32_t* utf32_output) {
   const char16_t* end = buf + len;
 
@@ -76,7 +76,7 @@ std::pair<const char16_t*, char32_t*> sse_convert_utf16_to_utf32(const char16_t*
   while (buf + 16 <= end) {
     __m128i in = _mm_loadu_si128((__m128i*)buf);
 
-    if (big_endian) {
+    if (is_big_endian(big_endian)) {
       const __m128i swap = _mm_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
       in = _mm_shuffle_epi8(in, swap);
     }
@@ -106,13 +106,13 @@ std::pair<const char16_t*, char32_t*> sse_convert_utf16_to_utf32(const char16_t*
       size_t k = 0;
       if(size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1);}
       for(; k < forward; k++) {
-        uint16_t word = big_endian ? scalar::utf16::swap_bytes(buf[k]) : buf[k];
+        uint16_t word = is_big_endian(big_endian) ? scalar::utf16::swap_bytes(buf[k]) : buf[k];
         if((word &0xF800 ) != 0xD800) {
           *utf32_output++ = char32_t(word);
         } else {
           // must be a surrogate pair
           uint16_t diff = uint16_t(word - 0xD800);
-          uint16_t next_word = big_endian ? scalar::utf16::swap_bytes(buf[k+1]) : buf[k+1];
+          uint16_t next_word = is_big_endian(big_endian) ? scalar::utf16::swap_bytes(buf[k+1]) : buf[k+1];
           k++;
           uint16_t diff2 = uint16_t(next_word - 0xDC00);
           if((diff | diff2) > 0x3FF)  { return std::make_pair(nullptr, utf32_output); }
@@ -133,7 +133,7 @@ std::pair<const char16_t*, char32_t*> sse_convert_utf16_to_utf32(const char16_t*
   Otherwise, it is the position of the first unprocessed byte in buf (even if finished).
   A scalar routing should carry on the conversion of the tail if needed.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 std::pair<result, char32_t*> sse_convert_utf16_to_utf32_with_errors(const char16_t* buf, size_t len, char32_t* utf32_output) {
   const char16_t* start = buf;
   const char16_t* end = buf + len;
@@ -144,7 +144,7 @@ std::pair<result, char32_t*> sse_convert_utf16_to_utf32_with_errors(const char16
   while (buf + 16 <= end) {
     __m128i in = _mm_loadu_si128((__m128i*)buf);
 
-    if (big_endian) {
+    if (is_big_endian(big_endian)) {
       const __m128i swap = _mm_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
       in = _mm_shuffle_epi8(in, swap);
     }
@@ -174,13 +174,13 @@ std::pair<result, char32_t*> sse_convert_utf16_to_utf32_with_errors(const char16
       size_t k = 0;
       if(size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1);}
       for(; k < forward; k++) {
-        uint16_t word = big_endian ? scalar::utf16::swap_bytes(buf[k]) : buf[k];
+        uint16_t word = is_big_endian(big_endian) ? scalar::utf16::swap_bytes(buf[k]) : buf[k];
         if((word &0xF800 ) != 0xD800) {
           *utf32_output++ = char32_t(word);
         } else {
           // must be a surrogate pair
           uint16_t diff = uint16_t(word - 0xD800);
-          uint16_t next_word = big_endian ? scalar::utf16::swap_bytes(buf[k+1]) : buf[k+1];
+          uint16_t next_word = is_big_endian(big_endian) ? scalar::utf16::swap_bytes(buf[k+1]) : buf[k+1];
           k++;
           uint16_t diff2 = uint16_t(next_word - 0xDC00);
           if((diff | diff2) > 0x3FF)  { return std::make_pair(result(error_code::SURROGATE, buf - start + k - 1), utf32_output); }

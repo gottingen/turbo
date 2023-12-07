@@ -18,7 +18,7 @@
 #include <cstring>
 
 #include "turbo/unicode/internal/config.h"
-#include "turbo/unicode/encoding_types.h"
+#include "turbo/utf/encoding_types.h"
 #include "turbo/unicode/error.h"
 
 // Public API

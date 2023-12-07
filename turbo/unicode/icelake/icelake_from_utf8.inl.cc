@@ -23,7 +23,7 @@
  * completed. Upon error, the output is set to null.
  */
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 utf8_to_utf16_result fast_avx512_convert_utf8_to_utf16(const char *in, size_t len, char16_t *out) {
   const char *const final_in = in + len;
   bool result = true;
@@ -38,7 +38,7 @@ utf8_to_utf16_result fast_avx512_convert_utf8_to_utf16(const char *in, size_t le
   return std::make_pair(in, out);
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 turbo::result fast_avx512_convert_utf8_to_utf16_with_errors(const char *in, size_t len, char16_t *out) {
   const char *const init_in = in;
   const char16_t *const init_out = out;
@@ -63,12 +63,12 @@ turbo::result fast_avx512_convert_utf8_to_utf16_with_errors(const char *in, size
 }
 
 
-template <endianness big_endian, typename OUTPUT>
+template <EndianNess big_endian, typename OUTPUT>
 std::pair<const char*, OUTPUT*> validating_utf8_to_fixed_length(const char* str, size_t len, OUTPUT* dwords) {
     constexpr bool UTF32 = std::is_same<OUTPUT, uint32_t>::value;
     constexpr bool UTF16 = std::is_same<OUTPUT, char16_t>::value;
     static_assert(UTF32 or UTF16, "output type has to be uint32_t (for UTF-32) or char16_t (for UTF-16)");
-    static_assert(!(UTF32 and big_endian), "we do not currently support big-endian UTF-32");
+    static_assert(!(UTF32 and is_big_endian(big_endian)), "we do not currently support big-endian UTF-32");
 
     const char* ptr = str;
     const char* end = ptr + len;
@@ -186,12 +186,12 @@ std::pair<const char*, OUTPUT*> validating_utf8_to_fixed_length(const char* str,
 }
 
 // Like validating_utf8_to_fixed_length but returns as soon as an error is identified
-template <endianness big_endian, typename OUTPUT>
+template <EndianNess big_endian, typename OUTPUT>
 std::tuple<const char*, OUTPUT*, bool> validating_utf8_to_fixed_length_with_constant_checks(const char* str, size_t len, OUTPUT* dwords) {
     constexpr bool UTF32 = std::is_same<OUTPUT, uint32_t>::value;
     constexpr bool UTF16 = std::is_same<OUTPUT, char16_t>::value;
     static_assert(UTF32 or UTF16, "output type has to be uint32_t (for UTF-32) or char16_t (for UTF-16)");
-    static_assert(!(UTF32 and big_endian), "we do not currently support big-endian UTF-32");
+    static_assert(!(UTF32 and is_big_endian(big_endian)), "we do not currently support big-endian UTF-32");
 
     const char* ptr = str;
     const char* end = ptr + len;

@@ -18,7 +18,7 @@
   Returns a pair: the first unprocessed byte from buf and utf32_output
   A scalar routing should carry on the conversion of the tail.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 std::tuple<const char16_t*, char32_t*, bool> ConvertUtf16ToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) {
   const char16_t* end = buf + len;
   const __m512i v_fc00 = _mm512_set1_epi16((uint16_t)0xfc00);
@@ -38,7 +38,7 @@ std::tuple<const char16_t*, char32_t*, bool> ConvertUtf16ToUtf32(const char16_t*
   while (buf + 32 <= end) {
     // Always safe because buf + 32 <= end so that end - buf >= 32 bytes:
     __m512i in = _mm512_loadu_si512((__m512i*)const_cast<char16_t*>(buf));
-    if(big_endian) { in = _mm512_shuffle_epi8(in, byteflip); }
+    if(is_big_endian(big_endian)) { in = _mm512_shuffle_epi8(in, byteflip); }
 
     // H - bitmask for high surrogates
     const __mmask32 H = _mm512_cmpeq_epi16_mask(_mm512_and_si512(in, v_fc00), v_d800);

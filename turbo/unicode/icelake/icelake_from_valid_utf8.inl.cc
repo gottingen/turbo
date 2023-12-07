@@ -32,12 +32,12 @@
     - pair.second   - the first unprocessed output word
 */
 TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion)
-template <endianness big_endian, typename OUTPUT>
+template <EndianNess big_endian, typename OUTPUT>
 std::pair<const char*, OUTPUT*> valid_utf8_to_fixed_length(const char* str, size_t len, OUTPUT* dwords) {
     constexpr bool UTF32 = std::is_same<OUTPUT, uint32_t>::value;
     constexpr bool UTF16 = std::is_same<OUTPUT, char16_t>::value;
     static_assert(UTF32 or UTF16, "output type has to be uint32_t (for UTF-32) or char16_t (for UTF-16)");
-    static_assert(!(UTF32 and big_endian), "we do not currently support big-endian UTF-32");
+    static_assert(!(UTF32 and is_big_endian(big_endian)), "we do not currently support big-endian UTF-32");
 
     __m512i byteflip = _mm512_setr_epi64(
             0x0607040502030001,

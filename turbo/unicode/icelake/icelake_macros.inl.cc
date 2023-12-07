@@ -137,7 +137,7 @@
         } else {                                                                          \
                 const __m256i h0 = _mm512_castsi512_si256(utf8);                          \
                 const __m256i h1 = _mm512_extracti64x4_epi64(utf8, 1);                    \
-                if(big_endian) {                                                          \
+                if(is_big_endian(big_endian)) {                                                          \
                 _mm512_storeu_si512((__m512i*)(output + 0*16), _mm512_shuffle_epi8(_mm512_cvtepu8_epi16(h0), byteflip)); \
                 _mm512_storeu_si512((__m512i*)(output + 2*16), _mm512_shuffle_epi8(_mm512_cvtepu8_epi16(h1), byteflip)); \
                 } else {                                                                  \

@@ -64,7 +64,7 @@
   Returns a pair: the first unprocessed byte from buf and utf8_output
   A scalar routing should carry on the conversion of the tail.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 std::pair<const char16_t*, char32_t*> arm_convert_utf16_to_utf32(const char16_t* buf, size_t len, char32_t* utf32_out) {
   uint32_t * utf32_output = reinterpret_cast<uint32_t*>(utf32_out);
   const char16_t* end = buf + len;
@@ -128,7 +128,7 @@ std::pair<const char16_t*, char32_t*> arm_convert_utf16_to_utf32(const char16_t*
   Otherwise, it is the position of the first unprocessed byte in buf (even if finished).
   A scalar routing should carry on the conversion of the tail if needed.
 */
-template <endianness big_endian>
+template <EndianNess big_endian>
 std::pair<result, char32_t*> arm_convert_utf16_to_utf32_with_errors(const char16_t* buf, size_t len, char32_t* utf32_out) {
   uint32_t * utf32_output = reinterpret_cast<uint32_t*>(utf32_out);
   const char16_t* start = buf;

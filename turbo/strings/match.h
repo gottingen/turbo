@@ -144,6 +144,34 @@ namespace turbo {
 
     /**
      * @ingroup turbo_strings_match
+     * @brief Returns whether given ASCII strings `piece1` and `piece2` are equal, ignoring
+     *        case in the comparison.
+     *        Example:
+     *        @code
+     *        std::string_view input("abc");
+     *        EXPECT_TRUE(turbo::str_equals_ignore_case(input, "ABC"));
+     *        @endcode
+     * @note This function is constexpr if and only if the compiler supports.
+     * @param piece1 The first string to compare.
+     * @param piece2 The second string to compare.
+     * @return true if the strings are equal, false otherwise.
+     */
+    [[nodiscard]]
+    constexpr bool str_equals_ignore_case(const std::string_view &piece1,
+                                          const std::string_view & piece2) noexcept {
+        auto constexpr func =[](std::string_view piece1, std::string_view piece2) constexpr -> bool {
+            for (std::size_t i = 0; i < piece1.size(); ++i) {
+                if (ascii_to_lower(piece1[i]) != ascii_to_lower(piece2[i])) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        return piece1.size() == piece2.size() && func(piece1, piece2);
+    }
+
+    /**
+     * @ingroup turbo_strings_match
      * @brief Returns whether given ASCII strings `first` and `last` are equal, ignoring
      *        case in the comparison.
      *        Example:
@@ -159,33 +187,12 @@ namespace turbo {
      */
     [[nodiscard]]
     constexpr bool str_equals_ignore_case(const char *first, const char *last, std::string_view str) noexcept {
-        for (std::size_t i = 0; first != last && i < str.length(); ++i, ++first) {
-            if (ascii_to_lower(*first) != ascii_to_lower(str[i])) {
+        for(size_t i = 0; first != last && i != str.size(); ++first, ++i) {
+            if(ascii_to_lower(*first) != ascii_to_lower(str[i])) {
                 return false;
             }
         }
-
         return true;
-    }
-
-    /**
-     * @ingroup turbo_strings_match
-     * @brief Returns whether given ASCII strings `piece1` and `piece2` are equal, ignoring
-     *        case in the comparison.
-     *        Example:
-     *        @code
-     *        std::string_view input("abc");
-     *        EXPECT_TRUE(turbo::str_equals_ignore_case(input, "ABC"));
-     *        @endcode
-     * @note This function is constexpr if and only if the compiler supports.
-     * @param piece1 The first string to compare.
-     * @param piece2 The second string to compare.
-     * @return true if the strings are equal, false otherwise.
-     */
-    [[nodiscard]]
-    constexpr bool str_equals_ignore_case(std::string_view piece1,
-                          std::string_view piece2) noexcept {
-        return str_equals_ignore_case(piece1.data(), piece1.end(), piece2);
     }
 
     /**

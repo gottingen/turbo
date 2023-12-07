@@ -20,7 +20,7 @@ namespace scalar {
 namespace {
 namespace utf8_to_utf16 {
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline size_t convert(const char* buf, size_t len, char16_t* utf16_output) {
  const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
   size_t pos = 0;
@@ -110,7 +110,7 @@ inline size_t convert(const char* buf, size_t len, char16_t* utf16_output) {
   return utf16_output - start;
 }
 
-template <endianness big_endian>
+template <EndianNess big_endian>
 inline result convert_with_errors(const char* buf, size_t len, char16_t* utf16_output) {
  const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
   size_t pos = 0;
@@ -213,7 +213,7 @@ inline result convert_with_errors(const char* buf, size_t len, char16_t* utf16_o
  * If the error is believed to have occured prior to 'buf', the count value contain in the result
  * will be SIZE_T - 1, SIZE_T - 2, or SIZE_T - 3.
  */
-template <endianness endian>
+template <EndianNess endian>
 inline result rewind_and_convert_with_errors(size_t prior_bytes, const char* buf, size_t len, char16_t* utf16_output) {
   size_t extra_len{0};
   // We potentially need to go back in time and find a leading byte.

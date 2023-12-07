@@ -109,27 +109,27 @@ TURBO_MUST_USE_RESULT result Implementation::ValidateAsciiWithErrors(const char 
 }
 
 TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf16Le(const char16_t *buf, size_t len) const noexcept {
-  const char16_t* tail = sse_validate_utf16<endianness::LITTLE>(buf, len);
+  const char16_t* tail = sse_validate_utf16<EndianNess::SYS_LITTLE_ENDIAN>(buf, len);
   if (tail) {
-    return scalar::utf16::validate<endianness::LITTLE>(tail, len - (tail - buf));
+    return scalar::utf16::validate<EndianNess::SYS_LITTLE_ENDIAN>(tail, len - (tail - buf));
   } else {
     return false;
   }
 }
 
 TURBO_MUST_USE_RESULT bool Implementation::ValidateUtf16Be(const char16_t *buf, size_t len) const noexcept {
-  const char16_t* tail = sse_validate_utf16<endianness::BIG>(buf, len);
+  const char16_t* tail = sse_validate_utf16<EndianNess::SYS_BIG_ENDIAN>(buf, len);
   if (tail) {
-    return scalar::utf16::validate<endianness::BIG>(tail, len - (tail - buf));
+    return scalar::utf16::validate<EndianNess::SYS_BIG_ENDIAN>(tail, len - (tail - buf));
   } else {
     return false;
   }
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ValidateUtf16LeWithErrors(const char16_t *buf, size_t len) const noexcept {
-  result res = sse_validate_utf16_with_errors<endianness::LITTLE>(buf, len);
+  result res = sse_validate_utf16_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len);
   if (res.count != len) {
-    result scalar_res = scalar::utf16::validate_with_errors<endianness::LITTLE>(buf + res.count, len - res.count);
+    result scalar_res = scalar::utf16::validate_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf + res.count, len - res.count);
     return result(scalar_res.error, res.count + scalar_res.count);
   } else {
     return res;
@@ -137,9 +137,9 @@ TURBO_MUST_USE_RESULT result Implementation::ValidateUtf16LeWithErrors(const cha
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ValidateUtf16BeWithErrors(const char16_t *buf, size_t len) const noexcept {
-  result res = sse_validate_utf16_with_errors<endianness::BIG>(buf, len);
+  result res = sse_validate_utf16_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len);
   if (res.count != len) {
-    result scalar_res = scalar::utf16::validate_with_errors<endianness::BIG>(buf + res.count, len - res.count);
+    result scalar_res = scalar::utf16::validate_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf + res.count, len - res.count);
     return result(scalar_res.error, res.count + scalar_res.count);
   } else {
     return res;
@@ -167,33 +167,33 @@ TURBO_MUST_USE_RESULT result Implementation::ValidateUtf32WithErrors(const char3
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf8ToUtf16Le(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16::validating_transcoder converter;
-  return converter.convert<endianness::LITTLE>(buf, len, utf16_output);
+  return converter.convert<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf8ToUtf16Be(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16::validating_transcoder converter;
-  return converter.convert<endianness::BIG>(buf, len, utf16_output);
+  return converter.convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf8ToUtf16LeWithErrors(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16::validating_transcoder converter;
-  return converter.convert_with_errors<endianness::LITTLE>(buf, len, utf16_output);
+  return converter.convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
 }
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf8ToUtf16BeWithErrors(const char* buf, size_t len, char16_t* utf16_output) const noexcept {
   utf8_to_utf16::validating_transcoder converter;
-  return converter.convert_with_errors<endianness::BIG>(buf, len, utf16_output);
+  return converter.convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
 }
 
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf8ToUtf16Le(const char* input, size_t size,
     char16_t* utf16_output) const noexcept {
-  return utf8_to_utf16::convert_valid<endianness::LITTLE>(input, size,  utf16_output);
+  return utf8_to_utf16::convert_valid<EndianNess::SYS_LITTLE_ENDIAN>(input, size,  utf16_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf8ToUtf16Be(const char* input, size_t size,
     char16_t* utf16_output) const noexcept {
-  return utf8_to_utf16::convert_valid<endianness::BIG>(input, size,  utf16_output);
+  return utf8_to_utf16::convert_valid<EndianNess::SYS_BIG_ENDIAN>(input, size,  utf16_output);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf8ToUtf32(const char* buf, size_t len, char32_t* utf32_output) const noexcept {
@@ -212,11 +212,11 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf8ToUtf32(const char*
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  std::pair<const char16_t*, char*> ret = sse_convert_utf16_to_utf8<endianness::LITTLE>(buf, len, utf8_output);
+  std::pair<const char16_t*, char*> ret = sse_convert_utf16_to_utf8<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf8_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf8_output;
   if (ret.first != buf + len) {
-    const size_t scalar_saved_bytes = scalar::utf16_to_utf8::convert<endianness::LITTLE>(
+    const size_t scalar_saved_bytes = scalar::utf16_to_utf8::convert<EndianNess::SYS_LITTLE_ENDIAN>(
                                         ret.first, len - (ret.first - buf), ret.second);
     if (scalar_saved_bytes == 0) { return 0; }
     saved_bytes += scalar_saved_bytes;
@@ -225,11 +225,11 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf8(const char16_t
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf8(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
-  std::pair<const char16_t*, char*> ret = sse_convert_utf16_to_utf8<endianness::BIG>(buf, len, utf8_output);
+  std::pair<const char16_t*, char*> ret = sse_convert_utf16_to_utf8<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf8_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf8_output;
   if (ret.first != buf + len) {
-    const size_t scalar_saved_bytes = scalar::utf16_to_utf8::convert<endianness::BIG>(
+    const size_t scalar_saved_bytes = scalar::utf16_to_utf8::convert<EndianNess::SYS_BIG_ENDIAN>(
                                         ret.first, len - (ret.first - buf), ret.second);
     if (scalar_saved_bytes == 0) { return 0; }
     saved_bytes += scalar_saved_bytes;
@@ -239,10 +239,10 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf8(const char16_t
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
-  std::pair<result, char*> ret = westmere::sse_convert_utf16_to_utf8_with_errors<endianness::LITTLE>(buf, len, utf8_output);
+  std::pair<result, char*> ret = westmere::sse_convert_utf16_to_utf8_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf8_output);
   if (ret.first.error) { return ret.first; }  // Can return directly since scalar fallback already found correct ret.first.count
   if (ret.first.count != len) { // All good so far, but not finished
-    result scalar_res = scalar::utf16_to_utf8::convert_with_errors<endianness::LITTLE>(
+    result scalar_res = scalar::utf16_to_utf8::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(
                                         buf + ret.first.count, len - ret.first.count, ret.second);
     if (scalar_res.error) {
       scalar_res.count += ret.first.count;
@@ -257,10 +257,10 @@ TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf8WithErrors(cons
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16BeToUtf8WithErrors(const char16_t* buf, size_t len, char* utf8_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
-  std::pair<result, char*> ret = westmere::sse_convert_utf16_to_utf8_with_errors<endianness::BIG>(buf, len, utf8_output);
+  std::pair<result, char*> ret = westmere::sse_convert_utf16_to_utf8_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf8_output);
   if (ret.first.error) { return ret.first; }  // Can return directly since scalar fallback already found correct ret.first.count
   if (ret.first.count != len) { // All good so far, but not finished
-    result scalar_res = scalar::utf16_to_utf8::convert_with_errors<endianness::BIG>(
+    result scalar_res = scalar::utf16_to_utf8::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(
                                         buf + ret.first.count, len - ret.first.count, ret.second);
     if (scalar_res.error) {
       scalar_res.count += ret.first.count;
@@ -312,11 +312,11 @@ TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf8WithErrors(const 
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  std::pair<const char16_t*, char32_t*> ret = sse_convert_utf16_to_utf32<endianness::LITTLE>(buf, len, utf32_output);
+  std::pair<const char16_t*, char32_t*> ret = sse_convert_utf16_to_utf32<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf32_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf32_output;
   if (ret.first != buf + len) {
-    const size_t scalar_saved_bytes = scalar::utf16_to_utf32::convert<endianness::LITTLE>(
+    const size_t scalar_saved_bytes = scalar::utf16_to_utf32::convert<EndianNess::SYS_LITTLE_ENDIAN>(
                                         ret.first, len - (ret.first - buf), ret.second);
     if (scalar_saved_bytes == 0) { return 0; }
     saved_bytes += scalar_saved_bytes;
@@ -325,11 +325,11 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16LeToUtf32(const char16_
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf32(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
-  std::pair<const char16_t*, char32_t*> ret = sse_convert_utf16_to_utf32<endianness::BIG>(buf, len, utf32_output);
+  std::pair<const char16_t*, char32_t*> ret = sse_convert_utf16_to_utf32<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf32_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf32_output;
   if (ret.first != buf + len) {
-    const size_t scalar_saved_bytes = scalar::utf16_to_utf32::convert<endianness::BIG>(
+    const size_t scalar_saved_bytes = scalar::utf16_to_utf32::convert<EndianNess::SYS_BIG_ENDIAN>(
                                         ret.first, len - (ret.first - buf), ret.second);
     if (scalar_saved_bytes == 0) { return 0; }
     saved_bytes += scalar_saved_bytes;
@@ -339,10 +339,10 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf16BeToUtf32(const char16_
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
-  std::pair<result, char32_t*> ret = westmere::sse_convert_utf16_to_utf32_with_errors<endianness::LITTLE>(buf, len, utf32_output);
+  std::pair<result, char32_t*> ret = westmere::sse_convert_utf16_to_utf32_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf32_output);
   if (ret.first.error) { return ret.first; }  // Can return directly since scalar fallback already found correct ret.first.count
   if (ret.first.count != len) { // All good so far, but not finished
-    result scalar_res = scalar::utf16_to_utf32::convert_with_errors<endianness::LITTLE>(
+    result scalar_res = scalar::utf16_to_utf32::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(
                                         buf + ret.first.count, len - ret.first.count, ret.second);
     if (scalar_res.error) {
       scalar_res.count += ret.first.count;
@@ -357,10 +357,10 @@ TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16LeToUtf32WithErrors(con
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf16BeToUtf32WithErrors(const char16_t* buf, size_t len, char32_t* utf32_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
-  std::pair<result, char32_t*> ret = westmere::sse_convert_utf16_to_utf32_with_errors<endianness::BIG>(buf, len, utf32_output);
+  std::pair<result, char32_t*> ret = westmere::sse_convert_utf16_to_utf32_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf32_output);
   if (ret.first.error) { return ret.first; }  // Can return directly since scalar fallback already found correct ret.first.count
   if (ret.first.count != len) { // All good so far, but not finished
-    result scalar_res = scalar::utf16_to_utf32::convert_with_errors<endianness::BIG>(
+    result scalar_res = scalar::utf16_to_utf32::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(
                                         buf + ret.first.count, len - ret.first.count, ret.second);
     if (scalar_res.error) {
       scalar_res.count += ret.first.count;
@@ -378,11 +378,11 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertValidUtf32ToUtf8(const char3
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Le(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  std::pair<const char32_t*, char16_t*> ret = sse_convert_utf32_to_utf16<endianness::LITTLE>(buf, len, utf16_output);
+  std::pair<const char32_t*, char16_t*> ret = sse_convert_utf32_to_utf16<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf16_output;
   if (ret.first != buf + len) {
-    const size_t scalar_saved_bytes = scalar::utf32_to_utf16::convert<endianness::LITTLE>(
+    const size_t scalar_saved_bytes = scalar::utf32_to_utf16::convert<EndianNess::SYS_LITTLE_ENDIAN>(
                                         ret.first, len - (ret.first - buf), ret.second);
     if (scalar_saved_bytes == 0) { return 0; }
     saved_bytes += scalar_saved_bytes;
@@ -391,11 +391,11 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Le(const char32_
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Be(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
-  std::pair<const char32_t*, char16_t*> ret = sse_convert_utf32_to_utf16<endianness::BIG>(buf, len, utf16_output);
+  std::pair<const char32_t*, char16_t*> ret = sse_convert_utf32_to_utf16<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
   if (ret.first == nullptr) { return 0; }
   size_t saved_bytes = ret.second - utf16_output;
   if (ret.first != buf + len) {
-    const size_t scalar_saved_bytes = scalar::utf32_to_utf16::convert<endianness::BIG>(
+    const size_t scalar_saved_bytes = scalar::utf32_to_utf16::convert<EndianNess::SYS_BIG_ENDIAN>(
                                         ret.first, len - (ret.first - buf), ret.second);
     if (scalar_saved_bytes == 0) { return 0; }
     saved_bytes += scalar_saved_bytes;
@@ -405,9 +405,9 @@ TURBO_MUST_USE_RESULT size_t Implementation::ConvertUtf32ToUtf16Be(const char32_
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf16leWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
-  std::pair<result, char16_t*> ret = westmere::sse_convert_utf32_to_utf16_with_errors<endianness::LITTLE>(buf, len, utf16_output);
+  std::pair<result, char16_t*> ret = westmere::sse_convert_utf32_to_utf16_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
   if (ret.first.count != len) {
-    result scalar_res = scalar::utf32_to_utf16::convert_with_errors<endianness::LITTLE>(
+    result scalar_res = scalar::utf32_to_utf16::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(
                                         buf + ret.first.count, len - ret.first.count, ret.second);
     if (scalar_res.error) {
       scalar_res.count += ret.first.count;
@@ -422,9 +422,9 @@ TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf16leWithErrors(con
 
 TURBO_MUST_USE_RESULT result Implementation::ConvertUtf32ToUtf16BeWithErrors(const char32_t* buf, size_t len, char16_t* utf16_output) const noexcept {
   // ret.first.count is always the position in the buffer, not the number of words written even if finished
-  std::pair<result, char16_t*> ret = westmere::sse_convert_utf32_to_utf16_with_errors<endianness::BIG>(buf, len, utf16_output);
+  std::pair<result, char16_t*> ret = westmere::sse_convert_utf32_to_utf16_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
   if (ret.first.count != len) {
-    result scalar_res = scalar::utf32_to_utf16::convert_with_errors<endianness::BIG>(
+    result scalar_res = scalar::utf32_to_utf16::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(
                                         buf + ret.first.count, len - ret.first.count, ret.second);
     if (scalar_res.error) {
       scalar_res.count += ret.first.count;
@@ -458,11 +458,11 @@ void Implementation::ChangeEndiannessUtf16(const char16_t * input, size_t length
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::CountUtf16Le(const char16_t * input, size_t length) const noexcept {
-  return utf16::count_code_points<endianness::LITTLE>(input, length);
+  return utf16::count_code_points<EndianNess::SYS_LITTLE_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::CountUtf16Be(const char16_t * input, size_t length) const noexcept {
-  return utf16::count_code_points<endianness::BIG>(input, length);
+  return utf16::count_code_points<EndianNess::SYS_BIG_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::CountUtf8(const char * input, size_t length) const noexcept {
@@ -470,19 +470,19 @@ TURBO_MUST_USE_RESULT size_t Implementation::CountUtf8(const char * input, size_
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf8LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
-  return utf16::Utf8LengthFromUtf16<endianness::LITTLE>(input, length);
+  return utf16::Utf8LengthFromUtf16<EndianNess::SYS_LITTLE_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf8LengthFromUtf16be(const char16_t * input, size_t length) const noexcept {
-  return utf16::Utf8LengthFromUtf16<endianness::BIG>(input, length);
+  return utf16::Utf8LengthFromUtf16<EndianNess::SYS_BIG_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf32LengthFromUtf16Le(const char16_t * input, size_t length) const noexcept {
-  return utf16::Utf32LengthFromUtf16<endianness::LITTLE>(input, length);
+  return utf16::Utf32LengthFromUtf16<EndianNess::SYS_LITTLE_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf32LengthFromUtf16Be(const char16_t * input, size_t length) const noexcept {
-  return utf16::Utf32LengthFromUtf16<endianness::BIG>(input, length);
+  return utf16::Utf32LengthFromUtf16<EndianNess::SYS_BIG_ENDIAN>(input, length);
 }
 
 TURBO_MUST_USE_RESULT size_t Implementation::Utf16LengthFromUtf8(const char * input, size_t length) const noexcept {
