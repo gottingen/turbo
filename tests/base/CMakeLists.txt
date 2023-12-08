@@ -106,7 +106,7 @@ carbin_cc_library(
         turbo
         NAME
         exception_testing
-        HDRS
+        HEADERS
         "exception_testing.h"
         COPTS
         ${TURBO_DEFAULT_COPTS}
@@ -122,7 +122,7 @@ carbin_cc_library(
         turbo
         NAME
         exception_safety_testing
-        HDRS
+        HEADERS
         "exception_safety_testing.h"
         SOURCES
         "exception_safety_testing.cc"

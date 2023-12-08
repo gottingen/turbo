@@ -31,25 +31,27 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+    TURBO_NAMESPACE_BEGIN
 
-//------------------------------------------------------------------------------
-// SeedGenException
-//------------------------------------------------------------------------------
-class SeedGenException : public std::exception {
- public:
-  SeedGenException() = default;
-  ~SeedGenException() override;
-  const char* what() const noexcept override;
-};
+    //------------------------------------------------------------------------------
+    // SeedGenException
+    //------------------------------------------------------------------------------
+    class SeedGenException : public std::exception {
+    public:
+        SeedGenException() = default;
 
-namespace random_internal {
+        ~SeedGenException() override;
 
-// throw delegator
-[[noreturn]] void ThrowSeedGenException();
+        const char *what() const noexcept override;
+    };
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
+    namespace random_internal {
+
+        // throw delegator
+        [[noreturn]] void ThrowSeedGenException();
+
+    }  // namespace random_internal
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_SEED_GEN_EXCEPTION_H_

@@ -39,7 +39,7 @@
 #include "turbo/meta/compare.h"
 #include "turbo/meta/container.h"
 #include "turbo/platform/port.h"
-#include "turbo/random/random.h"
+//#include "turbo/random/random.h"
 #include "turbo/format/format.h"
 #include "turbo/strings/str_split.h"
 #include "turbo/strings/string_view.h"
@@ -85,10 +85,10 @@ namespace turbo {
             }
         }  // namespace
 
-// The base class for a sorted associative container checker. TreeType is the
-// container type to check and CheckerType is the container type to check
-// against. TreeType is expected to be btree_{set,map,multiset,multimap} and
-// CheckerType is expected to be {set,map,multiset,multimap}.
+        // The base class for a sorted associative container checker. TreeType is the
+        // container type to check and CheckerType is the container type to check
+        // against. TreeType is expected to be btree_{set,map,multiset,multimap} and
+        // CheckerType is expected to be {set,map,multiset,multimap}.
         template<typename TreeType, typename CheckerType>
         class base_checker {
         public:

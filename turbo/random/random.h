@@ -32,158 +32,79 @@
 #define TURBO_RANDOM_RANDOM_H_
 
 #include <random>
-
-#include "turbo/random/distributions.h"  // IWYU pragma: export
-#include "turbo/random/internal/nonsecure_base.h"  // IWYU pragma: export
-#include "turbo/random/internal/pcg_engine.h"  // IWYU pragma: export
-#include "turbo/random/internal/pool_urbg.h"
-#include "turbo/random/internal/randen_engine.h"
-#include "turbo/random/seed_sequences.h"  // IWYU pragma: export
+#include <numeric>
+#include "turbo/random/engine.h"
+#include "turbo/random/fast_random.h"
+#include "turbo/meta/type_traits.h"
+#include <vector>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-// -----------------------------------------------------------------------------
-// turbo::BitGen
-// -----------------------------------------------------------------------------
-//
-// `turbo::BitGen` is a general-purpose random bit generator for generating
-// random values for use within the Turbo random library. Typically, you use a
-// bit generator in combination with a distribution to provide random values.
-//
-// Example:
-//
-//   // Create an turbo::BitGen. There is no need to seed this bit generator.
-//   turbo::BitGen gen;
-//
-//   // Generate an integer value in the closed interval [1,6]
-//   int die_roll = turbo::uniform_int_distribution<int>(1, 6)(gen);
-//
-// `turbo::BitGen` is seeded by default with non-deterministic data to produce
-// different sequences of random values across different instances, including
-// different binary invocations. This behavior is different than the standard
-// library bit generators, which use golden values as their seeds. Default
-// construction intentionally provides no stability guarantees, to avoid
-// accidental dependence on such a property.
-//
-// `turbo::BitGen` may be constructed with an optional seed sequence type,
-// conforming to [rand.req.seed_seq], which will be mixed with additional
-// non-deterministic data as detailed below.
-//
-// Example:
-//
-//  // Create an turbo::BitGen using an std::seed_seq seed sequence
-//  std::seed_seq seq{1,2,3};
-//  turbo::BitGen gen_with_seed(seq);
-//
-//  // Generate an integer value in the closed interval [1,6]
-//  int die_roll2 = turbo::uniform_int_distribution<int>(1, 6)(gen_with_seed);
-//
-// Constructing two `turbo::BitGen`s with the same seed sequence in the same
-// process will produce the same sequence of variates, but need not do so across
-// multiple processes even if they're executing the same binary.
-//
-// `turbo::BitGen` meets the requirements of the Uniform Random Bit Generator
-// (URBG) concept as per the C++17 standard [rand.req.urng] though differs
-// slightly with [rand.req.eng]. Like its standard library equivalents (e.g.
-// `std::mersenne_twister_engine`) `turbo::BitGen` is not cryptographically
-// secure.
-//
-// This type has been optimized to perform better than Mersenne Twister
-// (https://en.wikipedia.org/wiki/Mersenne_Twister) and many other complex URBG
-// types on modern x86, ARM, and PPC architectures.
-//
-// This type is thread-compatible, but not thread-safe.
+    inline uint64_t fast_random() {
+        return FastRandom::get_thread_instance()->generate();
+    }
 
-// ---------------------------------------------------------------------------
-// turbo::BitGen member functions
-// ---------------------------------------------------------------------------
+    inline uint64_t fast_random(uint64_t range) {
+        return FastRandom::get_thread_instance()->generate(range);
+    }
 
-// turbo::BitGen::operator()()
-//
-// Calls the BitGen, returning a generated value.
+    inline uint64_t fast_random(uint64_t lo, uint64_t hi) {
+        return FastRandom::get_thread_instance()->generate_64(lo, hi);
+    }
 
-// turbo::BitGen::min()
-//
-// Returns the smallest possible value from this bit generator.
+    inline uint64_t fast_random_u64(uint64_t lo, uint64_t hi) {
+        return FastRandom::get_thread_instance()->generate_u64(lo, hi);
+    }
 
-// turbo::BitGen::max()
-//
-// Returns the largest possible value from this bit generator.
+    template<class T = int64_t, std::enable_if_t<std::is_integral_v<T> ||std::is_floating_point_v<T>, int>>
+    inline T fast_random(int64_t lo, int64_t hi) {
+        return FastRandom::get_thread_instance()->generate<T>(lo, hi);
+    }
 
-// turbo::BitGen::discard(num)
-//
-// Advances the internal state of this bit generator by `num` times, and
-// discards the intermediate results.
-// ---------------------------------------------------------------------------
+    inline double fast_random_double() {
+        return FastRandom::get_thread_instance()->generate_double();
+    }
 
-using BitGen = random_internal::NonsecureURBGBase<
-    random_internal::randen_engine<uint64_t>>;
+    void fast_random_bytes(void *output, size_t output_length);
 
-// -----------------------------------------------------------------------------
-// turbo::InsecureBitGen
-// -----------------------------------------------------------------------------
-//
-// `turbo::InsecureBitGen` is an efficient random bit generator for generating
-// random values, recommended only for performance-sensitive use cases where
-// `turbo::BitGen` is not satisfactory when compute-bounded by bit generation
-// costs.
-//
-// Example:
-//
-//   // Create an turbo::InsecureBitGen
-//   turbo::InsecureBitGen gen;
-//   for (size_t i = 0; i < 1000000; i++) {
-//
-//     // Generate a bunch of random values from some complex distribution
-//     auto my_rnd = some_distribution(gen, 1, 1000);
-//   }
-//
-// Like `turbo::BitGen`, `turbo::InsecureBitGen` is seeded by default with
-// non-deterministic data to produce different sequences of random values across
-// different instances, including different binary invocations. (This behavior
-// is different than the standard library bit generators, which use golden
-// values as their seeds.)
-//
-// `turbo::InsecureBitGen` may be constructed with an optional seed sequence
-// type, conforming to [rand.req.seed_seq], which will be mixed with additional
-// non-deterministic data, as detailed in the `turbo::BitGen` comment.
-//
-// `turbo::InsecureBitGen` meets the requirements of the Uniform Random Bit
-// Generator (URBG) concept as per the C++17 standard [rand.req.urng] though
-// its implementation differs slightly with [rand.req.eng]. Like its standard
-// library equivalents (e.g. `std::mersenne_twister_engine`)
-// `turbo::InsecureBitGen` is not cryptographically secure.
-//
-// Prefer `turbo::BitGen` over `turbo::InsecureBitGen` as the general type is
-// often fast enough for the vast majority of applications.
+    std::string fast_random_printable(size_t length);
 
-using InsecureBitGen =
-    random_internal::NonsecureURBGBase<random_internal::pcg64_2018_engine>;
 
-// ---------------------------------------------------------------------------
-// turbo::InsecureBitGen member functions
-// ---------------------------------------------------------------------------
+    template<typename T>
+    class UniformRandom {
+    public:
+        template<check_requires<std::is_integral<T>>>
+        UniformRandom(): _gen(), _hi(std::numeric_limits<T>::max()), _lo(std::numeric_limits<T>::min()) {}
 
-// turbo::InsecureBitGen::operator()()
-//
-// Calls the InsecureBitGen, returning a generated value.
+        UniformRandom(T hi, T lo) : _gen(), _hi(hi), _lo(lo) {}
 
-// turbo::InsecureBitGen::min()
-//
-// Returns the smallest possible value from this bit generator.
+        UniformRandom(BitGen gen, T hi, T lo) : _gen(gen), _hi(hi), _lo(lo) {}
 
-// turbo::InsecureBitGen::max()
-//
-// Returns the largest possible value from this bit generator.
+        T generate() {
+            return Uniform(_gen, _lo, _hi);
+        }
 
-// turbo::InsecureBitGen::discard(num)
-//
-// Advances the internal state of this bit generator by `num` times, and
-// discards the intermediate results.
-// ---------------------------------------------------------------------------
+    private:
+        BitGen _gen;
+        T _hi;
+        T _lo;
+    };
 
-TURBO_NAMESPACE_END
+    template<typename T, check_requires<std::is_integral<T>>>
+    class UniformRandomRanges {
+    public:
+
+        UniformRandomRanges(const std::vector<std::pair<T, T>> &ranges) : _gen(), _ranges(ranges) {}
+
+        T generate() {
+            auto index = Uniform(IntervalClosedOpen, _gen, 0, _ranges.size());
+            return Uniform(_gen, _ranges[index].first, _ranges[index].second);
+        }
+
+    private:
+        BitGen _gen;
+        std::vector<std::pair<T, T>> _ranges;
+    };
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_RANDOM_H_

@@ -13,12 +13,13 @@
 // limitations under the License.
 #include "turbo/platform/port.h"
 
+#include "turbo/unicode/converter.h"
+
 TURBO_DISABLE_CLANG_WARNING(-Wcase-qual)
 TURBO_DISABLE_CLANG_WARNING(-Wsign-conversion)
 
 #include "turbo/unicode/utf.h"
 #include "turbo/unicode/implementation.cc"
-#include "turbo/unicode/error.cc"
 // The large tables should be included once and they
 // should not depend on a kernel.
 #include "turbo/unicode/tables/utf8_to_utf16_tables.h"

@@ -21,6 +21,7 @@
 #include <string>
 #include <string_view>
 #include "turbo/meta/span.h"
+#include "turbo/utf/converter.h"
 
 namespace turbo {
 

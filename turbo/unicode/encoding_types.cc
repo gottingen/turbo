@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/utf/encoding_types.h"
+#include "turbo/unicode/encoding_types.h"
 
 namespace turbo {
 
