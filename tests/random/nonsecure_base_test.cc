@@ -22,7 +22,7 @@
 #include <sstream>
 
 #include "gtest/gtest.h"
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 #include "turbo/random/random.h"
 
 namespace {
@@ -145,10 +145,10 @@ TEST(NonsecureURBGBase, SeedSeqConstructorIsValid) {
 TEST(NonsecureURBGBase, CompatibleWithDistributionUtils) {
   ExampleNonsecureURBG rbg;
 
-  turbo::Uniform(rbg, 0, 100);
-  turbo::Uniform(rbg, 0.5, 0.7);
-  turbo::Poisson<uint32_t>(rbg);
-  turbo::Exponential<float>(rbg);
+  turbo::uniform(rbg, 0, 100);
+  turbo::uniform(rbg, 0.5, 0.7);
+  turbo::poisson<uint32_t>(rbg);
+  turbo::exponential<float>(rbg);
 }
 
 TEST(NonsecureURBGBase, CompatibleWithStdDistributions) {

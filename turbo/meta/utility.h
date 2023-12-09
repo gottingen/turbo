@@ -53,25 +53,25 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-// integer_sequence
-//
-// Class template representing a compile-time integer sequence. An instantiation
-// of `integer_sequence<T, Ints...>` has a sequence of integers encoded in its
-// type through its template arguments (which is a common need when
-// working with C++11 variadic templates). `turbo::integer_sequence` is designed
-// to be a drop-in replacement for C++14's `std::integer_sequence`.
-//
-// Example:
-//
-//   template< class T, T... Ints >
-//   void user_function(integer_sequence<T, Ints...>);
-//
-//   int main()
-//   {
-//     // user_function's `T` will be deduced to `int` and `Ints...`
-//     // will be deduced to `0, 1, 2, 3, 4`.
-//     user_function(make_integer_sequence<int, 5>());
-//   }
+    // integer_sequence
+    //
+    // Class template representing a compile-time integer sequence. An instantiation
+    // of `integer_sequence<T, Ints...>` has a sequence of integers encoded in its
+    // type through its template arguments (which is a common need when
+    // working with C++11 variadic templates). `turbo::integer_sequence` is designed
+    // to be a drop-in replacement for C++14's `std::integer_sequence`.
+    //
+    // Example:
+    //
+    //   template< class T, T... Ints >
+    //   void user_function(integer_sequence<T, Ints...>);
+    //
+    //   int main()
+    //   {
+    //     // user_function's `T` will be deduced to `int` and `Ints...`
+    //     // will be deduced to `0, 1, 2, 3, 4`.
+    //     user_function(make_integer_sequence<int, 5>());
+    //   }
     template<typename T, T... Ints>
     struct integer_sequence {
         using value_type = T;
@@ -79,11 +79,11 @@ namespace turbo {
         static constexpr size_t size() noexcept { return sizeof...(Ints); }
     };
 
-// index_sequence
-//
-// A helper template for an `integer_sequence` of `size_t`,
-// `turbo::index_sequence` is designed to be a drop-in replacement for C++14's
-// `std::index_sequence`.
+    // index_sequence
+    //
+    // A helper template for an `integer_sequence` of `size_t`,
+    // `turbo::index_sequence` is designed to be a drop-in replacement for C++14's
+    // `std::index_sequence`.
     template<size_t... Ints>
     using index_sequence = integer_sequence<size_t, Ints...>;
 
@@ -92,7 +92,7 @@ namespace turbo {
         template<typename Seq, size_t SeqSize, size_t Rem>
         struct Extend;
 
-// Note that SeqSize == sizeof...(Ints). It's passed explicitly for efficiency.
+    // Note that SeqSize == sizeof...(Ints). It's passed explicitly for efficiency.
         template<typename T, T... Ints, size_t SeqSize>
         struct Extend<integer_sequence<T, Ints...>, SeqSize, 0> {
             using type = integer_sequence<T, Ints..., (Ints + SeqSize)...>;
@@ -216,37 +216,17 @@ namespace turbo {
     void in_place_index(utility_internal::InPlaceIndexTag<I>) {}
 #endif  // TURBO_USES_STD_VARIANT
 
-    // Constexpr move and forward
-
-    // move()
-    //
-    // A constexpr version of `std::move()`, designed to be a drop-in replacement
-    // for C++14's `std::move()`.
-    template<typename T>
-    constexpr std::remove_reference_t<T> &&move(T &&t) noexcept {
-        return static_cast<std::remove_reference_t<T> &&>(t);
-    }
-
-    // forward()
-    //
-    // A constexpr version of `std::forward()`, designed to be a drop-in replacement
-    // for C++14's `std::forward()`.
-    template<typename T>
-    constexpr T &&forward(
-            std::remove_reference_t<T> &t) noexcept {  // NOLINT(runtime/references)
-        return static_cast<T &&>(t);
-    }
 
     namespace utility_internal {
         // Helper method for expanding tuple into a called method.
         template<typename Functor, typename Tuple, std::size_t... Indexes>
         auto apply_helper(Functor &&functor, Tuple &&t, index_sequence<Indexes...>)
         -> decltype(turbo::base_internal::invoke(
-                turbo::forward<Functor>(functor),
-                std::get<Indexes>(turbo::forward<Tuple>(t))...)) {
+                std::forward<Functor>(functor),
+                std::get<Indexes>(std::forward<Tuple>(t))...)) {
             return turbo::base_internal::invoke(
-                    turbo::forward<Functor>(functor),
-                    std::get<Indexes>(turbo::forward<Tuple>(t))...);
+                    std::forward<Functor>(functor),
+                    std::get<Indexes>(std::forward<Tuple>(t))...);
         }
 
     }  // namespace utility_internal
@@ -293,11 +273,11 @@ namespace turbo {
     template<typename Functor, typename Tuple>
     auto apply(Functor &&functor, Tuple &&t)
     -> decltype(utility_internal::apply_helper(
-            turbo::forward<Functor>(functor), turbo::forward<Tuple>(t),
+            std::forward<Functor>(functor), std::forward<Tuple>(t),
             turbo::make_index_sequence<std::tuple_size<
                     typename std::remove_reference<Tuple>::type>::value>{})) {
         return utility_internal::apply_helper(
-                turbo::forward<Functor>(functor), turbo::forward<Tuple>(t),
+                std::forward<Functor>(functor), std::forward<Tuple>(t),
                 turbo::make_index_sequence<std::tuple_size<
                         typename std::remove_reference<Tuple>::type>::value>{});
     }
@@ -317,8 +297,8 @@ namespace turbo {
     //   }
     template<typename T, typename U = T>
     T exchange(T &obj, U &&new_value) {
-        T old_value = turbo::move(obj);
-        obj = turbo::forward<U>(new_value);
+        T old_value = std::move(obj);
+        obj = std::forward<U>(new_value);
         return old_value;
     }
 

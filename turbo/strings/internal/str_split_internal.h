@@ -218,7 +218,7 @@ struct SplitterIsConvertibleToImpl<C, true, false>
 
 template <typename C>
 struct SplitterIsConvertibleToImpl<C, true, true>
-    : turbo::conjunction<
+    : std::conjunction<
           std::is_constructible<typename C::key_type, std::string_view>,
           std::is_constructible<typename C::mapped_type, std::string_view>> {};
 

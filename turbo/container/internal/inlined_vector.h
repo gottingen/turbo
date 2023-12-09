@@ -77,7 +77,7 @@ using IsAtLeastForwardIterator = std::is_convertible<
 
 template <typename A>
 using IsMemcpyOk =
-    turbo::conjunction<std::is_same<A, std::allocator<ValueType<A>>>,
+    std::conjunction<std::is_same<A, std::allocator<ValueType<A>>>,
                       std::is_trivially_copy_constructible<ValueType<A>>,
                       std::is_trivially_copy_assignable<ValueType<A>>,
                       std::is_trivially_destructible<ValueType<A>>>;

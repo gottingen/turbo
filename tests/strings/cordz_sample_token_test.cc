@@ -161,8 +161,8 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
         //   3) Iterate over Cords visible to a token.
         //   4) Unsample
         //   5) Sample
-        int index = turbo::Uniform(gen, 0, kNumCords);
-        if (turbo::Bernoulli(gen, 0.5)) {
+        int index = turbo::uniform(gen, 0, kNumCords);
+        if (turbo::bernoulli(gen, 0.5)) {
           TestCordData& cord = cords[index];
           // Track/untrack.
           if (cord.data.is_profiled()) {
@@ -176,7 +176,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
         } else {
           std::unique_ptr<CordzSampleToken>& token = tokens[index];
           if (token) {
-            if (turbo::Bernoulli(gen, 0.5)) {
+            if (turbo::bernoulli(gen, 0.5)) {
               // 3) Iterate over Cords visible to a token.
               for (const CordzInfo& info : *token) {
                 // This is trivial work to allow us to compile the loop.

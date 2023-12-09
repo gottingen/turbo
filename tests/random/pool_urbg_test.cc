@@ -31,7 +31,7 @@ namespace {
 
 // is_randen_pool trait is true when parameterized by an RandenPool
 template <typename T>
-using is_randen_pool = typename turbo::disjunction<  //
+using is_randen_pool = typename std::disjunction<  //
     std::is_same<T, RandenPool<uint8_t>>,           //
     std::is_same<T, RandenPool<uint16_t>>,          //
     std::is_same<T, RandenPool<uint32_t>>,          //

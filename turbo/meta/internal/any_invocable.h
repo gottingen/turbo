@@ -738,7 +738,7 @@ using CanAssignReferenceWrapper = TrueAlias<
 // don't treat non-moveable result types correctly. For example this was the
 // case in libc++ before commit c3a24882 (2022-05).
 #define TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_true(inv_quals)      \
-  std::enable_if_t<turbo::disjunction<                                       \
+  std::enable_if_t<std::disjunction<                                       \
       std::is_nothrow_invocable_r<                                           \
           ReturnType, UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals, \
           P...>,                                                             \
@@ -777,7 +777,7 @@ using CanAssignReferenceWrapper = TrueAlias<
                                                                                \
     /*SFINAE constraint to check if F is invocable with the proper signature*/ \
     template <class F>                                                         \
-    using CallIsValid = TrueAlias<std::enable_if_t<turbo::disjunction<         \
+    using CallIsValid = TrueAlias<std::enable_if_t<std::disjunction<         \
         turbo::base_internal::is_invocable_r<ReturnType,                        \
                                             std::decay_t<F> inv_quals, P...>, \
         std::is_same<ReturnType,                                               \

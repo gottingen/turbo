@@ -1382,7 +1382,7 @@ class raw_hash_set {
   // cases.
   template <class T>
   using RequiresInsertable = typename std::enable_if<
-      turbo::disjunction<std::is_convertible<T, init_type>,
+      std::disjunction<std::is_convertible<T, init_type>,
                         SameAsElementReference<T>>::value,
       int>::type;
 

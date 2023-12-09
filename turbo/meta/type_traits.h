@@ -128,50 +128,6 @@ namespace turbo {
     template<typename... Ts>
     using void_t = typename type_traits_internal::VoidTImpl<Ts...>::type;
 
-    // conjunction
-    //
-    // Performs a compile-time logical AND operation on the passed types (which
-    // must have  `::value` members convertible to `bool`. Short-circuits if it
-    // encounters any `false` members (and does not compare the `::value` members
-    // of any remaining arguments).
-    //
-    // This metafunction is designed to be a drop-in replacement for the C++17
-    // `std::conjunction` metafunction.
-    template<typename... Ts>
-    struct conjunction : std::true_type {
-    };
-
-    template<typename T, typename... Ts>
-    struct conjunction<T, Ts...>
-            : std::conditional<T::value, conjunction<Ts...>, T>::type {
-    };
-
-    template<typename T>
-    struct conjunction<T> : T {
-    };
-
-    // disjunction
-    //
-    // Performs a compile-time logical OR operation on the passed types (which
-    // must have  `::value` members convertible to `bool`. Short-circuits if it
-    // encounters any `true` members (and does not compare the `::value` members
-    // of any remaining arguments).
-    //
-    // This metafunction is designed to be a drop-in replacement for the C++17
-    // `std::disjunction` metafunction.
-    template<typename... Ts>
-    struct disjunction : std::false_type {
-    };
-
-    template<typename T, typename... Ts>
-    struct disjunction<T, Ts...> :
-            std::conditional<T::value, T, disjunction<Ts...>>::type {
-    };
-
-    template<typename T>
-    struct disjunction<T> : T {
-    };
-
     // negation
     //
     // Performs a compile-time logical NOT operation on the passed type (which
@@ -209,10 +165,10 @@ namespace turbo {
     template <typename T>
     using remove_cvref_t = typename std::remove_cvref<T>::type;
 #else
-// remove_cvref()
-//
-// C++11 compatible implementation of std::remove_cvref which was added in
-// C++20.
+    // remove_cvref()
+    //
+    // C++11 compatible implementation of std::remove_cvref which was added in
+    // C++20.
     template<typename T>
     struct remove_cvref {
         using type =
@@ -733,10 +689,10 @@ namespace turbo {
 #if !defined(__GNUC__) || (defined(__GNUC__) && (__GNUC__ >= 5))
 
     template<class... C>
-    constexpr bool turbo_require = conjunction<C...>::value;
+    constexpr bool turbo_require = std::conjunction<C...>::value;
 
     template<class... C>
-    constexpr bool either = disjunction<C...>::value;
+    constexpr bool either = std::disjunction<C...>::value;
 
     template<class... C>
     constexpr bool disallow = std::negation<std::conjunction<C...>>::value;
@@ -762,13 +718,13 @@ namespace turbo {
     using check_requires = std::enable_if_t<conjunction<C...>::value, int>;
 
     template <class... C>
-    using check_either = std::enable_if_t<disjunction<C...>::value, int>;
+    using check_either = std::enable_if_t<std::disjunction<C...>::value, int>;
 
     template <class... C>
-    using check_disallow = std::enable_if_t<turbo::negation<turbo::conjunction<C...>>::value, int>;
+    using check_disallow = std::enable_if_t<turbo::negation<std::conjunction<C...>>::value, int>;
 
     template <class... C>
-    using check_disallow_one = std::enable_if_t<turbo::negation<turbo::disjunction<C...>>::value, int>;
+    using check_disallow_one = std::enable_if_t<turbo::negation<std::disjunction<C...>>::value, int>;
 
 #endif
 
@@ -793,7 +749,7 @@ namespace turbo {
      **************/
 
     template<class... Args>
-    struct all_scalar : conjunction<std::is_scalar<Args>...> {
+    struct all_scalar : std::conjunction<std::is_scalar<Args>...> {
     };
 
     struct identity {

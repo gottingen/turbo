@@ -35,6 +35,14 @@
 #include <numeric>
 #include "turbo/random/engine.h"
 #include "turbo/random/fast_random.h"
+#include "turbo/random/uniform.h"
+#include "turbo/random/bernoulli.h"
+#include "turbo/random/beta.h"
+#include "turbo/random/exponential.h"
+#include "turbo/random/gaussian.h"
+#include "turbo/random/log_uniform.h"
+#include "turbo/random/poisson.h"
+#include "turbo/random/zipf.h"
 #include "turbo/meta/type_traits.h"
 #include <vector>
 
@@ -81,7 +89,7 @@ namespace turbo {
         UniformRandom(BitGen gen, T hi, T lo) : _gen(gen), _hi(hi), _lo(lo) {}
 
         T generate() {
-            return Uniform(_gen, _lo, _hi);
+            return uniform(_gen, _lo, _hi);
         }
 
     private:
@@ -97,8 +105,8 @@ namespace turbo {
         UniformRandomRanges(const std::vector<std::pair<T, T>> &ranges) : _gen(), _ranges(ranges) {}
 
         T generate() {
-            auto index = Uniform(IntervalClosedOpen, _gen, 0, _ranges.size());
-            return Uniform(_gen, _ranges[index].first, _ranges[index].second);
+            auto index = uniform(IntervalClosedOpen, _gen, 0, _ranges.size());
+            return uniform(_gen, _ranges[index].first, _ranges[index].second);
         }
 
     private:

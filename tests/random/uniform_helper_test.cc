@@ -214,7 +214,7 @@ Invalid InferredUniformReturnT(...);
 template <typename A, typename B, typename Expect>
 void CheckArgsInferType() {
   static_assert(
-      turbo::conjunction<
+      std::conjunction<
           std::is_same<Expect, decltype(InferredUniformReturnT<A, B>(0))>,
           std::is_same<Expect,
                        decltype(InferredUniformReturnT<B, A>(0))>>::value,

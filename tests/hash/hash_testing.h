@@ -28,7 +28,7 @@
 #include <variant>
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+    TURBO_NAMESPACE_BEGIN
 
 // Run the turbo::Hash algorithm over all the elements passed in and verify that
 // their hash expansion is congruent with their `==` operator.
@@ -140,239 +140,245 @@ TURBO_NAMESPACE_BEGIN
 //       H::combine_contiguous(std::move(state), x.p, x.p + x.size), x.size);
 // }
 //
-template <int&... ExplicitBarrier, typename Container>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(const Container& values);
+    template<int &... ExplicitBarrier, typename Container>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(const Container &values);
 
-template <int&... ExplicitBarrier, typename Container, typename Eq>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals);
+    template<int &... ExplicitBarrier, typename Container, typename Eq>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(const Container &values, Eq equals);
 
-template <int&..., typename T>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values);
+    template<int &..., typename T>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values);
 
-template <int&..., typename T, typename Eq>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values,
-                                      Eq equals);
+    template<int &..., typename T, typename Eq>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values,
+                                           Eq equals);
 
-namespace hash_internal {
+    namespace hash_internal {
 
-struct PrintVisitor {
-  size_t index;
-  template <typename T>
-  std::string operator()(const T* value) const {
-    return turbo::Format("#{}({})", index, testing::PrintToString(*value));
-  }
-};
+        struct PrintVisitor {
+            size_t index;
 
-template <typename Eq>
-struct EqVisitor {
-  Eq eq;
-  template <typename T, typename U>
-  bool operator()(const T* t, const U* u) const {
-    return eq(*t, *u);
-  }
-};
+            template<typename T>
+            std::string operator()(const T *value) const {
+                return turbo::Format("#{}({})", index, testing::PrintToString(*value));
+            }
+        };
 
-struct ExpandVisitor {
-  template <typename T>
-  SpyHashState operator()(const T* value) const {
-    return SpyHashState::combine(SpyHashState(), *value);
-  }
-};
+        template<typename Eq>
+        struct EqVisitor {
+            Eq eq;
 
-template <typename Container, typename Eq>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals) {
-  using V = typename Container::value_type;
+            template<typename T, typename U>
+            bool operator()(const T *t, const U *u) const {
+                return eq(*t, *u);
+            }
+        };
 
-  struct Info {
-    const V& value;
-    size_t index;
-    std::string ToString() const {
-      return std::visit(PrintVisitor{index}, value);
+        struct ExpandVisitor {
+            template<typename T>
+            SpyHashState operator()(const T *value) const {
+                return SpyHashState::combine(SpyHashState(), *value);
+            }
+        };
+
+        template<typename Container, typename Eq>
+        TURBO_MUST_USE_RESULT testing::AssertionResult
+        VerifyTypeImplementsTurboHashCorrectly(const Container &values, Eq equals) {
+            using V = typename Container::value_type;
+
+            struct Info {
+                const V &value;
+                size_t index;
+
+                std::string ToString() const {
+                    return std::visit(PrintVisitor{index}, value);
+                }
+
+                SpyHashState expand() const { return std::visit(ExpandVisitor{}, value); }
+            };
+
+            using EqClass = std::vector<Info>;
+            std::vector<EqClass> classes;
+
+            // Gather the values in equivalence classes.
+            size_t i = 0;
+            for (const auto &value: values) {
+                EqClass *c = nullptr;
+                for (auto &eqclass: classes) {
+                    if (std::visit(EqVisitor<Eq>{equals}, value, eqclass[0].value)) {
+                        c = &eqclass;
+                        break;
+                    }
+                }
+                if (c == nullptr) {
+                    classes.emplace_back();
+                    c = &classes.back();
+                }
+                c->push_back({value, i});
+                ++i;
+
+                // Verify potential errors captured by SpyHashState.
+                if (auto error = c->back().expand().error()) {
+                    return testing::AssertionFailure() << *error;
+                }
+            }
+
+            if (classes.size() < 2) {
+                return testing::AssertionFailure()
+                        << "At least two equivalence classes are expected.";
+            }
+
+            // We assume that equality is correctly implemented.
+            // Now we verify that TurboHashValue is also correctly implemented.
+
+            for (const auto &c: classes) {
+                // All elements of the equivalence class must have the same hash
+                // expansion.
+                const SpyHashState expected = c[0].expand();
+                for (const Info &v: c) {
+                    if (v.expand() != v.expand()) {
+                        return testing::AssertionFailure()
+                                << "Hash expansion for " << v.ToString()
+                                << " is non-deterministic.";
+                    }
+                    if (v.expand() != expected) {
+                        return testing::AssertionFailure()
+                                << "Values " << c[0].ToString() << " and " << v.ToString()
+                                << " evaluate as equal but have an unequal hash expansion.";
+                    }
+                }
+
+                // Elements from other classes must have different hash expansion.
+                for (const auto &c2: classes) {
+                    if (&c == &c2) continue;
+                    const SpyHashState c2_hash = c2[0].expand();
+                    switch (SpyHashState::Compare(expected, c2_hash)) {
+                        case SpyHashState::CompareResult::kEqual:
+                            return testing::AssertionFailure()
+                                    << "Values " << c[0].ToString() << " and " << c2[0].ToString()
+                                    << " evaluate as unequal but have an equal hash expansion.";
+                        case SpyHashState::CompareResult::kBSuffixA:
+                            return testing::AssertionFailure()
+                                    << "Hash expansion of " << c2[0].ToString()
+                                    << " is a suffix of the hash expansion of " << c[0].ToString()
+                                    << ".";
+                        case SpyHashState::CompareResult::kASuffixB:
+                            return testing::AssertionFailure()
+                                    << "Hash expansion of " << c[0].ToString()
+                                    << " is a suffix of the hash expansion of " << c2[0].ToString()
+                                    << ".";
+                        case SpyHashState::CompareResult::kUnequal:
+                            break;
+                    }
+                }
+            }
+            return testing::AssertionSuccess();
+        }
+
+        template<typename... T>
+        struct TypeSet {
+            template<typename U, bool = std::disjunction<std::is_same<T, U>...>::value>
+            struct Insert {
+                using type = TypeSet<U, T...>;
+            };
+            template<typename U>
+            struct Insert<U, true> {
+                using type = TypeSet;
+            };
+
+            template<template<typename...> class C>
+            using apply = C<T...>;
+        };
+
+        template<typename... T>
+        struct MakeTypeSet : TypeSet<> {
+        };
+        template<typename T, typename... Ts>
+        struct MakeTypeSet<T, Ts...> : MakeTypeSet<Ts...>::template Insert<T>::type {
+        };
+
+        template<typename... T>
+        using VariantForTypes = typename MakeTypeSet<
+                const typename std::decay<T>::type *...>::template apply<std::variant>;
+
+        template<typename Container>
+        struct ContainerAsVector {
+            using V = std::variant<const typename Container::value_type *>;
+            using Out = std::vector<V>;
+
+            static Out Do(const Container &values) {
+                Out out;
+                for (const auto &v: values) out.push_back(&v);
+                return out;
+            }
+        };
+
+        template<typename... T>
+        struct ContainerAsVector<std::tuple<T...>> {
+            using V = VariantForTypes<T...>;
+            using Out = std::vector<V>;
+
+            template<size_t... I>
+            static Out DoImpl(const std::tuple<T...> &tuple, turbo::index_sequence<I...>) {
+                return Out{&std::get<I>(tuple)...};
+            }
+
+            static Out Do(const std::tuple<T...> &values) {
+                return DoImpl(values, turbo::index_sequence_for<T...>());
+            }
+        };
+
+        template<>
+        struct ContainerAsVector<std::tuple<>> {
+            static std::vector<VariantForTypes<int>> Do(std::tuple<>) { return {}; }
+        };
+
+        struct DefaultEquals {
+            template<typename T, typename U>
+            bool operator()(const T &t, const U &u) const {
+                return t == u;
+            }
+        };
+
+    }  // namespace hash_internal
+
+    template<int &..., typename Container>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(const Container &values) {
+        return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
+                hash_internal::ContainerAsVector<Container>::Do(values),
+                hash_internal::DefaultEquals{});
     }
-    SpyHashState expand() const { return std::visit(ExpandVisitor{}, value); }
-  };
 
-  using EqClass = std::vector<Info>;
-  std::vector<EqClass> classes;
-
-  // Gather the values in equivalence classes.
-  size_t i = 0;
-  for (const auto& value : values) {
-    EqClass* c = nullptr;
-    for (auto& eqclass : classes) {
-      if (std::visit(EqVisitor<Eq>{equals}, value, eqclass[0].value)) {
-        c = &eqclass;
-        break;
-      }
-    }
-    if (c == nullptr) {
-      classes.emplace_back();
-      c = &classes.back();
-    }
-    c->push_back({value, i});
-    ++i;
-
-    // Verify potential errors captured by SpyHashState.
-    if (auto error = c->back().expand().error()) {
-      return testing::AssertionFailure() << *error;
-    }
-  }
-
-  if (classes.size() < 2) {
-    return testing::AssertionFailure()
-           << "At least two equivalence classes are expected.";
-  }
-
-  // We assume that equality is correctly implemented.
-  // Now we verify that TurboHashValue is also correctly implemented.
-
-  for (const auto& c : classes) {
-    // All elements of the equivalence class must have the same hash
-    // expansion.
-    const SpyHashState expected = c[0].expand();
-    for (const Info& v : c) {
-      if (v.expand() != v.expand()) {
-        return testing::AssertionFailure()
-               << "Hash expansion for " << v.ToString()
-               << " is non-deterministic.";
-      }
-      if (v.expand() != expected) {
-        return testing::AssertionFailure()
-               << "Values " << c[0].ToString() << " and " << v.ToString()
-               << " evaluate as equal but have an unequal hash expansion.";
-      }
+    template<int &..., typename Container, typename Eq>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(const Container &values, Eq equals) {
+        return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
+                hash_internal::ContainerAsVector<Container>::Do(values), equals);
     }
 
-    // Elements from other classes must have different hash expansion.
-    for (const auto& c2 : classes) {
-      if (&c == &c2) continue;
-      const SpyHashState c2_hash = c2[0].expand();
-      switch (SpyHashState::Compare(expected, c2_hash)) {
-        case SpyHashState::CompareResult::kEqual:
-          return testing::AssertionFailure()
-                 << "Values " << c[0].ToString() << " and " << c2[0].ToString()
-                 << " evaluate as unequal but have an equal hash expansion.";
-        case SpyHashState::CompareResult::kBSuffixA:
-          return testing::AssertionFailure()
-                 << "Hash expansion of " << c2[0].ToString()
-                 << " is a suffix of the hash expansion of " << c[0].ToString()
-                 << ".";
-        case SpyHashState::CompareResult::kASuffixB:
-          return testing::AssertionFailure()
-                 << "Hash expansion of " << c[0].ToString()
-                 << " is a suffix of the hash expansion of " << c2[0].ToString()
-                 << ".";
-        case SpyHashState::CompareResult::kUnequal:
-          break;
-      }
+    template<int &..., typename T>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values) {
+        return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
+                hash_internal::ContainerAsVector<std::initializer_list<T>>::Do(values),
+                hash_internal::DefaultEquals{});
     }
-  }
-  return testing::AssertionSuccess();
-}
 
-template <typename... T>
-struct TypeSet {
-  template <typename U, bool = disjunction<std::is_same<T, U>...>::value>
-  struct Insert {
-    using type = TypeSet<U, T...>;
-  };
-  template <typename U>
-  struct Insert<U, true> {
-    using type = TypeSet;
-  };
+    template<int &..., typename T, typename Eq>
+    TURBO_MUST_USE_RESULT testing::AssertionResult
+    VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values,
+                                           Eq equals) {
+        return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
+                hash_internal::ContainerAsVector<std::initializer_list<T>>::Do(values),
+                equals);
+    }
 
-  template <template <typename...> class C>
-  using apply = C<T...>;
-};
-
-template <typename... T>
-struct MakeTypeSet : TypeSet<> {};
-template <typename T, typename... Ts>
-struct MakeTypeSet<T, Ts...> : MakeTypeSet<Ts...>::template Insert<T>::type {};
-
-template <typename... T>
-using VariantForTypes = typename MakeTypeSet<
-    const typename std::decay<T>::type*...>::template apply<std::variant>;
-
-template <typename Container>
-struct ContainerAsVector {
-  using V = std::variant<const typename Container::value_type*>;
-  using Out = std::vector<V>;
-
-  static Out Do(const Container& values) {
-    Out out;
-    for (const auto& v : values) out.push_back(&v);
-    return out;
-  }
-};
-
-template <typename... T>
-struct ContainerAsVector<std::tuple<T...>> {
-  using V = VariantForTypes<T...>;
-  using Out = std::vector<V>;
-
-  template <size_t... I>
-  static Out DoImpl(const std::tuple<T...>& tuple, turbo::index_sequence<I...>) {
-    return Out{&std::get<I>(tuple)...};
-  }
-
-  static Out Do(const std::tuple<T...>& values) {
-    return DoImpl(values, turbo::index_sequence_for<T...>());
-  }
-};
-
-template <>
-struct ContainerAsVector<std::tuple<>> {
-  static std::vector<VariantForTypes<int>> Do(std::tuple<>) { return {}; }
-};
-
-struct DefaultEquals {
-  template <typename T, typename U>
-  bool operator()(const T& t, const U& u) const {
-    return t == u;
-  }
-};
-
-}  // namespace hash_internal
-
-template <int&..., typename Container>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(const Container& values) {
-  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
-      hash_internal::ContainerAsVector<Container>::Do(values),
-      hash_internal::DefaultEquals{});
-}
-
-template <int&..., typename Container, typename Eq>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(const Container& values, Eq equals) {
-  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
-      hash_internal::ContainerAsVector<Container>::Do(values), equals);
-}
-
-template <int&..., typename T>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values) {
-  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
-      hash_internal::ContainerAsVector<std::initializer_list<T>>::Do(values),
-      hash_internal::DefaultEquals{});
-}
-
-template <int&..., typename T, typename Eq>
-TURBO_MUST_USE_RESULT testing::AssertionResult
-VerifyTypeImplementsTurboHashCorrectly(std::initializer_list<T> values,
-                                      Eq equals) {
-  return hash_internal::VerifyTypeImplementsTurboHashCorrectly(
-      hash_internal::ContainerAsVector<std::initializer_list<T>>::Do(values),
-      equals);
-}
-
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_HASH_HASH_TESTING_H_

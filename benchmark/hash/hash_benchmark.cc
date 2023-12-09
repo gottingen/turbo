@@ -270,7 +270,7 @@ TURBO_MAYBE_UNUSED static const bool kInitialized = [] {
   turbo::BitGen gen;
   static_assert(sizeof(entropy) % sizeof(uint64_t) == 0, "");
   for (int i = 0; i != sizeof(entropy); i += sizeof(uint64_t)) {
-    auto rand = turbo::Uniform<uint64_t>(gen);
+    auto rand = turbo::uniform<uint64_t>(gen);
     memcpy(&entropy[i], &rand, sizeof(uint64_t));
   }
   return true;

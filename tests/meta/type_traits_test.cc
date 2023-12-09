@@ -120,12 +120,12 @@ TEST(VoidTTest, BasicUsage) {
 }
 
 TEST(ConjunctionTest, BasicBooleanLogic) {
-  EXPECT_TRUE(turbo::conjunction<>::value);
-  EXPECT_TRUE(turbo::conjunction<std::true_type>::value);
-  EXPECT_TRUE((turbo::conjunction<std::true_type, std::true_type>::value));
-  EXPECT_FALSE((turbo::conjunction<std::true_type, std::false_type>::value));
-  EXPECT_FALSE((turbo::conjunction<std::false_type, std::true_type>::value));
-  EXPECT_FALSE((turbo::conjunction<std::false_type, std::false_type>::value));
+  EXPECT_TRUE(std::conjunction<>::value);
+  EXPECT_TRUE(std::conjunction<std::true_type>::value);
+  EXPECT_TRUE((std::conjunction<std::true_type, std::true_type>::value));
+  EXPECT_FALSE((std::conjunction<std::true_type, std::false_type>::value));
+  EXPECT_FALSE((std::conjunction<std::false_type, std::true_type>::value));
+  EXPECT_FALSE((std::conjunction<std::false_type, std::false_type>::value));
 }
 
 struct MyTrueType {
@@ -138,33 +138,33 @@ struct MyFalseType {
 
 TEST(ConjunctionTest, ShortCircuiting) {
   EXPECT_FALSE(
-      (turbo::conjunction<std::true_type, std::false_type, Dummy>::value));
+      (std::conjunction<std::true_type, std::false_type, Dummy>::value));
   EXPECT_TRUE((std::is_base_of<MyFalseType,
-                               turbo::conjunction<std::true_type, MyFalseType,
+                               std::conjunction<std::true_type, MyFalseType,
                                                  std::false_type>>::value));
   EXPECT_TRUE(
       (std::is_base_of<MyTrueType,
-                       turbo::conjunction<std::true_type, MyTrueType>>::value));
+                       std::conjunction<std::true_type, MyTrueType>>::value));
 }
 
 TEST(DisjunctionTest, BasicBooleanLogic) {
-  EXPECT_FALSE(turbo::disjunction<>::value);
-  EXPECT_FALSE(turbo::disjunction<std::false_type>::value);
-  EXPECT_TRUE((turbo::disjunction<std::true_type, std::true_type>::value));
-  EXPECT_TRUE((turbo::disjunction<std::true_type, std::false_type>::value));
-  EXPECT_TRUE((turbo::disjunction<std::false_type, std::true_type>::value));
-  EXPECT_FALSE((turbo::disjunction<std::false_type, std::false_type>::value));
+  EXPECT_FALSE(std::disjunction<>::value);
+  EXPECT_FALSE(std::disjunction<std::false_type>::value);
+  EXPECT_TRUE((std::disjunction<std::true_type, std::true_type>::value));
+  EXPECT_TRUE((std::disjunction<std::true_type, std::false_type>::value));
+  EXPECT_TRUE((std::disjunction<std::false_type, std::true_type>::value));
+  EXPECT_FALSE((std::disjunction<std::false_type, std::false_type>::value));
 }
 
 TEST(DisjunctionTest, ShortCircuiting) {
   EXPECT_TRUE(
-      (turbo::disjunction<std::false_type, std::true_type, Dummy>::value));
+      (std::disjunction<std::false_type, std::true_type, Dummy>::value));
   EXPECT_TRUE((
-      std::is_base_of<MyTrueType, turbo::disjunction<std::false_type, MyTrueType,
+      std::is_base_of<MyTrueType, std::disjunction<std::false_type, MyTrueType,
                                                     std::true_type>>::value));
   EXPECT_TRUE((
       std::is_base_of<MyFalseType,
-                      turbo::disjunction<std::false_type, MyFalseType>>::value));
+                      std::disjunction<std::false_type, MyFalseType>>::value));
 }
 
 TEST(NegationTest, BasicBooleanLogic) {

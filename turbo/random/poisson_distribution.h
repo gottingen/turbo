@@ -204,7 +204,7 @@ namespace turbo {
 
         // Use ratio of uniforms method.
         //
-        // Let u ~ Uniform(0, 1), v ~ Uniform(-1, 1),
+        // Let u ~ uniform(0, 1), v ~ uniform(-1, 1),
         //     a = lambda + 1/2,
         //     s = 1.5 - sqrt(3/e) + sqrt(2(lambda + 1/2)/e),
         //     x = s * v/u + a.

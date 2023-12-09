@@ -102,6 +102,7 @@ set(TURBO_ALL_SRC
         "random/discrete_distribution.cc"
         "random/gaussian_distribution.cc"
         "random/fast_random.cc"
+        "random/fwd.cc"
         "random/random.cc"
         "random/internal/pool_urbg.cc"
         "random/internal/randen.cc"

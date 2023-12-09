@@ -982,7 +982,7 @@ struct CustomHashType {
 
 template <InvokeTag allowed, InvokeTag... tags>
 struct EnableIfContained
-    : std::enable_if<turbo::disjunction<
+    : std::enable_if<std::disjunction<
           std::integral_constant<bool, allowed == tags>...>::value> {};
 
 template <

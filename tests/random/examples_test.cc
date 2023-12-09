@@ -28,27 +28,27 @@ TEST(Examples, Basic) {
   std::vector<int> objs = {10, 20, 30, 40, 50};
 
   // Choose an element from a set.
-  auto elem = objs[turbo::Uniform(gen, 0u, objs.size())];
+  auto elem = objs[turbo::uniform(gen, 0u, objs.size())];
   Use(elem);
 
   // Generate a uniform value between 1 and 6.
-  auto dice_roll = turbo::Uniform<int>(turbo::IntervalClosedClosed, gen, 1, 6);
+  auto dice_roll = turbo::uniform<int>(turbo::IntervalClosedClosed, gen, 1, 6);
   Use(dice_roll);
 
   // Generate a random byte.
-  auto byte = turbo::Uniform<uint8_t>(gen);
+  auto byte = turbo::uniform<uint8_t>(gen);
   Use(byte);
 
   // Generate a fractional value from [0f, 1f).
-  auto fraction = turbo::Uniform<float>(gen, 0, 1);
+  auto fraction = turbo::uniform<float>(gen, 0, 1);
   Use(fraction);
 
   // Toss a fair coin; 50/50 probability.
-  bool coin_toss = turbo::Bernoulli(gen, 0.5);
+  bool coin_toss = turbo::bernoulli(gen, 0.5);
   Use(coin_toss);
 
   // Select a file size between 1k and 10MB, biased towards smaller file sizes.
-  auto file_size = turbo::LogUniform<size_t>(gen, 1000, 10 * 1000 * 1000);
+  auto file_size = turbo::log_uniform<size_t>(gen, 1000, 10 * 1000 * 1000);
   Use(file_size);
 
   // Randomize (shuffle) a collection.
@@ -67,8 +67,8 @@ TEST(Examples, CreateingCorrelatedVariateSequences) {
     turbo::BitGen gen_1(my_seed);
     turbo::BitGen gen_2(my_seed);  // Produces same variates as gen_1.
 
-    EXPECT_EQ(turbo::Bernoulli(gen_1, 0.5), turbo::Bernoulli(gen_2, 0.5));
-    EXPECT_EQ(turbo::Uniform<uint32_t>(gen_1), turbo::Uniform<uint32_t>(gen_2));
+    EXPECT_EQ(turbo::bernoulli(gen_1, 0.5), turbo::bernoulli(gen_2, 0.5));
+    EXPECT_EQ(turbo::uniform<uint32_t>(gen_1), turbo::uniform<uint32_t>(gen_2));
   }
 
   // Create a correlated sequence from an existing URBG.
@@ -79,8 +79,8 @@ TEST(Examples, CreateingCorrelatedVariateSequences) {
     turbo::BitGen gen_1(my_seed);
     turbo::BitGen gen_2(my_seed);
 
-    EXPECT_EQ(turbo::Bernoulli(gen_1, 0.5), turbo::Bernoulli(gen_2, 0.5));
-    EXPECT_EQ(turbo::Uniform<uint32_t>(gen_1), turbo::Uniform<uint32_t>(gen_2));
+    EXPECT_EQ(turbo::bernoulli(gen_1, 0.5), turbo::bernoulli(gen_2, 0.5));
+    EXPECT_EQ(turbo::uniform<uint32_t>(gen_1), turbo::uniform<uint32_t>(gen_2));
   }
 
   // An alternate construction which uses user-supplied data
@@ -92,8 +92,8 @@ TEST(Examples, CreateingCorrelatedVariateSequences) {
     turbo::BitGen gen_1(my_seed);
     turbo::BitGen gen_2(my_seed);
 
-    EXPECT_EQ(turbo::Bernoulli(gen_1, 0.5), turbo::Bernoulli(gen_2, 0.5));
-    EXPECT_EQ(turbo::Uniform<uint32_t>(gen_1), turbo::Uniform<uint32_t>(gen_2));
+    EXPECT_EQ(turbo::bernoulli(gen_1, 0.5), turbo::bernoulli(gen_2, 0.5));
+    EXPECT_EQ(turbo::uniform<uint32_t>(gen_1), turbo::uniform<uint32_t>(gen_2));
   }
 }
 

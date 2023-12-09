@@ -60,6 +60,18 @@ struct IntervalOpenClosedTag
 struct IntervalOpenOpenTag
     : public random_internal::TagTypeCompare<IntervalOpenOpenTag> {};
 
+template <typename Tag>
+struct is_random_tag : public std::false_type {};
+
+template <>
+struct is_random_tag<IntervalClosedClosedTag> : public std::true_type {};
+template <>
+struct is_random_tag<IntervalClosedOpenTag> : public std::true_type {};
+template <>
+struct is_random_tag<IntervalOpenClosedTag> : public std::true_type {};
+template <>
+struct is_random_tag<IntervalOpenOpenTag> : public std::true_type {};
+
 namespace random_internal {
 
 // In the absence of an explicitly provided return-type, the template
@@ -72,11 +84,11 @@ namespace random_internal {
 // compile-time logic for deciding if such a conversion is possible.
 //
 // If no such conversion between {A, B} exists, then the overload for
-// turbo::Uniform() will be discarded, and the call will be ill-formed.
-// Return-type for turbo::Uniform() when the return-type is inferred.
+// turbo::uniform() will be discarded, and the call will be ill-formed.
+// Return-type for turbo::uniform() when the return-type is inferred.
 template <typename A, typename B>
 using uniform_inferred_return_t =
-    std::enable_if_t<turbo::disjunction<is_widening_convertible<A, B>,
+    std::enable_if_t<std::disjunction<is_widening_convertible<A, B>,
                                         is_widening_convertible<B, A>>::value,
                       typename std::conditional<
                           is_widening_convertible<A, B>::value, B, A>::type>;
@@ -85,7 +97,7 @@ using uniform_inferred_return_t =
 //    uniform_lower_bound(tag, a, b)
 // and
 //    uniform_upper_bound(tag, a, b)
-// are used as implementation-details for turbo::Uniform().
+// are used as implementation-details for turbo::uniform().
 //
 // Conceptually,
 //    [a, b] == [uniform_lower_bound(IntervalClosedClosed, a, b),
@@ -99,9 +111,9 @@ using uniform_inferred_return_t =
 //
 template <typename IntType, typename Tag>
 typename std::enable_if_t<
-    turbo::conjunction<
+    std::conjunction<
         IsIntegral<IntType>,
-        turbo::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
+        std::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     IntType>
 uniform_lower_bound(Tag, IntType a, IntType) {
@@ -110,9 +122,9 @@ uniform_lower_bound(Tag, IntType a, IntType) {
 
 template <typename FloatType, typename Tag>
 typename std::enable_if_t<
-    turbo::conjunction<
+    std::conjunction<
         std::is_floating_point<FloatType>,
-        turbo::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
+        std::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     FloatType>
 uniform_lower_bound(Tag, FloatType a, FloatType b) {
@@ -121,7 +133,7 @@ uniform_lower_bound(Tag, FloatType a, FloatType b) {
 
 template <typename NumType, typename Tag>
 typename std::enable_if_t<
-    turbo::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
+    std::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
                       std::is_same<Tag, IntervalClosedOpenTag>>::value,
     NumType>
 uniform_lower_bound(Tag, NumType a, NumType) {
@@ -130,9 +142,9 @@ uniform_lower_bound(Tag, NumType a, NumType) {
 
 template <typename IntType, typename Tag>
 typename std::enable_if_t<
-    turbo::conjunction<
+    std::conjunction<
         IsIntegral<IntType>,
-        turbo::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
+        std::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     IntType>
 uniform_upper_bound(Tag, IntType, IntType b) {
@@ -141,9 +153,9 @@ uniform_upper_bound(Tag, IntType, IntType b) {
 
 template <typename FloatType, typename Tag>
 typename std::enable_if_t<
-    turbo::conjunction<
+    std::conjunction<
         std::is_floating_point<FloatType>,
-        turbo::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
+        std::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     FloatType>
 uniform_upper_bound(Tag, FloatType, FloatType b) {
@@ -152,9 +164,9 @@ uniform_upper_bound(Tag, FloatType, FloatType b) {
 
 template <typename IntType, typename Tag>
 typename std::enable_if_t<
-    turbo::conjunction<
+    std::conjunction<
         IsIntegral<IntType>,
-        turbo::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
+        std::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
                           std::is_same<Tag, IntervalOpenClosedTag>>>::value,
     IntType>
 uniform_upper_bound(Tag, IntType, IntType b) {
@@ -163,9 +175,9 @@ uniform_upper_bound(Tag, IntType, IntType b) {
 
 template <typename FloatType, typename Tag>
 typename std::enable_if_t<
-    turbo::conjunction<
+    std::conjunction<
         std::is_floating_point<FloatType>,
-        turbo::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
+        std::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
                           std::is_same<Tag, IntervalOpenClosedTag>>>::value,
     FloatType>
 uniform_upper_bound(Tag, FloatType, FloatType b) {
@@ -215,7 +227,7 @@ using UniformDistribution =
                               turbo::uniform_real_distribution<NumType>>::type;
 
 // UniformDistributionWrapper is used as the underlying distribution type
-// by the turbo::Uniform template function. It selects the proper Turbo
+// by the turbo::uniform template function. It selects the proper Turbo
 // uniform distribution and provides constructor overloads that match the
 // expected parameter order as well as adjusting distribtuion bounds based
 // on the tag.

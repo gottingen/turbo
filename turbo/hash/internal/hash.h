@@ -492,7 +492,7 @@ namespace turbo {
         // for now.
         H
 #else   // _MSC_VER
-        typename std::enable_if<turbo::conjunction<is_hashable<Ts>...>::value, H>::type
+        typename std::enable_if<std::conjunction<is_hashable<Ts>...>::value, H>::type
 #endif  // _MSC_VER
         TurboHashValue(H hash_state, const std::tuple<Ts...> &t) {
             return hash_internal::hash_tuple(std::move(hash_state), t,
@@ -783,7 +783,7 @@ namespace turbo {
 
         // TurboHashValue for hashing std::variant
         template<typename H, typename... T>
-        typename std::enable_if<conjunction<is_hashable<T>...>::value, H>::type
+        typename std::enable_if<std::conjunction<is_hashable<T>...>::value, H>::type
         TurboHashValue(H hash_state, const std::variant<T...> &v) {
             if (!v.valueless_by_exception()) {
                 hash_state = std::visit(VariantVisitor<H>{std::move(hash_state)}, v);
@@ -926,7 +926,7 @@ namespace turbo {
             // Probe each implementation in order.
             // disjunction provides short circuiting wrt instantiation.
             template<typename T>
-            using Apply = turbo::disjunction<         //
+            using Apply = std::disjunction<         //
                     Probe<UniquelyRepresentedProbe, T>,  //
                     Probe<HashValueProbe, T>,            //
                     Probe<LegacyHashProbe, T>,           //
@@ -955,7 +955,7 @@ namespace turbo {
 
             template<typename T>
             using IntegralFastPath =
-                    conjunction<std::is_integral<T>, is_uniquely_represented<T>>;
+                    std::conjunction<std::is_integral<T>, is_uniquely_represented<T>>;
 
         public:
             // Move only

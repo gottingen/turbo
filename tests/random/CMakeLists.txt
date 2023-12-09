@@ -68,9 +68,6 @@ carbin_cc_test(
         ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(

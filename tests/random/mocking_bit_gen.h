@@ -40,7 +40,7 @@
 #include "turbo/base/internal/fast_type_id.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 #include "turbo/random/internal/distribution_caller.h"
 #include "turbo/random/random.h"
 #include "turbo/meta/span.h"
@@ -73,14 +73,14 @@ class BitGenRef;
 //
 // Example:
 //
-//  // Mock a call to an `turbo::Bernoulli` distribution using Googletest
+//  // Mock a call to an `turbo::bernoulli` distribution using Googletest
 //   turbo::MockingBitGen bitgen;
 //
 //   ON_CALL(turbo::MockBernoulli(), Call(bitgen, 0.5))
 //       .WillByDefault(testing::Return(true));
-//   EXPECT_TRUE(turbo::Bernoulli(bitgen, 0.5));
+//   EXPECT_TRUE(turbo::bernoulli(bitgen, 0.5));
 //
-//  // Mock a call to an `turbo::Uniform` distribution within Googletest
+//  // Mock a call to an `turbo::uniform` distribution within Googletest
 //  turbo::MockingBitGen bitgen;
 //
 //   ON_CALL(turbo::MockUniform<int>(), Call(bitgen, testing::_, testing::_))
@@ -88,14 +88,14 @@ class BitGenRef;
 //           return low + (high - low) / 2;
 //       });
 //
-//   EXPECT_EQ(turbo::Uniform<int>(gen, 0, 10), 5);
-//   EXPECT_EQ(turbo::Uniform<int>(gen, 30, 40), 35);
+//   EXPECT_EQ(turbo::uniform<int>(gen, 0, 10), 5);
+//   EXPECT_EQ(turbo::uniform<int>(gen, 30, 40), 35);
 //
 // At this time, only mock distributions supplied within the Turbo random
 // library are officially supported.
 //
 // EXPECT_CALL and ON_CALL need to be made within the same DLL component as
-// the call to turbo::Uniform and related methods, otherwise mocking will fail
+// the call to turbo::uniform and related methods, otherwise mocking will fail
 // since the  underlying implementation creates a type-specific pointer which
 // will be distinct across different DLL boundaries.
 //

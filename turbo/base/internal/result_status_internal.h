@@ -45,7 +45,7 @@ struct HasConversionOperatorToResultStatus<T, U, decltype(test<T, U>(0))>
 // Detects whether `T` is constructible or convertible from `ResultStatus<U>`.
 template <typename T, typename U>
 using IsConstructibleOrConvertibleFromResultStatus =
-    turbo::disjunction<std::is_constructible<T, ResultStatus<U>&>,
+    std::disjunction<std::is_constructible<T, ResultStatus<U>&>,
                       std::is_constructible<T, const ResultStatus<U>&>,
                       std::is_constructible<T, ResultStatus<U>&&>,
                       std::is_constructible<T, const ResultStatus<U>&&>,
@@ -58,7 +58,7 @@ using IsConstructibleOrConvertibleFromResultStatus =
 // `ResultStatus<U>`.
 template <typename T, typename U>
 using IsConstructibleOrConvertibleOrAssignableFromResultStatus =
-    turbo::disjunction<IsConstructibleOrConvertibleFromResultStatus<T, U>,
+    std::disjunction<IsConstructibleOrConvertibleFromResultStatus<T, U>,
                       std::is_assignable<T&, ResultStatus<U>&>,
                       std::is_assignable<T&, const ResultStatus<U>&>,
                       std::is_assignable<T&, ResultStatus<U>&&>,
@@ -82,10 +82,10 @@ struct IsDirectInitializationAmbiguous<T, turbo::ResultStatus<V>>
 // Checks against the constraints of the direction initialization, i.e. when
 // `ResultStatus<T>::ResultStatus(U&&)` should participate in overload resolution.
 template <typename T, typename U>
-using IsDirectInitializationValid = turbo::disjunction<
+using IsDirectInitializationValid = std::disjunction<
     // Short circuits if T is basically U.
     std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
-    turbo::negation<turbo::disjunction<
+    turbo::negation<std::disjunction<
         std::is_same<turbo::ResultStatus<T>,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,
@@ -120,10 +120,10 @@ struct IsForwardingAssignmentAmbiguous<T, turbo::ResultStatus<U>>
 // Checks against the constraints of the forwarding assignment, i.e. whether
 // `ResultStatus<T>::operator(U&&)` should participate in overload resolution.
 template <typename T, typename U>
-using IsForwardingAssignmentValid = turbo::disjunction<
+using IsForwardingAssignmentValid = std::disjunction<
     // Short circuits if T is basically U.
     std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
-    turbo::negation<turbo::disjunction<
+    turbo::negation<std::disjunction<
         std::is_same<turbo::ResultStatus<T>,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,

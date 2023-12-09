@@ -84,7 +84,7 @@ namespace turbo {
     //
     // Example:
     //    void TakesBitGenRef(turbo::BitGenRef gen) {
-    //      int x = turbo::Uniform<int>(gen, 0, 1000);
+    //      int x = turbo::uniform<int>(gen, 0, 1000);
     //    }
     //
     class BitGenRef {

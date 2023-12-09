@@ -746,13 +746,13 @@ void BM_BtreeSet_IteratorSubtraction(benchmark::State& state) {
   turbo::btree_set<int> set;
   for (int i : vec) set.insert(i);
 
-  size_t distance = turbo::Uniform(bitgen, 0u, set.size());
+  size_t distance = turbo::uniform(bitgen, 0u, set.size());
   while (state.KeepRunningBatch(distance)) {
-    size_t end = turbo::Uniform(bitgen, distance, set.size());
+    size_t end = turbo::uniform(bitgen, distance, set.size());
     size_t begin = end - distance;
     benchmark::DoNotOptimize(set.find(static_cast<int>(end)) -
                              set.find(static_cast<int>(begin)));
-    distance = turbo::Uniform(bitgen, 0u, set.size());
+    distance = turbo::uniform(bitgen, 0u, set.size());
   }
 }
 

@@ -255,7 +255,7 @@ namespace turbo {
 
 // Does `Ts...` contain `T`?
             template<class T, class... Ts>
-            using Contains = turbo::disjunction<std::is_same<T, Ts>...>;
+            using Contains = std::disjunction<std::is_same<T, Ts>...>;
 
             template<class From, class To>
             using CopyConst =
@@ -347,7 +347,7 @@ namespace turbo {
                     turbo::index_sequence<OffsetSeq...>> {
             private:
                 static_assert(sizeof...(Elements) > 0, "At least one field is required");
-                static_assert(turbo::conjunction<IsLegalElementType<Elements>...>::value,
+                static_assert(std::conjunction<IsLegalElementType<Elements>...>::value,
                               "Invalid element type (see IsLegalElementType)");
 
                 enum {
@@ -689,7 +689,7 @@ namespace turbo {
         public:
             static_assert(sizeof...(Ts) > 0, "At least one field is required");
             static_assert(
-                    turbo::conjunction<internal_layout::IsLegalElementType<Ts>...>::value,
+                    std::conjunction<internal_layout::IsLegalElementType<Ts>...>::value,
                     "Invalid element type (see IsLegalElementType)");
 
             // The result type of `Partial()` with `NumSizes` arguments.
@@ -725,7 +725,7 @@ namespace turbo {
             template<class... Sizes>
             static constexpr PartialType<sizeof...(Sizes)> Partial(Sizes &&... sizes) {
                 static_assert(sizeof...(Sizes) <= sizeof...(Ts), "");
-                return PartialType<sizeof...(Sizes)>(turbo::forward<Sizes>(sizes)...);
+                return PartialType<sizeof...(Sizes)>(std::forward<Sizes>(sizes)...);
             }
 
             // Creates a layout with the sizes of all arrays specified. If you know

@@ -102,7 +102,7 @@ namespace turbo {
 
         template<typename T>
         using expect_cxx14_apis =
-                turbo::disjunction<turbo::negation<is_std_unordered_map<T>>,
+                std::disjunction<turbo::negation<is_std_unordered_map<T>>,
                         has_cxx14_std_apis>;
 
         template<typename TypeParam>
@@ -152,7 +152,7 @@ namespace turbo {
 
         template<typename T>
         using expect_alloc_constructors =
-                turbo::disjunction<turbo::negation<is_std_unordered_map<T>>,
+                std::disjunction<turbo::negation<is_std_unordered_map<T>>,
                         has_alloc_std_constructors>;
 
         template<typename TypeParam>

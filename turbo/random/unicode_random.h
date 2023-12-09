@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <vector>
 #include "turbo/random/engine.h"
+#include "turbo/random/discrete_distribution.h"
 
 namespace turbo {
 
@@ -34,12 +35,12 @@ namespace turbo {
         std::vector<uint8_t> generate(size_t output_bytes, long seed);
     private:
         BitGen _gen;
-        std::discrete_distribution<> bytes_count;
-        std::uniform_int_distribution<int> val_7bit{0x00, 0x7f}; // 0b0xxxxxxx
-        std::uniform_int_distribution<int> val_6bit{0x00, 0x3f}; // 0b10xxxxxx
-        std::uniform_int_distribution<int> val_5bit{0x00, 0x1f}; // 0b110xxxxx
-        std::uniform_int_distribution<int> val_4bit{0x00, 0x0f}; // 0b1110xxxx
-        std::uniform_int_distribution<int> val_3bit{0x00, 0x07}; // 0b11110xxx
+        discrete_distribution<> bytes_count;
+        uniform_int_distribution<int> val_7bit{0x00, 0x7f}; // 0b0xxxxxxx
+        uniform_int_distribution<int> val_6bit{0x00, 0x3f}; // 0b10xxxxxx
+        uniform_int_distribution<int> val_5bit{0x00, 0x1f}; // 0b110xxxxx
+        uniform_int_distribution<int> val_4bit{0x00, 0x0f}; // 0b1110xxxx
+        uniform_int_distribution<int> val_3bit{0x00, 0x07}; // 0b11110xxx
     };
 }
 #endif  // TURBO_RANDOM_UNICODE_RANDOM_H_

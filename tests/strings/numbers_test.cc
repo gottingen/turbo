@@ -38,7 +38,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 #include "turbo/random/random.h"
 #include "tests/strings/numbers_test_common.h"
 #include "turbo/strings/internal/ostringstream.h"
@@ -1721,7 +1721,7 @@ namespace {
         turbo::BitGen rng;
         for (int i = 0; i < 100000; ++i) {
             TestFastHexToBufferZeroPad16(
-                    turbo::LogUniform(rng, std::numeric_limits<uint64_t>::min(),
+                    turbo::log_uniform(rng, std::numeric_limits<uint64_t>::min(),
                                       std::numeric_limits<uint64_t>::max()));
         }
     }

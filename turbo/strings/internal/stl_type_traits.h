@@ -66,7 +66,7 @@ using IsBitset = IsBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsSTLContainer
-    : turbo::disjunction<
+    : std::disjunction<
           IsArray<C>, IsBitset<C>, IsSpecialization<C, std::deque>,
           IsSpecialization<C, std::forward_list>,
           IsSpecialization<C, std::list>, IsSpecialization<C, std::map>,
@@ -142,7 +142,7 @@ using IsBaseOfBitset = IsBaseOfBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsBaseOfSTLContainer
-    : turbo::disjunction<IsBaseOfArray<C>, IsBaseOfBitset<C>,
+    : std::disjunction<IsBaseOfArray<C>, IsBaseOfBitset<C>,
                         IsBaseOfSpecialization<C, std::deque>,
                         IsBaseOfSpecialization<C, std::forward_list>,
                         IsBaseOfSpecialization<C, std::list>,
@@ -221,7 +221,7 @@ using IsConvertibleToBitset = IsConvertibleToBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsConvertibleToSTLContainer
-    : turbo::disjunction<
+    : std::disjunction<
           IsConvertibleToArray<C>, IsConvertibleToBitset<C>,
           IsConvertibleToSpecialization<C, std::deque>,
           IsConvertibleToSpecialization<C, std::forward_list>,
@@ -238,7 +238,7 @@ struct IsConvertibleToSTLContainer
 
 template <typename C>
 struct IsStrictlyBaseOfAndConvertibleToSTLContainer
-    : turbo::conjunction<turbo::negation<IsSTLContainer<C>>,
+    : std::conjunction<turbo::negation<IsSTLContainer<C>>,
                         IsBaseOfSTLContainer<C>,
                         IsConvertibleToSTLContainer<C>> {};
 

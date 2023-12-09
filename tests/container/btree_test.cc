@@ -39,7 +39,7 @@
 #include "turbo/meta/compare.h"
 #include "turbo/meta/container.h"
 #include "turbo/platform/port.h"
-//#include "turbo/random/random.h"
+#include "turbo/random/random.h"
 #include "turbo/format/format.h"
 #include "turbo/strings/str_split.h"
 #include "turbo/strings/string_view.h"
@@ -3587,8 +3587,8 @@ namespace turbo {
                 for (int i: vec) set.insert(i);
 
                 for (int i = 0; i < 1000; ++i) {
-                    size_t begin = turbo::Uniform(bitgen, 0u, set.size());
-                    size_t end = turbo::Uniform(bitgen, begin, set.size());
+                    size_t begin = turbo::uniform(bitgen, 0u, set.size());
+                    size_t end = turbo::uniform(bitgen, begin, set.size());
                     ASSERT_EQ(end - begin, set.find(end) - set.find(begin))
                                                 << begin << " " << end;
                 }

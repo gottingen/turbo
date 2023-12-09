@@ -2538,8 +2538,8 @@ TEST_P(CordTest, BtreeHostileSplitInsertJoin) {
 
     for (int j = 0; j < 1000; ++j) {
         MaybeHarden(cord);
-        size_t offset = turbo::Uniform(bitgen, 0u, cord.size());
-        size_t length = turbo::Uniform(bitgen, 100u, data.size());
+        size_t offset = turbo::uniform(bitgen, 0u, cord.size());
+        size_t length = turbo::uniform(bitgen, 100u, data.size());
         if (cord.size() == offset) {
             cord.append(std::string_view(data.data(), length));
         } else {
