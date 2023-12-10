@@ -38,9 +38,9 @@ namespace {
         FALLBACK = 2,
     };
 
-// Correctness tests:
-// - Every source/destination byte alignment 0-15, every size 0-511 bytes
-// - Arbitrarily aligned source, large size
+    // Correctness tests:
+    // - Every source/destination byte alignment 0-15, every size 0-511 bytes
+    // - Arbitrarily aligned source, large size
     template<size_t max_size>
     class CrcMemcpyTest : public testing::Test {
     protected:
