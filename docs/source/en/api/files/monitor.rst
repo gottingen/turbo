@@ -3,7 +3,7 @@
 .. _turbo_files_monitor_module:
 
 
-read files
+monitor files
 =========================
 
 .. doxygengroup:: turbo_files_monitor

@@ -3,7 +3,7 @@
 .. _turbo_files_read_module:
 
 
-read files
+options
 =========================
 
 .. doxygengroup:: turbo_files_operation

@@ -3,7 +3,7 @@
 .. _turbo_files_utility_module:
 
 
-read files
+filesystem utility
 =========================
 
 .. doxygengroup:: turbo_files_utility

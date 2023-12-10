@@ -3,7 +3,7 @@
 .. _turbo_files_write_module:
 
 
-read files
+write files
 =========================
 
 .. doxygengroup:: turbo_files_write_file
