@@ -74,7 +74,6 @@
 #include "turbo/times/time.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     namespace {
 
@@ -956,5 +955,4 @@ namespace turbo {
         return true;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

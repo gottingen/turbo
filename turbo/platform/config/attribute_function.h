@@ -110,10 +110,6 @@
 #define TURBO_ATTRIBUTE_TRIVIAL_ABI
 #endif
 
-// These annotations are not available yet due to fear of breaking code.
-#define TURBO_ATTRIBUTE_PURE_FUNCTION
-#define TURBO_ATTRIBUTE_CONST_FUNCTION
-
 // TURBO_CONST_INIT
 //
 // A variable declaration annotated with the `TURBO_CONST_INIT` attribute will

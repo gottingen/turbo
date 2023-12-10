@@ -29,3 +29,4 @@ The following empty types are used for tag dispatching:
 
 .. doxygenstruct:: turbo::unaligned_mode
    :project: turbo-docs
+

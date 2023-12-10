@@ -93,52 +93,52 @@ struct timeval;
 #include "turbo/times/cctz/time_zone.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     class Duration;  // Defined below
     class Time;      // Defined below
     class TimeZone;  // Defined below
+}  // namespace turbo
+namespace turbo::time_internal {
+    int64_t IDivDuration(bool satq, Duration num, Duration den, Duration *rem);
 
-    namespace time_internal {
-        int64_t IDivDuration(bool satq, Duration num, Duration den, Duration *rem);
+    constexpr Time FromUnixDuration(Duration d);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixDuration(Duration d);
+    constexpr Duration ToUnixDuration(Time t);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration ToUnixDuration(Time t);
+    constexpr int64_t GetRepHi(Duration d);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr int64_t GetRepHi(Duration d);
+    constexpr uint32_t GetRepLo(Duration d);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr uint32_t GetRepLo(Duration d);
+    constexpr Duration MakeDuration(int64_t hi,
+                                    uint32_t lo);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration MakeDuration(int64_t hi,
-                                                                       uint32_t lo);
+    constexpr Duration MakeDuration(int64_t hi,
+                                    int64_t lo);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration MakeDuration(int64_t hi,
-                                                                       int64_t lo);
+    inline Duration MakePosDoubleDuration(double n);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration MakePosDoubleDuration(double n);
+    constexpr int64_t kTicksPerNanosecond = 4;
+    constexpr int64_t kTicksPerSecond = 1000 * 1000 * 1000 * kTicksPerNanosecond;
 
-        constexpr int64_t kTicksPerNanosecond = 4;
-        constexpr int64_t kTicksPerSecond = 1000 * 1000 * 1000 * kTicksPerNanosecond;
+    template<std::intmax_t N>
+    constexpr Duration FromInt64(int64_t v,
+                                 std::ratio<1, N>);
 
-        template<std::intmax_t N>
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration FromInt64(int64_t v,
-                                                                    std::ratio<1, N>);
+    constexpr Duration FromInt64(int64_t v,
+                                 std::ratio<60>);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration FromInt64(int64_t v,
-                                                                    std::ratio<60>);
+    constexpr Duration FromInt64(int64_t v,
+                                 std::ratio<3600>);
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration FromInt64(int64_t v,
-                                                                    std::ratio<3600>);
+    template<typename T>
+    using EnableIfIntegral = typename std::enable_if<
+            std::is_integral<T>::value || std::is_enum<T>::value, int>::type;
+    template<typename T>
+    using EnableIfFloat =
+            typename std::enable_if<std::is_floating_point<T>::value, int>::type;
+}  // namespace turbo::time_internal
 
-        template<typename T>
-        using EnableIfIntegral = typename std::enable_if<
-                std::is_integral<T>::value || std::is_enum<T>::value, int>::type;
-        template<typename T>
-        using EnableIfFloat =
-                typename std::enable_if<std::is_floating_point<T>::value, int>::type;
-    }  // namespace time_internal
-
+namespace turbo {
     // Duration
     //
     // The `turbo::Duration` class represents a signed, fixed-length amount of time.
@@ -255,281 +255,281 @@ namespace turbo {
         uint32_t rep_lo_;
     };
 
-// Relational Operators
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator<(Duration lhs,
-                                                            Duration rhs);
+    // Relational Operators
+    constexpr bool operator<(Duration lhs,
+                             Duration rhs);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator>(Duration lhs,
-                                                            Duration rhs) {
+    constexpr bool operator>(Duration lhs,
+                             Duration rhs) {
         return rhs < lhs;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator>=(Duration lhs,
-                                                             Duration rhs) {
+    constexpr bool operator>=(Duration lhs,
+                              Duration rhs) {
         return !(lhs < rhs);
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator<=(Duration lhs,
-                                                             Duration rhs) {
+    constexpr bool operator<=(Duration lhs,
+                              Duration rhs) {
         return !(rhs < lhs);
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator==(Duration lhs,
-                                                             Duration rhs);
+    constexpr bool operator==(Duration lhs,
+                              Duration rhs);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator!=(Duration lhs,
-                                                             Duration rhs) {
+    constexpr bool operator!=(Duration lhs,
+                              Duration rhs) {
         return !(lhs == rhs);
     }
 
-// Additive Operators
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration operator-(Duration d);
+    // Additive Operators
+    constexpr Duration operator-(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration operator+(Duration lhs,
-                                                             Duration rhs) {
+    inline Duration operator+(Duration lhs,
+                              Duration rhs) {
         return lhs += rhs;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration operator-(Duration lhs,
-                                                             Duration rhs) {
+    inline Duration operator-(Duration lhs,
+                              Duration rhs) {
         return lhs -= rhs;
     }
 
-// Multiplicative Operators
-// Integer operands must be representable as int64_t.
+    // Multiplicative Operators
+    // Integer operands must be representable as int64_t.
     template<typename T>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration operator*(Duration lhs, T rhs) {
+    Duration operator*(Duration lhs, T rhs) {
         return lhs *= rhs;
     }
 
     template<typename T>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration operator*(T lhs, Duration rhs) {
+    Duration operator*(T lhs, Duration rhs) {
         return rhs *= lhs;
     }
 
     template<typename T>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration operator/(Duration lhs, T rhs) {
+    Duration operator/(Duration lhs, T rhs) {
         return lhs /= rhs;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t operator/(Duration lhs,
-                                                            Duration rhs) {
+    inline int64_t operator/(Duration lhs,
+                             Duration rhs) {
         return time_internal::IDivDuration(true, lhs, rhs,
                                            &lhs);  // trunc towards zero
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration operator%(Duration lhs,
-                                                             Duration rhs) {
+    inline Duration operator%(Duration lhs,
+                              Duration rhs) {
         return lhs %= rhs;
     }
 
-// IDivDuration()
-//
-// Divides a numerator `Duration` by a denominator `Duration`, returning the
-// quotient and remainder. The remainder always has the same sign as the
-// numerator. The returned quotient and remainder respect the identity:
-//
-//   numerator = denominator * quotient + remainder
-//
-// Returned quotients are capped to the range of `int64_t`, with the difference
-// spilling into the remainder to uphold the above identity. This means that the
-// remainder returned could differ from the remainder returned by
-// `Duration::operator%` for huge quotients.
-//
-// See also the notes on `InfiniteDuration()` below regarding the behavior of
-// division involving zero and infinite durations.
-//
-// Example:
-//
-//   constexpr turbo::Duration a =
-//       turbo::Seconds(std::numeric_limits<int64_t>::max());  // big
-//   constexpr turbo::Duration b = turbo::Nanoseconds(1);       // small
-//
-//   turbo::Duration rem = a % b;
-//   // rem == turbo::ZeroDuration()
-//
-//   // Here, q would overflow int64_t, so rem accounts for the difference.
-//   int64_t q = turbo::IDivDuration(a, b, &rem);
-//   // q == std::numeric_limits<int64_t>::max(), rem == a - b * q
+    // IDivDuration()
+    //
+    // Divides a numerator `Duration` by a denominator `Duration`, returning the
+    // quotient and remainder. The remainder always has the same sign as the
+    // numerator. The returned quotient and remainder respect the identity:
+    //
+    //   numerator = denominator * quotient + remainder
+    //
+    // Returned quotients are capped to the range of `int64_t`, with the difference
+    // spilling into the remainder to uphold the above identity. This means that the
+    // remainder returned could differ from the remainder returned by
+    // `Duration::operator%` for huge quotients.
+    //
+    // See also the notes on `InfiniteDuration()` below regarding the behavior of
+    // division involving zero and infinite durations.
+    //
+    // Example:
+    //
+    //   constexpr turbo::Duration a =
+    //       turbo::Seconds(std::numeric_limits<int64_t>::max());  // big
+    //   constexpr turbo::Duration b = turbo::Nanoseconds(1);       // small
+    //
+    //   turbo::Duration rem = a % b;
+    //   // rem == turbo::ZeroDuration()
+    //
+    //   // Here, q would overflow int64_t, so rem accounts for the difference.
+    //   int64_t q = turbo::IDivDuration(a, b, &rem);
+    //   // q == std::numeric_limits<int64_t>::max(), rem == a - b * q
     inline int64_t IDivDuration(Duration num, Duration den, Duration *rem) {
         return time_internal::IDivDuration(true, num, den,
                                            rem);  // trunc towards zero
     }
 
-// FDivDuration()
-//
-// Divides a `Duration` numerator into a fractional number of units of a
-// `Duration` denominator.
-//
-// See also the notes on `InfiniteDuration()` below regarding the behavior of
-// division involving zero and infinite durations.
-//
-// Example:
-//
-//   double d = turbo::FDivDuration(turbo::Milliseconds(1500), turbo::Seconds(1));
-//   // d == 1.5
-    TURBO_ATTRIBUTE_CONST_FUNCTION double FDivDuration(Duration num, Duration den);
+    // FDivDuration()
+    //
+    // Divides a `Duration` numerator into a fractional number of units of a
+    // `Duration` denominator.
+    //
+    // See also the notes on `InfiniteDuration()` below regarding the behavior of
+    // division involving zero and infinite durations.
+    //
+    // Example:
+    //
+    //   double d = turbo::FDivDuration(turbo::Milliseconds(1500), turbo::Seconds(1));
+    //   // d == 1.5
+    double FDivDuration(Duration num, Duration den);
 
-// ZeroDuration()
-//
-// Returns a zero-length duration. This function behaves just like the default
-// constructor, but the name helps make the semantics clear at call sites.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration ZeroDuration() {
+    // ZeroDuration()
+    //
+    // Returns a zero-length duration. This function behaves just like the default
+    // constructor, but the name helps make the semantics clear at call sites.
+    constexpr Duration ZeroDuration() {
         return Duration();
     }
 
-// AbsDuration()
-//
-// Returns the absolute value of a duration.
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration AbsDuration(Duration d) {
+    // AbsDuration()
+    //
+    // Returns the absolute value of a duration.
+    inline Duration AbsDuration(Duration d) {
         return (d < ZeroDuration()) ? -d : d;
     }
 
-// Trunc()
-//
-// Truncates a duration (toward zero) to a multiple of a non-zero unit.
-//
-// Example:
-//
-//   turbo::Duration d = turbo::Nanoseconds(123456789);
-//   turbo::Duration a = turbo::Trunc(d, turbo::Microseconds(1));  // 123456us
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Trunc(Duration d, Duration unit);
+    // Trunc()
+    //
+    // Truncates a duration (toward zero) to a multiple of a non-zero unit.
+    //
+    // Example:
+    //
+    //   turbo::Duration d = turbo::Nanoseconds(123456789);
+    //   turbo::Duration a = turbo::Trunc(d, turbo::Microseconds(1));  // 123456us
+    Duration Trunc(Duration d, Duration unit);
 
-// Floor()
-//
-// Floors a duration using the passed duration unit to its largest value not
-// greater than the duration.
-//
-// Example:
-//
-//   turbo::Duration d = turbo::Nanoseconds(123456789);
-//   turbo::Duration b = turbo::Floor(d, turbo::Microseconds(1));  // 123456us
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Floor(Duration d, Duration unit);
+    // Floor()
+    //
+    // Floors a duration using the passed duration unit to its largest value not
+    // greater than the duration.
+    //
+    // Example:
+    //
+    //   turbo::Duration d = turbo::Nanoseconds(123456789);
+    //   turbo::Duration b = turbo::Floor(d, turbo::Microseconds(1));  // 123456us
+    Duration Floor(Duration d, Duration unit);
 
-// Ceil()
-//
-// Returns the ceiling of a duration using the passed duration unit to its
-// smallest value not less than the duration.
-//
-// Example:
-//
-//   turbo::Duration d = turbo::Nanoseconds(123456789);
-//   turbo::Duration c = turbo::Ceil(d, turbo::Microseconds(1));   // 123457us
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Ceil(Duration d, Duration unit);
+    // Ceil()
+    //
+    // Returns the ceiling of a duration using the passed duration unit to its
+    // smallest value not less than the duration.
+    //
+    // Example:
+    //
+    //   turbo::Duration d = turbo::Nanoseconds(123456789);
+    //   turbo::Duration c = turbo::Ceil(d, turbo::Microseconds(1));   // 123457us
+    Duration Ceil(Duration d, Duration unit);
 
-// InfiniteDuration()
-//
-// Returns an infinite `Duration`.  To get a `Duration` representing negative
-// infinity, use `-InfiniteDuration()`.
-//
-// Duration arithmetic overflows to +/- infinity and saturates. In general,
-// arithmetic with `Duration` infinities is similar to IEEE 754 infinities
-// except where IEEE 754 NaN would be involved, in which case +/-
-// `InfiniteDuration()` is used in place of a "nan" Duration.
-//
-// Examples:
-//
-//   constexpr turbo::Duration inf = turbo::InfiniteDuration();
-//   const turbo::Duration d = ... any finite duration ...
-//
-//   inf == inf + inf
-//   inf == inf + d
-//   inf == inf - inf
-//   -inf == d - inf
-//
-//   inf == d * 1e100
-//   inf == inf / 2
-//   0 == d / inf
-//   INT64_MAX == inf / d
-//
-//   d < inf
-//   -inf < d
-//
-//   // Division by zero returns infinity, or INT64_MIN/MAX where appropriate.
-//   inf == d / 0
-//   INT64_MAX == d / turbo::ZeroDuration()
-//
-// The examples involving the `/` operator above also apply to `IDivDuration()`
-// and `FDivDuration()`.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration InfiniteDuration();
+    // InfiniteDuration()
+    //
+    // Returns an infinite `Duration`.  To get a `Duration` representing negative
+    // infinity, use `-InfiniteDuration()`.
+    //
+    // Duration arithmetic overflows to +/- infinity and saturates. In general,
+    // arithmetic with `Duration` infinities is similar to IEEE 754 infinities
+    // except where IEEE 754 NaN would be involved, in which case +/-
+    // `InfiniteDuration()` is used in place of a "nan" Duration.
+    //
+    // Examples:
+    //
+    //   constexpr turbo::Duration inf = turbo::InfiniteDuration();
+    //   const turbo::Duration d = ... any finite duration ...
+    //
+    //   inf == inf + inf
+    //   inf == inf + d
+    //   inf == inf - inf
+    //   -inf == d - inf
+    //
+    //   inf == d * 1e100
+    //   inf == inf / 2
+    //   0 == d / inf
+    //   INT64_MAX == inf / d
+    //
+    //   d < inf
+    //   -inf < d
+    //
+    //   // Division by zero returns infinity, or INT64_MIN/MAX where appropriate.
+    //   inf == d / 0
+    //   INT64_MAX == d / turbo::ZeroDuration()
+    //
+    // The examples involving the `/` operator above also apply to `IDivDuration()`
+    // and `FDivDuration()`.
+    constexpr Duration InfiniteDuration();
 
-// Nanoseconds()
-// Microseconds()
-// Milliseconds()
-// Seconds()
-// Minutes()
-// Hours()
-//
-// Factory functions for constructing `Duration` values from an integral number
-// of the unit indicated by the factory function's name. The number must be
-// representable as int64_t.
-//
-// NOTE: no "Days()" factory function exists because "a day" is ambiguous.
-// Civil days are not always 24 hours long, and a 24-hour duration often does
-// not correspond with a civil day. If a 24-hour duration is needed, use
-// `turbo::Hours(24)`. If you actually want a civil day, use turbo::CivilDay
-// from civil_time.h.
-//
-// Example:
-//
-//   turbo::Duration a = turbo::Seconds(60);
-//   turbo::Duration b = turbo::Minutes(1);  // b == a
+    // Nanoseconds()
+    // Microseconds()
+    // Milliseconds()
+    // Seconds()
+    // Minutes()
+    // Hours()
+    //
+    // Factory functions for constructing `Duration` values from an integral number
+    // of the unit indicated by the factory function's name. The number must be
+    // representable as int64_t.
+    //
+    // NOTE: no "Days()" factory function exists because "a day" is ambiguous.
+    // Civil days are not always 24 hours long, and a 24-hour duration often does
+    // not correspond with a civil day. If a 24-hour duration is needed, use
+    // `turbo::Hours(24)`. If you actually want a civil day, use turbo::CivilDay
+    // from civil_time.h.
+    //
+    // Example:
+    //
+    //   turbo::Duration a = turbo::Seconds(60);
+    //   turbo::Duration b = turbo::Minutes(1);  // b == a
     template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Nanoseconds(T n) {
+    constexpr Duration Nanoseconds(T n) {
         return time_internal::FromInt64(n, std::nano{});
     }
 
     template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Microseconds(T n) {
+    constexpr Duration Microseconds(T n) {
         return time_internal::FromInt64(n, std::micro{});
     }
 
     template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Milliseconds(T n) {
+    constexpr Duration Milliseconds(T n) {
         return time_internal::FromInt64(n, std::milli{});
     }
 
     template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Seconds(T n) {
+    constexpr Duration Seconds(T n) {
         return time_internal::FromInt64(n, std::ratio<1>{});
     }
 
     template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Minutes(T n) {
+    constexpr Duration Minutes(T n) {
         return time_internal::FromInt64(n, std::ratio<60>{});
     }
 
     template<typename T, time_internal::EnableIfIntegral<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration Hours(T n) {
+    constexpr Duration Hours(T n) {
         return time_internal::FromInt64(n, std::ratio<3600>{});
     }
 
-// Factory overloads for constructing `Duration` values from a floating-point
-// number of the unit indicated by the factory function's name. These functions
-// exist for convenience, but they are not as efficient as the integral
-// factories, which should be preferred.
-//
-// Example:
-//
-//   auto a = turbo::Seconds(1.5);        // OK
-//   auto b = turbo::Milliseconds(1500);  // BETTER
+    // Factory overloads for constructing `Duration` values from a floating-point
+    // number of the unit indicated by the factory function's name. These functions
+    // exist for convenience, but they are not as efficient as the integral
+    // factories, which should be preferred.
+    //
+    // Example:
+    //
+    //   auto a = turbo::Seconds(1.5);        // OK
+    //   auto b = turbo::Milliseconds(1500);  // BETTER
     template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Nanoseconds(T n) {
+    Duration Nanoseconds(T n) {
         return n * Nanoseconds(1);
     }
 
     template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Microseconds(T n) {
+    Duration Microseconds(T n) {
         return n * Microseconds(1);
     }
 
     template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Milliseconds(T n) {
+    Duration Milliseconds(T n) {
         return n * Milliseconds(1);
     }
 
     template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Seconds(T n) {
+    Duration Seconds(T n) {
         if (n >= 0) {  // Note: `NaN >= 0` is false.
             if (n >= static_cast<T>((std::numeric_limits<int64_t>::max)())) {
                 return InfiniteDuration();
@@ -544,192 +544,192 @@ namespace turbo {
     }
 
     template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Minutes(T n) {
+    Duration Minutes(T n) {
         return n * Minutes(1);
     }
 
     template<typename T, time_internal::EnableIfFloat<T> = 0>
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration Hours(T n) {
+    Duration Hours(T n) {
         return n * Hours(1);
     }
 
-// ToInt64Nanoseconds()
-// ToInt64Microseconds()
-// ToInt64Milliseconds()
-// ToInt64Seconds()
-// ToInt64Minutes()
-// ToInt64Hours()
-//
-// Helper functions that convert a Duration to an integral count of the
-// indicated unit. These return the same results as the `IDivDuration()`
-// function, though they usually do so more efficiently; see the
-// documentation of `IDivDuration()` for details about overflow, etc.
-//
-// Example:
-//
-//   turbo::Duration d = turbo::Milliseconds(1500);
-//   int64_t isec = turbo::ToInt64Seconds(d);  // isec == 1
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Nanoseconds(Duration d);
+    // ToInt64Nanoseconds()
+    // ToInt64Microseconds()
+    // ToInt64Milliseconds()
+    // ToInt64Seconds()
+    // ToInt64Minutes()
+    // ToInt64Hours()
+    //
+    // Helper functions that convert a Duration to an integral count of the
+    // indicated unit. These return the same results as the `IDivDuration()`
+    // function, though they usually do so more efficiently; see the
+    // documentation of `IDivDuration()` for details about overflow, etc.
+    //
+    // Example:
+    //
+    //   turbo::Duration d = turbo::Milliseconds(1500);
+    //   int64_t isec = turbo::ToInt64Seconds(d);  // isec == 1
+    int64_t ToInt64Nanoseconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Microseconds(Duration d);
+    int64_t ToInt64Microseconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Milliseconds(Duration d);
+    int64_t ToInt64Milliseconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Seconds(Duration d);
+    int64_t ToInt64Seconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Minutes(Duration d);
+    int64_t ToInt64Minutes(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64Hours(Duration d);
+    int64_t ToInt64Hours(Duration d);
 
-// ToDoubleNanoseconds()
-// ToDoubleMicroseconds()
-// ToDoubleMilliseconds()
-// ToDoubleSeconds()
-// ToDoubleMinutes()
-// ToDoubleHours()
-//
-// Helper functions that convert a Duration to a floating point count of the
-// indicated unit. These functions are shorthand for the `FDivDuration()`
-// function above; see its documentation for details about overflow, etc.
-//
-// Example:
-//
-//   turbo::Duration d = turbo::Milliseconds(1500);
-//   double dsec = turbo::ToDoubleSeconds(d);  // dsec == 1.5
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleNanoseconds(Duration d);
+    // ToDoubleNanoseconds()
+    // ToDoubleMicroseconds()
+    // ToDoubleMilliseconds()
+    // ToDoubleSeconds()
+    // ToDoubleMinutes()
+    // ToDoubleHours()
+    //
+    // Helper functions that convert a Duration to a floating point count of the
+    // indicated unit. These functions are shorthand for the `FDivDuration()`
+    // function above; see its documentation for details about overflow, etc.
+    //
+    // Example:
+    //
+    //   turbo::Duration d = turbo::Milliseconds(1500);
+    //   double dsec = turbo::ToDoubleSeconds(d);  // dsec == 1.5
+    double ToDoubleNanoseconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleMicroseconds(Duration d);
+    double ToDoubleMicroseconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleMilliseconds(Duration d);
+    double ToDoubleMilliseconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleSeconds(Duration d);
+    double ToDoubleSeconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleMinutes(Duration d);
+    double ToDoubleMinutes(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToDoubleHours(Duration d);
+    double ToDoubleHours(Duration d);
 
-// FromChrono()
-//
-// Converts any of the pre-defined std::chrono durations to an turbo::Duration.
-//
-// Example:
-//
-//   std::chrono::milliseconds ms(123);
-//   turbo::Duration d = turbo::FromChrono(ms);
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    // FromChrono()
+    //
+    // Converts any of the pre-defined std::chrono durations to an turbo::Duration.
+    //
+    // Example:
+    //
+    //   std::chrono::milliseconds ms(123);
+    //   turbo::Duration d = turbo::FromChrono(ms);
+    constexpr Duration FromChrono(
             const std::chrono::nanoseconds &d);
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::microseconds &d);
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::milliseconds &d);
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::seconds &d);
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::minutes &d);
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::hours &d);
 
-// ToChronoNanoseconds()
-// ToChronoMicroseconds()
-// ToChronoMilliseconds()
-// ToChronoSeconds()
-// ToChronoMinutes()
-// ToChronoHours()
-//
-// Converts an turbo::Duration to any of the pre-defined std::chrono durations.
-// If overflow would occur, the returned value will saturate at the min/max
-// chrono duration value instead.
-//
-// Example:
-//
-//   turbo::Duration d = turbo::Microseconds(123);
-//   auto x = turbo::ToChronoMicroseconds(d);
-//   auto y = turbo::ToChronoNanoseconds(d);  // x == y
-//   auto z = turbo::ToChronoSeconds(turbo::InfiniteDuration());
-//   // z == std::chrono::seconds::max()
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::nanoseconds ToChronoNanoseconds(
+    // ToChronoNanoseconds()
+    // ToChronoMicroseconds()
+    // ToChronoMilliseconds()
+    // ToChronoSeconds()
+    // ToChronoMinutes()
+    // ToChronoHours()
+    //
+    // Converts an turbo::Duration to any of the pre-defined std::chrono durations.
+    // If overflow would occur, the returned value will saturate at the min/max
+    // chrono duration value instead.
+    //
+    // Example:
+    //
+    //   turbo::Duration d = turbo::Microseconds(123);
+    //   auto x = turbo::ToChronoMicroseconds(d);
+    //   auto y = turbo::ToChronoNanoseconds(d);  // x == y
+    //   auto z = turbo::ToChronoSeconds(turbo::InfiniteDuration());
+    //   // z == std::chrono::seconds::max()
+    std::chrono::nanoseconds ToChronoNanoseconds(
             Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::microseconds ToChronoMicroseconds(
+    std::chrono::microseconds ToChronoMicroseconds(
             Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::milliseconds ToChronoMilliseconds(
+    std::chrono::milliseconds ToChronoMilliseconds(
             Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::seconds ToChronoSeconds(Duration d);
+    std::chrono::seconds ToChronoSeconds(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::minutes ToChronoMinutes(Duration d);
+    std::chrono::minutes ToChronoMinutes(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::hours ToChronoHours(Duration d);
+    std::chrono::hours ToChronoHours(Duration d);
 
-// FormatDuration()
-//
-// Returns a string representing the duration in the form "72h3m0.5s".
-// Returns "inf" or "-inf" for +/- `InfiniteDuration()`.
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::string FormatDuration(Duration d);
+    // FormatDuration()
+    //
+    // Returns a string representing the duration in the form "72h3m0.5s".
+    // Returns "inf" or "-inf" for +/- `InfiniteDuration()`.
+    std::string FormatDuration(Duration d);
 
-// Output stream operator.
+    // Output stream operator.
     inline std::ostream &operator<<(std::ostream &os, Duration d) {
         return os << FormatDuration(d);
     }
 
-// ParseDuration()
-//
-// Parses a duration string consisting of a possibly signed sequence of
-// decimal numbers, each with an optional fractional part and a unit
-// suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
-// Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
-// `ZeroDuration()`. Parses "inf" and "-inf" as +/- `InfiniteDuration()`.
+    // ParseDuration()
+    //
+    // Parses a duration string consisting of a possibly signed sequence of
+    // decimal numbers, each with an optional fractional part and a unit
+    // suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
+    // Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
+    // `ZeroDuration()`. Parses "inf" and "-inf" as +/- `InfiniteDuration()`.
     bool ParseDuration(std::string_view dur_string, Duration *d);
 
-// Time
-//
-// An `turbo::Time` represents a specific instant in time. Arithmetic operators
-// are provided for naturally expressing time calculations. Instances are
-// created using `turbo::Now()` and the `turbo::From*()` factory functions that
-// accept the gamut of other time representations. Formatting and parsing
-// functions are provided for conversion to and from strings.  `turbo::Time`
-// should be passed by value rather than const reference.
-//
-// `turbo::Time` assumes there are 60 seconds in a minute, which means the
-// underlying time scales must be "smeared" to eliminate leap seconds.
-// See https://developers.google.com/time/smear.
-//
-// Even though `turbo::Time` supports a wide range of timestamps, exercise
-// caution when using values in the distant past. `turbo::Time` uses the
-// Proleptic Gregorian calendar, which extends the Gregorian calendar backward
-// to dates before its introduction in 1582.
-// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar
-// for more information. Use the ICU calendar classes to convert a date in
-// some other calendar (http://userguide.icu-project.org/datetime/calendar).
-//
-// Similarly, standardized time zones are a reasonably recent innovation, with
-// the Greenwich prime meridian being established in 1884. The TZ database
-// itself does not profess accurate offsets for timestamps prior to 1970. The
-// breakdown of future timestamps is subject to the whim of regional
-// governments.
-//
-// The `turbo::Time` class represents an instant in time as a count of clock
-// ticks of some granularity (resolution) from some starting point (epoch).
-//
-// `turbo::Time` uses a resolution that is high enough to avoid loss in
-// precision, and a range that is wide enough to avoid overflow, when
-// converting between tick counts in most Google time scales (i.e., resolution
-// of at least one nanosecond, and range +/-100 billion years).  Conversions
-// between the time scales are performed by truncating (towards negative
-// infinity) to the nearest representable point.
-//
-// Examples:
-//
-//   turbo::Time t1 = ...;
-//   turbo::Time t2 = t1 + turbo::Minutes(2);
-//   turbo::Duration d = t2 - t1;  // == turbo::Minutes(2)
-//
+    // Time
+    //
+    // An `turbo::Time` represents a specific instant in time. Arithmetic operators
+    // are provided for naturally expressing time calculations. Instances are
+    // created using `turbo::Now()` and the `turbo::From*()` factory functions that
+    // accept the gamut of other time representations. Formatting and parsing
+    // functions are provided for conversion to and from strings.  `turbo::Time`
+    // should be passed by value rather than const reference.
+    //
+    // `turbo::Time` assumes there are 60 seconds in a minute, which means the
+    // underlying time scales must be "smeared" to eliminate leap seconds.
+    // See https://developers.google.com/time/smear.
+    //
+    // Even though `turbo::Time` supports a wide range of timestamps, exercise
+    // caution when using values in the distant past. `turbo::Time` uses the
+    // Proleptic Gregorian calendar, which extends the Gregorian calendar backward
+    // to dates before its introduction in 1582.
+    // See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar
+    // for more information. Use the ICU calendar classes to convert a date in
+    // some other calendar (http://userguide.icu-project.org/datetime/calendar).
+    //
+    // Similarly, standardized time zones are a reasonably recent innovation, with
+    // the Greenwich prime meridian being established in 1884. The TZ database
+    // itself does not profess accurate offsets for timestamps prior to 1970. The
+    // breakdown of future timestamps is subject to the whim of regional
+    // governments.
+    //
+    // The `turbo::Time` class represents an instant in time as a count of clock
+    // ticks of some granularity (resolution) from some starting point (epoch).
+    //
+    // `turbo::Time` uses a resolution that is high enough to avoid loss in
+    // precision, and a range that is wide enough to avoid overflow, when
+    // converting between tick counts in most Google time scales (i.e., resolution
+    // of at least one nanosecond, and range +/-100 billion years).  Conversions
+    // between the time scales are performed by truncating (towards negative
+    // infinity) to the nearest representable point.
+    //
+    // Examples:
+    //
+    //   turbo::Time t1 = ...;
+    //   turbo::Time t2 = t1 + turbo::Minutes(2);
+    //   turbo::Duration d = t2 - t1;  // == turbo::Minutes(2)
+    //
     class Time {
     public:
         // Value semantics.
@@ -827,57 +827,57 @@ namespace turbo {
     };
 
     // Relational Operators
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator<(Time lhs, Time rhs) {
+    constexpr bool operator<(Time lhs, Time rhs) {
         return lhs.rep_ < rhs.rep_;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator>(Time lhs, Time rhs) {
+    constexpr bool operator>(Time lhs, Time rhs) {
         return rhs < lhs;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator>=(Time lhs, Time rhs) {
+    constexpr bool operator>=(Time lhs, Time rhs) {
         return !(lhs < rhs);
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator<=(Time lhs, Time rhs) {
+    constexpr bool operator<=(Time lhs, Time rhs) {
         return !(rhs < lhs);
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator==(Time lhs, Time rhs) {
+    constexpr bool operator==(Time lhs, Time rhs) {
         return lhs.rep_ == rhs.rep_;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator!=(Time lhs, Time rhs) {
+    constexpr bool operator!=(Time lhs, Time rhs) {
         return !(lhs == rhs);
     }
 
     // Additive Operators
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Time operator+(Time lhs, Duration rhs) {
+    inline Time operator+(Time lhs, Duration rhs) {
         return lhs += rhs;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Time operator+(Duration lhs, Time rhs) {
+    inline Time operator+(Duration lhs, Time rhs) {
         return rhs += lhs;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Time operator-(Time lhs, Duration rhs) {
+    inline Time operator-(Time lhs, Duration rhs) {
         return lhs -= rhs;
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration operator-(Time lhs, Time rhs) {
+    inline Duration operator-(Time lhs, Time rhs) {
         return lhs.rep_ - rhs.rep_;
     }
 
     // UnixEpoch()
     //
     // Returns the `turbo::Time` representing "1970-01-01 00:00:00.0 +0000".
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time UnixEpoch() { return Time(); }
+    constexpr Time UnixEpoch() { return Time(); }
 
     // UniversalEpoch()
     //
     // Returns the `turbo::Time` representing "0001-01-01 00:00:00.0 +0000", the
     // epoch of the ICU Universal Time Scale.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time UniversalEpoch() {
+    constexpr Time UniversalEpoch() {
         // 719162 is the number of days from 0001-01-01 to 1970-01-01,
         // assuming the Gregorian calendar.
         return Time(
@@ -887,7 +887,7 @@ namespace turbo {
     // InfiniteFuture()
     //
     // Returns an `turbo::Time` that is infinitely far in the future.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time InfiniteFuture() {
+    constexpr Time InfiniteFuture() {
         return Time(time_internal::MakeDuration((std::numeric_limits<int64_t>::max)(),
                                                 ~uint32_t{0}));
     }
@@ -895,7 +895,7 @@ namespace turbo {
     // InfinitePast()
     //
     // Returns an `turbo::Time` that is infinitely far in the past.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time InfinitePast() {
+    constexpr Time InfinitePast() {
         return Time(time_internal::MakeDuration((std::numeric_limits<int64_t>::min)(),
                                                 ~uint32_t{0}));
     }
@@ -909,19 +909,19 @@ namespace turbo {
     // FromUniversal()
     //
     // Creates an `turbo::Time` from a variety of other representations.
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixNanos(int64_t ns);
+    constexpr Time FromUnixNanos(int64_t ns);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixMicros(int64_t us);
+    constexpr Time FromUnixMicros(int64_t us);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixMillis(int64_t ms);
+    constexpr Time FromUnixMillis(int64_t ms);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixSeconds(int64_t s);
+    constexpr Time FromUnixSeconds(int64_t s);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromTimeT(time_t t);
+    constexpr Time FromTimeT(time_t t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time FromUDate(double udate);
+    Time FromUDate(double udate);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time FromUniversal(int64_t universal);
+    Time FromUniversal(int64_t universal);
 
     // ToUnixNanos()
     // ToUnixMicros()
@@ -935,19 +935,19 @@ namespace turbo {
     // these operations round down toward negative infinity where necessary to
     // adjust to the resolution of the result type.  Beware of possible time_t
     // over/underflow in ToTime{T,val,spec}() on 32-bit platforms.
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixNanos(Time t);
+    int64_t ToUnixNanos(Time t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixMicros(Time t);
+    int64_t ToUnixMicros(Time t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixMillis(Time t);
+    int64_t ToUnixMillis(Time t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUnixSeconds(Time t);
+    int64_t ToUnixSeconds(Time t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION time_t ToTimeT(Time t);
+    time_t ToTimeT(Time t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION double ToUDate(Time t);
+    double ToUDate(Time t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToUniversal(Time t);
+    int64_t ToUniversal(Time t);
 
     // DurationFromTimespec()
     // DurationFromTimeval()
@@ -963,21 +963,21 @@ namespace turbo {
     // and gettimeofday(2)), so conversion functions are provided for both cases.
     // The "to timespec/val" direction is easily handled via overloading, but
     // for "from timespec/val" the desired type is part of the function name.
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration DurationFromTimespec(timespec ts);
+    Duration DurationFromTimespec(timespec ts);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION Duration DurationFromTimeval(timeval tv);
+    Duration DurationFromTimeval(timeval tv);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION timespec ToTimespec(Duration d);
+    timespec ToTimespec(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION timeval ToTimeval(Duration d);
+    timeval ToTimeval(Duration d);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time TimeFromTimespec(timespec ts);
+    Time TimeFromTimespec(timespec ts);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION Time TimeFromTimeval(timeval tv);
+    Time TimeFromTimeval(timeval tv);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION timespec ToTimespec(Time t);
+    timespec ToTimespec(Time t);
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION timeval ToTimeval(Time t);
+    timeval ToTimeval(Time t);
 
     // FromChrono()
     //
@@ -988,7 +988,7 @@ namespace turbo {
     //   auto tp = std::chrono::system_clock::from_time_t(123);
     //   turbo::Time t = turbo::FromChrono(tp);
     //   // t == turbo::FromTimeT(123)
-    TURBO_ATTRIBUTE_PURE_FUNCTION Time
+    Time
     FromChrono(const std::chrono::system_clock::time_point &tp);
 
     // ToChronoTime()
@@ -1002,7 +1002,7 @@ namespace turbo {
     //   turbo::Time t = turbo::FromTimeT(123);
     //   auto tp = turbo::ToChronoTime(t);
     //   // tp == std::chrono::system_clock::from_time_t(123);
-    TURBO_ATTRIBUTE_CONST_FUNCTION std::chrono::system_clock::time_point
+    std::chrono::system_clock::time_point
     ToChronoTime(Time);
 
     // TimeZone
@@ -1197,11 +1197,11 @@ namespace turbo {
         time_internal::cctz::time_zone cz_;
     };
 
-// LoadTimeZone()
-//
-// Loads the named zone. May perform I/O on the initial load of the named
-// zone. If the name is invalid, or some other kind of error occurs, returns
-// `false` and `*tz` is set to the UTC time zone.
+    // LoadTimeZone()
+    //
+    // Loads the named zone. May perform I/O on the initial load of the named
+    // zone. If the name is invalid, or some other kind of error occurs, returns
+    // `false` and `*tz` is set to the UTC time zone.
     inline bool LoadTimeZone(std::string_view name, TimeZone *tz) {
         if (name == "localtime") {
             *tz = TimeZone(time_internal::cctz::local_time_zone());
@@ -1213,101 +1213,101 @@ namespace turbo {
         return b;
     }
 
-// FixedTimeZone()
-//
-// Returns a TimeZone that is a fixed offset (seconds east) from UTC.
-// Note: If the absolute value of the offset is greater than 24 hours
-// you'll get UTC (i.e., no offset) instead.
+    // FixedTimeZone()
+    //
+    // Returns a TimeZone that is a fixed offset (seconds east) from UTC.
+    // Note: If the absolute value of the offset is greater than 24 hours
+    // you'll get UTC (i.e., no offset) instead.
     inline TimeZone FixedTimeZone(int seconds) {
         return TimeZone(
                 time_internal::cctz::fixed_time_zone(std::chrono::seconds(seconds)));
     }
 
-// UTCTimeZone()
-//
-// Convenience method returning the UTC time zone.
+    // UTCTimeZone()
+    //
+    // Convenience method returning the UTC time zone.
     inline TimeZone UTCTimeZone() {
         return TimeZone(time_internal::cctz::utc_time_zone());
     }
 
-// LocalTimeZone()
-//
-// Convenience method returning the local time zone, or UTC if there is
-// no configured local zone.  Warning: Be wary of using LocalTimeZone(),
-// and particularly so in a server process, as the zone configured for the
-// local machine should be irrelevant.  Prefer an explicit zone name.
+    // LocalTimeZone()
+    //
+    // Convenience method returning the local time zone, or UTC if there is
+    // no configured local zone.  Warning: Be wary of using LocalTimeZone(),
+    // and particularly so in a server process, as the zone configured for the
+    // local machine should be irrelevant.  Prefer an explicit zone name.
     inline TimeZone LocalTimeZone() {
         return TimeZone(time_internal::cctz::local_time_zone());
     }
 
-// ToCivilSecond()
-// ToCivilMinute()
-// ToCivilHour()
-// ToCivilDay()
-// ToCivilMonth()
-// ToCivilYear()
-//
-// Helpers for TimeZone::At(Time) to return particularly aligned civil times.
-//
-// Example:
-//
-//   turbo::Time t = ...;
-//   turbo::TimeZone tz = ...;
-//   const auto cd = turbo::ToCivilDay(t, tz);
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilSecond ToCivilSecond(Time t,
-                                                                   TimeZone tz) {
+    // ToCivilSecond()
+    // ToCivilMinute()
+    // ToCivilHour()
+    // ToCivilDay()
+    // ToCivilMonth()
+    // ToCivilYear()
+    //
+    // Helpers for TimeZone::At(Time) to return particularly aligned civil times.
+    //
+    // Example:
+    //
+    //   turbo::Time t = ...;
+    //   turbo::TimeZone tz = ...;
+    //   const auto cd = turbo::ToCivilDay(t, tz);
+    inline CivilSecond ToCivilSecond(Time t,
+                                     TimeZone tz) {
         return tz.At(t).cs;  // already a CivilSecond
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMinute ToCivilMinute(Time t,
-                                                                   TimeZone tz) {
+    inline CivilMinute ToCivilMinute(Time t,
+                                     TimeZone tz) {
         return CivilMinute(tz.At(t).cs);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilHour ToCivilHour(Time t, TimeZone tz) {
+    inline CivilHour ToCivilHour(Time t, TimeZone tz) {
         return CivilHour(tz.At(t).cs);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilDay ToCivilDay(Time t, TimeZone tz) {
+    inline CivilDay ToCivilDay(Time t, TimeZone tz) {
         return CivilDay(tz.At(t).cs);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilMonth ToCivilMonth(Time t,
-                                                                 TimeZone tz) {
+    inline CivilMonth ToCivilMonth(Time t,
+                                   TimeZone tz) {
         return CivilMonth(tz.At(t).cs);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline CivilYear ToCivilYear(Time t, TimeZone tz) {
+    inline CivilYear ToCivilYear(Time t, TimeZone tz) {
         return CivilYear(tz.At(t).cs);
     }
 
-// FromCivil()
-//
-// Helper for TimeZone::At(CivilSecond) that provides "order-preserving
-// semantics." If the civil time maps to a unique time, that time is
-// returned. If the civil time is repeated in the given time zone, the
-// time using the pre-transition offset is returned. Otherwise, the
-// civil time is skipped in the given time zone, and the transition time
-// is returned. This means that for any two civil times, ct1 and ct2,
-// (ct1 < ct2) => (FromCivil(ct1) <= FromCivil(ct2)), the equal case
-// being when two non-existent civil times map to the same transition time.
-//
-// Note: Accepts civil times of any alignment.
-    TURBO_ATTRIBUTE_PURE_FUNCTION inline Time FromCivil(CivilSecond ct,
-                                                        TimeZone tz) {
+    // FromCivil()
+    //
+    // Helper for TimeZone::At(CivilSecond) that provides "order-preserving
+    // semantics." If the civil time maps to a unique time, that time is
+    // returned. If the civil time is repeated in the given time zone, the
+    // time using the pre-transition offset is returned. Otherwise, the
+    // civil time is skipped in the given time zone, and the transition time
+    // is returned. This means that for any two civil times, ct1 and ct2,
+    // (ct1 < ct2) => (FromCivil(ct1) <= FromCivil(ct2)), the equal case
+    // being when two non-existent civil times map to the same transition time.
+    //
+    // Note: Accepts civil times of any alignment.
+    inline Time FromCivil(CivilSecond ct,
+                          TimeZone tz) {
         const auto ti = tz.At(ct);
         if (ti.kind == TimeZone::TimeInfo::SKIPPED) return ti.trans;
         return ti.pre;
     }
 
-// TimeConversion
-//
-// An `turbo::TimeConversion` represents the conversion of year, month, day,
-// hour, minute, and second values (i.e., a civil time), in a particular
-// `turbo::TimeZone`, to a time instant (an absolute time), as returned by
-// `turbo::ConvertDateTime()`. Legacy version of `turbo::TimeZone::TimeInfo`.
-//
-// Deprecated. Use `turbo::TimeZone::TimeInfo`.
+    // TimeConversion
+    //
+    // An `turbo::TimeConversion` represents the conversion of year, month, day,
+    // hour, minute, and second values (i.e., a civil time), in a particular
+    // `turbo::TimeZone`, to a time instant (an absolute time), as returned by
+    // `turbo::ConvertDateTime()`. Legacy version of `turbo::TimeZone::TimeInfo`.
+    //
+    // Deprecated. Use `turbo::TimeZone::TimeInfo`.
     struct
     TimeConversion {
         Time pre;    // time calculated using the pre-transition offset
@@ -1324,190 +1324,190 @@ namespace turbo {
         bool normalized;  // input values were outside their valid ranges
     };
 
-// ConvertDateTime()
-//
-// Legacy version of `turbo::TimeZone::At(turbo::CivilSecond)` that takes
-// the civil time as six, separate values (YMDHMS).
-//
-// The input month, day, hour, minute, and second values can be outside
-// of their valid ranges, in which case they will be "normalized" during
-// the conversion.
-//
-// Example:
-//
-//   // "October 32" normalizes to "November 1".
-//   turbo::TimeConversion tc =
-//       turbo::ConvertDateTime(2013, 10, 32, 8, 30, 0, lax);
-//   // tc.kind == TimeConversion::UNIQUE && tc.normalized == true
-//   // turbo::ToCivilDay(tc.pre, tz).month() == 11
-//   // turbo::ToCivilDay(tc.pre, tz).day() == 1
-//
-// Deprecated. Use `turbo::TimeZone::At(CivilSecond)`.
+    // ConvertDateTime()
+    //
+    // Legacy version of `turbo::TimeZone::At(turbo::CivilSecond)` that takes
+    // the civil time as six, separate values (YMDHMS).
+    //
+    // The input month, day, hour, minute, and second values can be outside
+    // of their valid ranges, in which case they will be "normalized" during
+    // the conversion.
+    //
+    // Example:
+    //
+    //   // "October 32" normalizes to "November 1".
+    //   turbo::TimeConversion tc =
+    //       turbo::ConvertDateTime(2013, 10, 32, 8, 30, 0, lax);
+    //   // tc.kind == TimeConversion::UNIQUE && tc.normalized == true
+    //   // turbo::ToCivilDay(tc.pre, tz).month() == 11
+    //   // turbo::ToCivilDay(tc.pre, tz).day() == 1
+    //
+    // Deprecated. Use `turbo::TimeZone::At(CivilSecond)`.
     TimeConversion ConvertDateTime(int64_t year, int mon, int day, int hour,
                                    int min, int sec, TimeZone tz);
 
-// FromDateTime()
-//
-// A convenience wrapper for `turbo::ConvertDateTime()` that simply returns
-// the "pre" `turbo::Time`.  That is, the unique result, or the instant that
-// is correct using the pre-transition offset (as if the transition never
-// happened).
-//
-// Example:
-//
-//   turbo::Time t = turbo::FromDateTime(2017, 9, 26, 9, 30, 0, lax);
-//   // t = 2017-09-26 09:30:00 -0700
-//
-// Deprecated. Use `turbo::FromCivil(CivilSecond, TimeZone)`. Note that the
-// behavior of `FromCivil()` differs from `FromDateTime()` for skipped civil
-// times. If you care about that see `turbo::TimeZone::At(turbo::CivilSecond)`.
+    // FromDateTime()
+    //
+    // A convenience wrapper for `turbo::ConvertDateTime()` that simply returns
+    // the "pre" `turbo::Time`.  That is, the unique result, or the instant that
+    // is correct using the pre-transition offset (as if the transition never
+    // happened).
+    //
+    // Example:
+    //
+    //   turbo::Time t = turbo::FromDateTime(2017, 9, 26, 9, 30, 0, lax);
+    //   // t = 2017-09-26 09:30:00 -0700
+    //
+    // Deprecated. Use `turbo::FromCivil(CivilSecond, TimeZone)`. Note that the
+    // behavior of `FromCivil()` differs from `FromDateTime()` for skipped civil
+    // times. If you care about that see `turbo::TimeZone::At(turbo::CivilSecond)`.
     inline Time FromDateTime(int64_t year, int mon, int day, int hour,
                              int min, int sec, TimeZone tz) {
         return ConvertDateTime(year, mon, day, hour, min, sec, tz).pre;
     }
 
-// FromTM()
-//
-// Converts the `tm_year`, `tm_mon`, `tm_mday`, `tm_hour`, `tm_min`, and
-// `tm_sec` fields to an `turbo::Time` using the given time zone. See ctime(3)
-// for a description of the expected values of the tm fields. If the civil time
-// is unique (see `turbo::TimeZone::At(turbo::CivilSecond)` above), the matching
-// time instant is returned.  Otherwise, the `tm_isdst` field is consulted to
-// choose between the possible results.  For a repeated civil time, `tm_isdst !=
-// 0` returns the matching DST instant, while `tm_isdst == 0` returns the
-// matching non-DST instant.  For a skipped civil time there is no matching
-// instant, so `tm_isdst != 0` returns the DST instant, and `tm_isdst == 0`
-// returns the non-DST instant, that would have matched if the transition never
-// happened.
-    TURBO_ATTRIBUTE_PURE_FUNCTION Time FromTM(const struct tm &tm, TimeZone tz);
+    // FromTM()
+    //
+    // Converts the `tm_year`, `tm_mon`, `tm_mday`, `tm_hour`, `tm_min`, and
+    // `tm_sec` fields to an `turbo::Time` using the given time zone. See ctime(3)
+    // for a description of the expected values of the tm fields. If the civil time
+    // is unique (see `turbo::TimeZone::At(turbo::CivilSecond)` above), the matching
+    // time instant is returned.  Otherwise, the `tm_isdst` field is consulted to
+    // choose between the possible results.  For a repeated civil time, `tm_isdst !=
+    // 0` returns the matching DST instant, while `tm_isdst == 0` returns the
+    // matching non-DST instant.  For a skipped civil time there is no matching
+    // instant, so `tm_isdst != 0` returns the DST instant, and `tm_isdst == 0`
+    // returns the non-DST instant, that would have matched if the transition never
+    // happened.
+    Time FromTM(const struct tm &tm, TimeZone tz);
 
-// ToTM()
-//
-// Converts the given `turbo::Time` to a struct tm using the given time zone.
-// See ctime(3) for a description of the values of the tm fields.
-    TURBO_ATTRIBUTE_PURE_FUNCTION struct tm ToTM(Time t, TimeZone tz);
+    // ToTM()
+    //
+    // Converts the given `turbo::Time` to a struct tm using the given time zone.
+    // See ctime(3) for a description of the values of the tm fields.
+    struct tm ToTM(Time t, TimeZone tz);
 
-// RFC3339_full
-// RFC3339_sec
-//
-// FormatTime()/ParseTime() format specifiers for RFC3339 date/time strings,
-// with trailing zeros trimmed or with fractional seconds omitted altogether.
-//
-// Note that RFC3339_sec[] matches an ISO 8601 extended format for date and
-// time with UTC offset.  Also note the use of "%Y": RFC3339 mandates that
-// years have exactly four digits, but we allow them to take their natural
-// width.
+    // RFC3339_full
+    // RFC3339_sec
+    //
+    // FormatTime()/ParseTime() format specifiers for RFC3339 date/time strings,
+    // with trailing zeros trimmed or with fractional seconds omitted altogether.
+    //
+    // Note that RFC3339_sec[] matches an ISO 8601 extended format for date and
+    // time with UTC offset.  Also note the use of "%Y": RFC3339 mandates that
+    // years have exactly four digits, but we allow them to take their natural
+    // width.
     TURBO_DLL extern const char RFC3339_full[];  // %Y-%m-%d%ET%H:%M:%E*S%Ez
     TURBO_DLL extern const char RFC3339_sec[];   // %Y-%m-%d%ET%H:%M:%S%Ez
 
-// RFC1123_full
-// RFC1123_no_wday
-//
-// FormatTime()/ParseTime() format specifiers for RFC1123 date/time strings.
+    // RFC1123_full
+    // RFC1123_no_wday
+    //
+    // FormatTime()/ParseTime() format specifiers for RFC1123 date/time strings.
     TURBO_DLL extern const char RFC1123_full[];     // %a, %d %b %E4Y %H:%M:%S %z
     TURBO_DLL extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
 
-// FormatTime()
-//
-// Formats the given `turbo::Time` in the `turbo::TimeZone` according to the
-// provided format string. Uses strftime()-like formatting options, with
-// the following extensions:
-//
-//   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
-//   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
-//   - %E#S - Seconds with # digits of fractional precision
-//   - %E*S - Seconds with full fractional precision (a literal '*')
-//   - %E#f - Fractional seconds with # digits of precision
-//   - %E*f - Fractional seconds with full precision (a literal '*')
-//   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
-//   - %ET  - The RFC3339 "date-time" separator "T"
-//
-// Note that %E0S behaves like %S, and %E0f produces no characters.  In
-// contrast %E*f always produces at least one digit, which may be '0'.
-//
-// Note that %Y produces as many characters as it takes to fully render the
-// year.  A year outside of [-999:9999] when formatted with %E4Y will produce
-// more than four characters, just like %Y.
-//
-// We recommend that format strings include the UTC offset (%z, %Ez, or %E*z)
-// so that the result uniquely identifies a time instant.
-//
-// Example:
-//
-//   turbo::CivilSecond cs(2013, 1, 2, 3, 4, 5);
-//   turbo::Time t = turbo::FromCivil(cs, lax);
-//   std::string f = turbo::FormatTime("%H:%M:%S", t, lax);  // "03:04:05"
-//   f = turbo::FormatTime("%H:%M:%E3S", t, lax);  // "03:04:05.000"
-//
-// Note: If the given `turbo::Time` is `turbo::InfiniteFuture()`, the returned
-// string will be exactly "infinite-future". If the given `turbo::Time` is
-// `turbo::InfinitePast()`, the returned string will be exactly "infinite-past".
-// In both cases the given format string and `turbo::TimeZone` are ignored.
-//
-    TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(std::string_view format,
-                                                         Time t, TimeZone tz);
+    // FormatTime()
+    //
+    // Formats the given `turbo::Time` in the `turbo::TimeZone` according to the
+    // provided format string. Uses strftime()-like formatting options, with
+    // the following extensions:
+    //
+    //   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
+    //   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
+    //   - %E#S - Seconds with # digits of fractional precision
+    //   - %E*S - Seconds with full fractional precision (a literal '*')
+    //   - %E#f - Fractional seconds with # digits of precision
+    //   - %E*f - Fractional seconds with full precision (a literal '*')
+    //   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
+    //   - %ET  - The RFC3339 "date-time" separator "T"
+    //
+    // Note that %E0S behaves like %S, and %E0f produces no characters.  In
+    // contrast %E*f always produces at least one digit, which may be '0'.
+    //
+    // Note that %Y produces as many characters as it takes to fully render the
+    // year.  A year outside of [-999:9999] when formatted with %E4Y will produce
+    // more than four characters, just like %Y.
+    //
+    // We recommend that format strings include the UTC offset (%z, %Ez, or %E*z)
+    // so that the result uniquely identifies a time instant.
+    //
+    // Example:
+    //
+    //   turbo::CivilSecond cs(2013, 1, 2, 3, 4, 5);
+    //   turbo::Time t = turbo::FromCivil(cs, lax);
+    //   std::string f = turbo::FormatTime("%H:%M:%S", t, lax);  // "03:04:05"
+    //   f = turbo::FormatTime("%H:%M:%E3S", t, lax);  // "03:04:05.000"
+    //
+    // Note: If the given `turbo::Time` is `turbo::InfiniteFuture()`, the returned
+    // string will be exactly "infinite-future". If the given `turbo::Time` is
+    // `turbo::InfinitePast()`, the returned string will be exactly "infinite-past".
+    // In both cases the given format string and `turbo::TimeZone` are ignored.
+    //
+    std::string FormatTime(std::string_view format,
+                           Time t, TimeZone tz);
 
-// Convenience functions that format the given time using the RFC3339_full
-// format.  The first overload uses the provided TimeZone, while the second
-// uses LocalTimeZone().
-    TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(Time t, TimeZone tz);
+    // Convenience functions that format the given time using the RFC3339_full
+    // format.  The first overload uses the provided TimeZone, while the second
+    // uses LocalTimeZone().
+    std::string FormatTime(Time t, TimeZone tz);
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION std::string FormatTime(Time t);
+    std::string FormatTime(Time t);
 
-// Output stream operator.
+    // Output stream operator.
     inline std::ostream &operator<<(std::ostream &os, Time t) {
         return os << FormatTime(t);
     }
 
-// ParseTime()
-//
-// Parses an input string according to the provided format string and
-// returns the corresponding `turbo::Time`. Uses strftime()-like formatting
-// options, with the same extensions as FormatTime(), but with the
-// exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f.  %Ez
-// and %E*z also accept the same inputs, which (along with %z) includes
-// 'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
-//
-// %Y consumes as many numeric characters as it can, so the matching data
-// should always be terminated with a non-numeric.  %E4Y always consumes
-// exactly four characters, including any sign.
-//
-// Unspecified fields are taken from the default date and time of ...
-//
-//   "1970-01-01 00:00:00.0 +0000"
-//
-// For example, parsing a string of "15:45" (%H:%M) will return an turbo::Time
-// that represents "1970-01-01 15:45:00.0 +0000".
-//
-// Note that since ParseTime() returns time instants, it makes the most sense
-// to parse fully-specified date/time strings that include a UTC offset (%z,
-// %Ez, or %E*z).
-//
-// Note also that `turbo::ParseTime()` only heeds the fields year, month, day,
-// hour, minute, (fractional) second, and UTC offset.  Other fields, like
-// weekday (%a or %A), while parsed for syntactic validity, are ignored
-// in the conversion.
-//
-// Date and time fields that are out-of-range will be treated as errors
-// rather than normalizing them like `turbo::CivilSecond` does.  For example,
-// it is an error to parse the date "Oct 32, 2013" because 32 is out of range.
-//
-// A leap second of ":60" is normalized to ":00" of the following minute
-// with fractional seconds discarded.  The following table shows how the
-// given seconds and subseconds will be parsed:
-//
-//   "59.x" -> 59.x  // exact
-//   "60.x" -> 00.0  // normalized
-//   "00.x" -> 00.x  // exact
-//
-// Errors are indicated by returning false and assigning an error message
-// to the "err" out param if it is non-null.
-//
-// Note: If the input string is exactly "infinite-future", the returned
-// `turbo::Time` will be `turbo::InfiniteFuture()` and `true` will be returned.
-// If the input string is "infinite-past", the returned `turbo::Time` will be
-// `turbo::InfinitePast()` and `true` will be returned.
-//
+    // ParseTime()
+    //
+    // Parses an input string according to the provided format string and
+    // returns the corresponding `turbo::Time`. Uses strftime()-like formatting
+    // options, with the same extensions as FormatTime(), but with the
+    // exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f.  %Ez
+    // and %E*z also accept the same inputs, which (along with %z) includes
+    // 'z' and 'Z' as synonyms for +00:00.  %ET accepts either 'T' or 't'.
+    //
+    // %Y consumes as many numeric characters as it can, so the matching data
+    // should always be terminated with a non-numeric.  %E4Y always consumes
+    // exactly four characters, including any sign.
+    //
+    // Unspecified fields are taken from the default date and time of ...
+    //
+    //   "1970-01-01 00:00:00.0 +0000"
+    //
+    // For example, parsing a string of "15:45" (%H:%M) will return an turbo::Time
+    // that represents "1970-01-01 15:45:00.0 +0000".
+    //
+    // Note that since ParseTime() returns time instants, it makes the most sense
+    // to parse fully-specified date/time strings that include a UTC offset (%z,
+    // %Ez, or %E*z).
+    //
+    // Note also that `turbo::ParseTime()` only heeds the fields year, month, day,
+    // hour, minute, (fractional) second, and UTC offset.  Other fields, like
+    // weekday (%a or %A), while parsed for syntactic validity, are ignored
+    // in the conversion.
+    //
+    // Date and time fields that are out-of-range will be treated as errors
+    // rather than normalizing them like `turbo::CivilSecond` does.  For example,
+    // it is an error to parse the date "Oct 32, 2013" because 32 is out of range.
+    //
+    // A leap second of ":60" is normalized to ":00" of the following minute
+    // with fractional seconds discarded.  The following table shows how the
+    // given seconds and subseconds will be parsed:
+    //
+    //   "59.x" -> 59.x  // exact
+    //   "60.x" -> 00.0  // normalized
+    //   "00.x" -> 00.x  // exact
+    //
+    // Errors are indicated by returning false and assigning an error message
+    // to the "err" out param if it is non-null.
+    //
+    // Note: If the input string is exactly "infinite-future", the returned
+    // `turbo::Time` will be `turbo::InfiniteFuture()` and `true` will be returned.
+    // If the input string is "infinite-past", the returned `turbo::Time` will be
+    // `turbo::InfinitePast()` and `true` will be returned.
+    //
     bool ParseTime(std::string_view format, std::string_view input, Time *time,
                    std::string *err);
 
@@ -1527,23 +1527,23 @@ namespace turbo {
 
     namespace time_internal {
 
-// Creates a Duration with a given representation.
-// REQUIRES: hi,lo is a valid representation of a Duration as specified
-// in time/duration.cc.
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration MakeDuration(int64_t hi,
-                                                                       uint32_t lo = 0) {
+        // Creates a Duration with a given representation.
+        // REQUIRES: hi,lo is a valid representation of a Duration as specified
+        // in time/duration.cc.
+        constexpr Duration MakeDuration(int64_t hi,
+                                        uint32_t lo = 0) {
             return Duration(hi, lo);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration MakeDuration(int64_t hi,
-                                                                       int64_t lo) {
+        constexpr Duration MakeDuration(int64_t hi,
+                                        int64_t lo) {
             return MakeDuration(hi, static_cast<uint32_t>(lo));
         }
 
-// Make a Duration value from a floating-point number, as long as that number
-// is in the range [ 0 .. numeric_limits<int64_t>::max ), that is, as long as
-// it's positive and can be converted to int64_t without risk of UB.
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline Duration MakePosDoubleDuration(double n) {
+        // Make a Duration value from a floating-point number, as long as that number
+        // is in the range [ 0 .. numeric_limits<int64_t>::max ), that is, as long as
+        // it's positive and can be converted to int64_t without risk of UB.
+        inline Duration MakePosDoubleDuration(double n) {
             const int64_t int_secs = static_cast<int64_t>(n);
             const uint32_t ticks = static_cast<uint32_t>(
                     std::round((n - static_cast<double>(int_secs)) * kTicksPerSecond));
@@ -1552,86 +1552,86 @@ namespace turbo {
                    : MakeDuration(int_secs + 1, ticks - kTicksPerSecond);
         }
 
-// Creates a normalized Duration from an almost-normalized (sec,ticks)
-// pair. sec may be positive or negative.  ticks must be in the range
-// -kTicksPerSecond < *ticks < kTicksPerSecond.  If ticks is negative it
-// will be normalized to a positive value in the resulting Duration.
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration MakeNormalizedDuration(
+        // Creates a normalized Duration from an almost-normalized (sec,ticks)
+        // pair. sec may be positive or negative.  ticks must be in the range
+        // -kTicksPerSecond < *ticks < kTicksPerSecond.  If ticks is negative it
+        // will be normalized to a positive value in the resulting Duration.
+        constexpr Duration MakeNormalizedDuration(
                 int64_t sec, int64_t ticks) {
             return (ticks < 0) ? MakeDuration(sec - 1, ticks + kTicksPerSecond)
                                : MakeDuration(sec, ticks);
         }
 
-// Provide access to the Duration representation.
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr int64_t GetRepHi(Duration d) {
+        // Provide access to the Duration representation.
+        constexpr int64_t GetRepHi(Duration d) {
             return d.rep_hi_;
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr uint32_t GetRepLo(Duration d) {
+        constexpr uint32_t GetRepLo(Duration d) {
             return d.rep_lo_;
         }
 
-// Returns true iff d is positive or negative infinity.
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool IsInfiniteDuration(Duration d) {
+        // Returns true iff d is positive or negative infinity.
+        constexpr bool IsInfiniteDuration(Duration d) {
             return GetRepLo(d) == ~uint32_t{0};
         }
 
-// Returns an infinite Duration with the opposite sign.
-// REQUIRES: IsInfiniteDuration(d)
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration OppositeInfinity(Duration d) {
+        // Returns an infinite Duration with the opposite sign.
+        // REQUIRES: IsInfiniteDuration(d)
+        constexpr Duration OppositeInfinity(Duration d) {
             return GetRepHi(d) < 0
                    ? MakeDuration((std::numeric_limits<int64_t>::max)(), ~uint32_t{0})
                    : MakeDuration((std::numeric_limits<int64_t>::min)(),
                                   ~uint32_t{0});
         }
 
-// Returns (-n)-1 (equivalently -(n+1)) without avoidable overflow.
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr int64_t NegateAndSubtractOne(
+        // Returns (-n)-1 (equivalently -(n+1)) without avoidable overflow.
+        constexpr int64_t NegateAndSubtractOne(
                 int64_t n) {
             // Note: Good compilers will optimize this expression to ~n when using
             // a two's-complement representation (which is required for int64_t).
             return (n < 0) ? -(n + 1) : (-n) - 1;
         }
 
-// Map between a Time and a Duration since the Unix epoch.  Note that these
-// functions depend on the above mentioned choice of the Unix epoch for the
-// Time representation (and both need to be Time friends).  Without this
-// knowledge, we would need to add-in/subtract-out UnixEpoch() respectively.
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixDuration(Duration d) {
+        // Map between a Time and a Duration since the Unix epoch.  Note that these
+        // functions depend on the above mentioned choice of the Unix epoch for the
+        // Time representation (and both need to be Time friends).  Without this
+        // knowledge, we would need to add-in/subtract-out UnixEpoch() respectively.
+        constexpr Time FromUnixDuration(Duration d) {
             return Time(d);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration ToUnixDuration(Time t) {
+        constexpr Duration ToUnixDuration(Time t) {
             return t.rep_;
         }
 
         template<std::intmax_t N>
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration FromInt64(int64_t v,
-                                                                    std::ratio<1, N>) {
+        constexpr Duration FromInt64(int64_t v,
+                                     std::ratio<1, N>) {
             static_assert(0 < N && N <= 1000 * 1000 * 1000, "Unsupported ratio");
             // Subsecond ratios cannot overflow.
             return MakeNormalizedDuration(
                     v / N, v % N * kTicksPerNanosecond * 1000 * 1000 * 1000 / N);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration FromInt64(int64_t v,
-                                                                    std::ratio<60>) {
+        constexpr Duration FromInt64(int64_t v,
+                                     std::ratio<60>) {
             return (v <= (std::numeric_limits<int64_t>::max)() / 60 &&
                     v >= (std::numeric_limits<int64_t>::min)() / 60)
                    ? MakeDuration(v * 60)
                    : v > 0 ? InfiniteDuration() : -InfiniteDuration();
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration FromInt64(int64_t v,
-                                                                    std::ratio<3600>) {
+        constexpr Duration FromInt64(int64_t v,
+                                     std::ratio<3600>) {
             return (v <= (std::numeric_limits<int64_t>::max)() / 3600 &&
                     v >= (std::numeric_limits<int64_t>::min)() / 3600)
                    ? MakeDuration(v * 3600)
                    : v > 0 ? InfiniteDuration() : -InfiniteDuration();
         }
 
-// IsValidRep64<T>(0) is true if the expression `int64_t{std::declval<T>()}` is
-// valid. That is, if a T can be assigned to an int64_t without narrowing.
+        // IsValidRep64<T>(0) is true if the expression `int64_t{std::declval<T>()}` is
+        // valid. That is, if a T can be assigned to an int64_t without narrowing.
         template<typename T>
         constexpr auto IsValidRep64(int) -> decltype(int64_t{std::declval<T>()} == 0) {
             return true;
@@ -1642,51 +1642,52 @@ namespace turbo {
             return false;
         }
 
-// Converts a std::chrono::duration to an turbo::Duration.
+        // Converts a std::chrono::duration to an turbo::Duration.
         template<typename Rep, typename Period>
-        TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+        constexpr Duration FromChrono(
                 const std::chrono::duration<Rep, Period> &d) {
             static_assert(IsValidRep64<Rep>(0), "duration::rep is invalid");
             return FromInt64(int64_t{d.count()}, Period{});
         }
 
         template<typename Ratio>
-        TURBO_ATTRIBUTE_CONST_FUNCTION int64_t ToInt64(Duration d, Ratio) {
+        int64_t ToInt64(Duration d, Ratio) {
             // Note: This may be used on MSVC, which may have a system_clock period of
             // std::ratio<1, 10 * 1000 * 1000>
             return ToInt64Seconds(d * Ratio::den / Ratio::num);
         }
-// Fastpath implementations for the 6 common duration units.
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d, std::nano) {
+
+        // Fastpath implementations for the 6 common duration units.
+        inline int64_t ToInt64(Duration d, std::nano) {
             return ToInt64Nanoseconds(d);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d, std::micro) {
+        inline int64_t ToInt64(Duration d, std::micro) {
             return ToInt64Microseconds(d);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d, std::milli) {
+        inline int64_t ToInt64(Duration d, std::milli) {
             return ToInt64Milliseconds(d);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d,
-                                                              std::ratio<1>) {
+        inline int64_t ToInt64(Duration d,
+                               std::ratio<1>) {
             return ToInt64Seconds(d);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d,
-                                                              std::ratio<60>) {
+        inline int64_t ToInt64(Duration d,
+                               std::ratio<60>) {
             return ToInt64Minutes(d);
         }
 
-        TURBO_ATTRIBUTE_CONST_FUNCTION inline int64_t ToInt64(Duration d,
-                                                              std::ratio<3600>) {
+        inline int64_t ToInt64(Duration d,
+                               std::ratio<3600>) {
             return ToInt64Hours(d);
         }
 
-// Converts an turbo::Duration to a chrono duration of type T.
+        // Converts an turbo::Duration to a chrono duration of type T.
         template<typename T>
-        TURBO_ATTRIBUTE_CONST_FUNCTION T ToChronoDuration(Duration d) {
+        T ToChronoDuration(Duration d) {
             using Rep = typename T::rep;
             using Period = typename T::period;
             static_assert(IsValidRep64<Rep>(0), "duration::rep is invalid");
@@ -1700,8 +1701,8 @@ namespace turbo {
 
     }  // namespace time_internal
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator<(Duration lhs,
-                                                            Duration rhs) {
+    constexpr bool operator<(Duration lhs,
+                             Duration rhs) {
         return time_internal::GetRepHi(lhs) != time_internal::GetRepHi(rhs)
                ? time_internal::GetRepHi(lhs) < time_internal::GetRepHi(rhs)
                : time_internal::GetRepHi(lhs) == (std::numeric_limits<int64_t>::min)()
@@ -1710,13 +1711,13 @@ namespace turbo {
                  : time_internal::GetRepLo(lhs) < time_internal::GetRepLo(rhs);
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr bool operator==(Duration lhs,
-                                                             Duration rhs) {
+    constexpr bool operator==(Duration lhs,
+                              Duration rhs) {
         return time_internal::GetRepHi(lhs) == time_internal::GetRepHi(rhs) &&
                time_internal::GetRepLo(lhs) == time_internal::GetRepLo(rhs);
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration operator-(Duration d) {
+    constexpr Duration operator-(Duration d) {
         // This is a little interesting because of the special cases.
         //
         // If rep_lo_ is zero, we have it easy; it's safe to negate rep_hi_, we're
@@ -1742,62 +1743,61 @@ namespace turbo {
                                 time_internal::GetRepLo(d));
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Duration InfiniteDuration() {
+    constexpr Duration InfiniteDuration() {
         return time_internal::MakeDuration((std::numeric_limits<int64_t>::max)(),
                                            ~uint32_t{0});
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::nanoseconds &d) {
         return time_internal::FromChrono(d);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::microseconds &d) {
         return time_internal::FromChrono(d);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::milliseconds &d) {
         return time_internal::FromChrono(d);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::seconds &d) {
         return time_internal::FromChrono(d);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::minutes &d) {
         return time_internal::FromChrono(d);
     }
 
-    TURBO_ATTRIBUTE_PURE_FUNCTION constexpr Duration FromChrono(
+    constexpr Duration FromChrono(
             const std::chrono::hours &d) {
         return time_internal::FromChrono(d);
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixNanos(int64_t ns) {
+    constexpr Time FromUnixNanos(int64_t ns) {
         return time_internal::FromUnixDuration(Nanoseconds(ns));
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixMicros(int64_t us) {
+    constexpr Time FromUnixMicros(int64_t us) {
         return time_internal::FromUnixDuration(Microseconds(us));
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixMillis(int64_t ms) {
+    constexpr Time FromUnixMillis(int64_t ms) {
         return time_internal::FromUnixDuration(Milliseconds(ms));
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromUnixSeconds(int64_t s) {
+    constexpr Time FromUnixSeconds(int64_t s) {
         return time_internal::FromUnixDuration(Seconds(s));
     }
 
-    TURBO_ATTRIBUTE_CONST_FUNCTION constexpr Time FromTimeT(time_t t) {
+    constexpr Time FromTimeT(time_t t) {
         return time_internal::FromUnixDuration(Seconds(t));
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_TIME_TIME_H_
