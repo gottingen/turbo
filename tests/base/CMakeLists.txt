@@ -180,20 +180,6 @@ carbin_cc_test(
 )
 
 
-carbin_cc_test(
-        NAME
-        invoke_test
-        SOURCES
-        "invoke_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
 
 carbin_cc_test(
         NAME

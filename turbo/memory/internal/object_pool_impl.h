@@ -131,45 +131,110 @@ namespace turbo {
                 return nullptr;
             }
 
+            inline T *get_free_list() {
+                /* Fetch local free ptr */
+                if (_cur_free.nfree) {
+                    _global_nfree.fetch_sub(1, std::memory_order_relaxed);
+                    return _cur_free.ptrs[--_cur_free.nfree];
+                }
+                /* Fetch a FreeChunk from global.
+                   TODO: Popping from _free needs to copy a FreeChunk which is
+                   costly, but hardly impacts amortized performance. */
+                if (_pool->pop_free_chunk(_cur_free)) {
+                    _global_nfree.fetch_sub(1, std::memory_order_relaxed);
+                    return _cur_free.ptrs[--_cur_free.nfree];
+                }
+                return nullptr;
+            }
+
             inline T *get() {
-                auto ptr = get_raw();
+                auto ptr = get_free_list();
                 if (ptr != nullptr) {
-                    new(ptr) T();
-                    if (!ObjectPoolTraits<T>::validate(ptr)) {
-                        ptr->~T();
-                        return_object(ptr);
+                    return ptr;
+                }
+                if (_cur_block && _cur_block->nitem < BLOCK_NITEM) {
+                    T *obj = (T *) _cur_block->items + _cur_block->nitem;
+                    new(obj) T();
+                    if (!ObjectPoolTraits<T>::validate(obj)) {
+                        obj->~T();
                         return nullptr;
                     }
+                    ++_cur_block->nitem;
+                    return obj;
                 }
-                return ptr;
+                /* Fetch a Block from global */
+                _cur_block = add_block(&_cur_block_index);
+                if (_cur_block != nullptr) {
+                    T *obj = (T *) _cur_block->items + _cur_block->nitem;
+                    new(obj) T();
+                    if (!ObjectPoolTraits<T>::validate(obj)) {
+                        obj->~T();
+                        return nullptr;
+                    }
+                    ++_cur_block->nitem;
+                    return obj;
+                }
+                return nullptr;
             }
 
             template<typename ...Args>
             inline T *get(const Args &...args) {
-                auto ptr = get_raw();
+                auto ptr = get_free_list();
                 if (ptr != nullptr) {
-                    new(ptr) T(args...);
-                    if (!ObjectPoolTraits<T>::validate(ptr)) {
-                        ptr->~T();
-                        return_object(ptr);
+                    return ptr;
+                }
+                if (_cur_block && _cur_block->nitem < BLOCK_NITEM) {
+                    T *obj = (T *) _cur_block->items + _cur_block->nitem;
+                    new(obj) T(args...);
+                    if (!ObjectPoolTraits<T>::validate(obj)) {
+                        obj->~T();
                         return nullptr;
                     }
+                    ++_cur_block->nitem;
+                    return obj;
                 }
-                return ptr;
+                _cur_block = add_block(&_cur_block_index);
+                if (_cur_block != nullptr) {
+                    T *obj = (T *) _cur_block->items + _cur_block->nitem;
+                    new(obj) T(args...);
+                    if (!ObjectPoolTraits<T>::validate(obj)) {
+                        obj->~T();
+                        return nullptr;
+                    }
+                    ++_cur_block->nitem;
+                    return obj;
+                }
+                return nullptr;
             }
 
             template<typename ...Args>
             inline T *get(Args &&...args) {
-                auto ptr = get_raw();
+                auto ptr = get_free_list();
                 if (ptr != nullptr) {
-                    new(ptr) T(std::forward<Args>(args)...);
-                    if (!ObjectPoolTraits<T>::validate(ptr)) {
-                        ptr->~T();
-                        return_object(ptr);
+                    return ptr;
+                }
+                if (_cur_block && _cur_block->nitem < BLOCK_NITEM) {
+                    T *obj = (T *) _cur_block->items + _cur_block->nitem;
+                    new(obj) T(std::forward<Args>(args)...);
+                    if (!ObjectPoolTraits<T>::validate(obj)) {
+                        obj->~T();
                         return nullptr;
                     }
+                    ++_cur_block->nitem;
+                    return obj;
                 }
-                return ptr;
+                _cur_block = add_block(&_cur_block_index);
+                if (_cur_block != nullptr) {
+                    T *obj = (T *) _cur_block->items + _cur_block->nitem;
+                    new(obj) T(std::forward<Args>(args)...);
+                    if (!ObjectPoolTraits<T>::validate(obj)) {
+                        obj->~T();
+                        return nullptr;
+                    }
+                    ++_cur_block->nitem;
+                    return obj;
+                }
+                return nullptr;
             }
 
             inline int return_object(T *ptr) {

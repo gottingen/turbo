@@ -22,7 +22,6 @@
 #include <type_traits>
 
 #include "turbo/base/endian.h"
-#include "turbo/base/internal/invoke.h"
 #include "turbo/container/internal/compressed_tuple.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
@@ -366,16 +365,16 @@ struct CordRepExternal : public CordRep {
 struct Rank1 {};
 struct Rank0 : Rank1 {};
 
-template <typename Releaser, typename = ::turbo::base_internal::invoke_result_t<
+template <typename Releaser, typename = std::invoke_result_t<
                                  Releaser, std::string_view>>
 void InvokeReleaser(Rank0, Releaser&& releaser, std::string_view data) {
-  ::turbo::base_internal::invoke(std::forward<Releaser>(releaser), data);
+  std::invoke(std::forward<Releaser>(releaser), data);
 }
 
 template <typename Releaser,
-          typename = ::turbo::base_internal::invoke_result_t<Releaser>>
+          typename = std::invoke_result_t<Releaser>>
 void InvokeReleaser(Rank1, Releaser&& releaser, std::string_view) {
-  ::turbo::base_internal::invoke(std::forward<Releaser>(releaser));
+  std::invoke(std::forward<Releaser>(releaser));
 }
 
 // We use CompressedTuple so that we can benefit from EBCO.

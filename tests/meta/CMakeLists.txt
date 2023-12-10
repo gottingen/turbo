@@ -147,7 +147,5 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         turbo::turbo
         turbo::test_instance_tracker
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 

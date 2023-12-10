@@ -19,7 +19,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/internal/invoke.h"
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
@@ -39,7 +38,7 @@ constexpr bool WasDeduced() {
 
 template <typename Callback>
 constexpr bool ReturnsVoid() {
-  return (std::is_same<base_internal::invoke_result_t<Callback>, void>::value);
+  return (std::is_same<std::invoke_result_t<Callback>, void>::value);
 }
 
 template <typename Callback>

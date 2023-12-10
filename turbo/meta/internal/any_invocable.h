@@ -63,7 +63,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/internal/invoke.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
@@ -126,13 +125,13 @@ using RemoveCVRef =
 template <class ReturnType, class F, class... P,
           typename = std::enable_if_t<std::is_void<ReturnType>::value>>
 void InvokeR(F&& f, P&&... args) {
-  turbo::base_internal::invoke(std::forward<F>(f), std::forward<P>(args)...);
+  std::invoke(std::forward<F>(f), std::forward<P>(args)...);
 }
 
 template <class ReturnType, class F, class... P,
           std::enable_if_t<!std::is_void<ReturnType>::value, int> = 0>
 ReturnType InvokeR(F&& f, P&&... args) {
-  return turbo::base_internal::invoke(std::forward<F>(f),
+  return std::invoke(std::forward<F>(f),
                                      std::forward<P>(args)...);
 }
 
@@ -747,7 +746,7 @@ using CanAssignReferenceWrapper = TrueAlias<
               UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals, P...>,  \
           std::is_same<                                                      \
               ReturnType,                                                    \
-              turbo::base_internal::invoke_result_t<                          \
+              std::invoke_result_t<                          \
                   UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals,     \
                   P...>>>>::value>
 
@@ -778,10 +777,10 @@ using CanAssignReferenceWrapper = TrueAlias<
     /*SFINAE constraint to check if F is invocable with the proper signature*/ \
     template <class F>                                                         \
     using CallIsValid = TrueAlias<std::enable_if_t<std::disjunction<         \
-        turbo::base_internal::is_invocable_r<ReturnType,                        \
+        std::is_invocable_r<ReturnType,                        \
                                             std::decay_t<F> inv_quals, P...>, \
         std::is_same<ReturnType,                                               \
-                     turbo::base_internal::invoke_result_t<                     \
+                     std::invoke_result_t<                     \
                          std::decay_t<F> inv_quals, P...>>>::value>>;         \
                                                                                \
     /*SFINAE constraint to check if F is nothrow-invocable when necessary*/    \

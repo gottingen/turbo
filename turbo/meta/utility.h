@@ -46,7 +46,6 @@
 #include <utility>
 
 #include "turbo/base/internal/inline_variable.h"
-#include "turbo/base/internal/invoke.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
 
@@ -221,10 +220,10 @@ namespace turbo {
         // Helper method for expanding tuple into a called method.
         template<typename Functor, typename Tuple, std::size_t... Indexes>
         auto apply_helper(Functor &&functor, Tuple &&t, index_sequence<Indexes...>)
-        -> decltype(turbo::base_internal::invoke(
+        -> decltype(std::invoke(
                 std::forward<Functor>(functor),
                 std::get<Indexes>(std::forward<Tuple>(t))...)) {
-            return turbo::base_internal::invoke(
+            return std::invoke(
                     std::forward<Functor>(functor),
                     std::get<Indexes>(std::forward<Tuple>(t))...);
         }
