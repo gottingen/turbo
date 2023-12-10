@@ -29,28 +29,29 @@
 #include "turbo/random/internal/traits.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-
-    // turbo::poisson_distribution:
-    // Generates discrete variates conforming to a Poisson distribution.
-    //   p(n) = (mean^n / n!) exp(-mean)
-    //
-    // Depending on the parameter, the distribution selects one of the following
-    // algorithms:
-    // * The standard algorithm, attributed to Knuth, extended using a split method
-    // for larger values
-    // * The "Ratio of Uniforms as a convenient method for sampling from classical
-    // discrete distributions", Stadlober, 1989.
-    // http://www.sciencedirect.com/science/article/pii/0377042790903495
-    //
-    // NOTE: param_type.mean() is a double, which permits values larger than
-    // poisson_distribution<IntType>::max(), however this should be avoided and
-    // the distribution results are limited to the max() value.
-    //
-    // The goals of this implementation are to provide good performance while still
-    // beig thread-safe: This limits the implementation to not using lgamma provided
-    // by <math.h>.
-    //
+    /**
+     * @ingroup turbo_random_poisson
+     * @brief turbo::poisson_distribution<T>
+     *        Generates discrete variates conforming to a Poisson distribution.
+     *        p(n) = (mean^n / n!) exp(-mean)
+     *
+     *        Depending on the parameter, the distribution selects one of the following
+     *        algorithms:
+     *        * The standard algorithm, attributed to Knuth, extended using a split method
+     *        for larger values
+     *        * The "Ratio of Uniforms as a convenient method for sampling from classical
+     *        discrete distributions", Stadlober, 1989.
+     *        http://www.sciencedirect.com/science/article/pii/0377042790903495
+     *
+     *        NOTE: param_type.mean() is a double, which permits values larger than
+     *        poisson_distribution<IntType>::max(), however this should be avoided and
+     *        the distribution results are limited to the max() value.
+     *
+     *        The goals of this implementation are to provide good performance while still
+     *        beig thread-safe: This limits the implementation to not using lgamma provided
+     *        by <math.h>.
+     * @tparam IntType
+     */
     template<typename IntType = int>
     class poisson_distribution {
     public:
@@ -258,8 +259,6 @@ namespace turbo {
         }
         return is;
     }
-
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_POISSON_DISTRIBUTION_H_

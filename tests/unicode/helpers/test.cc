@@ -99,8 +99,8 @@ Usage:
 Examples:
 
     # Test haswell implementations with tests having strings 'convert'
-    # and 'utf8' in their name -- for instance 'ConvertUtf8ToUtf16' and
-    # 'ConvertUtf16ToUtf8'.
+    # and 'utf8' in their name -- for instance 'convert_utf8_to_utf16' and
+    # 'convert_utf16_to_utf8'.
 
     $ test --arch haswell --test convert --test utf8
 )txt", file);

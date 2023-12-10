@@ -31,10 +31,24 @@
 #ifndef TURBO_RANDOM_RANDOM_H_
 #define TURBO_RANDOM_RANDOM_H_
 
+/**
+ * @defgroup turbo_random_module Turbo Random Module
+ * @defgroup turbo_random_engine Turbo Random Module
+ * @defgroup turbo_random_uniform Turbo Random Module
+ * @defgroup turbo_random_bernoulli Turbo Random Module
+ * @defgroup turbo_random_beta Turbo Random Module
+ * @defgroup turbo_random_exponential Turbo Random Module
+ * @defgroup turbo_random_gaussian Turbo Random Module
+ * @defgroup turbo_random_log_uniform Turbo Random Module
+ * @defgroup turbo_random_poisson Turbo Random Module
+ * @defgroup turbo_random_zipf Turbo Random Module
+ * @defgroup turbo_random_bytes Turbo Random Module
+ * @defgroup turbo_random_unicode Turbo Random Module
+ * @brief Turbo Random Module
+ */
 #include <random>
 #include <numeric>
 #include "turbo/random/engine.h"
-#include "turbo/random/fast_random.h"
 #include "turbo/random/uniform.h"
 #include "turbo/random/bernoulli.h"
 #include "turbo/random/beta.h"
@@ -43,76 +57,9 @@
 #include "turbo/random/log_uniform.h"
 #include "turbo/random/poisson.h"
 #include "turbo/random/zipf.h"
+#include "turbo/random/bytes.h"
+#include "turbo/random/unicode.h"
 #include "turbo/meta/type_traits.h"
 #include <vector>
-
-namespace turbo {
-
-    inline uint64_t fast_random() {
-        return FastRandom::get_thread_instance()->generate();
-    }
-
-    inline uint64_t fast_random(uint64_t range) {
-        return FastRandom::get_thread_instance()->generate(range);
-    }
-
-    inline uint64_t fast_random(uint64_t lo, uint64_t hi) {
-        return FastRandom::get_thread_instance()->generate_64(lo, hi);
-    }
-
-    inline uint64_t fast_random_u64(uint64_t lo, uint64_t hi) {
-        return FastRandom::get_thread_instance()->generate_u64(lo, hi);
-    }
-
-    template<class T = int64_t, std::enable_if_t<std::is_integral_v<T> ||std::is_floating_point_v<T>, int>>
-    inline T fast_random(int64_t lo, int64_t hi) {
-        return FastRandom::get_thread_instance()->generate<T>(lo, hi);
-    }
-
-    inline double fast_random_double() {
-        return FastRandom::get_thread_instance()->generate_double();
-    }
-
-    void fast_random_bytes(void *output, size_t output_length);
-
-    std::string fast_random_printable(size_t length);
-
-
-    template<typename T>
-    class UniformRandom {
-    public:
-        template<check_requires<std::is_integral<T>>>
-        UniformRandom(): _gen(), _hi(std::numeric_limits<T>::max()), _lo(std::numeric_limits<T>::min()) {}
-
-        UniformRandom(T hi, T lo) : _gen(), _hi(hi), _lo(lo) {}
-
-        UniformRandom(BitGen gen, T hi, T lo) : _gen(gen), _hi(hi), _lo(lo) {}
-
-        T generate() {
-            return uniform(_gen, _lo, _hi);
-        }
-
-    private:
-        BitGen _gen;
-        T _hi;
-        T _lo;
-    };
-
-    template<typename T, check_requires<std::is_integral<T>>>
-    class UniformRandomRanges {
-    public:
-
-        UniformRandomRanges(const std::vector<std::pair<T, T>> &ranges) : _gen(), _ranges(ranges) {}
-
-        T generate() {
-            auto index = uniform(IntervalClosedOpen, _gen, 0, _ranges.size());
-            return uniform(_gen, _ranges[index].first, _ranges[index].second);
-        }
-
-    private:
-        BitGen _gen;
-        std::vector<std::pair<T, T>> _ranges;
-    };
-}  // namespace turbo
 
 #endif  // TURBO_RANDOM_RANDOM_H_

@@ -21,26 +21,30 @@
 
 namespace turbo {
 
-    // -----------------------------------------------------------------------------
-    // turbo::bernoulli(bitgen, p)
-    // -----------------------------------------------------------------------------
-    //
-    // `turbo::bernoulli` produces a random boolean value, with probability `p`
-    // (where 0.0 <= p <= 1.0) equaling `true`.
-    //
-    // Prefer `turbo::bernoulli` to produce boolean values over other alternatives
-    // such as comparing an `turbo::uniform()` value to a specific output.
-    //
-    // See https://en.wikipedia.org/wiki/Bernoulli_distribution
-    //
-    // Example:
-    //
-    //   turbo::BitGen bitgen;
-    //   ...
-    //   if (turbo::bernoulli(bitgen, 1.0/3721.0)) {
-    //     std::cout << "Asteroid field navigation successful.";
-    //   }
-    //
+    /**
+     * @ingroup turbo_random_bernoulli
+     * @brief turbo::bernoulli(bitgen, p)
+     *         turbo::bernoulli produces a random boolean value, with probability p
+     *         (where 0.0 <= p <= 1.0) equaling true.
+     *
+     *         Prefer turbo::bernoulli to produce boolean values over other alternatives
+     *         such as comparing an turbo::uniform() value to a specific output.
+     *
+     *         See https://en.wikipedia.org/wiki/Bernoulli_distribution
+     *
+     *         Example:
+     *         @code cpp
+     *         turbo::BitGen bitgen;
+     *         ...
+     *         if (turbo::bernoulli(bitgen, 1.0/3721.0)) {
+     *              std::cout << "Asteroid field navigation successful.";
+     *         }
+     *         @endcode
+     * @tparam URBG random generator
+     * @param urbg random generator
+     * @param p probability
+     * @return bool
+     */
     template<typename URBG>
     bool bernoulli(URBG &&urbg,  // NOLINT(runtime/references)
                    double p) {
@@ -51,11 +55,43 @@ namespace turbo {
                 distribution_t>(&urbg, p);
     }
 
+    /**
+     * @ingroup turbo_random_bernoulli
+     * @brief turbo::bernoulli(p) is similar to turbo::bernoulli(bitgen, p)
+     *        but uses a thread-local random generator for efficiency and
+     *        convenience.
+     *        @see turbo::bernoulli(bitgen, p)
+     *        @see turbo::get_tls_bit_gen()
+     *        @see turbo::set_tls_bit_gen()
+     * @note This function is thread-safe.
+     * @param p probability
+     * @return bool
+     */
     bool bernoulli(double p) {
         using distribution_t = turbo::bernoulli_distribution;
 
         return random_internal::DistributionCaller<BitGen>::template Call<
                 distribution_t>(&get_tls_bit_gen(), p);
+    }
+
+    /**
+     * @ingroup turbo_random_bernoulli
+     * @brief turbo::fast_bernoulli(p) is similar to turbo::bernoulli(bitgen, p)
+     *        but uses a thread-local insecure random generator for efficiency and
+     *        convenience. in this case, the random generator is faster than
+     *        turbo::bernoulli(p).
+     *       @see turbo::bernoulli(bitgen, p)
+     *       @see turbo::get_tls_fast_bit_gen()
+     *       @see turbo::set_tls_fast_bit_gen()
+     * @note This function is thread-safe.
+     * @param p probability
+     * @return bool
+     */
+    bool fast_bernoulli(double p) {
+        using distribution_t = turbo::bernoulli_distribution;
+
+        return random_internal::DistributionCaller<InsecureBitGen>::template Call<
+                distribution_t>(&get_tls_fast_bit_gen(), p);
     }
 
 }  // namespace turbo

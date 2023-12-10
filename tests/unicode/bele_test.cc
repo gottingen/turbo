@@ -52,53 +52,53 @@ const size_t utf32_size = sizeof(utf32_string)/sizeof(char32_t);
 const size_t number_of_code_points = utf32_size;
 
 
-TEST(ValidateUtf8) {
-    turbo::result res = implementation.ValidateUtf8WithErrors(utf8, utf8_size);
+TEST(validate_utf8) {
+    turbo::result res = implementation.validate_utf8_with_errors(utf8, utf8_size);
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
-TEST(ValidateUtf16Le) {
-    turbo::result res = implementation.ValidateUtf16LeWithErrors(utf16le, utf16_size);
+TEST(validate_utf16le) {
+    turbo::result res = implementation.validate_utf16le_with_errors(utf16le, utf16_size);
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
-TEST(ValidateUtf16Be) {
-    turbo::result res = implementation.ValidateUtf16BeWithErrors(utf16be, utf16_size);
+TEST(validate_utf16be) {
+    turbo::result res = implementation.validate_utf16be_with_errors(utf16be, utf16_size);
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
-TEST(ValidateUtf32) {
-    turbo::result res = implementation.ValidateUtf32WithErrors(utf32, utf32_size);
+TEST(validate_utf32) {
+    turbo::result res = implementation.validate_utf32_with_errors(utf32, utf32_size);
     ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
 }
 
-TEST(CountUtf8) {
-    size_t count = implementation.CountUtf8(utf8, utf8_size);
+TEST(count_utf8) {
+    size_t count = implementation.count_utf8(utf8, utf8_size);
     ASSERT_EQUAL(count, number_of_code_points);
 }
 
-TEST(CountUtf16Le) {
-    size_t count = implementation.CountUtf16Le(utf16le, utf16_size);
+TEST(count_utf16le) {
+    size_t count = implementation.count_utf16le(utf16le, utf16_size);
     ASSERT_EQUAL(count, number_of_code_points);
 }
 
-TEST(CountUtf16Be) {
-    size_t count = implementation.CountUtf16Be(reinterpret_cast<const char16_t*>(utf16be_string), sizeof(utf16be_string)/sizeof(uint16_t));
+TEST(count_utf16be) {
+    size_t count = implementation.count_utf16be(reinterpret_cast<const char16_t*>(utf16be_string), sizeof(utf16be_string)/sizeof(uint16_t));
     ASSERT_EQUAL(count, number_of_code_points);
 }
 
-TEST(ConvertUtf8ToUtf16Le) {
+TEST(convert_utf8_to_utf16le) {
     char16_t buffer[utf16_size];
-    size_t count = implementation.ConvertUtf8ToUtf16Le(utf8, utf8_size, buffer);
+    size_t count = implementation.convert_utf8_to_utf16le(utf8, utf8_size, buffer);
     ASSERT_EQUAL(count, utf16_size);
     for(size_t i = 0; i < utf16_size; i++) {
         ASSERT_EQUAL(buffer[i], utf16le[i]);
     }
 }
 
-TEST(ConvertUtf8ToUtf16Be) {
+TEST(convert_utf8_to_utf16be) {
     char16_t buffer[utf16_size];
-    size_t count = implementation.ConvertUtf8ToUtf16Be(utf8, utf8_size, buffer);
+    size_t count = implementation.convert_utf8_to_utf16be(utf8, utf8_size, buffer);
     ASSERT_EQUAL(count, utf16_size);
     for(size_t i = 0; i < utf16_size; i++) {
         ASSERT_EQUAL(buffer[i], utf16be[i]);
@@ -106,46 +106,36 @@ TEST(ConvertUtf8ToUtf16Be) {
 }
 
 
-TEST(ConvertUtf8ToUtf32) {
+TEST(convert_utf8_to_utf32) {
     char32_t buffer[utf32_size];
-    size_t count = implementation.ConvertUtf8ToUtf32(utf8, utf8_size, buffer);
+    size_t count = implementation.convert_utf8_to_utf32(utf8, utf8_size, buffer);
     ASSERT_EQUAL(count, utf32_size);
     for(size_t i = 0; i < utf32_size; i++) {
         ASSERT_EQUAL(buffer[i], utf32[i]);
     }
 }
 
-TEST(ConvertUtf32ToUtf8) {
+TEST(convert_utf32_to_utf8) {
     char buffer[utf8_size];
-    size_t count = implementation.ConvertUtf32ToUtf8(utf32, utf32_size, buffer);
+    size_t count = implementation.convert_utf32_to_utf8(utf32, utf32_size, buffer);
     ASSERT_EQUAL(count, utf8_size);
     for(size_t i = 0; i < utf8_size; i++) {
         ASSERT_EQUAL(buffer[i], utf8[i]);
     }
 }
 
-TEST(ConvertUtf32ToUtf16Be) {
+TEST(convert_utf32_to_utf16be) {
     char buffer[utf8_size];
-    size_t count = implementation.ConvertUtf32ToUtf8(utf32, utf32_size, buffer);
+    size_t count = implementation.convert_utf32_to_utf8(utf32, utf32_size, buffer);
     ASSERT_EQUAL(count, utf8_size);
     for(size_t i = 0; i < utf8_size; i++) {
         ASSERT_EQUAL(buffer[i], utf8[i]);
     }
 }
 
-TEST(ConvertUtf32ToUtf16Le) {
+TEST(convert_utf32_to_utf16le) {
     char buffer[utf8_size];
-    size_t count = implementation.ConvertUtf32ToUtf8(utf32, utf32_size, buffer);
-    ASSERT_EQUAL(count, utf8_size);
-    for(size_t i = 0; i < utf8_size; i++) {
-        ASSERT_EQUAL(buffer[i], utf8[i]);
-    }
-}
-
-
-TEST(ConvertUtf16LeToUtf8) {
-    char buffer[utf8_size];
-    size_t count = implementation.ConvertUtf16LeToUtf8(utf16le, utf16_size, buffer);
+    size_t count = implementation.convert_utf32_to_utf8(utf32, utf32_size, buffer);
     ASSERT_EQUAL(count, utf8_size);
     for(size_t i = 0; i < utf8_size; i++) {
         ASSERT_EQUAL(buffer[i], utf8[i]);
@@ -153,18 +143,28 @@ TEST(ConvertUtf16LeToUtf8) {
 }
 
 
-TEST(ConvertUtf16LeToUtf32) {
+TEST(convert_utf16le_to_utf8) {
+    char buffer[utf8_size];
+    size_t count = implementation.convert_utf16le_to_utf8(utf16le, utf16_size, buffer);
+    ASSERT_EQUAL(count, utf8_size);
+    for(size_t i = 0; i < utf8_size; i++) {
+        ASSERT_EQUAL(buffer[i], utf8[i]);
+    }
+}
+
+
+TEST(convert_utf16le_to_utf32) {
     char32_t buffer[utf32_size];
-    size_t count = implementation.ConvertUtf16LeToUtf32(utf16le, utf16_size, buffer);
+    size_t count = implementation.convert_utf16le_to_utf32(utf16le, utf16_size, buffer);
     ASSERT_EQUAL(count, utf32_size);
     for(size_t i = 0; i < utf32_size; i++) {
         ASSERT_EQUAL(buffer[i], utf32[i]);
     }
 }
 
-TEST(ConvertUtf16BeToUtf8) {
+TEST(convert_utf16be_to_utf8) {
     char buffer[utf8_size];
-    size_t count = implementation.ConvertUtf16BeToUtf8(utf16be, utf16_size, buffer);
+    size_t count = implementation.convert_utf16be_to_utf8(utf16be, utf16_size, buffer);
     ASSERT_EQUAL(count, utf8_size);
     for(size_t i = 0; i < utf8_size; i++) {
         ASSERT_EQUAL(buffer[i], utf8[i]);
@@ -172,9 +172,9 @@ TEST(ConvertUtf16BeToUtf8) {
 }
 
 
-TEST(ConvertUtf16BeToUtf32) {
+TEST(convert_utf16be_to_utf32) {
     char32_t buffer[utf32_size];
-    size_t count = implementation.ConvertUtf16BeToUtf32(utf16be, utf16_size, buffer);
+    size_t count = implementation.convert_utf16be_to_utf32(utf16be, utf16_size, buffer);
     ASSERT_EQUAL(count, utf32_size);
     for(size_t i = 0; i < utf32_size; i++) {
         ASSERT_EQUAL(buffer[i], utf32[i]);

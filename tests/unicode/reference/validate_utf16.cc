@@ -22,7 +22,7 @@ namespace turbo {
 namespace tests {
 namespace reference {
 
-TURBO_MUST_USE_RESULT bool ValidateUtf16(const char16_t *buf, size_t len) noexcept {
+TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexcept {
   const char16_t* curr = buf;
   const char16_t* end = buf + len;
 

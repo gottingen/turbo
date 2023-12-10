@@ -19,18 +19,18 @@
 #include <iostream>
 #include <iomanip>
 
-#include <tests/unicode/helpers/random_utf8.h>
+#include "turbo/random/random.h"
 #include <tests/unicode/reference/validate_utf8.h>
 #include <tests/unicode/helpers/test.h>
 
 TEST(brute_force) {
   uint32_t seed{1234};
-  turbo::tests::helpers::random_utf8 gen_1_2_3_4(seed, 1, 1, 1, 1);
+  turbo::Utf8Generator gen_1_2_3_4(1, 1, 1, 1);
   size_t total = 1000;
   for (size_t i = 0; i < total; i++) {
 
     auto UTF8 = gen_1_2_3_4.generate(rand() % 256);
-    if (!implementation.ValidateUtf8((const char *)UTF8.data(), UTF8.size())) {
+    if (!implementation.validate_utf8((const char *)UTF8.data(), UTF8.size())) {
       std::cerr << "bug" << std::endl;
       ASSERT_TRUE(false);
     }
@@ -39,9 +39,9 @@ TEST(brute_force) {
       const int bitflip{1 << (rand() % 8)};
       UTF8[rand() % UTF8.size()] = uint8_t(bitflip); // we flip exactly one bit
       bool is_ok =
-          implementation.ValidateUtf8((const char *)UTF8.data(), UTF8.size());
+          implementation.validate_utf8((const char *)UTF8.data(), UTF8.size());
       bool is_ok_basic =
-          turbo::tests::reference::ValidateUtf8((const char *)UTF8.data(), UTF8.size());
+          turbo::tests::reference::validate_utf8((const char *)UTF8.data(), UTF8.size());
       if (is_ok != is_ok_basic) {
         std::cerr << "bug" << std::endl;
         ASSERT_TRUE(false);

@@ -31,7 +31,7 @@
 #include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/numbers.h"
-#include "turbo/unicode/utf.h"
+#include "turbo/unicode/converter.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -240,7 +240,7 @@ namespace turbo {
                             }
 
                             //d += strings_internal::EncodeUTF8Char(d, rune);
-                            d += turbo::ConvertUtf32ToUtf8(&rune, 1, d);
+                            d += turbo::convert_utf32_to_utf8(&rune, 1, d);
                             break;
                         }
                         case 'U': {
@@ -291,7 +291,7 @@ namespace turbo {
                             if (IsSurrogate(rune, std::string_view(hex_start, 9), error)) {
                                 return false;
                             }
-                            d += turbo::ConvertUtf32ToUtf8(&rune, 1, d);
+                            d += turbo::convert_utf32_to_utf8(&rune, 1, d);
                             //d += strings_internal::EncodeUTF8Char(d, rune);
                             break;
                         }

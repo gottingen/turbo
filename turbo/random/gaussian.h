@@ -21,22 +21,27 @@
 
 namespace turbo {
 
-    // -----------------------------------------------------------------------------
-    // turbo::gaussian<T>(bitgen, mean = 0, stddev = 1)
-    // -----------------------------------------------------------------------------
-    //
-    // `turbo::gaussian` produces a floating point number selected from the Gaussian
-    // (ie. "Normal") distribution. `T` must be a floating point type, but may be
-    // inferred from the types of `mean` and `stddev`.
-    //
-    // See https://en.wikipedia.org/wiki/Normal_distribution
-    //
-    // Example:
-    //
-    //   turbo::BitGen bitgen;
-    //   ...
-    //   double giraffe_height = turbo::gaussian(bitgen, 16.3, 3.3);
-    //
+    /**
+     * @ingroup turbo_random_gaussian
+     * @brief turbo::gaussian<T>(bitgen, mean = 0, stddev = 1)
+     *        turbo::gaussian produces a floating point number selected from the Gaussian
+     *        (ie. "Normal") distribution. `T` must be a floating point type, but may be
+     *        inferred from the types of `mean` and `stddev`.
+     *        See https://en.wikipedia.org/wiki/Normal_distribution
+     *
+     *        Example:
+     *        @code cpp
+     *        turbo::BitGen bitgen;
+     *        ...
+     *        double giraffe_height = turbo::gaussian(bitgen, 16.3, 3.3);
+     *        @endcode
+     * @tparam RealType
+     * @tparam URBG
+     * @param urbg
+     * @param mean
+     * @param stddev
+     * @return RealType
+     */
     template<typename RealType, typename URBG>
     RealType gaussian(URBG &&urbg,  // NOLINT(runtime/references)
                       RealType mean = 0, RealType stddev = 1) {
@@ -52,6 +57,19 @@ namespace turbo {
                 distribution_t>(&urbg, mean, stddev);
     }
 
+    /**
+     * @ingroup turbo_random_gaussian
+     * @brief  similar to turbo::gaussian<T>(bitgen, mean = 0, stddev = 1) but use the default bitgen
+     *         turbo::gaussian produces a floating point number selected from the Gaussian
+     *         (ie. "Normal") distribution. `T` must be a floating point type, but may be
+     *         inferred from the types of `mean` and `stddev`.
+     * @see   turbo::get_tls_bit_gen()
+     * @see   turbo::set_tls_bit_gen()
+     * @tparam RealType
+     * @param mean
+     * @param stddev
+     * @return RealType
+     */
     template<typename RealType>
     RealType gaussian(RealType mean = 0, RealType stddev = 1) {
         static_assert(
@@ -62,7 +80,33 @@ namespace turbo {
         using distribution_t = typename turbo::gaussian_distribution<RealType>;
 
         return random_internal::DistributionCaller<BitGen>::template Call<
-                distribution_t>(&get_tls_bit_gen, mean, stddev);
+                distribution_t>(&get_tls_bit_gen(), mean, stddev);
+    }
+
+    /**
+     * @ingroup turbo_random_gaussian
+     * @brief  similar to turbo::gaussian<T>(bitgen, mean = 0, stddev = 1) but use the fast bitgen
+     *         turbo::gaussian produces a floating point number selected from the Gaussian
+     *         (ie. "Normal") distribution. `T` must be a floating point type, but may be
+     *         inferred from the types of `mean` and `stddev`.
+     * @see   turbo::get_tls_fast_bit_gen()
+     * @see   turbo::set_tls_fast_bit_gen()
+     * @tparam RealType
+     * @param mean
+     * @param stddev
+     * @return RealType
+     */
+    template<typename RealType>
+    RealType fast_gaussian(RealType mean = 0, RealType stddev = 1) {
+        static_assert(
+                std::is_floating_point<RealType>::value,
+                "Template-argument 'RealType' must be a floating-point type, in "
+                "turbo::gaussian<RealType, URBG>(...)");
+
+        using distribution_t = typename turbo::gaussian_distribution<RealType>;
+
+        return random_internal::DistributionCaller<InsecureBitGen>::template Call<
+                distribution_t>(&get_tls_fast_bit_gen(), mean, stddev);
     }
 }  // namespace turbo
 

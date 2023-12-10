@@ -20,9 +20,7 @@
 #include <random>
 #include <stdexcept>
 
-#include <tests/unicode/helpers/random_int.h>
-#include <tests/unicode/helpers/random_utf8.h>
-#include <tests/unicode/helpers/random_utf16.h>
+#include "turbo/random/random.h"
 #include <tests/unicode/helpers/test.h>
 #include <tests/unicode/reference/encode_utf16.h>
 
@@ -35,9 +33,9 @@ TEST(boommmmm) {
   const char* utf8_bom = "\xef\xbb\xbf"; 
   const char* utf16be_bom = "\xfe\xff"; 
   const char* utf16le_bom = "\xff\xfe"; 
-  ASSERT_TRUE(implementation.DetectEncodings(utf8_bom, 3) == turbo::EncodingType::UTF8);
-  ASSERT_TRUE(implementation.DetectEncodings(utf16be_bom, 2) == turbo::EncodingType::UTF16_BE);
-  ASSERT_TRUE(implementation.DetectEncodings(utf16le_bom, 2) == turbo::EncodingType::UTF16_LE);
+  ASSERT_TRUE(implementation.detect_encodings(utf8_bom, 3) == turbo::EncodingType::UTF8);
+  ASSERT_TRUE(implementation.detect_encodings(utf16be_bom, 2) == turbo::EncodingType::UTF16_BE);
+  ASSERT_TRUE(implementation.detect_encodings(utf16le_bom, 2) == turbo::EncodingType::UTF16_LE);
 }
 
 
@@ -49,12 +47,12 @@ TEST(pure_utf8_ASCII) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf8 random(seed, 1, 0, 0, 0);
+    turbo::Utf8Generator random(1, 0, 0, 0);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
       auto expected = turbo::EncodingType::UTF8 | turbo::EncodingType::UTF16_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size);
       ASSERT_TRUE(actual == expected);
@@ -70,7 +68,7 @@ TEST(pure_utf16_ASCII) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::RandomInt random(0,127, seed);
+    turbo::FixedUniform<int> random(127, seed);
 
     for (size_t size : input_size) {
       std::vector<uint16_t> generated;
@@ -78,7 +76,7 @@ TEST(pure_utf16_ASCII) {
         generated.push_back(uint16_t(random()));
       }
       auto expected = turbo::EncodingType::UTF8 | turbo::EncodingType::UTF16_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.data()),
                       size);
       ASSERT_TRUE(actual == expected);
@@ -94,7 +92,7 @@ TEST(pure_utf32_ASCII) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::RandomInt random(0,0x7f, seed);
+    turbo::FixedUniform<int> random(0x7f, seed);
 
     for (size_t size : input_size) {
       std::vector<uint32_t> generated;
@@ -102,7 +100,7 @@ TEST(pure_utf32_ASCII) {
         generated.push_back(random());
       }
       auto expected = turbo::EncodingType::UTF8 | turbo::EncodingType::UTF16_LE | turbo::EncodingType::UTF32_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.data()),
                       size);
       ASSERT_TRUE(actual == expected);
@@ -121,8 +119,8 @@ TEST(no_utf8_bytes_no_surrogates) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::RandomIntRanges random({{0x007f, 0xd800-1},
-                                                     {0xe000, 0xffff}}, seed);
+    turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x007f, 0xd800-1},
+                                                     {0xe000, 0xffff}});
 
     for (size_t size : input_size) {
       std::vector<uint32_t> generated;
@@ -130,7 +128,7 @@ TEST(no_utf8_bytes_no_surrogates) {
         generated.push_back(random());
       }
       auto expected = turbo::EncodingType::UTF16_LE | turbo::EncodingType::UTF32_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.data()),
                       size);
       ASSERT_TRUE(actual == expected);
@@ -147,12 +145,12 @@ TEST(two_utf8_bytes) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf8 random(seed, 0, 1, 0, 0);
+    turbo::Utf8Generator random( 0, 1, 0, 0);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
       auto expected = turbo::EncodingType::UTF8 | turbo::EncodingType::UTF16_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size);
       if(actual != expected) {
@@ -176,12 +174,12 @@ TEST(utf_16_surrogates) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf16 random(seed, 0, 1);
+    turbo::Utf16Generator random( 0, 1);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size/2);
       auto expected = turbo::EncodingType::UTF16_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size);
       ASSERT_TRUE(actual == expected);
@@ -200,8 +198,8 @@ TEST(utf32_surrogates) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::RandomInt random_prefix(0x10000, 0x10ffff, seed);
-    turbo::tests::helpers::RandomInt random_suffix(0xd800, 0xdfff, seed);
+    turbo::FixedUniform<int> random_prefix(0x10000, 0x10ffff);
+    turbo::FixedUniform<int> random_suffix(0xd800, 0xdfff);
 
     for (size_t size : input_size) {
       std::vector<uint32_t> generated;
@@ -209,7 +207,7 @@ TEST(utf32_surrogates) {
         generated.push_back((random_prefix() & 0xffff0000) + random_suffix());
       }
       auto expected = turbo::EncodingType::UTF32_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.data()),
                       size);
       ASSERT_TRUE(actual == expected);
@@ -230,7 +228,7 @@ TEST(edge_surrogate) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::RandomInt random(0x10000, 0x10ffff, seed);
+    turbo::FixedUniform<int> random(0x10000, 0x10ffff);
 
     const size_t size = 512;
     std::vector<uint16_t> generated(size/2,0);
@@ -244,7 +242,7 @@ TEST(edge_surrogate) {
       i += 32;
     }
     auto expected = turbo::EncodingType::UTF16_LE;
-    auto actual = implementation.DetectEncodings(
+    auto actual = implementation.detect_encodings(
                     reinterpret_cast<const char *>(generated.data()),
                     size);
     ASSERT_TRUE(actual == expected);
@@ -260,12 +258,12 @@ TEST(tail_utf8) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf8 random(seed, 0, 0, 1, 0);
+    turbo::Utf8Generator random( 0, 0, 1, 0);
     std::array<size_t, 5> multiples_three{12, 54, 66, 126, 252};
     for (size_t size : multiples_three) {
       auto generated = random.generate_counted(size);
       auto expected = turbo::EncodingType::UTF8 | turbo::EncodingType::UTF16_LE;
-      auto actual = implementation.DetectEncodings(
+      auto actual = implementation.detect_encodings(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size);
       ASSERT_TRUE(actual == expected);

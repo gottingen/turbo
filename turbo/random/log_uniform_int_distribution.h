@@ -31,15 +31,24 @@
 #include "turbo/random/uniform_int_distribution.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
-    // log_uniform_int_distribution:
-    //
-    // Returns a random variate R in range [min, max] such that
-    // floor(log(R-min, base)) is uniformly distributed.
-    // We ensure uniformity by discretization using the
-    // boundary sets [0, 1, base, base * base, ... min(base*n, max)]
-    //
+    /**
+     * @ingroup turbo_random_log_uniform_int_distribution
+     * @brief turbo::log_uniform_int_distribution<T>(bitgen, min = 0, max = (std::numeric_limits<T>::max)(), base = 2)
+     *        turbo::log_uniform_int_distribution produces a random integer in the range [min, max] such that
+     *        floor(log(R-min, base)) is uniformly distributed.
+     *        We ensure uniformity by discretization using the
+     *        boundary sets [0, 1, base, base * base, ... min(base*n, max)]
+     *        See https://en.wikipedia.org/wiki/Logarithmic_distribution
+     *
+     *        Example:
+     *        @code cpp
+     *        turbo::BitGen bitgen;
+     *        ...
+     *        int64_t giraffe_height = turbo::log_uniform_int_distribution<int64_t>(bitgen, 16, 32, 2);
+     *        @endcode
+     * @tparam IntType
+     */
     template<typename IntType = int>
     class log_uniform_int_distribution {
     private:
@@ -257,7 +266,6 @@ namespace turbo {
         return is;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_LOG_UNIFORM_INT_DISTRIBUTION_H_

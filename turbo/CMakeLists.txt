@@ -101,9 +101,9 @@ set(TURBO_ALL_SRC
         "profiling/internal/periodic_sampler.cc"
         "random/discrete_distribution.cc"
         "random/gaussian_distribution.cc"
-        "random/fast_random.cc"
         "random/fwd.cc"
         "random/random.cc"
+        "random/unicode.cc"
         "random/internal/pool_urbg.cc"
         "random/internal/randen.cc"
         "random/internal/randen_detect.cc"
@@ -156,8 +156,8 @@ set(TURBO_ALL_SRC
         "times/cctz/time_zone_lookup.cc"
         "times/cctz/time_zone_posix.cc"
         "times/cctz/zone_info_source.cc"
-        "unicode/utf.cc"
         "unicode/encoding_types.cc"
+        "unicode/codec/encode_utf16.cc"
         )
 
 if (BUILD_STATIC_LIBRARY)

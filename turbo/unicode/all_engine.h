@@ -18,6 +18,5 @@
 #define TURBO_UNICODE_ALL_ENGINE_H_
 
 #include "turbo/unicode/scalar/engine.h"
-#include "turbo/unicode/haswell/engine.h"
 
 #endif  // TURBO_UNICODE_ALL_ENGINE_H_

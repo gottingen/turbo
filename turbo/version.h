@@ -16,25 +16,22 @@
 #define TURBO_VERSION_H_
 
 #include "turbo/format/format.h"
-
-// TURBO_VERSION % 100 is the patch level
-// TURBO_VERSION / 100 % 1000 is the minor version
-// TURBO_VERSION / 100000 is the major version
-
-// current version: 0.6.16
-#define TURBO_VERSION 000616
-
-#define TURBO_MAJOR_VERSION TURBO_VERSION / 100000
-#define TURBO_MINOR_VERSION TURBO_VERSION / 100 % 1000
-#define TURBO_PATCH_VERSION TURBO_VERSION % 100
+#include "turbo/strings/version.h"
+#include "turbo/unicode/version.h"
 
 namespace turbo {
 
-const std::string &version() {
-  static const std::string vstr = turbo::Format(
-      "{}.{}.{}", TURBO_MAJOR_VERSION, TURBO_MINOR_VERSION, TURBO_PATCH_VERSION);
-  return vstr;
-}
+    /**
+     * @brief Turbo version this is the version of the whole library
+     *        it should be updated when any of the submodules are updated.
+     *        The version is in the format of major.minor.patch
+     *        major: major changes, API changes, breaking changes
+     *        minor: minor changes, new features, new modules
+     *        patch: bug fixes, performance improvements
+     *        The version is used to check if the library is compatible with the
+     *        application.
+     */
+    static constexpr turbo::ModuleVersion version = turbo::ModuleVersion{0, 9, 36};
 
 } // namespace turbo
 

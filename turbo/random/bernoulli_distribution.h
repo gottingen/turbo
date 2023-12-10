@@ -24,32 +24,70 @@
 #include "turbo/random/internal/iostream_state_saver.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
-    // turbo::bernoulli_distribution is a drop in replacement for
-    // std::bernoulli_distribution. It guarantees that (given a perfect
-    // UniformRandomBitGenerator) the acceptance probability is *exactly* equal to
-    // the given double.
-    //
-    // The implementation assumes that double is IEEE754
+    /**
+     * @ingroup turbo_random_bernoulli
+     * @brief turbo::bernoulli_distribution is a drop in replacement for
+     *        std::bernoulli_distribution. It guarantees that (given a perfect
+     *        UniformRandomBitGenerator) the acceptance probability is *exactly* equal to
+     *        the given double.
+     *
+     *        The implementation assumes that double is IEEE754
+     *        Example:
+     *        @code
+     *        #include <turbo/random/bernoulli_distribution.h>
+     *        #include <iostream>
+     *        #include <turbo/random/random.h>
+     *
+     *        int main() {
+     *            turbo::BitGen gen;
+     *            turbo::bernoulli_distribution dist(0.5);
+     *            std::cout << dist(gen) << std::endl;
+     *            return 0;
+     *        }
+     *        @endcode
+     */
     class bernoulli_distribution {
     public:
         using result_type = bool;
 
+        /**
+         * @brief The type of the distribution parameters
+         */
         class param_type {
         public:
             using distribution_type = bernoulli_distribution;
 
+            /**
+             * @brief Constructs a new param_type object
+             *
+             * @param p The probability of success
+             */
             explicit param_type(double p = 0.5) : prob_(p) {
                 assert(p >= 0.0 && p <= 1.0);
             }
 
+            /**
+             * @brief Returns the probability of success
+             *
+             * @return double The probability of success
+             */
             double p() const { return prob_; }
 
+            /**
+             * @brief operator== for param_type objects
+             *        Returns true if the two param_type objects are equal
+             *        Returns false if the two param_type objects are not equal
+             */
             friend bool operator==(const param_type &p1, const param_type &p2) {
                 return p1.p() == p2.p();
             }
 
+            /**
+             * @brief operator!= for param_type objects
+             *        Returns true if the two param_type objects are not equal
+             *        Returns false if the two param_type objects are equal
+             */
             friend bool operator!=(const param_type &p1, const param_type &p2) {
                 return p1.p() != p2.p();
             }
@@ -58,33 +96,75 @@ namespace turbo {
             double prob_;
         };
 
+        /**
+         * @brief Constructs a new bernoulli_distribution object
+         */
         bernoulli_distribution() : bernoulli_distribution(0.5) {}
 
+        /**
+         * @brief Constructs a new bernoulli_distribution object
+         *
+         * @param p The probability of success
+         */
         explicit bernoulli_distribution(double p) : param_(p) {}
 
         explicit bernoulli_distribution(param_type p) : param_(p) {}
 
-        // no-op
+        /**
+         * @brief Resets the distribution state
+         */
         void reset() {}
 
+        /**
+         * @brief Generates a random number
+         *
+         * @tparam URBG The type of the random number generator
+         * @param g The random number generator
+         * @return result_type The generated random number
+         */
         template<typename URBG>
         bool operator()(URBG &g) {  // NOLINT(runtime/references)
             return Generate(param_.p(), g);
         }
 
+        /**
+         * @brief Generates a random number
+         *
+         * @tparam URBG The type of the random number generator
+         * @param g The random number generator
+         * @param param The distribution parameters
+         * @return result_type The generated random number
+         */
         template<typename URBG>
         bool operator()(URBG &g,  // NOLINT(runtime/references)
                         const param_type &param) {
             return Generate(param.p(), g);
         }
 
+        /**
+         * @brief Returns the distribution parameters
+         *
+         * @return param_type The distribution parameters
+         */
         param_type param() const { return param_; }
 
+        /**
+         * @brief Sets the distribution parameters
+         *
+         * @param param The distribution parameters
+         */
         void param(const param_type &param) { param_ = param; }
 
+        /**
+         * @brief Returns the minimum value that can be generated
+         *
+         * @return result_type The minimum value that can be generated
+         */
         double p() const { return param_.p(); }
 
+
         result_type (min)() const { return false; }
+
 
         result_type (max)() const { return true; }
 
@@ -197,7 +277,6 @@ namespace turbo {
         }
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_BERNOULLI_DISTRIBUTION_H_

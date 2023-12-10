@@ -42,7 +42,7 @@ namespace turbo::unicode {
         }
     };
 
-    struct Utf16LengthFromUtf8 {
+    struct utf16_length_from_utf8 {
         template <class Tag, class Arch>
         size_t operator()(Arch, const char* in,  size_t size,Tag) {
             using b_type = turbo::simd::batch<char, Arch>;

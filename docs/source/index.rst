@@ -30,6 +30,8 @@ Contents
     en/api/files
     en/api/strings
     en/api/memory
+    en/api/unicode
+    en/api/random
 
 
 .. toctree::

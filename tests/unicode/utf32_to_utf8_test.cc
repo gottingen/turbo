@@ -37,9 +37,9 @@ TEST(EncodeUTF8Char, BasicFunction) {
     char buf0[7] = {'\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'};
     char buf1[7] = {'\xFF', '\xFF', '\xFF', '\xFF', '\xFF', '\xFF', '\xFF'};
     char *buf0_written =
-        &buf0[turbo::ConvertUtf32ToUtf8(&test.first, 1, buf0)];
+        &buf0[turbo::convert_utf32_to_utf8(&test.first, 1, buf0)];
     char *buf1_written =
-        &buf1[turbo::ConvertUtf32ToUtf8(&test.first, 1, buf1)];
+        &buf1[turbo::convert_utf32_to_utf8(&test.first, 1, buf1)];
     int apparent_length = 7;
     while (buf0[apparent_length - 1] == '\x00' &&
            buf1[apparent_length - 1] == '\xFF') {
@@ -53,10 +53,10 @@ TEST(EncodeUTF8Char, BasicFunction) {
   }
   char buf[32] = "Don't Tread On Me";
   char32_t a= 0x00110000;
-  EXPECT_LE(turbo::ConvertUtf32ToUtf8(&a, 1, buf), 4);
+  EXPECT_LE(turbo::convert_utf32_to_utf8(&a, 1, buf), 4);
   char buf2[32] = "Negative is invalid but sane";
   char32_t b = -1;
-  EXPECT_LE(turbo::ConvertUtf32ToUtf8(&b,1, buf2), 4);
+  EXPECT_LE(turbo::convert_utf32_to_utf8(&b,1, buf2), 4);
 }
 #if defined(__clang__)
 #pragma clang diagnostic pop

@@ -232,7 +232,7 @@ namespace turbo::unicode::utf8 {
         return counter;
     }
 
-    inline size_t Utf16LengthFromUtf8(const char *buf, size_t len) {
+    inline size_t utf16_length_from_utf8(const char *buf, size_t len) {
         const int8_t *p = reinterpret_cast<const int8_t *>(buf);
         size_t counter{0};
         for (size_t i = 0; i < len; i++) {
@@ -302,7 +302,7 @@ namespace turbo::unicode::utf16 {
     }
 
     template<EndianNess big_endian>
-    inline size_t Utf8LengthFromUtf16(const char16_t *buf, size_t len) {
+    inline size_t utf8_length_from_utf16(const char16_t *buf, size_t len) {
         // We are not BOM aware.
         const uint16_t *p = reinterpret_cast<const uint16_t *>(buf);
         size_t counter{0};
@@ -321,7 +321,7 @@ namespace turbo::unicode::utf16 {
     }
 
     template<EndianNess big_endian>
-    inline size_t Utf32LengthFromUtf16(const char16_t *buf, size_t len) {
+    inline size_t utf32_length_from_utf16(const char16_t *buf, size_t len) {
         // We are not BOM aware.
         const uint16_t *p = reinterpret_cast<const uint16_t *>(buf);
         size_t counter{0};
@@ -332,7 +332,7 @@ namespace turbo::unicode::utf16 {
         return counter;
     }
 
-    TURBO_FORCE_INLINE void ChangeEndiannessUtf16(const char16_t *in, size_t size, char16_t *out) {
+    TURBO_FORCE_INLINE void change_endianness_utf16(const char16_t *in, size_t size, char16_t *out) {
         const uint16_t *input = reinterpret_cast<const uint16_t *>(in);
         uint16_t *output = reinterpret_cast<uint16_t *>(out);
         for (size_t i = 0; i < size; i++) {
@@ -372,7 +372,7 @@ namespace turbo::unicode::utf32 {
         return result(error_code::SUCCESS, pos);
     }
 
-    inline size_t Utf8LengthFromUtf32(const char32_t *buf, size_t len) {
+    inline size_t utf8_length_from_utf32(const char32_t *buf, size_t len) {
         // We are not BOM aware.
         const uint32_t *p = reinterpret_cast<const uint32_t *>(buf);
         size_t counter{0};
@@ -389,7 +389,7 @@ namespace turbo::unicode::utf32 {
         return counter;
     }
 
-    inline size_t Utf16LengthFromUtf32(const char32_t *buf, size_t len) {
+    inline size_t utf16_length_from_utf32(const char32_t *buf, size_t len) {
         // We are not BOM aware.
         const uint32_t *p = reinterpret_cast<const uint32_t *>(buf);
         size_t counter{0};

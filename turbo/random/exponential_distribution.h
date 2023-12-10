@@ -29,9 +29,20 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-    // turbo::exponential_distribution:
-    // Generates a number conforming to an exponential distribution and is
-    // equivalent to the standard [rand.dist.pois.exp] distribution.
+    /**
+     * @ingroup turbo_random_exponential
+     * @brief turbo::exponential_distribution<T>
+     *        generates a number conforming to an exponential distribution and is
+     *        equivalent to the standard [rand.dist.pois.exp] distribution.
+     *        See https://en.wikipedia.org/wiki/Exponential_distribution.
+     *        Example:
+     *        @code cpp
+     *        turbo::BitGen bitgen;
+     *        ...
+     *        double call_length = turbo::exponential(bitgen, 7.0);
+     *        @endcode
+     * @tparam RealType
+     */
     template<typename RealType = double>
     class exponential_distribution {
     public:

@@ -17,7 +17,7 @@
 #include <array>
 #include <algorithm>
 
-#include "helpers/random_utf32.h"
+#include "turbo/random/random.h"
 #include <tests/unicode/helpers/test.h>
 #include <fstream>
 #include <iostream>
@@ -25,11 +25,11 @@
 
 TEST(validate_utf32__returns_true_for_valid_input) {
   uint32_t seed{1234};
-  turbo::tests::helpers::random_utf32 generator{seed};
+  turbo::Utf32Generator generator{};
   for(size_t trial = 0; trial < 1000; trial++) {
-    const auto utf32{generator.generate(256, seed)};
+    const auto utf32{generator.generate(256)};
 
-    ASSERT_TRUE(implementation.ValidateUtf32(
+    ASSERT_TRUE(implementation.validate_utf32(
               reinterpret_cast<const char32_t*>(utf32.data()), utf32.size()));
   }
 }
@@ -37,12 +37,12 @@ TEST(validate_utf32__returns_true_for_valid_input) {
 TEST(validate_utf32__returns_true_for_empty_string) {
   const char32_t* buf = (char32_t*)"";
 
-  ASSERT_TRUE(implementation.ValidateUtf32(buf, 0));
+  ASSERT_TRUE(implementation.validate_utf32(buf, 0));
 }
 
 TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
   uint32_t seed{1234};
-  turbo::tests::helpers::random_utf32 generator{seed};
+  turbo::Utf32Generator generator{};
   for(size_t trial = 0; trial < 10; trial++) {
     auto utf32{generator.generate(128)};
     const char32_t*  buf = reinterpret_cast<const char32_t*>(utf32.data());
@@ -53,7 +53,7 @@ TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
         const char32_t old = utf32[i];
         utf32[i] = wrong_value;
 
-        ASSERT_FALSE(implementation.ValidateUtf32(buf, len));
+        ASSERT_FALSE(implementation.validate_utf32(buf, len));
 
         utf32[i] = old;
       }
@@ -63,7 +63,7 @@ TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
 
 TEST(validate_utf32__returns_false_when_input_too_large) {
   uint32_t seed{1234};
-  turbo::tests::helpers::random_utf32 generator{seed};
+  turbo::Utf32Generator generator{};
 
   std::uniform_int_distribution<uint32_t> bad_range{0x110000, 0xffffffff};
   std::mt19937 gen{seed};
@@ -79,7 +79,7 @@ TEST(validate_utf32__returns_false_when_input_too_large) {
         const char32_t old = utf32[i];
         utf32[i] = wrong_value;
 
-        ASSERT_FALSE(implementation.ValidateUtf32(buf, len));
+        ASSERT_FALSE(implementation.validate_utf32(buf, len));
 
         utf32[i] = old;
       }

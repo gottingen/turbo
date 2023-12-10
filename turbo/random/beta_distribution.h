@@ -29,27 +29,41 @@
 #include "turbo/random/internal/iostream_state_saver.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
-    // turbo::beta_distribution:
-    // Generate a floating-point variate conforming to a Beta distribution:
-    //   pdf(x) \propto x^(alpha-1) * (1-x)^(beta-1),
-    // where the params alpha and beta are both strictly positive real values.
-    //
-    // The support is the open interval (0, 1), but the return value might be equal
-    // to 0 or 1, due to numerical errors when alpha and beta are very different.
-    //
-    // Usage note: One usage is that alpha and beta are counts of number of
-    // successes and failures. When the total number of trials are large, consider
-    // approximating a beta distribution with a Gaussian distribution with the same
-    // mean and variance. One could use the skewness, which depends only on the
-    // smaller of alpha and beta when the number of trials are sufficiently large,
-    // to quantify how far a beta distribution is from the normal distribution.
+    /**
+     * @ingroup turbo_random_beta
+     * @brief turbo::beta_distribution<T> generates a floating point variate conforming to a Beta distribution.
+     *        pdf(x) \propto x^(alpha-1) * (1-x)^(beta-1),
+     *        where the params alpha and beta are both strictly positive real values.
+     *
+     *        The support is the open interval (0, 1), but the return value might be equal
+     *        to 0 or 1, due to numerical errors when alpha and beta are very different.
+     *
+     * @note  One usage is that alpha and beta are counts of number of
+     *        successes and failures. When the total number of trials are large, consider
+     *        approximating a beta distribution with a Gaussian distribution with the same
+     *        mean and variance. One could use the skewness, which depends only on the
+     *        smaller of alpha and beta when the number of trials are sufficiently large,
+     *        to quantify how far a beta distribution is from the normal distribution.
+     *
+     *        Example:
+     *        @code cpp
+     *        turbo::BitGen bitgen;
+     *        ...
+     *        turbo::beta_distribution<> dist(3.0, 2.0);
+     *        double sample = dist(bitgen);
+     *        @endcode
+     * @tparam RealType the floating point type
+     */
     template<typename RealType = double>
     class beta_distribution {
     public:
         using result_type = RealType;
 
+        /**
+         * @brief   param_type is the parameter type for turbo::beta_distribution<T>
+         * @tparam  RealType
+         */
         class param_type {
         public:
             using distribution_type = beta_distribution;
@@ -200,11 +214,27 @@ namespace turbo {
                           "parameterized using a floating-point type.");
         };
 
+        /**
+         * @brief Construct a new beta distribution object
+         *        with alpha = 1 and beta = 1
+         */
         beta_distribution() : beta_distribution(1) {}
 
+        /**
+         * @brief Construct a new beta distribution object
+         *        with alpha must be greater than 0, and beta
+         *        has a default value of 1
+         * @param alpha
+         * @param beta default value is 1
+         */
         explicit beta_distribution(result_type alpha, result_type beta = 1)
                 : param_(alpha, beta) {}
 
+        /**
+         * @brief Construct a new beta distribution object with a param_type
+         *        @see param_type
+         * @param p
+         */
         explicit beta_distribution(const param_type &p) : param_(p) {}
 
         void reset() {}
@@ -426,7 +456,6 @@ namespace turbo {
         return is;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_BETA_DISTRIBUTION_H_

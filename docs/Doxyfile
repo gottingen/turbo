@@ -27,7 +27,28 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/strings/str_split.h    \
                     ../turbo/strings/str_replace.h  \
                     ../turbo/memory/object_pool.h \
-                    ../turbo/memory/resource_pool.h
+                    ../turbo/memory/resource_pool.h \
+                    ../turbo/unicode/converter.h \
+                    ../turbo/random/random.h  \
+                    ../turbo/random/bernoulli.h \
+                    ../turbo/random/bernoulli_distribution.h \
+                    ../turbo/random/beta.h \
+                    ../turbo/random/beta_distribution.h \
+                    ../turbo/random/bytes.h \
+                    ../turbo/random/uniform.h \
+                    ../turbo/random/uniform_distribution.h \
+                    ../turbo/random/engine.h \
+                    ../turbo/random/fwrd.h \
+                    ../turbo/random/zipf.h \
+                    ../turbo/random/zipf_distribution.h \
+                    ../turbo/random/gaussian.h \
+                    ../turbo/random/gaussian_distribution.h \
+                    ./turbo/random/log_uniform.h \
+                    ./turbo/random/log_uniform_distribution.h \
+                    ../turbo/random/exponential.h \
+                    ../turbo/random/exponential_distribution.h \
+                    ../turbo/random/poisson.h \
+                    ../turbo/random/poisson_distribution.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

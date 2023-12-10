@@ -20,9 +20,8 @@
 #include <random>
 #include <stdexcept>
 
-#include <tests/unicode/helpers/random_int.h>
+#include "turbo/random/random.h"
 #include <tests/unicode/helpers/transcode_test_base.h>
-#include <tests/unicode/helpers/random_utf8.h>
 #include <tests/unicode/helpers/test.h>
 
 namespace {
@@ -39,11 +38,11 @@ TEST(count_pure_ASCII) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf8 random(seed, 1, 0, 0, 0);
+    turbo::Utf8Generator random(1, 0, 0, 0);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.CountUtf8(
+      ASSERT_TRUE(implementation.count_utf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }
@@ -58,11 +57,11 @@ TEST(count_1_or_2_UTF8_bytes) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf8 random(seed, 1, 1, 0, 0);
+    turbo::Utf8Generator random(1, 1, 0, 0);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.CountUtf8(
+      ASSERT_TRUE(implementation.count_utf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }
@@ -77,11 +76,11 @@ TEST(count_1_or_2_or_3_UTF8_bytes) {
     }
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf8 random(seed, 1, 1, 1, 0);
+    turbo::Utf8Generator random(1, 1, 1, 0);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.CountUtf8(
+      ASSERT_TRUE(implementation.count_utf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }
@@ -92,11 +91,11 @@ TEST(count_1_2_3_or_4_UTF8_bytes) {
   for (size_t trial = 0; trial < 10000; trial++) {
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf8 random(seed, 1, 1, 1, 1);
+    turbo::Utf8Generator random(1, 1, 1, 1);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_TRUE(implementation.CountUtf8(
+      ASSERT_TRUE(implementation.count_utf8(
                       reinterpret_cast<const char *>(generated.first.data()),
                       size) == generated.second);
     }

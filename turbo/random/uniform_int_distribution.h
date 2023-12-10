@@ -40,20 +40,22 @@
 #include "turbo/random/internal/wide_multiply.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
-    // turbo::uniform_int_distribution<T>
-    //
-    // This distribution produces random integer values uniformly distributed in the
-    // closed (inclusive) interval [a, b].
-    //
-    // Example:
-    //
-    //   turbo::BitGen gen;
-    //
-    //   // Use the distribution to produce a value between 1 and 6, inclusive.
-    //   int die_roll = turbo::uniform_int_distribution<int>(1, 6)(gen);
-    //
+    /**
+     * @ingroup turbo_random_uniform
+     * @brief turbo::uniform_int_distribution<T>
+     *        This distribution produces random integer values uniformly distributed in the
+     *        closed (inclusive) interval [a, b].
+     *
+     *        Example:
+     *        @code
+     *        turbo::BitGen gen;
+     *
+     *        // Use the distribution to produce a value between 1 and 6, inclusive.
+     *        int die_roll = turbo::uniform_int_distribution<int>(1, 6)(gen);
+     *        @endcode
+     * @tparam IntType must be an integral type
+     */
     template<typename IntType = int>
     class uniform_int_distribution {
     private:
@@ -276,7 +278,6 @@ namespace turbo {
         return helper::hi(product);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_UNIFORM_INT_DISTRIBUTION_H_

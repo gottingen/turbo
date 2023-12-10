@@ -81,8 +81,19 @@ namespace turbo {
 
     }  // namespace random_internal
 
-    // turbo::gaussian_distribution:
-    // Generates a number conforming to a Gaussian distribution.
+    /**
+     * @ingroup turbo_random_gaussian
+     * @brief turbo::gaussian_distribution<T>
+     *        the gaussian_distribution implements the Ziggurat algorithm
+     *        for generating random gaussian numbers.
+     *        The specific algorithm has some of the improvements suggested by the
+     *        2005 paper, "An Improved Ziggurat Method to Generate Normal Random Samples",
+     *        Jurgen A Doornik.  (https://www.doornik.com/research/ziggurat.pdf)
+     *        See https://en.wikipedia.org/wiki/Ziggurat_algorithm
+     *        See https://en.wikipedia.org/wiki/Normal_distribution
+     *        See https://www.jstatsoft.org/v05/i08/
+     * @tparam RealType
+     */
     template<typename RealType = double>
     class gaussian_distribution : random_internal::gaussian_distribution_base {
     public:

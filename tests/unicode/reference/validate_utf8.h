@@ -18,7 +18,7 @@ namespace turbo {
 namespace tests {
 namespace reference {
 
-    TURBO_MUST_USE_RESULT bool ValidateUtf8(const char *buf, size_t len) noexcept;
+    TURBO_MUST_USE_RESULT bool validate_utf8(const char *buf, size_t len) noexcept;
 
 } // namespace reference
 } // namespace tests

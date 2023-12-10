@@ -46,9 +46,71 @@ namespace turbo {
     TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalOpenOpenTag, IntervalOpen, {});
     TURBO_INTERNAL_INLINE_CONSTEXPR(IntervalOpenClosedTag, IntervalOpenClosed, {});
 
+    /**
+     * @ingroup turbo_random_engine
+     * @brief get_tls_bit_gen() returns a thread-local `turbo::BitGen` instance.
+     *       This function is thread-safe.
+     * @note user should not call this function directly, use turbo::uniform or
+     *       other distribution functions instead.
+     * @return a thread-local `turbo::BitGen` instance.
+     */
     BitGen &get_tls_bit_gen();
 
+    /**
+     * @ingroup turbo_random_engine
+     * @brief set_tls_bit_gen() sets a thread-local `turbo::BitGen` instance.
+     *       This function is thread-safe.
+     *       user can call this function to set a thread-local `turbo::BitGen` instance.
+     *       at the beginning of a thread.
+     *       Example:
+     *       @code
+     *       void thread_func() {
+     *          turbo::BitGen gen;
+     *          turbo::set_tls_bit_gen(std::move(gen));
+     *          // use turbo::uniform or other distribution functions.
+     *          while (!stop) {
+     *              int value = turbo::uniform(0, 100);
+     *              ...
+     *              ...
+     *          }
+     *       }
+     *       @endcode
+     * @note if there not special requirement, user should not call this function.
+     */
     void set_tls_bit_gen(BitGen &&bit_gen);
+
+    /**
+     * @ingroup turbo_random_engine
+     * @brief get_tls_fast_bit_gen() returns a thread-local `turbo::InsecureBitGen` instance.
+     *       This function is thread-safe.
+     * @note user should not call this function directly, use turbo::uniform or
+     *       other distribution functions instead.
+     * @return a thread-local `turbo::InsecureBitGen` instance.
+     */
+    InsecureBitGen &get_tls_fast_bit_gen();
+
+    /**
+     * @ingroup turbo_random_engine
+     * @brief set_tls_fast_bit_gen() sets a thread-local `turbo::InsecureBitGen` instance.
+     *       This function is thread-safe.
+     *       user can call this function to set a thread-local `turbo::InsecureBitGen` instance.
+     *       at the beginning of a thread.
+     *       Example:
+     *       @code
+     *       void thread_func() {
+     *          turbo::InsecureBitGen gen;
+     *          turbo::set_tls_fast_bit_gen(std::move(gen));
+     *          // use turbo::uniform or other distribution functions.
+     *          while (!stop) {
+     *              int value = turbo::uniform(0, 100);
+     *              ...
+     *              ...
+     *          }
+     *       }
+     *       @endcode
+     * @note if there not special requirement, user should not call this function.
+     */
+    void set_tls_fast_bit_gen(InsecureBitGen &&bit_gen);
 
 }  // namespace turbo
 

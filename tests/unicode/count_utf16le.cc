@@ -20,9 +20,8 @@
 #include <random>
 #include <stdexcept>
 
-#include <tests/unicode/helpers/random_int.h>
+#include "turbo/random/random.h"
 #include <tests/unicode/helpers/transcode_test_base.h>
-#include <tests/unicode/helpers/random_utf16.h>
 #include <tests/unicode/helpers/test.h>
 
 
@@ -38,13 +37,11 @@ TEST(count_just_one_word) {
       std::cout << ".";
       std::cout.flush();
     }
-    uint32_t seed{1234};
-
-    turbo::tests::helpers::random_utf16 random(seed, 1, 0);
+    turbo::Utf16Generator random(1, 0);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_EQUAL(implementation.CountUtf16Le(
+      ASSERT_EQUAL(implementation.count_utf16le(
                       reinterpret_cast<const char16_t *>(generated.first.data()),
                       size), generated.second);
     }
@@ -56,13 +53,12 @@ TEST(count_1_or_2_UTF16_words) {
       std::cout << ".";
       std::cout.flush();
     }
-    uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf16 random(seed, 1, 1);
+    turbo::Utf16Generator random(1, 1);
 
     for (size_t size : input_size) {
       auto generated = random.generate_counted(size);
-      ASSERT_EQUAL(implementation.CountUtf16Le(
+      ASSERT_EQUAL(implementation.count_utf16le(
                       reinterpret_cast<const char16_t *>(generated.first.data()),
                       size),generated.second);
     }
@@ -73,12 +69,12 @@ TEST(count_2_UTF16_words) {
   for (size_t trial = 0; trial < 10000; trial++) {
     uint32_t seed{1234};
 
-    turbo::tests::helpers::random_utf16 random(seed, 0, 1);
+    turbo::Utf16Generator random(0, 1);
 
     for (size_t size : input_size) {
 
       auto generated = random.generate_counted(size);
-      ASSERT_EQUAL(implementation.CountUtf16Le(
+      ASSERT_EQUAL(implementation.count_utf16le(
                       reinterpret_cast<const char16_t *>(generated.first.data()),
                       size), generated.second);
     }

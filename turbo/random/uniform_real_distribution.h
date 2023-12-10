@@ -45,21 +45,23 @@
 #include "turbo/random/internal/iostream_state_saver.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
-    // turbo::uniform_real_distribution<T>
-    //
-    // This distribution produces random floating-point values uniformly distributed
-    // over the half-open interval [a, b).
-    //
-    // Example:
-    //
-    //   turbo::BitGen gen;
-    //
-    //   // Use the distribution to produce a value between 0.0 (inclusive)
-    //   // and 1.0 (exclusive).
-    //   double value = turbo::uniform_real_distribution<double>(0, 1)(gen);
-    //
+    /**
+     * @ingroup turbo_random_uniform
+     * @brief turbo::uniform_real_distribution<T>
+     *        this distribution produces random floating point values uniformly distributed
+     *        over the half-open interval [a, b).
+     *
+     *        Example:
+     *        @code
+     *        turbo::BitGen gen;
+     *
+     *        // Use the distribution to produce a value between 0.0 (inclusive)
+     *        // and 1.0 (exclusive).
+     *        double value = turbo::uniform_real_distribution<double>(0, 1)(gen);
+     *        @endcode
+     * @tparam RealType default is double
+     */
     template<typename RealType = double>
     class uniform_real_distribution {
     public:
@@ -203,7 +205,6 @@ namespace turbo {
         return is;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_

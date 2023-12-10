@@ -17,6 +17,8 @@
 namespace turbo {
     static thread_local BitGen bitgen;
 
+    static thread_local InsecureBitGen fast_bitgen;
+
 
     BitGen &get_tls_bit_gen() {
         return bitgen;
@@ -24,5 +26,13 @@ namespace turbo {
 
     void set_tls_bit_gen(BitGen &&bit_gen) {
         bitgen = std::move(bit_gen);
+    }
+
+    InsecureBitGen &get_tls_fast_bit_gen() {
+        return fast_bitgen;
+    }
+
+    void set_tls_fast_bit_gen(InsecureBitGen &&bit_gen) {
+        fast_bitgen = std::move(bit_gen);
     }
 }
