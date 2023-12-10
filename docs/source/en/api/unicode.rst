@@ -8,6 +8,6 @@ unicode module
 
 .. toctree::
 
-    unicode_detector
-    unicode_validate
-    unicode_converter
+    unicode/unicode_detector
+    unicode/unicode_validate
+    unicode/unicode_converter

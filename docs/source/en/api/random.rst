@@ -8,15 +8,15 @@ random module
 
 .. toctree::
 
-    random_engine
-    random_bernoulli
-    random_beta
-    random_uniform
-    random_zipf
-    random_gaussian
-    random_log_uniform
-    random_exponential
-    random_poisson
-    random_unicode
-    random_bytes
+    random/random_engine
+    random/random_bernoulli
+    random/random_beta
+    random/random_uniform
+    random/random_zipf
+    random/random_gaussian
+    random/random_log_uniform
+    random/random_exponential
+    random/random_poisson
+    random/random_unicode
+    random/random_bytes
 

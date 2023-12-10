@@ -23,23 +23,24 @@ namespace turbo {
     FileWatcher::FileWatcher() : _last_ts(NON_EXIST_TS) {
     }
 
-    int FileWatcher::init(const char *file_path) {
-        if (init_from_not_exist(file_path) != 0) {
-            return -1;
+    turbo::Status FileWatcher::init(const char *file_path) {
+        auto rs = init_from_not_exist(file_path);
+        if (!rs.ok()) {
+            return rs;
         }
         check_and_consume(nullptr);
-        return 0;
+        return turbo::ok_status();
     }
 
-    int FileWatcher::init_from_not_exist(const char *file_path) {
+    turbo::Status FileWatcher::init_from_not_exist(const char *file_path) {
         if (nullptr == file_path) {
-            return -1;
+            return turbo::invalid_argument_error("file path is nullptr");
         }
         if (!_file_path.empty()) {
-            return -1;
+            return turbo::invalid_argument_error("file path is not empty");
         }
         _file_path = file_path;
-        return 0;
+        return ok_status();
     }
 
     FileWatcher::Change FileWatcher::check(Timestamp *new_timestamp) const {

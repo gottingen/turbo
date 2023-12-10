@@ -41,6 +41,7 @@ namespace turbo {
     /// \code{.cpp}
     /// DEFINE_HANDLER(ClassName, HandleName, HandleCreator, HandleDestroyer);
     /// \code{.cpp}
+
     template<typename T>
     class unique_handle {
     private:

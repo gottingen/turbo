@@ -30,7 +30,7 @@
 namespace turbo {
 
     /**
-     * @ingroup turbo_files
+     * @ingroup turbo_files_write_file
      * @brief RandomWriteFile is a file io utility class.
      * eg.
      * @code
