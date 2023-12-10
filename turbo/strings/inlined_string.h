@@ -2735,17 +2735,17 @@ namespace turbo {
     struct is_string_type<inlined_string> : public std::true_type {
     };
 
-// Compatibility function, to make sure toStdString(s) can be called
-// to convert a std::string or inlined_string variable s into type std::string
-// with very little overhead if s was already std::string
+    // Compatibility function, to make sure toStdString(s) can be called
+    // to convert a std::string or inlined_string variable s into type std::string
+    // with very little overhead if s was already std::string
     inline std::string toStdString(const turbo::inlined_string &s) {
         return std::string(s.data(), s.size());
     }
 
     inline const std::string &toStdString(const std::string &s) { return s; }
 
-// If called with a temporary, the compiler will select this overload instead
-// of the above, so we don't return a (lvalue) reference to a temporary.
+    // If called with a temporary, the compiler will select this overload instead
+    // of the above, so we don't return a (lvalue) reference to a temporary.
     inline std::string &&toStdString(std::string &&s) { return std::move(s); }
 
 } // namespace turbo

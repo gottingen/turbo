@@ -1,5 +1,5 @@
-Turbo
-==========
+.. Copyright 2023 The Elastic AI Search Authors.
+.. Licensed under the Apache License, Version 2.0 (the "License");
 
 ..  image:: image/ticon.png
     :height: 200px
@@ -17,7 +17,7 @@ Contents
 --------
 
 .. toctree::
-    :caption: ENGLISH
+    :caption: GET START
 
     en/overview
     en/platform
