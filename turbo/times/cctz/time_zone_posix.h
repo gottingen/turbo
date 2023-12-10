@@ -57,76 +57,72 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
 
-// The date/time of the transition. The date is specified as either:
-// (J) the Nth day of the year (1 <= N <= 365), excluding leap days, or
-// (N) the Nth day of the year (0 <= N <= 365), including leap days, or
-// (M) the Nth weekday of a month (e.g., the 2nd Sunday in March).
-// The time, specified as a day offset, identifies the particular moment
-// of the transition, and may be negative or >= 24h, and in which case
-// it would take us to another day, and perhaps week, or even month.
-struct PosixTransition {
-  enum DateFormat { J, N, M };
+    // The date/time of the transition. The date is specified as either:
+    // (J) the Nth day of the year (1 <= N <= 365), excluding leap days, or
+    // (N) the Nth day of the year (0 <= N <= 365), including leap days, or
+    // (M) the Nth weekday of a month (e.g., the 2nd Sunday in March).
+    // The time, specified as a day offset, identifies the particular moment
+    // of the transition, and may be negative or >= 24h, and in which case
+    // it would take us to another day, and perhaps week, or even month.
+    struct PosixTransition {
+        enum DateFormat {
+            J, N, M
+        };
 
-  struct Date {
-    struct NonLeapDay {
-      std::int_fast16_t day;  // day of non-leap year [1:365]
+        struct Date {
+            struct NonLeapDay {
+                std::int_fast16_t day;  // day of non-leap year [1:365]
+            };
+            struct Day {
+                std::int_fast16_t day;  // day of year [0:365]
+            };
+            struct MonthWeekWeekday {
+                std::int_fast8_t month;    // month of year [1:12]
+                std::int_fast8_t week;     // week of month [1:5] (5==last)
+                std::int_fast8_t weekday;  // 0==Sun, ..., 6=Sat
+            };
+
+            DateFormat fmt;
+
+            union {
+                NonLeapDay j;
+                Day n;
+                MonthWeekWeekday m;
+            };
+        };
+
+        struct Time {
+            std::int_fast32_t offset;  // seconds before/after 00:00:00
+        };
+
+        Date date;
+        Time time;
     };
-    struct Day {
-      std::int_fast16_t day;  // day of year [0:365]
+
+    // The entirety of a POSIX-string specified time-zone rule. The standard
+    // abbreviation and offset are always given. If the time zone includes
+    // daylight saving, then the daylight abbrevation is non-empty and the
+    // remaining fields are also valid. Note that the start/end transitions
+    // are not ordered---in the southern hemisphere the transition to end
+    // daylight time occurs first in any particular year.
+    struct PosixTimeZone {
+        std::string std_abbr;
+        std::int_fast32_t std_offset;
+
+        std::string dst_abbr;
+        std::int_fast32_t dst_offset;
+        PosixTransition dst_start;
+        PosixTransition dst_end;
     };
-    struct MonthWeekWeekday {
-      std::int_fast8_t month;    // month of year [1:12]
-      std::int_fast8_t week;     // week of month [1:5] (5==last)
-      std::int_fast8_t weekday;  // 0==Sun, ..., 6=Sat
-    };
 
-    DateFormat fmt;
+    // Breaks down a POSIX time-zone specification into its constituent pieces,
+    // filling in any missing values (DST offset, or start/end transition times)
+    // with the standard-defined defaults. Returns false if the specification
+    // could not be parsed (although some fields of *res may have been altered).
+    bool ParsePosixSpec(const std::string &spec, PosixTimeZone *res);
 
-    union {
-      NonLeapDay j;
-      Day n;
-      MonthWeekWeekday m;
-    };
-  };
-
-  struct Time {
-    std::int_fast32_t offset;  // seconds before/after 00:00:00
-  };
-
-  Date date;
-  Time time;
-};
-
-// The entirety of a POSIX-string specified time-zone rule. The standard
-// abbreviation and offset are always given. If the time zone includes
-// daylight saving, then the daylight abbrevation is non-empty and the
-// remaining fields are also valid. Note that the start/end transitions
-// are not ordered---in the southern hemisphere the transition to end
-// daylight time occurs first in any particular year.
-struct PosixTimeZone {
-  std::string std_abbr;
-  std::int_fast32_t std_offset;
-
-  std::string dst_abbr;
-  std::int_fast32_t dst_offset;
-  PosixTransition dst_start;
-  PosixTransition dst_end;
-};
-
-// Breaks down a POSIX time-zone specification into its constituent pieces,
-// filling in any missing values (DST offset, or start/end transition times)
-// with the standard-defined defaults. Returns false if the specification
-// could not be parsed (although some fields of *res may have been altered).
-bool ParsePosixSpec(const std::string& spec, PosixTimeZone* res);
-
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::time_internal::cctz
 
 #endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_

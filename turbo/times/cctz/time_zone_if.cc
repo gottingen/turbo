@@ -13,33 +13,27 @@
 //   limitations under the License.
 
 #include "time_zone_if.h"
-
 #include "time_zone_info.h"
 #include "time_zone_libc.h"
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
 
-std::unique_ptr<TimeZoneIf> TimeZoneIf::Load(const std::string& name) {
-  // Support "libc:localtime" and "libc:*" to access the legacy
-  // localtime and UTC support respectively from the C library.
-  if (name.compare(0, 5, "libc:") == 0) {
-    return std::unique_ptr<TimeZoneIf>(new TimeZoneLibC(name.substr(5)));
-  }
+    std::unique_ptr<TimeZoneIf> TimeZoneIf::Load(const std::string &name) {
+        // Support "libc:localtime" and "libc:*" to access the legacy
+        // localtime and UTC support respectively from the C library.
+        if (name.compare(0, 5, "libc:") == 0) {
+            return std::unique_ptr<TimeZoneIf>(new TimeZoneLibC(name.substr(5)));
+        }
 
-  // Otherwise use the "zoneinfo" implementation by default.
-  std::unique_ptr<TimeZoneInfo> tz(new TimeZoneInfo);
-  if (!tz->Load(name)) tz.reset();
-  return std::unique_ptr<TimeZoneIf>(tz.release());
-}
+        // Otherwise use the "zoneinfo" implementation by default.
+        std::unique_ptr<TimeZoneInfo> tz(new TimeZoneInfo);
+        if (!tz->Load(name)) tz.reset();
+        return std::unique_ptr<TimeZoneIf>(tz.release());
+    }
 
-// Defined out-of-line to avoid emitting a weak vtable in all TUs.
-TimeZoneIf::~TimeZoneIf() {}
+    // Defined out-of-line to avoid emitting a weak vtable in all TUs.
+    TimeZoneIf::~TimeZoneIf() {}
 
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+
+}  // namespace turbo::time_internal::cctz

@@ -139,44 +139,44 @@ namespace turbo {
                 typename std::enable_if<std::is_floating_point<T>::value, int>::type;
     }  // namespace time_internal
 
-// Duration
-//
-// The `turbo::Duration` class represents a signed, fixed-length amount of time.
-// A `Duration` is generated using a unit-specific factory function, or is
-// the result of subtracting one `turbo::Time` from another. Durations behave
-// like unit-safe integers and they support all the natural integer-like
-// arithmetic operations. Arithmetic overflows and saturates at +/- infinity.
-// `Duration` should be passed by value rather than const reference.
-//
-// Factory functions `Nanoseconds()`, `Microseconds()`, `Milliseconds()`,
-// `Seconds()`, `Minutes()`, `Hours()` and `InfiniteDuration()` allow for
-// creation of constexpr `Duration` values
-//
-// Examples:
-//
-//   constexpr turbo::Duration ten_ns = turbo::Nanoseconds(10);
-//   constexpr turbo::Duration min = turbo::Minutes(1);
-//   constexpr turbo::Duration hour = turbo::Hours(1);
-//   turbo::Duration dur = 60 * min;  // dur == hour
-//   turbo::Duration half_sec = turbo::Milliseconds(500);
-//   turbo::Duration quarter_sec = 0.25 * turbo::Seconds(1);
-//
-// `Duration` values can be easily converted to an integral number of units
-// using the division operator.
-//
-// Example:
-//
-//   constexpr turbo::Duration dur = turbo::Milliseconds(1500);
-//   int64_t ns = dur / turbo::Nanoseconds(1);   // ns == 1500000000
-//   int64_t ms = dur / turbo::Milliseconds(1);  // ms == 1500
-//   int64_t sec = dur / turbo::Seconds(1);    // sec == 1 (subseconds truncated)
-//   int64_t min = dur / turbo::Minutes(1);    // min == 0
-//
-// See the `IDivDuration()` and `FDivDuration()` functions below for details on
-// how to access the fractional parts of the quotient.
-//
-// Alternatively, conversions can be performed using helpers such as
-// `ToInt64Microseconds()` and `ToDoubleSeconds()`.
+    // Duration
+    //
+    // The `turbo::Duration` class represents a signed, fixed-length amount of time.
+    // A `Duration` is generated using a unit-specific factory function, or is
+    // the result of subtracting one `turbo::Time` from another. Durations behave
+    // like unit-safe integers and they support all the natural integer-like
+    // arithmetic operations. Arithmetic overflows and saturates at +/- infinity.
+    // `Duration` should be passed by value rather than const reference.
+    //
+    // Factory functions `Nanoseconds()`, `Microseconds()`, `Milliseconds()`,
+    // `Seconds()`, `Minutes()`, `Hours()` and `InfiniteDuration()` allow for
+    // creation of constexpr `Duration` values
+    //
+    // Examples:
+    //
+    //   constexpr turbo::Duration ten_ns = turbo::Nanoseconds(10);
+    //   constexpr turbo::Duration min = turbo::Minutes(1);
+    //   constexpr turbo::Duration hour = turbo::Hours(1);
+    //   turbo::Duration dur = 60 * min;  // dur == hour
+    //   turbo::Duration half_sec = turbo::Milliseconds(500);
+    //   turbo::Duration quarter_sec = 0.25 * turbo::Seconds(1);
+    //
+    // `Duration` values can be easily converted to an integral number of units
+    // using the division operator.
+    //
+    // Example:
+    //
+    //   constexpr turbo::Duration dur = turbo::Milliseconds(1500);
+    //   int64_t ns = dur / turbo::Nanoseconds(1);   // ns == 1500000000
+    //   int64_t ms = dur / turbo::Milliseconds(1);  // ms == 1500
+    //   int64_t sec = dur / turbo::Seconds(1);    // sec == 1 (subseconds truncated)
+    //   int64_t min = dur / turbo::Minutes(1);    // min == 0
+    //
+    // See the `IDivDuration()` and `FDivDuration()` functions below for details on
+    // how to access the fractional parts of the quotient.
+    //
+    // Alternatively, conversions can be performed using helpers such as
+    // `ToInt64Microseconds()` and `ToDoubleSeconds()`.
     class Duration {
     public:
         // Value semantics.

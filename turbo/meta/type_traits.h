@@ -61,10 +61,6 @@ namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
     namespace type_traits_internal {
-        template<typename... Ts>
-        struct VoidTImpl {
-            using type = void;
-        };
 
         ////////////////////////////////
         // Library Fundamentals V2 TS //
@@ -86,7 +82,7 @@ namespace turbo {
         };
 
         template<template<class...> class Op, class... Args>
-        struct is_detected_impl<typename VoidTImpl<Op<Args...>>::type, Op, Args...> {
+        struct is_detected_impl<typename std::void_t<Op<Args...>>, Op, Args...> {
             using type = std::true_type;
         };
 
@@ -112,21 +108,6 @@ namespace turbo {
         };
 
     }  // namespace type_traits_internal
-
-    // void_t()
-    //
-    // Ignores the type of any its arguments and returns `void`. In general, this
-    // metafunction allows you to create a general case that maps to `void` while
-    // allowing specializations that map to specific types.
-    //
-    // This metafunction is designed to be a drop-in replacement for the C++17
-    // `std::void_t` metafunction.
-    //
-    // NOTE: `turbo::void_t` does not use the standard-specified implementation so
-    // that it can remain compatible with gcc < 5.1. This can introduce slightly
-    // different behavior, such as when ordering partial specializations.
-    template<typename... Ts>
-    using void_t = typename type_traits_internal::VoidTImpl<Ts...>::type;
 
     // negation
     //

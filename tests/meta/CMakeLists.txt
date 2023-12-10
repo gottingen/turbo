@@ -37,8 +37,6 @@ carbin_cc_test(
         ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 

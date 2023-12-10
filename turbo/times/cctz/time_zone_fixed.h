@@ -20,33 +20,30 @@
 #include "turbo/platform/port.h"
 #include "turbo/times/cctz/time_zone.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
 
-// Helper functions for dealing with the names and abbreviations
-// of time zones that are a fixed offset (seconds east) from UTC.
-// FixedOffsetFromName() extracts the offset from a valid fixed-offset
-// name, while FixedOffsetToName() and FixedOffsetToAbbr() generate
-// the canonical zone name and abbreviation respectively for the given
-// offset.
-//
-// A fixed-offset name looks like "Fixed/UTC<+-><hours>:<mins>:<secs>".
-// Its abbreviation is of the form "UTC(<+->H?H(MM(SS)?)?)?" where the
-// optional pieces are omitted when their values are zero.  (Note that
-// the sign is the opposite of that used in a POSIX TZ specification.)
-//
-// Note: FixedOffsetFromName() fails on syntax errors or when the parsed
-// offset exceeds 24 hours.  FixedOffsetToName() and FixedOffsetToAbbr()
-// both produce "UTC" when the argument offset exceeds 24 hours.
-bool FixedOffsetFromName(const std::string& name, seconds* offset);
-std::string FixedOffsetToName(const seconds& offset);
-std::string FixedOffsetToAbbr(const seconds& offset);
+    // Helper functions for dealing with the names and abbreviations
+    // of time zones that are a fixed offset (seconds east) from UTC.
+    // FixedOffsetFromName() extracts the offset from a valid fixed-offset
+    // name, while FixedOffsetToName() and FixedOffsetToAbbr() generate
+    // the canonical zone name and abbreviation respectively for the given
+    // offset.
+    //
+    // A fixed-offset name looks like "Fixed/UTC<+-><hours>:<mins>:<secs>".
+    // Its abbreviation is of the form "UTC(<+->H?H(MM(SS)?)?)?" where the
+    // optional pieces are omitted when their values are zero.  (Note that
+    // the sign is the opposite of that used in a POSIX TZ specification.)
+    //
+    // Note: FixedOffsetFromName() fails on syntax errors or when the parsed
+    // offset exceeds 24 hours.  FixedOffsetToName() and FixedOffsetToAbbr()
+    // both produce "UTC" when the argument offset exceeds 24 hours.
+    bool FixedOffsetFromName(const std::string &name, seconds *offset);
 
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    std::string FixedOffsetToName(const seconds &offset);
+
+    std::string FixedOffsetToAbbr(const seconds &offset);
+
+
+}  // namespace turbo::time_internal::cctz
 
 #endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_

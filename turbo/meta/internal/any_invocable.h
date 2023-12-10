@@ -682,7 +682,7 @@ using UnwrapStdReferenceWrapper =
 // substitution failures happen when forming the template arguments.
 template <class... T>
 using TrueAlias =
-    std::integral_constant<bool, sizeof(turbo::void_t<T...>*) != 0>;
+    std::integral_constant<bool, sizeof(std::void_t<T...>*) != 0>;
 
 /*SFINAE constraints for the conversion-constructor.*/
 template <class Sig, class F,

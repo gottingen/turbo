@@ -97,7 +97,7 @@ namespace turbo {
         struct detector : std::false_type {
         };
         template<template<class...> class Trait, class... Args>
-        struct detector<Trait, turbo::void_t<Trait<Args...>>, Args...>
+        struct detector<Trait, std::void_t<Trait<Args...>>, Args...>
                 : std::true_type {
         };
 

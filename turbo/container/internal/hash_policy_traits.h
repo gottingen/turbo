@@ -66,7 +66,7 @@ struct hash_policy_traits : common_policy_traits<Policy> {
   struct ConstantIteratorsImpl : std::false_type {};
 
   template <class P>
-  struct ConstantIteratorsImpl<P, turbo::void_t<typename P::constant_iterators>>
+  struct ConstantIteratorsImpl<P, std::void_t<typename P::constant_iterators>>
       : P::constant_iterators {};
 
  public:

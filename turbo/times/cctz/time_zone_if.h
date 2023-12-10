@@ -24,54 +24,52 @@
 #include "turbo/times/cctz/civil_time.h"
 #include "turbo/times/cctz/time_zone.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
 
-// A simple interface used to hide time-zone complexities from time_zone::Impl.
-// Subclasses implement the functions for civil-time conversions in the zone.
-class TimeZoneIf {
- public:
-  // A factory function for TimeZoneIf implementations.
-  static std::unique_ptr<TimeZoneIf> Load(const std::string& name);
+    // A simple interface used to hide time-zone complexities from time_zone::Impl.
+    // Subclasses implement the functions for civil-time conversions in the zone.
+    class TimeZoneIf {
+    public:
+        // A factory function for TimeZoneIf implementations.
+        static std::unique_ptr<TimeZoneIf> Load(const std::string &name);
 
-  virtual ~TimeZoneIf();
+        virtual ~TimeZoneIf();
 
-  virtual time_zone::absolute_lookup BreakTime(
-      const time_point<seconds>& tp) const = 0;
-  virtual time_zone::civil_lookup MakeTime(const civil_second& cs) const = 0;
+        virtual time_zone::absolute_lookup BreakTime(
+                const time_point<seconds> &tp) const = 0;
 
-  virtual bool NextTransition(const time_point<seconds>& tp,
-                              time_zone::civil_transition* trans) const = 0;
-  virtual bool PrevTransition(const time_point<seconds>& tp,
-                              time_zone::civil_transition* trans) const = 0;
+        virtual time_zone::civil_lookup MakeTime(const civil_second &cs) const = 0;
 
-  virtual std::string Version() const = 0;
-  virtual std::string Description() const = 0;
+        virtual bool NextTransition(const time_point<seconds> &tp,
+                                    time_zone::civil_transition *trans) const = 0;
 
- protected:
-  TimeZoneIf() {}
-};
+        virtual bool PrevTransition(const time_point<seconds> &tp,
+                                    time_zone::civil_transition *trans) const = 0;
 
-// Convert between time_point<seconds> and a count of seconds since the
-// Unix epoch.  We assume that the std::chrono::system_clock and the
-// Unix clock are second aligned, and that the results are representable.
-// (That is, that they share an epoch, which is required since C++20.)
-inline std::int_fast64_t ToUnixSeconds(const time_point<seconds>& tp) {
-  return (tp - std::chrono::time_point_cast<seconds>(
-                   std::chrono::system_clock::from_time_t(0)))
-      .count();
-}
-inline time_point<seconds> FromUnixSeconds(std::int_fast64_t t) {
-  return std::chrono::time_point_cast<seconds>(
-             std::chrono::system_clock::from_time_t(0)) +
-         seconds(t);
-}
+        virtual std::string Version() const = 0;
 
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        virtual std::string Description() const = 0;
+
+    protected:
+        TimeZoneIf() {}
+    };
+
+    // Convert between time_point<seconds> and a count of seconds since the
+    // Unix epoch.  We assume that the std::chrono::system_clock and the
+    // Unix clock are second aligned, and that the results are representable.
+    // (That is, that they share an epoch, which is required since C++20.)
+    inline std::int_fast64_t ToUnixSeconds(const time_point<seconds> &tp) {
+        return (tp - std::chrono::time_point_cast<seconds>(
+                std::chrono::system_clock::from_time_t(0)))
+                .count();
+    }
+
+    inline time_point<seconds> FromUnixSeconds(std::int_fast64_t t) {
+        return std::chrono::time_point_cast<seconds>(
+                std::chrono::system_clock::from_time_t(0)) +
+               seconds(t);
+    }
+
+}  // namespace turbo::time_internal::cctz
 
 #endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IF_H_

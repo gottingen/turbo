@@ -877,14 +877,14 @@ template <typename T, typename = void>
 struct IsHashCallable : std::false_type {};
 
 template <typename T>
-struct IsHashCallable<T, turbo::void_t<decltype(std::declval<turbo::Hash<T>>()(
+struct IsHashCallable<T, std::void_t<decltype(std::declval<turbo::Hash<T>>()(
                             std::declval<const T&>()))>> : std::true_type {};
 
 template <typename T, typename = void>
 struct IsAggregateInitializable : std::false_type {};
 
 template <typename T>
-struct IsAggregateInitializable<T, turbo::void_t<decltype(T{})>>
+struct IsAggregateInitializable<T, std::void_t<decltype(T{})>>
     : std::true_type {};
 
 TEST(IsHashableTest, ValidHash) {

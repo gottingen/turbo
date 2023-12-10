@@ -85,20 +85,20 @@ struct IsBaseOfSpecializationImpl : std::false_type {};
 // template.
 template <typename C, template <typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
-    C, T, turbo::void_t<typename C::value_type, typename C::allocator_type>>
+    C, T, std::void_t<typename C::value_type, typename C::allocator_type>>
     : std::is_base_of<C,
                       T<typename C::value_type, typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::key_compare,
+    std::void_t<typename C::key_type, typename C::key_compare,
                  typename C::allocator_type>>
     : std::is_base_of<C, T<typename C::key_type, typename C::key_compare,
                            typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::key_compare, typename C::allocator_type>>
     : std::is_base_of<C,
                       T<typename C::key_type, typename C::mapped_type,
@@ -107,7 +107,7 @@ struct IsBaseOfSpecializationImpl<
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::hasher,
+    std::void_t<typename C::key_type, typename C::hasher,
                  typename C::key_equal, typename C::allocator_type>>
     : std::is_base_of<C, T<typename C::key_type, typename C::hasher,
                            typename C::key_equal, typename C::allocator_type>> {
@@ -116,7 +116,7 @@ template <typename C,
           template <typename, typename, typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::hasher, typename C::key_equal,
                  typename C::allocator_type>>
     : std::is_base_of<C, T<typename C::key_type, typename C::mapped_type,
@@ -163,20 +163,20 @@ struct IsConvertibleToSpecializationImpl : std::false_type {};
 // STL template.
 template <typename C, template <typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
-    C, T, turbo::void_t<typename C::value_type, typename C::allocator_type>>
+    C, T, std::void_t<typename C::value_type, typename C::allocator_type>>
     : std::is_convertible<
           C, T<typename C::value_type, typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::key_compare,
+    std::void_t<typename C::key_type, typename C::key_compare,
                  typename C::allocator_type>>
     : std::is_convertible<C, T<typename C::key_type, typename C::key_compare,
                                typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::key_compare, typename C::allocator_type>>
     : std::is_convertible<
           C, T<typename C::key_type, typename C::mapped_type,
@@ -184,7 +184,7 @@ struct IsConvertibleToSpecializationImpl<
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::hasher,
+    std::void_t<typename C::key_type, typename C::hasher,
                  typename C::key_equal, typename C::allocator_type>>
     : std::is_convertible<
           C, T<typename C::key_type, typename C::hasher, typename C::key_equal,
@@ -193,7 +193,7 @@ template <typename C,
           template <typename, typename, typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::hasher, typename C::key_equal,
                  typename C::allocator_type>>
     : std::is_convertible<C, T<typename C::key_type, typename C::mapped_type,

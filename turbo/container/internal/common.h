@@ -28,7 +28,7 @@ namespace container_internal {
 template <class, class = void>
 struct IsTransparent : std::false_type {};
 template <class T>
-struct IsTransparent<T, turbo::void_t<typename T::is_transparent>>
+struct IsTransparent<T, std::void_t<typename T::is_transparent>>
     : std::true_type {};
 
 template <bool is_transparent>
@@ -136,7 +136,7 @@ class node_handle : public node_handle_base<PolicyTraits, Alloc> {
 // For maps.
 template <typename Policy, typename PolicyTraits, typename Alloc>
 class node_handle<Policy, PolicyTraits, Alloc,
-                  turbo::void_t<typename Policy::mapped_type>>
+                  std::void_t<typename Policy::mapped_type>>
     : public node_handle_base<PolicyTraits, Alloc> {
   using Base = node_handle_base<PolicyTraits, Alloc>;
   using slot_type = typename PolicyTraits::slot_type;
