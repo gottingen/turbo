@@ -25,7 +25,7 @@
 namespace turbo {
 
     /**
-     * @ingroup tuebo_files_read_file
+     * @ingroup turbo_files_read_file
      * @brief SequentialReadFile is a file io utility class.
      * eg.
      * @code
