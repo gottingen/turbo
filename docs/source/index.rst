@@ -30,6 +30,7 @@ Contents
     :maxdepth: 3
     :caption: TUTORIAL
 
+    en/testing
     en/tutorial
 
 
