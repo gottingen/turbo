@@ -31,9 +31,6 @@
  * @history
  * 2021-08-31: 1.0 created by jeff
  */
- /**
-  * @defgroup turbo_memory_pool turbo_memory
-  */
 
 namespace turbo {
 

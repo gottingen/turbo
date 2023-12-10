@@ -29,6 +29,7 @@ namespace turbo {
      /**
       * @ingroup turbo_files_operation
       * @brief Fio is a file io utility class.
+      * @note
       *        It is Low-level operations on filesystem of the
       *        underlying operating system. we have Encapsulates
       *        some upper-level classes and interfaces. this is
@@ -61,7 +62,7 @@ namespace turbo {
          * @brief file_open_append is a function to open a file for appending.
          *        this is used to get file size when the file is opened.
          * @param fp
-         * @return
+         * @return a ResultStatus<size_t> object.
          */
         static turbo::ResultStatus<size_t> file_size(std::FILE *fp);
 

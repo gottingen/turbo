@@ -31,21 +31,6 @@
 #ifndef TURBO_RANDOM_RANDOM_H_
 #define TURBO_RANDOM_RANDOM_H_
 
-/**
- * @defgroup turbo_random_module Turbo Random Module
- * @defgroup turbo_random_engine Turbo Random Module
- * @defgroup turbo_random_uniform Turbo Random Module
- * @defgroup turbo_random_bernoulli Turbo Random Module
- * @defgroup turbo_random_beta Turbo Random Module
- * @defgroup turbo_random_exponential Turbo Random Module
- * @defgroup turbo_random_gaussian Turbo Random Module
- * @defgroup turbo_random_log_uniform Turbo Random Module
- * @defgroup turbo_random_poisson Turbo Random Module
- * @defgroup turbo_random_zipf Turbo Random Module
- * @defgroup turbo_random_bytes Turbo Random Module
- * @defgroup turbo_random_unicode Turbo Random Module
- * @brief Turbo Random Module
- */
 #include <random>
 #include <numeric>
 #include "turbo/random/engine.h"

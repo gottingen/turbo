@@ -16,6 +16,7 @@
 
 
 set(TURBO_ALL_SRC
+        "base/version.cc"
         "base/atexit.cc"
         "base/internal/raw_logging.cc"
         "base/internal/strerror.cc"

@@ -2,6 +2,7 @@ PROJECT_NAME      = "turbo-docs"
 XML_OUTPUT        = xml
 INPUT             = ./turbo/platform/part.h \
                     ./turbo/platform/attribute_functions.h \
+                    ../turbo/base/version.h \
                     ../turbo/base/assume.h \
                     ../turbo/base/sysinfo.h \
                     ../turbo/base/endian.h  \
@@ -16,6 +17,7 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/files/sequential_read_file.h \
                     ../turbo/files/sequential_write_file.h \
                     ../turbo/files/utility.h               \
+                    ../turbo/strings/version.h \
                     ../turbo/strings/utility.h \
                     ../turbo/strings/ascii.h \
                     ../turbo/strings/escaping.h \
@@ -27,9 +29,12 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/strings/str_case_conv.h \
                     ../turbo/strings/str_split.h    \
                     ../turbo/strings/str_replace.h  \
+                    ../turbo/memory/version.h \
                     ../turbo/memory/object_pool.h \
                     ../turbo/memory/resource_pool.h \
+                    ../turbo/unicode/version.h \
                     ../turbo/unicode/converter.h \
+                    ../turbo/random/version.h  \
                     ../turbo/random/random.h  \
                     ../turbo/random/bernoulli.h \
                     ../turbo/random/bernoulli_distribution.h \
@@ -50,7 +55,35 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/random/exponential_distribution.h \
                     ../turbo/random/poisson.h \
                     ../turbo/random/poisson_distribution.h \
-                    ../turbo/random/unicode.h
+                    ../turbo/random/unicode.h \
+                    ../turbo/simd/version.h \
+                    ../turbo/simd/types/api.h \
+                    ../turbo/simd/types/batch.h \
+                    ../turbo/simd/types/batch_constant.h \
+                    ../turbo/simd/config/simd_arch.h \
+                    ../turbo/simd/config/simd_config.h \
+                    ../turbo/simd/memory/alignment.h \
+                    ../turbo/simd/memory/aligned_allocator.h \
+                    ../turbo/simd/types/generic_arch.h \
+                    ../turbo/simd/types/simd_traits.h \
+                    ../turbo/simd/types/avx2_register.h \
+                    ../turbo/simd/types/avx512bw_register.h \
+                    ../turbo/simd/types/avx512cd_register.h \
+                    ../turbo/simd/types/avx512dq_register.h \
+                    ../turbo/simd/types/avx512f_register.h \
+                    ../turbo/simd/types/avx_register.h \
+                    ../turbo/simd/types/fma3_avx_register.h \
+                    ../turbo/simd/types/fma3_avx2_register.h \
+                    ../turbo/simd/types/fma3_sse_register.h \
+                    ../turbo/simd/types/fma4_register.h \
+                    ../turbo/simd/types/neon64_register.h \
+                    ../turbo/simd/types/neon_register.h \
+                    ../turbo/simd/types/sse2_register.h \
+                    ../turbo/simd/types/sse3_register.h \
+                    ../turbo/simd/types/sse4_1_register.h \
+                    ../turbo/simd/types/sse4_2_register.h \
+                    ../turbo/simd/types/ssse3_register.h  \
+                    ../turbo/simd/types/sve_register.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

@@ -25,27 +25,6 @@
 #include "turbo/simd/types/simd_traits.h"
 
 namespace turbo::simd {
-    /**
-     * high level free functions
-     *
-     * @defgroup batch_arithmetic Arithmetic operators
-     * @defgroup batch_constant Constant batches
-     * @defgroup batch_data_transfer Memory operators
-     * @defgroup batch_math Basic math operators
-     * @defgroup batch_math_extra Extra math operators
-     * @defgroup batch_fp Floating point manipulation
-     * @defgroup batch_rounding Rounding operators
-     * @defgroup batch_conversion Conversion operators
-     * @defgroup batch_complex_op Complex operators
-     * @defgroup batch_logical Logical operators
-     * @defgroup batch_bitwise Bitwise operators
-     * @defgroup batch_reducers Reducers
-     * @defgroup batch_miscellaneous Miscellaneous
-     * @defgroup batch_trigo Trigonometry
-     *
-     * @defgroup batch_bool_logical Boolean logical operators
-     * @defgroup batch_bool_reducers Boolean reducers
-     */
 
     /**
      * @ingroup batch_math

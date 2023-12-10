@@ -23,6 +23,14 @@ Contents
     en/install
 
 .. toctree::
+    :maxdepth: 3
+    :caption: TUTORIAL
+
+    en/tutorial
+
+
+.. toctree::
+    :maxdepth: 3
     :caption: API REFERENCE
 
     en/api/platform
@@ -32,6 +40,7 @@ Contents
     en/api/memory
     en/api/unicode
     en/api/random
+    en/api/simd
 
 
 .. toctree::

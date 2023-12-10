@@ -25,11 +25,6 @@
 #include "turbo/platform/port.h"
 
 
-/**
-* @defgroup turbo_base_endian base functions
-*
-*/
-
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 

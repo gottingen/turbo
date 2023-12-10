@@ -21,6 +21,12 @@
 
 #include "turbo/module/module_version.h"
 
+/**
+ * @defgroup turbo_unicode_converter turbo::unicode::Converter
+ * @defgroup turbo_unicode_validate turbo::unicode::Converter
+ * @defgroup turbo_unicode_detector turbo::unicode::Converter
+ */
+
 namespace turbo {
 
     static constexpr turbo::ModuleVersion unicode_version = turbo::ModuleVersion{0, 9, 36};

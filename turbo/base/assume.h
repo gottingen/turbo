@@ -18,11 +18,6 @@
 #include <cstdlib>
 #include "turbo/platform/port.h"
 
-/**
-* @defgroup turbo_base base functions
-*
-*/
-
 namespace turbo {
 
     /**

@@ -21,9 +21,18 @@
 
 #include "turbo/module/module_version.h"
 
+/**
+ * @defgroup turbo_strings_ascii ASCII utilities
+ * @defgroup turbo_strings_convert String conversion utilities
+ * @defgroup turbo_strings_trim String trimming utilities
+ * @defgroup turbo_strings_match String matching utilities
+ * @defgroup turbo_strings_split String matching utilities
+ * @defgroup turbo_strings_replace String matching utilities
+ */
+
 namespace turbo {
 
-    static constexpr turbo::ModuleVersion string_version = turbo::ModuleVersion{0, 9, 36};
+    static constexpr turbo::ModuleVersion strings_version = turbo::ModuleVersion{0, 9, 36};
 
 }  // namespace turbo
 #endif  // TURBO_STRINGS_VERSION_H_
