@@ -1,7 +1,8 @@
 PROJECT_NAME      = "turbo-docs"
 XML_OUTPUT        = xml
-INPUT             = ./turbo/platform/part.h \
-                    ./turbo/platform/attribute_functions.h \
+INPUT             = ../turbo/platform/version.h \
+                    ../turbo/platform/port.h \
+                    ../turbo/platform/config/attribute_function.h \
                     ../turbo/base/version.h \
                     ../turbo/base/assume.h \
                     ../turbo/base/sysinfo.h \

@@ -21,6 +21,10 @@
 
 #include "turbo/module/module_version.h"
 
+/**
+* @defgroup turbo_function_macro function attribute
+*
+*/
 
 namespace turbo {
 

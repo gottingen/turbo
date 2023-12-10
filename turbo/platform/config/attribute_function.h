@@ -34,7 +34,7 @@
 #endif
 
 /**
- * @ingroup turbo_platform
+ * @ingroup turbo_function_macro
  * @brief This macro is used to mark a function as hot.
  * @details The `TURBO_HOT` macro is used to mark a function as hot. This
  *          attribute is used to inform the compiler that a function is a hot
@@ -99,6 +99,7 @@
 // See also the upstream documentation:
 // https://clang.llvm.org/docs/AttributeReference.html#trivial-abi
 //
+
 #if TURBO_HAVE_CPP_ATTRIBUTE(clang::trivial_abi)
 #define TURBO_ATTRIBUTE_TRIVIAL_ABI [[clang::trivial_abi]]
 #define TURBO_HAVE_ATTRIBUTE_TRIVIAL_ABI 1
@@ -199,6 +200,23 @@
 //
 // TODO(b/176172494): Use TURBO_HAVE_CPP_ATTRIBUTE(nodiscard) when all code is
 // compliant with the stricter [[nodiscard]].
+
+/**
+ * @ingroup turbo_function_macro
+ * @brief This macro is used to mark a function as must use result.
+ * @details The `TURBO_MUST_USE_RESULT` macro is used to mark a function as must
+ *          use result. This attribute is used to inform the compiler that a
+ *          function must be used. The function is optimized more aggressively
+ *          and on many platforms special calling sequences are used. For
+ *          example, on ARM targets a function marked as must use result is
+ *          expected to be called more often than a cold function. This
+ *          attribute is often used to mark functions that are called
+ *          frequently inside loops.
+ * @code
+ *          TURBO_MUST_USE_RESULT int foo();
+ * @endcode
+ * @note    after c++17, use [[nodiscard]] instead.
+ */
 #if defined(__clang__) && TURBO_HAVE_ATTRIBUTE(warn_unused_result)
 #define TURBO_MUST_USE_RESULT __attribute__((warn_unused_result))
 #else
@@ -214,7 +232,7 @@
 #endif // TURBO_MAYBE_UNUSED
 
 /**
- * @ingroup turbo_platform
+ * @ingroup turbo_function_macro
  * @brief This macro is used to force inline a function.
  * @details The `TURBO_FORCE_INLINE` macro is used to force inline a function.
  *          This attribute is used to inform the compiler that a function is a
@@ -268,23 +286,23 @@
 #define TURBO_POSTFIX_FORCE_INLINE
 #endif
 
-// ------------------------------------------------------------------------
-// TURBO_FORCE_INLINE_LAMBDA
-//
-// TURBO_FORCE_INLINE_LAMBDA is used to force inline a call to a lambda when
-// possible. Force inlining a lambda can be useful to reduce overhead in
-// situations where a lambda may may only be called once, or inlining allows the
-// compiler to apply other optimizations that wouldn't otherwise be possible.
-//
-// The ability to force inline a lambda is currently only available on a subset
-// of compilers.
-//
-// Example usage:
-//
-//		auto lambdaFunction = []() TURBO_FORCE_INLINE_LAMBDA
-//		{
-//		};
-//
+/**
+ * @ingroup turbo_function_macro
+ * @brief This macro is used to force inline a lambda function. Force inlining
+ *        a lambda can be useful to reduce overhead in situations where a lambda
+ *        may may only be called once, or inlining allows the compiler to apply
+ *        other optimizations that wouldn't otherwise be possible.
+ *
+ *        The ability to force inline a lambda is currently only available on a
+ *        subset of compilers.
+ *
+ *        Example usage:
+ *        @code {.cpp}
+ *        auto lambdaFunction = []() TURBO_FORCE_INLINE_LAMBDA
+ *        {
+ *        };
+ *        @endcode
+ */
 #ifndef TURBO_FORCE_INLINE_LAMBDA
 #if defined(TURBO_COMPILER_GNUC) || defined(TURBO_COMPILER_CLANG)
 #define TURBO_FORCE_INLINE_LAMBDA __attribute__((always_inline))
