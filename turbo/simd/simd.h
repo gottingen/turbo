@@ -22,7 +22,6 @@
 #endif
 
 #include "turbo/simd/arch/scalar.h"
-#include "turbo/simd/memory/aligned_allocator.h"
 
 #if defined(TURBO_NO_SUPPORTED_ARCHITECTURE)
 // to type definition or anything appart from scalar definition and aligned allocator

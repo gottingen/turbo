@@ -4,14 +4,8 @@
 Alignment manipulation
 ======================
 
-Aligned memory allocator
-------------------------
 
-.. doxygenclass:: turbo::simd::aligned_allocator
-   :project: turbo-docs
-   :members:
-
-Alignement checker
+alignment checker
 ------------------
 
 .. doxygenfunction:: turbo::simd::is_aligned

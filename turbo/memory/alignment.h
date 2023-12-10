@@ -12,13 +12,13 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_SIMD_ALIGNMENT_H_
-#define TURBO_SIMD_ALIGNMENT_H_
+#ifndef TURBO_MEMORY_ALIGNMENT_H_
+#define TURBO_MEMORY_ALIGNMENT_H_
 
-#include "turbo/simd/types/simd_utils.h"
-#include "turbo/simd/memory/aligned_allocator.h"
+#include <type_traits>
+#include "turbo/memory/aligned_allocator.h"
 
-namespace turbo::simd {
+namespace turbo {
     /**
      * @struct aligned_mode
      * @brief tag for load and store of aligned memory.
@@ -60,7 +60,7 @@ namespace turbo::simd {
     };
 
     template<class C>
-    struct container_alignment<C, detail::void_t<typename C::allocator_type>> {
+    struct container_alignment<C, std::void_t<typename C::allocator_type>> {
         using type = allocator_alignment_t<typename C::allocator_type>;
     };
 
@@ -71,16 +71,17 @@ namespace turbo::simd {
      * alignment checker *
      *********************/
 
+
     /**
-     * Checks whether pointer \c ptr is aligned according the alignment
-     * requirements of \c Arch.
-     * @return true if the alignment requirements are met
+     * @brief check if a pointer is aligned to a given alignment.
+     * @param ptr pointer to check.
+     * @param alignment alignment to check.
+     * @return true if the pointer is aligned to the given alignment.
      */
-    template<class Arch = default_arch>
-    inline bool is_aligned(void const *ptr) {
-        return (reinterpret_cast<uintptr_t>(ptr) % static_cast<uintptr_t>(Arch::alignment())) == 0;
+    inline bool is_aligned(void const *ptr, size_t alignment) {
+        return (reinterpret_cast<uintptr_t>(ptr) % static_cast<uintptr_t>(alignment)) == 0;
     }
 
 }
 
-#endif
+#endif  // TURBO_MEMORY_ALIGNMENT_H_

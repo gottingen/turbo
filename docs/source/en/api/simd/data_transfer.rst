@@ -65,10 +65,5 @@ Between batches:
    :project: turbo-docs
    :content-only:
 
-The following empty types are used for tag dispatching:
+There are two empty types are used for tag dispatching see :ref:`turbo_alignment_tag`.
 
-.. doxygenstruct:: turbo::simd::aligned_mode
-   :project: turbo-docs
-
-.. doxygenstruct:: turbo::simd::unaligned_mode
-   :project: turbo-docs

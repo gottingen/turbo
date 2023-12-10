@@ -19,7 +19,7 @@
 #include <complex>
 
 #include "turbo/simd/config/simd_arch.h"
-#include "turbo/simd/memory/alignment.h"
+#include "turbo/memory/alignment.h"
 #include "turbo/simd/types/simd_utils.h"
 
 namespace turbo::simd {

@@ -53,7 +53,7 @@ mechanism that allows you to easily write such a generic code:
 .. literalinclude:: ../../../../tests/simd/doc/explicit_use_of_an_instruction_set_mean_tag_dispatch.cc
 
 
-Here, the ``Tag`` template parameter can be :cpp:class:`turbo::simd::aligned_mode` or :cpp:class:`turbo::simd::unaligned_mode`. Assuming the existence
+Here, the ``Tag`` template parameter can be :cpp:class:`turbo::aligned_mode` or :cpp:class:`turbo::unaligned_mode`. Assuming the existence
 of a ``get_alignment_tag`` meta-function in the code, the previous code can be invoked this way:
 
 .. code::

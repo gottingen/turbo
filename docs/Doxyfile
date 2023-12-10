@@ -32,6 +32,8 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/strings/str_replace.h  \
                     ../turbo/memory/version.h \
                     ../turbo/memory/object_pool.h \
+                    ../turbo/memory/alignment.h \
+                    ../turbo/memory/aligned_allocator.h \
                     ../turbo/memory/resource_pool.h \
                     ../turbo/unicode/version.h \
                     ../turbo/unicode/converter.h \
@@ -63,8 +65,6 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/simd/types/batch_constant.h \
                     ../turbo/simd/config/simd_arch.h \
                     ../turbo/simd/config/simd_config.h \
-                    ../turbo/simd/memory/alignment.h \
-                    ../turbo/simd/memory/aligned_allocator.h \
                     ../turbo/simd/types/generic_arch.h \
                     ../turbo/simd/types/simd_traits.h \
                     ../turbo/simd/types/avx2_register.h \

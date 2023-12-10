@@ -12,8 +12,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_SIMD_MEMORY_ALIGNED_ALLOCATOR_H_
-#define TURBO_SIMD_MEMORY_ALIGNED_ALLOCATOR_H_
+#ifndef TURBO_MEMORY_ALIGNED_ALLOCATOR_H_
+#define TURBO_MEMORY_ALIGNED_ALLOCATOR_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -30,9 +30,7 @@
 #include <cassert>
 #include <memory>
 
-#include "turbo/simd/config/simd_arch.h"
-
-namespace turbo::simd {
+namespace turbo {
 
     /**
      * @class aligned_allocator
@@ -270,7 +268,7 @@ namespace turbo::simd {
      ****************************************/
 
     namespace detail {
-        inline void *xaligned_malloc(size_t size, size_t alignment) {
+        inline void *aligned_malloc_impl(size_t size, size_t alignment) {
             assert(((alignment & (alignment - 1)) == 0) && "alignment must be a power of two");
             assert((alignment >= sizeof(void *)) && "alignment must be at least the size of a pointer");
             void *res = nullptr;
@@ -284,7 +282,7 @@ namespace turbo::simd {
             return res;
         }
 
-        inline void xaligned_free(void *ptr) {
+        inline void aligned_free_impl(void *ptr) {
 #ifdef _WIN32
             _aligned_free(ptr);
 #else
@@ -294,20 +292,16 @@ namespace turbo::simd {
     }
 
     inline void *aligned_malloc(size_t size, size_t alignment) {
-        return detail::xaligned_malloc(size, alignment);
+        return detail::aligned_malloc_impl(size, alignment);
     }
 
     inline void aligned_free(void *ptr) {
-        detail::xaligned_free(ptr);
+        detail::aligned_free_impl(ptr);
     }
 
     template<class T>
     inline size_t get_alignment_offset(const T *p, size_t size, size_t block_size) {
-        // size_t block_size = simd_traits<T>::size;
         if (block_size == 1) {
-            // The simd_block consists of exactly one scalar so that all
-            // elements of the array
-            // are "well" aligned.
             return 0;
         } else if (size_t(p) & (sizeof(T) - 1)) {
             // The array is not aligned to the size of a single element, so that
@@ -322,11 +316,7 @@ namespace turbo::simd {
         }
     }
 
-    template<class T, class A = default_arch>
-    using default_allocator = typename std::conditional<A::requires_alignment(),
-            aligned_allocator<T, A::alignment()>,
-            std::allocator<T>>::type;
-}
+}  // namespace turbo
 
-#endif  // TURBO_SIMD_MEMORY_ALIGNED_ALLOCATOR_H_
+#endif  // TURBO_MEMORY_ALIGNED_ALLOCATOR_H_
 

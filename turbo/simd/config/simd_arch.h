@@ -22,6 +22,7 @@
 #include "turbo/simd/types/all_registers.h"
 //#include "turbo/simd/config/simd_config.h"
 #include "turbo/simd/config/simd_cpuid.h"
+#include "turbo/memory/alignment.h"
 
 namespace turbo::simd {
 
@@ -232,6 +233,22 @@ namespace turbo::simd {
     template<class ArchList = supported_architectures, class F>
     inline detail::dispatcher<F, ArchList> dispatch(F &&f) noexcept {
         return {std::forward<F>(f)};
+    }
+
+
+    template<class T, class A = default_arch>
+    using default_allocator = typename std::conditional<A::requires_alignment(),
+            turbo::aligned_allocator<T, A::alignment()>,
+            std::allocator<T>>::type;
+
+    /**
+    * Checks whether pointer \c ptr is aligned according the alignment
+    * requirements of \c Arch.
+    * @return true if the alignment requirements are met
+    */
+    template<class Arch = default_arch>
+    inline bool is_aligned(void const *ptr) {
+        return turbo::is_aligned(ptr,Arch::alignment()) == 0;
     }
 
 } // namespace turbo::simd

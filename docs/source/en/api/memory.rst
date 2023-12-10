@@ -8,4 +8,5 @@ memory module
 
 .. toctree::
 
-    memory_pool
+    memory/memory_pool
+    memory/aligned_allocator

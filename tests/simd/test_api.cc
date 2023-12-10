@@ -116,25 +116,25 @@ private:
         batch_type b;
         std::copy(v.cbegin(), v.cend(), expected.begin());
 
-        b = batch_type::load(v.data(), turbo::simd::unaligned_mode());
+        b = batch_type::load(v.data(), turbo::unaligned_mode());
         INFO(name, " unaligned");
         CHECK_BATCH_EQ(b, expected);
 
-        b = batch_type::load(v.data(), turbo::simd::aligned_mode());
+        b = batch_type::load(v.data(), turbo::aligned_mode());
         INFO(name, " aligned");
         CHECK_BATCH_EQ(b, expected);
     }
 
     template<class V>
     void test_store_impl(const V &v, const std::string &name) {
-        batch_type b = batch_type::load(v.data(), turbo::simd::aligned_mode());
+        batch_type b = batch_type::load(v.data(), turbo::aligned_mode());
         V res(size);
 
-        turbo::simd::store_as(res.data(), b, turbo::simd::unaligned_mode());
+        turbo::simd::store_as(res.data(), b, turbo::unaligned_mode());
         INFO(name, " unaligned");
         CHECK_VECTOR_EQ(res, v);
 
-        turbo::simd::store_as(res.data(), b, turbo::simd::aligned_mode());
+        turbo::simd::store_as(res.data(), b, turbo::aligned_mode());
         INFO(name, " aligned");
         CHECK_VECTOR_EQ(res, v);
     }

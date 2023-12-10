@@ -12,16 +12,13 @@
 // limitations under the License.
 //
 
-#include "turbo/simd/simd.h"
-#ifndef TURBO_NO_SUPPORTED_ARCHITECTURE
-
 #include <type_traits>
 #include <vector>
-
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
 
-#include "turbo/simd/memory/aligned_allocator.h"
-#include "turbo/simd/memory/alignment.h"
+#include "turbo/memory/aligned_allocator.h"
+#include "turbo/memory/alignment.h"
 
 struct mock_container
 {
@@ -30,32 +27,31 @@ struct mock_container
 TEST_CASE("[alignment]")
 {
     using u_vector_type = std::vector<double>;
-    using a_vector_type = std::vector<double, turbo::simd::default_allocator<double>>;
+    using a_vector_type = std::vector<double, turbo::aligned_allocator<double, 32>>;
 
-    using u_vector_align = turbo::simd::container_alignment_t<u_vector_type>;
-    using a_vector_align = turbo::simd::container_alignment_t<a_vector_type>;
-    using mock_align = turbo::simd::container_alignment_t<mock_container>;
+    using u_vector_align = turbo::container_alignment_t<u_vector_type>;
+    using a_vector_align = turbo::container_alignment_t<a_vector_type>;
+    using mock_align = turbo::container_alignment_t<mock_container>;
 
-    CHECK_UNARY((std::is_same<u_vector_align, turbo::simd::unaligned_mode>::value));
-    CHECK_UNARY((std::is_same<a_vector_align, turbo::simd::aligned_mode>::value));
-    CHECK_UNARY((std::is_same<mock_align, turbo::simd::unaligned_mode>::value));
+    CHECK_UNARY((std::is_same<u_vector_align, turbo::unaligned_mode>::value));
+    CHECK_UNARY((std::is_same<a_vector_align, turbo::aligned_mode>::value));
+    CHECK_UNARY((std::is_same<mock_align, turbo::unaligned_mode>::value));
 }
 
 TEST_CASE("[is_aligned]")
 {
     float f[100];
     void* unaligned_f = static_cast<void*>(&f[0]);
-    constexpr std::size_t alignment = turbo::simd::default_arch::alignment();
+    constexpr std::size_t alignment = 32;
     std::size_t aligned_f_size;
     void* aligned_f = std::align(alignment, sizeof(f), unaligned_f, aligned_f_size);
-    CHECK_UNARY(turbo::simd::is_aligned(aligned_f));
+    CHECK_UNARY(turbo::is_aligned(aligned_f, 32));
 
     // GCC does not generate correct alignment on ARM
     // (see https://godbolt.org/z/obv1n8bWq)
 #if !(TURBO_WITH_NEON && defined(__GNUC__) && !defined(__clang__))
     alignas(alignment) char aligned[8];
-    CHECK_UNARY(turbo::simd::is_aligned(&aligned[0]));
-    CHECK_UNARY(!turbo::simd::is_aligned(&aligned[3]));
+    CHECK_UNARY(turbo::is_aligned(&aligned[0], 32));
+    CHECK_UNARY(!turbo::is_aligned(&aligned[3], 32));
 #endif
 }
-#endif
