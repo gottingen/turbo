@@ -27,7 +27,7 @@ project = 'turbo-docs'
 copyright = 'Copyright 2023 The Elastic-AI Authors.'
 author = 'jeff.li'
 
-html_logo = 'image/turbo.png'
+html_logo = 'image/ticon.png'
 
 exclude_patterns = []
 highlight_language = 'c++'

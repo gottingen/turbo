@@ -1,8 +1,12 @@
 Turbo
 ==========
 
-.. image:: image/turbo.png
-   :alt: turbo
+..  image:: image/ticon.png
+    :height: 200px
+    :width: 240 px
+    :scale: 80 %
+    :align: center
+    :alt: turbo
 
 Turbo is a library of c++17 components designed with practicality
 and efficiently in mind. However, it seems like stl, but it just
