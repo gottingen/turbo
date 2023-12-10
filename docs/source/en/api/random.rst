@@ -11,11 +11,12 @@ random module
     random_engine
     random_bernoulli
     random_beta
-    random_bytes
     random_uniform
     random_zipf
     random_gaussian
     random_log_uniform
     random_exponential
     random_poisson
+    random_unicode
+    random_bytes
 

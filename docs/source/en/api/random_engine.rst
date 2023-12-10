@@ -3,7 +3,7 @@
 .. _turbo_random_engine_module:
 
 
-endian
+random engine
 =========================
 
 .. doxygengroup:: turbo_random_engine

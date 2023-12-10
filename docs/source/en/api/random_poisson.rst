@@ -3,7 +3,7 @@
 .. _turbo_random_poisson_module:
 
 
-endian
+poisson distribution
 =========================
 
 .. doxygengroup:: turbo_random_poisson

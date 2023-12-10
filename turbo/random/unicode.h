@@ -23,6 +23,28 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_random_unicode
+     * @brief Generates random UTF-8 sequences.
+     *        The generator is based on the following probabilities:
+     *        - 1 byte: 0x00 - 0x7f (127)
+     *        - 2 bytes: 0xc2 - 0xdf (192 - 223)
+     *        - 3 bytes: 0xe0 - 0xef (224 - 239)
+     *        - 4 bytes: 0xf0 - 0xf4 (240 - 244)
+     *        The probabilities are configurable.
+     *        Example:
+     *        @code{.cpp}
+     *        Utf8Generator gen(50, 30, 15, 5);
+     *        std::vector<uint8_t> bytes = gen.generate(100);
+     *        @endcode
+     *        The example above will generate 100 random bytes with the following
+     *        probabilities:
+     *        - 1 byte: 50%
+     *        - 2 bytes: 30%
+     *        - 3 bytes: 15%
+     *        - 4 bytes: 5%
+     * @note The generator is not thread-safe.
+     */
     class Utf8Generator {
     public:
         Utf8Generator(int prob_1byte, int prob_2bytes,
@@ -43,6 +65,25 @@ namespace turbo {
         uniform_int_distribution<int> val_3bit{0x00, 0x07}; // 0b11110xxx
     };
 
+    /**
+     * @ingroup turbo_random_unicode
+     * @brief Generates random UTF-16 sequences.
+     *        The generator is based on the following probabilities:
+     *        - 1 word: 0x0000 - 0xd7ff (0 - 55295)
+     *        - 2 words: 0xe000 - 0xffff (57344 - 65535)
+     *        - 2 words: 0x10000 - 0x10ffff (65536 - 1114111)
+     *        The probabilities are configurable.
+     *        Example:
+     *        @code{.cpp}
+     *        Utf16Generator gen(50, 50);
+     *        std::vector<uint16_t> words = gen.generate(100);
+     *        @endcode
+     *        The example above will generate 100 random words with the following
+     *        probabilities:
+     *        - 1 word: 50%
+     *        - 2 words: 50%
+     * @note The generator is not thread-safe.
+     */
     class Utf16Generator {
     public:
         Utf16Generator(int single_word_prob, int two_words_probability)
@@ -64,6 +105,16 @@ namespace turbo {
         uint32_t generate();
     };
 
+    /**
+     * @ingroup turbo_random_unicode
+     * @brief Generates random UTF-32 sequences.
+     *        by the following formula:
+     *        Example:
+     *        @code{.cpp}
+     *        Utf32Generator gen;
+     *        std::vector<uint32_t> words = gen.generate(100);
+     *        @endcode
+     */
     class Utf32Generator {
     public:
         static constexpr int32_t number_code_points = 0x0010ffff - (0xdfff - 0xd800);

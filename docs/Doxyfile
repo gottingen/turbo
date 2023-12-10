@@ -48,7 +48,8 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/random/exponential.h \
                     ../turbo/random/exponential_distribution.h \
                     ../turbo/random/poisson.h \
-                    ../turbo/random/poisson_distribution.h
+                    ../turbo/random/poisson_distribution.h \
+                    ../turbo/random/unicode.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

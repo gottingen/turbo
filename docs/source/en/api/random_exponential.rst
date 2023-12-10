@@ -3,7 +3,7 @@
 .. _turbo_random_exponential_module:
 
 
-endian
+exponential distribution
 =========================
 
 .. doxygengroup:: turbo_random_exponential

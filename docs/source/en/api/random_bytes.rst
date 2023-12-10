@@ -3,7 +3,7 @@
 .. _turbo_random_bytes_module:
 
 
-endian
+bytes generation
 =========================
 
 .. doxygengroup:: turbo_random_bytes

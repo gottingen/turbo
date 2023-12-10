@@ -3,7 +3,7 @@
 .. _turbo_random_zipf_module:
 
 
-endian
+zipf distribution
 =========================
 
 .. doxygengroup:: turbo_random_zipf

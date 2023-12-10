@@ -3,7 +3,7 @@
 .. _turbo_random_log_uniform_module:
 
 
-endian
+log uniform distribution
 =========================
 
 .. doxygengroup:: turbo_random_log_uniform
