@@ -46,6 +46,10 @@ namespace turbo::hash_internal {
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_hash_engine
+     * @brief bytes_hash_tag is a tag for bytes_hash.
+     */
     struct bytes_hash_tag {
 
         static constexpr const char* name() {

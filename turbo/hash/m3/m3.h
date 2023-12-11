@@ -29,6 +29,10 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_hash_engine
+     * @brief m3_hash_tag is a tag for m3_hash.
+     */
     struct m3_hash_tag {
 
         static constexpr const char* name() {

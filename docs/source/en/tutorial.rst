@@ -23,3 +23,7 @@ This tutorial shows how to use the ``simd`` module to accelerate
 
     simd/basic_usage
     simd/vectorized_code
+
+
+hash
+====================================

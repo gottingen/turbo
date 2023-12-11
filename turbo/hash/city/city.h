@@ -74,6 +74,10 @@ namespace turbo::hash_internal {
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_hash_engine
+     * @brief city_hash_tag is a tag for city_hash.
+     */
     struct city_hash_tag {
 
         static constexpr const char* name() {

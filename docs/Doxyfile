@@ -84,7 +84,14 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/simd/types/sse4_1_register.h \
                     ../turbo/simd/types/sse4_2_register.h \
                     ../turbo/simd/types/ssse3_register.h  \
-                    ../turbo/simd/types/sve_register.h
+                    ../turbo/simd/types/sve_register.h  \
+                    ../turbo/hash/version.h \
+                    ../turbo/hash/hash.h \
+                    ../turbo/hash/xx/xx.h \
+                    ../turbo/hash/fwd.h \
+                    ../turbo/hash/m3/m3.h \
+                    ../turbo/hash/city/city.h \
+                    ../turbo/hash/bytes/bytes.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO
