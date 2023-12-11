@@ -14,7 +14,7 @@
 
 #include <cstdlib>
 
-#include "turbo/hash/hash.h"
+#include "turbo/hash/hash_old.h"
 
 // Prints the hash of argv[1].
 int main(int argc, char** argv) {

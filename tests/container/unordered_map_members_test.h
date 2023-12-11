@@ -37,7 +37,7 @@ TYPED_TEST_P(MembersTest, Typedefs) {
                                       typename TypeParam::mapped_type>,
                             typename TypeParam::value_type>()));
   EXPECT_TRUE((std::conjunction<
-               turbo::negation<std::is_signed<typename TypeParam::size_type>>,
+               std::negation<std::is_signed<typename TypeParam::size_type>>,
                std::is_integral<typename TypeParam::size_type>>()));
   EXPECT_TRUE((std::conjunction<
                std::is_signed<typename TypeParam::difference_type>,

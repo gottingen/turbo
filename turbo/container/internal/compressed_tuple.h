@@ -37,16 +37,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/meta/utility.h"
-
-#if defined(_MSC_VER) && !defined(__NVCC__)
-// We need to mark these classes with this declspec to ensure that
-// CompressedTuple happens.
-#define TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC __declspec(empty_bases)
-#else
-#define TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC
-#endif
-
 namespace turbo::container_internal {
 
     template<typename... Ts>
@@ -106,7 +96,7 @@ namespace turbo::container_internal {
             constexpr Storage() = default;
 
             template<typename V>
-            explicit constexpr Storage(turbo::in_place_t, V &&v)
+            explicit constexpr Storage(std::in_place_t, V &&v)
                     : value(std::forward<V>(v)) {}
 
             constexpr const T &get() const &{ return value; }
@@ -119,11 +109,11 @@ namespace turbo::container_internal {
         };
 
         template<typename T, size_t I>
-        struct TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC Storage<T, I, true> : T {
+        struct  Storage<T, I, true> : T {
             constexpr Storage() = default;
 
             template<typename V>
-            explicit constexpr Storage(turbo::in_place_t, V &&v)
+            explicit constexpr Storage(std::in_place_t, V &&v)
                     : T(std::forward<V>(v)) {}
 
             constexpr const T &get() const &{ return *this; }
@@ -136,11 +126,11 @@ namespace turbo::container_internal {
         };
 
         template<typename D, typename I, bool ShouldAnyUseBase>
-        struct TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTupleImpl;
+        struct CompressedTupleImpl;
 
         template<typename... Ts, size_t... I, bool ShouldAnyUseBase>
-        struct TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTupleImpl<
-                CompressedTuple<Ts...>, turbo::index_sequence<I...>, ShouldAnyUseBase>
+        struct CompressedTupleImpl<
+                CompressedTuple<Ts...>, std::index_sequence<I...>, ShouldAnyUseBase>
             // We use the dummy identity function through std::integral_constant to
             // convince MSVC of accepting and expanding I in that context. Without it
             // you would get:
@@ -150,22 +140,22 @@ namespace turbo::container_internal {
             constexpr CompressedTupleImpl() = default;
 
             template<typename... Vs>
-            explicit constexpr CompressedTupleImpl(turbo::in_place_t, Vs &&... args)
-                    : Storage<Ts, I>(turbo::in_place, std::forward<Vs>(args))... {}
+            explicit constexpr CompressedTupleImpl(std::in_place_t, Vs &&... args)
+                    : Storage<Ts, I>(std::in_place, std::forward<Vs>(args))... {}
 
             friend CompressedTuple<Ts...>;
         };
 
         template<typename... Ts, size_t... I>
-        struct TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTupleImpl<
-                CompressedTuple<Ts...>, turbo::index_sequence<I...>, false>
+        struct CompressedTupleImpl<
+                CompressedTuple<Ts...>, std::index_sequence<I...>, false>
             // We use the dummy identity function as above...
                 : Storage<Ts, std::integral_constant<size_t, I>::value, false> ... {
             constexpr CompressedTupleImpl() = default;
 
             template<typename... Vs>
-            explicit constexpr CompressedTupleImpl(turbo::in_place_t, Vs &&... args)
-                    : Storage<Ts, I, false>(turbo::in_place, std::forward<Vs>(args))... {}
+            explicit constexpr CompressedTupleImpl(std::in_place_t, Vs &&... args)
+                    : Storage<Ts, I, false>(std::in_place, std::forward<Vs>(args))... {}
 
             friend CompressedTuple<Ts...>;
         };
@@ -236,9 +226,8 @@ namespace turbo::container_internal {
     //
     // https://en.cppreference.com/w/cpp/language/ebo
     template<typename... Ts>
-    class TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTuple
-            : private internal_compressed_tuple::CompressedTupleImpl<
-                    CompressedTuple<Ts...>, turbo::index_sequence_for<Ts...>,
+    class CompressedTuple : private internal_compressed_tuple::CompressedTupleImpl<
+                    CompressedTuple<Ts...>, std::index_sequence_for<Ts...>,
                     internal_compressed_tuple::ShouldAnyUseBase<Ts...>()> {
     private:
         template<int I>
@@ -260,19 +249,19 @@ namespace turbo::container_internal {
 #endif
 
         explicit constexpr CompressedTuple(const Ts &... base)
-                : CompressedTuple::CompressedTupleImpl(turbo::in_place, base...) {}
+                : CompressedTuple::CompressedTupleImpl(std::in_place, base...) {}
 
         template<typename First, typename... Vs,
                 std::enable_if_t<
                         std::conjunction<
                                 // Ensure we are not hiding default copy/move constructors.
-                                turbo::negation<std::is_same<void(CompressedTuple),
+                                std::negation<std::is_same<void(CompressedTuple),
                                         void(std::decay_t<First>)>>,
                                 internal_compressed_tuple::TupleItemsMoveConstructible<
                                         CompressedTuple<Ts...>, First, Vs...>>::value,
                         bool> = true>
         explicit constexpr CompressedTuple(First &&first, Vs &&... base)
-                : CompressedTuple::CompressedTupleImpl(turbo::in_place,
+                : CompressedTuple::CompressedTupleImpl(std::in_place,
                                                        std::forward<First>(first),
                                                        std::forward<Vs>(base)...) {}
 
@@ -300,11 +289,10 @@ namespace turbo::container_internal {
     // Explicit specialization for a zero-element tuple
     // (needed to avoid ambiguous overloads for the default constructor).
     template<>
-    class TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC CompressedTuple<> {
+    class CompressedTuple<> {
     };
 
 }  // namespace turbo::container_internal
 
-#undef TURBO_INTERNAL_COMPRESSED_TUPLE_DECLSPEC
 
 #endif  // TURBO_CONTAINER_INTERNAL_COMPRESSED_TUPLE_H_

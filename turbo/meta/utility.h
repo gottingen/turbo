@@ -91,7 +91,7 @@ namespace turbo {
         template<typename Seq, size_t SeqSize, size_t Rem>
         struct Extend;
 
-    // Note that SeqSize == sizeof...(Ints). It's passed explicitly for efficiency.
+        // Note that SeqSize == sizeof...(Ints). It's passed explicitly for efficiency.
         template<typename T, T... Ints, size_t SeqSize>
         struct Extend<integer_sequence<T, Ints...>, SeqSize, 0> {
             using type = integer_sequence<T, Ints..., (Ints + SeqSize)...>;
@@ -102,8 +102,8 @@ namespace turbo {
             using type = integer_sequence<T, Ints..., (Ints + SeqSize)..., 2 * SeqSize>;
         };
 
-// Recursion helper for 'make_integer_sequence<T, N>'.
-// 'Gen<T, N>::type' is an alias for 'integer_sequence<T, 0, 1, ... N-1>'.
+        // Recursion helper for 'make_integer_sequence<T, N>'.
+        // 'Gen<T, N>::type' is an alias for 'integer_sequence<T, 0, 1, ... N-1>'.
         template<typename T, size_t N>
         struct Gen {
             using type =
@@ -135,85 +135,31 @@ namespace turbo {
 
     }  // namespace utility_internal
 
-// Compile-time sequences of integers
+    // Compile-time sequences of integers
 
-// make_integer_sequence
-//
-// This template alias is equivalent to
-// `integer_sequence<int, 0, 1, ..., N-1>`, and is designed to be a drop-in
-// replacement for C++14's `std::make_integer_sequence`.
+    // make_integer_sequence
+    //
+    // This template alias is equivalent to
+    // `integer_sequence<int, 0, 1, ..., N-1>`, and is designed to be a drop-in
+    // replacement for C++14's `std::make_integer_sequence`.
     template<typename T, T N>
     using make_integer_sequence = typename utility_internal::Gen<T, N>::type;
 
-// make_index_sequence
-//
-// This template alias is equivalent to `index_sequence<0, 1, ..., N-1>`,
-// and is designed to be a drop-in replacement for C++14's
-// `std::make_index_sequence`.
+    // make_index_sequence
+    //
+    // This template alias is equivalent to `index_sequence<0, 1, ..., N-1>`,
+    // and is designed to be a drop-in replacement for C++14's
+    // `std::make_index_sequence`.
     template<size_t N>
     using make_index_sequence = make_integer_sequence<size_t, N>;
 
-// index_sequence_for
-//
-// Converts a typename pack into an index sequence of the same length, and
-// is designed to be a drop-in replacement for C++14's
-// `std::index_sequence_for()`
+    // index_sequence_for
+    //
+    // Converts a typename pack into an index sequence of the same length, and
+    // is designed to be a drop-in replacement for C++14's
+    // `std::index_sequence_for()`
     template<typename... Ts>
     using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
-
-// Tag types
-
-#ifdef TURBO_USES_STD_OPTIONAL
-
-    using std::in_place_t;
-    using std::in_place;
-
-#else  // TURBO_USES_STD_OPTIONAL
-
-    // in_place_t
-    //
-    // Tag type used to specify in-place construction, such as with
-    // `std::optional`, designed to be a drop-in replacement for C++17's
-    // `std::in_place_t`.
-    struct in_place_t {};
-
-    TURBO_INTERNAL_INLINE_CONSTEXPR(in_place_t, in_place, {});
-
-#endif  // TURBO_USES_STD_OPTIONAL
-
-#if defined(TURBO_USES_STD_ANY) || defined(TURBO_USES_STD_VARIANT)
-    using std::in_place_type;
-    using std::in_place_type_t;
-#else
-
-    // in_place_type_t
-    //
-    // Tag type used for in-place construction when the type to construct needs to
-    // be specified, such as with `std::any`, designed to be a drop-in replacement
-    // for C++17's `std::in_place_type_t`.
-    template <typename T>
-    using in_place_type_t = void (*)(utility_internal::InPlaceTypeTag<T>);
-
-    template <typename T>
-    void in_place_type(utility_internal::InPlaceTypeTag<T>) {}
-#endif  // TURBO_USES_STD_ANY || TURBO_USES_STD_VARIANT
-
-#ifdef TURBO_USES_STD_VARIANT
-    using std::in_place_index;
-    using std::in_place_index_t;
-#else
-
-    // in_place_index_t
-    //
-    // Tag type used for in-place construction when the type to construct needs to
-    // be specified, such as with `std::any`, designed to be a drop-in replacement
-    // for C++17's `std::in_place_index_t`.
-    template <size_t I>
-    using in_place_index_t = void (*)(utility_internal::InPlaceIndexTag<I>);
-
-    template <size_t I>
-    void in_place_index(utility_internal::InPlaceIndexTag<I>) {}
-#endif  // TURBO_USES_STD_VARIANT
 
 
     namespace utility_internal {

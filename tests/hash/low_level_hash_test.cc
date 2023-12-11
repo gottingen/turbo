@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/hash/internal/low_level_hash.h"
+#include "turbo/hash/bytes/low_level_hash.h"
 
 #include <cinttypes>
 

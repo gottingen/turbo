@@ -1150,7 +1150,7 @@ namespace {
         for (size_t i = 0; i < kNumRandomTests; ++i) {
             int64_t high = random_int64(rng);
             uint64_t low = random_uint64(rng);
-            IntType value = turbo::MakeInt128(high, low);
+            IntType value = turbo::make_int128(high, low);
 
             int base = random_base(rng);
             std::string str_value;

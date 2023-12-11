@@ -42,37 +42,63 @@
 // of a+b is easily derived from the hashes of a and b.  This property
 // doesn't hold for any hash functions in this file.
 
-#ifndef TURBO_HASH_INTERNAL_CITY_H_
-#define TURBO_HASH_INTERNAL_CITY_H_
+#ifndef TURBO_HASH_CITY_CITY_H_
+#define TURBO_HASH_CITY_CITY_H_
 
-#include <stdint.h>
-#include <stdlib.h>  // for size_t.
+#include <cstdint>
+#include <cstdlib>  // for size_t.
 
 #include <utility>
 
 #include "turbo/platform/port.h"
+#include "turbo/hash/fwd.h"
+
+namespace turbo::hash_internal {
+
+    // Hash function for a byte array.
+    uint64_t CityHash64(const char *s, size_t len);
+
+    // Hash function for a byte array.  For convenience, a 64-bit seed is also
+    // hashed into the result.
+    uint64_t CityHash64WithSeed(const char *s, size_t len, uint64_t seed);
+
+    // Hash function for a byte array.  For convenience, two seeds are also
+    // hashed into the result.
+    uint64_t CityHash64WithSeeds(const char *s, size_t len, uint64_t seed0,
+                                 uint64_t seed1);
+
+    // Hash function for a byte array.  Most useful in 32-bit binaries.
+    uint32_t CityHash32(const char *s, size_t len);
+
+}  // namespace turbo::hash_internal
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace hash_internal {
 
-// Hash function for a byte array.
-uint64_t CityHash64(const char *s, size_t len);
+    struct city_hash_tag {
 
-// Hash function for a byte array.  For convenience, a 64-bit seed is also
-// hashed into the result.
-uint64_t CityHash64WithSeed(const char *s, size_t len, uint64_t seed);
+        static constexpr const char* name() {
+            return "city_hash";
+        }
 
-// Hash function for a byte array.  For convenience, two seeds are also
-// hashed into the result.
-uint64_t CityHash64WithSeeds(const char *s, size_t len, uint64_t seed0,
-                             uint64_t seed1);
+        constexpr static bool available() {
+            return true;
+        }
+    };
 
-// Hash function for a byte array.  Most useful in 32-bit binaries.
-uint32_t CityHash32(const char *s, size_t len);
+    template <>
+    struct hasher_engine<city_hash_tag> {
 
-}  // namespace hash_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        static size_t hash64(const char *s, size_t len);
 
-#endif  // TURBO_HASH_INTERNAL_CITY_H_
+        static size_t hash64_with_seed(const char *s, size_t len, uint64_t seed);
+    };
+
+    inline size_t hasher_engine<city_hash_tag>::hash64(const char *s, size_t len) {
+        return hash_internal::CityHash64(s, len);
+    }
+
+    inline size_t hasher_engine<city_hash_tag>::hash64_with_seed(const char *s, size_t len, uint64_t seed) {
+        return hash_internal::CityHash64WithSeed(s, len, seed);
+    }
+}
+#endif  // TURBO_HASH_CITY_CITY_H_

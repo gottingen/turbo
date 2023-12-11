@@ -28,7 +28,7 @@
 
 namespace turbo {
 
-    static constexpr turbo::ModuleVersion meta_version = turbo::ModuleVersion{0, 9, 36};
+    static constexpr turbo::ModuleVersion platform_version = turbo::ModuleVersion{0, 9, 36};
 
 }  // namespace turbo
 #endif  // TURBO_PLATFORM_VERSION_H_

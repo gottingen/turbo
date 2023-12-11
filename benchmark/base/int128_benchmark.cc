@@ -41,8 +41,8 @@ std::vector<std::pair<T, T>> GetRandomClass128SampleUniformDivisor() {
   std::uniform_int_distribution<H> uniform_h;
   values.reserve(kSampleSize);
   for (size_t i = 0; i < kSampleSize; ++i) {
-    T a{turbo::MakeUint128(uniform_h(random), uniform_h(random))};
-    T b{turbo::MakeUint128(uniform_h(random), uniform_h(random))};
+    T a{turbo::make_uint128(uniform_h(random), uniform_h(random))};
+    T b{turbo::make_uint128(uniform_h(random), uniform_h(random))};
     values.emplace_back(std::max(a, b), std::max(T(2), std::min(a, b)));
   }
   return values;
@@ -81,7 +81,7 @@ std::vector<std::pair<T, H>> GetRandomClass128SampleSmallDivisor() {
   std::uniform_int_distribution<H> uniform_h;
   values.reserve(kSampleSize);
   for (size_t i = 0; i < kSampleSize; ++i) {
-    T a{turbo::MakeUint128(uniform_h(random), uniform_h(random))};
+    T a{turbo::make_uint128(uniform_h(random), uniform_h(random))};
     H b{std::max(H{2}, uniform_h(random))};
     values.emplace_back(std::max(a, T(b)), b);
   }
@@ -119,8 +119,8 @@ std::vector<std::pair<turbo::uint128, turbo::uint128>> GetRandomClass128Sample()
   values.reserve(kSampleSize);
   for (size_t i = 0; i < kSampleSize; ++i) {
     values.emplace_back(
-        turbo::MakeUint128(uniform_uint64(random), uniform_uint64(random)),
-        turbo::MakeUint128(uniform_uint64(random), uniform_uint64(random)));
+        turbo::make_uint128(uniform_uint64(random), uniform_uint64(random)),
+        turbo::make_uint128(uniform_uint64(random), uniform_uint64(random)));
   }
   return values;
 }

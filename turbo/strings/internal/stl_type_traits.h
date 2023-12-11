@@ -238,7 +238,7 @@ struct IsConvertibleToSTLContainer
 
 template <typename C>
 struct IsStrictlyBaseOfAndConvertibleToSTLContainer
-    : std::conjunction<turbo::negation<IsSTLContainer<C>>,
+    : std::conjunction<std::negation<IsSTLContainer<C>>,
                         IsBaseOfSTLContainer<C>,
                         IsConvertibleToSTLContainer<C>> {};
 

@@ -85,12 +85,12 @@ template <typename T, typename U>
 using IsDirectInitializationValid = std::disjunction<
     // Short circuits if T is basically U.
     std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
-    turbo::negation<std::disjunction<
+    std::negation<std::disjunction<
         std::is_same<turbo::ResultStatus<T>,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
-        std::is_same<turbo::in_place_t,
+        std::is_same<std::in_place_t,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
         IsDirectInitializationAmbiguous<T, U>>>>;
 
@@ -123,12 +123,12 @@ template <typename T, typename U>
 using IsForwardingAssignmentValid = std::disjunction<
     // Short circuits if T is basically U.
     std::is_same<T, std::remove_cv_t<std::remove_reference_t<U>>>,
-    turbo::negation<std::disjunction<
+    std::negation<std::disjunction<
         std::is_same<turbo::ResultStatus<T>,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
         std::is_same<turbo::Status,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
-        std::is_same<turbo::in_place_t,
+        std::is_same<std::in_place_t,
                      std::remove_cv_t<std::remove_reference_t<U>>>,
         IsForwardingAssignmentAmbiguous<T, U>>>>;
 
@@ -197,7 +197,7 @@ class ResultStatusData {
   }
 
   template <typename... Args>
-  explicit ResultStatusData(turbo::in_place_t, Args&&... args)
+  explicit ResultStatusData(std::in_place_t, Args&&... args)
       : data_(std::forward<Args>(args)...) {
     make_status();
   }

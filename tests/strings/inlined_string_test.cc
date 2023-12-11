@@ -29,7 +29,7 @@
 #include "turbo/times/clock.h"
 #include <turbo/strings/str_split.h>
 #include "turbo/container/for_each.h"
-#include "turbo/hash/hash.h"
+#include "turbo/hash/hash_old.h"
 #include "gtest/gtest.h"
 
 using namespace std;

@@ -482,7 +482,7 @@ namespace {
     };
 
     TEST(ResultStatus, InPlaceConstruction) {
-        EXPECT_THAT(turbo::ResultStatus<Foo>(turbo::in_place, 10),
+        EXPECT_THAT(turbo::ResultStatus<Foo>(std::in_place, 10),
                     IsOkAndHolds(Field(&Foo::x, 10)));
     }
 
@@ -495,7 +495,7 @@ namespace {
     };
 
     TEST(ResultStatus, InPlaceInitListConstruction) {
-        turbo::ResultStatus<InPlaceHelper> status_or(turbo::in_place, {10, 11, 12},
+        turbo::ResultStatus<InPlaceHelper> status_or(std::in_place, {10, 11, 12},
                                                      std::make_unique<int>(13));
         EXPECT_THAT(status_or, IsOkAndHolds(AllOf(
                 Field(&InPlaceHelper::x, ElementsAre(10, 11, 12)),
@@ -515,7 +515,7 @@ namespace {
     }
 
     TEST(ResultStatus, EmplaceInitializerList) {
-        turbo::ResultStatus<InPlaceHelper> status_or(turbo::in_place, {10, 11, 12},
+        turbo::ResultStatus<InPlaceHelper> status_or(std::in_place, {10, 11, 12},
                                                      std::make_unique<int>(13));
         status_or.emplace({1, 2, 3}, std::make_unique<int>(4));
         EXPECT_THAT(status_or,

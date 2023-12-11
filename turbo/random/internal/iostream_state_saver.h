@@ -187,13 +187,13 @@ struct stream_u128_helper<turbo::uint128> {
     uint64_t h = 0;
     uint64_t l = 0;
     in >> h >> l;
-    return turbo::MakeUint128(h, l);
+    return turbo::make_uint128(h, l);
   }
 
   template <typename OStream>
   inline void write(turbo::uint128 val, OStream& out) {
-    uint64_t h = turbo::Uint128High64(val);
-    uint64_t l = turbo::Uint128Low64(val);
+    uint64_t h = turbo::uint128_high64(val);
+    uint64_t l = turbo::uint128_low64(val);
     out << h << out.fill() << l;
   }
 };

@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "turbo/hash/hash.h"
+#include "turbo/hash/hash_old.h"
 #include "turbo/strings/match.h"
 #include "turbo/format/format.h"
 

@@ -23,6 +23,7 @@
 
 /**
  * @defgroup turbo_memory_pool turbo_memory
+ * @defgroup turbo_memory_info turbo_memory
  */
 
 namespace turbo {

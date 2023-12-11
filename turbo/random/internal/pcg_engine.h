@@ -225,11 +225,11 @@ namespace turbo::random_internal {
         using state_type = turbo::uint128;
 
         static inline constexpr state_type multiplier() {
-            return turbo::MakeUint128(kMultA, kMultB);
+            return turbo::make_uint128(kMultA, kMultB);
         }
 
         static inline constexpr state_type increment() {
-            return turbo::MakeUint128(kIncA, kIncB);
+            return turbo::make_uint128(kIncA, kIncB);
         }
     };
 

@@ -102,3 +102,15 @@ carbin_cc_test(
         turbo::turbo
         ${CARBIN_DEPS_LINK}
 )
+
+carbin_cc_test(
+        NAME
+        engine_test
+        SOURCES
+        "engine_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+        ${CARBIN_DEPS_LINK}
+)

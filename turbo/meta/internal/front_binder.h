@@ -46,7 +46,7 @@ namespace turbo {
 
         public:
             template<class... Ts>
-            constexpr explicit FrontBinder(turbo::in_place_t, Ts &&... ts)
+            constexpr explicit FrontBinder(std::in_place_t, Ts &&... ts)
                     : bound_args_(std::forward<Ts>(ts)...) {}
 
             template<class... FreeArgs, class R = std::invoke_result_t<

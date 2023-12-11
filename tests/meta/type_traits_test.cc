@@ -59,61 +59,6 @@ namespace {
                 std::enable_if_t<std::is_same<T &&, StructA &>::value, int> = 0>
         ConvertibleToReturnType bar(T &&, const StructB &, StructC &&) &&;  // NOLINT
     };
-
-    template<class Class, class... Ts>
-    using BarIsCallableImpl =
-            decltype(std::declval<Class>().bar(std::declval<Ts>()...));
-
-    template<class Class, class... T>
-    using BarIsCallable =
-            turbo::type_traits_internal::is_detected<BarIsCallableImpl, Class, T...>;
-
-    template<class Class, class... T>
-    using BarIsCallableConv = turbo::type_traits_internal::is_detected_convertible<
-            ReturnType, BarIsCallableImpl, Class, T...>;
-
-    // NOTE: Test of detail type_traits_internal::is_detected.
-    TEST_CASE("IsDetectedTest, BasicUsage") {
-        REQUIRE((BarIsCallable<TypeWithBarFunction, StructA &, const StructB &,
-                StructC>::value));
-        REQUIRE(
-                (BarIsCallable<TypeWithBarFunction, StructA &, StructB &, StructC>::value));
-        REQUIRE(
-                (BarIsCallable<TypeWithBarFunction, StructA &, StructB, StructC>::value));
-
-        REQUIRE_FALSE((BarIsCallable<int, StructA &, const StructB &, StructC>::value));
-        REQUIRE_FALSE((BarIsCallable<TypeWithBarFunction &, StructA &, const StructB &,
-                StructC>::value));
-        REQUIRE_FALSE((BarIsCallable<TypeWithBarFunction, StructA, const StructB &,
-                StructC>::value));
-    }
-
-    // NOTE: Test of detail type_traits_internal::is_detected_convertible.
-    TEST_CASE("IsDetectedConvertibleTest, BasicUsage") {
-        REQUIRE((BarIsCallableConv<TypeWithBarFunction, StructA &, const StructB &,
-                StructC>::value));
-        REQUIRE((BarIsCallableConv<TypeWithBarFunction, StructA &, StructB &,
-                StructC>::value));
-        REQUIRE((BarIsCallableConv<TypeWithBarFunction, StructA &, StructB,
-                StructC>::value));
-        REQUIRE((BarIsCallableConv<TypeWithBarFunctionAndConvertibleReturnType,
-                StructA &, const StructB &, StructC>::value));
-        REQUIRE((BarIsCallableConv<TypeWithBarFunctionAndConvertibleReturnType,
-                StructA &, StructB &, StructC>::value));
-        REQUIRE((BarIsCallableConv<TypeWithBarFunctionAndConvertibleReturnType,
-                StructA &, StructB, StructC>::value));
-
-        REQUIRE_FALSE(
-                (BarIsCallableConv<int, StructA &, const StructB &, StructC>::value));
-        REQUIRE_FALSE((BarIsCallableConv<TypeWithBarFunction &, StructA &,
-                const StructB &, StructC>::value));
-        REQUIRE_FALSE((BarIsCallableConv<TypeWithBarFunction, StructA, const StructB &,
-                StructC>::value));
-        REQUIRE_FALSE((BarIsCallableConv<TypeWithBarFunctionAndConvertibleReturnType &,
-                StructA &, const StructB &, StructC>::value));
-        REQUIRE_FALSE((BarIsCallableConv<TypeWithBarFunctionAndConvertibleReturnType,
-                StructA, const StructB &, StructC>::value));
-    }
     
 
     struct MyTrueType {
@@ -126,10 +71,10 @@ namespace {
 
 
     TEST_CASE("NegationTest, BasicBooleanLogic") {
-        REQUIRE_FALSE(turbo::negation<std::true_type>::value);
-        REQUIRE_FALSE(turbo::negation<MyTrueType>::value);
-        REQUIRE(turbo::negation<std::false_type>::value);
-        REQUIRE(turbo::negation<MyFalseType>::value);
+        REQUIRE_FALSE(std::negation<std::true_type>::value);
+        REQUIRE_FALSE(std::negation<MyTrueType>::value);
+        REQUIRE(std::negation<std::false_type>::value);
+        REQUIRE(std::negation<MyFalseType>::value);
     }
 
     // all member functions are trivial
@@ -214,7 +159,7 @@ namespace {
 
     struct GetTypeExtT {
         template<typename T>
-        turbo::result_of_t<const GetTypeT &(T)> operator()(T &&arg) const {
+        std::result_of_t<const GetTypeT &(T)> operator()(T &&arg) const {
             return GetType(std::forward<T>(arg));
         }
 
@@ -247,99 +192,7 @@ namespace {
 
     }  // namespace adl_namespace
 
-    TEST_CASE("TypeTraitsTest, IsSwappable") {
-        using turbo::type_traits_internal::IsSwappable;
-        using turbo::type_traits_internal::StdSwapIsUnconstrained;
 
-        REQUIRE(IsSwappable<int>::value);
-
-        struct S {
-        };
-        REQUIRE(IsSwappable<S>::value);
-
-        struct NoConstruct {
-            NoConstruct(NoConstruct &&) = delete;
-
-            NoConstruct &operator=(NoConstruct &&) { return *this; }
-
-            ~NoConstruct() = default;
-        };
-
-        REQUIRE_EQ(IsSwappable<NoConstruct>::value, StdSwapIsUnconstrained::value);
-        struct NoAssign {
-            NoAssign(NoAssign &&) {}
-
-            NoAssign &operator=(NoAssign &&) = delete;
-
-            ~NoAssign() = default;
-        };
-
-        REQUIRE_EQ(IsSwappable<NoAssign>::value, StdSwapIsUnconstrained::value);
-
-        REQUIRE_FALSE(IsSwappable<adl_namespace::DeletedSwap>::value);
-
-        REQUIRE(IsSwappable<adl_namespace::SpecialNoexceptSwap>::value);
-    }
-
-    TEST_CASE("TypeTraitsTest, IsNothrowSwappable") {
-        using turbo::type_traits_internal::IsNothrowSwappable;
-        using turbo::type_traits_internal::StdSwapIsUnconstrained;
-
-        REQUIRE(IsNothrowSwappable<int>::value);
-
-        struct NonNoexceptMoves {
-            NonNoexceptMoves(NonNoexceptMoves &&) {}
-
-            NonNoexceptMoves &operator=(NonNoexceptMoves &&) { return *this; }
-
-            ~NonNoexceptMoves() = default;
-        };
-
-        REQUIRE_FALSE(IsNothrowSwappable<NonNoexceptMoves>::value);
-
-        struct NoConstruct {
-            NoConstruct(NoConstruct &&) = delete;
-
-            NoConstruct &operator=(NoConstruct &&) { return *this; }
-
-            ~NoConstruct() = default;
-        };
-
-        REQUIRE_FALSE(IsNothrowSwappable<NoConstruct>::value);
-
-        struct NoAssign {
-            NoAssign(NoAssign &&) {}
-
-            NoAssign &operator=(NoAssign &&) = delete;
-
-            ~NoAssign() = default;
-        };
-
-        REQUIRE_FALSE(IsNothrowSwappable<NoAssign>::value);
-
-        REQUIRE_FALSE(IsNothrowSwappable<adl_namespace::DeletedSwap>::value);
-
-        REQUIRE(IsNothrowSwappable<adl_namespace::SpecialNoexceptSwap>::value);
-    }
-
-    TEST_CASE("TrivallyRelocatable, Sanity") {
-#if !defined(TURBO_HAVE_ATTRIBUTE_TRIVIAL_ABI) || \
-    !TURBO_HAVE_BUILTIN(__is_trivially_relocatable)
-        INFO("No trivial ABI support.");
-#endif
-
-        struct Trivial {
-        };
-        struct NonTrivial {
-            NonTrivial(const NonTrivial &) {}  // NOLINT
-        };
-        struct TURBO_ATTRIBUTE_TRIVIAL_ABI TrivialAbi {
-            TrivialAbi(const TrivialAbi &) {}  // NOLINT
-        };
-        REQUIRE(turbo::is_trivially_relocatable<Trivial>::value);
-        REQUIRE_FALSE(turbo::is_trivially_relocatable<NonTrivial>::value);
-        REQUIRE(turbo::is_trivially_relocatable<TrivialAbi>::value);
-    }
 
 #ifdef TURBO_HAVE_CONSTANT_EVALUATED
 

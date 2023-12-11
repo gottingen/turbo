@@ -17,7 +17,7 @@
 #include <numeric>
 #include <vector>
 
-#include "turbo/hash/hash.h"
+#include "turbo/hash/hash_old.h"
 #include "benchmark/benchmark.h"
 
 namespace {

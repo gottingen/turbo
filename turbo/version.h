@@ -27,6 +27,7 @@
 #include "turbo/memory/version.h"
 #include "turbo/meta/version.h"
 #include "turbo/module/version.h"
+#include "turbo/platform/version.h"
 #include "turbo/random/version.h"
 #include "turbo/simd/version.h"
 #include "turbo/strings/version.h"
@@ -61,6 +62,7 @@ namespace turbo {
     static_assert(kMinCompatibleVersion <= log_version, "Turbo version is lower than log version");
     static_assert(kMinCompatibleVersion <= memory_version, "Turbo version is lower than memory version");
     static_assert(kMinCompatibleVersion <= meta_version, "Turbo version is lower than meta version");
+    static_assert(kMinCompatibleVersion <= platform_version, "Turbo version is lower than platform version");
     static_assert(kMinCompatibleVersion <= module_version, "Turbo version is lower than module version");
     static_assert(kMinCompatibleVersion <= random_version, "Turbo version is lower than random version");
     static_assert(kMinCompatibleVersion <= simd_version, "Turbo version is lower than simd version");
@@ -81,6 +83,7 @@ namespace turbo {
     static_assert(version >= memory_version, "Turbo version is lower than memory version");
     static_assert(version >= meta_version, "Turbo version is lower than meta version");
     static_assert(version >= module_version, "Turbo version is lower than module version");
+    static_assert(version >= platform_version, "Turbo version is lower than platform version");
     static_assert(version >= random_version, "Turbo version is lower than random version");
     static_assert(version >= simd_version, "Turbo version is lower than simd version");
     static_assert(version >= strings_version, "Turbo version is lower than strings version");

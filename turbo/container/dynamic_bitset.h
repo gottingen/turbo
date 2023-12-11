@@ -127,22 +127,22 @@
 
 namespace turbo {
 
-//
-// @brief      Dynamic bitset.
-//
-// @details    Data structure used to store a vector of bits and apply binary operations to it. The
-//             bits are stored in an optimized way in an underling block type. It is highly inspired
-//             by std\::bitset but with a run-time changeable size.
-//
-//             Preconditions are checked with @a assert but no exception will be thrown if one is
-//             violated (as with std\::bitset).
-//
-// @remark     It is not a Container as it does not provide iterators because of the reference proxy
-//             class used to access the bits.
-//
-// @tparam     Block      Block type to use for storing the bits, must be an unsigned integral type
-// @tparam     Allocator  Allocator type to use for memory management, must meet the standard
-//             requirements of @a Allocator
+    //
+    // @brief      Dynamic bitset.
+    //
+    // @details    Data structure used to store a vector of bits and apply binary operations to it. The
+    //             bits are stored in an optimized way in an underling block type. It is highly inspired
+    //             by std\::bitset but with a run-time changeable size.
+    //
+    //             Preconditions are checked with @a assert but no exception will be thrown if one is
+    //             violated (as with std\::bitset).
+    //
+    // @remark     It is not a Container as it does not provide iterators because of the reference proxy
+    //             class used to access the bits.
+    //
+    // @tparam     Block      Block type to use for storing the bits, must be an unsigned integral type
+    // @tparam     Allocator  Allocator type to use for memory management, must meet the standard
+    //             requirements of @a Allocator
 
     template<typename Block = unsigned long long, typename Allocator = std::allocator<Block>>
     class dynamic_bitset {

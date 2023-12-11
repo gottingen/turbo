@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/hash/hash.h"
+#include "turbo/hash/hash_old.h"
 
 #include <algorithm>
 #include <array>
@@ -1243,30 +1243,30 @@ TEST(HashTest, DoesNotUseImplicitConversionsToBool) {
             turbo::Hash<ValueWithBoolConversion>()(ValueWithBoolConversion{1}));
 }
 
-TEST(HashOf, MatchesHashForSingleArgument) {
+TEST(hash_of, MatchesHashForSingleArgument) {
   std::string s = "forty two";
   int i = 42;
   double d = 42.0;
   std::tuple<int, int> t{4, 2};
 
-  EXPECT_EQ(turbo::HashOf(s), turbo::Hash<std::string>{}(s));
-  EXPECT_EQ(turbo::HashOf(i), turbo::Hash<int>{}(i));
-  EXPECT_EQ(turbo::HashOf(d), turbo::Hash<double>{}(d));
-  EXPECT_EQ(turbo::HashOf(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
+  EXPECT_EQ(turbo::hash_of(s), turbo::Hash<std::string>{}(s));
+  EXPECT_EQ(turbo::hash_of(i), turbo::Hash<int>{}(i));
+  EXPECT_EQ(turbo::hash_of(d), turbo::Hash<double>{}(d));
+  EXPECT_EQ(turbo::hash_of(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
 }
 
-TEST(HashOf, MatchesHashOfTupleForMultipleArguments) {
+TEST(hash_of, MatchesHashOfTupleForMultipleArguments) {
   std::string hello = "hello";
   std::string world = "world";
 
-  EXPECT_EQ(turbo::HashOf(), turbo::HashOf(std::make_tuple()));
-  EXPECT_EQ(turbo::HashOf(hello), turbo::HashOf(std::make_tuple(hello)));
-  EXPECT_EQ(turbo::HashOf(hello, world),
-            turbo::HashOf(std::make_tuple(hello, world)));
+  EXPECT_EQ(turbo::hash_of(), turbo::hash_of(std::make_tuple()));
+  EXPECT_EQ(turbo::hash_of(hello), turbo::hash_of(std::make_tuple(hello)));
+  EXPECT_EQ(turbo::hash_of(hello, world),
+            turbo::hash_of(std::make_tuple(hello, world)));
 }
 
 template <typename T>
-std::true_type HashOfExplicitParameter(decltype(turbo::HashOf<T>(0))) {
+std::true_type HashOfExplicitParameter(decltype(turbo::hash_of<T>(0))) {
   return {};
 }
 template <typename T>
@@ -1274,7 +1274,7 @@ std::false_type HashOfExplicitParameter(size_t) {
   return {};
 }
 
-TEST(HashOf, CantPassExplicitTemplateParameters) {
+TEST(hash_of, CantPassExplicitTemplateParameters) {
   EXPECT_FALSE(HashOfExplicitParameter<int>(0));
 }
 

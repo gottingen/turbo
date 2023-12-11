@@ -75,9 +75,9 @@ set(TURBO_ALL_SRC
         "flags/validators.cc"
         "format/fmt/format.cc"
         "format/fmt/os.cc"
-        "hash/internal/city.cc"
+        "hash/city/city.cc"
         "hash/internal/hash.cc"
-        "hash/internal/low_level_hash.cc"
+        "hash/bytes/low_level_hash.cc"
         "log/async.cc"
         "log/cfg.cc"
         "log/condition.cc"
@@ -88,6 +88,7 @@ set(TURBO_ALL_SRC
         "log/stdout_sinks.cc"
         "memory/jemalloc_helper.cc"
         "memory/memory.cc"
+        "memory/memory_info.cc"
         "module/module_loader.cc"
         "module/module.cc"
         "platform/internal/cycleclock.cc"
@@ -194,3 +195,14 @@ if (BUILD_SHARED_LIBRARY)
     )
 endif (BUILD_SHARED_LIBRARY)
 
+file(GLOB_RECURSE TCLI_SRC "tools/*.cc")
+carbin_cc_binary(
+        NAME
+        turbo
+        SOURCES
+        ${TCLI_SRC}
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)
