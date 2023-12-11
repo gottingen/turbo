@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "low_level_hash.h"
-
+#include "turbo/hash/bytes/bytes_hash.h"
+#include "turbo/hash/city/city.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/base/int128.h"
-
+#ifdef TURBO_HAVE_INTRINSIC_INT128
 namespace turbo::hash_internal {
 
     static uint64_t Mix(uint64_t v0, uint64_t v1) {
@@ -25,7 +25,7 @@ namespace turbo::hash_internal {
         return turbo::uint128_low64(p) ^ turbo::uint128_high64(p);
     }
 
-    uint64_t LowLevelHash(const void *data, size_t len, uint64_t seed,
+    uint64_t bytes_hash(const void *data, size_t len, uint64_t seed,
                           const uint64_t salt[5]) {
         const uint8_t *ptr = static_cast<const uint8_t *>(data);
         uint64_t starting_length = static_cast<uint64_t>(len);
@@ -105,4 +105,33 @@ namespace turbo::hash_internal {
         return Mix(w, z);
     }
 }  // namespace turbo::hash_internal
+#endif // TURBO_HAVE_INTRINSIC_INT128
 
+namespace turbo {
+    namespace bytes_internal {
+        constexpr uint64_t kDefaultHashSalt[5] = {
+                uint64_t{0x243F6A8885A308D3}, uint64_t{0x13198A2E03707344},
+                uint64_t{0xA4093822299F31D0}, uint64_t{0x082EFA98EC4E6C89},
+                uint64_t{0x452821E638D01377},
+        };
+    } // namespace bytes_internal
+
+    uint32_t hasher_engine<bytes_hash_tag>::hash32(const char *s, size_t len) {
+        return hash_internal::CityHash32(s, len);
+    }
+    size_t hasher_engine<bytes_hash_tag>::hash64(const char *s, size_t len) {
+#ifdef TURBO_HAVE_INTRINSIC_INT128
+        return hash_internal::bytes_hash(s, len, 0, bytes_internal::kDefaultHashSalt);
+#else
+        return hash_internal::CityHash64(reinterpret_cast<const char*>(data), len);
+#endif
+    }
+
+    size_t hasher_engine<bytes_hash_tag>::hash64_with_seed(const char *s, size_t len, uint64_t seed) {
+#ifdef TURBO_HAVE_INTRINSIC_INT128
+        return hash_internal::bytes_hash(s, len, seed, bytes_internal::kDefaultHashSalt);
+#else
+        return hash_internal::CityHash64WithSeed(reinterpret_cast<const char*>(data), len, seed);
+#endif
+    }
+}

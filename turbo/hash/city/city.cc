@@ -19,7 +19,7 @@
 // possible hash functions, by using SIMD instructions, or by
 // compromising on hash quality.
 
-#include "city.h"
+#include "turbo/hash/city/city.h"
 
 #include <string.h>  // for memcpy and memset
 #include <algorithm>
@@ -342,3 +342,16 @@ namespace turbo::hash_internal {
     }
 
 }  // namespace turbo::hash_internal
+namespace turbo {
+    uint32_t hasher_engine<city_hash_tag>::hash32(const char *s, size_t len) {
+        return hash_internal::CityHash32(s, len);
+    }
+
+    size_t hasher_engine<city_hash_tag>::hash64(const char *s, size_t len) {
+        return hash_internal::CityHash64(s, len);
+    }
+
+    size_t hasher_engine<city_hash_tag>::hash64_with_seed(const char *s, size_t len, uint64_t seed) {
+        return hash_internal::CityHash64WithSeed(s, len, seed);
+    }
+}

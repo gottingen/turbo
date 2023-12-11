@@ -3846,8 +3846,8 @@ inline bool has_executable_extension(const path &p) {
             return iterator(*this, _path.end());
         }
 
-//-----------------------------------------------------------------------------
-// [fs.path.nonmember] path non-member functions
+        //-----------------------------------------------------------------------------
+        // [fs.path.nonmember] path non-member functions
         inline void swap(path & lhs, path & rhs)
         noexcept {
         swap(lhs

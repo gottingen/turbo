@@ -45,7 +45,6 @@
 
 #include "turbo/base/int128.h"
 #include "turbo/container/fixed_array.h"
-#include "turbo/hash/city/city.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
 #include <variant>
@@ -61,16 +60,16 @@
 
 namespace turbo::hash_internal {
 
-    template<typename T>
+    template<typename T, typename Tag>
     struct HashImpl {
         size_t operator()(const T &value) const {
-            return MixingHashState::hash(value);
+            return MixingHashState<Tag>::hash(value);
         }
     };
 
-    template<typename T>
+    template<typename T, typename Tag>
     struct Hash
-            : std::conditional_t<is_hashable<T>::value, HashImpl<T>, PoisonedHash> {
+            : std::conditional_t<is_hashable<T>::value, HashImpl<T, Tag>, PoisonedHash> {
     };
 
     template<typename H>

@@ -24,7 +24,7 @@ void run_version_cmd();
 
 int main(int argc, char **argv) {
     turbo::App app("turbo", "Turbo is command line tool for convenient usage");
-    app.add_flag("--version", turbo::tools::Context::get_instance().version, "0.0.1");
+    app.add_flag("-v, --version", turbo::tools::Context::get_instance().version, "0.0.1");
     turbo::tools::set_up_hash_cmdline(app);
     app.callback([&]() {
         if (turbo::tools::Context::get_instance().version) {
@@ -59,5 +59,7 @@ void run_version_cmd() {
     versions.add_row({"Turbo-simd", turbo::simd_version.to_string()});
     versions.add_row({"Turbo-strings", turbo::strings_version.to_string()});
     versions.add_row({"Turbo-times", turbo::times_version.to_string()});
+    versions.column(0).format().font_color(turbo::Color::yellow);
+    versions.column(1).format().font_color(turbo::Color::green);
     std::cout<<versions<<std::endl;
 }

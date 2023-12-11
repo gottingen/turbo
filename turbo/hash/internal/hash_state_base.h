@@ -20,7 +20,7 @@
 #define TURBO_HASH_INTERNAL_HASH_STATE_BASE_H_
 
 #include "turbo/hash/internal/piece_wise_combiner.h"
-#include "turbo/hash/bytes/low_level_hash.h"
+
 
 namespace turbo::hash_internal {
 

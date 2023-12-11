@@ -17,10 +17,7 @@
 #ifndef TURBO_HASH_HASH_H_
 #define TURBO_HASH_HASH_H_
 
-#include "turbo/hash/mix/simple_mix.h"
-#include "turbo/hash/mix/murmur_mix.h"
-#include "turbo/hash/city/city.h"
-#include "turbo/hash/bytes/low_level_hash.h"
+#include "turbo/hash/hash_engine.h"
 
 namespace turbo {
 

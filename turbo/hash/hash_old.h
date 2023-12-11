@@ -83,6 +83,7 @@
 
 #include "turbo/meta/function_ref.h"
 #include "turbo/hash/internal/hash.h"
+#include "turbo/hash/hash_engine.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -243,8 +244,8 @@ namespace turbo {
     // Note: unlike `std::hash', `turbo::Hash` should never be specialized. It must
     // only be extended by adding `TurboHashValue()` overloads.
     //
-    template<typename T>
-    using Hash = turbo::hash_internal::Hash<T>;
+    template<typename T, typename Tag = default_hash_engine>
+    using Hash = turbo::hash_internal::Hash<T, Tag>;
 
     // hash_of
     //

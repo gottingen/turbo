@@ -88,17 +88,11 @@ namespace turbo {
     template <>
     struct hasher_engine<city_hash_tag> {
 
+        static uint32_t hash32(const char *s, size_t len);
+
         static size_t hash64(const char *s, size_t len);
 
         static size_t hash64_with_seed(const char *s, size_t len, uint64_t seed);
     };
-
-    inline size_t hasher_engine<city_hash_tag>::hash64(const char *s, size_t len) {
-        return hash_internal::CityHash64(s, len);
-    }
-
-    inline size_t hasher_engine<city_hash_tag>::hash64_with_seed(const char *s, size_t len, uint64_t seed) {
-        return hash_internal::CityHash64WithSeed(s, len, seed);
-    }
 }
 #endif  // TURBO_HASH_CITY_CITY_H_

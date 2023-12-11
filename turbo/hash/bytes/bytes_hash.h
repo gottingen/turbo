@@ -39,19 +39,12 @@ namespace turbo::hash_internal {
     // To allow all hashable types (including std::string_view and Span) to depend on
     // this algorithm, we keep the API low-level, with as few dependencies as
     // possible.
-    uint64_t LowLevelHash(const void *data, size_t len, uint64_t seed,
+    uint64_t bytes_hash(const void *data, size_t len, uint64_t seed,
                           const uint64_t salt[5]);
 
 }  // namespace turbo::hash_internal
 
 namespace turbo {
-    namespace bytes_internal {
-        constexpr uint64_t kDefaultHashSalt[5] = {
-                uint64_t{0x243F6A8885A308D3}, uint64_t{0x13198A2E03707344},
-                uint64_t{0xA4093822299F31D0}, uint64_t{0x082EFA98EC4E6C89},
-                uint64_t{0x452821E638D01377},
-        };
-    } // namespace bytes_internal
 
     struct bytes_hash_tag {
 
@@ -67,17 +60,12 @@ namespace turbo {
     template <>
     struct hasher_engine<bytes_hash_tag> {
 
+        static uint32_t hash32(const char *s, size_t len);
+
         static size_t hash64(const char *s, size_t len);
 
         static size_t hash64_with_seed(const char *s, size_t len, uint64_t seed);
     };
 
-    inline size_t hasher_engine<bytes_hash_tag>::hash64(const char *s, size_t len) {
-        return hash_internal::LowLevelHash(s, len, 0, bytes_internal::kDefaultHashSalt);
-    }
-
-    inline size_t hasher_engine<bytes_hash_tag>::hash64_with_seed(const char *s, size_t len, uint64_t seed) {
-        return hash_internal::LowLevelHash(s, len, seed, bytes_internal::kDefaultHashSalt);
-    }
-}
+}  // namespace turbo
 #endif  // TURBO_HASH_BYTES_LOW_LEVEL_HASH_H_

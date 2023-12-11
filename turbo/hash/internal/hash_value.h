@@ -18,7 +18,6 @@
 #define TURBO_HASH_INTERNAL_HASH_VALUE_H_
 
 #include <type_traits>
-#include "turbo/hash/bytes/low_level_hash.h"
 
 namespace turbo::hash_internal {
 

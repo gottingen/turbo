@@ -20,7 +20,9 @@
 #include "turbo/base/bits.h"
 #include "turbo/platform/port.h"
 #include "turbo/hash/internal/hash_state_base.h"
+#include "turbo/hash/hash_engine.h"
 #include "turbo/base/endian.h"
+#include "turbo/hash/fwd.h"
 
 namespace turbo {
     class HashState;
@@ -29,7 +31,8 @@ namespace turbo {
 namespace turbo::hash_internal {
 
     // MixingHashState
-    class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState> {
+    template<typename Tag>
+    class TURBO_DLL MixingHashState : public HashStateBase<MixingHashState<Tag>> {
         // turbo::uint128 is not an alias or a thin wrapper around the intrinsic.
         // We use the intrinsic when available to improve performance.
 #ifdef TURBO_HAVE_INTRINSIC_INT128
@@ -81,7 +84,7 @@ namespace turbo::hash_internal {
         // Overload of MixingHashState::hash()
         template<typename T, std::enable_if_t<!IntegralFastPath<T>::value, int> = 0>
         static size_t hash(const T &value) {
-            return static_cast<size_t>(combine(MixingHashState{}, value).state_);
+            return static_cast<size_t>( HashStateBase<MixingHashState<Tag>>::combine(MixingHashState{}, value).state_);
         }
 
     private:
@@ -107,7 +110,7 @@ namespace turbo::hash_internal {
                 }
                 inner_state = MixingHashState{};
             });
-            return MixingHashState::combine(std::move(state), unordered_state);
+            return  HashStateBase<MixingHashState<Tag>>::combine(std::move(state), unordered_state);
         }
 
         // Allow the HashState type-erasure implementation to invoke
@@ -212,17 +215,9 @@ namespace turbo::hash_internal {
             return static_cast<uint64_t>(m ^ (m >> (sizeof(m) * 8 / 2)));
         }
 
-        // An extern to avoid bloat on a direct call to LowLevelHash() with fixed
-        // values for both the seed and salt parameters.
-        static uint64_t LowLevelHashImpl(const unsigned char *data, size_t len);
-
         TURBO_FORCE_INLINE static uint64_t Hash64(const unsigned char *data,
                                                   size_t len) {
-#ifdef TURBO_HAVE_INTRINSIC_INT128
-            return LowLevelHashImpl(data, len);
-#else
-            return hash_internal::CityHash64(reinterpret_cast<const char*>(data), len);
-#endif
+            return hasher_engine<Tag>::hash64(reinterpret_cast<const char *>(data), len);
         }
 
         // Seed()
@@ -258,7 +253,8 @@ namespace turbo::hash_internal {
     };
 
     // MixingHashState::CombineContiguousImpl()
-    inline uint64_t MixingHashState::CombineContiguousImpl(
+    template<typename Tag>
+    inline uint64_t MixingHashState<Tag>::CombineContiguousImpl(
             uint64_t state, const unsigned char *first, size_t len,
             std::integral_constant<int, 4> /* sizeof_size_t */) {
         // For large values we use CityHash, for small ones we just use a
@@ -268,7 +264,7 @@ namespace turbo::hash_internal {
             if (TURBO_UNLIKELY(len > PiecewiseChunkSize())) {
                 return CombineLargeContiguousImpl32(state, first, len);
             }
-            v = hash_internal::CityHash32(reinterpret_cast<const char *>(first), len);
+            v = hasher_engine<Tag>::hash32(reinterpret_cast<const char *>(first), len);
         } else if (len >= 4) {
             v = Read4To8(first, len);
         } else if (len > 0) {
@@ -281,7 +277,8 @@ namespace turbo::hash_internal {
     }
 
     // Overload of MixingHashState::CombineContiguousImpl()
-    inline uint64_t MixingHashState::CombineContiguousImpl(
+    template<typename Tag>
+    inline uint64_t MixingHashState<Tag>::CombineContiguousImpl(
             uint64_t state, const unsigned char *first, size_t len,
             std::integral_constant<int, 8> /* sizeof_size_t */) {
         // For large values we use LowLevelHash or CityHash depending on the platform,
@@ -319,6 +316,8 @@ namespace turbo::hash_internal {
         }
         return Mix(state, v);
     }
+
+    extern template class MixingHashState<bytes_hash_tag>;
 }  // namespace turbo::hash_internal
 
 #endif  // TURBO_HASH_INTERNAL_MIXING_HASH_STATE_H_
