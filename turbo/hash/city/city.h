@@ -94,5 +94,5 @@ namespace turbo {
 
         static size_t hash64_with_seed(const char *s, size_t len, uint64_t seed);
     };
-}
+}  // namespace turbo
 #endif  // TURBO_HASH_CITY_CITY_H_

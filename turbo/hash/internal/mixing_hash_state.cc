@@ -49,4 +49,5 @@ namespace turbo::hash_internal {
     TURBO_CONST_INIT const void *const MixingHashState<Tag>::kSeed = &kSeed;
 
     template class MixingHashState<bytes_hash_tag>;
+    template class MixingHashState<m3_hash_tag>;
 }  // namespace turbo::hash_internal

@@ -71,7 +71,10 @@ namespace turbo {
         aa.a = 3;
         turbo::Println("std r: {}", std::hash<HashTest>()(aa));
 
-        turbo::Println("murmur r: {}", turbo::Hash<HashTest>()(aa));
-        turbo::Println("murmur r: {}", turbo::Hash<int>{}(3));
+        turbo::Println("bytes engine: {}", turbo::Hash<HashTest>()(aa));
+        turbo::Println("bytes engine: {}", turbo::Hash<int>{}(3));
+
+        turbo::Println("m3 engine: {}", turbo::Hash<HashTest,m3_hash_tag>()(aa));
+        turbo::Println("m3 engine: {}", turbo::Hash<int, m3_hash_tag>{}(3));
     }
 }
