@@ -778,7 +778,7 @@ namespace turbo {
 
     private:
         template<typename H, typename TheT, size_t TheN, typename TheA>
-        friend H TurboHashValue(H h, const turbo::InlinedVector<TheT, TheN, TheA> &a);
+        friend H hash_value(H h, const turbo::InlinedVector<TheT, TheN, TheA> &a);
 
         void MoveAssignment(MemcpyPolicy, InlinedVector &&other) {
             inlined_vector_internal::DestroyAdapter<A>::DestroyElements(
@@ -895,12 +895,12 @@ namespace turbo {
         return !(a < b);
     }
 
-    // `TurboHashValue(...)`
+    // `hash_value(...)`
     //
     // Provides `turbo::Hash` support for `turbo::InlinedVector`. It is uncommon to
     // call this directly.
     template<typename H, typename T, size_t N, typename A>
-    H TurboHashValue(H h, const turbo::InlinedVector<T, N, A> &a) {
+    H hash_value(H h, const turbo::InlinedVector<T, N, A> &a) {
         auto size = a.size();
         return H::combine(H::combine_contiguous(std::move(h), a.data(), size), size);
     }

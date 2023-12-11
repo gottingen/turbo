@@ -50,7 +50,7 @@ class TypeErasedInterface {
   virtual ~TypeErasedInterface() = default;
 
   template <typename H>
-  friend H TurboHashValue(H state, const TypeErasedInterface& wrapper) {
+  friend H hash_value(H state, const TypeErasedInterface& wrapper) {
     state = H::combine(std::move(state), std::type_index(typeid(wrapper)));
     wrapper.HashValue(turbo::HashState::Create(&state));
     return state;
@@ -130,7 +130,7 @@ struct FastUnorderedSet {
   std::vector<T> values;
 
   template <typename H>
-  friend H TurboHashValue(H h, const FastUnorderedSet& fus) {
+  friend H hash_value(H h, const FastUnorderedSet& fus) {
     return H::combine(H::combine_unordered(std::move(h), fus.values.begin(),
                                            fus.values.end()),
                       fus.values.size());

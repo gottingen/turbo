@@ -211,4 +211,5 @@ carbin_cc_binary(
         ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
+        PUBLIC
 )

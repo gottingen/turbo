@@ -229,7 +229,7 @@ namespace turbo {
 
         // Support for turbo::Hash.
         template<typename H>
-        friend H TurboHashValue(H h, uint128 v) {
+        friend H hash_value(H h, uint128 v) {
             return H::combine(std::move(h), uint128_high64(v), uint128_low64(v));
         }
 
@@ -498,7 +498,7 @@ namespace turbo {
 
         // Support for turbo::Hash.
         template<typename H>
-        friend H TurboHashValue(H h, int128 v) {
+        friend H hash_value(H h, int128 v) {
             return H::combine(std::move(h), int128_high64(v), int128_low64(v));
         }
 

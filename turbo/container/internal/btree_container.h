@@ -235,7 +235,7 @@ class btree_container {
 
   // Support turbo::Hash.
   template <typename State>
-  friend State TurboHashValue(State h, const btree_container &b) {
+  friend State hash_value(State h, const btree_container &b) {
     for (const auto &v : b) {
       h = State::combine(std::move(h), v);
     }

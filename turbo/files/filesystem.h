@@ -592,7 +592,7 @@ public:
             iterator end() const;
 
             template<typename H>
-            friend H TurboHashValue(H h, const path &p) {
+            friend H hash_value(H h, const path &p) {
                 return H::combine(std::move(h), p.string());
             }
 

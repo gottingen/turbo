@@ -22,7 +22,7 @@
 struct HashTest {
     int a;
     template <typename H>
-    H TurboHashValue(H state, const HashTest& v) {
+    H hash_value(H state, const HashTest& v) {
         return H::combine(std::move(state), v.a);
     }
 };

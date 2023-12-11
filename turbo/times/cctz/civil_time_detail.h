@@ -495,7 +495,7 @@ namespace turbo::time_internal::cctz {
             }
 
             template<typename H>
-            friend H TurboHashValue(H h, civil_time a) {
+            friend H hash_value(H h, civil_time a) {
                 return impl::TurboHashValueImpl(T{}, std::move(h), a.f_);
             }
 

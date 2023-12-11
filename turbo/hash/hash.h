@@ -22,7 +22,7 @@
 //   * The `turbo::Hash` functor, which is used to invoke the hasher within the
 //     Turbo hashing framework. `turbo::Hash<T>` supports most basic types and
 //     a number of Turbo types out of the box.
-//   * `TurboHashValue`, an extension point that allows you to extend types to
+//   * `hash_value`, an extension point that allows you to extend types to
 //     support Turbo hashing without requiring you to define a hashing
 //     algorithm.
 //   * `HashState`, a type-erased class which implements the manipulation of the
@@ -60,14 +60,14 @@
 //   };
 //
 //   // To add hashing support to `Circle`, we simply need to add a free
-//   // (non-member) function `TurboHashValue()`, and return the combined hash
+//   // (non-member) function `hash_value()`, and return the combined hash
 //   // state of the existing hash state and the class state. You can add such a
 //   // free function using a friend declaration within the body of the class:
 //   class Circle {
 //    public:
 //     ...
 //     template <typename H>
-//     friend H TurboHashValue(H h, const Circle& c) {
+//     friend H hash_value(H h, const Circle& c) {
 //       return H::combine(std::move(h), c.center_, c.radius_);
 //     }
 //     ...
@@ -97,7 +97,7 @@ namespace turbo {
     // satisfying any of the following conditions (in order):
     //
     //  * T is an arithmetic or pointer type
-    //  * T defines an overload for `TurboHashValue(H, const T&)` for an arbitrary
+    //  * T defines an overload for `hash_value(H, const T&)` for an arbitrary
     //    hash state `H`.
     //  - T defines a specialization of `std::hash<T>`
     //
@@ -149,12 +149,12 @@ namespace turbo {
     // following order:
     //
     //   * Natively supported types out of the box (see above)
-    //   * Types for which an `TurboHashValue()` overload is provided (such as
+    //   * Types for which an `hash_value()` overload is provided (such as
     //     user-defined types). See "Adding Type Support to `turbo::Hash`" below.
     //   * Types which define a `std::hash<T>` specialization
     //
     // The fallback to legacy hash functions exists mainly for backwards
-    // compatibility. If you have a choice, prefer defining an `TurboHashValue`
+    // compatibility. If you have a choice, prefer defining an `hash_value`
     // overload instead of specializing any legacy hash functors.
     //
     // -----------------------------------------------------------------------------
@@ -168,11 +168,11 @@ namespace turbo {
     //   state of an object. Note that it is up to the implementation how it stores
     //   such state. A hash table, for example, may mix the state to produce an
     //   integer value; a testing framework may simply hold a vector of that state.
-    // * Within implementations of `TurboHashValue()` used to extend user-defined
+    // * Within implementations of `hash_value()` used to extend user-defined
     //   types. (See "Adding Type Support to turbo::Hash" below.)
     // * Inside a `HashState`, providing type erasure for the concept of a hash
     //   state, which you can use to extend the `turbo::Hash` framework for types
-    //   that are otherwise difficult to extend using `TurboHashValue()`. (See the
+    //   that are otherwise difficult to extend using `hash_value()`. (See the
     //   `HashState` class below.)
     //
     // The "hash state" concept contains three member functions for mixing hash
@@ -223,27 +223,27 @@ namespace turbo {
     // Adding Type Support to `turbo::Hash`
     // -----------------------------------------------------------------------------
     //
-    // To add support for your user-defined type, add a proper `TurboHashValue()`
+    // To add support for your user-defined type, add a proper `hash_value()`
     // overload as a free (non-member) function. The overload will take an
     // existing hash state and should combine that state with state from the type.
     //
     // Example:
     //
     //   template <typename H>
-    //   H TurboHashValue(H state, const MyType& v) {
+    //   H hash_value(H state, const MyType& v) {
     //     return H::combine(std::move(state), v.field1, ..., v.fieldN);
     //   }
     //
     // where `(field1, ..., fieldN)` are the members you would use on your
     // `operator==` to define equality.
     //
-    // Notice that `TurboHashValue` is not a class member, but an ordinary function.
-    // An `TurboHashValue` overload for a type should only be declared in the same
-    // file and namespace as said type. The proper `TurboHashValue` implementation
+    // Notice that `hash_value` is not a class member, but an ordinary function.
+    // An `hash_value` overload for a type should only be declared in the same
+    // file and namespace as said type. The proper `hash_value` implementation
     // for a given type will be discovered via ADL.
     //
     // Note: unlike `std::hash', `turbo::Hash` should never be specialized. It must
-    // only be extended by adding `TurboHashValue()` overloads.
+    // only be extended by adding `hash_value()` overloads.
     //
     template<typename T, typename Tag = default_hash_engine>
     using Hash = turbo::hash_internal::Hash<T, Tag>;
@@ -271,7 +271,7 @@ namespace turbo {
     // HashState
     //
     // A type erased version of the hash state concept, for use in user-defined
-    // `TurboHashValue` implementations that can't use templates (such as PImpl
+    // `hash_value` implementations that can't use templates (such as PImpl
     // classes, virtual functions, etc.). The type erasure adds overhead so it
     // should be avoided unless necessary.
     //
@@ -282,7 +282,7 @@ namespace turbo {
     // All other calls will be handled internally and will not invoke overloads
     // provided by the wrapped class.
     //
-    // Users of this class should still define a template `TurboHashValue` function,
+    // Users of this class should still define a template `hash_value` function,
     // but can use `turbo::HashState::Create(&state)` to erase the type of the hash
     // state and dispatch to their private hashing logic.
     //
@@ -294,7 +294,7 @@ namespace turbo {
     //   class Interface {
     //    public:
     //     template <typename H>
-    //     friend H TurboHashValue(H state, const Interface& value) {
+    //     friend H hash_value(H state, const Interface& value) {
     //       state = H::combine(std::move(state), std::type_index(typeid(*this)));
     //       value.HashValue(turbo::HashState::Create(&state));
     //       return state;

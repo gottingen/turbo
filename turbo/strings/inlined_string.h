@@ -1546,7 +1546,7 @@ namespace turbo {
 
         template<typename H>
         friend H
-        TurboHashValue(H hash_state,
+        hash_value(H hash_state,
                        const turbo::basic_inlined_string<value_type, traits_type,
                                allocator_type> &str) {
             return H::combine(

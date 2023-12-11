@@ -65,7 +65,7 @@ struct bigstruct {
     return memcmp(x.a, y.a, sizeof(x.a)) == 0;
   }
   template <typename H>
-  friend H TurboHashValue(H h, const bigstruct& c) {
+  friend H hash_value(H h, const bigstruct& c) {
     return H::combine_contiguous(std::move(h), c.a, sizeof(c.a));
   }
 };

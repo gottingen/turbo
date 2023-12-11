@@ -237,7 +237,7 @@ namespace turbo {
         }
 
         template<typename H>
-        friend H TurboHashValue(H h, Duration d) {
+        friend H hash_value(H h, Duration d) {
             return H::combine(std::move(h), d.rep_hi_, d.rep_lo_);
         }
 
@@ -800,7 +800,7 @@ namespace turbo {
         Breakdown In(TimeZone tz) const;
 
         template<typename H>
-        friend H TurboHashValue(H h, Time t) {
+        friend H hash_value(H h, Time t) {
             return H::combine(std::move(h), t.rep_);
         }
 
@@ -1181,7 +1181,7 @@ namespace turbo {
         bool PrevTransition(Time t, CivilTransition *trans) const;
 
         template<typename H>
-        friend H TurboHashValue(H h, TimeZone tz) {
+        friend H hash_value(H h, TimeZone tz) {
             return H::combine(std::move(h), tz.cz_);
         }
 

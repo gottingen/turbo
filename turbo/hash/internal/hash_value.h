@@ -22,28 +22,28 @@
 namespace turbo::hash_internal {
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Basic Types
+    // hash_value for Basic Types
     // -----------------------------------------------------------------------------
 
-    // Note: Default `TurboHashValue` implementations live in `hash_internal`. This
+    // Note: Default `hash_value` implementations live in `hash_internal`. This
     // allows us to block lexical scope lookup when doing an unqualified call to
-    // `TurboHashValue` below. User-defined implementations of `TurboHashValue` can
+    // `hash_value` below. User-defined implementations of `hash_value` can
     // only be found via ADL.
 
-    // TurboHashValue() for hashing bool values
+    // hash_value() for hashing bool values
     //
     // We use SFINAE to ensure that this overload only accepts bool, not types that
     // are convertible to bool.
     template<typename H, typename B>
-    typename std::enable_if<std::is_same<B, bool>::value, H>::type TurboHashValue(
+    typename std::enable_if<std::is_same<B, bool>::value, H>::type hash_value(
             H hash_state, B value) {
         return H::combine(std::move(hash_state),
                           static_cast<unsigned char>(value ? 1 : 0));
     }
 
-    // TurboHashValue() for hashing enum values
+    // hash_value() for hashing enum values
     template<typename H, typename Enum>
-    typename std::enable_if<std::is_enum<Enum>::value, H>::type TurboHashValue(
+    typename std::enable_if<std::is_enum<Enum>::value, H>::type hash_value(
             H hash_state, Enum e) {
         // In practice, we could almost certainly just invoke hash_bytes directly,
         // but it's possible that a sanitizer might one day want to
@@ -54,12 +54,12 @@ namespace turbo::hash_internal {
                           static_cast<typename std::underlying_type<Enum>::type>(e));
     }
 
-    // TurboHashValue() for hashing floating-point values
+    // hash_value() for hashing floating-point values
     template<typename H, typename Float>
     typename std::enable_if<std::is_same<Float, float>::value ||
                             std::is_same<Float, double>::value,
             H>::type
-    TurboHashValue(H hash_state, Float value) {
+    hash_value(H hash_state, Float value) {
         return hash_internal::hash_bytes(std::move(hash_state),
                                          value == 0 ? 0 : value);
     }
@@ -70,7 +70,7 @@ namespace turbo::hash_internal {
     // convert it to something else first.
     template<typename H, typename LongDouble>
     typename std::enable_if<std::is_same<LongDouble, long double>::value, H>::type
-    TurboHashValue(H hash_state, LongDouble value) {
+    hash_value(H hash_state, LongDouble value) {
         const int category = std::fpclassify(value);
         switch (category) {
             case FP_INFINITE:
@@ -99,9 +99,9 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), category);
     }
 
-    // TurboHashValue() for hashing pointers
+    // hash_value() for hashing pointers
     template<typename H, typename T>
-    H TurboHashValue(H hash_state, T *ptr) {
+    H hash_value(H hash_state, T *ptr) {
         auto v = reinterpret_cast<uintptr_t>(ptr);
         // Due to alignment, pointers tend to have low bits as zero, and the next few
         // bits follow a pattern since they are also multiples of some base value.
@@ -110,15 +110,15 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), v, v);
     }
 
-    // TurboHashValue() for hashing nullptr_t
+    // hash_value() for hashing nullptr_t
     template<typename H>
-    H TurboHashValue(H hash_state, std::nullptr_t) {
+    H hash_value(H hash_state, std::nullptr_t) {
         return H::combine(std::move(hash_state), static_cast<void *>(nullptr));
     }
 
-    // TurboHashValue() for hashing pointers-to-member
+    // hash_value() for hashing pointers-to-member
     template<typename H, typename T, typename C>
-    H TurboHashValue(H hash_state, T C::* ptr) {
+    H hash_value(H hash_state, T C::* ptr) {
         auto salient_ptm_size = [](std::size_t n) -> std::size_t {
 #if defined(_MSC_VER)
             // Pointers-to-member-function on MSVC consist of one pointer plus 0, 1, 2,
@@ -150,14 +150,14 @@ namespace turbo::hash_internal {
     }
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Composite Types
+    // hash_value for Composite Types
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue() for hashing pairs
+    // hash_value() for hashing pairs
     template<typename H, typename T1, typename T2>
     typename std::enable_if<is_hashable<T1>::value && is_hashable<T2>::value,
             H>::type
-    TurboHashValue(H hash_state, const std::pair<T1, T2> &p) {
+    hash_value(H hash_state, const std::pair<T1, T2> &p) {
         return H::combine(std::move(hash_state), p.first, p.second);
     }
 
@@ -170,7 +170,7 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), std::get<Is>(t)...);
     }
 
-// TurboHashValue for hashing tuples
+// hash_value for hashing tuples
     template<typename H, typename... Ts>
 #if defined(_MSC_VER)
     // This SFINAE gets MSVC confused under some conditions. Let's just disable it
@@ -179,32 +179,32 @@ namespace turbo::hash_internal {
 #else   // _MSC_VER
     typename std::enable_if<std::conjunction<is_hashable<Ts>...>::value, H>::type
 #endif  // _MSC_VER
-    TurboHashValue(H hash_state, const std::tuple<Ts...> &t) {
+    hash_value(H hash_state, const std::tuple<Ts...> &t) {
         return hash_internal::hash_tuple(std::move(hash_state), t,
                                          turbo::make_index_sequence<sizeof...(Ts)>());
     }
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Pointers
+    // hash_value for Pointers
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue for hashing unique_ptr
+    // hash_value for hashing unique_ptr
     template<typename H, typename T, typename D>
-    H TurboHashValue(H hash_state, const std::unique_ptr<T, D> &ptr) {
+    H hash_value(H hash_state, const std::unique_ptr<T, D> &ptr) {
         return H::combine(std::move(hash_state), ptr.get());
     }
 
-    // TurboHashValue for hashing shared_ptr
+    // hash_value for hashing shared_ptr
     template<typename H, typename T>
-    H TurboHashValue(H hash_state, const std::shared_ptr<T> &ptr) {
+    H hash_value(H hash_state, const std::shared_ptr<T> &ptr) {
         return H::combine(std::move(hash_state), ptr.get());
     }
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for String-Like Types
+    // hash_value for String-Like Types
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue for hashing strings
+    // hash_value for hashing strings
     //
     // All the string-like types supported here provide the same hash expansion for
     // the same character sequence. These types are:
@@ -219,7 +219,7 @@ namespace turbo::hash_internal {
     // misbehave in cases where the traits' `eq()` member isn't equivalent to `==`
     // on the underlying character type.
     template<typename H>
-    H TurboHashValue(H hash_state, std::string_view str) {
+    H hash_value(H hash_state, std::string_view str) {
         return H::combine(
                 H::combine_contiguous(std::move(hash_state), str.data(), str.size()),
                 str.size());
@@ -230,7 +230,7 @@ namespace turbo::hash_internal {
             typename = std::enable_if_t<std::is_same<Char, wchar_t>::value ||
                                         std::is_same<Char, char16_t>::value ||
                                         std::is_same<Char, char32_t>::value>>
-    H TurboHashValue(
+    H hash_value(
             H hash_state,
             const std::basic_string<Char, std::char_traits<Char>, Alloc> &str) {
         return H::combine(
@@ -239,20 +239,20 @@ namespace turbo::hash_internal {
     }
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Sequence Containers
+    // hash_value for Sequence Containers
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue for hashing std::array
+    // hash_value for hashing std::array
     template<typename H, typename T, size_t N>
-    typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<T>::value, H>::type hash_value(
             H hash_state, const std::array<T, N> &array) {
         return H::combine_contiguous(std::move(hash_state), array.data(),
                                      array.size());
     }
 
-    // TurboHashValue for hashing std::deque
+    // hash_value for hashing std::deque
     template<typename H, typename T, typename Allocator>
-    typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<T>::value, H>::type hash_value(
             H hash_state, const std::deque<T, Allocator> &deque) {
         // TODO(gromer): investigate a more efficient implementation taking
         // advantage of the chunk structure.
@@ -262,9 +262,9 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), deque.size());
     }
 
-    // TurboHashValue for hashing std::forward_list
+    // hash_value for hashing std::forward_list
     template<typename H, typename T, typename Allocator>
-    typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<T>::value, H>::type hash_value(
             H hash_state, const std::forward_list<T, Allocator> &list) {
         size_t size = 0;
         for (const T &t: list) {
@@ -274,9 +274,9 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), size);
     }
 
-    // TurboHashValue for hashing std::list
+    // hash_value for hashing std::list
     template<typename H, typename T, typename Allocator>
-    typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<T>::value, H>::type hash_value(
             H hash_state, const std::list<T, Allocator> &list) {
         for (const auto &t: list) {
             hash_state = H::combine(std::move(hash_state), t);
@@ -284,7 +284,7 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), list.size());
     }
 
-    // TurboHashValue for hashing std::vector
+    // hash_value for hashing std::vector
     //
     // Do not use this for vector<bool> on platforms that have a working
     // implementation of std::hash. It does not have a .data(), and a fallback for
@@ -292,25 +292,25 @@ namespace turbo::hash_internal {
     template<typename H, typename T, typename Allocator>
     typename std::enable_if<is_hashable<T>::value && !std::is_same<T, bool>::value,
             H>::type
-    TurboHashValue(H hash_state, const std::vector<T, Allocator> &vector) {
+    hash_value(H hash_state, const std::vector<T, Allocator> &vector) {
         return H::combine(H::combine_contiguous(std::move(hash_state), vector.data(),
                                                 vector.size()),
                           vector.size());
     }
 
-// TurboHashValue special cases for hashing std::vector<bool>
+// hash_value special cases for hashing std::vector<bool>
 
 #if TURBO_IS_BIG_ENDIAN && \
     (defined(__GLIBCXX__) || defined(__GLIBCPP__))
 
     // std::hash in libstdc++ does not work correctly with vector<bool> on Big
-        // Endian platforms therefore we need to implement a custom TurboHashValue for
+        // Endian platforms therefore we need to implement a custom hash_value for
         // it. More details on the bug:
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=102531
         template <typename H, typename T, typename Allocator>
         typename std::enable_if<is_hashable<T>::value && std::is_same<T, bool>::value,
                                 H>::type
-        TurboHashValue(H hash_state, const std::vector<T, Allocator>& vector) {
+        hash_value(H hash_state, const std::vector<T, Allocator>& vector) {
           typename H::TurboInternalPiecewiseCombiner combiner;
           for (const auto& i : vector) {
             unsigned char c = static_cast<unsigned char>(i);
@@ -330,7 +330,7 @@ namespace turbo::hash_internal {
     template<typename H, typename T, typename Allocator>
     typename std::enable_if<is_hashable<T>::value && std::is_same<T, bool>::value,
             H>::type
-    TurboHashValue(H hash_state, const std::vector<T, Allocator> &vector) {
+    hash_value(H hash_state, const std::vector<T, Allocator> &vector) {
         return H::combine(std::move(hash_state),
                           std::hash<std::vector<T, Allocator>>{}(vector),
                           vector.size());
@@ -339,27 +339,27 @@ namespace turbo::hash_internal {
 #endif
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Ordered Associative Containers
+    // hash_value for Ordered Associative Containers
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue for hashing std::map
+    // hash_value for hashing std::map
     template<typename H, typename Key, typename T, typename Compare,
             typename Allocator>
     typename std::enable_if<is_hashable<Key>::value && is_hashable<T>::value,
             H>::type
-    TurboHashValue(H hash_state, const std::map<Key, T, Compare, Allocator> &map) {
+    hash_value(H hash_state, const std::map<Key, T, Compare, Allocator> &map) {
         for (const auto &t: map) {
             hash_state = H::combine(std::move(hash_state), t);
         }
         return H::combine(std::move(hash_state), map.size());
     }
 
-    // TurboHashValue for hashing std::multimap
+    // hash_value for hashing std::multimap
     template<typename H, typename Key, typename T, typename Compare,
             typename Allocator>
     typename std::enable_if<is_hashable<Key>::value && is_hashable<T>::value,
             H>::type
-    TurboHashValue(H hash_state,
+    hash_value(H hash_state,
                    const std::multimap<Key, T, Compare, Allocator> &map) {
         for (const auto &t: map) {
             hash_state = H::combine(std::move(hash_state), t);
@@ -367,9 +367,9 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), map.size());
     }
 
-    // TurboHashValue for hashing std::set
+    // hash_value for hashing std::set
     template<typename H, typename Key, typename Compare, typename Allocator>
-    typename std::enable_if<is_hashable<Key>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<Key>::value, H>::type hash_value(
             H hash_state, const std::set<Key, Compare, Allocator> &set) {
         for (const auto &t: set) {
             hash_state = H::combine(std::move(hash_state), t);
@@ -377,9 +377,9 @@ namespace turbo::hash_internal {
         return H::combine(std::move(hash_state), set.size());
     }
 
-    // TurboHashValue for hashing std::multiset
+    // hash_value for hashing std::multiset
     template<typename H, typename Key, typename Compare, typename Allocator>
-    typename std::enable_if<is_hashable<Key>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<Key>::value, H>::type hash_value(
             H hash_state, const std::multiset<Key, Compare, Allocator> &set) {
         for (const auto &t: set) {
             hash_state = H::combine(std::move(hash_state), t);
@@ -388,23 +388,23 @@ namespace turbo::hash_internal {
     }
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Unordered Associative Containers
+    // hash_value for Unordered Associative Containers
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue for hashing std::unordered_set
+    // hash_value for hashing std::unordered_set
     template<typename H, typename Key, typename Hash, typename KeyEqual,
             typename Alloc>
-    typename std::enable_if<is_hashable<Key>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<Key>::value, H>::type hash_value(
             H hash_state, const std::unordered_set<Key, Hash, KeyEqual, Alloc> &s) {
         return H::combine(
                 H::combine_unordered(std::move(hash_state), s.begin(), s.end()),
                 s.size());
     }
 
-    // TurboHashValue for hashing std::unordered_multiset
+    // hash_value for hashing std::unordered_multiset
     template<typename H, typename Key, typename Hash, typename KeyEqual,
             typename Alloc>
-    typename std::enable_if<is_hashable<Key>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<Key>::value, H>::type hash_value(
             H hash_state,
             const std::unordered_multiset<Key, Hash, KeyEqual, Alloc> &s) {
         return H::combine(
@@ -412,24 +412,24 @@ namespace turbo::hash_internal {
                 s.size());
     }
 
-    // TurboHashValue for hashing std::unordered_set
+    // hash_value for hashing std::unordered_set
     template<typename H, typename Key, typename T, typename Hash,
             typename KeyEqual, typename Alloc>
     typename std::enable_if<is_hashable<Key>::value && is_hashable<T>::value,
             H>::type
-    TurboHashValue(H hash_state,
+    hash_value(H hash_state,
                    const std::unordered_map<Key, T, Hash, KeyEqual, Alloc> &s) {
         return H::combine(
                 H::combine_unordered(std::move(hash_state), s.begin(), s.end()),
                 s.size());
     }
 
-    // TurboHashValue for hashing std::unordered_multiset
+    // hash_value for hashing std::unordered_multiset
     template<typename H, typename Key, typename T, typename Hash,
             typename KeyEqual, typename Alloc>
     typename std::enable_if<is_hashable<Key>::value && is_hashable<T>::value,
             H>::type
-    TurboHashValue(H hash_state,
+    hash_value(H hash_state,
                    const std::unordered_multimap<Key, T, Hash, KeyEqual, Alloc> &s) {
         return H::combine(
                 H::combine_unordered(std::move(hash_state), s.begin(), s.end()),
@@ -437,19 +437,19 @@ namespace turbo::hash_internal {
     }
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Wrapper Types
+    // hash_value for Wrapper Types
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue for hashing std::reference_wrapper
+    // hash_value for hashing std::reference_wrapper
     template<typename H, typename T>
-    typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<T>::value, H>::type hash_value(
             H hash_state, std::reference_wrapper<T> opt) {
         return H::combine(std::move(hash_state), opt.get());
     }
 
-    // TurboHashValue for hashing std::optional
+    // hash_value for hashing std::optional
     template<typename H, typename T>
-    typename std::enable_if<is_hashable<T>::value, H>::type TurboHashValue(
+    typename std::enable_if<is_hashable<T>::value, H>::type hash_value(
             H hash_state, const std::optional<T> &opt) {
         if (opt) hash_state = H::combine(std::move(hash_state), *opt);
         return H::combine(std::move(hash_state), opt.has_value());
@@ -466,10 +466,10 @@ namespace turbo::hash_internal {
         }
     };
 
-    // TurboHashValue for hashing std::variant
+    // hash_value for hashing std::variant
     template<typename H, typename... T>
     typename std::enable_if<std::conjunction<is_hashable<T>...>::value, H>::type
-    TurboHashValue(H hash_state, const std::variant<T...> &v) {
+    hash_value(H hash_state, const std::variant<T...> &v) {
         if (!v.valueless_by_exception()) {
             hash_state = std::visit(VariantVisitor<H>{std::move(hash_state)}, v);
         }
@@ -478,23 +478,23 @@ namespace turbo::hash_internal {
 
 
     // -----------------------------------------------------------------------------
-    // TurboHashValue for Other Types
+    // hash_value for Other Types
     // -----------------------------------------------------------------------------
 
-    // TurboHashValue for hashing std::bitset is not defined on Little Endian
+    // hash_value for hashing std::bitset is not defined on Little Endian
     // platforms, for the same reason as for vector<bool> (see std::vector above):
     // It does not expose the raw bytes, and a fallback to std::hash<> is most
     // likely faster.
 
 #if TURBO_IS_BIG_ENDIAN && \
     (defined(__GLIBCXX__) || defined(__GLIBCPP__))
-    // TurboHashValue for hashing std::bitset
+    // hash_value for hashing std::bitset
         //
         // std::hash in libstdc++ does not work correctly with std::bitset on Big Endian
-        // platforms therefore we need to implement a custom TurboHashValue for it. More
+        // platforms therefore we need to implement a custom hash_value for it. More
         // details on the bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=102531
         template <typename H, size_t N>
-        H TurboHashValue(H hash_state, const std::bitset<N>& set) {
+        H hash_value(H hash_state, const std::bitset<N>& set) {
           typename H::TurboInternalPiecewiseCombiner combiner;
           for (int i = 0; i < N; i++) {
             unsigned char c = static_cast<unsigned char>(set[i]);

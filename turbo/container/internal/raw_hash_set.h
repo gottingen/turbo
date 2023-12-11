@@ -2213,7 +2213,7 @@ class raw_hash_set {
   template <typename H>
   friend typename std::enable_if<H::template is_hashable<value_type>::value,
                                  H>::type
-  TurboHashValue(H h, const raw_hash_set& s) {
+  hash_value(H h, const raw_hash_set& s) {
     return H::combine(H::combine_unordered(std::move(h), s.begin(), s.end()),
                       s.size());
   }

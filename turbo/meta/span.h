@@ -460,7 +460,7 @@ namespace turbo {
 
         // Support for turbo::Hash.
         template<typename H>
-        friend H TurboHashValue(H h, Span v) {
+        friend H hash_value(H h, Span v) {
             return H::combine(H::combine_contiguous(std::move(h), v.data(), v.size()),
                               v.size());
         }

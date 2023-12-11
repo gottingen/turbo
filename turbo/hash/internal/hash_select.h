@@ -52,9 +52,9 @@ namespace turbo::hash_internal {
             template<typename H, typename T>
             static auto Invoke(H state, const T &value) -> std::enable_if_t<
             std::is_same<H,
-                    decltype(TurboHashValue(std::move(state), value))>::value,
+                    decltype(hash_value(std::move(state), value))>::value,
             H> {
-                return TurboHashValue(std::move(state), value);
+                return hash_value(std::move(state), value);
             }
         };
 

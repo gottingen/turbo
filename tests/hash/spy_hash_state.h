@@ -29,9 +29,9 @@ namespace turbo::hash_internal {
 
     // SpyHashState is an implementation of the HashState API that simply
     // accumulates all input bytes in an internal buffer. This makes it useful
-    // for testing TurboHashValue overloads (so long as they are templated on the
+    // for testing hash_value overloads (so long as they are templated on the
     // HashState parameter), since it can report the exact hash representation
-    // that the TurboHashValue overload produces.
+    // that the hash_value overload produces.
     //
     // Sample usage:
     // EXPECT_EQ(SpyHashState::combine(SpyHashState(), foo),
@@ -73,15 +73,15 @@ namespace turbo::hash_internal {
                                         const Args &... args) {
             // Pass an instance of SpyHashStateImpl<A> when trying to combine `A`. This
             // allows us to test that the user only uses this instance for combine calls
-            // and does not call TurboHashValue directly.
-            // See TurboHashValue implementation at the bottom.
+            // and does not call hash_value directly.
+            // See hash_value implementation at the bottom.
             s = SpyHashStateImpl<A>::HashStateBase::combine(std::move(s), a);
             return SpyHashStateImpl::combine(std::move(s), args...);
         }
 
         static SpyHashStateImpl combine(SpyHashStateImpl s) {
             if (direct_turbo_hash_value_error_) {
-                *s.error_ = "TurboHashValue should not be invoked directly.";
+                *s.error_ = "hash_value should not be invoked directly.";
             } else if (s.moved_from_) {
                 *s.error_ = "Used moved-from instance of the hash state object.";
             }
@@ -215,8 +215,8 @@ namespace turbo::hash_internal {
         };
 
         // This is true if SpyHashStateImpl<T> has been passed to a call of
-        // TurboHashValue with the wrong type. This detects that the user called
-        // TurboHashValue directly (because the hash state type does not match).
+        // hash_value with the wrong type. This detects that the user called
+        // hash_value directly (because the hash state type does not match).
         static bool direct_turbo_hash_value_error_;
 
         std::vector<std::string> hash_representation_;
@@ -257,7 +257,7 @@ namespace turbo::hash_internal {
             //    compile time errors. If we didn't disable the overload we would get
             //    ambiguous overload errors, which we don't want.
             int = RunOnStartup<SpyHashStateImpl<T>::SetDirectTurboHashValueError>::run>
-    void TurboHashValue(SpyHashStateImpl<T>, const U &);
+    void hash_value(SpyHashStateImpl<T>, const U &);
 
     using SpyHashState = SpyHashStateImpl<void>;
 

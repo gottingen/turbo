@@ -779,7 +779,7 @@ namespace turbo {
         std::optional<uint32_t> expected_checksum() const;
 
         template<typename H>
-        friend H TurboHashValue(H hash_state, const turbo::Cord &c) {
+        friend H hash_value(H hash_state, const turbo::Cord &c) {
             std::optional<std::string_view> maybe_flat = c.try_flat();
             if (maybe_flat.has_value()) {
                 return H::combine(std::move(hash_state), *maybe_flat);
@@ -1049,7 +1049,7 @@ namespace turbo {
         // Requires src.length() > kMaxBytesToCopy.
         Cord &AssignLargeString(std::string &&src);
 
-        // Helper for TurboHashValue().
+        // Helper for hash_value().
         template<typename H>
         H HashFragmented(H hash_state) const {
             typename H::TurboInternalPiecewiseCombiner combiner;

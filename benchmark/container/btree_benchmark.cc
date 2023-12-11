@@ -601,7 +601,7 @@ struct BigType {
 
   // Support turbo::Hash.
   template <typename State>
-  friend State TurboHashValue(State h, const BigType& b) {
+  friend State hash_value(State h, const BigType& b) {
     for (int i = 0; i < Size && i < Copies; ++i)
       h = State::combine(std::move(h), b.values[i]);
     return h;
