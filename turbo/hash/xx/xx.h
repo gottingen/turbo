@@ -13,31 +13,41 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_HASH_HASH_ENGINE_H_
-#define TURBO_HASH_HASH_ENGINE_H_
 
+#ifndef TURBO_HASH_XX_XX_H_
+#define TURBO_HASH_XX_XX_H_
+
+#include <cstdint>
+#include <cstdlib>  // for size_t.
+
+#include <utility>
+
+#include "turbo/platform/port.h"
 #include "turbo/hash/fwd.h"
-#include "turbo/hash/mix/murmur_mix.h"
-#include "turbo/hash/mix/simple_mix.h"
-#include "turbo/hash/city/city.h"
-#include "turbo/hash/bytes/bytes_hash.h"
-#include "turbo/hash/m3/m3.h"
-#include "turbo/hash/xx/xx.h"
 
 namespace turbo {
 
-#ifdef TURBO_DEFAUT_HASH_ENGINE
-using default_hash_engine = TURBO_DEFAUT_HASH_ENGINE;
-#else
-using default_hash_engine = bytes_hash_tag;
-#endif
+    struct xx_hash_tag {
 
-    constexpr const char* supported_hash_engines[] = {
-        "bytes_hash",
-        "city_hash",
-        "m3_hash"
+        static constexpr const char* name() {
+            return "city_hash";
+        }
+
+        constexpr static bool available() {
+            return true;
+        }
+    };
+
+    template <>
+    struct hasher_engine<xx_hash_tag> {
+
+        static uint32_t hash32(const char *s, size_t len);
+
+        static size_t hash64(const char *s, size_t len);
+
+        static size_t hash64_with_seed(const char *s, size_t len, uint64_t seed);
     };
 
 }  // namespace turbo
 
-#endif  // TURBO_HASH_HASH_ENGINE_H_
+#endif  // TURBO_HASH_XX_XX_H_

@@ -317,8 +317,10 @@ namespace turbo::hash_internal {
         return Mix(state, v);
     }
 
+    extern template class MixingHashState<city_hash_tag>;
     extern template class MixingHashState<bytes_hash_tag>;
     extern template class MixingHashState<m3_hash_tag>;
+    extern template class MixingHashState<xx_hash_tag>;
 }  // namespace turbo::hash_internal
 
 #endif  // TURBO_HASH_INTERNAL_MIXING_HASH_STATE_H_
