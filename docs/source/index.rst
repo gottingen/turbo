@@ -38,14 +38,15 @@ Contents
     :maxdepth: 3
     :caption: API REFERENCE
 
-    en/api/platform
     en/api/base
     en/api/files
-    en/api/strings
+    en/api/hash
     en/api/memory
-    en/api/unicode
+    en/api/platform
     en/api/random
+    en/api/strings
     en/api/simd
+    en/api/unicode
 
 
 .. toctree::
