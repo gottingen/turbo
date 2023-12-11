@@ -20,7 +20,7 @@
 
 #include "benchmark/benchmark.h"
 #include "turbo/container/flat_hash_set.h"
-#include "turbo/hash/hash_old.h"
+#include "turbo/hash/hash.h"
 #include "turbo/platform/port.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/cord.h"

@@ -12,26 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
-
-#ifndef TURBO_TOOLS_CONTEXT_H_
-#define TURBO_TOOLS_CONTEXT_H_
-
-#include <string>
 #include "turbo/hash/hash_engine.h"
 
-namespace turbo::tools {
+namespace turbo {
 
-    struct Context {
-        static Context &get_instance() {
-            static Context instance;
-            return instance;
-        }
-
-        bool verbose = false;
-        bool version = false;
-        std::string hash_string;
-        turbo::hash_engine_type engine{turbo::hash_engine_type::bytes_hash};
-    };
-}  // namespace turbo::tools
-#endif  // TURBO_TOOLS_CONTEXT_H_
+    std::map<std::string, hash_engine_type> engine_map = {
+            {"bytes", hash_engine_type::bytes_hash},
+            {"city", hash_engine_type::city_hash},
+            {"m3", hash_engine_type::m3_hash},
+            {"xx", hash_engine_type::xx_hash}};
+}  // namespace turbo

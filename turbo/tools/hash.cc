@@ -17,23 +17,39 @@
 #include "turbo/tools/context.h"
 #include "turbo/format/table.h"
 #include "turbo/format/format.h"
-#include "turbo/hash/hash_old.h"
+#include "turbo/hash/hash.h"
 
 namespace turbo::tools {
+
     void set_up_hash_cmdline(turbo::App &app) {
         auto hcmd = app.add_subcommand("hash", "hash a string or a file");
         hcmd->add_option("-s, --string", Context::get_instance().hash_string, "hash a string");
+        hcmd->add_option("-e, --engine", Context::get_instance().engine, "hash a string")
+        ->transform(CheckedTransformer(engine_map, turbo::ignore_case));
         hcmd->callback([]() { run_hash_string(); });
     }
 
 
     void run_hash_string() {
         turbo::Table result;
+        result.add_row({"engine", turbo::supported_hash_engines[static_cast<int>(turbo::tools::Context::get_instance().engine)]});
         result.add_row({"original", turbo::tools::Context::get_instance().hash_string});
-        result[0].format().font_color(turbo::Color::yellow);
-        result.add_row(
-                {"hash", turbo::Format(turbo::Hash<std::string>{}(turbo::tools::Context::get_instance().hash_string))});
-        result[1].format().font_color(turbo::Color::green);
+        switch (turbo::tools::Context::get_instance().engine) {
+                case turbo::hash_engine_type::bytes_hash:
+                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, bytes_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                break;
+            case turbo::hash_engine_type::city_hash:
+                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, city_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                break;
+            case turbo::hash_engine_type::m3_hash:
+                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, m3_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                break;
+            case turbo::hash_engine_type::xx_hash:
+                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, xx_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                break;
+        }
+        result.column(0).format().font_color(turbo::Color::yellow);
+        result.column(1).format().font_color(turbo::Color::green);
         std::cout << result << std::endl;
     }
 }  // namespace turbo::tools

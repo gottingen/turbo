@@ -21,6 +21,12 @@
 
 #include "turbo/module/module_version.h"
 
+/**
+ * @defgroup turbo_hash_mixer turbo::hash_mixer
+ * @defgroup turbo_hash_engine turbo::hash_engine
+ * @defgroup turbo_hash_state turbo::hash_state
+ * @defgroup turbo_hash_function turbo::hash_function
+ */
  
 namespace turbo {
 

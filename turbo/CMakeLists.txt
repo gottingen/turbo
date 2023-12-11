@@ -83,6 +83,7 @@ set(TURBO_ALL_SRC
         "hash/xx/xxhash.cc"
         "hash/xx/xxh_x86dispatch.cc"
         "hash/xx/xx.cc"
+        "hash/hash_engine.cc"
         "log/async.cc"
         "log/cfg.cc"
         "log/condition.cc"

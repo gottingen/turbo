@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/hash/hash_old.h"
+#include "turbo/hash/hash.h"
 #include "turbo/strings/string_view.h"
 
 namespace turbo {

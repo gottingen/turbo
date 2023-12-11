@@ -23,6 +23,7 @@
 #include "turbo/hash/bytes/bytes_hash.h"
 #include "turbo/hash/m3/m3.h"
 #include "turbo/hash/xx/xx.h"
+#include <map>
 
 namespace turbo {
 
@@ -35,9 +36,19 @@ using default_hash_engine = bytes_hash_tag;
     constexpr const char* supported_hash_engines[] = {
         "bytes_hash",
         "city_hash",
-        "m3_hash"
+        "m3_hash",
+        "xx_hash",
     };
-
+    enum class hash_engine_type {
+        bytes_hash,
+        city_hash,
+        m3_hash,
+        xx_hash,
+    };
+    /**
+     * for cmd line
+     */
+     extern std::map<std::string, hash_engine_type> engine_map;
 }  // namespace turbo
 
 #endif  // TURBO_HASH_HASH_ENGINE_H_

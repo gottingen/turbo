@@ -15,8 +15,8 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest/doctest.h"
+#include "turbo/hash/mixer.h"
 #include "turbo/hash/hash.h"
-#include "turbo/hash/hash_old.h"
 #include "turbo/format/print.h"
 
 struct HashTest {

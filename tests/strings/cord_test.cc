@@ -29,7 +29,7 @@
 #include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/container/fixed_array.h"
-#include "turbo/hash/hash_old.h"
+#include "turbo/hash/hash.h"
 #include "turbo/platform/port.h"
 #include "turbo/random/random.h"
 #include "tests/strings/cord_test_helpers.h"

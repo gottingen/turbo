@@ -30,116 +30,116 @@
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
-// Run the turbo::Hash algorithm over all the elements passed in and verify that
-// their hash expansion is congruent with their `==` operator.
-//
-// It is used in conjunction with EXPECT_TRUE. Failures will output information
-// on what requirement failed and on which objects.
-//
-// Users should pass a collection of types as either an initializer list or a
-// container of cases.
-//
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
-//       {v1, v2, ..., vN}));
-//
-//   std::vector<MyType> cases;
-//   // Fill cases...
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(cases));
-//
-// Users can pass a variety of types for testing heterogeneous lookup with
-// `std::make_tuple`:
-//
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
-//       std::make_tuple(v1, v2, ..., vN)));
-//
-//
-// Ideally, the values passed should provide enough coverage of the `==`
-// operator and the TurboHashValue implementations.
-// For dynamically sized types, the empty state should usually be included in
-// the values.
-//
-// The function accepts an optional comparator function, in case that `==` is
-// not enough for the values provided.
-//
-// Usage:
-//
-//   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
-//       std::make_tuple(v1, v2, ..., vN), MyCustomEq{}));
-//
-// It checks the following requirements:
-//   1. The expansion for a value is deterministic.
-//   2. For any two objects `a` and `b` in the sequence, if `a == b` evaluates
-//      to true, then their hash expansion must be equal.
-//   3. If `a == b` evaluates to false their hash expansion must be unequal.
-//   4. If `a == b` evaluates to false neither hash expansion can be a
-//      suffix of the other.
-//   5. TurboHashValue overloads should not be called by the user. They are only
-//      meant to be called by the framework. Users should call H::combine() and
-//      H::combine_contiguous().
-//   6. No moved-from instance of the hash state is used in the implementation
-//      of TurboHashValue.
-//
-// The values do not have to have the same type. This can be useful for
-// equivalent types that support heterogeneous lookup.
-//
-// A possible reason for breaking (2) is combining state in the hash expansion
-// that was not used in `==`.
-// For example:
-//
-// struct Bad2 {
-//   int a, b;
-//   template <typename H>
-//   friend H TurboHashValue(H state, Bad2 x) {
-//     // Uses a and b.
-//     return H::combine(std::move(state), x.a, x.b);
-//   }
-//   friend bool operator==(Bad2 x, Bad2 y) {
-//     // Only uses a.
-//     return x.a == y.a;
-//   }
-// };
-//
-// As for (3), breaking this usually means that there is state being passed to
-// the `==` operator that is not used in the hash expansion.
-// For example:
-//
-// struct Bad3 {
-//   int a, b;
-//   template <typename H>
-//   friend H TurboHashValue(H state, Bad3 x) {
-//     // Only uses a.
-//     return H::combine(std::move(state), x.a);
-//   }
-//   friend bool operator==(Bad3 x, Bad3 y) {
-//     // Uses a and b.
-//     return x.a == y.a && x.b == y.b;
-//   }
-// };
-//
-// Finally, a common way to break 4 is by combining dynamic ranges without
-// combining the size of the range.
-// For example:
-//
-// struct Bad4 {
-//   int *p, size;
-//   template <typename H>
-//   friend H TurboHashValue(H state, Bad4 x) {
-//     return H::combine_contiguous(std::move(state), x.p, x.p + x.size);
-//   }
-//   friend bool operator==(Bad4 x, Bad4 y) {
-//    // Compare two ranges for equality. C++14 code can instead use std::equal.
-//     return turbo::equal(x.p, x.p + x.size, y.p, y.p + y.size);
-//   }
-// };
-//
-// An easy solution to this is to combine the size after combining the range,
-// like so:
-// template <typename H>
-// friend H TurboHashValue(H state, Bad4 x) {
-//   return H::combine(
-//       H::combine_contiguous(std::move(state), x.p, x.p + x.size), x.size);
-// }
-//
+    // Run the turbo::Hash algorithm over all the elements passed in and verify that
+    // their hash expansion is congruent with their `==` operator.
+    //
+    // It is used in conjunction with EXPECT_TRUE. Failures will output information
+    // on what requirement failed and on which objects.
+    //
+    // Users should pass a collection of types as either an initializer list or a
+    // container of cases.
+    //
+    //   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
+    //       {v1, v2, ..., vN}));
+    //
+    //   std::vector<MyType> cases;
+    //   // Fill cases...
+    //   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(cases));
+    //
+    // Users can pass a variety of types for testing heterogeneous lookup with
+    // `std::make_tuple`:
+    //
+    //   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
+    //       std::make_tuple(v1, v2, ..., vN)));
+    //
+    //
+    // Ideally, the values passed should provide enough coverage of the `==`
+    // operator and the TurboHashValue implementations.
+    // For dynamically sized types, the empty state should usually be included in
+    // the values.
+    //
+    // The function accepts an optional comparator function, in case that `==` is
+    // not enough for the values provided.
+    //
+    // Usage:
+    //
+    //   EXPECT_TRUE(turbo::VerifyTypeImplementsTurboHashCorrectly(
+    //       std::make_tuple(v1, v2, ..., vN), MyCustomEq{}));
+    //
+    // It checks the following requirements:
+    //   1. The expansion for a value is deterministic.
+    //   2. For any two objects `a` and `b` in the sequence, if `a == b` evaluates
+    //      to true, then their hash expansion must be equal.
+    //   3. If `a == b` evaluates to false their hash expansion must be unequal.
+    //   4. If `a == b` evaluates to false neither hash expansion can be a
+    //      suffix of the other.
+    //   5. TurboHashValue overloads should not be called by the user. They are only
+    //      meant to be called by the framework. Users should call H::combine() and
+    //      H::combine_contiguous().
+    //   6. No moved-from instance of the hash state is used in the implementation
+    //      of TurboHashValue.
+    //
+    // The values do not have to have the same type. This can be useful for
+    // equivalent types that support heterogeneous lookup.
+    //
+    // A possible reason for breaking (2) is combining state in the hash expansion
+    // that was not used in `==`.
+    // For example:
+    //
+    // struct Bad2 {
+    //   int a, b;
+    //   template <typename H>
+    //   friend H TurboHashValue(H state, Bad2 x) {
+    //     // Uses a and b.
+    //     return H::combine(std::move(state), x.a, x.b);
+    //   }
+    //   friend bool operator==(Bad2 x, Bad2 y) {
+    //     // Only uses a.
+    //     return x.a == y.a;
+    //   }
+    // };
+    //
+    // As for (3), breaking this usually means that there is state being passed to
+    // the `==` operator that is not used in the hash expansion.
+    // For example:
+    //
+    // struct Bad3 {
+    //   int a, b;
+    //   template <typename H>
+    //   friend H TurboHashValue(H state, Bad3 x) {
+    //     // Only uses a.
+    //     return H::combine(std::move(state), x.a);
+    //   }
+    //   friend bool operator==(Bad3 x, Bad3 y) {
+    //     // Uses a and b.
+    //     return x.a == y.a && x.b == y.b;
+    //   }
+    // };
+    //
+    // Finally, a common way to break 4 is by combining dynamic ranges without
+    // combining the size of the range.
+    // For example:
+    //
+    // struct Bad4 {
+    //   int *p, size;
+    //   template <typename H>
+    //   friend H TurboHashValue(H state, Bad4 x) {
+    //     return H::combine_contiguous(std::move(state), x.p, x.p + x.size);
+    //   }
+    //   friend bool operator==(Bad4 x, Bad4 y) {
+    //    // Compare two ranges for equality. C++14 code can instead use std::equal.
+    //     return turbo::equal(x.p, x.p + x.size, y.p, y.p + y.size);
+    //   }
+    // };
+    //
+    // An easy solution to this is to combine the size after combining the range,
+    // like so:
+    // template <typename H>
+    // friend H TurboHashValue(H state, Bad4 x) {
+    //   return H::combine(
+    //       H::combine_contiguous(std::move(state), x.p, x.p + x.size), x.size);
+    // }
+    //
     template<int &... ExplicitBarrier, typename Container>
     TURBO_MUST_USE_RESULT testing::AssertionResult
     VerifyTypeImplementsTurboHashCorrectly(const Container &values);

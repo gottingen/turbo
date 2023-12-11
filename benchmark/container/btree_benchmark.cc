@@ -35,7 +35,7 @@
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/container/flat_hash_set.h"
 #include "turbo/container/internal/hashtable_debug.h"
-#include "turbo/hash/hash_old.h"
+#include "turbo/hash/hash.h"
 #include "turbo/log/log.h"
 #include "turbo/memory/memory.h"
 #include "turbo/random/random.h"
