@@ -19,7 +19,6 @@
 #include "turbo/times/time.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     /**
      * @ingroup turbo_times_clock

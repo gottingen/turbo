@@ -398,7 +398,7 @@ namespace turbo {
 // Conversions involving time zones.
 //
 
-    turbo::TimeConversion ConvertDateTime(int64_t year, int mon, int day, int hour,
+    turbo::TimeConversion convert_date_time(int64_t year, int mon, int day, int hour,
                                           int min, int sec, TimeZone tz) {
         // Avoids years that are too extreme for CivilSecond to normalize.
         if (year > 300000000000) return InfiniteFutureTimeConversion();

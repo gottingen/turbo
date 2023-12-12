@@ -1188,39 +1188,39 @@ namespace {
         const int kMin = std::numeric_limits<int>::min();
         turbo::Time t;
 
-        t = turbo::FromDateTime(std::numeric_limits<turbo::civil_year_t>::max(), kMax,
+        t = turbo::from_date_time(std::numeric_limits<turbo::civil_year_t>::max(), kMax,
                                 kMax, kMax, kMax, kMax, utc);
         EXPECT_EQ("infinite-future",
                   turbo::format_time(ymdhms, t, utc));  // no overflow
-        t = turbo::FromDateTime(std::numeric_limits<turbo::civil_year_t>::min(), kMin,
+        t = turbo::from_date_time(std::numeric_limits<turbo::civil_year_t>::min(), kMin,
                                 kMin, kMin, kMin, kMin, utc);
         EXPECT_EQ("infinite-past", turbo::format_time(ymdhms, t, utc));  // no overflow
 
         // Check normalization.
-        EXPECT_TRUE(turbo::ConvertDateTime(2013, 10, 32, 8, 30, 0, utc).normalized);
-        t = turbo::FromDateTime(2015, 1, 1, 0, 0, 60, utc);
+        EXPECT_TRUE(turbo::convert_date_time(2013, 10, 32, 8, 30, 0, utc).normalized);
+        t = turbo::from_date_time(2015, 1, 1, 0, 0, 60, utc);
         EXPECT_EQ("2015-01-01 00:01:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 1, 1, 0, 60, 0, utc);
+        t = turbo::from_date_time(2015, 1, 1, 0, 60, 0, utc);
         EXPECT_EQ("2015-01-01 01:00:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 1, 1, 24, 0, 0, utc);
+        t = turbo::from_date_time(2015, 1, 1, 24, 0, 0, utc);
         EXPECT_EQ("2015-01-02 00:00:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 1, 32, 0, 0, 0, utc);
+        t = turbo::from_date_time(2015, 1, 32, 0, 0, 0, utc);
         EXPECT_EQ("2015-02-01 00:00:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 13, 1, 0, 0, 0, utc);
+        t = turbo::from_date_time(2015, 13, 1, 0, 0, 0, utc);
         EXPECT_EQ("2016-01-01 00:00:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 13, 32, 60, 60, 60, utc);
+        t = turbo::from_date_time(2015, 13, 32, 60, 60, 60, utc);
         EXPECT_EQ("2016-02-03 13:01:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 1, 1, 0, 0, -1, utc);
+        t = turbo::from_date_time(2015, 1, 1, 0, 0, -1, utc);
         EXPECT_EQ("2014-12-31 23:59:59", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 1, 1, 0, -1, 0, utc);
+        t = turbo::from_date_time(2015, 1, 1, 0, -1, 0, utc);
         EXPECT_EQ("2014-12-31 23:59:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 1, 1, -1, 0, 0, utc);
+        t = turbo::from_date_time(2015, 1, 1, -1, 0, 0, utc);
         EXPECT_EQ("2014-12-31 23:00:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, 1, -1, 0, 0, 0, utc);
+        t = turbo::from_date_time(2015, 1, -1, 0, 0, 0, utc);
         EXPECT_EQ("2014-12-30 00:00:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, -1, 1, 0, 0, 0, utc);
+        t = turbo::from_date_time(2015, -1, 1, 0, 0, 0, utc);
         EXPECT_EQ("2014-11-01 00:00:00", turbo::format_time(ymdhms, t, utc));
-        t = turbo::FromDateTime(2015, -1, -1, -1, -1, -1, utc);
+        t = turbo::from_date_time(2015, -1, -1, -1, -1, -1, utc);
         EXPECT_EQ("2014-10-29 22:58:59", turbo::format_time(ymdhms, t, utc));
     }
 
