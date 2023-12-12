@@ -74,7 +74,7 @@ namespace turbo {
             Latch l(1);
             REQUIRE_FALSE(l.WaitFor(turbo::milliseconds(100)));
             l.CountDown();
-            REQUIRE(l.WaitFor(turbo::ZeroDuration()));
+            REQUIRE(l.WaitFor(turbo::zero_duration()));
         }
 
         SUBCASE("WaitUntil")
@@ -82,7 +82,7 @@ namespace turbo {
             Latch l(1);
             REQUIRE_FALSE(l.WaitUntil(turbo::time_now() + turbo::milliseconds(100)));
             l.CountDown();
-            REQUIRE(l.WaitUntil(turbo::Now()));
+            REQUIRE(l.WaitUntil(turbo::time_now()));
         }
     }
 }  // namespace turbo

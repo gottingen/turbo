@@ -129,16 +129,16 @@ TEST(Duration, ToConversion) {
     constexpr turbo::Duration z = turbo::zero_duration();                  \
     constexpr turbo::Duration inf = turbo::infinite_duration();            \
     constexpr double dbl_inf = std::numeric_limits<double>::infinity(); \
-    EXPECT_EQ(kint64min, turbo::ToInt64##UNIT(-inf));                    \
-    EXPECT_EQ(-1, turbo::ToInt64##UNIT(-d));                             \
-    EXPECT_EQ(0, turbo::ToInt64##UNIT(z));                               \
-    EXPECT_EQ(1, turbo::ToInt64##UNIT(d));                               \
-    EXPECT_EQ(kint64max, turbo::ToInt64##UNIT(inf));                     \
-    EXPECT_EQ(-dbl_inf, turbo::ToDouble##UNIT(-inf));                    \
-    EXPECT_EQ(-1.5, turbo::ToDouble##UNIT(-d));                          \
-    EXPECT_EQ(0, turbo::ToDouble##UNIT(z));                              \
-    EXPECT_EQ(1.5, turbo::ToDouble##UNIT(d));                            \
-    EXPECT_EQ(dbl_inf, turbo::ToDouble##UNIT(inf));                      \
+    EXPECT_EQ(kint64min, turbo::to_int64_##UNIT(-inf));                    \
+    EXPECT_EQ(-1, turbo::to_int64_##UNIT(-d));                             \
+    EXPECT_EQ(0, turbo::to_int64_##UNIT(z));                               \
+    EXPECT_EQ(1, turbo::to_int64_##UNIT(d));                               \
+    EXPECT_EQ(kint64max, turbo::to_int64_##UNIT(inf));                     \
+    EXPECT_EQ(-dbl_inf, turbo::to_double_##UNIT(-inf));                    \
+    EXPECT_EQ(-1.5, turbo::to_double_##UNIT(-d));                          \
+    EXPECT_EQ(0, turbo::to_double_##UNIT(z));                              \
+    EXPECT_EQ(1.5, turbo::to_double_##UNIT(d));                            \
+    EXPECT_EQ(dbl_inf, turbo::to_double_##UNIT(inf));                      \
   } while (0)
 
   TEST_DURATION_CONVERSION(nanoseconds);
@@ -987,7 +987,7 @@ TEST(Duration, AbsoluteValue) {
   GTEST_SKIP();
 #endif
 
-  EXPECT_EQ(turbo::zero_duration(), abs_duration(turbo::ZeroDuration()));
+  EXPECT_EQ(turbo::zero_duration(), turbo::abs_duration(turbo::zero_duration()));
   EXPECT_EQ(turbo::seconds(1), abs_duration(turbo::seconds(1)));
   EXPECT_EQ(turbo::seconds(1), abs_duration(turbo::seconds(-1)));
 
@@ -1576,7 +1576,7 @@ TEST(Duration, format_duration) {
             turbo::format_duration(turbo::hours(2540400) + turbo::minutes(10) +
                                  turbo::seconds(10)));
 
-  EXPECT_EQ("0", turbo::format_duration(turbo::ZeroDuration()));
+  EXPECT_EQ("0", turbo::format_duration(turbo::zero_duration()));
   EXPECT_EQ("0", turbo::format_duration(turbo::seconds(0)));
   EXPECT_EQ("0", turbo::format_duration(turbo::nanoseconds(0)));
 

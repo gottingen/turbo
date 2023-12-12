@@ -41,7 +41,7 @@ BENCHMARK(BM_Clock_Now_GetCurrentTimeNanos);
 
 void BM_Clock_Now_TurboTime_ToUnixNanos(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::to_unix_nanos(turbo::Now()));
+    benchmark::DoNotOptimize(turbo::to_unix_nanos(turbo::time_now()));
   }
 }
 BENCHMARK(BM_Clock_Now_TurboTime_ToUnixNanos);

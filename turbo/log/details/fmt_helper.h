@@ -114,9 +114,9 @@ namespace turbo::tlog {
                 pad_uint(n, 9, dest);
             }
 
-// return fraction of a second of the given time_point.
-// e.g.
-// fraction<std::milliseconds>(tp) -> will return the millis part of the second
+        // return fraction of a second of the given time_point.
+        // e.g.
+        // fraction<std::milliseconds>(tp) -> will return the millis part of the second
             template<typename ToDuration>
             inline ToDuration time_fraction(log_clock::time_point tp) {
                 using std::chrono::duration_cast;

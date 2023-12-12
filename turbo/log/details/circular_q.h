@@ -19,140 +19,121 @@
 #include <vector>
 #include <cassert>
 
-namespace turbo::tlog {
-namespace details {
-template<typename T>
-class circular_q
-{
-    size_t max_items_ = 0;
-    typename std::vector<T>::size_type head_ = 0;
-    typename std::vector<T>::size_type tail_ = 0;
-    size_t overrun_counter_ = 0;
-    std::vector<T> v_;
+namespace turbo::tlog::details {
 
-public:
-    using value_type = T;
+    template<typename T>
+    class circular_q {
+        size_t max_items_ = 0;
+        typename std::vector<T>::size_type head_ = 0;
+        typename std::vector<T>::size_type tail_ = 0;
+        size_t overrun_counter_ = 0;
+        std::vector<T> v_;
 
-    // empty ctor - create a disabled queue with no elements allocated at all
-    circular_q() = default;
+    public:
+        using value_type = T;
 
-    explicit circular_q(size_t max_items)
-        : max_items_(max_items + 1) // one item is reserved as marker for full q
-        , v_(max_items_)
-    {}
+        // empty ctor - create a disabled queue with no elements allocated at all
+        circular_q() = default;
 
-    circular_q(const circular_q &) = default;
-    circular_q &operator=(const circular_q &) = default;
+        explicit circular_q(size_t max_items)
+                : max_items_(max_items + 1) // one item is reserved as marker for full q
+                , v_(max_items_) {}
 
-    // move cannot be default,
-    // since we need to reset head_, tail_, etc to zero in the moved object
-    circular_q(circular_q &&other) noexcept
-    {
-        copy_moveable(std::move(other));
-    }
+        circular_q(const circular_q &) = default;
 
-    circular_q &operator=(circular_q &&other) noexcept
-    {
-        copy_moveable(std::move(other));
-        return *this;
-    }
+        circular_q &operator=(const circular_q &) = default;
 
-    // push back, overrun (oldest) item if no room left
-    void push_back(T &&item)
-    {
-        if (max_items_ > 0)
-        {
-            v_[tail_] = std::move(item);
-            tail_ = (tail_ + 1) % max_items_;
+        // move cannot be default,
+        // since we need to reset head_, tail_, etc to zero in the moved object
+        circular_q(circular_q &&other) noexcept {
+            copy_moveable(std::move(other));
+        }
 
-            if (tail_ == head_) // overrun last item if full
-            {
-                head_ = (head_ + 1) % max_items_;
-                ++overrun_counter_;
+        circular_q &operator=(circular_q &&other) noexcept {
+            copy_moveable(std::move(other));
+            return *this;
+        }
+
+        // push back, overrun (oldest) item if no room left
+        void push_back(T &&item) {
+            if (max_items_ > 0) {
+                v_[tail_] = std::move(item);
+                tail_ = (tail_ + 1) % max_items_;
+
+                if (tail_ == head_) // overrun last item if full
+                {
+                    head_ = (head_ + 1) % max_items_;
+                    ++overrun_counter_;
+                }
             }
         }
-    }
 
-    // Return reference to the front item.
-    // If there are no elements in the container, the behavior is undefined.
-    const T &front() const
-    {
-        return v_[head_];
-    }
-
-    T &front()
-    {
-        return v_[head_];
-    }
-
-    // Return number of elements actually stored
-    size_t size() const
-    {
-        if (tail_ >= head_)
-        {
-            return tail_ - head_;
+        // Return reference to the front item.
+        // If there are no elements in the container, the behavior is undefined.
+        const T &front() const {
+            return v_[head_];
         }
-        else
-        {
-            return max_items_ - (head_ - tail_);
+
+        T &front() {
+            return v_[head_];
         }
-    }
 
-    // Return const reference to item by index.
-    // If index is out of range 0…size()-1, the behavior is undefined.
-    const T &at(size_t i) const
-    {
-        assert(i < size());
-        return v_[(head_ + i) % max_items_];
-    }
-
-    // Pop item from front.
-    // If there are no elements in the container, the behavior is undefined.
-    void pop_front()
-    {
-        head_ = (head_ + 1) % max_items_;
-    }
-
-    bool empty() const
-    {
-        return tail_ == head_;
-    }
-
-    bool full() const
-    {
-        // head is ahead of the tail by 1
-        if (max_items_ > 0)
-        {
-            return ((tail_ + 1) % max_items_) == head_;
+        // Return number of elements actually stored
+        size_t size() const {
+            if (tail_ >= head_) {
+                return tail_ - head_;
+            } else {
+                return max_items_ - (head_ - tail_);
+            }
         }
-        return false;
-    }
 
-    size_t overrun_counter() const
-    {
-        return overrun_counter_;
-    }
+        // Return const reference to item by index.
+        // If index is out of range 0…size()-1, the behavior is undefined.
+        const T &at(size_t i) const {
+            assert(i < size());
+            return v_[(head_ + i) % max_items_];
+        }
 
-    void reset_overrun_counter()
-    {
-        overrun_counter_ = 0;
-    }
+        // Pop item from front.
+        // If there are no elements in the container, the behavior is undefined.
+        void pop_front() {
+            head_ = (head_ + 1) % max_items_;
+        }
 
-private:
-    // copy from other&& and reset it to disabled state
-    void copy_moveable(circular_q &&other) noexcept
-    {
-        max_items_ = other.max_items_;
-        head_ = other.head_;
-        tail_ = other.tail_;
-        overrun_counter_ = other.overrun_counter_;
-        v_ = std::move(other.v_);
+        bool empty() const {
+            return tail_ == head_;
+        }
 
-        // put &&other in disabled, but valid state
-        other.max_items_ = 0;
-        other.head_ = other.tail_ = 0;
-        other.overrun_counter_ = 0;
-    }
-};
-} // namespace details
-} // namespace turbo::tlog
+        bool full() const {
+            // head is ahead of the tail by 1
+            if (max_items_ > 0) {
+                return ((tail_ + 1) % max_items_) == head_;
+            }
+            return false;
+        }
+
+        size_t overrun_counter() const {
+            return overrun_counter_;
+        }
+
+        void reset_overrun_counter() {
+            overrun_counter_ = 0;
+        }
+
+    private:
+        // copy from other&& and reset it to disabled state
+        void copy_moveable(circular_q &&other) noexcept {
+            max_items_ = other.max_items_;
+            head_ = other.head_;
+            tail_ = other.tail_;
+            overrun_counter_ = other.overrun_counter_;
+            v_ = std::move(other.v_);
+
+            // put &&other in disabled, but valid state
+            other.max_items_ = 0;
+            other.head_ = other.tail_ = 0;
+            other.overrun_counter_ = 0;
+        }
+    };
+
+} // namespace turbo::tlog::details

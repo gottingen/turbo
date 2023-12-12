@@ -20,25 +20,30 @@
 
 namespace turbo::tlog {
 
-namespace sinks {
-class TURBO_DLL sink
-{
-public:
-    virtual ~sink() = default;
-    virtual void log(const details::log_msg &msg) = 0;
-    virtual void flush() = 0;
-    virtual void set_pattern(const std::string &pattern) = 0;
-    virtual void set_formatter(std::unique_ptr<turbo::tlog::formatter> sink_formatter) = 0;
+    namespace sinks {
+        class TURBO_DLL sink {
+        public:
+            virtual ~sink() = default;
 
-    void set_level(level::level_enum log_level);
-    level::level_enum level() const;
-    bool should_log(level::level_enum msg_level) const;
+            virtual void log(const details::log_msg &msg) = 0;
 
-protected:
-    // sink log level - default is all
-    level_t level_{level::trace};
-};
+            virtual void flush() = 0;
 
-} // namespace sinks
+            virtual void set_pattern(const std::string &pattern) = 0;
+
+            virtual void set_formatter(std::unique_ptr<turbo::tlog::formatter> sink_formatter) = 0;
+
+            void set_level(level::level_enum log_level);
+
+            level::level_enum level() const;
+
+            bool should_log(level::level_enum msg_level) const;
+
+        protected:
+            // sink log level - default is all
+            level_t level_{level::trace};
+        };
+
+    } // namespace sinks
 } // namespace turbo::tlog
 
