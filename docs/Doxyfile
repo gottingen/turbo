@@ -93,10 +93,10 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/hash/city/city.h \
                     ../turbo/hash/bytes/bytes.h \
                     ../turbo/times/version.h \
-                    ../turbo/times/times.h \
+                    ../turbo/times/time.h \
                     ../turbo/times/clock.h \
                     ../turbo/times/civil_time.h \
-                    ../turbo/times/stop_watch.h
+                    ../turbo/times/stop_watcher.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO
