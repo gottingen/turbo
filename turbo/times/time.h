@@ -1478,7 +1478,8 @@ namespace turbo {
         return b;
     }
 
-    /**
+
+    /**`
      * @ingroup turbo_times_time_zone
      * @brief Returns a TimeZone that is a fixed offset (seconds east) from UTC.
      *        Note: If the absolute value of the offset is greater than 24 hours
@@ -1983,7 +1984,7 @@ namespace turbo {
         template<std::intmax_t N>
         constexpr Duration FromInt64(int64_t v,
                                      std::ratio<1, N>) {
-            static_assert(0 < N && N <= 1000 * 1000 * 1000, "Unsupported ratio");
+            static_assert(0 < N && N <= 1000000000, "Unsupported ratio");
             // Subsecond ratios cannot overflow.
             return MakeNormalizedDuration(
                     v / N, v % N * kTicksPerNanosecond * 1000 * 1000 * 1000 / N);

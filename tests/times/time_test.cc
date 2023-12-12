@@ -25,56 +25,29 @@
 #include <limits>
 #include <string>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include "doctest/doctest.h"
 #include "turbo/base/int128.h"
 #include "turbo/times/clock.h"
 #include "tests/times/test_util.h"
 
 namespace {
 
-#if defined(GTEST_USES_SIMPLE_RE) && GTEST_USES_SIMPLE_RE
-    const char kZoneAbbrRE[] = ".*";  // just punt
-#else
-    const char kZoneAbbrRE[] = "[A-Za-z]{3,4}|[-+][0-9]{2}([0-9]{2})?";
-#endif
 
 // This helper is a macro so that failed expectations show up with the
 // correct line numbers.
-#define EXPECT_CIVIL_INFO(ci, y, m, d, h, min, s, off, isdst)      \
+#define REQUIRE_CIVIL_INFO(ci, y, m, d, h, min, s, off, isdst)      \
   do {                                                             \
-    EXPECT_EQ(y, ci.cs.year());                                    \
-    EXPECT_EQ(m, ci.cs.month());                                   \
-    EXPECT_EQ(d, ci.cs.day());                                     \
-    EXPECT_EQ(h, ci.cs.hour());                                    \
-    EXPECT_EQ(min, ci.cs.minute());                                \
-    EXPECT_EQ(s, ci.cs.second());                                  \
-    EXPECT_EQ(off, ci.offset);                                     \
-    EXPECT_EQ(isdst, ci.is_dst);                                   \
-    EXPECT_THAT(ci.zone_abbr, testing::MatchesRegex(kZoneAbbrRE)); \
+    REQUIRE_EQ(y, ci.cs.year());                                    \
+    REQUIRE_EQ(m, ci.cs.month());                                   \
+    REQUIRE_EQ(d, ci.cs.day());                                     \
+    REQUIRE_EQ(h, ci.cs.hour());                                    \
+    REQUIRE_EQ(min, ci.cs.minute());                                \
+    REQUIRE_EQ(s, ci.cs.second());                                  \
+    REQUIRE_EQ(off, ci.offset);                                     \
+    REQUIRE_EQ(isdst, ci.is_dst);                                   \
   } while (0)
 
-// A gMock matcher to match timespec values. Use this matcher like:
-// timespec ts1, ts2;
-// EXPECT_THAT(ts1, TimespecMatcher(ts2));
-    MATCHER_P(TimespecMatcher, ts, "") {
-        if (ts.tv_sec == arg.tv_sec && ts.tv_nsec == arg.tv_nsec) return true;
-        *result_listener << "expected: {" << ts.tv_sec << ", " << ts.tv_nsec << "} ";
-        *result_listener << "actual: {" << arg.tv_sec << ", " << arg.tv_nsec << "}";
-        return false;
-    }
-
-// A gMock matcher to match timeval values. Use this matcher like:
-// timeval tv1, tv2;
-// EXPECT_THAT(tv1, TimevalMatcher(tv2));
-    MATCHER_P(TimevalMatcher, tv, "") {
-        if (tv.tv_sec == arg.tv_sec && tv.tv_usec == arg.tv_usec) return true;
-        *result_listener << "expected: {" << tv.tv_sec << ", " << tv.tv_usec << "} ";
-        *result_listener << "actual: {" << arg.tv_sec << ", " << arg.tv_usec << "}";
-        return false;
-    }
-
-    TEST(Time, ConstExpr) {
+    TEST_CASE("Time, ConstExpr") {
         constexpr turbo::Time t0 = turbo::unix_epoch();
         static_assert(t0 == turbo::Time(), "unix_epoch");
         constexpr turbo::Time t1 = turbo::infinite_future();
@@ -93,84 +66,84 @@ namespace {
         static_assert(t7 == turbo::Time(), "from_time_t");
     }
 
-    TEST(Time, ValueSemantics) {
+    TEST_CASE("Time, ValueSemantics") {
         turbo::Time a;      // Default construction
         turbo::Time b = a;  // Copy construction
-        EXPECT_EQ(a, b);
+        REQUIRE_EQ(a, b);
         turbo::Time c(a);  // Copy construction (again)
-        EXPECT_EQ(a, b);
-        EXPECT_EQ(a, c);
-        EXPECT_EQ(b, c);
+        REQUIRE_EQ(a, b);
+        REQUIRE_EQ(a, c);
+        REQUIRE_EQ(b, c);
         b = c;  // Assignment
-        EXPECT_EQ(a, b);
-        EXPECT_EQ(a, c);
-        EXPECT_EQ(b, c);
+        REQUIRE_EQ(a, b);
+        REQUIRE_EQ(a, c);
+        REQUIRE_EQ(b, c);
     }
 
-    TEST(Time, unix_epoch) {
+    TEST_CASE("time, unix_epoch") {
         const auto ci = turbo::utc_time_zone().At(turbo::unix_epoch());
-        EXPECT_EQ(turbo::CivilSecond(1970, 1, 1, 0, 0, 0), ci.cs);
-        EXPECT_EQ(turbo::zero_duration(), ci.subsecond);
-        EXPECT_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
+        REQUIRE_EQ(turbo::CivilSecond(1970, 1, 1, 0, 0, 0), ci.cs);
+        REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
+        REQUIRE_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
     }
 
-    TEST(Time, Breakdown) {
+    TEST_CASE("Time, Breakdown") {
         turbo::TimeZone tz = turbo::time_internal::load_time_zone("America/New_York");
         turbo::Time t = turbo::unix_epoch();
 
         // The Unix epoch as seen in NYC.
         auto ci = tz.At(t);
-        EXPECT_CIVIL_INFO(ci, 1969, 12, 31, 19, 0, 0, -18000, false);
-        EXPECT_EQ(turbo::zero_duration(), ci.subsecond);
-        EXPECT_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
+        REQUIRE_CIVIL_INFO(ci, 1969, 12, 31, 19, 0, 0, -18000, false);
+        REQUIRE_EQ(turbo::zero_duration(), ci.subsecond);
+        REQUIRE_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
 
         // Just before the epoch.
         t -= turbo::nanoseconds(1);
         ci = tz.At(t);
-        EXPECT_CIVIL_INFO(ci, 1969, 12, 31, 18, 59, 59, -18000, false);
-        EXPECT_EQ(turbo::nanoseconds(999999999), ci.subsecond);
-        EXPECT_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
+        REQUIRE_CIVIL_INFO(ci, 1969, 12, 31, 18, 59, 59, -18000, false);
+        REQUIRE_EQ(turbo::nanoseconds(999999999), ci.subsecond);
+        REQUIRE_EQ(turbo::Weekday::wednesday, turbo::get_weekday(ci.cs));
 
         // Some time later.
         t += turbo::hours(24) * 2735;
         t += turbo::hours(18) + turbo::minutes(30) + turbo::seconds(15) +
              turbo::nanoseconds(9);
         ci = tz.At(t);
-        EXPECT_CIVIL_INFO(ci, 1977, 6, 28, 14, 30, 15, -14400, true);
-        EXPECT_EQ(8, ci.subsecond / turbo::nanoseconds(1));
-        EXPECT_EQ(turbo::Weekday::tuesday, turbo::get_weekday(ci.cs));
+        REQUIRE_CIVIL_INFO(ci, 1977, 6, 28, 14, 30, 15, -14400, true);
+        REQUIRE_EQ(8, ci.subsecond / turbo::nanoseconds(1));
+        REQUIRE_EQ(turbo::Weekday::tuesday, turbo::get_weekday(ci.cs));
     }
 
-    TEST(Time, AdditiveOperators) {
+    TEST_CASE("Time, AdditiveOperators") {
         const turbo::Duration d = turbo::nanoseconds(1);
         const turbo::Time t0;
         const turbo::Time t1 = t0 + d;
 
-        EXPECT_EQ(d, t1 - t0);
-        EXPECT_EQ(-d, t0 - t1);
-        EXPECT_EQ(t0, t1 - d);
+        REQUIRE_EQ(d, t1 - t0);
+        REQUIRE_EQ(-d, t0 - t1);
+        REQUIRE_EQ(t0, t1 - d);
 
         turbo::Time t(t0);
-        EXPECT_EQ(t0, t);
+        REQUIRE_EQ(t0, t);
         t += d;
-        EXPECT_EQ(t0 + d, t);
-        EXPECT_EQ(d, t - t0);
+        REQUIRE_EQ(t0 + d, t);
+        REQUIRE_EQ(d, t - t0);
         t -= d;
-        EXPECT_EQ(t0, t);
+        REQUIRE_EQ(t0, t);
 
         // Tests overflow between subseconds and seconds.
         t = turbo::unix_epoch();
         t += turbo::milliseconds(500);
-        EXPECT_EQ(turbo::unix_epoch() + turbo::milliseconds(500), t);
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::milliseconds(500), t);
         t += turbo::milliseconds(600);
-        EXPECT_EQ(turbo::unix_epoch() + turbo::milliseconds(1100), t);
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::milliseconds(1100), t);
         t -= turbo::milliseconds(600);
-        EXPECT_EQ(turbo::unix_epoch() + turbo::milliseconds(500), t);
+        REQUIRE_EQ(turbo::unix_epoch() + turbo::milliseconds(500), t);
         t -= turbo::milliseconds(500);
-        EXPECT_EQ(turbo::unix_epoch(), t);
+        REQUIRE_EQ(turbo::unix_epoch(), t);
     }
 
-    TEST(Time, RelationalOperators) {
+    TEST_CASE("Time, RelationalOperators") {
         constexpr turbo::Time t1 = turbo::from_unix_nanos(0);
         constexpr turbo::Time t2 = turbo::from_unix_nanos(1);
         constexpr turbo::Time t3 = turbo::from_unix_nanos(2);
@@ -203,7 +176,7 @@ namespace {
         static_assert(t3 >= t1, "");
     }
 
-    TEST(Time, Infinity) {
+    TEST_CASE("Time, Infinity") {
         constexpr turbo::Time ifuture = turbo::infinite_future();
         constexpr turbo::Time ipast = turbo::infinite_past();
 
@@ -213,35 +186,35 @@ namespace {
         static_assert(ifuture > ipast, "");
 
         // Arithmetic saturates
-        EXPECT_EQ(ifuture, ifuture + turbo::seconds(1));
-        EXPECT_EQ(ifuture, ifuture - turbo::seconds(1));
-        EXPECT_EQ(ipast, ipast + turbo::seconds(1));
-        EXPECT_EQ(ipast, ipast - turbo::seconds(1));
+        REQUIRE_EQ(ifuture, ifuture + turbo::seconds(1));
+        REQUIRE_EQ(ifuture, ifuture - turbo::seconds(1));
+        REQUIRE_EQ(ipast, ipast + turbo::seconds(1));
+        REQUIRE_EQ(ipast, ipast - turbo::seconds(1));
 
-        EXPECT_EQ(turbo::infinite_duration(), ifuture - ifuture);
-        EXPECT_EQ(turbo::infinite_duration(), ifuture - ipast);
-        EXPECT_EQ(-turbo::infinite_duration(), ipast - ifuture);
-        EXPECT_EQ(-turbo::infinite_duration(), ipast - ipast);
+        REQUIRE_EQ(turbo::infinite_duration(), ifuture - ifuture);
+        REQUIRE_EQ(turbo::infinite_duration(), ifuture - ipast);
+        REQUIRE_EQ(-turbo::infinite_duration(), ipast - ifuture);
+        REQUIRE_EQ(-turbo::infinite_duration(), ipast - ipast);
 
         constexpr turbo::Time t = turbo::unix_epoch();  // Any finite time.
         static_assert(t < ifuture, "");
         static_assert(t > ipast, "");
 
-        EXPECT_EQ(ifuture, t + turbo::infinite_duration());
-        EXPECT_EQ(ipast, t - turbo::infinite_duration());
+        REQUIRE_EQ(ifuture, t + turbo::infinite_duration());
+        REQUIRE_EQ(ipast, t - turbo::infinite_duration());
     }
 
-    TEST(Time, FloorConversion) {
+    TEST_CASE("Time, FloorConversion") {
 #define TEST_FLOOR_CONVERSION(TO, FROM) \
-  EXPECT_EQ(1, TO(FROM(1001)));         \
-  EXPECT_EQ(1, TO(FROM(1000)));         \
-  EXPECT_EQ(0, TO(FROM(999)));          \
-  EXPECT_EQ(0, TO(FROM(1)));            \
-  EXPECT_EQ(0, TO(FROM(0)));            \
-  EXPECT_EQ(-1, TO(FROM(-1)));          \
-  EXPECT_EQ(-1, TO(FROM(-999)));        \
-  EXPECT_EQ(-1, TO(FROM(-1000)));       \
-  EXPECT_EQ(-2, TO(FROM(-1001)));
+  REQUIRE_EQ(1, TO(FROM(1001)));         \
+  REQUIRE_EQ(1, TO(FROM(1000)));         \
+  REQUIRE_EQ(0, TO(FROM(999)));          \
+  REQUIRE_EQ(0, TO(FROM(1)));            \
+  REQUIRE_EQ(0, TO(FROM(0)));            \
+  REQUIRE_EQ(-1, TO(FROM(-1)));          \
+  REQUIRE_EQ(-1, TO(FROM(-999)));        \
+  REQUIRE_EQ(-1, TO(FROM(-1000)));       \
+  REQUIRE_EQ(-2, TO(FROM(-1001)));
 
         TEST_FLOOR_CONVERSION(turbo::to_unix_micros, turbo::from_unix_nanos);
         TEST_FLOOR_CONVERSION(turbo::to_unix_millis, turbo::from_unix_micros);
@@ -251,55 +224,36 @@ namespace {
 #undef TEST_FLOOR_CONVERSION
 
         // Tests to_unix_nanos.
-        EXPECT_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(3) / 2));
-        EXPECT_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(1)));
-        EXPECT_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(1) / 2));
-        EXPECT_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(0)));
-        EXPECT_EQ(-1,
+        REQUIRE_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(3) / 2));
+        REQUIRE_EQ(1, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(1)));
+        REQUIRE_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(1) / 2));
+        REQUIRE_EQ(0, turbo::to_unix_nanos(turbo::unix_epoch() + turbo::nanoseconds(0)));
+        REQUIRE_EQ(-1,
                   turbo::to_unix_nanos(turbo::unix_epoch() - turbo::nanoseconds(1) / 2));
-        EXPECT_EQ(-1, turbo::to_unix_nanos(turbo::unix_epoch() - turbo::nanoseconds(1)));
-        EXPECT_EQ(-2,
+        REQUIRE_EQ(-1, turbo::to_unix_nanos(turbo::unix_epoch() - turbo::nanoseconds(1)));
+        REQUIRE_EQ(-2,
                   turbo::to_unix_nanos(turbo::unix_epoch() - turbo::nanoseconds(3) / 2));
 
         // Tests to_universal, which uses a different epoch than the tests above.
-        EXPECT_EQ(1,
+        REQUIRE_EQ(1,
                   turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(101)));
-        EXPECT_EQ(1,
+        REQUIRE_EQ(1,
                   turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(100)));
-        EXPECT_EQ(0,
+        REQUIRE_EQ(0,
                   turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(99)));
-        EXPECT_EQ(0,
+        REQUIRE_EQ(0,
                   turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(1)));
-        EXPECT_EQ(0,
+        REQUIRE_EQ(0,
                   turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(0)));
-        EXPECT_EQ(-1,
+        REQUIRE_EQ(-1,
                   turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-1)));
-        EXPECT_EQ(-1,
+        REQUIRE_EQ(-1,
                   turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-99)));
-        EXPECT_EQ(
+        REQUIRE_EQ(
                 -1, turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-100)));
-        EXPECT_EQ(
+        REQUIRE_EQ(
                 -2, turbo::to_universal(turbo::universal_epoch() + turbo::nanoseconds(-101)));
 
-        // Tests to_timespec()/time_from_timespec()
-        const struct {
-            turbo::Time t;
-            timespec ts;
-        } to_ts[] = {
-                {turbo::from_unix_seconds(1) + turbo::nanoseconds(1),      {1,  1}},
-                {turbo::from_unix_seconds(1) + turbo::nanoseconds(1) / 2,  {1,  0}},
-                {turbo::from_unix_seconds(1) + turbo::nanoseconds(0),      {1,  0}},
-                {turbo::from_unix_seconds(0) + turbo::nanoseconds(0),      {0,  0}},
-                {turbo::from_unix_seconds(0) - turbo::nanoseconds(1) / 2,  {-1, 999999999}},
-                {turbo::from_unix_seconds(0) - turbo::nanoseconds(1),      {-1, 999999999}},
-                {turbo::from_unix_seconds(-1) + turbo::nanoseconds(1),     {-1, 1}},
-                {turbo::from_unix_seconds(-1) + turbo::nanoseconds(1) / 2, {-1, 0}},
-                {turbo::from_unix_seconds(-1) + turbo::nanoseconds(0),     {-1, 0}},
-                {turbo::from_unix_seconds(-1) - turbo::nanoseconds(1) / 2, {-2, 999999999}},
-        };
-        for (const auto &test: to_ts) {
-            EXPECT_THAT(turbo::to_timespec(test.t), TimespecMatcher(test.ts));
-        }
         const struct {
             timespec ts;
             turbo::Time t;
@@ -315,28 +269,9 @@ namespace {
                 {{-2, 999999999}, turbo::from_unix_seconds(-1) - turbo::nanoseconds(1)},
         };
         for (const auto &test: from_ts) {
-            EXPECT_EQ(test.t, turbo::time_from_timespec(test.ts));
+            REQUIRE_EQ(test.t, turbo::time_from_timespec(test.ts));
         }
 
-        // Tests to_timeval()/time_from_timeval() (same as timespec above)
-        const struct {
-            turbo::Time t;
-            timeval tv;
-        } to_tv[] = {
-                {turbo::from_unix_seconds(1) + turbo::microseconds(1),      {1,  1}},
-                {turbo::from_unix_seconds(1) + turbo::microseconds(1) / 2,  {1,  0}},
-                {turbo::from_unix_seconds(1) + turbo::microseconds(0),      {1,  0}},
-                {turbo::from_unix_seconds(0) + turbo::microseconds(0),      {0,  0}},
-                {turbo::from_unix_seconds(0) - turbo::microseconds(1) / 2,  {-1, 999999}},
-                {turbo::from_unix_seconds(0) - turbo::microseconds(1),      {-1, 999999}},
-                {turbo::from_unix_seconds(-1) + turbo::microseconds(1),     {-1, 1}},
-                {turbo::from_unix_seconds(-1) + turbo::microseconds(1) / 2, {-1, 0}},
-                {turbo::from_unix_seconds(-1) + turbo::microseconds(0),     {-1, 0}},
-                {turbo::from_unix_seconds(-1) - turbo::microseconds(1) / 2, {-2, 999999}},
-        };
-        for (const auto &test: to_tv) {
-            EXPECT_THAT(to_timeval(test.t), TimevalMatcher(test.tv));
-        }
         const struct {
             timeval tv;
             turbo::Time t;
@@ -352,176 +287,28 @@ namespace {
                 {{-2, 999999}, turbo::from_unix_seconds(-1) - turbo::microseconds(1)},
         };
         for (const auto &test: from_tv) {
-            EXPECT_EQ(test.t, turbo::time_from_timeval(test.tv));
+            REQUIRE_EQ(test.t, turbo::time_from_timeval(test.tv));
         }
 
         // Tests flooring near negative infinity.
         const int64_t min_plus_1 = std::numeric_limits<int64_t>::min() + 1;
-        EXPECT_EQ(min_plus_1, turbo::to_unix_seconds(turbo::from_unix_seconds(min_plus_1)));
-        EXPECT_EQ(std::numeric_limits<int64_t>::min(),
+        REQUIRE_EQ(min_plus_1, turbo::to_unix_seconds(turbo::from_unix_seconds(min_plus_1)));
+        REQUIRE_EQ(std::numeric_limits<int64_t>::min(),
                   turbo::to_unix_seconds(turbo::from_unix_seconds(min_plus_1) -
                                        turbo::nanoseconds(1) / 2));
 
         // Tests flooring near positive infinity.
-        EXPECT_EQ(std::numeric_limits<int64_t>::max(),
+        REQUIRE_EQ(std::numeric_limits<int64_t>::max(),
                   turbo::to_unix_seconds(
                           turbo::from_unix_seconds(std::numeric_limits<int64_t>::max()) +
                           turbo::nanoseconds(1) / 2));
-        EXPECT_EQ(std::numeric_limits<int64_t>::max(),
+        REQUIRE_EQ(std::numeric_limits<int64_t>::max(),
                   turbo::to_unix_seconds(
                           turbo::from_unix_seconds(std::numeric_limits<int64_t>::max())));
-        EXPECT_EQ(std::numeric_limits<int64_t>::max() - 1,
+        REQUIRE_EQ(std::numeric_limits<int64_t>::max() - 1,
                   turbo::to_unix_seconds(
                           turbo::from_unix_seconds(std::numeric_limits<int64_t>::max()) -
                           turbo::nanoseconds(1) / 2));
-    }
-
-    TEST(Time, RoundtripConversion) {
-#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
-        GTEST_SKIP();
-#endif
-
-#define TEST_CONVERSION_ROUND_TRIP(SOURCE, FROM, TO, MATCHER) \
-  EXPECT_THAT(TO(FROM(SOURCE)), MATCHER(SOURCE))
-
-        // from_unix_nanos() and to_unix_nanos()
-        int64_t now_ns = turbo::get_current_time_nanos();
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::from_unix_nanos, turbo::to_unix_nanos,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::from_unix_nanos, turbo::to_unix_nanos,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::from_unix_nanos, turbo::to_unix_nanos,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_ns, turbo::from_unix_nanos, turbo::to_unix_nanos,
-                                   testing::Eq)
-                            << now_ns;
-
-        // from_unix_micros() and to_unix_micros()
-        int64_t now_us = turbo::get_current_time_nanos() / 1000;
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::from_unix_micros, turbo::to_unix_micros,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::from_unix_micros, turbo::to_unix_micros,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::from_unix_micros, turbo::to_unix_micros,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_us, turbo::from_unix_micros, turbo::to_unix_micros,
-                                   testing::Eq)
-                            << now_us;
-
-        // from_unix_millis() and to_unix_millis()
-        int64_t now_ms = turbo::get_current_time_nanos() / 1000000;
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::from_unix_millis, turbo::to_unix_millis,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::from_unix_millis, turbo::to_unix_millis,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::from_unix_millis, turbo::to_unix_millis,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_ms, turbo::from_unix_millis, turbo::to_unix_millis,
-                                   testing::Eq)
-                            << now_ms;
-
-        // from_unix_seconds() and to_unix_seconds()
-        int64_t now_s = std::time(nullptr);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::from_unix_seconds, turbo::to_unix_seconds,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::from_unix_seconds, turbo::to_unix_seconds,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::from_unix_seconds, turbo::to_unix_seconds,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_s, turbo::from_unix_seconds, turbo::to_unix_seconds,
-                                   testing::Eq)
-                            << now_s;
-
-        // from_time_t() and to_time_t()
-        time_t now_time_t = std::time(nullptr);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::from_time_t, turbo::to_time_t, testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::from_time_t, turbo::to_time_t, testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::from_time_t, turbo::to_time_t, testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_time_t, turbo::from_time_t, turbo::to_time_t,
-                                   testing::Eq)
-                            << now_time_t;
-
-        // time_from_timeval() and to_timeval()
-        timeval tv;
-        tv.tv_sec = -1;
-        tv.tv_usec = 0;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::time_from_timeval, turbo::to_timeval,
-                                   TimevalMatcher);
-        tv.tv_sec = -1;
-        tv.tv_usec = 999999;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::time_from_timeval, turbo::to_timeval,
-                                   TimevalMatcher);
-        tv.tv_sec = 0;
-        tv.tv_usec = 0;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::time_from_timeval, turbo::to_timeval,
-                                   TimevalMatcher);
-        tv.tv_sec = 0;
-        tv.tv_usec = 1;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::time_from_timeval, turbo::to_timeval,
-                                   TimevalMatcher);
-        tv.tv_sec = 1;
-        tv.tv_usec = 0;
-        TEST_CONVERSION_ROUND_TRIP(tv, turbo::time_from_timeval, turbo::to_timeval,
-                                   TimevalMatcher);
-
-        // time_from_timespec() and to_timespec()
-        timespec ts;
-        ts.tv_sec = -1;
-        ts.tv_nsec = 0;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::time_from_timespec, turbo::to_timespec,
-                                   TimespecMatcher);
-        ts.tv_sec = -1;
-        ts.tv_nsec = 999999999;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::time_from_timespec, turbo::to_timespec,
-                                   TimespecMatcher);
-        ts.tv_sec = 0;
-        ts.tv_nsec = 0;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::time_from_timespec, turbo::to_timespec,
-                                   TimespecMatcher);
-        ts.tv_sec = 0;
-        ts.tv_nsec = 1;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::time_from_timespec, turbo::to_timespec,
-                                   TimespecMatcher);
-        ts.tv_sec = 1;
-        ts.tv_nsec = 0;
-        TEST_CONVERSION_ROUND_TRIP(ts, turbo::time_from_timespec, turbo::to_timespec,
-                                   TimespecMatcher);
-
-        // from_udate() and to_udate()
-        double now_ud = turbo::get_current_time_nanos() / 1000000;
-        TEST_CONVERSION_ROUND_TRIP(-1.5, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(-0.5, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(0.5, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(1.5, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq);
-        TEST_CONVERSION_ROUND_TRIP(now_ud, turbo::from_udate, turbo::to_udate,
-                                   testing::DoubleEq)
-                            << std::fixed << std::setprecision(17) << now_ud;
-
-        // from_universal() and to_universal()
-        int64_t now_uni = ((719162LL * (24 * 60 * 60)) * (1000 * 1000 * 10)) +
-                          (turbo::get_current_time_nanos() / 100);
-        TEST_CONVERSION_ROUND_TRIP(-1, turbo::from_universal, turbo::to_universal,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(0, turbo::from_universal, turbo::to_universal,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(1, turbo::from_universal, turbo::to_universal,
-                                   testing::Eq);
-        TEST_CONVERSION_ROUND_TRIP(now_uni, turbo::from_universal, turbo::to_universal,
-                                   testing::Eq)
-                            << now_uni;
-
-#undef TEST_CONVERSION_ROUND_TRIP
     }
 
     template<typename Duration>
@@ -529,20 +316,20 @@ namespace {
         return std::chrono::system_clock::from_time_t(0) + d;
     }
 
-    TEST(Time, from_chrono) {
-        EXPECT_EQ(turbo::from_time_t(-1),
+    TEST_CASE("time, from_chrono") {
+        REQUIRE_EQ(turbo::from_time_t(-1),
                   turbo::from_chrono(std::chrono::system_clock::from_time_t(-1)));
-        EXPECT_EQ(turbo::from_time_t(0),
+        REQUIRE_EQ(turbo::from_time_t(0),
                   turbo::from_chrono(std::chrono::system_clock::from_time_t(0)));
-        EXPECT_EQ(turbo::from_time_t(1),
+        REQUIRE_EQ(turbo::from_time_t(1),
                   turbo::from_chrono(std::chrono::system_clock::from_time_t(1)));
 
-        EXPECT_EQ(
+        REQUIRE_EQ(
                 turbo::from_unix_millis(-1),
                 turbo::from_chrono(MakeChronoUnixTime(std::chrono::milliseconds(-1))));
-        EXPECT_EQ(turbo::from_unix_millis(0),
+        REQUIRE_EQ(turbo::from_unix_millis(0),
                   turbo::from_chrono(MakeChronoUnixTime(std::chrono::milliseconds(0))));
-        EXPECT_EQ(turbo::from_unix_millis(1),
+        REQUIRE_EQ(turbo::from_unix_millis(1),
                   turbo::from_chrono(MakeChronoUnixTime(std::chrono::milliseconds(1))));
 
         // Chrono doesn't define exactly its range and precision (neither does
@@ -551,46 +338,42 @@ namespace {
         const auto century = std::chrono::seconds(century_sec);
         const auto chrono_future = MakeChronoUnixTime(century);
         const auto chrono_past = MakeChronoUnixTime(-century);
-        EXPECT_EQ(turbo::from_unix_seconds(century_sec),
+        REQUIRE_EQ(turbo::from_unix_seconds(century_sec),
                   turbo::from_chrono(chrono_future));
-        EXPECT_EQ(turbo::from_unix_seconds(-century_sec), turbo::from_chrono(chrono_past));
+        REQUIRE_EQ(turbo::from_unix_seconds(-century_sec), turbo::from_chrono(chrono_past));
 
         // Roundtrip them both back to chrono.
-        EXPECT_EQ(chrono_future,
+        REQUIRE_EQ(chrono_future,
                   turbo::to_chrono_time(turbo::from_unix_seconds(century_sec)));
-        EXPECT_EQ(chrono_past,
+        REQUIRE_EQ(chrono_past,
                   turbo::to_chrono_time(turbo::from_unix_seconds(-century_sec)));
     }
 
-    TEST(Time, to_chrono_time) {
-#if defined(TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT) && \
-    TURBO_SKIP_TIME_TESTS_BROKEN_ON_MSVC_OPT
-        GTEST_SKIP();
-#endif
+    TEST_CASE("time, to_chrono_time") {
 
-        EXPECT_EQ(std::chrono::system_clock::from_time_t(-1),
+        REQUIRE_EQ(std::chrono::system_clock::from_time_t(-1),
                   turbo::to_chrono_time(turbo::from_time_t(-1)));
-        EXPECT_EQ(std::chrono::system_clock::from_time_t(0),
+        REQUIRE_EQ(std::chrono::system_clock::from_time_t(0),
                   turbo::to_chrono_time(turbo::from_time_t(0)));
-        EXPECT_EQ(std::chrono::system_clock::from_time_t(1),
+        REQUIRE_EQ(std::chrono::system_clock::from_time_t(1),
                   turbo::to_chrono_time(turbo::from_time_t(1)));
 
-        EXPECT_EQ(MakeChronoUnixTime(std::chrono::milliseconds(-1)),
+        REQUIRE_EQ(MakeChronoUnixTime(std::chrono::milliseconds(-1)),
                   turbo::to_chrono_time(turbo::from_unix_millis(-1)));
-        EXPECT_EQ(MakeChronoUnixTime(std::chrono::milliseconds(0)),
+        REQUIRE_EQ(MakeChronoUnixTime(std::chrono::milliseconds(0)),
                   turbo::to_chrono_time(turbo::from_unix_millis(0)));
-        EXPECT_EQ(MakeChronoUnixTime(std::chrono::milliseconds(1)),
+        REQUIRE_EQ(MakeChronoUnixTime(std::chrono::milliseconds(1)),
                   turbo::to_chrono_time(turbo::from_unix_millis(1)));
 
         // Time before the Unix epoch should floor, not trunc.
         const auto tick = turbo::nanoseconds(1) / 4;
-        EXPECT_EQ(std::chrono::system_clock::from_time_t(0) -
+        REQUIRE_EQ(std::chrono::system_clock::from_time_t(0) -
                   std::chrono::system_clock::duration(1),
                   turbo::to_chrono_time(turbo::unix_epoch() - tick));
     }
 
 // Check that turbo::int128 works as a std::chrono::duration representation.
-    TEST(Time, Chrono128) {
+    TEST_CASE("Time, Chrono128") {
         // Define a std::chrono::time_point type whose time[sic]_since_epoch() is
         // a signed 128-bit count of attoseconds. This has a range and resolution
         // (currently) beyond those of turbo::Time, and undoubtedly also beyond those
@@ -610,8 +393,8 @@ namespace {
         // but floor() is only available since c++17.
         for (const auto tp: {std::chrono::system_clock::time_point::min(),
                              std::chrono::system_clock::time_point::max()}) {
-            EXPECT_EQ(tp, turbo::to_chrono_time(turbo::from_chrono(tp)));
-            EXPECT_EQ(tp, std::chrono::time_point_cast<
+            REQUIRE_EQ(tp, turbo::to_chrono_time(turbo::from_chrono(tp)));
+            REQUIRE_EQ(tp, std::chrono::time_point_cast<
                     std::chrono::system_clock::time_point::duration>(
                     std::chrono::time_point_cast<Timestamp::duration>(tp)));
         }
@@ -619,21 +402,21 @@ namespace {
         v *= Timestamp::duration::period::den;
         auto ts = Timestamp(Timestamp::duration(v));
         ts += std::chrono::duration<int64_t, std::atto>(0);
-        EXPECT_EQ(std::numeric_limits<int64_t>::min(),
+        REQUIRE_EQ(std::numeric_limits<int64_t>::min(),
                   ts.time_since_epoch().count() / Timestamp::duration::period::den);
-        EXPECT_EQ(0,
+        REQUIRE_EQ(0,
                   ts.time_since_epoch().count() % Timestamp::duration::period::den);
         v = std::numeric_limits<int64_t>::max();
         v *= Timestamp::duration::period::den;
         ts = Timestamp(Timestamp::duration(v));
         ts += std::chrono::duration<int64_t, std::atto>(999999999750000000);
-        EXPECT_EQ(std::numeric_limits<int64_t>::max(),
+        REQUIRE_EQ(std::numeric_limits<int64_t>::max(),
                   ts.time_since_epoch().count() / Timestamp::duration::period::den);
-        EXPECT_EQ(999999999750000000,
+        REQUIRE_EQ(999999999750000000,
                   ts.time_since_epoch().count() % Timestamp::duration::period::den);
     }
 
-    TEST(Time, TimeZoneAt) {
+    TEST_CASE("Time, TimeZoneAt") {
         const turbo::TimeZone nyc =
                 turbo::time_internal::load_time_zone("America/New_York");
         const std::string fmt = "%a, %e %b %Y %H:%M:%S %z (%Z)";
@@ -641,55 +424,55 @@ namespace {
         // A non-transition where the civil time is unique.
         turbo::CivilSecond nov01(2013, 11, 1, 8, 30, 0);
         const auto nov01_ci = nyc.At(nov01);
-        EXPECT_EQ(turbo::TimeZone::TimeInfo::UNIQUE, nov01_ci.kind);
-        EXPECT_EQ("Fri,  1 Nov 2013 08:30:00 -0400 (EDT)",
+        REQUIRE_EQ(turbo::TimeZone::TimeInfo::UNIQUE, nov01_ci.kind);
+        REQUIRE_EQ("Fri,  1 Nov 2013 08:30:00 -0400 (EDT)",
                   turbo::format_time(fmt, nov01_ci.pre, nyc));
-        EXPECT_EQ(nov01_ci.pre, nov01_ci.trans);
-        EXPECT_EQ(nov01_ci.pre, nov01_ci.post);
-        EXPECT_EQ(nov01_ci.pre, turbo::from_civil(nov01, nyc));
+        REQUIRE_EQ(nov01_ci.pre, nov01_ci.trans);
+        REQUIRE_EQ(nov01_ci.pre, nov01_ci.post);
+        REQUIRE_EQ(nov01_ci.pre, turbo::from_civil(nov01, nyc));
 
         // A Spring DST transition, when there is a gap in civil time
         // and we prefer the later of the possible interpretations of a
         // non-existent time.
         turbo::CivilSecond mar13(2011, 3, 13, 2, 15, 0);
         const auto mar_ci = nyc.At(mar13);
-        EXPECT_EQ(turbo::TimeZone::TimeInfo::SKIPPED, mar_ci.kind);
-        EXPECT_EQ("Sun, 13 Mar 2011 03:15:00 -0400 (EDT)",
+        REQUIRE_EQ(turbo::TimeZone::TimeInfo::SKIPPED, mar_ci.kind);
+        REQUIRE_EQ("Sun, 13 Mar 2011 03:15:00 -0400 (EDT)",
                   turbo::format_time(fmt, mar_ci.pre, nyc));
-        EXPECT_EQ("Sun, 13 Mar 2011 03:00:00 -0400 (EDT)",
+        REQUIRE_EQ("Sun, 13 Mar 2011 03:00:00 -0400 (EDT)",
                   turbo::format_time(fmt, mar_ci.trans, nyc));
-        EXPECT_EQ("Sun, 13 Mar 2011 01:15:00 -0500 (EST)",
+        REQUIRE_EQ("Sun, 13 Mar 2011 01:15:00 -0500 (EST)",
                   turbo::format_time(fmt, mar_ci.post, nyc));
-        EXPECT_EQ(mar_ci.trans, turbo::from_civil(mar13, nyc));
+        REQUIRE_EQ(mar_ci.trans, turbo::from_civil(mar13, nyc));
 
         // A Fall DST transition, when civil times are repeated and
         // we prefer the earlier of the possible interpretations of an
         // ambiguous time.
         turbo::CivilSecond nov06(2011, 11, 6, 1, 15, 0);
         const auto nov06_ci = nyc.At(nov06);
-        EXPECT_EQ(turbo::TimeZone::TimeInfo::REPEATED, nov06_ci.kind);
-        EXPECT_EQ("Sun,  6 Nov 2011 01:15:00 -0400 (EDT)",
+        REQUIRE_EQ(turbo::TimeZone::TimeInfo::REPEATED, nov06_ci.kind);
+        REQUIRE_EQ("Sun,  6 Nov 2011 01:15:00 -0400 (EDT)",
                   turbo::format_time(fmt, nov06_ci.pre, nyc));
-        EXPECT_EQ("Sun,  6 Nov 2011 01:00:00 -0500 (EST)",
+        REQUIRE_EQ("Sun,  6 Nov 2011 01:00:00 -0500 (EST)",
                   turbo::format_time(fmt, nov06_ci.trans, nyc));
-        EXPECT_EQ("Sun,  6 Nov 2011 01:15:00 -0500 (EST)",
+        REQUIRE_EQ("Sun,  6 Nov 2011 01:15:00 -0500 (EST)",
                   turbo::format_time(fmt, nov06_ci.post, nyc));
-        EXPECT_EQ(nov06_ci.pre, turbo::from_civil(nov06, nyc));
+        REQUIRE_EQ(nov06_ci.pre, turbo::from_civil(nov06, nyc));
 
         // Check that (time_t) -1 is handled correctly.
         turbo::CivilSecond minus1(1969, 12, 31, 18, 59, 59);
         const auto minus1_cl = nyc.At(minus1);
-        EXPECT_EQ(turbo::TimeZone::TimeInfo::UNIQUE, minus1_cl.kind);
-        EXPECT_EQ(-1, turbo::to_time_t(minus1_cl.pre));
-        EXPECT_EQ("Wed, 31 Dec 1969 18:59:59 -0500 (EST)",
+        REQUIRE_EQ(turbo::TimeZone::TimeInfo::UNIQUE, minus1_cl.kind);
+        REQUIRE_EQ(-1, turbo::to_time_t(minus1_cl.pre));
+        REQUIRE_EQ("Wed, 31 Dec 1969 18:59:59 -0500 (EST)",
                   turbo::format_time(fmt, minus1_cl.pre, nyc));
-        EXPECT_EQ("Wed, 31 Dec 1969 23:59:59 +0000 (UTC)",
+        REQUIRE_EQ("Wed, 31 Dec 1969 23:59:59 +0000 (UTC)",
                   turbo::format_time(fmt, minus1_cl.pre, turbo::utc_time_zone()));
     }
 
 // from_civil(CivilSecond(year, mon, day, hour, min, sec), utc_time_zone())
 // has a specialized fastpath implementation, which we exercise here.
-    TEST(Time, FromCivilUTC) {
+    TEST_CASE("Time, FromCivilUTC") {
         const turbo::TimeZone utc = turbo::utc_time_zone();
         const std::string fmt = "%a, %e %b %Y %H:%M:%S %z (%Z)";
         const int kMax = std::numeric_limits<int>::max();
@@ -699,37 +482,37 @@ namespace {
         // 292091940881 is the last positive year to use the fastpath.
         t = turbo::from_civil(
                 turbo::CivilSecond(292091940881, kMax, kMax, kMax, kMax, kMax), utc);
-        EXPECT_EQ("Fri, 25 Nov 292277026596 12:21:07 +0000 (UTC)",
+        REQUIRE_EQ("Fri, 25 Nov 292277026596 12:21:07 +0000 (UTC)",
                   turbo::format_time(fmt, t, utc));
         t = turbo::from_civil(
                 turbo::CivilSecond(292091940882, kMax, kMax, kMax, kMax, kMax), utc);
-        EXPECT_EQ("infinite-future", turbo::format_time(fmt, t, utc));  // no overflow
+        REQUIRE_EQ("infinite-future", turbo::format_time(fmt, t, utc));  // no overflow
 
         // -292091936940 is the last negative year to use the fastpath.
         t = turbo::from_civil(
                 turbo::CivilSecond(-292091936940, kMin, kMin, kMin, kMin, kMin), utc);
-        EXPECT_EQ("Fri,  1 Nov -292277022657 10:37:52 +0000 (UTC)",
+        REQUIRE_EQ("Fri,  1 Nov -292277022657 10:37:52 +0000 (UTC)",
                   turbo::format_time(fmt, t, utc));
         t = turbo::from_civil(
                 turbo::CivilSecond(-292091936941, kMin, kMin, kMin, kMin, kMin), utc);
-        EXPECT_EQ("infinite-past", turbo::format_time(fmt, t, utc));  // no underflow
+        REQUIRE_EQ("infinite-past", turbo::format_time(fmt, t, utc));  // no underflow
 
         // Check that we're counting leap years correctly.
         t = turbo::from_civil(turbo::CivilSecond(1900, 2, 28, 23, 59, 59), utc);
-        EXPECT_EQ("Wed, 28 Feb 1900 23:59:59 +0000 (UTC)",
+        REQUIRE_EQ("Wed, 28 Feb 1900 23:59:59 +0000 (UTC)",
                   turbo::format_time(fmt, t, utc));
         t = turbo::from_civil(turbo::CivilSecond(1900, 3, 1, 0, 0, 0), utc);
-        EXPECT_EQ("Thu,  1 Mar 1900 00:00:00 +0000 (UTC)",
+        REQUIRE_EQ("Thu,  1 Mar 1900 00:00:00 +0000 (UTC)",
                   turbo::format_time(fmt, t, utc));
         t = turbo::from_civil(turbo::CivilSecond(2000, 2, 29, 23, 59, 59), utc);
-        EXPECT_EQ("Tue, 29 Feb 2000 23:59:59 +0000 (UTC)",
+        REQUIRE_EQ("Tue, 29 Feb 2000 23:59:59 +0000 (UTC)",
                   turbo::format_time(fmt, t, utc));
         t = turbo::from_civil(turbo::CivilSecond(2000, 3, 1, 0, 0, 0), utc);
-        EXPECT_EQ("Wed,  1 Mar 2000 00:00:00 +0000 (UTC)",
+        REQUIRE_EQ("Wed,  1 Mar 2000 00:00:00 +0000 (UTC)",
                   turbo::format_time(fmt, t, utc));
     }
 
-    TEST(Time, to_tm) {
+    TEST_CASE("time, to_tm") {
         const turbo::TimeZone utc = turbo::utc_time_zone();
 
         // Compares the results of to_tm() to gmtime_r() for lots of times over the
@@ -747,17 +530,16 @@ namespace {
 #else
             gmtime_r(&tt, &tm_lc);
 #endif
-            EXPECT_EQ(tm_lc.tm_year, tm_bt.tm_year);
-            EXPECT_EQ(tm_lc.tm_mon, tm_bt.tm_mon);
-            EXPECT_EQ(tm_lc.tm_mday, tm_bt.tm_mday);
-            EXPECT_EQ(tm_lc.tm_hour, tm_bt.tm_hour);
-            EXPECT_EQ(tm_lc.tm_min, tm_bt.tm_min);
-            EXPECT_EQ(tm_lc.tm_sec, tm_bt.tm_sec);
-            EXPECT_EQ(tm_lc.tm_wday, tm_bt.tm_wday);
-            EXPECT_EQ(tm_lc.tm_yday, tm_bt.tm_yday);
-            EXPECT_EQ(tm_lc.tm_isdst, tm_bt.tm_isdst);
-
-            ASSERT_FALSE(HasFailure());
+            REQUIRE_EQ(tm_lc.tm_year, tm_bt.tm_year);
+            REQUIRE_EQ(tm_lc.tm_mon, tm_bt.tm_mon);
+            REQUIRE_EQ(tm_lc.tm_mday, tm_bt.tm_mday);
+            REQUIRE_EQ(tm_lc.tm_hour, tm_bt.tm_hour);
+            REQUIRE_EQ(tm_lc.tm_min, tm_bt.tm_min);
+            REQUIRE_EQ(tm_lc.tm_sec, tm_bt.tm_sec);
+            REQUIRE_EQ(tm_lc.tm_wday, tm_bt.tm_wday);
+            REQUIRE_EQ(tm_lc.tm_yday, tm_bt.tm_yday);
+            REQUIRE_EQ(tm_lc.tm_isdst, tm_bt.tm_isdst);
+            
         }
 
         // Checks that the tm_isdst field is correct when in standard time.
@@ -765,39 +547,39 @@ namespace {
                 turbo::time_internal::load_time_zone("America/New_York");
         turbo::Time t = turbo::from_civil(turbo::CivilSecond(2014, 3, 1, 0, 0, 0), nyc);
         struct tm tm = to_tm(t, nyc);
-        EXPECT_FALSE(tm.tm_isdst);
+        REQUIRE_FALSE(tm.tm_isdst);
 
         // Checks that the tm_isdst field is correct when in daylight time.
         t = turbo::from_civil(turbo::CivilSecond(2014, 4, 1, 0, 0, 0), nyc);
         tm = to_tm(t, nyc);
-        EXPECT_TRUE(tm.tm_isdst);
+        REQUIRE(tm.tm_isdst);
 
         // Checks overflow.
         tm = to_tm(turbo::infinite_future(), nyc);
-        EXPECT_EQ(std::numeric_limits<int>::max() - 1900, tm.tm_year);
-        EXPECT_EQ(11, tm.tm_mon);
-        EXPECT_EQ(31, tm.tm_mday);
-        EXPECT_EQ(23, tm.tm_hour);
-        EXPECT_EQ(59, tm.tm_min);
-        EXPECT_EQ(59, tm.tm_sec);
-        EXPECT_EQ(4, tm.tm_wday);
-        EXPECT_EQ(364, tm.tm_yday);
-        EXPECT_FALSE(tm.tm_isdst);
+        REQUIRE_EQ(std::numeric_limits<int>::max() - 1900, tm.tm_year);
+        REQUIRE_EQ(11, tm.tm_mon);
+        REQUIRE_EQ(31, tm.tm_mday);
+        REQUIRE_EQ(23, tm.tm_hour);
+        REQUIRE_EQ(59, tm.tm_min);
+        REQUIRE_EQ(59, tm.tm_sec);
+        REQUIRE_EQ(4, tm.tm_wday);
+        REQUIRE_EQ(364, tm.tm_yday);
+        REQUIRE_FALSE(tm.tm_isdst);
 
         // Checks underflow.
         tm = to_tm(turbo::infinite_past(), nyc);
-        EXPECT_EQ(std::numeric_limits<int>::min(), tm.tm_year);
-        EXPECT_EQ(0, tm.tm_mon);
-        EXPECT_EQ(1, tm.tm_mday);
-        EXPECT_EQ(0, tm.tm_hour);
-        EXPECT_EQ(0, tm.tm_min);
-        EXPECT_EQ(0, tm.tm_sec);
-        EXPECT_EQ(0, tm.tm_wday);
-        EXPECT_EQ(0, tm.tm_yday);
-        EXPECT_FALSE(tm.tm_isdst);
+        REQUIRE_EQ(std::numeric_limits<int>::min(), tm.tm_year);
+        REQUIRE_EQ(0, tm.tm_mon);
+        REQUIRE_EQ(1, tm.tm_mday);
+        REQUIRE_EQ(0, tm.tm_hour);
+        REQUIRE_EQ(0, tm.tm_min);
+        REQUIRE_EQ(0, tm.tm_sec);
+        REQUIRE_EQ(0, tm.tm_wday);
+        REQUIRE_EQ(0, tm.tm_yday);
+        REQUIRE_FALSE(tm.tm_isdst);
     }
 
-    TEST(Time, from_tm) {
+    TEST_CASE("time, from_tm") {
         const turbo::TimeZone nyc =
                 turbo::time_internal::load_time_zone("America/New_York");
 
@@ -812,13 +594,13 @@ namespace {
         tm.tm_sec = 3;
         tm.tm_isdst = -1;
         turbo::Time t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-06-28T01:02:03-04:00", turbo::format_time(t, nyc));  // DST
+        REQUIRE_EQ("2014-06-28T01:02:03-04:00", turbo::format_time(t, nyc));  // DST
         tm.tm_isdst = 0;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-06-28T01:02:03-04:00", turbo::format_time(t, nyc));  // DST
+        REQUIRE_EQ("2014-06-28T01:02:03-04:00", turbo::format_time(t, nyc));  // DST
         tm.tm_isdst = 1;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-06-28T01:02:03-04:00", turbo::format_time(t, nyc));  // DST
+        REQUIRE_EQ("2014-06-28T01:02:03-04:00", turbo::format_time(t, nyc));  // DST
 
         // Adjusts tm to refer to an ambiguous time.
         tm.tm_year = 2014 - 1900;
@@ -829,13 +611,13 @@ namespace {
         tm.tm_sec = 42;
         tm.tm_isdst = -1;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-11-02T01:30:42-04:00", turbo::format_time(t, nyc));  // DST
+        REQUIRE_EQ("2014-11-02T01:30:42-04:00", turbo::format_time(t, nyc));  // DST
         tm.tm_isdst = 0;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-11-02T01:30:42-05:00", turbo::format_time(t, nyc));  // STD
+        REQUIRE_EQ("2014-11-02T01:30:42-05:00", turbo::format_time(t, nyc));  // STD
         tm.tm_isdst = 1;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-11-02T01:30:42-04:00", turbo::format_time(t, nyc));  // DST
+        REQUIRE_EQ("2014-11-02T01:30:42-04:00", turbo::format_time(t, nyc));  // DST
 
         // Adjusts tm to refer to a skipped time.
         tm.tm_year = 2014 - 1900;
@@ -846,13 +628,13 @@ namespace {
         tm.tm_sec = 42;
         tm.tm_isdst = -1;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-03-09T03:30:42-04:00", turbo::format_time(t, nyc));  // DST
+        REQUIRE_EQ("2014-03-09T03:30:42-04:00", turbo::format_time(t, nyc));  // DST
         tm.tm_isdst = 0;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-03-09T01:30:42-05:00", turbo::format_time(t, nyc));  // STD
+        REQUIRE_EQ("2014-03-09T01:30:42-05:00", turbo::format_time(t, nyc));  // STD
         tm.tm_isdst = 1;
         t = from_tm(tm, nyc);
-        EXPECT_EQ("2014-03-09T03:30:42-04:00", turbo::format_time(t, nyc));  // DST
+        REQUIRE_EQ("2014-03-09T03:30:42-04:00", turbo::format_time(t, nyc));  // DST
 
         // Adjusts tm to refer to a time with a year larger than 2147483647.
         tm.tm_year = 2147483647 - 1900 + 1;
@@ -863,7 +645,7 @@ namespace {
         tm.tm_sec = 3;
         tm.tm_isdst = -1;
         t = from_tm(tm, turbo::utc_time_zone());
-        EXPECT_EQ("2147483648-06-28T01:02:03+00:00",
+        REQUIRE_EQ("2147483648-06-28T01:02:03+00:00",
                   turbo::format_time(t, turbo::utc_time_zone()));
 
         // Adjusts tm to refer to a time with a very large month.
@@ -875,11 +657,11 @@ namespace {
         tm.tm_sec = 3;
         tm.tm_isdst = -1;
         t = from_tm(tm, turbo::utc_time_zone());
-        EXPECT_EQ("178958989-08-28T01:02:03+00:00",
+        REQUIRE_EQ("178958989-08-28T01:02:03+00:00",
                   turbo::format_time(t, turbo::utc_time_zone()));
     }
 
-    TEST(Time, TMRoundTrip) {
+    TEST_CASE("Time, TMRoundTrip") {
         const turbo::TimeZone nyc =
                 turbo::time_internal::load_time_zone("America/New_York");
 
@@ -889,7 +671,7 @@ namespace {
         for (turbo::Time t = start; t < end; t += turbo::minutes(1)) {
             struct tm tm = to_tm(t, nyc);
             turbo::Time rt = from_tm(tm, nyc);
-            EXPECT_EQ(rt, t);
+            REQUIRE_EQ(rt, t);
         }
 
         // Test round-tripping across an ambiguous transition
@@ -898,7 +680,7 @@ namespace {
         for (turbo::Time t = start; t < end; t += turbo::minutes(1)) {
             struct tm tm = to_tm(t, nyc);
             turbo::Time rt = from_tm(tm, nyc);
-            EXPECT_EQ(rt, t);
+            REQUIRE_EQ(rt, t);
         }
 
         // Test round-tripping of unique instants crossing a day boundary
@@ -907,11 +689,11 @@ namespace {
         for (turbo::Time t = start; t < end; t += turbo::minutes(1)) {
             struct tm tm = to_tm(t, nyc);
             turbo::Time rt = from_tm(tm, nyc);
-            EXPECT_EQ(rt, t);
+            REQUIRE_EQ(rt, t);
         }
     }
 
-    TEST(Time, Range) {
+    TEST_CASE("Time, Range") {
         // The API's documented range is +/- 100 billion years.
         const turbo::Duration range = turbo::hours(24) * 365.2425 * 100000000000;
 
@@ -919,18 +701,18 @@ namespace {
         turbo::Time bases[2] = {turbo::unix_epoch(), turbo::time_now()};
         for (const auto base: bases) {
             turbo::Time bottom = base - range;
-            EXPECT_GT(bottom, bottom - turbo::nanoseconds(1));
-            EXPECT_LT(bottom, bottom + turbo::nanoseconds(1));
+            REQUIRE_GT(bottom, bottom - turbo::nanoseconds(1));
+            REQUIRE_LT(bottom, bottom + turbo::nanoseconds(1));
             turbo::Time top = base + range;
-            EXPECT_GT(top, top - turbo::nanoseconds(1));
-            EXPECT_LT(top, top + turbo::nanoseconds(1));
+            REQUIRE_GT(top, top - turbo::nanoseconds(1));
+            REQUIRE_LT(top, top + turbo::nanoseconds(1));
             turbo::Duration full_range = 2 * range;
-            EXPECT_EQ(full_range, top - bottom);
-            EXPECT_EQ(-full_range, bottom - top);
+            REQUIRE_EQ(full_range, top - bottom);
+            REQUIRE_EQ(-full_range, bottom - top);
         }
     }
 
-    TEST(Time, Limits) {
+    TEST_CASE("Time, Limits") {
         // It is an implementation detail that Time().rep_ == zero_duration(),
         // and that the resolution of a Duration is 1/4 of a nanosecond.
         const turbo::Time zero;
@@ -941,24 +723,24 @@ namespace {
                 zero + turbo::seconds(std::numeric_limits<int64_t>::min());
 
         // Some simple max/min bounds checks.
-        EXPECT_LT(max, turbo::infinite_future());
-        EXPECT_GT(min, turbo::infinite_past());
-        EXPECT_LT(zero, max);
-        EXPECT_GT(zero, min);
-        EXPECT_GE(turbo::unix_epoch(), min);
-        EXPECT_LT(turbo::unix_epoch(), max);
+        REQUIRE_LT(max, turbo::infinite_future());
+        REQUIRE_GT(min, turbo::infinite_past());
+        REQUIRE_LT(zero, max);
+        REQUIRE_GT(zero, min);
+        REQUIRE_GE(turbo::unix_epoch(), min);
+        REQUIRE_LT(turbo::unix_epoch(), max);
 
         // Check sign of Time differences.
-        EXPECT_LT(turbo::zero_duration(), max - zero);
-        EXPECT_LT(turbo::zero_duration(),
+        REQUIRE_LT(turbo::zero_duration(), max - zero);
+        REQUIRE_LT(turbo::zero_duration(),
                   zero - turbo::nanoseconds(1) / 4 - min);  // avoid zero - min
 
         // Arithmetic works at max - 0.25ns and min + 0.25ns.
-        EXPECT_GT(max, max - turbo::nanoseconds(1) / 4);
-        EXPECT_LT(min, min + turbo::nanoseconds(1) / 4);
+        REQUIRE_GT(max, max - turbo::nanoseconds(1) / 4);
+        REQUIRE_LT(min, min + turbo::nanoseconds(1) / 4);
     }
 
-    TEST(Time, ConversionSaturation) {
+    TEST_CASE("Time, ConversionSaturation") {
         const turbo::TimeZone utc = turbo::utc_time_zone();
         turbo::Time t;
 
@@ -967,24 +749,24 @@ namespace {
         time_t tt = max_time_t - 1;
         t = turbo::from_time_t(tt);
         tt = turbo::to_time_t(t);
-        EXPECT_EQ(max_time_t - 1, tt);
+        REQUIRE_EQ(max_time_t - 1, tt);
         t += turbo::seconds(1);
         tt = turbo::to_time_t(t);
-        EXPECT_EQ(max_time_t, tt);
+        REQUIRE_EQ(max_time_t, tt);
         t += turbo::seconds(1);  // no effect
         tt = turbo::to_time_t(t);
-        EXPECT_EQ(max_time_t, tt);
+        REQUIRE_EQ(max_time_t, tt);
 
         tt = min_time_t + 1;
         t = turbo::from_time_t(tt);
         tt = turbo::to_time_t(t);
-        EXPECT_EQ(min_time_t + 1, tt);
+        REQUIRE_EQ(min_time_t + 1, tt);
         t -= turbo::seconds(1);
         tt = turbo::to_time_t(t);
-        EXPECT_EQ(min_time_t, tt);
+        REQUIRE_EQ(min_time_t, tt);
         t -= turbo::seconds(1);  // no effect
         tt = turbo::to_time_t(t);
-        EXPECT_EQ(min_time_t, tt);
+        REQUIRE_EQ(min_time_t, tt);
 
         const auto max_timeval_sec =
                 std::numeric_limits<decltype(timeval::tv_sec)>::max();
@@ -995,31 +777,31 @@ namespace {
         tv.tv_usec = 999998;
         t = turbo::time_from_timeval(tv);
         tv = to_timeval(t);
-        EXPECT_EQ(max_timeval_sec, tv.tv_sec);
-        EXPECT_EQ(999998, tv.tv_usec);
+        REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
+        REQUIRE_EQ(999998, tv.tv_usec);
         t += turbo::microseconds(1);
         tv = to_timeval(t);
-        EXPECT_EQ(max_timeval_sec, tv.tv_sec);
-        EXPECT_EQ(999999, tv.tv_usec);
+        REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
+        REQUIRE_EQ(999999, tv.tv_usec);
         t += turbo::microseconds(1);  // no effect
         tv = to_timeval(t);
-        EXPECT_EQ(max_timeval_sec, tv.tv_sec);
-        EXPECT_EQ(999999, tv.tv_usec);
+        REQUIRE_EQ(max_timeval_sec, tv.tv_sec);
+        REQUIRE_EQ(999999, tv.tv_usec);
 
         tv.tv_sec = min_timeval_sec;
         tv.tv_usec = 1;
         t = turbo::time_from_timeval(tv);
         tv = to_timeval(t);
-        EXPECT_EQ(min_timeval_sec, tv.tv_sec);
-        EXPECT_EQ(1, tv.tv_usec);
+        REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
+        REQUIRE_EQ(1, tv.tv_usec);
         t -= turbo::microseconds(1);
         tv = to_timeval(t);
-        EXPECT_EQ(min_timeval_sec, tv.tv_sec);
-        EXPECT_EQ(0, tv.tv_usec);
+        REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
+        REQUIRE_EQ(0, tv.tv_usec);
         t -= turbo::microseconds(1);  // no effect
         tv = to_timeval(t);
-        EXPECT_EQ(min_timeval_sec, tv.tv_sec);
-        EXPECT_EQ(0, tv.tv_usec);
+        REQUIRE_EQ(min_timeval_sec, tv.tv_sec);
+        REQUIRE_EQ(0, tv.tv_usec);
 
         const auto max_timespec_sec =
                 std::numeric_limits<decltype(timespec::tv_sec)>::max();
@@ -1030,80 +812,80 @@ namespace {
         ts.tv_nsec = 999999998;
         t = turbo::time_from_timespec(ts);
         ts = turbo::to_timespec(t);
-        EXPECT_EQ(max_timespec_sec, ts.tv_sec);
-        EXPECT_EQ(999999998, ts.tv_nsec);
+        REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
+        REQUIRE_EQ(999999998, ts.tv_nsec);
         t += turbo::nanoseconds(1);
         ts = turbo::to_timespec(t);
-        EXPECT_EQ(max_timespec_sec, ts.tv_sec);
-        EXPECT_EQ(999999999, ts.tv_nsec);
+        REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
+        REQUIRE_EQ(999999999, ts.tv_nsec);
         t += turbo::nanoseconds(1);  // no effect
         ts = turbo::to_timespec(t);
-        EXPECT_EQ(max_timespec_sec, ts.tv_sec);
-        EXPECT_EQ(999999999, ts.tv_nsec);
+        REQUIRE_EQ(max_timespec_sec, ts.tv_sec);
+        REQUIRE_EQ(999999999, ts.tv_nsec);
 
         ts.tv_sec = min_timespec_sec;
         ts.tv_nsec = 1;
         t = turbo::time_from_timespec(ts);
         ts = turbo::to_timespec(t);
-        EXPECT_EQ(min_timespec_sec, ts.tv_sec);
-        EXPECT_EQ(1, ts.tv_nsec);
+        REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
+        REQUIRE_EQ(1, ts.tv_nsec);
         t -= turbo::nanoseconds(1);
         ts = turbo::to_timespec(t);
-        EXPECT_EQ(min_timespec_sec, ts.tv_sec);
-        EXPECT_EQ(0, ts.tv_nsec);
+        REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
+        REQUIRE_EQ(0, ts.tv_nsec);
         t -= turbo::nanoseconds(1);  // no effect
         ts = turbo::to_timespec(t);
-        EXPECT_EQ(min_timespec_sec, ts.tv_sec);
-        EXPECT_EQ(0, ts.tv_nsec);
+        REQUIRE_EQ(min_timespec_sec, ts.tv_sec);
+        REQUIRE_EQ(0, ts.tv_nsec);
 
         // Checks how TimeZone::At() saturates on infinities.
         auto ci = utc.At(turbo::infinite_future());
-        EXPECT_CIVIL_INFO(ci, std::numeric_limits<int64_t>::max(), 12, 31, 23, 59, 59,
+        REQUIRE_CIVIL_INFO(ci, std::numeric_limits<int64_t>::max(), 12, 31, 23, 59, 59,
                           0, false);
-        EXPECT_EQ(turbo::infinite_duration(), ci.subsecond);
-        EXPECT_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
-        EXPECT_EQ(365, turbo::get_year_day(ci.cs));
-        EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
+        REQUIRE_EQ(turbo::infinite_duration(), ci.subsecond);
+        REQUIRE_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
+        REQUIRE_EQ(365, turbo::get_year_day(ci.cs));
+        REQUIRE_EQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
         ci = utc.At(turbo::infinite_past());
-        EXPECT_CIVIL_INFO(ci, std::numeric_limits<int64_t>::min(), 1, 1, 0, 0, 0, 0,
+        REQUIRE_CIVIL_INFO(ci, std::numeric_limits<int64_t>::min(), 1, 1, 0, 0, 0, 0,
                           false);
-        EXPECT_EQ(-turbo::infinite_duration(), ci.subsecond);
-        EXPECT_EQ(turbo::Weekday::sunday, turbo::get_weekday(ci.cs));
-        EXPECT_EQ(1, turbo::get_year_day(ci.cs));
-        EXPECT_STREQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
+        REQUIRE_EQ(-turbo::infinite_duration(), ci.subsecond);
+        REQUIRE_EQ(turbo::Weekday::sunday, turbo::get_weekday(ci.cs));
+        REQUIRE_EQ(1, turbo::get_year_day(ci.cs));
+        REQUIRE_EQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
 
         // Approach the maximal Time value from below.
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 15, 30, 6), utc);
-        EXPECT_EQ("292277026596-12-04T15:30:06+00:00",
+        REQUIRE_EQ("292277026596-12-04T15:30:06+00:00",
                   turbo::format_time(turbo::RFC3339_full, t, utc));
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 15, 30, 7), utc);
-        EXPECT_EQ("292277026596-12-04T15:30:07+00:00",
+        REQUIRE_EQ("292277026596-12-04T15:30:07+00:00",
                   turbo::format_time(turbo::RFC3339_full, t, utc));
-        EXPECT_EQ(
+        REQUIRE_EQ(
                 turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::max()),
                 t);
 
         // Checks that we can also get the maximal Time value for a far-east zone.
         const turbo::TimeZone plus14 = turbo::fixed_time_zone(14 * 60 * 60);
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 5, 5, 30, 7), plus14);
-        EXPECT_EQ("292277026596-12-05T05:30:07+14:00",
+        REQUIRE_EQ("292277026596-12-05T05:30:07+14:00",
                   turbo::format_time(turbo::RFC3339_full, t, plus14));
-        EXPECT_EQ(
+        REQUIRE_EQ(
                 turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::max()),
                 t);
 
         // One second later should push us to infinity.
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 15, 30, 8), utc);
-        EXPECT_EQ("infinite-future", turbo::format_time(turbo::RFC3339_full, t, utc));
+        REQUIRE_EQ("infinite-future", turbo::format_time(turbo::RFC3339_full, t, utc));
 
         // Approach the minimal Time value from above.
         t = turbo::from_civil(turbo::CivilSecond(-292277022657, 1, 27, 8, 29, 53), utc);
-        EXPECT_EQ("-292277022657-01-27T08:29:53+00:00",
+        REQUIRE_EQ("-292277022657-01-27T08:29:53+00:00",
                   turbo::format_time(turbo::RFC3339_full, t, utc));
         t = turbo::from_civil(turbo::CivilSecond(-292277022657, 1, 27, 8, 29, 52), utc);
-        EXPECT_EQ("-292277022657-01-27T08:29:52+00:00",
+        REQUIRE_EQ("-292277022657-01-27T08:29:52+00:00",
                   turbo::format_time(turbo::RFC3339_full, t, utc));
-        EXPECT_EQ(
+        REQUIRE_EQ(
                 turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::min()),
                 t);
 
@@ -1111,21 +893,21 @@ namespace {
         const turbo::TimeZone minus12 = turbo::fixed_time_zone(-12 * 60 * 60);
         t = turbo::from_civil(turbo::CivilSecond(-292277022657, 1, 26, 20, 29, 52),
                              minus12);
-        EXPECT_EQ("-292277022657-01-26T20:29:52-12:00",
+        REQUIRE_EQ("-292277022657-01-26T20:29:52-12:00",
                   turbo::format_time(turbo::RFC3339_full, t, minus12));
-        EXPECT_EQ(
+        REQUIRE_EQ(
                 turbo::unix_epoch() + turbo::seconds(std::numeric_limits<int64_t>::min()),
                 t);
 
         // One second before should push us to -infinity.
         t = turbo::from_civil(turbo::CivilSecond(-292277022657, 1, 27, 8, 29, 51), utc);
-        EXPECT_EQ("infinite-past", turbo::format_time(turbo::RFC3339_full, t, utc));
+        REQUIRE_EQ("infinite-past", turbo::format_time(turbo::RFC3339_full, t, utc));
     }
 
 // In zones with POSIX-style recurring rules we use special logic to
 // handle conversions in the distant future.  Here we check the limits
 // of those conversions, particularly with respect to integer overflow.
-    TEST(Time, ExtendedConversionSaturation) {
+    TEST_CASE("Time, ExtendedConversionSaturation") {
         const turbo::TimeZone syd =
                 turbo::time_internal::load_time_zone("Australia/Sydney");
         const turbo::TimeZone nyc =
@@ -1137,51 +919,51 @@ namespace {
 
         // The maximal time converted in each zone.
         ci = syd.At(max);
-        EXPECT_CIVIL_INFO(ci, 292277026596, 12, 5, 2, 30, 7, 39600, true);
+        REQUIRE_CIVIL_INFO(ci, 292277026596, 12, 5, 2, 30, 7, 39600, true);
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 5, 2, 30, 7), syd);
-        EXPECT_EQ(max, t);
+        REQUIRE_EQ(max, t);
         ci = nyc.At(max);
-        EXPECT_CIVIL_INFO(ci, 292277026596, 12, 4, 10, 30, 7, -18000, false);
+        REQUIRE_CIVIL_INFO(ci, 292277026596, 12, 4, 10, 30, 7, -18000, false);
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 10, 30, 7), nyc);
-        EXPECT_EQ(max, t);
+        REQUIRE_EQ(max, t);
 
         // One second later should push us to infinity.
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 5, 2, 30, 8), syd);
-        EXPECT_EQ(turbo::infinite_future(), t);
+        REQUIRE_EQ(turbo::infinite_future(), t);
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 10, 30, 8), nyc);
-        EXPECT_EQ(turbo::infinite_future(), t);
+        REQUIRE_EQ(turbo::infinite_future(), t);
 
         // And we should stick there.
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 5, 2, 30, 9), syd);
-        EXPECT_EQ(turbo::infinite_future(), t);
+        REQUIRE_EQ(turbo::infinite_future(), t);
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 10, 30, 9), nyc);
-        EXPECT_EQ(turbo::infinite_future(), t);
+        REQUIRE_EQ(turbo::infinite_future(), t);
 
         // All the way up to a saturated date/time, without overflow.
         t = turbo::from_civil(turbo::CivilSecond::max(), syd);
-        EXPECT_EQ(turbo::infinite_future(), t);
+        REQUIRE_EQ(turbo::infinite_future(), t);
         t = turbo::from_civil(turbo::CivilSecond::max(), nyc);
-        EXPECT_EQ(turbo::infinite_future(), t);
+        REQUIRE_EQ(turbo::infinite_future(), t);
     }
 
-    TEST(Time, FromCivilAlignment) {
+    TEST_CASE("Time, FromCivilAlignment") {
         const turbo::TimeZone utc = turbo::utc_time_zone();
         const turbo::CivilSecond cs(2015, 2, 3, 4, 5, 6);
         turbo::Time t = turbo::from_civil(cs, utc);
-        EXPECT_EQ("2015-02-03T04:05:06+00:00", turbo::format_time(t, utc));
+        REQUIRE_EQ("2015-02-03T04:05:06+00:00", turbo::format_time(t, utc));
         t = turbo::from_civil(turbo::CivilMinute(cs), utc);
-        EXPECT_EQ("2015-02-03T04:05:00+00:00", turbo::format_time(t, utc));
+        REQUIRE_EQ("2015-02-03T04:05:00+00:00", turbo::format_time(t, utc));
         t = turbo::from_civil(turbo::CivilHour(cs), utc);
-        EXPECT_EQ("2015-02-03T04:00:00+00:00", turbo::format_time(t, utc));
+        REQUIRE_EQ("2015-02-03T04:00:00+00:00", turbo::format_time(t, utc));
         t = turbo::from_civil(turbo::CivilDay(cs), utc);
-        EXPECT_EQ("2015-02-03T00:00:00+00:00", turbo::format_time(t, utc));
+        REQUIRE_EQ("2015-02-03T00:00:00+00:00", turbo::format_time(t, utc));
         t = turbo::from_civil(turbo::CivilMonth(cs), utc);
-        EXPECT_EQ("2015-02-01T00:00:00+00:00", turbo::format_time(t, utc));
+        REQUIRE_EQ("2015-02-01T00:00:00+00:00", turbo::format_time(t, utc));
         t = turbo::from_civil(turbo::CivilYear(cs), utc);
-        EXPECT_EQ("2015-01-01T00:00:00+00:00", turbo::format_time(t, utc));
+        REQUIRE_EQ("2015-01-01T00:00:00+00:00", turbo::format_time(t, utc));
     }
 
-    TEST(Time, LegacyDateTime) {
+    TEST_CASE("Time, LegacyDateTime") {
         const turbo::TimeZone utc = turbo::utc_time_zone();
         const std::string ymdhms = "%Y-%m-%d %H:%M:%S";
         const int kMax = std::numeric_limits<int>::max();
@@ -1190,100 +972,100 @@ namespace {
 
         t = turbo::from_date_time(std::numeric_limits<turbo::civil_year_t>::max(), kMax,
                                 kMax, kMax, kMax, kMax, utc);
-        EXPECT_EQ("infinite-future",
+        REQUIRE_EQ("infinite-future",
                   turbo::format_time(ymdhms, t, utc));  // no overflow
         t = turbo::from_date_time(std::numeric_limits<turbo::civil_year_t>::min(), kMin,
                                 kMin, kMin, kMin, kMin, utc);
-        EXPECT_EQ("infinite-past", turbo::format_time(ymdhms, t, utc));  // no overflow
+        REQUIRE_EQ("infinite-past", turbo::format_time(ymdhms, t, utc));  // no overflow
 
         // Check normalization.
-        EXPECT_TRUE(turbo::convert_date_time(2013, 10, 32, 8, 30, 0, utc).normalized);
+        REQUIRE(turbo::convert_date_time(2013, 10, 32, 8, 30, 0, utc).normalized);
         t = turbo::from_date_time(2015, 1, 1, 0, 0, 60, utc);
-        EXPECT_EQ("2015-01-01 00:01:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2015-01-01 00:01:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 1, 1, 0, 60, 0, utc);
-        EXPECT_EQ("2015-01-01 01:00:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2015-01-01 01:00:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 1, 1, 24, 0, 0, utc);
-        EXPECT_EQ("2015-01-02 00:00:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2015-01-02 00:00:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 1, 32, 0, 0, 0, utc);
-        EXPECT_EQ("2015-02-01 00:00:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2015-02-01 00:00:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 13, 1, 0, 0, 0, utc);
-        EXPECT_EQ("2016-01-01 00:00:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2016-01-01 00:00:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 13, 32, 60, 60, 60, utc);
-        EXPECT_EQ("2016-02-03 13:01:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2016-02-03 13:01:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 1, 1, 0, 0, -1, utc);
-        EXPECT_EQ("2014-12-31 23:59:59", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2014-12-31 23:59:59", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 1, 1, 0, -1, 0, utc);
-        EXPECT_EQ("2014-12-31 23:59:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2014-12-31 23:59:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 1, 1, -1, 0, 0, utc);
-        EXPECT_EQ("2014-12-31 23:00:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2014-12-31 23:00:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, 1, -1, 0, 0, 0, utc);
-        EXPECT_EQ("2014-12-30 00:00:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2014-12-30 00:00:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, -1, 1, 0, 0, 0, utc);
-        EXPECT_EQ("2014-11-01 00:00:00", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2014-11-01 00:00:00", turbo::format_time(ymdhms, t, utc));
         t = turbo::from_date_time(2015, -1, -1, -1, -1, -1, utc);
-        EXPECT_EQ("2014-10-29 22:58:59", turbo::format_time(ymdhms, t, utc));
+        REQUIRE_EQ("2014-10-29 22:58:59", turbo::format_time(ymdhms, t, utc));
     }
 
-    TEST(Time, NextTransitionUTC) {
+    TEST_CASE("Time, NextTransitionUTC") {
         const auto tz = turbo::utc_time_zone();
         turbo::TimeZone::CivilTransition trans;
 
         auto t = turbo::infinite_past();
-        EXPECT_FALSE(tz.NextTransition(t, &trans));
+        REQUIRE_FALSE(tz.NextTransition(t, &trans));
 
         t = turbo::infinite_future();
-        EXPECT_FALSE(tz.NextTransition(t, &trans));
+        REQUIRE_FALSE(tz.NextTransition(t, &trans));
     }
 
-    TEST(Time, PrevTransitionUTC) {
+    TEST_CASE("Time, PrevTransitionUTC") {
         const auto tz = turbo::utc_time_zone();
         turbo::TimeZone::CivilTransition trans;
 
         auto t = turbo::infinite_future();
-        EXPECT_FALSE(tz.PrevTransition(t, &trans));
+        REQUIRE_FALSE(tz.PrevTransition(t, &trans));
 
         t = turbo::infinite_past();
-        EXPECT_FALSE(tz.PrevTransition(t, &trans));
+        REQUIRE_FALSE(tz.PrevTransition(t, &trans));
     }
 
-    TEST(Time, NextTransitionNYC) {
+    TEST_CASE("Time, NextTransitionNYC") {
         const auto tz = turbo::time_internal::load_time_zone("America/New_York");
         turbo::TimeZone::CivilTransition trans;
 
         auto t = turbo::from_civil(turbo::CivilSecond(2018, 6, 30, 0, 0, 0), tz);
-        EXPECT_TRUE(tz.NextTransition(t, &trans));
-        EXPECT_EQ(turbo::CivilSecond(2018, 11, 4, 2, 0, 0), trans.from);
-        EXPECT_EQ(turbo::CivilSecond(2018, 11, 4, 1, 0, 0), trans.to);
+        REQUIRE(tz.NextTransition(t, &trans));
+        REQUIRE_EQ(turbo::CivilSecond(2018, 11, 4, 2, 0, 0), trans.from);
+        REQUIRE_EQ(turbo::CivilSecond(2018, 11, 4, 1, 0, 0), trans.to);
 
         t = turbo::infinite_future();
-        EXPECT_FALSE(tz.NextTransition(t, &trans));
+        REQUIRE_FALSE(tz.NextTransition(t, &trans));
 
         t = turbo::infinite_past();
-        EXPECT_TRUE(tz.NextTransition(t, &trans));
+        REQUIRE(tz.NextTransition(t, &trans));
         if (trans.from == turbo::CivilSecond(1918, 03, 31, 2, 0, 0)) {
             // It looks like the tzdata is only 32 bit (probably macOS),
             // which bottoms out at 1901-12-13T20:45:52+00:00.
-            EXPECT_EQ(turbo::CivilSecond(1918, 3, 31, 3, 0, 0), trans.to);
+            REQUIRE_EQ(turbo::CivilSecond(1918, 3, 31, 3, 0, 0), trans.to);
         } else {
-            EXPECT_EQ(turbo::CivilSecond(1883, 11, 18, 12, 3, 58), trans.from);
-            EXPECT_EQ(turbo::CivilSecond(1883, 11, 18, 12, 0, 0), trans.to);
+            REQUIRE_EQ(turbo::CivilSecond(1883, 11, 18, 12, 3, 58), trans.from);
+            REQUIRE_EQ(turbo::CivilSecond(1883, 11, 18, 12, 0, 0), trans.to);
         }
     }
 
-    TEST(Time, PrevTransitionNYC) {
+    TEST_CASE("Time, PrevTransitionNYC") {
         const auto tz = turbo::time_internal::load_time_zone("America/New_York");
         turbo::TimeZone::CivilTransition trans;
 
         auto t = turbo::from_civil(turbo::CivilSecond(2018, 6, 30, 0, 0, 0), tz);
-        EXPECT_TRUE(tz.PrevTransition(t, &trans));
-        EXPECT_EQ(turbo::CivilSecond(2018, 3, 11, 2, 0, 0), trans.from);
-        EXPECT_EQ(turbo::CivilSecond(2018, 3, 11, 3, 0, 0), trans.to);
+        REQUIRE(tz.PrevTransition(t, &trans));
+        REQUIRE_EQ(turbo::CivilSecond(2018, 3, 11, 2, 0, 0), trans.from);
+        REQUIRE_EQ(turbo::CivilSecond(2018, 3, 11, 3, 0, 0), trans.to);
 
         t = turbo::infinite_past();
-        EXPECT_FALSE(tz.PrevTransition(t, &trans));
+        REQUIRE_FALSE(tz.PrevTransition(t, &trans));
 
         t = turbo::infinite_future();
-        EXPECT_TRUE(tz.PrevTransition(t, &trans));
+        REQUIRE(tz.PrevTransition(t, &trans));
         // We have a transition but we don't know which one.
     }
 

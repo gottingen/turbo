@@ -34,6 +34,7 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/memory/object_pool.h \
                     ../turbo/memory/alignment.h \
                     ../turbo/memory/aligned_allocator.h \
+                    ../turbo/memory/memory_info.h \
                     ../turbo/memory/resource_pool.h \
                     ../turbo/unicode/version.h \
                     ../turbo/unicode/converter.h \
