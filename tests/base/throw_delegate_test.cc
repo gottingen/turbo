@@ -19,7 +19,8 @@
 #include <stdexcept>
 
 #include "turbo/platform/port.h"
-#include "gtest/gtest.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest/doctest.h"
 
 namespace {
 
@@ -42,9 +43,9 @@ namespace {
 #ifdef TURBO_HAVE_EXCEPTIONS
         try {
             f(what_arg);
-            FAIL() << "Didn't throw";
+            FAIL("Didn't throw");
         } catch (const E &e) {
-            EXPECT_STREQ(e.what(), what_arg);
+            REQUIRE_EQ(std::string(e.what()), std::string(what_arg));
         }
 #else
         EXPECT_DEATH_IF_SUPPORTED(f(what_arg), what_arg);
@@ -56,9 +57,9 @@ namespace {
 #ifdef TURBO_HAVE_EXCEPTIONS
         try {
             f(what_arg);
-            FAIL() << "Didn't throw";
+            FAIL("Didn't throw");
         } catch (const E &e) {
-            EXPECT_STREQ(e.what(), what_arg);
+            REQUIRE_EQ(std::string(e.what()), std::string(what_arg));
         }
 #else
         EXPECT_DEATH_IF_SUPPORTED(f(what_arg), what_arg);
@@ -70,7 +71,7 @@ namespace {
 #ifdef TURBO_HAVE_EXCEPTIONS
         try {
             f();
-            FAIL() << "Didn't throw";
+            FAIL("Didn't throw");
         } catch (const E &e) {
         }
 #else
@@ -78,83 +79,83 @@ namespace {
 #endif
     }
 
-    TEST(ThrowDelegate, ThrowStdLogicErrorChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdLogicErrorChar") {
         ExpectThrowChar<std::logic_error>(ThrowStdLogicError);
     }
 
-    TEST(ThrowDelegate, ThrowStdInvalidArgumentChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdInvalidArgumentChar") {
         ExpectThrowChar<std::invalid_argument>(ThrowStdInvalidArgument);
     }
 
-    TEST(ThrowDelegate, ThrowStdDomainErrorChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdDomainErrorChar") {
         ExpectThrowChar<std::domain_error>(ThrowStdDomainError);
     }
 
-    TEST(ThrowDelegate, ThrowStdLengthErrorChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdLengthErrorChar") {
         ExpectThrowChar<std::length_error>(ThrowStdLengthError);
     }
 
-    TEST(ThrowDelegate, ThrowStdOutOfRangeChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdOutOfRangeChar") {
         ExpectThrowChar<std::out_of_range>(ThrowStdOutOfRange);
     }
 
-    TEST(ThrowDelegate, ThrowStdRuntimeErrorChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdRuntimeErrorChar") {
         ExpectThrowChar<std::runtime_error>(ThrowStdRuntimeError);
     }
 
-    TEST(ThrowDelegate, ThrowStdRangeErrorChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdRangeErrorChar") {
         ExpectThrowChar<std::range_error>(ThrowStdRangeError);
     }
 
-    TEST(ThrowDelegate, ThrowStdOverflowErrorChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdOverflowErrorChar") {
         ExpectThrowChar<std::overflow_error>(ThrowStdOverflowError);
     }
 
-    TEST(ThrowDelegate, ThrowStdUnderflowErrorChar) {
+    TEST_CASE("ThrowDelegate, ThrowStdUnderflowErrorChar") {
         ExpectThrowChar<std::underflow_error>(ThrowStdUnderflowError);
     }
 
-    TEST(ThrowDelegate, ThrowStdLogicErrorString) {
+    TEST_CASE("ThrowDelegate, ThrowStdLogicErrorString") {
         ExpectThrowString<std::logic_error>(ThrowStdLogicError);
     }
 
-    TEST(ThrowDelegate, ThrowStdInvalidArgumentString) {
+    TEST_CASE("ThrowDelegate, ThrowStdInvalidArgumentString") {
         ExpectThrowString<std::invalid_argument>(ThrowStdInvalidArgument);
     }
 
-    TEST(ThrowDelegate, ThrowStdDomainErrorString) {
+    TEST_CASE("ThrowDelegate, ThrowStdDomainErrorString") {
         ExpectThrowString<std::domain_error>(ThrowStdDomainError);
     }
 
-    TEST(ThrowDelegate, ThrowStdLengthErrorString) {
+    TEST_CASE("ThrowDelegate, ThrowStdLengthErrorString") {
         ExpectThrowString<std::length_error>(ThrowStdLengthError);
     }
 
-    TEST(ThrowDelegate, ThrowStdOutOfRangeString) {
+    TEST_CASE("ThrowDelegate, ThrowStdOutOfRangeString") {
         ExpectThrowString<std::out_of_range>(ThrowStdOutOfRange);
     }
 
-    TEST(ThrowDelegate, ThrowStdRuntimeErrorString) {
+    TEST_CASE("ThrowDelegate, ThrowStdRuntimeErrorString") {
         ExpectThrowString<std::runtime_error>(ThrowStdRuntimeError);
     }
 
-    TEST(ThrowDelegate, ThrowStdRangeErrorString) {
+    TEST_CASE("ThrowDelegate, ThrowStdRangeErrorString") {
         ExpectThrowString<std::range_error>(ThrowStdRangeError);
     }
 
-    TEST(ThrowDelegate, ThrowStdOverflowErrorString) {
+    TEST_CASE("ThrowDelegate, ThrowStdOverflowErrorString") {
         ExpectThrowString<std::overflow_error>(ThrowStdOverflowError);
     }
 
-    TEST(ThrowDelegate, ThrowStdUnderflowErrorString) {
+    TEST_CASE("ThrowDelegate, ThrowStdUnderflowErrorString") {
         ExpectThrowString<std::underflow_error>(ThrowStdUnderflowError);
     }
 
-    TEST(ThrowDelegate, ThrowStdBadFunctionCallNoWhat) {
+    TEST_CASE("ThrowDelegate, ThrowStdBadFunctionCallNoWhat") {
 #ifdef TURBO_HAVE_EXCEPTIONS
         try {
             ThrowStdBadFunctionCall();
-            FAIL() << "Didn't throw";
+            FAIL("Didn't throw");
         } catch (const std::bad_function_call &) {
         }
 #ifdef _LIBCPP_VERSION
@@ -168,7 +169,7 @@ namespace {
 #endif
     }
 
-    TEST(ThrowDelegate, ThrowStdBadAllocNoWhat) {
+    TEST_CASE("ThrowDelegate, ThrowStdBadAllocNoWhat") {
         ExpectThrowNoWhat<std::bad_alloc>(ThrowStdBadAlloc);
     }
 
