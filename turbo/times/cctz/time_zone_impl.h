@@ -34,7 +34,7 @@ namespace turbo::time_internal::cctz {
 
         // Load a named time zone. Returns false if the name is invalid, or if
         // some other kind of error occurs. Note that loading "UTC" never fails.
-        static bool LoadTimeZone(const std::string &name, time_zone *tz);
+        static bool load_time_zone(const std::string &name, time_zone *tz);
 
         // Clears the map of cached time zones.  Primarily for use in benchmarks
         // that gauge the performance of loading/parsing the time-zone data.

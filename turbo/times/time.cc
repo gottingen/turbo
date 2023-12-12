@@ -55,11 +55,11 @@ namespace turbo {
                     std::chrono::system_clock::from_time_t(0));
         }
 
-// Floors d to the next unit boundary closer to negative infinity.
+        // Floors d to the next unit boundary closer to negative infinity.
         inline int64_t FloorToUnit(turbo::Duration d, turbo::Duration unit) {
             turbo::Duration rem;
-            int64_t q = turbo::IDivDuration(d, unit, &rem);
-            return (q > 0 || rem >= ZeroDuration() ||
+            int64_t q = turbo::safe_int_mod(d, unit, &rem);
+            return (q > 0 || rem >= zero_duration() ||
                     q == std::numeric_limits<int64_t>::min())
                    ? q
                    : q - 1;
@@ -73,7 +73,7 @@ namespace turbo {
             bd.hour = 23;
             bd.minute = 59;
             bd.second = 59;
-            bd.subsecond = turbo::InfiniteDuration();
+            bd.subsecond = turbo::infinite_duration();
             bd.weekday = 4;
             bd.yearday = 365;
             bd.offset = 0;
@@ -90,7 +90,7 @@ namespace turbo {
             bd.hour = 0;
             bd.minute = 0;
             bd.second = 0;
-            bd.subsecond = -turbo::InfiniteDuration();
+            bd.subsecond = -turbo::infinite_duration();
             bd.weekday = 7;
             bd.yearday = 1;
             bd.offset = 0;
@@ -102,7 +102,7 @@ namespace turbo {
         inline turbo::TimeZone::CivilInfo InfiniteFutureCivilInfo() {
             TimeZone::CivilInfo ci;
             ci.cs = CivilSecond::max();
-            ci.subsecond = InfiniteDuration();
+            ci.subsecond = infinite_duration();
             ci.offset = 0;
             ci.is_dst = false;
             ci.zone_abbr = "-00";
@@ -112,7 +112,7 @@ namespace turbo {
         inline turbo::TimeZone::CivilInfo InfinitePastCivilInfo() {
             TimeZone::CivilInfo ci;
             ci.cs = CivilSecond::min();
-            ci.subsecond = -InfiniteDuration();
+            ci.subsecond = -infinite_duration();
             ci.offset = 0;
             ci.is_dst = false;
             ci.zone_abbr = "-00";
@@ -121,7 +121,7 @@ namespace turbo {
 
         inline turbo::TimeConversion InfiniteFutureTimeConversion() {
             turbo::TimeConversion tc;
-            tc.pre = tc.trans = tc.post = turbo::InfiniteFuture();
+            tc.pre = tc.trans = tc.post = turbo::infinite_future();
             tc.kind = turbo::TimeConversion::UNIQUE;
             tc.normalized = true;
             return tc;
@@ -129,14 +129,14 @@ namespace turbo {
 
         inline TimeConversion InfinitePastTimeConversion() {
             turbo::TimeConversion tc;
-            tc.pre = tc.trans = tc.post = turbo::InfinitePast();
+            tc.pre = tc.trans = tc.post = turbo::infinite_past();
             tc.kind = turbo::TimeConversion::UNIQUE;
             tc.normalized = true;
             return tc;
         }
 
-// Makes a Time from sec, overflowing to InfiniteFuture/InfinitePast as
-// necessary. If sec is min/max, then consult cs+tz to check for overlow.
+        // Makes a Time from sec, overflowing to infinite_future/infinite_past as
+        // necessary. If sec is min/max, then consult cs+tz to check for overlow.
         Time MakeTimeWithOverflow(const cctz::time_point <cctz::seconds> &sec,
                                   const cctz::civil_second &cs,
                                   const cctz::time_zone &tz,
@@ -147,21 +147,21 @@ namespace turbo {
                 const auto al = tz.lookup(max);
                 if (cs > al.cs) {
                     if (normalized) *normalized = true;
-                    return turbo::InfiniteFuture();
+                    return turbo::infinite_future();
                 }
             }
             if (sec == min) {
                 const auto al = tz.lookup(min);
                 if (cs < al.cs) {
                     if (normalized) *normalized = true;
-                    return turbo::InfinitePast();
+                    return turbo::infinite_past();
                 }
             }
             const auto hi = (sec - unix_epoch()).count();
             return time_internal::FromUnixDuration(time_internal::MakeDuration(hi));
         }
 
-// Returns Mon=1..Sun=7.
+        // Returns Mon=1..Sun=7.
         inline int MapWeekday(const cctz::weekday &wd) {
             switch (wd) {
                 case cctz::weekday::monday:
@@ -188,7 +188,7 @@ namespace turbo {
                                     cctz::time_zone::civil_transition *trans) const,
                             Time t, TimeZone::CivilTransition *trans) {
             // Transitions are second-aligned, so we can discard any fractional part.
-            const auto tp = unix_epoch() + cctz::seconds(ToUnixSeconds(t));
+            const auto tp = unix_epoch() + cctz::seconds(to_unix_seconds(t));
             cctz::time_zone::civil_transition tr;
             if (!(tz.*find_transition)(tp, &tr)) return false;
             trans->from = CivilSecond(tr.from);
@@ -198,13 +198,13 @@ namespace turbo {
 
     }  // namespace
 
-//
-// Time
-//
+    //
+    // Time
+    //
 
     turbo::Time::Breakdown Time::In(turbo::TimeZone tz) const {
-        if (*this == turbo::InfiniteFuture()) return InfiniteFutureBreakdown();
-        if (*this == turbo::InfinitePast()) return InfinitePastBreakdown();
+        if (*this == turbo::infinite_future()) return InfiniteFutureBreakdown();
+        if (*this == turbo::infinite_past()) return InfinitePastBreakdown();
 
         const auto tp = unix_epoch() + cctz::seconds(time_internal::GetRepHi(rep_));
         const auto al = cctz::time_zone(tz).lookup(tp);
@@ -227,72 +227,72 @@ namespace turbo {
         return bd;
     }
 
-//
-// Conversions from/to other time types.
-//
+    //
+    // Conversions from/to other time types.
+    //
 
-    turbo::Time FromUDate(double udate) {
-        return time_internal::FromUnixDuration(turbo::Milliseconds(udate));
+    turbo::Time from_udate(double udate) {
+        return time_internal::FromUnixDuration(turbo::milliseconds(udate));
     }
 
-    turbo::Time FromUniversal(int64_t universal) {
-        return turbo::UniversalEpoch() + 100 * turbo::Nanoseconds(universal);
+    turbo::Time from_universal(int64_t universal) {
+        return turbo::universal_epoch() + 100 * turbo::nanoseconds(universal);
     }
 
-    int64_t ToUnixNanos(Time t) {
+    int64_t to_unix_nanos(Time t) {
         if (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >= 0 &&
             time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >> 33 == 0) {
             return (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) *
                     1000 * 1000 * 1000) +
                    (time_internal::GetRepLo(time_internal::ToUnixDuration(t)) / 4);
         }
-        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Nanoseconds(1));
+        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::nanoseconds(1));
     }
 
-    int64_t ToUnixMicros(Time t) {
+    int64_t to_unix_micros(Time t) {
         if (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >= 0 &&
             time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >> 43 == 0) {
             return (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) *
                     1000 * 1000) +
                    (time_internal::GetRepLo(time_internal::ToUnixDuration(t)) / 4000);
         }
-        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Microseconds(1));
+        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::microseconds(1));
     }
 
-    int64_t ToUnixMillis(Time t) {
+    int64_t to_unix_millis(Time t) {
         if (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >= 0 &&
             time_internal::GetRepHi(time_internal::ToUnixDuration(t)) >> 53 == 0) {
             return (time_internal::GetRepHi(time_internal::ToUnixDuration(t)) * 1000) +
                    (time_internal::GetRepLo(time_internal::ToUnixDuration(t)) /
                     (4000 * 1000));
         }
-        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::Milliseconds(1));
+        return FloorToUnit(time_internal::ToUnixDuration(t), turbo::milliseconds(1));
     }
 
-    int64_t ToUnixSeconds(Time t) {
+    int64_t to_unix_seconds(Time t) {
         return time_internal::GetRepHi(time_internal::ToUnixDuration(t));
     }
 
-    time_t ToTimeT(Time t) { return turbo::ToTimespec(t).tv_sec; }
+    time_t to_time_t(Time t) { return turbo::to_timespec(t).tv_sec; }
 
-    double ToUDate(Time t) {
-        return turbo::FDivDuration(time_internal::ToUnixDuration(t),
-                                   turbo::Milliseconds(1));
+    double to_udate(Time t) {
+        return turbo::safe_float_mod(time_internal::ToUnixDuration(t),
+                                   turbo::milliseconds(1));
     }
 
-    int64_t ToUniversal(turbo::Time t) {
-        return turbo::FloorToUnit(t - turbo::UniversalEpoch(), turbo::Nanoseconds(100));
+    int64_t to_universal(turbo::Time t) {
+        return turbo::FloorToUnit(t - turbo::universal_epoch(), turbo::nanoseconds(100));
     }
 
-    turbo::Time TimeFromTimespec(timespec ts) {
-        return time_internal::FromUnixDuration(turbo::DurationFromTimespec(ts));
+    turbo::Time time_from_timespec(timespec ts) {
+        return time_internal::FromUnixDuration(turbo::duration_from_timespec(ts));
     }
 
-    turbo::Time TimeFromTimeval(timeval tv) {
-        return time_internal::FromUnixDuration(turbo::DurationFromTimeval(tv));
+    turbo::Time time_from_timeval(timeval tv) {
+        return time_internal::FromUnixDuration(turbo::duration_from_timeval(tv));
     }
 
-    timespec ToTimespec(Time t) {
+    timespec to_timespec(Time t) {
         timespec ts;
         turbo::Duration d = time_internal::ToUnixDuration(t);
         if (!time_internal::IsInfiniteDuration(d)) {
@@ -302,7 +302,7 @@ namespace turbo {
                 return ts;
             }
         }
-        if (d >= turbo::ZeroDuration()) {
+        if (d >= turbo::zero_duration()) {
             ts.tv_sec = std::numeric_limits<time_t>::max();
             ts.tv_nsec = 1000 * 1000 * 1000 - 1;
         } else {
@@ -312,9 +312,9 @@ namespace turbo {
         return ts;
     }
 
-    timeval ToTimeval(Time t) {
+    timeval to_timeval(Time t) {
         timeval tv;
-        timespec ts = turbo::ToTimespec(t);
+        timespec ts = turbo::to_timespec(t);
         tv.tv_sec = static_cast<decltype(tv.tv_sec)>(ts.tv_sec);
         if (tv.tv_sec != ts.tv_sec) {  // narrowing
             if (ts.tv_sec < 0) {
@@ -330,15 +330,15 @@ namespace turbo {
         return tv;
     }
 
-    Time FromChrono(const std::chrono::system_clock::time_point &tp) {
-        return time_internal::FromUnixDuration(time_internal::FromChrono(
+    Time from_chrono(const std::chrono::system_clock::time_point &tp) {
+        return time_internal::FromUnixDuration(time_internal::from_chrono(
                 tp - std::chrono::system_clock::from_time_t(0)));
     }
 
-    std::chrono::system_clock::time_point ToChronoTime(turbo::Time t) {
+    std::chrono::system_clock::time_point to_chrono_time(turbo::Time t) {
         using D = std::chrono::system_clock::duration;
         auto d = time_internal::ToUnixDuration(t);
-        if (d < ZeroDuration()) d = Floor(d, FromChrono(D{1}));
+        if (d < zero_duration()) d = floor(d, from_chrono(D{1}));
         return std::chrono::system_clock::from_time_t(0) +
                time_internal::ToChronoDuration<D>(d);
     }
@@ -348,8 +348,8 @@ namespace turbo {
     //
 
     turbo::TimeZone::CivilInfo TimeZone::At(Time t) const {
-        if (t == turbo::InfiniteFuture()) return InfiniteFutureCivilInfo();
-        if (t == turbo::InfinitePast()) return InfinitePastCivilInfo();
+        if (t == turbo::infinite_future()) return InfiniteFutureCivilInfo();
+        if (t == turbo::infinite_past()) return InfinitePastCivilInfo();
 
         const auto ud = time_internal::ToUnixDuration(t);
         const auto tp = unix_epoch() + cctz::seconds(time_internal::GetRepHi(ud));
@@ -430,11 +430,11 @@ namespace turbo {
         return tc;
     }
 
-    turbo::Time FromTM(const struct tm &tm, turbo::TimeZone tz) {
+    turbo::Time from_tm(const struct tm &tm, turbo::TimeZone tz) {
         civil_year_t tm_year = tm.tm_year;
         // Avoids years that are too extreme for CivilSecond to normalize.
-        if (tm_year > 300000000000ll) return InfiniteFuture();
-        if (tm_year < -300000000000ll) return InfinitePast();
+        if (tm_year > 300000000000ll) return infinite_future();
+        if (tm_year < -300000000000ll) return infinite_past();
         int tm_mon = tm.tm_mon;
         if (tm_mon == std::numeric_limits<int>::max()) {
             tm_mon -= 12;
@@ -445,7 +445,7 @@ namespace turbo {
         return tm.tm_isdst == 0 ? ti.post : ti.pre;
     }
 
-    struct tm ToTM(turbo::Time t, turbo::TimeZone tz) {
+    struct tm to_tm(turbo::Time t, turbo::TimeZone tz) {
         struct tm tm = {};
 
         const auto ci = tz.At(t);
@@ -466,7 +466,7 @@ namespace turbo {
             tm.tm_year = static_cast<int>(cs.year() - 1900);
         }
 
-        switch (GetWeekday(cs)) {
+        switch (get_weekday(cs)) {
             case Weekday::sunday:
                 tm.tm_wday = 0;
                 break;
@@ -489,7 +489,7 @@ namespace turbo {
                 tm.tm_wday = 6;
                 break;
         }
-        tm.tm_yday = GetYearDay(cs) - 1;
+        tm.tm_yday = get_year_day(cs) - 1;
         tm.tm_isdst = ci.is_dst ? 1 : 0;
 
         return tm;

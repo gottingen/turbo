@@ -71,31 +71,31 @@ namespace turbo {
 
     }  // namespace
 
-    std::string FormatTime(std::string_view format, turbo::Time t,
+    std::string format_time(std::string_view format, turbo::Time t,
                            turbo::TimeZone tz) {
-        if (t == turbo::InfiniteFuture()) return std::string(kInfiniteFutureStr);
-        if (t == turbo::InfinitePast()) return std::string(kInfinitePastStr);
+        if (t == turbo::infinite_future()) return std::string(kInfiniteFutureStr);
+        if (t == turbo::infinite_past()) return std::string(kInfinitePastStr);
         const auto parts = Split(t);
         return cctz::detail::format(std::string(format), parts.sec, parts.fem,
                                     cctz::time_zone(tz));
     }
 
-    std::string FormatTime(turbo::Time t, turbo::TimeZone tz) {
-        return FormatTime(RFC3339_full, t, tz);
+    std::string format_time(turbo::Time t, turbo::TimeZone tz) {
+        return format_time(RFC3339_full, t, tz);
     }
 
-    std::string FormatTime(turbo::Time t) {
-        return turbo::FormatTime(RFC3339_full, t, turbo::LocalTimeZone());
+    std::string format_time(turbo::Time t) {
+        return turbo::format_time(RFC3339_full, t, turbo::local_time_zone());
     }
 
-    bool ParseTime(std::string_view format, std::string_view input,
+    bool parse_time(std::string_view format, std::string_view input,
                    turbo::Time *time, std::string *err) {
-        return turbo::ParseTime(format, input, turbo::UTCTimeZone(), time, err);
+        return turbo::parse_time(format, input, turbo::utc_time_zone(), time, err);
     }
 
 // If the input string does not contain an explicit UTC offset, interpret
 // the fields with respect to the given TimeZone.
-    bool ParseTime(std::string_view format, std::string_view input,
+    bool parse_time(std::string_view format, std::string_view input,
                    turbo::TimeZone tz, turbo::Time *time, std::string *err) {
         auto strip_leading_space = [](std::string_view *sv) {
             while (!sv->empty()) {
@@ -111,8 +111,8 @@ namespace turbo {
             turbo::Time value;
         };
         static Literal literals[] = {
-                {kInfiniteFutureStr, strlen(kInfiniteFutureStr), InfiniteFuture()},
-                {kInfinitePastStr,   strlen(kInfinitePastStr),   InfinitePast()},
+                {kInfiniteFutureStr, strlen(kInfiniteFutureStr), infinite_future()},
+                {kInfinitePastStr,   strlen(kInfinitePastStr),   infinite_past()},
         };
         strip_leading_space(&input);
         for (const auto &lit: literals) {

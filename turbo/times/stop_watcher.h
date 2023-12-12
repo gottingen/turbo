@@ -23,6 +23,11 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_times_stop_watcher StopWatcher utilities
+     * @brief This class is used to time a block of code, and print out the time it took to run.
+     *        It is useful for timing the performance of a block of code.
+     */
     class StopWatcher {
     protected:
         /// This is the type of a printing function, you can make your own
@@ -51,35 +56,35 @@ namespace turbo {
         // Get the elapse from start() to stop(), in various units.
         [[nodiscard]] turbo::Duration elapsed() const;
 
-        [[nodiscard]] int64_t elapsed_nano() const { return turbo::ToInt64Nanoseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_nano() const { return turbo::to_int64_nanoseconds(elapsed()); }
 
-        [[nodiscard]] int64_t elapsed_micro() const { return turbo::ToInt64Microseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_micro() const { return turbo::to_int64_microseconds(elapsed()); }
 
-        [[nodiscard]] int64_t elapsed_mill() const { return turbo::ToInt64Milliseconds(elapsed()); }
+        [[nodiscard]] int64_t elapsed_mill() const { return turbo::to_int64_milliseconds(elapsed()); }
 
-        [[nodiscard]] int64_t elapsed_sec() const { return turbo::ToInt64Seconds(elapsed());; }
+        [[nodiscard]] int64_t elapsed_sec() const { return turbo::to_int64_seconds(elapsed());; }
 
-        [[nodiscard]] double elapsed_nano(double) const { return turbo::ToDoubleNanoseconds(elapsed()); }
+        [[nodiscard]] double elapsed_nano(double) const { return turbo::to_double_nanoseconds(elapsed()); }
 
-        [[nodiscard]] double elapsed_micro(double) const { return turbo::ToDoubleMicroseconds(elapsed()); }
+        [[nodiscard]] double elapsed_micro(double) const { return turbo::to_double_microseconds(elapsed()); }
 
-        [[nodiscard]] double elapsed_mill(double) const { return turbo::ToDoubleMilliseconds(elapsed()); }
+        [[nodiscard]] double elapsed_mill(double) const { return turbo::to_double_milliseconds(elapsed()); }
 
-        [[nodiscard]] double elapsed_sec(double) const { return turbo::ToDoubleSeconds(elapsed()); }
+        [[nodiscard]] double elapsed_sec(double) const { return turbo::to_double_seconds(elapsed()); }
 
         [[nodiscard]] std::chrono::duration<double> elapsed_chrono() const {
-            return turbo::ToChronoNanoseconds(elapsed());
+            return turbo::to_chrono_nanoseconds(elapsed());
         }
 
         /// This prints out a time string from a time
         std::string make_time_str(turbo::Duration span) const {  // NOLINT(modernize-use-nodiscard)
-            if (span < turbo::Microseconds(1))
-                return turbo::Format("{}ns", turbo::ToDoubleNanoseconds(span));
-            if (span < turbo::Milliseconds(1))
-                return turbo::Format("{}us", turbo::ToDoubleMicroseconds(span));
-            if (span < turbo::Seconds(1))
-                return turbo::Format("{}us", turbo::ToDoubleMilliseconds(span));
-            return turbo::Format("{}us", turbo::ToDoubleSeconds(span));
+            if (span < turbo::microseconds(1))
+                return turbo::Format("{}ns", turbo::to_double_nanoseconds(span));
+            if (span < turbo::milliseconds(1))
+                return turbo::Format("{}us", turbo::to_double_microseconds(span));
+            if (span < turbo::seconds(1))
+                return turbo::Format("{}us", turbo::to_double_milliseconds(span));
+            return turbo::Format("{}us", turbo::to_double_seconds(span));
         }
 
         std::string to_string() const {
@@ -87,7 +92,7 @@ namespace turbo {
         }
 
     private:
-        static constexpr turbo::Duration kZero = turbo::Nanoseconds(0);
+        static constexpr turbo::Duration kZero = turbo::nanoseconds(0);
         turbo::Time _start;
         std::string _title;
         time_print_t _time_print;

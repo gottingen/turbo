@@ -305,8 +305,8 @@ namespace turbo::time_internal::cctz {
     //
     //   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
     //   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
-    //   - %E#S - Seconds with # digits of fractional precision
-    //   - %E*S - Seconds with full fractional precision (a literal '*')
+    //   - %E#S - seconds with # digits of fractional precision
+    //   - %E*S - seconds with full fractional precision (a literal '*')
     //   - %E#f - Fractional seconds with # digits of precision
     //   - %E*f - Fractional seconds with full precision (a literal '*')
     //   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)

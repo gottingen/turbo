@@ -45,7 +45,7 @@ namespace turbo::time_internal::cctz {
     //
     // Each class can be constructed by passing up to six optional integer
     // arguments representing the YMDHMS fields (in that order) to the
-    // constructor. Omitted fields are assigned their minimum valid value. Hours,
+    // constructor. Omitted fields are assigned their minimum valid value. hours,
     // minutes, and seconds will be set to 0, month and day will be set to 1, and
     // since there is no minimum valid year, it will be set to 1970. So, a
     // default-constructed civil-time object will have YMDHMS fields representing

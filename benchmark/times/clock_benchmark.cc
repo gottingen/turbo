@@ -27,7 +27,7 @@ namespace {
 
 void BM_Clock_Now_TurboTime(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::Now());
+    benchmark::DoNotOptimize(turbo::time_now());
   }
 }
 BENCHMARK(BM_Clock_Now_TurboTime);
@@ -41,14 +41,14 @@ BENCHMARK(BM_Clock_Now_GetCurrentTimeNanos);
 
 void BM_Clock_Now_TurboTime_ToUnixNanos(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ToUnixNanos(turbo::Now()));
+    benchmark::DoNotOptimize(turbo::to_unix_nanos(turbo::Now()));
   }
 }
 BENCHMARK(BM_Clock_Now_TurboTime_ToUnixNanos);
 
 void BM_Clock_Now_CycleClock(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::base_internal::CycleClock::Now());
+    benchmark::DoNotOptimize(turbo::base_internal::CycleClock::time_now());
   }
 }
 BENCHMARK(BM_Clock_Now_CycleClock);

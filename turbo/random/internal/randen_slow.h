@@ -19,22 +19,20 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
-// RANDen = RANDom generator or beetroots in Swiss High German.
-// RandenSlow implements the basic state manipulation methods for
-// architectures lacking AES hardware acceleration intrinsics.
-class RandenSlow {
- public:
-  static void Generate(const void* keys, void* state_void);
-  static void Absorb(const void* seed_void, void* state_void);
-  static const void* GetKeys();
-};
+    // RANDen = RANDom generator or beetroots in Swiss High German.
+    // RandenSlow implements the basic state manipulation methods for
+    // architectures lacking AES hardware acceleration intrinsics.
+    class RandenSlow {
+    public:
+        static void Generate(const void *keys, void *state_void);
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        static void Absorb(const void *seed_void, void *state_void);
+
+        static const void *GetKeys();
+    };
+
+}  // namespace turbo::random_internal
 
 #endif  // TURBO_RANDOM_INTERNAL_RANDEN_SLOW_H_

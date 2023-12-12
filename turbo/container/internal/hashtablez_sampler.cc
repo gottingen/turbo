@@ -82,7 +82,7 @@ void HashtablezInfo::PrepareForSampling(int64_t stride,
   hashes_bitwise_xor.store(0, std::memory_order_relaxed);
   max_reserve.store(0, std::memory_order_relaxed);
 
-  create_time = turbo::Now();
+  create_time = turbo::time_now();
   weight = stride;
   // The inliner makes hardcoded skip_count difficult (especially when combined
   // with LTO).  We use the ability to exclude stacks by regex when encoding

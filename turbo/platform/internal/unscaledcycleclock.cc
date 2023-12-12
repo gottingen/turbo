@@ -42,7 +42,7 @@ namespace base_internal {
 
 #if defined(__i386__)
 
-int64_t UnscaledCycleClock::Now() {
+int64_t UnscaledCycleClock::time_now() {
   int64_t ret;
   __asm__ volatile("rdtsc" : "=A"(ret));
   return ret;
@@ -60,7 +60,7 @@ double UnscaledCycleClock::Frequency() {
 
 #elif defined(__powerpc__) || defined(__ppc__)
 
-int64_t UnscaledCycleClock::Now() {
+int64_t UnscaledCycleClock::time_now() {
 #ifdef __GLIBC__
   return __ppc_get_timebase();
 #else
@@ -110,7 +110,7 @@ double UnscaledCycleClock::Frequency() {
 // The frequency is fixed, typically in the range 1-50MHz.  It can be
 // read at CNTFRQ special register.  We assume the OS has set up
 // the virtual timer properly.
-int64_t UnscaledCycleClock::Now() {
+int64_t UnscaledCycleClock::time_now() {
   int64_t virtual_timer_value;
   asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
   return virtual_timer_value;
@@ -124,7 +124,7 @@ double UnscaledCycleClock::Frequency() {
 
 #elif defined(__riscv)
 
-int64_t UnscaledCycleClock::Now() {
+int64_t UnscaledCycleClock::time_now() {
   int64_t virtual_timer_value;
   asm volatile("rdcycle %0" : "=r"(virtual_timer_value));
   return virtual_timer_value;
@@ -138,7 +138,7 @@ double UnscaledCycleClock::Frequency() {
 
 #pragma intrinsic(__rdtsc)
 
-int64_t UnscaledCycleClock::Now() { return __rdtsc(); }
+int64_t UnscaledCycleClock::time_now() { return __rdtsc(); }
 
 double UnscaledCycleClock::Frequency() {
   return base_internal::NominalCPUFrequency();

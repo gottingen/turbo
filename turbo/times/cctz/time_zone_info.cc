@@ -185,16 +185,16 @@ namespace turbo::time_internal::cctz {
         }
 
         inline time_zone::civil_lookup MakeUnique(std::int_fast64_t unix_time) {
-            return MakeUnique(FromUnixSeconds(unix_time));
+            return MakeUnique(from_unix_seconds(unix_time));
         }
 
         inline time_zone::civil_lookup MakeSkipped(const Transition &tr,
                                                    const civil_second &cs) {
             time_zone::civil_lookup cl;
             cl.kind = time_zone::civil_lookup::SKIPPED;
-            cl.pre = FromUnixSeconds(tr.unix_time - 1 + (cs - tr.prev_civil_sec));
-            cl.trans = FromUnixSeconds(tr.unix_time);
-            cl.post = FromUnixSeconds(tr.unix_time - (tr.civil_sec - cs));
+            cl.pre = from_unix_seconds(tr.unix_time - 1 + (cs - tr.prev_civil_sec));
+            cl.trans = from_unix_seconds(tr.unix_time);
+            cl.post = from_unix_seconds(tr.unix_time - (tr.civil_sec - cs));
             return cl;
         }
 
@@ -202,9 +202,9 @@ namespace turbo::time_internal::cctz {
                                                     const civil_second &cs) {
             time_zone::civil_lookup cl;
             cl.kind = time_zone::civil_lookup::REPEATED;
-            cl.pre = FromUnixSeconds(tr.unix_time - 1 - (tr.prev_civil_sec - cs));
-            cl.trans = FromUnixSeconds(tr.unix_time);
-            cl.post = FromUnixSeconds(tr.unix_time + (cs - tr.civil_sec));
+            cl.pre = from_unix_seconds(tr.unix_time - 1 - (tr.prev_civil_sec - cs));
+            cl.trans = from_unix_seconds(tr.unix_time);
+            cl.post = from_unix_seconds(tr.unix_time + (cs - tr.civil_sec));
             return cl;
         }
 
@@ -863,7 +863,7 @@ namespace turbo::time_internal::cctz {
 
     time_zone::absolute_lookup TimeZoneInfo::BreakTime(
             const time_point<seconds> &tp) const {
-        std::int_fast64_t unix_time = ToUnixSeconds(tp);
+        std::int_fast64_t unix_time = to_unix_seconds(tp);
         const std::size_t timecnt = transitions_.size();
         assert(timecnt != 0);  // We always add a transition.
 
@@ -995,7 +995,7 @@ namespace turbo::time_internal::cctz {
             // really a sentinel, not a transition.  See pre-2018f tz/zic.c.
             ++begin;
         }
-        std::int_fast64_t unix_time = ToUnixSeconds(tp);
+        std::int_fast64_t unix_time = to_unix_seconds(tp);
         const Transition target = {unix_time, 0, civil_second(), civil_second()};
         const Transition *tr =
                 std::upper_bound(begin, end, target, Transition::ByUnixTime());
@@ -1021,8 +1021,8 @@ namespace turbo::time_internal::cctz {
             // really a sentinel, not a transition.  See pre-2018f tz/zic.c.
             ++begin;
         }
-        std::int_fast64_t unix_time = ToUnixSeconds(tp);
-        if (FromUnixSeconds(unix_time) != tp) {
+        std::int_fast64_t unix_time = to_unix_seconds(tp);
+        if (from_unix_seconds(unix_time) != tp) {
             if (unix_time == std::numeric_limits<std::int_fast64_t>::max()) {
                 if (end == begin) return false;  // Ignore future_spec_.
                 trans->from = (--end)->prev_civil_sec + 1;

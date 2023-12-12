@@ -72,7 +72,7 @@ namespace turbo {
         SUBCASE("WaitFor")
         {
             Latch l(1);
-            REQUIRE_FALSE(l.WaitFor(turbo::Milliseconds(100)));
+            REQUIRE_FALSE(l.WaitFor(turbo::milliseconds(100)));
             l.CountDown();
             REQUIRE(l.WaitFor(turbo::ZeroDuration()));
         }
@@ -80,7 +80,7 @@ namespace turbo {
         SUBCASE("WaitUntil")
         {
             Latch l(1);
-            REQUIRE_FALSE(l.WaitUntil(turbo::Now() + turbo::Milliseconds(100)));
+            REQUIRE_FALSE(l.WaitUntil(turbo::time_now() + turbo::milliseconds(100)));
             l.CountDown();
             REQUIRE(l.WaitUntil(turbo::Now()));
         }

@@ -32,20 +32,19 @@
 
 namespace turbo {
 
-    Time Now() {
+    Time time_now() {
         // TODO(bww): Get a timespec instead so we don't have to divide.
-        int64_t n = turbo::GetCurrentTimeNanos();
+        int64_t n = turbo::get_current_time_nanos();
         if (n >= 0) {
             return time_internal::FromUnixDuration(
                     time_internal::MakeDuration(n / 1000000000, n % 1000000000 * 4));
         }
-        return time_internal::FromUnixDuration(turbo::Nanoseconds(n));
+        return time_internal::FromUnixDuration(turbo::nanoseconds(n));
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
-// Decide if we should use the fast GetCurrentTimeNanos() algorithm
+// Decide if we should use the fast get_current_time_nanos() algorithm
 // based on the cyclecounter, otherwise just get the time directly
 // from the OS on every call. This can be chosen at compile-time via
 // -DTURBO_USE_CYCLECLOCK_FOR_GET_CURRENT_TIME_NANOS=[0|1]
@@ -74,7 +73,7 @@ namespace turbo {
 #if !TURBO_USE_CYCLECLOCK_FOR_GET_CURRENT_TIME_NANOS
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
-int64_t GetCurrentTimeNanos() { return GET_CURRENT_TIME_NANOS_FROM_SYSTEM(); }
+int64_t get_current_time_nanos() { return GET_CURRENT_TIME_NANOS_FROM_SYSTEM(); }
 TURBO_NAMESPACE_END
 }  // namespace turbo
 #else  // Use the cyclecounter-based implementation below.
@@ -82,35 +81,35 @@ TURBO_NAMESPACE_END
 // Allows override by test.
 #ifndef GET_CURRENT_TIME_NANOS_CYCLECLOCK_NOW
 #define GET_CURRENT_TIME_NANOS_CYCLECLOCK_NOW() \
-  ::turbo::time_internal::UnscaledCycleClockWrapperForGetCurrentTime::Now()
+  ::turbo::time_internal::UnscaledCycleClockWrapperForGetCurrentTime::time_now()
 #endif
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
     namespace time_internal {
-// This is a friend wrapper around UnscaledCycleClock::Now()
-// (needed to access UnscaledCycleClock).
+        // This is a friend wrapper around UnscaledCycleClock::time_now()
+        // (needed to access UnscaledCycleClock).
         class UnscaledCycleClockWrapperForGetCurrentTime {
         public:
-            static int64_t Now() { return base_internal::UnscaledCycleClock::Now(); }
+            static int64_t time_now() { return base_internal::UnscaledCycleClock::time_now(); }
         };
     }  // namespace time_internal
 
-// uint64_t is used in this module to provide an extra bit in multiplications
+    // uint64_t is used in this module to provide an extra bit in multiplications
 
-// ---------------------------------------------------------------------
-// An implementation of reader-write locks that use no atomic ops in the read
-// case.  This is a generalization of Lamport's method for reading a multiword
-// clock.  Increment a word on each write acquisition, using the low-order bit
-// as a spinlock; the word is the high word of the "clock".  Readers read the
-// high word, then all other data, then the high word again, and repeat the
-// read if the reads of the high words yields different answers, or an odd
-// value (either case suggests possible interference from a writer).
-// Here we use a spinlock to ensure only one writer at a time, rather than
-// spinning on the bottom bit of the word to benefit from SpinLock
-// spin-delay tuning.
+    // ---------------------------------------------------------------------
+    // An implementation of reader-write locks that use no atomic ops in the read
+    // case.  This is a generalization of Lamport's method for reading a multiword
+    // clock.  Increment a word on each write acquisition, using the low-order bit
+    // as a spinlock; the word is the high word of the "clock".  Readers read the
+    // high word, then all other data, then the high word again, and repeat the
+    // read if the reads of the high words yields different answers, or an odd
+    // value (either case suggests possible interference from a writer).
+    // Here we use a spinlock to ensure only one writer at a time, rather than
+    // spinning on the bottom bit of the word to benefit from SpinLock
+    // spin-delay tuning.
 
-// Acquire seqlock (*seq) and return the value to be written to unlock.
+    // Acquire seqlock (*seq) and return the value to be written to unlock.
     static inline uint64_t SeqAcquire(std::atomic<uint64_t> *seq) {
         uint64_t x = seq->fetch_add(1, std::memory_order_relaxed);
 
@@ -124,34 +123,34 @@ namespace turbo {
         return x + 2;   // original word plus 2
     }
 
-// Release seqlock (*seq) by writing x to it---a value previously returned by
-// SeqAcquire.
+    // Release seqlock (*seq) by writing x to it---a value previously returned by
+    // SeqAcquire.
     static inline void SeqRelease(std::atomic<uint64_t> *seq, uint64_t x) {
         // The unlock store to *seq must have release ordering so that all
         // updates to shared data must finish before this store.
         seq->store(x, std::memory_order_release);  // release lock for readers
     }
 
-// ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-// "nsscaled" is unit of time equal to a (2**kScale)th of a nanosecond.
+    // "nsscaled" is unit of time equal to a (2**kScale)th of a nanosecond.
     enum {
         kScale = 30
     };
 
-// The minimum interval between samples of the time base.
-// We pick enough time to amortize the cost of the sample,
-// to get a reasonably accurate cycle counter rate reading,
-// and not so much that calculations will overflow 64-bits.
+    // The minimum interval between samples of the time base.
+    // We pick enough time to amortize the cost of the sample,
+    // to get a reasonably accurate cycle counter rate reading,
+    // and not so much that calculations will overflow 64-bits.
     static const uint64_t kMinNSBetweenSamples = 2000 << 20;
 
-// We require that kMinNSBetweenSamples shifted by kScale
-// have at least a bit left over for 64-bit calculations.
+    // We require that kMinNSBetweenSamples shifted by kScale
+    // have at least a bit left over for 64-bit calculations.
     static_assert(((kMinNSBetweenSamples << (kScale + 1)) >> (kScale + 1)) ==
                   kMinNSBetweenSamples,
                   "cannot represent kMaxBetweenSamplesNSScaled");
 
-// data from a sample of the kernel's time value
+    // data from a sample of the kernel's time value
     struct TimeSampleAtomic {
         std::atomic<uint64_t> raw_ns{0};              // raw kernel time
         std::atomic<uint64_t> base_ns{0};             // our estimate of time
@@ -161,7 +160,7 @@ namespace turbo {
         // to avoid a division on the fast path).
         std::atomic<uint64_t> min_cycles_per_sample{0};
     };
-// Same again, but with non-atomic types
+    // Same again, but with non-atomic types
     struct TimeSample {
         uint64_t raw_ns = 0;                 // raw kernel time
         uint64_t base_ns = 0;                // our estimate of time
@@ -199,13 +198,13 @@ namespace turbo {
     };
     TURBO_CONST_INIT static TimeState time_state;
 
-// Return the time in ns as told by the kernel interface.  Place in *cycleclock
-// the value of the cycleclock at about the time of the syscall.
-// This call represents the time base that this module synchronizes to.
-// Ensures that *cycleclock does not step back by up to (1 << 16) from
-// last_cycleclock, to discard small backward counter steps.  (Larger steps are
-// assumed to be complete resyncs, which shouldn't happen.  If they do, a full
-// reinitialization of the outer algorithm should occur.)
+    // Return the time in ns as told by the kernel interface.  Place in *cycleclock
+    // the value of the cycleclock at about the time of the syscall.
+    // This call represents the time base that this module synchronizes to.
+    // Ensures that *cycleclock does not step back by up to (1 << 16) from
+    // last_cycleclock, to discard small backward counter steps.  (Larger steps are
+    // assumed to be complete resyncs, which shouldn't happen.  If they do, a full
+    // reinitialization of the outer algorithm should occur.)
     static int64_t GetCurrentTimeNanosFromKernel(uint64_t last_cycleclock,
                                                  uint64_t *cycleclock)
     TURBO_EXCLUSIVE_LOCKS_REQUIRED(time_state.lock) {
@@ -260,9 +259,9 @@ namespace turbo {
 
     static int64_t GetCurrentTimeNanosSlowPath() TURBO_COLD;
 
-// Read the contents of *atomic into *sample.
-// Each field is read atomically, but to maintain atomicity between fields,
-// the access must be done under a lock.
+    // Read the contents of *atomic into *sample.
+    // Each field is read atomically, but to maintain atomicity between fields,
+    // the access must be done under a lock.
     static void ReadTimeSampleAtomic(const struct TimeSampleAtomic *atomic,
                                      struct TimeSample *sample) {
         sample->base_ns = atomic->base_ns.load(std::memory_order_relaxed);
@@ -274,36 +273,36 @@ namespace turbo {
         sample->raw_ns = atomic->raw_ns.load(std::memory_order_relaxed);
     }
 
-// Public routine.
-// Algorithm:  We wish to compute real time from a cycle counter.  In normal
-// operation, we construct a piecewise linear approximation to the kernel time
-// source, using the cycle counter value.  The start of each line segment is at
-// the same point as the end of the last, but may have a different slope (that
-// is, a different idea of the cycle counter frequency).  Every couple of
-// seconds, the kernel time source is sampled and compared with the current
-// approximation.  A new slope is chosen that, if followed for another couple
-// of seconds, will correct the error at the current position.  The information
-// for a sample is in the "last_sample" struct.  The linear approximation is
-//   estimated_time = last_sample.base_ns +
-//     last_sample.ns_per_cycle * (counter_reading - last_sample.base_cycles)
-// (ns_per_cycle is actually stored in different units and scaled, to avoid
-// overflow).  The base_ns of the next linear approximation is the
-// estimated_time using the last approximation; the base_cycles is the cycle
-// counter value at that time; the ns_per_cycle is the number of ns per cycle
-// measured since the last sample, but adjusted so that most of the difference
-// between the estimated_time and the kernel time will be corrected by the
-// estimated time to the next sample.  In normal operation, this algorithm
-// relies on:
-// - the cycle counter and kernel time rates not changing a lot in a few
-//   seconds.
-// - the client calling into the code often compared to a couple of seconds, so
-//   the time to the next correction can be estimated.
-// Any time ns_per_cycle is not known, a major error is detected, or the
-// assumption about frequent calls is violated, the implementation returns the
-// kernel time.  It records sufficient data that a linear approximation can
-// resume a little later.
+    // Public routine.
+    // Algorithm:  We wish to compute real time from a cycle counter.  In normal
+    // operation, we construct a piecewise linear approximation to the kernel time
+    // source, using the cycle counter value.  The start of each line segment is at
+    // the same point as the end of the last, but may have a different slope (that
+    // is, a different idea of the cycle counter frequency).  Every couple of
+    // seconds, the kernel time source is sampled and compared with the current
+    // approximation.  A new slope is chosen that, if followed for another couple
+    // of seconds, will correct the error at the current position.  The information
+    // for a sample is in the "last_sample" struct.  The linear approximation is
+    //   estimated_time = last_sample.base_ns +
+    //     last_sample.ns_per_cycle * (counter_reading - last_sample.base_cycles)
+    // (ns_per_cycle is actually stored in different units and scaled, to avoid
+    // overflow).  The base_ns of the next linear approximation is the
+    // estimated_time using the last approximation; the base_cycles is the cycle
+    // counter value at that time; the ns_per_cycle is the number of ns per cycle
+    // measured since the last sample, but adjusted so that most of the difference
+    // between the estimated_time and the kernel time will be corrected by the
+    // estimated time to the next sample.  In normal operation, this algorithm
+    // relies on:
+    // - the cycle counter and kernel time rates not changing a lot in a few
+    //   seconds.
+    // - the client calling into the code often compared to a couple of seconds, so
+    //   the time to the next correction can be estimated.
+    // Any time ns_per_cycle is not known, a major error is detected, or the
+    // assumption about frequent calls is violated, the implementation returns the
+    // kernel time.  It records sufficient data that a linear approximation can
+    // resume a little later.
 
-    int64_t GetCurrentTimeNanos() {
+    int64_t get_current_time_nanos() {
         // read the data from the "last_sample" struct (but don't need raw_ns yet)
         // The reads of "seq" and test of the values emulate a reader lock.
         uint64_t base_ns;
@@ -366,9 +365,9 @@ namespace turbo {
         return GetCurrentTimeNanosSlowPath();
     }
 
-// Return (a << kScale)/b.
-// Zero is returned if b==0.   Scaling is performed internally to
-// preserve precision without overflow.
+    // Return (a << kScale)/b.
+    // Zero is returned if b==0.   Scaling is performed internally to
+    // preserve precision without overflow.
     static uint64_t SafeDivideAndScale(uint64_t a, uint64_t b) {
         // Find maximum safe_shift so that
         //  0 <= safe_shift <= kScale  and  (a << safe_shift) does not overflow.
@@ -388,17 +387,17 @@ namespace turbo {
             uint64_t now_cycles, uint64_t now_ns, uint64_t delta_cycles,
             const struct TimeSample *sample) TURBO_COLD;
 
-// The slow path of GetCurrentTimeNanos().  This is taken while gathering
-// initial samples, when enough time has elapsed since the last sample, and if
-// any other thread is writing to last_sample.
-//
-// Manually mark this 'noinline' to minimize stack frame size of the fast
-// path.  Without this, sometimes a compiler may inline this big block of code
-// into the fast path.  That causes lots of register spills and reloads that
-// are unnecessary unless the slow path is taken.
-//
-// TODO(turbo-team): Remove this attribute when our compiler is smart enough
-// to do the right thing.
+    // The slow path of get_current_time_nanos().  This is taken while gathering
+    // initial samples, when enough time has elapsed since the last sample, and if
+    // any other thread is writing to last_sample.
+    //
+    // Manually mark this 'noinline' to minimize stack frame size of the fast
+    // path.  Without this, sometimes a compiler may inline this big block of code
+    // into the fast path.  That causes lots of register spills and reloads that
+    // are unnecessary unless the slow path is taken.
+    //
+    // TODO(turbo-team): Remove this attribute when our compiler is smart enough
+    // to do the right thing.
     TURBO_NO_INLINE
     static int64_t GetCurrentTimeNanosSlowPath()
     TURBO_LOCKS_EXCLUDED(time_state.lock) {
@@ -440,9 +439,9 @@ namespace turbo {
         return static_cast<int64_t>(estimated_base_ns);
     }
 
-// Main part of the algorithm.  Locks out readers, updates the approximation
-// using the new sample from the kernel, and stores the result in last_sample
-// for readers.  Returns the new estimated time.
+    // Main part of the algorithm.  Locks out readers, updates the approximation
+    // using the new sample from the kernel, and stores the result in last_sample
+    // for readers.  Returns the new estimated time.
     static uint64_t UpdateLastSample(uint64_t now_cycles, uint64_t now_ns,
                                      uint64_t delta_cycles,
                                      const struct TimeSample *sample)
@@ -553,20 +552,20 @@ namespace turbo {
         constexpr turbo::Duration MaxSleep() {
 #ifdef _WIN32
             // Windows Sleep() takes unsigned long argument in milliseconds.
-            return turbo::Milliseconds(
+            return turbo::milliseconds(
                 std::numeric_limits<unsigned long>::max());  // NOLINT(runtime/int)
 #else
-            return turbo::Seconds(std::numeric_limits<time_t>::max());
+            return turbo::seconds(std::numeric_limits<time_t>::max());
 #endif
         }
 
-// Sleeps for the given duration.
-// REQUIRES: to_sleep <= MaxSleep().
+        // Sleeps for the given duration.
+        // REQUIRES: to_sleep <= MaxSleep().
         void SleepOnce(turbo::Duration to_sleep) {
 #ifdef _WIN32
-            Sleep(static_cast<DWORD>(to_sleep / turbo::Milliseconds(1)));
+            Sleep(static_cast<DWORD>(to_sleep / turbo::milliseconds(1)));
 #else
-            struct timespec sleep_time = turbo::ToTimespec(to_sleep);
+            struct timespec sleep_time = turbo::to_timespec(to_sleep);
             while (nanosleep(&sleep_time, &sleep_time) != 0 && errno == EINTR) {
                 // Ignore signals and wait for the full interval to elapse.
             }
@@ -581,7 +580,7 @@ extern "C" {
 
 TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(
         turbo::Duration duration) {
-    while (duration > turbo::ZeroDuration()) {
+    while (duration > turbo::zero_duration()) {
         turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());
         turbo::SleepOnce(to_sleep);
         duration -= to_sleep;

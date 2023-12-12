@@ -21,7 +21,14 @@
 
 #include "turbo/module/module_version.h"
 
-
+/**
+ * @defgroup turbo_times_clock Clock utilities
+ * @defgroup turbo_times_stop_watcher StopWatcher utilities
+ * @defgroup turbo_times_duration Duration utilities
+ * @defgroup turbo_times_time_point TimePoint utilities
+ * @defgroup turbo_times_time_zone TimeZone utilities
+ * @defgroup turbo_times_civil_time CivilTime utilities
+ */
 namespace turbo {
 
     static constexpr turbo::ModuleVersion times_version = turbo::ModuleVersion{0, 9, 36};

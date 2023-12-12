@@ -49,6 +49,7 @@ Contents
     en/api/random
     en/api/strings
     en/api/simd
+    en/api/times
     en/api/unicode
 
 

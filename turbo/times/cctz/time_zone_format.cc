@@ -106,7 +106,7 @@ namespace turbo::time_internal::cctz::detail {
             return weekday::sunday; /*NOTREACHED*/
         }
 
-        std::tm ToTM(const time_zone::absolute_lookup &al) {
+        std::tm to_tm(const time_zone::absolute_lookup &al) {
             std::tm tm{};
             tm.tm_sec = al.cs.second();
             tm.tm_min = al.cs.minute();
@@ -311,8 +311,8 @@ namespace turbo::time_internal::cctz::detail {
 //
 //   - %Ez  - RFC3339-compatible numeric UTC offset (+hh:mm or -hh:mm)
 //   - %E*z - Full-resolution numeric UTC offset (+hh:mm:ss or -hh:mm:ss)
-//   - %E#S - Seconds with # digits of fractional precision
-//   - %E*S - Seconds with full fractional precision (a literal '*')
+//   - %E#S - seconds with # digits of fractional precision
+//   - %E*S - seconds with full fractional precision (a literal '*')
 //   - %E4Y - Four-character years (-999 ... -001, 0000, 0001 ... 9999)
 //   - %ET  - The RFC3339 "date-time" separator "T"
 //
@@ -332,7 +332,7 @@ namespace turbo::time_internal::cctz::detail {
         std::string result;
         result.reserve(format.size());  // A reasonable guess for the result size.
         const time_zone::absolute_lookup al = tz.lookup(tp);
-        const std::tm tm = ToTM(al);
+        const std::tm tm = to_tm(al);
 
         // Scratch buffer for internal conversions.
         char buf[3 + kDigits10_64];  // enough for longest conversion
@@ -436,7 +436,7 @@ namespace turbo::time_internal::cctz::detail {
                         result.append(al.abbr);
                         break;
                     case 's':
-                        bp = Format64(ep, 0, ToUnixSeconds(tp));
+                        bp = Format64(ep, 0, to_unix_seconds(tp));
                         result.append(bp, static_cast<std::size_t>(ep - bp));
                         break;
                     case '%':
@@ -750,7 +750,7 @@ namespace turbo::time_internal::cctz::detail {
             }
             switch (*fmt++) {
                 case 'Y':
-                    // Symmetrically with FormatTime(), directly handing %Y avoids the
+                    // Symmetrically with format_time(), directly handing %Y avoids the
                     // tm.tm_year overflow problem.  However, tm.tm_year will still be
                     // used by other specifiers like %D.
                     data = ParseInt(data, 0, kyearmin, kyearmax, &year);
@@ -943,7 +943,7 @@ namespace turbo::time_internal::cctz::detail {
 
         // If we saw %s then we ignore anything else and return that time.
         if (saw_percent_s) {
-            *sec = FromUnixSeconds(percent_s);
+            *sec = from_unix_seconds(percent_s);
             *fs = detail::femtoseconds::zero();
             return true;
         }

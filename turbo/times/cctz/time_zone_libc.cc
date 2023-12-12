@@ -196,7 +196,7 @@ namespace turbo::time_internal::cctz {
         al.is_dst = false;
         al.abbr = "-00";
 
-        const std::int_fast64_t s = ToUnixSeconds(tp);
+        const std::int_fast64_t s = to_unix_seconds(tp);
 
         // If std::time_t cannot hold the input we saturate the output.
         if (s < std::numeric_limits<std::time_t>::min()) {
@@ -231,13 +231,13 @@ namespace turbo::time_internal::cctz {
         if (!local_) {
             // If time_point<seconds> cannot hold the result we saturate.
             static const civil_second min_tp_cs =
-                    civil_second() + ToUnixSeconds(time_point<seconds>::min());
+                    civil_second() + to_unix_seconds(time_point<seconds>::min());
             static const civil_second max_tp_cs =
-                    civil_second() + ToUnixSeconds(time_point<seconds>::max());
+                    civil_second() + to_unix_seconds(time_point<seconds>::max());
             const time_point<seconds> tp = (cs < min_tp_cs) ? time_point<seconds>::min()
                                                             : (cs > max_tp_cs)
                                                               ? time_point<seconds>::max()
-                                                              : FromUnixSeconds(cs - civil_second());
+                                                              : from_unix_seconds(cs - civil_second());
             return {time_zone::civil_lookup::UNIQUE, tp, tp, tp};
         }
 
@@ -263,7 +263,7 @@ namespace turbo::time_internal::cctz {
         if (make_time(cs, 0, &t0, &offset0) && make_time(cs, 1, &t1, &offset1)) {
             if (t0 == t1) {
                 // The civil time was singular (pre == trans == post).
-                const time_point<seconds> tp = FromUnixSeconds(t0);
+                const time_point<seconds> tp = from_unix_seconds(t0);
                 return {time_zone::civil_lookup::UNIQUE, tp, tp, tp};
             }
 
@@ -272,18 +272,18 @@ namespace turbo::time_internal::cctz {
                 std::swap(offset0, offset1);
             }
             const std::time_t tt = find_trans(t0, t1, offset1);
-            const time_point<seconds> trans = FromUnixSeconds(tt);
+            const time_point<seconds> trans = from_unix_seconds(tt);
 
             if (offset0 < offset1) {
                 // The civil time did not exist (pre >= trans > post).
-                const time_point<seconds> pre = FromUnixSeconds(t1);
-                const time_point<seconds> post = FromUnixSeconds(t0);
+                const time_point<seconds> pre = from_unix_seconds(t1);
+                const time_point<seconds> post = from_unix_seconds(t0);
                 return {time_zone::civil_lookup::SKIPPED, pre, trans, post};
             }
 
             // The civil time was ambiguous (pre < trans <= post).
-            const time_point<seconds> pre = FromUnixSeconds(t0);
-            const time_point<seconds> post = FromUnixSeconds(t1);
+            const time_point<seconds> pre = from_unix_seconds(t0);
+            const time_point<seconds> post = from_unix_seconds(t1);
             return {time_zone::civil_lookup::REPEATED, pre, trans, post};
         }
 

@@ -52,7 +52,7 @@ namespace turbo::tlog::details {
     bool LogEveryNSecState::ShouldLog(double seconds) {
         using turbo::base_internal::CycleClock;
         LossyIncrement(&counter_);
-        const int64_t now_cycles = CycleClock::Now();
+        const int64_t now_cycles = CycleClock::time_now();
         int64_t next_cycles = next_log_time_cycles_.load(std::memory_order_relaxed);
 #if defined(__myriad2__)
         // myriad2 does not have 8-byte compare and exchange.  Use a racy version that

@@ -22,29 +22,28 @@
 // with different flags from other targets, using different levels of
 // optimization, potentially introducing ODR violations.
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
-// RANDen = RANDom generator or beetroots in Swiss High German.
-// 'Strong' (well-distributed, unpredictable, backtracking-resistant) random
-// generator, faster in some benchmarks than std::mt19937_64 and pcg64_c32.
-//
-// RandenHwAes implements the basic state manipulation methods.
-class RandenHwAes {
- public:
-  static void Generate(const void* keys, void* state_void);
-  static void Absorb(const void* seed_void, void* state_void);
-  static const void* GetKeys();
-};
 
-// HasRandenHwAesImplementation returns true when there is an accelerated
-// implementation, and false otherwise.  If there is no implementation,
-// then attempting to use it will abort the program.
-bool HasRandenHwAesImplementation();
+    // RANDen = RANDom generator or beetroots in Swiss High German.
+    // 'Strong' (well-distributed, unpredictable, backtracking-resistant) random
+    // generator, faster in some benchmarks than std::mt19937_64 and pcg64_c32.
+    //
+    // RandenHwAes implements the basic state manipulation methods.
+    class RandenHwAes {
+    public:
+        static void Generate(const void *keys, void *state_void);
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        static void Absorb(const void *seed_void, void *state_void);
+
+        static const void *GetKeys();
+    };
+
+    // HasRandenHwAesImplementation returns true when there is an accelerated
+    // implementation, and false otherwise.  If there is no implementation,
+    // then attempting to use it will abort the program.
+    bool HasRandenHwAesImplementation();
+
+}  // namespace turbo::random_internal
 
 #endif  // TURBO_RANDOM_INTERNAL_RANDEN_HWAES_H_

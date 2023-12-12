@@ -60,7 +60,7 @@ BENCHMARK(BM_Step_Days);
 void BM_Format(benchmark::State& state) {
   const turbo::CivilSecond c(2014, 1, 2, 3, 4, 5);
   while (state.KeepRunning()) {
-    const std::string s = turbo::FormatCivilTime(c);
+    const std::string s = turbo::format_civil_time(c);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -70,7 +70,7 @@ void BM_Parse(benchmark::State& state) {
   const std::string f = "2014-01-02T03:04:05";
   turbo::CivilSecond c;
   while (state.KeepRunning()) {
-    const bool b = turbo::ParseCivilTime(f, &c);
+    const bool b = turbo::parse_civil_time(f, &c);
     benchmark::DoNotOptimize(b);
   }
 }
@@ -80,7 +80,7 @@ void BM_RoundTripFormatParse(benchmark::State& state) {
   const turbo::CivilSecond c(2014, 1, 2, 3, 4, 5);
   turbo::CivilSecond out;
   while (state.KeepRunning()) {
-    const bool b = turbo::ParseCivilTime(turbo::FormatCivilTime(c), &out);
+    const bool b = turbo::parse_civil_time(turbo::format_civil_time(c), &out);
     benchmark::DoNotOptimize(b);
   }
 }

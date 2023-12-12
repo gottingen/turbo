@@ -25,22 +25,22 @@ namespace {
 
 TEST(CivilTime, DefaultConstruction) {
   turbo::CivilSecond ss;
-  EXPECT_EQ("1970-01-01T00:00:00", turbo::FormatCivilTime(ss));
+  EXPECT_EQ("1970-01-01T00:00:00", turbo::format_civil_time(ss));
 
   turbo::CivilMinute mm;
-  EXPECT_EQ("1970-01-01T00:00", turbo::FormatCivilTime(mm));
+  EXPECT_EQ("1970-01-01T00:00", turbo::format_civil_time(mm));
 
   turbo::CivilHour hh;
-  EXPECT_EQ("1970-01-01T00", turbo::FormatCivilTime(hh));
+  EXPECT_EQ("1970-01-01T00", turbo::format_civil_time(hh));
 
   turbo::CivilDay d;
-  EXPECT_EQ("1970-01-01", turbo::FormatCivilTime(d));
+  EXPECT_EQ("1970-01-01", turbo::format_civil_time(d));
 
   turbo::CivilMonth m;
-  EXPECT_EQ("1970-01", turbo::FormatCivilTime(m));
+  EXPECT_EQ("1970-01", turbo::format_civil_time(m));
 
   turbo::CivilYear y;
-  EXPECT_EQ("1970", turbo::FormatCivilTime(y));
+  EXPECT_EQ("1970", turbo::format_civil_time(y));
 }
 
 TEST(CivilTime, StructMember) {
@@ -53,117 +53,117 @@ TEST(CivilTime, StructMember) {
 
 TEST(CivilTime, FieldsConstruction) {
   EXPECT_EQ("2015-01-02T03:04:05",
-            turbo::FormatCivilTime(turbo::CivilSecond(2015, 1, 2, 3, 4, 5)));
+            turbo::format_civil_time(turbo::CivilSecond(2015, 1, 2, 3, 4, 5)));
   EXPECT_EQ("2015-01-02T03:04:00",
-            turbo::FormatCivilTime(turbo::CivilSecond(2015, 1, 2, 3, 4)));
+            turbo::format_civil_time(turbo::CivilSecond(2015, 1, 2, 3, 4)));
   EXPECT_EQ("2015-01-02T03:00:00",
-            turbo::FormatCivilTime(turbo::CivilSecond(2015, 1, 2, 3)));
+            turbo::format_civil_time(turbo::CivilSecond(2015, 1, 2, 3)));
   EXPECT_EQ("2015-01-02T00:00:00",
-            turbo::FormatCivilTime(turbo::CivilSecond(2015, 1, 2)));
+            turbo::format_civil_time(turbo::CivilSecond(2015, 1, 2)));
   EXPECT_EQ("2015-01-01T00:00:00",
-            turbo::FormatCivilTime(turbo::CivilSecond(2015, 1)));
+            turbo::format_civil_time(turbo::CivilSecond(2015, 1)));
   EXPECT_EQ("2015-01-01T00:00:00",
-            turbo::FormatCivilTime(turbo::CivilSecond(2015)));
+            turbo::format_civil_time(turbo::CivilSecond(2015)));
 
   EXPECT_EQ("2015-01-02T03:04",
-            turbo::FormatCivilTime(turbo::CivilMinute(2015, 1, 2, 3, 4, 5)));
+            turbo::format_civil_time(turbo::CivilMinute(2015, 1, 2, 3, 4, 5)));
   EXPECT_EQ("2015-01-02T03:04",
-            turbo::FormatCivilTime(turbo::CivilMinute(2015, 1, 2, 3, 4)));
+            turbo::format_civil_time(turbo::CivilMinute(2015, 1, 2, 3, 4)));
   EXPECT_EQ("2015-01-02T03:00",
-            turbo::FormatCivilTime(turbo::CivilMinute(2015, 1, 2, 3)));
+            turbo::format_civil_time(turbo::CivilMinute(2015, 1, 2, 3)));
   EXPECT_EQ("2015-01-02T00:00",
-            turbo::FormatCivilTime(turbo::CivilMinute(2015, 1, 2)));
+            turbo::format_civil_time(turbo::CivilMinute(2015, 1, 2)));
   EXPECT_EQ("2015-01-01T00:00",
-            turbo::FormatCivilTime(turbo::CivilMinute(2015, 1)));
+            turbo::format_civil_time(turbo::CivilMinute(2015, 1)));
   EXPECT_EQ("2015-01-01T00:00",
-            turbo::FormatCivilTime(turbo::CivilMinute(2015)));
+            turbo::format_civil_time(turbo::CivilMinute(2015)));
 
   EXPECT_EQ("2015-01-02T03",
-            turbo::FormatCivilTime(turbo::CivilHour(2015, 1, 2, 3, 4, 5)));
+            turbo::format_civil_time(turbo::CivilHour(2015, 1, 2, 3, 4, 5)));
   EXPECT_EQ("2015-01-02T03",
-            turbo::FormatCivilTime(turbo::CivilHour(2015, 1, 2, 3, 4)));
+            turbo::format_civil_time(turbo::CivilHour(2015, 1, 2, 3, 4)));
   EXPECT_EQ("2015-01-02T03",
-            turbo::FormatCivilTime(turbo::CivilHour(2015, 1, 2, 3)));
+            turbo::format_civil_time(turbo::CivilHour(2015, 1, 2, 3)));
   EXPECT_EQ("2015-01-02T00",
-            turbo::FormatCivilTime(turbo::CivilHour(2015, 1, 2)));
+            turbo::format_civil_time(turbo::CivilHour(2015, 1, 2)));
   EXPECT_EQ("2015-01-01T00",
-            turbo::FormatCivilTime(turbo::CivilHour(2015, 1)));
+            turbo::format_civil_time(turbo::CivilHour(2015, 1)));
   EXPECT_EQ("2015-01-01T00",
-            turbo::FormatCivilTime(turbo::CivilHour(2015)));
+            turbo::format_civil_time(turbo::CivilHour(2015)));
 
   EXPECT_EQ("2015-01-02",
-            turbo::FormatCivilTime(turbo::CivilDay(2015, 1, 2, 3, 4, 5)));
+            turbo::format_civil_time(turbo::CivilDay(2015, 1, 2, 3, 4, 5)));
   EXPECT_EQ("2015-01-02",
-            turbo::FormatCivilTime(turbo::CivilDay(2015, 1, 2, 3, 4)));
+            turbo::format_civil_time(turbo::CivilDay(2015, 1, 2, 3, 4)));
   EXPECT_EQ("2015-01-02",
-            turbo::FormatCivilTime(turbo::CivilDay(2015, 1, 2, 3)));
+            turbo::format_civil_time(turbo::CivilDay(2015, 1, 2, 3)));
   EXPECT_EQ("2015-01-02",
-            turbo::FormatCivilTime(turbo::CivilDay(2015, 1, 2)));
+            turbo::format_civil_time(turbo::CivilDay(2015, 1, 2)));
   EXPECT_EQ("2015-01-01",
-            turbo::FormatCivilTime(turbo::CivilDay(2015, 1)));
+            turbo::format_civil_time(turbo::CivilDay(2015, 1)));
   EXPECT_EQ("2015-01-01",
-            turbo::FormatCivilTime(turbo::CivilDay(2015)));
+            turbo::format_civil_time(turbo::CivilDay(2015)));
 
   EXPECT_EQ("2015-01",
-            turbo::FormatCivilTime(turbo::CivilMonth(2015, 1, 2, 3, 4, 5)));
+            turbo::format_civil_time(turbo::CivilMonth(2015, 1, 2, 3, 4, 5)));
   EXPECT_EQ("2015-01",
-            turbo::FormatCivilTime(turbo::CivilMonth(2015, 1, 2, 3, 4)));
+            turbo::format_civil_time(turbo::CivilMonth(2015, 1, 2, 3, 4)));
   EXPECT_EQ("2015-01",
-            turbo::FormatCivilTime(turbo::CivilMonth(2015, 1, 2, 3)));
+            turbo::format_civil_time(turbo::CivilMonth(2015, 1, 2, 3)));
   EXPECT_EQ("2015-01",
-            turbo::FormatCivilTime(turbo::CivilMonth(2015, 1, 2)));
+            turbo::format_civil_time(turbo::CivilMonth(2015, 1, 2)));
   EXPECT_EQ("2015-01",
-            turbo::FormatCivilTime(turbo::CivilMonth(2015, 1)));
+            turbo::format_civil_time(turbo::CivilMonth(2015, 1)));
   EXPECT_EQ("2015-01",
-            turbo::FormatCivilTime(turbo::CivilMonth(2015)));
+            turbo::format_civil_time(turbo::CivilMonth(2015)));
 
   EXPECT_EQ("2015",
-            turbo::FormatCivilTime(turbo::CivilYear(2015, 1, 2, 3, 4, 5)));
+            turbo::format_civil_time(turbo::CivilYear(2015, 1, 2, 3, 4, 5)));
   EXPECT_EQ("2015",
-            turbo::FormatCivilTime(turbo::CivilYear(2015, 1, 2, 3, 4)));
+            turbo::format_civil_time(turbo::CivilYear(2015, 1, 2, 3, 4)));
   EXPECT_EQ("2015",
-            turbo::FormatCivilTime(turbo::CivilYear(2015, 1, 2, 3)));
+            turbo::format_civil_time(turbo::CivilYear(2015, 1, 2, 3)));
   EXPECT_EQ("2015",
-            turbo::FormatCivilTime(turbo::CivilYear(2015, 1, 2)));
+            turbo::format_civil_time(turbo::CivilYear(2015, 1, 2)));
   EXPECT_EQ("2015",
-            turbo::FormatCivilTime(turbo::CivilYear(2015, 1)));
+            turbo::format_civil_time(turbo::CivilYear(2015, 1)));
   EXPECT_EQ("2015",
-            turbo::FormatCivilTime(turbo::CivilYear(2015)));
+            turbo::format_civil_time(turbo::CivilYear(2015)));
 }
 
 TEST(CivilTime, FieldsConstructionLimits) {
   const int kIntMax = std::numeric_limits<int>::max();
   EXPECT_EQ("2038-01-19T03:14:07",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, 1, 0, 0, kIntMax)));
   EXPECT_EQ("6121-02-11T05:21:07",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, 1, 0, kIntMax, kIntMax)));
   EXPECT_EQ("251104-11-20T12:21:07",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, 1, kIntMax, kIntMax, kIntMax)));
   EXPECT_EQ("6130715-05-30T12:21:07",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, kIntMax, kIntMax, kIntMax, kIntMax)));
   EXPECT_EQ("185087685-11-26T12:21:07",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, kIntMax, kIntMax, kIntMax, kIntMax, kIntMax)));
 
   const int kIntMin = std::numeric_limits<int>::min();
   EXPECT_EQ("1901-12-13T20:45:52",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, 1, 0, 0, kIntMin)));
   EXPECT_EQ("-2182-11-20T18:37:52",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, 1, 0, kIntMin, kIntMin)));
   EXPECT_EQ("-247165-02-11T10:37:52",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, 1, kIntMin, kIntMin, kIntMin)));
   EXPECT_EQ("-6126776-08-01T10:37:52",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, 1, kIntMin, kIntMin, kIntMin, kIntMin)));
   EXPECT_EQ("-185083747-10-31T10:37:52",
-            turbo::FormatCivilTime(turbo::CivilSecond(
+            turbo::format_civil_time(turbo::CivilSecond(
                 1970, kIntMin, kIntMin, kIntMin, kIntMin, kIntMin)));
 }
 
@@ -285,41 +285,41 @@ TEST(CivilTime, ExplicitCrossAlignment) {
   //
 
   turbo::CivilSecond second(2015, 1, 2, 3, 4, 5);
-  EXPECT_EQ("2015-01-02T03:04:05", turbo::FormatCivilTime(second));
+  EXPECT_EQ("2015-01-02T03:04:05", turbo::format_civil_time(second));
 
   turbo::CivilMinute minute(second);
-  EXPECT_EQ("2015-01-02T03:04", turbo::FormatCivilTime(minute));
+  EXPECT_EQ("2015-01-02T03:04", turbo::format_civil_time(minute));
 
   turbo::CivilHour hour(minute);
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(hour));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(hour));
 
   turbo::CivilDay day(hour);
-  EXPECT_EQ("2015-01-02", turbo::FormatCivilTime(day));
+  EXPECT_EQ("2015-01-02", turbo::format_civil_time(day));
 
   turbo::CivilMonth month(day);
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(month));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(month));
 
   turbo::CivilYear year(month);
-  EXPECT_EQ("2015", turbo::FormatCivilTime(year));
+  EXPECT_EQ("2015", turbo::format_civil_time(year));
 
   //
   // Now assign from larger units -> smaller units
   //
 
   month = turbo::CivilMonth(year);
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(month));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(month));
 
   day = turbo::CivilDay(month);
-  EXPECT_EQ("2015-01-01", turbo::FormatCivilTime(day));
+  EXPECT_EQ("2015-01-01", turbo::format_civil_time(day));
 
   hour = turbo::CivilHour(day);
-  EXPECT_EQ("2015-01-01T00", turbo::FormatCivilTime(hour));
+  EXPECT_EQ("2015-01-01T00", turbo::format_civil_time(hour));
 
   minute = turbo::CivilMinute(hour);
-  EXPECT_EQ("2015-01-01T00:00", turbo::FormatCivilTime(minute));
+  EXPECT_EQ("2015-01-01T00:00", turbo::format_civil_time(minute));
 
   second = turbo::CivilSecond(minute);
-  EXPECT_EQ("2015-01-01T00:00:00", turbo::FormatCivilTime(second));
+  EXPECT_EQ("2015-01-01T00:00:00", turbo::format_civil_time(second));
 }
 
 // Metafunction to test whether difference is allowed between two types.
@@ -369,7 +369,7 @@ TEST(CivilTime, ValueSemantics) {
   const turbo::CivilHour c(b);
   turbo::CivilHour d;
   d = c;
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(d));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(d));
 }
 
 TEST(CivilTime, Relational) {
@@ -422,70 +422,70 @@ TEST(CivilTime, Relational) {
 
 TEST(CivilTime, Arithmetic) {
   turbo::CivilSecond second(2015, 1, 2, 3, 4, 5);
-  EXPECT_EQ("2015-01-02T03:04:06", turbo::FormatCivilTime(second += 1));
-  EXPECT_EQ("2015-01-02T03:04:07", turbo::FormatCivilTime(second + 1));
-  EXPECT_EQ("2015-01-02T03:04:08", turbo::FormatCivilTime(2 + second));
-  EXPECT_EQ("2015-01-02T03:04:05", turbo::FormatCivilTime(second - 1));
-  EXPECT_EQ("2015-01-02T03:04:05", turbo::FormatCivilTime(second -= 1));
-  EXPECT_EQ("2015-01-02T03:04:05", turbo::FormatCivilTime(second++));
-  EXPECT_EQ("2015-01-02T03:04:07", turbo::FormatCivilTime(++second));
-  EXPECT_EQ("2015-01-02T03:04:07", turbo::FormatCivilTime(second--));
-  EXPECT_EQ("2015-01-02T03:04:05", turbo::FormatCivilTime(--second));
+  EXPECT_EQ("2015-01-02T03:04:06", turbo::format_civil_time(second += 1));
+  EXPECT_EQ("2015-01-02T03:04:07", turbo::format_civil_time(second + 1));
+  EXPECT_EQ("2015-01-02T03:04:08", turbo::format_civil_time(2 + second));
+  EXPECT_EQ("2015-01-02T03:04:05", turbo::format_civil_time(second - 1));
+  EXPECT_EQ("2015-01-02T03:04:05", turbo::format_civil_time(second -= 1));
+  EXPECT_EQ("2015-01-02T03:04:05", turbo::format_civil_time(second++));
+  EXPECT_EQ("2015-01-02T03:04:07", turbo::format_civil_time(++second));
+  EXPECT_EQ("2015-01-02T03:04:07", turbo::format_civil_time(second--));
+  EXPECT_EQ("2015-01-02T03:04:05", turbo::format_civil_time(--second));
 
   turbo::CivilMinute minute(2015, 1, 2, 3, 4);
-  EXPECT_EQ("2015-01-02T03:05", turbo::FormatCivilTime(minute += 1));
-  EXPECT_EQ("2015-01-02T03:06", turbo::FormatCivilTime(minute + 1));
-  EXPECT_EQ("2015-01-02T03:07", turbo::FormatCivilTime(2 + minute));
-  EXPECT_EQ("2015-01-02T03:04", turbo::FormatCivilTime(minute - 1));
-  EXPECT_EQ("2015-01-02T03:04", turbo::FormatCivilTime(minute -= 1));
-  EXPECT_EQ("2015-01-02T03:04", turbo::FormatCivilTime(minute++));
-  EXPECT_EQ("2015-01-02T03:06", turbo::FormatCivilTime(++minute));
-  EXPECT_EQ("2015-01-02T03:06", turbo::FormatCivilTime(minute--));
-  EXPECT_EQ("2015-01-02T03:04", turbo::FormatCivilTime(--minute));
+  EXPECT_EQ("2015-01-02T03:05", turbo::format_civil_time(minute += 1));
+  EXPECT_EQ("2015-01-02T03:06", turbo::format_civil_time(minute + 1));
+  EXPECT_EQ("2015-01-02T03:07", turbo::format_civil_time(2 + minute));
+  EXPECT_EQ("2015-01-02T03:04", turbo::format_civil_time(minute - 1));
+  EXPECT_EQ("2015-01-02T03:04", turbo::format_civil_time(minute -= 1));
+  EXPECT_EQ("2015-01-02T03:04", turbo::format_civil_time(minute++));
+  EXPECT_EQ("2015-01-02T03:06", turbo::format_civil_time(++minute));
+  EXPECT_EQ("2015-01-02T03:06", turbo::format_civil_time(minute--));
+  EXPECT_EQ("2015-01-02T03:04", turbo::format_civil_time(--minute));
 
   turbo::CivilHour hour(2015, 1, 2, 3);
-  EXPECT_EQ("2015-01-02T04", turbo::FormatCivilTime(hour += 1));
-  EXPECT_EQ("2015-01-02T05", turbo::FormatCivilTime(hour + 1));
-  EXPECT_EQ("2015-01-02T06", turbo::FormatCivilTime(2 + hour));
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(hour - 1));
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(hour -= 1));
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(hour++));
-  EXPECT_EQ("2015-01-02T05", turbo::FormatCivilTime(++hour));
-  EXPECT_EQ("2015-01-02T05", turbo::FormatCivilTime(hour--));
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(--hour));
+  EXPECT_EQ("2015-01-02T04", turbo::format_civil_time(hour += 1));
+  EXPECT_EQ("2015-01-02T05", turbo::format_civil_time(hour + 1));
+  EXPECT_EQ("2015-01-02T06", turbo::format_civil_time(2 + hour));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(hour - 1));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(hour -= 1));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(hour++));
+  EXPECT_EQ("2015-01-02T05", turbo::format_civil_time(++hour));
+  EXPECT_EQ("2015-01-02T05", turbo::format_civil_time(hour--));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(--hour));
 
   turbo::CivilDay day(2015, 1, 2);
-  EXPECT_EQ("2015-01-03", turbo::FormatCivilTime(day += 1));
-  EXPECT_EQ("2015-01-04", turbo::FormatCivilTime(day + 1));
-  EXPECT_EQ("2015-01-05", turbo::FormatCivilTime(2 + day));
-  EXPECT_EQ("2015-01-02", turbo::FormatCivilTime(day - 1));
-  EXPECT_EQ("2015-01-02", turbo::FormatCivilTime(day -= 1));
-  EXPECT_EQ("2015-01-02", turbo::FormatCivilTime(day++));
-  EXPECT_EQ("2015-01-04", turbo::FormatCivilTime(++day));
-  EXPECT_EQ("2015-01-04", turbo::FormatCivilTime(day--));
-  EXPECT_EQ("2015-01-02", turbo::FormatCivilTime(--day));
+  EXPECT_EQ("2015-01-03", turbo::format_civil_time(day += 1));
+  EXPECT_EQ("2015-01-04", turbo::format_civil_time(day + 1));
+  EXPECT_EQ("2015-01-05", turbo::format_civil_time(2 + day));
+  EXPECT_EQ("2015-01-02", turbo::format_civil_time(day - 1));
+  EXPECT_EQ("2015-01-02", turbo::format_civil_time(day -= 1));
+  EXPECT_EQ("2015-01-02", turbo::format_civil_time(day++));
+  EXPECT_EQ("2015-01-04", turbo::format_civil_time(++day));
+  EXPECT_EQ("2015-01-04", turbo::format_civil_time(day--));
+  EXPECT_EQ("2015-01-02", turbo::format_civil_time(--day));
 
   turbo::CivilMonth month(2015, 1);
-  EXPECT_EQ("2015-02", turbo::FormatCivilTime(month += 1));
-  EXPECT_EQ("2015-03", turbo::FormatCivilTime(month + 1));
-  EXPECT_EQ("2015-04", turbo::FormatCivilTime(2 + month));
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(month - 1));
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(month -= 1));
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(month++));
-  EXPECT_EQ("2015-03", turbo::FormatCivilTime(++month));
-  EXPECT_EQ("2015-03", turbo::FormatCivilTime(month--));
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(--month));
+  EXPECT_EQ("2015-02", turbo::format_civil_time(month += 1));
+  EXPECT_EQ("2015-03", turbo::format_civil_time(month + 1));
+  EXPECT_EQ("2015-04", turbo::format_civil_time(2 + month));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(month - 1));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(month -= 1));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(month++));
+  EXPECT_EQ("2015-03", turbo::format_civil_time(++month));
+  EXPECT_EQ("2015-03", turbo::format_civil_time(month--));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(--month));
 
   turbo::CivilYear year(2015);
-  EXPECT_EQ("2016", turbo::FormatCivilTime(year += 1));
-  EXPECT_EQ("2017", turbo::FormatCivilTime(year + 1));
-  EXPECT_EQ("2018", turbo::FormatCivilTime(2 + year));
-  EXPECT_EQ("2015", turbo::FormatCivilTime(year - 1));
-  EXPECT_EQ("2015", turbo::FormatCivilTime(year -= 1));
-  EXPECT_EQ("2015", turbo::FormatCivilTime(year++));
-  EXPECT_EQ("2017", turbo::FormatCivilTime(++year));
-  EXPECT_EQ("2017", turbo::FormatCivilTime(year--));
-  EXPECT_EQ("2015", turbo::FormatCivilTime(--year));
+  EXPECT_EQ("2016", turbo::format_civil_time(year += 1));
+  EXPECT_EQ("2017", turbo::format_civil_time(year + 1));
+  EXPECT_EQ("2018", turbo::format_civil_time(2 + year));
+  EXPECT_EQ("2015", turbo::format_civil_time(year - 1));
+  EXPECT_EQ("2015", turbo::format_civil_time(year -= 1));
+  EXPECT_EQ("2015", turbo::format_civil_time(year++));
+  EXPECT_EQ("2017", turbo::format_civil_time(++year));
+  EXPECT_EQ("2017", turbo::format_civil_time(year--));
+  EXPECT_EQ("2015", turbo::format_civil_time(--year));
 }
 
 TEST(CivilTime, ArithmeticLimits) {
@@ -494,63 +494,63 @@ TEST(CivilTime, ArithmeticLimits) {
 
   turbo::CivilSecond second(1970, 1, 1, 0, 0, 0);
   second += kIntMax;
-  EXPECT_EQ("2038-01-19T03:14:07", turbo::FormatCivilTime(second));
+  EXPECT_EQ("2038-01-19T03:14:07", turbo::format_civil_time(second));
   second -= kIntMax;
-  EXPECT_EQ("1970-01-01T00:00:00", turbo::FormatCivilTime(second));
+  EXPECT_EQ("1970-01-01T00:00:00", turbo::format_civil_time(second));
   second += kIntMin;
-  EXPECT_EQ("1901-12-13T20:45:52", turbo::FormatCivilTime(second));
+  EXPECT_EQ("1901-12-13T20:45:52", turbo::format_civil_time(second));
   second -= kIntMin;
-  EXPECT_EQ("1970-01-01T00:00:00", turbo::FormatCivilTime(second));
+  EXPECT_EQ("1970-01-01T00:00:00", turbo::format_civil_time(second));
 
   turbo::CivilMinute minute(1970, 1, 1, 0, 0);
   minute += kIntMax;
-  EXPECT_EQ("6053-01-23T02:07", turbo::FormatCivilTime(minute));
+  EXPECT_EQ("6053-01-23T02:07", turbo::format_civil_time(minute));
   minute -= kIntMax;
-  EXPECT_EQ("1970-01-01T00:00", turbo::FormatCivilTime(minute));
+  EXPECT_EQ("1970-01-01T00:00", turbo::format_civil_time(minute));
   minute += kIntMin;
-  EXPECT_EQ("-2114-12-08T21:52", turbo::FormatCivilTime(minute));
+  EXPECT_EQ("-2114-12-08T21:52", turbo::format_civil_time(minute));
   minute -= kIntMin;
-  EXPECT_EQ("1970-01-01T00:00", turbo::FormatCivilTime(minute));
+  EXPECT_EQ("1970-01-01T00:00", turbo::format_civil_time(minute));
 
   turbo::CivilHour hour(1970, 1, 1, 0);
   hour += kIntMax;
-  EXPECT_EQ("246953-10-09T07", turbo::FormatCivilTime(hour));
+  EXPECT_EQ("246953-10-09T07", turbo::format_civil_time(hour));
   hour -= kIntMax;
-  EXPECT_EQ("1970-01-01T00", turbo::FormatCivilTime(hour));
+  EXPECT_EQ("1970-01-01T00", turbo::format_civil_time(hour));
   hour += kIntMin;
-  EXPECT_EQ("-243014-03-24T16", turbo::FormatCivilTime(hour));
+  EXPECT_EQ("-243014-03-24T16", turbo::format_civil_time(hour));
   hour -= kIntMin;
-  EXPECT_EQ("1970-01-01T00", turbo::FormatCivilTime(hour));
+  EXPECT_EQ("1970-01-01T00", turbo::format_civil_time(hour));
 
   turbo::CivilDay day(1970, 1, 1);
   day += kIntMax;
-  EXPECT_EQ("5881580-07-11", turbo::FormatCivilTime(day));
+  EXPECT_EQ("5881580-07-11", turbo::format_civil_time(day));
   day -= kIntMax;
-  EXPECT_EQ("1970-01-01", turbo::FormatCivilTime(day));
+  EXPECT_EQ("1970-01-01", turbo::format_civil_time(day));
   day += kIntMin;
-  EXPECT_EQ("-5877641-06-23", turbo::FormatCivilTime(day));
+  EXPECT_EQ("-5877641-06-23", turbo::format_civil_time(day));
   day -= kIntMin;
-  EXPECT_EQ("1970-01-01", turbo::FormatCivilTime(day));
+  EXPECT_EQ("1970-01-01", turbo::format_civil_time(day));
 
   turbo::CivilMonth month(1970, 1);
   month += kIntMax;
-  EXPECT_EQ("178958940-08", turbo::FormatCivilTime(month));
+  EXPECT_EQ("178958940-08", turbo::format_civil_time(month));
   month -= kIntMax;
-  EXPECT_EQ("1970-01", turbo::FormatCivilTime(month));
+  EXPECT_EQ("1970-01", turbo::format_civil_time(month));
   month += kIntMin;
-  EXPECT_EQ("-178955001-05", turbo::FormatCivilTime(month));
+  EXPECT_EQ("-178955001-05", turbo::format_civil_time(month));
   month -= kIntMin;
-  EXPECT_EQ("1970-01", turbo::FormatCivilTime(month));
+  EXPECT_EQ("1970-01", turbo::format_civil_time(month));
 
   turbo::CivilYear year(0);
   year += kIntMax;
-  EXPECT_EQ("2147483647", turbo::FormatCivilTime(year));
+  EXPECT_EQ("2147483647", turbo::format_civil_time(year));
   year -= kIntMax;
-  EXPECT_EQ("0", turbo::FormatCivilTime(year));
+  EXPECT_EQ("0", turbo::format_civil_time(year));
   year += kIntMin;
-  EXPECT_EQ("-2147483648", turbo::FormatCivilTime(year));
+  EXPECT_EQ("-2147483648", turbo::format_civil_time(year));
   year -= kIntMin;
-  EXPECT_EQ("0", turbo::FormatCivilTime(year));
+  EXPECT_EQ("0", turbo::format_civil_time(year));
 }
 
 TEST(CivilTime, Difference) {
@@ -616,8 +616,8 @@ TEST(CivilTime, Properties) {
   EXPECT_EQ(4, ss.hour());
   EXPECT_EQ(5, ss.minute());
   EXPECT_EQ(6, ss.second());
-  EXPECT_EQ(turbo::Weekday::tuesday, turbo::GetWeekday(ss));
-  EXPECT_EQ(34, turbo::GetYearDay(ss));
+  EXPECT_EQ(turbo::Weekday::tuesday, turbo::get_weekday(ss));
+  EXPECT_EQ(34, turbo::get_year_day(ss));
 
   turbo::CivilMinute mm(2015, 2, 3, 4, 5, 6);
   EXPECT_EQ(2015, mm.year());
@@ -626,8 +626,8 @@ TEST(CivilTime, Properties) {
   EXPECT_EQ(4, mm.hour());
   EXPECT_EQ(5, mm.minute());
   EXPECT_EQ(0, mm.second());
-  EXPECT_EQ(turbo::Weekday::tuesday, turbo::GetWeekday(mm));
-  EXPECT_EQ(34, turbo::GetYearDay(mm));
+  EXPECT_EQ(turbo::Weekday::tuesday, turbo::get_weekday(mm));
+  EXPECT_EQ(34, turbo::get_year_day(mm));
 
   turbo::CivilHour hh(2015, 2, 3, 4, 5, 6);
   EXPECT_EQ(2015, hh.year());
@@ -636,8 +636,8 @@ TEST(CivilTime, Properties) {
   EXPECT_EQ(4, hh.hour());
   EXPECT_EQ(0, hh.minute());
   EXPECT_EQ(0, hh.second());
-  EXPECT_EQ(turbo::Weekday::tuesday, turbo::GetWeekday(hh));
-  EXPECT_EQ(34, turbo::GetYearDay(hh));
+  EXPECT_EQ(turbo::Weekday::tuesday, turbo::get_weekday(hh));
+  EXPECT_EQ(34, turbo::get_year_day(hh));
 
   turbo::CivilDay d(2015, 2, 3, 4, 5, 6);
   EXPECT_EQ(2015, d.year());
@@ -646,8 +646,8 @@ TEST(CivilTime, Properties) {
   EXPECT_EQ(0, d.hour());
   EXPECT_EQ(0, d.minute());
   EXPECT_EQ(0, d.second());
-  EXPECT_EQ(turbo::Weekday::tuesday, turbo::GetWeekday(d));
-  EXPECT_EQ(34, turbo::GetYearDay(d));
+  EXPECT_EQ(turbo::Weekday::tuesday, turbo::get_weekday(d));
+  EXPECT_EQ(34, turbo::get_year_day(d));
 
   turbo::CivilMonth m(2015, 2, 3, 4, 5, 6);
   EXPECT_EQ(2015, m.year());
@@ -656,8 +656,8 @@ TEST(CivilTime, Properties) {
   EXPECT_EQ(0, m.hour());
   EXPECT_EQ(0, m.minute());
   EXPECT_EQ(0, m.second());
-  EXPECT_EQ(turbo::Weekday::sunday, turbo::GetWeekday(m));
-  EXPECT_EQ(32, turbo::GetYearDay(m));
+  EXPECT_EQ(turbo::Weekday::sunday, turbo::get_weekday(m));
+  EXPECT_EQ(32, turbo::get_year_day(m));
 
   turbo::CivilYear y(2015, 2, 3, 4, 5, 6);
   EXPECT_EQ(2015, y.year());
@@ -666,28 +666,28 @@ TEST(CivilTime, Properties) {
   EXPECT_EQ(0, y.hour());
   EXPECT_EQ(0, y.minute());
   EXPECT_EQ(0, y.second());
-  EXPECT_EQ(turbo::Weekday::thursday, turbo::GetWeekday(y));
-  EXPECT_EQ(1, turbo::GetYearDay(y));
+  EXPECT_EQ(turbo::Weekday::thursday, turbo::get_weekday(y));
+  EXPECT_EQ(1, turbo::get_year_day(y));
 }
 
 TEST(CivilTime, Format) {
   turbo::CivilSecond ss;
-  EXPECT_EQ("1970-01-01T00:00:00", turbo::FormatCivilTime(ss));
+  EXPECT_EQ("1970-01-01T00:00:00", turbo::format_civil_time(ss));
 
   turbo::CivilMinute mm;
-  EXPECT_EQ("1970-01-01T00:00", turbo::FormatCivilTime(mm));
+  EXPECT_EQ("1970-01-01T00:00", turbo::format_civil_time(mm));
 
   turbo::CivilHour hh;
-  EXPECT_EQ("1970-01-01T00", turbo::FormatCivilTime(hh));
+  EXPECT_EQ("1970-01-01T00", turbo::format_civil_time(hh));
 
   turbo::CivilDay d;
-  EXPECT_EQ("1970-01-01", turbo::FormatCivilTime(d));
+  EXPECT_EQ("1970-01-01", turbo::format_civil_time(d));
 
   turbo::CivilMonth m;
-  EXPECT_EQ("1970-01", turbo::FormatCivilTime(m));
+  EXPECT_EQ("1970-01", turbo::format_civil_time(m));
 
   turbo::CivilYear y;
-  EXPECT_EQ("1970", turbo::FormatCivilTime(y));
+  EXPECT_EQ("1970", turbo::format_civil_time(y));
 }
 
 TEST(CivilTime, Parse) {
@@ -699,173 +699,173 @@ TEST(CivilTime, Parse) {
   turbo::CivilYear y;
 
   // CivilSecond OK; others fail
-  EXPECT_TRUE(turbo::ParseCivilTime("2015-01-02T03:04:05", &ss));
-  EXPECT_EQ("2015-01-02T03:04:05", turbo::FormatCivilTime(ss));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04:05", &mm));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04:05", &hh));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04:05", &d));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04:05", &m));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04:05", &y));
+  EXPECT_TRUE(turbo::parse_civil_time("2015-01-02T03:04:05", &ss));
+  EXPECT_EQ("2015-01-02T03:04:05", turbo::format_civil_time(ss));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04:05", &mm));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04:05", &hh));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04:05", &d));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04:05", &m));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04:05", &y));
 
   // CivilMinute OK; others fail
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04", &ss));
-  EXPECT_TRUE(turbo::ParseCivilTime("2015-01-02T03:04", &mm));
-  EXPECT_EQ("2015-01-02T03:04", turbo::FormatCivilTime(mm));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04", &hh));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04", &d));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04", &m));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03:04", &y));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04", &ss));
+  EXPECT_TRUE(turbo::parse_civil_time("2015-01-02T03:04", &mm));
+  EXPECT_EQ("2015-01-02T03:04", turbo::format_civil_time(mm));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04", &hh));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04", &d));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04", &m));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03:04", &y));
 
   // CivilHour OK; others fail
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03", &ss));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03", &mm));
-  EXPECT_TRUE(turbo::ParseCivilTime("2015-01-02T03", &hh));
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(hh));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03", &d));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03", &m));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02T03", &y));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03", &ss));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03", &mm));
+  EXPECT_TRUE(turbo::parse_civil_time("2015-01-02T03", &hh));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(hh));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03", &d));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03", &m));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02T03", &y));
 
   // CivilDay OK; others fail
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02", &ss));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02", &mm));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02", &hh));
-  EXPECT_TRUE(turbo::ParseCivilTime("2015-01-02", &d));
-  EXPECT_EQ("2015-01-02", turbo::FormatCivilTime(d));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02", &m));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01-02", &y));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02", &ss));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02", &mm));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02", &hh));
+  EXPECT_TRUE(turbo::parse_civil_time("2015-01-02", &d));
+  EXPECT_EQ("2015-01-02", turbo::format_civil_time(d));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02", &m));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01-02", &y));
 
   // CivilMonth OK; others fail
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01", &ss));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01", &mm));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01", &hh));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01", &d));
-  EXPECT_TRUE(turbo::ParseCivilTime("2015-01", &m));
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(m));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015-01", &y));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01", &ss));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01", &mm));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01", &hh));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01", &d));
+  EXPECT_TRUE(turbo::parse_civil_time("2015-01", &m));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(m));
+  EXPECT_FALSE(turbo::parse_civil_time("2015-01", &y));
 
   // CivilYear OK; others fail
-  EXPECT_FALSE(turbo::ParseCivilTime("2015", &ss));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015", &mm));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015", &hh));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015", &d));
-  EXPECT_FALSE(turbo::ParseCivilTime("2015", &m));
-  EXPECT_TRUE(turbo::ParseCivilTime("2015", &y));
-  EXPECT_EQ("2015", turbo::FormatCivilTime(y));
+  EXPECT_FALSE(turbo::parse_civil_time("2015", &ss));
+  EXPECT_FALSE(turbo::parse_civil_time("2015", &mm));
+  EXPECT_FALSE(turbo::parse_civil_time("2015", &hh));
+  EXPECT_FALSE(turbo::parse_civil_time("2015", &d));
+  EXPECT_FALSE(turbo::parse_civil_time("2015", &m));
+  EXPECT_TRUE(turbo::parse_civil_time("2015", &y));
+  EXPECT_EQ("2015", turbo::format_civil_time(y));
 }
 
 TEST(CivilTime, FormatAndParseLenient) {
   turbo::CivilSecond ss;
-  EXPECT_EQ("1970-01-01T00:00:00", turbo::FormatCivilTime(ss));
+  EXPECT_EQ("1970-01-01T00:00:00", turbo::format_civil_time(ss));
 
   turbo::CivilMinute mm;
-  EXPECT_EQ("1970-01-01T00:00", turbo::FormatCivilTime(mm));
+  EXPECT_EQ("1970-01-01T00:00", turbo::format_civil_time(mm));
 
   turbo::CivilHour hh;
-  EXPECT_EQ("1970-01-01T00", turbo::FormatCivilTime(hh));
+  EXPECT_EQ("1970-01-01T00", turbo::format_civil_time(hh));
 
   turbo::CivilDay d;
-  EXPECT_EQ("1970-01-01", turbo::FormatCivilTime(d));
+  EXPECT_EQ("1970-01-01", turbo::format_civil_time(d));
 
   turbo::CivilMonth m;
-  EXPECT_EQ("1970-01", turbo::FormatCivilTime(m));
+  EXPECT_EQ("1970-01", turbo::format_civil_time(m));
 
   turbo::CivilYear y;
-  EXPECT_EQ("1970", turbo::FormatCivilTime(y));
+  EXPECT_EQ("1970", turbo::format_civil_time(y));
 
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-01-02T03:04:05", &ss));
-  EXPECT_EQ("2015-01-02T03:04:05", turbo::FormatCivilTime(ss));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &ss));
+  EXPECT_EQ("2015-01-02T03:04:05", turbo::format_civil_time(ss));
 
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-01-02T03:04:05", &mm));
-  EXPECT_EQ("2015-01-02T03:04", turbo::FormatCivilTime(mm));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &mm));
+  EXPECT_EQ("2015-01-02T03:04", turbo::format_civil_time(mm));
 
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-01-02T03:04:05", &hh));
-  EXPECT_EQ("2015-01-02T03", turbo::FormatCivilTime(hh));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &hh));
+  EXPECT_EQ("2015-01-02T03", turbo::format_civil_time(hh));
 
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-01-02T03:04:05", &d));
-  EXPECT_EQ("2015-01-02", turbo::FormatCivilTime(d));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &d));
+  EXPECT_EQ("2015-01-02", turbo::format_civil_time(d));
 
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-01-02T03:04:05", &m));
-  EXPECT_EQ("2015-01", turbo::FormatCivilTime(m));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &m));
+  EXPECT_EQ("2015-01", turbo::format_civil_time(m));
 
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-01-02T03:04:05", &y));
-  EXPECT_EQ("2015", turbo::FormatCivilTime(y));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-01-02T03:04:05", &y));
+  EXPECT_EQ("2015", turbo::format_civil_time(y));
 }
 
 TEST(CivilTime, ParseEdgeCases) {
   turbo::CivilSecond ss;
   EXPECT_TRUE(
-      turbo::ParseLenientCivilTime("9223372036854775807-12-31T23:59:59", &ss));
-  EXPECT_EQ("9223372036854775807-12-31T23:59:59", turbo::FormatCivilTime(ss));
+      turbo::parse_lenient_Civil_time("9223372036854775807-12-31T23:59:59", &ss));
+  EXPECT_EQ("9223372036854775807-12-31T23:59:59", turbo::format_civil_time(ss));
   EXPECT_TRUE(
-      turbo::ParseLenientCivilTime("-9223372036854775808-01-01T00:00:00", &ss));
-  EXPECT_EQ("-9223372036854775808-01-01T00:00:00", turbo::FormatCivilTime(ss));
+      turbo::parse_lenient_Civil_time("-9223372036854775808-01-01T00:00:00", &ss));
+  EXPECT_EQ("-9223372036854775808-01-01T00:00:00", turbo::format_civil_time(ss));
 
   turbo::CivilMinute mm;
   EXPECT_TRUE(
-      turbo::ParseLenientCivilTime("9223372036854775807-12-31T23:59", &mm));
-  EXPECT_EQ("9223372036854775807-12-31T23:59", turbo::FormatCivilTime(mm));
+      turbo::parse_lenient_Civil_time("9223372036854775807-12-31T23:59", &mm));
+  EXPECT_EQ("9223372036854775807-12-31T23:59", turbo::format_civil_time(mm));
   EXPECT_TRUE(
-      turbo::ParseLenientCivilTime("-9223372036854775808-01-01T00:00", &mm));
-  EXPECT_EQ("-9223372036854775808-01-01T00:00", turbo::FormatCivilTime(mm));
+      turbo::parse_lenient_Civil_time("-9223372036854775808-01-01T00:00", &mm));
+  EXPECT_EQ("-9223372036854775808-01-01T00:00", turbo::format_civil_time(mm));
 
   turbo::CivilHour hh;
   EXPECT_TRUE(
-      turbo::ParseLenientCivilTime("9223372036854775807-12-31T23", &hh));
-  EXPECT_EQ("9223372036854775807-12-31T23", turbo::FormatCivilTime(hh));
+      turbo::parse_lenient_Civil_time("9223372036854775807-12-31T23", &hh));
+  EXPECT_EQ("9223372036854775807-12-31T23", turbo::format_civil_time(hh));
   EXPECT_TRUE(
-      turbo::ParseLenientCivilTime("-9223372036854775808-01-01T00", &hh));
-  EXPECT_EQ("-9223372036854775808-01-01T00", turbo::FormatCivilTime(hh));
+      turbo::parse_lenient_Civil_time("-9223372036854775808-01-01T00", &hh));
+  EXPECT_EQ("-9223372036854775808-01-01T00", turbo::format_civil_time(hh));
 
   turbo::CivilDay d;
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("9223372036854775807-12-31", &d));
-  EXPECT_EQ("9223372036854775807-12-31", turbo::FormatCivilTime(d));
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("-9223372036854775808-01-01", &d));
-  EXPECT_EQ("-9223372036854775808-01-01", turbo::FormatCivilTime(d));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("9223372036854775807-12-31", &d));
+  EXPECT_EQ("9223372036854775807-12-31", turbo::format_civil_time(d));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("-9223372036854775808-01-01", &d));
+  EXPECT_EQ("-9223372036854775808-01-01", turbo::format_civil_time(d));
 
   turbo::CivilMonth m;
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("9223372036854775807-12", &m));
-  EXPECT_EQ("9223372036854775807-12", turbo::FormatCivilTime(m));
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("-9223372036854775808-01", &m));
-  EXPECT_EQ("-9223372036854775808-01", turbo::FormatCivilTime(m));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("9223372036854775807-12", &m));
+  EXPECT_EQ("9223372036854775807-12", turbo::format_civil_time(m));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("-9223372036854775808-01", &m));
+  EXPECT_EQ("-9223372036854775808-01", turbo::format_civil_time(m));
 
   turbo::CivilYear y;
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("9223372036854775807", &y));
-  EXPECT_EQ("9223372036854775807", turbo::FormatCivilTime(y));
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("-9223372036854775808", &y));
-  EXPECT_EQ("-9223372036854775808", turbo::FormatCivilTime(y));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("9223372036854775807", &y));
+  EXPECT_EQ("9223372036854775807", turbo::format_civil_time(y));
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("-9223372036854775808", &y));
+  EXPECT_EQ("-9223372036854775808", turbo::format_civil_time(y));
 
   // Tests some valid, but interesting, cases
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("0", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("0", &ss)) << ss;
   EXPECT_EQ(turbo::CivilYear(0), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("0-1", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("0-1", &ss)) << ss;
   EXPECT_EQ(turbo::CivilMonth(0, 1), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime(" 2015 ", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time(" 2015 ", &ss)) << ss;
   EXPECT_EQ(turbo::CivilYear(2015), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime(" 2015-6 ", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time(" 2015-6 ", &ss)) << ss;
   EXPECT_EQ(turbo::CivilMonth(2015, 6), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-6-7", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-6-7", &ss)) << ss;
   EXPECT_EQ(turbo::CivilDay(2015, 6, 7), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime(" 2015-6-7 ", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time(" 2015-6-7 ", &ss)) << ss;
   EXPECT_EQ(turbo::CivilDay(2015, 6, 7), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("2015-06-07T10:11:12 ", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("2015-06-07T10:11:12 ", &ss)) << ss;
   EXPECT_EQ(turbo::CivilSecond(2015, 6, 7, 10, 11, 12), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime(" 2015-06-07T10:11:12 ", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time(" 2015-06-07T10:11:12 ", &ss)) << ss;
   EXPECT_EQ(turbo::CivilSecond(2015, 6, 7, 10, 11, 12), ss);
-  EXPECT_TRUE(turbo::ParseLenientCivilTime("-01-01", &ss)) << ss;
+  EXPECT_TRUE(turbo::parse_lenient_Civil_time("-01-01", &ss)) << ss;
   EXPECT_EQ(turbo::CivilMonth(-1, 1), ss);
 
   // Tests some invalid cases
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("01-01-2015", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("2015-", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("0xff-01", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("2015-02-30T04:05:06", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("2015-02-03T04:05:96", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("X2015-02-03T04:05:06", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("2015-02-03T04:05:003", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("2015 -02-03T04:05:06", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("2015-02-03-04:05:06", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("2015:02:03T04-05-06", &ss)) << ss;
-  EXPECT_FALSE(turbo::ParseLenientCivilTime("9223372036854775808", &y)) << y;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("01-01-2015", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("2015-", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("0xff-01", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("2015-02-30T04:05:06", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("2015-02-03T04:05:96", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("X2015-02-03T04:05:06", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("2015-02-03T04:05:003", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("2015 -02-03T04:05:06", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("2015-02-03-04:05:06", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("2015:02:03T04-05-06", &ss)) << ss;
+  EXPECT_FALSE(turbo::parse_lenient_Civil_time("9223372036854775808", &y)) << y;
 }
 
 TEST(CivilTime, OutputStream) {
@@ -930,11 +930,11 @@ TEST(CivilTime, OutputStream) {
 
 TEST(CivilTime, Weekday) {
   turbo::CivilDay d(1970, 1, 1);
-  EXPECT_EQ(turbo::Weekday::thursday, turbo::GetWeekday(d)) << d;
+  EXPECT_EQ(turbo::Weekday::thursday, turbo::get_weekday(d)) << d;
 
   // We used to get this wrong for years < -30.
   d = turbo::CivilDay(-31, 12, 24);
-  EXPECT_EQ(turbo::Weekday::wednesday, turbo::GetWeekday(d)) << d;
+  EXPECT_EQ(turbo::Weekday::wednesday, turbo::get_weekday(d)) << d;
 }
 
 TEST(CivilTime, NextPrevWeekday) {
@@ -942,39 +942,39 @@ TEST(CivilTime, NextPrevWeekday) {
   const turbo::CivilDay thursday(1970, 1, 1);
 
   // Thursday -> Thursday
-  turbo::CivilDay d = turbo::NextWeekday(thursday, turbo::Weekday::thursday);
+  turbo::CivilDay d = turbo::next_weekday(thursday, turbo::Weekday::thursday);
   EXPECT_EQ(7, d - thursday) << d;
-  EXPECT_EQ(d - 14, turbo::PrevWeekday(thursday, turbo::Weekday::thursday));
+  EXPECT_EQ(d - 14, turbo::prev_weekday(thursday, turbo::Weekday::thursday));
 
   // Thursday -> Friday
-  d = turbo::NextWeekday(thursday, turbo::Weekday::friday);
+  d = turbo::next_weekday(thursday, turbo::Weekday::friday);
   EXPECT_EQ(1, d - thursday) << d;
-  EXPECT_EQ(d - 7, turbo::PrevWeekday(thursday, turbo::Weekday::friday));
+  EXPECT_EQ(d - 7, turbo::prev_weekday(thursday, turbo::Weekday::friday));
 
   // Thursday -> Saturday
-  d = turbo::NextWeekday(thursday, turbo::Weekday::saturday);
+  d = turbo::next_weekday(thursday, turbo::Weekday::saturday);
   EXPECT_EQ(2, d - thursday) << d;
-  EXPECT_EQ(d - 7, turbo::PrevWeekday(thursday, turbo::Weekday::saturday));
+  EXPECT_EQ(d - 7, turbo::prev_weekday(thursday, turbo::Weekday::saturday));
 
   // Thursday -> Sunday
-  d = turbo::NextWeekday(thursday, turbo::Weekday::sunday);
+  d = turbo::next_weekday(thursday, turbo::Weekday::sunday);
   EXPECT_EQ(3, d - thursday) << d;
-  EXPECT_EQ(d - 7, turbo::PrevWeekday(thursday, turbo::Weekday::sunday));
+  EXPECT_EQ(d - 7, turbo::prev_weekday(thursday, turbo::Weekday::sunday));
 
   // Thursday -> Monday
-  d = turbo::NextWeekday(thursday, turbo::Weekday::monday);
+  d = turbo::next_weekday(thursday, turbo::Weekday::monday);
   EXPECT_EQ(4, d - thursday) << d;
-  EXPECT_EQ(d - 7, turbo::PrevWeekday(thursday, turbo::Weekday::monday));
+  EXPECT_EQ(d - 7, turbo::prev_weekday(thursday, turbo::Weekday::monday));
 
   // Thursday -> Tuesday
-  d = turbo::NextWeekday(thursday, turbo::Weekday::tuesday);
+  d = turbo::next_weekday(thursday, turbo::Weekday::tuesday);
   EXPECT_EQ(5, d - thursday) << d;
-  EXPECT_EQ(d - 7, turbo::PrevWeekday(thursday, turbo::Weekday::tuesday));
+  EXPECT_EQ(d - 7, turbo::prev_weekday(thursday, turbo::Weekday::tuesday));
 
   // Thursday -> Wednesday
-  d = turbo::NextWeekday(thursday, turbo::Weekday::wednesday);
+  d = turbo::next_weekday(thursday, turbo::Weekday::wednesday);
   EXPECT_EQ(6, d - thursday) << d;
-  EXPECT_EQ(d - 7, turbo::PrevWeekday(thursday, turbo::Weekday::wednesday));
+  EXPECT_EQ(d - 7, turbo::prev_weekday(thursday, turbo::Weekday::wednesday));
 }
 
 // NOTE: Run this with --copt=-ftrapv to detect overflow problems.
@@ -1027,39 +1027,39 @@ TEST(CivilTime, DifferenceNoIntermediateOverflow) {
 TEST(CivilTime, NormalizeSimpleOverflow) {
   turbo::CivilSecond cs;
   cs = turbo::CivilSecond(2013, 11, 15, 16, 32, 59 + 1);
-  EXPECT_EQ("2013-11-15T16:33:00", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-11-15T16:33:00", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 16, 59 + 1, 14);
-  EXPECT_EQ("2013-11-15T17:00:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-11-15T17:00:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 23 + 1, 32, 14);
-  EXPECT_EQ("2013-11-16T00:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-11-16T00:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 30 + 1, 16, 32, 14);
-  EXPECT_EQ("2013-12-01T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-12-01T16:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 12 + 1, 15, 16, 32, 14);
-  EXPECT_EQ("2014-01-15T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2014-01-15T16:32:14", turbo::format_civil_time(cs));
 }
 
 TEST(CivilTime, NormalizeSimpleUnderflow) {
   turbo::CivilSecond cs;
   cs = turbo::CivilSecond(2013, 11, 15, 16, 32, 0 - 1);
-  EXPECT_EQ("2013-11-15T16:31:59", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-11-15T16:31:59", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 16, 0 - 1, 14);
-  EXPECT_EQ("2013-11-15T15:59:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-11-15T15:59:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 0 - 1, 32, 14);
-  EXPECT_EQ("2013-11-14T23:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-11-14T23:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 1 - 1, 16, 32, 14);
-  EXPECT_EQ("2013-10-31T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-10-31T16:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 1 - 1, 15, 16, 32, 14);
-  EXPECT_EQ("2012-12-15T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2012-12-15T16:32:14", turbo::format_civil_time(cs));
 }
 
 TEST(CivilTime, NormalizeMultipleOverflow) {
   turbo::CivilSecond cs(2013, 12, 31, 23, 59, 59 + 1);
-  EXPECT_EQ("2014-01-01T00:00:00", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2014-01-01T00:00:00", turbo::format_civil_time(cs));
 }
 
 TEST(CivilTime, NormalizeMultipleUnderflow) {
   turbo::CivilSecond cs(2014, 1, 1, 0, 0, 0 - 1);
-  EXPECT_EQ("2013-12-31T23:59:59", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-12-31T23:59:59", turbo::format_civil_time(cs));
 }
 
 TEST(CivilTime, NormalizeOverflowLimits) {
@@ -1067,56 +1067,56 @@ TEST(CivilTime, NormalizeOverflowLimits) {
 
   const int kintmax = std::numeric_limits<int>::max();
   cs = turbo::CivilSecond(0, kintmax, kintmax, kintmax, kintmax, kintmax);
-  EXPECT_EQ("185085715-11-27T12:21:07", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("185085715-11-27T12:21:07", turbo::format_civil_time(cs));
 
   const int kintmin = std::numeric_limits<int>::min();
   cs = turbo::CivilSecond(0, kintmin, kintmin, kintmin, kintmin, kintmin);
-  EXPECT_EQ("-185085717-10-31T10:37:52", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("-185085717-10-31T10:37:52", turbo::format_civil_time(cs));
 }
 
 TEST(CivilTime, NormalizeComplexOverflow) {
   turbo::CivilSecond cs;
   cs = turbo::CivilSecond(2013, 11, 15, 16, 32, 14 + 123456789);
-  EXPECT_EQ("2017-10-14T14:05:23", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2017-10-14T14:05:23", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 16, 32 + 1234567, 14);
-  EXPECT_EQ("2016-03-22T00:39:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2016-03-22T00:39:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 16 + 123456, 32, 14);
-  EXPECT_EQ("2027-12-16T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2027-12-16T16:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15 + 1234, 16, 32, 14);
-  EXPECT_EQ("2017-04-02T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2017-04-02T16:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11 + 123, 15, 16, 32, 14);
-  EXPECT_EQ("2024-02-15T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2024-02-15T16:32:14", turbo::format_civil_time(cs));
 }
 
 TEST(CivilTime, NormalizeComplexUnderflow) {
   turbo::CivilSecond cs;
   cs = turbo::CivilSecond(1999, 3, 0, 0, 0, 0);  // year 400
-  EXPECT_EQ("1999-02-28T00:00:00", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("1999-02-28T00:00:00", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 16, 32, 14 - 123456789);
-  EXPECT_EQ("2009-12-17T18:59:05", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2009-12-17T18:59:05", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 16, 32 - 1234567, 14);
-  EXPECT_EQ("2011-07-12T08:25:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2011-07-12T08:25:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15, 16 - 123456, 32, 14);
-  EXPECT_EQ("1999-10-16T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("1999-10-16T16:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11, 15 - 1234, 16, 32, 14);
-  EXPECT_EQ("2010-06-30T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2010-06-30T16:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11 - 123, 15, 16, 32, 14);
-  EXPECT_EQ("2003-08-15T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2003-08-15T16:32:14", turbo::format_civil_time(cs));
 }
 
 TEST(CivilTime, NormalizeMishmash) {
   turbo::CivilSecond cs;
   cs = turbo::CivilSecond(2013, 11 - 123, 15 + 1234, 16 - 123456, 32 + 1234567,
                          14 - 123456789);
-  EXPECT_EQ("1991-05-09T03:06:05", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("1991-05-09T03:06:05", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11 + 123, 15 - 1234, 16 + 123456, 32 - 1234567,
                          14 + 123456789);
-  EXPECT_EQ("2036-05-24T05:58:23", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2036-05-24T05:58:23", turbo::format_civil_time(cs));
 
   cs = turbo::CivilSecond(2013, 11, -146097 + 1, 16, 32, 14);
-  EXPECT_EQ("1613-11-01T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("1613-11-01T16:32:14", turbo::format_civil_time(cs));
   cs = turbo::CivilSecond(2013, 11 + 400 * 12, -146097 + 1, 16, 32, 14);
-  EXPECT_EQ("2013-11-01T16:32:14", turbo::FormatCivilTime(cs));
+  EXPECT_EQ("2013-11-01T16:32:14", turbo::format_civil_time(cs));
 }
 
 // Convert all the days from 1970-1-1 to 1970-1-146097 (aka 2369-12-31)
@@ -1133,25 +1133,25 @@ TEST(CivilTime, NormalizeAllTheDays) {
 
 TEST(CivilTime, NormalizeWithHugeYear) {
   turbo::CivilMonth c(9223372036854775807, 1);
-  EXPECT_EQ("9223372036854775807-01", turbo::FormatCivilTime(c));
+  EXPECT_EQ("9223372036854775807-01", turbo::format_civil_time(c));
   c = c - 1;  // Causes normalization
-  EXPECT_EQ("9223372036854775806-12", turbo::FormatCivilTime(c));
+  EXPECT_EQ("9223372036854775806-12", turbo::format_civil_time(c));
 
   c = turbo::CivilMonth(-9223372036854775807 - 1, 1);
-  EXPECT_EQ("-9223372036854775808-01", turbo::FormatCivilTime(c));
+  EXPECT_EQ("-9223372036854775808-01", turbo::format_civil_time(c));
   c = c + 12;  // Causes normalization
-  EXPECT_EQ("-9223372036854775807-01", turbo::FormatCivilTime(c));
+  EXPECT_EQ("-9223372036854775807-01", turbo::format_civil_time(c));
 }
 
 TEST(CivilTime, LeapYears) {
   const turbo::CivilSecond s1(2013, 2, 28 + 1, 0, 0, 0);
-  EXPECT_EQ("2013-03-01T00:00:00", turbo::FormatCivilTime(s1));
+  EXPECT_EQ("2013-03-01T00:00:00", turbo::format_civil_time(s1));
 
   const turbo::CivilSecond s2(2012, 2, 28 + 1, 0, 0, 0);
-  EXPECT_EQ("2012-02-29T00:00:00", turbo::FormatCivilTime(s2));
+  EXPECT_EQ("2012-02-29T00:00:00", turbo::format_civil_time(s2));
 
   const turbo::CivilSecond s3(1900, 2, 28 + 1, 0, 0, 0);
-  EXPECT_EQ("1900-03-01T00:00:00", turbo::FormatCivilTime(s3));
+  EXPECT_EQ("1900-03-01T00:00:00", turbo::format_civil_time(s3));
 
   const struct {
     int year;
@@ -1198,13 +1198,13 @@ TEST(CivilTime, LeapYears) {
 TEST(CivilTime, FirstThursdayInMonth) {
   const turbo::CivilDay nov1(2014, 11, 1);
   const turbo::CivilDay thursday =
-      turbo::NextWeekday(nov1 - 1, turbo::Weekday::thursday);
-  EXPECT_EQ("2014-11-06", turbo::FormatCivilTime(thursday));
+      turbo::next_weekday(nov1 - 1, turbo::Weekday::thursday);
+  EXPECT_EQ("2014-11-06", turbo::format_civil_time(thursday));
 
   // Bonus: Date of Thanksgiving in the United States
   // Rule: Fourth Thursday of November
   const turbo::CivilDay thanksgiving = thursday +  7 * 3;
-  EXPECT_EQ("2014-11-27", turbo::FormatCivilTime(thanksgiving));
+  EXPECT_EQ("2014-11-27", turbo::format_civil_time(thanksgiving));
 }
 
 TEST(CivilTime, DocumentationExample) {

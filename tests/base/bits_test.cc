@@ -453,7 +453,7 @@ namespace {
             CHECK_EQ(bit_ceil(uint64_t{0x40000000000}), uint64_t{0x40000000000});
         }
 
-        SUBCASE("Floor") {
+        SUBCASE("floor") {
 #if TURBO_INTERNAL_HAS_CONSTEXPR_CLZ
             static_assert(bit_floor(0u) == 0, "");
             static_assert(bit_floor(1u) == 1, "");

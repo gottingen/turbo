@@ -19,18 +19,18 @@
 namespace turbo {
 
     StopWatcher::StopWatcher(const std::string &title, time_print_t time_print)
-    : _start(turbo::Now()), _title(title),
+    : _start(turbo::time_now()), _title(title),
     _time_print(std::move(time_print)),
-    _duration(turbo::Nanoseconds(0)) {
+    _duration(turbo::nanoseconds(0)) {
     }
 
     void StopWatcher::reset() {
-        _start = turbo::Now();
+        _start = turbo::time_now();
         _duration = turbo::Duration();
     }
 
     const StopWatcher &StopWatcher::stop() {
-        auto n = turbo::Now();
+        auto n = turbo::time_now();
         if (_duration <= kZero) {
             _duration = n - _start;
         }
@@ -41,6 +41,6 @@ namespace turbo {
         if (_duration > kZero) {
             return  _duration;
         }
-        return turbo::Now() - _start;
+        return turbo::time_now() - _start;
     }
 }  // namespace turbo

@@ -91,7 +91,12 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/hash/fwd.h \
                     ../turbo/hash/m3/m3.h \
                     ../turbo/hash/city/city.h \
-                    ../turbo/hash/bytes/bytes.h
+                    ../turbo/hash/bytes/bytes.h \
+                    ../turbo/times/version.h \
+                    ../turbo/times/times.h \
+                    ../turbo/times/clock.h \
+                    ../turbo/times/civil_time.h \
+                    ../turbo/times/stop_watch.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

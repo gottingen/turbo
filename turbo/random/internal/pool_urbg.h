@@ -21,111 +21,117 @@
 #include "turbo/random/internal/traits.h"
 #include "turbo/meta/span.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
-// RandenPool is a thread-safe random number generator [random.req.urbg] that
-// uses an underlying pool of Randen generators to generate values.  Each thread
-// has affinity to one instance of the underlying pool generators.  Concurrent
-// access is guarded by a spin-lock.
-template <typename T>
-class RandenPool {
- public:
-  using result_type = T;
-  static_assert(std::is_unsigned<result_type>::value,
-                "RandenPool template argument must be a built-in unsigned "
-                "integer type");
 
-  static constexpr result_type(min)() {
-    return (std::numeric_limits<result_type>::min)();
-  }
+    // RandenPool is a thread-safe random number generator [random.req.urbg] that
+    // uses an underlying pool of Randen generators to generate values.  Each thread
+    // has affinity to one instance of the underlying pool generators.  Concurrent
+    // access is guarded by a spin-lock.
+    template<typename T>
+    class RandenPool {
+    public:
+        using result_type = T;
+        static_assert(std::is_unsigned<result_type>::value,
+                      "RandenPool template argument must be a built-in unsigned "
+                      "integer type");
 
-  static constexpr result_type(max)() {
-    return (std::numeric_limits<result_type>::max)();
-  }
+        static constexpr result_type (min)() {
+            return (std::numeric_limits<result_type>::min)();
+        }
 
-  RandenPool() {}
+        static constexpr result_type (max)() {
+            return (std::numeric_limits<result_type>::max)();
+        }
 
-  // Returns a single value.
-  inline result_type operator()() { return Generate(); }
+        RandenPool() {}
 
-  // Fill data with random values.
-  static void Fill(turbo::Span<result_type> data);
+        // Returns a single value.
+        inline result_type operator()() { return Generate(); }
 
- protected:
-  // Generate returns a single value.
-  static result_type Generate();
-};
+        // Fill data with random values.
+        static void Fill(turbo::Span<result_type> data);
 
-extern template class RandenPool<uint8_t>;
-extern template class RandenPool<uint16_t>;
-extern template class RandenPool<uint32_t>;
-extern template class RandenPool<uint64_t>;
+    protected:
+        // Generate returns a single value.
+        static result_type Generate();
+    };
 
-// PoolURBG uses an underlying pool of random generators to implement a
-// thread-compatible [random.req.urbg] interface with an internal cache of
-// values.
-template <typename T, size_t kBufferSize>
-class PoolURBG {
-  // Inheritance to access the protected static members of RandenPool.
-  using unsigned_type = typename make_unsigned_bits<T>::type;
-  using PoolType = RandenPool<unsigned_type>;
-  using SpanType = turbo::Span<unsigned_type>;
+    extern template
+    class RandenPool<uint8_t>;
 
-  static constexpr size_t kInitialBuffer = kBufferSize + 1;
-  static constexpr size_t kHalfBuffer = kBufferSize / 2;
+    extern template
+    class RandenPool<uint16_t>;
 
- public:
-  using result_type = T;
+    extern template
+    class RandenPool<uint32_t>;
 
-  static_assert(std::is_unsigned<result_type>::value,
-                "PoolURBG must be parameterized by an unsigned integer type");
+    extern template
+    class RandenPool<uint64_t>;
 
-  static_assert(kBufferSize > 1,
-                "PoolURBG must be parameterized by a buffer-size > 1");
+    // PoolURBG uses an underlying pool of random generators to implement a
+    // thread-compatible [random.req.urbg] interface with an internal cache of
+    // values.
+    template<typename T, size_t kBufferSize>
+    class PoolURBG {
+        // Inheritance to access the protected static members of RandenPool.
+        using unsigned_type = typename make_unsigned_bits<T>::type;
+        using PoolType = RandenPool<unsigned_type>;
+        using SpanType = turbo::Span<unsigned_type>;
 
-  static_assert(kBufferSize <= 256,
-                "PoolURBG must be parameterized by a buffer-size <= 256");
+        static constexpr size_t kInitialBuffer = kBufferSize + 1;
+        static constexpr size_t kHalfBuffer = kBufferSize / 2;
 
-  static constexpr result_type(min)() {
-    return (std::numeric_limits<result_type>::min)();
-  }
+    public:
+        using result_type = T;
 
-  static constexpr result_type(max)() {
-    return (std::numeric_limits<result_type>::max)();
-  }
+        static_assert(std::is_unsigned<result_type>::value,
+                      "PoolURBG must be parameterized by an unsigned integer type");
 
-  PoolURBG() : next_(kInitialBuffer) {}
+        static_assert(kBufferSize > 1,
+                      "PoolURBG must be parameterized by a buffer-size > 1");
 
-  // copy-constructor does not copy cache.
-  PoolURBG(const PoolURBG&) : next_(kInitialBuffer) {}
-  const PoolURBG& operator=(const PoolURBG&) {
-    next_ = kInitialBuffer;
-    return *this;
-  }
+        static_assert(kBufferSize <= 256,
+                      "PoolURBG must be parameterized by a buffer-size <= 256");
 
-  // move-constructor does move cache.
-  PoolURBG(PoolURBG&&) = default;
-  PoolURBG& operator=(PoolURBG&&) = default;
+        static constexpr result_type (min)() {
+            return (std::numeric_limits<result_type>::min)();
+        }
 
-  inline result_type operator()() {
-    if (next_ >= kBufferSize) {
-      next_ = (kBufferSize > 2 && next_ > kBufferSize) ? kHalfBuffer : 0;
-      PoolType::Fill(SpanType(reinterpret_cast<unsigned_type*>(state_ + next_),
-                              kBufferSize - next_));
-    }
-    return state_[next_++];
-  }
+        static constexpr result_type (max)() {
+            return (std::numeric_limits<result_type>::max)();
+        }
 
- private:
-  // Buffer size.
-  size_t next_;  // index within state_
-  result_type state_[kBufferSize];
-};
+        PoolURBG() : next_(kInitialBuffer) {}
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        // copy-constructor does not copy cache.
+        PoolURBG(const PoolURBG &) : next_(kInitialBuffer) {}
+
+        const PoolURBG &operator=(const PoolURBG &) {
+            next_ = kInitialBuffer;
+            return *this;
+        }
+
+        // move-constructor does move cache.
+        PoolURBG(PoolURBG &&) = default;
+
+        PoolURBG &operator=(PoolURBG &&) = default;
+
+        inline result_type operator()() {
+            if (next_ >= kBufferSize) {
+                next_ = (kBufferSize > 2 && next_ > kBufferSize) ? kHalfBuffer : 0;
+                PoolType::Fill(SpanType(reinterpret_cast<unsigned_type *>(state_ + next_),
+                                        kBufferSize - next_));
+            }
+            return state_[next_++];
+        }
+
+    private:
+        // Buffer size.
+        size_t next_;  // index within state_
+        result_type state_[kBufferSize];
+    };
+
+}  // namespace turbo::random_internal
 
 #endif  // TURBO_RANDOM_INTERNAL_POOL_URBG_H_

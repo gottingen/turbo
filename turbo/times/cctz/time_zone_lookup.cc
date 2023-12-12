@@ -110,7 +110,7 @@ namespace turbo::time_internal::cctz {
     }
 
     bool load_time_zone(const std::string &name, time_zone *tz) {
-        return time_zone::Impl::LoadTimeZone(name, tz);
+        return time_zone::Impl::load_time_zone(name, tz);
     }
 
     time_zone utc_time_zone() {

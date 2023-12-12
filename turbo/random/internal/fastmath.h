@@ -24,34 +24,31 @@
 
 #include "turbo/base/bits.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
-// Compute log2(n) using integer operations.
-// While std::log2 is more accurate than std::log(n) / std::log(2), for
-// very large numbers--those close to std::numeric_limits<uint64_t>::max() - 2,
-// for instance--std::log2 rounds up rather than down, which introduces
-// definite skew in the results.
-inline int IntLog2Floor(uint64_t n) {
-  return (n <= 1) ? 0 : (63 - countl_zero(n));
-}
-inline int IntLog2Ceil(uint64_t n) {
-  return (n <= 1) ? 0 : (64 - countl_zero(n - 1));
-}
+    // Compute log2(n) using integer operations.
+    // While std::log2 is more accurate than std::log(n) / std::log(2), for
+    // very large numbers--those close to std::numeric_limits<uint64_t>::max() - 2,
+    // for instance--std::log2 rounds up rather than down, which introduces
+    // definite skew in the results.
+    inline int IntLog2Floor(uint64_t n) {
+        return (n <= 1) ? 0 : (63 - countl_zero(n));
+    }
 
-inline double StirlingLogFactorial(double n) {
-  assert(n >= 1);
-  // Using Stirling's approximation.
-  constexpr double kLog2PI = 1.83787706640934548356;
-  const double logn = std::log(n);
-  const double ninv = 1.0 / static_cast<double>(n);
-  return n * logn - n + 0.5 * (kLog2PI + logn) + (1.0 / 12.0) * ninv -
-         (1.0 / 360.0) * ninv * ninv * ninv;
-}
+    inline int IntLog2Ceil(uint64_t n) {
+        return (n <= 1) ? 0 : (64 - countl_zero(n - 1));
+    }
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    inline double StirlingLogFactorial(double n) {
+        assert(n >= 1);
+        // Using Stirling's approximation.
+        constexpr double kLog2PI = 1.83787706640934548356;
+        const double logn = std::log(n);
+        const double ninv = 1.0 / static_cast<double>(n);
+        return n * logn - n + 0.5 * (kLog2PI + logn) + (1.0 / 12.0) * ninv -
+               (1.0 / 360.0) * ninv * ninv * ninv;
+    }
+
+}  // namespace turbo::random_internal
 
 #endif  // TURBO_RANDOM_INTERNAL_FASTMATH_H_

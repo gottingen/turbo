@@ -88,7 +88,7 @@ template <>
 struct Generator<turbo::Time> {
   int maxval;
   explicit Generator(int m) : maxval(m) {}
-  turbo::Time operator()(int i) const { return turbo::FromUnixMillis(i); }
+  turbo::Time operator()(int i) const { return turbo::from_unix_millis(i); }
 };
 
 template <>

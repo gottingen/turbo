@@ -45,7 +45,7 @@ namespace turbo::time_internal::cctz {
 
     time_zone time_zone::Impl::UTC() { return time_zone(UTCImpl()); }
 
-    bool time_zone::Impl::LoadTimeZone(const std::string &name, time_zone *tz) {
+    bool time_zone::Impl::load_time_zone(const std::string &name, time_zone *tz) {
         const Impl *const utc_impl = UTCImpl();
 
         // Check for UTC (which is never a key in time_zone_map).
