@@ -39,7 +39,7 @@ It can be used as a hash functor object, like this:
 
 .. code-block:: cpp
 
-    #include <turbo/hash.hpp>
+    #include <turbo/hash/hash.h>
     #include <iostream>
     #include <string>
 
@@ -59,7 +59,7 @@ For example, if you have a class ``Foo`` that you want to hash, you can write:
 
 .. code-block:: cpp
 
-    #include <turbo/hash.hpp>
+    #include <turbo/hash/hash.h>
     #include <iostream>
     #include <string>
 
@@ -92,7 +92,7 @@ The ``turbo::Hash`` module can easily switch hash algorithms, such as city hash 
 
 .. code-block:: cpp
 
-    #include <turbo/hash.hpp>
+    #include <turbo/hash/hash.h>
     #include <iostream>
     #include <string>
 
@@ -121,7 +121,7 @@ algorithm.
 .. code-block:: cpp
 
     #define TURBO_HASH_DEFAULT_ENGINE turbo::xx_hash_engine
-    #include <turbo/hash.hpp>
+    #include <turbo/hash/hash.h>
     #include <iostream>
     #include <string>
 
@@ -145,7 +145,7 @@ If you want to make your defined type hashable by turbo::Hash, you need to defin
 
 .. code-block:: cpp
 
-    #include <turbo/hash.hpp>
+    #include <turbo/hash/hash.h>
     #include <iostream>
     #include <string>
 
@@ -179,7 +179,7 @@ your type, and use ``turbo::Hash`` to hash your type. The following example show
 
 .. code-block:: cpp
 
-    #include <turbo/hash.hpp>
+    #include <turbo/hash/hash.h>
     #include <iostream>
     #include <string>
 
@@ -223,7 +223,7 @@ at this case, turbo::Hash will use select ``hash_value`` to hash your type if yo
 
 .. code-block:: cpp
 
-    #include <turbo/hash.hpp>
+    #include <turbo/hash/hash.h>
     #include <iostream>
     #include <string>
 
