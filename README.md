@@ -1,5 +1,9 @@
 turbo * c++ common library
 ====
+[Documentation](https://turbo-docs.readthedocs.io/) |
+[Acknowledge](https://turbo-docs.readthedocs.io/) |
+[Contributors](CONTRIBUTORS.md) |
+[Release Notes](NEWS.md)
 
 <div align="center">
 <img src=docs/source/image/ticon.png width=240 height=200 />
