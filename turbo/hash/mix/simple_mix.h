@@ -81,6 +81,11 @@ namespace turbo {
         }
     };
 
+    /**
+     * @ingroup turbo_hash_mixer
+     * @brief Simple mix for integer hash integer,
+     *        and generate 8 bytes or 4 bytes hash value.
+     */
     struct simple_mix {
         using mix4  = simple_mix_impl<4>;
         using mix8  =simple_mix_impl<8>;

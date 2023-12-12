@@ -67,6 +67,10 @@ namespace turbo {
         }
     };
 
+    /**
+     * @ingroup turbo_hash_mixer
+     * @brief murmur_mix is a mix engine for integer hash.
+     */
     struct murmur_mix {
         using mix4  = murmur_mix_impl<4>;
         using mix8  = murmur_mix_impl<8>;

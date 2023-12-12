@@ -17,6 +17,9 @@ Contents
 --------
 
 .. toctree::
+    :caption: ABOUT
+
+.. toctree::
     :caption: GET START
 
     en/overview

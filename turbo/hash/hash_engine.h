@@ -27,6 +27,29 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_hash_engine
+     * @brief default_hash_engine is a default hash_engine for turbo::hash_engine.
+     *        by default, it is bytes_hash. if you want to use other hash_engine,
+     *        as the default hash_engine, you can define TURBO_DEFAUL_HASH_ENGINE to
+     *        your hash_engine.
+     *        for example:
+     *        @code
+     *        #define TURBO_DEFAUL_HASH_ENGINE city_hash
+     *        #include <turbo/hash/hash.h>
+     *        // now, the default hash_engine is city_hash.
+     *        @endcode
+     *        or
+     *        @code
+     *        #include <turbo/hash/hash.h>
+     *        // now, the default hash_engine is bytes_hash.
+     *        // specify the hash_engine when you use it.
+     *        using my_hash_engine = turbo::hash_engine<bytes_hash_tag>;
+     *        my_hash_engine hash_engine;
+     *        size_t hash = hash_engine(key);
+     *        @endcode
+     *
+     */
 #ifdef TURBO_DEFAUT_HASH_ENGINE
 using default_hash_engine = TURBO_DEFAUT_HASH_ENGINE;
 #else

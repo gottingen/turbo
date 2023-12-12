@@ -9,3 +9,6 @@ hash module
 .. toctree::
 
     hash/engine
+    hash/mixer
+    hash/state
+    hash/function

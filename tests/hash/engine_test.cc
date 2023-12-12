@@ -39,10 +39,10 @@ namespace std {
 namespace turbo {
 
     TEST_CASE("mix, try") {
-        auto r = hash_mixer<4>()(2);
+        auto r = Mixer<4>()(2);
         turbo::Println("r: {}", static_cast<uint32_t>(r));
         REQUIRE_NE(r,  0);
-        r = hash_mixer<8>()(2);
+        r = Mixer<8>()(2);
         turbo::Println("r: {}", r);
         REQUIRE_NE(r,  0);
 
@@ -53,10 +53,10 @@ namespace turbo {
     }
 
     TEST_CASE("mix, murmur") {
-        auto r = hash_mixer<4, size_t, murmur_mix>()(2);
+        auto r = Mixer<4, size_t, murmur_mix>()(2);
         turbo::Println("murmur r: {}", static_cast<uint32_t>(r));
         REQUIRE_NE(r,  0);
-        r = hash_mixer<8, size_t, murmur_mix>()(2);
+        r = Mixer<8, size_t, murmur_mix>()(2);
         turbo::Println("murmur r: {}", r);
         REQUIRE_NE(r,  0);
 

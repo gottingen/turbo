@@ -1,11 +1,11 @@
 .. Copyright 2020 The Turbo Authors.
 
-.. _turbo_hash_engine_module:
+.. _turbo_hash_mixer_module:
 
 
-hash engine
+mixer engines
 =========================
 
-.. doxygengroup:: turbo_hash_engine
+.. doxygengroup:: turbo_hash_mixer
    :project: turbo-docs
    :members:

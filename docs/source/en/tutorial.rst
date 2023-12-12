@@ -7,13 +7,13 @@ You may obtain a copy of the License at
 .. _turbo_tutorial:
 
 
-base
+base guidance
 =================================
 
-strings
+strings guidance
 =================================
 
-simd
+simd guidance
 ==================================
 
 This tutorial shows how to use the ``simd`` module to accelerate
@@ -25,5 +25,11 @@ This tutorial shows how to use the ``simd`` module to accelerate
     simd/vectorized_code
 
 
-hash
+hash guidance
 ====================================
+
+..  toctree::
+    :maxdepth: 3
+
+    hash/hash
+
