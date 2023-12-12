@@ -19,28 +19,28 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+    TURBO_NAMESPACE_BEGIN
 
-static constexpr const char kExceptionMessage[] =
-    "Failed generating seed-material for URBG.";
+    static constexpr const char kExceptionMessage[] =
+            "Failed generating seed-material for URBG.";
 
-SeedGenException::~SeedGenException() = default;
+    SeedGenException::~SeedGenException() = default;
 
-const char* SeedGenException::what() const noexcept {
-  return kExceptionMessage;
-}
+    const char *SeedGenException::what() const noexcept {
+        return kExceptionMessage;
+    }
 
-namespace random_internal {
+    namespace random_internal {
 
-void ThrowSeedGenException() {
+        void ThrowSeedGenException() {
 #ifdef TURBO_HAVE_EXCEPTIONS
-  throw turbo::SeedGenException();
+            throw turbo::SeedGenException();
 #else
-  std::cerr << kExceptionMessage << std::endl;
-  std::terminate();
+            std::cerr << kExceptionMessage << std::endl;
+            std::terminate();
 #endif
-}
+        }
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
+    }  // namespace random_internal
+    TURBO_NAMESPACE_END
 }  // namespace turbo

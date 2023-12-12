@@ -287,7 +287,7 @@ static void WriteFailureInfo(int signo, void* ucontext, int cpu,
                   &writerfn_struct);
 }
 
-// turbo::SleepFor() can't be used here since TurboInternalSleepFor()
+// turbo::sleep_for() can't be used here since TurboInternalSleepFor()
 // may be overridden to do something that isn't async-signal-safe on
 // some platforms.
 static void PortableSleepForSeconds(int seconds) {

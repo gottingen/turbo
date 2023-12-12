@@ -110,36 +110,36 @@ namespace {
             constexpr int kTrials = 100;
 
             for (int i = 0; i < kTrials; ++i) {
-                uint8_t value = turbo::Uniform(rng, std::numeric_limits<uint8_t>::min(),
+                uint8_t value = turbo::uniform(rng, std::numeric_limits<uint8_t>::min(),
                                                std::numeric_limits<uint8_t>::max());
-                int shift = turbo::Uniform(rng, -2 * std::numeric_limits<uint8_t>::digits,
+                int shift = turbo::uniform(rng, -2 * std::numeric_limits<uint8_t>::digits,
                                            2 * std::numeric_limits<uint8_t>::digits);
 
                 CHECK_EQ(rotl(value, shift), rotr(value, -shift));
             }
 
             for (int i = 0; i < kTrials; ++i) {
-                uint16_t value = turbo::Uniform(rng, std::numeric_limits<uint16_t>::min(),
+                uint16_t value = turbo::uniform(rng, std::numeric_limits<uint16_t>::min(),
                                                 std::numeric_limits<uint16_t>::max());
-                int shift = turbo::Uniform(rng, -2 * std::numeric_limits<uint16_t>::digits,
+                int shift = turbo::uniform(rng, -2 * std::numeric_limits<uint16_t>::digits,
                                            2 * std::numeric_limits<uint16_t>::digits);
 
                 CHECK_EQ(rotl(value, shift), rotr(value, -shift));
             }
 
             for (int i = 0; i < kTrials; ++i) {
-                uint32_t value = turbo::Uniform(rng, std::numeric_limits<uint32_t>::min(),
+                uint32_t value = turbo::uniform(rng, std::numeric_limits<uint32_t>::min(),
                                                 std::numeric_limits<uint32_t>::max());
-                int shift = turbo::Uniform(rng, -2 * std::numeric_limits<uint32_t>::digits,
+                int shift = turbo::uniform(rng, -2 * std::numeric_limits<uint32_t>::digits,
                                            2 * std::numeric_limits<uint32_t>::digits);
 
                 CHECK_EQ(rotl(value, shift), rotr(value, -shift));
             }
 
             for (int i = 0; i < kTrials; ++i) {
-                uint64_t value = turbo::Uniform(rng, std::numeric_limits<uint64_t>::min(),
+                uint64_t value = turbo::uniform(rng, std::numeric_limits<uint64_t>::min(),
                                                 std::numeric_limits<uint64_t>::max());
-                int shift = turbo::Uniform(rng, -2 * std::numeric_limits<uint64_t>::digits,
+                int shift = turbo::uniform(rng, -2 * std::numeric_limits<uint64_t>::digits,
                                            2 * std::numeric_limits<uint64_t>::digits);
 
                 CHECK_EQ(rotl(value, shift), rotr(value, -shift));
@@ -157,7 +157,7 @@ namespace {
     PopcountInput<T> GeneratePopcountInput(turbo::BitGen &gen) {
         PopcountInput <T> ret;
         for (int i = 0; i < std::numeric_limits<T>::digits; i++) {
-            bool coin = turbo::Bernoulli(gen, 0.2);
+            bool coin = turbo::bernoulli(gen, 0.2);
             if (coin) {
                 ret.value |= T{1} << i;
                 ret.expected++;
@@ -453,7 +453,7 @@ namespace {
             CHECK_EQ(bit_ceil(uint64_t{0x40000000000}), uint64_t{0x40000000000});
         }
 
-        SUBCASE("Floor") {
+        SUBCASE("floor") {
 #if TURBO_INTERNAL_HAS_CONSTEXPR_CLZ
             static_assert(bit_floor(0u) == 0, "");
             static_assert(bit_floor(1u) == 1, "");

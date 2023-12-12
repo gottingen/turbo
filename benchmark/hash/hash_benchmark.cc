@@ -50,7 +50,7 @@ class TypeErasedInterface {
   virtual ~TypeErasedInterface() = default;
 
   template <typename H>
-  friend H TurboHashValue(H state, const TypeErasedInterface& wrapper) {
+  friend H hash_value(H state, const TypeErasedInterface& wrapper) {
     state = H::combine(std::move(state), std::type_index(typeid(wrapper)));
     wrapper.HashValue(turbo::HashState::Create(&state));
     return state;
@@ -130,7 +130,7 @@ struct FastUnorderedSet {
   std::vector<T> values;
 
   template <typename H>
-  friend H TurboHashValue(H h, const FastUnorderedSet& fus) {
+  friend H hash_value(H h, const FastUnorderedSet& fus) {
     return H::combine(H::combine_unordered(std::move(h), fus.values.begin(),
                                            fus.values.end()),
                       fus.values.size());
@@ -270,7 +270,7 @@ TURBO_MAYBE_UNUSED static const bool kInitialized = [] {
   turbo::BitGen gen;
   static_assert(sizeof(entropy) % sizeof(uint64_t) == 0, "");
   for (int i = 0; i != sizeof(entropy); i += sizeof(uint64_t)) {
-    auto rand = turbo::Uniform<uint64_t>(gen);
+    auto rand = turbo::uniform<uint64_t>(gen);
     memcpy(&entropy[i], &rand, sizeof(uint64_t));
   }
   return true;

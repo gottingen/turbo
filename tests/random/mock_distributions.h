@@ -28,7 +28,7 @@
 // https://github.com/google/googletest
 //
 // EXPECT_CALL and ON_CALL need to be made within the same DLL component as
-// the call to turbo::Uniform and related methods, otherwise mocking will fail
+// the call to turbo::uniform and related methods, otherwise mocking will fail
 // since the  underlying implementation creates a type-specific pointer which
 // will be distinct across different DLL boundaries.
 //
@@ -38,10 +38,10 @@
 //   EXPECT_CALL(turbo::MockUniform<int>(), Call(mock, 1, 1000))
 //     .WillRepeatedly(testing::ReturnRoundRobin({20, 40}));
 //
-//   EXPECT_EQ(turbo::Uniform<int>(gen, 1, 1000), 20);
-//   EXPECT_EQ(turbo::Uniform<int>(gen, 1, 1000), 40);
-//   EXPECT_EQ(turbo::Uniform<int>(gen, 1, 1000), 20);
-//   EXPECT_EQ(turbo::Uniform<int>(gen, 1, 1000), 40);
+//   EXPECT_EQ(turbo::uniform<int>(gen, 1, 1000), 20);
+//   EXPECT_EQ(turbo::uniform<int>(gen, 1, 1000), 40);
+//   EXPECT_EQ(turbo::uniform<int>(gen, 1, 1000), 20);
+//   EXPECT_EQ(turbo::uniform<int>(gen, 1, 1000), 40);
 
 #ifndef TURBO_RANDOM_MOCK_DISTRIBUTIONS_H_
 #define TURBO_RANDOM_MOCK_DISTRIBUTIONS_H_
@@ -53,7 +53,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "turbo/meta/type_traits.h"
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 #include "tests/random/mock_overload_set.h"
 #include "tests/random/mocking_bit_gen.h"
 
@@ -64,7 +64,7 @@ TURBO_NAMESPACE_BEGIN
 // turbo::MockUniform
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::Uniform.
+// Matches calls to turbo::uniform.
 //
 // `turbo::MockUniform` is a class template used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
@@ -76,7 +76,7 @@ TURBO_NAMESPACE_BEGIN
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockUniform<uint32_t>(), Call(mock))
 //     .WillOnce(Return(123456));
-//  auto x = turbo::Uniform<uint32_t>(mock);
+//  auto x = turbo::uniform<uint32_t>(mock);
 //  assert(x == 123456)
 //
 template <typename R>
@@ -92,7 +92,7 @@ using MockUniform = random_internal::MockOverloadSet<
 // turbo::MockBernoulli
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::Bernoulli.
+// Matches calls to turbo::bernoulli.
 //
 // `turbo::MockBernoulli` is a class used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
@@ -104,7 +104,7 @@ using MockUniform = random_internal::MockOverloadSet<
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockBernoulli(), Call(mock, testing::_))
 //     .WillOnce(Return(false));
-//  assert(turbo::Bernoulli(mock, 0.5) == false);
+//  assert(turbo::bernoulli(mock, 0.5) == false);
 //
 using MockBernoulli =
     random_internal::MockOverloadSet<turbo::bernoulli_distribution,
@@ -114,7 +114,7 @@ using MockBernoulli =
 // turbo::MockBeta
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::Beta.
+// Matches calls to turbo::beta.
 //
 // `turbo::MockBeta` is a class used in conjunction with Googletest's `ON_CALL()`
 // and `EXPECT_CALL()` macros. To use it, default-construct an instance of it
@@ -126,7 +126,7 @@ using MockBernoulli =
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockBeta(), Call(mock, 3.0, 2.0))
 //     .WillOnce(Return(0.567));
-//  auto x = turbo::Beta<double>(mock, 3.0, 2.0);
+//  auto x = turbo::beta<double>(mock, 3.0, 2.0);
 //  assert(x == 0.567);
 //
 template <typename RealType>
@@ -139,7 +139,7 @@ using MockBeta =
 // turbo::MockExponential
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::Exponential.
+// Matches calls to turbo::exponential.
 //
 // `turbo::MockExponential` is a class template used in conjunction with
 // Googletest's `ON_CALL()` and `EXPECT_CALL()` macros. To use it,
@@ -152,7 +152,7 @@ using MockBeta =
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockExponential<double>(), Call(mock, 0.5))
 //     .WillOnce(Return(12.3456789));
-//  auto x = turbo::Exponential<double>(mock, 0.5);
+//  auto x = turbo::exponential<double>(mock, 0.5);
 //  assert(x == 12.3456789)
 //
 template <typename RealType>
@@ -164,7 +164,7 @@ using MockExponential =
 // turbo::MockGaussian
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::Gaussian.
+// Matches calls to turbo::gaussian.
 //
 // `turbo::MockGaussian` is a class template used in conjunction with
 // Googletest's `ON_CALL()` and `EXPECT_CALL()` macros. To use it,
@@ -177,7 +177,7 @@ using MockExponential =
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockGaussian<double>(), Call(mock, 16.3, 3.3))
 //     .WillOnce(Return(12.3456789));
-//  auto x = turbo::Gaussian<double>(mock, 16.3, 3.3);
+//  auto x = turbo::gaussian<double>(mock, 16.3, 3.3);
 //  assert(x == 12.3456789)
 //
 template <typename RealType>
@@ -190,7 +190,7 @@ using MockGaussian =
 // turbo::MockLogUniform
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::LogUniform.
+// Matches calls to turbo::log_uniform.
 //
 // `turbo::MockLogUniform` is a class template used in conjunction with
 // Googletest's `ON_CALL()` and `EXPECT_CALL()` macros. To use it,
@@ -203,7 +203,7 @@ using MockGaussian =
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockLogUniform<int>(), Call(mock, 10, 10000, 10))
 //     .WillOnce(Return(1221));
-//  auto x = turbo::LogUniform<int>(mock, 10, 10000, 10);
+//  auto x = turbo::log_uniform<int>(mock, 10, 10000, 10);
 //  assert(x == 1221)
 //
 template <typename IntType>
@@ -215,7 +215,7 @@ using MockLogUniform = random_internal::MockOverloadSet<
 // turbo::MockPoisson
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::Poisson.
+// Matches calls to turbo::poisson.
 //
 // `turbo::MockPoisson` is a class template used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
@@ -227,7 +227,7 @@ using MockLogUniform = random_internal::MockOverloadSet<
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockPoisson<int>(), Call(mock, 2.0))
 //     .WillOnce(Return(1221));
-//  auto x = turbo::Poisson<int>(mock, 2.0);
+//  auto x = turbo::poisson<int>(mock, 2.0);
 //  assert(x == 1221)
 //
 template <typename IntType>
@@ -239,7 +239,7 @@ using MockPoisson =
 // turbo::MockZipf
 // -----------------------------------------------------------------------------
 //
-// Matches calls to turbo::Zipf.
+// Matches calls to turbo::zipf.
 //
 // `turbo::MockZipf` is a class template used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
@@ -251,7 +251,7 @@ using MockPoisson =
 //  turbo::MockingBitGen mock;
 //  EXPECT_CALL(turbo::MockZipf<int>(), Call(mock, 1000000, 2.0, 1.0))
 //     .WillOnce(Return(1221));
-//  auto x = turbo::Zipf<int>(mock, 1000000, 2.0, 1.0);
+//  auto x = turbo::zipf<int>(mock, 1000000, 2.0, 1.0);
 //  assert(x == 1221)
 //
 template <typename IntType>

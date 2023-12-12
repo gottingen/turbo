@@ -20,24 +20,24 @@
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" AND NOT CMAKE_OSX_ARCHITECTURES)
 
 add_library(test_doc_any_arch OBJECT
-            explicit_use_of_an_instruction_set_mean_aligned.cpp
-            explicit_use_of_an_instruction_set_mean_arch_independent.cpp
-            explicit_use_of_an_instruction_set_mean.cpp
-            explicit_use_of_an_instruction_set_mean_tag_dispatch.cpp
-            manipulating_abstract_batches.cpp
-            manipulating_parametric_batches.cpp
-            writing_vectorized_code.cpp)
+            explicit_use_of_an_instruction_set_mean_aligned,cc
+            explicit_use_of_an_instruction_set_mean_arch_independent,cc
+            explicit_use_of_an_instruction_set_mean,cc
+            explicit_use_of_an_instruction_set_mean_tag_dispatch,cc
+            manipulating_abstract_batches,cc
+            manipulating_parametric_batches,cc
+            writing_vectorized_code,cc)
 target_include_directories(test_doc_any_arch PRIVATE ${TURBO_SIMD_INCLUDE_DIR})
 target_compile_options(test_doc_any_arch PRIVATE -mavx)
 
 add_library(test_doc_avx2 OBJECT
-            explicit_use_of_an_instruction_set.cpp
-            sum_avx2.cpp)
+            explicit_use_of_an_instruction_set,cc
+            sum_avx2,cc)
 target_compile_options(test_doc_avx2 PRIVATE -mavx2)
 target_include_directories(test_doc_avx2 PRIVATE ${TURBO_SIMD_INCLUDE_DIR})
 
 add_library(test_doc_sse2 OBJECT
-            sum_sse2.cpp)
+            sum_sse2,cc)
 target_compile_options(test_doc_sse2 PRIVATE -msse2)
 target_include_directories(test_doc_sse2 PRIVATE ${TURBO_SIMD_INCLUDE_DIR})
 

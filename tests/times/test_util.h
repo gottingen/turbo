@@ -24,7 +24,7 @@ TURBO_NAMESPACE_BEGIN
 namespace time_internal {
 
 // Loads the named timezone, but dies on any failure.
-turbo::TimeZone LoadTimeZone(const std::string& name);
+turbo::TimeZone load_time_zone(const std::string& name);
 
 }  // namespace time_internal
 TURBO_NAMESPACE_END

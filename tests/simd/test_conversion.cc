@@ -39,7 +39,7 @@ struct conversion_test
     using float_vector = std::vector<float, turbo::simd::default_allocator<float>>;
     using double_vector = std::vector<double, turbo::simd::default_allocator<double>>;
 
-    using uint8_vector = std::vector<uint8_t, turbo::simd::aligned_allocator<uint8_t, A>>;
+    using uint8_vector = std::vector<uint8_t, turbo::aligned_allocator<uint8_t, A>>;
 
     /*int32_batch i32pos;
     int32_batch i32neg;

@@ -1,11 +1,14 @@
 PROJECT_NAME      = "turbo-docs"
 XML_OUTPUT        = xml
-INPUT             = ./turbo/platform/part.h \
-                    ./turbo/platform/attribute_functions.h \
+INPUT             = ../turbo/platform/version.h \
+                    ../turbo/platform/port.h \
+                    ../turbo/platform/config/attribute_function.h \
+                    ../turbo/base/version.h \
                     ../turbo/base/assume.h \
                     ../turbo/base/sysinfo.h \
                     ../turbo/base/endian.h  \
                     ../turbo/base/status.h  \
+                    ../turbo/files/version.h \
                     ../turbo/files/filesystem.h \
                     ../turbo/files/file_event_listener.h \
                     ../turbo/files/file_option.h \
@@ -15,6 +18,7 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/files/sequential_read_file.h \
                     ../turbo/files/sequential_write_file.h \
                     ../turbo/files/utility.h               \
+                    ../turbo/strings/version.h \
                     ../turbo/strings/utility.h \
                     ../turbo/strings/ascii.h \
                     ../turbo/strings/escaping.h \
@@ -25,7 +29,74 @@ INPUT             = ./turbo/platform/part.h \
                     ../turbo/strings/charconv.h   \
                     ../turbo/strings/str_case_conv.h \
                     ../turbo/strings/str_split.h    \
-                    ../turbo/strings/str_replace.h
+                    ../turbo/strings/str_replace.h  \
+                    ../turbo/memory/version.h \
+                    ../turbo/memory/object_pool.h \
+                    ../turbo/memory/alignment.h \
+                    ../turbo/memory/aligned_allocator.h \
+                    ../turbo/memory/resource_pool.h \
+                    ../turbo/unicode/version.h \
+                    ../turbo/unicode/converter.h \
+                    ../turbo/random/version.h  \
+                    ../turbo/random/random.h  \
+                    ../turbo/random/bernoulli.h \
+                    ../turbo/random/bernoulli_distribution.h \
+                    ../turbo/random/beta.h \
+                    ../turbo/random/beta_distribution.h \
+                    ../turbo/random/bytes.h \
+                    ../turbo/random/uniform.h \
+                    ../turbo/random/uniform_distribution.h \
+                    ../turbo/random/engine.h \
+                    ../turbo/random/fwrd.h \
+                    ../turbo/random/zipf.h \
+                    ../turbo/random/zipf_distribution.h \
+                    ../turbo/random/gaussian.h \
+                    ../turbo/random/gaussian_distribution.h \
+                    ./turbo/random/log_uniform.h \
+                    ./turbo/random/log_uniform_distribution.h \
+                    ../turbo/random/exponential.h \
+                    ../turbo/random/exponential_distribution.h \
+                    ../turbo/random/poisson.h \
+                    ../turbo/random/poisson_distribution.h \
+                    ../turbo/random/unicode.h \
+                    ../turbo/simd/version.h \
+                    ../turbo/simd/types/api.h \
+                    ../turbo/simd/types/batch.h \
+                    ../turbo/simd/types/batch_constant.h \
+                    ../turbo/simd/config/simd_arch.h \
+                    ../turbo/simd/config/simd_config.h \
+                    ../turbo/simd/types/generic_arch.h \
+                    ../turbo/simd/types/simd_traits.h \
+                    ../turbo/simd/types/avx2_register.h \
+                    ../turbo/simd/types/avx512bw_register.h \
+                    ../turbo/simd/types/avx512cd_register.h \
+                    ../turbo/simd/types/avx512dq_register.h \
+                    ../turbo/simd/types/avx512f_register.h \
+                    ../turbo/simd/types/avx_register.h \
+                    ../turbo/simd/types/fma3_avx_register.h \
+                    ../turbo/simd/types/fma3_avx2_register.h \
+                    ../turbo/simd/types/fma3_sse_register.h \
+                    ../turbo/simd/types/fma4_register.h \
+                    ../turbo/simd/types/neon64_register.h \
+                    ../turbo/simd/types/neon_register.h \
+                    ../turbo/simd/types/sse2_register.h \
+                    ../turbo/simd/types/sse3_register.h \
+                    ../turbo/simd/types/sse4_1_register.h \
+                    ../turbo/simd/types/sse4_2_register.h \
+                    ../turbo/simd/types/ssse3_register.h  \
+                    ../turbo/simd/types/sve_register.h  \
+                    ../turbo/hash/version.h \
+                    ../turbo/hash/hash.h \
+                    ../turbo/hash/xx/xx.h \
+                    ../turbo/hash/fwd.h \
+                    ../turbo/hash/m3/m3.h \
+                    ../turbo/hash/city/city.h \
+                    ../turbo/hash/bytes/bytes.h \
+                    ../turbo/times/version.h \
+                    ../turbo/times/time.h \
+                    ../turbo/times/clock.h \
+                    ../turbo/times/civil_time.h \
+                    ../turbo/times/stop_watcher.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

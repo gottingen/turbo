@@ -28,110 +28,119 @@
 #include "turbo/times/cctz/zone_info_source.h"
 #include "tzfile.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
 
-// A transition to a new UTC offset.
-struct Transition {
-  std::int_least64_t unix_time;   // the instant of this transition
-  std::uint_least8_t type_index;  // index of the transition type
-  civil_second civil_sec;         // local civil time of transition
-  civil_second prev_civil_sec;    // local civil time one second earlier
+    // A transition to a new UTC offset.
+    struct Transition {
+        std::int_least64_t unix_time;   // the instant of this transition
+        std::uint_least8_t type_index;  // index of the transition type
+        civil_second civil_sec;         // local civil time of transition
+        civil_second prev_civil_sec;    // local civil time one second earlier
 
-  struct ByUnixTime {
-    inline bool operator()(const Transition& lhs, const Transition& rhs) const {
-      return lhs.unix_time < rhs.unix_time;
-    }
-  };
-  struct ByCivilTime {
-    inline bool operator()(const Transition& lhs, const Transition& rhs) const {
-      return lhs.civil_sec < rhs.civil_sec;
-    }
-  };
-};
+        struct ByUnixTime {
+            inline bool operator()(const Transition &lhs, const Transition &rhs) const {
+                return lhs.unix_time < rhs.unix_time;
+            }
+        };
 
-// The characteristics of a particular transition.
-struct TransitionType {
-  std::int_least32_t utc_offset;  // the new prevailing UTC offset
-  civil_second civil_max;         // max convertible civil time for offset
-  civil_second civil_min;         // min convertible civil time for offset
-  bool is_dst;                    // did we move into daylight-saving time
-  std::uint_least8_t abbr_index;  // index of the new abbreviation
-};
+        struct ByCivilTime {
+            inline bool operator()(const Transition &lhs, const Transition &rhs) const {
+                return lhs.civil_sec < rhs.civil_sec;
+            }
+        };
+    };
 
-// A time zone backed by the IANA Time Zone Database (zoneinfo).
-class TimeZoneInfo : public TimeZoneIf {
- public:
-  TimeZoneInfo() = default;
-  TimeZoneInfo(const TimeZoneInfo&) = delete;
-  TimeZoneInfo& operator=(const TimeZoneInfo&) = delete;
+    // The characteristics of a particular transition.
+    struct TransitionType {
+        std::int_least32_t utc_offset;  // the new prevailing UTC offset
+        civil_second civil_max;         // max convertible civil time for offset
+        civil_second civil_min;         // min convertible civil time for offset
+        bool is_dst;                    // did we move into daylight-saving time
+        std::uint_least8_t abbr_index;  // index of the new abbreviation
+    };
 
-  // Loads the zoneinfo for the given name, returning true if successful.
-  bool Load(const std::string& name);
+    // A time zone backed by the IANA Time Zone Database (zoneinfo).
+    class TimeZoneInfo : public TimeZoneIf {
+    public:
+        TimeZoneInfo() = default;
 
-  // TimeZoneIf implementations.
-  time_zone::absolute_lookup BreakTime(
-      const time_point<seconds>& tp) const override;
-  time_zone::civil_lookup MakeTime(const civil_second& cs) const override;
-  bool NextTransition(const time_point<seconds>& tp,
-                      time_zone::civil_transition* trans) const override;
-  bool PrevTransition(const time_point<seconds>& tp,
-                      time_zone::civil_transition* trans) const override;
-  std::string Version() const override;
-  std::string Description() const override;
+        TimeZoneInfo(const TimeZoneInfo &) = delete;
 
- private:
-  struct Header {            // counts of:
-    std::size_t timecnt;     // transition times
-    std::size_t typecnt;     // transition types
-    std::size_t charcnt;     // zone abbreviation characters
-    std::size_t leapcnt;     // leap seconds (we expect none)
-    std::size_t ttisstdcnt;  // UTC/local indicators (unused)
-    std::size_t ttisutcnt;   // standard/wall indicators (unused)
+        TimeZoneInfo &operator=(const TimeZoneInfo &) = delete;
 
-    bool Build(const tzhead& tzh);
-    std::size_t DataLength(std::size_t time_len) const;
-  };
+        // Loads the zoneinfo for the given name, returning true if successful.
+        bool Load(const std::string &name);
 
-  bool GetTransitionType(std::int_fast32_t utc_offset, bool is_dst,
-                         const std::string& abbr, std::uint_least8_t* index);
-  bool EquivTransitions(std::uint_fast8_t tt1_index,
-                        std::uint_fast8_t tt2_index) const;
-  bool ExtendTransitions();
+        // TimeZoneIf implementations.
+        time_zone::absolute_lookup BreakTime(
+                const time_point<seconds> &tp) const override;
 
-  bool ResetToBuiltinUTC(const seconds& offset);
-  bool Load(ZoneInfoSource* zip);
+        time_zone::civil_lookup MakeTime(const civil_second &cs) const override;
 
-  // Helpers for BreakTime() and MakeTime().
-  time_zone::absolute_lookup LocalTime(std::int_fast64_t unix_time,
-                                       const TransitionType& tt) const;
-  time_zone::absolute_lookup LocalTime(std::int_fast64_t unix_time,
-                                       const Transition& tr) const;
-  time_zone::civil_lookup TimeLocal(const civil_second& cs,
-                                    year_t c4_shift) const;
+        bool NextTransition(const time_point<seconds> &tp,
+                            time_zone::civil_transition *trans) const override;
 
-  std::vector<Transition> transitions_;  // ordered by unix_time and civil_sec
-  std::vector<TransitionType> transition_types_;  // distinct transition types
-  std::uint_fast8_t default_transition_type_;     // for before first transition
-  std::string abbreviations_;  // all the NUL-terminated abbreviations
+        bool PrevTransition(const time_point<seconds> &tp,
+                            time_zone::civil_transition *trans) const override;
 
-  std::string version_;      // the tzdata version if available
-  std::string future_spec_;  // for after the last zic transition
-  bool extended_;            // future_spec_ was used to generate transitions
-  year_t last_year_;         // the final year of the generated transitions
+        std::string Version() const override;
 
-  // We remember the transitions found during the last BreakTime() and
-  // MakeTime() calls. If the next request is for the same transition we
-  // will avoid re-searching.
-  mutable std::atomic<std::size_t> local_time_hint_ = {};  // BreakTime() hint
-  mutable std::atomic<std::size_t> time_local_hint_ = {};  // MakeTime() hint
-};
+        std::string Description() const override;
 
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    private:
+        struct Header {            // counts of:
+            std::size_t timecnt;     // transition times
+            std::size_t typecnt;     // transition types
+            std::size_t charcnt;     // zone abbreviation characters
+            std::size_t leapcnt;     // leap seconds (we expect none)
+            std::size_t ttisstdcnt;  // UTC/local indicators (unused)
+            std::size_t ttisutcnt;   // standard/wall indicators (unused)
+
+            bool Build(const tzhead &tzh);
+
+            std::size_t DataLength(std::size_t time_len) const;
+        };
+
+        bool GetTransitionType(std::int_fast32_t utc_offset, bool is_dst,
+                               const std::string &abbr, std::uint_least8_t *index);
+
+        bool EquivTransitions(std::uint_fast8_t tt1_index,
+                              std::uint_fast8_t tt2_index) const;
+
+        bool ExtendTransitions();
+
+        bool ResetToBuiltinUTC(const seconds &offset);
+
+        bool Load(ZoneInfoSource *zip);
+
+        // Helpers for BreakTime() and MakeTime().
+        time_zone::absolute_lookup LocalTime(std::int_fast64_t unix_time,
+                                             const TransitionType &tt) const;
+
+        time_zone::absolute_lookup LocalTime(std::int_fast64_t unix_time,
+                                             const Transition &tr) const;
+
+        time_zone::civil_lookup TimeLocal(const civil_second &cs,
+                                          year_t c4_shift) const;
+
+        std::vector<Transition> transitions_;  // ordered by unix_time and civil_sec
+        std::vector<TransitionType> transition_types_;  // distinct transition types
+        std::uint_fast8_t default_transition_type_;     // for before first transition
+        std::string abbreviations_;  // all the NUL-terminated abbreviations
+
+        std::string version_;      // the tzdata version if available
+        std::string future_spec_;  // for after the last zic transition
+        bool extended_;            // future_spec_ was used to generate transitions
+        year_t last_year_;         // the final year of the generated transitions
+
+        // We remember the transitions found during the last BreakTime() and
+        // MakeTime() calls. If the next request is for the same transition we
+        // will avoid re-searching.
+        mutable std::atomic<std::size_t> local_time_hint_ = {};  // BreakTime() hint
+        mutable std::atomic<std::size_t> time_local_hint_ = {};  // MakeTime() hint
+    };
+
+
+}  // namespace turbo::time_internal::cctz
 
 #endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_INFO_H_

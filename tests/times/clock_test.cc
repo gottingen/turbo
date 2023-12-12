@@ -32,9 +32,9 @@ typedef void (*sig_t)(int);
 namespace {
 
 TEST(Time, Now) {
-  const turbo::Time before = turbo::FromUnixNanos(turbo::GetCurrentTimeNanos());
-  const turbo::Time now = turbo::Now();
-  const turbo::Time after = turbo::FromUnixNanos(turbo::GetCurrentTimeNanos());
+  const turbo::Time before = turbo::from_unix_nanos(turbo::GetCurrentTimeNanos());
+  const turbo::Time now = turbo::time_now();
+  const turbo::Time after = turbo::from_unix_nanos(turbo::GetCurrentTimeNanos());
   EXPECT_GE(now, before);
   EXPECT_GE(after, now);
 }
@@ -50,28 +50,28 @@ void AlarmHandler(int signo) {
 }
 #endif
 
-// Does SleepFor(d) take between lower_bound and upper_bound at least
+// Does sleep_for(d) take between lower_bound and upper_bound at least
 // once between now and (now + timeout)?  If requested (and supported),
 // add an alarm for the middle of the sleep period and expect it to fire.
 bool SleepForBounded(turbo::Duration d, turbo::Duration lower_bound,
                      turbo::Duration upper_bound, turbo::Duration timeout,
                      AlarmPolicy alarm_policy, int* attempts) {
-  const turbo::Time deadline = turbo::Now() + timeout;
-  while (turbo::Now() < deadline) {
+  const turbo::Time deadline = turbo::time_now() + timeout;
+  while (turbo::time_now() < deadline) {
 #if defined(TURBO_HAVE_ALARM)
     sig_t old_alarm = SIG_DFL;
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       alarm_handler_invoked = false;
       old_alarm = signal(SIGALRM, AlarmHandler);
-      alarm(turbo::ToInt64Seconds(d / 2));
+      alarm(turbo::to_int64_seconds(d / 2));
     }
 #else
     EXPECT_EQ(alarm_policy, AlarmPolicy::kWithoutAlarm);
 #endif
     ++*attempts;
-    turbo::Time start = turbo::Now();
-    turbo::SleepFor(d);
-    turbo::Duration actual = turbo::Now() - start;
+    turbo::Time start = turbo::time_now();
+    turbo::sleep_for(d);
+    turbo::Duration actual = turbo::time_now() - start;
 #if defined(TURBO_HAVE_ALARM)
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       signal(SIGALRM, old_alarm);
@@ -79,7 +79,7 @@ bool SleepForBounded(turbo::Duration d, turbo::Duration lower_bound,
     }
 #endif
     if (lower_bound <= actual && actual <= upper_bound) {
-      return true;  // yes, the SleepFor() was correctly bounded
+      return true;  // yes, the sleep_for() was correctly bounded
     }
   }
   return false;
@@ -98,18 +98,18 @@ testing::AssertionResult AssertSleepForBounded(turbo::Duration d,
     return testing::AssertionSuccess();
   }
   return testing::AssertionFailure()
-         << "SleepFor(" << d << ") did not return within [" << lower_bound
+         << "sleep_for(" << d << ") did not return within [" << lower_bound
          << ":" << upper_bound << "] in " << attempts << " attempt"
          << (attempts == 1 ? "" : "s") << " over " << timeout
          << (alarm_policy == AlarmPolicy::kWithAlarm ? " with" : " without")
          << " an alarm";
 }
 
-// Tests that SleepFor() returns neither too early nor too late.
-TEST(SleepFor, Bounded) {
-  const turbo::Duration d = turbo::Milliseconds(2500);
-  const turbo::Duration early = turbo::Milliseconds(100);
-  const turbo::Duration late = turbo::Milliseconds(300);
+// Tests that sleep_for() returns neither too early nor too late.
+TEST(sleep_for, Bounded) {
+  const turbo::Duration d = turbo::milliseconds(2500);
+  const turbo::Duration early = turbo::milliseconds(100);
+  const turbo::Duration late = turbo::milliseconds(300);
   const turbo::Duration timeout = 48 * d;
   EXPECT_TRUE(AssertSleepForBounded(d, early, late, timeout,
                                     AlarmPolicy::kWithoutAlarm));

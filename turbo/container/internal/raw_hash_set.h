@@ -317,7 +317,7 @@ struct IsDecomposable : std::false_type {};
 
 template <class Policy, class Hash, class Eq, class... Ts>
 struct IsDecomposable<
-    turbo::void_t<decltype(Policy::apply(
+    std::void_t<decltype(Policy::apply(
         RequireUsableKey<typename Policy::key_type, Hash, Eq>(),
         std::declval<Ts>()...))>,
     Policy, Hash, Eq, Ts...> : std::true_type {};
@@ -1382,7 +1382,7 @@ class raw_hash_set {
   // cases.
   template <class T>
   using RequiresInsertable = typename std::enable_if<
-      turbo::disjunction<std::is_convertible<T, init_type>,
+      std::disjunction<std::is_convertible<T, init_type>,
                         SameAsElementReference<T>>::value,
       int>::type;
 
@@ -2213,7 +2213,7 @@ class raw_hash_set {
   template <typename H>
   friend typename std::enable_if<H::template is_hashable<value_type>::value,
                                  H>::type
-  TurboHashValue(H h, const raw_hash_set& s) {
+  hash_value(H h, const raw_hash_set& s) {
     return H::combine(H::combine_unordered(std::move(h), s.begin(), s.end()),
                       s.size());
   }
@@ -2614,7 +2614,7 @@ typename raw_hash_set<P, H, E, A>::size_type EraseIf(
 
 namespace hashtable_debug_internal {
 template <typename Set>
-struct HashtableDebugAccess<Set, turbo::void_t<typename Set::raw_hash_set>> {
+struct HashtableDebugAccess<Set, std::void_t<typename Set::raw_hash_set>> {
   using Traits = typename Set::PolicyTraits;
   using Slot = typename Traits::slot_type;
 

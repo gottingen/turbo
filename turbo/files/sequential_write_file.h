@@ -25,7 +25,7 @@
 namespace turbo {
 
     /**
-     * @ingroup turbo_files
+     * @ingroup turbo_files_write_file
      * @brief SequentialWriteFile is a file io utility class.
      * eg.
      * @code

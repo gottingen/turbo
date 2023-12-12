@@ -46,9 +46,6 @@
 // #define BSD manifest constant only in
 // sys/param.h
 
-/**
- * @defgroup turbo_files filesystem - A C++17-like filesystem implementation for
- */
 #ifndef _WIN32
 
 #include <sys/param.h>
@@ -223,23 +220,68 @@ namespace turbo {
 #endif
         };
 
-#if __cplusplus < 201703L
-                                                                                                                                template <typename char_type>
-constexpr char_type path_helper_base<char_type>::preferred_separator;
-#endif
-
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                class path;
+class path;
 namespace detail {
 bool has_executable_extension(const path &p);
 }
 #endif
-
-        // [fs.class.path] class path
-        class TURBO_DLL path
+        /**
+         * @ingroup turbo_files_filesystem
+         * @brief The class path represents a path on a filesystem.
+         *        It supports the following operations:
+         *        * construction from a string or a sequence of elements
+         *        * appending and concatenation using operator/= and operator/+
+         *        * comparison using operator==, operator!=, operator<, operator<=,
+         *        operator>, operator>=
+         *        * decomposition into elements using root_name(), root_directory(),
+         *        root_path(), relative_path(), parent_path(), filename(), stem(),
+         *        extension()
+         *        * query operations using empty(), has_root_name(), has_root_path(),
+         *        has_relative_path(), has_parent_path(), has_filename(), has_stem(),
+         *        has_extension(), is_absolute(), is_relative()
+         *        * lexically normalizing with lexically_normal()
+         *        * lexically relative to another path with lexically_relative()
+         *        * lexically proximate to another path with lexically_proximate()
+         *        * iteration over the elements with begin() and end()
+         *        * stream operations with operator<< and operator>>
+         *        * conversion to string with string(), u8string(), u16string(),
+         *        u32string(), wstring(), generic_string(), generic_u8string(),
+         *        generic_u16string(), generic_u32string(), generic_wstring()
+         *        * conversion to native format with native()
+         *        * conversion to c-string with c_str()
+         *        * conversion to string_view with string_view()
+         *        * conversion to u8string_view with u8string_view()
+         *        * conversion to u16string_view with u16string_view()
+         *        * conversion to u32string_view with u32string_view()
+         *        * conversion to wstring_view with wstring_view()
+         *        * conversion to generic_string_view with generic_string_view()
+         *        * conversion to generic_u8string_view with
+         *        generic_u8string_view()
+         *        * conversion to generic_u16string_view with
+         *        generic_u16string_view()
+         *        * conversion to generic_u32string_view with
+         *        generic_u32string_view()
+         *        * conversion to generic_wstring_view with generic_wstring_view()
+         *        * conversion to std::basic_string with operator std::basic_string()
+         *        * conversion to std::basic_string_view with
+         *        operator std::basic_string_view()
+         *        * conversion to std::basic_string_view with
+         *        operator std::basic_string_view()
+         *        * conversion to std::basic_string_view with
+         *        operator std::basic_string_view()
+         *        * conversion to std::basic_string_view with
+         *        operator std::basic_string_view()
+         *        * conversion to std::basic_string_view with
+         *        operator std::basic_string_view()
+         *
+         *        The class path is not thread-safe.
+         *
+         */
+        class path
 #if defined(TURBO_PLATFORM_WINDOWS) && \
     !defined(TURBO_WIN_DISABLE_WSTRING_STORAGE_TYPE)
-                                                                                                                                    #define GHC_USE_WCHAR_T
+#define GHC_USE_WCHAR_T
 #define TURBO_NATIVEWP(p) p.c_str()
 #define TURBO_PLATFORM_LITERAL(str) L##str
     : private path_helper_base<std::wstring::value_type> {
@@ -550,7 +592,7 @@ public:
             iterator end() const;
 
             template<typename H>
-            friend H TurboHashValue(H h, const path &p) {
+            friend H hash_value(H h, const path &p) {
                 return H::combine(std::move(h), p.string());
             }
 
@@ -3804,8 +3846,8 @@ inline bool has_executable_extension(const path &p) {
             return iterator(*this, _path.end());
         }
 
-//-----------------------------------------------------------------------------
-// [fs.path.nonmember] path non-member functions
+        //-----------------------------------------------------------------------------
+        // [fs.path.nonmember] path non-member functions
         inline void swap(path & lhs, path & rhs)
         noexcept {
         swap(lhs
@@ -5082,6 +5124,23 @@ inline bool has_executable_extension(const path &p) {
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Reads the target of a symlink.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             turbo::filesystem::read_symlink("test.txt");
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to read.
+     * @return The target of the symlink.
+     */
     inline path proximate(const path &p, std::error_code &ec) {
         auto cp = current_path(ec);
         if (!ec) {
@@ -5108,6 +5167,23 @@ inline bool has_executable_extension(const path &p) {
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Reads the target of a symlink.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             turbo::filesystem::read_symlink("test.txt");
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to read.
+     * @return The target of the symlink.
+     */
     inline path read_symlink(const path &p) {
         std::error_code ec;
         auto result = read_symlink(p, ec);
@@ -5135,6 +5211,22 @@ inline bool has_executable_extension(const path &p) {
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Removes the given file.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             turbo::filesystem::remove("test.txt");
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to remove.
+     */
     inline path relative(const path &p, const path &base) {
         return weakly_canonical(p).lexically_relative(weakly_canonical(base));
     }
@@ -5148,6 +5240,22 @@ inline bool has_executable_extension(const path &p) {
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Removes the given file.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             turbo::filesystem::remove("test.txt");
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to remove.
+     */
     inline bool remove(const path &p) {
         std::error_code ec;
         auto result = remove(p, ec);
@@ -5207,6 +5315,23 @@ inline bool has_executable_extension(const path &p) {
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Removes the given directory and all of its contents.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             turbo::filesystem::remove_all("test");
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to remove.
+     * @return The number of files removed.
+     */
     inline uintmax_t remove_all(const path &p) {
         std::error_code ec;
         auto result = remove_all(p, ec);
@@ -5265,7 +5390,23 @@ inline bool has_executable_extension(const path &p) {
     }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Renames the given file to the given name.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             turbo::filesystem::rename("test.txt", "test2.txt");
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param from The path to rename.
+     * @param to The new name of the file.
+     */
     inline void rename(const path &from, const path &to) {
         std::error_code ec;
         rename(from, to, ec);
@@ -5297,6 +5438,23 @@ inline bool has_executable_extension(const path &p) {
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Resizes the given file to the given size.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             turbo::filesystem::resize_file("test.txt", 1024);
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to resize.
+     * @param size The new size of the file.
+     */
     inline void resize_file(const path &p, uintmax_t size) {
         std::error_code ec;
         resize_file(p, size, ec);
@@ -5306,29 +5464,46 @@ inline bool has_executable_extension(const path &p) {
     }
 
 #endif
-
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Resizes the given file to the given size.
+     *        if error occurs, it will reflect in the error code.
+     *        it is recommended to use this function instead of the throw
+     *        version.
+     *        Example:
+     *        @code {.cpp}
+     *        std::error_code ec;
+     *        turbo::filesystem::resize_file("test.txt", 1024, ec);
+     *        if (ec) {
+     *            // handle error
+     *         }
+     *         @endcode
+     * @param p The path to resize.
+     * @param size The new size of the file.
+     * @param ec The error code to set if an error occurs.
+     */
     inline void resize_file(const path &p, uintmax_t size,
                             std::error_code &ec) noexcept {
         ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                LARGE_INTEGER lisize;
-  lisize.QuadPart = static_cast<LONGLONG>(size);
-  if (lisize.QuadPart < 0) {
+    LARGE_INTEGER lisize;
+    lisize.QuadPart = static_cast<LONGLONG>(size);
+    if (lisize.QuadPart < 0) {
 #ifdef ERROR_FILE_TOO_LARGE
-    ec = detail::make_system_error(ERROR_FILE_TOO_LARGE);
+        ec = detail::make_system_error(ERROR_FILE_TOO_LARGE);
 #else
-    ec = detail::make_system_error(223);
+        ec = detail::make_system_error(223);
 #endif
-    return;
-  }
-  detail::unique_handle file(CreateFileW(TURBO_NATIVEWP(p), GENERIC_WRITE, 0,
+        return;
+    }
+    detail::unique_handle file(CreateFileW(TURBO_NATIVEWP(p), GENERIC_WRITE, 0,
                                          NULL, OPEN_EXISTING, 0, NULL));
-  if (!file) {
-    ec = detail::make_system_error();
-  } else if (SetFilePointerEx(file.get(), lisize, NULL, FILE_BEGIN) == 0 ||
+    if (!file) {
+        ec = detail::make_system_error();
+    } else if (SetFilePointerEx(file.get(), lisize, NULL, FILE_BEGIN) == 0 ||
              SetEndOfFile(file.get()) == 0) {
-    ec = detail::make_system_error();
-  }
+        ec = detail::make_system_error();
+    }
 #else
         if (::truncate(p.c_str(), static_cast<off_t>(size)) != 0) {
             ec = detail::make_system_error();
@@ -5337,7 +5512,24 @@ inline bool has_executable_extension(const path &p) {
     }
 
 #ifdef TURBO_HAVE_EXCEPTIONS
-
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Returns the space information of the given path.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             auto space = turbo::filesystem::space("test.txt");
+     *             handle_space(space);
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to get the space information of.
+     * @return The space information of the given path.
+     */
     inline space_info space(const path &p) {
         std::error_code ec;
         auto result = space(p, ec);
@@ -5349,6 +5541,25 @@ inline bool has_executable_extension(const path &p) {
 
 #endif
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Returns the space information of the given path.
+     *        This function will return the space information of the given path.
+     *        it is recommended to use this function instead of the throw
+     *        version.
+     *        Example:
+     *        @code {.cpp}
+     *        std::error_code ec;
+     *        auto space = turbo::filesystem::space("test.txt", ec);
+     *        if (ec) {
+     *        // handle error
+     *        }
+     *        handle_space(space);
+     *        @endcode
+     * @param p The path to get the space information of.
+     * @param ec The error code to set if an error occurs.
+     * @return The space information of the given path.
+     */
     inline space_info space(const path &p,
                             std::error_code &ec) noexcept {
         ec.clear();
@@ -5383,6 +5594,24 @@ inline bool has_executable_extension(const path &p) {
 
 #ifdef TURBO_HAVE_EXCEPTIONS
 
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Returns the file status of the given path.
+     *        if error occurs, this function will throw a filesystem_error
+     *        exception. you should use the version by closing exceptions
+     *        within a try catch block.
+     *        Example:
+     *        @code {.cpp}
+     *        try {
+     *             auto status = turbo::filesystem::status("test.txt");
+     *             handle_status(status);
+     *         } catch (const turbo::filesystem::filesystem_error &e) {
+     *              // handle error
+     *         }
+     *         @endcode
+     * @param p The path to get the status of.
+     * @return The file status of the given path.
+     */
     inline file_status status(const path &p) {
         std::error_code ec;
         auto result = status(p, ec);
@@ -5393,7 +5622,25 @@ inline bool has_executable_extension(const path &p) {
     }
 
 #endif
-
+    /**
+     * @ingroup turbo_files_filesystem
+     * @brief Returns the file status of the given path.
+     *        This function will return the file status of the given path.
+     *        it is recommended to use this function instead of the throw
+     *        version.
+     *        Example:
+     *        @code {.cpp}
+     *        std::error_code ec;
+     *        auto status = turbo::filesystem::status("test.txt", ec);
+     *        if (ec) {
+     *        // handle error
+     *        }
+     *        handle_status(status);
+     *        @endcode
+     * @param p The path to get the status of.
+     * @param ec The error code to set if an error occurs.
+     * @return The file status of the given path.
+     */
     inline file_status status(const path &p,
                               std::error_code &ec) noexcept {
         return detail::status_ex(p, ec);
@@ -5507,9 +5754,9 @@ inline bool has_executable_extension(const path &p) {
         return ec ? path() : result.lexically_normal();
     }
 
-//-----------------------------------------------------------------------------
-// [fs.class.file_status] class file_status
-// [fs.file_status.cons] constructors and destructor
+    //-----------------------------------------------------------------------------
+    // [fs.class.file_status] class file_status
+    // [fs.file_status.cons] constructors and destructor
     inline file_status::file_status() noexcept
             : file_status(file_type::none) {}
 
@@ -5961,7 +6208,27 @@ directory_entry::operator<=>(const directory_entry &rhs) const noexcept {
 // [fs.class.directory_iterator] class directory_iterator
 
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                            class directory_iterator::impl {
+        /**
+     * @ingroup tubo_files_filesystem
+     * @brief The directory_iterator class is used to iterate over the contents of a
+     *        directory.
+     *        Each directory entry is returned as a directory_entry object.
+     *        The directory_iterator class is a forward iterator.
+     *        Example:
+     *        @code {.cpp}
+     *        for (auto &p : filesystem::directory_iterator("/tmp")) {
+     *        std::cout << p.path().string() << std::endl;
+     *        }
+     *        @endcode
+     *       Another example:
+     *       @code {.cpp}
+     *       filesystem::directory_iterator it("/tmp");
+     *       while (it != filesystem::directory_iterator()) {
+     *          std::cout << it->path().string() << std::endl;
+     *       }
+     *       @endcode
+     */
+class directory_iterator::impl {
 public:
   impl(const path &p, directory_options options)
       : _base(p), _options(options), _dirHandle(INVALID_HANDLE_VALUE) {
@@ -6062,7 +6329,27 @@ public:
 };
 #else
 
-// POSIX implementation
+    // POSIX implementation
+    /**
+     * @ingroup tubo_files_filesystem
+     * @brief The directory_iterator class is used to iterate over the contents of a
+     *        directory.
+     *        Each directory entry is returned as a directory_entry object.
+     *        The directory_iterator class is a forward iterator.
+     *        Example:
+     *        @code {.cpp}
+     *        for (auto &p : filesystem::directory_iterator("/tmp")) {
+     *        std::cout << p.path().string() << std::endl;
+     *        }
+     *        @endcode
+     *       Another example:
+     *       @code {.cpp}
+     *       filesystem::directory_iterator it("/tmp");
+     *       while (it != filesystem::directory_iterator()) {
+     *          std::cout << it->path().string() << std::endl;
+     *       }
+     *       @endcode
+     */
     class directory_iterator::impl {
     public:
         impl(const path &path, directory_options options)
@@ -6434,7 +6721,7 @@ public:
         _impl->_recursion_pending = false;
     }
 
-// other members as required by [input.iterators]
+    // other members as r`equired by [input.iterators]
     inline bool recursive_directory_iterator::operator==(
             const recursive_directory_iterator &rhs) const {
         return _impl->_dir_iter_stack.top() == rhs._impl->_dir_iter_stack.top();

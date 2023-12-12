@@ -234,11 +234,9 @@ namespace turbo::simd {
                 using type = with_slow_conversion;
             };
 
-            using turbo::simd::detail::void_t;
-
             template<class A, class From, class To>
             struct conversion_type_impl<A, From, To,
-                    void_t<decltype(fast_cast(std::declval<const batch<From, A> &>(),
+                    std::void_t<decltype(fast_cast(std::declval<const batch<From, A> &>(),
                                               std::declval<const batch<To, A> &>(),
                                               std::declval<const A &>()))>> {
                 using type = with_fast_conversion;

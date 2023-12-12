@@ -23,7 +23,7 @@
 #include "turbo/container/internal/hash_function_defaults.h"
 #include "turbo/container/internal/hashtable_debug.h"
 #include "turbo/container/internal/raw_hash_set.h"
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 #include "turbo/random/random.h"
 #include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
@@ -94,7 +94,7 @@ class RandomizedAllocator {
     }
 
     // Choose a random one.
-    size_t i = turbo::Uniform<size_t>(GlobalBitGen(), 0, pointers.size());
+    size_t i = turbo::uniform<size_t>(GlobalBitGen(), 0, pointers.size());
     T* result = pointers[i];
     pointers[i] = pointers.back();
     pointers.pop_back();
@@ -324,7 +324,7 @@ struct AlmostSequential {
   mutable Sequential<T> current;
 
   auto operator()() const -> decltype(current()) {
-    while (turbo::Uniform(GlobalBitGen(), 0.0, 1.0) <= percent_skip / 100.)
+    while (turbo::uniform(GlobalBitGen(), 0.0, 1.0) <= percent_skip / 100.)
       current();
     return current();
   }
@@ -333,7 +333,7 @@ struct AlmostSequential {
 struct Uniform {
   template <typename T>
   T operator()(T) const {
-    return turbo::Uniform<T>(turbo::IntervalClosed, GlobalBitGen(), T{0}, ~T{0});
+    return turbo::uniform<T>(turbo::IntervalClosed, GlobalBitGen(), T{0}, ~T{0});
   }
 };
 
@@ -342,7 +342,7 @@ struct Gaussian {
   T operator()(T) const {
     double d;
     do {
-      d = turbo::Gaussian<double>(GlobalBitGen(), 1e6, 1e4);
+      d = turbo::gaussian<double>(GlobalBitGen(), 1e6, 1e4);
     } while (d <= 0 || d > std::numeric_limits<T>::max() / 2);
     return static_cast<T>(d);
   }
@@ -351,7 +351,7 @@ struct Gaussian {
 struct Zipf {
   template <typename T>
   T operator()(T) const {
-    return turbo::Zipf<T>(GlobalBitGen(), std::numeric_limits<T>::max(), 1.6);
+    return turbo::zipf<T>(GlobalBitGen(), std::numeric_limits<T>::max(), 1.6);
   }
 };
 

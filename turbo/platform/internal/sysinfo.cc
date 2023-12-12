@@ -233,12 +233,12 @@ static int64_t ReadMonotonicClockNanos() {
 
 class UnscaledCycleClockWrapperForInitializeFrequency {
  public:
-  static int64_t Now() { return base_internal::UnscaledCycleClock::Now(); }
+  static int64_t time_now() { return base_internal::UnscaledCycleClock::time_now(); }
 };
 
 struct TimeTscPair {
   int64_t time;  // From ReadMonotonicClockNanos().
-  int64_t tsc;   // From UnscaledCycleClock::Now().
+  int64_t tsc;   // From UnscaledCycleClock::time_now().
 };
 
 // Returns a pair of values (monotonic kernel time, TSC ticks) that
@@ -251,7 +251,7 @@ static TimeTscPair GetTimeTscPair() {
   TimeTscPair best;
   for (int i = 0; i < 10; ++i) {
     int64_t t0 = ReadMonotonicClockNanos();
-    int64_t tsc = UnscaledCycleClockWrapperForInitializeFrequency::Now();
+    int64_t tsc = UnscaledCycleClockWrapperForInitializeFrequency::time_now();
     int64_t t1 = ReadMonotonicClockNanos();
     int64_t latency = t1 - t0;
     if (latency < best_latency) {

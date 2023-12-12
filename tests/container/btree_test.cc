@@ -85,10 +85,10 @@ namespace turbo {
             }
         }  // namespace
 
-// The base class for a sorted associative container checker. TreeType is the
-// container type to check and CheckerType is the container type to check
-// against. TreeType is expected to be btree_{set,map,multiset,multimap} and
-// CheckerType is expected to be {set,map,multiset,multimap}.
+        // The base class for a sorted associative container checker. TreeType is the
+        // container type to check and CheckerType is the container type to check
+        // against. TreeType is expected to be btree_{set,map,multiset,multimap} and
+        // CheckerType is expected to be {set,map,multiset,multimap}.
         template<typename TreeType, typename CheckerType>
         class base_checker {
         public:
@@ -3587,8 +3587,8 @@ namespace turbo {
                 for (int i: vec) set.insert(i);
 
                 for (int i = 0; i < 1000; ++i) {
-                    size_t begin = turbo::Uniform(bitgen, 0u, set.size());
-                    size_t end = turbo::Uniform(bitgen, begin, set.size());
+                    size_t begin = turbo::uniform(bitgen, 0u, set.size());
+                    size_t end = turbo::uniform(bitgen, begin, set.size());
                     ASSERT_EQ(end - begin, set.find(end) - set.find(begin))
                                                 << begin << " " << end;
                 }

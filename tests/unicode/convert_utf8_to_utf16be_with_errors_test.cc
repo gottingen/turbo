@@ -19,8 +19,7 @@
 #include <iostream>
 
 #include <tests/unicode/helpers/transcode_test_base.h>
-#include <tests/unicode/helpers/random_int.h>
-#include <tests/unicode/helpers/random_utf8.h>
+#include "turbo/random/random.h"
 #include <tests/unicode/helpers/test.h>
 #include <memory>
 
@@ -38,9 +37,9 @@ TEST(issue_213) {
   const char buf[] = "\x01\x9a\x84";
   // We select the byte 0x84. It is a continuation byte so it is possible
   // that the predicted output might be zero.
-  size_t expected_size = implementation.Utf16LengthFromUtf8(buf + 2, 1);
+  size_t expected_size = implementation.utf16_length_from_utf8(buf + 2, 1);
   std::unique_ptr<char16_t[]>buffer(new char16_t[expected_size]);
-  turbo::result r = turbo::ConvertUtf8ToUtf16BeWithErrors(buf + 2, 1, buffer.get());
+  turbo::result r = turbo::convert_utf8_to_utf16be_with_errors(buf + 2, 1, buffer.get());
   ASSERT_TRUE(r.error != turbo::SUCCESS);
   // r.count: In case of error, indicates the position of the error in the input.
   // In case of success, indicates the number of words validated/written.
@@ -57,13 +56,13 @@ TEST(convert_pure_ASCII) {
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-      turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
-      implementation.ChangeEndiannessUtf16(utf16be.data(), res.count, utf16le);
+      turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
+      implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.Utf16LengthFromUtf8(utf8, size);
+      return implementation.utf16_length_from_utf8(utf8, size);
     };
 
     for (size_t size: input_size) {
@@ -78,20 +77,20 @@ TEST(convert_1_or_2_UTF8_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     uint32_t seed{1234+uint32_t(trial)};
     if((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
-    turbo::tests::helpers::RandomInt random(0x0000, 0x07ff, seed); // range for 1 or 2 UTF-8 bytes
+    turbo::FixedUniform<int> random(0x0000, 0x07ff); // range for 1 or 2 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-      turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
-      implementation.ChangeEndiannessUtf16(utf16be.data(), res.count, utf16le);
+      turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
+      implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.Utf16LengthFromUtf8(utf8, size);
+      return implementation.utf16_length_from_utf8(utf8, size);
     };
     for (size_t size: input_size) {
-      transcode_utf8_to_utf16_test_base test(random, size);
+      transcode_utf8_to_utf16_test_base test([&random](){return random();}, size);
       ASSERT_TRUE(test(procedure));
       ASSERT_TRUE(test.check_size(size_procedure));
     }
@@ -103,21 +102,21 @@ TEST(convert_1_or_2_or_3_UTF8_bytes) {
     uint32_t seed{1234+uint32_t(trial)};
     if((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 1, 2 or 3 UTF-8 bytes
-    turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd7ff},
-                                                     {0xe000, 0xffff}}, seed);
+    turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd7ff},
+                                                     {0xe000, 0xffff}});
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-      turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
-      implementation.ChangeEndiannessUtf16(utf16be.data(), res.count, utf16le);
+      turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
+      implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.Utf16LengthFromUtf8(utf8, size);
+      return implementation.utf16_length_from_utf8(utf8, size);
     };
     for (size_t size: input_size) {
-      transcode_utf8_to_utf16_test_base test(random, size);
+      transcode_utf8_to_utf16_test_base test([&random](){return random();}, size);
       ASSERT_TRUE(test(procedure));
       ASSERT_TRUE(test.check_size(size_procedure));
     }
@@ -128,21 +127,21 @@ TEST(convert_3_or_4_UTF8_bytes) {
   for(size_t trial = 0; trial < trials; trial ++) {
     uint32_t seed{1234+uint32_t(trial)};
     if((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
-    turbo::tests::helpers::RandomIntRanges random({{0x0800, 0xd800-1},
-                                                     {0xe000, 0x10ffff}}, seed); // range for 3 or 4 UTF-8 bytes
+    turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0800, 0xd800-1},
+                                                     {0xe000, 0x10ffff}}); // range for 3 or 4 UTF-8 bytes
 
     auto procedure = [&implementation](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
       std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-      turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
-      implementation.ChangeEndiannessUtf16(utf16be.data(), res.count, utf16le);
+      turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
+      implementation.change_endianness_utf16(utf16be.data(), res.count, utf16le);
       ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
       return res.count;
     };
     auto size_procedure = [&implementation](const char* utf8, size_t size) -> size_t {
-      return implementation.Utf16LengthFromUtf8(utf8, size);
+      return implementation.utf16_length_from_utf8(utf8, size);
     };
     for (size_t size: input_size) {
-      transcode_utf8_to_utf16_test_base test(random, size);
+      transcode_utf8_to_utf16_test_base test([&random](){return random();}, size);
       ASSERT_TRUE(test(procedure));
       ASSERT_TRUE(test.check_size(size_procedure));
     }
@@ -151,17 +150,17 @@ TEST(convert_3_or_4_UTF8_bytes) {
 
 TEST(header_bits_error) {
   uint32_t seed{1234};
-  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
-                                                  {0xe000, 0x10ffff}}, seed);
+  turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd800-1},
+                                                  {0xe000, 0x10ffff}});
 
   for(size_t trial = 0; trial < num_trials; trial++) {
-    transcode_utf8_to_utf16_test_base test(random, fix_size);
+    transcode_utf8_to_utf16_test_base test([&random](){return random();}, fix_size);
 
     for (int i = 0; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11000000) != 0b10000000) {  // Only process leading bytes
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
           std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-          turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
+          turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
           ASSERT_EQUAL(res.error, turbo::error_code::HEADER_BITS);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -177,16 +176,16 @@ TEST(header_bits_error) {
 
 TEST(too_short_error) {
   uint32_t seed{1234};
-  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
-                                                {0xe000, 0x10ffff}}, seed);
+  turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd800-1},
+                                                {0xe000, 0x10ffff}});
   for(size_t trial = 0; trial < num_trials; trial++) {
-    transcode_utf8_to_utf16_test_base test(random, fix_size);
+    transcode_utf8_to_utf16_test_base test([&random](){return random();}, fix_size);
     int leading_byte_pos = 0;
     for (int i = 0; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11000000) == 0b10000000) {  // Only process continuation bytes by making them leading bytes
         auto procedure = [&implementation, &leading_byte_pos](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
           std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-          turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
+          turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
           ASSERT_EQUAL(res.error, turbo::error_code::TOO_SHORT);
           ASSERT_EQUAL(res.count, leading_byte_pos);
           return 0;
@@ -204,15 +203,15 @@ TEST(too_short_error) {
 
 TEST(too_long_error) {
   uint32_t seed{1234};
-  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
-                                                {0xe000, 0x10ffff}}, seed);
+  turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd800-1},
+                                                {0xe000, 0x10ffff}});
   for(size_t trial = 0; trial < num_trials; trial++) {
-    transcode_utf8_to_utf16_test_base test(random, fix_size);
+    transcode_utf8_to_utf16_test_base test([&random](){return random();}, fix_size);
     for (int i = 1; i < fix_size; i++) {
       if(((test.input_utf8[i] & 0b11000000) != 0b10000000)) {  // Only process leading bytes by making them continuation bytes
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16) -> size_t {
           std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-          turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
+          turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
           ASSERT_EQUAL(res.error, turbo::error_code::TOO_LONG);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -227,16 +226,15 @@ TEST(too_long_error) {
 }
 
 TEST(overlong_error) {
-  uint32_t seed{1234};
-  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
-                                                {0xe000, 0x10ffff}}, seed);
+  turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd800-1},
+                                                {0xe000, 0x10ffff}});
   for(size_t trial = 0; trial < num_trials; trial++) {
-    transcode_utf8_to_utf16_test_base test(random, fix_size);
+    transcode_utf8_to_utf16_test_base test([&random](){return random();}, fix_size);
     for (int i = 1; i < fix_size; i++) {
       if((unsigned char)test.input_utf8[i] >= (unsigned char)0b11000000) { // Only non-ASCII leading bytes can be overlong
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
           std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-          turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
+          turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
           ASSERT_EQUAL(res.error, turbo::error_code::OVERLONG);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -262,15 +260,15 @@ TEST(overlong_error) {
 
 TEST(too_large_error) {
   uint32_t seed{1234};
-  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
-                                                {0xe000, 0x10ffff}}, seed);
+  turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd800-1},
+                                                {0xe000, 0x10ffff}});
   for(size_t trial = 0; trial < num_trials; trial++) {
-    transcode_utf8_to_utf16_test_base test(random, fix_size);
+    transcode_utf8_to_utf16_test_base test([&random](){return random();}, fix_size);
     for (int i = 1; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11111000) == 0b11110000) { // Can only have too large error in 4-bytes case
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
           std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-          turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
+          turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
           ASSERT_EQUAL(res.error, turbo::error_code::TOO_LARGE);
           ASSERT_EQUAL(res.count, i);
           return 0;
@@ -285,15 +283,15 @@ TEST(too_large_error) {
 
 TEST(surrogate_error) {
   uint32_t seed{1234};
-  turbo::tests::helpers::RandomIntRanges random({{0x0000, 0xd800-1},
-                                              {0xe000, 0x10ffff}}, seed);
+  turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd800-1},
+                                              {0xe000, 0x10ffff}});
   for(size_t trial = 0; trial < num_trials; trial++) {
-    transcode_utf8_to_utf16_test_base test(random, fix_size);
+    transcode_utf8_to_utf16_test_base test([&random](){return random();}, fix_size);
     for (int i = 1; i < fix_size; i++) {
       if((test.input_utf8[i] & 0b11110000) == 0b11100000) { // Can only have surrogate error in 3-bytes case
         auto procedure = [&implementation, &i](const char* utf8, size_t size, char16_t* utf16le) -> size_t {
           std::vector<char16_t> utf16be(2*size);  // Assume each UTF-8 byte is converted into two UTF-16 bytes
-          turbo::result res = implementation.ConvertUtf8ToUtf16BeWithErrors(utf8, size, utf16be.data());
+          turbo::result res = implementation.convert_utf8_to_utf16be_with_errors(utf8, size, utf16be.data());
           ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
           ASSERT_EQUAL(res.count, i);
           return 0;

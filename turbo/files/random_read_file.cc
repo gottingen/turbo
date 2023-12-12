@@ -56,7 +56,7 @@ namespace turbo {
                 return turbo::ok_status();
             }
             if (_option.open_interval > 0) {
-                turbo::SleepFor(turbo::Milliseconds(_option.open_interval));
+                turbo::sleep_for(turbo::milliseconds(_option.open_interval));
             }
         }
         return turbo::errno_to_status(errno, turbo::Format("Failed opening file {} for reading", _file_path.c_str()));

@@ -46,13 +46,15 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <intrin.h>  // NOLINT(build/include_order)
 #else
+
 // MSVC-equivalent __cpuid intrinsic function.
 static void __cpuid(int cpu_info[4], int info_type) {
-  __asm__ volatile("cpuid \n\t"
-                   : "=a"(cpu_info[0]), "=b"(cpu_info[1]), "=c"(cpu_info[2]),
-                     "=d"(cpu_info[3])
-                   : "a"(info_type), "c"(0));
+    __asm__ volatile("cpuid \n\t"
+            : "=a"(cpu_info[0]), "=b"(cpu_info[1]), "=c"(cpu_info[2]),
+    "=d"(cpu_info[3])
+            : "a"(info_type), "c"(0));
 }
+
 #endif
 #endif  // TURBO_INTERNAL_USE_X86_CPUID
 
@@ -98,9 +100,7 @@ static uint32_t GetAuxval(uint32_t hwcap_type) {
 
 #endif
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
 // The default return at the end of the function might be unreachable depending
 // on the configuration. Ignore that warning.
@@ -109,117 +109,115 @@ namespace random_internal {
 #pragma clang diagnostic ignored "-Wunreachable-code-return"
 #endif
 
-// CPUSupportsRandenHwAes returns whether the CPU is a microarchitecture
-// which supports the crpyto/aes instructions or extensions necessary to use the
-// accelerated RandenHwAes implementation.
-//
-// 1. For x86 it is sufficient to use the CPUID instruction to detect whether
-//    the cpu supports AES instructions. Done.
-//
-// Fon non-x86 it is much more complicated.
-//
-// 2. When TURBO_INTERNAL_USE_GETAUXVAL is defined, use getauxval() (either
-//    the direct c-library version, or the android probing version which loads
-//    libc), and read the hardware capability bits.
-//    This is based on the technique used by boringssl uses to detect
-//    cpu capabilities, and should allow us to enable crypto in the android
-//    builds where it is supported.
-//
-// 3. Use the default for the compiler architecture.
-//
+    // CPUSupportsRandenHwAes returns whether the CPU is a microarchitecture
+    // which supports the crpyto/aes instructions or extensions necessary to use the
+    // accelerated RandenHwAes implementation.
+    //
+    // 1. For x86 it is sufficient to use the CPUID instruction to detect whether
+    //    the cpu supports AES instructions. Done.
+    //
+    // Fon non-x86 it is much more complicated.
+    //
+    // 2. When TURBO_INTERNAL_USE_GETAUXVAL is defined, use getauxval() (either
+    //    the direct c-library version, or the android probing version which loads
+    //    libc), and read the hardware capability bits.
+    //    This is based on the technique used by boringssl uses to detect
+    //    cpu capabilities, and should allow us to enable crypto in the android
+    //    builds where it is supported.
+    //
+    // 3. Use the default for the compiler architecture.
+    //
 
-bool CPUSupportsRandenHwAes() {
+    bool CPUSupportsRandenHwAes() {
 #if defined(TURBO_INTERNAL_USE_X86_CPUID)
-  // 1. For x86: Use CPUID to detect the required AES instruction set.
-  int regs[4];
-  __cpuid(reinterpret_cast<int*>(regs), 1);
-  return regs[2] & (1 << 25);  // AES
+        // 1. For x86: Use CPUID to detect the required AES instruction set.
+        int regs[4];
+        __cpuid(reinterpret_cast<int *>(regs), 1);
+        return regs[2] & (1 << 25);  // AES
 
 #elif defined(TURBO_INTERNAL_USE_GETAUXVAL)
-  // 2. Use getauxval() to read the hardware bits and determine
-  // cpu capabilities.
+        // 2. Use getauxval() to read the hardware bits and determine
+        // cpu capabilities.
 
 #define AT_HWCAP 16
 #define AT_HWCAP2 26
 #if defined(TURBO_ARCH_PPC)
-  // For Power / PPC: Expect that the cpu supports VCRYPTO
-  // See https://members.openpowerfoundation.org/document/dl/576
-  // VCRYPTO should be present in POWER8 >= 2.07.
-  // Uses Linux kernel constants from arch/powerpc/include/uapi/asm/cputable.h
-  static const uint32_t kVCRYPTO = 0x02000000;
-  const uint32_t hwcap = GetAuxval(AT_HWCAP2);
-  return (hwcap & kVCRYPTO) != 0;
+        // For Power / PPC: Expect that the cpu supports VCRYPTO
+        // See https://members.openpowerfoundation.org/document/dl/576
+        // VCRYPTO should be present in POWER8 >= 2.07.
+        // Uses Linux kernel constants from arch/powerpc/include/uapi/asm/cputable.h
+        static const uint32_t kVCRYPTO = 0x02000000;
+        const uint32_t hwcap = GetAuxval(AT_HWCAP2);
+        return (hwcap & kVCRYPTO) != 0;
 
 #elif defined(TURBO_ARCH_ARM)
-  // For ARM: Require crypto+neon
-  // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0500f/CIHBIBBA.html
-  // Uses Linux kernel constants from arch/arm64/include/asm/hwcap.h
-  static const uint32_t kNEON = 1 << 12;
-  uint32_t hwcap = GetAuxval(AT_HWCAP);
-  if ((hwcap & kNEON) == 0) {
-    return false;
-  }
+        // For ARM: Require crypto+neon
+        // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0500f/CIHBIBBA.html
+        // Uses Linux kernel constants from arch/arm64/include/asm/hwcap.h
+        static const uint32_t kNEON = 1 << 12;
+        uint32_t hwcap = GetAuxval(AT_HWCAP);
+        if ((hwcap & kNEON) == 0) {
+          return false;
+        }
 
-  // And use it again to detect AES.
-  static const uint32_t kAES = 1 << 0;
-  const uint32_t hwcap2 = GetAuxval(AT_HWCAP2);
-  return (hwcap2 & kAES) != 0;
+        // And use it again to detect AES.
+        static const uint32_t kAES = 1 << 0;
+        const uint32_t hwcap2 = GetAuxval(AT_HWCAP2);
+        return (hwcap2 & kAES) != 0;
 
 #elif defined(TURBO_ARCH_AARCH64)
-  // For AARCH64: Require crypto+neon
-  // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0500f/CIHBIBBA.html
-  static const uint32_t kNEON = 1 << 1;
-  static const uint32_t kAES = 1 << 3;
-  const uint32_t hwcap = GetAuxval(AT_HWCAP);
-  return ((hwcap & kNEON) != 0) && ((hwcap & kAES) != 0);
+        // For AARCH64: Require crypto+neon
+        // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0500f/CIHBIBBA.html
+        static const uint32_t kNEON = 1 << 1;
+        static const uint32_t kAES = 1 << 3;
+        const uint32_t hwcap = GetAuxval(AT_HWCAP);
+        return ((hwcap & kNEON) != 0) && ((hwcap & kAES) != 0);
 #endif
 
 #else  // TURBO_INTERNAL_USE_GETAUXVAL
-  // 3. By default, assume that the compiler default.
-  return TURBO_HAVE_ACCELERATED_AES ? true : false;
+        // 3. By default, assume that the compiler default.
+        return TURBO_HAVE_ACCELERATED_AES ? true : false;
 
 #endif
-  // NOTE: There are some other techniques that may be worth trying:
-  //
-  // * Use an environment variable: TURBO_RANDOM_USE_HWAES
-  //
-  // * Rely on compiler-generated target-based dispatch.
-  // Using x86/gcc it might look something like this:
-  //
-  // int __attribute__((target("aes"))) HasAes() { return 1; }
-  // int __attribute__((target("default"))) HasAes() { return 0; }
-  //
-  // This does not work on all architecture/compiler combinations.
-  //
-  // * On Linux consider reading /proc/cpuinfo and/or /proc/self/auxv.
-  // These files have lines which are easy to parse; for ARM/AARCH64 it is quite
-  // easy to find the Features: line and extract aes / neon. Likewise for
-  // PPC.
-  //
-  // * Fork a process and test for SIGILL:
-  //
-  // * Many architectures have instructions to read the ISA. Unfortunately
-  //   most of those require that the code is running in ring 0 /
-  //   protected-mode.
-  //
-  //   There are several examples. e.g. Valgrind detects PPC ISA 2.07:
-  //   https://github.com/lu-zero/valgrind/blob/master/none/tests/ppc64/test_isa_2_07_part1.c
-  //
-  //   MRS <Xt>, ID_AA64ISAR0_EL1 ; Read ID_AA64ISAR0_EL1 into Xt
-  //
-  //   uint64_t val;
-  //   __asm __volatile("mrs %0, id_aa64isar0_el1" :"=&r" (val));
-  //
-  // * Use a CPUID-style heuristic database.
-  //
-  // * On Apple (__APPLE__), AES is available on Arm v8.
-  //   https://stackoverflow.com/questions/45637888/how-to-determine-armv8-features-at-runtime-on-ios
-}
+        // NOTE: There are some other techniques that may be worth trying:
+        //
+        // * Use an environment variable: TURBO_RANDOM_USE_HWAES
+        //
+        // * Rely on compiler-generated target-based dispatch.
+        // Using x86/gcc it might look something like this:
+        //
+        // int __attribute__((target("aes"))) HasAes() { return 1; }
+        // int __attribute__((target("default"))) HasAes() { return 0; }
+        //
+        // This does not work on all architecture/compiler combinations.
+        //
+        // * On Linux consider reading /proc/cpuinfo and/or /proc/self/auxv.
+        // These files have lines which are easy to parse; for ARM/AARCH64 it is quite
+        // easy to find the Features: line and extract aes / neon. Likewise for
+        // PPC.
+        //
+        // * Fork a process and test for SIGILL:
+        //
+        // * Many architectures have instructions to read the ISA. Unfortunately
+        //   most of those require that the code is running in ring 0 /
+        //   protected-mode.
+        //
+        //   There are several examples. e.g. Valgrind detects PPC ISA 2.07:
+        //   https://github.com/lu-zero/valgrind/blob/master/none/tests/ppc64/test_isa_2_07_part1.c
+        //
+        //   MRS <Xt>, ID_AA64ISAR0_EL1 ; Read ID_AA64ISAR0_EL1 into Xt
+        //
+        //   uint64_t val;
+        //   __asm __volatile("mrs %0, id_aa64isar0_el1" :"=&r" (val));
+        //
+        // * Use a CPUID-style heuristic database.
+        //
+        // * On Apple (__APPLE__), AES is available on Arm v8.
+        //   https://stackoverflow.com/questions/45637888/how-to-determine-armv8-features-at-runtime-on-ios
+    }
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::random_internal

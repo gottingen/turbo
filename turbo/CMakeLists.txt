@@ -16,6 +16,8 @@
 
 
 set(TURBO_ALL_SRC
+        "base/version.cc"
+        "base/atexit.cc"
         "base/internal/raw_logging.cc"
         "base/internal/strerror.cc"
         "base/log_severity.cc"
@@ -55,6 +57,7 @@ set(TURBO_ALL_SRC
         "../tests/debugging/stack_consumption.cc"
         "debugging/internal/vdso_support.cc"
         "debugging/leak_check.cc"
+        "fiber/context.cc"
         "files/file_watcher.cc"
         "files/fio.cc"
         "files/utility.cc"
@@ -72,9 +75,15 @@ set(TURBO_ALL_SRC
         "flags/validators.cc"
         "format/fmt/format.cc"
         "format/fmt/os.cc"
-        "hash/internal/city.cc"
-        "hash/internal/hash.cc"
-        "hash/internal/low_level_hash.cc"
+        "hash/city/city.cc"
+        "hash/internal/mixing_hash_state.cc"
+        "hash/bytes/bytes_hash.cc"
+        "hash/m3/murmurhash3.cc"
+        "hash/m3/m3.cc"
+        "hash/xx/xxhash.cc"
+        "hash/xx/xxh_x86dispatch.cc"
+        "hash/xx/xx.cc"
+        "hash/hash_engine.cc"
         "log/async.cc"
         "log/cfg.cc"
         "log/condition.cc"
@@ -84,6 +93,8 @@ set(TURBO_ALL_SRC
         "log/tlog.cc"
         "log/stdout_sinks.cc"
         "memory/jemalloc_helper.cc"
+        "memory/memory.cc"
+        "memory/memory_info.cc"
         "module/module_loader.cc"
         "module/module.cc"
         "platform/internal/cycleclock.cc"
@@ -98,6 +109,9 @@ set(TURBO_ALL_SRC
         "profiling/internal/periodic_sampler.cc"
         "random/discrete_distribution.cc"
         "random/gaussian_distribution.cc"
+        "random/fwd.cc"
+        "random/random.cc"
+        "random/unicode.cc"
         "random/internal/pool_urbg.cc"
         "random/internal/randen.cc"
         "random/internal/randen_detect.cc"
@@ -150,7 +164,8 @@ set(TURBO_ALL_SRC
         "times/cctz/time_zone_lookup.cc"
         "times/cctz/time_zone_posix.cc"
         "times/cctz/zone_info_source.cc"
-        "unicode/utf.cc"
+        "unicode/encoding_types.cc"
+        "unicode/codec/encode_utf16.cc"
         )
 
 if (BUILD_STATIC_LIBRARY)
@@ -186,3 +201,15 @@ if (BUILD_SHARED_LIBRARY)
     )
 endif (BUILD_SHARED_LIBRARY)
 
+file(GLOB_RECURSE TCLI_SRC "tools/*.cc")
+carbin_cc_binary(
+        NAME
+        turbo
+        SOURCES
+        ${TCLI_SRC}
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+        PUBLIC
+)

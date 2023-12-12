@@ -297,12 +297,12 @@ struct CalculatedFloat {
 // Returns the bit width of the given uint128.  (Equivalently, returns 128
 // minus the number of leading zero bits.)
 int BitWidth(uint128 value) {
-  if (Uint128High64(value) == 0) {
+  if (uint128_high64(value) == 0) {
     // This static_cast is only needed when using a std::bit_width()
     // implementation that does not have the fix for LWG 3656 applied.
-    return static_cast<int>(bit_width(Uint128Low64(value)));
+    return static_cast<int>(bit_width(uint128_low64(value)));
   }
-  return 128 - countl_zero(Uint128High64(value));
+  return 128 - countl_zero(uint128_high64(value));
 }
 
 // Calculates how far to the right a mantissa needs to be shifted to create a
@@ -722,13 +722,13 @@ bool EiselLemire(const strings_internal::ParsedFloat& input, bool negative,
   // (+) Wider Approximation.
   static constexpr uint64_t high64_mask =
       FloatTraits<FloatType>::kEiselLemireMask;
-  if (((Uint128High64(x) & high64_mask) == high64_mask) &&
-      (man > (std::numeric_limits<uint64_t>::max() - Uint128Low64(x)))) {
+  if (((uint128_high64(x) & high64_mask) == high64_mask) &&
+      (man > (std::numeric_limits<uint64_t>::max() - uint128_low64(x)))) {
     uint128 y =
         static_cast<uint128>(man) *
         static_cast<uint128>(
             kPower10MantissaLowTable[exp10 - kPower10TableMinInclusive]);
-    x += Uint128High64(y);
+    x += uint128_high64(y);
     // For example, parsing "4503599627370497.5" will take the if-true
     // branch here (for double precision), since:
     //  - x   = 0x8000000000000BFF_FFFFFFFFFFFFFFFF
@@ -738,17 +738,17 @@ bool EiselLemire(const strings_internal::ParsedFloat& input, bool negative,
     //  - x   = 0x7FFFFFFFFFFFFFFF_FFFFFFFFFFFFFFFF
     //  - y   = 0x813FFFFFFFFFFFFF_8A00000000000000
     //  - man = 0x9C40000000000000
-    if (((Uint128High64(x) & high64_mask) == high64_mask) &&
-        ((Uint128Low64(x) + 1) == 0) &&
-        (man > (std::numeric_limits<uint64_t>::max() - Uint128Low64(y)))) {
+    if (((uint128_high64(x) & high64_mask) == high64_mask) &&
+        ((uint128_low64(x) + 1) == 0) &&
+        (man > (std::numeric_limits<uint64_t>::max() - uint128_low64(y)))) {
       return false;
     }
   }
 
   // (+) Shifting to 54 Bits (or for single precision, to 25 bits).
-  uint64_t msb = Uint128High64(x) >> 63;
+  uint64_t msb = uint128_high64(x) >> 63;
   uint64_t ret_man =
-      Uint128High64(x) >> (msb + FloatTraits<FloatType>::kEiselLemireShift);
+      uint128_high64(x) >> (msb + FloatTraits<FloatType>::kEiselLemireShift);
   ret_exp2 -= 1 ^ msb;
 
   // (+) Half-way Ambiguity.
@@ -760,7 +760,7 @@ bool EiselLemire(const strings_internal::ParsedFloat& input, bool negative,
   // Likewise, when parsing "20040229.0" for single precision:
   //  - x       = 0x4C72894000000000_0000000000000000
   //  - ret_man = 0x000000000131CA25
-  if ((Uint128Low64(x) == 0) && ((Uint128High64(x) & high64_mask) == 0) &&
+  if ((uint128_low64(x) == 0) && ((uint128_high64(x) & high64_mask) == 0) &&
       ((ret_man & 3) == 1)) {
     return false;
   }

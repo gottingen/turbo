@@ -36,12 +36,12 @@ namespace {
         EXPECT_EQ(a.name(), b.name());
 
         turbo::TimeZone implicit_utc;
-        turbo::TimeZone explicit_utc = turbo::UTCTimeZone();
+        turbo::TimeZone explicit_utc = turbo::utc_time_zone();
         EXPECT_EQ(implicit_utc, explicit_utc);
         EXPECT_EQ(implicit_utc.name(), explicit_utc.name());
 
-        turbo::TimeZone la = turbo::time_internal::LoadTimeZone("America/Los_Angeles");
-        turbo::TimeZone nyc = turbo::time_internal::LoadTimeZone("America/New_York");
+        turbo::TimeZone la = turbo::time_internal::load_time_zone("America/Los_Angeles");
+        turbo::TimeZone nyc = turbo::time_internal::load_time_zone("America/New_York");
         EXPECT_NE(la, nyc);
     }
 
@@ -54,44 +54,44 @@ namespace {
     TEST(TimeZone, DefaultTimeZones) {
         turbo::TimeZone tz;
         EXPECT_EQ("UTC", turbo::TimeZone().name());
-        EXPECT_EQ("UTC", turbo::UTCTimeZone().name());
+        EXPECT_EQ("UTC", turbo::utc_time_zone().name());
     }
 
-    TEST(TimeZone, FixedTimeZone) {
-        const turbo::TimeZone tz = turbo::FixedTimeZone(123);
+    TEST(TimeZone, fixed_time_zone) {
+        const turbo::TimeZone tz = turbo::fixed_time_zone(123);
         const cctz::time_zone cz = cctz::fixed_time_zone(cctz::seconds(123));
         EXPECT_EQ(tz, turbo::TimeZone(cz));
     }
 
-    TEST(TimeZone, LocalTimeZone) {
-        const turbo::TimeZone local_tz = turbo::LocalTimeZone();
-        turbo::TimeZone tz = turbo::time_internal::LoadTimeZone("localtime");
+    TEST(TimeZone, local_time_zone) {
+        const turbo::TimeZone local_tz = turbo::local_time_zone();
+        turbo::TimeZone tz = turbo::time_internal::load_time_zone("localtime");
         EXPECT_EQ(tz, local_tz);
     }
 
     TEST(TimeZone, NamedTimeZones) {
-        turbo::TimeZone nyc = turbo::time_internal::LoadTimeZone("America/New_York");
+        turbo::TimeZone nyc = turbo::time_internal::load_time_zone("America/New_York");
         EXPECT_EQ("America/New_York", nyc.name());
-        turbo::TimeZone syd = turbo::time_internal::LoadTimeZone("Australia/Sydney");
+        turbo::TimeZone syd = turbo::time_internal::load_time_zone("Australia/Sydney");
         EXPECT_EQ("Australia/Sydney", syd.name());
-        turbo::TimeZone fixed = turbo::FixedTimeZone((((3 * 60) + 25) * 60) + 45);
+        turbo::TimeZone fixed = turbo::fixed_time_zone((((3 * 60) + 25) * 60) + 45);
         EXPECT_EQ("Fixed/UTC+03:25:45", fixed.name());
     }
 
     TEST(TimeZone, Failures) {
-        turbo::TimeZone tz = turbo::time_internal::LoadTimeZone("America/Los_Angeles");
-        EXPECT_FALSE(LoadTimeZone("Invalid/TimeZone", &tz));
-        EXPECT_EQ(turbo::UTCTimeZone(), tz);  // guaranteed fallback to UTC
+        turbo::TimeZone tz = turbo::time_internal::load_time_zone("America/Los_Angeles");
+        EXPECT_FALSE(load_time_zone("Invalid/TimeZone", &tz));
+        EXPECT_EQ(turbo::utc_time_zone(), tz);  // guaranteed fallback to UTC
 
         // Ensures that the load still fails on a subsequent attempt.
-        tz = turbo::time_internal::LoadTimeZone("America/Los_Angeles");
-        EXPECT_FALSE(LoadTimeZone("Invalid/TimeZone", &tz));
-        EXPECT_EQ(turbo::UTCTimeZone(), tz);  // guaranteed fallback to UTC
+        tz = turbo::time_internal::load_time_zone("America/Los_Angeles");
+        EXPECT_FALSE(load_time_zone("Invalid/TimeZone", &tz));
+        EXPECT_EQ(turbo::utc_time_zone(), tz);  // guaranteed fallback to UTC
 
         // Loading an empty string timezone should fail.
-        tz = turbo::time_internal::LoadTimeZone("America/Los_Angeles");
-        EXPECT_FALSE(LoadTimeZone("", &tz));
-        EXPECT_EQ(turbo::UTCTimeZone(), tz);  // guaranteed fallback to UTC
+        tz = turbo::time_internal::load_time_zone("America/Los_Angeles");
+        EXPECT_FALSE(load_time_zone("", &tz));
+        EXPECT_EQ(turbo::utc_time_zone(), tz);  // guaranteed fallback to UTC
     }
 
 }  // namespace

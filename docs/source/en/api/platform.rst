@@ -6,6 +6,6 @@
 turbo platform module
 =========================
 
-.. doxygengroup:: turbo_platform
+.. doxygengroup:: turbo_function_macro
    :project: turbo-docs
    :members:

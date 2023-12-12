@@ -17,17 +17,13 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
-// Returns whether the current CPU supports RandenHwAes implementation.
-// This typically involves supporting cryptographic extensions on whichever
-// platform is currently running.
-bool CPUSupportsRandenHwAes();
+    // Returns whether the current CPU supports RandenHwAes implementation.
+    // This typically involves supporting cryptographic extensions on whichever
+    // platform is currently running.
+    bool CPUSupportsRandenHwAes();
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::random_internal
 
 #endif  // TURBO_RANDOM_INTERNAL_RANDEN_DETECT_H_

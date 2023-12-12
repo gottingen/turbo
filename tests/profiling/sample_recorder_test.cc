@@ -135,11 +135,11 @@ TEST(SampleRecorderTest, MultiThreaded) {
             break;
           }
           case 2: {
-            turbo::Duration oldest = turbo::ZeroDuration();
+            turbo::Duration oldest = turbo::zero_duration();
             sampler.Iterate([&](const Info& info) {
-              oldest = std::max(oldest, turbo::Now() - info.create_time);
+              oldest = std::max(oldest, turbo::time_now() - info.create_time);
             });
-            ASSERT_GE(oldest, turbo::ZeroDuration());
+            ASSERT_GE(oldest, turbo::zero_duration());
             break;
           }
         }
@@ -148,7 +148,7 @@ TEST(SampleRecorderTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  turbo::SleepFor(turbo::Seconds(3));
+  turbo::sleep_for(turbo::seconds(3));
   stop.CountDown();
 }
 */

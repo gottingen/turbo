@@ -64,9 +64,6 @@
 #include "turbo/base/turbo_module.h"
 #include "turbo/format/format.h"
 
-/**
- * @defgroup turbo_base_status
- */
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 

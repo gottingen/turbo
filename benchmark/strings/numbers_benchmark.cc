@@ -20,7 +20,7 @@
 
 #include "benchmark/benchmark.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 #include "turbo/random/random.h"
 #include "turbo/strings/numbers.h"
 
@@ -269,7 +269,7 @@ void BM_FastHexToBufferZeroPad16(benchmark::State& state) {
   auto min = std::numeric_limits<uint64_t>::min();
   auto max = std::numeric_limits<uint64_t>::max();
   for (auto& num : nums) {
-    num = turbo::LogUniform(rng, min, max);
+    num = turbo::log_uniform(rng, min, max);
   }
 
   char buf[16];

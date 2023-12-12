@@ -639,11 +639,11 @@ TEST(RandenTest, IsFastOrSlow) {
   static constexpr size_t kCount = 100000;
   randen_u64 engine;
   randen_u64::result_type sum = 0;
-  auto start = turbo::GetCurrentTimeNanos();
+  auto start = turbo::get_current_time_nanos();
   for (int i = 0; i < kCount; i++) {
     sum += engine();
   }
-  auto duration = turbo::GetCurrentTimeNanos() - start;
+  auto duration = turbo::get_current_time_nanos() - start;
 
   TURBO_INTERNAL_LOG(INFO, turbo::Format("{}{}", static_cast<double>(duration) /
                                            static_cast<double>(kCount),

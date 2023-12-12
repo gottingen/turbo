@@ -63,9 +63,9 @@ class UnscaledCycleClock {
 
   // Return the value of a cycle counter that counts at a rate that is
   // approximately constant.
-  static int64_t Now();
+  static int64_t time_now();
 
-  // Return the how much UnscaledCycleClock::Now() increases per second.
+  // Return the how much UnscaledCycleClock::time_now() increases per second.
   // This is not necessarily the core CPU clock frequency.
   // It may be the nominal value report by the kernel, rather than a measured
   // value.
@@ -79,7 +79,7 @@ class UnscaledCycleClock {
 
 #if defined(__x86_64__)
 
-inline int64_t UnscaledCycleClock::Now() {
+inline int64_t UnscaledCycleClock::time_now() {
   uint64_t low, high;
   __asm__ volatile("rdtsc" : "=a"(low), "=d"(high));
   return static_cast<int64_t>((high << 32) | low);

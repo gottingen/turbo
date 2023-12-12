@@ -183,8 +183,8 @@ namespace turbo {
     constexpr functional_internal::bind_front_t<F, BoundArgs...> bind_front(
             F &&func, BoundArgs &&... args) {
         return functional_internal::bind_front_t<F, BoundArgs...>(
-                turbo::in_place, turbo::forward<F>(func),
-                turbo::forward<BoundArgs>(args)...);
+                std::in_place, std::forward<F>(func),
+                std::forward<BoundArgs>(args)...);
     }
 
 #endif  // defined(__cpp_lib_bind_front) && __cpp_lib_bind_front >= 201907L

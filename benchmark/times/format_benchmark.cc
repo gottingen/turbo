@@ -36,12 +36,12 @@ void BM_Format_FormatTime(benchmark::State& state) {
   const std::string fmt = kFormats[state.range(0)];
   state.SetLabel(fmt);
   const turbo::TimeZone lax =
-      turbo::time_internal::LoadTimeZone("America/Los_Angeles");
+      turbo::time_internal::load_time_zone("America/Los_Angeles");
   const turbo::Time t =
-      turbo::FromCivil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-      turbo::Nanoseconds(1);
+      turbo::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
+      turbo::nanoseconds(1);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::FormatTime(fmt, t, lax).length());
+    benchmark::DoNotOptimize(turbo::format_time(fmt, t, lax).length());
   }
 }
 BENCHMARK(BM_Format_FormatTime)->DenseRange(0, kNumFormats - 1);
@@ -50,13 +50,13 @@ void BM_Format_ParseTime(benchmark::State& state) {
   const std::string fmt = kFormats[state.range(0)];
   state.SetLabel(fmt);
   const turbo::TimeZone lax =
-      turbo::time_internal::LoadTimeZone("America/Los_Angeles");
-  turbo::Time t = turbo::FromCivil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
-                 turbo::Nanoseconds(1);
-  const std::string when = turbo::FormatTime(fmt, t, lax);
+      turbo::time_internal::load_time_zone("America/Los_Angeles");
+  turbo::Time t = turbo::from_civil(turbo::CivilSecond(1977, 6, 28, 9, 8, 7), lax) +
+                 turbo::nanoseconds(1);
+  const std::string when = turbo::format_time(fmt, t, lax);
   std::string err;
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(turbo::ParseTime(fmt, when, lax, &t, &err));
+    benchmark::DoNotOptimize(turbo::parse_time(fmt, when, lax, &t, &err));
   }
 }
 BENCHMARK(BM_Format_ParseTime)->DenseRange(0, kNumFormats - 1);

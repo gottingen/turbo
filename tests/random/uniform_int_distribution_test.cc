@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/random/uniform_int_distribution.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
+#include "doctest/doctest.h"
+#include "turbo/random/uniform_int_distribution.h"
 #include <cmath>
 #include <cstdint>
 #include <iterator>
@@ -22,8 +24,6 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "tests/random/chi_square.h"
 #include "tests/random/distribution_test_util.h"
@@ -34,22 +34,18 @@
 
 namespace {
 
-    template<typename IntType>
-    class UniformIntDistributionTest : public ::testing::Test {
-    };
 
-    using IntTypes = ::testing::Types<int8_t, uint8_t, int16_t, uint16_t, int32_t,
+    using IntTypes = std::tuple<int8_t, uint8_t, int16_t, uint16_t, int32_t,
             uint32_t, int64_t, uint64_t>;
-    TYPED_TEST_SUITE(UniformIntDistributionTest, IntTypes);
 
-    TYPED_TEST(UniformIntDistributionTest, ParamSerializeTest) {
+    TEST_CASE_TEMPLATE_DEFINE("UniformIntDistributionTest", T, ParamSerializeTest) {
         // This test essentially ensures that the parameters serialize,
         // not that the values generated cover the full range.
-        using Limits = std::numeric_limits<TypeParam>;
+        using Limits = std::numeric_limits<T>;
         using param_type =
-                typename turbo::uniform_int_distribution<TypeParam>::param_type;
-        const TypeParam kMin = std::is_unsigned<TypeParam>::value ? 37 : -105;
-        const TypeParam kNegOneOrZero = std::is_unsigned<TypeParam>::value ? 0 : -1;
+                typename turbo::uniform_int_distribution<T>::param_type;
+        const T kMin = std::is_unsigned<T>::value ? 37 : -105;
+        const T kNegOneOrZero = std::is_unsigned<T>::value ? 0 : -1;
 
         constexpr int kCount = 1000;
         turbo::InsecureBitGen gen;
@@ -65,42 +61,42 @@ namespace {
         }) {
             const auto a = param.a();
             const auto b = param.b();
-            turbo::uniform_int_distribution<TypeParam> before(a, b);
-            EXPECT_EQ(before.a(), param.a());
-            EXPECT_EQ(before.b(), param.b());
+            turbo::uniform_int_distribution<T> before(a, b);
+            REQUIRE_EQ(before.a(), param.a());
+            REQUIRE_EQ(before.b(), param.b());
 
             {
                 // Initialize via param_type
-                turbo::uniform_int_distribution<TypeParam> via_param(param);
-                EXPECT_EQ(via_param, before);
+                turbo::uniform_int_distribution<T> via_param(param);
+                REQUIRE_EQ(via_param, before);
             }
 
             // Initialize via iostreams
             std::stringstream ss;
             ss << before;
 
-            turbo::uniform_int_distribution<TypeParam> after(Limits::min() + 3,
+            turbo::uniform_int_distribution<T> after(Limits::min() + 3,
                                                              Limits::max() - 5);
 
-            EXPECT_NE(before.a(), after.a());
-            EXPECT_NE(before.b(), after.b());
-            EXPECT_NE(before.param(), after.param());
-            EXPECT_NE(before, after);
+            REQUIRE_NE(before.a(), after.a());
+            REQUIRE_NE(before.b(), after.b());
+            REQUIRE_NE(before.param(), after.param());
+            REQUIRE_NE(before, after);
 
             ss >> after;
 
-            EXPECT_EQ(before.a(), after.a());
-            EXPECT_EQ(before.b(), after.b());
-            EXPECT_EQ(before.param(), after.param());
-            EXPECT_EQ(before, after);
+            REQUIRE_EQ(before.a(), after.a());
+            REQUIRE_EQ(before.b(), after.b());
+            REQUIRE_EQ(before.param(), after.param());
+            REQUIRE_EQ(before, after);
 
             // Smoke test.
             auto sample_min = after.max();
             auto sample_max = after.min();
             for (int i = 0; i < kCount; i++) {
                 auto sample = after(gen);
-                EXPECT_GE(sample, after.min());
-                EXPECT_LE(sample, after.max());
+                REQUIRE_GE(sample, after.min());
+                REQUIRE_LE(sample, after.max());
                 if (sample > sample_max) {
                     sample_max = sample;
                 }
@@ -112,30 +108,13 @@ namespace {
             TURBO_RAW_LOG(INFO, "%s", msg.c_str());
         }
     }
+    TEST_CASE_TEMPLATE_APPLY(ParamSerializeTest, IntTypes);
 
-    TYPED_TEST(UniformIntDistributionTest, ViolatesPreconditionsDeathTest) {
-#if GTEST_HAS_DEATH_TEST
-        // Hi < Lo
-        EXPECT_DEBUG_DEATH({ turbo::uniform_int_distribution<TypeParam> dist(10, 1); },
-                           "");
-#endif  // GTEST_HAS_DEATH_TEST
-#if defined(NDEBUG)
-        // opt-mode, for invalid parameters, will generate a garbage value,
-        // but should not enter an infinite loop.
-        turbo::InsecureBitGen gen;
-        turbo::uniform_int_distribution<TypeParam> dist(10, 1);
-        auto x = dist(gen);
-
-        // Any value will generate a non-empty string.
-        EXPECT_FALSE(turbo::Format(+x).empty()) << x;
-#endif  // NDEBUG
-    }
-
-    TYPED_TEST(UniformIntDistributionTest, TestMoments) {
+    TEST_CASE_TEMPLATE_DEFINE("UniformIntDistributionTest", T, TestMoments) {
         constexpr int kSize = 100000;
-        using Limits = std::numeric_limits<TypeParam>;
+        using Limits = std::numeric_limits<T>;
         using param_type =
-                typename turbo::uniform_int_distribution<TypeParam>::param_type;
+                typename turbo::uniform_int_distribution<T>::param_type;
 
         // We use a fixed bit generator for distribution accuracy tests.  This allows
         // these tests to be deterministic, while still testing the quality of the
@@ -145,11 +124,11 @@ namespace {
         std::vector<double> values(kSize);
         for (const auto &param:
                 {param_type(0, Limits::max()), param_type(13, 127)}) {
-            turbo::uniform_int_distribution<TypeParam> dist(param);
+            turbo::uniform_int_distribution<T> dist(param);
             for (int i = 0; i < kSize; i++) {
                 const auto sample = dist(rng);
-                ASSERT_LE(dist.param().a(), sample);
-                ASSERT_GE(dist.param().b(), sample);
+                REQUIRE_LE(dist.param().a(), sample);
+                REQUIRE_GE(dist.param().b(), sample);
                 values[i] = sample;
             }
 
@@ -163,14 +142,16 @@ namespace {
 
             // TODO(ahh): this is not the right bound
             // empirically validated with --runs_per_test=10000.
-            EXPECT_NEAR(mean, moments.mean, 0.01 * var);
-            EXPECT_NEAR(var, moments.variance, 0.015 * var);
-            EXPECT_NEAR(0.0, moments.skewness, 0.025);
-            EXPECT_NEAR(kurtosis, moments.kurtosis, 0.02 * kurtosis);
+            REQUIRE_LE(std::abs(mean - moments.mean), 0.01 * var);
+            REQUIRE_LE(std::abs(var- moments.variance), 0.015 * var);
+            REQUIRE_LE(std::abs(0.0- moments.skewness), 0.025);
+            REQUIRE_LE(std::abs(kurtosis- moments.kurtosis), 0.02 * kurtosis);
         }
     }
 
-    TYPED_TEST(UniformIntDistributionTest, ChiSquaredTest50) {
+    TEST_CASE_TEMPLATE_APPLY(TestMoments, IntTypes);
+
+    TEST_CASE_TEMPLATE_DEFINE("UniformIntDistributionTest", T, ChiSquaredTest50) {
         using turbo::random_internal::kChiSquared;
 
         constexpr size_t kTrials = 1000;
@@ -182,15 +163,15 @@ namespace {
         const int kThreshold =
                 turbo::random_internal::ChiSquareValue(kBuckets, 0.999999);
 
-        const TypeParam min = std::is_unsigned<TypeParam>::value ? 37 : -37;
-        const TypeParam max = min + kBuckets;
+        const T min = std::is_unsigned<T>::value ? 37 : -37;
+        const T max = min + kBuckets;
 
         // We use a fixed bit generator for distribution accuracy tests.  This allows
         // these tests to be deterministic, while still testing the quality of the
         // implementation.
         turbo::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
 
-        turbo::uniform_int_distribution<TypeParam> dist(min, max);
+        turbo::uniform_int_distribution<T> dist(min, max);
 
         std::vector<int32_t> counts(kBuckets + 1, 0);
         for (size_t i = 0; i < kTrials; i++) {
@@ -209,13 +190,14 @@ namespace {
                 turbo::FormatAppend(&msg, "{}\n", a);
             }
             turbo::FormatAppend(&msg, "{} p-value {}\n", kChiSquared, p_value);
-            turbo::FormatAppend(&msg, "High {} value: {} > {}", kChiSquared, chi_square,kThreshold);
+            turbo::FormatAppend(&msg, "High {} value: {} > {}", kChiSquared, chi_square, kThreshold);
             TURBO_RAW_LOG(INFO, "%s", msg.c_str());
-            FAIL() << msg;
+            FAIL(msg);
         }
     }
+    TEST_CASE_TEMPLATE_APPLY(ChiSquaredTest50, IntTypes);
 
-    TEST(UniformIntDistributionTest, StabilityTest) {
+    TEST_CASE("UniformIntDistributionTest, StabilityTest") {
         // turbo::uniform_int_distribution stability relies only on integer operations.
         turbo::random_internal::sequence_urbg urbg(
                 {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
@@ -231,8 +213,8 @@ namespace {
                 v = dist(urbg);
             }
         }
-        EXPECT_EQ(12, urbg.invocations());
-        EXPECT_THAT(output, testing::ElementsAre(4, 4, 3, 2, 1, 0, 1, 4, 3, 1, 3, 1));
+        REQUIRE_EQ(12, urbg.invocations());
+        REQUIRE_EQ(output, std::vector<int>{4, 4, 3, 2, 1, 0, 1, 4, 3, 1, 3, 1});
 
         {
             urbg.reset();
@@ -241,9 +223,9 @@ namespace {
                 v = dist(urbg);
             }
         }
-        EXPECT_EQ(12, urbg.invocations());
-        EXPECT_THAT(output, testing::ElementsAre(97, 86, 75, 41, 36, 16, 38, 92, 67,
-                                                 30, 80, 38));
+        REQUIRE_EQ(12, urbg.invocations());
+        REQUIRE_EQ(output, std::vector<int>{97, 86, 75, 41, 36, 16, 38, 92, 67,
+                                                 30, 80, 38});
 
         {
             urbg.reset();
@@ -252,9 +234,9 @@ namespace {
                 v = dist(urbg);
             }
         }
-        EXPECT_EQ(12, urbg.invocations());
-        EXPECT_THAT(output, testing::ElementsAre(9648, 8562, 7439, 4089, 3571, 1602,
-                                                 3813, 9195, 6641, 2986, 7956, 3765));
+        REQUIRE_EQ(12, urbg.invocations());
+        REQUIRE_EQ(output, std::vector<int>{9648, 8562, 7439, 4089, 3571, 1602,
+                                                 3813, 9195, 6641, 2986, 7956, 3765});
     }
 
 }  // namespace

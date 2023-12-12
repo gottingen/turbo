@@ -1141,7 +1141,7 @@ namespace turbo::simd {
             batch<T, A> acc3 = min(acc2, step3);
             return acc3.get(0);
         }
-        // TODO: move this in xsimd_generic
+
         namespace detail {
             template<class A, class T, class = typename std::enable_if<std::is_integral<T>::value, void>::type>
             inline T hadd_default(batch<T, A> const &self, requires_arch<sse2>) noexcept {
@@ -1248,7 +1248,6 @@ namespace turbo::simd {
 
         // sadd
 
-        // TODO: move this in xsimd_generic
         namespace detail {
             template<class A, class T, class = typename std::enable_if<std::is_integral<T>::value, void>::type>
             inline batch<T, A>
@@ -1342,7 +1341,6 @@ namespace turbo::simd {
         }
 
         // ssub
-        // TODO: move this in xsimd_generic
         namespace detail {
             template<class A, class T, class = typename std::enable_if<std::is_integral<T>::value, void>::type>
             inline batch<T, A>

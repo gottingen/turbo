@@ -63,7 +63,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "turbo/base/internal/invoke.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
 #include "turbo/platform/port.h"
@@ -126,13 +125,13 @@ using RemoveCVRef =
 template <class ReturnType, class F, class... P,
           typename = std::enable_if_t<std::is_void<ReturnType>::value>>
 void InvokeR(F&& f, P&&... args) {
-  turbo::base_internal::invoke(std::forward<F>(f), std::forward<P>(args)...);
+  std::invoke(std::forward<F>(f), std::forward<P>(args)...);
 }
 
 template <class ReturnType, class F, class... P,
           std::enable_if_t<!std::is_void<ReturnType>::value, int> = 0>
 ReturnType InvokeR(F&& f, P&&... args) {
-  return turbo::base_internal::invoke(std::forward<F>(f),
+  return std::invoke(std::forward<F>(f),
                                      std::forward<P>(args)...);
 }
 
@@ -361,12 +360,12 @@ ReturnType RemoteInvoker(
 ////////////////////////////////////////////////////////////////////////////////
 //
 // A metafunction that checks if a type T is an instantiation of
-// turbo::in_place_type_t (needed for constructor constraints of AnyInvocable).
+// std::in_place_type_t (needed for constructor constraints of AnyInvocable).
 template <class T>
 struct IsInPlaceType : std::false_type {};
 
 template <class T>
-struct IsInPlaceType<turbo::in_place_type_t<T>> : std::true_type {};
+struct IsInPlaceType<std::in_place_type_t<T>> : std::true_type {};
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -463,7 +462,7 @@ class CoreImpl {
   // invocation of the Invocable. The unqualified type is the target object
   // type to be stored.
   template <class QualTRef, class... Args>
-  explicit CoreImpl(turbo::in_place_type_t<QualTRef>, Args&&... args) {
+  explicit CoreImpl(std::in_place_type_t<QualTRef>, Args&&... args) {
     InitializeStorage<QualTRef>(std::forward<Args>(args)...);
   }
 
@@ -683,7 +682,7 @@ using UnwrapStdReferenceWrapper =
 // substitution failures happen when forming the template arguments.
 template <class... T>
 using TrueAlias =
-    std::integral_constant<bool, sizeof(turbo::void_t<T...>*) != 0>;
+    std::integral_constant<bool, sizeof(std::void_t<T...>*) != 0>;
 
 /*SFINAE constraints for the conversion-constructor.*/
 template <class Sig, class F,
@@ -738,7 +737,7 @@ using CanAssignReferenceWrapper = TrueAlias<
 // don't treat non-moveable result types correctly. For example this was the
 // case in libc++ before commit c3a24882 (2022-05).
 #define TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT_true(inv_quals)      \
-  std::enable_if_t<turbo::disjunction<                                       \
+  std::enable_if_t<std::disjunction<                                       \
       std::is_nothrow_invocable_r<                                           \
           ReturnType, UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals, \
           P...>,                                                             \
@@ -747,7 +746,7 @@ using CanAssignReferenceWrapper = TrueAlias<
               UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals, P...>,  \
           std::is_same<                                                      \
               ReturnType,                                                    \
-              turbo::base_internal::invoke_result_t<                          \
+              std::invoke_result_t<                          \
                   UnwrapStdReferenceWrapper<std::decay_t<F>> inv_quals,     \
                   P...>>>>::value>
 
@@ -777,11 +776,11 @@ using CanAssignReferenceWrapper = TrueAlias<
                                                                                \
     /*SFINAE constraint to check if F is invocable with the proper signature*/ \
     template <class F>                                                         \
-    using CallIsValid = TrueAlias<std::enable_if_t<turbo::disjunction<         \
-        turbo::base_internal::is_invocable_r<ReturnType,                        \
+    using CallIsValid = TrueAlias<std::enable_if_t<std::disjunction<         \
+        std::is_invocable_r<ReturnType,                        \
                                             std::decay_t<F> inv_quals, P...>, \
         std::is_same<ReturnType,                                               \
-                     turbo::base_internal::invoke_result_t<                     \
+                     std::invoke_result_t<                     \
                          std::decay_t<F> inv_quals, P...>>>::value>>;         \
                                                                                \
     /*SFINAE constraint to check if F is nothrow-invocable when necessary*/    \
@@ -804,8 +803,8 @@ using CanAssignReferenceWrapper = TrueAlias<
                                                                                \
     /*Forward along the in-place construction parameters.*/                    \
     template <class T, class... Args>                                          \
-    explicit Impl(turbo::in_place_type_t<T>, Args&&... args)                    \
-        : Core(turbo::in_place_type<std::decay_t<T> inv_quals>,                \
+    explicit Impl(std::in_place_type_t<T>, Args&&... args)                    \
+        : Core(std::in_place_type<std::decay_t<T> inv_quals>,                \
                std::forward<Args>(args)...) {}                                 \
                                                                                \
     InvokerType<noex, ReturnType, P...>* ExtractInvoker() cv {                 \

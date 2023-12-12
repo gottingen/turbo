@@ -1,5 +1,13 @@
 turbo * c++ common library
 ====
+[Documentation](https://turbo-docs.readthedocs.io/) |
+[Acknowledge](https://turbo-docs.readthedocs.io/) |
+[Contributors](CONTRIBUTORS.md) |
+[Release Notes](NEWS.md)
+
+<div align="center">
+<img src=docs/source/image/ticon.png width=240 height=200 />
+</div>
 
 Turbo is a library of c++17 components designed with practicality
 and efficiently in mind. However, it seems like stl, but it just 

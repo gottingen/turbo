@@ -155,7 +155,7 @@ namespace turbo {
         template<typename T>
         struct pair_adaptor<
                 T,
-                conditional_t<false, void_t<typename T::value_type::first_type, typename T::value_type::second_type>, void>>
+                conditional_t<false, std::void_t<typename T::value_type::first_type, typename T::value_type::second_type>, void>>
                 : std::true_type {
             using value_type = typename T::value_type;
             using first_type = typename std::remove_const<typename value_type::first_type>::type;
@@ -282,7 +282,7 @@ namespace turbo {
         struct is_mutable_container<
                 T,
                 conditional_t<false,
-                        void_t<typename T::value_type,
+                        std::void_t<typename T::value_type,
                                 decltype(std::declval<T>().end()),
                                 decltype(std::declval<T>().clear()),
                                 decltype(std::declval<T>().insert(std::declval<decltype(std::declval<T>().end())>(),
@@ -302,7 +302,7 @@ namespace turbo {
         template<typename T>
         struct is_readable_container<
                 T,
-                conditional_t<false, void_t<decltype(std::declval<T>().end()), decltype(std::declval<T>().begin())>, void>>
+                conditional_t<false, std::void_t<decltype(std::declval<T>().end()), decltype(std::declval<T>().begin())>, void>>
                 : public std::true_type {
         };
 
@@ -313,7 +313,7 @@ namespace turbo {
 
         // check if an object is a wrapper (it has a value_type defined)
         template<typename T>
-        struct is_wrapper<T, conditional_t<false, void_t<typename T::value_type>, void>> : public std::true_type {
+        struct is_wrapper<T, conditional_t<false, std::void_t<typename T::value_type>, void>> : public std::true_type {
         };
 
         // Check for tuple like types, as in classes with a tuple_size type trait

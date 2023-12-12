@@ -23,38 +23,36 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
-// `sequence_urbg` is a simple random number generator which meets the
-// requirements of [rand.req.urbg], and is solely for testing turbo
-// distributions.
-class sequence_urbg {
- public:
-  using result_type = uint64_t;
+    // `sequence_urbg` is a simple random number generator which meets the
+    // requirements of [rand.req.urbg], and is solely for testing turbo
+    // distributions.
+    class sequence_urbg {
+    public:
+        using result_type = uint64_t;
 
-  static constexpr result_type(min)() {
-    return (std::numeric_limits<result_type>::min)();
-  }
-  static constexpr result_type(max)() {
-    return (std::numeric_limits<result_type>::max)();
-  }
+        static constexpr result_type (min)() {
+            return (std::numeric_limits<result_type>::min)();
+        }
 
-  sequence_urbg(std::initializer_list<result_type> data) : i_(0), data_(data) {}
-  void reset() { i_ = 0; }
+        static constexpr result_type (max)() {
+            return (std::numeric_limits<result_type>::max)();
+        }
 
-  result_type operator()() { return data_[i_++ % data_.size()]; }
+        sequence_urbg(std::initializer_list<result_type> data) : i_(0), data_(data) {}
 
-  size_t invocations() const { return i_; }
+        void reset() { i_ = 0; }
 
- private:
-  size_t i_;
-  std::vector<result_type> data_;
-};
+        result_type operator()() { return data_[i_++ % data_.size()]; }
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        size_t invocations() const { return i_; }
+
+    private:
+        size_t i_;
+        std::vector<result_type> data_;
+    };
+
+}  // namespace turbo::random_internal
 
 #endif  // TURBO_RANDOM_INTERNAL_SEQUENCE_URBG_H_

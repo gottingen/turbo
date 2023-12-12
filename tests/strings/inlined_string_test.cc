@@ -37,7 +37,7 @@ using namespace turbo;
 
 namespace {
 
-    static const int seed = turbo::ToUnixSeconds(turbo::Now());
+    static const int seed = turbo::to_unix_seconds(turbo::time_now());
     using RandomT = std::mt19937;
     static RandomT rng(seed);
     static const size_t maxString = 100;

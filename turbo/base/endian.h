@@ -25,11 +25,6 @@
 #include "turbo/platform/port.h"
 
 
-/**
-* @defgroup turbo_base_endian base functions
-*
-*/
-
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
 
@@ -74,6 +69,12 @@ namespace turbo {
 #endif
     }
 
+    enum class EndianNess {
+        SYS_LITTLE_ENDIAN,
+        SYS_BIG_ENDIAN
+    };
+
+
 #if TURBO_IS_LITTLE_ENDIAN
 
     /**
@@ -83,6 +84,7 @@ namespace turbo {
 
     static constexpr bool kIsLittleEndian = true;
 
+    static constexpr EndianNess kEndianNess = EndianNess::SYS_LITTLE_ENDIAN;
     /**
      * @ingroup turbo_base_endian
      * @brief Convert a 16-bit quantity from host byte order to network byte order.
@@ -115,9 +117,9 @@ namespace turbo {
      * @return True if the host is little-endian, false otherwise
      */
     static constexpr bool kIsLittleEndian = false;
-    // Portable definitions for htonl (host-to-network) etc on big-endian
-    // architectures. These definitions are simpler since the host byte order is the
-    // same as network byte order.
+
+    static constexpr EndianNess kEndianNess = EndianNess::SYS_BIG_ENDIAN;
+
     /**
      * @ingroup turbo_base_endian
      * @brief Convert a 16-bit quantity from host byte order to network byte order.
@@ -147,6 +149,36 @@ namespace turbo {
     "Unsupported byte order: Either TURBO_IS_BIG_ENDIAN or " \
        "TURBO_IS_LITTLE_ENDIAN must be defined"
 #endif  // byte order
+
+    /**
+     * @ingroup turbo_base_endian
+     * @brief Determine if the given endian is big-endian.
+     * @param e The endian to check
+     * @return True if the endian is big-endian, false otherwise
+     */
+    constexpr bool is_big_endian(EndianNess e) {
+        return e == EndianNess::SYS_BIG_ENDIAN;
+    }
+
+    /**
+     * @ingroup turbo_base_endian
+     * @brief Determine if the given endian is little-endian.
+     * @param e The endian to check
+     * @return True if the endian is little-endian, false otherwise
+     */
+    constexpr bool is_little_endian(EndianNess e) {
+        return e == EndianNess::SYS_LITTLE_ENDIAN;
+    }
+
+    /**
+     * @ingroup turbo_base_endian
+     * @brief Determine if the given endian is the same as the current host.
+     * @param e The endian to check
+     * @return True if the endian is the same as the current host, false otherwise
+     */
+    constexpr bool match_system(EndianNess e) {
+        return e == kEndianNess;
+    }
 
     /**
      * @ingroup turbo_base_endian

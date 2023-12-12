@@ -106,7 +106,7 @@ carbin_cc_library(
         turbo
         NAME
         exception_testing
-        HDRS
+        HEADERS
         "exception_testing.h"
         COPTS
         ${TURBO_DEFAULT_COPTS}
@@ -122,7 +122,7 @@ carbin_cc_library(
         turbo
         NAME
         exception_safety_testing
-        HDRS
+        HEADERS
         "exception_safety_testing.h"
         SOURCES
         "exception_safety_testing.cc"
@@ -179,20 +179,6 @@ carbin_cc_test(
         ${GTEST_MAIN_LIB}
 )
 
-
-carbin_cc_test(
-        NAME
-        invoke_test
-        SOURCES
-        "invoke_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
-)
 
 
 carbin_cc_test(

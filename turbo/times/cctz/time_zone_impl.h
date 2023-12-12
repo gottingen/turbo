@@ -24,70 +24,66 @@
 #include "turbo/times/cctz/civil_time.h"
 #include "turbo/times/cctz/time_zone.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
 
-// time_zone::Impl is the internal object referenced by a cctz::time_zone.
-class time_zone::Impl {
- public:
-  // The UTC time zone. Also used for other time zones that fail to load.
-  static time_zone UTC();
+    // time_zone::Impl is the internal object referenced by a cctz::time_zone.
+    class time_zone::Impl {
+    public:
+        // The UTC time zone. Also used for other time zones that fail to load.
+        static time_zone UTC();
 
-  // Load a named time zone. Returns false if the name is invalid, or if
-  // some other kind of error occurs. Note that loading "UTC" never fails.
-  static bool LoadTimeZone(const std::string& name, time_zone* tz);
+        // Load a named time zone. Returns false if the name is invalid, or if
+        // some other kind of error occurs. Note that loading "UTC" never fails.
+        static bool load_time_zone(const std::string &name, time_zone *tz);
 
-  // Clears the map of cached time zones.  Primarily for use in benchmarks
-  // that gauge the performance of loading/parsing the time-zone data.
-  static void ClearTimeZoneMapTestOnly();
+        // Clears the map of cached time zones.  Primarily for use in benchmarks
+        // that gauge the performance of loading/parsing the time-zone data.
+        static void ClearTimeZoneMapTestOnly();
 
-  // The primary key is the time-zone ID (e.g., "America/New_York").
-  const std::string& Name() const {
-    // TODO: It would nice if the zoneinfo data included the zone name.
-    return name_;
-  }
+        // The primary key is the time-zone ID (e.g., "America/New_York").
+        const std::string &Name() const {
+            // TODO: It would nice if the zoneinfo data included the zone name.
+            return name_;
+        }
 
-  // Breaks a time_point down to civil-time components in this time zone.
-  time_zone::absolute_lookup BreakTime(const time_point<seconds>& tp) const {
-    return zone_->BreakTime(tp);
-  }
+        // Breaks a time_point down to civil-time components in this time zone.
+        time_zone::absolute_lookup BreakTime(const time_point<seconds> &tp) const {
+            return zone_->BreakTime(tp);
+        }
 
-  // Converts the civil-time components in this time zone into a time_point.
-  // That is, the opposite of BreakTime(). The requested civil time may be
-  // ambiguous or illegal due to a change of UTC offset.
-  time_zone::civil_lookup MakeTime(const civil_second& cs) const {
-    return zone_->MakeTime(cs);
-  }
+        // Converts the civil-time components in this time zone into a time_point.
+        // That is, the opposite of BreakTime(). The requested civil time may be
+        // ambiguous or illegal due to a change of UTC offset.
+        time_zone::civil_lookup MakeTime(const civil_second &cs) const {
+            return zone_->MakeTime(cs);
+        }
 
-  // Finds the time of the next/previous offset change in this time zone.
-  bool NextTransition(const time_point<seconds>& tp,
-                      time_zone::civil_transition* trans) const {
-    return zone_->NextTransition(tp, trans);
-  }
-  bool PrevTransition(const time_point<seconds>& tp,
-                      time_zone::civil_transition* trans) const {
-    return zone_->PrevTransition(tp, trans);
-  }
+        // Finds the time of the next/previous offset change in this time zone.
+        bool NextTransition(const time_point<seconds> &tp,
+                            time_zone::civil_transition *trans) const {
+            return zone_->NextTransition(tp, trans);
+        }
 
-  // Returns an implementation-defined version string for this time zone.
-  std::string Version() const { return zone_->Version(); }
+        bool PrevTransition(const time_point<seconds> &tp,
+                            time_zone::civil_transition *trans) const {
+            return zone_->PrevTransition(tp, trans);
+        }
 
-  // Returns an implementation-defined description of this time zone.
-  std::string Description() const { return zone_->Description(); }
+        // Returns an implementation-defined version string for this time zone.
+        std::string Version() const { return zone_->Version(); }
 
- private:
-  explicit Impl(const std::string& name);
-  static const Impl* UTCImpl();
+        // Returns an implementation-defined description of this time zone.
+        std::string Description() const { return zone_->Description(); }
 
-  const std::string name_;
-  std::unique_ptr<TimeZoneIf> zone_;
-};
+    private:
+        explicit Impl(const std::string &name);
 
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        static const Impl *UTCImpl();
+
+        const std::string name_;
+        std::unique_ptr<TimeZoneIf> zone_;
+    };
+
+}  // namespace turbo::time_internal::cctz
 
 #endif  // TURBO_TIME_INTERNAL_CCTZ_TIME_ZONE_IMPL_H_

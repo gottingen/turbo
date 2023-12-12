@@ -30,67 +30,66 @@
 #include "turbo/platform/port.h"
 #include "turbo/random/internal/traits.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
+namespace turbo::random_internal {
 
-// wide_multiply<T> multiplies two N-bit values to a 2N-bit result.
-template <typename UIntType>
-struct wide_multiply {
-  static constexpr size_t kN = std::numeric_limits<UIntType>::digits;
-  using input_type = UIntType;
-  using result_type = typename random_internal::unsigned_bits<kN * 2>::type;
+    // wide_multiply<T> multiplies two N-bit values to a 2N-bit result.
+    template<typename UIntType>
+    struct wide_multiply {
+        static constexpr size_t kN = std::numeric_limits<UIntType>::digits;
+        using input_type = UIntType;
+        using result_type = typename random_internal::unsigned_bits<kN * 2>::type;
 
-  static result_type multiply(input_type a, input_type b) {
-    return static_cast<result_type>(a) * b;
-  }
+        static result_type multiply(input_type a, input_type b) {
+            return static_cast<result_type>(a) * b;
+        }
 
-  static input_type hi(result_type r) {
-    return static_cast<input_type>(r >> kN);
-  }
-  static input_type lo(result_type r) { return static_cast<input_type>(r); }
+        static input_type hi(result_type r) {
+            return static_cast<input_type>(r >> kN);
+        }
 
-  static_assert(std::is_unsigned<UIntType>::value,
-                "Class-template wide_multiply<> argument must be unsigned.");
-};
+        static input_type lo(result_type r) { return static_cast<input_type>(r); }
 
-// MultiplyU128ToU256 multiplies two 128-bit values to a 256-bit value.
-inline U256 MultiplyU128ToU256(uint128 a, uint128 b) {
-  const uint128 a00 = static_cast<uint64_t>(a);
-  const uint128 a64 = a >> 64;
-  const uint128 b00 = static_cast<uint64_t>(b);
-  const uint128 b64 = b >> 64;
+        static_assert(std::is_unsigned<UIntType>::value,
+                      "Class-template wide_multiply<> argument must be unsigned.");
+    };
 
-  const uint128 c00 = a00 * b00;
-  const uint128 c64a = a00 * b64;
-  const uint128 c64b = a64 * b00;
-  const uint128 c128 = a64 * b64;
+    // MultiplyU128ToU256 multiplies two 128-bit values to a 256-bit value.
+    inline U256 MultiplyU128ToU256(uint128 a, uint128 b) {
+        const uint128 a00 = static_cast<uint64_t>(a);
+        const uint128 a64 = a >> 64;
+        const uint128 b00 = static_cast<uint64_t>(b);
+        const uint128 b64 = b >> 64;
 
-  const uint64_t carry =
-      static_cast<uint64_t>(((c00 >> 64) + static_cast<uint64_t>(c64a) +
-                             static_cast<uint64_t>(c64b)) >>
-                            64);
+        const uint128 c00 = a00 * b00;
+        const uint128 c64a = a00 * b64;
+        const uint128 c64b = a64 * b00;
+        const uint128 c128 = a64 * b64;
 
-  return {c128 + (c64a >> 64) + (c64b >> 64) + carry,
-          c00 + (c64a << 64) + (c64b << 64)};
-}
+        const uint64_t carry =
+                static_cast<uint64_t>(((c00 >> 64) + static_cast<uint64_t>(c64a) +
+                                       static_cast<uint64_t>(c64b)) >>
+                                                                    64);
+
+        return {c128 + (c64a >> 64) + (c64b >> 64) + carry,
+                c00 + (c64a << 64) + (c64b << 64)};
+    }
 
 
-template <>
-struct wide_multiply<uint128> {
-  using input_type = uint128;
-  using result_type = U256;
+    template<>
+    struct wide_multiply<uint128> {
+        using input_type = uint128;
+        using result_type = U256;
 
-  static result_type multiply(input_type a, input_type b) {
-    return MultiplyU128ToU256(a, b);
-  }
+        static result_type multiply(input_type a, input_type b) {
+            return MultiplyU128ToU256(a, b);
+        }
 
-  static input_type hi(result_type r) { return r.hi; }
-  static input_type lo(result_type r) { return r.lo; }
-};
+        static input_type hi(result_type r) { return r.hi; }
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        static input_type lo(result_type r) { return r.lo; }
+    };
+
+
+}  // namespace turbo::random_internal
 
 #endif  // TURBO_RANDOM_INTERNAL_WIDE_MULTIPLY_H_

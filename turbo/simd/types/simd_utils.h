@@ -334,20 +334,6 @@ namespace turbo::simd {
         }
     }
 
-    /*********************************
-     * Backport of void_t from C++17 *
-     *********************************/
-
-    namespace detail {
-        template<class... T>
-        struct make_void {
-            using type = void;
-        };
-
-        template<class... T>
-        using void_t = typename make_void<T...>::type;
-    }
-
     /**************************************************
      * Equivalent of void_t but with size_t parameter *
      **************************************************/

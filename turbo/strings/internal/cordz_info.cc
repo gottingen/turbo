@@ -312,7 +312,7 @@ CordzInfo::CordzInfo(CordRep* rep,
       parent_stack_depth_(FillParentStack(src, parent_stack_)),
       method_(method),
       parent_method_(GetParentMethod(src)),
-      create_time_(turbo::Now()) {
+      create_time_(turbo::time_now()) {
   update_tracker_.LossyAdd(method);
   if (src) {
     // Copy parent counters.

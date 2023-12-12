@@ -1828,7 +1828,7 @@ namespace turbo {
             };
 
             template<template<typename> class C, class Table>
-            struct VerifyResultOf<C, Table, turbo::void_t<C<Table>>> : std::true_type {
+            struct VerifyResultOf<C, Table, std::void_t<C<Table>>> : std::true_type {
             };
 
             TEST(Table, HeterogeneousLookupOverloads) {

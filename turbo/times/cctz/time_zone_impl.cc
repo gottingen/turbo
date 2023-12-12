@@ -24,90 +24,85 @@
 #include "time_zone_fixed.h"
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
 
-namespace {
+    namespace {
 
-// time_zone::Impls are linked into a map to support fast lookup by name.
-using TimeZoneImplByName =
-    std::unordered_map<std::string, const time_zone::Impl*>;
-TimeZoneImplByName* time_zone_map = nullptr;
+        // time_zone::Impls are linked into a map to support fast lookup by name.
+        using TimeZoneImplByName =
+                std::unordered_map<std::string, const time_zone::Impl *>;
+        TimeZoneImplByName *time_zone_map = nullptr;
 
-// Mutual exclusion for time_zone_map.
-std::mutex& TimeZoneMutex() {
-  // This mutex is intentionally "leaked" to avoid the static deinitialization
-  // order fiasco (std::mutex's destructor is not trivial on many platforms).
-  static std::mutex* time_zone_mutex = new std::mutex;
-  return *time_zone_mutex;
-}
+        // Mutual exclusion for time_zone_map.
+        std::mutex &TimeZoneMutex() {
+            // This mutex is intentionally "leaked" to avoid the static deinitialization
+            // order fiasco (std::mutex's destructor is not trivial on many platforms).
+            static std::mutex *time_zone_mutex = new std::mutex;
+            return *time_zone_mutex;
+        }
 
-}  // namespace
+    }  // namespace
 
-time_zone time_zone::Impl::UTC() { return time_zone(UTCImpl()); }
+    time_zone time_zone::Impl::UTC() { return time_zone(UTCImpl()); }
 
-bool time_zone::Impl::LoadTimeZone(const std::string& name, time_zone* tz) {
-  const Impl* const utc_impl = UTCImpl();
+    bool time_zone::Impl::load_time_zone(const std::string &name, time_zone *tz) {
+        const Impl *const utc_impl = UTCImpl();
 
-  // Check for UTC (which is never a key in time_zone_map).
-  auto offset = seconds::zero();
-  if (FixedOffsetFromName(name, &offset) && offset == seconds::zero()) {
-    *tz = time_zone(utc_impl);
-    return true;
-  }
+        // Check for UTC (which is never a key in time_zone_map).
+        auto offset = seconds::zero();
+        if (FixedOffsetFromName(name, &offset) && offset == seconds::zero()) {
+            *tz = time_zone(utc_impl);
+            return true;
+        }
 
-  // Check whether the time zone has already been loaded.
-  {
-    std::lock_guard<std::mutex> lock(TimeZoneMutex());
-    if (time_zone_map != nullptr) {
-      TimeZoneImplByName::const_iterator itr = time_zone_map->find(name);
-      if (itr != time_zone_map->end()) {
-        *tz = time_zone(itr->second);
-        return itr->second != utc_impl;
-      }
+        // Check whether the time zone has already been loaded.
+        {
+            std::lock_guard<std::mutex> lock(TimeZoneMutex());
+            if (time_zone_map != nullptr) {
+                TimeZoneImplByName::const_iterator itr = time_zone_map->find(name);
+                if (itr != time_zone_map->end()) {
+                    *tz = time_zone(itr->second);
+                    return itr->second != utc_impl;
+                }
+            }
+        }
+
+        // Load the new time zone (outside the lock).
+        std::unique_ptr<const Impl> new_impl(new Impl(name));
+
+        // Add the new time zone to the map.
+        std::lock_guard<std::mutex> lock(TimeZoneMutex());
+        if (time_zone_map == nullptr) time_zone_map = new TimeZoneImplByName;
+        const Impl *&impl = (*time_zone_map)[name];
+        if (impl == nullptr) {  // this thread won any load race
+            impl = new_impl->zone_ ? new_impl.release() : utc_impl;
+        }
+        *tz = time_zone(impl);
+        return impl != utc_impl;
     }
-  }
 
-  // Load the new time zone (outside the lock).
-  std::unique_ptr<const Impl> new_impl(new Impl(name));
-
-  // Add the new time zone to the map.
-  std::lock_guard<std::mutex> lock(TimeZoneMutex());
-  if (time_zone_map == nullptr) time_zone_map = new TimeZoneImplByName;
-  const Impl*& impl = (*time_zone_map)[name];
-  if (impl == nullptr) {  // this thread won any load race
-    impl = new_impl->zone_ ? new_impl.release() : utc_impl;
-  }
-  *tz = time_zone(impl);
-  return impl != utc_impl;
-}
-
-void time_zone::Impl::ClearTimeZoneMapTestOnly() {
-  std::lock_guard<std::mutex> lock(TimeZoneMutex());
-  if (time_zone_map != nullptr) {
-    // Existing time_zone::Impl* entries are in the wild, so we can't delete
-    // them. Instead, we move them to a private container, where they are
-    // logically unreachable but not "leaked".  Future requests will result
-    // in reloading the data.
-    static auto* cleared = new std::deque<const time_zone::Impl*>;
-    for (const auto& element : *time_zone_map) {
-      cleared->push_back(element.second);
+    void time_zone::Impl::ClearTimeZoneMapTestOnly() {
+        std::lock_guard<std::mutex> lock(TimeZoneMutex());
+        if (time_zone_map != nullptr) {
+            // Existing time_zone::Impl* entries are in the wild, so we can't delete
+            // them. Instead, we move them to a private container, where they are
+            // logically unreachable but not "leaked".  Future requests will result
+            // in reloading the data.
+            static auto *cleared = new std::deque<const time_zone::Impl *>;
+            for (const auto &element: *time_zone_map) {
+                cleared->push_back(element.second);
+            }
+            time_zone_map->clear();
+        }
     }
-    time_zone_map->clear();
-  }
-}
 
-time_zone::Impl::Impl(const std::string& name)
-    : name_(name), zone_(TimeZoneIf::Load(name_)) {}
+    time_zone::Impl::Impl(const std::string &name)
+            : name_(name), zone_(TimeZoneIf::Load(name_)) {}
 
-const time_zone::Impl* time_zone::Impl::UTCImpl() {
-  static const Impl* utc_impl = new Impl("UTC");  // never fails
-  return utc_impl;
-}
+    const time_zone::Impl *time_zone::Impl::UTCImpl() {
+        static const Impl *utc_impl = new Impl("UTC");  // never fails
+        return utc_impl;
+    }
 
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+
+}  // namespace turbo::time_internal::cctz

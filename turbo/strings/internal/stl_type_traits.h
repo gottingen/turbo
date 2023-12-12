@@ -66,7 +66,7 @@ using IsBitset = IsBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsSTLContainer
-    : turbo::disjunction<
+    : std::disjunction<
           IsArray<C>, IsBitset<C>, IsSpecialization<C, std::deque>,
           IsSpecialization<C, std::forward_list>,
           IsSpecialization<C, std::list>, IsSpecialization<C, std::map>,
@@ -85,20 +85,20 @@ struct IsBaseOfSpecializationImpl : std::false_type {};
 // template.
 template <typename C, template <typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
-    C, T, turbo::void_t<typename C::value_type, typename C::allocator_type>>
+    C, T, std::void_t<typename C::value_type, typename C::allocator_type>>
     : std::is_base_of<C,
                       T<typename C::value_type, typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::key_compare,
+    std::void_t<typename C::key_type, typename C::key_compare,
                  typename C::allocator_type>>
     : std::is_base_of<C, T<typename C::key_type, typename C::key_compare,
                            typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::key_compare, typename C::allocator_type>>
     : std::is_base_of<C,
                       T<typename C::key_type, typename C::mapped_type,
@@ -107,7 +107,7 @@ struct IsBaseOfSpecializationImpl<
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::hasher,
+    std::void_t<typename C::key_type, typename C::hasher,
                  typename C::key_equal, typename C::allocator_type>>
     : std::is_base_of<C, T<typename C::key_type, typename C::hasher,
                            typename C::key_equal, typename C::allocator_type>> {
@@ -116,7 +116,7 @@ template <typename C,
           template <typename, typename, typename, typename, typename> class T>
 struct IsBaseOfSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::hasher, typename C::key_equal,
                  typename C::allocator_type>>
     : std::is_base_of<C, T<typename C::key_type, typename C::mapped_type,
@@ -142,7 +142,7 @@ using IsBaseOfBitset = IsBaseOfBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsBaseOfSTLContainer
-    : turbo::disjunction<IsBaseOfArray<C>, IsBaseOfBitset<C>,
+    : std::disjunction<IsBaseOfArray<C>, IsBaseOfBitset<C>,
                         IsBaseOfSpecialization<C, std::deque>,
                         IsBaseOfSpecialization<C, std::forward_list>,
                         IsBaseOfSpecialization<C, std::list>,
@@ -163,20 +163,20 @@ struct IsConvertibleToSpecializationImpl : std::false_type {};
 // STL template.
 template <typename C, template <typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
-    C, T, turbo::void_t<typename C::value_type, typename C::allocator_type>>
+    C, T, std::void_t<typename C::value_type, typename C::allocator_type>>
     : std::is_convertible<
           C, T<typename C::value_type, typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::key_compare,
+    std::void_t<typename C::key_type, typename C::key_compare,
                  typename C::allocator_type>>
     : std::is_convertible<C, T<typename C::key_type, typename C::key_compare,
                                typename C::allocator_type>> {};
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::key_compare, typename C::allocator_type>>
     : std::is_convertible<
           C, T<typename C::key_type, typename C::mapped_type,
@@ -184,7 +184,7 @@ struct IsConvertibleToSpecializationImpl<
 template <typename C, template <typename, typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::hasher,
+    std::void_t<typename C::key_type, typename C::hasher,
                  typename C::key_equal, typename C::allocator_type>>
     : std::is_convertible<
           C, T<typename C::key_type, typename C::hasher, typename C::key_equal,
@@ -193,7 +193,7 @@ template <typename C,
           template <typename, typename, typename, typename, typename> class T>
 struct IsConvertibleToSpecializationImpl<
     C, T,
-    turbo::void_t<typename C::key_type, typename C::mapped_type,
+    std::void_t<typename C::key_type, typename C::mapped_type,
                  typename C::hasher, typename C::key_equal,
                  typename C::allocator_type>>
     : std::is_convertible<C, T<typename C::key_type, typename C::mapped_type,
@@ -221,7 +221,7 @@ using IsConvertibleToBitset = IsConvertibleToBitsetImpl<std::decay_t<C>>;
 
 template <typename C>
 struct IsConvertibleToSTLContainer
-    : turbo::disjunction<
+    : std::disjunction<
           IsConvertibleToArray<C>, IsConvertibleToBitset<C>,
           IsConvertibleToSpecialization<C, std::deque>,
           IsConvertibleToSpecialization<C, std::forward_list>,
@@ -238,7 +238,7 @@ struct IsConvertibleToSTLContainer
 
 template <typename C>
 struct IsStrictlyBaseOfAndConvertibleToSTLContainer
-    : turbo::conjunction<turbo::negation<IsSTLContainer<C>>,
+    : std::conjunction<std::negation<IsSTLContainer<C>>,
                         IsBaseOfSTLContainer<C>,
                         IsConvertibleToSTLContainer<C>> {};
 

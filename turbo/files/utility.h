@@ -43,9 +43,11 @@ namespace turbo {
         // ".mylog" => (".mylog". "")
         // "my_folder/.mylog" => ("my_folder/.mylog", "")
         // "my_folder/.mylog.txt" => ("my_folder/.mylog", ".txt")
+
         static std::tuple<std::string, std::string> split_by_extension(const std::string &fname);
 
         /**
+         * @ingroup turbo_files_utility
          * @brief get file md5 sum.
          * @param path [input] file path
          * @param size [output] file size that is calculated.
@@ -66,6 +68,7 @@ namespace turbo {
         static turbo::ResultStatus<std::string> md5_sum_file(const std::string_view &path, int64_t *size = nullptr);
 
         /**
+         * @ingroup turbo_files_utility
          * @brief get file sha1 sum.
          * @param path [input] file path
          * @param size [output] file size that is calculated.
@@ -86,6 +89,7 @@ namespace turbo {
         static turbo::ResultStatus<std::string> sha1_sum_file(const std::string_view &path, int64_t *size = nullptr);
 
         /**
+         * @ingroup turbo_files_utility
          * @brief list files in the specified directory.
          *        If the directory does not exist, it will be returned with an error.
          *        If the directory is not a directory, it will be returned with an error.
@@ -101,6 +105,7 @@ namespace turbo {
         static turbo::Status list_files(const std::string_view &root_path,std::vector<std::string> &result, bool full_path = true) noexcept;
 
         /**
+         * @ingroup turbo_files_utility
          * @brief list directories in the specified directory.
          *        If the directory does not exist, it will be returned with an error.
          *        If the directory is not a directory, it will be returned with an error.
@@ -116,6 +121,7 @@ namespace turbo {
         static turbo::Status list_directories(const std::string_view &root_path,std::vector<std::string> &result, bool full_path = true) noexcept;
 
         /**
+         * @ingroup turbo_files_utility
          * @brief read file content.
          * @param file_path [input] file path
          * @param result [output] file content
@@ -125,6 +131,7 @@ namespace turbo {
         static turbo::Status read_file(const std::string_view &file_path, std::string &result, bool append = false) noexcept;
 
         /**
+         * @ingroup turbo_files_utility
          * @brief write file content.
          * @param file_path [input] file path
          * @param content [input] file content

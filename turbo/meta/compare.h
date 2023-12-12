@@ -651,7 +651,7 @@ namespace turbo {
 
         template<
                 typename Compare, typename K, typename LK,
-                std::enable_if_t<!std::is_same<bool, turbo::result_of_t<Compare(
+                std::enable_if_t<!std::is_same<bool, std::result_of_t<Compare(
                         const K &, const LK &)>>::value,
                         int> = 0>
         constexpr turbo::weak_ordering do_three_way_comparison(const Compare &compare,
@@ -661,7 +661,7 @@ namespace turbo {
 
         template<
                 typename Compare, typename K, typename LK,
-                std::enable_if_t<std::is_same<bool, turbo::result_of_t<Compare(
+                std::enable_if_t<std::is_same<bool, std::result_of_t<Compare(
                         const K &, const LK &)>>::value,
                         int> = 0>
         constexpr turbo::weak_ordering do_three_way_comparison(const Compare &compare,

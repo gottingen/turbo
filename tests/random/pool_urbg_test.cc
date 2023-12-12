@@ -31,7 +31,7 @@ namespace {
 
 // is_randen_pool trait is true when parameterized by an RandenPool
 template <typename T>
-using is_randen_pool = typename turbo::disjunction<  //
+using is_randen_pool = typename std::disjunction<  //
     std::is_same<T, RandenPool<uint8_t>>,           //
     std::is_same<T, RandenPool<uint16_t>>,          //
     std::is_same<T, RandenPool<uint32_t>>,          //
@@ -39,7 +39,7 @@ using is_randen_pool = typename turbo::disjunction<  //
 
 // MyFill either calls RandenPool::Fill() or std::generate(..., rng)
 template <typename T, typename V>
-typename std::enable_if_t<turbo::negation<is_randen_pool<T>>::value, void>  //
+typename std::enable_if_t<std::negation<is_randen_pool<T>>::value, void>  //
 MyFill(T& rng, turbo::Span<V> data) {  // NOLINT(runtime/references)
   std::generate(std::begin(data), std::end(data), rng);
 }

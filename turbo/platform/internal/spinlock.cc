@@ -119,7 +119,7 @@ void SpinLock::SlowLock() {
   // it.  Record the current timestamp in the local variable wait_start_time
   // so the total wait time can be stored in the lockword once this thread
   // obtains the lock.
-  int64_t wait_start_time = CycleClock::Now();
+  int64_t wait_start_time = CycleClock::time_now();
   uint32_t wait_cycles = 0;
   int lock_wait_call_count = 0;
   while ((lock_value & kSpinLockHeld) != 0) {
@@ -164,7 +164,7 @@ void SpinLock::SlowLock() {
     // Spin again after returning from the wait routine to give this thread
     // some chance of obtaining the lock.
     lock_value = SpinLoop();
-    wait_cycles = EncodeWaitCycles(wait_start_time, CycleClock::Now());
+    wait_cycles = EncodeWaitCycles(wait_start_time, CycleClock::time_now());
     lock_value = TryLockInternal(lock_value, wait_cycles);
   }
 }

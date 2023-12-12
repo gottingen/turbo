@@ -8,9 +8,9 @@ string module
 
 .. toctree::
 
-    strings_ascii
-    strings_convert
-    strings_trim
-    strings_match
-    strings_split
-    strings_replace
+    strings/strings_ascii
+    strings/strings_convert
+    strings/strings_trim
+    strings/strings_match
+    strings/strings_split
+    strings/strings_replace

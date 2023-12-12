@@ -42,7 +42,7 @@ class ConstBitGen {
 
 namespace {
 
-int FnTest(turbo::BitGenRef gen_ref) { return turbo::Uniform(gen_ref, 1, 7); }
+int FnTest(turbo::BitGenRef gen_ref) { return turbo::uniform(gen_ref, 1, 7); }
 
 template <typename T>
 class BitGenRefTest : public testing::Test {};

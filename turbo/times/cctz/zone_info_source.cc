@@ -16,38 +16,31 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz {
+namespace turbo::time_internal::cctz {
+
 
 // Defined out-of-line to avoid emitting a weak vtable in all TUs.
-ZoneInfoSource::~ZoneInfoSource() {}
-std::string ZoneInfoSource::Version() const { return std::string(); }
+    ZoneInfoSource::~ZoneInfoSource() {}
 
-}  // namespace cctz
-}  // namespace time_internal
-TURBO_NAMESPACE_END
+    std::string ZoneInfoSource::Version() const { return std::string(); }
+
 }  // namespace turbo
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-namespace cctz_extension {
+namespace turbo::time_internal::cctz_extension {
 
-namespace {
+    namespace {
 
-// A default for cctz_extension::zone_info_source_factory, which simply
-// defers to the fallback factory.
-std::unique_ptr<turbo::time_internal::cctz::ZoneInfoSource> DefaultFactory(
-    const std::string& name,
-    const std::function<
-        std::unique_ptr<turbo::time_internal::cctz::ZoneInfoSource>(
-            const std::string& name)>& fallback_factory) {
-  return fallback_factory(name);
-}
+        // A default for cctz_extension::zone_info_source_factory, which simply
+        // defers to the fallback factory.
+        std::unique_ptr<turbo::time_internal::cctz::ZoneInfoSource> DefaultFactory(
+                const std::string &name,
+                const std::function<
+                        std::unique_ptr<turbo::time_internal::cctz::ZoneInfoSource>(
+                                const std::string &name)> &fallback_factory) {
+            return fallback_factory(name);
+        }
 
-}  // namespace
+    }  // namespace
 
 // A "weak" definition for cctz_extension::zone_info_source_factory.
 // The user may override this with their own "strong" definition (see
@@ -60,12 +53,12 @@ std::unique_ptr<turbo::time_internal::cctz::ZoneInfoSource> DefaultFactory(
 // pass "#pragma comment(linker, ...)" to the Windows linker.
 #if (__has_attribute(weak) || defined(__GNUC__)) && !defined(__MINGW32__) && \
     !defined(__CYGWIN__)
-ZoneInfoSourceFactory zone_info_source_factory __attribute__((weak)) =
-    DefaultFactory;
+    ZoneInfoSourceFactory zone_info_source_factory __attribute__((weak)) =
+            DefaultFactory;
 #elif defined(_MSC_VER) && !defined(__MINGW32__) && !defined(_LIBCPP_VERSION)
-extern ZoneInfoSourceFactory zone_info_source_factory;
-extern ZoneInfoSourceFactory default_factory;
-ZoneInfoSourceFactory default_factory = DefaultFactory;
+    extern ZoneInfoSourceFactory zone_info_source_factory;
+    extern ZoneInfoSourceFactory default_factory;
+    ZoneInfoSourceFactory default_factory = DefaultFactory;
 #if defined(_M_IX86) || defined(_M_ARM)
 #pragma comment(                                                                                                                 \
         linker,                                                                                                                  \
@@ -106,11 +99,9 @@ ZoneInfoSourceFactory default_factory = DefaultFactory;
 #error Unsupported MSVC platform
 #endif  // _M_<PLATFORM>
 #else
-// Make it a "strong" definition if we have no other choice.
-ZoneInfoSourceFactory zone_info_source_factory = DefaultFactory;
+    // Make it a "strong" definition if we have no other choice.
+    ZoneInfoSourceFactory zone_info_source_factory = DefaultFactory;
 #endif
 
-}  // namespace cctz_extension
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+
+}  // namespace turbo::time_internal::cctz

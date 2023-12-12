@@ -12,12 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "turbo/platform/port.h"
+
+//#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "doctest/doctest.h"
+
+#ifdef TURBO_HAVE_INTRINSIC_INT128
+
+
 #include "turbo/base/int128.h"
 
 #include <sstream>
 #include <string>
-
-#include "gtest/gtest.h"
+#include <vector>
 
 namespace {
 
@@ -92,11 +100,11 @@ namespace {
         os.width(test_case.width);
         os.fill(kFill);
         os << test_case.value;
-        SCOPED_TRACE(StreamFormatToString(test_case.flags, test_case.width));
-        EXPECT_EQ(os.str(), test_case.expected);
+        //SCOPED_TRACE(StreamFormatToString(test_case.flags, test_case.width));
+        REQUIRE_EQ(os.str(), test_case.expected);
     }
 
-    TEST(Uint128, OStreamValueTest) {
+    TEST_CASE("Uint128, OStreamValueTest") {
         CheckUint128Case({1, kDec, /*width = */ 0, "1"});
         CheckUint128Case({1, kOct, /*width = */ 0, "1"});
         CheckUint128Case({1, kHex, /*width = */ 0, "1"});
@@ -119,17 +127,17 @@ namespace {
         CheckUint128Case({std::numeric_limits<uint64_t>::max(), kHex,
                                  /*width = */ 0, "ffffffffffffffff"});
         CheckUint128Case(
-                {turbo::MakeUint128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
-        CheckUint128Case({turbo::MakeUint128(1, 0), kOct, /*width = */ 0,
+                {turbo::make_uint128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
+        CheckUint128Case({turbo::make_uint128(1, 0), kOct, /*width = */ 0,
                           "2000000000000000000000"});
         CheckUint128Case(
-                {turbo::MakeUint128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
-        CheckUint128Case({turbo::MakeUint128(0x8000000000000000, 0), kDec,
+                {turbo::make_uint128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
+        CheckUint128Case({turbo::make_uint128(0x8000000000000000, 0), kDec,
                                  /*width = */ 0, "170141183460469231731687303715884105728"});
-        CheckUint128Case({turbo::MakeUint128(0x8000000000000000, 0), kOct,
+        CheckUint128Case({turbo::make_uint128(0x8000000000000000, 0), kOct,
                                  /*width = */ 0,
                           "2000000000000000000000000000000000000000000"});
-        CheckUint128Case({turbo::MakeUint128(0x8000000000000000, 0), kHex,
+        CheckUint128Case({turbo::make_uint128(0x8000000000000000, 0), kHex,
                                  /*width = */ 0, "80000000000000000000000000000000"});
         CheckUint128Case({turbo::kuint128max, kDec, /*width = */ 0,
                           "340282366920938463463374607431768211455"});
@@ -141,7 +149,7 @@ namespace {
 
     std::vector<Uint128TestCase> GetUint128FormatCases();
 
-    TEST(Uint128, OStreamFormatTest) {
+    TEST_CASE("Uint128, OStreamFormatTest") {
         for (const Uint128TestCase &test_case: GetUint128FormatCases()) {
             CheckUint128Case(test_case);
         }
@@ -160,11 +168,11 @@ namespace {
         os.width(test_case.width);
         os.fill(kFill);
         os << test_case.value;
-        SCOPED_TRACE(StreamFormatToString(test_case.flags, test_case.width));
-        EXPECT_EQ(os.str(), test_case.expected);
+        //SCOPED_TRACE(StreamFormatToString(test_case.flags, test_case.width));
+        REQUIRE_EQ(os.str(), test_case.expected);
     }
 
-    TEST(Int128, OStreamValueTest) {
+    TEST_CASE("Int128, OStreamValueTest") {
         CheckInt128Case({1, kDec, /*width = */ 0, "1"});
         CheckInt128Case({1, kOct, /*width = */ 0, "1"});
         CheckInt128Case({1, kHex, /*width = */ 0, "1"});
@@ -187,29 +195,29 @@ namespace {
         CheckInt128Case({std::numeric_limits<uint64_t>::max(), kHex,
                                 /*width = */ 0, "ffffffffffffffff"});
         CheckInt128Case(
-                {turbo::MakeInt128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
+                {turbo::make_int128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
         CheckInt128Case(
-                {turbo::MakeInt128(1, 0), kOct, /*width = */ 0, "2000000000000000000000"});
+                {turbo::make_int128(1, 0), kOct, /*width = */ 0, "2000000000000000000000"});
         CheckInt128Case(
-                {turbo::MakeInt128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
-        CheckInt128Case({turbo::MakeInt128(std::numeric_limits<int64_t>::max(),
+                {turbo::make_int128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
+        CheckInt128Case({turbo::make_int128(std::numeric_limits<int64_t>::max(),
                                            std::numeric_limits<uint64_t>::max()),
                          kDec, /*width = */ 0,
                          "170141183460469231731687303715884105727"});
-        CheckInt128Case({turbo::MakeInt128(std::numeric_limits<int64_t>::max(),
+        CheckInt128Case({turbo::make_int128(std::numeric_limits<int64_t>::max(),
                                            std::numeric_limits<uint64_t>::max()),
                          kOct, /*width = */ 0,
                          "1777777777777777777777777777777777777777777"});
-        CheckInt128Case({turbo::MakeInt128(std::numeric_limits<int64_t>::max(),
+        CheckInt128Case({turbo::make_int128(std::numeric_limits<int64_t>::max(),
                                            std::numeric_limits<uint64_t>::max()),
                          kHex, /*width = */ 0, "7fffffffffffffffffffffffffffffff"});
-        CheckInt128Case({turbo::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
+        CheckInt128Case({turbo::make_int128(std::numeric_limits<int64_t>::min(), 0),
                          kDec, /*width = */ 0,
                          "-170141183460469231731687303715884105728"});
-        CheckInt128Case({turbo::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
+        CheckInt128Case({turbo::make_int128(std::numeric_limits<int64_t>::min(), 0),
                          kOct, /*width = */ 0,
                          "2000000000000000000000000000000000000000000"});
-        CheckInt128Case({turbo::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
+        CheckInt128Case({turbo::make_int128(std::numeric_limits<int64_t>::min(), 0),
                          kHex, /*width = */ 0, "80000000000000000000000000000000"});
         CheckInt128Case({-1, kDec, /*width = */ 0, "-1"});
         CheckInt128Case({-1, kOct, /*width = */ 0,
@@ -225,7 +233,7 @@ namespace {
 
     std::vector<Int128TestCase> GetInt128FormatCases();
 
-    TEST(Int128, OStreamFormatTest) {
+    TEST_CASE("Int128, OStreamFormatTest") {
         for (const Int128TestCase &test_case: GetInt128FormatCases()) {
             CheckInt128Case(test_case);
         }
@@ -1392,3 +1400,4 @@ namespace {
     }
 
 }  // namespace
+#endif // DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN

@@ -17,13 +17,13 @@
 #include "turbo/random/internal/pool_urbg.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+    TURBO_NAMESPACE_BEGIN
 
-SeedSeq MakeSeedSeq() {
-  SeedSeq::result_type seed_material[8];
-  random_internal::RandenPool<uint32_t>::Fill(turbo::MakeSpan(seed_material));
-  return SeedSeq(std::begin(seed_material), std::end(seed_material));
-}
+    SeedSeq MakeSeedSeq() {
+        SeedSeq::result_type seed_material[8];
+        random_internal::RandenPool<uint32_t>::Fill(turbo::MakeSpan(seed_material));
+        return SeedSeq(std::begin(seed_material), std::end(seed_material));
+    }
 
-TURBO_NAMESPACE_END
+    TURBO_NAMESPACE_END
 }  // namespace turbo

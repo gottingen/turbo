@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 
 #include <cfloat>
 #include <cmath>
@@ -35,7 +35,7 @@ struct Invalid {};
 
 template <typename A, typename B>
 auto InferredUniformReturnT(int)
-    -> decltype(turbo::Uniform(std::declval<turbo::InsecureBitGen&>(),
+    -> decltype(turbo::uniform(std::declval<turbo::InsecureBitGen&>(),
                               std::declval<A>(), std::declval<B>()));
 
 template <typename, typename>
@@ -43,7 +43,7 @@ Invalid InferredUniformReturnT(...);
 
 template <typename TagType, typename A, typename B>
 auto InferredTaggedUniformReturnT(int)
-    -> decltype(turbo::Uniform(std::declval<TagType>(),
+    -> decltype(turbo::uniform(std::declval<TagType>(),
                               std::declval<turbo::InsecureBitGen&>(),
                               std::declval<A>(), std::declval<B>()));
 
@@ -52,21 +52,21 @@ Invalid InferredTaggedUniformReturnT(...);
 
 // Given types <A, B, Expect>, CheckArgsInferType() verifies that
 //
-//   turbo::Uniform(gen, A{}, B{})
+//   turbo::uniform(gen, A{}, B{})
 //
 // returns the type "Expect".
 //
-// This interface can also be used to assert that a given turbo::Uniform()
+// This interface can also be used to assert that a given turbo::uniform()
 // overload does not exist / will not compile. Given types <A, B>, the
 // expression
 //
-//   decltype(turbo::Uniform(..., std::declval<A>(), std::declval<B>()))
+//   decltype(turbo::uniform(..., std::declval<A>(), std::declval<B>()))
 //
 // will not compile, leaving the definition of InferredUniformReturnT<A, B> to
 // resolve (via SFINAE) to the overload which returns type "Invalid". This
 // allows tests to assert that an invocation such as
 //
-//   turbo::Uniform(gen, 1.23f, std::numeric_limits<int>::max() - 1)
+//   turbo::uniform(gen, 1.23f, std::numeric_limits<int>::max() - 1)
 //
 // should not compile, since neither type, float nor int, can precisely
 // represent both endpoint-values. Writing:
@@ -77,13 +77,13 @@ Invalid InferredTaggedUniformReturnT(...);
 template <typename A, typename B, typename Expect>
 void CheckArgsInferType() {
   static_assert(
-      turbo::conjunction<
+      std::conjunction<
           std::is_same<Expect, decltype(InferredUniformReturnT<A, B>(0))>,
           std::is_same<Expect,
                        decltype(InferredUniformReturnT<B, A>(0))>>::value,
       "");
   static_assert(
-      turbo::conjunction<
+      std::conjunction<
           std::is_same<Expect, decltype(InferredTaggedUniformReturnT<
                                         turbo::IntervalOpenOpenTag, A, B>(0))>,
           std::is_same<Expect,
@@ -94,14 +94,14 @@ void CheckArgsInferType() {
 
 template <typename A, typename B, typename ExplicitRet>
 auto ExplicitUniformReturnT(int) -> decltype(
-    turbo::Uniform<ExplicitRet>(*std::declval<turbo::InsecureBitGen*>(),
+    turbo::uniform<ExplicitRet>(*std::declval<turbo::InsecureBitGen*>(),
                                std::declval<A>(), std::declval<B>()));
 
 template <typename, typename, typename ExplicitRet>
 Invalid ExplicitUniformReturnT(...);
 
 template <typename TagType, typename A, typename B, typename ExplicitRet>
-auto ExplicitTaggedUniformReturnT(int) -> decltype(turbo::Uniform<ExplicitRet>(
+auto ExplicitTaggedUniformReturnT(int) -> decltype(turbo::uniform<ExplicitRet>(
     std::declval<TagType>(), *std::declval<turbo::InsecureBitGen*>(),
     std::declval<A>(), std::declval<B>()));
 
@@ -110,7 +110,7 @@ Invalid ExplicitTaggedUniformReturnT(...);
 
 // Given types <A, B, Expect>, CheckArgsReturnExpectedType() verifies that
 //
-//   turbo::Uniform<Expect>(gen, A{}, B{})
+//   turbo::uniform<Expect>(gen, A{}, B{})
 //
 // returns the type "Expect", and that the function-overload has the signature
 //
@@ -118,14 +118,14 @@ Invalid ExplicitTaggedUniformReturnT(...);
 template <typename A, typename B, typename Expect>
 void CheckArgsReturnExpectedType() {
   static_assert(
-      turbo::conjunction<
+      std::conjunction<
           std::is_same<Expect,
                        decltype(ExplicitUniformReturnT<A, B, Expect>(0))>,
           std::is_same<Expect, decltype(ExplicitUniformReturnT<B, A, Expect>(
                                    0))>>::value,
       "");
   static_assert(
-      turbo::conjunction<
+      std::conjunction<
           std::is_same<Expect,
                        decltype(ExplicitTaggedUniformReturnT<
                                 turbo::IntervalOpenOpenTag, A, B, Expect>(0))>,
@@ -202,25 +202,25 @@ TEST_F(RandomDistributionsTest, UniformTypeInference) {
 TEST_F(RandomDistributionsTest, UniformExamples) {
   // Examples.
   turbo::InsecureBitGen gen;
-  EXPECT_NE(1, turbo::Uniform(gen, static_cast<uint16_t>(0), 1.0f));
-  EXPECT_NE(1, turbo::Uniform(gen, 0, 1.0));
-  EXPECT_NE(1, turbo::Uniform(turbo::IntervalOpenOpen, gen,
+  EXPECT_NE(1, turbo::uniform(gen, static_cast<uint16_t>(0), 1.0f));
+  EXPECT_NE(1, turbo::uniform(gen, 0, 1.0));
+  EXPECT_NE(1, turbo::uniform(turbo::IntervalOpenOpen, gen,
                              static_cast<uint16_t>(0), 1.0f));
-  EXPECT_NE(1, turbo::Uniform(turbo::IntervalOpenOpen, gen, 0, 1.0));
-  EXPECT_NE(1, turbo::Uniform(turbo::IntervalOpenOpen, gen, -1, 1.0));
-  EXPECT_NE(1, turbo::Uniform<double>(turbo::IntervalOpenOpen, gen, -1, 1));
-  EXPECT_NE(1, turbo::Uniform<float>(turbo::IntervalOpenOpen, gen, 0, 1));
-  EXPECT_NE(1, turbo::Uniform<float>(gen, 0, 1));
+  EXPECT_NE(1, turbo::uniform(turbo::IntervalOpenOpen, gen, 0, 1.0));
+  EXPECT_NE(1, turbo::uniform(turbo::IntervalOpenOpen, gen, -1, 1.0));
+  EXPECT_NE(1, turbo::uniform<double>(turbo::IntervalOpenOpen, gen, -1, 1));
+  EXPECT_NE(1, turbo::uniform<float>(turbo::IntervalOpenOpen, gen, 0, 1));
+  EXPECT_NE(1, turbo::uniform<float>(gen, 0, 1));
 }
 
 TEST_F(RandomDistributionsTest, UniformNoBounds) {
   turbo::InsecureBitGen gen;
 
-  turbo::Uniform<uint8_t>(gen);
-  turbo::Uniform<uint16_t>(gen);
-  turbo::Uniform<uint32_t>(gen);
-  turbo::Uniform<uint64_t>(gen);
-  turbo::Uniform<turbo::uint128>(gen);
+  turbo::uniform<uint8_t>(gen);
+  turbo::uniform<uint16_t>(gen);
+  turbo::uniform<uint32_t>(gen);
+  turbo::uniform<uint64_t>(gen);
+  turbo::uniform<turbo::uint128>(gen);
 }
 
 TEST_F(RandomDistributionsTest, UniformNonsenseRanges) {
@@ -238,50 +238,50 @@ TEST_F(RandomDistributionsTest, UniformNonsenseRanges) {
   turbo::InsecureBitGen gen;
 
   // <uint>
-  EXPECT_EQ(0, turbo::Uniform<uint64_t>(gen, 0, 0));
-  EXPECT_EQ(1, turbo::Uniform<uint64_t>(gen, 1, 0));
-  EXPECT_EQ(0, turbo::Uniform<uint64_t>(turbo::IntervalOpenOpen, gen, 0, 0));
-  EXPECT_EQ(1, turbo::Uniform<uint64_t>(turbo::IntervalOpenOpen, gen, 1, 0));
+  EXPECT_EQ(0, turbo::uniform<uint64_t>(gen, 0, 0));
+  EXPECT_EQ(1, turbo::uniform<uint64_t>(gen, 1, 0));
+  EXPECT_EQ(0, turbo::uniform<uint64_t>(turbo::IntervalOpenOpen, gen, 0, 0));
+  EXPECT_EQ(1, turbo::uniform<uint64_t>(turbo::IntervalOpenOpen, gen, 1, 0));
 
   constexpr auto m = (std::numeric_limits<uint64_t>::max)();
 
-  EXPECT_EQ(m, turbo::Uniform(gen, m, m));
-  EXPECT_EQ(m, turbo::Uniform(gen, m, m - 1));
-  EXPECT_EQ(m - 1, turbo::Uniform(gen, m - 1, m));
-  EXPECT_EQ(m, turbo::Uniform(turbo::IntervalOpenOpen, gen, m, m));
-  EXPECT_EQ(m, turbo::Uniform(turbo::IntervalOpenOpen, gen, m, m - 1));
-  EXPECT_EQ(m - 1, turbo::Uniform(turbo::IntervalOpenOpen, gen, m - 1, m));
+  EXPECT_EQ(m, turbo::uniform(gen, m, m));
+  EXPECT_EQ(m, turbo::uniform(gen, m, m - 1));
+  EXPECT_EQ(m - 1, turbo::uniform(gen, m - 1, m));
+  EXPECT_EQ(m, turbo::uniform(turbo::IntervalOpenOpen, gen, m, m));
+  EXPECT_EQ(m, turbo::uniform(turbo::IntervalOpenOpen, gen, m, m - 1));
+  EXPECT_EQ(m - 1, turbo::uniform(turbo::IntervalOpenOpen, gen, m - 1, m));
 
   // <int>
-  EXPECT_EQ(0, turbo::Uniform<int64_t>(gen, 0, 0));
-  EXPECT_EQ(1, turbo::Uniform<int64_t>(gen, 1, 0));
-  EXPECT_EQ(0, turbo::Uniform<int64_t>(turbo::IntervalOpenOpen, gen, 0, 0));
-  EXPECT_EQ(1, turbo::Uniform<int64_t>(turbo::IntervalOpenOpen, gen, 1, 0));
+  EXPECT_EQ(0, turbo::uniform<int64_t>(gen, 0, 0));
+  EXPECT_EQ(1, turbo::uniform<int64_t>(gen, 1, 0));
+  EXPECT_EQ(0, turbo::uniform<int64_t>(turbo::IntervalOpenOpen, gen, 0, 0));
+  EXPECT_EQ(1, turbo::uniform<int64_t>(turbo::IntervalOpenOpen, gen, 1, 0));
 
   constexpr auto l = (std::numeric_limits<int64_t>::min)();
   constexpr auto r = (std::numeric_limits<int64_t>::max)();
 
-  EXPECT_EQ(l, turbo::Uniform(gen, l, l));
-  EXPECT_EQ(r, turbo::Uniform(gen, r, r));
-  EXPECT_EQ(r, turbo::Uniform(gen, r, r - 1));
-  EXPECT_EQ(r - 1, turbo::Uniform(gen, r - 1, r));
-  EXPECT_EQ(l, turbo::Uniform(turbo::IntervalOpenOpen, gen, l, l));
-  EXPECT_EQ(r, turbo::Uniform(turbo::IntervalOpenOpen, gen, r, r));
-  EXPECT_EQ(r, turbo::Uniform(turbo::IntervalOpenOpen, gen, r, r - 1));
-  EXPECT_EQ(r - 1, turbo::Uniform(turbo::IntervalOpenOpen, gen, r - 1, r));
+  EXPECT_EQ(l, turbo::uniform(gen, l, l));
+  EXPECT_EQ(r, turbo::uniform(gen, r, r));
+  EXPECT_EQ(r, turbo::uniform(gen, r, r - 1));
+  EXPECT_EQ(r - 1, turbo::uniform(gen, r - 1, r));
+  EXPECT_EQ(l, turbo::uniform(turbo::IntervalOpenOpen, gen, l, l));
+  EXPECT_EQ(r, turbo::uniform(turbo::IntervalOpenOpen, gen, r, r));
+  EXPECT_EQ(r, turbo::uniform(turbo::IntervalOpenOpen, gen, r, r - 1));
+  EXPECT_EQ(r - 1, turbo::uniform(turbo::IntervalOpenOpen, gen, r - 1, r));
 
   // <double>
   const double e = std::nextafter(1.0, 2.0);  // 1 + epsilon
   const double f = std::nextafter(1.0, 0.0);  // 1 - epsilon
   const double g = std::numeric_limits<double>::denorm_min();
 
-  EXPECT_EQ(1.0, turbo::Uniform(gen, 1.0, e));
-  EXPECT_EQ(1.0, turbo::Uniform(gen, 1.0, f));
-  EXPECT_EQ(0.0, turbo::Uniform(gen, 0.0, g));
+  EXPECT_EQ(1.0, turbo::uniform(gen, 1.0, e));
+  EXPECT_EQ(1.0, turbo::uniform(gen, 1.0, f));
+  EXPECT_EQ(0.0, turbo::uniform(gen, 0.0, g));
 
-  EXPECT_EQ(e, turbo::Uniform(turbo::IntervalOpenOpen, gen, 1.0, e));
-  EXPECT_EQ(f, turbo::Uniform(turbo::IntervalOpenOpen, gen, 1.0, f));
-  EXPECT_EQ(g, turbo::Uniform(turbo::IntervalOpenOpen, gen, 0.0, g));
+  EXPECT_EQ(e, turbo::uniform(turbo::IntervalOpenOpen, gen, 1.0, e));
+  EXPECT_EQ(f, turbo::uniform(turbo::IntervalOpenOpen, gen, 1.0, f));
+  EXPECT_EQ(g, turbo::uniform(turbo::IntervalOpenOpen, gen, 0.0, g));
 }
 
 // TODO(lar): Validate properties of non-default interval-semantics.
@@ -290,7 +290,7 @@ TEST_F(RandomDistributionsTest, UniformReal) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Uniform(gen, 0, 1.0);
+    values[i] = turbo::uniform(gen, 0, 1.0);
   }
 
   const auto moments =
@@ -307,7 +307,7 @@ TEST_F(RandomDistributionsTest, UniformInt) {
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
     const int64_t kMax = 1000000000000ll;
-    int64_t j = turbo::Uniform(turbo::IntervalClosedClosed, gen, 0, kMax);
+    int64_t j = turbo::uniform(turbo::IntervalClosedClosed, gen, 0, kMax);
     // convert to double.
     values[i] = static_cast<double>(j) / static_cast<double>(kMax);
   }
@@ -320,16 +320,16 @@ TEST_F(RandomDistributionsTest, UniformInt) {
   EXPECT_NEAR(9 / 5.0, moments.kurtosis, 0.02);
 
   /*
-  // NOTE: These are not supported by turbo::Uniform, which is specialized
+  // NOTE: These are not supported by turbo::uniform, which is specialized
   // on integer and real valued types.
 
   enum E { E0, E1 };    // enum
   enum S : int { S0, S1 };    // signed enum
   enum U : unsigned int { U0, U1 };  // unsigned enum
 
-  turbo::Uniform(gen, E0, E1);
-  turbo::Uniform(gen, S0, S1);
-  turbo::Uniform(gen, U0, U1);
+  turbo::uniform(gen, E0, E1);
+  turbo::uniform(gen, S0, S1);
+  turbo::uniform(gen, U0, U1);
   */
 }
 
@@ -338,7 +338,7 @@ TEST_F(RandomDistributionsTest, Exponential) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Exponential<double>(gen);
+    values[i] = turbo::exponential<double>(gen);
   }
 
   const auto moments =
@@ -354,7 +354,7 @@ TEST_F(RandomDistributionsTest, PoissonDefault) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Poisson<int64_t>(gen);
+    values[i] = turbo::poisson<int64_t>(gen);
   }
 
   const auto moments =
@@ -371,7 +371,7 @@ TEST_F(RandomDistributionsTest, PoissonLarge) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Poisson<int64_t>(gen, kMean);
+    values[i] = turbo::poisson<int64_t>(gen, kMean);
   }
 
   const auto moments =
@@ -388,7 +388,7 @@ TEST_F(RandomDistributionsTest, Bernoulli) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Bernoulli(gen, kP);
+    values[i] = turbo::bernoulli(gen, kP);
   }
 
   const auto moments =
@@ -403,7 +403,7 @@ TEST_F(RandomDistributionsTest, Beta) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Beta(gen, kAlpha, kBeta);
+    values[i] = turbo::beta(gen, kAlpha, kBeta);
   }
 
   const auto moments =
@@ -416,7 +416,7 @@ TEST_F(RandomDistributionsTest, Zipf) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Zipf<int64_t>(gen, 100);
+    values[i] = turbo::zipf<int64_t>(gen, 100);
   }
 
   // The mean of a zipf distribution is: H(N, s-1) / H(N,s).
@@ -432,7 +432,7 @@ TEST_F(RandomDistributionsTest, Gaussian) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::Gaussian<double>(gen);
+    values[i] = turbo::gaussian<double>(gen);
   }
 
   const auto moments =
@@ -448,7 +448,7 @@ TEST_F(RandomDistributionsTest, LogUniform) {
 
   turbo::InsecureBitGen gen;
   for (int i = 0; i < kSize; i++) {
-    values[i] = turbo::LogUniform<int64_t>(gen, 0, (1 << 10) - 1);
+    values[i] = turbo::log_uniform<int64_t>(gen, 0, (1 << 10) - 1);
   }
 
   // The mean is the sum of the fractional means of the uniform distributions:

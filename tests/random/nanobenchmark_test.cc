@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/random/internal/nanobenchmark.h"
+#include "benchmark/random/nanobenchmark.h"
 
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/strings/numbers.h"

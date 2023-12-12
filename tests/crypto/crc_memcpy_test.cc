@@ -24,7 +24,7 @@
 
 #include "turbo/crypto/crc32c.h"
 #include "turbo/memory/memory.h"
-#include "turbo/random/distributions.h"
+#include "turbo/random/fwd.h"
 #include "turbo/random/random.h"
 #include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
@@ -38,9 +38,9 @@ namespace {
         FALLBACK = 2,
     };
 
-// Correctness tests:
-// - Every source/destination byte alignment 0-15, every size 0-511 bytes
-// - Arbitrarily aligned source, large size
+    // Correctness tests:
+    // - Every source/destination byte alignment 0-15, every size 0-511 bytes
+    // - Arbitrarily aligned source, large size
     template<size_t max_size>
     class CrcMemcpyTest : public testing::Test {
     protected:
@@ -108,10 +108,10 @@ namespace {
                 char *base_data = static_cast<char *>(source_.get()) + source_alignment;
                 for (size_t i = 0; i < size; i++) {
                     *(base_data + i) =
-                            static_cast<char>(turbo::Uniform<unsigned char>(gen_));
+                            static_cast<char>(turbo::uniform<unsigned char>(gen_));
                 }
                 turbo::crc32c_t initial_crc =
-                        turbo::crc32c_t{turbo::Uniform<uint32_t>(gen_)};
+                        turbo::crc32c_t{turbo::uniform<uint32_t>(gen_)};
                 turbo::crc32c_t experiment_crc =
                         engine_->Compute(destination_.get(), source_.get() + source_alignment,
                                          size, initial_crc);
@@ -139,10 +139,10 @@ namespace {
                 char *base_data = static_cast<char *>(source_.get());
                 for (size_t i = 0; i < size; i++) {
                     *(base_data + i) =
-                            static_cast<char>(turbo::Uniform<unsigned char>(gen_));
+                            static_cast<char>(turbo::uniform<unsigned char>(gen_));
                 }
                 turbo::crc32c_t initial_crc =
-                        turbo::crc32c_t{turbo::Uniform<uint32_t>(gen_)};
+                        turbo::crc32c_t{turbo::uniform<uint32_t>(gen_)};
                 turbo::crc32c_t experiment_crc =
                         engine_->Compute(destination_.get() + dest_alignment, source_.get(),
                                          size, initial_crc);

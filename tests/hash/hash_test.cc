@@ -67,7 +67,7 @@ class TypeErasedValue {
   explicit TypeErasedValue(const T& n) : n_(n) {}
 
   template <typename H>
-  friend H TurboHashValue(H hash_state, const TypeErasedValue& v) {
+  friend H hash_value(H hash_state, const TypeErasedValue& v) {
     v.HashValue(turbo::HashState::Create(&hash_state));
     return hash_state;
   }
@@ -561,7 +561,7 @@ class UnorderedSequence {
     return !(lhs == rhs);
   }
   template <typename H>
-  friend H TurboHashValue(H h, const UnorderedSequence& u) {
+  friend H hash_value(H h, const UnorderedSequence& u) {
     return H::combine(H::combine_unordered(std::move(h), u.begin(), u.end()),
                       u.size());
   }
@@ -639,14 +639,14 @@ using NestedIntSequenceTypes = testing::Types<
 INSTANTIATE_TYPED_TEST_SUITE_P(My, HashValueNestedSequenceTest,
                               NestedIntSequenceTypes);
 
-// Private type that only supports TurboHashValue to make sure our chosen hash
+// Private type that only supports hash_value to make sure our chosen hash
 // implementation is recursive within turbo::Hash.
 // It uses std::abs() on the value to provide different bitwise representations
 // of the same logical value.
 struct Private {
   int i;
   template <typename H>
-  friend H TurboHashValue(H h, Private p) {
+  friend H hash_value(H h, Private p) {
     return H::combine(std::move(h), std::abs(p.i));
   }
 
@@ -660,7 +660,7 @@ struct Private {
 };
 
 // Test helper for combine_piecewise_buffer.  It holds a std::string_view to the
-// buffer-to-be-hashed.  Its TurboHashValue specialization will split up its
+// buffer-to-be-hashed.  Its hash_value specialization will split up its
 // contents at the character offsets requested.
 class PiecewiseHashTester {
  public:
@@ -676,7 +676,7 @@ class PiecewiseHashTester {
         split_locations_(std::move(split_locations)) {}
 
   template <typename H>
-  friend H TurboHashValue(H h, const PiecewiseHashTester& p) {
+  friend H hash_value(H h, const PiecewiseHashTester& p) {
     if (!p.piecewise_) {
       return H::combine_contiguous(std::move(h), p.buf_.data(), p.buf_.size());
     }
@@ -709,7 +709,7 @@ class PiecewiseHashTester {
 // by "bar"
 struct DummyFooBar {
   template <typename H>
-  friend H TurboHashValue(H h, const DummyFooBar&) {
+  friend H hash_value(H h, const DummyFooBar&) {
     const char* foo = "foo";
     const char* bar = "bar";
     h = H::combine_contiguous(std::move(h), foo, 3);
@@ -877,14 +877,14 @@ template <typename T, typename = void>
 struct IsHashCallable : std::false_type {};
 
 template <typename T>
-struct IsHashCallable<T, turbo::void_t<decltype(std::declval<turbo::Hash<T>>()(
+struct IsHashCallable<T, std::void_t<decltype(std::declval<turbo::Hash<T>>()(
                             std::declval<const T&>()))>> : std::true_type {};
 
 template <typename T, typename = void>
 struct IsAggregateInitializable : std::false_type {};
 
 template <typename T>
-struct IsAggregateInitializable<T, turbo::void_t<decltype(T{})>>
+struct IsAggregateInitializable<T, std::void_t<decltype(T{})>>
     : std::true_type {};
 
 TEST(IsHashableTest, ValidHash) {
@@ -917,18 +917,18 @@ TEST(IsHashableTest, PoisonHash) {
 
 // Hashable types
 //
-// These types exist simply to exercise various TurboHashValue behaviors, so
-// they are named by what their TurboHashValue overload does.
+// These types exist simply to exercise various hash_value behaviors, so
+// they are named by what their hash_value overload does.
 struct NoOp {
   template <typename HashCode>
-  friend HashCode TurboHashValue(HashCode h, NoOp n) {
+  friend HashCode hash_value(HashCode h, NoOp n) {
     return h;
   }
 };
 
 struct EmptyCombine {
   template <typename HashCode>
-  friend HashCode TurboHashValue(HashCode h, EmptyCombine e) {
+  friend HashCode hash_value(HashCode h, EmptyCombine e) {
     return HashCode::combine(std::move(h));
   }
 };
@@ -936,7 +936,7 @@ struct EmptyCombine {
 template <typename Int>
 struct CombineIterative {
   template <typename HashCode>
-  friend HashCode TurboHashValue(HashCode h, CombineIterative c) {
+  friend HashCode hash_value(HashCode h, CombineIterative c) {
     for (int i = 0; i < 5; ++i) {
       h = HashCode::combine(std::move(h), Int(i));
     }
@@ -947,7 +947,7 @@ struct CombineIterative {
 template <typename Int>
 struct CombineVariadic {
   template <typename HashCode>
-  friend HashCode TurboHashValue(HashCode h, CombineVariadic c) {
+  friend HashCode hash_value(HashCode h, CombineVariadic c) {
     return HashCode::combine(std::move(h), Int(0), Int(1), Int(2), Int(3),
                              Int(4));
   }
@@ -982,13 +982,13 @@ struct CustomHashType {
 
 template <InvokeTag allowed, InvokeTag... tags>
 struct EnableIfContained
-    : std::enable_if<turbo::disjunction<
+    : std::enable_if<std::disjunction<
           std::integral_constant<bool, allowed == tags>...>::value> {};
 
 template <
     typename H, InvokeTag... Tags,
     typename = typename EnableIfContained<InvokeTag::kHashValue, Tags...>::type>
-H TurboHashValue(H state, CustomHashType<Tags...> t) {
+H hash_value(H state, CustomHashType<Tags...> t) {
   static_assert(MinTag<Tags...>::value == InvokeTag::kHashValue, "");
   return H::combine(std::move(state),
                     t.value + static_cast<int>(InvokeTag::kHashValue));
@@ -1102,7 +1102,7 @@ struct StructWithPadding {
   int i;
 
   template <typename H>
-  friend H TurboHashValue(H hash_state, const StructWithPadding& s) {
+  friend H hash_value(H hash_state, const StructWithPadding& s) {
     return H::combine(std::move(hash_state), s.c, s.i);
   }
 };
@@ -1120,7 +1120,7 @@ struct ArraySlice {
   T* end;
 
   template <typename H>
-  friend H TurboHashValue(H hash_state, const ArraySlice& slice) {
+  friend H hash_value(H hash_state, const ArraySlice& slice) {
     for (auto t = slice.begin; t != slice.end; ++t) {
       hash_state = H::combine(std::move(hash_state), *t);
     }
@@ -1168,7 +1168,7 @@ struct ConvertibleFromNoOp {
   ConvertibleFromNoOp(NoOp) {}  // NOLINT(runtime/explicit)
 
   template <typename H>
-  friend H TurboHashValue(H hash_state, ConvertibleFromNoOp) {
+  friend H hash_value(H hash_state, ConvertibleFromNoOp) {
     return H::combine(std::move(hash_state), 1);
   }
 };
@@ -1192,7 +1192,7 @@ struct IntAndString {
   std::string s;
 
   template <typename H>
-  friend H TurboHashValue(H hash_state, IntAndString int_and_string) {
+  friend H hash_value(H hash_state, IntAndString int_and_string) {
     return H::combine(std::move(hash_state), int_and_string.s,
                       int_and_string.i);
   }
@@ -1243,30 +1243,30 @@ TEST(HashTest, DoesNotUseImplicitConversionsToBool) {
             turbo::Hash<ValueWithBoolConversion>()(ValueWithBoolConversion{1}));
 }
 
-TEST(HashOf, MatchesHashForSingleArgument) {
+TEST(hash_of, MatchesHashForSingleArgument) {
   std::string s = "forty two";
   int i = 42;
   double d = 42.0;
   std::tuple<int, int> t{4, 2};
 
-  EXPECT_EQ(turbo::HashOf(s), turbo::Hash<std::string>{}(s));
-  EXPECT_EQ(turbo::HashOf(i), turbo::Hash<int>{}(i));
-  EXPECT_EQ(turbo::HashOf(d), turbo::Hash<double>{}(d));
-  EXPECT_EQ(turbo::HashOf(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
+  EXPECT_EQ(turbo::hash_of(s), turbo::Hash<std::string>{}(s));
+  EXPECT_EQ(turbo::hash_of(i), turbo::Hash<int>{}(i));
+  EXPECT_EQ(turbo::hash_of(d), turbo::Hash<double>{}(d));
+  EXPECT_EQ(turbo::hash_of(t), (turbo::Hash<std::tuple<int, int>>{}(t)));
 }
 
-TEST(HashOf, MatchesHashOfTupleForMultipleArguments) {
+TEST(hash_of, MatchesHashOfTupleForMultipleArguments) {
   std::string hello = "hello";
   std::string world = "world";
 
-  EXPECT_EQ(turbo::HashOf(), turbo::HashOf(std::make_tuple()));
-  EXPECT_EQ(turbo::HashOf(hello), turbo::HashOf(std::make_tuple(hello)));
-  EXPECT_EQ(turbo::HashOf(hello, world),
-            turbo::HashOf(std::make_tuple(hello, world)));
+  EXPECT_EQ(turbo::hash_of(), turbo::hash_of(std::make_tuple()));
+  EXPECT_EQ(turbo::hash_of(hello), turbo::hash_of(std::make_tuple(hello)));
+  EXPECT_EQ(turbo::hash_of(hello, world),
+            turbo::hash_of(std::make_tuple(hello, world)));
 }
 
 template <typename T>
-std::true_type HashOfExplicitParameter(decltype(turbo::HashOf<T>(0))) {
+std::true_type HashOfExplicitParameter(decltype(turbo::hash_of<T>(0))) {
   return {};
 }
 template <typename T>
@@ -1274,7 +1274,7 @@ std::false_type HashOfExplicitParameter(size_t) {
   return {};
 }
 
-TEST(HashOf, CantPassExplicitTemplateParameters) {
+TEST(hash_of, CantPassExplicitTemplateParameters) {
   EXPECT_FALSE(HashOfExplicitParameter<int>(0));
 }
 

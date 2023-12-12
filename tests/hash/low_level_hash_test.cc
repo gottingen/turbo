@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/hash/internal/low_level_hash.h"
+#include "turbo/hash/bytes/bytes_hash.h"
 
 #include <cinttypes>
 
@@ -522,7 +522,7 @@ TEST_CASE("LowLevelHashTest- VerifyGolden") {
     CAPTURE(turbo::Format("i = {}; input = {}", i, cases[i].base64_data));
     std::string str;
       REQUIRE(turbo::base64_decode(cases[i].base64_data, &str));
-      CHECK_EQ(turbo::hash_internal::LowLevelHash(str.data(), str.size(),
+      CHECK_EQ(turbo::hash_internal::bytes_hash(str.data(), str.size(),
                                                 cases[i].seed, kSalt),
               kGolden[i]);
   }

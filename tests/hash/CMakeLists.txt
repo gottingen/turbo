@@ -91,11 +91,12 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
 )
 
+
 carbin_cc_test(
         NAME
-        murmur_test
+        engine_test
         SOURCES
-        "murmur_test.cc"
+        "engine_test.cc"
         COPTS
         ${CARBIN_CXX_OPTIONS}
         DEPS

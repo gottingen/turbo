@@ -165,7 +165,7 @@ private:
     {
         using lower_arch = turbo::simd::sse2;
         using expected_batch_type = turbo::simd::batch<float, lower_arch>;
-        using load_as_return_type = decltype(turbo::simd::load_as<float, lower_arch>(std::declval<float*>(), turbo::simd::aligned_mode()));
+        using load_as_return_type = decltype(turbo::simd::load_as<float, lower_arch>(std::declval<float*>(), turbo::aligned_mode()));
         static_assert(std::is_same<load_as_return_type, expected_batch_type>::value, "honoring arch parameter");
     };
 #endif
@@ -183,11 +183,11 @@ private:
         INFO(name, " aligned");
         CHECK_BATCH_EQ(b, expected);
 
-        b = turbo::simd::load_as<value_type>(v.data(), turbo::simd::unaligned_mode());
+        b = turbo::simd::load_as<value_type>(v.data(), turbo::unaligned_mode());
         INFO(name, " unaligned (load_as)");
         CHECK_BATCH_EQ(b, expected);
 
-        b = turbo::simd::load_as<value_type>(v.data(), turbo::simd::aligned_mode());
+        b = turbo::simd::load_as<value_type>(v.data(), turbo::aligned_mode());
         INFO(name, " aligned (load_as)");
         CHECK_BATCH_EQ(b, expected);
     }
@@ -195,11 +195,11 @@ private:
     struct test_load_char
     {
         /* Make sure simd doesn't try to be smart with char types */
-        static_assert(std::is_same<turbo::simd::batch<char>, decltype(turbo::simd::load_as<char>(std::declval<char*>(), turbo::simd::aligned_mode()))>::value,
+        static_assert(std::is_same<turbo::simd::batch<char>, decltype(turbo::simd::load_as<char>(std::declval<char*>(), turbo::aligned_mode()))>::value,
                       "honor explicit type request");
-        static_assert(std::is_same<turbo::simd::batch<unsigned char>, decltype(turbo::simd::load_as<unsigned char>(std::declval<unsigned char*>(), turbo::simd::aligned_mode()))>::value,
+        static_assert(std::is_same<turbo::simd::batch<unsigned char>, decltype(turbo::simd::load_as<unsigned char>(std::declval<unsigned char*>(), turbo::aligned_mode()))>::value,
                       "honor explicit type request");
-        static_assert(std::is_same<turbo::simd::batch<signed char>, decltype(turbo::simd::load_as<signed char>(std::declval<signed char*>(), turbo::simd::aligned_mode()))>::value,
+        static_assert(std::is_same<turbo::simd::batch<signed char>, decltype(turbo::simd::load_as<signed char>(std::declval<signed char*>(), turbo::aligned_mode()))>::value,
                       "honor explicit type request");
     };
 
@@ -217,11 +217,11 @@ private:
         INFO(name, " aligned");
         CHECK_VECTOR_EQ(res, v);
 
-        turbo::simd::store_as(res.data(), b, turbo::simd::unaligned_mode());
+        turbo::simd::store_as(res.data(), b, turbo::unaligned_mode());
         INFO(name, " unaligned (store_as)");
         CHECK_VECTOR_EQ(res, v);
 
-        turbo::simd::store_as(res.data(), b, turbo::simd::aligned_mode());
+        turbo::simd::store_as(res.data(), b, turbo::aligned_mode());
         INFO(name, " aligned (store_as)");
         CHECK_VECTOR_EQ(res, v);
     }

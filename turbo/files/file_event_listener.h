@@ -22,12 +22,13 @@
 
 namespace turbo {
 
-    /**
-     * @ingroup turbo_files
-     * @brief FileEventListener is a listener for file events. It is used to
-     *        monitor file events, such as open, close, etc. It is used in the
-     *        FileMonitor class.
-     */
+     /**
+      * @ingroup turbo_files_operation
+      * @brief FileEventListener is a listener for file events. It is used to
+      *        inspire by RocksDB's EventListener. It is used in the
+      *        FileMonitor class. or some condition that you want to trigger
+      *        some action during the file operation.
+      */
     struct FileEventListener {
         FileEventListener()
                 : before_open(nullptr), after_open(nullptr), before_close(nullptr), after_close(nullptr) {}

@@ -189,7 +189,7 @@ namespace turbo {
         };
 
         template<template<typename> class Extract, typename Obj, typename Default>
-        struct ExtractOr<Extract, Obj, Default, void_t<Extract<Obj>>> {
+        struct ExtractOr<Extract, Obj, Default, std::void_t<Extract<Obj>>> {
             using type = Extract<Obj>;
         };
 

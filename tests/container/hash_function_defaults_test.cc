@@ -268,14 +268,14 @@ namespace turbo {
                 hash_default_hash<turbo::Cord> hash;
                 auto bitgen = turbo::BitGen();
                 for (int i = 0; i < 1000; ++i) {
-                    const int number_of_segments = turbo::Uniform(bitgen, 0, 10);
+                    const int number_of_segments = turbo::uniform(bitgen, 0, 10);
                     std::vector<std::string> pieces;
                     for (size_t s = 0; s < number_of_segments; ++s) {
                         std::string str;
-                        str.resize(turbo::Uniform(bitgen, 0, 4096));
+                        str.resize(turbo::uniform(bitgen, 0, 4096));
                         // MSVC needed the explicit return type in the lambda.
                         std::generate(str.begin(), str.end(), [&]() -> char {
-                            return static_cast<char>(turbo::Uniform<unsigned char>(bitgen));
+                            return static_cast<char>(turbo::uniform<unsigned char>(bitgen));
                         });
                         pieces.push_back(str);
                     }

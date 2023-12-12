@@ -56,7 +56,7 @@ namespace turbo {
         // may occur immediately) or the timeout has elapsed, returning the value of
         // its "notified" state in either case.
         bool WaitForNotificationWithTimeout(const turbo::Duration &d) const {
-            std::chrono::microseconds timeout = turbo::ToChronoMicroseconds(d);
+            std::chrono::microseconds timeout = turbo::to_chrono_microseconds(d);
             std::unique_lock lk(_data->mutex);
             TLOG_CHECK_GE(_data->count, 0ul);
             return _data->cond.wait_for(lk, timeout, [this] { return _data->count == 0; });
@@ -68,7 +68,7 @@ namespace turbo {
         // may occur immediately) or the deadline has expired, returning the value of
         // its "notified" state in either case.
         bool WaitForNotificationWithDeadline(const turbo::Time &deadline) const {
-            auto d = turbo::ToChronoTime(deadline);
+            auto d = turbo::to_chrono_time(deadline);
             std::unique_lock lk(_data->mutex);
             TLOG_CHECK_GE(_data->count, 0ul);
             return _data->cond.wait_until(lk, d, [this] { return _data->count == 0; });

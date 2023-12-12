@@ -364,7 +364,7 @@ class FixedArray {
   }
 
   template <typename H>
-  friend H TurboHashValue(H h, const FixedArray& v) {
+  friend H hash_value(H h, const FixedArray& v) {
     return H::combine(H::combine_contiguous(std::move(h), v.data(), v.size()),
                       v.size());
   }

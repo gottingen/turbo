@@ -48,10 +48,10 @@ void CycleClockSource::Register(CycleClockSourceFunc source) {
 }
 
 #ifdef _WIN32
-int64_t CycleClock::Now() {
+int64_t CycleClock::time_now() {
   auto fn = LoadCycleClockSource();
   if (fn == nullptr) {
-    return base_internal::UnscaledCycleClock::Now() >> kShift;
+    return base_internal::UnscaledCycleClock::time_now() >> kShift;
   }
   return fn() >> kShift;
 }
@@ -59,7 +59,7 @@ int64_t CycleClock::Now() {
 
 #else
 
-int64_t CycleClock::Now() {
+int64_t CycleClock::time_now() {
   return std::chrono::duration_cast<std::chrono::nanoseconds>(
              std::chrono::steady_clock::now().time_since_epoch())
       .count();

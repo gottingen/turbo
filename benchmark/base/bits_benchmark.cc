@@ -31,7 +31,7 @@ static void BM_bit_width(benchmark::State& state) {
   std::vector<T> values;
   values.reserve(count);
   for (size_t i = 0; i < count; ++i) {
-    values.push_back(turbo::Uniform<T>(rng, 0, std::numeric_limits<T>::max()));
+    values.push_back(turbo::uniform<T>(rng, 0, std::numeric_limits<T>::max()));
   }
 
   while (state.KeepRunningBatch(static_cast<int64_t>(count))) {
@@ -53,7 +53,7 @@ static void BM_bit_width_nonzero(benchmark::State& state) {
   std::vector<T> values;
   values.reserve(count);
   for (size_t i = 0; i < count; ++i) {
-    values.push_back(turbo::Uniform<T>(rng, 1, std::numeric_limits<T>::max()));
+    values.push_back(turbo::uniform<T>(rng, 1, std::numeric_limits<T>::max()));
   }
 
   while (state.KeepRunningBatch(static_cast<int64_t>(count))) {

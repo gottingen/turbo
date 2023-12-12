@@ -87,7 +87,7 @@ namespace container_internal {
 #endif
 
 template <typename Compare, typename T, typename U>
-using compare_result_t = turbo::result_of_t<const Compare(const T &, const U &)>;
+using compare_result_t = std::result_of_t<const Compare(const T &, const U &)>;
 
 // A helper class that indicates if the Compare parameter is a key-compare-to
 // comparator.
@@ -322,11 +322,11 @@ template <typename T, typename = void>
 struct prefers_linear_node_search : std::false_type {};
 template <typename T>
 struct has_linear_node_search_preference<
-    T, turbo::void_t<typename T::turbo_btree_prefer_linear_node_search>>
+    T, std::void_t<typename T::turbo_btree_prefer_linear_node_search>>
     : std::true_type {};
 template <typename T>
 struct prefers_linear_node_search<
-    T, turbo::void_t<typename T::turbo_btree_prefer_linear_node_search>>
+    T, std::void_t<typename T::turbo_btree_prefer_linear_node_search>>
     : T::turbo_btree_prefer_linear_node_search {};
 
 template <typename Compare, typename Key>

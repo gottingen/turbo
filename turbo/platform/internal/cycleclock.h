@@ -60,15 +60,15 @@ using CycleClockSourceFunc = int64_t (*)();
 // -----------------------------------------------------------------------------
 class CycleClock {
  public:
-  // CycleClock::Now()
+  // CycleClock::time_now()
   //
   // Returns the value of a cycle counter that counts at a rate that is
   // approximately constant.
-  static int64_t Now();
+  static int64_t time_now();
 
   // CycleClock::Frequency()
   //
-  // Returns the amount by which `CycleClock::Now()` increases per second. Note
+  // Returns the amount by which `CycleClock::time_now()` increases per second. Note
   // that this value may not necessarily match the core CPU clock frequency.
   static double Frequency();
 
@@ -95,7 +95,7 @@ class CycleClockSource {
   //
   // Register a function that provides an alternate source for the unscaled CPU
   // cycle count value. The source function must be async signal safe, must not
-  // call CycleClock::Now(), and must have a frequency that matches that of the
+  // call CycleClock::time_now(), and must have a frequency that matches that of the
   // unscaled clock used by CycleClock. A nullptr value resets CycleClock to use
   // the default source.
   static void Register(CycleClockSourceFunc source);
@@ -121,10 +121,10 @@ inline CycleClockSourceFunc CycleClock::LoadCycleClockSource() {
 
 // Accessing globals in inlined code in Window DLLs is problematic.
 #ifndef _WIN32
-inline int64_t CycleClock::Now() {
+inline int64_t CycleClock::time_now() {
   auto fn = LoadCycleClockSource();
   if (fn == nullptr) {
-    return base_internal::UnscaledCycleClock::Now() >> kShift;
+    return base_internal::UnscaledCycleClock::time_now() >> kShift;
   }
   return fn() >> kShift;
 }

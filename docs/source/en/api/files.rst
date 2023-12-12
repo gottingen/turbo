@@ -6,6 +6,11 @@
 files module
 =========================
 
-.. doxygengroup:: turbo_files
-   :project: turbo-docs
-   :members:
+.. toctree::
+
+    files/operation
+    files/filesystem
+    files/read
+    files/write
+    files/utility
+    files/monitor

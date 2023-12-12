@@ -87,7 +87,7 @@ struct NonStandardLayout {
   }
 
   template <typename H>
-  friend H TurboHashValue(H h, const NonStandardLayout& v) {
+  friend H hash_value(H h, const NonStandardLayout& v) {
     return H::combine(std::move(h), v.value);
   }
 

@@ -8,6 +8,6 @@ base module
 
 .. toctree::
 
-    base_endian
-    base_utility
-    base_status
+    base/base_endian
+    base/base_utility
+    base/base_status

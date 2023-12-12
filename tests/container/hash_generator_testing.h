@@ -44,7 +44,7 @@ template <class Container, class = void>
 struct IsMap : std::false_type {};
 
 template <class Map>
-struct IsMap<Map, turbo::void_t<typename Map::mapped_type>> : std::true_type {};
+struct IsMap<Map, std::void_t<typename Map::mapped_type>> : std::true_type {};
 
 }  // namespace generator_internal
 
@@ -142,7 +142,7 @@ struct Generator<std::unique_ptr<T>> {
 };
 
 template <class U>
-struct Generator<U, turbo::void_t<decltype(std::declval<U&>().key()),
+struct Generator<U, std::void_t<decltype(std::declval<U&>().key()),
                                 decltype(std::declval<U&>().value())>>
     : Generator<std::pair<
           typename std::decay<decltype(std::declval<U&>().key())>::type,

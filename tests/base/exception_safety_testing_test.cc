@@ -518,7 +518,7 @@ TEST(ThrowingValueTest, NonThrowingPlacementDelete) {
         template<typename TesterInstance>
         struct NullaryTestValidator<
                 TesterInstance,
-                turbo::void_t<decltype(std::declval<TesterInstance>().Test())>>
+                std::void_t<decltype(std::declval<TesterInstance>().Test())>>
                 : public std::true_type {
         };
 
@@ -536,7 +536,7 @@ TEST(ThrowingValueTest, NonThrowingPlacementDelete) {
         template<typename TesterInstance>
         struct UnaryTestValidator<
                 TesterInstance,
-                turbo::void_t<decltype(std::declval<TesterInstance>().Test(DummyOp))>>
+                std::void_t<decltype(std::declval<TesterInstance>().Test(DummyOp))>>
                 : public std::true_type {
         };
 

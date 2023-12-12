@@ -92,7 +92,7 @@ class FunctionRef<R(Args...)> {
   // Used to disable constructors for objects that are not compatible with the
   // signature of this FunctionRef.
   template <typename F,
-            typename FR = turbo::base_internal::invoke_result_t<F, Args&&...>>
+            typename FR = std::invoke_result_t<F, Args&&...>>
   using EnableIfCompatible =
       typename std::enable_if<std::is_void<R>::value ||
                               std::is_convertible<FR, R>::value>::type;
@@ -115,7 +115,7 @@ class FunctionRef<R(Args...)> {
   // functions can decay to function pointers implicitly.
   template <
       typename F, typename = EnableIfCompatible<F*>,
-      turbo::functional_internal::EnableIf<turbo::is_function<F>::value> = 0>
+      turbo::functional_internal::EnableIf<std::is_function<F>::value> = 0>
   FunctionRef(F* f)  // NOLINT(runtime/explicit)
       : invoker_(&turbo::functional_internal::InvokeFunction<F*, R, Args...>) {
     assert(f != nullptr);

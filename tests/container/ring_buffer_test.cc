@@ -522,16 +522,16 @@ TEST(ring_buffer, all) {
     // ring_buffer(this_type&& x, const allocator_type& allocator);
     // this_type& operator=(this_type&& x);
 
-    RBListString rbListStringM1(turbo::move(rbListString5));
+    RBListString rbListStringM1(std::move(rbListString5));
     EXPECT_TRUE(rbListStringM1.validate() && rbListString5.validate());
     EXPECT_TRUE((rbListStringM1.size() == 10) && (rbListString5.size() == 0));
 
-    RBListString rbListStringM2(turbo::move(rbListStringM1),
+    RBListString rbListStringM2(std::move(rbListStringM1),
                                 RBListString::allocator_type());
     EXPECT_TRUE(rbListStringM2.validate() && rbListStringM1.validate());
     EXPECT_TRUE((rbListStringM2.size() == 10) && (rbListStringM1.size() == 0));
 
-    rbListStringM1 = turbo::move(rbListStringM2);
+    rbListStringM1 = std::move(rbListStringM2);
     EXPECT_TRUE(rbListStringM1.validate() && rbListStringM2.validate());
     EXPECT_TRUE((rbListStringM1.size() == 10) && (rbListStringM2.size() == 0));
   }

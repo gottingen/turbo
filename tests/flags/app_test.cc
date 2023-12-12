@@ -36,10 +36,10 @@ TEST_CASE_FIXTURE(TApp, "OneFlagShortValues [app]") {
     app.add_flag("-c{v1},--count{v2}");
     args = {"-c"};
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--count") == 1u);
+    CHECK_EQ(app.count("-c"), 1u);
+    CHECK_EQ(app.count("--count"), 1u);
     auto v = app["-c"]->results();
-    CHECK("v1" == v[0]);
+    CHECK_EQ("v1",  v[0]);
 
     CHECK_THROWS_AS(app["--invalid"], turbo::OptionNotFound);
 }
@@ -49,26 +49,26 @@ TEST_CASE_FIXTURE(TApp, "OneFlagShortValuesAs [app]") {
     args = {"-c"};
     run();
     const auto *opt = app["-c"];
-    CHECK(1 == opt->as<int>());
+    CHECK_EQ(1 , opt->as<int>());
     args = {"--count"};
     run();
-    CHECK(2 == opt->as<int>());
+    CHECK_EQ(2 , opt->as<int>());
     flg->take_first();
     args = {"-c", "--count"};
     run();
-    CHECK(1 == opt->as<int>());
+    CHECK_EQ(1 , opt->as<int>());
     flg->take_last();
-    CHECK(2 == opt->as<int>());
+    CHECK_EQ(2 , opt->as<int>());
     flg->multi_option_policy(turbo::MultiOptionPolicy::Throw);
     CHECK_THROWS_AS(opt->as<int>(), turbo::ArgumentMismatch);
     flg->multi_option_policy(turbo::MultiOptionPolicy::TakeAll);
     auto vec = opt->as<std::vector<int>>();
-    CHECK(1 == vec[0]);
-    CHECK(2 == vec[1]);
+    CHECK_EQ(1 , vec[0]);
+    CHECK_EQ(2 , vec[1]);
     flg->multi_option_policy(turbo::MultiOptionPolicy::Join);
-    CHECK("1\n2" == opt->as<std::string>());
+    CHECK_EQ("1\n2" , opt->as<std::string>());
     flg->delimiter(',');
-    CHECK("1,2" == opt->as<std::string>());
+    CHECK_EQ("1,2" , opt->as<std::string>());
 }
 
 TEST_CASE_FIXTURE(TApp, "OneFlagShortWindows [app]") {
@@ -76,8 +76,8 @@ TEST_CASE_FIXTURE(TApp, "OneFlagShortWindows [app]") {
     args = {"/c"};
     app.allow_windows_style_options();
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--count") == 1u);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--count") , 1u);
 }
 
 TEST_CASE_FIXTURE(TApp, "WindowsLongShortMix1 [app]") {
@@ -87,8 +87,8 @@ TEST_CASE_FIXTURE(TApp, "WindowsLongShortMix1 [app]") {
     auto *b = app.add_flag("--c");
     args = {"/c"};
     run();
-    CHECK(a->count() == 1u);
-    CHECK(b->count() == 0u);
+    CHECK_EQ(a->count() , 1u);
+    CHECK_EQ(b->count() , 0u);
 }
 
 TEST_CASE_FIXTURE(TApp, "WindowsLongShortMix2 [app]") {
@@ -98,8 +98,8 @@ TEST_CASE_FIXTURE(TApp, "WindowsLongShortMix2 [app]") {
     auto *b = app.add_flag("-c");
     args = {"/c"};
     run();
-    CHECK(a->count() == 1u);
-    CHECK(b->count() == 0u);
+    CHECK_EQ(a->count() , 1u);
+    CHECK_EQ(b->count() , 0u);
 }
 
 TEST_CASE_FIXTURE(TApp, "CountNonExist [app]") {
@@ -113,8 +113,8 @@ TEST_CASE_FIXTURE(TApp, "OneFlagLong [app]") {
     app.add_flag("-c,--count");
     args = {"--count"};
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--count") == 1u);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--count") , 1u);
 }
 
 TEST_CASE_FIXTURE(TApp, "DashedOptions [app]") {
@@ -124,10 +124,10 @@ TEST_CASE_FIXTURE(TApp, "DashedOptions [app]") {
 
     args = {"-c", "--q", "--this", "--that"};
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--q") == 1u);
-    CHECK(app.count("--this") == 2u);
-    CHECK(app.count("--that") == 2u);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--q") , 1u);
+    CHECK_EQ(app.count("--this") , 2u);
+    CHECK_EQ(app.count("--that") , 2u);
 }
 
 TEST_CASE_FIXTURE(TApp, "DashedOptionsSingleString [app]") {
@@ -136,10 +136,10 @@ TEST_CASE_FIXTURE(TApp, "DashedOptionsSingleString [app]") {
     app.add_flag("--this,--that");
 
     app.parse("-c --q --this --that");
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--q") == 1u);
-    CHECK(app.count("--this") == 2u);
-    CHECK(app.count("--that") == 2u);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--q") , 1u);
+    CHECK_EQ(app.count("--this") , 2u);
+    CHECK_EQ(app.count("--that") , 2u);
 }
 
 TEST_CASE_FIXTURE(TApp, "StrangeFlagNames [app]") {
@@ -149,8 +149,8 @@ TEST_CASE_FIXTURE(TApp, "StrangeFlagNames [app]") {
     CHECK_THROWS_AS(app.add_flag("--t t"), turbo::ConstructionError);
     args = {"-=", "--t\tt"};
     run();
-    CHECK(app.count("-=") == 1u);
-    CHECK(app.count("--t\tt") == 1u);
+    CHECK_EQ(app.count("-=") , 1u);
+    CHECK_EQ(app.count("--t\tt") , 1u);
 }
 
 TEST_CASE_FIXTURE(TApp, "BoolFlagOverride [app]") {
@@ -178,9 +178,9 @@ TEST_CASE_FIXTURE(TApp, "OneFlagRef [app]") {
     app.add_flag("-c,--count", ref);
     args = {"--count"};
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--count") == 1u);
-    CHECK(ref == 1);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--count") , 1u);
+    CHECK_EQ(ref , 1);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneFlagRefValue [app]") {
@@ -188,9 +188,9 @@ TEST_CASE_FIXTURE(TApp, "OneFlagRefValue [app]") {
     app.add_flag("-c,--count", ref);
     args = {"--count=7"};
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--count") == 1u);
-    CHECK(ref == 7);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--count") , 1u);
+    CHECK_EQ(ref , 7);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneFlagRefValueFalse [app]") {
@@ -198,16 +198,16 @@ TEST_CASE_FIXTURE(TApp, "OneFlagRefValueFalse [app]") {
     auto *flg = app.add_flag("-c,--count", ref);
     args = {"--count=false"};
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--count") == 1u);
-    CHECK(ref == -1);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--count") , 1u);
+    CHECK_EQ(ref , -1);
 
     CHECK(!flg->check_fname("c"));
     args = {"--count=0"};
     run();
-    CHECK(app.count("-c") == 1u);
-    CHECK(app.count("--count") == 1u);
-    CHECK(ref == 0);
+    CHECK_EQ(app.count("-c") , 1u);
+    CHECK_EQ(app.count("--count") , 1u);
+    CHECK_EQ(ref , 0);
 
     args = {"--count=happy"};
     CHECK_THROWS_AS(run(), turbo::ConversionError);
@@ -220,10 +220,10 @@ TEST_CASE_FIXTURE(TApp, "FlagNegation [app]") {
     CHECK(!flg->check_fname("count"));
     CHECK(flg->check_fname("ncount"));
     run();
-    CHECK(app.count("-c") == 3u);
-    CHECK(app.count("--count") == 3u);
-    CHECK(app.count("--ncount") == 3u);
-    CHECK(ref == 1);
+    CHECK_EQ(app.count("-c") , 3u);
+    CHECK_EQ(app.count("--count") , 3u);
+    CHECK_EQ(app.count("--ncount") , 3u);
+    CHECK_EQ(ref , 1);
 }
 
 TEST_CASE_FIXTURE(TApp, "FlagNegationShortcutNotation [app]") {
@@ -231,10 +231,10 @@ TEST_CASE_FIXTURE(TApp, "FlagNegationShortcutNotation [app]") {
     app.add_flag("-c,--count{true},!--ncount", ref);
     args = {"--count=TRUE", "-c", "--ncount"};
     run();
-    CHECK(app.count("-c") == 3u);
-    CHECK(app.count("--count") == 3u);
-    CHECK(app.count("--ncount") == 3u);
-    CHECK(ref == 1);
+    CHECK_EQ(app.count("-c") , 3u);
+    CHECK_EQ(app.count("--count") , 3u);
+    CHECK_EQ(app.count("--ncount") , 3u);
+    CHECK_EQ(ref , 1);
 }
 
 TEST_CASE_FIXTURE(TApp, "FlagNegationShortcutNotationInvalid [app]") {
@@ -249,9 +249,9 @@ TEST_CASE_FIXTURE(TApp, "OneString [app]") {
     app.add_option("-s,--string", str);
     args = {"--string", "mystring"};
     run();
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
-    CHECK("mystring" == str);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
+    CHECK_EQ("mystring" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringWindowsStyle [app]") {
@@ -260,9 +260,9 @@ TEST_CASE_FIXTURE(TApp, "OneStringWindowsStyle [app]") {
     args = {"/string", "mystring"};
     app.allow_windows_style_options();
     run();
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
-    CHECK("mystring" == str);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
+    CHECK_EQ("mystring" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringSingleStringInput [app]") {
@@ -270,9 +270,9 @@ TEST_CASE_FIXTURE(TApp, "OneStringSingleStringInput [app]") {
     app.add_option("-s,--string", str);
 
     app.parse("--string mystring");
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
-    CHECK("mystring" == str);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
+    CHECK_EQ("mystring" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersion [app]") {
@@ -280,9 +280,9 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersion [app]") {
     app.add_option("-s,--string", str);
     args = {"--string=mystring"};
     run();
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
-    CHECK("mystring" == str);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
+    CHECK_EQ("mystring" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionWindowsStyle [app]") {
@@ -291,27 +291,27 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionWindowsStyle [app]") {
     args = {"/string:mystring"};
     app.allow_windows_style_options();
     run();
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
-    CHECK("mystring" == str);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
+    CHECK_EQ("mystring" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleString [app]") {
     std::string str;
     app.add_option("-s,--string", str);
     app.parse("--string=mystring");
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
-    CHECK("mystring" == str);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
+    CHECK_EQ("mystring" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuoted [app]") {
     std::string str;
     app.add_option("-s,--string", str);
     app.parse(R"raw(--string="this is my quoted string")raw");
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
-    CHECK("this is my quoted string" == str);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
+    CHECK_EQ("this is my quoted string" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultiple [app]") {
@@ -320,9 +320,9 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultiple [app]")
     app.add_option("-t,--tstr", str2);
     app.add_option("-m,--mstr", str3);
     app.parse(R"raw(--string="this is my quoted string" -t 'qstring 2' -m=`"quoted string"`)raw");
-    CHECK("this is my quoted string" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
+    CHECK_EQ("this is my quoted string" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringEmbeddedEqual [app]") {
@@ -331,14 +331,14 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringEmbeddedEqual [app]") 
     app.add_option("-t,--tstr", str2);
     app.add_option("-m,--mstr", str3);
     app.parse(R"raw(--string="app=\"test1 b\" test2=\"frogs\"" -t 'qstring 2' -m=`"quoted string"`)raw");
-    CHECK("app=\"test1 b\" test2=\"frogs\"" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
+    CHECK_EQ("app=\"test1 b\" test2=\"frogs\"" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
 
     app.parse(R"raw(--string="app='test1 b' test2='frogs'" -t 'qstring 2' -m=`"quoted string"`)raw");
-    CHECK("app='test1 b' test2='frogs'" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
+    CHECK_EQ("app='test1 b' test2='frogs'" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringEmbeddedEqualWindowsStyle [app]") {
@@ -348,14 +348,14 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringEmbeddedEqualWindowsSt
     app.add_option("--mstr", str3);
     app.allow_windows_style_options();
     app.parse(R"raw(/string:"app:\"test1 b\" test2:\"frogs\"" /t 'qstring 2' /mstr:`"quoted string"`)raw");
-    CHECK("app:\"test1 b\" test2:\"frogs\"" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
+    CHECK_EQ("app:\"test1 b\" test2:\"frogs\"" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
 
     app.parse(R"raw(/string:"app:'test1 b' test2:'frogs'" /t 'qstring 2' /mstr:`"quoted string"`)raw");
-    CHECK("app:'test1 b' test2:'frogs'" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
+    CHECK_EQ("app:'test1 b' test2:'frogs'" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleMixedStyle [app]") {
@@ -365,9 +365,9 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleMixedSty
     app.add_option("-m,--mstr", str3);
     app.allow_windows_style_options();
     app.parse(R"raw(/string:"this is my quoted string" /t 'qstring 2' -m=`"quoted string"`)raw");
-    CHECK("this is my quoted string" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
+    CHECK_EQ("this is my quoted string" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleInMiddle [app]") {
@@ -376,9 +376,9 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleInMiddle
     app.add_option("-t,--tstr", str2);
     app.add_option("-m,--mstr", str3);
     app.parse(R"raw(--string="this is my quoted string" -t "qst\"ring 2" -m=`"quoted string"`)raw");
-    CHECK("this is my quoted string" == str);
-    CHECK("qst\"ring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
+    CHECK_EQ("this is my quoted string" , str);
+    CHECK_EQ("qst\"ring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedEscapedCharacters [app]") {
@@ -387,9 +387,9 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedEscapedCharacter
     app.add_option("-t,--tstr", str2);
     app.add_option("-m,--mstr", str3);
     app.parse(R"raw(--string="this is my \"quoted\" string" -t 'qst\'ring 2' -m=`"quoted\` string"`")raw");
-    CHECK("this is my \"quoted\" string" == str);
-    CHECK("qst\'ring 2" == str2);
-    CHECK("\"quoted` string\"" == str3);
+    CHECK_EQ("this is my \"quoted\" string" , str);
+    CHECK_EQ("qst\'ring 2" , str2);
+    CHECK_EQ("\"quoted` string\"" , str3);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleWithEqual [app]") {
@@ -399,10 +399,10 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleWithEqua
     app.add_option("-m,--mstr", str3);
     app.add_option("-j,--jstr", str4);
     app.parse(R"raw(--string="this is my quoted string" -t 'qstring 2' -m=`"quoted string"` --jstr=Unquoted)raw");
-    CHECK("this is my quoted string" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
-    CHECK("Unquoted" == str4);
+    CHECK_EQ("this is my quoted string" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
+    CHECK_EQ("Unquoted" , str4);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleWithEqualAndProgram [app]") {
@@ -414,10 +414,10 @@ TEST_CASE_FIXTURE(TApp, "OneStringEqualVersionSingleStringQuotedMultipleWithEqua
     app.parse(
             R"raw(program --string="this is my quoted string" -t 'qstring 2' -m=`"quoted string"` --jstr=Unquoted)raw",
             true);
-    CHECK("this is my quoted string" == str);
-    CHECK("qstring 2" == str2);
-    CHECK("\"quoted string\"" == str3);
-    CHECK("Unquoted" == str4);
+    CHECK_EQ("this is my quoted string" , str);
+    CHECK_EQ("qstring 2" , str2);
+    CHECK_EQ("\"quoted string\"" , str3);
+    CHECK_EQ("Unquoted" , str4);
 }
 
 TEST_CASE_FIXTURE(TApp, "OneStringFlagLike [app]") {
@@ -425,8 +425,8 @@ TEST_CASE_FIXTURE(TApp, "OneStringFlagLike [app]") {
     app.add_option("-s,--string", str)->expected(0, 1);
     args = {"--string"};
     run();
-    CHECK(app.count("-s") == 1u);
-    CHECK(app.count("--string") == 1u);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(app.count("--string") , 1u);
     CHECK(str.empty());
 }
 
@@ -435,14 +435,14 @@ TEST_CASE_FIXTURE(TApp, "OneIntFlagLike [app]") {
     auto *opt = app.add_option("-i", val)->expected(0, 1);
     args = {"-i"};
     run();
-    CHECK(app.count("-i") == 1u);
+    CHECK_EQ(app.count("-i") , 1u);
     opt->default_str("7");
     run();
-    CHECK(7 == val);
+    CHECK_EQ(7 , val);
 
     opt->default_val(9);
     run();
-    CHECK(9 == val);
+    CHECK_EQ(9 , val);
 }
 
 TEST_CASE_FIXTURE(TApp, "TogetherInt [app]") {
@@ -450,11 +450,11 @@ TEST_CASE_FIXTURE(TApp, "TogetherInt [app]") {
     app.add_option("-i,--int", i);
     args = {"-i4"};
     run();
-    CHECK(app.count("--int") == 1u);
-    CHECK(app.count("-i") == 1u);
-    CHECK(4 == i);
-    CHECK("4" == app["-i"]->as<std::string>());
-    CHECK(4.0 == app["--int"]->as<double>());
+    CHECK_EQ(app.count("--int") , 1u);
+    CHECK_EQ(app.count("-i") , 1u);
+    CHECK_EQ(4 , i);
+    CHECK_EQ("4" , app["-i"]->as<std::string>());
+    CHECK_EQ(4.0 , app["--int"]->as<double>());
 }
 
 TEST_CASE_FIXTURE(TApp, "SepInt [app]") {
@@ -462,27 +462,27 @@ TEST_CASE_FIXTURE(TApp, "SepInt [app]") {
     app.add_option("-i,--int", i);
     args = {"-i", "4"};
     run();
-    CHECK(app.count("--int") == 1u);
-    CHECK(app.count("-i") == 1u);
-    CHECK(4 == i);
+    CHECK_EQ(app.count("--int") , 1u);
+    CHECK_EQ(app.count("-i") , 1u);
+    CHECK_EQ(4 , i);
 }
 
 TEST_CASE_FIXTURE(TApp, "DefaultStringAgain [app]") {
     std::string str = "previous";
     app.add_option("-s,--string", str);
     run();
-    CHECK(app.count("-s") == 0u);
-    CHECK(app.count("--string") == 0u);
-    CHECK("previous" == str);
+    CHECK_EQ(app.count("-s") , 0u);
+    CHECK_EQ(app.count("--string") , 0u);
+    CHECK_EQ("previous" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "DefaultStringAgainEmpty [app]") {
     std::string str = "previous";
     app.add_option("-s,--string", str);
     app.parse("   ");
-    CHECK(app.count("-s") == 0u);
-    CHECK(app.count("--string") == 0u);
-    CHECK("previous" == str);
+    CHECK_EQ(app.count("-s") , 0u);
+    CHECK_EQ(app.count("--string") , 0u);
+    CHECK_EQ("previous" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "DualOptions [app]") {
@@ -495,7 +495,7 @@ TEST_CASE_FIXTURE(TApp, "DualOptions [app]") {
 
     args = {"--vector=one", "--vector=two"};
     run();
-    CHECK(vstr == ans);
+    CHECK_EQ(vstr , ans);
 
     args = {"--string=one", "--string=two"};
     CHECK_THROWS_AS(run(), turbo::ArgumentMismatch);
@@ -509,10 +509,10 @@ TEST_CASE_FIXTURE(TApp, "LotsOfFlags [app]") {
 
     args = {"-a", "-b", "-aA"};
     run();
-    CHECK(app.count("-a") == 2u);
-    CHECK(app.count("-b") == 1u);
-    CHECK(app.count("-A") == 1u);
-    CHECK(4u == app.count_all());
+    CHECK_EQ(app.count("-a") , 2u);
+    CHECK_EQ(app.count("-b") , 1u);
+    CHECK_EQ(app.count("-A") , 1u);
+    CHECK_EQ(4u , app.count_all());
 }
 
 TEST_CASE_FIXTURE(TApp, "NumberFlags [app]") {
@@ -522,8 +522,8 @@ TEST_CASE_FIXTURE(TApp, "NumberFlags [app]") {
 
     args = {"-7"};
     run();
-    CHECK(app.count("-1") == 1u);
-    CHECK(7 == val);
+    CHECK_EQ(app.count("-1") , 1u);
+    CHECK_EQ(7 , val);
 }
 
 TEST_CASE_FIXTURE(TApp, "DisableFlagOverrideTest [app]") {
@@ -538,7 +538,7 @@ TEST_CASE_FIXTURE(TApp, "DisableFlagOverrideTest [app]") {
     opt->disable_flag_override(false);
     CHECK(!opt->get_disable_flag_override());
     CHECK_NOTHROW(run());
-    CHECK(5 == val);
+    CHECK_EQ(5 , val);
     opt->disable_flag_override();
     args = {"--7=7"};
     CHECK_NOTHROW(run());
@@ -551,9 +551,9 @@ TEST_CASE_FIXTURE(TApp, "LotsOfFlagsSingleString [app]") {
     app.add_flag("-b");
 
     app.parse("-a -b -aA");
-    CHECK(app.count("-a") == 2u);
-    CHECK(app.count("-b") == 1u);
-    CHECK(app.count("-A") == 1u);
+    CHECK_EQ(app.count("-a") , 2u);
+    CHECK_EQ(app.count("-b") , 1u);
+    CHECK_EQ(app.count("-A") , 1u);
 }
 
 TEST_CASE_FIXTURE(TApp, "LotsOfFlagsSingleStringExtraSpace [app]") {
@@ -563,9 +563,9 @@ TEST_CASE_FIXTURE(TApp, "LotsOfFlagsSingleStringExtraSpace [app]") {
     app.add_flag("-b");
 
     app.parse("  -a    -b    -aA   ");
-    CHECK(app.count("-a") == 2u);
-    CHECK(app.count("-b") == 1u);
-    CHECK(app.count("-A") == 1u);
+    CHECK_EQ(app.count("-a") , 2u);
+    CHECK_EQ(app.count("-b") , 1u);
+    CHECK_EQ(app.count("-A") , 1u);
 }
 
 TEST_CASE_FIXTURE(TApp, "SingleArgVector [app]") {
@@ -578,14 +578,14 @@ TEST_CASE_FIXTURE(TApp, "SingleArgVector [app]") {
     app.add_option("-p", path);
 
     app.parse("-c t1 -c t2 -c t3 a1 a2 a3 a4 -p happy");
-    CHECK(channels.size() == 3u);
-    CHECK(iargs.size() == 4u);
-    CHECK("happy" == path);
+    CHECK_EQ(channels.size() , 3u);
+    CHECK_EQ(iargs.size() , 4u);
+    CHECK_EQ("happy" , path);
 
     app.parse("-c t1 a1 -c t2 -c t3 a2 a3 a4 -p happy");
-    CHECK(channels.size() == 3u);
-    CHECK(iargs.size() == 4u);
-    CHECK("happy" == path);
+    CHECK_EQ(channels.size() , 3u);
+    CHECK_EQ(iargs.size() , 4u);
+    CHECK_EQ("happy" , path);
 }
 
 TEST_CASE_FIXTURE(TApp, "StrangeOptionNames [app]") {
@@ -596,10 +596,10 @@ TEST_CASE_FIXTURE(TApp, "StrangeOptionNames [app]") {
     CHECK_THROWS_AS(app.add_option("--t t"), turbo::ConstructionError);
     args = {"-:)", "--{}", "5"};
     run();
-    CHECK(app.count("-:") == 1u);
-    CHECK(app.count("--{}") == 1u);
-    CHECK(app["-:"]->as<char>() == ')');
-    CHECK(app["--{}"]->as<int>() == 5);
+    CHECK_EQ(app.count("-:") , 1u);
+    CHECK_EQ(app.count("--{}") , 1u);
+    CHECK_EQ(app["-:"]->as<char>() , ')');
+    CHECK_EQ(app["--{}"]->as<int>() , 5);
 }
 
 TEST_CASE_FIXTURE(TApp, "FlagLikeOption [app]") {
@@ -607,14 +607,14 @@ TEST_CASE_FIXTURE(TApp, "FlagLikeOption [app]") {
     auto *opt = app.add_option("--flag", val)->type_size(0)->default_str("true");
     args = {"--flag"};
     run();
-    CHECK(app.count("--flag") == 1u);
+    CHECK_EQ(app.count("--flag") , 1u);
     CHECK(val);
     val = false;
     opt->type_size(0, 0);  // should be the same as above
-    CHECK(0 == opt->get_type_size_min());
-    CHECK(0 == opt->get_type_size_max());
+    CHECK_EQ(0 , opt->get_type_size_min());
+    CHECK_EQ(0 , opt->get_type_size_max());
     run();
-    CHECK(app.count("--flag") == 1u);
+    CHECK_EQ(app.count("--flag") , 1u);
     CHECK(val);
 }
 
@@ -627,12 +627,12 @@ TEST_CASE_FIXTURE(TApp, "FlagLikeIntOption [app]") {
     args = {"--flag"};
     CHECK(opt->as<std::string>().empty());
     run();
-    CHECK(app.count("--flag") == 1u);
+    CHECK_EQ(app.count("--flag") , 1u);
     CHECK(-47 != val);
     args = {"--flag", "12"};
     run();
 
-    CHECK(12 == val);
+    CHECK_EQ(12 , val);
     args.clear();
     run();
     CHECK(opt->as<std::string>().empty());
@@ -663,11 +663,11 @@ TEST_CASE_FIXTURE(TApp, "ShortOpts [app]") {
 
     run();
 
-    CHECK(app.count("-z") == 2u);
-    CHECK(app.count("-y") == 1u);
-    CHECK(funnyint == std::uint64_t{2});
-    CHECK(someopt == "zyz");
-    CHECK(3u == app.count_all());
+    CHECK_EQ(app.count("-z") , 2u);
+    CHECK_EQ(app.count("-y") , 1u);
+    CHECK_EQ(funnyint , std::uint64_t{2});
+    CHECK_EQ(someopt , "zyz");
+    CHECK_EQ(3u , app.count_all());
 }
 
 TEST_CASE_FIXTURE(TApp, "TwoParamTemplateOpts [app]") {
@@ -679,7 +679,7 @@ TEST_CASE_FIXTURE(TApp, "TwoParamTemplateOpts [app]") {
 
     run();
 
-    CHECK(funnyint == 32.0);
+    CHECK_EQ(funnyint , 32.0);
 
     args = {"-y", "32.3"};
     CHECK_THROWS_AS(run(), turbo::ConversionError);
@@ -703,10 +703,10 @@ TEST_CASE_FIXTURE(TApp, "DefaultOpts [app]") {
 
     run();
 
-    CHECK(app.count("i") == 1u);
-    CHECK(app.count("-s") == 1u);
-    CHECK(i == 2);
-    CHECK(s == "9");
+    CHECK_EQ(app.count("i") , 1u);
+    CHECK_EQ(app.count("-s") , 1u);
+    CHECK_EQ(i , 2);
+    CHECK_EQ(s , "9");
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeLastOpt [app]") {
@@ -718,7 +718,7 @@ TEST_CASE_FIXTURE(TApp, "TakeLastOpt [app]") {
 
     run();
 
-    CHECK("two" == str);
+    CHECK_EQ("two" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeLastOpt2 [app]") {
@@ -730,7 +730,7 @@ TEST_CASE_FIXTURE(TApp, "TakeLastOpt2 [app]") {
 
     run();
 
-    CHECK("two" == str);
+    CHECK_EQ("two" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeFirstOpt [app]") {
@@ -742,7 +742,7 @@ TEST_CASE_FIXTURE(TApp, "TakeFirstOpt [app]") {
 
     run();
 
-    CHECK("one" == str);
+    CHECK_EQ("one" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeFirstOpt2 [app]") {
@@ -754,7 +754,7 @@ TEST_CASE_FIXTURE(TApp, "TakeFirstOpt2 [app]") {
 
     run();
 
-    CHECK("one" == str);
+    CHECK_EQ("one" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "JoinOpt [app]") {
@@ -766,7 +766,7 @@ TEST_CASE_FIXTURE(TApp, "JoinOpt [app]") {
 
     run();
 
-    CHECK("one\ntwo" == str);
+    CHECK_EQ("one\ntwo" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "SumOpt [app]") {
@@ -778,7 +778,7 @@ TEST_CASE_FIXTURE(TApp, "SumOpt [app]") {
 
     run();
 
-    CHECK(5 == val);
+    CHECK_EQ(5 , val);
 }
 
 TEST_CASE_FIXTURE(TApp, "SumOptFloat [app]") {
@@ -790,7 +790,7 @@ TEST_CASE_FIXTURE(TApp, "SumOptFloat [app]") {
 
     run();
 
-    CHECK(0.6 == val);
+    CHECK_EQ(0.6 , val);
 }
 
 TEST_CASE_FIXTURE(TApp, "SumOptString [app]") {
@@ -802,7 +802,7 @@ TEST_CASE_FIXTURE(TApp, "SumOptString [app]") {
 
     run();
 
-    CHECK("i2" == val);
+    CHECK_EQ("i2" , val);
 }
 
 TEST_CASE_FIXTURE(TApp, "JoinOpt2 [app]") {
@@ -814,7 +814,7 @@ TEST_CASE_FIXTURE(TApp, "JoinOpt2 [app]") {
 
     run();
 
-    CHECK("one\ntwo" == str);
+    CHECK_EQ("one\ntwo" , str);
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeLastOptMulti [app]") {
@@ -825,7 +825,7 @@ TEST_CASE_FIXTURE(TApp, "TakeLastOptMulti [app]") {
 
     run();
 
-    CHECK(std::vector<int>({2, 3}) == vals);
+    CHECK_EQ(std::vector<int>({2, 3}) , vals);
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeLastOptMulti_alternative_path [app]") {
@@ -836,7 +836,7 @@ TEST_CASE_FIXTURE(TApp, "TakeLastOptMulti_alternative_path [app]") {
 
     run();
 
-    CHECK(std::vector<int>({2, 3}) == vals);
+    CHECK_EQ(std::vector<int>({2, 3}) , vals);
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeLastOptMultiCheck [app]") {
@@ -849,7 +849,7 @@ TEST_CASE_FIXTURE(TApp, "TakeLastOptMultiCheck [app]") {
 
     CHECK_NOTHROW(run());
 
-    CHECK(std::vector<int>({2, -3}) == vals);
+    CHECK_EQ(std::vector<int>({2, -3}) , vals);
 }
 
 TEST_CASE_FIXTURE(TApp, "TakeFirstOptMulti [app]") {
@@ -860,7 +860,7 @@ TEST_CASE_FIXTURE(TApp, "TakeFirstOptMulti [app]") {
 
     run();
 
-    CHECK(std::vector<int>({1, 2}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2}) , vals);
 }
 
 TEST_CASE_FIXTURE(TApp, "MissingValueNonRequiredOpt [app]") {
@@ -895,11 +895,11 @@ TEST_CASE_FIXTURE(TApp, "NoMissingValueMoreThan [app]") {
 
     args = {"-v", "2", "3", "4"};
     run();
-    CHECK(std::vector<int>({2, 3, 4}) == vals1);
+    CHECK_EQ(std::vector<int>({2, 3, 4}) , vals1);
 
     args = {"--vals", "2", "3", "4"};
     run();
-    CHECK(std::vector<int>({2, 3, 4}) == vals2);
+    CHECK_EQ(std::vector<int>({2, 3, 4}) , vals2);
 }
 
 TEST_CASE_FIXTURE(TApp, "NotRequiredOptsSingle [app]") {
@@ -955,7 +955,7 @@ TEST_CASE_FIXTURE(TApp, "RequiredOptsDouble [app]") {
 
     run();
 
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
 }
 
 TEST_CASE_FIXTURE(TApp, "emptyVectorReturn [app]") {
@@ -969,19 +969,19 @@ TEST_CASE_FIXTURE(TApp, "emptyVectorReturn [app]") {
     args = {"--str"};
 
     CHECK_NOTHROW(run());
-    CHECK(std::vector<std::string>({""}) == strs);
+    CHECK_EQ(std::vector<std::string>({""}) , strs);
     args = {"--str", "one", "two"};
 
     run();
 
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
 
     args = {"--str", "{}", "--str2", "{}"};
 
     run();
 
     CHECK(strs.empty());
-    CHECK(std::vector<std::string>{"{}"} == strs2);
+    CHECK_EQ(std::vector<std::string>{"{}"} , strs2);
     opt1->default_str("{}");
     args = {"--str"};
 
@@ -1019,11 +1019,11 @@ TEST_CASE_FIXTURE(TApp, "RequiredOptsDoubleNeg [app]") {
     args = {"-s", "one", "two", "-s", "three"};
 
     REQUIRE_NOTHROW(run());
-    CHECK(std::vector<std::string>({"one", "two", "three"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two", "three"}) , strs);
 
     args = {"-s", "one", "two"};
     REQUIRE_NOTHROW(run());
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
 }
 
 // This makes sure unlimited option priority is
@@ -1039,14 +1039,14 @@ TEST_CASE_FIXTURE(TApp, "PositionalNoSpace [app]") {
     args = {"-O", "Test", "param1", "param2"};
     run();
 
-    CHECK(1u == options.size());
-    CHECK("Test" == options.at(0));
+    CHECK_EQ(1u , options.size());
+    CHECK_EQ("Test" , options.at(0));
 
     args = {"-OTest", "param1", "param2"};
     run();
 
-    CHECK(1u == options.size());
-    CHECK("Test" == options.at(0));
+    CHECK_EQ(1u , options.size());
+    CHECK_EQ("Test" , options.at(0));
 }
 
 // Tests positionals at end
@@ -1061,8 +1061,8 @@ TEST_CASE_FIXTURE(TApp, "PositionalAtEnd [app]") {
     args = {"-O", "Test", "param1"};
     run();
 
-    CHECK("Test" == options);
-    CHECK("param1" == foo);
+    CHECK_EQ("Test" , options);
+    CHECK_EQ("param1" , foo);
 
     args = {"param2", "-O", "Test"};
     CHECK_THROWS_AS(run(), turbo::ExtrasError);
@@ -1079,15 +1079,15 @@ TEST_CASE_FIXTURE(TApp, "RequiredPositionals [app]") {
     args = {"1", "2", "3"};
     run();
 
-    CHECK(2u == sources.size());
-    CHECK("3" == dest);
+    CHECK_EQ(2u , sources.size());
+    CHECK_EQ("3" , dest);
 
     args = {"a"};
     sources.clear();
     run();
 
     CHECK(sources.empty());
-    CHECK("a" == dest);
+    CHECK_EQ("a" , dest);
 }
 
 TEST_CASE_FIXTURE(TApp, "RequiredPositionalVector [app]") {
@@ -1106,15 +1106,15 @@ TEST_CASE_FIXTURE(TApp, "RequiredPositionalVector [app]") {
     args = {"1", "2", "3"};
     run();
 
-    CHECK(1u == sources.size());
-    CHECK("1" == d1);
-    CHECK("2" == d2);
+    CHECK_EQ(1u , sources.size());
+    CHECK_EQ("1" , d1);
+    CHECK_EQ("2" , d2);
     CHECK(d3.empty());
     args = {"a"};
     sources.clear();
     run();
 
-    CHECK(1u == sources.size());
+    CHECK_EQ(1u , sources.size());
 }
 
 // Tests positionals at end
@@ -1130,9 +1130,9 @@ TEST_CASE_FIXTURE(TApp, "RequiredPositionalValidation [app]") {
     args = {"1", "2", "string", "3"};
     run();
 
-    CHECK(2u == sources.size());
-    CHECK(3 == dest);
-    CHECK("string" == d2);
+    CHECK_EQ(2u , sources.size());
+    CHECK_EQ(3 , dest);
+    CHECK_EQ("string" , d2);
 }
 
 // Tests positionals at end
@@ -1147,14 +1147,14 @@ TEST_CASE_FIXTURE(TApp, "PositionalValidation [app]") {
     args = {"1", "param1"};
     run();
 
-    CHECK("1" == options);
-    CHECK("param1" == foo);
+    CHECK_EQ("1" , options);
+    CHECK_EQ("param1" , foo);
 
     args = {"param1", "1"};
     CHECK_NOTHROW(run());
 
-    CHECK("1" == options);
-    CHECK("param1" == foo);
+    CHECK_EQ("1" , options);
+    CHECK_EQ("param1" , foo);
 
     CHECK(nullptr != app.get_option("bar")->get_validator("valbar"));
 }
@@ -1170,14 +1170,14 @@ TEST_CASE_FIXTURE(TApp, "PositionalNoSpaceLong [app]") {
     args = {"--option", "Test", "param1", "param2"};
     run();
 
-    CHECK(1u == options.size());
-    CHECK("Test" == options.at(0));
+    CHECK_EQ(1u , options.size());
+    CHECK_EQ("Test" , options.at(0));
 
     args = {"--option=Test", "param1", "param2"};
     run();
 
-    CHECK(1u == options.size());
-    CHECK("Test" == options.at(0));
+    CHECK_EQ(1u , options.size());
+    CHECK_EQ("Test" , options.at(0));
 }
 
 TEST_CASE_FIXTURE(TApp, "RequiredOptsUnlimited [app]") {
@@ -1190,42 +1190,42 @@ TEST_CASE_FIXTURE(TApp, "RequiredOptsUnlimited [app]") {
 
     args = {"--str", "one", "--str", "two"};
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
 
     args = {"--str", "one", "two"};
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
 
     // It's better to feed a hungry option than to feed allow_extras
     app.allow_extras();
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
-    CHECK(std::vector<std::string>({}) == app.remaining());
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
+    CHECK_EQ(std::vector<std::string>({}) , app.remaining());
 
     app.allow_extras(false);
     std::vector<std::string> remain;
     auto *popt = app.add_option("positional", remain);
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
     CHECK(remain.empty());
 
     args = {"--str", "one", "--", "two"};
 
     run();
-    CHECK(std::vector<std::string>({"one"}) == strs);
-    CHECK(std::vector<std::string>({"two"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"one"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"two"}) , remain);
 
     args = {"one", "--str", "two"};
 
     run();
-    CHECK(std::vector<std::string>({"two"}) == strs);
-    CHECK(std::vector<std::string>({"one"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"two"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"one"}) , remain);
 
     args = {"--str", "one", "two"};
     popt->required();
     run();
-    CHECK(std::vector<std::string>({"one"}) == strs);
-    CHECK(std::vector<std::string>({"two"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"one"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"two"}) , remain);
 }
 
 TEST_CASE_FIXTURE(TApp, "RequiredOptsUnlimitedShort [app]") {
@@ -1238,36 +1238,36 @@ TEST_CASE_FIXTURE(TApp, "RequiredOptsUnlimitedShort [app]") {
 
     args = {"-s", "one", "-s", "two"};
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
 
     args = {"-s", "one", "two"};
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
 
     // It's better to feed a hungry option than to feed allow_extras
     app.allow_extras();
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
-    CHECK(std::vector<std::string>({}) == app.remaining());
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
+    CHECK_EQ(std::vector<std::string>({}) , app.remaining());
 
     app.allow_extras(false);
     std::vector<std::string> remain;
     app.add_option("positional", remain);
     run();
-    CHECK(std::vector<std::string>({"one", "two"}) == strs);
+    CHECK_EQ(std::vector<std::string>({"one", "two"}) , strs);
     CHECK(remain.empty());
 
     args = {"-s", "one", "--", "two"};
 
     run();
-    CHECK(std::vector<std::string>({"one"}) == strs);
-    CHECK(std::vector<std::string>({"two"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"one"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"two"}) , remain);
 
     args = {"one", "-s", "two"};
 
     run();
-    CHECK(std::vector<std::string>({"two"}) == strs);
-    CHECK(std::vector<std::string>({"one"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"two"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"one"}) , remain);
 }
 
 TEST_CASE_FIXTURE(TApp, "OptsUnlimitedEnd [app]") {
@@ -1279,8 +1279,8 @@ TEST_CASE_FIXTURE(TApp, "OptsUnlimitedEnd [app]") {
 
     run();
 
-    CHECK(std::vector<std::string>({"two", "three"}) == strs);
-    CHECK(std::vector<std::string>({"one", "four"}) == app.remaining());
+    CHECK_EQ(std::vector<std::string>({"two", "three"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"one", "four"}) , app.remaining());
 }
 
 TEST_CASE_FIXTURE(TApp, "RequireOptPriority [app]") {
@@ -1293,14 +1293,14 @@ TEST_CASE_FIXTURE(TApp, "RequireOptPriority [app]") {
     args = {"--str", "one", "two", "three"};
     run();
 
-    CHECK(std::vector<std::string>({"one"}) == strs);
-    CHECK(std::vector<std::string>({"two", "three"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"one"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"two", "three"}) , remain);
 
     args = {"two", "three", "--str", "one", "four"};
     run();
 
-    CHECK(std::vector<std::string>({"one", "four"}) == strs);
-    CHECK(std::vector<std::string>({"two", "three"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"one", "four"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"two", "three"}) , remain);
 }
 
 TEST_CASE_FIXTURE(TApp, "RequireOptPriorityShort [app]") {
@@ -1313,14 +1313,14 @@ TEST_CASE_FIXTURE(TApp, "RequireOptPriorityShort [app]") {
     args = {"-s", "one", "two", "three"};
     run();
 
-    CHECK(std::vector<std::string>({"one"}) == strs);
-    CHECK(std::vector<std::string>({"two", "three"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"one"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"two", "three"}) , remain);
 
     args = {"two", "three", "-s", "one", "four"};
     run();
 
-    CHECK(std::vector<std::string>({"one", "four"}) == strs);
-    CHECK(std::vector<std::string>({"two", "three"}) == remain);
+    CHECK_EQ(std::vector<std::string>({"one", "four"}) , strs);
+    CHECK_EQ(std::vector<std::string>({"two", "three"}) , remain);
 }
 
 TEST_CASE_FIXTURE(TApp, "NotRequiredExpectedDouble [app]") {
@@ -1368,15 +1368,15 @@ TEST_CASE_FIXTURE(TApp, "CallbackFlags [app]") {
     app.add_flag_function("-v", func);
 
     run();
-    CHECK(0u == value);
+    CHECK_EQ(0u , value);
 
     args = {"-v"};
     run();
-    CHECK(1u == value);
+    CHECK_EQ(1u , value);
 
     args = {"-vv"};
     run();
-    CHECK(2u == value);
+    CHECK_EQ(2u , value);
 
     CHECK_THROWS_AS(app.add_flag_function("hi", func), turbo::IncorrectConstruction);
 }
@@ -1389,23 +1389,23 @@ TEST_CASE_FIXTURE(TApp, "CallbackFlagsFalse [app]") {
     app.add_flag_function("-v,-f{false},--val,--fval{false}", func);
 
     run();
-    CHECK(0 == value);
+    CHECK_EQ(0 , value);
 
     args = {"-f"};
     run();
-    CHECK(-1 == value);
+    CHECK_EQ(-1 , value);
 
     args = {"-vfv"};
     run();
-    CHECK(1 == value);
+    CHECK_EQ(1 , value);
 
     args = {"--fval"};
     run();
-    CHECK(-1 == value);
+    CHECK_EQ(-1 , value);
 
     args = {"--fval=2"};
     run();
-    CHECK(-2 == value);
+    CHECK_EQ(-2 , value);
 
     CHECK_THROWS_AS(app.add_flag_function("hi", func), turbo::IncorrectConstruction);
 }
@@ -1418,23 +1418,23 @@ TEST_CASE_FIXTURE(TApp, "CallbackFlagsFalseShortcut [app]") {
     app.add_flag_function("-v,!-f,--val,!--fval", func);
 
     run();
-    CHECK(0 == value);
+    CHECK_EQ(0 , value);
 
     args = {"-f"};
     run();
-    CHECK(-1 == value);
+    CHECK_EQ(-1 , value);
 
     args = {"-vfv"};
     run();
-    CHECK(1 == value);
+    CHECK_EQ(1 , value);
 
     args = {"--fval"};
     run();
-    CHECK(-1 == value);
+    CHECK_EQ(-1 , value);
 
     args = {"--fval=2"};
     run();
-    CHECK(-2 == value);
+    CHECK_EQ(-2 , value);
 
     CHECK_THROWS_AS(app.add_flag_function("hi", func), turbo::IncorrectConstruction);
 }
@@ -1449,15 +1449,15 @@ TEST_CASE_FIXTURE(TApp, "CallbackFlagsAuto [app]") {
     app.add_flag("-v", func);
 
     run();
-    CHECK(0u == value);
+    CHECK_EQ(0u , value);
 
     args = {"-v"};
     run();
-    CHECK(1u == value);
+    CHECK_EQ(1u , value);
 
     args = {"-vv"};
     run();
-    CHECK(2u == value);
+    CHECK_EQ(2u , value);
 
     CHECK_THROWS_AS(app.add_flag("hi", func), turbo::IncorrectConstruction);
 }
@@ -1475,10 +1475,10 @@ TEST_CASE_FIXTURE(TApp, "Positionals [app]") {
 
     run();
 
-    CHECK(app.count("posit1") == 1u);
-    CHECK(app.count("posit2") == 1u);
-    CHECK(posit1 == "thing1");
-    CHECK(posit2 == "thing2");
+    CHECK_EQ(app.count("posit1") , 1u);
+    CHECK_EQ(app.count("posit2") , 1u);
+    CHECK_EQ(posit1 , "thing1");
+    CHECK_EQ(posit2 , "thing2");
 }
 
 TEST_CASE_FIXTURE(TApp, "ForcedPositional [app]") {
@@ -1490,14 +1490,14 @@ TEST_CASE_FIXTURE(TApp, "ForcedPositional [app]") {
     run();
     std::vector<std::string> answers1 = {"two", "three"};
     CHECK(one->count());
-    CHECK(posit == answers1);
+    CHECK_EQ(posit , answers1);
 
     args = {"--", "--one", "two", "three"};
     std::vector<std::string> answers2 = {"--one", "two", "three"};
     run();
 
     CHECK(!one->count());
-    CHECK(posit == answers2);
+    CHECK_EQ(posit , answers2);
 }
 
 TEST_CASE_FIXTURE(TApp, "MixedPositionals [app]") {
@@ -1511,10 +1511,10 @@ TEST_CASE_FIXTURE(TApp, "MixedPositionals [app]") {
 
     run();
 
-    CHECK(app.count("posit2") == 1u);
-    CHECK(app.count("--posit1") == 1u);
-    CHECK(positional_int == 7);
-    CHECK(positional_string == "thing2");
+    CHECK_EQ(app.count("posit2") , 1u);
+    CHECK_EQ(app.count("--posit1") , 1u);
+    CHECK_EQ(positional_int , 7);
+    CHECK_EQ(positional_string , "thing2");
 }
 
 TEST_CASE_FIXTURE(TApp, "BigPositional [app]") {
@@ -1524,12 +1524,12 @@ TEST_CASE_FIXTURE(TApp, "BigPositional [app]") {
     args = {"one"};
 
     run();
-    CHECK(vec == args);
+    CHECK_EQ(vec , args);
 
     args = {"one", "two"};
     run();
 
-    CHECK(vec == args);
+    CHECK_EQ(vec , args);
 }
 
 TEST_CASE_FIXTURE(TApp, "VectorArgAndPositional [app]") {
@@ -1541,20 +1541,20 @@ TEST_CASE_FIXTURE(TApp, "VectorArgAndPositional [app]") {
     args = {"one"};
 
     run();
-    CHECK(vec == args);
+    CHECK_EQ(vec , args);
 
     args = {"--args", "1", "2"};
 
     run();
-    CHECK(ivec.size() == 2);
+    CHECK_EQ(ivec.size() , 2);
     vec.clear();
     ivec.clear();
 
     args = {"--args", "1", "2", "one", "two"};
     run();
 
-    CHECK(vec.size() == 2);
-    CHECK(ivec.size() == 2);
+    CHECK_EQ(vec.size() , 2);
+    CHECK_EQ(ivec.size() , 2);
 
     app.validate_optional_arguments(false);
     CHECK_THROWS(run());
@@ -1570,20 +1570,20 @@ TEST_CASE_FIXTURE(TApp, "Reset [app]") {
 
     run();
 
-    CHECK(app.count("--simple") == 1u);
-    CHECK(app.count("-d") == 1u);
-    CHECK(doub == doctest::Approx(1.2));
+    CHECK_EQ(app.count("--simple") , 1u);
+    CHECK_EQ(app.count("-d") , 1u);
+    CHECK_EQ(doub , doctest::Approx(1.2));
 
     app.clear();
 
-    CHECK(app.count("--simple") == 0u);
-    CHECK(app.count("-d") == 0u);
+    CHECK_EQ(app.count("--simple") , 0u);
+    CHECK_EQ(app.count("-d") , 0u);
 
     run();
 
-    CHECK(app.count("--simple") == 1u);
-    CHECK(app.count("-d") == 1u);
-    CHECK(doub == doctest::Approx(1.2));
+    CHECK_EQ(app.count("--simple") , 1u);
+    CHECK_EQ(app.count("-d") , 1u);
+    CHECK_EQ(doub , doctest::Approx(1.2));
 }
 
 TEST_CASE_FIXTURE(TApp, "RemoveOption [app]") {
@@ -1635,7 +1635,7 @@ TEST_CASE_FIXTURE(TApp, "FileNotExists [app]") {
     args = {"--file", myfile};
 
     run();
-    CHECK(filename == myfile);
+    CHECK_EQ(filename , myfile);
 
     bool ok = static_cast<bool>(std::ofstream(myfile.c_str()).put('a'));  // create file
     CHECK(ok);
@@ -1660,7 +1660,7 @@ TEST_CASE_FIXTURE(TApp, "FileExists [app]") {
     bool ok = static_cast<bool>(std::ofstream(myfile.c_str()).put('a'));  // create file
     CHECK(ok);
     run();
-    CHECK(filename == myfile);
+    CHECK_EQ(filename , myfile);
 
     std::remove(myfile.c_str());
     CHECK(!turbo::ExistingFile(myfile).empty());
@@ -1691,15 +1691,15 @@ TEST_CASE_FIXTURE(TApp, "DefaultedResult [app]") {
     auto *optv = app.add_option("--val", ival);
     args = {};
     run();
-    CHECK("NA" == sval);
+    CHECK_EQ("NA" , sval);
     std::string nString;
     opts->results(nString);
-    CHECK("NA" == nString);
+    CHECK_EQ("NA" , nString);
     int newIval = 0;
     // CHECK_THROWS_AS (optv->results(newIval), turbo::ConversionError);
     optv->default_str("442");
     optv->results(newIval);
-    CHECK(442 == newIval);
+    CHECK_EQ(442 , newIval);
 }
 
 TEST_CASE_FIXTURE(TApp, "OriginalOrder [app]") {
@@ -1712,10 +1712,10 @@ TEST_CASE_FIXTURE(TApp, "OriginalOrder [app]") {
 
     run();
 
-    CHECK(std::vector<int>({1, 3, 4}) == st1);
-    CHECK(std::vector<int>({2}) == st2);
+    CHECK_EQ(std::vector<int>({1, 3, 4}) , st1);
+    CHECK_EQ(std::vector<int>({2}) , st2);
 
-    CHECK(std::vector<turbo::Option *>({op1, op2, op1, op1}) == app.parse_order());
+    CHECK_EQ(std::vector<turbo::Option *>({op1, op2, op1, op1}) , app.parse_order());
 }
 
 TEST_CASE_FIXTURE(TApp, "NeedsFlags [app]") {
@@ -1870,8 +1870,8 @@ TEST_CASE_FIXTURE(TApp, "Env [app]") {
 
     run();
 
-    CHECK(val == 2);
-    CHECK(vopt->count() == 1u);
+    CHECK_EQ(val , 2);
+    CHECK_EQ(vopt->count() , 1u);
 
     vopt->required();
     run();
@@ -1890,8 +1890,8 @@ TEST_CASE_FIXTURE(TApp, "EnvOnly [app]") {
 
     run();
 
-    CHECK(val == 2);
-    CHECK(vopt->count() == 1u);
+    CHECK_EQ(val , 2);
+    CHECK_EQ(vopt->count() , 1u);
 
     vopt->required();
     run();
@@ -2014,7 +2014,7 @@ TEST_CASE_FIXTURE(TApp, "AllowExtras [app]") {
 
     REQUIRE_NOTHROW(run());
     CHECK(val);
-    CHECK(std::vector<std::string>({"-x"}) == app.remaining());
+    CHECK_EQ(std::vector<std::string>({"-x"}) , app.remaining());
 }
 
 TEST_CASE_FIXTURE(TApp, "AllowExtrasOrder [app]") {
@@ -2023,12 +2023,12 @@ TEST_CASE_FIXTURE(TApp, "AllowExtrasOrder [app]") {
 
     args = {"-x", "-f"};
     REQUIRE_NOTHROW(run());
-    CHECK(std::vector<std::string>({"-x", "-f"}) == app.remaining());
+    CHECK_EQ(std::vector<std::string>({"-x", "-f"}) , app.remaining());
 
     std::vector<std::string> left_over = app.remaining();
     app.parse(left_over);
-    CHECK(std::vector<std::string>({"-f", "-x"}) == app.remaining());
-    CHECK(left_over == app.remaining_for_passthrough());
+    CHECK_EQ(std::vector<std::string>({"-f", "-x"}) , app.remaining());
+    CHECK_EQ(left_over , app.remaining_for_passthrough());
 }
 
 TEST_CASE_FIXTURE(TApp, "AllowExtrasCascade [app]") {
@@ -2037,7 +2037,7 @@ TEST_CASE_FIXTURE(TApp, "AllowExtrasCascade [app]") {
 
     args = {"-x", "45", "-f", "27"};
     REQUIRE_NOTHROW(run());
-    CHECK(std::vector<std::string>({"-x", "45", "-f", "27"}) == app.remaining());
+    CHECK_EQ(std::vector<std::string>({"-x", "45", "-f", "27"}) , app.remaining());
 
     std::vector<std::string> left_over = app.remaining_for_passthrough();
 
@@ -2048,8 +2048,8 @@ TEST_CASE_FIXTURE(TApp, "AllowExtrasCascade [app]") {
     capp.add_option("-f", v2);
 
     capp.parse(left_over);
-    CHECK(45 == v1);
-    CHECK(27 == v2);
+    CHECK_EQ(45 , v1);
+    CHECK_EQ(27 , v2);
 }
 // makes sure the error throws on the rValue version of the parse
 TEST_CASE_FIXTURE(TApp, "ExtrasErrorRvalueParse [app]") {
@@ -2064,7 +2064,7 @@ TEST_CASE_FIXTURE(TApp, "AllowExtrasCascadeDirect [app]") {
 
     args = {"-x", "45", "-f", "27"};
     REQUIRE_NOTHROW(run());
-    CHECK(std::vector<std::string>({"-x", "45", "-f", "27"}) == app.remaining());
+    CHECK_EQ(std::vector<std::string>({"-x", "45", "-f", "27"}) , app.remaining());
 
     turbo::App capp{"cascade_program"};
     int v1{0};
@@ -2073,8 +2073,8 @@ TEST_CASE_FIXTURE(TApp, "AllowExtrasCascadeDirect [app]") {
     capp.add_option("-f", v2);
 
     capp.parse(app.remaining_for_passthrough());
-    CHECK(45 == v1);
-    CHECK(27 == v2);
+    CHECK_EQ(45 , v1);
+    CHECK_EQ(27 , v2);
 }
 
 TEST_CASE_FIXTURE(TApp, "AllowExtrasArgModify [app]") {
@@ -2085,15 +2085,15 @@ TEST_CASE_FIXTURE(TApp, "AllowExtrasArgModify [app]") {
     app.add_option("-f", v2);
     args = {"27", "-f", "45", "-x"};
     app.parse(args);
-    CHECK(std::vector<std::string>({"45", "-x"}) == args);
+    CHECK_EQ(std::vector<std::string>({"45", "-x"}) , args);
 
     turbo::App capp{"cascade_program"};
 
     capp.add_option("-x", v1);
 
     capp.parse(args);
-    CHECK(45 == v1);
-    CHECK(27 == v2);
+    CHECK_EQ(45 , v1);
+    CHECK_EQ(27 , v2);
 }
 
 // Test horrible error
@@ -2141,23 +2141,23 @@ TEST_CASE_FIXTURE(TApp, "FallthroughParentFail [app]") {
 
 TEST_CASE_FIXTURE(TApp, "FallthroughParents [app]") {
     auto *sub = app.add_subcommand("test");
-    CHECK(&app == turbo::detail::AppFriend::get_fallthrough_parent(sub));
+    CHECK_EQ(&app , turbo::detail::AppFriend::get_fallthrough_parent(sub));
 
     auto *ssub = sub->add_subcommand("sub2");
-    CHECK(sub == turbo::detail::AppFriend::get_fallthrough_parent(ssub));
+    CHECK_EQ(sub , turbo::detail::AppFriend::get_fallthrough_parent(ssub));
 
     auto *og1 = app.add_option_group("g1");
     auto *og2 = og1->add_option_group("g2");
     auto *og3 = og2->add_option_group("g3");
-    CHECK(&app == turbo::detail::AppFriend::get_fallthrough_parent(og3));
+    CHECK_EQ(&app , turbo::detail::AppFriend::get_fallthrough_parent(og3));
 
     auto *ogb1 = sub->add_option_group("g1");
     auto *ogb2 = ogb1->add_option_group("g2");
     auto *ogb3 = ogb2->add_option_group("g3");
-    CHECK(sub == turbo::detail::AppFriend::get_fallthrough_parent(ogb3));
+    CHECK_EQ(sub , turbo::detail::AppFriend::get_fallthrough_parent(ogb3));
 
     ogb2->name("groupb");
-    CHECK(ogb2 == turbo::detail::AppFriend::get_fallthrough_parent(ogb3));
+    CHECK_EQ(ogb2 , turbo::detail::AppFriend::get_fallthrough_parent(ogb3));
 }
 
 TEST_CASE_FIXTURE(TApp, "OptionWithDefaults [app]") {
@@ -2180,7 +2180,7 @@ TEST_CASE_FIXTURE(TApp, "OrderedModifyingTransforms [app]") {
 
     run();
 
-    CHECK(std::vector<std::string>({"one21", "two21"}) == val);
+    CHECK_EQ(std::vector<std::string>({"one21", "two21"}) , val);
 }
 
 TEST_CASE_FIXTURE(TApp, "ThrowingTransform [app]") {
@@ -2197,7 +2197,7 @@ TEST_CASE_FIXTURE(TApp, "ThrowingTransform [app]") {
     try {
         run();
     } catch (const turbo::ValidationError &e) {
-        CHECK(std::string("--mess: My Message") == e.what());
+        CHECK_EQ(std::string("--mess: My Message") , e.what());
     }
 }
 
@@ -2215,7 +2215,7 @@ TEST_CASE_FIXTURE(TApp, "EachItem [app]") {
 
     run();
 
-    CHECK(dummy == results);
+    CHECK_EQ(dummy , results);
 }
 
 // #128
@@ -2225,7 +2225,7 @@ TEST_CASE_FIXTURE(TApp, "RepeatingMultiArgumentOptions [app]") {
 
     args = {"--entry", "key1", "value1", "--entry", "key2", "value2"};
     REQUIRE_NOTHROW(run());
-    CHECK(std::vector<std::string>({"key1", "value1", "key2", "value2"}) == entries);
+    CHECK_EQ(std::vector<std::string>({"key1", "value1", "key2", "value2"}) , entries);
 
     args.pop_back();
     REQUIRE_THROWS_AS(run(), turbo::ArgumentMismatch);
@@ -2239,7 +2239,7 @@ TEST_CASE_FIXTURE(TApp, "EmptyOptionEach [app]") {
     args = {"--each", "that"};
     run();
 
-    CHECK("that" == q);
+    CHECK_EQ("that" , q);
 }
 
 // #122
@@ -2280,17 +2280,17 @@ TEST_CASE_FIXTURE(TApp, "CustomUserSepParse [app]") {
     args = {"--idx", "1,2,3"};
     auto *opt = app.add_option("--idx", vals)->delimiter(',');
     run();
-    CHECK(std::vector<int>({1, 2, 3}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2, 3}) , vals);
     std::vector<int> vals2;
     // check that the results vector gets the results in the same way
     opt->results(vals2);
-    CHECK(vals == vals2);
+    CHECK_EQ(vals , vals2);
 
     app.remove_option(opt);
 
     app.add_option("--idx", vals)->delimiter(',')->capture_default_str();
     run();
-    CHECK(std::vector<int>({1, 2, 3}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2, 3}) , vals);
 }
 
 // #209
@@ -2300,10 +2300,10 @@ TEST_CASE_FIXTURE(TApp, "DefaultUserSepParse [app]") {
     args = {"--idx", "1 2 3", "4 5 6"};
     auto *opt = app.add_option("--idx", vals, "");
     run();
-    CHECK(std::vector<std::string>({"1 2 3", "4 5 6"}) == vals);
+    CHECK_EQ(std::vector<std::string>({"1 2 3", "4 5 6"}) , vals);
     opt->delimiter(',');
     run();
-    CHECK(std::vector<std::string>({"1 2 3", "4 5 6"}) == vals);
+    CHECK_EQ(std::vector<std::string>({"1 2 3", "4 5 6"}) , vals);
 }
 
 // #209
@@ -2324,13 +2324,13 @@ TEST_CASE_FIXTURE(TApp, "CustomUserSepParse2 [app]") {
     args = {"--idx", "1,2,"};
     auto *opt = app.add_option("--idx", vals)->delimiter(',');
     run();
-    CHECK(std::vector<int>({1, 2}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2}) , vals);
 
     app.remove_option(opt);
 
     app.add_option("--idx", vals, "")->delimiter(',')->capture_default_str();
     run();
-    CHECK(std::vector<int>({1, 2}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2}) , vals);
 }
 
 TEST_CASE_FIXTURE(TApp, "CustomUserSepParseFunction [app]") {
@@ -2340,7 +2340,7 @@ TEST_CASE_FIXTURE(TApp, "CustomUserSepParseFunction [app]") {
     app.add_option_function<std::vector<int>>("--idx", [&vals](std::vector<int> v) { vals = std::move(v); })
             ->delimiter(',');
     run();
-    CHECK(std::vector<int>({1, 2, 3}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2, 3}) , vals);
 }
 
 // delimiter removal
@@ -2350,13 +2350,13 @@ TEST_CASE_FIXTURE(TApp, "CustomUserSepParseToggle [app]") {
     args = {"--idx", "1,2,3"};
     auto *opt = app.add_option("--idx", vals)->delimiter(',');
     run();
-    CHECK(std::vector<std::string>({"1", "2", "3"}) == vals);
+    CHECK_EQ(std::vector<std::string>({"1", "2", "3"}) , vals);
     opt->delimiter('\0');
     run();
-    CHECK(std::vector<std::string>({"1,2,3"}) == vals);
+    CHECK_EQ(std::vector<std::string>({"1,2,3"}) , vals);
     opt->delimiter(',');
     run();
-    CHECK(std::vector<std::string>({"1", "2", "3"}) == vals);
+    CHECK_EQ(std::vector<std::string>({"1", "2", "3"}) , vals);
 }
 
 // #209
@@ -2369,12 +2369,12 @@ TEST_CASE_FIXTURE(TApp, "CustomUserSepParse3 [app]") {
             "2"};
     auto *opt = app.add_option("--idx", vals)->delimiter(',');
     run();
-    CHECK(std::vector<int>({1, 2}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2}) , vals);
     app.remove_option(opt);
 
     app.add_option("--idx", vals)->delimiter(',');
     run();
-    CHECK(std::vector<int>({1, 2}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2}) , vals);
 }
 
 // #209
@@ -2384,13 +2384,13 @@ TEST_CASE_FIXTURE(TApp, "CustomUserSepParse4 [app]") {
     args = {"--idx", "1,    2"};
     auto *opt = app.add_option("--idx", vals)->delimiter(',')->capture_default_str();
     run();
-    CHECK(std::vector<int>({1, 2}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2}) , vals);
 
     app.remove_option(opt);
 
     app.add_option("--idx", vals)->delimiter(',');
     run();
-    CHECK(std::vector<int>({1, 2}) == vals);
+    CHECK_EQ(std::vector<int>({1, 2}) , vals);
 }
 
 // #218
@@ -2400,13 +2400,13 @@ TEST_CASE_FIXTURE(TApp, "CustomUserSepParse5 [app]") {
     args = {"this", "is", "a", "test"};
     auto *opt = app.add_option("bar", bar, "bar");
     run();
-    CHECK(std::vector<std::string>({"this", "is", "a", "test"}) == bar);
+    CHECK_EQ(std::vector<std::string>({"this", "is", "a", "test"}) , bar);
 
     app.remove_option(opt);
     args = {"this", "is", "a", "test"};
     app.add_option("bar", bar, "bar")->capture_default_str();
     run();
-    CHECK(std::vector<std::string>({"this", "is", "a", "test"}) == bar);
+    CHECK_EQ(std::vector<std::string>({"this", "is", "a", "test"}) , bar);
 }
 
 // #218
@@ -2420,19 +2420,19 @@ TEST_CASE_FIXTURE(TApp, "logFormSingleDash [app]") {
     app.final_callback([&]() {
         auto rem = app.remaining();
         for (auto &arg: rem) {
-            if (arg == "-v") {
+            if (arg , "-v") {
                 verbose = true;
             }
-            if (arg == "-vv") {
+            if (arg , "-vv") {
                 veryverbose = true;
             }
-            if (arg == "-vvv") {
+            if (arg , "-vvv") {
                 veryveryverbose = true;
             }
         }
     });
     run();
-    CHECK(app.remaining().size() == 3U);
+    CHECK_EQ(app.remaining().size() , 3U);
     CHECK(verbose);
     CHECK(veryverbose);
     CHECK(veryveryverbose);

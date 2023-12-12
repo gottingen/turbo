@@ -235,7 +235,7 @@ class btree_container {
 
   // Support turbo::Hash.
   template <typename State>
-  friend State TurboHashValue(State h, const btree_container &b) {
+  friend State hash_value(State h, const btree_container &b) {
     for (const auto &v : b) {
       h = State::combine(std::move(h), v);
     }
@@ -376,7 +376,7 @@ class btree_set_container : public btree_container<Tree> {
   template <
       typename T,
       typename std::enable_if_t<
-          turbo::conjunction<
+          std::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,
@@ -395,7 +395,7 @@ class btree_set_container : public btree_container<Tree> {
   template <
       typename T,
       typename std::enable_if_t<
-          turbo::conjunction<
+          std::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,
@@ -664,7 +664,7 @@ class btree_multiset_container : public btree_container<Tree> {
   template <
       typename T,
       typename std::enable_if_t<
-          turbo::conjunction<
+          std::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,
@@ -680,7 +680,7 @@ class btree_multiset_container : public btree_container<Tree> {
   template <
       typename T,
       typename std::enable_if_t<
-          turbo::conjunction<
+          std::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,

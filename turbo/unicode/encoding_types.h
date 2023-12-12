@@ -11,14 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef TURBO_UNICODE_ENCODING_TYPES_H_
-#define TURBO_UNICODE_ENCODING_TYPES_H_
+
+#ifndef TURBO_UTF_ENCODING_TYPES_H_
+#define TURBO_UTF_ENCODING_TYPES_H_
 
 #include <string>
+#include "turbo/base/endian.h"
 
 namespace turbo {
 
-enum EncodingType {
+    enum EncodingType {
         UTF8 = 1,       // BOM 0xef 0xbb 0xbf
         UTF16_LE = 2,   // BOM 0xff 0xfe
         UTF16_BE = 4,   // BOM 0xfe 0xff
@@ -26,37 +28,32 @@ enum EncodingType {
         UTF32_BE = 16,   // BOM 0x00 0x00 0xfe 0xff
 
         unspecified = 0
-};
+    };
 
-enum endianness {
-        LITTLE,
-        BIG
-};
+    std::string to_string(EncodingType bom);
 
-bool match_system(endianness e);
+    // Note that BOM for UTF8 is discouraged.
+    namespace BOM {
 
-std::string to_string(EncodingType bom);
+        /**
+         * Checks for a BOM. If not, returns unspecified
+         * @param input         the string to process
+         * @param length        the length of the string in words
+         * @return the corresponding encoding
+         */
 
-// Note that BOM for UTF8 is discouraged.
-namespace BOM {
+        EncodingType check_bom(const uint8_t *byte, size_t length);
 
-/**
- * Checks for a BOM. If not, returns unspecified
- * @param input         the string to process
- * @param length        the length of the string in words
- * @return the corresponding encoding
- */
+        EncodingType check_bom(const char *byte, size_t length);
 
-EncodingType check_bom(const uint8_t* byte, size_t length);
-EncodingType check_bom(const char* byte, size_t length);
-/**
- * Returns the size, in bytes, of the BOM for a given encoding type.
- * Note that UTF8 BOM are discouraged.
- * @param bom         the encoding type
- * @return the size in bytes of the corresponding BOM
- */
-size_t bom_byte_size(EncodingType bom);
+        /**
+         * Returns the size, in bytes, of the BOM for a given encoding type.
+         * Note that UTF8 BOM are discouraged.
+         * @param bom         the encoding type
+         * @return the size in bytes of the corresponding BOM
+         */
+        size_t bom_byte_size(EncodingType bom);
 
-} // BOM namespace
+    } // BOM namespace
 } // namespace turbo
-#endif  // TURBO_UNICODE_ENCODING_TYPES_H_
+#endif  // TURBO_UTF_ENCODING_TYPES_H_
