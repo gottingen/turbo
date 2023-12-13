@@ -20,7 +20,7 @@
 #ifdef TLOG_USE_STD_FORMAT
 using filename_memory_buf_t = std::basic_string<turbo::tlog::filename_t::value_type>;
 #else
-using filename_memory_buf_t = fmt::basic_memory_buffer<turbo::tlog::filename_t::value_type, 250>;
+using filename_memory_buf_t = turbo::basic_memory_buffer<turbo::tlog::filename_t::value_type, 250>;
 #endif
 
 #ifdef TLOG_WCHAR_FILENAMES

@@ -21,34 +21,34 @@
 #include "turbo/format/fmt/printf.h"
 #include "turbo/format/fmt/os.h"
 #include "turbo/format/fmt/ostream.h"
-#include "turbo/format/fmt/color.h"
+#include "turbo/format/color.h"
 
 namespace turbo {
 
     template<typename ...Args>
     void Print(std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, fmt, std::forward<Args>(args)...);
+        turbo::print(stdout, fmt, std::forward<Args>(args)...);
     }
 
     template<typename ...Args>
     void Println(std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, "{}\n", format(fmt, std::forward<Args>(args)...));
+        turbo::print(stdout, "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename ...Args>
     void FPrint(std::FILE *file, std::string_view fmt,  Args &&... args) {
-        fmt::print(file, fmt, std::forward<Args>(args)...);
+        turbo::print(file, fmt, std::forward<Args>(args)...);
     }
 
     template<typename ...Args>
     void FPrintln(std::FILE *file, std::string_view fmt,  Args &&... args) {
-        fmt::print(file, "{}\n", format(fmt, std::forward<Args>(args)...));
+        turbo::print(file, "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
-    using fmt::color;
-    using fmt::bg;
-    using fmt::fg;
-    using fmt::text_style;
+    using turbo::color;
+    using turbo::bg;
+    using turbo::fg;
+    using turbo::text_style;
 
     static const text_style RedFG = fg(color::red);
     static const text_style GreenFG = fg(color::green);
@@ -56,22 +56,22 @@ namespace turbo {
 
     template<typename ...Args>
     void Print(const text_style& ts, std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, ts, fmt, std::forward<Args>(args)...);
+        turbo::print(stdout, ts, fmt, std::forward<Args>(args)...);
     }
 
     template<typename ...Args>
     void Println(const text_style& ts, std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, ts, "{}\n", format(fmt, std::forward<Args>(args)...));
+        turbo::print(stdout, ts, "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename ...Args>
     void Print(const color& c, std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, fg(c), fmt, std::forward<Args>(args)...);
+        turbo::print(stdout, fg(c), fmt, std::forward<Args>(args)...);
     }
 
     template<typename ...Args>
     void Println(const color& c, std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, fg(c), "{}\n", format(fmt, std::forward<Args>(args)...));
+        turbo::print(stdout, fg(c), "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
 }  // namespace turbo

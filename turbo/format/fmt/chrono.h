@@ -110,7 +110,7 @@ constexpr To lossless_integral_conversion(const From from, int& ec) {
 
   if (detail::const_check(F::is_signed && !T::is_signed)) {
     // From may be negative, not allowed!
-    if (fmt::detail::is_negative(from)) {
+    if (turbo::detail::is_negative(from)) {
       ec = 1;
       return {};
     }
@@ -449,14 +449,14 @@ inline std::tm localtime(std::time_t time) {
     dispatcher(std::time_t t) : time_(t) {}
 
     bool run() {
-      using namespace fmt::detail;
+      using namespace turbo::detail;
       return handle(localtime_r(&time_, &tm_));
     }
 
     bool handle(std::tm* tm) { return tm != nullptr; }
 
     bool handle(detail::null<>) {
-      using namespace fmt::detail;
+      using namespace turbo::detail;
       return fallback(localtime_s(&tm_, &time_));
     }
 
@@ -464,7 +464,7 @@ inline std::tm localtime(std::time_t time) {
 
 #if !TURBO_MSC_VERSION
     bool fallback(detail::null<>) {
-      using namespace fmt::detail;
+      using namespace turbo::detail;
       std::tm* tm = std::localtime(&time_);
       if (tm) tm_ = *tm;
       return tm != nullptr;
@@ -498,14 +498,14 @@ inline std::tm gmtime(std::time_t time) {
     dispatcher(std::time_t t) : time_(t) {}
 
     bool run() {
-      using namespace fmt::detail;
+      using namespace turbo::detail;
       return handle(gmtime_r(&time_, &tm_));
     }
 
     bool handle(std::tm* tm) { return tm != nullptr; }
 
     bool handle(detail::null<>) {
-      using namespace fmt::detail;
+      using namespace turbo::detail;
       return fallback(gmtime_s(&tm_, &time_));
     }
 

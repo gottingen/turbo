@@ -27,15 +27,6 @@
 FMT_BEGIN_NAMESPACE
 namespace detail {
 
-FMT_FUNC void assert_fail(const char* file, int line, const char* message) {
-  // Use unchecked std::fprintf to avoid triggering another assertion when
-  // writing to stderr fails
-  std::fprintf(stderr, "%s:%d: assertion failed: %s", file, line, message);
-  // Chosen instead of std::abort to satisfy Clang in CUDA mode during device
-  // code pass.
-  std::terminate();
-}
-
 FMT_FUNC void throw_format_error(const char* message) {
   FMT_THROW(format_error(message));
 }
@@ -1438,7 +1429,7 @@ FMT_FUNC void report_system_error(int error_code,
 
 FMT_FUNC std::string vformat(std::string_view fmt, format_args args) {
   // Don't optimize the "{}" case to keep the binary size small and because it
-  // can be better optimized in fmt::format anyway.
+  // can be better optimized in turbo::format anyway.
   auto buffer = memory_buffer();
   detail::vformat_to(buffer, fmt, args);
   return to_string(buffer);

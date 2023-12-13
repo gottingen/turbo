@@ -37,7 +37,7 @@ namespace turbo::tlog {
 
             template<typename T>
             inline void append_int(T n, memory_buf_t &dest) {
-                fmt::format_int i(n);
+                turbo::format_int i(n);
                 dest.append(i.data(), i.data() + i.size());
             }
 
@@ -65,7 +65,7 @@ namespace turbo::tlog {
             template<typename T>
             inline unsigned int count_digits(T n) {
                 using count_type = typename std::conditional<(sizeof(T) > sizeof(uint32_t)), uint64_t, uint32_t>::type;
-                return static_cast<unsigned int>(fmt::
+                return static_cast<unsigned int>(turbo::
                 // fmt 7.0.0 renamed the internal namespace to detail.
                 // See: https://github.com/fmtlib/fmt/issues/1538
                 detail::count_digits(static_cast<count_type>(n)));

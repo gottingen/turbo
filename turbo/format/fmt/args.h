@@ -62,12 +62,12 @@ class dynamic_arg_list {
 
 /**
   \rst
-  A dynamic version of `fmt::format_arg_store`.
+  A dynamic version of `turbo::format_arg_store`.
   It's equipped with a storage to potentially temporary objects which lifetimes
   could be shorter than the format arguments object.
 
-  It can be implicitly converted into `~fmt::basic_format_args` for passing
-  into type-erased formatting functions such as `~fmt::vformat`.
+  It can be implicitly converted into `~turbo::basic_format_args` for passing
+  into type-erased formatting functions such as `~turbo::vformat`.
   \endrst
  */
 template <typename Context>
@@ -154,11 +154,11 @@ class dynamic_format_arg_store
 
     **Example**::
 
-      fmt::dynamic_format_arg_store<fmt::format_context> store;
+      turbo::dynamic_format_arg_store<turbo::format_context> store;
       store.push_back(42);
       store.push_back("abc");
       store.push_back(1.5f);
-      std::string result = fmt::vformat("{} and {} and {}", store);
+      std::string result = turbo::vformat("{} and {} and {}", store);
     \endrst
   */
   template <typename T> void push_back(const T& arg) {
@@ -175,11 +175,11 @@ class dynamic_format_arg_store
 
     **Example**::
 
-      fmt::dynamic_format_arg_store<fmt::format_context> store;
+      turbo::dynamic_format_arg_store<turbo::format_context> store;
       char band[] = "Rolling Stones";
       store.push_back(std::cref(band));
       band[9] = 'c'; // Changing str affects the output.
-      std::string result = fmt::vformat("{}", store);
+      std::string result = turbo::vformat("{}", store);
       // result == "Rolling Scones"
     \endrst
   */
@@ -201,9 +201,9 @@ class dynamic_format_arg_store
         dynamic_args_.push<std::basic_string<char_type>>(arg.name).c_str();
     if (detail::const_check(need_copy<T>::value)) {
       emplace_arg(
-          fmt::arg(arg_name, dynamic_args_.push<stored_type<T>>(arg.value)));
+          turbo::arg(arg_name, dynamic_args_.push<stored_type<T>>(arg.value)));
     } else {
-      emplace_arg(fmt::arg(arg_name, arg.value));
+      emplace_arg(turbo::arg(arg_name, arg.value));
     }
   }
 

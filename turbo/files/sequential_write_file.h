@@ -123,7 +123,7 @@ namespace turbo {
          * @return the status of the operation.
          */
         template<typename Char, size_t N>
-        [[nodiscard]] turbo::Status write(const fmt::basic_memory_buffer<Char, N> &buffer) {
+        [[nodiscard]] turbo::Status write(const turbo::basic_memory_buffer<Char, N> &buffer) {
             return write(buffer.data(), buffer.size() * sizeof(Char));
         }
 

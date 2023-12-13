@@ -106,7 +106,7 @@ auto vformat(basic_string_view<Char> format_str,
 
 template <typename... T>
 auto format(wformat_string<T...> fmt, T&&... args) -> std::wstring {
-  return vformat(fmt::wstring_view(fmt), fmt::make_wformat_args(args...));
+  return vformat(turbo::wstring_view(fmt), turbo::make_wformat_args(args...));
 }
 
 // Pass char_t as a default template parameter instead of using
@@ -116,7 +116,7 @@ template <typename S, typename... Args, typename Char = char_t<S>,
                         !std::is_same<Char, wchar_t>::value)>
 auto format(const S& format_str, Args&&... args) -> std::basic_string<Char> {
   return vformat(detail::to_string_view(format_str),
-                 fmt::make_format_args<buffer_context<Char>>(args...));
+                 turbo::make_format_args<buffer_context<Char>>(args...));
 }
 
 template <typename Locale, typename S, typename Char = char_t<S>,
@@ -136,7 +136,7 @@ template <typename Locale, typename S, typename... Args,
 inline auto format(const Locale& loc, const S& format_str, Args&&... args)
     -> std::basic_string<Char> {
   return detail::vformat(loc, detail::to_string_view(format_str),
-                         fmt::make_format_args<buffer_context<Char>>(args...));
+                         turbo::make_format_args<buffer_context<Char>>(args...));
 }
 
 template <typename OutputIt, typename S, typename Char = char_t<S>,
@@ -156,7 +156,7 @@ template <typename OutputIt, typename S, typename... Args,
                             detail::is_exotic_char<Char>::value)>
 inline auto format_to(OutputIt out, const S& fmt, Args&&... args) -> OutputIt {
   return vformat_to(out, detail::to_string_view(fmt),
-                    fmt::make_format_args<buffer_context<Char>>(args...));
+                    turbo::make_format_args<buffer_context<Char>>(args...));
 }
 
 template <typename Locale, typename S, typename OutputIt, typename... Args,
@@ -182,7 +182,7 @@ inline auto format_to(OutputIt out, const Locale& loc, const S& format_str,
                       Args&&... args) ->
     typename std::enable_if<enable, OutputIt>::type {
   return vformat_to(out, loc, detail::to_string_view(format_str),
-                    fmt::make_format_args<buffer_context<Char>>(args...));
+                    turbo::make_format_args<buffer_context<Char>>(args...));
 }
 
 template <typename OutputIt, typename Char, typename... Args,
@@ -205,7 +205,7 @@ template <typename OutputIt, typename S, typename... Args,
 inline auto format_to_n(OutputIt out, size_t n, const S& fmt,
                         const Args&... args) -> format_to_n_result<OutputIt> {
   return vformat_to_n(out, n, detail::to_string_view(fmt),
-                      fmt::make_format_args<buffer_context<Char>>(args...));
+                      turbo::make_format_args<buffer_context<Char>>(args...));
 }
 
 template <typename S, typename... Args, typename Char = char_t<S>,
@@ -213,7 +213,7 @@ template <typename S, typename... Args, typename Char = char_t<S>,
 inline auto formatted_size(const S& fmt, Args&&... args) -> size_t {
   detail::counting_buffer<Char> buf;
   detail::vformat_to(buf, detail::to_string_view(fmt),
-                     fmt::make_format_args<buffer_context<Char>>(args...));
+                     turbo::make_format_args<buffer_context<Char>>(args...));
   return buf.count();
 }
 
@@ -231,20 +231,20 @@ inline void vprint(wstring_view fmt, wformat_args args) {
 
 template <typename... T>
 void print(std::FILE* f, wformat_string<T...> fmt, T&&... args) {
-  return vprint(f, wstring_view(fmt), fmt::make_wformat_args(args...));
+  return vprint(f, wstring_view(fmt), turbo::make_wformat_args(args...));
 }
 
 template <typename... T> void print(wformat_string<T...> fmt, T&&... args) {
-  return vprint(wstring_view(fmt), fmt::make_wformat_args(args...));
+  return vprint(wstring_view(fmt), turbo::make_wformat_args(args...));
 }
 
 template <typename... T>
 void println(std::FILE* f, wformat_string<T...> fmt, T&&... args) {
-  return print(f, L"{}\n", fmt::format(fmt, std::forward<T>(args)...));
+  return print(f, L"{}\n", turbo::format(fmt, std::forward<T>(args)...));
 }
 
 template <typename... T> void println(wformat_string<T...> fmt, T&&... args) {
-  return print(L"{}\n", fmt::format(fmt, std::forward<T>(args)...));
+  return print(L"{}\n", turbo::format(fmt, std::forward<T>(args)...));
 }
 
 /**

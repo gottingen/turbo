@@ -53,11 +53,6 @@
 #  define FMT_END_DETAIL_NAMESPACE }
 #endif
 
-#ifdef __NVCC__
-#  define FMT_CUDA_VERSION (__CUDACC_VER_MAJOR__ * 100 + __CUDACC_VER_MINOR__)
-#else
-#  define FMT_CUDA_VERSION 0
-#endif
 
 #ifdef __has_builtin
 #  define FMT_HAS_BUILTIN(x) __has_builtin(x)
@@ -853,7 +848,7 @@ enum { inline_buffer_size = 500 };
 
   **Example**::
 
-     auto out = fmt::memory_buffer();
+     auto out = turbo::memory_buffer();
      format_to(std::back_inserter(out), "The answer is {}.", 42);
 
   This will append the following output to the ``out`` object:
@@ -938,7 +933,7 @@ class basic_memory_buffer final : public detail::buffer<T> {
  public:
   /**
     \rst
-    Constructs a :class:`fmt::basic_memory_buffer` object moving the content
+    Constructs a :class:`turbo::basic_memory_buffer` object moving the content
     of the other object to it.
     \endrst
    */
@@ -1919,7 +1914,7 @@ inline auto find_escape(const char* begin, const char* end)
       using char_type TURBO_MAYBE_UNUSED = turbo::remove_cvref_t<decltype(s[0])>; \
       TURBO_MAYBE_UNUSED constexpr explicit                                 \
       operator std::basic_string_view<char_type>() const {                    \
-        return fmt::detail_exported::compile_string_to_view<char_type>(s);    \
+        return turbo::detail_exported::compile_string_to_view<char_type>(s);    \
       }                                                                       \
     };                                                                        \
     return FMT_COMPILE_STRING();                                              \
@@ -1932,10 +1927,10 @@ inline auto find_escape(const char* begin, const char* end)
   **Example**::
 
     // A compile-time error because 'd' is an invalid specifier for strings.
-    std::string s = fmt::format(FMT_STRING("{:d}"), "foo");
+    std::string s = turbo::format(FMT_STRING("{:d}"), "foo");
   \endrst
  */
-#define FMT_STRING(s) FMT_STRING_IMPL(s, fmt::detail::compile_string, )
+#define FMT_STRING(s) FMT_STRING_IMPL(s, turbo::detail::compile_string, )
 
 template <size_t width, typename Char, typename OutputIt>
 auto write_codepoint(OutputIt out, char prefix, uint32_t cp) -> OutputIt {
@@ -4066,13 +4061,13 @@ template <typename Char> struct udl_formatter {
 
   template <typename... T>
   auto operator()(T&&... args) const -> std::basic_string<Char> {
-    return vformat(str, fmt::make_format_args<buffer_context<Char>>(args...));
+    return vformat(str, turbo::make_format_args<buffer_context<Char>>(args...));
   }
 };
 
 #  if TURBO_USE_NONTYPE_TEMPLATE_ARGS
 template <typename T, typename Char, size_t N,
-          fmt::detail_exported::fixed_string<Char, N> Str>
+          turbo::detail_exported::fixed_string<Char, N> Str>
 struct statically_named_arg : view {
   static constexpr auto name = Str.data;
 
@@ -4081,16 +4076,16 @@ struct statically_named_arg : view {
 };
 
 template <typename T, typename Char, size_t N,
-          fmt::detail_exported::fixed_string<Char, N> Str>
+          turbo::detail_exported::fixed_string<Char, N> Str>
 struct is_named_arg<statically_named_arg<T, Char, N, Str>> : std::true_type {};
 
 template <typename T, typename Char, size_t N,
-          fmt::detail_exported::fixed_string<Char, N> Str>
+          turbo::detail_exported::fixed_string<Char, N> Str>
 struct is_statically_named_arg<statically_named_arg<T, Char, N, Str>>
     : std::true_type {};
 
 template <typename Char, size_t N,
-          fmt::detail_exported::fixed_string<Char, N> Str>
+          turbo::detail_exported::fixed_string<Char, N> Str>
 struct udl_arg {
   template <typename T> auto operator=(T&& value) const {
     return statically_named_arg<T, Char, N, Str>(std::forward<T>(value));
@@ -4130,7 +4125,7 @@ TURBO_DLL auto vsystem_error(int error_code, std::string_view format_str,
 /**
  \rst
  Constructs :class:`std::system_error` with a message formatted with
- ``fmt::format(fmt, args...)``.
+ ``turbo::format(fmt, args...)``.
   *error_code* is a system error code as given by ``errno``.
 
  **Example**::
@@ -4141,13 +4136,13 @@ TURBO_DLL auto vsystem_error(int error_code, std::string_view format_str,
    const char* filename = "madeup";
    std::FILE* file = std::fopen(filename, "r");
    if (!file)
-     throw fmt::system_error(errno, "cannot open file '{}'", filename);
+     throw turbo::system_error(errno, "cannot open file '{}'", filename);
  \endrst
 */
 template <typename... T>
 auto system_error(int error_code, format_string<T...> fmt, T&&... args)
     -> std::system_error {
-  return vsystem_error(error_code, fmt, fmt::make_format_args(args...));
+  return vsystem_error(error_code, fmt, turbo::make_format_args(args...));
 }
 
 /**
@@ -4268,7 +4263,7 @@ struct formatter<Char[N], Char> : formatter<std::basic_string_view<Char>, Char> 
 
   **Example**::
 
-    auto s = fmt::format("{}", fmt::ptr(p));
+    auto s = turbo::format("{}", turbo::ptr(p));
   \endrst
  */
 template <typename T> auto ptr(T p) -> const void* {
@@ -4290,7 +4285,7 @@ template <typename T> auto ptr(const std::shared_ptr<T>& p) -> const void* {
   **Example**::
 
     enum class color { red, green, blue };
-    auto s = fmt::format("{}", fmt::underlying(color::red));
+    auto s = turbo::format("{}", turbo::underlying(color::red));
   \endrst
  */
 template <typename Enum>
@@ -4345,7 +4340,7 @@ template <typename T> struct group_digits_view { T value; };
 
   **Example**::
 
-    fmt::print("{}", fmt::group_digits(12345));
+    turbo::print("{}", turbo::group_digits(12345));
     // Output: "12,345"
   \endrst
  */
@@ -4440,12 +4435,12 @@ auto join(It begin, Sentinel end, std::string_view sep) -> join_view<It, Sentine
   **Example**::
 
     std::vector<int> v = {1, 2, 3};
-    fmt::print("{}", fmt::join(v, ", "));
+    turbo::print("{}", turbo::join(v, ", "));
     // Output: "1, 2, 3"
 
-  ``fmt::join`` applies passed format specifiers to the range elements::
+  ``turbo::join`` applies passed format specifiers to the range elements::
 
-    fmt::print("{:02}", fmt::join(v, ", "));
+    turbo::print("{:02}", turbo::join(v, ", "));
     // Output: "01, 02, 03"
   \endrst
  */
@@ -4463,7 +4458,7 @@ auto join(Range&& range, std::string_view sep)
 
     #include <fmt/format.h>
 
-    std::string answer = fmt::to_string(42);
+    std::string answer = turbo::to_string(42);
   \endrst
  */
 template <typename T, TURBO_ENABLE_IF(!std::is_integral<T>::value)>
@@ -4579,12 +4574,12 @@ FMT_END_DETAIL_NAMESPACE
 inline namespace literals {
 /**
   \rst
-  User-defined literal equivalent of :func:`fmt::arg`.
+  User-defined literal equivalent of :func:`turbo::arg`.
 
   **Example**::
 
-    using namespace fmt::literals;
-    fmt::print("Elapsed time: {s:.2f} seconds", "s"_a=1.23);
+    using namespace turbo::literals;
+    turbo::print("Elapsed time: {s:.2f} seconds", "s"_a=1.23);
   \endrst
  */
 #  if TURBO_USE_NONTYPE_TEMPLATE_ARGS
@@ -4609,7 +4604,7 @@ template <typename Locale, typename... T,
           TURBO_ENABLE_IF(detail::is_locale<Locale>::value)>
 inline auto format(const Locale& loc, format_string<T...> fmt, T&&... args)
     -> std::string {
-  return fmt::vformat(loc, std::string_view(fmt), fmt::make_format_args(args...));
+  return turbo::vformat(loc, std::string_view(fmt), turbo::make_format_args(args...));
 }
 
 template <typename OutputIt, typename Locale,
@@ -4628,7 +4623,7 @@ template <typename OutputIt, typename Locale, typename... T,
                             detail::is_locale<Locale>::value)>
 TURBO_FORCE_INLINE auto format_to(OutputIt out, const Locale& loc,
                           format_string<T...> fmt, T&&... args) -> OutputIt {
-  return vformat_to(out, loc, fmt, fmt::make_format_args(args...));
+  return vformat_to(out, loc, fmt, turbo::make_format_args(args...));
 }
 
 template <typename Locale, typename... T,
@@ -4637,7 +4632,7 @@ template <typename Locale, typename... T,
                                              format_string<T...> fmt,
                                              T&&... args) -> size_t {
   auto buf = detail::counting_buffer<>();
-  detail::vformat_to<char>(buf, fmt, fmt::make_format_args(args...),
+  detail::vformat_to<char>(buf, fmt, turbo::make_format_args(args...),
                            detail::locale_ref(loc));
   return buf.count();
 }

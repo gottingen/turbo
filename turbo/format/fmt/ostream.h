@@ -135,8 +135,8 @@ struct formatter<detail::streamed_view<T>, Char>
 
   **Example**::
 
-    fmt::print("Current thread id: {}\n",
-               fmt::streamed(std::this_thread::get_id()));
+    turbo::print("Current thread id: {}\n",
+               turbo::streamed(std::this_thread::get_id()));
   \endrst
  */
 template <typename T>
@@ -171,12 +171,12 @@ void vprint(std::basic_ostream<Char>& os,
 
   **Example**::
 
-    fmt::print(cerr, "Don't {}!", "panic");
+    turbo::print(cerr, "Don't {}!", "panic");
   \endrst
  */
 TURBO_MODULE_EXPORT template <typename... T>
 void print(std::ostream& os, format_string<T...> fmt, T&&... args) {
-  const auto& vargs = fmt::make_format_args(args...);
+  const auto& vargs = turbo::make_format_args(args...);
   if (detail::is_utf8())
     vprint(os, fmt, vargs);
   else
@@ -188,12 +188,12 @@ template <typename... Args>
 void print(std::wostream& os,
            basic_format_string<wchar_t, type_identity_t<Args>...> fmt,
            Args&&... args) {
-  vprint(os, fmt, fmt::make_format_args<buffer_context<wchar_t>>(args...));
+  vprint(os, fmt, turbo::make_format_args<buffer_context<wchar_t>>(args...));
 }
 
 TURBO_MODULE_EXPORT template <typename... T>
 void println(std::ostream& os, format_string<T...> fmt, T&&... args) {
-  fmt::print(os, "{}\n", fmt::format(fmt, std::forward<T>(args)...));
+  turbo::print(os, "{}\n", turbo::format(fmt, std::forward<T>(args)...));
 }
 
 TURBO_MODULE_EXPORT
@@ -201,7 +201,7 @@ template <typename... Args>
 void println(std::wostream& os,
              basic_format_string<wchar_t, type_identity_t<Args>...> fmt,
              Args&&... args) {
-  print(os, L"{}\n", fmt::format(fmt, std::forward<Args>(args)...));
+  print(os, L"{}\n", turbo::format(fmt, std::forward<Args>(args)...));
 }
 
 FMT_END_NAMESPACE

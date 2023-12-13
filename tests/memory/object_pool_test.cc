@@ -83,19 +83,19 @@ namespace {
         YellObj() {
             ++nc;
             ptr_set.insert(this);
-            printf("Created %p\n", this);
+            ::printf("Created %p\n", this);
         }
         ~YellObj() {
             ++nd;
             ptr_set.erase(this);
-            printf("Destroyed %p\n", this);
+            ::printf("Destroyed %p\n", this);
         }
         char _dummy[96];
     };
 
     TEST_CASE_FIXTURE(ObjectPoolTest, "change_config") {
         int a[2];
-        printf("%lu\n", TURBO_ARRAY_SIZE(a));
+        ::printf("%lu\n", TURBO_ARRAY_SIZE(a));
 
         ObjectPoolInfo info = describe_objects<MyObject>();
         ObjectPoolInfo zero_info = { 0, 0, 0, 0, 3, 3, 0 };
@@ -121,7 +121,7 @@ namespace {
         NonDefaultCtorObject* p2 = get_object<NonDefaultCtorObject>(100, 30);
         REQUIRE_EQ(130, p2->_value);
 
-        printf("BLOCK_NITEM=%lu\n", ObjectPool<YellObj>::BLOCK_NITEM);
+        ::printf("BLOCK_NITEM=%lu\n", ObjectPool<YellObj>::BLOCK_NITEM);
 
         nc = 0;
         nd = 0;
@@ -186,14 +186,14 @@ namespace {
             *get_object<int>() = i;
         }
         tm.stop();
-        printf("get a int takes %.1fns\n", tm.elapsed_mill()/(double)N);
+        ::printf("get a int takes %.1fns\n", tm.elapsed_mill()/(double)N);
 
         tm.reset();
         for (size_t i = 0; i < N; ++i) {
             *(new int) = i;
         }
         tm.stop();
-        printf("new a int takes %" PRId64 "ns\n", tm.elapsed_mill()/N);
+        ::printf("new a int takes %" PRId64 "ns\n", tm.elapsed_mill()/N);
 
         std::cout << describe_objects<int>() << std::endl;
         clear_objects<int>();

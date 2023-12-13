@@ -571,8 +571,8 @@ using wprintf_args = basic_format_args<wprintf_context>;
 
 /**
   \rst
-  Constructs an `~fmt::format_arg_store` object that contains references to
-  arguments and can be implicitly converted to `~fmt::printf_args`.
+  Constructs an `~turbo::format_arg_store` object that contains references to
+  arguments and can be implicitly converted to `~turbo::printf_args`.
   \endrst
  */
 template <typename... T>
@@ -583,8 +583,8 @@ inline auto make_printf_args(const T&... args)
 
 /**
   \rst
-  Constructs an `~fmt::format_arg_store` object that contains references to
-  arguments and can be implicitly converted to `~fmt::wprintf_args`.
+  Constructs an `~turbo::format_arg_store` object that contains references to
+  arguments and can be implicitly converted to `~turbo::wprintf_args`.
   \endrst
  */
 template <typename... T>
@@ -609,7 +609,7 @@ inline auto vsprintf(
 
   **Example**::
 
-    std::string message = fmt::sprintf("The answer is %d", 42);
+    std::string message = turbo::sprintf("The answer is %d", 42);
   \endrst
 */
 template <typename S, typename... T,
@@ -617,7 +617,7 @@ template <typename S, typename... T,
 inline auto sprintf(const S& fmt, const T&... args) -> std::basic_string<Char> {
   using context = basic_printf_context_t<Char>;
   return vsprintf(detail::to_string_view(fmt),
-                  fmt::make_format_args<context>(args...));
+                  turbo::make_format_args<context>(args...));
 }
 
 template <typename S, typename Char = char_t<S>>
@@ -639,14 +639,14 @@ inline auto vfprintf(
 
   **Example**::
 
-    fmt::fprintf(stderr, "Don't %s!", "panic");
+    turbo::fprintf(stderr, "Don't %s!", "panic");
   \endrst
  */
 template <typename S, typename... T, typename Char = char_t<S>>
 inline auto fprintf(std::FILE* f, const S& fmt, const T&... args) -> int {
   using context = basic_printf_context_t<Char>;
   return vfprintf(f, detail::to_string_view(fmt),
-                  fmt::make_format_args<context>(args...));
+                  turbo::make_format_args<context>(args...));
 }
 
 template <typename S, typename Char = char_t<S>>
@@ -663,14 +663,14 @@ inline auto vprintf(
 
   **Example**::
 
-    fmt::printf("Elapsed time: %.2f seconds", 1.23);
+    turbo::printf("Elapsed time: %.2f seconds", 1.23);
   \endrst
  */
 template <typename S, typename... T, TURBO_ENABLE_IF(detail::is_string<S>::value)>
 inline auto printf(const S& fmt, const T&... args) -> int {
   return vprintf(
       detail::to_string_view(fmt),
-      fmt::make_format_args<basic_printf_context_t<char_t<S>>>(args...));
+      turbo::make_format_args<basic_printf_context_t<char_t<S>>>(args...));
 }
 
 TURBO_END_EXPORT

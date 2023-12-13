@@ -44,11 +44,11 @@
 
 #ifndef FMT_BEGIN_NAMESPACE
 #  define FMT_BEGIN_NAMESPACE \
-    namespace fmt {           \
-    inline namespace v10 {
+    namespace turbo {
+//    inline namespace v10 {
 #  define FMT_END_NAMESPACE \
-    }                       \
     }
+//    }
 #endif
 
 // Enable minimal optimizations for more compact code in debug mode.
@@ -507,7 +507,7 @@ FMT_BEGIN_NAMESPACE
             /**
               \rst
               A contiguous memory buffer with an optional growing ability. It is an internal
-              class and shouldn't be used directly, only via `~fmt::basic_memory_buffer`.
+              class and shouldn't be used directly, only via `~turbo::basic_memory_buffer`.
               \endrst
              */
             template<typename T>
@@ -1569,8 +1569,8 @@ FMT_BEGIN_NAMESPACE
         /**
           \rst
           An array of references to arguments. It can be implicitly converted into
-          `~fmt::basic_format_args` for passing into type-erased formatting functions
-          such as `~fmt::vformat`.
+          `~turbo::basic_format_args` for passing into type-erased formatting functions
+          such as `~turbo::vformat`.
           \endrst
          */
         template<typename Context, typename... Args>
@@ -1609,10 +1609,10 @@ FMT_BEGIN_NAMESPACE
 
         /**
           \rst
-          Constructs a `~fmt::format_arg_store` object that contains references to
-          arguments and can be implicitly converted to `~fmt::format_args`. `Context`
-          can be omitted in which case it defaults to `~fmt::context`.
-          See `~fmt::arg` for lifetime considerations.
+          Constructs a `~turbo::format_arg_store` object that contains references to
+          arguments and can be implicitly converted to `~turbo::format_args`. `Context`
+          can be omitted in which case it defaults to `~turbo::context`.
+          See `~turbo::arg` for lifetime considerations.
           \endrst
          */
         template<typename Context = format_context, typename... T>
@@ -1629,7 +1629,7 @@ FMT_BEGIN_NAMESPACE
 
           **Example**::
 
-            fmt::print("Elapsed time: {s:.2f} seconds", fmt::arg("s", 1.23));
+            turbo::print("Elapsed time: {s:.2f} seconds", turbo::arg("s", 1.23));
           \endrst
          */
         template<typename Char, typename T>
@@ -1698,7 +1698,7 @@ FMT_BEGIN_NAMESPACE
 
             /**
              \rst
-             Constructs a `basic_format_args` object from `~fmt::format_arg_store`.
+             Constructs a `basic_format_args` object from `~turbo::format_arg_store`.
              \endrst
              */
             template<typename... Args>
@@ -1710,7 +1710,7 @@ FMT_BEGIN_NAMESPACE
             /**
              \rst
              Constructs a `basic_format_args` object from
-             `~fmt::dynamic_format_arg_store`.
+             `~turbo::dynamic_format_arg_store`.
              \endrst
              */
             constexpr TURBO_FORCE_INLINE basic_format_args(
@@ -2625,7 +2625,7 @@ FMT_BEGIN_NAMESPACE
           **Example**::
 
             // Check format string at runtime instead of compile-time.
-            fmt::print(fmt::runtime("{:d}"), "I am not a number");
+            turbo::print(turbo::runtime("{:d}"), "I am not a number");
           \endrst
          */
         inline auto runtime(std::string_view s) -> runtime_format_string<> { return {{s}}; }
@@ -2642,13 +2642,13 @@ FMT_BEGIN_NAMESPACE
           **Example**::
 
             #include <fmt/core.h>
-            std::string message = fmt::format("The answer is {}.", 42);
+            std::string message = turbo::format("The answer is {}.", 42);
           \endrst
         */
         template<typename... T>
         [[nodiscard]] TURBO_FORCE_INLINE auto format(format_string<T...> fmt, T &&... args)
         -> std::string {
-            return vformat(fmt, fmt::make_format_args(args...));
+            return vformat(fmt, turbo::make_format_args(args...));
         }
 
         /** Formats a string and writes the output to ``out``. */
@@ -2669,14 +2669,14 @@ FMT_BEGIN_NAMESPACE
          **Example**::
 
            auto out = std::vector<char>();
-           fmt::format_to(std::back_inserter(out), "{}", 42);
+           turbo::format_to(std::back_inserter(out), "{}", 42);
          \endrst
          */
         template<typename OutputIt, typename... T,
                 TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
         TURBO_FORCE_INLINE auto format_to(OutputIt out, format_string<T...> fmt, T &&... args)
         -> OutputIt {
-            return vformat_to(out, fmt, fmt::make_format_args(args...));
+            return vformat_to(out, fmt, turbo::make_format_args(args...));
         }
 
         template<typename OutputIt>
@@ -2709,7 +2709,7 @@ FMT_BEGIN_NAMESPACE
                 TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
         TURBO_FORCE_INLINE auto format_to_n(OutputIt out, size_t n, format_string<T...> fmt,
                                             T &&... args) -> format_to_n_result<OutputIt> {
-            return vformat_to_n(out, n, fmt, fmt::make_format_args(args...));
+            return vformat_to_n(out, n, fmt, turbo::make_format_args(args...));
         }
 
         /** Returns the number of chars in the output of ``format(fmt, args...)``. */
@@ -2717,7 +2717,7 @@ FMT_BEGIN_NAMESPACE
         [[nodiscard]] TURBO_FORCE_INLINE auto formatted_size(format_string<T...> fmt,
                                                              T &&... args) -> size_t {
             auto buf = detail::counting_buffer<>();
-            detail::vformat_to<char>(buf, fmt, fmt::make_format_args(args...), {});
+            detail::vformat_to<char>(buf, fmt, turbo::make_format_args(args...), {});
             return buf.count();
         }
 
@@ -2732,12 +2732,12 @@ FMT_BEGIN_NAMESPACE
 
           **Example**::
 
-            fmt::print("Elapsed time: {0:.2f} seconds", 1.23);
+            turbo::print("Elapsed time: {0:.2f} seconds", 1.23);
           \endrst
          */
         template<typename... T>
         TURBO_FORCE_INLINE void print(format_string<T...> fmt, T &&... args) {
-            const auto &vargs = fmt::make_format_args(args...);
+            const auto &vargs = turbo::make_format_args(args...);
             return detail::is_utf8() ? vprint(fmt, vargs)
                                      : detail::vprint_mojibake(stdout, fmt, vargs);
         }
@@ -2749,12 +2749,12 @@ FMT_BEGIN_NAMESPACE
 
           **Example**::
 
-            fmt::print(stderr, "Don't {}!", "panic");
+            turbo::print(stderr, "Don't {}!", "panic");
           \endrst
          */
         template<typename... T>
         TURBO_FORCE_INLINE void print(std::FILE *f, format_string<T...> fmt, T &&... args) {
-            const auto &vargs = fmt::make_format_args(args...);
+            const auto &vargs = turbo::make_format_args(args...);
             return detail::is_utf8() ? vprint(f, fmt, vargs)
                                      : detail::vprint_mojibake(f, fmt, vargs);
         }
@@ -2765,7 +2765,7 @@ FMT_BEGIN_NAMESPACE
          */
         template<typename... T>
         TURBO_FORCE_INLINE void println(std::FILE *f, format_string<T...> fmt, T &&... args) {
-            return fmt::print(f, "{}\n", fmt::format(fmt, std::forward<T>(args)...));
+            return turbo::print(f, "{}\n", turbo::format(fmt, std::forward<T>(args)...));
         }
 
         /**
@@ -2774,7 +2774,7 @@ FMT_BEGIN_NAMESPACE
          */
         template<typename... T>
         TURBO_FORCE_INLINE void println(format_string<T...> fmt, T &&... args) {
-            return fmt::println(stdout, fmt, std::forward<T>(args)...);
+            return turbo::println(stdout, fmt, std::forward<T>(args)...);
         }
 
         TURBO_END_EXPORT

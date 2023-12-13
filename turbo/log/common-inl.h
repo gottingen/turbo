@@ -55,8 +55,8 @@ namespace turbo::tlog {
 
     tlog_ex::tlog_ex(const std::string &msg, int last_errno) {
         memory_buf_t outbuf;
-        fmt::format_system_error(outbuf, last_errno, msg.c_str());
-        msg_ = fmt::to_string(outbuf);
+        turbo::format_system_error(outbuf, last_errno, msg.c_str());
+        msg_ = turbo::to_string(outbuf);
     }
 
     const char *tlog_ex::what() const noexcept {

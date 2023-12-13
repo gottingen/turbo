@@ -154,7 +154,7 @@ TURBO_DLL std::system_error vwindows_error(int error_code, string_view format_st
    LPOFSTRUCT of = LPOFSTRUCT();
    HFILE file = OpenFile(filename, &of, OF_READ);
    if (file == HFILE_ERROR) {
-     throw fmt::windows_error(GetLastError(),
+     throw turbo::windows_error(GetLastError(),
                               "cannot open file '{}'", filename);
    }
  \endrst
@@ -162,7 +162,7 @@ TURBO_DLL std::system_error vwindows_error(int error_code, string_view format_st
 template <typename... Args>
 std::system_error windows_error(int error_code, string_view message,
                                 const Args&... args) {
-  return vwindows_error(error_code, message, fmt::make_format_args(args...));
+  return vwindows_error(error_code, message, turbo::make_format_args(args...));
 }
 
 // Reports a Windows error without throwing an exception.
@@ -225,19 +225,19 @@ class buffered_file {
   TURBO_DLL int descriptor() const;
 
   void vprint(std::string_view format_str, format_args args) {
-    fmt::vprint(file_, format_str, args);
+    turbo::vprint(file_, format_str, args);
   }
 
   template <typename... Args>
   inline void print(std::string_view format_str, const Args&... args) {
-    vprint(format_str, fmt::make_format_args(args...));
+    vprint(format_str, turbo::make_format_args(args...));
   }
 };
 
 #if FMT_USE_FCNTL
 // A file. Closed file is represented by a file object with descriptor -1.
 // Methods that are not declared with noexcept may throw
-// fmt::system_error in case of failure. Note that some errors such as
+// turbo::system_error in case of failure. Note that some errors such as
 // closing the file multiple times will cause a crash on Windows rather
 // than an exception. You can get standard behavior by overriding the
 // invalid parameter handler with _set_invalid_parameter_handler.
@@ -420,7 +420,7 @@ class TURBO_DLL ostream {
    */
   template <typename... T> void print(format_string<T...> fmt, T&&... args) {
     vformat_to(detail::buffer_appender<char>(buffer_), fmt,
-               fmt::make_format_args(args...));
+               turbo::make_format_args(args...));
   }
 };
 
@@ -435,7 +435,7 @@ class TURBO_DLL ostream {
 
   **Example**::
 
-    auto out = fmt::output_file("guide.txt");
+    auto out = turbo::output_file("guide.txt");
     out.print("Don't {}", "Panic");
   \endrst
  */

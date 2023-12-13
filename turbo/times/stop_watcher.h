@@ -119,13 +119,6 @@ namespace turbo {
         bool _show;
     };
 
-}  // namespace turbo
-
-inline std::ostream &operator<<(std::ostream &in, const turbo::StopWatcher &timer) { return in << timer.to_string(); }
-
-namespace fmt {
-
-    // Support for fmt formatting  (e.g. "{:012.9}" or just "{}")
     template<>
     struct formatter<turbo::StopWatcher> : formatter<std::string> {
         template<typename FormatContext>
@@ -133,7 +126,10 @@ namespace fmt {
             return formatter<std::string>::format(sw.to_string(), ctx);
         }
     };
-} // namespace std
+}  // namespace turbo
+
+inline std::ostream &operator<<(std::ostream &in, const turbo::StopWatcher &timer) { return in << timer.to_string(); }
+
 
 
 #endif  // TURBO_TIME_STOP_WATCHER_H_

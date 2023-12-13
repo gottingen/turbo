@@ -141,7 +141,7 @@ void detail::format_windows_error(detail::buffer<char>& out, int error_code,
     if (msg) {
       unicode_to_utf8<wchar_t> utf8_message;
       if (utf8_message.convert(msg)) {
-        fmt::format_to(buffer_appender<char>(out), FMT_STRING("{}: {}"),
+        turbo::format_to(buffer_appender<char>(out), FMT_STRING("{}: {}"),
                        message, string_view(utf8_message));
         return;
       }

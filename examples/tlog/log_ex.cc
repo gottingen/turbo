@@ -332,7 +332,7 @@ struct my_type {
 };
 
 template<>
-struct fmt::formatter<my_type> : fmt::formatter<std::string> {
+struct turbo::formatter<my_type> : turbo::formatter<std::string> {
     auto format(my_type my, format_context &ctx) -> decltype(ctx.out()) {
         return format_to(ctx.out(), "[my_type i={}]", my.i);
     }

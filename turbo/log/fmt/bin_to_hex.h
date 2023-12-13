@@ -97,7 +97,7 @@ namespace turbo::tlog {
 
 } // namespace turbo::tlog
 
-namespace fmt {
+namespace turbo {
 
     template<typename T>
     struct formatter<turbo::tlog::details::dump_info<T>, char> {
@@ -212,4 +212,4 @@ namespace fmt {
             }
         }
     };
-} // namespace std
+} // namespace turbo

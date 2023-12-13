@@ -81,18 +81,18 @@ namespace turbo::tlog {
     using sinks_init_list = std::initializer_list<sink_ptr>;
     using err_handler = std::function<void(const std::string &err_msg)>;
 
-    namespace fmt_lib = fmt;
+    namespace fmt_lib = turbo;
 
-    using memory_buf_t = fmt::basic_memory_buffer<char, 250>;
+    using memory_buf_t = turbo::basic_memory_buffer<char, 250>;
 
     template<typename... Args>
-    using format_string_t = fmt::format_string<Args...>;
+    using format_string_t = turbo::format_string<Args...>;
 
     template<class T>
     using remove_cvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
 // clang doesn't like SFINAE disabled constructor in std::is_convertible<> so have to repeat the condition from basic_format_string here,
-// in addition, fmt::basic_runtime<Char> is only convertible to basic_format_string<Char> but not basic_string_view<Char>
+// in addition, turbo::basic_runtime<Char> is only convertible to basic_format_string<Char> but not basic_string_view<Char>
     template<class T, class Char = char>
     struct is_convertible_to_basic_format_string
             : std::integral_constant<bool,
@@ -100,13 +100,13 @@ namespace turbo::tlog {
     };
 
 #    if defined(TLOG_WCHAR_FILENAMES) || defined(TLOG_WCHAR_TO_UTF8_SUPPORT)
-    using wstring_view_t = fmt::basic_string_view<wchar_t>;
-    using wmemory_buf_t = fmt::basic_memory_buffer<wchar_t, 250>;
+    using wstring_view_t = turbo::basic_string_view<wchar_t>;
+    using wmemory_buf_t = turbo::basic_memory_buffer<wchar_t, 250>;
 
     template<typename... Args>
-    using wformat_string_t = fmt::wformat_string<Args...>;
+    using wformat_string_t = turbo::wformat_string<Args...>;
 #    endif
-#    define TLOG_BUF_TO_STRING(x) fmt::to_string(x)
+#    define TLOG_BUF_TO_STRING(x) turbo::to_string(x)
 
 #ifdef TLOG_WCHAR_TO_UTF8_SUPPORT
 #    ifndef _WIN32

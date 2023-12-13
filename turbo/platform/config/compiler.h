@@ -588,6 +588,13 @@
         #  endif
         #endif
 
+        #ifdef __NVCC__
+        #  define TURBO_CUDA_VERSION (__CUDACC_VER_MAJOR__ * 100 + __CUDACC_VER_MINOR__)
+        #else
+        #  define TURBO_CUDA_VERSION 0
+        #endif
+
+
 #endif // TURBO_PLATFORM_CONFIG_COMPILER_H_
 
 
