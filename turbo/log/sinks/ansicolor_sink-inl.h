@@ -19,6 +19,7 @@
 #include "turbo/base/sysinfo.h"
 #include <turbo/log/pattern_formatter.h>
 #include "turbo/log/details/os.h"
+#include "turbo/format/print.h"
 
 namespace turbo::tlog {
     namespace sinks {
@@ -28,19 +29,19 @@ namespace turbo::tlog {
                 : target_file_(target_file), mutex_(ConsoleMutex::mutex()),
                   formatter_(details::make_unique<turbo::tlog::pattern_formatter>()) {
             set_color_mode(mode);
-            colors_[level::trace] = to_string_(white);
-            colors_[level::debug] = to_string_(cyan);
-            colors_[level::info] = to_string_(green);
-            colors_[level::warn] = to_string_(yellow_bold);
-            colors_[level::err] = to_string_(red_bold);
-            colors_[level::critical] = to_string_(bold_on_red);
-            colors_[level::off] = to_string_(reset);
+            colors_[level::trace] = fg(color::white);
+            colors_[level::debug] = fg(color::cyan);
+            colors_[level::info] = fg(color::green_yellow);
+            colors_[level::warn] = fg(color::yellow);
+            colors_[level::err] = fg(color::red) | emphasis::bold;
+            colors_[level::critical] = fg(color::white) | bg(color::red)| emphasis::bold;;
+            colors_[level::off] = fg(color::white);
         }
 
         template<typename ConsoleMutex>
-        void ansicolor_sink<ConsoleMutex>::set_color(level::level_enum color_level, std::string_view color) {
+        void ansicolor_sink<ConsoleMutex>::set_color(level::level_enum color_level, text_style color) {
             std::lock_guard<mutex_t> lock(mutex_);
-            colors_[static_cast<size_t>(color_level)] = to_string_(color);
+            colors_[static_cast<size_t>(color_level)] = color;
         }
 
         template<typename ConsoleMutex>
@@ -56,13 +57,13 @@ namespace turbo::tlog {
                 // before color range
                 print_range_(formatted, 0, msg.color_range_start);
                 // in color range
-                print_ccode_(colors_[static_cast<size_t>(msg.level)]);
-                print_range_(formatted, msg.color_range_start, msg.color_range_end);
-                print_ccode_(reset);
+                //print_ccode_(colors_[static_cast<size_t>(msg.level)]);
+                //print_range_(formatted, msg.color_range_start, msg.color_range_end);
+                //print_ccode_(reset);
+                turbo::print(target_file_, colors_[static_cast<size_t>(msg.level)], std::string_view {formatted.data() + msg.color_range_start, msg.color_range_end - msg.color_range_start});
                 // after color range
                 print_range_(formatted, msg.color_range_end, formatted.size());
-            } else // no color
-            {
+            } else {
                 print_range_(formatted, 0, formatted.size());
             }
             fflush(target_file_);
