@@ -243,7 +243,7 @@ namespace turbo::tlog {
                throw_tlog_ex(fmt_lib::format("WideCharToMultiByte failed. Last error: {}", ::GetLastError()));
            }
 
-            void utf8_to_wstrbuf(string_view_t str, wmemory_buf_t &target)
+            void utf8_to_wstrbuf(std::string_view str, wmemory_buf_t &target)
            {
                if (str.size() > static_cast<size_t>((std::numeric_limits<int>::max)()) - 1)
                {

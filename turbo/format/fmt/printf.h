@@ -286,7 +286,7 @@ class printf_arg_formatter : public arg_formatter<Char> {
     return write_null_pointer(this->specs.type != presentation_type::pointer);
   }
 
-  OutputIt operator()(basic_string_view<Char> value) {
+  OutputIt operator()(std::basic_string_view<Char> value) {
     return base::operator()(value);
   }
 
@@ -298,7 +298,7 @@ class printf_arg_formatter : public arg_formatter<Char> {
   /** Formats an argument of a custom (user-defined) type. */
   OutputIt operator()(typename basic_format_arg<context_type>::handle handle) {
     auto parse_ctx =
-        basic_printf_parse_context<Char>(basic_string_view<Char>());
+        basic_printf_parse_context<Char>(std::basic_string_view<Char>());
     handle.format(parse_ctx, context_);
     return this->out;
   }
@@ -410,7 +410,7 @@ inline auto parse_printf_presentation_type(char c, type t)
 }
 
 template <typename Char, typename Context>
-void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
+void vprintf(buffer<Char>& buf, std::basic_string_view<Char> format,
              basic_format_args<Context> args) {
   using iterator = buffer_appender<Char>;
   auto out = iterator(buf);
@@ -437,12 +437,12 @@ void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
     }
     Char c = *it++;
     if (it != end && *it == c) {
-      out = write(out, basic_string_view<Char>(start, to_unsigned(it - start)));
+      out = write(out, std::basic_string_view<Char>(start, to_unsigned(it - start)));
       start = ++it;
       continue;
     }
     out =
-        write(out, basic_string_view<Char>(start, to_unsigned(it - 1 - start)));
+        write(out, std::basic_string_view<Char>(start, to_unsigned(it - 1 - start)));
 
     auto specs = format_specs<Char>();
     specs.align = align::right;
@@ -477,7 +477,7 @@ void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
       auto str_end = str + specs.precision;
       auto nul = std::find(str, str_end, Char());
       arg = make_arg<basic_printf_context<iterator, Char>>(
-          basic_string_view<Char>(
+          std::basic_string_view<Char>(
               str, to_unsigned(nul != str_end ? nul - str : specs.precision)));
     }
     if (specs.alt && visit_format_arg(is_zero_int(), arg)) specs.alt = false;
@@ -555,7 +555,7 @@ void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
     out = visit_format_arg(
         printf_arg_formatter<iterator, Char>(out, specs, context), arg);
   }
-  write(out, basic_string_view<Char>(start, to_unsigned(it - start)));
+  write(out, std::basic_string_view<Char>(start, to_unsigned(it - start)));
 }
 FMT_END_DETAIL_NAMESPACE
 

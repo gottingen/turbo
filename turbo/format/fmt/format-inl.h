@@ -41,7 +41,7 @@ FMT_FUNC void throw_format_error(const char* message) {
 }
 
 FMT_FUNC void format_error_code(detail::buffer<char>& out, int error_code,
-                                string_view message) noexcept {
+                                std::string_view message) noexcept {
   // Report error code making sure that the output fits into
   // inline_buffer_size to avoid dynamic memory allocation and potential
   // bad_alloc.
@@ -144,7 +144,7 @@ TURBO_DLL FMT_FUNC auto format_facet<std::locale>::do_put(
 }
 #endif
 
-FMT_FUNC std::system_error vsystem_error(int error_code, string_view fmt,
+FMT_FUNC std::system_error vsystem_error(int error_code, std::string_view fmt,
                                          format_args args) {
   auto ec = std::error_code(error_code, std::generic_category());
   return std::system_error(ec, vformat(fmt, args));
@@ -1405,8 +1405,8 @@ template <> struct formatter<detail::bigint> {
   }
 };
 
-FMT_FUNC detail::utf8_to_utf16::utf8_to_utf16(string_view s) {
-  for_each_codepoint(s, [this](uint32_t cp, string_view) {
+FMT_FUNC detail::utf8_to_utf16::utf8_to_utf16(std::string_view s) {
+  for_each_codepoint(s, [this](uint32_t cp, std::string_view) {
     if (cp == invalid_code_point) FMT_THROW(std::runtime_error("invalid utf8"));
     if (cp <= 0xFFFF) {
       buffer_.push_back(static_cast<wchar_t>(cp));
@@ -1436,7 +1436,7 @@ FMT_FUNC void report_system_error(int error_code,
   report_error(format_system_error, error_code, message);
 }
 
-FMT_FUNC std::string vformat(string_view fmt, format_args args) {
+FMT_FUNC std::string vformat(std::string_view fmt, format_args args) {
   // Don't optimize the "{}" case to keep the binary size small and because it
   // can be better optimized in fmt::format anyway.
   auto buffer = memory_buffer();
@@ -1446,13 +1446,13 @@ FMT_FUNC std::string vformat(string_view fmt, format_args args) {
 
 namespace detail {
 #ifndef _WIN32
-FMT_FUNC bool write_console(std::FILE*, string_view) { return false; }
+FMT_FUNC bool write_console(std::FILE*, std::string_view) { return false; }
 #else
 using dword = conditional_t<sizeof(long) == 4, unsigned long, unsigned>;
 extern "C" __declspec(dllimport) int __stdcall WriteConsoleW(  //
     void*, const void*, dword, dword*, void*);
 
-FMT_FUNC bool write_console(std::FILE* f, string_view text) {
+FMT_FUNC bool write_console(std::FILE* f, std::string_view text) {
   auto fd = _fileno(f);
   if (!_isatty(fd)) return false;
   auto u16 = utf8_to_utf16(text);
@@ -1462,7 +1462,7 @@ FMT_FUNC bool write_console(std::FILE* f, string_view text) {
 }
 
 // Print assuming legacy (non-Unicode) encoding.
-FMT_FUNC void vprint_mojibake(std::FILE* f, string_view fmt, format_args args) {
+FMT_FUNC void vprint_mojibake(std::FILE* f, std::string_view fmt, format_args args) {
   auto buffer = memory_buffer();
   detail::vformat_to(buffer, fmt,
                      basic_format_args<buffer_context<char>>(args));
@@ -1470,18 +1470,18 @@ FMT_FUNC void vprint_mojibake(std::FILE* f, string_view fmt, format_args args) {
 }
 #endif
 
-FMT_FUNC void print(std::FILE* f, string_view text) {
+FMT_FUNC void print(std::FILE* f, std::string_view text) {
   if (!write_console(f, text)) fwrite_fully(text.data(), 1, text.size(), f);
 }
 }  // namespace detail
 
-FMT_FUNC void vprint(std::FILE* f, string_view fmt, format_args args) {
+FMT_FUNC void vprint(std::FILE* f, std::string_view fmt, format_args args) {
   auto buffer = memory_buffer();
   detail::vformat_to(buffer, fmt, args);
   detail::print(f, {buffer.data(), buffer.size()});
 }
 
-FMT_FUNC void vprint(string_view fmt, format_args args) {
+FMT_FUNC void vprint(std::string_view fmt, format_args args) {
   vprint(stdout, fmt, args);
 }
 

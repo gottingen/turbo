@@ -340,7 +340,7 @@ template <typename CodeUnit>
 constexpr const size_t codecvt_result<CodeUnit>::max_size;
 
 template <typename CodeUnit>
-void write_codecvt(codecvt_result<CodeUnit>& out, string_view in_buf,
+void write_codecvt(codecvt_result<CodeUnit>& out, std::string_view in_buf,
                    const std::locale& loc) {
 #if TURBO_CLANG_VERSION
 #  pragma clang diagnostic push
@@ -359,7 +359,7 @@ void write_codecvt(codecvt_result<CodeUnit>& out, string_view in_buf,
 }
 
 template <typename OutputIt>
-auto write_encoded_tm_str(OutputIt out, string_view in, const std::locale& loc)
+auto write_encoded_tm_str(OutputIt out, std::string_view in, const std::locale& loc)
     -> OutputIt {
   if (detail::is_utf8() && loc != get_classic_locale()) {
     // char16_t and char32_t codecvts are broken in MSVC (linkage errors) and
@@ -388,7 +388,7 @@ auto write_encoded_tm_str(OutputIt out, string_view in, const std::locale& loc)
 
 template <typename Char, typename OutputIt,
           TURBO_ENABLE_IF(!std::is_same<Char, char>::value)>
-auto write_tm_str(OutputIt out, string_view sv, const std::locale& loc)
+auto write_tm_str(OutputIt out, std::string_view sv, const std::locale& loc)
     -> OutputIt {
   codecvt_result<Char> unit;
   write_codecvt(unit, sv, loc);
@@ -397,7 +397,7 @@ auto write_tm_str(OutputIt out, string_view sv, const std::locale& loc)
 
 template <typename Char, typename OutputIt,
           TURBO_ENABLE_IF(std::is_same<Char, char>::value)>
-auto write_tm_str(OutputIt out, string_view sv, const std::locale& loc)
+auto write_tm_str(OutputIt out, std::string_view sv, const std::locale& loc)
     -> OutputIt {
   return write_encoded_tm_str(out, sv, loc);
 }
@@ -429,7 +429,7 @@ auto write(OutputIt out, const std::tm& time, const std::locale& loc,
            char format, char modifier = 0) -> OutputIt {
   auto&& buf = basic_memory_buffer<Char>();
   do_write<char>(buf, time, loc, format, modifier);
-  return write_encoded_tm_str(out, string_view(buf.data(), buf.size()), loc);
+  return write_encoded_tm_str(out, std::string_view(buf.data(), buf.size()), loc);
 }
 
 }  // namespace detail
@@ -1715,12 +1715,12 @@ OutputIt format_duration_value(OutputIt out, Rep val, int precision) {
 }
 
 template <typename Char, typename OutputIt>
-OutputIt copy_unit(string_view unit, OutputIt out, Char) {
+OutputIt copy_unit(std::string_view unit, OutputIt out, Char) {
   return std::copy(unit.begin(), unit.end(), out);
 }
 
 template <typename OutputIt>
-OutputIt copy_unit(string_view unit, OutputIt out, wchar_t) {
+OutputIt copy_unit(std::string_view unit, OutputIt out, wchar_t) {
   // This works when wchar_t is UTF-32 because units only contain characters
   // that have the same representation in UTF-16 and UTF-32.
   utf8_to_utf16 u(unit);
@@ -1730,7 +1730,7 @@ OutputIt copy_unit(string_view unit, OutputIt out, wchar_t) {
 template <typename Char, typename Period, typename OutputIt>
 OutputIt format_duration_unit(OutputIt out) {
   if (const char* unit = get_units<Period>())
-    return copy_unit(string_view(unit), out, Char());
+    return copy_unit(std::string_view(unit), out, Char());
   *out++ = '[';
   out = write<Char>(out, Period::num);
   if (const_check(Period::den != 1)) {
@@ -2053,7 +2053,7 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
   arg_ref_type width_ref;
   arg_ref_type precision_ref;
   bool localized = false;
-  basic_string_view<Char> format_str;
+  std::basic_string_view<Char> format_str;
   using duration = std::chrono::duration<Rep, Period>;
 
   using iterator = typename basic_format_parse_context<Char>::iterator;
@@ -2090,7 +2090,7 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
   constexpr auto parse(basic_format_parse_context<Char>& ctx)
       -> decltype(ctx.begin()) {
     auto range = do_parse(ctx);
-    format_str = basic_string_view<Char>(
+    format_str = std::basic_string_view<Char>(
         &*range.begin, turbo::to_unsigned(range.end - range.begin));
     return range.end;
   }
@@ -2120,7 +2120,7 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
       detail::parse_chrono_format(begin, end, f);
     }
     return detail::write(
-        ctx.out(), basic_string_view<Char>(buf.data(), buf.size()), specs_copy);
+        ctx.out(), std::basic_string_view<Char>(buf.data(), buf.size()), specs_copy);
   }
 };
 
@@ -2211,7 +2211,7 @@ template <typename Char> struct formatter<std::tm, Char> {
   detail::arg_ref<Char> width_ref;
 
  protected:
-  basic_string_view<Char> format_str;
+  std::basic_string_view<Char> format_str;
 
   constexpr auto do_parse(basic_format_parse_context<Char>& ctx)
       -> decltype(ctx.begin()) {
@@ -2245,7 +2245,7 @@ template <typename Char> struct formatter<std::tm, Char> {
         detail::tm_writer<decltype(out), Char, Duration>(loc, out, tm, subsecs);
     detail::parse_chrono_format(format_str.begin(), format_str.end(), w);
     return detail::write(
-        ctx.out(), basic_string_view<Char>(buf.data(), buf.size()), specs_copy);
+        ctx.out(), std::basic_string_view<Char>(buf.data(), buf.size()), specs_copy);
   }
 
  public:

@@ -113,7 +113,7 @@ namespace turbo::tlog {
             log(loc, lvl, "{}", msg);
         }
 
-        void log(log_clock::time_point log_time, source_loc loc, level::level_enum lvl, string_view_t msg) {
+        void log(log_clock::time_point log_time, source_loc loc, level::level_enum lvl, std::string_view msg) {
             bool log_enabled = should_log(lvl);
             bool traceback_enabled = tracer_.enabled();
             if (!log_enabled && !traceback_enabled) {
@@ -124,7 +124,7 @@ namespace turbo::tlog {
             log_it_(log_msg, log_enabled, traceback_enabled);
         }
 
-        void log(source_loc loc, level::level_enum lvl, string_view_t msg) {
+        void log(source_loc loc, level::level_enum lvl, std::string_view msg) {
             bool log_enabled = should_log(lvl);
             bool traceback_enabled = tracer_.enabled();
             if (!log_enabled && !traceback_enabled) {
@@ -135,7 +135,7 @@ namespace turbo::tlog {
             log_it_(log_msg, log_enabled, traceback_enabled);
         }
 
-        void log(level::level_enum lvl, string_view_t msg) {
+        void log(level::level_enum lvl, std::string_view msg) {
             log(source_loc{}, lvl, msg);
         }
 
@@ -193,7 +193,7 @@ namespace turbo::tlog {
 
             memory_buf_t buf;
             details::os::wstr_to_utf8buf(wstring_view_t(msg.data(), msg.size()), buf);
-            details::log_msg log_msg(log_time, loc, name_, lvl, string_view_t(buf.data(), buf.size()));
+            details::log_msg log_msg(log_time, loc, name_, lvl, std::string_view(buf.data(), buf.size()));
             log_it_(log_msg, log_enabled, traceback_enabled);
         }
 
@@ -208,7 +208,7 @@ namespace turbo::tlog {
 
             memory_buf_t buf;
             details::os::wstr_to_utf8buf(wstring_view_t(msg.data(), msg.size()), buf);
-            details::log_msg log_msg(loc, name_, lvl, string_view_t(buf.data(), buf.size()));
+            details::log_msg log_msg(loc, name_, lvl, std::string_view(buf.data(), buf.size()));
             log_it_(log_msg, log_enabled, traceback_enabled);
         }
 
@@ -346,7 +346,7 @@ namespace turbo::tlog {
 
         // common implementation for after templated public api has been resolved
         template<typename... Args>
-        void log_(source_loc loc, level::level_enum lvl, string_view_t fmt, Args &&... args) {
+        void log_(source_loc loc, level::level_enum lvl, std::string_view fmt, Args &&... args) {
             bool log_enabled = should_log(lvl);
             bool traceback_enabled = tracer_.enabled();
             if (!log_enabled && !traceback_enabled) {
@@ -355,7 +355,7 @@ namespace turbo::tlog {
             TLOG_TRY {
                 memory_buf_t buf;
                 fmt::vformat_to(fmt::appender(buf), fmt, fmt::make_format_args(std::forward<Args>(args)...));
-                details::log_msg log_msg(loc, name_, lvl, string_view_t(buf.data(), buf.size()));
+                details::log_msg log_msg(loc, name_, lvl, std::string_view(buf.data(), buf.size()));
                 log_it_(log_msg, log_enabled, traceback_enabled);
             }
             TLOG_LOGGER_CATCH(loc)
@@ -384,7 +384,7 @@ namespace turbo::tlog {
 
                 memory_buf_t buf;
                 details::os::wstr_to_utf8buf(wstring_view_t(wbuf.data(), wbuf.size()), buf);
-                details::log_msg log_msg(loc, name_, lvl, string_view_t(buf.data(), buf.size()));
+                details::log_msg log_msg(loc, name_, lvl, std::string_view(buf.data(), buf.size()));
                 log_it_(log_msg, log_enabled, traceback_enabled);
             }
             TLOG_LOGGER_CATCH(loc)
@@ -404,7 +404,7 @@ namespace turbo::tlog {
             {
                 memory_buf_t buf;
                 details::os::wstr_to_utf8buf(msg, buf);
-                details::log_msg log_msg(loc, name_, lvl, string_view_t(buf.data(), buf.size()));
+                details::log_msg log_msg(loc, name_, lvl, std::string_view(buf.data(), buf.size()));
                 log_it_(log_msg, log_enabled, traceback_enabled);
             }
             TLOG_LOGGER_CATCH(loc)

@@ -55,12 +55,12 @@ template <typename T> class is_std_string_like {
  public:
   static constexpr const bool value =
       is_string<T>::value ||
-      std::is_convertible<T, std_string_view<char>>::value ||
+      std::is_convertible<T, std::basic_string_view<char>>::value ||
       !std::is_void<decltype(check<T>(nullptr))>::value;
 };
 
 template <typename Char>
-struct is_std_string_like<fmt::basic_string_view<Char>> : std::true_type {};
+struct is_std_string_like<std::basic_string_view<Char>> : std::true_type {};
 
 template <typename T> class is_map {
   template <typename U> static auto check(U*) -> typename U::mapped_type;
@@ -317,7 +317,7 @@ template <typename FormatContext> struct format_tuple_element {
 
   int i;
   FormatContext& ctx;
-  basic_string_view<char_type> separator;
+  std::basic_string_view<char_type> separator;
 };
 
 }  // namespace detail
@@ -340,21 +340,21 @@ struct formatter<Tuple, Char,
   decltype(detail::tuple::get_formatters<Tuple, Char>(
       detail::tuple_index_sequence<Tuple>())) formatters_;
 
-  basic_string_view<Char> separator_ = detail::string_literal<Char, ',', ' '>{};
-  basic_string_view<Char> opening_bracket_ =
+  std::basic_string_view<Char> separator_ = detail::string_literal<Char, ',', ' '>{};
+  std::basic_string_view<Char> opening_bracket_ =
       detail::string_literal<Char, '('>{};
-  basic_string_view<Char> closing_bracket_ =
+  std::basic_string_view<Char> closing_bracket_ =
       detail::string_literal<Char, ')'>{};
 
  public:
   constexpr formatter() {}
 
-  constexpr void set_separator(basic_string_view<Char> sep) {
+  constexpr void set_separator(std::basic_string_view<Char> sep) {
     separator_ = sep;
   }
 
-  constexpr void set_brackets(basic_string_view<Char> open,
-                                  basic_string_view<Char> close) {
+  constexpr void set_brackets(std::basic_string_view<Char> open,
+                                  std::basic_string_view<Char> close) {
     opening_bracket_ = open;
     closing_bracket_ = close;
   }
@@ -383,7 +383,7 @@ template <typename T, typename Char> struct is_range {
   static constexpr const bool value =
       detail::is_range_<T>::value && !detail::is_std_string_like<T>::value &&
       !std::is_convertible<T, std::basic_string<Char>>::value &&
-      !std::is_convertible<T, detail::std_string_view<Char>>::value;
+      !std::is_convertible<T, std::basic_string_view<Char>>::value;
 };
 
 namespace detail {
@@ -431,10 +431,10 @@ struct range_formatter<
                             is_formattable<T, Char>>::value>> {
  private:
   detail::range_formatter_type<Char, T> underlying_;
-  basic_string_view<Char> separator_ = detail::string_literal<Char, ',', ' '>{};
-  basic_string_view<Char> opening_bracket_ =
+  std::basic_string_view<Char> separator_ = detail::string_literal<Char, ',', ' '>{};
+  std::basic_string_view<Char> opening_bracket_ =
       detail::string_literal<Char, '['>{};
-  basic_string_view<Char> closing_bracket_ =
+  std::basic_string_view<Char> closing_bracket_ =
       detail::string_literal<Char, ']'>{};
 
  public:
@@ -444,12 +444,12 @@ struct range_formatter<
     return underlying_;
   }
 
-  constexpr void set_separator(basic_string_view<Char> sep) {
+  constexpr void set_separator(std::basic_string_view<Char> sep) {
     separator_ = sep;
   }
 
-  constexpr void set_brackets(basic_string_view<Char> open,
-                                  basic_string_view<Char> close) {
+  constexpr void set_brackets(std::basic_string_view<Char> open,
+                                  std::basic_string_view<Char> close) {
     opening_bracket_ = open;
     closing_bracket_ = close;
   }
@@ -573,9 +573,9 @@ struct formatter<
 
 template <typename Char, typename... T> struct tuple_join_view : detail::view {
   const std::tuple<T...>& tuple;
-  basic_string_view<Char> sep;
+  std::basic_string_view<Char> sep;
 
-  tuple_join_view(const std::tuple<T...>& t, basic_string_view<Char> s)
+  tuple_join_view(const std::tuple<T...>& t, std::basic_string_view<Char> s)
       : tuple(t), sep{s} {}
 };
 
@@ -697,14 +697,14 @@ TURBO_BEGIN_EXPORT
   \endrst
  */
 template <typename... T>
-constexpr auto join(const std::tuple<T...>& tuple, string_view sep)
+constexpr auto join(const std::tuple<T...>& tuple, std::string_view sep)
     -> tuple_join_view<char, T...> {
   return {tuple, sep};
 }
 
 template <typename... T>
 constexpr auto join(const std::tuple<T...>& tuple,
-                        basic_string_view<wchar_t> sep)
+                        std::basic_string_view<wchar_t> sep)
     -> tuple_join_view<wchar_t, T...> {
   return {tuple, sep};
 }
@@ -721,7 +721,7 @@ constexpr auto join(const std::tuple<T...>& tuple,
   \endrst
  */
 template <typename T>
-auto join(std::initializer_list<T> list, string_view sep)
+auto join(std::initializer_list<T> list, std::string_view sep)
     -> join_view<const T*, const T*> {
   return join(std::begin(list), std::end(list), sep);
 }

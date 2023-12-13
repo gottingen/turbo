@@ -28,7 +28,7 @@ template TURBO_DLL auto decimal_point_impl(locale_ref) -> char;
 
 template TURBO_DLL void buffer<char>::append(const char*, const char*);
 
-template TURBO_DLL void vformat_to(buffer<char>&, string_view,
+template TURBO_DLL void vformat_to(buffer<char>&, std::string_view,
                                  typename vformat_args<>::type, locale_ref);
 
 // Explicit instantiations for wchar_t.

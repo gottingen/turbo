@@ -26,11 +26,11 @@ namespace turbo::tlog {
     namespace details {
         namespace fmt_helper {
 
-            inline turbo::tlog::string_view_t to_string_view(const memory_buf_t &buf) noexcept {
-                return turbo::tlog::string_view_t{buf.data(), buf.size()};
+            inline std::string_view to_string_view(const memory_buf_t &buf) noexcept {
+                return std::string_view {buf.data(), buf.size()};
             }
 
-            inline void append_string_view(turbo::tlog::string_view_t view, memory_buf_t &dest) {
+            inline void append_string_view(std::string_view view, memory_buf_t &dest) {
                 auto *buf_ptr = view.data();
                 dest.append(buf_ptr, buf_ptr + view.size());
             }

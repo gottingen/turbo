@@ -43,7 +43,7 @@ template class file_access<file_access_tag, std::__stdoutbuf<char>,
 auto get_file(std::__stdoutbuf<char>&) -> FILE*;
 #endif
 
-inline bool write_ostream_unicode(std::ostream& os, fmt::string_view data) {
+inline bool write_ostream_unicode(std::ostream& os, std::string_view data) {
 #if TURBO_MSC_VERSION
   if (auto* buf = dynamic_cast<std::filebuf*>(os.rdbuf()))
     if (FILE* f = get_file(*buf)) return write_console(f, data);
@@ -66,7 +66,7 @@ inline bool write_ostream_unicode(std::ostream& os, fmt::string_view data) {
   return false;
 }
 inline bool write_ostream_unicode(std::wostream&,
-                                  fmt::basic_string_view<wchar_t>) {
+                                  std::basic_string_view<wchar_t>) {
   return false;
 }
 
@@ -104,7 +104,7 @@ template <typename T> struct streamed_view { const T& value; };
 
 // Formats an object of type T that has an overloaded ostream operator<<.
 template <typename Char>
-struct basic_ostream_formatter : formatter<basic_string_view<Char>, Char> {
+struct basic_ostream_formatter : formatter<std::basic_string_view<Char>, Char> {
   void set_debug_format() = delete;
 
   template <typename T, typename OutputIt>
@@ -112,7 +112,7 @@ struct basic_ostream_formatter : formatter<basic_string_view<Char>, Char> {
       -> OutputIt {
     auto buffer = basic_memory_buffer<Char>();
     detail::format_value(buffer, value, ctx.locale());
-    return formatter<basic_string_view<Char>, Char>::format(
+    return formatter<std::basic_string_view<Char>, Char>::format(
         {buffer.data(), buffer.size()}, ctx);
   }
 };
@@ -146,7 +146,7 @@ auto streamed(const T& value) -> detail::streamed_view<T> {
 
 namespace detail {
 
-inline void vprint_directly(std::ostream& os, string_view format_str,
+inline void vprint_directly(std::ostream& os, std::string_view format_str,
                             format_args args) {
   auto buffer = memory_buffer();
   detail::vformat_to(buffer, format_str, args);
@@ -157,7 +157,7 @@ inline void vprint_directly(std::ostream& os, string_view format_str,
 
 TURBO_MODULE_EXPORT template <typename Char>
 void vprint(std::basic_ostream<Char>& os,
-            basic_string_view<type_identity_t<Char>> format_str,
+            std::basic_string_view<type_identity_t<Char>> format_str,
             basic_format_args<buffer_context<type_identity_t<Char>>> args) {
   auto buffer = basic_memory_buffer<Char>();
   detail::vformat_to(buffer, format_str, args);

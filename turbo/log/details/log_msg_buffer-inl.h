@@ -53,8 +53,8 @@ namespace turbo::tlog::details {
     }
 
     void log_msg_buffer::update_string_views() {
-        logger_name = string_view_t{buffer.data(), logger_name.size()};
-        payload = string_view_t{buffer.data() + logger_name.size(), payload.size()};
+        logger_name = std::string_view{buffer.data(), logger_name.size()};
+        payload = std::string_view{buffer.data() + logger_name.size(), payload.size()};
     }
 
 } // namespace turbo::tlog::details

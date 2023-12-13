@@ -235,7 +235,7 @@ constexpr inline void abort_fuzzing_if(bool condition) {
 
 template <typename CharT, CharT... C> struct string_literal {
   static constexpr CharT value[sizeof...(C)] = {C...};
-  constexpr operator basic_string_view<CharT>() const {
+  constexpr operator std::basic_string_view<CharT>() const {
     return {value, sizeof...(C)};
   }
 };
@@ -656,13 +656,13 @@ constexpr inline uint32_t invalid_code_point = ~uint32_t();
 // Invokes f(cp, sv) for every code point cp in s with sv being the string view
 // corresponding to the code point. cp is invalid_code_point on error.
 template <typename F>
-constexpr void for_each_codepoint(string_view s, F f) {
+constexpr void for_each_codepoint(std::string_view s, F f) {
   auto decode = [f](const char* buf_ptr, const char* ptr) {
     auto cp = uint32_t();
     auto error = 0;
     auto end = utf8_decode(buf_ptr, &cp, &error);
     bool result = f(error ? invalid_code_point : cp,
-                    string_view(ptr, error ? 1 : turbo::to_unsigned(end - buf_ptr)));
+                    std::string_view(ptr, error ? 1 : turbo::to_unsigned(end - buf_ptr)));
     return result ? (error ? buf_ptr + 1 : end) : nullptr;
   };
   auto p = s.data();
@@ -687,17 +687,17 @@ constexpr void for_each_codepoint(string_view s, F f) {
 }
 
 template <typename Char>
-inline auto compute_width(basic_string_view<Char> s) -> size_t {
+inline auto compute_width(std::basic_string_view<Char> s) -> size_t {
   return s.size();
 }
 
 // Computes approximate display width of a UTF-8 string.
-constexpr inline size_t compute_width(string_view s) {
+constexpr inline size_t compute_width(std::string_view s) {
   size_t num_code_points = 0;
   // It is not a lambda for compatibility with C++14.
   struct count_code_points {
     size_t* count;
-    constexpr auto operator()(uint32_t cp, string_view) const -> bool {
+    constexpr auto operator()(uint32_t cp, std::string_view) const -> bool {
       *count += turbo::to_unsigned(
           1 +
           (cp >= 0x1100 &&
@@ -726,19 +726,19 @@ constexpr inline size_t compute_width(string_view s) {
   return num_code_points;
 }
 
-inline auto compute_width(basic_string_view<char8_type> s) -> size_t {
+inline auto compute_width(std::basic_string_view<char8_type> s) -> size_t {
   return compute_width(
-      string_view(reinterpret_cast<const char*>(s.data()), s.size()));
+      std::string_view(reinterpret_cast<const char*>(s.data()), s.size()));
 }
 
 template <typename Char>
-inline auto code_point_index(basic_string_view<Char> s, size_t n) -> size_t {
+inline auto code_point_index(std::basic_string_view<Char> s, size_t n) -> size_t {
   size_t size = s.size();
   return n < size ? n : size;
 }
 
 // Calculates the index of the nth code point in a UTF-8 string.
-inline auto code_point_index(string_view s, size_t n) -> size_t {
+inline auto code_point_index(std::string_view s, size_t n) -> size_t {
   const char* data = s.data();
   size_t num_code_points = 0;
   for (size_t i = 0, size = s.size(); i != size; ++i) {
@@ -747,10 +747,10 @@ inline auto code_point_index(string_view s, size_t n) -> size_t {
   return s.size();
 }
 
-inline auto code_point_index(basic_string_view<char8_type> s, size_t n)
+inline auto code_point_index(std::basic_string_view<char8_type> s, size_t n)
     -> size_t {
   return code_point_index(
-      string_view(reinterpret_cast<const char*>(s.data()), s.size()), n);
+      std::string_view(reinterpret_cast<const char*>(s.data()), s.size()), n);
 }
 
 template <typename T> struct is_integral : std::is_integral<T> {};
@@ -986,8 +986,8 @@ struct is_contiguous<basic_memory_buffer<T, SIZE, Allocator>> : std::true_type {
 
 TURBO_END_EXPORT
 namespace detail {
-TURBO_DLL bool write_console(std::FILE* f, string_view text);
-TURBO_DLL void print(std::FILE*, string_view);
+TURBO_DLL bool write_console(std::FILE* f, std::string_view text);
+TURBO_DLL void print(std::FILE*, std::string_view);
 }  // namespace detail
 TURBO_BEGIN_EXPORT
 
@@ -1013,17 +1013,17 @@ template <typename Char, size_t N> struct fixed_string {
 };
 #endif
 
-// Converts a compile-time string to basic_string_view.
+// Converts a compile-time string to std::basic_string_view.
 template <typename Char, size_t N>
 constexpr auto compile_string_to_view(const Char (&s)[N])
-    -> basic_string_view<Char> {
+    -> std::basic_string_view<Char> {
   // Remove trailing NUL character if needed. Won't be present if this is used
   // with a raw character array (i.e. not defined as a string).
   return {s, N - (std::char_traits<Char>::to_int_type(s[N - 1]) == 0 ? 1 : 0)};
 }
 template <typename Char>
-constexpr auto compile_string_to_view(detail::std_string_view<Char> s)
-    -> basic_string_view<Char> {
+constexpr auto compile_string_to_view(std::basic_string_view<Char> s)
+    -> std::basic_string_view<Char> {
   return {s.data(), s.size()};
 }
 }  // namespace detail_exported
@@ -1060,7 +1060,7 @@ template <typename Locale> class format_facet : public Locale::facet {
   static TURBO_DLL typename Locale::id id;
 
   explicit format_facet(Locale& loc);
-  explicit format_facet(string_view sep = "",
+  explicit format_facet(std::string_view sep = "",
                         std::initializer_list<unsigned char> g = {3},
                         std::string decimal_point = ".")
       : separator_(sep.data(), sep.size()),
@@ -1356,8 +1356,8 @@ class utf8_to_utf16 {
   basic_memory_buffer<wchar_t> buffer_;
 
  public:
-  TURBO_DLL explicit utf8_to_utf16(string_view s);
-  operator basic_string_view<wchar_t>() const { return {&buffer_[0], size()}; }
+  TURBO_DLL explicit utf8_to_utf16(std::string_view s);
+  operator std::basic_string_view<wchar_t>() const { return {&buffer_[0], size()}; }
   auto size() const -> size_t { return buffer_.size() - 1; }
   auto c_str() const -> const wchar_t* { return &buffer_[0]; }
   auto str() const -> std::wstring { return {&buffer_[0], size()}; }
@@ -1371,7 +1371,7 @@ class unicode_to_utf8 {
 
  public:
   unicode_to_utf8() {}
-  explicit unicode_to_utf8(basic_string_view<WChar> s) {
+  explicit unicode_to_utf8(std::basic_string_view<WChar> s) {
     static_assert(sizeof(WChar) == 2 || sizeof(WChar) == 4,
                   "Expect utf16 or utf32");
 
@@ -1379,7 +1379,7 @@ class unicode_to_utf8 {
       FMT_THROW(std::runtime_error(sizeof(WChar) == 2 ? "invalid utf16"
                                                       : "invalid utf32"));
   }
-  operator string_view() const { return string_view(&buffer_[0], size()); }
+  operator std::string_view() const { return std::string_view(&buffer_[0], size()); }
   size_t size() const { return buffer_.size() - 1; }
   const char* c_str() const { return &buffer_[0]; }
   std::string str() const { return std::string(&buffer_[0], size()); }
@@ -1387,12 +1387,12 @@ class unicode_to_utf8 {
   // Performs conversion returning a bool instead of throwing exception on
   // conversion error. This method may still throw in case of memory allocation
   // error.
-  bool convert(basic_string_view<WChar> s) {
+  bool convert(std::basic_string_view<WChar> s) {
     if (!convert(buffer_, s)) return false;
     buffer_.push_back(0);
     return true;
   }
-  static bool convert(Buffer& buf, basic_string_view<WChar> s) {
+  static bool convert(Buffer& buf, std::basic_string_view<WChar> s) {
     for (auto p = s.begin(); p != s.end(); ++p) {
       uint32_t c = static_cast<uint32_t>(*p);
       if (sizeof(WChar) == 2 && c >= 0xd800 && c <= 0xdfff) {
@@ -1842,7 +1842,7 @@ constexpr auto write_padded(OutputIt out, const format_specs<Char>& specs,
 }
 
 template <align::type align = align::left, typename Char, typename OutputIt>
-constexpr auto write_bytes(OutputIt out, string_view bytes,
+constexpr auto write_bytes(OutputIt out, std::string_view bytes,
                                const format_specs<Char>& specs) -> OutputIt {
   return write_padded<align>(
       out, specs, bytes.size(), [bytes](reserve_iterator<OutputIt> it) {
@@ -1900,8 +1900,8 @@ inline auto find_escape(const char* begin, const char* end)
     -> find_escape_result<char> {
   if (!is_utf8()) return find_escape<char>(begin, end);
   auto result = find_escape_result<char>{end, nullptr, 0};
-  for_each_codepoint(string_view(begin, turbo::to_unsigned(end - begin)),
-                     [&](uint32_t cp, string_view sv) {
+  for_each_codepoint(std::string_view(begin, turbo::to_unsigned(end - begin)),
+                     [&](uint32_t cp, std::string_view sv) {
                        if (needs_escape(cp)) {
                          result = {sv.begin(), sv.end(), cp};
                          return false;
@@ -1918,7 +1918,7 @@ inline auto find_escape(const char* begin, const char* end)
     struct TURBO_HIDDEN FMT_COMPILE_STRING : base {              \
       using char_type TURBO_MAYBE_UNUSED = turbo::remove_cvref_t<decltype(s[0])>; \
       TURBO_MAYBE_UNUSED constexpr explicit                                 \
-      operator fmt::basic_string_view<char_type>() const {                    \
+      operator std::basic_string_view<char_type>() const {                    \
         return fmt::detail_exported::compile_string_to_view<char_type>(s);    \
       }                                                                       \
     };                                                                        \
@@ -1981,7 +1981,7 @@ auto write_escaped_cp(OutputIt out, const find_escape_result<Char>& escape)
     if (escape.cp < 0x110000) {
       return write_codepoint<8, Char>(out, 'U', escape.cp);
     }
-    for (Char escape_char : basic_string_view<Char>(
+    for (Char escape_char : std::basic_string_view<Char>(
              escape.begin, turbo::to_unsigned(escape.end - escape.begin))) {
       out = write_codepoint<2, Char>(out, 'x',
                                      static_cast<uint32_t>(escape_char) & 0xFF);
@@ -1993,7 +1993,7 @@ auto write_escaped_cp(OutputIt out, const find_escape_result<Char>& escape)
 }
 
 template <typename Char, typename OutputIt>
-auto write_escaped_string(OutputIt out, basic_string_view<Char> str)
+auto write_escaped_string(OutputIt out, std::basic_string_view<Char> str)
     -> OutputIt {
   *out++ = static_cast<Char>('"');
   auto begin = str.begin(), end = str.end();
@@ -2136,7 +2136,7 @@ template <typename Char> class digit_grouping {
 
   // Applies grouping to digits and write the output to out.
   template <typename Out, typename C>
-  Out apply(Out out, basic_string_view<C> digits) const {
+  Out apply(Out out, std::basic_string_view<C> digits) const {
     auto num_digits = static_cast<int>(digits.size());
     auto separators = basic_memory_buffer<int>();
     separators.push_back(0);
@@ -2176,7 +2176,7 @@ auto write_int(OutputIt out, UInt value, unsigned prefix,
           char sign = static_cast<char>(prefix);
           *it++ = static_cast<Char>(sign);
         }
-        return grouping.apply(it, string_view(digits, turbo::to_unsigned(num_digits)));
+        return grouping.apply(it, std::string_view(digits, turbo::to_unsigned(num_digits)));
       });
 }
 
@@ -2362,7 +2362,7 @@ class counting_iterator {
 };
 
 template <typename Char, typename OutputIt>
-constexpr auto write(OutputIt out, basic_string_view<Char> s,
+constexpr auto write(OutputIt out, std::basic_string_view<Char> s,
                          const format_specs<Char>& specs) -> OutputIt {
   auto data = s.data();
   auto size = s.size();
@@ -2374,7 +2374,7 @@ constexpr auto write(OutputIt out, basic_string_view<Char> s,
     if (is_debug)
       width = write_escaped_string(counting_iterator{}, s).count();
     else
-      width = compute_width(basic_string_view<Char>(data, size));
+      width = compute_width(std::basic_string_view<Char>(data, size));
   }
   return write_padded(out, specs, size, width,
                       [=](reserve_iterator<OutputIt> it) {
@@ -2384,7 +2384,7 @@ constexpr auto write(OutputIt out, basic_string_view<Char> s,
 }
 template <typename Char, typename OutputIt>
 constexpr auto write(OutputIt out,
-                         basic_string_view<type_identity_t<Char>> s,
+                         std::basic_string_view<type_identity_t<Char>> s,
                          const format_specs<Char>& specs, locale_ref)
     -> OutputIt {
   return write(out, s, specs);
@@ -2394,7 +2394,7 @@ constexpr auto write(OutputIt out, const Char* s,
                          const format_specs<Char>& specs, locale_ref)
     -> OutputIt {
   return specs.type != presentation_type::pointer
-             ? write(out, basic_string_view<Char>(s), specs, {})
+             ? write(out, std::basic_string_view<Char>(s), specs, {})
              : write_ptr<Char>(out, bit_cast<uintptr_t>(s), &specs);
 }
 
@@ -2537,7 +2537,7 @@ TURBO_CONSTEXPR20 auto write_significand(OutputIt out, T significand,
   auto buffer = memory_buffer();
   write_significand<char>(appender(buffer), significand, significand_size);
   detail::fill_n(appender(buffer), exponent, '0');
-  return grouping.apply(out, string_view(buffer.data(), buffer.size()));
+  return grouping.apply(out, std::string_view(buffer.data(), buffer.size()));
 }
 
 template <typename Char, typename UInt,
@@ -2600,7 +2600,7 @@ TURBO_CONSTEXPR20 auto write_significand(OutputIt out, T significand,
   write_significand(buffer_appender<Char>(buffer), significand,
                     significand_size, integral_size, decimal_point);
   grouping.apply(
-      out, basic_string_view<Char>(buffer.data(), turbo::to_unsigned(integral_size)));
+      out, std::basic_string_view<Char>(buffer.data(), turbo::to_unsigned(integral_size)));
   return detail::copy_str_noinline<Char>(buffer.data() + integral_size,
                                          buffer.end(), out);
 }
@@ -2720,7 +2720,7 @@ template <typename Char> class fallback_digit_grouping {
   constexpr int count_separators(int) const { return 0; }
 
   template <typename Out, typename C>
-  constexpr Out apply(Out out, basic_string_view<C>) const {
+  constexpr Out apply(Out out, std::basic_string_view<C>) const {
     return out;
   }
 };
@@ -3857,7 +3857,7 @@ auto write(OutputIt out, monostate, format_specs<Char> = {}, locale_ref = {})
 }
 
 template <typename Char, typename OutputIt>
-constexpr auto write(OutputIt out, basic_string_view<Char> value)
+constexpr auto write(OutputIt out, std::basic_string_view<Char> value)
     -> OutputIt {
   auto it = reserve(out, value.size());
   it = copy_str_noinline<Char>(value.begin(), value.end(), it);
@@ -3903,7 +3903,7 @@ constexpr auto write(OutputIt out, Char value) -> OutputIt {
 template <typename Char, typename OutputIt>
 constexpr auto write(OutputIt out, const Char* value)
     -> OutputIt {
-  if (value) return write(out, basic_string_view<Char>(value));
+  if (value) return write(out, std::basic_string_view<Char>(value));
   throw_format_error("string pointer is null");
   return out;
 }
@@ -4062,7 +4062,7 @@ constexpr void handle_dynamic_spec(int& value,
 }
 
 template <typename Char> struct udl_formatter {
-  basic_string_view<Char> str;
+  std::basic_string_view<Char> str;
 
   template <typename... T>
   auto operator()(T&&... args) const -> std::basic_string<Char> {
@@ -4107,7 +4107,7 @@ template <typename Char> struct udl_arg {
 #  endif
 
 template <typename Locale, typename Char>
-auto vformat(const Locale& loc, basic_string_view<Char> fmt,
+auto vformat(const Locale& loc, std::basic_string_view<Char> fmt,
              basic_format_args<buffer_context<type_identity_t<Char>>> args)
     -> std::basic_string<Char> {
   auto buf = basic_memory_buffer<Char>();
@@ -4118,13 +4118,13 @@ auto vformat(const Locale& loc, basic_string_view<Char> fmt,
 using format_func = void (*)(detail::buffer<char>&, int, const char*);
 
 TURBO_DLL void format_error_code(buffer<char>& out, int error_code,
-                               string_view message) noexcept;
+                               std::string_view message) noexcept;
 
 TURBO_DLL void report_error(format_func func, int error_code,
                           const char* message) noexcept;
 FMT_END_DETAIL_NAMESPACE
 
-TURBO_DLL auto vsystem_error(int error_code, string_view format_str,
+TURBO_DLL auto vsystem_error(int error_code, std::string_view format_str,
                            format_args args) -> std::system_error;
 
 /**
@@ -4254,11 +4254,11 @@ struct formatter<void*, Char> : formatter<const void*, Char> {
 };
 
 template <typename Char, size_t N>
-struct formatter<Char[N], Char> : formatter<basic_string_view<Char>, Char> {
+struct formatter<Char[N], Char> : formatter<std::basic_string_view<Char>, Char> {
   template <typename FormatContext>
   constexpr auto format(const Char* val, FormatContext& ctx) const
       -> decltype(ctx.out()) {
-    return formatter<basic_string_view<Char>, Char>::format(val, ctx);
+    return formatter<std::basic_string_view<Char>, Char>::format(val, ctx);
   }
 };
 
@@ -4307,11 +4307,11 @@ constexpr auto format_as(Enum e) noexcept -> underlying_t<Enum> {
 
 class bytes {
  private:
-  string_view data_;
+  std::string_view data_;
   friend struct formatter<bytes>;
 
  public:
-  explicit bytes(string_view data) : data_(data) {}
+  explicit bytes(std::string_view data) : data_(data) {}
 };
 
 template <> struct formatter<bytes> {
@@ -4382,9 +4382,9 @@ template <typename It, typename Sentinel, typename Char = char>
 struct join_view : detail::view {
   It begin;
   Sentinel end;
-  basic_string_view<Char> sep;
+  std::basic_string_view<Char> sep;
 
-  join_view(It b, Sentinel e, basic_string_view<Char> s)
+  join_view(It b, Sentinel e, std::basic_string_view<Char> s)
       : begin(b), end(e), sep(s) {}
 };
 
@@ -4429,7 +4429,7 @@ struct formatter<join_view<It, Sentinel, Char>, Char> {
   separated by `sep`.
  */
 template <typename It, typename Sentinel>
-auto join(It begin, Sentinel end, string_view sep) -> join_view<It, Sentinel> {
+auto join(It begin, Sentinel end, std::string_view sep) -> join_view<It, Sentinel> {
   return {begin, end, sep};
 }
 
@@ -4450,7 +4450,7 @@ auto join(It begin, Sentinel end, string_view sep) -> join_view<It, Sentinel> {
   \endrst
  */
 template <typename Range>
-auto join(Range&& range, string_view sep)
+auto join(Range&& range, std::string_view sep)
     -> join_view<detail::iterator_t<Range>, detail::sentinel_t<Range>> {
   return join(std::begin(range), std::end(range), sep);
 }
@@ -4494,7 +4494,7 @@ template <typename Char, size_t SIZE>
 FMT_BEGIN_DETAIL_NAMESPACE
 
 template <typename Char>
-void vformat_to(buffer<Char>& buf, basic_string_view<Char> fmt,
+void vformat_to(buffer<Char>& buf, std::basic_string_view<Char> fmt,
                 typename vformat_args<Char>::type args, locale_ref loc) {
   auto out = buffer_appender<Char>(buf);
   if (fmt.size() == 2 && equal2(fmt.data(), "{}")) {
@@ -4508,13 +4508,13 @@ void vformat_to(buffer<Char>& buf, basic_string_view<Char> fmt,
     basic_format_parse_context<Char> parse_context;
     buffer_context<Char> context;
 
-    format_handler(buffer_appender<Char> p_out, basic_string_view<Char> str,
+    format_handler(buffer_appender<Char> p_out, std::basic_string_view<Char> str,
                    basic_format_args<buffer_context<Char>> p_args,
                    locale_ref p_loc)
         : parse_context(str), context(p_out, p_args, p_loc) {}
 
     void on_text(const Char* begin, const Char* end) {
-      auto text = basic_string_view<Char>(begin, turbo::to_unsigned(end - begin));
+      auto text = std::basic_string_view<Char>(begin, turbo::to_unsigned(end - begin));
       context.advance_to(write<Char>(context.out(), text));
     }
 
@@ -4524,7 +4524,7 @@ void vformat_to(buffer<Char>& buf, basic_string_view<Char> fmt,
     constexpr auto on_arg_id(int id) -> int {
       return parse_context.check_arg_id(id), id;
     }
-    constexpr auto on_arg_id(basic_string_view<Char> id) -> int {
+    constexpr auto on_arg_id(std::basic_string_view<Char> id) -> int {
       int arg_id = context.arg_id(id);
       if (arg_id < 0) on_error("argument not found");
       return arg_id;
@@ -4563,7 +4563,7 @@ void vformat_to(buffer<Char>& buf, basic_string_view<Char> fmt,
 }
 
 #ifndef FMT_HEADER_ONLY
-extern template TURBO_DLL void vformat_to(buffer<char>&, string_view,
+extern template TURBO_DLL void vformat_to(buffer<char>&, std::string_view,
                                         typename vformat_args<>::type,
                                         locale_ref);
 extern template TURBO_DLL auto thousands_sep_impl<char>(locale_ref)
@@ -4600,7 +4600,7 @@ constexpr auto operator"" _a(const char* s, size_t) -> detail::udl_arg<char> {
 }  // namespace literals
 
 template <typename Locale, TURBO_ENABLE_IF(detail::is_locale<Locale>::value)>
-inline auto vformat(const Locale& loc, string_view fmt, format_args args)
+inline auto vformat(const Locale& loc, std::string_view fmt, format_args args)
     -> std::string {
   return detail::vformat(loc, fmt, args);
 }
@@ -4609,13 +4609,13 @@ template <typename Locale, typename... T,
           TURBO_ENABLE_IF(detail::is_locale<Locale>::value)>
 inline auto format(const Locale& loc, format_string<T...> fmt, T&&... args)
     -> std::string {
-  return fmt::vformat(loc, string_view(fmt), fmt::make_format_args(args...));
+  return fmt::vformat(loc, std::string_view(fmt), fmt::make_format_args(args...));
 }
 
 template <typename OutputIt, typename Locale,
           TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value&&
                             detail::is_locale<Locale>::value)>
-auto vformat_to(OutputIt out, const Locale& loc, string_view fmt,
+auto vformat_to(OutputIt out, const Locale& loc, std::string_view fmt,
                 format_args args) -> OutputIt {
   using detail::get_buffer;
   auto&& buf = get_buffer<char>(out);

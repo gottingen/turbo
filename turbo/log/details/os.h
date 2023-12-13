@@ -63,7 +63,7 @@ TURBO_DLL std::string filename_to_str(const filename_t &filename);
 #if (defined(TLOG_WCHAR_TO_UTF8_SUPPORT) || defined(TLOG_WCHAR_FILENAMES)) && defined(_WIN32)
 TURBO_DLL void wstr_to_utf8buf(wstring_view_t wstr, memory_buf_t &target);
 
-TURBO_DLL void utf8_to_wstrbuf(string_view_t str, wmemory_buf_t &target);
+TURBO_DLL void utf8_to_wstrbuf(std::string_view str, wmemory_buf_t &target);
 #endif
 
 

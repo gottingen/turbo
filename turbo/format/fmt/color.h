@@ -331,7 +331,7 @@ template <typename Char> struct ansi_color_escape {
     // If we have a terminal color, we need to output another escape code
     // sequence.
     if (!text_color.is_rgb) {
-      bool is_background = esc == string_view("\x1b[48;2;");
+      bool is_background = esc == std::string_view("\x1b[48;2;");
       uint32_t value = text_color.value.term_color;
       // Background ASCII codes are the same as the foreground ones but with
       // 10 more.
@@ -424,7 +424,7 @@ constexpr ansi_color_escape<Char> make_emphasis(emphasis em) noexcept {
 }
 
 template <typename Char> inline void reset_color(buffer<Char>& buffer) {
-  auto reset_color = string_view("\x1b[0m");
+  auto reset_color = std::string_view("\x1b[0m");
   buffer.append(reset_color.begin(), reset_color.end());
 }
 
@@ -435,7 +435,7 @@ template <typename T> struct styled_arg {
 
 template <typename Char>
 void vformat_to(buffer<Char>& buf, const text_style& ts,
-                basic_string_view<Char> format_str,
+                std::basic_string_view<Char> format_str,
                 basic_format_args<buffer_context<type_identity_t<Char>>> args) {
   bool has_style = false;
   if (ts.has_emphasis()) {
@@ -459,13 +459,13 @@ void vformat_to(buffer<Char>& buf, const text_style& ts,
 
 FMT_END_DETAIL_NAMESPACE
 
-inline void vprint(std::FILE* f, const text_style& ts, string_view fmt,
+inline void vprint(std::FILE* f, const text_style& ts, std::string_view fmt,
                    format_args args) {
   // Legacy wide streams are not supported.
   auto buf = memory_buffer();
   detail::vformat_to(buf, ts, fmt, args);
   if (detail::is_utf8()) {
-    detail::print(f, string_view(buf.begin(), buf.size()));
+    detail::print(f, std::string_view(buf.begin(), buf.size()));
     return;
   }
   buf.push_back('\0');
@@ -544,7 +544,7 @@ inline std::basic_string<Char> format(const text_style& ts, const S& format_str,
 template <typename OutputIt, typename Char,
           TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value)>
 OutputIt vformat_to(
-    OutputIt out, const text_style& ts, basic_string_view<Char> format_str,
+    OutputIt out, const text_style& ts, std::basic_string_view<Char> format_str,
     basic_format_args<buffer_context<type_identity_t<Char>>> args) {
   auto&& buf = detail::get_buffer<Char>(out);
   detail::vformat_to(buf, ts, format_str, args);
@@ -602,7 +602,7 @@ struct formatter<detail::styled_arg<T>, Char> : formatter<T, Char> {
     }
     out = formatter<T, Char>::format(value, ctx);
     if (has_style) {
-      auto reset_color = string_view("\x1b[0m");
+      auto reset_color = std::string_view("\x1b[0m");
       out = std::copy(reset_color.begin(), reset_color.end(), out);
     }
     return out;

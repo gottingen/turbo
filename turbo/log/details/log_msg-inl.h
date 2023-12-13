@@ -21,8 +21,8 @@
 namespace turbo::tlog::details {
 
     log_msg::log_msg(turbo::tlog::log_clock::time_point log_time, turbo::tlog::source_loc loc,
-                     string_view_t a_logger_name,
-                     turbo::tlog::level::level_enum lvl, turbo::tlog::string_view_t msg)
+                     std::string_view a_logger_name,
+                     turbo::tlog::level::level_enum lvl, std::string_view msg)
             : logger_name(a_logger_name), level(lvl), time(log_time)
 #ifndef TLOG_NO_THREAD_ID
             , thread_id(turbo::thread_id())
@@ -30,12 +30,12 @@ namespace turbo::tlog::details {
             , source(loc), payload(msg) {}
 
     log_msg::log_msg(
-            turbo::tlog::source_loc loc, string_view_t a_logger_name, turbo::tlog::level::level_enum lvl,
-            turbo::tlog::string_view_t msg)
+            turbo::tlog::source_loc loc, std::string_view a_logger_name, turbo::tlog::level::level_enum lvl,
+            std::string_view msg)
             : log_msg(os::now(), loc, a_logger_name, lvl, msg) {}
 
-    log_msg::log_msg(string_view_t a_logger_name, turbo::tlog::level::level_enum lvl,
-                     turbo::tlog::string_view_t msg)
+    log_msg::log_msg(std::string_view a_logger_name, turbo::tlog::level::level_enum lvl,
+                     std::string_view msg)
             : log_msg(os::now(), source_loc{}, a_logger_name, lvl, msg) {}
 
 } // namespace turbo::tlog::details

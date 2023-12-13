@@ -43,7 +43,7 @@ class dynamic_arg_list {
     constexpr typed_node(const Arg& arg) : value(arg) {}
 
     template <typename Char>
-    constexpr typed_node(const basic_string_view<Char>& arg)
+    constexpr typed_node(const std::basic_string_view<Char>& arg)
         : value(arg.data(), arg.size()) {}
   };
 
@@ -86,8 +86,7 @@ class dynamic_format_arg_store
 
     enum {
       value = !(detail::is_reference_wrapper<T>::value ||
-                std::is_same<T, basic_string_view<char_type>>::value ||
-                std::is_same<T, detail::std_string_view<char_type>>::value ||
+                std::is_same<T, std::basic_string_view<char_type>>::value ||
                 (mapped_type != detail::type::cstring_type &&
                  mapped_type != detail::type::string_type &&
                  mapped_type != detail::type::custom_type))
@@ -95,7 +94,7 @@ class dynamic_format_arg_store
   };
 
   template <typename T>
-  using stored_type = conditional_t<
+  using stored_type = std::conditional_t<
       std::is_convertible<T, std::basic_string<char_type>>::value &&
           !detail::is_reference_wrapper<T>::value,
       std::basic_string<char_type>, T>;

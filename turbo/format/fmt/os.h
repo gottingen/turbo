@@ -224,12 +224,12 @@ class buffered_file {
 
   TURBO_DLL int descriptor() const;
 
-  void vprint(string_view format_str, format_args args) {
+  void vprint(std::string_view format_str, format_args args) {
     fmt::vprint(file_, format_str, args);
   }
 
   template <typename... Args>
-  inline void print(string_view format_str, const Args&... args) {
+  inline void print(std::string_view format_str, const Args&... args) {
     vprint(format_str, fmt::make_format_args(args...));
   }
 };

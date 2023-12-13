@@ -87,9 +87,6 @@ FMT_BEGIN_NAMESPACE
                 return value;
             }
 
-
-            template<typename Char> using std_string_view = std::basic_string_view<Char>;
-
 #ifdef FMT_USE_INT128
             // Do nothing.
 #elif defined(__SIZEOF_INT128__) && !defined(__NVCC__) && \
@@ -127,128 +124,6 @@ FMT_BEGIN_NAMESPACE
             }
         }  // namespace detail
 
-        /**
-          An implementation of ``std::basic_string_view`` for pre-C++17. It provides a
-          subset of the API. ``fmt::basic_string_view`` is used for format strings even
-          if ``std::string_view`` is available to prevent issues when a library is
-          compiled with a different ``-std`` option than the client code (which is not
-          recommended).
-         */
-        TURBO_MODULE_EXPORT
-        template<typename Char>
-        class basic_string_view {
-        private:
-            const Char *data_;
-            size_t size_;
-
-        public:
-            using value_type = Char;
-            using iterator = const Char *;
-
-            constexpr basic_string_view() noexcept: data_(nullptr), size_(0) {}
-
-            /** Constructs a string reference object from a C string and a size. */
-            constexpr basic_string_view(const Char *s, size_t count) noexcept
-                    : data_(s), size_(count) {}
-
-            /**
-              \rst
-              Constructs a string reference object from a C string computing
-              the size with ``std::char_traits<Char>::length``.
-              \endrst
-             */
-            constexpr
-            TURBO_FORCE_INLINE
-            basic_string_view(const Char *s)
-                    : data_(s),
-                      size_(detail::const_check(std::is_same<Char, char>::value &&
-                                                !turbo::is_constant_evaluated(true))
-                            ? std::strlen(reinterpret_cast<const char *>(s))
-                            : std::char_traits<Char>::length(s)) {}
-
-            /** Constructs a string reference from a ``std::basic_string`` object. */
-            template<typename Traits, typename Alloc>
-            constexpr basic_string_view(
-                    const std::basic_string<Char, Traits, Alloc> &s) noexcept
-                    : data_(s.data()), size_(s.size()) {}
-
-            template<typename S, TURBO_ENABLE_IF(std::is_same<
-                                                       S, detail::std_string_view<Char>>::value)>
-            constexpr basic_string_view(S s) noexcept
-                    : data_(s.data()), size_(s.size()) {}
-
-            /** Returns a pointer to the string data. */
-            constexpr auto data() const noexcept -> const Char * { return data_; }
-
-            /** Returns the string size. */
-            constexpr auto size() const noexcept -> size_t { return size_; }
-
-            constexpr auto begin() const noexcept -> iterator { return data_; }
-
-            constexpr auto end() const noexcept -> iterator { return data_ + size_; }
-
-            constexpr auto operator[](size_t pos) const noexcept -> const Char & {
-                return data_[pos];
-            }
-
-            constexpr void remove_prefix(size_t n) noexcept {
-                data_ += n;
-                size_ -= n;
-            }
-
-            constexpr bool starts_with(
-                    basic_string_view<Char> sv) const noexcept {
-                return size_ >= sv.size_ &&
-                       std::char_traits<Char>::compare(data_, sv.data_, sv.size_) == 0;
-            }
-
-            constexpr bool starts_with(Char c) const noexcept {
-                return size_ >= 1 && std::char_traits<Char>::eq(*data_, c);
-            }
-
-            constexpr bool starts_with(const Char *s) const {
-                return starts_with(basic_string_view<Char>(s));
-            }
-
-            // Lexicographically compare this string reference to other.
-            constexpr auto compare(basic_string_view other) const -> int {
-                size_t str_size = size_ < other.size_ ? size_ : other.size_;
-                int result = std::char_traits<Char>::compare(data_, other.data_, str_size);
-                if (result == 0)
-                    result = size_ == other.size_ ? 0 : (size_ < other.size_ ? -1 : 1);
-                return result;
-            }
-
-            constexpr friend auto operator==(basic_string_view lhs,
-                                             basic_string_view rhs)
-            -> bool {
-                return lhs.compare(rhs) == 0;
-            }
-
-            friend auto operator!=(basic_string_view lhs, basic_string_view rhs) -> bool {
-                return lhs.compare(rhs) != 0;
-            }
-
-            friend auto operator<(basic_string_view lhs, basic_string_view rhs) -> bool {
-                return lhs.compare(rhs) < 0;
-            }
-
-            friend auto operator<=(basic_string_view lhs, basic_string_view rhs) -> bool {
-                return lhs.compare(rhs) <= 0;
-            }
-
-            friend auto operator>(basic_string_view lhs, basic_string_view rhs) -> bool {
-                return lhs.compare(rhs) > 0;
-            }
-
-            friend auto operator>=(basic_string_view lhs, basic_string_view rhs) -> bool {
-                return lhs.compare(rhs) >= 0;
-            }
-        };
-
-        TURBO_MODULE_EXPORT
-        using string_view = basic_string_view<char>;
-
         /** Specifies if ``T`` is a character type. Can be specialized by users. */
         TURBO_MODULE_EXPORT
         template<typename T>
@@ -269,37 +144,31 @@ FMT_BEGIN_NAMESPACE
             };
 
             template<typename Char, TURBO_ENABLE_IF(is_char<Char>::value)>
-            TURBO_FORCE_INLINE auto to_string_view(const Char *s) -> basic_string_view<Char> {
+            TURBO_FORCE_INLINE auto to_string_view(const Char *s) -> std::basic_string_view<Char> {
                 return s;
             }
 
             template<typename Char, typename Traits, typename Alloc>
             inline auto to_string_view(const std::basic_string<Char, Traits, Alloc> &s)
-            -> basic_string_view<Char> {
+            -> std::basic_string_view<Char> {
                 return s;
             }
 
             template<typename Char>
-            constexpr auto to_string_view(basic_string_view<Char> s)
-            -> basic_string_view<Char> {
-                return s;
-            }
-
-            template<typename Char,
-                    TURBO_ENABLE_IF(!std::is_empty<std_string_view<Char>>::value)>
-            inline auto to_string_view(std_string_view<Char> s) -> basic_string_view<Char> {
+            constexpr auto to_string_view(std::basic_string_view<Char> s)
+            -> std::basic_string_view<Char> {
                 return s;
             }
 
             template<typename S, TURBO_ENABLE_IF(is_compile_string<S>::value)>
             constexpr auto to_string_view(const S &s)
-            -> basic_string_view<typename S::char_type> {
-                return basic_string_view<typename S::char_type>(s);
+            -> std::basic_string_view<typename S::char_type> {
+                return std::basic_string_view<typename S::char_type>(s);
             }
 
             void to_string_view(...);
 
-            // Specifies whether S is a string type convertible to fmt::basic_string_view.
+            // Specifies whether S is a string type convertible to std::basic_string_view.
             // It should be a constexpr function but MSVC 2017 fails to compile it in
             // enable_if and MSVC 2015 fails to compile it as an alias template.
             // ADL is intentionally disabled as to_string_view is not an extension point.
@@ -362,7 +231,7 @@ FMT_BEGIN_NAMESPACE
             FMT_TYPE_CONSTANT(double, double_type);
             FMT_TYPE_CONSTANT(long double, long_double_type);
             FMT_TYPE_CONSTANT(const Char*, cstring_type);
-            FMT_TYPE_CONSTANT(basic_string_view<Char>, string_type);
+            FMT_TYPE_CONSTANT(std::basic_string_view<Char>, string_type);
             FMT_TYPE_CONSTANT(const void*, pointer_type);
 
             constexpr bool is_integral_type(type t) {
@@ -420,7 +289,7 @@ FMT_BEGIN_NAMESPACE
         template<typename Char>
         class basic_format_parse_context {
         private:
-            basic_string_view<Char> format_str_;
+            std::basic_string_view<Char> format_str_;
             int next_arg_id_;
 
             constexpr void do_check_arg_id(int id);
@@ -430,7 +299,7 @@ FMT_BEGIN_NAMESPACE
             using iterator = const Char *;
 
             explicit constexpr basic_format_parse_context(
-                    basic_string_view<Char> format_str, int next_arg_id = 0)
+                    std::basic_string_view<Char> format_str, int next_arg_id = 0)
                     : format_str_(format_str), next_arg_id_(next_arg_id) {}
 
             /**
@@ -480,7 +349,7 @@ FMT_BEGIN_NAMESPACE
                 do_check_arg_id(id);
             }
 
-            constexpr void check_arg_id(basic_string_view<Char>) {}
+            constexpr void check_arg_id(std::basic_string_view<Char>) {}
 
             constexpr void check_dynamic_spec(int arg_id);
         };
@@ -499,7 +368,7 @@ FMT_BEGIN_NAMESPACE
 
             public:
                 explicit constexpr compile_parse_context(
-                        basic_string_view<Char> format_str, int num_args, const type *types,
+                        std::basic_string_view<Char> format_str, int num_args, const type *types,
                         int next_arg_id = 0)
                         : base(format_str, next_arg_id), num_args_(num_args), types_(types) {}
 
@@ -1119,7 +988,7 @@ FMT_BEGIN_NAMESPACE
                     if (turbo::is_constant_evaluated()) string.size = {};
                 }
 
-                constexpr TURBO_FORCE_INLINE value(basic_string_view<char_type> val) {
+                constexpr TURBO_FORCE_INLINE value(std::basic_string_view<char_type> val) {
                     string.data = val.data();
                     string.size = val.size();
                 }
@@ -1273,7 +1142,7 @@ FMT_BEGIN_NAMESPACE
                         TURBO_ENABLE_IF(is_string<T>::value && !std::is_pointer<T>::value &&
                                       std::is_same<char_type, char_t<T>>::value)>
                 constexpr TURBO_FORCE_INLINE auto map(const T &val)
-                -> basic_string_view<char_type> {
+                -> std::basic_string_view<char_type> {
                     return to_string_view(val);
                 }
 
@@ -1494,7 +1363,7 @@ FMT_BEGIN_NAMESPACE
                 case detail::type::cstring_type:
                     return vis(arg.value_.string.data);
                 case detail::type::string_type:
-                    using sv = basic_string_view<typename Context::char_type>;
+                    using sv = std::basic_string_view<typename Context::char_type>;
                     return vis(sv(arg.value_.string.data, arg.value_.string.size));
                 case detail::type::pointer_type:
                     return vis(arg.value_.pointer);
@@ -1662,11 +1531,11 @@ FMT_BEGIN_NAMESPACE
 
             constexpr auto arg(int id) const -> format_arg { return args_.get(id); }
 
-            constexpr auto arg(basic_string_view<Char> name) -> format_arg {
+            constexpr auto arg(std::basic_string_view<Char> name) -> format_arg {
                 return args_.get(name);
             }
 
-            constexpr auto arg_id(basic_string_view<Char> name) -> int {
+            constexpr auto arg_id(std::basic_string_view<Char> name) -> int {
                 return args_.get_id(name);
             }
 
@@ -1777,7 +1646,7 @@ FMT_BEGIN_NAMESPACE
           should only be used as a parameter type in type-erased functions such as
           ``vformat``::
 
-            void vlog(string_view format_str, format_args args);  // OK
+            void vlog(std::string_view format_str, format_args args);  // OK
             format_args args = make_format_args(42);  // Error: dangling reference
           \endrst
          */
@@ -1872,13 +1741,13 @@ FMT_BEGIN_NAMESPACE
             }
 
             template<typename Char>
-            auto get(basic_string_view<Char> name) const -> format_arg {
+            auto get(std::basic_string_view<Char> name) const -> format_arg {
                 int id = get_id(name);
                 return id >= 0 ? get(id) : format_arg();
             }
 
             template<typename Char>
-            auto get_id(basic_string_view<Char> name) const -> int {
+            auto get_id(std::basic_string_view<Char> name) const -> int {
                 if (!has_named_args()) return -1;
                 const auto &named_args =
                         (is_packed() ? values_[-1] : args_[-1].value_).named_args;
@@ -1936,7 +1805,7 @@ FMT_BEGIN_NAMESPACE
                 unsigned char size_ = 1;
 
             public:
-                constexpr void operator=(basic_string_view<Char> s) {
+                constexpr void operator=(std::basic_string_view<Char> s) {
                     auto size = s.size();
                     TURBO_ASSERT(size <= max_size, "invalid fill");
                     for (size_t i = 0; i < size; ++i) data_[i] = s[i];
@@ -2013,7 +1882,7 @@ FMT_BEGIN_NAMESPACE
                 constexpr explicit arg_ref(int index)
                         : kind(arg_id_kind::index), val(index) {}
 
-                constexpr explicit arg_ref(basic_string_view<Char> name)
+                constexpr explicit arg_ref(std::basic_string_view<Char> name)
                         : kind(arg_id_kind::name), val(name) {}
 
                 constexpr auto operator=(int idx) -> arg_ref & {
@@ -2027,10 +1896,10 @@ FMT_BEGIN_NAMESPACE
                 union value {
                     constexpr value(int idx = 0) : index(idx) {}
 
-                    constexpr value(basic_string_view<Char> n) : name(n) {}
+                    constexpr value(std::basic_string_view<Char> n) : name(n) {}
 
                     int index;
-                    basic_string_view<Char> name;
+                    std::basic_string_view<Char> name;
                 } val;
             };
 
@@ -2177,7 +2046,7 @@ FMT_BEGIN_NAMESPACE
                     ctx.check_dynamic_spec(id);
                 }
 
-                constexpr void on_name(basic_string_view<Char> id) {
+                constexpr void on_name(std::basic_string_view<Char> id) {
                     ref = arg_ref<Char>(id);
                     ctx.check_arg_id(id);
                 }
@@ -2402,7 +2271,7 @@ FMT_BEGIN_NAMESPACE
 
                     constexpr void on_index(int id) { arg_id = handler.on_arg_id(id); }
 
-                    constexpr void on_name(basic_string_view<Char> id) {
+                    constexpr void on_name(std::basic_string_view<Char> id) {
                         arg_id = handler.on_arg_id(id);
                     }
                 };
@@ -2432,7 +2301,7 @@ FMT_BEGIN_NAMESPACE
 
             template<bool IS_CONSTEXPR, typename Char, typename Handler>
             constexpr TURBO_FORCE_INLINE void parse_format_string(
-                    basic_string_view<Char> format_str, Handler &&handler) {
+                    std::basic_string_view<Char> format_str, Handler &&handler) {
                 auto begin = format_str.data();
                 auto end = begin + format_str.size();
                 if (end - begin < 32) {
@@ -2519,7 +2388,7 @@ FMT_BEGIN_NAMESPACE
 
 #if TURBO_USE_NONTYPE_TEMPLATE_ARGS
             template <int N, typename T, typename... Args, typename Char>
-            constexpr auto get_arg_index_by_name(basic_string_view<Char> name) -> int {
+            constexpr auto get_arg_index_by_name(std::basic_string_view<Char> name) -> int {
               if constexpr (is_statically_named_arg<T>()) {
                 if (name == T::name) return N;
               }
@@ -2531,7 +2400,7 @@ FMT_BEGIN_NAMESPACE
 #endif
 
             template<typename... Args, typename Char>
-            constexpr auto get_arg_index_by_name(basic_string_view<Char> name) -> int {
+            constexpr auto get_arg_index_by_name(std::basic_string_view<Char> name) -> int {
 #if TURBO_USE_NONTYPE_TEMPLATE_ARGS
                 if constexpr (sizeof...(Args) > 0)
                   return get_arg_index_by_name<0, Args...>(name);
@@ -2557,7 +2426,7 @@ FMT_BEGIN_NAMESPACE
                 type types_[num_args > 0 ? static_cast<size_t>(num_args) : 1];
 
             public:
-                explicit constexpr format_string_checker(basic_string_view<Char> fmt)
+                explicit constexpr format_string_checker(std::basic_string_view<Char> fmt)
                         : context_(fmt, num_args, types_),
                           parse_funcs_{&parse_format_specs<Args, parse_context_type>...},
                           types_{mapped_type_constant<Args, buffer_context<Char>>::value...} {}
@@ -2570,7 +2439,7 @@ FMT_BEGIN_NAMESPACE
                     return context_.check_arg_id(id), id;
                 }
 
-                constexpr auto on_arg_id(basic_string_view<Char> id) -> int {
+                constexpr auto on_arg_id(std::basic_string_view<Char> id) -> int {
 #if TURBO_USE_NONTYPE_TEMPLATE_ARGS
                     auto index = get_arg_index_by_name<Args...>(id);
                     if (index == invalid_arg_index) on_error("named argument is not found");
@@ -2610,7 +2479,7 @@ FMT_BEGIN_NAMESPACE
                     TURBO_ENABLE_IF(is_compile_string<S>::value)>
             void check_format_string(S format_str) {
                 using char_t = typename S::char_type;
-                constexpr auto s = basic_string_view<char_t>(format_str);
+                constexpr auto s = std::basic_string_view<char_t>(format_str);
                 using checker = format_string_checker<char_t, turbo::remove_cvref_t<Args>...>;
                 constexpr bool error = (parse_format_string<true>(s, checker(s)), true);
                 turbo::ignore_unused(error);
@@ -2628,14 +2497,14 @@ FMT_BEGIN_NAMESPACE
 
 // Use vformat_args and avoid type_identity to keep symbols short.
             template<typename Char>
-            void vformat_to(buffer<Char> &buf, basic_string_view<Char> fmt,
+            void vformat_to(buffer<Char> &buf, std::basic_string_view<Char> fmt,
                             typename vformat_args<Char>::type args, locale_ref loc = {});
 
-            TURBO_DLL void vprint_mojibake(std::FILE *, string_view, format_args);
+            TURBO_DLL void vprint_mojibake(std::FILE *, std::string_view, format_args);
 
 #ifndef _WIN32
 
-            inline void vprint_mojibake(std::FILE *, string_view, format_args) {}
+            inline void vprint_mojibake(std::FILE *, std::string_view, format_args) {}
 
 #endif
         }  // namespace detail
@@ -2697,27 +2566,25 @@ FMT_BEGIN_NAMESPACE
 
         FMT_FORMAT_AS(Char *, const Char*);
 
-        FMT_FORMAT_AS(std::basic_string<Char>, basic_string_view<Char>);
+        FMT_FORMAT_AS(std::basic_string<Char>, std::basic_string_view<Char>);
 
         FMT_FORMAT_AS(std::nullptr_t, const void*);
 
-        FMT_FORMAT_AS(detail::std_string_view<Char>, basic_string_view<Char>);
-
         template<typename Char = char>
         struct runtime_format_string {
-            basic_string_view<Char> str;
+            std::basic_string_view<Char> str;
         };
 
-/** A compile-time format string. */
+        /** A compile-time format string. */
         template<typename Char, typename... Args>
         class basic_format_string {
         private:
-            basic_string_view<Char> str_;
+            std::basic_string_view<Char> str_;
 
         public:
             template<typename S,
                     TURBO_ENABLE_IF(
-                            std::is_convertible<const S &, basic_string_view<Char>>::value)>
+                            std::is_convertible<const S &, std::basic_string_view<Char>>::value)>
             TURBO_CONSTEVAL TURBO_FORCE_INLINE basic_format_string(const S &s) : str_(s) {
                 static_assert(
                         detail::count<
@@ -2738,15 +2605,15 @@ FMT_BEGIN_NAMESPACE
 
             basic_format_string(runtime_format_string<Char> fmt) : str_(fmt.str) {}
 
-            TURBO_FORCE_INLINE operator basic_string_view<Char>() const { return str_; }
+            TURBO_FORCE_INLINE operator std::basic_string_view<Char>() const { return str_; }
 
-            TURBO_FORCE_INLINE auto get() const -> basic_string_view<Char> { return str_; }
+            TURBO_FORCE_INLINE auto get() const -> std::basic_string_view<Char> { return str_; }
         };
 
 #if TURBO_GCC_VERSION && TURBO_GCC_VERSION < 409
         // Workaround broken conversion on older gcc.
-        template <typename...> using format_string = string_view;
-        inline auto runtime(string_view s) -> string_view { return s; }
+        template <typename...> using format_string = std::string_view;
+        inline auto runtime(std::string_view s) -> std::string_view { return s; }
 #else
         template<typename... Args>
         using format_string = basic_format_string<char, type_identity_t<Args>...>;
@@ -2761,11 +2628,11 @@ FMT_BEGIN_NAMESPACE
             fmt::print(fmt::runtime("{:d}"), "I am not a number");
           \endrst
          */
-        inline auto runtime(string_view s) -> runtime_format_string<> { return {{s}}; }
+        inline auto runtime(std::string_view s) -> runtime_format_string<> { return {{s}}; }
 
 #endif
 
-        TURBO_DLL auto vformat(string_view fmt, format_args args) -> std::string;
+        TURBO_DLL auto vformat(std::string_view fmt, format_args args) -> std::string;
 
         /**
           \rst
@@ -2787,7 +2654,7 @@ FMT_BEGIN_NAMESPACE
         /** Formats a string and writes the output to ``out``. */
         template<typename OutputIt,
                 TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
-        auto vformat_to(OutputIt out, string_view fmt, format_args args) -> OutputIt {
+        auto vformat_to(OutputIt out, std::string_view fmt, format_args args) -> OutputIt {
             auto &&buf = detail::get_buffer<char>(out);
             detail::vformat_to(buf, fmt, args, {});
             return detail::get_iterator(buf, out);
@@ -2822,7 +2689,7 @@ FMT_BEGIN_NAMESPACE
 
         template<typename OutputIt, typename... T,
                 TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
-        auto vformat_to_n(OutputIt out, size_t n, string_view fmt, format_args args)
+        auto vformat_to_n(OutputIt out, size_t n, std::string_view fmt, format_args args)
         -> format_to_n_result<OutputIt> {
             using traits = detail::fixed_buffer_traits;
             auto buf = detail::iterator_buffer<OutputIt, char, traits>(out, n);
@@ -2854,9 +2721,9 @@ FMT_BEGIN_NAMESPACE
             return buf.count();
         }
 
-        TURBO_DLL void vprint(string_view fmt, format_args args);
+        TURBO_DLL void vprint(std::string_view fmt, format_args args);
 
-        TURBO_DLL void vprint(std::FILE *f, string_view fmt, format_args args);
+        TURBO_DLL void vprint(std::FILE *f, std::string_view fmt, format_args args);
 
         /**
           \rst

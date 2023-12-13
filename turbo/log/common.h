@@ -83,7 +83,6 @@ namespace turbo::tlog {
 
     namespace fmt_lib = fmt;
 
-    using string_view_t = fmt::basic_string_view<char>;
     using memory_buf_t = fmt::basic_memory_buffer<char, 250>;
 
     template<typename... Args>
@@ -97,7 +96,7 @@ namespace turbo::tlog {
     template<class T, class Char = char>
     struct is_convertible_to_basic_format_string
             : std::integral_constant<bool,
-                    std::is_convertible<T, fmt::basic_string_view<Char>>::value> {
+                    std::is_convertible<T, std::basic_string_view<Char>>::value> {
     };
 
 #    if defined(TLOG_WCHAR_FILENAMES) || defined(TLOG_WCHAR_TO_UTF8_SUPPORT)
@@ -152,13 +151,13 @@ namespace turbo::tlog {
             n_levels
         };
 
-#define TLOG_LEVEL_NAME_TRACE turbo::tlog::string_view_t("trace", 5)
-#define TLOG_LEVEL_NAME_DEBUG turbo::tlog::string_view_t("debug", 5)
-#define TLOG_LEVEL_NAME_INFO turbo::tlog::string_view_t("info", 4)
-#define TLOG_LEVEL_NAME_WARNING turbo::tlog::string_view_t("warning", 7)
-#define TLOG_LEVEL_NAME_ERROR turbo::tlog::string_view_t("error", 5)
-#define TLOG_LEVEL_NAME_CRITICAL turbo::tlog::string_view_t("critical", 8)
-#define TLOG_LEVEL_NAME_OFF turbo::tlog::string_view_t("off", 3)
+#define TLOG_LEVEL_NAME_TRACE std::string_view("trace", 5)
+#define TLOG_LEVEL_NAME_DEBUG std::string_view("debug", 5)
+#define TLOG_LEVEL_NAME_INFO std::string_view("info", 4)
+#define TLOG_LEVEL_NAME_WARNING std::string_view("warning", 7)
+#define TLOG_LEVEL_NAME_ERROR std::string_view("error", 5)
+#define TLOG_LEVEL_NAME_CRITICAL std::string_view("critical", 8)
+#define TLOG_LEVEL_NAME_OFF std::string_view("off", 3)
 
 #if !defined(TLOG_LEVEL_NAMES)
 #    define TLOG_LEVEL_NAMES                                                                                                             \
@@ -176,7 +175,7 @@ namespace turbo::tlog {
         }
 #endif
 
-        TURBO_DLL const string_view_t &to_string_view(turbo::tlog::level::level_enum l) noexcept;
+        TURBO_DLL const std::string_view &to_string_view(turbo::tlog::level::level_enum l) noexcept;
 
         TURBO_DLL const char *to_short_c_str(turbo::tlog::level::level_enum l) noexcept;
 
