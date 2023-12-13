@@ -8,7 +8,7 @@
 #include "turbo/format/fmt/format-inl.h"
 
 namespace turbo {
-    namespace detail {
+    namespace fmt_detail {
 
         template TURBO_DLL auto dragonbox::to_decimal(float x) noexcept
         -> dragonbox::decimal_fp<float>;
@@ -45,5 +45,5 @@ namespace turbo {
 
         template TURBO_DLL void buffer<wchar_t>::append(const wchar_t *, const wchar_t *);
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 }  // namespace turbo

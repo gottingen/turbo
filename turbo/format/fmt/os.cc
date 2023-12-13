@@ -76,7 +76,7 @@ namespace {
 namespace turbo {
 
 #ifdef _WIN32
-    namespace detail {
+    namespace fmt_detail {
 
     class system_message {
       system_message(const system_message&) = delete;
@@ -125,10 +125,10 @@ namespace turbo {
       }
     };
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     TURBO_DLL const std::error_category& system_category() noexcept {
-      static const detail::utf8_system_category category;
+      static const fmt_detail::utf8_system_category category;
       return category;
     }
 
@@ -138,7 +138,7 @@ namespace turbo {
       return std::system_error(ec, vformat(format_str, args));
     }
 
-    void detail::format_windows_error(detail::buffer<char>& out, int error_code,
+    void fmt_detail::format_windows_error(fmt_detail::buffer<char>& out, int error_code,
                                       const char* message) noexcept {
       FMT_TRY {
         system_message msg(error_code);
@@ -156,7 +156,7 @@ namespace turbo {
     }
 
     void report_windows_error(int error_code, const char* message) noexcept {
-      report_error(detail::format_windows_error, error_code, message);
+      report_error(fmt_detail::format_windows_error, error_code, message);
     }
 #endif  // _WIN32
 
@@ -202,7 +202,7 @@ namespace turbo {
     file::file(cstring_view path, int oflag) {
 #  if defined(_WIN32) && !defined(__MINGW32__)
         fd_ = -1;
-        auto converted = detail::utf8_to_utf16(string_view(path.c_str()));
+        auto converted = fmt_detail::utf8_to_utf16(string_view(path.c_str()));
         *this = file::open_windows_file(converted.c_str(), oflag);
 #  else
         FMT_RETRY(fd_, FMT_POSIX_CALL(open(path.c_str(), oflag, default_open_mode)));
@@ -343,7 +343,7 @@ namespace turbo {
       if (fd == -1) {
         FMT_THROW(
             system_error(err, FMT_STRING("cannot open file {}"),
-                         detail::unicode_to_utf8<wchar_t>(path.c_str()).c_str()));
+                         fmt_detail::unicode_to_utf8<wchar_t>(path.c_str()).c_str()));
       }
       return file(fd);
     }
@@ -366,20 +366,20 @@ namespace turbo {
 
 #  endif
 
-    namespace detail {
+    namespace fmt_detail {
 
         void file_buffer::grow(size_t) {
             if (this->size() == this->capacity()) flush();
         }
 
         file_buffer::file_buffer(cstring_view path,
-                                 const detail::ostream_params &params)
+                                 const fmt_detail::ostream_params &params)
                 : file_(path, params.oflag) {
             set(new char[params.buffer_size], params.buffer_size);
         }
 
         file_buffer::file_buffer(file_buffer &&other)
-                : detail::buffer<char>(other.data(), other.size(), other.capacity()),
+                : fmt_detail::buffer<char>(other.data(), other.size(), other.capacity()),
                   file_(std::move(other.file_)) {
             other.clear();
             other.set(nullptr, 0);
@@ -389,7 +389,7 @@ namespace turbo {
             flush();
             delete[] data();
         }
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     ostream::~ostream() = default;
 

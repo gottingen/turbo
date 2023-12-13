@@ -51,16 +51,16 @@ namespace turbo {
 
         void advance_to(OutputIt it) { out_ = it; }
 
-        detail::locale_ref locale() { return {}; }
+        fmt_detail::locale_ref locale() { return {}; }
 
         format_arg arg(int id) const { return args_.get(id); }
 
         constexpr void on_error(const char *message) {
-            detail::error_handler().on_error(message);
+            fmt_detail::error_handler().on_error(message);
         }
     };
 
-    namespace detail {
+    namespace fmt_detail {
 
         // Checks if a value fits in int - used to avoid warnings about comparing
         // signed and unsigned integers.
@@ -148,11 +148,11 @@ namespace turbo {
                 if (const_check(sizeof(target_type) <= sizeof(int))) {
                     // Extra casts are used to silence warnings.
                     if (is_signed) {
-                        arg_ = detail::make_arg<Context>(
+                        arg_ = fmt_detail::make_arg<Context>(
                                 static_cast<int>(static_cast<target_type>(value)));
                     } else {
                         using unsigned_type = typename make_unsigned_or_bool<target_type>::type;
-                        arg_ = detail::make_arg<Context>(
+                        arg_ = fmt_detail::make_arg<Context>(
                                 static_cast<unsigned>(static_cast<unsigned_type>(value)));
                     }
                 } else {
@@ -160,9 +160,9 @@ namespace turbo {
                         // glibc's printf doesn't sign extend arguments of smaller types:
                         //   std::printf("%lld", -42);  // prints "4294967254"
                         // but we don't have to do the same because it's a UB.
-                        arg_ = detail::make_arg<Context>(static_cast<long long>(value));
+                        arg_ = fmt_detail::make_arg<Context>(static_cast<long long>(value));
                     } else {
-                        arg_ = detail::make_arg<Context>(
+                        arg_ = fmt_detail::make_arg<Context>(
                                 static_cast<typename make_unsigned_or_bool<U>::type>(value));
                     }
                 }
@@ -172,10 +172,10 @@ namespace turbo {
             void operator()(U) {}  // No conversion needed for non-integral types.
         };
 
-// Converts an integer argument to T for printf, if T is an integral type.
-// If T is void, the argument is converted to corresponding signed or unsigned
-// type depending on the type specifier: 'd' and 'i' - signed, other -
-// unsigned).
+        // Converts an integer argument to T for printf, if T is an integral type.
+        // If T is void, the argument is converted to corresponding signed or unsigned
+        // type depending on the type specifier: 'd' and 'i' - signed, other -
+        // unsigned).
         template<typename T, typename Context, typename Char>
         void convert_arg(basic_format_arg<Context> &arg, Char type) {
             visit_format_arg(arg_converter<T, Context>(arg, type), arg);
@@ -192,7 +192,7 @@ namespace turbo {
 
             template<typename T, TURBO_ENABLE_IF(std::is_integral<T>::value)>
             void operator()(T value) {
-                arg_ = detail::make_arg<Context>(
+                arg_ = fmt_detail::make_arg<Context>(
                         static_cast<typename Context::char_type>(value));
             }
 
@@ -223,7 +223,7 @@ namespace turbo {
             template<typename T, TURBO_ENABLE_IF(std::is_integral<T>::value)>
             unsigned operator()(T value) {
                 auto width = static_cast<uint32_or_64_or_128_t<T>>(value);
-                if (detail::is_negative(value)) {
+                if (fmt_detail::is_negative(value)) {
                     specs_.align = align::left;
                     width = 0 - width;
                 }
@@ -268,7 +268,7 @@ namespace turbo {
 
             OutputIt operator()(monostate value) { return base::operator()(value); }
 
-            template<typename T, TURBO_ENABLE_IF(detail::is_integral<T>::value)>
+            template<typename T, TURBO_ENABLE_IF(fmt_detail::is_integral<T>::value)>
             OutputIt operator()(T value) {
                 // MSVC2013 fails to compile separate overloads for bool and Char so use
                 // std::is_same instead.
@@ -384,7 +384,7 @@ namespace turbo {
                 } else if (*it == '*') {
                     ++it;
                     specs.width = static_cast<int>(visit_format_arg(
-                            detail::printf_width_handler<Char>(specs), get_arg(-1)));
+                            fmt_detail::printf_width_handler<Char>(specs), get_arg(-1)));
                 }
             }
             return arg_index;
@@ -445,7 +445,7 @@ namespace turbo {
                     arg_index = parse_ctx.next_arg_id();
                 else
                     parse_ctx.check_arg_id(--arg_index);
-                return detail::get_arg(context, arg_index);
+                return fmt_detail::get_arg(context, arg_index);
             };
 
             const Char *start = parse_ctx.begin();
@@ -582,7 +582,7 @@ namespace turbo {
 
     template<typename Char>
     using basic_printf_context_t =
-            basic_printf_context<detail::buffer_appender<Char>, Char>;
+            basic_printf_context<fmt_detail::buffer_appender<Char>, Char>;
 
     using printf_context = basic_printf_context_t<char>;
     using wprintf_context = basic_printf_context_t<wchar_t>;
@@ -620,7 +620,7 @@ namespace turbo {
             basic_format_args<basic_printf_context_t<type_identity_t<Char>>> args)
     -> std::basic_string<Char> {
         auto buf = basic_memory_buffer<Char>();
-        detail::vprintf(buf, detail::to_string_view(fmt), args);
+        fmt_detail::vprintf(buf, to_string_view(fmt), args);
         return to_string(buf);
     }
 
@@ -632,7 +632,7 @@ namespace turbo {
             basic_format_args<basic_printf_context_t<type_identity_t<Char>>> args)
     -> int {
         auto buf = basic_memory_buffer<Char>();
-        detail::vprintf(buf, detail::to_string_view(fmt), args);
+        fmt_detail::vprintf(buf, to_string_view(fmt), args);
         size_t size = buf.size();
         return std::fwrite(buf.data(), sizeof(Char), size, f) < size
                ? -1
@@ -644,7 +644,7 @@ namespace turbo {
             const S &fmt,
             basic_format_args<basic_printf_context_t<type_identity_t<Char>>> args)
     -> int {
-        return vfprintf(stdout, detail::to_string_view(fmt), args);
+        return vfprintf(stdout, to_string_view(fmt), args);
     }
 
 }  // namespace turbo

@@ -11,7 +11,7 @@
 #include "format.h"
 
 namespace turbo {
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename Char, typename InputIt>
         constexpr inline counting_iterator copy_str(InputIt begin, InputIt end,
@@ -125,7 +125,7 @@ namespace turbo {
  */
 #if defined(__cpp_if_constexpr) && defined(__cpp_return_type_deduction)
 #  define FMT_COMPILE(s) \
-    FMT_STRING_IMPL(s, turbo::detail::compiled_string, explicit)
+    FMT_STRING_IMPL(s, turbo::fmt_detail::compiled_string, explicit)
 #else
 #  define FMT_COMPILE(s) FMT_STRING(s)
 #endif
@@ -159,7 +159,7 @@ namespace turbo {
             if constexpr (N == 0)
                 return first;
             else
-                return detail::get<N - 1>(rest...);
+                return fmt_detail::get<N - 1>(rest...);
         }
 
         template<typename Char, typename... Args>
@@ -174,7 +174,7 @@ namespace turbo {
         template<int N, typename... Args>
         struct get_type_impl<N, type_list<Args...>> {
             using type =
-                    remove_cvref_t<decltype(detail::get<N>(std::declval<Args>()...))>;
+                    remove_cvref_t<decltype(fmt_detail::get<N>(std::declval<Args>()...))>;
         };
 
         template<int N, typename T>
@@ -219,8 +219,8 @@ namespace turbo {
 // This ensures that the argument type is convertible to `const T&`.
         template<typename T, int N, typename... Args>
         constexpr const T &get_arg_checked(const Args &... args) {
-            const auto &arg = detail::get<N>(args...);
-            if constexpr (detail::is_named_arg<remove_cvref_t<decltype(arg)>>()) {
+            const auto &arg = fmt_detail::get<N>(args...);
+            if constexpr (fmt_detail::is_named_arg<remove_cvref_t<decltype(arg)>>()) {
                 return arg.value;
             } else {
                 return arg;
@@ -370,7 +370,7 @@ namespace turbo {
                     compile_parse_context<Char>(str, max_value<int>(), nullptr, next_arg_id);
             auto f = formatter<T, Char>();
             auto end = f.parse(ctx);
-            return {f, pos + turbo::detail::to_unsigned(end - str.data()),
+            return {f, pos + turbo::fmt_detail::to_unsigned(end - str.data()),
                     next_arg_id == 0 ? manual_indexing_id : ctx.next_arg_id()};
         }
 
@@ -413,7 +413,7 @@ namespace turbo {
         };
 
         template<typename T>
-        struct field_type<T, enable_if_t < detail::is_named_arg<T>::value>> {
+        struct field_type<T, enable_if_t < fmt_detail::is_named_arg<T>::value>> {
         using type = remove_cvref_t<decltype(T::value)>;
     };
 
@@ -516,21 +516,21 @@ namespace turbo {
     }
 
     template<typename... Args, typename S,
-            TURBO_ENABLE_IF(detail::is_compiled_string<S>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_compiled_string<S>::value)>
     constexpr auto compile(S format_str) {
         constexpr auto str = basic_string_view<typename S::char_type>(format_str);
         if constexpr (str.size() == 0) {
-            return detail::make_text(str, 0, 0);
+            return fmt_detail::make_text(str, 0, 0);
         } else {
             constexpr auto result =
-                    detail::compile_format_string<detail::type_list<Args...>, 0, 0>(
+                    fmt_detail::compile_format_string<fmt_detail::type_list<Args...>, 0, 0>(
                             format_str);
             return result;
         }
     }
 
 #endif  // defined(__cpp_if_constexpr) && defined(__cpp_return_type_deduction)
-}  // namespace detail
+}  // namespace fmt_detail
 
 TURBO_BEGIN_EXPORT
 
@@ -538,7 +538,7 @@ TURBO_BEGIN_EXPORT
 
 template<typename CompiledFormat, typename... Args,
         typename Char = typename CompiledFormat::char_type,
-        TURBO_ENABLE_IF(detail::is_compiled_format<CompiledFormat>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_format<CompiledFormat>::value)>
 TURBO_FORCE_INLINE std::basic_string<Char> format(const CompiledFormat &cf,
                                                   const Args &... args) {
     auto s = std::basic_string<Char>();
@@ -547,21 +547,21 @@ TURBO_FORCE_INLINE std::basic_string<Char> format(const CompiledFormat &cf,
 }
 
 template<typename OutputIt, typename CompiledFormat, typename... Args,
-        TURBO_ENABLE_IF(detail::is_compiled_format<CompiledFormat>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_format<CompiledFormat>::value)>
 constexpr TURBO_FORCE_INLINE OutputIt format_to(OutputIt out, const CompiledFormat &cf,
                                                 const Args &... args) {
     return cf.format(out, args...);
 }
 
 template<typename S, typename... Args,
-        TURBO_ENABLE_IF(detail::is_compiled_string<S>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_string<S>::value)>
 TURBO_FORCE_INLINE std::basic_string<typename S::char_type> format(const S &,
                                                                    Args &&... args) {
     if constexpr (std::is_same<typename S::char_type, char>::value) {
         constexpr auto str = basic_string_view<typename S::char_type>(S());
         if constexpr (str.size() == 2 && str[0] == '{' && str[1] == '}') {
-            const auto &first = detail::first(args...);
-            if constexpr (detail::is_named_arg<
+            const auto &first = fmt_detail::first(args...);
+            if constexpr (fmt_detail::is_named_arg<
                     remove_cvref_t<decltype(first)>>::value) {
                 return turbo::to_string(first.value);
             } else {
@@ -569,9 +569,9 @@ TURBO_FORCE_INLINE std::basic_string<typename S::char_type> format(const S &,
             }
         }
     }
-    constexpr auto compiled = detail::compile<Args...>(S());
+    constexpr auto compiled = fmt_detail::compile<Args...>(S());
     if constexpr (std::is_same<remove_cvref_t<decltype(compiled)>,
-            detail::unknown_format>()) {
+            fmt_detail::unknown_format>()) {
         return turbo::format(
                 static_cast<basic_string_view<typename S::char_type>>(S()),
                 std::forward<Args>(args)...);
@@ -581,11 +581,11 @@ TURBO_FORCE_INLINE std::basic_string<typename S::char_type> format(const S &,
 }
 
 template<typename OutputIt, typename S, typename... Args,
-        TURBO_ENABLE_IF(detail::is_compiled_string<S>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_string<S>::value)>
 constexpr OutputIt format_to(OutputIt out, const S &, Args &&... args) {
-    constexpr auto compiled = detail::compile<Args...>(S());
+    constexpr auto compiled = fmt_detail::compile<Args...>(S());
     if constexpr (std::is_same<remove_cvref_t < decltype(compiled)>,
-            detail::unknown_format > ()) {
+            fmt_detail::unknown_format > ()) {
         return turbo::format_to(
                 out, static_cast<basic_string_view<typename S::char_type>>(S()),
                 std::forward<Args>(args)...);
@@ -597,32 +597,32 @@ constexpr OutputIt format_to(OutputIt out, const S &, Args &&... args) {
 #endif
 
 template<typename OutputIt, typename S, typename... Args,
-        TURBO_ENABLE_IF(detail::is_compiled_string<S>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_string<S>::value)>
 format_to_n_result <OutputIt> format_to_n(OutputIt out, size_t n,
                                           const S &format_str, Args &&... args) {
-    auto it = turbo::format_to(detail::truncating_iterator<OutputIt>(out, n),
+    auto it = turbo::format_to(fmt_detail::truncating_iterator<OutputIt>(out, n),
                                format_str, std::forward<Args>(args)...);
     return {it.base(), it.count()};
 }
 
 template<typename S, typename... Args,
-        TURBO_ENABLE_IF(detail::is_compiled_string<S>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_string<S>::value)>
 TURBO_CONSTEXPR20 size_t formatted_size(const S &format_str,
                                         const Args &... args) {
-    return turbo::format_to(detail::counting_iterator(), format_str, args...)
+    return turbo::format_to(fmt_detail::counting_iterator(), format_str, args...)
             .count();
 }
 
 template<typename S, typename... Args,
-        TURBO_ENABLE_IF(detail::is_compiled_string<S>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_string<S>::value)>
 void print(std::FILE *f, const S &format_str, const Args &... args) {
     memory_buffer buffer;
     turbo::format_to(std::back_inserter(buffer), format_str, args...);
-    detail::print(f, {buffer.data(), buffer.size()});
+    fmt_detail::print(f, {buffer.data(), buffer.size()});
 }
 
 template<typename S, typename... Args,
-        TURBO_ENABLE_IF(detail::is_compiled_string<S>::value)>
+        TURBO_ENABLE_IF(fmt_detail::is_compiled_string<S>::value)>
 void print(const S &format_str, const Args &... args) {
     print(stdout, format_str, args...);
 }
@@ -631,7 +631,7 @@ void print(const S &format_str, const Args &... args) {
 inline namespace literals {
 template <detail_exported::fixed_string Str> constexpr auto operator""_cf() {
   using char_t = remove_cvref_t<decltype(Str.data[0])>;
-  return detail::udl_compiled_string<char_t, sizeof(Str.data) / sizeof(char_t),
+  return fmt_detail::udl_compiled_string<char_t, sizeof(Str.data) / sizeof(char_t),
                                      Str>();
 }
 }  // namespace literals

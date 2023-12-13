@@ -25,13 +25,13 @@
 #include "format.h"
 
 namespace turbo {
-namespace detail {
+namespace fmt_detail {
 
 void throw_format_error(const char* message) {
   FMT_THROW(format_error(message));
 }
 
-void format_error_code(detail::buffer<char>& out, int error_code,
+void format_error_code(fmt_detail::buffer<char>& out, int error_code,
                                 std::string_view message) noexcept {
   // Report error code making sure that the output fits into
   // inline_buffer_size to avoid dynamic memory allocation and potential
@@ -42,11 +42,11 @@ void format_error_code(detail::buffer<char>& out, int error_code,
   // Subtract 2 to account for terminating null characters in SEP and ERROR_STR.
   size_t error_code_size = sizeof(SEP) + sizeof(ERROR_STR) - 2;
   auto abs_value = static_cast<uint32_or_64_or_128_t<int>>(error_code);
-  if (detail::is_negative(error_code)) {
+  if (fmt_detail::is_negative(error_code)) {
     abs_value = 0 - abs_value;
     ++error_code_size;
   }
-  error_code_size += turbo::to_unsigned(detail::count_digits(abs_value));
+  error_code_size += turbo::to_unsigned(fmt_detail::count_digits(abs_value));
   auto it = buffer_appender<char>(out);
   if (message.size() <= inline_buffer_size - error_code_size)
     format_to(it, FMT_STRING("{}{}"), message, SEP);
@@ -116,7 +116,7 @@ auto write_loc(appender out, loc_value value,
 #endif
   return false;
 }
-}  // namespace detail
+}  // namespace fmt_detail
 
 template <typename Locale> typename Locale::id format_facet<Locale>::id;
 
@@ -131,7 +131,7 @@ template <>
 TURBO_DLL auto format_facet<std::locale>::do_put(
     appender out, loc_value val, const format_specs<>& specs) const -> bool {
   return val.visit(
-      detail::loc_writer<>{out, specs, separator_, grouping_, decimal_point_});
+      fmt_detail::loc_writer<>{out, specs, separator_, grouping_, decimal_point_});
 }
 #endif
 
@@ -141,7 +141,7 @@ std::system_error vsystem_error(int error_code, std::string_view fmt,
   return std::system_error(ec, vformat(fmt, args));
 }
 
-namespace detail {
+namespace fmt_detail {
 
 template <typename F> inline bool operator==(basic_fp<F> x, basic_fp<F> y) {
   return x.f == y.f && x.e == y.e;
@@ -1368,15 +1368,15 @@ small_divisor_case_label:
   return ret_value;
 }
 }  // namespace dragonbox
-}  // namespace detail
+}  // namespace fmt_detail
 
-template <> struct formatter<detail::bigint> {
+template <> struct formatter<fmt_detail::bigint> {
   constexpr auto parse(format_parse_context& ctx)
       -> format_parse_context::iterator {
     return ctx.begin();
   }
 
-  auto format(const detail::bigint& n, format_context& ctx) const
+  auto format(const fmt_detail::bigint& n, format_context& ctx) const
       -> format_context::iterator {
     auto out = ctx.out();
     bool first = true;
@@ -1391,12 +1391,12 @@ template <> struct formatter<detail::bigint> {
     }
     if (n.exp_ > 0)
       out = format_to(out, FMT_STRING("p{}"),
-                      n.exp_ * detail::bigint::bigit_bits);
+                      n.exp_ * fmt_detail::bigint::bigit_bits);
     return out;
   }
 };
 
-detail::utf8_to_utf16::utf8_to_utf16(std::string_view s) {
+fmt_detail::utf8_to_utf16::utf8_to_utf16(std::string_view s) {
   for_each_codepoint(s, [this](uint32_t cp, std::string_view) {
     if (cp == invalid_code_point) FMT_THROW(std::runtime_error("invalid utf8"));
     if (cp <= 0xFFFF) {
@@ -1411,7 +1411,7 @@ detail::utf8_to_utf16::utf8_to_utf16(std::string_view s) {
   buffer_.push_back(0);
 }
 
-void format_system_error(detail::buffer<char>& out, int error_code,
+void format_system_error(fmt_detail::buffer<char>& out, int error_code,
                                   const char* message) noexcept {
   FMT_TRY {
     auto ec = std::error_code(error_code, std::generic_category());
@@ -1431,11 +1431,11 @@ std::string vformat(std::string_view fmt, format_args args) {
   // Don't optimize the "{}" case to keep the binary size small and because it
   // can be better optimized in turbo::format anyway.
   auto buffer = memory_buffer();
-  detail::vformat_to(buffer, fmt, args);
+  fmt_detail::vformat_to(buffer, fmt, args);
   return to_string(buffer);
 }
 
-namespace detail {
+namespace fmt_detail {
 #ifndef _WIN32
 bool write_console(std::FILE*, std::string_view) { return false; }
 #else
@@ -1455,7 +1455,7 @@ bool write_console(std::FILE* f, std::string_view text) {
 // Print assuming legacy (non-Unicode) encoding.
 void vprint_mojibake(std::FILE* f, std::string_view fmt, format_args args) {
   auto buffer = memory_buffer();
-  detail::vformat_to(buffer, fmt,
+  fmt_detail::vformat_to(buffer, fmt,
                      basic_format_args<buffer_context<char>>(args));
   fwrite_fully(buffer.data(), 1, buffer.size(), f);
 }
@@ -1464,19 +1464,19 @@ void vprint_mojibake(std::FILE* f, std::string_view fmt, format_args args) {
 void print(std::FILE* f, std::string_view text) {
   if (!write_console(f, text)) fwrite_fully(text.data(), 1, text.size(), f);
 }
-}  // namespace detail
+}  // namespace fmt_detail
 
 void vprint(std::FILE* f, std::string_view fmt, format_args args) {
   auto buffer = memory_buffer();
-  detail::vformat_to(buffer, fmt, args);
-  detail::print(f, {buffer.data(), buffer.size()});
+  fmt_detail::vformat_to(buffer, fmt, args);
+  fmt_detail::print(f, {buffer.data(), buffer.size()});
 }
 
 void vprint(std::string_view fmt, format_args args) {
   vprint(stdout, fmt, args);
 }
 
-namespace detail {
+namespace fmt_detail {
 
 struct singleton {
   unsigned char upper;
@@ -1665,7 +1665,7 @@ auto is_printable(uint32_t cp) -> bool {
   return cp < 0x110000;
 }
 
-}  // namespace detail
+}  // namespace fmt_detail
 
 }  // namespace turbo
 

@@ -17,12 +17,12 @@
 #endif
 
 namespace turbo {
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename T>
         using is_exotic_char = std::bool_constant<!std::is_same<T, char>::value>;
 
-        inline auto write_loc(std::back_insert_iterator<detail::buffer<wchar_t>> out,
+        inline auto write_loc(std::back_insert_iterator<fmt_detail::buffer<wchar_t>> out,
                               loc_value value, const format_specs<wchar_t> &specs,
                               locale_ref loc) -> bool {
 #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
@@ -35,7 +35,7 @@ namespace turbo {
 #endif
             return false;
         }
-    }  // namespace detail
+    }  // namespace fmt_detail
 
 
     using wstring_view = std::basic_string_view<wchar_t>;
@@ -62,7 +62,7 @@ namespace turbo {
     struct is_char<wchar_t> : std::true_type {
     };
     template<>
-    struct is_char<detail::char8_type> : std::true_type {
+    struct is_char<fmt_detail::char8_type> : std::true_type {
     };
     template<>
     struct is_char<char16_t> : std::true_type {
@@ -80,7 +80,7 @@ namespace turbo {
     inline namespace literals {
 #if !TURBO_USE_NONTYPE_TEMPLATE_ARGS
 
-        constexpr detail::udl_arg<wchar_t> operator "" _a(const wchar_t *s, size_t) {
+        constexpr fmt_detail::udl_arg<wchar_t> operator "" _a(const wchar_t *s, size_t) {
             return {s};
         }
 
@@ -95,7 +95,7 @@ namespace turbo {
 
     template<typename Range>
     auto join(Range &&range, wstring_view sep)
-    -> join_view<detail::iterator_t<Range>, detail::sentinel_t<Range>,
+    -> join_view<fmt_detail::iterator_t<Range>, fmt_detail::sentinel_t<Range>,
             wchar_t> {
         return join(std::begin(range), std::end(range), sep);
     }
@@ -111,7 +111,7 @@ namespace turbo {
                  basic_format_args<buffer_context<type_identity_t<Char>>> args)
     -> std::basic_string<Char> {
         basic_memory_buffer<Char> buffer;
-        detail::vformat_to(buffer, format_str, args);
+        fmt_detail::vformat_to(buffer, format_str, args);
         return to_string(buffer);
     }
 
@@ -126,111 +126,111 @@ namespace turbo {
             TURBO_ENABLE_IF(!std::is_same<Char, char>::value &&
                             !std::is_same<Char, wchar_t>::value)>
     auto format(const S &format_str, Args &&... args) -> std::basic_string<Char> {
-        return vformat(detail::to_string_view(format_str),
+        return vformat(to_string_view(format_str),
                        turbo::make_format_args<buffer_context<Char>>(args...));
     }
 
     template<typename Locale, typename S, typename Char = char_t<S>,
-            TURBO_ENABLE_IF(detail::is_locale<Locale>::value&&
-                                    detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_locale<Locale>::value&&
+                                    fmt_detail::is_exotic_char<Char>::value)>
     inline auto vformat(
             const Locale &loc, const S &format_str,
             basic_format_args<buffer_context<type_identity_t<Char>>> args)
     -> std::basic_string<Char> {
-        return detail::vformat(loc, detail::to_string_view(format_str), args);
+        return fmt_detail::vformat(loc, to_string_view(format_str), args);
     }
 
     template<typename Locale, typename S, typename... Args,
             typename Char = char_t<S>,
-            TURBO_ENABLE_IF(detail::is_locale<Locale>::value&&
-                                    detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_locale<Locale>::value&&
+                                    fmt_detail::is_exotic_char<Char>::value)>
     inline auto format(const Locale &loc, const S &format_str, Args &&... args)
     -> std::basic_string<Char> {
-        return detail::vformat(loc, detail::to_string_view(format_str),
+        return fmt_detail::vformat(loc, to_string_view(format_str),
                                turbo::make_format_args<buffer_context<Char>>(args...));
     }
 
     template<typename OutputIt, typename S, typename Char = char_t<S>,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
-                                    detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, Char>::value&&
+                                    fmt_detail::is_exotic_char<Char>::value)>
     auto vformat_to(OutputIt out, const S &format_str,
                     basic_format_args<buffer_context<type_identity_t<Char>>> args)
     -> OutputIt {
-        auto &&buf = detail::get_buffer<Char>(out);
-        detail::vformat_to(buf, detail::to_string_view(format_str), args);
-        return detail::get_iterator(buf, out);
+        auto &&buf = fmt_detail::get_buffer<Char>(out);
+        fmt_detail::vformat_to(buf, to_string_view(format_str), args);
+        return fmt_detail::get_iterator(buf, out);
     }
 
     template<typename OutputIt, typename S, typename... Args,
             typename Char = char_t<S>,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
-                                    detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, Char>::value&&
+                                    fmt_detail::is_exotic_char<Char>::value)>
     inline auto format_to(OutputIt out, const S &fmt, Args &&... args) -> OutputIt {
-        return vformat_to(out, detail::to_string_view(fmt),
+        return vformat_to(out, to_string_view(fmt),
                           turbo::make_format_args<buffer_context<Char>>(args...));
     }
 
     template<typename Locale, typename S, typename OutputIt, typename... Args,
             typename Char = char_t<S>,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
-                                    detail::is_locale<Locale>::value&&
-                                    detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, Char>::value&&
+                                    fmt_detail::is_locale<Locale>::value&&
+                                    fmt_detail::is_exotic_char<Char>::value)>
     inline auto vformat_to(
             OutputIt out, const Locale &loc, const S &format_str,
             basic_format_args<buffer_context<type_identity_t<Char>>> args) -> OutputIt {
-        auto &&buf = detail::get_buffer<Char>(out);
-        vformat_to(buf, detail::to_string_view(format_str), args,
-                   detail::locale_ref(loc));
-        return detail::get_iterator(buf, out);
+        auto &&buf = fmt_detail::get_buffer<Char>(out);
+        vformat_to(buf, to_string_view(format_str), args,
+                   fmt_detail::locale_ref(loc));
+        return fmt_detail::get_iterator(buf, out);
     }
 
     template<
             typename OutputIt, typename Locale, typename S, typename... Args,
             typename Char = char_t<S>,
-            bool enable = detail::is_output_iterator<OutputIt, Char>::value &&
-                          detail::is_locale<Locale>::value && detail::is_exotic_char<Char>::value>
+            bool enable = fmt_detail::is_output_iterator<OutputIt, Char>::value &&
+                          fmt_detail::is_locale<Locale>::value && fmt_detail::is_exotic_char<Char>::value>
     inline auto format_to(OutputIt out, const Locale &loc, const S &format_str,
                           Args &&... args) ->
     typename std::enable_if<enable, OutputIt>::type {
-        return vformat_to(out, loc, detail::to_string_view(format_str),
+        return vformat_to(out, loc, to_string_view(format_str),
                           turbo::make_format_args<buffer_context<Char>>(args...));
     }
 
     template<typename OutputIt, typename Char, typename... Args,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
-                                    detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, Char>::value&&
+                                    fmt_detail::is_exotic_char<Char>::value)>
     inline auto vformat_to_n(
             OutputIt out, size_t n, std::basic_string_view <Char> format_str,
             basic_format_args<buffer_context<type_identity_t<Char>>> args)
     -> format_to_n_result<OutputIt> {
-        detail::iterator_buffer<OutputIt, Char, detail::fixed_buffer_traits> buf(out,
+        fmt_detail::iterator_buffer<OutputIt, Char, fmt_detail::fixed_buffer_traits> buf(out,
                                                                                  n);
-        detail::vformat_to(buf, format_str, args);
+        fmt_detail::vformat_to(buf, format_str, args);
         return {buf.out(), buf.count()};
     }
 
     template<typename OutputIt, typename S, typename... Args,
             typename Char = char_t<S>,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
-                                    detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, Char>::value&&
+                                    fmt_detail::is_exotic_char<Char>::value)>
     inline auto format_to_n(OutputIt out, size_t n, const S &fmt,
                             const Args &... args) -> format_to_n_result<OutputIt> {
-        return vformat_to_n(out, n, detail::to_string_view(fmt),
+        return vformat_to_n(out, n, to_string_view(fmt),
                             turbo::make_format_args<buffer_context<Char>>(args...));
     }
 
     template<typename S, typename... Args, typename Char = char_t<S>,
-            TURBO_ENABLE_IF(detail::is_exotic_char<Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_exotic_char<Char>::value)>
     inline auto formatted_size(const S &fmt, Args &&... args) -> size_t {
-        detail::counting_buffer<Char> buf;
-        detail::vformat_to(buf, detail::to_string_view(fmt),
+        fmt_detail::counting_buffer<Char> buf;
+        fmt_detail::vformat_to(buf, to_string_view(fmt),
                            turbo::make_format_args<buffer_context<Char>>(args...));
         return buf.count();
     }
 
     inline void vprint(std::FILE *f, wstring_view fmt, wformat_args args) {
         wmemory_buffer buffer;
-        detail::vformat_to(buffer, fmt, args);
+        fmt_detail::vformat_to(buffer, fmt, args);
         buffer.push_back(L'\0');
         if (std::fputws(buffer.data(), f) == -1)
             FMT_THROW(system_error(errno, FMT_STRING("cannot write to file")));

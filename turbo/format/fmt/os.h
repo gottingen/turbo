@@ -335,7 +335,7 @@ namespace turbo {
     // Returns the memory page size.
     long getpagesize();
 
-    namespace detail {
+    namespace fmt_detail {
 
         struct buffer_size {
             buffer_size() = default;
@@ -361,7 +361,7 @@ namespace turbo {
             }
 
             template<typename... T>
-            ostream_params(T... params, detail::buffer_size bs)
+            ostream_params(T... params, fmt_detail::buffer_size bs)
                     : ostream_params(params...) {
                 this->buffer_size = bs.value;
             }
@@ -370,7 +370,7 @@ namespace turbo {
 // for empty parameter packs.
 #  if defined(__INTEL_COMPILER) && __INTEL_COMPILER < 2000
             ostream_params(int new_oflag) : oflag(new_oflag) {}
-            ostream_params(detail::buffer_size bs) : buffer_size(bs.value) {}
+            ostream_params(fmt_detail::buffer_size bs) : buffer_size(bs.value) {}
 #  endif
         };
 
@@ -398,20 +398,20 @@ namespace turbo {
             }
         };
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     // Added {} below to work around default constructor error known to
     // occur in Xcode versions 7.2.1 and 8.2.1.
-    constexpr detail::buffer_size buffer_size{};
+    constexpr fmt_detail::buffer_size buffer_size{};
 
     /** A fast output stream which is not thread-safe. */
     class TURBO_DLL ostream {
     private:
         TURBO_MSC_WARNING(suppress :
                               4251)
-        detail::file_buffer buffer_;
+        fmt_detail::file_buffer buffer_;
 
-        ostream(cstring_view path, const detail::ostream_params &params)
+        ostream(cstring_view path, const fmt_detail::ostream_params &params)
                 : buffer_(path, params) {}
 
     public:
@@ -432,7 +432,7 @@ namespace turbo {
          */
         template<typename... T>
         void print(format_string<T...> fmt, T &&... args) {
-            vformat_to(detail::buffer_appender<char>(buffer_), fmt,
+            vformat_to(fmt_detail::buffer_appender<char>(buffer_), fmt,
                        turbo::make_format_args(args...));
         }
     };
@@ -454,7 +454,7 @@ namespace turbo {
      */
     template<typename... T>
     inline ostream output_file(cstring_view path, T... params) {
-        return {path, detail::ostream_params(params...)};
+        return {path, fmt_detail::ostream_params(params...)};
     }
 
 #endif  // FMT_USE_FCNTL

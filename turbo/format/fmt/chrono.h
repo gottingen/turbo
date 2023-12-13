@@ -80,7 +80,7 @@ namespace turbo {
             static_assert(T::is_integer, "To must be integral");
 
             // A and B are both signed, or both unsigned.
-            if (detail::const_check(F::digits <= T::digits)) {
+            if (fmt_detail::const_check(F::digits <= T::digits)) {
                 // From fits in To without any problem.
             } else {
                 // From does not always fit in To, resort to a dynamic check.
@@ -108,23 +108,23 @@ namespace turbo {
             static_assert(F::is_integer, "From must be integral");
             static_assert(T::is_integer, "To must be integral");
 
-            if (detail::const_check(F::is_signed && !T::is_signed)) {
+            if (fmt_detail::const_check(F::is_signed && !T::is_signed)) {
                 // From may be negative, not allowed!
-                if (turbo::detail::is_negative(from)) {
+                if (turbo::fmt_detail::is_negative(from)) {
                     ec = 1;
                     return {};
                 }
                 // From is positive. Can it always fit in To?
-                if (detail::const_check(F::digits > T::digits) &&
-                    from > static_cast<From>(detail::max_value<To>())) {
+                if (fmt_detail::const_check(F::digits > T::digits) &&
+                    from > static_cast<From>(fmt_detail::max_value<To>())) {
                     ec = 1;
                     return {};
                 }
             }
 
-            if (detail::const_check(!F::is_signed && T::is_signed &&
+            if (fmt_detail::const_check(!F::is_signed && T::is_signed &&
                                     F::digits >= T::digits) &&
-                from > static_cast<From>(detail::max_value<To>())) {
+                from > static_cast<From>(fmt_detail::max_value<To>())) {
                 ec = 1;
                 return {};
             }
@@ -214,15 +214,15 @@ namespace turbo {
                     lossless_integral_conversion<IntermediateRep>(from.count(), ec);
             if (ec) return {};
             // multiply with Factor::num without overflow or underflow
-            if (detail::const_check(Factor::num != 1)) {
-                const auto max1 = detail::max_value<IntermediateRep>() / Factor::num;
+            if (fmt_detail::const_check(Factor::num != 1)) {
+                const auto max1 = fmt_detail::max_value<IntermediateRep>() / Factor::num;
                 if (count > max1) {
                     ec = 1;
                     return {};
                 }
                 const auto min1 =
                         (std::numeric_limits<IntermediateRep>::min)() / Factor::num;
-                if (detail::const_check(!std::is_unsigned<IntermediateRep>::value) &&
+                if (fmt_detail::const_check(!std::is_unsigned<IntermediateRep>::value) &&
                     count < min1) {
                     ec = 1;
                     return {};
@@ -230,7 +230,7 @@ namespace turbo {
                 count *= Factor::num;
             }
 
-            if (detail::const_check(Factor::den != 1)) count /= Factor::den;
+            if (fmt_detail::const_check(Factor::den != 1)) count /= Factor::den;
             auto tocount = lossless_integral_conversion<typename To::rep>(count, ec);
             return ec ? To() : To(tocount);
         }
@@ -283,8 +283,8 @@ namespace turbo {
             }
 
             // multiply with Factor::num without overflow or underflow
-            if (detail::const_check(Factor::num != 1)) {
-                constexpr auto max1 = detail::max_value<IntermediateRep>() /
+            if (fmt_detail::const_check(Factor::num != 1)) {
+                constexpr auto max1 = fmt_detail::max_value<IntermediateRep>() /
                                       static_cast<IntermediateRep>(Factor::num);
                 if (count > max1) {
                     ec = 1;
@@ -300,7 +300,7 @@ namespace turbo {
             }
 
             // this can't go wrong, right? den>0 is checked earlier.
-            if (detail::const_check(Factor::den != 1)) {
+            if (fmt_detail::const_check(Factor::den != 1)) {
                 using common_t = typename std::common_type<IntermediateRep, intmax_t>::type;
                 count /= static_cast<common_t>(Factor::den);
             }
@@ -321,7 +321,7 @@ namespace turbo {
 // Usage: f FMT_NOMACRO()
 #define FMT_NOMACRO
 
-    namespace detail {
+    namespace fmt_detail {
         template<typename T = void>
         struct null {
         };
@@ -370,7 +370,7 @@ namespace turbo {
         template<typename OutputIt>
         auto write_encoded_tm_str(OutputIt out, std::string_view in, const std::locale &loc)
         -> OutputIt {
-            if (detail::is_utf8() && loc != get_classic_locale()) {
+            if (fmt_detail::is_utf8() && loc != get_classic_locale()) {
                 // char16_t and char32_t codecvts are broken in MSVC (linkage errors) and
                 // gcc-4.
 #if TURBO_MSC_VERSION != 0 || \
@@ -441,7 +441,7 @@ namespace turbo {
             return write_encoded_tm_str(out, std::string_view(buf.data(), buf.size()), loc);
         }
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
 
     /**
@@ -457,14 +457,14 @@ namespace turbo {
             dispatcher(std::time_t t) : time_(t) {}
 
             bool run() {
-                using namespace turbo::detail;
+                using namespace turbo::fmt_detail;
                 return handle(localtime_r(&time_, &tm_));
             }
 
             bool handle(std::tm *tm) { return tm != nullptr; }
 
-            bool handle(detail::null<>) {
-                using namespace turbo::detail;
+            bool handle(fmt_detail::null<>) {
+                using namespace turbo::fmt_detail;
                 return fallback(localtime_s(&tm_, &time_));
             }
 
@@ -472,7 +472,7 @@ namespace turbo {
 
 #if !TURBO_MSC_VERSION
 
-            bool fallback(detail::null<>) {
+            bool fallback(fmt_detail::null<>) {
                 using namespace turbo::detail;
                 std::tm *tm = std::localtime(&time_);
                 if (tm) tm_ = *tm;
@@ -508,14 +508,14 @@ namespace turbo {
             dispatcher(std::time_t t) : time_(t) {}
 
             bool run() {
-                using namespace turbo::detail;
+                using namespace turbo::fmt_detail;
                 return handle(gmtime_r(&time_, &tm_));
             }
 
             bool handle(std::tm *tm) { return tm != nullptr; }
 
-            bool handle(detail::null<>) {
-                using namespace turbo::detail;
+            bool handle(fmt_detail::null<>) {
+                using namespace turbo::fmt_detail;
                 return fallback(gmtime_s(&tm_, &time_));
             }
 
@@ -523,7 +523,7 @@ namespace turbo {
 
 #if !TURBO_MSC_VERSION
 
-            bool fallback(detail::null<>) {
+            bool fallback(fmt_detail::null<>) {
                 std::tm *tm = std::gmtime(&time_);
                 if (tm) tm_ = *tm;
                 return tm != nullptr;
@@ -542,7 +542,7 @@ namespace turbo {
         return gmtime(std::chrono::system_clock::to_time_t(time_point));
     }
 
-    namespace detail {
+    namespace fmt_detail {
 
         // DEPRECATED!
         template<typename Char>
@@ -1184,7 +1184,7 @@ namespace turbo {
             using subsecond_precision = std::chrono::duration<
                     typename std::common_type<typename Duration::rep,
                             std::chrono::seconds::rep>::type,
-                    std::ratio<1, detail::pow10(num_fractional_digits)>>;
+                    std::ratio<1, fmt_detail::pow10(num_fractional_digits)>>;
 
             const auto fractional =
                     d - std::chrono::duration_cast<std::chrono::seconds>(d);
@@ -1194,7 +1194,7 @@ namespace turbo {
                     ? fractional.count()
                     : std::chrono::duration_cast<subsecond_precision>(fractional).count();
             auto n = static_cast<uint32_or_64_or_128_t<long long>>(subseconds);
-            const int num_digits = detail::count_digits(n);
+            const int num_digits = fmt_detail::count_digits(n);
 
             int leading_zeroes = (std::max)(0, num_fractional_digits - num_digits);
             if (precision < 0) {
@@ -1211,7 +1211,7 @@ namespace turbo {
                 out = std::fill_n(out, leading_zeroes, '0');
                 int remaining = precision - leading_zeroes;
                 if (remaining != 0 && remaining < num_digits) {
-                    n /= turbo::to_unsigned(detail::pow10(turbo::to_unsigned(num_digits - remaining)));
+                    n /= turbo::to_unsigned(fmt_detail::pow10(turbo::to_unsigned(num_digits - remaining)));
                     out = format_decimal<Char>(out, n, remaining).end;
                     return;
                 }
@@ -1366,7 +1366,7 @@ namespace turbo {
                     *out_++ = *d++;
                     *out_++ = *d;
                 } else {
-                    out_ = detail::write_padding(out_, pad);
+                    out_ = fmt_detail::write_padding(out_, pad);
                     *out_++ = static_cast<char>('0' + v);
                 }
             }
@@ -1998,9 +1998,9 @@ namespace turbo {
                 if (isnan(value)) return write_nan();
                 uint32_or_64_or_128_t<int> n =
                         turbo::to_unsigned(to_nonnegative_int(value, max_value<int>()));
-                int num_digits = detail::count_digits(n);
+                int num_digits = fmt_detail::count_digits(n);
                 if (width > num_digits) {
-                    out = detail::write_padding(out, pad, width - num_digits);
+                    out = fmt_detail::write_padding(out, pad, width - num_digits);
                 }
                 out = format_decimal<char_type>(out, n, num_digits).end;
             }
@@ -2114,7 +2114,7 @@ namespace turbo {
                                                precision);
                         if (negative) *out++ = '-';
                         if (buf.size() < 2 || buf[1] == '.') {
-                            out = detail::write_padding(out, pad);
+                            out = fmt_detail::write_padding(out, pad);
                         }
                         out = std::copy(buf.begin(), buf.end(), out);
                     } else {
@@ -2215,8 +2215,8 @@ namespace turbo {
         auto format(weekday wd, FormatContext &ctx) const -> decltype(ctx.out()) {
             auto time = std::tm();
             time.tm_wday = static_cast<int>(wd.c_encoding());
-            detail::get_locale loc(localized, ctx.locale());
-            auto w = detail::tm_writer<decltype(ctx.out()), Char>(loc, ctx.out(), time);
+            fmt_detail::get_locale loc(localized, ctx.locale());
+            auto w = fmt_detail::tm_writer<decltype(ctx.out()), Char>(loc, ctx.out(), time);
             w.on_abbr_weekday();
             return w.out();
         }
@@ -2227,7 +2227,7 @@ namespace turbo {
     private:
         format_specs<Char> specs;
         int precision = -1;
-        using arg_ref_type = detail::arg_ref<Char>;
+        using arg_ref_type = fmt_detail::arg_ref<Char>;
         arg_ref_type width_ref;
         arg_ref_type precision_ref;
         bool localized = false;
@@ -2244,23 +2244,23 @@ namespace turbo {
             auto begin = ctx.begin(), end = ctx.end();
             if (begin == end || *begin == '}') return {begin, begin};
 
-            begin = detail::parse_align(begin, end, specs);
+            begin = fmt_detail::parse_align(begin, end, specs);
             if (begin == end) return {begin, begin};
 
-            begin = detail::parse_dynamic_spec(begin, end, specs.width, width_ref, ctx);
+            begin = fmt_detail::parse_dynamic_spec(begin, end, specs.width, width_ref, ctx);
             if (begin == end) return {begin, begin};
 
-            auto checker = detail::chrono_format_checker();
+            auto checker = fmt_detail::chrono_format_checker();
             if (*begin == '.') {
                 checker.has_precision_integral = !std::is_floating_point<Rep>::value;
                 begin =
-                        detail::parse_precision(begin, end, precision, precision_ref, ctx);
+                        fmt_detail::parse_precision(begin, end, precision, precision_ref, ctx);
             }
             if (begin != end && *begin == 'L') {
                 ++begin;
                 localized = true;
             }
-            end = detail::parse_chrono_format(begin, end, checker);
+            end = fmt_detail::parse_chrono_format(begin, end, checker);
             return {begin, end};
         }
 
@@ -2283,21 +2283,21 @@ namespace turbo {
             // is not specified.
             basic_memory_buffer<Char> buf;
             auto out = std::back_inserter(buf);
-            detail::handle_dynamic_spec<detail::width_checker>(specs_copy.width,
+            fmt_detail::handle_dynamic_spec<fmt_detail::width_checker>(specs_copy.width,
                                                                width_ref, ctx);
-            detail::handle_dynamic_spec<detail::precision_checker>(precision_copy,
+            fmt_detail::handle_dynamic_spec<fmt_detail::precision_checker>(precision_copy,
                                                                    precision_ref, ctx);
             if (begin == end || *begin == '}') {
-                out = detail::format_duration_value<Char>(out, d.count(), precision_copy);
-                detail::format_duration_unit<Char, Period>(out);
+                out = fmt_detail::format_duration_value<Char>(out, d.count(), precision_copy);
+                fmt_detail::format_duration_unit<Char, Period>(out);
             } else {
-                detail::chrono_formatter<FormatContext, decltype(out), Rep, Period> f(
+                fmt_detail::chrono_formatter<FormatContext, decltype(out), Rep, Period> f(
                         ctx, out, d);
                 f.precision = precision_copy;
                 f.localized = localized;
-                detail::parse_chrono_format(begin, end, f);
+                fmt_detail::parse_chrono_format(begin, end, f);
             }
-            return detail::write(
+            return fmt_detail::write(
                     ctx.out(), std::basic_string_view<Char>(buf.data(), buf.size()), specs_copy);
         }
     };
@@ -2306,7 +2306,7 @@ namespace turbo {
     struct formatter<std::chrono::time_point<std::chrono::system_clock, Duration>,
             Char> : formatter<std::tm, Char> {
         constexpr formatter() {
-            this->format_str = detail::string_literal<Char, '%', 'F', ' ', '%', 'T'>{};
+            this->format_str = fmt_detail::string_literal<Char, '%', 'F', ' ', '%', 'T'>{};
         }
 
         template<typename FormatContext>
@@ -2342,7 +2342,7 @@ namespace turbo {
     struct formatter<std::chrono::local_time<Duration>, Char>
         : formatter<std::tm, Char> {
       constexpr formatter() {
-        this->format_str = detail::string_literal<Char, '%', 'F', ' ', '%', 'T'>{};
+        this->format_str = fmt_detail::string_literal<Char, '%', 'F', ' ', '%', 'T'>{};
       }
 
       template <typename FormatContext>
@@ -2387,7 +2387,7 @@ namespace turbo {
     struct formatter<std::tm, Char> {
     private:
         format_specs<Char> specs;
-        detail::arg_ref<Char> width_ref;
+        fmt_detail::arg_ref<Char> width_ref;
 
     protected:
         std::basic_string_view<Char> format_str;
@@ -2397,13 +2397,13 @@ namespace turbo {
             auto begin = ctx.begin(), end = ctx.end();
             if (begin == end || *begin == '}') return begin;
 
-            begin = detail::parse_align(begin, end, specs);
+            begin = fmt_detail::parse_align(begin, end, specs);
             if (begin == end) return end;
 
-            begin = detail::parse_dynamic_spec(begin, end, specs.width, width_ref, ctx);
+            begin = fmt_detail::parse_dynamic_spec(begin, end, specs.width, width_ref, ctx);
             if (begin == end) return end;
 
-            end = detail::parse_chrono_format(begin, end, detail::tm_format_checker());
+            end = fmt_detail::parse_chrono_format(begin, end, fmt_detail::tm_format_checker());
             // Replace default format_str only if the new spec is not empty.
             if (end != begin) format_str = {begin, turbo::to_unsigned(end - begin)};
             return end;
@@ -2415,15 +2415,15 @@ namespace turbo {
             auto specs_copy = specs;
             basic_memory_buffer<Char> buf;
             auto out = std::back_inserter(buf);
-            detail::handle_dynamic_spec<detail::width_checker>(specs_copy.width,
+            fmt_detail::handle_dynamic_spec<fmt_detail::width_checker>(specs_copy.width,
                                                                width_ref, ctx);
 
             const auto loc_ref = ctx.locale();
-            detail::get_locale loc(static_cast<bool>(loc_ref), loc_ref);
+            fmt_detail::get_locale loc(static_cast<bool>(loc_ref), loc_ref);
             auto w =
-                    detail::tm_writer<decltype(out), Char, Duration>(loc, out, tm, subsecs);
-            detail::parse_chrono_format(format_str.begin(), format_str.end(), w);
-            return detail::write(
+                    fmt_detail::tm_writer<decltype(out), Char, Duration>(loc, out, tm, subsecs);
+            fmt_detail::parse_chrono_format(format_str.begin(), format_str.end(), w);
+            return fmt_detail::write(
                     ctx.out(), std::basic_string_view<Char>(buf.data(), buf.size()), specs_copy);
         }
 

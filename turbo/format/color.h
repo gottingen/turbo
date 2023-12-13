@@ -207,7 +207,7 @@ namespace turbo {
         uint8_t b;
     };
 
-    namespace detail {
+    namespace fmt_detail {
 
         // color is a struct of either a rgb color or a terminal color.
         struct color_type {
@@ -234,7 +234,7 @@ namespace turbo {
             } value;
         };
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     /** A text style consisting of foreground and background colors and emphasis. */
     class text_style {
@@ -283,12 +283,12 @@ namespace turbo {
             return static_cast<uint8_t>(ems) != 0;
         }
 
-        constexpr detail::color_type get_foreground() const noexcept {
+        constexpr fmt_detail::color_type get_foreground() const noexcept {
             TURBO_ASSERT(has_foreground(), "no foreground specified for this style");
             return foreground_color;
         }
 
-        constexpr detail::color_type get_background() const noexcept {
+        constexpr fmt_detail::color_type get_background() const noexcept {
             TURBO_ASSERT(has_background(), "no background specified for this style");
             return background_color;
         }
@@ -300,7 +300,7 @@ namespace turbo {
 
     private:
         constexpr text_style(bool is_foreground,
-                             detail::color_type text_color) noexcept
+                             fmt_detail::color_type text_color) noexcept
                 : set_foreground_color(), set_background_color(), ems() {
             if (is_foreground) {
                 foreground_color = text_color;
@@ -311,24 +311,24 @@ namespace turbo {
             }
         }
 
-        friend constexpr text_style fg(detail::color_type foreground) noexcept;
+        friend constexpr text_style fg(fmt_detail::color_type foreground) noexcept;
 
-        friend constexpr text_style bg(detail::color_type background) noexcept;
+        friend constexpr text_style bg(fmt_detail::color_type background) noexcept;
 
-        detail::color_type foreground_color;
-        detail::color_type background_color;
+        fmt_detail::color_type foreground_color;
+        fmt_detail::color_type background_color;
         bool set_foreground_color;
         bool set_background_color;
         emphasis ems;
     };
 
     /** Creates a text style from the foreground (text) color. */
-    constexpr inline text_style fg(detail::color_type foreground) noexcept {
+    constexpr inline text_style fg(fmt_detail::color_type foreground) noexcept {
         return text_style(true, foreground);
     }
 
     /** Creates a text style from the background color. */
-    constexpr inline text_style bg(detail::color_type background) noexcept {
+    constexpr inline text_style bg(fmt_detail::color_type background) noexcept {
         return text_style(false, background);
     }
 
@@ -336,11 +336,11 @@ namespace turbo {
         return text_style(lhs) | rhs;
     }
 
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename Char>
         struct ansi_color_escape {
-            constexpr ansi_color_escape(detail::color_type text_color,
+            constexpr ansi_color_escape(fmt_detail::color_type text_color,
                                         const char *esc) noexcept {
                 // If we have a terminal color, we need to output another escape code
                 // sequence.
@@ -426,13 +426,13 @@ namespace turbo {
 
         template<typename Char>
         constexpr ansi_color_escape<Char> make_foreground_color(
-                detail::color_type foreground) noexcept {
+                fmt_detail::color_type foreground) noexcept {
             return ansi_color_escape<Char>(foreground, "\x1b[38;2;");
         }
 
         template<typename Char>
         constexpr ansi_color_escape<Char> make_background_color(
-                detail::color_type background) noexcept {
+                fmt_detail::color_type background) noexcept {
             return ansi_color_escape<Char>(background, "\x1b[48;2;");
         }
 
@@ -460,32 +460,32 @@ namespace turbo {
             bool has_style = false;
             if (ts.has_emphasis()) {
                 has_style = true;
-                auto emphasis = detail::make_emphasis<Char>(ts.get_emphasis());
+                auto emphasis = fmt_detail::make_emphasis<Char>(ts.get_emphasis());
                 buf.append(emphasis.begin(), emphasis.end());
             }
             if (ts.has_foreground()) {
                 has_style = true;
-                auto foreground = detail::make_foreground_color<Char>(ts.get_foreground());
+                auto foreground = fmt_detail::make_foreground_color<Char>(ts.get_foreground());
                 buf.append(foreground.begin(), foreground.end());
             }
             if (ts.has_background()) {
                 has_style = true;
-                auto background = detail::make_background_color<Char>(ts.get_background());
+                auto background = fmt_detail::make_background_color<Char>(ts.get_background());
                 buf.append(background.begin(), background.end());
             }
-            detail::vformat_to(buf, format_str, args,{});
+            fmt_detail::vformat_to(buf, format_str, args,{});
             if (has_style)
-                detail::reset_color<Char>(buf);
+                fmt_detail::reset_color<Char>(buf);
         }
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     inline void vprint(std::FILE *f, const text_style &ts, std::string_view fmt,format_args args) {
         // Legacy wide streams are not supported.
         auto buf = memory_buffer();
-        detail::vformat_to(buf, ts, fmt, args);
-        if (detail::is_utf8()) {
-            detail::print(f, std::string_view(buf.begin(), buf.size()));
+        fmt_detail::vformat_to(buf, ts, fmt, args);
+        if (fmt_detail::is_utf8()) {
+            fmt_detail::print(f, std::string_view(buf.begin(), buf.size()));
             return;
         }
         buf.push_back('\0');
@@ -494,43 +494,6 @@ namespace turbo {
             FMT_THROW(system_error(errno, FMT_STRING("cannot write to file")));
     }
 
-    /**
-      \rst
-      Formats a string and prints it to the specified file stream using ANSI
-      escape sequences to specify text formatting.
-
-      **Example**::
-
-        turbo::print(turbo::emphasis::bold | fg(turbo::color::red),
-                   "Elapsed time: {0:.2f} seconds", 1.23);
-      \endrst
-     */
-    template<typename S, typename... Args,
-            TURBO_ENABLE_IF(detail::is_string<S>::value)>
-
-    void print(std::FILE *f, const text_style &ts, const S &format_str,
-               const Args &... args) {
-        vprint(f, ts, format_str,
-               turbo::make_format_args<buffer_context<char_t<S>>>(args...));
-    }
-
-    /**
-      \rst
-      Formats a string and prints it to stdout using ANSI escape sequences to
-      specify text formatting.
-
-      **Example**::
-
-        turbo::print(turbo::emphasis::bold | fg(turbo::color::red),
-                   "Elapsed time: {0:.2f} seconds", 1.23);
-      \endrst
-     */
-    template<typename S, typename... Args,
-            TURBO_ENABLE_IF(detail::is_string<S>::value)>
-
-    void print(const text_style &ts, const S &format_str, const Args &... args) {
-        return print(stdout, ts, format_str, args...);
-    }
 
     template<typename S, typename Char = char_t<S>>
     inline std::basic_string<Char> vformat(
@@ -539,78 +502,37 @@ namespace turbo {
 
             > args) {
         basic_memory_buffer<Char> buf;
-        detail::vformat_to(buf, ts, detail::to_string_view(format_str), args
+        fmt_detail::vformat_to(buf, ts, to_string_view(format_str), args
         );
         return
                 turbo::to_string(buf);
     }
 
-    /**
-      \rst
-      Formats arguments and returns the result as a string using ANSI
-      escape sequences to specify text formatting.
-
-      **Example**::
-
-        #include <fmt/color.h>
-        std::string message = turbo::format(turbo::emphasis::bold | fg(turbo::color::red),
-                                          "The answer is {}", 42);
-      \endrst
-    */
-    template<typename S, typename... Args, typename Char = char_t<S>>
-    inline std::basic_string<Char> format(const text_style &ts, const S &format_str,
-                                          const Args &... args) {
-        return turbo::vformat(ts, detail::to_string_view(format_str),
-                              turbo::make_format_args<buffer_context<Char>>(args...));
-    }
 
     /**
       Formats a string with the given text_style and writes the output to ``out``.
      */
     template<typename OutputIt, typename Char,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, Char>::value)>
 
     OutputIt vformat_to(
             OutputIt out, const text_style &ts, std::basic_string_view<Char> format_str,
             basic_format_args<buffer_context<type_identity_t<Char>>
 
             > args) {
-        auto &&buf = detail::get_buffer<Char>(out);
-        detail::vformat_to(buf, ts, format_str, args
+        auto &&buf = fmt_detail::get_buffer<Char>(out);
+        fmt_detail::vformat_to(buf, ts, format_str, args
         );
         return
-                detail::get_iterator(buf, out
+                fmt_detail::get_iterator(buf, out
                 );
     }
 
-    /**
-      \rst
-      Formats arguments with the given text_style, writes the result to the output
-      iterator ``out`` and returns the iterator past the end of the output range.
-
-      **Example**::
-
-        std::vector<char> out;
-        turbo::format_to(std::back_inserter(out),
-                       turbo::emphasis::bold | fg(turbo::color::red), "{}", 42);
-      \endrst
-    */
-    template<typename OutputIt, typename S, typename... Args,
-            bool enable = detail::is_output_iterator<OutputIt, char_t<S>>::value &&
-                          detail::is_string<S>::value
-    >
-
-    inline auto format_to(OutputIt out, const text_style &ts, const S &format_str,
-                          Args &&... args) ->
-    typename std::enable_if<enable, OutputIt>::type {
-        return vformat_to(out, ts, detail::to_string_view(format_str),
-                          turbo::make_format_args<buffer_context<char_t<S>>>(args...));
-    }
 
     template<typename T, typename Char>
-    struct formatter<detail::styled_arg<T>, Char> : formatter<T, Char> {
+    struct formatter<fmt_detail::styled_arg<T>, Char> : formatter<T, Char> {
         template<typename FormatContext>
-        auto format(const detail::styled_arg<T> &arg, FormatContext &ctx) const
+        auto format(const fmt_detail::styled_arg<T> &arg, FormatContext &ctx) const
         -> decltype(ctx.out()) {
             const auto &ts = arg.style;
             const auto &value = arg.value;
@@ -619,19 +541,19 @@ namespace turbo {
             bool has_style = false;
             if (ts.has_emphasis()) {
                 has_style = true;
-                auto emphasis = detail::make_emphasis<Char>(ts.get_emphasis());
+                auto emphasis = fmt_detail::make_emphasis<Char>(ts.get_emphasis());
                 out = std::copy(emphasis.begin(), emphasis.end(), out);
             }
             if (ts.has_foreground()) {
                 has_style = true;
                 auto foreground =
-                        detail::make_foreground_color<Char>(ts.get_foreground());
+                        fmt_detail::make_foreground_color<Char>(ts.get_foreground());
                 out = std::copy(foreground.begin(), foreground.end(), out);
             }
             if (ts.has_background()) {
                 has_style = true;
                 auto background =
-                        detail::make_background_color<Char>(ts.get_background());
+                        fmt_detail::make_background_color<Char>(ts.get_background());
                 out = std::copy(background.begin(), background.end(), out);
             }
             out = formatter<T, Char>::format(value, ctx);
@@ -644,24 +566,6 @@ namespace turbo {
 
     };
 
-    /**
-      \rst
-      Returns an argument that will be formatted using ANSI escape sequences,
-      to be used in a formatting function.
-
-      **Example**::
-
-        turbo::print("Elapsed time: {0:.2f} seconds",
-                   turbo::styled(1.23, turbo::fg(turbo::color::green) |
-                                     turbo::bg(turbo::color::blue)));
-      \endrst
-     */
-    template<typename T>
-    constexpr auto styled(const T &value, text_style ts)
-    -> detail::styled_arg<turbo::remove_cvref_t<T>> {
-        return detail::styled_arg<turbo::remove_cvref_t<T>>
-                {value, ts};
-    }
 
 }  // namespace turbo
 

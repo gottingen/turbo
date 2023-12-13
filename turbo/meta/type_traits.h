@@ -525,6 +525,177 @@ namespace turbo {
     constexpr T conditional_static_cast(U value) {
         return value;
     }
+
+    template<typename T>
+    struct is_char : std::false_type {
+    };
+    template<>
+    struct is_char<char> : std::true_type {
+    };
+
+    struct compile_string {
+    };
+
+    template<typename S>
+    struct is_compile_string : std::is_base_of<compile_string, S> {
+    };
+
+
+    template<typename Char, TURBO_ENABLE_IF(is_char<Char>::value)>
+    TURBO_FORCE_INLINE auto to_string_view(const Char *s) -> std::basic_string_view<Char> {
+        return s;
+    }
+
+    template<typename Char, typename Traits, typename Alloc>
+    inline auto to_string_view(const std::basic_string<Char, Traits, Alloc> &s)
+    -> std::basic_string_view<Char> {
+        return s;
+    }
+
+    template<typename Char>
+    constexpr auto to_string_view(std::basic_string_view<Char> s)
+    -> std::basic_string_view<Char> {
+        return s;
+    }
+
+    template<typename S, TURBO_ENABLE_IF(is_compile_string<S>::value)>
+    constexpr auto to_string_view(const S &s)
+    -> std::basic_string_view<typename S::char_type> {
+        return std::basic_string_view<typename S::char_type>(s);
+    }
+
+    void to_string_view(...);
+
+    // Specifies whether S is a string type convertible to std::basic_string_view.
+    // It should be a constexpr function but MSVC 2017 fails to compile it in
+    // enable_if and MSVC 2015 fails to compile it as an alias template.
+    // ADL is intentionally disabled as to_string_view is not an extension point.
+    template<typename S>
+    struct is_string
+            : std::is_class<decltype(to_string_view(std::declval<S>()))> {
+    };
+
+    // range
+    namespace meta_detail {
+#  define FMT_DECLTYPE_RETURN(val)  \
+    ->decltype(val) { return val; } \
+    static_assert(                  \
+        true, "")  // This makes it so that a semicolon is required after the
+        // macro, which helps clang-format handle the formatting.
+        // Member function overload
+
+        // Returns true if T has a std::string-like interface, like std::string_view.
+        template<typename T>
+        class is_std_string_like {
+            template<typename U>
+            static auto check(U *p)
+            -> decltype((void) p->find('a'), p->length(), (void) p->data(), int());
+
+            template<typename>
+            static void check(...);
+
+        public:
+            static constexpr const bool value =
+                    is_string<T>::value ||
+                    std::is_convertible<T, std::basic_string_view<char>>::value ||
+                    !std::is_void<decltype(check<T>(nullptr))>::value;
+        };
+
+        template<typename Char>
+        struct is_std_string_like<std::basic_string_view<Char>> : std::true_type {
+        };
+
+    }  // namespace meta_detail
+
+    // C array overload
+    template<typename T, std::size_t N>
+    auto range_begin(const T (&arr)[N]) -> const T * {
+        return arr;
+    }
+
+    template<typename T, std::size_t N>
+    auto range_end(const T (&arr)[N]) -> const T * {
+        return arr + N;
+    }
+
+    template<typename T, typename Enable = void>
+    struct has_member_fn_begin_end_t : std::false_type {
+    };
+
+    template<typename T>
+    struct has_member_fn_begin_end_t<T, std::void_t<decltype(std::declval<T>().begin()),
+            decltype(std::declval<T>().end())>>
+            : std::true_type {
+    };
+
+
+    template<typename T>
+    auto range_begin(T &&rng) FMT_DECLTYPE_RETURN(static_cast<T &&>(rng).begin());
+
+    template<typename T>
+    auto range_end(T &&rng) FMT_DECLTYPE_RETURN(static_cast<T &&>(rng).end());
+
+    // ADL overload. Only participates in overload resolution if member functions
+    // are not found.
+    template<typename T>
+    auto range_begin(T &&rng)
+    -> std::enable_if_t<!has_member_fn_begin_end_t<T &&>::value,
+            decltype(begin(static_cast<T &&>(rng)))> {
+        return begin(static_cast<T &&>(rng));
+    }
+
+    template<typename T>
+    auto range_end(T &&rng) -> std::enable_if_t<!has_member_fn_begin_end_t<T &&>::value,
+            decltype(end(static_cast<T &&>(rng)))> {
+        return end(static_cast<T &&>(rng));
+    }
+
+    template<typename T, typename Enable = void>
+    struct has_const_begin_end : std::false_type {
+    };
+
+    template<typename T>
+    struct has_const_begin_end<
+            T,
+            std::void_t<
+                    decltype(range_begin(std::declval<const turbo::remove_cvref_t<T> &>())),
+                    decltype(range_end(std::declval<const turbo::remove_cvref_t<T> &>()))>>
+            : std::true_type {
+    };
+
+    template<typename T, typename Enable = void>
+    struct has_mutable_begin_end : std::false_type {
+    };
+
+    template<typename T>
+    struct has_mutable_begin_end<
+            T, std::void_t<decltype(range_begin(std::declval<T>())),
+                    decltype(range_end(std::declval<T>())),
+                    // the extra int here is because older versions of MSVC don't
+                    // SFINAE properly unless there are distinct types
+                    int>> : std::true_type {
+    };
+
+
+    template<typename T, typename _ = void>
+    struct is_range : std::false_type {
+    };
+
+    template<typename T>
+    struct is_range<T, void>
+            : std::integral_constant<bool, (has_const_begin_end<T>::value ||
+                                            has_mutable_begin_end<T>::value)> {
+    };
+
+
+    template<typename T, typename Char>
+    struct is_range_printable {
+        static constexpr const bool value =
+                is_range<T>::value && !meta_detail::is_std_string_like<T>::value &&
+                !std::is_convertible<T, std::basic_string<Char>>::value &&
+                !std::is_convertible<T, std::basic_string_view<Char>>::value;
+    };
+#  undef FMT_DECLTYPE_RETURN
 }  // namespace turbo
 
 

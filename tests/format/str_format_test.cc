@@ -20,6 +20,7 @@
 #include "turbo/strings/inlined_string.h"
 #include "turbo/format/format.h"
 #include "turbo/format/print.h"
+#include "turbo/format/fmt/std.h"
 #include <memory>
 
 TEST_CASE("format -InlinedString") {
@@ -41,8 +42,51 @@ TEST_CASE("format -InlinedString") {
 enum TestE {
     A, B, C
 };
-TEST_CASE("format -smart pointer") {
+enum TestE1 {
+    AA, BB, CC
+};
+enum class TestE2 {
+    AAA, BBB, CCC
+};
+TEST_CASE("format -enum") {
     auto e = TestE::A;
-    auto s = turbo::format("{}", turbo::underlying(e));
+    auto e1 = TestE1::AA;
+    auto s = turbo::format("{}", e);
+    auto s1 = turbo::format("{}", e1);
     turbo::println("{}", s);
+    turbo::println("{}", s1);
+
+    auto e2 = TestE2::AAA;
+    auto s2 = turbo::format("{}", e2);
+    turbo::println("{:>30}", s2);
+    std::vector<int> array = {1, 2, 4};
+    turbo::println("{}", array);
+    std::set<int> set = {1, 2, 4};
+    turbo::println("{}", set);
+    std::map<int, int> map = {{1, 2},
+                              {2, 3},
+                              {4, 5}};
+    turbo::println("{}", map);
+    std::unique_ptr<int> ptr = std::make_unique<int>(42);
+    turbo::println("{}", ptr);
+
+    std::shared_ptr<int> ptr1 = std::make_shared<int>(42);
+    turbo::println("{}", ptr1);
+
+   std::vector<std::vector<int>> vv = {
+           {1, 2, 3},
+           {4, 5, 6}
+   };
+   turbo::println("{}", vv);
 }
+/*
+TEST_CASE("format container smart pointer") {
+    std::vector<std::unique_ptr<int>> v;
+    v.emplace_back(std::make_unique<int>(42));
+    v.emplace_back(std::make_unique<int>(43));
+    turbo::println("{}", v);
+    std::vector<std::shared_ptr<int>> v1;
+    v1.emplace_back(std::make_shared<int>(42));
+    v1.emplace_back(std::make_shared<int>(43));
+    turbo::println("{}", v1);
+}*/

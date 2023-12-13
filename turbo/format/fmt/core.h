@@ -33,6 +33,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
+#include "turbo/meta/reflect.h"
 
 
 #ifdef _MSC_VER
@@ -67,7 +68,7 @@ namespace turbo {
             return static_cast<unsigned char>(b);
         }
 
-        namespace detail {
+        namespace fmt_detail {
 
 
             // Suppresses "conditional expression is constant" warnings.
@@ -111,65 +112,20 @@ namespace turbo {
                 return TURBO_UNICODE || (sizeof(section) == 3 && uchar(section[0]) == 0xC2 &&
                                        uchar(section[1]) == 0xA7);
             }
-        }  // namespace detail
+        }  // namespace fmt_detail
 
         /** Specifies if ``T`` is a character type. Can be specialized by users. */
-        template<typename T>
-        struct is_char : std::false_type {
-        };
-        template<>
-        struct is_char<char> : std::true_type {
-        };
 
-        namespace detail {
+
+        namespace fmt_detail {
 
             // A base class for compile-time strings.
-            struct compile_string {
-            };
-
-            template<typename S>
-            struct is_compile_string : std::is_base_of<compile_string, S> {
-            };
-
-            template<typename Char, TURBO_ENABLE_IF(is_char<Char>::value)>
-            TURBO_FORCE_INLINE auto to_string_view(const Char *s) -> std::basic_string_view<Char> {
-                return s;
-            }
-
-            template<typename Char, typename Traits, typename Alloc>
-            inline auto to_string_view(const std::basic_string<Char, Traits, Alloc> &s)
-            -> std::basic_string_view<Char> {
-                return s;
-            }
-
-            template<typename Char>
-            constexpr auto to_string_view(std::basic_string_view<Char> s)
-            -> std::basic_string_view<Char> {
-                return s;
-            }
-
-            template<typename S, TURBO_ENABLE_IF(is_compile_string<S>::value)>
-            constexpr auto to_string_view(const S &s)
-            -> std::basic_string_view<typename S::char_type> {
-                return std::basic_string_view<typename S::char_type>(s);
-            }
-
-            void to_string_view(...);
-
-            // Specifies whether S is a string type convertible to std::basic_string_view.
-            // It should be a constexpr function but MSVC 2017 fails to compile it in
-            // enable_if and MSVC 2015 fails to compile it as an alias template.
-            // ADL is intentionally disabled as to_string_view is not an extension point.
-            template<typename S>
-            struct is_string
-                    : std::is_class<decltype(detail::to_string_view(std::declval<S>()))> {
-            };
 
             template<typename S, typename = void>
             struct char_t_impl {
             };
             template<typename S>
-            struct char_t_impl<S, std::enable_if_t<is_string<S>::value>> {
+            struct char_t_impl<S, std::enable_if_t<turbo::is_string<S>::value>> {
                 using result = decltype(to_string_view(std::declval<S>()));
                 using type = typename result::value_type;
             };
@@ -261,10 +217,10 @@ namespace turbo {
                     throw_format_error(message);
                 }
             };
-        }  // namespace detail
+        }  // namespace fmt_detail
 
         /** String's character type. */
-        template<typename S> using char_t = typename detail::char_t_impl<S>::type;
+        template<typename S> using char_t = typename fmt_detail::char_t_impl<S>::type;
 
         /**
           \rst
@@ -313,7 +269,7 @@ namespace turbo {
              */
             constexpr auto next_arg_id() -> int {
                 if (next_arg_id_ < 0) {
-                    detail::throw_format_error(
+                    fmt_detail::throw_format_error(
                             "cannot switch from manual to automatic argument indexing");
                     return 0;
                 }
@@ -328,7 +284,7 @@ namespace turbo {
              */
             constexpr void check_arg_id(int id) {
                 if (next_arg_id_ > 0) {
-                    detail::throw_format_error(
+                    fmt_detail::throw_format_error(
                             "cannot switch from automatic to manual argument indexing");
                     return;
                 }
@@ -343,7 +299,7 @@ namespace turbo {
 
         using format_parse_context = basic_format_parse_context<char>;
 
-        namespace detail {
+        namespace fmt_detail {
             // A parse context with extra data used only in compile-time checks.
             template<typename Char>
             class compile_parse_context : public basic_format_parse_context<Char> {
@@ -383,7 +339,7 @@ namespace turbo {
 #endif
                 }
             };
-        }  // namespace detail
+        }  // namespace fmt_detail
 
         template<typename Char>
         constexpr void basic_format_parse_context<Char>::do_check_arg_id(int id) {
@@ -391,9 +347,9 @@ namespace turbo {
             // formatting has its own validation.
             if (turbo::is_constant_evaluated() &&
                 (!TURBO_GCC_VERSION || TURBO_GCC_VERSION >= 1200)) {
-                using context = detail::compile_parse_context<Char>;
+                using context = fmt_detail::compile_parse_context<Char>;
                 if (id >= static_cast<context *>(this)->num_args())
-                    detail::throw_format_error("argument not found");
+                    fmt_detail::throw_format_error("argument not found");
             }
         }
 
@@ -402,7 +358,7 @@ namespace turbo {
                 int arg_id) {
             if (turbo::is_constant_evaluated() &&
                 (!TURBO_GCC_VERSION || TURBO_GCC_VERSION >= 1200)) {
-                using context = detail::compile_parse_context<Char>;
+                using context = fmt_detail::compile_parse_context<Char>;
                 static_cast<context *>(this)->check_dynamic_spec(arg_id);
             }
         }
@@ -439,7 +395,7 @@ namespace turbo {
 
         class appender;
 
-        namespace detail {
+        namespace fmt_detail {
 
             template<typename Context, typename T>
             constexpr auto has_const_formatter_impl(T *)
@@ -1028,8 +984,12 @@ namespace turbo {
             template<typename T>
             struct format_as_result {
                 template<typename U,
-                        TURBO_ENABLE_IF(std::is_enum<U>::value || std::is_class<U>::value)>
+                        TURBO_ENABLE_IF(std::is_class<U>::value)>
                 static auto map(U *) -> decltype(format_as(std::declval<U>()));
+
+                template<typename U,
+                        TURBO_ENABLE_IF(std::is_enum<U>::value)>
+                static auto map(U *) -> decltype(format_as(turbo::nameof_enum<U>()));
 
                 static auto map(...) -> void;
 
@@ -1193,7 +1153,7 @@ namespace turbo {
                 }
 
                 template<typename T, typename U = turbo::remove_cvref_t<T>,
-                        TURBO_ENABLE_IF((std::is_class<U>::value || std::is_enum<U>::value ||
+                        TURBO_ENABLE_IF((std::is_class<U>::value ||
                                        std::is_union<U>::value) &&
                                       !is_string<U>::value && !is_char<U>::value &&
                                       !is_named_arg<U>::value &&
@@ -1201,6 +1161,16 @@ namespace turbo {
                 constexpr TURBO_FORCE_INLINE auto map(T &&val)
                 -> decltype(this->do_map(std::forward<T>(val))) {
                     return do_map(std::forward<T>(val));
+                }
+
+                template<typename T, typename U = turbo::remove_cvref_t<T>,
+                        TURBO_ENABLE_IF(std::is_enum<U>::value &&
+                                        !is_string<U>::value && !is_char<U>::value &&
+                                        !is_named_arg<U>::value &&
+                                        !std::is_arithmetic<format_as_t<U>>::value)>
+                constexpr TURBO_FORCE_INLINE auto map(T &&val)
+                -> decltype(turbo::nameof_enum(std::forward<T>(val))) {
+                    return turbo::nameof_enum(std::forward<T>(val));
                 }
 
                 template<typename T, TURBO_ENABLE_IF(is_named_arg<T>::value)>
@@ -1231,15 +1201,15 @@ namespace turbo {
             enum : unsigned long long {
                 has_named_args_bit = 1ULL << 62
             };
-        }  // namespace detail
+        }  // namespace fmt_detail
 
         // An output iterator that appends to a buffer.
         // It is used to reduce symbol sizes for the common case.
-        class appender : public std::back_insert_iterator<detail::buffer<char>> {
-            using base = std::back_insert_iterator<detail::buffer<char>>;
+        class appender : public std::back_insert_iterator<fmt_detail::buffer<char>> {
+            using base = std::back_insert_iterator<fmt_detail::buffer<char>>;
 
         public:
-            using std::back_insert_iterator<detail::buffer<char>>::back_insert_iterator;
+            using std::back_insert_iterator<fmt_detail::buffer<char>>::back_insert_iterator;
 
             appender(base it) noexcept: base(it) {}
 
@@ -1255,11 +1225,11 @@ namespace turbo {
         template<typename Context>
         class basic_format_arg {
         private:
-            detail::value<Context> value_;
-            detail::type type_;
+            fmt_detail::value<Context> value_;
+            fmt_detail::type type_;
 
             template<typename ContextType, typename T>
-            friend constexpr auto detail::make_arg(T &&value)
+            friend constexpr auto fmt_detail::make_arg(T &&value)
             -> basic_format_arg<ContextType>;
 
             template<typename Visitor, typename Ctx>
@@ -1275,15 +1245,15 @@ namespace turbo {
 
             template<typename T, typename Char, size_t NUM_ARGS, size_t NUM_NAMED_ARGS>
             friend
-            struct detail::arg_data;
+            struct fmt_detail::arg_data;
 
-            basic_format_arg(const detail::named_arg_info<char_type> *args, size_t size)
+            basic_format_arg(const fmt_detail::named_arg_info<char_type> *args, size_t size)
                     : value_(args, size) {}
 
         public:
             class handle {
             public:
-                explicit handle(detail::custom_value<Context> custom) : custom_(custom) {}
+                explicit handle(fmt_detail::custom_value<Context> custom) : custom_(custom) {}
 
                 void format(typename Context::parse_context_type &parse_ctx,
                             Context &ctx) const {
@@ -1291,21 +1261,21 @@ namespace turbo {
                 }
 
             private:
-                detail::custom_value<Context> custom_;
+                fmt_detail::custom_value<Context> custom_;
             };
 
-            constexpr basic_format_arg() : type_(detail::type::none_type) {}
+            constexpr basic_format_arg() : type_(fmt_detail::type::none_type) {}
 
             constexpr explicit operator bool() const noexcept {
-                return type_ != detail::type::none_type;
+                return type_ != fmt_detail::type::none_type;
             }
 
-            auto type() const -> detail::type { return type_; }
+            auto type() const -> fmt_detail::type { return type_; }
 
-            auto is_integral() const -> bool { return detail::is_integral_type(type_); }
+            auto is_integral() const -> bool { return fmt_detail::is_integral_type(type_); }
 
             auto is_arithmetic() const -> bool {
-                return detail::is_arithmetic_type(type_);
+                return fmt_detail::is_arithmetic_type(type_);
             }
         };
 
@@ -1320,44 +1290,44 @@ namespace turbo {
         constexpr TURBO_FORCE_INLINE auto visit_format_arg(
                 Visitor &&vis, const basic_format_arg<Context> &arg) -> decltype(vis(0)) {
             switch (arg.type_) {
-                case detail::type::none_type:
+                case fmt_detail::type::none_type:
                     break;
-                case detail::type::int_type:
+                case fmt_detail::type::int_type:
                     return vis(arg.value_.int_value);
-                case detail::type::uint_type:
+                case fmt_detail::type::uint_type:
                     return vis(arg.value_.uint_value);
-                case detail::type::long_long_type:
+                case fmt_detail::type::long_long_type:
                     return vis(arg.value_.long_long_value);
-                case detail::type::ulong_long_type:
+                case fmt_detail::type::ulong_long_type:
                     return vis(arg.value_.ulong_long_value);
-                case detail::type::int128_type:
-                    return vis(detail::convert_for_visit(arg.value_.int128_value));
-                case detail::type::uint128_type:
-                    return vis(detail::convert_for_visit(arg.value_.uint128_value));
-                case detail::type::bool_type:
+                case fmt_detail::type::int128_type:
+                    return vis(fmt_detail::convert_for_visit(arg.value_.int128_value));
+                case fmt_detail::type::uint128_type:
+                    return vis(fmt_detail::convert_for_visit(arg.value_.uint128_value));
+                case fmt_detail::type::bool_type:
                     return vis(arg.value_.bool_value);
-                case detail::type::char_type:
+                case fmt_detail::type::char_type:
                     return vis(arg.value_.char_value);
-                case detail::type::float_type:
+                case fmt_detail::type::float_type:
                     return vis(arg.value_.float_value);
-                case detail::type::double_type:
+                case fmt_detail::type::double_type:
                     return vis(arg.value_.double_value);
-                case detail::type::long_double_type:
+                case fmt_detail::type::long_double_type:
                     return vis(arg.value_.long_double_value);
-                case detail::type::cstring_type:
+                case fmt_detail::type::cstring_type:
                     return vis(arg.value_.string.data);
-                case detail::type::string_type:
+                case fmt_detail::type::string_type:
                     using sv = std::basic_string_view<typename Context::char_type>;
                     return vis(sv(arg.value_.string.data, arg.value_.string.size));
-                case detail::type::pointer_type:
+                case fmt_detail::type::pointer_type:
                     return vis(arg.value_.pointer);
-                case detail::type::custom_type:
+                case fmt_detail::type::custom_type:
                     return vis(typename basic_format_arg<Context>::handle(arg.value_.custom));
             }
             return vis(monostate());
         }
 
-        namespace detail {
+        namespace fmt_detail {
 
             template<typename Char, typename InputIt>
             auto copy_str(InputIt begin, InputIt end, appender out) -> appender {
@@ -1367,7 +1337,7 @@ namespace turbo {
 
             template<typename Char, typename R, typename OutputIt>
             constexpr auto copy_str(R &&rng, OutputIt out) -> OutputIt {
-                return detail::copy_str<Char>(rng.begin(), rng.end(), out);
+                return fmt_detail::copy_str<Char>(rng.begin(), rng.end(), out);
             }
 
             template<typename...> using void_t = void;
@@ -1478,7 +1448,7 @@ namespace turbo {
             constexpr inline auto make_arg(T &&value) -> basic_format_arg<Context> {
                 return make_arg < Context > (value);
             }
-        }  // namespace detail
+        }  // namespace fmt_detail
 
         // Formatting context.
         template<typename OutputIt, typename Char>
@@ -1486,7 +1456,7 @@ namespace turbo {
         private:
             OutputIt out_;
             basic_format_args<basic_format_context> args_;
-            detail::locale_ref loc_;
+            fmt_detail::locale_ref loc_;
 
         public:
             using iterator = OutputIt;
@@ -1509,7 +1479,7 @@ namespace turbo {
               are stored in the object so make sure they have appropriate lifetimes.
              */
             constexpr basic_format_context(OutputIt out, format_args ctx_args,
-                                           detail::locale_ref loc = {})
+                                           fmt_detail::locale_ref loc = {})
                     : out_(out), args_(ctx_args), loc_(loc) {}
 
             constexpr auto arg(int id) const -> format_arg { return args_.get(id); }
@@ -1524,7 +1494,7 @@ namespace turbo {
 
             auto args() const -> const format_args & { return args_; }
 
-            constexpr auto error_handler() -> detail::error_handler { return {}; }
+            constexpr auto error_handler() -> fmt_detail::error_handler { return {}; }
 
             void on_error(const char *message) { error_handler().on_error(message); }
 
@@ -1533,20 +1503,20 @@ namespace turbo {
 
             // Advances the begin iterator to ``it``.
             void advance_to(iterator it) {
-                if (!detail::is_back_insert_iterator<iterator>()) out_ = it;
+                if (!fmt_detail::is_back_insert_iterator<iterator>()) out_ = it;
             }
 
-            constexpr auto locale() -> detail::locale_ref { return loc_; }
+            constexpr auto locale() -> fmt_detail::locale_ref { return loc_; }
         };
 
         template<typename Char>
         using buffer_context =
-                basic_format_context<detail::buffer_appender<Char>, Char>;
+                basic_format_context<fmt_detail::buffer_appender<Char>, Char>;
         using format_context = buffer_context<char>;
 
         template<typename T, typename Char = char>
         using is_formattable = std::bool_constant<!std::is_base_of<
-                detail::unformattable, decltype(detail::arg_mapper<buffer_context<Char>>()
+                fmt_detail::unformattable, decltype(fmt_detail::arg_mapper<buffer_context<Char>>()
                         .map(std::declval<T>()))>::value>;
 
         /**
@@ -1560,33 +1530,33 @@ namespace turbo {
         class format_arg_store {
         private:
             static const size_t num_args = sizeof...(Args);
-            static const size_t num_named_args = detail::count_named_args<Args...>();
-            static const bool is_packed = num_args <= detail::max_packed_args;
+            static const size_t num_named_args = fmt_detail::count_named_args<Args...>();
+            static const bool is_packed = num_args <= fmt_detail::max_packed_args;
 
-            using value_type = std::conditional_t<is_packed, detail::value<Context>,
+            using value_type = std::conditional_t<is_packed, fmt_detail::value<Context>,
                     basic_format_arg<Context>>;
 
-            detail::arg_data<value_type, typename Context::char_type, num_args,
+            fmt_detail::arg_data<value_type, typename Context::char_type, num_args,
                     num_named_args>
                     data_;
 
             friend class basic_format_args<Context>;
 
             static constexpr unsigned long long desc =
-                    (is_packed ? detail::encode_types<Context, Args...>()
-                               : detail::is_unpacked_bit | num_args) |
+                    (is_packed ? fmt_detail::encode_types<Context, Args...>()
+                               : fmt_detail::is_unpacked_bit | num_args) |
                     (num_named_args != 0
-                     ? static_cast<unsigned long long>(detail::has_named_args_bit)
+                     ? static_cast<unsigned long long>(fmt_detail::has_named_args_bit)
                      : 0);
 
         public:
             template<typename... T>
             constexpr TURBO_FORCE_INLINE format_arg_store(T &&... args)
-                    : data_{detail::make_arg<
+                    : data_{fmt_detail::make_arg<
                             is_packed, Context,
-                            detail::mapped_type_constant<turbo::remove_cvref_t<T>, Context>::value>(
+                            fmt_detail::mapped_type_constant<turbo::remove_cvref_t<T>, Context>::value>(
                             TURBO_FORWARD(args))...} {
-                detail::init_named_args(data_.named_args(), 0, 0, args...);
+                fmt_detail::init_named_args(data_.named_args(), 0, 0, args...);
             }
         };
 
@@ -1616,8 +1586,8 @@ namespace turbo {
           \endrst
          */
         template<typename Char, typename T>
-        inline auto arg(const Char *name, const T &arg) -> detail::named_arg<Char, T> {
-            static_assert(!detail::is_named_arg<T>(), "nested named arguments");
+        inline auto arg(const Char *name, const T &arg) -> fmt_detail::named_arg<Char, T> {
+            static_assert(!fmt_detail::is_named_arg<T>(), "nested named arguments");
             return {name, arg};
         }
 
@@ -1649,26 +1619,26 @@ namespace turbo {
                 // locality and reduce compiled code size since storing larger objects
                 // may require more code (at least on x86-64) even if the same amount of
                 // data is actually copied to stack. It saves ~10% on the bloat test.
-                const detail::value<Context> *values_;
+                const fmt_detail::value<Context> *values_;
                 const format_arg *args_;
             };
 
             constexpr auto is_packed() const -> bool {
-                return (desc_ & detail::is_unpacked_bit) == 0;
+                return (desc_ & fmt_detail::is_unpacked_bit) == 0;
             }
 
             auto has_named_args() const -> bool {
-                return (desc_ & detail::has_named_args_bit) != 0;
+                return (desc_ & fmt_detail::has_named_args_bit) != 0;
             }
 
-            constexpr auto type(int index) const -> detail::type {
-                int shift = index * detail::packed_arg_bits;
-                unsigned int mask = (1 << detail::packed_arg_bits) - 1;
-                return static_cast<detail::type>((desc_ >> shift) & mask);
+            constexpr auto type(int index) const -> fmt_detail::type {
+                int shift = index * fmt_detail::packed_arg_bits;
+                unsigned int mask = (1 << fmt_detail::packed_arg_bits) - 1;
+                return static_cast<fmt_detail::type>((desc_ >> shift) & mask);
             }
 
             constexpr TURBO_FORCE_INLINE basic_format_args(unsigned long long desc,
-                                                           const detail::value<Context> *values)
+                                                           const fmt_detail::value<Context> *values)
                     : desc_(desc), values_(values) {}
 
             constexpr basic_format_args(unsigned long long desc, const format_arg *args)
@@ -1704,7 +1674,7 @@ namespace turbo {
              \endrst
              */
             constexpr basic_format_args(const format_arg *args, int count)
-                    : basic_format_args(detail::is_unpacked_bit | turbo::to_unsigned(count),
+                    : basic_format_args(fmt_detail::is_unpacked_bit | turbo::to_unsigned(count),
                                         args) {}
 
             /** Returns the argument with the specified id. */
@@ -1714,9 +1684,9 @@ namespace turbo {
                     if (id < max_size()) arg = args_[id];
                     return arg;
                 }
-                if (id >= detail::max_packed_args) return arg;
+                if (id >= fmt_detail::max_packed_args) return arg;
                 arg.type_ = type(id);
-                if (arg.type_ == detail::type::none_type) return arg;
+                if (arg.type_ == fmt_detail::type::none_type) return arg;
                 arg.value_ = values_[id];
                 return arg;
             }
@@ -1739,9 +1709,9 @@ namespace turbo {
             }
 
             auto max_size() const -> int {
-                unsigned long long max_packed = detail::max_packed_args;
+                unsigned long long max_packed = fmt_detail::max_packed_args;
                 return static_cast<int>(is_packed() ? max_packed
-                                                    : desc_ & ~detail::is_unpacked_bit);
+                                                    : desc_ & ~fmt_detail::is_unpacked_bit);
             }
         };
 
@@ -1773,7 +1743,7 @@ namespace turbo {
         }
         using sign_t = sign::type;
 
-        namespace detail {
+        namespace fmt_detail {
 
             // Workaround an array initialization issue in gcc 4.8.
             template<typename Char>
@@ -1803,7 +1773,7 @@ namespace turbo {
                     return data_[index];
                 }
             };
-        }  // namespace detail
+        }  // namespace fmt_detail
 
         enum class presentation_type : unsigned char {
             none,
@@ -1837,7 +1807,7 @@ namespace turbo {
             sign_t sign: 3;
             bool alt: 1;  // Alternate form ('#').
             bool localized: 1;
-            detail::fill_t<Char> fill;
+            fmt_detail::fill_t<Char> fill;
 
             constexpr format_specs()
                     : width(0),
@@ -1849,7 +1819,7 @@ namespace turbo {
                       localized(false) {}
         };
 
-        namespace detail {
+        namespace fmt_detail {
 
             enum class arg_id_kind {
                 none, index, name
@@ -1895,11 +1865,6 @@ namespace turbo {
 
             // Converts a character to ASCII. Returns '\0' on conversion failure.
             template<typename Char, TURBO_ENABLE_IF(std::is_integral<Char>::value)>
-            constexpr auto to_ascii(Char c) -> char {
-                return c <= 0xff ? static_cast<char>(c) : '\0';
-            }
-
-            template<typename Char, TURBO_ENABLE_IF(std::is_enum<Char>::value)>
             constexpr auto to_ascii(Char c) -> char {
                 return c <= 0xff ? static_cast<char>(c) : '\0';
             }
@@ -2488,31 +2453,31 @@ namespace turbo {
             inline void vprint_mojibake(std::FILE *, std::string_view, format_args) {}
 
 #endif
-        }  // namespace detail
+        }  // namespace fmt_detail
 
 
         // A formatter specialization for natively supported types.
         template<typename T, typename Char>
         struct formatter<T, Char,
-                std::enable_if_t<detail::type_constant<T, Char>::value !=
-                            detail::type::custom_type>> {
+                std::enable_if_t<fmt_detail::type_constant<T, Char>::value !=
+                            fmt_detail::type::custom_type>> {
         private:
-            detail::dynamic_format_specs<Char> specs_;
+            fmt_detail::dynamic_format_specs<Char> specs_;
 
         public:
             template<typename ParseContext>
             constexpr auto parse(ParseContext &ctx) -> const Char * {
-                auto type = detail::type_constant<T, Char>::value;
+                auto type = fmt_detail::type_constant<T, Char>::value;
                 auto end =
-                        detail::parse_format_specs(ctx.begin(), ctx.end(), specs_, ctx, type);
-                if (type == detail::type::char_type) detail::check_char_specs(specs_);
+                        fmt_detail::parse_format_specs(ctx.begin(), ctx.end(), specs_, ctx, type);
+                if (type == fmt_detail::type::char_type) fmt_detail::check_char_specs(specs_);
                 return end;
             }
 
-            template<detail::type U = detail::type_constant<T, Char>::value,
-                    TURBO_ENABLE_IF(U == detail::type::string_type ||
-                                  U == detail::type::cstring_type ||
-                                  U == detail::type::char_type)>
+            template<fmt_detail::type U = fmt_detail::type_constant<T, Char>::value,
+                    TURBO_ENABLE_IF(U == fmt_detail::type::string_type ||
+                                  U == fmt_detail::type::cstring_type ||
+                                  U == fmt_detail::type::char_type)>
             constexpr void set_debug_format(bool set = true) {
                 specs_.type = set ? presentation_type::debug : presentation_type::none;
             }
@@ -2567,19 +2532,19 @@ namespace turbo {
                             std::is_convertible<const S &, std::basic_string_view<Char>>::value)>
             TURBO_CONSTEVAL TURBO_FORCE_INLINE basic_format_string(const S &s) : str_(s) {
                 static_assert(
-                        detail::count<
-                                (std::is_base_of<detail::view, std::remove_reference_t<Args>>::value &&
+                        fmt_detail::count<
+                                (std::is_base_of<fmt_detail::view, std::remove_reference_t<Args>>::value &&
                                  std::is_reference<Args>::value)...>() == 0,
                         "passing views as lvalues is disallowed");
 #ifdef TURBO_HAS_CONSTEVAL
-                if constexpr (detail::count_named_args<Args...>() ==
-                              detail::count_statically_named_args<Args...>()) {
+                if constexpr (fmt_detail::count_named_args<Args...>() ==
+                              fmt_detail::count_statically_named_args<Args...>()) {
                   using checker =
-                      detail::format_string_checker<Char, turbo::remove_cvref_t<Args>...>;
-                  detail::parse_format_string<true>(str_, checker(s));
+                      fmt_detail::format_string_checker<Char, turbo::remove_cvref_t<Args>...>;
+                  fmt_detail::parse_format_string<true>(str_, checker(s));
                 }
 #else
-                detail::check_format_string<Args...>(s);
+                fmt_detail::check_format_string<Args...>(s);
 #endif
             }
 
@@ -2610,11 +2575,11 @@ namespace turbo {
 
         /** Formats a string and writes the output to ``out``. */
         template<typename OutputIt,
-                TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
+                TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, char>::value)>
         auto vformat_to(OutputIt out, std::string_view fmt, format_args args) -> OutputIt {
-            auto &&buf = detail::get_buffer<char>(out);
-            detail::vformat_to(buf, fmt, args, {});
-            return detail::get_iterator(buf, out);
+            auto &&buf = fmt_detail::get_buffer<char>(out);
+            fmt_detail::vformat_to(buf, fmt, args, {});
+            return fmt_detail::get_iterator(buf, out);
         }
 
         /**
@@ -2630,7 +2595,7 @@ namespace turbo {
          \endrst
          */
         template<typename OutputIt, typename... T,
-                TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
+                TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, char>::value)>
         TURBO_FORCE_INLINE auto format_to(OutputIt out, format_string<T...> fmt, T &&... args)
         -> OutputIt {
             return vformat_to(out, fmt, turbo::make_format_args(args...));
@@ -2645,12 +2610,12 @@ namespace turbo {
         };
 
         template<typename OutputIt, typename... T,
-                TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
+                TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, char>::value)>
         auto vformat_to_n(OutputIt out, size_t n, std::string_view fmt, format_args args)
         -> format_to_n_result<OutputIt> {
-            using traits = detail::fixed_buffer_traits;
-            auto buf = detail::iterator_buffer<OutputIt, char, traits>(out, n);
-            detail::vformat_to(buf, fmt, args, {});
+            using traits = fmt_detail::fixed_buffer_traits;
+            auto buf = fmt_detail::iterator_buffer<OutputIt, char, traits>(out, n);
+            fmt_detail::vformat_to(buf, fmt, args, {});
             return {buf.out(), buf.count()};
         }
 
@@ -2663,7 +2628,7 @@ namespace turbo {
           \endrst
          */
         template<typename OutputIt, typename... T,
-                TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value)>
+                TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, char>::value)>
         TURBO_FORCE_INLINE auto format_to_n(OutputIt out, size_t n, format_string<T...> fmt,
                                             T &&... args) -> format_to_n_result<OutputIt> {
             return vformat_to_n(out, n, fmt, turbo::make_format_args(args...));
@@ -2673,8 +2638,8 @@ namespace turbo {
         template<typename... T>
         [[nodiscard]] TURBO_FORCE_INLINE auto formatted_size(format_string<T...> fmt,
                                                              T &&... args) -> size_t {
-            auto buf = detail::counting_buffer<>();
-            detail::vformat_to<char>(buf, fmt, turbo::make_format_args(args...), {});
+            auto buf = fmt_detail::counting_buffer<>();
+            fmt_detail::vformat_to<char>(buf, fmt, turbo::make_format_args(args...), {});
             return buf.count();
         }
 

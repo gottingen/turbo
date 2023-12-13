@@ -77,7 +77,7 @@ export module fmt;
 #define TURBO_END_EXPORT }
 #define FMT_BEGIN_DETAIL_NAMESPACE \
   }                                \
-  namespace detail {
+  namespace fmt_detail {
 #define FMT_END_DETAIL_NAMESPACE \
   }                              \
   export {

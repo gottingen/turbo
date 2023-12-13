@@ -1219,10 +1219,10 @@ namespace turbo {
 
                     // Contains address of all data edges
                     EXPECT_THAT(
-                            str, AllOf(HasSubstr(turbo::format("{}", turbo::Ptr(flat))),
-                                       HasSubstr(turbo::format("{}", turbo::Ptr(external))),
-                                       HasSubstr(turbo::format("{}", turbo::Ptr(substr_flat))),
-                                       HasSubstr(turbo::format("{}", turbo::Ptr(substr_external)))));
+                            str, AllOf(HasSubstr(turbo::format("{}", turbo::ptr(flat))),
+                                       HasSubstr(turbo::format("{}", turbo::ptr(external))),
+                                       HasSubstr(turbo::format("{}", turbo::ptr(substr_flat))),
+                                       HasSubstr(turbo::format("{}", turbo::ptr(substr_external)))));
 
                     if (api != 0) {
                         // Contains label

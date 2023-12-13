@@ -98,13 +98,13 @@ using TestParams = std::vector<TestParam>;
 
 // Matcher validating when mutable copies are required / performed.
 MATCHER_P2(EqIfPrivate, param, rep,
-           turbo::format("Equal {} if private", turbo::Ptr(rep))) {
+           turbo::format("Equal {} if private", turbo::ptr(rep))) {
   return param.refcount_is_one ? arg == rep : true;
 }
 
 // Matcher validating when mutable copies are required / performed.
 MATCHER_P2(EqIfPrivateAndCapacity, param, rep,
-           turbo::format("Equal {} if private and capacity", turbo::Ptr(rep))) {
+           turbo::format("Equal {} if private and capacity", turbo::ptr(rep))) {
   return (param.refcount_is_one && param.with_capacity) ? arg == rep : true;
 }
 
@@ -112,7 +112,7 @@ MATCHER_P2(EqIfPrivateAndCapacity, param, rep,
 // tests doing exactly one update as subsequent updates could return the
 // original (freed and re-used) pointer.
 MATCHER_P2(NeIfShared, param, rep,
-           turbo::format("Not equal {} if shared", turbo::Ptr(rep))) {
+           turbo::format("Not equal {} if shared", turbo::ptr(rep))) {
   return param.refcount_is_one ? true : arg != rep;
 }
 

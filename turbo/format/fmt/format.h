@@ -54,16 +54,16 @@
 #  if TURBO_HAVE_EXCEPTIONS
 #    if TURBO_MSC_VERSION || defined(__NVCC__)
                                                                                                                         FMT_BEGIN_NAMESPACE
-namespace detail {
+namespace fmt_detail {
 template <typename Exception> inline void do_throw(const Exception& x) {
   // Silence unreachable code warnings in MSVC and NVCC because these
   // are nearly impossible to fix in a generic code.
   volatile bool b = true;
   if (b) throw x;
 }
-}  // namespace detail
+}  // namespace fmt_detail
 FMT_END_NAMESPACE
-#      define FMT_THROW(x) detail::do_throw(x)
+#      define FMT_THROW(x) fmt_detail::do_throw(x)
 #    else
 #      define FMT_THROW(x) throw x
 #    endif
@@ -116,7 +116,7 @@ namespace turbo {
             : std::conditional_t<bool(P1::value), conjunction<Pn...>, P1> {
     };
 
-    namespace detail {
+    namespace fmt_detail {
 
         constexpr inline void abort_fuzzing_if(bool condition) {
             turbo::ignore_unused(condition);
@@ -747,7 +747,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         template<typename T>
         struct is_locale<T, void_t<decltype(T::classic())>> : std::true_type {
         };
-    }  // namespace detail
+    }  // namespace fmt_detail
 
 
 // The number of characters to store in the basic_memory_buffer object itself
@@ -779,7 +779,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
  */
     template<typename T, size_t SIZE = inline_buffer_size,
             typename Allocator = std::allocator<T>>
-    class basic_memory_buffer final : public detail::buffer<T> {
+    class basic_memory_buffer final : public fmt_detail::buffer<T> {
     private:
         T store_[SIZE];
 
@@ -794,7 +794,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
     protected:
         TURBO_CONSTEXPR20 void grow(size_t size) override {
-            detail::abort_fuzzing_if(size > 5000);
+            fmt_detail::abort_fuzzing_if(size > 5000);
             const size_t max_size = std::allocator_traits<Allocator>::max_size(alloc_);
             size_t old_capacity = this->capacity();
             size_t new_capacity = old_capacity + old_capacity / 2;
@@ -807,7 +807,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                     std::allocator_traits<Allocator>::allocate(alloc_, new_capacity);
             // The following code doesn't throw, so the raw pointer above doesn't leak.
             std::uninitialized_copy(old_data, old_data + this->size(),
-                                    detail::make_checked(new_data, new_capacity));
+                                    fmt_detail::make_checked(new_data, new_capacity));
             this->set(new_data, new_capacity);
             // deallocate must not throw according to the standard, but even if it does,
             // the buffer already uses the new storage and will deallocate it in
@@ -823,7 +823,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                 const Allocator &alloc = Allocator())
                 : alloc_(alloc) {
             this->set(store_, SIZE);
-            if (turbo::is_constant_evaluated()) detail::fill_n(store_, SIZE, T());
+            if (turbo::is_constant_evaluated()) fmt_detail::fill_n(store_, SIZE, T());
         }
 
         TURBO_CONSTEXPR20 ~basic_memory_buffer() { deallocate(); }
@@ -836,8 +836,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             size_t size = other.size(), capacity = other.capacity();
             if (data == other.store_) {
                 this->set(store_, capacity);
-                detail::copy_str<T>(other.store_, other.store_ + size,
-                                    detail::make_checked(store_, capacity));
+                fmt_detail::copy_str<T>(other.store_, other.store_ + size,
+                                    fmt_detail::make_checked(store_, capacity));
             } else {
                 this->set(data, capacity);
                 // Set pointer to the inline array so that delete is not called
@@ -884,7 +884,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         void reserve(size_t new_capacity) { this->try_reserve(new_capacity); }
 
         // Directly append data into the buffer
-        using detail::buffer<T>::append;
+        using fmt_detail::buffer<T>::append;
 
         template<typename ContiguousRange>
         void append(const ContiguousRange &range) {
@@ -899,11 +899,11 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
     };
 
 
-    namespace detail {
+    namespace fmt_detail {
         TURBO_DLL bool write_console(std::FILE *f, std::string_view text);
 
         TURBO_DLL void print(std::FILE *, std::string_view);
-    }  // namespace detail
+    }  // namespace fmt_detail
 
 // Suppress a misleading warning in older versions of clang.
 #if TURBO_CLANG_VERSION
@@ -920,7 +920,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 #if TURBO_USE_NONTYPE_TEMPLATE_ARGS
                                                                                                                                 template <typename Char, size_t N> struct fixed_string {
   constexpr fixed_string(const Char (&str)[N]) {
-    detail::copy_str<Char, const Char*, Char*>(static_cast<const Char*>(str),
+    fmt_detail::copy_str<Char, const Char*, Char*>(static_cast<const Char*>(str),
                                                str + N, data);
   }
   Char data[N] = {};
@@ -948,10 +948,10 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         basic_format_arg<format_context> value_;
 
     public:
-        template<typename T, TURBO_ENABLE_IF(!detail::is_float128<T>::value)>
-        loc_value(T value) : value_(detail::make_arg<format_context>(value)) {}
+        template<typename T, TURBO_ENABLE_IF(!fmt_detail::is_float128<T>::value)>
+        loc_value(T value) : value_(fmt_detail::make_arg<format_context>(value)) {}
 
-        template<typename T, TURBO_ENABLE_IF(detail::is_float128<T>::value)>
+        template<typename T, TURBO_ENABLE_IF(fmt_detail::is_float128<T>::value)>
         loc_value(T) {}
 
         template<typename Visitor>
@@ -991,7 +991,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         }
     };
 
-    namespace detail {
+    namespace fmt_detail {
 
         // Returns true if value is negative, false otherwise.
         // Same as `value < 0` but doesn't produce warnings if T is an unsigned type.
@@ -1262,7 +1262,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             // Buffer is large enough to hold all digits (digits10 + 1).
             Char buffer[digits10<UInt>() + 1] = {};
             auto end = format_decimal(buffer, value, size).end;
-            return {out, detail::copy_str_noinline<Char>(buffer, end, out)};
+            return {out, fmt_detail::copy_str_noinline<Char>(buffer, end, out)};
         }
 
         template<unsigned BASE_BITS, typename Char, typename UInt>
@@ -1289,7 +1289,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             // Buffer should be large enough to hold all digits (digits / BASE_BITS + 1).
             char buffer[num_bits<UInt>() / BASE_BITS + 1];
             format_uint < BASE_BITS > (buffer, value, num_digits, upper);
-            return detail::copy_str_noinline<Char>(buffer, buffer + num_digits, out);
+            return fmt_detail::copy_str_noinline<Char>(buffer, buffer + num_digits, out);
         }
 
 // A converter from UTF-8 to UTF-16.
@@ -1478,14 +1478,14 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             struct float_info<T, std::enable_if_t<std::numeric_limits<T>::digits == 64 ||
                                                   std::numeric_limits<T>::digits == 113 ||
                                                   is_float128<T>::value>> {
-                using carrier_uint = detail::uint128_t;
+                using carrier_uint = fmt_detail::uint128_t;
                 static const int exponent_bits = 15;
             };
 
 // A double-double floating point number.
             template<typename T>
             struct float_info<T, std::enable_if_t<is_double_double<T>::value>> {
-                using carrier_uint = detail::uint128_t;
+                using carrier_uint = fmt_detail::uint128_t;
             };
 
             template<typename T>
@@ -1577,7 +1577,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                 // Assume Float is in the format [sign][exponent][significand].
                 using carrier_uint = typename dragonbox::float_info<Float>::carrier_uint;
                 const auto num_float_significand_bits =
-                        detail::num_significand_bits<Float>();
+                        fmt_detail::num_significand_bits<Float>();
                 const auto implicit_bit = carrier_uint(1) << num_float_significand_bits;
                 const auto significand_mask = implicit_bit - 1;
                 auto u = bit_cast<carrier_uint>(n);
@@ -1771,7 +1771,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
         TURBO_NO_INLINE constexpr auto fill(OutputIt it, size_t n,
                                             const fill_t<Char> &fill) -> OutputIt {
             auto fill_size = fill.size();
-            if (fill_size == 1) return detail::fill_n(it, n, fill[0]);
+            if (fill_size == 1) return fmt_detail::fill_n(it, n, fill[0]);
             auto data = fill.data();
             for (size_t i = 0; i < n; ++i)
                 it = copy_str<Char>(data, data + fill_size, it);
@@ -1902,7 +1902,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
     std::string s = turbo::format(FMT_STRING("{:d}"), "foo");
   \endrst
  */
-#define FMT_STRING(s) FMT_STRING_IMPL(s, turbo::detail::compile_string, )
+#define FMT_STRING(s) FMT_STRING_IMPL(s, turbo::compile_string, )
 
         template<size_t width, typename Char, typename OutputIt>
         auto write_codepoint(OutputIt out, char prefix, uint32_t cp) -> OutputIt {
@@ -2058,7 +2058,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                     out, specs, data.size, [=](reserve_iterator<OutputIt> it) {
                         for (unsigned p = prefix & 0xffffff; p != 0; p >>= 8)
                             *it++ = static_cast<Char>(p & 0xff);
-                        it = detail::fill_n(it, data.padding, static_cast<Char>('0'));
+                        it = fmt_detail::fill_n(it, data.padding, static_cast<Char>('0'));
                         return write_digits(it);
                     });
         }
@@ -2479,7 +2479,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                     specs.fill.size() == 1 && *specs.fill.data() == static_cast<Char>('0');
             if (is_zero_fill) specs.fill[0] = static_cast<Char>(' ');
             return write_padded(out, specs, size, [=](reserve_iterator<OutputIt> it) {
-                if (sign) *it++ = detail::sign<Char>(sign);
+                if (sign) *it++ = fmt_detail::sign<Char>(sign);
                 return copy_str<Char>(str, str + str_size, it);
             });
         }
@@ -2518,11 +2518,11 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                                                  const Grouping &grouping) -> OutputIt {
             if (!grouping.has_separator()) {
                 out = write_significand < Char > (out, significand, significand_size);
-                return detail::fill_n(out, exponent, static_cast<Char>('0'));
+                return fmt_detail::fill_n(out, exponent, static_cast<Char>('0'));
             }
             auto buffer = memory_buffer();
             write_significand < char > (appender(buffer), significand, significand_size);
-            detail::fill_n(appender(buffer), exponent, '0');
+            fmt_detail::fill_n(appender(buffer), exponent, '0');
             return grouping.apply(out, std::string_view(buffer.data(), buffer.size()));
         }
 
@@ -2558,18 +2558,18 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             Char buffer[digits10<UInt>() + 2];
             auto end = write_significand(buffer, significand, significand_size,
                                          integral_size, decimal_point);
-            return detail::copy_str_noinline<Char>(buffer, end, out);
+            return fmt_detail::copy_str_noinline<Char>(buffer, end, out);
         }
 
         template<typename OutputIt, typename Char>
         constexpr auto write_significand(OutputIt out, const char *significand,
                                          int significand_size, int integral_size,
                                          Char decimal_point) -> OutputIt {
-            out = detail::copy_str_noinline<Char>(significand,
+            out = fmt_detail::copy_str_noinline<Char>(significand,
                                                   significand + integral_size, out);
             if (!decimal_point) return out;
             *out++ = decimal_point;
-            return detail::copy_str_noinline<Char>(significand + integral_size,
+            return fmt_detail::copy_str_noinline<Char>(significand + integral_size,
                                                    significand + significand_size, out);
         }
 
@@ -2587,7 +2587,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                               significand_size, integral_size, decimal_point);
             grouping.apply(
                     out, std::basic_string_view<Char>(buffer.data(), turbo::to_unsigned(integral_size)));
-            return detail::copy_str_noinline<Char>(buffer.data() + integral_size,
+            return fmt_detail::copy_str_noinline<Char>(buffer.data() + integral_size,
                                                    buffer.end(), out);
         }
 
@@ -2605,7 +2605,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             using iterator = reserve_iterator<OutputIt>;
 
             Char decimal_point =
-                    fspecs.locale ? detail::decimal_point<Char>(loc) : static_cast<Char>('.');
+                    fspecs.locale ? fmt_detail::decimal_point<Char>(loc) : static_cast<Char>('.');
 
             int output_exp = f.exponent + significand_size - 1;
             auto use_exp_format = [=]() {
@@ -2633,11 +2633,11 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                 size += turbo::to_unsigned((decimal_point ? 1 : 0) + 2 + exp_digits);
                 char exp_char = fspecs.upper ? 'E' : 'e';
                 auto write = [=](iterator it) {
-                    if (sign) *it++ = detail::sign<Char>(sign);
+                    if (sign) *it++ = fmt_detail::sign<Char>(sign);
                     // Insert a decimal point after the first digit and add an exponent.
                     it = write_significand(it, significand, significand_size, 1,
                                            decimal_point);
-                    if (num_zeros > 0) it = detail::fill_n(it, num_zeros, zero);
+                    if (num_zeros > 0) it = fmt_detail::fill_n(it, num_zeros, zero);
                     *it++ = static_cast<Char>(exp_char);
                     return write_exponent<Char>(output_exp, it);
                 };
@@ -2659,12 +2659,12 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                 auto grouping = Grouping(loc, fspecs.locale);
                 size += turbo::to_unsigned(grouping.count_separators(exp));
                 return write_padded<align::right>(out, specs, size, [&](iterator it) {
-                    if (sign) *it++ = detail::sign<Char>(sign);
+                    if (sign) *it++ = fmt_detail::sign<Char>(sign);
                     it = write_significand<Char>(it, significand, significand_size,
                                                  f.exponent, grouping);
                     if (!fspecs.showpoint) return it;
                     *it++ = decimal_point;
-                    return num_zeros > 0 ? detail::fill_n(it, num_zeros, zero) : it;
+                    return num_zeros > 0 ? fmt_detail::fill_n(it, num_zeros, zero) : it;
                 });
             } else if (exp > 0) {
                 // 1234e-2 -> 12.34[0+]
@@ -2673,10 +2673,10 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                 auto grouping = Grouping(loc, fspecs.locale);
                 size += turbo::to_unsigned(grouping.count_separators(exp));
                 return write_padded<align::right>(out, specs, size, [&](iterator it) {
-                    if (sign) *it++ = detail::sign<Char>(sign);
+                    if (sign) *it++ = fmt_detail::sign<Char>(sign);
                     it = write_significand(it, significand, significand_size, exp,
                                            decimal_point, grouping);
-                    return num_zeros > 0 ? detail::fill_n(it, num_zeros, zero) : it;
+                    return num_zeros > 0 ? fmt_detail::fill_n(it, num_zeros, zero) : it;
                 });
             }
             // 1234e-6 -> 0.001234
@@ -2688,11 +2688,11 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             bool pointy = num_zeros != 0 || significand_size != 0 || fspecs.showpoint;
             size += 1 + (pointy ? 1 : 0) + turbo::to_unsigned(num_zeros);
             return write_padded<align::right>(out, specs, size, [&](iterator it) {
-                if (sign) *it++ = detail::sign<Char>(sign);
+                if (sign) *it++ = fmt_detail::sign<Char>(sign);
                 *it++ = zero;
                 if (!pointy) return it;
                 *it++ = decimal_point;
-                it = detail::fill_n(it, num_zeros, zero);
+                it = fmt_detail::fill_n(it, num_zeros, zero);
                 return write_significand<Char>(it, significand, significand_size);
             });
         }
@@ -2745,7 +2745,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
         TURBO_CONSTEXPR20 bool isfinite(T value) {
             constexpr T inf = T(std::numeric_limits<double>::infinity());
             if (turbo::is_constant_evaluated())
-                return !detail::isnan(value) && value < inf && value > -inf;
+                return !fmt_detail::isnan(value) && value < inf && value > -inf;
             return std::isfinite(value);
         }
 
@@ -2753,7 +2753,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
         constexpr bool isfinite(T value) {
             T inf = T(std::numeric_limits<double>::infinity());
             // std::isfinite doesn't support __float128.
-            return !detail::isnan(value) && value < inf && value > -inf;
+            return !fmt_detail::isnan(value) && value < inf && value > -inf;
         }
 
         template<typename T, TURBO_ENABLE_IF(is_floating_point<T>::value)>
@@ -2761,7 +2761,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             if (turbo::is_constant_evaluated()) {
 #ifdef __cpp_if_constexpr
                 if constexpr (std::numeric_limits<double>::is_iec559) {
-                    auto bits = detail::bit_cast<uint64_t>(static_cast<double>(value));
+                    auto bits = fmt_detail::bit_cast<uint64_t>(static_cast<double>(value));
                     return (bits >> (num_bits<uint64_t>() - 1)) != 0;
                 }
 #endif
@@ -3357,7 +3357,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             using carrier_uint = typename info::carrier_uint;
 
             constexpr auto num_float_significand_bits =
-                    detail::num_significand_bits<Float>();
+                    fmt_detail::num_significand_bits<Float>();
 
             basic_fp <carrier_uint> f(value);
             f.e += num_float_significand_bits;
@@ -3398,7 +3398,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             }
 
             char xdigits[num_bits<carrier_uint>() / 4];
-            detail::fill_n(xdigits, sizeof(xdigits), '0');
+            fmt_detail::fill_n(xdigits, sizeof(xdigits), '0');
             format_uint<4>(xdigits, f.f, num_xdigits, specs.upper);
 
             // Remove zero tail
@@ -3422,7 +3422,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                 buf.push_back('+');
                 abs_e = static_cast<uint32_t>(f.e);
             }
-            format_decimal<char>(appender(buf), abs_e, detail::count_digits(abs_e));
+            format_decimal<char>(appender(buf), abs_e, fmt_detail::count_digits(abs_e));
         }
 
         template<typename Float, TURBO_ENABLE_IF(is_double_double<Float>::value)>
@@ -3767,19 +3767,19 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
         -> OutputIt {
             float_specs fspecs = parse_float_type_spec(specs);
             fspecs.sign = specs.sign;
-            if (detail::signbit(value)) {  // value < 0 is false for NaN so use signbit.
+            if (fmt_detail::signbit(value)) {  // value < 0 is false for NaN so use signbit.
                 fspecs.sign = sign::minus;
                 value = -value;
             } else if (fspecs.sign == sign::minus) {
                 fspecs.sign = sign::none;
             }
 
-            if (!detail::isfinite(value))
-                return write_nonfinite(out, detail::isnan(value), specs, fspecs);
+            if (!fmt_detail::isfinite(value))
+                return write_nonfinite(out, fmt_detail::isnan(value), specs, fspecs);
 
             if (specs.align == align::numeric && fspecs.sign) {
                 auto it = reserve(out, 1);
-                *it++ = detail::sign<Char>(fspecs.sign);
+                *it++ = fmt_detail::sign<Char>(fspecs.sign);
                 out = base_iterator(out, it);
                 fspecs.sign = sign::none;
                 if (specs.width != 0) --specs.width;
@@ -3787,7 +3787,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
 
             memory_buffer buffer;
             if (fspecs.format == float_format::hex) {
-                if (fspecs.sign) buffer.push_back(detail::sign<char>(fspecs.sign));
+                if (fspecs.sign) buffer.push_back(fmt_detail::sign<char>(fspecs.sign));
                 format_hexfloat(convert_float(value), specs.precision, fspecs, buffer);
                 return write_bytes<align::right>(out, {buffer.data(), buffer.size()},
                                                  specs);
@@ -3827,7 +3827,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             if (const_check(!is_supported_floating_point(value))) return out;
 
             auto fspecs = float_specs();
-            if (detail::signbit(value)) {
+            if (fmt_detail::signbit(value)) {
                 fspecs.sign = sign::minus;
                 value = -value;
             }
@@ -3972,7 +3972,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
 
             template<typename T>
             constexpr TURBO_FORCE_INLINE auto operator()(T value) -> iterator {
-                return detail::write(out, value, specs, locale);
+                return fmt_detail::write(out, value, specs, locale);
             }
 
             auto operator()(typename basic_format_arg<context>::handle) -> iterator {
@@ -4062,11 +4062,11 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                 case arg_id_kind::none:
                     break;
                 case arg_id_kind::index:
-                    value = detail::get_dynamic_spec<Handler>(get_arg(ctx, ref.val.index),
+                    value = fmt_detail::get_dynamic_spec<Handler>(get_arg(ctx, ref.val.index),
                                                               ctx.error_handler());
                     break;
                 case arg_id_kind::name:
-                    value = detail::get_dynamic_spec<Handler>(get_arg(ctx, ref.val.name),
+                    value = fmt_detail::get_dynamic_spec<Handler>(get_arg(ctx, ref.val.name),
                                                               ctx.error_handler());
                     break;
             }
@@ -4127,18 +4127,18 @@ struct udl_arg {
                      basic_format_args<buffer_context<type_identity_t<Char>>> args)
         -> std::basic_string<Char> {
             auto buf = basic_memory_buffer<Char>();
-            detail::vformat_to(buf, fmt, args, detail::locale_ref(loc));
+            fmt_detail::vformat_to(buf, fmt, args, fmt_detail::locale_ref(loc));
             return {buf.data(), buf.size()};
         }
 
-        using format_func = void (*)(detail::buffer<char> &, int, const char *);
+        using format_func = void (*)(fmt_detail::buffer<char> &, int, const char *);
 
         TURBO_DLL void format_error_code(buffer<char> &out, int error_code,
                                          std::string_view message) noexcept;
 
         TURBO_DLL void report_error(format_func func, int error_code,
                                     const char *message) noexcept;
-    } // namespace detail
+    } // namespace fmt_detail
 
     TURBO_DLL auto vsystem_error(int error_code, std::string_view format_str,
                                  format_args args) -> std::system_error;
@@ -4182,7 +4182,7 @@ struct udl_arg {
   *error_code* is a system error code as given by ``errno``.
   \endrst
  */
-    TURBO_DLL void format_system_error(detail::buffer<char> &out, int error_code,
+    TURBO_DLL void format_system_error(fmt_detail::buffer<char> &out, int error_code,
                                        const char *message) noexcept;
 
 // Reports a system error without throwing an exception.
@@ -4202,13 +4202,13 @@ struct udl_arg {
 
         template<typename UInt>
         auto format_unsigned(UInt value) -> char * {
-            auto n = static_cast<detail::uint32_or_64_or_128_t<UInt>>(value);
-            return detail::format_decimal(buffer_, n, buffer_size - 1).begin;
+            auto n = static_cast<fmt_detail::uint32_or_64_or_128_t<UInt>>(value);
+            return fmt_detail::format_decimal(buffer_, n, buffer_size - 1).begin;
         }
 
         template<typename Int>
         auto format_signed(Int value) -> char * {
-            auto abs_value = static_cast<detail::uint32_or_64_or_128_t<Int>>(value);
+            auto abs_value = static_cast<fmt_detail::uint32_or_64_or_128_t<Int>>(value);
             bool negative = value < 0;
             if (negative) abs_value = 0 - abs_value;
             auto begin = format_unsigned(abs_value);
@@ -4259,9 +4259,9 @@ struct udl_arg {
     };
 
     template<typename T, typename Char>
-    struct formatter<T, Char, std::enable_if_t<detail::has_format_as<T>::value>>
-            : private formatter<detail::format_as_t<T>> {
-        using base = formatter<detail::format_as_t<T>>;
+    struct formatter<T, Char, std::enable_if_t<fmt_detail::has_format_as<T>::value>>
+            : private formatter<fmt_detail::format_as_t<T>> {
+        using base = formatter<fmt_detail::format_as_t<T>>;
         using base::parse;
 
         template<typename FormatContext>
@@ -4299,7 +4299,7 @@ struct udl_arg {
     template<typename T>
     auto ptr(T p) -> const void * {
         static_assert(std::is_pointer<T>::value, "");
-        return detail::bit_cast<const void *>(p);
+        return fmt_detail::bit_cast<const void *>(p);
     }
 
     template<typename T, typename Deleter>
@@ -4339,22 +4339,22 @@ struct udl_arg {
     template<>
     struct formatter<bytes> {
     private:
-        detail::dynamic_format_specs<> specs_;
+        fmt_detail::dynamic_format_specs<> specs_;
 
     public:
         template<typename ParseContext>
         constexpr auto parse(ParseContext &ctx) -> const char * {
             return parse_format_specs(ctx.begin(), ctx.end(), specs_, ctx,
-                                      detail::type::string_type);
+                                      fmt_detail::type::string_type);
         }
 
         template<typename FormatContext>
         auto format(bytes b, FormatContext &ctx) -> decltype(ctx.out()) {
-            detail::handle_dynamic_spec<detail::width_checker>(specs_.width,
+            fmt_detail::handle_dynamic_spec<fmt_detail::width_checker>(specs_.width,
                                                                specs_.width_ref, ctx);
-            detail::handle_dynamic_spec<detail::precision_checker>(
+            fmt_detail::handle_dynamic_spec<fmt_detail::precision_checker>(
                     specs_.precision, specs_.precision_ref, ctx);
-            return detail::write_bytes(ctx.out(), b.data_, specs_);
+            return fmt_detail::write_bytes(ctx.out(), b.data_, specs_);
         }
     };
 
@@ -4383,31 +4383,31 @@ struct udl_arg {
     template<typename T>
     struct formatter<group_digits_view<T>> : formatter<T> {
     private:
-        detail::dynamic_format_specs<> specs_;
+        fmt_detail::dynamic_format_specs<> specs_;
 
     public:
         template<typename ParseContext>
         constexpr auto parse(ParseContext &ctx) -> const char * {
             return parse_format_specs(ctx.begin(), ctx.end(), specs_, ctx,
-                                      detail::type::int_type);
+                                      fmt_detail::type::int_type);
         }
 
         template<typename FormatContext>
         auto format(group_digits_view<T> t, FormatContext &ctx)
         -> decltype(ctx.out()) {
-            detail::handle_dynamic_spec<detail::width_checker>(specs_.width,
+            fmt_detail::handle_dynamic_spec<fmt_detail::width_checker>(specs_.width,
                                                                specs_.width_ref, ctx);
-            detail::handle_dynamic_spec<detail::precision_checker>(
+            fmt_detail::handle_dynamic_spec<fmt_detail::precision_checker>(
                     specs_.precision, specs_.precision_ref, ctx);
-            return detail::write_int(
-                    ctx.out(), static_cast<detail::uint64_or_128_t<T>>(t.value), 0, specs_,
-                    detail::digit_grouping<char>("\3", ","));
+            return fmt_detail::write_int(
+                    ctx.out(), static_cast<fmt_detail::uint64_or_128_t<T>>(t.value), 0, specs_,
+                    fmt_detail::digit_grouping<char>("\3", ","));
         }
     };
 
 // DEPRECATED! join_view will be moved to ranges.h.
     template<typename It, typename Sentinel, typename Char = char>
-    struct join_view : detail::view {
+    struct join_view : fmt_detail::view {
         It begin;
         Sentinel end;
         std::basic_string_view<Char> sep;
@@ -4442,7 +4442,7 @@ struct udl_arg {
                 out = value_formatter_.format(*it, ctx);
                 ++it;
                 while (it != value.end) {
-                    out = detail::copy_str<Char>(value.sep.begin(), value.sep.end(), out);
+                    out = fmt_detail::copy_str<Char>(value.sep.begin(), value.sep.end(), out);
                     ctx.advance_to(out);
                     out = value_formatter_.format(*it, ctx);
                     ++it;
@@ -4479,7 +4479,7 @@ struct udl_arg {
  */
     template<typename Range>
     auto join(Range &&range, std::string_view sep)
-    -> join_view<detail::iterator_t<Range>, detail::sentinel_t<Range>> {
+    -> join_view<fmt_detail::iterator_t<Range>, fmt_detail::sentinel_t<Range>> {
         return join(std::begin(range), std::end(range), sep);
     }
 
@@ -4497,7 +4497,7 @@ struct udl_arg {
     template<typename T, TURBO_ENABLE_IF(!std::is_integral<T>::value)>
     inline auto to_string(const T &value) -> std::string {
         auto buffer = memory_buffer();
-        detail::write<char>(appender(buffer), value);
+        fmt_detail::write<char>(appender(buffer), value);
         return {buffer.data(), buffer.size()};
     }
 
@@ -4505,21 +4505,21 @@ struct udl_arg {
     [[nodiscard]] inline auto to_string(T value) -> std::string {
         // The buffer should be large enough to store the number including the sign
         // or "false" for bool.
-        constexpr int max_size = detail::digits10<T>() + 2;
+        constexpr int max_size = fmt_detail::digits10<T>() + 2;
         char buffer[max_size > 5 ? static_cast<unsigned>(max_size) : 5];
         char *begin = buffer;
-        return std::string(begin, detail::write<char>(begin, value));
+        return std::string(begin, fmt_detail::write<char>(begin, value));
     }
 
     template<typename Char, size_t SIZE>
     [[nodiscard]] auto to_string(const basic_memory_buffer<Char, SIZE> &buf)
     -> std::basic_string<Char> {
         auto size = buf.size();
-        detail::assume(size < std::basic_string<Char>().max_size());
+        fmt_detail::assume(size < std::basic_string<Char>().max_size());
         return std::basic_string<Char>(buf.data(), size);
     }
 
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename Char>
         void vformat_to(buffer<Char> &buf, std::basic_string_view<Char> fmt,
@@ -4576,11 +4576,11 @@ struct udl_arg {
                         visit_format_arg(custom_formatter<Char>{parse_context, context}, arg);
                         return parse_context.begin();
                     }
-                    auto specs = detail::dynamic_format_specs<Char>();
+                    auto specs = fmt_detail::dynamic_format_specs<Char>();
                     begin = parse_format_specs(begin, end, specs, parse_context, arg.type());
-                    detail::handle_dynamic_spec<detail::width_checker>(
+                    fmt_detail::handle_dynamic_spec<fmt_detail::width_checker>(
                             specs.width, specs.width_ref, context);
-                    detail::handle_dynamic_spec<detail::precision_checker>(
+                    fmt_detail::handle_dynamic_spec<fmt_detail::precision_checker>(
                             specs.precision, specs.precision_ref, context);
                     if (begin == end || *begin != '}')
                         on_error("missing '}' in format string");
@@ -4589,7 +4589,7 @@ struct udl_arg {
                     return begin;
                 }
             };
-            detail::parse_format_string<false>(fmt, format_handler(out, fmt, args, loc));
+            fmt_detail::parse_format_string<false>(fmt, format_handler(out, fmt, args, loc));
         }
 
 
@@ -4608,7 +4608,7 @@ struct udl_arg {
         extern template TURBO_DLL auto decimal_point_impl(locale_ref) -> wchar_t;
 
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     inline namespace literals {
 /**
@@ -4624,51 +4624,51 @@ struct udl_arg {
 #  if TURBO_USE_NONTYPE_TEMPLATE_ARGS
         template <detail_exported::fixed_string Str> constexpr auto operator""_a() {
         using char_t = turbo::remove_cvref_t<decltype(Str.data[0])>;
-        return detail::udl_arg<char_t, sizeof(Str.data) / sizeof(char_t), Str>();
+        return fmt_detail::udl_arg<char_t, sizeof(Str.data) / sizeof(char_t), Str>();
     }
 #  else
 
-        constexpr auto operator "" _a(const char *s, size_t) -> detail::udl_arg<char> {
+        constexpr auto operator "" _a(const char *s, size_t) -> fmt_detail::udl_arg<char> {
             return {s};
         }
 
 #  endif
     }  // namespace literals
 
-    template<typename Locale, TURBO_ENABLE_IF(detail::is_locale<Locale>::value)>
+    template<typename Locale, TURBO_ENABLE_IF(fmt_detail::is_locale<Locale>::value)>
     inline auto vformat(const Locale &loc, std::string_view fmt, format_args args)
     -> std::string {
-        return detail::vformat(loc, fmt, args);
+        return fmt_detail::vformat(loc, fmt, args);
     }
 
 
     template<typename OutputIt, typename Locale,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value&&
-                                    detail::is_locale<Locale>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, char>::value&&
+                                    fmt_detail::is_locale<Locale>::value)>
     auto vformat_to(OutputIt out, const Locale &loc, std::string_view fmt,
                     format_args args) -> OutputIt {
-        using detail::get_buffer;
+        using fmt_detail::get_buffer;
         auto &&buf = get_buffer<char>(out);
-        detail::vformat_to(buf, fmt, args, detail::locale_ref(loc));
-        return detail::get_iterator(buf, out);
+        fmt_detail::vformat_to(buf, fmt, args, fmt_detail::locale_ref(loc));
+        return fmt_detail::get_iterator(buf, out);
     }
 
     template<typename OutputIt, typename Locale, typename... T,
-            TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, char>::value&&
-                                    detail::is_locale<Locale>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_output_iterator<OutputIt, char>::value&&
+                                    fmt_detail::is_locale<Locale>::value)>
     TURBO_FORCE_INLINE auto format_to(OutputIt out, const Locale &loc,
                                       format_string<T...> fmt, T &&... args) -> OutputIt {
         return vformat_to(out, loc, fmt, turbo::make_format_args(args...));
     }
 
     template<typename Locale, typename... T,
-            TURBO_ENABLE_IF(detail::is_locale<Locale>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_locale<Locale>::value)>
     [[nodiscard]] TURBO_FORCE_INLINE auto formatted_size(const Locale &loc,
                                                          format_string<T...> fmt,
                                                          T &&... args) -> size_t {
-        auto buf = detail::counting_buffer<>();
-        detail::vformat_to<char>(buf, fmt, turbo::make_format_args(args...),
-                                 detail::locale_ref(loc));
+        auto buf = fmt_detail::counting_buffer<>();
+        fmt_detail::vformat_to<char>(buf, fmt, turbo::make_format_args(args...),
+                                 fmt_detail::locale_ref(loc));
         return buf.count();
     }
 
@@ -4677,20 +4677,20 @@ struct udl_arg {
     template<typename FormatContext>
     constexpr TURBO_FORCE_INLINE auto
     formatter<T, Char,
-            std::enable_if_t<detail::type_constant<T, Char>::value !=
-                             detail::type::custom_type>>::format(const T &val,
+            std::enable_if_t<fmt_detail::type_constant<T, Char>::value !=
+                             fmt_detail::type::custom_type>>::format(const T &val,
                                                                  FormatContext &ctx)
     const -> decltype(ctx.out()) {
-        if (specs_.width_ref.kind != detail::arg_id_kind::none ||
-            specs_.precision_ref.kind != detail::arg_id_kind::none) {
+        if (specs_.width_ref.kind != fmt_detail::arg_id_kind::none ||
+            specs_.precision_ref.kind != fmt_detail::arg_id_kind::none) {
             auto specs = specs_;
-            detail::handle_dynamic_spec<detail::width_checker>(specs.width,
+            fmt_detail::handle_dynamic_spec<fmt_detail::width_checker>(specs.width,
                                                                specs.width_ref, ctx);
-            detail::handle_dynamic_spec<detail::precision_checker>(
+            fmt_detail::handle_dynamic_spec<fmt_detail::precision_checker>(
                     specs.precision, specs.precision_ref, ctx);
-            return detail::write<Char>(ctx.out(), val, specs, ctx.locale());
+            return fmt_detail::write<Char>(ctx.out(), val, specs, ctx.locale());
         }
-        return detail::write<Char>(ctx.out(), val, specs_, ctx.locale());
+        return fmt_detail::write<Char>(ctx.out(), val, specs_, ctx.locale());
     }
 
 }  // namespace turbo

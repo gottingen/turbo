@@ -38,8 +38,8 @@ namespace turbo {
     template<typename... T>
     TURBO_FORCE_INLINE void print(format_string<T...> fmt, T &&... args) {
         const auto &vargs = turbo::make_format_args(args...);
-        return detail::is_utf8() ? vprint(fmt, vargs)
-                                 : detail::vprint_mojibake(stdout, fmt, vargs);
+        return fmt_detail::is_utf8() ? vprint(fmt, vargs)
+                                 : fmt_detail::vprint_mojibake(stdout, fmt, vargs);
     }
 
     /**
@@ -55,8 +55,8 @@ namespace turbo {
     template<typename... T>
     TURBO_FORCE_INLINE void print(std::FILE *f, format_string<T...> fmt, T &&... args) {
         const auto &vargs = turbo::make_format_args(args...);
-        return detail::is_utf8() ? vprint(f, fmt, vargs)
-                                 : detail::vprint_mojibake(f, fmt, vargs);
+        return fmt_detail::is_utf8() ? vprint(f, fmt, vargs)
+                                 : fmt_detail::vprint_mojibake(f, fmt, vargs);
     }
 
 
@@ -72,10 +72,10 @@ namespace turbo {
     template<typename... T>
     void print(std::ostream &os, format_string<T...> fmt, T &&... args) {
         const auto &vargs = turbo::make_format_args(args...);
-        if (detail::is_utf8())
+        if (fmt_detail::is_utf8())
             vprint(os, fmt, vargs);
         else
-            detail::vprint_directly(os, fmt, vargs);
+            fmt_detail::vprint_directly(os, fmt, vargs);
     }
 
 
@@ -84,6 +84,44 @@ namespace turbo {
                basic_format_string<wchar_t, type_identity_t<Args>...> fmt,
                Args &&... args) {
         vprint(os, fmt, turbo::make_format_args<buffer_context<wchar_t>>(args...));
+    }
+
+    /**
+      \rst
+      Formats a string and prints it to the specified file stream using ANSI
+      escape sequences to specify text formatting.
+
+      **Example**::
+
+        turbo::print(turbo::emphasis::bold | fg(turbo::color::red),
+                   "Elapsed time: {0:.2f} seconds", 1.23);
+      \endrst
+     */
+    template<typename S, typename... Args,
+            TURBO_ENABLE_IF(is_string<S>::value)>
+
+    void print(std::FILE *f, const text_style &ts, const S &format_str,
+               const Args &... args) {
+        vprint(f, ts, format_str,
+               turbo::make_format_args<buffer_context<char_t<S>>>(args...));
+    }
+
+    /**
+      \rst
+      Formats a string and prints it to stdout using ANSI escape sequences to
+      specify text formatting.
+
+      **Example**::
+
+        turbo::print(turbo::emphasis::bold | fg(turbo::color::red),
+                   "Elapsed time: {0:.2f} seconds", 1.23);
+      \endrst
+     */
+    template<typename S, typename... Args,
+            TURBO_ENABLE_IF(is_string<S>::value)>
+
+    void print(const text_style &ts, const S &format_str, const Args &... args) {
+        return print(stdout, ts, format_str, args...);
     }
 
 
@@ -132,7 +170,7 @@ namespace turbo {
     template<typename S, typename... T, typename Char = char_t<S>>
     inline auto fprintf(std::FILE *f, const S &fmt, const T &... args) -> int {
         using context = basic_printf_context_t<Char>;
-        return vfprintf(f, detail::to_string_view(fmt),
+        return vfprintf(f, to_string_view(fmt),
                         turbo::make_format_args<context>(args...));
     }
 
@@ -146,10 +184,10 @@ namespace turbo {
       \endrst
     */
     template<typename S, typename... T,
-            typename Char = std::enable_if_t<detail::is_string<S>::value, char_t<S>>>
+            typename Char = std::enable_if_t<is_string<S>::value, char_t<S>>>
     inline auto sprintf(const S &fmt, const T &... args) -> std::basic_string<Char> {
         using context = basic_printf_context_t<Char>;
-        return vsprintf(detail::to_string_view(fmt),
+        return vsprintf(to_string_view(fmt),
                         turbo::make_format_args<context>(args...));
     }
 
@@ -162,10 +200,9 @@ namespace turbo {
         turbo::printf("Elapsed time: %.2f seconds", 1.23);
       \endrst
      */
-    template<typename S, typename... T, TURBO_ENABLE_IF(detail::is_string<S>::value)>
+    template<typename S, typename... T, TURBO_ENABLE_IF(is_string<S>::value)>
     inline auto printf(const S &fmt, const T &... args) -> int {
-        return vprintf(
-                detail::to_string_view(fmt),
+        return vprintf(to_string_view(fmt),
                 turbo::make_format_args<basic_printf_context_t<char_t<S>>>(args...));
     }
 

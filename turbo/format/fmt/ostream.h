@@ -21,7 +21,7 @@
 
 namespace turbo {
 
-    namespace detail {
+    namespace fmt_detail {
 
 // Generate a unique explicit instantion in every translation unit using a tag
 // type in an anonymous namespace.
@@ -105,7 +105,7 @@ namespace turbo {
             const T &value;
         };
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
 // Formats an object of type T that has an overloaded ostream operator<<.
     template<typename Char>
@@ -116,7 +116,7 @@ namespace turbo {
         auto format(const T &value, basic_format_context<OutputIt, Char> &ctx) const
         -> OutputIt {
             auto buffer = basic_memory_buffer<Char>();
-            detail::format_value(buffer, value, ctx.locale());
+            fmt_detail::format_value(buffer, value, ctx.locale());
             return formatter<std::basic_string_view<Char>, Char>::format(
                     {buffer.data(), buffer.size()}, ctx);
         }
@@ -125,10 +125,10 @@ namespace turbo {
     using ostream_formatter = basic_ostream_formatter<char>;
 
     template<typename T, typename Char>
-    struct formatter<detail::streamed_view<T>, Char>
+    struct formatter<fmt_detail::streamed_view<T>, Char>
             : basic_ostream_formatter<Char> {
         template<typename OutputIt>
-        auto format(detail::streamed_view<T> view,
+        auto format(fmt_detail::streamed_view<T> view,
                     basic_format_context<OutputIt, Char> &ctx) const -> OutputIt {
             return basic_ostream_formatter<Char>::format(view.value, ctx);
         }
@@ -145,29 +145,29 @@ namespace turbo {
       \endrst
      */
     template<typename T>
-    auto streamed(const T &value) -> detail::streamed_view<T> {
+    auto streamed(const T &value) -> fmt_detail::streamed_view<T> {
         return {value};
     }
 
-    namespace detail {
+    namespace fmt_detail {
 
         inline void vprint_directly(std::ostream &os, std::string_view format_str,
                                     format_args args) {
             auto buffer = memory_buffer();
-            detail::vformat_to(buffer, format_str, args);
-            detail::write_buffer(os, buffer);
+            fmt_detail::vformat_to(buffer, format_str, args);
+            fmt_detail::write_buffer(os, buffer);
         }
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     template<typename Char>
     void vprint(std::basic_ostream<Char> &os,
                 std::basic_string_view<type_identity_t<Char>> format_str,
                 basic_format_args<buffer_context<type_identity_t<Char>>> args) {
         auto buffer = basic_memory_buffer<Char>();
-        detail::vformat_to(buffer, format_str, args);
-        if (detail::write_ostream_unicode(os, {buffer.data(), buffer.size()})) return;
-        detail::write_buffer(os, buffer);
+        fmt_detail::vformat_to(buffer, format_str, args);
+        if (fmt_detail::write_ostream_unicode(os, {buffer.data(), buffer.size()})) return;
+        fmt_detail::write_buffer(os, buffer);
     }
 
 }  // namespace turbo

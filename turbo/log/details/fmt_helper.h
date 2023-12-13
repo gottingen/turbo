@@ -68,7 +68,7 @@ namespace turbo::tlog {
                 return static_cast<unsigned int>(turbo::
                 // fmt 7.0.0 renamed the internal namespace to detail.
                 // See: https://github.com/fmtlib/fmt/issues/1538
-                detail::count_digits(static_cast<count_type>(n)));
+                fmt_detail::count_digits(static_cast<count_type>(n)));
             }
 
             inline void pad2(int n, memory_buf_t &dest) {

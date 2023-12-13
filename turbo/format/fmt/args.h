@@ -16,7 +16,7 @@
 
 namespace turbo {
 
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename T>
         struct is_reference_wrapper : std::false_type {
@@ -68,7 +68,7 @@ namespace turbo {
                 return value;
             }
         };
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     /**
       \rst
@@ -87,39 +87,39 @@ namespace turbo {
 
         template<typename T>
         struct need_copy {
-            static constexpr detail::type mapped_type =
-                    detail::mapped_type_constant<T, Context>::value;
+            static constexpr fmt_detail::type mapped_type =
+                    fmt_detail::mapped_type_constant<T, Context>::value;
 
             enum {
-                value = !(detail::is_reference_wrapper<T>::value ||
+                value = !(fmt_detail::is_reference_wrapper<T>::value ||
                           std::is_same<T, std::basic_string_view<char_type>>::value ||
-                          (mapped_type != detail::type::cstring_type &&
-                           mapped_type != detail::type::string_type &&
-                           mapped_type != detail::type::custom_type))
+                          (mapped_type != fmt_detail::type::cstring_type &&
+                           mapped_type != fmt_detail::type::string_type &&
+                           mapped_type != fmt_detail::type::custom_type))
             };
         };
 
         template<typename T>
         using stored_type = std::conditional_t<
                 std::is_convertible<T, std::basic_string<char_type>>::value &&
-                !detail::is_reference_wrapper<T>::value,
+                !fmt_detail::is_reference_wrapper<T>::value,
                 std::basic_string<char_type>, T>;
 
         // Storage of basic_format_arg must be contiguous.
         std::vector<basic_format_arg<Context>> data_;
-        std::vector<detail::named_arg_info<char_type>> named_info_;
+        std::vector<fmt_detail::named_arg_info<char_type>> named_info_;
 
         // Storage of arguments not fitting into basic_format_arg must grow
         // without relocation because items in data_ refer to it.
-        detail::dynamic_arg_list dynamic_args_;
+        fmt_detail::dynamic_arg_list dynamic_args_;
 
         friend class basic_format_args<Context>;
 
         unsigned long long get_types() const {
-            return detail::is_unpacked_bit | data_.size() |
+            return fmt_detail::is_unpacked_bit | data_.size() |
                    (named_info_.empty()
                     ? 0ULL
-                    : static_cast<unsigned long long>(detail::has_named_args_bit));
+                    : static_cast<unsigned long long>(fmt_detail::has_named_args_bit));
         }
 
         const basic_format_arg<Context> *data() const {
@@ -128,16 +128,16 @@ namespace turbo {
 
         template<typename T>
         void emplace_arg(const T &arg) {
-            data_.emplace_back(detail::make_arg<Context>(arg));
+            data_.emplace_back(fmt_detail::make_arg<Context>(arg));
         }
 
         template<typename T>
-        void emplace_arg(const detail::named_arg<char_type, T> &arg) {
+        void emplace_arg(const fmt_detail::named_arg<char_type, T> &arg) {
             if (named_info_.empty()) {
-                constexpr const detail::named_arg_info<char_type> *zero_ptr{nullptr};
+                constexpr const fmt_detail::named_arg_info<char_type> *zero_ptr{nullptr};
                 data_.insert(data_.begin(), {zero_ptr, 0});
             }
-            data_.emplace_back(detail::make_arg<Context>(detail::unwrap(arg.value)));
+            data_.emplace_back(fmt_detail::make_arg<Context>(fmt_detail::unwrap(arg.value)));
             auto pop_one = [](std::vector<basic_format_arg<Context>> *data) {
                 data->pop_back();
             };
@@ -170,10 +170,10 @@ namespace turbo {
         */
         template<typename T>
         void push_back(const T &arg) {
-            if (detail::const_check(need_copy<T>::value))
+            if (fmt_detail::const_check(need_copy<T>::value))
                 emplace_arg(dynamic_args_.push<stored_type<T>>(arg));
             else
-                emplace_arg(detail::unwrap(arg));
+                emplace_arg(fmt_detail::unwrap(arg));
         }
 
         /**
@@ -205,10 +205,10 @@ namespace turbo {
           argument. The name is always copied into the store.
         */
         template<typename T>
-        void push_back(const detail::named_arg<char_type, T> &arg) {
+        void push_back(const fmt_detail::named_arg<char_type, T> &arg) {
             const char_type *arg_name =
                     dynamic_args_.push<std::basic_string<char_type>>(arg.name).c_str();
-            if (detail::const_check(need_copy<T>::value)) {
+            if (fmt_detail::const_check(need_copy<T>::value)) {
                 emplace_arg(
                         turbo::arg(arg_name, dynamic_args_.push<stored_type<T>>(arg.value)));
             } else {
@@ -220,7 +220,7 @@ namespace turbo {
         void clear() {
             data_.clear();
             named_info_.clear();
-            dynamic_args_ = detail::dynamic_arg_list();
+            dynamic_args_ = fmt_detail::dynamic_arg_list();
         }
 
         /**

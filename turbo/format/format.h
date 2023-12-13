@@ -22,24 +22,10 @@
 #include "turbo/format/fmt/ranges.h"
 #include "turbo/format/fmt/printf.h"
 #include "turbo/format/fmt/std.h"
+#include "turbo/format/color.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {
-
-    template<typename T>
-    auto Ptr(T p) -> const void * {
-        return turbo::ptr(p);
-    }
-
-    template<typename T, typename Deleter>
-    auto Ptr(const std::unique_ptr<T, Deleter> &p) -> const void * {
-        return turbo::ptr(p);
-    }
-
-    template<typename T>
-    auto Ptr(const std::shared_ptr<T> &p) -> const void * {
-        return turbo::ptr(p);
-    }
 
     /**
           \rst
@@ -58,11 +44,75 @@ namespace turbo {
     }
 
     template<typename Locale, typename... T,
-            TURBO_ENABLE_IF(detail::is_locale<Locale>::value)>
+            TURBO_ENABLE_IF(fmt_detail::is_locale<Locale>::value)>
     inline auto format(const Locale &loc, format_string<T...> fmt, T &&... args)
     -> std::string {
         return turbo::vformat(loc, std::string_view(fmt), turbo::make_format_args(args...));
     }
+
+    /**
+     \rst
+     Returns an argument that will be formatted using ANSI escape sequences,
+     to be used in a formatting function.
+
+     **Example**::
+
+       turbo::print("Elapsed time: {0:.2f} seconds",
+                  turbo::styled(1.23, turbo::fg(turbo::color::green) |
+                                    turbo::bg(turbo::color::blue)));
+     \endrst
+    */
+    template<typename T>
+    constexpr auto styled(const T &value, text_style ts)
+    -> fmt_detail::styled_arg<turbo::remove_cvref_t<T>> {
+        return fmt_detail::styled_arg<turbo::remove_cvref_t<T>>
+                {value, ts};
+    }
+
+    /**
+      \rst
+      Formats arguments and returns the result as a string using ANSI
+      escape sequences to specify text formatting.
+
+      **Example**::
+
+        #include <fmt/color.h>
+        std::string message = turbo::format(turbo::emphasis::bold | fg(turbo::color::red),
+                                          "The answer is {}", 42);
+      \endrst
+    */
+    template<typename S, typename... Args, typename Char = char_t<S>>
+    inline std::basic_string<Char> format(const text_style &ts, const S &format_str,
+                                          const Args &... args) {
+        return turbo::vformat(ts, to_string_view(format_str),
+                              turbo::make_format_args<buffer_context<Char>>(args...));
+    }
+
+    /**
+     \rst
+     Formats arguments with the given text_style, writes the result to the output
+     iterator ``out`` and returns the iterator past the end of the output range.
+
+     **Example**::
+
+       std::vector<char> out;
+       turbo::format_to(std::back_inserter(out),
+                      turbo::emphasis::bold | fg(turbo::color::red), "{}", 42);
+     \endrst
+   */
+    template<typename OutputIt, typename S, typename... Args,
+            bool enable = fmt_detail::is_output_iterator<OutputIt, char_t<S>>::value &&
+                          is_string<S>::value
+    >
+
+    inline auto format_to(OutputIt out, const text_style &ts, const S &format_str,
+                          Args &&... args) ->
+    typename std::enable_if<enable, OutputIt>::type {
+        return vformat_to(out, ts, to_string_view(format_str),
+                          turbo::make_format_args<buffer_context<char_t<S>>>(args...));
+    }
+
+
 
     template<typename String = std::string, typename T>
     TURBO_MUST_USE_RESULT inline String format(const T &t) {

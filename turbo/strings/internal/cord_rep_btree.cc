@@ -64,7 +64,7 @@ namespace turbo {
                 std::string sharing = const_cast<CordRep *>(rep)->refcount.IsOne()
                                       ? std::string("Private")
                                       : turbo::format("Shared({})", rep->refcount.Get());
-                std::string sptr = turbo::format("{}", Ptr(rep));
+                std::string sptr = turbo::format("{}", ptr(rep));
 
                 // Dumps the data contents of `rep` if `include_contents` is true.
                 // Always emits a new line character.

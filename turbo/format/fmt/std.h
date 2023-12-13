@@ -17,6 +17,14 @@
 #include <utility>
 #include <optional>
 #include <variant>
+#include <list>
+#include <vector>
+#include <initializer_list>
+#include <deque>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include "turbo/strings/match.h"
 #include "turbo/files/filesystem.h"
 #include "ostream.h"
@@ -34,7 +42,7 @@
 
 namespace turbo {
 
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename Char>
         void write_escaped_path(basic_memory_buffer<Char> &quoted,
@@ -62,7 +70,7 @@ namespace turbo {
                     std::back_inserter(quoted), p.native());
         }
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     template<typename Char>
     struct formatter<turbo::filesystem::path, Char>
@@ -78,7 +86,7 @@ namespace turbo {
         auto format(const turbo::filesystem::path &p, FormatContext &ctx) const ->
         typename FormatContext::iterator {
             auto quoted = basic_memory_buffer<Char>();
-            detail::write_escaped_path(quoted, p);
+            fmt_detail::write_escaped_path(quoted, p);
             return formatter<std::basic_string_view<Char>>::format(
                     std::basic_string_view<Char>(quoted.data(), quoted.size()), ctx);
         }
@@ -99,10 +107,10 @@ namespace turbo {
     private:
         formatter<T, Char> underlying_;
         static constexpr std::basic_string_view<Char> optional =
-                detail::string_literal<Char, 'o', 'p', 't', 'i', 'o', 'n', 'a', 'l',
+                fmt_detail::string_literal<Char, 'o', 'p', 't', 'i', 'o', 'n', 'a', 'l',
                         '('>{};
         static constexpr std::basic_string_view<Char> none =
-                detail::string_literal<Char, 'n', 'o', 'n', 'e'>{};
+                fmt_detail::string_literal<Char, 'n', 'o', 'n', 'e'>{};
 
         template<class U>
         constexpr static auto maybe_set_debug_format(U &u, bool set)
@@ -123,13 +131,13 @@ namespace turbo {
         template<typename FormatContext>
         auto format(std::optional<T> const &opt, FormatContext &ctx) const
         -> decltype(ctx.out()) {
-            if (!opt) return detail::write<Char>(ctx.out(), none);
+            if (!opt) return fmt_detail::write<Char>(ctx.out(), none);
 
             auto out = ctx.out();
-            out = detail::write<Char>(out, optional);
+            out = fmt_detail::write<Char>(out, optional);
             ctx.advance_to(out);
             out = underlying_.format(*opt, ctx);
-            return detail::write(out, ')');
+            return fmt_detail::write(out, ')');
         }
     };
 
@@ -147,12 +155,12 @@ namespace turbo {
         auto format(const std::monostate &, FormatContext &ctx) const
         -> decltype(ctx.out()) {
             auto out = ctx.out();
-            out = detail::write<Char>(out, "monostate");
+            out = fmt_detail::write<Char>(out, "monostate");
             return out;
         }
     };
 
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename T>
         using variant_index_sequence =
@@ -181,23 +189,23 @@ namespace turbo {
         template<typename Char, typename OutputIt, typename T>
         auto write_variant_alternative(OutputIt out, const T &v) -> OutputIt {
             if constexpr (is_string<T>::value)
-                return write_escaped_string<Char>(out, detail::to_string_view(v));
+                return write_escaped_string<Char>(out, to_string_view(v));
             else if constexpr (std::is_same_v<T, Char>)
                 return write_escaped_char(out, v);
             else
                 return write<Char>(out, v);
         }
 
-    }  // namespace detail
+    }  // namespace fmt_detail
     template<typename T>
     struct is_variant_like {
-        static constexpr const bool value = detail::is_variant_like_<T>::value;
+        static constexpr const bool value = fmt_detail::is_variant_like_<T>::value;
     };
 
     template<typename T, typename C>
     struct is_variant_formattable {
         static constexpr const bool value =
-                detail::is_variant_formattable_<T, C>::value;
+                fmt_detail::is_variant_formattable_<T, C>::value;
     };
 
     template<typename Variant, typename Char>
@@ -215,15 +223,15 @@ namespace turbo {
         -> decltype(ctx.out()) {
             auto out = ctx.out();
 
-            out = detail::write<Char>(out, "variant(");
+            out = fmt_detail::write<Char>(out, "variant(");
             try {
                 std::visit(
                         [&](const auto &v) {
-                            out = detail::write_variant_alternative<Char>(out, v);
+                            out = fmt_detail::write_variant_alternative<Char>(out, v);
                         },
                         value);
             } catch (const std::bad_variant_access &) {
-                detail::write<Char>(out, "valueless by exception");
+                fmt_detail::write<Char>(out, "valueless by exception");
             }
             *out++ = ')';
             return out;
@@ -244,9 +252,9 @@ namespace turbo {
         constexpr auto format(const std::error_code &ec, FormatContext &ctx) const
         -> decltype(ctx.out()) {
             auto out = ctx.out();
-            out = detail::write_bytes(out, ec.category().name(), format_specs<Char>());
-            out = detail::write<Char>(out, Char(':'));
-            out = detail::write<Char>(out, ec.value());
+            out = fmt_detail::write_bytes(out, ec.category().name(), format_specs<Char>());
+            out = fmt_detail::write<Char>(out, Char(':'));
+            out = fmt_detail::write<Char>(out, ec.value());
             return out;
         }
     };
@@ -277,7 +285,7 @@ namespace turbo {
             format_specs<Char> spec;
             auto out = ctx.out();
             if (!with_typename_)
-                return detail::write_bytes(out, std::string_view(ex.what()), spec);
+                return fmt_detail::write_bytes(out, std::string_view(ex.what()), spec);
 
             const std::type_info &ti = typeid(ex);
 #ifdef FMT_HAS_ABI_CXA_DEMANGLE
@@ -318,24 +326,63 @@ namespace turbo {
             } else {
                 demangled_name_view = std::string_view(ti.name());
             }
-            out = detail::write_bytes(out, demangled_name_view, spec);
+            out = fmt_detail::write_bytes(out, demangled_name_view, spec);
 #elif TURBO_MSC_VERSION
             std::string_view demangled_name_view(ti.name());
             if (demangled_name_view.starts_with("class "))
               demangled_name_view.remove_prefix(6);
             else if (demangled_name_view.starts_with("struct "))
               demangled_name_view.remove_prefix(7);
-            out = detail::write_bytes(out, demangled_name_view, spec);
+            out = fmt_detail::write_bytes(out, demangled_name_view, spec);
 #else
-            out = detail::write_bytes(out, std::string_view(ti.name()), spec);
+            out = fmt_detail::write_bytes(out, std::string_view(ti.name()), spec);
 #endif
-            out = detail::write<Char>(out, Char(':'));
-            out = detail::write<Char>(out, Char(' '));
-            out = detail::write_bytes(out, std::string_view(ex.what()), spec);
+            out = fmt_detail::write<Char>(out, Char(':'));
+            out = fmt_detail::write<Char>(out, Char(' '));
+            out = fmt_detail::write_bytes(out, std::string_view(ex.what()), spec);
 
             return out;
         }
     };
 }  // namespace turbo
 
+namespace turbo {
+
+    template<typename T>
+    struct is_smart_pointer : std::false_type {
+    };
+
+    template<typename T>
+    struct is_smart_pointer<std::unique_ptr<T>> : std::true_type {
+    };
+
+    template<typename T>
+    struct is_smart_pointer<std::shared_ptr<T>> : std::true_type {
+    };
+
+    template<typename T>
+    struct is_smart_pointer<std::weak_ptr<T>> : std::true_type {
+    };
+
+    template<typename T, typename Char>
+    struct formatter<T, Char,
+            std::enable_if_t<is_smart_pointer<T>::value
+                             && is_formattable<typename T::element_type, Char>::value>> {
+        formatter<typename T::element_type, Char> underlying_;
+
+        template<typename ParseContext>
+        constexpr auto parse(ParseContext &ctx) -> decltype(ctx.begin()) {
+            return underlying_.parse(ctx);
+        }
+
+        template<typename FormatContext>
+        auto format(const T &p, FormatContext &ctx) -> decltype(ctx.out()) {
+            if (p) {
+                return underlying_.format(*p, ctx);
+            } else {
+                return format_to(ctx.out(), "nullptr");
+            }
+        }
+    };
+}  // namespace turbo
 #endif  // FMT_STD_H_

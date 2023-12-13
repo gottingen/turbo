@@ -20,7 +20,7 @@
 
 namespace turbo {
 
-    namespace detail {
+    namespace fmt_detail {
 
         template<typename Range, typename OutputIt>
         auto copy(const Range &range, OutputIt out) -> OutputIt {
@@ -46,27 +46,6 @@ namespace turbo {
             *out++ = ch;
             return out;
         }
-
-        // Returns true if T has a std::string-like interface, like std::string_view.
-        template<typename T>
-        class is_std_string_like {
-            template<typename U>
-            static auto check(U *p)
-            -> decltype((void) p->find('a'), p->length(), (void) p->data(), int());
-
-            template<typename>
-            static void check(...);
-
-        public:
-            static constexpr const bool value =
-                    is_string<T>::value ||
-                    std::is_convertible<T, std::basic_string_view<char>>::value ||
-                    !std::is_void<decltype(check<T>(nullptr))>::value;
-        };
-
-        template<typename Char>
-        struct is_std_string_like<std::basic_string_view<Char>> : std::true_type {
-        };
 
         template<typename T>
         class is_map {
@@ -106,92 +85,18 @@ namespace turbo {
         struct conditional_helper {
         };
 
-        template<typename T, typename _ = void>
-        struct is_range_ : std::false_type {
-        };
+
 
 #if !TURBO_MSC_VERSION || TURBO_MSC_VERSION > 1800
 
-#  define FMT_DECLTYPE_RETURN(val)  \
-    ->decltype(val) { return val; } \
-    static_assert(                  \
-        true, "")  // This makes it so that a semicolon is required after the
-        // macro, which helps clang-format handle the formatting.
 
-// C array overload
-        template<typename T, std::size_t N>
-        auto range_begin(const T (&arr)[N]) -> const T * {
-            return arr;
-        }
 
-        template<typename T, std::size_t N>
-        auto range_end(const T (&arr)[N]) -> const T * {
-            return arr + N;
-        }
 
-        template<typename T, typename Enable = void>
-        struct has_member_fn_begin_end_t : std::false_type {
-        };
 
-        template<typename T>
-        struct has_member_fn_begin_end_t<T, void_t<decltype(std::declval<T>().begin()),
-                decltype(std::declval<T>().end())>>
-                : std::true_type {
-        };
 
-// Member function overload
-        template<typename T>
-        auto range_begin(T &&rng) FMT_DECLTYPE_RETURN(static_cast<T &&>(rng).begin());
 
-        template<typename T>
-        auto range_end(T &&rng) FMT_DECLTYPE_RETURN(static_cast<T &&>(rng).end());
 
-// ADL overload. Only participates in overload resolution if member functions
-// are not found.
-        template<typename T>
-        auto range_begin(T &&rng)
-        -> std::enable_if_t<!has_member_fn_begin_end_t<T &&>::value,
-                decltype(begin(static_cast<T &&>(rng)))> {
-            return begin(static_cast<T &&>(rng));
-        }
 
-        template<typename T>
-        auto range_end(T &&rng) -> std::enable_if_t<!has_member_fn_begin_end_t<T &&>::value,
-                decltype(end(static_cast<T &&>(rng)))> {
-            return end(static_cast<T &&>(rng));
-        }
-
-        template<typename T, typename Enable = void>
-        struct has_const_begin_end : std::false_type {
-        };
-        template<typename T, typename Enable = void>
-        struct has_mutable_begin_end : std::false_type {
-        };
-
-        template<typename T>
-        struct has_const_begin_end<
-                T,
-                void_t<
-                        decltype(detail::range_begin(std::declval<const turbo::remove_cvref_t<T> &>())),
-                        decltype(detail::range_end(std::declval<const turbo::remove_cvref_t<T> &>()))>>
-                : std::true_type {
-        };
-
-        template<typename T>
-        struct has_mutable_begin_end<
-                T, void_t<decltype(detail::range_begin(std::declval<T>())),
-                        decltype(detail::range_end(std::declval<T>())),
-                        // the extra int here is because older versions of MSVC don't
-                        // SFINAE properly unless there are distinct types
-                        int>> : std::true_type {
-        };
-
-        template<typename T>
-        struct is_range_<T, void>
-                : std::integral_constant<bool, (has_const_begin_end<T>::value ||
-                                                has_mutable_begin_end<T>::value)> {
-        };
-#  undef FMT_DECLTYPE_RETURN
 #endif
 
 // tuple_size and tuple_element check.
@@ -290,7 +195,7 @@ namespace turbo {
         }
 
         namespace tuple {
-// Workaround a bug in MSVC 2019 (v140).
+            // Workaround a bug in MSVC 2019 (v140).
             template<typename Char, typename... T>
             using result_t = std::tuple<formatter<turbo::remove_cvref_t<T>, Char>...>;
 
@@ -304,7 +209,7 @@ namespace turbo {
 #if TURBO_MSC_VERSION && TURBO_MSC_VERSION < 1920
         // Older MSVC doesn't get the reference type correctly for arrays.
         template <typename R> struct range_reference_type_impl {
-          using type = decltype(*detail::range_begin(std::declval<R&>()));
+          using type = decltype(*fmt_detail::range_begin(std::declval<R&>()));
         };
 
         template <typename T, std::size_t N> struct range_reference_type_impl<T[N]> {
@@ -316,11 +221,11 @@ namespace turbo {
 #else
         template<typename Range>
         using range_reference_type =
-                decltype(*detail::range_begin(std::declval<Range &>()));
+                decltype(*range_begin(std::declval<Range &>()));
 #endif
 
-// We don't use the Range's value_type for anything, but we do need the Range's
-// reference type, with cv-ref stripped.
+        // We don't use the Range's value_type for anything, but we do need the Range's
+        // reference type, with cv-ref stripped.
         template<typename Range>
         using uncvref_type = turbo::remove_cvref_t<range_reference_type<Range>>;
 
@@ -333,13 +238,13 @@ namespace turbo {
         template<typename Formatter>
         constexpr void maybe_set_debug_format(Formatter &, ...) {}
 
-// These are not generic lambdas for compatibility with C++11.
+        // These are not generic lambdas for compatibility with C++11.
         template<typename ParseContext>
         struct parse_empty_specs {
             template<typename Formatter>
             constexpr void operator()(Formatter &f) {
                 f.parse(ctx);
-                detail::maybe_set_debug_format(f, true);
+                fmt_detail::maybe_set_debug_format(f, true);
             }
 
             ParseContext &ctx;
@@ -352,7 +257,7 @@ namespace turbo {
             template<typename T>
             void operator()(const formatter<T, char_type> &f, const T &v) {
                 if (i > 0)
-                    ctx.advance_to(detail::copy_str<char_type>(separator, ctx.out()));
+                    ctx.advance_to(fmt_detail::copy_str<char_type>(separator, ctx.out()));
                 ctx.advance_to(f.format(v, ctx));
                 ++i;
             }
@@ -362,18 +267,18 @@ namespace turbo {
             std::basic_string_view<char_type> separator;
         };
 
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     template<typename T>
     struct is_tuple_like {
         static constexpr const bool value =
-                detail::is_tuple_like_<T>::value && !detail::is_range_<T>::value;
+                fmt_detail::is_tuple_like_<T>::value && !is_range<T>::value;
     };
 
     template<typename T, typename C>
     struct is_tuple_formattable {
         static constexpr const bool value =
-                detail::is_tuple_formattable_<T, C>::value;
+                fmt_detail::is_tuple_formattable_<T, C>::value;
     };
 
     template<typename Tuple, typename Char>
@@ -381,14 +286,14 @@ namespace turbo {
             std::enable_if_t<turbo::is_tuple_like<Tuple>::value &&
                              turbo::is_tuple_formattable<Tuple, Char>::value>> {
     private:
-        decltype(detail::tuple::get_formatters<Tuple, Char>(
-                detail::tuple_index_sequence<Tuple>())) formatters_;
+        decltype(fmt_detail::tuple::get_formatters<Tuple, Char>(
+                fmt_detail::tuple_index_sequence<Tuple>())) formatters_;
 
-        std::basic_string_view<Char> separator_ = detail::string_literal<Char, ',', ' '>{};
+        std::basic_string_view<Char> separator_ = fmt_detail::string_literal<Char, ',', ' '>{};
         std::basic_string_view<Char> opening_bracket_ =
-                detail::string_literal<Char, '('>{};
+                fmt_detail::string_literal<Char, '('>{};
         std::basic_string_view<Char> closing_bracket_ =
-                detail::string_literal<Char, ')'>{};
+                fmt_detail::string_literal<Char, ')'>{};
 
     public:
         constexpr formatter() {}
@@ -408,30 +313,22 @@ namespace turbo {
             auto it = ctx.begin();
             if (it != ctx.end() && *it != '}')
                 FMT_THROW(format_error("invalid format specifier"));
-            detail::for_each(formatters_, detail::parse_empty_specs<ParseContext>{ctx});
+            fmt_detail::for_each(formatters_, fmt_detail::parse_empty_specs<ParseContext>{ctx});
             return it;
         }
 
         template<typename FormatContext>
         auto format(const Tuple &value, FormatContext &ctx) const
         -> decltype(ctx.out()) {
-            ctx.advance_to(detail::copy_str<Char>(opening_bracket_, ctx.out()));
-            detail::for_each2(
+            ctx.advance_to(fmt_detail::copy_str<Char>(opening_bracket_, ctx.out()));
+            fmt_detail::for_each2(
                     formatters_, value,
-                    detail::format_tuple_element<FormatContext>{0, ctx, separator_});
-            return detail::copy_str<Char>(closing_bracket_, ctx.out());
+                    fmt_detail::format_tuple_element<FormatContext>{0, ctx, separator_});
+            return fmt_detail::copy_str<Char>(closing_bracket_, ctx.out());
         }
     };
 
-    template<typename T, typename Char>
-    struct is_range {
-        static constexpr const bool value =
-                detail::is_range_<T>::value && !detail::is_std_string_like<T>::value &&
-                !std::is_convertible<T, std::basic_string<Char>>::value &&
-                !std::is_convertible<T, std::basic_string_view<Char>>::value;
-    };
-
-    namespace detail {
+    namespace fmt_detail {
         template<typename Context>
         struct range_mapper {
             using mapper = arg_mapper<Context>;
@@ -467,7 +364,7 @@ namespace turbo {
                 : is_formattable<uncvref_type<maybe_const_range<R>>, Char> {
         };
 #endif
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     template<typename T, typename Char, typename Enable = void>
     struct range_formatter;
@@ -478,17 +375,17 @@ namespace turbo {
             std::enable_if_t<conjunction<std::is_same<T, turbo::remove_cvref_t<T>>,
                     is_formattable<T, Char>>::value>> {
     private:
-        detail::range_formatter_type<Char, T> underlying_;
-        std::basic_string_view<Char> separator_ = detail::string_literal<Char, ',', ' '>{};
+        fmt_detail::range_formatter_type<Char, T> underlying_;
+        std::basic_string_view<Char> separator_ = fmt_detail::string_literal<Char, ',', ' '>{};
         std::basic_string_view<Char> opening_bracket_ =
-                detail::string_literal<Char, '['>{};
+                fmt_detail::string_literal<Char, '['>{};
         std::basic_string_view<Char> closing_bracket_ =
-                detail::string_literal<Char, ']'>{};
+                fmt_detail::string_literal<Char, ']'>{};
 
     public:
         constexpr range_formatter() {}
 
-        constexpr auto underlying() -> detail::range_formatter_type<Char, T> & {
+        constexpr auto underlying() -> fmt_detail::range_formatter_type<Char, T> & {
             return underlying_;
         }
 
@@ -516,7 +413,7 @@ namespace turbo {
                 if (*it != ':') FMT_THROW(format_error("invalid format specifier"));
                 ++it;
             } else {
-                detail::maybe_set_debug_format(underlying_, true);
+                fmt_detail::maybe_set_debug_format(underlying_, true);
             }
 
             ctx.advance_to(it);
@@ -525,19 +422,19 @@ namespace turbo {
 
         template<typename R, typename FormatContext>
         auto format(R &&range, FormatContext &ctx) const -> decltype(ctx.out()) {
-            detail::range_mapper<buffer_context<Char>> mapper;
+            fmt_detail::range_mapper<buffer_context<Char>> mapper;
             auto out = ctx.out();
-            out = detail::copy_str<Char>(opening_bracket_, out);
+            out = fmt_detail::copy_str<Char>(opening_bracket_, out);
             int i = 0;
-            auto it = detail::range_begin(range);
-            auto end = detail::range_end(range);
+            auto it = range_begin(range);
+            auto end = range_end(range);
             for (; it != end; ++it) {
-                if (i > 0) out = detail::copy_str<Char>(separator_, out);
+                if (i > 0) out = fmt_detail::copy_str<Char>(separator_, out);
                 ctx.advance_to(out);
                 out = underlying_.format(mapper.map(*it), ctx);
                 ++i;
             }
-            out = detail::copy_str<Char>(closing_bracket_, out);
+            out = fmt_detail::copy_str<Char>(closing_bracket_, out);
             return out;
         }
     };
@@ -546,7 +443,7 @@ namespace turbo {
         disabled, map, set, sequence, string, debug_string
     };
 
-    namespace detail {
+    namespace fmt_detail {
         template<typename T>
         struct range_format_kind_
                 : std::integral_constant<range_format,
@@ -568,22 +465,22 @@ namespace turbo {
                 K, R, Char,
                 std::enable_if_t<(K == range_format::sequence || K == range_format::map ||
                                   K == range_format::set)>> {
-            using range_type = detail::maybe_const_range<R>;
-            range_formatter<detail::uncvref_type<range_type>, Char> underlying_;
+            using range_type = fmt_detail::maybe_const_range<R>;
+            range_formatter<fmt_detail::uncvref_type<range_type>, Char> underlying_;
 
             constexpr range_default_formatter() { init(range_format_constant<K>()); }
 
             constexpr void init(range_format_constant<range_format::set>) {
-                underlying_.set_brackets(detail::string_literal<Char, '{'>{},
-                                         detail::string_literal<Char, '}'>{});
+                underlying_.set_brackets(fmt_detail::string_literal<Char, '{'>{},
+                                         fmt_detail::string_literal<Char, '}'>{});
             }
 
             constexpr void init(range_format_constant<range_format::map>) {
-                underlying_.set_brackets(detail::string_literal<Char, '{'>{},
-                                         detail::string_literal<Char, '}'>{});
+                underlying_.set_brackets(fmt_detail::string_literal<Char, '{'>{},
+                                         fmt_detail::string_literal<Char, '}'>{});
                 underlying_.underlying().set_brackets({}, {});
                 underlying_.underlying().set_separator(
-                        detail::string_literal<Char, ':', ' '>{});
+                        fmt_detail::string_literal<Char, ':', ' '>{});
             }
 
             constexpr void init(range_format_constant<range_format::sequence>) {}
@@ -599,12 +496,12 @@ namespace turbo {
                 return underlying_.format(range, ctx);
             }
         };
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     template<typename T, typename Char, typename Enable = void>
     struct range_format_kind
             : std::conditional_t<
-                    is_range<T, Char>::value, detail::range_format_kind_<T>,
+                    is_range_printable<T, Char>::value, fmt_detail::range_format_kind_<T>,
                     std::integral_constant<range_format, range_format::disabled>> {
     };
 
@@ -616,15 +513,15 @@ namespace turbo {
 // Workaround a bug in MSVC 2015 and earlier.
 #if !TURBO_MSC_VERSION || TURBO_MSC_VERSION >= 1910
                     ,
-                    detail::is_formattable_delayed<R, Char>
+                    fmt_detail::is_formattable_delayed<R, Char>
 #endif
             >::value>>
-            : detail::range_default_formatter<range_format_kind<R, Char>::value, R,
+            : fmt_detail::range_default_formatter<range_format_kind<R, Char>::value, R,
                     Char> {
     };
 
     template<typename Char, typename... T>
-    struct tuple_join_view : detail::view {
+    struct tuple_join_view : fmt_detail::view {
         const std::tuple<T...> &tuple;
         std::basic_string_view<Char> sep;
 
@@ -701,9 +598,9 @@ namespace turbo {
         }
     };
 
-    namespace detail {
-// Check if T has an interface like a container adaptor (e.g. std::stack,
-// std::queue, std::priority_queue).
+    namespace fmt_detail {
+        // Check if T has an interface like a container adaptor (e.g. std::stack,
+        // std::queue, std::priority_queue).
         template<typename T>
         class is_container_adaptor_like {
             template<typename U>
@@ -725,13 +622,13 @@ namespace turbo {
 
             auto end() const -> typename Container::const_iterator { return c.end(); }
         };
-    }  // namespace detail
+    }  // namespace fmt_detail
 
     template<typename T, typename Char>
     struct formatter<T, Char,
-            std::enable_if_t<detail::is_container_adaptor_like<T>::value>>
-            : formatter<detail::all<typename T::container_type>, Char> {
-        using all = detail::all<typename T::container_type>;
+            std::enable_if_t<fmt_detail::is_container_adaptor_like<T>::value>>
+            : formatter<fmt_detail::all<typename T::container_type>, Char> {
+        using all = fmt_detail::all<typename T::container_type>;
 
         template<typename FormatContext>
         auto format(const T &t, FormatContext &ctx) const -> decltype(ctx.out()) {
