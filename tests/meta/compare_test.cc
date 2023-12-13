@@ -15,7 +15,6 @@
 #include "turbo/meta/compare.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-
 #include "doctest/doctest.h"
 
 #include "turbo/base/casts.h"

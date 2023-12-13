@@ -1074,7 +1074,7 @@ namespace testing {
                     typename NewOperation,
                     typename = EnableIfTestable<sizeof...(Contracts), Factory, NewOperation>>
             testing::AssertionResult Test(const NewOperation &new_operation) const {
-                return TestImpl(new_operation, turbo::index_sequence_for<Contracts...>());
+                return TestImpl(new_operation, std::index_sequence_for<Contracts...>());
             }
 
             /*
@@ -1111,7 +1111,7 @@ namespace testing {
 
             template<typename SelectedOperation, size_t... Indices>
             testing::AssertionResult TestImpl(SelectedOperation selected_operation,
-                                              turbo::index_sequence<Indices...>) const {
+                                              std::index_sequence<Indices...>) const {
                 return ExceptionSafetyTest<FactoryElementType<Factory>>(
                         factory_, selected_operation, std::get<Indices>(contracts_)...)
                         .Test();
