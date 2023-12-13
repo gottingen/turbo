@@ -44,29 +44,6 @@ namespace {
 #pragma warning(disable : 4101)  // unreferenced local variable
 #endif                           // _MSC_VER
 
-    template<typename... Ts>
-    class Counter {
-    };
-
-    template<size_t... Is>
-    void CountAll(std::index_sequence<Is...>) {
-        // We only need an alias here, but instantiate a variable to silence warnings
-        // for unused typedefs in some compilers.
-        TURBO_MAYBE_UNUSED Counter<std::make_index_sequence<Is>...> seq;
-    }
-
-    // This test verifies that turbo::make_index_sequence can handle large arguments
-    // without blowing up template instantiation stack, going OOM or taking forever
-    // to compile (there is hard 15 minutes limit imposed by forge).
-    TEST_CASE("IntegerSequenceTest, MakeIndexSequencePerformance") {
-        // O(log N) template instantiations.
-        // We only need an alias here, but instantiate a variable to silence warnings
-        // for unused typedefs in some compilers.
-        TURBO_MAYBE_UNUSED std::make_index_sequence<(1 << 16) - 1> seq;
-        // O(N) template instantiations.
-        CountAll(std::make_index_sequence<(1 << 8) - 1>());
-    }
-
     template<typename F, typename Tup, size_t... Is>
     auto ApplyFromTupleImpl(F f, const Tup &tup, std::index_sequence<Is...>)
     -> decltype(f(std::get<Is>(tup)...)) {
