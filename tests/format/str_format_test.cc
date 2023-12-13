@@ -19,6 +19,8 @@
 #include "doctest/doctest.h"
 #include "turbo/strings/inlined_string.h"
 #include "turbo/format/format.h"
+#include "turbo/format/print.h"
+#include <memory>
 
 TEST_CASE("format -InlinedString") {
 
@@ -34,4 +36,13 @@ TEST_CASE("format -InlinedString") {
     CHECK_EQ(s, "1, 2, 4");
     turbo::format_range_append(&s,"{}",array, ", ");
     CHECK_EQ(s, "1, 2, 41, 2, 4");
+}
+
+enum TestE {
+    A, B, C
+};
+TEST_CASE("format -smart pointer") {
+    auto e = TestE::A;
+    auto s = turbo::format("{}", turbo::underlying(e));
+    turbo::println("{}", s);
 }

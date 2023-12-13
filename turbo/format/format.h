@@ -40,15 +40,30 @@ namespace turbo {
     auto Ptr(const std::shared_ptr<T> &p) -> const void * {
         return turbo::ptr(p);
     }
-    /*
-    template<typename String = std::string, typename ...Args>
-    TURBO_MUST_USE_RESULT inline String format(std::string_view fmt, Args &&... args) {
-        String result;
-        turbo::memory_buffer buf;
-        turbo::format_to(std::back_inserter(buf), fmt, std::forward<Args>(args)...);
-        return String(buf.data(), buf.size());
+
+    /**
+          \rst
+          Formats ``args`` according to specifications in ``fmt`` and returns the result
+          as a string.
+
+          **Example**::
+
+            #include <fmt/core.h>
+            std::string message = turbo::format("The answer is {}.", 42);
+          \endrst
+        */
+    template<typename... T>
+    [[nodiscard]] TURBO_FORCE_INLINE auto format(format_string<T...> fmt, T &&... args) -> std::string {
+        return vformat(fmt, turbo::make_format_args(args...));
     }
-    */
+
+    template<typename Locale, typename... T,
+            TURBO_ENABLE_IF(detail::is_locale<Locale>::value)>
+    inline auto format(const Locale &loc, format_string<T...> fmt, T &&... args)
+    -> std::string {
+        return turbo::vformat(loc, std::string_view(fmt), turbo::make_format_args(args...));
+    }
+
     template<typename String = std::string, typename T>
     TURBO_MUST_USE_RESULT inline String format(const T &t) {
         String result;

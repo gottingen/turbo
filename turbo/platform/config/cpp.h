@@ -47,7 +47,7 @@
        (!TURBO_MSC_VERSION || _MSC_FULL_VER >= 193030704))
 // consteval is broken in MSVC before VS2022 and Apple clang before 14.
 #    define TURBO_CONSTEVAL consteval
-#    define FMT_HAS_CONSTEVAL
+#    define TURBO_HAS_CONSTEVAL
 #  else
 #    define TURBO_CONSTEVAL
 #  endif
@@ -62,12 +62,6 @@
 #  else
 #    define TURBO_USE_NONTYPE_TEMPLATE_ARGS 0
 #  endif
-#endif
-
-#ifndef TURBO_MODULE_EXPORT
-#  define TURBO_MODULE_EXPORT
-#  define TURBO_BEGIN_EXPORT
-#  define TURBO_END_EXPORT
 #endif
 
 #endif  // TURBO_PLATFORM_CONFIG_CPP_H_

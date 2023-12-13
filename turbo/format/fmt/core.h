@@ -42,14 +42,6 @@
 #  define FMT_UNCHECKED_ITERATOR(It) using unchecked_type = It
 #endif
 
-#ifndef FMT_BEGIN_NAMESPACE
-#  define FMT_BEGIN_NAMESPACE \
-    namespace turbo {
-//    inline namespace v10 {
-#  define FMT_END_NAMESPACE \
-    }
-//    }
-#endif
 
 // Enable minimal optimizations for more compact code in debug mode.
 TURBO_GCC_PRAGMA("GCC push_options")
@@ -58,16 +50,13 @@ TURBO_GCC_PRAGMA("GCC push_options")
 TURBO_GCC_PRAGMA("GCC optimize(\"Og\")")
 #endif
 
-FMT_BEGIN_NAMESPACE
-
+namespace turbo {
 
         template<typename T>
         struct type_identity {
             using type = T;
         };
         template<typename T> using type_identity_t = typename type_identity<T>::type;
-        template<typename T>
-        using underlying_t = typename std::underlying_type<T>::type;
 
         struct monostate {
             constexpr monostate() {}
@@ -125,7 +114,6 @@ FMT_BEGIN_NAMESPACE
         }  // namespace detail
 
         /** Specifies if ``T`` is a character type. Can be specialized by users. */
-        TURBO_MODULE_EXPORT
         template<typename T>
         struct is_char : std::false_type {
         };
@@ -285,7 +273,6 @@ FMT_BEGIN_NAMESPACE
           You can use the ``format_parse_context`` type alias for ``char`` instead.
           \endrst
          */
-        TURBO_MODULE_EXPORT
         template<typename Char>
         class basic_format_parse_context {
         private:
@@ -354,7 +341,6 @@ FMT_BEGIN_NAMESPACE
             constexpr void check_dynamic_spec(int arg_id);
         };
 
-        TURBO_MODULE_EXPORT
         using format_parse_context = basic_format_parse_context<char>;
 
         namespace detail {
@@ -421,17 +407,16 @@ FMT_BEGIN_NAMESPACE
             }
         }
 
-        TURBO_MODULE_EXPORT template<typename Context>
+        template<typename Context>
         class basic_format_arg;
 
-        TURBO_MODULE_EXPORT template<typename Context>
+        template<typename Context>
         class basic_format_args;
 
-        TURBO_MODULE_EXPORT template<typename Context>
+        template<typename Context>
         class dynamic_format_arg_store;
 
         // A formatter for objects of type T.
-        TURBO_MODULE_EXPORT
         template<typename T, typename Char = char, typename Enable = void>
         struct formatter {
             // A deleted default constructor indicates a disabled formatter.
@@ -1248,8 +1233,8 @@ FMT_BEGIN_NAMESPACE
             };
         }  // namespace detail
 
-// An output iterator that appends to a buffer.
-// It is used to reduce symbol sizes for the common case.
+        // An output iterator that appends to a buffer.
+        // It is used to reduce symbol sizes for the common case.
         class appender : public std::back_insert_iterator<detail::buffer<char>> {
             using base = std::back_insert_iterator<detail::buffer<char>>;
 
@@ -1331,7 +1316,6 @@ FMT_BEGIN_NAMESPACE
           ``vis(value)`` will be called with the value of type ``double``.
           \endrst
          */
-        TURBO_MODULE_EXPORT
         template<typename Visitor, typename Context>
         constexpr TURBO_FORCE_INLINE auto visit_format_arg(
                 Visitor &&vis, const basic_format_arg<Context> &arg) -> decltype(vis(0)) {
@@ -1495,7 +1479,6 @@ FMT_BEGIN_NAMESPACE
                 return make_arg < Context > (value);
             }
         }  // namespace detail
-        TURBO_BEGIN_EXPORT
 
         // Formatting context.
         template<typename OutputIt, typename Char>
@@ -1638,8 +1621,6 @@ FMT_BEGIN_NAMESPACE
             return {name, arg};
         }
 
-        TURBO_END_EXPORT
-
         /**
           \rst
           A view of a collection of formatting arguments. To avoid lifetime issues it
@@ -1767,7 +1748,7 @@ FMT_BEGIN_NAMESPACE
         /** An alias to ``basic_format_args<format_context>``. */
         // A separate type would result in shorter symbols but break ABI compatibility
         // between clang and gcc on ARM (#1919).
-        TURBO_MODULE_EXPORT using format_args = basic_format_args<format_context>;
+        using format_args = basic_format_args<format_context>;
 
 // We cannot use enum classes as bit fields because of a gcc bug, so we put them
 // in namespaces instead (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61414).
@@ -2495,7 +2476,7 @@ FMT_BEGIN_NAMESPACE
                 using type = format_args;
             };
 
-// Use vformat_args and avoid type_identity to keep symbols short.
+            // Use vformat_args and avoid type_identity to keep symbols short.
             template<typename Char>
             void vformat_to(buffer<Char> &buf, std::basic_string_view<Char> fmt,
                             typename vformat_args<Char>::type args, locale_ref loc = {});
@@ -2509,7 +2490,6 @@ FMT_BEGIN_NAMESPACE
 #endif
         }  // namespace detail
 
-        TURBO_BEGIN_EXPORT
 
         // A formatter specialization for natively supported types.
         template<typename T, typename Char>
@@ -2591,7 +2571,7 @@ FMT_BEGIN_NAMESPACE
                                 (std::is_base_of<detail::view, std::remove_reference_t<Args>>::value &&
                                  std::is_reference<Args>::value)...>() == 0,
                         "passing views as lvalues is disallowed");
-#ifdef FMT_HAS_CONSTEVAL
+#ifdef TURBO_HAS_CONSTEVAL
                 if constexpr (detail::count_named_args<Args...>() ==
                               detail::count_statically_named_args<Args...>()) {
                   using checker =
@@ -2610,11 +2590,6 @@ FMT_BEGIN_NAMESPACE
             TURBO_FORCE_INLINE auto get() const -> std::basic_string_view<Char> { return str_; }
         };
 
-#if TURBO_GCC_VERSION && TURBO_GCC_VERSION < 409
-        // Workaround broken conversion on older gcc.
-        template <typename...> using format_string = std::string_view;
-        inline auto runtime(std::string_view s) -> std::string_view { return s; }
-#else
         template<typename... Args>
         using format_string = basic_format_string<char, type_identity_t<Args>...>;
 
@@ -2630,26 +2605,8 @@ FMT_BEGIN_NAMESPACE
          */
         inline auto runtime(std::string_view s) -> runtime_format_string<> { return {{s}}; }
 
-#endif
-
         TURBO_DLL auto vformat(std::string_view fmt, format_args args) -> std::string;
 
-        /**
-          \rst
-          Formats ``args`` according to specifications in ``fmt`` and returns the result
-          as a string.
-
-          **Example**::
-
-            #include <fmt/core.h>
-            std::string message = turbo::format("The answer is {}.", 42);
-          \endrst
-        */
-        template<typename... T>
-        [[nodiscard]] TURBO_FORCE_INLINE auto format(format_string<T...> fmt, T &&... args)
-        -> std::string {
-            return vformat(fmt, turbo::make_format_args(args...));
-        }
 
         /** Formats a string and writes the output to ``out``. */
         template<typename OutputIt,
@@ -2725,60 +2682,7 @@ FMT_BEGIN_NAMESPACE
 
         TURBO_DLL void vprint(std::FILE *f, std::string_view fmt, format_args args);
 
-        /**
-          \rst
-          Formats ``args`` according to specifications in ``fmt`` and writes the output
-          to ``stdout``.
-
-          **Example**::
-
-            turbo::print("Elapsed time: {0:.2f} seconds", 1.23);
-          \endrst
-         */
-        template<typename... T>
-        TURBO_FORCE_INLINE void print(format_string<T...> fmt, T &&... args) {
-            const auto &vargs = turbo::make_format_args(args...);
-            return detail::is_utf8() ? vprint(fmt, vargs)
-                                     : detail::vprint_mojibake(stdout, fmt, vargs);
-        }
-
-        /**
-          \rst
-          Formats ``args`` according to specifications in ``fmt`` and writes the
-          output to the file ``f``.
-
-          **Example**::
-
-            turbo::print(stderr, "Don't {}!", "panic");
-          \endrst
-         */
-        template<typename... T>
-        TURBO_FORCE_INLINE void print(std::FILE *f, format_string<T...> fmt, T &&... args) {
-            const auto &vargs = turbo::make_format_args(args...);
-            return detail::is_utf8() ? vprint(f, fmt, vargs)
-                                     : detail::vprint_mojibake(f, fmt, vargs);
-        }
-
-        /**
-          Formats ``args`` according to specifications in ``fmt`` and writes the
-          output to the file ``f`` followed by a newline.
-         */
-        template<typename... T>
-        TURBO_FORCE_INLINE void println(std::FILE *f, format_string<T...> fmt, T &&... args) {
-            return turbo::print(f, "{}\n", turbo::format(fmt, std::forward<T>(args)...));
-        }
-
-        /**
-          Formats ``args`` according to specifications in ``fmt`` and writes the output
-          to ``stdout`` followed by a newline.
-         */
-        template<typename... T>
-        TURBO_FORCE_INLINE void println(format_string<T...> fmt, T &&... args) {
-            return turbo::println(stdout, fmt, std::forward<T>(args)...);
-        }
-
-        TURBO_END_EXPORT
         TURBO_GCC_PRAGMA("GCC pop_options")
-FMT_END_NAMESPACE
+}  // namespace turbo
 
 #endif  // TURBO_FORMAT_FMT_CORE_H_

@@ -24,14 +24,14 @@
 
 #include "format.h"
 
-FMT_BEGIN_NAMESPACE
+namespace turbo {
 namespace detail {
 
-FMT_FUNC void throw_format_error(const char* message) {
+void throw_format_error(const char* message) {
   FMT_THROW(format_error(message));
 }
 
-FMT_FUNC void format_error_code(detail::buffer<char>& out, int error_code,
+void format_error_code(detail::buffer<char>& out, int error_code,
                                 std::string_view message) noexcept {
   // Report error code making sure that the output fits into
   // inline_buffer_size to avoid dynamic memory allocation and potential
@@ -54,7 +54,7 @@ FMT_FUNC void format_error_code(detail::buffer<char>& out, int error_code,
   TURBO_ASSERT(out.size() <= inline_buffer_size, "");
 }
 
-FMT_FUNC void report_error(format_func func, int error_code,
+void report_error(format_func func, int error_code,
                            const char* message) noexcept {
   memory_buffer full_message;
   func(full_message, error_code, message);
@@ -83,27 +83,27 @@ template <typename Locale> Locale locale_ref::get() const {
 }
 
 template <typename Char>
-FMT_FUNC auto thousands_sep_impl(locale_ref loc) -> thousands_sep_result<Char> {
+auto thousands_sep_impl(locale_ref loc) -> thousands_sep_result<Char> {
   auto& facet = std::use_facet<std::numpunct<Char>>(loc.get<std::locale>());
   auto grouping = facet.grouping();
   auto thousands_sep = grouping.empty() ? Char() : facet.thousands_sep();
   return {std::move(grouping), thousands_sep};
 }
-template <typename Char> FMT_FUNC Char decimal_point_impl(locale_ref loc) {
+template <typename Char> Char decimal_point_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
       .decimal_point();
 }
 #else
 template <typename Char>
-FMT_FUNC auto thousands_sep_impl(locale_ref) -> thousands_sep_result<Char> {
+auto thousands_sep_impl(locale_ref) -> thousands_sep_result<Char> {
   return {"\03", FMT_STATIC_THOUSANDS_SEPARATOR};
 }
-template <typename Char> FMT_FUNC Char decimal_point_impl(locale_ref) {
+template <typename Char> Char decimal_point_impl(locale_ref) {
   return '.';
 }
 #endif
 
-FMT_FUNC auto write_loc(appender out, loc_value value,
+auto write_loc(appender out, loc_value value,
                         const format_specs<>& specs, locale_ref loc) -> bool {
 #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
   auto locale = loc.get<std::locale>();
@@ -128,14 +128,14 @@ template <typename Locale> format_facet<Locale>::format_facet(Locale& loc) {
 }
 
 template <>
-TURBO_DLL FMT_FUNC auto format_facet<std::locale>::do_put(
+TURBO_DLL auto format_facet<std::locale>::do_put(
     appender out, loc_value val, const format_specs<>& specs) const -> bool {
   return val.visit(
       detail::loc_writer<>{out, specs, separator_, grouping_, decimal_point_});
 }
 #endif
 
-FMT_FUNC std::system_error vsystem_error(int error_code, std::string_view fmt,
+std::system_error vsystem_error(int error_code, std::string_view fmt,
                                          format_args args) {
   auto ec = std::error_code(error_code, std::generic_category());
   return std::system_error(ec, vformat(fmt, args));
@@ -1105,7 +1105,7 @@ template <> struct cache_accessor<double> {
   }
 };
 
-FMT_FUNC uint128_fallback get_cached_power(int k) noexcept {
+uint128_fallback get_cached_power(int k) noexcept {
   return cache_accessor<double>::get_cached_power(k);
 }
 
@@ -1396,7 +1396,7 @@ template <> struct formatter<detail::bigint> {
   }
 };
 
-FMT_FUNC detail::utf8_to_utf16::utf8_to_utf16(std::string_view s) {
+detail::utf8_to_utf16::utf8_to_utf16(std::string_view s) {
   for_each_codepoint(s, [this](uint32_t cp, std::string_view) {
     if (cp == invalid_code_point) FMT_THROW(std::runtime_error("invalid utf8"));
     if (cp <= 0xFFFF) {
@@ -1411,7 +1411,7 @@ FMT_FUNC detail::utf8_to_utf16::utf8_to_utf16(std::string_view s) {
   buffer_.push_back(0);
 }
 
-FMT_FUNC void format_system_error(detail::buffer<char>& out, int error_code,
+void format_system_error(detail::buffer<char>& out, int error_code,
                                   const char* message) noexcept {
   FMT_TRY {
     auto ec = std::error_code(error_code, std::generic_category());
@@ -1422,12 +1422,12 @@ FMT_FUNC void format_system_error(detail::buffer<char>& out, int error_code,
   format_error_code(out, error_code, message);
 }
 
-FMT_FUNC void report_system_error(int error_code,
+void report_system_error(int error_code,
                                   const char* message) noexcept {
   report_error(format_system_error, error_code, message);
 }
 
-FMT_FUNC std::string vformat(std::string_view fmt, format_args args) {
+std::string vformat(std::string_view fmt, format_args args) {
   // Don't optimize the "{}" case to keep the binary size small and because it
   // can be better optimized in turbo::format anyway.
   auto buffer = memory_buffer();
@@ -1437,13 +1437,13 @@ FMT_FUNC std::string vformat(std::string_view fmt, format_args args) {
 
 namespace detail {
 #ifndef _WIN32
-FMT_FUNC bool write_console(std::FILE*, std::string_view) { return false; }
+bool write_console(std::FILE*, std::string_view) { return false; }
 #else
 using dword = conditional_t<sizeof(long) == 4, unsigned long, unsigned>;
 extern "C" __declspec(dllimport) int __stdcall WriteConsoleW(  //
     void*, const void*, dword, dword*, void*);
 
-FMT_FUNC bool write_console(std::FILE* f, std::string_view text) {
+bool write_console(std::FILE* f, std::string_view text) {
   auto fd = _fileno(f);
   if (!_isatty(fd)) return false;
   auto u16 = utf8_to_utf16(text);
@@ -1453,7 +1453,7 @@ FMT_FUNC bool write_console(std::FILE* f, std::string_view text) {
 }
 
 // Print assuming legacy (non-Unicode) encoding.
-FMT_FUNC void vprint_mojibake(std::FILE* f, std::string_view fmt, format_args args) {
+void vprint_mojibake(std::FILE* f, std::string_view fmt, format_args args) {
   auto buffer = memory_buffer();
   detail::vformat_to(buffer, fmt,
                      basic_format_args<buffer_context<char>>(args));
@@ -1461,18 +1461,18 @@ FMT_FUNC void vprint_mojibake(std::FILE* f, std::string_view fmt, format_args ar
 }
 #endif
 
-FMT_FUNC void print(std::FILE* f, std::string_view text) {
+void print(std::FILE* f, std::string_view text) {
   if (!write_console(f, text)) fwrite_fully(text.data(), 1, text.size(), f);
 }
 }  // namespace detail
 
-FMT_FUNC void vprint(std::FILE* f, std::string_view fmt, format_args args) {
+void vprint(std::FILE* f, std::string_view fmt, format_args args) {
   auto buffer = memory_buffer();
   detail::vformat_to(buffer, fmt, args);
   detail::print(f, {buffer.data(), buffer.size()});
 }
 
-FMT_FUNC void vprint(std::string_view fmt, format_args args) {
+void vprint(std::string_view fmt, format_args args) {
   vprint(stdout, fmt, args);
 }
 
@@ -1515,7 +1515,7 @@ inline auto is_printable(uint16_t x, const singleton* singletons,
 }
 
 // This code is generated by support/printable.py.
-FMT_FUNC auto is_printable(uint32_t cp) -> bool {
+auto is_printable(uint32_t cp) -> bool {
   static constexpr singleton singletons0[] = {
       {0x00, 1},  {0x03, 5},  {0x05, 6},  {0x06, 3},  {0x07, 6},  {0x08, 8},
       {0x09, 17}, {0x0a, 28}, {0x0b, 25}, {0x0c, 20}, {0x0d, 16}, {0x0e, 13},
@@ -1667,6 +1667,6 @@ FMT_FUNC auto is_printable(uint32_t cp) -> bool {
 
 }  // namespace detail
 
-FMT_END_NAMESPACE
+}  // namespace turbo
 
 #endif  // FMT_FORMAT_INL_H_

@@ -94,7 +94,7 @@ extern "C++" {
 // purview to be exported.
 #include "turbo/format/fmt/args.h"
 #include "turbo/format/fmt/chrono.h"
-#include "turbo/format/fmt/color.h"
+#include "turbo/format/color.h"
 #include "turbo/format/fmt/compile.h"
 #include "turbo/format/fmt/format.h"
 #include "turbo/format/fmt/os.h"

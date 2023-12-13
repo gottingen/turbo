@@ -25,10 +25,12 @@
 #    include <winapifamily.h>
 #  endif
 #  if (TURBO_HAVE_INCLUDE(<fcntl.h>) || defined(__APPLE__) || \
-       defined(__linux__)) &&                              \
-      (!defined(WINAPI_FAMILY) ||                          \
+       defined(__linux__)) && \
+      (!defined(WINAPI_FAMILY) || \
        (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
+
 #    include <fcntl.h>  // for O_RDONLY
+
 #    define FMT_USE_FCNTL 1
 #  else
 #    define FMT_USE_FCNTL 0
@@ -70,8 +72,7 @@
 
 #define FMT_RETRY(result, expression) FMT_RETRY_VAL(result, expression, -1)
 
-FMT_BEGIN_NAMESPACE
-TURBO_BEGIN_EXPORT
+namespace turbo {
 
 /**
   \rst
@@ -98,354 +99,366 @@ TURBO_BEGIN_EXPORT
     format(std::string("{}"), 42);
   \endrst
  */
-template <typename Char> class basic_cstring_view {
- private:
-  const Char* data_;
+    template<typename Char>
+    class basic_cstring_view {
+    private:
+        const Char *data_;
 
- public:
-  /** Constructs a string reference object from a C string. */
-  basic_cstring_view(const Char* s) : data_(s) {}
+    public:
+        /** Constructs a string reference object from a C string. */
+        basic_cstring_view(const Char *s) : data_(s) {}
 
-  /**
-    \rst
-    Constructs a string reference from an ``std::string`` object.
-    \endrst
-   */
-  basic_cstring_view(const std::basic_string<Char>& s) : data_(s.c_str()) {}
+        /**
+          \rst
+          Constructs a string reference from an ``std::string`` object.
+          \endrst
+         */
+        basic_cstring_view(const std::basic_string<Char> &s) : data_(s.c_str()) {}
 
-  /** Returns the pointer to a C string. */
-  const Char* c_str() const { return data_; }
-};
+        /** Returns the pointer to a C string. */
+        const Char *c_str() const { return data_; }
+    };
 
-using cstring_view = basic_cstring_view<char>;
-using wcstring_view = basic_cstring_view<wchar_t>;
+    using cstring_view = basic_cstring_view<char>;
+    using wcstring_view = basic_cstring_view<wchar_t>;
 
 #ifdef _WIN32
-TURBO_DLL const std::error_category& system_category() noexcept;
+    TURBO_DLL const std::error_category& system_category() noexcept;
 
-FMT_BEGIN_DETAIL_NAMESPACE
-TURBO_DLL void format_windows_error(buffer<char>& out, int error_code,
-                                  const char* message) noexcept;
-FMT_END_DETAIL_NAMESPACE
+    FMT_BEGIN_DETAIL_NAMESPACE
+    TURBO_DLL void format_windows_error(buffer<char>& out, int error_code,
+                                      const char* message) noexcept;
+    FMT_END_DETAIL_NAMESPACE
 
-TURBO_DLL std::system_error vwindows_error(int error_code, string_view format_str,
-                                         format_args args);
+    TURBO_DLL std::system_error vwindows_error(int error_code, string_view format_str,
+                                             format_args args);
 
-/**
- \rst
- Constructs a :class:`std::system_error` object with the description
- of the form
+    /**
+     \rst
+     Constructs a :class:`std::system_error` object with the description
+     of the form
 
- .. parsed-literal::
-   *<message>*: *<system-message>*
+     .. parsed-literal::
+       *<message>*: *<system-message>*
 
- where *<message>* is the formatted message and *<system-message>* is the
- system message corresponding to the error code.
- *error_code* is a Windows error code as given by ``GetLastError``.
- If *error_code* is not a valid error code such as -1, the system message
- will look like "error -1".
+     where *<message>* is the formatted message and *<system-message>* is the
+     system message corresponding to the error code.
+     *error_code* is a Windows error code as given by ``GetLastError``.
+     If *error_code* is not a valid error code such as -1, the system message
+     will look like "error -1".
 
- **Example**::
+     **Example**::
 
-   // This throws a system_error with the description
-   //   cannot open file 'madeup': The system cannot find the file specified.
-   // or similar (system message may vary).
-   const char *filename = "madeup";
-   LPOFSTRUCT of = LPOFSTRUCT();
-   HFILE file = OpenFile(filename, &of, OF_READ);
-   if (file == HFILE_ERROR) {
-     throw turbo::windows_error(GetLastError(),
-                              "cannot open file '{}'", filename);
-   }
- \endrst
-*/
-template <typename... Args>
-std::system_error windows_error(int error_code, string_view message,
-                                const Args&... args) {
-  return vwindows_error(error_code, message, turbo::make_format_args(args...));
-}
+       // This throws a system_error with the description
+       //   cannot open file 'madeup': The system cannot find the file specified.
+       // or similar (system message may vary).
+       const char *filename = "madeup";
+       LPOFSTRUCT of = LPOFSTRUCT();
+       HFILE file = OpenFile(filename, &of, OF_READ);
+       if (file == HFILE_ERROR) {
+         throw turbo::windows_error(GetLastError(),
+                                  "cannot open file '{}'", filename);
+       }
+     \endrst
+    */
+    template <typename... Args>
+    std::system_error windows_error(int error_code, string_view message,
+                                    const Args&... args) {
+      return vwindows_error(error_code, message, turbo::make_format_args(args...));
+    }
 
-// Reports a Windows error without throwing an exception.
-// Can be used to report errors from destructors.
-TURBO_DLL void report_windows_error(int error_code, const char* message) noexcept;
+    // Reports a Windows error without throwing an exception.
+    // Can be used to report errors from destructors.
+    TURBO_DLL void report_windows_error(int error_code, const char* message) noexcept;
 #else
-inline const std::error_category& system_category() noexcept {
-  return std::system_category();
-}
+
+    inline const std::error_category &system_category() noexcept {
+        return std::system_category();
+    }
+
 #endif  // _WIN32
 
 // std::system is not available on some platforms such as iOS (#2248).
 #ifdef __OSX__
-template <typename S, typename... Args, typename Char = char_t<S>>
-void say(const S& format_str, Args&&... args) {
-  std::system(format("say \"{}\"", format(format_str, args...)).c_str());
-}
+    template <typename S, typename... Args, typename Char = char_t<S>>
+    void say(const S& format_str, Args&&... args) {
+      std::system(format("say \"{}\"", format(format_str, args...)).c_str());
+    }
 #endif
 
 // A buffered file.
-class buffered_file {
- private:
-  FILE* file_;
+    class buffered_file {
+    private:
+        FILE *file_;
 
-  friend class file;
+        friend class file;
 
-  explicit buffered_file(FILE* f) : file_(f) {}
+        explicit buffered_file(FILE *f) : file_(f) {}
 
- public:
-  buffered_file(const buffered_file&) = delete;
-  void operator=(const buffered_file&) = delete;
+    public:
+        buffered_file(const buffered_file &) = delete;
 
-  // Constructs a buffered_file object which doesn't represent any file.
-  buffered_file() noexcept : file_(nullptr) {}
+        void operator=(const buffered_file &) = delete;
 
-  // Destroys the object closing the file it represents if any.
-  TURBO_DLL ~buffered_file() noexcept;
+        // Constructs a buffered_file object which doesn't represent any file.
+        buffered_file() noexcept: file_(nullptr) {}
 
- public:
-  buffered_file(buffered_file&& other) noexcept : file_(other.file_) {
-    other.file_ = nullptr;
-  }
+        // Destroys the object closing the file it represents if any.
+        TURBO_DLL ~buffered_file() noexcept;
 
-  buffered_file& operator=(buffered_file&& other) {
-    close();
-    file_ = other.file_;
-    other.file_ = nullptr;
-    return *this;
-  }
+    public:
+        buffered_file(buffered_file &&other) noexcept: file_(other.file_) {
+            other.file_ = nullptr;
+        }
 
-  // Opens a file.
-  TURBO_DLL buffered_file(cstring_view filename, cstring_view mode);
+        buffered_file &operator=(buffered_file &&other) {
+            close();
+            file_ = other.file_;
+            other.file_ = nullptr;
+            return *this;
+        }
 
-  // Closes the file.
-  TURBO_DLL void close();
+        // Opens a file.
+        TURBO_DLL buffered_file(cstring_view filename, cstring_view mode);
 
-  // Returns the pointer to a FILE object representing this file.
-  FILE* get() const noexcept { return file_; }
+        // Closes the file.
+        TURBO_DLL void close();
 
-  TURBO_DLL int descriptor() const;
+        // Returns the pointer to a FILE object representing this file.
+        FILE *get() const noexcept { return file_; }
 
-  void vprint(std::string_view format_str, format_args args) {
-    turbo::vprint(file_, format_str, args);
-  }
+        TURBO_DLL int descriptor() const;
 
-  template <typename... Args>
-  inline void print(std::string_view format_str, const Args&... args) {
-    vprint(format_str, turbo::make_format_args(args...));
-  }
-};
+        void vprint(std::string_view format_str, format_args args) {
+            turbo::vprint(file_, format_str, args);
+        }
+
+        template<typename... Args>
+        inline void print(std::string_view format_str, const Args &... args) {
+            vprint(format_str, turbo::make_format_args(args...));
+        }
+    };
 
 #if FMT_USE_FCNTL
+
 // A file. Closed file is represented by a file object with descriptor -1.
 // Methods that are not declared with noexcept may throw
 // turbo::system_error in case of failure. Note that some errors such as
 // closing the file multiple times will cause a crash on Windows rather
 // than an exception. You can get standard behavior by overriding the
 // invalid parameter handler with _set_invalid_parameter_handler.
-class TURBO_DLL file {
- private:
-  int fd_;  // File descriptor.
+    class TURBO_DLL file {
+    private:
+        int fd_;  // File descriptor.
 
-  // Constructs a file object with a given descriptor.
-  explicit file(int fd) : fd_(fd) {}
+        // Constructs a file object with a given descriptor.
+        explicit file(int fd) : fd_(fd) {}
 
- public:
-  // Possible values for the oflag argument to the constructor.
-  enum {
-    RDONLY = FMT_POSIX(O_RDONLY),  // Open for reading only.
-    WRONLY = FMT_POSIX(O_WRONLY),  // Open for writing only.
-    RDWR = FMT_POSIX(O_RDWR),      // Open for reading and writing.
-    CREATE = FMT_POSIX(O_CREAT),   // Create if the file doesn't exist.
-    APPEND = FMT_POSIX(O_APPEND),  // Open in append mode.
-    TRUNC = FMT_POSIX(O_TRUNC)     // Truncate the content of the file.
-  };
+    public:
+        // Possible values for the oflag argument to the constructor.
+        enum {
+            RDONLY = FMT_POSIX(O_RDONLY),  // Open for reading only.
+            WRONLY = FMT_POSIX(O_WRONLY),  // Open for writing only.
+            RDWR = FMT_POSIX(O_RDWR),      // Open for reading and writing.
+            CREATE = FMT_POSIX(O_CREAT),   // Create if the file doesn't exist.
+            APPEND = FMT_POSIX(O_APPEND),  // Open in append mode.
+            TRUNC = FMT_POSIX(O_TRUNC)     // Truncate the content of the file.
+        };
 
-  // Constructs a file object which doesn't represent any file.
-  file() noexcept : fd_(-1) {}
+        // Constructs a file object which doesn't represent any file.
+        file() noexcept: fd_(-1) {}
 
-  // Opens a file and constructs a file object representing this file.
-  file(cstring_view path, int oflag);
+        // Opens a file and constructs a file object representing this file.
+        file(cstring_view path, int oflag);
 
- public:
-  file(const file&) = delete;
-  void operator=(const file&) = delete;
+    public:
+        file(const file &) = delete;
 
-  file(file&& other) noexcept : fd_(other.fd_) { other.fd_ = -1; }
+        void operator=(const file &) = delete;
 
-  // Move assignment is not noexcept because close may throw.
-  file& operator=(file&& other) {
-    close();
-    fd_ = other.fd_;
-    other.fd_ = -1;
-    return *this;
-  }
+        file(file &&other) noexcept: fd_(other.fd_) { other.fd_ = -1; }
 
-  // Destroys the object closing the file it represents if any.
-  ~file() noexcept;
+        // Move assignment is not noexcept because close may throw.
+        file &operator=(file &&other) {
+            close();
+            fd_ = other.fd_;
+            other.fd_ = -1;
+            return *this;
+        }
 
-  // Returns the file descriptor.
-  int descriptor() const noexcept { return fd_; }
+        // Destroys the object closing the file it represents if any.
+        ~file() noexcept;
 
-  // Closes the file.
-  void close();
+        // Returns the file descriptor.
+        int descriptor() const noexcept { return fd_; }
 
-  // Returns the file size. The size has signed type for consistency with
-  // stat::st_size.
-  long long size() const;
+        // Closes the file.
+        void close();
 
-  // Attempts to read count bytes from the file into the specified buffer.
-  size_t read(void* buffer, size_t count);
+        // Returns the file size. The size has signed type for consistency with
+        // stat::st_size.
+        long long size() const;
 
-  // Attempts to write count bytes from the specified buffer to the file.
-  size_t write(const void* buffer, size_t count);
+        // Attempts to read count bytes from the file into the specified buffer.
+        size_t read(void *buffer, size_t count);
 
-  // Duplicates a file descriptor with the dup function and returns
-  // the duplicate as a file object.
-  static file dup(int fd);
+        // Attempts to write count bytes from the specified buffer to the file.
+        size_t write(const void *buffer, size_t count);
 
-  // Makes fd be the copy of this file descriptor, closing fd first if
-  // necessary.
-  void dup2(int fd);
+        // Duplicates a file descriptor with the dup function and returns
+        // the duplicate as a file object.
+        static file dup(int fd);
 
-  // Makes fd be the copy of this file descriptor, closing fd first if
-  // necessary.
-  void dup2(int fd, std::error_code& ec) noexcept;
+        // Makes fd be the copy of this file descriptor, closing fd first if
+        // necessary.
+        void dup2(int fd);
 
-  // Creates a pipe setting up read_end and write_end file objects for reading
-  // and writing respectively.
-  static void pipe(file& read_end, file& write_end);
+        // Makes fd be the copy of this file descriptor, closing fd first if
+        // necessary.
+        void dup2(int fd, std::error_code &ec) noexcept;
 
-  // Creates a buffered_file object associated with this file and detaches
-  // this file object from the file.
-  buffered_file fdopen(const char* mode);
+        // Creates a pipe setting up read_end and write_end file objects for reading
+        // and writing respectively.
+        static void pipe(file &read_end, file &write_end);
+
+        // Creates a buffered_file object associated with this file and detaches
+        // this file object from the file.
+        buffered_file fdopen(const char *mode);
 
 #  if defined(_WIN32) && !defined(__MINGW32__)
-  // Opens a file and constructs a file object representing this file by
-  // wcstring_view filename. Windows only.
-  static file open_windows_file(wcstring_view path, int oflag);
+        // Opens a file and constructs a file object representing this file by
+        // wcstring_view filename. Windows only.
+        static file open_windows_file(wcstring_view path, int oflag);
 #  endif
-};
+    };
 
-// Returns the memory page size.
-long getpagesize();
+    // Returns the memory page size.
+    long getpagesize();
 
-FMT_BEGIN_DETAIL_NAMESPACE
+    namespace detail {
 
-struct buffer_size {
-  buffer_size() = default;
-  size_t value = 0;
-  buffer_size operator=(size_t val) const {
-    auto bs = buffer_size();
-    bs.value = val;
-    return bs;
-  }
-};
+        struct buffer_size {
+            buffer_size() = default;
 
-struct ostream_params {
-  int oflag = file::WRONLY | file::CREATE | file::TRUNC;
-  size_t buffer_size = BUFSIZ > 32768 ? BUFSIZ : 32768;
+            size_t value = 0;
 
-  ostream_params() {}
+            buffer_size operator=(size_t val) const {
+                auto bs = buffer_size();
+                bs.value = val;
+                return bs;
+            }
+        };
 
-  template <typename... T>
-  ostream_params(T... params, int new_oflag) : ostream_params(params...) {
-    oflag = new_oflag;
-  }
+        struct ostream_params {
+            int oflag = file::WRONLY | file::CREATE | file::TRUNC;
+            size_t buffer_size = BUFSIZ > 32768 ? BUFSIZ : 32768;
 
-  template <typename... T>
-  ostream_params(T... params, detail::buffer_size bs)
-      : ostream_params(params...) {
-    this->buffer_size = bs.value;
-  }
+            ostream_params() {}
+
+            template<typename... T>
+            ostream_params(T... params, int new_oflag) : ostream_params(params...) {
+                oflag = new_oflag;
+            }
+
+            template<typename... T>
+            ostream_params(T... params, detail::buffer_size bs)
+                    : ostream_params(params...) {
+                this->buffer_size = bs.value;
+            }
 
 // Intel has a bug that results in failure to deduce a constructor
 // for empty parameter packs.
 #  if defined(__INTEL_COMPILER) && __INTEL_COMPILER < 2000
-  ostream_params(int new_oflag) : oflag(new_oflag) {}
-  ostream_params(detail::buffer_size bs) : buffer_size(bs.value) {}
+            ostream_params(int new_oflag) : oflag(new_oflag) {}
+            ostream_params(detail::buffer_size bs) : buffer_size(bs.value) {}
 #  endif
-};
+        };
 
-class file_buffer final : public buffer<char> {
-  file file_;
+        class file_buffer final : public buffer<char> {
+            file file_;
 
-  TURBO_DLL void grow(size_t) override;
+            TURBO_DLL void grow(size_t) override;
 
- public:
-  TURBO_DLL file_buffer(cstring_view path, const ostream_params& params);
-  TURBO_DLL file_buffer(file_buffer&& other);
-  TURBO_DLL ~file_buffer();
+        public:
+            TURBO_DLL file_buffer(cstring_view path, const ostream_params &params);
 
-  void flush() {
-    if (size() == 0) return;
-    file_.write(data(), size() * sizeof(data()[0]));
-    clear();
-  }
+            TURBO_DLL file_buffer(file_buffer &&other);
 
-  void close() {
-    flush();
-    file_.close();
-  }
-};
+            TURBO_DLL ~file_buffer();
 
-FMT_END_DETAIL_NAMESPACE
+            void flush() {
+                if (size() == 0) return;
+                file_.write(data(), size() * sizeof(data()[0]));
+                clear();
+            }
 
-// Added {} below to work around default constructor error known to
-// occur in Xcode versions 7.2.1 and 8.2.1.
-constexpr detail::buffer_size buffer_size{};
+            void close() {
+                flush();
+                file_.close();
+            }
+        };
 
-/** A fast output stream which is not thread-safe. */
-class TURBO_DLL ostream {
- private:
-  TURBO_MSC_WARNING(suppress : 4251)
-  detail::file_buffer buffer_;
+    }  // namespace detail
 
-  ostream(cstring_view path, const detail::ostream_params& params)
-      : buffer_(path, params) {}
+    // Added {} below to work around default constructor error known to
+    // occur in Xcode versions 7.2.1 and 8.2.1.
+    constexpr detail::buffer_size buffer_size{};
 
- public:
-  ostream(ostream&& other) : buffer_(std::move(other.buffer_)) {}
+    /** A fast output stream which is not thread-safe. */
+    class TURBO_DLL ostream {
+    private:
+        TURBO_MSC_WARNING(suppress :
+                              4251)
+        detail::file_buffer buffer_;
 
-  ~ostream();
+        ostream(cstring_view path, const detail::ostream_params &params)
+                : buffer_(path, params) {}
 
-  void flush() { buffer_.flush(); }
+    public:
+        ostream(ostream &&other) : buffer_(std::move(other.buffer_)) {}
 
-  template <typename... T>
-  friend ostream output_file(cstring_view path, T... params);
+        ~ostream();
 
-  void close() { buffer_.close(); }
+        void flush() { buffer_.flush(); }
 
-  /**
-    Formats ``args`` according to specifications in ``fmt`` and writes the
-    output to the file.
-   */
-  template <typename... T> void print(format_string<T...> fmt, T&&... args) {
-    vformat_to(detail::buffer_appender<char>(buffer_), fmt,
-               turbo::make_format_args(args...));
-  }
-};
+        template<typename... T>
+        friend ostream output_file(cstring_view path, T... params);
 
-/**
-  \rst
-  Opens a file for writing. Supported parameters passed in *params*:
+        void close() { buffer_.close(); }
 
-  * ``<integer>``: Flags passed to `open
-    <https://pubs.opengroup.org/onlinepubs/007904875/functions/open.html>`_
-    (``file::WRONLY | file::CREATE | file::TRUNC`` by default)
-  * ``buffer_size=<integer>``: Output buffer size
+        /**
+          Formats ``args`` according to specifications in ``fmt`` and writes the
+          output to the file.
+         */
+        template<typename... T>
+        void print(format_string<T...> fmt, T &&... args) {
+            vformat_to(detail::buffer_appender<char>(buffer_), fmt,
+                       turbo::make_format_args(args...));
+        }
+    };
 
-  **Example**::
+    /**
+      \rst
+      Opens a file for writing. Supported parameters passed in *params*:
 
-    auto out = turbo::output_file("guide.txt");
-    out.print("Don't {}", "Panic");
-  \endrst
- */
-template <typename... T>
-inline ostream output_file(cstring_view path, T... params) {
-  return {path, detail::ostream_params(params...)};
-}
+      * ``<integer>``: Flags passed to `open
+        <https://pubs.opengroup.org/onlinepubs/007904875/functions/open.html>`_
+        (``file::WRONLY | file::CREATE | file::TRUNC`` by default)
+      * ``buffer_size=<integer>``: Output buffer size
+
+      **Example**::
+
+        auto out = turbo::output_file("guide.txt");
+        out.print("Don't {}", "Panic");
+      \endrst
+     */
+    template<typename... T>
+    inline ostream output_file(cstring_view path, T... params) {
+        return {path, detail::ostream_params(params...)};
+    }
+
 #endif  // FMT_USE_FCNTL
 
-TURBO_END_EXPORT
-FMT_END_NAMESPACE
+}  // namespace turbo
 
 #endif  // FMT_OS_H_
