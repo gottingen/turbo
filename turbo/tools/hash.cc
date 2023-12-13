@@ -36,16 +36,16 @@ namespace turbo::tools {
         result.add_row({"original", turbo::tools::Context::get_instance().hash_string});
         switch (turbo::tools::Context::get_instance().engine) {
                 case turbo::hash_engine_type::bytes_hash:
-                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, bytes_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                result.add_row({"hash", turbo::format(turbo::Hash<std::string, bytes_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
                 break;
             case turbo::hash_engine_type::city_hash:
-                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, city_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                result.add_row({"hash", turbo::format(turbo::Hash<std::string, city_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
                 break;
             case turbo::hash_engine_type::m3_hash:
-                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, m3_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                result.add_row({"hash", turbo::format(turbo::Hash<std::string, m3_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
                 break;
             case turbo::hash_engine_type::xx_hash:
-                result.add_row({"hash", turbo::Format(turbo::Hash<std::string, xx_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
+                result.add_row({"hash", turbo::format(turbo::Hash<std::string, xx_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
                 break;
         }
         result.column(0).format().font_color(turbo::Color::yellow);

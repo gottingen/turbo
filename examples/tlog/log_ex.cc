@@ -186,7 +186,7 @@ void async_example() {
 // Log binary data as hex.
 // Many types of std::container<char> types can be used.
 // Iterator ranges are supported too.
-// Format flags:
+// format flags:
 // {:X} - print in uppercase.
 // {:s} - don't separate each byte with space.
 // {:p} - don't print the position on each line start.

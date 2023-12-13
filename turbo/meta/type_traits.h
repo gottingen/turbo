@@ -123,45 +123,53 @@ namespace turbo {
     };
 #endif
 
-// turbo::is_constant_evaluated()
-//
-// Detects whether the function call occurs within a constant-evaluated context.
-// Returns true if the evaluation of the call occurs within the evaluation of an
-// expression or conversion that is manifestly constant-evaluated; otherwise
-// returns false.
-//
-// This function is implemented in terms of `std::is_constant_evaluated` for
-// c++20 and up. For older c++ versions, the function is implemented in terms
-// of `__builtin_is_constant_evaluated` if available, otherwise the function
-// will fail to compile.
-//
-// Applications can inspect `TURBO_HAVE_CONSTANT_EVALUATED` at compile time
-// to check if this function is supported.
-//
-// Example:
-//
-// constexpr MyClass::MyClass(int param) {
-// #ifdef TURBO_HAVE_CONSTANT_EVALUATED
-//   if (!turbo::is_constant_evaluated()) {
-//     TURBO_LOG(INFO) << "MyClass(" << param << ")";
-//   }
-// #endif  // TURBO_HAVE_CONSTANT_EVALUATED
-// }
-//
-// Upstream documentation:
-//
-// http://en.cppreference.com/w/cpp/types/is_constant_evaluated
-// http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#:~:text=__builtin_is_constant_evaluated
-//
-#if defined(TURBO_HAVE_CONSTANT_EVALUATED)
-    constexpr bool is_constant_evaluated() noexcept {
-#ifdef __cpp_lib_is_constant_evaluated
-      return std::is_constant_evaluated();
-#elif TURBO_HAVE_BUILTIN(__builtin_is_constant_evaluated)
-      return __builtin_is_constant_evaluated();
+    // turbo::is_constant_evaluated()
+    //
+    // Detects whether the function call occurs within a constant-evaluated context.
+    // Returns true if the evaluation of the call occurs within the evaluation of an
+    // expression or conversion that is manifestly constant-evaluated; otherwise
+    // returns false.
+    //
+    // This function is implemented in terms of `std::is_constant_evaluated` for
+    // c++20 and up. For older c++ versions, the function is implemented in terms
+    // of `__builtin_is_constant_evaluated` if available, otherwise the function
+    // will fail to compile.
+    //
+    // Applications can inspect `TURBO_HAVE_CONSTANT_EVALUATED` at compile time
+    // to check if this function is supported.
+    //
+    // Example:
+    //
+    // constexpr MyClass::MyClass(int param) {
+    // #ifdef TURBO_HAVE_CONSTANT_EVALUATED
+    //   if (!turbo::is_constant_evaluated()) {
+    //     TURBO_LOG(INFO) << "MyClass(" << param << ")";
+    //   }
+    // #endif  // TURBO_HAVE_CONSTANT_EVALUATED
+    // }
+    //
+    // Upstream documentation:
+    //
+    // http://en.cppreference.com/w/cpp/types/is_constant_evaluated
+    // http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#:~:text=__builtin_is_constant_evaluated
+    //
+    constexpr TURBO_FORCE_INLINE auto is_constant_evaluated(bool default_value = false) noexcept -> bool {
+        // Workaround for incompatibility between libstdc++ consteval-based
+        // std::is_constant_evaluated() implementation and clang-14.
+        // https://github.com/fmtlib/fmt/issues/3247
+#if TURBO_CPLUSPLUS >= TURBO_CPLUSPLUS_20 && defined(_GLIBCXX_RELEASE) && \
+    _GLIBCXX_RELEASE >= 12 && \
+    (TURBO_CLANG_VERSION >= 1400 && TURBO_CLANG_VERSION < 1500)
+        ignore_unused(default_value);
+                return __builtin_is_constant_evaluated();
+#elif defined(__cpp_lib_is_constant_evaluated)
+        ignore_unused(default_value);
+                return std::is_constant_evaluated();
+#else
+        return default_value;
 #endif
     }
-#endif  // TURBO_HAVE_CONSTANT_EVALUATED
+
     TURBO_NAMESPACE_END
 
 #ifdef TURBO_COMPILER_HAVE_RTTI
@@ -422,6 +430,9 @@ namespace turbo {
      * concepts *
      ************/
 
+#define TURBO_ENABLE_IF(...) std::enable_if_t<(__VA_ARGS__), int> = 0
+#define TURBO_FORWARD(...) static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
+
 #if !defined(__GNUC__) || (defined(__GNUC__) && (__GNUC__ >= 5))
 
     template<class... C>
@@ -499,10 +510,11 @@ namespace turbo {
      * select implementation *
      *************************/
 
-    template<class B, class T1, class T2, TURBO_REQUIRES(all_scalar < B, T1, T2 >)>
+    template<class B, class T1, class T2, TURBO_REQUIRES(all_scalar<B, T1, T2>)>
     inline std::common_type_t<T1, T2> select(const B &cond, const T1 &v1, const T2 &v2) noexcept {
         return cond ? v1 : v2;
     }
+
     // to avoid useless casts (see https://github.com/nlohmann/json/issues/2893#issuecomment-889152324)
     template<typename T, typename U, std::enable_if_t<!std::is_same<T, U>::value, int> = 0>
     constexpr T conditional_static_cast(U value) {

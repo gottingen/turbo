@@ -20,18 +20,18 @@
 #include "turbo/strings/inlined_string.h"
 #include "turbo/format/format.h"
 
-TEST_CASE("Format -InlinedString") {
+TEST_CASE("format -InlinedString") {
 
-    turbo::inlined_string s = turbo::Format(42);
+    turbo::inlined_string s = turbo::format(42);
     CHECK_EQ(s, "42");
-    std::string stdstr  = turbo::Format(42);
+    std::string stdstr  = turbo::format(42);
     CHECK_EQ(stdstr, "42");
 }
 
-TEST_CASE("Format -InlinedString") {
+TEST_CASE("format -InlinedString") {
     std::vector<int> array = {1, 2, 4};
-    auto s = turbo::FormatRange("{}",array, ", ");
+    auto s = turbo::format_range("{}",array, ", ");
     CHECK_EQ(s, "1, 2, 4");
-    turbo::FormatRangeAppend(&s,"{}",array, ", ");
+    turbo::format_range_append(&s,"{}",array, ", ");
     CHECK_EQ(s, "1, 2, 41, 2, 4");
 }

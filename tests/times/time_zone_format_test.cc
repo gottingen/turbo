@@ -78,7 +78,7 @@ namespace turbo {
             // Testing format()
             //
 
-            TEST_CASE("Format, TimePointResolution") {
+            TEST_CASE("format, TimePointResolution") {
                 const char kFmt[] = "%H:%M:%E*S";
                 const time_zone utc = utc_time_zone();
                 const time_point<chrono::nanoseconds> t0 =
@@ -107,7 +107,7 @@ namespace turbo {
                           format(kFmt, chrono::time_point_cast<chrono::hours>(t0), utc));
             }
 
-            TEST_CASE("Format, TimePointExtendedResolution") {
+            TEST_CASE("format, TimePointExtendedResolution") {
                 const char kFmt[] = "%H:%M:%E*S";
                 const time_zone utc = utc_time_zone();
                 const time_point<turbo::time_internal::cctz::seconds> tp =
@@ -134,7 +134,7 @@ namespace turbo {
                           detail::format(kFmt, tp, detail::femtoseconds(1), utc));
             }
 
-            TEST_CASE("Format, Basics") {
+            TEST_CASE("format, Basics") {
                 time_zone tz = utc_time_zone();
                 time_point<chrono::nanoseconds> tp = chrono::system_clock::from_time_t(0);
 
@@ -159,7 +159,7 @@ namespace turbo {
                 REQUIRE_EQ("13:04:05.006007008", format("%H:%M:%E9S", tp, tz));
             }
 
-            TEST_CASE("Format, PosixConversions") {
+            TEST_CASE("format, PosixConversions") {
                 const time_zone tz = utc_time_zone();
                 auto tp = chrono::system_clock::from_time_t(0);
 
@@ -203,7 +203,7 @@ namespace turbo {
 #endif
             }
 
-            TEST_CASE("Format, LocaleSpecific") {
+            TEST_CASE("format, LocaleSpecific") {
                 const time_zone tz = utc_time_zone();
                 auto tp = chrono::system_clock::from_time_t(0);
 
@@ -252,7 +252,7 @@ namespace turbo {
 #endif
             }
 
-            TEST_CASE("Format, Escaping") {
+            TEST_CASE("format, Escaping") {
                 const time_zone tz = utc_time_zone();
                 auto tp = chrono::system_clock::from_time_t(0);
 
@@ -271,7 +271,7 @@ namespace turbo {
                 TestFormatSpecifier(tp, tz, "%%%%E3S", "%%E3S");
             }
 
-            TEST_CASE("Format, ExtendedSeconds") {
+            TEST_CASE("format, ExtendedSeconds") {
                 const time_zone tz = utc_time_zone();
 
                 // No subseconds.
@@ -333,7 +333,7 @@ namespace turbo {
                           format("%Y-%m-%d %H:%M:%E*S", tp, tz));
             }
 
-            TEST_CASE("Format, ExtendedSubeconds") {
+            TEST_CASE("format, ExtendedSubeconds") {
                 const time_zone tz = utc_time_zone();
 
                 // No subseconds.
@@ -395,7 +395,7 @@ namespace turbo {
                           format("%Y-%m-%d %H:%M:%S.%E*f", tp, tz));
             }
 
-            TEST_CASE("Format, CompareExtendSecondsVsSubseconds") {
+            TEST_CASE("format, CompareExtendSecondsVsSubseconds") {
                 const time_zone tz = utc_time_zone();
 
                 // This test case illustrates the differences/similarities between:
@@ -437,7 +437,7 @@ namespace turbo {
                 }
             }
 
-            TEST_CASE("Format, ExtendedOffset") {
+            TEST_CASE("format, ExtendedOffset") {
                 const auto tp = chrono::system_clock::from_time_t(0);
 
                 auto tz = fixed_time_zone(turbo::time_internal::cctz::seconds::zero());
@@ -518,7 +518,7 @@ namespace turbo {
                 TestFormatSpecifier(tp, tz, "%Ez", "-12:34");
             }
 
-            TEST_CASE("Format, ExtendedSecondOffset") {
+            TEST_CASE("format, ExtendedSecondOffset") {
                 const auto tp = chrono::system_clock::from_time_t(0);
 
                 auto tz = fixed_time_zone(turbo::time_internal::cctz::seconds::zero());
@@ -599,7 +599,7 @@ namespace turbo {
                 TestFormatSpecifier(tp, tz, "%:::z", "-12:34:56");
             }
 
-            TEST_CASE("Format, ExtendedYears") {
+            TEST_CASE("format, ExtendedYears") {
                 const time_zone utc = utc_time_zone();
                 const char e4y_fmt[] = "%E4Y%m%d";  // no separators
 
@@ -632,7 +632,7 @@ namespace turbo {
                 REQUIRE_EQ("100001127", format(e4y_fmt, tp, utc));
             }
 
-            TEST_CASE("Format, RFC3339Format") {
+            TEST_CASE("format, RFC3339Format") {
                 time_zone tz;
                 REQUIRE(load_time_zone("America/Los_Angeles", &tz));
 
@@ -679,7 +679,7 @@ namespace turbo {
                 REQUIRE_EQ("1977-06-28T09:08:07-07:00", format(RFC3339_sec, tp, tz));
             }
 
-            TEST_CASE("Format, RFC1123Format") {  // locale specific
+            TEST_CASE("format, RFC1123Format") {  // locale specific
                 time_zone tz;
                 REQUIRE(load_time_zone("America/Los_Angeles", &tz));
 
@@ -688,7 +688,7 @@ namespace turbo {
                 REQUIRE_EQ("28 Jun 1977 09:08:07 -0700", format(RFC1123_no_wday, tp, tz));
             }
 
-            TEST_CASE("Format, Week") {
+            TEST_CASE("format, Week") {
                 const time_zone utc = utc_time_zone();
 
                 auto tp = convert(civil_second(2017, 1, 1, 0, 0, 0), utc);

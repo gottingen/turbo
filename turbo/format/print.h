@@ -32,7 +32,7 @@ namespace turbo {
 
     template<typename ...Args>
     void Println(std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, "{}\n", Format(fmt, std::forward<Args>(args)...));
+        fmt::print(stdout, "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename ...Args>
@@ -42,7 +42,7 @@ namespace turbo {
 
     template<typename ...Args>
     void FPrintln(std::FILE *file, std::string_view fmt,  Args &&... args) {
-        fmt::print(file, "{}\n", Format(fmt, std::forward<Args>(args)...));
+        fmt::print(file, "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
     using fmt::color;
@@ -61,7 +61,7 @@ namespace turbo {
 
     template<typename ...Args>
     void Println(const text_style& ts, std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, ts, "{}\n", Format(fmt, std::forward<Args>(args)...));
+        fmt::print(stdout, ts, "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename ...Args>
@@ -71,7 +71,7 @@ namespace turbo {
 
     template<typename ...Args>
     void Println(const color& c, std::string_view fmt,  Args &&... args) {
-        fmt::print(stdout, fg(c), "{}\n", Format(fmt, std::forward<Args>(args)...));
+        fmt::print(stdout, fg(c), "{}\n", format(fmt, std::forward<Args>(args)...));
     }
 
 }  // namespace turbo

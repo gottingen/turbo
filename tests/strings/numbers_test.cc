@@ -216,10 +216,10 @@ namespace {
 
     void CheckHex64(uint64_t v) {
         char expected[16 + 1];
-        std::string actual = turbo::Format("{:016x}", v);
+        std::string actual = turbo::format("{:016x}", v);
         snprintf(expected, sizeof(expected), "%016" PRIx64, static_cast<uint64_t>(v));
         EXPECT_EQ(expected, actual) << " Input " << v;
-        actual = turbo::Format("{:16x}", v);
+        actual = turbo::format("{:16x}", v);
         snprintf(expected, sizeof(expected), "%16" PRIx64, static_cast<uint64_t>(v));
         EXPECT_EQ(expected, actual) << " Input " << v;
     }
@@ -1058,16 +1058,16 @@ namespace {
 
             // Test overflow
             EXPECT_FALSE(
-                    parse_func(turbo::Format("{}{}", std::numeric_limits<IntType>::max(), value),
+                    parse_func(turbo::format("{}{}", std::numeric_limits<IntType>::max(), value),
                                &parsed_value, base));
 
             // Test underflow
             if (std::numeric_limits<IntType>::min() < 0) {
                 EXPECT_FALSE(
-                        parse_func(turbo::Format("{}{}", std::numeric_limits<IntType>::min(), value),
+                        parse_func(turbo::format("{}{}", std::numeric_limits<IntType>::min(), value),
                                    &parsed_value, base));
             } else {
-                EXPECT_FALSE(parse_func(turbo::Format("-{}", value), &parsed_value, base));
+                EXPECT_FALSE(parse_func(turbo::format("-{}", value), &parsed_value, base));
             }
         }
     }
@@ -1349,7 +1349,7 @@ namespace {
                 mismatches.push_back(d);
                 if (mismatches.size() < 10) {
                     TURBO_RAW_LOG(ERROR, "%s",
-                                  turbo::Format("Six-digit failure with double.  d={}={}  sixdigits={} printf(%g)={}",
+                                  turbo::format("Six-digit failure with double.  d={}={}  sixdigits={} printf(%g)={}",
                                                 d, d, sixdigitsbuf, snprintfbuf).c_str());
                 }
             }
@@ -1400,7 +1400,7 @@ namespace {
                     char buf[kSixDigitsToBufferSize];
                     TURBO_RAW_LOG(
                             INFO, "%s",
-                            turbo::Format("Exp {} powten={}({}) ({}) ", exponent, powten, powten,
+                            turbo::format("Exp {} powten={}({}) ({}) ", exponent, powten, powten,
                                           std::string(buf, SixDigitsToBuffer(powten, buf))).c_str());
                 }
                 for (int digits: digit_testcases) {
@@ -1428,7 +1428,7 @@ namespace {
                 char b1[32], b2[kSixDigitsToBufferSize];
                 TURBO_RAW_LOG(
                         ERROR, "%s",
-                        turbo::Format(
+                        turbo::format(
                                 "Mismatch #{}  d={} ({}) sixdigits='{}' snprintf='{}' Before.={} vs snprintf={} Perfect={} vs snprintf={} After.=.{} {} vs snprintf={}",
                                 i, d, ToNineDigits(d), sixdigitsbuf, snprintfbuf,
                                 PerfectDtoa(before),
@@ -1457,8 +1457,8 @@ namespace {
                 {" ",                                 false, 0},
                 {"-",                                 false, 0},
                 {"123@@@",                            false, 123},
-                {turbo::Format("{}{}", int32_min, int32_max), false, int32_min},
-                {turbo::Format("{}{}", int32_max, int32_max), false, int32_max},
+                {turbo::format("{}{}", int32_min, int32_max), false, int32_min},
+                {turbo::format("{}{}", int32_max, int32_max), false, int32_max},
         };
 
         for (const Int32TestLine &test_line: int32_test_line) {
@@ -1489,7 +1489,7 @@ namespace {
                 {" ",                                   false, 0},
                 {"-",                                   false, 0},
                 {"123@@@",                              false, 123},
-                {turbo::Format("{}{}", uint32_max, uint32_max), false, uint32_max},
+                {turbo::format("{}{}", uint32_max, uint32_max), false, uint32_max},
         };
 
         for (const Uint32TestLine &test_line: uint32_test_line) {
@@ -1521,8 +1521,8 @@ namespace {
                 {" ",                                 false, 0},
                 {"-",                                 false, 0},
                 {"123@@@",                            false, 123},
-                {turbo::Format("{}{}", int64_min, int64_max), false, int64_min},
-                {turbo::Format("{}{}", int64_max, int64_max), false, int64_max},
+                {turbo::format("{}{}", int64_min, int64_max), false, int64_min},
+                {turbo::format("{}{}", int64_max, int64_max), false, int64_max},
         };
 
         for (const Int64TestLine &test_line: int64_test_line) {
@@ -1553,7 +1553,7 @@ namespace {
                 {" ",                                   false, 0},
                 {"-",                                   false, 0},
                 {"123@@@",                              false, 123},
-                {turbo::Format("{}{}", uint64_max, uint64_max), false, uint64_max},
+                {turbo::format("{}{}", uint64_max, uint64_max), false, uint64_max},
         };
 
         for (const Uint64TestLine &test_line: uint64_test_line) {

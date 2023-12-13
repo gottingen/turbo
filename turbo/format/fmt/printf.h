@@ -14,7 +14,7 @@
 #include "format.h"
 
 FMT_BEGIN_NAMESPACE
-FMT_BEGIN_EXPORT
+TURBO_BEGIN_EXPORT
 
 template <typename T> struct printf_formatter { printf_formatter() = delete; };
 
@@ -51,7 +51,7 @@ template <typename OutputIt, typename Char> class basic_printf_context {
 
   format_arg arg(int id) const { return args_.get(id); }
 
-  FMT_CONSTEXPR void on_error(const char* message) {
+  constexpr void on_error(const char* message) {
     detail::error_handler().on_error(message);
   }
 };
@@ -78,14 +78,14 @@ template <> struct int_checker<true> {
 
 class printf_precision_handler {
  public:
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(std::is_integral<T>::value)>
   int operator()(T value) {
     if (!int_checker<std::numeric_limits<T>::is_signed>::fits_in_int(value))
       throw_format_error("number is too big");
     return (std::max)(static_cast<int>(value), 0);
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(!std::is_integral<T>::value)>
   int operator()(T) {
     throw_format_error("precision is not integer");
     return 0;
@@ -95,12 +95,12 @@ class printf_precision_handler {
 // An argument visitor that returns true iff arg is a zero integer.
 class is_zero_int {
  public:
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(std::is_integral<T>::value)>
   bool operator()(T value) {
     return value == 0;
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(!std::is_integral<T>::value)>
   bool operator()(T) {
     return false;
   }
@@ -125,10 +125,10 @@ template <typename T, typename Context> class arg_converter {
     if (type_ != 's') operator()<bool>(value);
   }
 
-  template <typename U, FMT_ENABLE_IF(std::is_integral<U>::value)>
+  template <typename U, TURBO_ENABLE_IF(std::is_integral<U>::value)>
   void operator()(U value) {
     bool is_signed = type_ == 'd' || type_ == 'i';
-    using target_type = conditional_t<std::is_same<T, void>::value, U, T>;
+    using target_type = std::conditional_t<std::is_same<T, void>::value, U, T>;
     if (const_check(sizeof(target_type) <= sizeof(int))) {
       // Extra casts are used to silence warnings.
       if (is_signed) {
@@ -152,7 +152,7 @@ template <typename T, typename Context> class arg_converter {
     }
   }
 
-  template <typename U, FMT_ENABLE_IF(!std::is_integral<U>::value)>
+  template <typename U, TURBO_ENABLE_IF(!std::is_integral<U>::value)>
   void operator()(U) {}  // No conversion needed for non-integral types.
 };
 
@@ -173,13 +173,13 @@ template <typename Context> class char_converter {
  public:
   explicit char_converter(basic_format_arg<Context>& arg) : arg_(arg) {}
 
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(std::is_integral<T>::value)>
   void operator()(T value) {
     arg_ = detail::make_arg<Context>(
         static_cast<typename Context::char_type>(value));
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(!std::is_integral<T>::value)>
   void operator()(T) {}  // No conversion needed for non-integral types.
 };
 
@@ -199,7 +199,7 @@ template <typename Char> class printf_width_handler {
  public:
   explicit printf_width_handler(format_specs<Char>& specs) : specs_(specs) {}
 
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(std::is_integral<T>::value)>
   unsigned operator()(T value) {
     auto width = static_cast<uint32_or_64_or_128_t<T>>(value);
     if (detail::is_negative(value)) {
@@ -211,7 +211,7 @@ template <typename Char> class printf_width_handler {
     return static_cast<unsigned>(width);
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(!std::is_integral<T>::value)>
   unsigned operator()(T) {
     throw_format_error("width is not integer");
     return 0;
@@ -247,7 +247,7 @@ class printf_arg_formatter : public arg_formatter<Char> {
 
   OutputIt operator()(monostate value) { return base::operator()(value); }
 
-  template <typename T, FMT_ENABLE_IF(detail::is_integral<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(detail::is_integral<T>::value)>
   OutputIt operator()(T value) {
     // MSVC2013 fails to compile separate overloads for bool and Char so use
     // std::is_same instead.
@@ -269,7 +269,7 @@ class printf_arg_formatter : public arg_formatter<Char> {
     return base::operator()(value);
   }
 
-  template <typename T, FMT_ENABLE_IF(std::is_floating_point<T>::value)>
+  template <typename T, TURBO_ENABLE_IF(std::is_floating_point<T>::value)>
   OutputIt operator()(T value) {
     return base::operator()(value);
   }
@@ -551,7 +551,7 @@ void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
 
     start = it;
 
-    // Format argument.
+    // format argument.
     out = visit_format_arg(
         printf_arg_formatter<iterator, Char>(out, specs, context), arg);
   }
@@ -613,7 +613,7 @@ inline auto vsprintf(
   \endrst
 */
 template <typename S, typename... T,
-          typename Char = enable_if_t<detail::is_string<S>::value, char_t<S>>>
+          typename Char = std::enable_if_t<detail::is_string<S>::value, char_t<S>>>
 inline auto sprintf(const S& fmt, const T&... args) -> std::basic_string<Char> {
   using context = basic_printf_context_t<Char>;
   return vsprintf(detail::to_string_view(fmt),
@@ -666,14 +666,14 @@ inline auto vprintf(
     fmt::printf("Elapsed time: %.2f seconds", 1.23);
   \endrst
  */
-template <typename S, typename... T, FMT_ENABLE_IF(detail::is_string<S>::value)>
+template <typename S, typename... T, TURBO_ENABLE_IF(detail::is_string<S>::value)>
 inline auto printf(const S& fmt, const T&... args) -> int {
   return vprintf(
       detail::to_string_view(fmt),
       fmt::make_format_args<basic_printf_context_t<char_t<S>>>(args...));
 }
 
-FMT_END_EXPORT
+TURBO_END_EXPORT
 FMT_END_NAMESPACE
 
 #endif  // FMT_PRINTF_H_

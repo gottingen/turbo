@@ -331,13 +331,13 @@ namespace turbo::tlog::details {
         result.append(expr);
         if constexpr (sizeof...(args) != 0) {
             result.append(" ");
-            turbo::FormatAppend(&result, std::forward<Args>(args)...);
+            turbo::format_append(&result, std::forward<Args>(args)...);
         }
         return result;
     }
 
     inline std::string MakeCheckString(std::string_view name, std::string_view v1, std::string_view v2, std::string_view op) {
-        return turbo::Format("Check {} failed: {} {} {}", name, v1, op, v2);
+        return turbo::format("Check {} failed: {} {} {}", name, v1, op, v2);
     }
 
 }  // namespace turbo::tlog::details

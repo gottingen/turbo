@@ -50,7 +50,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     namespace utility_internal {
         // Helper method for expanding tuple into a called method.
@@ -164,7 +163,12 @@ namespace turbo {
                         std::tuple_size<std::decay_t<Tuple>>::value>{});
     }
 
-    TURBO_NAMESPACE_END
+    template<typename Int>
+    constexpr auto to_unsigned(Int value) ->
+    typename std::make_unsigned<Int>::type {
+        TURBO_ASSERT(std::is_unsigned<Int>::value || value >= 0, "negative value");
+        return static_cast<typename std::make_unsigned<Int>::type>(value);
+    }
 }  // namespace turbo
 
 #endif  // TURBO_UTILITY_UTILITY_H_

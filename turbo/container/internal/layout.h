@@ -305,11 +305,11 @@ namespace turbo {
                     demangled = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, &status);
 #endif
                     if (status == 0 && demangled != nullptr) {  // Demangling succeeded.
-                        turbo::FormatAppend(&out, "<{}>", demangled);
+                        turbo::format_append(&out, "<{}>", demangled);
                         free(demangled);
                     } else {
 #if defined(__GXX_RTTI) || defined(_CPPRTTI)
-                        turbo::FormatAppend(&out, "<{}>", typeid(T).name());
+                        turbo::format_append(&out, "<{}>", typeid(T).name());
 #endif
                     }
                     return out;
@@ -653,15 +653,15 @@ namespace turbo {
                     const size_t sizes[] = {SizeOf<ElementType<OffsetSeq>>::value...};
                     const std::string types[] = {
                             adl_barrier::TypeName<ElementType<OffsetSeq>>()...};
-                    std::string res = turbo::Format("@0{}({})", types[0], sizes[0]);
+                    std::string res = turbo::format("@0{}({})", types[0], sizes[0]);
                     for (size_t i = 0; i != NumOffsets - 1; ++i) {
-                        turbo::FormatAppend(&res, "[{}]; @{}{}({})", size_[i], offsets[i + 1], types[i + 1],sizes[i + 1]);
+                        turbo::format_append(&res, "[{}]; @{}{}({})", size_[i], offsets[i + 1], types[i + 1],sizes[i + 1]);
                     }
                     // NumSizes is a constant that may be zero. Some compilers cannot see that
                     // inside the if statement "size_[NumSizes - 1]" must be valid.
                     int last = static_cast<int>(NumSizes) - 1;
                     if (NumTypes == NumSizes && last >= 0) {
-                        turbo::FormatAppend(&res, "[{}]", size_[last]);
+                        turbo::format_append(&res, "[{}]", size_[last]);
                     }
                     return res;
                 }

@@ -85,7 +85,7 @@ namespace turbo {
                 return true;
             }
 
-            MATCHER_P(IsNode, height, turbo::Format("Is a valid node of height {}", height)) {
+            MATCHER_P(IsNode, height, turbo::format("Is a valid node of height {}", height)) {
                 if (arg == nullptr) {
                     *result_listener << "Expected NODE, got nullptr";
                     return false;
@@ -108,7 +108,7 @@ namespace turbo {
             }
 
             MATCHER_P2(IsSubstring, start, length,
-                       turbo::Format("Is a substring(start = {} length = {})", start, length)) {
+                       turbo::format("Is a substring(start = {} length = {})", start, length)) {
                 if (arg == nullptr) {
                     *result_listener << "Expected substring, got nullptr";
                     return false;
@@ -197,7 +197,7 @@ namespace turbo {
 // Creates a flat containing the hexadecimal value of `i` zero padded
 // to at least 4 digits prefixed with "0x", e.g.: "0x04AC".
             CordRepFlat *MakeHexFlat(size_t i) {
-                return MakeFlat(turbo::Format("{:#04x}", i));
+                return MakeFlat(turbo::format("{:#04x}", i));
             }
 
             CordRepBtree *MakeLeaf(size_t size = CordRepBtree::kMaxCapacity) {
@@ -254,7 +254,7 @@ namespace turbo {
                 int height() const { return GetParam(); }
 
                 static std::string ToString(testing::TestParamInfo<int> param) {
-                    return turbo::Format(param.param);
+                    return turbo::format(param.param);
                 }
             };
 
@@ -1219,10 +1219,10 @@ namespace turbo {
 
                     // Contains address of all data edges
                     EXPECT_THAT(
-                            str, AllOf(HasSubstr(turbo::Format("{}", turbo::Ptr(flat))),
-                                       HasSubstr(turbo::Format("{}", turbo::Ptr(external))),
-                                       HasSubstr(turbo::Format("{}", turbo::Ptr(substr_flat))),
-                                       HasSubstr(turbo::Format("{}", turbo::Ptr(substr_external)))));
+                            str, AllOf(HasSubstr(turbo::format("{}", turbo::Ptr(flat))),
+                                       HasSubstr(turbo::format("{}", turbo::Ptr(external))),
+                                       HasSubstr(turbo::format("{}", turbo::Ptr(substr_flat))),
+                                       HasSubstr(turbo::format("{}", turbo::Ptr(substr_external)))));
 
                     if (api != 0) {
                         // Contains label
@@ -1398,7 +1398,7 @@ namespace turbo {
 
             TEST_P(CordRepBtreeTest, Rebuild) {
                 for (size_t size: {3u, 8u, 100u, 10000u, 1000000u}) {
-                    SCOPED_TRACE(turbo::Format("Rebuild @{}", size));
+                    SCOPED_TRACE(turbo::format("Rebuild @{}", size));
 
                     std::vector<CordRepFlat *> flats;
                     for (size_t i = 0; i < size; ++i) {

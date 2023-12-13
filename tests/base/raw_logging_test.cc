@@ -49,7 +49,7 @@ namespace {
         TURBO_INTERNAL_LOG(INFO, log_msg + " 2");
 
         float d = 1.1f;
-        TURBO_INTERNAL_LOG(INFO, turbo::Format("Internal log {} + {}", 3, d));
+        TURBO_INTERNAL_LOG(INFO, turbo::format("Internal log {} + {}", 3, d));
     }
 
 }  // namespace

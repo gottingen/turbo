@@ -133,7 +133,7 @@ namespace {
                 // Ensure that the creator does, in fact, create status objects with the
                 // expected error code and message.
                 std::string message =
-                        turbo::Format("error code {} test message", test.code);
+                        turbo::format("error code {} test message", test.code);
                 turbo::Status status = test.creator(
                         message
                 );
@@ -224,8 +224,8 @@ namespace {
             EXPECT_THAT(bad_status.get_payload(kUrl1), Optional(Eq(kPayload3)));
 
             // Testing dynamically generated type_url
-            bad_status.set_payload(turbo::Format("{}{}", kUrl1, ".1"), turbo::Cord(kPayload1));
-            EXPECT_THAT(bad_status.get_payload(turbo::Format("{}{}", kUrl1, ".1")),
+            bad_status.set_payload(turbo::format("{}{}", kUrl1, ".1"), turbo::Cord(kPayload1));
+            EXPECT_THAT(bad_status.get_payload(turbo::format("{}{}", kUrl1, ".1")),
                         Optional(Eq(kPayload1)));
         }
         */

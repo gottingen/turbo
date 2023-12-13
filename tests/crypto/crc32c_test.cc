@@ -144,7 +144,7 @@ namespace {
     TEST_CASE("CRC32C, Concat") {
         std::string hello = "Hello, ";
         std::string world = "world!";
-        std::string hello_world = turbo::Format("{}{}", hello, world);
+        std::string hello_world = turbo::format("{}{}", hello, world);
 
         turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
         turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
@@ -172,7 +172,7 @@ namespace {
     TEST_CASE("CRC32C, RemovePrefix") {
         std::string hello = "Hello, ";
         std::string world = "world!";
-        std::string hello_world = turbo::Format("{}{}", hello, world);
+        std::string hello_world = turbo::format("{}{}", hello, world);
 
         turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
         turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);
@@ -184,7 +184,7 @@ namespace {
     TEST_CASE("CRC32C, RemoveSuffix") {
         std::string hello = "Hello, ";
         std::string world = "world!";
-        std::string hello_world = turbo::Format("{}{}", hello, world);
+        std::string hello_world = turbo::format("{}{}", hello, world);
 
         turbo::crc32c_t crc_a = turbo::ComputeCrc32c(hello);
         turbo::crc32c_t crc_b = turbo::ComputeCrc32c(world);

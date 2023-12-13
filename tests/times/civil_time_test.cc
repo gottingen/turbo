@@ -670,7 +670,7 @@ TEST_CASE("CivilTime, Properties") {
   REQUIRE_EQ(1, turbo::get_year_day(y));
 }
 
-TEST_CASE("CivilTime, Format") {
+TEST_CASE("CivilTime, format") {
   turbo::CivilSecond ss;
   REQUIRE_EQ("1970-01-01T00:00:00", turbo::format_civil_time(ss));
 

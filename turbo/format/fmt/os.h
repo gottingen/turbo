@@ -21,10 +21,10 @@
 
 #ifndef FMT_USE_FCNTL
 // UWP doesn't provide _pipe.
-#  if FMT_HAS_INCLUDE("winapifamily.h")
+#  if TURBO_HAVE_INCLUDE("winapifamily.h")
 #    include <winapifamily.h>
 #  endif
-#  if (FMT_HAS_INCLUDE(<fcntl.h>) || defined(__APPLE__) || \
+#  if (TURBO_HAVE_INCLUDE(<fcntl.h>) || defined(__APPLE__) || \
        defined(__linux__)) &&                              \
       (!defined(WINAPI_FAMILY) ||                          \
        (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
@@ -71,7 +71,7 @@
 #define FMT_RETRY(result, expression) FMT_RETRY_VAL(result, expression, -1)
 
 FMT_BEGIN_NAMESPACE
-FMT_BEGIN_EXPORT
+TURBO_BEGIN_EXPORT
 
 /**
   \rst
@@ -121,14 +121,14 @@ using cstring_view = basic_cstring_view<char>;
 using wcstring_view = basic_cstring_view<wchar_t>;
 
 #ifdef _WIN32
-FMT_API const std::error_category& system_category() noexcept;
+TURBO_DLL const std::error_category& system_category() noexcept;
 
 FMT_BEGIN_DETAIL_NAMESPACE
-FMT_API void format_windows_error(buffer<char>& out, int error_code,
+TURBO_DLL void format_windows_error(buffer<char>& out, int error_code,
                                   const char* message) noexcept;
 FMT_END_DETAIL_NAMESPACE
 
-FMT_API std::system_error vwindows_error(int error_code, string_view format_str,
+TURBO_DLL std::system_error vwindows_error(int error_code, string_view format_str,
                                          format_args args);
 
 /**
@@ -167,7 +167,7 @@ std::system_error windows_error(int error_code, string_view message,
 
 // Reports a Windows error without throwing an exception.
 // Can be used to report errors from destructors.
-FMT_API void report_windows_error(int error_code, const char* message) noexcept;
+TURBO_DLL void report_windows_error(int error_code, const char* message) noexcept;
 #else
 inline const std::error_category& system_category() noexcept {
   return std::system_category();
@@ -199,7 +199,7 @@ class buffered_file {
   buffered_file() noexcept : file_(nullptr) {}
 
   // Destroys the object closing the file it represents if any.
-  FMT_API ~buffered_file() noexcept;
+  TURBO_DLL ~buffered_file() noexcept;
 
  public:
   buffered_file(buffered_file&& other) noexcept : file_(other.file_) {
@@ -214,15 +214,15 @@ class buffered_file {
   }
 
   // Opens a file.
-  FMT_API buffered_file(cstring_view filename, cstring_view mode);
+  TURBO_DLL buffered_file(cstring_view filename, cstring_view mode);
 
   // Closes the file.
-  FMT_API void close();
+  TURBO_DLL void close();
 
   // Returns the pointer to a FILE object representing this file.
   FILE* get() const noexcept { return file_; }
 
-  FMT_API int descriptor() const;
+  TURBO_DLL int descriptor() const;
 
   void vprint(string_view format_str, format_args args) {
     fmt::vprint(file_, format_str, args);
@@ -241,7 +241,7 @@ class buffered_file {
 // closing the file multiple times will cause a crash on Windows rather
 // than an exception. You can get standard behavior by overriding the
 // invalid parameter handler with _set_invalid_parameter_handler.
-class FMT_API file {
+class TURBO_DLL file {
  private:
   int fd_;  // File descriptor.
 
@@ -368,12 +368,12 @@ struct ostream_params {
 class file_buffer final : public buffer<char> {
   file file_;
 
-  FMT_API void grow(size_t) override;
+  TURBO_DLL void grow(size_t) override;
 
  public:
-  FMT_API file_buffer(cstring_view path, const ostream_params& params);
-  FMT_API file_buffer(file_buffer&& other);
-  FMT_API ~file_buffer();
+  TURBO_DLL file_buffer(cstring_view path, const ostream_params& params);
+  TURBO_DLL file_buffer(file_buffer&& other);
+  TURBO_DLL ~file_buffer();
 
   void flush() {
     if (size() == 0) return;
@@ -394,9 +394,9 @@ FMT_END_DETAIL_NAMESPACE
 constexpr detail::buffer_size buffer_size{};
 
 /** A fast output stream which is not thread-safe. */
-class FMT_API ostream {
+class TURBO_DLL ostream {
  private:
-  FMT_MSC_WARNING(suppress : 4251)
+  TURBO_MSC_WARNING(suppress : 4251)
   detail::file_buffer buffer_;
 
   ostream(cstring_view path, const detail::ostream_params& params)
@@ -445,7 +445,7 @@ inline ostream output_file(cstring_view path, T... params) {
 }
 #endif  // FMT_USE_FCNTL
 
-FMT_END_EXPORT
+TURBO_END_EXPORT
 FMT_END_NAMESPACE
 
 #endif  // FMT_OS_H_

@@ -127,17 +127,17 @@ namespace {
 
         template<typename... Args>
         std::string operator()(std::string_view fmt, const Args &... args) &{
-            return "&" + turbo::Format(fmt, args...);
+            return "&" + turbo::format(fmt, args...);
         }
 
         template<typename... Args>
         std::string operator()(std::string_view fmt, const Args &... args) const &{
-            return "const&" + turbo::Format(fmt, args...);
+            return "const&" + turbo::format(fmt, args...);
         }
 
         template<typename... Args>
         std::string operator()(std::string_view fmt, const Args &... args) &&{
-            return "&&" + turbo::Format(fmt, args...);
+            return "&&" + turbo::format(fmt, args...);
         }
     };
 

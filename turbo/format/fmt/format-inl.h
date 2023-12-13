@@ -55,12 +55,12 @@ FMT_FUNC void format_error_code(detail::buffer<char>& out, int error_code,
     abs_value = 0 - abs_value;
     ++error_code_size;
   }
-  error_code_size += detail::to_unsigned(detail::count_digits(abs_value));
+  error_code_size += turbo::to_unsigned(detail::count_digits(abs_value));
   auto it = buffer_appender<char>(out);
   if (message.size() <= inline_buffer_size - error_code_size)
     format_to(it, FMT_STRING("{}{}"), message, SEP);
   format_to(it, FMT_STRING("{}{}"), ERROR_STR, error_code);
-  FMT_ASSERT(out.size() <= inline_buffer_size, "");
+  TURBO_ASSERT(out.size() <= inline_buffer_size, "");
 }
 
 FMT_FUNC void report_error(format_func func, int error_code,
@@ -137,7 +137,7 @@ template <typename Locale> format_facet<Locale>::format_facet(Locale& loc) {
 }
 
 template <>
-FMT_API FMT_FUNC auto format_facet<std::locale>::do_put(
+TURBO_DLL FMT_FUNC auto format_facet<std::locale>::do_put(
     appender out, loc_value val, const format_specs<>& specs) const -> bool {
   return val.visit(
       detail::loc_writer<>{out, specs, separator_, grouping_, decimal_point_});
@@ -157,11 +157,11 @@ template <typename F> inline bool operator==(basic_fp<F> x, basic_fp<F> y) {
 }
 
 // Compilers should be able to optimize this into the ror instruction.
-FMT_CONSTEXPR inline uint32_t rotr(uint32_t n, uint32_t r) noexcept {
+constexpr inline uint32_t rotr(uint32_t n, uint32_t r) noexcept {
   r &= 31;
   return (n >> r) | (n << (32 - r));
 }
-FMT_CONSTEXPR inline uint64_t rotr(uint64_t n, uint32_t r) noexcept {
+constexpr inline uint64_t rotr(uint64_t n, uint32_t r) noexcept {
   r &= 63;
   return (n >> r) | (n << (64 - r));
 }
@@ -191,11 +191,11 @@ inline uint64_t umul96_lower64(uint32_t x, uint64_t y) noexcept {
 
 // Various fast log computations.
 inline int floor_log10_pow2_minus_log10_4_over_3(int e) noexcept {
-  FMT_ASSERT(e <= 2936 && e >= -2985, "too large exponent");
+  TURBO_ASSERT(e <= 2936 && e >= -2985, "too large exponent");
   return (e * 631305 - 261663) >> 21;
 }
 
-FMT_INLINE_VARIABLE constexpr struct {
+inline constexpr struct {
   uint32_t divisor;
   int shift_amount;
 } div_small_pow10_infos[] = {{10, 16}, {100, 16}};
@@ -217,7 +217,7 @@ bool check_divisibility_and_divide_by_pow10(uint32_t& n) noexcept {
   // to ceil(2^k/d) for large enough k.
   // The idea for item 2 originates from Schubfach.
   constexpr auto info = div_small_pow10_infos[N - 1];
-  FMT_ASSERT(n <= info.divisor * 10, "n is too large");
+  TURBO_ASSERT(n <= info.divisor * 10, "n is too large");
   constexpr uint32_t magic_number =
       (1u << info.shift_amount) / info.divisor + 1;
   n *= magic_number;
@@ -231,7 +231,7 @@ bool check_divisibility_and_divide_by_pow10(uint32_t& n) noexcept {
 // Precondition: n <= pow(10, N + 1).
 template <int N> uint32_t small_division_by_pow10(uint32_t n) noexcept {
   constexpr auto info = div_small_pow10_infos[N - 1];
-  FMT_ASSERT(n <= info.divisor * 10, "n is too large");
+  TURBO_ASSERT(n <= info.divisor * 10, "n is too large");
   constexpr uint32_t magic_number =
       (1u << info.shift_amount) / info.divisor + 1;
   return (n * magic_number) >> info.shift_amount;
@@ -256,7 +256,7 @@ template <> struct cache_accessor<float> {
   using cache_entry_type = uint64_t;
 
   static uint64_t get_cached_power(int k) noexcept {
-    FMT_ASSERT(k >= float_info<float>::min_k && k <= float_info<float>::max_k,
+    TURBO_ASSERT(k >= float_info<float>::min_k && k <= float_info<float>::max_k,
                "k is out of range");
     static constexpr const uint64_t pow10_significands[] = {
         0x81ceb32c4b43fcf5, 0xa2425ff75e14fc32, 0xcad2f7f5359a3b3f,
@@ -311,8 +311,8 @@ template <> struct cache_accessor<float> {
 
   static compute_mul_parity_result compute_mul_parity(
       carrier_uint two_f, const cache_entry_type& cache, int beta) noexcept {
-    FMT_ASSERT(beta >= 1, "");
-    FMT_ASSERT(beta < 64, "");
+    TURBO_ASSERT(beta >= 1, "");
+    TURBO_ASSERT(beta < 64, "");
 
     auto r = umul96_lower64(two_f, cache);
     return {((r >> (64 - beta)) & 1) != 0,
@@ -347,7 +347,7 @@ template <> struct cache_accessor<double> {
   using cache_entry_type = uint128_fallback;
 
   static uint128_fallback get_cached_power(int k) noexcept {
-    FMT_ASSERT(k >= float_info<double>::min_k && k <= float_info<double>::max_k,
+    TURBO_ASSERT(k >= float_info<double>::min_k && k <= float_info<double>::max_k,
                "k is out of range");
 
     static constexpr const uint128_fallback pow10_significands[] = {
@@ -1042,7 +1042,7 @@ template <> struct cache_accessor<double> {
 
     // Compute the required amount of bit-shift.
     int alpha = floor_log2_pow10(kb + offset) - floor_log2_pow10(kb) - offset;
-    FMT_ASSERT(alpha > 0 && alpha < 64, "shifting error detected");
+    TURBO_ASSERT(alpha > 0 && alpha < 64, "shifting error detected");
 
     // Try to recover the real cache.
     uint64_t pow5 = powers_of_5_64[offset];
@@ -1057,7 +1057,7 @@ template <> struct cache_accessor<double> {
     recovered_cache =
         uint128_fallback{(recovered_cache.low() >> alpha) | high_to_middle,
                          ((middle_low.low() >> alpha) | middle_to_low)};
-    FMT_ASSERT(recovered_cache.low() + 1 != 0, "");
+    TURBO_ASSERT(recovered_cache.low() + 1 != 0, "");
     return {recovered_cache.high(), recovered_cache.low() + 1};
 #endif
   }
@@ -1084,8 +1084,8 @@ template <> struct cache_accessor<double> {
 
   static compute_mul_parity_result compute_mul_parity(
       carrier_uint two_f, const cache_entry_type& cache, int beta) noexcept {
-    FMT_ASSERT(beta >= 1, "");
-    FMT_ASSERT(beta < 64, "");
+    TURBO_ASSERT(beta >= 1, "");
+    TURBO_ASSERT(beta < 64, "");
 
     auto r = umul192_lower128(two_f, cache);
     return {((r.high() >> (64 - beta)) & 1) != 0,
@@ -1128,8 +1128,8 @@ bool is_left_endpoint_integer_shorter_interval(int exponent) noexcept {
 }
 
 // Remove trailing zeros from n and return the number of zeros removed (float)
-FMT_INLINE int remove_trailing_zeros(uint32_t& n) noexcept {
-  FMT_ASSERT(n != 0, "");
+TURBO_FORCE_INLINE int remove_trailing_zeros(uint32_t& n) noexcept {
+  TURBO_ASSERT(n != 0, "");
   // Modular inverse of 5 (mod 2^32): (mod_inv_5 * 5) mod 2^32 = 1.
   // See https://github.com/fmtlib/fmt/issues/3163 for more details.
   const uint32_t mod_inv_5 = 0xcccccccd;
@@ -1153,8 +1153,8 @@ FMT_INLINE int remove_trailing_zeros(uint32_t& n) noexcept {
 }
 
 // Removes trailing zeros and returns the number of zeros removed (double)
-FMT_INLINE int remove_trailing_zeros(uint64_t& n) noexcept {
-  FMT_ASSERT(n != 0, "");
+TURBO_FORCE_INLINE int remove_trailing_zeros(uint64_t& n) noexcept {
+  TURBO_ASSERT(n != 0, "");
 
   // This magic number is ceil(2^90 / 10^8).
   constexpr uint64_t magic_number = 12379400392853802749ull;
@@ -1207,7 +1207,7 @@ FMT_INLINE int remove_trailing_zeros(uint64_t& n) noexcept {
 
 // The main algorithm for shorter interval case
 template <typename T>
-FMT_INLINE decimal_fp<T> shorter_interval_case(int exponent) noexcept {
+TURBO_FORCE_INLINE decimal_fp<T> shorter_interval_case(int exponent) noexcept {
   decimal_fp<T> ret_value;
   // Compute k and beta
   const int minus_k = floor_log10_pow2_minus_log10_4_over_3(exponent);
@@ -1380,7 +1380,7 @@ small_divisor_case_label:
 }  // namespace detail
 
 template <> struct formatter<detail::bigint> {
-  FMT_CONSTEXPR auto parse(format_parse_context& ctx)
+  constexpr auto parse(format_parse_context& ctx)
       -> format_parse_context::iterator {
     return ctx.begin();
   }

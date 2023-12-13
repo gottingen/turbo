@@ -113,8 +113,8 @@ namespace turbo::hash_internal {
 
         static CompareResult Compare(const SpyHashStateImpl &a,
                                      const SpyHashStateImpl &b) {
-            const std::string a_flat = turbo::FormatRange("{}", a.hash_representation_, "");
-            const std::string b_flat = turbo::FormatRange("{}", b.hash_representation_, "");
+            const std::string a_flat = turbo::format_range("{}", a.hash_representation_, "");
+            const std::string b_flat = turbo::format_range("{}", b.hash_representation_, "");
             if (a_flat == b_flat) return CompareResult::kEqual;
             if (turbo::ends_with(a_flat, b_flat)) return CompareResult::kBSuffixA;
             if (turbo::ends_with(b_flat, a_flat)) return CompareResult::kASuffixB;
@@ -130,12 +130,12 @@ namespace turbo::hash_internal {
                 size_t offset = 0;
                 for (char c: s) {
                     if (offset % 16 == 0) {
-                        out << turbo::Format("\n{:#04x}: ", offset);
+                        out << turbo::format("\n{:#04x}: ", offset);
                     }
                     if (offset % 2 == 0) {
                         out << " ";
                     }
-                    out << turbo::Format("{:02x}", c);
+                    out << turbo::format("{:02x}", c);
                     ++offset;
                 }
                 out << "\n";
@@ -206,7 +206,7 @@ namespace turbo::hash_internal {
             template<typename U>
             void operator()(SpyHashStateImpl<U> &inner) {
                 element_hash_representations.push_back(
-                        turbo::FormatRange("{}", inner.hash_representation_, ""));
+                        turbo::format_range("{}", inner.hash_representation_, ""));
                 if (inner.error_->has_value()) {
                     error = std::move(inner.error_);
                 }

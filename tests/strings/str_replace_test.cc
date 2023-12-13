@@ -198,7 +198,7 @@ TEST_CASE("str_replace_all") {
     SUBCASE("ReplacementsInPlace") {
         std::string s = std::string("$who bought $count #Noun. Thanks $who!");
         int count;
-        count = turbo::str_replace_all({{"$count", turbo::Format(5)},
+        count = turbo::str_replace_all({{"$count", turbo::format(5)},
                                         {"$who",   "Bob"},
                                         {"#Noun",  "Apples"}}, &s);
         REQUIRE_EQ(count, 4);

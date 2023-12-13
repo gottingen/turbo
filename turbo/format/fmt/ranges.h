@@ -92,7 +92,7 @@ template <typename... Ts> struct conditional_helper {};
 
 template <typename T, typename _ = void> struct is_range_ : std::false_type {};
 
-#if !FMT_MSC_VERSION || FMT_MSC_VERSION > 1800
+#if !TURBO_MSC_VERSION || TURBO_MSC_VERSION > 1800
 
 #  define FMT_DECLTYPE_RETURN(val)  \
     ->decltype(val) { return val; } \
@@ -128,12 +128,12 @@ auto range_end(T&& rng) FMT_DECLTYPE_RETURN(static_cast<T&&>(rng).end());
 // are not found.
 template <typename T>
 auto range_begin(T&& rng)
-    -> enable_if_t<!has_member_fn_begin_end_t<T&&>::value,
+    -> std::enable_if_t<!has_member_fn_begin_end_t<T&&>::value,
                    decltype(begin(static_cast<T&&>(rng)))> {
   return begin(static_cast<T&&>(rng));
 }
 template <typename T>
-auto range_end(T&& rng) -> enable_if_t<!has_member_fn_begin_end_t<T&&>::value,
+auto range_end(T&& rng) -> std::enable_if_t<!has_member_fn_begin_end_t<T&&>::value,
                                        decltype(end(static_cast<T&&>(rng)))> {
   return end(static_cast<T&&>(rng));
 }
@@ -147,8 +147,8 @@ template <typename T>
 struct has_const_begin_end<
     T,
     void_t<
-        decltype(detail::range_begin(std::declval<const remove_cvref_t<T>&>())),
-        decltype(detail::range_end(std::declval<const remove_cvref_t<T>&>()))>>
+        decltype(detail::range_begin(std::declval<const turbo::remove_cvref_t<T>&>())),
+        decltype(detail::range_end(std::declval<const turbo::remove_cvref_t<T>&>()))>>
     : std::true_type {};
 
 template <typename T>
@@ -178,7 +178,7 @@ template <typename T> class is_tuple_like_ {
 };
 
 // Check for integer_sequence
-#if defined(__cpp_lib_integer_sequence) || FMT_MSC_VERSION >= 1900
+#if defined(__cpp_lib_integer_sequence) || TURBO_MSC_VERSION >= 1900
 template <typename T, T... N>
 using integer_sequence = std::integer_sequence<T, N...>;
 template <size_t... N> using index_sequence = std::index_sequence<N...>;
@@ -187,7 +187,7 @@ template <size_t N> using make_index_sequence = std::make_index_sequence<N>;
 template <typename T, T... N> struct integer_sequence {
   using value_type = T;
 
-  static FMT_CONSTEXPR size_t size() { return sizeof...(N); }
+  static constexpr size_t size() { return sizeof...(N); }
 };
 
 template <size_t... N> using index_sequence = integer_sequence<size_t, N...>;
@@ -227,7 +227,7 @@ template <typename T, typename C> class is_tuple_formattable_<T, C, true> {
 };
 
 template <typename Tuple, typename F, size_t... Is>
-FMT_CONSTEXPR void for_each(index_sequence<Is...>, Tuple&& t, F&& f) {
+constexpr void for_each(index_sequence<Is...>, Tuple&& t, F&& f) {
   using std::get;
   // Using a free function get<Is>(Tuple) now.
   const int unused[] = {0, ((void)f(get<Is>(t)), 0)...};
@@ -235,8 +235,8 @@ FMT_CONSTEXPR void for_each(index_sequence<Is...>, Tuple&& t, F&& f) {
 }
 
 template <typename Tuple, typename F>
-FMT_CONSTEXPR void for_each(Tuple&& t, F&& f) {
-  for_each(tuple_index_sequence<remove_cvref_t<Tuple>>(),
+constexpr void for_each(Tuple&& t, F&& f) {
+  for_each(tuple_index_sequence<turbo::remove_cvref_t<Tuple>>(),
            std::forward<Tuple>(t), std::forward<F>(f));
 }
 
@@ -249,7 +249,7 @@ void for_each2(index_sequence<Is...>, Tuple1&& t1, Tuple2&& t2, F&& f) {
 
 template <typename Tuple1, typename Tuple2, typename F>
 void for_each2(Tuple1&& t1, Tuple2&& t2, F&& f) {
-  for_each2(tuple_index_sequence<remove_cvref_t<Tuple1>>(),
+  for_each2(tuple_index_sequence<turbo::remove_cvref_t<Tuple1>>(),
             std::forward<Tuple1>(t1), std::forward<Tuple2>(t2),
             std::forward<F>(f));
 }
@@ -257,7 +257,7 @@ void for_each2(Tuple1&& t1, Tuple2&& t2, F&& f) {
 namespace tuple {
 // Workaround a bug in MSVC 2019 (v140).
 template <typename Char, typename... T>
-using result_t = std::tuple<formatter<remove_cvref_t<T>, Char>...>;
+using result_t = std::tuple<formatter<turbo::remove_cvref_t<T>, Char>...>;
 
 using std::get;
 template <typename Tuple, typename Char, std::size_t... Is>
@@ -265,7 +265,7 @@ auto get_formatters(index_sequence<Is...>)
     -> result_t<Char, decltype(get<Is>(std::declval<Tuple>()))...>;
 }  // namespace tuple
 
-#if FMT_MSC_VERSION && FMT_MSC_VERSION < 1920
+#if TURBO_MSC_VERSION && TURBO_MSC_VERSION < 1920
 // Older MSVC doesn't get the reference type correctly for arrays.
 template <typename R> struct range_reference_type_impl {
   using type = decltype(*detail::range_begin(std::declval<R&>()));
@@ -286,19 +286,19 @@ using range_reference_type =
 // We don't use the Range's value_type for anything, but we do need the Range's
 // reference type, with cv-ref stripped.
 template <typename Range>
-using uncvref_type = remove_cvref_t<range_reference_type<Range>>;
+using uncvref_type = turbo::remove_cvref_t<range_reference_type<Range>>;
 
 template <typename Formatter>
-FMT_CONSTEXPR auto maybe_set_debug_format(Formatter& f, bool set)
+constexpr auto maybe_set_debug_format(Formatter& f, bool set)
     -> decltype(f.set_debug_format(set)) {
   f.set_debug_format(set);
 }
 template <typename Formatter>
-FMT_CONSTEXPR void maybe_set_debug_format(Formatter&, ...) {}
+constexpr void maybe_set_debug_format(Formatter&, ...) {}
 
 // These are not generic lambdas for compatibility with C++11.
 template <typename ParseContext> struct parse_empty_specs {
-  template <typename Formatter> FMT_CONSTEXPR void operator()(Formatter& f) {
+  template <typename Formatter> constexpr void operator()(Formatter& f) {
     f.parse(ctx);
     detail::maybe_set_debug_format(f, true);
   }
@@ -334,7 +334,7 @@ template <typename T, typename C> struct is_tuple_formattable {
 
 template <typename Tuple, typename Char>
 struct formatter<Tuple, Char,
-                 enable_if_t<fmt::is_tuple_like<Tuple>::value &&
+                 std::enable_if_t<fmt::is_tuple_like<Tuple>::value &&
                              fmt::is_tuple_formattable<Tuple, Char>::value>> {
  private:
   decltype(detail::tuple::get_formatters<Tuple, Char>(
@@ -347,20 +347,20 @@ struct formatter<Tuple, Char,
       detail::string_literal<Char, ')'>{};
 
  public:
-  FMT_CONSTEXPR formatter() {}
+  constexpr formatter() {}
 
-  FMT_CONSTEXPR void set_separator(basic_string_view<Char> sep) {
+  constexpr void set_separator(basic_string_view<Char> sep) {
     separator_ = sep;
   }
 
-  FMT_CONSTEXPR void set_brackets(basic_string_view<Char> open,
+  constexpr void set_brackets(basic_string_view<Char> open,
                                   basic_string_view<Char> close) {
     opening_bracket_ = open;
     closing_bracket_ = close;
   }
 
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     auto it = ctx.begin();
     if (it != ctx.end() && *it != '}')
       FMT_THROW(format_error("invalid format specifier"));
@@ -391,12 +391,12 @@ template <typename Context> struct range_mapper {
   using mapper = arg_mapper<Context>;
 
   template <typename T,
-            FMT_ENABLE_IF(has_formatter<remove_cvref_t<T>, Context>::value)>
+            TURBO_ENABLE_IF(has_formatter<turbo::remove_cvref_t<T>, Context>::value)>
   static auto map(T&& value) -> T&& {
     return static_cast<T&&>(value);
   }
   template <typename T,
-            FMT_ENABLE_IF(!has_formatter<remove_cvref_t<T>, Context>::value)>
+            TURBO_ENABLE_IF(!has_formatter<turbo::remove_cvref_t<T>, Context>::value)>
   static auto map(T&& value)
       -> decltype(mapper().map(static_cast<T&&>(value))) {
     return mapper().map(static_cast<T&&>(value));
@@ -405,16 +405,16 @@ template <typename Context> struct range_mapper {
 
 template <typename Char, typename Element>
 using range_formatter_type =
-    formatter<remove_cvref_t<decltype(range_mapper<buffer_context<Char>>{}.map(
+    formatter<turbo::remove_cvref_t<decltype(range_mapper<buffer_context<Char>>{}.map(
                   std::declval<Element>()))>,
               Char>;
 
 template <typename R>
 using maybe_const_range =
-    conditional_t<has_const_begin_end<R>::value, const R, R>;
+    std::conditional_t<has_const_begin_end<R>::value, const R, R>;
 
 // Workaround a bug in MSVC 2015 and earlier.
-#if !FMT_MSC_VERSION || FMT_MSC_VERSION >= 1910
+#if !TURBO_MSC_VERSION || TURBO_MSC_VERSION >= 1910
 template <typename R, typename Char>
 struct is_formattable_delayed
     : is_formattable<uncvref_type<maybe_const_range<R>>, Char> {};
@@ -427,7 +427,7 @@ struct range_formatter;
 template <typename T, typename Char>
 struct range_formatter<
     T, Char,
-    enable_if_t<conjunction<std::is_same<T, remove_cvref_t<T>>,
+    std::enable_if_t<conjunction<std::is_same<T, turbo::remove_cvref_t<T>>,
                             is_formattable<T, Char>>::value>> {
  private:
   detail::range_formatter_type<Char, T> underlying_;
@@ -438,24 +438,24 @@ struct range_formatter<
       detail::string_literal<Char, ']'>{};
 
  public:
-  FMT_CONSTEXPR range_formatter() {}
+  constexpr range_formatter() {}
 
-  FMT_CONSTEXPR auto underlying() -> detail::range_formatter_type<Char, T>& {
+  constexpr auto underlying() -> detail::range_formatter_type<Char, T>& {
     return underlying_;
   }
 
-  FMT_CONSTEXPR void set_separator(basic_string_view<Char> sep) {
+  constexpr void set_separator(basic_string_view<Char> sep) {
     separator_ = sep;
   }
 
-  FMT_CONSTEXPR void set_brackets(basic_string_view<Char> open,
+  constexpr void set_brackets(basic_string_view<Char> open,
                                   basic_string_view<Char> close) {
     opening_bracket_ = open;
     closing_bracket_ = close;
   }
 
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     auto it = ctx.begin();
     auto end = ctx.end();
 
@@ -515,19 +515,19 @@ using range_format_constant = std::integral_constant<range_format, K>;
 template <range_format K, typename R, typename Char>
 struct range_default_formatter<
     K, R, Char,
-    enable_if_t<(K == range_format::sequence || K == range_format::map ||
+    std::enable_if_t<(K == range_format::sequence || K == range_format::map ||
                  K == range_format::set)>> {
   using range_type = detail::maybe_const_range<R>;
   range_formatter<detail::uncvref_type<range_type>, Char> underlying_;
 
-  FMT_CONSTEXPR range_default_formatter() { init(range_format_constant<K>()); }
+  constexpr range_default_formatter() { init(range_format_constant<K>()); }
 
-  FMT_CONSTEXPR void init(range_format_constant<range_format::set>) {
+  constexpr void init(range_format_constant<range_format::set>) {
     underlying_.set_brackets(detail::string_literal<Char, '{'>{},
                              detail::string_literal<Char, '}'>{});
   }
 
-  FMT_CONSTEXPR void init(range_format_constant<range_format::map>) {
+  constexpr void init(range_format_constant<range_format::map>) {
     underlying_.set_brackets(detail::string_literal<Char, '{'>{},
                              detail::string_literal<Char, '}'>{});
     underlying_.underlying().set_brackets({}, {});
@@ -535,10 +535,10 @@ struct range_default_formatter<
         detail::string_literal<Char, ':', ' '>{});
   }
 
-  FMT_CONSTEXPR void init(range_format_constant<range_format::sequence>) {}
+  constexpr void init(range_format_constant<range_format::sequence>) {}
 
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     return underlying_.parse(ctx);
   }
 
@@ -552,17 +552,17 @@ struct range_default_formatter<
 
 template <typename T, typename Char, typename Enable = void>
 struct range_format_kind
-    : conditional_t<
+    : std::conditional_t<
           is_range<T, Char>::value, detail::range_format_kind_<T>,
           std::integral_constant<range_format, range_format::disabled>> {};
 
 template <typename R, typename Char>
 struct formatter<
     R, Char,
-    enable_if_t<conjunction<bool_constant<range_format_kind<R, Char>::value !=
+    std::enable_if_t<conjunction<std::bool_constant<range_format_kind<R, Char>::value !=
                                           range_format::disabled>
 // Workaround a bug in MSVC 2015 and earlier.
-#if !FMT_MSC_VERSION || FMT_MSC_VERSION >= 1910
+#if !TURBO_MSC_VERSION || TURBO_MSC_VERSION >= 1910
                             ,
                             detail::is_formattable_delayed<R, Char>
 #endif
@@ -589,7 +589,7 @@ template <typename Char, typename... T> struct tuple_join_view : detail::view {
 template <typename Char, typename... T>
 struct formatter<tuple_join_view<Char, T...>, Char> {
   template <typename ParseContext>
-  FMT_CONSTEXPR auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
+  constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     return do_parse(ctx, std::integral_constant<size_t, sizeof...(T)>());
   }
 
@@ -604,14 +604,14 @@ struct formatter<tuple_join_view<Char, T...>, Char> {
   std::tuple<formatter<typename std::decay<T>::type, Char>...> formatters_;
 
   template <typename ParseContext>
-  FMT_CONSTEXPR auto do_parse(ParseContext& ctx,
+  constexpr auto do_parse(ParseContext& ctx,
                               std::integral_constant<size_t, 0>)
       -> decltype(ctx.begin()) {
     return ctx.begin();
   }
 
   template <typename ParseContext, size_t N>
-  FMT_CONSTEXPR auto do_parse(ParseContext& ctx,
+  constexpr auto do_parse(ParseContext& ctx,
                               std::integral_constant<size_t, N>)
       -> decltype(ctx.begin()) {
     auto end = ctx.begin();
@@ -669,7 +669,7 @@ template <typename Container> struct all {
 
 template <typename T, typename Char>
 struct formatter<T, Char,
-                 enable_if_t<detail::is_container_adaptor_like<T>::value>>
+                 std::enable_if_t<detail::is_container_adaptor_like<T>::value>>
     : formatter<detail::all<typename T::container_type>, Char> {
   using all = detail::all<typename T::container_type>;
   template <typename FormatContext>
@@ -683,7 +683,7 @@ struct formatter<T, Char,
   }
 };
 
-FMT_BEGIN_EXPORT
+TURBO_BEGIN_EXPORT
 
 /**
   \rst
@@ -697,13 +697,13 @@ FMT_BEGIN_EXPORT
   \endrst
  */
 template <typename... T>
-FMT_CONSTEXPR auto join(const std::tuple<T...>& tuple, string_view sep)
+constexpr auto join(const std::tuple<T...>& tuple, string_view sep)
     -> tuple_join_view<char, T...> {
   return {tuple, sep};
 }
 
 template <typename... T>
-FMT_CONSTEXPR auto join(const std::tuple<T...>& tuple,
+constexpr auto join(const std::tuple<T...>& tuple,
                         basic_string_view<wchar_t> sep)
     -> tuple_join_view<wchar_t, T...> {
   return {tuple, sep};
@@ -726,7 +726,7 @@ auto join(std::initializer_list<T> list, string_view sep)
   return join(std::begin(list), std::end(list), sep);
 }
 
-FMT_END_EXPORT
+TURBO_END_EXPORT
 FMT_END_NAMESPACE
 
 #endif  // FMT_RANGES_H_

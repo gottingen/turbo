@@ -1,5 +1,5 @@
-// Copyright 2023 The Turbo Authors.
-//
+// Copyright 2023 The Elastic-AI Authors.
+// part of Elastic AI Search
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -13,20 +13,14 @@
 // limitations under the License.
 //
 
-#include "turbo/format/format.h"
-#include <iostream>
-#include <string>
 
-void str_cat_example();
-int main() {
-  str_cat_example();
-  return 0;
-}
+#ifndef TURBO_PLATFORM_CONFIG_CONFIG_UNICODE_H_
+#define TURBO_PLATFORM_CONFIG_CONFIG_UNICODE_H_
 
-void str_cat_example() {
-  int a = 1;
-  std::string b = "hello";
+#include "turbo/platform/config/compiler.h"
 
-  /// "1 hello"
-  std::cout << turbo::format("{} {}", a,b)<<std::endl;
-}
+#ifndef TURBO_UNICODE
+#  define TURBO_UNICODE !TURBO_MSC_VERSION
+#endif
+
+#endif  // TURBO_PLATFORM_CONFIG_CONFIG_UNICODE_H_

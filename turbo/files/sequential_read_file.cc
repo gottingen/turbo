@@ -56,7 +56,7 @@ namespace turbo {
                 turbo::sleep_for(turbo::milliseconds(_option.open_interval));
             }
         }
-        return turbo::errno_to_status(errno, turbo::Format("Failed opening file {} for reading", _file_path.c_str()));
+        return turbo::errno_to_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(void *buff, size_t len) {
@@ -166,7 +166,7 @@ namespace turbo {
     turbo::ResultStatus<bool> SequentialReadFile::is_eof() {
         auto ret = std::feof(_fp);
         if(ret < 0) {
-            return turbo::errno_to_status(errno, turbo::Format("test file eof {}", _file_path.c_str()));
+            return turbo::errno_to_status(errno, turbo::format("test file eof {}", _file_path.c_str()));
         }
         return ret == 0;
     }

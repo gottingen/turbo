@@ -40,10 +40,10 @@ class dynamic_arg_list {
     T value;
 
     template <typename Arg>
-    FMT_CONSTEXPR typed_node(const Arg& arg) : value(arg) {}
+    constexpr typed_node(const Arg& arg) : value(arg) {}
 
     template <typename Char>
-    FMT_CONSTEXPR typed_node(const basic_string_view<Char>& arg)
+    constexpr typed_node(const basic_string_view<Char>& arg)
         : value(arg.data(), arg.size()) {}
   };
 
@@ -72,7 +72,7 @@ class dynamic_arg_list {
  */
 template <typename Context>
 class dynamic_format_arg_store
-#if FMT_GCC_VERSION && FMT_GCC_VERSION < 409
+#if TURBO_GCC_VERSION && TURBO_GCC_VERSION < 409
     // Workaround a GCC template argument substitution bug.
     : public basic_format_args<Context>
 #endif
@@ -222,7 +222,7 @@ class dynamic_format_arg_store
     \endrst
   */
   void reserve(size_t new_cap, size_t new_cap_named) {
-    FMT_ASSERT(new_cap >= new_cap_named,
+    TURBO_ASSERT(new_cap >= new_cap_named,
                "Set of arguments includes set of named arguments");
     data_.reserve(new_cap);
     named_info_.reserve(new_cap_named);

@@ -37,7 +37,7 @@ inline auto write_loc(std::back_insert_iterator<detail::buffer<wchar_t>> out,
 }
 }  // namespace detail
 
-FMT_BEGIN_EXPORT
+TURBO_BEGIN_EXPORT
 
 using wstring_view = basic_string_view<wchar_t>;
 using wformat_parse_context = basic_format_parse_context<wchar_t>;
@@ -45,7 +45,7 @@ using wformat_context = buffer_context<wchar_t>;
 using wformat_args = basic_format_args<wformat_context>;
 using wmemory_buffer = basic_memory_buffer<wchar_t>;
 
-#if FMT_GCC_VERSION && FMT_GCC_VERSION < 409
+#if TURBO_GCC_VERSION && TURBO_GCC_VERSION < 409
 // Workaround broken conversion on older gcc.
 template <typename... Args> using wformat_string = wstring_view;
 inline auto runtime(wstring_view s) -> wstring_view { return s; }
@@ -69,7 +69,7 @@ constexpr format_arg_store<wformat_context, Args...> make_wformat_args(
 }
 
 inline namespace literals {
-#if FMT_USE_USER_DEFINED_LITERALS && !FMT_USE_NONTYPE_TEMPLATE_ARGS
+#if !TURBO_USE_NONTYPE_TEMPLATE_ARGS
 constexpr detail::udl_arg<wchar_t> operator"" _a(const wchar_t* s, size_t) {
   return {s};
 }
@@ -95,7 +95,7 @@ auto join(std::initializer_list<T> list, wstring_view sep)
   return join(std::begin(list), std::end(list), sep);
 }
 
-template <typename Char, FMT_ENABLE_IF(!std::is_same<Char, char>::value)>
+template <typename Char, TURBO_ENABLE_IF(!std::is_same<Char, char>::value)>
 auto vformat(basic_string_view<Char> format_str,
              basic_format_args<buffer_context<type_identity_t<Char>>> args)
     -> std::basic_string<Char> {
@@ -112,7 +112,7 @@ auto format(wformat_string<T...> fmt, T&&... args) -> std::wstring {
 // Pass char_t as a default template parameter instead of using
 // std::basic_string<char_t<S>> to reduce the symbol size.
 template <typename S, typename... Args, typename Char = char_t<S>,
-          FMT_ENABLE_IF(!std::is_same<Char, char>::value &&
+          TURBO_ENABLE_IF(!std::is_same<Char, char>::value &&
                         !std::is_same<Char, wchar_t>::value)>
 auto format(const S& format_str, Args&&... args) -> std::basic_string<Char> {
   return vformat(detail::to_string_view(format_str),
@@ -120,7 +120,7 @@ auto format(const S& format_str, Args&&... args) -> std::basic_string<Char> {
 }
 
 template <typename Locale, typename S, typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_locale<Locale>::value&&
+          TURBO_ENABLE_IF(detail::is_locale<Locale>::value&&
                             detail::is_exotic_char<Char>::value)>
 inline auto vformat(
     const Locale& loc, const S& format_str,
@@ -131,7 +131,7 @@ inline auto vformat(
 
 template <typename Locale, typename S, typename... Args,
           typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_locale<Locale>::value&&
+          TURBO_ENABLE_IF(detail::is_locale<Locale>::value&&
                             detail::is_exotic_char<Char>::value)>
 inline auto format(const Locale& loc, const S& format_str, Args&&... args)
     -> std::basic_string<Char> {
@@ -140,7 +140,7 @@ inline auto format(const Locale& loc, const S& format_str, Args&&... args)
 }
 
 template <typename OutputIt, typename S, typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
+          TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
                             detail::is_exotic_char<Char>::value)>
 auto vformat_to(OutputIt out, const S& format_str,
                 basic_format_args<buffer_context<type_identity_t<Char>>> args)
@@ -152,7 +152,7 @@ auto vformat_to(OutputIt out, const S& format_str,
 
 template <typename OutputIt, typename S, typename... Args,
           typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
+          TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
                             detail::is_exotic_char<Char>::value)>
 inline auto format_to(OutputIt out, const S& fmt, Args&&... args) -> OutputIt {
   return vformat_to(out, detail::to_string_view(fmt),
@@ -161,7 +161,7 @@ inline auto format_to(OutputIt out, const S& fmt, Args&&... args) -> OutputIt {
 
 template <typename Locale, typename S, typename OutputIt, typename... Args,
           typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
+          TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
                             detail::is_locale<Locale>::value&&
                                 detail::is_exotic_char<Char>::value)>
 inline auto vformat_to(
@@ -186,7 +186,7 @@ inline auto format_to(OutputIt out, const Locale& loc, const S& format_str,
 }
 
 template <typename OutputIt, typename Char, typename... Args,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
+          TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
                             detail::is_exotic_char<Char>::value)>
 inline auto vformat_to_n(
     OutputIt out, size_t n, basic_string_view<Char> format_str,
@@ -200,7 +200,7 @@ inline auto vformat_to_n(
 
 template <typename OutputIt, typename S, typename... Args,
           typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
+          TURBO_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value&&
                             detail::is_exotic_char<Char>::value)>
 inline auto format_to_n(OutputIt out, size_t n, const S& fmt,
                         const Args&... args) -> format_to_n_result<OutputIt> {
@@ -209,7 +209,7 @@ inline auto format_to_n(OutputIt out, size_t n, const S& fmt,
 }
 
 template <typename S, typename... Args, typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_exotic_char<Char>::value)>
+          TURBO_ENABLE_IF(detail::is_exotic_char<Char>::value)>
 inline auto formatted_size(const S& fmt, Args&&... args) -> size_t {
   detail::counting_buffer<Char> buf;
   detail::vformat_to(buf, detail::to_string_view(fmt),
@@ -253,7 +253,7 @@ template <typename... T> void println(wformat_string<T...> fmt, T&&... args) {
 template <typename T> inline auto to_wstring(const T& value) -> std::wstring {
   return format(FMT_STRING(L"{}"), value);
 }
-FMT_END_EXPORT
+TURBO_END_EXPORT
 FMT_END_NAMESPACE
 
 #endif  // FMT_XCHAR_H_

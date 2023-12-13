@@ -164,7 +164,7 @@ namespace turbo {
 
             template<typename T>
             std::string operator()(const T *value) const {
-                return turbo::Format("#{}({})", index, testing::PrintToString(*value));
+                return turbo::format("#{}({})", index, testing::PrintToString(*value));
             }
         };
 

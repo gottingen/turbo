@@ -56,7 +56,7 @@ namespace turbo {
         inline bool IsSurrogate(char32_t c, std::string_view src, std::string *error) {
             if (c >= 0xD800 && c <= 0xDFFF) {
                 if (error) {
-                    *error = turbo::Format("invalid surrogate character (0xD800-DFFF): \\{}",
+                    *error = turbo::format("invalid surrogate character (0xD800-DFFF): \\{}",
                                            src);
                 }
                 return true;

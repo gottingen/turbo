@@ -119,7 +119,7 @@ namespace {
                 int mem_comparison =
                         memcmp(destination_.get(), source_.get() + source_alignment, size);
                 SCOPED_TRACE(
-                        turbo::Format("Error in memcpy of size: {} with source alignment: {}", size, source_alignment));
+                        turbo::format("Error in memcpy of size: {} with source alignment: {}", size, source_alignment));
                 ASSERT_EQ(mem_comparison, 0);
                 turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(
                         initial_crc,
@@ -150,7 +150,7 @@ namespace {
                 int mem_comparison =
                         memcmp(destination_.get() + dest_alignment, source_.get(), size);
                 SCOPED_TRACE(
-                        turbo::Format("Error in memcpy of size: {} with dest alignment: {}", size, dest_alignment));
+                        turbo::format("Error in memcpy of size: {} with dest alignment: {}", size, dest_alignment));
                 ASSERT_EQ(mem_comparison, 0);
                 turbo::crc32c_t baseline_crc = turbo::ExtendCrc32c(
                         initial_crc,

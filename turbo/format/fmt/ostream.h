@@ -33,7 +33,7 @@ class file_access {
   friend auto get_file(BufType& obj) -> FILE* { return obj.*FileMemberPtr; }
 };
 
-#if FMT_MSC_VERSION
+#if TURBO_MSC_VERSION
 template class file_access<file_access_tag, std::filebuf,
                            &std::filebuf::_Myfile>;
 auto get_file(std::filebuf&) -> FILE*;
@@ -44,7 +44,7 @@ auto get_file(std::__stdoutbuf<char>&) -> FILE*;
 #endif
 
 inline bool write_ostream_unicode(std::ostream& os, fmt::string_view data) {
-#if FMT_MSC_VERSION
+#if TURBO_MSC_VERSION
   if (auto* buf = dynamic_cast<std::filebuf*>(os.rdbuf()))
     if (FILE* f = get_file(*buf)) return write_console(f, data);
 #elif defined(_WIN32) && defined(__GLIBCXX__)
@@ -61,7 +61,7 @@ inline bool write_ostream_unicode(std::ostream& os, fmt::string_view data) {
   if (auto* buf = dynamic_cast<std::__stdoutbuf<char>*>(os.rdbuf()))
     if (FILE* f = get_file(*buf)) return write_console(f, data);
 #else
-  ignore_unused(os, data);
+    turbo::ignore_unused(os, data);
 #endif
   return false;
 }
@@ -77,7 +77,7 @@ void write_buffer(std::basic_ostream<Char>& os, buffer<Char>& buf) {
   const Char* buf_data = buf.data();
   using unsigned_streamsize = std::make_unsigned<std::streamsize>::type;
   unsigned_streamsize size = buf.size();
-  unsigned_streamsize max_size = to_unsigned(max_value<std::streamsize>());
+  unsigned_streamsize max_size = turbo::to_unsigned(max_value<std::streamsize>());
   do {
     unsigned_streamsize n = size <= max_size ? size : max_size;
     os.write(buf_data, static_cast<std::streamsize>(n));
@@ -155,7 +155,7 @@ inline void vprint_directly(std::ostream& os, string_view format_str,
 
 }  // namespace detail
 
-FMT_MODULE_EXPORT template <typename Char>
+TURBO_MODULE_EXPORT template <typename Char>
 void vprint(std::basic_ostream<Char>& os,
             basic_string_view<type_identity_t<Char>> format_str,
             basic_format_args<buffer_context<type_identity_t<Char>>> args) {
@@ -174,7 +174,7 @@ void vprint(std::basic_ostream<Char>& os,
     fmt::print(cerr, "Don't {}!", "panic");
   \endrst
  */
-FMT_MODULE_EXPORT template <typename... T>
+TURBO_MODULE_EXPORT template <typename... T>
 void print(std::ostream& os, format_string<T...> fmt, T&&... args) {
   const auto& vargs = fmt::make_format_args(args...);
   if (detail::is_utf8())
@@ -183,7 +183,7 @@ void print(std::ostream& os, format_string<T...> fmt, T&&... args) {
     detail::vprint_directly(os, fmt, vargs);
 }
 
-FMT_MODULE_EXPORT
+TURBO_MODULE_EXPORT
 template <typename... Args>
 void print(std::wostream& os,
            basic_format_string<wchar_t, type_identity_t<Args>...> fmt,
@@ -191,12 +191,12 @@ void print(std::wostream& os,
   vprint(os, fmt, fmt::make_format_args<buffer_context<wchar_t>>(args...));
 }
 
-FMT_MODULE_EXPORT template <typename... T>
+TURBO_MODULE_EXPORT template <typename... T>
 void println(std::ostream& os, format_string<T...> fmt, T&&... args) {
   fmt::print(os, "{}\n", fmt::format(fmt, std::forward<T>(args)...));
 }
 
-FMT_MODULE_EXPORT
+TURBO_MODULE_EXPORT
 template <typename... Args>
 void println(std::wostream& os,
              basic_format_string<wchar_t, type_identity_t<Args>...> fmt,

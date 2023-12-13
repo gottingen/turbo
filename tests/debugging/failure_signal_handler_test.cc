@@ -47,7 +47,7 @@ namespace {
 
     TEST_P(FailureSignalHandlerDeathTest, TurboFailureSignal) {
         const int signo = GetParam();
-        std::string exit_regex = turbo::Format(
+        std::string exit_regex = turbo::format(
                 "\\*\\*\\* {} received at time=", turbo::debugging_internal::FailureSignalToString(signo));
 #ifndef _WIN32
         EXPECT_EXIT(InstallHandlerAndRaise(signo), testing::KilledBySignal(signo),
@@ -96,9 +96,9 @@ namespace {
     TEST_P(FailureSignalHandlerDeathTest, TurboFatalSignalsWithWriterFn) {
         const int signo = GetParam();
         std::string tmp_dir = GetTmpDir();
-        std::string file = turbo::Format("{}/signo_{}", tmp_dir, signo);
+        std::string file = turbo::format("{}/signo_{}", tmp_dir, signo);
 
-        std::string exit_regex = turbo::Format(
+        std::string exit_regex = turbo::format(
                 "\\*\\*\\* {} received at time=", turbo::debugging_internal::FailureSignalToString(signo));
 #ifndef _WIN32
         EXPECT_EXIT(InstallHandlerWithWriteToFileAndRaise(file.c_str(), signo),
@@ -116,7 +116,7 @@ namespace {
         std::getline(error_output, error_line);
         EXPECT_THAT(
                 error_line,
-                starts_with(turbo::Format(
+                starts_with(turbo::format(
                         "*** {} received at ", turbo::debugging_internal::FailureSignalToString(signo))));
 
         // On platforms where it is possible to get the current CPU, the
@@ -142,7 +142,7 @@ namespace {
         std::string result =
                 turbo::debugging_internal::FailureSignalToString(info.param);
         if (result.empty()) {
-            result = turbo::Format(info.param);
+            result = turbo::format(info.param);
         }
         return result;
     }

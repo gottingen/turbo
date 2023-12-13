@@ -519,7 +519,7 @@ TEST_CASE("LowLevelHashTest- VerifyGolden") {
   EXPECT_FALSE(true);
 #else
   for (size_t i = 0; i < kNumGoldenOutputs; ++i) {
-    CAPTURE(turbo::Format("i = {}; input = {}", i, cases[i].base64_data));
+    CAPTURE(turbo::format("i = {}; input = {}", i, cases[i].base64_data));
     std::string str;
       REQUIRE(turbo::base64_decode(cases[i].base64_data, &str));
       CHECK_EQ(turbo::hash_internal::bytes_hash(str.data(), str.size(),

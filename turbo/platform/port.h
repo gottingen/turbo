@@ -23,7 +23,7 @@
 * @defgroup turbo_platform platform
 *
 */
-
+#include "turbo/platform/config/cpp.h"
 #include "turbo/platform/config/attribute_simd.h"
 #include "turbo/platform/config/attribute_function.h"
 #include "turbo/platform/config/attribute_literal.h"
@@ -38,6 +38,7 @@
 #include "turbo/platform/config/config_have.h"
 #include "turbo/platform/config/config.h"
 #include "turbo/platform/config/wchar_config.h"
+#include "turbo/platform/config/config_unicode.h"
 
 
 #endif  // TURBO_PLATFORM_PORT_H_

@@ -110,7 +110,7 @@ TEST(Pow10HelperTest, Works) {
   for (const TestCase& test_case : kTestCases) {
     EXPECT_EQ(Pow10(test_case.power),
               std::ldexp(test_case.significand, test_case.radix))
-        << turbo::Format("Failure for Pow10({}): {:a} vs {:a}", test_case.power,
+        << turbo::format("Failure for Pow10({}): {:a} vs {:a}", test_case.power,
                            Pow10(test_case.power),
                            std::ldexp(test_case.significand, test_case.radix));
   }

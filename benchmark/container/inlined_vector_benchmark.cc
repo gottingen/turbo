@@ -258,7 +258,7 @@ namespace {
             VecType vec;
             size = sizeof(vec);
         }
-        state.SetLabel(turbo::Format("sz={}", size));
+        state.SetLabel(turbo::format("sz={}", size));
     }
 
     BENCHMARK_TEMPLATE(BM_Sizeof, turbo::InlinedVector<char, 1>);

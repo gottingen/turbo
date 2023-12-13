@@ -36,7 +36,7 @@ namespace turbo {
         TURBO_CONST_INIT std::atomic<bool> cord_btree_exhaustive_validation(false);
 
         void LogFatalNodeType(CordRep *rep) {
-            TURBO_INTERNAL_LOG(FATAL, turbo::Format("Unexpected node type: {}",
+            TURBO_INTERNAL_LOG(FATAL, turbo::format("Unexpected node type: {}",
                                                     static_cast<int>(rep->tag)));
         }
 

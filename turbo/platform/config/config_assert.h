@@ -17,6 +17,8 @@
 #define TURBO_PLATFORM_CONFIG_CONFIG_ASSERT_H_
 
 #include <cassert>
+#include <cstdio>
+#include <exception>
 #include "turbo/platform/config/attribute_variable.h"
 #include "turbo/platform/config/attribute_optimization.h"
 #include "turbo/platform/config/config_have.h"
@@ -33,13 +35,41 @@
 //
 // This macro is inspired by
 // https://akrzemi1.wordpress.com/2017/05/18/asserts-in-constexpr-functions/
+
+namespace turbo{
+    // Suppresses "unused variable" warnings with the method described in
+    // https://herbsutter.com/2009/10/18/mailbag-shutting-up-compiler-warnings/.
+    // (void)var does not work on many Intel compilers.
+    template<typename... T>
+    constexpr void ignore_unused(const T &...) {}
+
+    namespace detail {
+        [[noreturn]] inline void assert_fail(const char *file, int line,
+                                                const char *message) {
+            // Use unchecked std::fprintf to avoid triggering another assertion when
+            // writing to stderr fails
+            std::fprintf(stderr, "%s:%d: assertion failed: %s", file, line, message);
+            // Chosen instead of std::abort to satisfy Clang in CUDA mode during device
+            // code pass.
+            std::terminate();
+        }
+        constexpr  const char* select_msg(const char* expr, const char* msg) {
+            turbo::ignore_unused(expr);
+            return msg;
+        }
+        constexpr  const char* select_msg(const char* expr) {
+            return expr;
+        }
+    }
+}  // namespace turbo
+
 #if defined(NDEBUG)
-#define TURBO_ASSERT(expr) \
-  (false ? static_cast<void>(expr) : static_cast<void>(0))
+#define TURBO_ASSERT(condition, ...) \
+  (false ? static_cast<void>(condition) : static_cast<void>(0))
 #else
-#define TURBO_ASSERT(expr)                           \
-  (TURBO_LIKELY((expr)) ? static_cast<void>(0) \
-                             : [] { assert(false && #expr); }())  // NOLINT
+#define TURBO_ASSERT(condition, ...) \
+  ((condition) ? (void)0 :                              \
+  turbo::detail::assert_fail(__FILE__, __LINE__, turbo::detail::select_msg(#condition, #__VA_ARGS__)))
 #endif
 
 

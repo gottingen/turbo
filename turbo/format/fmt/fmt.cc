@@ -72,9 +72,9 @@ module;
 
 export module fmt;
 
-#define FMT_MODULE_EXPORT export
-#define FMT_BEGIN_EXPORT export {
-#define FMT_END_EXPORT }
+#define TURBO_MODULE_EXPORT export
+#define TURBO_BEGIN_EXPORT export {
+#define TURBO_END_EXPORT }
 #define FMT_BEGIN_DETAIL_NAMESPACE \
   }                                \
   namespace detail {
@@ -108,7 +108,7 @@ extern "C++" {
 #endif
 
 // gcc doesn't yet implement private module fragments
-#if !FMT_GCC_VERSION
+#if !TURBO_GCC_VERSION
 module :private;
 #endif
 

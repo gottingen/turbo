@@ -645,7 +645,7 @@ TEST(RandenTest, IsFastOrSlow) {
   }
   auto duration = turbo::get_current_time_nanos() - start;
 
-  TURBO_INTERNAL_LOG(INFO, turbo::Format("{}{}", static_cast<double>(duration) /
+  TURBO_INTERNAL_LOG(INFO, turbo::format("{}{}", static_cast<double>(duration) /
                                            static_cast<double>(kCount),
                                        "ns"));
 

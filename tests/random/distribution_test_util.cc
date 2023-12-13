@@ -71,7 +71,7 @@ namespace turbo {
         }
 
         std::ostream &operator<<(std::ostream &os, const DistributionMoments &moments) {
-            return os << turbo::Format("mean={}, stddev={}, skewness={}, kurtosis={}",
+            return os << turbo::format("mean={}, stddev={}, skewness={}, kurtosis={}",
                                           moments.mean, std::sqrt(moments.variance),
                                           moments.skewness, moments.kurtosis);
         }
@@ -89,7 +89,7 @@ namespace turbo {
                 return true;
             }
 
-            std::string formatted = turbo::Format("{} actual={} expected={}  err={}",
+            std::string formatted = turbo::format("{} actual={} expected={}  err={}",
                                                   msg, actual, expected, delta / bound);
             TURBO_RAW_LOG(INFO, "%s", formatted.c_str());
             return false;

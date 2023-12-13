@@ -39,7 +39,7 @@ namespace turbo {
             const CivilSecond ncs(NormalizeYear(cs.year()), cs.month(), cs.day(),
                                   cs.hour(), cs.minute(), cs.second());
             const TimeZone utc = utc_time_zone();
-            return Format("{}{}", cs.year(), format_time(fmt, from_civil(ncs, utc), utc));
+            return format("{}{}", cs.year(), format_time(fmt, from_civil(ncs, utc), utc));
         }
 
         template<typename CivilT>
@@ -54,11 +54,11 @@ namespace turbo {
             const civil_year_t y =
                     std::strtoll(np, &endp, 10);  // NOLINT(runtime/deprecated_fn)
             if (endp == np || errno == ERANGE) return false;
-            const std::string norm = Format("{}{}", NormalizeYear(y), endp);
+            const std::string norm = format("{}{}", NormalizeYear(y), endp);
 
             const TimeZone utc = utc_time_zone();
             Time t;
-            if (parse_time(Format("%Y{}", fmt), norm, utc, &t, nullptr)) {
+            if (parse_time(format("%Y{}", fmt), norm, utc, &t, nullptr)) {
                 const auto cs = to_civil_second(t, utc);
                 *c = CivilT(y, cs.month(), cs.day(), cs.hour(), cs.minute(), cs.second());
                 return true;

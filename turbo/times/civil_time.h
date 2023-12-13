@@ -399,7 +399,7 @@ namespace turbo {
      * @ingroup turbo_times_civil_time
      * @brief Formats the given civil-time value into a string value of the following
      *       format:
-     *       Type        | Format
+     *       Type        | format
      *       ---------------------------------
      *       CivilSecond | YYYY-MM-DDTHH:MM:SS
      *       CivilMinute | YYYY-MM-DDTHH:MM
@@ -452,7 +452,7 @@ namespace turbo {
      * @brief Parses a civil-time value from the specified `std::string_view` into the
      *       passed output parameter. Returns `true` upon successful parsing.
      *       The expected form of the input string is as follows:
-     *       Type        | Format
+     *       Type        | format
      *       ---------------------------------
      *       CivilSecond | YYYY-MM-DDTHH:MM:SS
      *       CivilMinute | YYYY-MM-DDTHH:MM

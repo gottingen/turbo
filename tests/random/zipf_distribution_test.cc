@@ -104,7 +104,7 @@ namespace {
                 if (sample < sample_min) sample_min = sample;
             }
             TURBO_INTERNAL_LOG(INFO,
-                               turbo::Format("Range: {}, {}", +sample_min, +sample_max));
+                               turbo::format("Range: {}, {}", +sample_min, +sample_max));
         }
     }
 
@@ -306,15 +306,15 @@ namespace {
         if (chi_square > threshold) {
             TURBO_INTERNAL_LOG(INFO, "values");
             for (size_t i = 0; i < expected.size(); i++) {
-                TURBO_INTERNAL_LOG(INFO, turbo::Format("{}: {} vs. E={}", points[i], buckets[i],expected[i]));
+                TURBO_INTERNAL_LOG(INFO, turbo::format("{}: {} vs. E={}", points[i], buckets[i],expected[i]));
             }
-            TURBO_INTERNAL_LOG(INFO, turbo::Format("trials {}", trials));
+            TURBO_INTERNAL_LOG(INFO, turbo::format("trials {}", trials));
             TURBO_INTERNAL_LOG(INFO,
-                               turbo::Format("mean {} vs. expected {}", avg,  mean()));
-            TURBO_INTERNAL_LOG(INFO, turbo::Format("{}(data, {}) = {} ({})", kChiSquared, dof,
+                               turbo::format("mean {} vs. expected {}", avg,  mean()));
+            TURBO_INTERNAL_LOG(INFO, turbo::format("{}(data, {}) = {} ({})", kChiSquared, dof,
                                                    chi_square,p_actual));
             TURBO_INTERNAL_LOG(INFO,
-                               turbo::Format("{} @ 0.9995 = {}", kChiSquared, threshold));
+                               turbo::format("{} @ 0.9995 = {}", kChiSquared, threshold));
             FAIL() << kChiSquared << " value of " << chi_square
                    << " is above the threshold.";
         }
@@ -342,7 +342,7 @@ namespace {
     std::string ParamName(
             const ::testing::TestParamInfo<zipf_u64::param_type> &info) {
         const auto &p = info.param;
-        std::string name = turbo::Format("k_{}__q_{:.6g}__v_{:.6g}", p.k(), p.q(),p.v());
+        std::string name = turbo::format("k_{}__q_{:.6g}__v_{:.6g}", p.k(), p.q(),p.v());
         return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},
                                            {".", "_"}});

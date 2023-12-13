@@ -671,7 +671,7 @@ namespace turbo {
 
     void Cord::remove_prefix(size_t n) {
         TURBO_INTERNAL_CHECK(n <= size(),
-                             turbo::Format("Requested prefix size {} exceeds Cord's size {}", n, size()));
+                             turbo::format("Requested prefix size {} exceeds Cord's size {}", n, size()));
         contents_.MaybeRemoveEmptyCrcNode();
         CordRep *tree = contents_.tree();
         if (tree == nullptr) {
@@ -701,7 +701,7 @@ namespace turbo {
 
     void Cord::remove_suffix(size_t n) {
         TURBO_INTERNAL_CHECK(n <= size(),
-                             turbo::Format("Requested suffix size {} exceeds Cord's size {}", n, size()));
+                             turbo::format("Requested suffix size {} exceeds Cord's size {}", n, size()));
         contents_.MaybeRemoveEmptyCrcNode();
         CordRep *tree = contents_.tree();
         if (tree == nullptr) {
@@ -1368,7 +1368,7 @@ namespace turbo {
         }
 
         uint8_t CordTestAccess::LengthToTag(size_t s) {
-            TURBO_INTERNAL_CHECK(s <= kMaxFlatLength, turbo::Format("Invalid length {}", s));
+            TURBO_INTERNAL_CHECK(s <= kMaxFlatLength, turbo::format("Invalid length {}", s));
             return cord_internal::AllocatedSizeToTag(s + cord_internal::kFlatOverhead);
         }
 

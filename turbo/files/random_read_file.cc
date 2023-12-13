@@ -59,7 +59,7 @@ namespace turbo {
                 turbo::sleep_for(turbo::milliseconds(_option.open_interval));
             }
         }
-        return turbo::errno_to_status(errno, turbo::Format("Failed opening file {} for reading", _file_path.c_str()));
+        return turbo::errno_to_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));
     }
 
     turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, void *buff, size_t len) {

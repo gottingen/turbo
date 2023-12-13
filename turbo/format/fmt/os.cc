@@ -123,7 +123,7 @@ class utf8_system_category final : public std::error_category {
 
 }  // namespace detail
 
-FMT_API const std::error_category& system_category() noexcept {
+TURBO_DLL const std::error_category& system_category() noexcept {
   static const detail::utf8_system_category category;
   return category;
 }
@@ -256,7 +256,7 @@ std::size_t file::read(void* buffer, std::size_t count) {
   FMT_RETRY(result, FMT_POSIX_CALL(read(fd_, buffer, convert_rwcount(count))));
   if (result < 0)
     FMT_THROW(system_error(errno, FMT_STRING("cannot read from file")));
-  return detail::to_unsigned(result);
+  return turbo::to_unsigned(result);
 }
 
 std::size_t file::write(const void* buffer, std::size_t count) {
@@ -264,7 +264,7 @@ std::size_t file::write(const void* buffer, std::size_t count) {
   FMT_RETRY(result, FMT_POSIX_CALL(write(fd_, buffer, convert_rwcount(count))));
   if (result < 0)
     FMT_THROW(system_error(errno, FMT_STRING("cannot write to file")));
-  return detail::to_unsigned(result);
+  return turbo::to_unsigned(result);
 }
 
 file file::dup(int fd) {

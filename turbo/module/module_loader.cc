@@ -55,9 +55,9 @@ namespace turbo {
         TURBO_UNUSED(suffix);
         const std::string noVerName = std::string(turbo::kModulePrefix) + name + std::string(turbo::kModuleSuffix);
         if (ver != kNullVersion) {
-            const std::string soname = Format("{}.{}", noVerName, ver.major);
+            const std::string soname = format("{}.{}", noVerName, ver.major);
 
-            const std::string fullName = Format("{}.{}", noVerName, ver.to_string());
+            const std::string fullName = format("{}.{}", noVerName, ver.to_string());
             return {fullName, noVerName + soname, noVerName};
         } else {
             return {noVerName};
@@ -69,7 +69,7 @@ namespace turbo {
                                           const ModuleVersion& ver) {
         const std::string noVerName = kModulePrefix + name + kModuleSuffix;
         if (ver != kNullVersion) {
-            const std::string fullName = Format("{}.{}.{}", kModulePrefix, ver.to_string(), kModuleSuffix);
+            const std::string fullName = format("{}.{}.{}", kModulePrefix, ver.to_string(), kModuleSuffix);
             return {fullName, noVerName};
         } else {
             return {noVerName};

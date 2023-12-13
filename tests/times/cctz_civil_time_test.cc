@@ -30,7 +30,7 @@ namespace turbo {
             namespace {
 
                 template<typename T>
-                std::string Format(const T &t) {
+                std::string format(const T &t) {
                     std::stringstream ss;
                     ss << t;
                     return ss.str();
@@ -337,22 +337,22 @@ namespace turbo {
 
             TEST_CASE("CivilTime, DefaultConstruction") {
                 civil_second ss;
-                REQUIRE_EQ("1970-01-01T00:00:00", Format(ss));
+                REQUIRE_EQ("1970-01-01T00:00:00", format(ss));
 
                 civil_minute mm;
-                REQUIRE_EQ("1970-01-01T00:00", Format(mm));
+                REQUIRE_EQ("1970-01-01T00:00", format(mm));
 
                 civil_hour hh;
-                REQUIRE_EQ("1970-01-01T00", Format(hh));
+                REQUIRE_EQ("1970-01-01T00", format(hh));
 
                 civil_day d;
-                REQUIRE_EQ("1970-01-01", Format(d));
+                REQUIRE_EQ("1970-01-01", format(d));
 
                 civil_month m;
-                REQUIRE_EQ("1970-01", Format(m));
+                REQUIRE_EQ("1970-01", format(m));
 
                 civil_year y;
-                REQUIRE_EQ("1970", Format(y));
+                REQUIRE_EQ("1970", format(y));
             }
 
             TEST_CASE("CivilTime, StructMember") {
@@ -364,75 +364,75 @@ namespace turbo {
             }
 
             TEST_CASE("CivilTime, FieldsConstruction") {
-                REQUIRE_EQ("2015-01-02T03:04:05", Format(civil_second(2015, 1, 2, 3, 4, 5)));
-                REQUIRE_EQ("2015-01-02T03:04:00", Format(civil_second(2015, 1, 2, 3, 4)));
-                REQUIRE_EQ("2015-01-02T03:00:00", Format(civil_second(2015, 1, 2, 3)));
-                REQUIRE_EQ("2015-01-02T00:00:00", Format(civil_second(2015, 1, 2)));
-                REQUIRE_EQ("2015-01-01T00:00:00", Format(civil_second(2015, 1)));
-                REQUIRE_EQ("2015-01-01T00:00:00", Format(civil_second(2015)));
+                REQUIRE_EQ("2015-01-02T03:04:05", format(civil_second(2015, 1, 2, 3, 4, 5)));
+                REQUIRE_EQ("2015-01-02T03:04:00", format(civil_second(2015, 1, 2, 3, 4)));
+                REQUIRE_EQ("2015-01-02T03:00:00", format(civil_second(2015, 1, 2, 3)));
+                REQUIRE_EQ("2015-01-02T00:00:00", format(civil_second(2015, 1, 2)));
+                REQUIRE_EQ("2015-01-01T00:00:00", format(civil_second(2015, 1)));
+                REQUIRE_EQ("2015-01-01T00:00:00", format(civil_second(2015)));
 
-                REQUIRE_EQ("2015-01-02T03:04", Format(civil_minute(2015, 1, 2, 3, 4, 5)));
-                REQUIRE_EQ("2015-01-02T03:04", Format(civil_minute(2015, 1, 2, 3, 4)));
-                REQUIRE_EQ("2015-01-02T03:00", Format(civil_minute(2015, 1, 2, 3)));
-                REQUIRE_EQ("2015-01-02T00:00", Format(civil_minute(2015, 1, 2)));
-                REQUIRE_EQ("2015-01-01T00:00", Format(civil_minute(2015, 1)));
-                REQUIRE_EQ("2015-01-01T00:00", Format(civil_minute(2015)));
+                REQUIRE_EQ("2015-01-02T03:04", format(civil_minute(2015, 1, 2, 3, 4, 5)));
+                REQUIRE_EQ("2015-01-02T03:04", format(civil_minute(2015, 1, 2, 3, 4)));
+                REQUIRE_EQ("2015-01-02T03:00", format(civil_minute(2015, 1, 2, 3)));
+                REQUIRE_EQ("2015-01-02T00:00", format(civil_minute(2015, 1, 2)));
+                REQUIRE_EQ("2015-01-01T00:00", format(civil_minute(2015, 1)));
+                REQUIRE_EQ("2015-01-01T00:00", format(civil_minute(2015)));
 
-                REQUIRE_EQ("2015-01-02T03", Format(civil_hour(2015, 1, 2, 3, 4, 5)));
-                REQUIRE_EQ("2015-01-02T03", Format(civil_hour(2015, 1, 2, 3, 4)));
-                REQUIRE_EQ("2015-01-02T03", Format(civil_hour(2015, 1, 2, 3)));
-                REQUIRE_EQ("2015-01-02T00", Format(civil_hour(2015, 1, 2)));
-                REQUIRE_EQ("2015-01-01T00", Format(civil_hour(2015, 1)));
-                REQUIRE_EQ("2015-01-01T00", Format(civil_hour(2015)));
+                REQUIRE_EQ("2015-01-02T03", format(civil_hour(2015, 1, 2, 3, 4, 5)));
+                REQUIRE_EQ("2015-01-02T03", format(civil_hour(2015, 1, 2, 3, 4)));
+                REQUIRE_EQ("2015-01-02T03", format(civil_hour(2015, 1, 2, 3)));
+                REQUIRE_EQ("2015-01-02T00", format(civil_hour(2015, 1, 2)));
+                REQUIRE_EQ("2015-01-01T00", format(civil_hour(2015, 1)));
+                REQUIRE_EQ("2015-01-01T00", format(civil_hour(2015)));
 
-                REQUIRE_EQ("2015-01-02", Format(civil_day(2015, 1, 2, 3, 4, 5)));
-                REQUIRE_EQ("2015-01-02", Format(civil_day(2015, 1, 2, 3, 4)));
-                REQUIRE_EQ("2015-01-02", Format(civil_day(2015, 1, 2, 3)));
-                REQUIRE_EQ("2015-01-02", Format(civil_day(2015, 1, 2)));
-                REQUIRE_EQ("2015-01-01", Format(civil_day(2015, 1)));
-                REQUIRE_EQ("2015-01-01", Format(civil_day(2015)));
+                REQUIRE_EQ("2015-01-02", format(civil_day(2015, 1, 2, 3, 4, 5)));
+                REQUIRE_EQ("2015-01-02", format(civil_day(2015, 1, 2, 3, 4)));
+                REQUIRE_EQ("2015-01-02", format(civil_day(2015, 1, 2, 3)));
+                REQUIRE_EQ("2015-01-02", format(civil_day(2015, 1, 2)));
+                REQUIRE_EQ("2015-01-01", format(civil_day(2015, 1)));
+                REQUIRE_EQ("2015-01-01", format(civil_day(2015)));
 
-                REQUIRE_EQ("2015-01", Format(civil_month(2015, 1, 2, 3, 4, 5)));
-                REQUIRE_EQ("2015-01", Format(civil_month(2015, 1, 2, 3, 4)));
-                REQUIRE_EQ("2015-01", Format(civil_month(2015, 1, 2, 3)));
-                REQUIRE_EQ("2015-01", Format(civil_month(2015, 1, 2)));
-                REQUIRE_EQ("2015-01", Format(civil_month(2015, 1)));
-                REQUIRE_EQ("2015-01", Format(civil_month(2015)));
+                REQUIRE_EQ("2015-01", format(civil_month(2015, 1, 2, 3, 4, 5)));
+                REQUIRE_EQ("2015-01", format(civil_month(2015, 1, 2, 3, 4)));
+                REQUIRE_EQ("2015-01", format(civil_month(2015, 1, 2, 3)));
+                REQUIRE_EQ("2015-01", format(civil_month(2015, 1, 2)));
+                REQUIRE_EQ("2015-01", format(civil_month(2015, 1)));
+                REQUIRE_EQ("2015-01", format(civil_month(2015)));
 
-                REQUIRE_EQ("2015", Format(civil_year(2015, 1, 2, 3, 4, 5)));
-                REQUIRE_EQ("2015", Format(civil_year(2015, 1, 2, 3, 4)));
-                REQUIRE_EQ("2015", Format(civil_year(2015, 1, 2, 3)));
-                REQUIRE_EQ("2015", Format(civil_year(2015, 1, 2)));
-                REQUIRE_EQ("2015", Format(civil_year(2015, 1)));
-                REQUIRE_EQ("2015", Format(civil_year(2015)));
+                REQUIRE_EQ("2015", format(civil_year(2015, 1, 2, 3, 4, 5)));
+                REQUIRE_EQ("2015", format(civil_year(2015, 1, 2, 3, 4)));
+                REQUIRE_EQ("2015", format(civil_year(2015, 1, 2, 3)));
+                REQUIRE_EQ("2015", format(civil_year(2015, 1, 2)));
+                REQUIRE_EQ("2015", format(civil_year(2015, 1)));
+                REQUIRE_EQ("2015", format(civil_year(2015)));
             }
 
             TEST_CASE("CivilTime, FieldsConstructionLimits") {
                 const int kIntMax = std::numeric_limits<int>::max();
                 REQUIRE_EQ("2038-01-19T03:14:07",
-                          Format(civil_second(1970, 1, 1, 0, 0, kIntMax)));
+                          format(civil_second(1970, 1, 1, 0, 0, kIntMax)));
                 REQUIRE_EQ("6121-02-11T05:21:07",
-                          Format(civil_second(1970, 1, 1, 0, kIntMax, kIntMax)));
+                          format(civil_second(1970, 1, 1, 0, kIntMax, kIntMax)));
                 REQUIRE_EQ("251104-11-20T12:21:07",
-                          Format(civil_second(1970, 1, 1, kIntMax, kIntMax, kIntMax)));
+                          format(civil_second(1970, 1, 1, kIntMax, kIntMax, kIntMax)));
                 REQUIRE_EQ("6130715-05-30T12:21:07",
-                          Format(civil_second(1970, 1, kIntMax, kIntMax, kIntMax, kIntMax)));
+                          format(civil_second(1970, 1, kIntMax, kIntMax, kIntMax, kIntMax)));
                 REQUIRE_EQ(
                         "185087685-11-26T12:21:07",
-                        Format(civil_second(1970, kIntMax, kIntMax, kIntMax, kIntMax, kIntMax)));
+                        format(civil_second(1970, kIntMax, kIntMax, kIntMax, kIntMax, kIntMax)));
 
                 const int kIntMin = std::numeric_limits<int>::min();
                 REQUIRE_EQ("1901-12-13T20:45:52",
-                          Format(civil_second(1970, 1, 1, 0, 0, kIntMin)));
+                          format(civil_second(1970, 1, 1, 0, 0, kIntMin)));
                 REQUIRE_EQ("-2182-11-20T18:37:52",
-                          Format(civil_second(1970, 1, 1, 0, kIntMin, kIntMin)));
+                          format(civil_second(1970, 1, 1, 0, kIntMin, kIntMin)));
                 REQUIRE_EQ("-247165-02-11T10:37:52",
-                          Format(civil_second(1970, 1, 1, kIntMin, kIntMin, kIntMin)));
+                          format(civil_second(1970, 1, 1, kIntMin, kIntMin, kIntMin)));
                 REQUIRE_EQ("-6126776-08-01T10:37:52",
-                          Format(civil_second(1970, 1, kIntMin, kIntMin, kIntMin, kIntMin)));
+                          format(civil_second(1970, 1, kIntMin, kIntMin, kIntMin, kIntMin)));
                 REQUIRE_EQ(
                         "-185083747-10-31T10:37:52",
-                        Format(civil_second(1970, kIntMin, kIntMin, kIntMin, kIntMin, kIntMin)));
+                        format(civil_second(1970, kIntMin, kIntMin, kIntMin, kIntMin, kIntMin)));
             }
 
             TEST_CASE("CivilTime, ImplicitCrossAlignment") {
@@ -506,41 +506,41 @@ namespace turbo {
                 //
 
                 civil_second second(2015, 1, 2, 3, 4, 5);
-                REQUIRE_EQ("2015-01-02T03:04:05", Format(second));
+                REQUIRE_EQ("2015-01-02T03:04:05", format(second));
 
                 civil_minute minute(second);
-                REQUIRE_EQ("2015-01-02T03:04", Format(minute));
+                REQUIRE_EQ("2015-01-02T03:04", format(minute));
 
                 civil_hour hour(minute);
-                REQUIRE_EQ("2015-01-02T03", Format(hour));
+                REQUIRE_EQ("2015-01-02T03", format(hour));
 
                 civil_day day(hour);
-                REQUIRE_EQ("2015-01-02", Format(day));
+                REQUIRE_EQ("2015-01-02", format(day));
 
                 civil_month month(day);
-                REQUIRE_EQ("2015-01", Format(month));
+                REQUIRE_EQ("2015-01", format(month));
 
                 civil_year year(month);
-                REQUIRE_EQ("2015", Format(year));
+                REQUIRE_EQ("2015", format(year));
 
                 //
                 // Now assign from larger units -> smaller units
                 //
 
                 month = civil_month(year);
-                REQUIRE_EQ("2015-01", Format(month));
+                REQUIRE_EQ("2015-01", format(month));
 
                 day = civil_day(month);
-                REQUIRE_EQ("2015-01-01", Format(day));
+                REQUIRE_EQ("2015-01-01", format(day));
 
                 hour = civil_hour(day);
-                REQUIRE_EQ("2015-01-01T00", Format(hour));
+                REQUIRE_EQ("2015-01-01T00", format(hour));
 
                 minute = civil_minute(hour);
-                REQUIRE_EQ("2015-01-01T00:00", Format(minute));
+                REQUIRE_EQ("2015-01-01T00:00", format(minute));
 
                 second = civil_second(minute);
-                REQUIRE_EQ("2015-01-01T00:00:00", Format(second));
+                REQUIRE_EQ("2015-01-01T00:00:00", format(second));
             }
 
             // Metafunction to test whether difference is allowed between two types.
@@ -592,7 +592,7 @@ namespace turbo {
                 const civil_hour c(b);
                 civil_hour d;
                 d = c;
-                REQUIRE_EQ("2015-01-02T03", Format(d));
+                REQUIRE_EQ("2015-01-02T03", format(d));
             }
 
             TEST_CASE("CivilTime, Relational") {
@@ -643,70 +643,70 @@ namespace turbo {
 
             TEST_CASE("CivilTime, Arithmetic") {
                 civil_second second(2015, 1, 2, 3, 4, 5);
-                REQUIRE_EQ("2015-01-02T03:04:06", Format(second += 1));
-                REQUIRE_EQ("2015-01-02T03:04:07", Format(second + 1));
-                REQUIRE_EQ("2015-01-02T03:04:08", Format(2 + second));
-                REQUIRE_EQ("2015-01-02T03:04:05", Format(second - 1));
-                REQUIRE_EQ("2015-01-02T03:04:05", Format(second -= 1));
-                REQUIRE_EQ("2015-01-02T03:04:05", Format(second++));
-                REQUIRE_EQ("2015-01-02T03:04:07", Format(++second));
-                REQUIRE_EQ("2015-01-02T03:04:07", Format(second--));
-                REQUIRE_EQ("2015-01-02T03:04:05", Format(--second));
+                REQUIRE_EQ("2015-01-02T03:04:06", format(second += 1));
+                REQUIRE_EQ("2015-01-02T03:04:07", format(second + 1));
+                REQUIRE_EQ("2015-01-02T03:04:08", format(2 + second));
+                REQUIRE_EQ("2015-01-02T03:04:05", format(second - 1));
+                REQUIRE_EQ("2015-01-02T03:04:05", format(second -= 1));
+                REQUIRE_EQ("2015-01-02T03:04:05", format(second++));
+                REQUIRE_EQ("2015-01-02T03:04:07", format(++second));
+                REQUIRE_EQ("2015-01-02T03:04:07", format(second--));
+                REQUIRE_EQ("2015-01-02T03:04:05", format(--second));
 
                 civil_minute minute(2015, 1, 2, 3, 4);
-                REQUIRE_EQ("2015-01-02T03:05", Format(minute += 1));
-                REQUIRE_EQ("2015-01-02T03:06", Format(minute + 1));
-                REQUIRE_EQ("2015-01-02T03:07", Format(2 + minute));
-                REQUIRE_EQ("2015-01-02T03:04", Format(minute - 1));
-                REQUIRE_EQ("2015-01-02T03:04", Format(minute -= 1));
-                REQUIRE_EQ("2015-01-02T03:04", Format(minute++));
-                REQUIRE_EQ("2015-01-02T03:06", Format(++minute));
-                REQUIRE_EQ("2015-01-02T03:06", Format(minute--));
-                REQUIRE_EQ("2015-01-02T03:04", Format(--minute));
+                REQUIRE_EQ("2015-01-02T03:05", format(minute += 1));
+                REQUIRE_EQ("2015-01-02T03:06", format(minute + 1));
+                REQUIRE_EQ("2015-01-02T03:07", format(2 + minute));
+                REQUIRE_EQ("2015-01-02T03:04", format(minute - 1));
+                REQUIRE_EQ("2015-01-02T03:04", format(minute -= 1));
+                REQUIRE_EQ("2015-01-02T03:04", format(minute++));
+                REQUIRE_EQ("2015-01-02T03:06", format(++minute));
+                REQUIRE_EQ("2015-01-02T03:06", format(minute--));
+                REQUIRE_EQ("2015-01-02T03:04", format(--minute));
 
                 civil_hour hour(2015, 1, 2, 3);
-                REQUIRE_EQ("2015-01-02T04", Format(hour += 1));
-                REQUIRE_EQ("2015-01-02T05", Format(hour + 1));
-                REQUIRE_EQ("2015-01-02T06", Format(2 + hour));
-                REQUIRE_EQ("2015-01-02T03", Format(hour - 1));
-                REQUIRE_EQ("2015-01-02T03", Format(hour -= 1));
-                REQUIRE_EQ("2015-01-02T03", Format(hour++));
-                REQUIRE_EQ("2015-01-02T05", Format(++hour));
-                REQUIRE_EQ("2015-01-02T05", Format(hour--));
-                REQUIRE_EQ("2015-01-02T03", Format(--hour));
+                REQUIRE_EQ("2015-01-02T04", format(hour += 1));
+                REQUIRE_EQ("2015-01-02T05", format(hour + 1));
+                REQUIRE_EQ("2015-01-02T06", format(2 + hour));
+                REQUIRE_EQ("2015-01-02T03", format(hour - 1));
+                REQUIRE_EQ("2015-01-02T03", format(hour -= 1));
+                REQUIRE_EQ("2015-01-02T03", format(hour++));
+                REQUIRE_EQ("2015-01-02T05", format(++hour));
+                REQUIRE_EQ("2015-01-02T05", format(hour--));
+                REQUIRE_EQ("2015-01-02T03", format(--hour));
 
                 civil_day day(2015, 1, 2);
-                REQUIRE_EQ("2015-01-03", Format(day += 1));
-                REQUIRE_EQ("2015-01-04", Format(day + 1));
-                REQUIRE_EQ("2015-01-05", Format(2 + day));
-                REQUIRE_EQ("2015-01-02", Format(day - 1));
-                REQUIRE_EQ("2015-01-02", Format(day -= 1));
-                REQUIRE_EQ("2015-01-02", Format(day++));
-                REQUIRE_EQ("2015-01-04", Format(++day));
-                REQUIRE_EQ("2015-01-04", Format(day--));
-                REQUIRE_EQ("2015-01-02", Format(--day));
+                REQUIRE_EQ("2015-01-03", format(day += 1));
+                REQUIRE_EQ("2015-01-04", format(day + 1));
+                REQUIRE_EQ("2015-01-05", format(2 + day));
+                REQUIRE_EQ("2015-01-02", format(day - 1));
+                REQUIRE_EQ("2015-01-02", format(day -= 1));
+                REQUIRE_EQ("2015-01-02", format(day++));
+                REQUIRE_EQ("2015-01-04", format(++day));
+                REQUIRE_EQ("2015-01-04", format(day--));
+                REQUIRE_EQ("2015-01-02", format(--day));
 
                 civil_month month(2015, 1);
-                REQUIRE_EQ("2015-02", Format(month += 1));
-                REQUIRE_EQ("2015-03", Format(month + 1));
-                REQUIRE_EQ("2015-04", Format(2 + month));
-                REQUIRE_EQ("2015-01", Format(month - 1));
-                REQUIRE_EQ("2015-01", Format(month -= 1));
-                REQUIRE_EQ("2015-01", Format(month++));
-                REQUIRE_EQ("2015-03", Format(++month));
-                REQUIRE_EQ("2015-03", Format(month--));
-                REQUIRE_EQ("2015-01", Format(--month));
+                REQUIRE_EQ("2015-02", format(month += 1));
+                REQUIRE_EQ("2015-03", format(month + 1));
+                REQUIRE_EQ("2015-04", format(2 + month));
+                REQUIRE_EQ("2015-01", format(month - 1));
+                REQUIRE_EQ("2015-01", format(month -= 1));
+                REQUIRE_EQ("2015-01", format(month++));
+                REQUIRE_EQ("2015-03", format(++month));
+                REQUIRE_EQ("2015-03", format(month--));
+                REQUIRE_EQ("2015-01", format(--month));
 
                 civil_year year(2015);
-                REQUIRE_EQ("2016", Format(year += 1));
-                REQUIRE_EQ("2017", Format(year + 1));
-                REQUIRE_EQ("2018", Format(2 + year));
-                REQUIRE_EQ("2015", Format(year - 1));
-                REQUIRE_EQ("2015", Format(year -= 1));
-                REQUIRE_EQ("2015", Format(year++));
-                REQUIRE_EQ("2017", Format(++year));
-                REQUIRE_EQ("2017", Format(year--));
-                REQUIRE_EQ("2015", Format(--year));
+                REQUIRE_EQ("2016", format(year += 1));
+                REQUIRE_EQ("2017", format(year + 1));
+                REQUIRE_EQ("2018", format(2 + year));
+                REQUIRE_EQ("2015", format(year - 1));
+                REQUIRE_EQ("2015", format(year -= 1));
+                REQUIRE_EQ("2015", format(year++));
+                REQUIRE_EQ("2017", format(++year));
+                REQUIRE_EQ("2017", format(year--));
+                REQUIRE_EQ("2015", format(--year));
             }
 
             TEST_CASE("CivilTime, ArithmeticLimits") {
@@ -715,63 +715,63 @@ namespace turbo {
 
                 civil_second second(1970, 1, 1, 0, 0, 0);
                 second += kIntMax;
-                REQUIRE_EQ("2038-01-19T03:14:07", Format(second));
+                REQUIRE_EQ("2038-01-19T03:14:07", format(second));
                 second -= kIntMax;
-                REQUIRE_EQ("1970-01-01T00:00:00", Format(second));
+                REQUIRE_EQ("1970-01-01T00:00:00", format(second));
                 second += kIntMin;
-                REQUIRE_EQ("1901-12-13T20:45:52", Format(second));
+                REQUIRE_EQ("1901-12-13T20:45:52", format(second));
                 second -= kIntMin;
-                REQUIRE_EQ("1970-01-01T00:00:00", Format(second));
+                REQUIRE_EQ("1970-01-01T00:00:00", format(second));
 
                 civil_minute minute(1970, 1, 1, 0, 0);
                 minute += kIntMax;
-                REQUIRE_EQ("6053-01-23T02:07", Format(minute));
+                REQUIRE_EQ("6053-01-23T02:07", format(minute));
                 minute -= kIntMax;
-                REQUIRE_EQ("1970-01-01T00:00", Format(minute));
+                REQUIRE_EQ("1970-01-01T00:00", format(minute));
                 minute += kIntMin;
-                REQUIRE_EQ("-2114-12-08T21:52", Format(minute));
+                REQUIRE_EQ("-2114-12-08T21:52", format(minute));
                 minute -= kIntMin;
-                REQUIRE_EQ("1970-01-01T00:00", Format(minute));
+                REQUIRE_EQ("1970-01-01T00:00", format(minute));
 
                 civil_hour hour(1970, 1, 1, 0);
                 hour += kIntMax;
-                REQUIRE_EQ("246953-10-09T07", Format(hour));
+                REQUIRE_EQ("246953-10-09T07", format(hour));
                 hour -= kIntMax;
-                REQUIRE_EQ("1970-01-01T00", Format(hour));
+                REQUIRE_EQ("1970-01-01T00", format(hour));
                 hour += kIntMin;
-                REQUIRE_EQ("-243014-03-24T16", Format(hour));
+                REQUIRE_EQ("-243014-03-24T16", format(hour));
                 hour -= kIntMin;
-                REQUIRE_EQ("1970-01-01T00", Format(hour));
+                REQUIRE_EQ("1970-01-01T00", format(hour));
 
                 civil_day day(1970, 1, 1);
                 day += kIntMax;
-                REQUIRE_EQ("5881580-07-11", Format(day));
+                REQUIRE_EQ("5881580-07-11", format(day));
                 day -= kIntMax;
-                REQUIRE_EQ("1970-01-01", Format(day));
+                REQUIRE_EQ("1970-01-01", format(day));
                 day += kIntMin;
-                REQUIRE_EQ("-5877641-06-23", Format(day));
+                REQUIRE_EQ("-5877641-06-23", format(day));
                 day -= kIntMin;
-                REQUIRE_EQ("1970-01-01", Format(day));
+                REQUIRE_EQ("1970-01-01", format(day));
 
                 civil_month month(1970, 1);
                 month += kIntMax;
-                REQUIRE_EQ("178958940-08", Format(month));
+                REQUIRE_EQ("178958940-08", format(month));
                 month -= kIntMax;
-                REQUIRE_EQ("1970-01", Format(month));
+                REQUIRE_EQ("1970-01", format(month));
                 month += kIntMin;
-                REQUIRE_EQ("-178955001-05", Format(month));
+                REQUIRE_EQ("-178955001-05", format(month));
                 month -= kIntMin;
-                REQUIRE_EQ("1970-01", Format(month));
+                REQUIRE_EQ("1970-01", format(month));
 
                 civil_year year(0);
                 year += kIntMax;
-                REQUIRE_EQ("2147483647", Format(year));
+                REQUIRE_EQ("2147483647", format(year));
                 year -= kIntMax;
-                REQUIRE_EQ("0", Format(year));
+                REQUIRE_EQ("0", format(year));
                 year += kIntMin;
-                REQUIRE_EQ("-2147483648", Format(year));
+                REQUIRE_EQ("-2147483648", format(year));
                 year -= kIntMin;
-                REQUIRE_EQ("0", Format(year));
+                REQUIRE_EQ("0", format(year));
             }
 
             TEST_CASE("CivilTime, ArithmeticDifference") {
@@ -891,26 +891,26 @@ namespace turbo {
 
             TEST_CASE("CivilTime, OutputStream") {
                 // Tests formatting of civil_year, which does not pad.
-                REQUIRE_EQ("2016", Format(civil_year(2016)));
-                REQUIRE_EQ("123", Format(civil_year(123)));
-                REQUIRE_EQ("0", Format(civil_year(0)));
-                REQUIRE_EQ("-1", Format(civil_year(-1)));
+                REQUIRE_EQ("2016", format(civil_year(2016)));
+                REQUIRE_EQ("123", format(civil_year(123)));
+                REQUIRE_EQ("0", format(civil_year(0)));
+                REQUIRE_EQ("-1", format(civil_year(-1)));
 
                 // Tests formatting of sub-year types, which pad to 2 digits
-                REQUIRE_EQ("2016-02", Format(civil_month(2016, 2)));
-                REQUIRE_EQ("2016-02-03", Format(civil_day(2016, 2, 3)));
-                REQUIRE_EQ("2016-02-03T04", Format(civil_hour(2016, 2, 3, 4)));
-                REQUIRE_EQ("2016-02-03T04:05", Format(civil_minute(2016, 2, 3, 4, 5)));
-                REQUIRE_EQ("2016-02-03T04:05:06", Format(civil_second(2016, 2, 3, 4, 5, 6)));
+                REQUIRE_EQ("2016-02", format(civil_month(2016, 2)));
+                REQUIRE_EQ("2016-02-03", format(civil_day(2016, 2, 3)));
+                REQUIRE_EQ("2016-02-03T04", format(civil_hour(2016, 2, 3, 4)));
+                REQUIRE_EQ("2016-02-03T04:05", format(civil_minute(2016, 2, 3, 4, 5)));
+                REQUIRE_EQ("2016-02-03T04:05:06", format(civil_second(2016, 2, 3, 4, 5, 6)));
 
                 // Tests formatting of weekday.
-                REQUIRE_EQ("Monday", Format(weekday::monday));
-                REQUIRE_EQ("Tuesday", Format(weekday::tuesday));
-                REQUIRE_EQ("Wednesday", Format(weekday::wednesday));
-                REQUIRE_EQ("Thursday", Format(weekday::thursday));
-                REQUIRE_EQ("Friday", Format(weekday::friday));
-                REQUIRE_EQ("Saturday", Format(weekday::saturday));
-                REQUIRE_EQ("Sunday", Format(weekday::sunday));
+                REQUIRE_EQ("Monday", format(weekday::monday));
+                REQUIRE_EQ("Tuesday", format(weekday::tuesday));
+                REQUIRE_EQ("Wednesday", format(weekday::wednesday));
+                REQUIRE_EQ("Thursday", format(weekday::thursday));
+                REQUIRE_EQ("Friday", format(weekday::friday));
+                REQUIRE_EQ("Saturday", format(weekday::saturday));
+                REQUIRE_EQ("Sunday", format(weekday::sunday));
             }
 
             TEST_CASE("CivilTime, OutputStreamLeftFillWidth") {
@@ -1008,14 +1008,14 @@ namespace turbo {
 
             TEST_CASE("CivilTime, NormalizeWithHugeYear") {
                 civil_month c(9223372036854775807, 1);
-                REQUIRE_EQ("9223372036854775807-01", Format(c));
+                REQUIRE_EQ("9223372036854775807-01", format(c));
                 c = c - 1;  // Causes normalization
-                REQUIRE_EQ("9223372036854775806-12", Format(c));
+                REQUIRE_EQ("9223372036854775806-12", format(c));
 
                 c = civil_month(-9223372036854775807 - 1, 1);
-                REQUIRE_EQ("-9223372036854775808-01", Format(c));
+                REQUIRE_EQ("-9223372036854775808-01", format(c));
                 c = c + 12;  // Causes normalization
-                REQUIRE_EQ("-9223372036854775807-01", Format(c));
+                REQUIRE_EQ("-9223372036854775807-01", format(c));
             }
 
             TEST_CASE("CivilTime, LeapYears") {
@@ -1060,12 +1060,12 @@ namespace turbo {
             TEST_CASE("CivilTime, FirstThursdayInMonth") {
                 const civil_day nov1(2014, 11, 1);
                 const civil_day thursday = next_weekday(nov1 - 1, weekday::thursday);
-                REQUIRE_EQ("2014-11-06", Format(thursday));
+                REQUIRE_EQ("2014-11-06", format(thursday));
 
                 // Bonus: Date of Thanksgiving in the United States
                 // Rule: Fourth Thursday of November
                 const civil_day thanksgiving = thursday + 7 * 3;
-                REQUIRE_EQ("2014-11-27", Format(thanksgiving));
+                REQUIRE_EQ("2014-11-27", format(thanksgiving));
             }
 
         }  // namespace cctz
