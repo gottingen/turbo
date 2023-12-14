@@ -27,42 +27,40 @@
 #include <mutex>
 #include <thread>
 
-namespace turbo::tlog {
-    namespace details {
+namespace turbo::tlog::details {
 
-        class TURBO_DLL periodic_worker {
-        public:
-            template<typename Rep, typename Period>
-            periodic_worker(const std::function<void()> &callback_fun, std::chrono::duration<Rep, Period> interval) {
-                active_ = (interval > std::chrono::duration<Rep, Period>::zero());
-                if (!active_) {
-                    return;
-                }
-
-                worker_thread_ = std::thread([this, callback_fun, interval]() {
-                    for (;;) {
-                        std::unique_lock<std::mutex> lock(this->mutex_);
-                        if (this->cv_.wait_for(lock, interval, [this] { return !this->active_; })) {
-                            return; // active_ == false, so exit this thread
-                        }
-                        callback_fun();
-                    }
-                });
+    class TURBO_DLL periodic_worker {
+    public:
+        template<typename Rep, typename Period>
+        periodic_worker(const std::function<void()> &callback_fun, std::chrono::duration<Rep, Period> interval) {
+            active_ = (interval > std::chrono::duration<Rep, Period>::zero());
+            if (!active_) {
+                return;
             }
 
-            periodic_worker(const periodic_worker &) = delete;
+            worker_thread_ = std::thread([this, callback_fun, interval]() {
+                for (;;) {
+                    std::unique_lock<std::mutex> lock(this->mutex_);
+                    if (this->cv_.wait_for(lock, interval, [this] { return !this->active_; })) {
+                        return; // active_ == false, so exit this thread
+                    }
+                    callback_fun();
+                }
+            });
+        }
 
-            periodic_worker &operator=(const periodic_worker &) = delete;
+        periodic_worker(const periodic_worker &) = delete;
 
-            // stop the worker thread and join it
-            ~periodic_worker();
+        periodic_worker &operator=(const periodic_worker &) = delete;
 
-        private:
-            bool active_;
-            std::thread worker_thread_;
-            std::mutex mutex_;
-            std::condition_variable cv_;
-        };
-    } // namespace details
-} // namespace turbo::tlog
+        // stop the worker thread and join it
+        ~periodic_worker();
+
+    private:
+        bool active_;
+        std::thread worker_thread_;
+        std::mutex mutex_;
+        std::condition_variable cv_;
+    };
+} // namespace turbo::tlog::details
 

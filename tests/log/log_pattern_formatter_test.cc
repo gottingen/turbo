@@ -91,7 +91,7 @@ TEST_CASE("color range test1 [pattern_formatter]")
     memory_buf_t formatted;
     std::string logger_name = "test";
     turbo::tlog::details::log_msg msg(logger_name, turbo::tlog::level::info,
-                                      turbo::tlog::string_view_t(buf.data(), buf.size()));
+                                      std::string_view(buf.data(), buf.size()));
     formatter->format(msg, formatted);
     REQUIRE_EQ(msg.color_range_start , 0);
     REQUIRE_EQ(msg.color_range_end , 5);

@@ -19,7 +19,7 @@
 
 namespace turbo::tlog {
 
-// Default logger factory-  creates synchronous loggers
+    // Default logger factory-  creates synchronous loggers
     class logger;
 
     struct synchronous_factory {

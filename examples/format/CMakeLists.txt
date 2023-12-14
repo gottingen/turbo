@@ -52,6 +52,15 @@ carbin_cc_binary(
 
 carbin_cc_binary(
         NAME
+        refresh_color
+        SOURCES
+        "refresh_color.cc"
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_binary(
+        NAME
         employees
         SOURCES
         "employees.cc"

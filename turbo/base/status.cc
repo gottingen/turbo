@@ -314,9 +314,9 @@ namespace turbo {
                                  StatusToStringMode::kWithModule;
 
         if (with_module) {
-            turbo::FormatAppend(&text, "{}::{}: {}", TurboModule(index()), StatusCodeToString(code()), message());
+            turbo::format_append(&text, "{}::{}: {}", TurboModule(index()), StatusCodeToString(code()), message());
         } else {
-            turbo::FormatAppend(&text, "{}: {}", StatusCodeToString(code()), message());
+            turbo::format_append(&text, "{}: {}", StatusCodeToString(code()), message());
         }
 
         const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
@@ -329,7 +329,7 @@ namespace turbo {
                                      const turbo::Cord &payload) {
                 std::optional<std::string> result;
                 if (printer) result = printer(type_url, payload);
-                turbo::FormatAppend(
+                turbo::format_append(
                         &text, " [{}='{}']", type_url,
                         result.has_value() ? *result : turbo::c_hex_encode(std::string(payload)));
             });
@@ -563,7 +563,7 @@ namespace turbo {
     namespace {
         std::string MessageForErrnoToStatus(int error_number,
                                             std::string_view message) {
-            return turbo::Format("{}: {}", message,
+            return turbo::format("{}: {}", message,
                                  turbo::base_internal::StrError(error_number));
         }
     }  // namespace
@@ -578,7 +578,7 @@ namespace turbo {
         std::string *MakeCheckFailString(const turbo::Status *status,
                                          const char *prefix) {
             return new std::string(
-                    turbo::Format("{} ({})", prefix,
+                    turbo::format("{} ({})", prefix,
                                   status->to_string(StatusToStringMode::kWithEverything)));
         }
 

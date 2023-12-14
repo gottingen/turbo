@@ -50,7 +50,7 @@ namespace turbo {
 
     namespace {
 
-        inline cctz::time_point <cctz::seconds> unix_epoch() {
+        inline cctz::time_point <cctz::seconds> cctz_unix_epoch() {
             return std::chrono::time_point_cast<cctz::seconds>(
                     std::chrono::system_clock::from_time_t(0));
         }
@@ -157,7 +157,7 @@ namespace turbo {
                     return turbo::infinite_past();
                 }
             }
-            const auto hi = (sec - unix_epoch()).count();
+            const auto hi = (sec - cctz_unix_epoch()).count();
             return time_internal::FromUnixDuration(time_internal::MakeDuration(hi));
         }
 
@@ -188,7 +188,7 @@ namespace turbo {
                                     cctz::time_zone::civil_transition *trans) const,
                             Time t, TimeZone::CivilTransition *trans) {
             // Transitions are second-aligned, so we can discard any fractional part.
-            const auto tp = unix_epoch() + cctz::seconds(to_unix_seconds(t));
+            const auto tp = cctz_unix_epoch() + cctz::seconds(to_unix_seconds(t));
             cctz::time_zone::civil_transition tr;
             if (!(tz.*find_transition)(tp, &tr)) return false;
             trans->from = CivilSecond(tr.from);
@@ -206,7 +206,7 @@ namespace turbo {
         if (*this == turbo::infinite_future()) return InfiniteFutureBreakdown();
         if (*this == turbo::infinite_past()) return InfinitePastBreakdown();
 
-        const auto tp = unix_epoch() + cctz::seconds(time_internal::GetRepHi(rep_));
+        const auto tp = cctz_unix_epoch() + cctz::seconds(time_internal::GetRepHi(rep_));
         const auto al = cctz::time_zone(tz).lookup(tp);
         const auto cs = al.cs;
         const auto cd = cctz::civil_day(cs);
@@ -352,7 +352,7 @@ namespace turbo {
         if (t == turbo::infinite_past()) return InfinitePastCivilInfo();
 
         const auto ud = time_internal::ToUnixDuration(t);
-        const auto tp = unix_epoch() + cctz::seconds(time_internal::GetRepHi(ud));
+        const auto tp = cctz_unix_epoch() + cctz::seconds(time_internal::GetRepHi(ud));
         const auto al = cz_.lookup(tp);
 
         TimeZone::CivilInfo ci;
@@ -398,7 +398,7 @@ namespace turbo {
 // Conversions involving time zones.
 //
 
-    turbo::TimeConversion ConvertDateTime(int64_t year, int mon, int day, int hour,
+    turbo::TimeConversion convert_date_time(int64_t year, int mon, int day, int hour,
                                           int min, int sec, TimeZone tz) {
         // Avoids years that are too extreme for CivilSecond to normalize.
         if (year > 300000000000) return InfiniteFutureTimeConversion();

@@ -18,6 +18,12 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/files/sequential_read_file.h \
                     ../turbo/files/sequential_write_file.h \
                     ../turbo/files/utility.h               \
+                    ../turbo/format/version.h \
+                    ../turbo/format/format.h \
+                    ../turbo/format/print.h \
+                    ../turbo/format/table.h \
+                    ../turbo/format/color.h \
+                    ../turbo/format/table/table.h \
                     ../turbo/strings/version.h \
                     ../turbo/strings/utility.h \
                     ../turbo/strings/ascii.h \
@@ -34,6 +40,7 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/memory/object_pool.h \
                     ../turbo/memory/alignment.h \
                     ../turbo/memory/aligned_allocator.h \
+                    ../turbo/memory/memory_info.h \
                     ../turbo/memory/resource_pool.h \
                     ../turbo/unicode/version.h \
                     ../turbo/unicode/converter.h \

@@ -32,7 +32,7 @@ namespace turbo {
         namespace {
 
             MATCHER_P2(IsBetween, a, b,
-                       turbo::Format("{}  between {} and {}", std::string(negation ? "isn't" : "is"), a, b)) {
+                       turbo::format("{}  between {} and {}", std::string(negation ? "isn't" : "is"), a, b)) {
                 return a <= arg && arg <= b;
             }
 

@@ -410,10 +410,7 @@ carbin_cc_test(
         COPTS
         ${CARBIN_CXX_OPTIONS}
         DEPS
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
         turbo::turbo
-        ${GTEST_MAIN_LIB}
 )
 
 # Internal-only target, do not depend on directly.

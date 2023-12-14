@@ -133,7 +133,7 @@ TYPED_TEST(PoissonDistributionInterfaceTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
 
-    TURBO_INTERNAL_LOG(INFO, turbo::Format("Range {{{}}}: {}, {}", param.mean(),
+    TURBO_INTERNAL_LOG(INFO, turbo::format("Range {{{}}}: {}, {}", param.mean(),
                                          +sample_min,+sample_max));
 
     // Validate stream serialization.
@@ -187,10 +187,10 @@ class PoissonModel {
   }
 
   void LogCDF() {
-    TURBO_INTERNAL_LOG(INFO, turbo::Format("CDF (mean = {})", mean_));
+    TURBO_INTERNAL_LOG(INFO, turbo::format("CDF (mean = {})", mean_));
     for (const auto c : cdf_) {
       TURBO_INTERNAL_LOG(INFO,
-                        turbo::Format("{}: pmf={} cdf={}", c.index,c.pmf, c.cdf));
+                        turbo::format("{}: pmf={} cdf={}", c.index,c.pmf, c.cdf));
     }
   }
 
@@ -286,7 +286,7 @@ bool PoissonDistributionZTest::SingleZTest(const double p,
 
   if (!pass) {
     TURBO_INTERNAL_LOG(
-        INFO, turbo::Format("p={} max_err={}\n"
+        INFO, turbo::format("p={} max_err={}\n"
                               " mean={} vs. {}\n"
                               " stddev={} vs. {}\n"
                               " skewness={} vs. {}\n"
@@ -338,7 +338,7 @@ std::vector<ZParam> GetZParams() {
 
 std::string ZParamName(const ::testing::TestParamInfo<ZParam>& info) {
   const auto& p = info.param;
-  std::string name = turbo::Format("mean_{:.6g}", p.mean);
+  std::string name = turbo::format("mean_{:.6g}", p.mean);
   return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
@@ -438,15 +438,15 @@ double PoissonDistributionChiSquaredTest::ChiSquaredTestImpl() {
   if (chi_square > threshold) {
     LogCDF();
 
-    TURBO_INTERNAL_LOG(INFO, turbo::Format("VALUES  buckets={} samples={}", counts.size(), kSamples));
+    TURBO_INTERNAL_LOG(INFO, turbo::format("VALUES  buckets={} samples={}", counts.size(), kSamples));
     for (size_t i = 0; i < counts.size(); i++) {
       TURBO_INTERNAL_LOG(
-          INFO, turbo::Format("{}: {} vs. E={}", cutoffs_[i], counts[i], e[i]));
+          INFO, turbo::format("{}: {} vs. E={}", cutoffs_[i], counts[i], e[i]));
     }
 
     TURBO_INTERNAL_LOG(
         INFO,
-        turbo::Format("{}(data, dof={}) = {} ({})\n vs. \n {}  @ 0.98 = {}", kChiSquared,  dof, chi_square,
+        turbo::format("{}(data, dof={}) = {} ({})\n vs. \n {}  @ 0.98 = {}", kChiSquared,  dof, chi_square,
                      p,  kChiSquared, threshold));
   }
   return p;

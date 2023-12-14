@@ -36,16 +36,16 @@ int main() {
     // right align 'Release Date' column
     movies.column(4).format().font_align(FontAlign::right);
 
-    movies[1][2].format().font_style({FontStyle::bold, FontStyle::italic});
-    movies[2][1].format().font_style({FontStyle::italic});
+    movies[1][2].format().font_style(emphasis::bold | emphasis::italic);
+    movies[2][1].format().font_style({emphasis::italic});
 
     // Color header cells
     for (size_t i = 0; i < 5; ++i) {
         movies[0][i]
                 .format()
-                .font_color(Color::white)
-                .font_style({FontStyle::bold})
-                .background_color(Color::blue);
+                .font_color(fg(color::white))
+                .font_color({emphasis::bold})
+                .font_color(bg(color::blue));
     }
 
     AsciiDocExporter exporter;

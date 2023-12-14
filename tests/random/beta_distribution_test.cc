@@ -108,7 +108,7 @@ namespace {
         for (TypeParam alpha: kValues) {
             for (TypeParam beta: kValues) {
                 TURBO_INTERNAL_LOG(
-                        INFO, turbo::Format("Smoke test for Beta({}, {})", alpha, beta));
+                        INFO, turbo::format("Smoke test for Beta({}, {})", alpha, beta));
 
                 param_type param(alpha, beta);
                 turbo::beta_distribution<TypeParam> before(alpha, beta);
@@ -329,7 +329,7 @@ namespace {
         if (!pass) {
             TURBO_INTERNAL_LOG(
                     INFO,
-                    turbo::Format(
+                    turbo::format(
                             "Beta({}, {}), "
                             "mean: sample {}, expect {}, which is {} stddevs away, "
                             "variance: sample {}, expect {}, which is {} stddevs away.",
@@ -399,13 +399,13 @@ namespace {
         if (!pass) {
             for (int i = 0; i < cutoffs.size(); i++) {
                 TURBO_INTERNAL_LOG(
-                        INFO, turbo::Format("cutoff[{}] = {}, actual count {}, expected {}]",
+                        INFO, turbo::format("cutoff[{}] = {}, actual count {}, expected {}]",
                                             i, cutoffs[i], counts[i],
                                             static_cast<int>(expected[i])));
             }
 
             TURBO_INTERNAL_LOG(
-                    INFO, turbo::Format(
+                    INFO, turbo::format(
                     "Beta({}, {}) {} {}, p = {}", alpha_, beta_,
                     turbo::random_internal::kChiSquared, chi_square,
                     turbo::random_internal::ChiSquarePValue(chi_square, dof)));
@@ -437,7 +437,7 @@ namespace {
 
     std::string ParamName(
             const ::testing::TestParamInfo<::testing::tuple<double, double>> &info) {
-        std::string name = turbo::Format("alpha_{}__beta_{}", ::testing::get<0>(info.param),
+        std::string name = turbo::format("alpha_{}__beta_{}", ::testing::get<0>(info.param),
                                          ::testing::get<1>(info.param));
         return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},

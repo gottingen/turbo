@@ -16,11 +16,35 @@
 #pragma once
 
 #include "turbo/format/table/table_internal.h"
+#include "turbo/format/table/printer.h"
 #include <string_view>
 #include <variant>
 #include <utility>
 
 namespace turbo {
+
+    /**
+     * @ingroup turbo_fmt_format_table
+     * @brief The Table class is the main class of the table module.
+     *        It provides a simple way to format data into a table.
+     *
+     *        Example:
+     *        @code{.cpp}
+     *        Table process_table;
+     *        process_table.add_row({"turbo", "1234", "0.1"});
+     *        process_table.add_row({"turbo", "1235", "0.2"});
+     *        std::cout << process_table << std::endl;
+     *        @endcode
+     *        Output:
+     *        @code{.unparsed}
+     *        +--------+------+-----+
+     *        |turbo   |1234  |0.1  |
+     *        +--------+------+-----+
+     *        |turbo   |1235  |0.2  |
+     *        +--------+------+-----+
+     *        @endcode
+     *        The table module is part of the turbo::format module.
+     */
 
     class Table {
     public:
@@ -74,7 +98,7 @@ namespace turbo {
 
         EntityFormat &format() { return table_->format(); }
 
-        void print(std::ostream &stream) { table_->print(stream); }
+        void print(std::ostream &stream) { Printer::print_table(stream, *table_);}
 
         std::string str() {
             std::stringstream stream;
@@ -84,7 +108,17 @@ namespace turbo {
 
         size_t size() const { return table_->size(); }
 
-        std::pair<size_t, size_t> shape() { return table_->shape(); }
+        std::pair<size_t, size_t> shape() {
+            std::pair<size_t, size_t> result{0, 0};
+            std::stringstream stream;
+            print(stream);
+            auto buffer = stream.str();
+            auto lines = EntityFormat::split_lines(buffer, "\n", "", true);
+            if (lines.size()) {
+                result = {get_sequence_length(lines[0], "", true), lines.size()};
+            }
+            return result;
+        }
 
         class RowIterator {
         public:
@@ -124,6 +158,10 @@ namespace turbo {
     inline std::ostream &operator<<(std::ostream &stream, const Table &table) {
         const_cast<Table &>(table).print(stream);
         return stream;
+    }
+
+    inline size_t table_print_line(const Table &table) {
+        return 2 * table.size() + 1;
     }
 
 } // namespace turbo

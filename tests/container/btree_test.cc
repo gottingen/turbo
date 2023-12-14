@@ -935,11 +935,11 @@ namespace turbo {
                 }
 
                 bool operator()(const std::string &a, int b) const {
-                    return a < turbo::Format(b);
+                    return a < turbo::format(b);
                 }
 
                 bool operator()(int a, const std::string &b) const {
-                    return turbo::Format(a) < b;
+                    return turbo::format(a) < b;
                 }
 
                 using is_transparent = void;
@@ -1112,7 +1112,7 @@ namespace turbo {
                 using StringSet = turbo::btree_set<StringLike>;
                 StringSet s;
                 for (int i = 0; i < 100; ++i) {
-                    ASSERT_TRUE(s.insert(turbo::Format(i).c_str()).second);
+                    ASSERT_TRUE(s.insert(turbo::format(i).c_str()).second);
                 }
                 StringLike::clear_constructor_call_count();
                 s.find("50");
@@ -2195,19 +2195,19 @@ namespace turbo {
                 turbo::btree_multimap<std::string, int> map;
                 for (int i = 0; i < 100; ++i) {
                     for (int j = 0; j < 100; ++j) {
-                        map.insert({turbo::Format(i), j});
+                        map.insert({turbo::format(i), j});
                     }
                 }
 
                 for (int i = 0; i < 100; ++i) {
-                    const std::string key = turbo::Format(i);
+                    const std::string key = turbo::format(i);
                     auto node_handle = map.extract(key);
                     EXPECT_EQ(node_handle.key(), key);
                     EXPECT_EQ(node_handle.mapped(), 0) << i;
                 }
 
                 for (int i = 0; i < 100; ++i) {
-                    const std::string key = turbo::Format(i);
+                    const std::string key = turbo::format(i);
                     auto node_handle = map.extract(key);
                     EXPECT_EQ(node_handle.key(), key);
                     EXPECT_EQ(node_handle.mapped(), 1) << i;

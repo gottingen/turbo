@@ -94,7 +94,7 @@ int weights[6][2] = {{10,90}, {25,75}, {50,50}, {75,25}, {90,10}, {99,1}};
 }
 
 //  Possible states.
-//  Format: xxx_yyy where xxx is the number of bytes (in UTF-8) and yyy is the error encoded (if any).
+//  format: xxx_yyy where xxx is the number of bytes (in UTF-8) and yyy is the error encoded (if any).
 enum state {
   ONE_VALID = 0,
   ONE_TOO_LONG,

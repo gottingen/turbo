@@ -22,115 +22,187 @@
 #include "turbo/format/fmt/ranges.h"
 #include "turbo/format/fmt/printf.h"
 #include "turbo/format/fmt/std.h"
+#include "turbo/format/color.h"
 #include "turbo/platform/port.h"
 
 namespace turbo {
 
+    /**
+     * @defgroup turbo_fmt_format turbo::format
+     * @brief The format module provides a fast and safe alternative to C stdio and C++ iostreams.
+     * @details The format module provides a fast and safe alternative to C stdio and C++ iostreams.
+     *          It is designed to be easy to use and to handle large amounts of data.
+     *          The format module is part of the turbo::format module.
+     *
+     *          Example:
+     *          @code{.cpp}
+     *          std::string message = turbo::format("The answer is {}.", 42);
+     *          @endcode
+     *          Output:
+     *          @code{.unparsed}
+     *          The answer is 42.
+     *          @endcode
+     * @ingroup turbo_fmt_format
+     */
+    template<typename... T>
+    [[nodiscard]] TURBO_FORCE_INLINE auto format(format_string<T...> fmt, T &&... args) -> std::string {
+        return vformat(fmt, turbo::make_format_args(args...));
+    }
+
+    template<typename Locale, typename... T,
+            TURBO_ENABLE_IF(fmt_detail::is_locale<Locale>::value)>
+    inline auto format(const Locale &loc, format_string<T...> fmt, T &&... args)
+    -> std::string {
+        return turbo::vformat(loc, std::string_view(fmt), turbo::make_format_args(args...));
+    }
+
+    /**
+     \rst
+     Returns an argument that will be formatted using ANSI escape sequences,
+     to be used in a formatting function.
+
+     **Example**::
+
+       turbo::print("Elapsed time: {0:.2f} seconds",
+                  turbo::styled(1.23, turbo::fg(turbo::color::green) |
+                                    turbo::bg(turbo::color::blue)));
+     \endrst
+    */
     template<typename T>
-    auto Ptr(T p) -> const void * {
-        return fmt::ptr(p);
+    constexpr auto styled(const T &value, text_style ts) -> fmt_detail::styled_arg<turbo::remove_cvref_t<T>> {
+        return fmt_detail::styled_arg<turbo::remove_cvref_t<T>>
+                {value, ts};
     }
 
-    template<typename T, typename Deleter>
-    auto Ptr(const std::unique_ptr<T, Deleter> &p) -> const void * {
-        return fmt::ptr(p);
+    /**
+      \rst
+      Formats arguments and returns the result as a string using ANSI
+      escape sequences to specify text formatting.
+
+      **Example**::
+
+        #include <fmt/color.h>
+        std::string message = turbo::format(turbo::emphasis::bold | fg(turbo::color::red),
+                                          "The answer is {}", 42);
+      \endrst
+    */
+    template<typename S, typename... Args, typename Char = char_t<S>>
+    inline std::basic_string<Char> format(const text_style &ts, const S &format_str,
+                                          const Args &... args) {
+        return turbo::vformat(ts, to_string_view(format_str),
+                              turbo::make_format_args<buffer_context<Char>>(args...));
     }
 
-    template<typename T>
-    auto Ptr(const std::shared_ptr<T> &p) -> const void * {
-        return fmt::ptr(p);
+    /**
+     \rst
+     Formats arguments with the given text_style, writes the result to the output
+     iterator ``out`` and returns the iterator past the end of the output range.
+
+     **Example**::
+
+       std::vector<char> out;
+       turbo::format_to(std::back_inserter(out),
+                      turbo::emphasis::bold | fg(turbo::color::red), "{}", 42);
+     \endrst
+   */
+    template<typename OutputIt, typename S, typename... Args,
+            bool enable = fmt_detail::is_output_iterator<OutputIt, char_t<S>>::value &&
+                          is_string<S>::value
+    >
+
+    inline auto format_to(OutputIt out, const text_style &ts, const S &format_str,
+                          Args &&... args) ->
+    typename std::enable_if<enable, OutputIt>::type {
+        return vformat_to(out, ts, to_string_view(format_str),
+                          turbo::make_format_args<buffer_context<char_t<S>>>(args...));
     }
 
-    template<typename String = std::string, typename ...Args>
-    TURBO_MUST_USE_RESULT inline String Format(std::string_view fmt, Args &&... args) {
-        String result;
-        fmt::memory_buffer buf;
-        fmt::format_to(std::back_inserter(buf), fmt, std::forward<Args>(args)...);
-        return String(buf.data(), buf.size());
-    }
 
     template<typename String = std::string, typename T>
-    TURBO_MUST_USE_RESULT inline String Format(const T &t) {
+    TURBO_MUST_USE_RESULT inline String format(const T &t) {
         String result;
-        fmt::memory_buffer buf;
-        fmt::format_to(std::back_inserter(buf), "{}", t);
+        turbo::memory_buffer buf;
+        turbo::format_to(std::back_inserter(buf), "{}", t);
         return String(buf.data(), buf.size());
     }
 
     template<typename String = std::string, typename ...Args>
-    void FormatAppend(String *dst, std::string_view fmt, Args &&... args) {
-        fmt::memory_buffer buf;
-        fmt::format_to(std::back_inserter(buf), fmt, std::forward<Args>(args)...);
+    void format_append(String *dst, std::string_view fmt, Args &&... args) {
+        turbo::memory_buffer buf;
+        turbo::format_to(std::back_inserter(buf), fmt, std::forward<Args>(args)...);
         dst->append(buf.data(), buf.size());
     }
 
     template<typename String = std::string, typename T>
-    void FormatAppend(String *dst, const T &t) {
-        fmt::memory_buffer buf;
-        fmt::format_to(std::back_inserter(buf), "{}", t);
+    void format_append(String *dst, const T &t) {
+        turbo::memory_buffer buf;
+        turbo::format_to(std::back_inserter(buf), "{}", t);
         dst->append(buf.data(), buf.size());
     }
 
 
     template<typename String = std::string, typename ...Args>
-    String FormatRange(std::string_view fmt, const std::tuple<Args...> &tuple, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(tuple, sep));
+    String format_range(std::string_view fmt, const std::tuple<Args...> &tuple, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(tuple, sep));
         return String(view_buf.data(), view_buf.size());
     }
 
     template<typename String = std::string, typename T>
 
-    String FormatRange(std::string_view fmt, std::initializer_list<T> list, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(list, sep));
+    String format_range(std::string_view fmt, std::initializer_list<T> list, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(list, sep));
         return String(view_buf.data(), view_buf.size());
     }
 
     template<typename It, typename Sentinel, typename String = std::string>
-    String FormatRange(std::string_view fmt, It begin, Sentinel end, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt,
-                       fmt::join(std::forward<It>(begin), std::forward<Sentinel>(end), sep));
+    String format_range(std::string_view fmt, It begin, Sentinel end, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt,
+                         turbo::join(std::forward<It>(begin), std::forward<Sentinel>(end), sep));
         return String(view_buf.data(), view_buf.size());
     }
 
     template<typename String = std::string, typename Range>
-    String FormatRange(std::string_view fmt, Range &&range, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(std::forward<Range>(range), sep));
+    String format_range(std::string_view fmt, Range &&range, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(std::forward<Range>(range), sep));
         return String(view_buf.data(), view_buf.size());
     }
 
-    /// FormatRangeAppend
+    /// format_range_append
     template<typename String = std::string, typename ...Args>
-    void FormatRangeAppend(String *dst, std::string_view fmt, const std::tuple<Args...> &tuple, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(tuple, sep));
+    void
+    format_range_append(String *dst, std::string_view fmt, const std::tuple<Args...> &tuple, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(tuple, sep));
         dst->append(view_buf.data(), view_buf.size());
     }
 
     template<typename String = std::string, typename T>
 
-    void FormatRangeAppend(String *dst, std::string_view fmt, std::initializer_list<T> list, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(list, sep));
+    void format_range_append(String *dst, std::string_view fmt, std::initializer_list<T> list, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(list, sep));
         dst->append(view_buf.data(), view_buf.size());
     }
 
     template<typename String = std::string, typename It, typename Sentinel>
-    void FormatRangeAppend(String *dst, std::string_view fmt, It begin, Sentinel end, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(begin, end, sep));
+    void format_range_append(String *dst, std::string_view fmt, It begin, Sentinel end, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(begin, end, sep));
         dst->append(view_buf.data(), view_buf.size());
     }
 
     template<typename String = std::string, typename Range>
-    void FormatRangeAppend(String *dst, std::string_view fmt, Range &&range, std::string_view sep) {
-        fmt::memory_buffer view_buf;
-        fmt::format_to(std::back_inserter(view_buf), fmt, fmt::join(std::forward<Range>(range), sep));
+    void format_range_append(String *dst, std::string_view fmt, Range &&range, std::string_view sep) {
+        turbo::memory_buffer view_buf;
+        turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(std::forward<Range>(range), sep));
         dst->append(view_buf.data(), view_buf.size());
     }
+
+
 }  // namespace turbo
 
 #endif  // TURBO_FORMAT_FORMAT_H_

@@ -38,8 +38,8 @@ namespace turbo::tlog {
             terminate
         };
 
-// Async msg to move to/from the queue
-// Movable only. should never be copied
+        // Async msg to move to/from the queue
+        // Movable only. should never be copied
         struct async_msg : log_msg_buffer {
             async_msg_type msg_type{async_msg_type::log};
             async_logger_ptr worker_ptr;

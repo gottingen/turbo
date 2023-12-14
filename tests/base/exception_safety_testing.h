@@ -183,7 +183,7 @@ namespace testing {
                                             const std::string &address_description,
                                             int countdown,
                                             const std::string &error_description) {
-                return turbo::Format(
+                return turbo::format(
                         "With coundtown at {}:\n"
                         "  {}\n"
                         "  Object originally constructed by {}\n"
@@ -607,7 +607,7 @@ namespace testing {
 
     private:
         static std::string GetInstanceString(int dummy) {
-            return turbo::Format("ThrowingValue<{}>({})",
+            return turbo::format("ThrowingValue<{}>({})",
                                  exceptions_internal::GetSpecString(Spec), dummy);
         }
 
@@ -770,7 +770,7 @@ namespace testing {
 
     private:
         static std::string GetInstanceString(int dummy) {
-            return turbo::Format("ThrowingAllocator<{}>({})",
+            return turbo::format("ThrowingAllocator<{}>({})",
                                  exceptions_internal::GetSpecString(Spec), dummy);
         }
 
@@ -787,7 +787,7 @@ namespace testing {
         void ReadStateAndMaybeThrow(std::string_view msg) const {
             if (!IsSpecified(AllocSpec::kNoThrowAllocate)) {
                 exceptions_internal::MaybeThrow(
-                        turbo::Format("Allocator id {} threw from {}", *dummy_, msg));
+                        turbo::format("Allocator id {} threw from {}", *dummy_, msg));
             }
         }
 
@@ -1074,7 +1074,7 @@ namespace testing {
                     typename NewOperation,
                     typename = EnableIfTestable<sizeof...(Contracts), Factory, NewOperation>>
             testing::AssertionResult Test(const NewOperation &new_operation) const {
-                return TestImpl(new_operation, turbo::index_sequence_for<Contracts...>());
+                return TestImpl(new_operation, std::index_sequence_for<Contracts...>());
             }
 
             /*
@@ -1111,7 +1111,7 @@ namespace testing {
 
             template<typename SelectedOperation, size_t... Indices>
             testing::AssertionResult TestImpl(SelectedOperation selected_operation,
-                                              turbo::index_sequence<Indices...>) const {
+                                              std::index_sequence<Indices...>) const {
                 return ExceptionSafetyTest<FactoryElementType<Factory>>(
                         factory_, selected_operation, std::get<Indices>(contracts_)...)
                         .Test();

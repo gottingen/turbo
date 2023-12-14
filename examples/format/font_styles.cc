@@ -22,22 +22,22 @@ int main() {
   styled_table.add_row(Row_t{"Bold", "Italic", "Bold & Italic", "Blinking"});
   styled_table.add_row(Row_t{"Underline", "Crossed", "Dark", "Bold, Italic & Underlined"});
 
-  styled_table[0][0].format().font_style({FontStyle::bold});
+  styled_table[0][0].format().font_style({emphasis::bold});
 
-  styled_table[0][1].format().font_style({FontStyle::italic});
+  styled_table[0][1].format().font_style({emphasis::italic});
 
-  styled_table[0][2].format().font_style({FontStyle::bold, FontStyle::italic});
+  styled_table[0][2].format().font_style(emphasis::bold| emphasis::italic);
 
-  styled_table[0][3].format().font_style({FontStyle::blink});
+  styled_table[0][3].format().font_style({emphasis::blink});
 
-  styled_table[1][0].format().font_style({FontStyle::underline});
+  styled_table[1][0].format().font_style({emphasis::underline});
 
-  styled_table[1][1].format().font_style({FontStyle::crossed});
+  styled_table[1][1].format().font_style({emphasis::strikethrough});
 
-  styled_table[1][2].format().font_style({FontStyle::dark});
+  styled_table[1][2].format().font_style({emphasis::faint});
 
   styled_table[1][3].format().font_style(
-      {FontStyle::bold, FontStyle::italic, FontStyle::underline});
+      emphasis::bold| emphasis::italic| emphasis::underline);
 
   std::cout << styled_table << std::endl;
 }

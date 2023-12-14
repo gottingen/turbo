@@ -319,7 +319,7 @@ namespace turbo::time_internal::cctz {
     // year. A year outside of [-999:9999] when formatted with %E4Y will produce
     // more than four characters, just like %Y.
     //
-    // Tip: Format strings should include the UTC offset (e.g., %z, %Ez, or %E*z)
+    // Tip: format strings should include the UTC offset (e.g., %z, %Ez, or %E*z)
     // so that the resulting string uniquely identifies an absolute time.
     //
     // Example:

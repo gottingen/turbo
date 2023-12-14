@@ -26,18 +26,18 @@ namespace turbo::tlog {
     namespace details {
         namespace fmt_helper {
 
-            inline turbo::tlog::string_view_t to_string_view(const memory_buf_t &buf) noexcept {
-                return turbo::tlog::string_view_t{buf.data(), buf.size()};
+            inline std::string_view to_string_view(const memory_buf_t &buf) noexcept {
+                return std::string_view {buf.data(), buf.size()};
             }
 
-            inline void append_string_view(turbo::tlog::string_view_t view, memory_buf_t &dest) {
+            inline void append_string_view(std::string_view view, memory_buf_t &dest) {
                 auto *buf_ptr = view.data();
                 dest.append(buf_ptr, buf_ptr + view.size());
             }
 
             template<typename T>
             inline void append_int(T n, memory_buf_t &dest) {
-                fmt::format_int i(n);
+                turbo::format_int i(n);
                 dest.append(i.data(), i.data() + i.size());
             }
 
@@ -65,10 +65,10 @@ namespace turbo::tlog {
             template<typename T>
             inline unsigned int count_digits(T n) {
                 using count_type = typename std::conditional<(sizeof(T) > sizeof(uint32_t)), uint64_t, uint32_t>::type;
-                return static_cast<unsigned int>(fmt::
+                return static_cast<unsigned int>(turbo::
                 // fmt 7.0.0 renamed the internal namespace to detail.
                 // See: https://github.com/fmtlib/fmt/issues/1538
-                detail::count_digits(static_cast<count_type>(n)));
+                fmt_detail::count_digits(static_cast<count_type>(n)));
             }
 
             inline void pad2(int n, memory_buf_t &dest) {
@@ -114,9 +114,9 @@ namespace turbo::tlog {
                 pad_uint(n, 9, dest);
             }
 
-// return fraction of a second of the given time_point.
-// e.g.
-// fraction<std::milliseconds>(tp) -> will return the millis part of the second
+        // return fraction of a second of the given time_point.
+        // e.g.
+        // fraction<std::milliseconds>(tp) -> will return the millis part of the second
             template<typename ToDuration>
             inline ToDuration time_fraction(log_clock::time_point tp) {
                 using std::chrono::duration_cast;

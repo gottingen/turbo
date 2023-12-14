@@ -17,26 +17,29 @@
 
 #include "turbo/log/details/log_msg.h"
 
-namespace turbo::tlog {
-namespace details {
+namespace turbo::tlog::details {
 
-// Extend log_msg with internal buffer to store its payload.
-// This is needed since log_msg holds string_views that points to stack data.
+    // Extend log_msg with internal buffer to store its payload.
+    // This is needed since log_msg holds string_views that points to stack data.
 
-class TURBO_DLL log_msg_buffer : public log_msg
-{
-    memory_buf_t buffer;
-    void update_string_views();
+    class TURBO_DLL log_msg_buffer : public log_msg {
+        memory_buf_t buffer;
 
-public:
-    log_msg_buffer() = default;
-    explicit log_msg_buffer(const log_msg &orig_msg);
-    log_msg_buffer(const log_msg_buffer &other);
-    log_msg_buffer(log_msg_buffer &&other) noexcept;
-    log_msg_buffer &operator=(const log_msg_buffer &other);
-    log_msg_buffer &operator=(log_msg_buffer &&other) noexcept;
-};
+        void update_string_views();
 
-} // namespace details
-} // namespace turbo::tlog
+    public:
+        log_msg_buffer() = default;
+
+        explicit log_msg_buffer(const log_msg &orig_msg);
+
+        log_msg_buffer(const log_msg_buffer &other);
+
+        log_msg_buffer(log_msg_buffer &&other) noexcept;
+
+        log_msg_buffer &operator=(const log_msg_buffer &other);
+
+        log_msg_buffer &operator=(log_msg_buffer &&other) noexcept;
+    };
+
+} // namespace turbo::tlog::details
 

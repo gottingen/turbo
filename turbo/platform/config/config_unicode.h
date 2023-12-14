@@ -1,5 +1,5 @@
-// Copyright 2023 The Turbo Authors.
-//
+// Copyright 2023 The Elastic-AI Authors.
+// part of Elastic AI Search
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -13,13 +13,14 @@
 // limitations under the License.
 //
 
-#pragma once
 
-#include "turbo/format/table/termcolor.h"
+#ifndef TURBO_PLATFORM_CONFIG_CONFIG_UNICODE_H_
+#define TURBO_PLATFORM_CONFIG_CONFIG_UNICODE_H_
 
-namespace turbo {
+#include "turbo/platform/config/compiler.h"
 
-    enum class Color {
-        none, grey, red, green, yellow, blue, magenta, cyan, white
-    };
-}
+#ifndef TURBO_UNICODE
+#  define TURBO_UNICODE !TURBO_MSC_VERSION
+#endif
+
+#endif  // TURBO_PLATFORM_CONFIG_CONFIG_UNICODE_H_

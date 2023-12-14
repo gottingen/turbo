@@ -60,9 +60,9 @@ namespace turbo::tlog {
         struct daily_filename_format_calculator {
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 // generate fmt datetime format string, e.g. {:%Y-%m-%d}.
-                filename_t fmt_filename = fmt::format(FMT_STRING(TLOG_FILENAME_T("{{:{}}}")),filename);
-                // MSVC doesn't allow fmt::runtime(..) with wchar, with fmtlib versions < 9.1.x
-                return fmt::format(fmt::runtime(fmt_filename), now_tm);
+                filename_t fmt_filename = turbo::format(FMT_STRING(TLOG_FILENAME_T("{{:{}}}")),filename);
+                // MSVC doesn't allow turbo::runtime(..) with wchar, with fmtlib versions < 9.1.x
+                return turbo::format(turbo::runtime(fmt_filename), now_tm);
 
             }
 

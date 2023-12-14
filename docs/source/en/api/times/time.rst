@@ -6,6 +6,8 @@
 time point
 =========================
 
-.. doxygengroup:: turbo_times_time_point
-   :project: turbo-docs
-   :members:
+.. toctree::
+
+    time_class
+    time_factory
+    time_trans

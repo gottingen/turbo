@@ -19,39 +19,33 @@
 #include <utility>
 // null, no cost dummy "mutex" and dummy "atomic" int
 
-namespace turbo::tlog {
-namespace details {
-struct null_mutex
-{
-    void lock() const {}
-    void unlock() const {}
-};
+namespace turbo::tlog::details {
+    struct null_mutex {
+        void lock() const {}
 
-struct null_atomic_int
-{
-    int value;
-    null_atomic_int() = default;
+        void unlock() const {}
+    };
 
-    explicit null_atomic_int(int new_value)
-        : value(new_value)
-    {}
+    struct null_atomic_int {
+        int value;
 
-    int load(std::memory_order = std::memory_order_relaxed) const
-    {
-        return value;
-    }
+        null_atomic_int() = default;
 
-    void store(int new_value, std::memory_order = std::memory_order_relaxed)
-    {
-        value = new_value;
-    }
+        explicit null_atomic_int(int new_value)
+                : value(new_value) {}
 
-    int exchange(int new_value, std::memory_order = std::memory_order_relaxed)
-    {
-        std::swap(new_value, value);
-        return new_value; // return value before the call
-    }
-};
+        int load(std::memory_order = std::memory_order_relaxed) const {
+            return value;
+        }
 
-} // namespace details
-} // namespace turbo::tlog
+        void store(int new_value, std::memory_order = std::memory_order_relaxed) {
+            value = new_value;
+        }
+
+        int exchange(int new_value, std::memory_order = std::memory_order_relaxed) {
+            std::swap(new_value, value);
+            return new_value; // return value before the call
+        }
+    };
+
+} // namespace turbo::tlog::details

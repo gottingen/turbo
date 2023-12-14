@@ -102,12 +102,12 @@ namespace {
         YellObj() {
             ++nc;
             ptr_set.insert(this);
-            printf("Created %p\n", this);
+            ::printf("Created %p\n", this);
         }
         ~YellObj() {
             ++nd;
             ptr_set.erase(this);
-            printf("Destroyed %p\n", this);
+            ::printf("Destroyed %p\n", this);
         }
         char _dummy[96];
     };
@@ -142,7 +142,7 @@ namespace {
         get_resource<NonDefaultCtorObject>(&id0, 100, 30);
         REQUIRE_EQ(130, address_resource(id0)->_value);
 
-        printf("BLOCK_NITEM=%lu\n", ResourcePool<YellObj>::BLOCK_NITEM);
+        ::printf("BLOCK_NITEM=%lu\n", ResourcePool<YellObj>::BLOCK_NITEM);
 
         nc = 0;
         nd = 0;
@@ -214,14 +214,14 @@ namespace {
             *get_resource(&id) = i;
         }
         tm.stop();
-        printf("get a int takes %.1fns\n", tm.elapsed_nano()/(double)N);
+        ::printf("get a int takes %.1fns\n", tm.elapsed_nano()/(double)N);
 
         tm.reset();
         for (size_t i = 0; i < N; ++i) {
             *(new int) = i;
         }
         tm.stop();
-        printf("new a int takes %luns\n", tm.elapsed_nano()/N);
+        ::printf("new a int takes %luns\n", tm.elapsed_nano()/N);
 
         tm.reset();
         for (size_t i = 0; i < N; ++i) {
@@ -229,7 +229,7 @@ namespace {
             *ResourcePool<int>::unsafe_address_resource(id) = i;
         }
         tm.stop();
-        printf("unsafe_address a int takes %.1fns\n", tm.elapsed_nano()/(double)N);
+        ::printf("unsafe_address a int takes %.1fns\n", tm.elapsed_nano()/(double)N);
 
         tm.reset();
         for (size_t i = 0; i < N; ++i) {
@@ -237,7 +237,7 @@ namespace {
             *address_resource(id) = i;
         }
         tm.stop();
-        printf("address a int takes %.1fns\n", tm.elapsed_nano()/(double)N);
+        ::printf("address a int takes %.1fns\n", tm.elapsed_nano()/(double)N);
 
         std::cout << describe_resources<int>() << std::endl;
         clear_resources<int>();
@@ -271,7 +271,7 @@ namespace {
                 get_resource(&id);
             }
             tm1.stop();
-            printf("get a SilentObj takes %luns\n", tm1.elapsed_nano()/N);
+            ::printf("get a SilentObj takes %luns\n", tm1.elapsed_nano()/N);
             //clear_resources<SilentObj>(); // free all blocks
 
             tm2.reset();
@@ -279,7 +279,7 @@ namespace {
                 new_list.push_back(new SilentObj);
             }
             tm2.stop();
-            printf("new a SilentObj takes %luns\n", tm2.elapsed_nano()/N);
+            ::printf("new a SilentObj takes %luns\n", tm2.elapsed_nano()/N);
             for (size_t i = 0; i < new_list.size(); ++i) {
                 delete new_list[i];
             }

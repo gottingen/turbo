@@ -85,7 +85,7 @@ namespace turbo {
                 turbo::sleep_for(turbo::milliseconds(_option.open_interval));
             }
         }
-        return turbo::errno_to_status(errno, turbo::Format("Failed opening file {} for writing", _file_path.c_str()));
+        return turbo::errno_to_status(errno, turbo::format("Failed opening file {} for writing", _file_path.c_str()));
     }
 
     turbo::Status SequentialWriteFile::reopen(bool truncate) {
@@ -99,7 +99,7 @@ namespace turbo {
     turbo::Status SequentialWriteFile::write(const char *data, size_t size) {
         TURBO_ASSERT(_fd != nullptr);
         if (std::fwrite(data, 1, size, _fd) != size) {
-            return turbo::errno_to_status(errno, turbo::Format("Failed writing to file {}", _file_path.c_str()));
+            return turbo::errno_to_status(errno, turbo::format("Failed writing to file {}", _file_path.c_str()));
         }
         return turbo::ok_status();
     }
@@ -133,11 +133,11 @@ namespace turbo {
         }
         auto fd = ::fileno(_fd);
         if (::ftruncate(fd, static_cast<off_t>(size)) != 0) {
-            return turbo::errno_to_status(errno, turbo::Format("Failed truncate file {} for size:{} ", _file_path.c_str(),
+            return turbo::errno_to_status(errno, turbo::format("Failed truncate file {} for size:{} ", _file_path.c_str(),
                                                              static_cast<off_t>(size)));
         }
         if(std::fseek(_fd, static_cast<off_t>(size), SEEK_SET) != 0) {
-            return turbo::errno_to_status(errno, turbo::Format("Failed seek file end {} for size:{} ", _file_path.c_str(),
+            return turbo::errno_to_status(errno, turbo::format("Failed seek file end {} for size:{} ", _file_path.c_str(),
                                                              static_cast<off_t>(size)));
         }
         return turbo::ok_status();
@@ -146,7 +146,7 @@ namespace turbo {
     turbo::Status SequentialWriteFile::flush() {
         if (std::fflush(_fd) != 0) {
             return turbo::errno_to_status(errno,
-                                        turbo::Format("Failed flush to file {}", _file_path.c_str()));
+                                        turbo::format("Failed flush to file {}", _file_path.c_str()));
         }
         return turbo::ok_status();
     }

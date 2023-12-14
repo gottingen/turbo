@@ -63,8 +63,8 @@ namespace turbo {
                 assert(depth <= CordRepBtree::kMaxDepth + 2);
                 std::string sharing = const_cast<CordRep *>(rep)->refcount.IsOne()
                                       ? std::string("Private")
-                                      : turbo::Format("Shared({})", rep->refcount.Get());
-                std::string sptr = turbo::Format("{}", Ptr(rep));
+                                      : turbo::format("Shared({})", rep->refcount.Get());
+                std::string sptr = turbo::format("{}", ptr(rep));
 
                 // Dumps the data contents of `rep` if `include_contents` is true.
                 // Always emits a new line character.
@@ -87,7 +87,7 @@ namespace turbo {
                 if (rep->IsBtree()) {
                     const CordRepBtree *node = rep->btree();
                     std::string label =
-                            node->height() ? turbo::Format("Node({})", node->height()) : "Leaf";
+                            node->height() ? turbo::format("Node({})", node->height()) : "Leaf";
                     stream << label << ", len = " << node->length
                            << ", begin = " << node->begin() << ", end = " << node->end()
                            << "\n";
@@ -426,7 +426,7 @@ namespace turbo {
   if ((x) != (y)) {                                                            \
     TURBO_RAW_LOG(ERROR,                                                        \
                  "CordRepBtree::CheckValid() FAILED: %s != %s (%s vs %s)", #x, \
-                 #y, turbo::Format(x).c_str(), turbo::Format(y).c_str());        \
+                 #y, turbo::format(x).c_str(), turbo::format(y).c_str());        \
     return false;                                                              \
   }
 

@@ -305,11 +305,11 @@ namespace turbo {
                     demangled = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, &status);
 #endif
                     if (status == 0 && demangled != nullptr) {  // Demangling succeeded.
-                        turbo::FormatAppend(&out, "<{}>", demangled);
+                        turbo::format_append(&out, "<{}>", demangled);
                         free(demangled);
                     } else {
 #if defined(__GXX_RTTI) || defined(_CPPRTTI)
-                        turbo::FormatAppend(&out, "<{}>", typeid(T).name());
+                        turbo::format_append(&out, "<{}>", typeid(T).name());
 #endif
                     }
                     return out;
@@ -343,8 +343,8 @@ namespace turbo {
             // `Min(sizeof...(Elements), NumSizes + 1)` (the number of arrays for which we
             // can compute offsets).
             template<class... Elements, size_t... SizeSeq, size_t... OffsetSeq>
-            class LayoutImpl<std::tuple<Elements...>, turbo::index_sequence<SizeSeq...>,
-                    turbo::index_sequence<OffsetSeq...>> {
+            class LayoutImpl<std::tuple<Elements...>, std::index_sequence<SizeSeq...>,
+                    std::index_sequence<OffsetSeq...>> {
             private:
                 static_assert(sizeof...(Elements) > 0, "At least one field is required");
                 static_assert(std::conjunction<IsLegalElementType<Elements>...>::value,
@@ -653,15 +653,15 @@ namespace turbo {
                     const size_t sizes[] = {SizeOf<ElementType<OffsetSeq>>::value...};
                     const std::string types[] = {
                             adl_barrier::TypeName<ElementType<OffsetSeq>>()...};
-                    std::string res = turbo::Format("@0{}({})", types[0], sizes[0]);
+                    std::string res = turbo::format("@0{}({})", types[0], sizes[0]);
                     for (size_t i = 0; i != NumOffsets - 1; ++i) {
-                        turbo::FormatAppend(&res, "[{}]; @{}{}({})", size_[i], offsets[i + 1], types[i + 1],sizes[i + 1]);
+                        turbo::format_append(&res, "[{}]; @{}{}({})", size_[i], offsets[i + 1], types[i + 1],sizes[i + 1]);
                     }
                     // NumSizes is a constant that may be zero. Some compilers cannot see that
                     // inside the if statement "size_[NumSizes - 1]" must be valid.
                     int last = static_cast<int>(NumSizes) - 1;
                     if (NumTypes == NumSizes && last >= 0) {
-                        turbo::FormatAppend(&res, "[{}]", size_[last]);
+                        turbo::format_append(&res, "[{}]", size_[last]);
                     }
                     return res;
                 }
@@ -673,17 +673,17 @@ namespace turbo {
 
             template<size_t NumSizes, class... Ts>
             using LayoutType = LayoutImpl<
-                    std::tuple<Ts...>, turbo::make_index_sequence<NumSizes>,
-                    turbo::make_index_sequence<adl_barrier::Min(sizeof...(Ts), NumSizes + 1)>>;
+                    std::tuple<Ts...>, std::make_index_sequence<NumSizes>,
+                    std::make_index_sequence<adl_barrier::Min(sizeof...(Ts), NumSizes + 1)>>;
 
         }  // namespace internal_layout
 
-// Descriptor of arrays of various types and sizes laid out in memory one after
-// another. See the top of the file for documentation.
-//
-// Check out the public API of internal_layout::LayoutImpl above. The type is
-// internal to the library but its methods are public, and they are inherited
-// by `Layout`.
+        // Descriptor of arrays of various types and sizes laid out in memory one after
+        // another. See the top of the file for documentation.
+        //
+        // Check out the public API of internal_layout::LayoutImpl above. The type is
+        // internal to the library but its methods are public, and they are inherited
+        // by `Layout`.
         template<class... Ts>
         class Layout : public internal_layout::LayoutType<sizeof...(Ts), Ts...> {
         public:

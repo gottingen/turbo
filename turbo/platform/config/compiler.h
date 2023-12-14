@@ -546,6 +546,55 @@
         #else
         #define TURBO_HAVE_MIN_CLANG_VERSION(x, y) 0
         #endif
+
+        #ifndef TURBO_GCC_VERSION
+            #if defined(TURBO_COMPILER_GNUC)
+                #define TURBO_GCC_VERSION (__GNUC__ * 100 + __GNUC_MINOR__)
+            #else
+                #define TURBO_GCC_VERSION 0
+            #endif
+        #endif  // TURBO_GCC_VERSION
+
+        #ifndef TURBO_CLANG_VERSION
+            #if defined(TURBO_COMPILER_CLANG)
+                #define TURBO_CLANG_VERSION (__clang_major__ * 100 + __clang_minor__)
+            #else
+                #define TURBO_CLANG_VERSION 0
+            #endif
+        #endif  // TURBO_CLANG_VERSION
+
+        #ifdef __ICL
+        #  define TURBO_ICC_VERSION __ICL
+        #elif defined(__INTEL_COMPILER)
+        #  define TURBO_ICC_VERSION __INTEL_COMPILER
+        #else
+        #  define TURBO_ICC_VERSION 0
+        #endif
+
+        #ifdef _MSC_VER
+        #  define TURBO_MSC_VERSION _MSC_VER
+        #  define TURBO_MSC_WARNING(...) __pragma(warning(__VA_ARGS__))
+        #else
+        #  define TURBO_MSC_VERSION 0
+        #  define TURBO_MSC_WARNING(...)
+        #endif
+
+        #ifndef TURBO_GCC_PRAGMA
+        // Workaround _Pragma bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59884.
+        #  if TURBO_GCC_VERSION >= 504
+        #    define TURBO_GCC_PRAGMA(arg) _Pragma(arg)
+        #  else
+        #    define TURBO_GCC_PRAGMA(arg)
+        #  endif
+        #endif
+
+        #ifdef __NVCC__
+        #  define TURBO_CUDA_VERSION (__CUDACC_VER_MAJOR__ * 100 + __CUDACC_VER_MINOR__)
+        #else
+        #  define TURBO_CUDA_VERSION 0
+        #endif
+
+
 #endif // TURBO_PLATFORM_CONFIG_COMPILER_H_
 
 

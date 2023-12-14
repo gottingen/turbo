@@ -182,7 +182,7 @@ TYPED_TEST(UniformRealDistributionTest, ParamSerializeTest) {
 
     if (!std::is_same<real_type, long double>::value) {
       // static_cast<double>(long double) can overflow.
-      std::string msg = turbo::Format("Range: {}, {}", static_cast<double>(sample_min), static_cast<double>(sample_max));
+      std::string msg = turbo::format("Range: {}, {}", static_cast<double>(sample_min), static_cast<double>(sample_max));
       TURBO_RAW_LOG(INFO, "%s", msg.c_str());
     }
   }
@@ -318,10 +318,10 @@ TYPED_TEST(UniformRealDistributionTest, ChiSquaredTest50) {
       // Chi-squared test failed. Output does not appear to be uniform.
       std::string msg;
       for (const auto& a : counts) {
-        turbo::FormatAppend(&msg, "{}\n", a);
+        turbo::format_append(&msg, "{}\n", a);
       }
-      turbo::FormatAppend(&msg, "{} p-value {}\n", kChiSquared,  p_value);
-      turbo::FormatAppend(&msg, "High {} value: {} > {}", kChiSquared,chi_square,
+      turbo::format_append(&msg, "{} p-value {}\n", kChiSquared,  p_value);
+      turbo::format_append(&msg, "High {} value: {} > {}", kChiSquared,chi_square,
                       kThreshold);
       TURBO_RAW_LOG(INFO, "%s", msg.c_str());
       FAIL() << msg;

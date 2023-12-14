@@ -20,20 +20,20 @@
 #include <string>
 #include <thread>
 #include <vector>
-
+#include <set>
+#include "doctest/doctest.h"
 #include "turbo/platform/port.h"
 #include "turbo/times/cctz/time_zone.h"
 #if defined(__linux__)
 #include <features.h>
 #endif
 
-#include "gtest/gtest.h"
 #include "turbo/times/cctz/civil_time.h"
 
 namespace chrono = std::chrono;
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace time_internal {
 namespace cctz {
 
@@ -650,14 +650,14 @@ time_zone LoadZone(const std::string& name) {
 #define ExpectTime(tp, tz, y, m, d, hh, mm, ss, off, isdst, zone) \
   do {                                                            \
     time_zone::absolute_lookup al = tz.lookup(tp);                \
-    EXPECT_EQ(y, al.cs.year());                                   \
-    EXPECT_EQ(m, al.cs.month());                                  \
-    EXPECT_EQ(d, al.cs.day());                                    \
-    EXPECT_EQ(hh, al.cs.hour());                                  \
-    EXPECT_EQ(mm, al.cs.minute());                                \
-    EXPECT_EQ(ss, al.cs.second());                                \
-    EXPECT_EQ(off, al.offset);                                    \
-    EXPECT_TRUE(isdst == al.is_dst);                              \
+    REQUIRE_EQ(y, al.cs.year());                                   \
+    REQUIRE_EQ(m, al.cs.month());                                  \
+    REQUIRE_EQ(d, al.cs.day());                                    \
+    REQUIRE_EQ(hh, al.cs.hour());                                  \
+    REQUIRE_EQ(mm, al.cs.minute());                                \
+    REQUIRE_EQ(ss, al.cs.second());                                \
+    REQUIRE_EQ(off, al.offset);                                    \
+    REQUIRE(isdst == al.is_dst);                              \
     /* EXPECT_STREQ(zone, al.abbr); */                            \
   } while (0)
 
@@ -675,7 +675,7 @@ int VersionCmp(time_zone tz, const std::string& target) {
 }  // namespace
 
 #if !defined(__EMSCRIPTEN__)
-TEST(TimeZones, LoadZonesConcurrently) {
+TEST_CASE("TimeZones, LoadZonesConcurrently") {
   std::promise<void> ready_promise;
   std::shared_future<void> ready_future(ready_promise.get_future());
   auto load_zones = [ready_future](std::promise<void>* started,
@@ -686,7 +686,7 @@ TEST(TimeZones, LoadZonesConcurrently) {
       std::string zone = *np;
       time_zone tz;
       if (load_time_zone(zone, &tz)) {
-        EXPECT_EQ(zone, tz.name());
+        REQUIRE_EQ(zone, tz.name());
       } else {
         failures->insert(zone);
       }
@@ -720,120 +720,120 @@ TEST(TimeZones, LoadZonesConcurrently) {
   for (const auto& thread_failure : thread_failures) {
     failures.insert(thread_failure.begin(), thread_failure.end());
   }
-  EXPECT_LE(failures.size(), max_failures) << testing::PrintToString(failures);
+  REQUIRE_LE(failures.size(), max_failures) ;
 }
 #endif
 
-TEST(TimeZone, UTC) {
+TEST_CASE("TimeZone, UTC") {
   const time_zone utc = utc_time_zone();
 
   time_zone loaded_utc;
-  EXPECT_TRUE(load_time_zone("UTC", &loaded_utc));
-  EXPECT_EQ(loaded_utc, utc);
+  REQUIRE(load_time_zone("UTC", &loaded_utc));
+  REQUIRE_EQ(loaded_utc, utc);
 
   time_zone loaded_utc0;
-  EXPECT_TRUE(load_time_zone("UTC0", &loaded_utc0));
-  EXPECT_EQ(loaded_utc0, utc);
+  REQUIRE(load_time_zone("UTC0", &loaded_utc0));
+  REQUIRE_EQ(loaded_utc0, utc);
 }
 
-TEST(TimeZone, NamedTimeZones) {
+TEST_CASE("TimeZone, NamedTimeZones") {
   const time_zone utc = utc_time_zone();
-  EXPECT_EQ("UTC", utc.name());
+  REQUIRE_EQ("UTC", utc.name());
   const time_zone nyc = LoadZone("America/New_York");
-  EXPECT_EQ("America/New_York", nyc.name());
+  REQUIRE_EQ("America/New_York", nyc.name());
   const time_zone syd = LoadZone("Australia/Sydney");
-  EXPECT_EQ("Australia/Sydney", syd.name());
+  REQUIRE_EQ("Australia/Sydney", syd.name());
   const time_zone fixed0 =
       fixed_time_zone(turbo::time_internal::cctz::seconds::zero());
-  EXPECT_EQ("UTC", fixed0.name());
+  REQUIRE_EQ("UTC", fixed0.name());
   const time_zone fixed_pos = fixed_time_zone(
       chrono::hours(3) + chrono::minutes(25) + chrono::seconds(45));
-  EXPECT_EQ("Fixed/UTC+03:25:45", fixed_pos.name());
+  REQUIRE_EQ("Fixed/UTC+03:25:45", fixed_pos.name());
   const time_zone fixed_neg = fixed_time_zone(
       -(chrono::hours(12) + chrono::minutes(34) + chrono::seconds(56)));
-  EXPECT_EQ("Fixed/UTC-12:34:56", fixed_neg.name());
+  REQUIRE_EQ("Fixed/UTC-12:34:56", fixed_neg.name());
 }
 
-TEST(TimeZone, Failures) {
+TEST_CASE("TimeZone, Failures") {
   time_zone tz;
-  EXPECT_FALSE(load_time_zone(":America/Los_Angeles", &tz));
+  REQUIRE_FALSE(load_time_zone(":America/Los_Angeles", &tz));
 
   tz = LoadZone("America/Los_Angeles");
-  EXPECT_FALSE(load_time_zone("Invalid/TimeZone", &tz));
-  EXPECT_EQ(chrono::system_clock::from_time_t(0),
+  REQUIRE_FALSE(load_time_zone("Invalid/TimeZone", &tz));
+  REQUIRE_EQ(chrono::system_clock::from_time_t(0),
             convert(civil_second(1970, 1, 1, 0, 0, 0), tz));  // UTC
 
   // Ensures that the load still fails on a subsequent attempt.
   tz = LoadZone("America/Los_Angeles");
-  EXPECT_FALSE(load_time_zone("Invalid/TimeZone", &tz));
-  EXPECT_EQ(chrono::system_clock::from_time_t(0),
+  REQUIRE_FALSE(load_time_zone("Invalid/TimeZone", &tz));
+  REQUIRE_EQ(chrono::system_clock::from_time_t(0),
             convert(civil_second(1970, 1, 1, 0, 0, 0), tz));  // UTC
 
   // Loading an empty string timezone should fail.
   tz = LoadZone("America/Los_Angeles");
-  EXPECT_FALSE(load_time_zone("", &tz));
-  EXPECT_EQ(chrono::system_clock::from_time_t(0),
+  REQUIRE_FALSE(load_time_zone("", &tz));
+  REQUIRE_EQ(chrono::system_clock::from_time_t(0),
             convert(civil_second(1970, 1, 1, 0, 0, 0), tz));  // UTC
 }
 
-TEST(TimeZone, Equality) {
+TEST_CASE("TimeZone, Equality") {
   const time_zone a;
   const time_zone b;
-  EXPECT_EQ(a, b);
-  EXPECT_EQ(a.name(), b.name());
+  REQUIRE_EQ(a, b);
+  REQUIRE_EQ(a.name(), b.name());
 
   const time_zone implicit_utc;
   const time_zone explicit_utc = utc_time_zone();
-  EXPECT_EQ(implicit_utc, explicit_utc);
-  EXPECT_EQ(implicit_utc.name(), explicit_utc.name());
+  REQUIRE_EQ(implicit_utc, explicit_utc);
+  REQUIRE_EQ(implicit_utc.name(), explicit_utc.name());
 
   const time_zone fixed_zero =
       fixed_time_zone(turbo::time_internal::cctz::seconds::zero());
-  EXPECT_EQ(fixed_zero, LoadZone(fixed_zero.name()));
-  EXPECT_EQ(fixed_zero, explicit_utc);
+  REQUIRE_EQ(fixed_zero, LoadZone(fixed_zero.name()));
+  REQUIRE_EQ(fixed_zero, explicit_utc);
 
   const time_zone fixed_utc = LoadZone("Fixed/UTC+00:00:00");
-  EXPECT_EQ(fixed_utc, LoadZone(fixed_utc.name()));
-  EXPECT_EQ(fixed_utc, explicit_utc);
+  REQUIRE_EQ(fixed_utc, LoadZone(fixed_utc.name()));
+  REQUIRE_EQ(fixed_utc, explicit_utc);
 
   const time_zone fixed_pos = fixed_time_zone(
       chrono::hours(3) + chrono::minutes(25) + chrono::seconds(45));
-  EXPECT_EQ(fixed_pos, LoadZone(fixed_pos.name()));
-  EXPECT_NE(fixed_pos, explicit_utc);
+  REQUIRE_EQ(fixed_pos, LoadZone(fixed_pos.name()));
+  REQUIRE_NE(fixed_pos, explicit_utc);
   const time_zone fixed_neg = fixed_time_zone(
       -(chrono::hours(12) + chrono::minutes(34) + chrono::seconds(56)));
-  EXPECT_EQ(fixed_neg, LoadZone(fixed_neg.name()));
-  EXPECT_NE(fixed_neg, explicit_utc);
+  REQUIRE_EQ(fixed_neg, LoadZone(fixed_neg.name()));
+  REQUIRE_NE(fixed_neg, explicit_utc);
 
   const time_zone fixed_lim = fixed_time_zone(chrono::hours(24));
-  EXPECT_EQ(fixed_lim, LoadZone(fixed_lim.name()));
-  EXPECT_NE(fixed_lim, explicit_utc);
+  REQUIRE_EQ(fixed_lim, LoadZone(fixed_lim.name()));
+  REQUIRE_NE(fixed_lim, explicit_utc);
   const time_zone fixed_ovfl =
       fixed_time_zone(chrono::hours(24) + chrono::seconds(1));
-  EXPECT_EQ(fixed_ovfl, LoadZone(fixed_ovfl.name()));
-  EXPECT_EQ(fixed_ovfl, explicit_utc);
+  REQUIRE_EQ(fixed_ovfl, LoadZone(fixed_ovfl.name()));
+  REQUIRE_EQ(fixed_ovfl, explicit_utc);
 
-  EXPECT_EQ(fixed_time_zone(chrono::seconds(1)),
+  REQUIRE_EQ(fixed_time_zone(chrono::seconds(1)),
             fixed_time_zone(chrono::seconds(1)));
 
   const time_zone local = local_time_zone();
-  EXPECT_EQ(local, LoadZone(local.name()));
+  REQUIRE_EQ(local, LoadZone(local.name()));
 
   time_zone la = LoadZone("America/Los_Angeles");
   time_zone nyc = LoadZone("America/New_York");
-  EXPECT_NE(la, nyc);
+  REQUIRE_NE(la, nyc);
 }
 
-TEST(StdChronoTimePoint, TimeTAlignment) {
+TEST_CASE("StdChronoTimePoint, TimeTAlignment") {
   // Ensures that the Unix epoch and the system clock epoch are an integral
   // number of seconds apart. This simplifies conversions to/from time_t.
   auto diff =
       chrono::system_clock::time_point() - chrono::system_clock::from_time_t(0);
-  EXPECT_EQ(chrono::system_clock::time_point::duration::zero(),
+  REQUIRE_EQ(chrono::system_clock::time_point::duration::zero(),
             diff % chrono::seconds(1));
 }
 
-TEST(BreakTime, TimePointResolution) {
+TEST_CASE("BreakTime, TimePointResolution") {
   const time_zone utc = utc_time_zone();
   const auto t0 = chrono::system_clock::from_time_t(0);
 
@@ -853,77 +853,77 @@ TEST(BreakTime, TimePointResolution) {
              0, 0, false, "UTC");
 }
 
-TEST(BreakTime, LocalTimeInUTC) {
+TEST_CASE("BreakTime, LocalTimeInUTC") {
   const time_zone tz = utc_time_zone();
   const auto tp = chrono::system_clock::from_time_t(0);
   ExpectTime(tp, tz, 1970, 1, 1, 0, 0, 0, 0, false, "UTC");
-  EXPECT_EQ(weekday::thursday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::thursday, get_weekday(convert(tp, tz)));
 }
 
-TEST(BreakTime, LocalTimeInUTCUnaligned) {
+TEST_CASE("BreakTime, LocalTimeInUTCUnaligned") {
   const time_zone tz = utc_time_zone();
   const auto tp =
       chrono::system_clock::from_time_t(0) - chrono::milliseconds(500);
   ExpectTime(tp, tz, 1969, 12, 31, 23, 59, 59, 0, false, "UTC");
-  EXPECT_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
 }
 
-TEST(BreakTime, LocalTimePosix) {
+TEST_CASE("BreakTime, LocalTimePosix") {
   // See IEEE Std 1003.1-1988 B.2.3 General Terms, Epoch.
   const time_zone tz = utc_time_zone();
   const auto tp = chrono::system_clock::from_time_t(536457599);
   ExpectTime(tp, tz, 1986, 12, 31, 23, 59, 59, 0, false, "UTC");
-  EXPECT_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
 }
 
-TEST(TimeZoneImpl, LocalTimeInFixed) {
+TEST_CASE("TimeZoneImpl, LocalTimeInFixed") {
   const turbo::time_internal::cctz::seconds offset =
       -(chrono::hours(8) + chrono::minutes(33) + chrono::seconds(47));
   const time_zone tz = fixed_time_zone(offset);
   const auto tp = chrono::system_clock::from_time_t(0);
   ExpectTime(tp, tz, 1969, 12, 31, 15, 26, 13, offset.count(), false,
              "-083347");
-  EXPECT_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
 }
 
-TEST(BreakTime, LocalTimeInNewYork) {
+TEST_CASE("BreakTime, LocalTimeInNewYork") {
   const time_zone tz = LoadZone("America/New_York");
   const auto tp = chrono::system_clock::from_time_t(45);
   ExpectTime(tp, tz, 1969, 12, 31, 19, 0, 45, -5 * 60 * 60, false, "EST");
-  EXPECT_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::wednesday, get_weekday(convert(tp, tz)));
 }
 
-TEST(BreakTime, LocalTimeInMTV) {
+TEST_CASE("BreakTime, LocalTimeInMTV") {
   const time_zone tz = LoadZone("America/Los_Angeles");
   const auto tp = chrono::system_clock::from_time_t(1380855729);
   ExpectTime(tp, tz, 2013, 10, 3, 20, 2, 9, -7 * 60 * 60, true, "PDT");
-  EXPECT_EQ(weekday::thursday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::thursday, get_weekday(convert(tp, tz)));
 }
 
-TEST(BreakTime, LocalTimeInSydney) {
+TEST_CASE("BreakTime, LocalTimeInSydney") {
   const time_zone tz = LoadZone("Australia/Sydney");
   const auto tp = chrono::system_clock::from_time_t(90);
   ExpectTime(tp, tz, 1970, 1, 1, 10, 1, 30, 10 * 60 * 60, false, "AEST");
-  EXPECT_EQ(weekday::thursday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::thursday, get_weekday(convert(tp, tz)));
 }
 
-TEST(MakeTime, TimePointResolution) {
+TEST_CASE("MakeTime, TimePointResolution") {
   const time_zone utc = utc_time_zone();
   const time_point<chrono::nanoseconds> tp_ns =
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc);
-  EXPECT_EQ("04:05", format("%M:%E*S", tp_ns, utc));
+  REQUIRE_EQ("04:05", format("%M:%E*S", tp_ns, utc));
   const time_point<chrono::microseconds> tp_us =
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc);
-  EXPECT_EQ("04:05", format("%M:%E*S", tp_us, utc));
+  REQUIRE_EQ("04:05", format("%M:%E*S", tp_us, utc));
   const time_point<chrono::milliseconds> tp_ms =
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc);
-  EXPECT_EQ("04:05", format("%M:%E*S", tp_ms, utc));
+  REQUIRE_EQ("04:05", format("%M:%E*S", tp_ms, utc));
   const time_point<chrono::seconds> tp_s =
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc);
-  EXPECT_EQ("04:05", format("%M:%E*S", tp_s, utc));
+  REQUIRE_EQ("04:05", format("%M:%E*S", tp_s, utc));
   const time_point<turbo::time_internal::cctz::seconds> tp_s64 =
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc);
-  EXPECT_EQ("04:05", format("%M:%E*S", tp_s64, utc));
+  REQUIRE_EQ("04:05", format("%M:%E*S", tp_s64, utc));
 
   // These next two require chrono::time_point_cast because the conversion
   // from a resolution of seconds (the return value of convert()) to a
@@ -931,27 +931,27 @@ TEST(MakeTime, TimePointResolution) {
   const time_point<chrono::minutes> tp_m =
       chrono::time_point_cast<chrono::minutes>(
           convert(civil_second(2015, 1, 2, 3, 4, 5), utc));
-  EXPECT_EQ("04:00", format("%M:%E*S", tp_m, utc));
+  REQUIRE_EQ("04:00", format("%M:%E*S", tp_m, utc));
   const time_point<chrono::hours> tp_h = chrono::time_point_cast<chrono::hours>(
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc));
-  EXPECT_EQ("00:00", format("%M:%E*S", tp_h, utc));
+  REQUIRE_EQ("00:00", format("%M:%E*S", tp_h, utc));
 }
 
-TEST(MakeTime, Normalization) {
+TEST_CASE("MakeTime, Normalization") {
   const time_zone tz = LoadZone("America/New_York");
   const auto tp = convert(civil_second(2009, 2, 13, 18, 31, 30), tz);
-  EXPECT_EQ(chrono::system_clock::from_time_t(1234567890), tp);
+  REQUIRE_EQ(chrono::system_clock::from_time_t(1234567890), tp);
 
   // Now requests for the same time_point but with out-of-range fields.
-  EXPECT_EQ(tp, convert(civil_second(2008, 14, 13, 18, 31, 30), tz));  // month
-  EXPECT_EQ(tp, convert(civil_second(2009, 1, 44, 18, 31, 30), tz));   // day
-  EXPECT_EQ(tp, convert(civil_second(2009, 2, 12, 42, 31, 30), tz));   // hour
-  EXPECT_EQ(tp, convert(civil_second(2009, 2, 13, 17, 91, 30), tz));   // minute
-  EXPECT_EQ(tp, convert(civil_second(2009, 2, 13, 18, 30, 90), tz));   // second
+  REQUIRE_EQ(tp, convert(civil_second(2008, 14, 13, 18, 31, 30), tz));  // month
+  REQUIRE_EQ(tp, convert(civil_second(2009, 1, 44, 18, 31, 30), tz));   // day
+  REQUIRE_EQ(tp, convert(civil_second(2009, 2, 12, 42, 31, 30), tz));   // hour
+  REQUIRE_EQ(tp, convert(civil_second(2009, 2, 13, 17, 91, 30), tz));   // minute
+  REQUIRE_EQ(tp, convert(civil_second(2009, 2, 13, 18, 30, 90), tz));   // second
 }
 
 // NOTE: Run this with -ftrapv to detect overflow problems.
-TEST(MakeTime, SysSecondsLimits) {
+TEST_CASE("MakeTime, SysSecondsLimits") {
   const char RFC3339[] = "%Y-%m-%d%ET%H:%M:%S%Ez";
   const time_zone utc = utc_time_zone();
   const time_zone east = fixed_time_zone(chrono::hours(14));
@@ -960,61 +960,61 @@ TEST(MakeTime, SysSecondsLimits) {
 
   // Approach the maximal time_point<cctz::seconds> value from below.
   tp = convert(civil_second(292277026596, 12, 4, 15, 30, 6), utc);
-  EXPECT_EQ("292277026596-12-04T15:30:06+00:00", format(RFC3339, tp, utc));
+  REQUIRE_EQ("292277026596-12-04T15:30:06+00:00", format(RFC3339, tp, utc));
   tp = convert(civil_second(292277026596, 12, 4, 15, 30, 7), utc);
-  EXPECT_EQ("292277026596-12-04T15:30:07+00:00", format(RFC3339, tp, utc));
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ("292277026596-12-04T15:30:07+00:00", format(RFC3339, tp, utc));
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second(292277026596, 12, 4, 15, 30, 8), utc);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second::max(), utc);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
 
   // Checks that we can also get the maximal value for a far-east zone.
   tp = convert(civil_second(292277026596, 12, 5, 5, 30, 7), east);
-  EXPECT_EQ("292277026596-12-05T05:30:07+14:00", format(RFC3339, tp, east));
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ("292277026596-12-05T05:30:07+14:00", format(RFC3339, tp, east));
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second(292277026596, 12, 5, 5, 30, 8), east);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second::max(), east);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
 
   // Checks that we can also get the maximal value for a far-west zone.
   tp = convert(civil_second(292277026596, 12, 4, 1, 30, 7), west);
-  EXPECT_EQ("292277026596-12-04T01:30:07-14:00", format(RFC3339, tp, west));
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ("292277026596-12-04T01:30:07-14:00", format(RFC3339, tp, west));
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second(292277026596, 12, 4, 7, 30, 8), west);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second::max(), west);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::max(), tp);
 
   // Approach the minimal time_point<cctz::seconds> value from above.
   tp = convert(civil_second(-292277022657, 1, 27, 8, 29, 53), utc);
-  EXPECT_EQ("-292277022657-01-27T08:29:53+00:00", format(RFC3339, tp, utc));
+  REQUIRE_EQ("-292277022657-01-27T08:29:53+00:00", format(RFC3339, tp, utc));
   tp = convert(civil_second(-292277022657, 1, 27, 8, 29, 52), utc);
-  EXPECT_EQ("-292277022657-01-27T08:29:52+00:00", format(RFC3339, tp, utc));
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ("-292277022657-01-27T08:29:52+00:00", format(RFC3339, tp, utc));
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second(-292277022657, 1, 27, 8, 29, 51), utc);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second::min(), utc);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
 
   // Checks that we can also get the minimal value for a far-east zone.
   tp = convert(civil_second(-292277022657, 1, 27, 22, 29, 52), east);
-  EXPECT_EQ("-292277022657-01-27T22:29:52+14:00", format(RFC3339, tp, east));
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ("-292277022657-01-27T22:29:52+14:00", format(RFC3339, tp, east));
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second(-292277022657, 1, 27, 22, 29, 51), east);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second::min(), east);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
 
   // Checks that we can also get the minimal value for a far-west zone.
   tp = convert(civil_second(-292277022657, 1, 26, 18, 29, 52), west);
-  EXPECT_EQ("-292277022657-01-26T18:29:52-14:00", format(RFC3339, tp, west));
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ("-292277022657-01-26T18:29:52-14:00", format(RFC3339, tp, west));
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second(-292277022657, 1, 26, 18, 29, 51), west);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second::min(), west);
-  EXPECT_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
+  REQUIRE_EQ(time_point<turbo::time_internal::cctz::seconds>::min(), tp);
 
   // Some similar checks for the "libc" time-zone implementation.
   if (sizeof(std::time_t) >= 8) {
@@ -1029,20 +1029,20 @@ TEST(MakeTime, SysSecondsLimits) {
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
     // The BSD gmtime_r() fails on extreme positive tm_year values.
 #else
-    EXPECT_EQ("2147485547-12-31T23:59:59+00:00", format(RFC3339, tp, cut));
+    REQUIRE_EQ("2147485547-12-31T23:59:59+00:00", format(RFC3339, tp, cut));
 #endif
     const year_t min_tm_year = year_t{std::numeric_limits<int>::min()} + 1900;
     tp = convert(civil_second(min_tm_year, 1, 1, 0, 0, 0), cut);
 #if defined(__Fuchsia__)
     // Fuchsia's gmtime_r() fails on extreme negative values (fxbug.dev/78527).
 #else
-    EXPECT_EQ("-2147481748-01-01T00:00:00+00:00", format(RFC3339, tp, cut));
+    REQUIRE_EQ("-2147481748-01-01T00:00:00+00:00", format(RFC3339, tp, cut));
 #endif
 #endif
   }
 }
 
-TEST(MakeTime, LocalTimeLibC) {
+TEST_CASE("MakeTime, LocalTimeLibC") {
   // Checks that cctz and libc agree on transition points in [1970:2037].
   //
   // We limit this test case to environments where:
@@ -1053,7 +1053,7 @@ TEST(MakeTime, LocalTimeLibC) {
   const char* const ep = getenv("TZ");
   std::string tz_name = (ep != nullptr) ? ep : "";
   for (const char* const* np = kTimeZoneNames; *np != nullptr; ++np) {
-    ASSERT_EQ(0, setenv("TZ", *np, 1));  // change what "localtime" means
+    REQUIRE_EQ(0, setenv("TZ", *np, 1));  // change what "localtime" means
     const auto zi = local_time_zone();
     const auto lc = LoadZone("libc:localtime");
     time_zone::civil_transition transition;
@@ -1066,21 +1066,21 @@ TEST(MakeTime, LocalTimeLibC) {
       if (fcl.kind == time_zone::civil_lookup::UNIQUE) {
         if (tcl.kind == time_zone::civil_lookup::UNIQUE) {
           // Both unique; must be an is_dst or abbr change.
-          ASSERT_EQ(transition.from, transition.to);
+          REQUIRE_EQ(transition.from, transition.to);
           const auto trans = fcl.trans;
           const auto tal = zi.lookup(trans);
           const auto tprev = trans - turbo::time_internal::cctz::seconds(1);
           const auto pal = zi.lookup(tprev);
           if (pal.is_dst == tal.is_dst) {
-            ASSERT_STRNE(pal.abbr, tal.abbr);
+            REQUIRE_NE(pal.abbr, tal.abbr);
           }
           continue;
         }
-        ASSERT_EQ(time_zone::civil_lookup::REPEATED, tcl.kind);
+        REQUIRE_EQ(time_zone::civil_lookup::REPEATED, tcl.kind);
         cs = transition.to;
       } else {
-        ASSERT_EQ(time_zone::civil_lookup::UNIQUE, tcl.kind);
-        ASSERT_EQ(time_zone::civil_lookup::SKIPPED, fcl.kind);
+        REQUIRE_EQ(time_zone::civil_lookup::UNIQUE, tcl.kind);
+        REQUIRE_EQ(time_zone::civil_lookup::SKIPPED, fcl.kind);
         cs = transition.from;
       }
       if (cs.year() > 2037) break;  // limit test time (and to 32-bit time_t)
@@ -1110,89 +1110,87 @@ TEST(MakeTime, LocalTimeLibC) {
         }
       }
       const auto cl_lc = lc.lookup(cs);
-      SCOPED_TRACE(testing::Message() << "For " << cs << " in " << *np);
-      EXPECT_EQ(cl_zi.kind, cl_lc.kind);
-      EXPECT_EQ(cl_zi.pre, cl_lc.pre);
-      EXPECT_EQ(cl_zi.trans, cl_lc.trans);
-      EXPECT_EQ(cl_zi.post, cl_lc.post);
+      REQUIRE_EQ(cl_zi.kind, cl_lc.kind);
+      REQUIRE_EQ(cl_zi.pre, cl_lc.pre);
+      REQUIRE_EQ(cl_zi.trans, cl_lc.trans);
+      REQUIRE_EQ(cl_zi.post, cl_lc.post);
     }
   }
   if (ep == nullptr) {
-    ASSERT_EQ(0, unsetenv("TZ"));
+    REQUIRE_EQ(0, unsetenv("TZ"));
   } else {
-    ASSERT_EQ(0, setenv("TZ", tz_name.c_str(), 1));
+    REQUIRE_EQ(0, setenv("TZ", tz_name.c_str(), 1));
   }
 #endif
 }
 
-TEST(NextTransition, UTC) {
+TEST_CASE("NextTransition, UTC") {
   const auto tz = utc_time_zone();
   time_zone::civil_transition trans;
 
   auto tp = time_point<turbo::time_internal::cctz::seconds>::min();
-  EXPECT_FALSE(tz.next_transition(tp, &trans));
+  REQUIRE_FALSE(tz.next_transition(tp, &trans));
 
   tp = time_point<turbo::time_internal::cctz::seconds>::max();
-  EXPECT_FALSE(tz.next_transition(tp, &trans));
+  REQUIRE_FALSE(tz.next_transition(tp, &trans));
 }
 
-TEST(PrevTransition, UTC) {
+TEST_CASE("PrevTransition, UTC") {
   const auto tz = utc_time_zone();
   time_zone::civil_transition trans;
 
   auto tp = time_point<turbo::time_internal::cctz::seconds>::max();
-  EXPECT_FALSE(tz.prev_transition(tp, &trans));
+  REQUIRE_FALSE(tz.prev_transition(tp, &trans));
 
   tp = time_point<turbo::time_internal::cctz::seconds>::min();
-  EXPECT_FALSE(tz.prev_transition(tp, &trans));
+  REQUIRE_FALSE(tz.prev_transition(tp, &trans));
 }
 
-TEST(NextTransition, AmericaNewYork) {
+TEST_CASE("NextTransition, AmericaNewYork") {
   const auto tz = LoadZone("America/New_York");
   time_zone::civil_transition trans;
 
   auto tp = convert(civil_second(2018, 6, 30, 0, 0, 0), tz);
-  EXPECT_TRUE(tz.next_transition(tp, &trans));
-  EXPECT_EQ(civil_second(2018, 11, 4, 2, 0, 0), trans.from);
-  EXPECT_EQ(civil_second(2018, 11, 4, 1, 0, 0), trans.to);
+  REQUIRE(tz.next_transition(tp, &trans));
+  REQUIRE_EQ(civil_second(2018, 11, 4, 2, 0, 0), trans.from);
+  REQUIRE_EQ(civil_second(2018, 11, 4, 1, 0, 0), trans.to);
 
   tp = time_point<turbo::time_internal::cctz::seconds>::max();
-  EXPECT_FALSE(tz.next_transition(tp, &trans));
+  REQUIRE_FALSE(tz.next_transition(tp, &trans));
 
   tp = time_point<turbo::time_internal::cctz::seconds>::min();
-  EXPECT_TRUE(tz.next_transition(tp, &trans));
+  REQUIRE(tz.next_transition(tp, &trans));
   if (trans.from == civil_second(1918, 3, 31, 2, 0, 0)) {
     // It looks like the tzdata is only 32 bit (probably macOS),
     // which bottoms out at 1901-12-13T20:45:52+00:00.
-    EXPECT_EQ(civil_second(1918, 3, 31, 3, 0, 0), trans.to);
+    REQUIRE_EQ(civil_second(1918, 3, 31, 3, 0, 0), trans.to);
   } else {
-    EXPECT_EQ(civil_second(1883, 11, 18, 12, 3, 58), trans.from);
-    EXPECT_EQ(civil_second(1883, 11, 18, 12, 0, 0), trans.to);
+    REQUIRE_EQ(civil_second(1883, 11, 18, 12, 3, 58), trans.from);
+    REQUIRE_EQ(civil_second(1883, 11, 18, 12, 0, 0), trans.to);
   }
 }
 
-TEST(PrevTransition, AmericaNewYork) {
+TEST_CASE("PrevTransition, AmericaNewYork") {
   const auto tz = LoadZone("America/New_York");
   time_zone::civil_transition trans;
 
   auto tp = convert(civil_second(2018, 6, 30, 0, 0, 0), tz);
-  EXPECT_TRUE(tz.prev_transition(tp, &trans));
-  EXPECT_EQ(civil_second(2018, 3, 11, 2, 0, 0), trans.from);
-  EXPECT_EQ(civil_second(2018, 3, 11, 3, 0, 0), trans.to);
+  REQUIRE(tz.prev_transition(tp, &trans));
+  REQUIRE_EQ(civil_second(2018, 3, 11, 2, 0, 0), trans.from);
+  REQUIRE_EQ(civil_second(2018, 3, 11, 3, 0, 0), trans.to);
 
   tp = time_point<turbo::time_internal::cctz::seconds>::min();
-  EXPECT_FALSE(tz.prev_transition(tp, &trans));
+  REQUIRE_FALSE(tz.prev_transition(tp, &trans));
 
   tp = time_point<turbo::time_internal::cctz::seconds>::max();
-  EXPECT_TRUE(tz.prev_transition(tp, &trans));
+  REQUIRE(tz.prev_transition(tp, &trans));
   // We have a transition but we don't know which one.
 }
 
-TEST(NextTransition, Scan) {
+TEST_CASE("NextTransition, Scan") {
   for (const char* const* np = kTimeZoneNames; *np != nullptr; ++np) {
-    SCOPED_TRACE(testing::Message() << "In " << *np);
     time_zone tz;
-    // EXPECT_TRUE(load_time_zone(*np, &tz));
+    // REQUIRE(load_time_zone(*np, &tz));
     if (!load_time_zone(*np, &tz)) {
       continue;  // tolerate kTimeZoneNames/zoneinfo skew
     }
@@ -1201,24 +1199,24 @@ TEST(NextTransition, Scan) {
     time_zone::civil_transition trans;
     while (tz.next_transition(tp, &trans)) {
       time_zone::civil_lookup from_cl = tz.lookup(trans.from);
-      EXPECT_NE(from_cl.kind, time_zone::civil_lookup::REPEATED);
+      REQUIRE_NE(from_cl.kind, time_zone::civil_lookup::REPEATED);
       time_zone::civil_lookup to_cl = tz.lookup(trans.to);
-      EXPECT_NE(to_cl.kind, time_zone::civil_lookup::SKIPPED);
+      REQUIRE_NE(to_cl.kind, time_zone::civil_lookup::SKIPPED);
 
       auto trans_tp = to_cl.trans;
       time_zone::absolute_lookup trans_al = tz.lookup(trans_tp);
-      EXPECT_EQ(trans_al.cs, trans.to);
+      REQUIRE_EQ(trans_al.cs, trans.to);
       auto pre_trans_tp = trans_tp - turbo::time_internal::cctz::seconds(1);
       time_zone::absolute_lookup pre_trans_al = tz.lookup(pre_trans_tp);
-      EXPECT_EQ(pre_trans_al.cs + 1, trans.from);
+      REQUIRE_EQ(pre_trans_al.cs + 1, trans.from);
 
       auto offset_delta = trans_al.offset - pre_trans_al.offset;
-      EXPECT_EQ(offset_delta, trans.to - trans.from);
+      REQUIRE_EQ(offset_delta, trans.to - trans.from);
       if (offset_delta == 0) {
         // This "transition" is only an is_dst or abbr change.
-        EXPECT_EQ(to_cl.kind, time_zone::civil_lookup::UNIQUE);
+        REQUIRE_EQ(to_cl.kind, time_zone::civil_lookup::UNIQUE);
         if (trans_al.is_dst == pre_trans_al.is_dst) {
-          EXPECT_STRNE(trans_al.abbr, pre_trans_al.abbr);
+          REQUIRE_NE(trans_al.abbr, pre_trans_al.abbr);
         }
       }
 
@@ -1227,7 +1225,7 @@ TEST(NextTransition, Scan) {
   }
 }
 
-TEST(TimeZoneEdgeCase, AmericaNewYork) {
+TEST_CASE("TimeZoneEdgeCase, AmericaNewYork") {
   const time_zone tz = LoadZone("America/New_York");
 
   // Spring 1:59:59 -> 3:00:00
@@ -1243,7 +1241,7 @@ TEST(TimeZoneEdgeCase, AmericaNewYork) {
   ExpectTime(tp, tz, 2013, 11, 3, 1, 0, 0, -5 * 3600, false, "EST");
 }
 
-TEST(TimeZoneEdgeCase, AmericaLosAngeles) {
+TEST_CASE("TimeZoneEdgeCase, AmericaLosAngeles") {
   const time_zone tz = LoadZone("America/Los_Angeles");
 
   // Spring 1:59:59 -> 3:00:00
@@ -1259,7 +1257,7 @@ TEST(TimeZoneEdgeCase, AmericaLosAngeles) {
   ExpectTime(tp, tz, 2013, 11, 3, 1, 0, 0, -8 * 3600, false, "PST");
 }
 
-TEST(TimeZoneEdgeCase, ArizonaNoTransition) {
+TEST_CASE("TimeZoneEdgeCase, ArizonaNoTransition") {
   const time_zone tz = LoadZone("America/Phoenix");
 
   // No transition in Spring.
@@ -1275,7 +1273,7 @@ TEST(TimeZoneEdgeCase, ArizonaNoTransition) {
   ExpectTime(tp, tz, 2013, 11, 3, 2, 0, 0, -7 * 3600, false, "MST");
 }
 
-TEST(TimeZoneEdgeCase, AsiaKathmandu) {
+TEST_CASE("TimeZoneEdgeCase, AsiaKathmandu") {
   const time_zone tz = LoadZone("Asia/Kathmandu");
 
   // A non-DST offset change from +0530 to +0545
@@ -1288,7 +1286,7 @@ TEST(TimeZoneEdgeCase, AsiaKathmandu) {
   ExpectTime(tp, tz, 1986, 1, 1, 0, 15, 0, 5.75 * 3600, false, "+0545");
 }
 
-TEST(TimeZoneEdgeCase, PacificChatham) {
+TEST_CASE("TimeZoneEdgeCase, PacificChatham") {
   const time_zone tz = LoadZone("Pacific/Chatham");
 
   // One-hour DST offset changes, but at atypical values
@@ -1308,7 +1306,7 @@ TEST(TimeZoneEdgeCase, PacificChatham) {
   ExpectTime(tp, tz, 2013, 9, 29, 3, 45, 0, 13.75 * 3600, true, "+1345");
 }
 
-TEST(TimeZoneEdgeCase, AustraliaLordHowe) {
+TEST_CASE("TimeZoneEdgeCase, AustraliaLordHowe") {
   const time_zone tz = LoadZone("Australia/Lord_Howe");
 
   // Half-hour DST offset changes
@@ -1328,7 +1326,7 @@ TEST(TimeZoneEdgeCase, AustraliaLordHowe) {
   ExpectTime(tp, tz, 2013, 10, 6, 2, 30, 0, 11 * 3600, true, "+11");
 }
 
-TEST(TimeZoneEdgeCase, PacificApia) {
+TEST_CASE("TimeZoneEdgeCase, PacificApia") {
   const time_zone tz = LoadZone("Pacific/Apia");
 
   // At the end of December 2011, Samoa jumped forward by one day,
@@ -1341,13 +1339,13 @@ TEST(TimeZoneEdgeCase, PacificApia) {
   //   1325239200 == Sat, 31 Dec 2011 00:00:00 +1400 (+14)
   auto tp = convert(civil_second(2011, 12, 29, 23, 59, 59), tz);
   ExpectTime(tp, tz, 2011, 12, 29, 23, 59, 59, -10 * 3600, true, "-10");
-  EXPECT_EQ(363, get_yearday(convert(tp, tz)));
+  REQUIRE_EQ(363, get_yearday(convert(tp, tz)));
   tp += turbo::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2011, 12, 31, 0, 0, 0, 14 * 3600, true, "+14");
-  EXPECT_EQ(365, get_yearday(convert(tp, tz)));
+  REQUIRE_EQ(365, get_yearday(convert(tp, tz)));
 }
 
-TEST(TimeZoneEdgeCase, AfricaCairo) {
+TEST_CASE("TimeZoneEdgeCase, AfricaCairo") {
   const time_zone tz = LoadZone("Africa/Cairo");
 
   if (VersionCmp(tz, "2014c") >= 0) {
@@ -1362,7 +1360,7 @@ TEST(TimeZoneEdgeCase, AfricaCairo) {
   }
 }
 
-TEST(TimeZoneEdgeCase, AfricaMonrovia) {
+TEST_CASE("TimeZoneEdgeCase, AfricaMonrovia") {
   const time_zone tz = LoadZone("Africa/Monrovia");
 
   if (VersionCmp(tz, "2017b") >= 0) {
@@ -1377,7 +1375,7 @@ TEST(TimeZoneEdgeCase, AfricaMonrovia) {
   }
 }
 
-TEST(TimeZoneEdgeCase, AmericaJamaica) {
+TEST_CASE("TimeZoneEdgeCase, AmericaJamaica") {
   // Jamaica discontinued DST transitions in 1983, and is now at a
   // constant -0500.  This makes it an interesting edge-case target.
   // Note that the 32-bit times used in a (tzh_version == 0) zoneinfo
@@ -1418,7 +1416,7 @@ TEST(TimeZoneEdgeCase, AmericaJamaica) {
   ExpectTime(tp, tz, 1983, 12, 31, 23, 59, 59, -5 * 3600, false, "EST");
 }
 
-TEST(TimeZoneEdgeCase, WET) {
+TEST_CASE("TimeZoneEdgeCase, WET") {
   // Cover some non-existent times within forward transitions.
   const time_zone tz = LoadZone("WET");
 
@@ -1436,43 +1434,43 @@ TEST(TimeZoneEdgeCase, WET) {
 
   // A non-existent time within the first transition.
   time_zone::civil_lookup cl1 = tz.lookup(civil_second(1977, 4, 3, 1, 15, 0));
-  EXPECT_EQ(time_zone::civil_lookup::SKIPPED, cl1.kind);
+  REQUIRE_EQ(time_zone::civil_lookup::SKIPPED, cl1.kind);
   ExpectTime(cl1.pre, tz, 1977, 4, 3, 2, 15, 0, 1 * 3600, true, "WEST");
   ExpectTime(cl1.trans, tz, 1977, 4, 3, 2, 0, 0, 1 * 3600, true, "WEST");
   ExpectTime(cl1.post, tz, 1977, 4, 3, 0, 15, 0, 0 * 3600, false, "WET");
 
   // A non-existent time within the second forward transition.
   time_zone::civil_lookup cl2 = tz.lookup(civil_second(1978, 4, 2, 1, 15, 0));
-  EXPECT_EQ(time_zone::civil_lookup::SKIPPED, cl2.kind);
+  REQUIRE_EQ(time_zone::civil_lookup::SKIPPED, cl2.kind);
   ExpectTime(cl2.pre, tz, 1978, 4, 2, 2, 15, 0, 1 * 3600, true, "WEST");
   ExpectTime(cl2.trans, tz, 1978, 4, 2, 2, 0, 0, 1 * 3600, true, "WEST");
   ExpectTime(cl2.post, tz, 1978, 4, 2, 0, 15, 0, 0 * 3600, false, "WET");
 }
 
-TEST(TimeZoneEdgeCase, FixedOffsets) {
+TEST_CASE("TimeZoneEdgeCase, FixedOffsets") {
   const time_zone gmtm5 = LoadZone("Etc/GMT+5");  // -0500
   auto tp = convert(civil_second(1970, 1, 1, 0, 0, 0), gmtm5);
   ExpectTime(tp, gmtm5, 1970, 1, 1, 0, 0, 0, -5 * 3600, false, "-05");
-  EXPECT_EQ(chrono::system_clock::from_time_t(5 * 3600), tp);
+  REQUIRE_EQ(chrono::system_clock::from_time_t(5 * 3600), tp);
 
   const time_zone gmtp5 = LoadZone("Etc/GMT-5");  // +0500
   tp = convert(civil_second(1970, 1, 1, 0, 0, 0), gmtp5);
   ExpectTime(tp, gmtp5, 1970, 1, 1, 0, 0, 0, 5 * 3600, false, "+05");
-  EXPECT_EQ(chrono::system_clock::from_time_t(-5 * 3600), tp);
+  REQUIRE_EQ(chrono::system_clock::from_time_t(-5 * 3600), tp);
 }
 
-TEST(TimeZoneEdgeCase, NegativeYear) {
+TEST_CASE("TimeZoneEdgeCase, NegativeYear") {
   // Tests transition from year 0 (aka 1BCE) to year -1.
   const time_zone tz = utc_time_zone();
   auto tp = convert(civil_second(0, 1, 1, 0, 0, 0), tz);
   ExpectTime(tp, tz, 0, 1, 1, 0, 0, 0, 0 * 3600, false, "UTC");
-  EXPECT_EQ(weekday::saturday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::saturday, get_weekday(convert(tp, tz)));
   tp -= turbo::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, -1, 12, 31, 23, 59, 59, 0 * 3600, false, "UTC");
-  EXPECT_EQ(weekday::friday, get_weekday(convert(tp, tz)));
+  REQUIRE_EQ(weekday::friday, get_weekday(convert(tp, tz)));
 }
 
-TEST(TimeZoneEdgeCase, UTC32bitLimit) {
+TEST_CASE("TimeZoneEdgeCase, UTC32bitLimit") {
   const time_zone tz = utc_time_zone();
 
   // Limits of signed 32-bit time_t
@@ -1485,7 +1483,7 @@ TEST(TimeZoneEdgeCase, UTC32bitLimit) {
   ExpectTime(tp, tz, 2038, 1, 19, 3, 14, 8, 0 * 3600, false, "UTC");
 }
 
-TEST(TimeZoneEdgeCase, UTC5DigitYear) {
+TEST_CASE("TimeZoneEdgeCase, UTC5DigitYear") {
   const time_zone tz = utc_time_zone();
 
   // Rollover to 5-digit year
@@ -1500,5 +1498,5 @@ TEST(TimeZoneEdgeCase, UTC5DigitYear) {
 
 }  // namespace cctz
 }  // namespace time_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

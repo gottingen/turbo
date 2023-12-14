@@ -35,12 +35,12 @@ namespace turbo {
 
         /// Standard print function, this one is set by default
         static std::string Simple(std::string_view title, std::string_view time) {
-            return turbo::Format("{}: {}", title, time);
+            return turbo::format("{}: {}", title, time);
         }
 
         /// This is a fancy print function with --- headers
         static std::string Big(std::string_view title, std::string_view time) {
-            return turbo::Format(
+            return turbo::format(
                     "-----------------------------------------\n| {} | time = {}\n-----------------------------------------",
                     title, time);
         }
@@ -79,12 +79,12 @@ namespace turbo {
         /// This prints out a time string from a time
         std::string make_time_str(turbo::Duration span) const {  // NOLINT(modernize-use-nodiscard)
             if (span < turbo::microseconds(1))
-                return turbo::Format("{}ns", turbo::to_double_nanoseconds(span));
+                return turbo::format("{}ns", turbo::to_double_nanoseconds(span));
             if (span < turbo::milliseconds(1))
-                return turbo::Format("{}us", turbo::to_double_microseconds(span));
+                return turbo::format("{}us", turbo::to_double_microseconds(span));
             if (span < turbo::seconds(1))
-                return turbo::Format("{}us", turbo::to_double_milliseconds(span));
-            return turbo::Format("{}us", turbo::to_double_seconds(span));
+                return turbo::format("{}us", turbo::to_double_milliseconds(span));
+            return turbo::format("{}us", turbo::to_double_seconds(span));
         }
 
         std::string to_string() const {
@@ -119,13 +119,6 @@ namespace turbo {
         bool _show;
     };
 
-}  // namespace turbo
-
-inline std::ostream &operator<<(std::ostream &in, const turbo::StopWatcher &timer) { return in << timer.to_string(); }
-
-namespace fmt {
-
-    // Support for fmt formatting  (e.g. "{:012.9}" or just "{}")
     template<>
     struct formatter<turbo::StopWatcher> : formatter<std::string> {
         template<typename FormatContext>
@@ -133,7 +126,10 @@ namespace fmt {
             return formatter<std::string>::format(sw.to_string(), ctx);
         }
     };
-} // namespace std
+}  // namespace turbo
+
+inline std::ostream &operator<<(std::ostream &in, const turbo::StopWatcher &timer) { return in << timer.to_string(); }
+
 
 
 #endif  // TURBO_TIME_STOP_WATCHER_H_

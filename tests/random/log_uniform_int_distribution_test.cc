@@ -109,7 +109,7 @@ namespace {
                 if (sample < sample_min) sample_min = sample;
             }
             TURBO_INTERNAL_LOG(INFO,
-                               turbo::Format("Range: {}, {}", +sample_min, +sample_max));
+                               turbo::format("Range: {}, {}", +sample_min, +sample_max));
         }
     }
 
@@ -184,10 +184,10 @@ namespace {
         if (chi_square > threshold) {
             TURBO_INTERNAL_LOG(INFO, "values");
             for (size_t i = 0; i < buckets.size(); i++) {
-                TURBO_INTERNAL_LOG(INFO, turbo::Format("{}: {}", i, buckets[i]));
+                TURBO_INTERNAL_LOG(INFO, turbo::format("{}: {}", i, buckets[i]));
             }
             TURBO_INTERNAL_LOG(INFO,
-                               turbo::Format("trials={}\n"
+                               turbo::format("trials={}\n"
                                                 "{}(data, {}) = {} ({})\n"
                                                 "{} @ 0.98 = {}",
                                                 trials, kChiSquared, dof, chi_square, p,
@@ -242,7 +242,7 @@ namespace {
             const ::testing::TestParamInfo<log_uniform_i32::param_type> &info) {
         const auto &p = info.param;
         std::string name =
-                turbo::Format("min_{}__max_{}__base_{}", p.min(), p.max(), p.base());
+                turbo::format("min_{}__max_{}__base_{}", p.min(), p.max(), p.base());
         return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},
                                            {".", "_"}});

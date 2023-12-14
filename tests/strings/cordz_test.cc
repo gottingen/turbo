@@ -75,7 +75,7 @@ turbo::Cord MakeAppendStringCord(TestCordSize size) {
 }
 
 std::string TestParamToString(::testing::TestParamInfo<TestCordSize> size) {
-  return turbo::Format("On{}{}", ToString(size.param), "Cord");
+  return turbo::format("On{}{}", ToString(size.param), "Cord");
 }
 
 class CordzUpdateTest : public testing::TestWithParam<TestCordSize> {

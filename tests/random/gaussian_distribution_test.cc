@@ -116,7 +116,7 @@ TYPED_TEST(GaussianDistributionInterfaceTest, SerializeTest) {
         }
         if (!std::is_same<TypeParam, long double>::value) {
           TURBO_INTERNAL_LOG(
-              INFO, turbo::Format("Range{{{}, {}}}: {}, {}", mean, stddev,
+              INFO, turbo::format("Range{{{}, {}}}: {}, {}", mean, stddev,
                                     sample_min, sample_max));
         }
 
@@ -240,7 +240,7 @@ bool GaussianDistributionTests::SingleZTest(const double p,
 
   if (!pass || jb > 9.21) {
     TURBO_INTERNAL_LOG(
-        INFO, turbo::Format("p={} max_err={}\n"
+        INFO, turbo::format("p={} max_err={}\n"
                               " mean={} vs. {}\n"
                               " stddev={} vs. {}\n"
                               " skewness={} vs. {}\n"
@@ -298,11 +298,11 @@ double GaussianDistributionTests::SingleChiSquaredTest() {
   if (chi_square > threshold) {
     for (int i = 0; i < cutoffs.size(); i++) {
       TURBO_INTERNAL_LOG(
-          INFO, turbo::Format("{} : ({}) = {}", i, cutoffs[i], counts[i]));
+          INFO, turbo::format("{} : ({}) = {}", i, cutoffs[i], counts[i]));
     }
 
     TURBO_INTERNAL_LOG(
-        INFO, turbo::Format("mean={} stddev={}\n expected {}\n{} {} ({})\n {}  @ 0.98 = {}", mean(), stddev(),
+        INFO, turbo::format("mean={} stddev={}\n expected {}\n{} {} ({})\n {}  @ 0.98 = {}", mean(), stddev(),
                            expected,             //
                            kChiSquared, chi_square, p,
                            kChiSquared, threshold));
@@ -378,7 +378,7 @@ std::vector<Param> GenParams() {
 
 std::string ParamName(const ::testing::TestParamInfo<Param>& info) {
   const auto& p = info.param;
-  std::string name = turbo::Format("mean_{:.6g}__stddev_{:.6g}",p.mean, p.stddev);
+  std::string name = turbo::format("mean_{:.6g}__stddev_{:.6g}",p.mean, p.stddev);
   return turbo::str_replace_all(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 

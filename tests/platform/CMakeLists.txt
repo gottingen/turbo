@@ -42,9 +42,6 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         turbo::atomic_hook_test_helper
         turbo::turbo
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -58,9 +55,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GMOCK_LIB}
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -75,8 +69,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -90,8 +82,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -105,8 +95,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -118,7 +106,6 @@ carbin_cc_test(
         ${CARBIN_CXX_OPTIONS}
         DEPS
         ${CARBIN_DEPS_LINK}
-        ${GTEST_LIB}
         turbo::turbo
         Threads::Threads
 )
@@ -133,8 +120,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -147,8 +132,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -161,8 +144,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 carbin_cc_test(
@@ -175,6 +156,4 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-        ${GTEST_LIB}
-        ${GTEST_MAIN_LIB}
 )

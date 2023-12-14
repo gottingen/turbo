@@ -31,7 +31,7 @@ namespace turbo {
 
         // Invoke the method, expanding the tuple of bound arguments.
         template<class R, class Tuple, size_t... Idx, class... Args>
-        R Apply(Tuple &&bound, turbo::index_sequence<Idx...>, Args &&... free) {
+        R Apply(Tuple &&bound, std::index_sequence<Idx...>, Args &&... free) {
             return std::invoke(
                     std::forward<Tuple>(bound).template get<Idx>()...,
                     std::forward<Args>(free)...);
@@ -40,7 +40,7 @@ namespace turbo {
         template<class F, class... BoundArgs>
         class FrontBinder {
             using BoundArgsT = turbo::container_internal::CompressedTuple<F, BoundArgs...>;
-            using Idx = turbo::make_index_sequence<sizeof...(BoundArgs) + 1>;
+            using Idx = std::make_index_sequence<sizeof...(BoundArgs) + 1>;
 
             BoundArgsT bound_args_;
 

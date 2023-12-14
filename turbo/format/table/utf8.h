@@ -23,7 +23,6 @@
 #include <locale>
 
 #include <cstdlib>
-#include "turbo/format/table/termcolor.h"
 #include <wchar.h>
 
 namespace turbo {

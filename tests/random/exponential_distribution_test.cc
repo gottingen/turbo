@@ -116,7 +116,7 @@ namespace {
             }
             if (!std::is_same<TypeParam, long double>::value) {
                 TURBO_INTERNAL_LOG(INFO,
-                                   turbo::Format("Range {{}}: {}, {}, lambda={}", lambda,
+                                   turbo::format("Range {{}}: {}, {}, lambda={}", lambda,
                                                  sample_min, sample_max, lambda));
             }
 
@@ -224,7 +224,7 @@ namespace {
 
         if (!pass) {
             TURBO_INTERNAL_LOG(
-                    INFO, turbo::Format("p={} max_err={}\n"
+                    INFO, turbo::format("p={} max_err={}\n"
                                         " lambda={}\n"
                                         " mean={} vs. {}\n"
                                         " stddev={} vs. {}\n"
@@ -280,11 +280,11 @@ namespace {
         if (chi_square > threshold) {
             for (int i = 0; i < cutoffs.size(); i++) {
                 TURBO_INTERNAL_LOG(
-                        INFO, turbo::Format("{} : ({}) = {}", i, cutoffs[i], counts[i]));
+                        INFO, turbo::format("{} : ({}) = {}", i, cutoffs[i], counts[i]));
             }
 
             TURBO_INTERNAL_LOG(INFO,
-                               turbo::Format("lambda {} \nexpected {}\n{} {} ({})\n{} @ 0.98 = {}", lambda(), expected,
+                               turbo::format("lambda {} \nexpected {}\n{} {} ({})\n{} @ 0.98 = {}", lambda(), expected,
                                              kChiSquared, chi_square, p,
                                              kChiSquared, threshold));
         }
@@ -342,7 +342,7 @@ namespace {
 
     std::string ParamName(const ::testing::TestParamInfo<Param> &info) {
         const auto &p = info.param;
-        std::string name = turbo::Format("lambda_{:.6f}", p.lambda);
+        std::string name = turbo::format("lambda_{:.6f}", p.lambda);
         return turbo::str_replace_all(name, {{"+", "_"},
                                            {"-", "_"},
                                            {".", "_"}});

@@ -826,7 +826,7 @@ namespace turbo {
 
 
 template<>
-struct fmt::formatter<turbo::ModuleVersion> {
+struct turbo::formatter<turbo::ModuleVersion> {
     // show major version
     bool show_major = false;
     // show minor version

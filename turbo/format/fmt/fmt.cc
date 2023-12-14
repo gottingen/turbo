@@ -72,12 +72,12 @@ module;
 
 export module fmt;
 
-#define FMT_MODULE_EXPORT export
-#define FMT_BEGIN_EXPORT export {
-#define FMT_END_EXPORT }
+#define TURBO_MODULE_EXPORT export
+#define TURBO_BEGIN_EXPORT export {
+#define TURBO_END_EXPORT }
 #define FMT_BEGIN_DETAIL_NAMESPACE \
   }                                \
-  namespace detail {
+  namespace fmt_detail {
 #define FMT_END_DETAIL_NAMESPACE \
   }                              \
   export {
@@ -94,7 +94,7 @@ extern "C++" {
 // purview to be exported.
 #include "turbo/format/fmt/args.h"
 #include "turbo/format/fmt/chrono.h"
-#include "turbo/format/fmt/color.h"
+#include "turbo/format/color.h"
 #include "turbo/format/fmt/compile.h"
 #include "turbo/format/fmt/format.h"
 #include "turbo/format/fmt/os.h"
@@ -108,7 +108,7 @@ extern "C++" {
 #endif
 
 // gcc doesn't yet implement private module fragments
-#if !FMT_GCC_VERSION
+#if !TURBO_GCC_VERSION
 module :private;
 #endif
 

@@ -28,5 +28,5 @@ void str_cat_example() {
   std::string b = "hello";
 
   /// "1 hello"
-  std::cout << turbo::Format("{} {}", a,b)<<std::endl;
+  std::cout << turbo::format("{} {}", a,b)<<std::endl;
 }

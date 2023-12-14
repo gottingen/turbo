@@ -37,7 +37,7 @@ int main() {
 
     // Color header cells
     for (size_t i = 0; i < 5; ++i) {
-        movies[0][i].format().font_color(Color::yellow).font_style({FontStyle::bold});
+        movies[0][i].format().font_color(fg(color::yellow)).font_style({emphasis::bold});
     }
 
     MarkdownExporter exporter;

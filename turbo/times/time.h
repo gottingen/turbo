@@ -69,7 +69,7 @@ namespace turbo::time_internal {
     constexpr Duration MakeDuration(int64_t hi,
                                     int64_t lo);
 
-    inline Duration MakePosDoubleDuration(double n);
+    inline Duration make_pos_double_duration(double n);
 
     constexpr int64_t kTicksPerNanosecond = 4;
     constexpr int64_t kTicksPerSecond = 1000 * 1000 * 1000 * kTicksPerNanosecond;
@@ -355,7 +355,6 @@ namespace turbo {
     /**
      * @ingroup turbo_times_duration
      * @brief Truncates a duration (toward zero) to a multiple of a non-zero unit.
-     *
      *        Example:
      *        @code
      *        turbo::Duration d = turbo::nanoseconds(123456789);
@@ -406,7 +405,6 @@ namespace turbo {
      *        arithmetic with `Duration` infinities is similar to IEEE 754 infinities
      *        except where IEEE 754 NaN would be involved, in which case +/-
      *        `infinite_duration()` is used in place of a "nan" Duration.
-     *
      *        Examples:
      *        @code
      *        constexpr turbo::Duration inf = turbo::infinite_duration();
@@ -445,12 +443,10 @@ namespace turbo {
      *        number of the unit indicated by the factory function's name. These
      *        functions exist for convenience, but they are not as efficient as the
      *        integral factories, which should be preferred.
-     *
      *        Example:
      *        @code
      *        turbo::Duration a = turbo::seconds(60);
      *        turbo::Duration b = turbo::minutes(1);  // b == a
-     *        @code
      *        auto a = turbo::seconds(1.5);        // OK
      *        auto b = turbo::milliseconds(1500);  // BETTER
      *        @endcode
@@ -513,12 +509,12 @@ namespace turbo {
             if (n >= static_cast<T>((std::numeric_limits<int64_t>::max)())) {
                 return infinite_duration();
             }
-            return time_internal::MakePosDoubleDuration(n);
+            return time_internal::make_pos_double_duration(n);
         } else {
             if (std::isnan(n))
                 return std::signbit(n) ? -infinite_duration() : infinite_duration();
             if (n <= (std::numeric_limits<int64_t>::min)()) return -infinite_duration();
-            return -time_internal::MakePosDoubleDuration(-n);
+            return -time_internal::make_pos_double_duration(-n);
         }
     }
 
@@ -813,7 +809,6 @@ namespace turbo {
     bool parse_duration(std::string_view dur_string, Duration *d);
 
     /**
-     * @ingroup turbo_times_time_point
      * @brief The `turbo::Time` class represents a specific instant in time. Arithmetic operators
      *        are provided for naturally expressing time calculations. Instances are
      *        created using `turbo::time_now()` and the `turbo::From*()` factory functions that
@@ -995,14 +990,14 @@ namespace turbo {
     }
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief Returns the `turbo::Time` representing "1970-01-01 00:00:00.0 +0000".
      * @return
      */
     constexpr Time unix_epoch() { return Time(); }
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief Returns the `turbo::Time` representing "0001-01-01 00:00:00.0 +0000", the
      *        epoch of the ICU Universal Time Scale.
      * @return
@@ -1015,7 +1010,7 @@ namespace turbo {
     }
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief Returns an `turbo::Time` that is infinitely far in the future.
      * @return
      */
@@ -1025,7 +1020,7 @@ namespace turbo {
     }
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief Returns an `turbo::Time` that is infinitely far in the past.
      * @return
      */
@@ -1035,7 +1030,7 @@ namespace turbo {
     }
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief Creates an `turbo::Time` from a variety of other representations.
      * @param ns
      * @return
@@ -1043,7 +1038,7 @@ namespace turbo {
     constexpr Time from_unix_nanos(int64_t ns);
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief  similar to `from_unix_nanos()`
      * @see `from_unix_nanos()`
      * @param us
@@ -1052,7 +1047,7 @@ namespace turbo {
     constexpr Time from_unix_micros(int64_t us);
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief  similar to `from_unix_nanos()`
      * @see `from_unix_nanos()`
      * @param ms
@@ -1061,7 +1056,7 @@ namespace turbo {
     constexpr Time from_unix_millis(int64_t ms);
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief  similar to `from_unix_nanos()`
      * @see `from_unix_nanos()`
      * @param s
@@ -1070,7 +1065,7 @@ namespace turbo {
     constexpr Time from_unix_seconds(int64_t s);
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief  similar to `from_unix_nanos()`
      * @see `from_unix_nanos()`
      * @param t
@@ -1079,7 +1074,7 @@ namespace turbo {
     constexpr Time from_time_t(time_t t);
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief  similar to `from_unix_nanos()`
      * @see `from_unix_nanos()`
      * @param udate
@@ -1088,7 +1083,7 @@ namespace turbo {
     Time from_udate(double udate);
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief  similar to `from_unix_nanos()`
      * @see `from_unix_nanos()`
      * @param universal
@@ -1239,9 +1234,8 @@ namespace turbo {
     /**
      * @ingroup turbo_times_time_point
      * @brief  Converts a `std::chrono::system_clock::time_point` to an `turbo::Time`.
-     *
      *         Example:
-     *         @code
+     *         @code {.cpp}
      *         auto tp = std::chrono::system_clock::from_time_t(123);
      *         turbo::Time t = turbo::from_chrono(tp);
      *         // t == turbo::from_time_t(123)
@@ -1253,11 +1247,10 @@ namespace turbo {
     from_chrono(const std::chrono::system_clock::time_point &tp);
 
     /**
-     * @ingroup turbo_times_time_point
+     * @ingroup turbo_times_time_point_create
      * @brief Converts an `turbo::Time` to a `std::chrono::system_clock::time_point`.
      *        If overflow would occur, the returned value will saturate at the min/max
      *        time point value instead.
-     *
      *        Example:
      *        @code
      *        turbo::Time t = turbo::from_time_t(123);
@@ -1413,7 +1406,6 @@ namespace turbo {
 
         /**
          * @brief Finds the time of the next offset change in this time zone.
-         *
          *       By definition, `NextTransition(t, &trans)` returns false when `t` is
          *       `infinite_future()`. If the zone has no transitions, the result will
          *       also be false no matter what the argument.
@@ -1427,7 +1419,6 @@ namespace turbo {
          *
          * @note Enumeration of time-zone transitions is for informational purposes only.
          *      Modern time-related code should not care about when offset changes occur.
-         *
          *      Example:
          *      @code
          *      turbo::TimeZone nyc;
@@ -1487,7 +1478,8 @@ namespace turbo {
         return b;
     }
 
-    /**
+
+    /**`
      * @ingroup turbo_times_time_zone
      * @brief Returns a TimeZone that is a fixed offset (seconds east) from UTC.
      *        Note: If the absolute value of the offset is greater than 24 hours
@@ -1524,7 +1516,6 @@ namespace turbo {
     /**
      * @ingroup turbo_times_time_zone
      * @brief Helpers for TimeZone::At(Time) to return particularly aligned civil times.
-     *
      *       Example:
      *       @code
      *       turbo::Time t = ...;
@@ -1561,7 +1552,7 @@ namespace turbo {
      * @param tz
      * @return
      */
-    inline CivilHour ToCivilHour(Time t, TimeZone tz) {
+    inline CivilHour to_civil_hour(Time t, TimeZone tz) {
         return CivilHour(tz.At(t).cs);
     }
 
@@ -1585,7 +1576,7 @@ namespace turbo {
      * @param tz
      * @return
      */
-    inline CivilMonth ToCivilMonth(Time t,
+    inline CivilMonth to_civil_month(Time t,
                                    TimeZone tz) {
         return CivilMonth(tz.At(t).cs);
     }
@@ -1598,7 +1589,7 @@ namespace turbo {
      * @param tz
      * @return
      */
-    inline CivilYear ToCivilYear(Time t, TimeZone tz) {
+    inline CivilYear to_civil_year(Time t, TimeZone tz) {
         return CivilYear(tz.At(t).cs);
     }
 
@@ -1630,7 +1621,7 @@ namespace turbo {
     // An `turbo::TimeConversion` represents the conversion of year, month, day,
     // hour, minute, and second values (i.e., a civil time), in a particular
     // `turbo::TimeZone`, to a time instant (an absolute time), as returned by
-    // `turbo::ConvertDateTime()`. Legacy version of `turbo::TimeZone::TimeInfo`.
+    // `turbo::convert_date_time()`. Legacy version of `turbo::TimeZone::TimeInfo`.
     //
     // Deprecated. Use `turbo::TimeZone::TimeInfo`.
     struct
@@ -1649,7 +1640,7 @@ namespace turbo {
         bool normalized;  // input values were outside their valid ranges
     };
 
-    // ConvertDateTime()
+    // convert_date_time()
     //
     // Legacy version of `turbo::TimeZone::At(turbo::CivilSecond)` that takes
     // the civil time as six, separate values (YMDHMS).
@@ -1662,45 +1653,45 @@ namespace turbo {
     //
     //   // "October 32" normalizes to "November 1".
     //   turbo::TimeConversion tc =
-    //       turbo::ConvertDateTime(2013, 10, 32, 8, 30, 0, lax);
+    //       turbo::convert_date_time(2013, 10, 32, 8, 30, 0, lax);
     //   // tc.kind == TimeConversion::UNIQUE && tc.normalized == true
     //   // turbo::to_civil_day(tc.pre, tz).month() == 11
     //   // turbo::to_civil_day(tc.pre, tz).day() == 1
     //
     // Deprecated. Use `turbo::TimeZone::At(CivilSecond)`.
-    TimeConversion ConvertDateTime(int64_t year, int mon, int day, int hour,
+    TimeConversion convert_date_time(int64_t year, int mon, int day, int hour,
                                    int min, int sec, TimeZone tz);
 
-    // FromDateTime()
+    // from_date_time()
     //
-    // A convenience wrapper for `turbo::ConvertDateTime()` that simply returns
+    // A convenience wrapper for `turbo::convert_date_time()` that simply returns
     // the "pre" `turbo::Time`.  That is, the unique result, or the instant that
     // is correct using the pre-transition offset (as if the transition never
     // happened).
     //
     // Example:
     //
-    //   turbo::Time t = turbo::FromDateTime(2017, 9, 26, 9, 30, 0, lax);
+    //   turbo::Time t = turbo::from_date_time(2017, 9, 26, 9, 30, 0, lax);
     //   // t = 2017-09-26 09:30:00 -0700
     //
     // Deprecated. Use `turbo::from_civil(CivilSecond, TimeZone)`. Note that the
-    // behavior of `from_civil()` differs from `FromDateTime()` for skipped civil
+    // behavior of `from_civil()` differs from `from_date_time()` for skipped civil
     // times. If you care about that see `turbo::TimeZone::At(turbo::CivilSecond)`.
     /**
      * @ingroup turbo_times_time_zone
-     * @brief  similar to `ConvertDateTime()` but returns the "pre" `turbo::Time`
+     * @brief  similar to `convert_date_time()` but returns the "pre" `turbo::Time`
      *         (the unique result, or the instant that is correct using the pre-transition
      *         offset (as if the transition never happened)).
      *         Deprecated. Use `turbo::from_civil(CivilSecond, TimeZone)`. Note that the
-     *         behavior of `from_civil()` differs from `FromDateTime()` for skipped civil
+     *         behavior of `from_civil()` differs from `from_date_time()` for skipped civil
      *         times. If you care about that see `turbo::TimeZone::At(turbo::CivilSecond)`.
      *         Example:
      *         @code
-     *         turbo::Time t = turbo::FromDateTime(2017, 9, 26, 9, 30, 0, lax);
+     *         turbo::Time t = turbo::from_date_time(2017, 9, 26, 9, 30, 0, lax);
      *         // t = 2017-09-26 09:30:00 -0700
      *         @endcode
      *
-     * @see `ConvertDateTime()`
+     * @see `convert_date_time()`
      * @param year
      * @param mon
      * @param day
@@ -1710,9 +1701,9 @@ namespace turbo {
      * @param tz
      * @return
      */
-    inline Time FromDateTime(int64_t year, int mon, int day, int hour,
+    inline Time from_date_time(int64_t year, int mon, int day, int hour,
                              int min, int sec, TimeZone tz) {
-        return ConvertDateTime(year, mon, day, hour, min, sec, tz).pre;
+        return convert_date_time(year, mon, day, hour, min, sec, tz).pre;
     }
 
     /**
@@ -1906,9 +1897,9 @@ namespace turbo {
     bool parse_time(std::string_view format, std::string_view input, TimeZone tz,
                     Time *time, std::string *err);
 
-// ============================================================================
-// Implementation Details Follow
-// ============================================================================
+    // ============================================================================
+    // Implementation Details Follow
+    // ============================================================================
 
     namespace time_internal {
 
@@ -1928,7 +1919,7 @@ namespace turbo {
         // Make a Duration value from a floating-point number, as long as that number
         // is in the range [ 0 .. numeric_limits<int64_t>::max ), that is, as long as
         // it's positive and can be converted to int64_t without risk of UB.
-        inline Duration MakePosDoubleDuration(double n) {
+        inline Duration make_pos_double_duration(double n) {
             const int64_t int_secs = static_cast<int64_t>(n);
             const uint32_t ticks = static_cast<uint32_t>(
                     std::round((n - static_cast<double>(int_secs)) * kTicksPerSecond));
@@ -1993,7 +1984,7 @@ namespace turbo {
         template<std::intmax_t N>
         constexpr Duration FromInt64(int64_t v,
                                      std::ratio<1, N>) {
-            static_assert(0 < N && N <= 1000 * 1000 * 1000, "Unsupported ratio");
+            static_assert(0 < N && N <= 1000000000, "Unsupported ratio");
             // Subsecond ratios cannot overflow.
             return MakeNormalizedDuration(
                     v / N, v % N * kTicksPerNanosecond * 1000 * 1000 * 1000 / N);

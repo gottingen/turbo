@@ -15,13 +15,11 @@
 #include "turbo/meta/compare.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-
 #include "doctest/doctest.h"
 
 #include "turbo/base/casts.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace {
 
 // This is necessary to avoid a bunch of lint warnings suggesting that we use
@@ -390,5 +388,4 @@ namespace turbo {
 #endif  // __cpp_inline_variables
 
     }  // namespace
-    TURBO_NAMESPACE_END
 }  // namespace turbo

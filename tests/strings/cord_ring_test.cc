@@ -86,7 +86,7 @@ struct TestParam {
   InputShareMode input_share_mode = kPrivate;
 
   std::string ToString() const {
-    return turbo::Format("{}{}{}", refcount_is_one ? "Private" : "Shared",
+    return turbo::format("{}{}{}", refcount_is_one ? "Private" : "Shared",
                         with_capacity ? "" : "_NoCapacity",
                         (input_share_mode == kPrivate) ? ""
                         : (input_share_mode == kShared)
@@ -98,13 +98,13 @@ using TestParams = std::vector<TestParam>;
 
 // Matcher validating when mutable copies are required / performed.
 MATCHER_P2(EqIfPrivate, param, rep,
-           turbo::Format("Equal {} if private", turbo::Ptr(rep))) {
+           turbo::format("Equal {} if private", turbo::ptr(rep))) {
   return param.refcount_is_one ? arg == rep : true;
 }
 
 // Matcher validating when mutable copies are required / performed.
 MATCHER_P2(EqIfPrivateAndCapacity, param, rep,
-           turbo::Format("Equal {} if private and capacity", turbo::Ptr(rep))) {
+           turbo::format("Equal {} if private and capacity", turbo::ptr(rep))) {
   return (param.refcount_is_one && param.with_capacity) ? arg == rep : true;
 }
 
@@ -112,7 +112,7 @@ MATCHER_P2(EqIfPrivateAndCapacity, param, rep,
 // tests doing exactly one update as subsequent updates could return the
 // original (freed and re-used) pointer.
 MATCHER_P2(NeIfShared, param, rep,
-           turbo::Format("Not equal {} if shared", turbo::Ptr(rep))) {
+           turbo::format("Not equal {} if shared", turbo::ptr(rep))) {
   return param.refcount_is_one ? true : arg != rep;
 }
 
@@ -684,7 +684,7 @@ TEST_P(CordRingBuildTest, AppendStringHavingPartialExtra) {
   EXPECT_THAT(result, EqIfPrivateAndCapacity(GetParam(), ring));
   EXPECT_THAT(result, NeIfShared(GetParam(), ring));
   if (GetParam().refcount_is_one) {
-    EXPECT_THAT(ToFlats(result), ElementsAre(Format("{}{}", str1, str1a), str2a));
+    EXPECT_THAT(ToFlats(result), ElementsAre(format("{}{}", str1, str1a), str2a));
   } else {
     EXPECT_THAT(ToFlats(result), ElementsAre(str1, str2));
   }
@@ -701,7 +701,7 @@ TEST_P(CordRingBuildTest, AppendStringHavingExtraInSubstring) {
   EXPECT_THAT(result, NeIfShared(GetParam(), ring));
   EXPECT_THAT(result->length, Eq(4 + str2.size()));
   if (GetParam().refcount_is_one) {
-    EXPECT_THAT(ToFlats(result), ElementsAre(Format("1234{}", str2)));
+    EXPECT_THAT(ToFlats(result), ElementsAre(format("1234{}", str2)));
   } else {
     EXPECT_THAT(ToFlats(result), ElementsAre("1234", str2));
   }
@@ -711,7 +711,7 @@ TEST_P(CordRingBuildTest, AppendStringHavingSharedExtra) {
   std::string_view str1 = "123456789_1234";
   std::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (int shared_type = 0; shared_type < 2; ++shared_type) {
-    SCOPED_TRACE(turbo::Format("Shared extra type {}", shared_type));
+    SCOPED_TRACE(turbo::format("Shared extra type {}", shared_type));
 
     // Create a flat that is shared in some way.
     CordRep* flat = nullptr;
@@ -750,7 +750,7 @@ TEST_P(CordRingBuildTest, AppendStringWithExtra) {
   ASSERT_THAT(result, IsValidRingBuffer());
   EXPECT_THAT(result->length, Eq(str1.size() + str2.size() + str3.size()));
   EXPECT_THAT(result, EqIfPrivateAndCapacity(GetParam(), ring));
-  EXPECT_THAT(ToFlats(result), ElementsAre(str1, Format("{}{}", str2, str3)));
+  EXPECT_THAT(ToFlats(result), ElementsAre(str1, format("{}{}", str2, str3)));
 }
 
 TEST_P(CordRingBuildTest, PrependString) {
@@ -780,7 +780,7 @@ TEST_P(CordRingBuildTest, PrependStringHavingExtra) {
   EXPECT_THAT(result, NeIfShared(GetParam(), ring));
   EXPECT_THAT(result->length, Eq(4 + str2.size()));
   if (GetParam().refcount_is_one) {
-    EXPECT_THAT(ToFlats(result), ElementsAre(Format("{}{}", str2, "1234")));
+    EXPECT_THAT(ToFlats(result), ElementsAre(format("{}{}", str2, "1234")));
   } else {
     EXPECT_THAT(ToFlats(result), ElementsAre(str2, "1234"));
   }
@@ -791,7 +791,7 @@ TEST_P(CordRingBuildTest, PrependStringHavingSharedExtra) {
   std::string_view str2 = "abcdefghij";
   std::string_view str1a = str1.substr(10);
   for (int shared_type = 1; shared_type < 2; ++shared_type) {
-    SCOPED_TRACE(turbo::Format("Shared extra type {}", shared_type));
+    SCOPED_TRACE(turbo::format("Shared extra type {}", shared_type));
 
     // Create a flat that is shared in some way.
     CordRep* flat = nullptr;
@@ -825,7 +825,7 @@ TEST_P(CordRingBuildTest, PrependStringWithExtra) {
   result = CordRepRing::Prepend(result, str3);
   EXPECT_THAT(result->length, Eq(str1.size() + str2.size() + str3.size()));
   EXPECT_THAT(result, EqIfPrivateAndCapacity(GetParam(), ring));
-  EXPECT_THAT(ToFlats(result), ElementsAre(Format("{}{}", str3, str2), str1));
+  EXPECT_THAT(ToFlats(result), ElementsAre(format("{}{}", str3, str2), str1));
 }
 
 TEST_P(CordRingBuildTest, AppendPrependStringMix) {
@@ -864,7 +864,7 @@ TEST_P(CordRingBuildTest, AppendPrependStringMixWithExtra) {
 
 TEST_P(CordRingBuildTest, AppendPrependStringMixWithPrependedExtra) {
   const auto& flats = kFoxFlats;
-  CordRep* flat = MakeFlat(Format("{}{}", std::string(50, '.'), flats[4]), 50);
+  CordRep* flat = MakeFlat(format("{}{}", std::string(50, '.'), flats[4]), 50);
   CordRepRing* ring = CreateWithCapacity(RemovePrefix(50, flat), 0);
   CordRepRing* result = ring;
   for (int i = 1; i <= 4; ++i) {
@@ -911,7 +911,7 @@ TEST_P(CordRingSubTest, SubRingFromLargeExternal) {
       large_string.c_str(),
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   };
-  std::string buffer = turbo::Format("{}{}{}", flats[0], flats[1], flats[2]);
+  std::string buffer = turbo::format("{}{}{}", flats[0], flats[1], flats[2]);
   std::string_view all = buffer;
   for (size_t offset = 0; offset < 30; ++offset) {
     CordRepRing* ring = RefIfShared(FromFlats(flats, composition));

@@ -186,7 +186,7 @@ void async_example() {
 // Log binary data as hex.
 // Many types of std::container<char> types can be used.
 // Iterator ranges are supported too.
-// Format flags:
+// format flags:
 // {:X} - print in uppercase.
 // {:s} - don't separate each byte with space.
 // {:p} - don't print the position on each line start.
@@ -332,7 +332,7 @@ struct my_type {
 };
 
 template<>
-struct fmt::formatter<my_type> : fmt::formatter<std::string> {
+struct turbo::formatter<my_type> : turbo::formatter<std::string> {
     auto format(my_type my, format_context &ctx) -> decltype(ctx.out()) {
         return format_to(ctx.out(), "[my_type i={}]", my.i);
     }

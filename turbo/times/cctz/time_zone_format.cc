@@ -488,7 +488,7 @@ namespace turbo::time_internal::cctz::detail {
             // Loop if there is no E modifier.
             if (*cur != 'E' || ++cur == end) continue;
 
-            // Format our extensions.
+            // format our extensions.
             if (*cur == 'T') {
                 // Formats %ET.
                 if (cur - 2 != pending) {

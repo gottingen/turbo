@@ -19,17 +19,14 @@
 
 #include "turbo/log/common.h"
 
- bool turbo::tlog::sinks::sink::should_log(turbo::tlog::level::level_enum msg_level) const
-{
+bool turbo::tlog::sinks::sink::should_log(turbo::tlog::level::level_enum msg_level) const {
     return msg_level >= level_.load(std::memory_order_relaxed);
 }
 
- void turbo::tlog::sinks::sink::set_level(level::level_enum log_level)
-{
+void turbo::tlog::sinks::sink::set_level(level::level_enum log_level) {
     level_.store(log_level, std::memory_order_relaxed);
 }
 
- turbo::tlog::level::level_enum turbo::tlog::sinks::sink::level() const
-{
+turbo::tlog::level::level_enum turbo::tlog::sinks::sink::level() const {
     return static_cast<turbo::tlog::level::level_enum>(level_.load(std::memory_order_relaxed));
 }

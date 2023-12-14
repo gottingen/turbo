@@ -50,122 +50,11 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-
-    // integer_sequence
-    //
-    // Class template representing a compile-time integer sequence. An instantiation
-    // of `integer_sequence<T, Ints...>` has a sequence of integers encoded in its
-    // type through its template arguments (which is a common need when
-    // working with C++11 variadic templates). `turbo::integer_sequence` is designed
-    // to be a drop-in replacement for C++14's `std::integer_sequence`.
-    //
-    // Example:
-    //
-    //   template< class T, T... Ints >
-    //   void user_function(integer_sequence<T, Ints...>);
-    //
-    //   int main()
-    //   {
-    //     // user_function's `T` will be deduced to `int` and `Ints...`
-    //     // will be deduced to `0, 1, 2, 3, 4`.
-    //     user_function(make_integer_sequence<int, 5>());
-    //   }
-    template<typename T, T... Ints>
-    struct integer_sequence {
-        using value_type = T;
-
-        static constexpr size_t size() noexcept { return sizeof...(Ints); }
-    };
-
-    // index_sequence
-    //
-    // A helper template for an `integer_sequence` of `size_t`,
-    // `turbo::index_sequence` is designed to be a drop-in replacement for C++14's
-    // `std::index_sequence`.
-    template<size_t... Ints>
-    using index_sequence = integer_sequence<size_t, Ints...>;
-
-    namespace utility_internal {
-
-        template<typename Seq, size_t SeqSize, size_t Rem>
-        struct Extend;
-
-        // Note that SeqSize == sizeof...(Ints). It's passed explicitly for efficiency.
-        template<typename T, T... Ints, size_t SeqSize>
-        struct Extend<integer_sequence<T, Ints...>, SeqSize, 0> {
-            using type = integer_sequence<T, Ints..., (Ints + SeqSize)...>;
-        };
-
-        template<typename T, T... Ints, size_t SeqSize>
-        struct Extend<integer_sequence<T, Ints...>, SeqSize, 1> {
-            using type = integer_sequence<T, Ints..., (Ints + SeqSize)..., 2 * SeqSize>;
-        };
-
-        // Recursion helper for 'make_integer_sequence<T, N>'.
-        // 'Gen<T, N>::type' is an alias for 'integer_sequence<T, 0, 1, ... N-1>'.
-        template<typename T, size_t N>
-        struct Gen {
-            using type =
-                    typename Extend<typename Gen<T, N / 2>::type, N / 2, N % 2>::type;
-        };
-
-        template<typename T>
-        struct Gen<T, 0> {
-            using type = integer_sequence<T>;
-        };
-
-        template<typename T>
-        struct InPlaceTypeTag {
-            explicit InPlaceTypeTag() = delete;
-
-            InPlaceTypeTag(const InPlaceTypeTag &) = delete;
-
-            InPlaceTypeTag &operator=(const InPlaceTypeTag &) = delete;
-        };
-
-        template<size_t I>
-        struct InPlaceIndexTag {
-            explicit InPlaceIndexTag() = delete;
-
-            InPlaceIndexTag(const InPlaceIndexTag &) = delete;
-
-            InPlaceIndexTag &operator=(const InPlaceIndexTag &) = delete;
-        };
-
-    }  // namespace utility_internal
-
-    // Compile-time sequences of integers
-
-    // make_integer_sequence
-    //
-    // This template alias is equivalent to
-    // `integer_sequence<int, 0, 1, ..., N-1>`, and is designed to be a drop-in
-    // replacement for C++14's `std::make_integer_sequence`.
-    template<typename T, T N>
-    using make_integer_sequence = typename utility_internal::Gen<T, N>::type;
-
-    // make_index_sequence
-    //
-    // This template alias is equivalent to `index_sequence<0, 1, ..., N-1>`,
-    // and is designed to be a drop-in replacement for C++14's
-    // `std::make_index_sequence`.
-    template<size_t N>
-    using make_index_sequence = make_integer_sequence<size_t, N>;
-
-    // index_sequence_for
-    //
-    // Converts a typename pack into an index sequence of the same length, and
-    // is designed to be a drop-in replacement for C++14's
-    // `std::index_sequence_for()`
-    template<typename... Ts>
-    using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
-
 
     namespace utility_internal {
         // Helper method for expanding tuple into a called method.
         template<typename Functor, typename Tuple, std::size_t... Indexes>
-        auto apply_helper(Functor &&functor, Tuple &&t, index_sequence<Indexes...>)
+        auto apply_helper(Functor &&functor, Tuple &&t, std::index_sequence<Indexes...>)
         -> decltype(std::invoke(
                 std::forward<Functor>(functor),
                 std::get<Indexes>(std::forward<Tuple>(t))...)) {
@@ -219,11 +108,11 @@ namespace turbo {
     auto apply(Functor &&functor, Tuple &&t)
     -> decltype(utility_internal::apply_helper(
             std::forward<Functor>(functor), std::forward<Tuple>(t),
-            turbo::make_index_sequence<std::tuple_size<
+            std::make_index_sequence<std::tuple_size<
                     typename std::remove_reference<Tuple>::type>::value>{})) {
         return utility_internal::apply_helper(
                 std::forward<Functor>(functor), std::forward<Tuple>(t),
-                turbo::make_index_sequence<std::tuple_size<
+                std::make_index_sequence<std::tuple_size<
                         typename std::remove_reference<Tuple>::type>::value>{});
     }
 
@@ -249,7 +138,7 @@ namespace turbo {
 
     namespace utility_internal {
         template<typename T, typename Tuple, size_t... I>
-        T make_from_tuple_impl(Tuple &&tup, turbo::index_sequence<I...>) {
+        T make_from_tuple_impl(Tuple &&tup, std::index_sequence<I...>) {
             return T(std::get<I>(std::forward<Tuple>(tup))...);
         }
     }  // namespace utility_internal
@@ -270,11 +159,16 @@ namespace turbo {
     constexpr T make_from_tuple(Tuple &&tup) {
         return utility_internal::make_from_tuple_impl<T>(
                 std::forward<Tuple>(tup),
-                turbo::make_index_sequence<
+                std::make_index_sequence<
                         std::tuple_size<std::decay_t<Tuple>>::value>{});
     }
 
-    TURBO_NAMESPACE_END
+    template<typename Int>
+    constexpr auto to_unsigned(Int value) ->
+    typename std::make_unsigned<Int>::type {
+        TURBO_ASSERT(std::is_unsigned<Int>::value || value >= 0, "negative value");
+        return static_cast<typename std::make_unsigned<Int>::type>(value);
+    }
 }  // namespace turbo
 
 #endif  // TURBO_UTILITY_UTILITY_H_

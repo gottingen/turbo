@@ -22,11 +22,11 @@
 namespace turbo::tlog {
     namespace level {
 
-        constexpr static string_view_t level_string_views[]TLOG_LEVEL_NAMES;
+        constexpr static std::string_view level_string_views[]TLOG_LEVEL_NAMES;
 
         static const char *short_level_names[]TLOG_SHORT_LEVEL_NAMES;
 
-        const string_view_t &to_string_view(turbo::tlog::level::level_enum l) noexcept {
+        const std::string_view &to_string_view(turbo::tlog::level::level_enum l) noexcept {
             return level_string_views[l];
         }
 
@@ -55,8 +55,8 @@ namespace turbo::tlog {
 
     tlog_ex::tlog_ex(const std::string &msg, int last_errno) {
         memory_buf_t outbuf;
-        fmt::format_system_error(outbuf, last_errno, msg.c_str());
-        msg_ = fmt::to_string(outbuf);
+        turbo::format_system_error(outbuf, last_errno, msg.c_str());
+        msg_ = turbo::to_string(outbuf);
     }
 
     const char *tlog_ex::what() const noexcept {

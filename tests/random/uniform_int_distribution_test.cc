@@ -104,7 +104,7 @@ namespace {
                     sample_min = sample;
                 }
             }
-            std::string msg = turbo::Format("Range: {}, {}", +sample_min, +sample_max);
+            std::string msg = turbo::format("Range: {}, {}", +sample_min, +sample_max);
             TURBO_RAW_LOG(INFO, "%s", msg.c_str());
         }
     }
@@ -187,10 +187,10 @@ namespace {
             // Chi-squared test failed. Output does not appear to be uniform.
             std::string msg;
             for (const auto &a: counts) {
-                turbo::FormatAppend(&msg, "{}\n", a);
+                turbo::format_append(&msg, "{}\n", a);
             }
-            turbo::FormatAppend(&msg, "{} p-value {}\n", kChiSquared, p_value);
-            turbo::FormatAppend(&msg, "High {} value: {} > {}", kChiSquared, chi_square, kThreshold);
+            turbo::format_append(&msg, "{} p-value {}\n", kChiSquared, p_value);
+            turbo::format_append(&msg, "High {} value: {} > {}", kChiSquared, chi_square, kThreshold);
             TURBO_RAW_LOG(INFO, "%s", msg.c_str());
             FAIL(msg);
         }

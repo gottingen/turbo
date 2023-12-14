@@ -940,13 +940,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::aborted_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status aborted_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kAborted, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kAborted, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -960,13 +960,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::already_exists_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status already_exists_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kAlreadyExists, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kAlreadyExists, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -980,13 +980,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::cancelled_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status cancelled_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kCancelled, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kCancelled, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1000,13 +1000,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::data_loss_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status data_loss_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kDataLoss, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kDataLoss, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1020,13 +1020,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::deadline_exceeded_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status deadline_exceeded_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kDeadlineExceeded, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kDeadlineExceeded, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1040,13 +1040,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::failed_precondition_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status failed_precondition_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kFailedPrecondition, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kFailedPrecondition, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1060,13 +1060,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::internal_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status internal_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kInternal, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kInternal, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1080,13 +1080,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::invalid_argument_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status invalid_argument_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kInvalidArgument, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kInvalidArgument, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1100,13 +1100,13 @@ namespace turbo {
      *        @code
      *        turbo::Status status = turbo::not_found_error("bad mode: {}", mode);
      *        @endcode
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status not_found_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kNotFound, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kNotFound, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1121,14 +1121,14 @@ namespace turbo {
      *        turbo::Status status = turbo::out_of_range_error("bad mode: {}", mode);
      *        @endcode
      *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      * @deprecated
      */
     template<typename ...Args>
     Status out_of_range_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kOutOfRange, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kOutOfRange, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1144,14 +1144,14 @@ namespace turbo {
      *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
      *        @endcode
      *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @deprecated
      * @return Status
      */
     template<typename ...Args>
     Status permission_denied_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kPermissionDenied, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kPermissionDenied, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1167,14 +1167,14 @@ namespace turbo {
      *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
      *        @endcode
      *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @deprecated
      * @return Status
      */
     template<typename ...Args>
     Status resource_exhausted_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kResourceExhausted, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kResourceExhausted, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1190,14 +1190,14 @@ namespace turbo {
      *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
      *        @endcode
      *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @deprecated
      * @return Status
      */
     template<typename ...Args>
     Status unauthenticated_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kUnauthenticated, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kUnauthenticated, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1213,14 +1213,14 @@ namespace turbo {
      *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
      *        @endcode
      *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @deprecated
      * @return Status
      */
     template<typename ...Args>
     Status unavailable_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kUnavailable, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kUnavailable, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1236,14 +1236,14 @@ namespace turbo {
      *        turbo::Status status = turbo::reach_file_end_error("bad mode: {}", mode);
      *        @endcode
      *        @note This function is not recommended to use. Use `turbo::reach_file_end_error()` instead.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @deprecated
      * @return Status
      */
     template<typename ...Args>
     Status unimplemented_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kUnimplemented, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kUnimplemented, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1257,7 +1257,7 @@ namespace turbo {
      */
     template<typename ...Args>
     Status unknown_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kUnknown, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kUnknown, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1271,7 +1271,7 @@ namespace turbo {
      */
     template<typename ...Args>
     Status file_not_exist_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kFileNotExist, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kFileNotExist, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1285,7 +1285,7 @@ namespace turbo {
      */
     template<typename ...Args>
     Status reach_file_end_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kReachFileEnd, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kReachFileEnd, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1299,7 +1299,7 @@ namespace turbo {
      */
     template<typename ...Args>
     Status disk_io_error(std::string_view fmt, Args &&...args) {
-        return Status(turbo::kDiskIOError, Format(fmt, std::forward<Args>(args)...));
+        return Status(turbo::kDiskIOError, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1313,13 +1313,13 @@ namespace turbo {
      *       turbo::Status status = turbo::make_status(turbo::kAborted, "bad mode: {}", mode);
      *       @endcode
      * @param errcode The error code.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status make_status(int errcode, std::string_view fmt, Args &&...args) {
-        return Status(errcode, Format(fmt, std::forward<Args>(args)...));
+        return Status(errcode, format(fmt, std::forward<Args>(args)...));
     }
 
     /**
@@ -1334,13 +1334,13 @@ namespace turbo {
      *      @endcode
      * @param module_index The module index.
      * @param errcode The error code.
-     * @param fmt The format string. @see turbo::Format()
+     * @param fmt The format string. @see turbo::format()
      * @param args The arguments to format the error message.
      * @return Status
      */
     template<typename ...Args>
     Status make_status(short module_index, int errcode, std::string_view fmt, Args &&...args) {
-        return Status(module_index, errcode, Format(fmt, std::forward<Args>(args)...));
+        return Status(module_index, errcode, format(fmt, std::forward<Args>(args)...));
     }
 
     /**

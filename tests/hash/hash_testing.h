@@ -164,7 +164,7 @@ namespace turbo {
 
             template<typename T>
             std::string operator()(const T *value) const {
-                return turbo::Format("#{}({})", index, testing::PrintToString(*value));
+                return turbo::format("#{}({})", index, testing::PrintToString(*value));
             }
         };
 
@@ -323,12 +323,12 @@ namespace turbo {
             using Out = std::vector<V>;
 
             template<size_t... I>
-            static Out DoImpl(const std::tuple<T...> &tuple, turbo::index_sequence<I...>) {
+            static Out DoImpl(const std::tuple<T...> &tuple, std::index_sequence<I...>) {
                 return Out{&std::get<I>(tuple)...};
             }
 
             static Out Do(const std::tuple<T...> &values) {
-                return DoImpl(values, turbo::index_sequence_for<T...>());
+                return DoImpl(values, std::index_sequence_for<T...>());
             }
         };
 

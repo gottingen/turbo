@@ -250,7 +250,7 @@ protected:
 
 #ifdef TLOG_WCHAR_TO_UTF8_SUPPORT
         wmemory_buf_t buf;
-        details::os::utf8_to_wstrbuf(string_view_t(formatted.data(), formatted.size()), buf);
+        details::os::utf8_to_wstrbuf(std::string_view(formatted.data(), formatted.size()), buf);
 
         LPCWSTR lp_wstr = buf.data();
         succeeded = static_cast<bool>(::ReportEventW(event_log_handle(), eventlog::get_event_type(msg), eventlog::get_event_category(msg), event_id_,
