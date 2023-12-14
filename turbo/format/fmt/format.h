@@ -637,7 +637,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return n < size ? n : size;
         }
 
-// Calculates the index of the nth code point in a UTF-8 string.
+        // Calculates the index of the nth code point in a UTF-8 string.
         inline auto code_point_index(std::string_view s, size_t n) -> size_t {
             const char *data = s.data();
             size_t num_code_points = 0;
@@ -750,33 +750,33 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
     }  // namespace fmt_detail
 
 
-// The number of characters to store in the basic_memory_buffer object itself
-// to avoid dynamic memory allocation.
+        // The number of characters to store in the basic_memory_buffer object itself
+        // to avoid dynamic memory allocation.
     enum {
         inline_buffer_size = 500
     };
 
-/**
-  \rst
-  A dynamically growing memory buffer for trivially copyable/constructible types
-  with the first ``SIZE`` elements stored in the object itself.
+        /**
+          \rst
+          A dynamically growing memory buffer for trivially copyable/constructible types
+          with the first ``SIZE`` elements stored in the object itself.
 
-  You can use the ``memory_buffer`` type alias for ``char`` instead.
+          You can use the ``memory_buffer`` type alias for ``char`` instead.
 
-  **Example**::
+          **Example**::
 
-     auto out = turbo::memory_buffer();
-     format_to(std::back_inserter(out), "The answer is {}.", 42);
+             auto out = turbo::memory_buffer();
+             format_to(std::back_inserter(out), "The answer is {}.", 42);
 
-  This will append the following output to the ``out`` object:
+          This will append the following output to the ``out`` object:
 
-  .. code-block:: none
+          .. code-block:: none
 
-     The answer is 42.
+             The answer is 42.
 
-  The output can be converted to an ``std::string`` with ``to_string(out)``.
-  \endrst
- */
+          The output can be converted to an ``std::string`` with ``to_string(out)``.
+          \endrst
+         */
     template<typename T, size_t SIZE = inline_buffer_size,
             typename Allocator = std::allocator<T>>
     class basic_memory_buffer final : public fmt_detail::buffer<T> {

@@ -120,8 +120,8 @@ namespace turbo {
         return vformat(turbo::wstring_view(fmt), turbo::make_wformat_args(args...));
     }
 
-// Pass char_t as a default template parameter instead of using
-// std::basic_string<char_t<S>> to reduce the symbol size.
+    // Pass char_t as a default template parameter instead of using
+    // std::basic_string<char_t<S>> to reduce the symbol size.
     template<typename S, typename... Args, typename Char = char_t<S>,
             TURBO_ENABLE_IF(!std::is_same<Char, char>::value &&
                             !std::is_same<Char, wchar_t>::value)>

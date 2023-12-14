@@ -187,7 +187,7 @@ namespace turbo {
         strikethrough = 1 << 7,
     };
 
-    constexpr bool operator &(emphasis lhs, emphasis rhs) noexcept {
+    constexpr bool operator&(emphasis lhs, emphasis rhs) noexcept {
         return static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs);
     }
 
@@ -477,14 +477,14 @@ namespace turbo {
                 auto background = fmt_detail::make_background_color<Char>(ts.get_background());
                 buf.append(background.begin(), background.end());
             }
-            fmt_detail::vformat_to(buf, format_str, args,{});
+            fmt_detail::vformat_to(buf, format_str, args, {});
             if (has_style)
                 fmt_detail::reset_color<Char>(buf);
         }
 
     }  // namespace fmt_detail
 
-    inline void vprint(std::FILE *f, const text_style &ts, std::string_view fmt,format_args args) {
+    inline void vprint(std::FILE *f, const text_style &ts, std::string_view fmt, format_args args) {
         // Legacy wide streams are not supported.
         auto buf = memory_buffer();
         fmt_detail::vformat_to(buf, ts, fmt, args);
@@ -502,9 +502,7 @@ namespace turbo {
     template<typename S, typename Char = char_t<S>>
     inline std::basic_string<Char> vformat(
             const text_style &ts, const S &format_str,
-            basic_format_args<buffer_context<type_identity_t<Char>>
-
-            > args) {
+            basic_format_args<buffer_context<type_identity_t<Char>>> args) {
         basic_memory_buffer<Char> buf;
         fmt_detail::vformat_to(buf, ts, to_string_view(format_str), args
         );
@@ -521,9 +519,7 @@ namespace turbo {
 
     OutputIt vformat_to(
             OutputIt out, const text_style &ts, std::basic_string_view<Char> format_str,
-            basic_format_args<buffer_context<type_identity_t<Char>>
-
-            > args) {
+            basic_format_args<buffer_context<type_identity_t<Char>>> args) {
         auto &&buf = fmt_detail::get_buffer<Char>(out);
         fmt_detail::vformat_to(buf, ts, format_str, args
         );
@@ -570,7 +566,185 @@ namespace turbo {
 
     };
 
+    /**
+     * @brief apply the style to a buff
+     * @tparam Char charactor type
+     * @tparam Out output iterator
+     * @param ts
+     * @return the iterator has write
+     */
+    template<typename Char, typename Out>
+    Out apply_text_style(text_style ts, Out output);
 
+    class text_style_builder {
+    public:
+        constexpr text_style_builder() noexcept: ts_() {}
+
+        explicit constexpr text_style_builder(const text_style &ts) noexcept: ts_(ts) {}
+
+        constexpr text_style_builder &operator|=(const text_style &rhs) noexcept {
+            ts_ |= rhs;
+            return *this;
+        }
+
+        constexpr text_style_builder &operator|=(const text_style_builder &rhs) noexcept {
+            ts_ |= rhs.ts_;
+            return *this;
+        }
+
+        constexpr text_style_builder &operator|=(emphasis em) noexcept {
+            ts_ |= em;
+            return *this;
+        }
+
+        explicit constexpr operator text_style() const noexcept { return ts_; }
+
+        [[nodiscard]] constexpr text_style get() const noexcept { return ts_; }
+
+        void set(text_style ts) noexcept { ts_ = ts; }
+
+        void reset() noexcept { ts_ = text_style(); }
+
+        text_style_builder &merge(text_style_builder rhs) {
+            ts_ |= rhs.ts_;
+            return *this;
+        }
+
+        text_style_builder &merge(text_style rhs) {
+            ts_ |= rhs;
+            return *this;
+        }
+
+        text_style_builder &fg(color foreground) noexcept {
+            ts_ | turbo::fg(foreground);
+            return *this;
+        }
+
+        text_style_builder &fg(terminal_color tc) noexcept {
+            ts_ |= turbo::fg(fmt_detail::color_type(tc));
+            return *this;
+        }
+
+        text_style_builder &bg(color background) noexcept {
+            ts_ | turbo::bg(background);
+            return *this;
+        }
+
+        text_style_builder &bg(terminal_color tc) noexcept {
+            ts_ |= turbo::bg(fmt_detail::color_type(tc));
+            return *this;
+        }
+
+        text_style_builder &emphasis(emphasis em) noexcept {
+            ts_ | em;
+            return *this;
+        }
+
+        text_style_builder &bold() noexcept {
+            ts_ | emphasis::bold;
+            return *this;
+        }
+
+        text_style_builder &faint() noexcept {
+            ts_ | emphasis::faint;
+            return *this;
+        }
+
+        text_style_builder &italic() noexcept {
+            ts_ | emphasis::italic;
+            return *this;
+        }
+
+        text_style_builder &underline() noexcept {
+            ts_ | emphasis::underline;
+            return *this;
+        }
+
+        text_style_builder &blink() noexcept {
+            ts_ | emphasis::blink;
+            return *this;
+        }
+
+        text_style_builder &reverse() noexcept {
+            ts_ | emphasis::reverse;
+            return *this;
+        }
+
+        text_style_builder &conceal() noexcept {
+            ts_ | emphasis::conceal;
+            return *this;
+        }
+
+        text_style_builder strikethrough() noexcept {
+            ts_ | emphasis::strikethrough;
+            return *this;
+        }
+
+        [[nodiscard]] std::string apply() const {
+            std::string buff;
+            buff.resize(500);
+            auto out = apply_text_style<char>(ts_, buff.begin());
+            buff.resize(out - buff.begin());
+            return buff;
+        }
+
+    private:
+        text_style ts_;
+    };
+
+    template<typename Char, typename Out>
+    Out apply_text_style(text_style ts, Out output) {
+        if (ts.has_emphasis()) {
+            auto emphasis = fmt_detail::make_emphasis<char>(ts.get_emphasis());
+            output = std::copy(emphasis.begin(), emphasis.end(), output);
+        }
+        if (ts.has_foreground()) {
+            auto foreground = fmt_detail::make_foreground_color<char>(ts.get_foreground());
+            output = std::copy(foreground.begin(), foreground.end(), output);
+        }
+        if (ts.has_background()) {
+            auto background = fmt_detail::make_background_color<char>(ts.get_background());
+            output = std::copy(background.begin(), background.end(), output);
+        }
+        return output;
+    }
+
+
+    inline text_style_builder operator|(const text_style_builder &lhs,
+                                        const text_style &rhs) noexcept {
+        return text_style_builder(lhs) |= rhs;
+    }
+
+    inline text_style_builder operator|(const text_style &lhs,
+                                        const text_style_builder &rhs) noexcept {
+        return text_style_builder(lhs) |= rhs;
+    }
+
+    inline text_style_builder operator|(const text_style_builder &lhs,
+                                        const text_style_builder &rhs) noexcept {
+        return text_style_builder(lhs) |= rhs;
+    }
+
+    inline std::string apply_text_style(text_style_builder ts) {
+        return std::move(ts.apply());
+    }
+
+    static constexpr std::string_view KResetStyle = "\x1b[0m";
+
+    inline std::string_view reset_text_style() {
+        return KResetStyle;
+    }
+
+    static constexpr std::string_view kBackLine = "\033[F";
+
+    inline std::string back_lines(size_t n) {
+        std::string result;
+        result.reserve(n * kBackLine.size());
+        for (size_t i = 0; i < n; ++i) {
+            result.append(kBackLine.data(), kBackLine.size());
+        }
+        return result;
+    }
 }  // namespace turbo
 
 #endif  // FMT_COLOR_H_

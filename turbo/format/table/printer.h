@@ -50,7 +50,8 @@ namespace turbo {
         static std::string print_content_left_aligned(const std::string &cell_content,
                                                const EntityFormat &format, size_t text_with_padding_size,
                                                size_t column_width) {
-            return  turbo::format(format.font_style_, "{:^{}}", cell_content, column_width - text_with_padding_size + cell_content.size());
+            std::string padding(column_width - text_with_padding_size, ' ');
+            return  turbo::format(format.font_style_, "{}{}", padding, cell_content);
         }
 
         static std::string print_content_center_aligned(const std::string &cell_content,
@@ -72,8 +73,8 @@ namespace turbo {
         static std::string print_content_right_aligned(const std::string &cell_content,
                                                 const EntityFormat &format, size_t text_with_padding_size,
                                                 size_t column_width) {
-
-            return  turbo::format(format.font_style_, "{:>{}}", cell_content, column_width - text_with_padding_size + cell_content.size());
+            std::string padding(column_width - text_with_padding_size, ' ');
+            return  turbo::format(format.font_style_, "{}{}", cell_content, padding);
         }
 
     };

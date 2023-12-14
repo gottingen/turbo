@@ -69,8 +69,7 @@ namespace turbo {
      \endrst
     */
     template<typename T>
-    constexpr auto styled(const T &value, text_style ts)
-    -> fmt_detail::styled_arg<turbo::remove_cvref_t<T>> {
+    constexpr auto styled(const T &value, text_style ts) -> fmt_detail::styled_arg<turbo::remove_cvref_t<T>> {
         return fmt_detail::styled_arg<turbo::remove_cvref_t<T>>
                 {value, ts};
     }
@@ -119,7 +118,6 @@ namespace turbo {
     }
 
 
-
     template<typename String = std::string, typename T>
     TURBO_MUST_USE_RESULT inline String format(const T &t) {
         String result;
@@ -162,7 +160,7 @@ namespace turbo {
     String format_range(std::string_view fmt, It begin, Sentinel end, std::string_view sep) {
         turbo::memory_buffer view_buf;
         turbo::format_to(std::back_inserter(view_buf), fmt,
-                       turbo::join(std::forward<It>(begin), std::forward<Sentinel>(end), sep));
+                         turbo::join(std::forward<It>(begin), std::forward<Sentinel>(end), sep));
         return String(view_buf.data(), view_buf.size());
     }
 
@@ -175,7 +173,8 @@ namespace turbo {
 
     /// format_range_append
     template<typename String = std::string, typename ...Args>
-    void format_range_append(String *dst, std::string_view fmt, const std::tuple<Args...> &tuple, std::string_view sep) {
+    void
+    format_range_append(String *dst, std::string_view fmt, const std::tuple<Args...> &tuple, std::string_view sep) {
         turbo::memory_buffer view_buf;
         turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(tuple, sep));
         dst->append(view_buf.data(), view_buf.size());
@@ -202,6 +201,8 @@ namespace turbo {
         turbo::format_to(std::back_inserter(view_buf), fmt, turbo::join(std::forward<Range>(range), sep));
         dst->append(view_buf.data(), view_buf.size());
     }
+
+
 }  // namespace turbo
 
 #endif  // TURBO_FORMAT_FORMAT_H_

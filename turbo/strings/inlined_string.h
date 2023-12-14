@@ -1547,8 +1547,8 @@ namespace turbo {
         template<typename H>
         friend H
         hash_value(H hash_state,
-                       const turbo::basic_inlined_string<value_type, traits_type,
-                               allocator_type> &str) {
+                   const turbo::basic_inlined_string<value_type, traits_type,
+                           allocator_type> &str) {
             return H::combine(
                     std::move(hash_state),
                     std::string_view(str.data(), str.size() * sizeof(value_type)));
@@ -2300,8 +2300,8 @@ namespace turbo {
         return npos;
     }
 
-// non-member functions
-// C++11 21.4.8.1/1
+    // non-member functions
+    // C++11 21.4.8.1/1
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(const basic_inlined_string<E, T, A, S> &lhs,
@@ -2312,7 +2312,7 @@ namespace turbo {
         return result;
     }
 
-// C++11 21.4.8.1/2
+    // C++11 21.4.8.1/2
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(basic_inlined_string<E, T, A, S> &&lhs,
@@ -2320,7 +2320,7 @@ namespace turbo {
         return std::move(lhs.append(rhs));
     }
 
-// C++11 21.4.8.1/3
+    // C++11 21.4.8.1/3
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(const basic_inlined_string<E, T, A, S> &lhs,
@@ -2342,7 +2342,7 @@ namespace turbo {
         return std::move(lhs.append(rhs));
     }
 
-// C++11 21.4.8.1/5
+    // C++11 21.4.8.1/5
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(const E *lhs, const basic_inlined_string<E, T, A, S> &rhs) {
@@ -2354,7 +2354,7 @@ namespace turbo {
         return result;
     }
 
-// C++11 21.4.8.1/6
+    // C++11 21.4.8.1/6
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(const E *lhs, basic_inlined_string<E, T, A, S> &&rhs) {
@@ -2372,7 +2372,7 @@ namespace turbo {
         return result;
     }
 
-// C++11 21.4.8.1/7
+    // C++11 21.4.8.1/7
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(E lhs, const basic_inlined_string<E, T, A, S> &rhs) {
@@ -2383,7 +2383,7 @@ namespace turbo {
         return result;
     }
 
-// C++11 21.4.8.1/8
+    // C++11 21.4.8.1/8
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(E lhs, basic_inlined_string<E, T, A, S> &&rhs) {
@@ -2412,7 +2412,7 @@ namespace turbo {
         return result;
     }
 
-// C++11 21.4.8.1/10
+    // C++11 21.4.8.1/10
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(basic_inlined_string<E, T, A, S> &&lhs, const E *rhs) {
@@ -2420,7 +2420,7 @@ namespace turbo {
         return std::move(lhs += rhs);
     }
 
-// C++11 21.4.8.1/11
+    // C++11 21.4.8.1/11
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(const basic_inlined_string<E, T, A, S> &lhs, E rhs) {
@@ -2431,7 +2431,7 @@ namespace turbo {
         return result;
     }
 
-// C++11 21.4.8.1/12
+    // C++11 21.4.8.1/12
     template<typename E, class T, class A, class S>
     inline basic_inlined_string<E, T, A, S>
     operator+(basic_inlined_string<E, T, A, S> &&lhs, E rhs) {

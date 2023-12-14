@@ -24,6 +24,7 @@
 /**
  * @defgroup turbo_fmt_print turbo::print
  * @defgroup turbo_fmt_format turbo::format
+ * @defgroup turbo_fmt_format_style turbo::format
  * @defgroup turbo_fmt_format_table turbo::format::table
  */
  

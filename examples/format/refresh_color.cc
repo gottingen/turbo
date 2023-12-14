@@ -32,15 +32,15 @@ int main() {
 
     while (keep_running) {
         Table process_table;
-        process_table.add_row(Row_t{" ", "*", " ", " ", " ", " ", " ", "*", " ", "*", " ", " ", " ", " ", " ", " "});
-        process_table.add_row(Row_t{" ", "*", " ", "*", " ", "*", " ", "*", " ", "*", " ", " ", " ", " ", " ", " "});
-        process_table.add_row(Row_t{"*", "*", "*", "*", " ", "*", " ", "*", "*", "*", " ", " ", " ", " ", " ", " "});
-        process_table.add_row(Row_t{" ", "*", " ", "*", " ", "*", " ", "*", " ", "*", " ", " ", " ", " ", " ", " "});
-        process_table.add_row(Row_t{" ", "*", " ", "*", " ", "*", " ", "*", " ", "*", " ", " ", " ", " ", "*", " "});
-        process_table.add_row(Row_t{" ", "*", " ", "*", " ", "*", " ", "*", " ", "8", "*", "*", " ", "* ", " ", "*"});
-        process_table.add_row(Row_t{" ", "*", " ", "*", " ", "*", " ", "*", " ", "*", " ", "*", "*", " ", " ", "*"});
-        process_table.add_row(Row_t{" ", "*", "*", "*", " ", "*", " ", "*", " ", "*", " ", "*", " ", "*", " ", "*"});
-        process_table.add_row(Row_t{" ", "*", " ", " ", "*", " ", " ", "*", " ", "*", "*", " ", " ", " ", "*", " "});
+        process_table.add_row(Row_t{" ", "|", " ", " ", " ", " ", " ", "|", " ", "|", " ", " ", " ", " ", " ", " "});
+        process_table.add_row(Row_t{" ", "|", " ", "|", " ", "|", " ", "|", " ", "|", " ", " ", " ", " ", " ", " "});
+        process_table.add_row(Row_t{"-", "|", "-", "|", " ", "|", " ", "|", " ", "|", " ", " ", " ", " ", " ", " "});
+        process_table.add_row(Row_t{" ", "|", " ", "|", " ", "|", " ", "|", "/", "|", " ", " ", " ", " ", " ", " "});
+        process_table.add_row(Row_t{" ", "|", " ", "|", " ", "|", " ", "|", " ", "|", " ", " ", " ", "-", "-", " "});
+        process_table.add_row(Row_t{" ", "|", " ", "|", " ", "|", " ", "|", " ", "|", "/", "\\", "/", "", " ", "\\"});
+        process_table.add_row(Row_t{" ", "|", " ", "|", " ", "|", " ", "|", " ", "|", " ", "|", "|", " ", " ", "|"});
+        process_table.add_row(Row_t{" ", "|", "/", "\\", " ", "/", " ", "|", " ", "|", " ", "/", "\\", " ", " ", "/"});
+        process_table.add_row(Row_t{" ", "|", " ", " ", "-", " ", " ", "|", " ", "|", "-", " ", " ", "-", "-", " "});
         bool need_to_change = false;
         size_t bc;
         size_t fc;
@@ -49,8 +49,8 @@ int main() {
                 need_to_change = true;
             }
             if(need_to_change){
-                bc = turbo::uniform<size_t>(0, colors.size() - 1);
-                fc = turbo::uniform<size_t>(0, colors.size() - 1);
+                bc = turbo::uniform(0ul, colors.size() - 1);
+                fc = turbo::uniform(0ul, colors.size() - 1);
                 need_to_change = false;
             }
             for (size_t i = 0; i < 9; ++i) {
@@ -59,12 +59,25 @@ int main() {
                     //process_table[i][j].set_text(std::string(1, cc));
                     process_table[i][j].format().font_style(bg(colors[bc]));
                     process_table[i][j].format().font_style(fg(colors[fc]));
+                    process_table[i][j].format().border_left_color(bg(colors[bc]));
+                    process_table[i][j].format().border_left_color(fg(colors[bc]));
+                    process_table[i][j].format().border_top_color(fg(colors[bc]));
+                    process_table[i][j].format().border_top_color(bg(colors[bc]));
+                    process_table[i][j].format().border_bottom_color(fg(colors[bc]));
+                    process_table[i][j].format().border_bottom_color(bg(colors[bc]));
+                    process_table[i][j].format().border_right_color(fg(colors[bc]));
+                    process_table[i][j].format().border_right_color(bg(colors[bc]));
+                    process_table[i][j].format().corner_top_left_color(fg(colors[bc]));
+                    process_table[i][j].format().corner_top_left_color(bg(colors[bc]));
+                    process_table[i][j].format().corner_bottom_left_color(fg(colors[bc]));
+                    process_table[i][j].format().corner_bottom_left_color(bg(colors[bc]));
+                    process_table[i][j].format().corner_bottom_right_color(fg(colors[bc]));
+                    process_table[i][j].format().corner_bottom_right_color(bg(colors[bc]));
+                    process_table[i][j].format().corner_top_right_color(fg(colors[bc]));
+                    process_table[i][j].format().corner_top_right_color(bg(colors[bc]));
                 }
 
-                //process_table[i][j].format().border_left_color(bg(colors[c]));
-                //process_table[i][j].format().border_left_color(fg(colors[c]));
-                //process_table[i][j].format().border_top_color(fg(colors[c]));
-                //process_table[i][j].format().border_top_color(bg(colors[c]));
+
             }
         }
 

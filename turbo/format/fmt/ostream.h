@@ -23,8 +23,8 @@ namespace turbo {
 
     namespace fmt_detail {
 
-// Generate a unique explicit instantion in every translation unit using a tag
-// type in an anonymous namespace.
+        // Generate a unique explicit instantion in every translation unit using a tag
+        // type in an anonymous namespace.
         namespace {
             struct file_access_tag {
             };
@@ -72,8 +72,8 @@ namespace turbo {
             return false;
         }
 
-// Write the content of buf to os.
-// It is a separate function rather than a part of vprint to simplify testing.
+        // Write the content of buf to os.
+        // It is a separate function rather than a part of vprint to simplify testing.
         template<typename Char>
         void write_buffer(std::basic_ostream<Char> &os, buffer<Char> &buf) {
             const Char *buf_data = buf.data();
@@ -107,7 +107,7 @@ namespace turbo {
 
     }  // namespace fmt_detail
 
-// Formats an object of type T that has an overloaded ostream operator<<.
+    // Formats an object of type T that has an overloaded ostream operator<<.
     template<typename Char>
     struct basic_ostream_formatter : formatter<std::basic_string_view<Char>, Char> {
         void set_debug_format() = delete;
