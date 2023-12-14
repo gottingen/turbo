@@ -21,6 +21,11 @@
 
 #include "turbo/module/module_version.h"
 
+/**
+ * @defgroup turbo_fmt_print turbo::print
+ * @defgroup turbo_fmt_format turbo::format
+ * @defgroup turbo_fmt_format_table turbo::format::table
+ */
  
 namespace turbo {
 

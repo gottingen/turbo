@@ -25,16 +25,20 @@
 
 namespace turbo {
 
+
     /**
-          \rst
-          Formats ``args`` according to specifications in ``fmt`` and writes the output
-          to ``stdout``.
-
-          **Example**::
-
-            turbo::print("Elapsed time: {0:.2f} seconds", 1.23);
-          \endrst
-         */
+      * @ingroup turbo_fmt_print
+      * @brief Formats ``args`` according to specifications in ``fmt`` and writes the output to ``stdout``.
+      *         Example:
+      *         @code{.cpp}
+      *         turbo::print("Elapsed time: {0:.2f} seconds", 1.23);
+      *         @endcode
+      *         Output:
+      *         @code{.unparsed}
+      *         Elapsed time: 1.23 seconds
+      *         @endcode
+      *         The print module is part of the turbo::format module.
+      */
     template<typename... T>
     TURBO_FORCE_INLINE void print(format_string<T...> fmt, T &&... args) {
         const auto &vargs = turbo::make_format_args(args...);

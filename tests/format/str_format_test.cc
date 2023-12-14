@@ -79,14 +79,9 @@ TEST_CASE("format -enum") {
    };
    turbo::println("{}", vv);
 }
-/*
+
 TEST_CASE("format container smart pointer") {
-    std::vector<std::unique_ptr<int>> v;
-    v.emplace_back(std::make_unique<int>(42));
-    v.emplace_back(std::make_unique<int>(43));
-    turbo::println("{}", v);
-    std::vector<std::shared_ptr<int>> v1;
-    v1.emplace_back(std::make_shared<int>(42));
-    v1.emplace_back(std::make_shared<int>(43));
-    turbo::println("{}", v1);
-}*/
+   std::shared_ptr<double> ptr;
+   turbo::println("{}", ptr);
+   turbo::println("{}", turbo::underlying(TestE::B));
+}

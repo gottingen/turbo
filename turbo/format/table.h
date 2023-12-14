@@ -16,6 +16,15 @@
 #ifndef TURBO_FORMAT_TABLE_H_
 #define TURBO_FORMAT_TABLE_H_
 
+/**
+ * @file table.h
+ * @ingroup turbo_fmt_format_table
+ * @brief The table module provides a simple way to format data into a table.
+ * @details The table module provides a simple way to format data into a table.
+ *         It is designed to be easy to use and to handle large amounts of data.
+ *         The table module is part of the turbo::format module.
+ *
+ */
 #include "turbo/format/table/table.h"
 #include "turbo/format/table/markdown_exporter.h"
 #include "turbo/format/table/latex_exporter.h"

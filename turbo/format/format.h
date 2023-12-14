@@ -28,16 +28,22 @@
 namespace turbo {
 
     /**
-          \rst
-          Formats ``args`` according to specifications in ``fmt`` and returns the result
-          as a string.
-
-          **Example**::
-
-            #include <fmt/core.h>
-            std::string message = turbo::format("The answer is {}.", 42);
-          \endrst
-        */
+     * @defgroup turbo_fmt_format turbo::format
+     * @brief The format module provides a fast and safe alternative to C stdio and C++ iostreams.
+     * @details The format module provides a fast and safe alternative to C stdio and C++ iostreams.
+     *          It is designed to be easy to use and to handle large amounts of data.
+     *          The format module is part of the turbo::format module.
+     *
+     *          Example:
+     *          @code{.cpp}
+     *          std::string message = turbo::format("The answer is {}.", 42);
+     *          @endcode
+     *          Output:
+     *          @code{.unparsed}
+     *          The answer is 42.
+     *          @endcode
+     * @ingroup turbo_fmt_format
+     */
     template<typename... T>
     [[nodiscard]] TURBO_FORCE_INLINE auto format(format_string<T...> fmt, T &&... args) -> std::string {
         return vformat(fmt, turbo::make_format_args(args...));

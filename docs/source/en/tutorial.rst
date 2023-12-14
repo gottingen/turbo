@@ -16,6 +16,16 @@ base guidance
 strings guidance
 =================================
 
+formatting guidance
+=================================
+
+..  toctree::
+    :maxdepth: 3
+
+    fmt/format
+    fmt/print
+    fmt/table
+
 simd guidance
 ==================================
 

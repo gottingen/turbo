@@ -23,6 +23,29 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_fmt_format_table
+     * @brief The Table class is the main class of the table module.
+     *        It provides a simple way to format data into a table.
+     *
+     *        Example:
+     *        @code{.cpp}
+     *        Table process_table;
+     *        process_table.add_row({"turbo", "1234", "0.1"});
+     *        process_table.add_row({"turbo", "1235", "0.2"});
+     *        std::cout << process_table << std::endl;
+     *        @endcode
+     *        Output:
+     *        @code{.unparsed}
+     *        +--------+------+-----+
+     *        |turbo   |1234  |0.1  |
+     *        +--------+------+-----+
+     *        |turbo   |1235  |0.2  |
+     *        +--------+------+-----+
+     *        @endcode
+     *        The table module is part of the turbo::format module.
+     */
+
     class Table {
     public:
         Table() : table_(TableInternal::create()) {}

@@ -43,6 +43,7 @@ Contents
 
     en/api/base
     en/api/files
+    en/api/format
     en/api/hash
     en/api/memory
     en/api/platform
