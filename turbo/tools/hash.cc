@@ -48,8 +48,9 @@ namespace turbo::tools {
                 result.add_row({"hash", turbo::format(turbo::Hash<std::string, xx_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
                 break;
         }
+
         result.column(0).format().font_color(turbo::color::yellow);
-        result.column(1).format().font_color(turbo::color::green);
+        result.column(1).format().font_color(turbo::color::light_sky_blue);
         std::cout << result << std::endl;
     }
 }  // namespace turbo::tools
