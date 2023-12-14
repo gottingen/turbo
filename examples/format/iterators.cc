@@ -35,7 +35,7 @@ int main() {
 
   // Iterate over cells in the first row
   for (auto &cell : table[0]) {
-    cell.format().font_style({FontStyle::underline}).font_align(FontAlign::center);
+    cell.format().font_style({emphasis::underline}).font_align(FontAlign::center);
   }
 
   // Iterator over cells in the second column
@@ -48,12 +48,12 @@ int main() {
   // Iterate over rows in the table
   size_t index = 0;
   for (auto &row : table) {
-    row.format().font_style({FontStyle::bold});
+    row.format().font_style({emphasis::bold});
 
     // Set blue background color for alternate rows
     if (index > 0 && index % 2 == 0) {
       for (auto &cell : row) {
-        cell.format().font_background_color(Color::blue);
+        cell.format().font_style(bg(color::blue));
       }
     }
     index += 1;

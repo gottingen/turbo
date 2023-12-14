@@ -60,17 +60,18 @@ namespace turbo {
             auto format = cell.format();
             std::string cell_string = cell.get_text();
 
-            auto font_style = format.font_style_.value();
+            auto font_style = format.font_style_;
 
             bool format_bold = false;
             bool format_italic = false;
-            std::for_each(font_style.begin(), font_style.end(), [&](FontStyle &style) {
-                if (style == FontStyle::bold) {
-                    format_bold = true;
-                } else if (style == FontStyle::italic) {
-                    format_italic = true;
-                }
-            });
+            if(font_style.has_emphasis()) {
+                auto emphasis = font_style.get_emphasis();
+                    if(emphasis & turbo::emphasis::bold) {
+                        format_bold = true;
+                    } else if(emphasis & turbo::emphasis::italic) {
+                        format_italic = true;
+                    }
+            }
 
             if (format_bold) {
                 ss << '*';

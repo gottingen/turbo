@@ -20,7 +20,7 @@ int main() {
 
   // Table.format() will apply styles for the whole table
   universal_constants.format()
-      .font_style({FontStyle::bold})
+      .font_style({emphasis::bold})
       .border_top(" ")
       .border_bottom(" ")
       .border_left(" ")
@@ -34,14 +34,14 @@ int main() {
       .padding_top(1)
       .padding_bottom(1)
       .font_align(FontAlign::center)
-      .font_style({FontStyle::underline})
-      .font_background_color(Color::red);
+      .font_style({emphasis::underline})
+      .font_style(fg(color::red));
 
   // Table.column(index) is used to access a particular column
   // You can use this to access and format a specific column
-  universal_constants.column(1).format().font_color(Color::yellow);
+  universal_constants.column(1).format().font_color(color::yellow);
 
-  universal_constants[0][1].format().font_background_color(Color::blue).font_color(Color::white);
+  universal_constants[0][1].format().font_style(bg(color::blue)).font_style(fg(color::white));
 
   std::cout << universal_constants << std::endl;
 }

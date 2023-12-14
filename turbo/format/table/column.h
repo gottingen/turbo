@@ -194,15 +194,15 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_color(value);
+            cell.get().format().border_color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_background_color(value);
+            cell.get().format().border_color(bg(value));
         return *this;
     }
 
@@ -212,15 +212,15 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_left_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_left_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_left_color(value);
+            cell.get().format().border_left_color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_left_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_left_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_left_background_color(value);
+            cell.get().format().border_left_color(bg(value));
         return *this;
     }
 
@@ -230,15 +230,15 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_right_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_right_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_right_color(value);
+            cell.get().format().border_right_color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_right_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_right_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_right_background_color(value);
+            cell.get().format().border_right_color(bg(value));
         return *this;
     }
 
@@ -248,15 +248,15 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_top_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_top_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_top_color(value);
+            cell.get().format().border_top_color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_top_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_top_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_top_background_color(value);
+            cell.get().format().border_top_color(bg(value));
         return *this;
     }
 
@@ -266,15 +266,15 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_bottom_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_bottom_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_bottom_color(value);
+            cell.get().format().border_bottom_color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::border_bottom_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::border_bottom_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().border_bottom_background_color(value);
+            cell.get().format().border_bottom_color(bg(value));
         return *this;
     }
 
@@ -284,15 +284,15 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::corner_color(Color value) {
+    inline ColumnFormat &ColumnFormat::corner_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().corner_color(value);
+            cell.get().format().corner_color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::corner_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::corner_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().corner_background_color(value);
+            cell.get().format().corner_color(bg(value));
         return *this;
     }
 
@@ -302,15 +302,15 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::column_separator_color(Color value) {
+    inline ColumnFormat &ColumnFormat::column_separator_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().column_separator_color(value);
+            cell.get().format().column_separator_color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::column_separator_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::column_separator_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().column_separator_background_color(value);
+            cell.get().format().column_separator_color(bg(value));
         return *this;
     }
 
@@ -320,33 +320,33 @@ namespace turbo {
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::font_style(const std::vector<FontStyle> &style) {
+    inline ColumnFormat &ColumnFormat::font_style(const turbo::emphasis &style) {
         for (auto &cell: column_.get().cells_)
             cell.get().format().font_style(style);
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::font_color(Color value) {
+    inline ColumnFormat &ColumnFormat::font_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().font_color(value);
+            cell.get().format().font_style(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::font_background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::font_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().font_background_color(value);
+            cell.get().format().font_style(bg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::color(Color value) {
+    inline ColumnFormat &ColumnFormat::color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().color(value);
+            cell.get().format().color(fg(value));
         return *this;
     }
 
-    inline ColumnFormat &ColumnFormat::background_color(Color value) {
+    inline ColumnFormat &ColumnFormat::background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().background_color(value);
+            cell.get().format().color(bg(value));
         return *this;
     }
 

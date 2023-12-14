@@ -16,6 +16,7 @@
 #pragma once
 
 #include "turbo/format/table/table_internal.h"
+#include "turbo/format/table/printer.h"
 #include <string_view>
 #include <variant>
 #include <utility>
@@ -74,7 +75,7 @@ namespace turbo {
 
         EntityFormat &format() { return table_->format(); }
 
-        void print(std::ostream &stream) { table_->print(stream); }
+        void print(std::ostream &stream) { Printer::print_table(stream, *table_);}
 
         std::string str() {
             std::stringstream stream;
@@ -84,7 +85,17 @@ namespace turbo {
 
         size_t size() const { return table_->size(); }
 
-        std::pair<size_t, size_t> shape() { return table_->shape(); }
+        std::pair<size_t, size_t> shape() {
+            std::pair<size_t, size_t> result{0, 0};
+            std::stringstream stream;
+            print(stream);
+            auto buffer = stream.str();
+            auto lines = EntityFormat::split_lines(buffer, "\n", "", true);
+            if (lines.size()) {
+                result = {get_sequence_length(lines[0], "", true), lines.size()};
+            }
+            return result;
+        }
 
         class RowIterator {
         public:

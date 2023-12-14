@@ -33,8 +33,8 @@ int main() {
 
     employees.column(0)
             .format()
-            .font_style({FontStyle::bold})
-            .font_color(Color::white)
+            .font_style({emphasis::bold})
+            .font_color(color::white)
             .font_align(FontAlign::right);
 
     employees.column(3).format().font_align(FontAlign::center);

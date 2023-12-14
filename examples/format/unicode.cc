@@ -7,9 +7,9 @@ int main() {
 
   table.format()
       .corner("♥")
-      .font_style({FontStyle::bold})
-      .corner_color(Color::magenta)
-      .border_color(Color::magenta);
+      .font_style({emphasis::bold})
+      .corner_color(fg(color::magenta))
+      .border_color(fg(color::magenta));
 
   table.add_row(Row_t{"English", "I love you"});
   table.add_row(Row_t{"French", "Je t’aime"});

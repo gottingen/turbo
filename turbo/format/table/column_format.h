@@ -39,60 +39,60 @@ namespace turbo {
         // Border
         ColumnFormat &border(const std::string &value);
 
-        ColumnFormat &border_color(Color value);
+        ColumnFormat &border_color(turbo::color value);
 
-        ColumnFormat &border_background_color(Color value);
+        ColumnFormat &border_background_color(turbo::color value);
 
         ColumnFormat &border_left(const std::string &value);
 
-        ColumnFormat &border_left_color(Color value);
+        ColumnFormat &border_left_color(turbo::color value);
 
-        ColumnFormat &border_left_background_color(Color value);
+        ColumnFormat &border_left_background_color(turbo::color value);
 
         ColumnFormat &border_right(const std::string &value);
 
-        ColumnFormat &border_right_color(Color value);
+        ColumnFormat &border_right_color(turbo::color value);
 
-        ColumnFormat &border_right_background_color(Color value);
+        ColumnFormat &border_right_background_color(turbo::color value);
 
         ColumnFormat &border_top(const std::string &value);
 
-        ColumnFormat &border_top_color(Color value);
+        ColumnFormat &border_top_color(turbo::color value);
 
-        ColumnFormat &border_top_background_color(Color value);
+        ColumnFormat &border_top_background_color(turbo::color value);
 
         ColumnFormat &border_bottom(const std::string &value);
 
-        ColumnFormat &border_bottom_color(Color value);
+        ColumnFormat &border_bottom_color(turbo::color value);
 
-        ColumnFormat &border_bottom_background_color(Color value);
+        ColumnFormat &border_bottom_background_color(turbo::color value);
 
         // Corner
         ColumnFormat &corner(const std::string &value);
 
-        ColumnFormat &corner_color(Color value);
+        ColumnFormat &corner_color(turbo::color value);
 
-        ColumnFormat &corner_background_color(Color value);
+        ColumnFormat &corner_background_color(turbo::color value);
 
         // Column separator
         ColumnFormat &column_separator(const std::string &value);
 
-        ColumnFormat &column_separator_color(Color value);
+        ColumnFormat &column_separator_color(turbo::color value);
 
-        ColumnFormat &column_separator_background_color(Color value);
+        ColumnFormat &column_separator_background_color(turbo::color value);
 
         // Font styling
         ColumnFormat &font_align(FontAlign value);
 
-        ColumnFormat &font_style(const std::vector<FontStyle> &style);
+        ColumnFormat &font_style(const turbo::emphasis &style);
 
-        ColumnFormat &font_color(Color value);
+        ColumnFormat &font_color(turbo::color value);
 
-        ColumnFormat &font_background_color(Color value);
+        ColumnFormat &font_background_color(turbo::color value);
 
-        ColumnFormat &color(Color value);
+        ColumnFormat &color(turbo::color value);
 
-        ColumnFormat &background_color(Color value);
+        ColumnFormat &background_color(turbo::color value);
 
         // Locale
         ColumnFormat &multi_byte_characters(bool value);

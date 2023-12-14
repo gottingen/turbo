@@ -21,7 +21,7 @@ int main() {
   Table class_diagram;
 
   // Global styling
-  class_diagram.format().font_style({FontStyle::bold}).font_align(FontAlign::center).width(60);
+  class_diagram.format().font_style({emphasis::bold}).font_align(FontAlign::center).width(60);
 
   // Animal class
   Table animal;

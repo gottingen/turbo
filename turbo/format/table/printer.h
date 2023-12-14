@@ -15,10 +15,11 @@
 
 #pragma once
 
-#include "turbo/format/table/color.h"
-#include "turbo/format/table/font_style.h"
 #include <utility>
 #include <vector>
+#include "turbo/format/table/table_internal.h"
+#include "turbo/format/print.h"
+#include "turbo/format/format.h"
 
 namespace turbo {
 
@@ -44,190 +45,322 @@ namespace turbo {
                                              const std::pair<size_t, size_t> &dimension,
                                              size_t num_columns);
 
-        static void apply_element_style(std::ostream &stream, Color foreground_color,
-                                        Color background_color,
-                                        const std::vector<FontStyle> &font_style) {
-            apply_foreground_color(stream, foreground_color);
-            apply_background_color(stream, background_color);
-            for (auto &style: font_style)
-                apply_font_style(stream, style);
-        }
-
-        static void reset_element_style(std::ostream &stream) { stream << termcolor::reset; }
 
     private:
-        static void print_content_left_aligned(std::ostream &stream, const std::string &cell_content,
+        static std::string print_content_left_aligned(const std::string &cell_content,
                                                const EntityFormat &format, size_t text_with_padding_size,
                                                size_t column_width) {
-
-            // Apply font style
-            apply_element_style(stream, *format.font_color_, *format.font_background_color_,
-                                *format.font_style_);
-            stream << cell_content;
-            // Only apply font_style to the font
-            // Not the padding. So calling apply_element_style with font_style = {}
-            reset_element_style(stream);
-            apply_element_style(stream, *format.font_color_, *format.font_background_color_, {});
-
-            if (text_with_padding_size < column_width) {
-                for (size_t j = 0; j < (column_width - text_with_padding_size); ++j) {
-                    stream << " ";
-                }
-            }
+            return  turbo::format(format.font_style_, "{:^{}}", cell_content, column_width - text_with_padding_size + cell_content.size());
         }
 
-        static void print_content_center_aligned(std::ostream &stream, const std::string &cell_content,
+        static std::string print_content_center_aligned(const std::string &cell_content,
                                                  const EntityFormat &format, size_t text_with_padding_size,
                                                  size_t column_width) {
+            std::string result;
             auto num_spaces = column_width - text_with_padding_size;
-            if (num_spaces % 2 == 0) {
-                // Even spacing on either side
-                for (size_t j = 0; j < num_spaces / 2; ++j)
-                    stream << " ";
-
-                // Apply font style
-                apply_element_style(stream, *format.font_color_, *format.font_background_color_,
-                                    *format.font_style_);
-                stream << cell_content;
-                // Only apply font_style to the font
-                // Not the padding. So calling apply_element_style with font_style = {}
-                reset_element_style(stream);
-                apply_element_style(stream, *format.font_color_, *format.font_background_color_, {});
-
-                for (size_t j = 0; j < num_spaces / 2; ++j)
-                    stream << " ";
-            } else {
-                auto num_spaces_before = num_spaces / 2 + 1;
-                for (size_t j = 0; j < num_spaces_before; ++j)
-                    stream << " ";
-
-                // Apply font style
-                apply_element_style(stream, *format.font_color_, *format.font_background_color_,
-                                    *format.font_style_);
-                stream << cell_content;
-                // Only apply font_style to the font
-                // Not the padding. So calling apply_element_style with font_style = {}
-                reset_element_style(stream);
-                apply_element_style(stream, *format.font_color_, *format.font_background_color_, {});
-
-                for (size_t j = 0; j < num_spaces - num_spaces_before; ++j)
-                    stream << " ";
+            auto num_spaces_before = num_spaces/2;
+            if(num_spaces %2 != 0){
+                num_spaces_before = num_spaces/2 + 1;
             }
+
+            std::string before(num_spaces_before, ' ');
+            std::string after(num_spaces - num_spaces_before, ' ');
+            result += turbo::format(format.font_style_, "{}{}{}", before, cell_content, after);
+            return result;
         }
 
-        static void print_content_right_aligned(std::ostream &stream, const std::string &cell_content,
+        static std::string print_content_right_aligned(const std::string &cell_content,
                                                 const EntityFormat &format, size_t text_with_padding_size,
                                                 size_t column_width) {
-            if (text_with_padding_size < column_width) {
-                for (size_t j = 0; j < (column_width - text_with_padding_size); ++j) {
-                    stream << " ";
-                }
-            }
 
-            // Apply font style
-            apply_element_style(stream, *format.font_color_, *format.font_background_color_,
-                                *format.font_style_);
-            stream << cell_content;
-            // Only apply font_style to the font
-            // Not the padding. So calling apply_element_style with font_style = {}
-            reset_element_style(stream);
-            apply_element_style(stream, *format.font_color_, *format.font_background_color_, {});
+            return  turbo::format(format.font_style_, "{:>{}}", cell_content, column_width - text_with_padding_size + cell_content.size());
         }
 
-        static void apply_font_style(std::ostream &stream, FontStyle style) {
-            switch (style) {
-                case FontStyle::bold:
-                    stream << termcolor::bold;
-                    break;
-                case FontStyle::dark:
-                    stream << termcolor::dark;
-                    break;
-                case FontStyle::italic:
-                    stream << termcolor::italic;
-                    break;
-                case FontStyle::underline:
-                    stream << termcolor::underline;
-                    break;
-                case FontStyle::blink:
-                    stream << termcolor::blink;
-                    break;
-                case FontStyle::reverse:
-                    stream << termcolor::reverse;
-                    break;
-                case FontStyle::concealed:
-                    stream << termcolor::concealed;
-                    break;
-                case FontStyle::crossed:
-                    stream << termcolor::crossed;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        static void apply_foreground_color(std::ostream &stream, Color foreground_color) {
-            switch (foreground_color) {
-                case Color::grey:
-                    stream << termcolor::grey;
-                    break;
-                case Color::red:
-                    stream << termcolor::red;
-                    break;
-                case Color::green:
-                    stream << termcolor::green;
-                    break;
-                case Color::yellow:
-                    stream << termcolor::yellow;
-                    break;
-                case Color::blue:
-                    stream << termcolor::blue;
-                    break;
-                case Color::magenta:
-                    stream << termcolor::magenta;
-                    break;
-                case Color::cyan:
-                    stream << termcolor::cyan;
-                    break;
-                case Color::white:
-                    stream << termcolor::white;
-                    break;
-                case Color::none:
-                default:
-                    break;
-            }
-        }
-
-        static void apply_background_color(std::ostream &stream, Color background_color) {
-            switch (background_color) {
-                case Color::grey:
-                    stream << termcolor::on_grey;
-                    break;
-                case Color::red:
-                    stream << termcolor::on_red;
-                    break;
-                case Color::green:
-                    stream << termcolor::on_green;
-                    break;
-                case Color::yellow:
-                    stream << termcolor::on_yellow;
-                    break;
-                case Color::blue:
-                    stream << termcolor::on_blue;
-                    break;
-                case Color::magenta:
-                    stream << termcolor::on_magenta;
-                    break;
-                case Color::cyan:
-                    stream << termcolor::on_cyan;
-                    break;
-                case Color::white:
-                    stream << termcolor::on_white;
-                    break;
-                case Color::none:
-                default:
-                    break;
-            }
-        }
     };
 
+    inline std::pair<std::vector<size_t>, std::vector<size_t>>
+    Printer::compute_cell_dimensions(TableInternal &table) {
+        std::pair<std::vector<size_t>, std::vector<size_t>> result;
+        size_t num_rows = table.size();
+        size_t num_columns = table.estimate_num_columns();
+
+        std::vector<size_t> row_heights, column_widths{};
+
+        for (size_t i = 0; i < num_columns; ++i) {
+            Column column = table.column(i);
+            size_t configured_width = column.get_configured_width();
+            size_t computed_width = column.get_computed_width();
+            if (configured_width != 0)
+                column_widths.push_back(configured_width);
+            else
+                column_widths.push_back(computed_width);
+        }
+
+        for (size_t i = 0; i < num_rows; ++i) {
+            Row row = table[i];
+            size_t configured_height = row.get_configured_height();
+            size_t computed_height = row.get_computed_height(column_widths);
+
+            // NOTE: Unlike column width, row height is calculated as the max
+            // b/w configured height and computed height
+            // which means that .width() has higher precedence than .height()
+            // when both are configured by the user
+            //
+            // TODO: Maybe this can be configured?
+            // If such a configuration is exposed, i.e., prefer height over width
+            // then the logic will be reversed, i.e.,
+            // column_widths.push_back(std::max(configured_width, computed_width))
+            // and
+            // row_height = configured_height if != 0 else computed_height
+
+            row_heights.push_back(std::max(configured_height, computed_height));
+        }
+
+        result.first = row_heights;
+        result.second = column_widths;
+
+        return result;
+    }
+
+    inline void Printer::print_table(std::ostream &stream, TableInternal &table) {
+        size_t num_rows = table.size();
+        size_t num_columns = table.estimate_num_columns();
+        auto dimensions = compute_cell_dimensions(table);
+        auto row_heights = dimensions.first;
+        auto column_widths = dimensions.second;
+        auto splitted_cells_text = std::vector<std::vector<std::vector<std::string>>>(
+                num_rows, std::vector<std::vector<std::string>>(num_columns, std::vector<std::string>{}));
+
+        // Pre-compute the cells' content and split them into lines before actually
+        // iterating the cells.
+        for (size_t i = 0; i < num_rows; ++i) {
+            Row row = table[i];
+            for (size_t j = 0; j < num_columns; ++j) {
+                Cell cell = row.cell(j);
+                const std::string &text = cell.get_text();
+                auto padding_left = *cell.format().padding_left_;
+                auto padding_right = *cell.format().padding_right_;
+
+                // Check if input text has embedded \n that are to be respected
+                bool has_new_line = text.find_first_of('\n') != std::string::npos;
+
+                if (has_new_line) {
+                    // Respect to the embedded '\n' characters
+                    splitted_cells_text[i][j] = EntityFormat::split_lines(
+                            text, "\n", cell.locale(), cell.is_multi_byte_character_support_enabled());
+                } else {
+                    // If there are no embedded \n characters, then apply word wrap.
+                    //
+                    // Configured column width cannot be lower than (padding_left +
+                    // padding_right) This is a bad configuration E.g., the user is trying
+                    // to force the column width to be 5 when padding_left and padding_right
+                    // are each configured to 3 (padding_left + padding_right) = 6 >
+                    // column_width
+                    auto content_width = column_widths[j] > padding_left + padding_right
+                                         ? column_widths[j] - padding_left - padding_right
+                                         : column_widths[j];
+                    auto word_wrapped_text = EntityFormat::word_wrap(text, content_width, cell.locale(),
+                                                                     cell.is_multi_byte_character_support_enabled());
+                    splitted_cells_text[i][j] = EntityFormat::split_lines(
+                            word_wrapped_text, "\n", cell.locale(), cell.is_multi_byte_character_support_enabled());
+                }
+            }
+        }
+
+        // For each row,
+        for (size_t i = 0; i < num_rows; ++i) {
+
+            // Print top border
+            bool border_top_printed{true};
+            for (size_t j = 0; j < num_columns; ++j) {
+                border_top_printed &= print_cell_border_top(stream, table, {i, j},
+                                                            {row_heights[i], column_widths[j]}, num_columns);
+            }
+            if (border_top_printed)
+                stream << "\n";
+
+            // Print row contents with word wrapping
+            for (size_t k = 0; k < row_heights[i]; ++k) {
+                for (size_t j = 0; j < num_columns; ++j) {
+                    print_row_in_cell(stream, table, {i, j}, {row_heights[i], column_widths[j]}, num_columns, k,
+                                      splitted_cells_text[i][j]);
+                }
+                if (k + 1 < row_heights[i])
+                    stream <<"\n";
+            }
+
+            if (i + 1 == num_rows) {
+
+                // Check if there is bottom border to print:
+                auto bottom_border_needed{true};
+                for (size_t j = 0; j < num_columns; ++j) {
+                    auto cell = table[i][j];
+                    auto format = cell.format();
+                    auto corner = *format.corner_bottom_left_;
+                    auto border_bottom = *format.border_bottom_;
+                    if (corner == "" && border_bottom == "") {
+                        bottom_border_needed = false;
+                        break;
+                    }
+                }
+
+                if (bottom_border_needed)
+                    stream <<"\n";
+                // Print bottom border for table
+                for (size_t j = 0; j < num_columns; ++j) {
+                    print_cell_border_bottom(stream, table, {i, j}, {row_heights[i], column_widths[j]},
+                                             num_columns);
+                }
+            }
+            if (i + 1 < num_rows)
+                stream <<"\n"; // Don't add newline after last row
+        }
+    }
+
+    inline void Printer::print_row_in_cell(std::ostream &stream, TableInternal &table,
+                                           const std::pair<size_t, size_t> &index,
+                                           const std::pair<size_t, size_t> &dimension,
+                                           size_t num_columns, size_t row_index,
+                                           const std::vector<std::string> &splitted_cell_text) {
+        auto column_width = dimension.second;
+        auto cell = table[index.first][index.second];
+        auto locale = cell.locale();
+        auto is_multi_byte_character_support_enabled = cell.is_multi_byte_character_support_enabled();
+        auto old_locale = std::locale::global(std::locale(locale));
+        auto format = cell.format();
+        auto text_height = splitted_cell_text.size();
+        auto padding_top = *format.padding_top_;
+
+        std::string row_content;
+        if (*format.show_border_left_) {
+            row_content += turbo::format(format.border_left_color_, "{}", *format.border_left_);
+        }
+
+        if (row_index < padding_top) {
+            // Padding top
+            row_content += std::string(column_width, ' ');
+        } else if (row_index >= padding_top && (row_index <= (padding_top + text_height))) {
+            // Retrieve padding left and right
+            // (column_width - padding_left - padding_right) is the amount of space
+            // available for cell text - Use this to word wrap cell contents
+            auto padding_left = *format.padding_left_;
+            auto padding_right = *format.padding_right_;
+
+            if (row_index - padding_top < text_height) {
+                auto line = splitted_cell_text[row_index - padding_top];
+
+                // Print left padding characters
+                row_content += std::string(padding_left, ' ');
+
+                // Print word-wrapped line
+                line = EntityFormat::trim(line);
+                auto line_with_padding_size =
+                        get_sequence_length(line, cell.locale(), is_multi_byte_character_support_enabled) +
+                        padding_left + padding_right;
+                switch (*format.font_align_) {
+                    case FontAlign::left:
+                        row_content += print_content_left_aligned(line, format, line_with_padding_size, column_width);
+                        break;
+                    case FontAlign::center:
+                        row_content += print_content_center_aligned(line, format, line_with_padding_size, column_width);
+                        break;
+                    case FontAlign::right:
+                        row_content+=print_content_right_aligned(line, format, line_with_padding_size, column_width);
+                        break;
+                }
+
+                // Print right padding characters
+                row_content += std::string(padding_right, ' ');
+            } else
+                row_content += std::string(column_width, ' ');
+
+        } else {
+            // Padding bottom
+            row_content += std::string(column_width, ' ');
+        }
+
+
+        if (index.second + 1 == num_columns) {
+            // Print right border after last column
+            if (*format.show_border_right_) {
+                row_content +=  turbo::format(format.border_right_color_, "{}", *format.border_right_);
+            }
+        }
+        stream<<row_content;
+        std::locale::global(old_locale);
+    }
+
+    inline bool Printer::print_cell_border_top(std::ostream &stream, TableInternal &table,
+                                               const std::pair<size_t, size_t> &index,
+                                               const std::pair<size_t, size_t> &dimension,
+                                               size_t num_columns) {
+        auto cell = table[index.first][index.second];
+        auto locale = cell.locale();
+        auto old_locale = std::locale::global(std::locale(locale));
+        auto format = cell.format();
+        auto column_width = dimension.second;
+
+        auto corner = *format.corner_top_left_;
+        auto corner_color = format.corner_top_left_color_;
+        auto border_top = *format.border_top_;
+
+        if ((corner == "" && border_top == "") || !*format.show_border_top_)
+            return false;
+        auto str = turbo::format(corner_color, "{}", corner);
+        stream<<str;
+
+        std::string border_top_str;
+        for (size_t i = 0; i < column_width; ++i) {
+            border_top_str += border_top;
+        }
+        str = turbo::format(format.border_top_color_, "{}", border_top_str);
+        stream<<str;
+
+        if (index.second + 1 == num_columns) {
+            // Print corner after last column
+            corner = *format.corner_top_right_;
+            corner_color = format.corner_top_right_color_;
+            str = turbo::format(corner_color, "{}", corner);
+            stream<<str;
+        }
+        std::locale::global(old_locale);
+        return true;
+    }
+
+    inline bool Printer::print_cell_border_bottom(std::ostream &stream, TableInternal &table,
+                                                  const std::pair<size_t, size_t> &index,
+                                                  const std::pair<size_t, size_t> &dimension,
+                                                  size_t num_columns) {
+        auto cell = table[index.first][index.second];
+        auto locale = cell.locale();
+        auto old_locale = std::locale::global(std::locale(locale));
+        auto format = cell.format();
+        auto column_width = dimension.second;
+
+        auto corner = *format.corner_bottom_left_;
+        auto corner_color = format.corner_bottom_left_color_;
+        auto border_bottom = *format.border_bottom_;
+
+        if ((corner == "" && border_bottom == "") || !*format.show_border_bottom_)
+            return false;
+
+        auto str = turbo::format(corner_color, "{}", corner);
+        stream<<str;
+
+        std::string border_bottom_str;
+        for (size_t i = 0; i < column_width; ++i) {
+            border_bottom_str += border_bottom;
+        }
+        str = turbo::format(format.border_bottom_color_, "{}", border_bottom_str);
+        stream<<str;
+        if (index.second + 1 == num_columns) {
+            // Print corner after last column
+            corner = *format.corner_bottom_right_;
+            corner_color = format.corner_bottom_right_color_;
+            str = turbo::format(corner_color, "{}", corner);
+            stream<<str;
+        }
+        std::locale::global(old_locale);
+        return true;
+    }
 } // namespace turbo

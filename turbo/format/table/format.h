@@ -20,9 +20,8 @@
 #include <cstddef>
 #include <sstream>
 #include <string>
-#include "turbo/format/table/color.h"
+#include "turbo/format/color.h"
 #include "turbo/format/table/font_align.h"
-#include "turbo/format/table/font_style.h"
 #include "turbo/format/table/utf8.h"
 #include <optional>
 #include <vector>
@@ -77,19 +76,11 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &border_color(Color value) {
-            border_left_color_ = value;
-            border_right_color_ = value;
-            border_top_color_ = value;
-            border_bottom_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &border_background_color(Color value) {
-            border_left_background_color_ = value;
-            border_right_background_color_ = value;
-            border_top_background_color_ = value;
-            border_bottom_background_color_ = value;
+        EntityFormat &border_color(text_style value) {
+            border_left_color_ |= value;
+            border_right_color_ |= value;
+            border_top_color_ |= value;
+            border_bottom_color_ |= value;
             return *this;
         }
 
@@ -98,13 +89,8 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &border_left_color(Color value) {
-            border_left_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &border_left_background_color(Color value) {
-            border_left_background_color_ = value;
+        EntityFormat &border_left_color(text_style value) {
+            border_left_color_ |= value;
             return *this;
         }
 
@@ -113,28 +99,19 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &border_right_color(Color value) {
-            border_right_color_ = value;
+        EntityFormat &border_right_color(text_style value) {
+            border_right_color_ |= value;
             return *this;
         }
 
-        EntityFormat &border_right_background_color(Color value) {
-            border_right_background_color_ = value;
-            return *this;
-        }
 
         EntityFormat &border_top(const std::string &value) {
             border_top_ = value;
             return *this;
         }
 
-        EntityFormat &border_top_color(Color value) {
-            border_top_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &border_top_background_color(Color value) {
-            border_top_background_color_ = value;
+        EntityFormat &border_top_color(text_style value) {
+            border_top_color_ |= value;
             return *this;
         }
 
@@ -143,15 +120,11 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &border_bottom_color(Color value) {
-            border_bottom_color_ = value;
+        EntityFormat &border_bottom_color(text_style value) {
+            border_bottom_color_ |= value;
             return *this;
         }
 
-        EntityFormat &border_bottom_background_color(Color value) {
-            border_bottom_background_color_ = value;
-            return *this;
-        }
 
         EntityFormat &show_border() {
             show_border_top_ = true;
@@ -217,49 +190,33 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &corner_color(Color value) {
-            corner_top_left_color_ = value;
-            corner_top_right_color_ = value;
-            corner_bottom_left_color_ = value;
-            corner_bottom_right_color_ = value;
+        EntityFormat &corner_color(text_style value) {
+            corner_top_left_color_ |= value;
+            corner_top_right_color_ |= value;
+            corner_bottom_left_color_ |= value;
+            corner_bottom_right_color_ |= value;
             return *this;
         }
 
-        EntityFormat &corner_background_color(Color value) {
-            corner_top_left_background_color_ = value;
-            corner_top_right_background_color_ = value;
-            corner_bottom_left_background_color_ = value;
-            corner_bottom_right_background_color_ = value;
-            return *this;
-        }
 
         EntityFormat &corner_top_left(const std::string &value) {
             corner_top_left_ = value;
             return *this;
         }
 
-        EntityFormat &corner_top_left_color(Color value) {
-            corner_top_left_color_ = value;
+        EntityFormat &corner_top_left_color(text_style value) {
+            corner_top_left_color_ |= value;
             return *this;
         }
 
-        EntityFormat &corner_top_left_background_color(Color value) {
-            corner_top_left_background_color_ = value;
-            return *this;
-        }
 
         EntityFormat &corner_top_right(const std::string &value) {
             corner_top_right_ = value;
             return *this;
         }
 
-        EntityFormat &corner_top_right_color(Color value) {
-            corner_top_right_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &corner_top_right_background_color(Color value) {
-            corner_top_right_background_color_ = value;
+        EntityFormat &corner_top_right_color(text_style value) {
+            corner_top_right_color_ |= value;
             return *this;
         }
 
@@ -268,28 +225,19 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &corner_bottom_left_color(Color value) {
-            corner_bottom_left_color_ = value;
+        EntityFormat &corner_bottom_left_color(text_style value) {
+            corner_bottom_left_color_ |= value;
             return *this;
         }
 
-        EntityFormat &corner_bottom_left_background_color(Color value) {
-            corner_bottom_left_background_color_ = value;
-            return *this;
-        }
 
         EntityFormat &corner_bottom_right(const std::string &value) {
             corner_bottom_right_ = value;
             return *this;
         }
 
-        EntityFormat &corner_bottom_right_color(Color value) {
-            corner_bottom_right_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &corner_bottom_right_background_color(Color value) {
-            corner_bottom_right_background_color_ = value;
+        EntityFormat &corner_bottom_right_color(text_style value) {
+            corner_bottom_right_color_ |= value;
             return *this;
         }
 
@@ -298,13 +246,8 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &column_separator_color(Color value) {
-            column_separator_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &column_separator_background_color(Color value) {
-            column_separator_background_color_ = value;
+        EntityFormat &column_separator_color(text_style value) {
+            column_separator_color_ |= value;
             return *this;
         }
 
@@ -313,37 +256,15 @@ namespace turbo {
             return *this;
         }
 
-        EntityFormat &font_style(const std::vector<FontStyle> &style) {
-            if (font_style_.has_value()) {
-                for (auto &s: style)
-                    font_style_->push_back(s);
-            } else {
-                font_style_ = style;
-            }
+        EntityFormat &font_style(text_style style) {
+            font_style_ |= style;
             return *this;
         }
 
-        EntityFormat &font_color(Color value) {
-            font_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &font_background_color(Color value) {
-            font_background_color_ = value;
-            return *this;
-        }
-
-        EntityFormat &color(Color value) {
-            font_color(value);
+        EntityFormat &color(text_style value) {
+            font_style(value);
             border_color(value);
             corner_color(value);
-            return *this;
-        }
-
-        EntityFormat &background_color(Color value) {
-            font_background_color(value);
-            border_background_color(value);
-            corner_background_color(value);
             return *this;
         }
 
@@ -442,31 +363,7 @@ namespace turbo {
             else
                 result.font_align_ = second.font_align_;
 
-            if (first.font_style_.has_value()) {
-                // Merge font styles using std::set_union
-                std::vector<FontStyle> merged_font_style(first.font_style_->size() +
-                                                         second.font_style_->size());
-#if defined(_WIN32) || defined(_WIN64)
-                // Fixes error in Windows - Sequence not ordered
-                std::sort(first.font_style_->begin(), first.font_style_->end());
-                std::sort(second.font_style_->begin(), second.font_style_->end());
-#endif
-                std::set_union(first.font_style_->begin(), first.font_style_->end(),
-                               second.font_style_->begin(), second.font_style_->end(),
-                               merged_font_style.begin());
-                result.font_style_ = merged_font_style;
-            } else
-                result.font_style_ = second.font_style_;
-
-            if (first.font_color_.has_value())
-                result.font_color_ = first.font_color_;
-            else
-                result.font_color_ = second.font_color_;
-
-            if (first.font_background_color_.has_value())
-                result.font_background_color_ = first.font_background_color_;
-            else
-                result.font_background_color_ = second.font_background_color_;
+            result.font_style_ = first.font_style_ | second.font_style_;
 
             // Padding
             if (first.padding_left_.has_value())
@@ -495,60 +392,30 @@ namespace turbo {
             else
                 result.border_left_ = second.border_left_;
 
-            if (first.border_left_color_.has_value())
-                result.border_left_color_ = first.border_left_color_;
-            else
-                result.border_left_color_ = second.border_left_color_;
-
-            if (first.border_left_background_color_.has_value())
-                result.border_left_background_color_ = first.border_left_background_color_;
-            else
-                result.border_left_background_color_ = second.border_left_background_color_;
+            result.border_left_color_ = second.border_left_color_ | first.border_left_color_;
 
             if (first.border_top_.has_value())
                 result.border_top_ = first.border_top_;
             else
                 result.border_top_ = second.border_top_;
 
-            if (first.border_top_color_.has_value())
-                result.border_top_color_ = first.border_top_color_;
-            else
-                result.border_top_color_ = second.border_top_color_;
-
-            if (first.border_top_background_color_.has_value())
-                result.border_top_background_color_ = first.border_top_background_color_;
-            else
-                result.border_top_background_color_ = second.border_top_background_color_;
+            result.border_top_color_ = second.border_top_color_ | first.border_top_color_;
 
             if (first.border_bottom_.has_value())
                 result.border_bottom_ = first.border_bottom_;
             else
                 result.border_bottom_ = second.border_bottom_;
 
-            if (first.border_bottom_color_.has_value())
-                result.border_bottom_color_ = first.border_bottom_color_;
-            else
-                result.border_bottom_color_ = second.border_bottom_color_;
+            result.border_bottom_color_ = second.border_bottom_color_ | first.border_bottom_color_;
 
-            if (first.border_bottom_background_color_.has_value())
-                result.border_bottom_background_color_ = first.border_bottom_background_color_;
-            else
-                result.border_bottom_background_color_ = second.border_bottom_background_color_;
 
             if (first.border_right_.has_value())
                 result.border_right_ = first.border_right_;
             else
                 result.border_right_ = second.border_right_;
 
-            if (first.border_right_color_.has_value())
-                result.border_right_color_ = first.border_right_color_;
-            else
-                result.border_right_color_ = second.border_right_color_;
 
-            if (first.border_right_background_color_.has_value())
-                result.border_right_background_color_ = first.border_right_background_color_;
-            else
-                result.border_right_background_color_ = second.border_right_background_color_;
+            result.border_right_color_ = second.border_right_color_ | first.border_right_color_;
 
             if (first.show_border_top_.has_value())
                 result.show_border_top_ = first.show_border_top_;
@@ -576,60 +443,31 @@ namespace turbo {
             else
                 result.corner_top_left_ = second.corner_top_left_;
 
-            if (first.corner_top_left_color_.has_value())
-                result.corner_top_left_color_ = first.corner_top_left_color_;
-            else
-                result.corner_top_left_color_ = second.corner_top_left_color_;
 
-            if (first.corner_top_left_background_color_.has_value())
-                result.corner_top_left_background_color_ = first.corner_top_left_background_color_;
-            else
-                result.corner_top_left_background_color_ = second.corner_top_left_background_color_;
+            result.corner_top_left_color_ = second.corner_top_left_color_ | first.corner_top_left_color_;
+
 
             if (first.corner_top_right_.has_value())
                 result.corner_top_right_ = first.corner_top_right_;
             else
                 result.corner_top_right_ = second.corner_top_right_;
 
-            if (first.corner_top_right_color_.has_value())
-                result.corner_top_right_color_ = first.corner_top_right_color_;
-            else
-                result.corner_top_right_color_ = second.corner_top_right_color_;
-
-            if (first.corner_top_right_background_color_.has_value())
-                result.corner_top_right_background_color_ = first.corner_top_right_background_color_;
-            else
-                result.corner_top_right_background_color_ = second.corner_top_right_background_color_;
+            result.corner_top_right_color_ = second.corner_top_right_color_ | first.corner_top_right_color_;
 
             if (first.corner_bottom_left_.has_value())
                 result.corner_bottom_left_ = first.corner_bottom_left_;
             else
                 result.corner_bottom_left_ = second.corner_bottom_left_;
 
-            if (first.corner_bottom_left_color_.has_value())
-                result.corner_bottom_left_color_ = first.corner_bottom_left_color_;
-            else
-                result.corner_bottom_left_color_ = second.corner_bottom_left_color_;
-
-            if (first.corner_bottom_left_background_color_.has_value())
-                result.corner_bottom_left_background_color_ = first.corner_bottom_left_background_color_;
-            else
-                result.corner_bottom_left_background_color_ = second.corner_bottom_left_background_color_;
+            result.corner_bottom_left_color_ = second.corner_bottom_left_color_ | first.corner_bottom_left_color_;
 
             if (first.corner_bottom_right_.has_value())
                 result.corner_bottom_right_ = first.corner_bottom_right_;
             else
                 result.corner_bottom_right_ = second.corner_bottom_right_;
 
-            if (first.corner_bottom_right_color_.has_value())
-                result.corner_bottom_right_color_ = first.corner_bottom_right_color_;
-            else
-                result.corner_bottom_right_color_ = second.corner_bottom_right_color_;
 
-            if (first.corner_bottom_right_background_color_.has_value())
-                result.corner_bottom_right_background_color_ = first.corner_bottom_right_background_color_;
-            else
-                result.corner_bottom_right_background_color_ = second.corner_bottom_right_background_color_;
+            result.corner_bottom_right_color_ = second.corner_bottom_right_color_ | first.corner_bottom_right_color_;
 
             // Column separator
             if (first.column_separator_.has_value())
@@ -637,15 +475,7 @@ namespace turbo {
             else
                 result.column_separator_ = second.column_separator_;
 
-            if (first.column_separator_color_.has_value())
-                result.column_separator_color_ = first.column_separator_color_;
-            else
-                result.column_separator_color_ = second.column_separator_color_;
-
-            if (first.column_separator_background_color_.has_value())
-                result.column_separator_background_color_ = first.column_separator_background_color_;
-            else
-                result.column_separator_background_color_ = second.column_separator_background_color_;
+            result.column_separator_color_ = second.column_separator_color_ | first.column_separator_color_;
 
             // Internationlization
             if (first.multi_byte_characters_.has_value())
@@ -681,23 +511,23 @@ namespace turbo {
         void set_defaults() {
             // NOTE: width and height are not set here
             font_align_ = FontAlign::left;
-            font_style_ = std::vector<FontStyle>{};
-            font_color_ = font_background_color_ = Color::none;
+            font_style_ = text_style{};
             padding_left_ = padding_right_ = 1;
             padding_top_ = padding_bottom_ = 0;
             border_top_ = border_bottom_ = "-";
             border_left_ = border_right_ = "|";
             show_border_left_ = show_border_right_ = show_border_top_ = show_border_bottom_ = true;
-            border_top_color_ = border_top_background_color_ = border_bottom_color_ =
-            border_bottom_background_color_ = border_left_color_ = border_left_background_color_ =
-            border_right_color_ = border_right_background_color_ = Color::none;
+            border_top_color_ =
+            border_bottom_color_ =
+            border_left_color_ =
+            border_right_color_ = text_style{};
             corner_top_left_ = corner_top_right_ = corner_bottom_left_ = corner_bottom_right_ = "+";
-            corner_top_left_color_ = corner_top_left_background_color_ = corner_top_right_color_ =
-            corner_top_right_background_color_ = corner_bottom_left_color_ =
-            corner_bottom_left_background_color_ = corner_bottom_right_color_ =
-            corner_bottom_right_background_color_ = Color::none;
+            corner_top_left_color_ =
+            corner_top_right_color_ =
+            corner_bottom_left_color_ =
+            corner_bottom_right_color_ = text_style{};
             column_separator_ = "|";
-            column_separator_color_ = column_separator_background_color_ = Color::none;
+            column_separator_color_ = text_style{};
             multi_byte_characters_ = false;
             locale_ = "";
         }
@@ -775,9 +605,7 @@ namespace turbo {
 
         // Font styling
         std::optional<FontAlign> font_align_{};
-        std::optional<std::vector<FontStyle>> font_style_{};
-        std::optional<Color> font_color_{};
-        std::optional<Color> font_background_color_{};
+        text_style font_style_{};
 
         // Element padding
         std::optional<size_t> padding_left_{};
@@ -788,45 +616,36 @@ namespace turbo {
         // Element border
         std::optional<bool> show_border_top_{};
         std::optional<std::string> border_top_{};
-        std::optional<Color> border_top_color_{};
-        std::optional<Color> border_top_background_color_{};
+        text_style border_top_color_{};
 
         std::optional<bool> show_border_bottom_{};
         std::optional<std::string> border_bottom_{};
-        std::optional<Color> border_bottom_color_{};
-        std::optional<Color> border_bottom_background_color_{};
+        text_style border_bottom_color_{};
 
         std::optional<bool> show_border_left_{};
         std::optional<std::string> border_left_{};
-        std::optional<Color> border_left_color_{};
-        std::optional<Color> border_left_background_color_{};
+        text_style border_left_color_{};
 
         std::optional<bool> show_border_right_{};
         std::optional<std::string> border_right_{};
-        std::optional<Color> border_right_color_{};
-        std::optional<Color> border_right_background_color_{};
+        text_style border_right_color_{};
 
         // Element corner
         std::optional<std::string> corner_top_left_{};
-        std::optional<Color> corner_top_left_color_{};
-        std::optional<Color> corner_top_left_background_color_{};
+        text_style corner_top_left_color_{};
 
         std::optional<std::string> corner_top_right_{};
-        std::optional<Color> corner_top_right_color_{};
-        std::optional<Color> corner_top_right_background_color_{};
+        text_style corner_top_right_color_{};
 
         std::optional<std::string> corner_bottom_left_{};
-        std::optional<Color> corner_bottom_left_color_{};
-        std::optional<Color> corner_bottom_left_background_color_{};
+        text_style corner_bottom_left_color_{};
 
         std::optional<std::string> corner_bottom_right_{};
-        std::optional<Color> corner_bottom_right_color_{};
-        std::optional<Color> corner_bottom_right_background_color_{};
+        text_style corner_bottom_right_color_{};
 
         // Element column separator
         std::optional<std::string> column_separator_{};
-        std::optional<Color> column_separator_color_{};
-        std::optional<Color> column_separator_background_color_{};
+        text_style column_separator_color_{};
 
         // Internationalization
         std::optional<bool> multi_byte_characters_{};

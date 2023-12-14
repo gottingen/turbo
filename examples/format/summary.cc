@@ -5,22 +5,22 @@ using Row_t = Table::Row_t;
 int main() {
 
   Table readme;
-  readme.format().border_color(Color::yellow);
+  readme.format().border_color(fg(color::yellow));
 
   readme.add_row(Row_t{"tabulate for Modern C++"});
-  readme[0].format().font_align(FontAlign::center).font_color(Color::yellow);
+  readme[0].format().font_align(FontAlign::center).font_style(fg(color::yellow));
 
   readme.add_row(Row_t{"https://github.com/p-ranav/tabulate"});
   readme[1]
       .format()
       .font_align(FontAlign::center)
-      .font_style({FontStyle::underline, FontStyle::italic})
-      .font_color(Color::white)
+      .font_style(emphasis::underline| emphasis::italic)
+      .font_style(fg(color::white))
       .hide_border_top();
 
   readme.add_row(Row_t{"Tabulate is a header-only library for printing aligned, formatted, and "
                        "colorized tables in Modern C++"});
-  readme[2].format().font_style({FontStyle::italic}).font_color(Color::magenta);
+  readme[2].format().font_style({emphasis::italic}).font_style(fg(color::magenta));
 
   Table highlights;
   highlights.add_row(Row_t{"Header-only Library", "Requires C++17", "MIT License"});
@@ -38,7 +38,7 @@ int main() {
   Table format;
   format.add_row(Row_t{"Horizontal Alignment", "Left aligned", "Center aligned", "Right aligned"});
   format[0].format().font_align(FontAlign::center);
-  format[0][0].format().font_color(Color::green).column_separator(":");
+  format[0][0].format().font_style(fg(color::green)).column_separator(":");
 
   format.column(1).format().width(25).font_align(FontAlign::left);
   format.column(2).format().width(25).font_align(FontAlign::center);
@@ -63,9 +63,9 @@ int main() {
 
   readme[5]
       .format()
-      .border_color(Color::green)
-      .font_color(Color::cyan)
-      .font_style({FontStyle::underline})
+      .border_color(fg(color::green))
+      .font_style(fg(color::cyan))
+      .font_style({emphasis::underline})
       .padding_top(0)
       .padding_bottom(0);
 
@@ -88,14 +88,14 @@ int main() {
 
   readme.add_row(Row_t{embedded_table});
 
-  readme[9].format().hide_border_top().border_color(Color::white).font_color(Color::yellow);
+  readme[9].format().hide_border_top().border_color(fg(color::white)).font_style(fg(color::yellow));
 
   readme.add_row(Row_t{"ᚠ ᚡ ᚢ ᚣ ᚤ ᚥ ᚦ ᚧ ᚨ ᚩ ᚪ ᚫ ᚬ ᚭ ᚮ ᚯ ᚰ ᚱ ᚲ ᚳ ᚴ ᚵ ᚶ ᚷ ᚸ ᚹ ᚺ "
                        "ᚻ ᚼ ᚽ ᚾ ᚿ ᛀ ᛁ ᛂ ᛃ ᛄ ᛅ ᛆ ᛇ "
                        "ᛈ ᛉ ᛊ ᛋ ᛌ ᛍ ᛎ ᛏ ᛐ ᛑ ᛒ ᛓ"});
   readme[10]
       .format()
-      .font_background_color(Color::red)
+      .font_style(bg(color::red))
       .hide_border_top()
       .multi_byte_characters(true);
 
@@ -104,7 +104,7 @@ int main() {
 
   Table chart;
   chart.format()
-      .font_color(Color::white)
+      .font_style(fg(color::white))
       .padding_left(0)
       .padding_right(0)
       .column_separator("")
@@ -136,46 +136,46 @@ int main() {
     chart.column(i).format().width(2);
   }
 
-  chart.column(2).format().border_color(Color::white).border_left("|").border_top("-");
-  chart.column(2)[8].format().background_color(Color::red);
-  chart.column(2)[7].format().background_color(Color::red);
+  chart.column(2).format().border_color(color::white).border_left("|").border_top("-");
+  chart.column(2)[8].format().color(bg(color::red));
+  chart.column(2)[7].format().color(bg(color::red));
 
-  chart.column(3)[8].format().background_color(Color::yellow);
-  chart.column(3)[7].format().background_color(Color::yellow);
-  chart.column(3)[6].format().background_color(Color::yellow);
+  chart.column(3)[8].format().color(bg(color::yellow));
+  chart.column(3)[7].format().color(bg(color::yellow));
+  chart.column(3)[6].format().color(bg(color::yellow));
 
-  chart.column(6)[8].format().background_color(Color::red);
-  chart.column(6)[7].format().background_color(Color::red);
-  chart.column(6)[6].format().background_color(Color::red);
-  chart.column(6)[5].format().background_color(Color::red);
+  chart.column(6)[8].format().color(bg(color::red));
+  chart.column(6)[7].format().color(bg(color::red));
+  chart.column(6)[6].format().color(bg(color::red));
+  chart.column(6)[5].format().color(bg(color::red));
 
-  chart.column(7)[8].format().background_color(Color::yellow);
-  chart.column(7)[7].format().background_color(Color::yellow);
-  chart.column(7)[6].format().background_color(Color::yellow);
-  chart.column(7)[5].format().background_color(Color::yellow);
-  chart.column(7)[4].format().background_color(Color::yellow);
+  chart.column(7)[8].format().color(bg(color::yellow));
+  chart.column(7)[7].format().color(bg(color::yellow));
+  chart.column(7)[6].format().color(bg(color::yellow));
+  chart.column(7)[5].format().color(bg(color::yellow));
+  chart.column(7)[4].format().color(bg(color::yellow));
 
-  chart.column(10)[8].format().background_color(Color::red);
-  chart.column(10)[7].format().background_color(Color::red);
-  chart.column(10)[6].format().background_color(Color::red);
-  chart.column(10)[5].format().background_color(Color::red);
-  chart.column(10)[4].format().background_color(Color::red);
-  chart.column(10)[3].format().background_color(Color::red);
+  chart.column(10)[8].format().color(bg(color::red));
+  chart.column(10)[7].format().color(bg(color::red));
+  chart.column(10)[6].format().color(bg(color::red));
+  chart.column(10)[5].format().color(bg(color::red));
+  chart.column(10)[4].format().color(bg(color::red));
+  chart.column(10)[3].format().color(bg(color::red));
 
-  chart.column(11)[8].format().background_color(Color::yellow);
-  chart.column(11)[7].format().background_color(Color::yellow);
-  chart.column(11)[6].format().background_color(Color::yellow);
-  chart.column(11)[5].format().background_color(Color::yellow);
-  chart.column(11)[4].format().background_color(Color::yellow);
-  chart.column(11)[3].format().background_color(Color::yellow);
-  chart.column(11)[2].format().background_color(Color::yellow);
-  chart.column(11)[1].format().background_color(Color::yellow);
+  chart.column(11)[8].format().color(bg(color::yellow));
+  chart.column(11)[7].format().color(bg(color::yellow));
+  chart.column(11)[6].format().color(bg(color::yellow));
+  chart.column(11)[5].format().color(bg(color::yellow));
+  chart.column(11)[4].format().color(bg(color::yellow));
+  chart.column(11)[3].format().color(bg(color::yellow));
+  chart.column(11)[2].format().color(bg(color::yellow));
+  chart.column(11)[1].format().color(bg(color::yellow));
 
-  chart[2][15].format().background_color(Color::red);
+  chart[2][15].format().color(bg(color::red));
   chart[2][16].set_text("Batch 1");
   chart.column(16).format().padding_left(1).width(20);
 
-  chart[4][15].format().background_color(Color::yellow);
+  chart[4][15].format().color(bg(color::yellow));
   chart[4][16].set_text("Batch 2");
 
   Table legend;
@@ -188,22 +188,22 @@ int main() {
   legend.column(0)
       .format()
       .font_align(FontAlign::right)
-      .font_color(Color::green)
-      .font_background_color(Color::grey);
+      .font_style(emphasis::italic)
+      .font_color(color::green);
 
-  legend.column(2).format().font_color(Color::white).font_background_color(Color::red);
+  legend.column(2).format().font_style(emphasis::italic).font_color(color::red);
 
-  legend[1][3].format().font_style({FontStyle::italic}).font_color(Color::yellow);
+  legend[1][3].format().font_style({emphasis::italic}).font_style(fg(color::yellow));
 
   chart.column(17).format().width(50);
 
   chart[4][17].set_text("Cells, rows, and columns");
   chart[5][17].set_text("can be independently formatted.");
   chart[7][17].set_text("This cell is green and italic");
-  chart[7][17].format().color(Color::green).font_style({FontStyle::italic});
+  chart[7][17].format().color(fg(color::green)).font_style({emphasis::italic});
 
   chart[8][17].set_text("This one's yellow and right-aligned");
-  chart[8][17].format().color(Color::yellow).font_align(FontAlign::right);
+  chart[8][17].format().color(fg(color::yellow)).font_align(FontAlign::right);
 
   chart[9][17].set_text("This one's on 🔥🔥🔥");
 

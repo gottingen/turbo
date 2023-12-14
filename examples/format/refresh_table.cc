@@ -39,9 +39,9 @@ int main() {
     for (size_t i = 0; i < 5; ++i) {
       process_table[0][i]
           .format()
-          .font_color(Color::yellow)
+          .font_style(fg(color::yellow))
           .font_align(FontAlign::center)
-          .font_style({FontStyle::bold});
+          .font_style({emphasis::bold});
     }
 
     std::cout << process_table << std::endl;

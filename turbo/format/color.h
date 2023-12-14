@@ -187,6 +187,10 @@ namespace turbo {
         strikethrough = 1 << 7,
     };
 
+    constexpr bool operator &(emphasis lhs, emphasis rhs) noexcept {
+        return static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs);
+    }
+
     // rgb is a struct for red, green and blue colors.
     // Using the name "rgb" makes some editors show the color in a tooltip.
     struct rgb {
