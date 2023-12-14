@@ -160,4 +160,8 @@ namespace turbo {
         return stream;
     }
 
+    inline size_t table_print_line(const Table &table) {
+        return 2 * table.size() + 1;
+    }
+
 } // namespace turbo

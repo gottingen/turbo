@@ -19,6 +19,7 @@ void waitingForWorkEnterKey() {
 
 int main() {
     std::thread tUserInput(waitingForWorkEnterKey);
+    size_t lines = 0;
     while (keep_running) {
         Table process_table;
         std::random_device rd;
@@ -47,9 +48,10 @@ int main() {
         std::cout << process_table << std::endl;
         std::cout << "Press ENTER to exit..." << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F\033[F";
+        lines = table_print_line(process_table) + 1;
+        turbo::backwards_lines(std::cout, lines);
     }
-    std::cout << "\033[B\033[B\033[B\033[B\033[B\033[B\033[B\033[B\033[B\033[B";
+    turbo::forward_lines(std::cout, lines);
     tUserInput.join();
 
     return 0;

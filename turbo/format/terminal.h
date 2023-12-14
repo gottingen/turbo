@@ -83,6 +83,42 @@ namespace turbo {
         return stream;
     }
 
+    static constexpr std::string_view kBackLine = "\033[F";
+
+    inline std::string backwards_lines(size_t n) {
+        std::string result;
+        result.reserve(n * kBackLine.size());
+        for (size_t i = 0; i < n; ++i) {
+            result.append(kBackLine.data(), kBackLine.size());
+        }
+        return result;
+    }
+
+    inline std::ostream &backwards_lines(std::ostream &stream, size_t n) {
+        if (fmt_detail::is_colorized(stream)) {
+            stream << backwards_lines(n);
+        }
+        return stream;
+    }
+
+    static constexpr std::string_view kForwardLine = "\033[B";
+
+    inline std::string forward_lines(size_t n) {
+        std::string result;
+        result.reserve(n * kForwardLine.size());
+        for (size_t i = 0; i < n; ++i) {
+            result.append(kForwardLine.data(), kForwardLine.size());
+        }
+        return result;
+    }
+
+    inline std::ostream &forward_lines(std::ostream &stream, size_t n) {
+        if (fmt_detail::is_colorized(stream)) {
+            stream << forward_lines(n);
+        }
+        return stream;
+    }
+
     inline std::ostream &bold(std::ostream &stream) {
         if (fmt_detail::is_colorized(stream)) {
             text_style_builder builder;

@@ -739,16 +739,6 @@ namespace turbo {
         return KResetStyle;
     }
 
-    static constexpr std::string_view kBackLine = "\033[F";
-
-    inline std::string back_lines(size_t n) {
-        std::string result;
-        result.reserve(n * kBackLine.size());
-        for (size_t i = 0; i < n; ++i) {
-            result.append(kBackLine.data(), kBackLine.size());
-        }
-        return result;
-    }
 }  // namespace turbo
 
 #endif  // FMT_COLOR_H_
