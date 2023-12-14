@@ -39,9 +39,9 @@ int main() {
     for (size_t i = 0; i < 5; ++i) {
         movies[0][i]
                 .format()
-                .font_style(fg(color::white))
+                .font_color(fg(color::white))
                 .font_style({emphasis::bold})
-                .font_style(bg(color::blue));
+                .font_color(bg(color::blue));
     }
 
     LatexExporter exporter;

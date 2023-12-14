@@ -59,7 +59,7 @@ void run_version_cmd() {
     versions.add_row({"Turbo-simd", turbo::simd_version.to_string()});
     versions.add_row({"Turbo-strings", turbo::strings_version.to_string()});
     versions.add_row({"Turbo-times", turbo::times_version.to_string()});
-    versions.column(0).format().font_color(turbo::color::yellow);
-    versions.column(1).format().font_color(turbo::color::green);
+    versions.column(0).format().font_color(turbo::terminal_color::yellow);
+    versions.column(1).format().font_color(turbo::terminal_color::green);
     std::cout<<versions<<std::endl;
 }

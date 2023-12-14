@@ -35,13 +35,13 @@ int main() {
       .padding_bottom(1)
       .font_align(FontAlign::center)
       .font_style({emphasis::underline})
-      .font_style(fg(color::red));
+      .font_color(fg(color::red));
 
   // Table.column(index) is used to access a particular column
   // You can use this to access and format a specific column
   universal_constants.column(1).format().font_color(color::yellow);
 
-  universal_constants[0][1].format().font_style(bg(color::blue)).font_style(fg(color::white));
+  universal_constants[0][1].format().font_color(bg(color::blue)).font_color(fg(color::white));
 
   std::cout << universal_constants << std::endl;
 }

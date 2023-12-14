@@ -9,18 +9,18 @@ int main() {
     readme.format().border_color(fg(color::yellow));
 
     readme.add_row(Row_t{"tabulate for Modern C++"});
-    readme[0].format().font_align(FontAlign::center).font_style(fg(color::yellow));
+    readme[0].format().font_align(FontAlign::center).font_color(fg(color::yellow));
 
-    readme.add_row(Row_t{"https://github.com/p-ranav/tabulate"});
+    readme.add_row(Row_t{"https://github.com/gottingen/turbo"});
     readme[1]
             .format()
             .font_align(FontAlign::center)
             .font_style(emphasis::underline | emphasis::italic)
-            .font_style(fg(color::white))
+            .font_color(fg(color::white))
             .hide_border_top();
 
     readme.add_row(Row_t{"turbo is a c++17 library for high performance application"});
-    readme[2].format().font_style({emphasis::italic}).font_style(fg(color::magenta)).font_align(FontAlign::center);
+    readme[2].format().font_style({emphasis::italic}).font_color(fg(color::magenta)).font_align(FontAlign::center);
 
     Table highlights;
     highlights.add_row(Row_t{"non dependencies", "Requires C++17", "Apache 2 License"});
@@ -32,13 +32,13 @@ int main() {
     readme.add_row(Row_t{empty_row});
     readme[4].format().hide_border_left().hide_border_right();
 
-    readme.add_row(Row_t{"Easily format and align content within cells"});
+    readme.add_row(Row_t{"helpful for build applications"});
     readme[5].format().font_align(FontAlign::center);
 
     Table format;
     format.add_row(Row_t{"Horizontal Alignment", "Left aligned", "Center aligned", "Right aligned"});
     format[0].format().font_align(FontAlign::center);
-    format[0][0].format().font_style(fg(color::green)).column_separator(":");
+    format[0][0].format().font_color(fg(color::green)).column_separator(":");
 
     format.column(1).format().width(25).font_align(FontAlign::left);
     format.column(2).format().width(25).font_align(FontAlign::center);
@@ -64,7 +64,7 @@ int main() {
     readme[5]
             .format()
             .border_color(fg(color::green))
-            .font_style(fg(color::cyan))
+            .font_color(fg(color::cyan))
             .font_style({emphasis::underline})
             .padding_top(0)
             .padding_bottom(0);
@@ -88,14 +88,14 @@ int main() {
 
     readme.add_row(Row_t{embedded_table});
 
-    readme[9].format().hide_border_top().border_color(fg(color::white)).font_style(fg(color::yellow));
+    readme[9].format().hide_border_top().border_color(fg(color::white)).font_color(fg(color::yellow));
 
     readme.add_row(Row_t{"ᚠ ᚡ ᚢ ᚣ ᚤ ᚥ ᚦ ᚧ ᚨ ᚩ ᚪ ᚫ ᚬ ᚭ ᚮ ᚯ ᚰ ᚱ ᚲ ᚳ ᚴ ᚵ ᚶ ᚷ ᚸ ᚹ ᚺ "
                          "ᚻ ᚼ ᚽ ᚾ ᚿ ᛀ ᛁ ᛂ ᛃ ᛄ ᛅ ᛆ ᛇ "
                          "ᛈ ᛉ ᛊ ᛋ ᛌ ᛍ ᛎ ᛏ ᛐ ᛑ ᛒ ᛓ"});
     readme[10]
             .format()
-            .font_style(bg(color::red))
+            .font_color(bg(color::red))
             .hide_border_top()
             .multi_byte_characters(true);
 
@@ -104,7 +104,7 @@ int main() {
 
     Table chart;
     chart.format()
-            .font_style(fg(color::white))
+            .font_color(fg(color::white))
             .padding_left(0)
             .padding_right(0)
             .column_separator("")
@@ -193,7 +193,7 @@ int main() {
 
     legend.column(2).format().font_style(emphasis::italic).font_color(color::red);
 
-    legend[1][3].format().font_style({emphasis::italic}).font_style(fg(color::yellow));
+    legend[1][3].format().font_style({emphasis::italic}).font_color(fg(color::yellow));
 
     chart.column(17).format().width(50);
 

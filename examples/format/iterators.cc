@@ -53,7 +53,7 @@ int main() {
     // Set blue background color for alternate rows
     if (index > 0 && index % 2 == 0) {
       for (auto &cell : row) {
-        cell.format().font_style(bg(color::blue));
+        cell.format().font_color(bg(color::blue));
       }
     }
     index += 1;

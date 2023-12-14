@@ -328,13 +328,25 @@ namespace turbo {
 
     inline ColumnFormat &ColumnFormat::font_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().font_style(fg(value));
+            cell.get().format().font_color(fg(value));
+        return *this;
+    }
+
+    inline ColumnFormat &ColumnFormat::font_color(turbo::terminal_color value) {
+        for (auto &cell: column_.get().cells_)
+            cell.get().format().font_color(fg(value));
         return *this;
     }
 
     inline ColumnFormat &ColumnFormat::font_background_color(turbo::color value) {
         for (auto &cell: column_.get().cells_)
-            cell.get().format().font_style(bg(value));
+            cell.get().format().font_color(bg(value));
+        return *this;
+    }
+
+    inline ColumnFormat &ColumnFormat::font_background_color(turbo::terminal_color value) {
+        for (auto &cell: column_.get().cells_)
+            cell.get().format().font_color(bg(value));
         return *this;
     }
 

@@ -49,8 +49,8 @@ namespace turbo::tools {
                 break;
         }
 
-        result.column(0).format().font_color(turbo::color::yellow);
-        result.column(1).format().font_color(turbo::color::light_sky_blue);
+        result.column(0).format().font_color(turbo::terminal_color::yellow);
+        result.column(1).format().font_color(turbo::terminal_color::green);
         std::cout << result << std::endl;
     }
 }  // namespace turbo::tools

@@ -88,7 +88,11 @@ namespace turbo {
 
         ColumnFormat &font_color(turbo::color value);
 
+        ColumnFormat &font_color(turbo::terminal_color value);
+
         ColumnFormat &font_background_color(turbo::color value);
+
+        ColumnFormat &font_background_color(turbo::terminal_color value);
 
         ColumnFormat &color(turbo::color value);
 

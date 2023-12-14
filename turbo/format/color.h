@@ -680,7 +680,7 @@ namespace turbo {
             return *this;
         }
 
-        [[nodiscard]] std::string apply() const {
+        [[nodiscard]] std::string build() const {
             std::string buff;
             buff.resize(500);
             auto out = apply_text_style<char>(ts_, buff.begin());
@@ -726,7 +726,11 @@ namespace turbo {
     }
 
     inline std::string apply_text_style(text_style_builder ts) {
-        return std::move(ts.apply());
+        return std::move(ts.build());
+    }
+
+    inline std::string apply_text_style(text_style ts) {
+        return apply_text_style(text_style_builder(ts));
     }
 
     static constexpr std::string_view KResetStyle = "\x1b[0m";

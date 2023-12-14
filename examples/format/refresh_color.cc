@@ -30,6 +30,15 @@ int main() {
                                         turbo::color::light_gray
     };
 
+    std::vector<turbo::terminal_color> terminal_colors = {turbo::terminal_color::red, turbo::terminal_color::green,
+                                                          turbo::terminal_color::yellow, turbo::terminal_color::blue,
+                                                          turbo::terminal_color::magenta, turbo::terminal_color::cyan,
+                                                          turbo::terminal_color::white, turbo::terminal_color::black,
+                                                          turbo::terminal_color::bright_blue,
+                                                          turbo::terminal_color::bright_cyan,
+                                                          turbo::terminal_color::bright_green,
+                                                          turbo::terminal_color::bright_yellow};
+
     while (keep_running) {
         Table process_table;
         process_table.add_row(Row_t{" ", "|", " ", " ", " ", " ", " ", "|", " ", "|", " ", " ", " ", " ", " ", " "});
@@ -45,20 +54,20 @@ int main() {
         size_t bc;
         size_t fc;
         for (int j = 0; j < 16; ++j) {
-            if(j== 0 || j == 3 || j == 6 || j == 9 || j == 12){
+            if (j == 0 || j == 3 || j == 6 || j == 9 || j == 12) {
                 need_to_change = true;
             }
-            if(need_to_change){
-                bc = turbo::uniform(0ul, colors.size() - 1);
-                fc = turbo::uniform(0ul, colors.size() - 1);
+            if (need_to_change) {
+                bc = turbo::uniform(0ul, terminal_colors.size() - 1);
+                fc = turbo::uniform(0ul, terminal_colors.size() - 1);
                 need_to_change = false;
             }
             for (size_t i = 0; i < 9; ++i) {
                 if (process_table[i][j].get_text() != " ") {
 
                     //process_table[i][j].set_text(std::string(1, cc));
-                    process_table[i][j].format().font_style(bg(colors[bc]));
-                    process_table[i][j].format().font_style(fg(colors[fc]));
+                    process_table[i][j].format().font_color(bg(terminal_colors[bc]));
+                    process_table[i][j].format().font_color(fg(terminal_colors[fc]));
                     process_table[i][j].format().border_left_color(bg(colors[bc]));
                     process_table[i][j].format().border_left_color(fg(colors[bc]));
                     process_table[i][j].format().border_top_color(fg(colors[bc]));

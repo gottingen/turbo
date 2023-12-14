@@ -261,6 +261,11 @@ namespace turbo {
             return *this;
         }
 
+        EntityFormat &font_color(text_style style) {
+            font_color_ |= style;
+            return *this;
+        }
+
         EntityFormat &color(text_style value) {
             font_style(value);
             border_color(value);
@@ -364,6 +369,7 @@ namespace turbo {
                 result.font_align_ = second.font_align_;
 
             result.font_style_ = first.font_style_ | second.font_style_;
+            result.font_color_ = first.font_color_ | second.font_color_;
 
             // Padding
             if (first.padding_left_.has_value())
@@ -511,7 +517,8 @@ namespace turbo {
         void set_defaults() {
             // NOTE: width and height are not set here
             font_align_ = FontAlign::left;
-            font_style_ = text_style{};
+            font_style_ = text_style_builder{};
+            font_color_ = text_style_builder{};
             padding_left_ = padding_right_ = 1;
             padding_top_ = padding_bottom_ = 0;
             border_top_ = border_bottom_ = "-";
@@ -520,14 +527,14 @@ namespace turbo {
             border_top_color_ =
             border_bottom_color_ =
             border_left_color_ =
-            border_right_color_ = text_style{};
+            border_right_color_ = text_style_builder{};
             corner_top_left_ = corner_top_right_ = corner_bottom_left_ = corner_bottom_right_ = "+";
             corner_top_left_color_ =
             corner_top_right_color_ =
             corner_bottom_left_color_ =
-            corner_bottom_right_color_ = text_style{};
+            corner_bottom_right_color_ = text_style_builder{};
             column_separator_ = "|";
-            column_separator_color_ = text_style{};
+            column_separator_color_ = text_style_builder{};
             multi_byte_characters_ = false;
             locale_ = "";
         }
@@ -605,7 +612,8 @@ namespace turbo {
 
         // Font styling
         std::optional<FontAlign> font_align_{};
-        text_style font_style_{};
+        text_style_builder font_style_{};
+        text_style_builder font_color_{};
 
         // Element padding
         std::optional<size_t> padding_left_{};
@@ -616,36 +624,36 @@ namespace turbo {
         // Element border
         std::optional<bool> show_border_top_{};
         std::optional<std::string> border_top_{};
-        text_style border_top_color_{};
+        text_style_builder border_top_color_{};
 
         std::optional<bool> show_border_bottom_{};
         std::optional<std::string> border_bottom_{};
-        text_style border_bottom_color_{};
+        text_style_builder border_bottom_color_{};
 
         std::optional<bool> show_border_left_{};
         std::optional<std::string> border_left_{};
-        text_style border_left_color_{};
+        text_style_builder border_left_color_{};
 
         std::optional<bool> show_border_right_{};
         std::optional<std::string> border_right_{};
-        text_style border_right_color_{};
+        text_style_builder border_right_color_{};
 
         // Element corner
         std::optional<std::string> corner_top_left_{};
-        text_style corner_top_left_color_{};
+        text_style_builder corner_top_left_color_{};
 
         std::optional<std::string> corner_top_right_{};
-        text_style corner_top_right_color_{};
+        text_style_builder corner_top_right_color_{};
 
         std::optional<std::string> corner_bottom_left_{};
-        text_style corner_bottom_left_color_{};
+        text_style_builder corner_bottom_left_color_{};
 
         std::optional<std::string> corner_bottom_right_{};
-        text_style corner_bottom_right_color_{};
+        text_style_builder corner_bottom_right_color_{};
 
         // Element column separator
         std::optional<std::string> column_separator_{};
-        text_style column_separator_color_{};
+        text_style_builder column_separator_color_{};
 
         // Internationalization
         std::optional<bool> multi_byte_characters_{};

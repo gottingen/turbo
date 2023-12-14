@@ -26,36 +26,36 @@ int main() {
     colors.add_row(
             Row_t{"Font Background is Red", "Font Background is Blue", "Font Background is Green"});
 
-    colors[0][0].format().font_style(fg(color::red)).font_style({emphasis::bold});
-    colors[0][1].format().font_style(fg(color::blue)).font_style({emphasis::bold});
-    colors[0][2].format().font_style(fg(color::green)).font_style({emphasis::bold});
+    colors[0][0].format().font_color(fg(color::red)).font_color({emphasis::bold});
+    colors[0][1].format().font_color(fg(color::blue)).font_color({emphasis::bold});
+    colors[0][2].format().font_color(fg(color::green)).font_color({emphasis::bold});
 
     colors[1][0]
             .format()
             .border_left_color(fg(color::red))
             .border_left_color(bg(color::red))
-            .font_style(bg(color::red))
-            .font_style(fg(color::red));
+            .font_color(bg(color::red))
+            .font_color(fg(color::red));
 
     colors[1][1]
             .format()
             .border_left_color(fg(color::blue))
             .border_left_color(bg(color::blue))
-            .font_style(bg(color::blue))
-            .font_style(fg(color::blue));
+            .font_color(bg(color::blue))
+            .font_color(fg(color::blue));
 
     colors[1][2]
             .format()
             .border_left_color(fg(color::green))
             .border_left_color(bg(color::green))
-            .font_style(bg(color::green))
-            .font_style(fg(color::green))
+            .font_color(bg(color::green))
+            .font_color(fg(color::green))
             .border_right_color(fg(color::green))
             .border_right_color(bg(color::green));
 
-    colors[2][0].format().font_style(bg(color::red)).font_style({emphasis::bold});
-    colors[2][1].format().font_style(bg(color::blue)).font_style({emphasis::bold});
-    colors[2][2].format().font_style(bg(color::green)).font_style({emphasis::bold});
+    colors[2][0].format().font_color(bg(color::red)).font_color({emphasis::bold});
+    colors[2][1].format().font_color(bg(color::blue)).font_color({emphasis::bold});
+    colors[2][2].format().font_color(bg(color::green)).font_color({emphasis::bold});
 
     std::cout << colors << std::endl;
 }

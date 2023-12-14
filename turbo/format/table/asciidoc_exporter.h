@@ -64,8 +64,8 @@ namespace turbo {
 
             bool format_bold = false;
             bool format_italic = false;
-            if(font_style.has_emphasis()) {
-                auto emphasis = font_style.get_emphasis();
+            if(font_style.get().has_emphasis()) {
+                auto emphasis = font_style.get().get_emphasis();
                     if(emphasis & turbo::emphasis::bold) {
                         format_bold = true;
                     } else if(emphasis & turbo::emphasis::italic) {

@@ -19,7 +19,7 @@
 #include <vector>
 #include "turbo/format/table/table_internal.h"
 #include "turbo/format/print.h"
-#include "turbo/format/format.h"
+#include "turbo/format/terminal.h"
 
 namespace turbo {
 
@@ -47,34 +47,77 @@ namespace turbo {
 
 
     private:
-        static std::string print_content_left_aligned(const std::string &cell_content,
+        static void print_content_left_aligned(std::ostream &stream, const std::string &cell_content,
                                                const EntityFormat &format, size_t text_with_padding_size,
                                                size_t column_width) {
-            std::string padding(column_width - text_with_padding_size, ' ');
-            return  turbo::format(format.font_style_, "{}{}", padding, cell_content);
+            // Apply font style
+            apply_style(stream, format.font_style_ | format.font_color_);
+            stream << cell_content;
+            // Only apply font_style to the font
+            // Not the padding. So calling apply_element_style with font_style = {}
+            reset_style(stream);
+            apply_style(stream, format.font_color_);
+
+            if (text_with_padding_size < column_width) {
+                for (size_t j = 0; j < (column_width - text_with_padding_size); ++j) {
+                    stream << " ";
+                }
+            }
         }
 
-        static std::string print_content_center_aligned(const std::string &cell_content,
+        static void print_content_center_aligned(std::ostream &stream, const std::string &cell_content,
                                                  const EntityFormat &format, size_t text_with_padding_size,
                                                  size_t column_width) {
-            std::string result;
             auto num_spaces = column_width - text_with_padding_size;
-            auto num_spaces_before = num_spaces/2;
-            if(num_spaces %2 != 0){
-                num_spaces_before = num_spaces/2 + 1;
-            }
+            if (num_spaces % 2 == 0) {
+                // Even spacing on either side
+                for (size_t j = 0; j < num_spaces / 2; ++j)
+                    stream << " ";
 
-            std::string before(num_spaces_before, ' ');
-            std::string after(num_spaces - num_spaces_before, ' ');
-            result += turbo::format(format.font_style_, "{}{}{}", before, cell_content, after);
-            return result;
+                // Apply font style
+                apply_style(stream, format.font_style_ | format.font_color_);
+                stream << cell_content;
+                // Only apply font_style to the font
+                // Not the padding. So calling apply_element_style with font_style = {}
+                reset_style(stream);
+                apply_style(stream, format.font_color_);
+
+                for (size_t j = 0; j < num_spaces / 2; ++j)
+                    stream << " ";
+            } else {
+                auto num_spaces_before = num_spaces / 2 + 1;
+                for (size_t j = 0; j < num_spaces_before; ++j)
+                    stream << " ";
+
+                // Apply font style
+                apply_style(stream, format.font_style_ | format.font_color_);
+                stream << cell_content;
+                // Only apply font_style to the font
+                // Not the padding. So calling apply_element_style with font_style = {}
+                reset_style(stream);
+                apply_style(stream, format.font_color_);
+
+                for (size_t j = 0; j < num_spaces - num_spaces_before; ++j)
+                    stream << " ";
+            }
         }
 
-        static std::string print_content_right_aligned(const std::string &cell_content,
+        static void print_content_right_aligned(std::ostream &stream, const std::string &cell_content,
                                                 const EntityFormat &format, size_t text_with_padding_size,
                                                 size_t column_width) {
-            std::string padding(column_width - text_with_padding_size, ' ');
-            return  turbo::format(format.font_style_, "{}{}", cell_content, padding);
+            if (text_with_padding_size < column_width) {
+                for (size_t j = 0; j < (column_width - text_with_padding_size); ++j) {
+                    stream << " ";
+                }
+            }
+
+            // Apply font style
+            apply_style(stream, format.font_style_ | format.font_color_);
+            stream << cell_content;
+            // Only apply font_style to the font
+            // Not the padding. So calling apply_element_style with font_style = {}
+            reset_style(stream);
+            apply_style(stream, format.font_color_);
         }
 
     };
@@ -232,14 +275,16 @@ namespace turbo {
         auto text_height = splitted_cell_text.size();
         auto padding_top = *format.padding_top_;
 
-        std::string row_content;
         if (*format.show_border_left_) {
-            row_content += turbo::format(format.border_left_color_, "{}", *format.border_left_);
+            apply_style(stream, format.border_left_color_);
+            stream << *format.border_left_;
+            reset_style(stream);
         }
 
+        apply_style(stream, format.font_color_);
         if (row_index < padding_top) {
             // Padding top
-            row_content += turbo::format(format.font_style_, "{}", std::string(column_width, ' '));
+            stream << std::string(column_width, ' ');
         } else if (row_index >= padding_top && (row_index <= (padding_top + text_height))) {
             // Retrieve padding left and right
             // (column_width - padding_left - padding_right) is the amount of space
@@ -251,7 +296,8 @@ namespace turbo {
                 auto line = splitted_cell_text[row_index - padding_top];
 
                 // Print left padding characters
-                row_content += turbo::format(format.font_style_, "{}", std::string(padding_left, ' '));
+                stream << std::string(padding_left, ' ');
+
                 // Print word-wrapped line
                 line = EntityFormat::trim(line);
                 auto line_with_padding_size =
@@ -259,36 +305,36 @@ namespace turbo {
                         padding_left + padding_right;
                 switch (*format.font_align_) {
                     case FontAlign::left:
-                        row_content += print_content_left_aligned(line, format, line_with_padding_size, column_width);
+                        print_content_left_aligned(stream, line, format, line_with_padding_size, column_width);
                         break;
                     case FontAlign::center:
-                        row_content += print_content_center_aligned(line, format, line_with_padding_size, column_width);
+                        print_content_center_aligned(stream, line, format, line_with_padding_size, column_width);
                         break;
                     case FontAlign::right:
-                        row_content+=print_content_right_aligned(line, format, line_with_padding_size, column_width);
+                        print_content_right_aligned(stream, line, format, line_with_padding_size, column_width);
                         break;
                 }
 
                 // Print right padding characters
-                row_content += turbo::format(format.font_style_, "{}", std::string(padding_right, ' '));
-            } else {
-                row_content += turbo::format(format.font_style_, "{}", std::string(column_width, ' '));
-            }
+                stream << std::string(padding_right, ' ');
+            } else
+                stream << std::string(column_width, ' ');
 
         } else {
             // Padding bottom
-            row_content += std::string(column_width, ' ');
-            row_content += turbo::format(format.font_style_, "{}", std::string(column_width, ' '));
+            stream << std::string(column_width, ' ');
         }
 
+        reset_style(stream);
 
         if (index.second + 1 == num_columns) {
             // Print right border after last column
             if (*format.show_border_right_) {
-                row_content +=  turbo::format(format.border_right_color_, "{}", *format.border_right_);
+                apply_style(stream, format.border_right_color_);
+                stream << *format.border_right_;
+                reset_style(stream);
             }
         }
-        stream<<row_content;
         std::locale::global(old_locale);
     }
 
@@ -308,22 +354,24 @@ namespace turbo {
 
         if ((corner == "" && border_top == "") || !*format.show_border_top_)
             return false;
-        auto str = turbo::format(corner_color, "{}", corner);
-        stream<<str;
 
-        std::string border_top_str;
+        apply_style(stream, corner_color);
+        stream << corner;
+        reset_style(stream);
+
         for (size_t i = 0; i < column_width; ++i) {
-            border_top_str += border_top;
+            apply_style(stream, format.border_top_color_);
+            stream << border_top;
+            reset_style(stream);
         }
-        str = turbo::format(format.border_top_color_, "{}", border_top_str);
-        stream<<str;
 
         if (index.second + 1 == num_columns) {
             // Print corner after last column
             corner = *format.corner_top_right_;
             corner_color = format.corner_top_right_color_;
-            str = turbo::format(corner_color, "{}", corner);
-            stream<<str;
+            apply_style(stream, corner_color);
+            stream << corner;
+            reset_style(stream);
         }
         std::locale::global(old_locale);
         return true;
@@ -346,21 +394,22 @@ namespace turbo {
         if ((corner == "" && border_bottom == "") || !*format.show_border_bottom_)
             return false;
 
-        auto str = turbo::format(corner_color, "{}", corner);
-        stream<<str;
+        apply_style(stream, corner_color);
+        stream << corner;
+        reset_style(stream);
 
-        std::string border_bottom_str;
         for (size_t i = 0; i < column_width; ++i) {
-            border_bottom_str += border_bottom;
+            apply_style(stream, format.border_bottom_color_);
+            stream << border_bottom;
+            reset_style(stream);
         }
-        str = turbo::format(format.border_bottom_color_, "{}", border_bottom_str);
-        stream<<str;
+
         if (index.second + 1 == num_columns) {
             // Print corner after last column
             corner = *format.corner_bottom_right_;
-            corner_color = format.corner_bottom_right_color_;
-            str = turbo::format(corner_color, "{}", corner);
-            stream<<str;
+            apply_style(stream, format.corner_bottom_right_color_);
+            stream << corner;
+            reset_style(stream);
         }
         std::locale::global(old_locale);
         return true;
