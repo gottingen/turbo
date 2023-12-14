@@ -238,7 +238,7 @@ namespace turbo {
 
         if (row_index < padding_top) {
             // Padding top
-            row_content += std::string(column_width, ' ');
+            row_content += turbo::format(format.font_style_, "{}", std::string(column_width, ' '));
         } else if (row_index >= padding_top && (row_index <= (padding_top + text_height))) {
             // Retrieve padding left and right
             // (column_width - padding_left - padding_right) is the amount of space
@@ -250,8 +250,7 @@ namespace turbo {
                 auto line = splitted_cell_text[row_index - padding_top];
 
                 // Print left padding characters
-                row_content += std::string(padding_left, ' ');
-
+                row_content += turbo::format(format.font_style_, "{}", std::string(padding_left, ' '));
                 // Print word-wrapped line
                 line = EntityFormat::trim(line);
                 auto line_with_padding_size =
@@ -270,13 +269,15 @@ namespace turbo {
                 }
 
                 // Print right padding characters
-                row_content += std::string(padding_right, ' ');
-            } else
-                row_content += std::string(column_width, ' ');
+                row_content += turbo::format(format.font_style_, "{}", std::string(padding_right, ' '));
+            } else {
+                row_content += turbo::format(format.font_style_, "{}", std::string(column_width, ' '));
+            }
 
         } else {
             // Padding bottom
             row_content += std::string(column_width, ' ');
+            row_content += turbo::format(format.font_style_, "{}", std::string(column_width, ' '));
         }
 
 
