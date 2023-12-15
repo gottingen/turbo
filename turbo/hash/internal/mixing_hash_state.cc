@@ -21,34 +21,26 @@ namespace turbo::hash_internal {
     uint64_t MixingHashState<Tag>::CombineLargeContiguousImpl32(
             uint64_t state, const unsigned char *first, size_t len) {
         while (len >= PiecewiseChunkSize()) {
-            state = Mix(state,
-                        hash_internal::CityHash32(reinterpret_cast<const char *>(first),
-                                                  PiecewiseChunkSize()));
+            state = hasher_engine<Tag>::hash32_with_seed(reinterpret_cast<const char *>(first), PiecewiseChunkSize(), state);
             len -= PiecewiseChunkSize();
             first += PiecewiseChunkSize();
         }
         // Handle the remainder.
-        return CombineContiguousImpl(state, first, len,
-                                     std::integral_constant<int, 4>{});
+        return len ? hasher_engine<Tag>::hash32_with_seed(reinterpret_cast<const char *>(first), len, state) : state;
     }
 
     template<typename Tag>
     uint64_t MixingHashState<Tag>::CombineLargeContiguousImpl64(
             uint64_t state, const unsigned char *first, size_t len) {
         while (len >= PiecewiseChunkSize()) {
-            state = Mix(state, Hash64(first, PiecewiseChunkSize()));
+            state = hasher_engine<Tag>::hash64_with_seed(reinterpret_cast<const char *>(first), PiecewiseChunkSize(), state);
             len -= PiecewiseChunkSize();
             first += PiecewiseChunkSize();
         }
         // Handle the remainder.
-        return CombineContiguousImpl(state, first, len,
-                                     std::integral_constant<int, 8>{});
+        return len ? hasher_engine<Tag>::hash64_with_seed(reinterpret_cast<const char *>(first), len, state) : state;
     }
 
-    template<typename Tag>
-    TURBO_CONST_INIT const void *const MixingHashState<Tag>::kSeed = &kSeed;
-
-    template class MixingHashState<city_hash_tag>;
     template class MixingHashState<bytes_hash_tag>;
     template class MixingHashState<m3_hash_tag>;
     template class MixingHashState<xx_hash_tag>;

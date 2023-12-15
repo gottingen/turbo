@@ -28,6 +28,8 @@
 #include "turbo/format/format.h"
 #include "turbo/strings/string_view.h"
 #include "turbo/strings/str_strip.h"
+#include "turbo/format/format.h"
+#include "turbo/format/print.h"
 
 namespace {
 
@@ -544,18 +546,18 @@ int main(int argc, char** argv) {
 
   switch (output()) {
     case OutputStyle::kRegular:
-      turbo::PrintF("%-*s%-*s       Min       Avg       Max\n%s\n", kNameWidth,
+      turbo::printf("%-*s%-*s       Min       Avg       Max\n%s\n", kNameWidth,
                    "Type", kDistWidth, "Distribution",
                    std::string(kNameWidth + kDistWidth + 10 * 3, '-'));
       for (const auto& result : results) {
-        turbo::PrintF("%-*s%-*s  %8.4f  %8.4f  %8.4f\n", kNameWidth, result.name,
+        turbo::printf("%-*s%-*s  %8.4f  %8.4f  %8.4f\n", kNameWidth, result.name,
                      kDistWidth, result.dist_name, result.ratios.min_load,
                      result.ratios.avg_load, result.ratios.max_load);
       }
       break;
     case OutputStyle::kBenchmark: {
-      turbo::PrintF("{\n");
-      turbo::PrintF("  \"benchmarks\": [\n");
+      turbo::printf("{\n");
+      turbo::printf("  \"benchmarks\": [\n");
       std::string_view comma;
       for (const auto& result : results) {
         auto print = [&](std::string_view stat, double Ratios::*val) {
@@ -564,23 +566,23 @@ int main(int argc, char** argv) {
           // Check the regex again. We might had have enabled only one of the
           // stats for the benchmark.
           if (!CanRunBenchmark(name)) return;
-          turbo::PrintF("    %s{\n", comma);
-          turbo::PrintF("      \"cpu_time\": %f,\n", 1e9 * result.ratios.*val);
-          turbo::PrintF("      \"real_time\": %f,\n", 1e9 * result.ratios.*val);
-          turbo::PrintF("      \"iterations\": 1,\n");
-          turbo::PrintF("      \"name\": \"%s\",\n", name);
-          turbo::PrintF("      \"time_unit\": \"ns\"\n");
-          turbo::PrintF("    }\n");
+          turbo::printf("    %s{\n", comma);
+          turbo::printf("      \"cpu_time\": %f,\n", 1e9 * result.ratios.*val);
+          turbo::printf("      \"real_time\": %f,\n", 1e9 * result.ratios.*val);
+          turbo::printf("      \"iterations\": 1,\n");
+          turbo::printf("      \"name\": \"%s\",\n", name);
+          turbo::printf("      \"time_unit\": \"ns\"\n");
+          turbo::printf("    }\n");
           comma = ",";
         };
         print("min", &Ratios::min_load);
         print("avg", &Ratios::avg_load);
         print("max", &Ratios::max_load);
       }
-      turbo::PrintF("  ],\n");
-      turbo::PrintF("  \"context\": {\n");
-      turbo::PrintF("  }\n");
-      turbo::PrintF("}\n");
+      turbo::printf("  ],\n");
+      turbo::printf("  \"context\": {\n");
+      turbo::printf("  }\n");
+      turbo::printf("}\n");
       break;
     }
   }

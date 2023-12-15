@@ -71,32 +71,4 @@ namespace turbo::hash_internal {
     uint32_t CityHash32(const char *s, size_t len);
 
 }  // namespace turbo::hash_internal
-
-namespace turbo {
-
-    /**
-     * @ingroup turbo_hash_engine
-     * @brief city_hash_tag is a tag for city_hash.
-     */
-    struct city_hash_tag {
-
-        static constexpr const char* name() {
-            return "city_hash";
-        }
-
-        constexpr static bool available() {
-            return true;
-        }
-    };
-
-    template <>
-    struct hasher_engine<city_hash_tag> {
-
-        static uint32_t hash32(const char *s, size_t len);
-
-        static size_t hash64(const char *s, size_t len);
-
-        static size_t hash64_with_seed(const char *s, size_t len, uint64_t seed);
-    };
-}  // namespace turbo
 #endif  // TURBO_HASH_CITY_CITY_H_

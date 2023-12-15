@@ -38,9 +38,6 @@ namespace turbo::tools {
                 case turbo::hash_engine_type::bytes_hash:
                 result.add_row({"hash", turbo::format(turbo::Hash<std::string, bytes_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
                 break;
-            case turbo::hash_engine_type::city_hash:
-                result.add_row({"hash", turbo::format(turbo::Hash<std::string, city_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
-                break;
             case turbo::hash_engine_type::m3_hash:
                 result.add_row({"hash", turbo::format(turbo::Hash<std::string, m3_hash_tag>{}(turbo::tools::Context::get_instance().hash_string))});
                 break;

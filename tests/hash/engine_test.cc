@@ -18,15 +18,12 @@
 #include "turbo/hash/mixer.h"
 #include "turbo/hash/hash.h"
 #include "turbo/format/print.h"
+#include "turbo/meta/reflect.h"
 
 struct HashTest {
     int a;
-    template <typename H>
-    H hash_value(H state, const HashTest& v) {
-        return H::combine(std::move(state), v.a);
-    }
 };
-
+/*
 namespace std {
     template<>
     struct hash<HashTest> {
@@ -35,7 +32,13 @@ namespace std {
         }
     };
 }
+*/
 
+template <typename H>
+H hash_value(H state, const HashTest& v) {
+    turbo::Println("hash_value: {}, {}", v.a, turbo::nameof_full_type<H>());
+    return H::combine(std::move(state), v.a);
+}
 namespace turbo {
 
     TEST_CASE("mix, try") {
@@ -69,7 +72,7 @@ namespace turbo {
     TEST_CASE("hash, murmur") {
         HashTest aa;
         aa.a = 3;
-        turbo::Println("std r: {}", std::hash<HashTest>()(aa));
+
 
         turbo::Println("bytes engine: {}", turbo::Hash<HashTest>()(aa));
         turbo::Println("bytes engine: {}", turbo::Hash<int>{}(3));
@@ -78,9 +81,12 @@ namespace turbo {
         turbo::Println("m3 engine: {}", turbo::Hash<int, m3_hash_tag>{}(3));
 
         turbo::Println("xx engine: {}", turbo::Hash<int, xx_hash_tag>{}(3));
-        turbo::Println("xx engine: {}", turbo::Hash<HashTest, xx_hash_tag>{}(aa));
+        turbo::Println("xx engine: {}", turbo::hasher_engine<xx_hash_tag>::mix(3));
 
-        turbo::Println("city engine: {}", turbo::Hash<int, city_hash_tag>{}(3));
-        turbo::Println("city engine: {}", turbo::Hash<HashTest, city_hash_tag>{}(aa));
+        turbo::Println("xx engine HashTest: {}", turbo::Hash<HashTest, xx_hash_tag>{}(aa));
+        turbo::Println("xx engine int : {}", turbo::Hash<int, xx_hash_tag>{}(3));
+        //turbo::Println("xx engine: {}", turbo::hasher_engine<xx_hash_tag>::hash64_with_seed(reinterpret_cast<const char*>(&aa.a), sizeof(aa.a), 0ul));
+        //turbo::Println("xx engine: {}", turbo::hasher_engine<xx_hash_tag>::hash64_with_seed(reinterpret_cast<const char*>(&aa.a), sizeof(aa.a), 0ul));
+        //turbo::Println("xx engine: {}", turbo::hasher_engine<xx_hash_tag>::hash32(reinterpret_cast<const char*>(&aa.a), sizeof(aa.a)));
     }
 }

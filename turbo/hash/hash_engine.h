@@ -19,7 +19,7 @@
 #include "turbo/hash/fwd.h"
 #include "turbo/hash/mix/murmur_mix.h"
 #include "turbo/hash/mix/simple_mix.h"
-#include "turbo/hash/city/city.h"
+#include "turbo/hash/bytes/city.h"
 #include "turbo/hash/bytes/bytes_hash.h"
 #include "turbo/hash/m3/m3.h"
 #include "turbo/hash/xx/xx.h"
@@ -58,13 +58,11 @@ using default_hash_engine = bytes_hash_tag;
 
     constexpr const char* supported_hash_engines[] = {
         "bytes_hash",
-        "city_hash",
         "m3_hash",
         "xx_hash",
     };
     enum class hash_engine_type {
         bytes_hash,
-        city_hash,
         m3_hash,
         xx_hash,
     };

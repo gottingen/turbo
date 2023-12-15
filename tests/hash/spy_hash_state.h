@@ -169,7 +169,7 @@ namespace turbo::hash_internal {
         using SpyHashStateImpl::HashStateBase::combine_contiguous;
 
         template<typename CombinerT>
-        static SpyHashStateImpl RunCombineUnordered(SpyHashStateImpl state,
+        static SpyHashStateImpl run_combine_unordered(SpyHashStateImpl state,
                                                     CombinerT combiner) {
             UnorderedCombinerCallback cb;
 

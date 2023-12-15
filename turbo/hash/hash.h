@@ -215,7 +215,7 @@ namespace turbo {
      *
      *        std::string s = "hello";
      *        auto h1 = turbo::Hash<std::string, xx_hash_tag>{}(s);
-     *        auto h2 = turbo::Hash<std::string, city_hash_tag>{}(s);
+     *        auto h2 = turbo::Hash<std::string, m3_hash_tag>{}(s);
      *        @endcode
      *        h1 and h2 are different.
      *        h1 = 10585824267198354851
@@ -275,7 +275,7 @@ namespace turbo {
      *        so it should be avoided unless necessary.
      *        Note: This wrapper will only erase calls to
      *            combine_contiguous(H, const unsigned char*, size_t)
-     *            RunCombineUnordered(H, CombinerF)
+     *            run_combine_unordered(H, CombinerF)
      *        All other calls will be handled internally and will not invoke overloads
      *        provided by the wrapped class.
      *        Users of this class should still define a template `hash_value` function,
@@ -354,7 +354,7 @@ namespace turbo {
         friend class HashState::HashStateBase;
 
         template<typename T>
-        static void CombineContiguousImpl(void *p, const unsigned char *first,
+        static void combine_contiguous_impl(void *p, const unsigned char *first,
                                           size_t size) {
             T &state = *static_cast<T *>(p);
             state = T::combine_contiguous(std::move(state), first, size);
@@ -363,7 +363,7 @@ namespace turbo {
         template<typename T>
         void Init(T *state) {
             state_ = state;
-            combine_contiguous_ = &CombineContiguousImpl<T>;
+            combine_contiguous_ = &combine_contiguous_impl<T>;
             run_combine_unordered_ = &RunCombineUnorderedImpl<T>;
         }
 
@@ -387,13 +387,13 @@ namespace turbo {
             // are the same type.  This isn't true in the SpyHash case, but SpyHash
             // types are move-convertible to each other, so this still works.
             T &real_state = state.Real<T>();
-            real_state = T::RunCombineUnordered(
+            real_state = T::run_combine_unordered(
                     std::move(real_state), CombineUnorderedInvoker<HashState>{f});
             return state;
         }
 
         template<typename CombinerT>
-        static HashState RunCombineUnordered(HashState state, CombinerT combiner) {
+        static HashState run_combine_unordered(HashState state, CombinerT combiner) {
             auto *run = state.run_combine_unordered_;
             return run(std::move(state), std::ref(combiner));
         }

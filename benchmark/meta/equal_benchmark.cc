@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "algorithm.h"
+#include "turbo/meta/algorithm.h"
 #include "benchmark/benchmark.h"
 
 namespace {
