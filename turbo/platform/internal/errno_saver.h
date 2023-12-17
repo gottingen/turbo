@@ -19,25 +19,23 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
+namespace turbo::base_internal {
 
-// `ErrnoSaver` captures the value of `errno` upon construction and restores it
-// upon deletion.  It is used in low-level code and must be super fast.  Do not
-// add instrumentation, even in debug modes.
-class ErrnoSaver {
- public:
-  ErrnoSaver() : saved_errno_(errno) {}
-  ~ErrnoSaver() { errno = saved_errno_; }
-  int operator()() const { return saved_errno_; }
+        // `ErrnoSaver` captures the value of `errno` upon construction and restores it
+        // upon deletion.  It is used in low-level code and must be super fast.  Do not
+        // add instrumentation, even in debug modes.
+    class ErrnoSaver {
+    public:
+        ErrnoSaver() : saved_errno_(errno) {}
 
- private:
-  const int saved_errno_;
-};
+        ~ErrnoSaver() { errno = saved_errno_; }
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        int operator()() const { return saved_errno_; }
+
+    private:
+        const int saved_errno_;
+    };
+
+}  // namespace turbo::base_internal
 
 #endif  // TURBO_PLATFORM_INTERNAL_ERRNO_SAVER_H_

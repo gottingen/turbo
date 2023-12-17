@@ -29,7 +29,7 @@ typedef void (*sig_t)(int);
 #error all known Linux and Apple targets have alarm
 #endif
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/times/time.h"
 
 namespace {

@@ -16,7 +16,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 #include <cstdint>
 #include <string>

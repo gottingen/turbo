@@ -18,36 +18,33 @@
 
 #include "turbo/profiling/internal/exponential_biased.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace profiling_internal {
+namespace turbo::profiling_internal {
 
-int64_t PeriodicSamplerBase::GetExponentialBiased(int period) noexcept {
-  return rng_.GetStride(period);
-}
-
-bool PeriodicSamplerBase::SubtleConfirmSample() noexcept {
-  int current_period = period();
-
-  // Deal with period case 0 (always off) and 1 (always on)
-  if (TURBO_UNLIKELY(current_period < 2)) {
-    stride_ = 0;
-    return current_period == 1;
-  }
-
-  // Check if this is the first call to Sample()
-  if (TURBO_UNLIKELY(stride_ == 1)) {
-    stride_ = static_cast<uint64_t>(-GetExponentialBiased(current_period));
-    if (static_cast<int64_t>(stride_) < -1) {
-      ++stride_;
-      return false;
+    int64_t PeriodicSamplerBase::GetExponentialBiased(int period) noexcept {
+        return rng_.GetStride(period);
     }
-  }
 
-  stride_ = static_cast<uint64_t>(-GetExponentialBiased(current_period));
-  return true;
-}
+    bool PeriodicSamplerBase::SubtleConfirmSample() noexcept {
+        int current_period = period();
 
-}  // namespace profiling_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        // Deal with period case 0 (always off) and 1 (always on)
+        if (TURBO_UNLIKELY(current_period < 2)) {
+            stride_ = 0;
+            return current_period == 1;
+        }
+
+        // Check if this is the first call to Sample()
+        if (TURBO_UNLIKELY(stride_ == 1)) {
+            stride_ = static_cast<uint64_t>(-GetExponentialBiased(current_period));
+            if (static_cast<int64_t>(stride_) < -1) {
+                ++stride_;
+                return false;
+            }
+        }
+
+        stride_ = static_cast<uint64_t>(-GetExponentialBiased(current_period));
+        return true;
+    }
+
+}  // namespace turbo::profiling_internal
+

@@ -56,7 +56,7 @@
 #include "turbo/crypto/internal/crc_memcpy.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/dynamic_annotations.h"
-#include "turbo/platform/internal/prefetch.h"
+#include "turbo/memory/prefetch.h"
 #include "turbo/strings/string_view.h"
 
 #ifdef TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE
@@ -242,9 +242,9 @@ crc32c_t AcceleratedCrcMemcpyEngine<vec_regions, int_regions>::Compute(
   while (copy_rounds > kBlocksPerCacheLine) {
     // Prefetch kPrefetchAhead bytes ahead of each pointer.
     for (size_t i = 0; i < kRegions; i++) {
-      turbo::base_internal::PrefetchT0(src_bytes + kPrefetchAhead +
+      turbo::prefetch_t0(src_bytes + kPrefetchAhead +
                                       region_size * i);
-      turbo::base_internal::PrefetchT0(dst_bytes + kPrefetchAhead +
+      turbo::prefetch_t0(dst_bytes + kPrefetchAhead +
                                       region_size * i);
     }
 

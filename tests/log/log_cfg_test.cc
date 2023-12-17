@@ -22,7 +22,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 using turbo::tlog::cfg::load_argv_levels;
 using turbo::tlog::cfg::load_env_levels;

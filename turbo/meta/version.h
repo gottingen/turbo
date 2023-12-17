@@ -22,6 +22,10 @@
 #include "turbo/module/module_version.h"
 
 
+/**
+ * @defgroup turbo_meta Meta
+ * @defgroup turbo_meta_functions Meta
+ */
 namespace turbo {
 
     static constexpr turbo::ModuleVersion meta_version = turbo::ModuleVersion{0, 9, 36};

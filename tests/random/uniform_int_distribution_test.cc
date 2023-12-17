@@ -14,7 +14,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/random/uniform_int_distribution.h"
 #include <cmath>
 #include <cstdint>

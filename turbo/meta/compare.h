@@ -27,8 +27,8 @@
 // (`std::weak_equality`, etc.) and are designed to be drop-in replacements
 // for code compliant with C++20.
 
-#ifndef TURBO_TYPES_COMPARE_H_
-#define TURBO_TYPES_COMPARE_H_
+#ifndef TURBO_META_COMPARE_H_
+#define TURBO_META_COMPARE_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -38,51 +38,49 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
 
-namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    namespace compare_internal {
+namespace turbo::compare_internal {
 
-        using value_type = int8_t;
+    using value_type = int8_t;
 
-        template<typename T>
-        struct Fail {
-            static_assert(sizeof(T) < 0, "Only literal `0` is allowed.");
-        };
+    template<typename T>
+    struct Fail {
+        static_assert(sizeof(T) < 0, "Only literal `0` is allowed.");
+    };
 
-        // We need the NullPtrT template to avoid triggering the modernize-use-nullptr
-        // ClangTidy warning in user code.
-        template<typename NullPtrT = std::nullptr_t>
-        struct OnlyLiteralZero {
-            constexpr OnlyLiteralZero(NullPtrT) noexcept {}  // NOLINT
+    // We need the NullPtrT template to avoid triggering the modernize-use-nullptr
+    // ClangTidy warning in user code.
+    template<typename NullPtrT = std::nullptr_t>
+    struct OnlyLiteralZero {
+        constexpr OnlyLiteralZero(NullPtrT) noexcept {}  // NOLINT
 
-            // Fails compilation when `nullptr` or integral type arguments other than
-            // `int` are passed. This constructor doesn't accept `int` because literal `0`
-            // has type `int`. Literal `0` arguments will be implicitly converted to
-            // `std::nullptr_t` and accepted by the above constructor, while other `int`
-            // arguments will fail to be converted and cause compilation failure.
-            template<
-                    typename T,
-                    typename = typename std::enable_if<
-                            std::is_same<T, std::nullptr_t>::value ||
-                            (std::is_integral<T>::value && !std::is_same<T, int>::value)>::type,
-                    typename = typename Fail<T>::type>
-            OnlyLiteralZero(T);  // NOLINT
-        };
+        // Fails compilation when `nullptr` or integral type arguments other than
+        // `int` are passed. This constructor doesn't accept `int` because literal `0`
+        // has type `int`. Literal `0` arguments will be implicitly converted to
+        // `std::nullptr_t` and accepted by the above constructor, while other `int`
+        // arguments will fail to be converted and cause compilation failure.
+        template<
+                typename T,
+                typename = typename std::enable_if<
+                        std::is_same<T, std::nullptr_t>::value ||
+                        (std::is_integral<T>::value && !std::is_same<T, int>::value)>::type,
+                typename = typename Fail<T>::type>
+        OnlyLiteralZero(T);  // NOLINT
+    };
 
-        enum class eq : value_type {
-            equal = 0,
-            equivalent = equal,
-            nonequal = 1,
-            nonequivalent = nonequal,
-        };
+    enum class eq : value_type {
+        equal = 0,
+        equivalent = equal,
+        nonequal = 1,
+        nonequivalent = nonequal,
+    };
 
-        enum class ord : value_type {
-            less = -1, greater = 1
-        };
+    enum class ord : value_type {
+        less = -1, greater = 1
+    };
 
-        enum class ncmp : value_type {
-            unordered = -127
-        };
+    enum class ncmp : value_type {
+        unordered = -127
+    };
 
 // Define macros to allow for creation or emulation of C++17 inline variables
 // based on whether the feature is supported. Note: we can't use
@@ -104,7 +102,7 @@ namespace turbo {
 #define TURBO_COMPARE_INLINE_BASECLASS_DECL(name) \
   TURBO_CONST_INIT static const T name
 
-        // A no-op expansion that can be followed by a semicolon at class level.
+    // A no-op expansion that can be followed by a semicolon at class level.
 #define TURBO_COMPARE_INLINE_SUBCLASS_DECL(type, name) static_assert(true, "")
 
 #define TURBO_COMPARE_INLINE_INIT(type, name, init) \
@@ -113,48 +111,49 @@ namespace turbo {
 
 #endif  // __cpp_inline_variables
 
-        // These template base classes allow for defining the values of the constants
-        // in the header file (for performance) without using inline variables (which
-        // aren't available in C++11).
-        template<typename T>
-        struct weak_equality_base {
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(nonequivalent);
-        };
+    // These template base classes allow for defining the values of the constants
+    // in the header file (for performance) without using inline variables (which
+    // aren't available in C++11).
+    template<typename T>
+    struct weak_equality_base {
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(nonequivalent);
+    };
 
-        template<typename T>
-        struct strong_equality_base {
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(equal);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(nonequal);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(nonequivalent);
-        };
+    template<typename T>
+    struct strong_equality_base {
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(equal);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(nonequal);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(nonequivalent);
+    };
 
-        template<typename T>
-        struct partial_ordering_base {
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(less);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(greater);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(unordered);
-        };
+    template<typename T>
+    struct partial_ordering_base {
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(less);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(greater);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(unordered);
+    };
 
-        template<typename T>
-        struct weak_ordering_base {
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(less);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(greater);
-        };
+    template<typename T>
+    struct weak_ordering_base {
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(less);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(greater);
+    };
 
-        template<typename T>
-        struct strong_ordering_base {
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(less);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(equal);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
-            TURBO_COMPARE_INLINE_BASECLASS_DECL(greater);
-        };
+    template<typename T>
+    struct strong_ordering_base {
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(less);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(equal);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(equivalent);
+        TURBO_COMPARE_INLINE_BASECLASS_DECL(greater);
+    };
 
-    }  // namespace compare_internal
+}  // namespace turbo::compare_internal
 
+namespace turbo {
     class weak_equality
             : public compare_internal::weak_equality_base<weak_equality> {
         explicit constexpr weak_equality(compare_internal::eq v) noexcept
@@ -788,4 +787,4 @@ namespace turbo {
     TURBO_NAMESPACE_END
 }  // namespace turbo
 
-#endif  // TURBO_TYPES_COMPARE_H_
+#endif  // TURBO_META_COMPARE_H_

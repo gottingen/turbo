@@ -19,7 +19,7 @@
 #include <iostream>
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN
@@ -34,7 +34,7 @@ namespace turbo {
 
             static char data[kDataSize];
 
-// Initialize data to pseudorandom values.
+            // Initialize data to pseudorandom values.
             void setup() {
                 uint64_t a = 9;
                 uint64_t b = 777;

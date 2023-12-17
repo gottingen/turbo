@@ -27,12 +27,12 @@
 #include "turbo/platform/internal/low_level_scheduling.h"
 #include "turbo/platform/internal/scheduling_mode.h"
 #include "turbo/platform/internal/spinlock.h"
-#include "turbo/platform/internal/sysinfo.h"
+#include "turbo/base/internal/sysinfo.h"
 #include "turbo/concurrent/latch.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 
 constexpr uint32_t kNumThreads = 10;

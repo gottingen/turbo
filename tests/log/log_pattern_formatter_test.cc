@@ -18,7 +18,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 using turbo::tlog::memory_buf_t;
 using turbo::tlog::details::fmt_helper::to_string_view;

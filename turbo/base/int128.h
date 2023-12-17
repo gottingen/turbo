@@ -13,15 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// -----------------------------------------------------------------------------
-// File: int128.h
-// -----------------------------------------------------------------------------
-//
-// This header file defines 128-bit integer types, `uint128` and `int128`.
-//
-// TODO(turbo-team): This module is inconsistent as many inline `uint128` methods
-// are defined in this file, while many inline `int128` methods are defined in
-// the `int128_*_intrinsic.inc` files.
+
 
 #ifndef TURBO_BASE_INT128_H_
 #define TURBO_BASE_INT128_H_

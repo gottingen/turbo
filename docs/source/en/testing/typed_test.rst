@@ -15,7 +15,7 @@ see the following example:
 ..  code-block:: c++
 
     #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-    #include "doctest/doctest.h"
+    #include "turbo/testing/test.h"
     template <typename T>
     void add(T a, T b) {
         return a + b;

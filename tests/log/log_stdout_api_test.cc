@@ -17,7 +17,7 @@
 #include "turbo/log/sinks/stdout_sinks.h"
 #include "turbo/log/sinks/stdout_color_sinks.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 TEST_CASE("stdout_st [stdout]")
 {

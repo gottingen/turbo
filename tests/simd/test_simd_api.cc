@@ -15,7 +15,7 @@
 #include "turbo/simd/types/simd_utils.h"
 #include "turbo/simd/simd.h"
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 template<class T>
 struct scalar_type {

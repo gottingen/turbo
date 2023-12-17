@@ -21,7 +21,7 @@
 #include <thread>
 #include <vector>
 #include <set>
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/platform/port.h"
 #include "turbo/times/cctz/time_zone.h"
 #if defined(__linux__)

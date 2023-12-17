@@ -21,7 +21,7 @@
 #include <type_traits>
 
 #include "turbo/platform/port.h"
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 namespace turbo {
     namespace time_internal {

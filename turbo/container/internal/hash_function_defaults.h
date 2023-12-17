@@ -56,108 +56,119 @@
 #include "turbo/strings/cord.h"
 #include "turbo/strings/string_view.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace container_internal {
+namespace turbo::container_internal {
 
-// The hash of an object of type T is computed by using turbo::Hash.
-template <class T, class E = void>
-struct HashEq {
-  using Hash = turbo::Hash<T>;
-  using Eq = std::equal_to<T>;
-};
+    // The hash of an object of type T is computed by using turbo::Hash.
+    template<class T, class E = void>
+    struct HashEq {
+        using Hash = turbo::Hash<T>;
+        using Eq = std::equal_to<T>;
+    };
 
-struct StringHash {
-  using is_transparent = void;
+    struct StringHash {
+        using is_transparent = void;
 
-  size_t operator()(std::string_view v) const {
-    return turbo::Hash<std::string_view>{}(v);
-  }
-  size_t operator()(const turbo::Cord& v) const {
-    return turbo::Hash<turbo::Cord>{}(v);
-  }
-};
+        size_t operator()(std::string_view v) const {
+            return turbo::Hash<std::string_view>{}(v);
+        }
 
-struct StringEq {
-  using is_transparent = void;
-  bool operator()(std::string_view lhs, std::string_view rhs) const {
-    return lhs == rhs;
-  }
-  bool operator()(const turbo::Cord& lhs, const turbo::Cord& rhs) const {
-    return lhs == rhs;
-  }
-  bool operator()(const turbo::Cord& lhs, std::string_view rhs) const {
-    return lhs == rhs;
-  }
-  bool operator()(std::string_view lhs, const turbo::Cord& rhs) const {
-    return lhs == rhs;
-  }
-};
+        size_t operator()(const turbo::Cord &v) const {
+            return turbo::Hash<turbo::Cord>{}(v);
+        }
+    };
 
-// Supports heterogeneous lookup for string-like elements.
-struct StringHashEq {
-  using Hash = StringHash;
-  using Eq = StringEq;
-};
+    struct StringEq {
+        using is_transparent = void;
 
-template <>
-struct HashEq<std::string> : StringHashEq {};
-template <>
-struct HashEq<std::string_view> : StringHashEq {};
-template <>
-struct HashEq<turbo::Cord> : StringHashEq {};
+        bool operator()(std::string_view lhs, std::string_view rhs) const {
+            return lhs == rhs;
+        }
 
-// Supports heterogeneous lookup for pointers and smart pointers.
-template <class T>
-struct HashEq<T*> {
-  struct Hash {
-    using is_transparent = void;
-    template <class U>
-    size_t operator()(const U& ptr) const {
-      return turbo::Hash<const T*>{}(HashEq::ToPtr(ptr));
-    }
-  };
-  struct Eq {
-    using is_transparent = void;
-    template <class A, class B>
-    bool operator()(const A& a, const B& b) const {
-      return HashEq::ToPtr(a) == HashEq::ToPtr(b);
-    }
-  };
+        bool operator()(const turbo::Cord &lhs, const turbo::Cord &rhs) const {
+            return lhs == rhs;
+        }
 
- private:
-  static const T* ToPtr(const T* ptr) { return ptr; }
-  template <class U, class D>
-  static const T* ToPtr(const std::unique_ptr<U, D>& ptr) {
-    return ptr.get();
-  }
-  template <class U>
-  static const T* ToPtr(const std::shared_ptr<U>& ptr) {
-    return ptr.get();
-  }
-};
+        bool operator()(const turbo::Cord &lhs, std::string_view rhs) const {
+            return lhs == rhs;
+        }
 
-template <class T, class D>
-struct HashEq<std::unique_ptr<T, D>> : HashEq<T*> {};
-template <class T>
-struct HashEq<std::shared_ptr<T>> : HashEq<T*> {};
+        bool operator()(std::string_view lhs, const turbo::Cord &rhs) const {
+            return lhs == rhs;
+        }
+    };
 
-// This header's visibility is restricted.  If you need to access the default
-// hasher please use the container's ::hasher alias instead.
-//
-// Example: typename Hash = typename turbo::flat_hash_map<K, V>::hasher
-template <class T>
-using hash_default_hash = typename container_internal::HashEq<T>::Hash;
+    // Supports heterogeneous lookup for string-like elements.
+    struct StringHashEq {
+        using Hash = StringHash;
+        using Eq = StringEq;
+    };
 
-// This header's visibility is restricted.  If you need to access the default
-// key equal please use the container's ::key_equal alias instead.
-//
-// Example: typename Eq = typename turbo::flat_hash_map<K, V, Hash>::key_equal
-template <class T>
-using hash_default_eq = typename container_internal::HashEq<T>::Eq;
+    template<>
+    struct HashEq<std::string> : StringHashEq {
+    };
+    template<>
+    struct HashEq<std::string_view> : StringHashEq {
+    };
+    template<>
+    struct HashEq<turbo::Cord> : StringHashEq {
+    };
 
-}  // namespace container_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    // Supports heterogeneous lookup for pointers and smart pointers.
+    template<class T>
+    struct HashEq<T *> {
+        struct Hash {
+            using is_transparent = void;
+
+            template<class U>
+            size_t operator()(const U &ptr) const {
+                return turbo::Hash<const T *>{}(HashEq::ToPtr(ptr));
+            }
+        };
+
+        struct Eq {
+            using is_transparent = void;
+
+            template<class A, class B>
+            bool operator()(const A &a, const B &b) const {
+                return HashEq::ToPtr(a) == HashEq::ToPtr(b);
+            }
+        };
+
+    private:
+        static const T *ToPtr(const T *ptr) { return ptr; }
+
+        template<class U, class D>
+        static const T *ToPtr(const std::unique_ptr<U, D> &ptr) {
+            return ptr.get();
+        }
+
+        template<class U>
+        static const T *ToPtr(const std::shared_ptr<U> &ptr) {
+            return ptr.get();
+        }
+    };
+
+    template<class T, class D>
+    struct HashEq<std::unique_ptr<T, D>> : HashEq<T *> {
+    };
+    template<class T>
+    struct HashEq<std::shared_ptr<T>> : HashEq<T *> {
+    };
+
+    // This header's visibility is restricted.  If you need to access the default
+    // hasher please use the container's ::hasher alias instead.
+    //
+    // Example: typename Hash = typename turbo::flat_hash_map<K, V>::hasher
+    template<class T>
+    using hash_default_hash = typename container_internal::HashEq<T>::Hash;
+
+    // This header's visibility is restricted.  If you need to access the default
+    // key equal please use the container's ::key_equal alias instead.
+    //
+    // Example: typename Eq = typename turbo::flat_hash_map<K, V, Hash>::key_equal
+    template<class T>
+    using hash_default_eq = typename container_internal::HashEq<T>::Eq;
+
+}  // namespace turbo::container_internal
 
 #endif  // TURBO_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_

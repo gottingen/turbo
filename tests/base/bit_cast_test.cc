@@ -20,7 +20,7 @@
 #include "turbo/base/casts.h"
 #include "turbo/platform/port.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 namespace turbo {
     TURBO_NAMESPACE_BEGIN

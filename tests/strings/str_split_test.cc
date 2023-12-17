@@ -34,7 +34,7 @@
 #include "turbo/strings/numbers.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 namespace {
 

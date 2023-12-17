@@ -14,7 +14,7 @@
 //
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/hash/mixer.h"
 #include "turbo/hash/hash.h"
 #include "turbo/format/print.h"

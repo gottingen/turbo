@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/prefetch.h"
+#include "turbo/memory/prefetch.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 namespace {
 
@@ -24,22 +24,22 @@ namespace {
 
     TEST_CASE("Prefetch") {
         SUBCASE("TemporalLocalityNone") {
-            turbo::base_internal::PrefetchNta(&number);
+            turbo::prefetch_nta(&number);
             CHECK_EQ(number, 42);
         }
 
         SUBCASE("TemporalLocalityLow") {
-            turbo::base_internal::PrefetchT2(&number);
+            turbo::prefetch_t2(&number);
             CHECK_EQ(number, 42);
         }
 
         SUBCASE("TemporalLocalityMedium") {
-            turbo::base_internal::PrefetchT1(&number);
+            turbo::prefetch_t1(&number);
             CHECK_EQ(number, 42);
         }
 
         SUBCASE("TemporalLocalityHigh") {
-            turbo::base_internal::PrefetchT0(&number);
+            turbo::prefetch_t0(&number);
             CHECK_EQ(number, 42);
         }
     }

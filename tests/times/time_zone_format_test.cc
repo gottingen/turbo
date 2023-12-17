@@ -27,7 +27,7 @@
 
 #endif
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/times/cctz/civil_time.h"
 
 namespace chrono = std::chrono;

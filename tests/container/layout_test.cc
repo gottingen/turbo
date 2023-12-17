@@ -27,7 +27,7 @@
 #include "turbo/meta/span.h"
 #include "turbo/platform/port.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 namespace turbo::container_internal {
     namespace {

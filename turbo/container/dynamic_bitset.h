@@ -127,23 +127,25 @@
 
 namespace turbo {
 
-    //
-    // @brief      Dynamic bitset.
-    //
-    // @details    Data structure used to store a vector of bits and apply binary operations to it. The
-    //             bits are stored in an optimized way in an underling block type. It is highly inspired
-    //             by std\::bitset but with a run-time changeable size.
-    //
-    //             Preconditions are checked with @a assert but no exception will be thrown if one is
-    //             violated (as with std\::bitset).
-    //
-    // @remark     It is not a Container as it does not provide iterators because of the reference proxy
-    //             class used to access the bits.
-    //
-    // @tparam     Block      Block type to use for storing the bits, must be an unsigned integral type
-    // @tparam     Allocator  Allocator type to use for memory management, must meet the standard
-    //             requirements of @a Allocator
-
+    /**
+     * @brief      Dynamic bitset.
+     *
+     * @details    Data structure used to store a vector of bits and apply binary operations to it. The
+     *             bits are stored in an optimized way in an underling block type. It is highly inspired
+     *             by std\::bitset but with a run-time changeable size.
+     *
+     *             Preconditions are checked with @a assert but no exception will be thrown if one is
+     *             violated (as with std\::bitset).
+     *
+     * @remark     It is not a Container as it does not provide iterators because of the reference proxy
+     *             class used to access the bits.
+     *
+     * @tparam     Block      Block type to use for storing the bits, must be an unsigned integral type
+     * @tparam     Allocator  Allocator type to use for memory management, must meet the standard
+     *             requirements of @a Allocator
+     *
+     * @since      0.9.30
+     */
     template<typename Block = unsigned long long, typename Allocator = std::allocator<Block>>
     class dynamic_bitset {
         static_assert(std::is_unsigned<Block>::value, "Block is not an unsigned integral type");
@@ -152,35 +154,35 @@ namespace turbo {
         /**
          * @brief      Type used to represent the size of a @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         typedef size_t size_type;
 
         /**
          * @brief      Same type as @p Block.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         typedef Block block_type;
 
         /**
          * @brief      Same type as @p Allocator.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         typedef Allocator allocator_type;
 
         /**
          * @brief      Number of bits that can be stored in a block.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         static constexpr size_type bits_per_block = std::numeric_limits<block_type>::digits;
 
         /**
          * @brief      Maximum value of @ref size_type, returned for invalid positions.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         static constexpr size_type npos = std::numeric_limits<size_type>::max();
 
@@ -192,7 +194,7 @@ namespace turbo {
          *             to a boolean. Hence this class is used as a proxy to enable subscript operator of
          *             the @ref sul::dynamic_bitset class to be used as if it was an array of bools.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         class reference {
         public:
@@ -205,28 +207,28 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference(dynamic_bitset<Block, Allocator> &bitset, size_type bit_pos);
 
             /**
              * @brief      Copy constructor.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference(const reference &) noexcept = default;
 
             /**
              * @brief      Move constructor.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference(reference &&) noexcept = default;
 
             /**
              * @brief      Destructor.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             ~reference() noexcept = default;
 
@@ -239,7 +241,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &operator=(bool v);
 
@@ -252,7 +254,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &operator=(const reference &rhs);
 
@@ -265,7 +267,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &operator=(reference &&rhs) noexcept;
 
@@ -279,7 +281,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &operator&=(bool v);
 
@@ -293,7 +295,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &operator|=(bool v);
 
@@ -307,7 +309,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &operator^=(bool v);
 
@@ -326,7 +328,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &operator-=(bool v);
 
@@ -337,7 +339,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             [[nodiscard]] constexpr bool operator~() const;
 
@@ -346,14 +348,14 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             [[nodiscard]] constexpr operator bool() const;
 
             /**
              * @brief      Deleted to avoid taking the address of a temporary proxy object.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr void operator&() = delete;
 
@@ -364,7 +366,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &set();
 
@@ -375,7 +377,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &reset();
 
@@ -386,7 +388,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &flip();
 
@@ -399,7 +401,7 @@ namespace turbo {
              *
              * @complexity Constant.
              *
-             * @since      1.0.0
+             * @since      0.9.30
              */
             constexpr reference &assign(bool v);
 
@@ -411,28 +413,28 @@ namespace turbo {
         /**
          * @brief      Const reference to a @ref sul::dynamic_bitset bit, type bool.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         typedef bool const_reference;
 
         /**
          * @brief      Copy constructor.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset(const dynamic_bitset<Block, Allocator> &other) = default;
 
         /**
          * @brief      Move constructor.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset(dynamic_bitset<Block, Allocator> &&other) noexcept = default;
 
         /**
          * @brief      Copy assignment operator.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator=(
                 const dynamic_bitset<Block, Allocator> &other) = default;
@@ -440,7 +442,7 @@ namespace turbo {
         /**
          * @brief      Move assignment operator.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator=(
                 dynamic_bitset<Block, Allocator> &&other) noexcept = default;
@@ -454,7 +456,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr explicit dynamic_bitset(const allocator_type &allocator = allocator_type());
 
@@ -472,7 +474,7 @@ namespace turbo {
          *
          * @complexity Linear in @p nbits / @ref bits_per_block.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr explicit dynamic_bitset(size_type nbits,
                                           unsigned long long init_val = 0,
@@ -490,7 +492,7 @@ namespace turbo {
          *
          * @complexity Linear in @p init_vals.size().
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset(std::initializer_list<block_type> init_vals,
                                  const allocator_type &allocator = allocator_type());
@@ -518,7 +520,7 @@ namespace turbo {
          *
          * @complexity Linear in std\::min(@p n, @p str.size() - @p pos).
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename _CharT, typename _Traits>
         constexpr explicit dynamic_bitset(
@@ -554,7 +556,7 @@ namespace turbo {
          *
          * @complexity Linear in std\::min(@p n, @p str.size() - @p pos).
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename _CharT, typename _Traits, typename _Alloc>
         constexpr explicit dynamic_bitset(
@@ -589,7 +591,7 @@ namespace turbo {
          *
          * @complexity Linear in std\::min(@p n, @p _Traits\::length(@p str) - @p pos).
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename _CharT, typename _Traits = std::char_traits<_CharT>>
         constexpr explicit dynamic_bitset(
@@ -603,7 +605,7 @@ namespace turbo {
         /**
          * @brief      Destructor.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         ~dynamic_bitset() noexcept = default;
 
@@ -620,7 +622,7 @@ namespace turbo {
          *             Additional complexity possible due to reallocation if capacity is less than @p
          *             nbits.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void resize(size_type nbits, bool value = false);
 
@@ -634,7 +636,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void clear();
 
@@ -648,7 +650,7 @@ namespace turbo {
          *
          * @complexity Amortized constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void push_back(bool value);
 
@@ -660,7 +662,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void pop_back();
 
@@ -673,7 +675,7 @@ namespace turbo {
          *
          * @complexity Amortized constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void append(block_type block);
 
@@ -686,7 +688,7 @@ namespace turbo {
          *             to reallocation if capacity is less than @ref size() + @p blocks.size() * @ref
          *             bits_per_block.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void append(std::initializer_list<block_type> blocks);
 
@@ -703,7 +705,7 @@ namespace turbo {
          *             to reallocation if capacity is less than @ref size() + std\::distance(@p first,
          *             @p last) * @ref bits_per_block.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename BlockInputIterator>
         constexpr void append(BlockInputIterator first, BlockInputIterator last);
@@ -722,7 +724,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator&=(
                 const dynamic_bitset<Block, Allocator> &rhs);
@@ -741,7 +743,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator|=(
                 const dynamic_bitset<Block, Allocator> &rhs);
@@ -760,7 +762,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator^=(
                 const dynamic_bitset<Block, Allocator> &rhs);
@@ -784,7 +786,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator-=(
                 const dynamic_bitset<Block, Allocator> &rhs);
@@ -800,7 +802,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator<<=(size_type shift);
 
@@ -815,7 +817,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &operator>>=(size_type shift);
 
@@ -835,7 +837,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr dynamic_bitset<Block, Allocator> operator<<(size_type shift) const;
 
@@ -855,7 +857,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr dynamic_bitset<Block, Allocator> operator>>(size_type shift) const;
 
@@ -872,7 +874,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr dynamic_bitset<Block, Allocator> operator~() const;
 
@@ -893,7 +895,7 @@ namespace turbo {
          *
          * @complexity Linear in @p len.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &set(size_type pos, size_type len, bool value);
 
@@ -911,7 +913,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &set(size_type pos, bool value = true);
 
@@ -922,7 +924,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &set();
 
@@ -940,7 +942,7 @@ namespace turbo {
          *
          * @complexity Linear in @p len.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &reset(size_type pos, size_type len);
 
@@ -957,7 +959,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &reset(size_type pos);
 
@@ -968,7 +970,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &reset();
 
@@ -986,7 +988,7 @@ namespace turbo {
          *
          * @complexity Linear in @p len.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &flip(size_type pos, size_type len);
 
@@ -1003,7 +1005,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &flip(size_type pos);
 
@@ -1014,7 +1016,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr dynamic_bitset<Block, Allocator> &flip();
 
@@ -1031,7 +1033,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool test(size_type pos) const;
 
@@ -1050,7 +1052,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool test_set(size_type pos, bool value = true);
 
@@ -1065,7 +1067,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool all() const;
 
@@ -1080,7 +1082,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool any() const;
 
@@ -1095,7 +1097,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool none() const;
 
@@ -1108,7 +1110,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr size_type count() const noexcept;
 
@@ -1125,7 +1127,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr reference operator[](size_type pos);
 
@@ -1142,7 +1144,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr const_reference operator[](size_type pos) const;
 
@@ -1153,7 +1155,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr size_type size() const noexcept;
 
@@ -1164,7 +1166,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr size_type num_blocks() const noexcept;
 
@@ -1180,7 +1182,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool empty() const noexcept;
 
@@ -1192,7 +1194,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr size_type capacity() const noexcept;
 
@@ -1208,7 +1210,7 @@ namespace turbo {
          *
          * @complexity At most linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void reserve(size_type num_bits);
 
@@ -1222,7 +1224,7 @@ namespace turbo {
          *
          * @complexity At most linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void shrink_to_fit();
 
@@ -1252,7 +1254,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool is_subset_of(const dynamic_bitset<Block, Allocator> &bitset) const;
 
@@ -1282,7 +1284,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool is_proper_subset_of(
                 const dynamic_bitset<Block, Allocator> &bitset) const;
@@ -1310,7 +1312,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr bool intersects(const dynamic_bitset<Block, Allocator> &bitset) const;
 
@@ -1325,7 +1327,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr size_type find_first() const;
 
@@ -1344,7 +1346,7 @@ namespace turbo {
          *
          * @complexity Linear in @ref size() - @p prev.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr size_type find_next(size_type prev) const;
 
@@ -1357,7 +1359,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         constexpr void swap(dynamic_bitset<Block, Allocator> &other);
 
@@ -1368,7 +1370,7 @@ namespace turbo {
          *
          * @complexity Constant.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         [[nodiscard]] constexpr allocator_type get_allocator() const;
 
@@ -1392,7 +1394,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename _CharT = char,
                 typename _Traits = std::char_traits<_CharT>,
@@ -1426,7 +1428,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename Function, typename... Parameters>
         constexpr void iterate_bits_on(Function &&function, Parameters &&... parameters) const;
@@ -1516,7 +1518,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename Block_, typename Allocator_>
         friend constexpr bool operator==(const dynamic_bitset<Block_, Allocator_> &lhs,
@@ -1566,7 +1568,7 @@ namespace turbo {
          *
          * @complexity Linear in the size of the @ref sul::dynamic_bitset.
          *
-         * @since      1.0.0
+         * @since      0.9.30
          */
         template<typename Block_, typename Allocator_>
         friend constexpr bool operator<(const dynamic_bitset<Block_, Allocator_> &lhs,
@@ -1679,7 +1681,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1707,7 +1709,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1736,7 +1738,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1765,7 +1767,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1798,7 +1800,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1831,7 +1833,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1864,7 +1866,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1897,7 +1899,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1926,7 +1928,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1959,7 +1961,7 @@ namespace turbo {
  *
  * @complexity Linear in the size of the @ref sul::dynamic_bitset.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */
@@ -1984,7 +1986,7 @@ namespace turbo {
  *
  * @complexity Constant.
  *
- * @since      1.0.0
+ * @since      0.9.30
  *
  * @relatesalso dynamic_bitset
  */

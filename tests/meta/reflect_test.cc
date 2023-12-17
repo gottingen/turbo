@@ -23,7 +23,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 #define REFLECT_ENUM_RANGE_MIN -120
 #define REFLECT_ENUM_RANGE_MAX 120

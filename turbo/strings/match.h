@@ -170,6 +170,8 @@ namespace turbo {
         return piece1.size() == piece2.size() && func(piece1, piece2);
     }
 
+    bool str_equals_ignore_case(const wchar_t* lhs, const wchar_t* rhs);
+
     /**
      * @ingroup turbo_strings_match
      * @brief Returns whether given ASCII strings `first` and `last` are equal, ignoring

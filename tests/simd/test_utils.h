@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 #ifndef TURBO_SIMD_TEST_UTILS_H_
 #define TURBO_SIMD_TEST_UTILS_H_

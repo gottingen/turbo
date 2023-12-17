@@ -16,6 +16,7 @@
 #define TURBO_BASE_SYSINFO_H_
 
 #include "turbo/platform/port.h"
+#include "turbo/base/internal/sysinfo.h"
 #include <cstdio>
 
 namespace turbo {
@@ -59,6 +60,28 @@ namespace turbo {
      * @return The host memory size
      */
     TURBO_DLL size_t get_host_memory_size();
+
+    /**
+     * @ingroup turbo_base
+     * @brief Get the nominal cpu frequency of the current machine.
+     *        Nominal core processor cycles per second of each processor.   This is _not_
+     *        necessarily the frequency of the CycleClock counter
+     *        Thread-safe.
+     * @return
+     */
+   inline double nominal_cpu_frequency() {
+        return base_internal::NominalCPUFrequency();
+    }
+
+    /**
+     * @ingroup turbo_base
+     * @brief Get the number of logical processors (hyperthreads) in system.
+     *        Thread-safe.
+     * @return
+     */
+    inline size_t cpu_num() {
+        return base_internal::NumCPUs();
+    }
 
 }  // namespace turbo
 

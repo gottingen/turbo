@@ -24,109 +24,112 @@
 
 #include "turbo/meta/type_traits.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace container_internal {
+namespace turbo::container_internal {
 
-// Defines how slots are initialized/destroyed/moved.
-template <class Policy, class = void>
-struct common_policy_traits {
-  // The actual object stored in the container.
-  using slot_type = typename Policy::slot_type;
-  using reference = decltype(Policy::element(std::declval<slot_type*>()));
-  using value_type = typename std::remove_reference<reference>::type;
+    // Defines how slots are initialized/destroyed/moved.
+    template<class Policy, class = void>
+    struct common_policy_traits {
+        // The actual object stored in the container.
+        using slot_type = typename Policy::slot_type;
+        using reference = decltype(Policy::element(std::declval<slot_type *>()));
+        using value_type = typename std::remove_reference<reference>::type;
 
-  // PRECONDITION: `slot` is UNINITIALIZED
-  // POSTCONDITION: `slot` is INITIALIZED
-  template <class Alloc, class... Args>
-  static void construct(Alloc* alloc, slot_type* slot, Args&&... args) {
-    Policy::construct(alloc, slot, std::forward<Args>(args)...);
-  }
+        // PRECONDITION: `slot` is UNINITIALIZED
+        // POSTCONDITION: `slot` is INITIALIZED
+        template<class Alloc, class... Args>
+        static void construct(Alloc *alloc, slot_type *slot, Args &&... args) {
+            Policy::construct(alloc, slot, std::forward<Args>(args)...);
+        }
 
-  // PRECONDITION: `slot` is INITIALIZED
-  // POSTCONDITION: `slot` is UNINITIALIZED
-  template <class Alloc>
-  static void destroy(Alloc* alloc, slot_type* slot) {
-    Policy::destroy(alloc, slot);
-  }
+        // PRECONDITION: `slot` is INITIALIZED
+        // POSTCONDITION: `slot` is UNINITIALIZED
+        template<class Alloc>
+        static void destroy(Alloc *alloc, slot_type *slot) {
+            Policy::destroy(alloc, slot);
+        }
 
-  // Transfers the `old_slot` to `new_slot`. Any memory allocated by the
-  // allocator inside `old_slot` to `new_slot` can be transferred.
-  //
-  // OPTIONAL: defaults to:
-  //
-  //     clone(new_slot, std::move(*old_slot));
-  //     destroy(old_slot);
-  //
-  // PRECONDITION: `new_slot` is UNINITIALIZED and `old_slot` is INITIALIZED
-  // POSTCONDITION: `new_slot` is INITIALIZED and `old_slot` is
-  //                UNINITIALIZED
-  template <class Alloc>
-  static void transfer(Alloc* alloc, slot_type* new_slot, slot_type* old_slot) {
-    transfer_impl(alloc, new_slot, old_slot, Rank0{});
-  }
+        // Transfers the `old_slot` to `new_slot`. Any memory allocated by the
+        // allocator inside `old_slot` to `new_slot` can be transferred.
+        //
+        // OPTIONAL: defaults to:
+        //
+        //     clone(new_slot, std::move(*old_slot));
+        //     destroy(old_slot);
+        //
+        // PRECONDITION: `new_slot` is UNINITIALIZED and `old_slot` is INITIALIZED
+        // POSTCONDITION: `new_slot` is INITIALIZED and `old_slot` is
+        //                UNINITIALIZED
+        template<class Alloc>
+        static void transfer(Alloc *alloc, slot_type *new_slot, slot_type *old_slot) {
+            transfer_impl(alloc, new_slot, old_slot, Rank0{});
+        }
 
-  // PRECONDITION: `slot` is INITIALIZED
-  // POSTCONDITION: `slot` is INITIALIZED
-  // Note: we use remove_const_t so that the two overloads have different args
-  // in the case of sets with explicitly const value_types.
-  template <class P = Policy>
-  static auto element(std::remove_const_t<slot_type>* slot)
-      -> decltype(P::element(slot)) {
-    return P::element(slot);
-  }
-  template <class P = Policy>
-  static auto element(const slot_type* slot) -> decltype(P::element(slot)) {
-    return P::element(slot);
-  }
+        // PRECONDITION: `slot` is INITIALIZED
+        // POSTCONDITION: `slot` is INITIALIZED
+        // Note: we use remove_const_t so that the two overloads have different args
+        // in the case of sets with explicitly const value_types.
+        template<class P = Policy>
+        static auto element(std::remove_const_t<slot_type> *slot)
+        -> decltype(P::element(slot)) {
+            return P::element(slot);
+        }
 
-  static constexpr bool transfer_uses_memcpy() {
-    return std::is_same<decltype(transfer_impl<std::allocator<char>>(
-                            nullptr, nullptr, nullptr, Rank0{})),
-                        std::true_type>::value;
-  }
+        template<class P = Policy>
+        static auto element(const slot_type *slot) -> decltype(P::element(slot)) {
+            return P::element(slot);
+        }
 
- private:
-  // To rank the overloads below for overload resoltion. Rank0 is preferred.
-  struct Rank2 {};
-  struct Rank1 : Rank2 {};
-  struct Rank0 : Rank1 {};
+        static constexpr bool transfer_uses_memcpy() {
+            return std::is_same<decltype(transfer_impl<std::allocator<char>>(
+                    nullptr, nullptr, nullptr, Rank0{})),
+                    std::true_type>::value;
+        }
 
-  // Use auto -> decltype as an enabler.
-  template <class Alloc, class P = Policy>
-  static auto transfer_impl(Alloc* alloc, slot_type* new_slot,
-                            slot_type* old_slot, Rank0)
-      -> decltype((void)P::transfer(alloc, new_slot, old_slot)) {
-    P::transfer(alloc, new_slot, old_slot);
-  }
+    private:
+        // To rank the overloads below for overload resoltion. Rank0 is preferred.
+        struct Rank2 {
+        };
+        struct Rank1 : Rank2 {
+        };
+        struct Rank0 : Rank1 {
+        };
+
+        // Use auto -> decltype as an enabler.
+        template<class Alloc, class P = Policy>
+        static auto transfer_impl(Alloc *alloc, slot_type *new_slot,
+                                  slot_type *old_slot, Rank0)
+        -> decltype((void) P::transfer(alloc, new_slot, old_slot)) {
+            P::transfer(alloc, new_slot, old_slot);
+        }
+
 #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
-  // This overload returns true_type for the trait below.
-  // The conditional_t is to make the enabler type dependent.
-  template <class Alloc,
-            typename = std::enable_if_t<turbo::is_trivially_relocatable<
-                std::conditional_t<false, Alloc, value_type>>::value>>
-  static std::true_type transfer_impl(Alloc*, slot_type* new_slot,
-                                      slot_type* old_slot, Rank1) {
-    // TODO(b/247130232): remove casts after fixing warnings.
-    // TODO(b/251814870): remove casts after fixing warnings.
-    std::memcpy(
-        static_cast<void*>(std::launder(
-            const_cast<std::remove_const_t<value_type>*>(&element(new_slot)))),
-        static_cast<const void*>(&element(old_slot)), sizeof(value_type));
-    return {};
-  }
+
+        // This overload returns true_type for the trait below.
+        // The conditional_t is to make the enabler type dependent.
+        template<class Alloc,
+                typename = std::enable_if_t<turbo::is_trivially_relocatable<
+                        std::conditional_t<false, Alloc, value_type>>::value>>
+        static std::true_type transfer_impl(Alloc *, slot_type *new_slot,
+                                            slot_type *old_slot, Rank1) {
+            // TODO(b/247130232): remove casts after fixing warnings.
+            // TODO(b/251814870): remove casts after fixing warnings.
+            std::memcpy(
+                    static_cast<void *>(std::launder(
+                            const_cast<std::remove_const_t<value_type> *>(&element(new_slot)))),
+                    static_cast<const void *>(&element(old_slot)), sizeof(value_type));
+            return {};
+        }
+
 #endif
 
-  template <class Alloc>
-  static void transfer_impl(Alloc* alloc, slot_type* new_slot,
-                            slot_type* old_slot, Rank2) {
-    construct(alloc, new_slot, std::move(element(old_slot)));
-    destroy(alloc, old_slot);
-  }
-};
+        template<class Alloc>
+        static void transfer_impl(Alloc *alloc, slot_type *new_slot,
+                                  slot_type *old_slot, Rank2) {
+            construct(alloc, new_slot, std::move(element(old_slot)));
+            destroy(alloc, old_slot);
+        }
+    };
 
-}  // namespace container_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::container_internal
 
 #endif  // TURBO_CONTAINER_INTERNAL_COMMON_POLICY_TRAITS_H_

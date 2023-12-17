@@ -14,7 +14,7 @@
 //
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "includes.h"
 
 #ifdef TLOG_USE_STD_FORMAT

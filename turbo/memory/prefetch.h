@@ -18,7 +18,9 @@
 #include "turbo/platform/port.h"
 
 #if TURBO_WITH_SSE3 || TURBO_WITH_SSE2
+
 #include <xmmintrin.h>
+
 #endif
 
 #if defined(_MSC_VER) && (TURBO_WITH_SSE3 || TURBO_WITH_SSE2)
@@ -52,30 +54,31 @@
 //
 // Example usage:
 //
-//   turbo::base_internal::PrefetchT0(addr);
+//   turbo::prefetch_t0(addr);
 //
 // Currently, the different prefetch calls behave on some Intel
 // architectures as follows:
 //
 //                 SNB..SKL   SKX
-// PrefetchT0()   L1/L2/L3  L1/L2
-// PrefetchT1()      L2/L3     L2
-// PrefetchT2()      L2/L3     L2
-// PrefetchNta()  L1/--/L3  L1*
+// prefetch_t0()   L1/L2/L3  L1/L2
+// prefetch_t1()      L2/L3     L2
+// prefetch_t2()      L2/L3     L2
+// prefetch_nta()  L1/--/L3  L1*
 //
-// * On SKX PrefetchNta() will bring the line into L1 but will evict
+// * On SKX prefetch_nta() will bring the line into L1 but will evict
 //   from L3 cache. This might result in surprising behavior.
 //
 // SNB = Sandy Bridge, SKL = Skylake, SKX = Skylake Xeon.
 //
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
 
-void PrefetchT0(const void* addr);
-void PrefetchT1(const void* addr);
-void PrefetchT2(const void* addr);
-void PrefetchNta(const void* addr);
+    void prefetch_t0(const void *addr);
+
+    void prefetch_t1(const void *addr);
+
+    void prefetch_t2(const void *addr);
+
+    void prefetch_nta(const void *addr);
 
 // Implementation details follow.
 
@@ -83,56 +86,57 @@ void PrefetchNta(const void* addr);
 
 #define TURBO_INTERNAL_HAVE_PREFETCH 1
 
-// See __builtin_prefetch:
-// https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html.
-//
-// These functions speculatively load for read only. This is
-// safe for all currently supported platforms. However, prefetch for
-// store may have problems depending on the target platform.
-//
-inline void PrefetchT0(const void* addr) {
-  // Note: this uses prefetcht0 on Intel.
-  __builtin_prefetch(addr, 0, 3);
-}
-inline void PrefetchT1(const void* addr) {
-  // Note: this uses prefetcht1 on Intel.
-  __builtin_prefetch(addr, 0, 2);
-}
-inline void PrefetchT2(const void* addr) {
-  // Note: this uses prefetcht2 on Intel.
-  __builtin_prefetch(addr, 0, 1);
-}
-inline void PrefetchNta(const void* addr) {
-  // Note: this uses prefetchtnta on Intel.
-  __builtin_prefetch(addr, 0, 0);
-}
+    // See __builtin_prefetch:
+    // https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html.
+    //
+    // These functions speculatively load for read only. This is
+    // safe for all currently supported platforms. However, prefetch for
+    // store may have problems depending on the target platform.
+    //
+    inline void prefetch_t0(const void *addr) {
+        // Note: this uses prefetcht0 on Intel.
+        __builtin_prefetch(addr, 0, 3);
+    }
+
+    inline void prefetch_t1(const void *addr) {
+        // Note: this uses prefetcht1 on Intel.
+        __builtin_prefetch(addr, 0, 2);
+    }
+
+    inline void prefetch_t2(const void *addr) {
+        // Note: this uses prefetcht2 on Intel.
+        __builtin_prefetch(addr, 0, 1);
+    }
+
+    inline void prefetch_nta(const void *addr) {
+        // Note: this uses prefetchtnta on Intel.
+        __builtin_prefetch(addr, 0, 0);
+    }
 
 #elif (TURBO_WITH_SSE3 || TURBO_WITH_SSE2)
 
 #define TURBO_INTERNAL_HAVE_PREFETCH 1
 
-inline void PrefetchT0(const void* addr) {
-  _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_T0);
-}
-inline void PrefetchT1(const void* addr) {
-  _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_T1);
-}
-inline void PrefetchT2(const void* addr) {
-  _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_T2);
-}
-inline void PrefetchNta(const void* addr) {
-  _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_NTA);
-}
+    inline void prefetch_t0(const void* addr) {
+      _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_T0);
+    }
+    inline void prefetch_t1(const void* addr) {
+      _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_T1);
+    }
+    inline void prefetch_t2(const void* addr) {
+      _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_T2);
+    }
+    inline void prefetch_nta(const void* addr) {
+      _mm_prefetch(reinterpret_cast<const char*>(addr), _MM_HINT_NTA);
+    }
 
 #else
-inline void PrefetchT0(const void*) {}
-inline void PrefetchT1(const void*) {}
-inline void PrefetchT2(const void*) {}
-inline void PrefetchNta(const void*) {}
+    inline void prefetch_t0(const void*) {}
+    inline void prefetch_t1(const void*) {}
+    inline void prefetch_t2(const void*) {}
+    inline void prefetch_nta(const void*) {}
 #endif
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_BASE_INTERNAL_PREFETCH_H_

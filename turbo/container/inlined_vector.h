@@ -53,16 +53,16 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-// -----------------------------------------------------------------------------
-// InlinedVector
-// -----------------------------------------------------------------------------
-//
-// An `turbo::InlinedVector` is designed to be a drop-in replacement for
-// `std::vector` for use cases where the vector's size is sufficiently small
-// that it can be inlined. If the inlined vector does grow beyond its estimated
-// capacity, it will trigger an initial allocation on the heap, and will behave
-// as a `std::vector`. The API of the `turbo::InlinedVector` within this file is
-// designed to cover the same API footprint as covered by `std::vector`.
+    // -----------------------------------------------------------------------------
+    // InlinedVector
+    // -----------------------------------------------------------------------------
+    //
+    // An `turbo::InlinedVector` is designed to be a drop-in replacement for
+    // `std::vector` for use cases where the vector's size is sufficiently small
+    // that it can be inlined. If the inlined vector does grow beyond its estimated
+    // capacity, it will trigger an initial allocation on the heap, and will behave
+    // as a `std::vector`. The API of the `turbo::InlinedVector` within this file is
+    // designed to cover the same API footprint as covered by `std::vector`.
     template<typename T, size_t N, typename A = std::allocator<T>>
     class InlinedVector {
         static_assert(N > 0, "`turbo::InlinedVector` requires an inlined capacity.");

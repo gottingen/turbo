@@ -81,9 +81,9 @@ carbin_cc_test(
 
 carbin_cc_test(
         NAME
-        low_level_hash_test
+        bytes_hash_test
         SOURCES
-        "low_level_hash_test.cc"
+        "bytes_hash_test.cc"
         COPTS
         ${CARBIN_CXX_OPTIONS}
         DEPS

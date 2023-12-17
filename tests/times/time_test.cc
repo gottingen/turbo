@@ -25,7 +25,7 @@
 #include <limits>
 #include <string>
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/base/int128.h"
 #include "turbo/times/clock.h"
 #include "tests/times/test_util.h"

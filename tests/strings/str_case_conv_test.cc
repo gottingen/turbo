@@ -15,7 +15,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/strings/str_case_conv.h"
 #include "turbo/strings/ascii.h"
 

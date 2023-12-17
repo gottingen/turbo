@@ -55,89 +55,87 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-// FunctionRef
-//
-// Dummy class declaration to allow the partial specialization based on function
-// types below.
-template <typename T>
-class FunctionRef;
+    // FunctionRef
+    //
+    // Dummy class declaration to allow the partial specialization based on function
+    // types below.
+    template<typename T>
+    class FunctionRef;
 
-// FunctionRef
-//
-// An `turbo::FunctionRef` is a lightweight wrapper to any invokable object with
-// a compatible signature. Generally, an `turbo::FunctionRef` should only be used
-// as an argument type and should be preferred as an argument over a const
-// reference to a `std::function`. `turbo::FunctionRef` itself does not allocate,
-// although the wrapped invokable may.
-//
-// Example:
-//
-//   // The following function takes a function callback by const reference
-//   bool Visitor(const std::function<void(my_proto&,
-//                                         std::string_view)>& callback);
-//
-//   // Assuming that the function is not stored or otherwise copied, it can be
-//   // replaced by an `turbo::FunctionRef`:
-//   bool Visitor(turbo::FunctionRef<void(my_proto&, std::string_view)>
-//                  callback);
-//
-// Note: the assignment operator within an `turbo::FunctionRef` is intentionally
-// deleted to prevent misuse; because the `turbo::FunctionRef` does not own the
-// underlying type, assignment likely indicates misuse.
-template <typename R, typename... Args>
-class FunctionRef<R(Args...)> {
- private:
-  // Used to disable constructors for objects that are not compatible with the
-  // signature of this FunctionRef.
-  template <typename F,
-            typename FR = std::invoke_result_t<F, Args&&...>>
-  using EnableIfCompatible =
-      typename std::enable_if<std::is_void<R>::value ||
-                              std::is_convertible<FR, R>::value>::type;
+    /**
+     * @ingroup turbo_meta_functions
+     * @brief A `turbo::FunctionRef` is a lightweight wrapper to any invokable object with
+     *        a compatible signature. Generally, an `turbo::FunctionRef` should only be used
+     *        as an argument type and should be preferred as an argument over a const
+     *        reference to a `std::function`. `turbo::FunctionRef` itself does not allocate,
+     *        although the wrapped invokable may.
+     *        Example:
+     *        @code
+     *        // The following function takes a function callback by const reference
+     *        bool Visitor(const std::function<void(my_proto&,
+     *        std::string_view)>& callback);
+     *        // Assuming that the function is not stored or otherwise copied, it can be
+     *        // replaced by an `turbo::FunctionRef`:
+     *        bool Visitor(turbo::FunctionRef<void(my_proto&, std::string_view)>
+     *        callback);
+     *        @endcode
+     *@note the assignment operator within an `turbo::FunctionRef` is intentionally
+     *     deleted to prevent misuse; because the `turbo::FunctionRef` does not own the
+     *     underlying type, assignment likely indicates misuse.
+     */
+    template<typename R, typename... Args>
+    class FunctionRef<R(Args...)> {
+    private:
+        // Used to disable constructors for objects that are not compatible with the
+        // signature of this FunctionRef.
+        template<typename F,
+                typename FR = std::invoke_result_t<F, Args &&...>>
+        using EnableIfCompatible =
+                typename std::enable_if<std::is_void<R>::value ||
+                                        std::is_convertible<FR, R>::value>::type;
 
- public:
-  // Constructs a FunctionRef from any invokable type.
-  template <typename F, typename = EnableIfCompatible<const F&>>
-  // NOLINTNEXTLINE(runtime/explicit)
-  FunctionRef(const F& f TURBO_ATTRIBUTE_LIFETIME_BOUND)
-      : invoker_(&turbo::functional_internal::InvokeObject<F, R, Args...>) {
-    turbo::functional_internal::AssertNonNull(f);
-    ptr_.obj = &f;
-  }
+    public:
+        // Constructs a FunctionRef from any invokable type.
+        template<typename F, typename = EnableIfCompatible<const F &>>
+        // NOLINTNEXTLINE(runtime/explicit)
+        FunctionRef(const F &f TURBO_ATTRIBUTE_LIFETIME_BOUND)
+                : invoker_(&turbo::functional_internal::InvokeObject<F, R, Args...>) {
+            turbo::functional_internal::AssertNonNull(f);
+            ptr_.obj = &f;
+        }
 
-  // Overload for function pointers. This eliminates a level of indirection that
-  // would happen if the above overload was used (it lets us store the pointer
-  // instead of a pointer to a pointer).
-  //
-  // This overload is also used for references to functions, since references to
-  // functions can decay to function pointers implicitly.
-  template <
-      typename F, typename = EnableIfCompatible<F*>,
-      turbo::functional_internal::EnableIf<std::is_function<F>::value> = 0>
-  FunctionRef(F* f)  // NOLINT(runtime/explicit)
-      : invoker_(&turbo::functional_internal::InvokeFunction<F*, R, Args...>) {
-    assert(f != nullptr);
-    ptr_.fun = reinterpret_cast<decltype(ptr_.fun)>(f);
-  }
+        // Overload for function pointers. This eliminates a level of indirection that
+        // would happen if the above overload was used (it lets us store the pointer
+        // instead of a pointer to a pointer).
+        //
+        // This overload is also used for references to functions, since references to
+        // functions can decay to function pointers implicitly.
+        template<
+                typename F, typename = EnableIfCompatible<F *>,
+                turbo::functional_internal::EnableIf<std::is_function<F>::value> = 0>
+        FunctionRef(F *f)  // NOLINT(runtime/explicit)
+                : invoker_(&turbo::functional_internal::InvokeFunction<F *, R, Args...>) {
+            assert(f != nullptr);
+            ptr_.fun = reinterpret_cast<decltype(ptr_.fun)>(f);
+        }
 
-  // To help prevent subtle lifetime bugs, FunctionRef is not assignable.
-  // Typically, it should only be used as an argument type.
-  FunctionRef& operator=(const FunctionRef& rhs) = delete;
-  FunctionRef(const FunctionRef& rhs) = default;
+        // To help prevent subtle lifetime bugs, FunctionRef is not assignable.
+        // Typically, it should only be used as an argument type.
+        FunctionRef &operator=(const FunctionRef &rhs) = delete;
 
-  // Call the underlying object.
-  R operator()(Args... args) const {
-    return invoker_(ptr_, std::forward<Args>(args)...);
-  }
+        FunctionRef(const FunctionRef &rhs) = default;
 
- private:
-  turbo::functional_internal::VoidPtr ptr_;
-  turbo::functional_internal::Invoker<R, Args...> invoker_;
-};
+        // Call the underlying object.
+        R operator()(Args... args) const {
+            return invoker_(ptr_, std::forward<Args>(args)...);
+        }
 
-TURBO_NAMESPACE_END
+    private:
+        turbo::functional_internal::VoidPtr ptr_;
+        turbo::functional_internal::Invoker<R, Args...> invoker_;
+    };
+
 }  // namespace turbo
 
 #endif  // TURBO_FUNCTIONAL_FUNCTION_REF_H_

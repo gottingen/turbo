@@ -20,7 +20,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     /**
      * @ingroup turbo_strings_convert
@@ -171,7 +170,6 @@ namespace turbo {
         return lhs;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_CHARCONV_H_

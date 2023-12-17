@@ -66,11 +66,11 @@ namespace turbo::container_internal {
 #endif
         }
 
-// We can't use EBCO on other CompressedTuples because that would mean that we
-// derive from multiple Storage<> instantiations with the same I parameter,
-// and potentially from multiple identical Storage<> instantiations.  So anytime
-// we use type inheritance rather than encapsulation, we mark
-// CompressedTupleImpl, to make this easy to detect.
+        // We can't use EBCO on other CompressedTuples because that would mean that we
+        // derive from multiple Storage<> instantiations with the same I parameter,
+        // and potentially from multiple identical Storage<> instantiations.  So anytime
+        // we use type inheritance rather than encapsulation, we mark
+        // CompressedTupleImpl, to make this easy to detect.
         struct uses_inheritance {
         };
 

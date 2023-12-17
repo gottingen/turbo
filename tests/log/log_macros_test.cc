@@ -15,7 +15,7 @@
 
 #include "includes.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 #if TLOG_ACTIVE_LEVEL != TLOG_LEVEL_DEBUG
 #    error "Invalid TLOG_ACTIVE_LEVEL in test. Should be TLOG_LEVEL_DEBUG"
