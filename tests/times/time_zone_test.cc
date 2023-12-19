@@ -16,7 +16,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "tests/times/test_util.h"
 #include "turbo/times/time.h"
 

@@ -195,7 +195,7 @@
 #include "turbo/memory/memory.h"
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
-#include "turbo/platform/internal/prefetch.h"
+#include "turbo/memory/prefetch.h"
 #include "turbo/platform/port.h"
 
 #if  TURBO_WITH_SSE2
@@ -2118,8 +2118,8 @@ class raw_hash_set {
 #ifdef TURBO_INTERNAL_HAVE_PREFETCH
     prefetch_heap_block();
     auto seq = probe(common(), hash_ref()(key));
-    base_internal::PrefetchT0(control() + seq.offset());
-    base_internal::PrefetchT0(slot_array() + seq.offset());
+    prefetch_t0(control() + seq.offset());
+    prefetch_t0(slot_array() + seq.offset());
 #endif  // TURBO_INTERNAL_HAVE_PREFETCH
   }
 
@@ -2530,7 +2530,7 @@ class raw_hash_set {
   // Prefetch the heap-allocated memory region to resolve potential TLB misses.
   // This is intended to overlap with execution of calculating the hash for a
   // key.
-  void prefetch_heap_block() const { base_internal::PrefetchT2(control()); }
+  void prefetch_heap_block() const { prefetch_t2(control()); }
 
   CommonFields& common() { return settings_.template get<0>(); }
   const CommonFields& common() const { return settings_.template get<0>(); }

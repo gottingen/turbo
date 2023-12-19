@@ -46,3 +46,11 @@ hash guidance
 
     hash/hash
 
+profiling your program
+====================================
+
+
+..  toctree::
+    :maxdepth: 3
+
+    profiling/profiling

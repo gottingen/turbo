@@ -34,7 +34,7 @@
 #endif
 #endif
 
-#include "turbo/platform/internal/sysinfo.h"
+#include "turbo/base/internal/sysinfo.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN

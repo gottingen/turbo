@@ -91,7 +91,7 @@ namespace turbo::hash_internal {
     template<typename H>
     template<typename I>
     H HashStateBase<H>::combine_unordered(H state, I begin, I end) {
-        return H::RunCombineUnordered(std::move(state),
+        return H::run_combine_unordered(std::move(state),
                                       CombineUnorderedCallback<I>{begin, end});
     }
 

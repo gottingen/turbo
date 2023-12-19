@@ -15,16 +15,16 @@
 #include "turbo/meta/compare.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 #include "turbo/base/casts.h"
 
 namespace turbo {
     namespace {
 
-// This is necessary to avoid a bunch of lint warnings suggesting that we use
-// CHECK_EQ/etc., which doesn't work in this case because they convert the `0`
-// to an int, which can't be converted to the unspecified zero type.
+        // This is necessary to avoid a bunch of lint warnings suggesting that we use
+        // CHECK_EQ/etc., which doesn't work in this case because they convert the `0`
+        // to an int, which can't be converted to the unspecified zero type.
         bool Identity(bool b) { return b; }
 
         TEST_CASE("Compare, WeakEquality") {

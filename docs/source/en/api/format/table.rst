@@ -6,10 +6,7 @@
 format table
 =========================
 
-.. doxygenfile:: table.h
-   :project: turbo-docs
-   :members:
-
 .. doxygenclass:: turbo::Table
    :project: turbo-docs
    :members:
+

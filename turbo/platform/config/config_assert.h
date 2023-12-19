@@ -22,6 +22,47 @@
 #include "turbo/platform/config/attribute_variable.h"
 #include "turbo/platform/config/attribute_optimization.h"
 #include "turbo/platform/config/config_have.h"
+#include <cstdlib>
+
+
+// `TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL()` aborts the program in the fastest
+// possible way, with no attempt at logging. One use is to implement hardening
+// aborts with TURBO_OPTION_HARDENED.  Since this is an internal symbol, it
+// should not be used directly outside of Turbo.
+#if TURBO_HAVE_BUILTIN(__builtin_trap) || \
+    (defined(__GNUC__) && !defined(__clang__))
+#define TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL() __builtin_trap()
+#else
+#define TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL() abort()
+#endif
+
+
+// `TURBO_INTERNAL_UNREACHABLE_IMPL()` is the platform specific directive to
+// indicate that a statement is unreachable, and to allow the compiler to
+// optimize accordingly. Clients should use `TURBO_UNREACHABLE()`, which is
+// defined below.
+#if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable >= 202202L
+#define TURBO_INTERNAL_UNREACHABLE_IMPL() std::unreachable()
+#elif defined(__GNUC__) || TURBO_HAVE_BUILTIN(__builtin_unreachable)
+#define TURBO_INTERNAL_UNREACHABLE_IMPL() __builtin_unreachable()
+#elif TURBO_HAVE_BUILTIN(__builtin_assume)
+#define TURBO_INTERNAL_UNREACHABLE_IMPL() __builtin_assume(false)
+#elif defined(_MSC_VER)
+#define TURBO_INTERNAL_UNREACHABLE_IMPL() __assume(false)
+#else
+#define TURBO_INTERNAL_UNREACHABLE_IMPL()
+#endif
+
+// `TURBO_INTERNAL_HARDENING_ABORT()` controls how `TURBO_HARDENING_ASSERT()`
+// aborts the program in release mode (when NDEBUG is defined). The
+// implementation should abort the program as quickly as possible and ideally it
+// should not be possible to ignore the abort request.
+#define TURBO_INTERNAL_HARDENING_ABORT()   \
+  do {                                    \
+    TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL(); \
+    TURBO_INTERNAL_UNREACHABLE_IMPL();     \
+  } while (false)
+
 
 // TURBO_ASSERT()
 //
@@ -45,13 +86,14 @@ namespace turbo{
 
     namespace detail {
         [[noreturn]] inline void assert_fail(const char *file, int line,
-                                                const char *message) {
+                                             const char *message) {
             // Use unchecked std::fprintf to avoid triggering another assertion when
             // writing to stderr fails
             std::fprintf(stderr, "%s:%d: assertion failed: %s", file, line, message);
             // Chosen instead of std::abort to satisfy Clang in CUDA mode during device
             // code pass.
-            std::terminate();
+            TURBO_INTERNAL_HARDENING_ABORT();
+            std::abort();
         }
         constexpr  const char* select_msg(const char* expr, const char* msg) {
             turbo::ignore_unused(expr);
@@ -62,54 +104,13 @@ namespace turbo{
         }
     }
 }  // namespace turbo
-
-#if defined(NDEBUG)
+#if defined(NDEBUG) && TURBO_OPTION_HARDENED ==  0
 #define TURBO_ASSERT(condition, ...) \
   (false ? static_cast<void>(condition) : static_cast<void>(0))
 #else
 #define TURBO_ASSERT(condition, ...) \
   ((condition) ? (void)0 :                              \
   turbo::detail::assert_fail(__FILE__, __LINE__, turbo::detail::select_msg(#condition, #__VA_ARGS__)))
-#endif
-
-
-
-// `TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL()` aborts the program in the fastest
-// possible way, with no attempt at logging. One use is to implement hardening
-// aborts with TURBO_OPTION_HARDENED.  Since this is an internal symbol, it
-// should not be used directly outside of Turbo.
-#if TURBO_HAVE_BUILTIN(__builtin_trap) || \
-    (defined(__GNUC__) && !defined(__clang__))
-#define TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL() __builtin_trap()
-#else
-#define TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL() abort()
-#endif
-
-// `TURBO_INTERNAL_HARDENING_ABORT()` controls how `TURBO_HARDENING_ASSERT()`
-// aborts the program in release mode (when NDEBUG is defined). The
-// implementation should abort the program as quickly as possible and ideally it
-// should not be possible to ignore the abort request.
-#define TURBO_INTERNAL_HARDENING_ABORT()   \
-  do {                                    \
-    TURBO_INTERNAL_IMMEDIATE_ABORT_IMPL(); \
-    TURBO_INTERNAL_UNREACHABLE_IMPL();     \
-  } while (false)
-
-
-// `TURBO_INTERNAL_UNREACHABLE_IMPL()` is the platform specific directive to
-// indicate that a statement is unreachable, and to allow the compiler to
-// optimize accordingly. Clients should use `TURBO_UNREACHABLE()`, which is
-// defined below.
-#if defined(__cpp_lib_unreachable) && __cpp_lib_unreachable >= 202202L
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() std::unreachable()
-#elif defined(__GNUC__) || TURBO_HAVE_BUILTIN(__builtin_unreachable)
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() __builtin_unreachable()
-#elif TURBO_HAVE_BUILTIN(__builtin_assume)
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() __builtin_assume(false)
-#elif defined(_MSC_VER)
-#define TURBO_INTERNAL_UNREACHABLE_IMPL() __assume(false)
-#else
-#define TURBO_INTERNAL_UNREACHABLE_IMPL()
 #endif
 
 // TURBO_HARDENING_ASSERT()

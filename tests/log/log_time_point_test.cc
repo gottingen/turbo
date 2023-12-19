@@ -18,7 +18,7 @@
 #include "turbo/log/async.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 TEST_CASE("time_point1 [time_point log_msg]")
 {

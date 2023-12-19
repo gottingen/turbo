@@ -696,6 +696,21 @@ namespace turbo {
                 !std::is_convertible<T, std::basic_string_view<Char>>::value;
     };
 #  undef FMT_DECLTYPE_RETURN
+
+    template<class T>
+    struct is_atomical : std::integral_constant<bool, (std::is_integral<T>::value ||
+            std::is_floating_point<T>::value)> {
+    };
+    template<class T>
+    struct is_atomical<const T> : is_atomical<T> {
+    };
+    template<class T>
+    struct is_atomical<volatile T> : is_atomical<T> {
+    };
+    template<class T>
+    struct is_atomical<const volatile T> : is_atomical<T> {
+    };
+
 }  // namespace turbo
 
 

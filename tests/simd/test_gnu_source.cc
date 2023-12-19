@@ -20,7 +20,7 @@
 #endif
 #include "turbo/simd/simd.h"
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 TEST_CASE("[GNU_SOURCE support]")
 {

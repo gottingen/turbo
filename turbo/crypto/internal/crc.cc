@@ -46,7 +46,7 @@
 #include "turbo/crypto/internal/crc_internal.h"
 #include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
-#include "turbo/platform/internal/prefetch.h"
+#include "turbo/memory/prefetch.h"
 
 namespace turbo {
 TURBO_NAMESPACE_BEGIN
@@ -309,7 +309,7 @@ void CRC32::Extend(uint32_t* crc, const void* bytes, size_t length) const {
 
     // Process kStride interleaved swaths through the data in parallel.
     while ((e - p) > kPrefetchHorizon) {
-      base_internal::PrefetchNta(
+      prefetch_nta(
           reinterpret_cast<const void*>(p + kPrefetchHorizon));
       // Process 64 bytes at a time
       step_stride();

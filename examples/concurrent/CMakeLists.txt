@@ -22,3 +22,12 @@ carbin_cc_binary(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_binary(
+        NAME
+        write_local
+        SOURCES
+        "write_local.cc"
+        DEPS
+        turbo::turbo
+)

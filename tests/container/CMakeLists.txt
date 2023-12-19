@@ -18,8 +18,7 @@
 carbin_cc_library(
         NAMESPACE
         turbo
-        NAME
-        btree_test_common
+        NAME        btree_test_common
         HEADERS
         "btree_test.h"
         COPTS
@@ -627,11 +626,13 @@ carbin_cc_test(
         ${GMOCK_LIB}
         ${GTEST_MAIN_LIB}
 )
+
+
 carbin_cc_test(
         NAME
-        linked_list_test
+        intrusive_list_test
         SOURCES
-        "linked_list_test.cc"
+        "intrusive_list_test.cc"
         COPTS
         ${CARBIN_CXX_OPTIONS}
         DEPS

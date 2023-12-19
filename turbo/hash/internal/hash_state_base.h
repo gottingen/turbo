@@ -115,7 +115,7 @@ namespace turbo::hash_internal {
     //
     //    `static H combine_contiguous(H state, const unsigned char*, size_t)`.
     //
-    // It must also provide a private template method named RunCombineUnordered.
+    // It must also provide a private template method named run_combine_unordered.
     //
     // A "consumer" is a 1-arg functor returning void.  Its argument is a reference
     // to an inner hash state object, and it may be called multiple times.  When
@@ -133,7 +133,7 @@ namespace turbo::hash_internal {
     // following:
     //
     //    `template <typename CombinerT>`
-    //    `static H RunCombineUnordered(H outer_state, CombinerT combiner)`
+    //    `static H run_combine_unordered(H outer_state, CombinerT combiner)`
     //
     // This function is responsible for constructing the inner state object and
     // providing a consumer to the combiner.  It uses side effects of the consumer
@@ -157,7 +157,7 @@ namespace turbo::hash_internal {
     //       using MyHashState::HashStateBase::combine_unordered;
     //     private:
     //       template <typename CombinerT>
-    //       static H RunCombineUnordered(H state, CombinerT combiner);
+    //       static H run_combine_unordered(H state, CombinerT combiner);
     //   };
     template<typename H>
     class HashStateBase {

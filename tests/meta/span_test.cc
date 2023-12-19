@@ -28,7 +28,7 @@
 #include "turbo/platform/options.h"
 #include "turbo/format/format.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 namespace {
     

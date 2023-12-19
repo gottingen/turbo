@@ -22,8 +22,6 @@
 #include "turbo/format/format.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-
     namespace {
 
         // Since a civil time has a larger year range than turbo::Time (64-bit years vs
@@ -190,5 +188,4 @@ namespace turbo {
 
     }  // namespace time_internal
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

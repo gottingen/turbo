@@ -25,4 +25,25 @@ namespace turbo {
         return str_contains(ih, in);
     }
 
+    bool str_equals_ignore_case(const wchar_t* lhs, const wchar_t* rhs) {
+        if (lhs == nullptr) return rhs == nullptr;
+
+        if (rhs == nullptr) return false;
+
+#ifdef TURBO_PLATFORM_WINDOWS
+        return _wcsicmp(lhs, rhs) == 0;
+#elif defined(TURBO_PLATFORM_LINUX) && !defined(TURBO_PLATFORM_ANDROID)
+        return wcscasecmp(lhs, rhs) == 0;
+#else
+        // Android, Mac OS X and Cygwin don't define wcscasecmp.
+        // Other unknown OSes may not define it either.
+        wint_t left, right;
+        do {
+            left = towlower(static_cast<wint_t>(*lhs++));
+            right = towlower(static_cast<wint_t>(*rhs++));
+        } while (left && left == right);
+        return left == right;
+#endif
+    }
+
 }  // namespace turbo

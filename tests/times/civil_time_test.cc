@@ -18,7 +18,7 @@
 #include <sstream>
 #include <iomanip>
 #include <type_traits>
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/platform/port.h"
 
 namespace {

@@ -15,7 +15,7 @@
 #include "turbo/meta/function_ref.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include <functional>
 #include <memory>
 

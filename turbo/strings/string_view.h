@@ -9,7 +9,6 @@
 #include <string_view>
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     // ClippedSubstr()
     //
@@ -30,7 +29,6 @@ namespace turbo {
         return p ? std::string_view(p) : std::string_view();
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif // TURBO_STRINGS_STRING_VIEW_H_

@@ -26,6 +26,15 @@ namespace turbo {
         return hash;
     }
 
+    uint32_t hasher_engine<m3_hash_tag>::hash32_with_seed(const char *s, size_t len, uint32_t seed) {
+        uint32_t hash;
+        hash_internal::MurmurHash3_x86_32_Context ctx;
+        hash_internal::MurmurHash3_x86_32_Init(&ctx, seed);
+        hash_internal::MurmurHash3_x86_32_Update(&ctx, s, len);
+        hash_internal::MurmurHash3_x86_32_Final(&hash, &ctx);
+        return hash;
+    }
+
     size_t hasher_engine<m3_hash_tag>::hash64(const char *s, size_t len) {
         uint64_t hash[2];
         hash_internal::MurmurHash3_x64_128_Context ctx;

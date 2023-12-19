@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/internal/sysinfo.h"
+#include "turbo/base/internal/sysinfo.h"
 
 #ifndef _WIN32
 
@@ -27,7 +27,7 @@
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 #include "turbo/concurrent/barrier.h"
 

@@ -103,7 +103,16 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/times/time.h \
                     ../turbo/times/clock.h \
                     ../turbo/times/civil_time.h \
-                    ../turbo/times/stop_watcher.h
+                    ../turbo/times/stop_watcher.h \
+                    ../turbo/profiling/version.h \
+                    ../turbo/profiling/average_gauge.h \
+                    ../turbo/profiling/batch.h \
+                    ../turbo/profiling/counter.h \
+                    ../turbo/profiling/histogram.h \
+                    ../turbo/profiling/maxer_gauge.h \
+                    ../turbo/profiling/miner_gauge.h \
+                    ../turbo/profiling/uniform_gauge.h \
+                    ../turbo/profiling/variable.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

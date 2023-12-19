@@ -14,7 +14,7 @@
 //
 
 #include "includes.h"
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #ifdef _WIN32
 #    include <windows.h>
 #else

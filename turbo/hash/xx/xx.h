@@ -21,9 +21,10 @@
 #include <cstdlib>  // for size_t.
 
 #include <utility>
-
+#include "turbo/hash/xx/xxhash.h"
 #include "turbo/platform/port.h"
 #include "turbo/hash/fwd.h"
+#include "turbo/hash/mix/common_mix.h"
 
 namespace turbo {
 
@@ -45,12 +46,30 @@ namespace turbo {
     template <>
     struct hasher_engine<xx_hash_tag> {
 
+        static uint64_t mix(uint64_t value);
+
+        static uint64_t mix_with_seed(uint64_t seed, uint64_t value);
+
+
         static uint32_t hash32(const char *s, size_t len);
+
+        static size_t hash32_with_seed(const char *s, size_t len, uint32_t seed);
 
         static size_t hash64(const char *s, size_t len);
 
         static size_t hash64_with_seed(const char *s, size_t len, uint64_t seed);
+
+        TURBO_FORCE_INLINE static uint64_t Seed() {
+            return 0;
+        }
     };
+
+    inline uint64_t  hasher_engine<xx_hash_tag>::mix(uint64_t value) {
+        return turbo::hash_internal::common_mix(value);
+    }
+    inline uint64_t hasher_engine<xx_hash_tag>::mix_with_seed(uint64_t seed, uint64_t value) {
+        return turbo::hash_internal::common_mix_with_seed(seed, value);
+    }
 
 }  // namespace turbo
 

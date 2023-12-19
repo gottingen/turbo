@@ -26,7 +26,7 @@
 #include <random>
 #include <string>
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "turbo/times/time.h"
 
 namespace {

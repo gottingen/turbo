@@ -26,7 +26,6 @@
 
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     inline uint64_t gbswap_64(uint64_t host_int) {
 #if TURBO_HAVE_BUILTIN(__builtin_bswap64) || defined(__GNUC__)
@@ -844,7 +843,6 @@ namespace turbo {
 
     }  // namespace big_endian
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_BASE_INTERNAL_ENDIAN_H_

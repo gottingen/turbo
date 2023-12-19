@@ -18,7 +18,7 @@
 #include "log_sink.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 TEST_CASE("dup_filter_test1 [dup_filter_sink]")
 {

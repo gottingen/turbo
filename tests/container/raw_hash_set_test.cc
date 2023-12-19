@@ -45,7 +45,7 @@
 #include "turbo/log/logging.h"
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/cycleclock.h"
-#include "turbo/platform/internal/prefetch.h"
+#include "turbo/memory/prefetch.h"
 #include "turbo/strings/string_view.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

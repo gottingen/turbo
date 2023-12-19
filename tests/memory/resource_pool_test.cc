@@ -17,7 +17,7 @@
 #include "turbo/format/print.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 
 #define TURBO_MEMORY_RESOURCE_POOL_TEST
 #include "turbo/memory/resource_pool.h"

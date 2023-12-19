@@ -72,9 +72,7 @@ namespace turbo {
 
 #if !TURBO_USE_CYCLECLOCK_FOR_GET_CURRENT_TIME_NANOS
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 int64_t get_current_time_nanos() { return GET_CURRENT_TIME_NANOS_FROM_SYSTEM(); }
-TURBO_NAMESPACE_END
 }  // namespace turbo
 #else  // Use the cyclecounter-based implementation below.
 
@@ -85,7 +83,6 @@ TURBO_NAMESPACE_END
 #endif
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace time_internal {
         // This is a friend wrapper around UnscaledCycleClock::time_now()
         // (needed to access UnscaledCycleClock).

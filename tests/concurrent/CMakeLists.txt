@@ -46,3 +46,14 @@ carbin_cc_test(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_test(
+        NAME
+        thread_local_test
+        SOURCES
+        "thread_local_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)

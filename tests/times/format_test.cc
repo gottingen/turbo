@@ -16,7 +16,7 @@
 #include <limits>
 #include <string>
 
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 #include "tests/times/test_util.h"
 #include "turbo/times/time.h"
 #include "turbo/strings/match.h"

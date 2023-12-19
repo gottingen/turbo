@@ -57,3 +57,24 @@ carbin_cc_test(
         ${GTEST_MAIN_LIB}
 )
 
+carbin_cc_test(
+        NAME
+        batch_test
+        SOURCES
+        "batch_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        reducer_test
+        SOURCES
+        "reducer_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)

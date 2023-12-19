@@ -15,7 +15,7 @@
 
 #include "includes.h"
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest/doctest.h"
+#include "turbo/testing/test.h"
 static const char *const tested_logger_name = "null_logger";
 static const char *const tested_logger_name2 = "null_logger2";
 

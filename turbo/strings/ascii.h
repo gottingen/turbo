@@ -60,7 +60,6 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace ascii_internal {
 
         // Declaration for an array of bitfields holding character information.
@@ -343,7 +342,6 @@ namespace turbo {
         return static_cast<std::uint16_t>(c - '0');
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_ASCII_H_
