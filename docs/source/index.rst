@@ -47,6 +47,7 @@ Contents
     en/api/hash
     en/api/memory
     en/api/platform
+    en/api/profiling
     en/api/random
     en/api/strings
     en/api/simd

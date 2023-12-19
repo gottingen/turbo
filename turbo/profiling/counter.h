@@ -22,6 +22,18 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_profiling_counters
+     * @brief A counter is a variable that keeps the sum of all the values that have been added to it.
+     *        Each time a value is added to the counter, the value is aggregated using the reducer.
+     *        Example:
+     *        @code{.cpp}
+     *        Counter<int64_t> qps("qps)
+     *        qps++;
+     *        //or qps<<1;
+     *        #endcode
+     * @tparam T The type of the value to be stored.
+     */
     template<typename T>
     class Counter : public Variable {
     public:

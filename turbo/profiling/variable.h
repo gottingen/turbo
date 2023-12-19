@@ -52,6 +52,32 @@ namespace turbo {
         virtual void dump(const Variable *variable) = 0;
     };
 
+    /**
+     * @ingroup turbo_profiling_variable
+     * @brief   ``Variable`` is the base class for all variables.
+     *          It provides the basic functionality for exposing and hiding variables. The Variable  is
+     *          Uniqued by name in global scope.
+     *          the Variable is designed to hold variables that are written many threads and read by one thread.
+     *          Most of time, the Variable is used to hold the metrics of the system.
+     *          all the Metric type like Counter, Gauge, UniqueGauge, MinerGauge, AverageGauge are derived from Variable.
+     *          The Variable is thread-safe. derived class should be implemented the virtual function describe_impl.
+     *          more detail see the derived class, like Counter, Gauge, UniqueGauge, MinerGauge, AverageGauge.
+     *          the main purpose of Variable is to provide a unified interface for all the metrics ,and when using the
+     *          Variable, it cost little performance. for example, we want to record the number of the request. we can
+     *          use the Counter like this:
+     *          @code
+     *          Counter<int> request_counter("request_counter","the number of the request");
+     *          request_counter++;
+     *          @endcode
+     *          and we can get the value of the request_counter like this:
+     *          @code
+     *          int request_count = request_counter.get_value();
+     *          @endcode
+     *          it will cost little when call it because erery thread has a local copy of the request_counter. and when
+     *          write , it only atomicly write it to the local copy. and when read, the combine will combine all the thread
+     *          local copy to the global copy. so it cost little performance.
+     *          so that do not read the value of the Variable frequently.
+     */
     class Variable {
     public:
         Variable() = default;

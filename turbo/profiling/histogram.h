@@ -114,6 +114,29 @@ namespace turbo {
         H *_histogram;
     };
 
+    /**
+     * @ingroup turbo_profiling_histograms
+     * @brief A histogram that keeps the distribution of values in a set of bins.
+     *        The histogram is aggregated using the reducer.
+     *        histogram  also supports the scope latency, the latency is the time between the scope creation and
+     *        the scope destruction. the latency is added to the histogram.
+     *        Example:
+     *        @code
+     *        Histogram<int, 10> histogram;
+     *        histogram.set_boundaries({10, 20, 30, 40, 50, 60, 70, 80, 90, 100});
+     *        // mesure the latency in milliseconds
+     *        void deal_rpc(Request *req) {
+     *              scope_reacord = histogram.scope_latency_milliseconds();
+     *              // do something
+     *              // the latency is added to the histogram
+     *              // the latency is the time between the scope creation and the scope destruction.
+     *              // the latency is added to the histogram.
+     *              // the latency is the time between the scope creation and the scope destruction.
+     *         }
+     *         @endcode
+     * @tparam T The type of the value to be stored.
+     * @tparam N The number of bins.
+     */
     template<typename T, size_t N, typename = typename std::enable_if_t<is_atomical<T>::value>>
     class Histogram : public Variable {
     public:

@@ -23,85 +23,92 @@
 
 namespace turbo {
 
-        template<typename T>
-        class AverageGauge : public Variable {
-        public:
-            AverageGauge() :_status(unavailable_error("")) {}
+    /**
+     * @ingroup turbo_profiling_gauges
+     * @brief A gauge that keeps the average value, the value is aggregated using the reducer.
+     * @tparam T
+     */
+    template<typename T>
+    class AverageGauge : public Variable {
+    public:
+        AverageGauge() : _status(unavailable_error("")) {}
 
-            explicit AverageGauge(const std::string_view &name, const std::string_view &description = "");
+        explicit AverageGauge(const std::string_view &name, const std::string_view &description = "");
 
-            AverageGauge(const std::string_view &name, const std::string_view &description,
-                  const std::map<std::string,std::string> &tags);
+        AverageGauge(const std::string_view &name, const std::string_view &description,
+                     const std::map<std::string, std::string> &tags);
 
-            AverageGauge(const AverageGauge &) = delete;
+        AverageGauge(const AverageGauge &) = delete;
 
-            AverageGauge &operator=(const AverageGauge &) = delete;
+        AverageGauge &operator=(const AverageGauge &) = delete;
 
-            ~AverageGauge() override = default;
+        ~AverageGauge() override = default;
 
-            void set(const T &value) {
-                _reducer<<(value);
-            }
-
-            void operator=(const T &value) {
-                _reducer<<(value);
-            }
-
-            AverageGauge&operator<<(const T &value) {
-                _reducer<<(value);
-                return *this;
-            }
-
-            operator T() const {
-                return _reducer.get_value();
-            }
-
-            void reset() {
-                _reducer.reset();
-            }
-
-            T get_value() const {
-                _reducer.combine_op().count = 0;
-                T v = _reducer.get_value();
-                v /= (_reducer.combine_op().count);
-                return v;
-
-            }
-
-            bool valid() const {
-                return _status.ok() && _reducer.valid();
-            }
-
-            [[nodiscard]] const turbo::Status &status() const {
-                return _status;
-            }
-        private:
-            std::string describe_impl(const DescriberOptions &options)  const override {
-                return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
-            }
-        private:
-            typedef profiling_internal::Reducer<T, profiling_internal::AvgTo<T>,
-                    profiling_internal::SetTo<T> > reducer_type;
-            reducer_type _reducer;
-            turbo::Status _status;
-        };
-
-        template<typename T>
-        AverageGauge<T>::AverageGauge(const std::string_view &name, const std::string_view &description)
-                : Variable() {
-            std::string desc(description);
-            if(desc.empty()){
-                desc = turbo::format("AverageGauge {}",  name);
-            }
-            _status = expose(name, desc, {}, "gauge");
+        void set(const T &value) {
+            _reducer << (value);
         }
 
-        template<typename T>
-        AverageGauge<T>::AverageGauge(const std::string_view &name, const std::string_view &description,
-                        const std::map<std::string, std::string> &tags)
-                : Variable() {
-            _status = expose(name, description, tags, "gauge");
+        void operator=(const T &value) {
+            _reducer << (value);
         }
+
+        AverageGauge &operator<<(const T &value) {
+            _reducer << (value);
+            return *this;
+        }
+
+        operator T() const {
+            return _reducer.get_value();
+        }
+
+        void reset() {
+            _reducer.reset();
+        }
+
+        T get_value() const {
+            _reducer.combine_op().count = 0;
+            T v = _reducer.get_value();
+            v /= (_reducer.combine_op().count);
+            return v;
+
+        }
+
+        bool valid() const {
+            return _status.ok() && _reducer.valid();
+        }
+
+        [[nodiscard]] const turbo::Status &status() const {
+            return _status;
+        }
+
+    private:
+        std::string describe_impl(const DescriberOptions &options) const override {
+            return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
+        }
+
+    private:
+        typedef profiling_internal::Reducer<T, profiling_internal::AvgTo<T>,
+                profiling_internal::SetTo<T> > reducer_type;
+        reducer_type _reducer;
+        turbo::Status _status;
+    };
+
+    template<typename T>
+    AverageGauge<T>::AverageGauge(const std::string_view &name, const std::string_view &description)
+            : Variable() {
+        std::string desc(description);
+        if (desc.empty()) {
+            desc = turbo::format("AverageGauge {}", name);
+        }
+        _status = expose(name, desc, {}, "gauge");
+    }
+
+    template<typename T>
+    AverageGauge<T>::AverageGauge(const std::string_view &name, const std::string_view &description,
+                                  const std::map<std::string, std::string> &tags)
+            : Variable() {
+        _status = expose(name, description, tags, "gauge");
+    }
 
     template<typename T, typename Char>
     struct formatter<AverageGauge<T>, Char> : formatter<T, Char> {

@@ -25,6 +25,10 @@
 
 namespace turbo {
 
+    /**
+     * @brief A MaxerGauge is a variable that keeps the maximum value of all the values that have been set.
+     * @tparam T The type of the value to be stored.
+     */
     template<typename T>
     class MaxerGauge : public Variable {
     public:

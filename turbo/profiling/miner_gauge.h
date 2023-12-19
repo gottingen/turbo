@@ -25,6 +25,11 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_profiling_gauges
+     * @brief A gauge that keeps the minimum value, the value is aggregated using the reducer.
+     * @tparam T
+     */
     template<typename T>
     class MinerGauge : public Variable {
     public:

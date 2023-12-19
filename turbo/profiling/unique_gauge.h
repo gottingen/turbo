@@ -27,6 +27,15 @@
 namespace turbo {
 
 
+    /**
+     * @ingroup turbo_profiling_gauges
+     * @brief UniqueGauge is a gauge that can be set to any value. the unique gauge is not aggregated.
+     *        use this gauge to expose a value that can be set to any value. and it is not using the reducer
+     *        for multiple threads values aggregation. the value is set to global value.
+     *        eg: the number of threads in the thread pool, the cpu usage, the memory usage, the disk usage, etc.
+     * @tparam T
+     * @tparam E
+     */
     template<typename T, typename E=void>
     class UniqueGauge : public Variable {
     public:

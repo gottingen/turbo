@@ -19,6 +19,7 @@
 #include "turbo/module/module_version.h"
 
 /**
+ * @defgroup turbo_profiling_variable Turbo Profiling Counters
  * @defgroup turbo_profiling_counters Turbo Profiling Counters
  * @defgroup turbo_profiling_gauges Turbo Profiling Gauges
  * @defgroup turbo_profiling_histogram Turbo Profiling Histogram
