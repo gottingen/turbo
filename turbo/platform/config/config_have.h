@@ -261,60 +261,6 @@
 #define TURBO_HAVE_ALARM 1
 #endif
 
-// TURBO_HAVE_STD_ANY
-//
-// Checks whether C++17 std::any is available by checking whether <any> exists.
-#ifdef TURBO_HAVE_STD_ANY
-#error "TURBO_HAVE_STD_ANY cannot be directly set."
-#endif
-
-#if TURBO_HAVE_INCLUDE(<any>) && defined(__cplusplus) && __cplusplus >= 201703L && \
-    !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_ANY 1
-#endif
-
-
-
-// TURBO_HAVE_STD_OPTIONAL
-//
-// Checks whether C++17 std::optional is available.
-#ifdef TURBO_HAVE_STD_OPTIONAL
-#error "TURBO_HAVE_STD_OPTIONAL cannot be directly set."
-#endif
-
-#if TURBO_HAVE_INCLUDE(<optional>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L && !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_OPTIONAL 1
-#endif
-
-
-// TURBO_HAVE_STD_VARIANT
-//
-// Checks whether C++17 std::variant is available.
-#ifdef TURBO_HAVE_STD_VARIANT
-#error "TURBO_HAVE_STD_VARIANT cannot be directly set."
-#endif
-
-#if TURBO_HAVE_INCLUDE(<variant>) && defined(__cplusplus) && \
-    __cplusplus >= 201703L && !TURBO_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define TURBO_HAVE_STD_VARIANT 1
-#endif
-
-
-// For MSVC, `__has_include` is supported in VS 2017 15.3, which is later than
-// the support for <optional>, <any>, <std::string_view>, <variant>. So we use
-// _MSC_VER to check whether we have VS 2017 RTM (when <optional>, <any>,
-// <std::string_view>, <variant> is implemented) or higher. Also, `__cplusplus` is
-// not correctly set by MSVC, so we use `_MSVC_LANG` to check the language
-// version.
-// TODO(zhangxy): fix tests before enabling aliasing for `std::any`.
-#if defined(_MSC_VER) && _MSC_VER >= 1910 &&         \
-    ((defined(_MSVC_LANG) && _MSVC_LANG > 201402) || \
-     (defined(__cplusplus) && __cplusplus > 201402))
-// #define TURBO_HAVE_STD_ANY 1
-#define TURBO_HAVE_STD_OPTIONAL 1
-#define TURBO_HAVE_STD_VARIANT 1
-#endif
 
 // `TURBO_COMPILER_HAVE_RTTI` determines whether turbo is being compiled with
 // RTTI support.

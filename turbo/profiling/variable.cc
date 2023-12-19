@@ -16,9 +16,6 @@
 #include "turbo/profiling/variable.h"
 #include "turbo/container/flat_hash_map.h"
 #include "turbo/log/logging.h"
-//#include "turbo/profiling/reducer.h"
-
-#include "turbo/profiling/internal/combiner.h"
 
 
 namespace turbo {
@@ -125,15 +122,15 @@ namespace turbo {
     }  // namespace profiling_internal
     Variable::~Variable() {
         auto rs = hide();
-        TLOG_CHECK(rs.ok(), "Failed to hide variable :{}: {}", name_, rs.message());
+        TLOG_CHECK((rs.ok() || is_not_found(rs)), "Failed to hide variable :{}: {}", name_, rs.to_string());
     }
     turbo::Status Variable::expose(const std::string_view &name, const std::string_view &description,
-                                   const std::map<std::string_view, std::string_view> &labels, const std::string_view &type) {
+                                   const std::map<std::string, std::string> &labels, const std::string_view &type) {
         return expose_impl(name, description, labels, type);
     }
 
     turbo::Status Variable::expose_impl(const std::string_view &name, const std::string_view &description,
-                                        const std::map<std::string_view, std::string_view> &labels,
+                                        const std::map<std::string, std::string> &labels,
                                         const std::string_view &type) {
         if (is_exposed()) {
             return turbo::already_exists_error("Variable :{} is already exposed", name_);

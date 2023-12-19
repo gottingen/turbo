@@ -343,7 +343,7 @@ namespace turbo::tlog::details {
 }  // namespace turbo::tlog::details
 
 #ifndef TLOG_CRASH_IS_ON
-#ifdef TLOG_CRASH_ON
+#if TURBO_OPTION_HARDENED == 1
 #define TLOG_CRASH_IS_ON() 1
 #else
 #define TLOG_CRASH_IS_ON() 0
@@ -366,6 +366,25 @@ namespace turbo::tlog::details {
 #endif
 #endif  // TLOG_CRASH
 
+#define TLOG_INTERNAL_DETAIL_LOGGING_CHECK_OP(name, op, val1, val2, ...)    \
+  do {                                                                       \
+    auto&& tlog_anonymous_x = (val1);                                       \
+    auto&& tlog_anonymous_y = (val2);                                       \
+    if (TURBO_UNLIKELY(!(tlog_anonymous_x op tlog_anonymous_y))) {          \
+        TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), ::turbo::tlog::details::FormatLog("", ::turbo::tlog::details::MakeCheckString(#name, #val1, #val2, #op), ##__VA_ARGS__)); \
+        TLOG_CRASH();                                                                        \
+    }                                                                        \
+  } while (0)
+
+#define TLOG_INTERNAL_DETAIL_LOGGING_DCHECK_OP(name, op, val1, val2, ...)    \
+  do {                                                                       \
+    auto&& tlog_anonymous_x = (val1);                                       \
+    auto&& tlog_anonymous_y = (val2);                                       \
+    if (TLOG_DEBUG_IS_ON() && TURBO_UNLIKELY(!(tlog_anonymous_x op tlog_anonymous_y))) {          \
+        TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), ::turbo::tlog::details::FormatLog("", ::turbo::tlog::details::MakeCheckString(#name, #val1, #val2, #op), ##__VA_ARGS__)); \
+        TLOG_CRASH();                                                                        \
+    }                                                                        \
+  } while (0)
 
 #define TLOG_CHECK(expr, ...) \
        do {                   \
@@ -419,24 +438,5 @@ namespace turbo::tlog::details {
 #define TLOG_DCHECK_GT(val1, val2, ...) \
     TLOG_INTERNAL_DETAIL_LOGGING_DCHECK_OP(CheckGT, >, val1, val2, ##__VA_ARGS__)
 
-#define TLOG_INTERNAL_DETAIL_LOGGING_CHECK_OP(name, op, val1, val2, ...)    \
-  do {                                                                       \
-    auto&& tlog_anonymous_x = (val1);                                       \
-    auto&& tlog_anonymous_y = (val2);                                       \
-    if (TURBO_UNLIKELY(!(tlog_anonymous_x op tlog_anonymous_y))) {          \
-        TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), ::turbo::tlog::details::FormatLog("", ::turbo::tlog::details::MakeCheckString(#name, #val1, #val2, #op), ##__VA_ARGS__)); \
-        TLOG_CRASH();                                                                        \
-    }                                                                        \
-  } while (0)
-
-#define TLOG_INTERNAL_DETAIL_LOGGING_DCHECK_OP(name, op, val1, val2, ...)    \
-  do {                                                                       \
-    auto&& tlog_anonymous_x = (val1);                                       \
-    auto&& tlog_anonymous_y = (val2);                                       \
-    if (TLOG_DEBUG_IS_ON() && TURBO_UNLIKELY(!(tlog_anonymous_x op tlog_anonymous_y))) {          \
-        TLOG_LOGGER_CRITICAL(turbo::tlog::default_logger_raw(), ::turbo::tlog::details::FormatLog("", ::turbo::tlog::details::MakeCheckString(#name, #val1, #val2, #op), ##__VA_ARGS__)); \
-        TLOG_CRASH();                                                                        \
-    }                                                                        \
-  } while (0)
 
 #endif  // TURBO_LOG_LOGGING_H_

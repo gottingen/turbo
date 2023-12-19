@@ -39,10 +39,11 @@ namespace turbo {
         virtual bool filter(const Variable &variable) const = 0;
     };
 
-    struct Describer{
-        virtual ~Describer() = default;
-
-        virtual std::string describe(const Variable *variable) const = 0;
+    struct DescriberOptions {
+        bool show_name = true;
+        bool show_description = true;
+        bool show_labels = true;
+        bool show_type = true;
     };
 
     struct Dumper {
@@ -58,7 +59,7 @@ namespace turbo {
         virtual ~Variable();
 
         turbo::Status expose(const std::string_view &name, const std::string_view &description,
-                             const std::map<std::string_view, std::string_view> &labels, const std::string_view &type);
+                             const std::map<std::string, std::string> &labels, const std::string_view &type);
 
         turbo::Status hide();
 
@@ -83,26 +84,32 @@ namespace turbo {
         static void list_exposed(std::vector<std::string> &names, const VariableFilter *filter = nullptr);
 
         static size_t count_exposed(const VariableFilter *filter = nullptr);
+
     public:
 
-        template<typename D, typename ...Args>
-        void describe(std::ostream &os, const D &d, Args &&...args) const {
-            os << d(this, std::forward<Args>(args)...);
+        void describe(std::ostream &os, const DescriberOptions &options = DescriberOptions()) const {
+            os << describe(options);
         }
 
-        template<typename D, typename ...Args>
-        [[nodiscard]] std::string describe(const D &d, Args &&...args) const {
-            return d(this, std::forward<Args>(args)...);
+        [[nodiscard]] std::string describe(const DescriberOptions &options = DescriberOptions()) const {
+            return describe_impl(options);
         }
+
 
 
     private:
         virtual turbo::Status expose_impl(const std::string_view &name, const std::string_view &description,
-                             const std::map<std::string_view, std::string_view> &labels, const std::string_view &type);
+                                          const std::map<std::string, std::string> &labels,
+                                          const std::string_view &type);
+
+        virtual std::string describe_impl(const DescriberOptions &options)  const = 0;
+
         // NOLINTNEXTLINE
         TURBO_NON_COPYABLE(Variable);
-        template <typename H>
+
+        template<typename H>
         friend H hash_value(H h, const Variable &c);
+
     private:
         std::string name_;
         std::string description_;
@@ -110,14 +117,14 @@ namespace turbo {
         std::string type_;
     };
 
-    template <typename H>
+    template<typename H>
     H hash_value(H h, const Variable &c) {
         return H::combine(std::move(h), c.name_, c.description_, c.labels_, c.type_);
     }
 
-    template <typename Char>
+    template<typename Char>
     struct formatter<Variable, Char> : formatter<std::string_view, Char> {
-        template <typename FormatContext>
+        template<typename FormatContext>
         auto format(const Variable &c, FormatContext &ctx) -> decltype(ctx.out()) {
             //return formatter<std::string_view, Char>::format(c.describe(), ctx);
             return "Variable";

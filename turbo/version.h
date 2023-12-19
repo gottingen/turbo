@@ -28,6 +28,7 @@
 #include "turbo/meta/version.h"
 #include "turbo/module/version.h"
 #include "turbo/platform/version.h"
+#include "turbo/profiling/version.h"
 #include "turbo/random/version.h"
 #include "turbo/simd/version.h"
 #include "turbo/strings/version.h"

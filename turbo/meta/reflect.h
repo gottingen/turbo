@@ -96,13 +96,17 @@
 
 // Enum value must be greater or equals than REFLECT_ENUM_RANGE_MIN. By default REFLECT_ENUM_RANGE_MIN = -128.
 // If need another min range for all enum types by default, redefine the macro REFLECT_ENUM_RANGE_MIN.
-#if !defined(REFLECT_ENUM_RANGE_MIN)
+#ifdef USER_REFLECT_ENUM_RANGE_MIN
+#  define REFLECT_ENUM_RANGE_MIN USER_REFLECT_ENUM_RANGE_MIN
+#else
 #  define REFLECT_ENUM_RANGE_MIN -128
 #endif
 
 // Enum value must be less or equals than REFLECT_ENUM_RANGE_MAX. By default REFLECT_ENUM_RANGE_MAX = 128.
 // If need another max range for all enum types by default, redefine the macro REFLECT_ENUM_RANGE_MAX.
-#if !defined(REFLECT_ENUM_RANGE_MAX)
+#ifdef USER_REFLECT_ENUM_RANGE_MAX
+#  define REFLECT_ENUM_RANGE_MAX USER_REFLECT_ENUM_RANGE_MAX
+#else
 #  define REFLECT_ENUM_RANGE_MAX 128
 #endif
 
@@ -124,9 +128,9 @@ namespace turbo {
 
     namespace customize {
 
-// Enum value must be in range [REFLECT_ENUM_RANGE_MIN, REFLECT_ENUM_RANGE_MAX]. By default REFLECT_ENUM_RANGE_MIN = -128, REFLECT_ENUM_RANGE_MAX = 128.
-// If you need another range for all enum types by default, redefine the macro REFLECT_ENUM_RANGE_MIN and REFLECT_ENUM_RANGE_MAX.
-// If you need another range for specific enum type, add specialization enum_range for necessary enum type.
+        // Enum value must be in range [REFLECT_ENUM_RANGE_MIN, REFLECT_ENUM_RANGE_MAX]. By default REFLECT_ENUM_RANGE_MIN = -128, REFLECT_ENUM_RANGE_MAX = 128.
+        // If you need another range for all enum types by default, redefine the macro REFLECT_ENUM_RANGE_MIN and REFLECT_ENUM_RANGE_MAX.
+        // If you need another range for specific enum type, add specialization enum_range for necessary enum type.
         template<typename E>
         struct enum_range {
             static_assert(std::is_enum_v<E>, "turbo::customize::enum_range requires enum type.");
