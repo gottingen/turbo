@@ -25,6 +25,9 @@
 #include <string_view>
 #include "turbo/base/status.h"
 #include "turbo/hash/hash.h"
+#include "turbo/profiling/snapshot.h"
+#include "turbo/profiling/dumper.h"
+#include "turbo/profiling/prometheus_dumper.h"
 
 namespace turbo {
 
@@ -46,10 +49,14 @@ namespace turbo {
         bool show_type = true;
     };
 
-    struct Dumper {
-        virtual ~Dumper() = default;
+    struct VariableAttr {
+        constexpr VariableAttr() = default;
+        constexpr VariableAttr(DumperType dumper_type, VariableType vt) : dumper_type(dumper_type), type(vt) {}
 
-        virtual void dump(const Variable *variable) = 0;
+        DumperType dumper_type{DUMP_PROMETHEUS_TYPE};
+        VariableType type{VariableType::VT_PROMETHEUS};
+
+        uint8_t reserved[6]{0};
     };
 
     /**
@@ -80,12 +87,14 @@ namespace turbo {
      */
     class Variable {
     public:
+        static PrometheusDumper g_dumper;
+    public:
         Variable() = default;
 
         virtual ~Variable();
 
         turbo::Status expose(const std::string_view &name, const std::string_view &description,
-                             const std::map<std::string, std::string> &labels, const std::string_view &type);
+                             const std::map<std::string, std::string> &labels, const VariableAttr &type);
 
         turbo::Status hide();
 
@@ -103,8 +112,8 @@ namespace turbo {
             return labels_;
         }
 
-        [[nodiscard]] const std::string &type() const {
-            return type_;
+        [[nodiscard]] const VariableAttr &attr() const {
+            return _attr;
         }
 
         static void list_exposed(std::vector<std::string> &names, const VariableFilter *filter = nullptr);
@@ -121,40 +130,39 @@ namespace turbo {
             return describe_impl(options);
         }
 
+        [[nodiscard]] VariableSnapshot get_snapshot() const {
+            return get_snapshot_impl();
+        }
 
+        [[nodiscard]] std::string dump_prometheus() const{
+            return g_dumper.dump(get_snapshot());
+        }
+
+        static void dump_prometheus_all(std::ostream &os);
+
+        static std::string dump_prometheus_all() {
+            std::stringstream ss;
+            dump_prometheus_all(ss);
+            return ss.str();
+        }
 
     private:
         virtual turbo::Status expose_impl(const std::string_view &name, const std::string_view &description,
                                           const std::map<std::string, std::string> &labels,
-                                          const std::string_view &type);
+                                          const VariableAttr &type);
 
-        virtual std::string describe_impl(const DescriberOptions &options)  const = 0;
+        virtual std::string describe_impl(const DescriberOptions &options) const = 0;
+
+        virtual VariableSnapshot get_snapshot_impl() const = 0;
 
         // NOLINTNEXTLINE
         TURBO_NON_COPYABLE(Variable);
-
-        template<typename H>
-        friend H hash_value(H h, const Variable &c);
 
     private:
         std::string name_;
         std::string description_;
         std::map<std::string, std::string> labels_;
-        std::string type_;
-    };
-
-    template<typename H>
-    H hash_value(H h, const Variable &c) {
-        return H::combine(std::move(h), c.name_, c.description_, c.labels_, c.type_);
-    }
-
-    template<typename Char>
-    struct formatter<Variable, Char> : formatter<std::string_view, Char> {
-        template<typename FormatContext>
-        auto format(const Variable &c, FormatContext &ctx) -> decltype(ctx.out()) {
-            //return formatter<std::string_view, Char>::format(c.describe(), ctx);
-            return "Variable";
-        }
+        VariableAttr _attr;
     };
 }  // namespace turbo
 

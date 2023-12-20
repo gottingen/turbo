@@ -145,8 +145,8 @@ namespace turbo {
             }
 
 
-// Testing that NextRandom generates uniform random numbers. Applies the
-// Anderson-Darling test for uniformity
+            // Testing that NextRandom generates uniform random numbers. Applies the
+            // Anderson-Darling test for uniformity
             TEST(ExponentialBiasedTest, TestNextRandom) {
                 for (auto n: std::vector<size_t>({
                                                          10,  // Check short-range correlation

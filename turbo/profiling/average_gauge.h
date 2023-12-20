@@ -31,6 +31,8 @@ namespace turbo {
     template<typename T>
     class AverageGauge : public Variable {
     public:
+        static constexpr VariableAttr kAvgGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_GAUGE_SCALAR);
+    public:
         AverageGauge() : _status(unavailable_error("")) {}
 
         explicit AverageGauge(const std::string_view &name, const std::string_view &description = "");
@@ -86,6 +88,18 @@ namespace turbo {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
 
+        VariableSnapshot get_snapshot_impl() const override {
+            using Gtype = GaugeSnapshot;
+            using Dtype = double;
+            Gtype snapshot;
+            snapshot.value = static_cast<Dtype>(get_value());
+            snapshot.name = name();
+            snapshot.description = description();
+            snapshot.labels = labels();
+            snapshot.type = attr().type;
+            return snapshot;
+        }
+
     private:
         typedef profiling_internal::Reducer<T, profiling_internal::AvgTo<T>,
                 profiling_internal::SetTo<T> > reducer_type;
@@ -100,14 +114,14 @@ namespace turbo {
         if (desc.empty()) {
             desc = turbo::format("AverageGauge {}", name);
         }
-        _status = expose(name, desc, {}, "gauge");
+        _status = expose(name, desc, {}, kAvgGaugeAttr);
     }
 
     template<typename T>
     AverageGauge<T>::AverageGauge(const std::string_view &name, const std::string_view &description,
                                   const std::map<std::string, std::string> &tags)
             : Variable() {
-        _status = expose(name, description, tags, "gauge");
+        _status = expose(name, description, tags, kAvgGaugeAttr);
     }
 
     template<typename T, typename Char>

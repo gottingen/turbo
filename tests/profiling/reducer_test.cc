@@ -22,6 +22,7 @@
 #include "turbo/profiling/maxer_gauge.h"
 #include "turbo/profiling/unique_gauge.h"
 #include "turbo/profiling/histogram.h"
+#include "turbo/profiling/prometheus_dumper.h"
 #include "turbo/format/print.h"
 #include "turbo/random/random.h"
 
@@ -44,9 +45,10 @@ TEST_CASE("reducer") {
     turbo::println("counter: {}", adder.describe());
     while (count < 100) {
         turbo::sleep_for(turbo::milliseconds(50));
-        turbo::println("counter: {}", adder);
+        turbo::println("{}", adder.dump_prometheus());
         count++;
     }
+    turbo::println("{}", turbo::Variable::dump_prometheus_all());
     stop = true;
     t1.join();
     t2.join();
@@ -83,9 +85,10 @@ TEST_CASE("gauges") {
     size_t count = 0;
     while (count < 100) {
         turbo::sleep_for(turbo::milliseconds(50));
-        turbo::println("gauge: {}, {}, {}", gauge, max_gauge, min_gauge);
+        turbo::println("{}{}{}", gauge.dump_prometheus(), max_gauge.dump_prometheus(), min_gauge.dump_prometheus());
         count++;
     }
+    turbo::println("{}", turbo::Variable::dump_prometheus_all());
     stop = true;
     t1.join();
     t2.join();
@@ -97,14 +100,13 @@ TEST_CASE("funciotn") {
     int i = 0;
     while (i < 10) {
         turbo::sleep_for(turbo::milliseconds(50));
-        turbo::println("function gauge: {}", gauge);
+        turbo::println("{}", gauge.dump_prometheus());
         i++;
     }
 }
 
 
 TEST_CASE("histogram") {
-    turbo::UniqueGauge<std::function<int()>> gauge("funciton_test");
     std::array<uint32_t, 5> bins = {10, 20, 30, 40, 50};
     turbo::Histogram<uint32_t, 5> histogram("histogram");
     std::atomic<int> count(0);
@@ -122,11 +124,13 @@ TEST_CASE("histogram") {
     auto t2= std::thread(func);
     auto t3= std::thread(func);
     int i = 0;
+    turbo::PrometheusDumper dumper;
     while (i < 1000) {
         turbo::sleep_for(turbo::milliseconds(50));
-        turbo::println("{}\n{}", count.load(), histogram);
+        turbo::println("{}\n{}", count.load(), dumper.dump(histogram.get_snapshot()));
         i++;
     }
+    turbo::println("{}", turbo::Variable::dump_prometheus_all());
     stop = true;
     t1.join();
     t2.join();

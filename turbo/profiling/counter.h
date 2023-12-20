@@ -37,12 +37,14 @@ namespace turbo {
     template<typename T>
     class Counter : public Variable {
     public:
-        Counter() :_status(unavailable_error("")) {}
+        static constexpr VariableAttr kCounterAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_COUNTER);
+    public:
+        Counter() : _status(unavailable_error("")) {}
 
         explicit Counter(const std::string_view &name, const std::string_view &description = "");
 
         Counter(const std::string_view &name, const std::string_view &description,
-                const std::map<std::string,std::string> &tags);
+                const std::map<std::string, std::string> &tags);
 
         Counter(const Counter &) = delete;
 
@@ -51,19 +53,19 @@ namespace turbo {
         ~Counter() override = default;
 
         void add(const T &value) {
-            _reducer<<(value);
+            _reducer << (value);
         }
 
         void increment() {
-            _reducer<<(T(1));
+            _reducer << (T(1));
         }
 
         void operator++() {
-            _reducer<<(T(1));
+            _reducer << (T(1));
         }
 
-        Counter&operator<<(const T &value) {
-            _reducer<<(value);
+        Counter &operator<<(const T &value) {
+            _reducer << (value);
             return *this;
         }
 
@@ -86,10 +88,24 @@ namespace turbo {
         [[nodiscard]] const turbo::Status &status() const {
             return _status;
         }
+
     private:
-        std::string describe_impl(const DescriberOptions &options)  const override {
+        std::string describe_impl(const DescriberOptions &options) const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
+
+        VariableSnapshot get_snapshot_impl() const override {
+            using Ctype = CounterSnapshot;
+            using Dtype = double;
+            Ctype snapshot;
+            snapshot.value = static_cast<Dtype>(get_value());
+            snapshot.name = name();
+            snapshot.description = description();
+            snapshot.labels = labels();
+            snapshot.type = attr().type;
+            return snapshot;
+        }
+
     private:
         typedef profiling_internal::Reducer<T, profiling_internal::AddTo<T>,
                 profiling_internal::AddTo<T> > reducer_type;
@@ -100,16 +116,16 @@ namespace turbo {
     template<typename T>
     Counter<T>::Counter(const std::string_view &name, const std::string_view &description) : Variable() {
         std::string desc(description);
-        if(desc.empty()){
-            desc = turbo::format("Counter {}",  name);
+        if (desc.empty()) {
+            desc = turbo::format("Counter {}", name);
         }
-        _status = this->expose(name, desc, {}, "counter");
+        _status = this->expose(name, desc, {}, kCounterAttr);
     }
 
     template<typename T>
     Counter<T>::Counter(const std::string_view &name, const std::string_view &description,
-                        const std::map<std::string,std::string> &tags) {
-        _status = this->expose(name, description, tags, "counter");
+                        const std::map<std::string, std::string> &tags) {
+        _status = this->expose(name, description, tags, kCounterAttr);
     }
 
     template<typename T, typename Char>
