@@ -30,7 +30,7 @@
  
 namespace turbo {
 
-    static constexpr turbo::ModuleVersion hash_version = turbo::ModuleVersion{0, 9, 36};
+    static constexpr turbo::ModuleVersion hash_version = turbo::ModuleVersion{0, 9, 37};
 
 }  // namespace turbo
 #endif  // TURBO_HASH_VERSION_H_

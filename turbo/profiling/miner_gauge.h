@@ -33,6 +33,8 @@ namespace turbo {
     template<typename T>
     class MinerGauge : public Variable {
     public:
+        static constexpr VariableAttr kMinerGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_GAUGE_SCALAR);
+    public:
         MinerGauge() : _reducer(std::numeric_limits<T>::max()), _status(unavailable_error("")) {}
 
         explicit MinerGauge(const std::string_view &name, const std::string_view &description = "");
@@ -82,6 +84,18 @@ namespace turbo {
         std::string describe_impl(const DescriberOptions &options)  const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
+
+        VariableSnapshot get_snapshot_impl() const override {
+            using Gtype = GaugeSnapshot;
+            using Dtype = double;
+            Gtype snapshot;
+            snapshot.value = static_cast<Dtype>(get_value());
+            snapshot.name = name();
+            snapshot.description = description();
+            snapshot.labels = labels();
+            snapshot.type = attr().type;
+            return snapshot;
+        }
     private:
         typedef profiling_internal::Reducer<T, profiling_internal::MinerTo<T>,
                 profiling_internal::SetTo<T> > reducer_type;
@@ -96,14 +110,14 @@ namespace turbo {
         if(desc.empty()){
             desc = turbo::format("MinerGuage {}",  name);
         }
-        _status = expose(name, desc, {}, "gauge");
+        _status = expose(name, desc, {}, kMinerGaugeAttr);
     }
 
     template<typename T>
     MinerGauge<T>::MinerGauge(const std::string_view &name, const std::string_view &description,
                               const std::map<std::string, std::string> &tags)
             : Variable(),  _reducer(std::numeric_limits<T>::max()) {
-        _status = expose(name, description, tags, "gauge");
+        _status = expose(name, description, tags, kMinerGaugeAttr);
     }
 
     template<typename T, typename Char>

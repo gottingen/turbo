@@ -110,6 +110,7 @@ set(TURBO_ALL_SRC
         "profiling/internal/exponential_biased.cc"
         "profiling/internal/periodic_sampler.cc"
         "profiling/variable.cc"
+        "profiling/prometheus_dumper.cc"
         "random/discrete_distribution.cc"
         "random/gaussian_distribution.cc"
         "random/fwd.cc"

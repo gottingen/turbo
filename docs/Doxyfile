@@ -112,7 +112,10 @@ INPUT             = ../turbo/platform/version.h \
                     ../turbo/profiling/maxer_gauge.h \
                     ../turbo/profiling/miner_gauge.h \
                     ../turbo/profiling/uniform_gauge.h \
-                    ../turbo/profiling/variable.h
+                    ../turbo/profiling/variable.h \
+                    ../turbo/profiling/dumper.h \
+                    ../turbo/profiling/snapshot.h \
+                    ../turbo/profiling/prometheus_dumper.h
 
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

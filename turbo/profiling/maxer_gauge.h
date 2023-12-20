@@ -32,6 +32,8 @@ namespace turbo {
     template<typename T>
     class MaxerGauge : public Variable {
     public:
+        static constexpr VariableAttr kMaxerGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_GAUGE_SCALAR);
+    public:
         MaxerGauge() :_status(unavailable_error("")) {}
 
         explicit MaxerGauge(const std::string_view &name, const std::string_view &description = "");
@@ -83,6 +85,18 @@ namespace turbo {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
 
+        VariableSnapshot get_snapshot_impl() const override {
+            using Gtype = GaugeSnapshot;
+            using Dtype = double;
+            Gtype snapshot;
+            snapshot.value = static_cast<Dtype>(get_value());
+            snapshot.name = name();
+            snapshot.description = description();
+            snapshot.labels = labels();
+            snapshot.type = attr().type;
+            return snapshot;
+        }
+
     private:
         typedef profiling_internal::Reducer<T, profiling_internal::MaxerTo<T>,
                 profiling_internal::SetTo<T> > reducer_type;
@@ -97,14 +111,14 @@ namespace turbo {
         if(desc.empty()){
             desc = turbo::format("MaxerGuage-{}",  name);
         }
-        _status = expose(name, desc, {}, "gauge");
+        _status = expose(name, desc, {}, kMaxerGaugeAttr);
     }
 
     template<typename T>
     MaxerGauge<T>::MaxerGauge(const std::string_view &name, const std::string_view &description,
                                   const std::map<std::string, std::string> &tags)
             : Variable() {
-        _status = expose(name, description, tags, "gauge");
+        _status = expose(name, description, tags, kMaxerGaugeAttr);
     }
 
     template<typename T, typename Char>

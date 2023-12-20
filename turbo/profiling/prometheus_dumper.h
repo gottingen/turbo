@@ -13,20 +13,21 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_PROFILING_VERSION_H_
-#define TURBO_PROFILING_VERSION_H_
+#ifndef TURBO_PROFILING_PROMETHEUS_DUMPER_H_
+#define TURBO_PROFILING_PROMETHEUS_DUMPER_H_
 
-#include "turbo/module/module_version.h"
+#include "turbo/profiling/dumper.h"
+#include "turbo/profiling/snapshot.h"
 
-/**
- * @defgroup turbo_profiling_variable Turbo Profiling Counters
- * @defgroup turbo_profiling_counters Turbo Profiling Counters
- * @defgroup turbo_profiling_gauges Turbo Profiling Gauges
- * @defgroup turbo_profiling_histogram Turbo Profiling Histogram
- * @defgroup turbo_profiling_dumper Turbo Profiling Dumpers
- */
 namespace turbo {
 
-    static constexpr turbo::ModuleVersion profiling_version = turbo::ModuleVersion{0, 9, 39};
+    /**
+     * @ingroup turbo_profiling_dumper
+     * @brief PrometheusDumper dumps the variable snapshot in prometheus format.
+     */
+    struct PrometheusDumper : public VariableDumper {
+        std::string dump(const VariableSnapshot &snapshot) override;
+    };
 }  // namespace turbo
-#endif  // TURBO_PROFILING_VERSION_H_
+
+#endif  // TURBO_PROFILING_PROMETHEUS_DUMPER_H_

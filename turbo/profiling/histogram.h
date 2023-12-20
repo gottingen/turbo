@@ -142,19 +142,20 @@ namespace turbo {
     public:
         typedef profiling_internal::BatchReducer<T, N + 1, profiling_internal::AddTo<T>,
                 profiling_internal::AddTo<T>> reducer_type;
+        static constexpr VariableAttr kHistogramAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_HISTOGRAM);
     public:
         Histogram()
                 : Variable(), _bins(), _reducer(), _status(unavailable_error("")) {}
 
         explicit Histogram(const std::string_view &name, const std::string_view &description = "")
                 : Histogram() {
-            _status = this->expose(name, description, {}, "histogram");
+            _status = this->expose(name, description, {}, kHistogramAttr);
         }
 
         Histogram(const std::string_view &name, const std::string_view &description,
                   const std::map<std::string, std::string> &tags)
                 : Histogram() {
-            _status = this->expose(name, description, tags, "histogram");
+            _status = this->expose(name, description, tags, kHistogramAttr);
         }
 
         Histogram(const Histogram &) = delete;
@@ -243,6 +244,27 @@ namespace turbo {
     private:
         std::string describe_impl(const DescriberOptions &options)  const override {
             return turbo::format("{}", get_value());
+        }
+
+        VariableSnapshot get_snapshot_impl() const override {
+            using Htype = HistogramSnapshot;
+            using Dtype = double;
+            Htype snapshot;
+            snapshot.name = name();
+            snapshot.description = description();
+            snapshot.labels = labels();
+            snapshot.type = attr().type;
+            snapshot.bins.resize(N);
+            snapshot.boundaries.resize(N);
+
+            for (size_t i = 0; i < N; ++i) {
+                snapshot.bins[i] = static_cast<Dtype>(_reducer.get_value(i));
+                snapshot.count += snapshot.bins[i];
+                snapshot.boundaries[i] = _bins[i];
+            }
+            snapshot.sum = _reducer.get_value(N);
+            snapshot.avg = snapshot.sum / snapshot.count;
+            return snapshot;
         }
     private:
         size_t find_bin(const T &value) {

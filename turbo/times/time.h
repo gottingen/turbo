@@ -433,12 +433,6 @@ namespace turbo {
 
     /**
      * @ingroup turbo_times_duration
-     * @function nanoseconds()
-     * @function microseconds()
-     * @function milliseconds()
-     * @function seconds()
-     * @function minutes()
-     * @function hours()
      * @brief Factory overloads for constructing `Duration` values from an integral
      *        number of the unit indicated by the factory function's name. These
      *        functions exist for convenience, but they are not as efficient as the

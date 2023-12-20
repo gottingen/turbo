@@ -120,18 +120,21 @@ namespace turbo {
         }
 
     }  // namespace profiling_internal
+
+    PrometheusDumper Variable::g_dumper;
+
     Variable::~Variable() {
         auto rs = hide();
         TLOG_CHECK((rs.ok() || is_not_found(rs)), "Failed to hide variable :{}: {}", name_, rs.to_string());
     }
     turbo::Status Variable::expose(const std::string_view &name, const std::string_view &description,
-                                   const std::map<std::string, std::string> &labels, const std::string_view &type) {
-        return expose_impl(name, description, labels, type);
+                                   const std::map<std::string, std::string> &labels, const VariableAttr &attr) {
+        return expose_impl(name, description, labels, attr);
     }
 
     turbo::Status Variable::expose_impl(const std::string_view &name, const std::string_view &description,
                                         const std::map<std::string, std::string> &labels,
-                                        const std::string_view &type) {
+                                        const VariableAttr &attr) {
         if (is_exposed()) {
             return turbo::already_exists_error("Variable :{} is already exposed", name_);
         }
@@ -143,7 +146,7 @@ namespace turbo {
         for (auto &label: labels) {
             labels_[std::string(label.first)] = std::string(label.second);
         }
-        type_ = type;
+        _attr = attr;
         {
             auto guard = profiling_internal::VariableRegistry::get_instance().get_guard();
             guard.create_variable(this);
@@ -162,7 +165,6 @@ namespace turbo {
         name_.clear();
         description_.clear();
         labels_.clear();
-        type_.clear();
         return turbo::ok_status();
     }
 
@@ -198,5 +200,15 @@ namespace turbo {
         }
         return count;
 
+    }
+
+    void Variable::dump_prometheus_all(std::ostream &os) {
+        auto guard = profiling_internal::VariableRegistry::get_instance().get_guard();
+        for (const auto &pair: guard.variables()) {
+            if(is_prometheus(pair.second->attr().type)) {
+                auto snapshot = pair.second->get_snapshot();
+                os << g_dumper.dump(snapshot) << "\n";
+            }
+        }
     }
 }  // namespace turbo
