@@ -93,51 +93,117 @@ namespace turbo {
 
         virtual ~Variable();
 
+        /**
+         * @brief expose to the global scope.
+         * @param name
+         * @param description
+         * @param labels
+         * @param type
+         * @return
+         */
         turbo::Status expose(const std::string_view &name, const std::string_view &description,
                              const std::map<std::string, std::string> &labels, const VariableAttr &type);
 
+        /**
+         * @brief hide from the global scope.
+         * @return
+         */
         turbo::Status hide();
 
+        /**
+         * @brief check if the variable is exposed.
+         * @return
+         */
         [[nodiscard]] bool is_exposed() const;
 
+        /**
+         * @brief get the name of the variable.
+         * @return
+         */
         [[nodiscard]] const std::string &name() const {
             return name_;
         }
 
+        /**
+         * @brief get the description of the variable.
+         * @return
+         */
         [[nodiscard]] const std::string &description() const {
             return description_;
         }
 
+        /**
+         * @brief get the labels of the variable.
+         * @return
+         */
         [[nodiscard]] const std::map<std::string, std::string> &labels() const {
             return labels_;
         }
 
+        /**
+         * @brief get the attr of the variable.
+         * @return
+         */
         [[nodiscard]] const VariableAttr &attr() const {
             return _attr;
         }
 
+        /**
+         * @brief list all the exposed variable names.
+         * @param names
+         * @param filter
+         */
         static void list_exposed(std::vector<std::string> &names, const VariableFilter *filter = nullptr);
 
+        /**
+         * @brief count exposed variable number.
+         * @param filter
+         * @return
+         */
         static size_t count_exposed(const VariableFilter *filter = nullptr);
 
     public:
 
+        /**
+         * @brief describe variable to stream, for debug
+         * @return
+         */
         void describe(std::ostream &os, const DescriberOptions &options = DescriberOptions()) const {
             os << describe(options);
         }
 
+        /**
+         * @brief describe variable to stream, for debug
+         * @return
+         */
         [[nodiscard]] std::string describe(const DescriberOptions &options = DescriberOptions()) const {
             return describe_impl(options);
         }
 
+        /**
+         * @brief get the snapshot of the variable.
+         * @return
+         */
         [[nodiscard]] VariableSnapshot get_snapshot() const {
             return get_snapshot_impl();
         }
 
+        /**
+         * @brief dump the exposed Variable to the ostream.
+         *        the format is prometheus text format.
+         *        if the variable do not support prometheus, it will
+         *        be return a string "unsupport".
+         */
         [[nodiscard]] std::string dump_prometheus() const{
             return g_dumper.dump(get_snapshot());
         }
 
+        /**
+         * @brief dump all the exposed Variable to the ostream.
+         *        the format is prometheus text format.
+         *        if the variable do not support prometheus, it will
+         *        be ignored.
+         */
         static void dump_prometheus_all(std::ostream &os);
 
         static std::string dump_prometheus_all() {

@@ -21,14 +21,18 @@
 
 #include "turbo/profiling/snapshot.h"
 #include <ostream>
+
 namespace turbo {
 
+    /**
+     * @brief DumperType is a bitfield that describes the supported dumpers.
+     */
     enum class DumperType : uint8_t {
         DUMP_PLAIN_NONE = 0,
-        DUMP_PLAIN_TEXT = 1<<0,
-        DUMP_PLAIN_JSON = 1<<1,
-        DUMP_PLAIN_HTML = 1<<2,
-        DUMP_PLAIN_PROMETHEUS = 1<<3,
+        DUMP_PLAIN_TEXT = 1 << 0,
+        DUMP_PLAIN_JSON = 1 << 1,
+        DUMP_PLAIN_HTML = 1 << 2,
+        DUMP_PLAIN_PROMETHEUS = 1 << 3,
     };
 
     constexpr DumperType operator|(DumperType a, DumperType b) {
@@ -83,18 +87,26 @@ namespace turbo {
         return a == DumperType::DUMP_PLAIN_NONE;
     }
 
-    static constexpr DumperType DUMP_ALL = DumperType::DUMP_PLAIN_TEXT | DumperType::DUMP_PLAIN_HTML | DumperType::DUMP_PLAIN_PROMETHEUS | DumperType::DUMP_PLAIN_JSON;
+    static constexpr DumperType DUMP_ALL =
+            DumperType::DUMP_PLAIN_TEXT | DumperType::DUMP_PLAIN_HTML | DumperType::DUMP_PLAIN_PROMETHEUS |
+            DumperType::DUMP_PLAIN_JSON;
 
-    static constexpr DumperType DUMP_PLAIN_TEXT = DumperType::DUMP_PLAIN_TEXT | DumperType::DUMP_PLAIN_HTML | DumperType::DUMP_PLAIN_JSON;
+    static constexpr DumperType DUMP_PLAIN_TEXT =
+            DumperType::DUMP_PLAIN_TEXT | DumperType::DUMP_PLAIN_HTML | DumperType::DUMP_PLAIN_JSON;
 
-    static constexpr DumperType DUMP_PROMETHEUS_TYPE = DumperType::DUMP_PLAIN_PROMETHEUS | DumperType::DUMP_PLAIN_TEXT| DumperType::DUMP_PLAIN_HTML;
+    static constexpr DumperType DUMP_PROMETHEUS_TYPE =
+            DumperType::DUMP_PLAIN_PROMETHEUS | DumperType::DUMP_PLAIN_TEXT | DumperType::DUMP_PLAIN_HTML;
 
-
+    /**
+     * @ingroup turbo_profiling_dumper
+     * @brief VariableDumper is the base class for all dumpers.
+     *        drivers need to implement the dump function.
+     */
     struct VariableDumper {
         virtual ~VariableDumper() = default;
 
         virtual void dump(std::ostream &os, const VariableSnapshot &snapshot) {
-            os<<dump(snapshot);
+            os << dump(snapshot);
         }
 
         virtual std::string dump(const VariableSnapshot &snapshot) = 0;

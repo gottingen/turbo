@@ -30,3 +30,10 @@ histogram
 .. doxygengroup:: turbo_profiling_histogram
    :project: turbo-docs
    :members:
+
+dumper
+=======================================
+
+.. doxygengroup:: turbo_profiling_dumper
+   :project: turbo-docs
+   :members:

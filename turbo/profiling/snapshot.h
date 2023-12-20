@@ -42,6 +42,12 @@ namespace turbo {
         return (static_cast<uint8_t>(vt) & static_cast<uint8_t>(VariableType::VT_PROMETHEUS)) != 0;
     }
 
+    /**
+     * @ingroup turbo_profiling_dumper
+     * @brief The SnapshotFamily struct is the base class for all snapshots.
+     *        Dumper implementations should use this class to access the common
+     *        fields of all snapshots. drives hold the data field.
+     */
     struct SnapshotFamily {
         std::string name;
         std::string description;
@@ -75,6 +81,20 @@ namespace turbo {
         std::string type_id;
     };
 
+    /**
+     * @ingroup turbo_profiling_dumper
+     * @brief The VariableSnapshot struct is the base class for all snapshots.
+     *        Dumper serializers should use this class to access the variable
+     *        snapshot.
+     *        Example:
+     *        @code {.cpp}
+     *        VariableSnapshot snapshot = variable->get_snapshot();
+     *        const CounterSnapshot* counter = std::get_if<CounterSnapshot>(&snapshot);
+     *        if(counter) {
+     *          // do something
+     *        }
+     *        @endcode
+     */
     using VariableSnapshot = std::variant<PlainStringSnapshot, CounterSnapshot, GaugeSnapshot,
             HistogramSnapshot, ObjectSnapshot>;
 

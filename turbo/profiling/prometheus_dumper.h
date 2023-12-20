@@ -21,6 +21,10 @@
 
 namespace turbo {
 
+    /**
+     * @ingroup turbo_profiling_dumper
+     * @brief PrometheusDumper dumps the variable snapshot in prometheus format.
+     */
     struct PrometheusDumper : public VariableDumper {
         std::string dump(const VariableSnapshot &snapshot) override;
     };

@@ -23,9 +23,10 @@
  * @defgroup turbo_profiling_counters Turbo Profiling Counters
  * @defgroup turbo_profiling_gauges Turbo Profiling Gauges
  * @defgroup turbo_profiling_histogram Turbo Profiling Histogram
+ * @defgroup turbo_profiling_dumper Turbo Profiling Dumpers
  */
 namespace turbo {
 
-    static constexpr turbo::ModuleVersion profiling_version = turbo::ModuleVersion{0, 9, 36};
+    static constexpr turbo::ModuleVersion profiling_version = turbo::ModuleVersion{0, 9, 39};
 }  // namespace turbo
 #endif  // TURBO_PROFILING_VERSION_H_

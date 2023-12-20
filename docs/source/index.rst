@@ -56,13 +56,22 @@ Contents
 
 
 .. toctree::
-    :caption: 中文文档
+    :maxdepth: 3
+    :caption: CHANGE LOG
 
-    cn/overview
+    en/changelog
 
 .. toctree::
+    :maxdepth: 3
+    :caption: PLAN
 
-    cn/install
+    en/plan
+
+.. toctree::
+    :maxdepth: 3
+    :caption: BLOG & TIPS
+
+    en/blog
 
 
 

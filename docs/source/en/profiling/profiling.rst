@@ -72,6 +72,116 @@ metric: a variable that is used to record the state of the application. For exam
 * Histogram metric: a metric that is used to record the distribution of a variable. For example, the distribution of
     latency, the distribution of the number of requests, etc.
 
+using metrics
+================================================
+
+the metrics is very easy to use. you can define a metric in global scope, and write it int the application
+anywhere. the metrics is thread safe. you can write it in multi-threaded environment.
+
+.. note::
+
+    the metrics is write light, read heavy. do not read it frequently as a getter. the metrics is not
+    designed for this. the metrics is designed for write frequently, read occasionally.
+
+let's see how to use the metrics.
+
+.. code-block:: c++
+
+    #include <turbo/profiling/variable.h>
+
+    // define a counter metric
+    turbo::Counter<std::int64_t> g_counter("counter", "counter description");
+    turbo::MaxerGauge<std::int64_t> g_maxer_gauge("maxer_gauge", "maxer gauge description");
+    turbo::MinerGauge<std::int64_t> g_miner_gauge("miner_gauge", "miner gauge description");
+
+    // define a histogram metric
+    turbo::Histogram<std::int64_t> g_histogram("histogram", "histogram description", {0, 10, 20, 30, 40, 50, 60, 70, 80, 90});
+
+    // write the metrics
+    g_counter.inc();
+    g_maxer_gauge.set(100);
+    g_miner_gauge.set(100);
+    g_histogram.observe(100);
+
+    // read the metrics
+    std::cout << g_counter.get() << std::endl;
+    std::cout << g_maxer_gauge.get() << std::endl;
+    std::cout << g_miner_gauge.get() << std::endl;
+    std::cout << g_histogram.get() << std::endl;
+
+    // dump the metrics
+    std::cout << g_counter.dump() << std::endl;
+    std::cout << g_maxer_gauge.dump() << std::endl;
+    std::cout << g_miner_gauge.dump() << std::endl;
+    std::cout << g_histogram.dump() << std::endl;
+
+    // dump the metrics to json
+    std::cout << g_counter.dump_json() << std::endl;
+    std::cout << g_maxer_gauge.dump_json() << std::endl;
+    std::cout << g_miner_gauge.dump_json() << std::endl;
+    std::cout << g_histogram.dump_json() << std::endl;
+
+    // dump the metrics to prometheus
+    turbo::PrometheusDump prometheus_dump;
+    std::cout << g_counter.dump_prometheus(prometheus_dump) << std::endl;
+    std::cout << g_maxer_gauge.dump_prometheus(prometheus_dump) << std::endl;
+    std::cout << g_miner_gauge.dump_prometheus(prometheus_dump) << std::endl;
+    std::cout << g_histogram.dump
+
+see a example usually in actual application
+
+.. code-block:: c++
+
+    #include <turbo/profiling/variable.h>
+    #include <turbo/profiling/prometheus_dump.h>
+    #include <turbo/profiling/counter.h>
+    #include <turbo/profiling/maxer_gauge.h>
+    #include <turbo/profiling/miner_gauge.h>
+    #include <turbo/profiling/histogram.h>
+    #include <turbo/random/random.h>
+
+    // define a counter metric
+    turbo::Counter<std::int64_t> g_counter("counter", "counter description");
+    turbo::MaxerGauge<std::int64_t> g_maxer_gauge("maxer_gauge", "maxer gauge description");
+    turbo::MinerGauge<std::int64_t> g_miner_gauge("miner_gauge", "miner gauge description");
+
+    // define a histogram metric
+    turbo::Histogram<std::int64_t> g_histogram("histogram", "histogram description", {0, 10, 20, 30, 40, 50, 60, 70, 80, 90});
+
+    // define a thread to write the metrics
+    bool g_running = true;
+    void write_metrics() {
+        while (g_running) {
+            g_counter.inc();
+            g_maxer_gauge.set(turbo::uniform<uint32_t>(50, 100));
+            g_miner_gauge.set(turbo::uniform<uint32_t>(0, 50));
+            auto s = g_histogram.scope_latency_double_milliseconds();
+            // do something
+        }
+    };
+    auto t0 = std::thread(write_metrics);
+    auto t1 = std::thread(write_metrics);
+    auto t2 = std::thread(write_metrics);
+    auto t3 = std::thread(write_metrics);
+    while (is_ask_to_stop() == false) {
+        // std::cout << g_counter.dump() << std::endl;
+        // std::cout << g_maxer_gauge.dump() << std::endl;
+        // std::cout << g_miner_gauge.dump() << std::endl;
+        // std::cout << g_histogram.dump() << std::endl;
+        auto str = Variable::dump_prometheus_all();
+        // report str to prometheus server
+        // or dump it when prometheus server request and response it
+        turbo::sleep_for(turbo::seconds(10));
+    }
+    g_running = false;
+    t0.join();
+    t1.join();
+    t2.join();
+    t3.join();
+
+
+
+
 prometheus
 =========================================
 
@@ -82,5 +192,27 @@ for alerting time series data. It is also very suitable for recording time serie
 
 turbo has supported prometheus. the ``Variable`` have supported  to dump the data to prometheus. details to see
 ``Variable`` api section.
+
+dump the data to prometheus
+
+.. code-block:: c++
+
+    #include <turbo/profiling/prometheus_dump.h>
+    #include <turbo/profiling/variable.h>
+
+    // define a counter metric
+    turbo::Counter<std::int64_t> g_counter("counter", "counter description");
+    turbo::MaxerGauge<std::int64_t> g_maxer_gauge("maxer_gauge", "maxer gauge description");
+    turbo::MinerGauge<std::int64_t> g_miner_gauge("miner_gauge", "miner gauge description");
+
+    // define a histogram metric
+    turbo::Histogram<std::int64_t> g_histogram("histogram", "histogram description", {0, 10, 20, 30, 40, 50, 60, 70, 80, 90});
+
+    // dump the data to prometheus
+    turbo::PrometheusDump prometheus_dump;
+    auto str = Variable::dump_prometheus_all(prometheus_dump);
+    // do something with str
+
+
 
 
