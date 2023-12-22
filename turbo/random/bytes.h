@@ -40,7 +40,7 @@ namespace turbo {
      * @param output_length
      */
     template<typename URBG>
-    void random_bytes(URBG &&urbg, void *output, size_t output_length) {
+    inline void random_bytes(URBG &&urbg, void *output, size_t output_length) {
         const size_t n = output_length / 8;
         for (size_t i = 0; i < n; ++i) {
             static_cast<uint64_t *>(output)[i] = uniform(urbg);
@@ -66,7 +66,7 @@ namespace turbo {
      * @param output
      * @param output_length
      */
-    void random_bytes(void *output, size_t output_length) {
+    inline void random_bytes(void *output, size_t output_length) {
         const size_t n = output_length / 8;
         for (size_t i = 0; i < n; ++i) {
             static_cast<uint64_t *>(output)[i] = uniform<uint64_t>();
@@ -92,7 +92,7 @@ namespace turbo {
      * @param output
      * @param output_length
      */
-    void fast_random_bytes(void *output, size_t output_length) {
+    inline void fast_random_bytes(void *output, size_t output_length) {
         const size_t n = output_length / 8;
         for (size_t i = 0; i < n; ++i) {
             static_cast<uint64_t *>(output)[i] = fast_uniform<uint64_t>();
@@ -142,20 +142,7 @@ namespace turbo {
      * @param output
      * @param output_length
      */
-    std::string random_printable(size_t length) {
-        std::string result(length, 0);
-        const size_t halflen = length / 2;
-        random_bytes(&result[0], halflen);
-        for (size_t i = 0; i < halflen; ++i) {
-            const uint8_t b = result[halflen - 1 - i];
-            result[length - 1 - 2 * i] = 'A' + (b & 0xF);
-            result[length - 2 - 2 * i] = 'A' + (b >> 4);
-        }
-        if (halflen * 2 != length) {
-            result[0] = 'A' + (uniform<uint64_t>() % 16);
-        }
-        return result;
-    }
+    inline std::string random_printable(size_t length);
 
     /**
      * @ingroup turbo_random_bytes
@@ -167,20 +154,7 @@ namespace turbo {
      * @param output
      * @param output_length
      */
-    std::string fast_random_printable(size_t length) {
-        std::string result(length, 0);
-        const size_t halflen = length / 2;
-        fast_random_bytes(&result[0], halflen);
-        for (size_t i = 0; i < halflen; ++i) {
-            const uint8_t b = result[halflen - 1 - i];
-            result[length - 1 - 2 * i] = 'A' + (b & 0xF);
-            result[length - 2 - 2 * i] = 'A' + (b >> 4);
-        }
-        if (halflen * 2 != length) {
-            result[0] = 'A' + (fast_uniform<uint64_t>() % 16);
-        }
-        return result;
-    }
+    std::string fast_random_printable(size_t length);
 
 }  // namespace turbo
 

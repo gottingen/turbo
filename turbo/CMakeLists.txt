@@ -113,6 +113,7 @@ set(TURBO_ALL_SRC
         "profiling/prometheus_dumper.cc"
         "random/discrete_distribution.cc"
         "random/gaussian_distribution.cc"
+        "random/bytes.cc"
         "random/fwd.cc"
         "random/random.cc"
         "random/unicode.cc"

@@ -67,7 +67,7 @@ namespace turbo {
      * @param p probability
      * @return bool
      */
-    bool bernoulli(double p) {
+    inline bool bernoulli(double p) {
         using distribution_t = turbo::bernoulli_distribution;
 
         return random_internal::DistributionCaller<BitGen>::template Call<
@@ -87,7 +87,7 @@ namespace turbo {
      * @param p probability
      * @return bool
      */
-    bool fast_bernoulli(double p) {
+    inline bool fast_bernoulli(double p) {
         using distribution_t = turbo::bernoulli_distribution;
 
         return random_internal::DistributionCaller<InsecureBitGen>::template Call<
