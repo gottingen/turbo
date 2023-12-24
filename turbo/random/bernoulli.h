@@ -90,8 +90,8 @@ namespace turbo {
     inline bool fast_bernoulli(double p) {
         using distribution_t = turbo::bernoulli_distribution;
 
-        return random_internal::DistributionCaller<InsecureBitGen>::template Call<
-                distribution_t>(&get_tls_fast_bit_gen(), p);
+        return random_internal::DistributionCaller<InsecureBitGen>::template Call<distribution_t>(
+                &get_tls_fast_bit_gen(), p);
     }
 
 }  // namespace turbo
