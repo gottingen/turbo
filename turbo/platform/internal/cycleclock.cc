@@ -28,49 +28,45 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
+namespace turbo::base_internal {
 
 #if TURBO_USE_UNSCALED_CYCLECLOCK
 
 #ifndef TURBO_COMPILER_CPP17_ENABLED
-constexpr int32_t CycleClock::kShift;
-constexpr double CycleClock::kFrequencyScale;
+    constexpr int32_t CycleClock::kShift;
+    constexpr double CycleClock::kFrequencyScale;
 #endif
 
-TURBO_CONST_INIT std::atomic<CycleClockSourceFunc>
-    CycleClock::cycle_clock_source_{nullptr};
+    TURBO_CONST_INIT std::atomic<CycleClockSourceFunc>
+            CycleClock::cycle_clock_source_{nullptr};
 
-void CycleClockSource::Register(CycleClockSourceFunc source) {
-  // Corresponds to the load(std::memory_order_acquire) in LoadCycleClockSource.
-  CycleClock::cycle_clock_source_.store(source, std::memory_order_release);
-}
+    void CycleClockSource::Register(CycleClockSourceFunc source) {
+        // Corresponds to the load(std::memory_order_acquire) in LoadCycleClockSource.
+        CycleClock::cycle_clock_source_.store(source, std::memory_order_release);
+    }
 
 #ifdef _WIN32
-int64_t CycleClock::time_now() {
-  auto fn = LoadCycleClockSource();
-  if (fn == nullptr) {
-    return base_internal::UnscaledCycleClock::time_now() >> kShift;
-  }
-  return fn() >> kShift;
-}
+    int64_t CycleClock::time_now() {
+      auto fn = LoadCycleClockSource();
+      if (fn == nullptr) {
+        return base_internal::UnscaledCycleClock::time_now() >> kShift;
+      }
+      return fn() >> kShift;
+    }
 #endif
 
 #else
 
-int64_t CycleClock::time_now() {
-  return std::chrono::duration_cast<std::chrono::nanoseconds>(
-             std::chrono::steady_clock::now().time_since_epoch())
-      .count();
-}
+    int64_t CycleClock::time_now() {
+      return std::chrono::duration_cast<std::chrono::nanoseconds>(
+                 std::chrono::steady_clock::now().time_since_epoch())
+          .count();
+    }
 
-double CycleClock::Frequency() {
-  return 1e9;
-}
+    double CycleClock::Frequency() {
+      return 1e9;
+    }
 
 #endif
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::base_internal

@@ -49,95 +49,95 @@
 #include "turbo/platform/internal/cycleclock_config.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
+namespace turbo::base_internal {
 
-using CycleClockSourceFunc = int64_t (*)();
+    using CycleClockSourceFunc = int64_t (*)();
 
-// -----------------------------------------------------------------------------
-// CycleClock
-// -----------------------------------------------------------------------------
-class CycleClock {
- public:
-  // CycleClock::time_now()
-  //
-  // Returns the value of a cycle counter that counts at a rate that is
-  // approximately constant.
-  static int64_t time_now();
+    // -----------------------------------------------------------------------------
+    // CycleClock
+    // -----------------------------------------------------------------------------
+    class CycleClock {
+    public:
+        // CycleClock::time_now()
+        //
+        // Returns the value of a cycle counter that counts at a rate that is
+        // approximately constant.
+        static int64_t time_now();
 
-  // CycleClock::Frequency()
-  //
-  // Returns the amount by which `CycleClock::time_now()` increases per second. Note
-  // that this value may not necessarily match the core CPU clock frequency.
-  static double Frequency();
+        // CycleClock::Frequency()
+        //
+        // Returns the amount by which `CycleClock::time_now()` increases per second. Note
+        // that this value may not necessarily match the core CPU clock frequency.
+        static double Frequency();
 
- private:
+    private:
 #if TURBO_USE_UNSCALED_CYCLECLOCK
-  static CycleClockSourceFunc LoadCycleClockSource();
 
-  static constexpr int32_t kShift = kCycleClockShift;
-  static constexpr double kFrequencyScale = kCycleClockFrequencyScale;
+        static CycleClockSourceFunc LoadCycleClockSource();
 
-  TURBO_CONST_INIT static std::atomic<CycleClockSourceFunc> cycle_clock_source_;
+        static constexpr int32_t kShift = kCycleClockShift;
+        static constexpr double kFrequencyScale = kCycleClockFrequencyScale;
+
+        TURBO_CONST_INIT static std::atomic<CycleClockSourceFunc> cycle_clock_source_;
 #endif  //  TURBO_USE_UNSCALED_CYCLECLOC
 
-  CycleClock() = delete;  // no instances
-  CycleClock(const CycleClock&) = delete;
-  CycleClock& operator=(const CycleClock&) = delete;
+        CycleClock() = delete;  // no instances
+        CycleClock(const CycleClock &) = delete;
 
-  friend class CycleClockSource;
-};
+        CycleClock &operator=(const CycleClock &) = delete;
 
-class CycleClockSource {
- private:
-  // CycleClockSource::Register()
-  //
-  // Register a function that provides an alternate source for the unscaled CPU
-  // cycle count value. The source function must be async signal safe, must not
-  // call CycleClock::time_now(), and must have a frequency that matches that of the
-  // unscaled clock used by CycleClock. A nullptr value resets CycleClock to use
-  // the default source.
-  static void Register(CycleClockSourceFunc source);
-};
+        friend class CycleClockSource;
+    };
+
+    class CycleClockSource {
+    private:
+        // CycleClockSource::Register()
+        //
+        // Register a function that provides an alternate source for the unscaled CPU
+        // cycle count value. The source function must be async signal safe, must not
+        // call CycleClock::time_now(), and must have a frequency that matches that of the
+        // unscaled clock used by CycleClock. A nullptr value resets CycleClock to use
+        // the default source.
+        static void Register(CycleClockSourceFunc source);
+    };
 
 #if TURBO_USE_UNSCALED_CYCLECLOCK
 
-inline CycleClockSourceFunc CycleClock::LoadCycleClockSource() {
+    inline CycleClockSourceFunc CycleClock::LoadCycleClockSource() {
 #if !defined(__x86_64__)
-  // Optimize for the common case (no callback) by first doing a relaxed load;
-  // this is significantly faster on non-x86 platforms.
-  if (cycle_clock_source_.load(std::memory_order_relaxed) == nullptr) {
-    return nullptr;
-  }
+        // Optimize for the common case (no callback) by first doing a relaxed load;
+        // this is significantly faster on non-x86 platforms.
+        if (cycle_clock_source_.load(std::memory_order_relaxed) == nullptr) {
+          return nullptr;
+        }
 #endif  // !defined(__x86_64__)
 
-  // This corresponds to the store(std::memory_order_release) in
-  // CycleClockSource::Register, and makes sure that any updates made prior to
-  // registering the callback are visible to this thread before the callback
-  // is invoked.
-  return cycle_clock_source_.load(std::memory_order_acquire);
-}
+        // This corresponds to the store(std::memory_order_release) in
+        // CycleClockSource::Register, and makes sure that any updates made prior to
+        // registering the callback are visible to this thread before the callback
+        // is invoked.
+        return cycle_clock_source_.load(std::memory_order_acquire);
+    }
 
 // Accessing globals in inlined code in Window DLLs is problematic.
 #ifndef _WIN32
-inline int64_t CycleClock::time_now() {
-  auto fn = LoadCycleClockSource();
-  if (fn == nullptr) {
-    return base_internal::UnscaledCycleClock::time_now() >> kShift;
-  }
-  return fn() >> kShift;
-}
+
+    inline int64_t CycleClock::time_now() {
+        auto fn = LoadCycleClockSource();
+        if (fn == nullptr) {
+            return base_internal::UnscaledCycleClock::time_now() >> kShift;
+        }
+        return fn() >> kShift;
+    }
+
 #endif
 
-inline double CycleClock::Frequency() {
-  return kFrequencyScale * base_internal::UnscaledCycleClock::Frequency();
-}
+    inline double CycleClock::Frequency() {
+        return kFrequencyScale * base_internal::UnscaledCycleClock::Frequency();
+    }
 
 #endif  // TURBO_USE_UNSCALED_CYCLECLOCK
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::base_internal
 
 #endif  // TURBO_PLATFORM_INTERNAL_CYCLECLOCK_H_
