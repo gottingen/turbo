@@ -12,4 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "encode_utf8.h"
+#include <cstdint>
+#include <cstddef>
+
+namespace turbo::unicode {
+    // validate UTF-16LE.
+    [[nodiscard]] bool validate_utf16(const char16_t *buf, size_t len) noexcept;
+
+} // namespace turbo::unicode

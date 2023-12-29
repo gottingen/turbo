@@ -68,81 +68,85 @@
 #include "turbo/platform/port.h"  // disable some warnings on Windows
 #include "turbo/strings/ascii.h"  // for turbo::ascii_to_lower
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace strings_internal {
+namespace turbo::strings_internal {
 
-inline char* memcat(char* dest, size_t destlen, const char* src,
-                    size_t srclen) {
-  return reinterpret_cast<char*>(memcpy(dest + destlen, src, srclen));
-}
-
-int memcasecmp(const char* s1, const char* s2, size_t len);
-char* memdup(const char* s, size_t slen);
-char* memrchr(const char* s, int c, size_t slen);
-size_t memspn(const char* s, size_t slen, const char* accept);
-size_t memcspn(const char* s, size_t slen, const char* reject);
-char* mempbrk(const char* s, size_t slen, const char* accept);
-
-// This is for internal use only.  Don't call this directly
-template <bool case_sensitive>
-const char* int_memmatch(const char* haystack, size_t haylen,
-                         const char* needle, size_t neelen) {
-  if (0 == neelen) {
-    return haystack;  // even if haylen is 0
-  }
-  const char* hayend = haystack + haylen;
-  const char* needlestart = needle;
-  const char* needleend = needlestart + neelen;
-
-  for (; haystack < hayend; ++haystack) {
-    char hay = case_sensitive
-                   ? *haystack
-                   : turbo::ascii_to_lower(static_cast<unsigned char>(*haystack));
-    char nee = case_sensitive
-                   ? *needle
-                   : turbo::ascii_to_lower(static_cast<unsigned char>(*needle));
-    if (hay == nee) {
-      if (++needle == needleend) {
-        return haystack + 1 - neelen;
-      }
-    } else if (needle != needlestart) {
-      // must back up haystack in case a prefix matched (find "aab" in "aaab")
-      haystack -= needle - needlestart;  // for loop will advance one more
-      needle = needlestart;
+    inline char *memcat(char *dest, size_t destlen, const char *src,
+                        size_t srclen) {
+        return reinterpret_cast<char *>(memcpy(dest + destlen, src, srclen));
     }
-  }
-  return nullptr;
-}
 
-// These are the guys you can call directly
-inline const char* memstr(const char* phaystack, size_t haylen,
-                          const char* pneedle) {
-  return int_memmatch<true>(phaystack, haylen, pneedle, strlen(pneedle));
-}
+    int memcasecmp(const char *s1, const char *s2, size_t len);
 
-inline const char* memcasestr(const char* phaystack, size_t haylen,
-                              const char* pneedle) {
-  return int_memmatch<false>(phaystack, haylen, pneedle, strlen(pneedle));
-}
+    char *memdup(const char *s, size_t slen);
 
-inline const char* memmem(const char* phaystack, size_t haylen,
-                          const char* pneedle, size_t needlelen) {
-  return int_memmatch<true>(phaystack, haylen, pneedle, needlelen);
-}
+    char *memrchr(const char *s, int c, size_t slen);
 
-inline const char* memcasemem(const char* phaystack, size_t haylen,
-                              const char* pneedle, size_t needlelen) {
-  return int_memmatch<false>(phaystack, haylen, pneedle, needlelen);
-}
+    size_t memspn(const char *s, size_t slen, const char *accept);
 
-// This is significantly faster for case-sensitive matches with very
-// few possible matches.  See unit test for benchmarks.
-const char* memmatch(const char* phaystack, size_t haylen, const char* pneedle,
-                     size_t neelen);
+    size_t memcspn(const char *s, size_t slen, const char *reject);
 
-}  // namespace strings_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    char *mempbrk(const char *s, size_t slen, const char *accept);
+
+    // This is for internal use only.  Don't call this directly
+    template<bool case_sensitive>
+    const char *int_memmatch(const char *haystack, size_t haylen,
+                             const char *needle, size_t neelen) {
+        if (0 == neelen) {
+            return haystack;  // even if haylen is 0
+        }
+        const char *hayend = haystack + haylen;
+        const char *needlestart = needle;
+        const char *needleend = needlestart + neelen;
+
+        for (; haystack < hayend; ++haystack) {
+            char hay = case_sensitive
+                       ? *haystack
+                       : turbo::ascii_to_lower(static_cast<unsigned char>(*haystack));
+            char nee = case_sensitive
+                       ? *needle
+                       : turbo::ascii_to_lower(static_cast<unsigned char>(*needle));
+            if (hay == nee) {
+                if (++needle == needleend) {
+                    return haystack + 1 - neelen;
+                }
+            } else if (needle != needlestart) {
+                // must back up haystack in case a prefix matched (find "aab" in "aaab")
+                haystack -= needle - needlestart;  // for loop will advance one more
+                needle = needlestart;
+            }
+        }
+        return nullptr;
+    }
+
+    // These are the guys you can call directly
+    inline const char *memstr(const char *phaystack, size_t haylen,
+                              const char *pneedle) {
+        return int_memmatch<true>(phaystack, haylen, pneedle, strlen(pneedle));
+    }
+
+    inline const char *memcasestr(const char *phaystack, size_t haylen,
+                                  const char *pneedle) {
+        return int_memmatch<false>(phaystack, haylen, pneedle, strlen(pneedle));
+    }
+
+    inline const char *memmem(const char *phaystack, size_t haylen,
+                              const char *pneedle, size_t needlelen) {
+        return int_memmatch<true>(phaystack, haylen, pneedle, needlelen);
+    }
+
+    inline const char *memcasemem(const char *phaystack, size_t haylen,
+                                  const char *pneedle, size_t needlelen) {
+        return int_memmatch<false>(phaystack, haylen, pneedle, needlelen);
+    }
+
+    // This is significantly faster for case-sensitive matches with very
+    // few possible matches.  See unit test for benchmarks.
+    const char *memmatch(const char *phaystack, size_t haylen, const char *pneedle,
+                         size_t neelen);
+
+    const char32_t *memmatch(const char32_t *phaystack, size_t haylen, const char32_t *pneedle,
+                         size_t neelen);
+
+}  // namespace turbo::strings_internal
 
 #endif  // TURBO_STRINGS_INTERNAL_MEMUTIL_H_

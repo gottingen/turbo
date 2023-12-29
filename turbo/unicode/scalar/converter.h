@@ -169,7 +169,7 @@ namespace turbo::unicode {
 
     /// inlines
 
-    [[nodiscard]] turbo::EncodingType Converter<scalar_engine>::auto_detect_encoding(const char *input, size_t length) noexcept {
+    [[nodiscard]] inline turbo::EncodingType Converter<scalar_engine>::auto_detect_encoding(const char *input, size_t length) noexcept {
         // If there is a BOM, then we trust it.
         auto bom_encoding = BOM::check_bom(input, length);
         if(bom_encoding != EncodingType::unspecified) { return bom_encoding; }

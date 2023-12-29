@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "transcode_test_base.h"
-#include "turbo/unicode/utf.h"
+#include "../transcode_test_base.h"
+#include "turbo/testing/test.h"
+#include "turbo/unicode/converter.h"
+#include "turbo/format/format.h"
+#include "turbo/unicode/codec/decode_utf16.h"
+#include "turbo/unicode/codec/decode_utf32.h"
+#include "turbo/unicode/codec/encode_utf16.h"
+#include "turbo/unicode/codec/encode_utf32.h"
+#include "turbo/unicode/codec/encode_utf8.h"
+#include "turbo/unicode/codec/validate_utf8.h"
+#include "turbo/unicode/codec/validate_utf16.h"
+#include "turbo/unicode/codec/validate_utf32.h"
 
 #ifndef TURBO_IS_BIG_ENDIAN
 #error "TURBO_IS_BIG_ENDIAN should be defined."
@@ -22,15 +32,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include <string>
-
-#include <tests/unicode/reference/encode_utf8.h>
-#include <tests/unicode/reference/encode_utf16.h>
-#include <tests/unicode/reference/encode_utf32.h>
-#include <tests/unicode/reference/decode_utf16.h>
-#include <tests/unicode/reference/decode_utf32.h>
-#include <tests/unicode/reference/validate_utf8.h>
-#include <tests/unicode/reference/validate_utf16.h>
-#include <tests/unicode/reference/validate_utf32.h>
 
 
 namespace turbo {
@@ -47,7 +48,7 @@ namespace turbo {
             }
 
             void transcode_test_base::encode_utf8(uint32_t codepoint, std::vector<char> &target) {
-                ::turbo::tests::reference::utf8::encode(codepoint, [&target](uint8_t byte) {
+                ::turbo::unicode::utf8::encode(codepoint, [&target](uint8_t byte) {
                     target.push_back(byte);
                 });
             }
@@ -55,7 +56,7 @@ namespace turbo {
             void transcode_test_base::encode_utf16(uint32_t codepoint, std::vector<char16_t> &target) {
                 char16_t W1;
                 char16_t W2;
-                switch (::turbo::tests::reference::utf16::encode(codepoint, W1, W2)) {
+                switch (::turbo::unicode::utf16::encode(codepoint, W1, W2)) {
                     case 1:
 #if TURBO_IS_BIG_ENDIAN
                         W1 = char16_t((uint16_t(W1)<<8)|(uint16_t(W1)>>8));
@@ -75,12 +76,12 @@ namespace turbo {
 
                     default:
                         throw std::invalid_argument(std::string("Value can't be encoded as UTF-16 code-point : ") +
-                                                    std::to_string(codepoint));
+                                                    turbo::format("{:x}", codepoint));
                 }
             }
 
             void transcode_test_base::encode_utf32(uint32_t codepoint, std::vector<char32_t> &target) {
-                ::turbo::tests::reference::utf32::encode(codepoint, [&target](uint32_t word) {
+                ::turbo::unicode::utf32::encode(codepoint, [&target](uint32_t word) {
                     target.push_back(word);
                 });
             }
@@ -104,10 +105,11 @@ namespace turbo {
             }
 
             bool transcode_utf8_to_utf16_test_base::is_input_valid() const {
-                return turbo::tests::reference::validate_utf8(input_utf8.data(), input_utf8.size());
+                return ::turbo::validate_utf8(input_utf8.data(), input_utf8.size());
             }
 
             bool transcode_utf8_to_utf16_test_base::validate(size_t saved_chars) const {
+                //turbo::println("validate() saved_chars = {}", saved_chars);
                 if (!is_input_valid()) {
                     if (saved_chars != 0) {
                         printf("input UTF-8 string is not valid, but conversion routine returned %zu, indicating a valid input\n",
@@ -170,7 +172,7 @@ namespace turbo {
             }
 
             bool transcode_utf8_to_utf32_test_base::is_input_valid() const {
-                return turbo::tests::reference::validate_utf8(input_utf8.data(), input_utf8.size());
+                return ::turbo::unicode::validate_utf8(input_utf8.data(), input_utf8.size());
             }
 
             bool transcode_utf8_to_utf32_test_base::validate(size_t saved_chars) const {
@@ -237,16 +239,16 @@ namespace turbo {
                     : input_utf16{input_utf16} {
 
                 auto consume = [this](const uint32_t codepoint) {
-                    ::turbo::tests::reference::utf8::encode(codepoint, [this](uint8_t byte) {
+                    ::turbo::unicode::utf8::encode(codepoint, [this](uint8_t byte) {
                         reference_output_utf8.push_back(byte);
                     });
                 };
 
                 auto error_handler = [](const char16_t *, const char16_t *,
-                                        turbo::tests::reference::utf16::Error) -> bool {
+                                        ::turbo::unicode::utf16::Error) -> bool {
                     throw std::invalid_argument("Wrong UTF-16 input");
                 };
-                turbo::tests::reference::utf16::decode(input_utf16.data(), input_utf16.size(), consume, error_handler);
+                ::turbo::unicode::utf16::decode(input_utf16.data(), input_utf16.size(), consume, error_handler);
                 output_utf8.resize(reference_output_utf8.size() + output_size_margin);
             }
 
@@ -256,7 +258,7 @@ namespace turbo {
             }
 
             bool transcode_utf16_to_utf8_test_base::is_input_valid() const {
-                return turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size());
+                return ::turbo::unicode::validate_utf16(input_utf16.data(), input_utf16.size());
             }
 
             bool transcode_utf16_to_utf8_test_base::validate(size_t saved_chars) const {
@@ -336,16 +338,16 @@ namespace turbo {
                     : input_utf16{input_utf16} {
 
                 auto consume = [this](const uint32_t codepoint) {
-                    ::turbo::tests::reference::utf32::encode(codepoint, [this](uint32_t byte) {
+                    ::turbo::unicode::utf32::encode(codepoint, [this](uint32_t byte) {
                         reference_output_utf32.push_back(byte);
                     });
                 };
 
                 auto error_handler = [](const char16_t *, const char16_t *,
-                                        turbo::tests::reference::utf16::Error) -> bool {
+                                        ::turbo::unicode::utf16::Error) -> bool {
                     throw std::invalid_argument("Wrong UTF-16 input");
                 };
-                turbo::tests::reference::utf16::decode(input_utf16.data(), input_utf16.size(), consume, error_handler);
+                ::turbo::unicode::utf16::decode(input_utf16.data(), input_utf16.size(), consume, error_handler);
                 output_utf32.resize(reference_output_utf32.size() + output_size_margin);
             }
 
@@ -356,7 +358,7 @@ namespace turbo {
             }
 
             bool transcode_utf16_to_utf32_test_base::is_input_valid() const {
-                return turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size());
+                return ::turbo::unicode::validate_utf16(input_utf16.data(), input_utf16.size());
             }
 
             bool transcode_utf16_to_utf32_test_base::validate(size_t saved_chars) const {
@@ -434,16 +436,16 @@ namespace turbo {
                     : input_utf32{input_utf32} {
 
                 auto consume = [this](const uint32_t codepoint) {
-                    ::turbo::tests::reference::utf8::encode(codepoint, [this](uint8_t byte) {
+                    ::turbo::unicode::utf8::encode(codepoint, [this](uint8_t byte) {
                         reference_output_utf8.push_back(byte);
                     });
                 };
 
                 auto error_handler = [](const char32_t *, const char32_t *,
-                                        turbo::tests::reference::utf32::Error) -> bool {
+                                        ::turbo::unicode::utf32::Error) -> bool {
                     throw std::invalid_argument("Wrong UTF-32 input");
                 };
-                turbo::tests::reference::utf32::decode(input_utf32.data(), input_utf32.size(), consume, error_handler);
+                ::turbo::unicode::utf32::decode(input_utf32.data(), input_utf32.size(), consume, error_handler);
                 output_utf8.resize(reference_output_utf8.size() + output_size_margin);
             }
 
@@ -453,7 +455,7 @@ namespace turbo {
             }
 
             bool transcode_utf32_to_utf8_test_base::is_input_valid() const {
-                return turbo::tests::reference::validate_utf32(input_utf32.data(), input_utf32.size());
+                return ::turbo::unicode::validate_utf32(input_utf32.data(), input_utf32.size());
             }
 
             bool transcode_utf32_to_utf8_test_base::validate(size_t saved_chars) const {
@@ -533,7 +535,7 @@ namespace turbo {
             }
 
             bool transcode_utf32_to_utf16_test_base::is_input_valid() const {
-                return turbo::tests::reference::validate_utf32(input_utf32.data(), input_utf32.size());
+                return ::turbo::unicode::validate_utf32(input_utf32.data(), input_utf32.size());
             }
 
             bool transcode_utf32_to_utf16_test_base::validate(size_t saved_chars) const {

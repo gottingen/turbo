@@ -170,7 +170,7 @@ namespace turbo::unicode {
     struct unsupported {
     };
     using last_engine = engine_list<scalar_engine>;
-    using all_x86_engines = engine_list<>;
+    using all_x86_engines = engine_list<avx2_engine>;
     using all_sve_engines = engine_list<>;
     using all_arm_engines = typename utf_internal::join<all_sve_engines>::type;
     using all_engines = typename utf_internal::join<all_arm_engines, all_x86_engines, last_engine>::type;

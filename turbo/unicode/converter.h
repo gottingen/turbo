@@ -19,6 +19,10 @@
 
 #include "turbo/unicode/engine.h"
 #include "turbo/unicode/scalar/converter.h"
+#include "turbo/platform/port.h"
+#if TURBO_WITH_AVX2
+#include "turbo/unicode/avx2/converter.h"
+#endif
 
 
 namespace turbo {
@@ -1245,7 +1249,11 @@ namespace turbo {
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
     [[nodiscard]] inline bool validate_utf16(const char16_t *buf, size_t len) noexcept {
-        return turbo::unicode::Converter<Engine>::validate_utf16(buf, len);
+        if constexpr (kIsLittleEndian) {
+            return turbo::unicode::Converter<Engine>::validate_utf16le(buf, len);
+        } else {
+            return turbo::unicode::Converter<Engine>::validate_utf16be(buf, len);
+        }
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
@@ -1329,9 +1337,9 @@ namespace turbo {
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
     [[nodiscard]] inline size_t convert_utf8_to_utf32(const char *input, size_t length, char32_t *utf32_output) noexcept {
         if constexpr (kIsLittleEndian) {
-            return turbo::unicode::Converter<Engine>::ConvertUtf8ToUtf32Le(input, length, utf32_output);
+            return turbo::unicode::Converter<Engine>::convert_utf8_to_utf32(input, length, utf32_output);
         } else {
-            return turbo::unicode::Converter<Engine>::ConvertUtf8ToUtf32Be(input, length, utf32_output);
+            return turbo::unicode::Converter<Engine>::convert_utf8_to_utf32(input, length, utf32_output);
         }
     }
 
@@ -1339,9 +1347,9 @@ namespace turbo {
     [[nodiscard]] inline result
     convert_utf8_to_utf32_with_errors(const char *input, size_t length, char32_t *utf32_output) noexcept {
         if constexpr (kIsLittleEndian) {
-            return turbo::unicode::Converter<Engine>::ConvertUtf8ToUtf32LeWithErrors(input, length, utf32_output);
+            return turbo::unicode::Converter<Engine>::convert_utf8_to_utf32_with_errors(input, length, utf32_output);
         } else {
-            return turbo::unicode::Converter<Engine>::ConvertUtf8ToUtf32BeWithErrors(input, length, utf32_output);
+            return turbo::unicode::Converter<Engine>::convert_utf8_to_utf32_with_errors(input, length, utf32_output);
         }
     }
 
@@ -1369,11 +1377,7 @@ namespace turbo {
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
     [[nodiscard]] inline size_t
     convert_valid_utf8_to_utf32(const char *input, size_t length, char32_t *utf32_buffer) noexcept {
-        if constexpr (kIsLittleEndian) {
-            return turbo::unicode::Converter<Engine>::ConvertValidUtf8ToUtf32Le(input, length, utf32_buffer);
-        } else {
-            return turbo::unicode::Converter<Engine>::ConvertValidUtf8ToUtf32Be(input, length, utf32_buffer);
-        }
+        return turbo::unicode::Converter<Engine>::convert_valid_utf8_to_utf32(input, length, utf32_buffer);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
@@ -1520,7 +1524,7 @@ namespace turbo {
         if constexpr (kIsLittleEndian) {
             return turbo::unicode::Converter<Engine>::utf8_length_from_utf16le(input, length);
         } else {
-            return turbo::unicode::Converter<Engine>::Utf8LengthFromUtf16Be(input, length);
+            return turbo::unicode::Converter<Engine>::utf8_length_from_utf16be(input, length);
         }
     }
 
@@ -1531,7 +1535,7 @@ namespace turbo {
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
     [[nodiscard]] inline size_t utf8_length_from_utf16be(const char16_t *input, size_t length) noexcept {
-        return turbo::unicode::Converter<Engine>::Utf8LengthFromUtf16Be(input, length);
+        return turbo::unicode::Converter<Engine>::utf8_length_from_utf16be(input, length);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
@@ -1577,7 +1581,7 @@ namespace turbo {
     [[nodiscard]] inline result
     convert_utf32_to_utf16_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept {
         if constexpr (kIsLittleEndian) {
-            return turbo::unicode::Converter<Engine>::ConvertUtf32ToUtf16LeWithErrors(input, length, utf16_buffer);
+            return turbo::unicode::Converter<Engine>::convert_utf32_to_utf16le_with_errors(input, length, utf16_buffer);
         } else {
             return turbo::unicode::Converter<Engine>::convert_utf32_to_utf16be_with_errors(input, length, utf16_buffer);
         }
@@ -1586,7 +1590,7 @@ namespace turbo {
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
     [[nodiscard]] inline result
     convert_utf32_to_utf16le_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept {
-        return turbo::unicode::Converter<Engine>::ConvertUtf32ToUtf16LeWithErrors(input, length, utf16_buffer);
+        return turbo::unicode::Converter<Engine>::convert_utf32_to_utf16le_with_errors(input, length, utf16_buffer);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>

@@ -1,5 +1,5 @@
-// Copyright 2023 The Elastic-AI Authors.
-// part of Elastic AI Search
+// Copyright 2023 The Turbo Authors.
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,20 +11,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef TURBO_UNICODE_UTILITY_H_
-#define TURBO_UNICODE_UTILITY_H_
-
-#include "turbo/simd/simd.h"
-#include "turbo/meta/type_traits.h"
+#include "validate_utf32.h"
 
 namespace turbo::unicode {
 
-    template <typename T,  typename Arch>
-    bool is_ascii(const turbo::simd::batch<T, Arch> &batch) {
-        return batch.mask() == 0;
-    }
-}  // namespace turbo::unicode
+    bool validate_utf32(const char32_t *buf, size_t len) noexcept {
+        const char32_t *curr = buf;
+        const char32_t *end = buf + len;
 
-#endif  // TURBO_UNICODE_UTILITY_H_
+        while (curr != end) {
+            const uint32_t word = *curr;
+
+            if (word > 0x10FFFF || (word >= 0xD800 && word <= 0xDFFF)) {
+                return false;
+            }
+
+            curr++;
+        }
+
+        return true;
+    }
+
+} // namespace turbo::unicode
+
+

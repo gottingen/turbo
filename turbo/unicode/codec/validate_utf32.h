@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
 
+#include <cstddef>
 #include <cstdint>
 
-namespace turbo { namespace tests { namespace reference { namespace utf16 {
+namespace turbo::unicode {
 
-  // returns whether the value can be represented in the UTF-16
-  bool valid_value(uint32_t value);
+    [[nodiscard]] bool validate_utf32(const char32_t *buf, size_t len) noexcept;
 
-  // Encodes the value using either one or two words (returns 1 or 2 respectively)
-  // Returns 0 if the value cannot be encoded
-  int encode(uint32_t value, char16_t& W1, char16_t& W2);
-
-}}}} // namespace utf16
+}  // namespace turbo::unicode

@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/utf.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "turbo/testing/test.h"
+
+#include "turbo/unicode/converter.h"
+#include "transcode_test_base.h"
 
 #include <array>
 #include <iostream>
 
-#include <tests/unicode/reference/validate_utf16.h>
-#include <tests/unicode/reference/decode_utf16.h>
-#include <tests/unicode/helpers/transcode_test_base.h>
+
+
+
 #include "turbo/random/random.h"
-#include <tests/unicode/helpers/test.h>
+
 
 
 namespace {
@@ -33,45 +38,44 @@ namespace {
 }
 
 
-TEST(convert_pure_ASCII) {
+TEST_CASE("convert_pure_ASCII") {
   size_t counter = 0;
   auto generator = [&counter]() -> uint32_t {
     return counter++ & 0x7f;
   };
 
-  auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
+  auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
     std::vector<char16_t> utf16be(size);
-    implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-    return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+    turbo::change_endianness_utf16(utf16le, size, utf16be.data());
+    return turbo::convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
   };
 
   std::array<size_t, 1> input_size{16};
   for (size_t size: input_size) {
     transcode_utf16_to_utf8_test_base test(generator, size);
-    ASSERT_TRUE(test(procedure));
+    REQUIRE(test(procedure));
   }
 }
 
-TEST(convert_into_1_or_2_UTF8_bytes) {
+TEST_CASE("convert_into_1_or_2_UTF8_bytes") {
   for(size_t trial = 0; trial < trials; trial ++) {
-    uint32_t seed{1234+uint32_t(trial)};
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     turbo::FixedUniform<int> random(0x0000, 0x07ff); // range for 1 or 2 UTF-8 bytes
 
-    auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
+    auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+      turbo::change_endianness_utf16(utf16le, size, utf16be.data());
+      return turbo::convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
     };
 
     for (size_t size: input_size) {
       transcode_utf16_to_utf8_test_base test([&random](){return random();}, size);
-      ASSERT_TRUE(test(procedure));
+      REQUIRE(test(procedure));
     }
   }
 }
 
-TEST(convert_into_1_or_2_or_3_UTF8_bytes) {
+TEST_CASE("convert_into_1_or_2_or_3_UTF8_bytes") {
   for(size_t trial = 0; trial < trials; trial ++) {
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 1, 2 or 3 UTF-8 bytes
@@ -80,35 +84,35 @@ TEST(convert_into_1_or_2_or_3_UTF8_bytes) {
                                                      {0x0800, 0xd7ff},
                                                      {0xe000, 0xffff}});
 
-    auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
+    auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+      turbo::change_endianness_utf16(utf16le, size, utf16be.data());
+      return turbo::convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
     };
 
     for (size_t size: input_size) {
       transcode_utf16_to_utf8_test_base test([&random](){return random();}, size);
-      ASSERT_TRUE(test(procedure));
+      REQUIRE(test(procedure));
     }
   }
 }
 
-TEST(convert_into_3_or_4_UTF8_bytes) {
+TEST_CASE("convert_into_3_or_4_UTF8_bytes") {
   for(size_t trial = 0; trial < trials; trial ++) {
     if ((trial % 100) == 0) { std::cout << "."; std::cout.flush(); }
     // range for 3 or 4 UTF-8 bytes
     turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0800, 0xd800-1},
                                                      {0xe000, 0x10ffff}});
 
-    auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
+    auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
-      implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-      return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+      turbo::change_endianness_utf16(utf16le, size, utf16be.data());
+      return turbo::convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
     };
 
     for (size_t size: input_size) {
       transcode_utf16_to_utf8_test_base test([&random](){return random();}, size);
-      ASSERT_TRUE(test(procedure));
+      REQUIRE(test(procedure));
     }
   }
 }
@@ -189,24 +193,21 @@ namespace {
   }
 }
 
-TEST(all_possible_8_codepoint_combinations) {
-  auto procedure = [&implementation](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
+TEST_CASE("all_possible_8_codepoint_combinations") {
+  auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
     std::vector<char16_t> utf16be(size);
-    implementation.change_endianness_utf16(utf16le, size, utf16be.data());
-    return implementation.convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
+    turbo::change_endianness_utf16(utf16le, size, utf16be.data());
+    return turbo::convert_valid_utf16be_to_utf8(utf16be.data(), size, utf8);
   };
 
   std::vector<char> output_utf8(256, ' ');
   const auto& combinations = all_combinations();
   for (const auto& input_utf16: combinations) {
-    if (turbo::tests::reference::validate_utf16(input_utf16.data(), input_utf16.size())) {
+    if (turbo::validate_utf16(input_utf16.data(), input_utf16.size())) {
       transcode_utf16_to_utf8_test_base test(input_utf16);
-      ASSERT_TRUE(test(procedure));
+      REQUIRE(test(procedure));
     }
   }
 }
 #endif
 
-int main(int argc, char* argv[]) {
-  return turbo::test::main(argc, argv);
-}

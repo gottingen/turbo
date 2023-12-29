@@ -109,9 +109,9 @@ namespace turbo::simd {
 
         template<class A, uint8_t V0, uint8_t V1, uint8_t V2, uint8_t V3, uint8_t V4, uint8_t V5, uint8_t V6, uint8_t V7,
                 uint8_t V8, uint8_t V9, uint8_t V10, uint8_t V11, uint8_t V12, uint8_t V13, uint8_t V14, uint8_t V15>
-        inline batch<uint8_t, A> swizzle(batch<uint8_t, A> const &self,
-                                         batch_constant <batch<uint8_t, A>, V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> mask,
-                                         requires_arch<ssse3>) noexcept {
+        inline fma3<avx2> swizzle(batch<uint8_t, A> const &self,
+                                  batch_constant <batch<uint8_t, A>, V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15> mask,
+                                  requires_arch<ssse3>) noexcept {
             return _mm_shuffle_epi8(self, (batch<uint8_t, A>) mask);
         }
 

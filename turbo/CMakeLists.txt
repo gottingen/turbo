@@ -137,6 +137,7 @@ set(TURBO_ALL_SRC
         "strings/str_replace.cc"
         "strings/str_split.cc"
         "strings/str_trim.cc"
+        "strings/unicode.cc"
         "strings/internal/charconv_bigint.cc"
         "strings/internal/charconv_parse.cc"
         "strings/internal/cord_internal.cc"
@@ -171,6 +172,9 @@ set(TURBO_ALL_SRC
         "times/cctz/zone_info_source.cc"
         "unicode/encoding_types.cc"
         "unicode/codec/encode_utf16.cc"
+        "unicode/codec/validate_utf8.cc"
+        "unicode/codec/validate_utf16.cc"
+        "unicode/codec/validate_utf32.cc"
         )
 
 if (BUILD_STATIC_LIBRARY)

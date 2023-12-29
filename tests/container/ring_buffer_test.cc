@@ -89,7 +89,7 @@ TEST(ring_buffer, all) {
     }
 
     // void push_back(const value_type& value);
-    sprintf(counterBuffer, "%d", counter++);
+    ::sprintf(counterBuffer, "%d", counter++);
     rbVectorString.push_back(std::string(counterBuffer));
     EXPECT_TRUE(rbVectorString.validate());
     EXPECT_TRUE(!rbVectorString.empty());
@@ -116,7 +116,7 @@ TEST(ring_buffer, all) {
     ++it;
     EXPECT_TRUE(it->empty());
 
-    sprintf(counterBuffer, "%d", counter++);
+    ::sprintf(counterBuffer, "%d", counter++);
     *it = counterBuffer;
     EXPECT_TRUE(*it == "1");
 
@@ -137,21 +137,21 @@ TEST(ring_buffer, all) {
 
     // Now we start hammering the ring buffer with push_back.
     for (size_t i = 0, iEnd = rbVectorString.capacity() * 5; i != iEnd; i++) {
-      sprintf(counterBuffer, "%d", counter++);
+      ::sprintf(counterBuffer, "%d", counter++);
       rbVectorString.push_back(std::string(counterBuffer));
       EXPECT_TRUE(rbVectorString.validate());
     }
 
     int counterCheck = counter - 1;
     char counterCheckBuffer[32];
-    sprintf(counterCheckBuffer, "%d", counterCheck);
+    ::sprintf(counterCheckBuffer, "%d", counterCheck);
     EXPECT_TRUE(rbVectorString.back() == counterCheckBuffer);
 
     // reverse_iterator rbegin();
     // reverse_iterator rend();
     for (RBVectorString::reverse_iterator ri = rbVectorString.rbegin();
          ri != rbVectorString.rend(); ++ri) {
-      sprintf(counterCheckBuffer, "%d", counterCheck--);
+      ::sprintf(counterCheckBuffer, "%d", counterCheck--);
       EXPECT_TRUE(*ri == counterCheckBuffer);
     }
 
@@ -162,7 +162,7 @@ TEST(ring_buffer, all) {
     for (RBVectorString::iterator i = rbVectorString.begin();
          i != rbVectorString.end(); ++i) {
       EXPECT_TRUE(*i == counterCheckBuffer);
-      sprintf(counterCheckBuffer, "%d", ++counterCheck);
+      ::sprintf(counterCheckBuffer, "%d", ++counterCheck);
     }
 
     // void clear();
@@ -363,7 +363,7 @@ TEST(ring_buffer, all) {
     }
 
     // void push_back(const value_type& value);
-    sprintf(counterBuffer, "%d", counter++);
+    ::sprintf(counterBuffer, "%d", counter++);
     rbListString.push_back(std::string(counterBuffer));
     EXPECT_TRUE(rbListString.validate());
     EXPECT_TRUE(!rbListString.empty());
@@ -390,7 +390,7 @@ TEST(ring_buffer, all) {
     ++it;
     EXPECT_TRUE(it->empty());
 
-    sprintf(counterBuffer, "%d", counter++);
+    ::sprintf(counterBuffer, "%d", counter++);
     *it = counterBuffer;
     EXPECT_TRUE(*it == "1");
 
@@ -411,22 +411,22 @@ TEST(ring_buffer, all) {
 
     // Now we start hammering the ring buffer with push_back.
     for (size_t i = 0, iEnd = rbListString.capacity() * 5; i != iEnd; i++) {
-      sprintf(counterBuffer, "%d", counter++);
+      ::sprintf(counterBuffer, "%d", counter++);
       rbListString.push_back(std::string(counterBuffer));
       EXPECT_TRUE(rbListString.validate());
     }
 
     int counterCheck = counter - 1;
     char counterCheckBuffer[32];
-    sprintf(counterCheckBuffer, "%d", counterCheck);
+    ::sprintf(counterCheckBuffer, "%d", counterCheck);
     EXPECT_TRUE(rbListString.back() == counterCheckBuffer);
 
     // reverse_iterator rbegin();
     // reverse_iterator rend();
     for (RBListString::reverse_iterator ri = rbListString.rbegin();
          ri != rbListString.rend(); ++ri) {
-      sprintf(counterCheckBuffer, "%d", counterCheck--);
-      EXPECT_TRUE(*ri == counterCheckBuffer);
+      ::sprintf(counterCheckBuffer, "%d", counterCheck--);
+      EXPECT_EQ(*ri, counterCheckBuffer);
     }
 
     ++counterCheck;
@@ -435,8 +435,8 @@ TEST(ring_buffer, all) {
     // iterator end();
     for (RBListString::iterator i = rbListString.begin();
          i != rbListString.end(); ++i) {
-      EXPECT_TRUE(*i == counterCheckBuffer);
-      sprintf(counterCheckBuffer, "%d", ++counterCheck);
+      EXPECT_EQ(*i,  counterCheckBuffer);
+      ::sprintf(counterCheckBuffer, "%d", ++counterCheck);
     }
 
     // void clear();

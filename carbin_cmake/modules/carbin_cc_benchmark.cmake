@@ -26,7 +26,7 @@ function(carbin_cc_benchmark)
             SOURCES
             DEFINITIONS
             COPTS
-            )
+    )
 
     cmake_parse_arguments(
             CARBIN_CC_BENCHMARK
@@ -61,19 +61,21 @@ function(carbin_cc_benchmark)
     target_compile_definitions(${testcase}
             PUBLIC
             ${CARBIN_CC_BENCHMARK_DEFINITIONS}
-            )
+    )
 
     target_include_directories(${testcase} ${CARBIN_INTERNAL_INCLUDE_WARNING_GUARD}
             PUBLIC
             "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
             "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>"
             "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-            )
+    )
     if (NOT CARBIN_CC_BENCHMARK_COMMAND)
         set(CARBIN_CC_BENCHMARK_COMMAND ${testcase})
     endif ()
-    add_test(NAME ${testcase}
-            COMMAND ${CARBIN_CC_BENCHMARK_COMMAND}
-            )
+    if (CARBIN_BENCHMARK_TEST)
+        add_test(NAME ${testcase}
+                COMMAND ${CARBIN_CC_BENCHMARK_COMMAND}
+        )
+    endif ()
 
 endfunction()

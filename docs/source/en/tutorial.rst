@@ -54,3 +54,12 @@ profiling your program
     :maxdepth: 3
 
     profiling/profiling
+
+unicode
+=============================================
+
+
+..  toctree::
+    :maxdepth: 3
+
+    profiling/unicode

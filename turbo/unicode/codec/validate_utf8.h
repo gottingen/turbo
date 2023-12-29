@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/internal/config.h"
 
+#include <cstddef>
+#include <cstdint>
 
-namespace turbo {  namespace tests { namespace reference {
-    // validate UTF-16LE.
-    TURBO_MUST_USE_RESULT bool validate_utf16(const char16_t *buf, size_t len) noexcept;
+namespace turbo::unicode {
 
-}}}
+    [[nodiscard]] bool validate_utf8(const char *buf, size_t len) noexcept;
+
+} // namespace turbo::unicode

@@ -29,6 +29,10 @@ namespace turbo {
              * represent UTF8 with char8_t and UTF-16LE with char16_t.
              */
             class transcode_test_base {
+                public:
+                transcode_test_base()  = default;
+                ~transcode_test_base() = default;
+
             protected:
                 void encode_utf8(uint32_t codepoint, std::vector<char> &target);
 
@@ -52,6 +56,9 @@ namespace turbo {
                 static constexpr size_t output_size_margin = 0; // extra room for buggy procedures
 
             public:
+                transcode_utf8_to_utf16_test_base() = default;
+                ~transcode_utf8_to_utf16_test_base() = default;
+
                 transcode_utf8_to_utf16_test_base(GenerateCodepoint generate, size_t input_size);
 
                 template<typename COLLECTION>

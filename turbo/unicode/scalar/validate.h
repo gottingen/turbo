@@ -25,8 +25,8 @@
 
 namespace turbo::unicode::ascii {
 
-    inline TURBO_MUST_USE_RESULT bool validate(const char *buf, size_t len) noexcept {
-        const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
+    [[nodiscard]] inline bool validate(const char *buf, size_t len) noexcept {
+        const auto *data = reinterpret_cast<const uint8_t *>(buf);
         uint64_t pos = 0;
         // process in blocks of 16 bytes when possible
         for (; pos + 16 < len; pos += 16) {
@@ -44,7 +44,7 @@ namespace turbo::unicode::ascii {
         return true;
     }
 
-    inline TURBO_MUST_USE_RESULT result validate_with_errors(const char *buf, size_t len) noexcept {
+    [[nodiscard]] inline result validate_with_errors(const char *buf, size_t len) noexcept {
         const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
         size_t pos = 0;
         // process in blocks of 16 bytes when possible
@@ -202,12 +202,13 @@ namespace turbo::unicode::utf8 {
 
     // Finds the previous leading byte and validates with errors from there
     // Used to pinpoint the location of an error when an invalid chunk is detected
-    inline TURBO_MUST_USE_RESULT result
-
-    rewind_and_validate_with_errors(const char *buf, size_t len) noexcept {
+    inline TURBO_MUST_USE_RESULT result rewind_and_validate_with_errors(const char *start, const char *buf, size_t len) noexcept {
+        if ((*start & 0b11000000) == 0b10000000) {
+            return result(error_code::TOO_LONG, 0);
+        }
         size_t extra_len{0};
         // A leading byte cannot be further than 4 bytes away
-        for (int i = 0; i < 5; i++) {
+        for(int i = 0; i < 5; i++) {
             unsigned char byte = *buf;
             if ((byte & 0b11000000) != 0b10000000) {
                 break;

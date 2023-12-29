@@ -18,6 +18,8 @@
 #define TURBO_RANDOM_UNIFORM_H_
 
 #include "turbo/random/fwd.h"
+#include "turbo/log/logging.h"
+#include "turbo/format/print.h"
 
 namespace turbo {
 
@@ -543,7 +545,7 @@ namespace turbo {
     class FixedUniformRanges {
     public:
         FixedUniformRanges(const std::vector<std::pair<T, T>> &ranges)
-                : _urbg(), _ranges(ranges), _range_index(0, ranges.size()) {
+                : _urbg(), _ranges(ranges), _range_index(0, ranges.size() > 0 ? ranges.size() - 1 : 0) {
             for (auto &range: _ranges) {
                 _distribution.emplace_back(range.first, range.second);
             }
@@ -551,8 +553,7 @@ namespace turbo {
 
         R operator()() {
             auto index = _range_index(_urbg);
-            //return static_cast<R>(_distribution[index](_urbg));
-            return turbo::uniform(_urbg, _ranges[index].first, _ranges[index].second);
+            return static_cast<R>(_distribution[index](_urbg));
         }
 
     private:

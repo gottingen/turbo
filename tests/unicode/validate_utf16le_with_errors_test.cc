@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/utf.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "turbo/testing/test.h"
+
+#include "turbo/unicode/converter.h"
+#include "transcode_test_base.h"
 
 #ifndef TURBO_IS_BIG_ENDIAN
 #error "TURBO_IS_BIG_ENDIAN should be defined."
@@ -22,71 +27,71 @@
 #include <algorithm>
 
 #include "turbo/random/random.h"
-#include <tests/unicode/helpers/test.h>
+
 #include <fstream>
 #include <iostream>
 #include <memory>
 
 
-TEST(validate_utf16le_with_errors__returns_success_for_valid_input__single_words) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16le_with_errors__returns_success_for_valid_input__single_words") {
+
   turbo::Utf16Generator generator{ 1, 0};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512)};
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-    ASSERT_EQUAL(res.count, utf16.size());
+    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    REQUIRE_EQ(res.count, utf16.size());
   }
 }
 
-TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pairs_short) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pairs_short") {
+
   turbo::Utf16Generator generator{ 0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(8)};
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-    ASSERT_EQUAL(res.count, utf16.size());
+    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    REQUIRE_EQ(res.count, utf16.size());
   }
 }
 
 
-TEST(validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pairs) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16le_with_errors__returns_success_for_valid_input__surrogate_pairs") {
+
   turbo::Utf16Generator generator{ 0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512)};
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+    turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-    ASSERT_EQUAL(res.count, utf16.size());
+    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    REQUIRE_EQ(res.count, utf16.size());
   }
 }
 
 // mixed = either 16-bit or 32-bit codewords
-TEST(validate_utf16le_with_errors__returns_success_for_valid_input__mixed) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16le_with_errors__returns_success_for_valid_input__mixed") {
+
   turbo::Utf16Generator generator{ 1, 1};
   const auto utf16{generator.generate(512)};
 
-  turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
+  turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(utf16.data()), utf16.size());
 
-  ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-  ASSERT_EQUAL(res.count, utf16.size());
+  REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+  REQUIRE_EQ(res.count, utf16.size());
 }
 
-TEST(validate_utf16le_with_errors__returns_success_for_empty_string) {
+TEST_CASE("validate_utf16le_with_errors__returns_success_for_empty_string") {
   const char16_t* buf = (char16_t*)"";
 
-  turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
+  turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
 
-  ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-  ASSERT_EQUAL(res.count, 0);
+  REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+  REQUIRE_EQ(res.count, 0);
 }
 
 // The first word must not be in range [0xDC00 .. 0xDFFF]
@@ -104,8 +109,8 @@ TEST(validate_utf16le_with_errors__returns_success_for_empty_string) {
 #if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
-TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word_value) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word_value") {
+
   turbo::Utf16Generator generator{ 1, 0};
   for(size_t trial = 0; trial < 10; trial++) {
     auto utf16{generator.generate(128)};
@@ -117,10 +122,10 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word
         const char16_t old = utf16[i];
         utf16[i] = wrong_value;
 
-        turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+        turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
-        ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
-        ASSERT_EQUAL(res.count, i);
+        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        REQUIRE_EQ(res.count, i);
 
         utf16[i] = old;
       }
@@ -138,8 +143,8 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_first_word
 #if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
-TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_word_value) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_word_value") {
+
   turbo::Utf16Generator generator{ 1, 0};
   auto utf16{generator.generate(128)};
   const char16_t*  buf = reinterpret_cast<const char16_t*>(utf16.data());
@@ -158,10 +163,10 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_wor
       utf16[i + 0] = valid_surrogate_W1;
       utf16[i + 1] = W2;
 
-      turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+      turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
-      ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
-      ASSERT_EQUAL(res.count, i);
+      REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+      REQUIRE_EQ(res.count, i);
 
       utf16[i + 0] = old_W1;
       utf16[i + 1] = old_W2;
@@ -179,9 +184,9 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_has_wrong_second_wor
 #if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
-TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
+TEST_CASE("validate_utf16le_with_errors__returns_error_when_input_is_truncated") {
   const char16_t valid_surrogate_W1 = 0xd800;
-  uint32_t seed{1234};
+
   turbo::Utf16Generator generator{ 1, 0};
   for (size_t size = 1; size < 128; size++) {
     auto utf16{generator.generate(128)};
@@ -190,10 +195,10 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
 
     utf16[size - 1] = valid_surrogate_W1;
 
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+    turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
-    ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
-    ASSERT_EQUAL(res.count, size - 1);
+    REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+    REQUIRE_EQ(res.count, size - 1);
   }
 }
 #endif
@@ -201,7 +206,7 @@ TEST(validate_utf16le_with_errors__returns_error_when_input_is_truncated) {
 #if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
-TEST(validate_utf16le_with_errors__extensive_tests) {
+TEST_CASE("validate_utf16le_with_errors__extensive_tests") {
   const std::string path{"validate_utf16_testcases.txt"};
   std::ifstream file{path};
   if (not file) {
@@ -261,13 +266,10 @@ TEST(validate_utf16le_with_errors__extensive_tests) {
     }
 
     // check
-    turbo::result res = implementation.validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
+    turbo::result res = turbo::validate_utf16le_with_errors(reinterpret_cast<const char16_t*>(buf), len);
 
-    ASSERT_EQUAL(res.error, valid);
+    REQUIRE_EQ(res.error, valid);
   }
 }
 #endif
 
-int main(int argc, char* argv[]) {
-  return turbo::test::main(argc, argv);
-}
