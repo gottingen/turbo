@@ -56,10 +56,9 @@ namespace turbo {
 
     /**
      * @ingroup turbo_base
-     * @brief Get the host memory size.
-     * @return The host memory size
+     * @brief Get the current thread id, on linux same as pthread_self().
      */
-    TURBO_DLL size_t get_host_memory_size();
+    uint64_t thread_numeric_id();
 
     /**
      * @ingroup turbo_base

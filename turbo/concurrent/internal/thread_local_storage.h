@@ -31,7 +31,7 @@ namespace turbo::concurrent_internal {
     public:
         typedef uint32_t resource_id_type;
         typedef T resource_type;
-        typedef ReusableId<resource_id_type> resource_id_generator_type;
+        typedef ReusableId<resource_type, resource_id_type> resource_id_generator_type;
 
         static constexpr resource_id_type BlockSize = 4096;
 

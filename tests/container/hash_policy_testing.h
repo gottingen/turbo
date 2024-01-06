@@ -30,7 +30,6 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 namespace container_internal {
 namespace hash_testing_internal {
 
@@ -163,7 +162,6 @@ auto keys(const Set& s)
 }
 
 }  // namespace container_internal
-TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // TURBO_UNORDERED_SUPPORTS_ALLOC_CTORS is false for glibcxx versions

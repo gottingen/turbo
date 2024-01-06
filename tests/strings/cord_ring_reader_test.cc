@@ -28,7 +28,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace cord_internal {
 namespace {
 
@@ -177,5 +177,5 @@ TEST(CordRingReaderTest, SeekBackward) {
 
 }  // namespace
 }  // namespace cord_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

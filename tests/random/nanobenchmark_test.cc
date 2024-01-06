@@ -18,7 +18,7 @@
 #include "turbo/strings/numbers.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace random_internal_nanobenchmark {
 namespace {
 
@@ -68,7 +68,7 @@ void RunAll(const int argc, char* argv[]) {
 
 }  // namespace
 }  // namespace random_internal_nanobenchmark
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 int main(int argc, char* argv[]) {

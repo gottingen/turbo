@@ -50,61 +50,59 @@ static std::atomic<bool> disable_stacktraces(true);  // Disabled until healthy.
 // Waiting until static initializers run seems to be late enough.
 // This file is included into stacktrace.cc so this will only run once.
 TURBO_MAYBE_UNUSED static int stacktraces_enabler = []() {
-  // Check if we can even create stacktraces. If not, bail early and leave
-  // disable_stacktraces set as-is.
-  // clang-format off
-  if (!EM_ASM_INT({ return (typeof wasmOffsetConverter !== 'undefined'); })) {
+    // Check if we can even create stacktraces. If not, bail early and leave
+    // disable_stacktraces set as-is.
+    // clang-format off
+    if (!EM_ASM_INT({return (typeof wasmOffsetConverter !== 'undefined');})) {
+        return 0;
+    }
+    // clang-format on
+    disable_stacktraces.store(false, std::memory_order_relaxed);
     return 0;
-  }
-  // clang-format on
-  disable_stacktraces.store(false, std::memory_order_relaxed);
-  return 0;
 }();
 
-template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
+template<bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
 static int UnwindImpl(void **result, int *sizes, int max_depth, int skip_count,
                       const void *ucp, int *min_dropped_frames) {
-  if (recursive || disable_stacktraces.load(std::memory_order_relaxed)) {
-    return 0;
-  }
-  ++recursive;
-
-  static_cast<void>(ucp);  // Unused.
-  constexpr int kStackLength = 64;
-  void *stack[kStackLength];
-
-  int size;
-  uintptr_t pc = emscripten_stack_snapshot();
-  size = emscripten_stack_unwind_buffer(pc, stack, kStackLength);
-
-  int result_count = size - skip_count;
-  if (result_count < 0) result_count = 0;
-  if (result_count > max_depth) result_count = max_depth;
-  for (int i = 0; i < result_count; i++) result[i] = stack[i + skip_count];
-
-  if (IS_STACK_FRAMES) {
-    // No implementation for finding out the stack frame sizes yet.
-    memset(sizes, 0, sizeof(*sizes) * result_count);
-  }
-  if (min_dropped_frames != nullptr) {
-    if (size - skip_count - max_depth > 0) {
-      *min_dropped_frames = size - skip_count - max_depth;
-    } else {
-      *min_dropped_frames = 0;
+    if (recursive || disable_stacktraces.load(std::memory_order_relaxed)) {
+        return 0;
     }
-  }
+    ++recursive;
 
-  --recursive;
+    static_cast<void>(ucp);  // Unused.
+    constexpr int kStackLength = 64;
+    void *stack[kStackLength];
 
-  return result_count;
+    int size;
+    uintptr_t pc = emscripten_stack_snapshot();
+    size = emscripten_stack_unwind_buffer(pc, stack, kStackLength);
+
+    int result_count = size - skip_count;
+    if (result_count < 0) result_count = 0;
+    if (result_count > max_depth) result_count = max_depth;
+    for (int i = 0; i < result_count; i++) result[i] = stack[i + skip_count];
+
+    if (IS_STACK_FRAMES) {
+        // No implementation for finding out the stack frame sizes yet.
+        memset(sizes, 0, sizeof(*sizes) * result_count);
+    }
+    if (min_dropped_frames != nullptr) {
+        if (size - skip_count - max_depth > 0) {
+            *min_dropped_frames = size - skip_count - max_depth;
+        } else {
+            *min_dropped_frames = 0;
+        }
+    }
+
+    --recursive;
+
+    return result_count;
 }
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace debugging_internal {
-bool StackTraceWorksForTest() { return true; }
-}  // namespace debugging_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+namespace turbo::debugging_internal {
+
+    bool StackTraceWorksForTest() { return true; }
+
+}  // namespace turbo::debugging_internal
 
 #endif  // TURBO_DEBUGGING_INTERNAL_STACKTRACE_EMSCRIPTEN_INL_H_

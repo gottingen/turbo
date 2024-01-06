@@ -430,7 +430,32 @@
 	#endif
 	#define TURBO_PLATFORM_DESKTOP 1
 
-
+#elif defined(TURBO_PLATFORM_NACL) || defined(__native_client__)
+    #undef  TURBO_PLATFORM_NACL
+    #define TURBO_PLATFORM_NACL 1
+    #define TURBO_PLATFORM_UNIX 1
+    #define TURBO_PLATFORM_POSIX 1
+    #define TURBO_PLATFORM_NAME "NaCl"
+    #if defined(__i386__) || defined(__intel__)
+        #define TURBO_PROCESSOR_X86 1
+        #define TURBO_SYSTEM_LITTLE_ENDIAN 1
+        #define TURBO_PLATFORM_DESCRIPTION "NaCl on x86"
+    #elif defined(__x86_64__)
+        #define TURBO_PROCESSOR_X86_64 1
+        #define TURBO_SYSTEM_LITTLE_ENDIAN 1
+        #define TURBO_PLATFORM_DESCRIPTION "NaCl on x64"
+    #elif defined(__arm__)
+        #define TURBO_ABI_ARM_LINUX 1
+        #define TURBO_PROCESSOR_ARM32 1
+        #define TURBO_SYSTEM_LITTLE_ENDIAN 1
+        #define TURBO_PLATFORM_DESCRIPTION "NaCl on ARM"
+    #else
+        #error Unknown processor
+    #endif
+    #if defined(__GNUC__)
+        #define TURBO_ASM_STYLE_ATT 1
+    #endif
+    #define TURBO_PLATFORM_DESKTOP 1
 #elif defined(TURBO_PLATFORM_BSD) || (defined(__BSD__) || defined(__FreeBSD__))
 	#undef  TURBO_PLATFORM_BSD
 	#define TURBO_PLATFORM_BSD 1

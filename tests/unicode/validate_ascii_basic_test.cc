@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/utf.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "turbo/testing/test.h"
+
+#include "turbo/unicode/converter.h"
+#include "transcode_test_base.h"
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <iomanip>
-#include <tests/unicode/helpers/test.h>
 
-TEST(hard_coded) {
+
+TEST_CASE("hard_coded") {
   // additional tests are from autobahn websocket testsuite
   // https://github.com/crossbario/autobahn-testsuite/tree/master/autobahntestsuite/autobahntestsuite/case
   const char *goodsequences[] = {"a",
@@ -74,16 +79,16 @@ TEST(hard_coded) {
       "\xef\xbb\xbf"};
   for (size_t i = 0; i < sizeof(goodsequences)/sizeof(goodsequences[0]); i++) {
     size_t len = std::strlen(goodsequences[i]);
-    if (!implementation.validate_ascii(goodsequences[i], len)) {
+    if (!turbo::validate_ascii(goodsequences[i], len)) {
       printf("bug goodsequences[%zu]\n", i);
-      ASSERT_TRUE(false);
+      REQUIRE(false);
     }
   }
   for (size_t i = 0; i < sizeof(badsequences)/sizeof(badsequences[0]); i++) {
     size_t len = std::strlen(badsequences[i]);
-    if (implementation.validate_ascii(badsequences[i], len)) {
+    if (turbo::validate_ascii(badsequences[i], len)) {
       printf("bug lookup2 badsequences[%zu]\n", i);
-      ASSERT_TRUE(false);
+      REQUIRE(false);
     }
   }
 
@@ -91,6 +96,3 @@ TEST(hard_coded) {
 }
 
 
-int main(int argc, char* argv[]) {
-  return turbo::test::main(argc, argv);
-}

@@ -20,7 +20,7 @@
 #include "turbo/format/format.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace strings_internal {
 
 namespace {
@@ -118,5 +118,5 @@ TEST(Pow10HelperTest, Works) {
 
 }  // namespace
 }  // namespace strings_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

@@ -190,7 +190,7 @@ static turbo::Cord MakeComposite() {
 }
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
 
     class CordTestPeer {
     public:
@@ -219,7 +219,7 @@ namespace turbo {
         }
     };
 
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 // The CordTest fixture runs all tests with and without Cord Btree enabled,

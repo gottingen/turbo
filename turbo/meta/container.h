@@ -54,36 +54,34 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/platform/port.h"
 
-namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    namespace container_algorithm_internal {
+namespace turbo::container_algorithm_internal {
 
-// NOTE: it is important to defer to ADL lookup for building with C++ modules,
-// especially for headers like <valarray> which are not visible from this file
-// but specialize std::begin and std::end.
-        using std::begin;
-        using std::end;
+    // NOTE: it is important to defer to ADL lookup for building with C++ modules,
+    // especially for headers like <valarray> which are not visible from this file
+    // but specialize std::begin and std::end.
+    using std::begin;
+    using std::end;
 
 // The type of the iterator given by begin(c) (possibly std::begin(c)).
 // ContainerIter<const vector<T>> gives vector<T>::const_iterator,
 // while ContainerIter<vector<T>> gives vector<T>::iterator.
-        template<typename C>
-        using ContainerIter = decltype(begin(std::declval<C &>()));
+    template<typename C>
+    using ContainerIter = decltype(begin(std::declval<C &>()));
 
 // An MSVC bug involving template parameter substitution requires us to use
 // decltype() here instead of just std::pair.
-        template<typename C1, typename C2>
-        using ContainerIterPairType =
-                decltype(std::make_pair(ContainerIter<C1>(), ContainerIter<C2>()));
+    template<typename C1, typename C2>
+    using ContainerIterPairType =
+            decltype(std::make_pair(ContainerIter<C1>(), ContainerIter<C2>()));
 
-        template<typename C>
-        using ContainerDifferenceType =
-                decltype(std::distance(std::declval<ContainerIter<C>>(),
-                                       std::declval<ContainerIter<C>>()));
+    template<typename C>
+    using ContainerDifferenceType =
+            decltype(std::distance(std::declval<ContainerIter<C>>(),
+                                   std::declval<ContainerIter<C>>()));
 
-        template<typename C>
-        using ContainerPointerType =
-                typename std::iterator_traits<ContainerIter<C>>::pointer;
+    template<typename C>
+    using ContainerPointerType =
+            typename std::iterator_traits<ContainerIter<C>>::pointer;
 
 // container_algorithm_internal::c_begin and
 // container_algorithm_internal::c_end are abbreviations for proper ADL
@@ -96,40 +94,40 @@ namespace turbo {
 //            container_algorithm_internal::end(c));
 // These are meant for internal use only.
 
-        template<typename C>
-        ContainerIter<C> c_begin(C &c) { return begin(c); }
+    template<typename C>
+    ContainerIter<C> c_begin(C &c) { return begin(c); }
 
-        template<typename C>
-        ContainerIter<C> c_end(C &c) { return end(c); }
+    template<typename C>
+    ContainerIter<C> c_end(C &c) { return end(c); }
 
-        template<typename T>
-        struct IsUnorderedContainer : std::false_type {
-        };
+    template<typename T>
+    struct IsUnorderedContainer : std::false_type {
+    };
 
-        template<class Key, class T, class Hash, class KeyEqual, class Allocator>
-        struct IsUnorderedContainer<
-                std::unordered_map<Key, T, Hash, KeyEqual, Allocator>> : std::true_type {
-        };
+    template<class Key, class T, class Hash, class KeyEqual, class Allocator>
+    struct IsUnorderedContainer<
+            std::unordered_map<Key, T, Hash, KeyEqual, Allocator>> : std::true_type {
+    };
 
-        template<class Key, class Hash, class KeyEqual, class Allocator>
-        struct IsUnorderedContainer<std::unordered_set<Key, Hash, KeyEqual, Allocator>>
-                : std::true_type {
-        };
+    template<class Key, class Hash, class KeyEqual, class Allocator>
+    struct IsUnorderedContainer<std::unordered_set<Key, Hash, KeyEqual, Allocator>>
+            : std::true_type {
+    };
 
 // container_algorithm_internal::c_size. It is meant for internal use only.
 
-        template<class C>
-        auto c_size(C &c) -> decltype(c.size()) {
-            return c.size();
-        }
+    template<class C>
+    auto c_size(C &c) -> decltype(c.size()) {
+        return c.size();
+    }
 
-        template<class T, std::size_t N>
-        constexpr std::size_t c_size(T (&)[N]) {
-            return N;
-        }
+    template<class T, std::size_t N>
+    constexpr std::size_t c_size(T (&)[N]) {
+        return N;
+    }
 
-    }  // namespace container_algorithm_internal
-
+}  // namespace turbo::container_algorithm_internal
+namespace turbo {
     // PUBLIC API
 
     //------------------------------------------------------------------------------
@@ -204,7 +202,7 @@ namespace turbo {
 // Container-based version of the <algorithm> `std::for_each()` function to
 // apply a function to a container's elements.
     template<typename C, typename Function>
-    std::decay_t <Function> c_for_each(C &&c, Function &&f) {
+    std::decay_t<Function> c_for_each(C &&c, Function &&f) {
         return std::for_each(container_algorithm_internal::c_begin(c),
                              container_algorithm_internal::c_end(c),
                              std::forward<Function>(f));
@@ -1678,7 +1676,7 @@ namespace turbo {
     // std::decay_t<T>. As a user of this function you can casually read
     // this as "returns T by value" and assume it does the right thing.
     template<typename Sequence, typename T>
-    std::decay_t <T> c_accumulate(const Sequence &sequence, T &&init) {
+    std::decay_t<T> c_accumulate(const Sequence &sequence, T &&init) {
         return std::accumulate(container_algorithm_internal::c_begin(sequence),
                                container_algorithm_internal::c_end(sequence),
                                std::forward<T>(init));
@@ -1687,8 +1685,8 @@ namespace turbo {
     // Overload of c_accumulate() for using a binary operations other than
     // addition for computing the accumulation.
     template<typename Sequence, typename T, typename BinaryOp>
-    std::decay_t <T> c_accumulate(const Sequence &sequence, T &&init,
-                             BinaryOp &&binary_op) {
+    std::decay_t<T> c_accumulate(const Sequence &sequence, T &&init,
+                                 BinaryOp &&binary_op) {
         return std::accumulate(container_algorithm_internal::c_begin(sequence),
                                container_algorithm_internal::c_end(sequence),
                                std::forward<T>(init),
@@ -1704,8 +1702,8 @@ namespace turbo {
     // std::decay_t<T>. As a user of this function you can casually read
     // this as "returns T by value" and assume it does the right thing.
     template<typename Sequence1, typename Sequence2, typename T>
-    std::decay_t <T> c_inner_product(const Sequence1 &factors1, const Sequence2 &factors2,
-                                T &&sum) {
+    std::decay_t<T> c_inner_product(const Sequence1 &factors1, const Sequence2 &factors2,
+                                    T &&sum) {
         return std::inner_product(container_algorithm_internal::c_begin(factors1),
                                   container_algorithm_internal::c_end(factors1),
                                   container_algorithm_internal::c_begin(factors2),
@@ -1717,8 +1715,8 @@ namespace turbo {
     // the product between the two container's element pair).
     template<typename Sequence1, typename Sequence2, typename T,
             typename BinaryOp1, typename BinaryOp2>
-    std::decay_t <T> c_inner_product(const Sequence1 &factors1, const Sequence2 &factors2,
-                                T &&sum, BinaryOp1 &&op1, BinaryOp2 &&op2) {
+    std::decay_t<T> c_inner_product(const Sequence1 &factors1, const Sequence2 &factors2,
+                                    T &&sum, BinaryOp1 &&op1, BinaryOp2 &&op2) {
         return std::inner_product(container_algorithm_internal::c_begin(factors1),
                                   container_algorithm_internal::c_end(factors1),
                                   container_algorithm_internal::c_begin(factors2),
@@ -1772,7 +1770,6 @@ namespace turbo {
                                 output_first, std::forward<BinaryOp>(op));
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_ALGORITHM_CONTAINER_H_

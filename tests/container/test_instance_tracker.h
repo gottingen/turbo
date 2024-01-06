@@ -21,7 +21,7 @@
 #include "turbo/meta/compare.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace test_internal {
 
 // A type that counts number of occurrences of the type, the live occurrences of
@@ -268,7 +268,7 @@ class MovableOnlyInstance : public BaseCountedInstance {
 };
 
 }  // namespace test_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_

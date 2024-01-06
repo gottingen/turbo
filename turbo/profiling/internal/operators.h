@@ -18,6 +18,7 @@
 #define TURBO_PROFILING_OPERATORS_H_
 
 #include <atomic>
+#include "turbo/profiling/internal/combiner.h"
 
 namespace turbo::profiling_internal {
 

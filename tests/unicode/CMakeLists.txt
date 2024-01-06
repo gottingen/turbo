@@ -14,37 +14,17 @@
 # limitations under the License.
 #
 
-
-
-# Internal-only target, do not depend on directly.
-file(GLOB REF_SRC "reference/*.cc")
 carbin_cc_library(
         NAMESPACE
         turbo
         NAME
-        test_reference
+        unicode_test_helper
         SOURCES
-        ${REF_SRC}
+        "helper/transcode_test_base.cc"
         COPTS
         ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-)
-
-# Internal-only target, do not depend on directly.
-file(GLOB HELPER_SRC "helpers/*.cc")
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        test_helper
-        SOURCES
-        ${HELPER_SRC}
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        turbo::turbo
-        turbo::test_reference
 )
 
 file(GLOB UNICODE_TEST_SRCS "*.cc")
@@ -58,11 +38,8 @@ foreach (UNICODE_UT ${UNICODE_TEST_SRCS})
             COPTS
             ${CARBIN_CXX_OPTIONS}
             DEPS
-            turbo::test_reference
-            turbo::test_helper
             turbo::turbo
-            ${GMOCK_LIB}
-            ${GTEST_LIB}
-            ${GTEST_MAIN_LIB}
+            turbo::unicode_test_helper
     )
 endforeach ()
+

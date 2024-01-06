@@ -31,7 +31,7 @@ been register before, it will case compile error.
 Method to get error description
 
 ```c++
-    const char *TurboError(int error_code);
+    const char *terror(int error_code);
 ```
 
 # turbo module

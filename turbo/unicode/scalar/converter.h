@@ -33,23 +33,23 @@ namespace turbo::unicode {
 
         [[nodiscard]] static inline bool validate_utf8(const char *buf, size_t len) noexcept;
 
-        [[nodiscard]] static inline result validate_utf8_with_errors(const char *buf, size_t len) noexcept;
+        [[nodiscard]] static inline UnicodeResult validate_utf8_with_errors(const char *buf, size_t len) noexcept;
 
         [[nodiscard]] static inline bool validate_ascii(const char *buf, size_t len) noexcept;
 
-        [[nodiscard]] static inline result validate_ascii_with_errors(const char *buf, size_t len) noexcept;
+        [[nodiscard]] static inline UnicodeResult validate_ascii_with_errors(const char *buf, size_t len) noexcept;
 
         [[nodiscard]] static inline bool validate_utf16le(const char16_t *buf, size_t len) noexcept;
 
         [[nodiscard]] static inline bool validate_utf16be(const char16_t *buf, size_t len) noexcept;
 
-        [[nodiscard]] static inline result validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept;
+        [[nodiscard]] static inline UnicodeResult validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept;
 
-        [[nodiscard]] static inline result validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept;
+        [[nodiscard]] static inline UnicodeResult validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept;
 
         [[nodiscard]] static inline bool validate_utf32(const char32_t *buf, size_t len) noexcept;
 
-        [[nodiscard]] static inline result validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept;
+        [[nodiscard]] static inline UnicodeResult validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept;
 
         [[nodiscard]] static inline size_t
         convert_utf8_to_utf16le(const char *buf, size_t len, char16_t *utf16_output) noexcept;
@@ -57,10 +57,10 @@ namespace turbo::unicode {
         [[nodiscard]] static inline size_t
         convert_utf8_to_utf16be(const char *buf, size_t len, char16_t *utf16_output) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf8_to_utf16le_with_errors(const char *buf, size_t len, char16_t *utf16_output) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf8_to_utf16be_with_errors(const char *buf, size_t len, char16_t *utf16_output) noexcept;
 
         [[nodiscard]] static inline size_t
@@ -72,7 +72,7 @@ namespace turbo::unicode {
         [[nodiscard]] static inline size_t
         convert_utf8_to_utf32(const char *buf, size_t len, char32_t *utf32_output) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf8_to_utf32_with_errors(const char *buf, size_t len, char32_t *utf32_output) noexcept;
 
         [[nodiscard]] static inline size_t
@@ -84,10 +84,10 @@ namespace turbo::unicode {
         [[nodiscard]] static inline size_t
         convert_utf16be_to_utf8(const char16_t *buf, size_t len, char *utf8_buffer) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf16le_to_utf8_with_errors(const char16_t *buf, size_t len, char *utf8_buffer) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf16be_to_utf8_with_errors(const char16_t *buf, size_t len, char *utf8_buffer) noexcept;
 
         [[nodiscard]] static inline size_t
@@ -99,7 +99,7 @@ namespace turbo::unicode {
         [[nodiscard]] static inline size_t
         convert_utf32_to_utf8(const char32_t *buf, size_t len, char *utf8_buffer) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf32_to_utf8_with_errors(const char32_t *buf, size_t len, char *utf8_buffer) noexcept;
 
         [[nodiscard]] static inline size_t
@@ -111,10 +111,10 @@ namespace turbo::unicode {
         [[nodiscard]] static inline size_t
         convert_utf32_to_utf16be(const char32_t *buf, size_t len, char16_t *utf16_buffer) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf32_to_utf16le_with_errors(const char32_t *buf, size_t len, char16_t *utf16_buffer) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf32_to_utf16be_with_errors(const char32_t *buf, size_t len, char16_t *utf16_buffer) noexcept;
 
         [[nodiscard]] static inline size_t
@@ -129,10 +129,10 @@ namespace turbo::unicode {
         [[nodiscard]] static inline size_t
         convert_utf16be_to_utf32(const char16_t *buf, size_t len, char32_t *utf32_buffer) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf16le_to_utf32_with_errors(const char16_t *buf, size_t len, char32_t *utf32_buffer) noexcept;
 
-        [[nodiscard]] static inline result
+        [[nodiscard]] static inline UnicodeResult
         convert_utf16be_to_utf32_with_errors(const char16_t *buf, size_t len, char32_t *utf32_buffer) noexcept;
 
         [[nodiscard]] static inline size_t
@@ -169,7 +169,7 @@ namespace turbo::unicode {
 
     /// inlines
 
-    [[nodiscard]] turbo::EncodingType Converter<scalar_engine>::auto_detect_encoding(const char *input, size_t length) noexcept {
+    [[nodiscard]] inline turbo::EncodingType Converter<scalar_engine>::auto_detect_encoding(const char *input, size_t length) noexcept {
         // If there is a BOM, then we trust it.
         auto bom_encoding = BOM::check_bom(input, length);
         if(bom_encoding != EncodingType::unspecified) { return bom_encoding; }
@@ -214,7 +214,7 @@ namespace turbo::unicode {
         return utf8::validate(buf, len);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::validate_utf8_with_errors(const char *buf, size_t len) noexcept {
         return utf8::validate_with_errors(buf, len);
     }
@@ -223,7 +223,7 @@ namespace turbo::unicode {
         return ascii::validate(buf, len);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::validate_ascii_with_errors(const char *buf, size_t len) noexcept {
         return ascii::validate_with_errors(buf, len);
     }
@@ -236,12 +236,12 @@ namespace turbo::unicode {
         return utf16::validate<EndianNess::SYS_BIG_ENDIAN>(buf, len);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept {
         return utf16::validate_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept {
         return utf16::validate_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len);
     }
@@ -250,7 +250,7 @@ namespace turbo::unicode {
         return utf32::validate(buf, len);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept {
         return utf32::validate_with_errors(buf, len);
     }
@@ -265,13 +265,13 @@ namespace turbo::unicode {
         return utf8_to_utf16::convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf8_to_utf16le_with_errors(const char *buf, size_t len,
                                                                   char16_t *utf16_output) noexcept {
         return utf8_to_utf16::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_output);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf8_to_utf16be_with_errors(const char *buf, size_t len,
                                                                   char16_t *utf16_output) noexcept {
         return utf8_to_utf16::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_output);
@@ -294,7 +294,7 @@ namespace turbo::unicode {
         return utf8_to_utf32::convert(buf, len, utf32_output);
     }
 
-    [[nodiscard]] inline result Converter<scalar_engine>::convert_utf8_to_utf32_with_errors(const char *buf, size_t len,
+    [[nodiscard]] inline UnicodeResult Converter<scalar_engine>::convert_utf8_to_utf32_with_errors(const char *buf, size_t len,
                                                                                             char32_t *utf32_output) noexcept {
         return utf8_to_utf32::convert_with_errors(buf, len, utf32_output);
     }
@@ -315,13 +315,13 @@ namespace turbo::unicode {
         return utf16_to_utf8::convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf8_buffer);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf16le_to_utf8_with_errors(const char16_t *buf, size_t len,
                                                                   char *utf8_buffer) noexcept {
         return utf16_to_utf8::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf8_buffer);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf16be_to_utf8_with_errors(const char16_t *buf, size_t len,
                                                                   char *utf8_buffer) noexcept {
         return utf16_to_utf8::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf8_buffer);
@@ -344,7 +344,7 @@ namespace turbo::unicode {
         return utf32_to_utf8::convert(buf, len, utf8_buffer);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf32_to_utf8_with_errors(const char32_t *buf, size_t len,
                                                                 char *utf8_buffer) noexcept {
         return utf32_to_utf8::convert_with_errors(buf, len, utf8_buffer);
@@ -367,13 +367,13 @@ namespace turbo::unicode {
         return utf32_to_utf16::convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_buffer);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf32_to_utf16le_with_errors(const char32_t *buf, size_t len,
                                                                    char16_t *utf16_buffer) noexcept {
         return utf32_to_utf16::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf16_buffer);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf32_to_utf16be_with_errors(const char32_t *buf, size_t len,
                                                                    char16_t *utf16_buffer) noexcept {
         return utf32_to_utf16::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf16_buffer);
@@ -403,13 +403,13 @@ namespace turbo::unicode {
         return utf16_to_utf32::convert<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf32_buffer);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf16le_to_utf32_with_errors(const char16_t *buf, size_t len,
                                                                    char32_t *utf32_buffer) noexcept {
         return utf16_to_utf32::convert_with_errors<EndianNess::SYS_LITTLE_ENDIAN>(buf, len, utf32_buffer);
     }
 
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     Converter<scalar_engine>::convert_utf16be_to_utf32_with_errors(const char16_t *buf, size_t len,
                                                                    char32_t *utf32_buffer) noexcept {
         return utf16_to_utf32::convert_with_errors<EndianNess::SYS_BIG_ENDIAN>(buf, len, utf32_buffer);

@@ -19,7 +19,6 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     /**
      * @ingroup turbo_string_convert
@@ -94,8 +93,6 @@ namespace turbo {
         return result;
     }
 
-
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_STR_CASE_CONV_H_

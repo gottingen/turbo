@@ -23,73 +23,69 @@
 #include "turbo/platform/port.h"
 #include "turbo/profiling/internal/exponential_biased.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace cord_internal {
-namespace {
+namespace turbo::cord_internal {
+    namespace {
 
-// The average interval until the next sample. A value of 0 disables profiling
-// while a value of 1 will profile all Cords.
-std::atomic<int> g_cordz_mean_interval(50000);
+        // The average interval until the next sample. A value of 0 disables profiling
+        // while a value of 1 will profile all Cords.
+        std::atomic<int> g_cordz_mean_interval(50000);
 
-}  // namespace
+    }  // namespace
 
 #ifdef TURBO_INTERNAL_CORDZ_ENABLED
 
-// Special negative 'not initialized' per thread value for cordz_next_sample.
-static constexpr int64_t kInitCordzNextSample = -1;
+    // Special negative 'not initialized' per thread value for cordz_next_sample.
+    static constexpr int64_t kInitCordzNextSample = -1;
 
-TURBO_CONST_INIT thread_local int64_t cordz_next_sample = kInitCordzNextSample;
+    TURBO_CONST_INIT thread_local int64_t cordz_next_sample = kInitCordzNextSample;
 
-// kIntervalIfDisabled is the number of profile-eligible events need to occur
-// before the code will confirm that cordz is still disabled.
-constexpr int64_t kIntervalIfDisabled = 1 << 16;
+    // kIntervalIfDisabled is the number of profile-eligible events need to occur
+    // before the code will confirm that cordz is still disabled.
+    constexpr int64_t kIntervalIfDisabled = 1 << 16;
 
-TURBO_NO_INLINE bool cordz_should_profile_slow() {
+    TURBO_NO_INLINE bool cordz_should_profile_slow() {
 
-  thread_local turbo::profiling_internal::ExponentialBiased
-      exponential_biased_generator;
-  int32_t mean_interval = get_cordz_mean_interval();
+        thread_local turbo::profiling_internal::ExponentialBiased
+                exponential_biased_generator;
+        int32_t mean_interval = get_cordz_mean_interval();
 
-  // Check if we disabled profiling. If so, set the next sample to a "large"
-  // number to minimize the overhead of the should_profile codepath.
-  if (mean_interval <= 0) {
-    cordz_next_sample = kIntervalIfDisabled;
-    return false;
-  }
+        // Check if we disabled profiling. If so, set the next sample to a "large"
+        // number to minimize the overhead of the should_profile codepath.
+        if (mean_interval <= 0) {
+            cordz_next_sample = kIntervalIfDisabled;
+            return false;
+        }
 
-  // Check if we're always sampling.
-  if (mean_interval == 1) {
-    cordz_next_sample = 1;
-    return true;
-  }
+        // Check if we're always sampling.
+        if (mean_interval == 1) {
+            cordz_next_sample = 1;
+            return true;
+        }
 
-  if (cordz_next_sample <= 0) {
-    // If first check on current thread, check cordz_should_profile()
-    // again using the created (initial) stride in cordz_next_sample.
-    const bool initialized = cordz_next_sample != kInitCordzNextSample;
-    cordz_next_sample = exponential_biased_generator.GetStride(mean_interval);
-    return initialized || cordz_should_profile();
-  }
+        if (cordz_next_sample <= 0) {
+            // If first check on current thread, check cordz_should_profile()
+            // again using the created (initial) stride in cordz_next_sample.
+            const bool initialized = cordz_next_sample != kInitCordzNextSample;
+            cordz_next_sample = exponential_biased_generator.GetStride(mean_interval);
+            return initialized || cordz_should_profile();
+        }
 
-  --cordz_next_sample;
-  return false;
-}
+        --cordz_next_sample;
+        return false;
+    }
 
-void cordz_set_next_sample_for_testing(int64_t next_sample) {
-  cordz_next_sample = next_sample;
-}
+    void cordz_set_next_sample_for_testing(int64_t next_sample) {
+        cordz_next_sample = next_sample;
+    }
 
 #endif  // TURBO_INTERNAL_CORDZ_ENABLED
 
-int32_t get_cordz_mean_interval() {
-  return g_cordz_mean_interval.load(std::memory_order_acquire);
-}
+    int32_t get_cordz_mean_interval() {
+        return g_cordz_mean_interval.load(std::memory_order_acquire);
+    }
 
-void set_cordz_mean_interval(int32_t mean_interval) {
-  g_cordz_mean_interval.store(mean_interval, std::memory_order_release);
-}
+    void set_cordz_mean_interval(int32_t mean_interval) {
+        g_cordz_mean_interval.store(mean_interval, std::memory_order_release);
+    }
 
-}  // namespace cord_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::cord_internal

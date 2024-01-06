@@ -15,7 +15,7 @@
 #include "inline_variable_testing.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace inline_variable_testing_internal {
 
         const Foo &get_foo_b() { return inline_variable_foo; }
@@ -23,5 +23,5 @@ namespace turbo {
         const int &get_int_b() { return inline_variable_int; }
 
     }  // namespace inline_variable_testing_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

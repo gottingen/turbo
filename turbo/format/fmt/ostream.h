@@ -62,7 +62,8 @@ namespace turbo {
             if (auto* buf = dynamic_cast<std::__stdoutbuf<char>*>(os.rdbuf()))
               if (FILE* f = get_file(*buf)) return write_console(f, data);
 #else
-            turbo::ignore_unused(os, data);
+            TURBO_UNUSED(os);
+            TURBO_UNUSED(data);
 #endif
             return false;
         }

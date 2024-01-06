@@ -52,99 +52,100 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-// HaveLeakSanitizer()
-//
-// Returns true if a leak-checking sanitizer (either ASan or standalone LSan) is
-// currently built into this target.
-bool HaveLeakSanitizer();
+    // HaveLeakSanitizer()
+    //
+    // Returns true if a leak-checking sanitizer (either ASan or standalone LSan) is
+    // currently built into this target.
+    bool HaveLeakSanitizer();
 
-// LeakCheckerIsActive()
-//
-// Returns true if a leak-checking sanitizer (either ASan or standalone LSan) is
-// currently built into this target and is turned on.
-bool LeakCheckerIsActive();
+    // LeakCheckerIsActive()
+    //
+    // Returns true if a leak-checking sanitizer (either ASan or standalone LSan) is
+    // currently built into this target and is turned on.
+    bool LeakCheckerIsActive();
 
-// DoIgnoreLeak()
-//
-// Implements `IgnoreLeak()` below. This function should usually
-// not be called directly; calling `IgnoreLeak()` is preferred.
-void DoIgnoreLeak(const void* ptr);
+    // DoIgnoreLeak()
+    //
+    // Implements `IgnoreLeak()` below. This function should usually
+    // not be called directly; calling `IgnoreLeak()` is preferred.
+    void DoIgnoreLeak(const void *ptr);
 
-// IgnoreLeak()
-//
-// Instruct the leak sanitizer to ignore leak warnings on the object referenced
-// by the passed pointer, as well as all heap objects transitively referenced
-// by it. The passed object pointer can point to either the beginning of the
-// object or anywhere within it.
-//
-// Example:
-//
-//   static T* obj = IgnoreLeak(new T(...));
-//
-// If the passed `ptr` does not point to an actively allocated object at the
-// time `IgnoreLeak()` is called, the call is a no-op; if it is actively
-// allocated, leak sanitizer will assume this object is referenced even if
-// there is no actual reference in user memory.
-//
-template <typename T>
-T* IgnoreLeak(T* ptr) {
-  DoIgnoreLeak(ptr);
-  return ptr;
-}
+    // IgnoreLeak()
+    //
+    // Instruct the leak sanitizer to ignore leak warnings on the object referenced
+    // by the passed pointer, as well as all heap objects transitively referenced
+    // by it. The passed object pointer can point to either the beginning of the
+    // object or anywhere within it.
+    //
+    // Example:
+    //
+    //   static T* obj = IgnoreLeak(new T(...));
+    //
+    // If the passed `ptr` does not point to an actively allocated object at the
+    // time `IgnoreLeak()` is called, the call is a no-op; if it is actively
+    // allocated, leak sanitizer will assume this object is referenced even if
+    // there is no actual reference in user memory.
+    //
+    template<typename T>
+    T *IgnoreLeak(T *ptr) {
+        DoIgnoreLeak(ptr);
+        return ptr;
+    }
 
-// FindAndReportLeaks()
-//
-// If any leaks are detected, prints a leak report and returns true.  This
-// function may be called repeatedly, and does not affect end-of-process leak
-// checking.
-//
-// Example:
-// if (FindAndReportLeaks()) {
-//   ... diagnostic already printed. Exit with failure code.
-//   exit(1)
-// }
-bool FindAndReportLeaks();
+    // FindAndReportLeaks()
+    //
+    // If any leaks are detected, prints a leak report and returns true.  This
+    // function may be called repeatedly, and does not affect end-of-process leak
+    // checking.
+    //
+    // Example:
+    // if (FindAndReportLeaks()) {
+    //   ... diagnostic already printed. Exit with failure code.
+    //   exit(1)
+    // }
+    bool FindAndReportLeaks();
 
-// LeakCheckDisabler
-//
-// This helper class indicates that any heap allocations done in the code block
-// covered by the scoped object, which should be allocated on the stack, will
-// not be reported as leaks. Leak check disabling will occur within the code
-// block and any nested function calls within the code block.
-//
-// Example:
-//
-//   void Foo() {
-//     LeakCheckDisabler disabler;
-//     ... code that allocates objects whose leaks should be ignored ...
-//   }
-//
-// REQUIRES: Destructor runs in same thread as constructor
-class LeakCheckDisabler {
- public:
-  LeakCheckDisabler();
-  LeakCheckDisabler(const LeakCheckDisabler&) = delete;
-  LeakCheckDisabler& operator=(const LeakCheckDisabler&) = delete;
-  ~LeakCheckDisabler();
-};
+    // LeakCheckDisabler
+    //
+    // This helper class indicates that any heap allocations done in the code block
+    // covered by the scoped object, which should be allocated on the stack, will
+    // not be reported as leaks. Leak check disabling will occur within the code
+    // block and any nested function calls within the code block.
+    //
+    // Example:
+    //
+    //   void Foo() {
+    //     LeakCheckDisabler disabler;
+    //     ... code that allocates objects whose leaks should be ignored ...
+    //   }
+    //
+    // REQUIRES: Destructor runs in same thread as constructor
+    class LeakCheckDisabler {
+    public:
+        LeakCheckDisabler();
 
-// RegisterLivePointers()
-//
-// Registers `ptr[0,size-1]` as pointers to memory that is still actively being
-// referenced and for which leak checking should be ignored. This function is
-// useful if you store pointers in mapped memory, for memory ranges that we know
-// are correct but for which normal analysis would flag as leaked code.
-void RegisterLivePointers(const void* ptr, size_t size);
+        LeakCheckDisabler(const LeakCheckDisabler &) = delete;
 
-// UnRegisterLivePointers()
-//
-// Deregisters the pointers previously marked as active in
-// `RegisterLivePointers()`, enabling leak checking of those pointers.
-void UnRegisterLivePointers(const void* ptr, size_t size);
+        LeakCheckDisabler &operator=(const LeakCheckDisabler &) = delete;
 
-TURBO_NAMESPACE_END
+        ~LeakCheckDisabler();
+    };
+
+    // RegisterLivePointers()
+    //
+    // Registers `ptr[0,size-1]` as pointers to memory that is still actively being
+    // referenced and for which leak checking should be ignored. This function is
+    // useful if you store pointers in mapped memory, for memory ranges that we know
+    // are correct but for which normal analysis would flag as leaked code.
+    void RegisterLivePointers(const void *ptr, size_t size);
+
+    // UnRegisterLivePointers()
+    //
+    // Deregisters the pointers previously marked as active in
+    // `RegisterLivePointers()`, enabling leak checking of those pointers.
+    void UnRegisterLivePointers(const void *ptr, size_t size);
+
 }  // namespace turbo
 
 #endif  // TURBO_DEBUGGING_LEAK_CHECK_H_

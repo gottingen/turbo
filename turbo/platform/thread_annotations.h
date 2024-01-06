@@ -309,25 +309,21 @@
 // but the compiler cannot confirm that.
 #define TURBO_TS_UNCHECKED_READ(x) turbo::base_internal::ts_unchecked_read(x)
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
+namespace turbo::base_internal {
 
-// Takes a reference to a guarded data member, and returns an unguarded
-// reference.
-// Do not use this function directly, use TURBO_TS_UNCHECKED_READ instead.
-template <typename T>
-inline const T& ts_unchecked_read(const T& v) TURBO_NO_THREAD_SAFETY_ANALYSIS {
-  return v;
-}
+    // Takes a reference to a guarded data member, and returns an unguarded
+    // reference.
+    // Do not use this function directly, use TURBO_TS_UNCHECKED_READ instead.
+    template<typename T>
+    inline const T &ts_unchecked_read(const T &v) TURBO_NO_THREAD_SAFETY_ANALYSIS {
+        return v;
+    }
 
-template <typename T>
-inline T& ts_unchecked_read(T& v) TURBO_NO_THREAD_SAFETY_ANALYSIS {
-  return v;
-}
+    template<typename T>
+    inline T &ts_unchecked_read(T &v) TURBO_NO_THREAD_SAFETY_ANALYSIS {
+        return v;
+    }
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::base_internal
 
 #endif  // TURBO_PLATFORM_THREAD_ANNOTATIONS_H_

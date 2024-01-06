@@ -18,7 +18,7 @@
 #include "turbo/platform/internal/atomic_hook.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace atomic_hook_internal {
 
         TURBO_INTERNAL_ATOMIC_HOOK_ATTRIBUTES turbo::base_internal::AtomicHook<VoidF>
@@ -30,5 +30,5 @@ namespace turbo {
         void RegisterFunc(VoidF f) { func.Store(f); }
 
     }  // namespace atomic_hook_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

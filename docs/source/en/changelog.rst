@@ -9,3 +9,4 @@ change log
     :maxdepth: 3
 
     changelog/v0939
+    changelog/v0943

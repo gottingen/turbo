@@ -20,9 +20,7 @@
 #include "turbo/platform/port.h"
 #include "turbo/strings/string_view.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace crc_internal {
+namespace turbo::crc_internal {
 
 crc32c_t CrcNonTemporalMemcpyEngine::Compute(void* __restrict dst,
                                              const void* __restrict src,
@@ -88,6 +86,4 @@ crc32c_t CrcNonTemporalMemcpyAVXEngine::Compute(void* __restrict dst,
   return crc;
 }
 
-}  // namespace crc_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::crc_internal

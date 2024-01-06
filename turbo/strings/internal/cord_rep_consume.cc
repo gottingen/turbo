@@ -21,42 +21,38 @@
 #include "turbo/meta/function_ref.h"
 #include "turbo/strings/internal/cord_internal.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace cord_internal {
+namespace turbo::cord_internal {
 
-namespace {
+    namespace {
 
-// Unrefs the provided `substring`, and returns `substring->child`
-// Adds or assumes a reference on `substring->child`
-CordRep* ClipSubstring(CordRepSubstring* substring) {
-  CordRep* child = substring->child;
-  if (substring->refcount.IsOne()) {
-    delete substring;
-  } else {
-    CordRep::Ref(child);
-    CordRep::Unref(substring);
-  }
-  return child;
-}
+        // Unrefs the provided `substring`, and returns `substring->child`
+        // Adds or assumes a reference on `substring->child`
+        CordRep *ClipSubstring(CordRepSubstring *substring) {
+            CordRep *child = substring->child;
+            if (substring->refcount.IsOne()) {
+                delete substring;
+            } else {
+                CordRep::Ref(child);
+                CordRep::Unref(substring);
+            }
+            return child;
+        }
 
-}  // namespace
+    }  // namespace
 
-void Consume(CordRep* rep, ConsumeFn consume_fn) {
-  size_t offset = 0;
-  size_t length = rep->length;
+    void Consume(CordRep *rep, ConsumeFn consume_fn) {
+        size_t offset = 0;
+        size_t length = rep->length;
 
-  if (rep->tag == SUBSTRING) {
-    offset += rep->substring()->start;
-    rep = ClipSubstring(rep->substring());
-  }
-  consume_fn(rep, offset, length);
-}
+        if (rep->tag == SUBSTRING) {
+            offset += rep->substring()->start;
+            rep = ClipSubstring(rep->substring());
+        }
+        consume_fn(rep, offset, length);
+    }
 
-void ReverseConsume(CordRep* rep, ConsumeFn consume_fn) {
-  return Consume(rep, std::move(consume_fn));
-}
+    void ReverseConsume(CordRep *rep, ConsumeFn consume_fn) {
+        return Consume(rep, std::move(consume_fn));
+    }
 
-}  // namespace cord_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::cord_internal

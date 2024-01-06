@@ -53,7 +53,7 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace random_internal_nanobenchmark {
 
 // Input influencing the function being measured (e.g. number of bytes to copy).
@@ -166,7 +166,7 @@ static inline size_t MeasureClosure(const Closure& closure,
 }
 
 }  // namespace random_internal_nanobenchmark
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_INTERNAL_NANOBENCHMARK_H_

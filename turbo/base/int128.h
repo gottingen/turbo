@@ -513,7 +513,6 @@ namespace turbo {
         return int128((std::numeric_limits<int64_t>::min)(), 0);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // Specialized numeric_limits for int128.
@@ -569,7 +568,6 @@ namespace std {
 //                      Implementation details follow
 // --------------------------------------------------------------------------
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     constexpr uint128 make_uint128(uint64_t high, uint64_t low) {
         return uint128(high, low);

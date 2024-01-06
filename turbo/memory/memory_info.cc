@@ -28,7 +28,16 @@
 #include <Psapi.h>
 #undef min
 #undef max
-#elif defined(TURBO_PLATFORM_LINUX)
+#else
+
+#include <pthread.h>
+#include <signal.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/resource.h>
+
+#if defined(TURBO_PLATFORM_LINUX)
 
 #include <sys/types.h>
 #include <sys/sysinfo.h>
@@ -40,6 +49,13 @@
 #include <unistd.h>
 #include <sys/sysctl.h>
 #include <sys/user.h>
+#elif defined(TURBO_PLATFORM_OSX)
+#include <mach/mach.h>
+#include <mach/task.h>
+#include <mach/mach_init.h>
+#include <mach/mach_host.h>
+#include <mach/vm_map.h>
+#endif
 #endif
 
 namespace turbo {
@@ -192,4 +208,79 @@ namespace turbo {
         return 0;
 #endif
     }
-}
+
+    size_t get_page_size_impl() {
+#ifdef _WIN32
+        SYSTEM_INFO system_info;
+  GetSystemInfo(&system_info);
+  return std::max(system_info.dwPageSize, system_info.dwAllocationGranularity);
+#elif defined(__wasm__) || defined(__asmjs__)
+        return getpagesize();
+#else
+        return static_cast<size_t>(sysconf(_SC_PAGESIZE));
+#endif
+    }
+
+    size_t get_page_size() {
+        static const size_t page_size = get_page_size_impl();
+        return page_size;
+    }
+
+    size_t get_peak_memory_used() {
+#if defined(TURBO_PLATFORM_WINDOWS)
+        /* Windows -------------------------------------------------- */
+        PROCESS_MEMORY_COUNTERS info;
+        GetProcessMemoryInfo( GetCurrentProcess( ), &info, sizeof(info) );
+        return (size_t)info.PeakWorkingSetSize;
+#elif defined(TURBO_PLATFORM_UNIX) || defined(TURBO_PLATFORM_APPLE) || defined(TURBO_PLATFORM_LINUX)
+        /* BSD, Linux, and OSX -------------------------------------- */
+        struct rusage rusage;
+        getrusage(RUSAGE_SELF, &rusage);
+#if defined(__APPLE__) && defined(__MACH__)
+        return (size_t)rusage.ru_maxrss;
+#else
+        return (size_t) (rusage.ru_maxrss * 1024L);
+#endif
+
+#else
+        /* Unknown OS ----------------------------------------------- */
+    return (size_t)0L;			/* Unsupported. */
+#endif
+    }
+
+    size_t get_current_memory_used() {
+#if defined(TURBO_PLATFORM_WINDOWS)
+        /* Windows -------------------------------------------------- */
+    PROCESS_MEMORY_COUNTERS info;
+    GetProcessMemoryInfo( GetCurrentProcess( ), &info, sizeof(info) );
+    return (size_t)info.WorkingSetSize;
+
+#elif defined(TURBO_PLATFORM_OSX)
+        /* OSX ------------------------------------------------------ */
+    struct mach_task_basic_info info;
+    mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+    if ( task_info( mach_task_self( ), MACH_TASK_BASIC_INFO,
+        (task_info_t)&info, &infoCount ) != KERN_SUCCESS )
+        return (size_t)0L;		/* Can't access? */
+    return (size_t)info.resident_size;
+
+#elif defined(TURBO_PLATFORM_LINUX)
+        /* Linux ---------------------------------------------------- */
+        long rss = 0L;
+        FILE *fp = nullptr;
+        if ((fp = fopen("/proc/self/statm", "r")) == nullptr)
+            return (size_t) 0L;        /* Can't open? */
+        if (fscanf(fp, "%*s%ld", &rss) != 1) {
+            fclose(fp);
+            return (size_t) 0L;        /* Can't read? */
+        }
+        fclose(fp);
+        return (size_t) rss * (size_t) get_page_size();
+
+#else
+        /* AIX, BSD, Solaris, and Unknown OS ------------------------ */
+        return (size_t)0L;			/* Unsupported. */
+#endif
+    }
+
+}  // namespace turbo

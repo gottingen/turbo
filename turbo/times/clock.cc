@@ -26,7 +26,7 @@
 #include <limits>
 
 #include "turbo/platform/port.h"
-#include "turbo/platform/internal/spinlock.h"
+#include "turbo/concurrent/spinlock.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
 #include "turbo/platform/thread_annotations.h"
 
@@ -190,7 +190,7 @@ namespace turbo {
 
         // A reader-writer lock protecting the static locations below.
         // See SeqAcquire() and SeqRelease() above.
-        turbo::base_internal::SpinLock lock{turbo::kConstInit,
+        turbo::SpinLock lock{turbo::kConstInit,
                                             base_internal::SCHEDULE_KERNEL_ONLY};
     };
     TURBO_CONST_INIT static TimeState time_state;
@@ -254,7 +254,7 @@ namespace turbo {
         return current_time_nanos_from_system;
     }
 
-    static int64_t GetCurrentTimeNanosSlowPath() TURBO_COLD;
+    static int64_t get_current_time_nanos_slow_path() TURBO_COLD;
 
     // Read the contents of *atomic into *sample.
     // Each field is read atomically, but to maintain atomicity between fields,
@@ -359,7 +359,7 @@ namespace turbo {
             return static_cast<int64_t>(
                     base_ns + ((delta_cycles * nsscaled_per_cycle) >> kScale));
         }
-        return GetCurrentTimeNanosSlowPath();
+        return get_current_time_nanos_slow_path();
     }
 
     // Return (a << kScale)/b.
@@ -396,11 +396,11 @@ namespace turbo {
     // TODO(turbo-team): Remove this attribute when our compiler is smart enough
     // to do the right thing.
     TURBO_NO_INLINE
-    static int64_t GetCurrentTimeNanosSlowPath()
+    static int64_t get_current_time_nanos_slow_path()
     TURBO_LOCKS_EXCLUDED(time_state.lock) {
         // Serialize access to slow-path.  Fast-path readers are not blocked yet, and
         // code below must not modify last_sample until the seqlock is acquired.
-        time_state.lock.Lock();
+        time_state.lock.lock();
 
         // Sample the kernel time base.  This is the definition of
         // "now" if we take the slow path.
@@ -431,7 +431,7 @@ namespace turbo {
                     UpdateLastSample(now_cycles, now_ns, delta_cycles, &sample);
         }
 
-        time_state.lock.Unlock();
+        time_state.lock.unlock();
 
         return static_cast<int64_t>(estimated_base_ns);
     }
@@ -575,7 +575,7 @@ namespace turbo {
 
 extern "C" {
 
-TURBO_WEAK void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(
+TURBO_WEAK void turbo_internal_sleep_for(
         turbo::Duration duration) {
     while (duration > turbo::zero_duration()) {
         turbo::Duration to_sleep = std::min(duration, turbo::MaxSleep());

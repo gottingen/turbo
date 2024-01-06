@@ -27,8 +27,6 @@
 #include "turbo/strings/ascii.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-
     namespace {
 
         // This GenericFind() template function encapsulates the finding algorithm
@@ -126,7 +124,7 @@ namespace turbo {
     }
 
     std::string_view by_length::Find(std::string_view text,
-                                    size_t pos) const {
+                                     size_t pos) const {
         pos = std::min(pos, text.size());  // truncate `pos`
         std::string_view substr = text.substr(pos);
         // If the string is shorter than the chunk size we say we
@@ -137,5 +135,4 @@ namespace turbo {
         return std::string_view(substr.data() + length_, 0);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

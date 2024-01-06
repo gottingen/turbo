@@ -52,7 +52,6 @@
 #include "turbo/strings/str_trim.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     //------------------------------------------------------------------------------
     // Delimiters
@@ -583,7 +582,6 @@ namespace turbo {
                 std::move(text), DelimiterType(d), std::move(p));
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_STR_SPLIT_H_

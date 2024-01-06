@@ -51,7 +51,7 @@
 #include "gtest/gtest.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace container_internal {
 
         struct RawHashSetTestOnlyAccess {
@@ -70,7 +70,7 @@ namespace turbo {
             using ::testing::Pair;
             using ::testing::UnorderedElementsAre;
 
-// Convenience function to static cast to ctrl_t.
+            // Convenience function to static cast to ctrl_t.
             ctrl_t CtrlT(int i) { return static_cast<ctrl_t>(i); }
 
             TEST(Util, NormalizeCapacity) {
@@ -1293,7 +1293,7 @@ namespace turbo {
                 return {};
             }
 
-// TODO(b/80415403): Figure out why this test is so flaky, esp. on MSVC
+                // TODO(b/80415403): Figure out why this test is so flaky, esp. on MSVC
             TEST(Table, DISABLED_EnsureNonQuadraticTopNXorSeedByProbeSeqLength) {
                 ProbeStatsPerSize stats;
                 std::vector<size_t> sizes = {Group::kWidth << 5, Group::kWidth << 10};
@@ -1309,10 +1309,10 @@ namespace turbo {
                 }
             }
 
-// Collect total ProbeStats on num_iters iterations of the following algorithm:
-// 1. Create new table
-// 2. Select 10% of keys and insert 10 elements key * 17 + j * 13
-// 3. Collect ProbeStats from final table
+            // Collect total ProbeStats on num_iters iterations of the following algorithm:
+            // 1. Create new table
+            // 2. Select 10% of keys and insert 10 elements key * 17 + j * 13
+            // 3. Collect ProbeStats from final table
             ProbeStats CollectProbeStatsOnLinearlyTransformedKeys(
                     const std::vector<int64_t> &keys, size_t num_iters) {
                 ProbeStats stats;
@@ -2358,5 +2358,5 @@ namespace turbo {
 
         }  // namespace
     }  // namespace container_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

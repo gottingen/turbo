@@ -18,6 +18,7 @@
 #include <turbo/log/cfg/helpers.h>
 #include "turbo/log/details/registry.h"
 #include "turbo/log/details/os.h"
+#include "turbo/base/env.h"
 
 //
 // Init levels and patterns from env variables TLOG_LEVEL
@@ -39,7 +40,7 @@
 namespace turbo::tlog {
     namespace cfg {
         inline void load_env_levels() {
-            auto env_val = details::os::getenv("TLOG_LEVEL");
+            auto env_val = turbo::get_env("TLOG_LEVEL");
             if (!env_val.empty()) {
                 helpers::load_levels(env_val);
             }

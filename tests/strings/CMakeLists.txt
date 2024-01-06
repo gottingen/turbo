@@ -505,3 +505,14 @@ carbin_cc_test(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_test(
+        NAME
+        unicode_view
+        SOURCES
+        "unicode_view_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)

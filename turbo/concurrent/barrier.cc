@@ -16,7 +16,6 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     bool Barrier::Block() {
         std::unique_lock l(this->lock_);
@@ -43,5 +42,4 @@ namespace turbo {
         // free to delete the barrier.
         return this->num_to_exit_ == 0;
     }
-    TURBO_NAMESPACE_END
 }  // namespace turbo

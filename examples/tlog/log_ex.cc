@@ -284,7 +284,7 @@ void trace_example() {
     TLOG_CHECK_GE(12, 11, "aaa {}", "some reason");
     TLOG_CHECK_LT(10, 11, "aaa {}", "some reason");
     TLOG_CHECK_LE(10, 11, "aaa {}", "some reason");
-    TLOG_DCHECK_LE(12, 11, "this should not display {}", "some reason");
+    TDLOG_CHECK_LE(12, 11, "this should not display {}", "some reason");
     int a = 10;
     size_t bb = 12;
     TLOG_CHECK_EQ(a, bb);

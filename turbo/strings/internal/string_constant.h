@@ -18,55 +18,48 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/strings/string_view.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace strings_internal {
+namespace turbo::strings_internal {
 
-// StringConstant<T> represents a compile time string constant.
-// It can be accessed via its `std::string_view value` static member.
-// It is guaranteed that the `std::string_view` returned has constant `.data()`,
-// constant `.size()` and constant `value[i]` for all `0 <= i < .size()`
-//
-// The `T` is an opaque type. It is guaranteed that different string constants
-// will have different values of `T`. This allows users to associate the string
-// constant with other static state at compile time.
-//
-// Instances should be made using the `MakeStringConstant()` factory function
-// below.
-template <typename T>
-struct StringConstant {
- private:
-  static constexpr bool TryConstexprEval(std::string_view view) {
-    return view.empty() || 2 * view[0] != 1;
-  }
+    // StringConstant<T> represents a compile time string constant.
+    // It can be accessed via its `std::string_view value` static member.
+    // It is guaranteed that the `std::string_view` returned has constant `.data()`,
+    // constant `.size()` and constant `value[i]` for all `0 <= i < .size()`
+    //
+    // The `T` is an opaque type. It is guaranteed that different string constants
+    // will have different values of `T`. This allows users to associate the string
+    // constant with other static state at compile time.
+    //
+    // Instances should be made using the `MakeStringConstant()` factory function
+    // below.
+    template<typename T>
+    struct StringConstant {
+    private:
+        static constexpr bool TryConstexprEval(std::string_view view) {
+            return view.empty() || 2 * view[0] != 1;
+        }
 
- public:
-  static constexpr std::string_view value = T{}();
-  constexpr std::string_view operator()() const { return value; }
+    public:
+        static constexpr std::string_view value = T{}();
 
-  // Check to be sure `view` points to constant data.
-  // Otherwise, it can't be constant evaluated.
-  static_assert(TryConstexprEval(value),
-                "The input std::string_view must point to constant data.");
-};
+        constexpr std::string_view operator()() const { return value; }
 
-#ifndef TURBO_COMPILER_CPP17_ENABLED
-template <typename T>
-constexpr std::string_view StringConstant<T>::value;
-#endif
+        // Check to be sure `view` points to constant data.
+        // Otherwise, it can't be constant evaluated.
+        static_assert(TryConstexprEval(value),
+                      "The input std::string_view must point to constant data.");
+    };
 
-// Factory function for `StringConstant` instances.
-// It supports callables that have a constexpr default constructor and a
-// constexpr operator().
-// It must return an `std::string_view` or `const char*` pointing to constant
-// data. This is validated at compile time.
-template <typename T>
-constexpr StringConstant<T> MakeStringConstant(T) {
-  return {};
-}
 
-}  // namespace strings_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    // Factory function for `StringConstant` instances.
+    // It supports callables that have a constexpr default constructor and a
+    // constexpr operator().
+    // It must return an `std::string_view` or `const char*` pointing to constant
+    // data. This is validated at compile time.
+    template<typename T>
+    constexpr StringConstant<T> MakeStringConstant(T) {
+        return {};
+    }
+
+}  // namespace turbo::strings_internal
 
 #endif  // TURBO_STRINGS_INTERNAL_STRING_CONSTANT_H_

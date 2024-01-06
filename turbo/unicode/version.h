@@ -29,7 +29,7 @@
 
 namespace turbo {
 
-    static constexpr turbo::ModuleVersion unicode_version = turbo::ModuleVersion{0, 9, 36};
+    static constexpr turbo::ModuleVersion unicode_version = turbo::ModuleVersion{0, 9, 43};
 
 }  // namespace turbo
 #endif  // TURBO_UNICODE_VERSION_H_

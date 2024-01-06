@@ -50,5 +50,16 @@ namespace turbo {
      */
     size_t get_physical_memory();
 
+    /**
+     * @ingroup turbo_memory_info
+     * @brief Get the memory page size.
+     * @return The memory page size
+     */
+    size_t get_page_size();
+
+    size_t get_peak_memory_used();
+
+    size_t get_current_memory_used();
+
 }  // namespace turbo
 #endif  // TURBO_MEMORY_MEMORY_INFO_H_

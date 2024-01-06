@@ -27,12 +27,13 @@
 #include "turbo/random/random.h"
 
 TEST_CASE("reducer") {
-    turbo::Counter<int> adder("counter");
+    turbo::Counter<int64_t> adder("counter");
 
     bool stop = false;
     auto thread_func = [&adder, &stop]() {
         while (!stop) {
             adder.add(1);
+            adder<<1;
             turbo::sleep_for(turbo::milliseconds(20));
         }
     };

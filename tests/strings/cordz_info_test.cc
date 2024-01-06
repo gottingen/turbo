@@ -30,7 +30,7 @@
 #include "gtest/gtest.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace cord_internal {
 namespace {
 
@@ -338,5 +338,5 @@ TEST(CordzInfoTest, FromParent) {
 
 }  // namespace
 }  // namespace cord_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

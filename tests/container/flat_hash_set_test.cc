@@ -26,7 +26,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace container_internal {
         namespace {
 
@@ -175,5 +175,5 @@ namespace turbo {
 
         }  // namespace
     }  // namespace container_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

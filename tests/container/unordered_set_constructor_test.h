@@ -26,7 +26,7 @@
 #include "turbo/meta/type_traits.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace container_internal {
 
         template<class UnordMap>
@@ -493,7 +493,7 @@ namespace turbo {
                 AssignmentFromInitializerListOverwritesExisting, AssignmentOnSelf);
 
     }  // namespace container_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_CONTAINER_INTERNAL_UNORDERED_SET_CONSTRUCTOR_TEST_H_

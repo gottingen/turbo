@@ -35,7 +35,7 @@
 #include "gtest/gtest.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace cord_internal {
 
 // Do not print statistics contents, the matcher prints them as needed.
@@ -553,5 +553,5 @@ TEST(CordzInfoStatisticsTest, ThreadSafety) {
 */
 }  // namespace
 }  // namespace cord_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

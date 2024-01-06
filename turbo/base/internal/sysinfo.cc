@@ -53,10 +53,10 @@
 #include <utility>
 #include <vector>
 
-#include "turbo/base/call_once.h"
+#include "turbo/concurrent/call_once.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/port.h"
-#include "turbo/platform/internal/spinlock.h"
+#include "turbo/concurrent/spinlock.h"
 #include "turbo/platform/internal/unscaledcycleclock.h"
 #include "turbo/platform/thread_annotations.h"
 
@@ -349,7 +349,7 @@ namespace turbo::base_internal {
     // NumCPUs() may be called before main() and before malloc is properly
     // initialized, therefore this must not allocate memory.
     int NumCPUs() {
-        base_internal::LowLevelCallOnce(
+        base_internal::low_level_call_once(
                 &init_num_cpus_once, []() { num_cpus = GetNumCPUs(); });
         return num_cpus;
     }
@@ -361,7 +361,7 @@ namespace turbo::base_internal {
     // NominalCPUFrequency() may be called before main() and before malloc is
     // properly initialized, therefore this must not allocate memory.
     double NominalCPUFrequency() {
-        base_internal::LowLevelCallOnce(
+        base_internal::low_level_call_once(
                 &init_nominal_cpu_frequency_once,
                 []() { nominal_cpu_frequency = GetNominalCPUFrequency(); });
         return nominal_cpu_frequency;

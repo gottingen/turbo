@@ -32,7 +32,6 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     //-----------------------------------------------------------------------------
     // crc32c_t
@@ -180,7 +179,6 @@ namespace turbo {
         return os << static_cast<uint32_t>(crc);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_CRYPTO_CRC32C_H_

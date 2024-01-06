@@ -48,7 +48,7 @@
 #include "turbo/meta/utility.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 
 namespace random_internal {
 template <typename>
@@ -232,7 +232,7 @@ class MockingBitGen {
                                                       // InvokeMock
 };
 
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_MOCKING_BIT_GEN_H_

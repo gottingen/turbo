@@ -288,17 +288,17 @@ namespace turbo {
         }
 
         constexpr fmt_detail::color_type get_foreground() const noexcept {
-            TURBO_ASSERT(has_foreground(), "no foreground specified for this style");
+            TURBO_ASSERT(has_foreground()&&"no foreground specified for this style");
             return foreground_color;
         }
 
         constexpr fmt_detail::color_type get_background() const noexcept {
-            TURBO_ASSERT(has_background(), "no background specified for this style");
+            TURBO_ASSERT(has_background()&&"no background specified for this style");
             return background_color;
         }
 
         constexpr emphasis get_emphasis() const noexcept {
-            TURBO_ASSERT(has_emphasis(), "no emphasis specified for this style");
+            TURBO_ASSERT(has_emphasis()&&"no emphasis specified for this style");
             return ems;
         }
 

@@ -34,36 +34,33 @@
 #include "turbo/random/internal/distribution_caller.h"
 #include "turbo/random/internal/fast_uniform_bits.h"
 
+namespace turbo::random_internal {
+    template<typename URBG, typename = void, typename = void, typename = void>
+    struct is_urbg : std::false_type {
+    };
+
+    template<typename URBG>
+    struct is_urbg<
+            URBG,
+            std::enable_if_t<std::is_same<
+                    typename URBG::result_type,
+                    typename std::decay<decltype((URBG::min)())>::type>::value>,
+            std::enable_if_t<std::is_same<
+                    typename URBG::result_type,
+                    typename std::decay<decltype((URBG::max)())>::type>::value>,
+            std::enable_if_t<std::is_same<
+                    typename URBG::result_type,
+                    typename std::decay<decltype(std::declval<URBG>()())>::type>::value>>
+            : std::true_type {
+    };
+
+    template<typename>
+    struct DistributionCaller;
+
+    class MockHelpers;
+
+}  // namespace turbo::random_internal
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    namespace random_internal {
-
-        template<typename URBG, typename = void, typename = void, typename = void>
-        struct is_urbg : std::false_type {
-        };
-
-        template<typename URBG>
-        struct is_urbg<
-                URBG,
-                std::enable_if_t<std::is_same<
-                        typename URBG::result_type,
-                        typename std::decay<decltype((URBG::min)())>::type>::value>,
-                std::enable_if_t<std::is_same<
-                        typename URBG::result_type,
-                        typename std::decay<decltype((URBG::max)())>::type>::value>,
-                std::enable_if_t<std::is_same<
-                        typename URBG::result_type,
-                        typename std::decay<decltype(std::declval<URBG>()())>::type>::value>>
-                : std::true_type {
-        };
-
-        template<typename>
-        struct DistributionCaller;
-
-        class MockHelpers;
-
-    }  // namespace random_internal
-
     // -----------------------------------------------------------------------------
     // turbo::BitGenRef
     // -----------------------------------------------------------------------------
@@ -189,7 +186,6 @@ namespace turbo {
         friend class ::turbo::random_internal::MockHelpers;          // for InvokeMock
     };
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_BIT_GEN_REF_H_

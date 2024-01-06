@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/utf.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "turbo/testing/test.h"
+
+#include "turbo/unicode/converter.h"
+#include "transcode_test_base.h"
 
 #include <cstdint>
 #include <utility>
-
-#include "gtest/gtest.h"
 #include "turbo/platform/port.h"
 
 namespace {
@@ -27,7 +30,7 @@ namespace {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc++2a-compat"
 #endif
-TEST(EncodeUTF8Char, BasicFunction) {
+TEST_CASE("EncodeUTF8Char, BasicFunction") {
   std::pair<char32_t, std::string> tests[] = {{0x0030, u8"\u0030"},
                                               {0x00A3, u8"\u00A3"},
                                               {0x00010000, u8"\U00010000"},
@@ -45,18 +48,18 @@ TEST(EncodeUTF8Char, BasicFunction) {
            buf1[apparent_length - 1] == '\xFF') {
       if (--apparent_length == 0) break;
     }
-    EXPECT_EQ(apparent_length, buf0_written - buf0);
-    EXPECT_EQ(apparent_length, buf1_written - buf1);
-    EXPECT_EQ(apparent_length, test.second.length());
-    EXPECT_EQ(std::string(buf0, apparent_length), test.second);
-    EXPECT_EQ(std::string(buf1, apparent_length), test.second);
+    REQUIRE_EQ(apparent_length, buf0_written - buf0);
+    REQUIRE_EQ(apparent_length, buf1_written - buf1);
+    REQUIRE_EQ(apparent_length, test.second.length());
+    REQUIRE_EQ(std::string(buf0, apparent_length), test.second);
+    REQUIRE_EQ(std::string(buf1, apparent_length), test.second);
   }
   char buf[32] = "Don't Tread On Me";
   char32_t a= 0x00110000;
-  EXPECT_LE(turbo::convert_utf32_to_utf8(&a, 1, buf), 4);
+  REQUIRE_LE(turbo::convert_utf32_to_utf8(&a, 1, buf), 4);
   char buf2[32] = "Negative is invalid but sane";
   char32_t b = -1;
-  EXPECT_LE(turbo::convert_utf32_to_utf8(&b,1, buf2), 4);
+  REQUIRE_LE(turbo::convert_utf32_to_utf8(&b,1, buf2), 4);
 }
 #if defined(__clang__)
 #pragma clang diagnostic pop

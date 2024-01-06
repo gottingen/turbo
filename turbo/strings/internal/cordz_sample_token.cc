@@ -18,47 +18,43 @@
 #include "turbo/strings/internal/cordz_handle.h"
 #include "turbo/strings/internal/cordz_info.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace cord_internal {
+namespace turbo::cord_internal {
 
-CordzSampleToken::Iterator& CordzSampleToken::Iterator::operator++() {
-  if (current_) {
-    current_ = current_->Next(*token_);
-  }
-  return *this;
-}
+    CordzSampleToken::Iterator &CordzSampleToken::Iterator::operator++() {
+        if (current_) {
+            current_ = current_->Next(*token_);
+        }
+        return *this;
+    }
 
-CordzSampleToken::Iterator CordzSampleToken::Iterator::operator++(int) {
-  Iterator it(*this);
-  operator++();
-  return it;
-}
+    CordzSampleToken::Iterator CordzSampleToken::Iterator::operator++(int) {
+        Iterator it(*this);
+        operator++();
+        return it;
+    }
 
-bool operator==(const CordzSampleToken::Iterator& lhs,
-                const CordzSampleToken::Iterator& rhs) {
-  return lhs.current_ == rhs.current_ &&
-         (lhs.current_ == nullptr || lhs.token_ == rhs.token_);
-}
+    bool operator==(const CordzSampleToken::Iterator &lhs,
+                    const CordzSampleToken::Iterator &rhs) {
+        return lhs.current_ == rhs.current_ &&
+               (lhs.current_ == nullptr || lhs.token_ == rhs.token_);
+    }
 
-bool operator!=(const CordzSampleToken::Iterator& lhs,
-                const CordzSampleToken::Iterator& rhs) {
-  return !(lhs == rhs);
-}
+    bool operator!=(const CordzSampleToken::Iterator &lhs,
+                    const CordzSampleToken::Iterator &rhs) {
+        return !(lhs == rhs);
+    }
 
-CordzSampleToken::Iterator::reference CordzSampleToken::Iterator::operator*()
+    CordzSampleToken::Iterator::reference CordzSampleToken::Iterator::operator*()
     const {
-  return *current_;
-}
+        return *current_;
+    }
 
-CordzSampleToken::Iterator::pointer CordzSampleToken::Iterator::operator->()
+    CordzSampleToken::Iterator::pointer CordzSampleToken::Iterator::operator->()
     const {
-  return current_;
-}
+        return current_;
+    }
 
-CordzSampleToken::Iterator::Iterator(const CordzSampleToken* token)
-    : token_(token), current_(CordzInfo::Head(*token)) {}
+    CordzSampleToken::Iterator::Iterator(const CordzSampleToken *token)
+            : token_(token), current_(CordzInfo::Head(*token)) {}
 
-}  // namespace cord_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::cord_internal

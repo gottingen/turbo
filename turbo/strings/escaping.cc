@@ -34,7 +34,6 @@
 #include "turbo/unicode/converter.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace {
 
         // These are used for the leave_nulls_escaped argument to CUnescapeInternal().
@@ -895,7 +894,7 @@ namespace turbo {
     // See CUnescapeInternal() for implementation details.
     // ----------------------------------------------------------------------
     bool c_decode(std::string_view source, std::string *dest,
-                   std::string *error) {
+                  std::string *error) {
         return CUnescapeInternal(source, kUnescapeNulls, dest, error);
     }
 
@@ -1009,5 +1008,4 @@ namespace turbo {
 
     template void bytes_to_hex(std::string_view, turbo::inlined_string *);
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -21,50 +21,49 @@
 #include "turbo/strings/internal/cordz_info.h"
 #include "turbo/strings/internal/cordz_update_tracker.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace cord_internal {
+namespace turbo::cord_internal {
 
 // CordzUpdateScope scopes an update to the provided CordzInfo.
 // The class invokes `info->Lock(method)` and `info->Unlock()` to guard
 // cordrep updates. This class does nothing if `info` is null.
 // See also the 'Lock`, `Unlock` and `SetCordRep` methods in `CordzInfo`.
-class TURBO_SCOPED_LOCKABLE CordzUpdateScope {
- public:
-  CordzUpdateScope(CordzInfo* info, CordzUpdateTracker::MethodIdentifier method)
-      TURBO_EXCLUSIVE_LOCK_FUNCTION(info)
-      : info_(info) {
-    if (TURBO_UNLIKELY(info_)) {
-      info->Lock(method);
-    }
-  }
+    class TURBO_SCOPED_LOCKABLE CordzUpdateScope {
+    public:
+        CordzUpdateScope(CordzInfo *info, CordzUpdateTracker::MethodIdentifier method)
+        TURBO_EXCLUSIVE_LOCK_FUNCTION(info)
+                : info_(info) {
+            if (TURBO_UNLIKELY(info_)) {
+                info->Lock(method);
+            }
+        }
 
-  // CordzUpdateScope can not be copied or assigned to.
-  CordzUpdateScope(CordzUpdateScope&& rhs) = delete;
-  CordzUpdateScope(const CordzUpdateScope&) = delete;
-  CordzUpdateScope& operator=(CordzUpdateScope&& rhs) = delete;
-  CordzUpdateScope& operator=(const CordzUpdateScope&) = delete;
+        // CordzUpdateScope can not be copied or assigned to.
+        CordzUpdateScope(CordzUpdateScope &&rhs) = delete;
 
-  ~CordzUpdateScope() TURBO_UNLOCK_FUNCTION() {
-    if (TURBO_UNLIKELY(info_)) {
-      info_->Unlock();
-    }
-  }
+        CordzUpdateScope(const CordzUpdateScope &) = delete;
 
-  void SetCordRep(CordRep* rep) const {
-    if (TURBO_UNLIKELY(info_)) {
-      info_->SetCordRep(rep);
-    }
-  }
+        CordzUpdateScope &operator=(CordzUpdateScope &&rhs) = delete;
 
-  CordzInfo* info() const { return info_; }
+        CordzUpdateScope &operator=(const CordzUpdateScope &) = delete;
 
- private:
-  CordzInfo* info_;
-};
+        ~CordzUpdateScope() TURBO_UNLOCK_FUNCTION() {
+            if (TURBO_UNLIKELY(info_)) {
+                info_->Unlock();
+            }
+        }
 
-}  // namespace cord_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        void SetCordRep(CordRep *rep) const {
+            if (TURBO_UNLIKELY(info_)) {
+                info_->SetCordRep(rep);
+            }
+        }
+
+        CordzInfo *info() const { return info_; }
+
+    private:
+        CordzInfo *info_;
+    };
+
+}  // namespace turbo::cord_internal
 
 #endif  // TURBO_STRINGS_INTERNAL_CORDZ_UPDATE_SCOPE_H_

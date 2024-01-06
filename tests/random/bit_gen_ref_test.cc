@@ -22,7 +22,6 @@
 #include "turbo/random/random.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
 class ConstBitGen {
  public:
@@ -98,5 +97,5 @@ TEST(BitGenRefTest, MockingBitGenBaseOverrides) {
   EXPECT_EQ(FnTest(gen_ref), 42);  // Copy
 }
 }  // namespace
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

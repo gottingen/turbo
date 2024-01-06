@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 #include "turbo/random/fwd.h"
+#include "turbo/concurrent/thread_local.h"
 
 namespace turbo {
     static thread_local BitGen bitgen;

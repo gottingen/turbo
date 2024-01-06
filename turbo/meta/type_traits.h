@@ -40,7 +40,6 @@
 #endif  // defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
 #if defined(__cpp_lib_remove_cvref) && __cpp_lib_remove_cvref >= 201711L
     template <typename T>
@@ -160,17 +159,16 @@ namespace turbo {
 #if TURBO_CPLUSPLUS >= TURBO_CPLUSPLUS_20 && defined(_GLIBCXX_RELEASE) && \
     _GLIBCXX_RELEASE >= 12 && \
     (TURBO_CLANG_VERSION >= 1400 && TURBO_CLANG_VERSION < 1500)
-        ignore_unused(default_value);
+        TURBO_UNUSED(default_value);
                 return __builtin_is_constant_evaluated();
 #elif defined(__cpp_lib_is_constant_evaluated)
-        ignore_unused(default_value);
+        TURBO_UNUSED(default_value);
                 return std::is_constant_evaluated();
 #else
         return default_value;
 #endif
     }
 
-    TURBO_NAMESPACE_END
 
 #ifdef TURBO_COMPILER_HAVE_RTTI
 #define TURBO_TYPE_INFO_OF(...) (&typeid(__VA_ARGS__))
@@ -711,8 +709,27 @@ namespace turbo {
     struct is_atomical<const volatile T> : is_atomical<T> {
     };
 
+    template <typename T>
+    struct CachelineAligned {
+        alignas (2*TURBO_CACHE_LINE_SIZE) T data;
+    };
+
+    template<bool...>
+    struct bool_pack;
+
+    template<bool... bs>
+    using all_true = std::is_same<bool_pack<bs..., true>, bool_pack<true, bs...>>;
+
+    template <typename T, typename... Ts>
+    using all_same = all_true<std::is_same_v<T, Ts>...>;
+
+    template <typename T, typename... Ts>
+    constexpr bool all_same_v = all_same<T, Ts...>::value;
+
+
 }  // namespace turbo
 
+#include "turbo/meta/internal/traits.h"
 
 //////
 // TURBO_DECLVAL(T)

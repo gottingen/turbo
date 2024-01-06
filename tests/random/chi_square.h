@@ -29,7 +29,7 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace random_internal {
 
 constexpr const char kChiSquared[] = "chi-squared";
@@ -83,7 +83,7 @@ double ChiSquareValue(int dof, double p);
 double ChiSquarePValue(double chi_square, int dof);
 
 }  // namespace random_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_INTERNAL_CHI_SQUARE_H_

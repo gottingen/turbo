@@ -379,7 +379,7 @@ namespace turbo {
             arg_ref<Char> arg_id;
 
             constexpr int on_auto() {
-                TURBO_ASSERT(false, "handler cannot be used with automatic indexing");
+                TURBO_ASSERT(false&& "handler cannot be used with automatic indexing");
                 return 0;
             }
 

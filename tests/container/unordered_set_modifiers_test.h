@@ -21,7 +21,7 @@
 #include "hash_policy_testing.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace container_internal {
 
         template<class UnordSet>
@@ -217,7 +217,7 @@ namespace turbo {
                                     Erase, EraseRange, EraseKey, Swap);
 
     }  // namespace container_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_CONTAINER_INTERNAL_UNORDERED_SET_MODIFIERS_TEST_H_

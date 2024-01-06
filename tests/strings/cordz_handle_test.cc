@@ -24,7 +24,7 @@
 #include "turbo/times/time.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace cord_internal {
 namespace {
 
@@ -262,5 +262,5 @@ TEST(CordzHandleTest, MultiThreaded) {
 */
 }  // namespace
 }  // namespace cord_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

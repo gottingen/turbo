@@ -710,9 +710,6 @@ TEST(ThrowingValueTest, NonThrowingPlacementDelete) {
             static constexpr int kExceptionSentinel = 9999;
         };
 
-#ifndef TURBO_COMPILER_CPP17_ENABLED
-        constexpr int BasicGuaranteeWithExtraContracts::kExceptionSentinel;
-#endif
 
         TEST(ExceptionCheckTest, BasicGuaranteeWithExtraContracts) {
             auto tester_with_val =

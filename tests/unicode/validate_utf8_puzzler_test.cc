@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/utf.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "turbo/testing/test.h"
+
+#include "turbo/unicode/converter.h"
+#include "transcode_test_base.h"
 #include <cstddef>
 #include <cstdint>
 #include <random>
 #include <iostream>
 #include <iomanip>
-#include <tests/unicode/helpers/test.h>
+
 
 // This is an attempt at reproducing an issue with the utf8 fuzzer
-TEST(puzzler) {
+TEST_CASE("puzzler") {
   const char* bad64 = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
   size_t length = 64;
-  ASSERT_FALSE(implementation.validate_utf8(bad64, length));
+  REQUIRE_FALSE(turbo::validate_utf8(bad64, length));
 }
 
 
-int main(int argc, char* argv[]) {
-  return turbo::test::main(argc, argv);
-}

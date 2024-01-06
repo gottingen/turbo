@@ -70,7 +70,7 @@ FMT_END_NAMESPACE
 #  else
                                                                                                                         #    define FMT_THROW(x)               \
       do {                             \
-        TURBO_ASSERT(false, (x).what()); \
+        TURBO_ASSERT(false&&(x).what()); \
       } while (false)
 #  endif
 #endif
@@ -119,7 +119,7 @@ namespace turbo {
     namespace fmt_detail {
 
         constexpr inline void abort_fuzzing_if(bool condition) {
-            turbo::ignore_unused(condition);
+            TURBO_UNUSED(condition);
 #ifdef FMT_FUZZ
             if (condition) throw std::runtime_error("fuzzing limit reached");
 #endif
@@ -254,7 +254,7 @@ namespace turbo {
 
             friend auto operator*(const uint128_fallback &lhs, uint32_t rhs)
             -> uint128_fallback {
-                TURBO_ASSERT(lhs.hi_ == 0, "");
+                TURBO_ASSERT(lhs.hi_ == 0);
                 uint64_t hi = (lhs.lo_ >> 32) * rhs;
                 uint64_t lo = (lhs.lo_ & ~uint32_t()) * rhs;
                 uint64_t new_lo = (hi << 32) + lo;
@@ -285,7 +285,7 @@ namespace turbo {
             constexpr void operator+=(uint128_fallback n) {
                 uint64_t new_lo = lo_ + n.lo_;
                 uint64_t new_hi = hi_ + n.hi_ + (new_lo < lo_ ? 1 : 0);
-                TURBO_ASSERT(new_hi >= hi_, "");
+                TURBO_ASSERT(new_hi >= hi_);
                 lo_ = new_lo;
                 hi_ = new_hi;
             }
@@ -865,7 +865,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
     \endrst
    */
         auto operator=(basic_memory_buffer &&other) noexcept -> basic_memory_buffer & {
-            TURBO_ASSERT(this != &other, "");
+            TURBO_ASSERT(this != &other);
             deallocate();
             move(other);
             return *this;
@@ -1235,7 +1235,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         template<typename Char, typename UInt>
         TURBO_CONSTEXPR20 auto format_decimal(Char *out, UInt value, int size)
         -> format_decimal_result<Char *> {
-            TURBO_ASSERT(size >= count_digits(value), "invalid digit count");
+            TURBO_ASSERT(size >= count_digits(value)&&"invalid digit count");
             out += size;
             Char *end = out;
             while (value >= 100) {
@@ -1410,13 +1410,13 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 // Computes floor(log10(pow(2, e))) for e in [-2620, 2620] using the method from
 // https://fmt.dev/papers/Dragonbox.pdf#page=28, section 6.1.
             inline int floor_log10_pow2(int e) noexcept {
-                TURBO_ASSERT(e <= 2620 && e >= -2620, "too large exponent");
+                TURBO_ASSERT(e <= 2620 && e >= -2620&&"too large exponent");
                 static_assert((-1 >> 1) == -1, "right shift is not arithmetic");
                 return (e * 315653) >> 20;
             }
 
             inline int floor_log2_pow10(int e) noexcept {
-                TURBO_ASSERT(e <= 1233 && e >= -1233, "too large exponent");
+                TURBO_ASSERT(e <= 1233 && e >= -1233&&"too large exponent");
                 return (e * 1741647) >> 19;
             }
 
@@ -1534,7 +1534,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 // Writes the exponent exp in the form "[+-]d{2,3}" to buffer.
         template<typename Char, typename It>
         constexpr auto write_exponent(int exp, It it) -> It {
-            TURBO_ASSERT(-10000 < exp && exp < 10000, "exponent out of range");
+            TURBO_ASSERT(-10000 < exp && exp < 10000&&"exponent out of range");
             if (exp < 0) {
                 *it++ = static_cast<Char>('-');
                 exp = -exp;
@@ -1932,9 +1932,9 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                     c = static_cast<Char>('t');
                     break;
                 case '"':
-                    TURBO_FALLTHROUGH;
+                    [[fallthrough]];
                 case '\'':
-                    TURBO_FALLTHROUGH;
+                    [[fallthrough]];
                 case '\\':
                     *out++ = static_cast<Char>('\\');
                     break;
@@ -2434,27 +2434,27 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                     break;
                 case presentation_type::general_upper:
                     result.upper = true;
-                    TURBO_FALLTHROUGH;
+                    [[fallthrough]];
                 case presentation_type::general_lower:
                     result.format = float_format::general;
                     break;
                 case presentation_type::exp_upper:
                     result.upper = true;
-                    TURBO_FALLTHROUGH;
+                    [[fallthrough]];
                 case presentation_type::exp_lower:
                     result.format = float_format::exp;
                     result.showpoint |= specs.precision != 0;
                     break;
                 case presentation_type::fixed_upper:
                     result.upper = true;
-                    TURBO_FALLTHROUGH;
+                    [[fallthrough]];
                 case presentation_type::fixed_lower:
                     result.format = float_format::fixed;
                     result.showpoint |= specs.precision != 0;
                     break;
                 case presentation_type::hexfloat_upper:
                     result.upper = true;
-                    TURBO_FALLTHROUGH;
+                    [[fallthrough]];
                 case presentation_type::hexfloat_lower:
                     result.format = float_format::hex;
                     break;
@@ -2780,9 +2780,9 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
         constexpr inline round_direction get_round_direction(uint64_t divisor,
                                                              uint64_t remainder,
                                                              uint64_t error) {
-            TURBO_ASSERT(remainder < divisor, "");  // divisor - remainder won't overflow.
-            TURBO_ASSERT(error < divisor, "");      // divisor - error won't overflow.
-            TURBO_ASSERT(error < divisor - error, "");  // error * 2 won't overflow.
+            TURBO_ASSERT(remainder < divisor);  // divisor - remainder won't overflow.
+            TURBO_ASSERT(error < divisor);      // divisor - error won't overflow.
+            TURBO_ASSERT(error < divisor - error);  // error * 2 won't overflow.
             // Round down if (remainder + error) * 2 <= divisor.
             if (remainder <= divisor - remainder && error * 2 <= divisor - remainder * 2)
                 return round_direction::down;
@@ -2812,7 +2812,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             constexpr digits::result on_digit(char digit, uint64_t divisor,
                                               uint64_t remainder, uint64_t error,
                                               bool integral) {
-                TURBO_ASSERT(remainder < divisor, "");
+                TURBO_ASSERT(remainder < divisor);
                 buf[size++] = digit;
                 if (!integral && error >= remainder) return digits::error;
                 if (size < precision) return digits::more;
@@ -2822,7 +2822,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                     // and divisor > (1 << 32) there.
                     if (error >= divisor || error >= divisor - error) return digits::error;
                 } else {
-                    TURBO_ASSERT(error == 1 && divisor > 2, "");
+                    TURBO_ASSERT(error == 1 && divisor > 2);
                 }
                 auto dir = get_round_direction(divisor, remainder, error);
                 if (dir != round_direction::up)
@@ -2863,8 +2863,8 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             // zero because it contains a product of two 64-bit numbers with MSB set (due
             // to normalization) - 1, shifted right by at most 60 bits.
             auto integral = static_cast<uint32_t>(value.f >> -one.e);
-            TURBO_ASSERT(integral != 0, "");
-            TURBO_ASSERT(integral == value.f >> -one.e, "");
+            TURBO_ASSERT(integral != 0);
+            TURBO_ASSERT(integral == value.f >> -one.e);
             // The fractional part of scaled value (p2 in Grisu) c = value % one.
             uint64_t fractional = value.f & (one.f - 1);
             exp = count_digits(integral);  // kappa in Grisu.
@@ -2925,7 +2925,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                         integral = 0;
                         break;
                     default:
-                        TURBO_ASSERT(false, "invalid number of digits");
+                        TURBO_ASSERT(false&&"invalid number of digits");
                 }
                 --exp;
                 auto remainder = (static_cast<uint64_t>(integral) << -one.e) + fractional;
@@ -2984,8 +2984,8 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
 
             // Computes *this -= other assuming aligned bigints and *this >= other.
             TURBO_CONSTEXPR20 void subtract_aligned(const bigint &other) {
-                TURBO_ASSERT(other.exp_ >= exp_, "unaligned bigints");
-                TURBO_ASSERT(compare(*this, other) >= 0, "");
+                TURBO_ASSERT(other.exp_ >= exp_&&"unaligned bigints");
+                TURBO_ASSERT(compare(*this, other) >= 0);
                 bigit borrow = 0;
                 int i = other.exp_ - exp_;
                 for (size_t j = 0, n = other.bigits_.size(); j != n; ++i, ++j)
@@ -3057,7 +3057,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
 
             template<typename Int>
             TURBO_CONSTEXPR20 void operator=(Int n) {
-                TURBO_ASSERT(n > 0, "");
+                TURBO_ASSERT(n > 0);
                 assign(uint64_or_128_t<Int>(n));
             }
 
@@ -3066,7 +3066,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             }
 
             TURBO_NO_INLINE TURBO_CONSTEXPR20 bigint &operator<<=(int shift) {
-                TURBO_ASSERT(shift >= 0, "");
+                TURBO_ASSERT(shift >= 0);
                 exp_ += shift / bigit_bits;
                 shift %= bigit_bits;
                 if (shift == 0) return *this;
@@ -3082,7 +3082,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
 
             template<typename Int>
             TURBO_CONSTEXPR20 bigint &operator*=(Int value) {
-                TURBO_ASSERT(value > 0, "");
+                TURBO_ASSERT(value > 0);
                 multiply(uint32_or_64_or_128_t<Int>(value));
                 return *this;
             }
@@ -3131,7 +3131,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
 
             // Assigns pow(10, exp) to this bigint.
             TURBO_CONSTEXPR20 void assign_pow10(int exp) {
-                TURBO_ASSERT(exp >= 0, "");
+                TURBO_ASSERT(exp >= 0);
                 if (exp == 0) return *this = 1;
                 // Find the top bit.
                 int bitmask = 1;
@@ -3193,9 +3193,9 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             // Divides this bignum by divisor, assigning the remainder to this and
             // returning the quotient.
             TURBO_CONSTEXPR20 int divmod_assign(const bigint &divisor) {
-                TURBO_ASSERT(this != &divisor, "");
+                TURBO_ASSERT(this != &divisor);
                 if (compare(*this, divisor) < 0) return 0;
-                TURBO_ASSERT(divisor.bigits_[divisor.bigits_.size() - 1u] != 0, "");
+                TURBO_ASSERT(divisor.bigits_[divisor.bigits_.size() - 1u] != 0);
                 align(divisor);
                 int quotient = 0;
                 do {
@@ -3436,7 +3436,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                                             buffer<char> &buf) -> int {
             // float is passed as double to reduce the number of instantiations.
             static_assert(!std::is_same<Float, float>::value, "");
-            TURBO_ASSERT(value >= 0, "value is negative");
+            TURBO_ASSERT(value >= 0&& "value is negative");
             auto converted_value = convert_float(value);
 
             const bool fixed = specs.format == float_format::fixed;
@@ -3511,10 +3511,9 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                     significand <<= 1;
                 } else {
                     // Normalize subnormal inputs.
-                    TURBO_ASSERT(significand != 0, "zeros should not appear hear");
+                    TURBO_ASSERT(significand != 0&&"zeros should not appear hear");
                     int shift = countl_zero(significand);
-                    TURBO_ASSERT(shift >= num_bits<uint64_t>() - num_significand_bits<double>(),
-                                 "");
+                    TURBO_ASSERT(shift >= num_bits<uint64_t>() - num_significand_bits<double>());
                     shift -= (num_bits<uint64_t>() - num_significand_bits<double>() - 2);
                     exponent = (std::numeric_limits<double>::min_exponent -
                                 num_significand_bits<double>()) -
@@ -3853,7 +3852,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
         template<typename Char, typename OutputIt>
         auto write(OutputIt out, monostate, format_specs<Char> = {}, locale_ref = {})
         -> OutputIt {
-            TURBO_ASSERT(false, "");
+            TURBO_ASSERT(false);
             return out;
         }
 

@@ -120,71 +120,6 @@
 #define TURBO_INTERNAL_DO_TOKEN_STR(x) #x
 #define TURBO_INTERNAL_TOKEN_STR(x) TURBO_INTERNAL_DO_TOKEN_STR(x)
 
-// -----------------------------------------------------------------------------
-// Turbo namespace annotations
-// -----------------------------------------------------------------------------
-
-// TURBO_NAMESPACE_BEGIN/TURBO_NAMESPACE_END
-//
-// An annotation placed at the beginning/end of each `namespace turbo` scope.
-// This is used to inject an inline namespace.
-//
-// The proper way to write Turbo code in the `turbo` namespace is:
-//
-// namespace turbo {
-// TURBO_NAMESPACE_BEGIN
-//
-// void Foo();  // turbo::Foo().
-//
-// TURBO_NAMESPACE_END
-// }  // namespace turbo
-//
-// Users of Turbo should not use these macros, because users of Turbo should
-// not write `namespace turbo {` in their own code for any reason.  (Turbo does
-// not support forward declarations of its own types, nor does it support
-// user-provided specialization of Turbo templates.  Code that violates these
-// rules may be broken without warning.)
-#if !defined(TURBO_OPTION_USE_INLINE_NAMESPACE) || \
-    !defined(TURBO_OPTION_INLINE_NAMESPACE_NAME)
-#error options.h is misconfigured.
-#endif
-
-// Check that TURBO_OPTION_INLINE_NAMESPACE_NAME is neither "head" nor ""
-#if defined(__cplusplus) && TURBO_OPTION_USE_INLINE_NAMESPACE == 1
-
-#define TURBO_INTERNAL_INLINE_NAMESPACE_STR \
-  TURBO_INTERNAL_TOKEN_STR(TURBO_OPTION_INLINE_NAMESPACE_NAME)
-
-static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != '\0',
-              "options.h misconfigured: TURBO_OPTION_INLINE_NAMESPACE_NAME must "
-              "not be empty.");
-static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
-                  TURBO_INTERNAL_INLINE_NAMESPACE_STR[1] != 'e' ||
-                  TURBO_INTERNAL_INLINE_NAMESPACE_STR[2] != 'a' ||
-                  TURBO_INTERNAL_INLINE_NAMESPACE_STR[3] != 'd' ||
-                  TURBO_INTERNAL_INLINE_NAMESPACE_STR[4] != '\0',
-              "options.h misconfigured: TURBO_OPTION_INLINE_NAMESPACE_NAME must "
-              "be changed to a new, unique identifier name.");
-
-#endif
-
-#if TURBO_OPTION_USE_INLINE_NAMESPACE == 0
-#define TURBO_NAMESPACE_BEGIN
-#define TURBO_NAMESPACE_END
-#define TURBO_INTERNAL_C_SYMBOL(x) x
-#elif TURBO_OPTION_USE_INLINE_NAMESPACE == 1
-#define TURBO_NAMESPACE_BEGIN \
-  inline namespace TURBO_OPTION_INLINE_NAMESPACE_NAME {
-#define TURBO_NAMESPACE_END }
-#define TURBO_INTERNAL_C_SYMBOL_HELPER_2(x, v) x##_##v
-#define TURBO_INTERNAL_C_SYMBOL_HELPER_1(x, v) \
-  TURBO_INTERNAL_C_SYMBOL_HELPER_2(x, v)
-#define TURBO_INTERNAL_C_SYMBOL(x) \
-  TURBO_INTERNAL_C_SYMBOL_HELPER_1(x, TURBO_OPTION_INLINE_NAMESPACE_NAME)
-#else
-#error options.h is misconfigured.
-#endif
-
 // TURBO_IS_LITTLE_ENDIAN
 // TURBO_IS_BIG_ENDIAN
 //
@@ -351,14 +286,14 @@ static_assert(TURBO_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
   (sizeof(::turbo::macros_internal::ArraySizeHelper(array)))
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace macros_internal {
 // Note: this internal template function declaration is used by TURBO_ARRAY_SIZE.
 // The function doesn't need a definition, as we only use its type.
 template <typename T, size_t N>
 auto ArraySizeHelper(const T (&array)[N]) -> char (&)[N];
 }  // namespace macros_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_PALTFORM_CONFIG_H_

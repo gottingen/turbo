@@ -212,3 +212,75 @@ carbin_cc_test(
         turbo::turbo
 )
 
+carbin_cc_test(
+        NAME
+        sysinfo_test
+        SOURCES
+        "sysinfo_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        processor_test
+        SOURCES
+        "processor_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        endpoint_test
+        SOURCES
+        "endpoint_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        "-fno-access-control"
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        uuid_test
+        SOURCES
+        "uuid_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        math_test
+        SOURCES
+        "math_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        env_test
+        SOURCES
+        "env_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)

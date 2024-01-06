@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/utf.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "turbo/testing/test.h"
+
+#include "turbo/unicode/converter.h"
+#include "transcode_test_base.h"
 
 #ifndef TURBO_IS_BIG_ENDIAN
 #error "TURBO_IS_BIG_ENDIAN should be defined."
@@ -22,73 +27,73 @@
 #include <algorithm>
 
 #include "turbo/random/random.h"
-#include <tests/unicode/helpers/test.h>
+
 #include <fstream>
 #include <iostream>
 #include <memory>
 
-TEST(validate_utf16be__returns_true_for_valid_input__single_words) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16be__returns_true_for_valid_input__single_words") {
+
   turbo::Utf16Generator generator{1, 0};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512)};
     std::vector<char16_t> flipped(utf16.size());
-    implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
+    turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-    turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-    ASSERT_EQUAL(res.count, utf16.size());
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
+    REQUIRE_EQ(res.count, utf16.size());
   }
 }
 
-TEST(validate_utf16be__returns_true_for_valid_input__surrogate_pairs_short) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16be__returns_true_for_valid_input__surrogate_pairs_short") {
+
   turbo::Utf16Generator generator{0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(8)};
     std::vector<char16_t> flipped(utf16.size());
-    implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
+    turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-    turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-    ASSERT_EQUAL(res.count, utf16.size());
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
+    REQUIRE_EQ(res.count, utf16.size());
   }
 }
 
 
-TEST(validate_utf16be__returns_true_for_valid_input__surrogate_pairs) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16be__returns_true_for_valid_input__surrogate_pairs") {
+
   turbo::Utf16Generator generator{0, 1};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf16{generator.generate(512)};
     std::vector<char16_t> flipped(utf16.size());
-    implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
+    turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-    turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-    ASSERT_EQUAL(res.count, utf16.size());
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
+    REQUIRE_EQ(res.count, utf16.size());
   }
 }
 
 // mixed = either 16-bit or 32-bit codewords
-TEST(validate_utf16be__returns_true_for_valid_input__mixed) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16be__returns_true_for_valid_input__mixed") {
+
   turbo::Utf16Generator generator{1, 1};
   const auto utf16{generator.generate(512)};
   std::vector<char16_t> flipped(utf16.size());
-  implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
+  turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-  turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-  ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-  ASSERT_EQUAL(res.count, utf16.size());
+  turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+  REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
+  REQUIRE_EQ(res.count, utf16.size());
 }
 
-TEST(validate_utf16be__returns_true_for_empty_string) {
+TEST_CASE("validate_utf16be__returns_true_for_empty_string") {
   const char16_t* buf = (const char16_t*)"";
 
-  turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
-  ASSERT_EQUAL(res.error, turbo::error_code::SUCCESS);
-  ASSERT_EQUAL(res.count, 0);
+  turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
+  REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
+  REQUIRE_EQ(res.count, 0);
 }
 
 // The first word must not be in range [0xDC00 .. 0xDFFF]
@@ -106,24 +111,24 @@ TEST(validate_utf16be__returns_true_for_empty_string) {
 #if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
-TEST(validate_utf16be__returns_false_when_input_has_wrong_first_word_value) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16be__returns_false_when_input_has_wrong_first_word_value") {
+
   turbo::Utf16Generator generator{1, 0};
   for(size_t trial = 0; trial < 10; trial++) {
     auto utf16{generator.generate(128)};
     const size_t len = utf16.size();
 
     std::vector<char16_t> flipped(len);
-    implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
+    turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
     for (char16_t wrong_value = 0xdc00; wrong_value <= 0xdfff; wrong_value++) {
       for (size_t i=0; i < utf16.size(); i++) {
         const char16_t old = flipped[i];
         flipped[i] = char16_t((wrong_value >> 8) | (wrong_value << 8));
 
-        turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-        ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
-        ASSERT_EQUAL(res.count, i);
+        turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
+        REQUIRE_EQ(res.count, i);
 
         flipped[i] = old;
       }
@@ -141,14 +146,14 @@ TEST(validate_utf16be__returns_false_when_input_has_wrong_first_word_value) {
 #if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
-TEST(validate_utf16be__returns_false_when_input_has_wrong_second_word_value) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf16be__returns_false_when_input_has_wrong_second_word_value") {
+
   turbo::Utf16Generator generator{1, 0};
   auto utf16{generator.generate(128)};
   const size_t len = utf16.size();
 
   std::vector<char16_t> flipped(len);
-  implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
+  turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
   const std::array<char16_t, 5> sample_wrong_second_word{
     0x0000, 0x0010, 0xffdb, 0x00e0, 0xffff
@@ -163,9 +168,9 @@ TEST(validate_utf16be__returns_false_when_input_has_wrong_second_word_value) {
       flipped[i + 0] = valid_surrogate_W1;
       flipped[i + 1] = W2;
 
-      turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-      ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
-      ASSERT_EQUAL(res.count, i);
+      turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
+      REQUIRE_EQ(res.count, i);
 
       flipped[i + 0] = old_W1;
       flipped[i + 1] = old_W2;
@@ -183,26 +188,23 @@ TEST(validate_utf16be__returns_false_when_input_has_wrong_second_word_value) {
 #if TURBO_IS_BIG_ENDIAN
 // todo: port this test for big-endian platforms.
 #else
-TEST(validate_utf16be__returns_false_when_input_is_truncated) {
+TEST_CASE("validate_utf16be__returns_false_when_input_is_truncated") {
   const char16_t valid_surrogate_W1 = 0x00d8;
-  uint32_t seed{1234};
+
   turbo::Utf16Generator generator{1, 0};
   for (size_t size = 1; size < 128; size++) {
     auto utf16{generator.generate(128)};
     const size_t len = utf16.size();
 
     std::vector<char16_t> flipped(len);
-    implementation.change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
+    turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
     flipped[size - 1] = valid_surrogate_W1;
 
-    turbo::result res = implementation.validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    ASSERT_EQUAL(res.error, turbo::error_code::SURROGATE);
-    ASSERT_EQUAL(res.count, size - 1);
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
+    REQUIRE_EQ(res.count, size - 1);
   }
 }
 #endif
 
-int main(int argc, char* argv[]) {
-  return turbo::test::main(argc, argv);
-}

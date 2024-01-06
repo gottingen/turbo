@@ -25,70 +25,66 @@
 #include "turbo/meta/type_traits.h"
 #include "turbo/meta/utility.h"
 
-namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    namespace functional_internal {
+namespace turbo::functional_internal {
 
-        // Invoke the method, expanding the tuple of bound arguments.
-        template<class R, class Tuple, size_t... Idx, class... Args>
-        R Apply(Tuple &&bound, std::index_sequence<Idx...>, Args &&... free) {
-            return std::invoke(
-                    std::forward<Tuple>(bound).template get<Idx>()...,
-                    std::forward<Args>(free)...);
+    // Invoke the method, expanding the tuple of bound arguments.
+    template<class R, class Tuple, size_t... Idx, class... Args>
+    R Apply(Tuple &&bound, std::index_sequence<Idx...>, Args &&... free) {
+        return std::invoke(
+                std::forward<Tuple>(bound).template get<Idx>()...,
+                std::forward<Args>(free)...);
+    }
+
+    template<class F, class... BoundArgs>
+    class FrontBinder {
+        using BoundArgsT = turbo::container_internal::CompressedTuple<F, BoundArgs...>;
+        using Idx = std::make_index_sequence<sizeof...(BoundArgs) + 1>;
+
+        BoundArgsT bound_args_;
+
+    public:
+        template<class... Ts>
+        constexpr explicit FrontBinder(std::in_place_t, Ts &&... ts)
+                : bound_args_(std::forward<Ts>(ts)...) {}
+
+        template<class... FreeArgs, class R = std::invoke_result_t<
+                F &, BoundArgs &..., FreeArgs &&...>>
+        R operator()(FreeArgs &&... free_args) &{
+            return functional_internal::Apply<R>(bound_args_, Idx(),
+                                                 std::forward<FreeArgs>(free_args)...);
         }
 
-        template<class F, class... BoundArgs>
-        class FrontBinder {
-            using BoundArgsT = turbo::container_internal::CompressedTuple<F, BoundArgs...>;
-            using Idx = std::make_index_sequence<sizeof...(BoundArgs) + 1>;
+        template<class... FreeArgs,
+                class R = std::invoke_result_t<
+                        const F &, const BoundArgs &..., FreeArgs &&...>>
+        R operator()(FreeArgs &&... free_args) const &{
+            return functional_internal::Apply<R>(bound_args_, Idx(),
+                                                 std::forward<FreeArgs>(free_args)...);
+        }
 
-            BoundArgsT bound_args_;
+        template<class... FreeArgs, class R = std::invoke_result_t<
+                F &&, BoundArgs &&..., FreeArgs &&...>>
+        R operator()(FreeArgs &&... free_args) &&{
+            // This overload is called when *this is an rvalue. If some of the bound
+            // arguments are stored by value or rvalue reference, we move them.
+            return functional_internal::Apply<R>(std::move(bound_args_), Idx(),
+                                                 std::forward<FreeArgs>(free_args)...);
+        }
 
-        public:
-            template<class... Ts>
-            constexpr explicit FrontBinder(std::in_place_t, Ts &&... ts)
-                    : bound_args_(std::forward<Ts>(ts)...) {}
+        template<class... FreeArgs,
+                class R = std::invoke_result_t<
+                        const F &&, const BoundArgs &&..., FreeArgs &&...>>
+        R operator()(FreeArgs &&... free_args) const &&{
+            // This overload is called when *this is an rvalue. If some of the bound
+            // arguments are stored by value or rvalue reference, we move them.
+            return functional_internal::Apply<R>(std::move(bound_args_), Idx(),
+                                                 std::forward<FreeArgs>(free_args)...);
+        }
+    };
 
-            template<class... FreeArgs, class R = std::invoke_result_t<
-                    F &, BoundArgs &..., FreeArgs &&...>>
-            R operator()(FreeArgs &&... free_args) &{
-                return functional_internal::Apply<R>(bound_args_, Idx(),
-                                                     std::forward<FreeArgs>(free_args)...);
-            }
+    template<class F, class... BoundArgs>
+    using bind_front_t = FrontBinder<std::decay_t<F>, std::decay_t<BoundArgs>...>;
 
-            template<class... FreeArgs,
-                    class R = std::invoke_result_t<
-                            const F &, const BoundArgs &..., FreeArgs &&...>>
-            R operator()(FreeArgs &&... free_args) const &{
-                return functional_internal::Apply<R>(bound_args_, Idx(),
-                                                     std::forward<FreeArgs>(free_args)...);
-            }
-
-            template<class... FreeArgs, class R = std::invoke_result_t<
-                    F &&, BoundArgs &&..., FreeArgs &&...>>
-            R operator()(FreeArgs &&... free_args) &&{
-                // This overload is called when *this is an rvalue. If some of the bound
-                // arguments are stored by value or rvalue reference, we move them.
-                return functional_internal::Apply<R>(std::move(bound_args_), Idx(),
-                                                     std::forward<FreeArgs>(free_args)...);
-            }
-
-            template<class... FreeArgs,
-                    class R = std::invoke_result_t<
-                            const F &&, const BoundArgs &&..., FreeArgs &&...>>
-            R operator()(FreeArgs &&... free_args) const &&{
-                // This overload is called when *this is an rvalue. If some of the bound
-                // arguments are stored by value or rvalue reference, we move them.
-                return functional_internal::Apply<R>(std::move(bound_args_), Idx(),
-                                                     std::forward<FreeArgs>(free_args)...);
-            }
-        };
-
-        template<class F, class... BoundArgs>
-        using bind_front_t = FrontBinder<std::decay_t < F>, std::decay_t<BoundArgs>...>;
-
-    }  // namespace functional_internal
-    TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::functional_internal
 
 #endif  // TURBO_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_

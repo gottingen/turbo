@@ -23,7 +23,7 @@
 #include "turbo/testing/test.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace {
 
         template<int N>
@@ -113,5 +113,5 @@ namespace turbo {
             }
         }
     }  // namespace
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

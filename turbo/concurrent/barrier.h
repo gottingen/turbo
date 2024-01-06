@@ -22,7 +22,6 @@
 #include "turbo/platform/thread_annotations.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
     // Barrier
     //
@@ -73,6 +72,5 @@ TURBO_NAMESPACE_BEGIN
         int num_to_block_ TURBO_GUARDED_BY(lock_);
         int num_to_exit_ TURBO_GUARDED_BY(lock_);
     };
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 #endif  // TURBO_CONCURRENT_BARRIER_H_

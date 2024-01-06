@@ -19,7 +19,7 @@
 #include "tests/random/distribution_test_util.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace random_internal {
 namespace {
 
@@ -229,5 +229,5 @@ double ChiSquarePValue(double chi_square, int dof) {
 }
 
 }  // namespace random_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

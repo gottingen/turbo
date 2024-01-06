@@ -16,7 +16,7 @@
 #include "benchmark/benchmark.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace profiling_internal {
 namespace {
 
@@ -75,5 +75,5 @@ BENCHMARK(BM_PeriodicSampler_Disabled);
 
 }  // namespace
 }  // namespace profiling_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

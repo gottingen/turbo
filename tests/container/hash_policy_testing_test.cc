@@ -16,30 +16,26 @@
 
 #include "gtest/gtest.h"
 
-namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-    namespace container_internal {
-        namespace {
+namespace turbo::container_internal {
+    namespace {
 
-            TEST(_, Hash) {
-                StatefulTestingHash h1;
-                EXPECT_EQ(1, h1.id());
-                StatefulTestingHash h2;
-                EXPECT_EQ(2, h2.id());
-                StatefulTestingHash h1c(h1);
-                EXPECT_EQ(1, h1c.id());
-                StatefulTestingHash h2m(std::move(h2));
-                EXPECT_EQ(2, h2m.id());
-                EXPECT_EQ(0, h2.id());
-                StatefulTestingHash h3;
-                EXPECT_EQ(3, h3.id());
-                h3 = StatefulTestingHash();
-                EXPECT_EQ(4, h3.id());
-                h3 = std::move(h1);
-                EXPECT_EQ(1, h3.id());
-            }
+        TEST(_, Hash) {
+            StatefulTestingHash h1;
+            EXPECT_EQ(1, h1.id());
+            StatefulTestingHash h2;
+            EXPECT_EQ(2, h2.id());
+            StatefulTestingHash h1c(h1);
+            EXPECT_EQ(1, h1c.id());
+            StatefulTestingHash h2m(std::move(h2));
+            EXPECT_EQ(2, h2m.id());
+            EXPECT_EQ(0, h2.id());
+            StatefulTestingHash h3;
+            EXPECT_EQ(3, h3.id());
+            h3 = StatefulTestingHash();
+            EXPECT_EQ(4, h3.id());
+            h3 = std::move(h1);
+            EXPECT_EQ(1, h3.id());
+        }
 
-        }  // namespace
-    }  // namespace container_internal
-    TURBO_NAMESPACE_END
-}  // namespace turbo
+    }  // namespace
+}  // namespace turbo::container_internal

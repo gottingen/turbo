@@ -1777,6 +1777,32 @@ namespace turbo::simd {
     }
 
     /**
+     * @ingroup batch_data_transfer
+     * @brief bitwise_rshift shifts each batch element to the right by \c n bits.
+     * @param x batch of integer values.
+     * @param n number of bits to shift.
+     * @return shifted batch.
+     */
+    template<class T, class A>
+    inline batch<T, A> bitwise_rshift(batch<T, A> const &x, int32_t n) noexcept {
+        detail::static_check_supported_config<T, A>();
+        return kernel::bitwise_rshift<A>(x, n, A{});
+    }
+
+    /**
+     * @ingroup batch_data_transfer
+     * @brief bitwise_lshift shifts each batch element to the left by \c n bits.
+     * @param x batch of integer values.
+     * @param n number of bits to shift.
+     * @return shifted batch.
+     */
+    template<class T, class A>
+    inline batch<T, A> bitwise_lshift(batch<T, A> const &x, int32_t n) noexcept {
+        detail::static_check_supported_config<T, A>();
+        return kernel::bitwise_lshift<A>(x, n, A{});
+    }
+
+    /**
      * @ingroup batch_math
      *
      * Computes the square root of the batch \c x.

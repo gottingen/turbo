@@ -16,16 +16,11 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace container_internal {
+namespace turbo::container_internal {
 
-// See hashtablez_sampler.h for details.
-extern "C" TURBO_WEAK bool TURBO_INTERNAL_C_SYMBOL(
-    TurboContainerInternalSampleEverything)() {
-  return false;
-}
+    // See hashtablez_sampler.h for details.
+    extern "C" TURBO_WEAK bool TurboContainerInternalSampleEverything() {
+        return false;
+    }
 
-}  // namespace container_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::container_internal

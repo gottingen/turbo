@@ -30,7 +30,7 @@
 #include "gtest/gtest.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace cord_internal {
 namespace {
 
@@ -289,5 +289,5 @@ TEST(CordRepBtreeReaderTest, ReadExhaustive) {
 
 }  // namespace
 }  // namespace cord_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

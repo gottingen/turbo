@@ -33,7 +33,6 @@
 #include "turbo/strings/internal/escaping.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     /**
      * @brief c_decode unescapes a `source` string and copies it into `dest`, rewriting C-style
@@ -254,7 +253,6 @@ namespace turbo {
         return result;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_ESCAPING_H_

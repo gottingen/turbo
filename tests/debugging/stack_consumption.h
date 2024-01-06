@@ -30,7 +30,7 @@
 #define TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION 1
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace debugging_internal {
 
 // Returns the stack consumption in bytes for the code exercised by
@@ -42,7 +42,7 @@ namespace debugging_internal {
 int GetSignalHandlerStackConsumption(void (*signal_handler)(int));
 
 }  // namespace debugging_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION

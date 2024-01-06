@@ -28,7 +28,7 @@
 #include <variant>
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
 
     // Run the turbo::Hash algorithm over all the elements passed in and verify that
     // their hash expansion is congruent with their `==` operator.
@@ -378,7 +378,7 @@ namespace turbo {
                 equals);
     }
 
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_HASH_HASH_TESTING_H_

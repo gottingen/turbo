@@ -21,7 +21,6 @@
 #include "turbo/testing/test.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace strings_internal {
 
         TEST_CASE("BigUnsigned, ShiftLeft") {
@@ -258,5 +257,4 @@ namespace turbo {
 
 
     }  // namespace strings_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo

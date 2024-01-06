@@ -31,114 +31,113 @@
 #include "turbo/times/clock.h"
 #include "turbo/times/time.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace cord_internal {
-namespace {
+namespace turbo::cord_internal {
 
-using ::testing::ElementsAre;
-using ::testing::Eq;
-using ::testing::Ne;
+    namespace {
+
+        using ::testing::ElementsAre;
+        using ::testing::Eq;
+        using ::testing::Ne;
 
 // Used test values
-auto constexpr kTrackCordMethod = CordzUpdateTracker::kConstructorString;
+        auto constexpr kTrackCordMethod = CordzUpdateTracker::kConstructorString;
 
-TEST(CordzSampleTokenTest, IteratorTraits) {
-  static_assert(std::is_copy_constructible<CordzSampleToken::Iterator>::value,
-                "");
-  static_assert(std::is_copy_assignable<CordzSampleToken::Iterator>::value, "");
-  static_assert(std::is_move_constructible<CordzSampleToken::Iterator>::value,
-                "");
-  static_assert(std::is_move_assignable<CordzSampleToken::Iterator>::value, "");
-  static_assert(
-      std::is_same<
-          std::iterator_traits<CordzSampleToken::Iterator>::iterator_category,
-          std::input_iterator_tag>::value,
-      "");
-  static_assert(
-      std::is_same<std::iterator_traits<CordzSampleToken::Iterator>::value_type,
-                   const CordzInfo&>::value,
-      "");
-  static_assert(
-      std::is_same<
-          std::iterator_traits<CordzSampleToken::Iterator>::difference_type,
-          ptrdiff_t>::value,
-      "");
-  static_assert(
-      std::is_same<std::iterator_traits<CordzSampleToken::Iterator>::pointer,
-                   const CordzInfo*>::value,
-      "");
-  static_assert(
-      std::is_same<std::iterator_traits<CordzSampleToken::Iterator>::reference,
-                   const CordzInfo&>::value,
-      "");
-}
+        TEST(CordzSampleTokenTest, IteratorTraits) {
+            static_assert(std::is_copy_constructible<CordzSampleToken::Iterator>::value,
+                          "");
+            static_assert(std::is_copy_assignable<CordzSampleToken::Iterator>::value, "");
+            static_assert(std::is_move_constructible<CordzSampleToken::Iterator>::value,
+                          "");
+            static_assert(std::is_move_assignable<CordzSampleToken::Iterator>::value, "");
+            static_assert(
+                    std::is_same<
+                            std::iterator_traits<CordzSampleToken::Iterator>::iterator_category,
+                            std::input_iterator_tag>::value,
+                    "");
+            static_assert(
+                    std::is_same<std::iterator_traits<CordzSampleToken::Iterator>::value_type,
+                            const CordzInfo &>::value,
+                    "");
+            static_assert(
+                    std::is_same<
+                            std::iterator_traits<CordzSampleToken::Iterator>::difference_type,
+                            ptrdiff_t>::value,
+                    "");
+            static_assert(
+                    std::is_same<std::iterator_traits<CordzSampleToken::Iterator>::pointer,
+                            const CordzInfo *>::value,
+                    "");
+            static_assert(
+                    std::is_same<std::iterator_traits<CordzSampleToken::Iterator>::reference,
+                            const CordzInfo &>::value,
+                    "");
+        }
 
-TEST(CordzSampleTokenTest, IteratorEmpty) {
-  CordzSampleToken token;
-  EXPECT_THAT(token.begin(), Eq(token.end()));
-}
+        TEST(CordzSampleTokenTest, IteratorEmpty) {
+            CordzSampleToken token;
+            EXPECT_THAT(token.begin(), Eq(token.end()));
+        }
 
-TEST(CordzSampleTokenTest, Iterator) {
-  TestCordData cord1, cord2, cord3;
-  CordzInfo::TrackCord(cord1.data, kTrackCordMethod);
-  CordzInfo* info1 = cord1.data.cordz_info();
-  CordzInfo::TrackCord(cord2.data, kTrackCordMethod);
-  CordzInfo* info2 = cord2.data.cordz_info();
-  CordzInfo::TrackCord(cord3.data, kTrackCordMethod);
-  CordzInfo* info3 = cord3.data.cordz_info();
+        TEST(CordzSampleTokenTest, Iterator) {
+            TestCordData cord1, cord2, cord3;
+            CordzInfo::TrackCord(cord1.data, kTrackCordMethod);
+            CordzInfo *info1 = cord1.data.cordz_info();
+            CordzInfo::TrackCord(cord2.data, kTrackCordMethod);
+            CordzInfo *info2 = cord2.data.cordz_info();
+            CordzInfo::TrackCord(cord3.data, kTrackCordMethod);
+            CordzInfo *info3 = cord3.data.cordz_info();
 
-  CordzSampleToken token;
-  std::vector<const CordzInfo*> found;
-  for (const CordzInfo& cord_info : token) {
-    found.push_back(&cord_info);
-  }
+            CordzSampleToken token;
+            std::vector<const CordzInfo *> found;
+            for (const CordzInfo &cord_info: token) {
+                found.push_back(&cord_info);
+            }
 
-  EXPECT_THAT(found, ElementsAre(info3, info2, info1));
+            EXPECT_THAT(found, ElementsAre(info3, info2, info1));
 
-  info1->Untrack();
-  info2->Untrack();
-  info3->Untrack();
-}
+            info1->Untrack();
+            info2->Untrack();
+            info3->Untrack();
+        }
 
-TEST(CordzSampleTokenTest, IteratorEquality) {
-  TestCordData cord1;
-  TestCordData cord2;
-  TestCordData cord3;
-  CordzInfo::TrackCord(cord1.data, kTrackCordMethod);
-  CordzInfo* info1 = cord1.data.cordz_info();
+        TEST(CordzSampleTokenTest, IteratorEquality) {
+            TestCordData cord1;
+            TestCordData cord2;
+            TestCordData cord3;
+            CordzInfo::TrackCord(cord1.data, kTrackCordMethod);
+            CordzInfo *info1 = cord1.data.cordz_info();
 
-  CordzSampleToken token1;
-  // lhs starts with the CordzInfo corresponding to cord1 at the head.
-  CordzSampleToken::Iterator lhs = token1.begin();
+            CordzSampleToken token1;
+            // lhs starts with the CordzInfo corresponding to cord1 at the head.
+            CordzSampleToken::Iterator lhs = token1.begin();
 
-  CordzInfo::TrackCord(cord2.data, kTrackCordMethod);
-  CordzInfo* info2 = cord2.data.cordz_info();
+            CordzInfo::TrackCord(cord2.data, kTrackCordMethod);
+            CordzInfo *info2 = cord2.data.cordz_info();
 
-  CordzSampleToken token2;
-  // rhs starts with the CordzInfo corresponding to cord2 at the head.
-  CordzSampleToken::Iterator rhs = token2.begin();
+            CordzSampleToken token2;
+            // rhs starts with the CordzInfo corresponding to cord2 at the head.
+            CordzSampleToken::Iterator rhs = token2.begin();
 
-  CordzInfo::TrackCord(cord3.data, kTrackCordMethod);
-  CordzInfo* info3 = cord3.data.cordz_info();
+            CordzInfo::TrackCord(cord3.data, kTrackCordMethod);
+            CordzInfo *info3 = cord3.data.cordz_info();
 
-  // lhs is on cord1 while rhs is on cord2.
-  EXPECT_THAT(lhs, Ne(rhs));
+            // lhs is on cord1 while rhs is on cord2.
+            EXPECT_THAT(lhs, Ne(rhs));
 
-  rhs++;
-  // lhs and rhs are both on cord1, but they didn't come from the same
-  // CordzSampleToken.
-  EXPECT_THAT(lhs, Ne(rhs));
+            rhs++;
+            // lhs and rhs are both on cord1, but they didn't come from the same
+            // CordzSampleToken.
+            EXPECT_THAT(lhs, Ne(rhs));
 
-  lhs++;
-  rhs++;
-  // Both lhs and rhs are done, so they are on nullptr.
-  EXPECT_THAT(lhs, Eq(rhs));
+            lhs++;
+            rhs++;
+            // Both lhs and rhs are done, so they are on nullptr.
+            EXPECT_THAT(lhs, Eq(rhs));
 
-  info1->Untrack();
-  info2->Untrack();
-  info3->Untrack();
-}
+            info1->Untrack();
+            info2->Untrack();
+            info3->Untrack();
+        }
 
 /*
 TEST(CordzSampleTokenTest, MultiThreaded) {
@@ -203,7 +202,5 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   stop.Notify();
 }
 */
-}  // namespace
-}  // namespace cord_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    }  // namespace
+}  // namespace turbo::cord_internal

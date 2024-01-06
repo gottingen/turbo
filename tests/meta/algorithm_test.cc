@@ -193,7 +193,36 @@ namespace {
 
         std::list<int> l{0, 1, 2, 3, 4};
         CHECK_EQ(*turbo::rotate(l.begin(), std::next(l.begin(), 3), l.end()), 0);
-        CHECK_EQ(l,  std::list<int>{3, 4, 0, 1, 2});
+        CHECK_EQ(l, std::list<int>{3, 4, 0, 1, 2});
+    }
+
+    // --------------------------------------------------------
+    // Testcase: distance
+    // --------------------------------------------------------
+    TEST_CASE("distance.integral" * doctest::timeout(300)) {
+
+        auto count = [](int beg, int end, int step) {
+            size_t c = 0;
+            for (int i = beg; step > 0 ? i < end : i > end; i += step) {
+                ++c;
+            }
+            return c;
+        };
+
+        for (int beg = -50; beg <= 50; ++beg) {
+            for (int end = -50; end <= 50; ++end) {
+                if (beg < end) {   // positive step
+                    for (int s = 1; s <= 50; s++) {
+                        REQUIRE((turbo::distance(beg, end, s) == count(beg, end, s)));
+                    }
+                } else {            // negative step
+                    for (int s = -1; s >= -50; s--) {
+                        REQUIRE((turbo::distance(beg, end, s) == count(beg, end, s)));
+                    }
+                }
+            }
+        }
+
     }
 
 }  // namespace

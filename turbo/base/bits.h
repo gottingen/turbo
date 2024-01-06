@@ -47,7 +47,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
 #if !(defined(__cpp_lib_bitops) && __cpp_lib_bitops >= 201907L)
 
@@ -179,7 +178,6 @@ namespace turbo {
 
 #endif
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_BASE_BITS_H_

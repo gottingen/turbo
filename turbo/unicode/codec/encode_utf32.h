@@ -19,7 +19,7 @@
 namespace turbo::unicode::utf32 {
 
     // returns whether the value can be represented in the UTF-32
-    bool valid_value(uint32_t value) {
+    inline bool valid_value(uint32_t value) {
 
         if (value > 0x10FFFF)
             return false;
@@ -34,7 +34,7 @@ namespace turbo::unicode::utf32 {
     // Returns 1 if the value can be encoded
     // Returns 0 if the value cannot be encoded
     template<typename CONSUMER>
-    int encode(uint32_t value, CONSUMER consumer) {
+    inline int encode(uint32_t value, CONSUMER consumer) {
         if (!valid_value(value))
             return 0;
 

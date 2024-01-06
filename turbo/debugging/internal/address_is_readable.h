@@ -17,16 +17,12 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace debugging_internal {
+namespace turbo::debugging_internal {
 
-// Return whether the byte at *addr is readable, without faulting.
-// Save and restores errno.
-bool AddressIsReadable(const void *addr);
+    // Return whether the byte at *addr is readable, without faulting.
+    // Save and restores errno.
+    bool AddressIsReadable(const void *addr);
 
-}  // namespace debugging_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::debugging_internal
 
 #endif  // TURBO_DEBUGGING_INTERNAL_ADDRESS_IS_READABLE_H_

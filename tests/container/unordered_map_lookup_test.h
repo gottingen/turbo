@@ -21,7 +21,7 @@
 #include "hash_policy_testing.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace container_internal {
 
 template <class UnordMap>
@@ -111,7 +111,7 @@ REGISTER_TYPED_TEST_SUITE_P(LookupTest, At, OperatorBracket, Count, Find,
                             EqualRange);
 
 }  // namespace container_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_CONTAINER_INTERNAL_UNORDERED_MAP_LOOKUP_TEST_H_

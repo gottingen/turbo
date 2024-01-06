@@ -27,7 +27,6 @@
 using ::testing::Ge;
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace profiling_internal {
         namespace {
 
@@ -198,5 +197,4 @@ namespace turbo {
 
         }  // namespace
     }  // namespace profiling_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo

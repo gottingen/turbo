@@ -65,7 +65,6 @@
 #include "turbo/format/format.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     // turbo::StatusCode
     //
@@ -95,7 +94,7 @@ namespace turbo {
     ///  using StatusCode =  int;
     // StatusCode::kOk
     //
-    // kOK (gRPC code "OK") does not indicate an error; this value is returned on
+    // kOK does not indicate an error; this value is returned on
     // success. It is typical to check for this value before proceeding on any
     // given call across an API or RPC boundary. To check this value, use the
     // `turbo::Status::ok()` member function rather than inspecting the raw code.
@@ -103,7 +102,7 @@ namespace turbo {
 
     // StatusCode::kCancelled
     //
-    // kCancelled (gRPC code "CANCELLED") indicates the operation was cancelled,
+    // kCancelled  indicates the operation was cancelled,
     // typically by the caller.
     static constexpr StatusCode kCancelled = 1;
 
@@ -117,7 +116,7 @@ namespace turbo {
 
     // StatusCode::kInvalidArgument
     //
-    // kInvalidArgument (gRPC code "INVALID_ARGUMENT") indicates the caller
+    // kInvalidArgument indicates the caller
     // specified an invalid argument, such as a malformed filename. Note that use
     // of such errors should be narrowly limited to indicate the invalid nature of
     // the arguments themselves. Errors with validly formed arguments that may
@@ -127,7 +126,7 @@ namespace turbo {
 
     // StatusCode::kDeadlineExceeded
     //
-    // kDeadlineExceeded (gRPC code "DEADLINE_EXCEEDED") indicates a deadline
+    // kDeadlineExceeded indicates a deadline
     // expired before the operation could complete. For operations that may change
     // state within a system, this error may be returned even if the operation has
     // completed successfully. For example, a successful response from a server
@@ -136,7 +135,7 @@ namespace turbo {
 
     // StatusCode::kNotFound
     //
-    // kNotFound (gRPC code "NOT_FOUND") indicates some requested entity (such as
+    // kNotFound indicates some requested entity (such as
     // a file or directory) was not found.
     //
     // `kNotFound` is useful if a request should be denied for an entire class of
@@ -147,14 +146,14 @@ namespace turbo {
 
     // StatusCode::kAlreadyExists
     //
-    // kAlreadyExists (gRPC code "ALREADY_EXISTS") indicates that the entity a
+    // kAlreadyExists indicates that the entity a
     // caller attempted to create (such as a file or directory) is already
     // present.
     static constexpr StatusCode kAlreadyExists = 6;
 
     // StatusCode::kPermissionDenied
     //
-    // kPermissionDenied (gRPC code "PERMISSION_DENIED") indicates that the caller
+    // kPermissionDenied indicates that the caller
     // does not have permission to execute the specified operation. Note that this
     // error is different than an error due to an *un*authenticated user. This
     // error code does not imply the request is valid or the requested entity
@@ -168,14 +167,14 @@ namespace turbo {
 
     // StatusCode::kResourceExhausted
     //
-    // kResourceExhausted (gRPC code "RESOURCE_EXHAUSTED") indicates some resource
+    // kResourceExhausted indicates some resource
     // has been exhausted, perhaps a per-user quota, or perhaps the entire file
     // system is out of space.
     static constexpr StatusCode kResourceExhausted = 8;
 
     // StatusCode::kFailedPrecondition
     //
-    // kFailedPrecondition (gRPC code "FAILED_PRECONDITION") indicates that the
+    // kFailedPrecondition indicates that the
     // operation was rejected because the system is not in a state required for
     // the operation's execution. For example, a directory to be deleted may be
     // non-empty, an "rmdir" operation is applied to a non-directory, etc.
@@ -196,7 +195,7 @@ namespace turbo {
 
     // StatusCode::kAborted
     //
-    // kAborted (gRPC code "ABORTED") indicates the operation was aborted,
+    // kAborted indicates the operation was aborted,
     // typically due to a concurrency issue such as a sequencer check failure or a
     // failed transaction.
     //
@@ -206,7 +205,7 @@ namespace turbo {
 
     // StatusCode::kOutOfRange
     //
-    // kOutOfRange (gRPC code "OUT_OF_RANGE") indicates the operation was
+    // kOutOfRange indicates the operation was
     // attempted past the valid range, such as seeking or reading past an
     // end-of-file.
     //
@@ -226,21 +225,21 @@ namespace turbo {
 
     // StatusCode::kUnimplemented
     //
-    // kUnimplemented (gRPC code "UNIMPLEMENTED") indicates the operation is not
+    // kUnimplemented indicates the operation is not
     // implemented or supported in this service. In this case, the operation
     // should not be re-attempted.
     static constexpr StatusCode kUnimplemented = 12;
 
     // StatusCode::kInternal
     //
-    // kInternal (gRPC code "INTERNAL") indicates an internal error has occurred
+    // kInternal indicates an internal error has occurred
     // and some invariants expected by the underlying system have not been
     // satisfied. This error code is reserved for serious errors.
     static constexpr StatusCode kInternal = 13;
 
     // StatusCode::kUnavailable
     //
-    // kUnavailable (gRPC code "UNAVAILABLE") indicates the service is currently
+    // kUnavailable indicates the service is currently
     // unavailable and that this is most likely a transient condition. An error
     // such as this can be corrected by retrying with a backoff scheme. Note that
     // it is not always safe to retry non-idempotent operations.
@@ -251,14 +250,14 @@ namespace turbo {
 
     // StatusCode::kDataLoss
     //
-    // kDataLoss (gRPC code "DATA_LOSS") indicates that unrecoverable data loss or
+    // kDataLoss indicates that unrecoverable data loss or
     // corruption has occurred. As this error is serious, proper alerting should
     // be attached to errors such as this.
     static constexpr StatusCode kDataLoss = 15;
 
     // StatusCode::kUnauthenticated
     //
-    // kUnauthenticated (gRPC code "UNAUTHENTICATED") indicates that the request
+    // kUnauthenticated indicates that the request
     // does not have valid authentication credentials for the operation. Correct
     // the authentication and try again.
     static constexpr StatusCode kUnauthenticated = 16;
@@ -268,6 +267,10 @@ namespace turbo {
     static constexpr StatusCode kReachFileEnd = 18;
 
     static constexpr StatusCode kDiskIOError = 19;
+
+    static constexpr StatusCode kAlreadyStop = 20;
+
+    static constexpr StatusCode kResourceBusy = 21;
     // StatusCode::DoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_
     //
     // NOTE: this error code entry should not be used and you should not rely on
@@ -277,7 +280,7 @@ namespace turbo {
     // codes with `switch()` statements to *not* simply enumerate all possible
     // values, but instead provide a "default:" case. Providing such a default
     // case ensures that code will compile when new codes are added.
-    static constexpr StatusCode kDoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_ = 20;
+    static constexpr StatusCode kDoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_ = 100;
 
     // StatusCodeToString()
     //
@@ -931,6 +934,22 @@ namespace turbo {
 
     /**
      * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kAlreadyStop.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_already_stop(const Status &status);
+
+    /**
+     * @ingroup turbo_base_status
+     * @brief Returns `true` if `status` is turbo::kResourceBusy.
+     * @param status The status to check.
+     * @return bool
+     */
+    [[nodiscard]] bool is_resource_busy(const Status &status);
+
+    /**
+     * @ingroup turbo_base_status
      * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name,
      *        using the fmt and args to format the error message.
      *        Example:
@@ -1304,6 +1323,33 @@ namespace turbo {
 
     /**
      * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::already_stop_error("");
+     *        @endcode
+     * @return Status
+     */
+    template<typename ...Args>
+    Status already_stop_error(std::string_view fmt, Args &&...args) {
+        return Status(turbo::kAlreadyStop, format(fmt, std::forward<Args>(args)...));
+    }
+
+    /**
+     * @ingroup turbo_base_status
+     * @brief Creates an `turbo::Status` object with an error code as indicated by the associated function name.
+     *        Example:
+     *        @code
+     *        turbo::Status status = turbo::resource_busy_error("");
+     *        @endcode
+     * @return Status
+     */
+    template<typename ...Args>
+    Status resource_busy_error(std::string_view fmt, Args &&...args) {
+        return Status(turbo::kResourceBusy, format(fmt, std::forward<Args>(args)...));
+    }
+    /**
+     * @ingroup turbo_base_status
      * @brief Creates an `turbo::Status` object with an error code and the error message.
      *       Example:
      *       @code
@@ -1544,7 +1590,6 @@ namespace turbo {
     // message-less kCancelled errors are common in the infrastructure.
     inline Status cancelled_error() { return Status(turbo::kCancelled); }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_BASE_STATUS_H_

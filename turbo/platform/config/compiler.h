@@ -247,42 +247,6 @@
 	#endif
 
 
-	// TURBO_COMPILER_CPP14_ENABLED
-	//
-	// Defined as 1 if the compiler has its available C++14 support enabled, else undefined.
-	// This does not mean that all of C++14 or any particular feature of C++14 is supported
-	// by the compiler. It means that whatever C++14 support the compiler has is enabled.
-	//
-	// We cannot use (__cplusplus >= 201402L) alone because some compiler vendors have
-	// decided to not define __cplusplus like thus until they have fully completed their
-	// C++14 support.
-	#if !defined(TURBO_COMPILER_CPP14_ENABLED) && defined(__cplusplus)
-		#if (__cplusplus >= 201402L) 								// Clang and GCC defines this like so in C++14 mode.
-			#define TURBO_COMPILER_CPP14_ENABLED 1
-		#elif defined(_MSC_VER) && (_MSC_VER >= 1900)  	// VS2015+
-			#define TURBO_COMPILER_CPP14_ENABLED 1
-		#endif
-	#endif
-
-
-	// TURBO_COMPILER_CPP17_ENABLED
-	//
-	// Defined as 1 if the compiler has its available C++17 support enabled, else undefined.
-	// This does not mean that all of C++17 or any particular feature of C++17 is supported
-	// by the compiler. It means that whatever C++17 support the compiler has is enabled.
- 	//
-	// We cannot use (__cplusplus >= 201703L) alone because some compiler vendors have
-	// decided to not define __cplusplus like thus until they have fully completed their
-	// C++17 support.
-	#if !defined(TURBO_COMPILER_CPP17_ENABLED) && defined(__cplusplus)
-		#if (__cplusplus >= 201703L)
-			#define TURBO_COMPILER_CPP17_ENABLED 1
-		#elif defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L) // C++17+
-			#define TURBO_COMPILER_CPP17_ENABLED 1
-		#endif
-	#endif
-
-
 	// TURBO_COMPILER_CPP20_ENABLED
 	//
 	// Defined as 1 if the compiler has its available C++20 support enabled, else undefined.
@@ -495,23 +459,6 @@
 	#ifndef TURBO_COMPILER_STRING
 		#define TURBO_COMPILER_STRING TURBO_COMPILER_NAME " compiler, version " INTERNAL_STRINGIZE(TURBO_COMPILER_VERSION)
 	#endif
-
-	// TURBO_COMPILER_NO_STRUCTURED_BINDING
-	//
-	// Indicates if target compiler supports the C++17 "structured binding" language feature.
-	// https://en.cppreference.com/w/cpp/language/structured_binding
-	//
-	//
-	#if !defined(TURBO_COMPILER_NO_STRUCTURED_BINDING)
-		#if defined(TURBO_COMPILER_CPP17_ENABLED)
-			// supported.
-		#elif defined(TURBO_COMPILER_MSVC) && (TURBO_COMPILER_VERSION >= 1912) // VS2017 15.3+
-			// supported.
-		#else
-			#define TURBO_COMPILER_NO_STRUCTURED_BINDING 1
-		#endif
-	#endif
-
 
 	// TURBO_COMPILER_NO_DESIGNATED_INITIALIZERS
 	//

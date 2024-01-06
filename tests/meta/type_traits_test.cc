@@ -223,4 +223,51 @@ namespace {
     }
 
 
+
+    TEST_CASE("RefWrapper" * doctest::timeout(300)) {
+
+        static_assert(std::is_same<
+                turbo::unwrap_reference_t<int>, int
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_reference_t<int &>, int &
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_reference_t<int &&>, int &&
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_reference_t<std::reference_wrapper<int>>, int &
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_reference_t<std::reference_wrapper<std::reference_wrapper<int>>>,
+                std::reference_wrapper<int> &
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_ref_decay_t<int>, int
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_ref_decay_t<int &>, int
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_ref_decay_t<int &&>, int
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_ref_decay_t<std::reference_wrapper<int>>, int &
+        >::value, "");
+
+        static_assert(std::is_same<
+                turbo::unwrap_ref_decay_t<std::reference_wrapper<std::reference_wrapper<int>>>,
+                std::reference_wrapper<int> &
+        >::value, "");
+
+    }
+
 }  // namespace

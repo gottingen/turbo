@@ -191,11 +191,11 @@ inline void TBBaseUnused(T const volatile & x) { (void)x; }
 #define TURBO_ATTRIBUTE_INITIAL_EXEC
 #endif
 
-#ifndef TURBO_INLINE_VARIABLE
-#if defined(TURBO_COMPILER_CPP17_ENABLED)
-#define TURBO_INLINE_VARIABLE inline
+#ifndef TURBO_THREAD_LOCAL
+#ifdef TURBO_PLATFORM_WINDOWS
+#define TURBO_THREAD_LOCAL __declspec(thread)
 #else
-#define TURBO_INLINE_VARIABLE
+#define TURBO_THREAD_LOCAL __thread
 #endif
 #endif
 

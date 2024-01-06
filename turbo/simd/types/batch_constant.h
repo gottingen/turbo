@@ -66,8 +66,7 @@ namespace turbo::simd
      * @tparam Values constants represented by this batch
      **/
     template <class batch_type, typename batch_type::value_type... Values>
-    struct batch_constant
-    {
+    struct batch_constant {
         static constexpr std::size_t size = sizeof...(Values);
         using arch_type = typename batch_type::arch_type;
         using value_type = typename batch_type::value_type;

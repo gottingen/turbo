@@ -58,7 +58,7 @@
 #include "tests/random/mocking_bit_gen.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 
 // -----------------------------------------------------------------------------
 // turbo::MockUniform
@@ -260,7 +260,7 @@ using MockZipf =
                                      IntType(MockingBitGen&, IntType, double,
                                              double)>;
 
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_MOCK_DISTRIBUTIONS_H_

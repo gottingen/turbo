@@ -24,7 +24,7 @@
 #include "turbo/base/internal/fast_type_id.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace random_internal {
 
 // MockHelpers works in conjunction with MockOverloadSet, MockingBitGen, and
@@ -129,7 +129,7 @@ class MockHelpers {
 };
 
 }  // namespace random_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_INTERNAL_MOCK_HELPERS_H_

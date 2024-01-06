@@ -34,7 +34,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     // -----------------------------------------------------------------------------
     // Function Template: WrapUnique()
@@ -275,7 +274,6 @@ namespace turbo {
             }
         }
     }  // namespace memory_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_MEMORY_MEMORY_H_

@@ -272,9 +272,9 @@ namespace turbo {
             return time_internal::MakeDuration(hi64, lo64);
         }
 
-// Tries to divide num by den as fast as possible by looking for common, easy
-// cases. If the division was done, the quotient is in *q and the remainder is
-// in *rem and true will be returned.
+        // Tries to divide num by den as fast as possible by looking for common, easy
+        // cases. If the division was done, the quotient is in *q and the remainder is
+        // in *rem and true will be returned.
         inline bool IDivFastPath(const Duration num, const Duration den, int64_t *q,
                                  Duration *rem) {
             // Bail if num or den is an infinity.
@@ -351,10 +351,10 @@ namespace turbo {
 
     namespace time_internal {
 
-// The 'satq' argument indicates whether the quotient should saturate at the
-// bounds of int64_t.  If it does saturate, the difference will spill over to
-// the remainder.  If it does not saturate, the remainder remain accurate,
-// but the returned quotient will over/underflow int64_t and should not be used.
+        // The 'satq' argument indicates whether the quotient should saturate at the
+        // bounds of int64_t.  If it does saturate, the difference will spill over to
+        // the remainder.  If it does not saturate, the remainder remain accurate,
+        // but the returned quotient will over/underflow int64_t and should not be used.
         int64_t safe_int_mod(bool satq, const Duration num, const Duration den,
                              Duration *rem) {
             int64_t q = 0;
@@ -400,9 +400,9 @@ namespace turbo {
 
     }  // namespace time_internal
 
-//
-// Additive operators.
-//
+    //
+    // Additive operators.
+    //
 
     Duration &Duration::operator+=(Duration rhs) {
         if (time_internal::IsInfiniteDuration(*this)) return *this;
@@ -440,9 +440,9 @@ namespace turbo {
         return *this;
     }
 
-//
-// Multiplicative operators.
-//
+    //
+    // Multiplicative operators.
+    //
 
     Duration &Duration::operator*=(int64_t r) {
         if (time_internal::IsInfiniteDuration(*this)) {
@@ -499,9 +499,9 @@ namespace turbo {
         return a / b;
     }
 
-//
-// trunc/floor/ceil.
-//
+    //
+    // trunc/floor/ceil.
+    //
 
     Duration trunc(Duration d, Duration unit) {
         return d - (d % unit);
@@ -517,9 +517,9 @@ namespace turbo {
         return td >= d ? td : td + abs_duration(unit);
     }
 
-//
-// Factory functions.
-//
+    //
+    // Factory functions.
+    //
 
     Duration duration_from_timespec(timespec ts) {
         if (static_cast<uint64_t>(ts.tv_nsec) < 1000 * 1000 * 1000) {
@@ -886,7 +886,7 @@ namespace turbo {
                         default:
                             break;
                     }
-                    TURBO_FALLTHROUGH;
+                    [[fallthrough]];
                 case 1:
                     switch (**start) {
                         case 's':

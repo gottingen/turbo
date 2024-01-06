@@ -67,10 +67,6 @@ TURBO_DLL void utf8_to_wstrbuf(std::string_view str, wmemory_buf_t &target);
 #endif
 
 
-// non thread safe, cross platform getenv/getenv_s
-// return empty string if field not found
-TURBO_DLL std::string getenv(const char *field);
-
 } // namespace os
 } // namespace details
 } // namespace turbo::tlog

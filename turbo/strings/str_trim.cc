@@ -18,8 +18,6 @@
 #include "turbo/strings/ascii.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
-
 
     template<typename String>
     typename std::enable_if<turbo::is_string_type<String>::value>::type
@@ -56,5 +54,4 @@ namespace turbo {
 
     template void trim_complete(turbo::inlined_string *str);
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

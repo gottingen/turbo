@@ -12,36 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/unicode/utf.h"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "turbo/testing/test.h"
+
+#include "turbo/unicode/converter.h"
+#include "transcode_test_base.h"
 
 #include <array>
 #include <algorithm>
 
 #include "turbo/random/random.h"
-#include <tests/unicode/helpers/test.h>
+
 #include <fstream>
 #include <iostream>
 #include <memory>
 
-TEST(validate_utf32__returns_true_for_valid_input) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf32__returns_true_for_valid_input") {
+
   turbo::Utf32Generator generator{};
   for(size_t trial = 0; trial < 1000; trial++) {
     const auto utf32{generator.generate(256)};
 
-    ASSERT_TRUE(implementation.validate_utf32(
+    REQUIRE(turbo::validate_utf32(
               reinterpret_cast<const char32_t*>(utf32.data()), utf32.size()));
   }
 }
 
-TEST(validate_utf32__returns_true_for_empty_string) {
+TEST_CASE("validate_utf32__returns_true_for_empty_string") {
   const char32_t* buf = (char32_t*)"";
 
-  ASSERT_TRUE(implementation.validate_utf32(buf, 0));
+  REQUIRE(turbo::validate_utf32(buf, 0));
 }
 
-TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf32__returns_false_when_input_in_forbidden_range") {
+
   turbo::Utf32Generator generator{};
   for(size_t trial = 0; trial < 10; trial++) {
     auto utf32{generator.generate(128)};
@@ -53,7 +58,7 @@ TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
         const char32_t old = utf32[i];
         utf32[i] = wrong_value;
 
-        ASSERT_FALSE(implementation.validate_utf32(buf, len));
+        REQUIRE_FALSE(turbo::validate_utf32(buf, len));
 
         utf32[i] = old;
       }
@@ -61,12 +66,12 @@ TEST(validate_utf32__returns_false_when_input_in_forbidden_range) {
   }
 }
 
-TEST(validate_utf32__returns_false_when_input_too_large) {
-  uint32_t seed{1234};
+TEST_CASE("validate_utf32__returns_false_when_input_too_large") {
+
   turbo::Utf32Generator generator{};
 
-  std::uniform_int_distribution<uint32_t> bad_range{0x110000, 0xffffffff};
-  std::mt19937 gen{seed};
+  turbo::BitGen gen;
+  turbo::uniform_int_distribution<uint32_t> bad_range{0x110000, 0xffffffff};
 
   for(size_t trial = 0; trial < 1000; trial++) {
     auto utf32{generator.generate(128)};
@@ -79,7 +84,7 @@ TEST(validate_utf32__returns_false_when_input_too_large) {
         const char32_t old = utf32[i];
         utf32[i] = wrong_value;
 
-        ASSERT_FALSE(implementation.validate_utf32(buf, len));
+        REQUIRE_FALSE(turbo::validate_utf32(buf, len));
 
         utf32[i] = old;
       }
@@ -87,6 +92,3 @@ TEST(validate_utf32__returns_false_when_input_too_large) {
   }
 }
 
-int main(int argc, char* argv[]) {
-  return turbo::test::main(argc, argv);
-}

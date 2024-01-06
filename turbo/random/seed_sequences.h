@@ -35,7 +35,6 @@
 #include "turbo/random/seed_gen_exception.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     // -----------------------------------------------------------------------------
     // turbo::SeedSeq
@@ -88,24 +87,23 @@ namespace turbo {
         return SeedSeq(std::begin(seed_material), std::end(seed_material));
     }
 
-// -----------------------------------------------------------------------------
-// turbo::MakeSeedSeq()
-// -----------------------------------------------------------------------------
-//
-// Constructs an `turbo::SeedSeq` salting the generated values using
-// implementation-defined entropy. The returned sequence can be used to create
-// equivalent bit generators correlated using this sequence.
-//
-// Example:
-//
-//   auto my_seed_seq = turbo::MakeSeedSeq();
-//   std::mt19937 rng1(my_seed_seq);
-//   std::mt19937 rng2(my_seed_seq);
-//   EXPECT_EQ(rng1(), rng2());
-//
-    SeedSeq MakeSeedSeq();
+    // -----------------------------------------------------------------------------
+    // turbo::make_seed_seq()
+    // -----------------------------------------------------------------------------
+    //
+    // Constructs an `turbo::SeedSeq` salting the generated values using
+    // implementation-defined entropy. The returned sequence can be used to create
+    // equivalent bit generators correlated using this sequence.
+    //
+    // Example:
+    //
+    //   auto my_seed_seq = turbo::make_seed_seq();
+    //   std::mt19937 rng1(my_seed_seq);
+    //   std::mt19937 rng2(my_seed_seq);
+    //   EXPECT_EQ(rng1(), rng2());
+    //
+    SeedSeq make_seed_seq();
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_SEED_SEQUENCES_H_

@@ -20,7 +20,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     /**
      * @ingroup turbo_strings_trim
@@ -211,6 +210,5 @@ namespace turbo {
     typename std::enable_if<turbo::is_string_type<String>::value>::type
     trim_complete(String *);
 
-    TURBO_NAMESPACE_END
 }
 #endif  // TURBO_STRINGS_STR_TRIM_H_

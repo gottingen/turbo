@@ -31,7 +31,7 @@ namespace turbo {
     /// Creates a dependency module which will dynamically load a library
     /// at runtime instead of at link time. This class will be a component of a
     /// module class which will have member functions for each of the functions
-    /// we use in flare
+    /// we use in turbo
     class Module {
     public:
         /// Loads the library \p plugin_file_name from the \p paths locations

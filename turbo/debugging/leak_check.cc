@@ -31,7 +31,6 @@ extern "C" TURBO_WEAK int __lsan_is_turned_off();
 #endif
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 bool HaveLeakSanitizer() { return true; }
 
 #if TURBO_WEAK_SUPPORTED
@@ -52,21 +51,24 @@ void UnRegisterLivePointers(const void* ptr, size_t size) {
 }
 LeakCheckDisabler::LeakCheckDisabler() { __lsan_disable(); }
 LeakCheckDisabler::~LeakCheckDisabler() { __lsan_enable(); }
-TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #else  // defined(TURBO_HAVE_LEAK_SANITIZER)
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-bool HaveLeakSanitizer() { return false; }
-bool LeakCheckerIsActive() { return false; }
-void DoIgnoreLeak(const void*) { }
-void RegisterLivePointers(const void*, size_t) { }
-void UnRegisterLivePointers(const void*, size_t) { }
-LeakCheckDisabler::LeakCheckDisabler() { }
-LeakCheckDisabler::~LeakCheckDisabler() { }
-TURBO_NAMESPACE_END
+    bool HaveLeakSanitizer() { return false; }
+
+    bool LeakCheckerIsActive() { return false; }
+
+    void DoIgnoreLeak(const void *) {}
+
+    void RegisterLivePointers(const void *, size_t) {}
+
+    void UnRegisterLivePointers(const void *, size_t) {}
+
+    LeakCheckDisabler::LeakCheckDisabler() {}
+
+    LeakCheckDisabler::~LeakCheckDisabler() {}
 }  // namespace turbo
 
 #endif  // defined(TURBO_HAVE_LEAK_SANITIZER)

@@ -18,7 +18,7 @@
 #include "turbo/base/internal/inline_variable.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace inline_variable_testing_internal {
 
 struct Foo {
@@ -40,7 +40,7 @@ const int& get_int_a();
 const int& get_int_b();
 
 }  // namespace inline_variable_testing_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_BASE_INTERNAL_INLINE_VARIABLE_TESTING_H_

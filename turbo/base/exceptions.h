@@ -112,8 +112,7 @@ namespace turbo {
     /// inner type is char const. Having two behaviors can be surprising, so avoid.
     template<typename Ex, typename... Args>
     TURBO_NORETURN TURBO_INLINE_VISIBILITY void throw_exception(Args &&... args) {
-        detail::throw_exception_<Ex, detail::throw_exception_arg_t<Args &&>...>(
-                static_cast<Args &&>(args)...);
+        detail::throw_exception_<Ex, detail::throw_exception_arg_t<Args &&>...>(static_cast<Args &&>(args)...);
     }
 
     /// terminate_with

@@ -32,60 +32,58 @@
 
 // Hardware acceleration is used when available.
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace crc_internal {
+namespace turbo::crc_internal {
 
-class CRC {
- public:
-  virtual ~CRC();
+    class CRC {
+    public:
+        virtual ~CRC();
 
-  // Place the CRC of the empty string in "*crc"
-  virtual void Empty(uint32_t* crc) const = 0;
+        // Place the CRC of the empty string in "*crc"
+        virtual void Empty(uint32_t *crc) const = 0;
 
-  // If "*crc" is the CRC of bytestring A, place the CRC of
-  // the bytestring formed from the concatenation of A and the "length"
-  // bytes at "bytes" into "*crc".
-  virtual void Extend(uint32_t* crc, const void* bytes,
-                      size_t length) const = 0;
+        // If "*crc" is the CRC of bytestring A, place the CRC of
+        // the bytestring formed from the concatenation of A and the "length"
+        // bytes at "bytes" into "*crc".
+        virtual void Extend(uint32_t *crc, const void *bytes,
+                            size_t length) const = 0;
 
-  // Equivalent to Extend(crc, bytes, length) where "bytes"
-  // points to an array of "length" zero bytes.
-  virtual void ExtendByZeroes(uint32_t* crc, size_t length) const = 0;
+        // Equivalent to Extend(crc, bytes, length) where "bytes"
+        // points to an array of "length" zero bytes.
+        virtual void ExtendByZeroes(uint32_t *crc, size_t length) const = 0;
 
-  // Inverse opration of ExtendByZeroes.  If `crc` is the CRC value of a string
-  // ending in `length` zero bytes, this returns a CRC value of that string
-  // with those zero bytes removed.
-  virtual void UnextendByZeroes(uint32_t* crc, size_t length) const = 0;
+        // Inverse opration of ExtendByZeroes.  If `crc` is the CRC value of a string
+        // ending in `length` zero bytes, this returns a CRC value of that string
+        // with those zero bytes removed.
+        virtual void UnextendByZeroes(uint32_t *crc, size_t length) const = 0;
 
-  // If *px is the CRC (as defined by *crc) of some string X,
-  // and y is the CRC of some string Y that is ylen bytes long, set
-  // *px to the CRC of the concatenation of X followed by Y.
-  virtual void Concat(uint32_t* px, uint32_t y, size_t ylen);
+        // If *px is the CRC (as defined by *crc) of some string X,
+        // and y is the CRC of some string Y that is ylen bytes long, set
+        // *px to the CRC of the concatenation of X followed by Y.
+        virtual void Concat(uint32_t *px, uint32_t y, size_t ylen);
 
-  // Apply a non-linear transformation to "*crc" so that
-  // it is safe to CRC the result with the same polynomial without
-  // any reduction of error-detection ability in the outer CRC.
-  // Unscramble() performs the inverse transformation.
-  // It is strongly recommended that CRCs be scrambled before storage or
-  // transmission, and unscrambled at the other end before futher manipulation.
-  virtual void Scramble(uint32_t* crc) const = 0;
-  virtual void Unscramble(uint32_t* crc) const = 0;
+        // Apply a non-linear transformation to "*crc" so that
+        // it is safe to CRC the result with the same polynomial without
+        // any reduction of error-detection ability in the outer CRC.
+        // Unscramble() performs the inverse transformation.
+        // It is strongly recommended that CRCs be scrambled before storage or
+        // transmission, and unscrambled at the other end before futher manipulation.
+        virtual void Scramble(uint32_t *crc) const = 0;
 
-  // Crc32c() returns the singleton implementation of CRC for the CRC32C
-  // polynomial.  Returns a handle that MUST NOT be destroyed with delete.
-  static CRC* Crc32c();
+        virtual void Unscramble(uint32_t *crc) const = 0;
 
- protected:
-  CRC();  // Clients may not call constructor; use Crc32c() instead.
+        // Crc32c() returns the singleton implementation of CRC for the CRC32C
+        // polynomial.  Returns a handle that MUST NOT be destroyed with delete.
+        static CRC *Crc32c();
 
- private:
-  CRC(const CRC&) = delete;
-  CRC& operator=(const CRC&) = delete;
-};
+    protected:
+        CRC();  // Clients may not call constructor; use Crc32c() instead.
 
-}  // namespace crc_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    private:
+        CRC(const CRC &) = delete;
+
+        CRC &operator=(const CRC &) = delete;
+    };
+
+}  // namespace turbo::crc_internal
 
 #endif  // TURBO_CRYPTO_INTERNAL_CRC_H_
