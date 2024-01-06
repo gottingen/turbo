@@ -45,7 +45,16 @@
 // checks enabled by this option may abort the program in a different way and
 // log additional information when `NDEBUG` is not defined.
 #ifndef TURBO_OPTION_HARDENED
-#define TURBO_OPTION_HARDENED 1
+#define TURBO_OPTION_HARDENED 0
 #endif
 
+#ifndef TURBO_OPTION_DEBUG
+#define TURBO_OPTION_DEBUG 0
+#endif
+
+#ifndef TURBO_OPTION_LOGGING_NO_SOURCE_LOC
+#define TLOG_SOURCE_LOC 1
+#else
+#define TLOG_SOURCE_LOC 0
+#endif
 #endif  // TURBO_PLATFORM_OPTIONS_H_

@@ -25,7 +25,7 @@
 #include "turbo/concurrent/latch.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace profiling_internal {
 
 namespace {
@@ -179,5 +179,5 @@ TEST(SampleRecorderTest, Callback) {
 
 }  // namespace
 }  // namespace profiling_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

@@ -44,8 +44,8 @@ TEST_CASE("issue_213") {
     // that the predicted output might be zero.
     size_t expected_size = turbo::utf32_length_from_utf8(buf + 2, 1);
     std::unique_ptr<char32_t[]> buffer(new char32_t[expected_size]);
-    turbo::result r = turbo::convert_utf8_to_utf32_with_errors(buf + 2, 1, buffer.get());
-    REQUIRE(r.error != turbo::SUCCESS);
+    turbo::UnicodeResult r = turbo::convert_utf8_to_utf32_with_errors(buf + 2, 1, buffer.get());
+    REQUIRE(r.error != turbo::UnicodeError::SUCCESS);
     //r.count: In case of error, indicates the position of the error in the input.
     // In case of success, indicates the number of words validated/written.
     REQUIRE(r.count == 0);
@@ -63,8 +63,8 @@ TEST_CASE("convert_pure_ASCII") {
         };
 
         auto procedure = [](const char *utf8, size_t size, char32_t *utf32) -> size_t {
-            turbo::result res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-            REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+            turbo::UnicodeResult res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+            REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
             return res.count;
         };
         auto size_procedure = [](const char *utf8, size_t size) -> size_t {
@@ -88,8 +88,8 @@ TEST_CASE("convert_1_or_2_UTF8_bytes") {
         turbo::FixedUniform<int> random(0x0000, 0x07ff); // range for 1 or 2 UTF-8 bytes
 
         auto procedure = [](const char *utf8, size_t size, char32_t *utf32) -> size_t {
-            turbo::result res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-            REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+            turbo::UnicodeResult res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+            REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
             return res.count;
         };
         auto size_procedure = [](const char *utf8, size_t size) -> size_t {
@@ -115,8 +115,8 @@ TEST_CASE("convert_1_or_2_or_3_UTF8_bytes") {
 
 
         auto procedure = [](const char *utf8, size_t size, char32_t *utf32) -> size_t {
-            turbo::result res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-            REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+            turbo::UnicodeResult res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+            REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
             return res.count;
         };
         auto size_procedure = [](const char *utf8, size_t size) -> size_t {
@@ -140,8 +140,8 @@ TEST_CASE("convert_3_or_4_UTF8_bytes") {
                                                        {0xe000, 0x10ffff}}); // range for 3 or 4 UTF-8 bytes
 
         auto procedure = [](const char *utf8, size_t size, char32_t *utf32) -> size_t {
-            turbo::result res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-            REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+            turbo::UnicodeResult res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+            REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
             return res.count;
         };
         auto size_procedure = [](const char *utf8, size_t size) -> size_t {
@@ -164,8 +164,8 @@ TEST_CASE("too_large_error") {
         for (int i = 1; i < fix_size; i++) {
             if ((test.input_utf8[i] & 0b11111000) == 0b11110000) { // Can only have too large error in 4-bytes case
                 auto procedure = [ &i](const char *utf8, size_t size, char32_t *utf32) -> size_t {
-                    turbo::result res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-                    REQUIRE_EQ(res.error, turbo::error_code::TOO_LARGE);
+                    turbo::UnicodeResult res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+                    REQUIRE_EQ(res.error, turbo::UnicodeError::TOO_LARGE);
                     REQUIRE_EQ(res.count, i);
                     return 0;
                 };
@@ -187,8 +187,8 @@ TEST_CASE("surrogate_error") {
         for (int i = 1; i < fix_size; i++) {
             if ((test.input_utf8[i] & 0b11110000) == 0b11100000) { // Can only have surrogate error in 3-bytes case
                 auto procedure = [ &i](const char *utf8, size_t size, char32_t *utf32) -> size_t {
-                    turbo::result res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
-                    REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+                    turbo::UnicodeResult res = turbo::convert_utf8_to_utf32_with_errors(utf8, size, utf32);
+                    REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
                     REQUIRE_EQ(res.count, i);
                     return 0;
                 };

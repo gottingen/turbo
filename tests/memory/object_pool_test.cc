@@ -42,11 +42,18 @@ namespace {
 namespace turbo {
     template<>
     struct ObjectPoolTraits<MyObject> : public ObjectPoolTraitsBase<MyObject>{
-        static constexpr size_t kBlockMaxSize = 128;
 
-        static constexpr size_t kBlockMaxItems = 3;
+        static constexpr size_t block_max_size() {
+            return 128;
+        }
 
-        static constexpr size_t kFreeChunkMaxItem = 5;
+        static constexpr size_t block_max_items() {
+            return 3;
+        }
+
+        static constexpr size_t free_chunk_max_items() {
+            return 5;
+        }
 
         static bool validate(const MyObject *ptr) {
             return true;
@@ -54,11 +61,7 @@ namespace turbo {
     };
     template<>
     struct ObjectPoolTraits<Foo> : public ObjectPoolTraitsBase<Foo> {
-        typedef ObjectPoolTraitsBase<Foo> Base;
-        using Base::kBlockMaxSize;
-        using Base::kBlockMaxItems;
-        using Base::kFreeChunkMaxItem;
-        static bool validate(const Foo *ptr) {
+        static constexpr bool validate(const Foo *ptr) {
             return ptr->x != 0;
         }
     };
@@ -353,8 +356,8 @@ namespace {
         std::cout << describe_objects<D>() << std::endl;
         clear_objects<D>();
         ObjectPoolInfo info = describe_objects<D>();
-        ObjectPoolInfo zero_info = { 0, 0, 0, 0, ObjectPoolTraits<D>::kBlockMaxItems,
-                                     ObjectPoolTraits<D>::kBlockMaxItems, 0 };
+        ObjectPoolInfo zero_info = { 0, 0, 0, 0, ObjectPoolTraits<D>::block_max_items(),
+                                     ObjectPoolTraits<D>::block_max_items(), 0 };
         REQUIRE_EQ(0, memcmp(&info, &zero_info, sizeof(info) - sizeof(size_t)));
         std::stringstream ss;
         ss << "info:\n"<<info<<"zero:\n"<<zero_info;

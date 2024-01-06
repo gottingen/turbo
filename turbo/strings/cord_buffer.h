@@ -38,7 +38,6 @@
 #include "turbo/strings/internal/cord_rep_flat.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     class Cord;
 
@@ -579,8 +578,7 @@ namespace turbo {
             rep_.rep()->length += n;
         }
     }
-
-    TURBO_NAMESPACE_END
+    
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_CORD_BUFFER_H_

@@ -57,23 +57,23 @@ const size_t number_of_code_points = utf32_size;
 
 
 TEST_CASE("validate_utf8") {
-    turbo::result res = turbo::validate_utf8_with_errors(utf8, utf8_size);
-    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    turbo::UnicodeResult res = turbo::validate_utf8_with_errors(utf8, utf8_size);
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
 }
 
 TEST_CASE("validate_utf16le") {
-        turbo::result res = turbo::validate_utf16le_with_errors(utf16le, utf16_size);
-        REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+        turbo::UnicodeResult res = turbo::validate_utf16le_with_errors(utf16le, utf16_size);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
 }
 
 TEST_CASE("validate_utf16be") {
-        turbo::result res = turbo::validate_utf16be_with_errors(utf16be, utf16_size);
-        REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+        turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(utf16be, utf16_size);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
 }
 
 TEST_CASE("validate_utf32") {
-        turbo::result res = turbo::validate_utf32_with_errors(utf32, utf32_size);
-        REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+        turbo::UnicodeResult res = turbo::validate_utf32_with_errors(utf32, utf32_size);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
 }
 
 TEST_CASE("count_utf8") {

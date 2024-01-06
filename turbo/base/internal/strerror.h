@@ -19,21 +19,17 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
+namespace turbo::base_internal {
 
-// A portable and thread-safe alternative to C89's `strerror`.
-//
-// The C89 specification of `strerror` is not suitable for use in a
-// multi-threaded application as the returned string may be changed by calls to
-// `strerror` from another thread.  The many non-stdlib alternatives differ
-// enough in their names, availability, and semantics to justify this wrapper
-// around them.  `errno` will not be modified by a call to `turbo::StrError`.
-std::string StrError(int errnum);
+    // A portable and thread-safe alternative to C89's `strerror`.
+    //
+    // The C89 specification of `strerror` is not suitable for use in a
+    // multi-threaded application as the returned string may be changed by calls to
+    // `strerror` from another thread.  The many non-stdlib alternatives differ
+    // enough in their names, availability, and semantics to justify this wrapper
+    // around them.  `errno` will not be modified by a call to `turbo::StrError`.
+    std::string StrError(int errnum);
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::base_internal
 
 #endif  // TURBO_BASE_INTERNAL_STRERROR_H_

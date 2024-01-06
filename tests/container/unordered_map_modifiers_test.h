@@ -23,7 +23,7 @@
 #include "hash_policy_testing.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace container_internal {
 
         template<class UnordMap>
@@ -350,7 +350,7 @@ namespace turbo {
         REGISTER_TYPED_TEST_SUITE_P(UniquePtrModifiersTest, TryEmplace);
 
     }  // namespace container_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_CONTAINER_INTERNAL_UNORDERED_MAP_MODIFIERS_TEST_H_

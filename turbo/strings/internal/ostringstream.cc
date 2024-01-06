@@ -19,25 +19,21 @@
 #include <ios>
 #include <streambuf>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace strings_internal {
+namespace turbo::strings_internal {
 
-OStringStream::Streambuf::int_type OStringStream::Streambuf::overflow(int c) {
-  assert(str_);
-  if (!std::streambuf::traits_type::eq_int_type(
-          c, std::streambuf::traits_type::eof()))
-    str_->push_back(static_cast<char>(c));
-  return 1;
-}
+    OStringStream::Streambuf::int_type OStringStream::Streambuf::overflow(int c) {
+        assert(str_);
+        if (!std::streambuf::traits_type::eq_int_type(
+                c, std::streambuf::traits_type::eof()))
+            str_->push_back(static_cast<char>(c));
+        return 1;
+    }
 
-std::streamsize OStringStream::Streambuf::xsputn(const char* s,
-                                                 std::streamsize n) {
-  assert(str_);
-  str_->append(s, static_cast<size_t>(n));
-  return n;
-}
+    std::streamsize OStringStream::Streambuf::xsputn(const char *s,
+                                                     std::streamsize n) {
+        assert(str_);
+        str_->append(s, static_cast<size_t>(n));
+        return n;
+    }
 
-}  // namespace strings_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::strings_internal

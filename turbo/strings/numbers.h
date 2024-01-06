@@ -180,7 +180,6 @@ namespace turbo {
     [[nodiscard]] inline bool simple_hex_atoi(std::string_view str,
                                                     turbo::uint128 *out, int base = 16);
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 // End of public API.  Implementation details follow.

@@ -637,7 +637,36 @@ carbin_cc_test(
         ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
+)
+
+carbin_cc_test(
+        NAME
+        bounded_queue_test
+        SOURCES
+        "bounded_queue_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        small_vector_test
+        SOURCES
+        "small_vector_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME tf_serializer_test
+        SOURCES
+        serializer_test.cc
+        COPTS ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
 )

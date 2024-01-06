@@ -20,157 +20,158 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace profiling_internal {
-namespace {
+namespace turbo::profiling_internal {
+    namespace {
 
-using testing::Eq;
-using testing::Return;
-using testing::StrictMock;
+        using testing::Eq;
+        using testing::Return;
+        using testing::StrictMock;
 
-class MockPeriodicSampler : public PeriodicSamplerBase {
- public:
-  virtual ~MockPeriodicSampler() = default;
+        class MockPeriodicSampler : public PeriodicSamplerBase {
+        public:
+            virtual ~MockPeriodicSampler() = default;
 
-  MOCK_METHOD(int, period, (), (const, noexcept));
-  MOCK_METHOD(int64_t, GetExponentialBiased, (int), (noexcept));
-};
+            MOCK_METHOD(int, period, (), (const, noexcept));
+            MOCK_METHOD(int64_t, GetExponentialBiased, (int), (noexcept));
+        };
 
-TEST(PeriodicSamplerBaseTest, Sample) {
-  StrictMock<MockPeriodicSampler> sampler;
+        TEST(PeriodicSamplerBaseTest, Sample) {
+            StrictMock<MockPeriodicSampler> sampler;
 
-  EXPECT_CALL(sampler, period()).Times(3).WillRepeatedly(Return(16));
-  EXPECT_CALL(sampler, GetExponentialBiased(16))
-      .WillOnce(Return(2))
-      .WillOnce(Return(3))
-      .WillOnce(Return(4));
+            EXPECT_CALL(sampler, period()).Times(3).WillRepeatedly(Return(16));
+            EXPECT_CALL(sampler, GetExponentialBiased(16))
+                    .WillOnce(Return(2))
+                    .WillOnce(Return(3))
+                    .WillOnce(Return(4));
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_TRUE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_TRUE(sampler.Sample());
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_TRUE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_TRUE(sampler.Sample());
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-}
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+        }
 
-TEST(PeriodicSamplerBaseTest, ImmediatelySample) {
-  StrictMock<MockPeriodicSampler> sampler;
+        TEST(PeriodicSamplerBaseTest, ImmediatelySample) {
+            StrictMock<MockPeriodicSampler> sampler;
 
-  EXPECT_CALL(sampler, period()).Times(2).WillRepeatedly(Return(16));
-  EXPECT_CALL(sampler, GetExponentialBiased(16))
-      .WillOnce(Return(1))
-      .WillOnce(Return(2))
-      .WillOnce(Return(3));
+            EXPECT_CALL(sampler, period()).Times(2).WillRepeatedly(Return(16));
+            EXPECT_CALL(sampler, GetExponentialBiased(16))
+                    .WillOnce(Return(1))
+                    .WillOnce(Return(2))
+                    .WillOnce(Return(3));
 
-  EXPECT_TRUE(sampler.Sample());
+            EXPECT_TRUE(sampler.Sample());
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_TRUE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_TRUE(sampler.Sample());
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-}
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+        }
 
-TEST(PeriodicSamplerBaseTest, Disabled) {
-  StrictMock<MockPeriodicSampler> sampler;
+        TEST(PeriodicSamplerBaseTest, Disabled) {
+            StrictMock<MockPeriodicSampler> sampler;
 
-  EXPECT_CALL(sampler, period()).Times(3).WillRepeatedly(Return(0));
+            EXPECT_CALL(sampler, period()).Times(3).WillRepeatedly(Return(0));
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-}
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+        }
 
-TEST(PeriodicSamplerBaseTest, AlwaysOn) {
-  StrictMock<MockPeriodicSampler> sampler;
+        TEST(PeriodicSamplerBaseTest, AlwaysOn) {
+            StrictMock<MockPeriodicSampler> sampler;
 
-  EXPECT_CALL(sampler, period()).Times(3).WillRepeatedly(Return(1));
+            EXPECT_CALL(sampler, period()).Times(3).WillRepeatedly(Return(1));
 
-  EXPECT_TRUE(sampler.Sample());
-  EXPECT_TRUE(sampler.Sample());
-  EXPECT_TRUE(sampler.Sample());
-}
+            EXPECT_TRUE(sampler.Sample());
+            EXPECT_TRUE(sampler.Sample());
+            EXPECT_TRUE(sampler.Sample());
+        }
 
-TEST(PeriodicSamplerBaseTest, Disable) {
-  StrictMock<MockPeriodicSampler> sampler;
+        TEST(PeriodicSamplerBaseTest, Disable) {
+            StrictMock<MockPeriodicSampler> sampler;
 
-  EXPECT_CALL(sampler, period()).WillOnce(Return(16));
-  EXPECT_CALL(sampler, GetExponentialBiased(16)).WillOnce(Return(3));
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
+            EXPECT_CALL(sampler, period()).WillOnce(Return(16));
+            EXPECT_CALL(sampler, GetExponentialBiased(16)).WillOnce(Return(3));
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
 
-  EXPECT_CALL(sampler, period()).Times(2).WillRepeatedly(Return(0));
+            EXPECT_CALL(sampler, period()).Times(2).WillRepeatedly(Return(0));
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-}
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+        }
 
-TEST(PeriodicSamplerBaseTest, Enable) {
-  StrictMock<MockPeriodicSampler> sampler;
+        TEST(PeriodicSamplerBaseTest, Enable) {
+            StrictMock<MockPeriodicSampler> sampler;
 
-  EXPECT_CALL(sampler, period()).WillOnce(Return(0));
-  EXPECT_FALSE(sampler.Sample());
+            EXPECT_CALL(sampler, period()).WillOnce(Return(0));
+            EXPECT_FALSE(sampler.Sample());
 
-  EXPECT_CALL(sampler, period()).Times(2).WillRepeatedly(Return(16));
-  EXPECT_CALL(sampler, GetExponentialBiased(16))
-      .Times(2)
-      .WillRepeatedly(Return(3));
+            EXPECT_CALL(sampler, period()).Times(2).WillRepeatedly(Return(16));
+            EXPECT_CALL(sampler, GetExponentialBiased(16))
+                    .Times(2)
+                    .WillRepeatedly(Return(3));
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_TRUE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_TRUE(sampler.Sample());
 
-  EXPECT_FALSE(sampler.Sample());
-  EXPECT_FALSE(sampler.Sample());
-}
+            EXPECT_FALSE(sampler.Sample());
+            EXPECT_FALSE(sampler.Sample());
+        }
 
-TEST(PeriodicSamplerTest, ConstructConstInit) {
-  struct Tag {};
-  TURBO_CONST_INIT static PeriodicSampler<Tag> sampler;
-  (void)sampler;
-}
+        TEST(PeriodicSamplerTest, ConstructConstInit) {
+            struct Tag {
+            };
+            TURBO_CONST_INIT static PeriodicSampler<Tag> sampler;
+            (void) sampler;
+        }
 
-TEST(PeriodicSamplerTest, DefaultPeriod0) {
-  struct Tag {};
-  PeriodicSampler<Tag> sampler;
-  EXPECT_THAT(sampler.period(), Eq(0));
-}
+        TEST(PeriodicSamplerTest, DefaultPeriod0) {
+            struct Tag {
+            };
+            PeriodicSampler<Tag> sampler;
+            EXPECT_THAT(sampler.period(), Eq(0));
+        }
 
-TEST(PeriodicSamplerTest, DefaultPeriod) {
-  struct Tag {};
-  PeriodicSampler<Tag, 100> sampler;
-  EXPECT_THAT(sampler.period(), Eq(100));
-}
+        TEST(PeriodicSamplerTest, DefaultPeriod) {
+            struct Tag {
+            };
+            PeriodicSampler<Tag, 100> sampler;
+            EXPECT_THAT(sampler.period(), Eq(100));
+        }
 
-TEST(PeriodicSamplerTest, SetGlobalPeriod) {
-  struct Tag1 {};
-  struct Tag2 {};
-  PeriodicSampler<Tag1, 25> sampler1;
-  PeriodicSampler<Tag2, 50> sampler2;
+        TEST(PeriodicSamplerTest, SetGlobalPeriod) {
+            struct Tag1 {
+            };
+            struct Tag2 {
+            };
+            PeriodicSampler<Tag1, 25> sampler1;
+            PeriodicSampler<Tag2, 50> sampler2;
 
-  EXPECT_THAT(sampler1.period(), Eq(25));
-  EXPECT_THAT(sampler2.period(), Eq(50));
+            EXPECT_THAT(sampler1.period(), Eq(25));
+            EXPECT_THAT(sampler2.period(), Eq(50));
 
-  std::thread thread([] {
-    PeriodicSampler<Tag1, 25> sampler1;
-    PeriodicSampler<Tag2, 50> sampler2;
-    EXPECT_THAT(sampler1.period(), Eq(25));
-    EXPECT_THAT(sampler2.period(), Eq(50));
-    sampler1.SetGlobalPeriod(10);
-    sampler2.SetGlobalPeriod(20);
-  });
-  thread.join();
+            std::thread thread([] {
+                PeriodicSampler<Tag1, 25> sampler1;
+                PeriodicSampler<Tag2, 50> sampler2;
+                EXPECT_THAT(sampler1.period(), Eq(25));
+                EXPECT_THAT(sampler2.period(), Eq(50));
+                sampler1.SetGlobalPeriod(10);
+                sampler2.SetGlobalPeriod(20);
+            });
+            thread.join();
 
-  EXPECT_THAT(sampler1.period(), Eq(10));
-  EXPECT_THAT(sampler2.period(), Eq(20));
-}
+            EXPECT_THAT(sampler1.period(), Eq(10));
+            EXPECT_THAT(sampler2.period(), Eq(20));
+        }
 
-}  // namespace
-}  // namespace profiling_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    }  // namespace
+}  // namespace turbo::profiling_internal

@@ -14,9 +14,10 @@
 
 #ifndef TURBO_UNICODE_ERROR_H_
 #define TURBO_UNICODE_ERROR_H_
+
 namespace turbo {
 
-    enum error_code {
+    enum class UnicodeError {
         SUCCESS = 0,
         HEADER_BITS,  // Any byte must have fewer than 5 header bits.
         TOO_SHORT,    // The leading byte must be followed by N-1 continuation bytes, where N is the UTF-8 character length
@@ -31,14 +32,18 @@ namespace turbo {
     };
 
 
-    struct result {
-        error_code error;
+    struct UnicodeResult {
+        UnicodeError error;
         size_t count;     // In case of error, indicates the position of the error. In case of success, indicates the number of words validated/written.
 
-        result() = default;
+        UnicodeResult() = default;
 
-        result(error_code error, size_t count): error{error}, count{count} {};
+        UnicodeResult(UnicodeError error, size_t count): error{error}, count{count} {};
     };
+
+    constexpr inline  bool is_unicode_error(UnicodeResult result) noexcept {
+        return result.error != UnicodeError::SUCCESS;
+    }
 
 }
 #endif  // TURBO_UNICODE_ERROR_H_

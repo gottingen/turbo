@@ -34,7 +34,7 @@ using testing::Le;
 using testing::Ne;
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
 
     class CordBufferTestPeer {
     public:
@@ -317,5 +317,5 @@ namespace turbo {
         }
 
     }  // namespace
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

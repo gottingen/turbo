@@ -17,7 +17,7 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace {
 
 static constexpr int kMaxStackDepth = 100;
@@ -49,5 +49,5 @@ void BM_GetStackTrace(benchmark::State& state) {
 
 BENCHMARK(BM_GetStackTrace)->DenseRange(10, kMaxStackDepth, 10);
 }  // namespace
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

@@ -27,7 +27,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace debugging_internal {
 namespace {
 
@@ -179,7 +179,7 @@ int GetSignalHandlerStackConsumption(void (*signal_handler)(int)) {
 }
 
 }  // namespace debugging_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION

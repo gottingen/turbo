@@ -95,7 +95,6 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     class Cord;
 
     class CordTestPeer;
@@ -1067,28 +1066,26 @@ namespace turbo {
         const crc_internal::CrcCordState *MaybeGetCrcCordState() const;
     };
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
-// allow a Cord to be logged
+    // allow a Cord to be logged
     extern std::ostream &operator<<(std::ostream &out, const Cord &cord);
 
-// ------------------------------------------------------------------
-// Internal details follow.  Clients should ignore.
+    // ------------------------------------------------------------------
+    // Internal details follow.  Clients should ignore.
 
     namespace cord_internal {
 
-// Does non-template-specific `CordRepExternal` initialization.
-// Requires `data` to be non-empty.
+        // Does non-template-specific `CordRepExternal` initialization.
+        // Requires `data` to be non-empty.
         void InitializeCordRepExternal(std::string_view data, CordRepExternal *rep);
 
-// Creates a new `CordRep` that owns `data` and `releaser` and returns a pointer
-// to it. Requires `data` to be non-empty.
+        // Creates a new `CordRep` that owns `data` and `releaser` and returns a pointer
+        // to it. Requires `data` to be non-empty.
         template<typename Releaser>
-// NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
+        // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
         CordRep *NewExternalRep(std::string_view data, Releaser &&releaser) {
             assert(!data.empty());
             using ReleaserType = std::decay_t<Releaser>;
@@ -1098,9 +1095,9 @@ namespace turbo {
             return rep;
         }
 
-// Overload for function reference types that dispatches using a function
-// pointer because there are no `alignof()` or `sizeof()` a function reference.
-// NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
+        // Overload for function reference types that dispatches using a function
+        // pointer because there are no `alignof()` or `sizeof()` a function reference.
+        // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
         inline CordRep *NewExternalRep(std::string_view data,
                                        void (&releaser)(std::string_view)) {
             return NewExternalRep(data, &releaser);
@@ -1689,7 +1686,7 @@ namespace turbo {
 
     inline bool operator>=(std::string_view x, const Cord &y) { return !(x < y); }
 
-// Some internals exposed to test code.
+    // Some internals exposed to test code.
     namespace strings_internal {
         class CordTestAccess {
         public:
@@ -1706,7 +1703,6 @@ namespace turbo {
             static uint8_t LengthToTag(size_t s);
         };
     }  // namespace strings_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_CORD_H_

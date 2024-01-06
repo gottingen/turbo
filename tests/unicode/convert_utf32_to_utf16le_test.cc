@@ -88,8 +88,8 @@ TEST_CASE("convert_into_2_or_4_UTF16_bytes") {
             std::cout.flush();
         }
         // range for 2 or 4 UTF-16 bytes (all codepoints)
-        turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000, 0xd7ff},
-                                                              {0xe000, 0xffff},
+        turbo::FixedUniformRanges<uint32_t, uint64_t> random({{0x0000,  0xd7ff},
+                                                              {0xe000,  0xffff},
                                                               {0x10000, 0x10ffff}});
 
         auto procedure = [](const char32_t *utf32, size_t size, char16_t *utf16) -> size_t {
@@ -125,7 +125,7 @@ TEST_CASE("convert_fails_if_there_is_surrogate") {
 
 TEST_CASE("convert_fails_if_input_too_large") {
 
-    turbo::FixedUniform<int> generator(0x110000, 0xffffffff);
+    turbo::FixedUniform<uint32_t> generator(0x110000, 0xffffffff);
 
     auto procedure = [](const char32_t *utf32, size_t size, char16_t *utf16) -> size_t {
         return turbo::convert_utf32_to_utf16le(utf32, size, utf16);

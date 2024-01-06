@@ -34,7 +34,7 @@ constexpr int kProbeLength = 8;
 #endif
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace container_internal {
 #if defined(TURBO_INTERNAL_HASHTABLEZ_SAMPLE)
         class HashtablezInfoHandlePeer {
@@ -425,5 +425,5 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
 
         }  // namespace
     }  // namespace container_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

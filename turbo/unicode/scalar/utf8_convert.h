@@ -123,7 +123,7 @@ namespace turbo::unicode::utf8_to_utf16 {
     }
 
     template<EndianNess big_endian>
-    inline result convert_with_errors(const char *buf, size_t len, char16_t *utf16_output) {
+    inline UnicodeResult convert_with_errors(const char *buf, size_t len, char16_t *utf16_output) {
         const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
         size_t pos = 0;
         char16_t *start{utf16_output};
@@ -154,11 +154,11 @@ namespace turbo::unicode::utf8_to_utf16 {
             } else if ((leading_byte & 0b11100000) == 0b11000000) {
                 // We have a two-byte UTF-8, it should become
                 // a single UTF-16 word.
-                if (pos + 1 >= len) { return result(error_code::TOO_SHORT, pos); } // minimal bound checking
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if (pos + 1 >= len) { return UnicodeResult{UnicodeError::TOO_SHORT, pos}; } // minimal bound checking
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return UnicodeResult(UnicodeError::TOO_SHORT, pos); }
                 // range check
                 uint32_t code_point = (leading_byte & 0b00011111) << 6 | (data[pos + 1] & 0b00111111);
-                if (code_point < 0x80 || 0x7ff < code_point) { return result(error_code::OVERLONG, pos); }
+                if (code_point < 0x80 || 0x7ff < code_point) { return UnicodeResult(UnicodeError::OVERLONG, pos); }
                 if (!match_system(big_endian)) {
                     code_point = uint32_t(gbswap_16(uint16_t(code_point)));
                 }
@@ -167,16 +167,16 @@ namespace turbo::unicode::utf8_to_utf16 {
             } else if ((leading_byte & 0b11110000) == 0b11100000) {
                 // We have a three-byte UTF-8, it should become
                 // a single UTF-16 word.
-                if (pos + 2 >= len) { return result(error_code::TOO_SHORT, pos); } // minimal bound checking
+                if (pos + 2 >= len) { return {UnicodeError::TOO_SHORT, pos}; } // minimal bound checking
 
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
                 // range check
                 uint32_t code_point = (leading_byte & 0b00001111) << 12 |
                                       (data[pos + 1] & 0b00111111) << 6 |
                                       (data[pos + 2] & 0b00111111);
-                if ((code_point < 0x800) || (0xffff < code_point)) { return result(error_code::OVERLONG, pos); }
-                if (0xd7ff < code_point && code_point < 0xe000) { return result(error_code::SURROGATE, pos); }
+                if ((code_point < 0x800) || (0xffff < code_point)) { return {UnicodeError::OVERLONG, pos}; }
+                if (0xd7ff < code_point && code_point < 0xe000) { return {UnicodeError::SURROGATE, pos}; }
                 if (!match_system(big_endian)) {
                     code_point = uint32_t(gbswap_16(uint16_t(code_point)));
                 }
@@ -184,17 +184,17 @@ namespace turbo::unicode::utf8_to_utf16 {
                 pos += 3;
             } else if ((leading_byte & 0b11111000) == 0b11110000) { // 0b11110000
                 // we have a 4-byte UTF-8 word.
-                if (pos + 3 >= len) { return result(error_code::TOO_SHORT, pos); } // minimal bound checking
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 3] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if (pos + 3 >= len) { return {UnicodeError::TOO_SHORT, pos}; } // minimal bound checking
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 3] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
 
                 // range check
                 uint32_t code_point =
                         (leading_byte & 0b00000111) << 18 | (data[pos + 1] & 0b00111111) << 12 |
                         (data[pos + 2] & 0b00111111) << 6 | (data[pos + 3] & 0b00111111);
-                if (code_point <= 0xffff) { return result(error_code::OVERLONG, pos); }
-                if (0x10ffff < code_point) { return result(error_code::TOO_LARGE, pos); }
+                if (code_point <= 0xffff) { return {UnicodeError::OVERLONG, pos}; }
+                if (0x10ffff < code_point) { return {UnicodeError::TOO_LARGE, pos}; }
                 code_point -= 0x10000;
                 uint16_t high_surrogate = uint16_t(0xD800 + (code_point >> 10));
                 uint16_t low_surrogate = uint16_t(0xDC00 + (code_point & 0x3FF));
@@ -207,11 +207,11 @@ namespace turbo::unicode::utf8_to_utf16 {
                 pos += 4;
             } else {
                 // we either have too many continuation bytes or an invalid leading byte
-                if ((leading_byte & 0b11000000) == 0b10000000) { return result(error_code::TOO_LONG, pos); }
-                else { return result(error_code::HEADER_BITS, pos); }
+                if ((leading_byte & 0b11000000) == 0b10000000) { return {UnicodeError::TOO_LONG, pos}; }
+                else { return {UnicodeError::HEADER_BITS, pos}; }
             }
         }
-        return result(error_code::SUCCESS, utf16_output - start);
+        return {UnicodeError::SUCCESS, static_cast<size_t>(utf16_output - start)};
     }
 
     /**
@@ -228,7 +228,7 @@ namespace turbo::unicode::utf8_to_utf16 {
      * will be SIZE_T - 1, SIZE_T - 2, or SIZE_T - 3.
      */
     template<EndianNess endian>
-    inline result
+    inline UnicodeResult
     rewind_and_convert_with_errors(size_t prior_bytes, const char *buf, size_t len, char16_t *utf16_output) {
         size_t extra_len{0};
         // We potentially need to go back in time and find a leading byte.
@@ -256,10 +256,10 @@ namespace turbo::unicode::utf8_to_utf16 {
             // If how_far_back == 3, we may have four consecutive continuation bytes!!!
             // [....] [continuation] [continuation] [continuation] | [buf is continuation]
             // Or we possibly have a stream that does not start with a leading byte.
-            return result(error_code::TOO_LONG, -how_far_back);
+            return {UnicodeError::TOO_LONG, -how_far_back};
         }
-        result res = convert_with_errors<endian>(buf, len + extra_len, utf16_output);
-        if (res.error) {
+        auto res = convert_with_errors<endian>(buf, len + extra_len, utf16_output);
+        if (is_unicode_error(res)) {
             res.count -= extra_len;
         }
         return res;
@@ -409,7 +409,7 @@ namespace turbo::unicode::utf8_to_utf32 {
         return utf32_output - start;
     }
 
-    inline result convert_with_errors(const char* buf, size_t len, char32_t* utf32_output) {
+    inline UnicodeResult convert_with_errors(const char* buf, size_t len, char32_t* utf32_output) {
         const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
         size_t pos = 0;
         char32_t* start{utf32_output};
@@ -437,49 +437,49 @@ namespace turbo::unicode::utf8_to_utf32 {
                 pos++;
             } else if ((leading_byte & 0b11100000) == 0b11000000) {
                 // We have a two-byte UTF-8
-                if(pos + 1 >= len) { return result(error_code::TOO_SHORT, pos); } // minimal bound checking
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if(pos + 1 >= len) { return {UnicodeError::TOO_SHORT, pos}; } // minimal bound checking
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
                 // range check
                 uint32_t code_point = (leading_byte & 0b00011111) << 6 | (data[pos + 1] & 0b00111111);
-                if (code_point < 0x80 || 0x7ff < code_point) { return result(error_code::OVERLONG, pos); }
+                if (code_point < 0x80 || 0x7ff < code_point) { return {UnicodeError::OVERLONG, pos}; }
                 *utf32_output++ = char32_t(code_point);
                 pos += 2;
             } else if ((leading_byte & 0b11110000) == 0b11100000) {
                 // We have a three-byte UTF-8
-                if(pos + 2 >= len) { return result(error_code::TOO_SHORT, pos); } // minimal bound checking
+                if(pos + 2 >= len) { return {UnicodeError::TOO_SHORT, pos}; } // minimal bound checking
 
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
                 // range check
                 uint32_t code_point = (leading_byte & 0b00001111) << 12 |
                                       (data[pos + 1] & 0b00111111) << 6 |
                                       (data[pos + 2] & 0b00111111);
-                if (code_point < 0x800 || 0xffff < code_point) { return result(error_code::OVERLONG, pos); }
-                if (0xd7ff < code_point && code_point < 0xe000) { return result(error_code::SURROGATE, pos); }
+                if (code_point < 0x800 || 0xffff < code_point) { return {UnicodeError::OVERLONG, pos}; }
+                if (0xd7ff < code_point && code_point < 0xe000) { return {UnicodeError::SURROGATE, pos}; }
                 *utf32_output++ = char32_t(code_point);
                 pos += 3;
             } else if ((leading_byte & 0b11111000) == 0b11110000) { // 0b11110000
                 // we have a 4-byte UTF-8 word.
-                if(pos + 3 >= len) { return result(error_code::TOO_SHORT, pos); } // minimal bound checking
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos);}
-                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 3] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if(pos + 3 >= len) { return {UnicodeError::TOO_SHORT, pos}; } // minimal bound checking
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos};}
+                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 3] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
 
                 // range check
                 uint32_t code_point =
                         (leading_byte & 0b00000111) << 18 | (data[pos + 1] & 0b00111111) << 12 |
                         (data[pos + 2] & 0b00111111) << 6 | (data[pos + 3] & 0b00111111);
-                if (code_point <= 0xffff) { return result(error_code::OVERLONG, pos); }
-                if (0x10ffff < code_point) { return result(error_code::TOO_LARGE, pos); }
+                if (code_point <= 0xffff) { return {UnicodeError::OVERLONG, pos}; }
+                if (0x10ffff < code_point) { return {UnicodeError::TOO_LARGE, pos}; }
                 *utf32_output++ = char32_t(code_point);
                 pos += 4;
             } else {
                 // we either have too many continuation bytes or an invalid leading byte
-                if ((leading_byte & 0b11000000) == 0b10000000) { return result(error_code::TOO_LONG, pos); }
-                else { return result(error_code::HEADER_BITS, pos); }
+                if ((leading_byte & 0b11000000) == 0b10000000) { return {UnicodeError::TOO_LONG, pos}; }
+                else { return {UnicodeError::HEADER_BITS, pos}; }
             }
         }
-        return result(error_code::SUCCESS, utf32_output - start);
+        return {UnicodeError::SUCCESS, static_cast<size_t>(utf32_output - start)};
     }
 
     /**
@@ -495,7 +495,7 @@ namespace turbo::unicode::utf8_to_utf32 {
      * If the error is believed to have occured prior to 'buf', the count value contain in the result
      * will be SIZE_T - 1, SIZE_T - 2, or SIZE_T - 3.
      */
-    inline result rewind_and_convert_with_errors(size_t prior_bytes, const char* buf, size_t len, char32_t* utf32_output) {
+    inline UnicodeResult rewind_and_convert_with_errors(size_t prior_bytes, const char* buf, size_t len, char32_t* utf32_output) {
         size_t extra_len{0};
         // We potentially need to go back in time and find a leading byte.
         size_t how_far_back = 3; // 3 bytes in the past + current position
@@ -522,11 +522,11 @@ namespace turbo::unicode::utf8_to_utf32 {
             // If how_far_back == 3, we may have four consecutive continuation bytes!!!
             // [....] [continuation] [continuation] [continuation] | [buf is continuation]
             // Or we possibly have a stream that does not start with a leading byte.
-            return result(error_code::TOO_LONG, -how_far_back);
+            return {UnicodeError::TOO_LONG, -how_far_back};
         }
 
-        result res = convert_with_errors(buf, len + extra_len, utf32_output);
-        if (res.error) {
+        auto res = convert_with_errors(buf, len + extra_len, utf32_output);
+        if (is_unicode_error(res)) {
             res.count -= extra_len;
         }
         return res;

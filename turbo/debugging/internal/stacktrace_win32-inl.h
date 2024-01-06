@@ -40,11 +40,17 @@
 #include <windows.h>    // for GetProcAddress and GetModuleHandle
 #include <cassert>
 
-typedef USHORT NTAPI RtlCaptureStackBackTrace_Function(
-    IN ULONG frames_to_skip,
-    IN ULONG frames_to_capture,
-    OUT PVOID *backtrace,
-    OUT PULONG backtrace_hash);
+typedef USHORT NTAPI
+RtlCaptureStackBackTrace_Function(
+        IN
+ULONG frames_to_skip,
+        IN
+ULONG frames_to_capture,
+        OUT
+PVOID *backtrace,
+        OUT
+PULONG backtrace_hash
+);
 
 // It is not possible to load RtlCaptureStackBackTrace at static init time in
 // UWP. CaptureStackBackTrace is the public version of RtlCaptureStackBackTrace
@@ -55,40 +61,36 @@ static RtlCaptureStackBackTrace_Function* const RtlCaptureStackBackTrace_fn =
 #else
 // Load the function we need at static init time, where we don't have
 // to worry about someone else holding the loader's lock.
-static RtlCaptureStackBackTrace_Function* const RtlCaptureStackBackTrace_fn =
-    (RtlCaptureStackBackTrace_Function*)GetProcAddress(
-        GetModuleHandleA("ntdll.dll"), "RtlCaptureStackBackTrace");
+static RtlCaptureStackBackTrace_Function *const RtlCaptureStackBackTrace_fn =
+        (RtlCaptureStackBackTrace_Function *) GetProcAddress(
+                GetModuleHandleA("ntdll.dll"), "RtlCaptureStackBackTrace");
 #endif  // WINAPI_PARTITION_APP && !WINAPI_PARTITION_DESKTOP
 
-template <bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
-static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
-                      const void*, int* min_dropped_frames) {
-  USHORT n = 0;
-  if (!RtlCaptureStackBackTrace_fn || skip_count < 0 || max_depth < 0) {
-    // can't get a stacktrace with no function/invalid args
-  } else {
-    n = RtlCaptureStackBackTrace_fn(static_cast<ULONG>(skip_count) + 2,
-                                    static_cast<ULONG>(max_depth), result, 0);
-  }
-  if (IS_STACK_FRAMES) {
-    // No implementation for finding out the stack frame sizes yet.
-    memset(sizes, 0, sizeof(*sizes) * n);
-  }
-  if (min_dropped_frames != nullptr) {
-    // Not implemented.
-    *min_dropped_frames = 0;
-  }
-  return n;
+template<bool IS_STACK_FRAMES, bool IS_WITH_CONTEXT>
+static int UnwindImpl(void **result, int *sizes, int max_depth, int skip_count,
+                      const void *, int *min_dropped_frames) {
+    USHORT n = 0;
+    if (!RtlCaptureStackBackTrace_fn || skip_count < 0 || max_depth < 0) {
+        // can't get a stacktrace with no function/invalid args
+    } else {
+        n = RtlCaptureStackBackTrace_fn(static_cast<ULONG>(skip_count) + 2,
+                                        static_cast<ULONG>(max_depth), result, 0);
+    }
+    if (IS_STACK_FRAMES) {
+        // No implementation for finding out the stack frame sizes yet.
+        memset(sizes, 0, sizeof(*sizes) * n);
+    }
+    if (min_dropped_frames != nullptr) {
+        // Not implemented.
+        *min_dropped_frames = 0;
+    }
+    return n;
 }
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace debugging_internal {
-bool StackTraceWorksForTest() {
-  return false;
-}
-}  // namespace debugging_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+namespace turbo::debugging_internal {
+    bool StackTraceWorksForTest() {
+        return false;
+    }
+}  // namespace turbo::debugging_internal
 
 #endif  // TURBO_DEBUGGING_INTERNAL_STACKTRACE_WIN32_INL_H_

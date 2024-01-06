@@ -57,21 +57,6 @@ carbin_cc_test(
         turbo::turbo
 )
 
-
-# On bazel BUILD this target use "alwayslink = 1" which is not implemented here
-carbin_cc_test(
-        NAME
-        spinlock_test
-        SOURCES
-        "spinlock_common_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-
-
 carbin_cc_test(
         NAME
         config_test
@@ -87,18 +72,6 @@ carbin_cc_test(
 
 carbin_cc_test(
         NAME
-        sysinfo_test
-        SOURCES
-        "sysinfo_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
         low_level_alloc_test
         SOURCES
         "low_level_alloc_test.cc"
@@ -108,18 +81,6 @@ carbin_cc_test(
         ${CARBIN_DEPS_LINK}
         turbo::turbo
         Threads::Threads
-)
-
-carbin_cc_test(
-        NAME
-        scoped_set_env_test
-        SOURCES
-        "scoped_set_env_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
 )
 
 carbin_cc_test(

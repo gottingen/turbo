@@ -29,7 +29,6 @@
 #include "turbo/random/uniform_int_distribution.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     // turbo::discrete_distribution
     //
@@ -245,7 +244,6 @@ namespace turbo {
         return is;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_DISCRETE_DISTRIBUTION_H_

@@ -108,7 +108,7 @@
 #if TURBO_INTERNAL_RACE_ANNOTATIONS_ENABLED == 1
 // Some of the symbols used in this section (e.g. AnnotateBenignRaceSized) are
 // defined by the compiler-based santizer implementation, not by the Turbo
-// library. Therefore they do not use TURBO_INTERNAL_C_SYMBOL.
+// library..
 
 // -------------------------------------------------------------
 // Annotations that suppress errors. It is usually better to express the
@@ -287,7 +287,7 @@ TURBO_INTERNAL_END_EXTERN_C
 #if TURBO_INTERNAL_READS_ANNOTATIONS_ENABLED == 1
 // Some of the symbols used in this section (e.g. AnnotateIgnoreReadsBegin) are
 // defined by the compiler-based implementation, not by the Turbo
-// library. Therefore they do not use TURBO_INTERNAL_C_SYMBOL.
+// library..
 
 // Request the analysis tool to ignore all reads in the current thread until
 // TURBO_ANNOTATE_IGNORE_READS_END is called. Useful to ignore intentional racey
@@ -322,20 +322,19 @@ TURBO_INTERNAL_END_EXTERN_C
 
 #define TURBO_ANNOTATE_IGNORE_READS_BEGIN()                          \
   TURBO_INTERNAL_GLOBAL_SCOPED(                                      \
-      TURBO_INTERNAL_C_SYMBOL(TurboInternalAnnotateIgnoreReadsBegin)) \
+      TurboInternalAnnotateIgnoreReadsBegin) \
   ()
 
 #define TURBO_ANNOTATE_IGNORE_READS_END()                          \
   TURBO_INTERNAL_GLOBAL_SCOPED(                                    \
-      TURBO_INTERNAL_C_SYMBOL(TurboInternalAnnotateIgnoreReadsEnd)) \
+      TurboInternalAnnotateIgnoreReadsEnd) \
   ()
 
-TURBO_INTERNAL_STATIC_INLINE void TURBO_INTERNAL_C_SYMBOL(
-    TurboInternalAnnotateIgnoreReadsBegin)()
+TURBO_INTERNAL_STATIC_INLINE void
+    TurboInternalAnnotateIgnoreReadsBegin()
     TURBO_INTERNAL_IGNORE_READS_BEGIN_ATTRIBUTE {}
 
-TURBO_INTERNAL_STATIC_INLINE void TURBO_INTERNAL_C_SYMBOL(
-    TurboInternalAnnotateIgnoreReadsEnd)()
+TURBO_INTERNAL_STATIC_INLINE void TurboInternalAnnotateIgnoreReadsEnd()
     TURBO_INTERNAL_IGNORE_READS_END_ATTRIBUTE {}
 
 #else
@@ -404,9 +403,7 @@ TURBO_INTERNAL_END_EXTERN_C
 #define TURBO_ANNOTATE_UNPROTECTED_READ(x) \
   turbo::base_internal::AnnotateUnprotectedRead(x)
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
+namespace turbo::base_internal {
 
 template <typename T>
 inline T AnnotateUnprotectedRead(const volatile T& x) {  // NOLINT
@@ -416,9 +413,7 @@ inline T AnnotateUnprotectedRead(const volatile T& x) {  // NOLINT
   return res;
 }
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::base_internal
 #endif
 
 #else

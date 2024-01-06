@@ -218,7 +218,8 @@ namespace turbo {
         //
         // Returns the last element of a `unicode_view`.
         constexpr const_reference back() const noexcept {
-            return TURBO_ASSERT(!empty()), ptr_[size() - 1];
+            TURBO_ASSERT(!empty());
+            return ptr_[size() - 1];
         }
 
         // unicode_view::data()

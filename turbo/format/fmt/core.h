@@ -332,7 +332,7 @@ namespace turbo {
                 using base::check_arg_id;
 
                 constexpr void check_dynamic_spec(int arg_id) {
-                    turbo::ignore_unused(arg_id);
+                    TURBO_UNUSED(arg_id);
 #if !defined(__LCC__)
                     if (arg_id < num_args_ && types_ && !is_integral_type(types_[arg_id]))
                         throw_format_error("width/precision is not integer");
@@ -1758,7 +1758,7 @@ namespace turbo {
             public:
                 constexpr void operator=(std::basic_string_view<Char> s) {
                     auto size = s.size();
-                    TURBO_ASSERT(size <= max_size, "invalid fill");
+                    TURBO_ASSERT(size <= max_size&&"invalid fill");
                     for (size_t i = 0; i < size; ++i) data_[i] = s[i];
                     size_ = static_cast<unsigned char>(size);
                 }
@@ -1899,7 +1899,7 @@ namespace turbo {
             template<typename Char>
             constexpr auto parse_nonnegative_int(const Char *&begin, const Char *end,
                                                  int error_value) noexcept -> int {
-                TURBO_ASSERT(begin != end && '0' <= *begin && *begin <= '9', "");
+                TURBO_ASSERT(begin != end && '0' <= *begin && *begin <= '9');
                 unsigned value = 0, prev = 0;
                 auto p = begin;
                 do {
@@ -1968,7 +1968,7 @@ namespace turbo {
             template<typename Char, typename Handler>
             constexpr TURBO_FORCE_INLINE auto parse_arg_id(const Char *begin, const Char *end,
                                                            Handler &&handler) -> const Char * {
-                TURBO_ASSERT(begin != end, "");
+                TURBO_ASSERT(begin != end);
                 Char c = *begin;
                 if (c != '}' && c != ':') return do_parse_arg_id(begin, end, handler);
                 handler.on_auto();
@@ -2004,7 +2004,7 @@ namespace turbo {
                                               int &value, arg_ref<Char> &ref,
                                               basic_format_parse_context<Char> &ctx)
             -> const Char * {
-                TURBO_ASSERT(begin != end, "");
+                TURBO_ASSERT(begin != end);
                 if ('0' <= *begin && *begin <= '9') {
                     int val = parse_nonnegative_int(begin, end, -1);
                     if (val != -1)
@@ -2428,7 +2428,7 @@ namespace turbo {
                 constexpr auto s = std::basic_string_view<char_t>(format_str);
                 using checker = format_string_checker<char_t, turbo::remove_cvref_t<Args>...>;
                 constexpr bool error = (parse_format_string<true>(s, checker(s)), true);
-                turbo::ignore_unused(error);
+                TURBO_UNUSED(error);
             }
 
             template<typename Char = char>

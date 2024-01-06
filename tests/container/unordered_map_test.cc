@@ -21,7 +21,7 @@
 #include "unordered_map_modifiers_test.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace container_internal {
         namespace {
 
@@ -46,5 +46,5 @@ namespace turbo {
 
         }  // namespace
     }  // namespace container_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

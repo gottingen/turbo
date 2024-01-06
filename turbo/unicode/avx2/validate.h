@@ -149,7 +149,7 @@ namespace turbo::unicode::simd {
 
 
     template <EndianNess big_endian>
-    inline const result avx2_validate_utf16_with_errors(const char16_t* input, size_t size) {
+    inline const UnicodeResult avx2_validate_utf16_with_errors(const char16_t* input, size_t size) {
         const char16_t* start = input;
         const char16_t* end = input + size;
 
@@ -217,12 +217,12 @@ namespace turbo::unicode::simd {
                     // one, 2) reject sole high surrogate.
                     input += simd16<uint16_t,avx2_engine>::ELEMENTS * 2 - 1;
                 } else {
-                    return result(error_code::SURROGATE, input - start);
+                    return UnicodeResult(UnicodeError::SURROGATE, input - start);
                 }
             }
         }
 
-        return result(error_code::SUCCESS, input - start);
+        return UnicodeResult(UnicodeError::SUCCESS, input - start);
     }
 
     /* Returns:
@@ -258,7 +258,7 @@ namespace turbo::unicode::simd {
     }
 
 
-    inline const result avx2_validate_utf32le_with_errors(const char32_t* input, size_t size) {
+    inline const UnicodeResult avx2_validate_utf32le_with_errors(const char32_t* input, size_t size) {
         const char32_t* start = input;
         const char32_t* end = input + size;
 
@@ -275,17 +275,17 @@ namespace turbo::unicode::simd {
 
             __m256i is_zero = _mm256_xor_si256(_mm256_max_epu32(currentmax, standardmax), standardmax);
             if(_mm256_testz_si256(is_zero, is_zero) == 0) {
-                return result(error_code::TOO_LARGE, input - start);
+                return UnicodeResult(UnicodeError::TOO_LARGE, input - start);
             }
 
             is_zero = _mm256_xor_si256(_mm256_max_epu32(currentoffsetmax, standardoffsetmax), standardoffsetmax);
             if(_mm256_testz_si256(is_zero, is_zero) == 0) {
-                return result(error_code::SURROGATE, input - start);
+                return UnicodeResult(UnicodeError::SURROGATE, input - start);
             }
             input += 8;
         }
 
-        return result(error_code::SUCCESS, input - start);
+        return UnicodeResult(UnicodeError::SUCCESS, input - start);
     }
 
 }

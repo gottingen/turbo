@@ -50,11 +50,10 @@ TURBO_REGISTER_ERRNO(turbo::kReachFileEnd, "REACH_FILE_END");
 TURBO_REGISTER_ERRNO(turbo::kDiskIOError, "DISK_IO_ERROR");
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
 
     std::string StatusCodeToString(StatusCode code) {
-        return TurboError(code);
+        return terror(code);
     }
 
     std::ostream &operator<<(std::ostream &os, StatusCode code) {
@@ -187,9 +186,6 @@ namespace turbo {
         return &empty.str;
     }
 
-#ifndef TURBO_COMPILER_CPP17_ENABLED
-    constexpr const char Status::kMovedFromString[];
-#endif
 
     const std::string *Status::MovedFromString() {
         static std::string *moved_from_string = new std::string(kMovedFromString);
@@ -419,6 +415,14 @@ namespace turbo {
         return status.code() == turbo::kDiskIOError;
     }
 
+    bool is_already_stop(const Status &status) {
+        return status.code() == turbo::kAlreadyStop;
+    }
+
+    bool is_resource_busy(const Status &status) {
+        return status.code() == turbo::kResourceBusy;
+    }
+
 
     StatusCode errno_to_status_code(int error_number) {
         switch (error_number) {
@@ -584,5 +588,4 @@ namespace turbo {
 
     }  // namespace status_internal
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

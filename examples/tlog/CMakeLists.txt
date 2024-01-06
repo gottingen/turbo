@@ -28,3 +28,14 @@ carbin_cc_binary(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_binary(
+        NAME
+        assertion
+        SOURCES
+        "assertion.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)

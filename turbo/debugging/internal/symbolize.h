@@ -29,7 +29,7 @@
 #ifdef TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE
 #error TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE cannot be directly set
 #elif defined(__ELF__) && defined(__GLIBC__) && !defined(__native_client__) \
-      && !defined(__asmjs__) && !defined(__wasm__)
+ && !defined(__asmjs__) && !defined(__wasm__)
 #define TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE 1
 
 #include <elf.h>
@@ -37,28 +37,24 @@
 #include <functional>
 #include <string>
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace debugging_internal {
+namespace turbo::debugging_internal {
 
-// Iterates over all sections, invoking callback on each with the section name
-// and the section header.
-//
-// Returns true on success; otherwise returns false in case of errors.
-//
-// This is not async-signal-safe.
-bool ForEachSection(int fd,
-                    const std::function<bool(std::string_view name,
-                                             const ElfW(Shdr) &)>& callback);
+    // Iterates over all sections, invoking callback on each with the section name
+    // and the section header.
+    //
+    // Returns true on success; otherwise returns false in case of errors.
+    //
+    // This is not async-signal-safe.
+    bool ForEachSection(int fd,
+                        const std::function<bool(std::string_view name,
+                                                 const ElfW(Shdr) &)> &callback);
 
-// Gets the section header for the given name, if it exists. Returns true on
-// success. Otherwise, returns false.
-bool GetSectionHeaderByName(int fd, const char *name, size_t name_len,
-                            ElfW(Shdr) *out);
+    // Gets the section header for the given name, if it exists. Returns true on
+    // success. Otherwise, returns false.
+    bool GetSectionHeaderByName(int fd, const char *name, size_t name_len,
+                                ElfW(Shdr) *out);
 
-}  // namespace debugging_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::debugging_internal
 
 #endif  // TURBO_INTERNAL_HAVE_ELF_SYMBOLIZE
 
@@ -74,68 +70,64 @@ TURBO_NAMESPACE_END
 #define TURBO_INTERNAL_HAVE_EMSCRIPTEN_SYMBOLIZE 1
 #endif
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace debugging_internal {
+namespace turbo::debugging_internal {
 
-struct SymbolDecoratorArgs {
-  // The program counter we are getting symbolic name for.
-  const void *pc;
-  // 0 for main executable, load address for shared libraries.
-  ptrdiff_t relocation;
-  // Read-only file descriptor for ELF image covering "pc",
-  // or -1 if no such ELF image exists in /proc/self/maps.
-  int fd;
-  // Output buffer, size.
-  // Note: the buffer may not be empty -- default symbolizer may have already
-  // produced some output, and earlier decorators may have adorned it in
-  // some way. You are free to replace or augment the contents (within the
-  // symbol_buf_size limit).
-  char *const symbol_buf;
-  size_t symbol_buf_size;
-  // Temporary scratch space, size.
-  // Use that space in preference to allocating your own stack buffer to
-  // conserve stack.
-  char *const tmp_buf;
-  size_t tmp_buf_size;
-  // User-provided argument
-  void* arg;
-};
-using SymbolDecorator = void (*)(const SymbolDecoratorArgs *);
+    struct SymbolDecoratorArgs {
+        // The program counter we are getting symbolic name for.
+        const void *pc;
+        // 0 for main executable, load address for shared libraries.
+        ptrdiff_t relocation;
+        // Read-only file descriptor for ELF image covering "pc",
+        // or -1 if no such ELF image exists in /proc/self/maps.
+        int fd;
+        // Output buffer, size.
+        // Note: the buffer may not be empty -- default symbolizer may have already
+        // produced some output, and earlier decorators may have adorned it in
+        // some way. You are free to replace or augment the contents (within the
+        // symbol_buf_size limit).
+        char *const symbol_buf;
+        size_t symbol_buf_size;
+        // Temporary scratch space, size.
+        // Use that space in preference to allocating your own stack buffer to
+        // conserve stack.
+        char *const tmp_buf;
+        size_t tmp_buf_size;
+        // User-provided argument
+        void *arg;
+    };
+    using SymbolDecorator = void (*)(const SymbolDecoratorArgs *);
 
-// Installs a function-pointer as a decorator. Returns a value less than zero
-// if the system cannot install the decorator. Otherwise, returns a unique
-// identifier corresponding to the decorator. This identifier can be used to
-// uninstall the decorator - See RemoveSymbolDecorator() below.
-int InstallSymbolDecorator(SymbolDecorator decorator, void* arg);
+    // Installs a function-pointer as a decorator. Returns a value less than zero
+    // if the system cannot install the decorator. Otherwise, returns a unique
+    // identifier corresponding to the decorator. This identifier can be used to
+    // uninstall the decorator - See RemoveSymbolDecorator() below.
+    int InstallSymbolDecorator(SymbolDecorator decorator, void *arg);
 
-// Removes a previously installed function-pointer decorator. Parameter "ticket"
-// is the return-value from calling InstallSymbolDecorator().
-bool RemoveSymbolDecorator(int ticket);
+    // Removes a previously installed function-pointer decorator. Parameter "ticket"
+    // is the return-value from calling InstallSymbolDecorator().
+    bool RemoveSymbolDecorator(int ticket);
 
-// Remove all installed decorators.  Returns true if successful, false if
-// symbolization is currently in progress.
-bool RemoveAllSymbolDecorators(void);
+    // Remove all installed decorators.  Returns true if successful, false if
+    // symbolization is currently in progress.
+    bool RemoveAllSymbolDecorators(void);
 
-// Registers an address range to a file mapping.
-//
-// Preconditions:
-//   start <= end
-//   filename != nullptr
-//
-// Returns true if the file was successfully registered.
-bool RegisterFileMappingHint(const void* start, const void* end,
-                             uint64_t offset, const char* filename);
+    // Registers an address range to a file mapping.
+    //
+    // Preconditions:
+    //   start <= end
+    //   filename != nullptr
+    //
+    // Returns true if the file was successfully registered.
+    bool RegisterFileMappingHint(const void *start, const void *end,
+                                 uint64_t offset, const char *filename);
 
-// Looks up the file mapping registered by RegisterFileMappingHint for an
-// address range. If there is one, the file name is stored in *filename and
-// *start and *end are modified to reflect the registered mapping. Returns
-// whether any hint was found.
-bool GetFileMappingHint(const void** start, const void** end, uint64_t* offset,
-                        const char** filename);
+    // Looks up the file mapping registered by RegisterFileMappingHint for an
+    // address range. If there is one, the file name is stored in *filename and
+    // *start and *end are modified to reflect the registered mapping. Returns
+    // whether any hint was found.
+    bool GetFileMappingHint(const void **start, const void **end, uint64_t *offset,
+                            const char **filename);
 
-}  // namespace debugging_internal
-TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // __cplusplus
@@ -146,8 +138,8 @@ TURBO_NAMESPACE_END
 extern "C"
 #endif  // __cplusplus
 
-    bool
-    TurboInternalGetFileMappingHint(const void** start, const void** end,
-                                   uint64_t* offset, const char** filename);
+bool
+TurboInternalGetFileMappingHint(const void **start, const void **end,
+                                uint64_t *offset, const char **filename);
 
 #endif  // TURBO_DEBUGGING_INTERNAL_SYMBOLIZE_H_

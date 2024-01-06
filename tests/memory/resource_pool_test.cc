@@ -41,24 +41,22 @@ namespace {
 namespace turbo {
     template<>
     struct ResourcePoolTraits<MyObject> : public ResourcePoolTraitsBase<MyObject>{
-        static constexpr size_t kBlockMaxSize = 128;
-
-        static constexpr size_t kBlockMaxItems = 3;
-
-        static constexpr size_t kFreeChunkMaxItem = 5;
-
-        static bool validate(const MyObject *ptr) {
-            return true;
+        static constexpr size_t block_max_size() {
+            return 128;
         }
+
+        static constexpr size_t block_max_items() {
+            return 3;
+        }
+
+        static constexpr size_t free_chunk_max_items() {
+            return 5;
+        }
+
     };
     template<>
     struct ResourcePoolTraits<Foo> : public ResourcePoolTraitsBase<Foo> {
-        typedef ResourcePoolTraitsBase<Foo> Base;
-        using Base::kBlockMaxSize;
-        using Base::kBlockMaxItems;
-        using Base::kFreeChunkMaxItem;
-        static bool validate(const Foo *ptr) {
-            turbo::Println("x: {}", ptr->x);
+        constexpr  static bool validate(const Foo *ptr) {
             return ptr->x != 0;
         }
     };
@@ -189,6 +187,7 @@ namespace {
                 ++nfoo;
             }
         }
+        turbo::println("nfoo={}, nfoo_dtor={}", nfoo, nfoo_dtor);
         REQUIRE_EQ(nfoo + nfoo_dtor, 100);
         REQUIRE_EQ((size_t)nfoo, describe_resources<Foo>().item_num);
     }
@@ -401,8 +400,8 @@ namespace {
         clear_resources<D>();
         ResourcePoolInfo info = describe_resources<D>();
         ResourcePoolInfo zero_info = { 0, 0, 0, 0,
-                                       ResourcePoolTraits<D>::kBlockMaxItems,
-                                       ResourcePoolTraits<D>::kBlockMaxItems, 0};
+                                       ResourcePoolTraits<D>::block_max_items(),
+                                       ResourcePoolTraits<D>::block_max_items(), 0};
         REQUIRE_EQ(0, memcmp(&info, &zero_info, sizeof(info) - sizeof(size_t)));
     }
 

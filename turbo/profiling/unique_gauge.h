@@ -138,9 +138,18 @@ namespace turbo {
             set(value);
         }
 
-        UniqueGauge &operator<<(const T &value) {
-            set(value);
+        template<class U>
+        UniqueGauge &operator<<(U value) {
+            add(value);
             return *this;
+        }
+
+        void add(T n) {
+            _value.fetch_add(n, std::memory_order_relaxed);
+        }
+
+        void sub(T n) {
+            _value.fetch_sub(n, std::memory_order_relaxed);
         }
 
         T get_value() const {
@@ -259,12 +268,12 @@ namespace turbo {
         mutable std::mutex _mutex;
     };
 
-    UniqueGauge<std::string, void>::UniqueGauge(const std::string_view &name, const std::string_view &description)
+    inline UniqueGauge<std::string, void>::UniqueGauge(const std::string_view &name, const std::string_view &description)
             : Variable() {
         _status = expose(name, description, {}, kUniqueStringGaugeAttr);
     }
 
-    UniqueGauge<std::string, void>::UniqueGauge(const std::string_view &name, const std::string_view &description,
+    inline UniqueGauge<std::string, void>::UniqueGauge(const std::string_view &name, const std::string_view &description,
                                                 const std::map<std::string, std::string> &tags)
             : Variable() {
         _status = expose(name, description, tags, kUniqueStringGaugeAttr);

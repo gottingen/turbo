@@ -33,7 +33,7 @@ namespace turbo::unicode::simd::utf8_to_utf16 {
      * performance penalty.
      */
 
-    const uint8_t shufutf8[209][16] =
+    constexpr uint8_t shufutf8[209][16] =
             {{0, 255, 1,   255, 2, 255, 3,   255, 4,  255, 5,   255, 0,  0,   0,   0},
              {0, 255, 1,   255, 2, 255, 3,   255, 4,  255, 6,   5,   0,  0,   0,   0},
              {0, 255, 1,   255, 2, 255, 3,   255, 5,  4,   6,   255, 0,  0,   0,   0},
@@ -243,10 +243,10 @@ namespace turbo::unicode::simd::utf8_to_utf16 {
              {3, 2,   1,   0,   7, 6,   5,   4,   9,  8,   255, 255, 0,  0,   0,   0},
              {3, 2,   1,   0,   7, 6,   5,   4,   10, 9,   8,   255, 0,  0,   0,   0},
              {3, 2,   1,   0,   7, 6,   5,   4,   11, 10,  9,   8,   0,  0,   0,   0}};
-/* number of two bytes : 64 */
-/* number of two + three bytes : 145 */
-/* number of two + three + four bytes : 209 */
-    const uint8_t utf8bigindex[4096][2] =
+        /* number of two bytes : 64 */
+        /* number of two + three bytes : 145 */
+        /* number of two + three + four bytes : 209 */
+    constexpr uint8_t utf8bigindex[4096][2] =
             {{209, 12},
              {209, 12},
              {209, 12},

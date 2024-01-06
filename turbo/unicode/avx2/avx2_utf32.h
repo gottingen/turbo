@@ -266,7 +266,7 @@ namespace turbo::unicode::simd {
     }
 
 
-    inline std::pair<result, char*> avx2_convert_utf32_to_utf8_with_errors(const char32_t* buf, size_t len, char* utf8_output) {
+    inline std::pair<UnicodeResult, char*> avx2_convert_utf32_to_utf8_with_errors(const char32_t* buf, size_t len, char* utf8_output) {
         const char32_t* end = buf + len;
         const char32_t* start = buf;
 
@@ -286,7 +286,7 @@ namespace turbo::unicode::simd {
             // Check for too large input
             const __m256i max_input = _mm256_max_epu32(_mm256_max_epu32(in, nextin), v_10ffff);
             if(static_cast<uint32_t>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(max_input, v_10ffff))) != 0xffffffff) {
-                return std::make_pair(result(error_code::TOO_LARGE, buf - start), utf8_output);
+                return std::make_pair(UnicodeResult(UnicodeError::TOO_LARGE, buf - start), utf8_output);
             }
 
             // Pack 32-bit UTF-32 code units to 16-bit UTF-16 code units with unsigned saturation
@@ -366,7 +366,7 @@ namespace turbo::unicode::simd {
                 const __m256i v_d800 = _mm256_set1_epi16((uint16_t)0xd800);
                 const __m256i forbidden_bytemask = _mm256_cmpeq_epi16(_mm256_and_si256(in_16, v_f800), v_d800);
                 if (static_cast<uint32_t>(_mm256_movemask_epi8(forbidden_bytemask)) != 0x0) {
-                    return std::make_pair(result(error_code::SURROGATE, buf - start), utf8_output);
+                    return std::make_pair(UnicodeResult(UnicodeError::SURROGATE, buf - start), utf8_output);
                 }
 
                 const __m256i dup_even = _mm256_setr_epi16(0x0000, 0x0202, 0x0404, 0x0606,
@@ -488,12 +488,12 @@ namespace turbo::unicode::simd {
                         *utf8_output++ = char((word>>6) | 0b11000000);
                         *utf8_output++ = char((word & 0b111111) | 0b10000000);
                     } else if((word & 0xFFFF0000 )==0) {  // 3-byte
-                        if (word >= 0xD800 && word <= 0xDFFF) { return std::make_pair(result(error_code::SURROGATE, buf - start + k), utf8_output); }
+                        if (word >= 0xD800 && word <= 0xDFFF) { return std::make_pair(UnicodeResult(UnicodeError::SURROGATE, buf - start + k), utf8_output); }
                         *utf8_output++ = char((word>>12) | 0b11100000);
                         *utf8_output++ = char(((word>>6) & 0b111111) | 0b10000000);
                         *utf8_output++ = char((word & 0b111111) | 0b10000000);
                     } else {  // 4-byte
-                        if (word > 0x10FFFF) { return std::make_pair(result(error_code::TOO_LARGE, buf - start + k), utf8_output); }
+                        if (word > 0x10FFFF) { return std::make_pair(UnicodeResult(UnicodeError::TOO_LARGE, buf - start + k), utf8_output); }
                         *utf8_output++ = char((word>>18) | 0b11110000);
                         *utf8_output++ = char(((word>>12) & 0b111111) | 0b10000000);
                         *utf8_output++ = char(((word>>6) & 0b111111) | 0b10000000);
@@ -504,7 +504,7 @@ namespace turbo::unicode::simd {
             }
         } // while
 
-        return std::make_pair(result(error_code::SUCCESS, buf - start), utf8_output);
+        return std::make_pair(UnicodeResult(UnicodeError::SUCCESS, buf - start), utf8_output);
     }
 
     template <EndianNess big_endian>
@@ -574,7 +574,7 @@ namespace turbo::unicode::simd {
 
 
     template <EndianNess big_endian>
-    std::pair<result, char16_t*> avx2_convert_utf32_to_utf16_with_errors(const char32_t* buf, size_t len, char16_t* utf16_output) {
+    std::pair<UnicodeResult, char16_t*> avx2_convert_utf32_to_utf16_with_errors(const char32_t* buf, size_t len, char16_t* utf16_output) {
         const char32_t* start = buf;
         const char32_t* end = buf + len;
 
@@ -595,7 +595,7 @@ namespace turbo::unicode::simd {
                 const __m256i v_d800 = _mm256_set1_epi32((uint32_t)0xd800);
                 const __m256i forbidden_bytemask = _mm256_cmpeq_epi32(_mm256_and_si256(in, v_f800), v_d800);
                 if (static_cast<uint32_t>(_mm256_movemask_epi8(forbidden_bytemask)) != 0x0) {
-                    return std::make_pair(result(error_code::SURROGATE, buf - start), utf16_output);
+                    return std::make_pair(UnicodeResult(UnicodeError::SURROGATE, buf - start), utf16_output);
                 }
 
                 __m128i utf16_packed = _mm_packus_epi32(_mm256_castsi256_si128(in),_mm256_extractf128_si256(in,1));
@@ -614,11 +614,11 @@ namespace turbo::unicode::simd {
                     uint32_t word = buf[k];
                     if((word & 0xFFFF0000)==0) {
                         // will not generate a surrogate pair
-                        if (word >= 0xD800 && word <= 0xDFFF) { return std::make_pair(result(error_code::SURROGATE, buf - start + k), utf16_output); }
+                        if (word >= 0xD800 && word <= 0xDFFF) { return std::make_pair(UnicodeResult(UnicodeError::SURROGATE, buf - start + k), utf16_output); }
                         *utf16_output++ = turbo::is_big_endian(big_endian) ? char16_t((uint16_t(word) >> 8) | (uint16_t(word) << 8)) : char16_t(word);
                     } else {
                         // will generate a surrogate pair
-                        if (word > 0x10FFFF) { return std::make_pair(result(error_code::TOO_LARGE, buf - start + k), utf16_output); }
+                        if (word > 0x10FFFF) { return std::make_pair(UnicodeResult(UnicodeError::TOO_LARGE, buf - start + k), utf16_output); }
                         word -= 0x10000;
                         uint16_t high_surrogate = uint16_t(0xD800 + (word >> 10));
                         uint16_t low_surrogate = uint16_t(0xDC00 + (word & 0x3FF));
@@ -634,7 +634,7 @@ namespace turbo::unicode::simd {
             }
         }
 
-        return std::make_pair(result(error_code::SUCCESS, buf - start), utf16_output);
+        return std::make_pair(UnicodeResult(UnicodeError::SUCCESS, buf - start), utf16_output);
     }
     
 }  // namespace turbo::unicode::simd

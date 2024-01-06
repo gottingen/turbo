@@ -58,9 +58,27 @@ namespace turbo {
 
         static constexpr size_t kFreeChunkMaxItem = 256;
 
-        static bool validate(const T *ptr) {
+        static constexpr size_t block_max_size() {
+            return kBlockMaxSize;
+        }
+
+        static constexpr size_t block_max_items() {
+            return kBlockMaxItems;
+        }
+
+        static constexpr size_t free_chunk_max_items() {
+            return kFreeChunkMaxItem;
+        }
+
+        static constexpr bool validate(const T *ptr) {
             return true;
         }
+    private:
+        static_assert(kBlockMaxSize >= sizeof(T), "kBlockMaxSize must be greater than sizeof(T)");
+        static_assert(kBlockMaxItems > 0, "kBlockMaxItems must be greater than 0");
+        static_assert(kFreeChunkMaxItem >= 0, "kFreeChunkMaxSize must be greater than 0");
+        static_assert(kBlockMaxSize / sizeof(T) >= kBlockMaxItems,
+                      "kBlockMaxSize must be greater than kBlockMaxItems * sizeof(T)");
     };
 
     /**
@@ -90,18 +108,7 @@ namespace turbo {
      */
     template<typename T>
     struct ResourcePoolTraits : public ResourcePoolTraitsBase<T>{
-        typedef ResourcePoolTraitsBase<T> Base;
-        using Base::kBlockMaxSize;
-        using Base::kBlockMaxItems;
-        using Base::kFreeChunkMaxItem;
-        using Base::validate;
 
-    private:
-        static_assert(kBlockMaxSize >= sizeof(T), "kBlockMaxSize must be greater than sizeof(T)");
-        static_assert(kBlockMaxItems > 0, "kBlockMaxItems must be greater than 0");
-        static_assert(kFreeChunkMaxItem >= 0, "kFreeChunkMaxSize must be greater than 0");
-        static_assert(kBlockMaxSize / sizeof(T) >= kBlockMaxItems,
-                      "kBlockMaxSize must be greater than kBlockMaxItems * sizeof(T)");
     };
 
     struct ResourcePoolInfo {

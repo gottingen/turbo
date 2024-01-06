@@ -85,7 +85,6 @@ carbin_cc_benchmark(
         insert_benchmark
         SOURCES
         "Insert.cc"
-        "getRSS.cc"
         "main.cc"
         COPTS
         ${CARBIN_CXX_OPTIONS}

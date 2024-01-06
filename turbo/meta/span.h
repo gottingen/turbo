@@ -67,7 +67,6 @@
 #include "turbo/platform/port.h" // TODO(strel): remove this include
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     //------------------------------------------------------------------------------
     // Span
@@ -769,6 +768,5 @@ namespace turbo {
         return Span<const T>(array, N);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 #endif  // TURBO_TYPES_SPAN_H_

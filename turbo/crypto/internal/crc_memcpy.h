@@ -28,92 +28,94 @@
 #define TURBO_INTERNAL_HAVE_X86_64_ACCELERATED_CRC_MEMCPY_ENGINE 1
 #endif
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace crc_internal {
+namespace turbo::crc_internal {
 
-class CrcMemcpyEngine {
- public:
-  virtual ~CrcMemcpyEngine() = default;
+    class CrcMemcpyEngine {
+    public:
+        virtual ~CrcMemcpyEngine() = default;
 
-  virtual crc32c_t Compute(void* __restrict dst, const void* __restrict src,
-                           std::size_t length, crc32c_t initial_crc) const = 0;
+        virtual crc32c_t Compute(void *__restrict dst, const void *__restrict src,
+                                 std::size_t length, crc32c_t initial_crc) const = 0;
 
- protected:
-  CrcMemcpyEngine() = default;
-};
+    protected:
+        CrcMemcpyEngine() = default;
+    };
 
-class CrcMemcpy {
- public:
-  static crc32c_t CrcAndCopy(void* __restrict dst, const void* __restrict src,
-                             std::size_t length,
-                             crc32c_t initial_crc = crc32c_t{0},
-                             bool non_temporal = false) {
-    static const ArchSpecificEngines engines = GetArchSpecificEngines();
-    auto* engine = non_temporal ? engines.non_temporal : engines.temporal;
-    return engine->Compute(dst, src, length, initial_crc);
-  }
+    class CrcMemcpy {
+    public:
+        static crc32c_t CrcAndCopy(void *__restrict dst, const void *__restrict src,
+                                   std::size_t length,
+                                   crc32c_t initial_crc = crc32c_t{0},
+                                   bool non_temporal = false) {
+            static const ArchSpecificEngines engines = GetArchSpecificEngines();
+            auto *engine = non_temporal ? engines.non_temporal : engines.temporal;
+            return engine->Compute(dst, src, length, initial_crc);
+        }
 
-  // For testing only: get an architecture-specific engine for tests.
-  static std::unique_ptr<CrcMemcpyEngine> GetTestEngine(int vector,
-                                                        int integer);
+        // For testing only: get an architecture-specific engine for tests.
+        static std::unique_ptr<CrcMemcpyEngine> GetTestEngine(int vector,
+                                                              int integer);
 
- private:
-  struct ArchSpecificEngines {
-    CrcMemcpyEngine* temporal;
-    CrcMemcpyEngine* non_temporal;
-  };
+    private:
+        struct ArchSpecificEngines {
+            CrcMemcpyEngine *temporal;
+            CrcMemcpyEngine *non_temporal;
+        };
 
-  static ArchSpecificEngines GetArchSpecificEngines();
-};
+        static ArchSpecificEngines GetArchSpecificEngines();
+    };
 
-// Fallback CRC-memcpy engine.
-class FallbackCrcMemcpyEngine : public CrcMemcpyEngine {
- public:
-  FallbackCrcMemcpyEngine() = default;
-  FallbackCrcMemcpyEngine(const FallbackCrcMemcpyEngine&) = delete;
-  FallbackCrcMemcpyEngine operator=(const FallbackCrcMemcpyEngine&) = delete;
+    // Fallback CRC-memcpy engine.
+    class FallbackCrcMemcpyEngine : public CrcMemcpyEngine {
+    public:
+        FallbackCrcMemcpyEngine() = default;
 
-  crc32c_t Compute(void* __restrict dst, const void* __restrict src,
-                   std::size_t length, crc32c_t initial_crc) const override;
-};
+        FallbackCrcMemcpyEngine(const FallbackCrcMemcpyEngine &) = delete;
 
-// CRC Non-Temporal-Memcpy engine.
-class CrcNonTemporalMemcpyEngine : public CrcMemcpyEngine {
- public:
-  CrcNonTemporalMemcpyEngine() = default;
-  CrcNonTemporalMemcpyEngine(const CrcNonTemporalMemcpyEngine&) = delete;
-  CrcNonTemporalMemcpyEngine operator=(const CrcNonTemporalMemcpyEngine&) =
-      delete;
+        FallbackCrcMemcpyEngine operator=(const FallbackCrcMemcpyEngine &) = delete;
 
-  crc32c_t Compute(void* __restrict dst, const void* __restrict src,
-                   std::size_t length, crc32c_t initial_crc) const override;
-};
+        crc32c_t Compute(void *__restrict dst, const void *__restrict src,
+                         std::size_t length, crc32c_t initial_crc) const override;
+    };
 
-// CRC Non-Temporal-Memcpy AVX engine.
-class CrcNonTemporalMemcpyAVXEngine : public CrcMemcpyEngine {
- public:
-  CrcNonTemporalMemcpyAVXEngine() = default;
-  CrcNonTemporalMemcpyAVXEngine(const CrcNonTemporalMemcpyAVXEngine&) = delete;
-  CrcNonTemporalMemcpyAVXEngine operator=(
-      const CrcNonTemporalMemcpyAVXEngine&) = delete;
+    // CRC Non-Temporal-Memcpy engine.
+    class CrcNonTemporalMemcpyEngine : public CrcMemcpyEngine {
+    public:
+        CrcNonTemporalMemcpyEngine() = default;
 
-  crc32c_t Compute(void* __restrict dst, const void* __restrict src,
-                   std::size_t length, crc32c_t initial_crc) const override;
-};
+        CrcNonTemporalMemcpyEngine(const CrcNonTemporalMemcpyEngine &) = delete;
 
-// Copy source to destination and return the CRC32C of the data copied.  If an
-// accelerated version is available, use the accelerated version, otherwise use
-// the generic fallback version.
-inline crc32c_t Crc32CAndCopy(void* __restrict dst, const void* __restrict src,
-                              std::size_t length,
-                              crc32c_t initial_crc = crc32c_t{0},
-                              bool non_temporal = false) {
-  return CrcMemcpy::CrcAndCopy(dst, src, length, initial_crc, non_temporal);
-}
+        CrcNonTemporalMemcpyEngine operator=(const CrcNonTemporalMemcpyEngine &) =
+        delete;
 
-}  // namespace crc_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+        crc32c_t Compute(void *__restrict dst, const void *__restrict src,
+                         std::size_t length, crc32c_t initial_crc) const override;
+    };
+
+    // CRC Non-Temporal-Memcpy AVX engine.
+    class CrcNonTemporalMemcpyAVXEngine : public CrcMemcpyEngine {
+    public:
+        CrcNonTemporalMemcpyAVXEngine() = default;
+
+        CrcNonTemporalMemcpyAVXEngine(const CrcNonTemporalMemcpyAVXEngine &) = delete;
+
+        CrcNonTemporalMemcpyAVXEngine operator=(
+                const CrcNonTemporalMemcpyAVXEngine &) = delete;
+
+        crc32c_t Compute(void *__restrict dst, const void *__restrict src,
+                         std::size_t length, crc32c_t initial_crc) const override;
+    };
+
+    // Copy source to destination and return the CRC32C of the data copied.  If an
+    // accelerated version is available, use the accelerated version, otherwise use
+    // the generic fallback version.
+    inline crc32c_t Crc32CAndCopy(void *__restrict dst, const void *__restrict src,
+                                  std::size_t length,
+                                  crc32c_t initial_crc = crc32c_t{0},
+                                  bool non_temporal = false) {
+        return CrcMemcpy::CrcAndCopy(dst, src, length, initial_crc, non_temporal);
+    }
+
+}  // namespace turbo::crc_internal
 
 #endif  // TURBO_CRYPTO_INTERNAL_CRC_MEMCPY_H_

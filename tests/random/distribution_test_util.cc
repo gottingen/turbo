@@ -24,7 +24,7 @@
 #include "turbo/format/format.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace random_internal {
         namespace {
 
@@ -413,5 +413,5 @@ namespace turbo {
         }
 
     }  // namespace random_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

@@ -19,37 +19,36 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-std::ostream& operator<<(std::ostream& os, turbo::LogSeverity s) {
-  if (s == turbo::NormalizeLogSeverity(s)) return os << turbo::LogSeverityName(s);
-  return os << "turbo::LogSeverity(" << static_cast<int>(s) << ")";
-}
+    std::ostream &operator<<(std::ostream &os, turbo::LogSeverity s) {
+        if (s == turbo::NormalizeLogSeverity(s)) return os << turbo::LogSeverityName(s);
+        return os << "turbo::LogSeverity(" << static_cast<int>(s) << ")";
+    }
 
-std::ostream& operator<<(std::ostream& os, turbo::LogSeverityAtLeast s) {
-  switch (s) {
-    case turbo::LogSeverityAtLeast::kInfo:
-    case turbo::LogSeverityAtLeast::kWarning:
-    case turbo::LogSeverityAtLeast::kError:
-    case turbo::LogSeverityAtLeast::kFatal:
-      return os << ">=" << static_cast<turbo::LogSeverity>(s);
-    case turbo::LogSeverityAtLeast::kInfinity:
-      return os << "INFINITY";
-  }
-  return os;
-}
+    std::ostream &operator<<(std::ostream &os, turbo::LogSeverityAtLeast s) {
+        switch (s) {
+            case turbo::LogSeverityAtLeast::kInfo:
+            case turbo::LogSeverityAtLeast::kWarning:
+            case turbo::LogSeverityAtLeast::kError:
+            case turbo::LogSeverityAtLeast::kFatal:
+                return os << ">=" << static_cast<turbo::LogSeverity>(s);
+            case turbo::LogSeverityAtLeast::kInfinity:
+                return os << "INFINITY";
+        }
+        return os;
+    }
 
-std::ostream& operator<<(std::ostream& os, turbo::LogSeverityAtMost s) {
-  switch (s) {
-    case turbo::LogSeverityAtMost::kInfo:
-    case turbo::LogSeverityAtMost::kWarning:
-    case turbo::LogSeverityAtMost::kError:
-    case turbo::LogSeverityAtMost::kFatal:
-      return os << "<=" << static_cast<turbo::LogSeverity>(s);
-    case turbo::LogSeverityAtMost::kNegativeInfinity:
-      return os << "NEGATIVE_INFINITY";
-  }
-  return os;
-}
-TURBO_NAMESPACE_END
+    std::ostream &operator<<(std::ostream &os, turbo::LogSeverityAtMost s) {
+        switch (s) {
+            case turbo::LogSeverityAtMost::kInfo:
+            case turbo::LogSeverityAtMost::kWarning:
+            case turbo::LogSeverityAtMost::kError:
+            case turbo::LogSeverityAtMost::kFatal:
+                return os << "<=" << static_cast<turbo::LogSeverity>(s);
+            case turbo::LogSeverityAtMost::kNegativeInfinity:
+                return os << "NEGATIVE_INFINITY";
+        }
+        return os;
+    }
+
 }  // namespace turbo

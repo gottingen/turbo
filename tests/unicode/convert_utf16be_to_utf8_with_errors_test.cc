@@ -42,8 +42,8 @@ TEST_CASE("convert_pure_ASCII") {
   auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
     std::vector<char16_t> utf16be(size);
     turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-    turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
     return res.count;
   };
   auto size_procedure = [](const char16_t* utf16, size_t size) -> size_t {
@@ -65,8 +65,8 @@ TEST_CASE("convert_into_1_or_2_UTF8_bytes") {
     auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
       turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-      REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+      turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
       return res.count;
     };
     auto size_procedure = [](const char16_t* utf16, size_t size) -> size_t {
@@ -92,8 +92,8 @@ TEST_CASE("convert_into_1_or_2_or_3_UTF8_bytes") {
     auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
       turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-      REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+      turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
       return res.count;
     };
     auto size_procedure = [](const char16_t* utf16, size_t size) -> size_t {
@@ -117,8 +117,8 @@ TEST_CASE("convert_into_3_or_4_UTF8_bytes") {
     auto procedure = [](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
       turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-      REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+      turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
       return res.count;
     };
     auto size_procedure = [](const char16_t* utf16, size_t size) -> size_t {
@@ -144,8 +144,8 @@ TEST_CASE("convert_fails_if_there_is_sole_low_surrogate") {
       auto procedure = [ &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
         std::vector<char16_t> utf16be(size);
         turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-        turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
         REQUIRE_EQ(res.count, i);
         return 0;
       };
@@ -170,8 +170,8 @@ TEST_CASE("convert_fails_if_there_is_sole_high_surrogate") {
       auto procedure = [ &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
         std::vector<char16_t> utf16be(size);
         turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-        turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
         REQUIRE_EQ(res.count, i);
         return 0;
       };
@@ -196,8 +196,8 @@ TEST_CASE("convert_fails_if_there_is_low_surrogate_is_followed_by_another_low_su
       auto procedure = [ &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
         std::vector<char16_t> utf16be(size);
         turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-        turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
         REQUIRE_EQ(res.count, i);
         return 0;
       };
@@ -226,8 +226,8 @@ TEST_CASE("convert_fails_if_there_is_surrogate_pair_is_followed_by_high_surrogat
     auto procedure = [ &i](const char16_t* utf16le, size_t size, char* utf8) -> size_t {
       std::vector<char16_t> utf16be(size);
       turbo::change_endianness_utf16(utf16le, size, utf16be.data());
-      turbo::result res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
-      REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+      turbo::UnicodeResult res = turbo::convert_utf16be_to_utf8_with_errors(utf16be.data(), size, utf8);
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
       REQUIRE_EQ(res.count, i+2);
       return 0;
     };

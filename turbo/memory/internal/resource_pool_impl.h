@@ -33,7 +33,7 @@ namespace turbo {
 
     template<typename T>
     struct ResourceId {
-        uint64_t value;
+        uint64_t value{0};
 
         operator uint64_t() const {
             return value;
@@ -68,7 +68,7 @@ namespace turbo {
     template<typename T>
     class TURBO_CACHE_LINE_ALIGNED ResourcePool {
     public:
-        static const size_t BLOCK_NITEM = ResourcePoolTraits<T>::kBlockMaxItems;
+        static const size_t BLOCK_NITEM = ResourcePoolTraits<T>::block_max_items();
         static const size_t FREE_CHUNK_NITEM = BLOCK_NITEM;
 
         // Free identifiers are batched in a FreeChunk before they're added to
@@ -123,54 +123,6 @@ namespace turbo {
                 delete (LocalPool *) arg;
             }
 
-            // We need following macro to construct T with different CTOR_ARGS
-            // which may include parenthesis because when T is POD, "new T()"
-            // and "new T" are different: former one sets all fields to 0 which
-            // we don't want.
-#define BAIDU_RESOURCE_POOL_GET(CTOR_ARGS)                              \
-        /* Fetch local free id */                                       \
-        if (_cur_free.nfree) {                                          \
-            const ResourceId<T> free_id = _cur_free.ids[--_cur_free.nfree]; \
-            *id = free_id;                                              \
-            _global_nfree.fetch_sub(1, std::memory_order_relaxed);                   \
-            return unsafe_address_resource(free_id);                    \
-        }                                                               \
-        /* Fetch a FreeChunk from global.                               \
-           TODO: Popping from _free needs to copy a FreeChunk which is  \
-           costly, but hardly impacts amortized performance. */         \
-        if (_pool->pop_free_chunk(_cur_free)) {                         \
-            --_cur_free.nfree;                                          \
-            const ResourceId<T> free_id =  _cur_free.ids[_cur_free.nfree]; \
-            *id = free_id;                                              \
-            _global_nfree.fetch_sub(1, std::memory_order_relaxed);                   \
-            return unsafe_address_resource(free_id);                    \
-        }                                                               \
-        /* Fetch memory from local block */                             \
-        if (_cur_block && _cur_block->nitem < BLOCK_NITEM) {            \
-            id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem; \
-            T* p = new ((T*)_cur_block->items + _cur_block->nitem) T CTOR_ARGS; \
-            if (!ResourcePoolValidator<T>::validate(p)) {               \
-                p->~T();                                                \
-                return nullptr;                                            \
-            }                                                           \
-            ++_cur_block->nitem;                                        \
-            return p;                                                   \
-        }                                                               \
-        /* Fetch a Block from global */                                 \
-        _cur_block = add_block(&_cur_block_index);                      \
-        if (_cur_block != nullptr) {                                       \
-            id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem; \
-            T* p = new ((T*)_cur_block->items + _cur_block->nitem) T CTOR_ARGS; \
-            if (!ResourcePoolValidator<T>::validate(p)) {               \
-                p->~T();                                                \
-                return nullptr;                                            \
-            }                                                           \
-            ++_cur_block->nitem;                                        \
-            return p;                                                   \
-        }                                                               \
-        return nullptr;                                                    \
-
-
             inline T *get_raw(ResourceId<T> *id) {
                 if (_cur_free.nfree) {
                     const ResourceId<T> free_id = _cur_free.ids[--_cur_free.nfree];
@@ -206,45 +158,123 @@ namespace turbo {
                 return nullptr;
             }
 
+            inline T *get_free_list(ResourceId<T> *id) {
+                if (_cur_free.nfree) {
+                    const ResourceId<T> free_id = _cur_free.ids[--_cur_free.nfree];
+                    *id = free_id;
+                    _global_nfree.fetch_sub(1, std::memory_order_relaxed);
+                    return unsafe_address_resource(free_id);
+                }
+                /* Fetch a FreeChunk from global.
+                   TODO: Popping from _free needs to copy a FreeChunk which is
+                   costly, but hardly impacts amortized performance. */
+                if (_pool->pop_free_chunk(_cur_free)) {
+                    --_cur_free.nfree;
+                    const ResourceId<T> free_id = _cur_free.ids[_cur_free.nfree];
+                    *id = free_id;
+                    _global_nfree.fetch_sub(1, std::memory_order_relaxed);
+                    return unsafe_address_resource(free_id);
+                }
+                return nullptr;
+            }
+
             inline T *get(ResourceId<T> *id) {
-                auto *ptr = get_raw(id);
-                if (ptr) {
-                    new(ptr) T();
-                    if (!ResourcePoolTraits<T>::validate(ptr)) {
-                        ptr->~T();
-                        return_resource(*id);
+                auto *ptr = get_free_list(id);
+                if(ptr) {
+                    return ptr;
+                }
+
+                if (_cur_block && _cur_block->nitem < BLOCK_NITEM) {
+                    id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem;
+                    T *p = (T *) _cur_block->items + _cur_block->nitem;
+                    new(p) T();
+                    if (!ResourcePoolTraits<T>::validate(p)) {
+                        p->~T();
                         return nullptr;
                     }
+                    ++_cur_block->nitem;
+                    return p;
                 }
-                return ptr;
+                /* Fetch a Block from global */
+                _cur_block = add_block(&_cur_block_index);
+                if (_cur_block != nullptr) {
+                    id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem;
+                    T *p = (T *) _cur_block->items + _cur_block->nitem;
+                    new(p) T();
+                    if (!ResourcePoolTraits<T>::validate(p)) {
+                        p->~T();
+                        return nullptr;
+                    }
+                    ++_cur_block->nitem;
+                    return p;
+                }
+                return nullptr;
             }
 
             template<typename ...Args>
             inline T *get(ResourceId<T> *id, const Args &...args) {
-                auto *ptr = get_raw(id);
-                if (ptr) {
-                    new(ptr) T(args...);
-                    if (!ResourcePoolTraits<T>::validate(ptr)) {
-                        ptr->~T();
-                        return_resource(*id);
+                auto *ptr = get_free_list(id);
+                if(ptr) {
+                    return ptr;
+                }
+                if (_cur_block && _cur_block->nitem < BLOCK_NITEM) {
+                    id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem;
+                    T *p = (T *) _cur_block->items + _cur_block->nitem;
+                    new(p) T(args...);
+                    if (!ResourcePoolTraits<T>::validate(p)) {
+                        p->~T();
                         return nullptr;
                     }
+                    ++_cur_block->nitem;
+                    return p;
                 }
-                return ptr;
+                /* Fetch a Block from global */
+                _cur_block = add_block(&_cur_block_index);
+                if (_cur_block != nullptr) {
+                    id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem;
+                    T *p = (T *) _cur_block->items + _cur_block->nitem;
+                    new(p) T(args...);
+                    if (!ResourcePoolTraits<T>::validate(p)) {
+                        p->~T();
+                        return nullptr;
+                    }
+                    ++_cur_block->nitem;
+                    return p;
+                }
+                return nullptr;
             }
 
             template<typename ...Args>
             inline T *get(ResourceId<T> *id, Args &&...args) {
-                auto *ptr = get_raw(id);
-                if (ptr) {
-                    new(ptr) T(std::forward<Args>(args)...);
-                    if (!ResourcePoolTraits<T>::validate(ptr)) {
-                        ptr->~T();
-                        return_resource(*id);
+                auto *ptr = get_free_list(id);
+                if(ptr) {
+                    return ptr;
+                }
+                if (_cur_block && _cur_block->nitem < BLOCK_NITEM) {
+                    id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem;
+                    T *p = (T *) _cur_block->items + _cur_block->nitem;
+                    new(p) T(std::forward<Args>(args)...);
+                    if (!ResourcePoolTraits<T>::validate(p)) {
+                        p->~T();
                         return nullptr;
                     }
+                    ++_cur_block->nitem;
+                    return p;
                 }
-                return ptr;
+                /* Fetch a Block from global */
+                _cur_block = add_block(&_cur_block_index);
+                if (_cur_block != nullptr) {
+                    id->value = _cur_block_index * BLOCK_NITEM + _cur_block->nitem;
+                    T *p = (T *) _cur_block->items + _cur_block->nitem;
+                    new(p) T(std::forward<Args>(args)...);
+                    if (!ResourcePoolTraits<T>::validate(p)) {
+                        p->~T();
+                        return nullptr;
+                    }
+                    ++_cur_block->nitem;
+                    return p;
+                }
+                return nullptr;
             }
 
             inline int return_resource(ResourceId<T> id) {
@@ -346,7 +376,7 @@ namespace turbo {
         }
 
         static inline size_t free_chunk_nitem() {
-            const size_t n = ResourcePoolTraits<T>::kFreeChunkMaxItem;
+            const size_t n = ResourcePoolTraits<T>::free_chunk_max_items();
             return n < FREE_CHUNK_NITEM ? n : FREE_CHUNK_NITEM;
         }
 

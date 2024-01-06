@@ -25,7 +25,7 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace strings_internal {
 
 // Computes the precise value of 10^exp. (I.e. the nearest representable
@@ -34,7 +34,7 @@ namespace strings_internal {
 double Pow10(int exp);
 
 }  // namespace strings_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_INTERNAL_POW10_HELPER_H_

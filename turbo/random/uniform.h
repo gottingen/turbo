@@ -231,8 +231,8 @@ namespace turbo {
         auto b = random_internal::uniform_upper_bound(tag, lo, hi);
         if (!random_internal::is_uniform_range_valid(a, b)) return lo;
 
-        return random_internal::DistributionCaller<BitGen>::template Call<
-                distribution_t>(&get_tls_fast_bit_gen(), lo, hi);
+        return random_internal::DistributionCaller<InsecureBitGen>::template
+                Call<distribution_t>(&get_tls_fast_bit_gen(), lo, hi);
     }
 
     /**

@@ -50,7 +50,6 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     using ::turbo::cord_internal::CordRep;
     using ::turbo::cord_internal::CordRepBtree;
@@ -157,13 +156,6 @@ namespace turbo {
         rep->base = rep->template get<0>().data.data();
         return rep;
     }
-
-// --------------------------------------------------------------------
-// Cord::InlineRep functions
-
-#ifndef TURBO_COMPILER_CPP17_ENABLED
-    constexpr unsigned char Cord::InlineRep::kMaxInline;
-#endif
 
     inline void Cord::InlineRep::set_data(const char *data, size_t n) {
         static_assert(kMaxInline == 15, "set_data is hard-coded for a length of 15");
@@ -1380,5 +1372,4 @@ namespace turbo {
             return sizeof(CordRepSubstring);
         }
     }  // namespace strings_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo

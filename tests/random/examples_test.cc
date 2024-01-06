@@ -62,7 +62,7 @@ TEST(Examples, CreateingCorrelatedVariateSequences) {
 
   // Create a correlated sequence from system entropy.
   {
-    auto my_seed = turbo::MakeSeedSeq();
+    auto my_seed = turbo::make_seed_seq();
 
     turbo::BitGen gen_1(my_seed);
     turbo::BitGen gen_2(my_seed);  // Produces same variates as gen_1.

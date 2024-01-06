@@ -64,13 +64,11 @@
 // or thread_local storage duration.
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
-enum ConstInitType {
-  kConstInit,
-};
+    enum ConstInitType {
+        kConstInit,
+    };
 
-TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_PLATFORM_CONST_INIT_H_

@@ -50,7 +50,7 @@ namespace turbo {
     template<typename T>
     class TURBO_CACHE_LINE_ALIGNED ObjectPool {
     public:
-        static constexpr size_t BLOCK_NITEM = ObjectPoolTraits<T>::kBlockMaxItems;
+        static constexpr size_t BLOCK_NITEM = ObjectPoolTraits<T>::block_max_items();
         static constexpr size_t FREE_CHUNK_NITEM = BLOCK_NITEM;
 
         // Free objects are batched in a FreeChunk before they're added to
@@ -306,7 +306,7 @@ namespace turbo {
         }
 
         inline static size_t free_chunk_nitem() {
-            const size_t n = ObjectPoolTraits<T>::kFreeChunkMaxItem;
+            const size_t n = ObjectPoolTraits<T>::free_chunk_max_items();
             return (n < FREE_CHUNK_NITEM ? n : FREE_CHUNK_NITEM);
         }
 

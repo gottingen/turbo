@@ -19,7 +19,7 @@
 #include "turbo/base/internal/raw_logging.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace time_internal {
 
         TimeZone load_time_zone(const std::string &name) {
@@ -29,7 +29,7 @@ namespace turbo {
         }
 
     }  // namespace time_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 namespace {

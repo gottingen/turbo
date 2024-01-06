@@ -23,7 +23,6 @@
 #include "gtest/gtest.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 namespace cord_internal {
 
 namespace {
@@ -43,7 +42,6 @@ TEST(CordzUpdateScopeTest, ScopeSampledCord) {
 }
 
 }  // namespace
-TURBO_NAMESPACE_END
 }  // namespace cord_internal
 
 }  // namespace turbo

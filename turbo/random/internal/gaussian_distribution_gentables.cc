@@ -110,9 +110,7 @@ namespace turbo::random_internal {
                "\n"
                "#include \"turbo/random/gaussian_distribution.h\"\n"
                "\n"
-               "namespace turbo {\n"
-               "TURBO_NAMESPACE_BEGIN\n"
-               "namespace random_internal {\n"
+               "namespace turbo::random_internal {\n"
                "\n"
                "const gaussian_distribution_base::Tables\n"
                "    gaussian_distribution_base::zg_ = {\n";
@@ -121,9 +119,7 @@ namespace turbo::random_internal {
         FormatArrayContents(os, tables_.f);
         *os << "};\n"
                "\n"
-               "}  // namespace random_internal\n"
-               "TURBO_NAMESPACE_END\n"
-               "}  // namespace turbo\n"
+               "}  // namespace turbo::random_internal\n"
                "\n"
                "// clang-format on\n"
                "// END GENERATED CODE";

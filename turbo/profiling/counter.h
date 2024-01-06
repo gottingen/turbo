@@ -16,6 +16,7 @@
 #ifndef TURBO_PROFILING_COUNTER_H_
 #define TURBO_PROFILING_COUNTER_H_
 
+#include <map>
 #include "turbo/profiling/variable.h"
 #include "turbo/profiling/internal/reducer.h"
 #include "turbo/profiling/internal/operators.h"
@@ -52,20 +53,30 @@ namespace turbo {
 
         ~Counter() override = default;
 
-        void add(const T &value) {
-            _reducer << (value);
+        template<typename U>
+        void add(const U &value) {
+            _reducer << static_cast<T>(value);
         }
 
         void increment() {
             _reducer << (T(1));
         }
 
+        void decrement() {
+            _reducer << (T(-1));
+        }
+
         void operator++() {
             _reducer << (T(1));
         }
 
-        Counter &operator<<(const T &value) {
-            _reducer << (value);
+        void operator--() {
+            _reducer << (T(-1));
+        }
+
+        template<typename U>
+        Counter &operator<<(U value) {
+            _reducer <<  static_cast<T>(value);
             return *this;
         }
 

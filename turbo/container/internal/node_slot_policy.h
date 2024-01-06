@@ -41,52 +41,48 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace container_internal {
+namespace turbo::container_internal {
 
-template <class Reference, class Policy>
-struct node_slot_policy {
-  static_assert(std::is_lvalue_reference<Reference>::value, "");
+    template<class Reference, class Policy>
+    struct node_slot_policy {
+        static_assert(std::is_lvalue_reference<Reference>::value, "");
 
-  using slot_type = typename std::remove_cv<
-      typename std::remove_reference<Reference>::type>::type*;
+        using slot_type = typename std::remove_cv<
+                typename std::remove_reference<Reference>::type>::type *;
 
-  template <class Alloc, class... Args>
-  static void construct(Alloc* alloc, slot_type* slot, Args&&... args) {
-    *slot = Policy::new_element(alloc, std::forward<Args>(args)...);
-  }
+        template<class Alloc, class... Args>
+        static void construct(Alloc *alloc, slot_type *slot, Args &&... args) {
+            *slot = Policy::new_element(alloc, std::forward<Args>(args)...);
+        }
 
-  template <class Alloc>
-  static void destroy(Alloc* alloc, slot_type* slot) {
-    Policy::delete_element(alloc, *slot);
-  }
+        template<class Alloc>
+        static void destroy(Alloc *alloc, slot_type *slot) {
+            Policy::delete_element(alloc, *slot);
+        }
 
-  template <class Alloc>
-  static void transfer(Alloc*, slot_type* new_slot, slot_type* old_slot) {
-    *new_slot = *old_slot;
-  }
+        template<class Alloc>
+        static void transfer(Alloc *, slot_type *new_slot, slot_type *old_slot) {
+            *new_slot = *old_slot;
+        }
 
-  static size_t space_used(const slot_type* slot) {
-    if (slot == nullptr) return Policy::element_space_used(nullptr);
-    return Policy::element_space_used(*slot);
-  }
+        static size_t space_used(const slot_type *slot) {
+            if (slot == nullptr) return Policy::element_space_used(nullptr);
+            return Policy::element_space_used(*slot);
+        }
 
-  static Reference element(slot_type* slot) { return **slot; }
+        static Reference element(slot_type *slot) { return **slot; }
 
-  template <class T, class P = Policy>
-  static auto value(T* elem) -> decltype(P::value(elem)) {
-    return P::value(elem);
-  }
+        template<class T, class P = Policy>
+        static auto value(T *elem) -> decltype(P::value(elem)) {
+            return P::value(elem);
+        }
 
-  template <class... Ts, class P = Policy>
-  static auto apply(Ts&&... ts) -> decltype(P::apply(std::forward<Ts>(ts)...)) {
-    return P::apply(std::forward<Ts>(ts)...);
-  }
-};
+        template<class... Ts, class P = Policy>
+        static auto apply(Ts &&... ts) -> decltype(P::apply(std::forward<Ts>(ts)...)) {
+            return P::apply(std::forward<Ts>(ts)...);
+        }
+    };
 
-}  // namespace container_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::container_internal
 
 #endif  // TURBO_CONTAINER_INTERNAL_NODE_SLOT_POLICY_H_

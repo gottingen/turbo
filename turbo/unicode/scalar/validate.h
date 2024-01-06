@@ -44,7 +44,7 @@ namespace turbo::unicode::ascii {
         return true;
     }
 
-    [[nodiscard]] inline result validate_with_errors(const char *buf, size_t len) noexcept {
+    [[nodiscard]] inline UnicodeResult validate_with_errors(const char *buf, size_t len) noexcept {
         const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
         size_t pos = 0;
         // process in blocks of 16 bytes when possible
@@ -56,15 +56,15 @@ namespace turbo::unicode::ascii {
             uint64_t v{v1 | v2};
             if ((v & 0x8080808080808080) != 0) {
                 for (; pos < len; pos++) {
-                    if (data[pos] >= 0b10000000) { return result(error_code::TOO_LARGE, pos); }
+                    if (data[pos] >= 0b10000000) { return {UnicodeError::TOO_LARGE, pos}; }
                 }
             }
         }
         // process the tail byte-by-byte
         for (; pos < len; pos++) {
-            if (data[pos] >= 0b10000000) { return result(error_code::TOO_LARGE, pos); }
+            if (data[pos] >= 0b10000000) { return {UnicodeError::TOO_LARGE, pos}; }
         }
-        return result(error_code::SUCCESS, pos);
+        return {UnicodeError::SUCCESS, pos};
     }
 }  // namespace turbo::unicode::ascii
 
@@ -135,7 +135,7 @@ namespace turbo::unicode::utf8 {
         return true;
     }
 
-    inline result validate_with_errors(const char *buf, size_t len) noexcept {
+    inline UnicodeResult validate_with_errors(const char *buf, size_t len) noexcept {
         const uint8_t *data = reinterpret_cast<const uint8_t *>(buf);
         size_t pos = 0;
         uint32_t code_point = 0;
@@ -156,55 +156,55 @@ namespace turbo::unicode::utf8 {
             unsigned char byte = data[pos];
 
             while (byte < 0b10000000) {
-                if (++pos == len) { return result(error_code::SUCCESS, len); }
+                if (++pos == len) { return {UnicodeError::SUCCESS, len}; }
                 byte = data[pos];
             }
 
             if ((byte & 0b11100000) == 0b11000000) {
                 next_pos = pos + 2;
-                if (next_pos > len) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if (next_pos > len) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
                 // range check
                 code_point = (byte & 0b00011111) << 6 | (data[pos + 1] & 0b00111111);
-                if ((code_point < 0x80) || (0x7ff < code_point)) { return result(error_code::OVERLONG, pos); }
+                if ((code_point < 0x80) || (0x7ff < code_point)) { return {UnicodeError::OVERLONG, pos}; }
             } else if ((byte & 0b11110000) == 0b11100000) {
                 next_pos = pos + 3;
-                if (next_pos > len) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if (next_pos > len) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
                 // range check
                 code_point = (byte & 0b00001111) << 12 |
                              (data[pos + 1] & 0b00111111) << 6 |
                              (data[pos + 2] & 0b00111111);
-                if ((code_point < 0x800) || (0xffff < code_point)) { return result(error_code::OVERLONG, pos); }
-                if (0xd7ff < code_point && code_point < 0xe000) { return result(error_code::SURROGATE, pos); }
+                if ((code_point < 0x800) || (0xffff < code_point)) { return {UnicodeError::OVERLONG, pos}; }
+                if (0xd7ff < code_point && code_point < 0xe000) { return {UnicodeError::SURROGATE, pos}; }
             } else if ((byte & 0b11111000) == 0b11110000) { // 0b11110000
                 next_pos = pos + 4;
-                if (next_pos > len) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
-                if ((data[pos + 3] & 0b11000000) != 0b10000000) { return result(error_code::TOO_SHORT, pos); }
+                if (next_pos > len) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 1] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 2] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
+                if ((data[pos + 3] & 0b11000000) != 0b10000000) { return {UnicodeError::TOO_SHORT, pos}; }
                 // range check
                 code_point =
                         (byte & 0b00000111) << 18 | (data[pos + 1] & 0b00111111) << 12 |
                         (data[pos + 2] & 0b00111111) << 6 | (data[pos + 3] & 0b00111111);
-                if (code_point <= 0xffff) { return result(error_code::OVERLONG, pos); }
-                if (0x10ffff < code_point) { return result(error_code::TOO_LARGE, pos); }
+                if (code_point <= 0xffff) { return {UnicodeError::OVERLONG, pos}; }
+                if (0x10ffff < code_point) { return {UnicodeError::TOO_LARGE, pos}; }
             } else {
                 // we either have too many continuation bytes or an invalid leading byte
-                if ((byte & 0b11000000) == 0b10000000) { return result(error_code::TOO_LONG, pos); }
-                else { return result(error_code::HEADER_BITS, pos); }
+                if ((byte & 0b11000000) == 0b10000000) { return {UnicodeError::TOO_LONG, pos}; }
+                else { return {UnicodeError::HEADER_BITS, pos}; }
             }
             pos = next_pos;
         }
-        return result(error_code::SUCCESS, len);
+        return {UnicodeError::SUCCESS, len};
     }
 
     // Finds the previous leading byte and validates with errors from there
     // Used to pinpoint the location of an error when an invalid chunk is detected
-    inline TURBO_MUST_USE_RESULT result rewind_and_validate_with_errors(const char *start, const char *buf, size_t len) noexcept {
+    inline TURBO_MUST_USE_RESULT UnicodeResult rewind_and_validate_with_errors(const char *start, const char *buf, size_t len) noexcept {
         if ((*start & 0b11000000) == 0b10000000) {
-            return result(error_code::TOO_LONG, 0);
+            return {UnicodeError::TOO_LONG, 0};
         }
         size_t extra_len{0};
         // A leading byte cannot be further than 4 bytes away
@@ -218,7 +218,7 @@ namespace turbo::unicode::utf8 {
             }
         }
 
-        result res = validate_with_errors(buf, len + extra_len);
+        auto res = validate_with_errors(buf, len + extra_len);
         res.count -= extra_len;
         return res;
     }
@@ -270,24 +270,24 @@ namespace turbo::unicode::utf16 {
     }
 
     template<EndianNess big_endian>
-    inline TURBO_MUST_USE_RESULT result validate_with_errors(const char16_t *buf, size_t len) noexcept {
+    inline TURBO_MUST_USE_RESULT UnicodeResult validate_with_errors(const char16_t *buf, size_t len) noexcept {
         const uint16_t *data = reinterpret_cast<const uint16_t *>(buf);
         size_t pos = 0;
         while (pos < len) {
             uint16_t word = !match_system(big_endian) ? gbswap_16(data[pos]) : data[pos];
             if ((word & 0xF800) == 0xD800) {
-                if (pos + 1 >= len) { return result(error_code::SURROGATE, pos); }
+                if (pos + 1 >= len) { return {UnicodeError::SURROGATE, pos}; }
                 uint16_t diff = uint16_t(word - 0xD800);
-                if (diff > 0x3FF) { return result(error_code::SURROGATE, pos); }
+                if (diff > 0x3FF) { return {UnicodeError::SURROGATE, pos}; }
                 uint16_t next_word = !match_system(big_endian) ? gbswap_16(data[pos + 1]) : data[pos + 1];
                 uint16_t diff2 = uint16_t(next_word - 0xDC00);
-                if (diff2 > 0x3FF) { return result(error_code::SURROGATE, pos); }
+                if (diff2 > 0x3FF) { return {UnicodeError::SURROGATE, pos}; }
                 pos += 2;
             } else {
                 pos++;
             }
         }
-        return result(error_code::SUCCESS, pos);
+        return {UnicodeError::SUCCESS, pos};
     }
 
     template<EndianNess big_endian>
@@ -358,19 +358,19 @@ namespace turbo::unicode::utf32 {
         return true;
     }
 
-    inline TURBO_MUST_USE_RESULT result validate_with_errors(const char32_t *buf, size_t len) noexcept {
+    inline TURBO_MUST_USE_RESULT UnicodeResult validate_with_errors(const char32_t *buf, size_t len) noexcept {
         const uint32_t *data = reinterpret_cast<const uint32_t *>(buf);
         size_t pos = 0;
         for (; pos < len; pos++) {
             uint32_t word = data[pos];
             if (word > 0x10FFFF) {
-                return result(error_code::TOO_LARGE, pos);
+                return {UnicodeError::TOO_LARGE, pos};
             }
             if (word >= 0xD800 && word <= 0xDFFF) {
-                return result(error_code::SURROGATE, pos);
+                return {UnicodeError::SURROGATE, pos};
             }
         }
-        return result(error_code::SUCCESS, pos);
+        return {UnicodeError::SUCCESS, pos};
     }
 
     inline size_t utf8_length_from_utf32(const char32_t *buf, size_t len) {

@@ -27,7 +27,6 @@
 #include "turbo/testing/test.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
     namespace {
 
         const uint64_t kInitialNumber{0x0123456789abcdef};
@@ -264,5 +263,4 @@ namespace turbo {
             }
         }
     }  // namespace
-    TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -18,7 +18,7 @@ static const char* HashName = "turbo::Hash";
 template <class Key, class Val, class H = turbo::Hash<Key>>
 using Map = turbo::node_hash_map<Key, Val, H>;
 
-#include "getRSS.h"
+#include "turbo/memory/memory_info.h"
 
 // inline
 #ifdef _WIN32
@@ -39,7 +39,7 @@ public:
 
     Bench(std::string testName)
         : mTestName(std::move(testName)) {
-        mInitialPeakRss = getPeakRSS();
+        mInitialPeakRss = turbo::get_peak_memory_used();
     }
 
     inline void beginMeasure(const char* measurementName) {
@@ -67,7 +67,7 @@ private:
     BENCHMARK_NOINLINE void show_result(clock::time_point end, uint64_t expected_result, uint64_t actual_result) {
         auto runtime_sec = std::chrono::duration<double>(end - mStartTime).count();
 
-        auto peakRss = getPeakRSS();
+        auto peakRss = turbo::get_peak_memory_used();
         if (peakRss > mInitialPeakRss) {
             peakRss -= mInitialPeakRss;
         } else {

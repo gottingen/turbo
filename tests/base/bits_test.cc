@@ -20,7 +20,7 @@
 #include "turbo/random/random.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace {
     TEST_CASE("Rotate") {
         SUBCASE("Left")
@@ -573,5 +573,5 @@ static_assert(TURBO_INTERNAL_HAS_CONSTEXPR_CTZ, "ctz should be constexpr");
 #endif
 
 }  // namespace
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

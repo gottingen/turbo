@@ -548,7 +548,7 @@ namespace turbo {
         template<typename Char>
         constexpr auto parse_align(const Char *begin, const Char *end,
                                    format_specs<Char> &specs) -> const Char * {
-            TURBO_ASSERT(begin != end, "");
+            TURBO_ASSERT(begin != end);
             auto align = align::none;
             auto p = begin + code_point_length(begin);
             if (end - p <= 0) p = begin;
@@ -1131,16 +1131,15 @@ namespace turbo {
             _tzset();
             return true;
           }();
-          ignore_unused(init);
+          TURBO_UNUSED(init);
         }
 #endif
 
 // Converts value to Int and checks that it's in the range [0, upper).
         template<typename T, typename Int, TURBO_ENABLE_IF(std::is_integral<T>::value)>
         inline Int to_nonnegative_int(T value, Int upper) {
-            TURBO_ASSERT(std::is_unsigned<Int>::value ||
-                         (value >= 0 && turbo::to_unsigned(value) <= turbo::to_unsigned(upper)),
-                         "invalid value");
+            TURBO_ASSERT((std::is_unsigned<Int>::value ||
+                         (value >= 0 && turbo::to_unsigned(value) <= turbo::to_unsigned(upper)))&& "invalid value");
             (void) upper;
             return static_cast<Int>(value);
         }
@@ -1198,7 +1197,7 @@ namespace turbo {
 
             int leading_zeroes = (std::max)(0, num_fractional_digits - num_digits);
             if (precision < 0) {
-                TURBO_ASSERT(!std::is_floating_point<typename Duration::rep>::value, "");
+                TURBO_ASSERT(!std::is_floating_point<typename Duration::rep>::value);
                 if (std::ratio_less<typename subsecond_precision::period,
                         std::chrono::seconds::period>::value) {
                     *out++ = '.';
@@ -1228,7 +1227,7 @@ namespace turbo {
         void write_floating_seconds(memory_buffer &buf, Duration duration,
                                     int num_fractional_digits = -1) {
             using rep = typename Duration::rep;
-            TURBO_ASSERT(std::is_floating_point<rep>::value, "");
+            TURBO_ASSERT(std::is_floating_point<rep>::value);
 
             auto val = duration.count();
 
@@ -1263,39 +1262,39 @@ namespace turbo {
             const std::tm &tm_;
 
             auto tm_sec() const noexcept -> int {
-                TURBO_ASSERT(tm_.tm_sec >= 0 && tm_.tm_sec <= 61, "");
+                TURBO_ASSERT(tm_.tm_sec >= 0 && tm_.tm_sec <= 61);
                 return tm_.tm_sec;
             }
 
             auto tm_min() const noexcept -> int {
-                TURBO_ASSERT(tm_.tm_min >= 0 && tm_.tm_min <= 59, "");
+                TURBO_ASSERT(tm_.tm_min >= 0 && tm_.tm_min <= 59);
                 return tm_.tm_min;
             }
 
             auto tm_hour() const noexcept -> int {
-                TURBO_ASSERT(tm_.tm_hour >= 0 && tm_.tm_hour <= 23, "");
+                TURBO_ASSERT(tm_.tm_hour >= 0 && tm_.tm_hour <= 23);
                 return tm_.tm_hour;
             }
 
             auto tm_mday() const noexcept -> int {
-                TURBO_ASSERT(tm_.tm_mday >= 1 && tm_.tm_mday <= 31, "");
+                TURBO_ASSERT(tm_.tm_mday >= 1 && tm_.tm_mday <= 31);
                 return tm_.tm_mday;
             }
 
             auto tm_mon() const noexcept -> int {
-                TURBO_ASSERT(tm_.tm_mon >= 0 && tm_.tm_mon <= 11, "");
+                TURBO_ASSERT(tm_.tm_mon >= 0 && tm_.tm_mon <= 11);
                 return tm_.tm_mon;
             }
 
             auto tm_year() const noexcept -> long long { return 1900ll + tm_.tm_year; }
 
             auto tm_wday() const noexcept -> int {
-                TURBO_ASSERT(tm_.tm_wday >= 0 && tm_.tm_wday <= 6, "");
+                TURBO_ASSERT(tm_.tm_wday >= 0 && tm_.tm_wday <= 6);
                 return tm_.tm_wday;
             }
 
             auto tm_yday() const noexcept -> int {
-                TURBO_ASSERT(tm_.tm_yday >= 0 && tm_.tm_yday <= 365, "");
+                TURBO_ASSERT(tm_.tm_yday >= 0 && tm_.tm_yday <= 365);
                 return tm_.tm_yday;
             }
 

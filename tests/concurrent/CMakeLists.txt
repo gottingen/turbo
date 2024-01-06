@@ -57,3 +57,38 @@ carbin_cc_test(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_test(
+        NAME
+        work_stealing_queue_test
+        SOURCES
+        "work_stealing_queue_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        spinlock_test
+        SOURCES
+        "spinlock_common_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)
+
+carbin_cc_test(
+        NAME
+        spin_lock_wait_test
+        SOURCES
+        "spin_lock_wait_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+)

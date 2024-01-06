@@ -166,7 +166,7 @@ namespace turbo {
     template<typename Int>
     constexpr auto to_unsigned(Int value) ->
     typename std::make_unsigned<Int>::type {
-        TURBO_ASSERT(std::is_unsigned<Int>::value || value >= 0, "negative value");
+        TURBO_ASSERT((std::is_unsigned<Int>::value || value >= 0)&&"negative value");
         return static_cast<typename std::make_unsigned<Int>::type>(value);
     }
 }  // namespace turbo

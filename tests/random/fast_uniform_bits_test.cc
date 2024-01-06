@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace random_internal {
 namespace {
 
@@ -332,5 +332,5 @@ TEST(FastUniformBitsTest, URBG32bitRegression) {
 
 }  // namespace
 }  // namespace random_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

@@ -23,7 +23,7 @@
 #include "tests/random/mocking_bit_gen.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace random_internal {
 
         template<typename DistrT, typename Fn>
@@ -95,6 +95,6 @@ namespace turbo {
         };
 
     }  // namespace random_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 #endif  // TURBO_RANDOM_INTERNAL_MOCK_OVERLOAD_SET_H_

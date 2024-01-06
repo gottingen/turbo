@@ -332,9 +332,6 @@ namespace turbo {
 #  endif
     };
 
-    // Returns the memory page size.
-    long getpagesize();
-
     namespace fmt_detail {
 
         struct buffer_size {

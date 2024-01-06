@@ -34,6 +34,8 @@
 #include "turbo/strings/version.h"
 #include "turbo/times/version.h"
 #include "turbo/unicode/version.h"
+#include "turbo/fiber/version.h"
+#include "turbo/taskflow/version.h"
 
 namespace turbo {
 
@@ -49,7 +51,7 @@ namespace turbo {
      *        The version is used to check if the library is compatible with the
      *        application.
      */
-    static constexpr turbo::ModuleVersion version = turbo::ModuleVersion{0, 9, 39};
+    static constexpr turbo::ModuleVersion version = turbo::ModuleVersion{0, 9, 43};
 
     // Check if the version is compatible with the submodules
     static_assert(kMinCompatibleVersion <= base_version, "Turbo version is lower than base version");
@@ -70,6 +72,8 @@ namespace turbo {
     static_assert(kMinCompatibleVersion <= strings_version, "Turbo version is lower than strings version");
     static_assert(kMinCompatibleVersion <= times_version, "Turbo version is lower than times version");
     static_assert(kMinCompatibleVersion <= unicode_version, "Turbo version is lower than unicode version");
+    static_assert(kMinCompatibleVersion <= fiber_version, "Turbo version is lower than fiber version");
+    static_assert(kMinCompatibleVersion <= tf_version, "Turbo version is lower than tf version");
 
     // turbo version is the most recent version of the library
     static_assert(version >= base_version, "Turbo version is lower than base version");
@@ -90,6 +94,8 @@ namespace turbo {
     static_assert(version >= strings_version, "Turbo version is lower than strings version");
     static_assert(version >= times_version, "Turbo version is lower than times version");
     static_assert(version >= unicode_version, "Turbo version is lower than unicode version");
+    static_assert(version >= files_version, "Turbo version is lower than fiber version");
+    static_assert(version >= tf_version, "Turbo version is lower than taskflow version");
 
 
 } // namespace turbo

@@ -27,7 +27,7 @@
 #include "turbo/strings/string_view.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 
 // Cord sizes relevant for testing
 enum class TestCordSize {
@@ -116,7 +116,7 @@ inline Cord MakeFragmentedCord(std::initializer_list<std::string_view> list) {
   return MakeFragmentedCord<std::initializer_list<std::string_view>>(list);
 }
 
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_CORD_TEST_HELPERS_H_

@@ -18,7 +18,6 @@
 #include "turbo/base/status.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     BadResultStatusAccess::BadResultStatusAccess(turbo::Status status)
             : status_(std::move(status)) {}
@@ -95,5 +94,4 @@ namespace turbo {
         }
 
     }  // namespace result_status_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo

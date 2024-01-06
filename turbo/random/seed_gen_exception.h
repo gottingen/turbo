@@ -31,7 +31,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     //------------------------------------------------------------------------------
     // SeedGenException
@@ -51,7 +50,6 @@ namespace turbo {
         [[noreturn]] void ThrowSeedGenException();
 
     }  // namespace random_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_SEED_GEN_EXCEPTION_H_

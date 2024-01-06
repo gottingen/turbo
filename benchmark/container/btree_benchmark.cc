@@ -44,7 +44,7 @@
 #include "turbo/times/time.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace container_internal {
 namespace {
 
@@ -760,5 +760,5 @@ BENCHMARK(BM_BtreeSet_IteratorSubtraction)->Range(1 << 10, 1 << 20);
 
 }  // namespace
 }  // namespace container_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

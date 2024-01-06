@@ -29,7 +29,6 @@
 #endif
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 namespace crc_internal {
 
 #if defined(__x86_64__) || defined(_M_X64)
@@ -252,5 +251,4 @@ bool SupportsArmCRC32PMULL() { return false; }
 #endif
 
 }  // namespace crc_internal
-TURBO_NAMESPACE_END
 }  // namespace turbo

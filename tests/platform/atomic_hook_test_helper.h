@@ -18,7 +18,7 @@
 #include "turbo/platform/internal/atomic_hook.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace atomic_hook_internal {
 
 using VoidF = void (*)();
@@ -28,7 +28,7 @@ void DefaultFunc();
 void RegisterFunc(VoidF func);
 
 }  // namespace atomic_hook_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_PLATFORM_INTERNAL_ATOMIC_HOOK_TEST_HELPER_H_

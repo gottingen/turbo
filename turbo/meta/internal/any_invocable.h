@@ -68,7 +68,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
 
 // Helper macro used to prevent spelling `noexcept` in language versions older
 // than C++17, where it is not part of the type system, in order to avoid
@@ -80,41 +79,43 @@ TURBO_NAMESPACE_BEGIN
 #endif
 
 // Defined in functional/any_invocable.h
-template <class Sig>
-class AnyInvocable;
+    template<class Sig>
+    class AnyInvocable;
 
-namespace internal_any_invocable {
+    namespace internal_any_invocable {
 
 // Constants relating to the small-object-storage for AnyInvocable
-enum StorageProperty : std::size_t {
-  kAlignment = alignof(std::max_align_t),  // The alignment of the storage
-  kStorageSize = sizeof(void*) * 2         // The size of the storage
-};
+        enum StorageProperty : std::size_t {
+            kAlignment = alignof(std::max_align_t),  // The alignment of the storage
+            kStorageSize = sizeof(void *) * 2         // The size of the storage
+        };
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 // A metafunction for checking if a type is an AnyInvocable instantiation.
 // This is used during conversion operations.
-template <class T>
-struct IsAnyInvocable : std::false_type {};
+        template<class T>
+        struct IsAnyInvocable : std::false_type {
+        };
 
-template <class Sig>
-struct IsAnyInvocable<AnyInvocable<Sig>> : std::true_type {};
+        template<class Sig>
+        struct IsAnyInvocable<AnyInvocable<Sig>> : std::true_type {
+        };
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 // A type trait that tells us whether or not a target function type should be
 // stored locally in the small object optimization storage
-template <class T>
-using IsStoredLocally = std::integral_constant<
-    bool, sizeof(T) <= kStorageSize && alignof(T) <= kAlignment &&
-              kAlignment % alignof(T) == 0 &&
-              std::is_nothrow_move_constructible<T>::value>;
+        template<class T>
+        using IsStoredLocally = std::integral_constant<
+                bool, sizeof(T) <= kStorageSize && alignof(T) <= kAlignment &&
+                      kAlignment % alignof(T) == 0 &&
+                      std::is_nothrow_move_constructible<T>::value>;
 
 // An implementation of std::remove_cvref_t of C++20.
-template <class T>
-using RemoveCVRef =
-    typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+        template<class T>
+        using RemoveCVRef =
+                typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -122,18 +123,18 @@ using RemoveCVRef =
 // equivalent to std::invoke except that it forces an implicit conversion to the
 // specified return type. If "R" is void, the function is executed and the
 // return value is simply ignored.
-template <class ReturnType, class F, class... P,
-          typename = std::enable_if_t<std::is_void<ReturnType>::value>>
-void InvokeR(F&& f, P&&... args) {
-  std::invoke(std::forward<F>(f), std::forward<P>(args)...);
-}
+        template<class ReturnType, class F, class... P,
+                typename = std::enable_if_t<std::is_void<ReturnType>::value>>
+        void InvokeR(F &&f, P &&... args) {
+            std::invoke(std::forward<F>(f), std::forward<P>(args)...);
+        }
 
-template <class ReturnType, class F, class... P,
-          std::enable_if_t<!std::is_void<ReturnType>::value, int> = 0>
-ReturnType InvokeR(F&& f, P&&... args) {
-  return std::invoke(std::forward<F>(f),
-                                     std::forward<P>(args)...);
-}
+        template<class ReturnType, class F, class... P,
+                std::enable_if_t<!std::is_void<ReturnType>::value, int> = 0>
+        ReturnType InvokeR(F &&f, P &&... args) {
+            return std::invoke(std::forward<F>(f),
+                               std::forward<P>(args)...);
+        }
 
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,23 +148,23 @@ ReturnType InvokeR(F&& f, P&&... args) {
 // itself. Since the parameter type may be incomplete at the point that this
 // metafunction is used, we can only do this optimization for scalar types
 // rather than for any trivial type.
-template <typename T>
-T ForwardImpl(std::true_type);
+        template<typename T>
+        T ForwardImpl(std::true_type);
 
-template <typename T>
-T&& ForwardImpl(std::false_type);
+        template<typename T>
+        T &&ForwardImpl(std::false_type);
 
 // NOTE: We deliberately use an intermediate struct instead of a direct alias,
 // as a workaround for b/206991861 on MSVC versions < 1924.
-template <class T>
-struct ForwardedParameter {
-  using type = decltype((
-      ForwardImpl<T>)(std::integral_constant<bool,
-                                             std::is_scalar<T>::value>()));
-};
+        template<class T>
+        struct ForwardedParameter {
+            using type = decltype((
+                    ForwardImpl<T>)(std::integral_constant<bool,
+                    std::is_scalar<T>::value>()));
+        };
 
-template <class T>
-using ForwardedParameterType = typename ForwardedParameter<T>::type;
+        template<class T>
+        using ForwardedParameterType = typename ForwardedParameter<T>::type;
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -173,199 +174,203 @@ using ForwardedParameterType = typename ForwardedParameter<T>::type;
 // "relocate_from_to" specifies that the manager should perform a move.
 //
 // "dispose" specifies that the manager should perform a destroy.
-enum class FunctionToCall : bool { relocate_from_to, dispose };
+        enum class FunctionToCall : bool {
+            relocate_from_to, dispose
+        };
 
 // The portion of `AnyInvocable` state that contains either a pointer to the
 // target object or the object itself in local storage
-union TypeErasedState {
-  struct {
-    // A pointer to the type-erased object when remotely stored
-    void* target;
-    // The size of the object for `RemoteManagerTrivial`
-    std::size_t size;
-  } remote;
+        union TypeErasedState {
+            struct {
+                // A pointer to the type-erased object when remotely stored
+                void *target;
+                // The size of the object for `RemoteManagerTrivial`
+                std::size_t size;
+            } remote;
 
-  // Local-storage for the type-erased object when small and trivial enough
-  alignas(kAlignment) char storage[kStorageSize];
-};
+            // Local-storage for the type-erased object when small and trivial enough
+            alignas(kAlignment) char storage[kStorageSize];
+        };
 
 // A typed accessor for the object in `TypeErasedState` storage
-template <class T>
-T& ObjectInLocalStorage(TypeErasedState* const state) {
-  // We launder here because the storage may be reused with the same type.
+        template<class T>
+        T &ObjectInLocalStorage(TypeErasedState *const state) {
+            // We launder here because the storage may be reused with the same type.
 #if TURBO_INTERNAL_CPLUSPLUS_LANG >= 201703L
-  return *std::launder(reinterpret_cast<T*>(&state->storage));
+            return *std::launder(reinterpret_cast<T *>(&state->storage));
 #elif TURBO_HAVE_BUILTIN(__builtin_launder)
-  return *__builtin_launder(reinterpret_cast<T*>(&state->storage));
+            return *__builtin_launder(reinterpret_cast<T*>(&state->storage));
 #else
 
-  // When `std::launder` or equivalent are not available, we rely on undefined
-  // behavior, which works as intended on Turbo's officially supported
-  // platforms as of Q2 2022.
+            // When `std::launder` or equivalent are not available, we rely on undefined
+            // behavior, which works as intended on Turbo's officially supported
+            // platforms as of Q2 2022.
 #if !defined(__clang__) && defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #pragma GCC diagnostic push
 #endif
-  return *reinterpret_cast<T*>(&state->storage);
+            return *reinterpret_cast<T*>(&state->storage);
 #if !defined(__clang__) && defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
 
 #endif
-}
+        }
 
 // The type for functions issuing lifetime-related operations: move and dispose
 // A pointer to such a function is contained in each `AnyInvocable` instance.
 // NOTE: When specifying `FunctionToCall::`dispose, the same state must be
 // passed as both "from" and "to".
-using ManagerType = void(FunctionToCall /*operation*/,
-                         TypeErasedState* /*from*/, TypeErasedState* /*to*/)
-    TURBO_INTERNAL_NOEXCEPT_SPEC(true);
+        using ManagerType = void(FunctionToCall /*operation*/,
+                                 TypeErasedState * /*from*/, TypeErasedState * /*to*/)
+        TURBO_INTERNAL_NOEXCEPT_SPEC(true);
 
 // The type for functions issuing the actual invocation of the object
 // A pointer to such a function is contained in each AnyInvocable instance.
-template <bool SigIsNoexcept, class ReturnType, class... P>
-using InvokerType = ReturnType(TypeErasedState*, ForwardedParameterType<P>...)
-    TURBO_INTERNAL_NOEXCEPT_SPEC(SigIsNoexcept);
+        template<bool SigIsNoexcept, class ReturnType, class... P>
+        using InvokerType = ReturnType(TypeErasedState *, ForwardedParameterType<P>...)
+        TURBO_INTERNAL_NOEXCEPT_SPEC(SigIsNoexcept);
 
 // The manager that is used when AnyInvocable is empty
-inline void EmptyManager(FunctionToCall /*operation*/,
-                         TypeErasedState* /*from*/,
-                         TypeErasedState* /*to*/) noexcept {}
+        inline void EmptyManager(FunctionToCall /*operation*/,
+                                 TypeErasedState * /*from*/,
+                                 TypeErasedState * /*to*/) noexcept {}
 
 // The manager that is used when a target function is in local storage and is
 // a trivially copyable type.
-inline void LocalManagerTrivial(FunctionToCall /*operation*/,
-                                TypeErasedState* const from,
-                                TypeErasedState* const to) noexcept {
-  // This single statement without branching handles both possible operations.
-  //
-  // For FunctionToCall::dispose, "from" and "to" point to the same state, and
-  // so this assignment logically would do nothing.
-  //
-  // Note: Correctness here relies on http://wg21.link/p0593, which has only
-  // become standard in C++20, though implementations do not break it in
-  // practice for earlier versions of C++.
-  //
-  // The correct way to do this without that paper is to first placement-new a
-  // default-constructed T in "to->storage" prior to the memmove, but doing so
-  // requires a different function to be created for each T that is stored
-  // locally, which can cause unnecessary bloat and be less cache friendly.
-  *to = *from;
+        inline void LocalManagerTrivial(FunctionToCall /*operation*/,
+                                        TypeErasedState *const from,
+                                        TypeErasedState *const to) noexcept {
+            // This single statement without branching handles both possible operations.
+            //
+            // For FunctionToCall::dispose, "from" and "to" point to the same state, and
+            // so this assignment logically would do nothing.
+            //
+            // Note: Correctness here relies on http://wg21.link/p0593, which has only
+            // become standard in C++20, though implementations do not break it in
+            // practice for earlier versions of C++.
+            //
+            // The correct way to do this without that paper is to first placement-new a
+            // default-constructed T in "to->storage" prior to the memmove, but doing so
+            // requires a different function to be created for each T that is stored
+            // locally, which can cause unnecessary bloat and be less cache friendly.
+            *to = *from;
 
-  // Note: Because the type is trivially copyable, the destructor does not need
-  // to be called ("trivially copyable" requires a trivial destructor).
-}
+            // Note: Because the type is trivially copyable, the destructor does not need
+            // to be called ("trivially copyable" requires a trivial destructor).
+        }
 
 // The manager that is used when a target function is in local storage and is
 // not a trivially copyable type.
-template <class T>
-void LocalManagerNontrivial(FunctionToCall operation,
-                            TypeErasedState* const from,
-                            TypeErasedState* const to) noexcept {
-  static_assert(IsStoredLocally<T>::value,
-                "Local storage must only be used for supported types.");
-  static_assert(!std::is_trivially_copyable<T>::value,
-                "Locally stored types must be trivially copyable.");
+        template<class T>
+        void LocalManagerNontrivial(FunctionToCall operation,
+                                    TypeErasedState *const from,
+                                    TypeErasedState *const to) noexcept {
+            static_assert(IsStoredLocally<T>::value,
+                          "Local storage must only be used for supported types.");
+            static_assert(!std::is_trivially_copyable<T>::value,
+                          "Locally stored types must be trivially copyable.");
 
-  T& from_object = (ObjectInLocalStorage<T>)(from);
+            T &from_object = (ObjectInLocalStorage<T>)(from);
 
-  switch (operation) {
-    case FunctionToCall::relocate_from_to:
-      // NOTE: Requires that the left-hand operand is already empty.
-      ::new (static_cast<void*>(&to->storage)) T(std::move(from_object));
-      TURBO_FALLTHROUGH;
-    case FunctionToCall::dispose:
-      from_object.~T();  // Must not throw. // NOLINT
-      return;
-  }
-  TURBO_UNREACHABLE();
-}
+            switch (operation) {
+                case FunctionToCall::relocate_from_to:
+                    // NOTE: Requires that the left-hand operand is already empty.
+                    ::new(static_cast<void *>(&to->storage)) T(std::move(from_object));
+                    [[fallthrough]];
+                case FunctionToCall::dispose:
+                    from_object.~T();  // Must not throw. // NOLINT
+                    return;
+            }
+            TURBO_UNREACHABLE();
+        }
 
 // The invoker that is used when a target function is in local storage
 // Note: QualTRef here is the target function type along with cv and reference
 // qualifiers that must be used when calling the function.
-template <bool SigIsNoexcept, class ReturnType, class QualTRef, class... P>
-ReturnType LocalInvoker(
-    TypeErasedState* const state,
-    ForwardedParameterType<P>... args) noexcept(SigIsNoexcept) {
-  using RawT = RemoveCVRef<QualTRef>;
-  static_assert(
-      IsStoredLocally<RawT>::value,
-      "Target object must be in local storage in order to be invoked from it.");
+        template<bool SigIsNoexcept, class ReturnType, class QualTRef, class... P>
+        ReturnType LocalInvoker(
+                TypeErasedState *const state,
+                ForwardedParameterType<P>... args) noexcept(SigIsNoexcept) {
+            using RawT = RemoveCVRef<QualTRef>;
+            static_assert(
+                    IsStoredLocally<RawT>::value,
+                    "Target object must be in local storage in order to be invoked from it.");
 
-  auto& f = (ObjectInLocalStorage<RawT>)(state);
-  return (InvokeR<ReturnType>)(static_cast<QualTRef>(f),
-                               static_cast<ForwardedParameterType<P>>(args)...);
-}
+            auto &f = (ObjectInLocalStorage<RawT>)(state);
+            return (InvokeR<ReturnType>)(static_cast<QualTRef>(f),
+                                         static_cast<ForwardedParameterType<P>>(args)...);
+        }
 
 // The manager that is used when a target function is in remote storage and it
 // has a trivial destructor
-inline void RemoteManagerTrivial(FunctionToCall operation,
-                                 TypeErasedState* const from,
-                                 TypeErasedState* const to) noexcept {
-  switch (operation) {
-    case FunctionToCall::relocate_from_to:
-      // NOTE: Requires that the left-hand operand is already empty.
-      to->remote = from->remote;
-      return;
-    case FunctionToCall::dispose:
+        inline void RemoteManagerTrivial(FunctionToCall operation,
+                                         TypeErasedState *const from,
+                                         TypeErasedState *const to) noexcept {
+            switch (operation) {
+                case FunctionToCall::relocate_from_to:
+                    // NOTE: Requires that the left-hand operand is already empty.
+                    to->remote = from->remote;
+                    return;
+                case FunctionToCall::dispose:
 #if defined(__cpp_sized_deallocation)
-      ::operator delete(from->remote.target, from->remote.size);
+                    ::operator delete(from->remote.target, from->remote.size);
 #else   // __cpp_sized_deallocation
-      ::operator delete(from->remote.target);
+                    ::operator delete(from->remote.target);
 #endif  // __cpp_sized_deallocation
-      return;
-  }
-  TURBO_UNREACHABLE();
-}
+                    return;
+            }
+            TURBO_UNREACHABLE();
+        }
 
 // The manager that is used when a target function is in remote storage and the
 // destructor of the type is not trivial
-template <class T>
-void RemoteManagerNontrivial(FunctionToCall operation,
-                             TypeErasedState* const from,
-                             TypeErasedState* const to) noexcept {
-  static_assert(!IsStoredLocally<T>::value,
-                "Remote storage must only be used for types that do not "
-                "qualify for local storage.");
+        template<class T>
+        void RemoteManagerNontrivial(FunctionToCall operation,
+                                     TypeErasedState *const from,
+                                     TypeErasedState *const to) noexcept {
+            static_assert(!IsStoredLocally<T>::value,
+                          "Remote storage must only be used for types that do not "
+                          "qualify for local storage.");
 
-  switch (operation) {
-    case FunctionToCall::relocate_from_to:
-      // NOTE: Requires that the left-hand operand is already empty.
-      to->remote.target = from->remote.target;
-      return;
-    case FunctionToCall::dispose:
-      ::delete static_cast<T*>(from->remote.target);  // Must not throw.
-      return;
-  }
-  TURBO_UNREACHABLE();
-}
+            switch (operation) {
+                case FunctionToCall::relocate_from_to:
+                    // NOTE: Requires that the left-hand operand is already empty.
+                    to->remote.target = from->remote.target;
+                    return;
+                case FunctionToCall::dispose:
+                    ::delete static_cast<T *>(from->remote.target);  // Must not throw.
+                    return;
+            }
+            TURBO_UNREACHABLE();
+        }
 
 // The invoker that is used when a target function is in remote storage
-template <bool SigIsNoexcept, class ReturnType, class QualTRef, class... P>
-ReturnType RemoteInvoker(
-    TypeErasedState* const state,
-    ForwardedParameterType<P>... args) noexcept(SigIsNoexcept) {
-  using RawT = RemoveCVRef<QualTRef>;
-  static_assert(!IsStoredLocally<RawT>::value,
-                "Target object must be in remote storage in order to be "
-                "invoked from it.");
+        template<bool SigIsNoexcept, class ReturnType, class QualTRef, class... P>
+        ReturnType RemoteInvoker(
+                TypeErasedState *const state,
+                ForwardedParameterType<P>... args) noexcept(SigIsNoexcept) {
+            using RawT = RemoveCVRef<QualTRef>;
+            static_assert(!IsStoredLocally<RawT>::value,
+                          "Target object must be in remote storage in order to be "
+                          "invoked from it.");
 
-  auto& f = *static_cast<RawT*>(state->remote.target);
-  return (InvokeR<ReturnType>)(static_cast<QualTRef>(f),
-                               static_cast<ForwardedParameterType<P>>(args)...);
-}
+            auto &f = *static_cast<RawT *>(state->remote.target);
+            return (InvokeR<ReturnType>)(static_cast<QualTRef>(f),
+                                         static_cast<ForwardedParameterType<P>>(args)...);
+        }
 
 ////////////////////////////////////////////////////////////////////////////////
 //
 // A metafunction that checks if a type T is an instantiation of
 // std::in_place_type_t (needed for constructor constraints of AnyInvocable).
-template <class T>
-struct IsInPlaceType : std::false_type {};
+        template<class T>
+        struct IsInPlaceType : std::false_type {
+        };
 
-template <class T>
-struct IsInPlaceType<std::in_place_type_t<T>> : std::true_type {};
+        template<class T>
+        struct IsInPlaceType<std::in_place_type_t<T>> : std::true_type {
+        };
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -373,8 +378,9 @@ struct IsInPlaceType<std::in_place_type_t<T>> : std::true_type {};
 // conversion-constructor. QualDecayedTRef is the decayed-type of the object to
 // wrap, along with the cv and reference qualifiers that must be applied when
 // performing an invocation of the wrapped object.
-template <class QualDecayedTRef>
-struct TypedConversionConstruct {};
+        template<class QualDecayedTRef>
+        struct TypedConversionConstruct {
+        };
 
 // A helper base class for all core operations of AnyInvocable. Most notably,
 // this class creates the function call operator and constraint-checkers so that
@@ -384,131 +390,135 @@ struct TypedConversionConstruct {};
 // the user of the top-level template accidentally passes a template argument
 // that is not a function type, they will get a static_assert in AnyInvocable's
 // class body rather than an error stating that Impl is not defined.
-template <class Sig>
-class Impl {};  // Note: This is partially-specialized later.
+        template<class Sig>
+        class Impl {
+        };  // Note: This is partially-specialized later.
 
 // A std::unique_ptr deleter that deletes memory allocated via ::operator new.
 #if defined(__cpp_sized_deallocation)
-class TrivialDeleter {
- public:
-  explicit TrivialDeleter(std::size_t size) : size_(size) {}
 
-  void operator()(void* target) const {
-    ::operator delete(target, size_);
-  }
+        class TrivialDeleter {
+        public:
+            explicit TrivialDeleter(std::size_t size) : size_(size) {}
 
- private:
-  std::size_t size_;
-};
+            void operator()(void *target) const {
+                ::operator delete(target, size_);
+            }
+
+        private:
+            std::size_t size_;
+        };
+
 #else   // __cpp_sized_deallocation
-class TrivialDeleter {
- public:
-  explicit TrivialDeleter(std::size_t) {}
+        class TrivialDeleter {
+         public:
+          explicit TrivialDeleter(std::size_t) {}
 
-  void operator()(void* target) const { ::operator delete(target); }
-};
+          void operator()(void* target) const { ::operator delete(target); }
+        };
 #endif  // __cpp_sized_deallocation
 
-template <bool SigIsNoexcept, class ReturnType, class... P>
-class CoreImpl;
+        template<bool SigIsNoexcept, class ReturnType, class... P>
+        class CoreImpl;
 
-constexpr bool IsCompatibleConversion(void*, void*) { return false; }
-template <bool NoExceptSrc, bool NoExceptDest, class... T>
-constexpr bool IsCompatibleConversion(CoreImpl<NoExceptSrc, T...>*,
-                                      CoreImpl<NoExceptDest, T...>*) {
-  return !NoExceptDest || NoExceptSrc;
-}
+        constexpr bool IsCompatibleConversion(void *, void *) { return false; }
+
+        template<bool NoExceptSrc, bool NoExceptDest, class... T>
+        constexpr bool IsCompatibleConversion(CoreImpl<NoExceptSrc, T...> *,
+                                              CoreImpl<NoExceptDest, T...> *) {
+            return !NoExceptDest || NoExceptSrc;
+        }
 
 // A helper base class for all core operations of AnyInvocable that do not
 // depend on the cv/ref qualifiers of the function type.
-template <bool SigIsNoexcept, class ReturnType, class... P>
-class CoreImpl {
- public:
-  using result_type = ReturnType;
+        template<bool SigIsNoexcept, class ReturnType, class... P>
+        class CoreImpl {
+        public:
+            using result_type = ReturnType;
 
-  CoreImpl() noexcept : manager_(EmptyManager), invoker_(nullptr) {}
+            CoreImpl() noexcept: manager_(EmptyManager), invoker_(nullptr) {}
 
-  enum class TargetType : int {
-    kPointer = 0,
-    kCompatibleAnyInvocable = 1,
-    kIncompatibleAnyInvocable = 2,
-    kOther = 3,
-  };
+            enum class TargetType : int {
+                kPointer = 0,
+                kCompatibleAnyInvocable = 1,
+                kIncompatibleAnyInvocable = 2,
+                kOther = 3,
+            };
 
-  // Note: QualDecayedTRef here includes the cv-ref qualifiers associated with
-  // the invocation of the Invocable. The unqualified type is the target object
-  // type to be stored.
-  template <class QualDecayedTRef, class F>
-  explicit CoreImpl(TypedConversionConstruct<QualDecayedTRef>, F&& f) {
-    using DecayedT = RemoveCVRef<QualDecayedTRef>;
+            // Note: QualDecayedTRef here includes the cv-ref qualifiers associated with
+            // the invocation of the Invocable. The unqualified type is the target object
+            // type to be stored.
+            template<class QualDecayedTRef, class F>
+            explicit CoreImpl(TypedConversionConstruct<QualDecayedTRef>, F &&f) {
+                using DecayedT = RemoveCVRef<QualDecayedTRef>;
 
-    constexpr TargetType kTargetType =
-        (std::is_pointer<DecayedT>::value ||
-         std::is_member_pointer<DecayedT>::value)
-            ? TargetType::kPointer
-        : IsCompatibleAnyInvocable<DecayedT>::value
-            ? TargetType::kCompatibleAnyInvocable
-        : IsAnyInvocable<DecayedT>::value
-            ? TargetType::kIncompatibleAnyInvocable
-            : TargetType::kOther;
-    // NOTE: We only use integers instead of enums as template parameters in
-    // order to work around a bug on C++14 under MSVC 2017.
-    // See b/236131881.
-    Initialize<static_cast<int>(kTargetType), QualDecayedTRef>(
-        std::forward<F>(f));
-  }
+                constexpr TargetType kTargetType =
+                        (std::is_pointer<DecayedT>::value ||
+                         std::is_member_pointer<DecayedT>::value)
+                        ? TargetType::kPointer
+                        : IsCompatibleAnyInvocable<DecayedT>::value
+                          ? TargetType::kCompatibleAnyInvocable
+                          : IsAnyInvocable<DecayedT>::value
+                            ? TargetType::kIncompatibleAnyInvocable
+                            : TargetType::kOther;
+                // NOTE: We only use integers instead of enums as template parameters in
+                // order to work around a bug on C++14 under MSVC 2017.
+                // See b/236131881.
+                Initialize<static_cast<int>(kTargetType), QualDecayedTRef>(
+                        std::forward<F>(f));
+            }
 
-  // Note: QualTRef here includes the cv-ref qualifiers associated with the
-  // invocation of the Invocable. The unqualified type is the target object
-  // type to be stored.
-  template <class QualTRef, class... Args>
-  explicit CoreImpl(std::in_place_type_t<QualTRef>, Args&&... args) {
-    InitializeStorage<QualTRef>(std::forward<Args>(args)...);
-  }
+            // Note: QualTRef here includes the cv-ref qualifiers associated with the
+            // invocation of the Invocable. The unqualified type is the target object
+            // type to be stored.
+            template<class QualTRef, class... Args>
+            explicit CoreImpl(std::in_place_type_t<QualTRef>, Args &&... args) {
+                InitializeStorage<QualTRef>(std::forward<Args>(args)...);
+            }
 
-  CoreImpl(CoreImpl&& other) noexcept {
-    other.manager_(FunctionToCall::relocate_from_to, &other.state_, &state_);
-    manager_ = other.manager_;
-    invoker_ = other.invoker_;
-    other.manager_ = EmptyManager;
-    other.invoker_ = nullptr;
-  }
+            CoreImpl(CoreImpl &&other) noexcept {
+                other.manager_(FunctionToCall::relocate_from_to, &other.state_, &state_);
+                manager_ = other.manager_;
+                invoker_ = other.invoker_;
+                other.manager_ = EmptyManager;
+                other.invoker_ = nullptr;
+            }
 
-  CoreImpl& operator=(CoreImpl&& other) noexcept {
-    // Put the left-hand operand in an empty state.
-    //
-    // Note: A full reset that leaves us with an object that has its invariants
-    // intact is necessary in order to handle self-move. This is required by
-    // types that are used with certain operations of the standard library, such
-    // as the default definition of std::swap when both operands target the same
-    // object.
-    Clear();
+            CoreImpl &operator=(CoreImpl &&other) noexcept {
+                // Put the left-hand operand in an empty state.
+                //
+                // Note: A full reset that leaves us with an object that has its invariants
+                // intact is necessary in order to handle self-move. This is required by
+                // types that are used with certain operations of the standard library, such
+                // as the default definition of std::swap when both operands target the same
+                // object.
+                Clear();
 
-    // Perform the actual move/destory operation on the target function.
-    other.manager_(FunctionToCall::relocate_from_to, &other.state_, &state_);
-    manager_ = other.manager_;
-    invoker_ = other.invoker_;
-    other.manager_ = EmptyManager;
-    other.invoker_ = nullptr;
+                // Perform the actual move/destory operation on the target function.
+                other.manager_(FunctionToCall::relocate_from_to, &other.state_, &state_);
+                manager_ = other.manager_;
+                invoker_ = other.invoker_;
+                other.manager_ = EmptyManager;
+                other.invoker_ = nullptr;
 
-    return *this;
-  }
+                return *this;
+            }
 
-  ~CoreImpl() { manager_(FunctionToCall::dispose, &state_, &state_); }
+            ~CoreImpl() { manager_(FunctionToCall::dispose, &state_, &state_); }
 
-  // Check whether or not the AnyInvocable is in the empty state.
-  bool HasValue() const { return invoker_ != nullptr; }
+            // Check whether or not the AnyInvocable is in the empty state.
+            bool HasValue() const { return invoker_ != nullptr; }
 
-  // Effects: Puts the object into its empty state.
-  void Clear() {
-    manager_(FunctionToCall::dispose, &state_, &state_);
-    manager_ = EmptyManager;
-    invoker_ = nullptr;
-  }
+            // Effects: Puts the object into its empty state.
+            void Clear() {
+                manager_(FunctionToCall::dispose, &state_, &state_);
+                manager_ = EmptyManager;
+                invoker_ = nullptr;
+            }
 
-  template <int target_type, class QualDecayedTRef, class F,
-            std::enable_if_t<target_type == 0, int> = 0>
-  void Initialize(F&& f) {
+            template<int target_type, class QualDecayedTRef, class F,
+                    std::enable_if_t<target_type == 0, int> = 0>
+            void Initialize(F &&f) {
 // This condition handles types that decay into pointers, which includes
 // function references. Since function references cannot be null, GCC warns
 // against comparing their decayed form with nullptr.
@@ -520,140 +530,141 @@ class CoreImpl {
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
 #pragma GCC diagnostic push
 #endif
-    if (static_cast<RemoveCVRef<QualDecayedTRef>>(f) == nullptr) {
+                if (static_cast<RemoveCVRef<QualDecayedTRef>>(f) == nullptr) {
 #if !defined(__clang__) && defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
-      manager_ = EmptyManager;
-      invoker_ = nullptr;
-      return;
-    }
-    InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
-  }
+                    manager_ = EmptyManager;
+                    invoker_ = nullptr;
+                    return;
+                }
+                InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
+            }
 
-  template <int target_type, class QualDecayedTRef, class F,
-            std::enable_if_t<target_type == 1, int> = 0>
-  void Initialize(F&& f) {
-    // In this case we can "steal the guts" of the other AnyInvocable.
-    f.manager_(FunctionToCall::relocate_from_to, &f.state_, &state_);
-    manager_ = f.manager_;
-    invoker_ = f.invoker_;
+            template<int target_type, class QualDecayedTRef, class F,
+                    std::enable_if_t<target_type == 1, int> = 0>
+            void Initialize(F &&f) {
+                // In this case we can "steal the guts" of the other AnyInvocable.
+                f.manager_(FunctionToCall::relocate_from_to, &f.state_, &state_);
+                manager_ = f.manager_;
+                invoker_ = f.invoker_;
 
-    f.manager_ = EmptyManager;
-    f.invoker_ = nullptr;
-  }
+                f.manager_ = EmptyManager;
+                f.invoker_ = nullptr;
+            }
 
-  template <int target_type, class QualDecayedTRef, class F,
-            std::enable_if_t<target_type == 2, int> = 0>
-  void Initialize(F&& f) {
-    if (f.HasValue()) {
-      InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
-    } else {
-      manager_ = EmptyManager;
-      invoker_ = nullptr;
-    }
-  }
+            template<int target_type, class QualDecayedTRef, class F,
+                    std::enable_if_t<target_type == 2, int> = 0>
+            void Initialize(F &&f) {
+                if (f.HasValue()) {
+                    InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
+                } else {
+                    manager_ = EmptyManager;
+                    invoker_ = nullptr;
+                }
+            }
 
-  template <int target_type, class QualDecayedTRef, class F,
-            typename = std::enable_if_t<target_type == 3>>
-  void Initialize(F&& f) {
-    InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
-  }
+            template<int target_type, class QualDecayedTRef, class F,
+                    typename = std::enable_if_t<target_type == 3>>
+            void Initialize(F &&f) {
+                InitializeStorage<QualDecayedTRef>(std::forward<F>(f));
+            }
 
-  // Use local (inline) storage for applicable target object types.
-  template <class QualTRef, class... Args,
-            typename = std::enable_if_t<
-                IsStoredLocally<RemoveCVRef<QualTRef>>::value>>
-  void InitializeStorage(Args&&... args) {
-    using RawT = RemoveCVRef<QualTRef>;
-    ::new (static_cast<void*>(&state_.storage))
-        RawT(std::forward<Args>(args)...);
+            // Use local (inline) storage for applicable target object types.
+            template<class QualTRef, class... Args,
+                    typename = std::enable_if_t<
+                            IsStoredLocally<RemoveCVRef<QualTRef>>::value>>
+            void InitializeStorage(Args &&... args) {
+                using RawT = RemoveCVRef<QualTRef>;
+                ::new(static_cast<void *>(&state_.storage))
+                        RawT(std::forward<Args>(args)...);
 
-    invoker_ = LocalInvoker<SigIsNoexcept, ReturnType, QualTRef, P...>;
-    // We can simplify our manager if we know the type is trivially copyable.
-    InitializeLocalManager<RawT>();
-  }
+                invoker_ = LocalInvoker<SigIsNoexcept, ReturnType, QualTRef, P...>;
+                // We can simplify our manager if we know the type is trivially copyable.
+                InitializeLocalManager<RawT>();
+            }
 
-  // Use remote storage for target objects that cannot be stored locally.
-  template <class QualTRef, class... Args,
-            std::enable_if_t<!IsStoredLocally<RemoveCVRef<QualTRef>>::value,
-                              int> = 0>
-  void InitializeStorage(Args&&... args) {
-    InitializeRemoteManager<RemoveCVRef<QualTRef>>(std::forward<Args>(args)...);
-    // This is set after everything else in case an exception is thrown in an
-    // earlier step of the initialization.
-    invoker_ = RemoteInvoker<SigIsNoexcept, ReturnType, QualTRef, P...>;
-  }
+            // Use remote storage for target objects that cannot be stored locally.
+            template<class QualTRef, class... Args,
+                    std::enable_if_t<!IsStoredLocally<RemoveCVRef<QualTRef>>::value,
+                            int> = 0>
+            void InitializeStorage(Args &&... args) {
+                InitializeRemoteManager<RemoveCVRef<QualTRef>>(std::forward<Args>(args)...);
+                // This is set after everything else in case an exception is thrown in an
+                // earlier step of the initialization.
+                invoker_ = RemoteInvoker<SigIsNoexcept, ReturnType, QualTRef, P...>;
+            }
 
-  template <class T,
-            typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
-  void InitializeLocalManager() {
-    manager_ = LocalManagerTrivial;
-  }
+            template<class T,
+                    typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+            void InitializeLocalManager() {
+                manager_ = LocalManagerTrivial;
+            }
 
-  template <class T,
-            std::enable_if_t<!std::is_trivially_copyable<T>::value, int> = 0>
-  void InitializeLocalManager() {
-    manager_ = LocalManagerNontrivial<T>;
-  }
+            template<class T,
+                    std::enable_if_t<!std::is_trivially_copyable<T>::value, int> = 0>
+            void InitializeLocalManager() {
+                manager_ = LocalManagerNontrivial<T>;
+            }
 
-  template <class T>
-  using HasTrivialRemoteStorage =
-      std::integral_constant<bool, std::is_trivially_destructible<T>::value &&
-                                       alignof(T) <=
-                                           TURBO_INTERNAL_DEFAULT_NEW_ALIGNMENT>;
+            template<class T>
+            using HasTrivialRemoteStorage =
+                    std::integral_constant<bool, std::is_trivially_destructible<T>::value &&
+                                                 alignof(T) <=
+                                                 TURBO_INTERNAL_DEFAULT_NEW_ALIGNMENT>;
 
-  template <class T, class... Args,
-            typename = std::enable_if_t<HasTrivialRemoteStorage<T>::value>>
-  void InitializeRemoteManager(Args&&... args) {
-    // unique_ptr is used for exception-safety in case construction throws.
-    std::unique_ptr<void, TrivialDeleter> uninitialized_target(
-        ::operator new(sizeof(T)), TrivialDeleter(sizeof(T)));
-    ::new (uninitialized_target.get()) T(std::forward<Args>(args)...);
-    state_.remote.target = uninitialized_target.release();
-    state_.remote.size = sizeof(T);
-    manager_ = RemoteManagerTrivial;
-  }
+            template<class T, class... Args,
+                    typename = std::enable_if_t<HasTrivialRemoteStorage<T>::value>>
+            void InitializeRemoteManager(Args &&... args) {
+                // unique_ptr is used for exception-safety in case construction throws.
+                std::unique_ptr<void, TrivialDeleter> uninitialized_target(
+                        ::operator new(sizeof(T)), TrivialDeleter(sizeof(T)));
+                ::new(uninitialized_target.get()) T(std::forward<Args>(args)...);
+                state_.remote.target = uninitialized_target.release();
+                state_.remote.size = sizeof(T);
+                manager_ = RemoteManagerTrivial;
+            }
 
-  template <class T, class... Args,
-            std::enable_if_t<!HasTrivialRemoteStorage<T>::value, int> = 0>
-  void InitializeRemoteManager(Args&&... args) {
-    state_.remote.target = ::new T(std::forward<Args>(args)...);
-    manager_ = RemoteManagerNontrivial<T>;
-  }
+            template<class T, class... Args,
+                    std::enable_if_t<!HasTrivialRemoteStorage<T>::value, int> = 0>
+            void InitializeRemoteManager(Args &&... args) {
+                state_.remote.target = ::new T(std::forward<Args>(args)...);
+                manager_ = RemoteManagerNontrivial<T>;
+            }
 
-  //////////////////////////////////////////////////////////////////////////////
-  //
-  // Type trait to determine if the template argument is an AnyInvocable whose
-  // function type is compatible enough with ours such that we can
-  // "move the guts" out of it when moving, rather than having to place a new
-  // object into remote storage.
+            //////////////////////////////////////////////////////////////////////////////
+            //
+            // Type trait to determine if the template argument is an AnyInvocable whose
+            // function type is compatible enough with ours such that we can
+            // "move the guts" out of it when moving, rather than having to place a new
+            // object into remote storage.
 
-  template <typename Other>
-  struct IsCompatibleAnyInvocable {
-    static constexpr bool value = false;
-  };
+            template<typename Other>
+            struct IsCompatibleAnyInvocable {
+                static constexpr bool value = false;
+            };
 
-  template <typename Sig>
-  struct IsCompatibleAnyInvocable<AnyInvocable<Sig>> {
-    static constexpr bool value =
-        (IsCompatibleConversion)(static_cast<
-                                     typename AnyInvocable<Sig>::CoreImpl*>(
-                                     nullptr),
-                                 static_cast<CoreImpl*>(nullptr));
-  };
+            template<typename Sig>
+            struct IsCompatibleAnyInvocable<AnyInvocable<Sig>> {
+                static constexpr bool value =
+                        (IsCompatibleConversion)(static_cast<
+                                                         typename AnyInvocable<Sig>::CoreImpl *>(
+                                                         nullptr),
+                                                 static_cast<CoreImpl *>(nullptr));
+            };
 
-  //
-  //////////////////////////////////////////////////////////////////////////////
+            //
+            //////////////////////////////////////////////////////////////////////////////
 
-  TypeErasedState state_;
-  ManagerType* manager_;
-  InvokerType<SigIsNoexcept, ReturnType, P...>* invoker_;
-};
+            TypeErasedState state_;
+            ManagerType *manager_;
+            InvokerType<SigIsNoexcept, ReturnType, P...> *invoker_;
+        };
 
 // A constructor name-tag used with Impl to request the
 // conversion-constructor
-struct ConversionConstruct {};
+        struct ConversionConstruct {
+        };
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -662,64 +673,64 @@ struct ConversionConstruct {};
 // currently std::reference_wrapper's operator() is not conditionally noexcept,
 // so when checking if such an Invocable is nothrow-invocable, we must pull out
 // the underlying type.
-template <class T>
-struct UnwrapStdReferenceWrapperImpl {
-  using type = T;
-};
+        template<class T>
+        struct UnwrapStdReferenceWrapperImpl {
+            using type = T;
+        };
 
-template <class T>
-struct UnwrapStdReferenceWrapperImpl<std::reference_wrapper<T>> {
-  using type = T&;
-};
+        template<class T>
+        struct UnwrapStdReferenceWrapperImpl<std::reference_wrapper<T>> {
+            using type = T &;
+        };
 
-template <class T>
-using UnwrapStdReferenceWrapper =
-    typename UnwrapStdReferenceWrapperImpl<T>::type;
+        template<class T>
+        using UnwrapStdReferenceWrapper =
+                typename UnwrapStdReferenceWrapperImpl<T>::type;
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 // An alias that always yields std::true_type (used with constraints) where
 // substitution failures happen when forming the template arguments.
-template <class... T>
-using TrueAlias =
-    std::integral_constant<bool, sizeof(std::void_t<T...>*) != 0>;
+        template<class... T>
+        using TrueAlias =
+                std::integral_constant<bool, sizeof(std::void_t<T...> *) != 0>;
 
 /*SFINAE constraints for the conversion-constructor.*/
-template <class Sig, class F,
-          class = std::enable_if_t<
-              !std::is_same<RemoveCVRef<F>, AnyInvocable<Sig>>::value>>
-using CanConvert = TrueAlias<
-    std::enable_if_t<!IsInPlaceType<RemoveCVRef<F>>::value>,
-    std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
-    std::enable_if_t<
-        Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
-    std::enable_if_t<std::is_constructible<std::decay_t<F>, F>::value>>;
+        template<class Sig, class F,
+                class = std::enable_if_t<
+                        !std::is_same<RemoveCVRef<F>, AnyInvocable<Sig>>::value>>
+        using CanConvert = TrueAlias<
+                std::enable_if_t<!IsInPlaceType<RemoveCVRef<F>>::value>,
+                std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
+                std::enable_if_t<
+                        Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
+                std::enable_if_t<std::is_constructible<std::decay_t<F>, F>::value>>;
 
 /*SFINAE constraints for the std::in_place constructors.*/
-template <class Sig, class F, class... Args>
-using CanEmplace = TrueAlias<
-    std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
-    std::enable_if_t<
-        Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
-    std::enable_if_t<std::is_constructible<std::decay_t<F>, Args...>::value>>;
+        template<class Sig, class F, class... Args>
+        using CanEmplace = TrueAlias<
+                std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
+                std::enable_if_t<
+                        Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
+                std::enable_if_t<std::is_constructible<std::decay_t<F>, Args...>::value>>;
 
 /*SFINAE constraints for the conversion-assign operator.*/
-template <class Sig, class F,
-          class = std::enable_if_t<
-              !std::is_same<RemoveCVRef<F>, AnyInvocable<Sig>>::value>>
-using CanAssign = TrueAlias<
-    std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
-    std::enable_if_t<
-        Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
-    std::enable_if_t<std::is_constructible<std::decay_t<F>, F>::value>>;
+        template<class Sig, class F,
+                class = std::enable_if_t<
+                        !std::is_same<RemoveCVRef<F>, AnyInvocable<Sig>>::value>>
+        using CanAssign = TrueAlias<
+                std::enable_if_t<Impl<Sig>::template CallIsValid<F>::value>,
+                std::enable_if_t<
+                        Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<F>::value>,
+                std::enable_if_t<std::is_constructible<std::decay_t<F>, F>::value>>;
 
 /*SFINAE constraints for the reference-wrapper conversion-assign operator.*/
-template <class Sig, class F>
-using CanAssignReferenceWrapper = TrueAlias<
-    std::enable_if_t<
-        Impl<Sig>::template CallIsValid<std::reference_wrapper<F>>::value>,
-    std::enable_if_t<Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<
-        std::reference_wrapper<F>>::value>>;
+        template<class Sig, class F>
+        using CanAssignReferenceWrapper = TrueAlias<
+                std::enable_if_t<
+                        Impl<Sig>::template CallIsValid<std::reference_wrapper<F>>::value>,
+                std::enable_if_t<Impl<Sig>::template CallIsNoexceptIfSigIsNoexcept<
+                        std::reference_wrapper<F>>::value>>;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -849,16 +860,19 @@ using CanAssignReferenceWrapper = TrueAlias<
 #endif
 
 // Non-ref-qualified partial specializations
-TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, , &);
-TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, , const&);
+        TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, , &);
+
+        TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, , const&);
 
 // Lvalue-ref-qualified partial specializations
-TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, &, &);
-TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &, const&);
+        TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, &, &);
+
+        TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &, const&);
 
 // Rvalue-ref-qualified partial specializations
-TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, &&, &&);
-TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &&, const&&);
+        TURBO_INTERNAL_ANY_INVOCABLE_IMPL(, &&, &&);
+
+        TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &&, const&&);
 
 // Undef the detail-only macros.
 #undef TURBO_INTERNAL_ANY_INVOCABLE_IMPL
@@ -868,8 +882,7 @@ TURBO_INTERNAL_ANY_INVOCABLE_IMPL(const, &&, const&&);
 #undef TURBO_INTERNAL_ANY_INVOCABLE_NOEXCEPT_CONSTRAINT
 #undef TURBO_INTERNAL_NOEXCEPT_SPEC
 
-}  // namespace internal_any_invocable
-TURBO_NAMESPACE_END
+    }  // namespace internal_any_invocable
 }  // namespace turbo
 
 #endif  // TURBO_FUNCTIONAL_INTERNAL_ANY_INVOCABLE_H_

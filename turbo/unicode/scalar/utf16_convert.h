@@ -85,7 +85,7 @@ namespace turbo::unicode::utf16_to_utf8 {
     }
 
     template<EndianNess big_endian>
-    inline result convert_with_errors(const char16_t *buf, size_t len, char *utf8_output) {
+    inline UnicodeResult convert_with_errors(const char16_t *buf, size_t len, char *utf8_output) {
         const uint16_t *data = reinterpret_cast<const uint16_t *>(buf);
         size_t pos = 0;
         char *start{utf8_output};
@@ -124,12 +124,12 @@ namespace turbo::unicode::utf16_to_utf8 {
                 pos++;
             } else {
                 // must be a surrogate pair
-                if (pos + 1 >= len) { return result(error_code::SURROGATE, pos); }
+                if (pos + 1 >= len) { return {UnicodeError::SURROGATE, pos}; }
                 uint16_t diff = uint16_t(word - 0xD800);
-                if (diff > 0x3FF) { return result(error_code::SURROGATE, pos); }
+                if (diff > 0x3FF) { return {UnicodeError::SURROGATE, pos}; }
                 uint16_t next_word = !match_system(big_endian) ? gbswap_16(data[pos + 1]) : data[pos + 1];
                 uint16_t diff2 = uint16_t(next_word - 0xDC00);
-                if (diff2 > 0x3FF) { return result(error_code::SURROGATE, pos); }
+                if (diff2 > 0x3FF) { return {UnicodeError::SURROGATE, pos}; }
                 uint32_t value = (diff << 10) + diff2 + 0x10000;
                 // will generate four UTF-8 bytes
                 // we have 0b11110XXX 0b10XXXXXX 0b10XXXXXX 0b10XXXXXX
@@ -140,7 +140,7 @@ namespace turbo::unicode::utf16_to_utf8 {
                 pos += 2;
             }
         }
-        return result(error_code::SUCCESS, utf8_output - start);
+        return {UnicodeError::SUCCESS, static_cast<size_t>(utf8_output - start)};
     }
 
 
@@ -233,7 +233,7 @@ namespace turbo::unicode::utf16_to_utf32 {
     }
 
     template<EndianNess big_endian>
-    inline result convert_with_errors(const char16_t *buf, size_t len, char32_t *utf32_output) {
+    inline UnicodeResult convert_with_errors(const char16_t *buf, size_t len, char32_t *utf32_output) {
         const uint16_t *data = reinterpret_cast<const uint16_t *>(buf);
         size_t pos = 0;
         char32_t *start{utf32_output};
@@ -246,17 +246,17 @@ namespace turbo::unicode::utf16_to_utf32 {
             } else {
                 // must be a surrogate pair
                 uint16_t diff = uint16_t(word - 0xD800);
-                if (diff > 0x3FF) { return result(error_code::SURROGATE, pos); }
-                if (pos + 1 >= len) { return result(error_code::SURROGATE, pos); } // minimal bound checking
+                if (diff > 0x3FF) { return {UnicodeError::SURROGATE, pos}; }
+                if (pos + 1 >= len) { return {UnicodeError::SURROGATE, pos}; } // minimal bound checking
                 uint16_t next_word = !match_system(big_endian) ? gbswap_16(data[pos + 1]) : data[pos + 1];
                 uint16_t diff2 = uint16_t(next_word - 0xDC00);
-                if (diff2 > 0x3FF) { return result(error_code::SURROGATE, pos); }
+                if (diff2 > 0x3FF) { return {UnicodeError::SURROGATE, pos}; }
                 uint32_t value = (diff << 10) + diff2 + 0x10000;
                 *utf32_output++ = char32_t(value);
                 pos += 2;
             }
         }
-        return result(error_code::SUCCESS, utf32_output - start);
+        return {UnicodeError::SUCCESS, static_cast<size_t>(utf32_output - start)};
     }
 
 

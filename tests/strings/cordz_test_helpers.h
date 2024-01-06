@@ -29,7 +29,7 @@
 #include "gtest/gtest.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 
 // Returns the CordzInfo for the cord, or nullptr if the cord is not sampled.
 inline const cord_internal::CordzInfo* GetCordzInfoForTesting(
@@ -144,7 +144,7 @@ Cord UnsampledCord(Args... args) {
   return cord;
 }
 
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_CORDZ_TEST_HELPERS_H_

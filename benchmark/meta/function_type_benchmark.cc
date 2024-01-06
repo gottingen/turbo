@@ -22,7 +22,7 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace {
 
 int dummy = 0;
@@ -172,5 +172,5 @@ void BM_NonTrivialArgsAnyInvocable(benchmark::State& state) {
 BENCHMARK(BM_NonTrivialArgsAnyInvocable);
 
 }  // namespace
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

@@ -71,7 +71,7 @@ class TurboErrorHelper {
         ::turbo::DescribeCustomizedErrno((error_code), #error_code, (description)); \
     template <> class TurboErrorHelper<(int)(error_code)> {};
 
-const char *TurboError(int error_code);
+const char *terror(int error_code);
 
 std::string StrError(int errnum);
 

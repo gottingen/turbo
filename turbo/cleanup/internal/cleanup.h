@@ -23,77 +23,72 @@
 #include "turbo/platform/port.h"
 #include "turbo/platform/thread_annotations.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
+namespace turbo::cleanup_internal {
 
-namespace cleanup_internal {
+    struct Tag {
+    };
 
-struct Tag {};
+    template<typename Arg, typename... Args>
+    constexpr bool WasDeduced() {
+        return (std::is_same<cleanup_internal::Tag, Arg>::value) &&
+               (sizeof...(Args) == 0);
+    }
 
-template <typename Arg, typename... Args>
-constexpr bool WasDeduced() {
-  return (std::is_same<cleanup_internal::Tag, Arg>::value) &&
-         (sizeof...(Args) == 0);
-}
+    template<typename Callback>
+    constexpr bool ReturnsVoid() {
+        return (std::is_same<std::invoke_result_t<Callback>, void>::value);
+    }
 
-template <typename Callback>
-constexpr bool ReturnsVoid() {
-  return (std::is_same<std::invoke_result_t<Callback>, void>::value);
-}
+    template<typename Callback>
+    class Storage {
+    public:
+        Storage() = delete;
 
-template <typename Callback>
-class Storage {
- public:
-  Storage() = delete;
+        explicit Storage(Callback callback) {
+            // Placement-new into a character buffer is used for eager destruction when
+            // the cleanup is invoked or cancelled. To ensure this optimizes well, the
+            // behavior is implemented locally instead of using an std::optional.
+            ::new(GetCallbackBuffer()) Callback(std::move(callback));
+            is_callback_engaged_ = true;
+        }
 
-  explicit Storage(Callback callback) {
-    // Placement-new into a character buffer is used for eager destruction when
-    // the cleanup is invoked or cancelled. To ensure this optimizes well, the
-    // behavior is implemented locally instead of using an std::optional.
-    ::new (GetCallbackBuffer()) Callback(std::move(callback));
-    is_callback_engaged_ = true;
-  }
+        Storage(Storage &&other) {
+            TURBO_HARDENING_ASSERT(other.IsCallbackEngaged());
 
-  Storage(Storage&& other) {
-    TURBO_HARDENING_ASSERT(other.IsCallbackEngaged());
+            ::new(GetCallbackBuffer()) Callback(std::move(other.GetCallback()));
+            is_callback_engaged_ = true;
 
-    ::new (GetCallbackBuffer()) Callback(std::move(other.GetCallback()));
-    is_callback_engaged_ = true;
+            other.DestroyCallback();
+        }
 
-    other.DestroyCallback();
-  }
+        Storage(const Storage &other) = delete;
 
-  Storage(const Storage& other) = delete;
+        Storage &operator=(Storage &&other) = delete;
 
-  Storage& operator=(Storage&& other) = delete;
+        Storage &operator=(const Storage &other) = delete;
 
-  Storage& operator=(const Storage& other) = delete;
+        void *GetCallbackBuffer() { return static_cast<void *>(+callback_buffer_); }
 
-  void* GetCallbackBuffer() { return static_cast<void*>(+callback_buffer_); }
+        Callback &GetCallback() {
+            return *reinterpret_cast<Callback *>(GetCallbackBuffer());
+        }
 
-  Callback& GetCallback() {
-    return *reinterpret_cast<Callback*>(GetCallbackBuffer());
-  }
+        bool IsCallbackEngaged() const { return is_callback_engaged_; }
 
-  bool IsCallbackEngaged() const { return is_callback_engaged_; }
+        void DestroyCallback() {
+            is_callback_engaged_ = false;
+            GetCallback().~Callback();
+        }
 
-  void DestroyCallback() {
-    is_callback_engaged_ = false;
-    GetCallback().~Callback();
-  }
+        void InvokeCallback() TURBO_NO_THREAD_SAFETY_ANALYSIS {
+            std::move(GetCallback())();
+        }
 
-  void InvokeCallback() TURBO_NO_THREAD_SAFETY_ANALYSIS {
-    std::move(GetCallback())();
-  }
+    private:
+        bool is_callback_engaged_;
+        alignas(Callback) char callback_buffer_[sizeof(Callback)];
+    };
 
- private:
-  bool is_callback_engaged_;
-  alignas(Callback) char callback_buffer_[sizeof(Callback)];
-};
-
-}  // namespace cleanup_internal
-
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::cleanup_internal
 
 #endif  // TURBO_CLEANUP_INTERNAL_CLEANUP_H_

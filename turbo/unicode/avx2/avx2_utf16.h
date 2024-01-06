@@ -80,29 +80,30 @@ namespace turbo::unicode::simd {
       Returns a pair: the first unprocessed byte from buf and utf8_output
       A scalar routing should carry on the conversion of the tail.
     */
-    template <EndianNess big_endian>
-    std::pair<const char16_t*, char*> avx2_convert_utf16_to_utf8(const char16_t* buf, size_t len, char* utf8_output) {
-        const char16_t* end = buf + len;
+    template<EndianNess big_endian>
+    std::pair<const char16_t *, char *> avx2_convert_utf16_to_utf8(const char16_t *buf, size_t len, char *utf8_output) {
+        const char16_t *end = buf + len;
         const __m256i v_0000 = _mm256_setzero_si256();
-        const __m256i v_f800 = _mm256_set1_epi16((int16_t)0xf800);
-        const __m256i v_d800 = _mm256_set1_epi16((int16_t)0xd800);
-        const __m256i v_c080 = _mm256_set1_epi16((int16_t)0xc080);
+        const __m256i v_f800 = _mm256_set1_epi16((int16_t) 0xf800);
+        const __m256i v_d800 = _mm256_set1_epi16((int16_t) 0xd800);
+        const __m256i v_c080 = _mm256_set1_epi16((int16_t) 0xc080);
         const size_t safety_margin = 12; // to avoid overruns, see issue https://github.com/simdutf/simdutf/issues/92
 
         while (buf + 16 + safety_margin <= end) {
-            __m256i in = _mm256_loadu_si256((__m256i*)buf);
+            __m256i in = _mm256_loadu_si256((__m256i *) buf);
             if (turbo::is_big_endian(big_endian)) {
                 const __m256i swap = _mm256_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
                                                       17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30);
                 in = _mm256_shuffle_epi8(in, swap);
             }
             // a single 16-bit UTF-16 word can yield 1, 2 or 3 UTF-8 bytes
-            const __m256i v_ff80 = _mm256_set1_epi16((int16_t)0xff80);
-            if(_mm256_testz_si256(in, v_ff80)) { // ASCII fast path!!!!
+            const __m256i v_ff80 = _mm256_set1_epi16((int16_t) 0xff80);
+            if (_mm256_testz_si256(in, v_ff80)) { // ASCII fast path!!!!
                 // 1. pack the bytes
-                const __m128i utf8_packed = _mm_packus_epi16(_mm256_castsi256_si128(in),_mm256_extractf128_si256(in,1));
+                const __m128i utf8_packed = _mm_packus_epi16(_mm256_castsi256_si128(in),
+                                                             _mm256_extractf128_si256(in, 1));
                 // 2. store (16 bytes)
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_packed);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_packed);
                 // 3. adjust pointers
                 buf += 16;
                 utf8_output += 16;
@@ -114,14 +115,15 @@ namespace turbo::unicode::simd {
 
             // no bits set above 11th bit
             const __m256i one_or_two_bytes_bytemask = _mm256_cmpeq_epi16(_mm256_and_si256(in, v_f800), v_0000);
-            const uint32_t one_or_two_bytes_bitmask = static_cast<uint32_t>(_mm256_movemask_epi8(one_or_two_bytes_bytemask));
+            const uint32_t one_or_two_bytes_bitmask = static_cast<uint32_t>(_mm256_movemask_epi8(
+                    one_or_two_bytes_bytemask));
             if (one_or_two_bytes_bitmask == 0xffffffff) {
 
                 // 1. prepare 2-byte values
                 // input 16-bit word : [0000|0aaa|aabb|bbbb] x 8
                 // expected output   : [110a|aaaa|10bb|bbbb] x 8
-                const __m256i v_1f00 = _mm256_set1_epi16((int16_t)0x1f00);
-                const __m256i v_003f = _mm256_set1_epi16((int16_t)0x003f);
+                const __m256i v_1f00 = _mm256_set1_epi16((int16_t) 0x1f00);
+                const __m256i v_003f = _mm256_set1_epi16((int16_t) 0x003f);
 
                 // t0 = [000a|aaaa|bbbb|bb00]
                 const __m256i t0 = _mm256_slli_epi16(in, 2);
@@ -140,20 +142,20 @@ namespace turbo::unicode::simd {
                 // 3. prepare bitmask for 8-bit lookup
                 const uint32_t M0 = one_byte_bitmask & 0x55555555;
                 const uint32_t M1 = M0 >> 7;
-                const uint32_t M2 = (M1 | M0)  & 0x00ff00ff;
+                const uint32_t M2 = (M1 | M0) & 0x00ff00ff;
                 // 4. pack the bytes
 
-                const uint8_t* row = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2)][0];
-                const uint8_t* row_2 = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2>>16)][0];
+                const uint8_t *row = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2)][0];
+                const uint8_t *row_2 = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2 >> 16)][0];
 
-                const __m128i shuffle = _mm_loadu_si128((__m128i*)(row + 1));
-                const __m128i shuffle_2 = _mm_loadu_si128((__m128i*)(row_2 + 1));
+                const __m128i shuffle = _mm_loadu_si128((__m128i *) (row + 1));
+                const __m128i shuffle_2 = _mm_loadu_si128((__m128i *) (row_2 + 1));
 
-                const __m256i utf8_packed = _mm256_shuffle_epi8(utf8_unpacked, _mm256_setr_m128i(shuffle,shuffle_2));
+                const __m256i utf8_packed = _mm256_shuffle_epi8(utf8_unpacked, _mm256_setr_m128i(shuffle, shuffle_2));
                 // 5. store bytes
-                _mm_storeu_si128((__m128i*)utf8_output, _mm256_castsi256_si128(utf8_packed));
+                _mm_storeu_si128((__m128i *) utf8_output, _mm256_castsi256_si128(utf8_packed));
                 utf8_output += row[0];
-                _mm_storeu_si128((__m128i*)utf8_output, _mm256_extractf128_si256(utf8_packed,1));
+                _mm_storeu_si128((__m128i *) utf8_output, _mm256_extractf128_si256(utf8_packed, 1));
                 utf8_output += row_2[0];
 
                 // 6. adjust pointers
@@ -207,7 +209,7 @@ namespace turbo::unicode::simd {
                 // [bbcc|cccc|bbcc|cccc] => [00cc|cccc|0bcc|cccc]
                 const __m256i t1 = _mm256_and_si256(t0, simdutf_vec(0b0011111101111111));
                 // [00cc|cccc|0bcc|cccc] => [10cc|cccc|0bcc|cccc]
-                const __m256i t2 = _mm256_or_si256 (t1, simdutf_vec(0b1000000000000000));
+                const __m256i t2 = _mm256_or_si256(t1, simdutf_vec(0b1000000000000000));
 
                 // [aaaa|bbbb|bbcc|cccc] =>  [0000|aaaa|bbbb|bbcc]
                 const __m256i s0 = _mm256_srli_epi16(in, 4);
@@ -246,33 +248,33 @@ namespace turbo::unicode::simd {
                   continue;
                 }*/
                 const uint8_t mask0 = uint8_t(mask);
-                const uint8_t* row0 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask0][0];
-                const __m128i shuffle0 = _mm_loadu_si128((__m128i*)(row0 + 1));
+                const uint8_t *row0 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask0][0];
+                const __m128i shuffle0 = _mm_loadu_si128((__m128i *) (row0 + 1));
                 const __m128i utf8_0 = _mm_shuffle_epi8(_mm256_castsi256_si128(out0), shuffle0);
 
                 const uint8_t mask1 = static_cast<uint8_t>(mask >> 8);
-                const uint8_t* row1 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask1][0];
-                const __m128i shuffle1 = _mm_loadu_si128((__m128i*)(row1 + 1));
+                const uint8_t *row1 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask1][0];
+                const __m128i shuffle1 = _mm_loadu_si128((__m128i *) (row1 + 1));
                 const __m128i utf8_1 = _mm_shuffle_epi8(_mm256_castsi256_si128(out1), shuffle1);
 
                 const uint8_t mask2 = static_cast<uint8_t>(mask >> 16);
-                const uint8_t* row2 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask2][0];
-                const __m128i shuffle2 = _mm_loadu_si128((__m128i*)(row2 + 1));
-                const __m128i utf8_2 = _mm_shuffle_epi8(_mm256_extractf128_si256(out0,1), shuffle2);
+                const uint8_t *row2 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask2][0];
+                const __m128i shuffle2 = _mm_loadu_si128((__m128i *) (row2 + 1));
+                const __m128i utf8_2 = _mm_shuffle_epi8(_mm256_extractf128_si256(out0, 1), shuffle2);
 
 
                 const uint8_t mask3 = static_cast<uint8_t>(mask >> 24);
-                const uint8_t* row3 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask3][0];
-                const __m128i shuffle3 = _mm_loadu_si128((__m128i*)(row3 + 1));
-                const __m128i utf8_3 = _mm_shuffle_epi8(_mm256_extractf128_si256(out1,1), shuffle3);
+                const uint8_t *row3 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask3][0];
+                const __m128i shuffle3 = _mm_loadu_si128((__m128i *) (row3 + 1));
+                const __m128i utf8_3 = _mm_shuffle_epi8(_mm256_extractf128_si256(out1, 1), shuffle3);
 
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_0);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_0);
                 utf8_output += row0[0];
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_1);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_1);
                 utf8_output += row1[0];
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_2);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_2);
                 utf8_output += row2[0];
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_3);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_3);
                 utf8_output += row3[0];
                 buf += 16;
                 // surrogate pair(s) in a register
@@ -282,29 +284,30 @@ namespace turbo::unicode::simd {
                 // in the presence of surrogate pairs may require non-trivial tables.
                 size_t forward = 15;
                 size_t k = 0;
-                if(size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1);}
-                for(; k < forward; k++) {
+                if (size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1); }
+                for (; k < forward; k++) {
                     uint16_t word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k]) : buf[k];
-                    if((word & 0xFF80)==0) {
+                    if ((word & 0xFF80) == 0) {
                         *utf8_output++ = char(word);
-                    } else if((word & 0xF800)==0) {
-                        *utf8_output++ = char((word>>6) | 0b11000000);
+                    } else if ((word & 0xF800) == 0) {
+                        *utf8_output++ = char((word >> 6) | 0b11000000);
                         *utf8_output++ = char((word & 0b111111) | 0b10000000);
-                    } else if((word &0xF800 ) != 0xD800) {
-                        *utf8_output++ = char((word>>12) | 0b11100000);
-                        *utf8_output++ = char(((word>>6) & 0b111111) | 0b10000000);
+                    } else if ((word & 0xF800) != 0xD800) {
+                        *utf8_output++ = char((word >> 12) | 0b11100000);
+                        *utf8_output++ = char(((word >> 6) & 0b111111) | 0b10000000);
                         *utf8_output++ = char((word & 0b111111) | 0b10000000);
                     } else {
                         // must be a surrogate pair
                         uint16_t diff = uint16_t(word - 0xD800);
-                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k+1]) : buf[k+1];
+                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k + 1]) : buf[k +
+                                                                                                                   1];
                         k++;
                         uint16_t diff2 = uint16_t(next_word - 0xDC00);
-                        if((diff | diff2) > 0x3FF)  { return std::make_pair(nullptr, utf8_output); }
+                        if ((diff | diff2) > 0x3FF) { return std::make_pair(nullptr, utf8_output); }
                         uint32_t value = (diff << 10) + diff2 + 0x10000;
-                        *utf8_output++ = char((value>>18) | 0b11110000);
-                        *utf8_output++ = char(((value>>12) & 0b111111) | 0b10000000);
-                        *utf8_output++ = char(((value>>6) & 0b111111) | 0b10000000);
+                        *utf8_output++ = char((value >> 18) | 0b11110000);
+                        *utf8_output++ = char(((value >> 12) & 0b111111) | 0b10000000);
+                        *utf8_output++ = char(((value >> 6) & 0b111111) | 0b10000000);
                         *utf8_output++ = char((value & 0b111111) | 0b10000000);
                     }
                 }
@@ -321,31 +324,33 @@ namespace turbo::unicode::simd {
   Otherwise, it is the position of the first unprocessed byte in buf (even if finished).
   A scalar routing should carry on the conversion of the tail if needed.
 */
-    template <EndianNess big_endian>
-    std::pair<result, char*> avx2_convert_utf16_to_utf8_with_errors(const char16_t* buf, size_t len, char* utf8_output) {
-        const char16_t* start = buf;
-        const char16_t* end = buf + len;
+    template<EndianNess big_endian>
+    std::pair<UnicodeResult, char *>
+    avx2_convert_utf16_to_utf8_with_errors(const char16_t *buf, size_t len, char *utf8_output) {
+        const char16_t *start = buf;
+        const char16_t *end = buf + len;
 
         const __m256i v_0000 = _mm256_setzero_si256();
-        const __m256i v_f800 = _mm256_set1_epi16((int16_t)0xf800);
-        const __m256i v_d800 = _mm256_set1_epi16((int16_t)0xd800);
-        const __m256i v_c080 = _mm256_set1_epi16((int16_t)0xc080);
+        const __m256i v_f800 = _mm256_set1_epi16((int16_t) 0xf800);
+        const __m256i v_d800 = _mm256_set1_epi16((int16_t) 0xd800);
+        const __m256i v_c080 = _mm256_set1_epi16((int16_t) 0xc080);
         const size_t safety_margin = 12; // to avoid overruns, see issue https://github.com/simdutf/simdutf/issues/92
 
         while (buf + 16 + safety_margin <= end) {
-            __m256i in = _mm256_loadu_si256((__m256i*)buf);
+            __m256i in = _mm256_loadu_si256((__m256i *) buf);
             if (turbo::is_big_endian(big_endian)) {
                 const __m256i swap = _mm256_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
                                                       17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30);
                 in = _mm256_shuffle_epi8(in, swap);
             }
             // a single 16-bit UTF-16 word can yield 1, 2 or 3 UTF-8 bytes
-            const __m256i v_ff80 = _mm256_set1_epi16((int16_t)0xff80);
-            if(_mm256_testz_si256(in, v_ff80)) { // ASCII fast path!!!!
+            const __m256i v_ff80 = _mm256_set1_epi16((int16_t) 0xff80);
+            if (_mm256_testz_si256(in, v_ff80)) { // ASCII fast path!!!!
                 // 1. pack the bytes
-                const __m128i utf8_packed = _mm_packus_epi16(_mm256_castsi256_si128(in),_mm256_extractf128_si256(in,1));
+                const __m128i utf8_packed = _mm_packus_epi16(_mm256_castsi256_si128(in),
+                                                             _mm256_extractf128_si256(in, 1));
                 // 2. store (16 bytes)
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_packed);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_packed);
                 // 3. adjust pointers
                 buf += 16;
                 utf8_output += 16;
@@ -357,14 +362,15 @@ namespace turbo::unicode::simd {
 
             // no bits set above 11th bit
             const __m256i one_or_two_bytes_bytemask = _mm256_cmpeq_epi16(_mm256_and_si256(in, v_f800), v_0000);
-            const uint32_t one_or_two_bytes_bitmask = static_cast<uint32_t>(_mm256_movemask_epi8(one_or_two_bytes_bytemask));
+            const uint32_t one_or_two_bytes_bitmask = static_cast<uint32_t>(_mm256_movemask_epi8(
+                    one_or_two_bytes_bytemask));
             if (one_or_two_bytes_bitmask == 0xffffffff) {
 
                 // 1. prepare 2-byte values
                 // input 16-bit word : [0000|0aaa|aabb|bbbb] x 8
                 // expected output   : [110a|aaaa|10bb|bbbb] x 8
-                const __m256i v_1f00 = _mm256_set1_epi16((int16_t)0x1f00);
-                const __m256i v_003f = _mm256_set1_epi16((int16_t)0x003f);
+                const __m256i v_1f00 = _mm256_set1_epi16((int16_t) 0x1f00);
+                const __m256i v_003f = _mm256_set1_epi16((int16_t) 0x003f);
 
                 // t0 = [000a|aaaa|bbbb|bb00]
                 const __m256i t0 = _mm256_slli_epi16(in, 2);
@@ -383,20 +389,20 @@ namespace turbo::unicode::simd {
                 // 3. prepare bitmask for 8-bit lookup
                 const uint32_t M0 = one_byte_bitmask & 0x55555555;
                 const uint32_t M1 = M0 >> 7;
-                const uint32_t M2 = (M1 | M0)  & 0x00ff00ff;
+                const uint32_t M2 = (M1 | M0) & 0x00ff00ff;
                 // 4. pack the bytes
 
-                const uint8_t* row = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2)][0];
-                const uint8_t* row_2 = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2>>16)][0];
+                const uint8_t *row = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2)][0];
+                const uint8_t *row_2 = &utf16_to_utf8::pack_1_2_utf8_bytes[uint8_t(M2 >> 16)][0];
 
-                const __m128i shuffle = _mm_loadu_si128((__m128i*)(row + 1));
-                const __m128i shuffle_2 = _mm_loadu_si128((__m128i*)(row_2 + 1));
+                const __m128i shuffle = _mm_loadu_si128((__m128i *) (row + 1));
+                const __m128i shuffle_2 = _mm_loadu_si128((__m128i *) (row_2 + 1));
 
-                const __m256i utf8_packed = _mm256_shuffle_epi8(utf8_unpacked, _mm256_setr_m128i(shuffle,shuffle_2));
+                const __m256i utf8_packed = _mm256_shuffle_epi8(utf8_unpacked, _mm256_setr_m128i(shuffle, shuffle_2));
                 // 5. store bytes
-                _mm_storeu_si128((__m128i*)utf8_output, _mm256_castsi256_si128(utf8_packed));
+                _mm_storeu_si128((__m128i *) utf8_output, _mm256_castsi256_si128(utf8_packed));
                 utf8_output += row[0];
-                _mm_storeu_si128((__m128i*)utf8_output, _mm256_extractf128_si256(utf8_packed,1));
+                _mm_storeu_si128((__m128i *) utf8_output, _mm256_extractf128_si256(utf8_packed, 1));
                 utf8_output += row_2[0];
 
                 // 6. adjust pointers
@@ -450,7 +456,7 @@ namespace turbo::unicode::simd {
                 // [bbcc|cccc|bbcc|cccc] => [00cc|cccc|0bcc|cccc]
                 const __m256i t1 = _mm256_and_si256(t0, simdutf_vec(0b0011111101111111));
                 // [00cc|cccc|0bcc|cccc] => [10cc|cccc|0bcc|cccc]
-                const __m256i t2 = _mm256_or_si256 (t1, simdutf_vec(0b1000000000000000));
+                const __m256i t2 = _mm256_or_si256(t1, simdutf_vec(0b1000000000000000));
 
                 // [aaaa|bbbb|bbcc|cccc] =>  [0000|aaaa|bbbb|bbcc]
                 const __m256i s0 = _mm256_srli_epi16(in, 4);
@@ -489,33 +495,33 @@ namespace turbo::unicode::simd {
                   continue;
                 }*/
                 const uint8_t mask0 = uint8_t(mask);
-                const uint8_t* row0 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask0][0];
-                const __m128i shuffle0 = _mm_loadu_si128((__m128i*)(row0 + 1));
+                const uint8_t *row0 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask0][0];
+                const __m128i shuffle0 = _mm_loadu_si128((__m128i *) (row0 + 1));
                 const __m128i utf8_0 = _mm_shuffle_epi8(_mm256_castsi256_si128(out0), shuffle0);
 
                 const uint8_t mask1 = static_cast<uint8_t>(mask >> 8);
-                const uint8_t* row1 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask1][0];
-                const __m128i shuffle1 = _mm_loadu_si128((__m128i*)(row1 + 1));
+                const uint8_t *row1 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask1][0];
+                const __m128i shuffle1 = _mm_loadu_si128((__m128i *) (row1 + 1));
                 const __m128i utf8_1 = _mm_shuffle_epi8(_mm256_castsi256_si128(out1), shuffle1);
 
                 const uint8_t mask2 = static_cast<uint8_t>(mask >> 16);
-                const uint8_t* row2 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask2][0];
-                const __m128i shuffle2 = _mm_loadu_si128((__m128i*)(row2 + 1));
-                const __m128i utf8_2 = _mm_shuffle_epi8(_mm256_extractf128_si256(out0,1), shuffle2);
+                const uint8_t *row2 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask2][0];
+                const __m128i shuffle2 = _mm_loadu_si128((__m128i *) (row2 + 1));
+                const __m128i utf8_2 = _mm_shuffle_epi8(_mm256_extractf128_si256(out0, 1), shuffle2);
 
 
                 const uint8_t mask3 = static_cast<uint8_t>(mask >> 24);
-                const uint8_t* row3 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask3][0];
-                const __m128i shuffle3 = _mm_loadu_si128((__m128i*)(row3 + 1));
-                const __m128i utf8_3 = _mm_shuffle_epi8(_mm256_extractf128_si256(out1,1), shuffle3);
+                const uint8_t *row3 = &utf16_to_utf8::pack_1_2_3_utf8_bytes[mask3][0];
+                const __m128i shuffle3 = _mm_loadu_si128((__m128i *) (row3 + 1));
+                const __m128i utf8_3 = _mm_shuffle_epi8(_mm256_extractf128_si256(out1, 1), shuffle3);
 
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_0);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_0);
                 utf8_output += row0[0];
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_1);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_1);
                 utf8_output += row1[0];
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_2);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_2);
                 utf8_output += row2[0];
-                _mm_storeu_si128((__m128i*)utf8_output, utf8_3);
+                _mm_storeu_si128((__m128i *) utf8_output, utf8_3);
                 utf8_output += row3[0];
                 buf += 16;
                 // surrogate pair(s) in a register
@@ -525,36 +531,40 @@ namespace turbo::unicode::simd {
                 // in the presence of surrogate pairs may require non-trivial tables.
                 size_t forward = 15;
                 size_t k = 0;
-                if(size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1);}
-                for(; k < forward; k++) {
+                if (size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1); }
+                for (; k < forward; k++) {
                     uint16_t word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k]) : buf[k];
-                    if((word & 0xFF80)==0) {
+                    if ((word & 0xFF80) == 0) {
                         *utf8_output++ = char(word);
-                    } else if((word & 0xF800)==0) {
-                        *utf8_output++ = char((word>>6) | 0b11000000);
+                    } else if ((word & 0xF800) == 0) {
+                        *utf8_output++ = char((word >> 6) | 0b11000000);
                         *utf8_output++ = char((word & 0b111111) | 0b10000000);
-                    } else if((word &0xF800 ) != 0xD800) {
-                        *utf8_output++ = char((word>>12) | 0b11100000);
-                        *utf8_output++ = char(((word>>6) & 0b111111) | 0b10000000);
+                    } else if ((word & 0xF800) != 0xD800) {
+                        *utf8_output++ = char((word >> 12) | 0b11100000);
+                        *utf8_output++ = char(((word >> 6) & 0b111111) | 0b10000000);
                         *utf8_output++ = char((word & 0b111111) | 0b10000000);
                     } else {
                         // must be a surrogate pair
                         uint16_t diff = uint16_t(word - 0xD800);
-                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k+1]) : buf[k+1];
+                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k + 1]) : buf[k +
+                                                                                                                   1];
                         k++;
                         uint16_t diff2 = uint16_t(next_word - 0xDC00);
-                        if((diff | diff2) > 0x3FF)  { return std::make_pair(result(error_code::SURROGATE, buf - start + k - 1), utf8_output); }
+                        if ((diff | diff2) > 0x3FF) {
+                            return std::make_pair(UnicodeResult(UnicodeError::SURROGATE, buf - start + k - 1),
+                                                  utf8_output);
+                        }
                         uint32_t value = (diff << 10) + diff2 + 0x10000;
-                        *utf8_output++ = char((value>>18) | 0b11110000);
-                        *utf8_output++ = char(((value>>12) & 0b111111) | 0b10000000);
-                        *utf8_output++ = char(((value>>6) & 0b111111) | 0b10000000);
+                        *utf8_output++ = char((value >> 18) | 0b11110000);
+                        *utf8_output++ = char(((value >> 12) & 0b111111) | 0b10000000);
+                        *utf8_output++ = char(((value >> 6) & 0b111111) | 0b10000000);
                         *utf8_output++ = char((value & 0b111111) | 0b10000000);
                     }
                 }
                 buf += k;
             }
         } // while
-        return std::make_pair(result(error_code::SUCCESS, buf - start), utf8_output);
+        return std::make_pair(UnicodeResult(UnicodeError::SUCCESS, buf - start), utf8_output);
     }
 
     /*
@@ -611,14 +621,15 @@ namespace turbo::unicode::simd {
   Returns a pair: the first unprocessed byte from buf and utf32_output
   A scalar routing should carry on the conversion of the tail.
 */
-    template <EndianNess big_endian>
-    std::pair<const char16_t*, char32_t*> avx2_convert_utf16_to_utf32(const char16_t* buf, size_t len, char32_t* utf32_output) {
-        const char16_t* end = buf + len;
-        const __m256i v_f800 = _mm256_set1_epi16((int16_t)0xf800);
-        const __m256i v_d800 = _mm256_set1_epi16((int16_t)0xd800);
+    template<EndianNess big_endian>
+    std::pair<const char16_t *, char32_t *>
+    avx2_convert_utf16_to_utf32(const char16_t *buf, size_t len, char32_t *utf32_output) {
+        const char16_t *end = buf + len;
+        const __m256i v_f800 = _mm256_set1_epi16((int16_t) 0xf800);
+        const __m256i v_d800 = _mm256_set1_epi16((int16_t) 0xd800);
 
         while (buf + 16 <= end) {
-            __m256i in = _mm256_loadu_si256((__m256i*)buf);
+            __m256i in = _mm256_loadu_si256((__m256i *) buf);
             if (turbo::is_big_endian(big_endian)) {
                 const __m256i swap = _mm256_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
                                                       17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30);
@@ -637,8 +648,10 @@ namespace turbo::unicode::simd {
             // it is likely an uncommon occurrence.
             if (surrogates_bitmask == 0x00000000) {
                 // case: we extend all sixteen 16-bit code units to sixteen 32-bit code units
-                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output), _mm256_cvtepu16_epi32(_mm256_castsi256_si128(in)));
-                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output + 8), _mm256_cvtepu16_epi32(_mm256_extractf128_si256(in,1)));
+                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output),
+                                    _mm256_cvtepu16_epi32(_mm256_castsi256_si128(in)));
+                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output + 8),
+                                    _mm256_cvtepu16_epi32(_mm256_extractf128_si256(in, 1)));
                 utf32_output += 16;
                 buf += 16;
                 // surrogate pair(s) in a register
@@ -648,19 +661,20 @@ namespace turbo::unicode::simd {
                 // in the presence of surrogate pairs may require non-trivial tables.
                 size_t forward = 15;
                 size_t k = 0;
-                if(size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1);}
-                for(; k < forward; k++) {
+                if (size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1); }
+                for (; k < forward; k++) {
                     uint16_t word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k]) : buf[k];
-                    if((word &0xF800 ) != 0xD800) {
+                    if ((word & 0xF800) != 0xD800) {
                         // No surrogate pair
                         *utf32_output++ = char32_t(word);
                     } else {
                         // must be a surrogate pair
                         uint16_t diff = uint16_t(word - 0xD800);
-                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k+1]) : buf[k+1];
+                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k + 1]) : buf[k +
+                                                                                                                   1];
                         k++;
                         uint16_t diff2 = uint16_t(next_word - 0xDC00);
-                        if((diff | diff2) > 0x3FF)  { return std::make_pair(nullptr, utf32_output); }
+                        if ((diff | diff2) > 0x3FF) { return std::make_pair(nullptr, utf32_output); }
                         uint32_t value = (diff << 10) + diff2 + 0x10000;
                         *utf32_output++ = char32_t(value);
                     }
@@ -678,15 +692,16 @@ namespace turbo::unicode::simd {
       Otherwise, it is the position of the first unprocessed byte in buf (even if finished).
       A scalar routing should carry on the conversion of the tail if needed.
     */
-    template <EndianNess big_endian>
-    std::pair<result, char32_t*> avx2_convert_utf16_to_utf32_with_errors(const char16_t* buf, size_t len, char32_t* utf32_output) {
-        const char16_t* start = buf;
-        const char16_t* end = buf + len;
-        const __m256i v_f800 = _mm256_set1_epi16((int16_t)0xf800);
-        const __m256i v_d800 = _mm256_set1_epi16((int16_t)0xd800);
+    template<EndianNess big_endian>
+    std::pair<UnicodeResult, char32_t *>
+    avx2_convert_utf16_to_utf32_with_errors(const char16_t *buf, size_t len, char32_t *utf32_output) {
+        const char16_t *start = buf;
+        const char16_t *end = buf + len;
+        const __m256i v_f800 = _mm256_set1_epi16((int16_t) 0xf800);
+        const __m256i v_d800 = _mm256_set1_epi16((int16_t) 0xd800);
 
         while (buf + 16 <= end) {
-            __m256i in = _mm256_loadu_si256((__m256i*)buf);
+            __m256i in = _mm256_loadu_si256((__m256i *) buf);
             if (turbo::is_big_endian(big_endian)) {
                 const __m256i swap = _mm256_setr_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
                                                       17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30);
@@ -705,8 +720,10 @@ namespace turbo::unicode::simd {
             // it is likely an uncommon occurrence.
             if (surrogates_bitmask == 0x00000000) {
                 // case: we extend all sixteen 16-bit code units to sixteen 32-bit code units
-                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output), _mm256_cvtepu16_epi32(_mm256_castsi256_si128(in)));
-                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output + 8), _mm256_cvtepu16_epi32(_mm256_extractf128_si256(in,1)));
+                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output),
+                                    _mm256_cvtepu16_epi32(_mm256_castsi256_si128(in)));
+                _mm256_storeu_si256(reinterpret_cast<__m256i *>(utf32_output + 8),
+                                    _mm256_cvtepu16_epi32(_mm256_extractf128_si256(in, 1)));
                 utf32_output += 16;
                 buf += 16;
                 // surrogate pair(s) in a register
@@ -716,19 +733,23 @@ namespace turbo::unicode::simd {
                 // in the presence of surrogate pairs may require non-trivial tables.
                 size_t forward = 15;
                 size_t k = 0;
-                if(size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1);}
-                for(; k < forward; k++) {
+                if (size_t(end - buf) < forward + 1) { forward = size_t(end - buf - 1); }
+                for (; k < forward; k++) {
                     uint16_t word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k]) : buf[k];
-                    if((word &0xF800 ) != 0xD800) {
+                    if ((word & 0xF800) != 0xD800) {
                         // No surrogate pair
                         *utf32_output++ = char32_t(word);
                     } else {
                         // must be a surrogate pair
                         uint16_t diff = uint16_t(word - 0xD800);
-                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k+1]) : buf[k+1];
+                        uint16_t next_word = turbo::is_big_endian(big_endian) ? turbo::gbswap_16(buf[k + 1]) : buf[k +
+                                                                                                                   1];
                         k++;
                         uint16_t diff2 = uint16_t(next_word - 0xDC00);
-                        if((diff | diff2) > 0x3FF)  { return std::make_pair(result(error_code::SURROGATE, buf - start + k - 1), utf32_output); }
+                        if ((diff | diff2) > 0x3FF) {
+                            return std::make_pair(UnicodeResult(UnicodeError::SURROGATE, buf - start + k - 1),
+                                                  utf32_output);
+                        }
                         uint32_t value = (diff << 10) + diff2 + 0x10000;
                         *utf32_output++ = char32_t(value);
                     }
@@ -736,13 +757,13 @@ namespace turbo::unicode::simd {
                 buf += k;
             }
         } // while
-        return std::make_pair(result(error_code::SUCCESS, buf - start), utf32_output);
+        return {{UnicodeError::SUCCESS, static_cast<size_t>(buf - start)}, utf32_output};
     }
 
-    TURBO_FORCE_INLINE void avx2_change_endianness_utf16(const char16_t* in, size_t size, char16_t* output) {
+    TURBO_FORCE_INLINE void avx2_change_endianness_utf16(const char16_t *in, size_t size, char16_t *output) {
         size_t pos = 0;
 
-        while (pos < size/32*32) {
+        while (pos < size / 32 * 32) {
             simd16x32<uint16_t, avx2_engine> input(reinterpret_cast<const uint16_t *>(in + pos));
             input.swap_bytes();
             input.store(reinterpret_cast<uint16_t *>(output));
@@ -753,11 +774,11 @@ namespace turbo::unicode::simd {
         turbo::unicode::utf16::change_endianness_utf16(in + pos, size - pos, output);
     }
 
-    template <EndianNess big_endian>
-    TURBO_FORCE_INLINE size_t count_code_points(const char16_t* in, size_t size) {
+    template<EndianNess big_endian>
+    TURBO_FORCE_INLINE size_t count_code_points(const char16_t *in, size_t size) {
         size_t pos = 0;
         size_t count = 0;
-        for(;pos < size/32*32; pos += 32) {
+        for (; pos < size / 32 * 32; pos += 32) {
             simd16x32<uint16_t, avx2_engine> input(reinterpret_cast<const uint16_t *>(in + pos));
             if (!match_system(big_endian)) { input.swap_bytes(); }
             uint64_t not_pair = input.not_in_range(0xDC00, 0xDFFF);
@@ -766,12 +787,12 @@ namespace turbo::unicode::simd {
         return count + turbo::unicode::utf16::count_code_points<big_endian>(in + pos, size - pos);
     }
 
-    template <EndianNess big_endian>
-    TURBO_FORCE_INLINE size_t utf8_length_from_utf16(const char16_t* in, size_t size) {
+    template<EndianNess big_endian>
+    TURBO_FORCE_INLINE size_t utf8_length_from_utf16(const char16_t *in, size_t size) {
         size_t pos = 0;
         size_t count = 0;
         // This algorithm could no doubt be improved!
-        for(;pos < size/32*32; pos += 32) {
+        for (; pos < size / 32 * 32; pos += 32) {
             simd16x32<uint16_t, avx2_engine> input(reinterpret_cast<const uint16_t *>(in + pos));
             if (!match_system(big_endian)) { input.swap_bytes(); }
             uint64_t ascii_mask = input.lteq(0x7F);
@@ -779,16 +800,16 @@ namespace turbo::unicode::simd {
             uint64_t not_pair_mask = input.not_in_range(0xD800, 0xDFFF);
 
             size_t ascii_count = turbo::popcount(ascii_mask) / 2;
-            size_t twobyte_count = turbo::popcount(twobyte_mask & ~ ascii_mask) / 2;
-            size_t threebyte_count = turbo::popcount(not_pair_mask & ~ twobyte_mask) / 2;
+            size_t twobyte_count = turbo::popcount(twobyte_mask & ~ascii_mask) / 2;
+            size_t threebyte_count = turbo::popcount(not_pair_mask & ~twobyte_mask) / 2;
             size_t fourbyte_count = 32 - turbo::popcount(not_pair_mask) / 2;
             count += 2 * fourbyte_count + 3 * threebyte_count + 2 * twobyte_count + ascii_count;
         }
         return count + turbo::unicode::utf16::utf8_length_from_utf16<big_endian>(in + pos, size - pos);
     }
 
-    template <EndianNess big_endian>
-    TURBO_FORCE_INLINE size_t utf32_length_from_utf16(const char16_t* in, size_t size) {
+    template<EndianNess big_endian>
+    TURBO_FORCE_INLINE size_t utf32_length_from_utf16(const char16_t *in, size_t size) {
         return count_code_points<big_endian>(in, size);
     }
 }  // namespace turbo::unicode::simd

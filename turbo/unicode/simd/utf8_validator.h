@@ -50,7 +50,7 @@ namespace turbo::unicode::simd::utf8_validation {
      * Validates that the string is actual UTF-8 and stops on errors.
      */
     template<class checker, typename Engine>
-    result generic_validate_utf8_with_errors(const uint8_t *input, size_t length) {
+    UnicodeResult generic_validate_utf8_with_errors(const uint8_t *input, size_t length) {
         checker c{};
         buf_block_reader<64> reader(input, length);
         size_t count{0};
@@ -59,7 +59,7 @@ namespace turbo::unicode::simd::utf8_validation {
             c.check_next_input(in);
             if (c.errors()) {
                 if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-                result res = turbo::unicode::utf8::rewind_and_validate_with_errors(
+                UnicodeResult res = turbo::unicode::utf8::rewind_and_validate_with_errors(
                         reinterpret_cast<const char *>(input), reinterpret_cast<const char *>(input + count),
                         length - count);
                 res.count += count;
@@ -76,18 +76,18 @@ namespace turbo::unicode::simd::utf8_validation {
         c.check_eof();
         if (c.errors()) {
             if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-            result res = turbo::unicode::utf8::rewind_and_validate_with_errors(
+            UnicodeResult res = turbo::unicode::utf8::rewind_and_validate_with_errors(
                     reinterpret_cast<const char *>(input), reinterpret_cast<const char *>(input + count),
                     length - count);
             res.count += count;
             return res;
         } else {
-            return result(error_code::SUCCESS, length);
+            return {UnicodeError::SUCCESS, length};
         }
     }
 
     template<typename Engine>
-    result generic_validate_utf8_with_errors(const char *input, size_t length) {
+    UnicodeResult generic_validate_utf8_with_errors(const char *input, size_t length) {
         return generic_validate_utf8_with_errors<utf8_checker<Engine>, Engine>(reinterpret_cast<const uint8_t *>(input),
                                                                                length);
     }
@@ -115,15 +115,15 @@ namespace turbo::unicode::simd::utf8_validation {
     }
 
     template<class checker, typename Engine>
-    result generic_validate_ascii_with_errors(const uint8_t *input, size_t length) {
+    UnicodeResult generic_validate_ascii_with_errors(const uint8_t *input, size_t length) {
         buf_block_reader<64> reader(input, length);
         size_t count{0};
         while (reader.has_full_block()) {
             simd::simd8x64<uint8_t, Engine> in(reader.full_block());
             if (!in.is_ascii()) {
-                result res = turbo::unicode::ascii::validate_with_errors(
+                UnicodeResult res = turbo::unicode::ascii::validate_with_errors(
                         reinterpret_cast<const char *>(input + count), length - count);
-                return result(res.error, count + res.count);
+                return {res.error, count + res.count};
             }
             reader.advance();
 
@@ -133,16 +133,16 @@ namespace turbo::unicode::simd::utf8_validation {
         reader.get_remainder(block);
         simd::simd8x64<uint8_t, Engine> in(block);
         if (!in.is_ascii()) {
-            result res = turbo::unicode::ascii::validate_with_errors(reinterpret_cast<const char *>(input + count),
+            UnicodeResult res = turbo::unicode::ascii::validate_with_errors(reinterpret_cast<const char *>(input + count),
                                                                      length - count);
-            return result(res.error, count + res.count);
+            return {res.error, count + res.count};
         } else {
-            return result(error_code::SUCCESS, length);
+            return {UnicodeError::SUCCESS, length};
         }
     }
 
     template<typename Engine>
-    result generic_validate_ascii_with_errors(const char *input, size_t length) {
+    UnicodeResult generic_validate_ascii_with_errors(const char *input, size_t length) {
         return generic_validate_ascii_with_errors<utf8_checker<Engine>, Engine>(
                 reinterpret_cast<const uint8_t *>(input),
                 length);

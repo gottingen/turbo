@@ -47,8 +47,8 @@ TEST_CASE("convert_2_UTF16_bytes") {
                                                      {0xe000, 0xffff}});
 
     auto procedure = [](const char16_t* utf16, size_t size, char32_t* utf32) -> size_t {
-      turbo::result res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
-      REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+      turbo::UnicodeResult res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
       return res.count;
     };
     auto size_procedure = [](const char16_t* utf16, size_t size) -> size_t {
@@ -69,8 +69,8 @@ TEST_CASE("convert_with_surrogates") {
                                                      {0xe000, 0x10ffff}});
 
     auto procedure = [](const char16_t* utf16, size_t size, char32_t* utf32) -> size_t {
-      turbo::result res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
-      REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+      turbo::UnicodeResult res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
       return res.count;
     };
     auto size_procedure = [](const char16_t* utf16, size_t size) -> size_t {
@@ -94,8 +94,8 @@ TEST_CASE("convert_fails_if_there_is_sole_low_surrogate") {
   for (char16_t low_surrogate = 0xdc00; low_surrogate <= 0xdfff; low_surrogate++) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [ &i](const char16_t* utf16, size_t size, char32_t* utf32) -> size_t {
-        turbo::result res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
-        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        turbo::UnicodeResult res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
         REQUIRE_EQ(res.count, i);
         return 0;
       };
@@ -118,8 +118,8 @@ TEST_CASE("convert_fails_if_there_is_sole_high_surrogate") {
   for (char16_t high_surrogate = 0xdc00; high_surrogate <= 0xdfff; high_surrogate++) {
     for (size_t i=0; i < size; i++) {
       auto procedure = [ &i](const char16_t* utf16, size_t size, char32_t* utf32) -> size_t {
-        turbo::result res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
-        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        turbo::UnicodeResult res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
         REQUIRE_EQ(res.count, i);
         return 0;
       };
@@ -142,8 +142,8 @@ TEST_CASE("convert_fails_if_there_is_low_surrogate_is_followed_by_another_low_su
   for (char16_t low_surrogate = 0xdc00; low_surrogate <= 0xdfff; low_surrogate++) {
     for (size_t i=0; i < size - 1; i++) {
       auto procedure = [ &i](const char16_t* utf16, size_t size, char32_t* utf32) -> size_t {
-        turbo::result res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
-        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        turbo::UnicodeResult res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
         REQUIRE_EQ(res.count, i);
         return 0;
       };
@@ -170,8 +170,8 @@ TEST_CASE("convert_fails_if_there_is_surrogate_pair_is_followed_by_high_surrogat
   const char16_t high_surrogate = 0xdc02;
   for (size_t i=0; i < size - 2; i++) {
     auto procedure = [ &i](const char16_t* utf16, size_t size, char32_t* utf32) -> size_t {
-      turbo::result res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
-      REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+      turbo::UnicodeResult res = turbo::convert_utf16le_to_utf32_with_errors(utf16, size, utf32);
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
       REQUIRE_EQ(res.count, i + 2);
       return 0;
     };

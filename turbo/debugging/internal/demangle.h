@@ -55,17 +55,13 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace debugging_internal {
+namespace turbo::debugging_internal {
 
-// Demangle `mangled`.  On success, return true and write the
-// demangled symbol name to `out`.  Otherwise, return false.
-// `out` is modified even if demangling is unsuccessful.
-bool Demangle(const char* mangled, char* out, size_t out_size);
+    // Demangle `mangled`.  On success, return true and write the
+    // demangled symbol name to `out`.  Otherwise, return false.
+    // `out` is modified even if demangling is unsuccessful.
+    bool Demangle(const char *mangled, char *out, size_t out_size);
 
-}  // namespace debugging_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::debugging_internal
 
 #endif  // TURBO_DEBUGGING_INTERNAL_DEMANGLE_H_

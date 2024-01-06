@@ -38,7 +38,7 @@ TEST(SeedSequences, Examples) {
     EXPECT_NE(engine(), bitgen());
   }
   {
-    auto seed_seq = turbo::MakeSeedSeq();
+    auto seed_seq = turbo::make_seed_seq();
     std::mt19937 random(seed_seq);
 
     EXPECT_NE(0, random());

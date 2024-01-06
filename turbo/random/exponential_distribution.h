@@ -27,7 +27,6 @@
 #include "turbo/random/internal/iostream_state_saver.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     /**
      * @ingroup turbo_random_exponential
@@ -173,7 +172,6 @@ namespace turbo {
         return is;
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_RANDOM_EXPONENTIAL_DISTRIBUTION_H_

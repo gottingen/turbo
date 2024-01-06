@@ -784,7 +784,6 @@ namespace turbo {
         return !cmp_less(t, u);
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_META_COMPARE_H_

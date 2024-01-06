@@ -16,6 +16,22 @@
 
 find_library(EXECINFO_LIBRARY execinfo)
 
+# Internal-only target, do not depend on directly.
+carbin_cc_library(
+        NAMESPACE
+        turbo
+        NAME
+        stack_consumption
+        HEADERS
+        "stack_consumption.h"
+        SOURCES
+        "stack_consumption.cc"
+        COPTS
+        ${TURBO_DEFAULT_COPTS}
+        DEPS
+        turbo::turbo
+        ${GTEST_LIB}
+)
 
 carbin_cc_test(
         NAME
@@ -39,6 +55,7 @@ carbin_cc_test(
         ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
+        turbo::stack_consumption
         ${GTEST_LIB}
         ${GMOCK_LIB}
 )
@@ -68,6 +85,7 @@ carbin_cc_test(
         ${CARBIN_CXX_OPTIONS}
         DEPS
         turbo::turbo
+        turbo::stack_consumption
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
@@ -84,23 +102,6 @@ carbin_cc_test(
         turbo::turbo
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
-)
-
-# Internal-only target, do not depend on directly.
-carbin_cc_library(
-        NAMESPACE
-        turbo
-        NAME
-        stack_consumption
-        HEADERS
-        "stack_consumption.h"
-        SOURCES
-        "stack_consumption.cc"
-        COPTS
-        ${TURBO_DEFAULT_COPTS}
-        DEPS
-        turbo::turbo
-        ${GTEST_LIB}
 )
 
 carbin_cc_test(

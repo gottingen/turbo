@@ -88,10 +88,10 @@ namespace turbo {
      * @tparam Engine default is turbo::unicode::default_engine
      * @param buf buffer to check
      * @param len  buffer length
-     * @return result, if valid utf8, result is ok, otherwise result is error and error position is set.
+     * @return UnicodeResult, if valid utf8, UnicodeResult is ok, otherwise UnicodeResult is error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result validate_utf8_with_errors(const char *buf, size_t len) noexcept;
+    [[nodiscard]] UnicodeResult validate_utf8_with_errors(const char *buf, size_t len) noexcept;
 
     /**
      * @ingroup turbo_unicode_validate
@@ -137,7 +137,7 @@ namespace turbo {
      * @return result, if valid ascii, result is ok, otherwise result is error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result validate_ascii_with_errors(const char *buf, size_t len) noexcept;
+    [[nodiscard]] UnicodeResult validate_ascii_with_errors(const char *buf, size_t len) noexcept;
 
     /**
      * @ingroup turbo_unicode_validate
@@ -214,7 +214,7 @@ namespace turbo {
      *         error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result validate_utf16_with_errors(const char16_t *buf, size_t len) noexcept;
+    [[nodiscard]] UnicodeResult validate_utf16_with_errors(const char16_t *buf, size_t len) noexcept;
 
     /**
      * @ingroup turbo_unicode_validate
@@ -229,7 +229,7 @@ namespace turbo {
      *         error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept;
+    [[nodiscard]] UnicodeResult validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept;
 
     /**
      * @ingroup turbo_unicode_validate
@@ -244,7 +244,7 @@ namespace turbo {
      *         error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept;
+    [[nodiscard]] UnicodeResult validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept;
 
     /**
      * @ingroup turbo_unicode_validate
@@ -283,7 +283,7 @@ namespace turbo {
      * @return true if valid utf32, otherwise false
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept;
+    [[nodiscard]] UnicodeResult validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept;
 
     /**
      * @ingroup turbo_unicode_converter
@@ -357,7 +357,7 @@ namespace turbo {
      * @return result, if valid utf8, result is ok, otherwise result is error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result convert_utf8_to_utf16_with_errors(const char *input, size_t length, char16_t *utf16_output) noexcept;
+    [[nodiscard]] UnicodeResult convert_utf8_to_utf16_with_errors(const char *input, size_t length, char16_t *utf16_output) noexcept;
 
     /**
      * @ingroup turbo_unicode_converter
@@ -376,7 +376,7 @@ namespace turbo {
      * @note guard that input buffer is little endian.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf8_to_utf16le_with_errors(const char *input, size_t length, char16_t *utf16_output) noexcept;
 
     /**
@@ -396,7 +396,7 @@ namespace turbo {
      * @note guard that input buffer is big endian.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf8_to_utf16be_with_errors(const char *input, size_t length, char16_t *utf16_output) noexcept;
 
     /**
@@ -422,7 +422,7 @@ namespace turbo {
      * @note guard that input buffer is little endian.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf8_to_utf32_with_errors(const char *input, size_t length, char32_t *utf32_output) noexcept;
 
     /**
@@ -594,7 +594,7 @@ namespace turbo {
      * @note guard that input buffer is big endian.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result convert_utf16_to_utf8_with_errors(const char16_t *input, size_t length, char *utf8_buffer) noexcept;
+    [[nodiscard]] UnicodeResult convert_utf16_to_utf8_with_errors(const char16_t *input, size_t length, char *utf8_buffer) noexcept;
 
     /**
      * @ingroup turbo_unicode_converter
@@ -613,7 +613,7 @@ namespace turbo {
      * @note guard that input buffer is little endian.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf16le_to_utf8_with_errors(const char16_t *input, size_t length, char *utf8_buffer) noexcept;
 
     /**
@@ -633,7 +633,7 @@ namespace turbo {
      * @note guard that input buffer is big endian.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf16be_to_utf8_with_errors(const char16_t *input, size_t length, char *utf8_buffer) noexcept;
 
     /**
@@ -747,7 +747,7 @@ namespace turbo {
      * @return result, if valid utf16, result is ok, otherwise result is error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf16_to_utf32_with_errors(const char16_t *input, size_t length, char32_t *utf32_buffer) noexcept;
 
     /**
@@ -762,7 +762,7 @@ namespace turbo {
      * @return utf32 output buffer length
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf16le_to_utf32_with_errors(const char16_t *input, size_t length, char32_t *utf32_buffer) noexcept;
 
     /**
@@ -777,7 +777,7 @@ namespace turbo {
      * @return utf32 output buffer length
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf16be_to_utf32_with_errors(const char16_t *input, size_t length, char32_t *utf32_buffer) noexcept;
 
     /**
@@ -899,7 +899,7 @@ namespace turbo {
      * @return utf8 output buffer length
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result convert_utf32_to_utf8_with_errors(const char32_t *input, size_t length, char *utf8_buffer) noexcept;
+    [[nodiscard]] UnicodeResult convert_utf32_to_utf8_with_errors(const char32_t *input, size_t length, char *utf8_buffer) noexcept;
 
     /**
      * @ingroup turbo_unicode_converter
@@ -994,7 +994,7 @@ namespace turbo {
      * @return result, if valid utf32, result is ok, otherwise result is error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf32_to_utf16_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept;
 
     /**
@@ -1014,7 +1014,7 @@ namespace turbo {
      * @return result, if valid utf32, result is ok, otherwise result is error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf32_to_utf16le_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept;
 
     /**
@@ -1034,7 +1034,7 @@ namespace turbo {
      * @return result, if valid utf32, result is ok, otherwise result is error and error position is set.
      */
     template<typename Engine = turbo::unicode::default_engine, typename turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>> = 0>
-    [[nodiscard]] result
+    [[nodiscard]] UnicodeResult
     convert_utf32_to_utf16be_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept;
 
     /**
@@ -1233,7 +1233,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result validate_utf8_with_errors(const char *buf, size_t len) noexcept {
+    [[nodiscard]] inline UnicodeResult validate_utf8_with_errors(const char *buf, size_t len) noexcept {
         return turbo::unicode::Converter<Engine>::validate_utf8_with_errors(buf, len);
     }
 
@@ -1243,7 +1243,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result validate_ascii_with_errors(const char *buf, size_t len) noexcept {
+    [[nodiscard]] inline UnicodeResult validate_ascii_with_errors(const char *buf, size_t len) noexcept {
         return turbo::unicode::Converter<Engine>::validate_ascii_with_errors(buf, len);
     }
 
@@ -1267,17 +1267,17 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result validate_utf16_with_errors(const char16_t *buf, size_t len) noexcept {
+    [[nodiscard]] inline UnicodeResult validate_utf16_with_errors(const char16_t *buf, size_t len) noexcept {
         return turbo::unicode::Converter<Engine>::validate_utf16_with_errors(buf, len);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept {
+    [[nodiscard]] inline UnicodeResult validate_utf16le_with_errors(const char16_t *buf, size_t len) noexcept {
         return turbo::unicode::Converter<Engine>::validate_utf16le_with_errors(buf, len);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept {
+    [[nodiscard]] inline UnicodeResult validate_utf16be_with_errors(const char16_t *buf, size_t len) noexcept {
         return turbo::unicode::Converter<Engine>::validate_utf16be_with_errors(buf, len);
     }
 
@@ -1287,7 +1287,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept {
+    [[nodiscard]] inline UnicodeResult validate_utf32_with_errors(const char32_t *buf, size_t len) noexcept {
         return turbo::unicode::Converter<Engine>::validate_utf32_with_errors(buf, len);
     }
 
@@ -1313,7 +1313,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf8_to_utf16_with_errors(const char *input, size_t length, char16_t *utf16_output) noexcept {
         if constexpr (kIsLittleEndian) {
             return turbo::unicode::Converter<Engine>::convert_utf8_to_utf16le_with_errors(input, length, utf16_output);
@@ -1323,13 +1323,13 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf8_to_utf16le_with_errors(const char *input, size_t length, char16_t *utf16_output) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf8_to_utf16le_with_errors(input, length, utf16_output);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf8_to_utf16be_with_errors(const char *input, size_t length, char16_t *utf16_output) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf8_to_utf16be_with_errors(input, length, utf16_output);
     }
@@ -1344,7 +1344,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf8_to_utf32_with_errors(const char *input, size_t length, char32_t *utf32_output) noexcept {
         if constexpr (kIsLittleEndian) {
             return turbo::unicode::Converter<Engine>::convert_utf8_to_utf32_with_errors(input, length, utf32_output);
@@ -1410,7 +1410,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf16_to_utf8_with_errors(const char16_t *input, size_t length, char *utf8_buffer) noexcept {
         if constexpr (kIsLittleEndian) {
             return turbo::unicode::Converter<Engine>::convert_utf16le_to_utf8_with_errors(input, length, utf8_buffer);
@@ -1420,13 +1420,13 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf16le_to_utf8_with_errors(const char16_t *input, size_t length, char *utf8_buffer) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf16le_to_utf8_with_errors(input, length, utf8_buffer);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf16be_to_utf8_with_errors(const char16_t *input, size_t length, char *utf8_buffer) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf16be_to_utf8_with_errors(input, length, utf8_buffer);
     }
@@ -1476,7 +1476,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf16_to_utf32_with_errors(const char16_t *input, size_t length, char32_t *utf32_buffer) noexcept {
         if constexpr (kIsLittleEndian) {
             return turbo::unicode::Converter<Engine>::convert_utf16le_to_utf32_with_errors(input, length, utf32_buffer);
@@ -1486,13 +1486,13 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf16le_to_utf32_with_errors(const char16_t *input, size_t length, char32_t *utf32_buffer) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf16le_to_utf32_with_errors(input, length, utf32_buffer);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf16be_to_utf32_with_errors(const char16_t *input, size_t length, char32_t *utf32_buffer) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf16be_to_utf32_with_errors(input, length, utf32_buffer);
     }
@@ -1544,7 +1544,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf32_to_utf8_with_errors(const char32_t *input, size_t length, char *utf8_buffer) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf32_to_utf8_with_errors(input, length, utf8_buffer);
     }
@@ -1578,7 +1578,7 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf32_to_utf16_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept {
         if constexpr (kIsLittleEndian) {
             return turbo::unicode::Converter<Engine>::convert_utf32_to_utf16le_with_errors(input, length, utf16_buffer);
@@ -1588,13 +1588,13 @@ namespace turbo {
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] inline result
+    [[nodiscard]] inline UnicodeResult
     convert_utf32_to_utf16le_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf32_to_utf16le_with_errors(input, length, utf16_buffer);
     }
 
     template<typename Engine, turbo::check_requires<turbo::unicode::is_unicode_engine<Engine>>>
-    [[nodiscard]] result
+    [[nodiscard]] inline UnicodeResult
     convert_utf32_to_utf16be_with_errors(const char32_t *input, size_t length, char16_t *utf16_buffer) noexcept {
         return turbo::unicode::Converter<Engine>::convert_utf32_to_utf16be_with_errors(input, length, utf16_buffer);
     }

@@ -18,7 +18,6 @@
 #include "turbo/strings/ascii.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     template<typename String>
     typename std::enable_if<turbo::is_string_type<String>::value>::type
@@ -44,5 +43,4 @@ namespace turbo {
 
     template void str_to_upper(turbo::inlined_string *);
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo

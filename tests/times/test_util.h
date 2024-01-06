@@ -19,15 +19,11 @@
 
 #include "turbo/times/time.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
+namespace turbo::time_internal {
 
-// Loads the named timezone, but dies on any failure.
-turbo::TimeZone load_time_zone(const std::string& name);
+    // Loads the named timezone, but dies on any failure.
+    turbo::TimeZone load_time_zone(const std::string &name);
 
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::time_internal
 
 #endif  // TURBO_TIME_INTERNAL_TEST_UTIL_H_

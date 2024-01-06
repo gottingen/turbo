@@ -845,14 +845,14 @@ namespace {
         REQUIRE_EQ(turbo::infinite_duration(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::thursday, turbo::get_weekday(ci.cs));
         REQUIRE_EQ(365, turbo::get_year_day(ci.cs));
-        REQUIRE_EQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
+        REQUIRE_EQ("-00", std::string(ci.zone_abbr));  // artifact of TimeZone::At()
         ci = utc.At(turbo::infinite_past());
         REQUIRE_CIVIL_INFO(ci, std::numeric_limits<int64_t>::min(), 1, 1, 0, 0, 0, 0,
                           false);
         REQUIRE_EQ(-turbo::infinite_duration(), ci.subsecond);
         REQUIRE_EQ(turbo::Weekday::sunday, turbo::get_weekday(ci.cs));
         REQUIRE_EQ(1, turbo::get_year_day(ci.cs));
-        REQUIRE_EQ("-00", ci.zone_abbr);  // artifact of TimeZone::At()
+        REQUIRE_EQ("-00", std::string(ci.zone_abbr));  // artifact of TimeZone::At()
 
         // Approach the maximal Time value from below.
         t = turbo::from_civil(turbo::CivilSecond(292277026596, 12, 4, 15, 30, 6), utc);

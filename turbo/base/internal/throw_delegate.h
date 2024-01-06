@@ -21,10 +21,7 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace base_internal {
-
+namespace turbo::base_internal {
 // Helper functions that allow throwing exceptions consistently from anywhere.
 // The main use case is for header-based libraries (eg templates), as they will
 // be built by many different targets with their own compiler options.
@@ -39,37 +36,53 @@ namespace base_internal {
 // both with and without exceptions and you need to conform to an interface
 // that uses exceptions.
 
-[[noreturn]] void ThrowStdLogicError(const std::string& what_arg);
-[[noreturn]] void ThrowStdLogicError(const char* what_arg);
-[[noreturn]] void ThrowStdInvalidArgument(const std::string& what_arg);
-[[noreturn]] void ThrowStdInvalidArgument(const char* what_arg);
-[[noreturn]] void ThrowStdDomainError(const std::string& what_arg);
-[[noreturn]] void ThrowStdDomainError(const char* what_arg);
-[[noreturn]] void ThrowStdLengthError(const std::string& what_arg);
-[[noreturn]] void ThrowStdLengthError(const char* what_arg);
-[[noreturn]] void ThrowStdOutOfRange(const std::string& what_arg);
-[[noreturn]] void ThrowStdOutOfRange(const char* what_arg);
-[[noreturn]] void ThrowStdRuntimeError(const std::string& what_arg);
-[[noreturn]] void ThrowStdRuntimeError(const char* what_arg);
-[[noreturn]] void ThrowStdRangeError(const std::string& what_arg);
-[[noreturn]] void ThrowStdRangeError(const char* what_arg);
-[[noreturn]] void ThrowStdOverflowError(const std::string& what_arg);
-[[noreturn]] void ThrowStdOverflowError(const char* what_arg);
-[[noreturn]] void ThrowStdUnderflowError(const std::string& what_arg);
-[[noreturn]] void ThrowStdUnderflowError(const char* what_arg);
+    [[noreturn]] void ThrowStdLogicError(const std::string &what_arg);
 
-[[noreturn]] void ThrowStdBadFunctionCall();
-[[noreturn]] void ThrowStdBadAlloc();
+    [[noreturn]] void ThrowStdLogicError(const char *what_arg);
 
-// ThrowStdBadArrayNewLength() cannot be consistently supported because
-// std::bad_array_new_length is missing in libstdc++ until 4.9.0.
-// https://gcc.gnu.org/onlinedocs/gcc-4.8.3/libstdc++/api/a01379_source.html
-// https://gcc.gnu.org/onlinedocs/gcc-4.9.0/libstdc++/api/a01327_source.html
-// libcxx (as of 3.2) and msvc (as of 2015) both have it.
-// [[noreturn]] void ThrowStdBadArrayNewLength();
+    [[noreturn]] void ThrowStdInvalidArgument(const std::string &what_arg);
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+    [[noreturn]] void ThrowStdInvalidArgument(const char *what_arg);
+
+    [[noreturn]] void ThrowStdDomainError(const std::string &what_arg);
+
+    [[noreturn]] void ThrowStdDomainError(const char *what_arg);
+
+    [[noreturn]] void ThrowStdLengthError(const std::string &what_arg);
+
+    [[noreturn]] void ThrowStdLengthError(const char *what_arg);
+
+    [[noreturn]] void ThrowStdOutOfRange(const std::string &what_arg);
+
+    [[noreturn]] void ThrowStdOutOfRange(const char *what_arg);
+
+    [[noreturn]] void ThrowStdRuntimeError(const std::string &what_arg);
+
+    [[noreturn]] void ThrowStdRuntimeError(const char *what_arg);
+
+    [[noreturn]] void ThrowStdRangeError(const std::string &what_arg);
+
+    [[noreturn]] void ThrowStdRangeError(const char *what_arg);
+
+    [[noreturn]] void ThrowStdOverflowError(const std::string &what_arg);
+
+    [[noreturn]] void ThrowStdOverflowError(const char *what_arg);
+
+    [[noreturn]] void ThrowStdUnderflowError(const std::string &what_arg);
+
+    [[noreturn]] void ThrowStdUnderflowError(const char *what_arg);
+
+    [[noreturn]] void ThrowStdBadFunctionCall();
+
+    [[noreturn]] void ThrowStdBadAlloc();
+
+    // ThrowStdBadArrayNewLength() cannot be consistently supported because
+    // std::bad_array_new_length is missing in libstdc++ until 4.9.0.
+    // https://gcc.gnu.org/onlinedocs/gcc-4.8.3/libstdc++/api/a01379_source.html
+    // https://gcc.gnu.org/onlinedocs/gcc-4.9.0/libstdc++/api/a01327_source.html
+    // libcxx (as of 3.2) and msvc (as of 2015) both have it.
+    // [[noreturn]] void ThrowStdBadArrayNewLength();
+
+}  // namespace turbo::base_internal
 
 #endif  // TURBO_PLATFORM_INTERNAL_THROW_DELEGATE_H_

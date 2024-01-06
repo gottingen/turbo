@@ -19,7 +19,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     static constexpr const char kExceptionMessage[] =
             "Failed generating seed-material for URBG.";
@@ -42,5 +41,4 @@ namespace turbo {
         }
 
     }  // namespace random_internal
-    TURBO_NAMESPACE_END
 }  // namespace turbo

@@ -21,7 +21,7 @@
 #include "turbo/testing/test.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace inline_variable_testing_internal {
         namespace {
 
@@ -61,5 +61,5 @@ namespace turbo {
 
         }  // namespace
     }  // namespace inline_variable_testing_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

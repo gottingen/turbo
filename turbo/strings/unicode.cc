@@ -61,7 +61,7 @@ namespace turbo {
     }
 
 
-// default constructors
+    // default constructors
     Unicode &Unicode::operator=(const Unicode &other) {
         UNICODE_INVARIANT_CHECK(*this);
         if (TURBO_UNLIKELY(&other == this)) {

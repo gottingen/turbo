@@ -77,7 +77,7 @@ namespace turbo::unicode::utf32_to_utf8 {
         return utf8_output - start;
     }
 
-    inline result convert_with_errors(const char32_t *buf, size_t len, char *utf8_output) {
+    inline UnicodeResult convert_with_errors(const char32_t *buf, size_t len, char *utf8_output) {
         const uint32_t *data = reinterpret_cast<const uint32_t *>(buf);
         size_t pos = 0;
         char *start{utf8_output};
@@ -107,7 +107,7 @@ namespace turbo::unicode::utf32_to_utf8 {
             } else if ((word & 0xFFFF0000) == 0) {
                 // will generate three UTF-8 bytes
                 // we have 0b1110XXXX 0b10XXXXXX 0b10XXXXXX
-                if (word >= 0xD800 && word <= 0xDFFF) { return result(error_code::SURROGATE, pos); }
+                if (word >= 0xD800 && word <= 0xDFFF) { return {UnicodeError::SURROGATE, pos}; }
                 *utf8_output++ = char((word >> 12) | 0b11100000);
                 *utf8_output++ = char(((word >> 6) & 0b111111) | 0b10000000);
                 *utf8_output++ = char((word & 0b111111) | 0b10000000);
@@ -115,7 +115,7 @@ namespace turbo::unicode::utf32_to_utf8 {
             } else {
                 // will generate four UTF-8 bytes
                 // we have 0b11110XXX 0b10XXXXXX 0b10XXXXXX 0b10XXXXXX
-                if (word > 0x10FFFF) { return result(error_code::TOO_LARGE, pos); }
+                if (word > 0x10FFFF) { return {UnicodeError::TOO_LARGE, pos}; }
                 *utf8_output++ = char((word >> 18) | 0b11110000);
                 *utf8_output++ = char(((word >> 12) & 0b111111) | 0b10000000);
                 *utf8_output++ = char(((word >> 6) & 0b111111) | 0b10000000);
@@ -123,7 +123,7 @@ namespace turbo::unicode::utf32_to_utf8 {
                 pos++;
             }
         }
-        return result(error_code::SUCCESS, utf8_output - start);
+        return {UnicodeError::SUCCESS, static_cast<size_t>(utf8_output - start)};
     }
 
     inline size_t convert_valid(const char32_t *buf, size_t len, char *utf8_output) {
@@ -206,19 +206,19 @@ namespace turbo::unicode::utf32_to_utf16 {
     }
 
     template<EndianNess big_endian>
-    inline result convert_with_errors(const char32_t *buf, size_t len, char16_t *utf16_output) {
+    inline UnicodeResult convert_with_errors(const char32_t *buf, size_t len, char16_t *utf16_output) {
         const uint32_t *data = reinterpret_cast<const uint32_t *>(buf);
         size_t pos = 0;
         char16_t *start{utf16_output};
         while (pos < len) {
             uint32_t word = data[pos];
             if ((word & 0xFFFF0000) == 0) {
-                if (word >= 0xD800 && word <= 0xDFFF) { return result(error_code::SURROGATE, pos); }
+                if (word >= 0xD800 && word <= 0xDFFF) { return {UnicodeError::SURROGATE, pos}; }
                 // will not generate a surrogate pair
                 *utf16_output++ = !match_system(big_endian) ? char16_t(gbswap_16(uint16_t(word))) : char16_t(word);
             } else {
                 // will generate a surrogate pair
-                if (word > 0x10FFFF) { return result(error_code::TOO_LARGE, pos); }
+                if (word > 0x10FFFF) { return {UnicodeError::TOO_LARGE, pos}; }
                 word -= 0x10000;
                 uint16_t high_surrogate = uint16_t(0xD800 + (word >> 10));
                 uint16_t low_surrogate = uint16_t(0xDC00 + (word & 0x3FF));
@@ -231,18 +231,18 @@ namespace turbo::unicode::utf32_to_utf16 {
             }
             pos++;
         }
-        return result(error_code::SUCCESS, utf16_output - start);
+        return {UnicodeError::SUCCESS, static_cast<size_t>(utf16_output - start)};
     }
 
 
-    template <EndianNess big_endian>
-    inline size_t convert_valid(const char32_t* buf, size_t len, char16_t* utf16_output) {
+    template<EndianNess big_endian>
+    inline size_t convert_valid(const char32_t *buf, size_t len, char16_t *utf16_output) {
         const uint32_t *data = reinterpret_cast<const uint32_t *>(buf);
         size_t pos = 0;
-        char16_t* start{utf16_output};
+        char16_t *start{utf16_output};
         while (pos < len) {
             uint32_t word = data[pos];
-            if((word & 0xFFFF0000)==0) {
+            if ((word & 0xFFFF0000) == 0) {
                 // will not generate a surrogate pair
                 *utf16_output++ = !match_system(big_endian) ? char16_t(gbswap_16(uint16_t(word))) : char16_t(word);
                 pos++;

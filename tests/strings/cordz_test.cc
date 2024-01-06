@@ -36,7 +36,7 @@ using testing::Eq;
 using testing::AnyOf;
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 
 using cord_internal::CordzInfo;
 using cord_internal::CordzSampleToken;
@@ -459,7 +459,7 @@ TEST(CordzTest, SmallSubCord) {
 
 }  // namespace
 
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_INTERNAL_CORDZ_ENABLED

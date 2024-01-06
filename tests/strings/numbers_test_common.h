@@ -26,7 +26,7 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace strings_internal {
 
 template <typename IntType>
@@ -178,7 +178,7 @@ inline const std::array<uint64_test_case, 34>& strtouint64_test_cases() {
 }
 
 }  // namespace strings_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_

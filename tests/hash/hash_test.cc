@@ -997,7 +997,7 @@ H hash_value(H state, CustomHashType<Tags...> t) {
 }  // namespace
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace hash_internal {
 template <InvokeTag... Tags>
 struct is_uniquely_represented<
@@ -1005,7 +1005,7 @@ struct is_uniquely_represented<
     typename EnableIfContained<InvokeTag::kUniquelyRepresented, Tags...>::type>
     : std::true_type {};
 }  // namespace hash_internal
-TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #if TURBO_HASH_INTERNAL_SUPPORT_LEGACY_HASH_

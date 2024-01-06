@@ -35,8 +35,8 @@ TEST_CASE("no_error") {
   turbo::Utf8Generator generator{1, 1, 1, 1};
   for(size_t trial = 0; trial < num_trials; trial++) {
     const auto utf8{generator.generate(512)};
-    turbo::result res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    turbo::UnicodeResult res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
     REQUIRE_EQ(res.count, utf8.size());
   }
 }
@@ -52,9 +52,9 @@ TEST_CASE("header_bits_error") {
       if((utf8[i] & 0b11000000) != 0b10000000) {  // Only process leading bytes
         const unsigned char old = utf8[i];
         utf8[i] = uint8_t(0b11111000);
-        turbo::result res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-          turbo::result res1 = turbo::unicode::Converter<turbo::unicode::scalar_engine>::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        REQUIRE_EQ(res.error, turbo::error_code::HEADER_BITS);
+        turbo::UnicodeResult res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+          turbo::UnicodeResult res1 = turbo::unicode::Converter<turbo::unicode::scalar_engine>::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        REQUIRE_EQ(res.error, turbo::UnicodeError::HEADER_BITS);
           REQUIRE_EQ(res1.count, i);
         REQUIRE_EQ(res.count, i);
 
@@ -74,8 +74,8 @@ TEST_CASE("too_short_error") {
       if((utf8[i] & 0b11000000) == 0b10000000) {  // Only process continuation bytes by making them leading bytes
         const unsigned char old = utf8[i];
         utf8[i] = uint8_t(0b11100000);
-        turbo::result res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        REQUIRE_EQ(res.error, turbo::error_code::TOO_SHORT);
+        turbo::UnicodeResult res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        REQUIRE_EQ(res.error, turbo::UnicodeError::TOO_SHORT);
         REQUIRE_EQ(res.count, leading_byte_pos);
         utf8[i] = old;
       } else {
@@ -94,8 +94,8 @@ TEST_CASE("too_long_error") {
       if(((utf8[i] & 0b11000000) != 0b10000000)) {  // Only process leading bytes by making them continuation bytes
         const unsigned char old = utf8[i];
         utf8[i] = uint8_t(0b10000000);
-        turbo::result res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        REQUIRE_EQ(res.error, turbo::error_code::TOO_LONG);
+        turbo::UnicodeResult res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        REQUIRE_EQ(res.error, turbo::UnicodeError::TOO_LONG);
         REQUIRE_EQ(res.count, i);
         utf8[i] = old;
       }
@@ -121,8 +121,8 @@ TEST_CASE("overlong_error") {
           utf8[i] = 0b11110000;
           utf8[i+1] = utf8[i+1] & 0b11001111;
         }
-        turbo::result res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        REQUIRE_EQ(res.error, turbo::error_code::OVERLONG);
+        turbo::UnicodeResult res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        REQUIRE_EQ(res.error, turbo::UnicodeError::OVERLONG);
         REQUIRE_EQ(res.count, i);
         utf8[i] = old;
         utf8[i+1] = second_old;
@@ -139,8 +139,8 @@ TEST_CASE("too_large_error") {
     for (int i = 1; i < 512; i++) {
       if((utf8[i] & 0b11111000) == 0b11110000) { // Can only have too large error in 4-bytes case
         utf8[i] += ((utf8[i] & 0b100) == 0b100) ? 0b10 : 0b100;   // Make sure we get too large error and not header bits error
-        turbo::result res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-        REQUIRE_EQ(res.error, turbo::error_code::TOO_LARGE);
+        turbo::UnicodeResult res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+        REQUIRE_EQ(res.error, turbo::UnicodeError::TOO_LARGE);
         REQUIRE_EQ(res.count, i);
         utf8[i] -= 0b100;
       }
@@ -160,8 +160,8 @@ TEST_CASE("surrogate_error") {
         utf8[i] = 0b11101101;                 // Leading byte is always the same
         for (int s = 0x8; s < 0xf; s++) {  // Modify second byte to create a surrogate codepoint
           utf8[i+1] = (utf8[i+1] & 0b11000011) | (s << 2);
-          turbo::result res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
-          REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+          turbo::UnicodeResult res = turbo::validate_utf8_with_errors(reinterpret_cast<const char*>(utf8.data()), utf8.size());
+          REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
           REQUIRE_EQ(res.count, i);
         }
         utf8[i] = old;

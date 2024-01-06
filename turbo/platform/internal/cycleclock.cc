@@ -32,11 +32,6 @@ namespace turbo::base_internal {
 
 #if TURBO_USE_UNSCALED_CYCLECLOCK
 
-#ifndef TURBO_COMPILER_CPP17_ENABLED
-    constexpr int32_t CycleClock::kShift;
-    constexpr double CycleClock::kFrequencyScale;
-#endif
-
     TURBO_CONST_INIT std::atomic<CycleClockSourceFunc>
             CycleClock::cycle_clock_source_{nullptr};
 

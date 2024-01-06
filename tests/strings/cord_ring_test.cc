@@ -34,7 +34,7 @@
 extern thread_local bool cord_ring;
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
+
 namespace {
 
 using RandomEngine = std::mt19937_64;
@@ -1451,5 +1451,5 @@ TEST_F(CordRingTest, Dump) {
 }
 
 }  // namespace
-TURBO_NAMESPACE_END
+
 }  // namespace turbo

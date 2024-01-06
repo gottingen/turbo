@@ -15,7 +15,7 @@
 #include "test_instance_tracker.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
     namespace test_internal {
         int BaseCountedInstance::num_instances_ = 0;
         int BaseCountedInstance::num_live_instances_ = 0;
@@ -25,5 +25,5 @@ namespace turbo {
         int BaseCountedInstance::num_comparisons_ = 0;
 
     }  // namespace test_internal
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo

@@ -90,6 +90,52 @@ namespace turbo {
         sleep_for(time - time_now());
     }
 
+    /**
+     * @ingroup turbo_times_clock
+     * @brief Returns the current time, expressed as an `turbo::Time` absolute time value.
+     * @return
+     */
+    inline turbo::Time from_now(timespec ts) {
+        return time_now() + duration_from_timespec(ts);
+    }
+
+    inline turbo::Time from_now(timeval tv) {
+        return time_now() + duration_from_timeval(tv);
+    }
+
+    inline turbo::Time seconds_from_now(int64_t secs) {
+        return time_now() + turbo::seconds(secs);
+    }
+
+    inline turbo::Time milliseconds_from_now(int64_t ms) {
+        return time_now() + turbo::milliseconds(ms);
+    }
+
+    inline turbo::Time microseconds_from_now(int64_t us) {
+        return time_now() + turbo::microseconds(us);
+    }
+
+    inline turbo::Time nanoseconds_from_now(int64_t ns) {
+        return time_now() + turbo::nanoseconds(ns);
+    }
+
+    inline turbo::Time double_seconds_from_now(double secs) {
+        return time_now() + turbo::seconds(secs);
+    }
+
+    inline turbo::Time double_milliseconds_from_now(double ms) {
+        return time_now() + turbo::milliseconds(ms);
+    }
+
+    inline turbo::Time double_microseconds_from_now(double us) {
+        return time_now() + turbo::microseconds(us);
+    }
+
+    inline turbo::Time double_nanoseconds_from_now(double ns) {
+        return time_now() + turbo::nanoseconds(ns);
+    }
+
+
 }  // namespace turbo
 
 // -----------------------------------------------------------------------------
@@ -103,11 +149,11 @@ namespace turbo {
 // By changing our extension points to be extern "C", we dodge this
 // check.
 extern "C" {
-void TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(turbo::Duration duration);
+void turbo_internal_sleep_for(turbo::Duration duration);
 }  // extern "C"
 
 inline void turbo::sleep_for(turbo::Duration duration) {
-    TURBO_INTERNAL_C_SYMBOL(TurboInternalSleepFor)(duration);
+    turbo_internal_sleep_for(duration);
 }
 
 #endif  // TURBO_TIME_CLOCK_H_

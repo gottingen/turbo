@@ -35,9 +35,9 @@ TEST_CASE("no_error_ASCII") {
     for(size_t trial = 0; trial < 1000; trial++) {
         const auto ascii{generator.generate(512)};
 
-        turbo::result res = turbo::validate_ascii_with_errors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
+        turbo::UnicodeResult res = turbo::validate_ascii_with_errors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
 
-        REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
         REQUIRE_EQ(res.count, ascii.size());
     }
 }
@@ -52,9 +52,9 @@ TEST_CASE("error_ASCII") {
         for (int i = 0; i < ascii.size(); i++) {
             ascii[i] += 0b10000000;
 
-            turbo::result res = turbo::validate_ascii_with_errors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
+            turbo::UnicodeResult res = turbo::validate_ascii_with_errors(reinterpret_cast<const char*>(ascii.data()), ascii.size());
 
-            REQUIRE_EQ(res.error, turbo::error_code::TOO_LARGE);
+            REQUIRE_EQ(res.error, turbo::UnicodeError::TOO_LARGE);
             REQUIRE_EQ(res.count, i);
 
             ascii[i] -= 0b10000000;

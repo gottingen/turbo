@@ -17,16 +17,11 @@
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
+namespace turbo::time_internal {
+    TimeZone load_time_zone(const std::string &name) {
+        TimeZone tz;
+        TURBO_RAW_CHECK(load_time_zone(name, &tz), name.c_str());
+        return tz;
+    }
 
-TimeZone load_time_zone(const std::string& name) {
-  TimeZone tz;
-  TURBO_RAW_CHECK(load_time_zone(name, &tz), name.c_str());
-  return tz;
-}
-
-}  // namespace time_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::time_internal

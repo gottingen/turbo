@@ -38,7 +38,6 @@
 #include "turbo/meta/utility.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     // bind_front()
     //
@@ -189,7 +188,6 @@ namespace turbo {
 
 #endif  // defined(__cpp_lib_bind_front) && __cpp_lib_bind_front >= 201907L
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_FUNCTIONAL_BIND_FRONT_H_

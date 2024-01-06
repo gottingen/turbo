@@ -219,9 +219,7 @@ namespace turbo::unicode::simd::utf8_to_utf32 {
             return utf32_output - start;
         }
 
-        TURBO_FORCE_INLINE result
-
-        convert_with_errors(const char *in, size_t size, char32_t *utf32_output) {
+        TURBO_FORCE_INLINE UnicodeResult convert_with_errors(const char *in, size_t size, char32_t *utf32_output) {
             size_t pos = 0;
             char32_t *start{utf32_output};
             // In the worst case, we have the haswell kernel which can cause an overflow of
@@ -258,7 +256,7 @@ namespace turbo::unicode::simd::utf8_to_utf32 {
                         this->check_utf8_bytes(input.chunks[3], input.chunks[2]);
                     }
                     if (errors()) {
-                        result res = turbo::unicode::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos,
+                        UnicodeResult res = turbo::unicode::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos,
                                                                                            utf32_output);
                         res.count += pos;
                         return res;
@@ -293,22 +291,22 @@ namespace turbo::unicode::simd::utf8_to_utf32 {
                 }
             }
             if (errors()) {
-                result res = turbo::unicode::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos,
+                UnicodeResult res = turbo::unicode::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos,
                                                                                    utf32_output);
                 res.count += pos;
                 return res;
             }
             if (pos < size) {
-                result res = turbo::unicode::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos,
+                UnicodeResult res = turbo::unicode::utf8_to_utf32::rewind_and_convert_with_errors(pos, in + pos, size - pos,
                                                                                    utf32_output);
-                if (res.error) {    // In case of error, we want the error position
+                if (is_unicode_error(res)) {    // In case of error, we want the error position
                     res.count += pos;
                     return res;
                 } else {    // In case of success, we want the number of word written
                     utf32_output += res.count;
                 }
             }
-            return result(error_code::SUCCESS, utf32_output - start);
+            return {UnicodeError::SUCCESS,static_cast<size_t>(utf32_output - start)};
         }
 
         TURBO_FORCE_INLINE bool errors() const {

@@ -47,49 +47,48 @@
 
 #if TURBO_USE_UNSCALED_CYCLECLOCK
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace time_internal {
-class UnscaledCycleClockWrapperForGetCurrentTime;
-}  // namespace time_internal
+namespace turbo::time_internal {
+    class UnscaledCycleClockWrapperForGetCurrentTime;
+}  // namespace turbo::time_internal
 
-namespace base_internal {
-class CycleClock;
-class UnscaledCycleClockWrapperForInitializeFrequency;
+namespace turbo::base_internal {
+    class CycleClock;
 
-class UnscaledCycleClock {
- private:
-  UnscaledCycleClock() = delete;
+    class UnscaledCycleClockWrapperForInitializeFrequency;
 
-  // Return the value of a cycle counter that counts at a rate that is
-  // approximately constant.
-  static int64_t time_now();
+    class UnscaledCycleClock {
+    private:
+        UnscaledCycleClock() = delete;
 
-  // Return the how much UnscaledCycleClock::time_now() increases per second.
-  // This is not necessarily the core CPU clock frequency.
-  // It may be the nominal value report by the kernel, rather than a measured
-  // value.
-  static double Frequency();
+        // Return the value of a cycle counter that counts at a rate that is
+        // approximately constant.
+        static int64_t time_now();
 
-  // Allowed users
-  friend class base_internal::CycleClock;
-  friend class time_internal::UnscaledCycleClockWrapperForGetCurrentTime;
-  friend class base_internal::UnscaledCycleClockWrapperForInitializeFrequency;
-};
+        // Return the how much UnscaledCycleClock::time_now() increases per second.
+        // This is not necessarily the core CPU clock frequency.
+        // It may be the nominal value report by the kernel, rather than a measured
+        // value.
+        static double Frequency();
+
+        // Allowed users
+        friend class base_internal::CycleClock;
+
+        friend class time_internal::UnscaledCycleClockWrapperForGetCurrentTime;
+
+        friend class base_internal::UnscaledCycleClockWrapperForInitializeFrequency;
+    };
 
 #if defined(__x86_64__)
 
-inline int64_t UnscaledCycleClock::time_now() {
-  uint64_t low, high;
-  __asm__ volatile("rdtsc" : "=a"(low), "=d"(high));
-  return static_cast<int64_t>((high << 32) | low);
-}
+    inline int64_t UnscaledCycleClock::time_now() {
+        uint64_t low, high;
+        __asm__ volatile("rdtsc" : "=a"(low), "=d"(high));
+        return static_cast<int64_t>((high << 32) | low);
+    }
 
 #endif
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::base_internal
 
 #endif  // TURBO_USE_UNSCALED_CYCLECLOCK
 

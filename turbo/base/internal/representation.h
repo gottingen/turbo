@@ -19,37 +19,33 @@
 
 #include "turbo/platform/port.h"
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace numeric_internal {
+namespace turbo::numeric_internal {
 
-// Returns true iff long double is represented as a pair of doubles added
-// together.
-inline constexpr bool IsDoubleDouble() {
-  // A double-double value always has exactly twice the precision of a double
-  // value--one double carries the high digits and one double carries the low
-  // digits. This property is not shared with any other common floating-point
-  // representation, so this test won't trigger false positives. For reference,
-  // this table gives the number of bits of precision of each common
-  // floating-point representation:
-  //
-  //                type     precision
-  //         IEEE single          24 b
-  //         IEEE double          53
-  //     x86 long double          64
-  //       double-double         106
-  //      IEEE quadruple         113
-  //
-  // Note in particular that a quadruple-precision float has greater precision
-  // than a double-double float despite taking up the same amount of memory; the
-  // quad has more of its bits allocated to the mantissa than the double-double
-  // has.
-  return std::numeric_limits<long double>::digits ==
-         2 * std::numeric_limits<double>::digits;
-}
+    // Returns true iff long double is represented as a pair of doubles added
+    // together.
+    inline constexpr bool IsDoubleDouble() {
+        // A double-double value always has exactly twice the precision of a double
+        // value--one double carries the high digits and one double carries the low
+        // digits. This property is not shared with any other common floating-point
+        // representation, so this test won't trigger false positives. For reference,
+        // this table gives the number of bits of precision of each common
+        // floating-point representation:
+        //
+        //                type     precision
+        //         IEEE single          24 b
+        //         IEEE double          53
+        //     x86 long double          64
+        //       double-double         106
+        //      IEEE quadruple         113
+        //
+        // Note in particular that a quadruple-precision float has greater precision
+        // than a double-double float despite taking up the same amount of memory; the
+        // quad has more of its bits allocated to the mantissa than the double-double
+        // has.
+        return std::numeric_limits<long double>::digits ==
+               2 * std::numeric_limits<double>::digits;
+    }
 
-}  // namespace numeric_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::numeric_internal
 
 #endif  // TURBO_BASE_INTERNAL_REPRESENTATION_H_

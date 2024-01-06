@@ -29,18 +29,15 @@ extern "C" bool __google_disable_rescheduling(void);
 extern "C" void __google_enable_rescheduling(bool disable_result);
 
 namespace turbo {
-TURBO_NAMESPACE_BEGIN
-class CondVar;
-class Mutex;
+    class SpinLock;          // To allow use of SchedulingGuard.
 
-namespace synchronization_internal {
-int MutexDelay(int32_t c, int mode);
-}  // namespace synchronization_internal
+    namespace synchronization_internal {
+        int MutexDelay(int32_t c, int mode);
+    }  // namespace synchronization_internal
 
-namespace base_internal {
+    namespace base_internal {
 
-class SchedulingHelper;  // To allow use of SchedulingGuard.
-class SpinLock;          // To allow use of SchedulingGuard.
+        class SchedulingHelper;  // To allow use of SchedulingGuard.
 
 // SchedulingGuard
 // Provides guard semantics that may be used to disable cooperative rescheduling
@@ -57,78 +54,83 @@ class SpinLock;          // To allow use of SchedulingGuard.
 // Mutex) within a rescheduling-disabled region.
 //
 // All methods are async-signal safe.
-class SchedulingGuard {
- public:
-  // Returns true iff the calling thread may be cooperatively rescheduled.
-  static bool ReschedulingIsAllowed();
-  SchedulingGuard(const SchedulingGuard&) = delete;
-  SchedulingGuard& operator=(const SchedulingGuard&) = delete;
+        class SchedulingGuard {
+        public:
+            // Returns true iff the calling thread may be cooperatively rescheduled.
+            static bool ReschedulingIsAllowed();
 
- private:
-  // Disable cooperative rescheduling of the calling thread.  It may still
-  // initiate scheduling operations (e.g. wake-ups), however, it may not itself
-  // reschedule.  Nestable.  The returned result is opaque, clients should not
-  // attempt to interpret it.
-  // REQUIRES: Result must be passed to a pairing EnableScheduling().
-  static bool DisableRescheduling();
+            SchedulingGuard(const SchedulingGuard &) = delete;
 
-  // Marks the end of a rescheduling disabled region, previously started by
-  // DisableRescheduling().
-  // REQUIRES: Pairs with innermost call (and result) of DisableRescheduling().
-  static void EnableRescheduling(bool disable_result);
+            SchedulingGuard &operator=(const SchedulingGuard &) = delete;
 
-  // A scoped helper for {Disable, Enable}Rescheduling().
-  // REQUIRES: destructor must run in same thread as constructor.
-  struct ScopedDisable {
-    ScopedDisable() { disabled = SchedulingGuard::DisableRescheduling(); }
-    ~ScopedDisable() { SchedulingGuard::EnableRescheduling(disabled); }
+        private:
+            // Disable cooperative rescheduling of the calling thread.  It may still
+            // initiate scheduling operations (e.g. wake-ups), however, it may not itself
+            // reschedule.  Nestable.  The returned result is opaque, clients should not
+            // attempt to interpret it.
+            // REQUIRES: Result must be passed to a pairing EnableScheduling().
+            static bool DisableRescheduling();
 
-    bool disabled;
-  };
+            // Marks the end of a rescheduling disabled region, previously started by
+            // DisableRescheduling().
+            // REQUIRES: Pairs with innermost call (and result) of DisableRescheduling().
+            static void EnableRescheduling(bool disable_result);
 
-  // A scoped helper to enable rescheduling temporarily.
-  // REQUIRES: destructor must run in same thread as constructor.
-  class ScopedEnable {
-   public:
-    ScopedEnable();
-    ~ScopedEnable();
+            // A scoped helper for {Disable, Enable}Rescheduling().
+            // REQUIRES: destructor must run in same thread as constructor.
+            struct ScopedDisable {
+                ScopedDisable() { disabled = SchedulingGuard::DisableRescheduling(); }
 
-   private:
-    int scheduling_disabled_depth_;
-  };
+                ~ScopedDisable() { SchedulingGuard::EnableRescheduling(disabled); }
 
-  // Access to SchedulingGuard is explicitly permitted.
-  friend class turbo::CondVar;
-  friend class turbo::Mutex;
-  friend class SchedulingHelper;
-  friend class SpinLock;
-  friend int turbo::synchronization_internal::MutexDelay(int32_t c, int mode);
-};
+                bool disabled;
+            };
 
-//------------------------------------------------------------------------------
-// End of public interfaces.
-//------------------------------------------------------------------------------
+            // A scoped helper to enable rescheduling temporarily.
+            // REQUIRES: destructor must run in same thread as constructor.
+            class ScopedEnable {
+            public:
+                ScopedEnable();
 
-inline bool SchedulingGuard::ReschedulingIsAllowed() {
-  return false;
-}
+                ~ScopedEnable();
 
-inline bool SchedulingGuard::DisableRescheduling() {
-  return false;
-}
+            private:
+                int scheduling_disabled_depth_;
+            };
 
-inline void SchedulingGuard::EnableRescheduling(bool /* disable_result */) {
-  return;
-}
+            // Access to SchedulingGuard is explicitly permitted.
+            friend class SchedulingHelper;
 
-inline SchedulingGuard::ScopedEnable::ScopedEnable()
-    : scheduling_disabled_depth_(0) {}
-inline SchedulingGuard::ScopedEnable::~ScopedEnable() {
-  TURBO_RAW_CHECK(scheduling_disabled_depth_ == 0, "disable unused warning");
-}
+            friend class turbo::SpinLock;
 
-}  // namespace base_internal
-TURBO_NAMESPACE_END
+            friend int turbo::synchronization_internal::MutexDelay(int32_t c, int mode);
+        };
+
+        //------------------------------------------------------------------------------
+        // End of public interfaces.
+        //------------------------------------------------------------------------------
+
+        inline bool SchedulingGuard::ReschedulingIsAllowed() {
+            return false;
+        }
+
+        inline bool SchedulingGuard::DisableRescheduling() {
+            return false;
+        }
+
+        inline void SchedulingGuard::EnableRescheduling(bool /* disable_result */) {
+            return;
+        }
+
+        inline SchedulingGuard::ScopedEnable::ScopedEnable()
+                : scheduling_disabled_depth_(0) {}
+
+        inline SchedulingGuard::ScopedEnable::~ScopedEnable() {
+            TURBO_RAW_CHECK(scheduling_disabled_depth_ == 0, "disable unused warning");
+        }
+
+    }  // namespace base_internal
+
 }  // namespace turbo
 
 #endif  // TURBO_PLATFORM_INTERNAL_LOW_LEVEL_SCHEDULING_H_

@@ -23,7 +23,7 @@
 #include "../base/exception_safety_testing.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
+
 
     namespace {
 
@@ -195,7 +195,7 @@ namespace turbo {
 
     }  // namespace
 
-    TURBO_NAMESPACE_END
+
 }  // namespace turbo
 
 #endif  // TURBO_HAVE_EXCEPTIONS

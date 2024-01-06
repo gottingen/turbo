@@ -40,8 +40,8 @@ TEST_CASE("validate_utf16be__returns_true_for_valid_input__single_words") {
     std::vector<char16_t> flipped(utf16.size());
     turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-    turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
     REQUIRE_EQ(res.count, utf16.size());
   }
 }
@@ -54,8 +54,8 @@ TEST_CASE("validate_utf16be__returns_true_for_valid_input__surrogate_pairs_short
     std::vector<char16_t> flipped(utf16.size());
     turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-    turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
     REQUIRE_EQ(res.count, utf16.size());
   }
 }
@@ -69,8 +69,8 @@ TEST_CASE("validate_utf16be__returns_true_for_valid_input__surrogate_pairs") {
     std::vector<char16_t> flipped(utf16.size());
     turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-    turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
     REQUIRE_EQ(res.count, utf16.size());
   }
 }
@@ -83,16 +83,16 @@ TEST_CASE("validate_utf16be__returns_true_for_valid_input__mixed") {
   std::vector<char16_t> flipped(utf16.size());
   turbo::change_endianness_utf16(utf16.data(), utf16.size(), flipped.data());
 
-  turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-  REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+  turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+  REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
   REQUIRE_EQ(res.count, utf16.size());
 }
 
 TEST_CASE("validate_utf16be__returns_true_for_empty_string") {
   const char16_t* buf = (const char16_t*)"";
 
-  turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
-  REQUIRE_EQ(res.error, turbo::error_code::SUCCESS);
+  turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(buf), 0);
+  REQUIRE_EQ(res.error, turbo::UnicodeError::SUCCESS);
   REQUIRE_EQ(res.count, 0);
 }
 
@@ -126,8 +126,8 @@ TEST_CASE("validate_utf16be__returns_false_when_input_has_wrong_first_word_value
         const char16_t old = flipped[i];
         flipped[i] = char16_t((wrong_value >> 8) | (wrong_value << 8));
 
-        turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-        REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+        turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+        REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
         REQUIRE_EQ(res.count, i);
 
         flipped[i] = old;
@@ -168,8 +168,8 @@ TEST_CASE("validate_utf16be__returns_false_when_input_has_wrong_second_word_valu
       flipped[i + 0] = valid_surrogate_W1;
       flipped[i + 1] = W2;
 
-      turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-      REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+      turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+      REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
       REQUIRE_EQ(res.count, i);
 
       flipped[i + 0] = old_W1;
@@ -201,8 +201,8 @@ TEST_CASE("validate_utf16be__returns_false_when_input_is_truncated") {
 
     flipped[size - 1] = valid_surrogate_W1;
 
-    turbo::result res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
-    REQUIRE_EQ(res.error, turbo::error_code::SURROGATE);
+    turbo::UnicodeResult res = turbo::validate_utf16be_with_errors(reinterpret_cast<const char16_t*>(flipped.data()), flipped.size());
+    REQUIRE_EQ(res.error, turbo::UnicodeError::SURROGATE);
     REQUIRE_EQ(res.count, size - 1);
   }
 }

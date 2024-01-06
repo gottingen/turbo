@@ -50,7 +50,6 @@
 #include "turbo/platform/port.h"
 
 namespace turbo {
-    TURBO_NAMESPACE_BEGIN
 
     // BadResultStatusAccess
     //
@@ -793,7 +792,6 @@ namespace turbo {
         // no-op
     }
 
-    TURBO_NAMESPACE_END
 }  // namespace turbo
 
 #endif  // TURBO_BASE_RESULT_STATUS_H_

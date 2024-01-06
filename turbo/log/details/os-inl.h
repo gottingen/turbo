@@ -292,23 +292,6 @@ namespace turbo::tlog {
 #endif
             }
 
-            std::string getenv(const char *field) {
-
-#if defined(_MSC_VER)
-#    if defined(__cplusplus_winrt)
-                return std::string{}; // not supported under uwp
-#    else
-                size_t len = 0;
-                char buf[128];
-                bool ok = ::getenv_s(&len, buf, sizeof(buf), field) == 0;
-                return ok ? buf : std::string{};
-#    endif
-#else // revert to getenv
-                char *buf = ::getenv(field);
-                return buf ? buf : std::string{};
-#endif
-            }
-
         } // namespace os
     } // namespace details
 } // namespace turbo::tlog

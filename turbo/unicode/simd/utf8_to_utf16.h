@@ -226,7 +226,7 @@ namespace turbo::unicode::simd::utf8_to_utf16 {
         }
 
         template<EndianNess endian>
-        TURBO_FORCE_INLINE result convert_with_errors(const char *in, size_t size, char16_t *utf16_output) {
+        TURBO_FORCE_INLINE UnicodeResult convert_with_errors(const char *in, size_t size, char16_t *utf16_output) {
             size_t pos = 0;
             char16_t *start{utf16_output};
             // In the worst case, we have the haswell kernel which can cause an overflow of
@@ -266,7 +266,7 @@ namespace turbo::unicode::simd::utf8_to_utf16 {
                     if (errors()) {
                         // rewind_and_convert_with_errors will seek a potential error from in+pos onward,
                         // with the ability to go back up to pos bytes, and read size-pos bytes forward.
-                        result res = turbo::unicode::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos,
+                        UnicodeResult res = turbo::unicode::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos,
                                                                                                            in + pos,
                                                                                                            size - pos,
                                                                                                            utf16_output);
@@ -306,7 +306,7 @@ namespace turbo::unicode::simd::utf8_to_utf16 {
             if (errors()) {
                 // rewind_and_convert_with_errors will seek a potential error from in+pos onward,
                 // with the ability to go back up to pos bytes, and read size-pos bytes forward.
-                result res = turbo::unicode::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos, in + pos,
+                UnicodeResult res = turbo::unicode::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos, in + pos,
                                                                                                    size - pos,
                                                                                                    utf16_output);
                 res.count += pos;
@@ -315,17 +315,17 @@ namespace turbo::unicode::simd::utf8_to_utf16 {
             if (pos < size) {
                 // rewind_and_convert_with_errors will seek a potential error from in+pos onward,
                 // with the ability to go back up to pos bytes, and read size-pos bytes forward.
-                result res = turbo::unicode::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos, in + pos,
+                UnicodeResult res = turbo::unicode::utf8_to_utf16::rewind_and_convert_with_errors<endian>(pos, in + pos,
                                                                                                    size - pos,
                                                                                                    utf16_output);
-                if (res.error) {    // In case of error, we want the error position
+                if (is_unicode_error(res)) {    // In case of error, we want the error position
                     res.count += pos;
                     return res;
                 } else {    // In case of success, we want the number of word written
                     utf16_output += res.count;
                 }
             }
-            return result(error_code::SUCCESS, utf16_output - start);
+            return UnicodeResult{UnicodeError::SUCCESS, static_cast<size_t>(utf16_output - start)};
         }
 
         TURBO_FORCE_INLINE bool errors() const {

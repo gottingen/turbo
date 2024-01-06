@@ -171,7 +171,7 @@ namespace turbo {
             using std::get;
             // Using a free function get<Is>(Tuple) now.
             const int unused[] = {0, ((void) f(get<Is>(t)), 0)...};
-            ignore_unused(unused);
+            TURBO_UNUSED(unused);
         }
 
         template<typename Tuple, typename F>
@@ -184,7 +184,7 @@ namespace turbo {
         void for_each2(index_sequence<Is...>, Tuple1 &&t1, Tuple2 &&t2, F &&f) {
             using std::get;
             const int unused[] = {0, ((void) f(get<Is>(t1), get<Is>(t2)), 0)...};
-            ignore_unused(unused);
+            TURBO_UNUSED(unused);
         }
 
         template<typename Tuple1, typename Tuple2, typename F>

@@ -40,52 +40,48 @@
 // We combine these three ideas and also change Simpira's subround keys from
 // structured/low-entropy counters to digits of Pi.
 
-namespace turbo {
-TURBO_NAMESPACE_BEGIN
-namespace random_internal {
-namespace {
+namespace turbo::random_internal {
+    namespace {
 
-struct RandenState {
-  const void* keys;
-  bool has_crypto;
-};
+        struct RandenState {
+            const void *keys;
+            bool has_crypto;
+        };
 
-RandenState GetRandenState() {
-  static const RandenState state = []() {
-    RandenState tmp;
+        RandenState GetRandenState() {
+            static const RandenState state = []() {
+                RandenState tmp;
 #if TURBO_RANDOM_INTERNAL_AES_DISPATCH
-    // HW AES Dispatch.
-    if (HasRandenHwAesImplementation() && CPUSupportsRandenHwAes()) {
-      tmp.has_crypto = true;
-      tmp.keys = RandenHwAes::GetKeys();
-    } else {
-      tmp.has_crypto = false;
-      tmp.keys = RandenSlow::GetKeys();
-    }
+                // HW AES Dispatch.
+                if (HasRandenHwAesImplementation() && CPUSupportsRandenHwAes()) {
+                    tmp.has_crypto = true;
+                    tmp.keys = RandenHwAes::GetKeys();
+                } else {
+                    tmp.has_crypto = false;
+                    tmp.keys = RandenSlow::GetKeys();
+                }
 #elif TURBO_HAVE_ACCELERATED_AES
-    // HW AES is enabled.
-    tmp.has_crypto = true;
-    tmp.keys = RandenHwAes::GetKeys();
+                // HW AES is enabled.
+                tmp.has_crypto = true;
+                tmp.keys = RandenHwAes::GetKeys();
 #else
-    // HW AES is disabled.
-    tmp.has_crypto = false;
-    tmp.keys = RandenSlow::GetKeys();
+                // HW AES is disabled.
+                tmp.has_crypto = false;
+                tmp.keys = RandenSlow::GetKeys();
 #endif
-    return tmp;
-  }();
-  return state;
-}
+                return tmp;
+            }();
+            return state;
+        }
 
-}  // namespace
+    }  // namespace
 
-Randen::Randen() {
-  auto tmp = GetRandenState();
-  keys_ = tmp.keys;
+    Randen::Randen() {
+        auto tmp = GetRandenState();
+        keys_ = tmp.keys;
 #if TURBO_RANDOM_INTERNAL_AES_DISPATCH
-  has_crypto_ = tmp.has_crypto;
+        has_crypto_ = tmp.has_crypto;
 #endif
-}
+    }
 
-}  // namespace random_internal
-TURBO_NAMESPACE_END
-}  // namespace turbo
+}  // namespace turbo::random_internal

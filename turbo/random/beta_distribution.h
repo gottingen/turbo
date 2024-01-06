@@ -420,7 +420,7 @@ namespace turbo {
             case param_type::JOEHNK:
                 return AlgorithmJoehnk(g, p);
             case param_type::CHENG_BA:
-                TURBO_FALLTHROUGH;
+                [[fallthrough]];
             case param_type::CHENG_BB:
                 return AlgorithmCheng(g, p);
             default:
