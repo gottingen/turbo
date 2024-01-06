@@ -47,17 +47,69 @@ carbin install gottingen/turbo
 
 # Try Try Try
 
-* Read [overview](docs/overview.md) to know the goals of turbo and its advantages. 
-* Read [getting start](docs/getting_start.md) for building turbo and work with [examples](examples).
+* Read [overview](https://turbo-docs.readthedocs.io/en/latest/en/overview.html) to know the goals of turbo and its advantages. 
+* Read [getting start](https://turbo-docs.readthedocs.io/en/latest/) for building turbo and work with [examples](examples).
+* Api reference is [here](https://turbo-docs.readthedocs.io/en/latest/en/api/base.html).
+* Carbin is a tool to manage c++ project, it's [here](https://carbin.readthedocs.io/en/latest/).
 * Modules:
-  * [platform](docs/platform.md)
-  * [base](docs/base.md)
-  * [simd](docs/simd.md)
-  * [flags]()
-  * [strings](docs/strings.md)
-  * [concurrent](docs/concurrent.md)
-  * [status](docs/status.md)
-  * [times](docs/times.md)
+  * platform compact cross platform
+  * base basic types and functions
+  * fiber & flow fiber and task control flow -- **good performance**
+    * Fiber
+    * FiberMutex
+    * FiberCond
+    * FiberBarrier
+    * TaskFlow
+  * simd simd instructions abstraction to batch processing -- **good performance**
+  * flags cmd line tools help to parse cmd line
+  * strings strings and string_view processing
+  * concurrent threading and lock options
+    * Barrier
+    * CallOnce
+    * SpinLock
+    * ThreadLocal
+  * times time and date processing -- **good performance**
+    * Time
+    * Duration
+    * CivilTime
+    * TimeZone
+  * format  string format and table format -- **good performance**
+    * format string
+    * println
+    * table format
+  * logging logging and log to file -- **good performance**
+  * files c++17 filesystem and convenient file api
+    * SequentialReadFile
+    * SequentialWriteFile
+    * RandomAccessFile
+    * RandomWriteFile
+  * hash hash framework and hash functions -- **good performance**
+    * city hash and bytes
+    * murmur hash
+    * xxhash
+  * crypto
+    * md5
+    * sha1
+    * sha256
+    * sha512
+    * crc32
+  * Unicode multi engine unicode support scalar and AVX2 -- **good performance**
+    * utf8
+    * utf16
+    * utf32
+  * profiling profiling with write-most variables                 -- **good performance**
+    * Counter
+    * Histogram
+    * Gauge
+  * random random number generator                                -- **good performance**
+    * Random
+    * RandomEngine
+    * RandomDevice
+  * container                                                    -- **good performance**
+    * small_vector stack allocated vector
+    * flat_hash_map goode performance hash map 
+    * flat_hash_set goode performance 
+    * flat_tree_map goode performance 
 
 # Acknowledgement
 
