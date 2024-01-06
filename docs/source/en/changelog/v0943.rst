@@ -1,5 +1,5 @@
-Release
-==================================
+.. Copyright 2023 The Elastic AI Search Authors.
+
 
 v0.9.39 - v0.9.43
 ================================
@@ -36,22 +36,3 @@ bug fix
 * fix bug in unicode test for random utf16 string generation.
 * fix bug for TURBO_ASSERT, when NDEBUG is defined, it will cause a crash.
 * fix bug for profiling operator<<, when the value not the same, but convert to the same type.
-
-v0.9.36 - v0.9.39
-================================
-
-* add support for thread local storage.
-* tidy implementation of format and table modules.
-* add function for fast random number generation.
-* remove turbo meta traits that c++17 now provides.
-* add hash algorithm for xxhash.
-* add hash algorithm for murmur3.
-* add hash framework for multiple hash algorithms selection.
-* support profiling of prometheus metrics.
-* add support for profiling module.
-* boost some implementations  to constexpr.
-* add turbo cmd line tool.
-
-# pre-release v0.9.36
-
-# base version v0.9.35

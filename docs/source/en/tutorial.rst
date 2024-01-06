@@ -16,6 +16,14 @@ base guidance
 strings guidance
 =================================
 
+fiber and flow control guidance
+=================================
+
+..  toctree::
+    :maxdepth: 3
+
+    tf/tf
+
 formatting guidance
 =================================
 
@@ -25,17 +33,6 @@ formatting guidance
     fmt/format
     fmt/print
     fmt/table
-
-simd guidance
-==================================
-
-This tutorial shows how to use the ``simd`` module to accelerate
-
-..  toctree::
-    :maxdepth: 3
-
-    simd/basic_usage
-    simd/vectorized_code
 
 
 hash guidance
@@ -63,3 +60,14 @@ unicode
     :maxdepth: 3
 
     profiling/unicode
+
+simd guidance
+==================================
+
+This tutorial shows how to use the ``simd`` module to accelerate
+
+..  toctree::
+    :maxdepth: 3
+
+    simd/basic_usage
+    simd/vectorized_code
