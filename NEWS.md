@@ -28,6 +28,8 @@ bug fix
 --------------------------------
 
 * atexit and thread_atexit will cause a crash when main thread and the variable already destructed.
+* fix gcc12 compile error for <string> not directly included in hash engine
+* fix gcc12 compile error for <cstddef> not directly included in compress tuple
 
 v0.9.39 - v0.9.43
 ================================
