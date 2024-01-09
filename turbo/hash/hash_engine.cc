@@ -16,8 +16,9 @@
 
 namespace turbo {
 
-    std::map<std::string, hash_engine_type> engine_map = {
+    std::map<std::string, hash_engine_type> engine_map = std::map<std::string, hash_engine_type>{
             {"bytes", hash_engine_type::bytes_hash},
             {"m3", hash_engine_type::m3_hash},
-            {"xx", hash_engine_type::xx_hash}};
+            {"xx", hash_engine_type::xx_hash}
+    };
 }  // namespace turbo

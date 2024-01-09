@@ -32,7 +32,7 @@
 
 namespace {
 
-    using testing::starts_with;
+    using testing::StartsWith;
 
 #if GTEST_HAS_DEATH_TEST
 
@@ -116,7 +116,7 @@ namespace {
         std::getline(error_output, error_line);
         EXPECT_THAT(
                 error_line,
-                starts_with(turbo::format(
+                StartsWith(turbo::format(
                         "*** {} received at ", turbo::debugging_internal::FailureSignalToString(signo))));
 
         // On platforms where it is possible to get the current CPU, the
@@ -127,7 +127,7 @@ namespace {
 
         if (turbo::debugging_internal::StackTraceWorksForTest()) {
             std::getline(error_output, error_line);
-            EXPECT_THAT(error_line, starts_with("PC: "));
+            EXPECT_THAT(error_line, StartsWith("PC: "));
         }
     }
 

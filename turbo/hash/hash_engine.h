@@ -24,6 +24,7 @@
 #include "turbo/hash/m3/m3.h"
 #include "turbo/hash/xx/xx.h"
 #include <map>
+#include <string>
 
 namespace turbo {
 
