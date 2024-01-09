@@ -11,10 +11,18 @@ addition
 * add temp file for temporary file operation.
 * add iobuf for io buffer operation, which is a buffer for file and network io.
 * add virtual zero copy stream for zero copy operation.
+* add zero copy stream for zero copy operation.
+* add zero copy iobuf for io operations, both network and file.
+* add temp file for temporary file operation.
+* add Filesystem Adaptor for file system operation. using can define it own tag Adaptors, and 
+  using Filesystem<Tag> for a unified interface. default tag is system filesystem, eg some case, user
+  may define the it based on rocksdb with kv, my define  a rocks_kv_tag, and using Filesystem<rocks_kv_tag>
+  to access.
 
 feature improvement
 --------------------------------
 * tidy file descriptor operation to file io module.
+* promote the sequential write file io, avoid c-style file cache.
 
 bug fix
 --------------------------------
