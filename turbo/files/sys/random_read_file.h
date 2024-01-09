@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TURBO_FILES_RANDOM_READ_FILE_H_
-#define TURBO_FILES_RANDOM_READ_FILE_H_
+#ifndef TURBO_FILES_SYS_RANDOM_READ_FILE_H_
+#define TURBO_FILES_SYS_RANDOM_READ_FILE_H_
 
 #include "turbo/base/result_status.h"
-#include "turbo/files/filesystem.h"
+#include "turbo/files/internal/filesystem.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/cord.h"
 #include "turbo/files/file_event_listener.h"
 #include "turbo/files/file_option.h"
-#include "turbo/files/fio.h"
+#include "turbo/files/fwd.h"
 
 namespace turbo {
 
@@ -58,13 +57,13 @@ namespace turbo {
      *    file.close();
      * @endcode
      */
-    class RandomReadFile {
+    class RandomReadFile :public  RandomAccessFileReader {
     public:
         RandomReadFile() = default;
 
         explicit RandomReadFile(const FileEventListener &listener);
 
-        ~RandomReadFile();
+        ~RandomReadFile() override;
 
         /**
          * @brief open file with path and option specified by user.
@@ -72,7 +71,7 @@ namespace turbo {
          * @param path file path
          * @param option file option
          */
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept;
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept override;
 
         /**
          * @brief read file content from offset to the specified length.
@@ -82,7 +81,7 @@ namespace turbo {
          *          size, the file content will be read from offset to the end of the file.
          * @return the length of the file content read and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(size_t offset, std::string *content, size_t n = npos);
+        [[nodiscard]] turbo::ResultStatus<size_t> read(off_t offset, std::string *content, size_t n = kInfiniteFileSize) override;
 
         /**
          * @brief read file content from offset to the specified length.
@@ -92,7 +91,7 @@ namespace turbo {
          *          size, the file content will be read from offset to the end of the file.
          * @return the length of the file content read and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(size_t offset, turbo::Cord *buf, size_t n = npos);
+        [[nodiscard]] turbo::ResultStatus<size_t> read(off_t offset, turbo::IOBuf *buf, size_t n = kInfiniteFileSize) override;
 
         /**
          * @brief read file content from offset to the specified length.
@@ -104,26 +103,16 @@ namespace turbo {
          *            in the result.
          * @return the length of the file content read and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(size_t offset, void *buff, size_t len);
+        [[nodiscard]] turbo::ResultStatus<size_t> read(off_t offset, void *buff, size_t len) override;
 
         /**
          * @brief close file.
          */
-        void close();
-
-        /**
-         * @brief get file path.
-         * @return file path.
-         */
-        [[nodiscard]]
-        const turbo::filesystem::path &path() const { return _file_path; }
+        void close() override;
 
     private:
         // no lint
         TURBO_NON_COPYABLE(RandomReadFile);
-
-        static const size_t npos = std::numeric_limits<size_t>::max();
-        std::FILE *_fp{nullptr};
         int        _fd;
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;
@@ -132,4 +121,4 @@ namespace turbo {
 
 } // namespace turbo
 
-#endif  // TURBO_FILES_RANDOM_READ_FILE_H_
+#endif  // TURBO_FILES_SYS_RANDOM_READ_FILE_H_

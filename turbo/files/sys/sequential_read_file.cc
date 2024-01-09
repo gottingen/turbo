@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#include "turbo/files/sequential_read_file.h"
-#include "turbo/files/fio.h"
+#include "turbo/files/sys/sequential_read_file.h"
+#include "turbo/files/sys/sys_io.h"
 #include "turbo/base/casts.h"
 #include "turbo/log/logging.h"
 #include <cerrno>
@@ -44,11 +44,11 @@ namespace turbo {
         }
 
         for (int tries = 0; tries < _option.open_tries; ++tries) {
-            auto rs = Fio::file_open_read(_file_path, "rb", _option);
+            auto rs = turbo::sys_io::open_read(_file_path, "rb", _option);
             if (rs.ok()) {
-                _fp = rs.value();
+                _fd = rs.value();
                 if (_listener.after_open) {
-                    _listener.after_open(_file_path, _fp);
+                    _listener.after_open(_file_path, _fd);
                 }
                 return turbo::ok_status();
             }
@@ -60,95 +60,82 @@ namespace turbo {
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(void *buff, size_t len) {
-        if (_fp == nullptr) {
-            return turbo::unavailable_error("file not open for read yet");
-        }
-        if(len == 0) {
+        INVALID_FD_RETURN(_fd);
+        if (len == 0) {
             return 0;
         }
         size_t has_read = 0;
         char *pdata = static_cast<char *>(buff);
-        while (has_read < len && !std::feof(_fp)) {
-            auto n = std::fread(pdata + static_cast<std::ptrdiff_t>(has_read), 1, len - has_read, _fp);
-            if (std::ferror(_fp)) {
+        while (has_read < len) {
+            auto left = len - has_read;
+            auto n = ::read(_fd, pdata + static_cast<std::ptrdiff_t>(has_read), left);
+            if (n < 0) {
                 return turbo::errno_to_status(errno, "");
             }
+            _position += n;
             has_read += n;
+            if (n < left) {
+                break;
+            }
+
         };
-        if(has_read == 0) {
+        if (has_read == 0) {
             return turbo::reach_file_end_error("");
         }
         return has_read;
     }
 
     turbo::ResultStatus<size_t> SequentialReadFile::read(std::string *content, size_t n) {
-        if (_fp == nullptr) {
-            return turbo::unavailable_error("file not open for read yet");
-        }
+        INVALID_FD_RETURN(_fd);
         size_t len = n;
-        if(len == npos) {
-            auto r = Fio::file_size(_fp);
-            if(!r.ok()) {
+        if (len == kInfiniteFileSize) {
+            auto r = turbo::sys_io::file_size(_fd);
+            if (!r.ok()) {
                 return r;
             }
             len = r.value();
         }
         auto pre_len = content->size();
         content->resize(pre_len + len);
-        char* pdata = content->data() + pre_len;
+        char *pdata = content->data() + pre_len;
         auto rs = read(pdata, len);
-        if(!rs.ok()) {
+        if (!rs.ok()) {
             content->resize(pre_len);
             return rs;
         }
         content->resize(pre_len + rs.value());
+        _position += rs.value();
         return rs.value();
     }
 
-    turbo::ResultStatus<size_t> SequentialReadFile::read(turbo::Cord *buf, size_t n) {
-        if (_fp == nullptr) {
-            return turbo::unavailable_error("file not open for read yet");
-        }
+    turbo::ResultStatus<size_t> SequentialReadFile::read(turbo::IOBuf *buf, size_t n) {
+        INVALID_FD_RETURN(_fd);
         size_t len = n;
-        if(len == npos) {
-            auto r = Fio::file_size(_fp);
-            if(!r.ok()) {
+        if (len == kInfiniteFileSize) {
+            auto r = turbo::sys_io::file_size(_fd);
+            if (!r.ok()) {
                 return r;
             }
             len = r.value();
         }
-        bool first = true;
-        size_t has_read = 0;
-        while(has_read < len) {
-            CordBuffer buffer = first ? buf->get_append_buffer(len) : CordBuffer::CreateWithDefaultLimit(len - has_read);
-            turbo::Span<char> slice = buffer.available_up_to(len - has_read);
-            auto rs = read(slice.data(), slice.size());
-            if(!rs.ok()) {
-                if(turbo::is_reach_file_end(rs.status())) {
-                    break;
-                }
-                return rs;
-            }
-            first = false;
-            buf->append(std::move(buffer));
-            has_read += rs.value();
+        IOPortal portal;
+        auto r = portal.append_from_file_descriptor(_fd, len);
+        if (!r.ok()) {
+            return r;
         }
-        // any data read from file yet, it already reach end last time
-        if(has_read == 0) {
-            return turbo::reach_file_end_error("");
-        }
-
-        return has_read;
+        _position += r.value();
+        buf->append(IOBuf::Movable(portal));
+        return r.value();
     }
 
     void SequentialReadFile::close() {
-        if (_fp != nullptr) {
+        if (_fd > 0) {
             if (_listener.before_close) {
-                _listener.before_close(_file_path, _fp);
+                _listener.before_close(_file_path, _fd);
             }
 
-            std::fclose(_fp);
-            _fp = nullptr;
+            ::close(_fd);
+            _fd = INVALID_FILE_HANDLER;
 
             if (_listener.after_close) {
                 _listener.after_close(_file_path);
@@ -157,18 +144,23 @@ namespace turbo {
     }
 
     turbo::Status SequentialReadFile::skip(off_t n) {
-        if (_fp != nullptr) {
-            std::fseek(_fp, implicit_cast<off_t>(n), SEEK_CUR);
-        }
+        INVALID_FD_RETURN(_fd);
+
+        ::lseek(_fd, implicit_cast<off_t>(n), SEEK_CUR);
         return turbo::ok_status();
     }
 
-    turbo::ResultStatus<bool> SequentialReadFile::is_eof() {
-        auto ret = std::feof(_fp);
-        if(ret < 0) {
+    turbo::ResultStatus<bool> SequentialReadFile::is_eof() const {
+        INVALID_FD_RETURN(_fd);
+        auto fp = fdopen(_fd, "rb");
+        if (fp == nullptr) {
             return turbo::errno_to_status(errno, turbo::format("test file eof {}", _file_path.c_str()));
         }
-        return ret == 0;
+        auto ret = ::feof(fp);
+        if (ret < 0) {
+            return turbo::errno_to_status(errno, turbo::format("test file eof {}", _file_path.c_str()));
+        }
+        return ret;
     }
 
 } // namespace turbo

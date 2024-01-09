@@ -12,15 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#include "turbo/files/random_read_file.h"
-#include "turbo/files/fio.h"
+#include "turbo/files/sys/random_read_file.h"
 #include "turbo/base/casts.h"
+#include "turbo/files/sys/sys_io.h"
+#include "turbo/files/io.h"
 #include "turbo/log/logging.h"
+#include "turbo/times/clock.h"
+#include "turbo/times/time.h"
+#include "turbo/base/result_status.h"
+#include "turbo/base/status.h"
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <cstddef>
 #include <fcntl.h>
 #include <unistd.h>
+#include <utility>
 
 namespace turbo {
 
@@ -46,13 +53,12 @@ namespace turbo {
         }
 
         for (int tries = 0; tries < _option.open_tries; ++tries) {
-            auto rs = Fio::file_open_read(_file_path, "rb", _option);
+            auto rs = turbo::sys_io::open_read(_file_path, "rb", _option);
             if (rs.ok()) {
-                _fp = rs.value();
+                _fd = rs.value();
                 if (_listener.after_open) {
-                    _listener.after_open(_file_path, _fp);
+                    _listener.after_open(_file_path, _fd);
                 }
-                _fd = fileno(_fp);
                 return turbo::ok_status();
             }
             if (_option.open_interval > 0) {
@@ -62,10 +68,8 @@ namespace turbo {
         return turbo::errno_to_status(errno, turbo::format("Failed opening file {} for reading", _file_path.c_str()));
     }
 
-    turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, void *buff, size_t len) {
-        if (_fp == nullptr) {
-            return turbo::unavailable_error("file not open for read yet");
-        }
+    turbo::ResultStatus<size_t> RandomReadFile::read(off_t offset, void *buff, size_t len) {
+        INVALID_FD_RETURN(_fd);
         size_t has_read = 0;
         /// _fd may > 0 with _fp valid
         ssize_t read_size = ::pread(_fd, buff, len, static_cast<off_t>(offset));
@@ -76,13 +80,11 @@ namespace turbo {
         return has_read;
     }
 
-    turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, std::string *content, size_t n) {
-        if (_fp == nullptr) {
-            return turbo::unavailable_error("file not open for read yet");
-        }
+    turbo::ResultStatus<size_t> RandomReadFile::read(off_t offset, std::string *content, size_t n) {
+        INVALID_FD_RETURN(_fd);
         size_t len = n;
-        if(len == npos) {
-            auto r = Fio::file_size(_fp);
+        if(len == kInfiniteFileSize) {
+            auto r = turbo::sys_io::file_size(_fd);
             if(!r.ok()) {
                 return r;
             }
@@ -100,38 +102,34 @@ namespace turbo {
         return rs.value();
     }
 
-    turbo::ResultStatus<size_t> RandomReadFile::read(size_t offset, turbo::Cord *buf, size_t n) {
-        if (_fp == nullptr) {
-            return turbo::unavailable_error("file not open for read yet");
-        }
+    turbo::ResultStatus<size_t> RandomReadFile::read(off_t offset, turbo::IOBuf *buf, size_t n) {
+        INVALID_FD_RETURN(_fd);
         size_t len = n;
-        if(len == npos) {
-            auto r = Fio::file_size(_fp);
+        if(len == kInfiniteFileSize) {
+            auto r = turbo::sys_io::file_size(_fd);
             if(!r.ok()) {
                 return r;
             }
             len = r.value();
         }
-        auto slice = buf->get_append_buffer(len);
-        auto rs = read(offset, slice.data(), len);
+        IOPortal portal;
+        auto rs = portal.pappend_from_file_descriptor(_fd, offset, len);
         if(!rs.ok()) {
             return rs;
         }
-        slice.SetLength(rs.value());
-        buf->append(std::move(slice));
+        buf->append(std::move(portal));
 
         return rs.value();
     }
 
     void RandomReadFile::close() {
-        _fd = -1;
-        if (_fp != nullptr) {
+        if (_fd != INVALID_FILE_HANDLER) {
             if (_listener.before_close) {
-                _listener.before_close(_file_path, _fp);
+                _listener.before_close(_file_path, _fd);
             }
 
-            std::fclose(_fp);
-            _fp = nullptr;
+            ::close(_fd);
+            _fd = INVALID_FILE_HANDLER;
 
             if (_listener.after_close) {
                 _listener.after_close(_file_path);

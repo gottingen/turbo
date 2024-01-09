@@ -1,5 +1,5 @@
-// Copyright 2023 The Turbo Authors.
-//
+// Copyright 2023 The Elastic-AI Authors.
+// part of Elastic AI Search
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -12,22 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+//
+// Created by jeff on 24-1-9.
+//
 
-#pragma once
+#ifndef TURBO_FILES_INTERNAL_FWD_H_
+#define TURBO_FILES_INTERNAL_FWD_H_
 
 #include <cstddef>
-#include <string>
+#include <limits>
 
-std::size_t count_files(const std::string &folder);
+namespace turbo {
 
-void prepare_logdir();
+#if defined(TURBO_PLATFORM_LINUX)
+    typedef int FILE_HANDLER;
+    static constexpr FILE_HANDLER INVALID_FILE_HANDLER = -1;
+#elif defined(TURBO_PLATFORM_WINDOWS)
 
-std::string file_contents(const std::string &filename);
+#endif
 
-std::size_t count_lines(const std::string &filename, bool dump = false);
+    static constexpr size_t kInfiniteFileSize = std::numeric_limits<size_t>::max();
 
-void require_message_count(const std::string &filename, const std::size_t messages);
+}  // namespace turbo
 
-std::size_t get_filesize(const std::string &filename);
-
-bool ends_with(std::string const &value, std::string const &ending);
+#endif  // TURBO_FILES_INTERNAL_FWD_H_

@@ -20,12 +20,11 @@
 #define TURBO_FILES_RANDOM_WRITE_FILE_H_
 
 #include "turbo/base/result_status.h"
-#include "turbo/files/filesystem.h"
+#include "turbo/files/internal/filesystem.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/cord.h"
 #include "turbo/files/file_event_listener.h"
 #include "turbo/files/file_option.h"
-#include "turbo/files/fio.h"
+#include "turbo/files/fwd.h"
 
 namespace turbo {
 
@@ -69,7 +68,7 @@ namespace turbo {
      *       file.close();
      * @endcode
      */
-    class RandomWriteFile {
+    class RandomWriteFile : public  RandomFileWriter {
     public:
 
         RandomWriteFile() = default;
@@ -78,14 +77,7 @@ namespace turbo {
 
         ///
 
-        ~RandomWriteFile();
-
-        /**
-         * @brief set_option set file option before open file.
-         *        default option is FileOption::kDefault.
-         *        If you want to set the file option, you must call this function before open file.
-         */
-        void set_option(const FileOption &option);
+        ~RandomWriteFile() override;
 
         /**
          * @brief open file with path and option specified by user.
@@ -97,9 +89,7 @@ namespace turbo {
          * @param truncate truncate file if true, default is false.
          * @return the status of the operation. If the file is opened successfully, the status is OK.
          */
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &fname,
-                           bool truncate = false);
-
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, bool truncate = false,const turbo::FileOption &option = FileOption::kDefault) noexcept override;
         /**
          * @brief reopen file with path and option specified by user.
          *        The option can be set by set_option function. @see set_option.
@@ -120,7 +110,7 @@ namespace turbo {
          *        If set to true, the file will be truncated to the length + offset.
          * @return the status of the operation.
          */
-        [[nodiscard]] turbo::Status write(size_t offset,const char *data, size_t size, bool truncate = false);
+        [[nodiscard]] turbo::Status write(off_t offset,const void *data, size_t size, bool truncate = false) override;
 
         /**
          * @brief write file content from offset to the specified length.
@@ -130,10 +120,12 @@ namespace turbo {
          *       If set to true, the file will be truncated to the str.size() + offset.
          * @return the status of the operation.
          */
-        [[nodiscard]] turbo::Status write(size_t offset, std::string_view str, bool truncate = false) {
+        [[nodiscard]] turbo::Status write(off_t offset, std::string_view str, bool truncate = false) override {
             return write(offset, str.data(), str.size(), truncate);
         }
 
+        [[nodiscard]] turbo::Status
+        write(off_t offset, const turbo::IOBuf &buff, bool truncate = false) override;
         /**
          * @brief truncate file to the specified length.
          * @param size [input] file length.
@@ -145,7 +137,7 @@ namespace turbo {
          * @brief get file size.
          * @return the file size and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> size() const;
+        [[nodiscard]] turbo::ResultStatus<size_t> size() const override;
 
         /**
          * @brief close file.
@@ -167,7 +159,6 @@ namespace turbo {
 
     private:
         static const size_t npos = std::numeric_limits<size_t>::max();
-        std::FILE *_fp{nullptr};
         int        _fd{-1};
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;

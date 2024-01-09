@@ -18,7 +18,8 @@
 
 #include <functional>
 #include <cstdio>
-#include "turbo/files/filesystem.h"
+#include "turbo/files/internal/filesystem.h"
+#include "turbo/files/internal/fwd.h"
 
 namespace turbo {
 
@@ -34,8 +35,8 @@ namespace turbo {
                 : before_open(nullptr), after_open(nullptr), before_close(nullptr), after_close(nullptr) {}
 
         std::function<void(const turbo::filesystem::path &filename)> before_open;
-        std::function<void(const turbo::filesystem::path &filename, std::FILE *file_stream)> after_open;
-        std::function<void(const turbo::filesystem::path &filename, std::FILE *file_stream)> before_close;
+        std::function<void(const turbo::filesystem::path &filename, FILE_HANDLER handler)> after_open;
+        std::function<void(const turbo::filesystem::path &filename, FILE_HANDLER file_stream)> before_close;
         std::function<void(const turbo::filesystem::path &filename)> after_close;
     };
 }  // namespace

@@ -16,8 +16,7 @@
 #pragma once
 
 #include "turbo/log/common.h"
-#include "turbo/files/sequential_write_file.h"
-#include "turbo/files/utility.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/format/format.h>
 #include <turbo/format/fmt/chrono.h>
@@ -43,7 +42,7 @@ namespace turbo::tlog {
             // Create filename for the form basename.YYYY-MM-DD
             static filename_t calc_filename(const filename_t &filename, const tm &now_tm) {
                 filename_t basename, ext;
-                std::tie(basename, ext) = turbo::FileUtility::split_by_extension(filename);
+                std::tie(basename, ext) = turbo::split_by_extension(filename);
                 return fmt_lib::format(FMT_STRING(TLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}{}")), basename,
                                        now_tm.tm_year + 1900,
                                        now_tm.tm_mon + 1, now_tm.tm_mday, ext);
@@ -106,8 +105,7 @@ namespace turbo::tlog {
 
                 auto now = log_clock::now();
                 auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(now));
-                file_writer_.set_option(kLogFileOption);
-                auto r = file_writer_.open(filename, truncate_);
+                auto r = file_writer_.open(filename, truncate_,kLogFileOption);
                 if(!r.ok()) {
                     throw_tlog_ex(r.to_string());
                 }
@@ -129,8 +127,7 @@ namespace turbo::tlog {
                 bool should_rotate = time >= rotation_tp_;
                 if (should_rotate) {
                     auto filename = FileNameCalc::calc_filename(base_filename_, now_tm(time));
-                    file_writer_.set_option(kLogFileOption);
-                    auto r = file_writer_.open(filename, truncate_);
+                    auto r = file_writer_.open(filename, truncate_, kLogFileOption);
                     if(!r.ok()) {
                         throw_tlog_ex(r.to_string());
                     }

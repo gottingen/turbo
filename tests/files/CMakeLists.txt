@@ -69,3 +69,15 @@ carbin_cc_test(
         DEPS
         turbo::turbo
 )
+
+carbin_cc_test(
+        NAME
+        iobuf_test
+        SOURCES
+        "iobuf_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        "-fno-access-control"
+        DEPS
+        turbo::turbo
+)

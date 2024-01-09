@@ -46,7 +46,7 @@ std::string file_contents(const std::string &filename)
     return std::string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 }
 
-std::size_t count_lines(const std::string &filename)
+std::size_t count_lines(const std::string &filename, bool dump)
 {
     std::ifstream ifs(filename);
     if (!ifs)
@@ -56,8 +56,12 @@ std::size_t count_lines(const std::string &filename)
 
     std::string line;
     size_t counter = 0;
-    while (std::getline(ifs, line))
+    while (std::getline(ifs, line)) {
+        if(dump) {
+            turbo::println(line);
+        }
         counter++;
+    }
     return counter;
 }
 

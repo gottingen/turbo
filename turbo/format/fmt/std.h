@@ -26,7 +26,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "turbo/strings/match.h"
-#include "turbo/files/filesystem.h"
 #include "ostream.h"
 
 // GCC 4 does not support TURBO_HAVE_INCLUDE.
@@ -39,60 +38,6 @@
 #    define FMT_HAS_ABI_CXA_DEMANGLE
 #  endif
 #endif
-
-namespace turbo {
-
-    namespace fmt_detail {
-
-        template<typename Char>
-        void write_escaped_path(basic_memory_buffer<Char> &quoted,
-                                const turbo::filesystem::path &p) {
-            write_escaped_string<Char>(std::back_inserter(quoted), p.string<Char>());
-        }
-
-#  ifdef _WIN32
-        template <>
-        inline void write_escaped_path<char>(memory_buffer& quoted,
-                                             const std::filesystem::path& p) {
-          auto buf = basic_memory_buffer<wchar_t>();
-          write_escaped_string<wchar_t>(std::back_inserter(buf), p.native());
-          // Convert UTF-16 to UTF-8.
-          if (!unicode_to_utf8<wchar_t>::convert(quoted, {buf.data(), buf.size()}))
-            FMT_THROW(std::runtime_error("invalid utf16"));
-        }
-#  endif
-
-        template<>
-        inline void write_escaped_path<turbo::filesystem::path::value_type>(
-                basic_memory_buffer<turbo::filesystem::path::value_type> &quoted,
-                const turbo::filesystem::path &p) {
-            write_escaped_string<turbo::filesystem::path::value_type>(
-                    std::back_inserter(quoted), p.native());
-        }
-
-    }  // namespace fmt_detail
-
-    template<typename Char>
-    struct formatter<turbo::filesystem::path, Char>
-            : formatter<std::basic_string_view<Char>> {
-        template<typename ParseContext>
-        constexpr auto parse(ParseContext &ctx) {
-            auto out = formatter<std::basic_string_view<Char>>::parse(ctx);
-            this->set_debug_format(false);
-            return out;
-        }
-
-        template<typename FormatContext>
-        auto format(const turbo::filesystem::path &p, FormatContext &ctx) const ->
-        typename FormatContext::iterator {
-            auto quoted = basic_memory_buffer<Char>();
-            fmt_detail::write_escaped_path(quoted, p);
-            return formatter<std::basic_string_view<Char>>::format(
-                    std::basic_string_view<Char>(quoted.data(), quoted.size()), ctx);
-        }
-    };
-
-}  // namespace turbo
 
 namespace turbo {
     template<typename Char>

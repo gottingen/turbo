@@ -16,11 +16,11 @@
 #define TURBO_FILES_SEQUENTIAL_READ_FILE_H_
 
 #include "turbo/base/result_status.h"
-#include "turbo/files/filesystem.h"
+#include "turbo/files/internal/filesystem.h"
 #include "turbo/platform/port.h"
-#include "turbo/strings/cord.h"
 #include "turbo/files/file_event_listener.h"
 #include "turbo/files/file_option.h"
+#include "turbo/files/fwd.h"
 
 namespace turbo {
 
@@ -54,13 +54,13 @@ namespace turbo {
      *     file.close();
      * @endcode
      */
-    class SequentialReadFile {
+    class SequentialReadFile : public SequentialFileReader {
     public:
         SequentialReadFile() = default;
 
         explicit SequentialReadFile(const FileEventListener &listener);
 
-        ~SequentialReadFile();
+        ~SequentialReadFile() override;
 
         /**
          * @brief open file with path and option specified by user.
@@ -68,7 +68,7 @@ namespace turbo {
          * @param path file path
          * @param option file option
          */
-        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept;
+        [[nodiscard]] turbo::Status open(const turbo::filesystem::path &path, const turbo::FileOption &option = FileOption::kDefault) noexcept override;
 
         /**
          * @brief read file content sequentially from the current position to the specified length.
@@ -77,7 +77,7 @@ namespace turbo {
          *          size, the file content will be read from the current position to the end of the file.
          * @return the length of the file content read and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(std::string *content, size_t n = npos);
+        [[nodiscard]] turbo::ResultStatus<size_t> read(std::string *content, size_t n = kInfiniteFileSize) override;
 
         /**
          * @brief read file content sequentially from the current position to the specified length.
@@ -86,7 +86,7 @@ namespace turbo {
          *          size, the file content will be read from the current position to the end of the file.
          * @return the length of the file content read and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(turbo::Cord *buf, size_t n = npos);
+        [[nodiscard]] turbo::ResultStatus<size_t> read(turbo::IOBuf *buf, size_t n = kInfiniteFileSize) override;
 
 
         /**
@@ -97,7 +97,7 @@ namespace turbo {
          *        If the length is less than the file size, the file content will be read from the current position to the length.
          * @return the length of the file content read and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> read(void *buff, size_t len);
+        [[nodiscard]] turbo::ResultStatus<size_t> read(void *buff, size_t len) override;
 
         /**
          * @brief skip file descriptor sequentially from the current position to the position specified by offset.
@@ -105,18 +105,20 @@ namespace turbo {
          * @param n [input] skip length, if n + current position is greater than the file size, the current position will be set to the end of the file.
          * @return the status of the operation.
          */
-        [[nodiscard]] turbo::Status skip(off_t n);
+        [[nodiscard]] turbo::Status skip(off_t n) override;
 
         /**
          * @brief if the current position is the end of the file, return true, otherwise return false.
          * @return the status of the operation.
          */
-        turbo::ResultStatus<bool> is_eof();
+        turbo::ResultStatus<bool> is_eof() const override;
 
         /**
          * @brief close file.
          */
-        void close();
+        void close() override;
+
+        size_t position() const override;
 
         /**
          * @brief get file path.
@@ -128,12 +130,17 @@ namespace turbo {
         // no lint
         TURBO_NON_COPYABLE(SequentialReadFile);
 
-        static const size_t npos = std::numeric_limits<size_t>::max();
-        std::FILE *_fp{nullptr};
+        FILE_HANDLER _fd{INVALID_FILE_HANDLER};
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;
         FileEventListener _listener;
+        size_t _position{0};
     };
+
+    /// inline functions
+    inline size_t SequentialReadFile::position() const {
+        return _position;
+    }
 
 } // namespace turbo
 

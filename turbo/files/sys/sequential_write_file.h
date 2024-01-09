@@ -16,11 +16,10 @@
 #define TURBO_FILES_SEQUENTIAL_WRITE_FILE_H_
 
 #include "turbo/base/result_status.h"
-#include "turbo/files/filesystem.h"
-#include "turbo/strings/cord.h"
-#include "turbo/files/file_event_listener.h"
+#include "turbo/files/internal/filesystem.h"
 #include "turbo/files/file_option.h"
 #include "turbo/format/format.h"
+#include "turbo/files/fwd.h"
 
 namespace turbo {
 
@@ -54,7 +53,7 @@ namespace turbo {
      *      // or use RAII.
      * @endcode
      */
-    class SequentialWriteFile {
+    class SequentialWriteFile : public SequentialFileWriter {
     public:
         SequentialWriteFile() = default;
 
@@ -68,13 +67,6 @@ namespace turbo {
         ~SequentialWriteFile();
 
         /**
-         * @brief set_option set file option before open file.
-         *        default option is FileOption::kDefault.
-         *        If you want to set the file option, you must call this function before open file.
-         */
-        void set_option(const FileOption &option);
-
-        /**
          * @brief open file with path and option specified by user.
          *        The option can be set by set_option function. @see set_option.
          *        If the file does not exist, it will be created.
@@ -86,7 +78,7 @@ namespace turbo {
          */
 
         [[nodiscard]] turbo::Status open(const turbo::filesystem::path &fname,
-                           bool truncate = false);
+                           bool truncate = false, const turbo::FileOption &option = FileOption::kDefault) noexcept override;
 
         /**
          * @brief reopen file with path and option specified by user.
@@ -106,7 +98,7 @@ namespace turbo {
          * @param size [input] write length.
          * @return the status of the operation.
          */
-        [[nodiscard]] turbo::Status write(const char *data, size_t size);
+        [[nodiscard]] turbo::Status write(const void *buff, size_t size) override;
 
         /**
          * @brief write file content to the end of the file.
@@ -116,6 +108,8 @@ namespace turbo {
         [[nodiscard]] turbo::Status write(std::string_view str) {
             return write(str.data(), str.size());
         }
+
+        [[nodiscard]] turbo::Status write(const turbo::IOBuf &buff) override;
 
         /**
          * @brief write file content to the end of the file.
@@ -132,18 +126,18 @@ namespace turbo {
          * @param size [input] file length.
          * @return the status of the operation.
          */
-        [[nodiscard]] turbo::Status truncate(size_t size);
+        [[nodiscard]] turbo::Status truncate(size_t size) override;
 
         /**
          * @brief get file size.
          * @return the file size and the status of the operation.
          */
-        [[nodiscard]] turbo::ResultStatus<size_t> size() const;
+        [[nodiscard]] turbo::ResultStatus<size_t> size() const override;
 
         /**
          * @brief close file.
          */
-        void close();
+        void close() override;
 
         /**
          * @brief flush file.
@@ -159,7 +153,7 @@ namespace turbo {
 
     private:
         static const size_t npos = std::numeric_limits<size_t>::max();
-        std::FILE *_fd{nullptr};
+        FILE_HANDLER  _fd{INVALID_FILE_HANDLER};
         turbo::filesystem::path _file_path;
         turbo::FileOption _option;
         FileEventListener _listener;

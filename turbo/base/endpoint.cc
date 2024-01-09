@@ -14,7 +14,7 @@
 //
 
 #include "turbo/base/endpoint.h"
-#include "turbo/base/fd_guard.h"
+#include "turbo/files/io.h"
 #include "turbo/base/internal/endpoint_internal.h"
 
 namespace turbo {
@@ -358,7 +358,7 @@ namespace turbo {
         if (endpoint2sockaddr(point, &serv_addr, &serv_addr_size) != 0) {
             return -1;
         }
-        fd_guard sockfd(socket(serv_addr.ss_family, SOCK_STREAM, 0));
+        FDGuard sockfd(socket(serv_addr.ss_family, SOCK_STREAM, 0));
         if (sockfd < 0) {
             return -1;
         }
@@ -388,7 +388,7 @@ namespace turbo {
         if (endpoint2sockaddr(point, &serv_addr, &serv_addr_size) != 0) {
             return -1;
         }
-        fd_guard sockfd(socket(serv_addr.ss_family, SOCK_STREAM, 0));
+        FDGuard sockfd(socket(serv_addr.ss_family, SOCK_STREAM, 0));
         if (sockfd < 0) {
             return -1;
         }

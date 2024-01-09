@@ -79,7 +79,7 @@ namespace turbo {
             detail::ThreadExitHelper* h =
                     (detail::ThreadExitHelper*)pthread_getspecific(detail::thread_atexit_key);
             if (h) {
-                pthread_setspecific(detail::thread_atexit_key, NULL);
+                pthread_setspecific(detail::thread_atexit_key, nullptr);
                 delete h;
             }
         }
@@ -99,9 +99,9 @@ namespace turbo {
 
             detail::ThreadExitHelper* h =
                     (detail::ThreadExitHelper*)pthread_getspecific(detail::thread_atexit_key);
-            if (NULL == h) {
+            if (nullptr == h) {
                 h = new (std::nothrow) detail::ThreadExitHelper;
-                if (NULL != h) {
+                if (nullptr != h) {
                     pthread_setspecific(detail::thread_atexit_key, h);
                 }
             }
@@ -120,7 +120,7 @@ namespace turbo {
     }  // namespace detail
 
     int thread_atexit(void (*fn)(void*), void* arg) {
-        if (NULL == fn) {
+        if (nullptr == fn) {
             errno = EINVAL;
             return -1;
         }
@@ -133,7 +133,7 @@ namespace turbo {
     }
 
     int thread_atexit(void (*fn)()) {
-        if (NULL == fn) {
+        if (nullptr == fn) {
             errno = EINVAL;
             return -1;
         }
@@ -141,7 +141,7 @@ namespace turbo {
     }
 
     void thread_atexit_cancel(void (*fn)(void*), void* arg) {
-        if (fn != NULL) {
+        if (fn != nullptr) {
             detail::ThreadExitHelper* h = detail::get_thread_exit_helper();
             if (h) {
                 h->remove(fn, arg);
@@ -150,7 +150,7 @@ namespace turbo {
     }
 
     void thread_atexit_cancel(void (*fn)()) {
-        if (NULL != fn) {
+        if (nullptr != fn) {
             thread_atexit_cancel(detail::call_single_arg_fn, (void*)fn);
         }
     }

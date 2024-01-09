@@ -282,15 +282,10 @@ namespace turbo {
     // case ensures that code will compile when new codes are added.
     static constexpr StatusCode kDoNotUseReservedForFutureExpansionUseDefaultInSwitchInstead_ = 100;
 
-    // StatusCodeToString()
+    // status_code_to_string()
     //
     // Returns the name for the status code, or "" if it is an unknown value.
-    std::string StatusCodeToString(StatusCode code);
-
-    // operator<<
-    //
-    // Streams StatusCodeToString(code) to `os`.
-    std::ostream &operator<<(std::ostream &os, StatusCode code);
+    std::string status_code_to_string(StatusCode code);
 
     // turbo::StatusToStringMode
     //

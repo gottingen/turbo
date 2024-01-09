@@ -1,6 +1,26 @@
 Release
 ==================================
 
+v0.9.43 -
+================================
+
+addition
+--------------------------------
+
+* add test for atexit, thread_atexit.
+* add temp file for temporary file operation.
+* add iobuf for io buffer operation, which is a buffer for file and network io.
+* add virtual zero copy stream for zero copy operation.
+
+feature improvement
+--------------------------------
+* tidy file descriptor operation to file io module.
+
+bug fix
+--------------------------------
+
+* atexit and thread_atexit will cause a crash when main thread and the variable already destructed.
+
 v0.9.39 - v0.9.43
 ================================
 

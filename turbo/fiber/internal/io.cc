@@ -21,7 +21,7 @@
 #include <atomic>
 #include "turbo/platform/port.h"
 #include "turbo/times/time.h"
-#include "turbo/base/fd_utility.h"                     // make_non_blocking
+#include "turbo/files/io.h"                     // make_non_blocking
 #include "turbo/log/logging.h"
 #include "turbo/hash/hash.h"   // fmix32
 #include "turbo/fiber/internal/waitable_event.h"

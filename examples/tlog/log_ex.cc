@@ -21,6 +21,7 @@
 #include "turbo/log/sinks/udp_sink.h"
 #include "turbo/log/logging.h"
 #include "turbo/times/stop_watcher.h"
+#include "turbo/files/filesystem.h"
 
 
 void load_levels_example();
@@ -397,17 +398,20 @@ void custom_flags_example() {
     // turbo::tlog::set_formatter(std::move(formatter));
 }
 
+
 void file_events_example() {
     // pass the turbo::tlog::turbo::FileEventListener to file sinks for open/close log file notifications
     turbo::FileEventListener handlers;
     handlers.before_open = [](turbo::tlog::filename_t filename) { turbo::tlog::info("Before opening {}", filename); };
-    handlers.after_open = [](turbo::tlog::filename_t filename, std::FILE *fstream) {
+    handlers.after_open = [](turbo::tlog::filename_t filename, int fstream) {
         turbo::tlog::info("After opening {}", filename);
-        fputs("After opening\n", fstream);
+        std::string str =  "After opening\n";
+        ::write(fstream,str.data(), str.size());
     };
-    handlers.before_close = [](turbo::tlog::filename_t filename, std::FILE *fstream) {
+    handlers.before_close = [](turbo::tlog::filename_t filename, turbo::FILE_HANDLER fd) {
         turbo::tlog::info("Before closing {}", filename);
-        fputs("Before closing\n", fstream);
+        std::string str =  "Before closing\n";
+        ::write(fd,str.data(), str.size());
     };
     handlers.after_close = [](turbo::tlog::filename_t filename) { turbo::tlog::info("After closing {}", filename); };
     auto file_sink = std::make_shared<turbo::tlog::sinks::basic_file_sink_mt>("logs/events-sample.txt", true, handlers);

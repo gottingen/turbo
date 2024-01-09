@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/files/sequential_write_file.h"
+#include "turbo/files/sys/sequential_write_file.h"
+#include "turbo/files/sys/sys_io.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <cerrno>
 #include <cstring>
 #include "turbo/base/casts.h"
-#include "turbo/files/fio.h"
 #include <iostream>
 #include "turbo/platform/port.h"
+#include "turbo/log/logging.h"
 
 namespace turbo {
 
@@ -32,12 +33,9 @@ namespace turbo {
         close();
     }
 
-    void SequentialWriteFile::set_option(const FileOption &option) {
-        _option = option;
-    }
-
-    turbo::Status SequentialWriteFile::open(const turbo::filesystem::path &fname, bool truncate) {
+    turbo::Status SequentialWriteFile::open(const turbo::filesystem::path &fname, bool truncate, const turbo::FileOption &option)  noexcept {
         close();
+        _option = option;
         _file_path = fname;
         TURBO_ASSERT(!_file_path.empty());
         auto *mode = "ab";
@@ -67,13 +65,13 @@ namespace turbo {
                 // opening the actual log-we-write-to in "ab" mode, since that
                 // interacts more politely with eternal processes that might
                 // rotate/truncate the file underneath us.
-                auto rs = Fio::file_open_write(_file_path, trunc_mode, _option);
+                auto rs = turbo::sys_io::open_write(_file_path, trunc_mode, _option);
                 if (!rs.ok()) {
                     continue;
                 }
-                std::fclose(rs.value());
+                ::close(rs.value());
             }
-            auto rs = Fio::file_open_write(_file_path, mode, _option);
+            auto rs = turbo::sys_io::open_write(_file_path, mode, _option);
             if (rs.ok()) {
                 _fd = rs.value();
                 if (_listener.after_open) {
@@ -96,30 +94,47 @@ namespace turbo {
         return open(_file_path, truncate);
     }
 
-    turbo::Status SequentialWriteFile::write(const char *data, size_t size) {
-        TURBO_ASSERT(_fd != nullptr);
-        if (std::fwrite(data, 1, size, _fd) != size) {
+    turbo::Status SequentialWriteFile::write(const void *data, size_t size) {
+        INVALID_FD_RETURN(_fd);
+        if (::write(_fd, data, size) != size) {
             return turbo::errno_to_status(errno, turbo::format("Failed writing to file {}", _file_path.c_str()));
         }
         return turbo::ok_status();
     }
 
-    turbo::ResultStatus<size_t> SequentialWriteFile::size() const {
-        if (_fd == nullptr) {
-            return turbo::invalid_argument_error("Failed getting file size. fp is null");
+    [[nodiscard]] turbo::Status SequentialWriteFile::write(const turbo::IOBuf &buff)  {
+        size_t size = buff.size();
+        IOBuf piece_data(buff);
+        ssize_t left = size;
+        while (left > 0) {
+            auto wrs = piece_data.cut_into_file_descriptor(_fd, left);
+            if (wrs.ok() && wrs.value() > 0) {
+                left -= wrs.value();
+            } else if (is_unavailable(wrs.status())) {
+                continue;
+            } else {
+                TLOG_WARN("write falied, err: {} fd: {} size: {}", wrs.status().to_string(), _fd, size);
+                return wrs.status();
+            }
         }
-        auto rs = Fio::file_size(_fd);
+
+        return turbo::ok_status();
+    }
+
+    turbo::ResultStatus<size_t> SequentialWriteFile::size() const {
+        INVALID_FD_RETURN(_fd);
+        auto rs = turbo::sys_io::file_size(_fd);
         return rs;
     }
 
     void SequentialWriteFile::close() {
-        if (_fd != nullptr) {
+        if (_fd != INVALID_FILE_HANDLER) {
             if (_listener.before_close) {
                 _listener.before_close(_file_path, _fd);
             }
 
-            std::fclose(_fd);
-            _fd = nullptr;
+            ::close(_fd);
+            _fd = INVALID_FILE_HANDLER;
 
             if (_listener.after_close) {
                 _listener.after_close(_file_path);
@@ -128,15 +143,12 @@ namespace turbo {
     }
 
     turbo::Status SequentialWriteFile::truncate(size_t size) {
-        if (_fd == nullptr) {
-            return turbo::invalid_argument_error("Failed getting file size. fp is null");
-        }
-        auto fd = ::fileno(_fd);
-        if (::ftruncate(fd, static_cast<off_t>(size)) != 0) {
+        INVALID_FD_RETURN(_fd);
+        if (::ftruncate(_fd, static_cast<off_t>(size)) != 0) {
             return turbo::errno_to_status(errno, turbo::format("Failed truncate file {} for size:{} ", _file_path.c_str(),
                                                              static_cast<off_t>(size)));
         }
-        if(std::fseek(_fd, static_cast<off_t>(size), SEEK_SET) != 0) {
+        if(::lseek(_fd, static_cast<off_t>(size), SEEK_SET) != 0) {
             return turbo::errno_to_status(errno, turbo::format("Failed seek file end {} for size:{} ", _file_path.c_str(),
                                                              static_cast<off_t>(size)));
         }
@@ -144,7 +156,8 @@ namespace turbo {
     }
 
     turbo::Status SequentialWriteFile::flush() {
-        if (std::fflush(_fd) != 0) {
+        INVALID_FD_RETURN(_fd);
+        if (::fsync(_fd) != 0) {
             return turbo::errno_to_status(errno,
                                         turbo::format("Failed flush to file {}", _file_path.c_str()));
         }

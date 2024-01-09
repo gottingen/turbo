@@ -13,4 +13,22 @@
 // limitations under the License.
 //
 
-#include "turbo/version.h"
+#ifndef TURBO_FILES_FWD_H_
+#define TURBO_FILES_FWD_H_
+
+#include "turbo/files/internal/filesystem.h"
+#include "turbo/base/result_status.h"
+#include "turbo/files/file_option.h"
+#include "turbo/files/file_event_listener.h"
+#include "turbo/files/internal/file_reader.h"
+#include "turbo/files/internal/file_writer.h"
+#include "turbo/files/internal/fwd.h"
+#include <cstddef>
+
+namespace turbo {
+
+    template<typename Tag>
+    struct FileAdapter;
+}  // namespace turbo
+
+#endif  // TURBO_FILES_FWD_H_

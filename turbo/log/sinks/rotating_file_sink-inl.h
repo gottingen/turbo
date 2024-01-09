@@ -18,8 +18,7 @@
 #include <turbo/log/sinks/rotating_file_sink.h>
 
 #include "turbo/log/common.h"
-#include "turbo/files/utility.h"
-#include "turbo/files/sequential_write_file.h"
+#include "turbo/files/filesystem.h"
 #include "turbo/log/details/null_mutex.h"
 #include <turbo/format/format.h>
 
@@ -46,8 +45,7 @@ namespace turbo::tlog {
             if (max_files > 200000) {
                 throw_tlog_ex("rotating sink constructor: max_files arg cannot exceed 200000");
             }
-            file_writer_.set_option(kLogFileOption);
-            auto r = file_writer_.open(calc_filename(base_filename_, 0));
+            auto r = file_writer_.open(calc_filename(base_filename_, 0), true, kLogFileOption);
             if (!r.ok()) {
                 throw_tlog_ex(r.to_string());
             }
@@ -71,7 +69,7 @@ namespace turbo::tlog {
             }
 
             filename_t basename, ext;
-            std::tie(basename, ext) = turbo::FileUtility::split_by_extension(filename);
+            std::tie(basename, ext) = turbo::split_by_extension(filename);
             return fmt_lib::format(TLOG_FILENAME_T("{}.{}{}"), basename, index, ext);
         }
 

@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef TURBO_BASE_FD_UTILITY_H_
-#define TURBO_BASE_FD_UTILITY_H_
+#ifndef TURBO_FILES_IO_FD_UTILITY_H_
+#define TURBO_FILES_IO_FD_UTILITY_H_
 
 namespace turbo {
 
@@ -37,4 +37,4 @@ namespace turbo {
 
 }  // namespace turbo
 
-#endif  // TURBO_BASE_FD_UTILITY_H_
+#endif  // TURBO_FILES_IO_FD_UTILITY_H_

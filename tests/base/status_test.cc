@@ -31,7 +31,7 @@ namespace {
         SUBCASE("registry")
         {
             const turbo::StatusCode code = 30;
-            REQUIRE_EQ(turbo::StatusCodeToString(code), "TEST_ERROR");
+            REQUIRE_EQ(turbo::status_code_to_string(code), "TEST_ERROR");
             turbo::Status s(30, "");
             REQUIRE_EQ(s.code(), 30);
             REQUIRE_EQ(s.raw_code(), 30);
@@ -58,7 +58,7 @@ namespace {
             std::ostringstream oss;
             oss << code;
             REQUIRE_EQ(oss.str(), "2");
-            REQUIRE_EQ(turbo::StatusCodeToString(code), "UNKNOWN");
+            REQUIRE_EQ(turbo::status_code_to_string(code), "UNKNOWN");
         }
     }
     // This structure holds the details for testing a single error code,
@@ -128,7 +128,7 @@ namespace {
     TEST_CASE("Status") {
         SUBCASE("CreateAndClassify") {
             for (const auto &test: kErrorTests) {
-                CAPTURE(turbo::StatusCodeToString(test.code));
+                CAPTURE(turbo::status_code_to_string(test.code));
 
                 // Ensure that the creator does, in fact, create status objects with the
                 // expected error code and message.

@@ -16,19 +16,21 @@
 // Created by jeff on 24-1-5.
 //
 
-#ifndef TURBO_BASE_FD_GUARD_H_
-#define TURBO_BASE_FD_GUARD_H_
+#ifndef TURBO_FILES_IO_FD_GUARD_H_
+#define TURBO_FILES_IO_FD_GUARD_H_
 
+#include "turbo/platform/port.h"
 #include <unistd.h>
+
 
 namespace turbo {
 
-    class fd_guard {
+    class FDGuard {
     public:
-        fd_guard() : _fd(-1) {}
-        explicit fd_guard(int fd) : _fd(fd) {}
+        FDGuard() : _fd(-1) {}
+        explicit FDGuard(int fd) : _fd(fd) {}
 
-        ~fd_guard() {
+        ~FDGuard() {
             if (_fd >= 0) {
                 ::close(_fd);
                 _fd = -1;
@@ -55,12 +57,12 @@ namespace turbo {
 
     private:
         // Copying this makes no sense.
-        fd_guard(const fd_guard&);
-        void operator=(const fd_guard&);
+        FDGuard(const FDGuard&);
+        void operator=(const FDGuard&);
 
         int _fd;
     };
 
 }  // namespace turbo
 
-#endif  // TURBO_BASE_FD_GUARD_H_
+#endif  // TURBO_FILES_IO_FD_GUARD_H_

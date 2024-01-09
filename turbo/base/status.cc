@@ -52,12 +52,8 @@ TURBO_REGISTER_ERRNO(turbo::kDiskIOError, "DISK_IO_ERROR");
 namespace turbo {
 
 
-    std::string StatusCodeToString(StatusCode code) {
+    std::string status_code_to_string(StatusCode code) {
         return terror(code);
-    }
-
-    std::ostream &operator<<(std::ostream &os, StatusCode code) {
-        return os << StatusCodeToString(code);
     }
 
     namespace status_internal {
@@ -310,9 +306,9 @@ namespace turbo {
                                  StatusToStringMode::kWithModule;
 
         if (with_module) {
-            turbo::format_append(&text, "{}::{}: {}", TurboModule(index()), StatusCodeToString(code()), message());
+            turbo::format_append(&text, "{}::{}: {}", TurboModule(index()), status_code_to_string(code()), message());
         } else {
-            turbo::format_append(&text, "{}: {}", StatusCodeToString(code()), message());
+            turbo::format_append(&text, "{}: {}", status_code_to_string(code()), message());
         }
 
         const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==

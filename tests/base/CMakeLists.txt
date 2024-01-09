@@ -16,6 +16,21 @@
 
 carbin_cc_test(
         NAME
+        atexit_test
+        SOURCES
+        "atexit_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+        ${GTEST_LIB}
+        ${GMOCK_LIB}
+        ${GTEST_MAIN_LIB}
+)
+
+carbin_cc_test(
+        NAME
         status_test
         SOURCES
         "status_test.cc"
