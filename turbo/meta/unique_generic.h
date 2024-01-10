@@ -210,7 +210,7 @@ namespace turbo {
             explicit Receiver(UniqueGeneric &parent) : scoped_generic_(&parent) {
                 // Check if we attempted to construct a Receiver for UniqueGeneric with an
                 // existing Receiver.
-                CHECK(!scoped_generic_->receiving_);
+                TURBO_RAW_CHECK(!scoped_generic_->receiving_, "");
                 scoped_generic_->receiving_ = true;
             }
 
@@ -220,21 +220,21 @@ namespace turbo {
 
             Receiver(Receiver &&move) {
                 TURBO_RAW_CHECK(!used_, "");       // Moving into already-used Receiver.
-                CHECK(!move.used_);  // Moving from already-used Receiver.
+                TURBO_RAW_CHECK(!move.used_, "");  // Moving from already-used Receiver.
                 scoped_generic_ = move.scoped_generic_;
                 move.scoped_generic_ = nullptr;
             }
 
             Receiver &operator=(Receiver &&move) {
                 TURBO_RAW_CHECK(!used_, "");       // Moving into already-used Receiver.
-                CHECK(!move.used_);  // Moving from already-used Receiver.
+                TURBO_RAW_CHECK(!move.used_, "");  // Moving from already-used Receiver.
                 scoped_generic_ = move.scoped_generic_;
                 move.scoped_generic_ = nullptr;
             }
 
             ~Receiver() {
                 if (scoped_generic_) {
-                    CHECK(scoped_generic_->receiving_);
+                    TURBO_RAW_CHECK(scoped_generic_->receiving_, "");
                     scoped_generic_->reset(value_);
                     scoped_generic_->receiving_ = false;
                 }
