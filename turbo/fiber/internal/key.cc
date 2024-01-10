@@ -335,7 +335,7 @@ namespace turbo::fiber_internal {
     void fiber_keytable_pool_reserve(fiber_keytable_pool_t *pool,
                                      size_t nfree,
                                      fiber_local_key key,
-                                     void *ctor(const void *),
+                                     const key_pool_ctor_t &ctor,
                                      const void *ctor_args) {
         if (pool == nullptr) {
             TLOG_ERROR("Param[pool] is nullptr");

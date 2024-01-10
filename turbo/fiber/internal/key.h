@@ -22,10 +22,12 @@
 #include "turbo/platform/port.h"
 #include <cstdint>
 #include <ostream>
+#include <functional>
 #include "turbo/format/format.h"
 
 namespace turbo::fiber_internal {
 
+    typedef std::function<void*(const void*)> key_pool_ctor_t;
 
     // Key of thread-local data, created by fiber_key_create.
     typedef struct {
@@ -138,7 +140,7 @@ namespace turbo::fiber_internal {
     // ctor(args).
     void fiber_keytable_pool_reserve(
             fiber_keytable_pool_t *pool, size_t nfree,
-            fiber_local_key key, void *ctor(const void *args), const void *args);
+            fiber_local_key key, const key_pool_ctor_t &ctor, const void *args);
 
 }  // namespace turbo::fiber_internal
 
