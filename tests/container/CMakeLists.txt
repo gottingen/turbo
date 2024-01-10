@@ -215,7 +215,6 @@ carbin_cc_test(
         ${GTEST_MAIN_LIB}
 )
 
-
 carbin_cc_test(
         NAME
         node_hash_set_test

@@ -137,3 +137,15 @@ carbin_cc_test(
         turbo::test_instance_tracker
 )
 
+carbin_cc_test(
+        NAME
+        unique_generic_test
+        SOURCES
+        "unique_generic_test.cc"
+        COPTS
+        ${CARBIN_CXX_OPTIONS}
+        DEPS
+        ${CARBIN_DEPS_LINK}
+        turbo::turbo
+        turbo::test_instance_tracker
+)

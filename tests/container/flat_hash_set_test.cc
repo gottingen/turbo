@@ -173,6 +173,18 @@ namespace turbo {
                 }
             }
 
+            TEST(IgnoreCase, set) {
+                turbo::flat_ignore_case_hash_set<std::string> s;
+                s.insert("abc");
+                s.insert("ABC");
+                EXPECT_EQ(s.size(), 1);
+                EXPECT_TRUE(s.contains("abc"));
+                EXPECT_TRUE(s.contains("ABC"));
+                EXPECT_FALSE(s.contains("Abc"));
+                EXPECT_FALSE(s.contains("aBc"));
+                EXPECT_FALSE(s.contains("abC"));
+            }
+
         }  // namespace
     }  // namespace container_internal
 
