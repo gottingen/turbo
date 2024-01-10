@@ -556,6 +556,12 @@ namespace turbo {
             flat_hash_map<K, V, H, E, A> &c, Predicate pred) {
         return container_internal::EraseIf(pred, &c);
     }
+
+    template<class K, class V,
+            class Hash = turbo::container_internal::hash_default_ignore_case_hash<K>,
+            class Eq = turbo::container_internal::hash_default_ignore_case_eq<K>,
+            class Allocator = std::allocator<std::pair<const K, V>>>
+    using flat_ignore_case_hash_map = flat_hash_map<K, V, Hash, Eq, Allocator>;
 }  // namespace turbo
 
 namespace turbo::container_internal {
@@ -600,12 +606,6 @@ namespace turbo::container_internal {
 
         static const V &value(const std::pair<const K, V> *kv) { return kv->second; }
     };
-
-    template<class K, class V,
-            class Hash = turbo::container_internal::hash_default_ignore_case_hash<K>,
-            class Eq = turbo::container_internal::hash_default_ignore_case_eq<K>,
-            class Allocator = std::allocator<std::pair<const K, V>>>
-    using flat_ignore_case_hash_map = flat_hash_map<K, V, Hash, Eq, Allocator>;
 
 }  // namespace turbo::container_internal
 
