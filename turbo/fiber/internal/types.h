@@ -181,29 +181,34 @@ namespace turbo::fiber_internal {
         unsigned conflict_size;
     } fiber_list_t;
 
-    typedef struct {
-        uint64_t value;
-    } fiber_token_t;
-
-    // fiber_token returned by fiber_token_create* can never be this value.
+    // fiber_token returned by fiber_session_create* can never be this value.
     // NOTE: don't confuse with INVALID_FIBER_ID!
-    static const fiber_token_t INVALID_FIBER_TOKEN = {0};
+    static constexpr uint64_t INVALID_FIBER_SESSION_VALUE = 0;
 
+    struct FiberSessionImpl {
+        uint64_t value{INVALID_FIBER_SESSION_VALUE};
+    };
 
-    // Overload operators for fiber_token_t
-    inline bool operator==(fiber_token_t id1, fiber_token_t id2) { return id1.value == id2.value; }
+    static constexpr FiberSessionImpl INVALID_FIBER_SESSION = {0};
 
-    inline bool operator!=(fiber_token_t id1, fiber_token_t id2) { return !(id1 == id2); }
+    typedef std::function<int(FiberSessionImpl session,void *data, int error_code) > session_on_error;
 
-    inline bool operator<(fiber_token_t id1, fiber_token_t id2) { return id1.value < id2.value; }
+    typedef std::function<int(FiberSessionImpl session,void *data, int error_code, const std::string &error_text) > session_on_error_msg;
 
-    inline bool operator>(fiber_token_t id1, fiber_token_t id2) { return id2 < id1; }
+    // Overload operators for FiberSessionImpl
+    inline bool operator==(FiberSessionImpl id1, FiberSessionImpl id2) { return id1.value == id2.value; }
 
-    inline bool operator<=(fiber_token_t id1, fiber_token_t id2) { return !(id2 < id1); }
+    inline bool operator!=(FiberSessionImpl id1, FiberSessionImpl id2) { return !(id1 == id2); }
 
-    inline bool operator>=(fiber_token_t id1, fiber_token_t id2) { return !(id1 < id2); }
+    inline bool operator<(FiberSessionImpl id1, FiberSessionImpl id2) { return id1.value < id2.value; }
 
-    inline std::ostream &operator<<(std::ostream &os, fiber_token_t id) { return os << id.value; }
+    inline bool operator>(FiberSessionImpl id1, FiberSessionImpl id2) { return id2 < id1; }
+
+    inline bool operator<=(FiberSessionImpl id1, FiberSessionImpl id2) { return !(id2 < id1); }
+
+    inline bool operator>=(FiberSessionImpl id1, FiberSessionImpl id2) { return !(id1 < id2); }
+
+    inline std::ostream &operator<<(std::ostream &os, FiberSessionImpl id) { return os << id.value; }
 
 
     typedef struct {
@@ -214,7 +219,7 @@ namespace turbo::fiber_internal {
         unsigned size;
         unsigned conflict_head;
         unsigned conflict_size;
-    } fiber_token_list_t;
+    } FiberSessionList;
 
     typedef uint64_t fiber_timer_id;
 

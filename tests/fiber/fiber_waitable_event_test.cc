@@ -26,8 +26,8 @@
 #include "turbo/fiber/internal/waitable_event.h"
 #include "turbo/fiber/internal/schedule_group.h"
 #include "turbo/fiber/internal/fiber_worker.h"
-#include "turbo/fiber/internal/fiber.h"
-#include "turbo/fiber/this_fiber.h"
+#include "turbo/fiber/fiber.h"
+
 
 namespace turbo::fiber_internal {
     extern std::atomic<ScheduleGroup *> g_task_control;

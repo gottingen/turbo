@@ -22,9 +22,8 @@
 #include <execinfo.h>
 #include "turbo/times/time.h"
 #include "turbo/log/logging.h"
-#include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/fiber.h"
 #include "turbo/fiber/internal/fiber_entity.h"
-#include "turbo/fiber/this_fiber.h"
 #include "turbo/times/stop_watcher.h"
 
 namespace turbo::fiber_internal {

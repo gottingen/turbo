@@ -21,7 +21,7 @@
 #include <turbo/fiber/execution_queue.h>
 #include "turbo/times/time.h"
 #include "turbo/times/stop_watcher.h"
-#include "turbo/fiber/this_fiber.h"
+
 #include "turbo/fiber/fiber_latch.h"
 #include "turbo/random/uniform.h"
 #include "turbo/concurrent/spinlock_wait.h"

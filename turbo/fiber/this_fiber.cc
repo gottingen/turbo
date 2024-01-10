@@ -13,9 +13,12 @@
 // limitations under the License.
 //
 
-#include "turbo/fiber/this_fiber.h"
 #include "turbo/fiber/internal/fiber_worker.h"
 #include "turbo/times/clock.h"
+#include <cstdint>
+#include "turbo/fiber/fiber.h"
+#include "turbo/times/time.h"
+#include "turbo/platform/port.h"
 
 namespace turbo::fiber_internal {
     extern TURBO_THREAD_LOCAL FiberWorker *tls_task_group;

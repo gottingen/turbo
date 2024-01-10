@@ -103,12 +103,12 @@ namespace turbo::fiber_internal {
     struct TidTraits {
         static const size_t BLOCK_SIZE = 63;
         static const size_t MAX_ENTRIES = 65536;
-        static const fiber_id_t TOKEN_INIT;
+        static const fiber_id_t SESSION_INIT;
 
         static bool exists(fiber_id_t id) { return turbo::fiber_internal::FiberWorker::exists(id); }
     };
 
-    const fiber_id_t TidTraits::TOKEN_INIT = INVALID_FIBER_ID;
+    const fiber_id_t TidTraits::SESSION_INIT = INVALID_FIBER_ID;
 
     typedef ListOfABAFreeId<fiber_id_t, TidTraits> TidList;
 

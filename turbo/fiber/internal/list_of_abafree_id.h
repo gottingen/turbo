@@ -46,7 +46,7 @@ namespace turbo::fiber_internal {
     //   static const size_t MAX_ENTRIES = 65536;
     //
     //   // Initial value of id. Id with the value is treated as invalid.
-    //   static const Id TOKEN_INIT = ...;
+    //   static const Id SESSION_INIT = ...;
     //
     //   // Returns true if the id is valid. The "validness" must be permanent or
     //   // stable for a very long period (to make the id ABA-free).
@@ -92,7 +92,7 @@ namespace turbo::fiber_internal {
     ListOfABAFreeId<Id, IdTraits>::ListOfABAFreeId()
             : _cur_block(&_head_block), _cur_index(0), _nblock(1) {
         for (size_t i = 0; i < IdTraits::BLOCK_SIZE; ++i) {
-            _head_block.ids[i] = IdTraits::TOKEN_INIT;
+            _head_block.ids[i] = IdTraits::SESSION_INIT;
         }
         _head_block.next = nullptr;
     }
@@ -130,7 +130,7 @@ namespace turbo::fiber_internal {
             Id *const pos = _cur_block->ids + _cur_index;
             forward_index();
             // The position is not used.
-            if (*pos == IdTraits::TOKEN_INIT || !IdTraits::exists(*pos)) {
+            if (*pos == IdTraits::SESSION_INIT || !IdTraits::exists(*pos)) {
                 *pos = id;
                 return 0;
             }
@@ -157,11 +157,11 @@ namespace turbo::fiber_internal {
         }
         ++_nblock;
         for (size_t i = 0; i < _cur_index; ++i) {
-            new_block->ids[i] = IdTraits::TOKEN_INIT;
+            new_block->ids[i] = IdTraits::SESSION_INIT;
         }
         for (size_t i = _cur_index; i < IdTraits::BLOCK_SIZE; ++i) {
             new_block->ids[i] = _cur_block->ids[i];
-            _cur_block->ids[i] = IdTraits::TOKEN_INIT;
+            _cur_block->ids[i] = IdTraits::SESSION_INIT;
         }
         new_block->next = _cur_block->next;
         _cur_block->next = new_block;
@@ -173,11 +173,11 @@ namespace turbo::fiber_internal {
         //    block A        new block      block B
         _cur_block->ids[_cur_index] = *saved_pos[2];
         *saved_pos[2] = *saved_pos[1];
-        *saved_pos[1] = IdTraits::TOKEN_INIT;
+        *saved_pos[1] = IdTraits::SESSION_INIT;
         forward_index();
         forward_index();
         _cur_block->ids[_cur_index] = *saved_pos[3];
-        *saved_pos[3] = IdTraits::TOKEN_INIT;
+        *saved_pos[3] = IdTraits::SESSION_INIT;
         forward_index();
         _cur_block->ids[_cur_index] = id;
         forward_index();
@@ -189,7 +189,7 @@ namespace turbo::fiber_internal {
     void ListOfABAFreeId<Id, IdTraits>::apply(const Fn &fn) {
         for (IdBlock *p = &_head_block; p != nullptr; p = p->next) {
             for (size_t i = 0; i < IdTraits::BLOCK_SIZE; ++i) {
-                if (p->ids[i] != IdTraits::TOKEN_INIT && IdTraits::exists(p->ids[i])) {
+                if (p->ids[i] != IdTraits::SESSION_INIT && IdTraits::exists(p->ids[i])) {
                     fn(p->ids[i]);
                 }
             }

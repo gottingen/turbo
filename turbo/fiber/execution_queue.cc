@@ -20,7 +20,7 @@
 // Date: 2016/04/16 18:43:24
 
 #include "turbo/fiber/execution_queue.h"
-#include "turbo/fiber/this_fiber.h"
+
 #include "turbo/memory/object_pool.h"           // turbo::get_object
 #include "turbo/memory/resource_pool.h"         // turbo::get_resource
 

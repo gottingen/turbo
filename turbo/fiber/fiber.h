@@ -37,6 +37,7 @@ namespace turbo {
     using fiber_internal::FiberAttribute;
     using fiber_internal::StackType;
     using fiber_internal::AttributeFlag;
+    using fiber_internal::FiberSessionImpl;
     /**
      * @ingroup turbo_fiber
      * @brief fiber id type
@@ -126,7 +127,7 @@ namespace turbo {
 
         void stop();
 
-       bool valid() const {
+        bool valid() const {
             return _fid != INVALID_FIBER_ID;
         }
 
@@ -144,6 +145,45 @@ namespace turbo {
         bool _detached{false};
     };
 
+    /**
+   * @ingroup turbo_fiber
+   * @brief yield cpu to other fibers
+   * @return 0 if success, -1 if error
+   */
+    int fiber_yield();
+
+    /**
+     * @ingroup turbo_fiber
+     * @brief sleep until deadline
+     * @param deadline
+     * @return status.ok() if success, otherwise error
+     */
+    turbo::Status fiber_sleep_until(const turbo::Time &deadline);
+
+    /**
+     * @ingroup turbo_fiber
+     * @brief sleep for a duration
+     * @param span
+     * @return status.ok() if success, otherwise error
+     */
+    turbo::Status fiber_sleep_for(const turbo::Duration &span);
+
+    turbo::Status fiber_usleep(uint64_t usec);
+
+    turbo::Status fiber_msleep(uint64_t msec);
+
+    turbo::Status fiber_nsleep(uint64_t nsec);
+
+    turbo::Status fiber_sleep(uint64_t sec);
+
+    /**
+     * @ingroup turbo_fiber
+     * @brief get current fiber id
+     * @return current fiber id
+     */
+    fiber_id_t get_fiber_id();
+
+
     /// inlined functions
     inline Fiber::Fiber(Fiber &&other) noexcept {
         _fid = other._fid;
@@ -160,6 +200,23 @@ namespace turbo {
             other._detached = false;
         }
         return *this;
+    }
+
+    /// inlined functions
+    inline turbo::Status fiber_usleep(uint64_t usec) {
+        return fiber_sleep_for(turbo::microseconds(usec));
+    }
+
+    inline turbo::Status fiber_msleep(uint64_t msec) {
+        return fiber_sleep_for(turbo::milliseconds(msec));
+    }
+
+    inline turbo::Status fiber_nsleep(uint64_t nsec) {
+        return fiber_sleep_for(turbo::nanoseconds(nsec));
+    }
+
+    inline turbo::Status fiber_sleep(uint64_t sec) {
+        return fiber_sleep_for(turbo::seconds(sec));
     }
 }  // namespace turbo
 #endif // TURBO_FIBER_FIBER_H_

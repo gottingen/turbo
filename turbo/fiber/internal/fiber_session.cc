@@ -6,10 +6,11 @@
 #include "turbo/fiber/internal/list_of_abafree_id.h"
 #include "turbo/memory/resource_pool.h"
 #include "turbo/fiber/internal/fiber.h"
+#include "turbo/fiber/internal/fiber_session.h"
 
 namespace turbo::fiber_internal {
 
-// This queue reduces the chance to allocate memory for deque
+    // This queue reduces the chance to allocate memory for deque
     template<typename T, int N>
     class SmallQueue {
     public:
@@ -80,15 +81,15 @@ namespace turbo::fiber_internal {
     };
 
     struct PendingError {
-        fiber_token_t tn;
+        FiberSessionImpl tn;
         int error_code;
         std::string error_text;
         const char *location;
 
-        PendingError() : tn(INVALID_FIBER_TOKEN), error_code(0), location(nullptr) {}
+        PendingError() : tn(INVALID_FIBER_SESSION), error_code(0), location(nullptr) {}
     };
 
-    struct TURBO_CACHE_LINE_ALIGNED token {
+    struct TURBO_CACHE_LINE_ALIGNED Session {
         // first_ver ~ locked_ver - 1: unlocked versions
         // locked_ver: locked
         // unlockable_ver: locked and about to be destroyed
@@ -98,17 +99,17 @@ namespace turbo::fiber_internal {
         turbo::SpinLock mutex;
         void *data;
 
-        int (*on_error)(fiber_token_t, void *, int);
+        session_on_error  on_error;
 
-        int (*on_error2)(fiber_token_t, void *, int, const std::string &);
+        session_on_error_msg on_error2;
 
         const char *lock_location;
         uint32_t *event;
         uint32_t *join_futex;
         SmallQueue<PendingError, 2> pending_q;
 
-        token() {
-            // Although value of the event(as version part of fiber_token_t)
+        Session() {
+            // Although value of the event(as version part of FiberSessionImpl)
             // does not matter, we set it to 0 to make program more deterministic.
             event = turbo::fiber_internal::waitable_event_create_checked<uint32_t>();
             join_futex = turbo::fiber_internal::waitable_event_create_checked<uint32_t>();
@@ -116,13 +117,13 @@ namespace turbo::fiber_internal {
             *join_futex = 0;
         }
 
-        ~token() {
+        ~Session() {
             turbo::fiber_internal::waitable_event_destroy(event);
             turbo::fiber_internal::waitable_event_destroy(join_futex);
         }
 
-        inline bool has_version(uint32_t token_ver) const {
-            return token_ver >= first_ver && token_ver < locked_ver;
+        inline bool has_version(uint32_t session_ver) const {
+            return session_ver >= first_ver && session_ver < locked_ver;
         }
 
         inline uint32_t contended_ver() const { return locked_ver + 1; }
@@ -135,64 +136,68 @@ namespace turbo::fiber_internal {
         inline uint32_t end_ver() const { return last_ver() + 1; }
     };
 
-    static_assert(sizeof(token) % 64 == 0, "sizeof token must align");
+    static_assert(sizeof(Session) % 64 == 0, "sizeof Session must align");
 
-    typedef turbo::ResourceId<token> IdResourceId;
+    typedef turbo::ResourceId<Session> IdResourceId;
 
-    inline fiber_token_t make_id(uint32_t version, IdResourceId slot) {
-        const fiber_token_t tmp =
+    inline FiberSessionImpl make_id(uint32_t version, IdResourceId slot) {
+        const FiberSessionImpl tmp =
                 {(((uint64_t) slot.value) << 32) | (uint64_t) version};
         return tmp;
     }
 
-    inline IdResourceId get_slot(fiber_token_t tn) {
+    inline IdResourceId get_slot(FiberSessionImpl tn) {
         const IdResourceId tmp = {(tn.value >> 32)};
         return tmp;
     }
 
-    inline uint32_t get_version(fiber_token_t tn) {
+    inline uint32_t get_version(FiberSessionImpl tn) {
         return (uint32_t) (tn.value & 0xFFFFFFFFul);
     }
 
-    inline bool token_exists_with_true_negatives(fiber_token_t tn) {
-        token *const meta = address_resource(get_slot(tn));
+    inline bool session_exists_with_true_negatives(FiberSessionImpl tn) {
+        Session *const meta = address_resource(get_slot(tn));
         if (meta == nullptr) {
             return false;
         }
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
-        return token_ver >= meta->first_ver && token_ver <= meta->last_ver();
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
+        return session_ver >= meta->first_ver && session_ver <= meta->last_ver();
     }
 
-// required by unittest
-    uint32_t token_value(fiber_token_t tn) {
-        token *const meta = address_resource(get_slot(tn));
+    // required by unittest
+    uint32_t session_value(FiberSessionImpl tn) {
+        Session *const meta = address_resource(get_slot(tn));
         if (meta != nullptr) {
             return *meta->event;
         }
         return 0;  // valid version never be zero
     }
 
-    static int default_fiber_token_on_error(fiber_token_t tn, void *, int) {
-        return fiber_token_unlock_and_destroy(tn);
+    static int default_fiber_session_on_error_func(FiberSessionImpl tn, void *, int) {
+        return fiber_session_unlock_and_destroy(tn);
     }
 
-    static int default_fiber_token_on_error2(
-            fiber_token_t tn, void *, int, const std::string &) {
-        return fiber_token_unlock_and_destroy(tn);
+    static int default_fiber_session_on_error2_func(
+            FiberSessionImpl tn, void *, int, const std::string &) {
+        return fiber_session_unlock_and_destroy(tn);
     }
 
-    void token_status(fiber_token_t tn, std::ostream &os) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+    static const session_on_error default_fiber_session_on_error = session_on_error(default_fiber_session_on_error_func);
+
+    static const session_on_error_msg default_fiber_session_on_error2 = session_on_error_msg(default_fiber_session_on_error2_func);
+
+    void session_status(FiberSessionImpl tn, std::ostream &os) {
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
-            os << "Invalid token=" << tn.value << '\n';
+            os << "Invalid Session=" << tn.value << '\n';
             return;
         }
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         uint32_t *event = meta->event;
         bool valid = true;
         void *data = nullptr;
-        int (*on_error)(fiber_token_t, void *, int) = nullptr;
-        int (*on_error2)(fiber_token_t, void *, int, const std::string &) = nullptr;
+        session_on_error on_error;
+        session_on_error_msg on_error2;
         uint32_t first_ver = 0;
         uint32_t locked_ver = 0;
         uint32_t unlockable_ver = 0;
@@ -202,7 +207,7 @@ namespace turbo::fiber_internal {
         uint32_t futex_value = 0;
 
         meta->mutex.lock();
-        if (meta->has_version(token_ver)) {
+        if (meta->has_version(session_ver)) {
             data = meta->data;
             on_error = meta->on_error;
             on_error2 = meta->on_error2;
@@ -225,7 +230,7 @@ namespace turbo::fiber_internal {
         meta->mutex.unlock();
 
         if (valid) {
-            os << "First token: "
+            os << "First Session: "
                << turbo::fiber_internal::make_id(first_ver, turbo::fiber_internal::get_slot(tn)).value << '\n'
                << "Range: " << locked_ver - first_ver << '\n'
                << "Status: ";
@@ -254,49 +259,49 @@ namespace turbo::fiber_internal {
                 }
             }
             if (on_error) {
-                if (on_error == default_fiber_token_on_error) {
+                if (&on_error == &default_fiber_session_on_error) {
                     os << "\nOnError: unlock_and_destroy";
                 } else {
-                    os << "\nOnError: " << (void *) on_error;
+                    os << "\nOnError: " << (void *) &on_error;
                 }
             } else {
-                if (on_error2 == default_fiber_token_on_error2) {
+                if (&on_error2 == &default_fiber_session_on_error2) {
                     os << "\nOnError2: unlock_and_destroy";
                 } else {
-                    os << "\nOnError2: " << (void *) on_error2;
+                    os << "\nOnError2: " << (void *) &on_error2;
                 }
             }
             os << "\nData: " << data;
         } else {
-            os << "Invalid token=" << tn.value;
+            os << "Invalid Session=" << tn.value;
         }
         os << '\n';
     }
 
-    void token_pool_status(std::ostream &os) {
-        os << turbo::describe_resources<token>() << '\n';
+    void session_pool_status(std::ostream &os) {
+        os << turbo::describe_resources<Session>() << '\n';
     }
 
-    struct token_traits {
+    struct session_traits {
         static const size_t BLOCK_SIZE = 63;
         static const size_t MAX_ENTRIES = 100000;
-        static const fiber_token_t TOKEN_INIT;
+        static const FiberSessionImpl SESSION_INIT;
 
-        static bool exists(fiber_token_t tn) { return turbo::fiber_internal::token_exists_with_true_negatives(tn); }
+        static bool exists(FiberSessionImpl tn) { return turbo::fiber_internal::session_exists_with_true_negatives(tn); }
     };
 
-    const fiber_token_t token_traits::TOKEN_INIT = INVALID_FIBER_TOKEN;
+    const FiberSessionImpl session_traits::SESSION_INIT = INVALID_FIBER_SESSION;
 
-    typedef ListOfABAFreeId<fiber_token_t, token_traits> token_list;
+    typedef ListOfABAFreeId<FiberSessionImpl, session_traits> session_list;
 
-    struct token_resetter {
-        explicit token_resetter(int ec, const std::string &et)
+    struct session_resetter {
+        explicit session_resetter(int ec, const std::string &et)
                 : _error_code(ec), _error_text(et) {}
 
-        void operator()(fiber_token_t &tn) const {
-            fiber_token_error2_verbose(
+        void operator()(FiberSessionImpl &tn) const {
+            fiber_session_error2_verbose(
                     tn, _error_code, _error_text, turbo::format("{}:{}", __FILE__, __LINE__).c_str());
-            tn = INVALID_FIBER_TOKEN;
+            tn = INVALID_FIBER_SESSION;
         }
 
     private:
@@ -304,29 +309,29 @@ namespace turbo::fiber_internal {
         const std::string &_error_text;
     };
 
-    size_t get_sizes(const fiber_token_list_t *list, size_t *cnt, size_t n) {
+    size_t get_sizes(const FiberSessionList *list, size_t *cnt, size_t n) {
         if (list->impl == nullptr) {
             return 0;
         }
-        return static_cast<turbo::fiber_internal::token_list *>(list->impl)->get_sizes(cnt, n);
+        return static_cast<turbo::fiber_internal::session_list *>(list->impl)->get_sizes(cnt, n);
     }
 
-    const int TOKEN_MAX_RANGE = 1024;
+    const int SESSION_MAX_RANGE = 1024;
 
-    static int token_create_impl(
-            fiber_token_t *tn, void *data,
-            int (*on_error)(fiber_token_t, void *, int),
-            int (*on_error2)(fiber_token_t, void *, int, const std::string &)) {
+    static int session_create_impl(
+            FiberSessionImpl *tn, void *data,
+            session_on_error on_error,
+            session_on_error_msg on_error2 ) {
         IdResourceId slot;
-        token *const meta = get_resource(&slot);
+        Session *const meta = get_resource(&slot);
         if (meta) {
             meta->data = data;
             meta->on_error = on_error;
             meta->on_error2 = on_error2;
             TLOG_CHECK(meta->pending_q.empty());
             uint32_t *event = meta->event;
-            if (0 == *event || *event + TOKEN_MAX_RANGE + 2 < *event) {
-                // Skip 0 so that fiber_token_t is never 0
+            if (0 == *event || *event + SESSION_MAX_RANGE + 2 < *event) {
+                // Skip 0 so that FiberSessionImpl is never 0
                 // avoid overflow to make comparisons simpler.
                 *event = 1;
             }
@@ -339,26 +344,26 @@ namespace turbo::fiber_internal {
         return ENOMEM;
     }
 
-    static int token_create_ranged_impl(
-            fiber_token_t *tn, void *data,
-            int (*on_error)(fiber_token_t, void *, int),
-            int (*on_error2)(fiber_token_t, void *, int, const std::string &),
+    static int session_create_ranged_impl(
+            FiberSessionImpl *tn, void *data,
+            const session_on_error &on_error,
+            const session_on_error_msg &on_error2,
             int range) {
-        if (range < 1 || range > TOKEN_MAX_RANGE) {
+        if (range < 1 || range > SESSION_MAX_RANGE) {
             TLOG_CRITICAL_IF(range < 1, "range must be positive, actually {}", range);
-            TLOG_CRITICAL_IF(range > TOKEN_MAX_RANGE, "max of range is {} , actually {}", TOKEN_MAX_RANGE, range);
+            TLOG_CRITICAL_IF(range > SESSION_MAX_RANGE, "max of range is {} , actually {}", SESSION_MAX_RANGE, range);
             return EINVAL;
         }
         IdResourceId slot;
-        token *const meta = get_resource(&slot);
+        Session *const meta = get_resource(&slot);
         if (meta) {
             meta->data = data;
             meta->on_error = on_error;
             meta->on_error2 = on_error2;
             TLOG_CHECK(meta->pending_q.empty());
             uint32_t *event = meta->event;
-            if (0 == *event || *event + TOKEN_MAX_RANGE + 2 < *event) {
-                // Skip 0 so that fiber_token_t is never 0
+            if (0 == *event || *event + SESSION_MAX_RANGE + 2 < *event) {
+                // Skip 0 so that FiberSessionImpl is never 0
                 // avoid overflow to make comparisons simpler.
                 *event = 1;
             }
@@ -372,45 +377,45 @@ namespace turbo::fiber_internal {
     }
 
 
-    int fiber_token_create(
-            fiber_token_t *tn, void *data,
-            int (*on_error)(fiber_token_t, void *, int)) {
-        return turbo::fiber_internal::token_create_impl(
+    int fiber_session_create(
+            FiberSessionImpl *tn, void *data,
+            const session_on_error &on_error) {
+        return turbo::fiber_internal::session_create_impl(
                 tn, data,
-                (on_error ? on_error : turbo::fiber_internal::default_fiber_token_on_error), nullptr);
+                (on_error ? on_error : turbo::fiber_internal::default_fiber_session_on_error), nullptr);
     }
 
-    int fiber_token_create_ranged(fiber_token_t *tn, void *data,
-                                  int (*on_error)(fiber_token_t, void *, int),
+    int fiber_session_create_ranged(FiberSessionImpl *tn, void *data,
+                                    const session_on_error &on_error,
                                   int range) {
-        return turbo::fiber_internal::token_create_ranged_impl(
+        return turbo::fiber_internal::session_create_ranged_impl(
                 tn, data,
-                (on_error ? on_error : turbo::fiber_internal::default_fiber_token_on_error),
+                (on_error ? on_error : turbo::fiber_internal::default_fiber_session_on_error),
                 nullptr, range);
     }
 
-    int fiber_token_lock_and_reset_range_verbose(
-            fiber_token_t tn, void **pdata, int range, const char *location) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+    int fiber_session_lock_and_reset_range_verbose(
+            FiberSessionImpl tn, void **pdata, int range, const char *location) {
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
         }
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         uint32_t *event = meta->event;
         bool ever_contended = false;
         meta->mutex.lock();
-        while (meta->has_version(token_ver)) {
+        while (meta->has_version(session_ver)) {
             if (*event == meta->first_ver) {
                 // contended locker always wakes up the event at unlock.
                 meta->lock_location = location;
                 if (range == 0) {
                     // fast path
                 } else if (range < 0 ||
-                           range > turbo::fiber_internal::TOKEN_MAX_RANGE ||
+                           range > turbo::fiber_internal::SESSION_MAX_RANGE ||
                            range + meta->first_ver <= meta->locked_ver) {
                     TLOG_CRITICAL_IF(range < 1, "range must be positive, actually {}", range);
-                    TLOG_CRITICAL_IF(range > turbo::fiber_internal::TOKEN_MAX_RANGE, "max of range is {} , actually {}",
-                                     turbo::fiber_internal::TOKEN_MAX_RANGE, range);
+                    TLOG_CRITICAL_IF(range > turbo::fiber_internal::SESSION_MAX_RANGE, "max of range is {} , actually {}",
+                                     turbo::fiber_internal::SESSION_MAX_RANGE, range);
                 } else {
                     meta->locked_ver = meta->first_ver + range;
                 }
@@ -430,7 +435,7 @@ namespace turbo::fiber_internal {
                     return errno;
                 }
                 meta->mutex.lock();
-            } else { // fiber_token_about_to_destroy was called.
+            } else { // fiber_session_about_to_destroy was called.
                 meta->mutex.unlock();
                 return EPERM;
             }
@@ -439,26 +444,26 @@ namespace turbo::fiber_internal {
         return EINVAL;
     }
 
-    int fiber_token_error_verbose(fiber_token_t tn, int error_code,
+    int fiber_session_error_verbose(FiberSessionImpl tn, int error_code,
                                   const char *location) {
-        return fiber_token_error2_verbose(tn, error_code, std::string(), location);
+        return fiber_session_error2_verbose(tn, error_code, std::string(), location);
     }
 
-    int fiber_token_about_to_destroy(fiber_token_t tn) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+    int fiber_session_about_to_destroy(FiberSessionImpl tn) {
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
         }
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         uint32_t *event = meta->event;
         meta->mutex.lock();
-        if (!meta->has_version(token_ver)) {
+        if (!meta->has_version(session_ver)) {
             meta->mutex.unlock();
             return EINVAL;
         }
         if (*event == meta->first_ver) {
             meta->mutex.unlock();
-            TLOG_CRITICAL("fiber_token={} is not locked!", tn.value);
+            TLOG_CRITICAL("fiber_session={} is not locked!", tn.value);
             return EPERM;
         }
         const bool contended = (*event == meta->contended_ver());
@@ -471,15 +476,15 @@ namespace turbo::fiber_internal {
         return 0;
     }
 
-    int fiber_token_cancel(fiber_token_t tn) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+    int fiber_session_cancel(FiberSessionImpl tn) {
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
         }
         uint32_t *event = meta->event;
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         meta->mutex.lock();
-        if (!meta->has_version(token_ver)) {
+        if (!meta->has_version(session_ver)) {
             meta->mutex.unlock();
             return EINVAL;
         }
@@ -495,18 +500,18 @@ namespace turbo::fiber_internal {
         return 0;
     }
 
-    int fiber_token_join(fiber_token_t tn) {
+    int fiber_session_join(FiberSessionImpl tn) {
         const turbo::fiber_internal::IdResourceId slot = turbo::fiber_internal::get_slot(tn);
-        turbo::fiber_internal::token *const meta = address_resource(slot);
+        turbo::fiber_internal::Session *const meta = address_resource(slot);
         if (!meta) {
-            // The token is not created yet, this join is definitely wrong.
+            // The Session is not created yet, this join is definitely wrong.
             return EINVAL;
         }
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         uint32_t *join_futex = meta->join_futex;
         while (1) {
             meta->mutex.lock();
-            const bool has_ver = meta->has_version(token_ver);
+            const bool has_ver = meta->has_version(session_ver);
             const uint32_t expected_ver = *join_futex;
             meta->mutex.unlock();
             if (!has_ver) {
@@ -520,15 +525,15 @@ namespace turbo::fiber_internal {
         return 0;
     }
 
-    int fiber_token_trylock(fiber_token_t tn, void **pdata) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+    int fiber_session_trylock(FiberSessionImpl tn, void **pdata) {
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
         }
         uint32_t *event = meta->event;
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         meta->mutex.lock();
-        if (!meta->has_version(token_ver)) {
+        if (!meta->has_version(session_ver)) {
             meta->mutex.unlock();
             return EINVAL;
         }
@@ -544,29 +549,29 @@ namespace turbo::fiber_internal {
         return 0;
     }
 
-    int fiber_token_lock_verbose(fiber_token_t tn, void **pdata,
+    int fiber_session_lock_verbose(FiberSessionImpl tn, void **pdata,
                                  const char *location) {
-        return fiber_token_lock_and_reset_range_verbose(tn, pdata, 0, location);
+        return fiber_session_lock_and_reset_range_verbose(tn, pdata, 0, location);
     }
 
-    int fiber_token_unlock(fiber_token_t tn) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+    int fiber_session_unlock(FiberSessionImpl tn) {
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
         }
         uint32_t *event = meta->event;
         // Release fence makes sure all changes made before signal visible to
         // woken-up waiters.
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         meta->mutex.lock();
-        if (!meta->has_version(token_ver)) {
+        if (!meta->has_version(session_ver)) {
             meta->mutex.unlock();
-            TLOG_CRITICAL("Invalid fiber_token={}", tn.value);
+            TLOG_CRITICAL("Invalid fiber_session={}", tn.value);
             return EINVAL;
         }
         if (*event == meta->first_ver) {
             meta->mutex.unlock();
-            TLOG_CRITICAL("fiber_token={} is not locked!", tn.value);
+            TLOG_CRITICAL("fiber_session={} is not locked!", tn.value);
             return EPERM;
         }
         turbo::fiber_internal::PendingError front;
@@ -584,30 +589,30 @@ namespace turbo::fiber_internal {
             *event = meta->first_ver;
             meta->mutex.unlock();
             if (contended) {
-                // We may wake up already-reused token, but that's OK.
+                // We may wake up already-reused Session, but that's OK.
                 turbo::fiber_internal::waitable_event_wake(event);
             }
             return 0;
         }
     }
 
-    int fiber_token_unlock_and_destroy(fiber_token_t tn) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+    int fiber_session_unlock_and_destroy(FiberSessionImpl tn) {
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
         }
         uint32_t *event = meta->event;
         uint32_t *join_futex = meta->join_futex;
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         meta->mutex.lock();
-        if (!meta->has_version(token_ver)) {
+        if (!meta->has_version(session_ver)) {
             meta->mutex.unlock();
-            TLOG_CRITICAL("Invalid fiber_token={}", tn.value);
+            TLOG_CRITICAL("Invalid fiber_session={}", tn.value);
             return EINVAL;
         }
         if (*event == meta->first_ver) {
             meta->mutex.unlock();
-            TLOG_CRITICAL("fiber_token={} is not locked!", tn.value);
+            TLOG_CRITICAL("fiber_session={} is not locked!", tn.value);
             return EPERM;
         }
         const uint32_t next_ver = meta->end_ver();
@@ -624,7 +629,7 @@ namespace turbo::fiber_internal {
         return 0;
     }
 
-    int fiber_token_list_init(fiber_token_list_t *list,
+    int fiber_session_list_init(FiberSessionList *list,
                               unsigned /*size*/,
                               unsigned /*conflict_size*/) {
         list->impl = nullptr;  // create on demand.
@@ -636,71 +641,71 @@ namespace turbo::fiber_internal {
         return 0;
     }
 
-    void fiber_token_list_destroy(fiber_token_list_t *list) {
-        delete static_cast<turbo::fiber_internal::token_list *>(list->impl);
+    void fiber_session_list_destroy(FiberSessionList *list) {
+        delete static_cast<turbo::fiber_internal::session_list *>(list->impl);
         list->impl = nullptr;
     }
 
-    int fiber_token_list_add(fiber_token_list_t *list, fiber_token_t tn) {
+    int fiber_session_list_add(FiberSessionList *list, FiberSessionImpl tn) {
         if (list->impl == nullptr) {
-            list->impl = new(std::nothrow) turbo::fiber_internal::token_list;
+            list->impl = new(std::nothrow) turbo::fiber_internal::session_list;
             if (nullptr == list->impl) {
                 return ENOMEM;
             }
         }
-        return static_cast<turbo::fiber_internal::token_list *>(list->impl)->add(tn);
+        return static_cast<turbo::fiber_internal::session_list *>(list->impl)->add(tn);
     }
 
-    int fiber_token_list_reset(fiber_token_list_t *list, int error_code) {
-        return fiber_token_reset2(list, error_code, std::string());
+    int fiber_session_list_reset(FiberSessionList *list, int error_code) {
+        return fiber_session_reset2(list, error_code, std::string());
     }
 
-    void fiber_token_list_swap(fiber_token_list_t *list1,
-                               fiber_token_list_t *list2) {
+    void fiber_session_list_swap(FiberSessionList *list1,
+                               FiberSessionList *list2) {
         std::swap(list1->impl, list2->impl);
     }
 
-    int fiber_token_list_reset_pthreadsafe(fiber_token_list_t *list, int error_code,
+    int fiber_session_list_reset_pthreadsafe(FiberSessionList *list, int error_code,
                                            pthread_mutex_t *mutex) {
-        return fiber_token_list_reset2_pthreadsafe(
+        return fiber_session_list_reset2_pthreadsafe(
                 list, error_code, std::string(), mutex);
     }
 
-    int fiber_token_list_reset_fibersafe(fiber_token_list_t *list, int error_code,
+    int fiber_session_list_reset_fibersafe(FiberSessionList *list, int error_code,
                                          fiber_mutex_t *mutex) {
-        return fiber_token_list_reset2_fibersafe(
+        return fiber_session_list_reset2_fibersafe(
                 list, error_code, std::string(), mutex);
     }
 
 
-    int fiber_token_create2(
-            fiber_token_t *tn, void *data,
-            int (*on_error)(fiber_token_t, void *, int, const std::string &)) {
-        return turbo::fiber_internal::token_create_impl(
+    int fiber_session_create2(
+            FiberSessionImpl *tn, void *data,
+            const session_on_error_msg &on_error) {
+        return turbo::fiber_internal::session_create_impl(
                 tn, data, nullptr,
-                (on_error ? on_error : turbo::fiber_internal::default_fiber_token_on_error2));
+                (on_error ? on_error : turbo::fiber_internal::default_fiber_session_on_error2));
     }
 
-    int fiber_token_create2_ranged(
-            fiber_token_t *tn, void *data,
-            int (*on_error)(fiber_token_t, void *, int, const std::string &),
+    int fiber_session_create2_ranged(
+            FiberSessionImpl *tn, void *data,
+            const session_on_error_msg &on_error,
             int range) {
-        return turbo::fiber_internal::token_create_ranged_impl(
+        return turbo::fiber_internal::session_create_ranged_impl(
                 tn, data, nullptr,
-                (on_error ? on_error : turbo::fiber_internal::default_fiber_token_on_error2), range);
+                (on_error ? on_error : turbo::fiber_internal::default_fiber_session_on_error2), range);
     }
 
-    int fiber_token_error2_verbose(fiber_token_t tn, int error_code,
+    int fiber_session_error2_verbose(FiberSessionImpl tn, int error_code,
                                    const std::string &error_text,
                                    const char *location) {
-        turbo::fiber_internal::token *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
+        turbo::fiber_internal::Session *const meta = address_resource(turbo::fiber_internal::get_slot(tn));
         if (!meta) {
             return EINVAL;
         }
-        const uint32_t token_ver = turbo::fiber_internal::get_version(tn);
+        const uint32_t session_ver = turbo::fiber_internal::get_version(tn);
         uint32_t *event = meta->event;
         meta->mutex.lock();
-        if (!meta->has_version(token_ver)) {
+        if (!meta->has_version(session_ver)) {
             meta->mutex.unlock();
             return EINVAL;
         }
@@ -725,17 +730,17 @@ namespace turbo::fiber_internal {
         }
     }
 
-    int fiber_token_reset2(fiber_token_list_t *list,
+    int fiber_session_reset2(FiberSessionList *list,
                            int error_code,
                            const std::string &error_text) {
         if (list->impl != nullptr) {
-            static_cast<turbo::fiber_internal::token_list *>(list->impl)->apply(
-                    turbo::fiber_internal::token_resetter(error_code, error_text));
+            static_cast<turbo::fiber_internal::session_list *>(list->impl)->apply(
+                    turbo::fiber_internal::session_resetter(error_code, error_text));
         }
         return 0;
     }
 
-    int fiber_token_list_reset2_pthreadsafe(fiber_token_list_t *list,
+    int fiber_session_list_reset2_pthreadsafe(FiberSessionList *list,
                                             int error_code,
                                             const std::string &error_text,
                                             pthread_mutex_t *mutex) {
@@ -745,8 +750,8 @@ namespace turbo::fiber_internal {
         if (list->impl == nullptr) {
             return 0;
         }
-        fiber_token_list_t tmplist;
-        const int rc = fiber_token_list_init(&tmplist, 0, 0);
+        FiberSessionList tmplist;
+        const int rc = fiber_session_list_init(&tmplist, 0, 0);
         if (rc != 0) {
             return rc;
         }
@@ -754,12 +759,12 @@ namespace turbo::fiber_internal {
         pthread_mutex_lock(mutex);
         std::swap(list->impl, tmplist.impl);
         pthread_mutex_unlock(mutex);
-        const int rc2 = fiber_token_reset2(&tmplist, error_code, error_text);
-        fiber_token_list_destroy(&tmplist);
+        const int rc2 = fiber_session_reset2(&tmplist, error_code, error_text);
+        fiber_session_list_destroy(&tmplist);
         return rc2;
     }
 
-    int fiber_token_list_reset2_fibersafe(fiber_token_list_t *list,
+    int fiber_session_list_reset2_fibersafe(FiberSessionList *list,
                                           int error_code,
                                           const std::string &error_text,
                                           fiber_mutex_t *mutex) {
@@ -769,8 +774,8 @@ namespace turbo::fiber_internal {
         if (list->impl == nullptr) {
             return 0;
         }
-        fiber_token_list_t tmplist;
-        const int rc = fiber_token_list_init(&tmplist, 0, 0);
+        FiberSessionList tmplist;
+        const int rc = fiber_session_list_init(&tmplist, 0, 0);
         if (rc != 0) {
             return rc;
         }
@@ -778,8 +783,8 @@ namespace turbo::fiber_internal {
         TURBO_UNUSED(turbo::fiber_internal::fiber_mutex_lock(mutex));
         std::swap(list->impl, tmplist.impl);
         turbo::fiber_internal::fiber_mutex_unlock(mutex);
-        const int rc2 = fiber_token_reset2(&tmplist, error_code, error_text);
-        fiber_token_list_destroy(&tmplist);
+        const int rc2 = fiber_session_reset2(&tmplist, error_code, error_text);
+        fiber_session_list_destroy(&tmplist);
         return rc2;
     }
 }  // namespace turbo::fiber_internal
