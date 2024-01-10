@@ -23,6 +23,7 @@ feature improvement
 --------------------------------
 * tidy file descriptor operation to file io module.
 * promote the sequential write file io, avoid c-style file cache.
+* add ignore case hash set/map
 
 bug fix
 --------------------------------
