@@ -74,7 +74,7 @@
 #include <unistd.h>
 
 #ifdef TURBO_PLATFORM_ANDROID
-                                                                                                                        #include <android/api-level.h>
+#include <android/api-level.h>
 #if __ANDROID_API__ < 12
 #include <sys/syscall.h>
 #endif
