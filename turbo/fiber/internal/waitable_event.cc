@@ -22,7 +22,7 @@
 #include "turbo/base/processor.h"             // cpu_relax
 #include "turbo/fiber/internal/schedule_group.h"
 #include "turbo/fiber/internal/fiber_worker.h"            // FiberWorker
-#include "turbo/times/timer_thread.h"
+#include "turbo/fiber/internal/timer.h"
 #include "turbo/fiber/internal/waitable_event.h"
 #include "turbo/fiber/internal/errno.h"
 #include "turbo/concurrent/lock.h"
@@ -264,7 +264,7 @@ namespace turbo::fiber_internal {
             return 1;
         }
         FiberEventWaiterNode *bbw = reinterpret_cast<FiberEventWaiterNode *>(&(*front));
-        unsleep_if_necessary(bbw, get_global_timer_thread());
+        unsleep_if_necessary(bbw, get_fiber_timer_thread());
         FiberWorker *g = tls_task_group;
         if (g) {
             FiberWorker::exchange(&g, bbw->tid);
@@ -306,7 +306,7 @@ namespace turbo::fiber_internal {
         // We will exchange with first waiter in the end.
         FiberEventWaiterNode *next = reinterpret_cast<FiberEventWaiterNode *>(&(*fiber_waiters.begin()));
         fiber_waiters.remove(*next);
-        unsleep_if_necessary(next, get_global_timer_thread());
+        unsleep_if_necessary(next, get_fiber_timer_thread());
         ++nwakeup;
         FiberWorker *g = get_task_group(next->control);
         const int saved_nwakeup = nwakeup;
@@ -314,7 +314,7 @@ namespace turbo::fiber_internal {
             // pop reversely
             FiberEventWaiterNode *w = reinterpret_cast<FiberEventWaiterNode *>(&(*fiber_waiters.rbegin()));
             fiber_waiters.remove(*w);
-            unsleep_if_necessary(w, get_global_timer_thread());
+            unsleep_if_necessary(w, get_fiber_timer_thread());
             g->ready_to_run_general(w->tid, true);
             ++nwakeup;
         }
@@ -378,7 +378,7 @@ namespace turbo::fiber_internal {
             // pop reversely
             FiberEventWaiterNode *w = reinterpret_cast<FiberEventWaiterNode *>(&(*fiber_waiters.rbegin()));
             fiber_waiters.remove(*w);
-            unsleep_if_necessary(w, get_global_timer_thread());
+            unsleep_if_necessary(w, get_fiber_timer_thread());
             g->ready_to_run_general(w->tid, true);
             ++nwakeup;
         } while (!fiber_waiters.empty());
@@ -418,7 +418,7 @@ namespace turbo::fiber_internal {
             return 1;
         }
         FiberEventWaiterNode *bbw = static_cast<FiberEventWaiterNode *>(front);
-        unsleep_if_necessary(bbw, get_global_timer_thread());
+        unsleep_if_necessary(bbw, get_fiber_timer_thread());
         FiberWorker *g = tls_task_group;
         if (g) {
             FiberWorker::exchange(&g, front->tid);
@@ -504,7 +504,7 @@ namespace turbo::fiber_internal {
         // FiberWorker::interrupt() no-op, there's no race between following code and
         // the two functions. The on-stack FiberEventWaiterNode is safe to use and
         // bw->waiter_state will not change again.
-        unsleep_if_necessary(bw, get_global_timer_thread());
+        unsleep_if_necessary(bw, get_fiber_timer_thread());
         tls_task_group->ready_to_run(bw->tid);
         // FIXME: jump back to original thread is buggy.
 
@@ -519,7 +519,7 @@ namespace turbo::fiber_internal {
     }
 
     static turbo::Status event_wait_from_pthread(FiberWorker *g, waitable_event *b, int expected_value,
-                                       const timespec *abstime) {
+                                                 const timespec *abstime) {
         // sys futex needs relative timeout.
         // Compute diff between abstime and now.
         timespec *ptimeout = nullptr;
@@ -602,7 +602,7 @@ namespace turbo::fiber_internal {
             if (abs_time < (turbo::time_now() + MIN_SLEEP)) {
                 return turbo::deadline_exceeded_error("");
             }
-            bbw.sleep_id = get_global_timer_thread()->schedule(
+            bbw.sleep_id = get_fiber_timer_thread()->schedule(
                     erase_from_event_and_wakeup, &bbw, abs_time);
             if (!bbw.sleep_id) {  // TimerThread stopped.
                 return turbo::already_stop_error("");
@@ -617,12 +617,12 @@ namespace turbo::fiber_internal {
 
         // erase_from_event_and_wakeup (called by TimerThread) is possibly still
         // running and using bbw. The chance is small, just spin until it's done.
-        TURBO_LOOP_WHEN(unsleep_if_necessary(&bbw, get_global_timer_thread()) < 0,30/*nops before sched_yield*/);
+        TURBO_LOOP_WHEN(unsleep_if_necessary(&bbw, get_fiber_timer_thread()) < 0, 30/*nops before sched_yield*/);
 
         // If current_waiter is nullptr, FiberWorker::interrupt() is running and using bbw.
         // Spin until current_waiter != nullptr.
         TURBO_LOOP_WHEN(bbw.task_meta->current_waiter.exchange(
-                nullptr, std::memory_order_acquire) == nullptr,30/*nops before sched_yield*/);
+                nullptr, std::memory_order_acquire) == nullptr, 30/*nops before sched_yield*/);
 
         bool is_interrupted = false;
         if (bbw.task_meta->interrupted) {

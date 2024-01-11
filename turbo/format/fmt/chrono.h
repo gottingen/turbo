@@ -587,9 +587,9 @@ namespace turbo {
             return begin;
         }
 
-// Writes two-digit numbers a, b and c separated by sep to buf.
-// The method by Pavel Novikov based on
-// https://johnnylee-sde.github.io/Fast-unsigned-integer-to-time-string/.
+        // Writes two-digit numbers a, b and c separated by sep to buf.
+        // The method by Pavel Novikov based on
+        // https://johnnylee-sde.github.io/Fast-unsigned-integer-to-time-string/.
         inline void write_digit2_separated(char *buf, unsigned a, unsigned b,
                                            unsigned c, char sep) {
             unsigned long long digits =
@@ -612,7 +612,7 @@ namespace turbo {
             digits |= 0x3030003030003030 | (usep << 16) | (usep << 40);
 
             constexpr const size_t len = 8;
-            if (const_check(is_big_endian())) {
+            if (const_check(!kIsLittleEndian)) {
                 char tmp[len];
                 std::memcpy(tmp, &digits, len);
                 std::reverse_copy(tmp, tmp + len, buf);

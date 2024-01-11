@@ -221,7 +221,9 @@ namespace turbo::fiber_internal {
         unsigned conflict_size;
     } FiberSessionList;
 
-    typedef uint64_t fiber_timer_id;
+    using  fiber_timer_id = uint64_t;
+
+    static constexpr fiber_timer_id INVALID_FIBER_TIMER_ID = 0;
 
 }  // namespace turbo::fiber_internal
 #endif  // TURBO_FIBER_INTERNAL_TYPES_H_

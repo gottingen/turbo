@@ -26,7 +26,7 @@
 #include "turbo/base/processor.h"
 #include "turbo/fiber/internal/schedule_group.h"
 #include "turbo/fiber/internal/fiber_worker.h"
-#include "turbo/times/timer_thread.h"
+#include "turbo/fiber/internal/timer.h"
 #include "turbo/fiber/internal/offset_table.h"
 #include "turbo/log/logging.h"
 #include "turbo/base/sysinfo.h"
@@ -670,7 +670,7 @@ namespace turbo::fiber_internal {
         FiberWorker *g = e.group;
 
         TimerThread::TaskId sleep_id;
-        sleep_id = get_global_timer_thread()->schedule(ready_to_run_from_timer_thread, void_args,
+        sleep_id = get_fiber_timer_thread()->schedule(ready_to_run_from_timer_thread, void_args,
                 turbo::microseconds_from_now(e.timeout_us));
 
         if (!sleep_id) {
@@ -691,7 +691,7 @@ namespace turbo::fiber_internal {
         // The thread is stopped or interrupted.
         // interrupt() always sees that current_sleep == 0. It will not schedule
         // the calling thread. The race is between current thread and timer thread.
-        if (get_global_timer_thread()->unschedule(sleep_id).ok()) {
+        if (get_fiber_timer_thread()->unschedule(sleep_id).ok()) {
             // added to timer, previous thread may be already woken up by timer and
             // even stopped. It's safe to schedule previous thread when unschedule()
             // returns 0 which means "the not-run-yet sleep_id is removed". If the
@@ -827,7 +827,7 @@ namespace turbo::fiber_internal {
                 return rc;
             }
         } else if (sleep_id != 0) {
-            if (get_global_timer_thread()->unschedule(sleep_id).ok()) {
+            if (get_fiber_timer_thread()->unschedule(sleep_id).ok()) {
                 turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
                 if (g) {
                     g->ready_to_run(tid);

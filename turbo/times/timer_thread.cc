@@ -26,6 +26,7 @@
 #include "turbo/hash/hash.h"
 #include "turbo/base/sysinfo.h"
 #include "turbo/base/threading.h"
+#include <utility>
 
 namespace turbo {
 
@@ -34,76 +35,69 @@ namespace turbo {
 
     }
 
-    const TimerThread::TaskId TimerThread::INVALID_TASK_ID = 0;
-
-    TimerThreadOptions::TimerThreadOptions()
-            : num_buckets(13) {
-    }
-
     // A task contains the necessary information for running fn(arg).
     // Tasks are created in Bucket::schedule and destroyed in TimerThread::run
-    struct TURBO_CACHE_LINE_ALIGNED TimerThread::Task{
-            Task * next;                 // For linking tasks in a Bucket.
-            turbo::Time run_time;           // run the task at this realtime
-            void (*fn)(void*);          // the fn(arg) to run
-            void* arg;
-            // Current TaskId, checked against version in TimerThread::run to test
-            // if this task is unscheduled.
-            TaskId task_id;
-            // initial_version:     not run yet
-            // initial_version + 1: running
-            // initial_version + 2: removed (also the version of next Task reused
-            //                      this struct)
-            std::atomic<uint32_t> version;
+    struct TURBO_CACHE_LINE_ALIGNED TimerThread::Task {
+        Task *next;                 // For linking tasks in a Bucket.
+        turbo::Time run_time;           // run the task at this realtime
+        timer_task_fn_t fn;          // the fn(arg) to run
+        void *arg;
+        // Current TaskId, checked against version in TimerThread::run to test
+        // if this task is unscheduled.
+        TaskId task_id;
+        // initial_version:     not run yet
+        // initial_version + 1: running
+        // initial_version + 2: removed (also the version of next Task reused
+        //                      this struct)
+        std::atomic<uint32_t> version;
 
-            Task() : version(2/*skip 0*/) {}
+        Task() : version(2/*skip 0*/) {}
 
-            // Run this task and delete this struct.
-            // Returns true if fn(arg) did run.
-            bool run_and_delete();
+        // Run this task and delete this struct.
+        // Returns true if fn(arg) did run.
+        bool run_and_delete();
 
-            // Delete this struct if this task was unscheduled.
-            // Returns true on deletion.
-            bool try_delete();
+        // Delete this struct if this task was unscheduled.
+        // Returns true on deletion.
+        bool try_delete();
     };
 
     // Timer tasks are sharded into different Buckets to reduce contentions.
-    class TURBO_CACHE_LINE_ALIGNED TimerThread::Bucket{
-            public:
-            Bucket()
-            : _nearest_run_time(turbo::infinite_future())
-            , _task_head(nullptr) {
-            }
+    class TURBO_CACHE_LINE_ALIGNED TimerThread::Bucket {
+    public:
+        Bucket()
+                : _nearest_run_time(turbo::infinite_future()), _task_head(nullptr) {
+        }
 
-            ~Bucket() {}
+        ~Bucket() {}
 
-            struct ScheduleResult {
-                TimerThread::TaskId task_id;
-                bool earlier;
-            };
+        struct ScheduleResult {
+            TimerThread::TaskId task_id;
+            bool earlier;
+        };
 
-            // Schedule a task into this bucket.
-            // Returns the TaskId and if it has the nearest run time.
-            ScheduleResult schedule(void (*fn)(void*), void* arg, const turbo::Time &abstime);
+        // Schedule a task into this bucket.
+        // Returns the TaskId and if it has the nearest run time.
+        ScheduleResult schedule(timer_task_fn_t &&fn, void *arg, const turbo::Time &abstime);
 
-            // Pull all scheduled tasks.
-            // This function is called in timer thread.
-            Task* consume_tasks();
+        // Pull all scheduled tasks.
+        // This function is called in timer thread.
+        Task *consume_tasks();
 
-            private:
-            turbo::SpinLock _mutex;
-            turbo::Time _nearest_run_time;
-            Task* _task_head;
+    private:
+        turbo::SpinLock _mutex;
+        turbo::Time _nearest_run_time;
+        Task *_task_head;
     };
-    
+
     inline TimerThread::TaskId make_task_id(
-            turbo::ResourceId <TimerThread::Task> slot, uint32_t version) {
+            turbo::ResourceId<TimerThread::Task> slot, uint32_t version) {
         return TimerThread::TaskId((((uint64_t) version) << 32) | slot.value);
     }
 
     inline
-    turbo::ResourceId <TimerThread::Task> slot_of_task_id(TimerThread::TaskId id) {
-        turbo::ResourceId <TimerThread::Task> slot = {(id & 0xFFFFFFFFul)};
+    turbo::ResourceId<TimerThread::Task> slot_of_task_id(TimerThread::TaskId id) {
+        turbo::ResourceId<TimerThread::Task> slot = {(id & 0xFFFFFFFFul)};
         return slot;
     }
 
@@ -177,16 +171,16 @@ namespace turbo {
     }
 
     TimerThread::Bucket::ScheduleResult
-    TimerThread::Bucket::schedule(void (*fn)(void *), void *arg,
+    TimerThread::Bucket::schedule(timer_task_fn_t &&fn, void *arg,
                                   const turbo::Time &abstime) {
-        turbo::ResourceId <Task> slot_id;
+        turbo::ResourceId<Task> slot_id;
         Task *task = turbo::get_resource<Task>(&slot_id);
         if (task == nullptr) {
             ScheduleResult result = {INVALID_TASK_ID, false};
             return result;
         }
         task->next = nullptr;
-        task->fn = fn;
+        task->fn = std::move(fn);
         task->arg = arg;
         task->run_time = abstime;
         uint32_t version = task->version.load(std::memory_order_relaxed);
@@ -211,15 +205,15 @@ namespace turbo {
     }
 
     TimerThread::TaskId TimerThread::schedule(
-            void (*fn)(void *), void *arg, const turbo::Time &abstime) {
+            timer_task_fn_t &&fn, void *arg, const turbo::Time &abstime) {
         if (_stop.load(std::memory_order_relaxed) || !_started) {
             // Not add tasks when TimerThread is about to stop.
             return INVALID_TASK_ID;
         }
         // Hashing by pthread id is better for cache locality.
         const Bucket::ScheduleResult result =
-                _buckets[turbo::hash_mixer8(turbo::thread_numeric_id()) % _options.num_buckets]
-                        .schedule(fn, arg, abstime);
+                _buckets[turbo::hash_mixer8(turbo::thread_numeric_id()) % _options.num_buckets].schedule(std::move(fn), arg,
+                                                                                                         abstime);
         if (result.earlier) {
             bool earlier = false;
             const auto run_time = abstime;
@@ -248,7 +242,7 @@ namespace turbo {
     // between timeout and latency in most RPC scenarios, this is why we don't
     // try to reuse tasks right now inside unschedule() with more complicated code.
     turbo::Status TimerThread::unschedule(TaskId task_id) {
-        const turbo::ResourceId <Task> slot_id = slot_of_task_id(task_id);
+        const turbo::ResourceId<Task> slot_id = slot_of_task_id(task_id);
         Task *const task = turbo::address_resource(slot_id);
         if (task == nullptr) {
             TLOG_ERROR("Invalid task_id={}", task_id);
@@ -325,7 +319,7 @@ namespace turbo {
             // Pull tasks from buckets.
             for (size_t i = 0; i < _options.num_buckets; ++i) {
                 Bucket &bucket = _buckets[i];
-                for (Task *p = bucket.consume_tasks(); p != nullptr; ) {
+                for (Task *p = bucket.consume_tasks(); p != nullptr;) {
                     // p->next should be kept first
                     // in case of the deletion of Task p which is unscheduled
                     Task *next_task = p->next;
@@ -398,7 +392,7 @@ namespace turbo {
             if (next_run_time != turbo::infinite_future()) {
                 du = next_run_time - now;
             }
-            auto r= _nsignals.wait_for(expected_nsignals, du);
+            auto r = _nsignals.wait_for(expected_nsignals, du);
             TURBO_UNUSED(r);
         }
         TLOG_INFO("Ended TimerThread={}", pthread_self());
@@ -419,36 +413,10 @@ namespace turbo {
                 _nsignals.wake_one();
                 pthread_join(_thread, nullptr);
             }
+            _started = false;
         }
     }
 
-    static pthread_once_t g_timer_thread_once = PTHREAD_ONCE_INIT;
-    static TimerThread *g_timer_thread = nullptr;
-
-    static void init_global_timer_thread() {
-        g_timer_thread = new(std::nothrow) TimerThread;
-        if (g_timer_thread == nullptr) {
-            TLOG_CRITICAL("Fail to new g_timer_thread");
-            return;
-        }
-        TimerThreadOptions options;
-        options.bvar_prefix = "bthread_timer";
-        const auto rc = g_timer_thread->start(&options);
-        if (!rc.ok()) {
-            TLOG_CRITICAL("Fail to start timer_thread, {}", rc.to_string());
-            delete g_timer_thread;
-            g_timer_thread = nullptr;
-            return;
-        }
-    }
-
-    TimerThread *get_or_create_global_timer_thread() {
-        pthread_once(&g_timer_thread_once, init_global_timer_thread);
-        return g_timer_thread;
-    }
-
-    TimerThread *get_global_timer_thread() {
-        return g_timer_thread;
-    }
-
+    template turbo::Status init_timer_thread<global_timer_thread_tag>(const TimerThreadOptions *options = nullptr);
+    template TimerThread * get_timer_thread<global_timer_thread_tag>();
 }  // end namespace turbo

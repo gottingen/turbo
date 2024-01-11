@@ -24,7 +24,7 @@
 #include "turbo/base/processor.h"            // cpu_relax
 #include "turbo/fiber/internal/fiber_worker.h"           // FiberWorker
 #include "turbo/fiber/internal/schedule_group.h"
-#include "turbo/times/timer_thread.h"         // global_timer_thread
+#include "turbo/fiber/internal/timer.h"         // global_timer_thread
 #include "turbo/log/logging.h"
 #include "turbo/base/turbo_error.h"
 #include "turbo/random/random.h"
@@ -125,7 +125,7 @@ namespace turbo::fiber_internal {
         _concurrency = concurrency;
 
         // Make sure TimerThread is ready.
-        if (get_or_create_global_timer_thread() == nullptr) {
+        if (!init_fiber_timer_thread().ok()) {
             TLOG_ERROR("Fail to get global_timer_thread");
             return -1;
         }
@@ -280,7 +280,7 @@ namespace turbo::fiber_internal {
         // access the removed group concurrently. We use simple strategy here:
         // Schedule a function which deletes the FiberWorker after
         if (erased) {
-            auto rs = get_global_timer_thread()->schedule(delete_task_group, g,
+            auto rs = get_fiber_timer_thread()->schedule(delete_task_group, g,
                                                 turbo::seconds_from_now(
                                                         FiberConfig::get_instance().task_group_delete_delay));
             TURBO_UNUSED(rs);

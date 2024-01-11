@@ -149,16 +149,6 @@ namespace turbo::fiber_internal {
 
     int fiber_about_to_quit();
 
-    // Run `on_timer(arg)' at or after real-time `abstime'. Put identifier of the
-    // timer into *id.
-    // Return 0 on success, errno otherwise.
-    int fiber_timer_add(fiber_timer_id *id, timespec abstime,
-                        void (*on_timer)(void *), void *arg);
-
-    // Unschedule the timer associated with `id'.
-    // Returns: 0 - exist & not-run; 1 - still running; EINVAL - not exist.
-    int fiber_timer_del(fiber_timer_id id);
-
 
     // Add a startup function that each pthread worker will run at the beginning
     // To run code at the end, use turbo::thread::atexit()

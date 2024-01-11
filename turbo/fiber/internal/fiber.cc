@@ -280,39 +280,6 @@ namespace turbo::fiber_internal {
         return EPERM;
     }
 
-    int fiber_timer_add(fiber_timer_id *id, timespec abstime,
-                        void (*on_timer)(void *), void *arg) {
-        turbo::fiber_internal::ScheduleGroup *c = turbo::fiber_internal::get_or_new_task_control();
-        if (c == nullptr) {
-            return ENOMEM;
-        }
-        turbo::TimerThread *tt = turbo::get_or_create_global_timer_thread();
-        if (tt == nullptr) {
-            return ENOMEM;
-        }
-        fiber_timer_id tmp = tt->schedule(on_timer, arg, turbo::time_from_timespec(abstime));
-        if (tmp != 0) {
-            *id = tmp;
-            return 0;
-        }
-        return 20;
-    }
-
-    int fiber_timer_del(fiber_timer_id id) {
-        turbo::fiber_internal::ScheduleGroup *c = turbo::fiber_internal::get_task_control();
-        if (c != nullptr) {
-            turbo::TimerThread *tt = turbo::get_global_timer_thread();
-            if (tt == nullptr) {
-                return EINVAL;
-            }
-            const auto state = tt->unschedule(id);
-            if (state.ok() || turbo::is_not_found(state)) {
-                return 0;
-            }
-        }
-        return EINVAL;
-    }
-
     int fiber_set_worker_startfn(void (*start_fn)()) {
         if (start_fn == nullptr) {
             return EINVAL;

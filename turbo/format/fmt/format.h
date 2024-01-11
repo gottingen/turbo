@@ -48,12 +48,13 @@
 #endif
 
 #include "core.h"
-
+#include "turbo/base/endian.h"
+#include "turbo/base/assume.h"
 
 #ifndef FMT_THROW
 #  if TURBO_HAVE_EXCEPTIONS
 #    if TURBO_MSC_VERSION || defined(__NVCC__)
-                                                                                                                        FMT_BEGIN_NAMESPACE
+FMT_BEGIN_NAMESPACE
 namespace fmt_detail {
 template <typename Exception> inline void do_throw(const Exception& x) {
   // Silence unreachable code warnings in MSVC and NVCC because these
@@ -166,7 +167,7 @@ namespace turbo {
             }
         };
 
-// Implementation of std::bit_cast for pre-C++20.
+        // Implementation of std::bit_cast for pre-C++20.
         template<typename To, typename From, TURBO_ENABLE_IF(sizeof(To) == sizeof(From))>
         TURBO_CONSTEXPR20 auto bit_cast(const From &from) -> To {
 #ifdef __cpp_lib_bit_cast
@@ -176,21 +177,6 @@ namespace turbo {
             // The cast suppresses a bogus -Wclass-memaccess on GCC.
             std::memcpy(static_cast<void *>(&to), &from, sizeof(to));
             return to;
-        }
-
-        inline auto is_big_endian() -> bool {
-#ifdef _WIN32
-            return false;
-#elif defined(__BIG_ENDIAN__)
-            return true;
-#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__)
-            return __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__;
-#else
-                                                                                                                                    struct bytes {
-    char data[sizeof(int)];
-  };
-  return bit_cast<bytes>(1).data[0] == 0;
-#endif
         }
 
         class uint128_fallback {
@@ -329,8 +315,8 @@ namespace turbo {
         using uintptr_t = uint128_t;
 #endif
 
-// Returns the largest possible value for type T. Same as
-// std::numeric_limits<T>::max() but shorter and not affected by the max macro.
+        // Returns the largest possible value for type T. Same as
+        // std::numeric_limits<T>::max() but shorter and not affected by the max macro.
         template<typename T>
         constexpr auto max_value() -> T {
             return (std::numeric_limits<T>::max)();
@@ -341,15 +327,15 @@ namespace turbo {
             return std::numeric_limits<T>::digits;
         }
 
-// std::numeric_limits<T>::digits may return 0 for 128-bit ints.
+        // std::numeric_limits<T>::digits may return 0 for 128-bit ints.
         template<>
         constexpr auto num_bits<int128_opt>() -> int { return 128; }
 
         template<>
         constexpr auto num_bits<uint128_t>() -> int { return 128; }
 
-// A heterogeneous bit_cast used for converting 96-bit long double to uint128_t
-// and 128-bit pointers to uint128_fallback.
+        // A heterogeneous bit_cast used for converting 96-bit long double to uint128_t
+        // and 128-bit pointers to uint128_fallback.
         template<typename To, typename From, TURBO_ENABLE_IF(sizeof(To) > sizeof(From))>
         inline auto bit_cast(const From &from) -> To {
             constexpr auto size = static_cast<int>(sizeof(From) / sizeof(unsigned));
@@ -357,7 +343,7 @@ namespace turbo {
                 unsigned value[static_cast<unsigned>(size)];
             } data = bit_cast<data_t>(from);
             auto result = To();
-            if (const_check(is_big_endian())) {
+            if (const_check(!kIsLittleEndian)) {
                 for (int i = 0; i < size; ++i)
                     result = (result << num_bits<unsigned>()) | data.value[i];
             } else {
@@ -367,20 +353,12 @@ namespace turbo {
             return result;
         }
 
-
-        TURBO_FORCE_INLINE void assume(bool condition) {
-            (void) condition;
-#if TURBO_HAVE_BUILTIN(__builtin_assume) && !TURBO_ICC_VERSION
-            __builtin_assume(condition);
-#endif
-        }
-
-// An approximation of iterator_t for pre-C++20 systems.
+        // An approximation of iterator_t for pre-C++20 systems.
         template<typename T>
         using iterator_t = decltype(std::begin(std::declval<T &>()));
         template<typename T> using sentinel_t = decltype(std::end(std::declval<T &>()));
 
-// A workaround for std::string not having mutable data() until C++17.
+        // A workaround for std::string not having mutable data() until C++17.
         template<typename Char>
         inline auto get_data(std::basic_string<Char> &s) -> Char * {
             return &s[0];
@@ -392,12 +370,12 @@ namespace turbo {
         }
 
 #if defined(_SECURE_SCL) && _SECURE_SCL
-                                                                                                                                // Make a checked iterator to avoid MSVC warnings.
-template <typename T> using checked_ptr = stdext::checked_array_iterator<T*>;
-template <typename T>
-constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
-  return {p, size};
-}
+        // Make a checked iterator to avoid MSVC warnings.
+        template <typename T> using checked_ptr = stdext::checked_array_iterator<T*>;
+        template <typename T>
+        constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
+            return {p, size};
+        }
 #else
         template<typename T> using checked_ptr = T *;
 
@@ -408,8 +386,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
 #endif
 
-// Attempts to reserve space for n extra characters in the output range.
-// Returns a pointer to the reserved range or a reference to it.
+        // Attempts to reserve space for n extra characters in the output range.
+        // Returns a pointer to the reserved range or a reference to it.
         template<typename Container, TURBO_ENABLE_IF(is_contiguous<Container>::value)>
 #if TURBO_CLANG_VERSION >= 307 && !TURBO_ICC_VERSION
         __attribute__((no_sanitize("undefined")))
@@ -465,8 +443,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return it;
         }
 
-// <algorithm> is spectacularly slow to compile in C++20 so use a simple fill_n
-// instead (#1998).
+        // <algorithm> is spectacularly slow to compile in C++20 so use a simple fill_n
+        // instead (#1998).
         template<typename OutputIt, typename Size, typename T>
         constexpr auto fill_n(OutputIt out, Size count, const T &value)
         -> OutputIt {
@@ -496,23 +474,23 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return copy_str<OutChar>(begin, end, out);
         }
 
-// A public domain branchless UTF-8 decoder by Christopher Wellons:
-// https://github.com/skeeto/branchless-utf8
-/* Decode the next character, c, from s, reporting errors in e.
- *
- * Since this is a branchless decoder, four bytes will be read from the
- * buffer regardless of the actual length of the next character. This
- * means the buffer _must_ have at least three bytes of zero padding
- * following the end of the data stream.
- *
- * Errors are reported in e, which will be non-zero if the parsed
- * character was somehow invalid: invalid byte sequence, non-canonical
- * encoding, or a surrogate half.
- *
- * The function returns a pointer to the next character. When an error
- * occurs, this pointer will be a guess that depends on the particular
- * error, but it will always advance at least one byte.
- */
+        // A public domain branchless UTF-8 decoder by Christopher Wellons:
+        // https://github.com/skeeto/branchless-utf8
+        /* Decode the next character, c, from s, reporting errors in e.
+         *
+         * Since this is a branchless decoder, four bytes will be read from the
+         * buffer regardless of the actual length of the next character. This
+         * means the buffer _must_ have at least three bytes of zero padding
+         * following the end of the data stream.
+         *
+         * Errors are reported in e, which will be non-zero if the parsed
+         * character was somehow invalid: invalid byte sequence, non-canonical
+         * encoding, or a surrogate half.
+         *
+         * The function returns a pointer to the next character. When an error
+         * occurs, this pointer will be a guess that depends on the particular
+         * error, but it will always advance at least one byte.
+         */
         constexpr inline auto utf8_decode(const char *s, uint32_t *c, int *e)
         -> const char * {
             constexpr const int masks[] = {0x00, 0x7f, 0x1f, 0x0f, 0x07};
@@ -552,8 +530,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
         constexpr inline uint32_t invalid_code_point = ~uint32_t();
 
-// Invokes f(cp, sv) for every code point cp in s with sv being the string view
-// corresponding to the code point. cp is invalid_code_point on error.
+        // Invokes f(cp, sv) for every code point cp in s with sv being the string view
+        // corresponding to the code point. cp is invalid_code_point on error.
         template<typename F>
         constexpr void for_each_codepoint(std::string_view s, F f) {
             auto decode = [f](const char *buf_ptr, const char *ptr) {
@@ -590,7 +568,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return s.size();
         }
 
-// Computes approximate display width of a UTF-8 string.
+        // Computes approximate display width of a UTF-8 string.
         constexpr inline size_t compute_width(std::string_view s) {
             size_t num_code_points = 0;
             // It is not a lambda for compatibility with C++14.
@@ -686,7 +664,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
 #ifndef FMT_USE_FLOAT128
 #  ifdef __clang__
-                                                                                                                                // Clang emulates GCC, so it has to appear early.
+// Clang emulates GCC, so it has to appear early.
 #    if TURBO_HAVE_INCLUDE(<quadmath.h>)
 #      define FMT_USE_FLOAT128 1
 #    endif
@@ -850,20 +828,20 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
     public:
         /**
-    \rst
-    Constructs a :class:`turbo::basic_memory_buffer` object moving the content
-    of the other object to it.
-    \endrst
-   */
+        \rst
+        Constructs a :class:`turbo::basic_memory_buffer` object moving the content
+        of the other object to it.
+        \endrst
+       */
         TURBO_CONSTEXPR20 basic_memory_buffer(basic_memory_buffer &&other) noexcept {
             move(other);
         }
 
         /**
-    \rst
-    Moves the content of the other ``basic_memory_buffer`` object to this one.
-    \endrst
-   */
+        \rst
+        Moves the content of the other ``basic_memory_buffer`` object to this one.
+        \endrst
+       */
         auto operator=(basic_memory_buffer &&other) noexcept -> basic_memory_buffer & {
             TURBO_ASSERT(this != &other);
             deallocate();
@@ -875,9 +853,9 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         auto get_allocator() const -> Allocator { return alloc_; }
 
         /**
-    Resizes the buffer to contain *count* elements. If T is a POD type new
-    elements may not be initialized.
-   */
+        Resizes the buffer to contain *count* elements. If T is a POD type new
+        elements may not be initialized.
+       */
         TURBO_CONSTEXPR20 void resize(size_t count) { this->try_resize(count); }
 
         /** Increases the buffer capacity to *new_capacity*. */
@@ -918,16 +896,16 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
     namespace detail_exported {
 #if TURBO_USE_NONTYPE_TEMPLATE_ARGS
-                                                                                                                                template <typename Char, size_t N> struct fixed_string {
-  constexpr fixed_string(const Char (&str)[N]) {
-    fmt_detail::copy_str<Char, const Char*, Char*>(static_cast<const Char*>(str),
+        template <typename Char, size_t N> struct fixed_string {
+        constexpr fixed_string(const Char (&str)[N]) {
+            fmt_detail::copy_str<Char, const Char*, Char*>(static_cast<const Char*>(str),
                                                str + N, data);
-  }
-  Char data[N] = {};
-};
+        }
+        Char data[N] = {};
+        };
 #endif
 
-// Converts a compile-time string to std::basic_string_view.
+        // Converts a compile-time string to std::basic_string_view.
         template<typename Char, size_t N>
         constexpr auto compile_string_to_view(const Char (&s)[N])
         -> std::basic_string_view<Char> {
@@ -960,8 +938,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         }
     };
 
-// A locale facet that formats values in UTF-8.
-// It is parameterized on the locale to avoid the heavy <locale> include.
+    // A locale facet that formats values in UTF-8.
+    // It is parameterized on the locale to avoid the heavy <locale> include.
     template<typename Locale>
     class format_facet : public Locale::facet {
     private:
@@ -1013,8 +991,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return true;
         }
 
-// Smallest of uint32_t, uint64_t, uint128_t that is large enough to
-// represent all values of an integral type T.
+        // Smallest of uint32_t, uint64_t, uint128_t that is large enough to
+        // represent all values of an integral type T.
         template<typename T>
         using uint32_or_64_or_128_t =
                 std::conditional_t<num_bits<T>() <= 32 && !FMT_REDUCE_INT_INSTANTIATIONS,
@@ -1028,7 +1006,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
       (factor)*1000000, (factor)*10000000, (factor)*100000000,               \
       (factor)*1000000000
 
-// Converts value in the range [0, 100) to a string.
+        // Converts value in the range [0, 100) to a string.
         constexpr const char *digits2(size_t value) {
             // GCC generates slightly better code when value is pointer-size.
             return &"0001020304050607080910111213141516171819"
@@ -1038,7 +1016,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                     "8081828384858687888990919293949596979899"[value * 2];
         }
 
-// Sign is a template parameter to workaround a bug in gcc 4.8.
+        // Sign is a template parameter to workaround a bug in gcc 4.8.
         template<typename Char, typename Sign>
         constexpr Char sign(Sign s) {
 #if !TURBO_GCC_VERSION || TURBO_GCC_VERSION >= 604
@@ -1073,8 +1051,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
 #ifdef FMT_BUILTIN_CLZLL
 
-// It is a separate function rather than a part of count_digits to workaround
-// the lack of static constexpr in constexpr functions.
+        // It is a separate function rather than a part of count_digits to workaround
+        // the lack of static constexpr in constexpr functions.
         inline auto do_count_digits(uint64_t n) -> int {
             // This has comparable performance to the version by Kendall Willets
             // (https://github.com/fmtlib/format-benchmark/blob/master/digits10)
@@ -1094,8 +1072,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
 #endif
 
-// Returns the number of decimal digits in n. Leading zeros are not counted
-// except for n == 0 in which case count_digits returns 1.
+        // Returns the number of decimal digits in n. Leading zeros are not counted
+        // except for n == 0 in which case count_digits returns 1.
         TURBO_CONSTEXPR20 inline auto count_digits(uint64_t n) -> int {
 #ifdef FMT_BUILTIN_CLZLL
             if (!turbo::is_constant_evaluated()) {
@@ -1105,7 +1083,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return count_digits_fallback(n);
         }
 
-// Counts the number of digits in n. BITS = log2(radix).
+        // Counts the number of digits in n. BITS = log2(radix).
         template<int BITS, typename UInt>
         constexpr auto count_digits(UInt n) -> int {
 #ifdef FMT_BUILTIN_CLZ
@@ -1202,7 +1180,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return decimal_point_impl<wchar_t>(loc);
         }
 
-// Compares two characters for equality.
+        // Compares two characters for equality.
         template<typename Char>
         auto equal2(const Char *lhs, const char *rhs) -> bool {
             return lhs[0] == Char(rhs[0]) && lhs[1] == Char(rhs[1]);
@@ -1212,7 +1190,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return memcmp(lhs, rhs, 2) == 0;
         }
 
-// Copies two characters from src to dst.
+        // Copies two characters from src to dst.
         template<typename Char>
         TURBO_CONSTEXPR20 TURBO_FORCE_INLINE void copy2(Char *dst, const char *src) {
             if (!turbo::is_constant_evaluated() && sizeof(Char) == sizeof(char)) {
@@ -1229,9 +1207,9 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             Iterator end;
         };
 
-// Formats a decimal unsigned integer value writing into out pointing to a
-// buffer of specified size. The caller must ensure that the buffer is large
-// enough.
+        // Formats a decimal unsigned integer value writing into out pointing to a
+        // buffer of specified size. The caller must ensure that the buffer is large
+        // enough.
         template<typename Char, typename UInt>
         TURBO_CONSTEXPR20 auto format_decimal(Char *out, UInt value, int size)
         -> format_decimal_result<Char *> {
@@ -1292,7 +1270,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return fmt_detail::copy_str_noinline<Char>(buffer, buffer + num_digits, out);
         }
 
-// A converter from UTF-8 to UTF-16.
+        // A converter from UTF-8 to UTF-16.
         class utf8_to_utf16 {
         private:
             basic_memory_buffer<wchar_t> buffer_;
@@ -1309,7 +1287,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             auto str() const -> std::wstring { return {&buffer_[0], size()}; }
         };
 
-// A converter from UTF-16/UTF-32 (host endian) to UTF-8.
+        // A converter from UTF-16/UTF-32 (host endian) to UTF-8.
         template<typename WChar, typename Buffer = memory_buffer>
         class unicode_to_utf8 {
         private:
@@ -1377,7 +1355,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             }
         };
 
-// Computes 128-bit result of multiplication of two 64-bit unsigned integers.
+        // Computes 128-bit result of multiplication of two 64-bit unsigned integers.
         inline uint128_fallback umul128(uint64_t x, uint64_t y) noexcept {
 #if FMT_USE_INT128
             auto p = static_cast<uint128_opt>(x) * static_cast<uint128_opt>(y);
@@ -1407,8 +1385,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
         }
 
         namespace dragonbox {
-// Computes floor(log10(pow(2, e))) for e in [-2620, 2620] using the method from
-// https://fmt.dev/papers/Dragonbox.pdf#page=28, section 6.1.
+            // Computes floor(log10(pow(2, e))) for e in [-2620, 2620] using the method from
+            // https://fmt.dev/papers/Dragonbox.pdf#page=28, section 6.1.
             inline int floor_log10_pow2(int e) noexcept {
                 TURBO_ASSERT(e <= 2620 && e >= -2620&&"too large exponent");
                 static_assert((-1 >> 1) == -1, "right shift is not arithmetic");
@@ -1420,7 +1398,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                 return (e * 1741647) >> 19;
             }
 
-// Computes upper 64 bits of multiplication of two 64-bit unsigned integers.
+            // Computes upper 64 bits of multiplication of two 64-bit unsigned integers.
             inline uint64_t umul128_upper64(uint64_t x, uint64_t y) noexcept {
 #if FMT_USE_INT128
                 auto p = static_cast<uint128_opt>(x) * static_cast<uint128_opt>(y);
@@ -1432,8 +1410,8 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 #endif
             }
 
-// Computes upper 128 bits of multiplication of a 64-bit unsigned integer and a
-// 128-bit unsigned integer.
+            // Computes upper 128 bits of multiplication of a 64-bit unsigned integer and a
+            // 128-bit unsigned integer.
             inline uint128_fallback umul192_upper128(uint64_t x,
                                                      uint128_fallback y) noexcept {
                 uint128_fallback r = umul128(x, y.high());
@@ -1443,7 +1421,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
             TURBO_DLL uint128_fallback get_cached_power(int k) noexcept;
 
-// Type-specific information that Dragonbox uses.
+            // Type-specific information that Dragonbox uses.
             template<typename T, typename Enable = void>
             struct float_info;
 
@@ -1473,7 +1451,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                 static const int shorter_interval_tie_upper_threshold = -77;
             };
 
-// An 80- or 128-bit floating point number.
+            // An 80- or 128-bit floating point number.
             template<typename T>
             struct float_info<T, std::enable_if_t<std::numeric_limits<T>::digits == 64 ||
                                                   std::numeric_limits<T>::digits == 113 ||
@@ -1482,7 +1460,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                 static const int exponent_bits = 15;
             };
 
-// A double-double floating point number.
+            // A double-double floating point number.
             template<typename T>
             struct float_info<T, std::enable_if_t<is_double_double<T>::value>> {
                 using carrier_uint = fmt_detail::uint128_t;
@@ -1499,15 +1477,15 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             TURBO_DLL auto to_decimal(T x) noexcept -> decimal_fp<T>;
         }  // namespace dragonbox
 
-// Returns true iff Float has the implicit bit which is not stored.
+        // Returns true iff Float has the implicit bit which is not stored.
         template<typename Float>
         constexpr bool has_implicit_bit() {
             // An 80-bit FP number has a 64-bit significand an no implicit bit.
             return std::numeric_limits<Float>::digits != 64;
         }
 
-// Returns the number of significand bits stored in Float. The implicit bit is
-// not counted since it is not stored.
+        // Returns the number of significand bits stored in Float. The implicit bit is
+        // not counted since it is not stored.
         template<typename Float>
         constexpr int num_significand_bits() {
             // std::numeric_limits may not support __float128.
@@ -1531,7 +1509,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                                         : std::numeric_limits<Float>::max_exponent - 1;
         }
 
-// Writes the exponent exp in the form "[+-]d{2,3}" to buffer.
+        // Writes the exponent exp in the form "[+-]d{2,3}" to buffer.
         template<typename Char, typename It>
         constexpr auto write_exponent(int exp, It it) -> It {
             TURBO_ASSERT(-10000 < exp && exp < 10000&&"exponent out of range");
@@ -1553,7 +1531,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return it;
         }
 
-// A floating-point number f * pow(2, e) where F is an unsigned type.
+        // A floating-point number f * pow(2, e) where F is an unsigned type.
         template<typename F>
         struct basic_fp {
             F f;
@@ -1605,7 +1583,7 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
 
         using fp = basic_fp<unsigned long long>;
 
-// Normalizes the value converted from double and multiplied by (1 << SHIFT).
+        // Normalizes the value converted from double and multiplied by (1 << SHIFT).
         template<int SHIFT = 0, typename F>
         constexpr basic_fp<F> normalize(basic_fp<F> value) {
             // Handle subnormals.
@@ -1623,21 +1601,21 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             return value;
         }
 
-// Computes lhs * rhs / pow(2, 64) rounded to nearest with half-up tie breaking.
+        // Computes lhs * rhs / pow(2, 64) rounded to nearest with half-up tie breaking.
         constexpr inline uint64_t multiply(uint64_t lhs, uint64_t rhs) {
 #if FMT_USE_INT128
             auto product = static_cast<__uint128_t>(lhs) * rhs;
             auto f = static_cast<uint64_t>(product >> 64);
             return (static_cast<uint64_t>(product) & (1ULL << 63)) != 0 ? f + 1 : f;
 #else
-                                                                                                                                    // Multiply 32-bit parts of significands.
-  uint64_t mask = (1ULL << 32) - 1;
-  uint64_t a = lhs >> 32, b = lhs & mask;
-  uint64_t c = rhs >> 32, d = rhs & mask;
-  uint64_t ac = a * c, bc = b * c, ad = a * d, bd = b * d;
-  // Compute mid 64-bit of result and round.
-  uint64_t mid = (bd >> 32) + (ad & mask) + (bc & mask) + (1U << 31);
-  return ac + (ad >> 32) + (bc >> 32) + (mid >> 32);
+            // Multiply 32-bit parts of significands.
+            uint64_t mask = (1ULL << 32) - 1;
+            uint64_t a = lhs >> 32, b = lhs & mask;
+            uint64_t c = rhs >> 32, d = rhs & mask;
+            uint64_t ac = a * c, bc = b * c, ad = a * d, bd = b * d;
+            // Compute mid 64-bit of result and round.
+            uint64_t mid = (bd >> 32) + (ad & mask) + (bc & mask) + (1U << 31);
+            return ac + (ad >> 32) + (bc >> 32) + (mid >> 32);
 #endif
         }
 
@@ -1681,10 +1659,6 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                     0x9e19db92b4e31ba9, 0xeb96bf6ebadf77d9, 0xaf87023b9bf0ee6b,
             };
 
-#if TURBO_GCC_VERSION && TURBO_GCC_VERSION < 409
-                                                                                                                                    #  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wnarrowing"
-#endif
             // Binary exponents of pow(10, k), for k = -348, -340, ..., 340, corresponding
             // to significands above.
             static constexpr int16_t pow10_exponents[87] = {
@@ -1696,9 +1670,6 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
                     242, 269, 295, 322, 348, 375, 402, 428, 455, 481, 508,
                     534, 561, 588, 614, 641, 667, 694, 720, 747, 774, 800,
                     827, 853, 880, 907, 933, 960, 986, 1013, 1039, 1066};
-#if TURBO_GCC_VERSION && TURBO_GCC_VERSION < 409
-#  pragma GCC diagnostic pop
-#endif
 
             static constexpr uint64_t power_of_10_64[20] = {
                     1, FMT_POWERS_OF_10(1ULL), FMT_POWERS_OF_10(1000000000ULL),
@@ -1719,20 +1690,13 @@ constexpr auto make_checked(T* p, size_t size) -> checked_ptr<T> {
             };
         };
 
-#if TURBO_CPLUSPLUS < 201703L
-                                                                                                                                template <typename T> constexpr uint64_t basic_data<T>::pow10_significands[];
-template <typename T> constexpr int16_t basic_data<T>::pow10_exponents[];
-template <typename T> constexpr uint64_t basic_data<T>::power_of_10_64[];
-template <typename T>
-constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
-#endif
 
-// This is a struct rather than an alias to avoid shadowing warnings in gcc.
+        // This is a struct rather than an alias to avoid shadowing warnings in gcc.
         struct data : basic_data<> {
         };
 
-// Returns a cached power of 10 `c_k = c_k.f * pow(2, c_k.e)` such that its
-// (binary) exponent satisfies `min_exponent <= c_k.e <= min_exponent + 28`.
+        // Returns a cached power of 10 `c_k = c_k.f * pow(2, c_k.e)` such that its
+        // (binary) exponent satisfies `min_exponent <= c_k.e <= min_exponent + 28`.
         constexpr inline fp get_cached_power(int min_exponent,
                                              int &pow10_exponent) {
             const int shift = 32;
@@ -1778,9 +1742,9 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             return it;
         }
 
-// Writes the output of f, padded according to format specifications in specs.
-// size: output size in code units.
-// width: output display width in (terminal) column positions.
+        // Writes the output of f, padded according to format specifications in specs.
+        // size: output size in code units.
+        // width: output display width in (terminal) column positions.
         template<align::type align = align::left, typename OutputIt, typename Char,
                 typename F>
         constexpr auto write_padded(OutputIt out, const format_specs<Char> &specs,
@@ -1831,7 +1795,7 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                          : base_iterator(out, write(reserve(out, size)));
         }
 
-// Returns true iff the code point cp is printable.
+        // Returns true iff the code point cp is printable.
         TURBO_DLL auto is_printable(uint32_t cp) -> bool;
 
         inline auto needs_escape(uint32_t cp) -> bool {
@@ -2012,8 +1976,8 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
                    : write(out, static_cast<unsigned_type>(value), specs, loc);
         }
 
-// Data for write_int that doesn't depend on output iterator type. It is used to
-// avoid template code bloat.
+        // Data for write_int that doesn't depend on output iterator type. It is used to
+        // avoid template code bloat.
         template<typename Char>
         struct write_int_data {
             size_t size;
@@ -2035,10 +1999,10 @@ constexpr uint32_t basic_data<T>::fractional_part_rounding_thresholds[];
             }
         };
 
-// Writes an integer in the format
-//   <left-padding><prefix><numeric-padding><digits><right-padding>
-// where <digits> are written by write_digits(it).
-// prefix contains chars in three lower bytes and the size in the fourth byte.
+        // Writes an integer in the format
+        //   <left-padding><prefix><numeric-padding><digits><right-padding>
+        // where <digits> are written by write_digits(it).
+        // prefix contains chars in three lower bytes and the size in the fourth byte.
         template<typename OutputIt, typename Char, typename W>
         constexpr TURBO_FORCE_INLINE auto write_int(OutputIt out, int num_digits,
                                                     unsigned prefix,
@@ -4142,53 +4106,53 @@ struct udl_arg {
     TURBO_DLL auto vsystem_error(int error_code, std::string_view format_str,
                                  format_args args) -> std::system_error;
 
-/**
- \rst
- Constructs :class:`std::system_error` with a message formatted with
- ``turbo::format(fmt, args...)``.
-  *error_code* is a system error code as given by ``errno``.
+    /**
+     \rst
+     Constructs :class:`std::system_error` with a message formatted with
+     ``turbo::format(fmt, args...)``.
+      *error_code* is a system error code as given by ``errno``.
 
- **Example**::
+     **Example**::
 
-   // This throws std::system_error with the description
-   //   cannot open file 'madeup': No such file or directory
-   // or similar (system message may vary).
-   const char* filename = "madeup";
-   std::FILE* file = std::fopen(filename, "r");
-   if (!file)
-     throw turbo::system_error(errno, "cannot open file '{}'", filename);
- \endrst
-*/
+       // This throws std::system_error with the description
+       //   cannot open file 'madeup': No such file or directory
+       // or similar (system message may vary).
+       const char* filename = "madeup";
+       std::FILE* file = std::fopen(filename, "r");
+       if (!file)
+         throw turbo::system_error(errno, "cannot open file '{}'", filename);
+     \endrst
+    */
     template<typename... T>
     auto system_error(int error_code, format_string<T...> fmt, T &&... args)
     -> std::system_error {
         return vsystem_error(error_code, fmt, turbo::make_format_args(args...));
     }
 
-/**
-  \rst
-  Formats an error message for an error returned by an operating system or a
-  language runtime, for example a file opening error, and writes it to *out*.
-  The format is the same as the one used by ``std::system_error(ec, message)``
-  where ``ec`` is ``std::error_code(error_code, std::generic_category()})``.
-  It is implementation-defined but normally looks like:
+    /**
+      \rst
+      Formats an error message for an error returned by an operating system or a
+      language runtime, for example a file opening error, and writes it to *out*.
+      The format is the same as the one used by ``std::system_error(ec, message)``
+      where ``ec`` is ``std::error_code(error_code, std::generic_category()})``.
+      It is implementation-defined but normally looks like:
 
-  .. parsed-literal::
-     *<message>*: *<system-message>*
+      .. parsed-literal::
+         *<message>*: *<system-message>*
 
-  where *<message>* is the passed message and *<system-message>* is the system
-  message corresponding to the error code.
-  *error_code* is a system error code as given by ``errno``.
-  \endrst
- */
+      where *<message>* is the passed message and *<system-message>* is the system
+      message corresponding to the error code.
+      *error_code* is a system error code as given by ``errno``.
+      \endrst
+     */
     TURBO_DLL void format_system_error(fmt_detail::buffer<char> &out, int error_code,
                                        const char *message) noexcept;
 
-// Reports a system error without throwing an exception.
-// Can be used to report errors from destructors.
+    // Reports a system error without throwing an exception.
+    // Can be used to report errors from destructors.
     TURBO_DLL void report_system_error(int error_code, const char *message) noexcept;
 
-/** Fast integer formatter. */
+    /** Fast integer formatter. */
     class format_int {
     private:
         // Buffer should be large enough to hold all digits (digits10 + 1),
@@ -4235,25 +4199,25 @@ struct udl_arg {
         }
 
         /**
-    Returns a pointer to the output buffer content. No terminating null
-    character is appended.
-   */
+        Returns a pointer to the output buffer content. No terminating null
+        character is appended.
+       */
         auto data() const -> const char * { return str_; }
 
         /**
-    Returns a pointer to the output buffer content with terminating null
-    character appended.
-   */
+        Returns a pointer to the output buffer content with terminating null
+        character appended.
+       */
         auto c_str() const -> const char * {
             buffer_[buffer_size - 1] = '\0';
             return str_;
         }
 
         /**
-    \rst
-    Returns the content of the output buffer as an ``std::string``.
-    \endrst
-   */
+            \rst
+            Returns the content of the output buffer as an ``std::string``.
+            \endrst
+           */
         auto str() const -> std::string { return std::string(str_, size()); }
     };
 
@@ -4286,15 +4250,15 @@ struct udl_arg {
         }
     };
 
-/**
-  \rst
-  Converts ``p`` to ``const void*`` for pointer formatting.
+    /**
+      \rst
+      Converts ``p`` to ``const void*`` for pointer formatting.
 
-  **Example**::
+      **Example**::
 
-    auto s = turbo::format("{}", turbo::ptr(p));
-  \endrst
- */
+        auto s = turbo::format("{}", turbo::ptr(p));
+      \endrst
+     */
     template<typename T>
     auto ptr(T p) -> const void * {
         static_assert(std::is_pointer<T>::value, "");
@@ -4357,23 +4321,23 @@ struct udl_arg {
         }
     };
 
-// group_digits_view is not derived from view because it copies the argument.
+    // group_digits_view is not derived from view because it copies the argument.
     template<typename T>
     struct group_digits_view {
         T value;
     };
 
-/**
-  \rst
-  Returns a view that formats an integer value using ',' as a locale-independent
-  thousands separator.
+    /**
+      \rst
+      Returns a view that formats an integer value using ',' as a locale-independent
+      thousands separator.
 
-  **Example**::
+      **Example**::
 
-    turbo::print("{}", turbo::group_digits(12345));
-    // Output: "12,345"
-  \endrst
- */
+        turbo::print("{}", turbo::group_digits(12345));
+        // Output: "12,345"
+      \endrst
+     */
     template<typename T>
     auto group_digits(T value) -> group_digits_view<T> {
         return {value};
@@ -4451,48 +4415,48 @@ struct udl_arg {
         }
     };
 
-/**
-  Returns a view that formats the iterator range `[begin, end)` with elements
-  separated by `sep`.
- */
+    /**
+      Returns a view that formats the iterator range `[begin, end)` with elements
+      separated by `sep`.
+     */
     template<typename It, typename Sentinel>
     auto join(It begin, Sentinel end, std::string_view sep) -> join_view<It, Sentinel> {
         return {begin, end, sep};
     }
 
-/**
-  \rst
-  Returns a view that formats `range` with elements separated by `sep`.
+    /**
+      \rst
+      Returns a view that formats `range` with elements separated by `sep`.
 
-  **Example**::
+      **Example**::
 
-    std::vector<int> v = {1, 2, 3};
-    turbo::print("{}", turbo::join(v, ", "));
-    // Output: "1, 2, 3"
+        std::vector<int> v = {1, 2, 3};
+        turbo::print("{}", turbo::join(v, ", "));
+        // Output: "1, 2, 3"
 
-  ``turbo::join`` applies passed format specifiers to the range elements::
+      ``turbo::join`` applies passed format specifiers to the range elements::
 
-    turbo::print("{:02}", turbo::join(v, ", "));
-    // Output: "01, 02, 03"
-  \endrst
- */
+        turbo::print("{:02}", turbo::join(v, ", "));
+        // Output: "01, 02, 03"
+      \endrst
+     */
     template<typename Range>
     auto join(Range &&range, std::string_view sep)
     -> join_view<fmt_detail::iterator_t<Range>, fmt_detail::sentinel_t<Range>> {
         return join(std::begin(range), std::end(range), sep);
     }
 
-/**
-  \rst
-  Converts *value* to ``std::string`` using the default format for type *T*.
+    /**
+      \rst
+      Converts *value* to ``std::string`` using the default format for type *T*.
 
-  **Example**::
+      **Example**::
 
-    #include <fmt/format.h>
+        #include <fmt/format.h>
 
-    std::string answer = turbo::to_string(42);
-  \endrst
- */
+        std::string answer = turbo::to_string(42);
+      \endrst
+     */
     template<typename T, TURBO_ENABLE_IF(!std::is_integral<T>::value)>
     inline auto to_string(const T &value) -> std::string {
         auto buffer = memory_buffer();
@@ -4514,7 +4478,7 @@ struct udl_arg {
     [[nodiscard]] auto to_string(const basic_memory_buffer<Char, SIZE> &buf)
     -> std::basic_string<Char> {
         auto size = buf.size();
-        fmt_detail::assume(size < std::basic_string<Char>().max_size());
+        assume(size < std::basic_string<Char>().max_size());
         return std::basic_string<Char>(buf.data(), size);
     }
 
