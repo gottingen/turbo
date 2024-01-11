@@ -34,11 +34,11 @@ namespace turbo {
     public:
         static constexpr VariableAttr kMaxerGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_GAUGE_SCALAR);
     public:
-        MaxerGauge() :_status(unavailable_error("")) {}
+        MaxerGauge() :_reducer(std::numeric_limits<T>::min()) {}
 
-        explicit MaxerGauge(const std::string_view &name, const std::string_view &description = "");
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
 
-        MaxerGauge(const std::string_view &name, const std::string_view &description,
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
                      const std::map<std::string,std::string> &tags);
 
         MaxerGauge(const MaxerGauge &) = delete;
@@ -72,14 +72,6 @@ namespace turbo {
             return _reducer.get_value();
         }
 
-        bool valid() const {
-            return _status.ok() && _reducer.valid();
-        }
-
-        [[nodiscard]] const turbo::Status &status() const {
-            return _status;
-        }
-
     private:
         std::string describe_impl(const DescriberOptions &options)  const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
@@ -101,24 +93,21 @@ namespace turbo {
         typedef profiling_internal::Reducer<T, profiling_internal::MaxerTo<T>,
                 profiling_internal::SetTo<T> > reducer_type;
         reducer_type _reducer;
-        turbo::Status _status;
     };
 
     template<typename T>
-    MaxerGauge<T>::MaxerGauge(const std::string_view &name, const std::string_view &description)
-            : Variable() {
+    turbo::Status MaxerGauge<T>::expose(const std::string_view &name, const std::string_view &description) {
         std::string desc(description);
         if(desc.empty()){
             desc = turbo::format("MaxerGuage-{}",  name);
         }
-        _status = expose(name, desc, {}, kMaxerGaugeAttr);
+        return expose_base(name, desc, {}, kMaxerGaugeAttr);
     }
 
     template<typename T>
-    MaxerGauge<T>::MaxerGauge(const std::string_view &name, const std::string_view &description,
-                                  const std::map<std::string, std::string> &tags)
-            : Variable() {
-        _status = expose(name, description, tags, kMaxerGaugeAttr);
+    turbo::Status MaxerGauge<T>::expose(const std::string_view &name, const std::string_view &description,
+                                  const std::map<std::string, std::string> &tags) {
+        return  expose_base(name, description, tags, kMaxerGaugeAttr);
     }
 
     template<typename T, typename Char>

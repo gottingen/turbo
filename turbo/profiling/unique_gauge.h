@@ -26,7 +26,6 @@
 
 namespace turbo {
 
-
     /**
      * @ingroup turbo_profiling_gauges
      * @brief UniqueGauge is a gauge that can be set to any value. the unique gauge is not aggregated.
@@ -41,11 +40,12 @@ namespace turbo {
     public:
         static constexpr VariableAttr kUniqueOBjectGaugeAttr = VariableAttr(DUMP_PLAIN_TEXT, VariableType::VT_OBJECT);
     public:
-        UniqueGauge() : _status(unavailable_error("")) {}
+        UniqueGauge() = default;
+        ~UniqueGauge() override = default;
 
-        explicit UniqueGauge(const std::string_view &name, const std::string_view &description = "");
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
 
-        UniqueGauge(const std::string_view &name, const std::string_view &description,
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
                     const std::map<std::string, std::string> &tags);
 
         void set(const T &value) {
@@ -74,15 +74,8 @@ namespace turbo {
             return _value;
         }
 
-        bool is_valid() const {
-            return _status.ok();
-        }
-
-        const Status& status() const {
-            return _status;
-        }
     private:
-        std::string describe_impl(const DescriberOptions &options)  const override {
+        std::string describe_impl(const DescriberOptions &options) const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
 
@@ -94,40 +87,39 @@ namespace turbo {
             snapshot.type = attr().type;
             T v = get_value();
             std::stringstream ss;
-            ss<<v;
+            ss << v;
             snapshot.value = ss.str();
             snapshot.type_id = turbo::nameof_short_type<T>();
             return snapshot;
         }
+
     private:
         T _value;
-        Status _status;
         mutable std::mutex _mutex;
     };
 
     template<typename T, typename E>
-    UniqueGauge<T, E>::UniqueGauge(const std::string_view &name, const std::string_view &description)
-            : Variable() {
-        _status = expose(name, description, {}, kUniqueOBjectGaugeAttr);
+    inline turbo::Status UniqueGauge<T, E>::expose(const std::string_view &name, const std::string_view &description) {
+        return expose_base(name, description, {}, kUniqueOBjectGaugeAttr);
     }
 
     template<typename T, typename E>
-    UniqueGauge<T, E>::UniqueGauge(const std::string_view &name, const std::string_view &description,
-                                   const std::map<std::string, std::string> &tags)
-            : Variable() {
-        _status = expose(name, description, tags, kUniqueOBjectGaugeAttr);
+    inline turbo::Status UniqueGauge<T, E>::expose(const std::string_view &name, const std::string_view &description,
+                                   const std::map<std::string, std::string> &tags) {
+        return expose_base(name, description, tags, kUniqueOBjectGaugeAttr);
     }
 
     template<typename T>
     class UniqueGauge<T, typename std::enable_if_t<is_atomical<T>::value>> : public Variable {
     public:
-        static constexpr VariableAttr kUniqueScalarGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_GAUGE_SCALAR);
+        static constexpr VariableAttr kUniqueScalarGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE,
+                                                                            VariableType::VT_GAUGE_SCALAR);
     public:
-        UniqueGauge() : _status(unavailable_error("")) {}
+        UniqueGauge()= default;
 
-        explicit UniqueGauge(const std::string_view &name, const std::string_view &description = "");
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
 
-        UniqueGauge(const std::string_view &name, const std::string_view &description,
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
                     const std::map<std::string, std::string> &tags);
 
         void set(const T &value) {
@@ -159,16 +151,8 @@ namespace turbo {
         operator T() const {
             return get_value();
         }
-
-        bool is_valid() const {
-            return _status.ok();
-        }
-
-        const Status& status() const {
-            return _status;
-        }
     private:
-        std::string describe_impl(const DescriberOptions &options)  const override {
+        std::string describe_impl(const DescriberOptions &options) const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
 
@@ -183,36 +167,35 @@ namespace turbo {
             snapshot.type = attr().type;
             return snapshot;
         }
+
     private:
         std::atomic<T> _value;
-        Status _status;
     };
 
     template<typename T>
-    UniqueGauge<T, typename std::enable_if_t<is_atomical<T>::value>>::UniqueGauge(const std::string_view &name,
-                                                                                  const std::string_view &description)
-            : Variable() {
-        _status = expose(name, description, {}, kUniqueScalarGaugeAttr);
+    inline turbo::Status UniqueGauge<T, typename std::enable_if_t<is_atomical<T>::value>>::
+    expose(const std::string_view &name, const std::string_view &description) {
+        return expose_base(name, description, {}, kUniqueScalarGaugeAttr);
     }
 
     template<typename T>
-    UniqueGauge<T, typename std::enable_if_t<is_atomical<T>::value>>::UniqueGauge(const std::string_view &name,
+    inline turbo::Status UniqueGauge<T, typename std::enable_if_t<is_atomical<T>::value>>::expose(const std::string_view &name,
                                                                                   const std::string_view &description,
-                                                                                  const std::map<std::string, std::string> &tags)
-            : Variable() {
-        _status = expose(name, description, tags, kUniqueScalarGaugeAttr);
+                                                                                  const std::map<std::string, std::string> &tags) {
+        return expose_base(name, description, tags, kUniqueScalarGaugeAttr);
     }
 
     template<>
     class UniqueGauge<std::string, void> : public Variable {
     public:
-        static constexpr VariableAttr kUniqueStringGaugeAttr = VariableAttr(DUMP_PLAIN_TEXT, VariableType::VT_PLAIN_STRING);
+        static constexpr VariableAttr kUniqueStringGaugeAttr = VariableAttr(DUMP_PLAIN_TEXT,
+                                                                            VariableType::VT_PLAIN_STRING);
     public:
-        UniqueGauge() : _status(unavailable_error("")) {}
+        UniqueGauge() = default;
 
-        explicit UniqueGauge(const std::string_view &name, const std::string_view &description = "");
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
 
-        UniqueGauge(const std::string_view &name, const std::string_view &description,
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
                     const std::map<std::string, std::string> &tags);
 
         void set(const std::string &value) {
@@ -241,15 +224,8 @@ namespace turbo {
             return _value;
         }
 
-        bool is_valid() const {
-            return _status.ok();
-        }
-
-        const Status& status() const {
-            return _status;
-        }
     private:
-        std::string describe_impl(const DescriberOptions &options)  const override {
+        std::string describe_impl(const DescriberOptions &options) const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
 
@@ -262,21 +238,21 @@ namespace turbo {
             snapshot.type = attr().type;
             return snapshot;
         }
+
     private:
         std::string _value;
-        Status _status;
         mutable std::mutex _mutex;
     };
 
-    inline UniqueGauge<std::string, void>::UniqueGauge(const std::string_view &name, const std::string_view &description)
-            : Variable() {
-        _status = expose(name, description, {}, kUniqueStringGaugeAttr);
+    inline turbo::Status UniqueGauge<std::string, void>::expose(const std::string_view &name,
+                                                       const std::string_view &description) {
+        return expose_base(name, description, {}, kUniqueStringGaugeAttr);
     }
 
-    inline UniqueGauge<std::string, void>::UniqueGauge(const std::string_view &name, const std::string_view &description,
-                                                const std::map<std::string, std::string> &tags)
-            : Variable() {
-        _status = expose(name, description, tags, kUniqueStringGaugeAttr);
+    inline turbo::Status UniqueGauge<std::string, void>::expose(const std::string_view &name,
+                                                       const std::string_view &description,
+                                                       const std::map<std::string, std::string> &tags) {
+        return expose_base(name, description, tags, kUniqueStringGaugeAttr);
     }
 
     template<typename R>
@@ -291,18 +267,18 @@ namespace turbo {
         };
         static constexpr VariableAttr kUniqueFuncGauge = std::conditional<is_atomical<R>::value, _scalarAttr, _ObjectAttr>::type::value;
     public:
-        UniqueGauge() : _status(unavailable_error("")) {}
+        UniqueGauge() = default;
 
-        explicit UniqueGauge(const std::string_view &name, const std::string_view &description = "");
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
 
-        UniqueGauge(const std::string_view &name, const std::string_view &description,
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
                     const std::map<std::string, std::string> &tags);
 
         void set(const std::function<R()> &value) {
             _value = value;
         }
 
-       R get_value() const {
+        R get_value() const {
             return _value();
         }
 
@@ -310,20 +286,13 @@ namespace turbo {
             return _value();
         }
 
-        bool is_valid() const {
-            return _status.ok();
-        }
-
-        const Status& status() const {
-            return _status;
-        }
     private:
-        std::string describe_impl(const DescriberOptions &options)  const override {
+        std::string describe_impl(const DescriberOptions &options) const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
         }
 
         VariableSnapshot get_snapshot_impl() const override {
-            using Gtype = typename std::conditional<is_atomical<R>::value,GaugeSnapshot, ObjectSnapshot>::type;
+            using Gtype = typename std::conditional<is_atomical<R>::value, GaugeSnapshot, ObjectSnapshot>::type;
             Gtype snapshot;
             snapshot.name = name();
             snapshot.description = description();
@@ -334,7 +303,7 @@ namespace turbo {
                 snapshot.value = r;
             } else {
                 std::stringstream ss;
-                ss<<r;
+                ss << r;
                 snapshot.value = ss.str();
                 std::memcpy(snapshot.value.data(), &r, sizeof(R));
                 snapshot.type_id = nameof_short_type<R>();
@@ -344,26 +313,25 @@ namespace turbo {
 
     private:
         std::function<R()> _value;
-        Status _status;
     };
 
     template<typename R>
-    UniqueGauge<std::function<R()>, void>::UniqueGauge(const std::string_view &name, const std::string_view &description)
-            : Variable() {
-        _status = expose(name, description, {}, kUniqueFuncGauge);
+    turbo::Status UniqueGauge<std::function<R()>, void>::expose(const std::string_view &name,
+                                                       const std::string_view &description) {
+        return expose_base(name, description, {}, kUniqueFuncGauge);
     }
 
     template<typename R>
-    UniqueGauge<std::function<R()>, void>::UniqueGauge(const std::string_view &name, const std::string_view &description,
-                                                const std::map<std::string, std::string> &tags)
-            : Variable() {
-        _status = expose(name, description, tags, kUniqueFuncGauge);
+    turbo::Status UniqueGauge<std::function<R()>, void>::expose(const std::string_view &name,
+                                                       const std::string_view &description,
+                                                       const std::map<std::string, std::string> &tags) {
+        return expose_base(name, description, tags, kUniqueFuncGauge);
     }
 
     template<typename R, typename Char>
-    struct formatter<UniqueGauge<std::function<R()>,void>, Char> : formatter<R, Char> {
+    struct formatter<UniqueGauge<std::function<R()>, void>, Char> : formatter<R, Char> {
         template<typename FormatContext>
-        auto format(const UniqueGauge<std::function<R()>,void> &t, FormatContext &ctx) {
+        auto format(const UniqueGauge<std::function<R()>, void> &t, FormatContext &ctx) {
             return formatter<R, Char>::format(t.get_value(), ctx);
         }
     };

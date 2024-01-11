@@ -144,25 +144,22 @@ namespace turbo {
                 profiling_internal::AddTo<T>> reducer_type;
         static constexpr VariableAttr kHistogramAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_HISTOGRAM);
     public:
-        Histogram()
-                : Variable(), _bins(), _reducer(), _status(unavailable_error("")) {}
-
-        explicit Histogram(const std::string_view &name, const std::string_view &description = "")
-                : Histogram() {
-            _status = this->expose(name, description, {}, kHistogramAttr);
-        }
-
-        Histogram(const std::string_view &name, const std::string_view &description,
-                  const std::map<std::string, std::string> &tags)
-                : Histogram() {
-            _status = this->expose(name, description, tags, kHistogramAttr);
-        }
+        Histogram() = default;
 
         Histogram(const Histogram &) = delete;
 
         Histogram &operator=(const Histogram &) = delete;
 
         ~Histogram() override = default;
+
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "") {
+            return expose_base(name, description, {}, kHistogramAttr);
+        }
+
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
+                  const std::map<std::string, std::string> &tags) {
+            return  expose_base(name, description, tags, kHistogramAttr);
+        }
 
         void set_boundaries(const std::array<T, N> &bins) {
             _bins = bins;
@@ -278,8 +275,10 @@ namespace turbo {
     private:
         std::array<T, N> _bins;
         reducer_type _reducer;
-        turbo::Status _status;
     };
+
+    turbo::Status expose(const std::string_view &name, const std::string_view &description,
+                         const std::map<std::string, std::string> &tags);
 
     template<typename T, typename Char>
     struct formatter<HistogramResult<T>, Char> : formatter<T, Char> {

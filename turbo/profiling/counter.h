@@ -20,6 +20,7 @@
 #include "turbo/profiling/variable.h"
 #include "turbo/profiling/internal/reducer.h"
 #include "turbo/profiling/internal/operators.h"
+#include "turbo/platform/port.h"
 
 namespace turbo {
 
@@ -40,18 +41,18 @@ namespace turbo {
     public:
         static constexpr VariableAttr kCounterAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_COUNTER);
     public:
-        Counter() : _status(unavailable_error("")) {}
-
-        explicit Counter(const std::string_view &name, const std::string_view &description = "");
-
-        Counter(const std::string_view &name, const std::string_view &description,
-                const std::map<std::string, std::string> &tags);
+        Counter() = default;
 
         Counter(const Counter &) = delete;
 
         Counter &operator=(const Counter &) = delete;
 
         ~Counter() override = default;
+
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
+
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
+                             const std::map<std::string, std::string> &tags);
 
         template<typename U>
         void add(const U &value) {
@@ -92,14 +93,6 @@ namespace turbo {
             return _reducer.get_value();
         }
 
-        bool valid() const {
-            return _status.ok() && _reducer.valid();
-        }
-
-        [[nodiscard]] const turbo::Status &status() const {
-            return _status;
-        }
-
     private:
         std::string describe_impl(const DescriberOptions &options) const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
@@ -118,25 +111,33 @@ namespace turbo {
         }
 
     private:
-        typedef profiling_internal::Reducer<T, profiling_internal::AddTo<T>,
-                profiling_internal::AddTo<T> > reducer_type;
+        typedef profiling_internal::Reducer<T, profiling_internal::AddTo<T>, profiling_internal::AddTo<T> > reducer_type;
         reducer_type _reducer;
-        turbo::Status _status;
     };
 
     template<typename T>
-    Counter<T>::Counter(const std::string_view &name, const std::string_view &description) : Variable() {
+    turbo::Status Counter<T>::expose(const std::string_view &name, const std::string_view &description) {
+        if(this->is_exposed()) {
+            return turbo::ok_status();
+        }
         std::string desc(description);
         if (desc.empty()) {
             desc = turbo::format("Counter {}", name);
         }
-        _status = this->expose(name, desc, {}, kCounterAttr);
+        return  expose_base(name, desc, {}, kCounterAttr);
     }
 
     template<typename T>
-    Counter<T>::Counter(const std::string_view &name, const std::string_view &description,
-                        const std::map<std::string, std::string> &tags) {
-        _status = this->expose(name, description, tags, kCounterAttr);
+    turbo::Status  Counter<T>::expose(const std::string_view &name, const std::string_view &description,
+                         const std::map<std::string, std::string> &tags) {
+        if(this->is_exposed()) {
+            return turbo::ok_status();
+        }
+        std::string desc(description);
+        if (desc.empty()) {
+            desc = turbo::format("Counter {}", name);
+        }
+        return  expose_base(name, desc, {}, kCounterAttr);
     }
 
     template<typename T, typename Char>

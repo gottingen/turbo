@@ -35,11 +35,11 @@ namespace turbo {
     public:
         static constexpr VariableAttr kMinerGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_GAUGE_SCALAR);
     public:
-        MinerGauge() : _reducer(std::numeric_limits<T>::max()), _status(unavailable_error("")) {}
+        MinerGauge() :Variable(), _reducer(std::numeric_limits<T>::max()) {}
 
-        explicit MinerGauge(const std::string_view &name, const std::string_view &description = "");
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
 
-        MinerGauge(const std::string_view &name, const std::string_view &description,
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
                    const std::map<std::string,std::string> &tags);
 
         MinerGauge(const MinerGauge &) = delete;
@@ -74,12 +74,9 @@ namespace turbo {
         }
 
         bool valid() const {
-            return _status.ok() && _reducer.valid();
+            return  _reducer.valid();
         }
 
-        [[nodiscard]] const turbo::Status &status() const {
-            return _status;
-        }
     private:
         std::string describe_impl(const DescriberOptions &options)  const override {
             return turbo::format("{}[{}-{}] : {}", name(), description(), labels(), get_value());
@@ -100,24 +97,21 @@ namespace turbo {
         typedef profiling_internal::Reducer<T, profiling_internal::MinerTo<T>,
                 profiling_internal::SetTo<T> > reducer_type;
         reducer_type _reducer;
-        turbo::Status _status;
     };
 
     template<typename T>
-    MinerGauge<T>::MinerGauge(const std::string_view &name, const std::string_view &description)
-            : Variable(),  _reducer(std::numeric_limits<T>::max()) {
+    turbo::Status MinerGauge<T>::expose(const std::string_view &name, const std::string_view &description) {
         std::string desc(description);
         if(desc.empty()){
             desc = turbo::format("MinerGuage {}",  name);
         }
-        _status = expose(name, desc, {}, kMinerGaugeAttr);
+        return expose_base(name, desc, {}, kMinerGaugeAttr);
     }
 
     template<typename T>
-    MinerGauge<T>::MinerGauge(const std::string_view &name, const std::string_view &description,
-                              const std::map<std::string, std::string> &tags)
-            : Variable(),  _reducer(std::numeric_limits<T>::max()) {
-        _status = expose(name, description, tags, kMinerGaugeAttr);
+    turbo::Status MinerGauge<T>::expose(const std::string_view &name, const std::string_view &description,
+                              const std::map<std::string, std::string> &tags) {
+        return expose_base(name, description, tags, kMinerGaugeAttr);
     }
 
     template<typename T, typename Char>

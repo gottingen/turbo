@@ -33,12 +33,12 @@ namespace turbo {
     public:
         static constexpr VariableAttr kAvgGaugeAttr = VariableAttr(DUMP_PROMETHEUS_TYPE, VariableType::VT_GAUGE_SCALAR);
     public:
-        AverageGauge() : _status(unavailable_error("")) {}
+        AverageGauge() = default;
 
-        explicit AverageGauge(const std::string_view &name, const std::string_view &description = "");
+        turbo::Status expose(const std::string_view &name, const std::string_view &description = "");
 
-        AverageGauge(const std::string_view &name, const std::string_view &description,
-                     const std::map<std::string, std::string> &tags);
+        turbo::Status expose(const std::string_view &name, const std::string_view &description,
+                             const std::map<std::string, std::string> &tags);
 
         AverageGauge(const AverageGauge &) = delete;
 
@@ -75,13 +75,6 @@ namespace turbo {
 
         }
 
-        bool valid() const {
-            return _status.ok() && _reducer.valid();
-        }
-
-        [[nodiscard]] const turbo::Status &status() const {
-            return _status;
-        }
 
     private:
         std::string describe_impl(const DescriberOptions &options) const override {
@@ -104,24 +97,21 @@ namespace turbo {
         typedef profiling_internal::Reducer<T, profiling_internal::AvgTo<T>,
                 profiling_internal::SetTo<T> > reducer_type;
         reducer_type _reducer;
-        turbo::Status _status;
     };
 
     template<typename T>
-    AverageGauge<T>::AverageGauge(const std::string_view &name, const std::string_view &description)
-            : Variable() {
+    turbo::Status AverageGauge<T>::expose(const std::string_view &name, const std::string_view &description) {
         std::string desc(description);
         if (desc.empty()) {
             desc = turbo::format("AverageGauge {}", name);
         }
-        _status = expose(name, desc, {}, kAvgGaugeAttr);
+        expose_base(name, desc, {}, kAvgGaugeAttr);
     }
 
     template<typename T>
-    AverageGauge<T>::AverageGauge(const std::string_view &name, const std::string_view &description,
-                                  const std::map<std::string, std::string> &tags)
-            : Variable() {
-        _status = expose(name, description, tags, kAvgGaugeAttr);
+    turbo::Status AverageGauge<T>::expose(const std::string_view &name, const std::string_view &description,
+                                          const std::map<std::string, std::string> &tags) {
+        return expose_base(name, description, tags, kAvgGaugeAttr);
     }
 
     template<typename T, typename Char>

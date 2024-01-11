@@ -27,7 +27,8 @@
 #include "turbo/random/random.h"
 
 TEST_CASE("reducer") {
-    turbo::Counter<int64_t> adder("counter");
+    turbo::Counter<int64_t> adder;
+    adder.expose("test");
 
     bool stop = false;
     auto thread_func = [&adder, &stop]() {
@@ -64,9 +65,12 @@ TEST_CASE("gauges") {
     static_assert(std::is_invocable_r_v<void, void(int), int>);
     static_assert(not std::is_invocable_r_v<void, void(int), void>);
 
-    turbo::AverageGauge<uint32_t> gauge("test");
-    turbo::MaxerGauge<uint32_t> max_gauge("max_gauge");
-    turbo::MinerGauge<uint32_t> min_gauge("min_gauge");
+    turbo::AverageGauge<uint32_t> gauge;
+    gauge.expose("avg_gauge");
+    turbo::MaxerGauge<uint32_t> max_gauge;
+    max_gauge.expose("max_gauge");
+    turbo::MinerGauge<uint32_t> min_gauge;
+    min_gauge.expose("min_gauge");
 
     bool stop = false;
     auto thread_func = [&gauge, &stop, &max_gauge, &min_gauge]() {
@@ -96,7 +100,8 @@ TEST_CASE("gauges") {
 }
 
 TEST_CASE("funciotn") {
-    turbo::UniqueGauge<std::function<int()>> gauge("funciton_test");
+    turbo::UniqueGauge<std::function<int()>> gauge;
+    gauge.expose("function_test");
     gauge.set([]() { return turbo::uniform<uint32_t>(0, 200); });
     int i = 0;
     while (i < 10) {
@@ -109,7 +114,8 @@ TEST_CASE("funciotn") {
 
 TEST_CASE("histogram") {
     std::array<uint32_t, 5> bins = {10, 20, 30, 40, 50};
-    turbo::Histogram<uint32_t, 5> histogram("histogram");
+    turbo::Histogram<uint32_t, 5> histogram;
+    histogram.expose("histogram");
     std::atomic<int> count(0);
 
     bool stop = false;

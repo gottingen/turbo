@@ -101,7 +101,7 @@ namespace turbo {
          * @param type
          * @return
          */
-        turbo::Status expose(const std::string_view &name, const std::string_view &description,
+        turbo::Status expose_base(const std::string_view &name, const std::string_view &description,
                              const std::map<std::string, std::string> &labels, const VariableAttr &type);
 
         /**
