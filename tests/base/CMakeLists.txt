@@ -16,36 +16,6 @@
 
 carbin_cc_test(
         NAME
-        atexit_test
-        SOURCES
-        "atexit_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
-        status_test
-        SOURCES
-        "status_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
-)
-
-carbin_cc_test(
-        NAME
         throw_delegate_test
         SOURCES
         "throw_delegate_test.cc"
@@ -54,21 +24,6 @@ carbin_cc_test(
         DEPS
         ${CARBIN_DEPS_LINK}
         turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        result_status_test
-        SOURCES
-        "result_status_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-        ${GTEST_LIB}
-        ${GMOCK_LIB}
-        ${GTEST_MAIN_LIB}
 )
 
 
@@ -227,42 +182,6 @@ carbin_cc_test(
         turbo::turbo
 )
 
-carbin_cc_test(
-        NAME
-        sysinfo_test
-        SOURCES
-        "sysinfo_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        processor_test
-        SOURCES
-        "processor_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
-
-carbin_cc_test(
-        NAME
-        endpoint_test
-        SOURCES
-        "endpoint_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        "-fno-access-control"
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)
 
 carbin_cc_test(
         NAME
@@ -288,14 +207,3 @@ carbin_cc_test(
         turbo::turbo
 )
 
-carbin_cc_test(
-        NAME
-        env_test
-        SOURCES
-        "env_test.cc"
-        COPTS
-        ${CARBIN_CXX_OPTIONS}
-        DEPS
-        ${CARBIN_DEPS_LINK}
-        turbo::turbo
-)

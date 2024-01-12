@@ -21,9 +21,9 @@
 
 #include "turbo/files/internal/filesystem.h"
 #include "turbo/files/internal/fwd.h"
-#include "turbo/base/result_status.h"
+#include "turbo/status/result_status.h"
 #include "turbo/files/file_option.h"
-#include "turbo/files/io.h"
+#include "turbo/system/io.h"
 #include "turbo/format/format.h"
 #include <string_view>
 

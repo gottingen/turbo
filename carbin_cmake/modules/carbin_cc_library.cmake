@@ -179,7 +179,7 @@ function(carbin_cc_library)
                     )
             set_property(TARGET ${CARBIN_CC_LIB_NAME}_SHARED PROPERTY POSITION_INDEPENDENT_CODE 1)
             set_target_properties(${CARBIN_CC_LIB_NAME}_SHARED PROPERTIES OUTPUT_NAME ${CARBIN_CC_LIB_NAME} CLEAN_DIRECT_OUTPUT 1)
-            add_library(${CARBIN_CC_LIB_NAMESPACE}::${CARBIN_CC_LIB_NAME}_shared ALIAS ${CARBIN_CC_LIB_NAME}_SHARED)
+            add_library(${CARBIN_CC_LIB_NAMESPACE}::${CARBIN_CC_LIB_NAME} ALIAS ${CARBIN_CC_LIB_NAME}_SHARED)
         endif ()
 
     else (CARBIN_CC_LIB_IS_INTERFACE)

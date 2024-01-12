@@ -21,7 +21,7 @@
 #include "turbo/log/details/os.h"
 #include <turbo/format/format.h>
 #include "turbo/log/formatter.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 
 #include <algorithm>
 #include <array>

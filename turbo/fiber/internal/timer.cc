@@ -18,8 +18,8 @@
 
 #include "turbo/fiber/internal/timer.h"
 #include "turbo/fiber/internal/schedule_group.h"
-#include "turbo/base/result_status.h"
-#include "turbo/base/status.h"
+#include "turbo/status/result_status.h"
+#include "turbo/status/status.h"
 
 namespace turbo {
     template Status init_timer_thread<fiber_timer_thread>(const TimerThreadOptions *options);

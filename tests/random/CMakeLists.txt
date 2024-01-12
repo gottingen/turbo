@@ -139,6 +139,8 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
+        pthread
+        m
         ${GMOCK_LIB}
         ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
@@ -184,7 +186,10 @@ carbin_cc_test(
         DEPS
         turbo::turbo
         turbo::random_internal_distribution_test_util
+        -lpthread
+        -lm
         ${GMOCK_LIB}
+        ${GTEST_LIB}
         ${GTEST_MAIN_LIB}
 )
 

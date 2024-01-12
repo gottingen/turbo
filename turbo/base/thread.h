@@ -19,11 +19,11 @@
 #ifndef TURBO_BASE_THREAD_H_
 #define TURBO_BASE_THREAD_H_
 
-#include "turbo/base/threading.h"
+#include "turbo/system/threading.h"
 #include <mutex>
 #include <string>
 #include <condition_variable>
-#include "turbo/base/status.h"
+#include "turbo/status/status.h"
 
 namespace turbo {
 

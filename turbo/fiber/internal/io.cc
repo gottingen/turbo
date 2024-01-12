@@ -21,13 +21,14 @@
 #include <atomic>
 #include "turbo/platform/port.h"
 #include "turbo/times/time.h"
-#include "turbo/files/io.h"                     // make_non_blocking
+#include "turbo/system/io.h"                     // make_non_blocking
 #include "turbo/log/logging.h"
 #include "turbo/hash/hash.h"   // fmix32
 #include "turbo/fiber/internal/waitable_event.h"
 #include "turbo/fiber/internal/fiber_worker.h"                  // FiberWorker
 #include "turbo/fiber/internal/fiber.h"                             // fiber_start_urgent
 #include "turbo/fiber/io.h"
+#include "turbo/status/error.h"
 
 // Implement fiber functions on file descriptors
 
@@ -493,7 +494,11 @@ namespace turbo {
                       socklen_t addrlen) {
         turbo::fiber_internal::FiberWorker *g = turbo::fiber_internal::tls_task_group;
         if (nullptr == g || g->is_current_pthread_task()) {
-            return ::connect(sockfd, serv_addr, addrlen) ? turbo::internal_error("") : turbo::ok_status();
+            auto r = ::connect(sockfd, serv_addr, addrlen);
+            if(r != 0) {
+                turbo::errno_to_status(errno, "");
+            }
+            return turbo::ok_status();
         }
         // FIXME: Scoped non-blocking?
         turbo::make_non_blocking(sockfd);

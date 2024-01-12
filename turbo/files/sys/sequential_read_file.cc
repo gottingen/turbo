@@ -79,9 +79,6 @@ namespace turbo {
             }
 
         };
-        if (has_read == 0) {
-            return turbo::reach_file_end_error("");
-        }
         return has_read;
     }
 

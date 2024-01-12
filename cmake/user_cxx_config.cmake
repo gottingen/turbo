@@ -39,6 +39,25 @@ endif ()
 # set it to haswell arch
 ##############################################################################
 set(CARBIN_CXX_OPTIONS ${CARBIN_DEFAULT_COPTS} ${CARBIN_ARCH_OPTION} ${CARBIN_RANDOM_RANDEN_COPTS})
+list(APPEND CARBIN_CXX_OPTIONS "-fPIC")
+list(APPEND CARBIN_CXX_OPTIONS "-Wall")
+list(APPEND CARBIN_CXX_OPTIONS "-Wextra")
+list(APPEND CARBIN_CXX_OPTIONS "-Werror")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-ignored-attributes")
+list(APPEND CARBIN_CXX_OPTIONS "-D__const__=__unused__")
+list(APPEND CARBIN_CXX_OPTIONS "-D__STRICT_ANSI__")
+list(APPEND CARBIN_CXX_OPTIONS "-fstrict-aliasing")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-unused-parameter")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-unused-variable")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-unused-function")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-unused-but-set-variable")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-unused-but-set-parameter")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-unused-result")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-unused-value")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-address")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-class-memaccess")
+list(APPEND CARBIN_CXX_OPTIONS "-Wno-deprecated-declarations")
+
 ###############################
 #
 # define you options here

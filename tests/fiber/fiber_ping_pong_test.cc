@@ -28,7 +28,7 @@
 #include "turbo/times/stop_watcher.h"
 #include <turbo/fiber/internal/waitable_event.h>
 #include "turbo/fiber/fiber.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 #include "turbo/concurrent/spinlock_wait.h"
 
 using namespace turbo;

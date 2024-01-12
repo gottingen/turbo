@@ -29,7 +29,7 @@
 #include "turbo/fiber/internal/timer.h"
 #include "turbo/fiber/internal/offset_table.h"
 #include "turbo/log/logging.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 
 namespace turbo::fiber_internal {
 

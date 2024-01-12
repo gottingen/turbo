@@ -24,8 +24,8 @@
 #include "turbo/times/timer_thread.h"
 #include "turbo/platform/port.h"
 #include "turbo/hash/hash.h"
-#include "turbo/base/sysinfo.h"
-#include "turbo/base/threading.h"
+#include "turbo/system/sysinfo.h"
+#include "turbo/system/threading.h"
 #include <utility>
 
 namespace turbo {

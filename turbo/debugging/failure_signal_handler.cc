@@ -49,7 +49,7 @@
 #include "turbo/debugging/internal/examine_stack.h"
 #include "turbo/debugging/stacktrace.h"
 #include "turbo/platform/port.h"
-#include "turbo/base/internal/sysinfo.h"
+#include "turbo/system/internal/sysinfo.h"
 
 #ifndef _WIN32
 #define TURBO_HAVE_SIGACTION

@@ -105,7 +105,7 @@ namespace turbo {
         if (desc.empty()) {
             desc = turbo::format("AverageGauge {}", name);
         }
-        expose_base(name, desc, {}, kAvgGaugeAttr);
+        return expose_base(name, desc, {}, kAvgGaugeAttr);
     }
 
     template<typename T>

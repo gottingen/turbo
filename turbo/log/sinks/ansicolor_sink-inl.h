@@ -16,7 +16,7 @@
 #pragma once
 
 #include <turbo/log/sinks/ansicolor_sink.h>
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 #include <turbo/log/pattern_formatter.h>
 #include "turbo/log/details/os.h"
 #include "turbo/format/print.h"

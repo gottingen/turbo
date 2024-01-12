@@ -24,7 +24,7 @@
 #include "turbo/base/endian.h"
 #include "turbo/base/internal/raw_logging.h"
 #include "turbo/concurrent/spinlock.h"
-#include "turbo/base/internal/sysinfo.h"
+#include "turbo/system/internal/sysinfo.h"
 #include "turbo/platform/internal/unaligned_access.h"
 #include "turbo/platform/port.h"
 #include "turbo/random/internal/randen.h"

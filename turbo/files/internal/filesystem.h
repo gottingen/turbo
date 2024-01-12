@@ -46,6 +46,9 @@
 // #define BSD manifest constant only in
 // sys/param.h
 
+#include "turbo/platform/port.h"
+#include "turbo/status/error.h"
+
 #ifndef _WIN32
 
 #include <sys/param.h>
@@ -201,13 +204,6 @@ namespace turbo {
     namespace filesystem {
 
         using std::basic_string_view;
-
-// temporary existing exception type for yet unimplemented parts
-        class TURBO_DLL not_implemented_exception : public std::logic_error {
-        public:
-            not_implemented_exception()
-                    : std::logic_error("function not implemented yet.") {}
-        };
 
         template<typename char_type>
         class path_helper_base {
@@ -1653,9 +1649,7 @@ public:
             TURBO_DLL std::error_code make_error_code(portable_error err);
 
 #ifdef TURBO_PLATFORM_WINDOWS
-            TURBO_DLL std::error_code make_system_error(uint32_t err = 0);
 #else
-            TURBO_DLL std::error_code make_system_error(int err = 0);
 
             template<typename T, typename = int>
             struct has_d_type : std::false_type {
@@ -2345,7 +2339,7 @@ inline std::wstring toWChar(const charT *unicodeString) {
             template<typename ErrorNumber>
             inline std::string systemErrorText(ErrorNumber code = 0) {
 #if defined(TURBO_PLATFORM_WINDOWS)
-                                                                                                                                        LPVOID msgBuf;
+LPVOID msgBuf;
   DWORD dw = code ? static_cast<DWORD>(code) : ::GetLastError();
   FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                      FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -2362,7 +2356,7 @@ inline std::wstring toWChar(const charT *unicodeString) {
             }
 
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                    using CreateSymbolicLinkW_fp = BOOLEAN(WINAPI *)(LPCWSTR, LPCWSTR, DWORD);
+using CreateSymbolicLinkW_fp = BOOLEAN(WINAPI *)(LPCWSTR, LPCWSTR, DWORD);
 using CreateHardLinkW_fp = BOOLEAN(WINAPI *)(LPCWSTR, LPCWSTR,
                                              LPSECURITY_ATTRIBUTES);
 
@@ -2417,7 +2411,7 @@ inline void create_hardlink(const path &target_name,
   if (api_call) {
     if (api_call(TURBO_NATIVEWP(new_hardlink), TURBO_NATIVEWP(target_name),
                  NULL) == 0) {
-      ec = detail::make_system_error();
+      ec = turbo::make_system_error();
     }
   } else {
     ec = detail::make_system_error(ERROR_NOT_SUPPORTED);
@@ -2433,7 +2427,7 @@ inline path getFullPathName(const wchar_t *p, std::error_code &ec) {
       return path(std::wstring(buf.data(), s2));
     }
   }
-  ec = detail::make_system_error();
+  ec = turbo::make_system_error();
   return path();
 }
 
@@ -2443,7 +2437,7 @@ inline path getFullPathName(const wchar_t *p, std::error_code &ec) {
                                        const path &new_symlink, bool,
                                        std::error_code &ec) {
                 if (::symlink(target_name.c_str(), new_symlink.c_str()) != 0) {
-                    ec = detail::make_system_error();
+                    ec = turbo::make_system_error();
                 }
             }
 
@@ -2453,7 +2447,7 @@ inline path getFullPathName(const wchar_t *p, std::error_code &ec) {
                                         const path &new_hardlink,
                                         std::error_code &ec) {
                 if (::link(target_name.c_str(), new_hardlink.c_str()) != 0) {
-                    ec = detail::make_system_error();
+                    ec = turbo::make_system_error();
                 }
             }
 
@@ -2463,16 +2457,16 @@ inline path getFullPathName(const wchar_t *p, std::error_code &ec) {
             template<typename T>
             inline file_status file_status_from_st_mode(T mode) {
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                        file_type ft = file_type::unknown;
-  if ((mode & _S_IFDIR) == _S_IFDIR) {
-    ft = file_type::directory;
-  } else if ((mode & _S_IFREG) == _S_IFREG) {
-    ft = file_type::regular;
-  } else if ((mode & _S_IFCHR) == _S_IFCHR) {
-    ft = file_type::character;
-  }
-  perms prms = static_cast<perms>(mode & 0xfff);
-  return file_status(ft, prms);
+                file_type ft = file_type::unknown;
+                  if ((mode & _S_IFDIR) == _S_IFDIR) {
+                    ft = file_type::directory;
+                  } else if ((mode & _S_IFREG) == _S_IFREG) {
+                    ft = file_type::regular;
+                  } else if ((mode & _S_IFCHR) == _S_IFCHR) {
+                    ft = file_type::character;
+                  }
+                  perms prms = static_cast<perms>(mode & 0xfff);
+                  return file_status(ft, prms);
 #else
                 file_type ft = file_type::unknown;
                 if (S_ISDIR(mode)) {
@@ -2497,7 +2491,7 @@ inline path getFullPathName(const wchar_t *p, std::error_code &ec) {
 
 #ifdef TURBO_PLATFORM_WINDOWS
 
-                                                                                                                                    class unique_handle {
+class unique_handle {
 public:
   typedef HANDLE element_type;
 
@@ -2574,7 +2568,7 @@ inline
       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING,
       FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, 0));
   if (!file) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return nullptr;
   }
 
@@ -2587,7 +2581,7 @@ inline
                       &bufferUsed, 0)) {
     return reparseData;
   } else {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   }
   return nullptr;
 }
@@ -2595,57 +2589,57 @@ inline
 
             inline path resolveSymlink(const path &p, std::error_code &ec) {
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                        path result;
-  auto reparseData = detail::getReparseData(p, ec);
-  if (!ec) {
-    if (reparseData && IsReparseTagMicrosoft(reparseData->ReparseTag)) {
-      switch (reparseData->ReparseTag) {
-      case IO_REPARSE_TAG_SYMLINK: {
-        auto printName = std::wstring(
-            &reparseData->SymbolicLinkReparseBuffer.PathBuffer
-                 [reparseData->SymbolicLinkReparseBuffer.PrintNameOffset /
-                  sizeof(WCHAR)],
-            reparseData->SymbolicLinkReparseBuffer.PrintNameLength /
-                sizeof(WCHAR));
-        auto substituteName = std::wstring(
-            &reparseData->SymbolicLinkReparseBuffer.PathBuffer
-                 [reparseData->SymbolicLinkReparseBuffer.SubstituteNameOffset /
-                  sizeof(WCHAR)],
-            reparseData->SymbolicLinkReparseBuffer.SubstituteNameLength /
-                sizeof(WCHAR));
-        if (detail::endsWith(substituteName, printName) &&
-            detail::startsWith(substituteName, std::wstring(L"\\??\\"))) {
-          result = printName;
-        } else {
-          result = substituteName;
-        }
-        if (reparseData->SymbolicLinkReparseBuffer.Flags &
-            0x1 /*SYMLINK_FLAG_RELATIVE*/) {
-          result = p.parent_path() / result;
-        }
-        break;
-      }
-      case IO_REPARSE_TAG_MOUNT_POINT:
-        result = detail::getFullPathName(TURBO_NATIVEWP(p), ec);
-        // result =
-        // std::wstring(&reparseData->MountPointReparseBuffer.PathBuffer[reparseData->MountPointReparseBuffer.SubstituteNameOffset
-        // / sizeof(WCHAR)],
-        // reparseData->MountPointReparseBuffer.SubstituteNameLength /
-        // sizeof(WCHAR));
-        break;
-      default:
-        break;
-      }
-    }
-  }
-  return result;
+            path result;
+                  auto reparseData = detail::getReparseData(p, ec);
+                  if (!ec) {
+                    if (reparseData && IsReparseTagMicrosoft(reparseData->ReparseTag)) {
+                      switch (reparseData->ReparseTag) {
+                      case IO_REPARSE_TAG_SYMLINK: {
+                        auto printName = std::wstring(
+                            &reparseData->SymbolicLinkReparseBuffer.PathBuffer
+                                 [reparseData->SymbolicLinkReparseBuffer.PrintNameOffset /
+                                  sizeof(WCHAR)],
+                            reparseData->SymbolicLinkReparseBuffer.PrintNameLength /
+                                sizeof(WCHAR));
+                        auto substituteName = std::wstring(
+                            &reparseData->SymbolicLinkReparseBuffer.PathBuffer
+                                 [reparseData->SymbolicLinkReparseBuffer.SubstituteNameOffset /
+                                  sizeof(WCHAR)],
+                            reparseData->SymbolicLinkReparseBuffer.SubstituteNameLength /
+                                sizeof(WCHAR));
+                        if (detail::endsWith(substituteName, printName) &&
+                            detail::startsWith(substituteName, std::wstring(L"\\??\\"))) {
+                          result = printName;
+                        } else {
+                          result = substituteName;
+                        }
+                        if (reparseData->SymbolicLinkReparseBuffer.Flags &
+                            0x1 /*SYMLINK_FLAG_RELATIVE*/) {
+                          result = p.parent_path() / result;
+                        }
+                        break;
+                      }
+                      case IO_REPARSE_TAG_MOUNT_POINT:
+                        result = detail::getFullPathName(TURBO_NATIVEWP(p), ec);
+                        // result =
+                        // std::wstring(&reparseData->MountPointReparseBuffer.PathBuffer[reparseData->MountPointReparseBuffer.SubstituteNameOffset
+                        // / sizeof(WCHAR)],
+                        // reparseData->MountPointReparseBuffer.SubstituteNameLength /
+                        // sizeof(WCHAR));
+                        break;
+                      default:
+                        break;
+                      }
+                    }
+                  }
+                  return result;
 #else
                 size_t bufferSize = 256;
                 while (true) {
                     std::vector<char> buffer(bufferSize, static_cast<char>(0));
                     auto rc = ::readlink(p.c_str(), buffer.data(), buffer.size());
                     if (rc < 0) {
-                        ec = detail::make_system_error();
+                        ec = turbo::make_system_error();
                         return path();
                     } else if (rc < static_cast<int>(bufferSize)) {
                         return path(
@@ -2757,7 +2751,7 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
                                                                                                                                         file_status fs;
   WIN32_FILE_ATTRIBUTE_DATA attr;
   if (!GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   } else {
     ec.clear();
     fs = detail::status_from_INFO(p, &attr, ec, sz, lwt);
@@ -2780,7 +2774,7 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
                     file_status f_s = detail::file_status_from_st_mode(fs.st_mode);
                     return f_s;
                 }
-                ec = detail::make_system_error();
+                ec = turbo::make_system_error();
                 if (detail::is_not_found_error(ec)) {
                     return file_status(file_type::not_found, perms::unknown);
                 }
@@ -2803,7 +2797,7 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
   WIN32_FILE_ATTRIBUTE_DATA attr;
   if (!::GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard,
                               &attr)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   } else if (attr.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) {
     auto reparseData = detail::getReparseData(p, ec);
     if (!ec && reparseData && IsReparseTagMicrosoft(reparseData->ReparseTag) &&
@@ -2845,7 +2839,7 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
                         if (result == 0) {
                             fs = detail::file_status_from_st_mode(st.st_mode);
                         } else {
-                            ec = detail::make_system_error();
+                            ec = turbo::make_system_error();
                             if (detail::is_not_found_error(ec)) {
                                 return file_status(file_type::not_found, perms::unknown);
                             }
@@ -2863,7 +2857,7 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
                     }
                     return fs;
                 } else {
-                    ec = detail::make_system_error();
+                    ec = turbo::make_system_error();
                     if (detail::is_not_found_error(ec)) {
                         return file_status(file_type::not_found, perms::unknown);
                     }
@@ -2901,16 +2895,15 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
 #endif
         }
 
-//-----------------------------------------------------------------------------
-// [fs.path.construct] constructors and destructor
+        //-----------------------------------------------------------------------------
+        // [fs.path.construct] constructors and destructor
 
         inline path::path() noexcept {}
 
         inline path::path(const path &p)
                 : _path(p._path)
 #if defined(TURBO_PLATFORM_WINDOWS) && defined(TURBO_WIN_AUTO_PREFIX_LONG_PATH)
-                                                                                                                                ,
-      _prefixLength(p._prefixLength)
+    ,_prefixLength(p._prefixLength)
 #endif
         {
         }
@@ -3452,12 +3445,12 @@ inline file_status status_from_INFO(const path &p, const INFO *info,
         inline path::string_type::size_type
         path::root_name_length() const noexcept {
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                    if (_path.length() >= _prefixLength + 2 &&
-      std::toupper(static_cast<unsigned char>(_path[_prefixLength])) >= 'A' &&
-      std::toupper(static_cast<unsigned char>(_path[_prefixLength])) <= 'Z' &&
-      _path[_prefixLength + 1] == ':') {
-    return 2;
-  }
+        if (_path.length() >= _prefixLength + 2 &&
+          std::toupper(static_cast<unsigned char>(_path[_prefixLength])) >= 'A' &&
+          std::toupper(static_cast<unsigned char>(_path[_prefixLength])) <= 'Z' &&
+          _path[_prefixLength + 1] == ':') {
+                return 2;
+        }
 #endif
             if (_path.length() > _prefixLength + 2 &&
                 _path[_prefixLength] == preferred_separator &&
@@ -3947,8 +3940,8 @@ inline bool has_executable_extension(const path &p) {
         return is;
     }
 
-//-----------------------------------------------------------------------------
-// [fs.class.filesystem_error] Class filesystem_error
+    //-----------------------------------------------------------------------------
+    // [fs.class.filesystem_error] Class filesystem_error
     inline
     filesystem_error::filesystem_error(const std::string &what_arg,
                                        std::error_code ec)
@@ -4006,7 +3999,7 @@ inline bool has_executable_extension(const path &p) {
     inline path absolute(const path &p, std::error_code &ec) {
         ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                if (p.empty()) {
+    if (p.empty()) {
     return absolute(current_path(ec), ec) / "";
   }
   ULONG size = ::GetFullPathNameW(TURBO_NATIVEWP(p), 0, 0, 0);
@@ -4021,7 +4014,7 @@ inline bool has_executable_extension(const path &p) {
       return result;
     }
   }
-  ec = detail::make_system_error();
+  ec = turbo::make_system_error();
   return path();
 #else
         path base = current_path(ec);
@@ -4044,7 +4037,7 @@ inline bool has_executable_extension(const path &p) {
                 }
             }
         }
-        ec = detail::make_system_error();
+        ec = turbo::make_system_error();
         return path();
 #endif
     }
@@ -4275,12 +4268,12 @@ inline bool has_executable_extension(const path &p) {
                 copy_options::update_existing) {
                 auto from_time = last_write_time(from, ec);
                 if (ec) {
-                    ec = detail::make_system_error();
+                    ec = turbo::make_system_error();
                     return false;
                 }
                 auto to_time = last_write_time(to, ec);
                 if (ec) {
-                    ec = detail::make_system_error();
+                    ec = turbo::make_system_error();
                     return false;
                 }
                 if (from_time <= to_time) {
@@ -4291,7 +4284,7 @@ inline bool has_executable_extension(const path &p) {
         }
 #ifdef TURBO_PLATFORM_WINDOWS
                                                                                                                                 if (!::CopyFileW(TURBO_NATIVEWP(from), TURBO_NATIVEWP(to), !overwrite)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return false;
   }
   return true;
@@ -4299,7 +4292,7 @@ inline bool has_executable_extension(const path &p) {
         std::vector<char> buffer(16384, '\0');
         int in = -1, out = -1;
         if ((in = ::open(from.c_str(), O_RDONLY)) < 0) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
             return false;
         }
         int mode = O_CREAT | O_WRONLY | O_TRUNC;
@@ -4308,7 +4301,7 @@ inline bool has_executable_extension(const path &p) {
         }
         if ((out = ::open(to.c_str(), mode,
                           static_cast<int>(sf.permissions() & perms::all))) < 0) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
             ::close(in);
             return false;
         }
@@ -4321,7 +4314,7 @@ inline bool has_executable_extension(const path &p) {
                     br -= bw;
                     offset += bw;
                 } else if (bw < 0) {
-                    ec = detail::make_system_error();
+                    ec = turbo::make_system_error();
                     ::close(in);
                     ::close(out);
                     return false;
@@ -4464,11 +4457,11 @@ inline bool has_executable_extension(const path &p) {
                                                                                                                                 if (!attributes.empty()) {
     if (!::CreateDirectoryExW(TURBO_NATIVEWP(attributes), TURBO_NATIVEWP(p),
                               NULL)) {
-      ec = detail::make_system_error();
+      ec = turbo::make_system_error();
       return false;
     }
   } else if (!::CreateDirectoryW(TURBO_NATIVEWP(p), NULL)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return false;
   }
 #else
@@ -4476,13 +4469,13 @@ inline bool has_executable_extension(const path &p) {
         if (!attributes.empty()) {
             struct ::stat fileStat;
             if (::stat(attributes.c_str(), &fileStat) != 0) {
-                ec = detail::make_system_error();
+                ec = turbo::make_system_error();
                 return false;
             }
             attribs = fileStat.st_mode;
         }
         if (::mkdir(p.c_str(), attribs) != 0) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
             return false;
         }
 #endif
@@ -4567,10 +4560,10 @@ inline bool has_executable_extension(const path &p) {
     inline path current_path(std::error_code &ec) {
         ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                DWORD pathlen = ::GetCurrentDirectoryW(0, 0);
+    DWORD pathlen = ::GetCurrentDirectoryW(0, 0);
   std::unique_ptr<wchar_t[]> buffer(new wchar_t[size_t(pathlen) + 1]);
   if (::GetCurrentDirectoryW(pathlen, buffer.get()) == 0) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return path();
   }
   return path(std::wstring(buffer.get()), path::native_format);
@@ -4579,7 +4572,7 @@ inline bool has_executable_extension(const path &p) {
                 std::max(int(::pathconf(".", _PC_PATH_MAX)), int(PATH_MAX)));
         std::unique_ptr<char[]> buffer(new char[pathlen + 1]);
         if (::getcwd(buffer.get(), pathlen) == nullptr) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
             return path();
         }
         return path(buffer.get());
@@ -4603,11 +4596,11 @@ inline bool has_executable_extension(const path &p) {
         ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
                                                                                                                                 if (!::SetCurrentDirectoryW(TURBO_NATIVEWP(p))) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   }
 #else
         if (::chdir(p.string().c_str()) == -1) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
         }
 #endif
     }
@@ -4647,8 +4640,8 @@ inline bool has_executable_extension(const path &p) {
                            std::error_code &ec) noexcept {
         ec.clear();
 #ifdef TURBO_PLATFORM_WINDOWS
-                                                                                                                                detail::unique_handle file1(
-      ::CreateFileW(TURBO_NATIVEWP(p1), 0,
+        detail::unique_handle file1(
+      : :CreateFileW(TURBO_NATIVEWP(p1), 0,
                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0,
                     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
   auto e1 = ::GetLastError();
@@ -4668,11 +4661,11 @@ inline bool has_executable_extension(const path &p) {
   }
   BY_HANDLE_FILE_INFORMATION inf1, inf2;
   if (!::GetFileInformationByHandle(file1.get(), &inf1)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return false;
   }
   if (!::GetFileInformationByHandle(file2.get(), &inf2)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return false;
   }
   return inf1.ftLastWriteTime.dwLowDateTime ==
@@ -4693,9 +4686,9 @@ inline bool has_executable_extension(const path &p) {
 #ifdef LWG_2937_BEHAVIOUR
             ec = detail::make_system_error(e1 ? e1 : errno);
 #else
-                                                                                                                                    if (rc1 && rc2) {
-      ec = detail::make_system_error(e1 ? e1 : errno);
-    }
+        if (rc1 && rc2) {
+            ec = detail::make_system_error(e1 ? e1 : errno);
+        }
 #endif
             return false;
         }
@@ -4723,7 +4716,7 @@ inline bool has_executable_extension(const path &p) {
 #ifdef TURBO_PLATFORM_WINDOWS
                                                                                                                                 WIN32_FILE_ATTRIBUTE_DATA attr;
   if (!GetFileAttributesExW(TURBO_NATIVEWP(p), GetFileExInfoStandard, &attr)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return static_cast<uintmax_t>(-1);
   }
   return static_cast<uintmax_t>(attr.nFileSizeHigh)
@@ -4732,7 +4725,7 @@ inline bool has_executable_extension(const path &p) {
 #else
         struct ::stat fileStat;
         if (::stat(p.c_str(), &fileStat) == -1) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
             return static_cast<uintmax_t>(-1);
         }
         return static_cast<uintmax_t>(fileStat.st_size);
@@ -4764,10 +4757,10 @@ inline bool has_executable_extension(const path &p) {
                     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0));
   BY_HANDLE_FILE_INFORMATION inf;
   if (!file) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   } else {
     if (!::GetFileInformationByHandle(file.get(), &inf)) {
-      ec = detail::make_system_error();
+      ec = turbo::make_system_error();
     } else {
       result = inf.nNumberOfLinks;
     }
@@ -4997,7 +4990,7 @@ inline bool has_executable_extension(const path &p) {
   ft.dwLowDateTime = static_cast<DWORD>(tt);
   ft.dwHighDateTime = static_cast<DWORD>(tt >> 32);
   if (!::SetFileTime(file.get(), 0, 0, &ft)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   }
 #elif defined(TURBO_PLATFORM_OSX)
                                                                                                                                 #ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
@@ -5015,7 +5008,7 @@ inline bool has_executable_extension(const path &p) {
       return;
     }
   }
-  ec = detail::make_system_error();
+  ec = turbo::make_system_error();
   return;
 #else
   struct ::timespec times[2];
@@ -5025,7 +5018,7 @@ inline bool has_executable_extension(const path &p) {
   times[1].tv_nsec = 0; // std::chrono::duration_cast<std::chrono::nanoseconds>(d).count()
                         // % 1000000000;
   if (::utimensat(AT_FDCWD, p.c_str(), times, AT_SYMLINK_NOFOLLOW) != 0) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   }
   return;
 #endif
@@ -5048,7 +5041,7 @@ inline bool has_executable_extension(const path &p) {
 #else
         if (::utimensat((int) AT_FDCWD, p.c_str(), times, AT_SYMLINK_NOFOLLOW) != 0) {
 #endif
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
         }
         return;
 #endif
@@ -5100,7 +5093,7 @@ inline bool has_executable_extension(const path &p) {
       return;
     }
   }
-  ec = detail::make_system_error();
+  ec = turbo::make_system_error();
 #else
   int mode = 0;
   if ((prms & perms::owner_read) == perms::owner_read) {
@@ -5110,13 +5103,13 @@ inline bool has_executable_extension(const path &p) {
     mode |= _S_IWRITE;
   }
   if (::_wchmod(p.wstring().c_str(), mode) != 0) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
   }
 #endif
 #else
         if ((opts & perm_options::nofollow) != perm_options::nofollow) {
             if (::chmod(p.c_str(), static_cast<mode_t>(prms)) != 0) {
-                ec = detail::make_system_error();
+                ec = turbo::make_system_error();
             }
         }
 #endif
@@ -5293,11 +5286,11 @@ inline bool has_executable_extension(const path &p) {
   if (!ec) {
     if (attr & FILE_ATTRIBUTE_DIRECTORY) {
       if (!RemoveDirectoryW(cstr)) {
-        ec = detail::make_system_error();
+        ec = turbo::make_system_error();
       }
     } else {
       if (!DeleteFileW(cstr)) {
-        ec = detail::make_system_error();
+        ec = turbo::make_system_error();
       }
     }
   }
@@ -5307,7 +5300,7 @@ inline bool has_executable_extension(const path &p) {
             if (error == ENOENT) {
                 return false;
             }
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
         }
 #endif
         return ec ? false : true;
@@ -5424,13 +5417,13 @@ inline bool has_executable_extension(const path &p) {
                                                                                                                                 if (from != to) {
     if (!MoveFileExW(TURBO_NATIVEWP(from), TURBO_NATIVEWP(to),
                      (DWORD)MOVEFILE_REPLACE_EXISTING)) {
-      ec = detail::make_system_error();
+      ec = turbo::make_system_error();
     }
   }
 #else
         if (from != to) {
             if (::rename(from.c_str(), to.c_str()) != 0) {
-                ec = detail::make_system_error();
+                ec = turbo::make_system_error();
             }
         }
 #endif
@@ -5499,14 +5492,14 @@ inline bool has_executable_extension(const path &p) {
     detail::unique_handle file(CreateFileW(TURBO_NATIVEWP(p), GENERIC_WRITE, 0,
                                          NULL, OPEN_EXISTING, 0, NULL));
     if (!file) {
-        ec = detail::make_system_error();
+        ec = turbo::make_system_error();
     } else if (SetFilePointerEx(file.get(), lisize, NULL, FILE_BEGIN) == 0 ||
              SetEndOfFile(file.get()) == 0) {
-        ec = detail::make_system_error();
+        ec = turbo::make_system_error();
     }
 #else
         if (::truncate(p.c_str(), static_cast<off_t>(size)) != 0) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
         }
 #endif
     }
@@ -5569,7 +5562,7 @@ inline bool has_executable_extension(const path &p) {
   ULARGE_INTEGER totalNumberOfFreeBytes = {{0, 0}};
   if (!GetDiskFreeSpaceExW(TURBO_NATIVEWP(p), &freeBytesAvailableToCaller,
                            &totalNumberOfBytes, &totalNumberOfFreeBytes)) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return {static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1),
             static_cast<uintmax_t>(-1)};
   }
@@ -5579,7 +5572,7 @@ inline bool has_executable_extension(const path &p) {
 #else
         struct ::statvfs sfs;
         if (::statvfs(p.c_str(), &sfs) != 0) {
-            ec = detail::make_system_error();
+            ec = turbo::make_system_error();
             return {static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1),
                     static_cast<uintmax_t>(-1)};
         }
@@ -5687,7 +5680,7 @@ inline bool has_executable_extension(const path &p) {
                                                                                                                                 wchar_t buffer[512];
   auto rc = GetTempPathW(511, buffer);
   if (!rc || rc > 511) {
-    ec = detail::make_system_error();
+    ec = turbo::make_system_error();
     return path();
   }
   return path(std::wstring(buffer));
@@ -6249,7 +6242,7 @@ public:
         if (error != ERROR_ACCESS_DENIED ||
             (options & directory_options::skip_permission_denied) ==
                 directory_options::none) {
-          _ec = detail::make_system_error();
+          _ec = turbo::make_system_error();
         }
       }
     }
@@ -6362,7 +6355,7 @@ public:
                     if ((error != EACCES && error != EPERM) ||
                         (options & directory_options::skip_permission_denied) ==
                         directory_options::none) {
-                        _ec = detail::make_system_error();
+                        _ec = turbo::make_system_error();
                     }
                 } else {
                     increment(_ec);
@@ -6400,7 +6393,7 @@ public:
                         _dir = nullptr;
                         _dir_entry._path.clear();
                         if (errno) {
-                            ec = detail::make_system_error();
+                            ec = turbo::make_system_error();
                         }
                         break;
                     }

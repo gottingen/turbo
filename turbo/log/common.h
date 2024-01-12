@@ -252,11 +252,11 @@ namespace turbo::tlog {
         }
 
     } // namespace details
-    static constexpr turbo::FileOption kLogFileOption{
-            .open_tries = 5,
-            .open_interval = 10,
-            .create_dir_if_miss = true,
-            .prevent_child = false
+    static constexpr turbo::FileOption  kLogFileOption = turbo::FileOption{
+            5,
+            10,
+            true,
+            false
     };
 } // namespace turbo::tlog
 

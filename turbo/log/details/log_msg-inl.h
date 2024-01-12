@@ -16,7 +16,7 @@
 #pragma once
 
 #include "turbo/log/details/log_msg.h"
-#include "turbo/base/sysinfo.h"
+#include "turbo/system/sysinfo.h"
 
 namespace turbo::tlog::details {
 

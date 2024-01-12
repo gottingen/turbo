@@ -24,7 +24,7 @@
 #include "turbo/fiber/internal/fiber_worker.h"            // FiberWorker
 #include "turbo/fiber/internal/timer.h"
 #include "turbo/fiber/internal/waitable_event.h"
-#include "turbo/fiber/internal/errno.h"
+#include "turbo/status/error.h"
 #include "turbo/concurrent/lock.h"
 
 // This file implements waitable_event.h
